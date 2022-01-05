@@ -125,16 +125,6 @@ typedef struct vlc_ml_show_t
     uint32_t i_nb_seasons;
 } vlc_ml_show_t;
 
-typedef struct vlc_ml_album_track_t
-{
-    int64_t i_artist_id;
-    int64_t i_album_id;
-    int64_t i_genre_id;
-
-    int i_track_nb;
-    int i_disc_nb;
-} vlc_ml_album_track_t;
-
 typedef struct vlc_ml_label_t
 {
     int64_t i_id;
@@ -224,7 +214,15 @@ typedef struct vlc_ml_media_t
     {
         vlc_ml_show_episode_t show_episode;
         vlc_ml_movie_t movie;
-        vlc_ml_album_track_t album_track;
+        struct
+        {
+            int64_t i_artist_id;
+            int64_t i_album_id;
+            int64_t i_genre_id;
+
+            int i_track_nb;
+            int i_disc_nb;
+        } album_track;
     };
 } vlc_ml_media_t;
 

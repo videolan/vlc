@@ -45,8 +45,10 @@ using namespace ::medialibrary::fs;
 class SDFileSystemFactory : public IFileSystemFactory, private IDeviceListerCb {
 public:
     SDFileSystemFactory(vlc_object_t *m_parent,
-                        IMediaLibrary* ml,
                         const std::string &scheme);
+
+    bool
+    initialize( const IMediaLibrary* ml ) override;
 
     std::shared_ptr<IDirectory>
     createDirectory(const std::string &mrl) override;
@@ -100,7 +102,6 @@ private:
 
 private:
     vlc_object_t *const m_parent;
-    IMediaLibrary* m_ml;
     const std::string m_scheme;
     std::shared_ptr<IDeviceLister> m_deviceLister;
     IFileSystemFactoryCb *m_callbacks;

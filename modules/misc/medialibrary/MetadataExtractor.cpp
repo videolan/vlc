@@ -142,17 +142,17 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
         {
             case AUDIO_ES:
                 t.type = medialibrary::parser::IItem::Track::Type::Audio;
-                t.a.nbChannels = p_es->audio.i_channels;
-                t.a.rate = p_es->audio.i_rate;
+                t.u.a.nbChannels = p_es->audio.i_channels;
+                t.u.a.rate = p_es->audio.i_rate;
                 break;
             case VIDEO_ES:
                 t.type = medialibrary::parser::IItem::Track::Type::Video;
-                t.v.fpsNum = p_es->video.i_frame_rate;
-                t.v.fpsDen = p_es->video.i_frame_rate_base;
-                t.v.width = p_es->video.i_width;
-                t.v.height = p_es->video.i_height;
-                t.v.sarNum = p_es->video.i_sar_num;
-                t.v.sarDen = p_es->video.i_sar_den;
+                t.u.v.fpsNum = p_es->video.i_frame_rate;
+                t.u.v.fpsDen = p_es->video.i_frame_rate_base;
+                t.u.v.width = p_es->video.i_width;
+                t.u.v.height = p_es->video.i_height;
+                t.u.v.sarNum = p_es->video.i_sar_num;
+                t.u.v.sarDen = p_es->video.i_sar_den;
                 break;
             default:
                 continue;

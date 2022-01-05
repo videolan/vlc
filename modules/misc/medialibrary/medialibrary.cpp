@@ -32,7 +32,6 @@
 #include "fs/devicelister.h"
 
 #include <medialibrary/IMedia.h>
-#include <medialibrary/IAlbumTrack.h>
 #include <medialibrary/IAlbum.h>
 #include <medialibrary/IArtist.h>
 #include <medialibrary/IGenre.h>
@@ -252,6 +251,21 @@ void MediaLibrary::onBookmarksDeleted( std::set<int64_t> bookmarkIds )
                                     VLC_ML_EVENT_BOOKMARKS_DELETED );
 }
 
+void MediaLibrary::onFoldersAdded( std::vector<medialibrary::FolderPtr> )
+{
+
+}
+
+void MediaLibrary::onFoldersModified( std::set<int64_t> )
+{
+
+}
+
+void MediaLibrary::onFoldersDeleted( std::set<int64_t> )
+{
+
+}
+
 void MediaLibrary::onDiscoveryStarted()
 {
     vlc_ml_event_t ev;
@@ -385,7 +399,21 @@ MediaLibrary* MediaLibrary::create( vlc_medialibrary_module_t* vlc_ml )
     auto mlDir = std::string{ userDir.get() } + "/ml/";
     auto dbPath = mlDir + "ml.db";
     auto mlFolderPath = mlDir + "mlstorage/";
-    auto ml = NewMediaLibrary( dbPath.c_str(), mlFolderPath.c_str(), true );
+    medialibrary::SetupConfig cfg;
+    cfg.deviceListers = { { "smb://", std::make_shared<vlc::medialibrary::DeviceLister>(
+                                           VLC_OBJECT(vlc_ml) ) } };
+    cfg.fsFactories = {
+        std::make_shared<vlc::medialibrary::SDFileSystemFactory>(
+                                    VLC_OBJECT( vlc_ml ), "file://"),
+        std::make_shared<vlc::medialibrary::SDFileSystemFactory>(
+                                    VLC_OBJECT( vlc_ml ), "smb://")
+    };
+
+    cfg.parserServices = {
+        std::make_shared<MetadataExtractor>( VLC_OBJECT( vlc_ml ) )
+    };
+
+    auto ml = NewMediaLibrary( dbPath.c_str(), mlFolderPath.c_str(), true, &cfg );
     if ( !ml )
         return nullptr;
 
@@ -409,12 +437,6 @@ bool MediaLibrary::Init()
     if( m_initialized )
         return true;
 
-    m_ml->registerDeviceLister( std::make_shared<vlc::medialibrary::DeviceLister>(
-                                    VLC_OBJECT(m_vlc_ml) ), "smb://" );
-    m_ml->addFileSystemFactory( std::make_shared<vlc::medialibrary::SDFileSystemFactory>(
-                                    VLC_OBJECT( m_vlc_ml ), m_ml.get(), "file://") );
-    m_ml->addFileSystemFactory( std::make_shared<vlc::medialibrary::SDFileSystemFactory>(
-                                    VLC_OBJECT( m_vlc_ml ), m_ml.get(), "smb://") );
     auto initStatus = m_ml->initialize( this );
     switch ( initStatus )
     {
@@ -453,7 +475,6 @@ bool MediaLibrary::Init()
         }
     }
 
-    m_ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
     try
     {
         m_ml->addThumbnailer( std::make_shared<Thumbnailer>( m_vlc_ml ) );
@@ -1369,7 +1390,8 @@ int MediaLibrary::controlMedia( int query, va_list args )
     switch( query )
     {
         case VLC_ML_MEDIA_UPDATE_PROGRESS:
-            if ( m->setLastPosition( va_arg( args, double ) ) == false )
+            if ( m->setLastPosition( va_arg( args, double ) ) ==
+                    medialibrary::IMedia::ProgressResult::Error )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
@@ -1857,7 +1879,7 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
             if ( pattern != nullptr )
                 query = m_ml->searchPlaylists( pattern, paramsPtr );
             else
-                query = m_ml->playlists( paramsPtr );
+                query = m_ml->playlists( medialibrary::PlaylistType::All, paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             switch ( listQuery )

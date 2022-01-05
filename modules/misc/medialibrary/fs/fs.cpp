@@ -39,16 +39,19 @@ namespace vlc {
 using namespace ::medialibrary;
 
 SDFileSystemFactory::SDFileSystemFactory(vlc_object_t *parent,
-                                         IMediaLibrary* ml,
                                          const std::string &scheme)
     : m_parent(parent)
-    , m_ml( ml )
     , m_scheme(scheme)
-    , m_deviceLister( m_ml->deviceLister( scheme ) )
     , m_callbacks( nullptr )
 {
     m_isNetwork = strncasecmp( m_scheme.c_str(), "file://",
                                m_scheme.length() ) != 0;
+}
+
+bool SDFileSystemFactory::initialize(const IMediaLibrary* ml)
+{
+    m_deviceLister = ml->deviceLister(m_scheme);
+    return m_deviceLister != nullptr;
 }
 
 std::shared_ptr<fs::IDirectory>

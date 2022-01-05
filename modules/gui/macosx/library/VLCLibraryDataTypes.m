@@ -256,24 +256,6 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @end
 
-@implementation VLCMediaLibraryAlbumTrack
-
-- (instancetype)initWithAlbumTrack:(struct vlc_ml_album_track_t *)p_albumTrack
-{
-    self = [super init];
-    if (self && p_albumTrack != NULL) {
-        _artistID = p_albumTrack->i_artist_id;
-        _albumID = p_albumTrack->i_album_id;
-        _genreID = p_albumTrack->i_genre_id;
-
-        _trackNumber = p_albumTrack->i_track_nb;
-        _discNumber = p_albumTrack->i_disc_nb;
-    }
-    return self;
-}
-
-@end
-
 @implementation VLCMediaLibraryGenre
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre
@@ -403,7 +385,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
                 break;
 
             case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
-                _albumTrack = [[VLCMediaLibraryAlbumTrack alloc] initWithAlbumTrack:&p_mediaItem->album_track];
+                _artistID = p_mediaItem->album_track.i_artist_id;
+                _albumID = p_mediaItem->album_track.i_album_id;
+                _genreID = p_mediaItem->album_track.i_genre_id;
+                _trackNumber = p_mediaItem->album_track.i_track_nb;
+                _discNumber = p_mediaItem->album_track.i_disc_nb;
                 break;
 
             default:

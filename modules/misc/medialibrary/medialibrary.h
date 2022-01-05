@@ -217,6 +217,9 @@ public:
     virtual void onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> bookmarks ) override;
     virtual void onBookmarksModified( std::set<int64_t> bookmarksIds ) override;
     virtual void onBookmarksDeleted( std::set<int64_t> bookmarksIds ) override;
+    virtual void onFoldersAdded( std::vector<medialibrary::FolderPtr> folders ) override;
+    virtual void onFoldersModified( std::set<int64_t> foldersIds ) override;
+    virtual void onFoldersDeleted( std::set<int64_t> foldersIds ) override;
     virtual void onDiscoveryStarted() override;
     virtual void onDiscoveryProgress(const std::string& entryPoint) override;
     virtual void onDiscoveryCompleted() override;
@@ -238,7 +241,6 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output );
 bool Convert( const medialibrary::IFile* input, vlc_ml_file_t& output );
 bool Convert( const medialibrary::IMovie* input, vlc_ml_movie_t& output );
 bool Convert( const medialibrary::IShowEpisode* input, vlc_ml_show_episode_t& output );
-bool Convert( const medialibrary::IAlbumTrack* input, vlc_ml_album_track_t& output );
 bool Convert( const medialibrary::IAlbum* input, vlc_ml_album_t& output );
 bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output );
 bool Convert( const medialibrary::IGenre* input, vlc_ml_genre_t& output );

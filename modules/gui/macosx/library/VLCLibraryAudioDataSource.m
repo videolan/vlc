@@ -230,12 +230,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             NSString *title = mediaItem.title;
             NSString *nameOfArtist;
 
-            VLCMediaLibraryAlbumTrack *albumTrack = mediaItem.albumTrack;
-            if (albumTrack) {
-                VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:albumTrack.artistID];
-                if (artist) {
-                    nameOfArtist = artist.name;
-                }
+            VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:mediaItem.artistID];
+            if (artist) {
+                nameOfArtist = artist.name;
             }
 
             if (title && nameOfArtist) {

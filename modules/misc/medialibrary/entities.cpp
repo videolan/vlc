@@ -31,7 +31,6 @@
 #include <medialibrary/IShowEpisode.h>
 #include <medialibrary/IArtist.h>
 #include <medialibrary/IAlbum.h>
-#include <medialibrary/IAlbumTrack.h>
 #include <medialibrary/IGenre.h>
 #include <medialibrary/ILabel.h>
 #include <medialibrary/IMediaGroup.h>
@@ -97,16 +96,6 @@ static bool convertThumbnails( const T input, vlc_ml_thumbnail_t *output )
         if ( !strdup_helper(thumbnailMrl, output[i].psz_mrl ))
             return false;
     }
-    return true;
-}
-
-bool Convert( const medialibrary::IAlbumTrack* input, vlc_ml_album_track_t& output )
-{
-    output.i_artist_id = input->artistId();
-    output.i_album_id = input->albumId();
-    output.i_disc_nb = input->discNumber();
-    output.i_genre_id = input->genreId();
-    output.i_track_nb = input->trackNumber();
     return true;
 }
 
@@ -194,11 +183,11 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
                 case medialibrary::IMedia::SubType::AlbumTrack:
                 {
                     output.i_subtype = VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
-                    auto albumTrack = input->albumTrack();
-                    if ( albumTrack == nullptr )
-                        return false;
-                    if ( Convert( albumTrack.get(), output.album_track ) == false )
-                        return false;
+                    output.album_track.i_artist_id = input->artistId();
+                    output.album_track.i_album_id = input->albumId();
+                    output.album_track.i_disc_nb = input->discNumber();
+                    output.album_track.i_genre_id = input->genreId();
+                    output.album_track.i_track_nb = input->trackNumber();
                     break;
                 }
                 case medialibrary::IMedia::SubType::Unknown:
@@ -533,21 +522,18 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
         {
             if ( media->subType() != medialibrary::IMedia::SubType::AlbumTrack )
                 break;
-            auto track = media->albumTrack();
-            if ( track == nullptr )
-                return nullptr;
-            auto album = track->album();
+            auto album = media->album();
             if ( album == nullptr )
                 return nullptr;
-            auto artist = track->artist();
+            auto artist = media->artist();
             if ( artist == nullptr )
                 return nullptr;
             // From the track itself:
             input_item_SetTitle( inputItem.get(), media->title().c_str() );
             input_item_SetDiscNumber( inputItem.get(),
-                                      std::to_string( track->discNumber() ).c_str() );
+                                      std::to_string( media->discNumber() ).c_str() );
             input_item_SetTrackNumber( inputItem.get(),
-                                       std::to_string( track->trackNumber() ).c_str() );
+                                       std::to_string( media->trackNumber() ).c_str() );
 
             // From the album:
             input_item_SetTrackTotal( inputItem.get(),

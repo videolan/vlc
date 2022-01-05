@@ -126,19 +126,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
-@interface VLCMediaLibraryAlbumTrack : NSObject
-
-- (instancetype)initWithAlbumTrack:(struct vlc_ml_album_track_t *)p_albumTrack;
-
-@property (readonly) int64_t artistID;
-@property (readonly) int64_t albumID;
-@property (readonly) int64_t genreID;
-
-@property (readonly) int trackNumber;
-@property (readonly) int discNumber;
-
-@end
-
 @interface VLCMediaLibraryGenre : NSObject
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre;
@@ -183,7 +170,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @property (readonly, nullable) VLCMediaLibraryShowEpisode *showEpisode;
 @property (readonly, nullable) VLCMediaLibraryMovie *movie;
-@property (readonly, nullable) VLCMediaLibraryAlbumTrack *albumTrack;
 
 @property (readwrite) int rating;
 @property (readwrite) float lastPlaybackRate;
@@ -201,6 +187,14 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readwrite) int lastAudioDelay;
 @property (readwrite) int lastSubtitleTrack;
 @property (readwrite) int lastSubtitleDelay;
+
+@property (readonly) int64_t artistID;
+@property (readonly) int64_t albumID;
+@property (readonly) int64_t genreID;
+
+@property (readonly) int trackNumber;
+@property (readonly) int discNumber;
+
 
 @end
 
