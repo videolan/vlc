@@ -285,6 +285,7 @@ void FakeESOut::createOrRecycleRealEsID( AbstractFakeESOutID *es_id_ )
         realid = es_out_Add( real_es_out, &fmt );
         if( b_preexisting && b_select ) /* was previously selected on other format */
             es_out_Control( real_es_out, ES_OUT_SET_ES, realid );
+        es_format_Clean( &fmt );
     }
 
     es_id->setRealESID( realid );
