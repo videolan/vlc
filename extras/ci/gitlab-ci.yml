@@ -25,7 +25,7 @@ variables:
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20241112155431
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
-    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20231013031754
+    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-snap:20251117145936
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20240806085528
     VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20250905104736
 
@@ -418,33 +418,30 @@ debian-meson:
     extends: .base-template
     image:
         name: $VLC_SNAP_IMAGE
-    script: |
-            cd extras/package/snap
-            make -f package.mak snap
-    after_script:
-        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh snap)"
-        - mv extras/package/snap/parts/vlc/build/contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
+        entrypoint: [""]
+    script:
+        - extras/package/snap/build.sh -p
     allow_failure: true
     variables: *variables-snap
 
-# snap:
-#     extends: .snap-common
+snap:
+    extends: .snap-common
 
-# nightly-snap:
-#     extends: .snap-common
-#     rules:
-#         - if: '$CI_PIPELINE_SOURCE == "schedule"'
-#     after_script:
-#         - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
-#         - mkdir nightlies
-#         - mv extras/package/snap/vlc_*.snap nightlies/
-#         - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
-#         - snapcraft push nightlies/vlc_*.snap --release edge
-#         - snapcraft logout
-#         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
-#     artifacts:
-#         paths:
-#            - nightlies/*
+nightly-snap:
+    extends: .snap-common
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    after_script:
+        - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
+        - mkdir nightlies
+        - mv vlc_*.snap nightlies/
+        - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
+        - snapcraft push nightlies/vlc_*.snap --release edge
+        - snapcraft logout
+        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    artifacts:
+        paths:
+           - nightlies/*
 
 #
 # Raspbian
