@@ -752,10 +752,14 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
         /* Convert from 100 nanoseconds unit to microseconds. */
         vlc_tick_t samp_time = VLC_TICK_FROM_MSFTIME(sample_time);
 
-        hr = IMFSample_GetBufferByIndex(output_sample, 0, &output_media_buffer);
+        DWORD output_count = 0;
+        hr = IMFSample_GetBufferCount(output_sample, &output_count);
+        if (unlikely(FAILED(hr)))
+            goto error;
 
-        BYTE *buffer_start;
-        hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
+        for (DWORD buf_index = 0; buf_index < output_count; buf_index++)
+        {
+        hr = IMFSample_GetBufferByIndex(output_sample, buf_index, &output_media_buffer);
         if (FAILED(hr))
             goto error;
 
@@ -821,11 +825,6 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
             decoder_QueueAudio(p_dec, aout_buffer);
         }
 
-        hr = IMFMediaBuffer_Unlock(output_media_buffer);
-        IMFSample_Release(output_media_buffer);
-        if (FAILED(hr))
-            goto error;
-
         if (p_sys->output_sample)
         {
             /* Sample is not provided by the MFT: clear its content. */
@@ -833,7 +832,12 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
             if (FAILED(hr))
                 goto error;
         }
-        else
+
+        IMFMediaBuffer_Release(output_media_buffer);
+        output_media_buffer = NULL;
+        }
+
+        if (!p_sys->output_sample)
         {
             /* Sample is provided by the MFT: decrease refcount. */
             IMFSample_Release(output_sample);
@@ -869,7 +873,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 error:
     msg_Err(p_dec, "Error in ProcessOutputStream()");
     if (output_media_buffer)
-        IMFSample_Release(output_media_buffer);
+        IMFMediaBuffer_Release(output_media_buffer);
     if (picture)
         picture_Release(picture);
     if (aout_buffer)
