@@ -186,7 +186,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
             if (likely(asprintf(&modbuf, "ext-%s", ext + 1) >= 0))
                 module = modbuf;
             else
-                modbuf = NULL;
+                goto error;
         }
         strict = false;
     }
@@ -196,13 +196,11 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     free(modbuf);
 
     if (priv->module == NULL)
-    {
-        free( p_demux->psz_filepath );
         goto error;
-    }
 
     return p_demux;
 error:
+    free( p_demux->psz_filepath );
     free( p_demux->psz_name );
     stream_CommonDelete( p_demux );
     return NULL;

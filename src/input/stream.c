@@ -77,6 +77,7 @@ stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
     stream_t *s = &priv->stream;
 
     s->psz_url = NULL;
+    s->psz_filepath = NULL;
     s->s = NULL;
     s->pf_read = NULL;
     s->pf_block = NULL;
