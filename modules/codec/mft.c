@@ -70,20 +70,6 @@ vlc_module_end()
 
 typedef struct
 {
-    HINSTANCE mfplat_dll;
-    HRESULT (STDCALL *fptr_MFTEnumEx)(GUID guidCategory, UINT32 Flags,
-                                 const MFT_REGISTER_TYPE_INFO *pInputType,
-                                 const MFT_REGISTER_TYPE_INFO *pOutputType,
-                                 IMFActivate ***pppMFTActivate, UINT32 *pcMFTActivate);
-    HRESULT (STDCALL *fptr_MFCreateSample)(IMFSample **ppIMFSample);
-    HRESULT (STDCALL *fptr_MFCreateMemoryBuffer)(DWORD cbMaxLength, IMFMediaBuffer **ppBuffer);
-    HRESULT (STDCALL *fptr_MFCreateAlignedMemoryBuffer)(DWORD cbMaxLength, DWORD fAlignmentFlags, IMFMediaBuffer **ppBuffer);
-} MFHandle;
-
-typedef struct
-{
-    MFHandle mf_handle;
-
     IMFTransform *mft;
 
     const GUID* major_type;
@@ -516,7 +502,6 @@ error:
 static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** result, DWORD size)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    MFHandle *mf = &p_sys->mf_handle;
     HRESULT hr;
 
     *result = NULL;
@@ -529,12 +514,12 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** re
     if (FAILED(hr))
         goto error;
 
-    hr = mf->fptr_MFCreateSample(&input_sample);
+    hr = MFCreateSample(&input_sample);
     if (FAILED(hr))
         goto error;
 
     DWORD allocation_size = __MAX(input_info.cbSize, size);
-    hr = mf->fptr_MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
+    hr = MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -559,7 +544,6 @@ error:
 static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **result)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    MFHandle *mf = &p_sys->mf_handle;
     HRESULT hr;
 
     *result = NULL;
@@ -585,7 +569,7 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **r
     if ((output_info.dwFlags & expected_flags) != expected_flags)
         goto error;
 
-    hr = mf->fptr_MFCreateSample(&output_sample);
+    hr = MFCreateSample(&output_sample);
     if (FAILED(hr))
         goto error;
 
@@ -593,9 +577,9 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **r
     DWORD allocation_size = output_info.cbSize;
     DWORD alignment = output_info.cbAlignment;
     if (alignment > 0)
-        hr = mf->fptr_MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, &output_media_buffer);
+        hr = MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, &output_media_buffer);
     else
-        hr = mf->fptr_MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
+        hr = MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -1157,7 +1141,6 @@ static void DestroyMFT(decoder_t *p_dec)
 static int FindMFT(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    MFHandle *mf = &p_sys->mf_handle;
     HRESULT hr;
 
     /* Try to create a MFT using MFTEnumEx. */
@@ -1189,7 +1172,7 @@ static int FindMFT(decoder_t *p_dec)
     MFT_REGISTER_TYPE_INFO input_type = { *p_sys->major_type, *p_sys->subtype };
     IMFActivate **activate_objects = NULL;
     UINT32 activate_objects_count = 0;
-    hr = mf->fptr_MFTEnumEx(category, flags, &input_type, NULL, &activate_objects, &activate_objects_count);
+    hr = MFTEnumEx(category, flags, &input_type, NULL, &activate_objects, &activate_objects_count);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -1217,35 +1200,14 @@ static int FindMFT(decoder_t *p_dec)
     return VLC_EGENERIC;
 }
 
-static int LoadMFTLibrary(MFHandle *mf)
+static int LoadMFTLibrary()
 {
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-#if defined(VLC_WINSTORE_APP) || __MINGW64_VERSION_MAJOR < 6
-    mf->mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
-    if (!mf->mfplat_dll)
-        goto error;
-
-    mf->fptr_MFTEnumEx = (void*)GetProcAddress(mf->mfplat_dll, "MFTEnumEx");
-    mf->fptr_MFCreateSample = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateSample");
-    mf->fptr_MFCreateMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateMemoryBuffer");
-    mf->fptr_MFCreateAlignedMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateAlignedMemoryBuffer");
-    if (!mf->fptr_MFTEnumEx || !mf->fptr_MFCreateSample || !mf->fptr_MFCreateMemoryBuffer || !mf->fptr_MFCreateAlignedMemoryBuffer)
-        goto error;
-#else
-    mf->fptr_MFTEnumEx = &MFTEnumEx;
-    mf->fptr_MFCreateSample = &MFCreateSample;
-    mf->fptr_MFCreateMemoryBuffer = &MFCreateMemoryBuffer;
-    mf->fptr_MFCreateAlignedMemoryBuffer = &MFCreateAlignedMemoryBuffer;
-#endif
 
     return VLC_SUCCESS;
-
-error:
-    MFShutdown();
-    return VLC_EGENERIC;
 }
 
 static int Open(vlc_object_t *p_this)
@@ -1263,10 +1225,11 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    if (LoadMFTLibrary(&p_sys->mf_handle))
+    if (LoadMFTLibrary())
     {
         msg_Err(p_dec, "Failed to load MFT library.");
-        goto error;
+        free(p_sys);
+        return VLC_EGENERIC;
     }
 
     if (FindMFT(p_dec))
@@ -1293,12 +1256,8 @@ static void Close(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    MFHandle *mf = &p_sys->mf_handle;
 
     DestroyMFT(p_dec);
-
-    if (mf->mfplat_dll)
-        FreeLibrary(mf->mfplat_dll);
 
     free(p_sys);
 
