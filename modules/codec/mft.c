@@ -884,6 +884,14 @@ error:
     return VLC_EGENERIC;
 }
 
+static void Flush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    HRESULT hr;
+
+    hr = IMFTransform_ProcessMessage(p_sys->mft, MFT_MESSAGE_COMMAND_FLUSH, 0);
+}
+
 static int DecodeSync(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1262,6 +1270,7 @@ static int Open(vlc_object_t *p_this)
         goto error;
 
     p_dec->pf_decode = p_sys->is_async ? DecodeAsync : DecodeSync;
+    p_dec->pf_flush = p_sys->is_async ? NULL : Flush;
 
     return VLC_SUCCESS;
 
