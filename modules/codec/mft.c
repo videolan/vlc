@@ -872,13 +872,18 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (!p_block) /* No Drain */
-        return VLCDEC_SUCCESS;
-
-    if (p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
+    if (p_block && p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
     {
         block_Release(p_block);
         return VLCDEC_SUCCESS;
+    }
+
+    if (p_block == NULL)
+    {
+        HRESULT hr;
+        hr = IMFTransform_ProcessMessage(p_sys->mft, MFT_MESSAGE_COMMAND_DRAIN, 0);
+        if (FAILED(hr))
+            return VLC_EGENERIC;
     }
 
     /* Drain the output stream before sending the input packet. */
@@ -889,9 +894,13 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
     } while (err == VLC_SUCCESS && keep_reading);
     if (err != VLC_SUCCESS)
         goto error;
-    if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
-        goto error;
-    block_Release(p_block);
+
+    if (p_block != NULL )
+    {
+        if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
+            goto error;
+        block_Release(p_block);
+    }
 
     return VLCDEC_SUCCESS;
 
