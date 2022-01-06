@@ -1150,6 +1150,8 @@ static void DestroyMFT(decoder_t *p_dec)
     p_sys->input_type = NULL;
     p_sys->output_type = NULL;
     p_sys->mft = NULL;
+
+    MFShutdown();
 }
 
 static int FindMFT(decoder_t *p_dec)
@@ -1217,17 +1219,21 @@ static int FindMFT(decoder_t *p_dec)
 
 static int LoadMFTLibrary(MFHandle *mf)
 {
+    HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+
 #if defined(VLC_WINSTORE_APP) || __MINGW64_VERSION_MAJOR < 6
     mf->mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
     if (!mf->mfplat_dll)
-        return VLC_EGENERIC;
+        goto error;
 
     mf->fptr_MFTEnumEx = (void*)GetProcAddress(mf->mfplat_dll, "MFTEnumEx");
     mf->fptr_MFCreateSample = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateSample");
     mf->fptr_MFCreateMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateMemoryBuffer");
     mf->fptr_MFCreateAlignedMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateAlignedMemoryBuffer");
     if (!mf->fptr_MFTEnumEx || !mf->fptr_MFCreateSample || !mf->fptr_MFCreateMemoryBuffer || !mf->fptr_MFCreateAlignedMemoryBuffer)
-        return VLC_EGENERIC;
+        goto error;
 #else
     mf->fptr_MFTEnumEx = &MFTEnumEx;
     mf->fptr_MFCreateSample = &MFCreateSample;
@@ -1236,6 +1242,10 @@ static int LoadMFTLibrary(MFHandle *mf)
 #endif
 
     return VLC_SUCCESS;
+
+error:
+    MFShutdown();
+    return VLC_EGENERIC;
 }
 
 static int Open(vlc_object_t *p_this)
