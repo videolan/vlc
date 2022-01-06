@@ -1,8 +1,8 @@
 name: vlc
-version-script: cat $SNAPCRAFT_STAGE/version
+adopt-info: vlc
 version: "daily"
 grade: stable
-base: core20
+base: core24
 summary: Read, capture, broadcast your multimedia streams
 description: |
   VLC is a free and open source cross-platform multimedia player and
@@ -12,105 +12,117 @@ description: |
 confinement: strict
 compression: lzo
 plugs:
+  desktop:
+    mount-host-font-cache: false
   dot-config-aacs:
     interface: personal-files
     read:
     - $HOME/.config/aacs
-
+hooks:
+  configure:
+    plugs:
+      - desktop
 apps:
   vlc:
-    desktop: usr/share/applications/vlc.desktop
-    command: bin/desktop-launch $SNAP/bin/vlc-snap-wrapper.sh
+    desktop: vlc.desktop
+    command: usr/bin/vlc-snap-wrapper.sh
+    extensions:
+      - kde-neon-6
     common-id: org.videolan.vlc
     plugs:
-      - unity7
-      - network
-      - network-bind
-      - home
-      - opengl
-      - pulseaudio
-      - mount-observe
-      - optical-drive
-      - camera
-      - removable-media
-      - screen-inhibit-control
-      - x11
-      - desktop
-      - desktop-legacy
-      - dvb
       - audio-playback
       - audio-record
-      - jack1
       - avahi-control
+      - avahi-observe
+      - camera
       - dot-config-aacs
+      - dvb
+      - hardware-observe
+      - home
+      - mount-observe
+      - media-control
+      - optical-drive
+      - removable-media
+      - screen-inhibit-control
+      - pipewire
     slots:
       - mpris
-
 parts:
-  desktop-qt5-vlc:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-commit: c12ad1891667b49b8401e606341ad7ba7ba6a69e
-    source-subdir: qt/
-    plugin: make
-    make-parameters: ["FLAVOR=qt5"]
-    build-packages:
-      - qtbase5-dev
-      - dpkg-dev
-    stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - shared-mime-info
-      - libqt5gui5
-      - libgdk-pixbuf2.0-0
-      - libqt5svg5
-      - locales-all
   vlc:
-    after: [desktop-qt5-vlc]
-    source: ../../../
+    source: .
     source-type: git
-    plugin: autotools
+    # We should be able to use the autotools plugin, but `kde-neon-6` override
+    # and prepend the `build-environment` variables with its own paths,
+    # and kde-qt6-core24-sdk already ships vlc which will create some linker issues
+    # when craftctl is called, this environment will be reseted even if we change the
+    # PATH/LD_LIBRARY_PATH in the override-build
+    plugin: nil
+
+    build-environment:
+      # setup our build environment to use the packages/libraries provided by the base snap packages
+      #be sure to have qmake and others in our path
+      - PATH: /snap/kde-qt6-core24-sdk/current/usr/bin/qt6:/snap/kf6-core24-sdk/current/usr/lib/qt6/libexec/${PATH:+:$PATH}
+
+    override-pull: |
+      craftctl default
+      craftctl set version=$(git describe --always HEAD)
     override-build: |
-      false
-      sed -i 's|0\.19\.8|0\.19\.7|'  configure.ac
       cd extras/tools
       ./bootstrap
-      make -j $(getconf _NPROCESSORS_ONLN)
+      make -j ${CRAFT_PARALLEL_BUILD_COUNT} all
       cd ../../
-      export PATH=$PWD/extras/tools/build/bin:$PATH
+      #kde-neon-6 extension override the paths (PATH/LD_LIBRARY_PATH/...) with kf6-core24-sdk paths so we can't set these in the environment
+      #kf6-core24-sdk already ships VLC, make sure that the one we're building will be used when linking vlc
+      export PATH=$PWD/extras/tools/build/bin:${PATH}
+      export LD_LIBRARY_PATH=$(pwd)/src/.libs/:$(pwd)/lib/.libs/:${LD_LIBRARY_PATH}
+      export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+      export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/snap/vlc-contrib-${CRAFT_ARCH_TRIPLET_BUILD_FOR}-${VLC_CONTRIB_SHA}.tar.bz2"
+      if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
       cd contrib && mkdir linux && cd linux
       ../bootstrap \
-          --host=$TRIPLET \
+          --host=${CRAFT_ARCH_TRIPLET_BUILD_FOR} \
           --enable-libdsm \
           --enable-dvdcss
       if [ -v VLC_PREBUILT_CONTRIBS_URL ]; then
           make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-          make -j $(getconf _NPROCESSORS_ONLN) tools
+          make -j ${CRAFT_PARALLEL_BUILD_COUNT} tools
       else
           make list
-          make -j $(getconf _NPROCESSORS_ONLN) fetch
-          make -j $(getconf _NPROCESSORS_ONLN) -k || make -j1
-          make package
+          make -j ${CRAFT_PARALLEL_BUILD_COUNT} fetch
+          make -j ${CRAFT_PARALLEL_BUILD_COUNT} -k || make -j1
+          #export prebuilt for CI jobs
+          if [ -f "$CRAFT_PROJECT_DIR/snap-save-prebuilt" ]; then
+              make package
+              mv ../vlc-contrib-*.tar.bz2 $CRAFT_PROJECT_DIR/contrib || true
+          fi
       fi
-      cd ../../
-      export NOCONFIGURE=1
+      cd ../..
+
+      #craftctl default
       ./bootstrap
       ./configure \
-          --prefix=$SNAPCRAFT_PART_INSTALL/usr \
-          --host=$TRIPLET \
-          --disable-wayland \
-          --enable-merge-ffmpeg \
-          --enable-extra-checks
-      make -j $(getconf _NPROCESSORS_ONLN)
-      echo $(git describe --always HEAD) > $SNAPCRAFT_STAGE/version
-      make -j $(getconf _NPROCESSORS_ONLN) install
-      sed -i 's|Icon=vlc|Icon=/usr/share/icons/hicolor/256x256/apps/vlc\.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/vlc.desktop
-      sed -i 's|TryExec=.*|TryExec=/snap/bin/vlc|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/vlc.desktop
+         --host=${CRAFT_ARCH_TRIPLET_BUILD_FOR} \
+         --prefix=/usr \
+         --enable-merge-ffmpeg \
+         --enable-extra-checks \
+         --disable-pipewire
+
+      make -j ${CRAFT_PARALLEL_BUILD_COUNT}
+      make install DESTDIR="${CRAFT_PART_INSTALL}"
+
+
+      cp ${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/vlc.png ${CRAFT_PART_INSTALL}/vlc.png
+      cp ${CRAFT_PART_INSTALL}/usr/share/applications/vlc.desktop ${CRAFT_PART_INSTALL}/vlc.desktop
+      sed -i 's/\(^Icon=\).*$/\1\/vlc.png/' ${CRAFT_PART_INSTALL}/vlc.desktop
+      sed -i 's|TryExec=.*|TryExec=/snap/bin/vlc|' ${CRAFT_PART_INSTALL}/vlc.desktop
     build-packages:
+      # build tools
       - ant
+      - autopoint
       - git
       - g++
+      - gperf
+      - nasm
       - make
       - autoconf
       - libtool
@@ -118,31 +130,114 @@ parts:
       - cmake
       - automake
       - build-essential
+      - curl
+      - gettext
+      - openjdk-11-jdk-headless
+      - python3
+      - python3-pip
+      - python3-venv
+      - python3-jinja2
+      - lua5.2
+      - pkg-config
+      - xz-utils
+      - zlib1g-dev
+      - bison
+      - flex
+
+      ##
+      - glslang-dev
+      - libaom-dev
+      - libarchive-dev
+      - libaribb24-dev
+      - libasound2-dev
+      - libass-dev
+      - libavcodec-dev
+      - libavdevice-dev
+      - libavfilter-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libbluray-dev
+      - libcaca-dev
+      - libcddb2-dev
+      - libchromaprint-dev
+      - libdav1d-dev
+      - libdca-dev
+      - libdvbpsi-dev
+      - libdvbcsa-dev
+      - libdvdnav-dev
+      - libdvdread-dev
+      - libebur128-dev
+      - libfaad-dev
+      - libffi-dev
+      - libflac-dev
+      - libfluidsynth-dev
+      - libgmp-dev
+      - libgsm1-dev
+      - libjack-dev
+      - libjpeg-turbo8-dev
+      - libkate-dev
+      - libmad0-dev
+      - libmatroska-dev
+      - libmodplug-dev
+      - libmpeg2-4-dev
+      - libmpcdec-dev
+      - libmpg123-dev
+      - libmysofa-dev
+      - libnfs-dev
+      - libogg-dev
+      - liborc-0.4-dev
+      - libplacebo-dev
+      - libpango1.0-dev
+      - libpostproc-dev
+      - libsamplerate0-dev
+      - libshout-dev
+      - libsidplay2-dev
+      - libsoxr-dev
+      - libspatialaudio-dev
+      - libspeex-dev
+      - libspeexdsp-dev
+      - libsrt-gnutls-dev
+      - libssh2-1-dev
+      - libswresample-dev
+      - libswscale-dev
+      - libtag1-dev
+      - libtheora-dev
+      - libtwolame-dev
+      - libupnp-dev
+      - libvncserver-dev
+      - libvorbis-dev
+      - libvpx-dev
+      - libx264-dev
+      - libx265-dev
+      - libxcb1-dev
       - libxcb-xfixes0-dev
-      - libqt5svg5-dev
       - libasound2-dev
       - libavahi-client-dev
       - libcdio-dev
       - libdbus-1-dev
       - libdirectfb-dev
+      - libdrm-dev
       - libegl1-mesa-dev
-      - libfreetype6-dev
+      - libfreetype-dev
       - libfribidi-dev
+      - libgbm-dev
       - libgles2-mesa-dev
       - libgnutls28-dev
-      - libgtk2.0-dev
-      - libidn11-dev
+      - libglib2.0-dev
+      - libgme-dev
+      - libgtk-3-dev
+      - libidn-dev
       - libjack-dev
-      - liblircclient-dev
+      - liblirc-dev
       - liblua5.2-dev
       - libmtp-dev
-      - libncursesw5-dev
+      - libncurses-dev
       - libpng-dev
       - libpulse-dev
-      - libqt5x11extras5-dev
-      - qtbase5-private-dev
+      - librist-dev
       - librsvg2-dev
       - libsecret-1-dev
+      - libsqlite3-dev
       - libudev-dev
       - libv4l-dev
       - libva-dev
@@ -162,110 +257,164 @@ parts:
       - libxml2-dev
       - libxpm-dev
       - libzvbi-dev
-      - lua5.2
-      - pkg-config
-      - qtbase5-dev
-      - xz-utils
-      - zlib1g-dev
-      - bison
-      - flex
       - libvulkan-dev
-      - qtdeclarative5-dev
-      - qtquickcontrols2-5-dev
-      - qml-module-qtquick-controls2
-      - qml-module-qtquick-layouts
-      - qml-module-qtquick-templates2
-      - qml-module-qtgraphicaleffects
       - libgcrypt20-dev
       - libsystemd-dev
+      - wayland-protocols
+
     stage-packages:
-      - fonts-freefont-ttf
+      - on amd64:
+          - i965-va-driver
+          - intel-media-va-driver
       - dbus-x11
-      - libegl1-mesa
+      - fonts-freefont-ttf
+      - libaacs0
+      - libaom3
+      - libarchive13
+      - libaribb24-0
+      - libasound2t64
+      - libass9
+      - libatk1.0-0
+      - libavcodec60
+      - libavformat60
+      - libavutil58
+      - libbluray2
+      - libcaca0
+      - libcddb2
+      - libchromaprint1
+      - libdav1d7
+      - libdb5.3
+      - libdca0
+      - libdvbpsi10
+      - libdvbcsa1
+      - libdvdnav4
+      - libdvdread8t64
+      - libebur128-1
+      #- libegl1-mesa
+      - libfluidsynth3
       - libfreetype6
       - libfribidi0
-      - libdb5.3
       - libgcc1
-      - libgl1-mesa-glx
-      - libgles2-mesa
+      - libgcrypt20
+      #- libgl1-mesa-glx
+      - libgles2
       - libglib2.0-0
+      - libglu1-mesa
+      - libgme0
+      - libgtk-3-0
+      - libidn12
+      - libjack0
+      - libkate1
+      - liblua5.2-0
+      - libmad0
+      - libmatroska7
+      - libmodplug1
+      - libmp3lame0
+      - libmpeg2-4
+      - libmpcdec6
+      - libmpg123-0
+      - libmtp9
+      - libmysofa1
+      - libnfs14
+      - libnotify4
+      - libopenjp2-7
+      - liborc-0.4-0
+      - libpango-1.0-0
+      - libplacebo338
+      - libpostproc57
       - libpulse0
-      - libqt5core5a
-      - libqt5gui5
+      - librist4
       - librsvg2-2
+      - libsamplerate0
       - libsecret-1-0
+      - libshout3
+      - libsndio7.0
+      - libsoxr0
+      - libspatialaudio0
+      - libspeex1
+      - libspeexdsp1
+      - libsqlite3-0
+      - libsrt1.5-gnutls
+      - libssh2-1
+      - libswresample4
+      - libswscale7
+      - libtag1v5-vanilla
+      - libtheora0
+      - libtwolame0
+      - libupnp17t64
       - libva-drm2
+      - libva-wayland2
       - libva-x11-2
       - libva2
       - libvdpau1
+      - libvncclient1
+      - libvorbisfile3
+      - libvpx9
+      - libvulkan1
       - libx11-6
+      - libx264-164
+      - libx265-199
       - libxcb-composite0
       - libxcb-damage0
       - libxcb-keysyms1
       - libxcb-randr0
       - libxcb-shm0
-      - libxcb-xv0
       - libxcb1
+      - libxcomposite1
+      - libxcursor1
       - libxext6
       - libxi6
       - libxinerama1
       - libxkbcommon-x11-0
       - libxpm4
-      - vdpau-driver-all
-      - i965-va-driver
-      - mesa-utils
-      - mesa-vdpau-drivers
-      - zlib1g
-      - kde-style-breeze
-      - breeze-icon-theme
-      - frameworkintegration
-      - plasma-integration
-      - phonon4qt5-backend-null
-      - libjack0
-      - libasound2
-      - libgtk-3-0
-      - liblua5.2-0
-      - libmtp9
-      - libzvbi0
-      - libnotify4
-      - libvulkan1
-      - libaacs0
-      - mesa-vulkan-drivers
-      - libvulkan-dev
-      - openjdk-8-jdk
-      - qml-module-qtquick-controls2
-      - qml-module-qtquick-layouts
-      - qml-module-qtquick-templates2
-      - qml-module-qtgraphicaleffects
-      - libgcrypt20
-      - libidn11
-      - libxcomposite1
-      - libxcursor1
       - libxrandr2
-      - libatk1.0-0
-      - libgtk2.0-0
-    filesets:
-      exclusion:
+      - libzvbi0
+      - mesa-utils
+      - mesa-va-drivers
+      - mesa-vdpau-drivers
+      - mesa-vulkan-drivers
+      - openjdk-8-jdk
+      - vdpau-driver-all
+      - zlib1g
+    prime:
+      #excluded
       - "-usr/lib/*/cmake/*"
       - "-usr/include/*"
       - "-usr/share/ECM/*"
       - "-usr/share/doc/*"
       - "-usr/share/man/*"
+      - "-usr/share/icons/breeze-dark*"
       - "-usr/bin/X11"
-      - "-usr/lib/gcc/x86_64-linux-gnu/6.0.0"
+      - "-usr/lib/gcc/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/6.0.0"
       - "-usr/lib/aspell/*"
-    prime:
-      - "$exclusion"
+      - "-usr/share/lintain"
 
   wrapper:
     plugin: dump
     after: [vlc]
-    source: .
+    source: extras/package/snap
     organize:
-      vlc-snap-wrapper.sh: bin/vlc-snap-wrapper.sh
+      vlc-snap-wrapper.sh: usr/bin/vlc-snap-wrapper.sh
 
   fixup-vulkan-icd-paths:
     plugin: nil
     after: [wrapper]
     override-build: |
-      sed -i -E 's,(^.+"library_path": ")/.*/,\1,' $SNAPCRAFT_STAGE/usr/share/vulkan/icd.d/*.json
+      sed -i -E 's,(^.+"library_path": ")/.*/,\1,' ${CRAFT_STAGE}/usr/share/vulkan/icd.d/*.json
+
+  cleanup:
+    after:
+      - fixup-vulkan-icd-paths
+    plugin: nil
+    build-snaps:
+      - core24
+      - kf6-core24
+      - kde-qt6-core24
+    # remove libraries already present in base snap pacakges
+    # kf6-core24 already ships vlc, make sure to not delete our own files
+    override-prime: |
+      set -eux
+      for snap in "core24" "kf6-core24" "kde-qt6-core24"
+      do
+        cd "/snap/$snap/current" && find . -type f,l -a ! -path "*vlc*" -exec rm -rf "{$CRAFT_PRIME}/{}" \;
+      done

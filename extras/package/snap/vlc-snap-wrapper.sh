@@ -23,16 +23,14 @@ elif [[ $VENDOR == *"X.Org"* ]]; then
   export VDPAU_DRIVER_PATH="/usr/lib/$ARCH/vdpau/"
 fi
 
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/usr/lib/vlc"
+export LD_LIBRARY_PATH="$SNAP/usr/lib:$SNAP/usr/lib/vlc:$LD_LIBRARY_PATH"
+export VLC_PLUGIN_PATH="$SNAP/usr/lib/vlc/plugins"
 
 # KDE specific
 ## Do not start slaves through klauncher but fork them directly.
 export KDE_FORK_SLAVES=1
 ## Neon PATCH! make KIO look for slaves in a dynamic location depending on $SNAP
-export KF5_LIBEXEC_DIR=$SNAP/usr/lib/$ARCH/libexec/kf5
-
-# set QML2 import path for Qt UI
-export QML2_IMPORT_PATH="$QML2_IMPORT_PATH:$SNAP/usr/lib/x86_64-linux-gnu/qt5/qml/"
+#export KF5_LIBEXEC_DIR=$SNAP/usr/lib/$ARCH/libexec/kf5
 
 # Link the aacs directory from $HOME #28017
 if [ ! -L "$HOME/.config/aacs" ]; then
