@@ -455,18 +455,28 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
 {
     output.i_id = input->id();
+
+    output.i_nb_media = input->nbMedia();
+
     output.b_banned = input->isBanned();
+
+    if ( strdup_helper( input->name(), output.psz_name ) == false )
+        return false;
+
     try
     {
-        if ( strdup_helper( input->mrl(), output.psz_mrl ) == false )
+        if (strdup_helper(input->mrl(), output.psz_mrl) == false)
             return false;
+
         output.b_present = true;
     }
     catch ( const medialibrary::fs::errors::DeviceRemoved& )
     {
         output.psz_mrl = nullptr;
+
         output.b_present = false;
     }
+
     return true;
 }
 

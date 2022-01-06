@@ -53,6 +53,7 @@ public:
             ML_PARENT_TYPE_CASE(VLC_ML_PARENT_SHOW);
             ML_PARENT_TYPE_CASE(VLC_ML_PARENT_GENRE);
             ML_PARENT_TYPE_CASE(VLC_ML_PARENT_GROUP);
+            ML_PARENT_TYPE_CASE(VLC_ML_PARENT_FOLDER);
             ML_PARENT_TYPE_CASE(VLC_ML_PARENT_PLAYLIST);
         default:
             return QString("UNKNOWN - %2").arg(id);
