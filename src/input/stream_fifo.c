@@ -123,7 +123,6 @@ vlc_stream_fifo_t *vlc_stream_fifo_New(vlc_object_t *parent, stream_t **reader)
     sys = vlc_stream_Private(s);
     sys->writer = writer;
     s->pf_block = vlc_stream_fifo_Block;
-    s->pf_seek = NULL;
     s->pf_control = vlc_stream_fifo_Control;
     *reader = s;
     return writer;
