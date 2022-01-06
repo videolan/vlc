@@ -509,16 +509,16 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         vout_rsc->started = true;
         if (vout_state != NULL)
             *vout_state = INPUT_RESOURCE_VOUT_STARTED;
-    }
 
-    DisplayVoutTitle(p_resource, cfg->vout, &vout_rsc->psz_prev_title);
+        DisplayVoutTitle(p_resource, cfg->vout, &vout_rsc->psz_prev_title);
 
-    /* Send original viewpoint to the input in order to update other ESes */
-    if (p_resource->p_input != NULL)
-    {
-        input_control_param_t param = { .viewpoint = cfg->fmt->pose };
-        input_ControlPush(p_resource->p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
-                          &param);
+        /* Send original viewpoint to the input in order to update other ESes */
+        if (p_resource->p_input != NULL)
+        {
+            input_control_param_t param = { .viewpoint = cfg->fmt->pose };
+            input_ControlPush(p_resource->p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
+                              &param);
+        }
     }
     vlc_mutex_unlock( &p_resource->lock );
 
