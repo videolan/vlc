@@ -17,11 +17,12 @@
  *****************************************************************************/
 
 import QtQml 2.11
+import QtQml.Models 2.11
 
 QtObject {
     id: root
 
-    property alias model: instantiator.model
+    property ListModel model
     property alias enabled: instantiator.active
     property alias asynchronous: instantiator.asynchronous
 
@@ -32,15 +33,17 @@ QtObject {
     readonly property QtObject _instantiator: Instantiator {
         id: instantiator
 
+        model: root.model
+
         delegate: Binding {
-            target: modelData.target ? modelData.target
-                                     : root.target
-            when: modelData.when !== undefined ? modelData.when
-                                               : root.when
-            property: modelData.property
-            value: modelData.value
-            delayed: modelData.delayed !== undefined ? modelData.delayed
-                                                     : root.delayed
+            target: model.target ? model.target
+                                 : root.target
+            when: model.when !== undefined ? model.when
+                                           : root.when
+            property: model.property
+            value: model.value
+            delayed: model.delayed !== undefined ? model.delayed
+                                                 : root.delayed
         }
     }
 }

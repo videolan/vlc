@@ -104,7 +104,7 @@ bool FlickableScrollHandler::eventFilter(QObject *watched, QEvent *event)
         ev.delta = wheel->pixelDelta();
         ev.type = Type::Pixel;
     }
-    else if (!wheel->angleDelta().isNull())
+    else if (!m_handleOnlyPixelDelta && !wheel->angleDelta().isNull())
     {
         ev.delta = wheel->angleDelta() / 8 / 15;
         ev.type = Type::Degree;

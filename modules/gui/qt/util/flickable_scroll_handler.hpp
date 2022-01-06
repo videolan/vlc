@@ -33,6 +33,7 @@ class FlickableScrollHandler : public QObject
     Q_PROPERTY(qreal effectiveScaleFactor READ effectiveScaleFactor NOTIFY effectiveScaleFactorChanged FINAL)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged FINAL)
     Q_PROPERTY(bool fallbackScroll MEMBER m_fallbackScroll NOTIFY fallbackScrollChanged FINAL)
+    Q_PROPERTY(bool handleOnlyPixelDelta MEMBER m_handleOnlyPixelDelta NOTIFY handleOnlyPixelDeltaChanged FINAL)
 
 public:
     explicit FlickableScrollHandler(QObject *parent = nullptr);
@@ -52,6 +53,8 @@ signals:
     void enabledChanged();
     void effectiveScaleFactorChanged();
     void fallbackScrollChanged();
+
+    void handleOnlyPixelDeltaChanged();
 
 private slots:
     void init();
@@ -86,6 +89,7 @@ private:
     } m_scrollBarV, m_scrollBarH;
 
     void adjustScrollBar(ScrollBar& scrollBar);
+    bool m_handleOnlyPixelDelta = false;
 };
 
 #endif // FLICKABLE_SCROLL_HANDLER_HPP

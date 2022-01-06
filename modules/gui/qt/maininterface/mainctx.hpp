@@ -261,6 +261,12 @@ public:
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); };
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); };
 
+    Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersion() { return QT_VERSION; };
+    Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersionCheck(unsigned char major,
+                                                                        unsigned char minor,
+                                                                        unsigned char patch)
+                                                                       { return QT_VERSION_CHECK(major, minor, patch); };
+
     void dropEventPlay( QDropEvent* event, bool b_play );
     /**
      * @brief ask for the application to terminate
