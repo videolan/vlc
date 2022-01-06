@@ -1418,8 +1418,8 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     /* display the picture immediately */
     render_now |= sys->displayed.current->b_force;
 
-    int ret = RenderPicture(vout, render_now);
-    if (render_now || ret != VLC_SUCCESS)
+    RenderPicture(vout, render_now);
+    if (render_now)
         return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
 
     /* Prepare the next picture immediately without waiting */
