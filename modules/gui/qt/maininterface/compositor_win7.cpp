@@ -19,6 +19,7 @@
 #include "mainctx_win32.hpp"
 #include "mainui.hpp"
 
+#define D3D11_NO_HELPERS  // avoid tons of warnings
 #include <d3d11.h>
 
 #include <dwmapi.h>

@@ -29,6 +29,7 @@
 
 #include <windows.h>
 
+#define D3D11_NO_HELPERS  // avoid tons of warnings
 #include <d3d11_1.h>
 #include <dcomp.h>
 #include <wrl.h>

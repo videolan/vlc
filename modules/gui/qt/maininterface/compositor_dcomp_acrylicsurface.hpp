@@ -32,6 +32,7 @@
 #  define _WIN32_WINNT 0x0603
 # endif
 
+#define D3D11_NO_HELPERS  // avoid tons of warnings
 #include <dcomp.h>
 #include <d3d11.h>
 #include <wrl.h>
