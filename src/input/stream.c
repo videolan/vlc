@@ -74,31 +74,14 @@ stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
     if (unlikely(priv == NULL))
         return NULL;
 
-    stream_t *s = &priv->stream;
-
-    s->psz_url = NULL;
-    s->psz_filepath = NULL;
-    s->s = NULL;
-    s->pf_read = NULL;
-    s->pf_block = NULL;
-    s->pf_readdir = NULL;
-    s->pf_seek = NULL;
-    s->pf_control = NULL;
-    s->p_sys = NULL;
-    s->p_input_item = NULL;
     assert(destroy != NULL);
     priv->destroy = destroy;
-    priv->block = NULL;
-    priv->peek = NULL;
-    priv->offset = 0;
-    priv->eof = false;
 
     /* UTF16 and UTF32 text file conversion */
     priv->text.conv = (vlc_iconv_t)(-1);
     priv->text.char_width = 1;
-    priv->text.little_endian = false;
 
-    return s;
+    return &priv->stream;
 }
 
 void *vlc_stream_Private(stream_t *stream)
