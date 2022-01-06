@@ -25,6 +25,10 @@
 
 #include <vlc_codec.h>
 
+#ifdef __cplusplus
+// avoid some warnings in mingw
+#define D3D11_NO_HELPERS
+#endif
 #include <d3d11.h>
 
 #include "dxgi_fmt.h"

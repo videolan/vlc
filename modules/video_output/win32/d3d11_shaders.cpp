@@ -28,9 +28,6 @@
 
 #include <cassert>
 
-#define COBJMACROS
-#include <d3d11.h>
-
 #include "d3d11_shaders.h"
 #include "d3d_dynamic_shader.h"
 

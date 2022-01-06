@@ -39,15 +39,10 @@
 #include <math.h>
 #include <new>
 
-#include <d3d11.h>
+#include "../../video_chroma/d3d11_fmt.h"
 #ifdef HAVE_D3D11_4_H
 #include <d3d11_4.h>
 #endif
-
-/* avoided until we can pass ISwapchainPanel without c++/cx mode
-# include <windows.ui.xaml.media.dxinterop.h> */
-
-#include "../../video_chroma/d3d11_fmt.h"
 
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"

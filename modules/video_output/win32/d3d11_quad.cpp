@@ -27,8 +27,6 @@
 #include <cassert>
 #include <vlc_common.h>
 
-#include <d3d11.h>
-
 #include "d3d11_quad.h"
 #include "common.h"
 

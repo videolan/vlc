@@ -35,8 +35,6 @@
 
 #include <windows.h>
 
-#include <d3d11.h>
-
 #include "dxgi_swapchain.h"
 #include "d3d11_swapchain.h"
 #include "d3d11_shaders.h"
