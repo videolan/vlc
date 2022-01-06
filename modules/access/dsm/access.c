@@ -147,6 +147,33 @@ typedef struct
     struct vlc_access_cache_entry *cache_entry;
 } access_sys_t;
 
+#if BDSM_VERSION_CURRENT >= 5
+
+static void
+smb_session_interrupt_callback( void *data )
+{
+    smb_session_abort( data );
+}
+
+static inline void
+smb_session_interrupt_register( access_sys_t *sys )
+{
+    vlc_interrupt_register( smb_session_interrupt_callback, sys->p_session );
+}
+
+static inline void
+smb_session_interrupt_unregister( void )
+{
+    vlc_interrupt_unregister();
+}
+
+#else
+
+#define smb_session_interrupt_register( sys ) do {} while (0)
+#define smb_session_interrupt_unregister() do {} while(0)
+
+#endif
+
 /*****************************************************************************
  * Open: Initialize module's data structures and libdsm
  *****************************************************************************/
@@ -184,16 +211,22 @@ static int Open( vlc_object_t *p_this )
 
     get_path( p_access );
 
+    smb_session_interrupt_register( p_sys );
+
     if( login( p_access ) != VLC_SUCCESS )
     {
         msg_Err( p_access, "Unable to open file with path %s (in share %s)",
                  p_sys->psz_path, p_sys->psz_share );
+        smb_session_interrupt_unregister();
         goto error;
     }
 
     /* If there is no shares, browse them */
     if( !p_sys->psz_share )
+    {
+        smb_session_interrupt_unregister();
         return BrowserInit( p_access );
+    }
 
     assert(p_sys->i_fd > 0);
 
@@ -204,8 +237,11 @@ static int Open( vlc_object_t *p_this )
     if( smb_stat_get( st, SMB_STAT_ISDIR ) )
     {
         smb_fclose( p_sys->p_session, p_sys->i_fd );
+        smb_session_interrupt_unregister();
         return BrowserInit( p_access );
     }
+
+    smb_session_interrupt_unregister();
 
     msg_Dbg( p_access, "Successfully opened smb://%s", p_access->psz_location );
 
@@ -573,7 +609,11 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
-    if (smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET) == -1)
+    smb_session_interrupt_register( p_sys );
+    int ret = smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET);
+    smb_session_interrupt_unregister();
+
+    if (ret == -1)
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -587,7 +627,10 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
     access_sys_t *p_sys = p_access->p_sys;
     int i_read;
 
+    smb_session_interrupt_register( p_sys );
     i_read = smb_fread( p_sys->p_session, p_sys->i_fd, p_buffer, i_len );
+    smb_session_interrupt_unregister();
+
     if( i_read < 0 )
     {
         msg_Err( p_access, "read failed" );
@@ -678,9 +721,16 @@ static int BrowseShare( stream_t *p_access, input_item_node_t *p_node )
     size_t          share_count;
     int             i_ret = VLC_SUCCESS;
 
+    smb_session_interrupt_register( p_sys );
+
     if( smb_share_get_list( p_sys->p_session, &shares, &share_count )
         != DSM_SUCCESS )
+    {
+        smb_session_interrupt_unregister();
         return VLC_EGENERIC;
+    }
+
+    smb_session_interrupt_unregister();
 
     struct vlc_readdir_helper rdh;
     vlc_readdir_helper_init( &rdh, p_access, p_node );
@@ -715,11 +765,18 @@ static int BrowseDirectory( stream_t *p_access, input_item_node_t *p_node )
     {
         if( asprintf( &psz_query, "%s\\*", p_sys->psz_path ) == -1 )
             return VLC_ENOMEM;
+
+        smb_session_interrupt_register( p_sys );
         files = smb_find( p_sys->p_session, p_sys->i_tid, psz_query );
+        smb_session_interrupt_unregister();
         free( psz_query );
     }
     else
+    {
+        smb_session_interrupt_register( p_sys );
         files = smb_find( p_sys->p_session, p_sys->i_tid, "\\*" );
+        smb_session_interrupt_unregister();
+    }
 
     if( files == NULL )
         return VLC_EGENERIC;
