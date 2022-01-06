@@ -217,6 +217,8 @@ static int test_any(struct hxxx_helper *hlpr,
         return 1;
     }
 
+    block_Release(b);
+
     return 0;
 }
 
