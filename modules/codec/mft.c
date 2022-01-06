@@ -759,82 +759,82 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 
         for (DWORD buf_index = 0; buf_index < output_count; buf_index++)
         {
-        hr = IMFSample_GetBufferByIndex(output_sample, buf_index, &output_media_buffer);
-        if (FAILED(hr))
-            goto error;
-
-        if (p_dec->fmt_in.i_cat == VIDEO_ES)
-        {
-            if (decoder_UpdateVideoFormat(p_dec))
-                return VLC_SUCCESS;
-            picture = decoder_NewPicture(p_dec);
-            if (!picture)
-                return VLC_SUCCESS;
-
-            UINT32 interlaced = false;
-            hr = IMFSample_GetUINT32(output_sample, &MFSampleExtension_Interlaced, &interlaced);
-            picture->b_progressive = !interlaced;
-
-            picture->date = samp_time;
-
-            BYTE *buffer_start;
-            hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
+            hr = IMFSample_GetBufferByIndex(output_sample, buf_index, &output_media_buffer);
             if (FAILED(hr))
                 goto error;
 
-            CopyPackedBufferToPicture(picture, buffer_start);
+            if (p_dec->fmt_in.i_cat == VIDEO_ES)
+            {
+                if (decoder_UpdateVideoFormat(p_dec))
+                    return VLC_SUCCESS;
+                picture = decoder_NewPicture(p_dec);
+                if (!picture)
+                    return VLC_SUCCESS;
 
-            hr = IMFMediaBuffer_Unlock(output_media_buffer);
-            if (FAILED(hr))
-                goto error;
+                UINT32 interlaced = false;
+                hr = IMFSample_GetUINT32(output_sample, &MFSampleExtension_Interlaced, &interlaced);
+                picture->b_progressive = !interlaced;
 
-            decoder_QueueVideo(p_dec, picture);
-        }
-        else
-        {
-            if (decoder_UpdateAudioFormat(p_dec))
-                goto error;
-            if (p_dec->fmt_out.audio.i_bitspersample == 0 || p_dec->fmt_out.audio.i_channels == 0)
-                goto error;
+                picture->date = samp_time;
 
-            DWORD total_length = 0;
-            hr = IMFSample_GetTotalLength(output_sample, &total_length);
-            if (FAILED(hr))
-                goto error;
+                BYTE *buffer_start;
+                hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
+                if (FAILED(hr))
+                    goto error;
 
-            int samples = total_length / (p_dec->fmt_out.audio.i_bitspersample * p_dec->fmt_out.audio.i_channels / 8);
-            aout_buffer = decoder_NewAudioBuffer(p_dec, samples);
-            if (!aout_buffer)
-                return VLC_SUCCESS;
-            if (aout_buffer->i_buffer < total_length)
-                goto error;
+                CopyPackedBufferToPicture(picture, buffer_start);
 
-            aout_buffer->i_pts = samp_time;
+                hr = IMFMediaBuffer_Unlock(output_media_buffer);
+                if (FAILED(hr))
+                    goto error;
 
-            BYTE *buffer_start;
-            hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
-            if (FAILED(hr))
-                goto error;
+                decoder_QueueVideo(p_dec, picture);
+            }
+            else
+            {
+                if (decoder_UpdateAudioFormat(p_dec))
+                    goto error;
+                if (p_dec->fmt_out.audio.i_bitspersample == 0 || p_dec->fmt_out.audio.i_channels == 0)
+                    goto error;
 
-            memcpy(aout_buffer->p_buffer, buffer_start, total_length);
+                DWORD total_length = 0;
+                hr = IMFSample_GetTotalLength(output_sample, &total_length);
+                if (FAILED(hr))
+                    goto error;
 
-            hr = IMFMediaBuffer_Unlock(output_media_buffer);
-            if (FAILED(hr))
-                goto error;
+                int samples = total_length / (p_dec->fmt_out.audio.i_bitspersample * p_dec->fmt_out.audio.i_channels / 8);
+                aout_buffer = decoder_NewAudioBuffer(p_dec, samples);
+                if (!aout_buffer)
+                    return VLC_SUCCESS;
+                if (aout_buffer->i_buffer < total_length)
+                    goto error;
 
-            decoder_QueueAudio(p_dec, aout_buffer);
-        }
+                aout_buffer->i_pts = samp_time;
 
-        if (p_sys->output_sample)
-        {
-            /* Sample is not provided by the MFT: clear its content. */
-            hr = IMFMediaBuffer_SetCurrentLength(output_media_buffer, 0);
-            if (FAILED(hr))
-                goto error;
-        }
+                BYTE *buffer_start;
+                hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
+                if (FAILED(hr))
+                    goto error;
 
-        IMFMediaBuffer_Release(output_media_buffer);
-        output_media_buffer = NULL;
+                memcpy(aout_buffer->p_buffer, buffer_start, total_length);
+
+                hr = IMFMediaBuffer_Unlock(output_media_buffer);
+                if (FAILED(hr))
+                    goto error;
+
+                decoder_QueueAudio(p_dec, aout_buffer);
+            }
+
+            if (p_sys->output_sample)
+            {
+                /* Sample is not provided by the MFT: clear its content. */
+                hr = IMFMediaBuffer_SetCurrentLength(output_media_buffer, 0);
+                if (FAILED(hr))
+                    goto error;
+            }
+
+            IMFMediaBuffer_Release(output_media_buffer);
+            output_media_buffer = NULL;
         }
 
         if (!p_sys->output_sample)
