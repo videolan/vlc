@@ -42,6 +42,7 @@ extern "C" {
 #include <mftransform.h>
 #include <mferror.h>
 #include <mfobjects.h>
+#include <codecapi.h>
 
 
 #define _VIDEOINFOHEADER_
@@ -207,14 +208,6 @@ static vlc_fourcc_t GUIDToFormat(const pair_format_guid table[], const GUID & gu
 
     return 0;
 }
-
-/*
- * Low latency mode for Windows 8. Without this option, the H264
- * decoder will fill *all* its internal buffers before returning a
- * frame. Because of this behavior, the decoder might return no frame
- * for more than 500 ms, making it unusable for playback.
- */
-DEFINE_GUID(CODECAPI_AVLowLatencyMode, 0x9c27891a, 0xed7a, 0x40e1, 0x88, 0xe8, 0xb2, 0x27, 0x27, 0xa0, 0x24, 0xee);
 
 static int SetInputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **result)
 {
