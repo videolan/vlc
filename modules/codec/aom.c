@@ -109,7 +109,7 @@ vlc_module_begin ()
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_COLS */
         add_integer( SOUT_CFG_PREFIX "cpu-used", 1, "Speed setting", CPU_USED_LONGTEXT )
             change_integer_range( 0, 10 )
-        add_integer( SOUT_CFG_PREFIX "lag-in-frames", 16, "Maximum number of lookahead frames", NULL )
+        add_integer( SOUT_CFG_PREFIX "lag-in-frames", 19, "Maximum number of lookahead frames", NULL )
             change_integer_range(0, 70 /* MAX_LAG_BUFFERS + MAX_LAP_BUFFERS */ )
         add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage", NULL )
             change_integer_range( 0, 2 )
