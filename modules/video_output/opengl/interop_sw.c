@@ -48,6 +48,27 @@ struct priv
         picture_t *display_pics[PBO_DISPLAY_COUNT];
         size_t display_idx;
     } pbo;
+
+#define OPENGL_VTABLE_F(X) \
+        X(PFNGLGETERRORPROC,        GetError) \
+        X(PFNGLGETINTEGERVPROC,     GetIntegerv) \
+        X(PFNGLGETSTRINGPROC,       GetString) \
+        \
+        X(PFNGLACTIVETEXTUREPROC,   ActiveTexture) \
+        X(PFNGLBINDTEXTUREPROC,     BindTexture) \
+        X(PFNGLTEXIMAGE2DPROC,      TexImage2D) \
+        X(PFNGLTEXSUBIMAGE2DPROC,   TexSubImage2D) \
+        \
+        X(PFNGLBINDBUFFERPROC,      BindBuffer) \
+        X(PFNGLBUFFERDATAPROC,      BufferData) \
+        X(PFNGLBUFFERSUBDATAPROC,   BufferSubData) \
+        X(PFNGLDELETEBUFFERSPROC,   DeleteBuffers) \
+        X(PFNGLGENBUFFERSPROC,      GenBuffers) \
+        X(PFNGLPIXELSTOREIPROC,     PixelStorei)
+    struct {
+#define DECLARE_SYMBOL(type, name) type name;
+        OPENGL_VTABLE_F(DECLARE_SYMBOL)
+    } gl;
 };
 
 static void
@@ -63,6 +84,7 @@ pbo_picture_destroy(picture_t *pic)
 static picture_t *
 pbo_picture_create(const struct vlc_gl_interop *interop)
 {
+    const struct priv *priv = interop->priv;
     picture_sys_t *picsys = calloc(1, sizeof(*picsys));
     if (unlikely(picsys == NULL))
         return NULL;
@@ -78,8 +100,8 @@ pbo_picture_create(const struct vlc_gl_interop *interop)
         return NULL;
     }
 
-    interop->vt->GenBuffers(pic->i_planes, picsys->buffers);
-    picsys->DeleteBuffers = interop->vt->DeleteBuffers;
+    priv->gl.GenBuffers(pic->i_planes, picsys->buffers);
+    picsys->DeleteBuffers = priv->gl.DeleteBuffers;
 
     /* XXX: needed since picture_NewFromResource override pic planes */
     if (picture_Setup(pic, &interop->fmt_out))
@@ -109,20 +131,21 @@ pbo_picture_create(const struct vlc_gl_interop *interop)
 static int
 pbo_data_alloc(const struct vlc_gl_interop *interop, picture_t *pic)
 {
+    const struct priv *priv = interop->priv;
     picture_sys_t *picsys = pic->p_sys;
 
-    interop->vt->GetError();
+    priv->gl.GetError();
 
     for (int i = 0; i < pic->i_planes; ++i)
     {
-        interop->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-        interop->vt->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
+        priv->gl.BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+        priv->gl.BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
                                 GL_DYNAMIC_DRAW);
 
-        if (interop->vt->GetError() != GL_NO_ERROR)
+        if (priv->gl.GetError() != GL_NO_ERROR)
         {
             msg_Err(interop->gl, "could not alloc PBO buffers");
-            interop->vt->DeleteBuffers(i, picsys->buffers);
+            priv->gl.DeleteBuffers(i, picsys->buffers);
             return VLC_EGENERIC;
         }
     }
@@ -145,7 +168,7 @@ pbo_pics_alloc(const struct vlc_gl_interop *interop)
     }
 
     /* turn off pbo */
-    interop->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    priv->gl.BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
 error:
@@ -170,23 +193,23 @@ tc_pbo_update(const struct vlc_gl_interop *interop, GLuint *textures,
     {
         GLsizeiptr size = pic->p[i].i_lines * pic->p[i].i_pitch;
         const GLvoid *data = pic->p[i].p_pixels;
-        interop->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER,
+        priv->gl.BindBuffer(GL_PIXEL_UNPACK_BUFFER,
                            p_sys->buffers[i]);
-        interop->vt->BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
+        priv->gl.BufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, size, data);
 
-        interop->vt->ActiveTexture(GL_TEXTURE0 + i);
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        priv->gl.ActiveTexture(GL_TEXTURE0 + i);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
 
-        interop->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
             * tex_width[i] / (pic->p[i].i_visible_pitch ? pic->p[i].i_visible_pitch : 1));
 
-        interop->vt->TexSubImage2D(interop->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
+        priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                                    interop->texs[i].format, interop->texs[i].type, NULL);
-        interop->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
 
     /* turn off pbo */
-    interop->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    priv->gl.BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
 }
@@ -195,10 +218,11 @@ static int
 tc_common_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures,
                             const GLsizei *tex_width, const GLsizei *tex_height)
 {
+    const struct priv *priv = interop->priv;
     for (unsigned i = 0; i < interop->tex_count; i++)
     {
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
-        interop->vt->TexImage2D(interop->tex_target, 0, interop->texs[i].internal,
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
+        priv->gl.TexImage2D(interop->tex_target, 0, interop->texs[i].internal,
                                 tex_width[i], tex_height[i], 0, interop->texs[i].format,
                                 interop->texs[i].type, NULL);
     }
@@ -215,7 +239,7 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
     GLenum tex_type = interop->texs[tex_idx].type;
 
     /* This unpack alignment is the default, but setting it just in case. */
-    interop->vt->PixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    priv->gl.PixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
     if (!priv->has_unpack_subimage)
     {
@@ -244,21 +268,21 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
                 source += pitch;
                 destination += visible_pitch;
             }
-            interop->vt->TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
+            priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
                                        tex_format, tex_type, priv->texture_temp_buf);
         }
         else
         {
-            interop->vt->TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
+            priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
                                        tex_format, tex_type, pixels);
         }
     }
     else
     {
-        interop->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ? visible_pitch : 1));
-        interop->vt->TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ? visible_pitch : 1));
+        priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
                                    tex_format, tex_type, pixels);
-        interop->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
     return VLC_SUCCESS;
 }
@@ -268,12 +292,13 @@ tc_common_update(const struct vlc_gl_interop *interop, GLuint *textures,
                  const GLsizei *tex_width, const GLsizei *tex_height,
                  picture_t *pic, const size_t *plane_offset)
 {
+    const struct priv *priv = interop->priv;
     int ret = VLC_SUCCESS;
     for (unsigned i = 0; i < interop->tex_count && ret == VLC_SUCCESS; i++)
     {
         assert(textures[i] != 0);
-        interop->vt->ActiveTexture(GL_TEXTURE0 + i);
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        priv->gl.ActiveTexture(GL_TEXTURE0 + i);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
         const void *pixels = plane_offset != NULL ?
                              &pic->p[i].p_pixels[plane_offset[i]] :
                              pic->p[i].p_pixels;
@@ -297,13 +322,24 @@ opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
 int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 {
+
+    struct priv *priv = calloc(1, sizeof(struct priv));
+    if (unlikely(priv == NULL))
+        return VLC_ENOMEM;
+
+#define LOAD_SYMBOL(type, name) \
+    priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name); \
+    assert(priv->gl.name != NULL);
+
+    OPENGL_VTABLE_F(LOAD_SYMBOL);
+
     video_color_space_t space;
     const vlc_fourcc_t *list;
 
     if (vlc_fourcc_IsYUV(interop->fmt_in.i_chroma))
     {
         GLint max_texture_units = 0;
-        interop->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+        priv->gl.GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
         if (max_texture_units < 3)
             return VLC_EGENERIC;
 
@@ -364,15 +400,12 @@ interop_init:
         video_format_FixRgb(&interop->fmt_out);
     }
 
-    struct priv *priv = interop->priv = calloc(1, sizeof(struct priv));
-    if (unlikely(priv == NULL))
-        return VLC_ENOMEM;
-
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_common_allocate_textures,
         .update_textures = tc_common_update,
         .close = opengl_interop_generic_deinit,
     };
+    interop->priv = priv;
     interop->ops = &ops;
     interop->fmt_in.i_chroma = i_chroma;
 
@@ -383,15 +416,15 @@ interop_init:
     if (allow_dr && priv->has_unpack_subimage)
     {
         /* Ensure we do direct rendering / PBO with OpenGL 3.0 or higher. */
-        const unsigned char *ogl_version = interop->vt->GetString(GL_VERSION);
+        const unsigned char *ogl_version = priv->gl.GetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
         const bool has_pbo = glver_ok &&
             (vlc_gl_StrHasToken(interop->api->extensions, "GL_ARB_pixel_buffer_object") ||
              vlc_gl_StrHasToken(interop->api->extensions, "GL_EXT_pixel_buffer_object"));
 
-        const bool supports_pbo = has_pbo && interop->vt->BufferData
-            && interop->vt->BufferSubData;
+        const bool supports_pbo = has_pbo && priv->gl.BufferData
+            && priv->gl.BufferSubData;
         if (supports_pbo && pbo_pics_alloc(interop) == VLC_SUCCESS)
         {
             static const struct vlc_gl_interop_ops pbo_ops = {
