@@ -74,6 +74,7 @@ void MLThreadPool::start(QRunnable* task, const char* queue)
         else
         {
             m_serialTasks[queue] = QQueue<QRunnable*>();
+            m_serialTasks[queue].push_back(task);
             auto serialTasks = new MLThreadPoolSerialTask(this, queue);
             serialTasks->setAutoDelete(false);
             m_threadpool.start(serialTasks);
