@@ -435,7 +435,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
             }
         }
 
-        /* Set default or user align/magin.
+        /* Set default or user align/margin.
          * Style overridden if no user value. */
         p_text_region->i_x = i_sys_align > 0 ? 20 : 0;
         p_text_region->i_y = 10;
