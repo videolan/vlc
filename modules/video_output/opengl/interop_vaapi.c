@@ -71,6 +71,11 @@ struct priv
         void (*destroyImageKHR)(EGLDisplay, EGLImage image);
     } egl;
 
+    struct
+    {
+        PFNGLBINDTEXTUREPROC BindTexture;
+    } gl;
+
     unsigned fourcc;
     EGLint drm_fourccs[3];
 
@@ -255,7 +260,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, GLuint *textures,
         if (egl_images[i] == NULL)
             goto error;
 
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
 
         priv->glEGLImageTargetTexture2DOES(interop->tex_target, egl_images[i]);
     }
@@ -270,7 +275,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, GLuint *textures,
         if (egl_images[i] == NULL)
             goto error;
 
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
 
         priv->glEGLImageTargetTexture2DOES(interop->tex_target, egl_images[i]);
     }
@@ -498,6 +503,11 @@ Open(vlc_object_t *obj)
     priv->glEGLImageTargetTexture2DOES =
         vlc_gl_GetProcAddress(interop->gl, "glEGLImageTargetTexture2DOES");
     if (priv->glEGLImageTargetTexture2DOES == NULL)
+        goto error;
+
+    priv->gl.BindTexture =
+        vlc_gl_GetProcAddress(interop->gl, "glBindTexture");
+    if (priv->gl.BindTexture == NULL)
         goto error;
 
     priv->vadpy = dec_device->opaque;
