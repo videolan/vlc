@@ -34,8 +34,6 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include "hxxx_helper.h"
-#define _VIDEOINFOHEADER_
-#include <vlc_codecs.h>
 
 #define COBJMACROS
 #include <initguid.h>
@@ -43,6 +41,10 @@
 #include <mftransform.h>
 #include <mferror.h>
 #include <mfobjects.h>
+
+
+#define _VIDEOINFOHEADER_
+#include <vlc_codecs.h>
 
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -581,7 +583,7 @@ error:
 static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    HRESULT hr;
+    HRESULT hr = S_OK;
     IMFSample *input_sample = NULL;
 
     block_t *p_xps_blocks = NULL;
