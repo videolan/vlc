@@ -1116,12 +1116,7 @@ static void DestroyMFT(decoder_t *p_dec)
         IMFMediaType_Release(p_sys->input_type);
     if (p_sys->output_sample)
     {
-        IMFMediaBuffer *output_media_buffer = NULL;
-        HRESULT hr = IMFSample_GetBufferByIndex(p_sys->output_sample, 0, &output_media_buffer);
-        if (SUCCEEDED(hr))
-            IMFSample_Release(output_media_buffer);
-        IMFSample_Release(p_sys->output_sample);
-        p_sys->output_sample = NULL;
+        IMFSample_RemoveAllBuffers(p_sys->output_sample);
     }
     if (p_sys->output_type)
         IMFMediaType_Release(p_sys->output_type);
