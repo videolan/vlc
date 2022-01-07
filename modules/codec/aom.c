@@ -54,6 +54,11 @@ static int OpenEncoder(vlc_object_t *);
 static void CloseEncoder(encoder_t *);
 static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
 
+static const int pi_profile_values_list[] =
+  { 0, 1, 2 };
+static const char *const ppsz_profile_text [] =
+  { N_("Main"), N_("High"), N_("Professional") };
+
 static const int pi_enc_bitdepth_values_list[] =
   { 8, 10, 12 };
 static const char *const ppsz_enc_bitdepth_text [] =
@@ -70,6 +75,11 @@ static bool aom_has_max_speed_10()
  * Module descriptor
  *****************************************************************************/
 
+#define PROFILE_LONGTEXT \
+    "Main Profile: 8 and 10-bit 4:2:0. " \
+    "High Profile: 8 and 10-bit 4:4:4. " \
+    "Professional Profile: 8, 10 and 12-bit for 4:2:2, otherwise 12-bit."
+
 vlc_module_begin ()
     set_shortname("aom")
     set_description(N_("AOM video decoder"))
@@ -82,8 +92,9 @@ vlc_module_begin ()
         set_capability("video encoder", 101)
         set_description(N_("AOM video encoder"))
         set_callback(OpenEncoder)
-        add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL )
+        add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", PROFILE_LONGTEXT )
             change_integer_range( 0, 2 )
+            change_integer_list( pi_profile_values_list, ppsz_profile_text )
         add_integer( SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL )
             change_integer_list( pi_enc_bitdepth_values_list, ppsz_enc_bitdepth_text )
         add_integer( SOUT_CFG_PREFIX "tile-rows", 0, "Tile Rows (in log2 units)", NULL )
