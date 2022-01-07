@@ -109,8 +109,6 @@ struct vlc_gl_interop {
     module_t *module;
 
     vlc_gl_t *gl;
-    const struct vlc_gl_api *api;
-    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
     GLenum tex_target;
 
     /* Input format
@@ -167,12 +165,11 @@ struct vlc_gl_interop {
 };
 
 struct vlc_gl_interop *
-vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
-                   vlc_video_context *context, const video_format_t *fmt);
+vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
+                   const video_format_t *fmt);
 
 struct vlc_gl_interop *
-vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
-                                 const struct vlc_gl_api *api);
+vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl);
 
 void
 vlc_gl_interop_Delete(struct vlc_gl_interop *interop);

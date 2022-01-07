@@ -366,8 +366,8 @@ opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
 }
 
 struct vlc_gl_interop *
-vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
-                   vlc_video_context *context, const video_format_t *fmt)
+vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
+                   const video_format_t *fmt)
 {
     struct vlc_gl_interop_private *priv = vlc_object_create(gl, sizeof *priv);
     if (priv == NULL)
@@ -381,10 +381,6 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     interop->gl = gl;
     /* this is the only allocated field, and we don't need it */
     interop->fmt_out.p_palette = interop->fmt_in.p_palette = NULL;
-
-    interop->gl = gl;
-    interop->api = api;
-    interop->vt = &api->vt;
 
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(fmt->i_chroma);
@@ -425,8 +421,7 @@ error:
 }
 
 struct vlc_gl_interop *
-vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
-                                 const struct vlc_gl_api *api)
+vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl)
 {
     struct vlc_gl_interop_private *priv = vlc_object_create(gl, sizeof *priv);
     if (priv == NULL)
@@ -436,8 +431,6 @@ vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
     interop->init = opengl_interop_init_impl;
     interop->ops = NULL;
     interop->gl = gl;
-    interop->api = api;
-    interop->vt = &api->vt;
 
     video_format_Init(&interop->fmt_in, VLC_CODEC_RGB32);
     interop->fmt_out = interop->fmt_in;

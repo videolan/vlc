@@ -209,7 +209,7 @@ static int Open( vlc_object_t *obj )
         goto gl_api_failure;
     }
 
-    sys->interop = vlc_gl_interop_New(sys->gl, api, filter->vctx_in,
+    sys->interop = vlc_gl_interop_New(sys->gl, filter->vctx_in,
                                       &filter->fmt_in.video);
     if (!sys->interop)
     {
