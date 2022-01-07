@@ -79,7 +79,7 @@ struct hxxx_helper
 };
 
 /* Init:
- * i_input_length_size set xvcC nal length or 0 for AnnexB (overriden by extradata)
+ * i_input_length_size set xvcC nal length or 0 for AnnexB (overridden by extradata)
  * i_output_length_size set xvcC nal length or 0 for AnnexB */
 void hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
                       vlc_fourcc_t i_codec, uint8_t i_input_length_size,

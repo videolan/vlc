@@ -51,7 +51,7 @@ public:
 
     ~VLCVarChoiceModel();
 
-    //QAbstractListModel overriden functions
+    //QAbstractListModel overridden functions
     virtual Qt::ItemFlags flags(const QModelIndex &) const  override;
     QHash<int, QByteArray> roleNames() const override;
     virtual int rowCount(const QModelIndex & = QModelIndex()) const override;

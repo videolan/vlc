@@ -527,7 +527,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 goto error;
             }
 
-            /* The fmt_in may have been overriden by the encoder. */
+            /* The fmt_in may have been overridden by the encoder. */
             const es_format_t *encoder_fmt_in = transcode_encoder_format_in( id->encoder );
 
             /* check if we need to add a converter between last user filter and encoder. */

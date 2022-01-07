@@ -94,7 +94,7 @@ static bool ReadWin32( HANDLE *hConsoleIn, unsigned char *p_buffer, int *pi_size
                     nbBytes++;
                 }
                 assert( clz( (unsigned char)~(p_buffer[*pi_size]) ) == nbBytes + 1 );
-                // The first utf8 byte will be overriden by a \0
+                // The first utf8 byte will be overridden by a \0
             }
             else
                 (*pi_size)--;

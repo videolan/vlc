@@ -193,7 +193,7 @@
  * Weak symbol annotation
  *
  * Use this macro before an external identifier \b definition to mark it as a
- * weak symbol. A weak symbol can be overriden by another symbol of the same
+ * weak symbol. A weak symbol can be overridden by another symbol of the same
  * name at the link time.
  */
 # define VLC_WEAK

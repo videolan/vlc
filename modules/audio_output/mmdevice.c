@@ -355,7 +355,7 @@ vlc_AudioSessionEvents_OnSessionDisconnected(IAudioSessionEvents *this,
             msg_Err(aout, "session disconnected: %s", "session disconnected");
             return S_OK;
         case DisconnectReasonExclusiveModeOverride:
-            msg_Err(aout, "session disconnected: %s", "stream overriden");
+            msg_Err(aout, "session disconnected: %s", "stream overridden");
             return S_OK;
         default:
             msg_Warn(aout, "session disconnected: unknown reason %d", reason);
