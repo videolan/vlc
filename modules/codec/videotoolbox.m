@@ -105,6 +105,7 @@ enum vtsession_status
     VTSESSION_STATUS_RESTART,
     VTSESSION_STATUS_RESTART_CHROMA,
     VTSESSION_STATUS_ABORT,
+    VTSESSION_STATUS_VOUT_FAILURE,
 };
 
 static int ConfigureVout(decoder_t *);
@@ -1938,6 +1939,11 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         var_Create(p_dec, "videotoolbox-failed", VLC_VAR_VOID);
         return VLCDEC_RELOAD;
     }
+    else if (p_sys->vtsession_status == VTSESSION_STATUS_VOUT_FAILURE)
+    {
+        vlc_mutex_unlock(&p_sys->lock);
+        return VLCDEC_RELOAD;
+    }
     vlc_mutex_unlock(&p_sys->lock);
 
     if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
@@ -2107,7 +2113,7 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     if (decoder_UpdateVideoFormat(p_dec) != 0)
     {
-        p_dec->p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+        p_dec->p_sys->vtsession_status = VTSESSION_STATUS_VOUT_FAILURE;
         return -1;
     }
     return 0;
