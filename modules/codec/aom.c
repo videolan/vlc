@@ -90,6 +90,8 @@ static bool aom_has_max_speed_10()
     "High Profile: 8 and 10-bit 4:4:4. " \
     "Professional Profile: 8, 10 and 12-bit for 4:2:2, otherwise 12-bit."
 
+#define CPU_USED_LONGTEXT "CPU speed setting. Ranges differ depending upon usage mode (good quality: 0-5, realtime: 6-10, all-intra: 7-9)."
+
 vlc_module_begin ()
     set_shortname("aom")
     set_description(N_("AOM video decoder"))
@@ -111,8 +113,8 @@ vlc_module_begin ()
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_ROWS */
         add_integer( SOUT_CFG_PREFIX "tile-columns", 0, "Tile Columns (in log2 units)", NULL )
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_COLS */
-        add_integer( SOUT_CFG_PREFIX "cpu-used", 1, "Speed setting", NULL )
-            change_integer_range( 0, aom_has_max_speed_10() ? 10 : 8 ) /* good: 0-5, realtime: 6-8 (or 10 for libaom >= 3.2.0) */
+        add_integer( SOUT_CFG_PREFIX "cpu-used", 1, "Speed setting", CPU_USED_LONGTEXT )
+            change_integer_range( 0, aom_has_max_speed_10() ? 10 : 8 )
         add_integer( SOUT_CFG_PREFIX "lag-in-frames", 16, "Maximum number of lookahead frames", NULL )
             change_integer_range(0, 70 /* MAX_LAG_BUFFERS + MAX_LAP_BUFFERS */ )
         add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage", NULL )
