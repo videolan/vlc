@@ -390,7 +390,7 @@ static void GLESSwap(vlc_gl_t *gl)
 
 - (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd
 {
-    _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
+    _appActive = ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground);
     if (unlikely(!_appActive))
         return nil;
 
