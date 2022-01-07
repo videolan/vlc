@@ -827,7 +827,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
             IMFSample_Release(p_sys->output_sample);
             p_sys->output_sample = NULL;
         }
-        if (AllocateOutputSample(p_dec, 0, &p_sys->output_sample))
+        if (AllocateOutputSample(p_dec, p_sys->output_stream_id, &p_sys->output_sample))
             goto error;
         // there's an output ready, keep trying
         *keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
@@ -1225,7 +1225,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Only one output sample is needed, we can allocate one and reuse it. */
-    if (AllocateOutputSample(p_dec, 0, &p_sys->output_sample))
+    if (AllocateOutputSample(p_dec, p_sys->output_stream_id, &p_sys->output_sample))
         goto error;
 
     p_dec->pf_decode = p_sys->is_async ? DecodeAsync : DecodeSync;
