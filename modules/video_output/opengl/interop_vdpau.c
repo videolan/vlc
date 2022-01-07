@@ -42,7 +42,7 @@
 #define INTEROP_CALL(fct, ...) \
     _##fct(__VA_ARGS__); \
     { \
-        GLenum ret = interop->vt->GetError(); \
+        GLenum ret = ((converter_sys_t*)interop->priv)->gl.GetError(); \
         if (ret != GL_NO_ERROR) \
         { \
             msg_Err(interop->gl, #fct " failed: 0x%x", ret); \
@@ -62,6 +62,9 @@ static PFNGLVDPAUUNMAPSURFACESNVPROC            _glVDPAUUnmapSurfacesNV;
 
 typedef struct {
     vlc_decoder_device *dec_device;
+    struct {
+        PFNGLGETERRORPROC GetError;
+    } gl;
 } converter_sys_t;
 
 static int
@@ -107,8 +110,10 @@ tc_vdpau_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
 static void
 Close(struct vlc_gl_interop *interop)
 {
-    _glVDPAUFiniNV(); assert(interop->vt->GetError() == GL_NO_ERROR);
     converter_sys_t *sys = interop->priv;
+
+    _glVDPAUFiniNV();
+    assert(sys->gl.GetError() == GL_NO_ERROR);
     vlc_decoder_device *dec_device = sys->dec_device;
     vlc_decoder_device_Release(dec_device);
 }
@@ -137,6 +142,8 @@ Open(vlc_object_t *obj)
         return VLC_ENOMEM;
     }
     sys->dec_device = dec_device;
+    sys->gl.GetError = vlc_gl_GetProcAddress(interop->gl, "glGetError");
+    assert(sys->gl.GetError != NULL);
 
     /* Request to change the input chroma to the core */
     interop->fmt_in.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
