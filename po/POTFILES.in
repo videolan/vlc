@@ -315,7 +315,7 @@ modules/codec/libass.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mad.c
-modules/codec/mft.c
+modules/codec/mft.cpp
 modules/codec/mpg123.c
 modules/codec/oggspots.c
 modules/codec/omxil/mediacodec.c

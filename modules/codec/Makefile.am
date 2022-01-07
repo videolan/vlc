@@ -590,7 +590,7 @@ codec_LTLIBRARIES += libdmo_plugin.la
 endif
 endif
 
-libmft_plugin_la_SOURCES = codec/mft.c
+libmft_plugin_la_SOURCES = codec/mft.cpp
 if HAVE_WIN32
 libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat libvlc_hxxxhelper.la
 codec_LTLIBRARIES += libmft_plugin.la
