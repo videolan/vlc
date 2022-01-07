@@ -1175,6 +1175,8 @@ static int FindMFT(decoder_t *p_dec)
 
         if (InitializeMFT(p_dec) == VLC_SUCCESS)
         {
+            for (++i; i < activate_objects_count; ++i)
+                IMFActivate_Release(activate_objects[i]);
             CoTaskMemFree(activate_objects);
             return VLC_SUCCESS;
         }
