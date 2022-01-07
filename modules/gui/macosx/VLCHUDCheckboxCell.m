@@ -43,7 +43,7 @@
     /* On 10.10+ we do not want custom drawing, therefore we swap out the implementation
      * of the selectors below with their original implementations.
      * Just calling super will not work, as the AppKit implementation for the NSButton
-     * checkbox checks if the drawing related selectors below are overriden, and if
+     * checkbox checks if the drawing related selectors below are overridden, and if
      * that is the case, will fall back to legacy drawing, without animation,
      * without vibrancy and non-layer-based.
      */
