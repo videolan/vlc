@@ -629,11 +629,11 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (FAILED(hr))
         goto error;
 
-    memcpy(buffer_start, p_block->p_buffer, p_block->i_buffer);
     if (p_xps_blocks) {
         buffer_start += block_ChainExtract(p_xps_blocks, buffer_start, alloc_size);
         p_sys->b_xps_pushed = true;
     }
+    memcpy(buffer_start, p_block->p_buffer, p_block->i_buffer);
 
     hr = IMFMediaBuffer_Unlock(input_media_buffer);
     if (FAILED(hr))
