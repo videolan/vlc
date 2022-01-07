@@ -918,6 +918,7 @@ void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
         {
             IDXGIDebug *pDXGIDebug = pv;
             IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+            IDXGIDebug_Release(pDXGIDebug);
         }
     }
 # endif
