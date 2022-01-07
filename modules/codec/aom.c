@@ -75,12 +75,6 @@ static const char *const ppsz_rc_end_usage_text [] =
   { N_("VBR"), N_("CBR"), N_("CQ"), N_("Q") };
 #endif
 
-/* Range of values for cpu-used was increased to 10 in libaom 3.2.0 */
-static bool aom_has_max_speed_10()
-{
-    return aom_codec_version() >= 197120;
-}
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -114,7 +108,7 @@ vlc_module_begin ()
         add_integer( SOUT_CFG_PREFIX "tile-columns", 0, "Tile Columns (in log2 units)", NULL )
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_COLS */
         add_integer( SOUT_CFG_PREFIX "cpu-used", 1, "Speed setting", CPU_USED_LONGTEXT )
-            change_integer_range( 0, aom_has_max_speed_10() ? 10 : 8 )
+            change_integer_range( 0, 10 )
         add_integer( SOUT_CFG_PREFIX "lag-in-frames", 16, "Maximum number of lookahead frames", NULL )
             change_integer_range(0, 70 /* MAX_LAG_BUFFERS + MAX_LAP_BUFFERS */ )
         add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage", NULL )
@@ -570,12 +564,6 @@ static int OpenEncoder(vlc_object_t *p_this)
 #endif
 
     int i_cpu_used = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "cpu-used" );
-    if( aom_has_max_speed_10() && i_cpu_used == 10 && enccfg.g_usage != AOM_USAGE_REALTIME )
-    {
-        msg_Warn( p_enc, "CPU speed 10 only valid for realtime, clamping to 9" );
-        i_cpu_used = 9;
-    }
-
     if (aom_codec_control(ctx, AOME_SET_CPUUSED, i_cpu_used))
     {
         AOM_ERR(p_this, ctx, "Failed to set cpu-used");
