@@ -1,5 +1,5 @@
 /*****************************************************************************
- * media.c: Libvlc API media descripor management
+ * media.c: Libvlc API media descriptor management
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN
  *

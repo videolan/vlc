@@ -76,7 +76,7 @@ libvlc_la_LDFLAGS += -Xlinker -install_name -Xlinker @rpath/libvlc.dylib
 endif
 
 # iOS and tvOS applications cannot install global shared libraries and
-# dylibs must be in frameworks so there's no need for libtool versionning.
+# dylibs must be in frameworks so there's no need for libtool versioning.
 if HAVE_IOS
 libvlc_la_LDFLAGS += -avoid-version
 endif

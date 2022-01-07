@@ -41,7 +41,7 @@ struct libvlc_media_t
     libvlc_state_t     state;
     vlc_atomic_rc_t    rc;
 
-    VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t*) p_subitems; /* A media descriptor can have Sub items. This is the only dependancy we really have on media_list */
+    VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t*) p_subitems; /* A media descriptor can have Sub items. This is the only dependency we really have on media_list */
     void *p_user_data;
 
     vlc_cond_t parsed_cond;
