@@ -114,7 +114,8 @@ vlc_module_begin ()
         add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage", NULL )
             change_integer_range( 0, 2 )
             change_integer_list( pi_usage_values_list, ppsz_usage_text )
-        add_integer( SOUT_CFG_PREFIX "rc-end-usage", AOM_CBR, "Rate control mode", NULL )
+        add_obsolete_integer( "sout-aom-rc-end-usage" ) /* since 4.0.0 */
+        add_integer( SOUT_CFG_PREFIX "rate-control", AOM_CBR, "Rate control mode", NULL )
             change_integer_range( 0, 3 )
             change_integer_list( pi_rc_end_usage_values_list, ppsz_rc_end_usage_text )
 #ifdef AOM_CTRL_AV1E_SET_ROW_MT
