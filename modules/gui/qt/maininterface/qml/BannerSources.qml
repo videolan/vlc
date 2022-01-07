@@ -62,10 +62,17 @@ FocusScope {
     }
 
     Binding {
-        target: !!contentModel ? contentModel : null
         property: "searchPattern"
         value: searchBox.searchPattern
         when: !!contentModel
+
+        Component.onCompleted: {
+            // restoreMode is only available in Qt >= 5.14
+            if ("restoreMode" in this)
+                this.restoreMode = Binding.RestoreBindingOrValue
+
+            target = Qt.binding(function() { return !!contentModel ? contentModel : null })
+        }
     }
 
     Widgets.AcrylicBackground {
