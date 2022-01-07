@@ -110,20 +110,8 @@ static const int pi_channels_maps[9] =
 };
 
 /* Possibly missing from mingw headers */
-#ifndef MF_E_TRANSFORM_NEED_MORE_INPUT
-# define MF_E_TRANSFORM_NEED_MORE_INPUT _HRESULT_TYPEDEF_(0xc00d6d72)
-#endif
-
-#ifndef MF_E_TRANSFORM_STREAM_CHANGE
-# define MF_E_TRANSFORM_STREAM_CHANGE _HRESULT_TYPEDEF_(0xc00d6d61)
-#endif
-
 #ifndef MF_E_NO_EVENTS_AVAILABLE
 # define MF_E_NO_EVENTS_AVAILABLE _HRESULT_TYPEDEF_(0xC00D3E80L)
-#endif
-
-#ifndef MF_EVENT_FLAG_NO_WAIT
-# define MF_EVENT_FLAG_NO_WAIT 0x00000001
 #endif
 
 /*
