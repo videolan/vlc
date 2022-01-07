@@ -161,7 +161,7 @@
 
 #define SOUT_STREAM_TITLE N_("Sout stream")
 #define SOUT_STREAM_HELP N_( "Sout stream modules allow to build a sout " \
-                "processing chain. Please refer to the Streaming Howto for " \
+                "processing chain. Please refer to the Streaming 'how-to' for " \
                 "more information. You can configure default options for " \
                 "each sout stream module here.")
 
