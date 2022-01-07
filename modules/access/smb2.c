@@ -48,8 +48,34 @@
 #include <smb2/libsmb2-raw.h>
 
 #ifdef HAVE_DSM
-# include <bdsm/netbios_ns.h>
-# include <bdsm/netbios_defs.h>
+# include <bdsm/bdsm.h>
+
+#if BDSM_VERSION_CURRENT >= 5
+
+static void
+netbios_ns_interrupt_callback(void *data)
+{
+    netbios_ns_abort(data);
+}
+
+static inline void
+netbios_ns_interrupt_register(netbios_ns *ns)
+{
+    vlc_interrupt_register(netbios_ns_interrupt_callback, ns);
+}
+
+static inline void
+netbios_ns_interrupt_unregister(void)
+{
+    vlc_interrupt_unregister();
+}
+
+#else
+
+#define netbios_ns_interrupt_register( ns ) do {} while (0)
+#define netbios_ns_interrupt_unregister() do {} while (0)
+#endif
+
 #endif
 
 #ifdef HAVE_ARPA_INET_H
@@ -738,6 +764,7 @@ vlc_smb2_resolve(stream_t *access, const char *host, unsigned port)
     netbios_ns *ns = netbios_ns_new();
     if (!ns)
         return NULL;
+    netbios_ns_interrupt_register(ns);
     uint32_t ip4_addr;
     if (netbios_ns_resolve(ns, host, NETBIOS_FILESERVER, &ip4_addr) == 0)
     {
@@ -745,6 +772,7 @@ vlc_smb2_resolve(stream_t *access, const char *host, unsigned port)
         if (inet_ntop(AF_INET, &ip4_addr, ip, sizeof(ip)))
             out_host = strdup(ip);
     }
+    netbios_ns_interrupt_unregister();
     netbios_ns_destroy(ns);
     return out_host;
 #else
