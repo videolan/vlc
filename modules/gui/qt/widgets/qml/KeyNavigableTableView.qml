@@ -103,7 +103,7 @@ FocusScope {
     property alias displaced: view.displaced
 
     property alias listScrollBar: view.listScrollBar
-    property alias listView: view.listView
+    property alias listView: view
 
     property alias displayMarginEnd: view.displayMarginEnd
 
@@ -163,7 +163,7 @@ FocusScope {
     }
 
     function positionViewAtBeginning() {
-        view.listView.positionViewAtBeginning()
+        view.positionViewAtBeginning()
     }
 
     function _qtAvoidSectionUpdate() {
