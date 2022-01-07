@@ -53,40 +53,26 @@ static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 // MLGroupListModel
 //=================================================================================================
 
-/* explicit */ MLGroupListModel::MLGroupListModel(QObject * parent)
-    : MLBaseModel(parent) {}
+/* explicit */ MLGroupListModel::MLGroupListModel(QObject * parent) : MLVideoModel(parent) {}
 
 //-------------------------------------------------------------------------------------------------
-// QAbstractItemModel implementation
+// MLVideoModel reimplementation
 //-------------------------------------------------------------------------------------------------
 
 QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
 {
-    return
-    {
-        { GROUP_IS_VIDEO,           "isVideo"            },
-        { GROUP_ID,                 "id"                 },
-        { GROUP_TITLE,              "title"              },
-        { GROUP_THUMBNAIL,          "thumbnail"          },
-        { GROUP_DURATION,           "duration"           },
-        { GROUP_DATE,               "date"               },
-        { GROUP_COUNT,              "count"              },
-        // NOTE: Media specific.
-        { GROUP_IS_NEW,             "isNew"              },
-        { GROUP_FILENAME,           "fileName"           },
-        { GROUP_PROGRESS,           "progress"           },
-        { GROUP_PLAYCOUNT,          "playcount"          },
-        { GROUP_RESOLUTION,         "resolution_name"    },
-        { GROUP_CHANNEL,            "channel"            },
-        { GROUP_MRL,                "mrl"                },
-        { GROUP_MRL_DISPLAY,        "display_mrl"        },
-        { GROUP_VIDEO_TRACK,        "videoDesc"          },
-        { GROUP_AUDIO_TRACK,        "audioDesc"          },
-        { GROUP_TITLE_FIRST_SYMBOL, "title_first_symbol" }
-    };
+    QHash<int, QByteArray> hash = MLVideoModel::roleNames();
+
+    hash.insert(GROUP_IS_VIDEO, "isVideo");
+    hash.insert(GROUP_DATE,     "date");
+    hash.insert(GROUP_COUNT,    "count");
+
+    return hash;
 }
 
-QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* override */
+// Protected MLVideoModel implementation
+
+QVariant MLGroupListModel::itemRoleData(MLItem * item, const int role) const /* override */
 {
     if (item == nullptr)
         return QVariant();
@@ -101,16 +87,17 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
             case Qt::DisplayRole:
                 return QVariant::fromValue(group->getTitle());
             // NOTE: These are the conditions for QML view(s).
+            case VIDEO_ID:
+                return QVariant::fromValue(group->getId());
+            case VIDEO_TITLE:
+                return QVariant::fromValue(group->getTitle());
+            case VIDEO_THUMBNAIL:
+                return getVideoListCover(this, group, MLGROUPLISTMODEL_COVER_WIDTH,
+                                         MLGROUPLISTMODEL_COVER_HEIGHT, VIDEO_THUMBNAIL);
+            case VIDEO_DURATION:
+                return QVariant::fromValue(group->getDuration());
             case GROUP_IS_VIDEO:
                 return false;
-            case GROUP_ID:
-                return QVariant::fromValue(group->getId());
-            case GROUP_TITLE:
-                return QVariant::fromValue(group->getTitle());
-            case GROUP_THUMBNAIL:
-                return getCover(group);
-            case GROUP_DURATION:
-                return QVariant::fromValue(group->getDuration());
             case GROUP_DATE:
                 return QVariant::fromValue(group->getDate());
             case GROUP_COUNT:
@@ -129,66 +116,24 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
                 return QVariant::fromValue(video->getTitle());
             case GROUP_IS_VIDEO:
                 return true;
-            case GROUP_ID:
-                return QVariant::fromValue(video->getId());
-            case GROUP_TITLE:
-                return QVariant::fromValue(video->getTitle());
-            case GROUP_THUMBNAIL:
-            {
-                vlc_ml_thumbnail_status_t status;
-                const QString thumbnail = video->getThumbnail(&status);
-                if (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE)
-                {
-                    generateVideoThumbnail(item->getId().id);
-                }
-                return QVariant::fromValue( thumbnail );
-            }
-            case GROUP_DURATION:
-                return QVariant::fromValue(video->getDuration());
             case GROUP_DATE:
                 return QVariant();
             case GROUP_COUNT:
                 return 1;
             // NOTE: Media specific.
-            case GROUP_IS_NEW:
-                return QVariant::fromValue(video->isNew());
-            case GROUP_FILENAME:
-                return QVariant::fromValue(video->getFileName());
-            case GROUP_PROGRESS:
-                return QVariant::fromValue(video->getProgress());
-            case GROUP_PLAYCOUNT:
-                return QVariant::fromValue(video->getPlayCount());
-            case GROUP_RESOLUTION:
-                return QVariant::fromValue(video->getResolutionName());
-            case GROUP_CHANNEL:
-                return QVariant::fromValue(video->getChannel());
-            case GROUP_MRL:
-                return QVariant::fromValue(video->getMRL());
-            case GROUP_MRL_DISPLAY:
-                return QVariant::fromValue(video->getDisplayMRL());
-            case GROUP_VIDEO_TRACK:
-                return QVariant::fromValue(video->getVideoDesc());
-            case GROUP_AUDIO_TRACK:
-                return QVariant::fromValue(video->getAudioDesc());
-            case GROUP_TITLE_FIRST_SYMBOL:
-                return QVariant::fromValue(getFirstSymbol(video->getTitle()));
             default:
-                return QVariant();
+                return MLVideoModel::itemRoleData(item, role);
         }
     }
 }
-
-//-------------------------------------------------------------------------------------------------
-// Protected MLBaseModel implementation
-//-------------------------------------------------------------------------------------------------
 
 vlc_ml_sorting_criteria_t MLGroupListModel::roleToCriteria(int role) const /* override */
 {
     switch (role)
     {
-        case GROUP_TITLE:
+        case VIDEO_TITLE:
             return VLC_ML_SORTING_ALPHA;
-        case GROUP_DURATION:
+        case VIDEO_DURATION:
             return VLC_ML_SORTING_DURATION;
         case GROUP_DATE:
             return VLC_ML_SORTING_INSERTIONDATE;
@@ -208,80 +153,10 @@ QByteArray MLGroupListModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) 
     return criterias.key(criteria, "");
 }
 
-//-------------------------------------------------------------------------------------------------
-
 ListCacheLoader<std::unique_ptr<MLItem>> * MLGroupListModel::createLoader() const /* override */
 {
     return new Loader(*this);
 }
-
-//-------------------------------------------------------------------------------------------------
-// Private functions
-//-------------------------------------------------------------------------------------------------
-
-QString MLGroupListModel::getCover(MLGroup * group) const
-{
-    QString cover = group->getCover();
-
-    // NOTE: Making sure we're not already generating a cover.
-    if (cover.isNull() == false || group->hasGenerator())
-        return cover;
-
-    MLItemId groupId = group->getId();
-    struct Context{
-        QString cover;
-    };
-    group->setGenerator(true);
-    m_mediaLib->runOnMLThread<Context>(this,
-    //ML thread
-    [groupId]
-    (vlc_medialibrary_t* ml, Context& ctx){
-        CoverGenerator generator{ml, groupId};
-
-        generator.setSize(QSize(MLGROUPLISTMODEL_COVER_WIDTH,
-                                 MLGROUPLISTMODEL_COVER_HEIGHT));
-
-        generator.setDefaultThumbnail(":/noart_videoCover.svg");
-
-        if (generator.cachedFileAvailable())
-            ctx.cover = generator.cachedFileURL();
-        else
-            ctx.cover = generator.execute();
-    },
-    //UI Thread
-    [this, groupId]
-    (quint64, Context& ctx)
-    {
-        int row;
-        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-        auto group = static_cast<MLGroup*>(findInCache(groupId, &row));
-        if (!group)
-            return;
-
-        group->setCover(ctx.cover);
-        group->setGenerator(false);
-
-        QModelIndex modelIndex =this->index(row);
-        //we're running in a callback
-        emit const_cast<MLGroupListModel*>(this)->dataChanged(modelIndex, modelIndex, { GROUP_THUMBNAIL });
-    });
-
-    return cover;
-}
-
-
-void MLGroupListModel::generateVideoThumbnail(uint64_t id) const
-{
-    m_mediaLib->runOnMLThread(this,
-    //ML thread
-    [id](vlc_medialibrary_t* ml){
-        vlc_ml_media_generate_thumbnail(ml, id, VLC_ML_THUMBNAIL_SMALL, 512, 320, .15 );
-    });
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private MLBaseModel reimplementation
-//-------------------------------------------------------------------------------------------------
 
 void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
@@ -305,14 +180,6 @@ void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
 
     MLBaseModel::onVlcMlEvent(event);
 }
-
-void MLGroupListModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status) /* override */
-{
-    auto videoItem = static_cast<MLVideo*>(mlitem);
-    videoItem->setThumbnail(status, mrl);
-    emit dataChanged(idx, idx, { GROUP_THUMBNAIL });
-}
-
 
 //=================================================================================================
 // Loader

@@ -22,49 +22,31 @@
 #define MLGROUPLISTMODEL_HPP
 
 // MediaLibrary includes
-#include "mlbasemodel.hpp"
+#include "mlvideomodel.hpp"
 
 // Forward declarations
-struct vlc_medialibrary_t;
 class MLGroup;
 
-class MLGroupListModel : public MLBaseModel
+class MLGroupListModel : public MLVideoModel
 {
     Q_OBJECT
 
 public:
     enum Roles
     {
-        GROUP_IS_VIDEO = Qt::UserRole + 1,
-        GROUP_ID,
-        GROUP_TITLE,
-        GROUP_THUMBNAIL,
-        GROUP_DURATION,
+        // NOTE: Group specific.
+        GROUP_IS_VIDEO = VIDEO_TITLE_FIRST_SYMBOL + 1,
         GROUP_DATE,
-        GROUP_COUNT,
-        // NOTE: Media specific.
-        GROUP_IS_NEW,
-        GROUP_FILENAME,
-        GROUP_PROGRESS,
-        GROUP_PLAYCOUNT,
-        GROUP_RESOLUTION,
-        GROUP_CHANNEL,
-        GROUP_MRL,
-        GROUP_MRL_DISPLAY,
-        GROUP_VIDEO_TRACK,
-        GROUP_AUDIO_TRACK,
-
-        GROUP_TITLE_FIRST_SYMBOL
+        GROUP_COUNT
     };
 
 public:
     explicit MLGroupListModel(QObject * parent = nullptr);
 
-
-public: // QAbstractItemModel implementation
+public: // MLVideoModel reimplementation
     QHash<int, QByteArray> roleNames() const override;
 
-protected: // MLBaseModel implementation
+protected: // MLVideoModel reimplementation
     QVariant itemRoleData(MLItem *item, int role = Qt::DisplayRole) const override;
 
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -75,18 +57,10 @@ protected: // MLBaseModel implementation
 
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
-    void thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status) override;
-
-private: // Functions
-    QString getCover(MLGroup * group) const;
-
-private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
 
-    void generateVideoThumbnail(uint64_t id) const;
-
 private:
-    struct Loader : public MLBaseModel::BaseLoader
+    struct Loader : public BaseLoader
     {
         Loader(const MLGroupListModel & model);
 

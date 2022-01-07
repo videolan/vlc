@@ -564,7 +564,7 @@ void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, Q
     QVariantList ids;
 
     for (const QModelIndex & index : selected)
-        ids.push_back(m_model->data(index, MLGroupListModel::GROUP_ID));
+        ids.push_back(m_model->data(index, MLVideoModel::VIDEO_ID));
 
     m_menu = new QMenu();
 
