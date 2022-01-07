@@ -25,14 +25,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_picture.h>
-#include "interop.h"
+typedef struct picture_t picture_t;
 
 /**
  * An importer uses an interop to convert picture_t to a valid vlc_gl_picture,
  * with all necessary transformations computed.
  */
 struct vlc_gl_importer;
+struct vlc_gl_interop;
 
 struct vlc_gl_importer *
 vlc_gl_importer_New(struct vlc_gl_interop *interop);

@@ -23,6 +23,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_picture.h>
 
 #include "importer_priv.h"
 
