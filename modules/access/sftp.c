@@ -396,7 +396,7 @@ static int Open( vlc_object_t* p_this )
         msg_Dbg( p_access, "Unable to check the remote host" );
         break;
     case LIBSSH2_KNOWNHOST_CHECK_MATCH:
-        msg_Dbg( p_access, "Succesfuly matched the host" );
+        msg_Dbg( p_access, "Successfully matched the host" );
         break;
     case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
         msg_Err( p_access, "The host does not match !! The remote key changed !!" );

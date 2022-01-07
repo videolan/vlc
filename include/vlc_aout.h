@@ -158,7 +158,7 @@ struct audio_output
     /**< Starts a new stream (mandatory, cannot be NULL).
       *
       * This callback changes the audio output from stopped to playing state
-      * (if succesful). After the callback returns, time_get(), play(),
+      * (if successful). After the callback returns, time_get(), play(),
       * pause(), flush() and eventually stop() callbacks may be called.
       *
       * \param fmt input stream sample format upon entry,

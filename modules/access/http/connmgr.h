@@ -37,7 +37,7 @@ struct vlc_http_cookie_jar_t;
  * Sends an HTTP request
  *
  * Sends an HTTP request, by either reusing an existing HTTP connection or
- * establishing a new one. If succesful, the initial HTTP response header is
+ * establishing a new one. If successful, the initial HTTP response header is
  * returned.
  *
  * @param mgr HTTP connection manager

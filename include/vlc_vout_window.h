@@ -191,7 +191,7 @@ typedef void (*vout_window_ack_cb)(struct vout_window_t *, unsigned width,
  * window events.
  *
  * As a general rule, the events can occur synchronously or asynchronously from
- * the time that the window is (succesfully) being created by vout_window_New()
+ * the time that the window is (successfully) being created by vout_window_New()
  * until the time that the window has been deleted by vout_window_Delete().
  *
  * \warning
@@ -372,7 +372,7 @@ typedef struct vout_window_t {
     /**
      * Window handle (mandatory)
      *
-     * This must be filled by the plugin upon succesful vout_window_Enable().
+     * This must be filled by the plugin upon successful vout_window_Enable().
      *
      * Depending on the \ref type above, a different member of this union is
      * used.
