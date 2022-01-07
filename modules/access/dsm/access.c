@@ -155,10 +155,30 @@ smb_session_interrupt_unregister( void )
     vlc_interrupt_unregister();
 }
 
+static void
+netbios_ns_interrupt_callback( void *data )
+{
+    netbios_ns_abort( data );
+}
+
+static inline void
+netbios_ns_interrupt_register( netbios_ns *ns )
+{
+    vlc_interrupt_register( netbios_ns_interrupt_callback, ns );
+}
+
+static inline void
+netbios_ns_interrupt_unregister( void )
+{
+    vlc_interrupt_unregister();
+}
+
 #else
 
 #define smb_session_interrupt_register( sys ) do {} while (0)
 #define smb_session_interrupt_unregister() do {} while(0)
+#define netbios_ns_interrupt_register( ns ) do {} while (0)
+#define netbios_ns_interrupt_unregister() do {} while (0)
 
 #endif
 
@@ -297,12 +317,14 @@ static int get_address( stream_t *p_access )
         netbios_ns *p_ns = netbios_ns_new();
         if( p_ns == NULL )
             return VLC_EGENERIC;
+        netbios_ns_interrupt_register( p_ns );
 
         /* Is this a netbios name on this LAN ? */
         uint32_t ip4_addr;
 
         int ret = netbios_ns_resolve( p_ns, p_sys->url.psz_host,
                                       NETBIOS_FILESERVER, &ip4_addr);
+        netbios_ns_interrupt_unregister();
         netbios_ns_destroy( p_ns );
 
         if( ret == 0 )
@@ -333,10 +355,12 @@ static int get_address( stream_t *p_access )
     netbios_ns *p_ns = netbios_ns_new();
     if( p_ns == NULL )
         return VLC_EGENERIC;
+    netbios_ns_interrupt_register( p_ns );
 
     /* We have an IP address, let's find the NETBIOS name */
     const char *psz_nbt = netbios_ns_inverse( p_ns, p_sys->addr.s_addr );
 
+    netbios_ns_interrupt_unregister();
     netbios_ns_destroy( p_ns );
 
     if( psz_nbt != NULL )
