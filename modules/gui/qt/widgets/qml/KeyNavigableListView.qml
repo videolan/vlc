@@ -30,8 +30,6 @@ ListView {
 
     // Properties
 
-    property alias modelCount: root.count
-
     property int fadeSize: root.delegateItem
                            ? (orientation === Qt.Vertical ? root.delegateItem.height
                                                           : root.delegateItem.width) / 2
@@ -196,34 +194,34 @@ ListView {
         if (orientation === ListView.Vertical)
         {
             if ( KeyHelper.matchDown(event) ) {
-                if (currentIndex !== modelCount - 1 )
+                if (currentIndex !== count - 1 )
                     newIndex = currentIndex + 1
                 else if ( root.keyNavigationWraps )
                     newIndex = 0
             } else if ( KeyHelper.matchPageDown(event) ) {
-                newIndex = Math.min(modelCount - 1, currentIndex + 10)
+                newIndex = Math.min(count - 1, currentIndex + 10)
             } else if ( KeyHelper.matchUp(event) ) {
                 if ( currentIndex !== 0 )
                     newIndex = currentIndex - 1
                 else if ( root.keyNavigationWraps )
-                    newIndex = modelCount - 1
+                    newIndex = count - 1
             } else if ( KeyHelper.matchPageUp(event) ) {
                 newIndex = Math.max(0, currentIndex - 10)
             }
         }else{
             if ( KeyHelper.matchRight(event) ) {
-                if (currentIndex !== modelCount - 1 )
+                if (currentIndex !== count - 1 )
                     newIndex = currentIndex + 1
                 else if ( root.keyNavigationWraps )
                     newIndex = 0
             }
             else if ( KeyHelper.matchPageDown(event) ) {
-                newIndex = Math.min(modelCount - 1, currentIndex + 10)
+                newIndex = Math.min(count - 1, currentIndex + 10)
             } else if ( KeyHelper.matchLeft(event) ) {
                 if ( currentIndex !== 0 )
                     newIndex = currentIndex - 1
                 else if ( root.keyNavigationWraps )
-                    newIndex = modelCount - 1
+                    newIndex = count - 1
             } else if ( KeyHelper.matchPageUp(event) ) {
                 newIndex = Math.max(0, currentIndex - 10)
             }
@@ -235,7 +233,7 @@ ListView {
         }
 
         var oldIndex = currentIndex
-        if (newIndex >= 0 && newIndex < modelCount && newIndex !== oldIndex) {
+        if (newIndex >= 0 && newIndex < count && newIndex !== oldIndex) {
             event.accepted = true;
 
             currentIndex = newIndex;
