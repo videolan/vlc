@@ -21,10 +21,6 @@
 #ifndef VLC_GL_IMPORTER_H
 #define VLC_GL_IMPORTER_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 typedef struct picture_t picture_t;
 
 /**
