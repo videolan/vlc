@@ -121,7 +121,6 @@ static int add_item( stream_t *p_access,  struct vlc_readdir_helper *p_rdh,
 
 struct access_sys_t
 {
-    netbios_ns         *p_ns;               /**< Netbios name service */
     smb_session        *p_session;          /**< bdsm SMB Session object */
 
     vlc_url_t           url;
@@ -177,10 +176,6 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
     if( p_access->p_sys == NULL )
         return VLC_ENOMEM;
-
-    p_sys->p_ns = netbios_ns_new();
-    if( p_sys->p_ns == NULL )
-        goto error;
 
     p_sys->p_session = smb_session_new();
     if( p_sys->p_session == NULL )
@@ -274,8 +269,6 @@ static void Close( vlc_object_t *p_this )
     stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_sys->p_ns )
-        netbios_ns_destroy( p_sys->p_ns );
     if( p_sys->i_fd )
         smb_fclose( p_sys->p_session, p_sys->i_fd );
     if( p_sys->p_session )
@@ -301,11 +294,18 @@ static int get_address( stream_t *p_access )
         /* This is not an ip address, let's try netbios/dns resolve */
         struct addrinfo *p_info = NULL;
 
+        netbios_ns *p_ns = netbios_ns_new();
+        if( p_ns == NULL )
+            return VLC_EGENERIC;
+
         /* Is this a netbios name on this LAN ? */
         uint32_t ip4_addr;
-        if( netbios_ns_resolve( p_sys->p_ns, p_sys->url.psz_host,
-                                NETBIOS_FILESERVER,
-                                &ip4_addr) == 0 )
+
+        int ret = netbios_ns_resolve( p_ns, p_sys->url.psz_host,
+                                      NETBIOS_FILESERVER, &ip4_addr);
+        netbios_ns_destroy( p_ns );
+
+        if( ret == 0 )
         {
             p_sys->addr.s_addr = ip4_addr;
             strlcpy( p_sys->netbios_name, p_sys->url.psz_host, 16);
@@ -330,8 +330,15 @@ static int get_address( stream_t *p_access )
             return VLC_EGENERIC;
     }
 
+    netbios_ns *p_ns = netbios_ns_new();
+    if( p_ns == NULL )
+        return VLC_EGENERIC;
+
     /* We have an IP address, let's find the NETBIOS name */
-    const char *psz_nbt = netbios_ns_inverse( p_sys->p_ns, p_sys->addr.s_addr );
+    const char *psz_nbt = netbios_ns_inverse( p_ns, p_sys->addr.s_addr );
+
+    netbios_ns_destroy( p_ns );
+
     if( psz_nbt != NULL )
         strlcpy( p_sys->netbios_name, psz_nbt, 16 );
     else
