@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import org.videolan.vlc 0.1
@@ -56,7 +57,9 @@ FocusScope {
         listView.resetStack()
     }
 
-	property alias effectSource: effect.source
+    property alias effectSource: effect.source
+
+    property alias scrollBarActive: scrollBar.active
 
     visible: false
 
@@ -136,6 +139,8 @@ FocusScope {
             anchors.fill: parent
             anchors.topMargin: root.topPadding
             anchors.bottomMargin: root.bottomPadding
+
+            ScrollBar.vertical: ScrollBar { id: scrollBar; active: true }
 
             focus: true
 
@@ -241,6 +246,9 @@ FocusScope {
 
                     opacity: enabled ? 1.0 : 0.5
                     spacing: button.spacing
+
+                    width: scrollBar.active ? (parent.width - scrollBar.width)
+                                            : parent.width
 
                     Loader {
                         id: icon
