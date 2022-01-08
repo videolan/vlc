@@ -26,7 +26,7 @@ Item {
     TapHandler {
         onDoubleTapped: {
             
-                if ((IntfWindow.visibility & Window.Maximized) !== 0) {
+                if ((MainCtx.intfMainWindow.visibility & Window.Maximized) !== 0) {
                     MainCtx.requestInterfaceNormal()
                 } else {
                     MainCtx.requestInterfaceMaximized()
@@ -40,7 +40,7 @@ Item {
         grabPermissions: TapHandler.CanTakeOverFromAnything
         onActiveChanged: {
             if (active) {
-                IntfWindow.startSystemMove();
+                MainCtx.intfMainWindow.startSystemMove();
             }
         }
     }

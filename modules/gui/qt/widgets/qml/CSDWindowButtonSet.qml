@@ -40,9 +40,9 @@ Row {
     }
 
     CSDWindowButton {
-        iconTxt: (IntfWindow.visibility & Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
+        iconTxt: (MainCtx.intfMainWindow.visibility & Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
         onClicked: {
-            if (IntfWindow.visibility & Window.Maximized) {
+            if (MainCtx.intfMainWindow & Window.Maximized) {
                 MainCtx.requestInterfaceNormal()
             } else {
                 MainCtx.requestInterfaceMaximized()
@@ -56,7 +56,7 @@ Row {
     CSDWindowButton {
         id: closeButton
         iconTxt: VLCIcons.window_close
-        onClicked: IntfWindow.close()
+        onClicked: MainCtx.intfMainWindow.close()
         height: windowButtonGroup.height
         color: closeButton.hovered ? "white" : windowButtonGroup.color
         hoverColor: "red"

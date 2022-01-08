@@ -66,15 +66,8 @@ namespace {
 template<class T>
 class SingletonRegisterHelper
 {
-    static QObject* m_instance;
+    static QPointer<QObject> m_instance;
     static QQmlEngine::ObjectOwnership m_ownership;
-
-    static void connect()
-    {
-        QObject::connect(m_instance, &QObject::destroyed, []() {
-            m_instance = nullptr;
-        });
-    }
 
 public:
     static QObject* callback(QQmlEngine *engine, QJSEngine *)
@@ -84,15 +77,14 @@ public:
         return m_instance;
     }
 
-    template<typename... Args>
+    template<class T2 = T, typename... Args>
     static auto getCallback(Args&&... args)
     {
         if (!m_instance)
         {
             m_ownership = QQmlEngine::ObjectOwnership::JavaScriptOwnership;
-            m_instance = new T(args...);
+            m_instance = new T2(std::forward<Args>(args)...);
             assert(!m_instance->parent());
-            connect();
         }
         else
             assert(sizeof...(args) == 0);
@@ -100,23 +92,23 @@ public:
         return callback;
     }
 
-    static void setInstance(T& instance)
+    template<class T2 = T>
+    static void setInstance(T2& instance)
     {
         assert(!m_instance);
         m_ownership = QQmlEngine::ObjectOwnership::CppOwnership;
         m_instance = &instance;
-        connect();
     }
 
     static auto getInstance()
     {
-        return m_instance;
+        return static_cast<T*>(m_instance);
     }
 };
 template<class T>
 QQmlEngine::ObjectOwnership SingletonRegisterHelper<T>::m_ownership = QQmlEngine::ObjectOwnership::JavaScriptOwnership;
 template<class T>
-QObject* SingletonRegisterHelper<T>::m_instance = nullptr;
+QPointer<QObject> SingletonRegisterHelper<T>::m_instance = nullptr;
 
 template<class T>
 void registerAnonymousType( const char *uri, int versionMajor )
@@ -129,8 +121,6 @@ void registerAnonymousType( const char *uri, int versionMajor )
     VLC_UNUSED( versionMajor );
 #endif
 }
-
-class InterfaceWindow : public QWindow { };
 
 } // anonymous namespace
 
@@ -149,8 +139,6 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
 
     assert(m_intf->p_mainPlayerController);
     SingletonRegisterHelper<PlayerController>::setInstance(*m_intf->p_mainPlayerController);
-
-    SingletonRegisterHelper<InterfaceWindow>::setInstance(*static_cast<InterfaceWindow*>(m_interfaceWindow));
 
     assert(DialogsProvider::getInstance());
     SingletonRegisterHelper<DialogsProvider>::setInstance(*DialogsProvider::getInstance());
@@ -232,7 +220,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::getCallback());
         qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);
         qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::getCallback());
-        qmlRegisterSingletonType<InterfaceWindow>(uri, versionMajor, versionMinor, "IntfWindow", SingletonRegisterHelper<InterfaceWindow>::callback);
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::getCallback());
         qmlRegisterSingletonType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", SingletonRegisterHelper<DialogModel>::getCallback(m_intf));

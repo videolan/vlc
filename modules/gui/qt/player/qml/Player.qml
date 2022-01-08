@@ -644,7 +644,7 @@ FocusScope {
     //visible when user navigates within the control bar
     KeyEventFilter {
         id: filter
-        target: IntfWindow
+        target: MainCtx.intfMainWindow
         enabled: controlBarView.state === "visible"
                  && (controlBarView.focus || topcontrolView.focus)
         Keys.onPressed: toolbarAutoHide.setVisible(5000)
