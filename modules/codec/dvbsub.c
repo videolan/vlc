@@ -202,7 +202,7 @@ typedef struct dvbsub_clut_s
 
 } dvbsub_clut_t;
 
-/* The Region is an aera on the image [7.2.3]
+/* The Region is an area on the image [7.2.3]
  * with a list of the object definitions associated and a CLUT */
 typedef struct dvbsub_region_s
 {
