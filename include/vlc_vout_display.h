@@ -99,18 +99,6 @@ typedef struct vout_display_cfg {
         vlc_rational_t sar; /**< Requested sample aspect ratio */
     } display;
 
-    /**
-     * Window properties
-     *
-     * Should be ignored from display modules.
-     */
-    struct {
-        /** Current window width */
-        unsigned width;
-        /** Current window height */
-        unsigned height;
-    } window_props;
-
     /** Alignment of the video within the window */
     vlc_video_align_t align;
 

@@ -101,11 +101,6 @@ void vout_display_PlacePicture(vout_display_place_t *place,
                                const video_format_t *source,
                                const vout_display_cfg_t *cfg)
 {
-    /* vout_display_PlacePicture() is called from vd plugins. They should not
-     * care about the initial window properties. */
-    assert(cfg->window_props.width == 0 && cfg->window_props.height == 0);
-
-    /* */
     memset(place, 0, sizeof(*place));
     if (cfg->display.width == 0 || cfg->display.height == 0)
         return;
@@ -660,8 +655,6 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
                                            &osys->cfg.display.height,
                                            source, cfg);
     }
-
-    osys->cfg.window_props.width = osys->cfg.window_props.height = 0;
 
     osys->pool = NULL;
 
