@@ -165,10 +165,6 @@ endif
 libegl_display_gbm_plugin_la_SOURCES = video_output/opengl/egl_display_gbm.c
 libegl_display_gbm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS) $(GBM_CFLAGS)
 libegl_display_gbm_plugin_la_LIBADD = $(EGL_LIBS) $(GBM_LIBS)
-if HAVE_KMS
-# DRM headers are bringing defines useful for opening DRM devices
-libegl_display_gbm_plugin_la_CPPFLAGS += $(KMS_CFLAGS) -DHAVE_KMS=1
-endif
 if HAVE_EGL
 if HAVE_GBM
 vout_LTLIBRARIES += libegl_display_gbm_plugin.la
