@@ -129,14 +129,9 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     if (cfg->is_display_filled) {
         display_width  = cfg->display.width;
         display_height = cfg->display.height;
-    } else {
-        vout_display_cfg_t cfg_tmp = *cfg;
-
-        cfg_tmp.display.width  = 0;
-        cfg_tmp.display.height = 0;
+    } else
         vout_display_GetDefaultDisplaySize(&display_width, &display_height,
-                                           source, &cfg_tmp);
-    }
+                                           source, cfg);
 
     const unsigned width  = source->i_visible_width;
     const unsigned height = source->i_visible_height;
