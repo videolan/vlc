@@ -174,6 +174,7 @@ class MainCtx : public QObject
     Q_PROPERTY(PlaylistPtr mainPlaylist READ getMainPlaylist CONSTANT FINAL)
     Q_PROPERTY(vlc::playlist::PlaylistControllerModel* mainPlaylistController READ getMainPlaylistController CONSTANT FINAL)
     Q_PROPERTY(bool smoothScroll READ smoothScroll NOTIFY smoothScrollChanged FINAL)
+    Q_PROPERTY(QWindow* intfMainWindow READ intfMainWindow CONSTANT FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -272,6 +273,8 @@ public:
 
     bool preferHotkeys() const;
     void setPreferHotkeys(bool enable);
+    
+    QWindow *intfMainWindow() const;
 
 protected:
     /* Systray */

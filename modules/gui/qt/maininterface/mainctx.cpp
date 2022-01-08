@@ -848,3 +848,11 @@ void MainCtx::setPreferHotkeys(bool enable)
 
     emit preferHotkeysChanged();
 }
+
+QWindow *MainCtx::intfMainWindow() const
+{
+    if (p_intf->p_compositor)
+        return p_intf->p_compositor->interfaceMainWindow();
+    else
+        return nullptr;
+}
