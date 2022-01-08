@@ -632,7 +632,6 @@ vlc_module_begin ()
     set_shortname("drm")
     /* Keep kms here for compatibility with previous video output. */
     add_shortcut("drm", "kms_drm", "kms")
-    set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_string( "kms-vlc-chroma", NULL, VLC_CHROMA_TEXT, VLC_CHROMA_LONGTEXT)
