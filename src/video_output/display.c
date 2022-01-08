@@ -653,14 +653,14 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
     unsigned display_width, display_height;
 
-    if (cfg->window_props.width == 0 || cfg->window_props.height == 0) {
+    if (cfg->display.width == 0 || cfg->display.height == 0) {
         /* Work around buggy window provider */
         msg_Warn(parent, "window size missing");
         vout_display_GetDefaultDisplaySize(&display_width, &display_height,
                                            source, cfg);
     } else {
-        display_width = cfg->window_props.width;
-        display_height = cfg->window_props.height;
+        display_width = cfg->display.width;
+        display_height = cfg->display.height;
     }
 
     osys->cfg = *cfg;

@@ -301,8 +301,8 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
         vdcfg.window = part->window;
         vlc_sem_wait(&part->lock);
-        vdcfg.window_props.width = part->width;
-        vdcfg.window_props.height = part->height;
+        vdcfg.display.width = part->width;
+        vdcfg.display.height = part->height;
 
         vout_display_t *display = vout_display_New(obj, &output->fmt, ctx, &vdcfg,
                                                    modname, NULL);
