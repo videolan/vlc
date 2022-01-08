@@ -76,15 +76,8 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const vout_display_cfg_t *cfg)
 {
     bool from_source = true;
-    /* Size reported by the window module */
-    if (cfg->window_props.width != 0 && cfg->window_props.height != 0) {
-        *width = cfg->window_props.width;
-        *height = cfg->window_props.height;
-        /* The dimensions are not initialized from the source format */
-        from_source = false;
-    }
     /* Use the original video size */
-    else if (source->i_sar_num >= source->i_sar_den) {
+    if (source->i_sar_num >= source->i_sar_den) {
         *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.sar.den / source->i_sar_den / cfg->display.sar.num;
         *height = source->i_visible_height;
     } else {
@@ -660,8 +653,16 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         return NULL;
 
     unsigned display_width, display_height;
-    vout_display_GetDefaultDisplaySize(&display_width, &display_height,
-                                       source, cfg);
+
+    if (cfg->window_props.width == 0 || cfg->window_props.height == 0) {
+        /* Work around buggy window provider */
+        msg_Warn(parent, "window size missing");
+        vout_display_GetDefaultDisplaySize(&display_width, &display_height,
+                                           source, cfg);
+    } else {
+        display_width = cfg->window_props.width;
+        display_height = cfg->window_props.height;
+    }
 
     osys->cfg = *cfg;
     /* The window size was used for the initial setup. Now it can be dropped in
