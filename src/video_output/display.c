@@ -76,21 +76,8 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const vout_display_cfg_t *cfg)
 {
     bool from_source = true;
-    /* Requested by the user */
-    if (cfg->display.width != 0 && cfg->display.height != 0) {
-        *width  = cfg->display.width;
-        *height = cfg->display.height;
-    } else if (cfg->display.width != 0) {
-        *width  = cfg->display.width;
-        *height = (int64_t)source->i_visible_height * source->i_sar_den * cfg->display.width * cfg->display.sar.num /
-            source->i_visible_width / source->i_sar_num / cfg->display.sar.den;
-    } else if (cfg->display.height != 0) {
-        *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.height * cfg->display.sar.den /
-            source->i_visible_height / source->i_sar_den / cfg->display.sar.num;
-        *height = cfg->display.height;
-    }
     /* Size reported by the window module */
-    else if (cfg->window_props.width != 0 && cfg->window_props.height != 0) {
+    if (cfg->window_props.width != 0 && cfg->window_props.height != 0) {
         *width = cfg->window_props.width;
         *height = cfg->window_props.height;
         /* The dimensions are not initialized from the source format */
