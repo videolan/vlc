@@ -300,9 +300,14 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
         }
 
         vdcfg.window = part->window;
+        vlc_sem_wait(&part->lock);
+        vdcfg.window_props.width = part->width;
+        vdcfg.window_props.height = part->height;
+
         vout_display_t *display = vout_display_New(obj, &output->fmt, ctx, &vdcfg,
                                                    modname, NULL);
         if (display == NULL) {
+            vlc_sem_post(&part->lock);
             vout_window_Disable(part->window);
             vout_window_Delete(part->window);
             splitter->i_output = i;
@@ -310,9 +315,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
             return VLC_EGENERIC;
         }
 
-        vlc_sem_wait(&part->lock);
         part->display = display;
-        vout_display_SetSize(display, part->width, part->height);
         vlc_sem_post(&part->lock);
     }
 
