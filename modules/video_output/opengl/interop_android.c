@@ -40,6 +40,12 @@ struct priv
     bool stex_attached;
     struct vlc_asurfacetexture *previous_texture;
     picture_t *current_picture;
+
+    struct {
+        PFNGLACTIVETEXTUREPROC ActiveTexture;
+        PFNGLBINDTEXTUREPROC BindTexture;
+        PFNGLGENTEXTURESPROC GenTextures;
+    } gl;
 };
 
 static void
@@ -119,7 +125,7 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
             SurfaceTexture_detachFromGLContext(previous_texture);
             /* SurfaceTexture_detachFromGLContext will destroy the previous
              * texture name, so we need to regenerate it. */
-            interop->api->vt.GenTextures(1, &textures[0]);
+            priv->gl.GenTextures(1, &textures[0]);
         }
 
         if (SurfaceTexture_attachToGLContext(texture, textures[0]) != 0)
@@ -147,8 +153,8 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
     ReductMatrix(priv->mtx_2x3, mtx_4x4);
     priv->transform_mtx = priv->mtx_2x3;
 
-    interop->vt->ActiveTexture(GL_TEXTURE0);
-    interop->vt->BindTexture(interop->tex_target, textures[0]);
+    priv->gl.ActiveTexture(GL_TEXTURE0);
+    priv->gl.BindTexture(interop->tex_target, textures[0]);
 
 success:
     if (previous_picture)
@@ -214,6 +220,14 @@ Open(vlc_object_t *obj)
     priv->current_picture = NULL;
     priv->previous_texture = NULL;
     priv->stex_attached = false;
+
+#define LOAD_SYMBOL(name) \
+    priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name); \
+    assert(priv->gl.name != NULL);
+
+    LOAD_SYMBOL(ActiveTexture);
+    LOAD_SYMBOL(BindTexture);
+    LOAD_SYMBOL(GenTextures);
 
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_anop_allocate_textures,
