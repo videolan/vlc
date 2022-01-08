@@ -577,6 +577,19 @@ enum VLCTreeBranchType {
             }
         }
     }
+    // Sort second and third level nodes (mix of subcat and plugin nodes) alphabetically
+    for (NSUInteger i = 0; i < [[self children] count]; i++) {
+        VLCTreeBranchItem * item_i = [[self children] objectAtIndex:i];
+        [[item_i children] sortUsingComparator: ^(id obj1, id obj2) {
+            return [[obj1 name] compare:[obj2 name]];
+        }];
+        for (NSUInteger j = 0; j < [[item_i children] count]; j++) {
+            VLCTreeBranchItem * item_j = [[item_i children] objectAtIndex:j];
+            [[item_j children] sortUsingComparator: ^(id obj1, id obj2) {
+                return [[obj1 name] compare:[obj2 name]];
+            }];
+        }
+    }
 
     return _children;
 }
