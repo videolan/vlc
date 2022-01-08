@@ -130,7 +130,7 @@ FocusScope {
             exclusionStrength: 0.1
         }
 
-        KeyNavigableListView {
+        ListView {
             id: listView
 
             anchors.fill: parent
@@ -314,13 +314,13 @@ FocusScope {
                 }
             }
 
-            listView.highlight: Rectangle {
+            highlight: Rectangle {
                 color: colors.accent
                 opacity: 0.8
             }
 
-            listView.highlightResizeDuration: 0
-            listView.highlightMoveDuration: 0
+            highlightResizeDuration: 0
+            highlightMoveDuration: 0
         }
     }
 
