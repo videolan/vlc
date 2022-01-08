@@ -560,6 +560,24 @@ enum VLCTreeBranchType {
         }
     }
     module_list_free(modules);
+
+    // Sort the top-level cat items into preferred order
+    NSUInteger index = 0;
+    NSUInteger childrenCount = [[self children] count];
+    for (unsigned i = 0; i < ARRAY_SIZE(categories_array); i++) {
+        // Try to find index of current cat
+        for (NSUInteger j = index; j < childrenCount; j++) {
+            VLCTreeBranchItem * item = [[self children] objectAtIndex:j];
+            if ([item category] == categories_array[i].id) {
+                if (j != index) {
+                    [[self children] exchangeObjectAtIndex:j withObjectAtIndex:index];
+                }
+                ++index;
+                break;
+            }
+        }
+    }
+
     return _children;
 }
 
