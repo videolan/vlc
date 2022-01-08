@@ -75,7 +75,6 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
                                         const vout_display_cfg_t *cfg)
 {
-    bool from_source = true;
     /* Use the original video size */
     if (source->i_sar_num >= source->i_sar_den) {
         *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.sar.den / source->i_sar_den / cfg->display.sar.num;
@@ -88,7 +87,7 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
     *width  = *width  * cfg->zoom.num / cfg->zoom.den;
     *height = *height * cfg->zoom.num / cfg->zoom.den;
 
-    if (from_source && ORIENT_IS_SWAP(source->orientation)) {
+    if (ORIENT_IS_SWAP(source->orientation)) {
         /* Apply the source orientation only if the dimensions are initialized
          * from the source format */
         unsigned store = *width;
