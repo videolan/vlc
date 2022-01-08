@@ -98,7 +98,7 @@ vlc_module_begin ()
     set_section( N_("Encoding") , NULL )
     set_description( N_("Video encoder (using OpenMAX IL)") )
     set_capability( "video encoder", 0 )
-    set_callbacks( OpenEncoder )
+    set_callback( OpenEncoder )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -896,7 +896,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 }
 
 static void CloseEncoder( encoder_t *p_enc )
-    { CloseGeneric( p_enc ); }
+{
+    CloseGeneric( VLC_OBJECT(p_enc) );
+}
 
 /*****************************************************************************
  * OpenEncoder: Create the encoder instance
@@ -916,7 +918,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     {
         .close = CloseEncoder,
         .encode_video = EncodeVideo,
-    }
+    };
     p_enc->ops = &ops;
 
     return VLC_SUCCESS;
