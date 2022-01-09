@@ -91,6 +91,13 @@ codec_LTLIBRARIES += libuleaddvaudio_plugin.la
 libcdg_plugin_la_SOURCES = codec/cdg.c
 codec_LTLIBRARIES += libcdg_plugin.la
 
+libdavs2_plugin_la_SOURCES = codec/davs2.c
+libdavs2_plugin_la_CFLAGS = $(AM_CFLAGS) $(DAVS2_CFLAGS)
+libdavs2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libdavs2_plugin_la_LIBADD = $(DAVS2_LIBS) $(LIBM)
+EXTRA_LTLIBRARIES += libdavs2_plugin.la
+codec_LTLIBRARIES += $(LTLIBdavs2)
+
 liblibmpeg2_plugin_la_SOURCES = codec/libmpeg2.c \
 	codec/synchro.c codec/synchro.h
 liblibmpeg2_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_libmpeg2)
@@ -570,7 +577,6 @@ libqsv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libqsv_plugin_la_LIBADD = $(MFX_LIBS)
 EXTRA_LTLIBRARIES += libqsv_plugin.la
 codec_LTLIBRARIES += $(LTLIBqsv)
-
 
 ### External frameworks ###
 

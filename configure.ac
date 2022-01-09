@@ -3036,6 +3036,13 @@ dnl Intel QuickSync (aka MediaSDK) H264/H262 encoder
 dnl
 PKG_ENABLE_MODULES_VLC([MFX], [qsv], [libmfx], [Intel QuickSync MPEG4-Part10/MPEG2 (aka H.264/H.262) encoder], [auto])
 
+
+dnl
+dnl  AVS2 decoder module (davs2)
+dnl
+PKG_ENABLE_MODULES_VLC([DAVS2], [davs2], [davs2], [AVS2 video decoder with libdavs2], [auto])
+
+
 dnl
 dnl libfluidsynth (MIDI synthetizer) plugin
 dnl

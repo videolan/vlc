@@ -297,6 +297,7 @@ modules/codec/cea708.h
 modules/codec/cvdsub.c
 modules/codec/daala.c
 modules/codec/dav1d.c
+modules/codec/davs2.c
 modules/codec/dca.c
 modules/codec/ddummy.c
 modules/codec/dmo/dmo.c
