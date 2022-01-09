@@ -673,6 +673,11 @@ static const staticentry_t p_list_video[] = {
         A("AVs2"),
         A("avs2"),
 
+    B(VLC_CODEC_CAVS2, "AVS2-P2 video (IEEE 1857.4)"),
+        A("AVS2"),
+
+    B(VLC_CODEC_CAVS3, "AVS3-P2 video (IEEE 1857.10)"),
+
     B(VLC_CODEC_AMV, "AMV"),
 
     B(VLC_CODEC_BINKVIDEO, "Bink Video"),
