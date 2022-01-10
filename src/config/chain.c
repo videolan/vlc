@@ -373,7 +373,7 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
         }
 
         /* get the type of the variable */
-        const int i_type = param->item.i_type;
+        const int i_type = CONFIG_CLASS(param->item.i_type);
 
         if( i_type != CONFIG_ITEM_BOOL && cfg->psz_value == NULL )
         {
