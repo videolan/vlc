@@ -76,16 +76,21 @@ stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
 
     stream_t *s = &priv->stream;
 
+    s->psz_name = NULL;
     s->psz_url = NULL;
+    s->psz_location = NULL;
     s->psz_filepath = NULL;
+    s->b_preparsing = false;
+    s->p_input_item = NULL;
     s->s = NULL;
+    s->out = NULL;
     s->pf_read = NULL;
     s->pf_block = NULL;
     s->pf_readdir = NULL;
+    s->pf_demux = NULL;
     s->pf_seek = NULL;
     s->pf_control = NULL;
     s->p_sys = NULL;
-    s->p_input_item = NULL;
     assert(destroy != NULL);
     priv->destroy = destroy;
     priv->block = NULL;
