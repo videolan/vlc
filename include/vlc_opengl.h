@@ -100,6 +100,8 @@ VLC_API vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
 VLC_API void vlc_gl_Release(vlc_gl_t *);
 VLC_API void vlc_gl_Hold(vlc_gl_t *);
 
+VLC_API bool vlc_gl_HasExtension(vlc_gl_t *gl, const char *extension);
+
 static inline int vlc_gl_MakeCurrent(vlc_gl_t *gl)
 {
     return gl->make_current(gl);

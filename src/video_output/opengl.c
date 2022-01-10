@@ -37,6 +37,13 @@ struct vlc_gl_priv_t
 {
     vlc_gl_t gl;
     vlc_atomic_rc_t rc;
+
+    struct {
+        const uint8_t* (*GetString)(uint32_t);
+        const uint8_t* (*GetStringi)(uint32_t, uint32_t);
+        void (*GetIntegerv)(uint32_t, int32_t *);
+        uint32_t (*GetError)();
+    } vt;
 };
 
 static int vlc_gl_start(void *func, bool forced, va_list ap)
@@ -84,6 +91,10 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
     gl->api_type = api_type;
     gl->surface = wnd;
     gl->device = NULL;
+    glpriv->vt.GetString = NULL;
+    glpriv->vt.GetStringi = NULL;
+    glpriv->vt.GetIntegerv = NULL;
+
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
                                  cfg->display.width, cfg->display.height);
     if (gl->module == NULL)
@@ -177,6 +188,69 @@ void vlc_gl_Release(vlc_gl_t *gl)
 
     vlc_objres_clear(VLC_OBJECT(gl));
     vlc_object_delete(gl);
+}
+
+bool vlc_gl_HasExtension(vlc_gl_t *gl, const char *extension)
+{
+#define GL_NO_ERROR 0
+#define GL_VERSION 0x1F02
+#define GL_MAJOR_VERSION 0x821B
+#define GL_EXTENSIONS 0x1F03
+#define GL_NUM_EXTENSIONS 0x821D
+    struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
+    /* Cache the OpenGL function before checking. It's not done at OpenGL
+     * provider creation because the context might not be current, and it is
+     * not done at MakeCurrent because MakeCurrent is currently called at each
+     * frames, whereas vlc_gl_HasExtension can be called only during the
+     * client code initialization. */
+    if (glpriv->vt.GetString == NULL && glpriv->vt.GetStringi == NULL)
+    {
+        glpriv->vt.GetString = vlc_gl_GetProcAddress(gl, "glGetString");
+        glpriv->vt.GetIntegerv = vlc_gl_GetProcAddress(gl, "glGetIntegerv");
+        glpriv->vt.GetError = vlc_gl_GetProcAddress(gl, "glGetError");
+
+        int32_t version;
+        /* GL_MAJOR_VERSION is available in every OpenGL and GLES>=3.
+         * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGet.xhtml
+         * https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glGet.xhtml
+         * It will return a GL_INVALID_ENUM error on GLES<3
+         */
+        glpriv->vt.GetIntegerv(GL_MAJOR_VERSION, &version);
+        uint32_t error = glpriv->vt.GetError();
+
+        if (error != GL_NO_ERROR)
+            version = 2;
+
+        /* Drain the errors before continuing. */
+        while (error != GL_NO_ERROR)
+            error = glpriv->vt.GetError();
+
+        /* glGetStringi is available in OpenGL>=3 and GLES>=3.
+         * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGetString.xhtml
+         * https://www.khronos.org/registry/OpenGL-Refpages/es3/html/glGetString.xhtml
+         */
+        if (version >= 3)
+            glpriv->vt.GetStringi = vlc_gl_GetProcAddress(gl, "glGetStringi");
+    }
+
+    /* Fallback to legacy checking mode. */
+    if (glpriv->vt.GetStringi == NULL)
+    {
+        const uint8_t *extensions = glpriv->vt.GetString(GL_EXTENSIONS);
+        return vlc_gl_StrHasToken((const char *)extensions, extension);
+    }
+
+    /* Unfortunately, no order is defined by the standard, so just loop over
+     * the different extensions linearily. */
+    int32_t count = 0;
+    glpriv->vt.GetIntegerv(GL_NUM_EXTENSIONS, &count);
+    for (int i = 0; i < count; ++i)
+    {
+        const uint8_t *name = glpriv->vt.GetStringi(GL_EXTENSIONS, i);
+        if (strcmp((const char *)name, extension) == 0)
+            return true;
+    }
+    return false;
 }
 
 #include <vlc_vout_window.h>

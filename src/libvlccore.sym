@@ -710,6 +710,7 @@ vlc_gl_Create
 vlc_gl_CreateOffscreen
 vlc_gl_Release
 vlc_gl_Hold
+vlc_gl_HasExtension
 vlc_gl_surface_Create
 vlc_gl_surface_CheckSize
 vlc_gl_surface_Destroy
