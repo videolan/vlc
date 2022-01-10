@@ -322,5 +322,5 @@ vlc_window_LDADD = ../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
 # Opt-out for building the test driver if there is no dynamic plugins, since we
 # cannot link static plugins currently anyway.
 if HAVE_DYNAMIC_PLUGINS
-noinst_PROGRAMS = vlc-window
+noinst_PROGRAMS += vlc-window
 endif
