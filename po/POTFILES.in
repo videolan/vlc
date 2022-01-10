@@ -784,6 +784,8 @@ modules/gui/qt/medialibrary/mlplaylistmedia.cpp
 modules/gui/qt/medialibrary/mlplaylistmedia.hpp
 modules/gui/qt/medialibrary/mlplaylistmodel.cpp
 modules/gui/qt/medialibrary/mlplaylistmodel.hpp
+modules/gui/qt/medialibrary/mlvideofoldersmodel.cpp
+modules/gui/qt/medialibrary/mlvideofoldersmodel.hpp
 modules/gui/qt/medialibrary/mlvideogroupsmodel.cpp
 modules/gui/qt/medialibrary/mlvideogroupsmodel.hpp
 modules/gui/qt/menus/menus.cpp

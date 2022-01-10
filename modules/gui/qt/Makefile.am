@@ -191,6 +191,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlurlmodel.hpp \
 	gui/qt/medialibrary/mlvideo.cpp \
 	gui/qt/medialibrary/mlvideo.hpp \
+	gui/qt/medialibrary/mlvideofoldersmodel.cpp \
+	gui/qt/medialibrary/mlvideofoldersmodel.hpp \
 	gui/qt/medialibrary/mlvideogroupsmodel.cpp \
 	gui/qt/medialibrary/mlvideogroupsmodel.hpp \
 	gui/qt/medialibrary/mlvideomodel.cpp \
@@ -403,6 +405,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlvideomodel.moc.cpp \
 	gui/qt/medialibrary/mlplaylistlistmodel.moc.cpp \
 	gui/qt/medialibrary/mlplaylistmodel.moc.cpp \
+	gui/qt/medialibrary/mlvideofoldersmodel.moc.cpp \
 	gui/qt/medialibrary/mlvideogroupsmodel.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
 	gui/qt/menus/qml_menu_wrapper.moc.cpp \

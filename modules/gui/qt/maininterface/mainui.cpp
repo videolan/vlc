@@ -14,6 +14,7 @@
 #include "medialibrary/mlrecentsvideomodel.hpp"
 #include "medialibrary/mlfoldersmodel.hpp"
 #include "medialibrary/mlvideogroupsmodel.hpp"
+#include "medialibrary/mlvideofoldersmodel.hpp"
 #include "medialibrary/mlplaylistlistmodel.hpp"
 #include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlplaylist.hpp"
@@ -325,6 +326,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLVideoModel>( uri, versionMajor, versionMinor, "MLVideoModel" );
         qmlRegisterType<MLRecentsVideoModel>( uri, versionMajor, versionMinor, "MLRecentsVideoModel" );
         qmlRegisterType<MLVideoGroupsModel>( uri, versionMajor, versionMinor, "MLVideoGroupsModel" );
+        qmlRegisterType<MLVideoFoldersModel>( uri, versionMajor, versionMinor, "MLVideoFoldersModel" );
         qmlRegisterType<MLPlaylistListModel>( uri, versionMajor, versionMinor, "MLPlaylistListModel" );
         qmlRegisterType<MLPlaylistModel>( uri, versionMajor, versionMinor, "MLPlaylistModel" );
 
