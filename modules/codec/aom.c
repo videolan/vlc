@@ -44,6 +44,12 @@
 
 #include "../packetizer/iso_color_tables.h"
 
+#ifndef AOM_USAGE_GOOD_QUALITY
+# define AOM_USAGE_GOOD_QUALITY 0
+# define AOM_USAGE_REALTIME 1
+# define AOM_USAGE_ALL_INTRA 2
+#endif
+
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
