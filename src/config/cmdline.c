@@ -337,6 +337,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             }
             fprintf( stderr, _( "For more information try %s--help%s\n" ),
                      color ? TS_GREEN : "", color ? TS_RESET : "" );
+            free( optlabel );
             goto out;
         }
     }
