@@ -446,7 +446,7 @@ Open(vlc_object_t *obj)
         goto error;
     }
 
-    if (!vlc_gl_StrHasToken(interop->api->extensions, "GL_OES_EGL_image"))
+    if (!vlc_gl_HasExtension(interop->gl, "GL_OES_EGL_image"))
         goto error;
 
     priv = interop->priv = calloc(1, sizeof(struct priv));

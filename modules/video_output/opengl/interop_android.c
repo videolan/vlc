@@ -197,8 +197,7 @@ Open(vlc_object_t *obj)
      || !interop->vctx)
         return VLC_EGENERIC;
 
-    const char *extensions = interop->api->vt.GetString(GL_EXTENSIONS);
-    if (!vlc_gl_StrHasToken(extensions, "GL_OES_EGL_image_external"))
+    if (!vlc_gl_HasExtension(interop->gl, "GL_OES_EGL_image_external"))
     {
         msg_Warn(&interop->obj, "GL_OES_EGL_image_external is not available,"
                 " disabling android interop.");

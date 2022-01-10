@@ -129,7 +129,7 @@ Open(vlc_object_t *obj)
      || (interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
       && interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
       && interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
-     || !vlc_gl_StrHasToken(interop->api->extensions, "GL_NV_vdpau_interop"))
+     || !vlc_gl_HasExtension(interop->gl, "GL_NV_vdpau_interop"))
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;

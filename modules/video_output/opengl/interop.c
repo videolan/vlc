@@ -136,7 +136,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
-    if (vlc_gl_StrHasToken(interop->api->extensions, "GL_ARB_texture_rg"))
+    if (vlc_gl_HasExtension(interop->gl, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
         oneplane16_texfmt = GL_R16;
