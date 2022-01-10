@@ -156,6 +156,11 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     p_demux->out            = out;
     p_demux->b_preparsing   = b_preparsing;
 
+    p_demux->pf_readdir = NULL;
+    p_demux->pf_demux   = NULL;
+    p_demux->pf_control = NULL;
+    p_demux->p_sys      = NULL;
+
     char *modbuf = NULL;
     bool strict = true;
 
@@ -449,9 +454,16 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
     if (unlikely(p_demux == NULL))
         return NULL;
 
-    p_demux->s = p_next;
-
     priv = vlc_stream_Private(p_demux);
+    p_demux->s            = p_next;
+    p_demux->p_input_item = NULL;
+    p_demux->p_sys        = NULL;
+    p_demux->psz_name     = NULL;
+    p_demux->psz_url      = NULL;
+    p_demux->psz_location = NULL;
+    p_demux->psz_filepath = NULL;
+    p_demux->out          = NULL;
+
     priv->module = module_need(p_demux, "demux_filter", p_name,
                                p_name != NULL);
     if (priv->module == NULL)

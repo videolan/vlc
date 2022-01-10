@@ -103,7 +103,9 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
 
     access->p_input_item = input ? input_GetItem(input) : NULL;
     access->out = out;
+    access->psz_name = NULL;
     access->psz_url = strdup(mrl);
+    access->psz_filepath = NULL;
     access->b_preparsing = preparsing;
     priv = vlc_stream_Private(access);
 
