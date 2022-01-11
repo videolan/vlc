@@ -235,6 +235,11 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(Times deadline,
         p.st = *sit;
         p.status = p.st->getLastBufferStatus();
         p.demuxed_amount = p.st->getDemuxedAmount(deadline).continuous;
+        if(p.st->startTimeContext.media != VLC_TS_INVALID)
+        {
+            if(p.st->currentTimeContext.media - p.st->startTimeContext.media > p.demuxed_amount)
+                p.demuxed_amount = p.st->currentTimeContext.media - p.st->startTimeContext.media;
+        }
         ++it;
     }
     std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);

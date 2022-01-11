@@ -70,6 +70,11 @@ bool HLSStream::setPosition(mtime_t ts , bool b)
     return ok;
 }
 
+bool HLSStream::isContiguousMux() const
+{
+    return format != StreamFormat::Type::WebVTT;
+}
+
 int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
 {
     if(i_payload == 53 &&
