@@ -128,9 +128,10 @@ VdpStatus vlc_vdp_video_attach(struct vlc_video_context *vctx,
 static void vlc_vdp_output_surface_destroy(picture_t *pic)
 {
     vlc_vdp_output_surface_t *sys = pic->p_sys;
+    struct vlc_vdp_device *device = GetVDPAUOpaqueContext(sys->vctx);
 
-    vdp_output_surface_destroy(sys->vdp, sys->surface);
-    vdp_release_x11(sys->vdp);
+    vdp_output_surface_destroy(device->vdp, sys->surface);
+    vlc_video_context_Release(sys->vctx);
     free(sys);
 }
 
@@ -144,7 +145,6 @@ picture_t *vlc_vdp_output_surface_create(struct vlc_video_context *vctx,
     if (unlikely(sys == NULL))
         return NULL;
 
-    sys->vdp = vdp_hold_x11(device->vdp, &sys->device);
     sys->gl_nv_surface = 0;
 
     VdpStatus err = vdp_output_surface_create(device->vdp, device->device,
@@ -153,7 +153,6 @@ picture_t *vlc_vdp_output_surface_create(struct vlc_video_context *vctx,
     if (err != VDP_STATUS_OK)
     {
 error:
-        vdp_release_x11(device->vdp);
         free(sys);
         return NULL;
     }
@@ -169,6 +168,8 @@ error:
         vdp_output_surface_destroy(device->vdp, sys->surface);
         goto error;
     }
+
+    sys->vctx = vlc_video_context_Hold(vctx);
     return pic;
 }
 

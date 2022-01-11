@@ -340,8 +340,7 @@ static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
 typedef struct vlc_vdp_output_surface
 {
     VdpOutputSurface surface;
-    VdpDevice device;
-    vdp_t *vdp;
+    struct vlc_video_context *vctx;
     ptrdiff_t gl_nv_surface;
 } vlc_vdp_output_surface_t;
 
