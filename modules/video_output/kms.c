@@ -332,13 +332,15 @@ error_set_crtc:
     drmModeRmFB(sys->drm_fd, new_fb);
 
 error_add_fb:
-    struct drm_mode_destroy_dumb destroy_request = {
-        .handle = request.handle
-    };
-    ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_request);
-    /* This must be a programmation error if we cannot destroy the resources
-     * we created. */
-    assert(ret == drvSuccess);
+    {
+        struct drm_mode_destroy_dumb destroy_request = {
+            .handle = request.handle
+        };
+        ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_request);
+        /* This must be a programmation error if we cannot destroy the resources
+         * we created. */
+        assert(ret == drvSuccess);
+    }
 
 error_create_dumb:
     if (sys->saved_crtc != NULL)
