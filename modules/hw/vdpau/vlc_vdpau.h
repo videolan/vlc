@@ -172,32 +172,6 @@ VdpStatus vdp_create_x11(void *dpy, int snum, vdp_t **vdpp, VdpDevice *devp);
  */
 void vdp_destroy_x11(vdp_t *);
 
-/* Instance reuse */
-
-/**
- * Creates a VDPAU instance.
- *
- * This function connects to the X11 server and creates a VDPAU instance and
- * VDPAU device matching the specified screen number.
- *
- * @param name X11 display name
- * @param snum X11 screen number
- * @param vdp memory location to hold the VDPAU instance pointer [OUT]
- * @param dev memory location to hold the VDPAU device handle [OUT]
- * @return VDP_STATUS_OK on success, otherwise a VDPAU error code.
- *
- * @note Use vdp_release_x11() to release the instance. <b>Do not use</b>
- * vdp_device_destroy() and/or vdp_destroy_x11() with vdp_get_x11().
- */
-VdpStatus vdp_get_x11(const char *name, int num, vdp_t **vdp, VdpDevice *dev);
-
-/**
- * Decreases the reference count of a VDPAU instance created by vdp_get_x11().
- * If it reaches zero, destroy the corresponding VDPAU device, then the VDPAU
- * instance and remove the pair from the process-wide list.
- */
-void vdp_release_x11(vdp_t *);
-
 /* VLC specifics */
 # include <stdatomic.h>
 # include <stdbool.h>
