@@ -45,6 +45,13 @@ struct priv
     CGLContextObj gl_ctx;
 #endif
     picture_t *last_pic;
+
+    struct {
+        PFNGLACTIVETEXTUREPROC ActiveTexture;
+        PFNGLBINDTEXTUREPROC BindTexture;
+        PFNGLTEXPARAMETERIPROC TexParameteri;
+        PFNGLTEXPARAMETERFPROC TexParameterf;
+    } gl;
 };
 
 #if TARGET_OS_IPHONE
@@ -93,12 +100,12 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
         }
 
         textures[i] = CVOpenGLESTextureGetName(cvtex);
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        interop->vt->TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        interop->vt->TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        interop->vt->BindTexture(interop->tex_target, 0);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        priv->gl.TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        priv->gl.TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        priv->gl.BindTexture(interop->tex_target, 0);
         priv->last_cvtexs[i] = cvtex;
     }
 
@@ -121,8 +128,8 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
     {
-        interop->vt->ActiveTexture(GL_TEXTURE0 + i);
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        priv->gl.ActiveTexture(GL_TEXTURE0 + i);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
 
         CGLError err =
             CGLTexImageIOSurface2D(priv->gl_ctx, interop->tex_target,
@@ -183,6 +190,15 @@ Open(vlc_object_t *obj)
     struct priv *priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
         return VLC_ENOMEM;
+
+#define LOAD_FUNCTION(name) \
+    priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name); \
+    assert(priv->gl.name != NULL)
+
+    LOAD_FUNCTION(ActiveTexture);
+    LOAD_FUNCTION(BindTexture);
+    LOAD_FUNCTION(TexParameteri);
+    LOAD_FUNCTION(TexParameterf);
 
 #if TARGET_OS_IPHONE
     const GLenum tex_target = GL_TEXTURE_2D;
