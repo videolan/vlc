@@ -178,8 +178,8 @@ error:
 }
 
 static int
-tc_pbo_update(const struct vlc_gl_interop *interop, GLuint *textures,
-              const GLsizei *tex_width, const GLsizei *tex_height,
+tc_pbo_update(const struct vlc_gl_interop *interop, uint32_t textures[],
+              const int32_t tex_width[], const int32_t tex_height[],
               picture_t *pic, const size_t *plane_offset)
 {
     (void) plane_offset; assert(plane_offset == NULL);
@@ -215,8 +215,8 @@ tc_pbo_update(const struct vlc_gl_interop *interop, GLuint *textures,
 }
 
 static int
-tc_common_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures,
-                            const GLsizei *tex_width, const GLsizei *tex_height)
+tc_common_allocate_textures(const struct vlc_gl_interop *interop, uint32_t textures[],
+                            const int32_t tex_width[], const int32_t tex_height[])
 {
     const struct priv *priv = interop->priv;
     for (unsigned i = 0; i < interop->tex_count; i++)
@@ -231,7 +231,7 @@ tc_common_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textur
 
 static int
 upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
-             GLsizei width, GLsizei height,
+             int32_t width, int32_t height,
              unsigned pitch, unsigned visible_pitch, const void *pixels)
 {
     struct priv *priv = interop->priv;
@@ -288,8 +288,8 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
 }
 
 static int
-tc_common_update(const struct vlc_gl_interop *interop, GLuint *textures,
-                 const GLsizei *tex_width, const GLsizei *tex_height,
+tc_common_update(const struct vlc_gl_interop *interop, uint32_t textures[],
+                 const int32_t tex_width[], const int32_t tex_height[],
                  picture_t *pic, const size_t *plane_offset)
 {
     const struct priv *priv = interop->priv;

@@ -189,8 +189,8 @@ vaegl_init_fourcc(struct priv *priv, unsigned va_fourcc)
 }
 
 static int
-tc_vaegl_update(const struct vlc_gl_interop *interop, GLuint *textures,
-                const GLsizei *tex_width, const GLsizei *tex_height,
+tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
+                const int32_t tex_width[], const int32_t tex_height[],
                 picture_t *pic, const size_t *plane_offset)
 {
     (void) plane_offset;

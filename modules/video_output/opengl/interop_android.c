@@ -80,8 +80,8 @@ ReductMatrix(float *mtx_2x3, const float *mtx_4x4)
 }
 
 static int
-tc_anop_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures,
-                          const GLsizei *tex_width, const GLsizei *tex_height)
+tc_anop_allocate_textures(const struct vlc_gl_interop *interop, uint32_t textures[],
+                          const int32_t tex_width[], const int32_t tex_height[])
 {
     (void) tex_width; (void) tex_height;
     struct priv *priv = interop->priv;
@@ -91,8 +91,8 @@ tc_anop_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures
 }
 
 static int
-tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
-               const GLsizei *tex_width, const GLsizei *tex_height,
+tc_anop_update(struct vlc_gl_interop *interop, uint32_t textures[],
+               const int32_t tex_width[], const int32_t tex_height[],
                picture_t *pic, const size_t *plane_offset)
 {
     struct priv *priv = interop->priv;

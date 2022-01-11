@@ -97,8 +97,8 @@ struct glpriv
 };
 
 static int
-GLConvUpdate(const struct vlc_gl_interop *interop, GLuint *textures,
-             const GLsizei *tex_width, const GLsizei *tex_height,
+GLConvUpdate(const struct vlc_gl_interop *interop, uint32_t textures[],
+             const int32_t tex_width[], const int32_t tex_height[],
              picture_t *pic, const size_t *plane_offset)
 {
     VLC_UNUSED(textures); VLC_UNUSED(tex_width); VLC_UNUSED(tex_height); VLC_UNUSED(plane_offset);
@@ -163,8 +163,8 @@ GLConvUpdate(const struct vlc_gl_interop *interop, GLuint *textures,
 }
 
 static int
-GLConvAllocateTextures(const struct vlc_gl_interop *interop, GLuint *textures,
-                       const GLsizei *tex_width, const GLsizei *tex_height)
+GLConvAllocateTextures(const struct vlc_gl_interop *interop, uint32_t textures[],
+                       const int32_t tex_width[], const int32_t tex_height[])
 {
     VLC_UNUSED(tex_width); VLC_UNUSED(tex_height);
     struct glpriv *priv = interop->priv;

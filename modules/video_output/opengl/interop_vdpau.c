@@ -68,8 +68,8 @@ typedef struct {
 } converter_sys_t;
 
 static int
-tc_vdpau_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
-                   GLsizei const tex_widths[], GLsizei const tex_heights[],
+tc_vdpau_gl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
+                   int32_t const tex_widths[], int32_t const tex_heights[],
                    picture_t *pic, size_t const plane_offsets[])
 {
     VLC_UNUSED(tex_widths);

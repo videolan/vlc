@@ -68,8 +68,8 @@ typedef struct {
 
 #define CALL_CUDA(func, ...) CudaCheckErr(VLC_OBJECT(interop->gl), devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
 
-static int tc_nvdec_gl_allocate_texture(const struct vlc_gl_interop *interop, GLuint *textures,
-                                const GLsizei *tex_width, const GLsizei *tex_height)
+static int tc_nvdec_gl_allocate_texture(const struct vlc_gl_interop *interop, uint32_t textures[],
+                                const int32_t tex_width[], const int32_t tex_height[])
 {
     converter_sys_t *p_sys = interop->priv;
     vlc_decoder_device *device = p_sys->device;
@@ -106,8 +106,8 @@ static int tc_nvdec_gl_allocate_texture(const struct vlc_gl_interop *interop, GL
 }
 
 static int
-tc_nvdec_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
-                   GLsizei const tex_widths[], GLsizei const tex_heights[],
+tc_nvdec_gl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
+                   int32_t const tex_widths[], int32_t const tex_heights[],
                    picture_t *pic, size_t const plane_offsets[])
 {
     VLC_UNUSED(plane_offsets);
