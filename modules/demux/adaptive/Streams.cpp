@@ -581,12 +581,9 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
 }
 
 bool AbstractStream::getMediaPlaybackTimes(vlc_tick_t *start, vlc_tick_t *end,
-                                           vlc_tick_t *length,
-                                           vlc_tick_t *mediaStart,
-                                           vlc_tick_t *demuxStart) const
+                                           vlc_tick_t *length) const
 {
-    return (segmentTracker->getMediaPlaybackRange(start, end, length) &&
-            fakeEsOut()->getStartTimestamps(mediaStart, demuxStart));
+    return segmentTracker->getMediaPlaybackRange(start, end, length);
 }
 
 void AbstractStream::runUpdates()

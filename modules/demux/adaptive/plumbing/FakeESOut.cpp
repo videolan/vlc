@@ -182,15 +182,6 @@ void FakeESOut::resetTimestamps()
     startTimes = SegmentTimes();
 }
 
-bool FakeESOut::getStartTimestamps( vlc_tick_t *pi_mediats, vlc_tick_t *pi_demuxts )
-{
-    if(!expected.b_timestamp_set)
-        return false;
-    *pi_demuxts = startTimes.demux;
-    *pi_mediats = startTimes.media;
-    return true;
-}
-
 void FakeESOut::setExpectedTimestamp(vlc_tick_t ts)
 {
     if(ts < 0)

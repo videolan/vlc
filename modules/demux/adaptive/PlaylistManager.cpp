@@ -746,15 +746,12 @@ void PlaylistManager::updateControlsPosition()
         return;
     cached.lastupdate = now;
 
-    vlc_tick_t rapPlaylistStart = 0;
-    vlc_tick_t rapDemuxStart = 0;
     for(AbstractStream* st : streams)
     {
         if(st->isValid() && !st->isDisabled() && st->isSelected())
         {
             if(st->getMediaPlaybackTimes(&cached.playlistStart, &cached.playlistEnd,
-                                         &cached.playlistLength,
-                                         &rapPlaylistStart, &rapDemuxStart))
+                                         &cached.playlistLength))
                 break;
         }
     }
@@ -780,7 +777,7 @@ void PlaylistManager::updateControlsPosition()
     SeekDebug(msg_Dbg(p_demux, "playlist Start/End %ld/%ld len %ld"
                                "rap pl/demux (%ld/%ld)",
                       cached.playlistStart, cached.playlistEnd, cached.playlistEnd,
-                      rapPlaylistStart, rapDemuxStart));
+                      startTimes.segment.media, startTimes.segment.demux));
 
     if(cached.b_live)
     {
@@ -826,8 +823,9 @@ void PlaylistManager::updateControlsPosition()
         }
     }
 
-    SeekDebug(msg_Dbg(p_demux, "cached.i_time (%ld) cur %ld rap start (pl %ld/dmx %ld)",
-               cached.i_time, currentTimes.continuous, rapPlaylistStart, rapDemuxStart));
+    SeekDebug(msg_Dbg(p_demux, "cached.i_time (%ld) cur %ld rap start (pl %ld/dmx %ld) pos %f",
+                      cached.i_time, currentTimes.continuous, startTimes.segment.media,
+                            startTimes.segment.demux, cached.f_position));
 }
 
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type, AbstractConnectionManager *conn)

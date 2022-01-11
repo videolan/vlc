@@ -85,7 +85,6 @@ namespace adaptive
             void setAssociatedTimestamp( vlc_tick_t );
             void setExpectedTimestamp( vlc_tick_t );
             void resetTimestamps();
-            bool getStartTimestamps( vlc_tick_t *, vlc_tick_t * );
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool decodersDrained();
