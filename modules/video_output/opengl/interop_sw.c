@@ -410,8 +410,8 @@ interop_init:
     interop->fmt_in.i_chroma = i_chroma;
 
     /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
-    priv->has_unpack_subimage =
-        !interop->api->is_gles || vlc_gl_HasExtension(interop->gl, "GL_EXT_unpack_subimage");
+    priv->has_unpack_subimage = interop->gl->api_type == VLC_OPENGL
+        || vlc_gl_HasExtension(interop->gl, "GL_EXT_unpack_subimage");
 
     if (allow_dr && priv->has_unpack_subimage)
     {
