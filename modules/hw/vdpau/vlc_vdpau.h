@@ -323,7 +323,10 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *,
 
 static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
 {
+    struct vlc_video_context *vctx = f->context.vctx;
+
     f->context.destroy(&f->context);
+    vlc_video_context_Release(vctx);
 }
 
 /**
