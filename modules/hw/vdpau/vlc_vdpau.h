@@ -339,11 +339,6 @@ static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
     return VDPAU_FIELD_FROM_PICCTX(fold->context.copy(&fold->context));
 }
 
-/**
- * Clone a VPD field based picture context that contains a video context
- */
-picture_context_t *VideoSurfaceCloneWithContext(picture_context_t *);
-
 typedef struct vlc_vdp_output_surface
 {
     VdpOutputSurface surface;

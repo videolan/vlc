@@ -111,15 +111,6 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *vctx,
     return field;
 }
 
-picture_context_t *VideoSurfaceCloneWithContext(picture_context_t *src_ctx)
-{
-    picture_context_t *dst_ctx = VideoSurfaceCopy(src_ctx);
-    if (unlikely(dst_ctx == NULL))
-        return NULL;
-    vlc_video_context_Hold(dst_ctx->vctx);
-    return dst_ctx;
-}
-
 VdpStatus vlc_vdp_video_attach(struct vlc_video_context *vctx,
                                VdpVideoSurface surface, picture_t *pic)
 {
