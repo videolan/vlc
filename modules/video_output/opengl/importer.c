@@ -205,8 +205,6 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
         return NULL;
 
     importer->interop = interop;
-    importer->api = interop->api;
-    importer->vt = &interop->api->vt;
 
     importer->mtx_transform_defined = false;
     importer->pic_mtx_defined = false;
@@ -264,10 +262,12 @@ void
 vlc_gl_importer_Delete(struct vlc_gl_importer *importer)
 {
     struct vlc_gl_interop *interop = importer->interop;
+
     if (interop && !interop->handle_texs_gen)
     {
-        const opengl_vtable_t *vt = interop->vt;
-        vt->DeleteTextures(interop->tex_count, importer->pic.textures);
+        void (*DeleteTextures)(uint32_t, uint32_t*) =
+            vlc_gl_GetProcAddress(interop->gl, "glDeleteTextures");
+        (*DeleteTextures)(interop->tex_count, importer->pic.textures);
     }
 
     free(importer);
