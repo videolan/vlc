@@ -226,6 +226,11 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
 
     InitOrientationMatrix(importer->mtx_orientation, glfmt->fmt.orientation);
 
+    /* OpenGL ES 2 includes support for non-power of 2 textures by specification. */
+    bool supports_npot = interop->gl->api_type == VLC_OPENGL_ES2
+        || vlc_gl_HasExtension(interop->gl, "GL_ARB_texture_non_power_of_two")
+        || vlc_gl_HasExtension(interop->gl, "GL_APPLE_texture_2D_limited_npot");
+
     /* Texture size */
     for (unsigned j = 0; j < interop->tex_count; j++) {
         GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
@@ -234,7 +239,7 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
                   / interop->texs[j].h.den;
         glfmt->visible_widths[j] = w;
         glfmt->visible_heights[j] = h;
-        if (interop->api->supports_npot) {
+        if (supports_npot) {
             glfmt->tex_widths[j]  = w;
             glfmt->tex_heights[j] = h;
         } else {
