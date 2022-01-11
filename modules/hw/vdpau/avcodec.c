@@ -50,12 +50,6 @@ typedef struct
     vlc_vdp_video_field_t *pool[];
 } vlc_va_sys_t;
 
-static inline vlc_vdp_video_field_t **GetVDPAUContextPrivate(vlc_video_context *vctx)
-{
-    return (vlc_vdp_video_field_t **)
-        vlc_video_context_GetPrivate( vctx, VLC_VIDEO_CONTEXT_VDPAU );
-}
-
 static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va, vdpau_decoder_device_t *vdpau_decoder)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -142,12 +136,8 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Lock, Close, };
 
-static void DestroyVDPAUVideoContext(void *private)
-{
-}
-
 const struct vlc_video_context_operations vdpau_vctx_ops = {
-    DestroyVDPAUVideoContext,
+    NULL,
 };
 
 static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *desc,
