@@ -183,8 +183,8 @@ namespace adaptive
             void setEOF( bool );
             bool isDraining() const;
             bool isEOF() const;
-            virtual vlc_tick_t getDemuxedAmount(vlc_tick_t) const  = 0;
-            virtual vlc_tick_t getBufferingLevel() const  = 0;
+            virtual Times getDemuxedAmount(Times) const  = 0;
+            virtual Times getBufferingLevel() const  = 0;
             virtual Times getFirstTimes() const  = 0;
             virtual Times getPCR() const = 0;
 
@@ -206,8 +206,8 @@ namespace adaptive
             virtual void Commit() override;
             virtual bool isEmpty() const override;
             virtual void setDraining() override;
-            virtual vlc_tick_t getDemuxedAmount(vlc_tick_t) const override;
-            virtual vlc_tick_t getBufferingLevel() const override;
+            virtual Times getDemuxedAmount(Times) const override;
+            virtual Times getBufferingLevel() const override;
             virtual Times getFirstTimes() const override;
             virtual Times getPCR() const override;
 
@@ -216,7 +216,7 @@ namespace adaptive
             void LockedSetDraining();
             std::list<Queueentry> incoming;
             std::list<Queueentry> commands;
-            vlc_tick_t bufferinglevel;
+            Times bufferinglevel;
             Times pcr;
             uint64_t nextsequence;
     };

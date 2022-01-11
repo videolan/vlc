@@ -335,23 +335,23 @@ AbstractStream::BufferingStatus AbstractStream::getLastBufferStatus() const
     return last_buffer_status;
 }
 
-vlc_tick_t AbstractStream::getDemuxedAmount(vlc_tick_t from) const
+Times AbstractStream::getDemuxedAmount(Times from) const
 {
     return fakeEsOut()->commandsQueue()->getDemuxedAmount(from);
 }
 
-AbstractStream::BufferingStatus AbstractStream::bufferize(vlc_tick_t nz_deadline,
+AbstractStream::BufferingStatus AbstractStream::bufferize(Times deadline,
                                                            vlc_tick_t i_min_buffering,
                                                            vlc_tick_t i_extra_buffering,
                                                            vlc_tick_t i_target_buffering,
                                                            bool b_keep_alive)
 {
-    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering,
+    last_buffer_status = doBufferize(deadline, i_min_buffering, i_extra_buffering,
                                      i_target_buffering, b_keep_alive);
     return last_buffer_status;
 }
 
-AbstractStream::BufferingStatus AbstractStream::doBufferize(vlc_tick_t nz_deadline,
+AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
                                                              vlc_tick_t i_min_buffering,
                                                              vlc_tick_t i_max_buffering,
                                                              vlc_tick_t i_target_buffering,
@@ -404,17 +404,24 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(vlc_tick_t nz_deadli
         }
     }
 
-    vlc_tick_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(nz_deadline);
+    vlc_tick_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(deadline).continuous;
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     if(i_demuxed < i_max_buffering) /* not already demuxed */
     {
-        vlc_tick_t nz_extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel() +
-                                    (i_max_buffering - i_demuxed) / 4;
-        nz_deadline = std::min(nz_extdeadline, nz_deadline + VLC_TICK_FROM_SEC(1));
+        Times extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel();
+        extdeadline.offsetBy((i_max_buffering - i_demuxed) / 4);
+
+        Times newdeadline = deadline;
+        newdeadline.offsetBy(VLC_TICK_FROM_SEC(1));
+
+        if(extdeadline.continuous < newdeadline.continuous)
+            deadline = extdeadline;
+        else
+            deadline = newdeadline;
 
         /* need to read, demuxer still buffering, ... */
         vlc_mutex_unlock(&lock);
-        Demuxer::Status demuxStatus = demuxer->demux(nz_deadline);
+        Demuxer::Status demuxStatus = demuxer->demux(deadline.continuous);
         fakeEsOut()->scheduleNecessaryMilestone();
         vlc_mutex_lock(&lock);
         if(demuxStatus != Demuxer::Status::Success)
@@ -437,7 +444,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(vlc_tick_t nz_deadli
             vlc_mutex_unlock(&lock);
             return BufferingStatus::End;
         }
-        i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(nz_deadline);
+        i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(deadline).continuous;
         segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     }
     vlc_mutex_unlock(&lock);
@@ -459,7 +466,7 @@ AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
     {
         AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR().continuous;
                  vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstTimes().continuous;
-                 vlc_tick_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
+                 vlc_tick_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel().continuous;
                  msg_Dbg(p_realdemux, "Stream pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64 "(+%" PRId64 ") [DRAINING] :%s",
                          pcrvalue, dtsvalue, deadline.continuous, bufferingLevel,
                          pcrvalue ? bufferingLevel - pcrvalue : 0,
@@ -482,7 +489,7 @@ AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
         return Status::Eof;
     }
 
-    vlc_tick_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
+    vlc_tick_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel().continuous;
 
     AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR().continuous;
              vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstTimes().continuous;

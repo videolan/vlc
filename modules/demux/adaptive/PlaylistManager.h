@@ -59,7 +59,7 @@ namespace adaptive
             bool    started() const;
             void    stop();
 
-            AbstractStream::BufferingStatus bufferize(vlc_tick_t, vlc_tick_t,
+            AbstractStream::BufferingStatus bufferize(Times, vlc_tick_t,
                                                       vlc_tick_t, vlc_tick_t);
             AbstractStream::Status dequeue(Times, Times *);
 

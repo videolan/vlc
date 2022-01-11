@@ -85,10 +85,10 @@ namespace adaptive
             Ongoing,
             Lessthanmin,
         };
-        BufferingStatus bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t,
+        BufferingStatus bufferize(Times, vlc_tick_t, vlc_tick_t,
                                   vlc_tick_t, bool = false);
         BufferingStatus getLastBufferStatus() const;
-        vlc_tick_t getDemuxedAmount(vlc_tick_t) const;
+        Times getDemuxedAmount(Times) const;
         Status dequeue(Times, Times *);
         bool decodersDrained();
         virtual bool setPosition(vlc_tick_t, bool);
@@ -143,7 +143,7 @@ namespace adaptive
 
     private:
         void declaredCodecs();
-        BufferingStatus doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t,
+        BufferingStatus doBufferize(Times, vlc_tick_t, vlc_tick_t,
                                     vlc_tick_t, bool);
         BufferingStatus last_buffer_status;
         bool valid;
