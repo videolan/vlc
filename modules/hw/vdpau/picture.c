@@ -67,7 +67,7 @@ static picture_context_t *VideoSurfaceCopy(picture_context_t *ctx)
         return NULL;
 
     *fnew = *fold;
-
+    vlc_video_context_Hold(ctx->vctx);
     atomic_fetch_add(&fold->frame->refs, 1);
     return &fnew->context;
 }
@@ -126,9 +126,6 @@ VdpStatus vlc_vdp_video_attach(struct vlc_video_context *vctx,
     vlc_vdp_video_field_t *field = vlc_vdp_video_create(vctx, surface);
     if (unlikely(field == NULL))
         return VDP_STATUS_RESOURCES;
-
-    field->context.destroy = VideoSurfaceDestroy;
-    field->context.copy = VideoSurfaceCloneWithContext;
 
     assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
         || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
