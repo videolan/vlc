@@ -1104,7 +1104,11 @@ static int InitializeMFT(decoder_t *p_dec)
     if (attributes.Get() && p_dec->fmt_in.i_codec == VLC_CODEC_H264)
     {
         /* It's not an error if the following call fails. */
-        attributes->SetUINT32(CODECAPI_AVLowLatencyMode, true);
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+        attributes->SetUINT32(CODECAPI_AVLowLatencyMode, TRUE);
+#else
+        attributes->SetUINT32(MF_LOW_LATENCY, TRUE);
+#endif
 
         hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec), p_dec->fmt_in.i_codec, 0, 0);
         hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
