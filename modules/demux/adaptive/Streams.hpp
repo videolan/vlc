@@ -111,6 +111,7 @@ namespace adaptive
                                            es_out_t *, AbstractSourceStream *) const  override;
         virtual bool startDemux();
         virtual bool restartDemux();
+        virtual bool isContiguousMux() const;
 
         virtual void prepareRestart(bool = true);
         bool resetForNewPosition(vlc_tick_t);
@@ -138,8 +139,11 @@ namespace adaptive
         FakeESOut::LockedFakeEsOut fakeEsOut() const;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         mutable vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
-
+public:
         SegmentTimes startTimeContext;
+        SegmentTimes currentTimeContext;
+        SegmentTimes prevTimeContext;
+        vlc_tick_t currentDuration;
 
     private:
         void declaredCodecs();
