@@ -48,6 +48,7 @@ extern "C" {
 #define _VIDEOINFOHEADER_
 #include <vlc_codecs.h>
 
+#include <atomic>
 #include <new>
 
 #include <wrl/client.h>
@@ -95,6 +96,36 @@ struct decoder_sys_t
     /* H264 only. */
     struct hxxx_helper hh = {};
     bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
+
+    std::atomic<size_t>  refcount{1};
+
+
+    void AddRef()
+    {
+        refcount++;
+    }
+
+    bool Release()
+    {
+        if (--refcount == 0)
+        {
+            DoRelease();
+            return true;
+        }
+        return false;
+    }
+
+    void DoRelease()
+    {
+        if (output_sample.Get())
+            output_sample->RemoveAllBuffers();
+
+        endStreaming();
+
+        delete this;
+
+        MFShutdown();
+    }
 
     bool isStreaming = false;
     HRESULT beginStreaming()
@@ -1125,20 +1156,11 @@ static void DestroyMFT(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
 
-    if (p_sys->output_sample.Get())
-    {
-        p_sys->output_sample->RemoveAllBuffers();
-    }
-
     if (p_sys->mft.Get())
         p_sys->endStream();
-        p_sys->endStreaming();
-    }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         hxxx_helper_clean(&p_sys->hh);
-
-    MFShutdown();
 }
 
 static int FindMFT(decoder_t *p_dec)
@@ -1264,7 +1286,7 @@ static void Close(vlc_object_t *p_this)
 
     DestroyMFT(p_dec);
 
-    delete p_sys;
+    p_sys->Release();
 
     CoUninitialize();
 }
