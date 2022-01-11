@@ -8,6 +8,11 @@ libvlc_vdpau_la_LDFLAGS = \
 	-export-symbols-regex ^vdp_ \
 	-version-info 0:0:0
 
+libvdpau_instance_plugin_la_SOURCES = hw/vdpau/device.c
+libvdpau_instance_plugin_la_CFLAGS = $(AM_CFLAGS) $(X_CFLAGS) $(VDPAU_CFLAGS)
+libvdpau_instance_plugin_la_LIBADD = libvlc_vdpau.la \
+	$(X_LIBS) $(X_PRE_LIBS) -lX11
+
 libvdpau_avcodec_plugin_la_SOURCES = hw/vdpau/avcodec.c hw/vdpau/picture.c
 libvdpau_avcodec_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(X_CFLAGS) $(AVCODEC_CFLAGS) $(VDPAU_CFLAGS)
@@ -38,7 +43,8 @@ libvdpau_display_plugin_la_LIBADD = libvlc_vdpau.la libvlc_xcb_events.la \
 
 if HAVE_VDPAU
 pkglib_LTLIBRARIES += libvlc_vdpau.la
-vdpau_LTLIBRARIES = libvdpau_deinterlace_plugin.la libvdpau_adjust_plugin.la \
+vdpau_LTLIBRARIES = libvdpau_instance_plugin.la \
+	libvdpau_deinterlace_plugin.la libvdpau_adjust_plugin.la \
 	libvdpau_sharpen_plugin.la libvdpau_chroma_plugin.la
 if HAVE_XCB
 vdpau_LTLIBRARIES += libvdpau_display_plugin.la
