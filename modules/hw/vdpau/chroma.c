@@ -689,7 +689,7 @@ static picture_t *YCbCrRender(filter_t *filter, picture_t *src)
     return (src != NULL) ? Render(filter, src, true) : NULL;
 }
 
-static int OutputCheckFormat(vlc_object_t *obj, vdpau_decoder_device_t *vdpau_dev,
+static int OutputCheckFormat(vlc_object_t *obj, struct vlc_video_context *vctx,
                              const video_format_t *fmt,
                              VdpRGBAFormat *restrict rgb_fmt)
 {
@@ -697,19 +697,20 @@ static int OutputCheckFormat(vlc_object_t *obj, vdpau_decoder_device_t *vdpau_de
         VDP_RGBA_FORMAT_R10G10B10A2, VDP_RGBA_FORMAT_B10G10R10A2,
         VDP_RGBA_FORMAT_B8G8R8A8, VDP_RGBA_FORMAT_R8G8B8A8,
     };
+    struct vlc_vdp_device *device = GetVDPAUOpaqueContext(vctx);
 
     for (unsigned i = 0; i < ARRAY_SIZE(rgb_fmts); i++)
     {
         uint32_t w, h;
         VdpBool ok;
 
-        VdpStatus err = vdp_output_surface_query_capabilities(vdpau_dev->vdp,
-                                                              vdpau_dev->device,
+        VdpStatus err = vdp_output_surface_query_capabilities(device->vdp,
+                                                              device->device,
                                                      rgb_fmts[i], &ok, &w, &h);
         if (err != VDP_STATUS_OK)
         {
             msg_Err(obj, "%s capabilities query failure: %s", "output surface",
-                    vdp_get_error_string(vdpau_dev->vdp, err));
+                    vdp_get_error_string(device->vdp, err));
             continue;
         }
 
@@ -726,16 +727,16 @@ static int OutputCheckFormat(vlc_object_t *obj, vdpau_decoder_device_t *vdpau_de
 }
 
 static picture_pool_t *OutputPoolAlloc(vlc_object_t *obj,
-    vdpau_decoder_device_t *vdpau_dev, const video_format_t *restrict fmt)
+    struct vlc_video_context *vctx, const video_format_t *restrict fmt)
 {
     /* Check output surface format */
     VdpRGBAFormat rgb_fmt;
 
-    if (OutputCheckFormat(obj, vdpau_dev, fmt, &rgb_fmt))
+    if (OutputCheckFormat(obj, vctx, fmt, &rgb_fmt))
         return NULL;
 
     /* Allocate the pool */
-    return vlc_vdp_output_pool_create(vdpau_dev, rgb_fmt, fmt, 3);
+    return vlc_vdp_output_pool_create(vctx, rgb_fmt, fmt, 3);
 }
 
 const struct vlc_video_context_operations vdpau_vctx_ops = {
@@ -819,7 +820,7 @@ static int OutputOpen(filter_t *filter)
         return VLC_EGENERIC;
 
     /* Allocate the output surface picture pool */
-    sys->pool = OutputPoolAlloc(VLC_OBJECT(filter), sys->device,
+    sys->pool = OutputPoolAlloc(VLC_OBJECT(filter), filter->vctx_out,
                                 &filter->fmt_out.video);
     if (sys->pool == NULL)
     {

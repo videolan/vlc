@@ -135,24 +135,25 @@ static void vlc_vdp_output_surface_destroy(picture_t *pic)
 }
 
 static
-picture_t *vlc_vdp_output_surface_create(vdpau_decoder_device_t *vdpau_dev,
+picture_t *vlc_vdp_output_surface_create(struct vlc_video_context *vctx,
                                          VdpRGBAFormat rgb_fmt,
                                          const video_format_t *restrict fmt)
 {
+    struct vlc_vdp_device *device = GetVDPAUOpaqueContext(vctx);
     vlc_vdp_output_surface_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return NULL;
 
-    sys->vdp = vdp_hold_x11(vdpau_dev->vdp, &sys->device);
+    sys->vdp = vdp_hold_x11(device->vdp, &sys->device);
     sys->gl_nv_surface = 0;
 
-    VdpStatus err = vdp_output_surface_create(vdpau_dev->vdp, vdpau_dev->device,
+    VdpStatus err = vdp_output_surface_create(device->vdp, device->device,
         rgb_fmt,
         fmt->i_visible_width, fmt->i_visible_height, &sys->surface);
     if (err != VDP_STATUS_OK)
     {
 error:
-        vdp_release_x11(vdpau_dev->vdp);
+        vdp_release_x11(device->vdp);
         free(sys);
         return NULL;
     }
@@ -165,13 +166,13 @@ error:
     picture_t *pic = picture_NewFromResource(fmt, &res);
     if (unlikely(pic == NULL))
     {
-        vdp_output_surface_destroy(vdpau_dev->vdp, sys->surface);
+        vdp_output_surface_destroy(device->vdp, sys->surface);
         goto error;
     }
     return pic;
 }
 
-picture_pool_t *vlc_vdp_output_pool_create(vdpau_decoder_device_t *vdpau_dev,
+picture_pool_t *vlc_vdp_output_pool_create(struct vlc_video_context *vctx,
                                            VdpRGBAFormat rgb_fmt,
                                            const video_format_t *restrict fmt,
                                            unsigned requested_count)
@@ -181,7 +182,7 @@ picture_pool_t *vlc_vdp_output_pool_create(vdpau_decoder_device_t *vdpau_dev,
 
     while (count < requested_count)
     {
-        pics[count] = vlc_vdp_output_surface_create(vdpau_dev, rgb_fmt, fmt);
+        pics[count] = vlc_vdp_output_surface_create(vctx, rgb_fmt, fmt);
         if (pics[count] == NULL)
             break;
         count++;
