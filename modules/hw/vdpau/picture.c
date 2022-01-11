@@ -98,7 +98,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *vctx,
     }
 
     field->context = (picture_context_t) {
-        VideoSurfaceDestroy, VideoSurfaceCopy, vctx,
+        VideoSurfaceDestroy, VideoSurfaceCopy, vlc_video_context_Hold(vctx),
     };
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
@@ -129,7 +129,6 @@ VdpStatus vlc_vdp_video_attach(struct vlc_video_context *vctx,
 
     field->context.destroy = VideoSurfaceDestroy;
     field->context.copy = VideoSurfaceCloneWithContext;
-    field->context.vctx = vlc_video_context_Hold(vctx);
 
     assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
         || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
