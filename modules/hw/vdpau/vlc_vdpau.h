@@ -214,6 +214,11 @@ void vdp_release_x11(vdp_t *);
 # include <vlc_fourcc.h>
 # include <vlc_picture.h>
 
+struct vlc_vdp_device {
+    vdp_t *vdp; /**< VDPAU driver instance */
+    VdpDevice device; /**< VDPAU device handle */
+};
+
 /** Converts VLC YUV format to VDPAU chroma type and YCbCr format */
 static inline
 bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
@@ -280,10 +285,7 @@ typedef struct vlc_vdp_video_field
 #define VDPAU_FIELD_FROM_PICCTX(pic_ctx)  \
     container_of((pic_ctx), vlc_vdp_video_field_t, context)
 
-typedef struct {
-    vdp_t              *vdp;
-    VdpDevice          device;
-} vdpau_decoder_device_t;
+typedef struct vlc_vdp_device vdpau_decoder_device_t;
 
 static inline vdpau_decoder_device_t *GetVDPAUOpaqueDevice(vlc_decoder_device *device)
 {
