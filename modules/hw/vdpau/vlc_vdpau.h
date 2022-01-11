@@ -268,8 +268,6 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
 typedef struct vlc_vdp_video_frame
 {
     VdpVideoSurface surface;
-    VdpDevice device;
-    vdp_t *vdp;
     atomic_uintptr_t refs;
 } vlc_vdp_video_frame_t;
 

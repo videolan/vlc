@@ -38,6 +38,7 @@ static_assert(offsetof (vlc_vdp_video_field_t, context) == 0,
 
 static void VideoSurfaceDestroy(struct picture_context_t *ctx)
 {
+    struct vlc_vdp_device *device = GetVDPAUOpaqueContext(ctx->vctx);
     vlc_vdp_video_field_t *field = container_of(ctx, vlc_vdp_video_field_t,
                                                 context);
     vlc_vdp_video_frame_t *frame = field->frame;
@@ -50,10 +51,10 @@ static void VideoSurfaceDestroy(struct picture_context_t *ctx)
         return;
 
     /* Destroy frame (video surface) */
-    err = vdp_video_surface_destroy(frame->vdp, frame->surface);
+    err = vdp_video_surface_destroy(device->vdp, frame->surface);
     if (err != VDP_STATUS_OK)
         fprintf(stderr, "video surface destruction failure: %s\n",
-                vdp_get_error_string(frame->vdp, err));
+                vdp_get_error_string(device->vdp, err));
     free(frame);
 }
 
@@ -106,8 +107,6 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *vctx,
 
     atomic_init(&frame->refs, 1);
     frame->surface = surface;
-    frame->vdp = device->vdp;
-    frame->device = device->device;
     return field;
 }
 
