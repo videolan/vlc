@@ -1103,8 +1103,13 @@ static void DestroyMFT(decoder_t *p_dec)
     {
         IMFSample_RemoveAllBuffers(p_sys->output_sample);
     }
+
     if (p_sys->mft)
+    {
+        IMFTransform_ProcessMessage(p_sys->mft, MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
+        IMFTransform_ProcessMessage(p_sys->mft, MFT_MESSAGE_NOTIFY_END_STREAMING, (ULONG_PTR)0);
         IMFTransform_Release(p_sys->mft);
+    }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         hxxx_helper_clean(&p_sys->hh);
