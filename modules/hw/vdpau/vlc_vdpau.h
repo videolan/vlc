@@ -191,15 +191,6 @@ void vdp_destroy_x11(vdp_t *);
 VdpStatus vdp_get_x11(const char *name, int num, vdp_t **vdp, VdpDevice *dev);
 
 /**
- * Increases the reference count of a VDPAU instance created by vdp_get_x11().
- * @param vdp VDPAU instance (as returned by vdp_get_x11())
- * @param device location to store the VDPAU device corresponding to the
- *               VDPAU instance (or NULL) [OUT]
- * @return the first pameter, always succeeds.
- */
-vdp_t *vdp_hold_x11(vdp_t *vdp, VdpDevice *device);
-
-/**
  * Decreases the reference count of a VDPAU instance created by vdp_get_x11().
  * If it reaches zero, destroy the corresponding VDPAU device, then the VDPAU
  * instance and remove the pair from the process-wide list.
