@@ -80,7 +80,7 @@ namespace adaptive
             Times getFirstTimes() const;
             unsigned getActiveStreamsCount() const;
 
-            Times getCurrentTimes() const;
+            Times getTimes(bool = false) const;
             mtime_t getMinAheadTime() const;
 
             virtual bool reactivateStream(AbstractStream *);

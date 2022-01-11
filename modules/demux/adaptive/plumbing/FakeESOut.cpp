@@ -181,8 +181,8 @@ bool FakeESOut::getStartTimestamps( mtime_t *pi_mediats, mtime_t *pi_demuxts )
 {
     if(!expected.b_timestamp_set)
         return false;
-    *pi_demuxts = timestamp_first;
-    *pi_mediats = expected.timestamp;
+    *pi_demuxts = startTimes.demux;
+    *pi_mediats = startTimes.media;
     return true;
 }
 
