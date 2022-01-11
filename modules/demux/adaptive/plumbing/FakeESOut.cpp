@@ -186,8 +186,8 @@ bool FakeESOut::getStartTimestamps( vlc_tick_t *pi_mediats, vlc_tick_t *pi_demux
 {
     if(!expected.b_timestamp_set)
         return false;
-    *pi_demuxts = timestamp_first;
-    *pi_mediats = expected.timestamp;
+    *pi_demuxts = startTimes.demux;
+    *pi_mediats = startTimes.media;
     return true;
 }
 

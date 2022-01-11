@@ -82,7 +82,7 @@ namespace adaptive
             Times getFirstTimes() const;
             unsigned getActiveStreamsCount() const;
 
-            Times getCurrentTimes() const;
+            Times getTimes(bool = false) const;
             vlc_tick_t getMinAheadTime() const;
 
             virtual bool reactivateStream(AbstractStream *);
@@ -130,6 +130,7 @@ namespace adaptive
             {
                 bool        b_live;
                 vlc_tick_t  i_time;
+                vlc_tick_t  i_normaltime;
                 double      f_position;
                 mutable vlc_mutex_t lock;
                 vlc_tick_t  playlistStart;
