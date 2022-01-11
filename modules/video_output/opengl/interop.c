@@ -30,27 +30,51 @@
 #include "interop_sw.h"
 #include "vout_helper.h"
 
+struct vlc_gl_interop_private
+{
+    struct vlc_gl_interop interop;
+
+#define OPENGL_VTABLE_F(X) \
+        X(PFNGLDELETETEXTURESPROC, DeleteTextures) \
+        X(PFNGLGENTEXTURESPROC,    GenTextures) \
+        X(PFNGLBINDTEXTUREPROC,    BindTexture) \
+        X(PFNGLTEXIMAGE2DPROC,     TexImage2D) \
+        X(PFNGLTEXENVFPROC,        TexEnvf) \
+        X(PFNGLTEXPARAMETERFPROC,  TexParameterf) \
+        X(PFNGLTEXPARAMETERIPROC,  TexParameteri) \
+        X(PFNGLGETERRORPROC,       GetError) \
+        X(PFNGLGETTEXLEVELPARAMETERIVPROC, GetTexLevelParameteriv) \
+
+    struct {
+#define DECLARE_SYMBOL(type, name) type name;
+        OPENGL_VTABLE_F(DECLARE_SYMBOL)
+    } gl;
+};
+
 int
 vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
                                 const GLsizei *tex_width,
                                 const GLsizei *tex_height, GLuint *textures)
 {
-    interop->vt->GenTextures(interop->tex_count, textures);
+    struct vlc_gl_interop_private *priv =
+        container_of(interop, struct vlc_gl_interop_private, interop);
+
+    priv->gl.GenTextures(interop->tex_count, textures);
 
     for (unsigned i = 0; i < interop->tex_count; i++)
     {
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
 
 #if !defined(USE_OPENGL_ES2)
         /* Set the texture parameters */
-        interop->vt->TexParameterf(interop->tex_target, GL_TEXTURE_PRIORITY, 1.0);
-        interop->vt->TexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        priv->gl.TexParameterf(interop->tex_target, GL_TEXTURE_PRIORITY, 1.0);
+        priv->gl.TexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #endif
 
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
     if (interop->ops->allocate_textures != NULL)
@@ -58,7 +82,7 @@ vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
         int ret = interop->ops->allocate_textures(interop, textures, tex_width, tex_height);
         if (ret != VLC_SUCCESS)
         {
-            interop->vt->DeleteTextures(interop->tex_count, textures);
+            priv->gl.DeleteTextures(interop->tex_count, textures);
             memset(textures, 0, interop->tex_count * sizeof(GLuint));
             return ret;
         }
@@ -70,15 +94,21 @@ void
 vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
                               GLuint *textures)
 {
-    interop->vt->DeleteTextures(interop->tex_count, textures);
+    struct vlc_gl_interop_private *priv =
+        container_of(interop, struct vlc_gl_interop_private, interop);
+    priv->gl.DeleteTextures(interop->tex_count, textures);
     memset(textures, 0, interop->tex_count * sizeof(GLuint));
 }
 
-static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
+static int GetTexFormatSize(struct vlc_gl_interop *interop, int target,
                             int tex_format, int tex_internal, int tex_type)
 {
-    GL_ASSERT_NOERROR(vt);
-    if (!vt->GetTexLevelParameteriv)
+    struct vlc_gl_interop_private *priv =
+        container_of(interop, struct vlc_gl_interop_private, interop);
+
+    GL_ASSERT_NOERROR(&priv->gl);
+
+    if (!priv->gl.GetTexLevelParameteriv)
         return -1;
 
     GLint tex_param_size;
@@ -100,16 +130,16 @@ static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
     }
     GLuint texture;
 
-    vt->GenTextures(1, &texture);
-    vt->BindTexture(target, texture);
-    vt->TexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
+    priv->gl.GenTextures(1, &texture);
+    priv->gl.BindTexture(target, texture);
+    priv->gl.TexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
     GLint size = 0;
-    vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
+    priv->gl.GetTexLevelParameteriv(target, 0, tex_param_size, &size);
 
-    vt->DeleteTextures(1, &texture);
+    priv->gl.DeleteTextures(1, &texture);
 
     bool has_error = false;
-    while (vt->GetError() != GL_NO_ERROR)
+    while (priv->gl.GetError() != GL_NO_ERROR)
         has_error = true;
 
     if (has_error)
@@ -153,7 +183,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
     if (desc->pixel_size == 2)
     {
-        if (GetTexFormatSize(interop->vt, tex_target, oneplane_texfmt,
+        if (GetTexFormatSize(interop, tex_target, oneplane_texfmt,
                              oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
             return VLC_EGENERIC;
     }
@@ -208,7 +238,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
         else if (desc->pixel_size == 2)
         {
             if (twoplanes16_texfmt == 0
-             || GetTexFormatSize(interop->vt, tex_target, twoplanes_texfmt,
+             || GetTexFormatSize(interop, tex_target, twoplanes_texfmt,
                                  twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
                 return VLC_EGENERIC;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
@@ -283,7 +313,7 @@ interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
             };
             break;
         case VLC_CODEC_BGRA: {
-            if (GetTexFormatSize(interop->vt, tex_target, GL_BGRA, GL_RGBA,
+            if (GetTexFormatSize(interop, tex_target, GL_BGRA, GL_RGBA,
                                  GL_UNSIGNED_BYTE) != 32)
                 return VLC_EGENERIC;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
@@ -339,13 +369,16 @@ struct vlc_gl_interop *
 vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
                    vlc_video_context *context, const video_format_t *fmt)
 {
-    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
-    if (!interop)
+    struct vlc_gl_interop_private *priv = vlc_object_create(gl, sizeof *priv);
+    if (priv == NULL)
         return NULL;
+
+    struct vlc_gl_interop *interop = &priv->interop;
 
     interop->init = opengl_interop_init_impl;
     interop->ops = NULL;
     interop->fmt_out = interop->fmt_in = *fmt;
+    interop->gl = gl;
     /* this is the only allocated field, and we don't need it */
     interop->fmt_out.p_palette = interop->fmt_in.p_palette = NULL;
 
@@ -361,6 +394,11 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
         vlc_object_delete(interop);
         return NULL;
     }
+
+#define LOAD_SYMBOL(type, name) \
+    priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name);
+    OPENGL_VTABLE_F(LOAD_SYMBOL);
+#undef LOAD_SYMBOL
 
     if (desc->plane_count == 0)
     {
@@ -378,6 +416,7 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
             goto error;
     }
 
+
     return interop;
 
 error:
@@ -389,10 +428,11 @@ struct vlc_gl_interop *
 vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
                                  const struct vlc_gl_api *api)
 {
-    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
-    if (!interop)
+    struct vlc_gl_interop_private *priv = vlc_object_create(gl, sizeof *priv);
+    if (priv == NULL)
         return NULL;
 
+    struct vlc_gl_interop *interop = &priv->interop;
     interop->init = opengl_interop_init_impl;
     interop->ops = NULL;
     interop->gl = gl;
@@ -401,6 +441,11 @@ vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
 
     video_format_Init(&interop->fmt_in, VLC_CODEC_RGB32);
     interop->fmt_out = interop->fmt_in;
+
+#define LOAD_SYMBOL(type, name) \
+    priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name);
+    OPENGL_VTABLE_F(LOAD_SYMBOL);
+#undef LOAD_SYMBOL
 
     int ret = opengl_interop_generic_init(interop, false);
     if (ret != VLC_SUCCESS)
