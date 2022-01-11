@@ -197,53 +197,6 @@ Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void
-DecoderDeviceClose(vlc_decoder_device *device)
-{
-    vdpau_decoder_device_t *vdpau_dev = GetVDPAUOpaqueDevice(device);
-    vdp_release_x11(vdpau_dev->vdp);
-}
-
-static const struct vlc_decoder_device_operations dev_ops = {
-    .close = DecoderDeviceClose,
-};
-
-static int
-DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
-{
-    if (!window || window->type != VOUT_WINDOW_TYPE_XID)
-        return VLC_EGENERIC;
-
-    if (!vlc_xlib_init(VLC_OBJECT(window)))
-        return VLC_EGENERIC;
-
-    vdpau_decoder_device_t *sys = vlc_obj_malloc(VLC_OBJECT(device), sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    if (vdp_get_x11(window->display.x11, -1,
-                    &sys->vdp, &sys->device) != VDP_STATUS_OK)
-        return VLC_EGENERIC;
-
-    const char *infos;
-    VdpStatus status = vdp_get_information_string(sys->vdp, &infos);
-    /* Favor original backends. Example: don't use a VAAPI backend when we
-     * have VAAPI decoder devices. */
-    if (status != VDP_STATUS_OK
-     || strstr(infos, "VAAPI") != NULL)
-    {
-        if (status == VDP_STATUS_OK)
-            msg_Dbg(device, "Not using '%s', favor a decdev with a compatible backend",
-                    infos);
-        vdp_release_x11(sys->vdp);
-        return VLC_EGENERIC;
-    }
-
-    device->ops = &dev_ops;
-    device->type = VLC_DECODER_DEVICE_VDPAU;
-    device->opaque = sys;
-    return VLC_SUCCESS;
-}
 
 vlc_module_begin ()
     set_description("VDPAU OpenGL surface converter")
@@ -251,6 +204,4 @@ vlc_module_begin ()
     set_callback(Open)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_shortcut("vdpau")
-    add_submodule()
-        set_callback_dec_device(DecoderDeviceOpen, 3)
 vlc_module_end ()
