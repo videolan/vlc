@@ -54,7 +54,6 @@ static void VideoSurfaceDestroy(struct picture_context_t *ctx)
     if (err != VDP_STATUS_OK)
         fprintf(stderr, "video surface destruction failure: %s\n",
                 vdp_get_error_string(frame->vdp, err));
-    vdp_release_x11(frame->vdp);
     free(frame);
 }
 
@@ -107,7 +106,8 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *vctx,
 
     atomic_init(&frame->refs, 1);
     frame->surface = surface;
-    frame->vdp = vdp_hold_x11(device->vdp, &frame->device);
+    frame->vdp = device->vdp;
+    frame->device = device->device;
     return field;
 }
 
