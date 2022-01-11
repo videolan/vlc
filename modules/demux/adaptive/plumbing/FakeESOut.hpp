@@ -85,7 +85,6 @@ namespace adaptive
             void setAssociatedTimestamp( mtime_t );
             void setExpectedTimestamp( mtime_t );
             void resetTimestamps();
-            bool getStartTimestamps( mtime_t *, mtime_t * );
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool decodersDrained();

@@ -583,12 +583,9 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 }
 
 bool AbstractStream::getMediaPlaybackTimes(mtime_t *start, mtime_t *end,
-                                           mtime_t *length,
-                                           mtime_t *mediaStart,
-                                           mtime_t *demuxStart) const
+                                           mtime_t *length) const
 {
-    return (segmentTracker->getMediaPlaybackRange(start, end, length) &&
-            fakeEsOut()->getStartTimestamps(mediaStart, demuxStart));
+    return segmentTracker->getMediaPlaybackRange(start, end, length);
 }
 
 void AbstractStream::runUpdates()

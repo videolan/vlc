@@ -92,8 +92,7 @@ namespace adaptive
         Status dequeue(Times, Times *);
         bool decodersDrained();
         virtual bool setPosition(mtime_t, bool);
-        bool getMediaPlaybackTimes(mtime_t *, mtime_t *, mtime_t *,
-                                   mtime_t *, mtime_t *) const;
+        bool getMediaPlaybackTimes(mtime_t *, mtime_t *, mtime_t *) const;
         void runUpdates();
 
         /* Used by demuxers fake streams */
