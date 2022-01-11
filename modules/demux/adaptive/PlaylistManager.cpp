@@ -218,7 +218,7 @@ static bool streamCompare(const PrioritizedAbstractStream &a,  const Prioritized
     return false;
 }
 
-AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
+AbstractStream::BufferingStatus PlaylistManager::bufferize(Times deadline,
                                                            mtime_t i_min_buffering,
                                                            mtime_t i_max_buffering,
                                                            mtime_t i_target_buffering)
@@ -234,7 +234,7 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
         PrioritizedAbstractStream &p = *it;
         p.st = *sit;
         p.status = p.st->getLastBufferStatus();
-        p.demuxed_amount = p.st->getDemuxedAmount(i_nzdeadline);
+        p.demuxed_amount = p.st->getDemuxedAmount(deadline).continuous;
         ++it;
     }
     std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);
@@ -257,7 +257,7 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
             /* initial */
         }
 
-        AbstractStream::BufferingStatus i_ret = st->bufferize(i_nzdeadline,
+        AbstractStream::BufferingStatus i_ret = st->bufferize(deadline,
                                                                i_min_buffering,
                                                                i_max_buffering,
                                                                i_target_buffering,
@@ -459,7 +459,7 @@ int PlaylistManager::doDemux(int64_t increment)
     }
 
     Times barrier = demux.times;
-    barrier.continuous += increment;
+    barrier.offsetBy(increment);
 
     vlc_mutex_unlock(&demux.lock);
 
@@ -697,10 +697,10 @@ void PlaylistManager::Run()
         }
 
         vlc_mutex_lock(&demux.lock);
-        mtime_t i_nzpcr = demux.times.continuous;
+        Times pcr = demux.times;
         vlc_mutex_unlock(&demux.lock);
 
-        AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering,
+        AbstractStream::BufferingStatus i_return = bufferize(pcr, i_min_buffering,
                                                              i_max_buffering, i_target_buffering);
 
         if(i_return != AbstractStream::BufferingStatus::Lessthanmin)

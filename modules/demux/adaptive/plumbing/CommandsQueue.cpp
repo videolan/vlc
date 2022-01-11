@@ -293,7 +293,7 @@ bool AbstractCommandsQueue::isEOF() const
 CommandsQueue::CommandsQueue()
     : AbstractCommandsQueue()
 {
-    bufferinglevel = VLC_TS_INVALID;
+    bufferinglevel = Times();
     nextsequence = 0;
 }
 
@@ -334,7 +334,7 @@ void CommandsQueue::Schedule( AbstractCommand *command, EsType )
     }
     else if( command->getType() == ES_OUT_SET_GROUP_PCR )
     {
-        bufferinglevel = command->getTimes().continuous;
+        bufferinglevel = command->getTimes();
         LockedCommit();
         commands.push_back( Queueentry(nextsequence++, command) );
     }
@@ -460,7 +460,7 @@ void CommandsQueue::Abort( bool b_reset )
 
     if( b_reset )
     {
-        bufferinglevel = VLC_TS_INVALID;
+        bufferinglevel = Times();
         pcr = Times();
         b_draining = false;
         b_eof = false;
@@ -477,20 +477,30 @@ void CommandsQueue::setDraining()
     LockedSetDraining();
 }
 
-mtime_t CommandsQueue::getDemuxedAmount(mtime_t from) const
+Times CommandsQueue::getDemuxedAmount(Times from) const
 {
     Times bufferingstart = getFirstTimes();
-    if( bufferinglevel == VLC_TS_INVALID ||
+    if( bufferinglevel.continuous == VLC_TS_INVALID ||
         bufferingstart.continuous == VLC_TS_INVALID ||
-        from > bufferinglevel )
-        return 0;
-    if( from > bufferingstart.continuous )
-        return bufferinglevel - from;
+        from.continuous > bufferinglevel.continuous )
+        return Times(SegmentTimes(0,0),0);
+    if( from.continuous > bufferingstart.continuous )
+    {
+        Times t = bufferinglevel;
+        t.segment.offsetBy( -from.continuous );
+        t.continuous -= from.continuous;
+        return t;
+    }
     else
-        return bufferinglevel - bufferingstart.continuous;
+    {
+        Times t = bufferinglevel;
+        t.segment.offsetBy( -bufferingstart.continuous );
+        t.continuous -= bufferingstart.continuous;
+        return t;
+    }
 }
 
-mtime_t CommandsQueue::getBufferingLevel() const
+Times CommandsQueue::getBufferingLevel() const
 {
     return bufferinglevel;
 }
@@ -522,3 +532,4 @@ Times CommandsQueue::getPCR() const
 {
     return pcr;
 }
+

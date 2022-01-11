@@ -337,23 +337,23 @@ AbstractStream::BufferingStatus AbstractStream::getLastBufferStatus() const
     return last_buffer_status;
 }
 
-mtime_t AbstractStream::getDemuxedAmount(mtime_t from) const
+Times AbstractStream::getDemuxedAmount(Times from) const
 {
     return fakeEsOut()->commandsQueue()->getDemuxedAmount(from);
 }
 
-AbstractStream::BufferingStatus AbstractStream::bufferize(mtime_t nz_deadline,
+AbstractStream::BufferingStatus AbstractStream::bufferize(Times deadline,
                                                            mtime_t i_min_buffering,
                                                            mtime_t i_extra_buffering,
                                                            mtime_t i_target_buffering,
                                                            bool b_keep_alive)
 {
-    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering,
+    last_buffer_status = doBufferize(deadline, i_min_buffering, i_extra_buffering,
                                      i_target_buffering, b_keep_alive);
     return last_buffer_status;
 }
 
-AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
+AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
                                                              mtime_t i_min_buffering,
                                                              mtime_t i_max_buffering,
                                                              mtime_t i_target_buffering,
@@ -406,17 +406,24 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
         }
     }
 
-    mtime_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(nz_deadline);
+    mtime_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(deadline).continuous;
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     if(i_demuxed < i_max_buffering) /* not already demuxed */
     {
-        mtime_t nz_extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel() +
-                                    (i_max_buffering - i_demuxed) / 4;
-        nz_deadline = std::min(nz_extdeadline, nz_deadline + CLOCK_FREQ);
+        Times extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel();
+        extdeadline.offsetBy((i_max_buffering - i_demuxed) / 4);
+
+        Times newdeadline = deadline;
+        newdeadline.offsetBy(CLOCK_FREQ);
+
+        if(extdeadline.continuous < newdeadline.continuous)
+            deadline = extdeadline;
+        else
+            deadline = newdeadline;
 
         /* need to read, demuxer still buffering, ... */
         vlc_mutex_unlock(&lock);
-        Demuxer::Status demuxStatus = demuxer->demux(nz_deadline);
+        Demuxer::Status demuxStatus = demuxer->demux(deadline.continuous);
         fakeEsOut()->scheduleNecessaryMilestone();
         vlc_mutex_lock(&lock);
         if(demuxStatus != Demuxer::Status::Success)
@@ -439,7 +446,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
             vlc_mutex_unlock(&lock);
             return BufferingStatus::End;
         }
-        i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(nz_deadline);
+        i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(deadline).continuous;
         segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     }
     vlc_mutex_unlock(&lock);
@@ -461,7 +468,7 @@ AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
     {
         AdvDebug(mtime_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR().continuous;
                  mtime_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstTimes().continuous;
-                 mtime_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
+                 mtime_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel().continuous;
                  msg_Dbg(p_realdemux, "Stream pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64 "(+%" PRId64 ") [DRAINING] :%s",
                          pcrvalue, dtsvalue, deadline.continuous, bufferingLevel,
                          pcrvalue ? bufferingLevel - pcrvalue : 0,
@@ -484,7 +491,7 @@ AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
         return Status::Eof;
     }
 
-    mtime_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
+    mtime_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel().continuous;
 
     AdvDebug(mtime_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR().continuous;
              mtime_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstTimes().continuous;

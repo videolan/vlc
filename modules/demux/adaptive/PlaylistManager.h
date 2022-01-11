@@ -57,7 +57,7 @@ namespace adaptive
             bool    started() const;
             void    stop();
 
-            AbstractStream::BufferingStatus bufferize(mtime_t, mtime_t,
+            AbstractStream::BufferingStatus bufferize(Times, mtime_t,
                                                       mtime_t, mtime_t);
             AbstractStream::Status dequeue(Times, Times *);
 
