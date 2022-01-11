@@ -81,12 +81,15 @@ static const VdpProcamp procamp_default =
     .hue = 0.f,
 };
 
-vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
+vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *vctx,
                                             VdpVideoSurface surface)
 {
+    struct vlc_vdp_device *device = GetVDPAUOpaqueContext(vctx);
     vlc_vdp_video_field_t *field = malloc(sizeof (*field));
     vlc_vdp_video_frame_t *frame = malloc(sizeof (*frame));
 
+    if (device == NULL)
+        vlc_assert_unreachable();
     if (unlikely(field == NULL || frame == NULL))
     {
         free(frame);
@@ -95,8 +98,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
     }
 
     field->context = (picture_context_t) {
-        VideoSurfaceDestroy, VideoSurfaceCopy,
-        NULL /*TODO*/
+        VideoSurfaceDestroy, VideoSurfaceCopy, vctx,
     };
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
@@ -105,7 +107,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
 
     atomic_init(&frame->refs, 1);
     frame->surface = surface;
-    frame->vdp = vdp_hold_x11(vdp, &frame->device);
+    frame->vdp = vdp_hold_x11(device->vdp, &frame->device);
     return field;
 }
 
@@ -118,10 +120,10 @@ picture_context_t *VideoSurfaceCloneWithContext(picture_context_t *src_ctx)
     return dst_ctx;
 }
 
-VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
-                               vlc_video_context *vctx, picture_t *pic)
+VdpStatus vlc_vdp_video_attach(struct vlc_video_context *vctx,
+                               VdpVideoSurface surface, picture_t *pic)
 {
-    vlc_vdp_video_field_t *field = vlc_vdp_video_create(vdp, surface);
+    vlc_vdp_video_field_t *field = vlc_vdp_video_create(vctx, surface);
     if (unlikely(field == NULL))
         return VDP_STATUS_RESOURCES;
 

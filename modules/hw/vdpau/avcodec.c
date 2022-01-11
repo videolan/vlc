@@ -70,7 +70,7 @@ static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va, vdpau_decoder_device_t
         return NULL;
     }
 
-    vlc_vdp_video_field_t *field = vlc_vdp_video_create(vdpau_decoder->vdp, surface);
+    vlc_vdp_video_field_t *field = vlc_vdp_video_create(sys->vctx, surface);
     if (unlikely(field == NULL))
         vdp_video_surface_destroy(vdpau_decoder->vdp, surface);
     return field;

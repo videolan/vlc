@@ -312,12 +312,14 @@ static inline vdpau_decoder_device_t *GetVDPAUOpaqueContext(vlc_video_context *v
 /**
  * Attaches a VDPAU video surface as context of a VLC picture.
  */
-VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, vlc_video_context *, picture_t *);
+VdpStatus vlc_vdp_video_attach(struct vlc_video_context *, VdpVideoSurface,
+                               picture_t *);
 
 /**
  * Wraps a VDPAU video surface into a VLC picture context.
  */
-vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *, VdpVideoSurface);
+vlc_vdp_video_field_t *vlc_vdp_video_create(struct vlc_video_context *,
+                                            VdpVideoSurface);
 
 static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
 {
