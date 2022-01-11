@@ -38,7 +38,6 @@ typedef struct vdp_instance
     vdp_t *vdp;
     VdpDevice device;
 
-    uintptr_t refs; /**< Reference count */
     struct vdp_instance *next;
 } vdp_instance_t;
 
@@ -68,7 +67,6 @@ static vdp_instance_t *vdp_instance_create(const char *name, int num)
     }
 
     vi->next = NULL;
-    vi->refs = 1;
 
     return vi;
 }
@@ -120,12 +118,7 @@ void vdp_release_x11(vdp_t *vdp)
         pp = &vi->next;
     }
 
-    assert(vi->refs > 0);
-    vi->refs--;
-    if (vi->refs > 0)
-        vi = NULL; /* Keep the instance for now */
-    else
-        *pp = vi->next; /* Unlink the instance */
+    *pp = vi->next; /* Unlink the instance */
     pthread_mutex_unlock(&lock);
 
     if (vi != NULL)
