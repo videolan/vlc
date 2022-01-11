@@ -38,17 +38,13 @@ typedef struct vdp_instance
     vdp_t *vdp;
     VdpDevice device;
 
-    int num; /**< X11 screen number */
-
     uintptr_t refs; /**< Reference count */
     struct vdp_instance *next;
-    char name[]; /**< X11 display name */
 } vdp_instance_t;
 
 static vdp_instance_t *vdp_instance_create(const char *name, int num)
 {
-    size_t namelen = strlen(name) + 1;
-    vdp_instance_t *vi = malloc(sizeof (*vi) + namelen);
+    vdp_instance_t *vi = malloc(sizeof (*vi));
 
     if (unlikely(vi == NULL))
         return NULL;
@@ -60,13 +56,10 @@ static vdp_instance_t *vdp_instance_create(const char *name, int num)
         return NULL;
     }
 
-    if (num >= 0)
-        vi->num = num;
-    else
-        vi->num = XDefaultScreen(vi->display);
+    if (num < 0)
+        num = XDefaultScreen(vi->display);
 
-    VdpStatus err = vdp_create_x11(vi->display, vi->num,
-                                   &vi->vdp, &vi->device);
+    VdpStatus err = vdp_create_x11(vi->display, num, &vi->vdp, &vi->device);
     if (err != VDP_STATUS_OK)
     {
         XCloseDisplay(vi->display);
@@ -75,7 +68,6 @@ static vdp_instance_t *vdp_instance_create(const char *name, int num)
     }
 
     vi->next = NULL;
-    memcpy(vi->name, name, namelen);
     vi->refs = 1;
 
     return vi;
@@ -89,35 +81,7 @@ static void vdp_instance_destroy(vdp_instance_t *vi)
     free(vi);
 }
 
-static int vicmp(const char *name, int num, const vdp_instance_t *vi)
-{
-    int val = strcmp(name, vi->name);
-    if (val)
-        return val;
-
-    if (num < 0)
-        num = XDefaultScreen(vi->display);
-    return num - vi->num;
-}
-
 static vdp_instance_t *list = NULL;
-
-static vdp_instance_t *vdp_instance_lookup(const char *name, int num)
-{
-    vdp_instance_t *vi = NULL;
-
-    for (vi = list; vi != NULL; vi = vi->next)
-    {
-        int val = vicmp(name, num, vi);
-        if (val == 0)
-        {
-            assert(vi->refs < UINTPTR_MAX);
-            vi->refs++;
-            break;
-        }
-    }
-    return vi;
-}
 
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -129,40 +93,14 @@ static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 VdpStatus vdp_get_x11(const char *display_name, int snum,
                       vdp_t **restrict vdpp, VdpDevice *restrict devicep)
 {
-    vdp_instance_t *vi, *vi2;
-
-    if (display_name == NULL)
-    {
-        display_name = getenv("DISPLAY");
-        if (display_name == NULL)
-            return VDP_STATUS_ERROR;
-    }
-
-    pthread_mutex_lock(&lock);
-    vi = vdp_instance_lookup(display_name, snum);
-    pthread_mutex_unlock(&lock);
-    if (vi != NULL)
-        goto found;
-
-    vi = vdp_instance_create(display_name, snum);
+    vdp_instance_t *vi = vdp_instance_create(display_name, snum);
     if (vi == NULL)
         return VDP_STATUS_ERROR;
 
     pthread_mutex_lock(&lock);
-    vi2 = vdp_instance_lookup(display_name, snum);
-    if (unlikely(vi2 != NULL))
-    {   /* Another thread created the instance (race condition corner case) */
-        pthread_mutex_unlock(&lock);
-        vdp_instance_destroy(vi);
-        vi = vi2;
-    }
-    else
-    {
-        vi->next = list;
-        list = vi;
-        pthread_mutex_unlock(&lock);
-    }
-found:
+    vi->next = list;
+    list = vi;
+    pthread_mutex_unlock(&lock);
     *vdpp = vi->vdp;
     *devicep = vi->device;
     return VDP_STATUS_OK;

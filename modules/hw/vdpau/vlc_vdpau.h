@@ -175,10 +175,11 @@ void vdp_destroy_x11(vdp_t *);
 /* Instance reuse */
 
 /**
- * Finds an existing pair of VDPAU instance and VDPAU device matching the
- * specified X11 display and screen number from within the process-wide list.
- * If no existing instance corresponds, connect to the X11 server,
- * create a new pair of instance and device, and set the reference count to 1.
+ * Creates a VDPAU instance.
+ *
+ * This function connects to the X11 server and creates a VDPAU instance and
+ * VDPAU device matching the specified screen number.
+ *
  * @param name X11 display name
  * @param snum X11 screen number
  * @param vdp memory location to hold the VDPAU instance pointer [OUT]
