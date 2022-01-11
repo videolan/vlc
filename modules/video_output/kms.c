@@ -492,6 +492,6 @@ vlc_module_begin ()
 
     set_description("Linux kernel mode setting window provider")
     set_callback(OpenWindow)
-    set_capability("vout window", 10)
+    set_capability("vout window", 9)
 
 vlc_module_end ()
