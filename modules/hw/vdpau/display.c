@@ -324,10 +324,6 @@ static int Open(vout_display_t *vd,
 
     vlc_decoder_device_Release(dec_device);
 
-    const char *info;
-    if (vdp_get_information_string(sys->vdp, &info) == VDP_STATUS_OK)
-        msg_Dbg(vd, "using back-end %s", info);
-
     /* Check source format */
     video_format_t fmt;
     VdpChromaType chroma;

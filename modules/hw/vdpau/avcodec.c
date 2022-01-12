@@ -235,10 +235,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, c
         return VLC_ENOMEM;
     }
 
-    const char *infos;
-    if (vdp_get_information_string(vdpau_decoder->vdp, &infos) == VDP_STATUS_OK)
-        msg_Info(va, "Using %s", infos);
-
     *vtcx_out = sys->vctx;
     va->ops = &ops;
     return VLC_SUCCESS;
