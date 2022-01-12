@@ -28,6 +28,8 @@ import "qrc:///util/Helpers.js" as Helpers
 Widgets.IconControlButton {
     id: playbackSpeedButton
 
+    readonly property bool _isCurrentViewPlayer: !paintOnly && (History.current.name === "player")
+
     size: VLCStyle.icon_medium
     text: I18n.qtr("Playback Speed")
     color: playbackSpeedPopup.visible ? colors.accent : colors.playerControlBarFg
@@ -42,7 +44,7 @@ Widgets.IconControlButton {
         focus: true
         parent: playbackSpeedButton.paintOnly
                 ? playbackSpeedButton // button is not part of main display (ToolbarEditorDialog)
-                : (History.current.view === "player") ? rootPlayer : g_root
+                : playbackSpeedButton._isCurrentViewPlayer ? rootPlayer : g_root
 
         Navigation.parentItem: playbackSpeedButton
 
@@ -68,14 +70,14 @@ Widgets.IconControlButton {
 
             // player related --
             playerControlLayout.requestLockUnlockAutoHide(true, playerControlLayout)
-            if (!!rootPlayer)
+            if (playbackSpeedButton._isCurrentViewPlayer)
                 rootPlayer.menu = playbackSpeedPopup
         }
 
         onClosed: {
             playerControlLayout.requestLockUnlockAutoHide(false, playerControlLayout)
             playbackSpeedButton.forceActiveFocus()
-            if (!!rootPlayer)
+            if (playbackSpeedButton._isCurrentViewPlayer)
                 rootPlayer.menu = undefined
         }
     }
