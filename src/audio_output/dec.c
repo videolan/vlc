@@ -612,12 +612,7 @@ void aout_DecDrain(audio_output_t *aout)
             aout->play(aout, block, vlc_tick_now());
     }
 
-    if (aout->drain)
-    {
-        aout->drain(aout);
-        aout_DrainedReport(aout);
-    }
-    else if (aout->drain_async)
+    if (aout->drain_async)
     {
         assert(!atomic_load_explicit(&owner->drained, memory_order_relaxed));
 
