@@ -237,9 +237,6 @@ struct audio_output
     void (*flush)( audio_output_t *);
     /**< Flushes the playback buffers (mandatory, cannot be NULL).
       *
-      * \param wait true to wait for playback of pending buffers (drain),
-      *             false to discard pending buffers (flush)
-      *
       * \note This callback cannot be called in stopped state.
       */
     void (*drain)(audio_output_t *);
