@@ -31,6 +31,7 @@
 #include "compositor_x11_renderwindow.hpp"
 #include "compositor_x11_renderclient.hpp"
 #include "compositor_x11_uisurface.hpp"
+#include "compositor_x11_utils.hpp"
 
 #include <vlc_cxx_helpers.hpp>
 
@@ -553,6 +554,7 @@ void CompositorX11RenderWindow::setVideoWindow( QWindow* window)
     xcb_flush(QX11Info::connection());
     m_videoClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);
     m_videoPosition = QRect(0,0,0,0);
+    setTransparentForMouseEvent(QX11Info::connection(), window->winId());
     m_videoWindow = window;
     emit videoSurfaceChanged(m_videoClient.get());
 }

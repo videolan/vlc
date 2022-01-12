@@ -115,6 +115,13 @@ bool CompositorX11::init()
             "X11 Composite version is too old, 0.2+ is required");
     REGISTER_XCB_EXTENSION(m_conn, composite, XCB_COMPOSITE_MAJOR_VERSION, XCB_COMPOSITE_MINOR_VERSION);
 
+    if (!checkExtensionPresent(m_intf, m_conn, "XFIXES"))
+        return false;
+    //2.x is required for SetWindowShapeRegion
+    static_assert (XCB_XFIXES_MAJOR_VERSION >= 2,
+            "X11 Fixes version is too old, 2.0+ is required");
+    REGISTER_XCB_EXTENSION(m_conn, xfixes, XCB_XFIXES_MAJOR_VERSION, XCB_XFIXES_MINOR_VERSION);
+
     // check whether we're running under "XWAYLAND"
     auto screens = qApp->screens();
     bool isXWayland = std::any_of(screens.begin(), screens.end(), [](QScreen* screen){
@@ -147,9 +154,13 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     m_mainCtx = mainCtx;
 
     m_videoWidget = std::make_unique<DummyNativeWidget>();
-    m_videoWidget->setWindowFlag(Qt::WindowType::BypassWindowManagerHint);
-    m_videoWidget->setWindowFlag(Qt::WindowType::WindowTransparentForInput);
+    // widget would normally require WindowTransparentForInput, without this
+    // we end up with an invisible area within our window that grabs our mouse events.
+    // But using this this causes rendering issues with some VoutDisplay
+    // (xcb_render for instance) instead, we manually, set a null intput region afterwards
+    // see setTransparentForMouseEvent
     m_videoWidget->winId();
+    m_videoWidget->setWindowFlag(Qt::WindowStaysOnBottomHint);
     m_videoWidget->show();
 
     bool useCSD = m_mainCtx->useClientSideDecoration();

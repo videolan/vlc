@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include <xcb/xfixes.h>
 #include <vlc_cxx_helpers.hpp>
 #include "compositor_x11_utils.hpp"
 
@@ -103,6 +104,17 @@ xcb_atom_t getInternAtom(xcb_connection_t* conn, const char* atomName)
     if (!atomReply)
         return 0;
     return atomReply->atom;
+}
+
+void setTransparentForMouseEvent(xcb_connection_t* conn, xcb_window_t window)
+{
+     xcb_rectangle_t *rect = 0;
+     int nrect = 0;
+
+     xcb_xfixes_region_t region = xcb_generate_id(conn);
+     xcb_xfixes_create_region(conn, region, nrect, rect);
+     xcb_xfixes_set_window_shape_region(conn, window, XCB_SHAPE_SK_INPUT, 0, 0, region);
+     xcb_xfixes_destroy_region(conn, region);
 }
 
 }

@@ -108,6 +108,8 @@ bool queryExtension(xcb_connection_t* conn, const char* name, uint8_t* first_eve
 bool findVisualFormat(xcb_connection_t* conn, xcb_visualid_t visual, xcb_render_pictformat_t* fmtOut, uint8_t* depthOut);
 
 xcb_atom_t getInternAtom(xcb_connection_t* conn, const char* atomName);
+
+void setTransparentForMouseEvent(xcb_connection_t* conn, xcb_window_t window);
 }
 
 
