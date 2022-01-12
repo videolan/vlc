@@ -90,14 +90,14 @@ struct vlc_video_context_operations
 /** Decoder device type */
 enum vlc_video_context_type
 {
-    VLC_VIDEO_CONTEXT_VAAPI = 1,
-    VLC_VIDEO_CONTEXT_VDPAU,
-    VLC_VIDEO_CONTEXT_DXVA2, /**< private: d3d9_video_context_t* */
-    VLC_VIDEO_CONTEXT_D3D11VA,  /**< private: d3d11_video_context_t* */
-    VLC_VIDEO_CONTEXT_AWINDOW, /**< private: android_video_context_t* */
-    VLC_VIDEO_CONTEXT_NVDEC,
-    VLC_VIDEO_CONTEXT_CVPX,
-    VLC_VIDEO_CONTEXT_MMAL,
+    VLC_VIDEO_CONTEXT_VAAPI = 1, //!< private: vaapi_vctx*
+    VLC_VIDEO_CONTEXT_VDPAU,     //!< empty
+    VLC_VIDEO_CONTEXT_DXVA2,     //!< private: d3d9_video_context_t*
+    VLC_VIDEO_CONTEXT_D3D11VA,   //!< private: d3d11_video_context_t*
+    VLC_VIDEO_CONTEXT_AWINDOW,   //!< private: android_video_context_t*
+    VLC_VIDEO_CONTEXT_NVDEC,     //!< empty
+    VLC_VIDEO_CONTEXT_CVPX,      //!< private: cvpx_video_context*
+    VLC_VIDEO_CONTEXT_MMAL,      //!< empty
 };
 
 VLC_API vlc_video_context * vlc_video_context_Create(vlc_decoder_device *,
