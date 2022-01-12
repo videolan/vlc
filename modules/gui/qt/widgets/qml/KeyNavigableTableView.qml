@@ -47,6 +47,8 @@ FocusScope {
         text: model.text || ""
     }
 
+    readonly property real sectionWidth: !!section.property ? VLCStyle.table_section_width : 0
+
     readonly property real usedRowSpace: {
         var s = 0
         for (var i in sortModel)
@@ -291,7 +293,7 @@ FocusScope {
                 Row {
                     id: row
 
-                    x: Math.max(0, view.width - root.usedRowSpace) / 2
+                    x: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
                     leftPadding: VLCStyle.margin_xxxsmall
                     rightPadding: VLCStyle.margin_xxxsmall
                     topPadding: root.headerTopPadding
@@ -355,7 +357,7 @@ FocusScope {
         delegate: TableViewDelegate {}
 
         flickableDirection: Flickable.AutoFlickDirection
-        contentWidth: root.usedRowSpace
+        contentWidth: root.usedRowSpace + root.sectionWidth
 
         onSelectAll: selectionDelegateModel.selectAll()
         onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )

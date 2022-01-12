@@ -40,11 +40,11 @@ T.Control {
 
     // Settings
 
-    width: Math.max(view.width, content.implicitWidth)
+    width: Math.max(view.width, content.implicitWidth) + root.sectionWidth
 
     height: root.rowHeight
 
-    leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2
+    leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
 
     hoverEnabled: true
     
