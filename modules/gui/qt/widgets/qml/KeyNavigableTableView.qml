@@ -252,7 +252,7 @@ FocusScope {
             readonly property alias contentWidth: row.width
             property alias loadedHeader: headerLoader.item
 
-            width: view.width
+            width: Math.max(view.width, root.usedRowSpace + root.sectionWidth)
             height: col.height
             color: headerColor
             visible: view.modelCount > 0
