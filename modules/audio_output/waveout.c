@@ -80,6 +80,7 @@ static uint32_t findDeviceID(char *);
 static int WaveOutTimeGet(audio_output_t * , vlc_tick_t *);
 static void WaveOutFlush( audio_output_t *);
 static void WaveOutDrain( audio_output_t *);
+static void WaveOutDrainAsync( audio_output_t *);
 static void WaveOutPause( audio_output_t *, bool, vlc_tick_t);
 static int WaveoutVolumeSet(audio_output_t * p_aout, float volume);
 static int WaveoutMuteSet(audio_output_t * p_aout, bool mute);
@@ -128,6 +129,8 @@ struct aout_sys_t
     vlc_mutex_t lock;
     vlc_cond_t cond;
     vlc_timer_t volume_poll_timer;
+
+    bool draining;
 };
 
 /*****************************************************************************
@@ -176,9 +179,11 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play = Play;
     p_aout->pause = WaveOutPause;
     p_aout->flush = WaveOutFlush;
-    p_aout->drain = WaveOutDrain;
+    p_aout->drain_async = WaveOutDrainAsync;
 
     aout_sys_t *sys = p_aout->sys;
+
+    sys->draining = false;
 
     /* Default behaviour is to use software gain */
     sys->b_soft = true;
@@ -648,6 +653,13 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
     p_waveheader->p_next = sys->p_free_list;
     sys->p_free_list = p_waveheader;
     sys->i_frames--;
+
+    if( sys->i_frames == 0 && sys->draining )
+    {
+        aout_DrainedReport( _p_aout );
+        sys->draining = false;
+    }
+
     vlc_cond_broadcast( &sys->cond );
     vlc_mutex_unlock( &sys->lock );
 }
@@ -852,6 +864,10 @@ static void WaveOutFlush( audio_output_t *p_aout)
     MMRESULT res;
     aout_sys_t *sys = p_aout->sys;
 
+    vlc_mutex_lock( &sys->lock );
+    sys->draining = false;
+    vlc_mutex_unlock( &sys->lock );
+
     res  = waveOutReset( sys->h_waveout );
     sys->i_played_length = 0;
     if( res != MMSYSERR_NOERROR )
@@ -867,6 +883,18 @@ static void WaveOutDrain( audio_output_t *p_aout)
     {
         vlc_cond_wait( &sys->cond, &sys->lock );
     }
+    vlc_mutex_unlock( &sys->lock );
+}
+
+static void WaveOutDrainAsync( audio_output_t *p_aout)
+{
+    aout_sys_t *sys = p_aout->sys;
+
+    vlc_mutex_lock( &sys->lock );
+    if( sys->i_frames == 0 )
+        aout_DrainedReport( p_aout );
+    else
+        sys->draining = true;
     vlc_mutex_unlock( &sys->lock );
 }
 
