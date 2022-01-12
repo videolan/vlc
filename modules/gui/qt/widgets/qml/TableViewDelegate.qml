@@ -102,19 +102,20 @@ T.Control {
             onPressed: _modifiersOnLastPress = mouse.modifiers
 
             onClicked: {
-                if (mouse.button === Qt.LeftButton
-                    ||
-                    selectionDelegateModel.isSelected(root.model.index(index, 0)) == false) {
+                if ((mouse.button === Qt.LeftButton)
+                        || !selectionDelegateModel.isSelected(root.model.index(index, 0))) {
 
-                    selectionDelegateModel.updateSelection(mouse.modifiers, view.currentIndex, index);
+                    selectionDelegateModel.updateSelection(mouse.modifiers, view.currentIndex, index)
 
-                    view.currentIndex = index;
+                    view.positionViewAtIndex(index, ListView.Contain)
 
-                    delegate.forceActiveFocus();
+                    view.currentIndex = index
+
+                    delegate.forceActiveFocus(Qt.MouseFouseReason)
                 }
 
                 if (mouse.button === Qt.RightButton)
-                    root.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y));
+                    root.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
             }
 
             onPositionChanged: {
