@@ -692,12 +692,7 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
             aout->play(aout, block, vlc_tick_now());
     }
 
-    if (aout->drain)
-    {
-        aout->drain(aout);
-        aout_DrainedReport(aout);
-    }
-    else if (aout->drain_async)
+    if (aout->drain_async)
     {
         assert(!atomic_load_explicit(&stream->drained, memory_order_relaxed));
         aout->drain_async(aout);

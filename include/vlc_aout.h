@@ -244,12 +244,6 @@ struct audio_output
       *
       * \note This callback cannot be called in stopped state.
       */
-    void (*drain)(audio_output_t *);
-    /**< Drain the playback buffers (can be NULL).
-      *
-      * If NULL, the caller will wait for the delay returned by time_get before
-      * calling stop().
-      */
 
     void (*drain_async)(audio_output_t *);
     /**< Drain the playback buffers asynchronously (can be NULL).
