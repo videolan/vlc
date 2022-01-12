@@ -3248,6 +3248,7 @@ have_xcb="no"
 have_xkbcommon_x11="no"
 have_xcb_keysyms="no"
 have_xcb_damage="no"
+have_xcb_xfixes="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   xcb_err=""
 
@@ -3294,12 +3295,21 @@ AS_IF([test "${enable_xcb}" != "no"], [
     AC_MSG_WARN([${XCB_DAMAGE_PKG_ERRORS}. Qt X11 composition disabled.])
   ])
 
+  dnl xcb-fixes
+  PKG_CHECK_MODULES([XCB_XFIXES], [xcb-xfixes], [
+      have_xcb_xfixes="yes"
+  ], [
+    AC_MSG_WARN([${XCB_XFIXES_PKG_ERRORS}. Qt X11 composition disabled.])
+  ])
+
+
   have_xcb="yes"
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 AM_CONDITIONAL([HAVE_XKBCOMMON_X11], [test "${have_xkbcommon_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_KEYSYMS], [test "${have_xcb_keysyms}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_DAMAGE], [test "${have_xcb_damage}" = "yes"])
+AM_CONDITIONAL([HAVE_XCB_XFIXES], [test "${have_xcb_xfixes}" = "yes"])
 
 dnl
 dnl VDPAU needs X11
