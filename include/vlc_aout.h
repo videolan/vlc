@@ -126,6 +126,7 @@
 
 struct vlc_audio_output_events {
     void (*timing_report)(audio_output_t *, vlc_tick_t system_now, vlc_tick_t pts);
+    void (*drained_report)(audio_output_t *);
     void (*volume_report)(audio_output_t *, float);
     void (*mute_report)(audio_output_t *, bool);
     void (*policy_report)(audio_output_t *, bool);
@@ -250,6 +251,20 @@ struct audio_output
       * calling stop().
       */
 
+    void (*drain_async)(audio_output_t *);
+    /**< Drain the playback buffers asynchronously (can be NULL).
+      *
+      * A drain operation can be cancelled by aout->flush() or aout->stop().
+      *
+      * It is legal to continue playback after a drain_async, if flush() is
+      * called before the next play().
+      *
+      * Call aout_DrainedReport() to notify that the stream is drained.
+      *
+      * If NULL, the caller will wait for the delay returned by time_get before
+      * calling stop().
+      */
+
     int (*volume_set)(audio_output_t *, float volume);
     /**< Changes playback volume (optional, may be NULL).
       *
@@ -292,6 +307,14 @@ struct audio_output
 static inline int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
 {
     return aout->time_get(aout, delay);
+}
+
+/**
+ * Report than the stream is drained (after a call to aout->drain_async)
+ */
+static inline void aout_DrainedReport(audio_output_t *aout)
+{
+    aout->events->drained_report(aout);
 }
 
 /**

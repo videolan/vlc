@@ -50,6 +50,9 @@ typedef struct
     aout_volume_t *volume;
     bool bitexact;
 
+    atomic_bool drained;
+    _Atomic vlc_tick_t drain_deadline;
+
     struct
     {
         vlc_mutex_t lock;
@@ -166,6 +169,10 @@ void aout_DecChangeRate(audio_output_t *aout, float rate);
 void aout_DecChangeDelay(audio_output_t *aout, vlc_tick_t delay);
 void aout_DecFlush(audio_output_t *);
 void aout_DecDrain(audio_output_t *);
+/* Contrary to other aout_Dec*() functions, this function can be called from
+ * any threads */
+bool aout_DecIsDrained(audio_output_t *);
+
 void aout_RequestRestart (audio_output_t *, unsigned);
 void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
                           vlc_tick_t audio_ts);

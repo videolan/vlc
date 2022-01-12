@@ -158,7 +158,6 @@ struct vlc_input_decoder_t
     /* Flushing */
     bool flushing;
     bool b_draining;
-    atomic_bool drained;
     bool b_idle;
     bool aborting;
 
@@ -1748,10 +1747,7 @@ static void *DecoderThread( void *p_data )
         vlc_mutex_lock( &p_owner->lock );
         vlc_fifo_Lock( p_owner->p_fifo );
         if( p_owner->b_draining && (frame == NULL) )
-        {
             p_owner->b_draining = false;
-            p_owner->drained = true;
-        }
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
     }
@@ -1857,7 +1853,6 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
 
     p_owner->flushing = false;
     p_owner->b_draining = false;
-    p_owner->drained = false;
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
 
@@ -2289,8 +2284,8 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
 #endif
     if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
-    else if( p_owner->fmt.i_cat == AUDIO_ES )
-        b_empty = !p_owner->b_draining || p_owner->drained;
+    else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->p_aout != NULL )
+        b_empty = aout_DecIsDrained( p_owner->p_aout );
     else
         b_empty = true; /* TODO subtitles support */
     vlc_mutex_unlock( &p_owner->lock );

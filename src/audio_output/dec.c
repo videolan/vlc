@@ -38,18 +38,6 @@
 #include "clock/clock.h"
 #include "libvlc.h"
 
-static void aout_Drain(audio_output_t *aout)
-{
-    if (aout->drain)
-        aout->drain(aout);
-    else
-    {
-        vlc_tick_t delay;
-        if (aout_TimeGet(aout, &delay) == 0)
-            vlc_tick_sleep(delay);
-    }
-}
-
 /**
  * Creates an audio output
  */
@@ -586,8 +574,28 @@ void aout_DecFlush(audio_output_t *aout)
             owner->sync.delay = 0;
         }
     }
+
+    atomic_store_explicit(&owner->drained, false, memory_order_relaxed);
+    atomic_store_explicit(&owner->drain_deadline, VLC_TICK_INVALID,
+                          memory_order_relaxed);
+
     owner->sync.discontinuity = true;
     owner->original_pts = VLC_TICK_INVALID;
+}
+
+bool aout_DecIsDrained(audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    if (aout->drain_async == NULL)
+    {
+        vlc_tick_t drain_deadline =
+            atomic_load_explicit(&owner->drain_deadline, memory_order_relaxed);
+        return drain_deadline != VLC_TICK_INVALID
+            && vlc_tick_now() >= drain_deadline;
+    }
+    else
+        return atomic_load_explicit(&owner->drained, memory_order_relaxed);
 }
 
 void aout_DecDrain(audio_output_t *aout)
@@ -604,7 +612,33 @@ void aout_DecDrain(audio_output_t *aout)
             aout->play(aout, block, vlc_tick_now());
     }
 
-    aout_Drain(aout);
+    if (aout->drain)
+    {
+        aout->drain(aout);
+        aout_DrainedReport(aout);
+    }
+    else if (aout->drain_async)
+    {
+        assert(!atomic_load_explicit(&owner->drained, memory_order_relaxed));
+
+        aout->drain_async(aout);
+    }
+    else
+    {
+        assert(atomic_load_explicit(&owner->drain_deadline,
+                                    memory_order_relaxed) == VLC_TICK_INVALID);
+
+        vlc_tick_t drain_deadline = vlc_tick_now();
+
+        vlc_tick_t delay;
+        if (aout_TimeGet(aout, &delay) == 0)
+            drain_deadline += delay;
+        /* else the deadline is now, and aout_DecIsDrained() will return true
+         * on the first call. */
+
+        atomic_store_explicit(&owner->drain_deadline, drain_deadline,
+                              memory_order_relaxed);
+    }
 
     vlc_clock_Reset(owner->sync.clock);
     if (owner->filters)
