@@ -69,6 +69,12 @@ static void aout_TimingNotify(audio_output_t *aout, vlc_tick_t system_ts,
     aout_RequestRetiming(aout, system_ts, audio_ts);
 }
 
+static void aout_DrainedNotify(audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    atomic_store_explicit(&owner->drained, true, memory_order_relaxed);
+}
+
 /**
  * Supply or update the current custom ("hardware") volume.
  * @param volume current custom volume
@@ -160,6 +166,7 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
 
 static const struct vlc_audio_output_events aout_events = {
     aout_TimingNotify,
+    aout_DrainedNotify,
     aout_VolumeNotify,
     aout_MuteNotify,
     aout_PolicyNotify,
@@ -242,6 +249,9 @@ audio_output_t *aout_New (vlc_object_t *parent)
     atomic_init (&owner->vp.update, false);
     vlc_atomic_rc_init(&owner->rc);
     vlc_audio_meter_Init(&owner->meter, aout);
+
+    atomic_init(&owner->drained, false);
+    atomic_init(&owner->drain_deadline, VLC_TICK_INVALID);
 
     /* Audio output module callbacks */
     var_Create (aout, "volume", VLC_VAR_FLOAT);

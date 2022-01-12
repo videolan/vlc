@@ -122,6 +122,7 @@
 
 struct vlc_audio_output_events {
     void (*timing_report)(audio_output_t *, vlc_tick_t system_now, vlc_tick_t pts);
+    void (*drained_report)(audio_output_t *);
     void (*volume_report)(audio_output_t *, float);
     void (*mute_report)(audio_output_t *, bool);
     void (*policy_report)(audio_output_t *, bool);
@@ -241,6 +242,20 @@ struct audio_output
       */
     void (*drain)(audio_output_t *);
     /**< Drain the playback buffers (can be NULL).
+      *
+      * If NULL, the caller will wait for the delay returned by time_get before
+      * calling stop().
+      */
+
+    void (*drain_async)(audio_output_t *);
+    /**< Drain the playback buffers asynchronously (can be NULL).
+      *
+      * A drain operation can be cancelled by aout->flush() or aout->stop().
+      *
+      * It is legal to continue playback after a drain_async, if flush() is
+      * called before the next play().
+      *
+      * Call aout_DrainedReport() to notify that the stream is drained.
       *
       * If NULL, the caller will wait for the delay returned by time_get before
       * calling stop().
@@ -401,6 +416,14 @@ VLC_API const char *aout_NameGet (audio_output_t *);
 VLC_API char *aout_DeviceGet (audio_output_t *);
 VLC_API int aout_DeviceSet (audio_output_t *, const char *);
 VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
+
+/**
+ * Report than the stream is drained (after a call to aout->drain_async)
+ */
+static inline void aout_DrainedReport(audio_output_t *aout)
+{
+    aout->events->drained_report(aout);
+}
 
 /**
  * Report change of configured audio volume to the core and UI.
