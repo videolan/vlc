@@ -254,25 +254,6 @@ typedef struct {
     picture_pool_t *pool;
 } vout_display_priv_t;
 
-static int vout_display_start(void *func, bool forced, va_list ap)
-{
-    vout_display_open_cb activate = func;
-    vout_display_priv_t *osys = va_arg(ap, vout_display_priv_t *);
-    vout_display_t *vd = &osys->display;
-    vlc_video_context *context = osys->src_vctx;
-
-    /* Picture buffer does not have the concept of aspect ratio */
-    video_format_Copy(&osys->display_fmt, vd->source);
-    vd->obj.force = forced; /* TODO: pass to activate() instead? */
-
-    int ret = activate(vd, &osys->display_fmt, context);
-    if (ret != VLC_SUCCESS) {
-        video_format_Clean(&osys->display_fmt);
-        vlc_objres_clear(VLC_OBJECT(vd));
-    }
-    return ret;
-}
-
 static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
 {
     VLC_UNUSED(o);
@@ -674,19 +655,49 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (owner)
         vd->owner = *owner;
 
-    if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
-                        vout_display_start, osys) == NULL)
-        goto error;
+    if (module == NULL || module[0] == '\0')
+        module = "any";
 
-    if (VoutDisplayCreateRender(vd)) {
-        if (vd->ops->close != NULL)
-            vd->ops->close(vd);
+    module_t **mods;
+    size_t strict;
+    ssize_t n = vlc_module_match("vout display", module, true, &mods, &strict);
+
+    msg_Dbg(vd, "looking for %s module matching \"%s\": %zd candidates",
+            "vout display", module, n);
+
+    for (ssize_t i = 0; i < n; i++) {
+        vout_display_open_cb cb = vlc_module_map(vlc_object_logger(vd),
+                                                 mods[i]);
+        if (cb == NULL)
+            continue;
+
+        /* Picture buffer does not have the concept of aspect ratio */
+        video_format_Copy(&osys->display_fmt, vd->source);
+        vd->obj.force = i < (ssize_t)strict; /* TODO: pass to cb() instead? */
+
+        int ret = cb(vd, &osys->display_fmt, vctx);
+        if (ret == VLC_SUCCESS) {
+            msg_Dbg(vd, "using %s module \"%s\"", "vout display",
+                    module_get_object(mods[i]));
+
+            if (VoutDisplayCreateRender(vd) == 0) {
+                free(mods);
+                return vd;
+            }
+
+            if (vd->ops->close != NULL)
+                vd->ops->close(vd);
+            vlc_objres_clear(VLC_OBJECT(vd));
+            video_format_Clean(&osys->display_fmt);
+            break;
+        }
+
         vlc_objres_clear(VLC_OBJECT(vd));
         video_format_Clean(&osys->display_fmt);
-        goto error;
     }
-    return vd;
-error:
+
+    msg_Dbg(vd, "no %s modules matched with name %s", "vout display", module);
+    free(mods);
     video_format_Clean(&osys->source);
     vlc_object_delete(vd);
     return NULL;
