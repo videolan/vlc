@@ -8,7 +8,7 @@ ifdef GPL
 PKGS += dvdnav
 endif
 endif
-ifeq ($(call need_pkg,"dvdnav >= 5.0.3"),)
+ifeq ($(call need_pkg,"dvdnav > 5.0.3"),)
 PKGS_FOUND += dvdnav
 endif
 
