@@ -15,9 +15,8 @@ libvdpau_instance_plugin_la_LIBADD = libvlc_vdpau.la \
 
 libvdpau_avcodec_plugin_la_SOURCES = hw/vdpau/avcodec.c hw/vdpau/picture.c
 libvdpau_avcodec_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(X_CFLAGS) $(AVCODEC_CFLAGS) $(VDPAU_CFLAGS)
-libvdpau_avcodec_plugin_la_LIBADD = libvlc_vdpau.la \
-	$(X_LIBS) $(X_PRE_LIBS) -lX11 $(AVCODEC_LIBS)
+	$(AVCODEC_CFLAGS) $(VDPAU_CFLAGS)
+libvdpau_avcodec_plugin_la_LIBADD = libvlc_vdpau.la $(AVCODEC_LIBS)
 
 libvdpau_deinterlace_plugin_la_SOURCES = hw/vdpau/deinterlace.c hw/vdpau/picture.c
 libvdpau_deinterlace_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)

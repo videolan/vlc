@@ -36,7 +36,6 @@
 #include <vlc_fourcc.h>
 #include <vlc_picture.h>
 #include <vlc_codec.h>
-#include <vlc_xlib.h>
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
 
@@ -167,12 +166,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, c
         default:
             msg_Err(va, "unsupported chroma type %"PRIu32, type);
             return VLC_EGENERIC;
-    }
-
-    if (!vlc_xlib_init(VLC_OBJECT(va)))
-    {
-        msg_Err(va, "Xlib is required for VDPAU");
-        return VLC_EGENERIC;
     }
 
     unsigned codec_refs;
