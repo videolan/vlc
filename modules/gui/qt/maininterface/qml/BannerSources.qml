@@ -58,7 +58,7 @@ FocusScope {
     }
 
     function search() {
-        searchBox.reqExpand()
+        searchBox.state = "expanded"
     }
 
     Binding {
@@ -395,10 +395,8 @@ FocusScope {
 
                             Widgets.SearchBox {
                                 id: searchBox
-                                visible: root.contentModel !== undefined
-                                enabled: visible
+                                visible: !!root.contentModel
                                 height: VLCStyle.bannerButton_height
-                                width: searchBox.implicitWith
                                 buttonWidth: VLCStyle.bannerButton_width
                             }
 

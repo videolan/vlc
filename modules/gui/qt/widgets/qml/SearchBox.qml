@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,114 +28,127 @@ FocusScope {
     id: root
 
     implicitWidth: content.implicitWidth
+    implicitHeight: content.implicitHeight
 
-    property alias buttonWidth: icon.width
-    property alias searchPattern: searchBox.text
+    property alias buttonWidth: iconButton.implicitWidth
+    property alias searchPattern: textField.text
 
-    property bool _expanded: false
-
-    function reqExpand() {
-        if (visible)
-            _expanded = true
+    property bool _widthOverridden: false
+    onWidthChanged: {
+        // Proper way of this would be checking if width is bound to implicitWidth
+        if (width === implicitWidth)
+            _widthOverridden = false
+        else
+            _widthOverridden = true
     }
 
-    on_ExpandedChanged: {
-        if (_expanded) {
-            searchBox.forceActiveFocus(Qt.ShortcutFocusReason)
-            animateExpand.start()
-        } else {
-            searchBox.clear()
-            icon.focus = true
-            searchBox.focus = false
-            animateRetract.start()
+    states: State {
+        name: "expanded"
+
+        PropertyChanges {
+            target: textField
+
+            focus: true
+            // Take care if SearchBox was set a specific width:
+            width: (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth)
+        }
+
+        PropertyChanges {
+            target: iconButton
+
+            highlighted: true
         }
     }
 
-    onActiveFocusChanged: {
-        if (!activeFocus && searchBox.text == "") {
-            _expanded = false
+    transitions: Transition {
+        from: ""; to: "expanded"
+        reversible: true
+
+        SequentialAnimation {
+            NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_normal; }
+            PropertyAction { property: "highlighted" }
+            PropertyAction { property: "focus" }
         }
     }
-
-    SmoothedAnimation {
-        id: animateExpand;
-        target: searchBoxRect;
-        properties: "width"
-        duration: VLCStyle.duration_faster
-        to: VLCStyle.widthSearchInput
-        easing.type: Easing.InSine
-        onStarted: {
-            searchBoxRect.visible = true
-        }
-    }
-
-    SmoothedAnimation {
-        id: animateRetract;
-        target: searchBoxRect;
-        properties: "width"
-        duration: VLCStyle.duration_faster
-        to: 0
-        easing.type: Easing.OutSine
-        onStopped: {
-            searchBoxRect.visible = false
-        }
-    }
-
 
     Row {
         id: content
+        anchors.fill: parent
 
-        Rectangle {
-            id: searchBoxRect
-            color: VLCStyle.colors.button
+        layoutDirection: Qt.RightToLeft // anchor iconButton to right
 
-            anchors.verticalCenter: parent.verticalCenter
-            visible: false
+        Widgets.IconToolButton {
+            id: iconButton
 
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+
+            size: VLCStyle.banner_icon_size
+
+            iconText: VLCIcons.search
+            text: I18n.qtr("Filter")
+
+            focus: root.state === ""
+
+            Navigation.parentItem: root
+            Navigation.leftItem: textField
+
+            onClicked: {
+                textField.clear()
+                root.state = (root.state === "") ? "expanded" : ""
+            }
+        }
+
+        TextField {
+            id: textField
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+
+            implicitWidth: VLCStyle.widthSearchInput
             width: 0
-            implicitHeight: searchBox.height
 
-            border.color: searchBox.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.buttonBorder
+            visible: (width > 0)
 
-            TextField {
-                id: searchBox
+            padding: VLCStyle.dp(6)
+            leftPadding: padding + VLCStyle.dp(4)
+            rightPadding: (textField.width - clearButton.x)
 
-                enabled: root._expanded
+            font.pixelSize: VLCStyle.fontSize_normal
 
-                anchors.fill: searchBoxRect
-                anchors.rightMargin: clearButton.visible ? (VLCStyle.margin_xxsmall + clearButton.width) : 0
+            palette.text: VLCStyle.colors.buttonText
+            palette.highlightedText: VLCStyle.colors.bgHoverText
+            palette.base: VLCStyle.colors.button
+            palette.highlight: VLCStyle.colors.accent
+            palette.mid: VLCStyle.colors.buttonBorder
 
-                font.pixelSize: VLCStyle.fontSize_normal
+            selectByMouse: true
 
-                palette.text: VLCStyle.colors.buttonText
-                palette.highlight: VLCStyle.colors.bgHover
-                palette.highlightedText: VLCStyle.colors.bgHoverText
+            placeholderText: I18n.qtr("filter")
 
-                selectByMouse: true
+            Navigation.parentItem: root
+            Navigation.rightItem: clearButton.visible ? clearButton : iconButton
+            Navigation.cancelAction: function() { root.state = "" }
 
-                placeholderText: I18n.qtr("filter")
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: {
+                //we don't want Navigation.cancelAction to match Backspace
+                if (event.matches(StandardKey.Backspace))
+                    event.accepted = true
+                Navigation.defaultKeyAction(event)
+            }
 
-                background: Rectangle { color: "transparent" }
+            Keys.onReleased: {
+                //we don't want Navigation.cancelAction to match Backspace
+                if (event.matches(StandardKey.Backspace))
+                    event.accepted = true
+                Navigation.defaultKeyReleaseAction(event)
+            }
 
-                Navigation.parentItem: root
-                Navigation.rightItem: clearButton.visible ? clearButton : icon
-                Navigation.cancelAction: function() { _expanded = false }
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: {
-                    //we don't want Navigation.cancelAction to match Backspace
-                    if (event.matches(StandardKey.Backspace)) {
-                        return
-                    }
-                    Navigation.defaultKeyAction(event)
-                }
+            Component.onCompleted: {
+                background.border.width = Qt.binding(function() { return root.activeFocus ? VLCStyle.dp(2)
+                                                                                          : VLCStyle.dp(1) })
 
-                Keys.onReleased: {
-                    //we don't want Navigation.cancelAction to match Backspace
-                    if (event.matches(StandardKey.Backspace)) {
-                        return
-                    }
-                    Navigation.defaultKeyReleaseAction(event)
-                }
             }
 
             Widgets.IconToolButton {
@@ -148,43 +161,18 @@ FocusScope {
                 size: VLCStyle.icon_small
                 iconText: VLCIcons.close
 
-                visible: ( _expanded && searchBox.text.length > 0 )
-                enabled: visible
+                visible: (textField.text.length > 0)
 
-                onClicked: {
-                    searchBox.clear()
+                onVisibleChanged: {
+                    if (!visible && parent.visible) {
+                        parent.focus = true
+                    }
                 }
+                onClicked: textField.clear()
 
-                Navigation.parentItem: root
-                Navigation.leftItem: searchBox
-                Navigation.rightItem: icon
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: Navigation.defaultKeyAction(event)
-            }
-        }
-
-        Widgets.IconToolButton {
-            id: icon
-
-            height: root.height
-
-            size: VLCStyle.banner_icon_size
-
-            iconText: VLCIcons.search
-            text: I18n.qtr("Filter")
-
-            focus: true
-
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed: Navigation.defaultKeyAction(event)
-
-            Navigation.parentItem: root
-            Navigation.leftItem: (_expanded) ? searchBox : null
-
-            onClicked: {
-                searchBox.clear();
-
-                _expanded = !_expanded;
+                Navigation.parentItem: textField
+                Navigation.leftItem: textField
+                Navigation.rightItem: iconButton
             }
         }
     }
