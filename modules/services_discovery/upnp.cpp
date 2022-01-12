@@ -874,13 +874,13 @@ namespace
             psz_album_artist = xml_getChildElementValue( itemElement, "upnp:albumArtist" );
             psz_albumArt = xml_getChildElementValue( itemElement, "upnp:albumArtURI" );
             const char *psz_media_type = xml_getChildElementValue( itemElement, "upnp:class" );
-            if (strcmp(psz_media_type, "object.item.videoItem") == 0)
+            if (strncmp(psz_media_type, "object.item.videoItem", 21) == 0)
                 media_type = VIDEO;
-            else if (strcmp(psz_media_type, "object.item.audioItem") == 0)
+            else if (strncmp(psz_media_type, "object.item.audioItem", 21) == 0)
                 media_type = AUDIO;
-            else if (strcmp(psz_media_type, "object.item.imageItem") == 0)
+            else if (strncmp(psz_media_type, "object.item.imageItem", 21) == 0)
                 media_type = IMAGE;
-            else if (strcmp(psz_media_type, "object.container") == 0)
+            else if (strncmp(psz_media_type, "object.container", 16 ) == 0)
                 media_type = CONTAINER;
             else
                 return false;
