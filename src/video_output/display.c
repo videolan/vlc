@@ -677,19 +677,15 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
         int ret = cb(vd, &osys->display_fmt, vctx);
         if (ret == VLC_SUCCESS) {
-            msg_Dbg(vd, "using %s module \"%s\"", "vout display",
-                    module_get_object(mods[i]));
-
             if (VoutDisplayCreateRender(vd) == 0) {
+                msg_Dbg(vd, "using %s module \"%s\"", "vout display",
+                        module_get_object(mods[i]));
                 free(mods);
                 return vd;
             }
 
             if (vd->ops->close != NULL)
                 vd->ops->close(vd);
-            vlc_objres_clear(VLC_OBJECT(vd));
-            video_format_Clean(&osys->display_fmt);
-            break;
         }
 
         vlc_objres_clear(VLC_OBJECT(vd));
