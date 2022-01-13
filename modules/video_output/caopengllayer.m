@@ -326,10 +326,14 @@ static int Open (vout_display_t *vd,
         if (unlikely(!sys->gl))
             goto error;
 
-        sys->gl->make_current = gl_cb_MakeCurrent;
-        sys->gl->release_current = gl_cb_ReleaseCurrent;
-        sys->gl->swap = gl_cb_Swap;
-        sys->gl->get_proc_address = gl_cb_GetProcAddress;
+        static const struct vlc_gl_operations gl_ops =
+        {
+            .make_current = gl_cb_MakeCurrent,
+            .release_current = gl_cb_ReleaseCurrent,
+            .swap = gl_cb_Swap,
+            .get_proc_address = gl_cb_GetProcAddress,
+        };
+        sys->gl->ops = &gl_ops;
         sys->gl->api_type = VLC_OPENGL;
 
         struct vlc_gl_sys *glsys = sys->gl->sys = malloc(sizeof(*glsys));
