@@ -367,12 +367,15 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         goto error2;
     }
 
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = NULL;
-    gl->swap_offscreen = SwapOffscreen;
-    gl->get_proc_address = GetSymbol;
-    gl->destroy = Close;
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .swap_offscreen = SwapOffscreen,
+        .get_proc_address = GetSymbol,
+        .close = Close,
+    };
+    gl->ops = &gl_ops;
 
     struct video_ctx *vctx = GetVCtx(gl);
 
