@@ -142,13 +142,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     SET_CALLBACK_ADDR(sys->makeCurrentCb, "vout-cb-make-current");
     SET_CALLBACK_ADDR(sys->getProcAddressCb, "vout-cb-get-proc-address");
 
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = Resize;
-    gl->swap = VglSwapBuffers;
-    gl->get_proc_address = OurGetProcAddress;
-    gl->destroy = Close;
-
     if( sys->setupCb )
     {
         libvlc_video_setup_device_cfg_t setup_cfg = {};
@@ -159,8 +152,19 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
             return VLC_EGENERIC;
         }
     }
-
     Resize(gl, width, height);
+
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .resize = Resize,
+        .swap = VglSwapBuffers,
+        .get_proc_address = OurGetProcAddress,
+        .close = Close,
+    };
+    gl->ops = &gl_ops;
+
     return VLC_SUCCESS;
 }
 
