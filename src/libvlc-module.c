@@ -1979,9 +1979,9 @@ vlc_module_begin ()
 
 /* Decoder options */
     add_category_hint(N_("Input access and codecs"), CODEC_CAT_LONGTEXT)
-    set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_module("access", "access", NULL, ACCESS_TEXT, ACCESS_LONGTEXT)
+    //set_subcategory( SUBCAT_INPUT_ACCESS )
+    add_obsolete_string("access") /* since 4.0.0 */
 
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
