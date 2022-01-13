@@ -42,7 +42,7 @@ Widgets.IconControlButton {
         focus: true
         parent: playbackSpeedButton.paintOnly
                 ? playbackSpeedButton // button is not part of main display (ToolbarEditorDialog)
-                : (History.current.view === "player") ? rootPlayer : g_mainDisplay
+                : (History.current.view === "player") ? rootPlayer : g_root
 
         onOpened: {
             // update popup coordinates
