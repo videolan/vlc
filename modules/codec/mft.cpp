@@ -50,6 +50,9 @@ extern "C" {
 
 #include <new>
 
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -66,33 +69,33 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-typedef struct
+struct decoder_sys_t
 {
-    IMFTransform *mft;
+    ComPtr<IMFTransform> mft;
 
-    const GUID* major_type;
-    const GUID* subtype;
+    const GUID* major_type = nullptr;
+    const GUID* subtype = nullptr;
     /* Container for a dynamically constructed subtype */
     GUID custom_subtype;
 
     /* For asynchronous MFT */
-    bool is_async;
-    IMFMediaEventGenerator *event_generator;
-    int pending_input_events;
-    int pending_output_events;
+    bool is_async = false;
+    ComPtr<IMFMediaEventGenerator> event_generator;
+    int pending_input_events = 0;
+    int pending_output_events = 0;
 
     /* Input stream */
-    DWORD input_stream_id;
-    IMFMediaType *input_type;
+    DWORD input_stream_id = 0;
+    ComPtr<IMFMediaType> input_type;
 
     /* Output stream */
-    DWORD output_stream_id;
-    IMFSample *output_sample;
+    DWORD output_stream_id = 0;
+    ComPtr<IMFSample> output_sample;
 
     /* H264 only. */
-    struct hxxx_helper hh;
-    bool   b_xps_pushed; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
-} decoder_sys_t;
+    struct hxxx_helper hh = {};
+    bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
+};
 
 static const int pi_channels_maps[9] =
 {
@@ -209,21 +212,21 @@ static vlc_fourcc_t GUIDToFormat(const pair_format_guid table[], const GUID & gu
     return 0;
 }
 
-static int SetInputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **result)
+static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> & result)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
-    *result = NULL;
+    result.Reset();
 
-    IMFMediaType *input_media_type = NULL;
+    ComPtr<IMFMediaType> input_media_type;
 
     /* Search a suitable input type for the MFT. */
     int input_type_index = 0;
     bool found = false;
     for (int i = 0; !found; ++i)
     {
-        hr = p_sys->mft->GetInputAvailableType(stream_id, i, &input_media_type);
+        hr = p_sys->mft->GetInputAvailableType(stream_id, i, input_media_type.GetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
             break;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
@@ -245,13 +248,12 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **result
         if (found)
             input_type_index = i;
 
-        input_media_type->Release();
-        input_media_type = NULL;
+        input_media_type.Reset();
     }
     if (!found)
         goto error;
 
-    hr = p_sys->mft->GetInputAvailableType(stream_id, input_type_index, &input_media_type);
+    hr = p_sys->mft->GetInputAvailableType(stream_id, input_type_index, input_media_type.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
@@ -328,18 +330,16 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **result
         }
     }
 
-    hr = p_sys->mft->SetInputType(stream_id, input_media_type, 0);
+    hr = p_sys->mft->SetInputType(stream_id, input_media_type.Get(), 0);
     if (FAILED(hr))
         goto error;
 
-    *result = input_media_type;
+    result.Swap(input_media_type);
 
     return VLC_SUCCESS;
 
 error:
     msg_Err(p_dec, "Error in SetInputType()");
-    if (input_media_type)
-        input_media_type->Release();
     return VLC_EGENERIC;
 }
 
@@ -348,7 +348,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
-    IMFMediaType *output_media_type = NULL;
+    ComPtr<IMFMediaType> output_media_type;
 
     /*
      * Enumerate available output types. The list is ordered by
@@ -359,7 +359,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
     bool found = false;
     for (int i = 0; !found; ++i)
     {
-        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, &output_media_type);
+        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, output_media_type.GetAddressOf());
         if (hr == MF_E_NO_MORE_TYPES)
             break;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
@@ -397,8 +397,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         if (found)
             output_type_index = i;
 
-        output_media_type->Release();
-        output_media_type = NULL;
+        output_media_type.Reset();
     }
     /*
      * It's not an error if we don't find the output type we were
@@ -409,11 +408,11 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
          * by the MFT */
         output_type_index = 0;
 
-    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, &output_media_type);
+    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, output_media_type.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
-    hr = p_sys->mft->SetOutputType(stream_id, output_media_type, 0);
+    hr = p_sys->mft->SetOutputType(stream_id, output_media_type.Get(), 0);
     if (FAILED(hr))
         goto error;
 
@@ -467,20 +466,18 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
 
 error:
     msg_Err(p_dec, "Error in SetOutputType()");
-    if (output_media_type)
-        output_media_type->Release();
     return VLC_EGENERIC;
 }
 
-static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** result, DWORD size)
+static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
-    *result = NULL;
+    result.Reset();
 
-    IMFSample *input_sample = NULL;
-    IMFMediaBuffer *input_media_buffer = NULL;
+    ComPtr<IMFSample> input_sample;
+    ComPtr<IMFMediaBuffer> input_media_buffer;
     DWORD allocation_size;
 
     MFT_INPUT_STREAM_INFO input_info;
@@ -488,44 +485,39 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** re
     if (FAILED(hr))
         goto error;
 
-    hr = MFCreateSample(&input_sample);
+    hr = MFCreateSample(input_sample.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
     allocation_size = __MAX(input_info.cbSize, size);
-    hr = MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
+    hr = MFCreateMemoryBuffer(allocation_size, input_media_buffer.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
-    hr = input_sample->AddBuffer(input_media_buffer);
-    input_media_buffer->Release();
+    hr = input_sample->AddBuffer(input_media_buffer.Get());
     if (FAILED(hr))
         goto error;
 
-    *result = input_sample;
+    result.Swap(input_sample);
 
     return VLC_SUCCESS;
 
 error:
     msg_Err(p_dec, "Error in AllocateInputSample()");
-    if (input_sample)
-        input_sample->Release();
-    if (input_media_buffer)
-        input_media_buffer->Release();
     return VLC_EGENERIC;
 }
 
-static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **result)
+static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSample> & result)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
-    *result = NULL;
+    result.Reset();
 
-    IMFSample *output_sample = NULL;
+    ComPtr<IMFSample> output_sample;
 
     MFT_OUTPUT_STREAM_INFO output_info;
-    IMFMediaBuffer *output_media_buffer = NULL;
+    ComPtr<IMFMediaBuffer> output_media_buffer;
     DWORD allocation_size;
     DWORD alignment;
 
@@ -549,31 +541,29 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **r
             goto error;
     }
 
-    hr = MFCreateSample(&output_sample);
+    hr = MFCreateSample(output_sample.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
     allocation_size = output_info.cbSize;
     alignment = output_info.cbAlignment;
     if (alignment > 0)
-        hr = MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, &output_media_buffer);
+        hr = MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, output_media_buffer.GetAddressOf());
     else
-        hr = MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
+        hr = MFCreateMemoryBuffer(allocation_size, output_media_buffer.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
-    hr = output_sample->AddBuffer(output_media_buffer);
+    hr = output_sample->AddBuffer(output_media_buffer.Get());
     if (FAILED(hr))
         goto error;
 
-    *result = output_sample;
+    result.Swap(output_sample);
 
     return VLC_SUCCESS;
 
 error:
     msg_Err(p_dec, "Error in AllocateOutputSample()");
-    if (output_sample)
-        output_sample->Release();
     return VLC_EGENERIC;
 }
 
@@ -581,12 +571,12 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr = S_OK;
-    IMFSample *input_sample = NULL;
+    ComPtr<IMFSample> input_sample;
 
     block_t *p_xps_blocks = NULL;
     DWORD alloc_size = p_block->i_buffer;
     vlc_tick_t ts;
-    IMFMediaBuffer *input_media_buffer = NULL;
+    ComPtr<IMFMediaBuffer> input_media_buffer;
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
     {
@@ -605,10 +595,10 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
         }
     }
 
-    if (AllocateInputSample(p_dec, stream_id, &input_sample, alloc_size))
+    if (AllocateInputSample(p_dec, stream_id, input_sample, alloc_size))
         goto error;
 
-    hr = input_sample->GetBufferByIndex(0, &input_media_buffer);
+    hr = input_sample->GetBufferByIndex(0, input_media_buffer.GetAddressOf());
     if (FAILED(hr))
         goto error;
 
@@ -638,23 +628,19 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (FAILED(hr))
         goto error;
 
-    hr = p_sys->mft->ProcessInput(stream_id, input_sample, 0);
+    hr = p_sys->mft->ProcessInput(stream_id, input_sample.Get(), 0);
     if (FAILED(hr))
     {
         msg_Dbg(p_dec, "Failed to process input stream %lu (error 0x%lX)", stream_id, hr);
         goto error;
     }
 
-    input_media_buffer->Release();
-    input_sample->Release();
     block_ChainRelease(p_xps_blocks);
 
     return VLC_SUCCESS;
 
 error:
     msg_Err(p_dec, "Error in ProcessInputStream(). (hr=0x%lX)\n", hr);
-    if (input_sample)
-        input_sample->Release();
     block_ChainRelease(p_xps_blocks);
     return VLC_EGENERIC;
 }
@@ -692,13 +678,13 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
     block_t *aout_buffer = NULL;
 
     DWORD output_status = 0;
-    MFT_OUTPUT_DATA_BUFFER output_buffer = { stream_id, p_sys->output_sample, 0, NULL };
+    MFT_OUTPUT_DATA_BUFFER output_buffer = { stream_id, p_sys->output_sample.Get(), 0, NULL };
     hr = p_sys->mft->ProcessOutput(0, 1, &output_buffer, &output_status);
     if (output_buffer.pEvents)
         output_buffer.pEvents->Release();
     /* Use the returned sample since it can be provided by the MFT. */
-    IMFSample *output_sample = output_buffer.pSample;
-    IMFMediaBuffer *output_media_buffer = NULL;
+    ComPtr<IMFSample> output_sample = output_buffer.pSample;
+    ComPtr<IMFMediaBuffer> output_media_buffer;
 
     keep_reading = false;
     if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
@@ -706,7 +692,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
     if (hr == S_OK)
     {
-        if (!output_sample)
+        if (output_sample.Get() == nullptr)
             return VLC_SUCCESS;
 
         LONGLONG sample_time;
@@ -723,7 +709,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
         for (DWORD buf_index = 0; buf_index < output_count; buf_index++)
         {
-            hr = output_sample->GetBufferByIndex(buf_index, &output_media_buffer);
+            hr = output_sample->GetBufferByIndex(buf_index, output_media_buffer.GetAddressOf());
             if (FAILED(hr))
                 goto error;
 
@@ -792,7 +778,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 decoder_QueueAudio(p_dec, aout_buffer);
             }
 
-            if (p_sys->output_sample)
+            if (p_sys->output_sample.Get())
             {
                 /* Sample is not provided by the MFT: clear its content. */
                 hr = output_media_buffer->SetCurrentLength(0);
@@ -800,11 +786,10 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                     goto error;
             }
 
-            output_media_buffer->Release();
-            output_media_buffer = NULL;
+            output_media_buffer.Reset();
         }
 
-        if (!p_sys->output_sample)
+        if (p_sys->output_sample.Get() == nullptr)
         {
             /* Sample is provided by the MFT: decrease refcount. */
             output_sample->Release();
@@ -820,12 +805,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             goto error;
 
         /* Reallocate output sample. */
-        if (p_sys->output_sample)
-        {
-            p_sys->output_sample->Release();
-            p_sys->output_sample = NULL;
-        }
-        if (AllocateOutputSample(p_dec, p_sys->output_stream_id, &p_sys->output_sample))
+        if (AllocateOutputSample(p_dec, p_sys->output_stream_id, p_sys->output_sample))
             goto error;
         // there's an output ready, keep trying
         keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
@@ -837,8 +817,6 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
 error:
     msg_Err(p_dec, "Error in ProcessOutputStream()");
-    if (output_media_buffer)
-        output_media_buffer->Release();
     if (picture)
         picture_Release(picture);
     if (aout_buffer)
@@ -901,13 +879,12 @@ static HRESULT DequeueMediaEvent(decoder_t *p_dec)
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
-    IMFMediaEvent *event = NULL;
-    hr = p_sys->event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, &event);
+    ComPtr<IMFMediaEvent> event;
+    hr = p_sys->event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, event.GetAddressOf());
     if (FAILED(hr))
         return hr;
     MediaEventType event_type;
     hr = event->GetType(&event_type);
-    event->Release();
     if (FAILED(hr))
         return hr;
 
@@ -1002,8 +979,8 @@ static int InitializeMFT(decoder_t *p_dec)
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
-    IMFAttributes *attributes = NULL;
-    hr = p_sys->mft->GetAttributes(&attributes);
+    ComPtr<IMFAttributes> attributes;
+    hr = p_sys->mft->GetAttributes(attributes.GetAddressOf());
     if (hr != E_NOTIMPL && FAILED(hr))
         goto error;
     if (SUCCEEDED(hr))
@@ -1018,11 +995,9 @@ static int InitializeMFT(decoder_t *p_dec)
             hr = attributes->SetUINT32(MF_TRANSFORM_ASYNC_UNLOCK, true);
             if (FAILED(hr))
                 goto error;
-            void *pv;
-            hr = p_sys->mft->QueryInterface(IID_IMFMediaEventGenerator, &pv);
+            hr = p_sys->mft.As(&p_sys->event_generator);
             if (FAILED(hr))
                 goto error;
-            p_sys->event_generator = static_cast<IMFMediaEventGenerator *>(pv);
         }
     }
 
@@ -1052,7 +1027,7 @@ static int InitializeMFT(decoder_t *p_dec)
     else if (FAILED(hr))
         goto error;
 
-    if (SetInputType(p_dec, p_sys->input_stream_id, &p_sys->input_type))
+    if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type))
         goto error;
 
     if (SetOutputType(p_dec, p_sys->output_stream_id))
@@ -1062,8 +1037,8 @@ static int InitializeMFT(decoder_t *p_dec)
      * The input type was not set by the previous call to
      * SetInputType, try again after setting the output type.
      */
-    if (!p_sys->input_type)
-        if (SetInputType(p_dec, p_sys->input_stream_id, &p_sys->input_type) || !p_sys->input_type)
+    if (p_sys->input_type.Get() == nullptr)
+        if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type) || p_sys->input_type.Get() == nullptr)
             goto error;
 
     /* This call can be a no-op for some MFT decoders, but it can potentially reduce starting time. */
@@ -1076,7 +1051,7 @@ static int InitializeMFT(decoder_t *p_dec)
     if (FAILED(hr))
         goto error;
 
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+    if (attributes.Get() && p_dec->fmt_in.i_codec == VLC_CODEC_H264)
     {
         /* It's not an error if the following call fails. */
         attributes->SetUINT32(CODECAPI_AVLowLatencyMode, true);
@@ -1096,28 +1071,19 @@ static void DestroyMFT(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
 
-    if (p_sys->event_generator)
-        p_sys->event_generator->Release();
-    if (p_sys->input_type)
-        p_sys->input_type->Release();
-    if (p_sys->output_sample)
+    if (p_sys->output_sample.Get())
     {
         p_sys->output_sample->RemoveAllBuffers();
     }
 
-    if (p_sys->mft)
+    if (p_sys->mft.Get())
     {
         p_sys->mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
         p_sys->mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, (ULONG_PTR)0);
-        p_sys->mft->Release();
     }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         hxxx_helper_clean(&p_sys->hh);
-
-    p_sys->event_generator = NULL;
-    p_sys->input_type = NULL;
-    p_sys->mft = NULL;
 
     MFShutdown();
 }
@@ -1167,7 +1133,7 @@ static int FindMFT(decoder_t *p_dec)
     void *pv;
     for (UINT32 i = 0; i < activate_objects_count; ++i)
     {
-        hr = activate_objects[i]->ActivateObject(IID_IMFTransform, &pv);
+        hr = activate_objects[i]->ActivateObject(__uuidof(p_sys->mft.Get()), &pv);
         activate_objects[i]->Release();
         if (FAILED(hr))
             continue;
@@ -1201,14 +1167,14 @@ static int Open(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
 
-    p_sys = static_cast<decoder_sys_t*>(calloc(1, sizeof(*p_sys)));
-    if (!p_sys)
+    p_sys = new (std::nothrow) decoder_sys_t();
+    if (unlikely(p_sys == nullptr))
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
 
     if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
     {
-        free(p_sys);
+        delete p_sys;
         return VLC_EGENERIC;
     }
 
@@ -1225,7 +1191,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     /* Only one output sample is needed, we can allocate one and reuse it. */
-    if (AllocateOutputSample(p_dec, p_sys->output_stream_id, &p_sys->output_sample))
+    if (AllocateOutputSample(p_dec, p_sys->output_stream_id, p_sys->output_sample))
         goto error;
 
     p_dec->pf_decode = p_sys->is_async ? DecodeAsync : DecodeSync;
@@ -1245,7 +1211,7 @@ static void Close(vlc_object_t *p_this)
 
     DestroyMFT(p_dec);
 
-    free(p_sys);
+    delete p_sys;
 
     CoUninitialize();
 }
