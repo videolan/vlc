@@ -457,12 +457,16 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->context = ctx;
 
     /* Initialize OpenGL callbacks */
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = Resize;
-    gl->swap = SwapBuffers;
-    gl->get_proc_address = GetSymbol;
-    gl->destroy = Close;
+    static const struct vlc_gl_operations ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .resize = Resize,
+        .swap = SwapBuffers,
+        .get_proc_address = GetSymbol,
+        .close = Close,
+    };
+    gl->ops = &ops;
 
     return VLC_SUCCESS;
 
