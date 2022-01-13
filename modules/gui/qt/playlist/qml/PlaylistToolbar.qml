@@ -88,7 +88,7 @@ RowLayout {
             criteriaRole: "key"
 
             onSortSelected: {
-                mainPlaylistController.sortKey = type
+                mainPlaylistController.sortKey = key
             }
 
             onSortOrderSelected: {

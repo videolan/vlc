@@ -62,7 +62,7 @@ FocusScope {
     // sortSelected is triggered with new sorting key when a different sorting key is selected
     // sortOrderSelected is triggered with Qt.AscendingOrder when different sorting key is selected
     // sortOrderSelected is triggered with Qt.AscendingOrder or Qt.DescendingOrder when the same sorting key is selected
-    signal sortSelected(int type)
+    signal sortSelected(var key)
     signal sortOrderSelected(int type)
 
     // Settings

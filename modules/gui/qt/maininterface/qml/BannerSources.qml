@@ -289,7 +289,7 @@ FocusScope {
 
                                 onSortSelected: {
                                     if (contentModel !== undefined)
-                                        contentModel.sortCriteria = type
+                                        contentModel.sortCriteria = key
                                 }
 
                                 onSortOrderSelected: {
