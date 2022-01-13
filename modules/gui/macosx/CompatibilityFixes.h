@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <AvailabilityMacros.h>
 #import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -80,6 +81,12 @@ extern NSString *const NSAppearanceNameDarkAqua;
 #pragma clang diagnostic pop
 @end
 
+#endif
+
+#ifndef MAC_OS_VERSION_12_0
+@interface NSScreen (IntroducedInMonterey)
+@property (readonly) NSEdgeInsets safeAreaInsets;
+@end
 #endif
 
 NS_ASSUME_NONNULL_END

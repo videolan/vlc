@@ -743,6 +743,16 @@
 #pragma mark -
 #pragma mark Fullscreen Logic
 
+- (NSRect)transformRect:(NSRect)src withSafeAreaFromScreen:(NSScreen *)screen multiplier:(CGFloat)multiplier
+{
+    if (@available (macOS 12, *)) {
+        NSEdgeInsets insets = screen.safeAreaInsets;
+        src.size.height -= multiplier * insets.top;
+    }
+
+    return src;
+}
+
 - (void)enterFullscreenWithAnimation:(BOOL)b_animation
 {
     NSMutableDictionary *dict1, *dict2;
@@ -763,6 +773,8 @@
     }
 
     screen_rect = [screen frame];
+    // Cut of safe area at the top of the screen
+    screen_rect = [self transformRect:screen_rect withSafeAreaFromScreen:screen multiplier:+1.];
 
     if (self.controlsBar)
         [self.controlsBar setFullscreenState:YES];
@@ -785,6 +797,7 @@
         rect = [[_videoView superview] convertRect: [_videoView frame] toView: nil]; /* Convert to Window base coord */
         rect.origin.x += [self frame].origin.x;
         rect.origin.y += [self frame].origin.y;
+
         o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
@@ -898,6 +911,13 @@
 
 - (void)hasBecomeFullscreen
 {
+    // Cover the top of the screen with the black window
+    NSRect window_frame = [self transformRect:o_fullscreen_window.frame withSafeAreaFromScreen:o_fullscreen_window.screen multiplier:-1.];
+    [o_fullscreen_window setFrame:window_frame display:YES];
+
+    NSRect video_frame = [self transformRect:_videoView.frame withSafeAreaFromScreen:o_fullscreen_window.screen multiplier:+1.];
+    _videoView.frame = video_frame;
+
     if ([[_videoView subviews] count] > 0)
         [o_fullscreen_window makeFirstResponder: [[_videoView subviews] firstObject]];
 
@@ -934,6 +954,13 @@
     if (!o_fullscreen_window) {
         return;
     }
+
+    // Convert black safe area from top screen
+    NSRect window_frame = [self transformRect:o_fullscreen_window.frame withSafeAreaFromScreen:o_fullscreen_window.screen multiplier:+1.];
+    [o_fullscreen_window setFrame:window_frame display:YES];
+
+    NSRect video_frame = [self transformRect:_videoView.frame withSafeAreaFromScreen:o_fullscreen_window.screen multiplier:-1.];
+    _videoView.frame = video_frame;
 
     [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
     [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
@@ -1056,9 +1083,10 @@
         [[[viewAnimations firstObject] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
         /* Fullscreen ended */
         [self hasEndedFullscreen];
-    } else
-    /* Fullscreen started */
+    } else {
+        /* Fullscreen started */
         [self hasBecomeFullscreen];
+    }
 }
 
 #pragma mark -
