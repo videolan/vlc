@@ -59,14 +59,14 @@ vlc_module_begin()
     set_shortname("libplacebo OpenGL ES2")
     set_description(N_("OpenGL ES2 based GPU instance"))
     add_shortcut("pl_opengles2", "pl_gles2")
-    add_module(MODULE_VARNAME, "opengl es2", NULL, GLES2_TEXT, PROVIDER_LONGTEXT);
+    add_module(MODULE_VARNAME, "opengl es2", "any", GLES2_TEXT, PROVIDER_LONGTEXT);
 #else // !USE_OPENGL_ES2
 # define API VLC_OPENGL
 # define MODULE_VARNAME "pl-gl"
     set_shortname("libplacebo OpenGL")
     set_description(N_("OpenGL based GPU instance"))
     add_shortcut("pl_opengl", "pl_gl")
-    add_module(MODULE_VARNAME, "opengl", NULL, GL_TEXT, PROVIDER_LONGTEXT);
+    add_module(MODULE_VARNAME, "opengl", "any", GL_TEXT, PROVIDER_LONGTEXT);
 #endif
 
     set_section("Context settings", NULL)
