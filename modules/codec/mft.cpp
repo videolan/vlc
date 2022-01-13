@@ -817,7 +817,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 goto error;
 
             DWORD total_length = 0;
-            hr = output_sample->GetTotalLength(&total_length);
+            hr = output_media_buffer->GetCurrentLength(&total_length);
             if (FAILED(hr))
                 goto error;
 
