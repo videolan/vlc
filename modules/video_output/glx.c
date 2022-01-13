@@ -230,13 +230,17 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         sys->restore_forget_gravity = false;
 
     /* Initialize OpenGL callbacks */
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .resize = NULL,
+        .swap = SwapBuffers,
+        .get_proc_address = GetSymbol,
+        .close = Close,
+    };
     gl->sys = sys;
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = NULL;
-    gl->swap = SwapBuffers;
-    gl->get_proc_address = GetSymbol;
-    gl->destroy = Close;
+    gl->ops = &gl_ops;
 
     bool is_swap_interval_set = false;
 
