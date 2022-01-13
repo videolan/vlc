@@ -361,7 +361,7 @@ int WindowOpen(vout_window_t *p_wnd)
 
     /* detect the video-splitter and prevent starts in fullscreen if it is enabled */
     char *psz_splitter = var_GetString(voutView.voutThread, "video-splitter");
-    BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
+    BOOL b_have_splitter = psz_splitter != NULL && strcmp(psz_splitter, "none");
     free(psz_splitter);
 
     if (!videoWallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || _playerController.fullscreen)) {
