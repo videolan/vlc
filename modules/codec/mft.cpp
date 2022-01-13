@@ -674,41 +674,58 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
     HRESULT hr;
-    picture_t *picture = NULL;
-    block_t *aout_buffer = NULL;
 
     DWORD output_status = 0;
     MFT_OUTPUT_DATA_BUFFER output_buffer = { stream_id, p_sys->output_sample.Get(), 0, NULL };
     hr = p_sys->mft->ProcessOutput(0, 1, &output_buffer, &output_status);
     if (output_buffer.pEvents)
         output_buffer.pEvents->Release();
-    /* Use the returned sample since it can be provided by the MFT. */
-    ComPtr<IMFSample> output_sample = output_buffer.pSample;
-    ComPtr<IMFMediaBuffer> output_media_buffer;
 
     keep_reading = false;
     if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
         return VLC_SUCCESS;
 
-    if (hr == S_OK)
+    if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
     {
-        if (output_sample.Get() == nullptr)
-            return VLC_SUCCESS;
+        if (SetOutputType(p_dec, p_sys->output_stream_id))
+            return VLC_EGENERIC;
 
-        LONGLONG sample_time;
-        hr = output_sample->GetSampleTime(&sample_time);
-        if (FAILED(hr))
-            goto error;
-        /* Convert from 100 nanoseconds unit to microseconds. */
-        vlc_tick_t samp_time = VLC_TICK_FROM_MSFTIME(sample_time);
+        /* Reallocate output sample. */
+        if (AllocateOutputSample(p_dec, p_sys->output_stream_id, p_sys->output_sample))
+            return VLC_EGENERIC;
+        // there's an output ready, keep trying
+        keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
+        return VLC_SUCCESS;
+    }
 
-        DWORD output_count = 0;
-        hr = output_sample->GetBufferCount(&output_count);
-        if (unlikely(FAILED(hr)))
-            goto error;
+    /* An error not listed above occurred */
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_dec, "Failed to process output stream %lu (error 0x%lX)", stream_id, hr);
+        return VLC_EGENERIC;
+    }
+
+    if (output_buffer.pSample == nullptr)
+        return VLC_SUCCESS;
+
+    LONGLONG sample_time;
+    hr = output_buffer.pSample->GetSampleTime(&sample_time);
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+    /* Convert from 100 nanoseconds unit to vlc ticks. */
+    vlc_tick_t samp_time = VLC_TICK_FROM_MSFTIME(sample_time);
+
+    DWORD output_count = 0;
+    hr = output_buffer.pSample->GetBufferCount(&output_count);
+    if (unlikely(FAILED(hr)))
+        return VLC_EGENERIC;
+
+    ComPtr<IMFSample> output_sample = output_buffer.pSample;
 
         for (DWORD buf_index = 0; buf_index < output_count; buf_index++)
         {
+            picture_t *picture = NULL;
+            ComPtr<IMFMediaBuffer> output_media_buffer;
             hr = output_sample->GetBufferByIndex(buf_index, output_media_buffer.GetAddressOf());
             if (FAILED(hr))
                 goto error;
@@ -733,18 +750,25 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 BYTE *buffer_start;
                 hr = output_media_buffer->Lock(&buffer_start, NULL, NULL);
                 if (FAILED(hr))
+                {
+                    picture_Release(picture);
                     goto error;
+                }
 
                 CopyPackedBufferToPicture(picture, buffer_start);
 
                 hr = output_media_buffer->Unlock();
                 if (FAILED(hr))
+                {
+                    picture_Release(picture);
                     goto error;
+                }
 
                 decoder_QueueVideo(p_dec, picture);
             }
             else
             {
+                block_t *aout_buffer = NULL;
                 if (decoder_UpdateAudioFormat(p_dec))
                     goto error;
                 if (p_dec->fmt_out.audio.i_bitspersample == 0 || p_dec->fmt_out.audio.i_channels == 0)
@@ -760,20 +784,29 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 if (!aout_buffer)
                     return VLC_SUCCESS;
                 if (aout_buffer->i_buffer < total_length)
+                {
+                    block_Release(aout_buffer);
                     goto error;
+                }
 
                 aout_buffer->i_pts = samp_time;
 
                 BYTE *buffer_start;
                 hr = output_media_buffer->Lock(&buffer_start, NULL, NULL);
                 if (FAILED(hr))
+                {
+                    block_Release(aout_buffer);
                     goto error;
+                }
 
                 memcpy(aout_buffer->p_buffer, buffer_start, total_length);
 
                 hr = output_media_buffer->Unlock();
                 if (FAILED(hr))
+                {
+                    block_Release(aout_buffer);
                     goto error;
+                }
 
                 decoder_QueueAudio(p_dec, aout_buffer);
             }
@@ -785,8 +818,6 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 if (FAILED(hr))
                     goto error;
             }
-
-            output_media_buffer.Reset();
         }
 
         if (p_sys->output_sample.Get() == nullptr)
@@ -797,30 +828,9 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
         keep_reading = true;
         return VLC_SUCCESS;
-    }
-
-    if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
-    {
-        if (SetOutputType(p_dec, p_sys->output_stream_id))
-            goto error;
-
-        /* Reallocate output sample. */
-        if (AllocateOutputSample(p_dec, p_sys->output_stream_id, p_sys->output_sample))
-            goto error;
-        // there's an output ready, keep trying
-        keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
-        return VLC_SUCCESS;
-    }
-
-    /* An error not listed above occurred */
-    msg_Dbg(p_dec, "Failed to process output stream %lu (error 0x%lX)", stream_id, hr);
 
 error:
     msg_Err(p_dec, "Error in ProcessOutputStream()");
-    if (picture)
-        picture_Release(picture);
-    if (aout_buffer)
-        block_Release(aout_buffer);
     return VLC_EGENERIC;
 }
 
