@@ -66,49 +66,29 @@ namespace {
 template<class T>
 class SingletonRegisterHelper
 {
-    static QPointer<QObject> m_instance;
-    static QQmlEngine::ObjectOwnership m_ownership;
+    static QPointer<T> m_instance;
 
 public:
     static QObject* callback(QQmlEngine *engine, QJSEngine *)
     {
         assert(m_instance);
-        engine->setObjectOwnership(m_instance, m_ownership);
+        engine->setObjectOwnership(m_instance, QQmlEngine::ObjectOwnership::CppOwnership);
         return m_instance;
     }
 
-    template<class T2 = T, typename... Args>
-    static auto getCallback(Args&&... args)
-    {
-        if (!m_instance)
-        {
-            m_ownership = QQmlEngine::ObjectOwnership::JavaScriptOwnership;
-            m_instance = new T2(std::forward<Args>(args)...);
-            assert(!m_instance->parent());
-        }
-        else
-            assert(sizeof...(args) == 0);
-
-        return callback;
-    }
-
-    template<class T2 = T>
-    static void setInstance(T2& instance)
+    static void setInstance(T* instance)
     {
         assert(!m_instance);
-        m_ownership = QQmlEngine::ObjectOwnership::CppOwnership;
-        m_instance = &instance;
+        m_instance = instance;
     }
 
-    static auto getInstance()
+    static T* getInstance()
     {
-        return static_cast<T*>(m_instance);
+        return m_instance;
     }
 };
 template<class T>
-QQmlEngine::ObjectOwnership SingletonRegisterHelper<T>::m_ownership = QQmlEngine::ObjectOwnership::JavaScriptOwnership;
-template<class T>
-QPointer<QObject> SingletonRegisterHelper<T>::m_instance = nullptr;
+QPointer<T> SingletonRegisterHelper<T>::m_instance = nullptr;
 
 template<class T>
 void registerAnonymousType( const char *uri, int versionMajor )
@@ -135,18 +115,24 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_mainCtx);
     assert(m_interfaceWindow);
 
-    SingletonRegisterHelper<MainCtx>::setInstance(*mainCtx);
+    SingletonRegisterHelper<MainCtx>::setInstance(mainCtx);
 
     assert(m_intf->p_mainPlayerController);
-    SingletonRegisterHelper<PlayerController>::setInstance(*m_intf->p_mainPlayerController);
+    SingletonRegisterHelper<PlayerController>::setInstance(m_intf->p_mainPlayerController);
 
     assert(DialogsProvider::getInstance());
-    SingletonRegisterHelper<DialogsProvider>::setInstance(*DialogsProvider::getInstance());
+    SingletonRegisterHelper<DialogsProvider>::setInstance(DialogsProvider::getInstance());
+
+    SingletonRegisterHelper<NavigationHistory>::setInstance( new NavigationHistory(this) );
+    SingletonRegisterHelper<I18n>::setInstance( new I18n(this) );
+    SingletonRegisterHelper<SystemPalette>::setInstance( new SystemPalette(this) );
+    SingletonRegisterHelper<DialogModel>::setInstance( new DialogModel(m_intf, this));
+    SingletonRegisterHelper<QmlKeyHelper>::setInstance( new QmlKeyHelper(this) );
 
     if (m_mainCtx->hasMediaLibrary())
     {
         assert(m_mainCtx->getMediaLibrary());
-        SingletonRegisterHelper<MediaLib>::setInstance(*m_mainCtx->getMediaLibrary());
+        SingletonRegisterHelper<MediaLib>::setInstance(m_mainCtx->getMediaLibrary());
     }
 
     registerQMLTypes();
@@ -217,13 +203,13 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 1;
 
         qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
-        qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::getCallback());
+        qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::callback);
         qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);
-        qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::getCallback());
+        qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::callback);
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
-        qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::getCallback());
-        qmlRegisterSingletonType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", SingletonRegisterHelper<DialogModel>::getCallback(m_intf));
-        qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::getCallback());
+        qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::callback);
+        qmlRegisterSingletonType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", SingletonRegisterHelper<DialogModel>::callback);
+        qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
 
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
@@ -349,4 +335,3 @@ void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)
         msg_Warn( m_intf, "qml error %s:%i %s", qtu(error.url().toString()), error.line(), qtu(error.description()) );
     }
 }
-
