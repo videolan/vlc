@@ -1048,10 +1048,6 @@ static const char* const ppsz_restore_playback_desc[] = {
 #define MUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure mux modules")
 
-#define ACCESS_OUTPUT_TEXT N_("Access output module")
-#define ACCESS_OUTPUT_LONGTEXT N_( \
-    "This is a legacy entry to let you configure access output modules")
-
 #define ANN_SAPINTV_TEXT N_("SAP announcement interval")
 #define ANN_SAPINTV_LONGTEXT N_( \
     "When the SAP flow control is disabled, " \
@@ -2041,8 +2037,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_MUX )
     add_module("mux", "sout mux", NULL, MUX_TEXT, MUX_LONGTEXT)
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_module("access_output", "sout access", NULL,
-               ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT)
+    add_obsolete_string("access_output") /* since 0.5.0 (warning since 4.0) */
     add_integer( "ttl", -1, TTL_TEXT, TTL_LONGTEXT )
     add_string( "miface", NULL, MIFACE_TEXT, MIFACE_LONGTEXT )
     add_integer( "dscp", 0, DSCP_TEXT, DSCP_LONGTEXT )
