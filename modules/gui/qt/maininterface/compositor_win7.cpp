@@ -160,8 +160,8 @@ void CompositorWin7::destroyMainInterface()
 
 void CompositorWin7::unloadGUI()
 {
-    commonGUIDestroy();
     m_qmlView.reset();
+    commonGUIDestroy();
 }
 
 bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)

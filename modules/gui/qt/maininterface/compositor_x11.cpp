@@ -188,8 +188,8 @@ void CompositorX11::destroyMainInterface()
 void CompositorX11::unloadGUI()
 {
     m_renderWindow->stopRendering();
-    commonGUIDestroy();
     m_qmlView.reset();
+    commonGUIDestroy();
 }
 
 void CompositorX11::onSurfacePositionChanged(const QPointF& position)
