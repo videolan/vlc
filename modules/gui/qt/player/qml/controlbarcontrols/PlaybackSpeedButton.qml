@@ -23,6 +23,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///player/" as P
+import "qrc:///util/Helpers.js" as Helpers
 
 Widgets.IconControlButton {
     id: playbackSpeedButton
