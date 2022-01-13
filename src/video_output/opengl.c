@@ -92,21 +92,11 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
         return NULL;
     }
 
-    if (gl->ops == NULL)
-    {
-        assert(gl->make_current);
-        assert(gl->release_current);
-        assert(gl->swap);
-        assert(gl->get_proc_address);
-    }
-    else
-    {
-        assert(gl->ops);
-        assert(gl->ops->make_current);
-        assert(gl->ops->release_current);
-        assert(gl->ops->swap);
-        assert(gl->ops->get_proc_address);
-    }
+    assert(gl->ops);
+    assert(gl->ops->make_current);
+    assert(gl->ops->release_current);
+    assert(gl->ops->swap);
+    assert(gl->ops->get_proc_address);
 
     return &glpriv->gl;
 }
@@ -160,20 +150,11 @@ vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
     /* The implementation must initialize the output chroma */
     assert(gl->offscreen_chroma_out != VLC_CODEC_UNKNOWN);
 
-    if (gl->ops == NULL)
-    {
-        assert(gl->make_current);
-        assert(gl->release_current);
-        assert(gl->swap);
-        assert(gl->get_proc_address);
-    }
-    else
-    {
-        assert(gl->ops->make_current);
-        assert(gl->ops->release_current);
-        assert(gl->ops->swap_offscreen);
-        assert(gl->ops->get_proc_address);
-    }
+    assert(gl->ops);
+    assert(gl->ops->make_current);
+    assert(gl->ops->release_current);
+    assert(gl->ops->swap_offscreen);
+    assert(gl->ops->get_proc_address);
 
     return &glpriv->gl;
 }
@@ -182,8 +163,6 @@ void vlc_gl_Delete(vlc_gl_t *gl)
 {
     if (gl->ops->close != NULL)
         gl->ops->close(gl);
-    else if (gl->destroy != NULL)
-        gl->destroy(gl);
 
     if (gl->device)
         vlc_decoder_device_Release(gl->device);

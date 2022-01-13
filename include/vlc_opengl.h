@@ -72,13 +72,9 @@ struct vlc_gl_t
     struct vlc_decoder_device *device;
     union {
         struct { /* on-screen */
-            void (*swap)(vlc_gl_t *);
-
             struct vout_window_t *surface;
         };
         struct { /* off-screen */
-            picture_t *(*swap_offscreen)(vlc_gl_t *);
-
             vlc_fourcc_t offscreen_chroma_out;
             struct vlc_video_context *offscreen_vctx_out;
             /* Flag to indicate if the OpenGL implementation produces upside-down
@@ -86,12 +82,6 @@ struct vlc_gl_t
             bool offscreen_vflip;
         };
     };
-
-    int  (*make_current)(vlc_gl_t *);
-    void (*release_current)(vlc_gl_t *);
-    void (*resize)(vlc_gl_t *, unsigned, unsigned);
-    void*(*get_proc_address)(vlc_gl_t *, const char *);
-    void (*destroy)(vlc_gl_t *);
 
     /* Defined by the core for libvlc_opengl API loading. */
     enum vlc_gl_api_type api_type;
@@ -120,45 +110,33 @@ VLC_API void vlc_gl_Delete(vlc_gl_t *);
 
 static inline int vlc_gl_MakeCurrent(vlc_gl_t *gl)
 {
-    if (gl->ops != NULL)
-        return gl->ops->make_current(gl);
-    return gl->make_current(gl);
+    return gl->ops->make_current(gl);
 }
 
 static inline void vlc_gl_ReleaseCurrent(vlc_gl_t *gl)
 {
-    if (gl->ops != NULL)
-        gl->ops->release_current(gl);
-    gl->release_current(gl);
+    gl->ops->release_current(gl);
 }
 
 static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)
 {
-    if (gl->ops != NULL && gl->ops->resize != NULL)
+    if (gl->ops->resize != NULL)
         gl->ops->resize(gl, w, h);
-    if (gl->ops == NULL && gl->resize)
-        gl->resize(gl, w, h);
 }
 
 static inline void vlc_gl_Swap(vlc_gl_t *gl)
 {
-    if (gl->ops != NULL)
-        gl->ops->swap(gl);
-    gl->swap(gl);
+    gl->ops->swap(gl);
 }
 
 static inline picture_t *vlc_gl_SwapOffscreen(vlc_gl_t *gl)
 {
-    if (gl->ops != NULL)
-        return gl->ops->swap_offscreen(gl);
-    return gl->swap_offscreen(gl);
+    return gl->ops->swap_offscreen(gl);
 }
 
 static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 {
-    if (gl->ops != NULL)
-        return gl->ops->get_proc_address(gl, name);
-    return gl->get_proc_address(gl, name);
+    return gl->ops->get_proc_address(gl, name);
 }
 
 VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,
