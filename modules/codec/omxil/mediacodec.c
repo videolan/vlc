@@ -708,6 +708,7 @@ CreateVideoContext(decoder_t *p_dec)
     avctx->render = PictureContextRenderPic;
     avctx->render_ts = p_sys->api.release_out_ts ? PictureContextRenderPicTs : NULL;
     avctx->get_texture = p_sys->video.surfacetexture ? PictureContextGetTexture : NULL;
+    avctx->texture = NULL;
 
     for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
     {
