@@ -345,12 +345,16 @@ static void FreeCVBuffer(picture_t *picture)
     if ([self resize:CGSizeMake(width, height)] != VLC_SUCCESS)
         return nil;
 
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = Resize;
-    gl->swap_offscreen = Swap;
-    gl->get_proc_address = GetSymbol;
-    gl->destroy = Close;
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .resize = Resize,
+        .swap_offscreen = Swap,
+        .get_proc_address = GetSymbol,
+        .close = Close,
+    };
+    gl->ops = &gl_ops;
     gl->offscreen_vflip = true;
     gl->offscreen_vctx_out = _vctx_out;
     gl->offscreen_chroma_out = VLC_CODEC_CVPX_BGRA;
