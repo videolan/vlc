@@ -1044,10 +1044,6 @@ static const char* const ppsz_restore_playback_desc[] = {
     "This allows you to select the order in which VLC will choose its " \
     "packetizers."  )
 
-#define MUX_TEXT N_("Mux module")
-#define MUX_LONGTEXT N_( \
-    "This is a legacy entry to let you configure mux modules")
-
 #define ANN_SAPINTV_TEXT N_("SAP announcement interval")
 #define ANN_SAPINTV_LONGTEXT N_( \
     "When the SAP flow control is disabled, " \
@@ -2034,8 +2030,7 @@ vlc_module_begin ()
     add_integer( "sap-interval", 5, ANN_SAPINTV_TEXT,
                                ANN_SAPINTV_LONGTEXT )
 
-    set_subcategory( SUBCAT_SOUT_MUX )
-    add_module("mux", "sout mux", NULL, MUX_TEXT, MUX_LONGTEXT)
+    add_obsolete_string("mux") /* since 0.5.0 (warning since 4.0) */
     set_subcategory( SUBCAT_SOUT_ACO )
     add_obsolete_string("access_output") /* since 0.5.0 (warning since 4.0) */
     add_integer( "ttl", -1, TTL_TEXT, TTL_LONGTEXT )
