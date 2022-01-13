@@ -229,12 +229,16 @@ static void Close(vlc_gl_t *gl)
 
     /* Setup the usual vlc_gl_t callbacks before loading the API since we need
      * the get_proc_address symbol and a current context. */
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = Resize;
-    gl->swap = Swap;
-    gl->get_proc_address = GetSymbol;
-    gl->destroy = Close;
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .resize = Resize,
+        .swap = Swap,
+        .get_proc_address = GetSymbol,
+        .close = Close,
+    };
+    gl->ops = &gl_ops;
 
     return self;
 }
