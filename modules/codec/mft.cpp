@@ -95,6 +95,48 @@ struct decoder_sys_t
     /* H264 only. */
     struct hxxx_helper hh = {};
     bool   b_xps_pushed = false; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
+
+    bool isStreaming = false;
+    HRESULT beginStreaming()
+    {
+        assert(!isStreaming);
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, (ULONG_PTR)0);
+        isStreaming = SUCCEEDED(hr);
+        return hr;
+    }
+    HRESULT endStreaming()
+    {
+        assert(isStreaming);
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, (ULONG_PTR)0);
+        isStreaming = SUCCEEDED(hr);
+        return hr;
+    }
+    bool streamStarted = false;
+    HRESULT startStream()
+    {
+        assert(!streamStarted);
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, (ULONG_PTR)0);
+        streamStarted = SUCCEEDED(hr);
+        return hr;
+    }
+    HRESULT endStream()
+    {
+        assert(streamStarted);
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
+        if (SUCCEEDED(hr))
+            streamStarted = false;
+        return hr;
+    }
+    HRESULT flushStream()
+    {
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
+        if (streamStarted)
+        {
+            streamStarted = false;
+            startStream();
+        }
+        return hr;
+    }
 };
 
 static const int pi_channels_maps[9] =
@@ -837,9 +879,7 @@ error:
 static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
-    HRESULT hr;
-
-    hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
+    p_sys->flushStream();
 }
 
 static int DecodeSync(decoder_t *p_dec, block_t *p_block)
@@ -1052,12 +1092,12 @@ static int InitializeMFT(decoder_t *p_dec)
             goto error;
 
     /* This call can be a no-op for some MFT decoders, but it can potentially reduce starting time. */
-    hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, (ULONG_PTR)0);
+    hr = p_sys->beginStreaming();
     if (FAILED(hr))
         goto error;
 
     /* This event is required for asynchronous MFTs, optional otherwise. */
-    hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, (ULONG_PTR)0);
+    hr = p_sys->startStream();
     if (FAILED(hr))
         goto error;
 
@@ -1087,9 +1127,8 @@ static void DestroyMFT(decoder_t *p_dec)
     }
 
     if (p_sys->mft.Get())
-    {
-        p_sys->mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
-        p_sys->mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, (ULONG_PTR)0);
+        p_sys->endStream();
+        p_sys->endStreaming();
     }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
