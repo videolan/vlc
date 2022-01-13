@@ -173,7 +173,7 @@ vlc_module_begin()
     set_capability("libplacebo gpu", 50)
     set_callback(InitInstance)
     add_shortcut("pl_vulkan")
-    add_module ("vk-platform", "vulkan platform", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
+    add_module ("vk-platform", "vulkan platform", "any", PROVIDER_TEXT, PROVIDER_LONGTEXT)
 
     set_section("Device selection", NULL)
     add_bool("vk-debug", false, DEBUG_TEXT, DEBUG_LONGTEXT)

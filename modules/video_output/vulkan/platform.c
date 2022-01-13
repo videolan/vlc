@@ -45,7 +45,7 @@ static int vlc_vk_start(void *func, bool forced, va_list ap)
  * Initializes a Vulkan platform module for a given window
  *
  * @param wnd window to use as Vulkan surface
- * @param name module name (or NULL for auto)
+ * @param name module name (or "any")
  * @return a new platform object, or NULL on failure
  */
 vlc_vk_platform_t *vlc_vk_platform_Create(struct vout_window_t *wnd, const char *name)
