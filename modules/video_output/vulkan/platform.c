@@ -61,7 +61,7 @@ vlc_vk_platform_t *vlc_vk_platform_Create(struct vout_window_t *wnd, const char 
     vk->ops = NULL;
     vk->window = wnd;
 
-    vk->module = vlc_module_load(wnd, "vulkan platform", name, false,
+    vk->module = vlc_module_load(wnd, "vulkan platform", name, true,
                                  vlc_vk_start, vk);
 
     if (vk->module == NULL)
