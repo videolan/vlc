@@ -69,7 +69,7 @@ Popup {
             clip: true
             implicitHeight: VLCStyle.heightBar_small
 
-            Navigation.parentItem: root
+            Navigation.parentItem: root.Navigation.parentItem
             Navigation.downItem: resetButton
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -130,7 +130,7 @@ Popup {
 
             spacing: 0
 
-            Navigation.parentItem: root
+            Navigation.parentItem: root.Navigation.parentItem
             Navigation.upItem: speedSlider
 
             Widgets.IconControlButton {
