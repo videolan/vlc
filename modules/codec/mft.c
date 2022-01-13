@@ -84,7 +84,6 @@ typedef struct
     /* Output stream */
     DWORD output_stream_id;
     IMFSample *output_sample;
-    IMFMediaType *output_type;
 
     /* H264 only. */
     struct hxxx_helper hh;
@@ -348,12 +347,10 @@ error:
     return VLC_EGENERIC;
 }
 
-static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **result)
+static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     HRESULT hr;
-
-    *result = NULL;
 
     IMFMediaType *output_media_type = NULL;
 
@@ -469,8 +466,6 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **resul
 
         p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_dec->fmt_out.audio.i_channels];
     }
-
-    *result = output_media_type;
 
     return VLC_SUCCESS;
 
@@ -818,9 +813,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 
     if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
     {
-        if (p_sys->output_type)
-            IMFMediaType_Release(p_sys->output_type);
-        if (SetOutputType(p_dec, p_sys->output_stream_id, &p_sys->output_type))
+        if (SetOutputType(p_dec, p_sys->output_stream_id))
             goto error;
 
         /* Reallocate output sample. */
@@ -1059,7 +1052,7 @@ static int InitializeMFT(decoder_t *p_dec)
     if (SetInputType(p_dec, p_sys->input_stream_id, &p_sys->input_type))
         goto error;
 
-    if (SetOutputType(p_dec, p_sys->output_stream_id, &p_sys->output_type))
+    if (SetOutputType(p_dec, p_sys->output_stream_id))
         goto error;
 
     /*
@@ -1108,8 +1101,6 @@ static void DestroyMFT(decoder_t *p_dec)
     {
         IMFSample_RemoveAllBuffers(p_sys->output_sample);
     }
-    if (p_sys->output_type)
-        IMFMediaType_Release(p_sys->output_type);
     if (p_sys->mft)
         IMFTransform_Release(p_sys->mft);
 
@@ -1118,7 +1109,6 @@ static void DestroyMFT(decoder_t *p_dec)
 
     p_sys->event_generator = NULL;
     p_sys->input_type = NULL;
-    p_sys->output_type = NULL;
     p_sys->mft = NULL;
 
     MFShutdown();
