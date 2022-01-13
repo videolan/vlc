@@ -538,13 +538,15 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **r
         return VLC_SUCCESS;
     }
 
-    DWORD expected_flags = 0;
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
-        expected_flags |= MFT_OUTPUT_STREAM_WHOLE_SAMPLES
+    {
+        const DWORD expected_flags =
+                          MFT_OUTPUT_STREAM_WHOLE_SAMPLES
                         | MFT_OUTPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER
                         | MFT_OUTPUT_STREAM_FIXED_SAMPLE_SIZE;
-    if ((output_info.dwFlags & expected_flags) != expected_flags)
-        goto error;
+        if ((output_info.dwFlags & expected_flags) != expected_flags)
+            goto error;
+    }
 
     hr = MFCreateSample(&output_sample);
     if (FAILED(hr))
