@@ -218,12 +218,16 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
     wglMakeCurrent(sys->hGLDC, NULL);
 
-    gl->make_current = MakeCurrent;
-    gl->release_current = ReleaseCurrent;
-    gl->resize = NULL;
-    gl->swap = Swap;
-    gl->get_proc_address = OurGetProcAddress;
-    gl->destroy = Close;
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = MakeCurrent,
+        .release_current = ReleaseCurrent,
+        .resize = NULL,
+        .swap = Swap,
+        .get_proc_address = OurGetProcAddress,
+        .close = Close,
+    };
+    gl->ops = &gl_ops;
 
     (void) width; (void) height;
     return VLC_SUCCESS;
