@@ -1593,7 +1593,7 @@ vlc_module_begin ()
               AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT )
 
     set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_module("aout", "audio output", NULL, AOUT_TEXT, AOUT_LONGTEXT)
+    add_module("aout", "audio output", "any", AOUT_TEXT, AOUT_LONGTEXT)
         change_short('A')
     add_string( "role", "video", ROLE_TEXT, ROLE_LONGTEXT )
         change_string_list( ppsz_roles, ppsz_roles_text )
