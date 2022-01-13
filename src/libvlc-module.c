@@ -1719,7 +1719,7 @@ vlc_module_begin ()
         change_safe()
 
     set_subcategory( SUBCAT_VIDEO_VOUT )
-    add_module("vout", "vout display", NULL, VOUT_TEXT, VOUT_LONGTEXT)
+    add_module("vout", "vout display", "any", VOUT_TEXT, VOUT_LONGTEXT)
         change_short('V')
 
     set_subcategory( SUBCAT_VIDEO_VFILTER )

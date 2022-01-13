@@ -68,9 +68,11 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
 
     msg_Dbg(vout, "Opening vout display wrapper");
 
-    if (splitter_name == NULL)
+    if (splitter_name == NULL) {
         modlist = modlistbuf = var_InheritString(vout, "vout");
-    else
+        if (unlikely(modlist == NULL))
+            return NULL;
+    } else
         modlist = "splitter,none";
 
     vd = vout_display_New(VLC_OBJECT(vout), fmt, vctx, cfg, modlist, &owner);
