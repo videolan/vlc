@@ -54,7 +54,7 @@ vlc_module_begin ()
     set_description (N_("OpenGL for Embedded Systems 2 video output"))
     set_callback_display(Open, 265)
     add_shortcut ("opengles2", "gles2")
-    add_module("gles2", "opengl es2", NULL, GLES2_TEXT, PROVIDER_LONGTEXT)
+    add_module("gles2", "opengl es2", "any", GLES2_TEXT, PROVIDER_LONGTEXT)
 
 #else
 
@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_description (N_("OpenGL video output"))
     set_callback_display(Open, 270)
     add_shortcut ("opengl", "gl")
-    add_module("gl", "opengl", NULL, GL_TEXT, PROVIDER_LONGTEXT)
+    add_module("gl", "opengl", "any", GL_TEXT, PROVIDER_LONGTEXT)
 #endif
     add_glopts ()
 
