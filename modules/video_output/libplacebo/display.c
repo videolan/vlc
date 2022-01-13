@@ -607,7 +607,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 0)
     add_shortcut ("libplacebo", "pl")
-    add_module ("pl-gpu", "libplacebo gpu", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
+    add_module ("pl-gpu", "libplacebo gpu", "any", PROVIDER_TEXT, PROVIDER_LONGTEXT)
 
     set_section("Custom shaders", NULL)
     add_loadfile("pl-user-shader", NULL, USER_SHADER_FILE_TEXT, USER_SHADER_FILE_LONGTEXT)
