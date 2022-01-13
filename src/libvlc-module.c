@@ -1738,7 +1738,7 @@ vlc_module_begin ()
     add_bool( "spu", true, SPU_TEXT, SPU_LONGTEXT )
         change_safe ()
     add_bool( "osd", true, OSD_TEXT, OSD_LONGTEXT )
-    add_module("text-renderer", "text renderer", NULL,
+    add_module("text-renderer", "text renderer", "any",
                TEXTRENDERER_TEXT, TEXTRENDERER_LONGTEXT)
 
     set_section( N_("Subtitles") , NULL )
