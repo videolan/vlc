@@ -81,7 +81,7 @@
     "Force a \"glinterop\" module.")
 
 #define add_glopts() \
-    add_module("glinterop", "glinterop", NULL, GLINTEROP_TEXT, GLINTEROP_LONGTEXT) \
+    add_module("glinterop", "glinterop", "any", GLINTEROP_TEXT, GLINTEROP_LONGTEXT) \
     add_glscale_opts() \
     add_glopts_placebo ()
 
