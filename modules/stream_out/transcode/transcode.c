@@ -151,7 +151,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
-    add_module(SOUT_CFG_PREFIX "venc", "video encoder", NULL,
+    add_module(SOUT_CFG_PREFIX "venc", "video encoder", "none",
                VENC_TEXT, VENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT )
@@ -178,7 +178,7 @@ vlc_module_begin ()
                     VFILTER_TEXT, VFILTER_LONGTEXT)
 
     set_section( N_("Audio"), NULL )
-    add_module(SOUT_CFG_PREFIX "aenc", "audio encoder", NULL,
+    add_module(SOUT_CFG_PREFIX "aenc", "audio encoder", "none",
                AENC_TEXT, AENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "acodec", NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT )
@@ -196,7 +196,7 @@ vlc_module_begin ()
                     AFILTER_TEXT, AFILTER_LONGTEXT)
 
     set_section( N_("Overlays/Subtitles"), NULL )
-    add_module(SOUT_CFG_PREFIX "senc", "spu encoder", NULL,
+    add_module(SOUT_CFG_PREFIX "senc", "spu encoder", "none",
                SENC_TEXT, SENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "scodec", NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT )
@@ -233,7 +233,7 @@ static int   Send( sout_stream_t *, void *, block_t * );
 static void SetAudioEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "aenc" );
-    if( psz_string && *psz_string )
+    if( psz_string && strcmp( psz_string, "none" ) )
     {
         char *psz_next = config_ChainCreate( &p_cfg->psz_name,
                                             &p_cfg->p_config_chain,
@@ -283,7 +283,7 @@ static void SetAudioEncoderConfig( sout_stream_t *p_stream, transcode_encoder_co
 static void SetVideoEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "venc" );
-    if( psz_string && *psz_string )
+    if( psz_string && strcmp( psz_string, "none" ) )
     {
         char *psz_next;
         psz_next = config_ChainCreate( &p_cfg->psz_name,
@@ -333,7 +333,7 @@ static void SetVideoEncoderConfig( sout_stream_t *p_stream, transcode_encoder_co
 static void SetSPUEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "senc" );
-    if( psz_string && *psz_string )
+    if( psz_string && strcmp( psz_string, "none" ) )
     {
         char *psz_next;
         psz_next = config_ChainCreate( &p_cfg->psz_name, &p_cfg->p_config_chain,
