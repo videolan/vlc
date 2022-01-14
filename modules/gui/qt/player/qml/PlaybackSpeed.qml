@@ -62,7 +62,10 @@ Popup {
         Slider {
             id: speedSlider
 
-            property bool _inhibitUpdate: false
+            // '_inhibitPlayerUpdate' is used to guard against double update
+            // initialize with true so that we don't update the Player till
+            // we initialize `value` property
+            property bool _inhibitPlayerUpdate: true
 
             from: 0.25
             to: 4
@@ -104,15 +107,15 @@ Popup {
             }
 
             onValueChanged:  {
-                if (_inhibitUpdate)
+                if (_inhibitPlayerUpdate)
                     return
                 Player.rate = value
             }
 
             function _updateFromPlayer() {
-                _inhibitUpdate = true
+                _inhibitPlayerUpdate = true
                 value = Player.rate
-                _inhibitUpdate = false
+                _inhibitPlayerUpdate = false
             }
 
             Connections {
