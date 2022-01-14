@@ -143,6 +143,8 @@ static void Drain (audio_output_t *aout)
     vlc_mutex_lock(&sys->lock);
     sys->drain (sys->opaque);
     vlc_mutex_unlock(&sys->lock);
+
+    aout_DrainedReport (aout);
 }
 
 static int VolumeSet (audio_output_t *aout, float vol)
@@ -377,7 +379,7 @@ static int Open (vlc_object_t *obj)
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
-    aout->drain = sys->drain ? Drain : NULL;
+    aout->drain_async = sys->drain ? Drain : NULL;
     if (sys->set_volume != NULL)
     {
         aout->volume_set = VolumeSet;
