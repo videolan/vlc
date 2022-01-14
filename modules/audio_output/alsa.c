@@ -731,8 +731,12 @@ static void Drain (audio_output_t *aout)
 {
     aout_sys_t *p_sys = aout->sys;
     snd_pcm_t *pcm = p_sys->pcm;
+
+    /* XXX: Synchronous drain, not interruptible. */
     snd_pcm_drain (pcm);
     snd_pcm_prepare (pcm);
+
+    aout_DrainedReport(aout);
 }
 
 /**
@@ -859,7 +863,7 @@ static int Open(vlc_object_t *obj)
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->flush = Flush;
-    aout->drain = Drain;
+    aout->drain_async = Drain;
 
     return VLC_SUCCESS;
 error:
