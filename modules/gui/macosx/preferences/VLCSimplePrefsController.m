@@ -286,9 +286,9 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     } else if ([itemIdent isEqual: VLCVideoSettingToolbarIdentifier]) {
         CreateToolbarItem(_NS("Video"), _NS("Video Settings"), @"VLCVideoCone", showVideoSettings);
     } else if ([itemIdent isEqual: VLCOSDSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"VLCSubtitleCone", showOSDSettings);
+        CreateToolbarItem(NSTR(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"VLCSubtitleCone", showOSDSettings);
     } else if ([itemIdent isEqual: VLCInputSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS(INPUT_TITLE), _NS("Input & Codec Settings"), @"VLCInputCone", showInputSettings);
+        CreateToolbarItem(NSTR(INPUT_TITLE), _NS("Input & Codec Settings"), @"VLCInputCone", showInputSettings);
     } else if ([itemIdent isEqual: VLCMediaLibrarySettingToolbarIdentifier]) {
         CreateToolbarItem(_NS("Media Library"), _NS("Media Library settings"), @"NXHelpBacktrack", showMediaLibrarySettings);
     } else if ([itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier]) {
@@ -530,7 +530,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     free(values);
 
     if (p_item->psz_longtext)
-        [object setToolTip: _NS(p_item->psz_longtext)];
+        [object setToolTip: NSTR(p_item->psz_longtext)];
 }
 
 // just for clarification that this is a module list
@@ -565,20 +565,20 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     free(texts);
 
     if (p_item->psz_longtext)
-        [object setToolTip: _NS(p_item->psz_longtext)];
+        [object setToolTip: NSTR(p_item->psz_longtext)];
 }
 
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
 {
     [object setState: config_GetInt(name)];
-    [object setToolTip: _NS(config_GetLabel(p_intf, name))];
+    [object setToolTip: NSTR(config_GetLabel(p_intf, name))];
 }
 
 - (void)setupField:(NSTextField *)object forOption:(const char *)psz_option
 {
     char *psz_tmp = config_GetPsz(psz_option);
     [object setStringValue: toNSStr(psz_tmp)];
-    [object setToolTip: _NS(config_GetLabel(p_intf, psz_option))];
+    [object setToolTip: NSTR(config_GetLabel(p_intf, psz_option))];
     free(psz_tmp);
 }
 
@@ -810,7 +810,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     i = config_GetInt("freetype-opacity") * 100.0 / 255.0 + 0.5;
     [_osd_opacityTextField setIntValue: i];
     [_osd_opacitySlider setIntValue: i];
-    [_osd_opacitySlider setToolTip: _NS(config_GetLabel(p_intf, "freetype-opacity"))];
+    [_osd_opacitySlider setToolTip: NSTR(config_GetLabel(p_intf, "freetype-opacity"))];
     [_osd_opacityTextField setToolTip: [_osd_opacitySlider toolTip]];
     [self setupButton:_osd_forceboldCheckbox forBoolValue: "freetype-bold"];
     [self setupButton:_osd_outline_colorPopup forIntList: "freetype-outline-color"];
@@ -837,7 +837,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         if (p_item->i_type == CONFIG_ITEM_KEY
            && strncmp(p_item->psz_name, "global-", 7) != 0
            && !EMPTY_STR(p_item->psz_text)) {
-            [tempArray_desc addObject: _NS(p_item->psz_text)];
+            [tempArray_desc addObject: NSTR(p_item->psz_text)];
             [tempArray_names addObject: toNSStr(p_item->psz_name)];
             if (p_item->value.psz)
                 [_hotkeySettings addObject: toNSStr(p_item->value.psz)];

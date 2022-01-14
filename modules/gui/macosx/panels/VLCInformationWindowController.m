@@ -126,8 +126,8 @@
     [self.window setTitle: _NS("Media Information")];
 
     [_uriLabel setStringValue: _NS("Location")];
-    [_titleLabel setStringValue: _NS(VLC_META_TITLE)];
-    [_artistLabel setStringValue: _NS(VLC_META_ARTIST)];
+    [_titleLabel setStringValue: NSTR(VLC_META_TITLE)];
+    [_artistLabel setStringValue: NSTR(VLC_META_ARTIST)];
     [_saveMetaDataButton setStringValue: _NS("Save Metadata")];
 
     [_segmentedView setLabel:_NS("General") forSegment:0];
@@ -135,22 +135,22 @@
     [_segmentedView setLabel:_NS("Statistics") forSegment:2];
 
     /* constants defined in vlc_meta.h */
-    [_genreLabel setStringValue: _NS(VLC_META_GENRE)];
-    [_copyrightLabel setStringValue: _NS(VLC_META_COPYRIGHT)];
-    [_albumLabel setStringValue: _NS(VLC_META_ALBUM)];
-    [_trackNumberLabel setStringValue: _NS(VLC_META_TRACK_NUMBER)];
+    [_genreLabel setStringValue: NSTR(VLC_META_GENRE)];
+    [_copyrightLabel setStringValue: NSTR(VLC_META_COPYRIGHT)];
+    [_albumLabel setStringValue: NSTR(VLC_META_ALBUM)];
+    [_trackNumberLabel setStringValue: NSTR(VLC_META_TRACK_NUMBER)];
     [_trackTotalLabel setStringValue: _NS("Track Total")];
-    [_descriptionLabel setStringValue: _NS(VLC_META_DESCRIPTION)];
-    [_dateLabel setStringValue: _NS(VLC_META_DATE)];
-    [_languageLabel setStringValue: _NS(VLC_META_LANGUAGE)];
-    [_nowPlayingLabel setStringValue: _NS(VLC_META_NOW_PLAYING)];
-    [_publisherLabel setStringValue: _NS(VLC_META_PUBLISHER)];
-    [_encodedbyLabel setStringValue: _NS(VLC_META_ENCODED_BY)];
-    [_showNameLabel setStringValue: _NS(VLC_META_SHOW_NAME)];
-    [_episodeLabel setStringValue: _NS(VLC_META_EPISODE)];
-    [_seasonLabel setStringValue: _NS(VLC_META_SEASON)];
-    [_actorsLabel setStringValue: _NS(VLC_META_ACTORS)];
-    [_directorLabel setStringValue: _NS(VLC_META_DIRECTOR)];
+    [_descriptionLabel setStringValue: NSTR(VLC_META_DESCRIPTION)];
+    [_dateLabel setStringValue: NSTR(VLC_META_DATE)];
+    [_languageLabel setStringValue: NSTR(VLC_META_LANGUAGE)];
+    [_nowPlayingLabel setStringValue: NSTR(VLC_META_NOW_PLAYING)];
+    [_publisherLabel setStringValue: NSTR(VLC_META_PUBLISHER)];
+    [_encodedbyLabel setStringValue: NSTR(VLC_META_ENCODED_BY)];
+    [_showNameLabel setStringValue: NSTR(VLC_META_SHOW_NAME)];
+    [_episodeLabel setStringValue: NSTR(VLC_META_EPISODE)];
+    [_seasonLabel setStringValue: NSTR(VLC_META_SEASON)];
+    [_actorsLabel setStringValue: NSTR(VLC_META_ACTORS)];
+    [_directorLabel setStringValue: NSTR(VLC_META_DIRECTOR)];
 
     /* statistics */
     [_inputLabel setStringValue: _NS("Input")];

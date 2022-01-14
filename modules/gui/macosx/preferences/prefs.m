@@ -626,42 +626,42 @@ enum VLCTreeBranchType {
 
 - (id)initWithCategory:(enum vlc_config_cat)category
 {
-    NSString * name = _NS(vlc_config_cat_GetName(category));
+    NSString * name = NSTR(vlc_config_cat_GetName(category));
     if (self = [super initWithName:name]) {
         _branchType = CategoryBranch;
         _category = category;
         _subcategory = SUBCAT_UNKNOWN;
         _configItems = nil;
         _configSize = 0;
-        //_help = [_NS(vlc_config_cat_GetHelp(category)) retain];
+        //_help = [NSTR(vlc_config_cat_GetHelp(category)) retain];
     }
     return self;
 }
 
 - (id)initWithSubcategory:(enum vlc_config_subcat)subcategory
 {
-    NSString * name = _NS(vlc_config_subcat_GetName(subcategory));
+    NSString * name = NSTR(vlc_config_subcat_GetName(subcategory));
     if (self = [super initWithName:name]) {
         _branchType = SubcategoryBranch;
         _category = CAT_UNKNOWN;
         _subcategory = subcategory;
         _configItems = nil;
         _configSize = 0;
-        //_help = [_NS(vlc_config_subcat_GetHelp(subcategory)) retain];
+        //_help = [NSTR(vlc_config_subcat_GetHelp(subcategory)) retain];
     }
     return self;
 }
 
 - (id)initWithPlugin:(module_t *)plugin
 {
-    NSString * name = _NS(module_get_name(plugin, false));
+    NSString * name = NSTR(module_get_name(plugin, false));
     if (self = [super initWithName:name]) {
         _branchType = PluginBranch;
         _category = CAT_UNKNOWN;
         _subcategory = SUBCAT_UNKNOWN;
         _configItems = module_config_get(plugin, &_configSize);
         //_plugin = plugin;
-        //_help = [_NS(vlc_config_subcat_GetHelp(subcategory)) retain];
+        //_help = [NSTR(vlc_config_subcat_GetHelp(subcategory)) retain];
     }
     return self;
 }

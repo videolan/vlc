@@ -61,7 +61,7 @@
 {
     NSString *htmlWithStyle = [NSString
                                stringWithFormat:@"<style>body { font-family: -apple-system, Helvetica Neue; }</style>%@",
-                               _NS(I_LONGHELP)];
+                               NSTR(I_LONGHELP)];
 
     [[helpWebView mainFrame] loadHTMLString:htmlWithStyle
                                     baseURL:[NSURL URLWithString:@"https://videolan.org"]];

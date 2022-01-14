@@ -290,7 +290,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
     if (p_item) {
         for (int i = 0; i < p_item->list_count; i++) {
-            [_fileSubEncodingPopup addItemWithTitle: _NS(p_item->list_text[i])];
+            [_fileSubEncodingPopup addItemWithTitle: NSTR(p_item->list_text[i])];
             [[_fileSubEncodingPopup lastItem] setRepresentedObject:[NSString stringWithFormat:@"%s", p_item->list.psz[i]]];
             if (p_item->value.psz && !strcmp(p_item->value.psz, p_item->list.psz[i]))
                 [_fileSubEncodingPopup selectItem: [_fileSubEncodingPopup lastItem]];
@@ -304,7 +304,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
     if (p_item) {
         for (i_index = 0; i_index < p_item->list_count; i_index++)
-            [_fileSubAlignPopup addItemWithTitle: _NS(p_item->list_text[i_index])];
+            [_fileSubAlignPopup addItemWithTitle: NSTR(p_item->list_text[i_index])];
 
         [_fileSubAlignPopup selectItemAtIndex: p_item->value.i];
     }
