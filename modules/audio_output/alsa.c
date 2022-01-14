@@ -863,7 +863,7 @@ static int Open(vlc_object_t *obj)
     aout->time_get = TimeGet;
     aout->play = Play;
     aout->flush = Flush;
-    aout->drain_async = Drain;
+    aout->drain = Drain;
 
     return VLC_SUCCESS;
 error:

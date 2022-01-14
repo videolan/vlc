@@ -379,7 +379,7 @@ static int Open (vlc_object_t *obj)
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
-    aout->drain_async = sys->drain ? Drain : NULL;
+    aout->drain = sys->drain ? Drain : NULL;
     if (sys->set_volume != NULL)
     {
         aout->volume_set = VolumeSet;

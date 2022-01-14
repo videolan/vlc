@@ -245,7 +245,7 @@ struct audio_output
       * \note This callback cannot be called in stopped state.
       */
 
-    void (*drain_async)(audio_output_t *);
+    void (*drain)(audio_output_t *);
     /**< Drain the playback buffers asynchronously (can be NULL).
       *
       * A drain operation can be cancelled by aout->flush() or aout->stop().

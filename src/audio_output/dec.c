@@ -667,7 +667,7 @@ bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream)
 {
     audio_output_t *aout = aout_stream_aout(stream);
 
-    if (aout->drain_async == NULL)
+    if (aout->drain == NULL)
     {
         vlc_tick_t drain_deadline =
             atomic_load_explicit(&stream->drain_deadline, memory_order_relaxed);
@@ -692,10 +692,10 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
             aout->play(aout, block, vlc_tick_now());
     }
 
-    if (aout->drain_async)
+    if (aout->drain)
     {
         assert(!atomic_load_explicit(&stream->drained, memory_order_relaxed));
-        aout->drain_async(aout);
+        aout->drain(aout);
     }
     else
     {

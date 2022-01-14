@@ -179,7 +179,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_aout->play = Play;
     p_aout->pause = WaveOutPause;
     p_aout->flush = WaveOutFlush;
-    p_aout->drain_async = WaveOutDrainAsync;
+    p_aout->drain = WaveOutDrainAsync;
 
     aout_sys_t *sys = p_aout->sys;
 
