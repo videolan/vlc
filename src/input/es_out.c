@@ -2088,7 +2088,7 @@ static char *EsOutCreateStrId( es_out_id_t *es, bool stable, const char *id,
     }
 
     if( !stable )
-        vlc_memstream_puts( &ms, "auto/" );
+        vlc_memstream_puts( &ms, "/auto" );
 
     vlc_memstream_printf( &ms, "/%d", es->fmt.i_id );
     ret = vlc_memstream_close( &ms );
