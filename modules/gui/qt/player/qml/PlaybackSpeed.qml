@@ -91,7 +91,7 @@ Popup {
                     width: speedSlider.visualPosition * parent.width
                     height: parent.height
                     radius: 2
-                    color: (speedSlider.activeFocus || speedSlider.pressed)
+                    color: (speedSlider.visualFocus || speedSlider.pressed)
                            ? root.colors.accent
                            : root.colors.text
                 }
@@ -103,7 +103,7 @@ Popup {
                 width: speedSlider.implicitHeight
                 height: speedSlider.implicitHeight
                 radius: speedSlider.implicitHeight
-                color: (speedSlider.activeFocus || speedSlider.pressed) ? root.colors.accent : root.colors.text
+                color: (speedSlider.visualFocus || speedSlider.pressed) ? root.colors.accent : root.colors.text
             }
 
             onValueChanged:  {
