@@ -212,6 +212,8 @@ struct decklink_sys_t
 
     /* !With LOCK */
 
+    vlc_timer_t drain_timer;
+
     /* single video module exclusive */
     struct
     {
@@ -818,6 +820,17 @@ static void CloseVideo(vout_display_t *vd)
  * Audio
  *****************************************************************************/
 
+static void DrainReset(audio_output_t *aout)
+{
+    decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
+
+    if (sys->drain_timer != NULL)
+    {
+        vlc_timer_destroy(sys->drain_timer);
+        sys->drain_timer = NULL;
+    }
+}
+
 static void Flush(audio_output_t *aout)
 {
     decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
@@ -827,8 +840,17 @@ static void Flush(audio_output_t *aout)
     if (!p_output)
         return;
 
+    DrainReset(aout);
+
     if (sys->p_output->FlushBufferedAudioSamples() == E_FAIL)
         msg_Err(aout, "Flush failed");
+}
+
+static void DrainTimerCb(void *data)
+{
+    audio_output_t *aout = (audio_output_t *) data;
+
+    aout_DrainedReport(aout);
 }
 
 static void Drain(audio_output_t *aout)
@@ -840,9 +862,28 @@ static void Drain(audio_output_t *aout)
     if (!p_output)
         return;
 
+    assert(sys->drain_timer == NULL);
+
     uint32_t samples;
     sys->p_output->GetBufferedAudioSampleFrameCount(&samples);
-    vlc_tick_sleep(vlc_tick_from_samples(samples, sys->i_rate));
+
+    if (samples == 0)
+    {
+        aout_DrainedReport(aout);
+        return;
+    }
+
+    /* Create and arm a timer to notify when drained */
+    int ret = vlc_timer_create(&sys->drain_timer, DrainTimerCb, aout);
+    if (ret != 0)
+    {
+        aout_DrainedReport(aout);
+        return;
+    }
+
+    vlc_timer_schedule(sys->drain_timer, false,
+                       vlc_tick_from_samples(samples, sys->i_rate),
+                       VLC_TIMER_FIRE_ONCE);
 }
 
 
@@ -910,15 +951,16 @@ static int OpenAudio(vlc_object_t *p_this)
     sys->i_rate = var_InheritInteger(aout, AUDIO_CFG_PREFIX "audio-rate");
     vlc_cond_signal(&sys->cond);
     vlc_mutex_unlock(&sys->lock);
+    sys->drain_timer = NULL;
 
     aout->play      = PlayAudio;
     aout->start     = Start;
     aout->flush     = Flush;
-    aout->drain     = Drain;
+    aout->drain_async = Drain;
     aout->time_get  = TimeGet;
 
     aout->pause     = aout_PauseDefault;
-    aout->stop      = NULL;
+    aout->stop      = DrainReset;
     aout->mute_set  = NULL;
     aout->volume_set= NULL;
 
