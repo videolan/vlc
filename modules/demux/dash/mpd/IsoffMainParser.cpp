@@ -446,6 +446,10 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
 
             parseAvailability<SegmentInformation>(mpd, segListNode, info);
 
+            uint64_t sequenceNumber = info->inheritStartNumber();
+            if(sequenceNumber == std::numeric_limits<uint64_t>::max())
+                sequenceNumber = 0;
+
             uint64_t nzStartTime = 0;
             std::vector<Node *>::const_iterator it;
             for(it = segments.begin(); it != segments.end(); ++it)
@@ -475,12 +479,12 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
                     nzStartTime += duration;
                 }
 
-                seg->setSequenceNumber(total);
+                seg->setSequenceNumber(sequenceNumber++);
 
                 list->addSegment(seg);
-                total++;
             }
 
+            total = list->getSegments().size();
             info->updateSegmentList(list, true);
         }
     }
