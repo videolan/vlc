@@ -1991,7 +1991,7 @@ vlc_module_begin ()
     //set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_VCODEC )
 
-    add_string( "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT )
+    add_string( "codec", "any", CODEC_TEXT, CODEC_LONGTEXT )
     add_bool( "hw-dec", true, HW_DEC_TEXT, HW_DEC_LONGTEXT )
     add_obsolete_string( "encoder" ) /* since 4.0.0 */
     add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)

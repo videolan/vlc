@@ -114,6 +114,9 @@ static inline module_t *module_need_var(vlc_object_t *obj, const char *cap,
                                         const char *varname)
 {
     char *list = var_InheritString(obj, varname);
+    if (unlikely(list == NULL))
+        return NULL;
+
     module_t *m = module_need(obj, cap, list, false);
 
     free(list);
