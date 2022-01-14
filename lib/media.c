@@ -839,7 +839,7 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
 }
 
 int
-libvlc_media_get_stat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
+libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
 {
     assert( p_md );
     assert( out );
@@ -853,8 +853,8 @@ libvlc_media_get_stat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
     const char *name;
     switch (type)
     {
-        case libvlc_media_stat_mtime:   name = "mtime"; break;
-        case libvlc_media_stat_size:    name = "size"; break;
+        case libvlc_media_filestat_mtime:   name = "mtime"; break;
+        case libvlc_media_filestat_size:    name = "size"; break;
         default:
             libvlc_printerr( "unknown libvlc_media_stat" );
             return -1;

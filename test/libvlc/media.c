@@ -242,13 +242,13 @@ static void subitem_added(const libvlc_event_t *event, void *user_data)
             uint64_t value;
             int ret;
 
-            ret = libvlc_media_get_stat(m, libvlc_media_stat_size, &value);
+            ret = libvlc_media_get_filestat(m, libvlc_media_filestat_size, &value);
             assert(ret == 1);
             /* All files size are 0, directory size depends on the FS. */
             if (libvlc_media_get_type(m) != libvlc_media_type_directory)
                 assert(value == 0);
 
-            ret = libvlc_media_get_stat(m, libvlc_media_stat_mtime, &value);
+            ret = libvlc_media_get_filestat(m, libvlc_media_filestat_mtime, &value);
             /* Epoch timestamp of the commit that added test/samples/subitems */
             assert(ret == 1 && value >= 1446796477);
         }

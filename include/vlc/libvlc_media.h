@@ -212,10 +212,10 @@ typedef struct libvlc_media_slave_t
 } libvlc_media_slave_t;
 
 /**
- * Type of stat that can be requested from libvlc_media_get_stat()
+ * Type of stat that can be requested from libvlc_media_get_filestat()
  */
-#define libvlc_media_stat_mtime 0
-#define libvlc_media_stat_size 1
+#define libvlc_media_filestat_mtime 0
+#define libvlc_media_filestat_size 1
 
 /**
  * Callback prototype to open a custom bitstream input media.
@@ -580,7 +580,7 @@ LIBVLC_API libvlc_time_t
  * \return 1 on success, 0 if not found, -1 on error.
  */
 LIBVLC_API int
-   libvlc_media_get_stat( libvlc_media_t *p_md, unsigned type, uint64_t *out );
+   libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out );
 
 /**
  * Parse the media asynchronously with options.
