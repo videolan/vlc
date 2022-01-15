@@ -840,7 +840,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (NSString *)name
 {
-    return NSTR(psz_name);
+    return toNSStr(psz_name);
 }
 
 - (int)intValue
