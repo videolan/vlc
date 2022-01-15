@@ -42,7 +42,6 @@
 # include <va/va_drm.h>
 #endif
 #include <libavcodec/avcodec.h>
-#include <libavcodec/vaapi.h>
 #include <libavutil/hwcontext_vaapi.h>
 
 #include "avcodec.h"

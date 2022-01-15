@@ -395,8 +395,10 @@ libvaapi_plugin_la_SOURCES = \
 libvaapi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libvaapi_plugin_la_LIBADD = $(LIBVA_LIBS) $(AVCODEC_LIBS)
-if HAVE_AVCODEC_VAAPI
+if HAVE_AVCODEC
+if HAVE_VAAPI
 codec_LTLIBRARIES += libvaapi_plugin.la
+endif
 endif
 
 libd3d9_common_la_SOURCES = video_chroma/d3d9_fmt.c video_chroma/d3d9_fmt.h \

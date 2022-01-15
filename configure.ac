@@ -2539,25 +2539,6 @@ AM_CONDITIONAL([HAVE_VAAPI_DRM], [test "${have_vaapi_drm}" = "yes"])
 AM_CONDITIONAL([HAVE_VAAPI_X11], [test "${have_vaapi_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_VAAPI_WL], [test "${have_vaapi_wl}" = "yes"])
 
-have_avcodec_vaapi="no"
-AS_IF([test "${have_vaapi}" = "yes" -a "${have_avcodec}" = "yes"], [
-  VLC_SAVE_FLAGS
-  CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
-  CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
-  AC_CHECK_HEADERS([libavcodec/vaapi.h], [
-    AC_MSG_NOTICE([VA API acceleration activated])
-    have_avcodec_vaapi="yes"
-  ],[
-    AS_IF([test -n "${enable_libva}"], [
-      AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])
-    ], [
-      AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])
-    ])
-  ])
-  VLC_RESTORE_FLAGS
-])
-AM_CONDITIONAL([HAVE_AVCODEC_VAAPI], [test "${have_avcodec_vaapi}" = "yes"])
-
 dnl
 dnl dxva2 needs avcodec
 dnl
