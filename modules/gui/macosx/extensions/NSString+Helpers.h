@@ -28,7 +28,12 @@
 #import <Cocoa/Cocoa.h>
 #import <vlc_input.h>
 
-#define _NS(s) ((s) ? toNSStr(vlc_gettext(s)) : @"")
+#define NSTR(s) ((s) ? toNSStr(vlc_gettext(s)) : @"")
+
+/**
+ * For marking translatable static strings (like `_()`)
+ */
+#define _NS(s) NSTR(s)
 
 /**
  * Get a contextualized translation string
