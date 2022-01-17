@@ -1,6 +1,6 @@
 # SMB2
-SMB2_VERSION := 08c1682f44b00fa694836703ed16ec74987f77d2
-SMB2_URL := https://github.com/sahlberg/libsmb2/archive/$(SMB2_VERSION).tar.gz
+SMB2_VERSION := 4.0.0
+SMB2_URL := https://github.com/sahlberg/libsmb2/archive/v$(SMB2_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
 ifndef HAVE_WIN32
