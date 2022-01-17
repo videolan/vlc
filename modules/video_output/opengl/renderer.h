@@ -32,6 +32,11 @@
 #include "interop.h"
 #include "sampler.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 struct pl_context;
 struct pl_shader;
 struct pl_shader_res;
@@ -106,5 +111,9 @@ vlc_gl_filter_open_fn vlc_gl_renderer_Open;
 int
 vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
                              const vlc_viewpoint_t *p_vp);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* include-guard */

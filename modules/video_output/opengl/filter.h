@@ -28,6 +28,11 @@
 
 struct vlc_gl_filter;
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 struct vlc_gl_tex_size {
     unsigned width;
     unsigned height;
@@ -144,5 +149,9 @@ struct vlc_gl_filter {
     const struct vlc_gl_filter_ops *ops;
     void *sys;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
