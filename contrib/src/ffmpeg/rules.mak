@@ -101,6 +101,11 @@ ifeq ($(ARCH),mips64el)
 FFMPEGCONF += --arch=mips64
 endif
 
+# RISC-V stuff
+ifneq ($(findstring $(ARCH),riscv32 riscv64),)
+FFMPEGCONF += --arch=riscv
+endif
+
 # x86 stuff
 ifeq ($(ARCH),i386)
 ifndef HAVE_DARWIN_OS
