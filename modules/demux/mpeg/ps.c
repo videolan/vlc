@@ -107,6 +107,7 @@ typedef struct
         MPEG_PS = 0,
         CDXA_PS,
         PSMF_PS,
+        IMKH_PS,
     } format;
 
     int         current_title;
@@ -153,6 +154,13 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         i_mux_rate = GetDWBE( &p_peek[96] );
         if( GetDWBE( &p_peek[86] ) > 0 )
             i_length = vlc_tick_from_samples( GetDWBE( &p_peek[92] ), GetDWBE( &p_peek[86] ));
+    }
+    else if( !memcmp( p_peek, "IMKH", 4 ) )
+    {
+        msg_Info( p_demux, "Detected Hikvision PVA header");
+        i_skip = 40;
+        format = IMKH_PS;
+        i_max_packets = 0;
     }
     else if( !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "CDXA", 4 ) )
     {
@@ -538,6 +546,16 @@ static int Demux( demux_t *p_demux )
                 if( !ps_track_fill( tk, &p_sys->psm, i_id,
                                     p_pkt->p_buffer, p_pkt->i_buffer, false ) )
                 {
+                    if( p_sys->format == IMKH_PS )
+                    {
+                        if( ps_id_to_type( &p_sys->psm , i_id ) == 0x91 )
+                        {
+                            tk->fmt.i_codec = VLC_CODEC_MULAW;
+                            tk->fmt.audio.i_channels = 1;
+                            tk->fmt.audio.i_rate = 8000;
+                        }
+                    }
+                    else
                     /* No PSM and no probing yet */
                     if( p_sys->format == PSMF_PS )
                     {
@@ -573,6 +591,7 @@ static int Demux( demux_t *p_demux )
             /* The popular VCD/SVCD subtitling WinSubMux does not
              * renumber the SCRs when merging subtitles into the PES */
             if( tk->b_seen && !p_sys->b_bad_scr &&
+                p_sys->format == MPEG_PS &&
                 ( tk->fmt.i_codec == VLC_CODEC_OGT ||
                   tk->fmt.i_codec == VLC_CODEC_CVD ) )
             {
@@ -625,6 +644,17 @@ static int Demux( demux_t *p_demux )
                     if( p_sys->i_first_scr == VLC_TICK_INVALID )
                         p_sys->i_first_scr = p_sys->i_scr;
                     es_out_SetPCR( p_demux->out, p_pkt->i_pts );
+                }
+
+                if( p_sys->format == IMKH_PS )
+                {
+                    /* Synchronization on NVR is always broken */
+                    if( llabs( p_pkt->i_dts - p_sys->i_scr ) > VLC_TICK_FROM_SEC(2) )
+                    {
+                        p_pkt->i_pts = p_pkt->i_pts - p_pkt->i_dts;
+                        p_pkt->i_dts = p_sys->i_scr;
+                        p_pkt->i_pts += p_sys->i_scr;
+                    }
                 }
 
                 if( tk->fmt.i_codec == VLC_CODEC_TELETEXT &&
