@@ -381,7 +381,7 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 ifdef HAVE_DARWIN_OS
 AUTORECONF = AUTOPOINT=true autoreconf
 else
-AUTORECONF = autoreconf
+AUTORECONF = GTKDOCIZE=true autoreconf
 endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
