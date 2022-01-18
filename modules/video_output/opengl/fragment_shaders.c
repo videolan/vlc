@@ -765,8 +765,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     }
 
 #ifdef HAVE_LIBPLACEBO
-    if (tc->pl_sh_res) {
-        const struct pl_shader_res *res = tc->pl_sh_res;
+    const struct pl_shader_res *res = tc->pl_sh_res;
+    if (res && res->input != PL_SHADER_SIG_NONE) {
         assert(res->input  == PL_SHADER_SIG_COLOR);
         assert(res->output == PL_SHADER_SIG_COLOR);
         ADDF(" result = %s(result);\n", res->name);
