@@ -536,7 +536,9 @@ int InitVideoDec( vlc_object_t *obj )
     i_thread_count = __MIN( i_thread_count, p_codec->id == AV_CODEC_ID_HEVC ? 32 : 16 );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
     p_context->thread_count = i_thread_count;
+#if LIBAVCODEC_VERSION_MAJOR < 60
     p_context->thread_safe_callbacks = true;
+#endif
 
     switch( p_codec->id )
     {
