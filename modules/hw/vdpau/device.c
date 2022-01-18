@@ -67,6 +67,8 @@ static int ScreenNumberOfWindow(Display *dpy, Window w)
 
 static int Open(vlc_decoder_device *device, vout_window_t *window)
 {
+    int errCode = VLC_EGENERIC;
+
     if (window == NULL || window->type != VOUT_WINDOW_TYPE_XID)
         return VLC_ENOTSUP;
     if (!vlc_xlib_init(VLC_OBJECT(device)))
@@ -98,8 +100,10 @@ static int Open(vlc_decoder_device *device, vout_window_t *window)
     {
         if (strstr(infos, "VAAPI") != NULL)
         {
-            Close(device);
-            return -EACCES;
+            vdp_device_destroy(vi->device.vdp, vi->device.device);
+            vdp_destroy_x11(vi->device.vdp);
+            errCode = -EACCES;
+            goto error;
         }
 
         msg_Info(device, "Using %s", infos);
@@ -114,7 +118,7 @@ static int Open(vlc_decoder_device *device, vout_window_t *window)
 error:
     XCloseDisplay(vi->display);
     free(vi);
-    return VLC_EGENERIC;
+    return errCode;
 }
 
 vlc_module_begin()
