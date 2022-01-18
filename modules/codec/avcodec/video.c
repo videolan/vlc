@@ -1620,7 +1620,7 @@ no_reuse:
 #endif
         AV_PIX_FMT_DXVA2_VLD,
 #endif
-        AV_PIX_FMT_VAAPI_VLD,
+        AV_PIX_FMT_VAAPI,
 #if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
         AV_PIX_FMT_VDPAU,
 #endif

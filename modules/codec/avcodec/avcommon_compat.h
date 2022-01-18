@@ -95,6 +95,16 @@
 #   define AV_PIX_FMT_FLAG_HWACCEL  PIX_FMT_HWACCEL
 #endif
 
+/*
+ * AV_PIX_FMT_VAAPI is not introduced in the same major version in libav and FFmpeg:
+ *  - libav:  lavu 55.8.0:    libav/d264c720f7b74286840719e506daba39f83b438b
+ *  - ffmpeg: lavu 54.31.100: ffmpeg/9f8e57efe4400ca86352277873792792279c3b15
+ */
+#if ( (LIBAVUTIL_VERSION_MICRO <  100 && LIBAVUTIL_VERSION_INT < AV_VERSION_INT( 55, 8, 0 ) ) || \
+      (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT < AV_VERSION_INT( 54, 31, 100 ) ) )
+#   define AV_PIX_FMT_VAAPI AV_PIX_FMT_VAAPI_VLD
+#endif
+
 #endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
 #if LIBAVUTIL_VERSION_MAJOR >= 55

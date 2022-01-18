@@ -37,7 +37,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
      * fatal, especially not if a software format. */
     switch (hwfmt)
     {
-        case AV_PIX_FMT_VAAPI_VLD:
+        case AV_PIX_FMT_VAAPI:
             switch (swfmt)
             {
                 case AV_PIX_FMT_YUVJ420P:
