@@ -1116,7 +1116,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
 
         /* Compute the PTS */
-#ifdef FF_API_PKT_PTS
+#if LIBAVCODEC_VERSION_CHECK(57, 24, 0, 61, 100)
         mtime_t i_pts = frame->pts;
 #else
         mtime_t i_pts = frame->pkt_pts;
