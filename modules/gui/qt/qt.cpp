@@ -792,6 +792,8 @@ static void *Thread( void *obj )
             msg_Err(p_intf, "unable to create main interface");
             delete p_intf->p_mi;
             p_intf->p_mi = nullptr;
+            //process deleteLater events as the main loop will never run
+            QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
             return ThreadCleanup( p_intf, CLEANUP_ERROR );
         }
 
