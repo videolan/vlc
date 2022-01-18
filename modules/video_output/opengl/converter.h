@@ -340,7 +340,6 @@ struct opengl_tex_converter_t
     bool yuv_color;
     GLfloat yuv_coefficients[16];
 
-    const struct pl_gpu *pl_gpu;
     struct pl_shader *pl_sh;
     const struct pl_shader_res *pl_sh_res;
 

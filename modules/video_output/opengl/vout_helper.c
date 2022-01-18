@@ -44,12 +44,6 @@
 #include "vout_helper.h"
 #include "internal.h"
 
-#if HAVE_LIBPLACEBO
-#if PL_API_VER >= 18
-#include <libplacebo/dummy.h>
-#endif
-#endif
-
 #ifndef GL_CLAMP_TO_EDGE
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
@@ -576,10 +570,6 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(tc->uloc.pl_vars);
-#if PL_API_VER >= 18
-    if (tc->pl_gpu)
-        pl_gpu_dummy_destroy(&tc->pl_gpu);
-#endif
     if (tc->pl_ctx)
         pl_context_destroy(&tc->pl_ctx);
 #endif
@@ -632,78 +622,14 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
     // create the main libplacebo context
     if (!subpics)
     {
-#if PL_API_VER >= 18
-        struct pl_gpu_dummy_params gpu_dummy_params = {
-            .caps = PL_GPU_CAP_INPUT_VARIABLES,
-            .glsl = (struct pl_glsl_desc) {
-#ifdef USE_OPENGL_ES2
-                .version = 100,
-                .gles = true,
-#else
-                .version = 120,
-#endif
-                .vulkan = false,
-            },
-            .limits = { 0 }
-        };
-#endif
-
-        const opengl_vtable_t *vt = tc->vt;
-
-#if PL_API_VER >= 18
-        vt->GetIntegerv(GL_MAX_TEXTURE_SIZE,
-                        (GLint *)&gpu_dummy_params.limits.max_tex_1d_dim);
-        gpu_dummy_params.limits.max_tex_2d_dim = gpu_dummy_params.limits.max_tex_1d_dim;
-#ifndef USE_OPENGL_ES2
-        vt->GetIntegerv(GL_MAX_3D_TEXTURE_SIZE,
-                        (GLint *)&gpu_dummy_params.limits.max_tex_3d_dim);
-        vt->GetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE,
-                        (GLint *)&gpu_dummy_params.limits.max_ubo_size);
-        vt->GetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE,
-                        (GLint *)&gpu_dummy_params.limits.max_ssbo_size);
-        vt->GetIntegerv(GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET_ARB,
-                        (GLint *)&gpu_dummy_params.limits.min_gather_offset);
-        vt->GetIntegerv(GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET_ARB,
-                        (GLint *)&gpu_dummy_params.limits.max_gather_offset);
-        vt->GetIntegerv(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE,
-                        (GLint *)&gpu_dummy_params.limits.max_shmem_size);
-        vt->GetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS,
-                        (GLint *)&gpu_dummy_params.limits.max_group_threads);
-        if (vt->GetIntegeri_v != NULL)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                vt->GetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, i,
-                                  (GLint *)&gpu_dummy_params.limits.max_dispatch[i]);
-                vt->GetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, i,
-                                  (GLint *)&gpu_dummy_params.limits.max_group_size[i]);
-            }
-        }
-#endif
-#endif
-
-        /* Drain potential errors, non-existing variables will be set to zero */
-        while (vt->GetError() != GL_NO_ERROR) {}
-
         tc->pl_ctx = pl_context_create(PL_API_VER, &(struct pl_context_params) {
             .log_cb    = log_cb,
             .log_priv  = tc,
             .log_level = PL_LOG_INFO,
         });
-
         if (tc->pl_ctx) {
-#if PL_API_VER >= 18
-            /* pl_gpu = NULL is not fatal but might generate incorrect shaders
-             * depending or more recent GLSL version than VLC shaders. */
-            tc->pl_gpu = pl_gpu_dummy_create(tc->pl_ctx, &gpu_dummy_params);
-
-            struct pl_shader_params shader_params = {
-                .gpu = tc->pl_gpu,
-            };
-#endif
-
 #   if PL_API_VER >= 20
-            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, &shader_params);
+            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
 #   elif PL_API_VER >= 6
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
 #   else
@@ -861,7 +787,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(GetError);
     GET_PROC_ADDR_CORE(GetIntegerv);
 #ifndef USE_OPENGL_ES2
-    GET_PROC_ADDR_OPTIONAL(GetIntegeri_v);
+    GET_PROC_ADDR_CORE(GetIntegeri_v);
 #endif
     GET_PROC_ADDR_CORE(GetString);
     GET_PROC_ADDR_CORE(PixelStorei);
