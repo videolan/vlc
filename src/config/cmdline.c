@@ -40,6 +40,94 @@
 
 #include <assert.h>
 
+#ifdef HAVE_DYNAMIC_PLUGINS
+#undef config_CmdLineEarlyScan
+/**
+ * Perform early scan of arguments for a small subset of simple options.
+ *
+ * Before proper full processing can be done, which requires full knowledge of
+ * all available options, we have a need to perform a preliminary check for a
+ * few options that affect plugin loading. This is because the full option set
+ * consists of a core subset plus various plugin subsets and we thus need to
+ * load plugin data to know the plugin subsets, but there are a few core options
+ * that actually affect loading of plugin data.
+ *
+ * Note that we want to be cautious about doing too much here. Firstly simply
+ * to avoid duplicating effort done later in the proper full processing step.
+ * Additionally though because fundamentally the very notion of a preliminary
+ * scan is problematic in terms of taking "correct" (or at least consistent)
+ * action in the face of certain use or misuse of options. Consider the fact
+ * that it is standard practice with option arguments that take a value, should
+ * a value not be provided within the same argument, to just consume the next
+ * argument as the option's value, no matter whether or not the next argument
+ * might "look" like an option itself (or an "early terminator"). Such is the
+ * behaviour of getopt. (It may perhaps seem wrong to do things that way, but
+ * that's how it works; it would alternatively be wrong for getopt in general to
+ * prevent options from taking values that just happen to resemble these things;
+ * and besides, bad consumption will only occur through bad option use which is
+ * fair to expect to cause incorrect results and in many cases ideally would be
+ * caught early by validation checks on option values anyway). So, a preliminary
+ * scan, by not knowing the full option set and not following the standard
+ * parsing rules (since it can't), naturally introduces risks of "incorrect" or
+ * "inconsistent" interpretation of the set of arguments, at least wrt. the
+ * later full/proper processing, and the more that we do, the more such
+ * incorrect/inconsistent processing scenarios we introduce. Furthermore
+ * consider the additional complication of short option "sets" (which is a short
+ * option argument involving multiple characters like `-abc`). In a short option
+ * set only the last option in the set (which is not necessarily its last
+ * character) can be one that takes a value, with any characters coming after it
+ * (if any) taken as its option value (if none then the next argument is
+ * consumed instead). In a preliminary scan where we do not know the full set of
+ * available short options, we can risk misinterpreting characters in short
+ * option sets as options when they are meant to be consumed as an option value.
+ * Thus it is very problematic to properly try to deal with an option like
+ * `--help`, which comes with the short option `-h` as well as `--no-help`, here
+ * in a preliminary scan, which is unfortunate because it might make a nice
+ * optimisation if we could.
+ *
+ * Considering this discussion, it is simply best that we keep option checks
+ * here to an absolute bare minimum of just the three plugin data related ones
+ * that we have no choice but to scan for early, and we must put up with a
+ * minimal amount of possible incorrect/inconsistent interpretation as
+ * unavoidable. (Though we could add some code after the full scan to determine
+ * whether or not the wrong action took place and issue a warning if so).
+ *
+ * @param p_this object to write command line options as variables to
+ * @param argc number of command line arguments
+ * @param argv command line arguments
+ */
+void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[] )
+{
+    for( int i = 0; i < argc; i++ )
+    {
+        const char *arg = argv[i];
+
+        /* Early terminator */
+        if( strcmp( arg, "--" ) == 0 )
+            break;
+
+#define check_option_variant(option, option_name, value) \
+    if( strcmp( arg, option ) == 0 ) \
+    { \
+        var_Create (p_this, option_name, VLC_VAR_BOOL); \
+        var_SetBool (p_this, option_name, value); \
+        continue; \
+    }
+#define check_option(option_name) \
+    check_option_variant("--"   option_name, option_name, true)  \
+    check_option_variant("--no-"option_name, option_name, false) \
+    check_option_variant("--no" option_name, option_name, false)
+
+        check_option("plugins-cache")
+        check_option("plugins-scan")
+        check_option("reset-plugins-cache")
+
+#undef check_option
+#undef check_option_variant
+    }
+}
+#endif
+
 #undef config_LoadCmdLine
 /**
  * Parse command line for configuration options.
@@ -51,9 +139,8 @@
  *
  * @param p_this object to write command line options as variables to
  * @param i_argc number of command line arguments
- * @param ppsz_args commandl ine arguments [IN/OUT]
- * @param pindex NULL to ignore unknown options,
- *               otherwise index of the first non-option argument [OUT]
+ * @param ppsz_args command line arguments [IN/OUT]
+ * @param pindex index of the first non-option argument [OUT]
  * @return 0 on success, -1 on error.
  */
 int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
@@ -61,8 +148,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     struct vlc_option *p_longopts;
-    const char **argv_copy = NULL;
-#define b_ignore_errors (pindex == NULL)
 
     /* Short options */
     i_shortopts = 0;
@@ -89,22 +174,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     {
         free( p_longopts );
         return -1;
-    }
-
-    /* If we are requested to ignore errors, then we must work on a copy
-     * of the ppsz_argv array, otherwise getopt_long will reorder it for
-     * us, ignoring the arity of the options */
-    if( b_ignore_errors )
-    {
-        argv_copy = vlc_alloc( i_argc, sizeof(char *) );
-        if( argv_copy == NULL )
-        {
-            free( psz_shortopts );
-            free( p_longopts );
-            return -1;
-        }
-        memcpy( argv_copy, ppsz_argv, i_argc * sizeof(char *) );
-        ppsz_argv = argv_copy;
     }
 
     /* Indicate that we want to know the difference between unknown option and
@@ -215,12 +284,11 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 /* Check if the option is deprecated */
                 if (param->obsolete)
                 {
-                    if( !b_ignore_errors )
-                        fprintf(stderr,
-                                _( "%sWarning:%s Option --%s no longer exists.\n" ),
-                                color ? TS_YELLOW_BOLD : "",
-                                color ? TS_RESET : "",
-                                psz_full_name);
+                    fprintf(stderr,
+                            _( "%sWarning:%s Option --%s no longer exists.\n" ),
+                            color ? TS_YELLOW_BOLD : "",
+                            color ? TS_RESET : "",
+                            psz_full_name);
                     continue;
                 }
 
@@ -291,7 +359,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         }
 
         /* Internal error: unknown option or missing option value */
-        if( !b_ignore_errors )
         {
             char *optlabel;
             if ( (state.opt && asprintf(&optlabel, "%s-%c%s",
@@ -352,7 +419,5 @@ out:
         free( (char *)p_longopts[i_index].name );
     free( p_longopts );
     free( psz_shortopts );
-    free( argv_copy );
     return ret;
 }
-
