@@ -86,7 +86,12 @@ static int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
  *****************************************************************************/
 int avformat_OpenMux( vlc_object_t *p_this )
 {
+#if LIBAVFORMAT_VERSION_MICRO >= 100 && \
+    LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+    const AVOutputFormat *file_oformat;
+#else
     AVOutputFormat *file_oformat;
+#endif
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     bool dummy = !strcmp( p_mux->p_access->psz_access, "dummy");
 
