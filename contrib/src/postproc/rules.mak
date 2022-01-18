@@ -50,6 +50,11 @@ ifeq ($(ARCH),mips64el)
 POSTPROCCONF += --arch=mips64
 endif
 
+# RISC-V stuff
+ifneq ($(findstring $(ARCH),riscv32 riscv64),)
+POSTPROCCONF += --arch=riscv
+endif
+
 # x86 stuff
 ifeq ($(ARCH),i386)
 POSTPROCCONF += --arch=x86
