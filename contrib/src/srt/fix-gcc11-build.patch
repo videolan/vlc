@@ -1,0 +1,22 @@
+From f1b35cbf5b9b42b031e9b119e4c802b5f744468c Mon Sep 17 00:00:00 2001
+From: Christophe Giboudeaux <krop@users.noreply.github.com>
+Date: Wed, 10 Feb 2021 12:42:45 +0000
+Subject: [PATCH] [core] Fix build with GCC 11. (#1806)
+
+The 'limits' header must be included explicitly.
+---
+ srtcore/sync.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/srtcore/sync.h b/srtcore/sync.h
+index 59c125a75..9f01ca91e 100644
+--- a/srtcore/sync.h
++++ b/srtcore/sync.h
+@@ -15,6 +15,7 @@
+ //#define ENABLE_CXX17
+ 
+ #include <cstdlib>
++#include <limits>
+ #ifdef ENABLE_STDCXX_SYNC
+ #include <chrono>
+ #include <thread>
