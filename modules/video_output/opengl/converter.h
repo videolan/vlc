@@ -167,9 +167,6 @@ typedef struct {
     PFNGLGENTEXTURESPROC    GenTextures;
     PFNGLGETERRORPROC       GetError;
     PFNGLGETINTEGERVPROC    GetIntegerv;
-#ifndef USE_OPENGL_ES2
-    PFNGLGETINTEGERIVPROC   GetIntegeri_v;
-#endif
     PFNGLGETSTRINGPROC      GetString;
     PFNGLPIXELSTOREIPROC    PixelStorei;
     PFNGLTEXIMAGE2DPROC     TexImage2D;
