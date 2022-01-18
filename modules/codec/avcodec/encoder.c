@@ -60,6 +60,13 @@
 
 #define RAW_AUDIO_FRAME_SIZE (2048)
 
+#if LIBAVCODEC_VERSION_MICRO >= 100 && \
+    LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+# define AVC_MAYBE_CONST const
+#else
+# define AVC_MAYBE_CONST
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -93,7 +100,7 @@ struct encoder_sys_t
     /*
      * libavcodec properties
      */
-    AVCodec         *p_codec;
+    AVC_MAYBE_CONST AVCodec *p_codec;
     AVCodecContext  *p_context;
 
     /*
@@ -234,7 +241,7 @@ static const int DEFAULT_ALIGN = 0;
 /*****************************************************************************
  * InitVideoEnc: probe the encoder
  *****************************************************************************/
-static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context, AVCodec *p_codec )
+static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context, AVC_MAYBE_CONST AVCodec *p_codec )
 {
     /* if we don't have i_frame_rate_base, we are probing and just checking if we can find codec
      * so set fps to requested fps if asked by user or input fps is availabled */
@@ -296,7 +303,7 @@ int InitVideoEnc( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     AVCodecContext *p_context;
-    AVCodec *p_codec = NULL;
+    AVC_MAYBE_CONST AVCodec *p_codec = NULL;
     unsigned i_codec_id;
     const char *psz_namecodec;
     float f_val;
