@@ -14,6 +14,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
+	$(APPLY) $(SRC)/ebml/missing-limits-include.patch
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake
