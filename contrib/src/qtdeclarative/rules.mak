@@ -21,6 +21,7 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
+	$(APPLY) $(SRC)/qtdeclarative/fix-gcc11-build.patch
 	$(MOVE)
 
 QT_DECLARATIVE_CONFIG := \
