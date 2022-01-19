@@ -400,6 +400,7 @@ meson: meson-$(MESON_VERSION).tar.gz
 	$(MOVE)
 
 .buildmeson: meson
+	mkdir -p $(PREFIX)/bin
 	printf "#!/bin/sh\n\npython3 $(abspath .)/meson/meson.py \"\$$@\"\n" > $(PREFIX)/bin/meson
 	chmod +x $(PREFIX)/bin/meson
 	touch $@
