@@ -1,0 +1,30 @@
+From 38c155bd1edc9773fea287fcc80659f25d1b21eb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Wed, 19 Jan 2022 11:53:02 +0100
+Subject: [PATCH] meson: Enable big objects support when building for windows
+
+Fix cross compilation when targetting win64
+---
+ meson.build | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 41344b3a3..8fb68f296 100644
+--- a/meson.build
++++ b/meson.build
+@@ -57,6 +57,12 @@ if host_machine.cpu_family() == 'arm' and cpp.alignment('struct { char c; }') !=
+   endif
+ endif
+ 
++if host_machine.system() == 'windows'
++  add_project_arguments(cpp.get_supported_arguments([
++    '-Wa,-mbig-obj'
++  ]), language : 'cpp')
++endif
++
+ check_headers = [
+   ['unistd.h'],
+   ['sys/mman.h'],
+-- 
+2.34.1
+
