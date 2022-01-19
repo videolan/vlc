@@ -71,7 +71,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
 
     /* Create base cat/subcat tree from core config set */
     unsigned confsize;
-    module_t *p_module = module_get_main();
+    module_t *p_module = main_module;
     module_config_t *const p_config = module_config_get (p_module, &confsize);
     for( size_t i = 0; i < confsize; i++ )
     {
@@ -465,16 +465,7 @@ bool PrefsTreeItem::contains( const QString &text, Qt::CaseSensitivity cs )
 {
     bool is_core = this->node_type != PrefsTreeItem::PLUGIN_NODE;
     enum vlc_config_subcat id = this->subcat_id;
-
-    /* find our module */
-    module_t *p_module;
-    if( !is_core )
-        p_module = this->p_module;
-    else
-    {
-        p_module = module_get_main();
-        assert( p_module );
-    }
+    module_t *p_module = this->p_module;
 
     /* check the node itself (its name/longname/helptext) */
 
