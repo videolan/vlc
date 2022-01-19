@@ -550,6 +550,9 @@ help:
 .PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt
 
 CMAKE_SYSTEM_NAME =
+ifdef HAVE_LINUX
+CMAKE_SYSTEM_NAME = Linux
+endif
 ifdef HAVE_WIN32
 CMAKE_SYSTEM_NAME = Windows
 ifdef HAVE_VISUALSTUDIO
