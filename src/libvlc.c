@@ -165,6 +165,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     module_LoadPlugins (p_libvlc);
 
     /*
+     * Fully process command line settings.
+     * Results are stored as runtime state within `p_libvlc` object variables.
+     */
+    int vlc_optind;
+    if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
+        goto error;
+
+    /*
      * Load saved settings into the config system, as applicable.
      */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
@@ -174,14 +182,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         else
             config_LoadConfigFile( p_libvlc );
     }
-
-    /*
-     * Fully process command line settings.
-     * Results are stored as runtime state within `p_libvlc` object variables.
-     */
-    int vlc_optind;
-    if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
-        goto error;
 
     vlc_LogInit(p_libvlc);
     vlc_tracer_Init(p_libvlc);
