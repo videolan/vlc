@@ -26,10 +26,10 @@ FXC2_DLL=dll/d3dcompiler_47.dll
 else ifeq ($(ARCH),i386)
 FXC2_CXX=$(CXX)
 FXC2_DLL=dll/d3dcompiler_47_32.dll
-else ifeq ($(shell which x86_64-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(shell command -v x86_64-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
 FXC2_CXX=x86_64-w64-mingw32-g++
 FXC2_DLL=dll/d3dcompiler_47.dll
-else ifeq ($(shell which i686-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(shell command -v i686-w64-mingw32-g++ >/dev/null 2>&1 || echo FAIL),)
 FXC2_CXX=i686-w64-mingw32-g++
 FXC2_DLL=dll/d3dcompiler_47_32.dll
 else
