@@ -14,20 +14,20 @@ $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.xz:
 
 harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(UNPACK)
-	$(APPLY) $(SRC)/harfbuzz/0002-Update-the-bundled-ax_pthread.m4.patch
+	$(APPLY) $(SRC)/harfbuzz/0001-meson-Enable-big-objects-support-when-building-for-w.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
-HARFBUZZ_CONF := --with-freetype \
-	--without-glib
+HARFBUZZ_CONF := -Dfreetype=enabled \
+	-Dglib=disabled
 
 ifdef HAVE_DARWIN_OS
-HARFBUZZ_CONF += --with-coretext
+HARFBUZZ_CONF += -Dcoretext=enabled
 endif
 
-.harfbuzz: harfbuzz
-	$(RECONF)
-	cd $< && $(HOSTVARS_PIC) ./configure $(HOSTCONF) $(HARFBUZZ_CONF) ICU_CONFIG=false
-	cd $< && $(MAKE) install
+.harfbuzz: harfbuzz crossfile.meson
+	cd $< && rm -rf ./build
+	cd $< && $(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF) build
+	cd $< && cd build && ninja install
 	touch $@
