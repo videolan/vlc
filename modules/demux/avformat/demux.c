@@ -52,6 +52,13 @@
 
 # define HAVE_AVUTIL_CODEC_ATTACHMENT 1
 
+#if LIBAVFORMAT_VERSION_MICRO >= 100 && \
+    LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+# define AVF_MAYBE_CONST const
+#else
+# define AVF_MAYBE_CONST
+#endif
+
 struct avformat_track_s
 {
     es_out_id_t *p_es;
@@ -63,7 +70,7 @@ struct avformat_track_s
  *****************************************************************************/
 struct demux_sys_t
 {
-    AVInputFormat  *fmt;
+    AVF_MAYBE_CONST AVInputFormat  *fmt;
     AVFormatContext *ic;
 
     struct avformat_track_s *tracks;
@@ -154,7 +161,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     demux_t       *p_demux = (demux_t*)p_this;
     demux_sys_t   *p_sys;
     AVProbeData   pd = { };
-    AVInputFormat *fmt = NULL;
+    AVF_MAYBE_CONST AVInputFormat *fmt = NULL;
     int64_t       i_start_time = -1;
     bool          b_can_seek;
     char         *psz_url;
