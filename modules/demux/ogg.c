@@ -1076,6 +1076,8 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
             if( p_block->i_dts < VLC_TICK_0 )
                 p_block->i_dts = VLC_TICK_0;
             date_Increment( &d, p_block->i_nb_samples );
+            if( p_stream->fmt.i_cat == AUDIO_ES )
+                p_block->i_pts = p_block->i_dts;
         }
     } /* else can't do anything, no timestamped blocks in stream */
 
