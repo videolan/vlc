@@ -20,7 +20,10 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
 HARFBUZZ_CONF := -Dfreetype=enabled \
-	-Dglib=disabled
+	-Dglib=disabled \
+	-Dgobject=disabled \
+	-Ddocs=disabled \
+	-Dtests=disabled
 
 ifdef HAVE_DARWIN_OS
 HARFBUZZ_CONF += -Dcoretext=enabled
