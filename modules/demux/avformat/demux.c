@@ -820,7 +820,11 @@ static int Demux( demux_t *p_demux )
     }
 
     // handle extra data change, this can happen for FLV
+#if LIBAVUTIL_VERSION_MAJOR < 57
     int side_data_size;
+#else
+    size_t side_data_size;
+#endif
     uint8_t *side_data = av_packet_get_side_data( &pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_data_size );
     if( side_data_size > 0 ) {
         // ignore new extradata which is the same as previous version
