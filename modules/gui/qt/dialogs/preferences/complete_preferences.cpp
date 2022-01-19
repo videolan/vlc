@@ -295,11 +295,14 @@ void PrefsTree::applyAll()
                      i_module++ )
             {
                 PrefsTreeItem *mod_item = subcat_item->child( i_module );
-                mod_item->panel->apply();
+                if( mod_item->panel )
+                    mod_item->panel->apply();
             }
-            subcat_item->panel->apply();
+            if( subcat_item->panel )
+                subcat_item->panel->apply();
         }
-        cat_item->panel->apply();
+        if( cat_item->panel )
+            cat_item->panel->apply();
     }
 }
 
