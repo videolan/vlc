@@ -7,7 +7,7 @@ ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
 PKGS_FOUND += protobuf
 else
 # check we have a matching protoc to use
-PROTOC_ABSPATH = $(shell PATH="$(PATH)" which protoc)
+PROTOC_ABSPATH = $(shell PATH="$(PATH)" command -v protoc)
 ifeq ($(PROTOC_ABSPATH),)
 PROTOC = $(error protoc not found (search path: $(PATH)))
 else

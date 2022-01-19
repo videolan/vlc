@@ -258,7 +258,7 @@ download = (rm -f $@.tmp && \
 	wget --passive -c -p -O $@.tmp "$(1)" && \
 	touch $@.tmp && \
 	mv $@.tmp $@ )
-else ifeq ($(which fetch >/dev/null 2>&1 || echo FAIL),)
+else ifeq ($(command -v fetch >/dev/null 2>&1 || echo FAIL),)
 download = (rm -f $@.tmp && \
 	fetch -p -o $@.tmp "$(1)" && \
 	touch $@.tmp && \
@@ -270,7 +270,7 @@ endif
 download_pkg = $(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
 	( $(call download,$(1)) && echo "Please upload this package $(lastword $(subst /, ,$(@))) to our FTP" )
 
-ifeq ($(shell which xz >/dev/null 2>&1 || echo FAIL),)
+ifeq ($(shell command -v xz >/dev/null 2>&1 || echo FAIL),)
 XZ = xz
 else
 XZ ?= $(error XZ (LZMA) compressor not found)
