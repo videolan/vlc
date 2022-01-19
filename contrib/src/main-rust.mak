@@ -33,7 +33,11 @@ else ifdef HAVE_LINUX
 ifeq ($(HOST),arm-linux-gnueabihf)
 RUST_TARGET = arm-unknown-linux-gnueabihf #add eabihf
 else
+ifeq ($(HOST),riscv64-linux-gnu)
+RUST_TARGET = riscv64gc-unknown-linux-gnu
+else
 RUST_TARGET = $(ARCH)-unknown-linux-gnu
+endif
 endif
 else ifdef HAVE_BSD
 RUST_TARGET = $(HOST)
