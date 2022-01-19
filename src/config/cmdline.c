@@ -215,11 +215,12 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 /* Check if the option is deprecated */
                 if (param->obsolete)
                 {
-                    fprintf(stderr,
-                            _( "%sWarning:%s Option --%s no longer exists.\n" ),
-                            color ? TS_YELLOW_BOLD : "",
-                            color ? TS_RESET : "",
-                            psz_full_name);
+                    if( !b_ignore_errors )
+                        fprintf(stderr,
+                                _( "%sWarning:%s Option --%s no longer exists.\n" ),
+                                color ? TS_YELLOW_BOLD : "",
+                                color ? TS_RESET : "",
+                                psz_full_name);
                     continue;
                 }
 
