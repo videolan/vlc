@@ -550,6 +550,9 @@ help:
 .PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt
 
 CMAKE_SYSTEM_NAME =
+ifdef HAVE_CROSS_COMPILE
+CMAKE_SYSTEM_NAME = $(error CMAKE_SYSTEM_NAME required for cross-compilation)
+endif
 ifdef HAVE_LINUX
 CMAKE_SYSTEM_NAME = Linux
 endif
