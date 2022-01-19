@@ -9,21 +9,6 @@ ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
 PKGS_FOUND += protobuf
 endif
 
-# check we have a matching protoc to use
-PROTOC_ABSPATH = $(shell PATH="$(PATH)" command -v protoc)
-ifeq ($(PROTOC_ABSPATH),)
-PROTOC = $(error protoc not found (search path: $(PATH)))
-else
-# make sure the installed protoc is compatible with the version we want to build
-SYS_PROTOC_VER = $(shell $(PROTOC_ABSPATH) --version)
-SYS_PROTOC_VERSION = $(word $(words $(SYS_PROTOC_VER)) , $(SYS_PROTOC_VER))
-ifneq ($(PROTOBUF_VERSION),$(SYS_PROTOC_VERSION))
-PROTOC = $(error protoc system version $(SYS_PROTOC_VERSION) and required version $(PROTOBUF_VERSION) do not match)
-else
-PROTOC = $(PROTOC_ABSPATH)
-endif
-endif
-
 $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
 	$(call download_pkg,$(PROTOBUF_URL),protobuf)
 
