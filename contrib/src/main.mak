@@ -433,7 +433,7 @@ ifdef HAVE_CROSS_COMPILE
 # generated crossfile, so everything should work as
 # expected.
 MESONFLAGS += --cross-file $(abspath crossfile.meson)
-MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBDIR)" \
+MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" \
 	PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
 	meson -Dpkg_config_libdir="$(PKG_CONFIG_LIBDIR)" \
 	-Dpkg_config_path="$(PKG_CONFIG_PATH)" \
