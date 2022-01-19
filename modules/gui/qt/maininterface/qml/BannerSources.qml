@@ -80,6 +80,14 @@ FocusScope {
         anchors.fill: parent
     }
 
+
+    MouseArea {
+        // don't tranfer mouse to underlying components (#26274)
+        anchors.fill: parent
+        hoverEnabled: true
+        preventStealing: true
+    }
+
     Item {
         id: pLBannerSources
 
