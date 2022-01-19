@@ -359,55 +359,53 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         }
 
         /* Internal error: unknown option or missing option value */
+        char *optlabel;
+        if ( (state.opt && asprintf(&optlabel, "%s-%c%s",
+                                    color ? TS_YELLOW : "", state.opt,
+                                    color ? TS_RESET : "") < 0)
+          || (!state.opt && asprintf(&optlabel, "%s%s%s",
+                                     color ? TS_YELLOW : "", ppsz_argv[state.ind-1],
+                                     color ? TS_RESET : "") < 0) )
         {
-            char *optlabel;
-            if ( (state.opt && asprintf(&optlabel, "%s-%c%s",
-                                        color ? TS_YELLOW : "", state.opt,
-                                        color ? TS_RESET : "") < 0)
-              || (!state.opt && asprintf(&optlabel, "%s%s%s",
-                                         color ? TS_YELLOW : "", ppsz_argv[state.ind-1],
-                                         color ? TS_RESET : "") < 0) )
-            {
-                /* just ignore failure - unlikely and not worth trying to handle in some way */
-                optlabel = NULL;
-            }
+            /* just ignore failure - unlikely and not worth trying to handle in some way */
+            optlabel = NULL;
+        }
 
-            fprintf( stderr, _( "%sError:%s " ), color ? TS_RED_BOLD : "", color ? TS_RESET : "");
-            if (i_cmd == ':')
-            {
-                fprintf( stderr, _( "Missing mandatory value for option %s\n" ), optlabel );
-            }
-            else
-            {
-                fprintf( stderr, _( "Unknown option `%s'\n" ), optlabel );
+        fprintf( stderr, _( "%sError:%s " ), color ? TS_RED_BOLD : "", color ? TS_RESET : "");
+        if (i_cmd == ':')
+        {
+            fprintf( stderr, _( "Missing mandatory value for option %s\n" ), optlabel );
+        }
+        else
+        {
+            fprintf( stderr, _( "Unknown option `%s'\n" ), optlabel );
 
-                /* suggestion matching */
-                if( !state.opt )
-                {
-                    float jw_filter = 0.8, best_metric = jw_filter, metric;
-                    const char *best = NULL;
-                    const char *jw_a = ppsz_argv[state.ind-1] + 2;
-                    for (size_t i = 0; i < (size_t)i_opts; i++) {
-                        if (p_longopts[i].is_obsolete)
-                            continue;
-                        const char *jw_b = p_longopts[i].name;
-                        if (vlc_jaro_winkler(jw_a, jw_b, &metric) == 0) { //ignore failed malloc calls
-                            if (metric > best_metric || (!best && metric >= jw_filter)) {
-                                best = jw_b;
-                                best_metric = metric;
-                            }
+            /* suggestion matching */
+            if( !state.opt )
+            {
+                float jw_filter = 0.8, best_metric = jw_filter, metric;
+                const char *best = NULL;
+                const char *jw_a = ppsz_argv[state.ind-1] + 2;
+                for (size_t i = 0; i < (size_t)i_opts; i++) {
+                    if (p_longopts[i].is_obsolete)
+                        continue;
+                    const char *jw_b = p_longopts[i].name;
+                    if (vlc_jaro_winkler(jw_a, jw_b, &metric) == 0) { //ignore failed malloc calls
+                        if (metric > best_metric || (!best && metric >= jw_filter)) {
+                            best = jw_b;
+                            best_metric = metric;
                         }
                     }
-                    if (best)
-                        fprintf( stderr, _( "       Did you mean %s--%s%s?\n" ),
-                                 color ? TS_GREEN : "", best, color ? TS_RESET : "" );
                 }
+                if (best)
+                    fprintf( stderr, _( "       Did you mean %s--%s%s?\n" ),
+                             color ? TS_GREEN : "", best, color ? TS_RESET : "" );
             }
-            fprintf( stderr, _( "For more information try %s--help%s\n" ),
-                     color ? TS_GREEN : "", color ? TS_RESET : "" );
-            free( optlabel );
-            goto out;
         }
+        fprintf( stderr, _( "For more information try %s--help%s\n" ),
+                 color ? TS_GREEN : "", color ? TS_RESET : "" );
+        free( optlabel );
+        goto out;
     }
 
     ret = 0;
