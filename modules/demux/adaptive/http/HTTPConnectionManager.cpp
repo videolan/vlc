@@ -54,7 +54,7 @@ void AbstractConnectionManager::updateDownloadRate(const adaptive::ID &sourceid,
     {
         BwDebug(msg_Dbg(p_object,
                 "%" PRId64 "Kbps downloaded %zuKBytes in %" PRId64 "ms latency %" PRId64 "ms [%s]",
-                1000 * size * 8 / (time ? time : 1), size / 1024, MS_FROM_VLC_TICK(time),
+                1000 * size * 8 / (time ? time : 1), size / 1024, time / 1000,
                 latency / 1000, sourceid.str().c_str()));
         rateObserver->updateDownloadRate(sourceid, size, time, latency);
     }
