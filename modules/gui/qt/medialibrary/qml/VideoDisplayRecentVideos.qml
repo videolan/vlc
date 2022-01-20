@@ -34,9 +34,9 @@ FocusScope {
 
     property Item focusItem: listView
 
-    property int currentIndex: -1
+    property alias currentIndex: listView.currentIndex
 
-    property var model: undefined
+    property alias model: listView.model
 
     // Properties
 
@@ -48,10 +48,6 @@ FocusScope {
 
     // Events
 
-    onCurrentIndexChanged: {
-        recentVideoListView.currentIndex = _currentIndex
-    }
-
     onFocusChanged: {
         if (activeFocus && root.currentIndex === -1 && root.model.count > 0)
             root.currentIndex = 0
@@ -60,20 +56,15 @@ FocusScope {
     // Functions
 
     function setCurrentItemFocus(reason) {
-        listView.setCurrentItemFocus(reason);
+        listView.setCurrentItemFocus(reason)
     }
 
-    function _actionAtIndex(index, model, selectionModel) {
+    function _actionAtIndex(index) {
         g_mainDisplay.showPlayer()
-        MediaLib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ), [":restore-playback-pos=2"] )
+        MediaLib.addAndPlay( model.getIdForIndexes(index), [":restore-playback-pos=2"] )
     }
 
     // Childs
-
-    Util.SelectableDelegateModel {
-        id: recentVideoSelection
-        model: root.model
-    }
 
     VideoContextMenu {
         id: contextMenu
@@ -122,8 +113,6 @@ FocusScope {
 
             focus: true
 
-            model: root.model
-
             fadeColor: VLCStyle.colors.bg
 
             Navigation.parentItem: root
@@ -141,6 +130,8 @@ FocusScope {
                 pictureWidth: VLCStyle.gridCover_video_width
                 pictureHeight: VLCStyle.gridCover_video_height
 
+                selected: activeFocus
+
                 focus: true
 
                 unselectedUnderlay: shadows.unselected
@@ -149,9 +140,8 @@ FocusScope {
                 onItemDoubleClicked: gridItem.play()
 
                 onItemClicked: {
-                    recentVideoSelection.updateSelection( modifier , root.model.currentIndex, index )
                     listView.currentIndex = index
-                    listView.forceActiveFocus()
+                    this.forceActiveFocus(Qt.MouseFocusReason)
                 }
 
                 // NOTE: contextMenu.popup wants a list of indexes.
@@ -159,12 +149,6 @@ FocusScope {
                     contextMenu.popup([root.model.index(index, 0)],
                                       globalMousePos,
                                       { "player-options": [":restore-playback-pos=2"] })
-                }
-
-                Connections {
-                    target: recentVideoSelection
-
-                    onSelectionChanged: selected = recentVideoSelection.isSelected(root.model.index(index, 0))
                 }
 
                 Behavior on opacity {
@@ -185,10 +169,7 @@ FocusScope {
                 width: VLCStyle.margin_normal
             }
 
-            onActionAtIndex: {
-                g_mainDisplay.showPlayer()
-                MediaLib.addAndPlay( model.getIdsForIndexes( recentVideoSelection.selectedIndexes ), [":restore-playback-pos=2"] )
-            }
+            onActionAtIndex: root._actionAtIndex(index)
 
             Widgets.GridShadows {
                 id: shadows
