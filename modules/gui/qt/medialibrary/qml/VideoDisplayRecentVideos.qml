@@ -151,6 +151,20 @@ FocusScope {
                                       { "player-options": [":restore-playback-pos=2"] })
                 }
 
+                dragItem: Widgets.DragItem {
+                    coverRole: "thumbnail"
+
+                    indexes: [index]
+
+                    onRequestData: {
+                        setData(identifier, [model])
+                    }
+
+                    function getSelectedInputItem(cb) {
+                        return MediaLib.mlInputItem([model.id], cb)
+                    }
+                }
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: VLCStyle.duration_faster
