@@ -445,9 +445,13 @@ static int Open( vlc_object_t *p_this )
 
     /* We handle description of an extra PMT */
     char* psz_string = var_CreateGetString( p_demux, "ts-extra-pmt" );
-    p_sys->b_user_pmt = false;
-    if( psz_string && *psz_string )
-        UserPmt( p_demux, psz_string );
+    const char* psz_fmt = psz_string;
+    if( psz_fmt && !strncmp(psz_fmt, "temp:", 5) )
+        psz_fmt += 5;
+    if( psz_fmt && *psz_fmt && UserPmt( p_demux, psz_fmt ) == VLC_SUCCESS )
+        p_sys->program_source = (psz_fmt == psz_string) ? USER_PMT : USER_TEMPPMT;
+    else
+        p_sys->program_source = STREAM_PATPMT;
     free( psz_string );
 
     psz_string = var_CreateGetStringCommand( p_demux, "ts-csa-ck" );

@@ -85,7 +85,12 @@ struct demux_sys_t
     /* All pid */
     ts_pid_list_t pids;
 
-    bool        b_user_pmt;
+    enum
+    {
+        STREAM_PATPMT,
+        USER_PMT,
+        USER_TEMPPMT,
+    } program_source;
     int         i_pmt_es;
 
     enum

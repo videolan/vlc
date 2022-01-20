@@ -102,8 +102,9 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     }
 
     /* override hotfixes */
-    if( p_pat->b_generated )
+    if( p_pat->b_generated || p_sys->program_source == USER_TEMPPMT )
     {
+        p_sys->program_source = STREAM_PATPMT;
         p_pat->b_generated = false;
         p_pat->i_version = -1;
         p_pat->i_ts_id = -1;
@@ -112,15 +113,15 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
 
     /* check versioning changes */
     if( ( p_pat->i_version != -1 && p_dvbpsipat->i_version == p_pat->i_version ) ||
-        ( p_pat->i_ts_id != -1 && p_dvbpsipat->i_ts_id != p_pat->i_ts_id ) )
+        ( p_pat->i_ts_id != -1 && p_dvbpsipat->i_ts_id != p_pat->i_ts_id ) ||
+        p_sys->program_source == USER_PMT )
     {
         dvbpsi_pat_delete( p_dvbpsipat );
         return;
     }
 
     /* check content */
-    if( !p_dvbpsipat->b_current_next || p_sys->b_user_pmt ||
-        PATCheck( p_demux, p_dvbpsipat ) )
+    if( !p_dvbpsipat->b_current_next || PATCheck( p_demux, p_dvbpsipat ) )
     {
         dvbpsi_pat_delete( p_dvbpsipat );
         return;
@@ -2345,7 +2346,6 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
         psz = psz_next;
     }
 
-    p_sys->b_user_pmt = true;
     free( psz_dup );
     return VLC_SUCCESS;
 
