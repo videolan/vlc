@@ -1,13 +1,14 @@
 # Makefile for PO directory in any package using GNU gettext.
-# Copyright (C) 1995-1997, 2000-2007, 2009-2010 by Ulrich Drepper <drepper@gnu.ai.mit.edu>
+# Copyright (C) 1995-2000 Ulrich Drepper <drepper@gnu.ai.mit.edu>
+# Copyright (C) 2000-2020 Free Software Foundation, Inc.
 #
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
 # notice and this notice are preserved.  This file is offered as-is,
 # without any warranty.
 #
-# Origin: gettext-0.19.8
-GETTEXT_MACRO_VERSION = 0.19
+# Origin: gettext-0.21
+GETTEXT_MACRO_VERSION = 0.20
 
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
@@ -52,16 +53,13 @@ GMSGFMT_ = @GMSGFMT@
 GMSGFMT_no = @GMSGFMT@
 GMSGFMT_yes = @GMSGFMT_015@
 GMSGFMT = $(GMSGFMT_$(USE_MSGCTXT))
-MSGFMT_ = @MSGFMT@
-MSGFMT_no = @MSGFMT@
-MSGFMT_yes = @MSGFMT_015@
-MSGFMT = $(MSGFMT_$(USE_MSGCTXT))
 XGETTEXT_ = @XGETTEXT@
 XGETTEXT_no = @XGETTEXT@
 XGETTEXT_yes = @XGETTEXT_015@
 XGETTEXT = $(XGETTEXT_$(USE_MSGCTXT))
-MSGMERGE = msgmerge
+MSGMERGE = @MSGMERGE@
 MSGMERGE_UPDATE = @MSGMERGE@ --update
+MSGMERGE_FOR_MSGFMT_OPTION = @MSGMERGE_FOR_MSGFMT_OPTION@
 MSGINIT = msginit
 MSGCONV = msgconv
 MSGFILTER = msgfilter
@@ -92,27 +90,44 @@ DISTFILESDEPS = $(DISTFILESDEPS_$(DIST_DEPENDS_ON_UPDATE_PO))
 
 # Makevars gets inserted here. (Don't remove this line!)
 
+all: all-@USE_NLS@
+
+
 .SUFFIXES:
-.SUFFIXES: .po .gmo .mo .sed .sin .nop .po-create .po-update
+.SUFFIXES: .po .gmo .sed .sin .nop .po-create .po-update
 
-.po.mo:
-	@echo "$(MSGFMT) -c -o $@ $<"; \
-	$(MSGFMT) -c -o t-$@ $< && mv t-$@ $@
+# The .pot file, stamp-po, .po files, and .gmo files appear in release tarballs.
+# The GNU Coding Standards say in
+# <https://www.gnu.org/prep/standards/html_node/Makefile-Basics.html>:
+#   "GNU distributions usually contain some files which are not source files
+#    ... . Since these files normally appear in the source directory, they
+#    should always appear in the source directory, not in the build directory.
+#    So Makefile rules to update them should put the updated files in the
+#    source directory."
+# Therefore we put these files in the source directory, not the build directory.
 
+# During .po -> .gmo conversion, take into account the most recent changes to
+# the .pot file. This eliminates the need to update the .po files when the
+# .pot file has changed, which would be troublesome if the .po files are put
+# under version control.
+$(GMOFILES): $(srcdir)/$(DOMAIN).pot
 .po.gmo:
 	@lang=`echo $* | sed -e 's,.*/,,'`; \
 	test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
-	echo "$${cdcmd}rm -f $${lang}.gmo && $(GMSGFMT) -c --statistics --verbose -o $${lang}.gmo $${lang}.po"; \
-	cd $(srcdir) && rm -f $${lang}.gmo && $(GMSGFMT) -c --statistics --verbose -o t-$${lang}.gmo $${lang}.po && mv t-$${lang}.gmo $${lang}.gmo
+	echo "$${cdcmd}rm -f $${lang}.gmo && $(MSGMERGE) $(MSGMERGE_FOR_MSGFMT_OPTION) -o $${lang}.1po $${lang}.po $(DOMAIN).pot && $(GMSGFMT) -c --statistics --verbose -o $${lang}.gmo $${lang}.1po && rm -f $${lang}.1po"; \
+	cd $(srcdir) && \
+	rm -f $${lang}.gmo && \
+	$(MSGMERGE) $(MSGMERGE_FOR_MSGFMT_OPTION) -o $${lang}.1po $${lang}.po $(DOMAIN).pot && \
+	$(GMSGFMT) -c --statistics --verbose -o t-$${lang}.gmo $${lang}.1po && \
+	mv t-$${lang}.gmo $${lang}.gmo && \
+	rm -f $${lang}.1po
 
 .sin.sed:
 	sed -e '/^#/d' $< > t-$@
 	mv t-$@ $@
 
 
-all: all-@USE_NLS@
-
-all-yes: stamp-po
+all-yes: $(srcdir)/stamp-po
 all-no:
 
 # Ensure that the gettext macros and this Makefile.in.in are in sync.
@@ -126,24 +141,24 @@ CHECK_MACRO_VERSION = \
 # internationalized messages, no $(srcdir)/$(DOMAIN).pot is created (because
 # we don't want to bother translators with empty POT files). We assume that
 # LINGUAS is empty in this case, i.e. $(POFILES) and $(GMOFILES) are empty.
-# In this case, stamp-po is a nop (i.e. a phony target).
+# In this case, $(srcdir)/stamp-po is a nop (i.e. a phony target).
 
-# stamp-po is a timestamp denoting the last time at which the CATALOGS have
-# been loosely updated. Its purpose is that when a developer or translator
-# checks out the package via CVS, and the $(DOMAIN).pot file is not in CVS,
-# "make" will update the $(DOMAIN).pot and the $(CATALOGS), but subsequent
-# invocations of "make" will do nothing. This timestamp would not be necessary
-# if updating the $(CATALOGS) would always touch them; however, the rule for
-# $(POFILES) has been designed to not touch files that don't need to be
-# changed.
-stamp-po: $(srcdir)/$(DOMAIN).pot
+# $(srcdir)/stamp-po is a timestamp denoting the last time at which the CATALOGS
+# have been loosely updated. Its purpose is that when a developer or translator
+# checks out the package from a version control system, and the $(DOMAIN).pot
+# file is not under version control, "make" will update the $(DOMAIN).pot and
+# the $(CATALOGS), but subsequent invocations of "make" will do nothing. This
+# timestamp would not be necessary if updating the $(CATALOGS) would always
+# touch them; however, the rule for $(POFILES) has been designed to not touch
+# files that don't need to be changed.
+$(srcdir)/stamp-po: $(srcdir)/$(DOMAIN).pot
 	@$(CHECK_MACRO_VERSION)
 	test ! -f $(srcdir)/$(DOMAIN).pot || \
 	  test -z "$(GMOFILES)" || $(MAKE) $(GMOFILES)
 	@test ! -f $(srcdir)/$(DOMAIN).pot || { \
-	  echo "touch stamp-po" && \
-	  echo timestamp > stamp-poT && \
-	  mv stamp-poT stamp-po; \
+	  echo "touch $(srcdir)/stamp-po" && \
+	  echo timestamp > $(srcdir)/stamp-poT && \
+	  mv $(srcdir)/stamp-poT $(srcdir)/stamp-po; \
 	}
 
 # Note: Target 'all' must not depend on target '$(DOMAIN).pot-update',
@@ -159,11 +174,9 @@ $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
 	package_gnu="$(PACKAGE_GNU)"; \
 	test -n "$$package_gnu" || { \
 	  if { if (LC_ALL=C find --version) 2>/dev/null | grep GNU >/dev/null; then \
-		 LC_ALL=C find -L $(top_srcdir) -maxdepth 1 -type f \
-			       -size -10000000c -exec grep 'GNU @PACKAGE@' \
-			       /dev/null '{}' ';' 2>/dev/null; \
+	         LC_ALL=C find -L $(top_srcdir) -maxdepth 1 -type f -size -10000000c -exec grep -i 'GNU @PACKAGE@' /dev/null '{}' ';' 2>/dev/null; \
 	       else \
-		 LC_ALL=C grep 'GNU @PACKAGE@' $(top_srcdir)/* 2>/dev/null; \
+	         LC_ALL=C grep -i 'GNU @PACKAGE@' $(top_srcdir)/* 2>/dev/null; \
 	       fi; \
 	     } | grep -v 'libtool:' >/dev/null; then \
 	     package_gnu=yes; \
@@ -184,26 +197,29 @@ $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
 	case `$(XGETTEXT) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
 	  '' | 0.[0-9] | 0.[0-9].* | 0.1[0-5] | 0.1[0-5].* | 0.16 | 0.16.[0-1]*) \
 	    $(XGETTEXT) --default-domain=$(DOMAIN) --directory=$(top_srcdir) \
-	      --add-comments=TRANSLATORS: $(XGETTEXT_OPTIONS) @XGETTEXT_EXTRA_OPTIONS@ \
+	      --add-comments=TRANSLATORS: \
 	      --files-from=$(srcdir)/POTFILES.in \
 	      --copyright-holder='$(COPYRIGHT_HOLDER)' \
 	      --msgid-bugs-address="$$msgid_bugs_address" \
+	      $(XGETTEXT_OPTIONS) @XGETTEXT_EXTRA_OPTIONS@ \
 	    ;; \
 	  *) \
 	    $(XGETTEXT) --default-domain=$(DOMAIN) --directory=$(top_srcdir) \
-	      --add-comments=TRANSLATORS: $(XGETTEXT_OPTIONS) @XGETTEXT_EXTRA_OPTIONS@ \
+	      --add-comments=TRANSLATORS: \
 	      --files-from=$(srcdir)/POTFILES.in \
 	      --copyright-holder='$(COPYRIGHT_HOLDER)' \
 	      --package-name="$${package_prefix}@PACKAGE@" \
 	      --package-version='@VERSION@' \
 	      --msgid-bugs-address="$$msgid_bugs_address" \
+	      $(XGETTEXT_OPTIONS) @XGETTEXT_EXTRA_OPTIONS@ \
 	    ;; \
 	esac
 	test ! -f $(DOMAIN).po || { \
 	  if test -f $(srcdir)/$(DOMAIN).pot-header; then \
 	    sed -e '1,/^#$$/d' < $(DOMAIN).po > $(DOMAIN).1po && \
-	    cat $(srcdir)/$(DOMAIN).pot-header $(DOMAIN).1po > $(DOMAIN).po; \
-	    rm -f $(DOMAIN).1po; \
+	    cat $(srcdir)/$(DOMAIN).pot-header $(DOMAIN).1po > $(DOMAIN).po && \
+	    rm -f $(DOMAIN).1po \
+	    || exit 1; \
 	  fi; \
 	  if test -f $(srcdir)/$(DOMAIN).pot; then \
 	    sed -f remove-potcdate.sed < $(srcdir)/$(DOMAIN).pot > $(DOMAIN).1po && \
@@ -228,17 +244,19 @@ $(srcdir)/$(DOMAIN).pot:
 # This target rebuilds a PO file if $(DOMAIN).pot has changed.
 # Note that a PO file is not touched if it doesn't need to be changed.
 $(POFILES): $(POFILESDEPS)
+	@test -f $(srcdir)/$(DOMAIN).pot || $(MAKE) $(srcdir)/$(DOMAIN).pot
 	@lang=`echo $@ | sed -e 's,.*/,,' -e 's/\.po$$//'`; \
 	if test -f "$(srcdir)/$${lang}.po"; then \
-	  test -f $(srcdir)/$(DOMAIN).pot || $(MAKE) $(srcdir)/$(DOMAIN).pot; \
 	  test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
-	  echo "$${cdcmd}$(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot"; \
+	  echo "$${cdcmd}$(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} --previous $${lang}.po $(DOMAIN).pot"; \
 	  cd $(srcdir) \
-	    && { case `$(MSGMERGE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
-	           '' | 0.[0-9] | 0.[0-9].* | 0.1[0-7] | 0.1[0-7].*) \
+	    && { case `$(MSGMERGE_UPDATE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+	           '' | 0.[0-9] | 0.[0-9].* | 0.1[0-5] | 0.1[0-5].*) \
 	             $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) $${lang}.po $(DOMAIN).pot;; \
+	           0.1[6-7] | 0.1[6-7].*) \
+	             $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --previous $${lang}.po $(DOMAIN).pot;; \
 	           *) \
-	             $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot;; \
+	             $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} --previous $${lang}.po $(DOMAIN).pot;; \
 	         esac; \
 	       }; \
 	else \
@@ -373,34 +391,41 @@ check: all
 
 info dvi ps pdf html tags TAGS ctags CTAGS ID:
 
+install-dvi install-ps install-pdf install-html:
+
 mostlyclean:
 	rm -f remove-potcdate.sed
-	rm -f stamp-poT
+	rm -f $(srcdir)/stamp-poT
 	rm -f core core.* $(DOMAIN).po $(DOMAIN).1po $(DOMAIN).2po *.new.po
 	rm -fr *.o
 
 clean: mostlyclean
 
 distclean: clean
-	rm -f Makefile Makefile.in POTFILES *.mo
+	rm -f Makefile Makefile.in POTFILES
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
-	rm -f stamp-po $(GMOFILES)
+	rm -f $(srcdir)/$(DOMAIN).pot $(srcdir)/stamp-po $(GMOFILES)
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 dist distdir:
 	test -z "$(DISTFILESDEPS)" || $(MAKE) $(DISTFILESDEPS)
 	@$(MAKE) dist2
 # This is a separate target because 'update-po' must be executed before.
-dist2: stamp-po $(DISTFILES)
-	dists="$(DISTFILES)"; \
+dist2: $(srcdir)/stamp-po $(DISTFILES)
+	@dists="$(DISTFILES)"; \
 	if test "$(PACKAGE)" = "gettext-tools"; then \
 	  dists="$$dists Makevars.template"; \
 	fi; \
 	if test -f $(srcdir)/$(DOMAIN).pot; then \
 	  dists="$$dists $(DOMAIN).pot stamp-po"; \
+	else \
+	  case $(XGETTEXT) in \
+	    :) echo "Warning: Creating a tarball without '$(DOMAIN).pot', because a suitable 'xgettext' program was not found in PATH." 1>&2;; \
+	    *) echo "Warning: Creating a tarball without '$(DOMAIN).pot', because 'xgettext' found no strings to extract. Check the contents of the POTFILES.in file and the XGETTEXT_OPTIONS in the Makevars file." 1>&2;; \
+	  esac; \
 	fi; \
 	if test -f $(srcdir)/ChangeLog; then \
 	  dists="$$dists ChangeLog"; \
@@ -439,13 +464,15 @@ update-po: Makefile
 	tmpdir=`pwd`; \
 	echo "$$lang:"; \
 	test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
-	echo "$${cdcmd}$(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang $$lang.po $(DOMAIN).pot -o $$lang.new.po"; \
+	echo "$${cdcmd}$(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang --previous $$lang.po $(DOMAIN).pot -o $$lang.new.po"; \
 	cd $(srcdir); \
 	if { case `$(MSGMERGE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
-	       '' | 0.[0-9] | 0.[0-9].* | 0.1[0-7] | 0.1[0-7].*) \
+	       '' | 0.[0-9] | 0.[0-9].* | 0.1[0-5] | 0.1[0-5].*) \
 	         $(MSGMERGE) $(MSGMERGE_OPTIONS) -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
+	       0.1[6-7] | 0.1[6-7].*) \
+	         $(MSGMERGE) $(MSGMERGE_OPTIONS) --previous -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
 	       *) \
-	         $(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
+	         $(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang --previous -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
 	     esac; \
 	   }; then \
 	  if cmp $$lang.po $$tmpdir/$$lang.new.po >/dev/null 2>&1; then \
