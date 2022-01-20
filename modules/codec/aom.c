@@ -46,7 +46,11 @@
 
 #ifndef AOM_USAGE_GOOD_QUALITY
 # define AOM_USAGE_GOOD_QUALITY 0
+#endif
+#ifndef AOM_USAGE_REALTIME
 # define AOM_USAGE_REALTIME 1
+#endif
+#ifndef AOM_USAGE_ALL_INTRA
 # define AOM_USAGE_ALL_INTRA 2
 #endif
 
