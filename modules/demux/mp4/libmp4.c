@@ -2984,6 +2984,8 @@ static int MP4_ReadBox_stz2( stream_t *p_stream, MP4_Box_t *p_box )
 
     uint32_t reserved;
     MP4_GET3BYTES( reserved );
+    (void) reserved;
+
     MP4_GET1BYTE(field_size);
 
     MP4_GET4BYTES( count );
