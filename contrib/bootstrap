@@ -271,6 +271,7 @@ fi
 # Checks
 #
 OS="${HOST#*-}" # strip architecture
+MAKE=make
 case "${OS}" in
 	*-darwin*)
 		if test -z "$BUILDFORIOS"
@@ -317,6 +318,7 @@ case "${OS}" in
 		fi
 		;;
 	*bsd*)
+		MAKE=gmake
 		add_make_enabled "HAVE_BSD"
 		;;
 	*android*)
@@ -384,5 +386,5 @@ add_make "TOPDST = .."
 add_make "-include config.mak"
 add_make 'include $(TOPSRC)/src/main.mak'
 echo "Bootstrap completed."
-make help
+${MAKE} help
 mkdir -p $BOOTSTRAP_PATH/tarballs || exit $?
