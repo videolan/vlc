@@ -131,9 +131,9 @@ static int  Control( demux_t *, int, va_list );
 
 /* Bitstream manipulation */
 static int  Ogg_ReadPage     ( demux_t *, ogg_page * );
-static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
+static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet *, bool );
 static unsigned Ogg_OpusPacketDuration( ogg_packet * );
-static void Ogg_QueueBlocks( demux_t *, logical_stream_t *, block_t * );
+static void Ogg_QueueBlocks( demux_t *, logical_stream_t *, block_t *, vlc_tick_t, bool );
 static void Ogg_SendQueuedBlock( demux_t *, logical_stream_t * );
 
 static inline bool Ogg_HasQueuedBlocks( const logical_stream_t *p_stream )
@@ -576,7 +576,7 @@ static int Demux( demux_t * p_demux )
                 }
             }
 
-            Ogg_DecodePacket( p_demux, p_stream, &oggpacket );
+            Ogg_DecodePacket( p_demux, p_stream, &oggpacket, ogg_page_eos( &p_sys->current_page ) );
         }
 
 
@@ -999,31 +999,19 @@ static void Ogg_SetNextFrame( demux_t *p_demux, logical_stream_t *p_stream,
     }
 }
 
-static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_stream )
+static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_stream,
+                                        vlc_tick_t i_enddts, bool b_eos )
 {
-    vlc_tick_t i_enddts = VLC_TICK_INVALID;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
-#ifdef HAVE_LIBVORBIS
-    long i_prev_blocksize = 0;
-#else
-    VLC_UNUSED(p_demux);
-#endif
     // PASS 1, set number of samples
     unsigned i_total_samples = 0;
     for( block_t *p_block = p_stream->queue.p_blocks; p_block; p_block = p_block->p_next )
     {
-        if( p_block->i_dts != VLC_TICK_INVALID )
-        {
-            i_enddts = p_block->i_dts;
-            break;
-        }
-
         if( p_block->i_flags & BLOCK_FLAG_HEADER )
             continue;
 
         ogg_packet dumb_packet;
-        dumb_packet.bytes = p_block->i_buffer;
-        dumb_packet.packet = p_block->p_buffer;
 
         switch( p_stream->fmt.i_codec )
         {
@@ -1032,6 +1020,10 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
                                         p_stream->special.speex.i_framesperpacket;
                 break;
             case VLC_CODEC_OPUS:
+                dumb_packet.bytes = p_block->i_buffer;
+                dumb_packet.packet = p_block->p_buffer;
+                /* Less complicated than Vorbis case below as packets samples count
+                 * is known for every packet */
                 p_block->i_nb_samples = Ogg_OpusPacketDuration( &dumb_packet );
                 break;
 #ifdef HAVE_LIBVORBIS
@@ -1042,13 +1034,30 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
                     msg_Err( p_demux, "missing vorbis headers, can't compute block size" );
                     break;
                 }
+
+                if( p_block->p_next == NULL )
+                    break;
+
+                /* Vorbis Hell
+                   Samples are computed from N..N+1 window
+                   We can set samples for packets up to N-1
+                   Last packet is granule pos - total... but
+                   that would be too easy without truncation
+                   and beginning of stream cases.
+                   If that's BOS, we need to truncate on start (negative samples)
+                   If that's EOS, we need to truncate the end to match granule.
+                   If that's both single page and not starting zero.. we're ***** */
+                dumb_packet.bytes = p_block->i_buffer;
+                dumb_packet.packet = p_block->p_buffer;
                 long i_blocksize = vorbis_packet_blocksize( p_stream->special.vorbis.p_info,
                                                             &dumb_packet );
-                if ( i_prev_blocksize )
-                    p_block->i_nb_samples = ( i_blocksize + i_prev_blocksize ) / 4;
-                else
-                    p_block->i_nb_samples = i_blocksize / 2;
-                i_prev_blocksize = i_blocksize;
+                dumb_packet.bytes = p_block->p_next->i_buffer;
+                dumb_packet.packet = p_block->p_next->p_buffer;
+                long i_nextblocksize = vorbis_packet_blocksize( p_stream->special.vorbis.p_info,
+                                                                &dumb_packet );
+                /* The spec has 3 specific cases depending on long/short prev/next blocksizes
+                   ranging weights from 1/4 to 3/4... but everyone does A/4 + B/4 */
+                p_block->i_nb_samples = (i_blocksize + i_nextblocksize) / 4;
                 break;
             }
 #endif
@@ -1065,26 +1074,41 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
     {
         date_t d = p_stream->dts;
         date_Set( &d, i_enddts );
-        i_enddts = date_Decrement( &d, i_total_samples );
+        date_Decrement( &d, i_total_samples );
+
+        /* truncate end */
+        if( b_eos && date_Get( &d ) < VLC_TICK_0 )
+            date_Set( &d, VLC_TICK_0 );
+
         for( block_t *p_block = p_stream->queue.p_blocks; p_block; p_block = p_block->p_next )
         {
-            if( p_block->i_dts != VLC_TICK_INVALID )
-                break;
             if( p_block->i_flags & BLOCK_FLAG_HEADER )
                 continue;
             p_block->i_dts = date_Get( &d );
-            if( p_block->i_dts < VLC_TICK_0 )
+
+            /* truncate start */
+            if( !b_eos && p_block->i_dts < VLC_TICK_0 )
                 p_block->i_dts = VLC_TICK_0;
-            date_Increment( &d, p_block->i_nb_samples );
+
+            /* Last page in the stream case, truncate end */
+            if( b_eos && p_block->p_next == NULL )
+                p_block->i_dts = __MIN(p_block->i_dts, i_enddts);
+
+            if( p_sys->i_nzpcr_offset )
+                p_block->i_dts += p_sys->i_nzpcr_offset;
+
             if( p_stream->fmt.i_cat == AUDIO_ES )
                 p_block->i_pts = p_block->i_dts;
+            date_Increment( &d, p_block->i_nb_samples );
         }
+
     } /* else can't do anything, no timestamped blocks in stream */
 
     return i_enddts;
 }
 
-static void Ogg_QueueBlocks( demux_t *p_demux, logical_stream_t *p_stream, block_t *p_block )
+static void Ogg_QueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
+                             block_t *p_block, vlc_tick_t i_enddts, bool b_eos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     VLC_UNUSED(p_sys);
@@ -1097,10 +1121,12 @@ static void Ogg_QueueBlocks( demux_t *p_demux, logical_stream_t *p_stream, block
 
     block_ChainLastAppend( &p_stream->queue.pp_append, p_block );
 
-    if( p_stream->i_pcr == VLC_TICK_INVALID && p_block->i_dts != VLC_TICK_INVALID )
+    /* If we can have or compute block start from granule, it is set.
+     * Otherwise the end dts will be used for reverse calculation */
+    if( p_stream->i_pcr == VLC_TICK_INVALID && i_enddts != VLC_TICK_INVALID )
     {
         /* fixup queue */
-        p_stream->i_pcr = Ogg_FixupOutputQueue( p_demux, p_stream );
+        p_stream->i_pcr = Ogg_FixupOutputQueue( p_demux, p_stream, i_enddts, b_eos );
     }
 
     DemuxDebug( msg_Dbg( p_demux, "%4.4s block queued > dts %"PRId64" spcr %"PRId64" pcr %"PRId64,
@@ -1188,7 +1214,7 @@ static bool Ogg_IsHeaderPacket( const logical_stream_t *p_stream,
  ****************************************************************************/
 static void Ogg_DecodePacket( demux_t *p_demux,
                               logical_stream_t *p_stream,
-                              ogg_packet *p_oggpacket )
+                              ogg_packet *p_oggpacket, bool b_eos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
@@ -1359,6 +1385,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     vlc_tick_t i_dts = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, true, false );
+    vlc_tick_t i_enddts = (i_dts == VLC_TICK_INVALID) ? Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, false, false )
+                                                      : VLC_TICK_INVALID;
     vlc_tick_t i_expected_dts = p_stream->b_interpolation_failed ? VLC_TICK_INVALID :
                                 date_Get( &p_stream->dts ); /* Interpolated or previous end time */
     if( i_dts == VLC_TICK_INVALID )
@@ -1497,7 +1525,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     memcpy( p_block->p_buffer, p_oggpacket->packet + i_header_len,
             p_oggpacket->bytes - i_header_len );
 
-    Ogg_QueueBlocks( p_demux, p_stream, p_block );
+    Ogg_QueueBlocks( p_demux, p_stream, p_block, i_enddts, b_eos );
 }
 
 static unsigned Ogg_OpusPacketDuration( ogg_packet *p_oggpacket )
