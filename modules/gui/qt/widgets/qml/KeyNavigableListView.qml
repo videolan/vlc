@@ -175,7 +175,7 @@ ListView {
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
 
-    ScrollBar.vertical: ScrollBar { id: scroll_id }
+    ScrollBar.vertical: ScrollBar { id: scroll_id; visible: root.contentHeight > root.height }
     ScrollBar.horizontal: ScrollBar { visible: root.contentWidth > root.width }
 
     highlightMoveDuration: 300 //ms
