@@ -418,10 +418,10 @@ FocusScope {
     }
 
     function _calculateCurrentRange() {
-        var myContentY = flickable.contentY - headerHeight - topMargin
-
+        var myContentY = flickable.contentY
         var contentYWithoutExpand = myContentY
         var heightWithoutExpand = flickable.height + displayMarginEnd
+
         if (expandIndex !== -1) {
             var expandItemY = getItemPos(flickable.getExpandItemGridId())[1]
 
@@ -436,11 +436,11 @@ FocusScope {
             heightWithoutExpand -= expandDisplayedHeight
         }
 
-        var rowId = Math.floor(contentYWithoutExpand / _effectiveCellHeight)
+        var onlyGridContentY = contentYWithoutExpand - headerHeight - topMargin
+        var rowId = Math.floor(onlyGridContentY / _effectiveCellHeight)
         var firstId = Math.max(rowId * _nbItemPerRow, 0)
 
-
-        rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / _effectiveCellHeight)
+        rowId = Math.ceil((onlyGridContentY + heightWithoutExpand) / _effectiveCellHeight)
         var lastId = Math.min(rowId * _nbItemPerRow, _count)
 
         return [firstId, lastId]
