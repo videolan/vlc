@@ -40,8 +40,16 @@ VideoAll {
 
     // Private
 
-    property var _meta: (MainCtx.grouping === MainCtx.GROUPING_NONE) ? metaVideo
-                                                                     : metaGroup
+    property var _meta: {
+        var grouping = MainCtx.grouping;
+
+        if (grouping === MainCtx.GROUPING_NONE)
+            return metaVideo
+        else if (grouping === MainCtx.GROUPING_NAME)
+            return metaGroup
+        else if (grouping === MainCtx.GROUPING_FOLDER)
+            return metaFolder
+    }
 
     // Signals
 
@@ -141,6 +149,32 @@ VideoAll {
                 return
             }
 
+            root.showList(object, Qt.MouseFocusReason)
+        }
+
+        function onLabelGrid(object) {
+            return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
+        }
+
+        function onLabelList(object) {
+            return root.getLabelGroup(object, I18n.qtr("%1"))
+        }
+    }
+
+    QtObject {
+        id: metaFolder
+
+        property var model: MLVideoFoldersModel { ml: MediaLib }
+
+        property var contextMenu: VideoFoldersContextMenu { model: metaFolder.model }
+
+        function onAction(indexes) {
+            var index = indexes[0]
+
+            root.showList(model.getDataAt(index), Qt.TabFocusReason)
+        }
+
+        function onDoubleClick(object) {
             root.showList(object, Qt.MouseFocusReason)
         }
 
