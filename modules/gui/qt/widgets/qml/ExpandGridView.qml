@@ -726,7 +726,6 @@ FocusScope {
 
             root.rowX = getItemPos(0)[0]
 
-            var i
             var expandItemGridId = getExpandItemGridId()
 
             var f_l = _calculateCurrentRange()
@@ -741,8 +740,6 @@ FocusScope {
 
             _updateChildrenMap(firstId, lastId)
 
-            var item
-            var pos
             // Place the delegates before the expandItem
             _setupIndexes(forceRelayout, [firstId, topGridEndId], 0)
 
