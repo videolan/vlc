@@ -753,11 +753,13 @@ FocusScope {
             // Place the delegates after the expandItem
             _setupIndexes(forceRelayout, [topGridEndId, lastId], root._expandItemVerticalSpace)
 
-            // Calculate and set the contentHeight
-            var newContentHeight = root.getItemPos(root._count - 1)[1] + root._effectiveCellHeight + root._expandItemVerticalSpace
-            contentHeight = newContentHeight + root.bottomMargin // topMargin is included from root.getItemPos
-            contentHeight += footerItemLoader.item ? footerItemLoader.item.height : 0
+            // update contentWidth and contentHeight
             contentWidth = root._effectiveCellWidth * root._nbItemPerRow - root.horizontalSpacing
+
+            var gridContentHeight = root.getItemPos(root._count - 1)[1] + root._effectiveCellHeight + root._expandItemVerticalSpace
+            contentHeight = gridContentHeight
+                    + (footerItemLoader.item ? footerItemLoader.item.height : 0)
+                    + root.bottomMargin // topMargin and headerHeight is included in root.getItemPos
         }
 
         Connections {
