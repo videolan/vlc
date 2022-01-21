@@ -29,5 +29,5 @@ rav1e: rav1e-$(RAV1E_VERSION).tar.gz .sum-rav1e .rav1e-vendor
 	$(MOVE)
 
 .rav1e: rav1e .cargo
-	cd $< && $(CARGOC_INSTALL) --no-default-features $(RAV1E_FEATURES)
+	+cd $< && $(CARGOC_INSTALL) --no-default-features $(RAV1E_FEATURES)
 	touch $@
