@@ -39,11 +39,14 @@ FocusScope {
 
     implicitHeight: contentRect.implicitHeight
 
+    // otherwise produces artefacts on retract animation
+    clip: true
+
     Rectangle{
         id: contentRect
 
+        anchors.fill: parent
         implicitHeight: contentLayout.implicitHeight + ( VLCStyle.margin_normal * 2 )
-        width: parent.width
         color: VLCStyle.colors.expandDelegate
 
         Rectangle {
