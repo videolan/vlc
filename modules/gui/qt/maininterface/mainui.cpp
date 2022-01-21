@@ -271,6 +271,9 @@ void MainUI::registerQMLTypes()
         qRegisterMetaType<QList<QQmlError>>("QList<QQmlError>");
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
+
+
+        qmlProtectModule(uri, versionMajor);
     }
 
     {
@@ -281,6 +284,9 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 1;
 
         qmlRegisterType<RoundImage>( uri, versionMajor, versionMinor, "RoundImage" );
+
+
+        qmlProtectModule(uri, versionMajor);
     }
 
     if (m_mainCtx->hasMediaLibrary())
@@ -327,6 +333,9 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<GroupListContextMenu>( uri, versionMajor, versionMinor, "GroupListContextMenu" );
         qmlRegisterType<PlaylistListContextMenu>( uri, versionMajor, versionMinor, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( uri, versionMajor, versionMinor, "PlaylistMediaContextMenu" );
+
+
+        qmlProtectModule(uri, versionMajor);
     }
 }
 
