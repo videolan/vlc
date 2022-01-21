@@ -383,6 +383,10 @@ static int64_t find_first_page_granule( demux_t *p_demux,
     seek_byte( p_demux, p_sys->i_input_position );
     ogg_stream_reset( &p_stream->os );
 
+    /* prevent reading the whole file if stream is gone */
+    if( i_pos2 > p_sys->i_input_position + OGGSEEK_SERIALNO_MAX_LOOKUP_BYTES )
+        i_pos2 = p_sys->i_input_position + OGGSEEK_SERIALNO_MAX_LOOKUP_BYTES;
+
     while( 1 )
     {
 

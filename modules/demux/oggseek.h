@@ -38,6 +38,7 @@
 #define PAGE_HEADER_BYTES 27
 
 #define OGGSEEK_BYTES_TO_READ 8500
+#define OGGSEEK_SERIALNO_MAX_LOOKUP_BYTES (OGGSEEK_BYTES_TO_READ * 25)
 
 /* index entries are structured as follows:
  *   - for theora, highest granulepos -> pagepos (bytes) where keyframe begins
