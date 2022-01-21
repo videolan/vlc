@@ -487,18 +487,13 @@ vlc_smb2_disconnect_share(stream_t *access)
 {
     struct access_sys *sys = access->p_sys;
 
-    if (!sys->smb2_connected)
-        return 0;
-
     if (smb2_disconnect_share_async(sys->smb2, smb2_generic_cb, access) < 0)
     {
         VLC_SMB2_SET_ERROR(access, "smb2_connect_share_async", 1);
         return -1;
     }
 
-    int ret = vlc_smb2_mainloop(access, true);
-    sys->smb2_connected = false;
-    return ret;
+    return vlc_smb2_mainloop(access, true);
 }
 
 static void
@@ -657,7 +652,11 @@ error:
         smb2_destroy_url(smb2_url);
     if (sys->smb2 != NULL)
     {
-        vlc_smb2_disconnect_share(access);
+        if (sys->smb2_connected)
+        {
+            vlc_smb2_disconnect_share(access);
+            sys->smb2_connected = false;
+        }
         smb2_destroy_context(sys->smb2);
         sys->smb2 = NULL;
     }
@@ -839,6 +838,8 @@ Close(vlc_object_t *p_obj)
         smb2_free_data(sys->smb2, sys->share_enum);
     else
         vlc_assert_unreachable();
+
+    assert(sys->smb2_connected);
 
     vlc_smb2_disconnect_share(access);
     smb2_destroy_context(sys->smb2);
