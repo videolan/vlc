@@ -97,13 +97,13 @@ struct access_sys
 };
 
 static int
-smb2_check_status(stream_t *access, int status, const char *psz_func)
+smb2_check_status(stream_t *access, struct smb2_context *smb2, int status, const char *psz_func)
 {
     struct access_sys *sys = access->p_sys;
 
     if (status < 0)
     {
-        const char *psz_error = smb2_get_error(sys->smb2);
+        const char *psz_error = smb2_get_error(smb2);
         msg_Warn(access, "%s failed: %d, '%s'", psz_func, status, psz_error);
         sys->error_status = status;
         return -1;
@@ -125,8 +125,8 @@ smb2_set_error(stream_t *access, const char *psz_func, int err)
     sys->error_status = err;
 }
 
-#define VLC_SMB2_CHECK_STATUS(access, status) \
-    smb2_check_status(access, status, __func__)
+#define VLC_SMB2_CHECK_STATUS(access, smb2, status) \
+    smb2_check_status(access, smb2, status, __func__)
 
 #define VLC_SMB2_SET_ERROR(access, func, err) \
     smb2_set_error(access, func, err)
@@ -162,7 +162,7 @@ smb2_service_fd(struct smb2_context *smb2, int fd, int revents)
 #endif
 
 static int
-vlc_smb2_mainloop(stream_t *access, bool teardown)
+vlc_smb2_mainloop(stream_t *access, struct smb2_context *smb2, bool teardown)
 {
 #define TEARDOWN_TIMEOUT 250 /* in ms */
     struct access_sys *sys = access->p_sys;
@@ -191,8 +191,8 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
     {
         int ret, smb2_timeout;
         size_t fd_count;
-        const t_socket *fds = smb2_get_fds(sys->smb2, &fd_count, &smb2_timeout);
-        int events = smb2_which_events(sys->smb2);
+        const t_socket *fds = smb2_get_fds(smb2, &fd_count, &smb2_timeout);
+        int events = smb2_which_events(smb2);
 
         struct pollfd p_fds[fd_count];
         for (size_t i = 0; i < fd_count; ++i)
@@ -229,7 +229,7 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
         {
             if (teardown)
                 sys->error_status = -ETIMEDOUT;
-            else if (smb2_service_fd(sys->smb2, -1, 0) < 0)
+            else if (smb2_service_fd(smb2, -1, 0) < 0)
                 VLC_SMB2_SET_ERROR(access, "smb2_service", 1);
         }
         else
@@ -237,7 +237,7 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
             for (size_t i = 0; i < fd_count; ++i)
             {
                 if (p_fds[i].revents
-                 && smb2_service_fd(sys->smb2, p_fds[i].fd, p_fds[i].revents) < 0)
+                 && smb2_service_fd(smb2, p_fds[i].fd, p_fds[i].revents) < 0)
                     VLC_SMB2_SET_ERROR(access, "smb2_service", 1);
             }
         }
@@ -250,11 +250,8 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
 }
 
 #define VLC_SMB2_GENERIC_CB() \
-    VLC_UNUSED(smb2); \
     stream_t *access = private_data; \
-    struct access_sys *sys = access->p_sys; \
-    assert(sys->smb2 == smb2); \
-    if (VLC_SMB2_CHECK_STATUS(access, status)) \
+    if (VLC_SMB2_CHECK_STATUS(access, smb2, status)) \
         return
 
 static void
@@ -271,6 +268,7 @@ smb2_read_cb(struct smb2_context *smb2, int status, void *data,
 {
     VLC_UNUSED(data);
     VLC_SMB2_GENERIC_CB();
+    struct access_sys *sys = access->p_sys;
 
     if (status == 0)
         sys->eof = true;
@@ -300,7 +298,7 @@ FileRead(stream_t *access, void *buf, size_t len)
         return 0;
     }
 
-    if (vlc_smb2_mainloop(access, false) < 0)
+    if (vlc_smb2_mainloop(access, sys->smb2, false) < 0)
         return 0;
 
     return sys->res.read.len;
@@ -465,35 +463,28 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
 }
 
 static int
-vlc_smb2_close_fh(stream_t *access)
+vlc_smb2_close_fh(stream_t *access, struct smb2_context *smb2,
+                  struct smb2fh *smb2fh)
 {
-    struct access_sys *sys = access->p_sys;
-
-    assert(sys->smb2fh);
-
-    if (smb2_close_async(sys->smb2, sys->smb2fh, smb2_generic_cb, access) < 0)
+    if (smb2_close_async(smb2, smb2fh, smb2_generic_cb, access) < 0)
     {
         VLC_SMB2_SET_ERROR(access, "smb2_close_async", 1);
         return -1;
     }
 
-    sys->smb2fh = NULL;
-
-    return vlc_smb2_mainloop(access, true);
+    return vlc_smb2_mainloop(access, smb2, true);
 }
 
 static int
-vlc_smb2_disconnect_share(stream_t *access)
+vlc_smb2_disconnect_share(stream_t *access, struct smb2_context *smb2)
 {
-    struct access_sys *sys = access->p_sys;
-
-    if (smb2_disconnect_share_async(sys->smb2, smb2_generic_cb, access) < 0)
+    if (smb2_disconnect_share_async(smb2, smb2_generic_cb, access) < 0)
     {
         VLC_SMB2_SET_ERROR(access, "smb2_connect_share_async", 1);
         return -1;
     }
 
-    return vlc_smb2_mainloop(access, true);
+    return vlc_smb2_mainloop(access, smb2, true);
 }
 
 static void
@@ -501,6 +492,7 @@ smb2_opendir_cb(struct smb2_context *smb2, int status, void *data,
                 void *private_data)
 {
     VLC_SMB2_GENERIC_CB();
+    struct access_sys *sys = access->p_sys;
 
     sys->smb2dir = data;
 }
@@ -510,6 +502,7 @@ smb2_open_cb(struct smb2_context *smb2, int status, void *data,
              void *private_data)
 {
     VLC_SMB2_GENERIC_CB();
+    struct access_sys *sys = access->p_sys;
 
     sys->smb2fh = data;
 }
@@ -519,6 +512,7 @@ smb2_share_enum_cb(struct smb2_context *smb2, int status, void *data,
                    void *private_data)
 {
     VLC_SMB2_GENERIC_CB();
+    struct access_sys *sys = access->p_sys;
 
     sys->share_enum = data;
 }
@@ -600,8 +594,9 @@ vlc_smb2_open_share(stream_t *access, const char *url,
         VLC_SMB2_SET_ERROR(access, "smb2_connect_share_async", err);
         goto error;
     }
-    if (vlc_smb2_mainloop(access, false) != 0)
+    if (vlc_smb2_mainloop(access, sys->smb2, false) != 0)
         goto error;
+
     sys->smb2_connected = true;
 
     vlc_smb2_print_addr(access);
@@ -616,7 +611,7 @@ vlc_smb2_open_share(stream_t *access, const char *url,
                             smb2_generic_cb, access) < 0)
             VLC_SMB2_SET_ERROR(access, "smb2_stat_async", 1);
 
-        if (vlc_smb2_mainloop(access, false) != 0)
+        if (vlc_smb2_mainloop(access, sys->smb2, false) != 0)
             goto error;
 
         if (smb2_stat.smb2_type == SMB2_TYPE_FILE)
@@ -642,7 +637,7 @@ vlc_smb2_open_share(stream_t *access, const char *url,
         goto error;
     }
 
-    if (vlc_smb2_mainloop(access, false) != 0)
+    if (vlc_smb2_mainloop(access, sys->smb2, false) != 0)
         goto error;
     smb2_destroy_url(smb2_url);
     return 0;
@@ -654,7 +649,7 @@ error:
     {
         if (sys->smb2_connected)
         {
-            vlc_smb2_disconnect_share(access);
+            vlc_smb2_disconnect_share(access, sys->smb2);
             sys->smb2_connected = false;
         }
         smb2_destroy_context(sys->smb2);
@@ -831,7 +826,7 @@ Close(vlc_object_t *p_obj)
     struct access_sys *sys = access->p_sys;
 
     if (sys->smb2fh != NULL)
-        vlc_smb2_close_fh(access);
+        vlc_smb2_close_fh(access, sys->smb2, sys->smb2fh);
     else if (sys->smb2dir != NULL)
         smb2_closedir(sys->smb2, sys->smb2dir);
     else if (sys->share_enum != NULL)
@@ -841,7 +836,7 @@ Close(vlc_object_t *p_obj)
 
     assert(sys->smb2_connected);
 
-    vlc_smb2_disconnect_share(access);
+    vlc_smb2_disconnect_share(access, sys->smb2);
     smb2_destroy_context(sys->smb2);
 
     vlc_UrlClean(&sys->encoded_url);
