@@ -423,13 +423,15 @@ FocusScope {
         var contentYWithoutExpand = myContentY
         var heightWithoutExpand = flickable.height + displayMarginEnd
         if (expandIndex !== -1) {
-            if (myContentY >= expandItem.y && myContentY < expandItem.y + _expandItemVerticalSpace)
-                contentYWithoutExpand = expandItem.y
-            if (myContentY >= expandItem.y + _expandItemVerticalSpace)
+            var expandItemY = getItemPos(flickable.getExpandItemGridId())[1]
+
+            if (myContentY >= expandItemY && myContentY < expandItemY + _expandItemVerticalSpace)
+                contentYWithoutExpand = expandItemY
+            if (myContentY >= expandItemY + _expandItemVerticalSpace)
                 contentYWithoutExpand = myContentY - _expandItemVerticalSpace
 
-            var expandYStart = Math.max(myContentY, expandItem.y)
-            var expandYEnd = Math.min(myContentY + height, expandItem.y + _expandItemVerticalSpace)
+            var expandYStart = Math.max(myContentY, expandItemY)
+            var expandYEnd = Math.min(myContentY + height, expandItemY + _expandItemVerticalSpace)
             var expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
             heightWithoutExpand -= expandDisplayedHeight
         }
