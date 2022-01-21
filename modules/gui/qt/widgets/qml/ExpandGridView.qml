@@ -647,17 +647,7 @@ FocusScope {
 
         anchors.fill: parent
 
-        onContentYChanged: { scrollLayoutTimer.start() }
-
-        Timer {
-            id: scrollLayoutTimer
-
-            interval: 1
-            running: false
-            repeat: false
-            triggeredOnStart: false
-            onTriggered: flickable.layout(false)
-        }
+        onContentYChanged: { Qt.callLater(flickable.layout, false) }
 
         function getExpandItemGridId() {
             var ret
