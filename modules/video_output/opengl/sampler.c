@@ -441,7 +441,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
         else
         {
             swizzle_per_tex[0] = "x";
-            swizzle_per_tex[1] = "xa";
+            swizzle_per_tex[1] = "xw";
         }
     }
     else if (desc->plane_count == 1)
