@@ -302,7 +302,7 @@ Control {
 
             property int shiftIndex: -1
 
-            property PlaylistDelegate delegateContainsDrag: null
+            property Item itemContainsDrag: null
 
             onDeselectAll: {
                 root.model.deselectAll()
@@ -333,6 +333,16 @@ Control {
                 property alias firstItemIndicatorVisible: firstItemIndicator.visible
 
                 readonly property bool containsDrag: dropArea.containsDrag
+
+                onContainsDragChanged: {
+                    if (root.model.count > 0) {
+                        listView.updateItemContainsDrag(this, containsDrag)
+                    } else if (!containsDrag && listView.itemContainsDrag === this) {
+                        // In case model count is changed somehow while
+                        // containsDrag is set
+                        listView.updateItemContainsDrag(this, false)
+                    }
+                }
 
                 Rectangle {
                     id: firstItemIndicator
@@ -389,25 +399,38 @@ Control {
             Rectangle {
                 id: dropIndicator
 
-                parent: visible ? (listView.delegateContainsDrag ? listView.delegateContainsDrag
-                                                                 : listView.footerItem)
-                                : null
+                parent: listView.itemContainsDrag
+
                 z: 99
 
                 anchors {
                     left: !!parent ? parent.left : undefined
                     right: !!parent ? parent.right : undefined
-                    top: listView.delegateContainsDrag ? (parent.topContainsDrag ? parent.top : undefined)
-                                                       : (parent ? parent.top : undefined)
-                    bottom: listView.delegateContainsDrag ? (parent.bottomContainsDrag ? parent.bottom : undefined)
-                                                          : undefined
-                    bottomMargin: -height
+                    top: !!parent ? (parent.bottomContainsDrag === true ? parent.bottom : parent.top)
+                                  : undefined
                 }
 
                 implicitHeight: VLCStyle.dp(1)
 
-                visible: !!listView.delegateContainsDrag || (listView.footerItem.containsDrag && !listView.footerItem.firstItemIndicatorVisible)
+                visible: !!parent
                 color: colors.accent
+            }
+
+            function updateItemContainsDrag(item, set) {
+                if (set) {
+                    // This callLater is needed because in Qt 5.15,
+                    // an item might set itemContainsDrag, before
+                    // the owning item releases it.
+                    Qt.callLater(function() {
+                        if (itemContainsDrag)
+                            console.debug(item + " set itemContainsDrag before it was released!")
+                        itemContainsDrag = item
+                    })
+                } else {
+                    if (itemContainsDrag !== item)
+                        console.debug(item + " released itemContainsDrag that is not owned!")
+                    itemContainsDrag = null
+                }
             }
 
             delegate: PlaylistDelegate {
@@ -415,15 +438,7 @@ Control {
 
                 width: listView.width
 
-                onContainsDragChanged: {
-                    if (delegate.topContainsDrag || delegate.bottomContainsDrag) {
-                        console.assert(listView.delegateContainsDrag === null)
-                        listView.delegateContainsDrag = delegate
-                    } else {
-                        console.assert(listView.delegateContainsDrag === delegate)
-                        listView.delegateContainsDrag = null
-                    }
-                }
+                onContainsDragChanged: listView.updateItemContainsDrag(this, containsDrag)
             }
 
             add: Transition {
