@@ -83,9 +83,6 @@ FocusScope {
 
     //delegate to display the extended item
     property Component delegate: Item{}
-    property Component expandDelegate: Item{}
-
-    property Component headerDelegate: Item{}
 
     property var _idChildrenList: []
     property var _unusedItemList: []
@@ -98,13 +95,15 @@ FocusScope {
     property alias contentX: flickable.contentX
     property alias gridScrollBar: flickableScrollBar
 
+    property alias expandDelegate: expandItemLoader.sourceComponent
     property alias expandItem: expandItemLoader.item
 
+    property alias headerDelegate: headerItemLoader.sourceComponent
     property alias headerHeight: headerItemLoader.implicitHeight
     property alias headerItem: headerItemLoader.item
 
-    property alias footerItem: footerItemLoader.item
     property alias footerDelegate: footerItemLoader.sourceComponent
+    property alias footerItem: footerItemLoader.item
 
     // Signals
 
@@ -591,9 +590,9 @@ FocusScope {
 
         Loader {
             id: headerItemLoader
+
             //load the header early (when the first row is visible)
             visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.topMargin)
-            sourceComponent: headerDelegate
             focus: item.focus
             onFocusChanged: {
                 if (!focus)
@@ -634,7 +633,7 @@ FocusScope {
 
         Loader {
             id: expandItemLoader
-            sourceComponent: expandDelegate
+
             active: root.expandIndex !== -1
             focus: active
 
