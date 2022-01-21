@@ -42,11 +42,5 @@ Item {
         target: MainCtx
         property: "acrylicActive"
         value: root.uiTransluency != 0
-
-        Component.onCompleted: {
-            // restoreMode is only available in Qt >= 5.14
-            if ("restoreMode" in this)
-                this.restoreMode = Binding.RestoreBindingOrValue
-        }
     }
 }
