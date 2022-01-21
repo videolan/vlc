@@ -2873,10 +2873,30 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
     /* Cheat and get additional info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
     oggpack_adv( &opb, 64 );
-    oggpack_adv( &opb, 8 ); /* version_id */
-    p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
-    fill_channels_info(&p_stream->fmt.audio);
-    p_stream->i_pre_skip = oggpack_read( &opb, 16 );
+    if( oggpack_read( &opb, 8 ) <= 1 ) /* version_id */
+    {
+        p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
+        p_stream->i_pre_skip = oggpack_read( &opb, 16 );
+        oggpack_adv( &opb, 48 );
+        switch( oggpack_read( &opb, 8 ) ) /* mapping family */
+        {
+            case 0: /* RFC7587 */
+                if( p_stream->fmt.audio.i_channels > 2 )
+                    break;
+                /* fallthrough */
+            case 1: /* Vorbis */
+                if( p_stream->fmt.audio.i_channels > 8 )
+                    break;
+                fill_channels_info( &p_stream->fmt.audio );
+                break;
+            case 2: /* Ambisonic */
+            case 3: /* Ambisonic with mixing matrix */
+                p_stream->fmt.audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
+                break;
+            default:
+                break;
+        }
+    }
     /* For Opus, trash the first 80 ms of decoded output as
            well, to avoid blowing out speakers if we get unlucky.
            Opus predicts content from prior frames, which can go
