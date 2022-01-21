@@ -162,6 +162,7 @@ void SortMenuVideo::onPopup(QMenu * menu) /* override */
     {
         { N_("Do not group videos"), MainCtx::GROUPING_NONE },
         { N_("Group by name"), MainCtx::GROUPING_NAME },
+        { N_("Group by folder"), MainCtx::GROUPING_FOLDER },
     };
 
     QActionGroup * group = new QActionGroup(this);
