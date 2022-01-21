@@ -194,7 +194,6 @@ QQuickItem* MainUI::createRootItem()
     return m_rootItem;
 }
 
-
 void MainUI::registerQMLTypes()
 {
     {
@@ -272,6 +271,22 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
+
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* const uri = "org.videolan.compat";
+        const int versionMajor = 0;
+        const int versionMinor = 1;
+
+        qmlRegisterModule(uri, versionMajor, versionMinor);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        qmlRegisterType(QUrl("qrc:///util/BindingRev14.qml"), uri, versionMajor, versionMinor, "BindingCompat");
+#else
+        qmlRegisterType(QUrl("qrc:///util/BindingRev8.qml"), uri, versionMajor, versionMinor, "BindingCompat");
+#endif
 
         qmlProtectModule(uri, versionMajor);
     }
