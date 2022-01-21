@@ -91,7 +91,7 @@ parts:
       fi
       cd ../../
       export NOCONFIGURE=1
-      autoreconf -fi
+      ./bootstrap
       ./configure \
           --prefix=$SNAPCRAFT_PART_INSTALL/usr \
           --disable-wayland \
