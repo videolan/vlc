@@ -357,6 +357,8 @@ QString CoverGenerator::getPrefix(vlc_ml_parent_type type) const
             return "genre";
         case VLC_ML_PARENT_GROUP:
             return "group";
+        case VLC_ML_PARENT_FOLDER:
+            return "folder";
         case VLC_ML_PARENT_PLAYLIST:
             return "playlist";
         default:
