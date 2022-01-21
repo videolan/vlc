@@ -58,6 +58,7 @@
 #endif
 
 #include "smb_common.h"
+#include "cache.h"
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -75,6 +76,8 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
+VLC_ACCESS_CACHE_REGISTER(smb2_cache);
+
 struct access_sys
 {
     struct smb2_context *   smb2;
@@ -87,6 +90,8 @@ struct access_sys
     bool                    smb2_connected;
 
     int                     error_status;
+
+    struct vlc_access_cache_entry *cache_entry;
 };
 
 struct vlc_smb2_op
@@ -628,6 +633,15 @@ error:
     return -1;
 }
 
+static void
+vlc_smb2_FreeContext(void *context)
+{
+    struct smb2_context *smb2 = context;
+
+    vlc_smb2_disconnect_share(NULL, smb2);
+    smb2_destroy_context(smb2);
+}
+
 static int
 vlc_smb2_connect_open_share(stream_t *access, const char *url,
                             const vlc_credential *credential)
@@ -662,6 +676,25 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
         password = NULL;
     }
 
+    struct vlc_access_cache_entry *cache_entry =
+        vlc_access_cache_GetSmbEntry(&smb2_cache, smb2_url->server, share,
+                                     credential->psz_username);
+    if (cache_entry != NULL)
+    {
+        int err = vlc_smb2_open_share(access, cache_entry->context, smb2_url, do_enum);
+        if (err == 0)
+        {
+            smb2_destroy_context(sys->smb2);
+            sys->smb2 = cache_entry->context;
+            sys->smb2_connected = true;
+            sys->cache_entry = cache_entry;
+
+            smb2_destroy_url(smb2_url);
+            msg_Dbg(access, "re-using old smb2 session");
+            return 0;
+        }
+    }
+
     smb2_set_security_mode(sys->smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
     smb2_set_password(sys->smb2, password);
     smb2_set_domain(sys->smb2, domain ? domain : "");
@@ -687,6 +720,12 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
 
     err = vlc_smb2_open_share(access, sys->smb2, smb2_url, do_enum);
     if (err < 0)
+        goto error;
+
+    sys->cache_entry = vlc_access_cache_entry_NewSmb(sys->smb2, smb2_url->server, share,
+                                                     credential->psz_username,
+                                                     vlc_smb2_FreeContext);
+    if (sys->cache_entry == NULL)
         goto error;
 
     smb2_destroy_url(smb2_url);
@@ -889,8 +928,7 @@ Close(vlc_object_t *p_obj)
 
     assert(sys->smb2_connected);
 
-    vlc_smb2_disconnect_share(access, sys->smb2);
-    smb2_destroy_context(sys->smb2);
+    vlc_access_cache_AddEntry(&smb2_cache, sys->cache_entry);
 
     vlc_UrlClean(&sys->encoded_url);
 }

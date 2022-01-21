@@ -376,7 +376,7 @@ endif
 
 libsmb2_plugin_la_SOURCES = access/smb2.c
 libsmb2_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMB2_CFLAGS)
-libsmb2_plugin_la_LIBADD = $(SMB2_LIBS) $(SOCKET_LIBS)
+libsmb2_plugin_la_LIBADD = $(SMB2_LIBS) $(SOCKET_LIBS) libvlc_access_cache.la
 libsmb2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 if HAVE_DSM
 libsmb2_plugin_la_CFLAGS += $(DSM_CFLAGS) -DHAVE_DSM
