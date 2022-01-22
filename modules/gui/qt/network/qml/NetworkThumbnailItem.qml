@@ -86,7 +86,6 @@ Item {
         source: item.rowModel.artwork
         visible: item.rowModel.artwork
                  && item.rowModel.artwork.toString() !== ""
-        mipmap: true
 
         Widgets.PlayCover {
             anchors.centerIn: parent

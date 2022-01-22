@@ -34,7 +34,6 @@ Item {
         anchors.centerIn: parent
         visible: !networkModel.artwork || networkModel.artwork.toString() === ""
         height: iconSize
-        mipmap: true
         sourceSize: Qt.size(width, height)
         source: {
             switch (networkModel.type) {
