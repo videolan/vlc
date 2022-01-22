@@ -215,11 +215,8 @@ PKG_CONFIG_LIBDIR ?= /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
 export PKG_CONFIG_LIBDIR
 need_pkg = $(shell PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) $(PKG_CONFIG) $(1) || echo 1)
 endif
-
-# This inhibits .pc file from within the cross-compilation toolchain sysroot.
-# Hopefully, nobody ever needs that.
-PKG_CONFIG_PATH := /usr/share/pkgconfig
 endif # HAVE_CROSS_COMPILE
+
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 PKG_CONFIG_PATH := $(shell cygpath -pm ${PKG_CONFIG_PATH})
