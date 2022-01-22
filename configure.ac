@@ -3169,7 +3169,6 @@ have_gl="no"
 PKG_CHECK_MODULES([GL], [gl], [
   have_gl="yes"
 ], [
-  AC_MSG_CHECKING([for OpenGL])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #ifdef _WIN32
 # include <GL/glew.h>
@@ -3179,13 +3178,17 @@ PKG_CHECK_MODULES([GL], [gl], [
     [int t0 = GL_TEXTURE0;]])
   ], [
     GL_CFLAGS=""
-    have_gl="yes"
     AS_IF([test "${SYS}" != "mingw32"], [
-      GL_LIBS="-lGL"
+      AC_CHECK_LIB([GL], [glTexture2D], [
+        have_gl="yes"
+        GL_LIBS="-lGL"
+      ])
     ], [
+      have_gl="yes"
       GL_LIBS="-lopengl32"
     ])
   ])
+  AC_MSG_CHECKING([for OpenGL])
   AC_MSG_RESULT([${have_gl}])
 ])
 AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
