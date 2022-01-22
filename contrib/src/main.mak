@@ -493,7 +493,7 @@ mostlyclean:
 	-$(RM) toolchain.cmake
 	-$(RM) crossfile.meson
 	-$(RM) -R "$(PREFIX)"
-	-$(RM) -R "$(BUILDBINDIR)"
+	-$(RM) "$(BUILDBINDIR)/$(HOST)-*"
 	-$(RM) -R */
 
 clean: mostlyclean
