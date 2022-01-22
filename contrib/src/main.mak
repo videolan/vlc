@@ -211,7 +211,7 @@ ifeq ($(shell unset PKG_CONFIG_LIBDIR; $(HOST)-pkg-config --version 1>/dev/null 
 PKG_CONFIG ?= $(HOST)-pkg-config
 else
 # Use the regular pkg-config and set some PKG_CONFIG_LIBDIR ourselves
-PKG_CONFIG_LIBDIR ?= /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
+PKG_CONFIG_LIBDIR ?= /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig:/usr/share/pkgconfig
 export PKG_CONFIG_LIBDIR
 need_pkg = $(shell PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) $(PKG_CONFIG) $(1) || echo 1)
 endif
