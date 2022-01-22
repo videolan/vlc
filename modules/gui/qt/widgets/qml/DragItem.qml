@@ -348,7 +348,6 @@ Item {
         id: artworkLoader
 
         Image {
-            mipmap: true
             fillMode: Image.PreserveAspectCrop
             width: coverSize
             height: coverSize
