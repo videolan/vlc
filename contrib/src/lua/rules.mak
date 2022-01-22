@@ -111,15 +111,11 @@ endif
 .sum-luac: .sum-lua
 	touch $@
 
+LUACVARS=AR="$(BUILDAR) cru"
 ifdef HAVE_WIN32
 ifndef HAVE_CROSS_COMPILE
-LUACVARS=CPPFLAGS="-DLUA_DL_DLL"
+LUACVARS+=CPPFLAGS="$(BUILDCPPFLAGS) -DLUA_DL_DLL"
 endif
-endif
-
-ifdef HAVE_CROSS_COMPILE
-# Remove the cross-compiler environment for the native compiler
-LUACVARS+=CFLAGS="" CPPFLAGS="" LDFLAGS=""
 endif
 
 # DO NOT use the same intermediate directory as the lua target
@@ -131,7 +127,7 @@ luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	$(MOVE)
 
 .luac: luac
-	cd $< && $(LUACVARS) $(MAKE) generic
+	cd $< && $(MAKE) $(BUILDVARS) $(LUACVARS) generic
 	mkdir -p -- $(BUILDBINDIR)
 	install -m 0755 -s -- $</src/luac $(BUILDBINDIR)/$(HOST)-luac
 	touch $@
