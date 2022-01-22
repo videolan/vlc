@@ -151,7 +151,8 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
             assert(window());
 
             QSGTexture* texture = window()->createTextureFromImage(m_roundImage,
-                QQuickWindow::TextureHasAlphaChannel);
+                static_cast<QQuickWindow::CreateTextureOptions>(QQuickWindow::TextureHasAlphaChannel |
+                                                                QQuickWindow::TextureCanUseAtlas));
 
             if (texture)
             {
