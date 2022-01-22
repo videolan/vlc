@@ -173,7 +173,39 @@ endif
 endif
 endif
 
-# Do not export those! Use HOSTVARS.
+ifeq ($(shell gcc --version >/dev/null 2>&1 || echo No GCC),)
+BUILDCC ?= gcc
+BUILDCXX ?= g++
+ifeq ($(shell gcc-ar --version >/dev/null 2>&1 || echo Prehistoric GCC),)
+BUILDAR ?= gcc-ar
+BUILDNM ?= gcc-nm
+BUILDRANLIB ?= gcc-ranlib
+endif
+else ifeq ($(shell clang --version >/dev/null 2>&1 || No LLVM/Clang),)
+BUILDCC ?= clang
+BUILDCXX ?= clang++
+ifeq ($(shell llvm-ar --version >/dev/null 2>&1 || echo Prehistoric LLVM),)
+BUILDAR ?= llvm-ar
+BUILDNM ?= llvm-nm
+BUILDRANLIB ?= llvm-ranlib
+BUILDSTRIP ?= llvm-strip
+endif
+endif
+
+BUILDCC ?= cc
+BUILDCXX ?= c++
+BUILDLD ?= $(BUILDCC)
+BUILDAR ?= ar
+BUILDNM ?= nm
+BUILDRANLIB ?= ranlib
+BUILDSTRIP ?= strip
+
+BUILDCPPFLAGS ?=
+BUILDCFLAGS ?= -O2
+BUILDCXXFLAGS ?= $(BUILDCFLAGS)
+BUILDLDFLAGS ?= $(BUILDCFLAGS)
+
+# Do not export variables above! Use HOSTVARS or BUILDVARS.
 
 # Do the FPU detection, after we have figured out our compilers and flags.
 ifneq ($(findstring $(ARCH),aarch64 i386 ppc ppc64 sparc sparc64 x86_64),)
@@ -332,6 +364,30 @@ HOSTVARS_PIC := $(HOSTTOOLS) \
 	CFLAGS="$(CFLAGS) $(PIC)" \
 	CXXFLAGS="$(CXXFLAGS) $(PIC)" \
 	LDFLAGS="$(LDFLAGS)"
+
+BUILDCOMMONCONF := --disable-dependency-tracking
+BUILDCOMMONCONF += --prefix="$(BUILDPREFIX)"
+BUILDCOMMONCONF += --datarootdir="$(BUILDPREFIX)/share"
+BUILDCOMMONCONF += --includedir="$(BUILDPREFIX)/include"
+BUILDCOMMONCONF += --libdir="$(BUILDPREFIX)"
+BUILDCOMMONCONF += --build="$(BUILD)" --host="$(BUILD)"
+# For platform-independent tools (--target should be meaningless):
+BUILDPROGCONF := $(BUILDCOMMONCONF) \
+	--target="$(BUILD)" --program-prefix=""
+# For platform-dependent tools:
+BUILDTOOLCONF := $(BUILDCOMMONCONF) \
+	--target="$(HOST)" --program-prefix="$(HOST)-"
+
+BUILDTOOLS := \
+	CC="$(BUILDCC)" CXX="$(BUILDCXX)" LD="$(BUILDLD)" \
+	AR="$(BUILDAR)" NM="$(BUILDNM)" RANLIB="$(BUILDRANLIB)" \
+	STRIP="$(BUILDSTRIP)" PATH="$(BUILDPREFIX)/bin:$(PATH)"
+
+BUILDVARS := $(BUILDTOOLS) \
+	CPPFLAGS="$(BUILDCPPFLAGS)" \
+	CFLAGS="$(BUILDCFLAGS)" \
+	CXXFLAGS="$(BUILDCXXFLAGS)" \
+	LDFLAGS="$(BUILDLDFLAGS)"
 
 download_git = \
 	rm -Rf -- "$(@:.tar.xz=)" && \
