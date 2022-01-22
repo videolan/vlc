@@ -211,8 +211,6 @@ ifeq ($(shell unset PKG_CONFIG_LIBDIR; $(HOST)-pkg-config --version 1>/dev/null 
 PKG_CONFIG ?= $(HOST)-pkg-config
 else
 # Use the regular pkg-config and set some PKG_CONFIG_LIBDIR ourselves
-PKG_CONFIG = pkg-config
-
 ifeq ($(findstring $(origin PKG_CONFIG_LIBDIR),undefined),)
 # an extra PKG_CONFIG_LIBDIR was provided, use it prioritarily
 PKG_CONFIG_LIBDIR := $(PKG_CONFIG_LIBDIR):/usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
