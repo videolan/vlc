@@ -139,6 +139,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         msg_Err(gl, "Could not create interop");
         goto free_vgl;
     }
+    GL_ASSERT_NOERROR(vt);
 
     vgl->filters = vlc_gl_filters_New(gl, api, vgl->interop);
     if (!vgl->filters)
@@ -146,6 +147,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         msg_Err(gl, "Could not create filters");
         goto delete_interop;
     }
+    GL_ASSERT_NOERROR(vt);
 
     int upscaler = var_InheritInteger(gl, "gl-upscaler");
     int downscaler = var_InheritInteger(gl, "gl-downscaler");
@@ -191,6 +193,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                  (const char *) &fmt->i_chroma);
         goto delete_filters;
     }
+    GL_ASSERT_NOERROR(vt);
 
     /* The renderer is a special filter: we need its concrete instance to
      * forward SetViewpoint() */
@@ -202,6 +205,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         msg_Err(gl, "Could not init filters framebuffers");
         goto delete_filters;
     }
+    GL_ASSERT_NOERROR(vt);
 
     vgl->sub_interop = vlc_gl_interop_NewForSubpictures(gl);
     if (!vgl->sub_interop)
@@ -209,6 +213,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         msg_Err(gl, "Could not create sub interop");
         goto delete_filters;
     }
+    GL_ASSERT_NOERROR(vt);
 
     vgl->sub_renderer =
         vlc_gl_sub_renderer_New(gl, api, vgl->sub_interop);
