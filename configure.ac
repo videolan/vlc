@@ -3718,7 +3718,9 @@ AC_ARG_ENABLE([sndio],
 have_sndio="no"
 AS_IF([test "$enable_sndio" != "no"], [
   AC_CHECK_HEADER([sndio.h], [
-    have_sndio="yes"
+    AC_CHECK_LIB([sndio], [sio_open], [
+      have_sndio="yes"
+    ])
   ])
 ])
 AM_CONDITIONAL([HAVE_SNDIO], [test "${have_sndio}" = "yes"])
