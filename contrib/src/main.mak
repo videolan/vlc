@@ -188,6 +188,10 @@ ifeq ($(call cppcheck, __SOFTFP__),)
 HAVE_FPU = 1
 endif
 endif
+else ifneq ($(filter riscv%, $(ARCH)),)
+ifneq ($(call cppcheck, __riscv_flen),)
+HAVE_FPU = 1
+endif
 else ifneq ($(call cppcheck, __mips_hard_float),)
 HAVE_FPU = 1
 endif
