@@ -34,12 +34,12 @@ if os.environ.get('HOST_SYSTEM') == 'darwin':
 _add_environ_val('ar', 'AR')
 _add_environ_val('strip', 'STRIP')
 _add_environ_val('pkgconfig', 'PKG_CONFIG')
-_add_environ_val('pkg_config_libdir', 'PKG_CONFIG_LIBDIR')
 _add_environ_val('windres', 'WINDRES')
 
 # Properties section
 args.file.write("\n[properties]\n")
 args.file.write("needs_exe_wrapper = true\n")
+_add_environ_val('pkg_config_libdir', 'PKG_CONFIG_LIBDIR')
 _add_environ_arr('c_args', 'CFLAGS')
 _add_environ_arr('c_link_args', 'LDFLAGS')
 _add_environ_arr('cpp_args', 'CXXFLAGS')
