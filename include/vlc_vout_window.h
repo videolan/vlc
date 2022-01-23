@@ -450,7 +450,7 @@ VLC_API void vout_window_Delete(vout_window_t *window);
  *
  * \param window window in respect to which the screensaver should be inhibited
  *               or deinhibited
- * \param true to inhibit, false to deinhibit
+ * \param enabled true to inhibit, false to deinhibit
  */
 void vout_window_SetInhibition(vout_window_t *window, bool enabled);
 
@@ -577,6 +577,7 @@ static inline void vout_window_ReportClose(vout_window_t *window)
  * This function is called by the window implementation to notify the owner of
  * the window that the state of the window changed.
  *
+ * \param window the window reporting the state change
  * \param state \see vout_window_state
  */
 static inline void vout_window_ReportState(vout_window_t *window,
@@ -597,6 +598,7 @@ VLC_API void vout_window_ReportWindowed(vout_window_t *wnd);
 /**
  * Reports that the window is in full screen.
  *
+ * \param wnd the window reporting the fullscreen state
  * \param id fullscreen output nul-terminated identifier, NULL for default
  */
 VLC_API void vout_window_ReportFullscreen(vout_window_t *wnd, const char *id);
@@ -694,6 +696,7 @@ static inline void vout_window_ReportKeyPress(vout_window_t *window, int key)
  * updated. Otherwise it will be added.
  * If the name parameter is NULL, the output will be removed.
  *
+ * \param window the window reporting the output device
  * \param id unique nul-terminated identifier for the output
  * \param name human-readable name
  */
