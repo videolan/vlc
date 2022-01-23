@@ -71,10 +71,22 @@ ifneq ($(findstring $(origin LD),undefined default),)
 LD := $(MAYBEHOST)ld
 endif
 ifneq ($(findstring $(origin AR),undefined default),)
+ifeq ($(shell $(MAYBEHOST)gcc-ar --version >/dev/null 2>&1 || echo Prehistory),)
+AR := $(MAYBEHOST)gcc-ar
+else
 AR := $(MAYBEHOST)ar
 endif
+endif
+ifeq ($(shell $(MAYBEHOST)gcc-nm --version >/dev/null 2>&1 || echo Prehistory),)
+NM ?= $(MAYBEHOST)gcc-nm
+else
 NM ?= $(MAYBEHOST)nm
+endif
+ifeq ($(shell $(MAYBEHOST)gcc-ranlib --version >/dev/null 2>&1 || echo Prehistory),)
+RANLIB ?= $(MAYBEHOST)gcc-ranlib
+else
 RANLIB ?= $(MAYBEHOST)ranlib
+endif
 STRIP ?= $(MAYBEHOST)strip
 WIDL ?= $(MAYBEHOST)widl
 WINDRES ?= $(MAYBEHOST)windres
