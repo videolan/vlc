@@ -83,9 +83,10 @@ typedef struct vlc_video_align {
  *
  * This primarily controls the size of the display area within the video
  * window, as follows:
- * - If \ref is_display_filled is set,
+ * - If \ref vout_display_cfg.is_display_filled is set,
  *   the video size is fitted to the display size.
- * - If \ref window size is valid, the video size is set to the window size,
+ * - If \ref vout_display_cfg.window size is valid, the video size is set to
+ *   the window size,
  * - Otherwise, the video size is determined from the original video format,
  *   multiplied by the zoom factor.
  */
@@ -131,7 +132,8 @@ enum vout_display_query {
      * Notifies a change in display size.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
 
@@ -139,7 +141,8 @@ enum vout_display_query {
      * Notifies a change of the display fill display flag by the user.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
 
@@ -147,7 +150,8 @@ enum vout_display_query {
      * Notifies a change of the user zoom factor.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_ZOOM,
 
@@ -155,7 +159,8 @@ enum vout_display_query {
      * Notifies a change of the sample aspect ratio.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
 
@@ -166,7 +171,8 @@ enum vout_display_query {
      * and video_format_t::i_visible_width/height
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,
 };
@@ -197,9 +203,8 @@ struct vout_display_owner_t {
  * "vout display" open callback
  *
  * @param vd vout display context
- * @param cfg Initial and current configuration.
  * @param fmtp It can be changed by the module to request a different format.
- * @param context XXX: to be defined.
+ * @param context The video context to configure the display for.
  * @return VLC_SUCCESS or a VLC error code
  */
 typedef int (*vout_display_open_cb)(vout_display_t *vd,
@@ -234,8 +239,10 @@ struct vlc_display_operations
      * queue the picture to be shown asynchronously at the given date.
      *
      *
-     * If prepare and display are not \c NULL, there is an implicit guarantee
-     * that display will be invoked with the exact same picture afterwards:
+     * If \ref vlc_display_operations.prepare and
+     * \ref vlc_display_operations.display are not \c NULL, there is an
+     * implicit guarantee that display will be invoked with the exact same
+     * picture afterwards:
      * prepare 1st picture, display 1st picture, prepare 2nd picture, display
      * 2nd picture, and so on.
      *
@@ -323,13 +330,14 @@ struct vout_display_t {
      * Picture format.
      *
      * This is the format of the pictures that are supplied to the
-     * \ref prepare and \ref display callbacks. Ideally, it should be identical
-     * or as close as possible as \ref source.
+     * \ref vlc_display_operations.prepare and
+     * \ref vlc_display_operations.display callbacks.
+     * Ideally, it should be identical or as close as possible as \ref source.
      *
      * This can only be changed from the display module activation callback,
-     * or within a \ref reset_pictures request.
+     * or within a \ref vlc_display_operations.reset_pictures request.
      *
-     * By default, it is equal to ::source except for the aspect ratio
+     * By default, it is equal to \ref source except for the aspect ratio
      * which is undefined(0) and is ignored.
      */
     const video_format_t *fmt;
