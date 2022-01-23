@@ -56,43 +56,28 @@ endif
 #
 # Default values for tools
 #
-ifndef HAVE_CROSS_COMPILE
-ifneq ($(findstring $(origin CC),undefined default),)
-CC := gcc
-endif
-ifneq ($(findstring $(origin CXX),undefined default),)
-CXX := g++
-endif
-ifneq ($(findstring $(origin LD),undefined default),)
-LD := ld
-endif
-ifneq ($(findstring $(origin AR),undefined default),)
-AR := ar
-endif
-NM ?= nm
-RANLIB ?= ranlib
-STRIP ?= strip
-WIDL ?= widl
-WINDRES ?= windres
+ifdef HAVE_CROSS_COMPILE
+MAYBEHOST := $(HOST)-
 else
+MAYBEHOST :=
+endif
 ifneq ($(findstring $(origin CC),undefined default),)
-CC := $(HOST)-gcc
+CC := $(MAYBEHOST)gcc
 endif
 ifneq ($(findstring $(origin CXX),undefined default),)
-CXX := $(HOST)-g++
+CXX := $(MAYBEHOST)g++
 endif
 ifneq ($(findstring $(origin LD),undefined default),)
-LD := $(HOST)-ld
+LD := $(MAYBEHOST)ld
 endif
 ifneq ($(findstring $(origin AR),undefined default),)
-AR := $(HOST)-ar
+AR := $(MAYBEHOST)ar
 endif
-NM ?= $(HOST)-nm
-RANLIB ?= $(HOST)-ranlib
-STRIP ?= $(HOST)-strip
-WIDL ?= $(HOST)-widl
-WINDRES ?= $(HOST)-windres
-endif
+NM ?= $(MAYBEHOST)nm
+RANLIB ?= $(MAYBEHOST)ranlib
+STRIP ?= $(MAYBEHOST)strip
+WIDL ?= $(MAYBEHOST)widl
+WINDRES ?= $(MAYBEHOST)windres
 
 ifdef HAVE_ANDROID
 ifneq ($(findstring $(origin CC),undefined default),)
