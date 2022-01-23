@@ -52,7 +52,12 @@ enum
     OSD_VERT_SLIDER,
 };
 
-VLC_API int vout_OSDEpg( vout_thread_t *, input_item_t * );
+/**
+ * \brief Show EPG information about the current program of an input item
+ * \param vout pointer to the vout the information is to be showed on
+ * \param input pointer to the input item the information is to be showed
+ */
+VLC_API int vout_OSDEpg( vout_thread_t *vout, input_item_t *input);
 
 /**
  * \brief Write an informative message if the OSD option is enabled.
@@ -111,4 +116,3 @@ VLC_API void vout_OSDIcon( vout_thread_t *p_this, int i_channel,
 #endif
 
 #endif /* VLC_VOUT_OSD_H */
-

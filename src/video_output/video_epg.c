@@ -542,13 +542,7 @@ static void OSDEpgDestroy(subpicture_t *subpic)
     free(sys);
 }
 
-/**
- * \brief Show EPG information about the current program of an input item
- * \param vout pointer to the vout the information is to be showed on
- * \param p_input pointer to the input item the information is to be showed
- * \param i_action osd_epg_action_e action
- */
-int vout_OSDEpg(vout_thread_t *vout, input_item_t *input )
+int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
 {
     vlc_epg_t *epg = NULL;
     int64_t epg_time;
