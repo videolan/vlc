@@ -336,13 +336,15 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
-static const struct vlc_display_operations ops = {
-    .close = Close,
-    .prepare = Prepare,
-    .display = Display,
-    .control = Control,
-    .set_viewpoint = SetViewpoint,
-};
+static const auto ops = []{
+    struct vlc_display_operations ops {};
+    ops.close = Close;
+    ops.prepare = Prepare;
+    ops.display = Display;
+    ops.control = Control;
+    ops.set_viewpoint = SetViewpoint;
+    return ops;
+}();
 
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
@@ -968,9 +970,11 @@ static bool CanUseTextureArray(vout_display_t *vd)
     // 15.200.1062.1004 is wrong - 2015/08/03 - 15.7.1 WHQL
     // 21.19.144.1281 is wrong   -
     // 22.19.165.3 is good       - 2017/05/04 - ReLive Edition 17.5.1
-    struct wddm_version WDDM_os = {
-        .wddm         = 21,  // starting with drivers designed for W10 Anniversary Update
-    };
+    const auto WDDM_os = []{
+        struct wddm_version wddm = {};
+        wddm.wddm         = 21;  // starting with drivers designed for W10 Anniversary Update
+        return wddm;
+    }();
     if (D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
     {
         msg_Dbg(vd, "AMD driver too old, fallback to legacy shader mode");
@@ -978,9 +982,11 @@ static bool CanUseTextureArray(vout_display_t *vd)
     }
 
     // xx.xx.1000.xxx drivers can't happen here for WDDM > 2.0
-    struct wddm_version WDDM_build = {
-        .revision     = 162,
-    };
+    const auto WDDM_build = []{
+        struct wddm_version wddm = {};
+        wddm.revision      = 162;
+        return wddm;
+    }();
     if (D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
     {
         msg_Dbg(vd, "Bogus AMD driver detected, fallback to legacy shader mode");
@@ -1004,9 +1010,11 @@ static bool BogusZeroCopy(const vout_display_t *vd)
     case 0x6863: // RX Vega Frontier Edition
     case 0x15DD: // RX Vega 8/11 (Ryzen iGPU)
     {
-        struct wddm_version WDDM = {
-            .revision     = 14011, // 18.10.2 - 2018/06/11
-        };
+        const auto WDDM = []{
+            struct wddm_version wddm = {};
+            wddm.revision     = 14011; // 18.10.2 - 2018/06/11
+            return wddm;
+        }();
         return D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
     }
     default:
@@ -1346,10 +1354,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 free(d3dquad);
                 continue;
             }
-            picture_resource_t picres = {
-                .p_sys      = (picture_sys_d3d11_t *) d3dquad,
-                .pf_destroy = DestroyPictureQuad,
-            };
+            const auto picres = [](picture_sys_d3d11_t * p_sys){
+                picture_resource_t res = {};
+                res.p_sys      = p_sys;
+                res.pf_destroy = DestroyPictureQuad;
+                return res;
+            }((picture_sys_d3d11_t *) d3dquad);
             (*region)[i] = picture_NewFromResource(&r->p_picture->format, &picres);
             if ((*region)[i] == NULL) {
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
