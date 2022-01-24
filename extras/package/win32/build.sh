@@ -327,12 +327,13 @@ if [ "$PREBUILT" != "yes" ]; then
     if [ "$PACKAGE" = "yes" ]; then
         make package
     fi
-elif [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-    make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-    make .luac
 else
-    make prebuilt
-    make .luac
+    if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+    else
+        make prebuilt
+    fi
+    make .luac .protoc
 fi
 cd ../..
 

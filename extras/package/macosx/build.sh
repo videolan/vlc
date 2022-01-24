@@ -180,11 +180,10 @@ else
 if [ ! -e "../$HOST_TRIPLET" ]; then
     if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
         make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-        make .luac
     else
         make prebuilt
-        make .luac
     fi
+    make .luac .protoc
 fi
 fi
 spopd
