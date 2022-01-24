@@ -21,6 +21,7 @@ pragma Singleton
 import QtQuick 2.11
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 Item {
     id: root
@@ -36,7 +37,7 @@ Item {
         }
     }
 
-    Binding {
+    BindingCompat {
         when: root.enabled
         target: MainCtx
         property: "acrylicActive"

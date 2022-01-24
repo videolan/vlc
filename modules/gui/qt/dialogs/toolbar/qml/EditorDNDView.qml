@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///util/" as Util
@@ -159,7 +160,7 @@ ListView {
 
         dndView: playerBtnDND
 
-        Binding {
+        BindingCompat {
             when: dropArea.containsDrag
             value: true
 

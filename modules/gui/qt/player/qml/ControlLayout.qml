@@ -21,6 +21,7 @@ import QtQuick.Layouts 1.11
 import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -121,7 +122,7 @@ FocusScope {
                 readonly property real minimumWidth: (expandable ? item.minimumWidth : item.implicitWidth)
                 readonly property bool expandable: (item.minimumWidth !== undefined)
 
-                Binding {
+                BindingCompat {
                     delayed: true // this is important
                     target: loader
                     property: "visible"

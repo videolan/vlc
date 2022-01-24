@@ -21,8 +21,10 @@ import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
-import org.videolan.vlc 0.1
 import QtQml.Models 2.11
+
+import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -61,7 +63,7 @@ FocusScope {
         searchBox.state = "expanded"
     }
 
-    Binding {
+    BindingCompat {
         property: "searchPattern"
         value: searchBox.searchPattern
         when: !!contentModel

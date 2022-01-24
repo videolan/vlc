@@ -22,6 +22,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Window 2.11
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -38,13 +39,13 @@ Rectangle {
     property alias g_root: root
     property QtObject g_dialogs: dialogsLoader.item
 
-    Binding {
+    BindingCompat {
         target: VLCStyle.self
         property: "appWidth"
         value: root.width
     }
 
-    Binding {
+    BindingCompat {
         target: VLCStyle.self
         property: "appHeight"
         value: root.height

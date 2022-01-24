@@ -20,6 +20,8 @@ import QtQuick 2.11
 import QtQml 2.11
 import QtQml.Models 2.11
 
+import org.videolan.compat 0.1
+
 QtObject {
     id: root
 
@@ -36,7 +38,7 @@ QtObject {
 
         model: root.model
 
-        delegate: Binding {
+        delegate: BindingCompat {
             target: model.target ? model.target
                                  : root.target
             when: model.when !== undefined ? model.when
