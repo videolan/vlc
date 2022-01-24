@@ -77,6 +77,10 @@ typedef struct vout_display_sys_t
     vlc_gl_t *gl;
     vout_display_place_t place;
     bool place_changed;
+
+    struct {
+        PFNGLFLUSHPROC Flush;
+    } vt;
 } vout_display_sys_t;
 
 /* Display callbacks */
@@ -154,6 +158,9 @@ static int Open(vout_display_t *vd,
     if (sys->gl == NULL)
         goto error;
 
+    sys->vt.Flush = vlc_gl_GetProcAddress(sys->gl, "glFlush");
+    if (sys->vt.Flush == NULL)
+        goto error;
 
     vout_display_cfg_t flipped_cfg = *vd->cfg;
     FlipVerticalAlign(&flipped_cfg);
@@ -211,6 +218,7 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
     if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {
         vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
+        sys->vt.Flush();
         vlc_gl_ReleaseCurrent (sys->gl);
     }
 }
