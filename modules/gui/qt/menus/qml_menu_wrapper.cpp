@@ -20,6 +20,7 @@
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlvideomodel.hpp"
 #include "medialibrary/mlvideogroupsmodel.hpp"
+#include "medialibrary/mlvideofoldersmodel.hpp"
 #include "medialibrary/mlplaylistlistmodel.hpp"
 #include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlalbummodel.hpp"
@@ -627,6 +628,69 @@ void VideoGroupsContextMenu::popup(const QModelIndexList & selected, QPoint pos,
                 this, &VideoGroupsContextMenu::showMediaInformation);
 #endif
     }
+
+    m_menu->popup(pos);
+}
+
+// VideoFoldersContextMenu
+
+VideoFoldersContextMenu::VideoFoldersContextMenu(QObject * parent) : QObject(parent) {}
+
+VideoFoldersContextMenu::~VideoFoldersContextMenu() /* override */
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+void VideoFoldersContextMenu::popup(const QModelIndexList & selected, QPoint pos,
+                                    QVariantMap options)
+{
+    if (m_model == nullptr)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    QVariantList ids;
+
+    for (const QModelIndex & index : selected)
+        ids.push_back(m_model->data(index, MLVideoFoldersModel::FOLDER_ID));
+
+    m_menu = new QMenu();
+
+    MediaLib * ml = m_model->ml();
+
+    QAction * action = m_menu->addAction(qtr("Add and play"));
+
+    connect(action, &QAction::triggered, [ml, ids, options]()
+    {
+        ml->addAndPlay(ids, options["player-options"].toStringList());
+    });
+
+    action = m_menu->addAction(qtr("Enqueue"));
+
+    connect(action, &QAction::triggered, [ml, ids]()
+    {
+        ml->addToPlaylist(ids);
+    });
+
+    action = m_menu->addAction(qtr("Add to playlist"));
+
+    connect(action, &QAction::triggered, [ids]()
+    {
+        DialogsProvider::getInstance()->playlistsDialog(ids);
+    });
+
+    action = m_menu->addAction(qtr("Play as audio"));
+
+    connect(action, &QAction::triggered, [ml, ids, options]()
+    {
+        QStringList list = options["player-options"].toStringList();
+
+        list.prepend(":no-video");
+
+        ml->addAndPlay(ids, list);
+    });
 
     m_menu->popup(pos);
 }

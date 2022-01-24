@@ -34,7 +34,7 @@ class MLAlbumTrackModel;
 class MLUrlModel;
 class MLVideoModel;
 class MLVideoGroupsModel;
-class MLGroupModel;
+class MLVideoFoldersModel;
 class MLPlaylistListModel;
 class MLPlaylistModel;
 class NetworkDeviceModel;
@@ -292,6 +292,29 @@ public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
 
 signals:
+    void showMediaInformation(int index);
+
+private:
+    QMenu * m_menu = nullptr;
+};
+
+// Folders
+
+class VideoFoldersContextMenu : public QObject {
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(MLVideoFoldersModel *, model, nullptr)
+
+public:
+    VideoFoldersContextMenu(QObject * parent = nullptr);
+
+    ~VideoFoldersContextMenu(); /* override */
+
+public slots:
+    void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
+
+signals:
+    // FIXME: This signal is required for VideoAll Connections.
     void showMediaInformation(int index);
 
 private:

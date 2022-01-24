@@ -350,6 +350,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<URLContextMenu>( uri, versionMajor, versionMinor, "URLContextMenu" );
         qmlRegisterType<VideoContextMenu>( uri, versionMajor, versionMinor, "VideoContextMenu" );
         qmlRegisterType<VideoGroupsContextMenu>( uri, versionMajor, versionMinor, "VideoGroupsContextMenu" );
+        qmlRegisterType<VideoFoldersContextMenu>( uri, versionMajor, versionMinor, "VideoFoldersContextMenu" );
         qmlRegisterType<PlaylistListContextMenu>( uri, versionMajor, versionMinor, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( uri, versionMajor, versionMinor, "PlaylistMediaContextMenu" );
 
