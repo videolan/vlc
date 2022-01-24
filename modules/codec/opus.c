@@ -175,6 +175,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
     p_sys->b_has_headers = false;
+    opus_header_init(&p_sys->header);
 
     date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 
@@ -238,6 +239,7 @@ static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
  *****************************************************************************/
 static int ProcessHeaders( decoder_t *p_dec )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;
 
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
@@ -253,10 +255,13 @@ static int ProcessHeaders( decoder_t *p_dec )
         (i_extra > 10 && memcmp( &p_extra[2], "OpusHead", 8 )) ) /* Borked muxers */
     {
         OpusHeader header;
+        opus_header_init(&header);
         opus_prepare_header( p_dec->fmt_in.audio.i_channels,
                              p_dec->fmt_in.audio.i_rate, &header );
-        if( opus_write_header( &p_alloc, &i_extra, &header,
-                               opus_get_version_string() ) )
+        int ret = opus_write_header( &p_alloc, &i_extra, &header,
+                                     opus_get_version_string() );
+        opus_header_clean(&header);
+        if(ret != 0)
         {
             free( p_alloc );
             return VLC_ENOMEM;
@@ -282,7 +287,11 @@ static int ProcessHeaders( decoder_t *p_dec )
     int ret = ProcessInitialHeader( p_dec, &oggpacket );
 
     if (ret != VLC_SUCCESS)
+    {
         msg_Err( p_dec, "initial Opus header is corrupted" );
+        opus_header_clean( &p_sys->header );
+        opus_header_init( &p_sys->header );
+    }
 
     free( p_alloc );
 
@@ -525,6 +534,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     if( p_sys->p_st ) opus_multistream_decoder_destroy(p_sys->p_st);
 
+    opus_header_clean( &p_sys->header );
     free( p_sys );
 }
 
@@ -662,6 +672,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     enc->fmt_out.audio.i_channels = enc->fmt_in.audio.i_channels;
 
     OpusHeader header;
+    opus_header_init(&header);
 
     opus_prepare_header(enc->fmt_out.audio.i_channels,
             enc->fmt_out.audio.i_rate, &header);
@@ -736,6 +747,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         sys->padding = NULL;
     }
 
+    opus_header_clean(&header);
 
     if (status != VLC_SUCCESS)
         return status;
@@ -749,6 +761,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
+    opus_header_clean(&header);
     if (sys->enc)
         opus_multistream_encoder_destroy(sys->enc);
     free(sys->buffer);

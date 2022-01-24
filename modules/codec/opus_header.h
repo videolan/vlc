@@ -43,6 +43,8 @@ typedef struct {
     unsigned char stream_map[255];
 } OpusHeader;
 
+void opus_header_init(OpusHeader *);
+void opus_header_clean(OpusHeader *);
 int opus_header_parse(const unsigned char *header, int len, OpusHeader *h);
 void opus_prepare_header(unsigned channels, unsigned rate, OpusHeader *header);
 int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const char *vendor);
