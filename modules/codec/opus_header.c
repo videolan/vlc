@@ -179,7 +179,16 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
         return 0;
     h->channel_mapping = ch;
 
-    if (h->channel_mapping != 0)
+    if(h->channel_mapping == 0)
+    {
+        if(h->channels>2)
+            return 0;
+        h->nb_streams = 1;
+        h->nb_coupled = h->channels>1;
+        h->stream_map[0]=0;
+        h->stream_map[1]=1;
+    }
+    else if(h->channel_mapping < 4)
     {
         if (!read_chars(&p, &ch, 1))
             return 0;
@@ -191,26 +200,43 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
         if (!read_chars(&p, &ch, 1))
             return 0;
 
-        if (ch>h->nb_streams || (ch+h->nb_streams)>255)
+        if (ch > h->nb_streams)
             return 0;
         h->nb_coupled = ch;
 
         /* Multi-stream support */
-        for (int i=0;i<h->channels;i++)
+        if(h->channel_mapping == 2)
         {
-            if (!read_chars(&p, &h->stream_map[i], 1))
+            if (h->nb_coupled + h->nb_streams > 255)
                 return 0;
-            if (h->stream_map[i]>(h->nb_streams+h->nb_coupled) && h->stream_map[i]!=255)
-                return 0;
+            for (int i=0;i<h->channels;i++)
+            {
+                if (!read_chars(&p, &h->stream_map[i], 1))
+                    return 0;
+                if (h->stream_map[i]>(h->nb_streams+h->nb_coupled) && h->stream_map[i]!=255)
+                    return 0;
+            }
         }
-    } else {
-        if(h->channels>2)
-            return 0;
-        h->nb_streams = 1;
-        h->nb_coupled = h->channels>1;
-        h->stream_map[0]=0;
-        h->stream_map[1]=1;
+        else /* Decoding Matrix */
+        {
+            if (h->nb_coupled + h->nb_streams > 255)
+                return 0;
+            int matrix_entries = h->channels * (h->nb_streams + h->nb_coupled);
+            int matrix_size = len - p.pos;
+            if(matrix_size < matrix_entries * 2)
+                return 0;
+            h->dmatrix = malloc(matrix_size);
+            if(h->dmatrix == NULL)
+                return 0;
+            if(!read_chars(&p, h->dmatrix, matrix_size))
+            {
+                free(h->dmatrix);
+                return 0;
+            }
+            h->dmatrix_size = matrix_size;
+        }
     }
+
     /*For version 0/1 we know there won't be any more data
       so reject any that have data past the end.*/
     if ((h->version==0 || h->version==1) && p.pos != len)
@@ -350,7 +376,7 @@ static int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int
     if (!write_chars(&p, &ch, 1))
         return 0;
 
-    if (h->channel_mapping != 0)
+    if (h->channel_mapping == 1)
     {
         ch = h->nb_streams;
         if (!write_chars(&p, &ch, 1))
@@ -431,9 +457,11 @@ void opus_header_init(OpusHeader *h)
     h->channel_mapping = 255; /* unknown */
     h->nb_streams = 0;
     h->nb_coupled = 0;
+    h->dmatrix_size = 0;
+    h->dmatrix = NULL;
 }
 
 void opus_header_clean(OpusHeader *h)
 {
-    VLC_UNUSED(h);
+    free(h->dmatrix);
 }
