@@ -424,7 +424,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
     GLint oneplane_texfmt;
-    if (vlc_gl_StrHasToken(priv->api->extensions, "GL_ARB_texture_rg"))
+    if (vlc_gl_HasExtension(priv->gl, "GL_ARB_texture_rg"))
         oneplane_texfmt = GL_RED;
     else
         oneplane_texfmt = GL_LUMINANCE;
