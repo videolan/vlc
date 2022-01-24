@@ -245,34 +245,29 @@ static int ProcessHeaders( decoder_t *p_dec )
     unsigned i_count;
 
     int i_extra = p_dec->fmt_in.i_extra;
-    uint8_t *p_extra = p_dec->fmt_in.p_extra;
+    const uint8_t *p_extra = p_dec->fmt_in.p_extra;
+    uint8_t *p_alloc = NULL;
 
     /* If we have no header (e.g. from RTP), make one. */
-    bool b_dummy_header = false;
     if( !i_extra ||
         (i_extra > 10 && memcmp( &p_extra[2], "OpusHead", 8 )) ) /* Borked muxers */
     {
         OpusHeader header;
         opus_prepare_header( p_dec->fmt_in.audio.i_channels,
                              p_dec->fmt_in.audio.i_rate, &header );
-        if( opus_write_header( &p_extra, &i_extra, &header,
+        if( opus_write_header( &p_alloc, &i_extra, &header,
                                opus_get_version_string() ) )
+        {
+            free( p_alloc );
             return VLC_ENOMEM;
-        b_dummy_header = true;
+        }
+        p_extra = p_alloc;
     }
 
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
-                           i_extra, p_extra ) )
+                           i_extra, p_extra ) || i_count < 2 )
     {
-        if( b_dummy_header )
-            free( p_extra );
-        return VLC_EGENERIC;
-    }
-
-    if( i_count < 2 )
-    {
-        if( b_dummy_header )
-            free( p_extra );
+        free( p_alloc );
         return VLC_EGENERIC;
     }
 
@@ -289,8 +284,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     if (ret != VLC_SUCCESS)
         msg_Err( p_dec, "initial Opus header is corrupted" );
 
-    if( b_dummy_header )
-        free( p_extra );
+    free( p_alloc );
 
     return ret;
 }
