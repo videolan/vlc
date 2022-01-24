@@ -152,16 +152,6 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
 #undef GET_PROC_ADDR
 
     GL_ASSERT_NOERROR(&api->vt);
-
-    api->extensions = (const char *) api->vt.GetString(GL_EXTENSIONS);
-    assert(api->extensions);
-    if (!api->extensions)
-    {
-        msg_Err(gl, "glGetString returned NULL");
-        return VLC_EGENERIC;
-    }
-
-    GL_ASSERT_NOERROR(&api->vt);
     GLint version;
     api->vt.GetIntegerv(GL_MAJOR_VERSION, &version);
     GLenum error = api->vt.GetError();

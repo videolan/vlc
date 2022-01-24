@@ -38,9 +38,6 @@ struct vlc_gl_api {
     /* True if the current API is OpenGL ES, set by the caller */
     bool is_gles;
 
-    /* Available gl extensions (from GL_EXTENSIONS) */
-    const char *extensions;
-
     /* Non-power-of-2 texture size support */
     bool supports_npot;
 
