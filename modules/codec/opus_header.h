@@ -41,6 +41,8 @@ typedef struct {
     int nb_streams;
     int nb_coupled;
     unsigned char stream_map[255];
+    size_t dmatrix_size;
+    unsigned char *dmatrix;
 } OpusHeader;
 
 void opus_header_init(OpusHeader *);
