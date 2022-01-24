@@ -116,7 +116,7 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
     QVBoxLayout *convertLayout = new QVBoxLayout( convertPanel );
 
     displayBox = new QCheckBox( qtr( "Display the output" ) );
-    displayBox->setToolTip( qtr( "This display the resulting media, but can "
+    displayBox->setToolTip( qtr( "This displays the resulting media, but can "
                                "slow things down." ) );
     convertLayout->addWidget( displayBox );
 
