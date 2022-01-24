@@ -850,6 +850,7 @@ static int vlc_ceil_log2( const unsigned int val )
 static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt)
 {
     OpusHeader h;
+    opus_header_init(&h);
 
     /* default mapping */
     static const unsigned char map[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -930,6 +931,7 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
 
     if (!channels) {
         msg_Err(demux, "Opus channel configuration 0x%.2x not supported yet", p[1]);
+        opus_header_clean(&h);
         return;
     }
 
@@ -952,10 +954,12 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
             p_fmt->audio.i_rate = 48000;
         }
     }
+    opus_header_clean(&h);
 
     return;
 
 explicit_config_too_short:
+    opus_header_clean(&h);
     msg_Err(demux, "Opus descriptor too short");
 }
 

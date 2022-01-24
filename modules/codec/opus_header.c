@@ -421,3 +421,19 @@ int opus_write_header(uint8_t **p_extra, int *i_extra, OpusHeader *header, const
     return 0;
 }
 
+void opus_header_init(OpusHeader *h)
+{
+    h->version = 0;
+    h->channels = 0;
+    h->preskip = 3840; /* default is 80 ms */
+    h->input_sample_rate = 0; /* unknown */
+    h->gain = 0;
+    h->channel_mapping = 255; /* unknown */
+    h->nb_streams = 0;
+    h->nb_coupled = 0;
+}
+
+void opus_header_clean(OpusHeader *h)
+{
+    VLC_UNUSED(h);
+}
