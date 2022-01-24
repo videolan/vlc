@@ -399,11 +399,13 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         vlc_gl_ReleaseCurrent(gl);
         goto error4;
     }
-    const char *extensions =
-        (const char *) sys->api.vt.GetString(GL_EXTENSIONS);
+
+
+    bool has_image_external =
+        vlc_gl_HasExtension(gl, "GL_OES_EGL_image_external");
     vlc_gl_ReleaseCurrent(gl);
 
-    if (!vlc_gl_StrHasToken(extensions, "GL_OES_EGL_image_external"))
+    if (!has_image_external)
     {
         msg_Warn(gl, "GL_OES_EGL_image_external is not available,"
                 " disabling egl_surfacetexture.");
