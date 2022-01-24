@@ -37,6 +37,9 @@
 #include <ogg/ogg.h>
 #include <opus.h>
 #include <opus_multistream.h>
+#ifdef OPUS_HAVE_OPUS_PROJECTION_H
+# include <opus_projection.h> /* from 1.3.0 */
+#endif
 
 #include "opus_header.h"
 
@@ -87,6 +90,9 @@ typedef struct
      */
     OpusHeader header;
     OpusMSDecoder *p_st;
+#ifdef OPUS_HAVE_OPUS_PROJECTION_H
+    OpusProjectionDecoder *p_pr;
+#endif
 
     /*
      * Common properties
@@ -159,6 +165,104 @@ static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static block_t *ProcessPacket( decoder_t *, ogg_packet *, block_t * );
 
 static block_t *DecodePacket( decoder_t *, ogg_packet *, int, vlc_tick_t );
+/*****************************************************************************
+ * Implementation Wrappers
+ *****************************************************************************/
+
+static void DecoderDestroy( decoder_sys_t *p_sys )
+{
+#ifdef OPUS_HAVE_OPUS_PROJECTION_H
+    if( p_sys->p_pr )
+    {
+        opus_projection_decoder_destroy( p_sys->p_pr );
+        p_sys->p_pr = NULL;
+    }
+    else
+#endif
+    if( p_sys->p_st )
+    {
+        opus_multistream_decoder_destroy( p_sys->p_st );
+        p_sys->p_st = NULL;
+    }
+}
+
+#ifdef OPUS_SET_GAIN
+static int SetDecoderGain( decoder_sys_t *p_sys, int gain )
+{
+# ifdef OPUS_HAVE_OPUS_PROJECTION_H
+    if( p_sys->p_pr )
+    {
+        if( opus_projection_decoder_ctl(
+                    p_sys->p_pr, OPUS_SET_GAIN(gain) ) != OPUS_OK )
+            return VLC_EGENERIC;
+    }
+    else
+# endif
+    {
+        if( opus_multistream_decoder_ctl(
+                    p_sys->p_st, OPUS_SET_GAIN(gain) ) != OPUS_OK )
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+#endif
+
+static int DecoderDecodeFloat( decoder_sys_t *p_sys, const ogg_packet *p_oggpacket,
+                               int spp, block_t *out )
+{
+#ifdef OPUS_HAVE_OPUS_PROJECTION_H
+    if( p_sys->p_pr )
+        return opus_projection_decode_float(p_sys->p_pr, p_oggpacket->packet,
+                                            p_oggpacket->bytes,
+                                            (float *)out->p_buffer, spp, 0);
+    else
+#endif
+        return opus_multistream_decode_float(p_sys->p_st, p_oggpacket->packet,
+                                             p_oggpacket->bytes,
+                                             (float *)out->p_buffer, spp, 0);
+}
+
+static int DecoderCreate( decoder_sys_t *p_sys )
+{
+    int err;
+    const OpusHeader *p_header = &p_sys->header;
+#ifdef OPUS_HAVE_OPUS_PROJECTION_H
+    if( p_header->channel_mapping == 3 )
+    {
+        p_sys->p_pr = opus_projection_decoder_create( 48000, p_header->channels,
+                        p_header->nb_streams, p_header->nb_coupled,
+                        p_header->dmatrix, p_header->dmatrix_size, &err );
+    }
+    else
+#endif
+    {
+        const unsigned char* p_stream_map = p_header->stream_map;
+        unsigned char new_stream_map[8];
+        if ( p_header->channel_mapping <= 1 )
+        {
+            if( p_header->channels > 2 )
+            {
+                static const uint32_t *pi_ch[6] = { pi_3channels_in, pi_4channels_in,
+                                                    pi_5channels_in, pi_6channels_in,
+                                                    pi_7channels_in, pi_8channels_in };
+                uint8_t pi_chan_table[AOUT_CHAN_MAX];
+
+                aout_CheckChannelReorder( pi_ch[p_header->channels-3], NULL,
+                                          pi_channels_maps[p_header->channels],
+                                          pi_chan_table );
+                for( int i=0;i<p_header->channels;i++ )
+                    new_stream_map[pi_chan_table[i]] = p_header->stream_map[i];
+
+                p_stream_map = new_stream_map;
+            }
+        }
+
+        p_sys->p_st = opus_multistream_decoder_create( 48000, p_header->channels,
+                        p_header->nb_streams, p_header->nb_coupled,
+                        p_stream_map, &err );
+    }
+    return err == OPUS_OK ? VLC_SUCCESS : VLC_EGENERIC;
+}
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -186,6 +290,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_flush     = Flush;
 
     p_sys->p_st = NULL;
+#ifdef OPUS_HAVE_OPUS_PROJECTION_H
+    p_sys->p_pr = NULL;
+#endif
 
     return VLC_SUCCESS;
 }
@@ -303,11 +410,7 @@ static int ProcessHeaders( decoder_t *p_dec )
  *****************************************************************************/
 static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
-    int err;
-    unsigned char* p_stream_map;
-    unsigned char new_stream_map[8];
     decoder_sys_t *p_sys = p_dec->p_sys;
-
     OpusHeader *p_header = &p_sys->header;
 
     if( !opus_header_parse((unsigned char *)p_oggpacket->packet,p_oggpacket->bytes,p_header) )
@@ -320,15 +423,17 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     if((p_header->channels>2 && p_header->channel_mapping==0) ||
         (p_header->channels>8 && p_header->channel_mapping==1) ||
         (p_header->channels>18 && p_header->channel_mapping==2) ||
-        p_header->channel_mapping>2)
+        (p_header->channels>18 && p_header->channel_mapping==3))
     {
         msg_Err( p_dec, "Unsupported channel mapping" );
         return VLC_EGENERIC;
     }
-    if (p_header->channel_mapping == 2)
+    if (p_header->channel_mapping >= 2)
     {
         int i_order = floor(sqrt(p_header->channels));
         int i_nondiegetic = p_header->channels - i_order * i_order;
+        msg_Dbg( p_dec, "Opus Ambisonic audio order=%d channels=%d+%d",
+                 i_order, p_header->channels - i_nondiegetic, i_nondiegetic);
         if (i_nondiegetic != 0 && i_nondiegetic != 2)
         {
             msg_Err( p_dec, "Unsupported ambisonic channel mapping" );
@@ -344,47 +449,24 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     {
         p_dec->fmt_out.audio.i_physical_channels =
             pi_channels_maps[p_header->channels];
-
-        if( p_header->channels>2 )
-        {
-            static const uint32_t *pi_ch[6] = { pi_3channels_in, pi_4channels_in,
-                                                pi_5channels_in, pi_6channels_in,
-                                                pi_7channels_in, pi_8channels_in };
-            uint8_t pi_chan_table[AOUT_CHAN_MAX];
-
-            aout_CheckChannelReorder( pi_ch[p_header->channels-3], NULL,
-                                      p_dec->fmt_out.audio.i_physical_channels,
-                                      pi_chan_table );
-            for(int i=0;i<p_header->channels;i++)
-                new_stream_map[pi_chan_table[i]]=p_header->stream_map[i];
-
-            p_stream_map = new_stream_map;
-        }
-        else
-            p_stream_map = p_header->stream_map;
     }
-    else //p_header->channel_mapping == 2
+    else //p_header->channel_mapping >= 2
     {
         p_dec->fmt_out.audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
-        p_stream_map = p_header->stream_map;
     }
 
     /* Opus decoder init */
-    p_sys->p_st = opus_multistream_decoder_create( 48000, p_header->channels,
-                    p_header->nb_streams, p_header->nb_coupled,
-                    p_stream_map,
-                    &err );
-    if( !p_sys->p_st || err!=OPUS_OK )
+    if( DecoderCreate( p_sys ) != VLC_SUCCESS )
     {
         msg_Err( p_dec, "decoder initialization failed" );
         return VLC_EGENERIC;
     }
 
 #ifdef OPUS_SET_GAIN
-    if( opus_multistream_decoder_ctl( p_sys->p_st,OPUS_SET_GAIN(p_header->gain) ) != OPUS_OK )
+    if( SetDecoderGain( p_sys, p_header->gain ) != VLC_SUCCESS )
     {
         msg_Err( p_dec, "OPUS_SET_GAIN failed" );
-        opus_multistream_decoder_destroy( p_sys->p_st );
+        DecoderDestroy( p_sys );
         return VLC_EGENERIC;
     }
 #endif
@@ -478,8 +560,7 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         return NULL;
     }
 
-    spp=opus_multistream_decode_float(p_sys->p_st, p_oggpacket->packet,
-         p_oggpacket->bytes, (float *)p_aout_buffer->p_buffer, spp, 0);
+    spp = DecoderDecodeFloat( p_sys, p_oggpacket, spp, p_aout_buffer );
 
     int i_end_trim = 0;
     if( i_duration > 0 && spp > 0 &&
@@ -532,7 +613,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t * p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_st ) opus_multistream_decoder_destroy(p_sys->p_st);
+    DecoderDestroy( p_sys );
 
     opus_header_clean( &p_sys->header );
     free( p_sys );
