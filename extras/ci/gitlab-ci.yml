@@ -19,7 +19,7 @@ default:
         - amd64
 
 variables:
-    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20201106141924
+    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20220224135804
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20201106143728
     VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20211020094514
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
