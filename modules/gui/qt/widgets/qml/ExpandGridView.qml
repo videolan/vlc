@@ -745,7 +745,8 @@ FocusScope {
             _setupIndexes(forceRelayout, [topGridEndId, lastId], root._expandItemVerticalSpace)
 
             // update contentWidth and contentHeight
-            contentWidth = root._effectiveCellWidth * root._nbItemPerRow - root.horizontalSpacing
+            var gridContentWidth = root._effectiveCellWidth * root._nbItemPerRow - root.horizontalSpacing
+            contentWidth = root.leftMargin + gridContentWidth + root.rightMargin
 
             var gridContentHeight = root.getItemPos(root._count - 1)[1] + root._effectiveCellHeight + root._expandItemVerticalSpace
             contentHeight = gridContentHeight
