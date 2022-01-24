@@ -187,8 +187,8 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     else
     {
         api->is_gles = false;
-        api->supports_npot = vlc_gl_StrHasToken(api->extensions, "GL_ARB_texture_non_power_of_two") ||
-                             vlc_gl_StrHasToken(api->extensions, "GL_APPLE_texture_2D_limited_npot");
+        api->supports_npot = vlc_gl_HasExtension(gl, "GL_ARB_texture_non_power_of_two") ||
+                             vlc_gl_HasExtension(gl, "GL_APPLE_texture_2D_limited_npot");
     }
 
     return VLC_SUCCESS;
