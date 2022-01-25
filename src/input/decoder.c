@@ -1193,8 +1193,6 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     {
         msg_Dbg( p_dec, "end of video preroll" );
 
-        if( p_vout )
-            vout_FlushAll( p_vout );
     }
 
     if( p_owner->b_first && p_owner->b_waiting )
