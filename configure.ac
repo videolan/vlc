@@ -4391,6 +4391,18 @@ AC_SUBST([soliddatadir])
 AM_CONDITIONAL([KDE_SOLID], [test "x${soliddatadir}" != "x"])
 
 dnl
+dnl Doxygen and documentation tools
+dnl
+doxygen_stylesheet=""
+AC_ARG_WITH([doxygen-stylesheet],
+    AS_HELP_STRING([--with-doxygen-stylesheet=PATH],
+                   [Doxygen stylesheet (default is doxygen default)]),
+                   [ doxygen_stylesheet="$with_doxygen_stylesheet" ], [])
+AC_SUBST([doxygen_stylesheet])
+
+
+
+dnl
 dnl  Find tools for win32 packaging
 dnl
 AS_IF([test "${SYS}" = "mingw32"], [
