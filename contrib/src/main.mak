@@ -235,7 +235,6 @@ export ACLOCAL_AMFLAGS
 # Tools #
 #########
 
-PKG_CONFIG ?= pkg-config
 need_pkg = $(shell $(PKG_CONFIG) $(1) || echo 1)
 
 ifdef HAVE_CROSS_COMPILE
@@ -249,6 +248,8 @@ export PKG_CONFIG_LIBDIR
 need_pkg = $(shell PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) $(PKG_CONFIG) $(1) || echo 1)
 endif
 endif # HAVE_CROSS_COMPILE
+
+PKG_CONFIG ?= pkg-config
 
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
