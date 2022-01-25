@@ -306,12 +306,6 @@ else
 SHA512SUM = $(error SHA-512 checksumming not found)
 endif
 
-ifeq ($(shell protoc --version >/dev/null 2>&1 || echo FAIL),)
-PROTOC = protoc
-else
-PROTOC ?= $(error Protobuf compiler (protoc) not found)
-endif
-
 #
 # Common helpers
 #
