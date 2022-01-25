@@ -171,18 +171,6 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_access, "Session: Host name = %s, ip = %s", p_sys->netbios_name,
              inet_ntoa( p_sys->addr ) );
 
-    /* Now that we have the required data, let's establish a session */
-    status = smb_session_connect( p_sys->p_session, p_sys->netbios_name,
-                                  p_sys->addr.s_addr, SMB_TRANSPORT_TCP );
-    if( status != DSM_SUCCESS )
-    {
-        msg_Err( p_access, "Unable to connect/negotiate SMB session");
-        /* FIXME: libdsm wrongly return network error when the server can't
-         * handle the SMBv1 protocol */
-        status = DSM_ERROR_GENERIC;
-        goto error;
-    }
-
     get_path( p_access );
 
     if( login( p_access ) != VLC_SUCCESS )
@@ -381,6 +369,17 @@ static int login( stream_t *p_access )
         psz_password = credential.psz_password;
     }
     psz_domain = credential.psz_realm ? credential.psz_realm : p_sys->netbios_name;
+
+    /* Now that we have the required data, let's establish a session */
+    int status = smb_session_connect( p_sys->p_session, p_sys->netbios_name,
+                                      p_sys->addr.s_addr, SMB_TRANSPORT_TCP );
+    if( status != DSM_SUCCESS )
+    {
+        msg_Err( p_access, "Unable to connect/negotiate SMB session");
+        /* FIXME: libdsm wrongly return network error when the server can't
+         * handle the SMBv1 protocol */
+        goto error;
+    }
 
     /* Try to authenticate on the remote machine */
     int connect_err = smb_connect( p_access, psz_login, psz_password, psz_domain );
