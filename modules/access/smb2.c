@@ -564,8 +564,75 @@ vlc_smb2_print_addr(stream_t *access)
 }
 
 static int
-vlc_smb2_open_share(stream_t *access, const char *url,
-                    const vlc_credential *credential)
+vlc_smb2_open_share(stream_t *access, struct smb2_context *smb2,
+                    struct smb2_url *smb2_url, bool do_enum)
+{
+    struct access_sys *sys = access->p_sys;
+    struct smb2_stat_64 smb2_stat;
+
+    struct vlc_smb2_op op = VLC_SMB2_OP(access, smb2);
+
+    int ret;
+    if (do_enum)
+        ret = smb2_share_enum_async(smb2, smb2_open_cb, &op);
+    else
+    {
+        if (smb2_stat_async(smb2, smb2_url->path, &smb2_stat,
+                            smb2_generic_cb, &op) < 0)
+            VLC_SMB2_SET_ERROR(&op, "smb2_stat_async", 1);
+
+        if (vlc_smb2_mainloop(&op, false) != 0)
+            goto error;
+
+        if (smb2_stat.smb2_type == SMB2_TYPE_FILE)
+        {
+            vlc_smb2_op_reset(&op, smb2);
+
+            sys->smb2_size = smb2_stat.smb2_size;
+            ret = smb2_open_async(smb2, smb2_url->path, O_RDONLY,
+                                  smb2_open_cb, &op);
+        }
+        else if (smb2_stat.smb2_type == SMB2_TYPE_DIRECTORY)
+        {
+            vlc_smb2_op_reset(&op, smb2);
+
+            ret = smb2_opendir_async(smb2, smb2_url->path, smb2_open_cb, &op);
+        }
+        else
+        {
+            msg_Err(access, "smb2_stat_cb: file type not handled");
+            op.error_status = 1;
+            goto error;
+        }
+    }
+
+    if (ret < 0)
+    {
+        VLC_SMB2_SET_ERROR(&op, "smb2_open*_async", 1);
+        goto error;
+    }
+
+    if (vlc_smb2_mainloop(&op, false) != 0)
+        goto error;
+
+    if (do_enum)
+        sys->share_enum = op.res.data;
+    else if (smb2_stat.smb2_type == SMB2_TYPE_FILE)
+        sys->smb2fh = op.res.data;
+    else if (smb2_stat.smb2_type == SMB2_TYPE_DIRECTORY)
+        sys->smb2dir = op.res.data;
+    else
+        vlc_assert_unreachable();
+
+    return 0;
+error:
+    sys->error_status = op.error_status;
+    return -1;
+}
+
+static int
+vlc_smb2_connect_open_share(stream_t *access, const char *url,
+                            const vlc_credential *credential)
 {
     struct access_sys *sys = access->p_sys;
 
@@ -607,69 +674,22 @@ vlc_smb2_open_share(stream_t *access, const char *url,
     if (err < 0)
     {
         VLC_SMB2_SET_ERROR(&op, "smb2_connect_share_async", err);
+        sys->error_status = op.error_status;
         goto error;
     }
     if (vlc_smb2_mainloop(&op, false) != 0)
+    {
+        sys->error_status = op.error_status;
         goto error;
+    }
 
     sys->smb2_connected = true;
 
     vlc_smb2_print_addr(access);
 
-    vlc_smb2_op_reset(&op, sys->smb2);
-    struct smb2_stat_64 smb2_stat;
-    int ret;
-    if (do_enum)
-        ret = smb2_share_enum_async(sys->smb2, smb2_open_cb, &op);
-    else
-    {
-        if (smb2_stat_async(sys->smb2, smb2_url->path, &smb2_stat,
-                            smb2_generic_cb, &op) < 0)
-            VLC_SMB2_SET_ERROR(&op, "smb2_stat_async", 1);
-
-        if (vlc_smb2_mainloop(&op, false) != 0)
-            goto error;
-
-        if (smb2_stat.smb2_type == SMB2_TYPE_FILE)
-        {
-            vlc_smb2_op_reset(&op, sys->smb2);
-
-            sys->smb2_size = smb2_stat.smb2_size;
-            ret = smb2_open_async(sys->smb2, smb2_url->path, O_RDONLY,
-                                  smb2_open_cb, &op);
-        }
-        else if (smb2_stat.smb2_type == SMB2_TYPE_DIRECTORY)
-        {
-            vlc_smb2_op_reset(&op, sys->smb2);
-
-            ret = smb2_opendir_async(sys->smb2, smb2_url->path,
-                                     smb2_open_cb, &op);
-        }
-        else
-        {
-            msg_Err(access, "smb2_stat_cb: file type not handled");
-            op.error_status = 1;
-            goto error;
-        }
-    }
-
-    if (ret < 0)
-    {
-        VLC_SMB2_SET_ERROR(&op, "smb2_open*_async", 1);
+    err = vlc_smb2_open_share(access, sys->smb2, smb2_url, do_enum);
+    if (err < 0)
         goto error;
-    }
-
-    if (vlc_smb2_mainloop(&op, false) != 0)
-        goto error;
-
-    if (do_enum)
-        sys->share_enum = op.res.data;
-    else if (smb2_stat.smb2_type == SMB2_TYPE_FILE)
-        sys->smb2fh = op.res.data;
-    else if (smb2_stat.smb2_type == SMB2_TYPE_DIRECTORY)
-        sys->smb2dir = op.res.data;
-    else
-        vlc_assert_unreachable();
 
     smb2_destroy_url(smb2_url);
     return 0;
@@ -677,8 +697,6 @@ vlc_smb2_open_share(stream_t *access, const char *url,
 error:
     if (smb2_url != NULL)
         smb2_destroy_url(smb2_url);
-
-    sys->error_status = op.error_status;
 
     if (sys->smb2 != NULL)
     {
@@ -784,7 +802,7 @@ Open(vlc_object_t *p_obj)
      * keystore/user interaction) */
     vlc_credential_get(&credential, access, "smb-user", "smb-pwd", NULL,
                        NULL);
-    ret = vlc_smb2_open_share(access, url, &credential);
+    ret = vlc_smb2_connect_open_share(access, url, &credential);
 
     while (ret == -1
         && (!sys->error_status || VLC_SMB2_STATUS_DENIED(sys->error_status))
@@ -793,7 +811,7 @@ Open(vlc_object_t *p_obj)
                               sys->encoded_url.psz_host))
     {
         sys->error_status = 0;
-        ret = vlc_smb2_open_share(access, url, &credential);
+        ret = vlc_smb2_connect_open_share(access, url, &credential);
     }
     free(resolved_host);
     free(url);
