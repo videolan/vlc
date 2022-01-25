@@ -3850,11 +3850,16 @@ PKG_ENABLE_MODULES_VLC([CHROMAPRINT], [stream_out_chromaprint], [libchromaprint 
 dnl
 dnl  Chromecast streaming support
 dnl
-m4_pushdef([protobuf_lite_version], 2.5.0)
 AC_ARG_VAR(PROTOC, [protobuf compiler])
 dnl Intentionally using prefixed binaries for native tool in contribs
 AC_CHECK_TOOL(PROTOC, protoc, no)
-PKG_WITH_MODULES([CHROMECAST],[protobuf-lite >= protobuf_lite_version], [
+AS_IF([test "x${PROTOC}" != "xno"], [
+    protoc_ver="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '//)"
+],[
+    protoc_ver="3.1.0"
+])
+m4_pushdef([protobuf_lite_version], ${protoc_ver})
+PKG_WITH_MODULES([CHROMECAST],[protobuf-lite = protobuf_lite_version], [
     AS_IF([test "x${PROTOC}" != "xno"], [
         build_chromecast="yes"
     ], [
@@ -3862,8 +3867,8 @@ PKG_WITH_MODULES([CHROMECAST],[protobuf-lite >= protobuf_lite_version], [
     ])
 ], [
     AS_IF([test "${enable_chromecast}" = "yes"],
-        AC_MSG_ERROR(Library [protobuf-lite >= protobuf_lite_version] needed for [chromecast] was not found),
-        AC_MSG_WARN(Library [protobuf-lite >= protobuf_lite_version] needed for [chromecast] was not found)
+        AC_MSG_ERROR(Library [protobuf-lite = protobuf_lite_version] needed for [chromecast] was not found),
+        AC_MSG_WARN(Library [protobuf-lite = protobuf_lite_version] needed for [chromecast] was not found)
     )
     enable_chromecast="no"
 ], [(Chromecast streaming support)], [auto])
