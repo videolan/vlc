@@ -369,7 +369,7 @@ EXTRA_LTLIBRARIES += libsmbc_plugin.la
 
 libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/sd.c access/smb_common.h
 libdsm_plugin_la_CFLAGS = $(AM_CFLAGS) $(DSM_CFLAGS)
-libdsm_plugin_la_LIBADD = $(DSM_LIBS)
+libdsm_plugin_la_LIBADD = $(DSM_LIBS) libvlc_access_cache.la
 if HAVE_DSM
 access_LTLIBRARIES += libdsm_plugin.la
 endif
