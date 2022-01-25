@@ -22,6 +22,13 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
 
 .medialibrary: medialibrary
 	cd $< && $(HOSTVARS_MESON) $(MESON) -Dlibvlc=disabled build
+	ninja -C $</build
+ifdef HAVE_LINUX
+ifndef HAVE_ANDROID
+	sed -e 's,^Libs\(.*\)-pthread,Libs\1-pthread -latomic,' \
+		-i $</build/meson-private/medialibrary.pc
+endif
+endif
 	cd $< && cd build && ninja install
 	touch $@
 
