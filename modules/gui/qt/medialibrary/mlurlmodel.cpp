@@ -131,10 +131,10 @@ QString MLUrl::getLastPlayedDate() const
     return m_lastPlayedDate;
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> *
+std::unique_ptr<MLBaseModel::BaseLoader>
 MLUrlModel::createLoader() const
 {
-    return new Loader(*this);
+    return std::make_unique<Loader>(*this);
 }
 
 size_t MLUrlModel::Loader::count(vlc_medialibrary_t* ml) const

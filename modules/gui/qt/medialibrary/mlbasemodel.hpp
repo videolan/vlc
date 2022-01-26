@@ -120,7 +120,6 @@ protected:
 
     virtual void onVlcMlEvent( const MLEvent &event );
 
-    virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
 
     virtual void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t )  {}
 
@@ -139,6 +138,8 @@ protected:
         vlc_ml_sorting_criteria_t m_sort;
         bool m_sort_desc;
     };
+
+    virtual std::unique_ptr<BaseLoader> createLoader() const = 0;
 
 public:
     MLItemId parentId() const;

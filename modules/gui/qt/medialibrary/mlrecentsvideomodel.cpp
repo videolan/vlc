@@ -24,10 +24,11 @@ MLRecentsVideoModel::MLRecentsVideoModel(QObject * parent) : MLVideoModel(parent
 
 // Protected MLBaseModel implementation
 
-ListCacheLoader<std::unique_ptr<MLItem>> * MLRecentsVideoModel::createLoader() const
+std::unique_ptr<MLBaseModel::BaseLoader>
+MLRecentsVideoModel::createLoader() const
 /* override */
 {
-    return new Loader(*this, m_numberOfItemsToShow);
+    return std::make_unique<Loader>(*this, m_numberOfItemsToShow);
 }
 
 // Private functions

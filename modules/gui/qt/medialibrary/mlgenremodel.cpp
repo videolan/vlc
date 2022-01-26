@@ -174,10 +174,10 @@ QString MLGenreModel::getCover(MLGenre * genre) const
 
 //-------------------------------------------------------------------------------------------------
 
-ListCacheLoader<std::unique_ptr<MLItem>> *
+std::unique_ptr<MLBaseModel::BaseLoader>
 MLGenreModel::createLoader() const
 {
-    return new Loader(*this);
+    return std::make_unique<Loader>(*this);
 }
 
 size_t MLGenreModel::Loader::count(vlc_medialibrary_t* ml) const

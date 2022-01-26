@@ -120,9 +120,10 @@ QByteArray MLVideoFoldersModel::criteriaToName(vlc_ml_sorting_criteria_t criteri
     return criterias.key(criteria, "");
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> * MLVideoFoldersModel::createLoader() const /* override */
+std::unique_ptr<MLBaseModel::BaseLoader>
+MLVideoFoldersModel::createLoader() const /* override */
 {
-    return new Loader(*this);
+    return std::make_unique<Loader>(*this);
 }
 
 // Protected MLBaseModel reimplementation

@@ -100,10 +100,10 @@ int MLRecentsModel::getNumberOfItemsToShow() const {
     return m_numberOfItemsToShow;
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> *
+std::unique_ptr<MLBaseModel::BaseLoader>
 MLRecentsModel::createLoader() const
 {
-    return new Loader(*this, m_numberOfItemsToShow);
+    return std::make_unique<Loader>(*this, m_numberOfItemsToShow);
 }
 
 MLRecentsModel::Loader::Loader(const MLRecentsModel &model, int numberOfItemsToShow)

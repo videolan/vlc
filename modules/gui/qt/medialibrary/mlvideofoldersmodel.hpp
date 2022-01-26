@@ -58,7 +58,7 @@ protected:
 
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 
-    ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
+    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
 
 protected: // MLBaseModel reimplementation
     void onVlcMlEvent(const MLEvent & event) override;

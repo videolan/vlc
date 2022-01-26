@@ -173,10 +173,10 @@ void MLVideoModel::generateThumbnail(uint64_t id) const
     });
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> *
+std::unique_ptr<MLBaseModel::BaseLoader>
 MLVideoModel::createLoader() const
 {
-    return new Loader(*this);
+    return std::make_unique<Loader>(*this);
 }
 
 size_t MLVideoModel::Loader::count(vlc_medialibrary_t* ml) const /* override */

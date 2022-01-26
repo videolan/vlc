@@ -153,9 +153,9 @@ QByteArray MLVideoGroupsModel::criteriaToName(vlc_ml_sorting_criteria_t criteria
     return criterias.key(criteria, "");
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> * MLVideoGroupsModel::createLoader() const /* override */
+std::unique_ptr<MLBaseModel::BaseLoader> MLVideoGroupsModel::createLoader() const /* override */
 {
-    return new Loader(*this);
+    return std::make_unique<Loader>(*this);
 }
 
 void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */

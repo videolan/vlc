@@ -85,7 +85,7 @@ void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
         return index.row();
     });
 
-    QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>> loader{ createLoader() };
+    QSharedPointer<BaseLoader> loader{ createLoader().release() };
     struct Ctx {
         std::vector<std::unique_ptr<MLItem>> items;
     };
@@ -437,7 +437,7 @@ void MLBaseModel::validateCache() const
         return;
 
     auto loader = createLoader();
-    m_cache.reset(new MLListCache(m_mediaLib, loader));
+    m_cache.reset(new MLListCache(m_mediaLib, loader.release()));
     connect(&*m_cache, &MLListCache::localSizeAboutToBeChanged,
             this, &MLBaseModel::onLocalSizeAboutToBeChanged);
     connect(&*m_cache, &MLListCache::localSizeChanged,

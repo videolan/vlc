@@ -142,10 +142,10 @@ void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent( event );
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> *
+std::unique_ptr<MLBaseModel::BaseLoader>
 MLAlbumTrackModel::createLoader() const
 {
-    return new Loader(*this);
+    return std::make_unique<Loader>(*this);
 }
 
 size_t MLAlbumTrackModel::Loader::count(vlc_medialibrary_t* ml) const

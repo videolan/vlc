@@ -38,7 +38,7 @@ public:
     virtual ~MLRecentsVideoModel() = default;
 
 protected: // MLBaseModel implementation
-    ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
+    std::unique_ptr<MLBaseModel::BaseLoader> createLoader() const override;
 
 private: // Functions
     int  getNumberOfItemsToShow();
