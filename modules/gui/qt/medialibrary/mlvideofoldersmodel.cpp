@@ -184,3 +184,13 @@ MLVideoFoldersModel::Loader::load(vlc_medialibrary_t * ml,
 
     return result;
 }
+
+std::unique_ptr<MLItem>
+MLVideoFoldersModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    assert(itemId.type == VLC_ML_PARENT_FOLDER);
+    ml_unique_ptr<vlc_ml_folder_t> folder(vlc_ml_get_folder(ml, itemId.id));
+    if (!folder)
+        return nullptr;
+    return std::make_unique<MLFolder>(folder.get());
+}

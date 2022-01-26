@@ -136,3 +136,14 @@ MLArtistModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) 
         res.emplace_back( std::make_unique<MLArtist>( &artist ) );
     return res;
 }
+
+std::unique_ptr<MLItem>
+MLArtistModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    assert(itemId.type == VLC_ML_PARENT_ARTIST);
+    ml_unique_ptr<vlc_ml_artist_t> artist(vlc_ml_get_artist(ml, itemId.id));
+    if (!artist)
+        return nullptr;
+    return std::make_unique<MLArtist>(artist.get());
+}
+

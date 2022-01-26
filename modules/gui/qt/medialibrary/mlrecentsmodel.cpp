@@ -146,3 +146,13 @@ MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count)
         res.emplace_back( std::make_unique<MLRecentMedia>( &media ) );
     return res;
 }
+
+std::unique_ptr<MLItem>
+MLRecentsModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    assert(itemId.type == VLC_ML_PARENT_UNKNOWN);
+    ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
+    if (!media)
+        return nullptr;
+    return std::make_unique<MLRecentMedia>(media.get());
+}

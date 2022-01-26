@@ -166,3 +166,13 @@ MLAlbumModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) c
         res.emplace_back( std::make_unique<MLAlbum>( &album ) );
     return res;
 }
+
+std::unique_ptr<MLItem>
+MLAlbumModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    assert(itemId.type == VLC_ML_PARENT_ALBUM);
+    ml_unique_ptr<vlc_ml_album_t> album(vlc_ml_get_album(ml, itemId.id));
+    if (!album)
+        return nullptr;
+    return std::make_unique<MLAlbum>(album.get());
+}

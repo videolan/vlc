@@ -132,6 +132,8 @@ protected:
 
         MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
 
+        virtual std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const = 0;
+
     protected:
         MLItemId m_parent;
         QString m_searchPattern;

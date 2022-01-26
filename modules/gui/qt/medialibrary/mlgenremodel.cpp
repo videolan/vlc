@@ -205,3 +205,13 @@ MLGenreModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) c
     return res;
 
 }
+
+std::unique_ptr<MLItem>
+MLGenreModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    assert(itemId.type == VLC_ML_PARENT_GENRE);
+    ml_unique_ptr<vlc_ml_genre_t> genre(vlc_ml_get_genre(ml, itemId.id));
+    if (!genre)
+        return nullptr;
+    return std::make_unique<MLGenre>(genre.get());
+}

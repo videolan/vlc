@@ -456,3 +456,13 @@ MLPlaylistListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t c
 
     return result;
 }
+
+std::unique_ptr<MLItem>
+MLPlaylistListModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    assert(itemId.type == VLC_ML_PARENT_PLAYLIST);
+    ml_unique_ptr<vlc_ml_playlist_t> playlist(vlc_ml_get_playlist(ml, itemId.id));
+    if (!playlist)
+        return nullptr;
+    return std::make_unique<MLPlaylist>(playlist.get());
+}

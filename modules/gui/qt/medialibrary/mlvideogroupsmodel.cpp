@@ -234,3 +234,29 @@ MLVideoGroupsModel::Loader::load(vlc_medialibrary_t* ml,
 
     return result;
 }
+
+
+std::unique_ptr<MLItem>
+MLVideoGroupsModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+{
+    if (itemId.type == VLC_ML_PARENT_UNKNOWN)
+    {
+        ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
+        if (!media)
+            return nullptr;
+        return std::make_unique<MLVideo>(media.get());
+    }
+    else if (itemId.type == VLC_ML_PARENT_GROUP)
+    {
+        ml_unique_ptr<vlc_ml_group_t> group(vlc_ml_get_group(ml, itemId.id));
+        if (!group)
+            return nullptr;
+        return std::make_unique<MLGroup>(group.get());
+    }
+    else
+    {
+        vlc_assert_unreachable();
+        return nullptr;
+    }
+
+}
