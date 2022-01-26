@@ -569,6 +569,16 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
     ])
   ])
 
+  AS_IF([test -z "$PROTOC"], [
+    AC_MSG_CHECKING([if contribs provide protoc])
+    AS_IF([test -x "${CONTRIB_DIR}/../bin/${host_alias}-protoc${BUILDEXEEXT}"], [
+      PROTOC="${CONTRIB_DIR}/../bin/${host_alias}-protoc${BUILDEXEEXT}"
+      AC_MSG_RESULT([yes])
+    ],[
+      AC_MSG_RESULT([no])
+    ])
+  ])
+
   AS_IF([test "${SYS}" = "darwin"], [
     export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
     export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
