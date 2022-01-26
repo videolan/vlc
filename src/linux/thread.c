@@ -52,7 +52,27 @@ unsigned long vlc_thread_id(void)
 static int sys_futex(void *addr, int op, unsigned val,
                      const struct timespec *to, void *addr2, int val3)
 {
-    return syscall(__NR_futex, addr, op, val, to, addr2, val3);
+    /* The futex Linux kernel system call exists in two variants:
+     * - the original one for use with long time_t, which suffers from the
+     *   year 2038 problem on 32-bit architectures,
+     * - the "time64" one for use with 64-bit time_t, which lacks backward
+     *   binary compatibility with 32-bit long time_t on 32-bit architectures.
+     */
+    static_assert (sizeof (time_t) == sizeof (long) || sizeof (time_t) == 8,
+                   "Unrecognised time_t type definition");
+
+#if !defined (__NR_futex)
+    /* Recent 32-bit platforms (e.g. riscv32) only support 64-bit time_t. */
+    static_assert (sizeof (time_t) == 8, "Expected 64-bit time_t");
+    const long num = __NR_futex_time64;
+#elif !defined (__NR_futex_time64)
+    static_assert (sizeof (time_t) == sizeof (long), "Expected long time_t");
+    const long num = __NR_futex;
+#else
+    const long num = sizeof (time_t) == sizeof (long)
+                     ? __NR_futex : __NR_futex_time64;
+#endif
+    return syscall(num, addr, op, val, to, addr2, val3);
 }
 
 static int vlc_futex_wake(void *addr, int nr)
