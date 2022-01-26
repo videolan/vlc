@@ -94,6 +94,7 @@ parts:
       ./bootstrap
       ./configure \
           --prefix=$SNAPCRAFT_PART_INSTALL/usr \
+          --host=$TRIPLET \
           --disable-wayland \
           --enable-merge-ffmpeg
       make -j $(getconf _NPROCESSORS_ONLN)
