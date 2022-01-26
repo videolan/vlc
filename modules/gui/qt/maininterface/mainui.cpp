@@ -245,6 +245,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
 
         qmlRegisterUncreatableType<DialogErrorModel>( uri, versionMajor, versionMinor, "DialogErrorModel", "");
+        qRegisterMetaType<DialogId>();
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
 
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
@@ -290,6 +291,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterSingletonType<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", SingletonRegisterHelper<MediaLib>::callback);
 
+        qRegisterMetaType<MLItemId>();
         qmlRegisterUncreatableType<MLItemId>( uri, versionMajor, versionMinor, "MLItemId", "");
         qmlRegisterUncreatableType<MLBaseModel>( uri, versionMajor, versionMinor, "MLModel", "ML Base Model is uncreatable." );
         qmlRegisterType<MLAlbumModel>( uri, versionMajor, versionMinor, "MLAlbumModel" );
