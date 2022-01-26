@@ -3,7 +3,7 @@ PROTOBUF_VERSION := 3.4.1
 PROTOBUF_URL := $(GITHUB)/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
 
 PKGS += protobuf
-ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
+ifeq ($(call need_pkg, "protobuf-lite = $(PROTOBUF_VERSION)"),)
 PKGS_FOUND += protobuf
 endif
 
