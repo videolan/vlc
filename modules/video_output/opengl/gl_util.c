@@ -47,6 +47,7 @@ LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
         }
     }
 
+    /*
     GLint source_len;
     vt->GetShaderiv(id, GL_SHADER_SOURCE_LENGTH, &source_len);
 
@@ -61,6 +62,7 @@ LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
             free(source_log);
         }
     }
+    */
 
 }
 
