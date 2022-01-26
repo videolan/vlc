@@ -57,7 +57,7 @@ static void context_state_cb (pa_context *ctx, void *userdata)
     }
 }
 
-static bool context_wait (pa_context *ctx, pa_threaded_mainloop *mainloop)
+static int context_wait(pa_context *ctx, pa_threaded_mainloop *mainloop)
 {
     pa_context_state_t state;
 
