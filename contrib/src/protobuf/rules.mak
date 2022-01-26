@@ -6,7 +6,7 @@ ifndef HAVE_TVOS
 PKGS += protobuf protoc
 endif # !HAVE_TVOS
 PKGS_ALL += protoc
-ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
+ifeq ($(call need_pkg, "protobuf-lite = $(PROTOBUF_VERSION)"),)
 PKGS_FOUND += protobuf protoc
 else
 ifeq ($(shell protoc --version 2>/dev/null | head -1 | sed s/'.* '//),$(PROTOBUF_VERSION))
