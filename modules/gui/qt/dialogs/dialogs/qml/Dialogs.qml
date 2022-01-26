@@ -189,7 +189,9 @@ Item {
 
     ModalDialog {
         id: loginDialog
-        property DialogId dialogId: null
+
+        //use var here as DialogId is a QGadget and passed by value
+        property var dialogId: null
         property string defaultUsername: ""
 
         onAboutToHide: restoreFocus()
@@ -318,7 +320,8 @@ Item {
     ModalDialog {
         id: questionDialog
 
-        property DialogId dialogId: null
+        //use var here as DialogId is a QGadget and passed by value
+        property var dialogId: null
         property alias text: content.text
         property alias cancelTxt: cancel.text
         property alias action1Txt: action1.text
