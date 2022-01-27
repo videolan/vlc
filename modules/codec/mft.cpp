@@ -990,7 +990,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                 return VLC_EGENERIC;
             }
 
-            UINT32 interlaced = false;
+            UINT32 interlaced = FALSE;
             hr = output_sample->GetUINT32(MFSampleExtension_Interlaced, &interlaced);
             if (FAILED(hr))
                 picture->b_progressive = true;
@@ -1310,14 +1310,14 @@ static int InitializeMFT(decoder_t *p_dec)
         goto error;
     if (SUCCEEDED(hr))
     {
-        UINT32 is_async = false;
+        UINT32 is_async = FALSE;
         hr = attributes->GetUINT32(MF_TRANSFORM_ASYNC, &is_async);
         if (hr != MF_E_ATTRIBUTENOTFOUND && FAILED(hr))
             goto error;
         p_sys->is_async = is_async;
         if (p_sys->is_async)
         {
-            hr = attributes->SetUINT32(MF_TRANSFORM_ASYNC_UNLOCK, true);
+            hr = attributes->SetUINT32(MF_TRANSFORM_ASYNC_UNLOCK, TRUE);
             if (FAILED(hr))
                 goto error;
             hr = p_sys->mft.As(&p_sys->event_generator);
