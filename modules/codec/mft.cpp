@@ -141,8 +141,6 @@ struct decoder_sys_t
         if (vctx_out)
             mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)0);
 
-        endStreaming();
-
         for (size_t i=0; i < ARRAY_SIZE(cachedSRV); i++)
         {
             for (size_t j=0; j < ARRAY_SIZE(cachedSRV[i]); j++)
@@ -166,21 +164,6 @@ struct decoder_sys_t
         MFShutdown();
     }
 
-    bool isStreaming = false;
-    HRESULT beginStreaming()
-    {
-        assert(!isStreaming);
-        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, (ULONG_PTR)0);
-        isStreaming = SUCCEEDED(hr);
-        return hr;
-    }
-    HRESULT endStreaming()
-    {
-        assert(isStreaming);
-        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, (ULONG_PTR)0);
-        isStreaming = SUCCEEDED(hr);
-        return hr;
-    }
     bool streamStarted = false;
     HRESULT startStream()
     {
@@ -1374,11 +1357,6 @@ static int InitializeMFT(decoder_t *p_dec)
     if (p_sys->input_type.Get() == nullptr)
         if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type) || p_sys->input_type.Get() == nullptr)
             goto error;
-
-    /* This call can be a no-op for some MFT decoders, but it can potentially reduce starting time. */
-    hr = p_sys->beginStreaming();
-    if (FAILED(hr))
-        goto error;
 
     /* This event is required for asynchronous MFTs, optional otherwise. */
     hr = p_sys->startStream();
