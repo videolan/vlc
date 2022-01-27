@@ -1458,11 +1458,22 @@ static int FindMFT(decoder_t *p_dec)
     return VLC_EGENERIC;
 }
 
-static int LoadMFTLibrary(decoder_sys_t *p_sys)
+static int LoadMFTLibrary(decoder_t *p_dec)
 {
+    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     if (FAILED(hr))
         return VLC_EGENERIC;
+
+    if (p_dec->fmt_in.i_cat != VIDEO_ES) // nothing left to do
+        return VLC_SUCCESS;
+
+    if (p_dec->fmt_in.video.i_width == 0) // don't consume D3D resource for a fake decoder
+    {
+        msg_Dbg(p_dec, "skip D3D handling for dummy decoder");
+        return VLC_SUCCESS;
+    }
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
     HINSTANCE mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
@@ -1495,7 +1506,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    if (LoadMFTLibrary(p_sys))
+    if (LoadMFTLibrary(p_dec))
     {
         msg_Err(p_dec, "Failed to load MFT library.");
         goto error;
