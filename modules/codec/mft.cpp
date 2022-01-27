@@ -85,7 +85,7 @@ struct decoder_sys_t
 
     // Direct3D
     vlc_video_context  *vctx_out = nullptr;
-    HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager);
+    HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager) = nullptr;
     UINT dxgi_token = 0;
     ComPtr<IMFDXGIDeviceManager> dxgi_manager;
     HANDLE d3d_handle = 0;
