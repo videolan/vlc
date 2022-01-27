@@ -3856,7 +3856,7 @@ AC_CHECK_TOOL(PROTOC, protoc, no)
 AS_IF([test "${PROTOC}" != "no"], [
     protoc_ver="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '//)"
 ],[
-    protoc_ver="3.1.0"
+    protoc_ver="3.4.1"
 ])
 m4_pushdef([protobuf_lite_version], ${protoc_ver})
 PKG_WITH_MODULES([CHROMECAST],[protobuf-lite = protobuf_lite_version], [
