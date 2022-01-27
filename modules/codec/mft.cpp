@@ -1151,7 +1151,8 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
 
 error:
     msg_Err(p_dec, "Error in DecodeSync()");
-    block_Release(p_block);
+    if (p_block)
+        block_Release(p_block);
     return VLCDEC_SUCCESS;
 }
 
