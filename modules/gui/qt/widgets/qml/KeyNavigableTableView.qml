@@ -68,6 +68,10 @@ FocusScope {
 
     property real availableRowWidth: 0
     property real _availabeRowWidthLastUpdateTime: Date.now()
+    readonly property real _currentAvailableRowWidth: root.width
+                                                      - root.sectionWidth * 2
+                                                      - (root.horizontalSpacing + _contextButtonHorizontalSpace)
+                                                      - (VLCStyle.margin_xxxsmall * 2)
 
     property Item dragItem
 
@@ -125,13 +129,7 @@ FocusScope {
         _qtAvoidSectionUpdate()
     }
 
-    onWidthChanged: {
-        availableRowWidthUpdater.enqueueUpdate()
-    }
-
-    onSectionChanged: {
-        availableRowWidthUpdater.enqueueUpdate()
-    }
+    on_CurrentAvailableRowWidthChanged: availableRowWidthUpdater.enqueueUpdate()
 
     /*
      *define the initial position/selection
@@ -204,9 +202,7 @@ FocusScope {
         }
 
         function _update() {
-            root.availableRowWidth = root.width
-                    - ( !!section.property ? VLCStyle.table_section_width * 2 : 0 )
-                    - (root.horizontalSpacing + _contextButtonHorizontalSpace)
+            root.availableRowWidth = root._currentAvailableRowWidth
             root._availabeRowWidthLastUpdateTime = Date.now()
         }
 
