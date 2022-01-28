@@ -566,6 +566,13 @@ void CompositorDCompositionUISurface::render()
     }
 }
 
+void CompositorDCompositionUISurface::forceRender()
+{
+    m_renderPending = false;
+    m_renderTimer.stop();
+    render();
+}
+
 void CompositorDCompositionUISurface::timerEvent(QTimerEvent *event)
 {
     if (!event)
@@ -615,6 +622,7 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
 
     case QEvent::Resize:
         updateSizes();
+        forceRender();
         break;
 
     case QEvent::WindowActivate:

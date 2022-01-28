@@ -111,6 +111,7 @@ private:
 
     void requestUpdate();
     void render();
+    void forceRender();
 
     void handleScreenChange();
 
