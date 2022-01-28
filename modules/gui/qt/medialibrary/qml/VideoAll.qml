@@ -140,7 +140,9 @@ FocusScope {
 
     function _onNavigationUp() {
         // NOTE: We are calling the header focus function when we have one.
-        if (headerItem && (typeof headerItem.setCurrentItemFocus === "function"))
+        if (headerItem && headerItem.visible
+            &&
+            (typeof headerItem.setCurrentItemFocus === "function"))
             headerItem.setCurrentItemFocus(Qt.TabFocusReason)
         else
             Navigation.defaultNavigationUp()

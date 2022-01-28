@@ -174,7 +174,7 @@ VideoAll {
 
         // NOTE: We want the header to be visible when we have at least one media visible.
         //       Otherwise it overlaps the default caption.
-        visible: (root.model.count)
+        visible: (root.model.count && modelRecent.count)
 
         function setCurrentItemFocus(reason) {
             var item = loader.item;
