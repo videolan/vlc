@@ -63,6 +63,7 @@ typedef struct vlc_gl_sys_t
 #if defined (USE_PLATFORM_WAYLAND)
     struct wl_egl_window *window;
 #endif
+    bool is_current;
 } vlc_gl_sys_t;
 
 static int MakeCurrent (vlc_gl_t *gl)
@@ -72,6 +73,7 @@ static int MakeCurrent (vlc_gl_t *gl)
     if (eglMakeCurrent (sys->display, sys->surface, sys->surface,
                         sys->context) != EGL_TRUE)
         return VLC_EGENERIC;
+    sys->is_current = true;
     return VLC_SUCCESS;
 }
 
@@ -81,6 +83,7 @@ static void ReleaseCurrent (vlc_gl_t *gl)
 
     eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
                     EGL_NO_CONTEXT);
+    sys->is_current = false;
 }
 
 #ifdef USE_PLATFORM_XCB
@@ -112,7 +115,18 @@ static void SwapBuffers (vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
 
-    eglSwapBuffers (sys->display, sys->surface);
+    if (!sys->is_current)
+    {
+        EGLSurface s_read = eglGetCurrentSurface(EGL_READ);
+        EGLSurface s_draw = eglGetCurrentSurface(EGL_DRAW);
+        EGLContext previous_context = eglGetCurrentContext();
+
+        eglMakeCurrent(sys->display, sys->surface, sys->surface, sys->context);
+        eglSwapBuffers (sys->display, sys->surface);
+        eglMakeCurrent(sys->display, s_read, s_draw, previous_context);
+    }
+    else
+        eglSwapBuffers (sys->display, sys->surface);
 }
 
 static void *GetSymbol(vlc_gl_t *gl, const char *procname)
@@ -234,6 +248,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
     sys->context = EGL_NO_CONTEXT;
+    sys->is_current = false;
 
     vout_window_t *wnd = gl->surface;
     EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
