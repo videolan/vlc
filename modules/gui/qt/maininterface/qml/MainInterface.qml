@@ -171,11 +171,19 @@ Rectangle {
             item.bgContent = root
         }
     }
+
     Connections {
         target: dialogsLoader.item
         onRestoreFocus: {
             stackView.focus = true
         }
+    }
+
+    MouseArea {
+        /// handles mouse navigation buttons
+        anchors.fill: parent
+        acceptedButtons: Qt.BackButton
+        onClicked: History.previous()
     }
 
     Loader {
@@ -186,4 +194,5 @@ Rectangle {
 
         source: "qrc:///widgets/CSDMouseStealer.qml"
     }
+
 }
