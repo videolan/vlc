@@ -37,6 +37,66 @@
 #elif defined (__powerpc__) || defined (__powerpc64__)
 # define CPU_FLAGS "cpu"
 
+#elif defined (__riscv)
+# include <vlc_strings.h>
+# define CPU_FLAGS "isa"
+
+static unsigned vlc_CPU_RV_isa_parse(const char *isa)
+{
+    unsigned caps = 0;
+    int c;
+
+    if (vlc_ascii_tolower((unsigned char)isa[0]) != 'r'
+     || vlc_ascii_tolower((unsigned char)isa[1]) != 'v')
+        return 0;
+
+    isa += 2;
+
+    if (strncmp(isa, "32", 2) == 0 || strncmp(isa, "64", 2) == 0)
+        isa += 2;
+    else if (strncmp(isa, "128", 3) == 0)
+        isa += 3;
+    else
+        return 0;
+
+    while ((c = vlc_ascii_tolower((unsigned char)*isa)) != '\0') {
+        size_t extlen = 1;
+
+        switch (c) {
+            case '_':
+                break;
+
+            case 'z':
+            case 's':
+            case 'h':
+            case 'x':
+                extlen = 1 + strcspn(isa + 1, "_");
+                break;
+
+            default:
+                if (((unsigned)(c - 'a')) > 'y')
+                    return 0;
+
+                while (isa[extlen] && ((unsigned)(isa[extlen] - '0')) < 10)
+                    extlen++;
+
+                if (vlc_ascii_tolower(isa[extlen]) == 'p') {
+                    extlen++;
+
+                    while (isa[extlen] && ((unsigned)(isa[extlen] - '0')) < 10)
+                        extlen++;
+                }
+        }
+
+        /* TODO: Zve extensions */
+        if (c == 'v')
+            caps |= VLC_CPU_RV_V;
+
+        isa += extlen;
+    }
+
+    return caps;
+}
 #endif
 
 #ifdef CPU_FLAGS
@@ -68,6 +128,10 @@ unsigned vlc_CPU_raw(void)
         if (*p != ':')
             continue;
 
+#if defined (__riscv)
+        p += strspn(p, "\t ");
+        core_caps = vlc_CPU_RV_isa_parse(p);
+#else
         while ((cap = strsep (&p, " ")) != NULL)
         {
 #if defined (__arm__) || defined (__aarch64__)
@@ -111,6 +175,7 @@ unsigned vlc_CPU_raw(void)
                 core_caps |= VLC_CPU_ALTIVEC;
 #endif
         }
+#endif
 
         /* Take the intersection of capabilities of each processor */
         all_caps &= core_caps;
