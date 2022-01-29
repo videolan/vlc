@@ -293,6 +293,10 @@ void vlc_CPU_dump (vlc_object_t *obj)
     if (vlc_CPU_ARM_NEON())
         vlc_memstream_puts(&stream, "ARM_NEON ");
 
+#elif defined (__riscv)
+    if (vlc_CPU_RV_V())
+        vlc_memstream_puts(&stream, "V ");
+
 #endif
 
 #if HAVE_FPU
