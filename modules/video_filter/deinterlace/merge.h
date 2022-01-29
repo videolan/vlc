@@ -159,6 +159,9 @@ void merge16_arm64_neon (void *, const void *, const void *, size_t);
 void merge8_arm_sve(void *, const void *, const void *, size_t);
 void merge16_arm_sve(void *, const void *, const void *, size_t);
 
+void merge8_rvv(void *, const void *, const void *, size_t);
+void merge16_rvv(void *, const void *, const void *, size_t);
+
 /*****************************************************************************
  * EndMerge routines
  *****************************************************************************/
