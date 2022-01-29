@@ -1775,6 +1775,28 @@ AS_IF([test "${enable_altivec}" = "yes"], [
 AC_SUBST([ALTIVEC_CFLAGS])
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
 
+
+AC_ARG_ENABLE([rvv],
+  AS_HELP_STRING([--disable-rvv],
+    [disable RISC-V Vector extension (default auto)]),, [
+  AS_CASE([${host_cpu}], [riscv*], [enable_rvv="yes"], [enable_rvv="no"])
+])
+AS_IF([test "${enable_rvv}" != "no"], [
+  AC_CACHE_CHECK([if $CCAS groks RISC-V V assembly], [ac_cv_riscv_v], [
+    AC_COMPILE_IFELSE([
+      AC_LANG_PROGRAM(,[[
+asm volatile(".option arch, +v\nvsetvli x0, x0, e8");
+]])
+    ], [
+      ac_cv_riscv_v="yes"
+    ], [
+      ac_cv_riscv_v="no"
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_RVV], [test "${ac_cv_riscv_v}" = "yes"])
+
+
 dnl
 dnl  Memory usage
 dnl
