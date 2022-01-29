@@ -29,13 +29,13 @@
 
 #undef CPU_FLAGS
 #if defined (__arm__) || defined (__aarch64__)
-# define CPU_FLAGS "Features\t:"
+# define CPU_FLAGS "Features"
 
 #elif defined (__i386__) || defined (__x86_64__)
-# define CPU_FLAGS "flags\t\t:"
+# define CPU_FLAGS "flags"
 
 #elif defined (__powerpc__) || defined (__powerpc64__)
-# define CPU_FLAGS "cpu\t\t:"
+# define CPU_FLAGS "cpu"
 
 #endif
 
@@ -52,7 +52,7 @@ unsigned vlc_CPU_raw(void)
 
     while (getline (&line, &linelen, info) != -1)
     {
-        char *p = line, *cap;
+        char *p, *cap;
         uint_fast32_t core_caps = 0;
 
 #if defined (__arm__)
@@ -61,6 +61,11 @@ unsigned vlc_CPU_raw(void)
             core_caps |= VLC_CPU_ARMv6;
 #endif
         if (strncmp (line, CPU_FLAGS, strlen (CPU_FLAGS)))
+            continue;
+
+        p = line + strlen(CPU_FLAGS);
+        p += strspn(p, "\t");
+        if (*p != ':')
             continue;
 
         while ((cap = strsep (&p, " ")) != NULL)
