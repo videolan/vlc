@@ -23,10 +23,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 #   include "config.h"
 #endif
@@ -38,38 +34,8 @@
 #include <vlc_mouse.h>
 #include <vlc_picture.h>
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open (filter_t *);
-
 #define CFG_PREFIX "transform-"
 
-#define TYPE_TEXT N_("Transform type")
-static const char * const type_list[] = { "90", "180", "270",
-    "hflip", "vflip", "transpose", "antitranspose" };
-static const char * const type_list_text[] = { N_("Rotate by 90 degrees"),
-    N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
-    N_("Flip horizontally"), N_("Flip vertically"),
-    N_("Transpose"), N_("Anti-transpose") };
-
-vlc_module_begin()
-    set_description(N_("Video transformation filter"))
-    set_shortname(N_("Transformation"))
-    set_help(N_("Rotate or flip the video"))
-    set_subcategory(SUBCAT_VIDEO_VFILTER)
-
-    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, NULL)
-        change_string_list(type_list, type_list_text)
-        change_safe()
-
-    add_shortcut("transform")
-    set_callback_video_filter(Open)
-vlc_module_end()
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
 static void HFlip(int *sx, int *sy, int w, int h, int dx, int dy)
 {
     VLC_UNUSED( h );
@@ -434,3 +400,25 @@ static int Open(filter_t *filter)
     filter->p_sys           = sys;
     return VLC_SUCCESS;
 }
+
+#define TYPE_TEXT N_("Transform type")
+static const char * const type_list[] = { "90", "180", "270",
+    "hflip", "vflip", "transpose", "antitranspose" };
+static const char * const type_list_text[] = { N_("Rotate by 90 degrees"),
+    N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
+    N_("Flip horizontally"), N_("Flip vertically"),
+    N_("Transpose"), N_("Anti-transpose") };
+
+vlc_module_begin()
+    set_description(N_("Video transformation filter"))
+    set_shortname(N_("Transformation"))
+    set_help(N_("Rotate or flip the video"))
+    set_subcategory(SUBCAT_VIDEO_VFILTER)
+
+    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, NULL)
+        change_string_list(type_list, type_list_text)
+        change_safe()
+
+    add_shortcut("transform")
+    set_callback_video_filter(Open)
+vlc_module_end()
