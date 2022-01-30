@@ -61,8 +61,6 @@ static int BuildFilterChain( filter_t *p_filter );
 
 static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid );
 static int CreateResizeChromaChain( filter_t *p_filter, const es_format_t *p_fmt_mid );
-static filter_t * AppendTransform( filter_chain_t *p_chain, const es_format_t *p_fmt_in,
-                                   const es_format_t *p_fmt_out );
 static void EsFormatMergeSize( es_format_t *p_dst,
                                const es_format_t *p_base,
                                const es_format_t *p_size );
@@ -442,31 +440,11 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
     filter_sys_t *p_sys = p_filter->p_sys;
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
-    if( p_filter->fmt_in.video.orientation != p_fmt_mid->video.orientation)
-    {
-        filter_t *p_transform = AppendTransform( p_sys->p_chain, &p_filter->fmt_in, p_fmt_mid );
-        // Check if filter was enough:
-        if( p_transform == NULL )
-            return VLC_EGENERIC;
-        if( es_format_IsSimilar(&p_transform->fmt_out, &p_filter->fmt_out ) )
-        {
-            p_filter->vctx_out = p_transform->vctx_out;
-            return VLC_SUCCESS;
-        }
-    }
-    else
     {
         if( filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid ) )
             return VLC_EGENERIC;
     }
 
-    if( p_fmt_mid->video.orientation != p_filter->fmt_out.video.orientation)
-    {
-        if( AppendTransform( p_sys->p_chain, p_fmt_mid,
-                             &p_filter->fmt_out ) == NULL )
-            goto error;
-    }
-    else
     {
         if( filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out ) )
             goto error;
@@ -511,59 +489,6 @@ static int CreateResizeChromaChain( filter_t *p_filter, const es_format_t *p_fmt
         p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
 
     return i_ret;
-}
-
-static filter_t * AppendTransform( filter_chain_t *p_chain, const es_format_t *p_fmt1,
-                                   const es_format_t *p_fmt2 )
-{
-    video_transform_t transform = video_format_GetTransform(p_fmt1->video.orientation, p_fmt2->video.orientation);
-
-    const char *type;
-
-    switch ( transform ) {
-
-        case TRANSFORM_R90:
-            type = "90";
-            break;
-        case TRANSFORM_R180:
-            type = "180";
-            break;
-        case TRANSFORM_R270:
-            type = "270";
-            break;
-        case TRANSFORM_HFLIP:
-            type = "hflip";
-            break;
-        case TRANSFORM_VFLIP:
-            type = "vflip";
-            break;
-        case TRANSFORM_TRANSPOSE:
-            type = "transpose";
-            break;
-        case TRANSFORM_ANTI_TRANSPOSE:
-            type = "antitranspose";
-            break;
-        default:
-            type = NULL;
-            break;
-    }
-
-    if( !type )
-        return NULL;
-
-    config_chain_t *cfg;
-    char *name;
-    char config[100];
-    snprintf( config, 100, "transform{type=%s}", type );
-    char *next = config_ChainCreate( &name, &cfg, config );
-
-    filter_t *p_filter = filter_chain_AppendFilter( p_chain, name, cfg, p_fmt2 );
-
-    config_ChainDestroy(cfg);
-    free(name);
-    free(next);
-
-    return p_filter;
 }
 
 static void EsFormatMergeSize( es_format_t *p_dst,
