@@ -216,11 +216,6 @@ static const transform_description_t descriptions[] = {
     DESC("antitranspose", AntiTranspose, TRANSFORM_ANTI_TRANSPOSE),
 };
 
-static bool dsc_is_rotated(const transform_description_t *dsc)
-{
-    return dsc->plane32 != dsc->yuyv;
-}
-
 typedef struct
 {
     const vlc_chroma_description_t *chroma;
@@ -319,7 +314,7 @@ static int Open(filter_t *filter)
         sys->plane[i] = sys->plane[0];
     sys->convert = dsc->convert;
 
-    if (dsc_is_rotated(dsc)) {
+    if (ORIENT_IS_SWAP(dsc->operation)) {
         switch (src->i_chroma) {
             case VLC_CODEC_I422:
             case VLC_CODEC_J422:
@@ -375,7 +370,7 @@ static int Open(filter_t *filter)
     switch (src->i_chroma) {
         case VLC_CODEC_UYVY:
         case VLC_CODEC_VYUY:
-            if (dsc_is_rotated(dsc)) {
+            if (ORIENT_IS_SWAP(dsc->operation)) {
                 msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
                         (char *)&src->i_chroma);
                 return VLC_EGENERIC;
