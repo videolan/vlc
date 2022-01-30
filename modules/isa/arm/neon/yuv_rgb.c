@@ -28,7 +28,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_cpu.h>
-#include "arm_neon/chroma_neon.h"
+#include "chroma_neon.h"
 
 static int Open (filter_t *);
 

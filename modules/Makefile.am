@@ -18,7 +18,6 @@ include access/Makefile.am
 include access/http/Makefile.am
 include access/rtp/Makefile.am
 include access/rtp/test/Makefile.am
-include arm_neon/Makefile.am
 include audio_filter/Makefile.am
 include audio_mixer/Makefile.am
 include audio_output/Makefile.am
@@ -32,6 +31,7 @@ include hw/d3d11/Makefile.am
 include hw/vaapi/Makefile.am
 include hw/vdpau/Makefile.am
 include hw/mmal/Makefile.am
+include isa/arm/Makefile.am
 include keystore/Makefile.am
 include logger/Makefile.am
 include lua/Makefile.am

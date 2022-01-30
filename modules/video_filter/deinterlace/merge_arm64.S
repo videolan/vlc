@@ -19,7 +19,7 @@
  // Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  //****************************************************************************/
 
-#include "../../arm_neon/asm.S"
+#include "../../isa/arm/asm.S"
 
 	.arch armv8-a+simd
 	.text
