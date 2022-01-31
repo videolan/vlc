@@ -1237,6 +1237,37 @@ error:
     return VLCDEC_SUCCESS;
 }
 
+static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & attributes)
+{
+    HRESULT hr = S_OK;
+#if defined(STATIC_CODECAPI_AVDecVideoAcceleration_H264)
+    switch (p_dec->fmt_in.i_codec)
+    {
+        case VLC_CODEC_H264:
+            hr = attributes->SetUINT32(CODECAPI_AVDecVideoAcceleration_H264, TRUE);
+            break;
+        case VLC_CODEC_WMV1:
+        case VLC_CODEC_WMV2:
+        case VLC_CODEC_WMV3:
+        case VLC_CODEC_VC1:
+            hr = attributes->SetUINT32(CODECAPI_AVDecVideoAcceleration_VC1, TRUE);
+            break;
+        case VLC_CODEC_MPGV:
+        case VLC_CODEC_MP2V:
+            hr = attributes->SetUINT32(CODECAPI_AVDecVideoAcceleration_MPEG2, TRUE);
+            break;
+        default:
+            hr = S_OK;
+            break;
+    }
+#else
+    VLC_UNUSED(p_dec);
+    VLC_UNUSED(attributes);
+#endif // STATIC_CODECAPI_AVDecVideoAcceleration_H264
+
+    return SUCCEEDED(hr) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 static void DestroyMFT(decoder_t *p_dec);
 
 static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
@@ -1320,6 +1351,7 @@ static int InitializeMFT(decoder_t *p_dec)
 
     if (attributes.Get() && p_dec->fmt_in.i_cat == VIDEO_ES)
     {
+        EnableHardwareAcceleration(p_dec, attributes);
         if (p_sys->fptr_MFCreateDXGIDeviceManager)
         {
             vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
