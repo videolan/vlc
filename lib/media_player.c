@@ -1098,7 +1098,6 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
     (void)drawable;
     libvlc_printerr ("can't set nsobject: APPLE build required");
     assert(false);
-    var_SetString (p_mi, "vout", "none");
     var_SetString (p_mi, "window", "none");
 #endif
 }
@@ -1156,7 +1155,6 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
     (void) drawable;
     libvlc_printerr ("can't set hwnd: WIN32 build required");
     assert(false);
-    var_SetString (p_mi, "vout", "none");
     var_SetString (p_mi, "window", "none");
 #endif
 }
@@ -1188,7 +1186,6 @@ void libvlc_media_player_set_android_context( libvlc_media_player_t *p_mi,
     (void) p_awindow_handler;
     libvlc_printerr ("can't set android context: ANDROID build required");
     assert(false);
-    var_SetString (p_mi, "vout", "none");
     var_SetString (p_mi, "window", "none");
 #endif
 }
