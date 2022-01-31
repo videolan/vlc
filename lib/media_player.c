@@ -1061,9 +1061,9 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     else if ( engine == libvlc_video_engine_disable )
     {
         // use the default display module
-        var_SetString ( mp, "vout", "" );
+        var_SetString ( mp, "vout", "any" );
         // use the default window
-        var_SetString( mp, "window", "");
+        var_SetString( mp, "window", "any" );
     }
     else
         return false;
@@ -1090,9 +1090,9 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 #ifdef __APPLE__
-    var_SetString (p_mi, "dec-dev", "");
-    var_SetString (p_mi, "vout", "");
-    var_SetString (p_mi, "window", "");
+    var_SetString (p_mi, "dec-dev", "any");
+    var_SetString (p_mi, "vout", "any");
+    var_SetString (p_mi, "window", "any");
     var_SetAddress (p_mi, "drawable-nsobject", drawable);
 #else
     (void)drawable;
@@ -1124,9 +1124,9 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 
-    var_SetString (p_mi, "dec-dev", "");
-    var_SetString (p_mi, "vout", "");
-    var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "");
+    var_SetString (p_mi, "dec-dev", "any");
+    var_SetString (p_mi, "vout", "any");
+    var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "any");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }
 
@@ -1146,10 +1146,10 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 #if defined (_WIN32) || defined (__OS2__)
-    var_SetString (p_mi, "dec-dev", "");
-    var_SetString (p_mi, "vout", "");
+    var_SetString (p_mi, "dec-dev", "any");
+    var_SetString (p_mi, "vout", "any");
     var_SetString (p_mi, "window",
-                   (drawable != NULL) ? "embed-hwnd,any" : "");
+                   (drawable != NULL) ? "embed-hwnd,any" : "any");
     var_SetInteger (p_mi, "drawable-hwnd", (uintptr_t)drawable);
 #else
     (void) drawable;
