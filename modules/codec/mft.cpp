@@ -186,11 +186,8 @@ struct decoder_sys_t
     HRESULT flushStream()
     {
         HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
-        if (streamStarted)
-        {
+        if (SUCCEEDED(hr))
             streamStarted = false;
-            startStream();
-        }
         return hr;
     }
 };
@@ -1096,7 +1093,8 @@ error:
 static void Flush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
-    p_sys->flushStream();
+    if (SUCCEEDED(p_sys->flushStream()))
+        p_sys->startStream();
 }
 
 static int DecodeSync(decoder_t *p_dec, block_t *p_block)
@@ -1458,6 +1456,9 @@ static void DestroyMFT(decoder_t *p_dec)
                 }
             }
         }
+
+        // make sure don't have any input pending
+        p_sys->flushStream();
     }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
