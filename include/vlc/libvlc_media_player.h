@@ -2223,8 +2223,9 @@ LIBVLC_API int libvlc_audio_output_set( libvlc_media_player_t *p_mi,
                                         const char *psz_name );
 
 /**
- * Gets a list of potential audio output devices,
- * \see libvlc_audio_output_device_set().
+ * Gets a list of potential audio output devices.
+ *
+ * See also libvlc_audio_output_device_set().
  *
  * \note Not all audio outputs support enumerating devices.
  * The audio output may be functional even if the list is empty (NULL).
@@ -2268,21 +2269,8 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
 /**
  * Configures an explicit audio output device.
  *
- * If the module parameter is NULL, audio output will be moved to the device
- * specified by the device identifier string immediately. This is the
- * recommended usage.
- *
  * A list of adequate potential device strings can be obtained with
  * libvlc_audio_output_device_enum().
- *
- * However passing NULL is supported in LibVLC version 2.2.0 and later only;
- * in earlier versions, this function would have no effects when the module
- * parameter was NULL.
- *
- * If the module parameter is not NULL, the device parameter of the
- * corresponding audio output, if it exists, will be set to the specified
- * string. Note that some audio output modules do not have such a parameter
- * (notably MMDevice and PulseAudio).
  *
  * \note This function does not select the specified audio output plugin.
  * libvlc_audio_output_set() is used for that purpose.
@@ -2292,10 +2280,10 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
  * Some audio output modules require further parameters (e.g. a channels map
  * in the case of ALSA).
  *
+ * \version This function originally expected three parameters.
+ * The middle parameter was removed from LibVLC 4.0 onward.
+  *
  * \param mp media player
- * \param module If NULL, current audio output module.
- *               if non-NULL, name of audio output module
-                 (see \ref libvlc_audio_output_t::psz_name)
  * \param device_id device identifier string
  *               (see \ref libvlc_audio_output_device_t::psz_device)
  *
@@ -2304,7 +2292,6 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
  * On error, a non-zero value is returned.
  */
 LIBVLC_API int libvlc_audio_output_device_set( libvlc_media_player_t *mp,
-                                                const char *module,
                                                 const char *device_id );
 
 /**

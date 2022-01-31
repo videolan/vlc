@@ -140,7 +140,7 @@ static void test_audio_video(libvlc_media_player_t *mp)
     libvlc_audio_output_device_t *aouts = libvlc_audio_output_device_enum(mp);
     for (libvlc_audio_output_device_t *e = aouts; e != NULL; e = e->p_next)
     {
-        libvlc_audio_output_device_set( mp, NULL, e->psz_device );
+        libvlc_audio_output_device_set( mp, e->psz_device );
     }
     libvlc_audio_output_device_list_release( aouts );
 }
