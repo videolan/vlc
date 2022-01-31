@@ -1423,7 +1423,35 @@ static void DestroyMFT(decoder_t *p_dec)
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
 
     if (p_sys->mft.Get())
+    {
         p_sys->endStream();
+
+        if (p_sys->output_sample.Get() == nullptr)
+        {
+            // the MFT produces the output and may still have some left, we need to drain them
+            HRESULT hr;
+            hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_COMMAND_DRAIN, 0);
+            if (SUCCEEDED(hr))
+            {
+                for (;;)
+                {
+                    DWORD output_status = 0;
+                    MFT_OUTPUT_DATA_BUFFER output_buffer = { p_sys->output_stream_id, p_sys->output_sample.Get(), 0, NULL };
+                    hr = p_sys->mft->ProcessOutput(0, 1, &output_buffer, &output_status);
+                    if (output_buffer.pEvents)
+                        output_buffer.pEvents->Release();
+                    if (output_buffer.pSample)
+                    {
+                        output_buffer.pSample->Release();
+                    }
+                    if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
+                        break;
+                    if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
+                        break;
+                }
+            }
+        }
+    }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         hxxx_helper_clean(&p_sys->hh);
