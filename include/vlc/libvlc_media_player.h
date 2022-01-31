@@ -2243,30 +2243,18 @@ LIBVLC_API int libvlc_audio_output_set( libvlc_media_player_t *p_mi,
 LIBVLC_API libvlc_audio_output_device_t *
 libvlc_audio_output_device_enum( libvlc_media_player_t *mp );
 
-/**
- * Gets a list of audio output devices for a given audio output module,
- * \see libvlc_audio_output_device_set().
- *
- * \note Not all audio outputs support this. In particular, an empty (NULL)
- * list of devices does <b>not</b> imply that the specified audio output does
- * not work.
- *
- * \note The list might not be exhaustive.
- *
- * \warning Some audio output devices in the list might not actually work in
- * some circumstances. By default, it is recommended to not specify any
- * explicit audio device.
- *
- * \param p_instance libvlc instance
- * \param aout audio output name
- *                 (as returned by libvlc_audio_output_list_get())
- * \return A NULL-terminated linked list of potential audio output devices.
- * It must be freed with libvlc_audio_output_device_list_release()
- * \version LibVLC 2.1.0 or later.
- */
-LIBVLC_API libvlc_audio_output_device_t *
+#if defined (__GNUC__) && !defined (__clang__)
+__attribute__((unused))
+__attribute__((noinline))
+__attribute__((error("Use libvlc_audio_output_device_enum() instead")))
+static libvlc_audio_output_device_t *
 libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
-                                     const char *aout );
+                                     const char *aout )
+{
+    (void) p_instance; (void) aout;
+    return NULL;
+}
+#endif
 
 /**
  * Frees a list of available audio output devices.
@@ -2295,9 +2283,6 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
  * corresponding audio output, if it exists, will be set to the specified
  * string. Note that some audio output modules do not have such a parameter
  * (notably MMDevice and PulseAudio).
- *
- * A list of adequate potential device strings can be obtained with
- * libvlc_audio_output_device_list_get().
  *
  * \note This function does not select the specified audio output plugin.
  * libvlc_audio_output_set() is used for that purpose.
@@ -2329,8 +2314,8 @@ LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
  * \warning The initial value for the current audio output device identifier
  * may not be set or may be some unknown value. A LibVLC application should
  * compare this value against the known device identifiers (e.g. those that
- * were previously retrieved by a call to libvlc_audio_output_device_enum or
- * libvlc_audio_output_device_list_get) to find the current audio output device.
+ * were previously retrieved by a call to libvlc_audio_output_device_enum) to
+ * find the current audio output device.
  *
  * It is possible that the selected audio output device changes (an external
  * change) without a call to libvlc_audio_output_device_set. That may make this

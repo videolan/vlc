@@ -171,40 +171,6 @@ err:
     return list;
 }
 
-libvlc_audio_output_device_t *
-libvlc_audio_output_device_list_get( libvlc_instance_t *p_instance,
-                                     const char *aout )
-{
-    char varname[32];
-    if( (size_t)snprintf( varname, sizeof(varname), "%s-audio-device", aout )
-                                                           >= sizeof(varname) )
-        return NULL;
-
-    if( config_GetType(varname) != VLC_VAR_STRING )
-        return NULL;
-
-    libvlc_audio_output_device_t *list = NULL, **pp = &list;
-    char **values, **texts;
-    ssize_t count = config_GetPszChoices( varname, &values, &texts );
-    for( ssize_t i = 0; i < count; i++ )
-    {
-        libvlc_audio_output_device_t *item = malloc( sizeof(*item) );
-        if( unlikely(item == NULL) )
-            break;
-
-        *pp = item;
-        pp = &item->p_next;
-        item->psz_device = values[i];
-        item->psz_description = texts[i];
-    }
-
-    *pp = NULL;
-    free( texts );
-    free( values );
-    (void) p_instance;
-    return list;
-}
-
 void libvlc_audio_output_device_list_release( libvlc_audio_output_device_t *l )
 {
     while( l != NULL )
