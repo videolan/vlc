@@ -132,14 +132,17 @@ struct decoder_sys_t
 
     void DoRelease()
     {
-        mft->SetInputType(input_stream_id, nullptr, 0);
-        mft->SetOutputType(output_stream_id, nullptr, 0);
-
         if (output_sample.Get())
             output_sample->RemoveAllBuffers();
 
-        if (vctx_out)
-            mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)0);
+        if (mft.Get())
+        {
+            // mft->SetInputType(input_stream_id, nullptr, 0);
+            // mft->SetOutputType(output_stream_id, nullptr, 0);
+
+            if (vctx_out)
+                mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)0);
+        }
 
         for (size_t i=0; i < ARRAY_SIZE(cachedSRV); i++)
         {
