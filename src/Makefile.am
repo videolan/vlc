@@ -507,6 +507,7 @@ libvlccore_la_SOURCES += posix/sort.c
 endif
 libvlccore_la_SOURCES += \
 	posix/thread.c
+libvlccore_la_LIBADD += $(LIBEXECINFO)
 if !HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	posix/dirs.c \
