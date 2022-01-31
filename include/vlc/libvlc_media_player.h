@@ -2299,10 +2299,11 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
  * \param device_id device identifier string
  *               (see \ref libvlc_audio_output_device_t::psz_device)
  *
- * \bug This function returns nothing. Errors are ignored (this is a
- * design bug).
+ * \return If the change of device was requested succesfully, zero is returned
+ * (the actual change is asynchronous and not guaranteed to succeed).
+ * On error, a non-zero value is returned.
  */
-LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
+LIBVLC_API int libvlc_audio_output_device_set( libvlc_media_player_t *mp,
                                                 const char *module,
                                                 const char *device_id );
 

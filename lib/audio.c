@@ -187,33 +187,34 @@ void libvlc_audio_output_device_list_release( libvlc_audio_output_device_t *l )
 /*****************************
  * Set device for using
  *****************************/
-void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
-                                     const char *module, const char *devid )
+int libvlc_audio_output_device_set( libvlc_media_player_t *mp,
+                                    const char *module, const char *devid )
 {
     if( devid == NULL )
-        return;
+        return -1;
 
     if( module != NULL )
     {
         char *cfg_name;
 
         if( asprintf( &cfg_name, "%s-audio-device", module ) == -1 )
-            return;
+            return -1;
 
         if( !var_Type( mp, cfg_name ) )
             /* Don't recreate the same variable over and over and over... */
             var_Create( mp, cfg_name, VLC_VAR_STRING );
         var_SetString( mp, cfg_name, devid );
         free( cfg_name );
-        return;
+        return 0;
     }
 
     audio_output_t *aout = GetAOut( mp );
     if( aout == NULL )
-        return;
+        return -1;
 
-    aout_DeviceSet( aout, devid );
+    int ret = aout_DeviceSet( aout, devid );
     aout_Release(aout);
+    return ret;
 }
 
 char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
