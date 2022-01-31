@@ -130,6 +130,7 @@ int libvlc_audio_output_set( libvlc_media_player_t *mp, const char *psz_name )
     var_SetString( mp, "aout", value );
     free( value );
 
+    vlc_player_aout_Reset(mp->player);
     return 0;
 }
 
