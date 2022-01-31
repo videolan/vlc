@@ -1317,8 +1317,13 @@ case "${host_cpu}" in
 esac
 
 dnl Check for backtrace() support
-AC_CHECK_HEADERS(execinfo.h)
-AC_CHECK_FUNCS(backtrace)
+AC_CHECK_HEADERS([execinfo.h])
+AC_CHECK_FUNCS([backtrace],, [
+  AC_CHECK_LIB([execinfo], [backtrace], [
+    LIBEXECINFO="-lexecinfo"])
+])
+AC_SUBST(LIBEXECINFO)
+
 
 dnl
 dnl  default modules

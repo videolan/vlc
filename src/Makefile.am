@@ -419,6 +419,7 @@ libvlccore_la_SOURCES += \
 	darwin/specific.c \
 	darwin/thread.c
 else
+libvlccore_la_LIBADD += $(LIBEXECINFO)
 libvlccore_la_SOURCES += \
 	posix/dirs.c \
 	posix/error.c \
