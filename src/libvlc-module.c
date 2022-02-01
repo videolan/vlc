@@ -2035,7 +2035,7 @@ vlc_module_begin ()
     add_integer( "dscp", 0, DSCP_TEXT, DSCP_LONGTEXT )
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
-    add_module("packetizer", "packetizer", NULL,
+    add_module("packetizer", "packetizer", "any",
                PACKETIZER_TEXT, PACKETIZER_LONGTEXT)
 
 /* Advanced options */
