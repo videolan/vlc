@@ -59,6 +59,8 @@ AbstractStream::AbstractStream(demux_t * demux_)
     notfound_sequence = 0;
     mightalwaysstartfromzero = false;
     last_buffer_status = BufferingStatus::Lessthanmin;
+    currentrep.width = 0;
+    currentrep.height = 0;
     vlc_mutex_init(&lock);
 }
 
@@ -735,6 +737,11 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
         p_fmt->psz_language = strdup(language.c_str());
     if(!p_fmt->psz_description && !description.empty())
         p_fmt->psz_description = strdup(description.c_str());
+    if( p_fmt->i_cat == VIDEO_ES && p_fmt->video.i_visible_width == 0)
+    {
+        p_fmt->video.i_visible_width = currentrep.width;
+        p_fmt->video.i_visible_height = currentrep.height;
+    }
 }
 
 AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
@@ -824,6 +831,16 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
                     event.prev ? event.prev->getStreamFormat().str().c_str() : "",
                     event.next ? event.next->getID().str().c_str() : "",
                     event.next ? event.next->getStreamFormat().str().c_str() : ""));
+            if(event.next)
+            {
+                currentrep.width = event.next->getWidth() > 0 ? event.next->getWidth() : 0;
+                currentrep.height = event.next->getHeight() > 0 ? event.next->getHeight() : 0;
+            }
+            else
+            {
+                currentrep.width = 0;
+                currentrep.height = 0;
+            }
         }
             break;
 
