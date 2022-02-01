@@ -265,6 +265,7 @@
         <file alias="GridShadows.qml">widgets/qml/GridShadows.qml</file>
         <file alias="ToolTipExt.qml">widgets/qml/ToolTipExt.qml</file>
         <file alias="MLDragItem.qml">widgets/qml/MLDragItem.qml</file>
+        <file alias="ScaledImage.qml">widgets/qml/ScaledImage.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
