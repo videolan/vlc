@@ -347,7 +347,7 @@ Item {
     Component {
         id: artworkLoader
 
-        Image {
+        ScaledImage {
             fillMode: Image.PreserveAspectCrop
             width: coverSize
             height: coverSize
