@@ -145,6 +145,11 @@ namespace adaptive
         bool eof;
         std::string language;
         std::string description;
+        struct
+        {
+            unsigned width;
+            unsigned height;
+        } currentrep;
 
         AbstractDemuxer *demuxer;
         AbstractSourceStream *demuxersource;
