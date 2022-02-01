@@ -297,7 +297,9 @@ void ExtensionTab::moreInformation()
     if( !index.isValid() )
         return;
 
-    ExtensionInfoDialog dlg( index, p_intf, windowHandle() );
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    ExtensionInfoDialog dlg( index, p_intf, parentWindow );
     dlg.exec();
 }
 
@@ -592,7 +594,9 @@ void AddonsTab::moreInformation()
 {
     QModelIndex index = addonsView->selectionModel()->selectedIndexes().first();
     if( !index.isValid() ) return;
-    AddonInfoDialog dlg( index, p_intf, windowHandle() );
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    AddonInfoDialog dlg( index, p_intf, parentWindow );
     dlg.exec();
 }
 

@@ -356,7 +356,9 @@ void VLMDialog::selectInput()
 
 void VLMDialog::selectOutput()
 {
-    SoutDialog *s = new SoutDialog( windowHandle(), p_intf );
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    SoutDialog *s = new SoutDialog( parentWindow, p_intf );
     if( s->exec() == QDialog::Accepted )
     {
         int i = s->getChain().indexOf( " " );

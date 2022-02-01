@@ -142,7 +142,9 @@ void VLCProfileSelector::editProfile()
 void VLCProfileSelector::editProfile( const QString& qs, const QString& value )
 {
     /* Create the Profile Editor */
-    VLCProfileEditor *editor = new VLCProfileEditor( qs, value, windowHandle() );
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    VLCProfileEditor *editor = new VLCProfileEditor( qs, value,  parentWindow );
 
     /* Show it */
     if( QDialog::Accepted == editor->exec() )

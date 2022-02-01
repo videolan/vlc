@@ -277,7 +277,9 @@ void OpenDialog::toggleAdvancedPanel()
 
 void OpenDialog::browseInputSlave()
 {
-    OpenDialog *od = new OpenDialog( windowHandle(), p_intf, true, SELECT );
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    OpenDialog *od = new OpenDialog( parentWindow, p_intf, true, SELECT );
     od->exec();
     ui.slaveText->setText( od->getMRL( false ) );
     delete od;
@@ -408,7 +410,9 @@ void OpenDialog::stream( bool b_transcode_only )
     {
         msg_Dbg( p_intf, "MRL(s) passed to the Sout: %s", qtu( soutMRLS[i] ) );
     }
-    THEDP->streamingDialog( windowHandle(), soutMRLS, b_transcode_only,
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    THEDP->streamingDialog( parentWindow, soutMRLS, b_transcode_only,
                             getOptions().split( " :" ) );
 }
 
