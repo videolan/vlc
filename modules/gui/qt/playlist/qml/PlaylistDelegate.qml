@@ -131,7 +131,7 @@ T.Control {
                 spread: 0.1
             }
 
-            Image {
+            Widgets.ScaledImage {
                 id: artwork
 
                 anchors.fill: parent

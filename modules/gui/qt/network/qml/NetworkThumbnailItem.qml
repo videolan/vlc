@@ -73,7 +73,7 @@ Item {
         }
     }
 
-    Image {
+    Widgets.ScaledImage {
         id: artwork
 
         x: (width - paintedWidth) / 2

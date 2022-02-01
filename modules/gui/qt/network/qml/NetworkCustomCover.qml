@@ -28,7 +28,7 @@ Item {
     property var networkModel
     property alias iconSize: custom_cover.width
 
-    Image {
+    Widgets.ScaledImage {
         id: custom_cover
 
         anchors.centerIn: parent
