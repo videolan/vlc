@@ -24,11 +24,12 @@
 #include <vlc_strings.h>
 #include <vlc_hash.h>
 #include <vlc_stream.h>
-#include <vlc_rand.h>
 #include <vlc_fs.h>
 
+#include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -345,18 +346,25 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
 static void
 fill_rand( int i_fd, size_t i_size )
 {
-    uint8_t p_buf[4096];
-    size_t i_written = 0;
-    while( i_written < i_size )
-    {
-        size_t i_tocopy = __MIN( i_size - i_written, 4096 );
+    unsigned int seed = 12345;
 
-        vlc_rand_bytes(p_buf, i_tocopy);
+    while( i_size > 0 )
+    {
+        uint8_t p_buf[4096];
+        size_t i_tocopy = __MIN( i_size, sizeof (p_buf) );
+
+        for (size_t i = 0; i < i_tocopy; i++)
+            p_buf[i] = rand_r(&seed);
+
         ssize_t i_ret = write( i_fd, p_buf, i_tocopy );
-        assert( i_ret > 0 );
-        i_written += i_ret;
+        if( i_ret < (ssize_t)i_tocopy ) {
+            if( i_ret >= 0 )
+                errno = ENOSPC;
+            perror("write error");
+            abort();
+        }
+        i_size -= i_ret;
     }
-    assert( i_written == i_size );
 }
 #endif
 
