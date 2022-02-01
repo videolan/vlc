@@ -111,6 +111,8 @@ void BaseRepresentation::getCodecsDesc(CodecDescriptionList *desc) const
         CodecDescription *dsc = makeCodecDescription(*it);
         dsc->setDescription(adaptationSet->description.Get());
         dsc->setLanguage(adaptationSet->getLang());
+        if(getWidth() > 0 && getHeight() > 0)
+            dsc->setDimensions(getWidth(), getHeight());
         desc->push_back(dsc);
     }
 }
