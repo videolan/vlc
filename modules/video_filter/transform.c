@@ -194,7 +194,6 @@ YUY2(R270)
 typedef struct {
     char      name[16];
     convert_t convert;
-    convert_t iconvert;
     video_transform_t operation;
     void      (*plane8) (plane_t *dst, const plane_t *src);
     void      (*plane16)(plane_t *dst, const plane_t *src);
@@ -203,18 +202,18 @@ typedef struct {
     void      (*yuyv)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
-#define DESC(str, f, invf, op) \
-    { str, f, invf, op, Plane8_##f, Plane16_##f, Plane32_##f, \
+#define DESC(str, f, op) \
+    { str, f, op, Plane8_##f, Plane16_##f, Plane32_##f, \
       Plane422_##f, PlaneYUY2_##f }
 
 static const transform_description_t descriptions[] = {
-    DESC("90",            R90,           R270,          TRANSFORM_R90),
-    DESC("180",           R180,          R180,          TRANSFORM_R180),
-    DESC("270",           R270,          R90,           TRANSFORM_R270),
-    DESC("hflip",         HFlip,         HFlip,         TRANSFORM_HFLIP),
-    DESC("vflip",         VFlip,         VFlip,         TRANSFORM_VFLIP),
-    DESC("transpose",     Transpose,     Transpose,     TRANSFORM_TRANSPOSE),
-    DESC("antitranspose", AntiTranspose, AntiTranspose, TRANSFORM_ANTI_TRANSPOSE),
+    DESC("90",            R90,           TRANSFORM_R90),
+    DESC("180",           R180,          TRANSFORM_R180),
+    DESC("270",           R270,          TRANSFORM_R270),
+    DESC("hflip",         HFlip,         TRANSFORM_HFLIP),
+    DESC("vflip",         VFlip,         TRANSFORM_VFLIP),
+    DESC("transpose",     Transpose,     TRANSFORM_TRANSPOSE),
+    DESC("antitranspose", AntiTranspose, TRANSFORM_ANTI_TRANSPOSE),
 };
 
 static bool dsc_is_rotated(const transform_description_t *dsc)
