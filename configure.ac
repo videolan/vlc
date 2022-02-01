@@ -2103,7 +2103,7 @@ AC_ARG_ENABLE([v4l2], AS_HELP_STRING([--disable-v4l2],
   [disable Video4Linux version 2 (default auto)]))
 have_v4l2="no"
 AS_IF([test "$enable_v4l2" != "no"], [
-  AC_CHECK_HEADERS([linux/videodev2.h], [
+  AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
     have_v4l2="yes"
   ])
 ])
