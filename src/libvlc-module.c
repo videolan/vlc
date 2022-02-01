@@ -1074,11 +1074,6 @@ static const char* const ppsz_restore_playback_desc[] = {
     "the correct demuxer is not automatically detected. You should not "\
     "set this as a global option unless you really know what you are doing." )
 
-#define VOD_SERVER_TEXT N_("VoD server module")
-#define VOD_SERVER_LONGTEXT N_( \
-    "You can select which VoD server module you want to use. Set this " \
-    "to 'vod_rtsp' to switch back to the old, legacy module." )
-
 #define TRACER_TEXT N_("Tracer module")
 #define TRACER_LONGTEXT N_( \
     "This allow to select which tracer module you want to use." )
@@ -2047,8 +2042,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_ADVANCED_MISC )
     add_category_hint(N_("Advanced"), NULL)
     set_section( N_("Special modules"), NULL )
-    add_module("vod-server", "vod server", NULL,
-               VOD_SERVER_TEXT, VOD_SERVER_LONGTEXT)
+    add_obsolete_string("vod-server") /* since 4.0.0 */
     add_module("tracer", "tracer", NULL,
                TRACER_TEXT, TRACER_LONGTEXT)
 
