@@ -38,6 +38,7 @@ namespace adaptive
                 void operator=(const CodecDescription&) = delete;
                 virtual ~CodecDescription();
                 const es_format_t *getFmt() const;
+                void setDimensions(unsigned, unsigned);
                 void setDescription(const std::string &);
                 void setLanguage(const std::string &);
                 void setAspectRatio(const AspectRatio &);
