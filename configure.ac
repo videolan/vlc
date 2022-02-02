@@ -3683,9 +3683,11 @@ AC_ARG_ENABLE([sndio],
 ])
 have_sndio="no"
 AS_IF([test "$enable_sndio" != "no"], [
-  AC_CHECK_HEADER([sndio.h], [
-    AC_CHECK_LIB([sndio], [sio_open], [
-      have_sndio="yes"
+  PKG_CHECK_MODULES([SNDIO], [sndio], [
+    have_sndio="yes"
+  ], [
+    AS_IF([test -n "$enable_sndio"], [
+      AC_MSG_ERROR([${SNDIO_PKG_ERRORS}.)])
     ])
   ])
 ])
