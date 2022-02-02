@@ -23,6 +23,7 @@
 
 	.arch armv8-a+simd
 	.text
+	bti_advertise
 
 #define	DEST	x0
 #define	SRC1	x1
