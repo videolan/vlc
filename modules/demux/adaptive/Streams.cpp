@@ -619,6 +619,14 @@ bool AbstractStream::getMediaPlaybackTimes(mtime_t *start, mtime_t *end,
     return segmentTracker->getMediaPlaybackRange(start, end, length);
 }
 
+bool AbstractStream::getMediaAdvanceAmount(mtime_t *duration) const
+{
+    if(startTimeContext.media == VLC_TS_INVALID)
+        return false;
+    *duration = currentTimeContext.media - startTimeContext.media;
+    return true;
+}
+
 void AbstractStream::runUpdates()
 {
     if(valid && !disabled)
