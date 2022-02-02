@@ -440,13 +440,7 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
             if(sequenceNumber == std::numeric_limits<uint64_t>::max())
                 sequenceNumber = 0;
 
-            stime_t duration = list->inheritDuration();
-            if(!duration)
-            {
-                delete list;
-                return 0;
-            }
-
+            const stime_t duration = list->inheritDuration();
             stime_t nzStartTime = sequenceNumber * duration;
             std::vector<Node *>::const_iterator it;
             for(it = segments.begin(); it != segments.end(); ++it)
