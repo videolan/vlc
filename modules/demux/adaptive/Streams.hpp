@@ -93,6 +93,7 @@ namespace adaptive
         bool decodersDrained();
         virtual bool setPosition(vlc_tick_t, bool);
         bool getMediaPlaybackTimes(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
+        bool getMediaAdvanceAmount(vlc_tick_t *) const;
         void runUpdates();
 
         /* Used by demuxers fake streams */
@@ -139,7 +140,7 @@ namespace adaptive
         FakeESOut::LockedFakeEsOut fakeEsOut() const;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         mutable vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
-public:
+
         SegmentTimes startTimeContext;
         SegmentTimes currentTimeContext;
         SegmentTimes prevTimeContext;
