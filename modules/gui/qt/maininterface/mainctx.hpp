@@ -175,6 +175,7 @@ class MainCtx : public QObject
     Q_PROPERTY(vlc::playlist::PlaylistControllerModel* mainPlaylistController READ getMainPlaylistController CONSTANT FINAL)
     Q_PROPERTY(bool smoothScroll READ smoothScroll NOTIFY smoothScrollChanged FINAL)
     Q_PROPERTY(QWindow* intfMainWindow READ intfMainWindow CONSTANT FINAL)
+    Q_PROPERTY(QScreen* screen READ screen NOTIFY screenChanged)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -253,6 +254,7 @@ public:
     inline void setDialogFilePath(const QUrl& filepath ){ m_dialogFilepath = filepath; }
     inline bool hasAcrylicSurface() const { return m_hasAcrylicSurface; }
     inline void reloadFromSettings() { loadFromSettingsImpl(true); }
+    inline QScreen* screen() const { return intfMainWindow()->screen(); }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -424,6 +426,8 @@ signals:
     void smoothScrollChanged();
 
     void preferHotkeysChanged();
+
+    void screenChanged();
 
 private:
     void loadPrefs(bool callSignals);

@@ -177,6 +177,14 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
     connect(this, &MainCtx::interfaceFullScreenChanged, this, &MainCtx::useClientSideDecorationChanged);
 
+    QMetaObject::invokeMethod(this, [this]()
+    {
+        // *** HACKY ***
+        assert(p_intf->p_compositor->interfaceMainWindow());
+        connect(p_intf->p_compositor->interfaceMainWindow(), &QWindow::screenChanged,
+                this, &MainCtx::screenChanged);
+    }, Qt::QueuedConnection);
+
     /** END of CONNECTS**/
 
 

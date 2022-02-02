@@ -55,6 +55,7 @@
 
 #include "videosurface.hpp"
 
+#include <QScreen>
 #include <QQuickWindow>
 #include <QQmlContext>
 #include <QQmlFileSelector>
@@ -212,6 +213,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
+        qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
