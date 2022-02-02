@@ -25,6 +25,10 @@ endif
 	$(APPLY) $(SRC)/gpg-error/version-bump-gawk-5.patch
 	$(APPLY) $(SRC)/gpg-error/win32-extern-struct.patch
 	$(APPLY) $(SRC)/gpg-error/darwin-triplet.patch
+ifndef HAVE_WIN32
+	cp -f -- "$(SRC)/gpg-error/lock-obj-pub.posix.h" \
+		"$(UNPACK_DIR)/src/lock-obj-pub.native.h"
+endif
 	$(MOVE)
 ifdef HAVE_ANDROID
 ifeq ($(ARCH),aarch64)
@@ -44,5 +48,6 @@ GPGERROR_CONF := $(HOSTCONF) \
 .gpg-error: libgpg-error
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(GPGERROR_CONF)
-	cd $< && $(MAKE) install
+	# pre_mkheader_cmds would delete our lock-obj-pub-native.h
+	cd $< && $(MAKE) pre_mkheader_cmds=true install
 	touch $@
