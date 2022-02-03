@@ -583,11 +583,6 @@ notsupp:
         p_sys->pf_merge = pixel_size == 1 ? merge8_arm64_neon : merge16_arm64_neon;
     else
 #endif
-#if defined(CAN_COMPILE_RVV)
-    if( vlc_CPU_RV_V() )
-        p_sys->pf_merge = pixel_size == 1 ? merge8_rvv : merge16_rvv;
-    else
-#endif
     {
         vlc_CPU_functions_init_once("deinterlace functions", &funcs);
         p_sys->pf_merge = funcs.merges[vlc_ctz(pixel_size)];

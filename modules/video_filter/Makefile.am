@@ -191,10 +191,6 @@ if HAVE_SVE
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_sve.S
 libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_SVE
 endif
-if HAVE_RVV
-libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_rvv.S
-libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_RVV
-endif
 libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
