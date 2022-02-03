@@ -54,7 +54,9 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
 #define QUALITY_MODE_TEXT N_("Quality mode")
 #define QUALITY_MODE_LONGTEXT N_("Quality setting which will determine max encoding time.")
 
-static const int quality_values[] = { 0, 1, 2 };
+static const int quality_values[] = {
+    VPX_DL_GOOD_QUALITY, VPX_DL_REALTIME, VPX_DL_BEST_QUALITY
+};
 static const char* const quality_desc[] = {
     N_("Good"), N_("Realtime"), N_("Best"),
 };
@@ -79,7 +81,6 @@ vlc_module_begin ()
 #   define ENC_CFG_PREFIX "sout-vpx-"
     add_integer( ENC_CFG_PREFIX "quality-mode", VPX_DL_GOOD_QUALITY, QUALITY_MODE_TEXT,
                  QUALITY_MODE_LONGTEXT )
-        change_integer_range( 0, 2 )
         change_integer_list( quality_values, quality_desc );
 #endif
 vlc_module_end ()
@@ -442,10 +443,10 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     /* Deadline (in ms) to spend in encoder */
     switch (var_GetInteger(p_enc, ENC_CFG_PREFIX "quality-mode")) {
-        case 1:
+        case VPX_DL_REALTIME:
             p_sys->quality = VPX_DL_REALTIME;
             break;
-        case 2:
+        case VPX_DL_BEST_QUALITY:
             p_sys->quality = VPX_DL_BEST_QUALITY;
             break;
         default:
