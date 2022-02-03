@@ -35,7 +35,7 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     format.setDepthBufferSize(8);
     format.setStencilBufferSize(8);
     format.setAlphaBufferSize(8);
-
+    format.setSwapInterval(0);
     setFormat(format);
 
     m_context = new QOpenGLContext();
@@ -116,6 +116,8 @@ void CompositorX11UISurface::render()
 
     m_uiRenderControl->polishItems();
     m_uiRenderControl->sync();
+
+    // FIXME: Render function should be executed in rendering thread
     m_uiRenderControl->render();
 
     m_uiWindow->resetOpenGLState();
