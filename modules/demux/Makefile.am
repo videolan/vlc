@@ -513,6 +513,7 @@ adaptive_test_SOURCES = \
     demux/adaptive/test/playlist/TemplatedUri.cpp \
     demux/adaptive/test/plumbing/CommandsQueue.cpp \
     demux/adaptive/test/plumbing/FakeEsOut.cpp \
+    demux/adaptive/test/SegmentTracker.cpp \
     demux/adaptive/test/test.cpp \
     demux/adaptive/test/test.hpp
 adaptive_test_LDADD = libvlc_adaptive.la

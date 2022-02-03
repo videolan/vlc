@@ -48,5 +48,7 @@ int main()
     TEST(BufferingLogic) ||
     TEST(CommandsQueue) ||
     TEST(M3U8MasterPlaylist) ||
-    TEST(M3U8Playlist);
+    TEST(M3U8Playlist) ||
+    TEST(SegmentTracker)
+    ;
 }

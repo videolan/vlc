@@ -48,5 +48,6 @@ int M3U8Playlist_test();
 int CommandsQueue_test();
 int BufferingLogic_test();
 int FakeEsOut_test();
+int SegmentTracker_test();
 
 #endif
