@@ -40,11 +40,6 @@ sd_LTLIBRARIES += $(LTLIBupnp)
 if HAVE_OSX
 libupnp_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,SystemConfiguration
 endif
-if HAVE_LINUX
-if !HAVE_ANDROID
-libupnp_plugin_la_LIBADD += -lpthread
-endif
-endif
 
 libpulselist_plugin_la_SOURCES = services_discovery/pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
