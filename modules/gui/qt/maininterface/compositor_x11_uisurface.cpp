@@ -287,10 +287,12 @@ void CompositorX11UISurface::exposeEvent(QExposeEvent *)
 {
     if (isExposed())
     {
-        m_context->makeCurrent(this);
-        m_uiRenderControl->initialize(m_context);
-        m_context->doneCurrent();
-
+        if (!m_uiWindow->openglContext())
+        {
+            m_context->makeCurrent(this);
+            m_uiRenderControl->initialize(m_context);
+            m_context->doneCurrent();
+        }
         requestUpdate();
     }
 }
