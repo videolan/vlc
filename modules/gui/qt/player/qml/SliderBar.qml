@@ -148,8 +148,19 @@ Slider {
 
             states: [
                 State {
+                    name: "hidden"
+                    when: !control.visible
+                    PropertyChanges {
+                        target: bufferRect
+                        width: bufferAnimWidth
+                        visible: false
+                        x: 0
+                        animateLoading: false
+                    }
+                },
+                State {
                     name: "buffering not started"
-                    when: Player.buffering === 0
+                    when: control.visible && Player.buffering === 0
                     PropertyChanges {
                         target: bufferRect
                         width: bufferAnimWidth
@@ -160,7 +171,7 @@ Slider {
                 },
                 State {
                     name: "time to start playing known"
-                    when: Player.buffering < 1
+                    when: control.visible && Player.buffering < 1
                     PropertyChanges {
                         target: bufferRect
                         width: Player.buffering * parent.width
@@ -171,7 +182,7 @@ Slider {
                 },
                 State {
                     name: "playing from buffer"
-                    when: Player.buffering === 1
+                    when: control.visible && Player.buffering === 1
                     PropertyChanges {
                         target: bufferRect
                         width: Player.buffering * parent.width
