@@ -23,6 +23,7 @@
 #endif
 
 #include "SegmentTracker.hpp"
+#include "SharedResources.hpp"
 #include "playlist/BasePlaylist.hpp"
 #include "playlist/BaseRepresentation.h"
 #include "playlist/BaseAdaptationSet.h"
@@ -264,8 +265,7 @@ bool SegmentTracker::ChunkEntry::isValid() const
 }
 
 SegmentTracker::ChunkEntry
-SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
-                             AbstractConnectionManager *connManager) const
+SegmentTracker::prepareChunk(bool switch_allowed, Position pos) const
 {
     if(!adaptationSet)
         return ChunkEntry();
@@ -333,7 +333,7 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
     if(!segment)
         segment = datasegment;
 
-    SegmentChunk *segmentChunk = segment->toChunk(resources, connManager, pos.number, pos.rep);
+    SegmentChunk *segmentChunk = segment->toChunk(resources, pos.number, pos.rep);
     if(!segmentChunk)
         return ChunkEntry();
 
@@ -356,15 +356,14 @@ void SegmentTracker::resetChunksSequence()
     }
 }
 
-ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
-                                            AbstractConnectionManager *connManager)
+ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed)
 {
     if(!adaptationSet || !next.isValid())
         return nullptr;
 
     if(chunkssequence.empty())
     {
-        ChunkEntry chunk = prepareChunk(switch_allowed, next, connManager);
+        ChunkEntry chunk = prepareChunk(switch_allowed, next);
         chunkssequence.push_back(chunk);
     }
 

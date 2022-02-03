@@ -223,7 +223,7 @@ namespace adaptive
             void getCodecsDesc(CodecDescriptionList *) const;
             const Role & getStreamRole() const;
             void reset();
-            ChunkInterface* getNextChunk(bool, AbstractConnectionManager *);
+            ChunkInterface* getNextChunk(bool);
             bool setPositionByTime(vlc_tick_t, bool, bool);
             void setPosition(const Position &, bool);
             bool setStartPosition();
@@ -253,8 +253,7 @@ namespace adaptive
                     vlc_tick_t duration;
             };
             std::list<ChunkEntry> chunkssequence;
-            ChunkEntry prepareChunk(bool switch_allowed, Position pos,
-                                    AbstractConnectionManager *connManager) const;
+            ChunkEntry prepareChunk(bool switch_allowed, Position pos) const;
             void resetChunksSequence();
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void notify(const TrackerEvent &) const;

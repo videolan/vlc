@@ -31,6 +31,7 @@
 #include "BaseRepresentation.h"
 #include "BasePlaylist.hpp"
 #include "SegmentChunk.hpp"
+#include "../SharedResources.hpp"
 #include "../http/BytesRange.hpp"
 #include "../http/HTTPConnectionManager.h"
 #include "../http/Downloader.hpp"
@@ -76,8 +77,7 @@ bool ISegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepre
     return true;
 }
 
-SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager *connManager,
-                                size_t index, BaseRepresentation *rep)
+SegmentChunk* ISegment::toChunk(SharedResources *res, size_t index, BaseRepresentation *rep)
 {
     const std::string url = getUrlSegment().toString(index, rep);
     BytesRange range;
@@ -90,7 +90,7 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
         chunkType = ChunkType::Index;
     else
         chunkType = ChunkType::Segment;
-    AbstractChunkSource *source = connManager->makeSource(url,
+    AbstractChunkSource *source = res->getConnManager()->makeSource(url,
                                                           rep->getAdaptationSet()->getID(),
                                                           chunkType,
                                                           range);
@@ -107,12 +107,12 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
                 delete chunk;
                 return nullptr;
             }
-            connManager->start(source);
+            res->getConnManager()->start(source);
             return chunk;
         }
         else
         {
-            connManager->recycleSource(source);
+            res->getConnManager()->recycleSource(source);
         }
     }
     return nullptr;

@@ -622,7 +622,7 @@ AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
 ChunkInterface * AbstractStream::getNextChunk() const
 {
     const bool b_restarting = fakeEsOut()->restarting();
-    ChunkInterface *ck = segmentTracker->getNextChunk(!b_restarting, connManager);
+    ChunkInterface *ck = segmentTracker->getNextChunk(!b_restarting);
     if(ck && !fakeEsOut()->hasSegmentStartTimes())
         fakeEsOut()->setSegmentStartTimes(startTimeContext);
 

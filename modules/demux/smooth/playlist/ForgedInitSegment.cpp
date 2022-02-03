@@ -134,8 +134,7 @@ block_t * ForgedInitSegment::buildMoovBox(const CodecParameters &codecparameters
     return moov;
 }
 
-SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionManager *,
-                                         size_t, BaseRepresentation *rep)
+SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, size_t, BaseRepresentation *rep)
 {
     QualityLevel *lvl = dynamic_cast<QualityLevel *>(rep);
     if(lvl == nullptr)

@@ -42,8 +42,8 @@ namespace smooth
                 ForgedInitSegment(ICanonicalUrl *parent, const std::string &,
                                   uint64_t, vlc_tick_t);
                 virtual ~ForgedInitSegment();
-                virtual SegmentChunk* toChunk(SharedResources *, AbstractConnectionManager *,
-                                              size_t, BaseRepresentation *) override;
+                virtual SegmentChunk* toChunk(SharedResources *, size_t,
+                                              BaseRepresentation *) override;
                 void setVideoSize(unsigned w, unsigned h);
                 void setTrackID(unsigned);
                 void setLanguage(const std::string &);
