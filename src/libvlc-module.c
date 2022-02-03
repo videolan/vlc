@@ -2043,7 +2043,7 @@ vlc_module_begin ()
     add_category_hint(N_("Advanced"), NULL)
     set_section( N_("Special modules"), NULL )
     add_obsolete_string("vod-server") /* since 4.0.0 */
-    add_module("tracer", "tracer", NULL,
+    add_module("tracer", "tracer", "none",
                TRACER_TEXT, TRACER_LONGTEXT)
 
     set_section( N_("Plugins" ), NULL )
