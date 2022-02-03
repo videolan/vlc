@@ -40,7 +40,6 @@ namespace adaptive
 
     namespace http
     {
-        class AbstractConnectionManager;
         class ChunkInterface;
     }
 
@@ -60,7 +59,7 @@ namespace adaptive
     public:
         AbstractStream(demux_t *);
         virtual ~AbstractStream();
-        bool init(const StreamFormat &, SegmentTracker *, AbstractConnectionManager *);
+        bool init(const StreamFormat &, SegmentTracker *);
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
@@ -137,7 +136,6 @@ namespace adaptive
         demux_t *p_realdemux;
         StreamFormat format;
 
-        AbstractConnectionManager *connManager; /* not owned */
         SegmentTracker *segmentTracker;
 
         ChunkInterface * getNextChunk() const;
@@ -179,7 +177,7 @@ namespace adaptive
         public:
             virtual ~AbstractStreamFactory() {}
             virtual AbstractStream *create(demux_t*, const StreamFormat &,
-                                   SegmentTracker *, AbstractConnectionManager *) const = 0;
+                                           SegmentTracker *) const = 0;
     };
 }
 #endif // STREAMS_HPP

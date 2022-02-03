@@ -64,7 +64,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     vlc_mutex_init(&lock);
 }
 
-bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, AbstractConnectionManager *conn)
+bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker)
 {
     /* Don't even try if not supported or already init */
     if(format_ == StreamFormat::Type::Unsupported || demuxersource)
@@ -92,7 +92,6 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                 segmentTracker = tracker;
                 segmentTracker->registerListener(this);
                 segmentTracker->notifyBufferingState(true);
-                connManager = conn;
                 fakeesout->setExpectedTimestamp(segmentTracker->getPlaybackTime());
                 declaredCodecs();
                 return true;
@@ -405,7 +404,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
     vlc_mutex_lock(&lock);
 
     /* Ensure it is configured */
-    if(!segmentTracker || !connManager || !valid)
+    if(!segmentTracker || !valid)
     {
         vlc_mutex_unlock(&lock);
         return BufferingStatus::End;

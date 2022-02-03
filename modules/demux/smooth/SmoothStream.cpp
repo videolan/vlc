@@ -46,10 +46,10 @@ block_t * SmoothStream::checkBlock(block_t *p_block, bool)
 }
 
 AbstractStream * SmoothStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
-                                             SegmentTracker *tracker, AbstractConnectionManager *manager) const
+                                             SegmentTracker *tracker) const
 {
     SmoothStream *stream = new (std::nothrow) SmoothStream(realdemux);
-    if(stream && !stream->init(format,tracker, manager))
+    if(stream && !stream->init(format,tracker))
     {
         delete stream;
         return nullptr;
