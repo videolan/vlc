@@ -225,10 +225,10 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
 }
 
 AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
-                               SegmentTracker *tracker, AbstractConnectionManager *manager) const
+                               SegmentTracker *tracker) const
 {
     HLSStream *stream = new (std::nothrow) HLSStream(realdemux);
-    if(stream && !stream->init(format, tracker, manager))
+    if(stream && !stream->init(format, tracker))
     {
         delete stream;
         return nullptr;

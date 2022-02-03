@@ -131,7 +131,7 @@ bool PlaylistManager::setupPeriod()
                 continue;
 
             AbstractStream *st = streamFactory->create(p_demux, set->getStreamFormat(),
-                                                       tracker, resources->getConnManager());
+                                                       tracker);
             if(!st)
             {
                 delete tracker;
