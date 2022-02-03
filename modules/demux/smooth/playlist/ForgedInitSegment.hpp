@@ -39,8 +39,8 @@ namespace smooth
                 ForgedInitSegment(ICanonicalUrl *parent, const std::string &,
                                   uint64_t, uint64_t);
                 virtual ~ForgedInitSegment();
-                virtual SegmentChunk* toChunk(SharedResources *, AbstractConnectionManager *,
-                                              size_t, BaseRepresentation *) override;
+                virtual SegmentChunk* toChunk(SharedResources *, size_t,
+                                              BaseRepresentation *) override;
                 void setWaveFormatEx(const std::string &);
                 void setCodecPrivateData(const std::string &);
                 void setChannels(uint16_t);

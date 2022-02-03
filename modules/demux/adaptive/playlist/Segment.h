@@ -38,11 +38,6 @@ namespace adaptive
 {
     class SharedResources;
 
-    namespace http
-    {
-        class AbstractConnectionManager;
-    }
-
     namespace playlist
     {
         class BaseRepresentation;
@@ -63,8 +58,7 @@ namespace adaptive
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
-                virtual SegmentChunk*                   toChunk         (SharedResources *, AbstractConnectionManager *,
-                                                                         size_t, BaseRepresentation *);
+                virtual SegmentChunk*                   toChunk         (SharedResources *, size_t, BaseRepresentation *);
                 virtual SegmentChunk*                   createChunk     (AbstractChunkSource *, BaseRepresentation *) = 0;
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setSequenceNumber(uint64_t);

@@ -304,8 +304,7 @@ block_t * ForgedInitSegment::buildMoovBox()
     return moov;
 }
 
-SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionManager *,
-                                         size_t, BaseRepresentation *rep)
+SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, size_t, BaseRepresentation *rep)
 {
     block_t *moov = buildMoovBox();
     if(moov)
