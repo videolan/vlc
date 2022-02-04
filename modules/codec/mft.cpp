@@ -1114,7 +1114,10 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
         HRESULT hr;
         hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_COMMAND_DRAIN, 0);
         if (FAILED(hr))
+        {
+            msg_Warn(p_dec, "draining failed (hr=0x%lX)", hr);
             return VLC_EGENERIC;
+        }
     }
 
     /* Drain the output stream before sending the input packet. */
@@ -1431,7 +1434,11 @@ static void DestroyMFT(decoder_t *p_dec)
             // the MFT produces the output and may still have some left, we need to drain them
             HRESULT hr;
             hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_COMMAND_DRAIN, 0);
-            if (SUCCEEDED(hr))
+            if (FAILED(hr))
+            {
+                msg_Warn(p_dec, "exit draining failed (hr=0x%lX)", hr);
+            }
+            else
             {
                 for (;;)
                 {
