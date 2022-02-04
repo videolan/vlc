@@ -89,7 +89,7 @@ public:
     HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager) = nullptr;
     UINT dxgi_token = 0;
     ComPtr<IMFDXGIDeviceManager> dxgi_manager;
-    HANDLE d3d_handle = 0;
+    HANDLE d3d_handle = INVALID_HANDLE_VALUE;
 
     // D3D11
     ComPtr<ID3D11Texture2D> cached_tex;
@@ -181,7 +181,7 @@ private:
 
         if (vctx_out && dxgi_manager.Get())
         {
-            if (d3d_handle)
+            if (d3d_handle != INVALID_HANDLE_VALUE)
                 dxgi_manager->CloseDeviceHandle(d3d_handle);
         }
 
