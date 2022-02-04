@@ -74,8 +74,9 @@ vlc_module_end()
 
 typedef HRESULT (WINAPI *pf_MFCreateDXGIDeviceManager)(UINT *, IMFDXGIDeviceManager **);
 
-struct decoder_sys_t
+class mft_dec_sys_t
 {
+public:
     ComPtr<IMFTransform> mft;
 
     const GUID* major_type = nullptr;
@@ -130,6 +131,31 @@ struct decoder_sys_t
         return false;
     }
 
+    HRESULT startStream()
+    {
+        assert(!streamStarted);
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, (ULONG_PTR)0);
+        streamStarted = SUCCEEDED(hr);
+        return hr;
+    }
+    HRESULT endStream()
+    {
+        assert(streamStarted);
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
+        if (SUCCEEDED(hr))
+            streamStarted = false;
+        return hr;
+    }
+    HRESULT flushStream()
+    {
+        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
+        if (SUCCEEDED(hr))
+            streamStarted = false;
+        return hr;
+    }
+
+private:
+
     void DoRelease()
     {
         if (output_sample.Get())
@@ -168,35 +194,13 @@ struct decoder_sys_t
     }
 
     bool streamStarted = false;
-    HRESULT startStream()
-    {
-        assert(!streamStarted);
-        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, (ULONG_PTR)0);
-        streamStarted = SUCCEEDED(hr);
-        return hr;
-    }
-    HRESULT endStream()
-    {
-        assert(streamStarted);
-        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, (ULONG_PTR)0);
-        if (SUCCEEDED(hr))
-            streamStarted = false;
-        return hr;
-    }
-    HRESULT flushStream()
-    {
-        HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
-        if (SUCCEEDED(hr))
-            streamStarted = false;
-        return hr;
-    }
 };
 
 struct mf_d3d11_pic_ctx
 {
     struct d3d11_pic_context ctx;
     IMFMediaBuffer *out_media;
-    decoder_sys_t  *mfdec;
+    mft_dec_sys_t  *mfdec;
 };
 #define MF_D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
     container_of(pic_ctx, mf_d3d11_pic_ctx, ctx.s)
@@ -318,7 +322,7 @@ static vlc_fourcc_t GUIDToFormat(const pair_format_guid table[], const GUID & gu
 
 static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> & result)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     result.Reset();
@@ -449,7 +453,7 @@ error:
 
 static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFMediaType> output_media_type;
@@ -575,7 +579,7 @@ error:
 
 static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSample> & result, DWORD size)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     result.Reset();
@@ -613,7 +617,7 @@ error:
 
 static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSample> & result)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     result.Reset();
@@ -673,7 +677,7 @@ error:
 
 static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_block)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr = S_OK;
     ComPtr<IMFSample> input_sample;
 
@@ -777,7 +781,7 @@ static void CopyPackedBufferToPicture(picture_t *p_pic, const uint8_t *p_src)
 static void d3d11mf_pic_context_destroy(picture_context_t *ctx)
 {
     mf_d3d11_pic_ctx *pic_ctx = MF_D3D11_PICCONTEXT_FROM_PICCTX(ctx);
-    decoder_sys_t *mfdec = pic_ctx->mfdec;
+    mft_dec_sys_t *mfdec = pic_ctx->mfdec;
     pic_ctx->out_media->Release();
     static_assert(offsetof(mf_d3d11_pic_ctx, ctx.s) == 0, "Cast assumption failure");
     d3d11_pic_context_destroy(ctx);
@@ -805,7 +809,7 @@ static picture_context_t *d3d11mf_pic_context_copy(picture_context_t *ctx)
 
 static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
                                           ComPtr<IMFMediaBuffer> &media_buffer,
-                                          decoder_sys_t *mfdec,
+                                          mft_dec_sys_t *mfdec,
                                           ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW],
                                           vlc_video_context *vctx)
 {
@@ -833,7 +837,7 @@ static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
 
 static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_reading)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     DWORD output_status = 0;
@@ -1092,14 +1096,14 @@ error:
 
 static void Flush(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     if (SUCCEEDED(p_sys->flushStream()))
         p_sys->startStream();
 }
 
 static int DecodeSync(decoder_t *p_dec, block_t *p_block)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
 
     if (p_block && p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
     {
@@ -1145,7 +1149,7 @@ error:
 
 static HRESULT DequeueMediaEvent(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFMediaEvent> event;
@@ -1169,7 +1173,7 @@ static HRESULT DequeueMediaEvent(decoder_t *p_dec)
 
 static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     if (!p_block) /* No Drain */
@@ -1276,7 +1280,7 @@ static void DestroyMFT(decoder_t *p_dec);
 
 static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
     hr = p_sys->fptr_MFCreateDXGIDeviceManager(&p_sys->dxgi_token, p_sys->dxgi_manager.GetAddressOf());
     if (FAILED(hr))
@@ -1299,7 +1303,7 @@ static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
 
 static int InitializeMFT(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     ComPtr<IMFAttributes> attributes;
@@ -1421,7 +1425,7 @@ error:
 
 static void DestroyMFT(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
 
     if (p_sys->mft.Get())
     {
@@ -1467,7 +1471,7 @@ static void DestroyMFT(decoder_t *p_dec)
 
 static int FindMFT(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
 
     /* Try to create a MFT using MFTEnumEx. */
@@ -1531,7 +1535,7 @@ static int FindMFT(decoder_t *p_dec)
 
 static int LoadMFTLibrary(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
 
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     if (FAILED(hr))
@@ -1564,9 +1568,9 @@ static int LoadMFTLibrary(decoder_t *p_dec)
 static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys;
+    mft_dec_sys_t *p_sys;
 
-    p_sys = new (std::nothrow) decoder_sys_t();
+    p_sys = new (std::nothrow) mft_dec_sys_t();
     if (unlikely(p_sys == nullptr))
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
@@ -1606,7 +1610,7 @@ error:
 static void Close(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
 
     DestroyMFT(p_dec);
 
