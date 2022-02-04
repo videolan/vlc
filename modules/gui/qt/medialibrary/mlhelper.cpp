@@ -18,6 +18,10 @@
 
 #include "mlhelper.hpp"
 
+// MediaLibrary includes
+#include "mlbasemodel.hpp"
+#include "mlitemcover.hpp"
+
 QString MsToString( int64_t time , bool doShort )
 {
     if (time < 0)
@@ -41,4 +45,60 @@ QString MsToString( int64_t time , bool doShort )
                 .arg(min, 2, 10, QChar('0'))
                 .arg(sec, 2, 10, QChar('0'));
 
+}
+
+QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int width, int height,
+                           int role )
+{
+    QString cover = item->getCover();
+
+    // NOTE: Making sure we're not already generating a cover.
+    if (cover.isNull() == false || item->hasGenerator())
+        return cover;
+
+    MLItemId itemId = item->getId();
+
+    struct Context { QString cover; };
+
+    item->setGenerator(true);
+
+    model->ml()->runOnMLThread<Context>(model,
+    //ML thread
+    [itemId, width, height]
+    (vlc_medialibrary_t * ml, Context & ctx)
+    {
+        CoverGenerator generator{ ml, itemId };
+
+        generator.setSize(QSize(width, height));
+
+        generator.setDefaultThumbnail(":/noart_videoCover.svg");
+
+        if (generator.cachedFileAvailable())
+            ctx.cover = generator.cachedFileURL();
+        else
+            ctx.cover = generator.execute();
+    },
+    //UI Thread
+    [model, itemId, role]
+    (quint64, Context & ctx)
+    {
+        int row;
+
+        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+        auto item = static_cast<MLItemCover *>(model->findInCache(itemId, &row));
+
+        if (!item)
+            return;
+
+        item->setCover(ctx.cover);
+
+        item->setGenerator(false);
+
+        QModelIndex modelIndex = model->index(row);
+
+        //we're running in a callback
+        emit const_cast<MLBaseModel *>(model)->dataChanged(modelIndex, modelIndex, { role });
+    });
+
+    return cover;
 }

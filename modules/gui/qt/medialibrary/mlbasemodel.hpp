@@ -36,8 +36,10 @@
 #include "mlqueryparams.hpp"
 #include "util/listcacheloader.hpp"
 
+// Fordward declarations
 class MLListCache;
 class MediaLib;
+class MLItemCover;
 
 class MLBaseModel : public QAbstractListModel
 {
@@ -172,6 +174,9 @@ protected:
     bool m_need_reset = false;
 
     mutable std::unique_ptr<MLListCache> m_cache;
+
+private: // Friends
+    friend QString getVideoListCover(const MLBaseModel*, MLItemCover*, int, int, int);
 };
 
 #endif // MLBASEMODEL_HPP
