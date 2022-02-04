@@ -226,7 +226,18 @@ static int Decode(decoder_t *dec, block_t *block)
             if (res < 0 && res != DAV1D_ERR(EAGAIN))
             {
                 msg_Err(dec, "Decoder feed error %d!", res);
-                i_ret = VLC_EGENERIC;
+                /* bitstream decoding errors (typically DAV1D_ERR(EINVAL), are assumed
+                 * to be recoverable. Other errors returned from this function are either
+                 * unexpected within the VLC configuration, or considered critical failures:
+                 * - EAGAIN is handled above.
+                 * - ENOMEM means out-of-memory and is unrecoverable.
+                 * - ENOPROTOOPT is a build or configuration error (invalid demuxer/muxer or unsupported bitdepth) and is unrecoverable.
+                 * - ERANGE means frame size limits exceeded. VLC doesn't use this so we can ignore this, but unless size changes, it would be unrecoverable.
+                 * - EINVAL is any other bitstream error which is basically what this is about.
+                 * - EIO means file count not be opened and is unrecoverable.
+                 * - ENOENT  is actually only returned by dav1d_parse_sequence_header(), which is outside this context (I think?).
+                 * - read() can return other values but it's OK to consider these critical for now. */
+                i_ret = res == DAV1D_ERR(EINVAL) ? VLCDEC_SUCCESS : VLCDEC_ECRITICAL;
                 break;
             }
         }
