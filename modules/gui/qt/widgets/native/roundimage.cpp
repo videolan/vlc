@@ -243,6 +243,8 @@ void RoundImage::regenerateRoundImage()
     if (!m_isComponentComplete || m_enqueuedGeneration)
         return;
 
+    m_roundImageGenerator.reset();
+
     // use Qt::QueuedConnection to delay generation, so that dependent properties
     // subsequent updates can be merged, f.e when VLCStyle.scale changes
     m_enqueuedGeneration = true;
@@ -250,6 +252,7 @@ void RoundImage::regenerateRoundImage()
     QMetaObject::invokeMethod(this, [this] ()
     {
         m_enqueuedGeneration = false;
+        assert(!m_roundImageGenerator);
 
         const qreal scaleWidth = this->width() * m_dpr;
         const qreal scaledHeight = this->height() * m_dpr;
