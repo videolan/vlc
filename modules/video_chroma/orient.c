@@ -191,57 +191,33 @@ TRANSFORMS(8)
 TRANSFORMS(16)
 TRANSFORMS(32)
 
-#define PLANE(f,g,bits) \
-static void Plane##bits##_##f(plane_t *restrict dst, \
-                              const plane_t *restrict src) \
-{ \
-    const unsigned char *src_pixels = src->p_pixels; \
-    unsigned char *restrict dst_pixels = dst->p_pixels; \
-    ptrdiff_t src_stride = src->i_pitch; \
-    ptrdiff_t dst_stride = dst->i_pitch; \
-    int src_width = src->i_visible_pitch / (bits / 8); \
-    int src_height = src->i_visible_lines; \
-\
-    g##_##bits(dst_pixels, dst_stride, src_pixels, src_stride, \
-               src_width, src_height); \
-}
-
-#undef PLANES // already exists on Windows
-#define PLANES(f, g) \
-PLANE(f,g,8) PLANE(f,g,16) PLANE(f,g,32)
-
-PLANES(HFlip, hflip)
-PLANES(VFlip, vflip)
-PLANES(Transpose, transpose)
-PLANES(AntiTranspose, antitranspose)
-PLANES(R90, r90)
-PLANES(R180, r180)
-PLANES(R270, r270)
+typedef void (*plane_transform_cb)(void *, ptrdiff_t, const void *, ptrdiff_t,
+                                   int, int);
 
 typedef struct {
     convert_t convert;
-    void      (*plane8) (plane_t *dst, const plane_t *src);
-    void      (*plane16)(plane_t *dst, const plane_t *src);
-    void      (*plane32)(plane_t *dst, const plane_t *src);
+    plane_transform_cb plane8;
+    plane_transform_cb plane16;
+    plane_transform_cb plane32;
 } transform_description_t;
 
-#define DESC(f) \
-    { f, Plane8_##f, Plane16_##f, Plane32_##f, }
+#define DESC(f, g) \
+    { f, g##_8, g##_16, g##_32, }
 
 static const transform_description_t descriptions[] = {
-    [TRANSFORM_R90] =            DESC(R90),
-    [TRANSFORM_R180] =           DESC(R180),
-    [TRANSFORM_R270] =           DESC(R270),
-    [TRANSFORM_HFLIP] =          DESC(HFlip),
-    [TRANSFORM_VFLIP] =          DESC(VFlip),
-    [TRANSFORM_TRANSPOSE] =      DESC(Transpose),
-    [TRANSFORM_ANTI_TRANSPOSE] = DESC(AntiTranspose),
+    [TRANSFORM_R90] =            DESC(R90, r90),
+    [TRANSFORM_R180] =           DESC(R180, r180),
+    [TRANSFORM_R270] =           DESC(R270, r270),
+    [TRANSFORM_HFLIP] =          DESC(HFlip, hflip),
+    [TRANSFORM_VFLIP] =          DESC(VFlip, vflip),
+    [TRANSFORM_TRANSPOSE] =      DESC(Transpose, transpose),
+    [TRANSFORM_ANTI_TRANSPOSE] = DESC(AntiTranspose, antitranspose),
 };
 
 typedef struct
 {
     const vlc_chroma_description_t *chroma;
-    void (*plane[PICTURE_PLANE_MAX])(plane_t *, const plane_t *);
+    plane_transform_cb plane[PICTURE_PLANE_MAX];
     convert_t convert;
 } filter_sys_t;
 
@@ -254,7 +230,10 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
         const vlc_chroma_description_t *chroma = sys->chroma;
 
         for (unsigned i = 0; i < chroma->plane_count; i++)
-            (sys->plane[i])(&dst->p[i], &src->p[i]);
+            (sys->plane[i])(dst->p[i].p_pixels, dst->p[i].i_pitch,
+                            src->p[i].p_pixels, src->p[i].i_pitch,
+                            src->p[i].i_visible_pitch / src->p[i].i_pixel_pitch,
+                            src->p[i].i_visible_lines);
 
         picture_CopyProperties(dst, src);
     }
