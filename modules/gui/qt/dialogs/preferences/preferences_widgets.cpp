@@ -1294,30 +1294,29 @@ void KeySelectorControl::finish()
         if( p_config_item->i_type != CONFIG_ITEM_KEY )
             continue;
 
-        /* If we are a (non-global) key option not empty */
-        if( strncmp( p_config_item->psz_name, "global-", 7 ) != 0 )
+        /* Capture global key items to fill in afterwards */
+        if( strncmp( p_config_item->psz_name, "global-", 7 ) == 0 )
         {
-            QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-            treeItem->setText( ACTION_COL, p_config_item->psz_text ?
-                                           qfut( p_config_item->psz_text ) : qfu("") );
-            treeItem->setData( ACTION_COL, Qt::UserRole,
-                               QVariant( qfu( p_config_item->psz_name ) ) );
-            if (p_config_item->psz_longtext)
-                treeItem->setToolTip( ACTION_COL, qfut(p_config_item->psz_longtext) );
+            if( !EMPTY_STR( p_config_item->value.psz ) )
+                global_keys.insert( qfu( p_config_item->psz_name + 7 ),
+                                    qfu( p_config_item->value.psz ) );
+            continue;
+        }
 
-            QString keys = p_config_item->value.psz ? qfut(p_config_item->value.psz) : qfu("");
-            treeItem->setText( HOTKEY_COL, keys.replace( "\t", ", " ) );
-            treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
-            treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
-            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
-            table->addTopLevelItem( treeItem );
-        }
-        /* Capture global key option mappings to fill in afterwards */
-        else if( !EMPTY_STR( p_config_item->value.psz ) )
-        {
-            global_keys.insert( qfu( p_config_item->psz_name + 7 ),
-                                qfu( p_config_item->value.psz ) );
-        }
+        QTreeWidgetItem *treeItem = new QTreeWidgetItem();
+        treeItem->setText( ACTION_COL, p_config_item->psz_text ?
+                                       qfut( p_config_item->psz_text ) : qfu("") );
+        treeItem->setData( ACTION_COL, Qt::UserRole,
+                           QVariant( qfu( p_config_item->psz_name ) ) );
+        if (p_config_item->psz_longtext)
+            treeItem->setToolTip( ACTION_COL, qfut(p_config_item->psz_longtext) );
+
+        QString keys = p_config_item->value.psz ? qfut(p_config_item->value.psz) : qfu("");
+        treeItem->setText( HOTKEY_COL, keys.replace( "\t", ", " ) );
+        treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
+        treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
+        treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
+        table->addTopLevelItem( treeItem );
     }
 
     QMap<QString, QString>::const_iterator i = global_keys.constBegin();
