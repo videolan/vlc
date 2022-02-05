@@ -1304,8 +1304,7 @@ void KeySelectorControl::finish()
         }
 
         QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-        treeItem->setText( ACTION_COL, p_config_item->psz_text ?
-                                       qfut( p_config_item->psz_text ) : qfu("") );
+        treeItem->setText( ACTION_COL, qfut( p_config_item->psz_text ) );
         treeItem->setData( ACTION_COL, Qt::UserRole,
                            QVariant( qfu( p_config_item->psz_name ) ) );
         if (p_config_item->psz_longtext)
