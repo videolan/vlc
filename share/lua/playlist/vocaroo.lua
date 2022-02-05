@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2016, 2019-2020 the VideoLAN team
+ Copyright © 2016, 2019-2020, 2022 the VideoLAN team
 
  Authors: Pierre Ynard
 
@@ -39,6 +39,6 @@ function parse()
         or "//media.vocaroo.com/mp3/"
 
     local path = vlc.access..":"..cdn..id
-    return { { path = path } }
+    return { { path = path; options = { ":http-referrer="..vlc.access.."://"..vlc.path } } }
 end
 
