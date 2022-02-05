@@ -105,8 +105,8 @@ static void store_trigo( filter_sys_t *sys, float f_angle )
 
     f_angle *= (float)(M_PI / 180.); /* degrees -> radians */
 
-    sincos.sin = lroundf(sinf(f_angle) * 4096.f);
-    sincos.cos = lroundf(cosf(f_angle) * 4096.f);
+    sincos.sin = lroundf(ldexpf(sinf(f_angle), 12));
+    sincos.cos = lroundf(ldexpf(cosf(f_angle), 12));
     atomic_store(&sys->sincos, sincos.u);
 }
 
