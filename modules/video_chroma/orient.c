@@ -108,57 +108,6 @@ static void Plane_VFlip(plane_t *restrict dst, const plane_t *restrict src)
     }
 }
 
-#define I422(f) \
-static void Plane422_##f(plane_t *restrict dst, const plane_t *restrict src) \
-{ \
-    for (int y = 0; y < dst->i_visible_lines; y += 2) { \
-        for (int x = 0; x < dst->i_visible_pitch; x++) { \
-            int sx, sy, uv; \
-            (f)(&sx, &sy, dst->i_visible_pitch, dst->i_visible_lines / 2, \
-                x, y / 2); \
-            uv = (1 + src->p_pixels[2 * sy * src->i_pitch + sx] + \
-                src->p_pixels[(2 * sy + 1) * src->i_pitch + sx]) / 2; \
-            dst->p_pixels[y * dst->i_pitch + x] = uv; \
-            dst->p_pixels[(y + 1) * dst->i_pitch + x] = uv; \
-        } \
-    } \
-}
-
-#define YUY2(f) \
-static void PlaneYUY2_##f(plane_t *restrict dst, const plane_t *restrict src) \
-{ \
-    unsigned dst_visible_width = dst->i_visible_pitch / 2; \
- \
-    for (int y = 0; y < dst->i_visible_lines; y += 2) { \
-        for (unsigned x = 0; x < dst_visible_width; x+= 2) { \
-            int sx0, sy0, sx1, sy1; \
-            (f)(&sx0, &sy0, dst_visible_width, dst->i_visible_lines, x, y); \
-            (f)(&sx1, &sy1, dst_visible_width, dst->i_visible_lines, \
-                x + 1, y + 1); \
-            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * (x + 0)] = \
-                src->p_pixels[sy0 * src->i_pitch + 2 * sx0]; \
-            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * (x + 1)] = \
-                src->p_pixels[sy1 * src->i_pitch + 2 * sx0]; \
-            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * (x + 0)] = \
-                src->p_pixels[sy0 * src->i_pitch + 2 * sx1]; \
-            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * (x + 1)] = \
-                src->p_pixels[sy1 * src->i_pitch + 2 * sx1]; \
- \
-            int sx, sy, u, v; \
-            (f)(&sx, &sy, dst_visible_width / 2, dst->i_visible_lines / 2, \
-                x / 2, y / 2); \
-            u = (1 + src->p_pixels[2 * sy * src->i_pitch + 4 * sx + 1] + \
-                src->p_pixels[(2 * sy + 1) * src->i_pitch + 4 * sx + 1]) / 2; \
-            v = (1 + src->p_pixels[2 * sy * src->i_pitch + 4 * sx + 3] + \
-                src->p_pixels[(2 * sy + 1) * src->i_pitch + 4 * sx + 3]) / 2; \
-            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * x + 1] = u; \
-            dst->p_pixels[(y + 0) * dst->i_pitch + 2 * x + 3] = v; \
-            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * x + 1] = u; \
-            dst->p_pixels[(y + 1) * dst->i_pitch + 2 * x + 3] = v; \
-        } \
-    } \
-}
-
 #undef PLANES // already exists on Windows
 #define PLANES(f) \
 PLANE(f,8) PLANE(f,16) PLANE(f,32)
@@ -173,34 +122,15 @@ PLANES(R90)
 PLANES(R180)
 PLANES(R270)
 
-#define Plane422_HFlip Plane16_HFlip
-#define Plane422_VFlip Plane_VFlip
-#define Plane422_R180  Plane16_R180
-I422(Transpose)
-I422(AntiTranspose)
-I422(R90)
-I422(R270)
-
-#define PlaneYUY2_HFlip Plane32_HFlip
-#define PlaneYUY2_VFlip Plane_VFlip
-#define PlaneYUY2_R180  Plane32_R180
-YUY2(Transpose)
-YUY2(AntiTranspose)
-YUY2(R90)
-YUY2(R270)
-
 typedef struct {
     convert_t convert;
     void      (*plane8) (plane_t *dst, const plane_t *src);
     void      (*plane16)(plane_t *dst, const plane_t *src);
     void      (*plane32)(plane_t *dst, const plane_t *src);
-    void      (*i422)(plane_t *dst, const plane_t *src);
-    void      (*yuyv)(plane_t *dst, const plane_t *src);
 } transform_description_t;
 
 #define DESC(f) \
-    { f, Plane8_##f, Plane16_##f, Plane32_##f, \
-      Plane422_##f, PlaneYUY2_##f }
+    { f, Plane8_##f, Plane16_##f, Plane32_##f, }
 
 static const transform_description_t descriptions[] = {
     [TRANSFORM_R90] =            DESC(R90),
@@ -304,31 +234,14 @@ static int Open(filter_t *filter)
         sys->plane[i] = sys->plane[0];
     sys->convert = dsc->convert;
 
-    if (ORIENT_IS_SWAP(transform)) {
-        switch (src->i_chroma) {
-            case VLC_CODEC_I422:
-            case VLC_CODEC_J422:
-                sys->plane[2] = sys->plane[1] = dsc->i422;
-                break;
-            default:
-                for (unsigned i = 0; i < chroma->plane_count; i++)
-                    if (chroma->p[i].w.num * chroma->p[i].h.den
-                     != chroma->p[i].h.num * chroma->p[i].w.den)
-                        return VLC_ENOTSUP;
-        }
-    }
+    if (ORIENT_IS_SWAP(transform)) /* Cannot transform non-square samples */
+        for (unsigned i = 0; i < chroma->plane_count; i++)
+            if (chroma->p[i].w.num * chroma->p[i].h.den
+             != chroma->p[i].h.num * chroma->p[i].w.den)
+                return VLC_ENOTSUP;
 
     /* Deal with weird packed formats */
     switch (src->i_chroma) {
-        case VLC_CODEC_UYVY:
-        case VLC_CODEC_VYUY:
-            if (ORIENT_IS_SWAP(transform))
-                return VLC_ENOTSUP;
-            /* fallthrough */
-        case VLC_CODEC_YUYV:
-        case VLC_CODEC_YVYU:
-            sys->plane[0] = dsc->yuyv; /* 32-bits, not 16-bits! */
-            break;
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
             return VLC_ENOTSUP;
