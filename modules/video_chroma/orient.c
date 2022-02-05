@@ -319,7 +319,8 @@ static int Open(filter_t *filter)
     switch (src->i_chroma) {
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
-            return VLC_ENOTSUP;
+            sys->plane[1] = dsc->plane16;
+            break;
     }
 
     static const struct vlc_filter_operations filter_ops =
