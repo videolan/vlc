@@ -424,7 +424,6 @@ private:
     QComboBox *searchOption;
     QLabel *searchOptionLabel;
     QTreeWidget *table;
-    QList<module_config_t *> values;
     QSet<QString> existingkeys;
 
 private slots:
