@@ -32,13 +32,13 @@
 #include "qt.hpp"
 #include <assert.h>
 
+#include <QTreeWidgetItem>
 #include <QLabel>
 #include <QDialog>
 #include <QSet>
 
 class QWidget;
 class QTreeWidget;
-class QTreeWidgetItem;
 class QGroupBox;
 class QGridLayout;
 class QBoxLayout;
@@ -395,6 +395,8 @@ void setfillVLCConfigCombo(const char *configname, QComboBox *combo );
 /**********************************************************************
  * Key selector widget
  **********************************************************************/
+class KeyTableItem;
+
 class KeySelectorControl : public ConfigControl
 {
     Q_OBJECT
@@ -414,8 +416,14 @@ protected:
     bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
+    void unset( KeyTableItem *, enum ColumnIndex );
+    void unset( QTreeWidgetItem *, int );
+    /** Reassign key to specified item */
+    void reassign_key( KeyTableItem *item, QString keys,
+                       enum KeySelectorControl::ColumnIndex column );
 
 private:
+    void selectKey( KeyTableItem *, enum ColumnIndex );
     void buildAppHotkeysList( QWidget *rootWidget );
     void finish();
     QLabel *label;
@@ -427,8 +435,30 @@ private:
     QSet<QString> existingkeys;
 
 private slots:
-    void selectKey( QTreeWidgetItem * = NULL, int column = 1 );
+    void selectKey( QTreeWidgetItem *, int );
     void filter();
+};
+
+struct KeyItemAttr
+{
+    const char *config_name;
+    QString keys;
+};
+
+class KeyTableItem : public QTreeWidgetItem
+{
+public:
+    KeyTableItem() {}
+    const QString &get_keys( enum KeySelectorControl::ColumnIndex );
+    void set_keys( QString, enum KeySelectorControl::ColumnIndex );
+    void set_keys( const char *keys, enum KeySelectorControl::ColumnIndex column )
+    {
+        set_keys( (keys) ? qfut( keys ) : qfu( "" ), column );
+    }
+    bool contains_key( QString, enum KeySelectorControl::ColumnIndex );
+    void remove_key( QString, enum KeySelectorControl::ColumnIndex );
+    struct KeyItemAttr normal;
+    struct KeyItemAttr global;
 };
 
 class KeyInputDialog : public QDialog
@@ -436,7 +466,7 @@ class KeyInputDialog : public QDialog
     Q_OBJECT
 
 public:
-    KeyInputDialog( QTreeWidget *, QTreeWidgetItem *, bool b_global = false );
+    KeyInputDialog( QTreeWidget *, KeyTableItem *, enum KeySelectorControl::ColumnIndex );
     bool conflicts;
     QString vlckey, vlckey_tr;
     void setExistingkeysSet( const QSet<QString> *keyset = NULL );
@@ -445,7 +475,7 @@ private:
     QTreeWidget *table;
     QLabel *selected, *warning;
     QPushButton *ok, *unset;
-    QTreeWidgetItem *keyItem;
+    KeyTableItem *keyItem;
     enum KeySelectorControl::ColumnIndex column;
 
     void checkForConflicts( const QString &sequence );
