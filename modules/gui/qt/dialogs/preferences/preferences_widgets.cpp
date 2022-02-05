@@ -1453,30 +1453,28 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
     if( obj != table || e->type() != QEvent::KeyPress )
         return ConfigControl::eventFilter(obj, e);
 
-    QKeyEvent *keyEv = static_cast<QKeyEvent*>(e);
-    QTreeWidget *aTable = static_cast<QTreeWidget *>(obj);
-    if( keyEv->key() == Qt::Key_Escape )
+    switch( static_cast<QKeyEvent*>(e)->key() )
     {
-        aTable->clearFocus();
-        return true;
+        case Qt::Key_Escape:
+            table->clearFocus();
+            return true;
+
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            selectKey( table->currentItem(), table->currentColumn() );
+            return true;
+
+        case Qt::Key_Delete:
+            if( table->currentColumn() != ACTION_COL )
+            {
+                table->currentItem()->setText( table->currentColumn(), NULL );
+                table->currentItem()->setData( table->currentColumn(), Qt::UserRole, QVariant() );
+            }
+            return true;
+
+        default:
+            return false;
     }
-    else if( keyEv->key() == Qt::Key_Return ||
-             keyEv->key() == Qt::Key_Enter )
-    {
-        selectKey( aTable->currentItem(), aTable->currentColumn() );
-        return true;
-    }
-    else if( keyEv->key() == Qt::Key_Delete )
-    {
-        if( aTable->currentColumn() != ACTION_COL )
-        {
-            aTable->currentItem()->setText( aTable->currentColumn(), NULL );
-            aTable->currentItem()->setData( aTable->currentColumn(), Qt::UserRole, QVariant() );
-        }
-        return true;
-    }
-    else
-        return false;
 }
 
 
