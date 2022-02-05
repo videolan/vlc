@@ -36,6 +36,7 @@
 #include <QLabel>
 #include <QDialog>
 #include <QSet>
+#include <QContextMenuEvent>
 
 class QWidget;
 class QTreeWidget;
@@ -411,16 +412,23 @@ public:
         GLOBAL_HOTKEY_COL = 2,
         ANY_COL = 3 // == count()
     };
+    static KeyTableItem *find_conflict( QTreeWidget *, QString, KeyTableItem *, enum ColumnIndex );
 
 protected:
     bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
+#ifndef QT_NO_CONTEXTMENU
+    void tableContextMenuEvent( QContextMenuEvent * );
+#endif
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     void unset( KeyTableItem *, enum ColumnIndex );
     void unset( QTreeWidgetItem *, int );
+    void reset( KeyTableItem *, enum ColumnIndex );
+    void reset_all( enum KeySelectorControl::ColumnIndex column );
     /** Reassign key to specified item */
     void reassign_key( KeyTableItem *item, QString keys,
                        enum KeySelectorControl::ColumnIndex column );
+    void copy_value( KeyTableItem *, enum KeySelectorControl::ColumnIndex );
 
 private:
     void selectKey( KeyTableItem *, enum ColumnIndex );
@@ -442,7 +450,9 @@ private slots:
 struct KeyItemAttr
 {
     const char *config_name;
+    QString default_keys;
     QString keys;
+    bool matches_default;
 };
 
 class KeyTableItem : public QTreeWidgetItem
@@ -450,6 +460,7 @@ class KeyTableItem : public QTreeWidgetItem
 public:
     KeyTableItem() {}
     const QString &get_keys( enum KeySelectorControl::ColumnIndex );
+    QString get_default_keys( enum KeySelectorControl::ColumnIndex );
     void set_keys( QString, enum KeySelectorControl::ColumnIndex );
     void set_keys( const char *keys, enum KeySelectorControl::ColumnIndex column )
     {
@@ -485,5 +496,13 @@ private:
 
 private slots:
     void unsetAction();
+};
+
+class KeyConflictDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    KeyConflictDialog( QTreeWidget *, KeyTableItem *, enum KeySelectorControl::ColumnIndex );
 };
 #endif

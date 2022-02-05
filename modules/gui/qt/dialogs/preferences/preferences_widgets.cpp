@@ -60,6 +60,9 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QFontComboBox>
+#include <QMenu>
+#include <QGuiApplication>
+#include <QClipboard>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
@@ -1293,7 +1296,9 @@ void KeySelectorControl::finish()
 
         KeyTableItem *treeItem = new KeyTableItem();
         treeItem->normal.config_name = p_config_item->psz_name;
+        treeItem->normal.default_keys = qfu( p_config_item->orig.psz );
         treeItem->global.config_name = nullptr;
+        treeItem->global.default_keys = qfu( "" );
 
         treeItem->setText( ACTION_COL, qfut( p_config_item->psz_text ) );
         if (p_config_item->psz_longtext)
@@ -1315,6 +1320,7 @@ void KeySelectorControl::finish()
             if( strcmp( item->normal.config_name, global_keys[i]->psz_name + 7 ) == 0 )
             {
                 item->global.config_name = global_keys[i]->psz_name;
+                item->global.default_keys = qfu( global_keys[i]->orig.psz );
                 item->set_keys( global_keys[i]->value.psz, GLOBAL_HOTKEY_COL );
                 break;
             }
@@ -1415,6 +1421,14 @@ void KeySelectorControl::doApply()
 
 bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
 {
+#ifndef QT_NO_CONTEXTMENU
+    if( obj == table && e->type() == QEvent::ContextMenu )
+    {
+        tableContextMenuEvent( static_cast<QContextMenuEvent*>(e) );
+        return true;
+    }
+#endif
+
     if( obj != table || e->type() != QEvent::KeyPress )
         return ConfigControl::eventFilter(obj, e);
 
@@ -1439,6 +1453,90 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
     }
 }
 
+#ifndef QT_NO_CONTEXTMENU
+void KeySelectorControl::tableContextMenuEvent( QContextMenuEvent *event )
+{
+    KeyTableItem *item = static_cast<KeyTableItem *>( this->table->currentItem() );
+    if( !item || item->isHidden() )
+        return;
+    /* Avoid menu from right-click on empty space after last item */
+    if( event->reason() == QContextMenuEvent::Mouse &&
+        !this->table->itemAt( this->table->viewport()->mapFromGlobal( event->globalPos() ) ) )
+        return;
+
+    enum ColumnIndex column = (enum ColumnIndex) this->table->currentColumn();
+
+    bool empty;
+    bool matches_default;
+    switch ( column )
+    {
+        case ACTION_COL:
+            empty = (item->normal.keys.isEmpty() && item->global.keys.isEmpty());
+            matches_default = (item->normal.matches_default && item->normal.matches_default);
+            break;
+        case HOTKEY_COL:
+            empty = item->normal.keys.isEmpty();
+            matches_default = item->normal.matches_default;
+            break;
+        case GLOBAL_HOTKEY_COL:
+            empty = item->global.keys.isEmpty();
+            matches_default = item->global.matches_default;
+            break;
+        default:
+            unreachable();
+    }
+
+    QMenu *menu = new QMenu();
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    QAction *modify = new QAction( qtr( "&Modify" ), this->table );
+    connect( modify, &QAction::triggered, [=]() { this->selectKey( item, column ); } );
+    menu->addAction( modify );
+
+    if( column != ACTION_COL )
+    {
+        QAction *copy = new QAction( qtr( "&Copy value" ), this->table );
+        if( empty )
+            copy->setEnabled( false );
+        else
+            connect( copy, &QAction::triggered, [=]() {
+                this->copy_value( item, column );
+            } );
+        menu->addAction( copy );
+    }
+
+    QAction *unset = new QAction( qtr( "&Unset" ), this->table );
+    if( empty )
+        unset->setEnabled( false );
+    else
+        connect( unset, &QAction::triggered, [=]() { this->unset( item, column ); } );
+    menu->addAction( unset );
+
+    QAction *reset = new QAction( qtr( "&Reset" ), this->table );
+    if( matches_default )
+        reset->setEnabled( false );
+    else
+        connect( reset, &QAction::triggered, [=]() {
+            if( column != ACTION_COL )
+                this->reset( item, column );
+            else
+            {
+                this->reset( item, HOTKEY_COL );
+                this->reset( item, GLOBAL_HOTKEY_COL );
+            }
+        } );
+    menu->addAction( reset );
+
+    QString reset_all_label = (column == ACTION_COL) ? qtr( "Reset &all" )
+                                                     : qtr( "Reset &all (column)" );
+    QAction *reset_all = new QAction( reset_all_label, this->table );
+    connect( reset_all, &QAction::triggered, [=]() { this->reset_all( column ); } );
+    menu->addAction( reset_all );
+
+    menu->popup( event->globalPos() );
+}
+#endif // QT_NO_CONTEXTMENU
+
 void KeySelectorControl::unset( QTreeWidgetItem *item, int column )
 {
     unset( static_cast<KeyTableItem*>( item ), (enum ColumnIndex) column );
@@ -1454,6 +1552,35 @@ void KeySelectorControl::unset( KeyTableItem *item,
     item->set_keys( nullptr, column );
 }
 
+void KeySelectorControl::reset( KeyTableItem *item,
+                                enum KeySelectorControl::ColumnIndex column )
+{
+    QString item_default = item->get_default_keys( column );
+    KeyTableItem *conflict = find_conflict( table, item_default, item, column );
+    if( conflict != nullptr )
+    {
+        KeyConflictDialog *dialog = new KeyConflictDialog( this->table, conflict, column );
+        dialog->exec();
+        if( dialog->result() == QDialog::Accepted )
+            reassign_key( item, item_default, column );
+        delete dialog;
+    }
+    else
+        item->set_keys( item_default, column );
+}
+
+void KeySelectorControl::reset_all( enum KeySelectorControl::ColumnIndex column )
+{
+    for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
+    {
+        KeyTableItem *item = static_cast<KeyTableItem *>( *iter );
+        if( column != GLOBAL_HOTKEY_COL )
+            item->set_keys( item->get_default_keys( HOTKEY_COL ), HOTKEY_COL );
+        if( column != HOTKEY_COL )
+            item->set_keys( item->get_default_keys( GLOBAL_HOTKEY_COL ), GLOBAL_HOTKEY_COL );
+    }
+}
+
 void KeySelectorControl::reassign_key( KeyTableItem *item, QString key,
                                        enum KeySelectorControl::ColumnIndex column )
 {
@@ -1466,6 +1593,32 @@ void KeySelectorControl::reassign_key( KeyTableItem *item, QString key,
     item->set_keys( key, column );
 }
 
+void KeySelectorControl::copy_value( KeyTableItem *item,
+                                     enum KeySelectorControl::ColumnIndex column )
+{
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setText( item->get_keys( column ) );
+}
+
+KeyTableItem * KeySelectorControl::find_conflict( QTreeWidget *table, QString key,
+                                                  KeyTableItem *ignore_item,
+                                                  enum KeySelectorControl::ColumnIndex column )
+{
+    if( key.isEmpty() )
+        return nullptr;
+    for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
+    {
+        KeyTableItem *item = static_cast<KeyTableItem *>( *iter );
+
+        if( item == ignore_item )
+            continue;
+
+        if( item->contains_key( key, column ) )
+            return item;
+    }
+    return nullptr;
+}
+
 const QString &KeyTableItem::get_keys( enum KeySelectorControl::ColumnIndex column )
 {
     if( column == KeySelectorControl::GLOBAL_HOTKEY_COL )
@@ -1473,12 +1626,25 @@ const QString &KeyTableItem::get_keys( enum KeySelectorControl::ColumnIndex colu
     return normal.keys;
 }
 
+QString KeyTableItem::get_default_keys( enum KeySelectorControl::ColumnIndex column )
+{
+    if( column == KeySelectorControl::GLOBAL_HOTKEY_COL )
+        return global.default_keys;
+    return normal.default_keys;
+}
+
 void KeyTableItem::set_keys( QString keys, enum KeySelectorControl::ColumnIndex column )
 {
     if( column == KeySelectorControl::GLOBAL_HOTKEY_COL )
+    {
         global.keys = keys;
+        global.matches_default = ( keys == global.default_keys );
+    }
     else
+    {
         normal.keys = keys;
+        normal.matches_default = ( keys ==  normal.default_keys );
+    }
     setText( column, keys.replace( "\t", ", " ) );
 }
 
@@ -1557,19 +1723,12 @@ void KeyInputDialog::checkForConflicts( const QString &sequence )
         return;
     }
 
-    for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
+    KeyTableItem *conflict = KeySelectorControl::find_conflict( table, vlckey, keyItem, column );
+    if( conflict != nullptr )
     {
-        KeyTableItem *item = static_cast<KeyTableItem *>( *iter );
-
-        if( item == keyItem )
-            continue;
-
-        if( !item->contains_key( vlckey, column ) )
-            continue;
-
         warning->setText(
                 qtr("Warning: this key or combination is already assigned to \"<b>%1</b>\"")
-                .arg( item->text( KeySelectorControl::ACTION_COL ) ) );
+                .arg( conflict->text( KeySelectorControl::ACTION_COL ) ) );
         warning->show();
         ok->show();
         unset->hide();
@@ -1621,3 +1780,35 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
 }
 
 void KeyInputDialog::unsetAction() { done( 2 ); }
+
+KeyConflictDialog::KeyConflictDialog( QTreeWidget *table, KeyTableItem * item,
+                                      enum KeySelectorControl::ColumnIndex column ) :
+                                      QDialog( table )
+{
+    setModal( true );
+
+    bool global = ( column == KeySelectorControl::GLOBAL_HOTKEY_COL );
+
+    setWindowTitle( global ? qtr( "Global Hotkey assignment conflict" )
+                           : qtr( "Hotkey assignment conflict" ) );
+    setWindowRole( "vlc-key-conflict" );
+
+    QVBoxLayout *vLayout = new QVBoxLayout( this );
+    QLabel *warning = new QLabel;
+    warning->setText(
+            qtr("Warning: this key or combination is already assigned to \"<b>%1</b>\"")
+            .arg( item->text( KeySelectorControl::ACTION_COL ) ) );
+    vLayout->addWidget( warning , Qt::AlignCenter );
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    QPushButton *force = new QPushButton( qtr("Assign") );
+    QPushButton *cancel = new QPushButton( qtr("Cancel") );
+    buttonBox->addButton( force, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
+    force->setDefault( true );
+
+    vLayout->addWidget( buttonBox );
+
+    connect( buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    connect( buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject );
+}
