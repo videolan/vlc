@@ -82,22 +82,16 @@ static const char *const ppsz_filter_options[] = {
     "angle", "use-motion", NULL
 };
 
-/*****************************************************************************
- * filter_sys_t
- *****************************************************************************/
+typedef struct {
+    int16_t sin;
+    int16_t cos;
+} sincos_t;
+
 typedef struct
 {
-    atomic_uint_fast32_t sincos;
+    _Atomic sincos_t sincos;
     motion_sensors_t *p_motion;
 } filter_sys_t;
-
-typedef union {
-    uint32_t u;
-    struct {
-        int16_t sin;
-        int16_t cos;
-    };
-} sincos_t;
 
 static void store_trigo( filter_sys_t *sys, float f_angle )
 {
@@ -107,15 +101,7 @@ static void store_trigo( filter_sys_t *sys, float f_angle )
 
     sincos.sin = lroundf(ldexpf(sinf(f_angle), 12));
     sincos.cos = lroundf(ldexpf(cosf(f_angle), 12));
-    atomic_store(&sys->sincos, sincos.u);
-}
-
-static void fetch_trigo( filter_sys_t *sys, int *i_sin, int *i_cos )
-{
-    sincos_t sincos = { .u = atomic_load(&sys->sincos) };
-
-    *i_sin = sincos.sin;
-    *i_cos = sincos.cos;
+    atomic_store_explicit(&sys->sincos, sincos, memory_order_relaxed);
 }
 
 static const struct vlc_filter_operations packed_filter_ops =
@@ -220,17 +206,15 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
         store_trigo( p_sys, i_angle / 20.f );
     }
 
-    int i_sin, i_cos;
-    fetch_trigo( p_sys, &i_sin, &i_cos );
-
     p_mouse->i_x = ( p_fmt->i_visible_width >> 1 );
     p_mouse->i_y = ( p_fmt->i_visible_height >> 1 );
 
     const int i_rx = ( i_x - p_mouse->i_x );
     const int i_ry = ( i_y - p_mouse->i_y );
+    sincos_t sc = atomic_load_explicit(&p_sys->sincos, memory_order_relaxed);
 
-    p_mouse->i_x += ( ( i_rx * i_cos - i_ry * i_sin )>> 12 );
-    p_mouse->i_y += ( ( i_rx * i_sin + i_ry * i_cos )>> 12 );
+    p_mouse->i_x += ( ( i_rx * sc.cos - i_ry * sc.sin )>> 12 );
+    p_mouse->i_y += ( ( i_rx * sc.sin + i_ry * sc.cos )>> 12 );
 
     return VLC_SUCCESS;
 }
@@ -248,8 +232,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
         store_trigo( p_sys, i_angle / 20.f );
     }
 
-    int i_sin, i_cos;
-    fetch_trigo( p_sys, &i_sin, &i_cos );
+    sincos_t sc = atomic_load_explicit(&p_sys->sincos, memory_order_relaxed);
 
     for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
@@ -267,12 +250,12 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 
         const uint8_t black_pixel = ( i_plane == Y_PLANE ) ? 0x00 : 0x80;
 
-        const int i_line_next =  i_cos / i_aspect -i_sin*i_visible_pitch;
-        const int i_col_next  = -i_sin / i_aspect -i_cos*i_visible_pitch;
-        int i_line_orig0 = ( - i_cos * i_line_center / i_aspect
-                             - i_sin * i_col_center + (1<<11) );
-        int i_col_orig0 =    i_sin * i_line_center / i_aspect
-                           - i_cos * i_col_center + (1<<11);
+        const int i_line_next =  sc.cos / i_aspect -sc.sin*i_visible_pitch;
+        const int i_col_next  = -sc.sin / i_aspect -sc.cos*i_visible_pitch;
+        int i_line_orig0 = ( - sc.cos * i_line_center / i_aspect
+                             - sc.sin * i_col_center + (1<<11) );
+        int i_col_orig0 =    sc.sin * i_line_center / i_aspect
+                           - sc.cos * i_col_center + (1<<11);
         for( int y = 0; y < i_visible_lines; y++)
         {
             uint8_t *p_out = &p_dstp->p_pixels[y * p_dstp->i_pitch];
@@ -341,8 +324,8 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
                     *p_out = black_pixel;
                 }
 
-                i_line_orig0 += i_sin;
-                i_col_orig0 += i_cos;
+                i_line_orig0 += sc.sin;
+                i_col_orig0 += sc.cos;
             }
 
             i_line_orig0 += i_line_next;
@@ -401,8 +384,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
         store_trigo( p_sys, i_angle / 20.f );
     }
 
-    int i_sin, i_cos;
-    fetch_trigo( p_sys, &i_sin, &i_cos );
+    sincos_t sc = atomic_load_explicit(&p_sys->sincos, memory_order_relaxed);
 
     for( int i_line = 0; i_line < i_visible_lines; i_line++ )
     {
@@ -412,11 +394,11 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
             int i_col_orig;
             /* Handle "1st Y", U and V */
             i_line_orig = i_line_center +
-                ( ( i_sin * ( i_col - i_col_center )
-                  + i_cos * ( i_line - i_line_center ) )>>12 );
+                ( ( sc.sin * ( i_col - i_col_center )
+                  + sc.cos * ( i_line - i_line_center ) )>>12 );
             i_col_orig = i_col_center +
-                ( ( i_cos * ( i_col - i_col_center )
-                  - i_sin * ( i_line - i_line_center ) )>>12 );
+                ( ( sc.cos * ( i_col - i_col_center )
+                  - sc.sin * ( i_line - i_line_center ) )>>12 );
             if( 0 <= i_col_orig && i_col_orig < i_visible_pitch
              && 0 <= i_line_orig && i_line_orig < i_visible_lines )
             {
@@ -438,11 +420,11 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
                 break;
 
             i_line_orig = i_line_center +
-                ( ( i_sin * ( i_col - i_col_center )
-                  + i_cos * ( i_line - i_line_center ) )>>12 );
+                ( ( sc.sin * ( i_col - i_col_center )
+                  + sc.cos * ( i_line - i_line_center ) )>>12 );
             i_col_orig = i_col_center +
-                ( ( i_cos * ( i_col - i_col_center )
-                  - i_sin * ( i_line - i_line_center ) )>>12 );
+                ( ( sc.cos * ( i_col - i_col_center )
+                  - sc.sin * ( i_line - i_line_center ) )>>12 );
             if( 0 <= i_col_orig && i_col_orig < i_visible_pitch
              && 0 <= i_line_orig && i_line_orig < i_visible_lines )
             {
