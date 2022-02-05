@@ -76,51 +76,147 @@ static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
 }
 typedef void (*convert_t)(int *, int *, int, int, int, int);
 
-#define PLANE(f,bits) \
-static void Plane##bits##_##f(plane_t *restrict dst, const plane_t *restrict src) \
-{ \
-    const uint##bits##_t *src_pixels = (const void *)src->p_pixels; \
-    uint##bits##_t *restrict dst_pixels = (void *)dst->p_pixels; \
-    const unsigned src_width = src->i_pitch / sizeof (*src_pixels); \
-    const unsigned dst_width = dst->i_pitch / sizeof (*dst_pixels); \
-    const unsigned dst_visible_width = dst->i_visible_pitch / sizeof (*dst_pixels); \
- \
-    for (int y = 0; y < dst->i_visible_lines; y++) { \
-        for (unsigned x = 0; x < dst_visible_width; x++) { \
-            int sx, sy; \
-            (f)(&sx, &sy, dst_visible_width, dst->i_visible_lines, x, y); \
-            dst_pixels[y * dst_width + x] = \
-                src_pixels[sy * src_width + sx]; \
-        } \
-    } \
-}
-
-static void Plane_VFlip(plane_t *restrict dst, const plane_t *restrict src)
+static void vflip(void *restrict dst, ptrdiff_t dst_stride,
+                  const void *restrict src, ptrdiff_t src_stride,
+                  int width, int height, int order)
 {
-    const uint8_t *src_pixels = src->p_pixels;
-    uint8_t *restrict dst_pixels = dst->p_pixels;
+    const unsigned char *src_pixels = src;
+    unsigned char *restrict dst_pixels = dst;
+    size_t visible_pitch = width << order;
 
-    dst_pixels += dst->i_pitch * dst->i_visible_lines;
-    for (int y = 0; y < dst->i_visible_lines; y++) {
-        dst_pixels -= dst->i_pitch;
-        memcpy(dst_pixels, src_pixels, dst->i_visible_pitch);
-        src_pixels += src->i_pitch;
+    dst_pixels += dst_stride * height;
+
+    for (int y = 0; y < height; y++) {
+        dst_pixels -= dst_stride;
+        memcpy(dst_pixels, src_pixels, visible_pitch);
+        src_pixels += src_stride;
     }
 }
 
-#undef PLANES // already exists on Windows
-#define PLANES(f) \
-PLANE(f,8) PLANE(f,16) PLANE(f,32)
+#define TRANSFORMS(bits) \
+static void hflip_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                         const void *restrict src, ptrdiff_t src_stride, \
+                         int width, int height) \
+{ \
+    const uint##bits##_t *restrict src_pixels = src; \
+    uint##bits##_t *restrict dst_pixels = dst; \
+\
+    dst_stride /= bits / 8; \
+    src_stride /= bits / 8; \
+    dst_pixels += width - 1; \
+\
+    for (int y = 0; y < height; y++) { \
+        for (int x = 0; x < width; x++) \
+            dst_pixels[-x] = src_pixels[x]; \
+\
+        src_pixels += src_stride; \
+        dst_pixels += dst_stride; \
+    } \
+} \
+\
+static void vflip_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                         const void *restrict src, ptrdiff_t src_stride, \
+                         int width, int height) \
+{ \
+    vflip(dst, dst_stride, src, src_stride, width, height, ctz(bits / 8)); \
+} \
+\
+static void r180_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                        const void *restrict src, ptrdiff_t src_stride, \
+                        int width, int height) \
+{ \
+    const unsigned char *src_pixels = src; \
+\
+    src_pixels += (height - 1) * src_stride; \
+    src_stride *= -1; \
+    hflip_##bits(dst, dst_stride, src_pixels, src_stride, width, height); \
+} \
+\
+static void transpose_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                             const void *restrict src, ptrdiff_t src_stride, \
+                             int src_width, int src_height) \
+{ \
+    const uint##bits##_t *restrict src_pixels = src; \
+    uint##bits##_t *restrict dst_pixels = dst; \
+\
+    dst_stride /= bits / 8; \
+    src_stride /= bits / 8; \
+\
+    for (int y = 0; y < src_height; y++) { \
+        for (int x = 0; x < src_width; x++) \
+            dst_pixels[x * dst_stride] = src_pixels[x]; \
+        src_pixels += src_stride; \
+        dst_pixels++; \
+    } \
+} \
+\
+static void r270_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                        const void *restrict src, ptrdiff_t src_stride, \
+                        int src_width, int src_height) \
+{ \
+    unsigned char *dst_pixels = dst; \
+\
+    dst_pixels += (src_width - 1) * dst_stride; \
+    dst_stride *= -1; \
+    transpose_##bits(dst_pixels, dst_stride, src, src_stride, \
+                     src_width, src_height); \
+} \
+\
+static void r90_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                       const void *restrict src, ptrdiff_t src_stride, \
+                       int src_width, int src_height) \
+{ \
+    const unsigned char *src_pixels = src; \
+\
+    src_pixels += (src_height - 1) * src_stride; \
+    src_stride *= -1; \
+    transpose_##bits(dst, dst_stride, src_pixels, src_stride, \
+                     src_width, src_height); \
+} \
+\
+static void antitranspose_##bits(void *restrict dst, ptrdiff_t dst_stride, \
+                                 const void *restrict src, \
+                                 ptrdiff_t src_stride, \
+                                 int src_width, int src_height) \
+{ \
+    const unsigned char *src_pixels = src; \
+\
+    src_pixels += (src_height - 1) * src_stride; \
+    src_stride *= -1; \
+    r270_##bits(dst, dst_stride, src_pixels, src_stride, \
+                src_width, src_height);\
+}
 
-PLANES(HFlip)
-#define Plane8_VFlip Plane_VFlip
-#define Plane16_VFlip Plane_VFlip
-#define Plane32_VFlip Plane_VFlip
-PLANES(Transpose)
-PLANES(AntiTranspose)
-PLANES(R90)
-PLANES(R180)
-PLANES(R270)
+TRANSFORMS(8)
+TRANSFORMS(16)
+TRANSFORMS(32)
+
+#define PLANE(f,g,bits) \
+static void Plane##bits##_##f(plane_t *restrict dst, \
+                              const plane_t *restrict src) \
+{ \
+    const unsigned char *src_pixels = src->p_pixels; \
+    unsigned char *restrict dst_pixels = dst->p_pixels; \
+    ptrdiff_t src_stride = src->i_pitch; \
+    ptrdiff_t dst_stride = dst->i_pitch; \
+    int src_width = src->i_visible_pitch / (bits / 8); \
+    int src_height = src->i_visible_lines; \
+\
+    g##_##bits(dst_pixels, dst_stride, src_pixels, src_stride, \
+               src_width, src_height); \
+}
+
+#undef PLANES // already exists on Windows
+#define PLANES(f, g) \
+PLANE(f,g,8) PLANE(f,g,16) PLANE(f,g,32)
+
+PLANES(HFlip, hflip)
+PLANES(VFlip, vflip)
+PLANES(Transpose, transpose)
+PLANES(AntiTranspose, antitranspose)
+PLANES(R90, r90)
+PLANES(R180, r180)
+PLANES(R270, r270)
 
 typedef struct {
     convert_t convert;
