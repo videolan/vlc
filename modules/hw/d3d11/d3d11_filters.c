@@ -63,7 +63,6 @@ struct filter_level
 typedef struct
 {
     float f_gamma;
-    bool  b_brightness_threshold;
 
     struct filter_level Brightness;
     struct filter_level Contrast;
@@ -453,8 +452,6 @@ static int D3D11OpenAdjust(filter_t *filter)
     InitLevel(filter, &sys->Hue,        "hue",        0.0 );
     InitLevel(filter, &sys->Saturation, "saturation", 1.0 );
     sys->f_gamma = var_CreateGetFloatCommand( filter, "gamma" );
-    sys->b_brightness_threshold =
-        var_CreateGetBoolCommand( filter, "brightness-threshold" );
 
     var_AddCallback( filter, "contrast",   AdjustCallback, sys );
     var_AddCallback( filter, "brightness", AdjustCallback, sys );
