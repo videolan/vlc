@@ -34,48 +34,6 @@
 #include <vlc_mouse.h>
 #include <vlc_picture.h>
 
-static void HFlip(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    VLC_UNUSED( h );
-    *sx = w - 1 - dx;
-    *sy = dy;
-}
-static void VFlip(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    VLC_UNUSED( w );
-    *sx = dx;
-    *sy = h - 1 - dy;
-}
-static void Transpose(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    VLC_UNUSED( h ); VLC_UNUSED( w );
-    *sx = dy;
-    *sy = dx;
-}
-static void AntiTranspose(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    *sx = h - 1 - dy;
-    *sy = w - 1 - dx;
-}
-static void R90(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    VLC_UNUSED( h );
-    *sx = dy;
-    *sy = w - 1 - dx;
-}
-static void R180(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    *sx = w - 1 - dx;
-    *sy = h - 1 - dy;
-}
-static void R270(int *sx, int *sy, int w, int h, int dx, int dy)
-{
-    VLC_UNUSED( w );
-    *sx = h - 1 - dy;
-    *sy = dx;
-}
-typedef void (*convert_t)(int *, int *, int, int, int, int);
-
 static void vflip(void *restrict dst, ptrdiff_t dst_stride,
                   const void *restrict src, ptrdiff_t src_stride,
                   int width, int height, int order)
@@ -195,30 +153,29 @@ typedef void (*plane_transform_cb)(void *, ptrdiff_t, const void *, ptrdiff_t,
                                    int, int);
 
 typedef struct {
-    convert_t convert;
     plane_transform_cb plane8;
     plane_transform_cb plane16;
     plane_transform_cb plane32;
 } transform_description_t;
 
-#define DESC(f, g) \
-    { f, g##_8, g##_16, g##_32, }
+#define DESC(g) \
+    { g##_8, g##_16, g##_32, }
 
 static const transform_description_t descriptions[] = {
-    [TRANSFORM_R90] =            DESC(R90, r90),
-    [TRANSFORM_R180] =           DESC(R180, r180),
-    [TRANSFORM_R270] =           DESC(R270, r270),
-    [TRANSFORM_HFLIP] =          DESC(HFlip, hflip),
-    [TRANSFORM_VFLIP] =          DESC(VFlip, vflip),
-    [TRANSFORM_TRANSPOSE] =      DESC(Transpose, transpose),
-    [TRANSFORM_ANTI_TRANSPOSE] = DESC(AntiTranspose, antitranspose),
+    [TRANSFORM_R90] =            DESC(r90),
+    [TRANSFORM_R180] =           DESC(r180),
+    [TRANSFORM_R270] =           DESC(r270),
+    [TRANSFORM_HFLIP] =          DESC(hflip),
+    [TRANSFORM_VFLIP] =          DESC(vflip),
+    [TRANSFORM_TRANSPOSE] =      DESC(transpose),
+    [TRANSFORM_ANTI_TRANSPOSE] = DESC(antitranspose),
 };
 
 typedef struct
 {
     const vlc_chroma_description_t *chroma;
+    video_transform_t transform;
     plane_transform_cb plane[PICTURE_PLANE_MAX];
-    convert_t convert;
 } filter_sys_t;
 
 static picture_t *Filter(filter_t *filter, picture_t *src)
@@ -249,10 +206,54 @@ static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
 
     const video_format_t *fmt = &filter->fmt_out.video;
     const filter_sys_t   *sys = filter->p_sys;
+    int dw = fmt->i_visible_width, dh = fmt->i_visible_height;
+    int dx = mouse->i_x, dy = mouse->i_y;
+    int sx, sy;
 
-    sys->convert(&mouse->i_x, &mouse->i_y,
-                 fmt->i_visible_width, fmt->i_visible_height,
-                 mouse->i_x, mouse->i_y);
+    switch (sys->transform) {
+        case TRANSFORM_HFLIP:
+        case TRANSFORM_R180:
+            sx = dw - 1 - dx;
+            break;
+        //case TRANSFORM_IDENTITY:
+        case TRANSFORM_VFLIP:
+            sx = dx;
+            break;
+        case TRANSFORM_TRANSPOSE:
+        case TRANSFORM_R90:
+            sx = dy;
+            break;
+        case TRANSFORM_R270:
+        case TRANSFORM_ANTI_TRANSPOSE:
+            sx = dh - 1 - dy;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    switch (sys->transform) {
+        //case TRANSFORM_IDENTITY:
+        case TRANSFORM_HFLIP:
+            sy = dy;
+            break;
+        case TRANSFORM_VFLIP:
+        case TRANSFORM_R180:
+            sy = dh - 1 - dy;
+            break;
+        case TRANSFORM_TRANSPOSE:
+        case TRANSFORM_R270:
+            sy = dx;
+            break;
+        case TRANSFORM_R90:
+        case TRANSFORM_ANTI_TRANSPOSE:
+            sy = dw - 1 - dx;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    mouse->i_x = sx;
+    mouse->i_y = sy;
     return VLC_SUCCESS;
 }
 
@@ -289,6 +290,7 @@ static int Open(filter_t *filter)
 
     const transform_description_t *const dsc = &descriptions[transform];
 
+    sys->transform = transform;
     sys->chroma = chroma;
 
     switch (chroma->pixel_size) {
@@ -307,7 +309,6 @@ static int Open(filter_t *filter)
 
     for (unsigned i = 1; i < PICTURE_PLANE_MAX; i++)
         sys->plane[i] = sys->plane[0];
-    sys->convert = dsc->convert;
 
     if (ORIENT_IS_SWAP(transform)) /* Cannot transform non-square samples */
         for (unsigned i = 0; i < chroma->plane_count; i++)
