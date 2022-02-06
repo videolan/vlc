@@ -63,6 +63,7 @@
 #include <QMenu>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QFont>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
@@ -1633,17 +1634,24 @@ QString KeyTableItem::get_default_keys( enum KeySelectorControl::ColumnIndex col
 
 void KeyTableItem::set_keys( QString keys, enum KeySelectorControl::ColumnIndex column )
 {
+    bool matches_default;
     if( column == KeySelectorControl::GLOBAL_HOTKEY_COL )
     {
         global.keys = keys;
-        global.matches_default = ( keys == global.default_keys );
+        matches_default = global.matches_default = ( keys == global.default_keys );
     }
     else
     {
         normal.keys = keys;
-        normal.matches_default = ( keys ==  normal.default_keys );
+        matches_default = normal.matches_default = ( keys ==  normal.default_keys );
     }
     setText( column, keys.replace( "\t", ", " ) );
+    QFont font = this->font( KeySelectorControl::ACTION_COL );
+    font.setWeight( matches_default ? QFont::Weight::Normal : QFont::Weight::Bold );
+    setFont( column,  font );
+    matches_default = (normal.matches_default && global.matches_default);
+    font.setWeight( matches_default ? QFont::Weight::Normal : QFont::Weight::Bold );
+    setFont( KeySelectorControl::ACTION_COL,  font );
 }
 
 bool KeyTableItem::contains_key( QString key, enum KeySelectorControl::ColumnIndex column )
