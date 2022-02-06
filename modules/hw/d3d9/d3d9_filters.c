@@ -63,10 +63,6 @@ typedef struct
     struct filter_level Saturation;
 } filter_sys_t;
 
-#define THRES_TEXT N_("Brightness threshold")
-#define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \
-        "shown as black or white. The threshold value will be the brightness " \
-        "defined below." )
 #define CONT_TEXT N_("Image contrast (0-2)")
 #define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1.")
 #define HUE_TEXT N_("Image hue (0-360)")
@@ -79,8 +75,7 @@ typedef struct
 #define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1.")
 
 static const char *const ppsz_filter_options[] = {
-    "contrast", "brightness", "hue", "saturation", "gamma",
-    "brightness-threshold", NULL
+    "contrast", "brightness", "hue", "saturation", "gamma", NULL
 };
 
 static void FillSample( DXVA2_VideoSample *p_sample,
@@ -503,9 +498,6 @@ vlc_module_begin()
         change_safe()
     add_float_with_range( "gamma", 1.0, 0.01, 10.0,
                           GAMMA_TEXT, GAMMA_LONGTEXT )
-        change_safe()
-    add_bool( "brightness-threshold", false,
-              THRES_TEXT, THRES_LONGTEXT )
         change_safe()
 
     add_submodule()
