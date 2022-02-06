@@ -267,21 +267,21 @@ static void FilterPlanar( filter_t *p_filter, picture_t *p_pic, picture_t *p_out
     int i_sat = (int)( atomic_load_explicit( &p_sys->f_saturation, memory_order_relaxed ) * f_range );
     float f_gamma = 1.f / atomic_load_explicit( &p_sys->f_gamma, memory_order_relaxed );
 
-        /* Contrast is a fast but kludged function, so I put this gap to be
-         * cleaner :) */
-        i_lum += i_mid - i_cont / 2;
+    /* Contrast is a fast but kludged function, so I put this gap to be
+     * cleaner :) */
+    i_lum += i_mid - i_cont / 2;
 
-        /* Fill the gamma lookup table */
-        for( unsigned i = 0 ; i < i_size; i++ )
-        {
-            pi_gamma[ i ] = VLC_CLIP( powf(i / f_max, f_gamma) * f_max, 0, i_max );
-        }
+    /* Fill the gamma lookup table */
+    for( unsigned i = 0 ; i < i_size; i++ )
+    {
+        pi_gamma[ i ] = VLC_CLIP( powf(i / f_max, f_gamma) * f_max, 0, i_max );
+    }
 
-        /* Fill the luma lookup table */
-        for( unsigned i = 0 ; i < i_size; i++ )
-        {
-            pi_luma[ i ] = pi_gamma[VLC_CLIP( (int)(i_lum + i_cont * i / i_range), 0, (int) i_max )];
-        }
+    /* Fill the luma lookup table */
+    for( unsigned i = 0 ; i < i_size; i++ )
+    {
+        pi_luma[ i ] = pi_gamma[VLC_CLIP( (int)(i_lum + i_cont * i / i_range), 0, (int) i_max )];
+    }
 
     /*
      * Do the Y plane
@@ -439,21 +439,21 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     i_sat = (int)( atomic_load_explicit( &p_sys->f_saturation, memory_order_relaxed ) * 256 );
     f_gamma = 1.0 / atomic_load_explicit( &p_sys->f_gamma, memory_order_relaxed );
 
-        /* Contrast is a fast but kludged function, so I put this gap to be
-         * cleaner :) */
-        i_lum += 128 - i_cont / 2;
+    /* Contrast is a fast but kludged function, so I put this gap to be
+     * cleaner :) */
+    i_lum += 128 - i_cont / 2;
 
-        /* Fill the gamma lookup table */
-        for( int i = 0 ; i < 256 ; i++ )
-        {
-          pi_gamma[ i ] = clip_uint8_vlc( pow(i / 255.0, f_gamma) * 255.0);
-        }
+    /* Fill the gamma lookup table */
+    for( int i = 0 ; i < 256 ; i++ )
+    {
+        pi_gamma[ i ] = clip_uint8_vlc( pow(i / 255.0, f_gamma) * 255.0);
+    }
 
-        /* Fill the luma lookup table */
-        for( int i = 0 ; i < 256 ; i++ )
-        {
-            pi_luma[ i ] = pi_gamma[clip_uint8_vlc( i_lum + i_cont * i / 256)];
-        }
+    /* Fill the luma lookup table */
+    for( int i = 0 ; i < 256 ; i++ )
+    {
+        pi_luma[ i ] = pi_gamma[clip_uint8_vlc( i_lum + i_cont * i / 256)];
+    }
 
     /*
      * Do the Y plane
