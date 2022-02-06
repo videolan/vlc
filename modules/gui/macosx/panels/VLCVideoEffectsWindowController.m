@@ -182,7 +182,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     [VLCVideoFilterHelper setVideoFilterProperty: "wall-cols" forFilter: "wall" withValue: getWidgetIntValue([items objectAtIndex:31])];
 
     if ([items count] >= 33) { // version >=2 of profile string
-        [VLCVideoFilterHelper setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" withValue: (vlc_value_t){ .b_bool = [[items objectAtIndex:32] intValue] }];
+        /* "brightness-threshold" at 32 */
     }
 
     vlc_value_t hueValue;
@@ -571,7 +571,6 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     [self setWidgetValue: _adjustContrastSlider forOption: "contrast" enabled: b_state];
     [self setWidgetValue: _adjustBrightnessSlider forOption: "brightness" enabled: b_state];
     [self setWidgetValue: _adjustSaturationSlider forOption: "saturation" enabled: b_state];
-    [self setWidgetValue: _adjustBrightnessCheckbox forOption: "brightness-threshold" enabled: b_state];
     [self setWidgetValue: _adjustGammaSlider forOption: "gamma" enabled: b_state];
     [_adjustBrightnessLabel setEnabled: b_state];
     [_adjustContrastLabel setEnabled: b_state];
@@ -704,7 +703,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
                      var_InheritInteger(vout, "wall-rows"),
                      var_InheritInteger(vout, "wall-cols"),
                      // version 2 of profile string:
-                     (int64_t)var_InheritBool(vout, "brightness-threshold"), // index: 32
+                     0LL /* "brightness-threshold" */, // index: 32
                      // version 3 of profile string: (vlc-3.0.0)
                      var_InheritFloat(vout, "hue") // index: 33
             ];
@@ -927,7 +926,7 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
         [VLCVideoFilterHelper setVideoFilter: "adjust" on: b_state];
         [_adjustBrightnessSlider setEnabled: b_state];
-        [_adjustBrightnessCheckbox setEnabled: b_state];
+        [_adjustBrightnessCheckbox setEnabled: NO];
         [_adjustBrightnessLabel setEnabled: b_state];
         [_adjustContrastSlider setEnabled: b_state];
         [_adjustContrastLabel setEnabled: b_state];
@@ -962,13 +961,6 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
         [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", [_adjustHueSlider floatValue]]];
     else
         [sender setToolTip: [NSString stringWithFormat:@"%0.3f", [sender floatValue]]];
-}
-
-- (IBAction)enableAdjustBrightnessThreshold:(id)sender
-{
-    [VLCVideoFilterHelper setVideoFilterProperty: "brightness-threshold"
-                                                      forFilter: "adjust"
-                                                      withValue: getWidgetBoolValue(sender)];
 }
 
 - (IBAction)enableSharpen:(id)sender
