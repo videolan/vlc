@@ -344,8 +344,6 @@ static void D3D11CloseAdjust(filter_t *filter)
     var_DelCallback( filter, "hue",        AdjustCallback, sys );
     var_DelCallback( filter, "saturation", AdjustCallback, sys );
     var_DelCallback( filter, "gamma",      AdjustCallback, sys );
-    var_DelCallback( filter, "brightness-threshold",
-                                             AdjustCallback, sys );
 
     for (int i=0; i<PROCESSOR_SLICES; i++)
     {
@@ -463,8 +461,6 @@ static int D3D11OpenAdjust(filter_t *filter)
     var_AddCallback( filter, "hue",        AdjustCallback, sys );
     var_AddCallback( filter, "saturation", AdjustCallback, sys );
     var_AddCallback( filter, "gamma",      AdjustCallback, sys );
-    var_AddCallback( filter, "brightness-threshold",
-                                             AdjustCallback, sys );
 
     hr = ID3D11VideoDevice_CreateVideoProcessor(sys->d3d_proc.d3dviddev,
                                                 sys->d3d_proc.procEnumerator, 0,
