@@ -173,7 +173,6 @@ static const transform_description_t descriptions[] = {
 
 typedef struct
 {
-    const vlc_chroma_description_t *chroma;
     video_transform_t transform;
     plane_transform_cb plane[PICTURE_PLANE_MAX];
 } filter_sys_t;
@@ -184,9 +183,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     picture_t *dst = filter_NewPicture(filter);
 
     if (likely(dst != NULL)) {
-        const vlc_chroma_description_t *chroma = sys->chroma;
-
-        for (unsigned i = 0; i < chroma->plane_count; i++)
+        for (int i = 0; i < src->i_planes; i++)
             (sys->plane[i])(dst->p[i].p_pixels, dst->p[i].i_pitch,
                             src->p[i].p_pixels, src->p[i].i_pitch,
                             src->p[i].i_visible_pitch / src->p[i].i_pixel_pitch,
@@ -291,7 +288,6 @@ static int Open(filter_t *filter)
     const transform_description_t *const dsc = &descriptions[transform];
 
     sys->transform = transform;
-    sys->chroma = chroma;
 
     switch (chroma->pixel_size) {
         case 1:
