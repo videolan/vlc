@@ -431,8 +431,6 @@ static int D3D9OpenAdjust(filter_t *filter)
     var_AddCallback( filter, "hue",        AdjustCallback, sys );
     var_AddCallback( filter, "saturation", AdjustCallback, sys );
     var_AddCallback( filter, "gamma",      AdjustCallback, sys );
-    var_AddCallback( filter, "brightness-threshold",
-                                             AdjustCallback, sys );
 
     hr = IDirectXVideoProcessorService_CreateVideoProcessor( processor,
                                                              processorGUID,
