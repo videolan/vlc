@@ -1203,9 +1203,7 @@ void FloatRangeConfigControl::finish()
  **********************************************************************/
 KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
 {
-    label = new QLabel(
-        qtr( "Action hotkey mappings. Double-click (or select and press Enter) "
-             "to change an action's hotkey. The delete key will unset." ), p );
+    label = new QLabel( qtr( "Action hotkey mappings." ), p );
 
     label->setWordWrap( true );
     searchLabel = new QLabel( qtr( "Search" ), p );
