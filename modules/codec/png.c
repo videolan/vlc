@@ -181,6 +181,21 @@ static void user_warning( png_structp p_png, png_const_charp warning_msg )
     msg_Warn( p_sys->p_obj, "%s", warning_msg );
 }
 
+#ifdef PNG_TEXT_SUPPORTED
+static void process_text_chunk( decoder_t *p_dec, const png_textp chunk )
+{
+    if( chunk->compression != PNG_ITXT_COMPRESSION_NONE ||
+        memcmp( chunk->key, "XML:com.adobe.xmp", 17 ) ||
+        chunk->itxt_length < 20 )
+        return;
+
+    const char *exifxmp = (const char *) chunk->text;
+    const char *orient = strnstr( exifxmp, ":Orientation>", chunk->itxt_length );
+    if(orient && orient - exifxmp > 14)
+        p_dec->fmt_out.video.orientation = ORIENT_FROM_EXIF( orient[13] - '0' );
+}
+#endif
+
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************
@@ -254,6 +269,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height = i_height;
     p_dec->fmt_out.video.i_sar_num = 1;
     p_dec->fmt_out.video.i_sar_den = 1;
+
+#ifdef PNG_TEXT_SUPPORTED
+    png_textp textp;
+    int numtextp;
+    if( png_get_text( p_png, p_info, &textp, &numtextp ) > 0 )
+        for( int ii=0; ii<numtextp; ii++ )
+            process_text_chunk( p_dec, &textp[ii] );
+#endif
 
     if( i_color_type == PNG_COLOR_TYPE_PALETTE )
         png_set_palette_to_rgb( p_png );
