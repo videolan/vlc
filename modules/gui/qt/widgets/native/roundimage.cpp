@@ -254,11 +254,11 @@ void RoundImage::regenerateRoundImage()
         m_enqueuedGeneration = false;
         assert(!m_roundImageGenerator);
 
-        const qreal scaleWidth = this->width() * m_dpr;
+        const qreal scaledWidth = this->width() * m_dpr;
         const qreal scaledHeight = this->height() * m_dpr;
         const qreal scaledRadius = this->radius() * m_dpr;
 
-        const ImageCacheKey key {source(), QSizeF {scaleWidth, scaledHeight}.toSize(), scaledRadius};
+        const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
         if (auto image = imageCache.object(key)) // should only by called in mainthread
         {
             m_roundImage = *image;
@@ -270,7 +270,7 @@ void RoundImage::regenerateRoundImage()
 
         // Image is generated in size factor of `m_dpr` to avoid scaling artefacts when
         // generated image is set with device pixel ratio
-        m_roundImageGenerator.reset(new RoundImageGenerator(m_source, scaleWidth, scaledHeight, scaledRadius));
+        m_roundImageGenerator.reset(new RoundImageGenerator(m_source, scaledWidth, scaledHeight, scaledRadius));
         connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this, key]()
         {
             const auto image = new QImage(m_roundImageGenerator->takeResult());
