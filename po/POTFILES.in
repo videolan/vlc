@@ -901,6 +901,7 @@ modules/gui/qt/player/qml/controlbarcontrols/PreviousButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/QuitButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/RandomButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/ReverseButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SkipForwardButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SlowerButton.qml
