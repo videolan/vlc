@@ -691,6 +691,21 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 
     jpeg_start_compress(&p_sys->p_jpeg, TRUE);
 
+    unsigned char exif[] = "Exif\x00\x00"
+                           "\x4d\x4d\x00\x2a" /* TIFF BE header */
+                           "\x00\x00\x00\x08" /* IFD0 offset */
+                           "\x00\x01" /* IFD0 tags count */
+                           "\x01\x12" /* tagtype */
+                           "\x00\x03" /* value type (x03 == short) */
+                           "\x00\x00\x00\x01" /* value count */
+                           "\xFF\xFF\x00\x00" /* value if <= 4 bytes or value offset */
+                           "\x00\x00\x00\x00" /* 0 last IFD */
+                           "\x00\x00\x00\x00" /* 0 last IFD offset */
+            ;
+    exif[24] = 0x00;
+    exif[25] = ORIENT_TO_EXIF(p_pic->format.orientation);
+    jpeg_write_marker(&p_sys->p_jpeg, JPEG_APP0 + 1, exif, sizeof(exif) - 1);
+
     /* Encode picture */
     p_row_pointers = vlc_alloc(p_pic->i_planes, sizeof(JSAMPARRAY));
     if (p_row_pointers == NULL)
