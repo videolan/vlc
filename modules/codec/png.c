@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_rand.h>
 #include <png.h>
 
 /* PNG_SYS_COMMON_MEMBERS:
@@ -194,6 +195,38 @@ static void process_text_chunk( decoder_t *p_dec, const png_textp chunk )
     if(orient && orient - exifxmp > 14)
         p_dec->fmt_out.video.orientation = ORIENT_FROM_EXIF( orient[13] - '0' );
 }
+
+static int make_xmp_packet( const video_format_t *fmt, png_textp chunk )
+{
+    unsigned char id[9];
+    vlc_rand_bytes(id, 8);
+    for(int i=0; i<8; i++)
+        id[i] = (id[i] % 26) + 'A';
+    id[8] = '\0';
+    int len = asprintf( &chunk->text,
+            "<?xpacket begin='﻿' id='%s'?>"
+             "<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='VLC " VERSION "'>"
+              "<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>"
+               "<rdf:Description rdf:about='' xmlns:tiff='http://ns.adobe.com/tiff/1.0/'>"
+                "<tiff:Orientation>%" PRIu8 "</tiff:Orientation>"
+               "</rdf:Description>"
+              "</rdf:RDF>"
+             "</x:xmpmeta>"
+            "<?xpacket end='r'?>", id, ORIENT_TO_EXIF(fmt->orientation) );
+    if(len == 0)
+    {
+        free(chunk->text);
+        chunk->text = NULL;
+    }
+    chunk->itxt_length = (len <= 0) ? 0 : len;
+    chunk->compression = PNG_ITXT_COMPRESSION_NONE;
+    chunk->key = len > 0 ? strdup( "XML:com.adobe.xmp" ) : NULL;
+    chunk->lang_key = NULL;
+    chunk->lang = NULL;
+    chunk->text_length = 0;
+    return len > 0 ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 #endif
 
 /****************************************************************************
@@ -426,7 +459,19 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
             PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
     if( p_sys->b_error ) goto error;
 
-    png_write_info( p_png, p_info );
+#ifdef PNG_TEXT_SUPPORTED
+    png_text text;
+    if( make_xmp_packet( &p_pic->format, &text ) == VLC_SUCCESS )
+    {
+        png_set_text( p_png, p_info, &text, 1 );
+        png_write_info( p_png, p_info );
+        free( text.key );
+        free( text.text );
+    }
+    else
+#endif
+        png_write_info( p_png, p_info );
+
     if( p_sys->b_error ) goto error;
 
     /* Encode picture */
