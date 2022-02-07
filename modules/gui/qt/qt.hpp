@@ -62,6 +62,7 @@ enum{
 extern "C" {
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 typedef struct vlc_playlist vlc_playlist_t;
+typedef struct intf_thread_t intf_thread_t;
 }
 
 namespace vlc {
