@@ -79,6 +79,11 @@ class mft_dec_sys_t
 public:
     ComPtr<IMFTransform> mft;
 
+    ~mft_dec_sys_t()
+    {
+        assert(!streamStarted);
+    }
+
     const GUID* major_type = nullptr;
     const GUID* subtype = nullptr;
     /* Container for a dynamically constructed subtype */
@@ -131,13 +136,16 @@ public:
         return false;
     }
 
+    /// Required for Async MFTs
     HRESULT startStream()
     {
         assert(!streamStarted);
         HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, (ULONG_PTR)0);
-        streamStarted = SUCCEEDED(hr);
+        if (SUCCEEDED(hr))
+            streamStarted = true;
         return hr;
     }
+    /// Used for Async MFTs
     HRESULT endStream()
     {
         assert(streamStarted);
@@ -146,6 +154,7 @@ public:
             streamStarted = false;
         return hr;
     }
+
     HRESULT flushStream()
     {
         HRESULT hr = mft->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
