@@ -111,8 +111,6 @@ struct qt_intf_t
     bool isShuttingDown;
 };
 
-vlc_object_cast(qt_intf_t)
-
 /**
  * This class may be used for scope-bound locking/unlocking
  * of a player_t*. As hinted, the player is locked when

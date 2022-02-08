@@ -283,8 +283,6 @@ struct vlc_player_t
     struct vlc_player_timer timer;
 };
 
-vlc_object_cast(vlc_player_t);
-
 #ifndef NDEBUG
 /*
  * Assert that the player mutex is locked.
