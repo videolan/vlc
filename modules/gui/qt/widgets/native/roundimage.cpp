@@ -93,6 +93,12 @@ namespace
             QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
             loop.exec();
 
+            if (reply->error() != QNetworkReply::NoError)
+            {
+                qDebug() << reply->errorString();
+                return {};
+            }
+
             class DataOwningBuffer : public QBuffer
             {
             public:
