@@ -253,6 +253,7 @@ public:
     {
         m_ref_.store(1);
     }
+    virtual ~DeckLinkCaptureDelegate() = default;
 
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, LPVOID *) { return E_NOINTERFACE; }
 
