@@ -729,7 +729,10 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
         if (pf_DXGIGetDebugInterface) {
             IDXGIDebug *pDXGIDebug;
             if (SUCCEEDED(pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug)))
+            {
                 IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+                IDXGIDebug_Release(pDXGIDebug);
+            }
         }
     }
 # endif

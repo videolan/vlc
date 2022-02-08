@@ -368,6 +368,7 @@ void CommonClean(vout_display_t *vd)
             HRESULT hr = pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug);
             if (SUCCEEDED(hr) && pDXGIDebug) {
                 hr = IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+                IDXGIDebug_Release(pDXGIDebug);
             }
         }
         FreeLibrary(sys->dxgidebug_dll);
