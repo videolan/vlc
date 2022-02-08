@@ -361,6 +361,7 @@
         <file alias="BackButton.qml">player/qml/controlbarcontrols/BackButton.qml</file>
         <file alias="ChapterNextButton.qml">player/qml/controlbarcontrols/ChapterNextButton.qml</file>
         <file alias="ChapterPreviousButton.qml">player/qml/controlbarcontrols/ChapterPreviousButton.qml</file>
+        <file alias="DvdMenuButton.qml">player/qml/controlbarcontrols/DvdMenuButton.qml</file>
         <file alias="ExpandingSpacerWidget.qml">player/qml/controlbarcontrols/ExpandingSpacerWidget.qml</file>
         <file alias="ExtendedSettingsButton.qml">player/qml/controlbarcontrols/ExtendedSettingsButton.qml</file>
         <file alias="FasterButton.qml">player/qml/controlbarcontrols/FasterButton.qml</file>

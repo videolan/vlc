@@ -871,6 +871,7 @@ modules/gui/qt/player/qml/controlbarcontrols/AtoBButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/BackButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/DvdMenuButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/FasterButton.qml
