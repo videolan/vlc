@@ -380,6 +380,9 @@ static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
     case VLC_CODEC_VP9:
         p_str = gst_structure_new_empty( "video/x-vp9" );
         break;
+    case VLC_CODEC_AV1:
+        p_str = gst_structure_new_empty( "video/x-av1" );
+        break;
     case VLC_CODEC_MPGV:
         p_str = gst_structure_new_empty( "video/mpeg" );
         gst_structure_set( p_str, "mpegversion", G_TYPE_INT, 2,
