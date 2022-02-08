@@ -1563,7 +1563,8 @@ static int LoadMFTLibrary(decoder_t *p_dec)
     HINSTANCE mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
     if (mfplat_dll)
     {
-        p_sys->fptr_MFCreateDXGIDeviceManager = (pf_MFCreateDXGIDeviceManager)GetProcAddress(mfplat_dll, "MFCreateDXGIDeviceManager");
+        p_sys->fptr_MFCreateDXGIDeviceManager =  reinterpret_cast<pf_MFCreateDXGIDeviceManager>(
+            GetProcAddress(mfplat_dll, "MFCreateDXGIDeviceManager") );
         // we still have the DLL automatically loaded after this
         FreeLibrary(mfplat_dll);
     }
