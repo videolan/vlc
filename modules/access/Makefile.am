@@ -370,9 +370,9 @@ EXTRA_LTLIBRARIES += libsmbc_plugin.la
 libdsm_plugin_la_SOURCES = access/dsm/access.c access/dsm/sd.c access/smb_common.h
 libdsm_plugin_la_CFLAGS = $(AM_CFLAGS) $(DSM_CFLAGS)
 libdsm_plugin_la_LIBADD = $(DSM_LIBS)
-libdsm_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-access_LTLIBRARIES += $(LTLIBdsm)
-EXTRA_LTLIBRARIES += libdsm_plugin.la
+if HAVE_DSM
+access_LTLIBRARIES += libdsm_plugin.la
+endif
 
 libsmb2_plugin_la_SOURCES = access/smb2.c
 libsmb2_plugin_la_CFLAGS = $(AM_CFLAGS) $(SMB2_CFLAGS)
