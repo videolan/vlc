@@ -463,3 +463,10 @@ librist_plugin_la_LIBADD = $(RIST_LIBS) $(SOCKET_LIBS)
 librist_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBrist)
 EXTRA_LTLIBRARIES += librist_plugin.la
+
+### TOOLS ###
+
+libvlc_access_cache_la_SOURCES = access/cache.c access/cache.h
+libvlc_access_cache_la_LIBADD = $(LTLIBVLCCORE)
+libvlc_access_cache_la_LDFLAGS = -static
+noinst_LTLIBRARIES += libvlc_access_cache.la
