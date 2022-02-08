@@ -255,14 +255,14 @@ public:
     }
     virtual ~DeckLinkCaptureDelegate() = default;
 
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, LPVOID *) { return E_NOINTERFACE; }
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, LPVOID *) override { return E_NOINTERFACE; }
 
-    virtual ULONG STDMETHODCALLTYPE AddRef(void)
+    ULONG STDMETHODCALLTYPE AddRef(void) override
     {
         return m_ref_.fetch_add(1);
     }
 
-    virtual ULONG STDMETHODCALLTYPE Release(void)
+    ULONG STDMETHODCALLTYPE Release(void) override
     {
         uintptr_t new_ref = m_ref_.fetch_sub(1);
         if (new_ref == 0)
@@ -270,7 +270,10 @@ public:
         return new_ref;
     }
 
-    virtual HRESULT STDMETHODCALLTYPE VideoInputFormatChanged(BMDVideoInputFormatChangedEvents events, IDeckLinkDisplayMode *mode, BMDDetectedVideoInputFormatFlags flags)
+    HRESULT STDMETHODCALLTYPE
+    VideoInputFormatChanged(BMDVideoInputFormatChangedEvents events,
+                            IDeckLinkDisplayMode *mode,
+                             BMDDetectedVideoInputFormatFlags flags) override
     {
         demux_sys_t *sys = static_cast<demux_sys_t *>(demux_->p_sys);
 
@@ -317,7 +320,9 @@ public:
         return S_OK;
     }
 
-    virtual HRESULT STDMETHODCALLTYPE VideoInputFrameArrived(IDeckLinkVideoInputFrame*, IDeckLinkAudioInputPacket*);
+    HRESULT STDMETHODCALLTYPE
+    VideoInputFrameArrived(IDeckLinkVideoInputFrame*,
+                           IDeckLinkAudioInputPacket*) override;
 
 private:
     std::atomic_uint m_ref_;
