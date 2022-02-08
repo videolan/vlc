@@ -71,6 +71,7 @@ public:
         VOLUME,
         TELETEXT_BUTTONS,
         ASPECT_RATIO_COMBOBOX,
+        DVD_MENUS_BUTTON,
         SPECIAL_MAX,
 
         WIDGET_SPACER = 0x40,
