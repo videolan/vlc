@@ -560,29 +560,46 @@ typedef void (*libvlc_video_output_cleanup_cb)(void* opaque);
 
 typedef struct libvlc_video_render_cfg_t
 {
-    unsigned width;                        /** rendering video width in pixel */
-    unsigned height;                      /** rendering video height in pixel */
-    unsigned bitdepth;      /** rendering video bit depth in bits per channel */
-    bool full_range;          /** video is full range or studio/limited range */
-    libvlc_video_color_space_t colorspace;              /** video color space */
-    libvlc_video_color_primaries_t primaries;       /** video color primaries */
-    libvlc_video_transfer_func_t transfer;        /** video transfer function */
-    void *device;   /** device used for rendering, IDirect3DDevice9* for D3D9 */
+    /** rendering video width in pixel */
+    unsigned width;
+    /** rendering video height in pixel */
+    unsigned height;
+    /** rendering video bit depth in bits per channel */
+    unsigned bitdepth;
+    /** video is full range or studio/limited range */
+    bool full_range;
+    /** video color space */
+    libvlc_video_color_space_t colorspace;
+    /** video color primaries */
+    libvlc_video_color_primaries_t primaries;
+    /** video transfer function */
+    libvlc_video_transfer_func_t transfer;
+    /** device used for rendering, IDirect3DDevice9* for D3D9 */
+    void *device;
 } libvlc_video_render_cfg_t;
 
 typedef struct libvlc_video_output_cfg_t
 {
     union {
-        int dxgi_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_engine_d3d11*/
-        uint32_t d3d9_format;  /** the rendering D3DFORMAT for \ref libvlc_video_engine_d3d9 */
-        int opengl_format;  /** the rendering GLint GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
-                            for \ref libvlc_video_engine_gles2 */
-        void *p_surface; /** currently unused */
+        /** The rendering DXGI_FORMAT for \ref libvlc_video_engine_d3d11. */
+        int dxgi_format;
+        /** The rendering D3DFORMAT for \ref libvlc_video_engine_d3d9. */
+        uint32_t d3d9_format;
+        /** The rendering GLint GL_RGBA or GL_RGB for
+         * \ref libvlc_video_engine_opengl and for
+         * \ref libvlc_video_engine_gles2. */
+        int opengl_format;
+        /** currently unused */
+        void *p_surface;
     };
-    bool full_range;          /** video is full range or studio/limited range */
-    libvlc_video_color_space_t colorspace;              /** video color space */
-    libvlc_video_color_primaries_t primaries;       /** video color primaries */
-    libvlc_video_transfer_func_t transfer;        /** video transfer function */
+    /** Video is full range or studio/limited range. */
+    bool full_range;
+    /** video color space */
+    libvlc_video_color_space_t colorspace;
+    /** video color primaries */
+    libvlc_video_color_primaries_t primaries;
+    /** video transfer function */
+    libvlc_video_transfer_func_t transfer;
 } libvlc_video_output_cfg_t;
 
 /**
