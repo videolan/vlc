@@ -272,6 +272,7 @@
         <file alias="ToolTipExt.qml">widgets/qml/ToolTipExt.qml</file>
         <file alias="MLDragItem.qml">widgets/qml/MLDragItem.qml</file>
         <file alias="ScaledImage.qml">widgets/qml/ScaledImage.qml</file>
+        <file alias="DropShadowImage.qml">widgets/qml/DropShadowImage.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
