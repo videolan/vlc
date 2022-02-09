@@ -31,6 +31,7 @@ Slider {
     property int barHeight: VLCStyle.dp(5, VLCStyle.scale)
     property bool _isHold: false
     property bool _isSeekPointsShown: true
+    property real _tooltipPosition: timeTooltip.pos.x / sliderRectMouseArea.width
 
     property alias backgroundColor: sliderRect.color
     property alias progressBarColor: progressRect.color
@@ -59,7 +60,7 @@ Slider {
 
         text: Player.length.scale(pos.x / control.width).toString() +
               (Player.hasChapters ?
-                   " - " + Player.chapters.getNameAtPosition(timeTooltip.position) : "")
+                   " - " + Player.chapters.getNameAtPosition(control._tooltipPosition) : "")
 
         pos: Qt.point(sliderRectMouseArea.mouseX, 0)
 
