@@ -94,15 +94,27 @@ using namespace TagLib;
 #include <algorithm>
 #include <limits>
 
+#if defined(VLC_PATCHED_TAGLIB_IOSTREAM_RESOLVERS) || \
+    TAGLIB_VERSION >= VERSION_INT(1, 12, 0)
+#define USE_IOSTREAM_RESOLVER 1
+#endif
+
 namespace VLCTagLib
 {
     template <class T>
+#ifdef USE_IOSTREAM_RESOLVER
+    class ExtResolver : public FileRef::StreamTypeResolver
+#else
     class ExtResolver : public FileRef::FileTypeResolver
+#endif
     {
         public:
             ExtResolver(const std::string &);
             ~ExtResolver() {}
             virtual File *createFile(FileName, bool, AudioProperties::ReadStyle) const;
+#ifdef USE_IOSTREAM_RESOLVER
+            virtual File *createFileFromStream(IOStream*, bool, AudioProperties::ReadStyle) const;
+#endif
 
         protected:
             std::string ext;
@@ -132,6 +144,25 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
 
     return 0;
 }
+
+#ifdef USE_IOSTREAM_RESOLVER
+template<class T>
+File* VLCTagLib::ExtResolver<T>::createFileFromStream(IOStream* s, bool, AudioProperties::ReadStyle) const
+{
+    std::string filename = std::string(s->name());
+    std::size_t namesize = filename.size();
+
+    if (namesize > ext.length())
+    {
+        std::string fext = filename.substr(namesize - ext.length(), ext.length());
+        std::transform(fext.begin(), fext.end(), fext.begin(), ::toupper);
+        if(fext == ext)
+            return new T(s, ID3v2::FrameFactory::instance(), false, AudioProperties::Fast);
+    }
+
+    return nullptr;
+}
+#endif
 
 static VLCTagLib::ExtResolver<MPEG::File> aacresolver(".aac");
 static bool b_extensions_registered = false;
