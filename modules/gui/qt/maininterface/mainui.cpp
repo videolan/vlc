@@ -41,6 +41,7 @@
 #include "util/qmlinputitem.hpp"
 #include "util/mouse_event_filter.hpp"
 #include "util/flickable_scroll_handler.hpp"
+#include "util/effects_image_provider.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -158,6 +159,8 @@ bool MainUI::setup(QQmlEngine* engine)
 
         engine->addImageProvider(MLCUSTOMCOVER_PROVIDERID, customCover);
     }
+    
+    SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
 
     m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/main/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())
@@ -220,6 +223,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::callback);
         qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
+        qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
 
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
