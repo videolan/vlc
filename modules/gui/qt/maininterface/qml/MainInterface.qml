@@ -183,6 +183,7 @@ Rectangle {
         /// handles mouse navigation buttons
         anchors.fill: parent
         acceptedButtons: Qt.BackButton
+        cursorShape: undefined
         onClicked: History.previous()
     }
 
