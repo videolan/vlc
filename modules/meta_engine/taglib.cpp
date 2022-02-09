@@ -142,7 +142,7 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
             return new T(fileName, false, AudioProperties::Fast);
     }
 
-    return 0;
+    return nullptr;
 }
 
 #ifdef USE_IOSTREAM_RESOLVER
