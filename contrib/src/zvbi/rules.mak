@@ -29,8 +29,6 @@ endif
 
 DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)
 
-ZVBI_CFLAGS := $(CFLAGS)
-ZVBI_CXXFLAGS := $(CXXFLAGS)
 ZVBICONF := \
 	--disable-dvb --disable-bktr \
 	--disable-nls --disable-proxy \
@@ -44,7 +42,7 @@ endif
 .zvbi: zvbi
 	$(UPDATE_AUTOCONFIG)
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(ZVBI_CFLAGS)" CXXFLAGS="$(ZVBI_CXXFLAGS)" ./configure $(ZVBICONF)
+	cd $< && $(HOSTVARS) ./configure $(ZVBICONF)
 	cd $< && $(MAKE) -C src install
 	cd $< && $(MAKE) SUBDIRS=. install
 	sed -i.orig -e "s/\/[^ ]*libiconv.a/-liconv/" $(PREFIX)/lib/pkgconfig/zvbi-0.2.pc
