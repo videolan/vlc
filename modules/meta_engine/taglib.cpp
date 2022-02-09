@@ -910,7 +910,6 @@ static int ReadMeta( vlc_object_t* p_this)
     vlc::threads::mutex_locker locker(taglib_lock);
     demux_meta_t*   p_demux_meta = (demux_meta_t *)p_this;
     vlc_meta_t*     p_meta;
-    FileRef f;
 
     p_demux_meta->p_meta = NULL;
 
@@ -946,7 +945,7 @@ static int ReadMeta( vlc_object_t* p_this)
     else
         s.setMaxSequentialRead( 1024 * 2048 );
 #endif
-    f = FileRef( &s, false, AudioProperties::ReadStyle::Fast );
+    FileRef f( &s, false, AudioProperties::ReadStyle::Fast );
 
     if( f.isNull() )
         return VLC_EGENERIC;
