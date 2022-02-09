@@ -60,18 +60,19 @@ index d7a3f507e8..589338f59b 100755
  check_lib ole32    "windows.h"            CoTaskMemFree        -lole32
  check_lib shell32  "windows.h shellapi.h" CommandLineToArgvW   -lshell32
 diff --git a/libavformat/udp.c b/libavformat/udp.c
-index 9b9d3de197..c5ebee9fdf 100644
+index 9b9d3de197..2c881a30ca 100644
 --- a/libavformat/udp.c
 +++ b/libavformat/udp.c
-@@ -1089,7 +1089,7 @@ static int udp_close(URLContext *h)
-         int ret;
-         // Cancel only read, as write has been signaled as success to the user
-         if (h->flags & AVIO_FLAG_READ) {
--#ifdef _WIN32
-+#if defined(_WIN32) && HAVE_W32THREADS
-             /* recvfrom() is not a cancellation point for win32, so we shutdown
-              * the socket and abort pending IO, subsequent recvfrom() calls
-              * will fail with WSAESHUTDOWN causing the thread to exit. */
+@@ -64,6 +64,9 @@
+ #if HAVE_W32THREADS
+ #undef HAVE_PTHREAD_CANCEL
+ #define HAVE_PTHREAD_CANCEL 1
++#elif defined(_WIN32_WINNT) && _WIN32_WINNT < 0x600
++#undef HAVE_PTHREAD_CANCEL // disable UDP threading as CancelIOEx is not on XP
++#define HAVE_PTHREAD_CANCEL 0
+ #endif
+
+ #if HAVE_PTHREAD_CANCEL
 -- 
 2.27.0.windows.1
 
