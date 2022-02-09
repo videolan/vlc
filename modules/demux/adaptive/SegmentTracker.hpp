@@ -219,7 +219,6 @@ namespace adaptive
                     bool index_sent;
             };
 
-            StreamFormat getCurrentFormat() const;
             void getCodecsDesc(CodecDescriptionList *) const;
             const Role & getStreamRole() const;
             void reset();
