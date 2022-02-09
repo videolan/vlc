@@ -38,7 +38,7 @@ ZVBICONF := \
 	$(HOSTCONF)
 
 ifdef HAVE_WIN32
-DEPS_upnp += pthreads $(DEPS_pthreads)
+DEPS_zvbi += pthreads $(DEPS_pthreads)
 endif
 
 .zvbi: zvbi
