@@ -26,6 +26,9 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: stepfwdBtn
     size: VLCStyle.icon_medium
+
+    enabled: Player.seekable
+
     iconText: VLCIcons.skip_for
     onClicked: Player.jumpFwd()
     text: I18n.qtr("Step forward")
