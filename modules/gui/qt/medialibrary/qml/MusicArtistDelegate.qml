@@ -132,8 +132,8 @@ T.Control {
             spacing: VLCStyle.margin_xsmall
 
             RoundImage {
-                width: VLCStyle.play_cover_small
-                height: width
+                Layout.preferredWidth: VLCStyle.play_cover_small
+                Layout.preferredHeight: Layout.preferredWidth
 
                 radius: width
 
