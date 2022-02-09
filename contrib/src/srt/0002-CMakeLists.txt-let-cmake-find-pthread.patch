@@ -31,7 +31,7 @@ index 77fbfb0..52d6bcd 100644
 +set (THREADS_PREFER_PTHREAD_FLAG ON)
 +find_package (Threads REQUIRED)
 +if (WIN32)
-+	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} -lpthreadGC2)
++	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} -lpthread)
  else()
 -	message(FATAL_ERROR "Failed to find pthread library. Specify PTHREAD_LIBRARY.")
 +	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ${CMAKE_THREAD_LIBS_INIT})
