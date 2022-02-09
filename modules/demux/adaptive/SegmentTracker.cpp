@@ -206,21 +206,6 @@ void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
     registerListener(logic);
 }
 
-StreamFormat SegmentTracker::getCurrentFormat() const
-{
-    BaseRepresentation *rep = current.rep;
-    if(!rep)
-        rep = logic->getNextRepresentation(adaptationSet, nullptr);
-    if(rep)
-    {
-        /* Ensure ephemere content is updated/loaded */
-        if(rep->needsUpdate(next.number))
-            rep->scheduleNextUpdate(next.number, rep->runLocalUpdates(resources));
-        return rep->getStreamFormat();
-    }
-    return StreamFormat();
-}
-
 void SegmentTracker::getCodecsDesc(CodecDescriptionList *descs) const
 {
     BaseRepresentation *rep = current.rep;
