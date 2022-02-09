@@ -26,6 +26,9 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: fasterBtn
     size: VLCStyle.icon_medium
+
+    enabled: Player.ratechangable
+
     iconText: VLCIcons.faster
     onClicked: Player.faster()
     text: I18n.qtr("Faster")

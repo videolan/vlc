@@ -26,7 +26,9 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: frameBtn
     size: VLCStyle.icon_medium
-    enabled: Player.isPlaying
+
+    enabled: Player.ratechangable
+
     iconText: VLCIcons.frame_by_frame
     onClicked: Player.frameNext()
     text: I18n.qtr("Next frame")
