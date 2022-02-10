@@ -38,10 +38,8 @@ namespace hls
             public:
                 HLSSegment( ICanonicalUrl *parent, uint64_t sequence );
                 virtual ~HLSSegment();
-                vlc_tick_t getUTCTime() const;
 
             protected:
-                vlc_tick_t utcTime;
                 virtual bool prepareChunk(SharedResources *, SegmentChunk *,
                                           BaseRepresentation *) override;
         };

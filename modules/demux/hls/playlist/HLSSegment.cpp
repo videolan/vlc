@@ -31,7 +31,6 @@ HLSSegment::HLSSegment( ICanonicalUrl *parent, uint64_t seq ) :
     Segment( parent )
 {
     setSequenceNumber(seq);
-    utcTime = 0;
 }
 
 HLSSegment::~HLSSegment()
@@ -55,9 +54,4 @@ bool HLSSegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRep
     }
 
     return Segment::prepareChunk(res, chunk, rep);
-}
-
-vlc_tick_t HLSSegment::getUTCTime() const
-{
-    return utcTime;
 }
