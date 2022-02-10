@@ -21,8 +21,6 @@ import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 
-import QtGraphicalEffects 1.0
-
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -108,18 +106,6 @@ T.Control {
             Layout.preferredWidth: VLCStyle.icon_normal
             Layout.alignment: Qt.AlignVCenter
 
-            DropShadow {
-                id: effect
-
-                anchors.fill: artwork
-                source: artwork
-                radius: 8
-                samples: 17
-                color: colors.glowColorBanner
-                visible: artwork.visible
-                spread: 0.1
-            }
-
             Widgets.ScaledImage {
                 id: artwork
 
@@ -128,24 +114,37 @@ T.Control {
                 source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtAlbumCover
                 visible: !statusIcon.visible
                 asynchronous: true
+
+                Widgets.DoubleShadow {
+                    anchors.centerIn: parent
+                    width: parent.paintedWidth
+                    height: parent.paintedHeight
+
+                    z: -1
+
+                    primaryBlurRadius: VLCStyle.dp(3)
+                    primaryColor: Qt.rgba(0, 0, 0, 0.18)
+                    primaryVerticalOffset: VLCStyle.dp(1)
+
+                    secondaryBlurRadius: VLCStyle.dp(14)
+                    secondaryColor: Qt.rgba(0, 0, 0, 0.22)
+                    secondaryVerticalOffset: VLCStyle.dp(6)
+                }
             }
 
             Widgets.IconLabel {
                 id: statusIcon
 
-                anchors.fill: parent
+                anchors.centerIn: parent
                 visible: (model.isCurrent && text !== "")
-                width: height
-                height: VLCStyle.icon_normal
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
                 color: colors.accent
                 text: {
                     if (Player.playingState === Player.PLAYING_STATE_PLAYING)
                         return VLCIcons.volume_high
-                    if (Player.playingState === Player.PLAYING_STATE_PAUSED)
+                    else if (Player.playingState === Player.PLAYING_STATE_PAUSED)
                         return VLCIcons.pause
-                    return ""
+                    else
+                        return ""
                 }
             }
         }
