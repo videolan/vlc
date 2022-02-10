@@ -53,7 +53,7 @@ private:
 
 private:
     QPointer<QObject> m_target;
-    Qt::MouseButtons m_targetItemInitialAcceptedMouseButtons = 0;
+    Qt::MouseButtons m_targetItemInitialAcceptedMouseButtons = Qt::NoButton;
     bool m_filterEventsSynthesizedByQt = false;
 };
 
