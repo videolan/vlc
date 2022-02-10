@@ -29,11 +29,14 @@
 #include "common.h"
 
 #include <initguid.h>
+#include <wrl/client.h>
 #include <propsys.h> /* stupid mingw headers don't include this */
 #include <sensors.h>
 #include <sensorsapi.h>
 
 #include <new>
+
+using Microsoft::WRL::ComPtr;
 
 class SensorReceiver : public ISensorEvents
 {
@@ -151,15 +154,14 @@ private:
 
 void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
 {
-    ISensor *pSensor = NULL;
-    ISensorManager *pSensorManager;
+    ComPtr<ISensorManager> pSensorManager;
     HRESULT hr = CoCreateInstance( CLSID_SensorManager,
                       NULL, CLSCTX_INPROC_SERVER,
                       IID_ISensorManager, (void**)&pSensorManager );
     if (SUCCEEDED(hr))
     {
-        ISensorCollection *pInclinometers;
-        hr = pSensorManager->GetSensorsByType(SENSOR_TYPE_INCLINOMETER_3D, &pInclinometers);
+        ComPtr<ISensorCollection> pInclinometers;
+        hr = pSensorManager->GetSensorsByType(SENSOR_TYPE_INCLINOMETER_3D, pInclinometers.GetAddressOf());
         if (SUCCEEDED(hr))
         {
             ULONG count;
@@ -167,7 +169,8 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
             msg_Dbg(vd, "Found %lu inclinometer", count);
             for (ULONG i=0; i<count; ++i)
             {
-                hr = pInclinometers->GetAt(i, &pSensor);
+                ComPtr<ISensor> pSensor;
+                hr = pInclinometers->GetAt(i, pSensor.GetAddressOf());
                 if (SUCCEEDED(hr))
                 {
                     SensorState state = SENSOR_STATE_NOT_AVAILABLE;
@@ -175,7 +178,7 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
                     if (SUCCEEDED(hr))
                     {
                         if (state == SENSOR_STATE_ACCESS_DENIED)
-                            hr = pSensorManager->RequestPermissions(hwnd, pInclinometers, TRUE);
+                            hr = pSensorManager->RequestPermissions(hwnd, pInclinometers.Get(), TRUE);
 
                         if (SUCCEEDED(hr))
                         {
@@ -206,22 +209,17 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
                             if (received)
                             {
                                 pSensor->SetEventSink(received);
-                                break;
+                                return pSensor.Detach();
                             }
                         }
                     }
-
-                    pSensor->Release();
-                    pSensor = NULL;
                 }
             }
-            pInclinometers->Release();
         }
         else
             msg_Dbg(vd, "inclinometer not found. (hr=0x%lX)", hr);
-        pSensorManager->Release();
     }
-    return pSensor;
+    return NULL;
 }
 
 void UnhookWindowsSensors(void *vSensor)
