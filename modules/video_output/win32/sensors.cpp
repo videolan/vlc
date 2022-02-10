@@ -158,11 +158,16 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
     HRESULT hr = CoCreateInstance( CLSID_SensorManager,
                       NULL, CLSCTX_INPROC_SERVER,
                       IID_ISensorManager, (void**)&pSensorManager );
-    if (SUCCEEDED(hr))
+    if (FAILED(hr))
+        return NULL;
     {
         ComPtr<ISensorCollection> pInclinometers;
         hr = pSensorManager->GetSensorsByType(SENSOR_TYPE_INCLINOMETER_3D, pInclinometers.GetAddressOf());
-        if (SUCCEEDED(hr))
+        if (FAILED(hr))
+        {
+            msg_Dbg(vd, "inclinometer not found. (hr=0x%lX)", hr);
+            return NULL;
+        }
         {
             ULONG count;
             pInclinometers->GetCount(&count);
@@ -171,16 +176,19 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
             {
                 ComPtr<ISensor> pSensor;
                 hr = pInclinometers->GetAt(i, pSensor.GetAddressOf());
-                if (SUCCEEDED(hr))
+                if (FAILED(hr))
+                    continue;
                 {
                     SensorState state = SENSOR_STATE_NOT_AVAILABLE;
                     hr = pSensor->GetState(&state);
-                    if (SUCCEEDED(hr))
+                    if (FAILED(hr))
+                        continue;
                     {
                         if (state == SENSOR_STATE_ACCESS_DENIED)
                             hr = pSensorManager->RequestPermissions(hwnd, pInclinometers.Get(), TRUE);
 
-                        if (SUCCEEDED(hr))
+                        if (FAILED(hr))
+                            continue;
                         {
                             vlc_viewpoint_t start_viewpoint;
                             vlc_viewpoint_init(&start_viewpoint);
@@ -216,8 +224,6 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
                 }
             }
         }
-        else
-            msg_Dbg(vd, "inclinometer not found. (hr=0x%lX)", hr);
     }
     return NULL;
 }
