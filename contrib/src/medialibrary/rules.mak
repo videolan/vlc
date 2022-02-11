@@ -1,34 +1,25 @@
-MEDIALIBRARY_HASH := 363bb8fcf50851a0ce7438ee5a9ad35f6f8954d0
-MEDIALIBRARY_VERSION := git-$(MEDIALIBRARY_HASH)
-MEDIALIBRARY_GITURL := https://code.videolan.org/videolan/medialibrary.git
+MEDIALIBRARY_VERSION := 0.11.0
+MEDIALIBRARY_URL := https://code.videolan.org/videolan/medialibrary/-/archive/$(MEDIALIBRARY_VERSION)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
 
 PKGS += medialibrary
-ifeq ($(call need_pkg,"medialibrary >= 0.9.3"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.11.0"),)
 PKGS_FOUND += medialibrary
 endif
 
 DEPS_medialibrary = sqlite $(DEPS_sqlite)
 
-$(TARBALLS)/medialibrary-$(MEDIALIBRARY_VERSION).tar.xz:
-	$(call download_git,$(MEDIALIBRARY_GITURL),,$(MEDIALIBRARY_HASH))
+$(TARBALLS)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2:
+	$(call download_pkg,$(MEDIALIBRARY_URL),medialibrary)
 
-.sum-medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz
-	$(call check_githash,$(MEDIALIBRARY_HASH))
-	touch $@
+.sum-medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
 
-medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
+medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 	$(UNPACK)
 	$(MOVE)
 
 .medialibrary: medialibrary
-	cd $< && $(HOSTVARS_MESON) $(MESON) -Dlibvlc=disabled build
+	cd $< && $(HOSTVARS_MESON) $(MESON) -Dlibvlc=disabled -Dlibtool_workaround=true build
 	ninja -C $</build
-ifdef HAVE_LINUX
-ifndef HAVE_ANDROID
-	sed -e 's,^Libs\(.*\)-pthread,Libs\1-pthread -latomic,' \
-		-i $</build/meson-private/medialibrary.pc
-endif
-endif
 	cd $< && cd build && ninja install
 	touch $@
 
