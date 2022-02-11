@@ -30,9 +30,7 @@
 
 #include "common.h"
 
-#define COBJMACROS
 #include "d3d_shaders.h"
-#include "d3d_dynamic_shader.h"
 
 #define SPHERE_RADIUS 1.f
 

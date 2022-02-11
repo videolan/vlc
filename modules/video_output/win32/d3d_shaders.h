@@ -23,8 +23,6 @@
 #ifndef VLC_D3D_SHADERS_H
 #define VLC_D3D_SHADERS_H
 
-#include <d3dcompiler.h> // for pD3DCompile
-
 #include "../../video_chroma/dxgi_fmt.h"
 
 #include <vlc_es.h>
