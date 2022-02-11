@@ -188,7 +188,7 @@ size_t MLVideoModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
     if (id <= 0)
         return vlc_ml_count_video_media(ml, &params);
     else
-        return vlc_ml_count_media_of(ml, &params, m_parent.type, id);
+        return vlc_ml_count_video_of(ml, &params, m_parent.type, id);
 }
 
 std::vector<std::unique_ptr<MLItem>>
@@ -203,7 +203,7 @@ MLVideoModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) c
     if (id <= 0)
         list.reset(vlc_ml_list_video_media(ml, &params));
     else
-        list.reset(vlc_ml_list_media_of(ml, &params, m_parent.type, id));
+        list.reset(vlc_ml_list_video_of(ml, &params, m_parent.type, id));
 
     if (list == nullptr)
         return {};
