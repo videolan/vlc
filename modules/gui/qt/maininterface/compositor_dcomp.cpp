@@ -371,7 +371,7 @@ void CompositorDirectComposition::addVisual(Microsoft::WRL::ComPtr<IDComposition
 {
     vlc_assert(m_rootVisual);
 
-    HRESULT hr = m_rootVisual->AddVisual(visual.Get(), FALSE, m_videoVisual ? m_videoVisual.Get() : m_uiVisual.Get());
+    HRESULT hr = m_rootVisual->AddVisual(visual.Get(), TRUE, NULL);
     if (FAILED(hr))
         msg_Err(m_intf, "failed to add visual, code: 0x%lX", hr);
 
