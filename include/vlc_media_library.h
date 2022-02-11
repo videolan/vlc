@@ -490,6 +490,8 @@ enum vlc_ml_list_queries
     /* Children entities listing */
     VLC_ML_LIST_MEDIA_OF,         /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_media_list_t**   */
     VLC_ML_COUNT_MEDIA_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t*             */
+    VLC_ML_LIST_VIDEO_OF,         /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t*             */
+    VLC_ML_COUNT_VIDEO_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t*             */
     VLC_ML_LIST_ARTISTS_OF,       /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_artist_list_t**  */
     VLC_ML_COUNT_ARTISTS_OF,      /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t*             */
     VLC_ML_LIST_ALBUMS_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_album_list_t**   */
@@ -1206,6 +1208,36 @@ static inline size_t vlc_ml_count_media_of( vlc_medialibrary_t* p_ml, const vlc_
     size_t res;
     if ( vlc_ml_list( p_ml, VLC_ML_COUNT_MEDIA_OF, params, i_parent_type, i_parent_id, &res ) != VLC_SUCCESS )
         return 0;
+    return res;
+}
+
+static inline vlc_ml_media_list_t* vlc_ml_list_video_of( vlc_medialibrary_t* p_ml,
+                                                         const vlc_ml_query_params_t* params,
+                                                         int i_parent_type, int64_t i_parent_id )
+{
+    vlc_assert( p_ml != NULL );
+
+    vlc_ml_media_list_t* res;
+
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_VIDEO_OF,
+                      params, i_parent_type, i_parent_id, &res ) != VLC_SUCCESS )
+        return NULL;
+
+    return res;
+}
+
+static inline size_t vlc_ml_count_video_of( vlc_medialibrary_t* p_ml,
+                                            const vlc_ml_query_params_t* params,
+                                            int i_parent_type, int64_t i_parent_id )
+{
+    vlc_assert( p_ml != NULL );
+
+    size_t res;
+
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_VIDEO_OF,
+                      params, i_parent_type, i_parent_id, &res ) != VLC_SUCCESS )
+        return 0;
+
     return res;
 }
 

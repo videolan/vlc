@@ -740,10 +740,33 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         psz_pattern = params->psz_pattern;
         paramsPtr = &p;
     }
+
+    medialibrary::IMedia::Type type = medialibrary::IMedia::Type::Unknown;
+
     switch ( listQuery )
     {
         case VLC_ML_LIST_MEDIA_OF:
         case VLC_ML_COUNT_MEDIA_OF:
+            // N/A default value
+            break;
+        case VLC_ML_LIST_VIDEO_OF:
+        case VLC_ML_COUNT_VIDEO_OF:
+            type = medialibrary::IMedia::Type::Video;
+            break;
+        case VLC_ML_LIST_FOLDERS_BY_TYPE:
+        case VLC_ML_COUNT_FOLDERS_BY_TYPE:
+            type = static_cast<medialibrary::IMedia::Type>(va_arg(args, int));
+            break;
+        default:
+            break;
+    }
+
+    switch ( listQuery )
+    {
+        case VLC_ML_LIST_MEDIA_OF:
+        case VLC_ML_COUNT_MEDIA_OF:
+        case VLC_ML_LIST_VIDEO_OF:
+        case VLC_ML_COUNT_VIDEO_OF:
         case VLC_ML_LIST_ARTISTS_OF:
         case VLC_ML_COUNT_ARTISTS_OF:
         case VLC_ML_LIST_ALBUMS_OF:
@@ -755,6 +778,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         default:
             break;
     }
+
     switch( listQuery )
     {
         case VLC_ML_LIST_ALBUM_TRACKS:
@@ -971,7 +995,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_COUNT_GROUPS:
         case VLC_ML_LIST_GROUP_MEDIA:
         case VLC_ML_COUNT_GROUP_MEDIA:
-            return listGroup( listQuery, paramsPtr, psz_pattern, nbItems, offset, args );
+            return listGroup( listQuery, paramsPtr, type, psz_pattern, nbItems, offset, args );
         case VLC_ML_LIST_PLAYLIST_MEDIA:
         case VLC_ML_COUNT_PLAYLIST_MEDIA:
         case VLC_ML_LIST_PLAYLISTS:
@@ -1506,6 +1530,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
     switch( query )
     {
         case VLC_ML_LIST_MEDIA_OF:
+        case VLC_ML_LIST_VIDEO_OF:
             switch ( parentType )
             {
                 case VLC_ML_PARENT_ALBUM:
@@ -1524,6 +1549,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
                     vlc_assert_unreachable();
             }
         case VLC_ML_COUNT_MEDIA_OF:
+        case VLC_ML_COUNT_VIDEO_OF:
             switch ( parentType )
             {
                 case VLC_ML_PARENT_ALBUM:
@@ -1792,7 +1818,8 @@ int MediaLibrary::listGenre( int listQuery, const medialibrary::QueryParameters*
 }
 
 int MediaLibrary::listGroup( int listQuery, const medialibrary::QueryParameters* paramsPtr,
-                             const char* pattern, uint32_t nbItems, uint32_t offset, va_list args )
+                             medialibrary::IMedia::Type type, const char* pattern,
+                             uint32_t nbItems, uint32_t offset, va_list args )
 {
     switch( listQuery )
     {
@@ -1804,7 +1831,7 @@ int MediaLibrary::listGroup( int listQuery, const medialibrary::QueryParameters*
             if ( pattern )
                 query = m_ml->searchMediaGroups( pattern, paramsPtr );
             else
-                query = m_ml->mediaGroups( medialibrary::IMedia::Type::Unknown, paramsPtr );
+                query = m_ml->mediaGroups( type, paramsPtr );
 
             if ( query == nullptr )
                 return VLC_EGENERIC;
@@ -1837,10 +1864,9 @@ int MediaLibrary::listGroup( int listQuery, const medialibrary::QueryParameters*
             medialibrary::Query<medialibrary::IMedia> query;
 
             if ( pattern )
-                query = group->searchMedia( pattern, medialibrary::IMedia::Type::Unknown,
-                                            paramsPtr );
+                query = group->searchMedia( pattern, type, paramsPtr );
             else
-                query = group->media( medialibrary::IMedia::Type::Unknown, paramsPtr );
+                query = group->media( type, paramsPtr );
 
             if ( query == nullptr )
                 return VLC_EGENERIC;

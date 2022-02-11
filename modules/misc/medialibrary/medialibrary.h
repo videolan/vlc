@@ -170,7 +170,8 @@ private:
     int listGenre( int listQuery, const medialibrary::QueryParameters* paramsPtr,
                    const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
     int listGroup( int listQuery, const medialibrary::QueryParameters* paramsPtr,
-                   const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
+                   medialibrary::IMedia::Type type, const char* pattern, uint32_t nbItems,
+                   uint32_t offset, va_list args );
     int listPlaylist( int listQuery, const medialibrary::QueryParameters* paramsPtr,
                       const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
     int listMedia( int listQuery, const medialibrary::QueryParameters* paramsPtr,
