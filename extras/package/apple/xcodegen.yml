@@ -19,6 +19,15 @@ settings:
       STRIP_BITCODE_FROM_COPIED_FILES: NO
       ENABLE_BITCODE: YES
       BITCODE_GENERATION_MODE: full
+fileGroups:
+  - "${VLC_SRC_DIR}/src"
+  - "${VLC_SRC_DIR}/include"
+  - "${VLC_SRC_DIR}/modules"
+  - "${VLC_SRC_DIR}/lib"
+  - "${VLC_SRC_DIR}/contrib/src"
+  - "${VLC_SRC_DIR}/contrib/bootstrap"
+  - "${VLC_SRC_DIR}/doc"
+  - "${VLC_SRC_DIR}/extras/package/apple/"
 targets:
   VLCAutomake:
     type: ""
@@ -27,20 +36,6 @@ targets:
       toolPath: ${VLC_SRC_DIR}/extras/package/apple/xcode.sh
       passSettings: true
       workingDirectory: ${VLC_SRC_DIR}
-    sources:
-      - path: "${VLC_SRC_DIR}/src"
-        excludes: "**/Makefile.in"
-      - path: "${VLC_SRC_DIR}/include"
-        excludes: "**/Makefile.in"
-      - path: "${VLC_SRC_DIR}/modules"
-        excludes: "**/Makefile.in"
-      - path: "${VLC_SRC_DIR}/lib"
-        excludes: "**/Makefile.in"
-      - path: "${VLC_SRC_DIR}/contrib/src"
-      - path: "${VLC_SRC_DIR}/contrib/bootstrap"
-      - path: "${VLC_SRC_DIR}/doc"
-        excludes: "**/Makefile.in"
-
   vlc_plugin:
     type: "framework"
     platform: ${VLC_PLATFORM}
