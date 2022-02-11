@@ -540,12 +540,10 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
 
 void CompositorX11RenderWindow::setVideoWindow( QWindow* window)
 {
-    window->setParent(m_window);
     //ensure Qt x11 pending operation have been forwarded to the server
     xcb_flush(QX11Info::connection());
     m_videoClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);
     m_videoPosition = QRect(0,0,0,0);
-    setTransparentForMouseEvent(QX11Info::connection(), window->winId());
     m_videoWindow = window;
     emit videoSurfaceChanged(m_videoClient.get());
 }
@@ -562,8 +560,6 @@ void CompositorX11RenderWindow::disableVideoWindow()
 
 void CompositorX11RenderWindow::setInterfaceWindow(CompositorX11UISurface* window)
 {
-    assert(m_window);
-    window->setParent(m_window);
     //ensure Qt x11 pending operation have been forwarded to the server
     xcb_flush(QX11Info::connection());
     m_interfaceClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);

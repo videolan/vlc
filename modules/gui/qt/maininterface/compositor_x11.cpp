@@ -152,26 +152,33 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
 {
     m_mainCtx = mainCtx;
 
-    m_videoWidget = std::make_unique<DummyNativeWidget>();
-    // widget would normally require WindowTransparentForInput, without this
-    // we end up with an invisible area within our window that grabs our mouse events.
-    // But using this this causes rendering issues with some VoutDisplay
-    // (xcb_render for instance) instead, we manually, set a null intput region afterwards
-    // see setTransparentForMouseEvent
-    m_videoWidget->winId();
-    m_videoWidget->setWindowFlag(Qt::WindowStaysOnBottomHint);
-    m_videoWidget->show();
 
     bool useCSD = m_mainCtx->useClientSideDecoration();
     m_renderWindow = std::make_unique<vlc::CompositorX11RenderWindow>(m_intf, m_conn, useCSD);
     if (!m_renderWindow->init())
         return false;
 
+    m_videoWidget = std::make_unique<DummyNativeWidget>(m_renderWindow.get());
+    // widget would normally require WindowTransparentForInput, without this
+    // we end up with an invisible area within our window that grabs our mouse events.
+    // But using this this causes rendering issues with some VoutDisplay
+    // (xcb_render for instance) instead, we manually, set a null input region afterwards
+    // see setTransparentForMouseEvent
+    m_videoWidget->winId();
+
+    //update manually EventMask as we don't use WindowTransparentForInput
+    const uint32_t mask = XCB_CW_EVENT_MASK;
+    const uint32_t values = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
+        | XCB_EVENT_MASK_PROPERTY_CHANGE | XCB_EVENT_MASK_FOCUS_CHANGE;
+    xcb_change_window_attributes(QX11Info::connection(), m_videoWidget->winId(), mask, &values);
+    setTransparentForMouseEvent(QX11Info::connection(), m_videoWidget->winId());
+    m_videoWidget->show();
+
     m_interfaceWindow = m_renderWindow->getWindow();
 
     m_qmlView = std::make_unique<CompositorX11UISurface>(m_interfaceWindow);
-    m_qmlView->setFlag(Qt::WindowType::BypassWindowManagerHint);
     m_qmlView->setFlag(Qt::WindowType::WindowTransparentForInput);
+    m_qmlView->setParent(m_interfaceWindow);
     m_qmlView->winId();
     m_qmlView->show();
 
