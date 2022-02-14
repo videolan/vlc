@@ -86,7 +86,7 @@ private: // Functions
 
     void drawImage(QPainter & painter, const QString & fileName, const QRect & rect);
 
-    void blur(QImage * image);
+    void blur(QImage &image);
 
     QString getPrefix(vlc_ml_parent_type type) const;
 

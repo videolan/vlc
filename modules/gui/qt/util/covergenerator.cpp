@@ -34,6 +34,11 @@
 #include <QGraphicsBlurEffect>
 #include <QUrl>
 
+// Qt private exported function
+QT_BEGIN_NAMESPACE
+extern void VLC_WEAK qt_blurImage(QImage &blurImage, qreal radius, bool quality, int transposed = 0);
+QT_END_NAMESPACE
+
 //-------------------------------------------------------------------------------------------------
 // Static variables
 
@@ -215,7 +220,7 @@ QString CoverGenerator::execute() /* override */
     painter.end();
 
     if (m_blur > 0)
-        blur(&image);
+        blur(image);
 
     image.save(fileName, "jpg");
 
@@ -320,32 +325,47 @@ void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, con
 
 //-------------------------------------------------------------------------------------------------
 
-// FIXME: This implementation is not ideal and uses a dedicated QGraphicsScene.
-void CoverGenerator::blur(QImage * image)
+void CoverGenerator::blur(QImage& image)
 {
-    assert(image);
+    if (Q_LIKELY(&qt_blurImage))
+    {
+        // A symbol is available for qt_blurImage()
+        // Exported function can be used directly within a separate thread:
+        qt_blurImage(image, 2.5 * (m_blur + 1), true);
+    }
+    else
+    {
+        const auto blurImage = [&]() {
+            QGraphicsScene scene;
 
-    QGraphicsScene scene;
+            QGraphicsPixmapItem item(QPixmap::fromImage(image));
 
-    QGraphicsPixmapItem item(QPixmap::fromImage(*image));
+            QGraphicsBlurEffect effect;
 
-    QGraphicsBlurEffect effect;
+            effect.setBlurRadius(m_blur);
 
-    effect.setBlurRadius(m_blur);
+            effect.setBlurHints(QGraphicsBlurEffect::QualityHint);
 
-    effect.setBlurHints(QGraphicsBlurEffect::QualityHint);
+            item.setGraphicsEffect(&effect);
 
-    item.setGraphicsEffect(&effect);
+            scene.addItem(&item);
 
-    scene.addItem(&item);
+            QPainter painter(&image);
 
-    QImage result(image->size(), QImage::Format_ARGB32);
+            scene.render(&painter);
+        };
 
-    QPainter painter(&result);
-
-    scene.render(&painter);
-
-    *image = result;
+        if (qApp->thread() == QThread::currentThread())
+        {
+            blurImage();
+        }
+        else
+        {
+            // Not executing in Qt GUI thread, this is not supported.
+            // Block this thread, and blur the image in the GUI thread instead:
+            QMetaObject::invokeMethod(qApp, blurImage, Qt::BlockingQueuedConnection);
+        }
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
