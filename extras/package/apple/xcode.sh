@@ -3,10 +3,6 @@
 SCRIPTDIR="$(cd $(dirname "$0"); pwd)"
 SRCROOT="${SCRIPTDIR}/../../../"
 
-if [ ! -f "${SRCROOT}/configure" ]; then
-    (cd "${SRCROOT}" && ./bootstrap)
-fi
-
 # https://developer.apple.com/documentation/xcode-release-notes/build-system-release-notes-for-xcode-10
 # > The new build system passes undefined_arch as the value for the ARCH
 # > environment variable when running shell script build phases. The value was
