@@ -753,6 +753,10 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_COUNT_VIDEO_OF:
             type = medialibrary::IMedia::Type::Video;
             break;
+        case VLC_ML_LIST_AUDIO_OF:
+        case VLC_ML_COUNT_AUDIO_OF:
+            type = medialibrary::IMedia::Type::Audio;
+            break;
         case VLC_ML_LIST_FOLDERS_BY_TYPE:
         case VLC_ML_COUNT_FOLDERS_BY_TYPE:
             type = static_cast<medialibrary::IMedia::Type>(va_arg(args, int));
@@ -767,6 +771,8 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_COUNT_MEDIA_OF:
         case VLC_ML_LIST_VIDEO_OF:
         case VLC_ML_COUNT_VIDEO_OF:
+        case VLC_ML_LIST_AUDIO_OF:
+        case VLC_ML_COUNT_AUDIO_OF:
         case VLC_ML_LIST_ARTISTS_OF:
         case VLC_ML_COUNT_ARTISTS_OF:
         case VLC_ML_LIST_ALBUMS_OF:
@@ -1531,6 +1537,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
     {
         case VLC_ML_LIST_MEDIA_OF:
         case VLC_ML_LIST_VIDEO_OF:
+        case VLC_ML_LIST_AUDIO_OF:
             switch ( parentType )
             {
                 case VLC_ML_PARENT_ALBUM:
@@ -1550,6 +1557,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
             }
         case VLC_ML_COUNT_MEDIA_OF:
         case VLC_ML_COUNT_VIDEO_OF:
+        case VLC_ML_COUNT_AUDIO_OF:
             switch ( parentType )
             {
                 case VLC_ML_PARENT_ALBUM:
