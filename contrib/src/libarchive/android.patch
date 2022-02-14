@@ -1,18 +1,6 @@
-diff -ruN libarchive/Makefile.am libarchive.new/Makefile.am
---- libarchive/Makefile.am	2016-10-24 04:20:30.000000000 +0200
-+++ libarchive.new/Makefile.am	2017-01-19 12:58:42.433742303 +0100
-@@ -246,6 +246,7 @@
- 
- # -no-undefined marks that libarchive doesn't rely on symbols
- # defined in the application.  This is mandatory for cygwin.
-+libarchive_la_CPPFLAGS= -I$(top_srcdir)/contrib/android/include
- libarchive_la_LDFLAGS= -no-undefined -version-info $(ARCHIVE_LIBTOOL_VERSION)
- libarchive_la_LIBADD= $(LTLIBICONV)
- 
-diff -ruN libarchive/Makefile.am libarchive.new/Makefile.am
---- libarchive/Makefile.am	2017-01-19 14:56:31.721427332 +0100
-+++ libarchive.new/Makefile.am	2017-01-19 14:52:46.857437351 +0100
-@@ -88,7 +88,7 @@
+--- libarchive/Makefile.am.orig	2022-02-09 13:24:12.000000000 +0100
++++ libarchive/Makefile.am	2022-02-14 19:22:31.487152622 +0100
+@@ -89,7 +89,7 @@
  #
  #
  
@@ -21,3 +9,11 @@ diff -ruN libarchive/Makefile.am libarchive.new/Makefile.am
  
  libarchive_la_SOURCES= \
  	libarchive/archive_acl.c \
+@@ -284,6 +284,7 @@
+ 
+ # -no-undefined marks that libarchive doesn't rely on symbols
+ # defined in the application.  This is mandatory for cygwin.
++libarchive_la_CPPFLAGS= -I$(top_srcdir)/contrib/android/include
+ libarchive_la_LDFLAGS= -no-undefined -version-info $(ARCHIVE_LIBTOOL_VERSION) $(GC_SECTIONS)
+ libarchive_la_LIBADD= $(LTLIBICONV)
+ 

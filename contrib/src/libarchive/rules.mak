@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.5.1
+LIBARCHIVE_VERSION := 3.6.0
 LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -31,7 +31,6 @@ endif
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
-	$(APPLY) $(SRC)/libarchive/configure.ac-add-AC_PROG_CPP.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
