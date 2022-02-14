@@ -1,6 +1,6 @@
 # srt
 
-SRT_VERSION := 1.4.2
+SRT_VERSION := 1.4.4
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -27,7 +27,6 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
 	$(APPLY) $(SRC)/srt/0001-core-ifdef-MSG_TRUNC-nixes-fix.patch
-	$(APPLY) $(SRC)/srt/fix-gcc11-build.patch
 	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
