@@ -229,7 +229,7 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
                     QString mrl;
                     if (event.media_thumbnail_generated.b_success)
                     {
-                        QString thumbnail = qfu(event.media_thumbnail_generated.psz_mrl);
+                        mrl = qfu(event.media_thumbnail_generated.psz_mrl);
                         status = event.media_thumbnail_generated.i_status;
                     }
                     thumbnailUpdated(index(row), item, mrl, status);
