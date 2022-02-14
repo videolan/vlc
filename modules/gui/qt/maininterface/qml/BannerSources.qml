@@ -343,7 +343,7 @@ FocusScope {
 
                         width: Math.min(contentWidth, availableWidth)
                         height: VLCStyle.localToolbar_height
-                        clip: true
+                        clip: contentWidth > width
                         contentWidth: localMenuGroup.width
                         contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
                         anchors.rightMargin: VLCStyle.margin_xxsmall // only applied when right aligned
