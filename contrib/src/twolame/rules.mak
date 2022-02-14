@@ -1,6 +1,6 @@
 # twolame
 
-TWOLAME_VERSION := 0.3.13
+TWOLAME_VERSION := 0.4.0
 TWOLAME_URL := $(SF)/twolame/twolame-$(TWOLAME_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
