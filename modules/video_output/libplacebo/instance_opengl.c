@@ -153,7 +153,7 @@ static void CloseInstance(vlc_placebo_t *pl)
             vlc_gl_ReleaseCurrent(sys->gl);
         }
 
-        vlc_gl_Release(sys->gl);
+        vlc_gl_Delete(sys->gl);
     }
 
     vlc_obj_free(VLC_OBJECT(pl), sys);

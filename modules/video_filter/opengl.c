@@ -156,7 +156,7 @@ static void Close( filter_t *filter )
         vlc_gl_interop_Delete(sys->interop);
         vlc_gl_ReleaseCurrent(sys->gl);
 
-        vlc_gl_Release(sys->gl);
+        vlc_gl_Delete(sys->gl);
         free(sys);
     }
 }
@@ -295,7 +295,7 @@ gl_api_failure:
     vlc_gl_ReleaseCurrent(sys->gl);
 
 make_current_failure:
-    vlc_gl_Release(sys->gl);
+    vlc_gl_Delete(sys->gl);
 
 gl_create_failure:
     free(sys);

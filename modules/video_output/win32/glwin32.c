@@ -195,7 +195,7 @@ static void Close(vout_display_t *vd)
             vout_display_opengl_Delete(sys->vgl);
             vlc_gl_ReleaseCurrent (gl);
         }
-        vlc_gl_Release (gl);
+        vlc_gl_Delete(gl);
         vlc_object_delete(surface);
     }
 

@@ -624,7 +624,7 @@ static void ClearSurface(vout_display_t *vd)
         vlc_gl_ReleaseCurrent(gl);
 
 end:
-        vlc_gl_Release(gl);
+        vlc_gl_Delete(gl);
     }
     else
     {

@@ -97,8 +97,7 @@ VLC_API vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
                                          unsigned width, unsigned height,
                                          unsigned flags, const char *name);
 
-VLC_API void vlc_gl_Release(vlc_gl_t *);
-VLC_API void vlc_gl_Hold(vlc_gl_t *);
+VLC_API void vlc_gl_Delete(vlc_gl_t *);
 
 VLC_API bool vlc_gl_HasExtension(vlc_gl_t *gl, const char *extension);
 

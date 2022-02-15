@@ -181,7 +181,7 @@ static int Open(vout_display_t *vd,
 
 error:
     if (sys->gl != NULL)
-        vlc_gl_Release (sys->gl);
+        vlc_gl_Delete(sys->gl);
     free (sys);
     return VLC_EGENERIC;
 }
@@ -198,7 +198,7 @@ static void Close(vout_display_t *vd)
     vout_display_opengl_Delete (sys->vgl);
     vlc_gl_ReleaseCurrent (gl);
 
-    vlc_gl_Release (gl);
+    vlc_gl_Delete(gl);
     free (sys);
 }
 
