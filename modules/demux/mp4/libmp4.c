@@ -4869,10 +4869,8 @@ static const struct
     { ATOM_uuid,    MP4_ReadBox_uuid,        0 },
 
     /* spatial/360°/VR */
-    { ATOM_st3d,    MP4_ReadBox_st3d,        ATOM_avc1 },
-    { ATOM_st3d,    MP4_ReadBox_st3d,        ATOM_mp4v },
-    { ATOM_sv3d,    MP4_ReadBoxContainer,    ATOM_avc1 },
-    { ATOM_sv3d,    MP4_ReadBoxContainer,    ATOM_mp4v },
+    { ATOM_st3d,    MP4_ReadBox_st3d,        0 },
+    { ATOM_sv3d,    MP4_ReadBoxContainer,    0 },
     { ATOM_proj,    MP4_ReadBoxContainer,    ATOM_sv3d },
     { ATOM_prhd,    MP4_ReadBox_prhd,        ATOM_proj },
     { ATOM_equi,    MP4_ReadBox_equi,        ATOM_proj },
