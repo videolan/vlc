@@ -1,0 +1,49 @@
+From 20ec99be7ecfd1a07e1ff7a7ef3e510203ea33bd Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 17 Feb 2022 13:35:52 -0500
+Subject: [PATCH] [builds/windows] Add support for legacy UWP builds.
+
+* builds/windows/ftsystem.c: Add neccessary macro substitutions to
+enable strict UWP builds.
+
+See !141.
+
+Co-authored-by: Alexei Podtelezhnikov <apodtele@gmail.com>
+---
+ builds/windows/ftsystem.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/builds/windows/ftsystem.c b/builds/windows/ftsystem.c
+index 1c49f30db..d4fc95675 100644
+--- a/builds/windows/ftsystem.c
++++ b/builds/windows/ftsystem.c
+@@ -196,7 +196,25 @@
+   }
+ 
+ 
+-#ifdef _WIN32_WCE
++#if defined( NTDDI_VERSION ) && NTDDI_VERSION < 0x0A000007 && \
++    defined( WINAPI_FAMILY_PARTITION )                 &&     \
++    !WINAPI_FAMILY_PARTITION( WINAPI_PARTITION_DESKTOP )
++
++#define PACK_DWORD64( hi, lo )  ( ( (DWORD64)(hi) << 32 ) | (DWORD)(lo) )
++
++#define CreateFileW( a, b, c, d, e, f, g ) \
++        CreateFileFromAppW( a, b, c, d, e, f, g )
++#define CreateFileMapping( a, b, c, d, e, f ) \
++        CreateFileMappingFromApp( a, b, c, PACK_DWORD64( d, e ), f )
++#define MapViewOfFile( a, b, c, d, e ) \
++        MapViewOfFileFromApp( a, b, PACK_DWORD64( c, d ), e )
++
++#define UWP_LEGACY
++
++#endif
++
++
++#if defined( _WIN32_WCE ) || defined( UWP_LEGACY )
+ 
+   FT_LOCAL_DEF( HANDLE )
+   CreateFileA( LPCSTR                lpFileName,
+-- 
+2.27.0.windows.1
+

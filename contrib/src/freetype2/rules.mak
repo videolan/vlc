@@ -15,7 +15,8 @@ $(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.xz:
 
 freetype: freetype-$(FREETYPE2_VERSION).tar.xz .sum-freetype2
 	$(UNPACK)
-	$(APPLY) $(SRC)/freetype2/uwpfixes.patch
+	$(APPLY) $(SRC)/freetype2/0001-builds-windows-Guard-some-non-ancient-API.patch
+	$(APPLY) $(SRC)/freetype2/0001-builds-windows-Add-support-for-legacy-UWP-builds.patch
 	$(call pkg_static, "builds/unix/freetype2.in")
 	$(MOVE)
 

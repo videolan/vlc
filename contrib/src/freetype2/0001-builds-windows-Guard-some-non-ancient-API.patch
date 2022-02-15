@@ -1,0 +1,79 @@
+From 1f951898751365e9bd2a920ce76652f2a59c3305 Mon Sep 17 00:00:00 2001
+From: Cameron Cawley <ccawley2011@gmail.com>
+Date: Mon, 6 Dec 2021 23:08:46 -0500
+Subject: [PATCH] [builds/windows] Guard some non-ancient API.
+
+We can support Windows 98 and NT 4.0 in principle...
+
+* builds/windows/ftdebug.c, builds/windows/ftsystem.c: Check for the
+ancient SDK using _WIN32_WINDOWS, _WIN32_WCE, or _WIN32_WINNT.
+---
+ builds/windows/ftdebug.c  | 6 ++++++
+ builds/windows/ftsystem.c | 6 +++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/builds/windows/ftdebug.c b/builds/windows/ftdebug.c
+index 94c22da75..ff5d4b481 100644
+--- a/builds/windows/ftdebug.c
++++ b/builds/windows/ftdebug.c
+@@ -136,6 +136,8 @@
+ 
+     va_start( ap, fmt );
+     vfprintf( stderr, fmt, ap );
++#if ( defined( _WIN32_WINNT ) && _WIN32_WINNT >= 0x0400 ) || \
++    ( defined( _WIN32_WCE )   && _WIN32_WCE   >= 0x0600 )
+     if ( IsDebuggerPresent() )
+     {
+       static char  buf[1024];
+@@ -144,6 +146,7 @@
+       vsnprintf( buf, sizeof buf, fmt, ap );
+       OutputDebugStringA( buf );
+     }
++#endif
+     va_end( ap );
+   }
+ 
+@@ -159,6 +162,8 @@
+ 
+     va_start( ap, fmt );
+     vfprintf( stderr, fmt, ap );
++#if ( defined( _WIN32_WINNT ) && _WIN32_WINNT >= 0x0400 ) || \
++    ( defined( _WIN32_WCE )   && _WIN32_WCE   >= 0x0600 )
+     if ( IsDebuggerPresent() )
+     {
+       static char  buf[1024];
+@@ -167,6 +172,7 @@
+       vsnprintf( buf, sizeof buf, fmt, ap );
+       OutputDebugStringA( buf );
+     }
++#endif
+     va_end( ap );
+ 
+     exit( EXIT_FAILURE );
+diff --git a/builds/windows/ftsystem.c b/builds/windows/ftsystem.c
+index 1ebadd49f..0433d6151 100644
+--- a/builds/windows/ftsystem.c
++++ b/builds/windows/ftsystem.c
+@@ -233,6 +233,10 @@
+                         dwFlagsAndAttributes, hTemplateFile );
+   }
+ 
++#endif
++
++#if defined( _WIN32_WCE ) || defined ( _WIN32_WINDOWS ) || \
++    !defined( _WIN32_WINNT ) || _WIN32_WINNT <= 0x0400
+ 
+   FT_LOCAL_DEF( BOOL )
+   GetFileSizeEx( HANDLE         hFile,
+@@ -248,7 +252,7 @@
+       return TRUE;
+   }
+ 
+-#endif /* _WIN32_WCE */
++#endif
+ 
+ 
+   /* documentation is in ftobjs.h */
+-- 
+2.27.0.windows.1
+
