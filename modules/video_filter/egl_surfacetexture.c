@@ -34,6 +34,7 @@
 
 #include "../video_output/android/utils.h"
 #include "../video_output/opengl/gl_api.h"
+#include "../video_output/opengl/gl_util.h"
 
 #define BUFFER_COUNT 3
 
@@ -400,9 +401,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         goto error4;
     }
 
+    struct vlc_gl_extension_vt extension_vt;
+    vlc_gl_LoadExtensionFunctions(gl, &extension_vt);
 
     bool has_image_external =
-        vlc_gl_HasExtension(gl, "GL_OES_EGL_image_external");
+        vlc_gl_HasExtension(&extension_vt, "GL_OES_EGL_image_external");
     vlc_gl_ReleaseCurrent(gl);
 
     if (!has_image_external)

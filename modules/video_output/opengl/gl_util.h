@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_opengl.h>
 #include "gl_common.h"
 
 static const float MATRIX4_IDENTITY[4*4] = {
@@ -88,5 +89,61 @@ vlc_gl_BuildProgram(vlc_object_t *obj, const opengl_vtable_t *vt,
  */
 module_t *
 vlc_gl_WrapOpenGLFilter(filter_t *filter, const char *opengl_filter_name);
+
+struct vlc_gl_extension_vt {
+    PFNGLGETSTRINGPROC      GetString;
+    PFNGLGETSTRINGIPROC     GetStringi;
+    PFNGLGETINTEGERVPROC    GetIntegerv;
+    PFNGLGETERRORPROC       GetError;
+};
+
+static inline void
+vlc_gl_LoadExtensionFunctions(vlc_gl_t *gl, struct vlc_gl_extension_vt *vt)
+{
+    vt->GetString = vlc_gl_GetProcAddress(gl, "glGetString");
+    vt->GetIntegerv = vlc_gl_GetProcAddress(gl, "glGetIntegerv");
+    vt->GetError = vlc_gl_GetProcAddress(gl, "glGetError");
+    vt->GetStringi = NULL;
+
+    GLint version;
+    vt->GetIntegerv(GL_MAJOR_VERSION, &version);
+    uint32_t error = vt->GetError();
+
+    if (error != GL_NO_ERROR)
+        version = 2;
+
+    /* Drain the errors before continuing. */
+    while (error != GL_NO_ERROR)
+        error = vt->GetError();
+
+    /* glGetStringi is available in OpenGL>=3 and GLES>=3.
+     * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGetString.xhtml
+     * https://www.khronos.org/registry/OpenGL-Refpages/es3/html/glGetString.xhtml
+     */
+    if (version >= 3)
+        vt->GetStringi = vlc_gl_GetProcAddress(gl, "glGetStringi");
+}
+
+static inline bool
+vlc_gl_HasExtension(
+    struct vlc_gl_extension_vt *vt,
+    const char *name
+){
+    if (vt->GetStringi == NULL)
+    {
+        const GLubyte *extensions = vt->GetString(GL_EXTENSIONS);
+        return vlc_gl_StrHasToken((const char *)extensions, name);
+    }
+
+    int32_t count = 0;
+    vt->GetIntegerv(GL_NUM_EXTENSIONS, &count);
+    for (int i = 0; i < count; ++i)
+    {
+        const uint8_t *extension = vt->GetStringi(GL_EXTENSIONS, i);
+        if (strcmp((const char *)extension, name) == 0)
+            return true;
+    }
+    return false;
+}
 
 #endif

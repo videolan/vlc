@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 
-#include "gl_api.h"
+#include "gl_util.h"
 #include "interop.h"
 #include "interop_sw.h"
 #include "vout_helper.h"
@@ -49,6 +49,8 @@ struct vlc_gl_interop_private
 #define DECLARE_SYMBOL(type, name) type name;
         OPENGL_VTABLE_F(DECLARE_SYMBOL)
     } gl;
+
+    struct vlc_gl_extension_vt extension_vt;
 };
 
 int
@@ -161,12 +163,15 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                       vlc_fourcc_t chroma,
                       const vlc_chroma_description_t *desc)
 {
+    struct vlc_gl_interop_private *priv =
+        container_of(interop, struct vlc_gl_interop_private, interop);
+
     (void) chroma;
 
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
-    if (vlc_gl_HasExtension(interop->gl, "GL_ARB_texture_rg"))
+    if (vlc_gl_HasExtension(&priv->extension_vt, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
         oneplane16_texfmt = GL_R16;
@@ -395,6 +400,8 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
     priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name);
     OPENGL_VTABLE_F(LOAD_SYMBOL);
 #undef LOAD_SYMBOL
+
+    vlc_gl_LoadExtensionFunctions(interop->gl, &priv->extension_vt);
 
     if (desc->plane_count == 0)
     {

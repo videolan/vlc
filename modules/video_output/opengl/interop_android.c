@@ -31,6 +31,7 @@
 #include "interop.h"
 #include "../android/utils.h"
 #include "gl_api.h"
+#include "gl_util.h"
 
 struct priv
 {
@@ -197,7 +198,10 @@ Open(vlc_object_t *obj)
      || !interop->vctx)
         return VLC_EGENERIC;
 
-    if (!vlc_gl_HasExtension(interop->gl, "GL_OES_EGL_image_external"))
+    struct vlc_gl_extension_vt extension_vt;
+    vlc_gl_LoadExtensionFunctions(interop->gl, &extension_vt);
+
+    if (!vlc_gl_HasExtension(&extension_vt, "GL_OES_EGL_image_external"))
     {
         msg_Warn(&interop->obj, "GL_OES_EGL_image_external is not available,"
                 " disabling android interop.");

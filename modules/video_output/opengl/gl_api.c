@@ -30,6 +30,7 @@
 #include <vlc_opengl.h>
 
 #include "gl_common.h"
+#include "gl_util.h"
 
 int
 vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
@@ -167,6 +168,9 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     while (error != GL_NO_ERROR)
         error = api->vt.GetError();
 
+    struct vlc_gl_extension_vt extension_vt;
+    vlc_gl_LoadExtensionFunctions(gl, &extension_vt);
+
     if (gl->api_type == VLC_OPENGL_ES2)
     {
         api->is_gles = true;
@@ -177,8 +181,8 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     else
     {
         api->is_gles = false;
-        api->supports_npot = vlc_gl_HasExtension(gl, "GL_ARB_texture_non_power_of_two") ||
-                             vlc_gl_HasExtension(gl, "GL_APPLE_texture_2D_limited_npot");
+        api->supports_npot = vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_non_power_of_two") ||
+                             vlc_gl_HasExtension(&extension_vt, "GL_APPLE_texture_2D_limited_npot");
     }
 
     return VLC_SUCCESS;

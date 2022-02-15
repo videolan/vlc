@@ -66,6 +66,8 @@ struct vlc_gl_sampler_priv {
      * conversion), selected by vlc_gl_sampler_SetCurrentPlane(). */
     bool expose_planes;
     unsigned plane;
+
+    struct vlc_gl_extension_vt extension_vt;
 };
 
 static inline struct vlc_gl_sampler_priv *
@@ -424,7 +426,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
     GLint oneplane_texfmt;
-    if (vlc_gl_HasExtension(priv->gl, "GL_ARB_texture_rg"))
+    if (vlc_gl_HasExtension(&priv->extension_vt, "GL_ARB_texture_rg"))
         oneplane_texfmt = GL_RED;
     else
         oneplane_texfmt = GL_LUMINANCE;
@@ -829,6 +831,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
         return NULL;
 
     struct vlc_gl_sampler *sampler = &priv->sampler;
+    vlc_gl_LoadExtensionFunctions(gl, &priv->extension_vt);
 
     priv->uloc.pl_vars = NULL;
     priv->pl_ctx = NULL;

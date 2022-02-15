@@ -168,6 +168,10 @@
 # define GL_STREAM_READ 0x88E1
 #endif
 
+#if !defined(GL_NUM_EXTENSIONS)
+# define GL_NUM_EXTENSIONS 0x821D
+#endif
+
 #ifndef APIENTRY
 # define APIENTRY
 #endif
@@ -289,6 +293,7 @@ typedef GLsync (APIENTRY *PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flag
 typedef void (APIENTRY *PFNGLDELETESYNCPROC) (GLsync sync);
 typedef GLenum (APIENTRY *PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint64 timeout);
 typedef void *(APIENTRY *PFNGLMAPBUFFERPROC)(GLenum, GLbitfield);
+typedef const GLubyte *(APIENTRY *PFNGLGETSTRINGIPROC) (GLenum name, GLint i);
 #endif
 
 /**

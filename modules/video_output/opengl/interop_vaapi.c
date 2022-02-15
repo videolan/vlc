@@ -33,7 +33,7 @@
 #include <vlc_codec.h>
 #include <vlc_plugin.h>
 
-#include "gl_api.h"
+#include "gl_util.h"
 #include "interop.h"
 #include "../../hw/vaapi/vlc_vaapi.h"
 
@@ -446,7 +446,10 @@ Open(vlc_object_t *obj)
         goto error;
     }
 
-    if (!vlc_gl_HasExtension(interop->gl, "GL_OES_EGL_image"))
+    struct vlc_gl_extension_vt extension_vt;
+    vlc_gl_LoadExtensionFunctions(interop->gl, &extension_vt);
+
+    if (!vlc_gl_HasExtension(&extension_vt, "GL_OES_EGL_image"))
         goto error;
 
     priv = interop->priv = calloc(1, sizeof(struct priv));
