@@ -23,17 +23,15 @@
 #ifndef VLC_D3D_DYNAMIC_SHADER_H
 #define VLC_D3D_DYNAMIC_SHADER_H
 
+#include <d3dcommon.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif// __cplusplus
 
-typedef struct
-{
-    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
-    pD3DCompile               OurD3DCompile;
-} d3d_shader_compiler_t;
+typedef struct d3d_shader_compiler_t d3d_shader_compiler_t;
 
-int D3D_InitShaderCompiler(vlc_object_t *, d3d_shader_compiler_t *);
+int D3D_CreateShaderCompiler(vlc_object_t *, d3d_shader_compiler_t **);
 void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *);
 
 HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
