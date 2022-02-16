@@ -43,6 +43,6 @@ DEPS_projectM = glew $(DEPS_glew)
 		-DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF \
 		-DINCLUDE-PROJECTM-QT:BOOL=OFF \
 		-DBUILD_PROJECTM_STATIC:BOOL=ON .
-	cd $< && $(CMAKEBUILD) . --target install
+	+$(CMAKEBUILD) $< --target install
 	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
 	touch $@
