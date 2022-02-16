@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include "mlgrouplistmodel.hpp"
+#include "mlvideogroupsmodel.hpp"
 
 // VLC includes
 #include <vlc_media_library.h>
@@ -39,8 +39,8 @@
 // Static variables
 
 // NOTE: We multiply by 2 to cover most dpi settings.
-static const int MLGROUPLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
-static const int MLGROUPLISTMODEL_COVER_HEIGHT = 320 * 2;
+static const int MLVIDEOGROUPSMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
+static const int MLVIDEOGROUPSMODEL_COVER_HEIGHT = 320 * 2;
 
 static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 {
@@ -50,16 +50,16 @@ static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 };
 
 //=================================================================================================
-// MLGroupListModel
+// MLVideoGroupsModel
 //=================================================================================================
 
-/* explicit */ MLGroupListModel::MLGroupListModel(QObject * parent) : MLVideoModel(parent) {}
+/* explicit */ MLVideoGroupsModel::MLVideoGroupsModel(QObject * parent) : MLVideoModel(parent) {}
 
 //-------------------------------------------------------------------------------------------------
 // MLVideoModel reimplementation
 //-------------------------------------------------------------------------------------------------
 
-QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
+QHash<int, QByteArray> MLVideoGroupsModel::roleNames() const /* override */
 {
     QHash<int, QByteArray> hash = MLVideoModel::roleNames();
 
@@ -72,7 +72,7 @@ QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
 
 // Protected MLVideoModel implementation
 
-QVariant MLGroupListModel::itemRoleData(MLItem * item, const int role) const /* override */
+QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /* override */
 {
     if (item == nullptr)
         return QVariant();
@@ -92,8 +92,8 @@ QVariant MLGroupListModel::itemRoleData(MLItem * item, const int role) const /* 
             case VIDEO_TITLE:
                 return QVariant::fromValue(group->getTitle());
             case VIDEO_THUMBNAIL:
-                return getVideoListCover(this, group, MLGROUPLISTMODEL_COVER_WIDTH,
-                                         MLGROUPLISTMODEL_COVER_HEIGHT, VIDEO_THUMBNAIL);
+                return getVideoListCover(this, group, MLVIDEOGROUPSMODEL_COVER_WIDTH,
+                                         MLVIDEOGROUPSMODEL_COVER_HEIGHT, VIDEO_THUMBNAIL);
             case VIDEO_DURATION:
                 return QVariant::fromValue(group->getDuration());
             case GROUP_IS_VIDEO:
@@ -127,7 +127,7 @@ QVariant MLGroupListModel::itemRoleData(MLItem * item, const int role) const /* 
     }
 }
 
-vlc_ml_sorting_criteria_t MLGroupListModel::roleToCriteria(int role) const /* override */
+vlc_ml_sorting_criteria_t MLVideoGroupsModel::roleToCriteria(int role) const /* override */
 {
     switch (role)
     {
@@ -142,23 +142,23 @@ vlc_ml_sorting_criteria_t MLGroupListModel::roleToCriteria(int role) const /* ov
     }
 }
 
-vlc_ml_sorting_criteria_t MLGroupListModel::nameToCriteria(QByteArray name) const /* override */
+vlc_ml_sorting_criteria_t MLVideoGroupsModel::nameToCriteria(QByteArray name) const /* override */
 {
     return criterias.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-QByteArray MLGroupListModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
+QByteArray MLVideoGroupsModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
 /* override */
 {
     return criterias.key(criteria, "");
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> * MLGroupListModel::createLoader() const /* override */
+ListCacheLoader<std::unique_ptr<MLItem>> * MLVideoGroupsModel::createLoader() const /* override */
 {
     return new Loader(*this);
 }
 
-void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
+void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
     int type = event.i_type;
 
@@ -185,10 +185,10 @@ void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
 // Loader
 //=================================================================================================
 
-MLGroupListModel::Loader::Loader(const MLGroupListModel & model)
+MLVideoGroupsModel::Loader::Loader(const MLVideoGroupsModel & model)
     : MLBaseModel::BaseLoader(model) {}
 
-size_t MLGroupListModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
+size_t MLVideoGroupsModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
     vlc_ml_query_params_t params = getParams().toCQueryParams();
 
@@ -196,7 +196,8 @@ size_t MLGroupListModel::Loader::count(vlc_medialibrary_t* ml) const /* override
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLGroupListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
+MLVideoGroupsModel::Loader::load(vlc_medialibrary_t* ml,
+                                 size_t index, size_t count) const /* override */
 {
     vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
 

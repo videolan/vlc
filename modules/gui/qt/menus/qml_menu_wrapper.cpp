@@ -19,7 +19,7 @@
 #include "menus.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlvideomodel.hpp"
-#include "medialibrary/mlgrouplistmodel.hpp"
+#include "medialibrary/mlvideogroupsmodel.hpp"
 #include "medialibrary/mlplaylistlistmodel.hpp"
 #include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlalbummodel.hpp"
@@ -605,7 +605,7 @@ void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, Q
     // NOTE: At the moment informations are only available for single video(s).
     if (selected.count() == 1
         &&
-        m_model->data(selected.first(), MLGroupListModel::GROUP_IS_VIDEO) == true
+        m_model->data(selected.first(), MLVideoGroupsModel::GROUP_IS_VIDEO) == true
         &&
         options.contains("information") && options["information"].type() == QVariant::Int)
     {

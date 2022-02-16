@@ -33,7 +33,7 @@ class MLArtistModel;
 class MLAlbumTrackModel;
 class MLUrlModel;
 class MLVideoModel;
-class MLGroupListModel;
+class MLVideoGroupsModel;
 class MLGroupModel;
 class MLPlaylistListModel;
 class MLPlaylistModel;
@@ -281,7 +281,7 @@ private:
 class GroupListContextMenu : public QObject {
     Q_OBJECT
 
-    SIMPLE_MENU_PROPERTY(MLGroupListModel *, model, nullptr)
+    SIMPLE_MENU_PROPERTY(MLVideoGroupsModel *, model, nullptr)
 
 public:
     GroupListContextMenu(QObject * parent = nullptr);

@@ -114,7 +114,7 @@ VideoAll {
     QtObject {
         id: metaGroup
 
-        property var model: MLGroupListModel { ml: MediaLib }
+        property var model: MLVideoGroupsModel { ml: MediaLib }
 
         property var contextMenu: GroupListContextMenu { model: metaGroup.model }
 

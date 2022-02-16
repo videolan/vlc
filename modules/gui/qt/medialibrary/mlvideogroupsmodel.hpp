@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef MLGROUPLISTMODEL_HPP
-#define MLGROUPLISTMODEL_HPP
+#ifndef MLVIDEOGROUPSMODEL_HPP
+#define MLVIDEOGROUPSMODEL_HPP
 
 // MediaLibrary includes
 #include "mlvideomodel.hpp"
@@ -27,7 +27,7 @@
 // Forward declarations
 class MLGroup;
 
-class MLGroupListModel : public MLVideoModel
+class MLVideoGroupsModel : public MLVideoModel
 {
     Q_OBJECT
 
@@ -41,7 +41,7 @@ public:
     };
 
 public:
-    explicit MLGroupListModel(QObject * parent = nullptr);
+    explicit MLVideoGroupsModel(QObject * parent = nullptr);
 
 public: // MLVideoModel reimplementation
     QHash<int, QByteArray> roleNames() const override;
@@ -62,7 +62,7 @@ protected: // MLVideoModel reimplementation
 private:
     struct Loader : public BaseLoader
     {
-        Loader(const MLGroupListModel & model);
+        Loader(const MLVideoGroupsModel & model);
 
         size_t count(vlc_medialibrary_t* ml) const override;
 
@@ -70,4 +70,4 @@ private:
     };
 };
 
-#endif // MLGROUPLISTMODEL_HPP
+#endif // MLVIDEOGROUPSMODEL_HPP

@@ -170,8 +170,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlgenremodel.hpp \
 	gui/qt/medialibrary/mlgroup.cpp \
 	gui/qt/medialibrary/mlgroup.hpp \
-	gui/qt/medialibrary/mlgrouplistmodel.cpp \
-	gui/qt/medialibrary/mlgrouplistmodel.hpp \
 	gui/qt/medialibrary/mlhelper.cpp \
 	gui/qt/medialibrary/mlhelper.hpp \
 	gui/qt/medialibrary/mlitemcover.cpp \
@@ -191,6 +189,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlurlmodel.hpp \
 	gui/qt/medialibrary/mlvideo.cpp \
 	gui/qt/medialibrary/mlvideo.hpp \
+	gui/qt/medialibrary/mlvideogroupsmodel.cpp \
+	gui/qt/medialibrary/mlvideogroupsmodel.hpp \
 	gui/qt/medialibrary/mlvideomodel.cpp \
 	gui/qt/medialibrary/mlvideomodel.hpp \
 	gui/qt/medialibrary/mlplaylist.cpp \
@@ -391,7 +391,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlbasemodel.moc.cpp \
 	gui/qt/medialibrary/mlfoldersmodel.moc.cpp \
 	gui/qt/medialibrary/mlgenremodel.moc.cpp \
-	gui/qt/medialibrary/mlgrouplistmodel.moc.cpp \
 	gui/qt/medialibrary/mllistcache.moc.cpp \
 	gui/qt/medialibrary/mlthreadpool.moc.cpp \
 	gui/qt/medialibrary/mlqmltypes.moc.cpp \
@@ -402,6 +401,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlvideomodel.moc.cpp \
 	gui/qt/medialibrary/mlplaylistlistmodel.moc.cpp \
 	gui/qt/medialibrary/mlplaylistmodel.moc.cpp \
+	gui/qt/medialibrary/mlvideogroupsmodel.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
 	gui/qt/menus/qml_menu_wrapper.moc.cpp \
 	gui/qt/menus/menus.moc.cpp \
