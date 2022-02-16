@@ -26,7 +26,7 @@
 
 decltype (PlayerControlbarModel::playerIdentifierDictionary)
     PlayerControlbarModel::playerIdentifierDictionary {
-        {Mainplayer,  N_("Main player")},
+        {Videoplayer, N_("Video player")},
         {Audioplayer, N_("Audio player")},
         {Miniplayer,  N_("Mini player")}
     };

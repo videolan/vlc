@@ -42,7 +42,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("Minimalist Style"),
                 {
                     {
-                        PlayerControlbarModel::Mainplayer,
+                        PlayerControlbarModel::Videoplayer,
                         {
                             {
                                 {
@@ -105,7 +105,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("One-liner Style"),
                 {
                     {
-                        PlayerControlbarModel::Mainplayer,
+                        PlayerControlbarModel::Videoplayer,
                         {
                             {
                                 {
@@ -180,7 +180,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("Simplest Style"),
                 {
                     {
-                        PlayerControlbarModel::Mainplayer,
+                        PlayerControlbarModel::Videoplayer,
                         {
                             {
                                 {
@@ -234,7 +234,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("Classic Style"),
                 {
                     {
-                        PlayerControlbarModel::Mainplayer,
+                        PlayerControlbarModel::Videoplayer,
                         {
                             {
                                 {

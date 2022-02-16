@@ -41,12 +41,12 @@ public:
     // When there is a need to add a new Player, just
     // add its identifier in this enum and set QML buttons layout
     // identifier to it. Such as `property int identifier =
-    // PlayerControlbarModel.Mainplayer`.
+    // PlayerControlbarModel.Videoplayer`.
     // To make it translatable, add a corresponding entry to
     // the static member playerIdentifierDictionary which is
     // initialized in the source file.
     enum PlayerIdentifier {
-        Mainplayer = 0,
+        Videoplayer = 0,
         Audioplayer,
         Miniplayer
     };

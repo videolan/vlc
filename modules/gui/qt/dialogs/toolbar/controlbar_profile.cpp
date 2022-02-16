@@ -27,7 +27,7 @@ decltype(ControlbarProfile::m_defaults)
     ControlbarProfile::m_defaults =
         {
             {
-                PlayerControlbarModel::Mainplayer,
+                PlayerControlbarModel::Videoplayer,
                 {
                     {
                         {
