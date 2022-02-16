@@ -46,6 +46,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_decoder.h \
 	../include/vlc_demux.h \
 	../include/vlc_dialog.h \
+	../include/vlc_diffutil.h \
 	../include/vlc_epg.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
@@ -385,6 +386,7 @@ libvlccore_la_SOURCES = \
 	misc/renderer_discovery.c \
 	misc/threads.c \
 	misc/cpu.c \
+	misc/diffutil.c \
 	misc/epg.c \
 	misc/exit.c \
 	misc/events.c \
@@ -624,7 +626,8 @@ check_PROGRAMS = \
 	test_randomizer \
 	test_media_source \
 	test_extensions \
-	test_thread
+	test_thread \
+	test_diffutil
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -652,6 +655,7 @@ test_arrays_SOURCES = test/arrays.c
 test_vector_SOURCES = test/vector.c
 test_shared_data_ptr_SOURCES = test/shared_data_ptr.cpp
 test_extensions_SOURCES = test/extensions.c
+test_diffutil_SOURCES = test/diffutil.c
 test_playlist_SOURCES = playlist/test.c \
 	playlist/content.c \
 	playlist/control.c \
