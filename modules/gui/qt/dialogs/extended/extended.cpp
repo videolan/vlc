@@ -111,7 +111,7 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
 
     mainTabW->insertTab( VIDEO_TAB, videoWidget, qtr( "Video Effects" ) );
 
-    syncW = new SyncControls( p_intf, videoTab );
+    syncW = new SyncControls( p_intf, mainTabW );
     mainTabW->insertTab( SYNCHRO_TAB, syncW, qtr( "Synchronization" ) );
 
     if( module_exists( "v4l2" ) )
