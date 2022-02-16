@@ -181,9 +181,13 @@ void ExtendedDialog::currentTabChanged( int i )
     {
         m_applyButton->setVisible( true );
         m_applyButton->setEnabled( !m_hashConfigs[i].isEmpty() );
+        m_applyButton->setFocusPolicy( Qt::StrongFocus );
     }
     else
+    {
         m_applyButton->setVisible( false );
+        m_applyButton->setFocusPolicy( Qt::NoFocus );
+    }
 }
 
 void ExtendedDialog::putAudioConfig( const QString& name, const QVariant value )
