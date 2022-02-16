@@ -43,5 +43,5 @@ FLUIDCONF := \
 
 .fluid: fluidsynth toolchain.cmake
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DFLUIDSYNTH_NOT_A_DLL" $(CMAKE) $(FLUIDCONF)
-	cd $< && $(CMAKEBUILD) . --target install
+	+$(CMAKEBUILD) $< --target install
 	touch $@
