@@ -73,12 +73,10 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
     Spatializer *spatial = new Spatializer( p_intf, audioTab );
     CONNECT( spatial, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
     audioTab->addTab( spatial, qtr( "Spatializer" ) );
-    audioLayout->addWidget( audioTab );
 
     StereoWidener *stereowiden = new StereoWidener( p_intf, audioTab );
     CONNECT( stereowiden, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
     audioTab->addTab( stereowiden, qtr( "Stereo Widener" ) );
-    audioLayout->addWidget( audioTab );
 
     QWidget *advancedTab = new QWidget;
     QGridLayout *advancedTabLayout = new QGridLayout;
@@ -95,6 +93,7 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
 
     advancedTab->setLayout( advancedTabLayout );
     audioTab->addTab( advancedTab, qtr( "Advanced" ) );
+
     audioLayout->addWidget( audioTab );
 
     mainTabW->insertTab( AUDIO_TAB, audioWidget, qtr( "Audio Effects" ) );
