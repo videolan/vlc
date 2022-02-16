@@ -116,7 +116,7 @@ VideoAll {
 
         property var model: MLVideoGroupsModel { ml: MediaLib }
 
-        property var contextMenu: GroupListContextMenu { model: metaGroup.model }
+        property var contextMenu: VideoGroupsContextMenu { model: metaGroup.model }
 
         function onAction(indexes) {
             var index = indexes[0]

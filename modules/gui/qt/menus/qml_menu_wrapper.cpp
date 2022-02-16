@@ -542,18 +542,19 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
 }
 
 //=================================================================================================
-// GroupListContextMenu
+// VideoGroupsContextMenu
 //=================================================================================================
 
-GroupListContextMenu::GroupListContextMenu(QObject * parent) : QObject(parent) {}
+VideoGroupsContextMenu::VideoGroupsContextMenu(QObject * parent) : QObject(parent) {}
 
-GroupListContextMenu::~GroupListContextMenu() /* override */
+VideoGroupsContextMenu::~VideoGroupsContextMenu() /* override */
 {
     if (m_menu)
         delete m_menu;
 }
 
-void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, QVariantMap options)
+void VideoGroupsContextMenu::popup(const QModelIndexList & selected, QPoint pos,
+                                   QVariantMap options)
 {
     if (m_model == nullptr)
         return;
@@ -619,10 +620,10 @@ void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, Q
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
         connect(mapper, &QSignalMapper::mappedInt,
-                this, &GroupListContextMenu::showMediaInformation);
+                this, &VideoGroupsContextMenu::showMediaInformation);
 #else
         connect(mapper, QOverload<int>::of(&QSignalMapper::mapped),
-                this, &GroupListContextMenu::showMediaInformation);
+                this, &VideoGroupsContextMenu::showMediaInformation);
 #endif
     }
 

@@ -278,15 +278,15 @@ private:
 // Groups
 //-------------------------------------------------------------------------------------------------
 
-class GroupListContextMenu : public QObject {
+class VideoGroupsContextMenu : public QObject {
     Q_OBJECT
 
     SIMPLE_MENU_PROPERTY(MLVideoGroupsModel *, model, nullptr)
 
 public:
-    GroupListContextMenu(QObject * parent = nullptr);
+    VideoGroupsContextMenu(QObject * parent = nullptr);
 
-    ~GroupListContextMenu() /* override */;
+    ~VideoGroupsContextMenu(); /* override */
 
 public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
