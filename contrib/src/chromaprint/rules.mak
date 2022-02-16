@@ -22,5 +22,5 @@ DEPS_chromaprint = ffmpeg $(DEPS_ffmpeg)
 
 .chromaprint: chromaprint toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(CMAKE)
-	cd $< && $(CMAKEBUILD) . --target install
+	+$(CMAKEBUILD) $< --target install
 	touch $@
