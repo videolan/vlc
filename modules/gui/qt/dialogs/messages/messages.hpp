@@ -67,7 +67,7 @@ private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 
     friend class    Singleton<MessagesDialog>;
-    QPushButton *updateButton;
+    QToolButton *updateButton;
     QMutex messageLocker;
 #ifndef NDEBUG
     QTreeWidget *pldebugTree;

@@ -100,8 +100,9 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     ui.filterEdit->setText( getSettings()->value( "messages-filter" ).toString() );
     getSettings()->endGroup();
 
-    updateButton = new QPushButton( QIcon(":/update.svg"), "" );
-    updateButton->setFlat( true );
+    updateButton = new QToolButton;
+    updateButton->setIcon( QIcon(":/update.svg") );
+    updateButton->setAutoRaise( true );
     ui.mainTab->setCornerWidget( updateButton );
 
 #ifndef NDEBUG
