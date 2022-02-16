@@ -547,7 +547,8 @@ FocusScope {
 
                 onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock, source)
 
-                identifier: PlayerControlbarModel.Mainplayer
+                identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Mainplayer
+                                                    : PlayerControlbarModel.Audioplayer
             }
         }
     }
