@@ -42,5 +42,5 @@ endif
 		-DWITH_OPENMP=OFF \
 		-DWITH_AVFFT=ON \
 		-Wno-dev
-	cd $< && $(CMAKEBUILD) . --target install
+	+$(CMAKEBUILD) $< --target install
 	touch $@
