@@ -47,6 +47,7 @@ public:
     // initialized in the source file.
     enum PlayerIdentifier {
         Mainplayer = 0,
+        Audioplayer,
         Miniplayer
     };
     Q_ENUM(PlayerIdentifier)

@@ -59,13 +59,29 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::PLAYLIST_BUTTON,
                                     ControlListModel::WIDGET_SPACER,
                                     ControlListModel::VOLUME
-                                },
+                                }, {}, {}
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
                                 {
-
-                                },
-                                {
-
-                                }
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::STOP_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::RECORD_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::NAVIGATION_BUTTONS,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PLAYLIST_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::VOLUME
+                                }, {}, {}
                             }
                         }
                     },
@@ -78,13 +94,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::STOP_BUTTON,
                                     ControlListModel::NEXT_BUTTON
-                                },
-                                {
-
-                                },
-                                {
-
-                                }
+                                }, {}, {}
                             }
                         }
                     }
@@ -117,10 +127,34 @@ decltype (ControlbarProfileModel::m_defaults)
                                 },
                                 {
                                     ControlListModel::VOLUME
+                                }, {}
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::STOP_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::FULLSCREEN_BUTTON,
+                                    ControlListModel::PLAYLIST_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::RECORD_BUTTON,
+                                    ControlListModel::SNAPSHOT_BUTTON,
+                                    ControlListModel::ATOB_BUTTON,
+                                    ControlListModel::FRAME_BUTTON
                                 },
                                 {
-
-                                }
+                                    ControlListModel::VOLUME
+                                }, {}
                             }
                         }
                     },
@@ -135,13 +169,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::STOP_BUTTON,
                                     ControlListModel::NEXT_BUTTON,
                                     ControlListModel::LOOP_BUTTON
-                                },
-                                {
-
-                                },
-                                {
-
-                                }
+                                }, {}, {}
                             }
                         }
                     }
@@ -170,6 +198,24 @@ decltype (ControlbarProfileModel::m_defaults)
                         }
                     },
                     {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::VOLUME
+                                },
+                                {
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::STOP_BUTTON
+                                },
+                                {
+                                    ControlListModel::FULLSCREEN_BUTTON
+                                }
+                            }
+                        }
+                    },
+                    {
                         PlayerControlbarModel::Miniplayer,
                         {
                             {
@@ -177,13 +223,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::NEXT_BUTTON
-                                },
-                                {
-
-                                },
-                                {
-
-                                }
+                                }, {}, {}
                             }
                         }
                     }
@@ -211,9 +251,32 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::LOOP_BUTTON,
                                     ControlListModel::RANDOM_BUTTON
                                 },
+                                {},
                                 {
-
+                                    ControlListModel::VOLUME
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::STOP_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::FULLSCREEN_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PLAYLIST_BUTTON,
+                                    ControlListModel::LOOP_BUTTON,
+                                    ControlListModel::RANDOM_BUTTON
                                 },
+                                {},
                                 {
                                     ControlListModel::VOLUME
                                 }
@@ -238,9 +301,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::LOOP_BUTTON,
                                     ControlListModel::RANDOM_BUTTON
                                 },
-                                {
-
-                                },
+                                {},
                                 {
                                     ControlListModel::VOLUME
                                 }
