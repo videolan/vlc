@@ -32,7 +32,7 @@ VideoAll {
 
     property int      initialIndex: 0
     property MLItemId initialId
-    property string   initialName
+    property string   initialTitle
 
     // Aliases
 
