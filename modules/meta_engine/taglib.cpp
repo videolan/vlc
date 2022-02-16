@@ -110,7 +110,7 @@ namespace VLCTagLib
 }
 
 template <class T>
-VLCTagLib::ExtResolver<T>::ExtResolver(const std::string & ext) : FileTypeResolver()
+VLCTagLib::ExtResolver<T>::ExtResolver(const std::string & ext)
 {
     this->ext = ext;
     std::transform(this->ext.begin(), this->ext.end(), this->ext.begin(), ::toupper);
