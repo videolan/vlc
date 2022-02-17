@@ -41,6 +41,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	tar xvzfo "$<" -C $(UNPACK_DIR) --strip-components=1
 	$(APPLY) $(SRC)/protobuf/protobuf-disable-gmock.patch
 	$(APPLY) $(SRC)/protobuf/protobuf-fix-build.patch
+	$(APPLY) $(SRC)/protobuf/include-algorithm.patch
 	$(MOVE)
 
 .protoc: protoc
@@ -55,6 +56,7 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(APPLY) $(SRC)/protobuf/protobuf-disable-gmock.patch
 	$(APPLY) $(SRC)/protobuf/dont-build-protoc.patch
 	$(APPLY) $(SRC)/protobuf/protobuf-fix-build.patch
+	$(APPLY) $(SRC)/protobuf/include-algorithm.patch
 	$(MOVE)
 
 .protobuf: protobuf
