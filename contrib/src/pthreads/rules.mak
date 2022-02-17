@@ -15,7 +15,7 @@ PKGS_ALL += winrt_headers
 endif
 PKGS += dxvahd dcomp
 PKGS_ALL += dxvahd dcomp
-ifeq ($(HAVE_MINGW64_V8),true)
+ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += winrt_headers dxvahd
 endif
 ifeq ($(HAVE_WINPTHREAD),)
