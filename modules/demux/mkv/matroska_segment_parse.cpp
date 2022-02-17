@@ -519,22 +519,42 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 }
             }
 
-            if( i_display_height && i_display_width )
+            unsigned int h_crop;
+            if (!add_overflow(i_crop_left, i_crop_right, &h_crop))
             {
-                tk->fmt.video.i_sar_num = i_display_width  * tk->fmt.video.i_height;
-                tk->fmt.video.i_sar_den = i_display_height * tk->fmt.video.i_width;
+                debug( vars, "invalid horizontal crop %u+%u",
+                              i_crop_left, i_crop_right );
+                i_crop_left = i_crop_right = 0;
+            }
+            else if (unlikely(h_crop >= tk->fmt.video.i_width))
+            {
+                debug( vars, "Horizontal crop (left=%u, right=%u) "
+                             "greater than the picture width (%u)",
+                              i_crop_left, i_crop_right, tk->fmt.video.i_width );
+                i_crop_left = i_crop_right = 0;
             }
 
-            tk->fmt.video.i_visible_width   = tk->fmt.video.i_width;
-            tk->fmt.video.i_visible_height  = tk->fmt.video.i_height;
-
-            if( i_crop_left || i_crop_right || i_crop_top || i_crop_bottom )
+            unsigned int v_crop;
+            if (!add_overflow(i_crop_top, i_crop_bottom, &v_crop))
             {
-                tk->fmt.video.i_x_offset        = i_crop_left;
-                tk->fmt.video.i_y_offset        = i_crop_top;
-                tk->fmt.video.i_visible_width  -= i_crop_left + i_crop_right;
-                tk->fmt.video.i_visible_height -= i_crop_top + i_crop_bottom;
+                debug( vars, "invalid vertical crop %u+%u",
+                              i_crop_top, i_crop_bottom);
+                i_crop_top = i_crop_bottom = 0;
             }
+            if (unlikely(v_crop >= tk->fmt.video.i_height))
+            {
+                debug( vars, "Vertical crop (top=%u, bottom=%u) "
+                             "greater than the picture height (%u)",
+                              i_crop_top, i_crop_bottom, tk->fmt.video.i_height );
+                i_crop_top = i_crop_bottom = 0;
+            }
+
+            tk->fmt.video.i_x_offset      = i_crop_left;
+            tk->fmt.video.i_y_offset      = i_crop_top;
+            tk->fmt.video.i_visible_width = tk->fmt.video.i_width -
+                                            (i_crop_left + i_crop_right);
+            tk->fmt.video.i_visible_height = tk->fmt.video.i_height -
+                                            (i_crop_top + i_crop_bottom);
             /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
                we do not support this atm */
         }
