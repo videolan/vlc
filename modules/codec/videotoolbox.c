@@ -478,9 +478,9 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
                                                 &i_vis_width, &i_vis_height))
         {
             p_dec->fmt_out.video.i_visible_width = i_vis_width;
-            p_dec->fmt_out.video.i_width = vlc_align( i_vis_width, VT_ALIGNMENT );
+            p_dec->fmt_out.video.i_width = vlc_align(i_width, VT_ALIGNMENT);
             p_dec->fmt_out.video.i_visible_height = i_vis_height;
-            p_dec->fmt_out.video.i_height = vlc_align( i_vis_height, VT_ALIGNMENT );
+            p_dec->fmt_out.video.i_height = vlc_align(i_height, VT_ALIGNMENT);
         }
         else return false;
     }
@@ -1181,8 +1181,8 @@ static int StartVideoToolbox(decoder_t *p_dec)
     OSStatus status = CMVideoFormatDescriptionCreate(
                                             kCFAllocatorDefault,
                                             p_sys->codec,
-                                            p_dec->fmt_out.video.i_visible_width,
-                                            p_dec->fmt_out.video.i_visible_height,
+                                            p_dec->fmt_out.video.i_width,
+                                            p_dec->fmt_out.video.i_height,
                                             decoderConfiguration,
                                             &p_sys->videoFormatDescription);
     if (status)
@@ -1204,9 +1204,9 @@ static int StartVideoToolbox(decoder_t *p_dec)
 #endif
 
     cfdict_set_int32(destinationPixelBufferAttributes,
-                     kCVPixelBufferWidthKey, p_dec->fmt_out.video.i_visible_width);
+                     kCVPixelBufferWidthKey, p_dec->fmt_out.video.i_width);
     cfdict_set_int32(destinationPixelBufferAttributes,
-                     kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_visible_height);
+                     kCVPixelBufferHeightKey, p_dec->fmt_out.video.i_height);
 
     if (p_sys->i_cvpx_format != 0)
     {
@@ -1603,8 +1603,8 @@ static int ConfigureVout(decoder_t *p_dec)
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
     }
 
-    p_dec->fmt_out.video.i_width = vlc_align( p_dec->fmt_out.video.i_visible_width, VT_ALIGNMENT );
-    p_dec->fmt_out.video.i_height = vlc_align( p_dec->fmt_out.video.i_visible_height, VT_ALIGNMENT );
+    p_dec->fmt_out.video.i_width = vlc_align(p_dec->fmt_out.video.i_width, VT_ALIGNMENT);
+    p_dec->fmt_out.video.i_height = vlc_align(p_dec->fmt_out.video.i_height, VT_ALIGNMENT);
 
     return VLC_SUCCESS;
 }
