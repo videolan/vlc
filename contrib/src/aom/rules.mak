@@ -1,23 +1,19 @@
 # aom
-AOM_VERSION := v3.1.1
-AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_VERSION).tar.gz
+AOM_VERSION := 3.3.0
+AOM_URL := https://storage.googleapis.com/aom-releases/libaom-$(AOM_VERSION).tar.gz
 
 PKGS += aom
 ifeq ($(call need_pkg,"aom"),)
 PKGS_FOUND += aom
 endif
 
-$(TARBALLS)/aom-$(AOM_VERSION).tar.gz:
-	$(call download_pkg,$(AOM_GITURL),aom)
+$(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
+	$(call download_pkg,$(AOM_URL),aom)
 
-.sum-aom: aom-$(AOM_VERSION).tar.gz
-	$(warning $@ not implemented)
-	touch $@
+.sum-aom: libaom-$(AOM_VERSION).tar.gz
 
-aom: aom-$(AOM_VERSION).tar.gz .sum-aom
-	rm -Rf $(UNPACK_DIR) $@
-	mkdir -p $(UNPACK_DIR)
-	tar xvzfo "$<" -C $(UNPACK_DIR)
+aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
+	$(UNPACK)
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
 	$(APPLY) $(SRC)/aom/aom-android-cpufeatures.patch
@@ -40,12 +36,10 @@ AOM_CONF := \
 	-DENABLE_DOCS=OFF \
 	-DENABLE_EXAMPLES=OFF \
 	-DENABLE_TOOLS=OFF \
-	-DCONFIG_UNIT_TESTS=0 \
-	-DENABLE_TESTS=OFF \
-	-DCONFIG_INSTALL_BINS=0 \
-	-DCONFIG_INSTALL_DOCS=0 \
-	-DCONFIG_DEPENDENCY_TRACKING=0 \
-	-DCONFIG_AV1_ENCODER=0
+	-DENABLE_TESTS=OFF
+
+# The aom module only supports decoding in 3.0.x
+AOM_CONF += -DCONFIG_AV1_ENCODER=0
 
 ifndef HAVE_WIN32
 AOM_CONF += -DCONFIG_PIC=1
