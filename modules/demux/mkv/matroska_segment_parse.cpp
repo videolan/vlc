@@ -487,7 +487,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             unsigned int i_crop_bottom = vars.track_video_info.i_crop_bottom;
             unsigned int i_crop_left   = vars.track_video_info.i_crop_left;
 
-            unsigned int i_display_unit   = vars.track_video_info.i_display_unit; VLC_UNUSED(i_display_unit);
+            unsigned int i_display_unit   = vars.track_video_info.i_display_unit;
             unsigned int i_display_width  = vars.track_video_info.i_display_width;
             unsigned int i_display_height = vars.track_video_info.i_display_height;
 
@@ -555,6 +555,11 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                                             (i_crop_left + i_crop_right);
             tk->fmt.video.i_visible_height = tk->fmt.video.i_height -
                                             (i_crop_top + i_crop_bottom);
+
+            if (i_display_unit == 0 && i_display_width == 0)
+                i_display_width = tk->fmt.video.i_width;
+            if (i_display_unit == 0 && i_display_height == 0)
+                i_display_height = tk->fmt.video.i_height;
 
             if (i_display_height && i_display_width)
             {
