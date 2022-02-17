@@ -304,7 +304,7 @@ vlc_decoder_device *vlc_encoder_GetDecoderDevice( encoder_t *enc )
 
 void vlc_encoder_Destroy(encoder_t *encoder)
 {
-    if (encoder->ops->close != NULL)
+    if (encoder->ops != NULL && encoder->ops->close != NULL)
         encoder->ops->close(encoder);
     if (encoder->p_module != NULL)
         module_unneed(encoder, encoder->p_module);
