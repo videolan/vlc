@@ -518,11 +518,10 @@ vlc_tick_t FakeESOut::applyTimestampContinuity(vlc_tick_t ts)
     if(ts == VLC_TICK_INVALID)
         return ts;
 
+    constexpr vlc_tick_t rollover = INT64_C(0x1FFFFFFFF) * 100 / 9;
+    constexpr vlc_tick_t halfroll = INT64_C(0x0FFFFFFFF) * 100 / 9;
     if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID)
     {
-        constexpr vlc_tick_t rollover = INT64_C(0x1FFFFFFFF) * 100 / 9;
-        constexpr vlc_tick_t halfroll = INT64_C(0x0FFFFFFFF) * 100 / 9;
-
         while(ts - synchronizationReference.second.segment.demux > halfroll)
         {
             ts -= rollover;
@@ -538,6 +537,11 @@ vlc_tick_t FakeESOut::applyTimestampContinuity(vlc_tick_t ts)
     {
         vlc_tick_t continuityoffset = synchronizationReference.second.continuous -
                                       synchronizationReference.second.segment.demux;
+
+        /* avoid triggering false roll when reference is 13 hours away */
+        if(ts - synchronizationReference.second.segment.demux > halfroll / 2)
+            synchronizationReference.second.offsetBy(halfroll / 2);
+
         ts += continuityoffset;
         assert(ts >= VLC_TICK_INVALID);
     }
