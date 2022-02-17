@@ -268,6 +268,7 @@ T.Control {
                 height: titleLabel.height
                 width: titleLabel.width
                 visible: root.title !== ""
+                clip: animationRunning
 
                 Widgets.ListLabel {
                     id: titleLabel

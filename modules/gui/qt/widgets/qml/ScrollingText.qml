@@ -25,8 +25,6 @@ Item {
 
     readonly property alias animationRunning: scrollAnimation.running
 
-    clip: true
-
     property Text label: undefined
     property bool scroll: false
 

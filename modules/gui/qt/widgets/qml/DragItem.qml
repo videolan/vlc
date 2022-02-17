@@ -321,6 +321,7 @@ Item {
             scroll: true
             height: titleLabel.height
             width: parent.width
+            clip: animationRunning
 
             T.Label {
                 id: titleLabel
