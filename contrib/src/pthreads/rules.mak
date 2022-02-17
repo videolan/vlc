@@ -11,7 +11,7 @@ PKGS += pthreads
 ifndef HAVE_VISUALSTUDIO
 PKGS += dxvahd
 PKGS_ALL += dxvahd
-ifeq ($(HAVE_MINGW64_V8),true)
+ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += dxvahd
 endif
 endif
