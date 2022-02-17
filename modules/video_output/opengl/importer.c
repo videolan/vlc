@@ -236,12 +236,16 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
 
     /* Texture size */
     for (unsigned j = 0; j < interop->tex_count; j++) {
-        GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
+        GLsizei vw = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
                   / interop->texs[j].w.den;
-        GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
+        GLsizei vh = interop->fmt_out.i_visible_height * interop->texs[j].h.num
                   / interop->texs[j].h.den;
-        glfmt->visible_widths[j] = w;
-        glfmt->visible_heights[j] = h;
+        GLsizei w = (interop->fmt_out.i_visible_width + interop->fmt_out.i_x_offset) * interop->texs[j].w.num
+                  / interop->texs[j].w.den;
+        GLsizei h = (interop->fmt_out.i_visible_height + interop->fmt_out.i_y_offset) *  interop->texs[j].h.num
+                  / interop->texs[j].h.den;
+        glfmt->visible_widths[j] = vw;
+        glfmt->visible_heights[j] = vh;
         if (supports_npot) {
             glfmt->tex_widths[j]  = w;
             glfmt->tex_heights[j] = h;
@@ -408,8 +412,8 @@ vlc_gl_importer_Update(struct vlc_gl_importer *importer, picture_t *picture)
 
     /* Update the texture */
     int ret = interop->ops->update_textures(interop, pic->textures,
-                                            glfmt->visible_widths,
-                                            glfmt->visible_heights, picture,
+                                            glfmt->tex_widths,
+                                            glfmt->tex_heights, picture,
                                             NULL);
 
     const float *tm = GetTransformMatrix(interop);
