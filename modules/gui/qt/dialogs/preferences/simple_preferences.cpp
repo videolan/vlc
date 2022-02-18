@@ -809,8 +809,13 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             radioGroup = new QButtonGroup(this);
             radioGroup->addButton( ui.qt, 0 );
             radioGroup->addButton( ui.skins, 1 );
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+            connect( radioGroup, &QButtonGroup::idClicked,
+                     ui.styleStackedWidget, &QStackedWidget::setCurrentIndex );
+#else
             connect( radioGroup, QOverload<int>::of(&QButtonGroup::buttonClicked),
                      ui.styleStackedWidget, &QStackedWidget::setCurrentIndex );
+#endif
             ui.styleStackedWidget->setCurrentIndex( radioGroup->checkedId() );
 
             connect( ui.minimalviewBox, &QCheckBox::toggled,
