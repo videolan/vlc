@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_cpu.h>
 #include <vlc_memstream.h>
+#include <vlc_modules.h>
 #include "libvlc.h"
 
 #include <assert.h>
@@ -304,4 +305,18 @@ void vlc_CPU_dump (vlc_object_t *obj)
         msg_Dbg (obj, "CPU has capabilities %s", stream.ptr);
         free(stream.ptr);
     }
+}
+
+void vlc_CPU_functions_init(const char *capability, void *restrict funcs)
+{
+    module_t **mods;
+    ssize_t n = vlc_module_match(capability, NULL, false, &mods, NULL);
+
+    for (ssize_t i = 0; i < n; i++) {
+        void (*init)(void *) = vlc_module_map(NULL, mods[i]);
+        if (likely(init != NULL))
+            init(funcs);
+    }
+
+    free(mods);
 }

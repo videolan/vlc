@@ -553,6 +553,7 @@ vlc_sem_trywait
 vlc_control_cancel
 vlc_GetCPUCount
 vlc_CPU
+vlc_CPU_functions_init
 vlc_event_attach
 vlc_event_detach
 vlc_filenamecmp

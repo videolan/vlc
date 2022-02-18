@@ -219,4 +219,46 @@ unsigned vlc_CPU_raw(void);
 
 # endif
 
+/**
+ * Initialises DSP functions.
+ *
+ * This helper looks for accelerated Digital Signal Processing functions
+ * identified by the supplied type name. Those functions ares typically
+ * implemented using architecture-specific assembler code with
+ * Single Instruction Multiple Data (SIMD) opcodes for faster processing.
+ *
+ * The exact purposes and semantics of the DSP functions is uniquely identified
+ * by a nul-terminated string.
+ *
+ * \note This function should not be used directly. It is recommended to use
+ * the convenience wrapper vlc_CPU_functions_init_once() instead.
+ *
+ * \param name nul-terminated type identifier (cannot be NULL)
+ * \param [inout] funcs type-specific data structure to be initialised
+ */
+VLC_API void vlc_CPU_functions_init(const char *name, void *restrict funcs);
+
+# ifndef __cplusplus
+/**
+ * Initialises DSP functions once.
+ *
+ * This is a convenience wrapper for vlc_CPU_functions_init().
+ * It only initialises the functions the first time it is evaluated.
+ */
+static inline void vlc_CPU_functions_init_once(const char *name,
+                                               void *restrict funcs)
+{
+    static vlc_once_t once = VLC_STATIC_ONCE;
+
+    if (!vlc_once_begin(&once)) {
+        vlc_CPU_functions_init(name, funcs);
+        vlc_once_complete(&once);
+    }
+}
+# endif
+
+#define set_cpu_funcs(name, activate, priority) \
+    set_callback(VLC_CHECKED_TYPE(void (*)(void *), activate)) \
+    set_capability(name, priority)
+
 #endif /* !VLC_CPU_H */
