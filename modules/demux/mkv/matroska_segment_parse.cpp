@@ -555,8 +555,25 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                                             (i_crop_left + i_crop_right);
             tk->fmt.video.i_visible_height = tk->fmt.video.i_height -
                                             (i_crop_top + i_crop_bottom);
-            /* FIXME: i_display_* allows you to not only set DAR, but also a zoom factor.
-               we do not support this atm */
+
+            if (i_display_height && i_display_width)
+            {
+                switch (i_display_unit)
+                {
+                    case 0: // pixels
+                    case 1: // centimeters
+                    case 2: // inches
+                        vlc_ureduce( &tk->fmt.video.i_sar_num, &tk->fmt.video.i_sar_den,
+                                     i_display_width * tk->fmt.video.i_visible_height,
+                                     i_display_height * tk->fmt.video.i_visible_width, 0);
+                        break;
+                    case 3: // display aspect ratio
+                        vlc_ureduce( &tk->fmt.video.i_sar_num, &tk->fmt.video.i_sar_den,
+                                     i_display_height * tk->fmt.video.i_visible_width,
+                                     i_display_width * tk->fmt.video.i_visible_height, 0);
+                        break;
+                }
+            }
         }
 #if LIBMATROSKA_VERSION >= 0x010406
         E_CASE( KaxVideoProjection, proj )
