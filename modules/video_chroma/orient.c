@@ -29,6 +29,7 @@
 #include <limits.h>
 
 #include <vlc_common.h>
+#include <vlc_cpu.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_mouse.h>
@@ -80,7 +81,7 @@ TRANSFORMS(16)
 TRANSFORMS(32)
 TRANSFORMS(64)
 
-static const struct plane_transforms transforms = {
+static struct plane_transforms transforms = {
     { hflip_8, hflip_16, hflip_32, hflip_64, },
     { transpose_8, transpose_16, transpose_32, transpose_64, },
 };
@@ -294,6 +295,8 @@ static int Open(filter_t *filter)
             if (chroma->p[i].w.num * chroma->p[i].h.den
              != chroma->p[i].h.num * chroma->p[i].w.den)
                 return VLC_ENOTSUP;
+
+    vlc_CPU_functions_init_once("video transform", &transforms);
 
     switch (chroma->pixel_size) {
         case 1:
