@@ -422,11 +422,8 @@ void BaseMedialibMenu::medialibAudioContextMenu(MediaLib* ml, const QVariantList
         QSignalMapper* sigmapper = new QSignalMapper(m_menu);
         connect(action, &QAction::triggered, sigmapper, QOverload<>::of(&QSignalMapper::map));
         sigmapper->setMapping(action, options["information"].toInt());
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-        connect(sigmapper, &QSignalMapper::mappedInt, this, &BaseMedialibMenu   ::showMediaInformation);
-#else
-        connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &BaseMedialibMenu::showMediaInformation);
-#endif
+        connect(sigmapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
+                this, &BaseMedialibMenu::showMediaInformation);
     }
     m_menu->popup(pos);
 }
@@ -533,11 +530,8 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
         QSignalMapper* sigmapper = new QSignalMapper(m_menu);
         connect(action, &QAction::triggered, sigmapper, QOverload<>::of(&QSignalMapper::map));
         sigmapper->setMapping(action, options["information"].toInt());
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-        connect(sigmapper, &QSignalMapper::mappedInt, this, &VideoContextMenu::showMediaInformation);
-#else
-        connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &VideoContextMenu::showMediaInformation);
-#endif
+        connect(sigmapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
+                this, &VideoContextMenu::showMediaInformation);
     }
 
     m_menu->popup(pos);
@@ -620,13 +614,8 @@ void VideoGroupsContextMenu::popup(const QModelIndexList & selected, QPoint pos,
 
         connect(action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map));
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-        connect(mapper, &QSignalMapper::mappedInt,
+        connect(mapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
                 this, &VideoGroupsContextMenu::showMediaInformation);
-#else
-        connect(mapper, QOverload<int>::of(&QSignalMapper::mapped),
-                this, &VideoGroupsContextMenu::showMediaInformation);
-#endif
     }
 
     m_menu->popup(pos);
@@ -809,13 +798,8 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
         connect(action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map));
 
         mapper->setMapping(action, options["information"].toInt());
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-        connect(mapper, &QSignalMapper::mappedInt, this,
-                &PlaylistMediaContextMenu::showMediaInformation);
-#else
-        connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this,
-                &PlaylistMediaContextMenu::showMediaInformation);
-#endif
+        connect(mapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
+                this, &PlaylistMediaContextMenu::showMediaInformation);
     }
 
     m_menu->addSeparator();

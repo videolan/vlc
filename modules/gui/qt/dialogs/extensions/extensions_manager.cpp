@@ -46,7 +46,7 @@ ExtensionsManager::ExtensionsManager( qt_intf_t *_p_intf, QObject *parent )
     instance = this;
 
     menuMapper = new QSignalMapper( this );
-    connect( menuMapper, QOverload<int>::of(&QSignalMapper::mapped), this, &ExtensionsManager::triggerMenu );
+    connect( menuMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, this, &ExtensionsManager::triggerMenu );
     connect( THEMIM, &PlayerController::playingStateChanged, this, &ExtensionsManager::playingChanged );
     connect( THEMIM, &PlayerController::inputChanged, this, &ExtensionsManager::inputChanged, Qt::DirectConnection );
     connect( THEMIM, &PlayerController::metaChanged, this, &ExtensionsManager::metaChanged );

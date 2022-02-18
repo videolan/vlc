@@ -1096,7 +1096,7 @@ PlayerController::PlayerController( qt_intf_t *_p_intf )
 {
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper(this);
-    connect( menusAudioMapper, QOverload<const QString &>::of(&QSignalMapper::mappedString),
+    connect( menusAudioMapper, QSIGNALMAPPER_MAPPEDSTR_SIGNAL,
              this, &PlayerController::menusUpdateAudio );
     connect( &d_ptr->m_position_timer, &QTimer::timeout, this, &PlayerController::updatePositionFromTimer );
     connect( &d_ptr->m_time_timer, &QTimer::timeout, this, &PlayerController::updateTimeFromTimer );
