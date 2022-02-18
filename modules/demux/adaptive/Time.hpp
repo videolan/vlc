@@ -121,7 +121,7 @@ class SynchronizationReferences
                 if(r.first == seq)
                 {
                     /* update reference when the timestamps are really old to prevent false roll */
-                    constexpr vlc_tick_t quarterroll = (INT64_C(0x1FFFFFFFF) * 100 / 9) >> 2;
+                    constexpr mtime_t quarterroll = (INT64_C(0x1FFFFFFFF) * 100 / 9) >> 2;
                     if(t.continuous - r.second.continuous > quarterroll)
                         r.second = t;
                     return;
