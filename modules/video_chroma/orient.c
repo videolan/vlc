@@ -281,36 +281,37 @@ static int Open(filter_t *filter)
     if (chroma == NULL)
         return VLC_ENOTSUP;
 
-    filter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(filter), sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    const transform_description_t *const dsc = &descriptions[transform];
-
-    sys->transform = transform;
-
-    switch (chroma->pixel_size) {
-        case 1:
-            sys->plane[0] = dsc->plane8;
-            break;
-        case 2:
-            sys->plane[0] = dsc->plane16;
-            break;
-        case 4:
-            sys->plane[0] = dsc->plane32;
-            break;
-        default:
-            return VLC_ENOTSUP;
-    }
-
-    for (unsigned i = 1; i < PICTURE_PLANE_MAX; i++)
-        sys->plane[i] = sys->plane[0];
-
     if (ORIENT_IS_SWAP(transform)) /* Cannot transform non-square samples */
         for (unsigned i = 0; i < chroma->plane_count; i++)
             if (chroma->p[i].w.num * chroma->p[i].h.den
              != chroma->p[i].h.num * chroma->p[i].w.den)
                 return VLC_ENOTSUP;
+
+    const transform_description_t *const dsc = &descriptions[transform];
+    plane_transform_cb plane;
+
+    switch (chroma->pixel_size) {
+        case 1:
+            plane = dsc->plane8;
+            break;
+        case 2:
+            plane = dsc->plane16;
+            break;
+        case 4:
+            plane = dsc->plane32;
+            break;
+        default:
+            return VLC_ENOTSUP;
+    }
+
+    filter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(filter), sizeof(*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    sys->transform = transform;
+
+    for (unsigned i = 0; i < ARRAY_SIZE(sys->plane); i++)
+        sys->plane[i] = plane;
 
     /* Deal with weird packed formats */
     switch (src->i_chroma) {
