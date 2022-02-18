@@ -98,6 +98,11 @@ typedef struct
         } latch;
         vlc_sem_t configured;
     } wm;
+    struct
+    {
+        unsigned width;
+        unsigned height;
+    } bounds;
 
     struct output_list *outputs;
     struct wl_list seats;
@@ -177,8 +182,25 @@ static void ReportSize(vlc_window_t *wnd, void *data)
     vout_window_sys_t *sys = wnd->sys;
     /* Zero wm.width or zero wm.height means the client should choose.
      * DO NOT REPORT those values to video output... */
-    unsigned width = sys->wm.width ? sys->wm.width : sys->set.width;
-    unsigned height = sys->wm.height ? sys->wm.height : sys->set.height;
+    unsigned width, height;
+
+    if (sys->wm.width != 0 && sys->wm.height != 0)
+    {
+        width = sys->wm.width;
+        height = sys->wm.height;
+    }
+    else if (sys->bounds.width != 0 && sys->bounds.height != 0
+     && (sys->bounds.width < sys->set.width
+      || sys->bounds.height < sys->set.height))
+    {
+        width = sys->bounds.width;
+        height = sys->bounds.height;
+    }
+    else
+    {
+        width = sys->set.width;
+        height = sys->set.height;
+    }
 
     wnd->owner.cbs->resized(wnd, width, height, ResizeAck, data);
 }
@@ -315,10 +337,30 @@ static void xdg_toplevel_close_cb(void *data, struct xdg_toplevel *toplevel)
     (void) toplevel;
 }
 
+#ifdef XDG_TOPLEVEL_CONFIGURE_BOUNDS_SINCE_VERSION
+static void xdg_toplevel_configure_bounds_cb(
+        void *data, struct xdg_toplevel* toplevel,
+        int32_t width, int32_t height
+){
+    // TODO for tiling window managers
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    msg_Dbg(wnd, "window configure bounds: %" PRId32 "x%" PRId32,
+            width, height);
+    (void)toplevel;
+    sys->bounds.width = width;
+    sys->bounds.height = height;
+}
+#endif
+
 static const struct xdg_toplevel_listener xdg_toplevel_cbs =
 {
     xdg_toplevel_configure_cb,
     xdg_toplevel_close_cb,
+#ifdef XDG_TOPLEVEL_CONFIGURE_BOUNDS_SINCE_VERSION
+    xdg_toplevel_configure_bounds_cb,
+#endif
 };
 
 static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
@@ -494,6 +536,13 @@ struct registry_handler
     uint32_t max_version;
 };
 
+
+#ifdef XDG_TOPLEVEL_CONFIGURE_BOUNDS_SINCE_VERSION
+#define VLC_XDG_WM_BASE_VERSION XDG_TOPLEVEL_CONFIGURE_BOUNDS_SINCE_VERSION
+#else
+#define VLC_XDG_WM_BASE_VERSION 1
+#endif
+
 static const struct registry_handler global_handlers[] =
 {
      { "wl_compositor", register_wl_compositor, 2 },
@@ -504,7 +553,7 @@ static const struct registry_handler global_handlers[] =
 #endif
      { "wl_shm", register_wl_shm, 1 },
 #ifdef XDG_SHELL
-     { "xdg_wm_base", register_xdg_wm_base, 1 },
+     { "xdg_wm_base", register_xdg_wm_base, VLC_XDG_WM_BASE_VERSION },
      { "zxdg_decoration_manager_v1", register_xdg_decoration_manager, 1 },
 #endif
 };
@@ -615,6 +664,8 @@ static int Open(vlc_window_t *wnd)
     sys->wm.latch.fullscreen = false;
     sys->set.width = 0;
     sys->set.height = 0;
+    sys->bounds.width = 0;
+    sys->bounds.height = 0;
     sys->outputs = output_list_create(wnd);
     wl_list_init(&sys->seats);
     sys->cursor_theme = NULL;
