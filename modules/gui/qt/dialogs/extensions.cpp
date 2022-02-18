@@ -177,11 +177,11 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
 
     layout = new QGridLayout( this );
     clickMapper = new QSignalMapper( this );
-    CONNECT( clickMapper, mapped( QObject* ), this, TriggerClick( QObject* ) );
+    connect( clickMapper, QSIGNALMAPPER_MAPPEDOBJ_SIGNAL, this, &ExtensionDialog::TriggerClick );
     inputMapper = new QSignalMapper( this );
-    CONNECT( inputMapper, mapped( QObject* ), this, SyncInput( QObject* ) );
+    connect( inputMapper, QSIGNALMAPPER_MAPPEDOBJ_SIGNAL, this, &ExtensionDialog::SyncInput );
     selectMapper = new QSignalMapper( this );
-    CONNECT( selectMapper, mapped( QObject* ), this, SyncSelection(QObject*) );
+    connect( selectMapper, QSIGNALMAPPER_MAPPEDOBJ_SIGNAL, this, &ExtensionDialog::SyncSelection );
 
     UpdateWidgets();
 }

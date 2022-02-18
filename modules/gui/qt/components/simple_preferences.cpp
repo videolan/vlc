@@ -215,7 +215,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
        set focus (keys) when it manages the buttons's exclusivity.
        See QT bugs 131 & 816 and QAbstractButton's source code. */
     QSignalMapper *mapper = new QSignalMapper( layout );
-    CONNECT( mapper, mapped(int), this, switchPanel(int) );
+    connect( mapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, this, &SPrefsCatList::switchPanel );
 
     QPixmap scaled;
 #if HAS_QT56
