@@ -38,9 +38,10 @@ FocusScope {
 
     readonly property int currentIndex: view.currentIndex
 
-    property int     initialIndex: 0
-    property MLItemId initialId
-    property string  initialName
+    // NOTE: We need 'var' for properties altered by StackView.replace().
+    property int    initialIndex: 0
+    property var    initialId
+    property string initialName
 
     // NOTE: Specify an optional header for the view.
     property Component header: undefined

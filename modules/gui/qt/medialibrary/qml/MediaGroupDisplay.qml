@@ -30,9 +30,10 @@ VideoAll {
 
     // Properties
 
-    property int      initialIndex: 0
-    property MLItemId initialId
-    property string   initialTitle
+    // NOTE: We need 'var' for properties altered by StackView.replace().
+    property int    initialIndex: 0
+    property var    initialId
+    property string initialTitle
 
     // Aliases
 
