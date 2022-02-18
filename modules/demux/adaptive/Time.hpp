@@ -114,15 +114,18 @@ using SynchronizationReference = std::pair<uint64_t, Times>;
 class SynchronizationReferences
 {
     public:
-        SynchronizationReferences()
+        SynchronizationReferences() = default;
+        void addReference(uint64_t seq, const Times &t)
         {
-
-        }
-        void addReference(uint64_t seq, Times t)
-        {
-            for(auto t : refs)
-                if(t.first == seq)
+            for(auto &r : refs)
+                if(r.first == seq)
+                {
+                    /* update reference when the timestamps are really old to prevent false roll */
+                    constexpr vlc_tick_t quarterroll = (INT64_C(0x1FFFFFFFF) * 100 / 9) >> 2;
+                    if(t.continuous - r.second.continuous > quarterroll)
+                        r.second = t;
                     return;
+                }
             while(refs.size() > 10)
                 refs.pop_back();
             refs.push_front(SynchronizationReference(seq, t));
