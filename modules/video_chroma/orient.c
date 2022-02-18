@@ -34,6 +34,8 @@
 #include <vlc_mouse.h>
 #include <vlc_picture.h>
 
+#include "orient.h"
+
 #define TRANSFORMS(bits) \
 static void hflip_##bits(void *restrict dst, ptrdiff_t dst_stride, \
                          const void *restrict src, ptrdiff_t src_stride, \
@@ -78,15 +80,7 @@ TRANSFORMS(16)
 TRANSFORMS(32)
 TRANSFORMS(64)
 
-typedef void (*plane_transform_cb)(void *, ptrdiff_t, const void *, ptrdiff_t,
-                                   int, int);
-
-#define MAX_ORDER 3
-
-static const struct {
-    plane_transform_cb hflip[MAX_ORDER + 1];
-    plane_transform_cb transpose[MAX_ORDER + 1];
-} transforms = {
+static const struct plane_transforms transforms = {
     { hflip_8, hflip_16, hflip_32, hflip_64, },
     { transpose_8, transpose_16, transpose_32, transpose_64, },
 };

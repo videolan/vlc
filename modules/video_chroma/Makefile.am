@@ -40,7 +40,7 @@ libyuy2_i422_plugin_la_SOURCES = video_chroma/yuy2_i422.c
 
 libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
 
-liborient_plugin_la_SOURCES = video_chroma/orient.c
+liborient_plugin_la_SOURCES = video_chroma/orient.c video_chroma/orient.h
 
 chroma_LTLIBRARIES = \
 	libi420_rgb_plugin.la \
