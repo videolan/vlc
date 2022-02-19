@@ -1311,14 +1311,12 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
                 PMTEsHasComponentTagBetween( p_dvbpsies, 0x30, 0x37 ) )
             {
                 es_format_Change( p_fmt, SPU_ES, VLC_CODEC_ARIB_A );
-                p_fmt->psz_language = strndup ( "jpn", 3 );
                 p_fmt->psz_description = strdup( _("ARIB subtitles") );
             }
             else if( i_data_component_id == 0x0012 &&
                      PMTEsHasComponentTagBetween( p_dvbpsies, 0x87, 0x88 ) )
             {
                 es_format_Change( p_fmt, SPU_ES, VLC_CODEC_ARIB_C );
-                p_fmt->psz_language = strndup ( "jpn", 3 );
                 p_fmt->psz_description = strdup( _("ARIB subtitles") );
             }
         }
