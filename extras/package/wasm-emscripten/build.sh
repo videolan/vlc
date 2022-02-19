@@ -125,7 +125,7 @@ diagnostic "vlc contribs: bootstrap"
             --disable-orc --disable-protobuf --disable-sidplay2 \
             --disable-soxr --disable-spatialaudio --disable-speex \
             --disable-speexdsp --disable-taglib --disable-zvbi \
-            --disable-rnnoise \
+            --disable-rnnoise --disable-libaribcaption \
             --host=wasm32-unknown-emscripten
 
 diagnostic "vlc contribs: make"
