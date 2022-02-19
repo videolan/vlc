@@ -1710,20 +1710,15 @@ bool libvlc_media_player_can_pause(libvlc_media_player_t *p_mi)
 
 bool libvlc_media_player_program_scrambled(libvlc_media_player_t *p_mi)
 {
+    const struct vlc_player_program *program;
     bool b_program_scrambled = false;
 
     vlc_player_t *player = p_mi->player;
     vlc_player_Lock(player);
-
-    const struct vlc_player_program *program =
-        vlc_player_GetSelectedProgram(player);
-    if (!program)
-        goto end;
-
-    b_program_scrambled = program->scrambled;
-
+    program = vlc_player_GetSelectedProgram(player);
+    if (program != NULL)
+        b_program_scrambled = program->scrambled;
     vlc_player_Unlock(player);
-end:
     return b_program_scrambled;
 }
 
