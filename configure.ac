@@ -3018,6 +3018,11 @@ AS_IF( [test "${enable_telx}" != "no" ],[
 AM_CONDITIONAL([HAVE_TELX], [test "x${have_telx}" = x"yes"])
 
 dnl
+dnl ARIB caption rendering module
+dnl
+PKG_ENABLE_MODULES_VLC([ARIBCAPTION], [], [libaribcaption], [ARIB caption decoder/renderer], [auto])
+
+dnl
 dnl ARIB subtitles rendering module
 dnl
 AC_ARG_ENABLE([aribsub],
