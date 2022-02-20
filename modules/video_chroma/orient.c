@@ -186,7 +186,7 @@ static const transform_description_t descriptions[] = {
 typedef struct
 {
     video_transform_t transform;
-    transform_description_t plane[PICTURE_PLANE_MAX];
+    transform_description_t plane;
     unsigned char plane_size_order[PICTURE_PLANE_MAX];
 } filter_sys_t;
 
@@ -197,11 +197,10 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
 
     if (likely(dst != NULL)) {
         for (int i = 0; i < src->i_planes; i++)
-            (sys->plane[i])(dst->p[i].p_pixels, dst->p[i].i_pitch,
-                            src->p[i].p_pixels, src->p[i].i_pitch,
-                            src->p[i].i_visible_pitch / src->p[i].i_pixel_pitch,
-                            src->p[i].i_visible_lines,
-                            sys->plane_size_order[i]);
+            sys->plane(dst->p[i].p_pixels, dst->p[i].i_pitch,
+                       src->p[i].p_pixels, src->p[i].i_pitch,
+                       src->p[i].i_visible_pitch / src->p[i].i_pixel_pitch,
+                       src->p[i].i_visible_lines, sys->plane_size_order[i]);
 
         picture_CopyProperties(dst, src);
     }
@@ -301,9 +300,6 @@ static int Open(filter_t *filter)
              != chroma->p[i].h.num * chroma->p[i].w.den)
                 return VLC_ENOTSUP;
 
-    const transform_description_t *const dsc = &descriptions[transform];
-    transform_description_t plane = *dsc;
-
     switch (chroma->pixel_size) {
         case 1:
             break;
@@ -322,10 +318,7 @@ static int Open(filter_t *filter)
     int order = vlc_ctz(chroma->pixel_size);
 
     sys->transform = transform;
-
-    for (unsigned i = 0; i < ARRAY_SIZE(sys->plane); i++)
-        sys->plane[i] = plane;
-
+    sys->plane = descriptions[transform];
     memset(sys->plane_size_order, order, sizeof (sys->plane_size_order));
 
     /* Deal with weird packed formats */
