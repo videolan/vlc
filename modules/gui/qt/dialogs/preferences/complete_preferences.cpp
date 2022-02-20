@@ -323,33 +323,16 @@ bool PrefsTree::filterItems( PrefsTreeItem *item, const QString &text,
     bool filtered = sub_filtered && !item->contains( text, cs );
     if ( b_show_only_loaded && sub_filtered && !item->module_is_loaded )
         filtered = true;
-    item->setExpanded( !sub_filtered );
     item->setHidden( filtered );
 
     return filtered;
 }
 
-/* collapse item if it's not selected or one of its sub items
- * returns whether the item was collapsed */
-bool PrefsTree::collapseUnselectedItems( PrefsTreeItem *item )
+void PrefsTree::unfilterItems( PrefsTreeItem *item )
 {
-    bool sub_collapsed = true;
-
-    for( int i = 0; i < item->childCount(); i++ )
-    {
-        PrefsTreeItem *sub_item = item->child( i );
-        if ( !collapseUnselectedItems( sub_item ) )
-        {
-            /* not all the sub items were collapsed */
-            sub_collapsed = false;
-        }
-    }
-
-    bool collapsed = sub_collapsed && !item->isSelected();
-    item->setExpanded( !sub_collapsed );
     item->setHidden( false );
-
-    return collapsed;
+    for( int i = 0; i < item->childCount(); i++ )
+        unfilterItems( item->child( i ) );
 }
 
 static void populateLoadedSet( QSet<QString> *loaded, vlc_object_t *p_node )
@@ -424,13 +407,9 @@ void PrefsTree::filter( const QString &text )
     {
         PrefsTreeItem *cat_item = topLevelItem( i );
         if ( clear_filter )
-        {
-            collapseUnselectedItems( cat_item );
-        }
+            unfilterItems( cat_item );
         else
-        {
             filterItems( cat_item, text, Qt::CaseInsensitive );
-        }
     }
 }
 

@@ -106,7 +106,7 @@ private:
     QTreeWidgetItem *findCatItem( enum vlc_config_cat cat );
     QTreeWidgetItem *findSubcatItem( enum vlc_config_subcat subcat );
     bool filterItems( PrefsTreeItem *item, const QString &text, Qt::CaseSensitivity cs );
-    bool collapseUnselectedItems( PrefsTreeItem *item );
+    void unfilterItems( PrefsTreeItem *item );
     void updateLoadedStatus( PrefsTreeItem *item , QSet<QString> *loaded );
     qt_intf_t *p_intf;
     module_t *main_module;
