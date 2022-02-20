@@ -734,6 +734,7 @@ dnl Check for non-standard system calls
 case "$SYS" in
   "linux")
     AC_CHECK_FUNCS([eventfd vmsplice sched_getaffinity recvmmsg memfd_create])
+    AC_REPLACE_FUNCS([getauxval])
     ;;
   "mingw32")
     AC_CHECK_FUNCS([_lock_file])

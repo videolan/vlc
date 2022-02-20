@@ -503,6 +503,11 @@ void *lfind( const void *key, const void *base, size_t *nmemb,
 void tdestroy( void *root, void (*free_node)(void *nodep) );
 #endif
 
+/* sys/auxv.h */
+#ifndef HAVE_GETAUXVAL
+unsigned long getauxval(unsigned long);
+#endif
+
 /* Random numbers */
 #ifndef HAVE_NRAND48
 double erand48 (unsigned short subi[3]);
