@@ -33,8 +33,28 @@
 #include <vlc_common.h>
 #include <vlc_cpu.h>
 
+#if defined (__aarch64__)
+unsigned vlc_CPU_raw(void)
+{
+    unsigned int flags = 0;
+    const unsigned long hwcap = getauxval(AT_HWCAP);
+    //const unsigned long hwcap2 = getauxval(AT_HWCAP2); // TODO: SVE2
+
+    /* HWCAP_FP (HAVE_FPU) is statically assumed. */
+# ifdef HWCAP_ASIMD
+    if (hwcap & HWCAP_ASIMD)
+        flags |= VLC_CPU_ARM_NEON;
+# endif
+# ifdef HWCAP_SVE
+    if (hwcap & HWCAP_SVE)
+        flags |= VLC_CPU_ARM_SVE;
+# endif
+    return flags;
+}
+
+#else
 #undef CPU_FLAGS
-#if defined (__arm__) || defined (__aarch64__)
+#if defined (__arm__)
 # define CPU_FLAGS "Features"
 
 #elif defined (__i386__) || defined (__x86_64__)
@@ -140,13 +160,9 @@ unsigned vlc_CPU_raw(void)
 #else
         while ((cap = strsep (&p, " ")) != NULL)
         {
-#if defined (__arm__) || defined (__aarch64__)
+#if defined (__arm__)
             if (!strcmp (cap, "neon"))
                 core_caps |= VLC_CPU_ARM_NEON;
-# if defined (__aarch64__)
-            if (!strcmp (cap, "sve"))
-                core_caps |= VLC_CPU_ARM_SVE;
-# endif
 
 #elif defined (__i386__) || defined (__x86_64__)
             if (!strcmp (cap, "mmx"))
@@ -194,4 +210,5 @@ unsigned vlc_CPU_raw(void)
 
     return all_caps;
 }
+#endif
 #endif
