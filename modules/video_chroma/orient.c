@@ -173,16 +173,14 @@ static void antitranspose(void *restrict dst, ptrdiff_t dst_stride,
 typedef void (*transform_description_t)(void *, ptrdiff_t, const void *,
                                         ptrdiff_t, int, int, int);
 
-#define DESC(g) g
-
 static const transform_description_t descriptions[] = {
-    [TRANSFORM_R90] =            DESC(r90),
-    [TRANSFORM_R180] =           DESC(r180),
-    [TRANSFORM_R270] =           DESC(r270),
-    [TRANSFORM_HFLIP] =          DESC(hflip),
-    [TRANSFORM_VFLIP] =          DESC(vflip),
-    [TRANSFORM_TRANSPOSE] =      DESC(transpose),
-    [TRANSFORM_ANTI_TRANSPOSE] = DESC(antitranspose),
+    [TRANSFORM_R90] =            r90,
+    [TRANSFORM_R180] =           r180,
+    [TRANSFORM_R270] =           r270,
+    [TRANSFORM_HFLIP] =          hflip,
+    [TRANSFORM_VFLIP] =          vflip,
+    [TRANSFORM_TRANSPOSE] =      transpose,
+    [TRANSFORM_ANTI_TRANSPOSE] = antitranspose,
 };
 
 typedef struct
