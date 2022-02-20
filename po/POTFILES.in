@@ -1283,7 +1283,6 @@ modules/video_chroma/i420_yuy2.h
 modules/video_chroma/i422_i420.c
 modules/video_chroma/i422_yuy2.c
 modules/video_chroma/i422_yuy2.h
-modules/video_chroma/omxdl.c
 modules/video_chroma/rv32.c
 modules/video_chroma/swscale.c
 modules/video_chroma/yuvp.c
