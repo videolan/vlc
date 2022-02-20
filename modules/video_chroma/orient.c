@@ -302,9 +302,7 @@ static int Open(filter_t *filter)
 
     switch (chroma->pixel_size) {
         case 1:
-            break;
         case 2:
-            break;
         case 4:
             break;
         default:
