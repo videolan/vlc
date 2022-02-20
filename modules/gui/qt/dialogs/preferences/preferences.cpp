@@ -166,10 +166,12 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     main_layout->setRowStretch( 2, 4 );
     main_layout->setMargin( 9 );
 
-    if( var_InheritBool( p_intf, "qt-advanced-pref" ) )
-        setAdvanced();
-    else
-        setSimple();
+    switch( var_InheritInteger( p_intf, "qt-initial-prefs-view" ) )
+    {
+        case 2:  setExpert();   break;
+        case 1:  setAdvanced(); break;
+        default: setSimple();   break;
+    }
 
     BUTTONACT( save, &PrefsDialog::save );
     BUTTONACT( cancel, &PrefsDialog::cancel );

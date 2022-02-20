@@ -116,10 +116,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADVANCED_PREFS_TEXT N_( "Show advanced preferences over simple ones" )
-#define ADVANCED_PREFS_LONGTEXT N_( "Show advanced preferences and not simple "\
-                                    "preferences when opening the preferences "\
-                                    "dialog." )
+#define INITIAL_PREFS_VIEW_TEXT N_( "Select the initial preferences view" )
+#define INITIAL_PREFS_VIEW_LONGTEXT N_( "Select which preferences view to show upon "\
+                                        "opening the preferences dialog." )
 
 #define SYSTRAY_TEXT N_( "Systray icon" )
 #define SYSTRAY_LONGTEXT N_( "Show an icon in the systray " \
@@ -249,6 +248,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define SMOOTH_SCROLLING_TEXT N_( "Use smooth scrolling in Flickable based views" )
 #define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Playqueue)" )
 
+static const int initial_prefs_view_list[] = { 0, 1, 2 };
+static const char *const initial_prefs_view_list_texts[] =
+    { N_("Simple"), N_("Advanced"), N_("Expert") };
+
 static const int i_notification_list[] =
     { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
 
@@ -374,8 +377,10 @@ vlc_module_begin ()
                nullptr )
 
 
-    add_bool( "qt-advanced-pref", false, ADVANCED_PREFS_TEXT,
-              ADVANCED_PREFS_LONGTEXT )
+    add_obsolete_bool( "qt-advanced-pref" ) /* since 4.0.0 */
+    add_integer( "qt-initial-prefs-view", 0, INITIAL_PREFS_VIEW_TEXT, INITIAL_PREFS_VIEW_LONGTEXT )
+        change_integer_range( 0, 2 )
+        change_integer_list( initial_prefs_view_list, initial_prefs_view_list_texts )
     add_bool( "qt-error-dialogs", true, ERROR_TEXT,
               nullptr )
 
