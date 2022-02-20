@@ -1,5 +1,5 @@
 # libiconv
-LIBICONV_VERSION := 1.15
+LIBICONV_VERSION := 1.16
 LIBICONV_URL := $(GNU)/libiconv/libiconv-$(LIBICONV_VERSION).tar.gz
 
 PKGS += iconv
@@ -24,9 +24,6 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(UNPACK)
 	$(APPLY) $(SRC)/iconv/win32.patch
 	$(APPLY) $(SRC)/iconv/bins.patch
-ifdef HAVE_WIN64
-	$(APPLY) $(SRC)/iconv/libiconv-win64.patch
-endif
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub libcharset/build-aux
 	$(MOVE)
