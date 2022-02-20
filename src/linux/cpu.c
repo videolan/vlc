@@ -52,12 +52,27 @@ unsigned vlc_CPU_raw(void)
     return flags;
 }
 
+#elif defined (__arm__)
+/* On AArch32, glibc's <bits/hwcap.h> uses different HWCAP names than the
+ * kernel and other libc's. Include the kernel header manually. */
+# include <asm/hwcap.h>
+
+unsigned vlc_CPU_raw(void)
+{
+    unsigned int flags = 0;
+    const unsigned long hwcap = getauxval(AT_HWCAP);
+
+    /* TLS implies ARMv6, Thumb-EE and VFP imply ARMv7 */
+    if (hwcap & (HWCAP_TLS|HWCAP_THUMBEE|HWCAP_VFP))
+        flags |= VLC_CPU_ARMv6; /* SIMD */
+    if (hwcap & HWCAP_NEON)
+        flags |= VLC_CPU_ARM_NEON; /* Advanced SIMD */
+    return flags;
+}
+
 #else
 #undef CPU_FLAGS
-#if defined (__arm__)
-# define CPU_FLAGS "Features"
-
-#elif defined (__i386__) || defined (__x86_64__)
+#if defined (__i386__) || defined (__x86_64__)
 # define CPU_FLAGS "flags"
 
 #elif defined (__powerpc__) || defined (__powerpc64__)
@@ -141,11 +156,6 @@ unsigned vlc_CPU_raw(void)
         char *p, *cap;
         uint_fast32_t core_caps = 0;
 
-#if defined (__arm__)
-        unsigned ver;
-        if (sscanf (line, "Processor\t: ARMv%u", &ver) >= 1 && ver >= 6)
-            core_caps |= VLC_CPU_ARMv6;
-#endif
         if (strncmp (line, CPU_FLAGS, strlen (CPU_FLAGS)))
             continue;
 
@@ -160,11 +170,7 @@ unsigned vlc_CPU_raw(void)
 #else
         while ((cap = strsep (&p, " ")) != NULL)
         {
-#if defined (__arm__)
-            if (!strcmp (cap, "neon"))
-                core_caps |= VLC_CPU_ARM_NEON;
-
-#elif defined (__i386__) || defined (__x86_64__)
+#if defined (__i386__) || defined (__x86_64__)
             if (!strcmp (cap, "mmx"))
                 core_caps |= VLC_CPU_MMX;
             if (!strcmp (cap, "sse"))
