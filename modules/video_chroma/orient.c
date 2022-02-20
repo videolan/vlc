@@ -55,24 +55,6 @@ static void hflip_##bits(void *restrict dst, ptrdiff_t dst_stride, \
     } \
 } \
 \
-static void vflip_##bits(void *restrict dst, ptrdiff_t dst_stride, \
-                         const void *restrict src, ptrdiff_t src_stride, \
-                         int width, int height) \
-{ \
-    vflip(dst, dst_stride, src, src_stride, width, height, ctz(bits / 8)); \
-} \
-\
-static void r180_##bits(void *restrict dst, ptrdiff_t dst_stride, \
-                        const void *restrict src, ptrdiff_t src_stride, \
-                        int width, int height) \
-{ \
-    const unsigned char *src_pixels = src; \
-\
-    src_pixels += (height - 1) * src_stride; \
-    src_stride *= -1; \
-    hflip_##bits(dst, dst_stride, src_pixels, src_stride, width, height); \
-} \
-\
 static void transpose_##bits(void *restrict dst, ptrdiff_t dst_stride, \
                              const void *restrict src, ptrdiff_t src_stride, \
                              int src_width, int src_height) \
@@ -89,43 +71,30 @@ static void transpose_##bits(void *restrict dst, ptrdiff_t dst_stride, \
         src_pixels += src_stride; \
         dst_pixels++; \
     } \
-} \
-\
-static void r270_##bits(void *restrict dst, ptrdiff_t dst_stride, \
-                        const void *restrict src, ptrdiff_t src_stride, \
-                        int src_width, int src_height) \
-{ \
-    unsigned char *dst_pixels = dst; \
-\
-    dst_pixels += (src_width - 1) * dst_stride; \
-    dst_stride *= -1; \
-    transpose_##bits(dst_pixels, dst_stride, src, src_stride, \
-                     src_width, src_height); \
-} \
-\
-static void r90_##bits(void *restrict dst, ptrdiff_t dst_stride, \
-                       const void *restrict src, ptrdiff_t src_stride, \
-                       int src_width, int src_height) \
-{ \
-    const unsigned char *src_pixels = src; \
-\
-    src_pixels += (src_height - 1) * src_stride; \
-    src_stride *= -1; \
-    transpose_##bits(dst, dst_stride, src_pixels, src_stride, \
-                     src_width, src_height); \
-} \
-\
-static void antitranspose_##bits(void *restrict dst, ptrdiff_t dst_stride, \
-                                 const void *restrict src, \
-                                 ptrdiff_t src_stride, \
-                                 int src_width, int src_height) \
-{ \
-    const unsigned char *src_pixels = src; \
-\
-    src_pixels += (src_height - 1) * src_stride; \
-    src_stride *= -1; \
-    r270_##bits(dst, dst_stride, src_pixels, src_stride, \
-                src_width, src_height);\
+}
+
+TRANSFORMS(8)
+TRANSFORMS(16)
+TRANSFORMS(32)
+
+typedef void (*plane_transform_cb)(void *, ptrdiff_t, const void *, ptrdiff_t,
+                                   int, int);
+
+#define MAX_ORDER 2
+
+static const struct {
+    plane_transform_cb hflip[MAX_ORDER + 1];
+    plane_transform_cb transpose[MAX_ORDER + 1];
+} transforms = {
+    { hflip_8, hflip_16, hflip_32, },
+    { transpose_8, transpose_16, transpose_32, },
+};
+
+static void hflip(void *restrict dst, ptrdiff_t dst_stride,
+                  const void *restrict src, ptrdiff_t src_stride,
+                  int width, int height, int order)
+{
+    transforms.hflip[order](dst, dst_stride, src, src_stride, width, height);
 }
 
 static void vflip(void *restrict dst, ptrdiff_t dst_stride,
@@ -145,21 +114,66 @@ static void vflip(void *restrict dst, ptrdiff_t dst_stride,
     }
 }
 
-TRANSFORMS(8)
-TRANSFORMS(16)
-TRANSFORMS(32)
+static void r180(void *restrict dst, ptrdiff_t dst_stride,
+                 const void *restrict src, ptrdiff_t src_stride,
+                 int width, int height, int order)
+{
+    const unsigned char *src_pixels = src;
 
-typedef void (*plane_transform_cb)(void *, ptrdiff_t, const void *, ptrdiff_t,
-                                   int, int);
+    src_pixels += (height - 1) * src_stride;
+    src_stride *= -1;
+    hflip(dst, dst_stride, src_pixels, src_stride, width, height, order);
+}
 
-typedef struct {
-    plane_transform_cb plane8;
-    plane_transform_cb plane16;
-    plane_transform_cb plane32;
-} transform_description_t;
+static void transpose(void *restrict dst, ptrdiff_t dst_stride,
+                      const void *restrict src, ptrdiff_t src_stride,
+                      int src_width, int src_height, int order)
+{
+    transforms.transpose[order](dst, dst_stride, src, src_stride,
+                                src_width, src_height);
+}
 
-#define DESC(g) \
-    { g##_8, g##_16, g##_32, }
+static void r270(void *restrict dst, ptrdiff_t dst_stride,
+                 const void *restrict src, ptrdiff_t src_stride,
+                 int src_width, int src_height, int order)
+{
+    unsigned char *dst_pixels = dst;
+
+    dst_pixels += (src_width - 1) * dst_stride;
+    dst_stride *= -1;
+    transpose(dst_pixels, dst_stride, src, src_stride, src_width, src_height,
+              order);
+}
+
+static void r90(void *restrict dst, ptrdiff_t dst_stride,
+                const void *restrict src, ptrdiff_t src_stride,
+                int src_width, int src_height, int order)
+{
+    const unsigned char *src_pixels = src;
+
+    src_pixels += (src_height - 1) * src_stride;
+    src_stride *= -1;
+    transpose(dst, dst_stride, src_pixels, src_stride, src_width, src_height,
+              order);
+}
+
+static void antitranspose(void *restrict dst, ptrdiff_t dst_stride,
+                          const void *restrict src,
+                          ptrdiff_t src_stride,
+                          int src_width, int src_height, int order)
+{
+    const unsigned char *src_pixels = src;
+
+    src_pixels += (src_height - 1) * src_stride;
+    src_stride *= -1;
+    r270(dst, dst_stride, src_pixels, src_stride, src_width, src_height,
+         order);
+}
+
+typedef void (*transform_description_t)(void *, ptrdiff_t, const void *,
+                                        ptrdiff_t, int, int, int);
+
+#define DESC(g) g
 
 static const transform_description_t descriptions[] = {
     [TRANSFORM_R90] =            DESC(r90),
@@ -174,7 +188,7 @@ static const transform_description_t descriptions[] = {
 typedef struct
 {
     video_transform_t transform;
-    plane_transform_cb plane[PICTURE_PLANE_MAX];
+    transform_description_t plane[PICTURE_PLANE_MAX];
     unsigned char plane_size_order[PICTURE_PLANE_MAX];
 } filter_sys_t;
 
@@ -188,7 +202,8 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
             (sys->plane[i])(dst->p[i].p_pixels, dst->p[i].i_pitch,
                             src->p[i].p_pixels, src->p[i].i_pitch,
                             src->p[i].i_visible_pitch / src->p[i].i_pixel_pitch,
-                            src->p[i].i_visible_lines);
+                            src->p[i].i_visible_lines,
+                            sys->plane_size_order[i]);
 
         picture_CopyProperties(dst, src);
     }
@@ -289,17 +304,14 @@ static int Open(filter_t *filter)
                 return VLC_ENOTSUP;
 
     const transform_description_t *const dsc = &descriptions[transform];
-    plane_transform_cb plane;
+    transform_description_t plane = *dsc;
 
     switch (chroma->pixel_size) {
         case 1:
-            plane = dsc->plane8;
             break;
         case 2:
-            plane = dsc->plane16;
             break;
         case 4:
-            plane = dsc->plane32;
             break;
         default:
             return VLC_ENOTSUP;
@@ -323,7 +335,6 @@ static int Open(filter_t *filter)
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
             /* Double-size samples on second plane */
-            sys->plane[1] = dsc->plane16;
             sys->plane_size_order[1]++;
             break;
     }
