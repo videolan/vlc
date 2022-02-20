@@ -24,6 +24,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef HAVE_SYS_AUXV_H
+# include <sys/auxv.h>
+#endif
+#ifndef AT_HWCAP /* ancient libc, fallback to kernel header */
+# include <linux/auxvec.h>
+#endif
 #include <vlc_common.h>
 #include <vlc_cpu.h>
 
