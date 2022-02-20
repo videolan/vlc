@@ -1,0 +1,128 @@
+diff --git a/Makefile.am b/Makefile.am
+index 815e3c7..e897de7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -19,7 +19,7 @@
+ AUTOMAKE_OPTIONS = 1.5 gnu no-dependencies
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = gnulib-local gettext-runtime libtextstyle gettext-tools
++SUBDIRS = gnulib-local gettext-runtime gettext-tools
+ 
+ changelog_etc = \
+   gettext-runtime/ChangeLog.0 \
+@@ -123,7 +123,6 @@ distcheck-hook:
+ 	test "`sed 1,16d $(srcdir)/gettext-runtime/intl/xsize.h | md5sum`" = "`sed 1,16d $(srcdir)/gettext-tools/gnulib-lib/xsize.h | md5sum`"
+ 	cmp -s $(srcdir)/gettext-runtime/man/help2man $(srcdir)/gettext-tools/man/help2man
+ 	cmp -s $(srcdir)/gettext-runtime/man/x-to-1.in $(srcdir)/gettext-tools/man/x-to-1.in
+-	cmp -s $(srcdir)/libtextstyle/m4/libtextstyle.m4 $(srcdir)/gettext-tools/gnulib-m4/libtextstyle.m4
+ 	cmp -s $(srcdir)/gettext-tools/examples/hello-java-awt/m4/TestAWT.java $(srcdir)/gettext-tools/examples/hello-java-swing/m4/TestAWT.java
+ 	cmp -s $(srcdir)/gettext-tools/examples/hello-java-awt/m4/TestAWT.class $(srcdir)/gettext-tools/examples/hello-java-swing/m4/TestAWT.class
+ 	test "`sed 1,15d $(srcdir)/gnulib-local/lib/alloca.in.h | md5sum`" = "`sed 1,15d $(srcdir)/gettext-runtime/libasprintf/alloca.in.h | md5sum`"
+diff --git a/configure.ac b/configure.ac
+index 49689fb..2d23b44 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -37,7 +37,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
+ 
+ dnl Checks for library functions.
+ 
+-AC_CONFIG_SUBDIRS([gettext-runtime libtextstyle gettext-tools])
++AC_CONFIG_SUBDIRS([gettext-runtime gettext-tools])
+ 
+ AM_EXTRA_RECURSIVE_TARGETS([maintainer-update-po])
+ 
+@@ -49,7 +49,7 @@ AC_CANONICAL_HOST
+ dnl Optional Features: AC_ARG_ENABLE calls
+ dnl Optional Packages: AC_ARG_WITH calls
+ dnl Some influential environment variables: AC_ARG_VAR calls
+-esyscmd([{ cd gettext-runtime && autoconf --trace=AC_ARG_ENABLE:'$n([$1],[$2])' --trace=AC_ARG_WITH:'$n([$1],[$2])' --trace=AC_ARG_VAR:'$n($@)' && cd ..; cd libtextstyle && autoconf --trace=AC_ARG_ENABLE:'$n([$1],[$2])' --trace=AC_ARG_WITH:'$n([$1],[$2])' --trace=AC_ARG_VAR:'$n($@)' && cd ..; { cd gettext-tools && autoconf --trace=AC_ARG_ENABLE:'$n([$1],[$2])' --trace=AC_ARG_WITH:'$n([$1],[$2])' --trace=AC_ARG_VAR:'$n($@)' && cd ..; } | grep -v installed.libtextstyle | grep -v installed.csharp | grep -v 'installed C#'; } | sed -f build-aux/ac-help.sed ])
++esyscmd([{ cd gettext-runtime && autoconf --trace=AC_ARG_ENABLE:'$n([$1],[$2])' --trace=AC_ARG_WITH:'$n([$1],[$2])' --trace=AC_ARG_VAR:'$n($@)' && cd ..; { cd gettext-tools && autoconf --trace=AC_ARG_ENABLE:'$n([$1],[$2])' --trace=AC_ARG_WITH:'$n([$1],[$2])' --trace=AC_ARG_VAR:'$n($@)' && cd ..; } | grep -v installed.csharp | grep -v 'installed C#'; } | sed -f build-aux/ac-help.sed ])
+ 
+ AC_CONFIG_FILES([Makefile])
+ 
+diff --git a/gettext-tools/Makefile.am b/gettext-tools/Makefile.am
+index 449a797..c5719c2 100644
+--- a/gettext-tools/Makefile.am
++++ b/gettext-tools/Makefile.am
+@@ -19,7 +19,7 @@
+ AUTOMAKE_OPTIONS = 1.5 gnu no-dependencies
+ ACLOCAL_AMFLAGS = -I m4 -I ../gettext-runtime/m4 -I ../m4 -I gnulib-m4 -I libgrep/gnulib-m4 -I libgettextpo/gnulib-m4
+ 
+-SUBDIRS = intl gnulib-lib libgrep src libgettextpo po its projects styles emacs misc man m4 tests system-tests gnulib-tests examples doc
++SUBDIRS = intl gnulib-lib libgrep libgettextpo src po its projects styles emacs misc man m4 tests system-tests gnulib-tests examples doc
+ 
+ EXTRA_DIST = misc/DISCLAIM
+ MOSTLYCLEANFILES = core *.stackdump
+diff --git a/gettext-tools/libgettextpo/textstyle.in.h b/gettext-tools/libgettextpo/textstyle.in.h
+index 536b51b..585ce66 100644
+--- a/gettext-tools/libgettextpo/textstyle.in.h
++++ b/gettext-tools/libgettextpo/textstyle.in.h
+@@ -213,7 +213,8 @@ typedef ostream_t file_ostream_t;
+ static inline file_ostream_t
+ file_ostream_create (FILE *fp)
+ {
+-  return fp;
++  /* Closing the stream we return should not close 'fp'.  */
++  return fdopen (dup (fileno (fp)), "w");
+ }
+ 
+ /* --------------------------- From fd-ostream.h --------------------------- */
+@@ -413,6 +414,30 @@ html_styled_ostream_create (ostream_t destination _GL_UNUSED,
+   return NULL;
+ }
+ 
++/* ----------------------- From noop-styled-ostream.h ----------------------- */
++
++/* noop_styled_ostream_t is a subtype of ostream_t.  */
++typedef ostream_t noop_styled_ostream_t;
++
++#define noop_styled_ostream_write_mem ostream_write_mem
++#define noop_styled_ostream_flush ostream_flush
++#define noop_styled_ostream_free ostream_free
++#define noop_styled_ostream_begin_use_class styled_ostream_begin_use_class
++#define noop_styled_ostream_end_use_class styled_ostream_end_use_class
++#define noop_styled_ostream_get_hyperlink_ref styled_ostream_get_hyperlink_ref
++#define noop_styled_ostream_get_hyperlink_id styled_ostream_get_hyperlink_id
++#define noop_styled_ostream_set_hyperlink styled_ostream_set_hyperlink
++#define noop_styled_ostream_flush_to_current_style styled_ostream_flush_to_current_style
++
++static inline ostream_t
++noop_styled_ostream_create (ostream_t destination, bool pass_ownership)
++{
++  if (pass_ownership)
++    return destination;
++  else
++    return fdopen (dup (fileno (destination)), "w");
++}
++
+ /* ------------------------------ From color.h ------------------------------ */
+ 
+ #define color_test_mode false
+diff --git a/gettext-tools/src/Makefile.am b/gettext-tools/src/Makefile.am
+index 764ffad..eccfbbd 100644
+--- a/gettext-tools/src/Makefile.am
++++ b/gettext-tools/src/Makefile.am
+@@ -292,19 +292,9 @@ cldr_plurals_SOURCES = cldr-plural.y cldr-plural-exp.c cldr-plurals.c
+ cldr_plurals_CFLAGS = $(AM_CFLAGS) $(INCXML)
+ cldr_plurals_LDADD = libgettextsrc.la $(LDADD)
+ 
+-if USE_INSTALLED_LIBTEXTSTYLE
+-LT_LIBTEXTSTYLE = @LTLIBTEXTSTYLE@
+-else
+-# How to get the include files of libtextstyle.
+-textstyle.h textstyle/stdbool.h textstyle/version.h textstyle/woe32dll.h:
+-	here=`pwd`; \
+-	cd ../../libtextstyle/lib && \
+-	  $(MAKE) install-nobase_includeHEADERS install-nobase_nodist_includeHEADERS includedir="$$here"
+-BUILT_SOURCES    += textstyle.h textstyle/stdbool.h textstyle/version.h textstyle/woe32dll.h
+-MOSTLYCLEANFILES += textstyle.h textstyle/stdbool.h textstyle/version.h textstyle/woe32dll.h
+-# Where to find the built libtextstyle library.
+-LT_LIBTEXTSTYLE = ../../libtextstyle/lib/libtextstyle.la
+-endif
++# Use the dummy libtextstyle from gnulib, as libgettextpo does.
++LT_LIBTEXTSTYLE =
++AM_CPPFLAGS += -I../libgettextpo -I$(top_srcdir)/libgettextpo
+ 
+ # How to build libgettextsrc.la.
+ # Need ../gnulib-lib/libgettextlib.la.

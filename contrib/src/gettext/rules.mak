@@ -1,5 +1,5 @@
 # gettext
-GETTEXT_VERSION := 0.19.8.1
+GETTEXT_VERSION := 0.21
 GETTEXT_URL := $(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
 ifndef HAVE_WINSTORE
@@ -17,8 +17,7 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
-	$(APPLY) $(SRC)/gettext/0001-libasprintf-On-mingw-really-use-our-vasprintf-functi.patch
-	$(APPLY) $(SRC)/gettext/0002-libasprintf-Avoid-compilation-error-on-mingw-with-D_.patch
+	$(APPLY) $(SRC)/gettext/gettext-0.21-disable-libtextstyle.patch
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv) libxml2 $(DEPS_libxml2)
@@ -30,16 +29,19 @@ GETTEXT_CONF = \
 	--disable-native-java \
 	--without-emacs \
 	--without-included-libxml
+
 ifdef HAVE_WIN32
 GETTEXT_CONF += --disable-threads
-GETTEXT_CFLAGS += -DLIBXML_STATIC
 endif
 
 .gettext: gettext
+	cd $< && cd gettext-runtime && $(AUTORECONF)
+	cd $< && cd gettext-tools && $(AUTORECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(GETTEXT_CFLAGS)" $(GETTEXT_CONF)
 ifndef HAVE_ANDROID
 	cd $< && $(MAKE) install
 else
+	# Android 32bits does not have localeconv
 	cd $< && $(MAKE) -C gettext-runtime install
 	cd $< && $(MAKE) -C gettext-tools/intl
 	cd $< && $(MAKE) -C gettext-tools/misc install
