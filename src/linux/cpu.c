@@ -70,13 +70,22 @@ unsigned vlc_CPU_raw(void)
     return flags;
 }
 
+#elif defined (__powerpc__) /* both 32- and 64-bit */
+unsigned vlc_CPU_raw(void)
+{
+    const unsigned long hwcap = getauxval(AT_HWCAP);
+    unsigned int flags = 0;
+
+    if (hwcap & PPC_FEATURE_HAS_ALTIVEC)
+        flags |= VLC_CPU_ALTIVEC;
+
+    return flags;
+}
+
 #else
 #undef CPU_FLAGS
 #if defined (__i386__) || defined (__x86_64__)
 # define CPU_FLAGS "flags"
-
-#elif defined (__powerpc__) || defined (__powerpc64__)
-# define CPU_FLAGS "cpu"
 
 #elif defined (__riscv)
 # include <vlc_strings.h>
@@ -197,10 +206,6 @@ unsigned vlc_CPU_raw(void)
                 core_caps |= VLC_CPU_XOP;
             if (!strcmp (cap, "fma4"))
                 core_caps |= VLC_CPU_FMA4;
-
-#elif defined (__powerpc__) || defined (__powerpc64__)
-            if (!strcmp (cap, "altivec supported"))
-                core_caps |= VLC_CPU_ALTIVEC;
 #endif
         }
 #endif
