@@ -96,13 +96,7 @@ unsigned vlc_CPU_raw(void)
     return flags;
 }
 
-#else
-#undef CPU_FLAGS
-#if defined (__i386__) || defined (__x86_64__)
-# define CPU_FLAGS "flags"
-#endif
-
-#ifdef CPU_FLAGS
+#elif defined (__i386__) || defined (__x86_64__)
 unsigned vlc_CPU_raw(void)
 {
     FILE *info = fopen ("/proc/cpuinfo", "rte");
@@ -118,17 +112,16 @@ unsigned vlc_CPU_raw(void)
         char *p, *cap;
         uint_fast32_t core_caps = 0;
 
-        if (strncmp (line, CPU_FLAGS, strlen (CPU_FLAGS)))
+        if (strncmp(line, "flags", 5))
             continue;
 
-        p = line + strlen(CPU_FLAGS);
+        p = line + 5;
         p += strspn(p, "\t");
         if (*p != ':')
             continue;
 
         while ((cap = strsep (&p, " ")) != NULL)
         {
-#if defined (__i386__) || defined (__x86_64__)
             if (!strcmp (cap, "mmx"))
                 core_caps |= VLC_CPU_MMX;
             if (!strcmp (cap, "sse"))
@@ -155,7 +148,6 @@ unsigned vlc_CPU_raw(void)
                 core_caps |= VLC_CPU_XOP;
             if (!strcmp (cap, "fma4"))
                 core_caps |= VLC_CPU_FMA4;
-#endif
         }
 
         /* Take the intersection of capabilities of each processor */
@@ -169,5 +161,4 @@ unsigned vlc_CPU_raw(void)
 
     return all_caps;
 }
-#endif
 #endif
