@@ -175,6 +175,7 @@ typedef struct
 {
     video_transform_t transform;
     plane_transform_cb plane[PICTURE_PLANE_MAX];
+    unsigned char plane_size_order[PICTURE_PLANE_MAX];
 } filter_sys_t;
 
 static picture_t *Filter(filter_t *filter, picture_t *src)
@@ -308,16 +309,22 @@ static int Open(filter_t *filter)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    int order = vlc_ctz(chroma->pixel_size);
+
     sys->transform = transform;
 
     for (unsigned i = 0; i < ARRAY_SIZE(sys->plane); i++)
         sys->plane[i] = plane;
 
+    memset(sys->plane_size_order, order, sizeof (sys->plane_size_order));
+
     /* Deal with weird packed formats */
     switch (src->i_chroma) {
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
+            /* Double-size samples on second plane */
             sys->plane[1] = dsc->plane16;
+            sys->plane_size_order[1]++;
             break;
     }
 
