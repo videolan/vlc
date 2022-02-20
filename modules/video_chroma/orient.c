@@ -34,23 +34,6 @@
 #include <vlc_mouse.h>
 #include <vlc_picture.h>
 
-static void vflip(void *restrict dst, ptrdiff_t dst_stride,
-                  const void *restrict src, ptrdiff_t src_stride,
-                  int width, int height, int order)
-{
-    const unsigned char *src_pixels = src;
-    unsigned char *restrict dst_pixels = dst;
-    size_t visible_pitch = width << order;
-
-    dst_pixels += dst_stride * height;
-
-    for (int y = 0; y < height; y++) {
-        dst_pixels -= dst_stride;
-        memcpy(dst_pixels, src_pixels, visible_pitch);
-        src_pixels += src_stride;
-    }
-}
-
 #define TRANSFORMS(bits) \
 static void hflip_##bits(void *restrict dst, ptrdiff_t dst_stride, \
                          const void *restrict src, ptrdiff_t src_stride, \
@@ -143,6 +126,23 @@ static void antitranspose_##bits(void *restrict dst, ptrdiff_t dst_stride, \
     src_stride *= -1; \
     r270_##bits(dst, dst_stride, src_pixels, src_stride, \
                 src_width, src_height);\
+}
+
+static void vflip(void *restrict dst, ptrdiff_t dst_stride,
+                  const void *restrict src, ptrdiff_t src_stride,
+                  int width, int height, int order)
+{
+    const unsigned char *src_pixels = src;
+    unsigned char *restrict dst_pixels = dst;
+    size_t visible_pitch = width << order;
+
+    dst_pixels += dst_stride * height;
+
+    for (int y = 0; y < height; y++) {
+        dst_pixels -= dst_stride;
+        memcpy(dst_pixels, src_pixels, visible_pitch);
+        src_pixels += src_stride;
+    }
 }
 
 TRANSFORMS(8)
