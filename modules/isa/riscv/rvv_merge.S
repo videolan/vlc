@@ -37,6 +37,7 @@ merge8_rvv:
 	add	a0, a0, t0
 	bnez	a3, 1b
 	ret
+	.size	merge8_rvv, . - merge8_rvv
 
 	.globl	merge16_rvv
 	.type	merge16_rvv, %function
@@ -55,4 +56,5 @@ merge16_rvv:
 	add	a0, a0, t1
 	bnez	a3, 1b
 	ret
+	.size	merge16_rvv, . - merge16_rvv
 
