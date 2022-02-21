@@ -683,9 +683,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         dst_space.primaries = var_InheritInteger(priv->gl, "target-prim");
         dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
+        struct pl_shader_obj *tone_map_state = NULL;
         pl_shader_color_map(sh, &color_params,
                 vlc_placebo_ColorSpace(fmt),
-                dst_space, NULL, false);
+                dst_space, &tone_map_state, false);
 
         struct pl_shader_obj *dither_state = NULL;
         int method = var_InheritInteger(priv->gl, "dither-algo");
@@ -718,6 +719,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         }
 
         const struct pl_shader_res *res = priv->pl_sh_res = pl_shader_finalize(sh);
+        pl_shader_obj_destroy(&tone_map_state);
         pl_shader_obj_destroy(&dither_state);
 
         FREENULL(priv->uloc.pl_vars);
