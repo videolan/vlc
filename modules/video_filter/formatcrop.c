@@ -55,13 +55,6 @@ static const char *const filter_options[] = {
 #define CROPRIGHT_LONGTEXT \
     N_("Number of pixels to crop from the right of the image.")
 
-struct sys {
-    unsigned x;
-    unsigned y;
-    unsigned width;
-    unsigned height;
-};
-
 #define IDX_TOP 0
 #define IDX_LEFT 1
 #define IDX_BOTTOM 2
@@ -88,8 +81,6 @@ static const struct transform transforms[8] = {
 static picture_t *
 Filter(filter_t *filter, picture_t *pic)
 {
-    struct sys *sys = filter->p_sys;
-
     if (!pic)
         return NULL;
 
@@ -101,19 +92,12 @@ Filter(filter_t *filter, picture_t *pic)
     picture_Release(pic);
 
     video_format_t *fmt = &out->format;
-    fmt->i_x_offset = sys->x;
-    fmt->i_y_offset = sys->y;
-    fmt->i_visible_width = sys->width;
-    fmt->i_visible_height = sys->height;
+    fmt->i_x_offset = filter->fmt_out.video.i_x_offset;
+    fmt->i_y_offset = filter->fmt_out.video.i_y_offset;
+    fmt->i_visible_width = filter->fmt_out.video.i_visible_width;
+    fmt->i_visible_height = filter->fmt_out.video.i_visible_height;
 
     return out;
-}
-
-static void
-Close(filter_t *filter)
-{
-    struct sys *sys = filter->p_sys;
-    free(sys);
 }
 
 static int
@@ -154,21 +138,18 @@ Open(filter_t *filter)
         return VLC_EGENERIC;
     }
 
-    struct sys *sys = malloc(sizeof(*sys));
-    if (!sys)
-        return VLC_EGENERIC;
-
-    filter->p_sys = sys;
-
-    sys->x = fmt->i_x_offset + crop_left;
-    sys->y = fmt->i_y_offset + crop_top;
-    sys->width = fmt->i_visible_width - crop_left - crop_right;
-    sys->height = fmt->i_visible_height - crop_top - crop_bottom;
+    filter->fmt_out.video.i_width = fmt->i_width;
+    filter->fmt_out.video.i_height = fmt->i_height;
+    filter->fmt_out.video.i_x_offset = fmt->i_x_offset + crop_left;
+    filter->fmt_out.video.i_y_offset = fmt->i_y_offset + crop_top;
+    filter->fmt_out.video.i_visible_width =
+        fmt->i_visible_width - crop_left - crop_right;
+    filter->fmt_out.video.i_visible_height =
+        fmt->i_visible_height - crop_top - crop_bottom;
 
     static const struct vlc_filter_operations filter_ops =
     {
         .filter_video = Filter,
-        .close = Close,
     };
     filter->ops = &filter_ops;
 
