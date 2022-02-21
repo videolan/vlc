@@ -68,8 +68,6 @@
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
 
-#define HOTKEY_ITEM_HEIGHT 24
-
 QString formatTooltip(const QString & tooltip)
 {
     QString text = tooltip;
@@ -1226,6 +1224,7 @@ KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
     table->headerItem()->setToolTip( GLOBAL_HOTKEY_COL, qtr( "Desktop level hotkey" ) );
     table->setAlternatingRowColors( true );
     table->setSelectionBehavior( QAbstractItemView::SelectItems );
+    table->setStyleSheet( "QTreeView::item { padding: 5px 0; }" );
 
     table->installEventFilter( this );
 
@@ -1332,7 +1331,6 @@ void KeySelectorControl::finish()
     table->resizeColumnToContents( HOTKEY_COL );
 
     table->setUniformRowHeights( true );
-    table->topLevelItem(0)->setSizeHint( 0, QSize( 0, HOTKEY_ITEM_HEIGHT ) );
 
     connect( table, &QTreeWidget::itemActivated,
              this, QOverload<QTreeWidgetItem *, int>::of(&KeySelectorControl::selectKey) );
