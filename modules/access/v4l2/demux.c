@@ -118,7 +118,7 @@ typedef struct
 {
     uint32_t v4l2;
     vlc_fourcc_t vlc;
-    uint8_t bpp; /**< Bytes per pixel (largest plane) */
+    uint8_t bpp; /**< Bytes per pixel (first plane) */
     uint32_t red;
     uint32_t green;
     uint32_t blue;
@@ -143,10 +143,10 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     { V4L2_PIX_FMT_YUV410,  VLC_CODEC_I410, 1, 0, 0, 0 },
 //  { V4L2_PIX_FMT_YVU410     },
 
-//  { V4L2_PIX_FMT_NV24,      },
-//  { V4L2_PIX_FMT_NV42,      },
-//  { V4L2_PIX_FMT_NV16,    VLC_CODEC_NV16, 1, 0, 0, 0 },
-//  { V4L2_PIX_FMT_NV61,    VLC_CODEC_NV61, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV24,    VLC_CODEC_NV24, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV42,    VLC_CODEC_NV42, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV16,    VLC_CODEC_NV16, 1, 0, 0, 0 },
+    { V4L2_PIX_FMT_NV61,    VLC_CODEC_NV61, 1, 0, 0, 0 },
     { V4L2_PIX_FMT_NV12,    VLC_CODEC_NV12, 1, 0, 0, 0 },
     { V4L2_PIX_FMT_NV21,    VLC_CODEC_NV21, 1, 0, 0, 0 },
 
