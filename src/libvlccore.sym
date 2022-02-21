@@ -660,7 +660,6 @@ vlc_object_parent
 vlc_object_get_tracer
 vlc_object_Log
 vlc_object_vaLog
-vlc_once
 vlc_once_begin
 vlc_once_complete
 vlc_rand_bytes

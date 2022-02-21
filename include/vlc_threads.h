@@ -594,17 +594,14 @@ VLC_API void vlc_once_complete(vlc_once_t *restrict once);
  * \param cb callback to execute (the first time)
  * \param opaque data pointer for the callback
  */
-VLC_API void vlc_once(vlc_once_t *restrict once, void (*cb)(void *),
-                      void *opaque);
-
-static inline void vlc_once_inline(vlc_once_t *restrict once,
-                                   void (*cb)(void *), void *opaque)
+static inline void vlc_once(vlc_once_t *restrict once, void (*cb)(void *),
+                            void *opaque)
 {
-    /* Fast path: check if already initialized */
-    if (unlikely(atomic_load_explicit(&once->value, memory_order_acquire) < 3))
-        vlc_once(once, cb, opaque);
+    if (unlikely(!vlc_once_begin(once))) {
+        cb(opaque);
+        vlc_once_complete(once);
+    }
 }
-#define vlc_once(once, cb, opaque) vlc_once_inline(once, cb, opaque)
 #endif
 
 /**
