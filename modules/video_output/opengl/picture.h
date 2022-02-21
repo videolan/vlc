@@ -141,6 +141,6 @@ vlc_gl_picture_ToTexCoords(const struct vlc_gl_picture *pic,
  */
 void
 vlc_gl_picture_ComputeDirectionMatrix(const struct vlc_gl_picture *pic,
-                                      float direction[static 2*2]);
+                                      float direction[2*2]);
 
 #endif
