@@ -844,9 +844,12 @@ module_t **module_list_get (size_t *n)
 
 size_t module_list_cap(module_t *const **restrict list, const char *name)
 {
-    assert(name != NULL);
+    vlc_modcap_t key;
 
-    const void **cp = tfind(&name, &modules.caps_tree, vlc_modcap_cmp);
+    assert(name != NULL);
+    key.name = (char *)name;
+
+    const void **cp = tfind(&key, &modules.caps_tree, vlc_modcap_cmp);
     if (cp == NULL)
     {
         *list = NULL;
