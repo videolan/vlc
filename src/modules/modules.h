@@ -121,13 +121,18 @@ void *vlc_plugin_Symbol(struct vlc_logger *, vlc_plugin_t *, const char *name);
 /**
  * Lists of all VLC modules with a given capability.
  *
- * The list is sorted by decreasing module score.
+ * This functions returns a table of all VLC modules whose capability
+ * matches the supplied capability name. Entries are sorted by decreasing
+ * module score.
  *
- * @param list pointer to the table of modules [OUT]
- * @param name name of capability of modules to look for
- * @return the number of modules in the list (possibly zero)
+ * \note This function cannot fail. It returns zero if, and only if, no
+ * modules match the requested capability inside the module bank.
+ *
+ * @param tab pointer to the table of modules [OUT]
+ * @param name capability nul-terminated string (cannot be NULL)
+ * @return the number of entries in the table
  */
-size_t module_list_cap(module_t *const **, const char *);
+size_t module_list_cap(module_t *const **tab, const char *name);
 
 int vlc_bindtextdomain (const char *);
 
