@@ -1742,16 +1742,6 @@ AS_IF([test "${enable_altivec}" = "yes"], [
     have_altivec="yes"
   ])
   AC_CHECK_HEADERS([altivec.h])
-
-  VLC_SAVE_FLAGS
-  LDFLAGS="${LDFLAGS} -Wl,-framework,vecLib"
-  AC_CACHE_CHECK([if linker needs -framework vecLib],
-    [ac_cv_ld_altivec],
-    [AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_ld_altivec=yes],[ac_cv_ld_altivec=no])])
-  VLC_RESTORE_FLAGS
-  AS_IF([test "${ac_cv_ld_altivec}" != "no"], [
-    VLC_ADD_LIBS([libvlccore],[-Wl,-framework,vecLib])
-  ])
 ])
 AC_SUBST([ALTIVEC_CFLAGS])
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
