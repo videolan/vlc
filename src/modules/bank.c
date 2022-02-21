@@ -73,7 +73,7 @@ static void vlc_modcap_free(void *data)
 
 static int vlc_module_cmp (const void *a, const void *b)
 {
-    const module_t *const *ma = a, *const *mb = b;
+    module_t *const *ma = a, *const *mb = b;
     /* Note that qsort() uses _ascending_ order,
      * so the smallest module is the one with the biggest score. */
     return (*mb)->i_score - (*ma)->i_score;
