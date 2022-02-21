@@ -24,6 +24,10 @@
 #ifndef VLC_GL_H
 #define VLC_GL_H 1
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /**
  * \file
  * This file defines GL structures and functions.
@@ -148,5 +152,9 @@ static inline bool vlc_gl_StrHasToken(const char *apis, const char *api)
     }
     return false;
 }
+
+#ifdef __cplusplus
+}
+#endif /* C++ */
 
 #endif /* VLC_GL_H */
