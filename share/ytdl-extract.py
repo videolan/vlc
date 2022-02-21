@@ -19,7 +19,7 @@
 import sys
 import json
 import urllib.parse
-import youtube_dl
+import yt_dlp
 
 class logger(object):
     def debug(self, msg):
@@ -38,7 +38,7 @@ def url_extract(url):
         'youtube_include_dash_manifest': False,
     }
 
-    dl = youtube_dl.YoutubeDL(opts)
+    dl = yt_dlp.YoutubeDL(opts)
 
     # Process a given URL
     infos = dl.extract_info(url, download=False)
@@ -58,7 +58,7 @@ def url_process(ie_url):
         'youtube_include_dash_manifest': False,
     }
 
-    dl = youtube_dl.YoutubeDL(opts)
+    dl = yt_dlp.YoutubeDL(opts)
 
     # Rebuild the original IE entry
     entry = { }
