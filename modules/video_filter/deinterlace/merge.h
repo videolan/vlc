@@ -31,6 +31,35 @@
  * Merge (line blending) routines for the VLC deinterlacer.
  */
 
+/**
+ * Average two vectors.
+ *
+ * This callback shall compute the element-wise rounded average of two vectors.
+ * This is used for blending scan lines of two fields for deinterlacing.
+ *
+ * The size of element is specified by the context,
+ * namely \see deinterlace_functions.
+ * Currently 8-bit and 16-bit elements are supported.
+ *
+ * \param d Output vector
+ * \param s1 First source vector
+ * \param s2 Second source vector
+ * \param len size of vectors in bytes
+ */
+
+typedef void (*merge_cb)(void *d, const void *s1, const void *s2, size_t len);
+
+/**
+ * Deinterlacing optimisation callbacks.
+ */
+struct deinterlace_functions {
+    /** Element-wise vector average
+     *
+     * The first array entries are indexed by the binary order of magnitude
+     * of the element size in bytes: 0 for 8-bit, 1 for 16-bit. */
+    merge_cb merges[2];
+};
+
 /*****************************************************************************
  * Macros
  *****************************************************************************/

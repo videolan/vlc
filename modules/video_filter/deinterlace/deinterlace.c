@@ -488,6 +488,10 @@ static const struct vlc_filter_operations filter_ops = {
     .close = Close,
 };
 
+static struct deinterlace_functions funcs = {
+    { Merge8BitGeneric, Merge16BitGeneric, },
+};
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -585,7 +589,8 @@ notsupp:
     else
 #endif
     {
-        p_sys->pf_merge = pixel_size == 1 ? Merge8BitGeneric : Merge16BitGeneric;
+        vlc_CPU_functions_init_once("deinterlace functions", &funcs);
+        p_sys->pf_merge = funcs.merges[vlc_ctz(pixel_size)];
 #if defined(__i386__) || defined(__x86_64__)
         p_sys->pf_end_merge = NULL;
 #endif
