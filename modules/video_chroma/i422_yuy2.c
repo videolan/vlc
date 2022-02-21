@@ -39,9 +39,9 @@
 
 #define SRC_FOURCC  "I422"
 #if defined (PLUGIN_PLAIN)
-#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,Y211"
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,Y211"
 #else
-#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV"
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #endif
 
 /*****************************************************************************
@@ -70,7 +70,6 @@ vlc_module_end ()
 VIDEO_FILTER_WRAPPER( I422_YUY2 )
 VIDEO_FILTER_WRAPPER( I422_YVYU )
 VIDEO_FILTER_WRAPPER( I422_UYVY )
-VIDEO_FILTER_WRAPPER( I422_IUYV )
 #if defined (PLUGIN_PLAIN)
 VIDEO_FILTER_WRAPPER( I422_Y211 )
 #endif
@@ -89,9 +88,6 @@ GetFilterOperations(filter_t *filter)
 
         case VLC_CODEC_UYVY:
             return &I422_UYVY_ops;
-
-        case VLC_FOURCC('I','U','Y','V'):
-            return &I422_IUYV_ops;
 
 #if defined (PLUGIN_PLAIN)
         case VLC_CODEC_Y211:
@@ -406,17 +402,6 @@ static void I422_UYVY( filter_t *p_filter, picture_t *p_source,
     }
 
 #endif
-}
-
-/*****************************************************************************
- * I422_IUYV: planar YUV 4:2:2 to interleaved packed IUYV 4:2:2
- *****************************************************************************/
-static void I422_IUYV( filter_t *p_filter, picture_t *p_source,
-                                           picture_t *p_dest )
-{
-    VLC_UNUSED(p_source); VLC_UNUSED(p_dest);
-    /* FIXME: TODO ! */
-    msg_Err( p_filter, "I422_IUYV unimplemented, please harass <sam@zoy.org>" );
 }
 
 /*****************************************************************************
