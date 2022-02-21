@@ -23,9 +23,16 @@ Demux:
  * Support for DAV video files
  * Add WebP image mapping
  * Fix missing audio start of Opus audio in MKV/WebM
+ * Fix an infinite loop in MP4
+ * Major overhaul of adaptive streaming stack
+ * Fix attachments extractions in ogg files
+
+Decoder:
+ * Fix playback of live AV1 streams
 
 Interface:
  * Qt/macOS: Fixup user provided URLs
+ * Add safe area handling on macOS
 
 Misc:
  * Update YouTube script
@@ -35,6 +42,17 @@ Misc:
  * Update libsmb2 to fix invalid UTF-8 encoding of some filenames
  * Update taglib to fix corruptions when editing some OGG metadata
  * Update FFmpeg to 4.4
+ * Update dav1d to 0.9.2
+ * Update fribidi to 1.0.11
+ * Update freetype to 2.11.1
+ * Update libass to 0.15.2
+ * Drop pthreadGC2 in favor of winpthreads
+ * Enable Java support for blurays on Apple M1
+ * Update libsrt to 1.4.4
+ * Update twolame to 0.4.0
+ * Update mpg123 to 1.29.3
+ * Update libnfs to 5.0.1
+ * Update libarchive to 3.6.0
 
 Changes between 3.0.15 and 3.0.16:
 ----------------------------------
