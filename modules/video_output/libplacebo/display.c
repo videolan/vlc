@@ -354,8 +354,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         target.color.transfer = sys->target.transfer;
         target.color.light = PL_COLOR_LIGHT_UNKNOWN; // re-infer
     }
-    if (sys->target.sig_avg > 0.0)
-        target.color.sig_avg = sys->target.sig_avg;
     if (sys->dither_depth > 0) {
         // override the sample depth without affecting the color encoding
         struct pl_bit_encoding *bits = &target.repr.bits;
@@ -709,9 +707,7 @@ vlc_module_begin ()
     add_integer("pl-output-hint", true, OUTPUT_HINT_TEXT, OUTPUT_HINT_LONGTEXT)
             change_integer_list(output_values, output_text)
 #endif
-    add_integer("pl-intent", pl_color_map_default_params.intent,
-            RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT)
-            change_integer_list(intent_values, intent_text)
+    add_placebo_color_map_opts("pl")
     add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT)
             change_integer_list(prim_values, prim_text)
     add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT)
@@ -725,34 +721,12 @@ vlc_module_begin ()
 
     // TODO: support for ICC profiles
 
-    set_section("Tone mapping", NULL)
-    add_integer("pl-tone-mapping", pl_color_map_default_params.tone_mapping_algo,
-            TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT)
-            change_integer_list(tone_values, tone_text)
-    add_float("pl-tone-mapping-param", pl_color_map_default_params.tone_mapping_param,
-            TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT)
-    add_float("pl-desat-strength", pl_color_map_default_params.desaturation_strength,
-            DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT)
-    add_float("pl-desat-exponent", pl_color_map_default_params.desaturation_exponent,
-            DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT)
-    add_float("pl-desat-base", pl_color_map_default_params.desaturation_base,
-            DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT)
-    add_float("pl-max-boost", pl_color_map_default_params.max_boost,
-            MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT)
-#if PL_API_VER >= 80
-    add_bool("pl-gamut-clipping", false, GAMUT_CLIPPING_TEXT, GAMUT_CLIPPING_LONGTEXT)
-#endif
-    add_bool("pl-gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT)
-
     add_float_with_range("pl-peak-period", pl_peak_detect_default_params.smoothing_period,
             0., 1000., PEAK_PERIOD_TEXT, PEAK_PERIOD_LONGTEXT)
     add_float("pl-scene-threshold-low", pl_peak_detect_default_params.scene_threshold_low,
             SCENE_THRESHOLD_LOW_TEXT, SCENE_THRESHOLD_LOW_LONGTEXT)
     add_float("pl-scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
             SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT)
-
-    add_float_with_range("pl-target-avg", 0.25,
-            0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT)
 
     set_section("Dithering", NULL)
     add_integer("pl-dither", -1,
@@ -814,6 +788,7 @@ vlc_module_end ()
 static void UpdateParams(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+    vlc_placebo_ColorMapParams(VLC_OBJECT(vd), "pl", &sys->color_map);
 
     sys->deband = pl_deband_default_params;
     sys->deband.iterations = var_InheritInteger(vd, "pl-iterations");
@@ -827,19 +802,6 @@ static void UpdateParams(vout_display_t *vd)
     sys->sigmoid.center = var_InheritFloat(vd, "pl-sigmoid-center");
     sys->sigmoid.slope = var_InheritFloat(vd, "pl-sigmoid-slope");
     bool use_sigmoid = var_InheritBool(vd, "pl-sigmoid");
-
-    sys->color_map = pl_color_map_default_params;
-    sys->color_map.intent = var_InheritInteger(vd, "pl-intent");
-    sys->color_map.tone_mapping_algo = var_InheritInteger(vd, "pl-tone-mapping");
-    sys->color_map.tone_mapping_param = var_InheritFloat(vd, "pl-tone-mapping-param");
-    sys->color_map.desaturation_strength = var_InheritFloat(vd, "pl-desat-strength");
-    sys->color_map.desaturation_exponent = var_InheritFloat(vd, "pl-desat-exponent");
-    sys->color_map.desaturation_base = var_InheritFloat(vd, "pl-desat-base");
-    sys->color_map.max_boost = var_InheritFloat(vd, "pl-max-boost");
-#if PL_API_VER >= 80
-    sys->color_map.gamut_clipping = var_InheritBool(vd, "pl-gamut-clipping");
-#endif
-    sys->color_map.gamut_warning = var_InheritBool(vd, "pl-gamut-warning");
 
     sys->dither = pl_dither_default_params;
     int method = var_InheritInteger(vd, "pl-dither");
@@ -911,7 +873,6 @@ static void UpdateParams(vout_display_t *vd)
     sys->target = (struct pl_color_space) {
         .primaries = var_InheritInteger(vd, "pl-target-prim"),
         .transfer = var_InheritInteger(vd, "pl-target-trc"),
-        .sig_avg = var_InheritFloat(vd, "pl-target-avg"),
     };
 
 #if PL_API_VER >= 113

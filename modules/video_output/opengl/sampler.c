@@ -670,14 +670,8 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 #ifdef HAVE_LIBPLACEBO
     if (priv->pl_sh) {
         struct pl_shader *sh = priv->pl_sh;
-        struct pl_color_map_params color_params = pl_color_map_default_params;
-        color_params.intent = var_InheritInteger(priv->gl, "rendering-intent");
-        color_params.tone_mapping_algo = var_InheritInteger(priv->gl, "tone-mapping");
-        color_params.tone_mapping_param = var_InheritFloat(priv->gl, "tone-mapping-param");
-        color_params.desaturation_strength = var_InheritFloat(priv->gl, "desat-strength");
-        color_params.desaturation_exponent = var_InheritFloat(priv->gl, "desat-exponent");
-        color_params.desaturation_base = var_InheritFloat(priv->gl, "desat-base");
-        color_params.gamut_warning = var_InheritBool(priv->gl, "tone-mapping-warn");
+        struct pl_color_map_params color_params;
+        vlc_placebo_ColorMapParams(VLC_OBJECT(priv->gl), "gl", &color_params);
 
         struct pl_color_space dst_space = pl_color_space_unknown;
         dst_space.primaries = var_InheritInteger(priv->gl, "target-prim");
