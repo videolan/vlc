@@ -687,7 +687,6 @@ ModuleListConfigControl::~ModuleListConfigControl()
         free( it->psz_module );
     qDeleteAll( modules );
     modules.clear();
-    delete groupBox;
 }
 
 void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
