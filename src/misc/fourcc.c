@@ -729,7 +729,7 @@ static const struct
     { { VLC_CODEC_YUV_PLANAR_420 },            PLANAR_8(3, 2, 2) },
     { { VLC_CODEC_NV12, VLC_CODEC_NV21 },      SEMIPLANAR(2, 2, 1, 8) },
     { { VLC_CODEC_YUV_PLANAR_422 },            PLANAR_8(3, 2, 1) },
-    { { VLC_CODEC_NV16, VLC_CODEC_NV61 },      PLANAR_8(2, 1, 1) },
+    { { VLC_CODEC_NV16, VLC_CODEC_NV61 },      SEMIPLANAR(2, 1, 1, 8) },
     { { VLC_CODEC_YUV_PLANAR_440 },            PLANAR_8(3, 1, 2) },
     { { VLC_CODEC_YUV_PLANAR_444 },            PLANAR_8(3, 1, 1) },
     { { VLC_CODEC_YUVA },                      PLANAR_8(4, 1, 1) },
