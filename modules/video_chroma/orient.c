@@ -322,6 +322,12 @@ static int Open(filter_t *filter)
     switch (src->i_chroma) {
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
+        case VLC_CODEC_NV16:
+        case VLC_CODEC_NV61:
+        case VLC_CODEC_NV24:
+        case VLC_CODEC_NV42:
+        case VLC_CODEC_P010:
+        case VLC_CODEC_P016:
             /* Double-size samples on second plane */
             sys->plane_size_order[1]++;
             break;
