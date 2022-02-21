@@ -398,6 +398,49 @@ enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
 static_assert (VLC_ONCE_DONE == 3, "Check vlc_once in header file");
 
+bool (vlc_once_begin)(vlc_once_t *restrict once)
+{
+    unsigned int value = VLC_ONCE_UNDONE;
+
+    if (atomic_compare_exchange_strong_explicit(&once->value, &value,
+                                                VLC_ONCE_DOING,
+                                                memory_order_acquire,
+                                                memory_order_acquire))
+        return false;
+
+    assert(value >= VLC_ONCE_DOING);
+
+    if (unlikely(value == VLC_ONCE_DOING)
+     && atomic_compare_exchange_strong_explicit(&once->value, &value,
+                                                VLC_ONCE_CONTEND,
+                                                memory_order_acquire,
+                                                memory_order_acquire))
+        value = VLC_ONCE_CONTEND;
+
+    assert(value >= VLC_ONCE_CONTEND);
+
+    while (unlikely(value != VLC_ONCE_DONE)) {
+        vlc_atomic_wait(&once->value, VLC_ONCE_CONTEND);
+        value = atomic_load_explicit(&once->value, memory_order_acquire);
+    }
+
+    return true;
+}
+
+void vlc_once_complete(vlc_once_t *restrict once)
+{
+    switch (atomic_exchange_explicit(&once->value, VLC_ONCE_DONE,
+                                     memory_order_release)) {
+        case VLC_ONCE_DOING: /* No waiters, nothing (else) to do */
+            break;
+        case VLC_ONCE_CONTEND: /* Notify waiters */
+            vlc_atomic_notify_all(&once->value);
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 void (vlc_once)(vlc_once_t *restrict once, void (*cb)(void *), void *opaque)
 {
     unsigned int value = VLC_ONCE_UNDONE;

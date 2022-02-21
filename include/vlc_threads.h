@@ -529,6 +529,55 @@ typedef struct
 #define VLC_STATIC_ONCE { ATOMIC_VAR_INIT(0) }
 
 /**
+ * Begins a one-time initialization.
+ *
+ * This function checks if a one-time initialization has completed:
+ * - If this is the first time the function is called for the given one-time
+ *   initialization object, it marks the beginning of the initialization and
+ *   returns true. vlc_once_complete() must be called to mark the completion
+ *   of the initialisation.
+ * - Otherwise, it waits until the initialization completes and returns false.
+ * - In particular, if the initialization has already completed, the function
+ *   returns false immediately without actually waiting.
+ *
+ * The specified one-time initialization object must have been initialized
+ * with @ref VLC_STATIC_ONCE, which is a constant expression suitable as a
+ * static initializer.
+ *
+ * \warning If this function is called twice without an intervening call to
+ * vlc_once_complete(), a dead lock will occur.
+ *
+ * \param once one-time initialisation object
+ * \retval false on the first call (for the given object)
+ * \retval true on subsequent calls (for the given object)
+ */
+VLC_API bool vlc_once_begin(vlc_once_t *restrict once);
+
+static inline bool vlc_once_begin_inline(vlc_once_t *restrict once)
+{
+    /* Fast path: check if already initialized */
+    if (unlikely(atomic_load_explicit(&once->value, memory_order_acquire) < 3))
+        return vlc_once_begin(once);
+    return true;
+}
+#define vlc_once_begin(once) vlc_once_begin_inline(once)
+
+/**
+ * Completes a one-time initialization.
+ *
+ * This function marks the end of an ongoing one-time initialization.
+ * If any thread is waiting for the completion of that initialization, its
+ * execution will be resumed.
+ *
+ * \warning The behavior is undefined if the one-time initialization object
+ * is uninitialized, if one-time initialization has not started, or
+ * if one-time initialization has already completed.
+ *
+ * \param once one-time initialisation object
+ */
+VLC_API void vlc_once_complete(vlc_once_t *restrict once);
+
+/**
  * Executes a function one time.
  *
  * The first time this function is called with a given one-time initialization
