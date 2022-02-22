@@ -417,10 +417,21 @@ bool Convert( const medialibrary::IMediaGroup* input, vlc_ml_group_t& output )
     output.i_id = input->id();
 
     output.i_nb_total_media = input->nbTotalMedia();
+    output.i_nb_video = input->nbVideo();
+    output.i_nb_audio = input->nbAudio();
+    output.i_nb_unknown = input->nbUnknown();
+    output.i_nb_present_media = input->nbPresentMedia();
+    output.i_nb_present_video = input->nbPresentVideo();
+    output.i_nb_present_audio = input->nbPresentAudio();
+    output.i_nb_present_unknown = input->nbPresentUnknown();
+
+    output.i_nb_seen = input->nbSeen();
+    output.i_nb_present_seen = input->nbPresentSeen();
 
     output.i_duration = input->duration();
 
     output.i_creation_date = input->creationDate();
+    output.i_last_modification_date = input->lastModificationDate();
 
     if( strdup_helper( input->name(), output.psz_name ) == false )
         return false;
