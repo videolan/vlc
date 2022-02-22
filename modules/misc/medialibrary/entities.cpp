@@ -305,6 +305,8 @@ bool Convert( const medialibrary::IAlbum* input, vlc_ml_album_t& output )
 {
     output.i_id = input->id();
     output.i_nb_tracks = input->nbTracks();
+    output.i_nb_present_tracks = input->nbPresentTracks();
+    output.i_nb_discs = input->nbDiscs();
     output.i_duration = input->duration();
     output.i_year = input->releaseYear();
 

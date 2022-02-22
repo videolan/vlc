@@ -306,6 +306,8 @@ typedef struct vlc_ml_album_t {
     int64_t i_artist_id;
 
     uint32_t i_nb_tracks;
+    uint32_t i_nb_present_tracks;
+    uint32_t i_nb_discs;
     int64_t i_duration; /* in ms */
     unsigned int i_year;
 } vlc_ml_album_t;
