@@ -148,17 +148,6 @@ ConfigControl *ConfigControl::createControl( module_config_t *p_item,
     return p_control;
 }
 
-/* Inserts controls into layouts
-   This is sub-optimal in the OO way, as controls's code still
-   depends on Layout classes. We should use layout inserters [friend]
-   classes, but it's unlikely we had to deal with a different layout.*/
-void ConfigControl::insertInto( QBoxLayout *layout )
-{
-    QGridLayout *sublayout = new QGridLayout();
-    fillGrid( sublayout, 0 );
-    layout->addLayout( sublayout );
-}
-
 void ConfigControl::insertIntoExistingGrid( QGridLayout *l, int line )
 {
     fillGrid( l, line );

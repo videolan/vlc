@@ -87,8 +87,6 @@ public:
     /* ConfigControl factory */
     static ConfigControl * createControl( module_config_t*, QWidget*,
                                           QGridLayout *, int line = 0 );
-    /* Inserts control into another layout block, using a sublayout */
-    void insertInto( QBoxLayout * );
     /* Inserts control into an existing grid layout */
     void insertIntoExistingGrid( QGridLayout*, int );
     virtual void doApply() = 0;
@@ -356,7 +354,6 @@ class ModuleListConfigControl : public VStringConfigControl
     friend class ConfigControl;
 public:
     ModuleListConfigControl( module_config_t *, QWidget *, bool );
-//    ModuleListConfigControl( module_config_t *, QLabel *, QComboBox*, bool );
     virtual ~ModuleListConfigControl();
     QString getValue() const Q_DECL_OVERRIDE;
 public slots:
