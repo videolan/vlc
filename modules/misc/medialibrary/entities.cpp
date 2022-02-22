@@ -355,6 +355,7 @@ bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output )
     output.i_id = input->id();
     output.i_nb_album = input->nbAlbums();
     output.i_nb_tracks = input->nbTracks();
+    output.i_nb_present_tracks = input->nbPresentTracks();
     output.psz_name = strdup( artistName( input ) );
     if ( unlikely( output.psz_name == nullptr ) )
         return false;

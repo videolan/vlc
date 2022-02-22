@@ -288,6 +288,7 @@ typedef struct vlc_ml_artist_t
 
     unsigned int i_nb_album;
     unsigned int i_nb_tracks;
+    uint32_t i_nb_present_tracks;
 } vlc_ml_artist_t;
 
 typedef struct vlc_ml_artist_list_t
