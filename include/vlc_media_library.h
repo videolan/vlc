@@ -232,7 +232,7 @@ typedef struct vlc_ml_group_t
 
     char* psz_name;
 
-    unsigned int i_nb_total_media;
+    uint32_t i_nb_total_media;
     uint32_t i_nb_video;
     uint32_t i_nb_audio;
     uint32_t i_nb_unknown;
@@ -244,9 +244,9 @@ typedef struct vlc_ml_group_t
     uint32_t i_nb_seen;
     uint32_t i_nb_present_seen;
 
-    unsigned int i_duration;
+    int64_t i_duration;
 
-    uint32_t i_creation_date;
+    time_t i_creation_date;
     time_t i_last_modification_date;
 } vlc_ml_group_t;
 
