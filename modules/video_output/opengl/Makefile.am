@@ -136,6 +136,12 @@ libglfilter_mock_plugin_la_LIBADD += libvlc_opengl.la $(GL_LIBS)
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la
 endif
 
+if HAVE_EMSCRIPTEN
+libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GL_LIBS)
+libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+noinst_LTLIBRARIES += libglfilter_mock_plugin.la
+endif
+
 if HAVE_IOS
 libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
