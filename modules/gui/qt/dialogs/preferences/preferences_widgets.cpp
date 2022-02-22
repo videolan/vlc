@@ -46,6 +46,7 @@
 #include <QSlider>
 #include <QFileDialog>
 #include <QGroupBox>
+#include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 #include <QDialogButtonBox>
@@ -54,6 +55,12 @@
 #include <QAction>
 #include <QKeySequence>
 #include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QPushButton>
+#include <QFontComboBox>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
@@ -244,6 +251,17 @@ void StringConfigControl::finish()
         label->setBuddy( text );
 }
 
+void StringConfigControl::changeVisibility( bool visible )
+{
+    text->setVisible( visible );
+    if ( label ) label->setVisible( visible );
+}
+
+QString StringConfigControl::getValue() const
+{
+    return text->text();
+}
+
 /********* String / Password **********/
 PasswordConfigControl::PasswordConfigControl( module_config_t *_p_item,
                                               QWidget *_parent ) :
@@ -331,6 +349,18 @@ void FileConfigControl::finish()
         label->setBuddy( text );
 }
 
+void FileConfigControl::changeVisibility( bool visible )
+{
+    text->setVisible( visible );
+    browse->setVisible( visible );
+    if ( label ) label->setVisible( visible );
+}
+
+QString FileConfigControl::getValue() const
+{
+    return text->text();
+}
+
 /********* String / Directory **********/
 DirectoryConfigControl::DirectoryConfigControl( module_config_t *_p_item,
                                                 QWidget *p ) :
@@ -389,6 +419,17 @@ void FontConfigControl::fillGrid( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( font, line, 1, 1, -1 );
+}
+
+void FontConfigControl::changeVisibility( bool visible )
+{
+    font->setVisible( visible );
+    if ( label ) label->setVisible( visible );
+}
+
+QString FontConfigControl::getValue() const
+{
+    return font->currentFont().family();
 }
 
 /********* String / choice list **********/
@@ -466,6 +507,12 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
     }
     if( label )
         label->setBuddy( combo );
+}
+
+void StringListConfigControl::changeVisibility( bool visible )
+{
+    combo->setVisible( visible );
+    if ( label ) label->setVisible( visible );
 }
 
 QString StringListConfigControl::getValue() const
@@ -586,6 +633,12 @@ void ModuleConfigControl::finish( )
     }
     if( label )
         label->setBuddy( combo );
+}
+
+void ModuleConfigControl::changeVisibility( bool visible )
+{
+    combo->setVisible( visible );
+    if ( label ) label->setVisible( visible );
 }
 
 QString ModuleConfigControl::getValue() const
@@ -718,11 +771,11 @@ QString ModuleListConfigControl::getValue() const
     return text->text();
 }
 
-void ModuleListConfigControl::changeVisibility( bool b )
+void ModuleListConfigControl::changeVisibility( bool visible )
 {
     foreach ( checkBoxListItem *it, modules )
-        it->checkBox->setVisible( b );
-    groupBox->setVisible( b );
+        it->checkBox->setVisible( visible );
+    groupBox->setVisible( visible );
 }
 
 void ModuleListConfigControl::onUpdate()
@@ -802,6 +855,12 @@ void IntegerConfigControl::finish()
         label->setBuddy( spin );
 }
 
+void IntegerConfigControl::changeVisibility( bool visible )
+{
+    spin->setVisible( visible );
+    if ( label ) label->setVisible( visible );
+}
+
 int IntegerConfigControl::getValue() const
 {
     return spin->value();
@@ -848,6 +907,12 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
     }
     if( label )
         label->setBuddy( slider );
+}
+
+void IntegerRangeSliderConfigControl::changeVisibility( bool visible )
+{
+    slider->setVisible( visible );
+    if ( label ) label->setVisible( visible );
 }
 
 int IntegerRangeSliderConfigControl::getValue() const
@@ -921,6 +986,12 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config )
         label->setBuddy( combo );
 }
 
+void IntegerListConfigControl::changeVisibility( bool visible )
+{
+    combo->setVisible( visible );
+    if ( label ) label->setVisible( visible );
+}
+
 int IntegerListConfigControl::getValue() const
 {
     return combo->itemData( combo->currentIndex() ).toInt();
@@ -954,6 +1025,11 @@ void BoolConfigControl::finish()
     checkbox->setChecked( p_item->value.i );
     if( p_item->psz_longtext )
         checkbox->setToolTip( formatTooltip(qfut(p_item->psz_longtext)) );
+}
+
+void BoolConfigControl::changeVisibility( bool visible )
+{
+    checkbox->setVisible( visible );
 }
 
 int BoolConfigControl::getValue() const
@@ -1004,6 +1080,12 @@ void ColorConfigControl::finish()
     }
 
     BUTTONACT( color_but, &ColorConfigControl::selectColor );
+}
+
+void ColorConfigControl::changeVisibility( bool visible )
+{
+    color_but->setVisible( visible );
+    if ( label ) label->setVisible( visible );
 }
 
 int ColorConfigControl::getValue() const
@@ -1078,6 +1160,12 @@ void FloatConfigControl::finish()
     }
     if( label )
         label->setBuddy( spin );
+}
+
+void FloatConfigControl::changeVisibility( bool visible )
+{
+    spin->setVisible( visible );
+    if ( label ) label->setVisible( visible );
 }
 
 float FloatConfigControl::getValue() const
@@ -1259,6 +1347,12 @@ void KeySelectorControl::finish()
     table->topLevelItem(0)->setSizeHint( 0, QSize( 0, HOTKEY_ITEM_HEIGHT ) );
 
     connect( table, &QTreeWidget::itemActivated, this, &KeySelectorControl::selectKey );
+}
+
+void KeySelectorControl::changeVisibility( bool visible )
+{
+    table->setVisible( visible );
+    if ( label ) label->setVisible( visible );
 }
 
 void KeySelectorControl::filter()

@@ -32,15 +32,9 @@
 #include "qt.hpp"
 #include <assert.h>
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QTreeWidget>
-#include <QSpinBox>
 #include <QLabel>
-#include <QPushButton>
 #include <QDialog>
-#include <QFontComboBox>
+#include <QSet>
 
 class QWidget;
 class QTreeWidget;
@@ -50,6 +44,14 @@ class QGridLayout;
 class QBoxLayout;
 class SearchLineEdit;
 class QDoubleSpinBox;
+class QCheckBox;
+class QComboBox;
+class QLineEdit;
+class QSpinBox;
+class QPushButton;
+class QFontComboBox;
+class QSlider;
+class QAbstractButton;
 
 /*******************************************************
  * Simple widgets
@@ -120,11 +122,7 @@ public:
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     QSpinBox *spin;
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        spin->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
@@ -150,11 +148,7 @@ public:
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     QSlider *slider;
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        slider->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
     void finish();
@@ -168,11 +162,7 @@ public:
     IntegerListConfigControl( module_config_t *, QLabel *, QComboBox* );
     int getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        combo->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish(module_config_t * );
@@ -188,10 +178,7 @@ public:
     BoolConfigControl( module_config_t *, QLabel *, QAbstractButton* );
     int getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        checkbox->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QAbstractButton *checkbox;
@@ -207,11 +194,7 @@ public:
     virtual ~ColorConfigControl() { delete color_px; }
     int getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        color_but->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
@@ -245,11 +228,7 @@ public:
     float getValue() const Q_DECL_OVERRIDE;
 
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        spin->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QDoubleSpinBox *spin;
 
@@ -287,13 +266,9 @@ class StringConfigControl : public VStringConfigControl
 public:
     StringConfigControl( module_config_t *, QWidget * );
     StringConfigControl( module_config_t *, QLabel *, QLineEdit* );
-    QString getValue() const Q_DECL_OVERRIDE { return text->text(); }
+    QString getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        text->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QLineEdit *text;
 private:
@@ -317,16 +292,11 @@ class FileConfigControl : public VStringConfigControl
 public:
     FileConfigControl( module_config_t *, QWidget * );
     FileConfigControl( module_config_t *, QLabel *, QLineEdit *, QPushButton * );
-    QString getValue() const Q_DECL_OVERRIDE { return text->text(); }
+    QString getValue() const Q_DECL_OVERRIDE;
 public slots:
     virtual void updateField();
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        text->setVisible( b );
-        browse->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     void finish();
     QLineEdit *text;
@@ -350,13 +320,9 @@ class FontConfigControl : public VStringConfigControl
 public:
     FontConfigControl( module_config_t *, QWidget * );
     FontConfigControl( module_config_t *, QLabel *, QFontComboBox *);
-    QString getValue() const Q_DECL_OVERRIDE { return font->currentFont().family(); }
+    QString getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        font->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QLabel *label;
     QFontComboBox *font;
@@ -370,11 +336,7 @@ public:
     ModuleConfigControl( module_config_t *, QLabel *, QComboBox* );
     QString getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        combo->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish( );
@@ -418,11 +380,7 @@ public:
     StringListConfigControl( module_config_t *, QLabel *, QComboBox* );
     QString getValue() const Q_DECL_OVERRIDE;
 protected:
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        combo->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QComboBox *combo;
 private:
@@ -454,11 +412,7 @@ public:
 
 protected:
     bool eventFilter( QObject *, QEvent * ) Q_DECL_OVERRIDE;
-    void changeVisibility( bool b ) Q_DECL_OVERRIDE
-    {
-        table->setVisible( b );
-        if ( label ) label->setVisible( b );
-    }
+    void changeVisibility( bool ) Q_DECL_OVERRIDE;
     void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 
 private:
