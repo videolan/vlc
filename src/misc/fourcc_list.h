@@ -1271,6 +1271,8 @@ static const staticentry_t p_list_video[] = {
         A("AGM7"),
 
     B(VLC_CODEC_NOTCHLC, "NotchLC"),
+
+    B(VLC_CODEC_RTP_VIDEO_RAW, "RTP raw video"),
 };
 
 static const staticentry_t p_list_audio[] = {
