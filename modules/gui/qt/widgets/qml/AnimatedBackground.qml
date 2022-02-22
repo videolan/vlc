@@ -59,6 +59,8 @@ Rectangle {
                   ? root.activeBorderColor
                   : VLCStyle.colors.setColorAlpha(root.activeBorderColor, 0)
 
+    border.width: root.active ? VLCStyle.focus_border : 0
+
     //---------------------------------------------------------------------------------------------
     // Animations
     //---------------------------------------------------------------------------------------------
@@ -68,13 +70,6 @@ Rectangle {
             id: borderAnimation
 
             duration: root.animationDuration
-            onRunningChanged: {
-                if (running && root.active) {
-                    border.width = Qt.binding(function() { return VLCStyle.focus_border })
-                } else if (!running && !root.active) {
-                    border.width = 0
-                }
-            }
         }
     }
 
