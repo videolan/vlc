@@ -322,6 +322,9 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos) const
     if(!segmentChunk)
         return ChunkEntry();
 
+    if(segment != datasegment) /* need to set for init */
+        segmentChunk->discontinuitySequenceNumber = datasegment->getDiscontinuitySequenceNumber();
+
     mtime_t startTime = VLC_TS_INVALID;
     mtime_t duration = 0;
     mtime_t displayTime = datasegment->getDisplayTime();
