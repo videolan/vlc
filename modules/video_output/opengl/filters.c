@@ -210,6 +210,7 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     struct vlc_gl_filter *filter = vlc_gl_filter_New(filters->gl, filters->api);
     if (!filter)
         return NULL;
+    filter->gl = filters->gl;
 
     struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
 
