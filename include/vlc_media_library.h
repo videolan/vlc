@@ -261,6 +261,9 @@ typedef struct vlc_ml_playlist_t
 
     uint32_t i_creation_date;
 
+    int64_t i_duration; /* In ms */
+    uint32_t i_nb_duration_unknown;
+
     bool b_is_read_only;
 } vlc_ml_playlist_t;
 

@@ -443,6 +443,9 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 
     output.i_creation_date = input->creationDate();
 
+    output.i_duration = input->duration();
+    output.i_nb_duration_unknown = input->nbDurationUnknown();
+
     output.b_is_read_only = input->isReadOnly();
 
     if( !strdup_helper( input->name(), output.psz_name ) ||
