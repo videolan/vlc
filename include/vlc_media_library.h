@@ -644,6 +644,9 @@ enum vlc_ml_event_type
     VLC_ML_EVENT_BOOKMARKS_ADDED,
     VLC_ML_EVENT_BOOKMARKS_UPDATED,
     VLC_ML_EVENT_BOOKMARKS_DELETED,
+    VLC_ML_EVENT_FOLDER_ADDED,
+    VLC_ML_EVENT_FOLDER_UPDATED,
+    VLC_ML_EVENT_FOLDER_DELETED,
     /**
      * A discovery started.
      *
@@ -783,6 +786,7 @@ typedef struct vlc_ml_event_t
             const vlc_ml_playlist_t* p_playlist;
             const vlc_ml_genre_t* p_genre;
             const vlc_ml_bookmark_t* p_bookmark;
+            const vlc_ml_folder_t* p_folder;
         } creation;
         struct
         {

@@ -86,6 +86,7 @@ void assignToEvent( vlc_ml_event_t* ev, vlc_ml_genre_t* g )    { ev->creation.p_
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_group_t* g )    { ev->creation.p_group    = g; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_playlist_t* p ) { ev->creation.p_playlist = p; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_bookmark_t* b ) { ev->creation.p_bookmark = b; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_folder_t* f )   { ev->creation.p_folder = f; }
 
 template <typename To, typename From>
 void wrapEntityCreatedEventCallback( vlc_medialibrary_module_t* ml,
@@ -251,19 +252,22 @@ void MediaLibrary::onBookmarksDeleted( std::set<int64_t> bookmarkIds )
                                     VLC_ML_EVENT_BOOKMARKS_DELETED );
 }
 
-void MediaLibrary::onFoldersAdded( std::vector<medialibrary::FolderPtr> )
+void MediaLibrary::onFoldersAdded( std::vector<medialibrary::FolderPtr> folders )
 {
-
+    wrapEntityCreatedEventCallback<vlc_ml_folder_t>( m_vlc_ml, folders,
+                                                     VLC_ML_EVENT_FOLDER_ADDED );
 }
 
-void MediaLibrary::onFoldersModified( std::set<int64_t> )
+void MediaLibrary::onFoldersModified( std::set<int64_t> folderIds )
 {
-
+    wrapEntityModifiedEventCallback( m_vlc_ml, folderIds,
+                                     VLC_ML_EVENT_FOLDER_UPDATED );
 }
 
-void MediaLibrary::onFoldersDeleted( std::set<int64_t> )
+void MediaLibrary::onFoldersDeleted( std::set<int64_t> folderIds )
 {
-
+    wrapEntityDeletedEventCallback( m_vlc_ml, folderIds,
+                                    VLC_ML_EVENT_FOLDER_DELETED );
 }
 
 void MediaLibrary::onDiscoveryStarted()
