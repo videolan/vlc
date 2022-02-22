@@ -3,45 +3,59 @@ Changes between 3.0.16 and 3.0.17:
 
 Core:
  * Fix a regression in parsing secondary source MRLs
+ * Allow brackets in path part of URLs
 
 Access:
  * Fix support for screen capture on macOS with avcapture
  * Fix closing of HTTP 1.x connections
  * Improve HTTP2 memory usage
  * Improve AVCapture module
+ * Improve AudioCD support (audio/data mixed mode, musicbrainz)
+ * Improve SMB compatibility by changing the read size
+ * Several improvements on the SRT modules (including streamID)
 
-Packetizers:
+Decoders/Packetizers:
  * Add support for DTS LBR
+ * Fix some HEVC hardware decoding on Windows and crashes when aspect ratio changes
+ * Fix hardware decoding for some AMD GPU drivers
+ * Add support for new Fourcc for E-AC3, AV1, GeoVision
+ * Fix crashes with VP9 streams
+ * Fix styling issues with subs tx3g (mp4) tracks
+ * Fix playback of live AV1 streams
 
 Audio Output:
  * iOS/tvOS: add support for spatial audio
+ * macOS: fix some channels ordering for > 5.1 channels
+ * Android: rework audio volume management
 
 Video Output:
  * Fix a D3D11 crash when the stream changes aspect ratio
 
 Demux:
+ * Major overhaul of the adaptive streaming stack
  * Support for DAV video files
  * Add WebP image mapping
  * Fix missing audio start of Opus audio in MKV/WebM
  * Fix an infinite loop in MP4
- * Major overhaul of adaptive streaming stack
  * Fix attachments extractions in ogg files
-
-Decoder:
- * Fix playback of live AV1 streams
+ * Support Uncompressed audio in mp4 (ISO/IEC 23003-5)
+ * Fix some lip sync issue in rare MPEG-TS streams
 
 Interface:
  * Qt/macOS: Fixup user provided URLs
  * Add safe area handling on macOS
+ * Qt: improve preferences search
+ * Qt: fix --no-mouse-events option
 
 Misc:
  * Update YouTube script
  * Fix Icecast directory parsing which could lead to missing entries
+ * Improve UPnP compatibility with some servers
 
 3rd party libraries (contrib):
+ * Update FFmpeg to 4.4
  * Update libsmb2 to fix invalid UTF-8 encoding of some filenames
  * Update taglib to fix corruptions when editing some OGG metadata
- * Update FFmpeg to 4.4
  * Update dav1d to 0.9.2
  * Update fribidi to 1.0.11
  * Update freetype to 2.11.1
@@ -53,6 +67,8 @@ Misc:
  * Update mpg123 to 1.29.3
  * Update libnfs to 5.0.1
  * Update libarchive to 3.6.0
+ * Update AOM encoder to 3.1.1
+
 
 Changes between 3.0.15 and 3.0.16:
 ----------------------------------
@@ -68,6 +84,7 @@ Interfaces:
 
 Misc
  * Multiple settings improvements
+
 
 Changes between 3.0.14 and 3.0.15:
 ----------------------------------
@@ -92,6 +109,7 @@ Text renderer:
 Misc:
  * Fix GnuTLS support for Windows XP
 
+
 Changes between 3.0.13 and 3.0.14:
 ----------------------------------
 
@@ -99,6 +117,7 @@ Core:
  * Fix double loading of slave input
  * Fix an issue causing the auto-updater not to launch the new version
    installer
+
 
 Changes between 3.0.12.1 and 3.0.13:
 ----------------------------------
