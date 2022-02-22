@@ -122,6 +122,9 @@ libschroedinger_plugin_la_LIBADD = $(LIBS_schroedinger)
 EXTRA_LTLIBRARIES += libschroedinger_plugin.la
 codec_LTLIBRARIES += $(LTLIBschroedinger)
 
+librtp_rawvid_plugin_la_SOURCES = codec/rtp-rawvid.c
+codec_LTLIBRARIES += librtp_rawvid_plugin.la
+
 
 ### Image codecs ###
 
