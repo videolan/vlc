@@ -45,15 +45,11 @@
 #include <QSignalMapper>
 #include <QVBoxLayout>
 #include <QScrollArea>
-#include <QHeaderView>
 
 #include <QStyleFactory>
-#include <QSettings>
 #include <QScreen>
-#include <QtAlgorithms>
 #include <QDir>
 
-#include <QSpacerItem>
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QLabel>
@@ -62,7 +58,9 @@
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QDialog>
-#include <QBoxLayout>
+#include <QFileDialog>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 #include <assert.h>
 #include <math.h>
@@ -75,7 +73,6 @@
 # include <shobjidl.h>
 #endif
 #include <vlc_modules.h>
-#include <vlc_arrays.h>
 
 static struct {
     const char iso[6];

@@ -28,7 +28,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
 #include <vlc_config_cat.h>
 
 #include <QTreeWidget>

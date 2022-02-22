@@ -26,7 +26,6 @@
 #include <QApplication>
 #include <QLabel>
 #include <QTreeWidget>
-#include <QVariant>
 #include <QString>
 #include <QFont>
 #include <QGroupBox>
@@ -37,9 +36,7 @@
 #include "dialogs/preferences/complete_preferences.hpp"
 #include "dialogs/preferences/preferences_widgets.hpp"
 
-#include <vlc_intf_strings.h>
 #include <vlc_modules.h>
-#include <vlc_plugin.h>
 #include <assert.h>
 
 #define ITEM_HEIGHT 25

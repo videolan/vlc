@@ -28,7 +28,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
 
 /* Auto-generated from .ui files */
 #include "ui_sprefs_input.h"
@@ -39,9 +38,6 @@
 #include "ui_sprefs_medialibrary.h"
 
 #include <vlc_media_library.h>
-#include <QDialogButtonBox>
-#include <QTableView>
-#include <QFileDialog>
 
 class MLFoldersEditor;
 

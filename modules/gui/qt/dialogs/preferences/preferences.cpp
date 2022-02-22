@@ -44,7 +44,6 @@
 #include <QStackedWidget>
 #include <QSplitter>
 #include <QShortcut>
-#include <QScrollArea>
 
 #include <vlc_modules.h>
 

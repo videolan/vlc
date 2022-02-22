@@ -32,25 +32,24 @@
 #include "qt.hpp"
 #include <assert.h>
 
-#include <QWidget>
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QTreeWidget>
 #include <QSpinBox>
 #include <QLabel>
-#include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QDialog>
 #include <QFontComboBox>
 
+class QWidget;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
 class QGridLayout;
 class QBoxLayout;
 class SearchLineEdit;
+class QDoubleSpinBox;
 
 /*******************************************************
  * Simple widgets

@@ -34,11 +34,11 @@
 #include "widgets/native/customwidgets.hpp"
 #include "widgets/native/searchlineedit.hpp"
 #include "util/qt_dirs.hpp"
-#include <vlc_actions.h>
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 
+#include <QWidget>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
@@ -48,12 +48,12 @@
 #include <QGroupBox>
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
-#include <QSignalMapper>
 #include <QDialogButtonBox>
 #include <QKeyEvent>
 #include <QColorDialog>
 #include <QAction>
 #include <QKeySequence>
+#include <QDoubleSpinBox>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
