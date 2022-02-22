@@ -432,8 +432,14 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 {
     output.i_id = input->id();
 
-    output.i_nb_media         = input->nbMedia();
+    output.i_nb_media = input->nbMedia();
+    output.i_nb_video = input->nbVideo();
+    output.i_nb_audio = input->nbAudio();
+    output.i_nb_unknown = input->nbUnknown();
     output.i_nb_present_media = input->nbPresentMedia();
+    output.i_nb_present_video = input->nbPresentVideo();
+    output.i_nb_present_audio = input->nbPresentAudio();
+    output.i_nb_present_unknown = input->nbPresentUnknown();
 
     output.i_creation_date = input->creationDate();
 

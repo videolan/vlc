@@ -250,7 +250,14 @@ typedef struct vlc_ml_playlist_t
     char* psz_artwork_mrl;
 
     unsigned int i_nb_media;
+    uint32_t i_nb_video;
+    uint32_t i_nb_audio;
+    uint32_t i_nb_unknown;
+
     unsigned int i_nb_present_media;
+    uint32_t i_nb_present_video;
+    uint32_t i_nb_present_audio;
+    uint32_t i_nb_present_unknown;
 
     uint32_t i_creation_date;
 
