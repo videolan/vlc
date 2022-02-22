@@ -823,12 +823,12 @@ void CaptureOpenPanel::initialize()
     int line = 0;
     module_config_t *p_config = config_FindConfig( "dshow-vdev" );
     vdevDshowW = new StringListConfigControl( p_config, this );
-    vdevDshowW->insertIntoExistingGrid( dshowDevLayout, line );
+    vdevDshowW->insertInto( dshowDevLayout, line );
     line++;
 
     p_config = config_FindConfig( "dshow-adev" );
     adevDshowW = new StringListConfigControl( p_config, this );
-    adevDshowW->insertIntoExistingGrid( dshowDevLayout, line );
+    adevDshowW->insertInto( dshowDevLayout, line );
     line++;
 
     /* dshow Properties */

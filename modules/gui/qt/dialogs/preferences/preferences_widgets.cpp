@@ -144,13 +144,8 @@ ConfigControl *ConfigControl::createControl( module_config_t *p_item,
     default:
         break;
     }
-    if ( p_control ) p_control->insertIntoExistingGrid( l, line );
+    if ( p_control ) p_control->insertInto( l, line );
     return p_control;
-}
-
-void ConfigControl::insertIntoExistingGrid( QGridLayout *l, int line )
-{
-    fillGrid( l, line );
 }
 
 /*******************************************************
@@ -220,7 +215,7 @@ StringConfigControl::StringConfigControl( module_config_t *_p_item,
     finish( );
 }
 
-void StringConfigControl::fillGrid( QGridLayout *l, int line )
+void StringConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->setColumnMinimumWidth( 1, 10 );
@@ -299,7 +294,7 @@ FileConfigControl::FileConfigControl( module_config_t *_p_item,
     finish( );
 }
 
-void FileConfigControl::fillGrid( QGridLayout *l, int line )
+void FileConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->setColumnMinimumWidth( 1, 10 );
@@ -405,7 +400,7 @@ FontConfigControl::FontConfigControl( module_config_t *_p_item,
     }
 }
 
-void FontConfigControl::fillGrid( QGridLayout *l, int line )
+void FontConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( font, line, 1, 1, -1 );
@@ -452,7 +447,7 @@ StringListConfigControl::StringListConfigControl( module_config_t *_p_item,
     finish( p_module_config );
 }
 
-void StringListConfigControl::fillGrid( QGridLayout *l, int line )
+void StringListConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
@@ -571,7 +566,7 @@ ModuleConfigControl::ModuleConfigControl( module_config_t *_p_item,
     finish( );
 }
 
-void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
+void ModuleConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( combo, line, LAST_COLUMN );
@@ -665,7 +660,7 @@ ModuleListConfigControl::ModuleListConfigControl( module_config_t *_p_item,
         text->setToolTip( formatTooltip( qfut( p_item->psz_longtext) ) );
 }
 
-void ModuleListConfigControl::fillGrid( QGridLayout *l, int line )
+void ModuleListConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( groupBox, line, 0, 1, -1 );
 }
@@ -821,7 +816,7 @@ IntegerConfigControl::IntegerConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void IntegerConfigControl::fillGrid( QGridLayout *l, int line )
+void IntegerConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
@@ -939,7 +934,7 @@ IntegerListConfigControl::IntegerListConfigControl( module_config_t *_p_item,
     finish( p_module_config );
 }
 
-void IntegerListConfigControl::fillGrid( QGridLayout *l, int line )
+void IntegerListConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( combo, line, LAST_COLUMN, Qt::AlignRight );
@@ -1004,7 +999,7 @@ BoolConfigControl::BoolConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void BoolConfigControl::fillGrid( QGridLayout *l, int line )
+void BoolConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( checkbox, line, 0, 1, -1 );
 }
@@ -1046,7 +1041,7 @@ ColorConfigControl::ColorConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void ColorConfigControl::fillGrid( QGridLayout *l, int line )
+void ColorConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
@@ -1128,7 +1123,7 @@ FloatConfigControl::FloatConfigControl( module_config_t *_p_item,
     finish();
 }
 
-void FloatConfigControl::fillGrid( QGridLayout *l, int line )
+void FloatConfigControl::insertInto( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
     l->addWidget( spin, line, LAST_COLUMN, Qt::AlignRight );
@@ -1229,7 +1224,7 @@ KeySelectorControl::KeySelectorControl( QWidget *p ) : ConfigControl( nullptr )
              this, &KeySelectorControl::filter );
 }
 
-void KeySelectorControl::fillGrid( QGridLayout *l, int line )
+void KeySelectorControl::insertInto( QGridLayout *l, int line )
 {
     QGridLayout *gLayout = new QGridLayout();
     gLayout->addWidget( label, 0, 0, 1, 4 );

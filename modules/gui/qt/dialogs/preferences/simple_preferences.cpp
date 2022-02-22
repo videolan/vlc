@@ -997,21 +997,21 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             panel_label->setText( qtr( "Configure Hotkeys" ) );
             control = new KeySelectorControl( this );
-            control->insertIntoExistingGrid( gLayout, line );
+            control->insertInto( gLayout, line );
             controls.append( control );
 
             line++;
 
             p_config = config_FindConfig( "hotkeys-y-wheel-mode" );
             control = new IntegerListConfigControl( p_config, this );
-            control->insertIntoExistingGrid( gLayout, line );
+            control->insertInto( gLayout, line );
             controls.append( control );
 
             line++;
 
             p_config = config_FindConfig( "hotkeys-x-wheel-mode" );
             control = new IntegerListConfigControl( p_config, this );
-            control->insertIntoExistingGrid( gLayout, line );
+            control->insertInto( gLayout, line );
             controls.append( control );
 
 #ifdef _WIN32
@@ -1019,7 +1019,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             p_config = config_FindConfig( "qt-disable-volume-keys" );
             control = new BoolConfigControl( p_config, this );
-            control->insertIntoExistingGrid( gLayout, line );
+            control->insertInto( gLayout, line );
             controls.append( control );
 #endif
             break;

@@ -87,14 +87,13 @@ public:
     /* ConfigControl factory */
     static ConfigControl * createControl( module_config_t*, QWidget*,
                                           QGridLayout *, int line = 0 );
-    /* Inserts control into an existing grid layout */
-    void insertIntoExistingGrid( QGridLayout*, int );
+    /** Inserts control into an existing grid layout */
+    virtual void insertInto( QGridLayout*, int row = 0 ) { Q_UNUSED( row ); }
     virtual void doApply() = 0;
 protected:
     ConfigControl( module_config_t *_p_conf ) : p_item( _p_conf ) {}
     virtual void changeVisibility( bool ) { }
     module_config_t *p_item;
-    virtual void fillGrid( QGridLayout*, int ) {}
 signals:
     void changed();
 };
@@ -118,11 +117,11 @@ class IntegerConfigControl : public VIntConfigControl
 public:
     IntegerConfigControl( module_config_t *, QWidget * );
     IntegerConfigControl( module_config_t *, QLabel*, QSpinBox* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     QSpinBox *spin;
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
     void finish();
@@ -159,10 +158,10 @@ Q_OBJECT
 public:
     IntegerListConfigControl( module_config_t *, QWidget * );
     IntegerListConfigControl( module_config_t *, QLabel *, QComboBox* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish(module_config_t * );
     QLabel *label;
@@ -175,10 +174,10 @@ class BoolConfigControl : public VIntConfigControl
 public:
     BoolConfigControl( module_config_t *, QWidget * );
     BoolConfigControl( module_config_t *, QLabel *, QAbstractButton* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QAbstractButton *checkbox;
     void finish();
@@ -191,10 +190,10 @@ public:
     ColorConfigControl( module_config_t *, QWidget * );
     ColorConfigControl( module_config_t *, QLabel *, QAbstractButton* );
     virtual ~ColorConfigControl() { delete color_px; }
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     int getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     QLabel *label;
     QAbstractButton *color_but;
@@ -224,11 +223,11 @@ class FloatConfigControl : public VFloatConfigControl
 public:
     FloatConfigControl( module_config_t *, QWidget * );
     FloatConfigControl( module_config_t *, QLabel*, QDoubleSpinBox* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     float getValue() const Q_DECL_OVERRIDE;
 
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QDoubleSpinBox *spin;
 
 private:
@@ -265,10 +264,10 @@ class StringConfigControl : public VStringConfigControl
 public:
     StringConfigControl( module_config_t *, QWidget * );
     StringConfigControl( module_config_t *, QLabel *, QLineEdit* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     QString getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QLineEdit *text;
 private:
     void finish();
@@ -291,12 +290,12 @@ class FileConfigControl : public VStringConfigControl
 public:
     FileConfigControl( module_config_t *, QWidget * );
     FileConfigControl( module_config_t *, QLabel *, QLineEdit *, QPushButton * );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     QString getValue() const Q_DECL_OVERRIDE;
 public slots:
     virtual void updateField();
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     void finish();
     QLineEdit *text;
     QLabel *label;
@@ -319,10 +318,10 @@ class FontConfigControl : public VStringConfigControl
 public:
     FontConfigControl( module_config_t *, QWidget * );
     FontConfigControl( module_config_t *, QLabel *, QFontComboBox *);
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     QString getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QLabel *label;
     QFontComboBox *font;
 };
@@ -333,10 +332,10 @@ class ModuleConfigControl : public VStringConfigControl
 public:
     ModuleConfigControl( module_config_t *, QWidget * );
     ModuleConfigControl( module_config_t *, QLabel *, QComboBox* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     QString getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish( );
     QLabel *label;
@@ -355,12 +354,12 @@ class ModuleListConfigControl : public VStringConfigControl
 public:
     ModuleListConfigControl( module_config_t *, QWidget *, bool );
     virtual ~ModuleListConfigControl();
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     QString getValue() const Q_DECL_OVERRIDE;
 public slots:
     void onUpdate();
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
 private:
     void finish( bool );
     void checkbox_lists(module_t*);
@@ -376,10 +375,10 @@ class StringListConfigControl : public VStringConfigControl
 public:
     StringListConfigControl( module_config_t *, QWidget * );
     StringListConfigControl( module_config_t *, QLabel *, QComboBox* );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     QString getValue() const Q_DECL_OVERRIDE;
 protected:
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     QComboBox *combo;
 private:
     void finish(module_config_t * );
@@ -401,6 +400,7 @@ class KeySelectorControl : public ConfigControl
 
 public:
     KeySelectorControl( QWidget * );
+    void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
     enum ColumnIndex
     {
@@ -417,7 +417,6 @@ protected:
     void tableContextMenuEvent( QContextMenuEvent * );
 #endif
     void changeVisibility( bool ) Q_DECL_OVERRIDE;
-    void fillGrid( QGridLayout*, int ) Q_DECL_OVERRIDE;
     void unset( KeyTableItem *, enum ColumnIndex );
     void unset( QTreeWidgetItem *, int );
     void reset( KeyTableItem *, enum ColumnIndex );
