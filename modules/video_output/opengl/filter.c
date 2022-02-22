@@ -31,6 +31,7 @@
 #include <vlc_modules.h>
 
 #include "gl_api.h"
+#include "picture.h"
 
 struct vlc_gl_filter *
 vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api)

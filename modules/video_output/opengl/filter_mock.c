@@ -74,6 +74,7 @@
 #include "gl_common.h"
 #include "gl_util.h"
 #include "sampler.h"
+#include "picture.h"
 
 #define MOCK_CFG_PREFIX "mock-"
 

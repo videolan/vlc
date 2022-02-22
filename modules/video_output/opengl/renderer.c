@@ -41,6 +41,7 @@
 #include "gl_util.h"
 #include "vout_helper.h"
 #include "sampler.h"
+#include "picture.h"
 
 #define SPHERE_RADIUS 1.f
 

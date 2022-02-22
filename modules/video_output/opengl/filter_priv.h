@@ -27,6 +27,7 @@
 #include <vlc_picture.h>
 
 #include "filter.h"
+#include "picture.h"
 
 struct vlc_gl_filter_priv {
     struct vlc_gl_filter filter;
