@@ -101,7 +101,7 @@ static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_qu
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    hr = d3d_dev->d3ddevice->CreateBuffer(&bd, NULL, quad->vertexBuffer.GetAddressOf());
+    hr = d3d_dev->d3ddevice->CreateBuffer(&bd, NULL, &quad->vertexBuffer);
     if(FAILED(hr)) {
         msg_Err(o, "Failed to create vertex buffer. (hr=%lX)", hr);
         goto fail;
@@ -111,7 +111,7 @@ static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_qu
     bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
     bd.ByteWidth = sizeof(WORD) * quad->generic.indexCount;
 
-    hr = d3d_dev->d3ddevice->CreateBuffer(&bd, NULL, quad->indexBuffer.GetAddressOf());
+    hr = d3d_dev->d3ddevice->CreateBuffer(&bd, NULL, &quad->indexBuffer);
     if(FAILED(hr)) {
         msg_Err(o, "Could not create the quad indices. (hr=0x%lX)", hr);
         goto fail;
@@ -253,7 +253,7 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
     constantDesc.ByteWidth = sizeof(PS_CONSTANT_BUFFER);
     constantDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     constantDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    hr = d3d_dev->d3ddevice->CreateBuffer(&constantDesc, NULL, quad->pPixelShaderConstants.GetAddressOf());
+    hr = d3d_dev->d3ddevice->CreateBuffer(&constantDesc, NULL, &quad->pPixelShaderConstants);
     if(FAILED(hr)) {
         msg_Err(o, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
         goto error;
@@ -263,7 +263,7 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
     {
         static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
         constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
-        hr = d3d_dev->d3ddevice->CreateBuffer(&constantDesc, NULL, quad->viewpointShaderConstant.GetAddressOf());
+        hr = d3d_dev->d3ddevice->CreateBuffer(&constantDesc, NULL, &quad->viewpointShaderConstant);
         if(FAILED(hr)) {
             msg_Err(o, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
             goto error;

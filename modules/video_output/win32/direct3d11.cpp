@@ -1080,7 +1080,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if (is_d3d11_opaque(fmt->i_chroma)) {
         ComPtr<ID3D10Multithread> pMultithread;
-        hr = sys->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(pMultithread.GetAddressOf()));
+        hr = sys->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&pMultithread));
         if (SUCCEEDED(hr))
             pMultithread->SetMultithreadProtected(TRUE);
     }
@@ -1093,13 +1093,13 @@ static HRESULT InitRenderFence(vout_display_sys_t *sys)
 {
     HRESULT hr;
     ComPtr<ID3D11Device5> d3ddev5;
-    hr = sys->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(d3ddev5.GetAddressOf()));
+    hr = sys->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3ddev5));
     if (FAILED(hr))
         goto error;
-    hr = d3ddev5->CreateFence(sys->renderFence, D3D11_FENCE_FLAG_NONE, IID_GRAPHICS_PPV_ARGS(sys->d3dRenderFence.GetAddressOf()));
+    hr = d3ddev5->CreateFence(sys->renderFence, D3D11_FENCE_FLAG_NONE, IID_GRAPHICS_PPV_ARGS(&sys->d3dRenderFence));
     if (FAILED(hr))
         goto error;
-    hr = sys->d3d_dev->d3dcontext->QueryInterface(IID_GRAPHICS_PPV_ARGS(sys->d3dcontext4.GetAddressOf()));
+    hr = sys->d3d_dev->d3dcontext->QueryInterface(IID_GRAPHICS_PPV_ARGS(&sys->d3dcontext4));
     if (FAILED(hr))
         goto error;
     sys->renderFinished = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -1140,7 +1140,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     spuBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE; /* keep source intact */
     spuBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO; /* discard */
 
-    hr = sys->d3d_dev->d3ddevice->CreateBlendState(&spuBlendDesc, pSpuBlendState.GetAddressOf());
+    hr = sys->d3d_dev->d3ddevice->CreateBlendState(&spuBlendDesc, &pSpuBlendState);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create SPU blend state. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -1154,7 +1154,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     D3D11_DEPTH_STENCIL_DESC stencilDesc = { };
 
     ComPtr<ID3D11DepthStencilState> pDepthStencilState;
-    hr = sys->d3d_dev->d3ddevice->CreateDepthStencilState(&stencilDesc, pDepthStencilState.GetAddressOf() );
+    hr = sys->d3d_dev->d3ddevice->CreateDepthStencilState(&stencilDesc, &pDepthStencilState );
     if (SUCCEEDED(hr))
         sys->d3d_dev->d3dcontext->OMSetDepthStencilState(pDepthStencilState.Get(), 0);
 

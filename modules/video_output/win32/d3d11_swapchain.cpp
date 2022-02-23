@@ -65,7 +65,7 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
 
     if ( display->swapchainTargetView[0].Get() ) {
         ComPtr<ID3D11Resource> res;
-        display->swapchainTargetView[0]->GetResource( res.GetAddressOf() );
+        display->swapchainTargetView[0]->GetResource( &res );
         if ( res )
         {
             ComPtr<ID3D11Texture2D> res2d;
@@ -123,12 +123,12 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
     }
 
     ComPtr<IDXGIDevice> pDXGIDevice;
-    hr = display->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(pDXGIDevice.GetAddressOf()));
+    hr = display->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&pDXGIDevice));
     if (FAILED(hr)) {
         return false;
     }
     ComPtr<IDXGIAdapter> dxgiadapter;
-    hr = pDXGIDevice->GetAdapter(dxgiadapter.GetAddressOf());
+    hr = pDXGIDevice->GetAdapter(&dxgiadapter);
     if (FAILED(hr)) {
         return false;
     }
@@ -137,7 +137,7 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
         return false;
 
     ComPtr<ID3D11Resource> pBackBuffer;
-    hr = DXGI_GetSwapChain1(display->sys)->GetBuffer( 0, IID_GRAPHICS_PPV_ARGS(pBackBuffer.GetAddressOf()) );
+    hr = DXGI_GetSwapChain1(display->sys)->GetBuffer( 0, IID_GRAPHICS_PPV_ARGS(&pBackBuffer) );
     if ( FAILED( hr ) ) {
         msg_Err( display->obj, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr );
         return false;
