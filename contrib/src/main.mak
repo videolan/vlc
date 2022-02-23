@@ -529,6 +529,7 @@ PKGS := $(sort $(PKGS_MANUAL) $(PKGS_DEPS))
 fetch: $(PKGS:%=.sum-%)
 fetch-all: $(PKGS_ALL:%=.sum-%)
 install: $(PKGS:%=.%)
+tools: $(PKGS_TOOLS:%=.dep-%)
 
 mostlyclean:
 	-$(RM) $(foreach p,$(PKGS_ALL),.$(p) .sum-$(p) .dep-$(p))
@@ -578,6 +579,8 @@ endif
 list:
 	@echo All packages:
 	@echo '  $(PKGS_ALL)' | tr " " "\n" | sort | tr "\n" " " |fmt
+	@echo All native tools:
+	@echo '  $(PKGS_TOOLS)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Distribution-provided packages:
 	@echo '  $(PKGS_FOUND)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Automatically selected packages:
@@ -594,7 +597,7 @@ list:
 help:
 	@cat $(SRC)/help.txt
 
-.PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt
+.PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt tools
 
 CMAKE_SYSTEM_NAME =
 ifdef HAVE_CROSS_COMPILE
