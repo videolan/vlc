@@ -55,6 +55,10 @@ namespace hls
 
                 virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const override;
 
+            protected:
+                time_t targetDuration;
+                Url playlistUrl;
+
             private:
                 static const unsigned MAX_UPDATE_FAILED_UPDATE_COUNT = 3;
                 StreamFormat streamFormat;
@@ -62,8 +66,6 @@ namespace hls
                 bool b_loaded;
                 unsigned updateFailureCount;
                 vlc_tick_t lastUpdateTime;
-                time_t targetDuration;
-                Url playlistUrl;
         };
     }
 }
