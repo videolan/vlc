@@ -343,7 +343,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
     bool found = false;
     for (int i = 0; !found; ++i)
     {
-        hr = p_sys->mft->GetInputAvailableType(stream_id, i, input_media_type.GetAddressOf());
+        hr = p_sys->mft->GetInputAvailableType(stream_id, i, &input_media_type);
         if (hr == MF_E_NO_MORE_TYPES)
             break;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
@@ -370,7 +370,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
     if (!found)
         goto error;
 
-    hr = p_sys->mft->GetInputAvailableType(stream_id, input_type_index, input_media_type.GetAddressOf());
+    hr = p_sys->mft->GetInputAvailableType(stream_id, input_type_index, &input_media_type);
     if (FAILED(hr))
         goto error;
 
@@ -476,7 +476,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
     bool found = false;
     for (int i = 0; !found; ++i)
     {
-        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, output_media_type.GetAddressOf());
+        hr = p_sys->mft->GetOutputAvailableType(stream_id, i, &output_media_type);
         if (hr == MF_E_NO_MORE_TYPES)
             break;
         else if (hr == MF_E_TRANSFORM_TYPE_NOT_SET)
@@ -525,7 +525,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
          * by the MFT */
         output_type_index = 0;
 
-    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, output_media_type.GetAddressOf());
+    hr = p_sys->mft->GetOutputAvailableType(stream_id, output_type_index, &output_media_type);
     if (FAILED(hr))
         goto error;
 
@@ -602,12 +602,12 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSamp
     if (FAILED(hr))
         goto error;
 
-    hr = MFCreateSample(input_sample.GetAddressOf());
+    hr = MFCreateSample(&input_sample);
     if (FAILED(hr))
         goto error;
 
     allocation_size = __MAX(input_info.cbSize, size);
-    hr = MFCreateMemoryBuffer(allocation_size, input_media_buffer.GetAddressOf());
+    hr = MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -658,16 +658,16 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSam
             goto error;
     }
 
-    hr = MFCreateSample(output_sample.GetAddressOf());
+    hr = MFCreateSample(&output_sample);
     if (FAILED(hr))
         goto error;
 
     allocation_size = output_info.cbSize;
     alignment = output_info.cbAlignment;
     if (alignment > 0)
-        hr = MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, output_media_buffer.GetAddressOf());
+        hr = MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, &output_media_buffer);
     else
-        hr = MFCreateMemoryBuffer(allocation_size, output_media_buffer.GetAddressOf());
+        hr = MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -715,7 +715,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (AllocateInputSample(p_dec, stream_id, input_sample, alloc_size))
         goto error;
 
-    hr = input_sample->GetBufferByIndex(0, input_media_buffer.GetAddressOf());
+    hr = input_sample->GetBufferByIndex(0, &input_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -900,7 +900,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
     {
         picture_t *picture = NULL;
         ComPtr<IMFMediaBuffer> output_media_buffer;
-        hr = output_sample->GetBufferByIndex(buf_index, output_media_buffer.GetAddressOf());
+        hr = output_sample->GetBufferByIndex(buf_index, &output_media_buffer);
         if (FAILED(hr))
             goto error;
 
@@ -1162,7 +1162,7 @@ static HRESULT DequeueMediaEvent(decoder_t *p_dec)
     HRESULT hr;
 
     ComPtr<IMFMediaEvent> event;
-    hr = p_sys->event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, event.GetAddressOf());
+    hr = p_sys->event_generator->GetEvent(MF_EVENT_FLAG_NO_WAIT, &event);
     if (FAILED(hr))
         return hr;
     MediaEventType event_type;
@@ -1291,7 +1291,7 @@ static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
 {
     mft_dec_sys_t *p_sys = static_cast<mft_dec_sys_t*>(p_dec->p_sys);
     HRESULT hr;
-    hr = p_sys->fptr_MFCreateDXGIDeviceManager(&p_sys->dxgi_token, p_sys->dxgi_manager.GetAddressOf());
+    hr = p_sys->fptr_MFCreateDXGIDeviceManager(&p_sys->dxgi_token, &p_sys->dxgi_manager);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -1316,7 +1316,7 @@ static int InitializeMFT(decoder_t *p_dec)
     HRESULT hr;
 
     ComPtr<IMFAttributes> attributes;
-    hr = p_sys->mft->GetAttributes(attributes.GetAddressOf());
+    hr = p_sys->mft->GetAttributes(&attributes);
     if (hr != E_NOTIMPL && FAILED(hr))
         goto error;
     if (SUCCEEDED(hr))
