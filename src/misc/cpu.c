@@ -116,7 +116,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
 
 #if defined( __i386__ ) || defined( __x86_64__ )
     unsigned int i_eax, i_ebx, i_ecx, i_edx;
-    bool b_amd;
 
     /* Needed for x86 CPU capabilities detection */
 # if defined (__i386__) && defined (__PIC__)
@@ -167,10 +166,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     if( !i_eax )
         goto out;
 #endif
-
-    /* borrowed from mpeg2dec */
-    b_amd = ( i_ebx == 0x68747541 ) && ( i_ecx == 0x444d4163 )
-                    && ( i_edx == 0x69746e65 );
 
     /* test for the MMX flag */
     cpuid( 0x00000001 );
