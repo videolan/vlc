@@ -117,12 +117,9 @@ variables:
 # Common rules
 .base-template:
     stage: build
-    only:
-        refs:
-            - merge_requests
-            - master@videolan/vlc
-    except:
-        - schedules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master@videolan/vlc"'
     artifacts:
         paths:
             - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
@@ -191,9 +188,8 @@ uwp-arm64-libvlc-llvm:
 
 .nightly-win-common:
     extends: .win-common
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
         - for ext in 7z zip; do mv ${SHORTARCH}/vlc-*-dev-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
@@ -278,9 +274,8 @@ debian:
 
 nightly-debian:
     extends: debian
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
     artifacts:
 
@@ -304,9 +299,8 @@ snap:
 
 nightly-snap:
     extends: .snap-common
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
         - mkdir nightlies
@@ -395,9 +389,8 @@ macos-arm64:
 
 .nightly-macos-common:
     extends: .macos-common
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
         - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
@@ -512,6 +505,5 @@ pages:
     artifacts:
         paths:
             - public
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
