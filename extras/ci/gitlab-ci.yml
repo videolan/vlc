@@ -12,6 +12,11 @@ default:
         - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
         - cd contrib && find . -maxdepth 1 -type f -name "vlc-contrib-*-${VLC_CONTRIB_SHA}.tar.bz2" -exec sh -c 'tar tf "$0" > /dev/null && shasum -a 512 "$0" | tee SHA512SUM' "{}" \;
     interruptible: true
+    # Most jobs use docker, so we can default to those tags.
+    # macOS base template will overwrite this
+    tags:
+        - docker
+        - amd64
 
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20201106141924
@@ -123,18 +128,11 @@ variables:
             - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
             - contrib/SHA512SUM
 
-# Common rules for jobs using docker
-.docker-template:
-    extends: .base-template
-    tags:
-        - docker
-        - amd64
-
 #
 # Windows
 #
 .win-common:
-    extends: .docker-template
+    extends: .base-template
     script: |
         if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
             NIGHTLY_EXTRA_BUILD_FLAGS="-i n -l"
@@ -236,7 +234,7 @@ nightly-win64-ucrt-llvm:
 # Debian
 #
 debian:
-    extends: .docker-template
+    extends: .base-template
     image:
         name: $VLC_DEBIAN_IMAGE
     script: |
@@ -290,7 +288,7 @@ nightly-debian:
 # Snap builds
 #
 .snap-common:
-    extends: .docker-template
+    extends: .base-template
     image:
         name: $VLC_SNAP_IMAGE
     script: |
@@ -325,7 +323,7 @@ nightly-snap:
 # Raspbian
 #
 raspbian-arm:
-    extends: .docker-template
+    extends: .base-template
     image:
         name: $VLC_RASPBIAN_IMAGE
     script: |
@@ -454,7 +452,7 @@ tvos-arm64:
 # Android
 #
 .android-common:
-    extends: .docker-template
+    extends: .base-template
     image:
         name: $VLC_ANDROID_IMAGE
     script: |
@@ -486,7 +484,7 @@ android-x86_64:
 #
 
 wasm32-emscripten-build :
-    extends: .docker-template
+    extends: .base-template
     variables: *variables-emscripten-wasm32
     image:
         name: $VLC_WASM_EMSCRIPTEN
@@ -503,7 +501,7 @@ wasm32-emscripten-build :
 # VLC Documentation
 #
 pages:
-    extends: .docker-template
+    extends: .base-template
     image:
         name: $VLC_DEBIAN_IMAGE
     script:
