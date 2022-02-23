@@ -180,8 +180,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
 # endif
     i_capabilities |= VLC_CPU_MMX;
 
-    if( i_edx & 0x02000000 )
-        i_capabilities |= VLC_CPU_MMXEXT;
 # if defined (CAN_COMPILE_SSE) && !defined (__SSE__)
     if (( i_edx & 0x02000000 ) && vlc_CPU_check ("SSE", SSE_test))
 # endif
@@ -209,8 +207,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
-    if( b_amd && ( i_edx & 0x00400000 ) )
-        i_capabilities |= VLC_CPU_MMXEXT;
 out:
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
@@ -257,8 +253,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
 #if defined (__i386__) || defined (__x86_64__)
     if (vlc_CPU_MMX())
         vlc_memstream_puts(&stream, "MMX ");
-    if (vlc_CPU_MMXEXT())
-        vlc_memstream_puts(&stream, "MMXEXT ");
     if (vlc_CPU_SSE())
         vlc_memstream_puts(&stream, "SSE ");
     if (vlc_CPU_SSE2())

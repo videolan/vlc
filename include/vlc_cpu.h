@@ -42,7 +42,6 @@ unsigned vlc_CPU_raw(void);
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
 #  define VLC_CPU_MMX    0x00000008
-#  define VLC_CPU_MMXEXT 0x00000020
 #  define VLC_CPU_SSE    0x00000040
 #  define VLC_CPU_SSE2   0x00000080
 #  define VLC_CPU_SSE3   0x00000100
@@ -64,11 +63,9 @@ unsigned vlc_CPU_raw(void);
 # endif
 
 # if defined (__SSE__)
-#  define vlc_CPU_MMXEXT() (1)
 #  define vlc_CPU_SSE() (1)
 #  define VLC_SSE
 # else
-#  define vlc_CPU_MMXEXT() ((vlc_CPU() & VLC_CPU_MMXEXT) != 0)
 #  define vlc_CPU_SSE() ((vlc_CPU() & VLC_CPU_SSE) != 0)
 #  define VLC_SSE __attribute__ ((__target__ ("sse")))
 # endif
