@@ -1,0 +1,13 @@
+--- protobuf/m4/acx_pthread.m4.orig	2022-02-23 11:15:51.818483000 +0100
++++ protobuf/m4/acx_pthread.m4	2022-02-23 11:16:06.148340600 +0100
+@@ -134,6 +134,10 @@ case "${host_cpu}-${host_os}" in
+ 
+         acx_pthread_flags="-pthreads pthread -mt -pthread $acx_pthread_flags"
+         ;;
++        *mingw*)
++        # Do not use pthread, fallback to the win32 threading API
++        acx_pthread_flags=""
++        ;;
+ esac
+ 
+ if test x"$acx_pthread_ok" = xno; then
