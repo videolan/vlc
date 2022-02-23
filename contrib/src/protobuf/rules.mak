@@ -24,9 +24,6 @@ $(TARBALLS)/protoc-$(PROTOBUF_VERSION)-cpp.tar.gz: $(TARBALLS)/protobuf-$(PROTOB
 .sum-protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz
 
 DEPS_protobuf = zlib $(DEPS_zlib)
-ifdef HAVE_WIN32
-DEPS_protobuf += pthreads $(DEPS_pthreads)
-endif
 
 PROTOBUFVARS := DIST_LANG="cpp"
 PROTOCVARS := DIST_LANG="cpp"
@@ -42,6 +39,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	$(APPLY) $(SRC)/protobuf/protobuf-disable-gmock.patch
 	$(APPLY) $(SRC)/protobuf/protobuf-fix-build.patch
 	$(APPLY) $(SRC)/protobuf/include-algorithm.patch
+	$(APPLY) $(SRC)/protobuf/protobuf-no-mingw-pthread.patch
 	$(MOVE)
 
 .protoc: protoc
@@ -57,6 +55,7 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(APPLY) $(SRC)/protobuf/dont-build-protoc.patch
 	$(APPLY) $(SRC)/protobuf/protobuf-fix-build.patch
 	$(APPLY) $(SRC)/protobuf/include-algorithm.patch
+	$(APPLY) $(SRC)/protobuf/protobuf-no-mingw-pthread.patch
 	$(MOVE)
 
 .protobuf: protobuf
