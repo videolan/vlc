@@ -82,7 +82,7 @@ parts:
           --disable-chromaprint
       if [ -v VLC_PREBUILT_CONTRIBS_URL ]; then
           make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-          make -j $(getconf _NPROCESSORS_ONLN) .protoc
+          make -j $(getconf _NPROCESSORS_ONLN) tools
       else
           make list
           make -j $(getconf _NPROCESSORS_ONLN) fetch

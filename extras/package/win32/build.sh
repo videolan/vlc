@@ -333,7 +333,7 @@ else
     else
         make prebuilt
     fi
-    make .luac .protoc
+    make -j$JOBS tools
 fi
 cd ../..
 

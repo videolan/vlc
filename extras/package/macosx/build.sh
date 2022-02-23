@@ -183,7 +183,7 @@ if [ ! -e "../$HOST_TRIPLET" ]; then
     else
         make prebuilt
     fi
-    make .luac .protoc
+    make -j$JOBS tools
 fi
 fi
 spopd
