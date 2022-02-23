@@ -29,15 +29,31 @@ endif
 PKGS += lua luac
 PKGS_ALL += luac
 ifeq ($(call need_pkg,"lua >= 5.1"),)
-PKGS_FOUND += lua luac
+PKGS_FOUND += lua
+ifndef HAVE_CROSS_COMPILE
+PKGS_FOUND += luac
+endif
 else
 ifeq ($(call need_pkg,"lua5.2"),)
-PKGS_FOUND += lua luac
+PKGS_FOUND += lua
+ifndef HAVE_CROSS_COMPILE
+PKGS_FOUND += luac
+endif
 else
 ifeq ($(call need_pkg,"lua5.1"),)
-PKGS_FOUND += lua luac
+PKGS_FOUND += lua
+ifndef HAVE_CROSS_COMPILE
+PKGS_FOUND += luac
 endif
 endif
+endif
+endif
+
+ifeq ($(shell $(HOST)-luac -v 2>/dev/null | head -1 | sed  -E 's/Lua ([0-9]+).([0-9]+).*/\1.\2/'),$(LUA_SHORTVERSION))
+PKGS_FOUND += luac
+endif
+ifeq ($(shell $(HOST)-luac -v 2>/dev/null | head -1 | sed  -E 's/Lua ([0-9]+).([0-9]+).*/\1.\2/'),5.2)
+PKGS_FOUND += luac
 endif
 
 $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
