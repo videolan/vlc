@@ -534,14 +534,12 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
 
   AS_IF([test -z "$LUAC"], [
-    dnl Old contribs mixed cross-tools and cross-compiled executables
-    AS_IF([test -x "${CONTRIB_DIR}/bin/luac${BUILDEXEEXT}"], [
-      LUAC="${CONTRIB_DIR}/bin/luac${BUILDEXEEXT}"
-    ])
-
-    dnl Newer contribs follow usual name space rules
+    AC_MSG_CHECKING([if contribs provide luac])
     AS_IF([test -x "${CONTRIB_DIR}/../bin/${host_alias}-luac${BUILDEXEEXT}"], [
       LUAC="${CONTRIB_DIR}/../bin/${host_alias}-luac${BUILDEXEEXT}"
+      AC_MSG_RESULT([yes])
+    ],[
+      AC_MSG_RESULT([no])
     ])
   ])
 
