@@ -39,8 +39,16 @@ struct d3d11_vertex_shader_t {
 /* A Quad is texture that can be displayed in a rectangle */
 struct d3d11_quad_t
 {
-    picture_sys_d3d11_t       picSys;
-    d3d_quad_t                generic;
+    ~d3d11_quad_t()
+    {
+        ReleaseD3D11PictureSys(&picSys);
+    }
+
+    void Reset();
+    void UpdateViewport(const RECT *, const d3d_format_t *display);
+
+    picture_sys_d3d11_t       picSys = {};
+    d3d_quad_t                generic = {};
     UINT                      resourceCount = 0;
     Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
@@ -65,7 +73,6 @@ HRESULT D3D11_CompilePixelShaderBlob(vlc_object_t *, const d3d_shader_compiler_t
 HRESULT D3D11_SetQuadPixelShader(vlc_object_t *, d3d11_device_t *,
                                  bool sharp,
                                  d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);
-void D3D11_ReleaseQuadPixelShader(d3d11_quad_t *);
 
 HRESULT D3D11_CompileVertexShaderBlob(vlc_object_t *, const d3d_shader_compiler_t *,
                                       d3d11_device_t *, bool flat, d3d_shader_blob *);

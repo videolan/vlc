@@ -265,7 +265,7 @@ static void UpdateSize(vout_display_t *vd)
     rect_dst.top    = sys->area.place.y;
     rect_dst.bottom = sys->area.place.y + sys->area.place.height;
 
-    D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
+    sys->picQuad.UpdateViewport( &rect_dst, sys->display.pixelFormat );
 
     RECT source_rect;
     source_rect.left   = vd->source->i_x_offset;
@@ -1208,7 +1208,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     rect_dst.top    = sys->area.place.y;
     rect_dst.bottom = sys->area.place.y + sys->area.place.height;
 
-    D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
+    sys->picQuad.UpdateViewport( &rect_dst, sys->display.pixelFormat );
 
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
@@ -1227,10 +1227,10 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
-    D3D11_ReleaseQuad(&sys->picQuad);
+    sys->picQuad.Reset();
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
-    D3D11_ReleaseQuad(&sys->regionQuad);
+    sys->regionQuad.Reset();
 
     ReleaseD3D11PictureSys(&sys->stagingSys);
 
@@ -1262,7 +1262,8 @@ static void Direct3D11DeleteRegions(int count, picture_t **region)
 
 static void DestroyPictureQuad(picture_t *p_picture)
 {
-    D3D11_ReleaseQuad( (d3d11_quad_t *) p_picture->p_sys );
+    d3d11_quad_t *quad = static_cast<d3d11_quad_t *>(p_picture->p_sys);
+    delete quad;
 }
 
 static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_count,
@@ -1293,8 +1294,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         for (int j = 0; j < sys->d3dregion_count; j++) {
             picture_t *cache = sys->d3dregions[j];
-            if (cache != NULL && ((d3d11_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]) {
-                ((d3d11_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]->GetDesc(&texDesc );
+            d3d11_quad_t *cache_quad = cache ? static_cast<d3d11_quad_t *>(cache->p_sys) : nullptr;
+            if (cache_quad != nullptr && cache_quad->picSys.texture[KNOWN_DXGI_INDEX]) {
+                cache_quad->picSys.texture[KNOWN_DXGI_INDEX]->GetDesc(&texDesc );
                 if (texDesc.Format == sys->regionQuad.generic.textureFormat->formatTexture &&
                     texDesc.Width  == r->p_picture->format.i_width &&
                     texDesc.Height == r->p_picture->format.i_height) {
@@ -1311,7 +1313,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             quad = static_cast<d3d11_quad_t*>(quad_picture->p_sys);
         else
         {
-            d3d11_quad_t *d3dquad = static_cast<d3d11_quad_t *>(calloc(1, sizeof(*d3dquad)));
+            d3d11_quad_t *d3dquad = new (std::nothrow) d3d11_quad_t;
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
@@ -1322,7 +1324,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 for (int j=0; j<DXGI_MAX_SHADER_VIEW; j++)
                     if (d3dquad->picSys.texture[j])
                         d3dquad->picSys.texture[j]->Release();
-                free(d3dquad);
+                delete d3dquad;
                 continue;
             }
 
@@ -1331,7 +1333,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                                            d3dquad->picSys.renderSrc)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
-                free(d3dquad);
+                delete d3dquad;
                 continue;
             }
             d3dquad->generic.i_width  = r->fmt.i_width;
@@ -1343,7 +1345,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             {
                 msg_Err(vd, "Failed to allocate %dx%d quad for OSD",
                              r->fmt.i_visible_width, r->fmt.i_visible_height);
-                free(d3dquad);
+                delete d3dquad;
                 continue;
             }
 
@@ -1351,7 +1353,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
-                free(d3dquad);
+                delete d3dquad;
                 continue;
             }
             const auto picres = [](picture_sys_d3d11_t * p_sys){
@@ -1364,7 +1366,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if ((*region)[i] == NULL) {
                 msg_Err(vd, "Failed to create %dx%d picture for OSD",
                         r->fmt.i_width, r->fmt.i_height);
-                D3D11_ReleaseQuad(d3dquad);
+                d3dquad->Reset();
                 continue;
             }
             quad_picture = (*region)[i];
@@ -1378,12 +1380,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
         }
 
-        hr = sys->d3d_dev->d3dcontext->Map(((d3d11_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        hr = sys->d3d_dev->d3dcontext->Map(quad->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( SUCCEEDED(hr) ) {
             err = picture_UpdatePlanes(quad_picture, static_cast<uint8_t*>(mappedResource.pData), mappedResource.RowPitch);
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to set the buffer on the SPU picture" );
-                sys->d3d_dev->d3dcontext->Unmap(((d3d11_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
+                sys->d3d_dev->d3dcontext->Unmap(quad->picSys.resource[KNOWN_DXGI_INDEX], 0);
                 picture_Release(quad_picture);
                 if ((*region)[i] == quad_picture)
                     (*region)[i] = NULL;
@@ -1392,7 +1394,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
             picture_CopyPixels(quad_picture, r->p_picture);
 
-            sys->d3d_dev->d3dcontext->Unmap(((d3d11_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
+            sys->d3d_dev->d3dcontext->Unmap(quad->picSys.resource[KNOWN_DXGI_INDEX], 0);
         } else {
             msg_Err(vd, "Failed to map the SPU texture (hr=0x%lX)", hr );
             picture_Release(quad_picture);
@@ -1432,7 +1434,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         spuViewport.top    += sys->area.place.y;
         spuViewport.bottom += sys->area.place.y;
 
-        D3D11_UpdateViewport( quad, &spuViewport, sys->display.pixelFormat );
+        quad->UpdateViewport( &spuViewport, sys->display.pixelFormat );
 
         D3D11_UpdateQuadOpacity(vd, sys->d3d_dev, quad, r->i_alpha / 255.0f );
     }

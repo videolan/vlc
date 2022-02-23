@@ -91,15 +91,6 @@ HRESULT D3D11_SetQuadPixelShader(vlc_object_t *o, d3d11_device_t *d3d_dev,
     return hr;
 }
 
-void D3D11_ReleaseQuadPixelShader(d3d11_quad_t *quad)
-{
-    for (size_t i=0; i<ARRAY_SIZE(quad->d3dpixelShader); i++)
-    {
-        quad->d3dpixelShader[i].Reset();
-        quad->SamplerStates[i].Reset();
-    }
-}
-
 HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *texture,
                                    const d3d_format_t *cfg, ComPtr<ID3D11RenderTargetView> output[DXGI_MAX_RENDER_TARGET] )
 {

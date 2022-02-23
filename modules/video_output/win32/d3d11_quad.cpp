@@ -124,14 +124,18 @@ fail:
     return false;
 }
 
-void D3D11_ReleaseQuad(d3d11_quad_t *quad)
+void d3d11_quad_t::Reset()
 {
-    quad->pPixelShaderConstants.Reset();
-    quad->vertexBuffer.Reset();
-    quad->indexBuffer.Reset();
-    quad->viewpointShaderConstant.Reset();
-    D3D11_ReleaseQuadPixelShader(quad);
-    ReleaseD3D11PictureSys(&quad->picSys);
+    pPixelShaderConstants.Reset();
+    vertexBuffer.Reset();
+    indexBuffer.Reset();
+    viewpointShaderConstant.Reset();
+    for (size_t i=0; i<ARRAY_SIZE(d3dpixelShader); i++)
+    {
+        d3dpixelShader[i].Reset();
+        SamplerStates[i].Reset();
+    }
+    ReleaseD3D11PictureSys(&picSys);
 }
 
 #undef D3D11_UpdateQuadPosition
@@ -272,7 +276,7 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
     return VLC_SUCCESS;
 
 error:
-    D3D11_ReleaseQuad(quad);
+    quad->Reset();
     return VLC_EGENERIC;
 }
 
@@ -294,26 +298,26 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     return VLC_SUCCESS;
 }
 
-void D3D11_UpdateViewport(d3d11_quad_t *quad, const RECT *rect, const d3d_format_t *display)
+void d3d11_quad_t::UpdateViewport(const RECT *rect, const d3d_format_t *display)
 {
     LONG srcAreaWidth, srcAreaHeight;
 
     srcAreaWidth  = RECTWidth(*rect);
     srcAreaHeight = RECTHeight(*rect);
 
-    quad->cropViewport[0].TopLeftX = rect->left;
-    quad->cropViewport[0].TopLeftY = rect->top;
-    quad->cropViewport[0].Width    = srcAreaWidth;
-    quad->cropViewport[0].Height   = srcAreaHeight;
+    cropViewport[0].TopLeftX = rect->left;
+    cropViewport[0].TopLeftY = rect->top;
+    cropViewport[0].Width    = srcAreaWidth;
+    cropViewport[0].Height   = srcAreaHeight;
 
-    switch ( quad->generic.textureFormat->formatTexture )
+    switch ( generic.textureFormat->formatTexture )
     {
     case DXGI_FORMAT_NV12:
     case DXGI_FORMAT_P010:
-        quad->cropViewport[1].TopLeftX = rect->left / 2;
-        quad->cropViewport[1].TopLeftY = rect->top / 2;
-        quad->cropViewport[1].Width    = srcAreaWidth / 2;
-        quad->cropViewport[1].Height   = srcAreaHeight / 2;
+        cropViewport[1].TopLeftX = rect->left / 2;
+        cropViewport[1].TopLeftY = rect->top / 2;
+        cropViewport[1].Width    = srcAreaWidth / 2;
+        cropViewport[1].Height   = srcAreaHeight / 2;
         break;
     case DXGI_FORMAT_R8G8B8A8_UNORM:
     case DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -328,29 +332,29 @@ void D3D11_UpdateViewport(d3d11_quad_t *quad, const RECT *rect, const d3d_format
         if ( display->formatTexture == DXGI_FORMAT_NV12 ||
              display->formatTexture == DXGI_FORMAT_P010 )
         {
-            quad->cropViewport[1].TopLeftX = rect->left / 2;
-            quad->cropViewport[1].TopLeftY = rect->top / 2;
-            quad->cropViewport[1].Width    = srcAreaWidth / 2;
-            quad->cropViewport[1].Height   = srcAreaHeight / 2;
+            cropViewport[1].TopLeftX = rect->left / 2;
+            cropViewport[1].TopLeftY = rect->top / 2;
+            cropViewport[1].Width    = srcAreaWidth / 2;
+            cropViewport[1].Height   = srcAreaHeight / 2;
         }
         break;
     case DXGI_FORMAT_UNKNOWN:
-        switch ( quad->generic.textureFormat->fourcc )
+        switch ( generic.textureFormat->fourcc )
         {
         case VLC_CODEC_YUVA:
             if ( display->formatTexture != DXGI_FORMAT_NV12 &&
                  display->formatTexture != DXGI_FORMAT_P010 )
             {
-                quad->cropViewport[1] = quad->cropViewport[0];
+                cropViewport[1] = cropViewport[0];
                 break;
             }
             /* fallthrough */
         case VLC_CODEC_I420_10L:
         case VLC_CODEC_I420:
-            quad->cropViewport[1].TopLeftX = quad->cropViewport[0].TopLeftX / 2;
-            quad->cropViewport[1].TopLeftY = quad->cropViewport[0].TopLeftY / 2;
-            quad->cropViewport[1].Width    = quad->cropViewport[0].Width / 2;
-            quad->cropViewport[1].Height   = quad->cropViewport[0].Height / 2;
+            cropViewport[1].TopLeftX = cropViewport[0].TopLeftX / 2;
+            cropViewport[1].TopLeftY = cropViewport[0].TopLeftY / 2;
+            cropViewport[1].Width    = cropViewport[0].Width / 2;
+            cropViewport[1].Height   = cropViewport[0].Height / 2;
             break;
         }
         break;
