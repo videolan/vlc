@@ -7,11 +7,17 @@ PKGS += protobuf protoc
 endif # !HAVE_TVOS
 PKGS_ALL += protoc
 ifeq ($(call need_pkg, "protobuf-lite = $(PROTOBUF_VERSION)"),)
-PKGS_FOUND += protobuf protoc
-else
+PKGS_FOUND += protobuf
+ifndef HAVE_CROSS_COMPILE
+PKGS_FOUND += protoc
+endif
+endif
+
+ifeq ($(shell $(HOST)-protoc --version 2>/dev/null | head -1 | sed s/'.* '//),$(PROTOBUF_VERSION))
+PKGS_FOUND += protoc
+endif
 ifeq ($(shell protoc --version 2>/dev/null | head -1 | sed s/'.* '//),$(PROTOBUF_VERSION))
 PKGS_FOUND += protoc
-endif # protoc
 endif
 
 $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
