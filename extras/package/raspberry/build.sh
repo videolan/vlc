@@ -110,7 +110,7 @@ info "Building contribs"
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
 
 # issue with arm detection of the target (detects i686)
-CONTRIBFLAGS="$CONTRIBFLAGS --disable-x265 --disable-mpg123 --disable-xcb"
+CONTRIBFLAGS="$CONTRIBFLAGS --disable-x265 --disable-mpg123 --disable-xcb --disable-libaribcaption"
 
 ${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
