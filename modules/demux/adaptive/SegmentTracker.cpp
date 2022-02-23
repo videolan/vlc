@@ -365,7 +365,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed)
 
     /* here next == wanted chunk pos */
     bool b_gap = (next.number != chunk.pos.number);
-    const bool b_switched = (next.rep != chunk.pos.rep) || !current.rep;
+    const bool b_switched = (current.rep != chunk.pos.rep) || !current.rep;
     bool b_discontinuity = chunk.chunk->discontinuity && current.isValid();
     if(b_discontinuity && current.number == next.number)
     {
@@ -376,7 +376,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed)
 
     if(b_switched)
     {
-        notify(RepresentationSwitchEvent(next.rep, chunk.pos.rep));
+        notify(RepresentationSwitchEvent(current.rep, chunk.pos.rep));
         initializing = true;
     }
 
