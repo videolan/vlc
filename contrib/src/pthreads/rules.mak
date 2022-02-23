@@ -18,6 +18,9 @@ PKGS_ALL += dxvahd dcomp
 ifeq ($(HAVE_MINGW64_V8),true)
 PKGS_FOUND += winrt_headers dxvahd
 endif
+ifeq ($(HAVE_WINPTHREAD),)
+PKGS_FOUND += pthreads
+endif
 endif
 endif
 
