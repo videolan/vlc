@@ -172,9 +172,6 @@ struct vlc_player_locker {
     BUTTON_SET_IMG( button, text, image, tooltip );                \
     BUTTONACT( button, thisslot );
 
-/* for widgets which must not follow the RTL auto layout changes */
-#define RTL_UNAFFECTED_WIDGET setLayoutDirection( Qt::LeftToRight );
-
 #define getSettings() p_intf->mainSettings
 
 static inline QString QVLCUserDir( vlc_userdir_t type )
