@@ -14,6 +14,9 @@ PKGS_ALL += dxvahd
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += dxvahd
 endif
+ifeq ($(HAVE_WINPTHREAD),)
+PKGS_FOUND += pthreads
+endif
 endif
 endif
 
