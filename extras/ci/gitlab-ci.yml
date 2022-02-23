@@ -152,6 +152,45 @@ nightly-win64:
         name: $VLC_WIN64_IMAGE
     variables: *variables-win64
 
+.release-win-common:
+    # We don't use any of the .win-common template so just use .docker-template
+    extends: .docker-template
+    only:
+      - tags
+    tags:
+        - release
+        - amd64
+    before_script:
+      # We usually can use $CI_COMMIT_TAG, but this lets us do fixup tags
+      # such as 3.0.123-1
+      # This is done in a before_script because we want to bypass the
+      # prebuilt contrib logic but can't have an empty before_script
+      - export RELEASE_TAG=$(echo $CI_COMMIT_TAG | cut -f 1 -d -)
+    script:
+      - export PATH=/opt/breakpad/bin:$PATH
+      - ./extras/package/win32/build.sh -r -l -i u -a $HOST_ARCH -b https://win.crashes.videolan.org
+      - >
+        ./extras/breakpad/symb_upload.py
+        --upload-url $CRASH_DRAGON_SUBMIT_URL
+        -p win --version $RELEASE_TAG
+        --prod VLC --log INFO
+        --strip-path $CI_PROJECT_DIR $CI_PROJECT_DIR/$SHORTARCH/symbols-$RELEASE_TAG
+    artifacts:
+      paths:
+        - $CI_PROJECT_DIR/$SHORTARCH/vlc-*release.7z
+
+release-win32:
+    extends: .release-win-common
+    image:
+        name: $VLC_WIN32_IMAGE
+    variables: *variables-win32
+
+release-win64:
+    extends: .release-win-common
+    image:
+        name: $VLC_WIN64_IMAGE
+    variables: *variables-win64
+
 #
 # Debian
 #
