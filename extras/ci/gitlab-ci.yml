@@ -83,12 +83,9 @@ variables:
 # Common rules
 .base-template:
     stage: build
-    only:
-        refs:
-            - merge_requests
-            - 3.0.x@videolan/vlc
-    except:
-        - schedules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "3.0.x@videolan/vlc"'
     artifacts:
         paths:
             - contrib/vlc-contrib-${TRIPLET}-*.tar.zst
@@ -163,9 +160,8 @@ uwparm64-libvlc-llvm:
 
 .nightly-win-common:
     extends: .win-common
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
         - for ext in 7z;             do mv ${VLCARCH}/vlc-*-debug.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
@@ -357,9 +353,8 @@ debian-qt6:
 
 nightly-debian:
     extends: debian
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
     artifacts:
 
@@ -387,9 +382,8 @@ nightly-debian:
 
 nightly-flatpak-x86_64:
     extends: .flatpak-common
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     image:
         name: $VLC_FLATPAK_IMAGE
         entrypoint: [""]
@@ -479,9 +473,8 @@ macos-arm64:
 
 .nightly-macos-common:
     extends: .macos-common
-    only:
-        - schedules
-    except:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
         - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
