@@ -22,6 +22,7 @@
 #include "player/player_controller.hpp"
 #include "player/player_controlbar_model.hpp"
 #include "player/control_list_model.hpp"
+#include "player/control_list_filter.hpp"
 
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
 #include "dialogs/toolbar/controlbar_profile.hpp"
@@ -255,6 +256,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<ControlbarProfile>(uri, versionMajor, versionMinor, "ControlbarProfile", "");
         qmlRegisterUncreatableType<PlayerControlbarModel>(uri, versionMajor, versionMinor, "PlayerControlbarModel", "");
         qmlRegisterUncreatableType<ControlListModel>( uri, versionMajor, versionMinor, "ControlListModel", "" );
+        qmlRegisterType<ControlListFilter>(uri, versionMajor, versionMinor, "ControlListFilter");
         qmlRegisterSingletonType(uri, versionMajor, versionMinor, "PlayerListModel", PlayerControlbarModel::getPlaylistIdentifierListModel);
 
         qmlRegisterType<StringListMenu>( uri, versionMajor, versionMinor, "StringListMenu" );

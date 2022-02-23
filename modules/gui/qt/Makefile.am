@@ -228,6 +228,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/player_controlbar_model.cpp gui/qt/player/player_controlbar_model.hpp \
 	gui/qt/player/control_list_model.cpp gui/qt/player/control_list_model.hpp \
+	gui/qt/player/control_list_filter.cpp \
+	gui/qt/player/control_list_filter.hpp \
 	gui/qt/playlist/media.hpp \
 	gui/qt/playlist/playlist_common.cpp \
 	gui/qt/playlist/playlist_common.hpp \
@@ -424,6 +426,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/player_controlbar_model.moc.cpp \
 	gui/qt/player/control_list_model.moc.cpp \
+	gui/qt/player/control_list_filter.moc.cpp \
 	gui/qt/playlist/playlist_common.moc.cpp \
 	gui/qt/playlist/playlist_controller.moc.cpp \
 	gui/qt/playlist/playlist_item.moc.cpp \
