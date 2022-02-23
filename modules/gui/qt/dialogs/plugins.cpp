@@ -48,10 +48,8 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QListView>
-#include <QListWidget>
 #include <QPainter>
 #include <QStyleOptionViewItem>
 #include <QKeyEvent>
@@ -67,6 +65,7 @@
 #include <QToolButton>
 #include <QStackedWidget>
 #include <QPainterPath>
+#include <QSignalMapper>
 
 //match the image source (width/height)
 #define SCORE_ICON_WIDTH_SCALE 4

@@ -27,10 +27,9 @@
 #include "input_manager.hpp"
 
 #include <QStackedWidget>
-#include <QVBoxLayout>
+#include <QGridLayout>
 #include <QScrollBar>
 #include <QLabel>
-#include <QStringList>
 #include <QDateTime>
 
 #include "EPGWidget.hpp"

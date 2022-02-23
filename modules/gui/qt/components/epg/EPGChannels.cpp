@@ -29,9 +29,7 @@
 #include "EPGView.hpp"
 
 #include <QPainter>
-#include <QFont>
 #include <QPaintEvent>
-#include <QtAlgorithms>
 
 EPGChannels::EPGChannels( QWidget *parent, EPGView *m_epgView )
     : QWidget( parent ), m_epgView( m_epgView ), m_offset( 0 )

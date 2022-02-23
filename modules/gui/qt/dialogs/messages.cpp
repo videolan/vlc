@@ -30,11 +30,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QTabWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QMutex>
-#include <QLineEdit>
 #include <QScrollBar>
 #include <QMutex>
 #include <QMutexLocker>

@@ -29,7 +29,8 @@
 #include <vlc_epg.h>
 
 #include <QWidget>
-#include <QStackedWidget>
+
+class QStackedWidget;
 
 class EPGView;
 class EPGItem;

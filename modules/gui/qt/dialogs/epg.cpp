@@ -31,7 +31,6 @@
 #include <vlc_playlist.h>
 
 #include <QVBoxLayout>
-#include <QSplitter>
 #include <QScrollBar>
 #include <QLabel>
 #include <QGroupBox>

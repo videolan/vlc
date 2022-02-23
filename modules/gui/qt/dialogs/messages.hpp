@@ -27,11 +27,9 @@
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
 #include "ui/messages_panel.h"
-#include <stdarg.h>
 #include <QMutex>
 #include <atomic>
 
-class QPushButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 class MsgEvent;

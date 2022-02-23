@@ -37,18 +37,11 @@
 
 #include <QDate>
 #include <QLabel>
-#include <QToolButton>
 #include <QPalette>
-#include <QEvent>
-#include <QResizeEvent>
-#include <QDate>
-#include <QMenu>
+#include <QAction>
 #include <QWidgetAction>
-#include <QDesktopWidget>
 #include <QPainter>
 #include <QTimer>
-#include <QSlider>
-#include <QBitmap>
 #include <QUrl>
 
 #if defined (QT5_HAS_X11)

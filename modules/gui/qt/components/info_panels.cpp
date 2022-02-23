@@ -41,7 +41,6 @@
 #include <QTreeWidget>
 #include <QTableWidget>
 #include <QHeaderView>
-#include <QList>
 #include <QStringList>
 #include <QGridLayout>
 #include <QLineEdit>

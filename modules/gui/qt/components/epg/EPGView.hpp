@@ -32,7 +32,6 @@
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
-#include <QList>
 #include <QHash>
 #include <QDateTime>
 

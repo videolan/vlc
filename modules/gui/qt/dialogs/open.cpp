@@ -29,7 +29,6 @@
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
 
-#include <QTabWidget>
 #include <QRegExp>
 #include <QMenu>
 

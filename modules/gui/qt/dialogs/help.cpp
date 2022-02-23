@@ -38,8 +38,6 @@
 #endif
 
 #include <QTextBrowser>
-#include <QTabWidget>
-#include <QLabel>
 #include <QString>
 #include <QDialogButtonBox>
 #include <QEvent>

@@ -22,7 +22,6 @@
 
 #include <QGraphicsView>
 
-class QGraphicsView;
 class QGraphicsScene;
 class QGraphicsPolygonItem;
 class QGraphicsLineItem;

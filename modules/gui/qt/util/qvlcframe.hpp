@@ -26,7 +26,6 @@
 
 #include <QWidget>
 #include <QDialog>
-#include <QHBoxLayout>
 #include <QApplication>
 #include <QMainWindow>
 #include <QKeyEvent>

@@ -21,8 +21,6 @@
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
 
-#include <QtAlgorithms>
-
 EPGProgram::EPGProgram( EPGView *view_, const vlc_epg_t *p_epg ) : QObject( view_ )
 {
     name = QString(p_epg->psz_name);

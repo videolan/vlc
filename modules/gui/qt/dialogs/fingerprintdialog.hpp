@@ -27,7 +27,6 @@
 #include "qt.hpp"
 
 #include <QDialog>
-#include <vlc_interface.h>
 #include <vlc_fingerprinter.h>
 
 namespace Ui {

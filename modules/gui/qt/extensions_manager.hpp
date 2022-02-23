@@ -33,8 +33,9 @@
 #include "qt.hpp"
 
 #include <QObject>
-#include <QMenu>
-#include <QSignalMapper>
+
+class QMenu;
+class QSignalMapper;
 
 class ExtensionsDialogProvider;
 
