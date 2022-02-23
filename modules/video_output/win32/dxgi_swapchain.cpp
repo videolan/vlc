@@ -203,7 +203,7 @@ void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_
     display->dxgiswapChain.As(&display->dxgiswapChain4);
 
 #ifdef HAVE_DXGI1_6_H
-    if (SUCCEEDED(display->dxgiswapChain->GetContainingOutput(dxgiOutput.GetAddressOf())))
+    if (SUCCEEDED(display->dxgiswapChain->GetContainingOutput(&dxgiOutput)))
     {
         ComPtr<IDXGIOutput6> dxgiOutput6;
         if (SUCCEEDED(dxgiOutput.As(&dxgiOutput6)))
@@ -295,7 +295,7 @@ static void DXGI_CreateSwapchainHwnd(dxgi_swapchain *display,
     FillSwapChainDesc(display, width, height, &scd);
 
     ComPtr<IDXGIFactory2> dxgifactory;
-    HRESULT hr = dxgiadapter->GetParent(IID_GRAPHICS_PPV_ARGS(dxgifactory.GetAddressOf()));
+    HRESULT hr = dxgiadapter->GetParent(IID_GRAPHICS_PPV_ARGS(&dxgifactory));
     if (FAILED(hr)) {
         msg_Err(display->obj, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
         return;
@@ -303,7 +303,7 @@ static void DXGI_CreateSwapchainHwnd(dxgi_swapchain *display,
 
     hr = dxgifactory->CreateSwapChainForHwnd(pFactoryDevice,
                                               display->swapchainSurface.hwnd, &scd,
-                                              NULL, NULL, display->dxgiswapChain.GetAddressOf());
+                                              NULL, NULL, &display->dxgiswapChain);
 
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
@@ -311,7 +311,7 @@ static void DXGI_CreateSwapchainHwnd(dxgi_swapchain *display,
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         hr = dxgifactory->CreateSwapChainForHwnd(pFactoryDevice,
                                                   display->swapchainSurface.hwnd, &scd,
-                                                  NULL, NULL, display->dxgiswapChain.GetAddressOf());
+                                                  NULL, NULL, &display->dxgiswapChain);
     }
     if (FAILED(hr)) {
         msg_Err(display->obj, "Could not create the SwapChain. (hr=0x%lX)", hr);
@@ -337,20 +337,20 @@ static void DXGI_CreateSwapchainDComp(dxgi_swapchain *display,
     scd.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
     ComPtr<IDXGIFactory2> dxgifactory;
-    HRESULT hr = dxgiadapter->GetParent(IID_GRAPHICS_PPV_ARGS(dxgifactory.GetAddressOf()));
+    HRESULT hr = dxgiadapter->GetParent(IID_GRAPHICS_PPV_ARGS(&dxgifactory));
     if (FAILED(hr)) {
         msg_Err(display->obj, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
         return;
     }
 
     hr = dxgifactory->CreateSwapChainForComposition(pFactoryDevice,
-                                                    &scd, NULL, display->dxgiswapChain.GetAddressOf());
+                                                    &scd, NULL, &display->dxgiswapChain);
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(display->obj, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         hr = dxgifactory->CreateSwapChainForComposition(pFactoryDevice,
-                                                        &scd, NULL, display->dxgiswapChain.GetAddressOf());
+                                                        &scd, NULL, &display->dxgiswapChain);
     }
     if (SUCCEEDED(hr)) {
         display->swapchainSurface.dcomp.visual->SetContent(display->dxgiswapChain.Get());
