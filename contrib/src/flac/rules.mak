@@ -1,6 +1,6 @@
 # FLAC
 
-FLAC_VERSION := 1.3.3
+FLAC_VERSION := 1.3.4
 FLAC_URL := http://downloads.xiph.org/releases/flac/flac-$(FLAC_VERSION).tar.xz
 
 PKGS += flac
@@ -15,7 +15,6 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
 
 flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 	$(UNPACK)
-	$(APPLY) $(SRC)/flac/mingw-min-max.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/flac/console_write.patch
 	$(APPLY) $(SRC)/flac/remove_blocking_code_useless_flaclib.patch
