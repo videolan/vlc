@@ -165,13 +165,7 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
         goto out;
 #endif
 
-    /* test for the MMX flag */
     cpuid( 0x00000001 );
-# if !defined (__MMX__)
-    if( ! (i_edx & 0x00800000) )
-        goto out;
-# endif
-    i_capabilities |= VLC_CPU_MMX;
 
 # if defined (CAN_COMPILE_SSE) && !defined (__SSE__)
     if (( i_edx & 0x02000000 ) && vlc_CPU_check ("SSE", SSE_test))
@@ -244,8 +238,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
     vlc_memstream_open(&stream);
 
 #if defined (__i386__) || defined (__x86_64__)
-    if (vlc_CPU_MMX())
-        vlc_memstream_puts(&stream, "MMX ");
     if (vlc_CPU_SSE())
         vlc_memstream_puts(&stream, "SSE ");
     if (vlc_CPU_SSE2())

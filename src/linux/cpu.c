@@ -122,8 +122,6 @@ unsigned vlc_CPU_raw(void)
 
         while ((cap = strsep (&p, " ")) != NULL)
         {
-            if (!strcmp (cap, "mmx"))
-                core_caps |= VLC_CPU_MMX;
             if (!strcmp (cap, "sse"))
                 core_caps |= VLC_CPU_SSE;
             if (!strcmp (cap, "sse2"))
