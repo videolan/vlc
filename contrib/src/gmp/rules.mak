@@ -1,7 +1,7 @@
 # GNU Multiple Precision Arithmetic
 
-GMP_VERSION := 6.1.2
-GMP_URL := https://gmplib.org/download/gmp-$(GMP_VERSION)/gmp-$(GMP_VERSION).tar.bz2
+GMP_VERSION := 6.2.1
+GMP_URL := https://gmplib.org/download/gmp/gmp-$(GMP_VERSION).tar.xz
 
 GMP_CONF :=
 
@@ -20,21 +20,14 @@ GMP_CONF += --disable-assembly
 endif
 endif
 
-$(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
+$(TARBALLS)/gmp-$(GMP_VERSION).tar.xz:
 	$(call download_pkg,$(GMP_URL),gmp)
 
-.sum-gmp: gmp-$(GMP_VERSION).tar.bz2
+.sum-gmp: gmp-$(GMP_VERSION).tar.xz
 
-gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
+gmp: gmp-$(GMP_VERSION).tar.xz .sum-gmp
 	$(UNPACK)
-	$(APPLY) $(SRC)/gmp/ppc64.patch
-	$(APPLY) $(SRC)/gmp/win-arm64.patch
 	$(APPLY) $(SRC)/gmp/gmp-fix-asm-detection.patch
-	$(APPLY) $(SRC)/gmp/tests-mpn-t-sqrlo.c-Initialise-scratch-area.patch
-	$(APPLY) $(SRC)/gmp/arm64-Add-GSYM_PREFIX-to-function-calls-in-assembly.patch
-ifdef HAVE_DARWIN_OS
-	$(APPLY) $(SRC)/gmp/arm64-Change-adrp-add-relocations-to-darwin-style.patch
-endif
 	# do not try the cross compiler to detect the build compiler
 	cd $(UNPACK_DIR) && sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' acinclude.m4
 	$(MOVE)
