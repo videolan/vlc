@@ -134,9 +134,10 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
                   : "cc");
 # endif
      /* Check if the OS really supports the requested instructions */
-# if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
+# if defined (__i386__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
   && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
+#  if !defined (__i486__)
     /* check if cpuid instruction is supported */
    asm volatile ("push %%ebx\n\t"
                  "pushf\n\t"
@@ -160,9 +161,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     /* the CPU supports the CPUID instruction - get its level */
     cpuid( 0x00000000 );
 
-# if defined (__i386__) && !defined (__i586__) \
-  && !defined (__i686__) && !defined (__pentium4__) \
-  && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
     if( !i_eax )
         goto out;
 #endif
