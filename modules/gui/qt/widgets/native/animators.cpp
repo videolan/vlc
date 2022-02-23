@@ -22,9 +22,9 @@
 #include "qt.hpp"
 #include "util/imagehelper.hpp"
 
-#include <QWidget>
-#include <QPixmap>
 #include <QAbstractItemView>
+
+class QWidget;
 
 BasicAnimator::BasicAnimator( QObject *parent )
     : QAbstractAnimation( parent ), current_frame( 0 )

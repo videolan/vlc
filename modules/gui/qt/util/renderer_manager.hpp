@@ -16,7 +16,6 @@
 #include <QTimer>
 #include <QVector>
 #include <QHash>
-#include <QPair>
 
 class RendererManagerEvent : public QEvent
 {

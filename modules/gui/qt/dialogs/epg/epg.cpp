@@ -30,7 +30,6 @@
 #include "EPGItem.hpp"
 
 #include <QVBoxLayout>
-#include <QSplitter>
 #include <QScrollBar>
 #include <QLabel>
 #include <QGroupBox>

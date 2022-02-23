@@ -30,53 +30,32 @@
 
 #include "maininterface/mainctx.hpp"
 #include "compositor.hpp"
-#include "player/player_controller.hpp"                    // Creation
 #include "util/renderer_manager.hpp"
 
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
-#include "util/imagehelper.hpp"
-#include "util/color_scheme_model.hpp"
 
 #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
 
-#include "playlist/playlist_model.hpp"
 #include "playlist/playlist_controller.hpp"
-#include <vlc_playlist.h>
 
 #include "videosurface.hpp"
 
 #include "menus/menus.hpp"                            // Menu creation
 
-#include "vlc_media_library.h"
-
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
 
-#include <QCloseEvent>
 #include <QKeyEvent>
 
 #include <QUrl>
-#include <QSize>
 #include <QDate>
 #include <QMimeData>
 
 #include <QWindow>
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QLabel>
-#include <QStackedWidget>
 #include <QScreen>
-#include <QStackedLayout>
 #ifdef _WIN32
 #include <QFileInfo>
 #endif
-
-
-#include <QtGlobal>
-#include <QTimer>
-
-#include <vlc_actions.h>                    /* Wheel event */
-#include <vlc_vout_window.h>                /* VOUT_ events */
 
 #define VLC_REFERENCE_SCALE_FACTOR 96.
 

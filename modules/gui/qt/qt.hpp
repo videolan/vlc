@@ -39,7 +39,6 @@
 
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
-#include <QUrl>
 
 #if ( QT_VERSION < QT_VERSION_CHECK(5, 11, 0) )
 # error Update your Qt version to at least 5.11.0

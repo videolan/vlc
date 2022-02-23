@@ -57,9 +57,6 @@
 #include "videosurface.hpp"
 
 #include <QScreen>
-#include <QQuickWindow>
-#include <QQmlContext>
-#include <QQmlFileSelector>
 
 using  namespace vlc::playlist;
 

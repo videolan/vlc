@@ -23,10 +23,8 @@
 #include "config.h"
 #endif
 
-#include <QObject>
 #include "mlbasemodel.hpp"
 #include "mlalbumtrack.hpp"
-
 
 class MLAlbumTrackModel : public MLBaseModel
 {

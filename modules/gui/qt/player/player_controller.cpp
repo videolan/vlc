@@ -32,11 +32,9 @@
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_vout.h>
 
-#include <QApplication>
 #include <QFile>
 #include <QDir>
 #include <QSignalMapper>
-#include <QMessageBox>
 
 #include <assert.h>
 

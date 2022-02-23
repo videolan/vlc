@@ -33,10 +33,8 @@
 #include <playlist/playlist_common.hpp>
 
 #include <QSystemTrayIcon>
-#include <QStackedWidget>
 #include <QtQuick/QQuickView>
-#include <QtQuickWidgets/QQuickWidget>
-#include <QtQuick/QQuickWindow>
+#include <QApplication>
 
 #ifdef _WIN32
 # include <shobjidl.h>

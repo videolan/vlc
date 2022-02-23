@@ -24,7 +24,6 @@
 
 #include "i18n.hpp"
 #include <vlc_common.h>
-#include <QDebug>
 
 #ifdef qtr
 #undef qtr

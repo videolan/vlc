@@ -25,15 +25,12 @@
 
 #include <QWidget>
 #include <QDialog>
-#include <QHBoxLayout>
-#include <QApplication>
 #include <QMainWindow>
-#include <QKeyEvent>
-#include <QDesktopWidget>
 #include <QSettings>
-#include <QStyle>
 
 #include "qt.hpp"
+
+class QKeyEvent;
 
 class QVLCTools
 {

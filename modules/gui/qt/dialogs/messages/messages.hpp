@@ -29,11 +29,8 @@
 /* Auto-generated from .ui files */
 #include "ui_messages_panel.h"
 
-#include <stdarg.h>
 #include <QMutex>
-#include <atomic>
 
-class QPushButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 class MsgEvent;

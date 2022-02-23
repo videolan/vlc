@@ -29,11 +29,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QTabWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QMutex>
-#include <QLineEdit>
 #include <QScrollBar>
 #include <QMutex>
 #include <QMutexLocker>
@@ -41,7 +38,6 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_input_item.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 

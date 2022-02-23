@@ -27,12 +27,11 @@
 
 #include "player/player_controller.hpp"
 
-#include <QTabWidget>
 #include <QLabel>
 #include <QTimeEdit>
-#include <QGroupBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QGridLayout>
 
 GotoTimeDialog::GotoTimeDialog( qt_intf_t *_p_intf)
                : QVLCDialog( nullptr, _p_intf )

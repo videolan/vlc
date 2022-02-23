@@ -32,6 +32,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsBlurEffect>
+#include <QUrl>
 
 //-------------------------------------------------------------------------------------------------
 // Static variables

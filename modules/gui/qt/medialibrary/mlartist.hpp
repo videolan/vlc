@@ -26,7 +26,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QList>
 #include <memory>
 #include <vlc_media_library.h>
 

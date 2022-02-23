@@ -27,9 +27,7 @@
 #include <QObject>
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
 #include <vlc_vout_window.h>
-
 
 #include "qt.hpp"
 

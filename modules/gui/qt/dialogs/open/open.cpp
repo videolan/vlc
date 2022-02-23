@@ -29,7 +29,6 @@
 #include "util/qt_dirs.hpp"
 #include "playlist/playlist_controller.hpp"
 
-#include <QTabWidget>
 #include <QRegExp>
 #include <QMenu>
 

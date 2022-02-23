@@ -18,9 +18,7 @@
 #include <math.h>
 
 #include <QtEvents>
-#include <QCoreApplication>
 #include <QWindow>
-#include <QQuickItem>
 #include <QX11Info>
 #include <QMainWindow>
 #include <QThread>

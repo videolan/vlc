@@ -32,10 +32,9 @@
 #include <QDialogButtonBox>
 #include <QApplication>
 #include <QClipboard>
-#include <QMimeData>
-#include <QList>
 #include <QFile>
 #include <QLabel>
+#include <QVBoxLayout>
 
 #include <assert.h>
 

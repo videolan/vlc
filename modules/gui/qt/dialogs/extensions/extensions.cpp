@@ -36,7 +36,6 @@
 #include <QListWidget>
 #include <QComboBox>
 #include <QCloseEvent>
-#include <QCoreApplication>
 #include <QKeyEvent>
 #include "widgets/native/customwidgets.hpp"
 

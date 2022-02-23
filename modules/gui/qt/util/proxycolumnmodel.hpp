@@ -24,7 +24,6 @@
 #endif
 
 #include "qt.hpp"
-#include <QAbstractItemModel>
 #include <type_traits>
 
 

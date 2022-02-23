@@ -24,11 +24,9 @@
 #include "ui_fingerprintdialog.h"
 
 #include "dialogs/fingerprint/chromaprint.hpp"
-#include <vlc_url.h>
 
 #include <QLabel>
 #include <QListWidgetItem>
-#include <new>
 
 FingerprintDialog::FingerprintDialog(QWidget *parent, qt_intf_t *p_intf,
                                      input_item_t *p_item ) :

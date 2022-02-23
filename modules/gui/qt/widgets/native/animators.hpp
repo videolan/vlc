@@ -31,7 +31,6 @@
 #include <QPersistentModelIndex>
 
 class QWidget;
-class QPixmap;
 class QAbstractItemView;
 
 class BasicAnimator : public QAbstractAnimation

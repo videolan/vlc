@@ -33,18 +33,9 @@
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 
 #include <QLabel>
-#include <QToolButton>
 #include <QPalette>
-#include <QEvent>
-#include <QResizeEvent>
-#include <QDate>
-#include <QMenu>
-#include <QWidgetAction>
-#include <QDesktopWidget>
-#include <QPainter>
+#include <QAction>
 #include <QTimer>
-#include <QSlider>
-#include <QBitmap>
 #include <QUrl>
 
 #if defined (QT5_HAS_X11)

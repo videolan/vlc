@@ -20,7 +20,6 @@
 
 #include <QObject>
 #include <QPalette>
-#include <QWidget>
 
 class SystemPalette : public QObject
 {

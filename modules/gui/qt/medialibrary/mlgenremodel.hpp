@@ -24,7 +24,6 @@
 #endif
 
 #include <memory>
-#include <QObject>
 #include "mlbasemodel.hpp"
 #include "mlgenre.hpp"
 

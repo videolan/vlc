@@ -25,7 +25,6 @@
 #define VLC_QT_QVLCAPP_HPP_
 
 #include <QApplication>
-#include <QEvent>
 #include <QStyle>
 
 #if defined(Q_OS_WIN)

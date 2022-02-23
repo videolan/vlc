@@ -22,7 +22,6 @@
 #include <QQuickRenderControl>
 #include "compositor.hpp"
 
-class QOpenGLPaintDevice;
 class QQuickWindow;
 class QQmlEngine;
 class QQmlComponent;

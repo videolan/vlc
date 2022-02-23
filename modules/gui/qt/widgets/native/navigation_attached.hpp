@@ -20,7 +20,6 @@
 
 #include <QObject>
 #include <QQuickItem>
-#include <QKeyEvent>
 
 #define VLC_QT_SIMPLE_PROPERTY(Type, property, defaultValue) \
   Q_PROPERTY(Type property READ get##property WRITE set##property NOTIFY property##Changed FINAL) \

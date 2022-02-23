@@ -23,8 +23,6 @@
 # include "config.h"
 #endif
 
-#include <QAbstractListModel>
-#include <QVector>
 #include "playlist_common.hpp"
 #include "playlist_item.hpp"
 #include "util/selectable_list_model.hpp"

@@ -42,7 +42,6 @@
 
 #include <QObject>
 #include <QApplication>
-#include <QObject>
 #include <QBasicTimer>
 #include <QMainWindow>
 #include <QQuickWindow>

@@ -27,7 +27,6 @@
 #include <cassert>
 #include <memory>
 #include <vector>
-#include <QtGlobal>
 #include <QObject>
 #include <QSharedPointer>
 #include "util/listcacheloader.hpp"

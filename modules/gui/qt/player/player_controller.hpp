@@ -26,7 +26,6 @@
 #include "qt.hpp"
 #include <QObject>
 #include <QEvent>
-#include <QAbstractListModel>
 #include <QScopedPointer>
 #include <vlc_cxx_helpers.hpp>
 #include "player/input_models.hpp"

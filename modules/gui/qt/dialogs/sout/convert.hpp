@@ -23,6 +23,8 @@
 #ifndef QVLC_CONVERT_DIALOG_H_
 #define QVLC_CONVERT_DIALOG_H_ 1
 
+#include <QUrl>
+
 #include "widgets/native/qvlcframe.hpp"
 
 class QLineEdit;

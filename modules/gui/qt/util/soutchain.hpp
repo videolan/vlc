@@ -25,8 +25,8 @@
 
 #include "qt.hpp"
 
-#include <QMap>
-
+#include <QPair>
+#include <QList>
 
 class SoutOption;
 

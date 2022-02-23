@@ -35,17 +35,13 @@
 #include "dialogs/dialogs_provider.hpp"
 #include "dialogs/mediainfo/info_panels.hpp"
 
-#include <QWidget>
 #include <QFrame>
 #include <QLabel>
-#include <QMouseEvent>
-#include <QPropertyAnimation>
 
-class QMenu;
-class QSlider;
+class QWidget;
 class QTimer;
-class QWidgetAction;
-class SpeedControlWidget;
+class QMouseEvent;
+
 struct vout_window_t;
 
 /******************** Video Widget ****************/

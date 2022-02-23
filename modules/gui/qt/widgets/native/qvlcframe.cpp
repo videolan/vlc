@@ -22,6 +22,10 @@
 
 #include <QWindow>
 #include <QScreen>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QKeyEvent>
+#include <QStyle>
 
 #include "qvlcframe.hpp"
 #include "maininterface/compositor.hpp"

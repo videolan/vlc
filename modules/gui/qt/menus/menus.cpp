@@ -53,7 +53,6 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QSignalMapper>
-#include <QStatusBar>
 
 using namespace vlc::playlist;
 

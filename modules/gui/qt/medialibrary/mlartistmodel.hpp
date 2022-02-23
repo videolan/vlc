@@ -23,7 +23,6 @@
 #include "config.h"
 #endif
 
-#include <QObject>
 #include "mlbasemodel.hpp"
 #include "mlartist.hpp"
 

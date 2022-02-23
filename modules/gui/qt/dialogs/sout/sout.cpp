@@ -32,9 +32,7 @@
 #include "widgets/native/qvlcframe.hpp"
 
 #include <QString>
-#include <QFileDialog>
-#include <QToolButton>
-#include <QSpinBox>
+
 #include <assert.h>
 #include <QWindow>
 

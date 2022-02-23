@@ -26,7 +26,6 @@
 
 
 #include <memory>
-#include <QObject>
 #include <QAbstractListModel>
 #include "vlc_media_library.h"
 #include "mlqmltypes.hpp"

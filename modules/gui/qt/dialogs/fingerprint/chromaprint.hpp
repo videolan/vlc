@@ -27,7 +27,6 @@
 #include <QObject>
 #include <QString>
 #include <vlc_fingerprinter.h>
-#include <vlc_interface.h>
 #include "qt.hpp"
 
 class Chromaprint : public QObject

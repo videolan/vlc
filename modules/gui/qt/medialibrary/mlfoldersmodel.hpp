@@ -28,7 +28,6 @@
 #include "qt.hpp"
 #include <QAbstractListModel>
 #include <QUrl>
-#include <QList>
 #include "mlhelper.hpp"
 
 #include <maininterface/mainctx.hpp>

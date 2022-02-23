@@ -29,7 +29,6 @@
 #include "mlbasemodel.hpp"
 #include "mlvideo.hpp"
 
-#include <QObject>
 #include <QDateTime>
 
 class MLRecentMedia : public MLItem {

@@ -19,7 +19,6 @@
 #include "mlthreadpool.hpp"
 
 #include <QMutexLocker>
-#include <QWaitCondition>
 
 MLThreadPoolSerialTask::MLThreadPoolSerialTask(MLThreadPool* parent, const QString& queueName)
     : m_parent(parent)

@@ -21,14 +21,12 @@
 #include "qt.hpp"
 #include "info_widgets.hpp"
 
-#include <QGridLayout>
 #include <QLabel>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QPolygonF>
 #include <QGraphicsPolygonItem>
 #include <QGraphicsLineItem>
-#include <QVectorIterator>
 
 #define STATS_LENGTH 60
 #define ADD_LABEL(row, color, text) \

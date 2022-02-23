@@ -24,10 +24,8 @@
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QFileDialog>
-#include <QtCore>
 
 #include <vlc_common.h>
-#include <vlc_input_item.h>
 #include <vlc_url.h>
 
 FirstRunWizard::FirstRunWizard( qt_intf_t *_p_intf, QWidget *parent)

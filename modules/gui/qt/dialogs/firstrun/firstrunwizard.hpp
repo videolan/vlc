@@ -22,7 +22,6 @@
 #include "ui_firstrunwizard.h"
 #include "util/singleton.hpp"
 
-#include <QObject>
 #include <QWizard>
 
 class MLFoldersEditor;

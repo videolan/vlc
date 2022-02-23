@@ -2,7 +2,6 @@
 #define NAVIGATION_HISTORY_HPP
 
 #include <QObject>
-#include <QList>
 #include <QtQml/QQmlPropertyMap>
 
 class NavigationHistory : public QObject

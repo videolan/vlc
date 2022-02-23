@@ -26,8 +26,6 @@
 #endif
 
 #include "qt.hpp"
-#include <QObject>
-#include <QStringList>
 #include <vlc_aout.h>
 
 class AudioDeviceModel : public QAbstractListModel

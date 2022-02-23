@@ -25,7 +25,6 @@
 
 #include "qt.hpp"
 #include <QAbstractListModel>
-#include <QMutex>
 #include <vlc_cxx_helpers.hpp>
 #include "varcommon_p.hpp"
 

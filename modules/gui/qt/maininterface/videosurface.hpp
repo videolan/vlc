@@ -19,7 +19,6 @@
 #define VIDEOSURFACE_HPP
 
 #include <QtQuick/QQuickItem>
-#include <QCursor>
 #include <QMutex>
 #include "qt.hpp"
 #include "vlc_vout_window.h"

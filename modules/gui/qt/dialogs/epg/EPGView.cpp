@@ -28,8 +28,6 @@
 #include "EPGItem.hpp"
 
 #include <QDateTime>
-#include <QMatrix>
-#include <QPaintEvent>
 #include <QRectF>
 
 EPGGraphicsScene::EPGGraphicsScene( QObject *parent ) : QGraphicsScene( parent )

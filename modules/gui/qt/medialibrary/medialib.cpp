@@ -19,11 +19,7 @@
 #include "medialib.hpp"
 #include "mlhelper.hpp"
 
-#include <vlc_playlist.h>
-#include <vlc_input_item.h>
-#include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
-#include <QSettings>
 
 MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
     : QObject( _parent )

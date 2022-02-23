@@ -29,10 +29,8 @@
 #include "custom_menus.hpp"
 
 #include <QObject>
-#include <QMenu>
-#include <QVector>
-#include <QAbstractListModel>
-#include <QMetaProperty>
+
+class QMenu;
 
 class VLCMenuBar : public QObject
 {

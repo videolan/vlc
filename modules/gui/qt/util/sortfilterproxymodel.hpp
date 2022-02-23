@@ -24,7 +24,6 @@
 #endif
 
 #include "qt.hpp"
-#include <QObject>
 #include <QSortFilterProxyModel>
 
 class SortFilterProxyModel : public QSortFilterProxyModel

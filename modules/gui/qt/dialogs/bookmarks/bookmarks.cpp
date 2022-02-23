@@ -30,10 +30,8 @@
 #include "maininterface/mainctx.hpp"
 
 #include <QHBoxLayout>
-#include <QSpacerItem>
 #include <QPushButton>
 #include <QDialogButtonBox>
-#include <QModelIndexList>
 #include <QTreeView>
 
 BookmarksDialog::BookmarksDialog( qt_intf_t *_p_intf ):QVLCFrame( _p_intf )

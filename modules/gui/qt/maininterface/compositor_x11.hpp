@@ -18,18 +18,14 @@
 #ifndef COMPOSITORX11_HPP
 #define COMPOSITORX11_HPP
 
-#include <QObject>
 #include "compositor.hpp"
 #include "videosurface.hpp"
 #include <memory>
 
 #include <xcb/xcb.h>
 
-class QMainWindow;
+class QObject;
 class QWidget;
-class MainUI;
-class InterfaceWindowHandler;
-class VideoWindowHandler;
 
 namespace vlc {
 

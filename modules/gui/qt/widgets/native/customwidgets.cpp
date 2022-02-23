@@ -28,14 +28,12 @@
 #endif
 
 #include "customwidgets.hpp"
-#include "qt.hpp"               /* needed for qtr,  but not necessary */
 
 #include <QtMath>  // for wheel deadzone calculation
 #include <QPainter>
 #include <QRect>
 #include <QKeyEvent>
 #include <QWheelEvent>
-#include <QPixmap>
 #include <QApplication>
 #include <vlc_actions.h>
 

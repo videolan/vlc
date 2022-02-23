@@ -26,13 +26,10 @@
 #ifndef VLC_QT_CUSTOMWIDGETS_HPP_
 #define VLC_QT_CUSTOMWIDGETS_HPP_
 
-#include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
-#include <QStackedWidget>
 #include <QSpinBox>
 #include <QCheckBox>
-#include <QList>
 #include <QToolButton>
 #include <QDial>
 

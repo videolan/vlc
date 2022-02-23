@@ -37,7 +37,7 @@
 #include "ui_equalizer.h"
 #include "ui_video_effects.h"
 
-#include <QTabWidget>
+class QTabWidget;
 
 #define BANDS 10
 

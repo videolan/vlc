@@ -33,22 +33,16 @@
 #include "util/qt_dirs.hpp"
 
 #include <QString>
-#include <QComboBox>
 #include <QVBoxLayout>
-#include <QStackedWidget>
 #include <QLabel>
 #include <QWidget>
 #include <QGridLayout>
-#include <QLineEdit>
-#include <QCheckBox>
 #include <QToolButton>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QHBoxLayout>
 #include <QDateTimeEdit>
 #include <QDateTime>
 #include <QSpinBox>
-#include <QScrollArea>
 #include <QFileDialog>
 
 

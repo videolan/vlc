@@ -18,8 +18,6 @@
 
 #include "sortfilterproxymodel.hpp"
 
-#include <QItemSelection>
-
 #include <cassert>
 
 SortFilterProxyModel::SortFilterProxyModel( QObject *parent )

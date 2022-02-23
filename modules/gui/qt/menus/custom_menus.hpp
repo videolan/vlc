@@ -24,8 +24,9 @@
 #include "qt.hpp"
 
 #include <QMenu>
-#include <QAbstractListModel>
 #include "medialibrary/mlrecentsmodel.hpp"
+
+class QAbstractListModel;
 
 class RendererAction : public QAction
 {
