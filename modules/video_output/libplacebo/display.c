@@ -231,6 +231,12 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         return; // Probably benign error, ignore it
     }
 
+#if PL_API_VER >= 199
+    bool need_vflip = false;
+#else
+    bool need_vflip = frame.flipped;
+#endif
+
     struct pl_image img = {
         .num_planes = pic->i_planes,
         .color      = vlc_placebo_ColorSpace(vd->fmt),
@@ -276,7 +282,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     vout_display_cfg_t cfg = *vd->cfg;
     cfg.display.width = frame.fbo->params.w;
     cfg.display.height = frame.fbo->params.h;
-    if (frame.flipped) {
+    if (need_vflip) {
         switch (cfg.align.vertical) {
         case VLC_VIDEO_ALIGN_TOP: cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM; break;
         case VLC_VIDEO_ALIGN_BOTTOM: cfg.align.vertical = VLC_VIDEO_ALIGN_TOP; break;
@@ -284,7 +290,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         }
     }
     vout_display_PlacePicture(&place, vd->fmt, &cfg);
-    if (frame.flipped) {
+    if (need_vflip) {
         place.y = frame.fbo->params.h - place.y;
         place.height = -place.height;
     }
@@ -378,7 +384,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                 assert(!"Failed processing the subpicture_t into pl_plane_data!?");
 
             struct pl_overlay *overlay = &sys->overlays[i];
-            int ysign = frame.flipped ? (-1) : 1;
+            int ysign = need_vflip ? (-1) : 1;
             *overlay = (struct pl_overlay) {
                 .rect = {
                     .x0 = place.x + r->i_x,
