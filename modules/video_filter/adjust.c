@@ -119,16 +119,6 @@ static int FloatCallback( vlc_object_t *obj, char const *varname,
     return VLC_SUCCESS;
 }
 
-static int BoolCallback( vlc_object_t *obj, char const *varname,
-                         vlc_value_t oldval, vlc_value_t newval, void *data )
-{
-    atomic_bool *atom = data;
-
-    atomic_store_explicit( atom, newval.b_bool, memory_order_relaxed );
-    (void) obj; (void) varname; (void) oldval;
-    return VLC_SUCCESS;
-}
-
 VIDEO_FILTER_WRAPPER_CLOSE( FilterPlanar, Destroy )
 
 static const struct vlc_filter_operations packed_filter_ops =
