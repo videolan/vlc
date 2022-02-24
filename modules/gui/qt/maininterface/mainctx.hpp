@@ -282,6 +282,9 @@ public:
     
     QWindow *intfMainWindow() const;
 
+    Q_INVOKABLE QVariant settingValue(const QString &key, const QVariant &defaultValue) const;
+    Q_INVOKABLE void setSettingValue(const QString &key, const QVariant &value);
+
 protected:
     /* Systray */
     void createSystray();
