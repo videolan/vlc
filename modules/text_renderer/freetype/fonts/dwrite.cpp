@@ -57,21 +57,19 @@ struct dw_sys_t
     dw_sys_t( HMODULE p_dw_dll ) : p_dw_dll( p_dw_dll )
     {
         /* This will fail on versions of Windows prior to 8.1 */
+        DWriteCreateFactoryProc pf;
 #ifdef VLC_WINSTORE_APP
-        if( DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
-                &p_dw_factory ) ) )
-            throw runtime_error( "failed to create DWrite factory" );
+        pf = DWriteCreateFactory;
 #else
-        DWriteCreateFactoryProc pf =
-                ( DWriteCreateFactoryProc ) GetProcAddress( p_dw_dll, "DWriteCreateFactory" );
+        pf = ( DWriteCreateFactoryProc ) GetProcAddress( p_dw_dll, "DWriteCreateFactory" );
 
         if( pf == NULL )
             throw runtime_error( "GetProcAddress() failed" );
+#endif
 
         if( pf( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
                 &p_dw_factory ) )
             throw runtime_error( "failed to create DWrite factory" );
-#endif
 
         if( p_dw_factory->GetSystemFontCollection( &p_dw_system_fonts ) )
             throw runtime_error( "GetSystemFontCollection() failed" );
