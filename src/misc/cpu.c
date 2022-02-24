@@ -129,21 +129,21 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
   && !defined (__i686__) && !defined (__pentium4__) \
   && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
 #  if !defined (__i486__)
-    /* check if cpuid instruction is supported */
-    unsigned int before;
+    /* Check if CPUID is supported by setting ID flag bit 21. */
+    unsigned int after, before;
     asm ("pushf\n\t"
-         "pop %%eax\n\t"
-         "movl %%eax, %1\n\t"
-         "xorl $0x200000, %%eax\n\t"
-         "push %%eax\n\t"
+         "pop %0\n\t"
+         "movl %0, %1\n\t"
+         "xorl $0x200000, %0\n\t"
+         "push %0\n\t"
          "popf\n\t"
          "pushf\n\t"
-         "pop %%eax\n\t"
-         : "=a" (i_eax), "=&r" (before)
+         "pop %0\n\t"
+         : "=&r" (after), "=&r" (before)
          :
          : "cc");
 
-    if( i_eax == before )
+    if( after == before )
         goto out;
 # endif
 
