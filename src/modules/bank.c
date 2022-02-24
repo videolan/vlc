@@ -181,7 +181,7 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
  * at build time. To workaround this, we add -Wl,-U,vlc_static_modules. */
 #if defined(__ELF__) \
     || (defined(__MACH__) && defined(HAVE_DYLIB_DYNAMIC_LOOKUP)) \
-    || !HAVE_DYNAMIC_PLUGINS
+    || !defined(HAVE_DYNAMIC_PLUGINS)
 VLC_WEAK
 extern vlc_plugin_cb vlc_static_modules[];
 
