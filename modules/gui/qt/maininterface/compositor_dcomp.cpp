@@ -149,7 +149,7 @@ bool CompositorDirectComposition::preInit(qt_intf_t * p_intf)
         requestedFeatureLevels,
         ARRAY_SIZE(requestedFeatureLevels),
         D3D11_SDK_VERSION,
-        d3dDevice.GetAddressOf(),
+        &d3dDevice,
         nullptr,    // Actual feature level
         nullptr);
 
@@ -227,7 +227,7 @@ bool CompositorDirectComposition::init()
         requestedFeatureLevels,
         ARRAY_SIZE(requestedFeatureLevels),
         D3D11_SDK_VERSION,
-        m_d3d11Device.GetAddressOf(),
+        &m_d3d11Device,
         nullptr,    // Actual feature level
         nullptr);
 

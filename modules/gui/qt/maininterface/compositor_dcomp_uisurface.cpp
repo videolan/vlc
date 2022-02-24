@@ -185,14 +185,14 @@ bool CompositorDCompositionUISurface::init()
         msg_Err(m_intf, "failed to retrieve egl device");
         return false;
     }
-    ID3D11Device* d3dDevice = nullptr;
-    eglRet = eglQueryDeviceAttribEXT(m_eglDevice, EGL_D3D11_DEVICE_ANGLE, reinterpret_cast<EGLAttrib*>(&d3dDevice));
+    ComPtr<ID3D11Device> d3dDevice;
+    eglRet = eglQueryDeviceAttribEXT(m_eglDevice, EGL_D3D11_DEVICE_ANGLE, reinterpret_cast<EGLAttrib*>(static_cast<void**>(&d3dDevice)));
     if (!eglRet || !d3dDevice)
     {
         msg_Err(m_intf, "failed to retrieve egl device");
         return false;
     }
-    HR(d3dDevice->QueryInterface(__uuidof(ID3D11Device1), (void **)(m_qtd3dDevice1.GetAddressOf())));
+    HR(d3dDevice.As(&m_qtd3dDevice1));
 
     m_uiOffscreenSurface = new QOffscreenSurface();
     m_uiOffscreenSurface->setFormat(format);;

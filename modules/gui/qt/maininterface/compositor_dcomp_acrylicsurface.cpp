@@ -204,7 +204,7 @@ catch (std::exception &err)
     return false;
 }
 
-bool CompositorDCompositionAcrylicSurface::createDevice(ID3D11Device *device)
+bool CompositorDCompositionAcrylicSurface::createDevice(Microsoft::WRL::ComPtr<ID3D11Device> device)
 try
 {
     QLibrary dcompDll("DCOMP.dll");
@@ -219,25 +219,25 @@ try
     using namespace Microsoft::WRL;
 
     ComPtr<IDXGIDevice> dxgiDevice;
-    HR(device->QueryInterface(dxgiDevice.GetAddressOf()), "query dxgi device");
+    HR(device.As(&dxgiDevice), "query dxgi device");
 
     ComPtr<IDCompositionDevice> dcompDevice1;
     HR(myDCompositionCreateDevice3(
                 dxgiDevice.Get(),
                 __uuidof(IDCompositionDevice),
-                (void**)dcompDevice1.GetAddressOf()), "create composition device");
+                &dcompDevice1), "create composition device");
 
-    HR(dcompDevice1->QueryInterface(m_dcompDevice.GetAddressOf()), "dcompdevice not an IDCompositionDevice3");
+    HR(dcompDevice1.As(&m_dcompDevice), "dcompdevice not an IDCompositionDevice3");
 
-    HR(m_dcompDevice->CreateVisual(m_rootVisual.GetAddressOf()), "create root visual");
+    HR(m_dcompDevice->CreateVisual(&m_rootVisual), "create root visual");
 
-    HR(m_dcompDevice->CreateRectangleClip(m_rootClip.GetAddressOf()), "create root clip");
+    HR(m_dcompDevice->CreateRectangleClip(&m_rootClip), "create root clip");
 
-    HR(m_dcompDevice->CreateTranslateTransform(m_translateTransform.GetAddressOf()), "create translate transform");
+    HR(m_dcompDevice->CreateTranslateTransform(&m_translateTransform), "create translate transform");
 
-    HR(m_dcompDevice->CreateSaturationEffect(m_saturationEffect.GetAddressOf()), "create saturation effect");
+    HR(m_dcompDevice->CreateSaturationEffect(&m_saturationEffect), "create saturation effect");
 
-    HR(m_dcompDevice->CreateGaussianBlurEffect(m_gaussianBlur.GetAddressOf()), "create gaussian effect");
+    HR(m_dcompDevice->CreateGaussianBlurEffect(&m_gaussianBlur), "create gaussian effect");
 
     m_saturationEffect->SetSaturation(2);
 
@@ -275,7 +275,7 @@ try
     thumbnail.rcSource = RECT{ 0, 0, desktopWidth, desktopHeight };
 
     HTHUMBNAIL desktopThumbnail;
-    HR(lDwmpCreateSharedThumbnailVisual(hwnd(), desktopWindow, 2, &thumbnail, m_dcompDevice.Get(), (void**)m_desktopVisual.GetAddressOf(), &desktopThumbnail), "create desktop visual");
+    HR(lDwmpCreateSharedThumbnailVisual(hwnd(), desktopWindow, 2, &thumbnail, m_dcompDevice.Get(), &m_desktopVisual, &desktopThumbnail), "create desktop visual");
     HR(m_rootVisual->AddVisual(m_desktopVisual.Get(), FALSE, nullptr), "Add desktop visual");
 
     return true;
@@ -307,7 +307,7 @@ try
     lSetWindowCompositionAttribute(m_dummyWindow, &CompositionAttribute);
 
     vlc_assert(!m_backHostVisual);
-    HR(lDwmpCreateSharedMultiWindowVisual(m_dummyWindow, m_dcompDevice.Get(), (void**)m_backHostVisual.GetAddressOf(), &m_backHostThumbnail)
+    HR(lDwmpCreateSharedMultiWindowVisual(m_dummyWindow, m_dcompDevice.Get(), &m_backHostVisual, &m_backHostThumbnail)
        , "failed to create shared multi visual");
 
     updateVisual();

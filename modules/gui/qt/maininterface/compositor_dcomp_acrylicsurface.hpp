@@ -183,7 +183,7 @@ protected:
 private:
     bool init(ID3D11Device *device);
     bool loadFunctions();
-    bool createDevice(ID3D11Device *device);
+    bool createDevice(Microsoft::WRL::ComPtr<ID3D11Device> device);
     bool createDesktopVisual();
     bool createBackHostVisual();
 
