@@ -568,7 +568,7 @@ static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
 {
     auto intfThread = reinterpret_cast<intf_thread_t*>(p_this);
     libvlc_int_t *libvlc = vlc_object_instance( p_this );
-    qt_intf_t* p_intf = (qt_intf_t*)vlc_object_create( libvlc, sizeof( *p_intf ) );
+    auto p_intf = vlc_object_create<qt_intf_t>( libvlc );
     if (!p_intf)
         return VLC_ENOMEM;
     p_intf->obj.logger = vlc_LogHeaderCreate(libvlc->obj.logger, "qt");

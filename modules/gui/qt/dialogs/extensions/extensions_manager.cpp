@@ -69,8 +69,7 @@ bool ExtensionsManager::loadExtensions()
 {
     if( !p_extensions_manager )
     {
-        p_extensions_manager = ( extensions_manager_t* )
-                    vlc_object_create( p_intf, sizeof( extensions_manager_t ) );
+        p_extensions_manager = vlc_object_create<extensions_manager_t>( p_intf );
         if( !p_extensions_manager )
         {
             b_failed = true;

@@ -258,9 +258,7 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
         return false;
 
     /* Create decoder object */
-    struct decoder_owner * p_owner =
-            reinterpret_cast<struct decoder_owner *>(
-                vlc_object_create(p_stream, sizeof(*p_owner)));
+    auto p_owner = vlc_object_create<decoder_owner>(p_stream);
     if(!p_owner)
         return false;
 

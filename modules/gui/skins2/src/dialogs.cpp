@@ -161,8 +161,7 @@ void Dialogs::destroy( intf_thread_t *pIntf )
 bool Dialogs::init()
 {
     // Allocate descriptor
-    m_pProvider = (intf_thread_t *)vlc_object_create( getIntf(),
-                                                    sizeof( intf_thread_t ) );
+    m_pProvider = vlc_object_create<intf_thread_t>( getIntf() );
     if( m_pProvider == NULL )
         return false;
 
