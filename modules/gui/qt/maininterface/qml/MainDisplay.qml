@@ -28,6 +28,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as P
 
+import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
@@ -185,6 +186,16 @@ FocusScope {
         showPlayer();
 
         backend.addAndPlay(ids);
+    }
+
+    Util.ModelSortSettingHandler {
+        id: modelSortSettingHandler
+    }
+
+    Connections {
+        target: sourcesBanner
+
+        onContentModelChanged: modelSortSettingHandler.set(sourcesBanner.contentModel, History.viewPath)
     }
 
     Rectangle {
