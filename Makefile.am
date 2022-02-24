@@ -23,7 +23,7 @@ BUILT_SOURCES_distclean =
 
 BUILT_SOURCES = $(BUILT_SOURCES_distclean)
 
-SUFFIXES = 
+SUFFIXES =
 
 DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-fast-install \
@@ -37,7 +37,6 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-live555 \
 	--disable-lua \
 	--disable-fribidi \
-	--disable-mkv \
 	--with-kde-solid='$${datadir}/kde4/apps'
 
 ACLOCAL_AMFLAGS = -I m4
