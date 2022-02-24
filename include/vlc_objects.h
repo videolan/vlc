@@ -279,6 +279,21 @@ VLC_API void vlc_obj_free(vlc_object_t *obj, void *ptr);
 
 #ifdef __cplusplus
 } /* extern "C" */
+
+#undef vlc_object_create
+
+template <typename O> VLC_MALLOC VLC_USED
+static inline void* vlc_object_create(O *obj, size_t size)
+{
+    return vlc_object_create(VLC_OBJECT(obj), size);
+}
+
+template<typename T, typename O> VLC_MALLOC VLC_USED
+static inline T* vlc_object_create(O *obj)
+{
+    static_assert(std::is_pointer<T>::value == false, "vlc_object_create can only create objects");
+    return static_cast<T*>(vlc_object_create(VLC_OBJECT(obj), sizeof(T)));
+}
 #endif
 
 /** @} */
