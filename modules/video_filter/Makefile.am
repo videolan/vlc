@@ -183,10 +183,6 @@ if HAVE_NEON
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm.S
 libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_ARM
 endif
-if HAVE_ARM64
-libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm64.S
-libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_ARM64
-endif
 if HAVE_SVE
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_sve.S
 libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_SVE

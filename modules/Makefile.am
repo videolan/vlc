@@ -31,6 +31,7 @@ include hw/d3d11/Makefile.am
 include hw/vaapi/Makefile.am
 include hw/vdpau/Makefile.am
 include hw/mmal/Makefile.am
+include isa/aarch64/Makefile.am
 include isa/arm/Makefile.am
 include isa/riscv/Makefile.am
 include keystore/Makefile.am

@@ -176,15 +176,6 @@ void merge8_armv6 (void *, const void *, const void *, size_t);
 void merge16_armv6 (void *, const void *, const void *, size_t);
 #endif
 
-#if defined(CAN_COMPILE_ARM64)
-/**
- * ARM64 NEON routine to blend pixels from two picture lines.
- */
-void merge8_arm64_neon (void *, const void *, const void *, size_t);
-void merge16_arm64_neon (void *, const void *, const void *, size_t);
-
-#endif
-
 void merge8_arm_sve(void *, const void *, const void *, size_t);
 void merge16_arm_sve(void *, const void *, const void *, size_t);
 

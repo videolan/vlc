@@ -1,5 +1,5 @@
  //*****************************************************************************
- // merge_arm64.S : ARM64 NEON mean
+ // merge.S : AArch64 Advanced SIMD mean
  //*****************************************************************************
  // Copyright (C) 2009-2012 Rémi Denis-Courmont
  // Copyright (C) 2016-	   Janne Grunau
@@ -19,7 +19,7 @@
  // Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  //****************************************************************************/
 
-#include "../../isa/arm/asm.S"
+#include "../../arm/asm.S"
 
 	.arch armv8-a+simd
 	.text
@@ -32,7 +32,7 @@
 
 	.align 2
 	// NOTE: Offset and pitch must be multiple of 16-bytes in VLC.
-function merge8_arm64_neon
+function merge8_arm64
 	bti		c
 	ands		x5, SIZE, #~63
 	b.eq		2f
@@ -69,7 +69,7 @@ function merge8_arm64_neon
 	ret
 
 	.align 2
-function merge16_arm64_neon
+function merge16_arm64
 	bti		c
 	ands		x5, SIZE, #~63
 	b.eq		2f
