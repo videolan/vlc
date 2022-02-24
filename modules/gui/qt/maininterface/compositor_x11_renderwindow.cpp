@@ -318,45 +318,38 @@ void X11DamageObserver::onEvent()
 
 //// CompositorX11RenderWindow
 
-CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCDS, QObject* parent)
-    : QObject(parent)
+CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCDS, QWidget* parent)
+    : QMainWindow(parent)
     , m_intf(p_intf)
     , m_conn(conn)
 {
-    m_rootWidget = new QMainWindow();
-    m_rootWidget->setAttribute(Qt::WA_NativeWindow);
-    m_rootWidget->setAttribute(Qt::WA_OpaquePaintEvent);
-    m_rootWidget->setAttribute(Qt::WA_NoSystemBackground);
-    m_rootWidget->setAttribute(Qt::WA_TranslucentBackground);
-    m_rootWidget->setAttribute(Qt::WA_MouseTracking);
+    setAttribute(Qt::WA_NativeWindow);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_MouseTracking);
 
     if (useCDS)
-        m_rootWidget->setWindowFlag(Qt::FramelessWindowHint);
+        setWindowFlag(Qt::FramelessWindowHint);
 
-    m_stable = new DummyNativeWidget(m_rootWidget);
+    m_stable = new DummyNativeWidget(this);
     m_stable->winId();
 
-    m_rootWidget->setCentralWidget(m_stable);
+    setCentralWidget(m_stable);
 
-    m_rootWidget->winId();
-    m_rootWidget->show();
+    winId();
+    show();
 
-    m_window = m_rootWidget->window()->windowHandle();
-    m_wid = m_window->winId();
+    m_window = window()->windowHandle();
+    m_wid = winId();
 }
 
 CompositorX11RenderWindow::~CompositorX11RenderWindow()
 {
     stopRendering();
 
-    if (m_rootWidget)
-    {
-        m_rootWidget->removeEventFilter(this);
-        m_window->removeEventFilter(this);
-
-        if (m_rootWidget)
-            delete m_rootWidget;
-    }
+    removeEventFilter(this);
+    m_window->removeEventFilter(this);
 }
 
 bool CompositorX11RenderWindow::init()
@@ -384,7 +377,7 @@ bool CompositorX11RenderWindow::init()
     }
 
     //install event filters
-    m_rootWidget->installEventFilter(this);
+    installEventFilter(this);
     m_window->installEventFilter(this);
 
     return true;
@@ -414,7 +407,7 @@ bool CompositorX11RenderWindow::startRendering()
     //pass initial values
     m_renderTask->onInterfaceSurfaceChanged(m_interfaceClient.get());
     m_renderTask->onVideoSurfaceChanged(m_videoClient.get());
-    m_renderTask->onWindowSizeChanged(m_rootWidget->size() * m_rootWidget->devicePixelRatioF());
+    m_renderTask->onWindowSizeChanged(size() * devicePixelRatioF());
     m_renderTask->onAcrylicChanged(m_hasAcrylic);
 
     //use the same thread as the rendering thread, neither tasks are blocking.
@@ -477,13 +470,13 @@ bool CompositorX11RenderWindow::eventFilter(QObject* obj, QEvent* event)
             if (m_interfaceWindow)
                 m_interfaceWindow->handleWindowEvent(event);
             resetClientPixmaps();
-            emit windowSizeChanged(resizeEvent->size() * m_rootWidget->devicePixelRatioF());
+            emit windowSizeChanged(resizeEvent->size() * devicePixelRatioF());
             needRefresh = true;
         }
     }
     else
     {
-        assert(obj == m_rootWidget);
+        assert(obj == this);
         if (event->type() == QEvent::Resize)
             return false;
 
@@ -540,7 +533,7 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
             m_videoClient->resetPixmap();
             m_videoClient->getPicture();
         }
-        m_videoPosition.setSize(size * m_rootWidget->devicePixelRatioF());
+        m_videoPosition.setSize(size * devicePixelRatioF());
         emit videoPositionChanged(m_videoPosition);
     }
 }
