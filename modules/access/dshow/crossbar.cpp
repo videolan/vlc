@@ -179,8 +179,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
     }
 
     ComPtr<IAMCrossbar> pXbar;
-    if( FAILED(pinInfo.pFilter->QueryInterface(IID_IAMCrossbar,
-                                               &pXbar)) )
+    if( FAILED(pinInfo.pFilter->QueryInterface(__uuidof(pXbar.Get()), &pXbar)) )
     {
         pinInfo.pFilter->Release();
         return S_FALSE;

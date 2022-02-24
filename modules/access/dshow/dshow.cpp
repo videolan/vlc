@@ -314,12 +314,11 @@ static void CreateDirectShowGraph( access_sys_t *p_sys )
 
     /* Create directshow filter graph */
     if( SUCCEEDED( CoCreateInstance( CLSID_FilterGraph, 0, CLSCTX_INPROC,
-                       IID_IFilterGraph, &p_sys->p_graph ) ) )
+                       __uuidof(p_sys->p_graph.Get()), &p_sys->p_graph ) ) )
     {
         /* Create directshow capture graph builder if available */
         if( SUCCEEDED( CoCreateInstance( CLSID_CaptureGraphBuilder2, 0,
-                         CLSCTX_INPROC, IID_ICaptureGraphBuilder2,
-                         &p_sys->p_capture_graph_builder2 ) ) )
+                         CLSCTX_INPROC, __uuidof(p_sys->p_capture_graph_builder2.Get()), &p_sys->p_capture_graph_builder2 ) ) )
         {
             p_sys->p_capture_graph_builder2->
                 SetFiltergraph(static_cast<IGraphBuilder *>(p_sys->p_graph.Get()) );
@@ -1221,7 +1220,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
     ComPtr<ICreateDevEnum> p_dev_enum;
 
     hr = CoCreateInstance( CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC,
-                           IID_ICreateDevEnum, &p_dev_enum );
+                           __uuidof(p_dev_enum.Get()), &p_dev_enum );
     if( FAILED(hr) )
     {
         msg_Err( p_this, "failed to create the device enumerator (0x%lX)", hr);
@@ -1260,8 +1259,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
     {
         /* Getting the property page to get the device name */
         ComPtr<IPropertyBag> p_bag;
-        hr = p_moniker->BindToStorage( 0, 0, IID_IPropertyBag,
-                                       &p_bag );
+        hr = p_moniker->BindToStorage( 0, 0, __uuidof(p_bag.Get()), &p_bag );
         if( SUCCEEDED(hr) )
         {
             VARIANT var;
@@ -1297,8 +1295,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                 {
                     msg_Dbg( p_this, "asked for %s, binding to %s", p_devicename->c_str() , devname.c_str() ) ;
                     /* NULL possibly means we don't need BindMoniker BindCtx ?? */
-                    hr = p_moniker->BindToObject( NULL, 0, IID_IBaseFilter,
-                                                  &p_base_filter );
+                    hr = p_moniker->BindToObject( NULL, 0, __uuidof(p_base_filter.Get()), &p_base_filter );
                     if( FAILED(hr) )
                     {
                         msg_Err( p_this, "couldn't bind moniker to filter "
@@ -1980,15 +1977,14 @@ static int AppendAudioEnabledVDevs( vlc_object_t *p_this, std::list<std::string>
     ComPtr<IGraphBuilder> p_gbuilder;
     ComPtr<ICaptureGraphBuilder2> p_cgbuilder;
 
-    if( FAILED( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_IFilterGraph,
-                                  &p_graph ) ) )
+    if( FAILED( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, __uuidof(p_graph.Get()), &p_graph ) ) )
         return VLC_EGENERIC;
 
     if( FAILED( p_graph.As( &p_gbuilder ) ) )
         return VLC_EGENERIC;
 
     if( FAILED( CoCreateInstance( CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC_SERVER,
-                                  IID_ICaptureGraphBuilder2, &p_cgbuilder ) ) )
+                                  __uuidof(p_cgbuilder.Get()), &p_cgbuilder ) ) )
         return VLC_EGENERIC;
 
     if( FAILED( p_cgbuilder->SetFiltergraph( p_gbuilder.Get() ) ) )
@@ -2123,7 +2119,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
 
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Audio, p_device_filter.Get(),
-                                     IID_IAMStreamConfig, &p_SC );
+                                     __uuidof(p_SC.Get()), &p_SC );
         if( SUCCEEDED(hr) )
         {
             ShowPropertyPage(p_SC);
@@ -2153,19 +2149,19 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
 
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Interleaved, p_device_filter.Get(),
-                                     IID_IAMStreamConfig, &p_SC );
+                                     __uuidof(p_SC.Get()), &p_SC );
         if( FAILED(hr) )
         {
             hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                          &MEDIATYPE_Video, p_device_filter.Get(),
-                                         IID_IAMStreamConfig, &p_SC );
+                                         __uuidof(p_SC.Get()), &p_SC );
         }
 
         if( FAILED(hr) )
         {
             hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                          &MEDIATYPE_Stream, p_device_filter.Get(),
-                                         IID_IAMStreamConfig, &p_SC );
+                                         __uuidof(p_SC.Get()), &p_SC );
         }
 
         if( SUCCEEDED(hr) )
