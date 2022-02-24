@@ -322,7 +322,7 @@ static void CreateDirectShowGraph( access_sys_t *p_sys )
                          &p_sys->p_capture_graph_builder2 ) ) )
         {
             p_sys->p_capture_graph_builder2->
-                SetFiltergraph((IGraphBuilder *)p_sys->p_graph.Get() );
+                SetFiltergraph(static_cast<IGraphBuilder *>(p_sys->p_graph.Get()) );
         }
 
         p_sys->p_graph.As( &p_sys->p_control );
@@ -1046,9 +1046,10 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         wchar_t *pwsz_devicename = ToWide( devicename.c_str() );
 
         if( likely( pwsz_devicename ) )
+        {
             hr = p_sys->p_graph->AddFilter( p_device_filter.Get(), pwsz_devicename );
-
-        free( pwsz_devicename );
+            free( pwsz_devicename );
+        }
 
         if( FAILED( hr ) )
         {
@@ -1302,7 +1303,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                     {
                         msg_Err( p_this, "couldn't bind moniker to filter "
                                  "object (0x%lX)", hr );
-                        return nullptr;
+                        p_base_filter.Reset();
                     }
                     return p_base_filter;
                 }
@@ -1378,13 +1379,13 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
             int piCount, piSize;
             if( SUCCEEDED(pSC->GetNumberOfCapabilities(&piCount, &piSize)) )
             {
-                BYTE *pSCC= (BYTE *)CoTaskMemAlloc(piSize);
+                void *pSCC= CoTaskMemAlloc(piSize);
                 if( NULL != pSCC )
                 {
                     int i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
                     for( int i=0; i<piCount; ++i )
                     {
-                        if( SUCCEEDED(pSC->GetStreamCaps(i, &p_mt, pSCC)) )
+                        if( SUCCEEDED(pSC->GetStreamCaps(i, &p_mt, static_cast<BYTE*>(pSCC))) )
                         {
                             int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
                             int i_current_priority = GetFourCCPriority(i_current_fourcc);
@@ -1401,7 +1402,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
                             if( !b_audio && MEDIATYPE_Video == p_mt->majortype
                                     && FORMAT_VideoInfo == p_mt->formattype )
                             {
-                                VIDEO_STREAM_CONFIG_CAPS *pVSCC = reinterpret_cast<VIDEO_STREAM_CONFIG_CAPS*>(pSCC);
+                                VIDEO_STREAM_CONFIG_CAPS *pVSCC = static_cast<VIDEO_STREAM_CONFIG_CAPS*>(pSCC);
                                 VIDEOINFOHEADER *pVih = reinterpret_cast<VIDEOINFOHEADER*>(p_mt->pbFormat);
 
                                 if( i_AvgTimePerFrame )
@@ -1477,7 +1478,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
                             else if( b_audio && p_mt->majortype == MEDIATYPE_Audio
                                     && p_mt->formattype == FORMAT_WaveFormatEx )
                             {
-                                AUDIO_STREAM_CONFIG_CAPS *pASCC = reinterpret_cast<AUDIO_STREAM_CONFIG_CAPS*>(pSCC);
+                                AUDIO_STREAM_CONFIG_CAPS *pASCC = static_cast<AUDIO_STREAM_CONFIG_CAPS*>(pSCC);
                                 WAVEFORMATEX *pWfx = reinterpret_cast<WAVEFORMATEX*>(p_mt->pbFormat);
 
                                 if( i_current_fourcc && (WAVE_FORMAT_PCM == pWfx->wFormatTag) )
@@ -1561,7 +1562,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
                             CoTaskMemFree( (PVOID)p_mt );
                         }
                     }
-                    CoTaskMemFree( (LPVOID)pSCC );
+                    CoTaskMemFree( pSCC );
                     if( i_priority >= ES_PRIORITY_SELECTABLE_MIN )
                         msg_Dbg( p_this, "EnumDeviceCaps: input pin default format configured");
                 }
