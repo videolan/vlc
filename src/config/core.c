@@ -42,11 +42,6 @@
 vlc_mutex_t config_lock = VLC_STATIC_MUTEX;
 atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
 
-static inline char *strdupnull (const char *src)
-{
-    return src ? strdup (src) : NULL;
-}
-
 int config_GetType(const char *name)
 {
     const struct vlc_param *param = vlc_param_Find(name);
