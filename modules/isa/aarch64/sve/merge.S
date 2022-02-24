@@ -1,5 +1,5 @@
 /******************************************************************************
- * merge_sve.S : ARM SVE mean
+ * merge.S : ARM SVE mean
  ******************************************************************************
  * Copyright (C) 2018 Rémi Denis-Courmont
  *
@@ -18,9 +18,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "../../isa/arm/asm.S"
+#include "../../arm/asm.S"
 
-	.arch armv8-a+sve
+	.arch	armv8-a+sve
 
 	/* TODO: prefetch, unroll */
 

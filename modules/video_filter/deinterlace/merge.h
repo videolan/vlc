@@ -176,9 +176,6 @@ void merge8_armv6 (void *, const void *, const void *, size_t);
 void merge16_armv6 (void *, const void *, const void *, size_t);
 #endif
 
-void merge8_arm_sve(void *, const void *, const void *, size_t);
-void merge16_arm_sve(void *, const void *, const void *, size_t);
-
 /*****************************************************************************
  * EndMerge routines
  *****************************************************************************/
