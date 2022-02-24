@@ -163,7 +163,7 @@ static HRESULT GetCrossbarIndexFromIPin( ComPtr<IAMCrossbar> & pXbar, LONG * Pin
  * FindCrossbarRoutes
  *****************************************************************************/
 HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
-                            IPin *p_input_pin, LONG physicalType, int depth )
+                            ComPtr<IPin> & p_input_pin, LONG physicalType, int depth )
 {
     HRESULT result = S_FALSE;
 
@@ -256,7 +256,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
         if( FAILED(GetCrossbarIPinAtIndex( pXbar, inputPinIndex,
                                            TRUE, pPin ) ) ) continue;
 
-        result = FindCrossbarRoutes( p_this, p_sys, pPin.Get(),
+        result = FindCrossbarRoutes( p_this, p_sys, pPin,
                                      physicalType, depth+1 );
 
         if( S_OK == result || (S_FALSE == result &&

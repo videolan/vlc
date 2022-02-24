@@ -54,7 +54,7 @@ struct access_sys_t;
 
 void DeleteCrossbarRoutes( access_sys_t * );
 HRESULT FindCrossbarRoutes( vlc_object_t *, access_sys_t *,
-                            IPin *, LONG, int = 0 );
+                            ComPtr<IPin> &, LONG, int = 0 );
 
 /****************************************************************************
  * Access descriptor declaration
