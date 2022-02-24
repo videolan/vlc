@@ -299,7 +299,8 @@ void vlc_CPU_functions_init(const char *capability, void *restrict funcs)
     module_t **mods;
     ssize_t n = vlc_module_match(capability, NULL, false, &mods, NULL);
 
-    for (ssize_t i = 0; i < n; i++) {
+    /* Descending order so higher priorities override the lower ones */
+    for (ssize_t i = n - 1; i >= 0; i--) {
         void (*init)(void *) = vlc_module_map(NULL, mods[i]);
         if (likely(init != NULL))
             init(funcs);
