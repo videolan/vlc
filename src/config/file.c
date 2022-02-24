@@ -49,11 +49,6 @@
 #include "modules/modules.h"
 #include "misc/rcu.h"
 
-static inline char *strdupnull (const char *src)
-{
-    return src ? strdup (src) : NULL;
-}
-
 /**
  * Get the user's configuration file
  */
