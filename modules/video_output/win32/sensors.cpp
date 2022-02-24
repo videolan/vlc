@@ -162,7 +162,7 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
         return NULL;
 
     ComPtr<ISensorCollection> pInclinometers;
-    hr = pSensorManager->GetSensorsByType(SENSOR_TYPE_INCLINOMETER_3D, pInclinometers.GetAddressOf());
+    hr = pSensorManager->GetSensorsByType(SENSOR_TYPE_INCLINOMETER_3D, &pInclinometers);
     if (FAILED(hr))
     {
         msg_Dbg(vd, "inclinometer not found. (hr=0x%lX)", hr);
@@ -175,7 +175,7 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
     for (ULONG i=0; i<count; ++i)
     {
         ComPtr<ISensor> pSensor;
-        hr = pInclinometers->GetAt(i, pSensor.GetAddressOf());
+        hr = pInclinometers->GetAt(i, &pSensor);
         if (FAILED(hr))
             continue;
 
