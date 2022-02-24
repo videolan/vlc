@@ -102,6 +102,7 @@ noreturn void sout_AnnounceUnRegister(vlc_object_t *obj,
 #undef sout_EncoderCreate
 encoder_t *sout_EncoderCreate( vlc_object_t *p_this, size_t owner_size )
 {
+    (void)owner_size;
     msg_Err (p_this, "Encoding support not compiled-in!");
     return NULL;
 }
@@ -163,15 +164,6 @@ noreturn sout_stream_t *sout_StreamChainNew(vlc_object_t *sout,
 {
     (void) sout; (void) chain; (void) next;
     vlc_assert_unreachable ();
-}
-
-int vlc_sdp_Start (struct vlc_memstream *sdp, vlc_object_t *obj, const char *cfg,
-                     const struct sockaddr *src, size_t srclen,
-                     const struct sockaddr *addr, size_t addrlen)
-{
-    VLC_UNUSED (obj); VLC_UNUSED (cfg); VLC_UNUSED (src); VLC_UNUSED (srclen);
-    VLC_UNUSED (addr); VLC_UNUSED (addrlen);
-    return 0;
 }
 #endif /* !ENABLE_SOUT */
 
