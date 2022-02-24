@@ -68,7 +68,11 @@ FocusScope {
         focus: true
 
         sourceComponent: ControlLayout {
-            model: playerControlLayout.model.left
+            model: ControlListFilter {
+                sourceModel: playerControlLayout.model.left
+
+                player: Player
+            }
 
             Navigation.parentItem: playerControlLayout
             Navigation.rightItem: layoutLoader_center.item
@@ -95,7 +99,11 @@ FocusScope {
                                               : implicitWidth
 
         sourceComponent: ControlLayout {
-            model: playerControlLayout.model.center
+            model: ControlListFilter {
+                sourceModel: playerControlLayout.model.center
+
+                player: Player
+            }
 
             Navigation.parentItem: playerControlLayout
             Navigation.leftItem: layoutLoader_left.item
@@ -123,7 +131,11 @@ FocusScope {
                 && !!playerControlLayout.model.right
 
         sourceComponent: ControlLayout {
-            model: playerControlLayout.model.right
+            model: ControlListFilter {
+                sourceModel: playerControlLayout.model.right
+
+                player: Player
+            }
 
             rightAligned: true
 
