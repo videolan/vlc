@@ -118,21 +118,12 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     unsigned int i_eax, i_ebx, i_ecx, i_edx;
 
     /* Needed for x86 CPU capabilities detection */
-# if defined (__i386__) && defined (__PIC__)
-#  define cpuid(reg) \
-    asm volatile ("xchgl %%ebx,%1\n\t" \
-                  "cpuid\n\t" \
-                  "xchgl %%ebx,%1\n\t" \
-                  : "=a" (i_eax), "=r" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
-                  : "a" (reg) \
-                  : "cc");
-# else
-#  define cpuid(reg) \
+# define cpuid(reg) \
     asm volatile ("cpuid\n\t" \
                   : "=a" (i_eax), "=b" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
                   : "a" (reg) \
                   : "cc");
-# endif
+
      /* Check if the OS really supports the requested instructions */
 # if defined (__i386__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
