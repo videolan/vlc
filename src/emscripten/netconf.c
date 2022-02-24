@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 #include <vlc_common.h>
+#include <vlc_network.h>
 
 char *vlc_getProxyUrl(const char *url)
 {
