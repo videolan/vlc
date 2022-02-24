@@ -130,22 +130,20 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
   && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
 #  if !defined (__i486__)
     /* check if cpuid instruction is supported */
-    asm ("push %%ebx\n\t"
-         "pushf\n\t"
+    unsigned int before;
+    asm ("pushf\n\t"
          "pop %%eax\n\t"
-         "movl %%eax, %%ebx\n\t"
+         "movl %%eax, %1\n\t"
          "xorl $0x200000, %%eax\n\t"
          "push %%eax\n\t"
          "popf\n\t"
          "pushf\n\t"
          "pop %%eax\n\t"
-         "movl %%ebx,%1\n\t"
-         "pop %%ebx\n\t"
-         : "=a" (i_eax), "=r" (i_ebx)
+         : "=a" (i_eax), "=&r" (before)
          :
          : "cc");
 
-    if( i_eax == i_ebx )
+    if( i_eax == before )
         goto out;
 # endif
 
