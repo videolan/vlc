@@ -59,7 +59,7 @@ struct dw_sys_t
         /* This will fail on versions of Windows prior to 8.1 */
 #ifdef VLC_WINSTORE_APP
         if( DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
-                reinterpret_cast<IUnknown **>( p_dw_factory.GetAddressOf() ) ) )
+                &p_dw_factory ) ) )
             throw runtime_error( "failed to create DWrite factory" );
 #else
         DWriteCreateFactoryProc pf =
@@ -69,18 +69,18 @@ struct dw_sys_t
             throw runtime_error( "GetProcAddress() failed" );
 
         if( pf( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
-                reinterpret_cast<IUnknown **>( p_dw_factory.GetAddressOf() ) ) )
+                &p_dw_factory ) )
             throw runtime_error( "failed to create DWrite factory" );
 #endif
 
-        if( p_dw_factory->GetSystemFontCollection( p_dw_system_fonts.GetAddressOf() ) )
+        if( p_dw_factory->GetSystemFontCollection( &p_dw_system_fonts ) )
             throw runtime_error( "GetSystemFontCollection() failed" );
 
-        if( p_dw_factory->GetSystemFontFallback( p_dw_fallbacks.GetAddressOf() ) )
+        if( p_dw_factory->GetSystemFontFallback( &p_dw_fallbacks ) )
             throw runtime_error( "GetSystemFontFallback() failed" );
 
         if( p_dw_factory->CreateNumberSubstitution( DWRITE_NUMBER_SUBSTITUTION_METHOD_CONTEXTUAL,
-                L"en-US", true, p_dw_substitution.GetAddressOf() ) )
+                L"en-US", true, &p_dw_substitution ) )
             throw runtime_error( "CreateNumberSubstitution() failed" );
     }
 
@@ -446,10 +446,10 @@ static vector< ComPtr< IDWriteFont > > DWrite_GetFonts( vlc_font_select_t *fs, I
             ComPtr< IDWriteFont > p_dw_font;
             ComPtr< IDWriteLocalizedStrings > p_dw_names;
 
-            if( FAILED( p_dw_family->GetFont( i, p_dw_font.GetAddressOf() ) ) )
+            if( FAILED( p_dw_family->GetFont( i, &p_dw_font ) ) )
                 throw runtime_error( "GetFont() failed" );
 
-            if( FAILED( p_dw_font->GetFaceNames( p_dw_names.GetAddressOf() ) ) )
+            if( FAILED( p_dw_font->GetFaceNames( &p_dw_names ) ) )
                 throw runtime_error( "GetFaceNames() failed" );
 
             if( DWrite_PartialMatch( fs, p_dw_names, face_name, true ) )
@@ -480,7 +480,7 @@ static vector< ComPtr< IDWriteFont > > DWrite_GetFonts( vlc_font_select_t *fs, I
                 break;
             }
 
-            if( FAILED( p_dw_family->GetFirstMatchingFont( weight, DWRITE_FONT_STRETCH_NORMAL, style, p_dw_font.GetAddressOf() ) ) )
+            if( FAILED( p_dw_family->GetFirstMatchingFont( weight, DWRITE_FONT_STRETCH_NORMAL, style, &p_dw_font ) ) )
                 throw runtime_error( "GetFirstMatchingFont() failed" );
 
             result.push_back( p_dw_font );
@@ -551,7 +551,7 @@ static void DWrite_ParseFamily( vlc_font_select_t *fs, IDWriteFontFamily *p_dw_f
         if( i & 2 )
             i_flags |= VLC_FONT_FLAG_ITALIC;
 
-        if( p_dw_font->CreateFontFace( p_dw_face.GetAddressOf() ) )
+        if( p_dw_font->CreateFontFace( &p_dw_face ) )
             throw runtime_error( "CreateFontFace() failed" );
 
         UINT32 i_num_files = 0;
@@ -559,12 +559,12 @@ static void DWrite_ParseFamily( vlc_font_select_t *fs, IDWriteFontFamily *p_dw_f
             throw runtime_error( "GetFiles() failed" );
 
         i_num_files = 1;
-        if( p_dw_face->GetFiles( &i_num_files, p_dw_file.GetAddressOf() ) )
+        if( p_dw_face->GetFiles( &i_num_files, &p_dw_file ) )
             throw runtime_error( "GetFiles() failed" );
 
         UINT32 i_font_index = p_dw_face->GetIndex();
 
-        if( p_dw_file->GetLoader( p_dw_loader.GetAddressOf() ) )
+        if( p_dw_file->GetLoader( &p_dw_loader ) )
             throw runtime_error( "GetLoader() failed" );
 
         const void  *key;
@@ -573,7 +573,7 @@ static void DWrite_ParseFamily( vlc_font_select_t *fs, IDWriteFontFamily *p_dw_f
             throw runtime_error( "GetReferenceKey() failed" );
 
         ComPtr< IDWriteFontFileStream > p_dw_stream;
-        if( p_dw_loader->CreateStreamFromKey( key, keySize, p_dw_stream.GetAddressOf() ) )
+        if( p_dw_loader->CreateStreamFromKey( key, keySize, &p_dw_stream ) )
             throw runtime_error( "CreateStreamFromKey() failed" );
 
         UINT64 i_stream_size;
@@ -635,7 +635,7 @@ extern "C" int DWrite_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
     /* Try to find an exact match first */
     if( SUCCEEDED( p_dw_sys->p_dw_system_fonts->FindFamilyName( pwsz_family, &i_index, &b_exists ) ) && b_exists )
     {
-        if( FAILED( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, p_dw_family.GetAddressOf() ) ) )
+        if( FAILED( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, &p_dw_family ) ) )
         {
             msg_Err( fs->p_obj, "DWrite_GetFamily: GetFontFamily() failed" );
             goto done;
@@ -671,13 +671,13 @@ extern "C" int DWrite_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
         for( i_index = 0; i_index < i_count; ++i_index )
         {
             ComPtr< IDWriteFontFamily > p_cur_family;
-            if( FAILED( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, p_cur_family.GetAddressOf() ) ) )
+            if( FAILED( p_dw_sys->p_dw_system_fonts->GetFontFamily( i_index, &p_cur_family ) ) )
             {
                 msg_Err( fs->p_obj, "DWrite_GetFamily: GetFontFamily() failed" );
                 continue;
             }
 
-            if( FAILED( p_cur_family->GetFamilyNames( p_names.GetAddressOf() ) ) )
+            if( FAILED( p_cur_family->GetFamilyNames( &p_names ) ) )
             {
                 msg_Err( fs->p_obj, "DWrite_GetFamily: GetFamilyNames() failed" );
                 continue;
@@ -741,20 +741,20 @@ static char *DWrite_Fallback( vlc_font_select_t *fs, const char *psz_lcname,
 
     if( p_dw_sys->p_dw_fallbacks->MapCharacters( p_ts.Get(), 0, i_text_length, p_dw_sys->p_dw_system_fonts.Get(), pwsz_family,
                                   DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
-                                  &i_mapped_length, p_dw_font.GetAddressOf(), &f_scale )
+                                  &i_mapped_length, &p_dw_font, &f_scale )
      || !p_dw_font )
     {
         msg_Warn( fs->p_obj, "DWrite_Fallback(): MapCharacters() failed" );
         goto done;
     }
 
-    if( p_dw_font->GetFontFamily( p_dw_family.GetAddressOf() ) )
+    if( p_dw_font->GetFontFamily( &p_dw_family ) )
     {
         msg_Err( fs->p_obj, "DWrite_Fallback(): GetFontFamily() failed" );
         goto done;
     }
 
-    if( p_dw_family->GetFamilyNames( p_names.GetAddressOf() ) )
+    if( p_dw_family->GetFamilyNames( &p_names ) )
     {
         msg_Err( fs->p_obj, "DWrite_Fallback(): GetFamilyNames() failed" );
         goto done;
