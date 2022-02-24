@@ -81,6 +81,10 @@ static inline vlc_object_t *VLC_OBJECT(T *d)
     { return &d->obj; }
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The root object */
 struct libvlc_int_t
 {
@@ -272,6 +276,10 @@ VLC_API VLC_MALLOC char *vlc_obj_strdup(vlc_object_t *obj, const char *str);
  * @param ptr pointer to the allocated resource
  */
 VLC_API void vlc_obj_free(vlc_object_t *obj, void *ptr);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 /** @} */
 /** @} */
