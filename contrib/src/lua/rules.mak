@@ -27,6 +27,7 @@ endif
 
 # Feel free to add autodetection if you need to...
 PKGS += lua luac
+PKGS_TOOLS += luac
 PKGS_ALL += luac
 ifeq ($(call need_pkg,"lua >= 5.1"),)
 PKGS_FOUND += lua
