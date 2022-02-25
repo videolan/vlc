@@ -1,5 +1,5 @@
  @*****************************************************************************
- @ merge_arm.S : ARM NEON mean
+ @ merge.S : ARM NEON mean
  @*****************************************************************************
  @ Copyright (C) 2009-2012 Rémi Denis-Courmont
  @
@@ -18,11 +18,11 @@
  @ Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  @****************************************************************************/
 
-#include "../../isa/arm/asm.S"
+#include "../asm.S"
 
 	.syntax	unified
 #if HAVE_AS_ARCH_DIRECTIVE
-	.arch	armv7
+	.arch	armv7-a
 #endif
 #if HAVE_AS_FPU_DIRECTIVE
 	.fpu	neon

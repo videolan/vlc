@@ -19,6 +19,9 @@ libchroma_yuv_neon_plugin_la_SOURCES = \
 libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libchroma_yuv_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
+libdeinterlace_neon_plugin_la_SOURCES = \
+	isa/arm/neon/deinterlace.c isa/arm/neon/merge.S
+
 libvolume_neon_plugin_la_SOURCES = isa/arm/neon/volume.c isa/arm/neon/amplify.S
 libvolume_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvolume_neon_plugin_LIBTOOLFLAGS = --tag=CC
@@ -35,6 +38,7 @@ libyuv_rgb_neon_plugin_LIBTOOLFLAGS = --tag=CC
 if HAVE_NEON
 neon_LTLIBRARIES = \
 	libchroma_yuv_neon_plugin.la \
+	libdeinterlace_neon_plugin.la \
 	libvolume_neon_plugin.la \
 	libyuv_rgb_neon_plugin.la
 endif

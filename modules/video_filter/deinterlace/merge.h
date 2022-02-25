@@ -162,14 +162,6 @@ void Merge8BitSSE2( void *, const void *, const void *, size_t );
 void Merge16BitSSE2( void *, const void *, const void *, size_t );
 #endif
 
-#if defined(CAN_COMPILE_ARM)
-/**
- * ARM NEON routine to blend pixels from two picture lines.
- */
-void merge8_arm_neon (void *, const void *, const void *, size_t);
-void merge16_arm_neon (void *, const void *, const void *, size_t);
-#endif
-
 /*****************************************************************************
  * EndMerge routines
  *****************************************************************************/

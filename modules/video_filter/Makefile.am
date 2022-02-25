@@ -179,10 +179,6 @@ libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/yadif_x86.asm
 # inline ASM doesn't build with -O0
 libdeinterlace_plugin_la_CFLAGS += -O2
 endif
-if HAVE_NEON
-libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm.S
-libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_ARM
-endif
 libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
