@@ -25,6 +25,7 @@
 	/* TODO: prefetch, unroll */
 
 	.text
+	.align	2
 	bti_advertise
 function merge8_arm_sve
 	bti	c
