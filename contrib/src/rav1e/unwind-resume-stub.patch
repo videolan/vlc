@@ -1,0 +1,27 @@
+From 30b9e63817bf60c3cab0bc6cebb073ee2344ac34 Mon Sep 17 00:00:00 2001
+From: Tristan Matthews <tmatth@videolan.org>
+Date: Fri, 25 Feb 2022 12:30:01 -0500
+Subject: [PATCH 1/1] lib: workaround for
+ https://github.com/rust-lang/rust/issues/79609
+
+This avoids to broken linking on some mingw32 versions. The function
+will never be called since we set `-C panic=abort`.
+---
+ src/lib.rs | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 63afa2d5..412bb0e0 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -389,3 +389,7 @@ pub mod bench {
+ 
+ #[cfg(fuzzing)]
+ pub mod fuzzing;
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_Resume() {}
+-- 
+2.32.0
+
