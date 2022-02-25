@@ -429,7 +429,6 @@ static bool ChromaNegotiation(vout_display_t *vd)
 
 static void CustomDestroyPicture(vout_display_t *vd)
 {
-    vout_window_t *wnd = vd->cfg->window;
     for (int c = 0; c < MAXHWBUF; c++)
         DestroyFB(vd, c);
 }
