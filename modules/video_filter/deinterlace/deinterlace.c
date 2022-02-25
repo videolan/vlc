@@ -569,9 +569,6 @@ notsupp:
     if( vlc_CPU_ARM_NEON() )
         p_sys->pf_merge = pixel_size == 1 ? merge8_arm_neon : merge16_arm_neon;
     else
-    if( vlc_CPU_ARMv6() )
-        p_sys->pf_merge = pixel_size == 1 ? merge8_armv6 : merge16_armv6;
-    else
 #endif
     {
         vlc_CPU_functions_init_once("deinterlace functions", &funcs);

@@ -1,4 +1,14 @@
+armdir = $(pluginsdir)/arm
 neondir = $(pluginsdir)/arm_neon
+
+libdeinterlace_arm_simd_plugin_la_SOURCES = \
+	isa/arm/simd/deinterlace.c isa/arm/simd/merge.S
+
+# TODO? use dedicated conditional, or purge
+if HAVE_NEON
+arm_LTLIBRARIES = \
+	libdeinterlace_arm_simd_plugin.la
+endif
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
 	isa/arm/neon/deinterleave_chroma.S \
