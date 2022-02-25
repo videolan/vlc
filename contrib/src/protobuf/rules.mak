@@ -4,6 +4,7 @@ PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF
 
 ifndef HAVE_TVOS
 PKGS += protobuf protoc
+PKGS_TOOLS += protoc
 endif # !HAVE_TVOS
 PKGS_ALL += protoc
 ifeq ($(call need_pkg, "protobuf-lite = $(PROTOBUF_VERSION)"),)
