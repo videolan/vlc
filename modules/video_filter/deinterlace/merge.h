@@ -141,7 +141,7 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1, const void *_p_s2,
 void MergeAltivec ( void *, const void *, const void *, size_t );
 #endif
 
-#if defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_SSE2)
 /**
  * SSE2 routine to blend pixels from two picture lines.
  *

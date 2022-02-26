@@ -63,7 +63,7 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
         *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
 
-#if defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_SSE2)
 VLC_SSE
 void Merge8BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                     size_t i_bytes )
