@@ -50,7 +50,6 @@ unsigned vlc_CPU_raw(void);
 #  define VLC_CPU_AVX    0x00002000
 #  define VLC_CPU_AVX2   0x00004000
 #  define VLC_CPU_XOP    0x00008000
-#  define VLC_CPU_FMA4   0x00010000
 
 # if defined (__SSE__)
 #  define VLC_SSE
@@ -112,12 +111,6 @@ unsigned vlc_CPU_raw(void);
 #  define vlc_CPU_XOP() (1)
 # else
 #  define vlc_CPU_XOP() ((vlc_CPU() & VLC_CPU_XOP) != 0)
-# endif
-
-# ifdef __FMA4__
-#  define vlc_CPU_FMA4() (1)
-# else
-#  define vlc_CPU_FMA4() ((vlc_CPU() & VLC_CPU_FMA4) != 0)
 # endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
