@@ -171,8 +171,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     if (( i_edx & 0x02000000 ) && vlc_CPU_check ("SSE", SSE_test))
 # endif
     {
-        /*if( i_edx & 0x02000000 )*/
-            i_capabilities |= VLC_CPU_SSE;
         if (i_edx & 0x04000000)
             i_capabilities |= VLC_CPU_SSE2;
         if (i_ecx & 0x00000001)
@@ -238,8 +236,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
     vlc_memstream_open(&stream);
 
 #if defined (__i386__) || defined (__x86_64__)
-    if (vlc_CPU_SSE())
-        vlc_memstream_puts(&stream, "SSE ");
     if (vlc_CPU_SSE2())
         vlc_memstream_puts(&stream, "SSE2 ");
     if (vlc_CPU_SSE3())

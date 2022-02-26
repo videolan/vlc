@@ -1361,11 +1361,11 @@ dnl  Accelerated modules
 dnl
 
 dnl  Check for fully working SSE2 intrinsics
-dnl  We need support for -msse[2], we need <emmintrin.h>, and we also need a
+dnl  We need support for -msse2, we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE([sse],
   AS_HELP_STRING([--disable-sse],
-    [disable SSE (1-4) optimizations (default auto)]),, [
+    [disable SSE (2-4) optimizations (default auto)]),, [
   case "${host_cpu}" in
     i?86|x86_64)
       enable_sse=yes
@@ -1377,7 +1377,7 @@ AC_ARG_ENABLE([sse],
 ])
 have_sse2="no"
 AS_IF([test "${enable_sse}" != "no"], [
-  ARCH="${ARCH} sse sse2"
+  ARCH="${ARCH} sse2"
 
   VLC_SAVE_FLAGS
   CFLAGS="${CFLAGS} -msse2"
@@ -1406,23 +1406,6 @@ frobzor = (uint64_t)_mm_movepi64_pi64(a);]])], [
   ])
 
   VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -msse"
-  AC_CACHE_CHECK([if $CC groks SSE inline assembly], [ac_cv_sse_inline], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
-]])
-    ], [
-      ac_cv_sse_inline=yes
-    ], [
-      ac_cv_sse_inline=no
-    ])
-  ])
-
-  AS_IF([test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"], [
-    AC_DEFINE(CAN_COMPILE_SSE, 1, [Define to 1 if SSE inline assembly is available.])
-  ])
-
   AC_CACHE_CHECK([if $CC groks SSE2 inline assembly], [ac_cv_sse2_inline], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
