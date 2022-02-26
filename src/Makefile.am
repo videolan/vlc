@@ -472,6 +472,7 @@ endif
 
 if HAVE_FREEBSD
 libvlccore_la_SOURCES += \
+	freebsd/cpu.c \
 	freebsd/thread.c
 endif
 
