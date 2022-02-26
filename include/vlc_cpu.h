@@ -45,7 +45,6 @@ unsigned vlc_CPU_raw(void);
 #  define VLC_CPU_SSE3   0x00000100
 #  define VLC_CPU_SSSE3  0x00000200
 #  define VLC_CPU_SSE4_1 0x00000400
-#  define VLC_CPU_SSE4A  0x00001000
 #  define VLC_CPU_AVX    0x00002000
 #  define VLC_CPU_AVX2   0x00004000
 
@@ -77,12 +76,6 @@ unsigned vlc_CPU_raw(void);
 #  define vlc_CPU_SSE4_1() (1)
 # else
 #  define vlc_CPU_SSE4_1() ((vlc_CPU() & VLC_CPU_SSE4_1) != 0)
-# endif
-
-# ifdef __SSE4A__
-#  define vlc_CPU_SSE4A() (1)
-# else
-#  define vlc_CPU_SSE4A() ((vlc_CPU() & VLC_CPU_SSE4A) != 0)
 # endif
 
 # ifdef __AVX__

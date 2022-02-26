@@ -242,8 +242,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
         vlc_memstream_puts(&stream, "SSSE3 ");
     if (vlc_CPU_SSE4_1())
         vlc_memstream_puts(&stream, "SSE4.1 ");
-    if (vlc_CPU_SSE4A())
-        vlc_memstream_puts(&stream, "SSE4A ");
     if (vlc_CPU_AVX())
         vlc_memstream_puts(&stream, "AVX ");
     if (vlc_CPU_AVX2())
