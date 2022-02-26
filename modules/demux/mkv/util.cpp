@@ -31,7 +31,7 @@ namespace mkv {
  * Local prototypes
  *****************************************************************************/
 
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_ZLIB
 int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk )
 {
     int result;

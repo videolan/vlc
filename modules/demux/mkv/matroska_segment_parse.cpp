@@ -1062,7 +1062,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 
     if ( bSupported )
     {
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_ZLIB
         if( p_track->i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
             p_track->i_encoding_scope & MATROSKA_ENCODING_SCOPE_PRIVATE &&
             p_track->i_extra_data && p_track->p_extra_data &&

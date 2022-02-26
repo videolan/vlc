@@ -603,7 +603,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
         }
 
-#if defined(HAVE_ZLIB_H)
+#ifdef HAVE_ZLIB
         if( track.i_compression_type == MATROSKA_COMPRESSION_ZLIB &&
             track.i_encoding_scope & MATROSKA_ENCODING_SCOPE_ALL_FRAMES )
         {

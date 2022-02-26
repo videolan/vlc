@@ -201,10 +201,7 @@ libmkv_plugin_la_SOURCES = \
 libmkv_plugin_la_SOURCES += packetizer/dts_header.h packetizer/dts_header.c
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CFLAGS_mkv)
 libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
-libmkv_plugin_la_LIBADD = $(LIBS_mkv)
-if HAVE_ZLIB
-libmkv_plugin_la_LIBADD += -lz
-endif
+libmkv_plugin_la_LIBADD = $(LIBS_mkv) $(LIBZ)
 demux_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
