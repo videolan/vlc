@@ -179,8 +179,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
             i_capabilities |= VLC_CPU_SSSE3;
         if (i_ecx & 0x00080000)
             i_capabilities |= VLC_CPU_SSE4_1;
-        if (i_ecx & 0x00100000)
-            i_capabilities |= VLC_CPU_SSE4_2;
     }
 
     /* test for additional capabilities */
@@ -244,8 +242,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
         vlc_memstream_puts(&stream, "SSSE3 ");
     if (vlc_CPU_SSE4_1())
         vlc_memstream_puts(&stream, "SSE4.1 ");
-    if (vlc_CPU_SSE4_2())
-        vlc_memstream_puts(&stream, "SSE4.2 ");
     if (vlc_CPU_SSE4A())
         vlc_memstream_puts(&stream, "SSE4A ");
     if (vlc_CPU_AVX())

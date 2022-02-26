@@ -1471,23 +1471,6 @@ asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
   AS_IF([test "${ac_cv_sse4_1_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4_1, 1, [Define to 1 if SSE4_1 inline assembly is available.]) ])
 
-  # SSE4.2
-  AC_CACHE_CHECK([if $CC groks SSE4.2 inline assembly],
-                 [ac_cv_sse4_2_inline], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
-]])
-    ], [
-      ac_cv_sse4_2_inline=yes
-    ], [
-      ac_cv_sse4_2_inline=no
-    ])
-  ])
-
-  AS_IF([test "${ac_cv_sse4_2_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_SSE4_2, 1, [Define to 1 if SSE4_2 inline assembly is available.]) ])
-
   # SSE4A
   AC_CACHE_CHECK([if $CC groks SSE4A inline assembly], [ac_cv_sse4a_inline], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
