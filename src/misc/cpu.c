@@ -58,8 +58,7 @@
 #include <machine/cpu.h>
 #endif
 
-#if defined (__i386__) || defined (__x86_64__) || defined (__powerpc__) \
- || defined (__ppc__) || defined (__ppc64__) || defined (__powerpc64__)
+#if defined (__i386__) || defined (__x86_64__)
 # if defined (HAVE_FORK)
 static bool vlc_CPU_check (const char *name, void (*func) (void))
 {
@@ -94,14 +93,6 @@ VLC_SSE static void SSE_test (void)
     asm volatile ("xorps %%xmm0,%%xmm0\n" : : : "xmm0", "xmm1");
 }
 #endif
-
-#if defined (CAN_COMPILE_ALTIVEC)
-static void Altivec_test (void)
-{
-    asm volatile ("mtspr 256, %0\n" "vand %%v0, %%v0, %%v0\n" : : "r" (-1));
-}
-#endif
-
 #else /* _WIN32 || __OS2__ */
 # define vlc_CPU_check(name, func) (1)
 #endif
@@ -192,11 +183,6 @@ out:
 
     if( i_error == 0 && i_has_altivec != 0 )
         i_capabilities |= VLC_CPU_ALTIVEC;
-
-#   elif defined( CAN_COMPILE_ALTIVEC )
-    if (vlc_CPU_check ("Altivec", Altivec_test))
-        i_capabilities |= VLC_CPU_ALTIVEC;
-
 #   endif
 
 #endif
