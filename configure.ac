@@ -1015,7 +1015,10 @@ AS_IF([test -n "${PKG_CONFIG}" ],[
 dnl
 dnl Check for zlib.h and -lz if available
 dnl
-AC_CHECK_HEADERS([zlib.h], [ have_zlib=yes ], [ have_zlib=no ])
+have_zlib="no"
+AC_CHECK_HEADERS([zlib.h], [
+  AC_CHECK_LIB([z], [inflate], [have_zlib=yes])
+])
 AM_CONDITIONAL([HAVE_ZLIB], [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
 then
