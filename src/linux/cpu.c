@@ -138,8 +138,6 @@ unsigned vlc_CPU_raw(void)
                 core_caps |= VLC_CPU_AVX;
             if (!strcmp (cap, "avx2"))
                 core_caps |= VLC_CPU_AVX2;
-            if (!strcmp (cap, "xop"))
-                core_caps |= VLC_CPU_XOP;
         }
 
         /* Take the intersection of capabilities of each processor */

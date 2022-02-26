@@ -252,8 +252,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
         vlc_memstream_puts(&stream, "AVX ");
     if (vlc_CPU_AVX2())
         vlc_memstream_puts(&stream, "AVX2 ");
-    if (vlc_CPU_XOP())
-        vlc_memstream_puts(&stream, "XOP ");
 
 #elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
     if (vlc_CPU_ALTIVEC())
