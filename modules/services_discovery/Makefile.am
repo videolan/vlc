@@ -5,8 +5,8 @@ libpodcast_plugin_la_SOURCES = services_discovery/podcast.c
 sd_LTLIBRARIES += libpodcast_plugin.la
 
 libsap_plugin_la_SOURCES = services_discovery/sap.c access/rtp/sdp.c
-libsap_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sap)
-libsap_plugin_la_LIBADD = $(LIBS_sap) $(SOCKET_LIBS)
+libsap_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libsap_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBZ)
 sd_LTLIBRARIES += libsap_plugin.la
 
 libavahi_plugin_la_SOURCES = services_discovery/avahi.c

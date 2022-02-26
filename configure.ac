@@ -1017,13 +1017,14 @@ dnl Check for zlib.h and -lz if available
 dnl
 have_zlib="no"
 AC_CHECK_HEADERS([zlib.h], [
-  AC_CHECK_LIB([z], [inflate], [have_zlib=yes])
+  AC_CHECK_LIB([z], [inflate], [
+    have_zlib=yes
+    AC_DEFINE([HAVE_ZLIB], 1, [Define to 1 if you have zlib.])
+    LIBZ="-lz"
+  ])
 ])
+AC_SUBST([LIBZ])
 AM_CONDITIONAL([HAVE_ZLIB], [ test "${have_zlib}" = "yes" ])
-if test "${have_zlib}" = "yes"
-then
-  VLC_ADD_LIBS([sap],[-lz])
-fi
 
 
 dnl

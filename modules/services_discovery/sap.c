@@ -79,7 +79,7 @@
 
 static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len )
 {
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_ZLIB
     int i_result, i_dstsize, n = 0;
     unsigned char *psz_dst = NULL;
     z_stream d_stream;
