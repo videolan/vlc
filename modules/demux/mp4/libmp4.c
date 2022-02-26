@@ -3442,7 +3442,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_Box_t *p_dcom;
     MP4_Box_t *p_cmvd;
 
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_ZLIB
     stream_t *p_stream_memory;
     z_stream z_data;
     uint8_t *p_data;
@@ -3480,7 +3480,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
     }
 
-#ifndef HAVE_ZLIB_H
+#ifndef HAVE_ZLIB
     msg_Dbg( p_stream, "read box: \"cmov\" zlib unsupported" );
     return 0;
 
@@ -3551,7 +3551,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
 #endif
 
     return p_box->data.p_cmov->p_moov ? 1 : 0;
-#endif /* HAVE_ZLIB_H */
+#endif /* HAVE_ZLIB */
 }
 
 static void MP4_FreeBox_rdrf( MP4_Box_t *p_box )

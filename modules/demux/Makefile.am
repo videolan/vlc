@@ -223,11 +223,8 @@ libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
                            demux/asf/asfpacket.c demux/asf/asfpacket.h \
                            packetizer/iso_color_tables.h \
                            meta_engine/ID3Genres.h
-libmp4_plugin_la_LIBADD = $(LIBM)
+libmp4_plugin_la_LIBADD = $(LIBM) $(LIBZ)
 libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
-if HAVE_ZLIB
-libmp4_plugin_la_LIBADD += -lz
-endif
 demux_LTLIBRARIES += libmp4_plugin.la
 
 libmpgv_plugin_la_SOURCES = demux/mpeg/mpgv.c
@@ -495,10 +492,7 @@ libvlc_adaptive_la_LDFLAGS = -static
 if !HAVE_WIN32
 libvlc_adaptive_la_LDFLAGS += -lpthread
 endif
-libvlc_adaptive_la_LIBADD += libvlc_http.la
-if HAVE_ZLIB
-libvlc_adaptive_la_LIBADD += -lz
-endif
+libvlc_adaptive_la_LIBADD += libvlc_http.la $(LIBZ)
 if HAVE_GCRYPT
 libvlc_adaptive_la_CXXFLAGS += $(GCRYPT_CFLAGS)
 libvlc_adaptive_la_LIBADD += $(GCRYPT_LIBS)
