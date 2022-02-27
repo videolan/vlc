@@ -126,13 +126,14 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
 {
     const uint8_t *data = reinterpret_cast<const uint8_t *>(data_);
     type = Type::Unknown;
-    const char moov[] = "ftypmoovmoof";
+    const char moov[] = "ftypmoovmoofemsg";
 
     if(sz > 188 && data[0] == 0x47 && data[188] == 0x47)
         type = StreamFormat::Type::MPEG2TS;
     else if(sz > 8 && (!memcmp(&moov,    &data[4], 4) ||
                        !memcmp(&moov[4], &data[4], 4) ||
-                       !memcmp(&moov[8], &data[4], 4)))
+                       !memcmp(&moov[8], &data[4], 4) ||
+                       !memcmp(&moov[12], &data[4], 4)))
         type = StreamFormat::Type::MP4;
     else if(IsWebVTT((const char *)data, sz))
         type = StreamFormat::Type::WebVTT;
