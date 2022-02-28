@@ -153,7 +153,7 @@ static void init_direct3d(struct render_context *ctx)
                                   NULL,
                                   creationFlags,
                                   NULL,
-                                  NULL,
+                                  0,
                                   D3D11_SDK_VERSION,
                                   &scd,
                                   &ctx->swapchain,
@@ -228,9 +228,9 @@ static void init_direct3d(struct render_context *ctx)
     ctx->vertexBufferStride = sizeof(OurVertices[0]);
 
     D3D11_MAPPED_SUBRESOURCE ms;
-    ctx->d3dctx->Map(ctx->pVertexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+    ctx->d3dctx->Map(ctx->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
     memcpy(ms.pData, OurVertices, sizeof(OurVertices));
-    ctx->d3dctx->Unmap(ctx->pVertexBuffer, NULL);
+    ctx->d3dctx->Unmap(ctx->pVertexBuffer, 0);
 
     ctx->quadIndexCount = 6;
     D3D11_BUFFER_DESC quadDesc = { };
@@ -240,7 +240,7 @@ static void init_direct3d(struct render_context *ctx)
     quadDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     ctx->d3device->CreateBuffer(&quadDesc, NULL, &ctx->pIndexBuffer);
 
-    ctx->d3dctx->Map(ctx->pIndexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+    ctx->d3dctx->Map(ctx->pIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
     WORD *triangle_pos = static_cast<WORD*>(ms.pData);
     triangle_pos[0] = 3;
     triangle_pos[1] = 1;
@@ -249,7 +249,7 @@ static void init_direct3d(struct render_context *ctx)
     triangle_pos[3] = 2;
     triangle_pos[4] = 1;
     triangle_pos[5] = 3;
-    ctx->d3dctx->Unmap(ctx->pIndexBuffer, NULL);
+    ctx->d3dctx->Unmap(ctx->pIndexBuffer, 0);
 
     ctx->d3dctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -413,10 +413,9 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg,
 
     ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->resized.textureShaderInput);
 
-    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {
-        .Format = texDesc.Format,
-        .ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D,
-    };
+    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = { };
+    renderTargetViewDesc.Format = texDesc.Format;
+    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     hr = ctx->d3deviceVLC->CreateRenderTargetView(ctx->resized.textureVLC, &renderTargetViewDesc, &ctx->resized.textureRenderTarget);
     if (FAILED(hr)) return false;
 
@@ -553,8 +552,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             }
             ReleaseSRWLockExclusive(&ctx->swapchainLock);
 
-            ctx->width  = LOWORD(lParam) * (BORDER_RIGHT - BORDER_LEFT) / 2.0f; /* remove the orange part ! */
-            ctx->height = HIWORD(lParam) * (BORDER_TOP - BORDER_BOTTOM) / 2.0f;
+            ctx->width  = unsigned(LOWORD(lParam) * (BORDER_RIGHT - BORDER_LEFT) / 2.0f); // remove the orange part !
+            ctx->height = unsigned(HIWORD(lParam) * (BORDER_TOP - BORDER_BOTTOM) / 2.0f);
 
             // tell libvlc we want a new rendering size
             // we could also match the source video size and scale in swapchain render
