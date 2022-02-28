@@ -12,7 +12,7 @@ DAV1D_CONF = -D enable_tests=false -D enable_tools=false
 
 $(TARBALLS)/dav1d-$(DAV1D_VERSION).tar.xz:
 	$(call download_pkg,$(DAV1D_URL),dav1d)
-	#~ $(call download_git,$(DAV1D_URL),,$(DAV1D_HASH))
+#	$(call download_git,$(DAV1D_URL),,$(DAV1D_HASH))
 
 .sum-dav1d: dav1d-$(DAV1D_VERSION).tar.xz
 
