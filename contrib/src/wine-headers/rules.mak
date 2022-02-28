@@ -5,6 +5,9 @@ WINE_URL := https://dl.winehq.org/wine/source/6.x/wine-$(WINE_VERSION).tar.xz
 ifdef HAVE_WIN32
 PKGS += wine-headers
 endif
+ifeq ($(call mingw_at_least, 8), true)
+PKGS_FOUND += wine-headers
+endif
 
 # Order is important since *_(n).idl will depends on *_(n-1).idl
 WINE_IDL_HEADERS = \
