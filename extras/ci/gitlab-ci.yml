@@ -140,6 +140,11 @@ variables:
         else
             extras/package/win32/build.sh -c -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
         fi
+        if [ "${CI_JOB_NAME}" = "win64" ]; then
+          cmake -DLIBVLC_SDK_INC:STRING=${CI_PROJECT_DIR}/include -DLIBVLC_SDK_LIB:STRING=${CI_PROJECT_DIR}/${SHORTARCH}/lib/.libs -H${CI_PROJECT_DIR}/doc/libvlc -B${CI_PROJECT_DIR}/doc/libvlc/build \
+                -G Ninja -DCMAKE_C_COMPILER=${TRIPLET}-gcc -DCMAKE_CXX_COMPILER=${TRIPLET}-g++ -DCMAKE_SYSTEM_NAME=Windows
+          cmake --build ${CI_PROJECT_DIR}/doc/libvlc/build
+        fi
 
 win32:
     extends: .win-common
