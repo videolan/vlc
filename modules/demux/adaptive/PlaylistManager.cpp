@@ -346,12 +346,16 @@ unsigned PlaylistManager::getActiveStreamsCount() const
     return count;
 }
 
-bool PlaylistManager::setPosition(vlc_tick_t mediatime, double pos)
+bool PlaylistManager::setPosition(vlc_tick_t mediatime, double pos, bool accurate)
 {
     bool ret = true;
     bool hasValidStream = false;
     StreamPosition streampos;
-    streampos.times.segment.media = mediatime;
+    streampos.times = demux.firsttimes;
+    if(streampos.times.continuous != VLC_TICK_INVALID)
+        streampos.times.offsetBy(mediatime - streampos.times.segment.media);
+    else
+        streampos.times.segment.media = mediatime;
     streampos.pos = pos;
     for(int real = 0; real < 2; real++)
     {
@@ -372,6 +376,15 @@ bool PlaylistManager::setPosition(vlc_tick_t mediatime, double pos)
         msg_Warn(p_demux, "there is no valid streams");
         ret = false;
     }
+
+    if(accurate && ret && streampos.times.continuous >= VLC_TICK_0)
+    {
+        es_out_Control(p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                       streampos.times.continuous);
+        SeekDebug(msg_Dbg(p_demux,"ES_OUT_SET_NEXT_DISPLAY_TIME to %" PRId64,
+                          streampos.times.continuous));
+    }
+
     return ret;
 }
 
@@ -626,12 +639,13 @@ int PlaylistManager::doControl(int i_query, va_list args)
             }
 
             double pos = va_arg(args, double);
+            bool accurate = va_arg(args, int);
             vlc_tick_t seekTime = cached.playlistStart + cached.playlistLength * pos;
 
             SeekDebug(msg_Dbg(p_demux, "Seek %f to %ld plstart %ld duration %ld",
                    pos, seekTime, cached.playlistEnd, cached.playlistLength));
 
-            if(!setPosition(seekTime, pos))
+            if(!setPosition(seekTime, pos, accurate))
             {
                 setBufferingRunState(true);
                 return VLC_EGENERIC;
@@ -652,7 +666,8 @@ int PlaylistManager::doControl(int i_query, va_list args)
             setBufferingRunState(false); /* stop downloader first */
 
             vlc_tick_t time = va_arg(args, vlc_tick_t);
-            if(!setPosition(time))
+            bool accurate = va_arg(args, int);
+            if(!setPosition(time, -1, accurate))
             {
                 setBufferingRunState(true);
                 return VLC_EGENERIC;

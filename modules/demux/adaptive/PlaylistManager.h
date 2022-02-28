@@ -79,7 +79,7 @@ namespace adaptive
             virtual int doDemux(vlc_tick_t);
 
             void    setLivePause(bool);
-            virtual bool    setPosition(vlc_tick_t, double pos = -1);
+            virtual bool setPosition(vlc_tick_t, double pos = -1, bool accurate = false);
             StreamPosition getResumePosition() const;
             Times getFirstTimes() const;
             unsigned getActiveStreamsCount() const;
