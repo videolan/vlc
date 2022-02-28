@@ -100,6 +100,7 @@ MPD * IsoffMainParser::parse()
         parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation"), mpd);
         parseMPDBaseUrl(mpd, root);
         parsePeriods(mpd, root);
+        mpd->addAttribute(new StartnumberAttr(1));
         mpd->debug();
     }
     return mpd;
