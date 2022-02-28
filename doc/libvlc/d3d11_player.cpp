@@ -1,4 +1,4 @@
-/* compile: g++ d3d11_player.cpp -o d3d11_player.exe -L<path/libvlc> -lvlc -ld3d11 -ld3dcompiler_47 -luuid */
+/* compile: g++ d3d11_player.cpp -o d3d11_player.exe -L<path/libvlc> -lvlc -ld3d11 -ld3dcompiler -luuid */
 
 /* This is the most extreme use case where libvlc is given its own ID3D11DeviceContext
    and draws in a texture shared with the ID3D11DeviceContext of the app.
@@ -622,12 +622,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
     /* remove "" around the given path */
     if (lpCmdLine[0] == '"')
     {
-        file_path = strdup( lpCmdLine+1 );
+        file_path = _strdup( lpCmdLine+1 );
         if (file_path[strlen(file_path)-1] == '"')
             file_path[strlen(file_path)-1] = '\0';
     }
     else
-        file_path = strdup( lpCmdLine );
+        file_path = _strdup( lpCmdLine );
 
     p_libvlc = libvlc_new( 0, NULL );
     p_media = libvlc_media_new_path( p_libvlc, file_path );

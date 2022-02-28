@@ -108,12 +108,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
     /* remove "" around the given path */
     if (lpCmdLine[0] == '"')
     {
-        file_path = strdup( lpCmdLine+1 );
+        file_path = _strdup( lpCmdLine+1 );
         if (file_path[strlen(file_path)-1] == '"')
             file_path[strlen(file_path)-1] = '\0';
     }
     else
-        file_path = strdup( lpCmdLine );
+        file_path = _strdup( lpCmdLine );
 
     Context.p_libvlc = libvlc_new( 0, NULL );
     p_media = libvlc_media_new_path( Context.p_libvlc, file_path );
