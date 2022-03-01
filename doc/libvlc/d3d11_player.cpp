@@ -74,7 +74,7 @@ struct render_context
 
     ID3D11SamplerState *samplerState;
 
-    SRWLOCK sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
+    SRWLOCK sizeLock; // the ReportSize callback cannot be called during/after the CleanupDevice_cb is called
     SRWLOCK swapchainLock; // protect the swapchain access when the UI needs to resize it
     unsigned width, height;
     struct {
@@ -474,7 +474,7 @@ static bool SelectPlane_cb( void *opaque, size_t plane, void *out )
     return true;
 }
 
-static bool Setup_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg, libvlc_video_setup_device_info_t *out )
+static bool SetupDevice_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg, libvlc_video_setup_device_info_t *out )
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
 
@@ -483,7 +483,7 @@ static bool Setup_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg,
     return true;
 }
 
-static void Cleanup_cb( void *opaque )
+static void CleanupDevice_cb( void *opaque )
 {
     // here we can release all things Direct3D11 for good (if playing only one file)
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
@@ -491,9 +491,9 @@ static void Cleanup_cb( void *opaque )
 }
 
 // receive the libvlc callback to call when we want to change the libvlc output size
-static void Resize_cb( void *opaque,
-                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
-                       void *report_opaque )
+static void SetResize_cb( void *opaque,
+                          void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                          void *report_opaque )
 {
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     AcquireSRWLockExclusive(&ctx->sizeLock);
@@ -674,7 +674,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     /* Tell VLC to render into our D3D11 environment */
     libvlc_video_set_output_callbacks( Context.p_mp, libvlc_video_engine_d3d11,
-                                       Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb,
+                                       SetupDevice_cb, CleanupDevice_cb, SetResize_cb,
+                                       UpdateOutput_cb, Swap_cb, StartRendering_cb,
                                        nullptr, nullptr, SelectPlane_cb,
                                        &Context );
 
