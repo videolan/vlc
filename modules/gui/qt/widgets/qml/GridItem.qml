@@ -20,7 +20,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.2
-import QtGraphicalEffects 1.0
+
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -60,8 +60,9 @@ T.Control {
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
     property alias pictureOverlay: picture.imageOverlay
-    property alias unselectedUnderlay: unselectedUnderlayLoader.sourceComponent
-    property alias selectedUnderlay: selectedUnderlayLoader.sourceComponent
+
+    property alias selectedShadow: selectedShadow
+    property alias unselectedShadow: unselectedShadow
 
     // Signals
 
@@ -89,15 +90,13 @@ T.Control {
             when: highlighted
 
             PropertyChanges {
-                target: selectedUnderlayLoader
-                opacity: 1
-                visible: true
+                target: selectedShadow
+                opacity: 1.0
             }
 
             PropertyChanges {
-                target: unselectedUnderlayLoader
+                target: unselectedShadow
                 opacity: 0
-                visible: false
             }
 
             PropertyChanges {
@@ -117,19 +116,14 @@ T.Control {
 
             SequentialAnimation {
                 PropertyAction {
-                    targets: [picture, selectedUnderlayLoader]
-                    properties: "visible, playCoverVisible"
+                    target: picture
+                    properties: "playCoverVisible"
                 }
 
                 NumberAnimation {
                     properties: "opacity, playCoverOpacity"
                     duration: VLCStyle.duration_long
                     easing.type: Easing.InSine
-                }
-
-                PropertyAction {
-                    target: unselectedUnderlayLoader
-                    property: "visible"
                 }
             }
         },
@@ -140,19 +134,14 @@ T.Control {
 
             SequentialAnimation {
                 PropertyAction {
-                    target: unselectedUnderlayLoader
-                    property: "visible, playCoverVisible"
+                    target: picture
+                    property: "playCoverVisible"
                 }
 
                 NumberAnimation {
                     properties: "opacity, playCoverOpacity"
                     duration: VLCStyle.duration_long
                     easing.type: Easing.OutSine
-                }
-
-                PropertyAction {
-                    targets: [picture, selectedUnderlayLoader]
-                    properties: "visible"
                 }
             }
         }
@@ -226,26 +215,6 @@ T.Control {
             root.dragItem.Drag.active = drag.active
         }
 
-        Loader {
-            id: unselectedUnderlayLoader
-
-            asynchronous: true
-        }
-
-        Loader {
-            id: selectedUnderlayLoader
-
-            asynchronous: true
-            active: false
-            visible: false
-            opacity: 0
-
-            onVisibleChanged: {
-                if (visible && !active)
-                    active = true
-            }
-        }
-
         ColumnLayout {
             id: layout
 
@@ -264,6 +233,50 @@ T.Control {
                 Layout.preferredHeight: pictureHeight
 
                 onPlayIconClicked: root.playClicked()
+
+                DoubleShadow {
+                    id: unselectedShadow
+
+                    anchors.fill: parent
+                    anchors.margins: VLCStyle.dp(1) // outside border (unselected)
+                    z: -1
+
+                    opacity: 0.62
+                    visible: opacity > 0
+
+                    xRadius: parent.radius
+                    yRadius: parent.radius
+
+                    primaryColor: Qt.rgba(0, 0, 0, .18)
+                    primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                    primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
+
+                    secondaryColor: Qt.rgba(0, 0, 0, .22)
+                    secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                    secondaryBlurRadius: VLCStyle.dp(14, VLCStyle.scale)
+                }
+
+                DoubleShadow {
+                    id: selectedShadow
+
+                    anchors.fill: parent
+                    anchors.margins: VLCStyle.dp()
+                    z: -1
+
+                    visible: opacity > 0
+                    opacity: 0
+
+                    xRadius: parent.radius
+                    yRadius: parent.radius
+
+                    primaryColor: Qt.rgba(0, 0, 0, .18)
+                    primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                    primaryBlurRadius: VLCStyle.dp(18, VLCStyle.scale)
+
+                    secondaryColor: Qt.rgba(0, 0, 0, .22)
+                    secondaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
+                    secondaryBlurRadius: VLCStyle.dp(72, VLCStyle.scale)
+                }
             }
 
             Widgets.ScrollingText {
