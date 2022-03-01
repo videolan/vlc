@@ -9,11 +9,14 @@ ifdef HAVE_WIN32
 PKGS += pthreads
 
 ifndef HAVE_VISUALSTUDIO
-PKGS += dxvahd
-PKGS_ALL += dxvahd
+PKGS += dxva dxvahd
+PKGS_ALL += dxva dxvahd
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += dxvahd
 endif # MINGW 8
+ifeq ($(call mingw_at_least, 10), true)
+PKGS_FOUND += dxva
+endif # MINGW 10
 ifeq ($(HAVE_WINPTHREAD),)
 PKGS_FOUND += pthreads
 endif
@@ -46,3 +49,12 @@ pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 	mkdir -p -- "$(PREFIX)/include"
 	cd $< && cp mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
+
+.sum-dxva: .sum-pthreads
+	touch $@
+
+.dxva: pthreads
+	mkdir -p -- "$(PREFIX)/include"
+	cd $< && cp mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
+	touch $@
+
