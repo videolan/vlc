@@ -470,46 +470,46 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
  * Vertex 0 should be assigned coordinates at index 2 from the
  * unrotated order and so on, thus yielding order: 2 3 0 1.
  */
-static void orientationVertexOrder(video_orientation_t orientation, int vertex_order[static 4])
+static void orientationVertexOrder(video_transform_t orientation, int vertex_order[static 4])
 {
     switch (orientation) {
-        case ORIENT_ROTATED_90:
+        case TRANSFORM_R90:
             vertex_order[0] = 3;
             vertex_order[1] = 0;
             vertex_order[2] = 1;
             vertex_order[3] = 2;
             break;
-        case ORIENT_ROTATED_270:
+        case TRANSFORM_R270:
             vertex_order[0] = 1;
             vertex_order[1] = 2;
             vertex_order[2] = 3;
             vertex_order[3] = 0;
             break;
-        case ORIENT_ROTATED_180:
+        case TRANSFORM_R180:
             vertex_order[0] = 2;
             vertex_order[1] = 3;
             vertex_order[2] = 0;
             vertex_order[3] = 1;
             break;
-        case ORIENT_TRANSPOSED:
+        case TRANSFORM_TRANSPOSE:
             vertex_order[0] = 2;
             vertex_order[1] = 1;
             vertex_order[2] = 0;
             vertex_order[3] = 3;
             break;
-        case ORIENT_HFLIPPED:
+        case TRANSFORM_HFLIP:
             vertex_order[0] = 1;
             vertex_order[1] = 0;
             vertex_order[2] = 3;
             vertex_order[3] = 2;
             break;
-        case ORIENT_VFLIPPED:
+        case TRANSFORM_VFLIP:
             vertex_order[0] = 3;
             vertex_order[1] = 2;
             vertex_order[2] = 1;
             vertex_order[3] = 0;
             break;
-        case ORIENT_ANTI_TRANSPOSED: /* transpose + vflip */
+        case TRANSFORM_ANTI_TRANSPOSE: /* transpose + vflip */
             vertex_order[0] = 0;
             vertex_order[1] = 3;
             vertex_order[2] = 2;
@@ -526,7 +526,7 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
 
 static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
                           const d3d_quad_t *quad,
-                          WORD *triangle_pos, video_orientation_t orientation)
+                          WORD *triangle_pos, video_transform_t orientation)
 {
     unsigned int src_width = quad->i_width;
     unsigned int src_height = quad->i_height;
@@ -537,7 +537,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
      * the rest of the visible area must correspond to -1,1 */
     switch (orientation)
     {
-    case ORIENT_ROTATED_90: /* 90° anti clockwise */
+    case TRANSFORM_R90: /* 90° anti clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
@@ -546,7 +546,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   =  (MidX - src_height) / (MidX - output->left);
         right  =                 MidX / (MidX - (src_width - output->right));
         break;
-    case ORIENT_ROTATED_180: /* 180° */
+    case TRANSFORM_R180: /* 180° */
         /* right/top aligned */
         MidY = (output->top + output->bottom) / 2.f;
         MidX = (output->left + output->right) / 2.f;
@@ -555,7 +555,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -MidX / (MidX - output->left);
         right  =  (src_width  - MidX) / (output->right - MidX);
         break;
-    case ORIENT_ROTATED_270: /* 90° clockwise */
+    case TRANSFORM_R270: /* 90° clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
@@ -564,7 +564,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -MidX / (MidX - output->left);
         right  =  (src_height - MidY) / (output->bottom - MidY);
         break;
-    case ORIENT_ANTI_TRANSPOSED:
+    case TRANSFORM_ANTI_TRANSPOSE:
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
         top    =  (src_width  - MidX) / (output->right - MidX);
@@ -572,7 +572,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -(src_height - MidY) / (output->bottom - MidY);
         right  =  MidX / (MidX - output->left);
         break;
-    case ORIENT_TRANSPOSED:
+    case TRANSFORM_TRANSPOSE:
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
         top    =  (src_width  - MidX) / (output->right - MidX);
@@ -580,7 +580,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -MidX / (MidX - output->left);
         right  =  (src_height - MidY) / (output->bottom - MidY);
         break;
-    case ORIENT_VFLIPPED:
+    case TRANSFORM_VFLIP:
         MidY = (output->top + output->bottom) / 2.f;
         MidX = (output->left + output->right) / 2.f;
         top    =  (src_height - MidY) / (output->bottom - MidY);
@@ -588,7 +588,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -MidX / (MidX - output->left);
         right  =  (src_width  - MidX) / (output->right - MidX);
         break;
-    case ORIENT_HFLIPPED:
+    case TRANSFORM_HFLIP:
         MidY = (output->top + output->bottom) / 2.f;
         MidX = (output->left + output->right) / 2.f;
         top    =  MidY / (MidY - output->top);
@@ -596,7 +596,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -(src_width  - MidX) / (output->right - MidX);
         right  =  MidX / (MidX - output->left);
         break;
-    case ORIENT_NORMAL:
+    case TRANSFORM_IDENTITY:
     default:
         /* left/top aligned */
         MidY = (output->top + output->bottom) / 2.f;
@@ -645,8 +645,8 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
     dst_data[3].texture.uv[1] = 0.0f;
 
     /* Make sure surfaces are facing the right way */
-    if( orientation == ORIENT_TOP_RIGHT || orientation == ORIENT_BOTTOM_LEFT
-     || orientation == ORIENT_LEFT_TOP  || orientation == ORIENT_RIGHT_BOTTOM )
+    if( orientation == TRANSFORM_HFLIP || orientation == TRANSFORM_VFLIP
+     || orientation == TRANSFORM_TRANSPOSE  || orientation == TRANSFORM_ANTI_TRANSPOSE )
     {
         triangle_pos[0] = 0;
         triangle_pos[1] = 1;
@@ -912,7 +912,7 @@ bool D3D_QuadSetupBuffers(vlc_object_t *o, d3d_quad_t *quad, video_projection_mo
 }
 
 bool D3D_SetupQuadData(vlc_object_t *o, d3d_quad_t *quad, const RECT *output, d3d_vertex_t*dst_data,
-                       void *pData, video_orientation_t orientation)
+                       void *pData, video_transform_t orientation)
 {
     switch (quad->projection)
     {

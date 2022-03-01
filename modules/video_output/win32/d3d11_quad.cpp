@@ -140,7 +140,7 @@ void d3d11_quad_t::Reset()
 
 #undef D3D11_UpdateQuadPosition
 bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad,
-                                const RECT *output, video_orientation_t orientation )
+                                const RECT *output, video_transform_t orientation )
 {
     bool result = true;
     HRESULT hr;

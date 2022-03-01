@@ -275,7 +275,7 @@ static void UpdateSize(vout_display_t *vd)
     d3d11_device_lock( sys->d3d_dev );
 
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
-                             vd->source->orientation);
+                             video_format_GetTransform(vd->source->orientation, ORIENT_NORMAL));
 
     D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
                           (float) vd->cfg->display.width / vd->cfg->display.height );
@@ -1067,7 +1067,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     source_rect.right  = fmt->i_x_offset + fmt->i_visible_width;
     source_rect.top    = fmt->i_y_offset;
     source_rect.bottom = fmt->i_y_offset + fmt->i_visible_height;
-    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect, vd->source->orientation))
+    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
+                                  video_format_GetTransform(vd->source->orientation, ORIENT_NORMAL)))
     {
         msg_Err(vd, "Could not set quad picture position.");
         return VLC_EGENERIC;
@@ -1409,7 +1410,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         output.top    = r->fmt.i_y_offset;
         output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
 
-        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output, ORIENT_NORMAL);
+        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output, TRANSFORM_IDENTITY);
 
         RECT spuViewport;
         spuViewport.left   = (FLOAT) r->i_x * sys->area.place.width  / subpicture->i_original_picture_width;
