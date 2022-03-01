@@ -1754,7 +1754,15 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
                 if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
                     PCRFixHandle( p_demux, p_pmt, p_block );
 
-                block_ChainLastAppend( &pid->u.p_stream->prepcr.pp_last, p_block );
+                if( pid->u.p_stream->p_proc )
+                {
+                    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+                        ts_stream_processor_Reset( pid->u.p_stream->p_proc );
+                    p_block = ts_stream_processor_Push( pid->u.p_stream->p_proc, i_stream_id, p_block );
+                }
+
+                if( p_block )
+                    block_ChainLastAppend( &pid->u.p_stream->prepcr.pp_last, p_block );
 
                 /* PCR Seen and no es->id, cleanup current and prepcr blocks */
                 if( p_pmt->pcr.i_current > -1)
