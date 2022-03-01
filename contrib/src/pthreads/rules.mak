@@ -16,7 +16,10 @@ endif # HAVE_WINSTORE
 PKGS += dxvahd dcomp
 PKGS_ALL += dxvahd dcomp
 ifeq ($(call mingw_at_least, 8), true)
-PKGS_FOUND += winrt_headers dxvahd
+PKGS_FOUND += dxvahd
+ifdef HAVE_WINSTORE
+PKGS_FOUND += winrt_headers
+endif # HAVE_WINSTORE
 endif # MINGW 8
 ifeq ($(HAVE_WINPTHREAD),)
 PKGS_FOUND += pthreads
