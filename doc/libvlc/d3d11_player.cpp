@@ -572,7 +572,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
             {
-                int key = tolower( (unsigned char)MapVirtualKey( wParam, 2 ) );
+                int key = tolower( MapVirtualKey( (UINT)wParam, 2 ) );
                 if (key == 'a')
                 {
                     if (AspectRatio == NULL)
@@ -703,5 +703,5 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     libvlc_release( p_libvlc );
 
-    return msg.wParam;
+    return (int)msg.wParam;
 }
