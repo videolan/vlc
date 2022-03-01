@@ -142,9 +142,9 @@ endif
 
 LN_S = ln -s
 ifdef HAVE_WIN32
-ifneq ($(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E __MINGW64_VERSION_MAJOR),)
+MINGW_W64_VERSION := $(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E -m 1 __MINGW64_VERSION_MAJOR | sed -e 's/\#define\s__MINGW64_VERSION_MAJOR\s//')
+ifneq ($(MINGW_W64_VERSION),)
 HAVE_MINGW_W64 := 1
-MINGW_W64_VERSION := $(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E 'define\s__MINGW64_VERSION_MAJOR' | sed -e 's/\#define\s__MINGW64_VERSION_MAJOR\s//')
 mingw_at_least = $(shell [ $(MINGW_W64_VERSION) -gt $(1) ] && echo true)
 HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
 endif
