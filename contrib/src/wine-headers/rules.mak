@@ -40,8 +40,4 @@ wine_widl = echo "GEN $(1)" && \
 	@for header in $(WINE_IDL_HEADERS); do \
 		$(call wine_widl,"`basename $$header idl`h",$$header,); \
 	done
-	@for header in $(WINE_EXTRA_HEADERS); do \
-		echo "CP  $$header"; \
-		cp "wine-headers/include/$$header" "$(PREFIX)/include"; \
-	done
 	touch $@
