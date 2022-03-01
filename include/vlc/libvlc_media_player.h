@@ -600,6 +600,8 @@ typedef struct libvlc_video_output_cfg_t
     libvlc_video_color_primaries_t primaries;
     /** video transfer function */
     libvlc_video_transfer_func_t transfer;
+    /** video surface orientation */
+    libvlc_video_orient_t orientation;
 } libvlc_video_output_cfg_t;
 
 /**

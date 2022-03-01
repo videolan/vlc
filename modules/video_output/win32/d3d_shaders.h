@@ -43,6 +43,7 @@ typedef struct {
     bool                     b_full_range;
     unsigned                 luminance_peak;
     const d3d_format_t       *pixelFormat;
+    video_orientation_t      orientation;
 } display_info_t;
 
 /* structures passed to the pixel shader */

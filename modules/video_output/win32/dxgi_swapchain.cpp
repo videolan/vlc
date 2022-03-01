@@ -449,6 +449,7 @@ void DXGI_SwapchainUpdateOutput( dxgi_swapchain *display, libvlc_video_output_cf
     out->colorspace     = (libvlc_video_color_space_t)     display->colorspace->color;
     out->primaries      = (libvlc_video_color_primaries_t) display->colorspace->primaries;
     out->transfer       = (libvlc_video_transfer_func_t)   display->colorspace->transfer;
+    out->orientation    = libvlc_video_orient_top_left;
 }
 
 bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,

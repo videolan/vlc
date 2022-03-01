@@ -216,6 +216,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     new_display.transfer  = (video_transfer_func_t)   out.transfer;
     new_display.primaries = (video_color_primaries_t) out.primaries;
     new_display.b_full_range = out.full_range;
+    new_display.orientation = (video_orientation_t) out.orientation;
 
     /* guestimate the display peak luminance */
     switch (new_display.transfer)
@@ -238,7 +239,8 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
            sys->display.color          != new_display.color ||
            sys->display.transfer       != new_display.transfer ||
            sys->display.primaries      != new_display.primaries ||
-           sys->display.b_full_range   != new_display.b_full_range ))
+           sys->display.b_full_range   != new_display.b_full_range ||
+           sys->display.orientation    != new_display.orientation ))
     {
         sys->display = new_display;
         /* TODO release the pixel shaders if the format changed */
@@ -275,7 +277,7 @@ static void UpdateSize(vout_display_t *vd)
     d3d11_device_lock( sys->d3d_dev );
 
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
-                             video_format_GetTransform(vd->source->orientation, ORIENT_NORMAL));
+                             video_format_GetTransform(vd->source->orientation, sys->display.orientation));
 
     D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
                           (float) vd->cfg->display.width / vd->cfg->display.height );
@@ -1068,7 +1070,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     source_rect.top    = fmt->i_y_offset;
     source_rect.bottom = fmt->i_y_offset + fmt->i_visible_height;
     if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
-                                  video_format_GetTransform(vd->source->orientation, ORIENT_NORMAL)))
+                                  video_format_GetTransform(vd->source->orientation, sys->display.orientation)))
     {
         msg_Err(vd, "Could not set quad picture position.");
         return VLC_EGENERIC;
@@ -1410,7 +1412,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         output.top    = r->fmt.i_y_offset;
         output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
 
-        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output, TRANSFORM_IDENTITY);
+        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output,
+            video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
 
         RECT spuViewport;
         spuViewport.left   = (FLOAT) r->i_x * sys->area.place.width  / subpicture->i_original_picture_width;

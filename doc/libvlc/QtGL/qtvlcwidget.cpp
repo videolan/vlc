@@ -82,6 +82,7 @@ public:
         render_cfg->colorspace = libvlc_video_colorspace_BT709;
         render_cfg->primaries  = libvlc_video_primaries_BT709;
         render_cfg->transfer   = libvlc_video_transfer_func_SRGB;
+        render_cfg->orientation = libvlc_video_orient_top_left;
 
         return true;
     }
