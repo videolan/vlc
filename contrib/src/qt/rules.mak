@@ -11,7 +11,7 @@ ifdef HAVE_MACOSX
 endif
 ifdef HAVE_WIN32
 PKGS += qt
-DEPS_qt = fxc2 $(DEPS_fxc2)
+DEPS_qt = fxc2 $(DEPS_fxc2) d3d9 $(DEPS_d3d9)
 ifdef HAVE_CROSS_COMPILE
 DEPS_qt += wine-headers
 endif

@@ -16,10 +16,6 @@ WINE_IDL_HEADERS = \
 	dxgi.idl dxgi1_2.idl dxgi1_3.idl dxgi1_4.idl dxgi1_5.idl dxgi1_6.idl \
 	dxva2api.idl
 
-ifndef HAVE_VISUALSTUDIO
-WINE_EXTRA_HEADERS += d3d9caps.h d3d9.h
-endif
-
 $(TARBALLS)/wine-$(WINE_VERSION).tar.xz:
 	$(call download_pkg,$(WINE_URL),wine)
 
