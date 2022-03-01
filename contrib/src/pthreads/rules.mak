@@ -13,14 +13,17 @@ ifdef HAVE_WINSTORE
 PKGS += winrt_headers
 PKGS_ALL += winrt_headers
 endif # HAVE_WINSTORE
-PKGS += d3d9 dxvahd dcomp
-PKGS_ALL += d3d9 dxvahd dcomp
+PKGS += d3d9 dxva dxvahd dcomp
+PKGS_ALL += d3d9 dxva dxvahd dcomp
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9 dxvahd
 ifdef HAVE_WINSTORE
 PKGS_FOUND += winrt_headers
 endif # HAVE_WINSTORE
 endif # MINGW 8
+ifeq ($(call mingw_at_least, 10), true)
+PKGS_FOUND += dxva
+endif # MINGW 10
 ifeq ($(HAVE_WINPTHREAD),)
 PKGS_FOUND += pthreads
 endif
@@ -80,5 +83,13 @@ pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 	mkdir -p -- "$(PREFIX)/include"
 	cd $< && cp mingw-w64-headers/include/d3d9.h "$(PREFIX)/include"
 	cd $< && cp mingw-w64-headers/include/d3d9caps.h "$(PREFIX)/include"
+	touch $@
+
+.sum-dxva: .sum-pthreads
+	touch $@
+
+.dxva: pthreads
+	mkdir -p -- "$(PREFIX)/include"
+	cd $< && cp mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
 

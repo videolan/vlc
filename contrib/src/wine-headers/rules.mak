@@ -7,7 +7,6 @@ PKGS += wine-headers
 endif
 
 # Order is important since *_(n).idl will depends on *_(n-1).idl
-WINE_EXTRA_HEADERS = dxva.h
 WINE_IDL_HEADERS = \
 	d3d11.idl \
 	d3d11_1.idl d3d11_2.idl d3d11_3.idl d3d11_4.idl \
