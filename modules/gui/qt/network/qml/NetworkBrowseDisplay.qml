@@ -203,8 +203,6 @@ FocusScope {
                 subtitle: ""
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
                 dragItem: networkDragItem
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
 
                 onPlayClicked: playAt(index)
                 onItemClicked : gridView.leftClickOnItem(modifier, index)
@@ -228,13 +226,6 @@ FocusScope {
             Navigation.upItem: gridView.headerItem
             Navigation.cancelAction: function() {
                 History.previous()
-            }
-
-            Widgets.GridShadows {
-                id: shadows
-
-                coverWidth: VLCStyle.gridCover_network_width
-                coverHeight: VLCStyle.gridCover_network_height
             }
         }
     }

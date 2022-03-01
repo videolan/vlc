@@ -272,8 +272,6 @@ FocusScope {
 
                 dragItem: dragItemPlaylist
 
-                selectedUnderlay  : shadows.selected
-                unselectedUnderlay: shadows.unselected
 
                 //---------------------------------------------------------------------------------
                 // Events
@@ -314,12 +312,6 @@ FocusScope {
             //-------------------------------------------------------------------------------------
             // Childs
 
-            Widgets.GridShadows {
-                id: shadows
-
-                coverWidth : _widthCover
-                coverHeight: _heightCover
-            }
         }
     }
 

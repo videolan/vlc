@@ -140,14 +140,6 @@ FocusScope {
             model: genreModel
             topMargin: VLCStyle.margin_large
 
-            Widgets.GridShadows {
-                id: shadows
-
-                leftPadding: 0
-                coverWidth: VLCStyle.colWidth(2)
-                coverHeight: shadows.coverWidth / 2
-            }
-
            delegate: Widgets.GridItem {
                 id: item
 
@@ -161,8 +153,6 @@ FocusScope {
                 image: model.cover || VLCStyle.noArtAlbumCover
                 playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
 
                 onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
                 onItemClicked: gridView_id.leftClickOnItem(modifier, item.index)

@@ -246,13 +246,6 @@ FocusScope {
 
             // Children
 
-            Widgets.GridShadows {
-                id: shadows
-
-                coverWidth: VLCStyle.gridCover_video_width
-                coverHeight: VLCStyle.gridCover_video_height
-            }
-
             delegate: VideoGridItem {
                 id: gridItem
 
@@ -273,9 +266,6 @@ FocusScope {
                 showNewIndicator: (model.isNew === true)
 
                 dragItem: root.dragItem
-
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
 
                 // Events
 

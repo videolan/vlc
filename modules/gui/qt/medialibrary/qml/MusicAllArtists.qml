@@ -126,15 +126,6 @@ FocusScope {
                 }
             }
 
-            Widgets.GridShadows {
-                id: shadows
-
-                leftPadding: (VLCStyle.colWidth(1) - shadows.coverWidth) / 2 // GridItem's rect is horizontally centered
-                coverWidth: VLCStyle.artistGridCover_radius
-                coverHeight: VLCStyle.artistGridCover_radius
-                coverRadius: VLCStyle.artistGridCover_radius
-            }
-
             delegate: AudioGridItem {
                 id: gridItem
 
@@ -150,9 +141,6 @@ FocusScope {
                 textAlignHCenter: true
                 width: VLCStyle.colWidth(1)
                 dragItem: artistsDragItem
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
-
 
                 onItemClicked: artistGrid.leftClickOnItem(modifier, index)
 
@@ -162,6 +150,9 @@ FocusScope {
                     artistGrid.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
+
+                selectedShadow.anchors.margins: VLCStyle.dp(1) // outside border
+                unselectedShadow.anchors.margins: VLCStyle.dp(1) // outside border
             }
         }
     }

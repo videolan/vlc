@@ -122,9 +122,6 @@ FocusScope {
 
                 focus: true
 
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
-
                 onItemDoubleClicked: gridItem.play()
 
                 onItemClicked: {
@@ -172,13 +169,6 @@ FocusScope {
             }
 
             onActionAtIndex: root._actionAtIndex(index)
-
-            Widgets.GridShadows {
-                id: shadows
-
-                coverWidth: VLCStyle.gridCover_video_width
-                coverHeight: VLCStyle.gridCover_video_height
-            }
         }
 
         Widgets.SubtitleLabel {

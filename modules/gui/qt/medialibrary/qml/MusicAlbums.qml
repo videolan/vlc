@@ -134,21 +134,11 @@ FocusScope {
             selectionDelegateModel: selectionModel
             model: albumModelId
 
-            Widgets.GridShadows {
-                id: shadows
-
-                coverWidth: VLCStyle.gridCover_music_width
-                coverHeight: VLCStyle.gridCover_music_height
-            }
-
             delegate: AudioGridItem {
                 id: audioGridItem
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
-
                 onItemClicked : gridView_id.leftClickOnItem(modifier, index)
 
                 onItemDoubleClicked: {

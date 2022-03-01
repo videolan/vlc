@@ -144,8 +144,6 @@ FocusScope {
                             pictureHeight: VLCStyle.gridCover_music_height
                             playCoverBorderWidth: VLCStyle.gridCover_music_border
                             dragItem: albumDragItem
-                            unselectedUnderlay: shadows.unselected
-                            selectedUnderlay: shadows.selected
 
                             onPlayClicked: play()
                             onItemDoubleClicked: play()
@@ -172,13 +170,6 @@ FocusScope {
                         onSelectAll: albumSelectionModel.selectAll()
 
                         onActionAtIndex: MediaLib.addAndPlay( albumModel.getIdForIndex( index ) )
-
-                        Widgets.GridShadows {
-                            id: shadows
-
-                            coverWidth: VLCStyle.gridCover_music_width
-                            coverHeight: VLCStyle.gridCover_music_height
-                        }
                     }
 
                     Widgets.SubtitleLabel {
@@ -318,8 +309,6 @@ FocusScope {
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem
-                unselectedUnderlay: shadows.unselected
-                selectedUnderlay: shadows.selected
 
                 onItemClicked : gridView_id.leftClickOnItem(modifier, index)
 
@@ -379,13 +368,6 @@ FocusScope {
             Connections {
                 target: contextMenu
                 onShowMediaInformation: gridView_id.switchExpandItem( index )
-            }
-
-            Widgets.GridShadows {
-                id: shadows
-
-                coverWidth: VLCStyle.gridCover_music_width
-                coverHeight: VLCStyle.gridCover_music_height
             }
         }
 
