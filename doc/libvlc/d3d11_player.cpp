@@ -80,7 +80,7 @@ struct render_context
     struct {
         unsigned width, height;
     } client_area;
-    void (*ReportSize)(void *ReportOpaque, unsigned width, unsigned height);
+    libvlc_video_output_resize_cb ReportSize;
     void *ReportOpaque;
 };
 
@@ -492,7 +492,7 @@ static void CleanupDevice_cb( void *opaque )
 
 // receive the libvlc callback to call when we want to change the libvlc output size
 static void SetResize_cb( void *opaque,
-                          void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                          libvlc_video_output_resize_cb report_size_change,
                           void *report_opaque )
 {
     struct render_context *ctx = static_cast<struct render_context *>( opaque );

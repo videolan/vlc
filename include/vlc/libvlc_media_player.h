@@ -714,6 +714,18 @@ typedef enum libvlc_video_engine_t {
     libvlc_video_engine_d3d9,
 } libvlc_video_engine_t;
 
+
+/** Callback type that can be called to request a render size changes.
+ * 
+ * libvlc will provide a callback of this type when calling \ref libvlc_video_output_set_resize_cb.
+ * 
+ * \param report_opaque parameter passed to \ref libvlc_video_output_set_resize_cb. [IN]
+ * \param width new rendering width requested. [IN]
+ * \param height new rendering height requested. [IN]
+ */
+typedef void( *libvlc_video_output_resize_cb )( void *report_opaque, unsigned width, unsigned height );
+
+
 /** Set the callback to call when the host app resizes the rendering area.
  *
  * This allows text rendering and aspect ratio to be handled properly when the host
@@ -728,7 +740,7 @@ typedef enum libvlc_video_engine_t {
  * \param report_opaque private pointer to pass to the \ref report_size_change callback. [IN]
  */
 typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
-                                                    void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                                                    libvlc_video_output_resize_cb report_size_change,
                                                     void *report_opaque );
 
 /** Tell the host the rendering for the given plane is about to start

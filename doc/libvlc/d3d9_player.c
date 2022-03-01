@@ -39,7 +39,7 @@ struct render_context
 
     CRITICAL_SECTION sizeLock; // the ReportSize callback cannot be called during/after the CleanupDevice_cb is called
     unsigned width, height;
-    void (*ReportSize)(void *ReportOpaque, unsigned width, unsigned height);
+    libvlc_video_output_resize_cb ReportSize;
     void *ReportOpaque;
 };
 
@@ -223,7 +223,7 @@ static void CleanupDevice_cb( void *opaque )
 }
 
 static void SetResize_cb( void *opaque,
-                          void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                          libvlc_video_output_resize_cb report_size_change,
                           void *report_opaque )
 {
     struct render_context *ctx = opaque;
