@@ -12,6 +12,9 @@ endif
 ifdef HAVE_WIN32
 PKGS += qt
 DEPS_qt = fxc2 $(DEPS_fxc2) d3d9 $(DEPS_d3d9)
+ifneq ($(call mingw_at_least, 8), true)
+DEPS_qt += dcomp $(DEPS_dcomp)
+endif # MINGW 8
 ifdef HAVE_CROSS_COMPILE
 DEPS_qt += wine-headers
 endif
