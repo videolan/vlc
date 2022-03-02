@@ -294,7 +294,7 @@ static const char *fragmentShaderSource =
     "void main()\n"
     "{\n"
     "    gl_FragColor = texture2D(texture, texcoord);\n"
-    "};\n";
+    "}\n";
 
 /*
  * Data used to seed our vertex array and element array buffers:
