@@ -32,6 +32,7 @@ extern "C" {
 # else
 #  include <stdbool.h>
 # endif
+#include <stddef.h>
 
 /** \defgroup libvlc_media LibVLC media
  * \ingroup libvlc
@@ -252,8 +253,8 @@ typedef int (*libvlc_media_open_cb)(void *opaque, void **datap,
  * \note If no data is immediately available, then the callback should sleep.
  * \warning The application is responsible for avoiding deadlock situations.
  */
-typedef ssize_t (*libvlc_media_read_cb)(void *opaque, unsigned char *buf,
-                                        size_t len);
+typedef ptrdiff_t (*libvlc_media_read_cb)(void *opaque, unsigned char *buf,
+                                         size_t len);
 
 /**
  * Callback prototype to seek a custom bitstream input media.

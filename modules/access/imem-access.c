@@ -23,6 +23,7 @@
 #endif
 #include <assert.h>
 #include <stdint.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_access.h>
@@ -44,12 +45,16 @@ typedef struct
 static ssize_t Read(stream_t *access, void *buf, size_t len)
 {
     access_sys_t *sys = access->p_sys;
+    static_assert(sizeof(ptrdiff_t) == sizeof(ssize_t),
+                  "libvlc_media_read_cb type mismatch");
+    static_assert(PTRDIFF_MAX == SSIZE_MAX,
+                  "libvlc_media_read_cb type mismatch");
 
-    ssize_t val = sys->read_cb(sys->opaque, buf, len);
+    ptrdiff_t val = sys->read_cb(sys->opaque, buf, len);
 
     if (val < 0) {
         msg_Err(access, "read error");
-        val = 0;
+        return 0; // end of stream (incl. fatal error)
     }
 
     return val;
