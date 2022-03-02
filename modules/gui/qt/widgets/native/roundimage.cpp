@@ -157,7 +157,8 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
             assert(window());
 
             QSGTexture* texture = window()->createTextureFromImage(m_roundImage,
-                static_cast<QQuickWindow::CreateTextureOptions>(QQuickWindow::TextureHasAlphaChannel |
+                static_cast<QQuickWindow::CreateTextureOptions>((Q_LIKELY(m_roundImage.hasAlphaChannel()) ? QQuickWindow::TextureHasAlphaChannel
+                                                                                                          : 0) |
                                                                 QQuickWindow::TextureCanUseAtlas));
 
             if (texture)
@@ -338,6 +339,11 @@ QImage RoundImage::RoundImageGenerator::execute()
     const QSizeF targetSize = defaultSize * ratio;
     const QPointF alignedCenteredTopLeft {(size.width() - targetSize.width()) / 2., (size.height() - targetSize.height()) / 2.};
     sourceReader.setScaledSize(targetSize.toSize());
+
+    if (Q_UNLIKELY(radius <= 0))
+    {
+        return sourceReader.read();
+    }
 
     QImage target(width, height, QImage::Format_ARGB32_Premultiplied);
     if (target.isNull())
