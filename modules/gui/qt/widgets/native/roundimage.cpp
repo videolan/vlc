@@ -39,6 +39,7 @@
 #include <QGuiApplication>
 #include <QSGImageNode>
 #include <QtQml>
+#include <QQmlFile>
 
 #ifdef QT_NETWORK_LIB
 #include <QNetworkAccessManager>
@@ -73,19 +74,12 @@ namespace
     // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
     QCache<ImageCacheKey, QImage> imageCache(2 * 1024 * 1024); // 2 MiB
 
-    QString getPath(const QUrl &url)
-    {
-        QString path = url.isLocalFile() ? url.toLocalFile() : url.toString();
-        if (path.startsWith("qrc:///"))
-            path.replace(0, strlen("qrc:///"), ":/");
-        return path;
-    }
-
     std::unique_ptr<QIODevice> getReadable(const QUrl &url)
+    try
     {
-#ifdef QT_NETWORK_LIB
-        if (url.scheme() == "http" || url.scheme() == "https")
+        if (!QQmlFile::isLocalFile(url))
         {
+#ifdef QT_NETWORK_LIB
             QNetworkAccessManager networkMgr;
             networkMgr.setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
             auto reply = networkMgr.get(QNetworkRequest(url));
@@ -94,38 +88,33 @@ namespace
             loop.exec();
 
             if (reply->error() != QNetworkReply::NoError)
-            {
-                qDebug() << reply->errorString();
-                return {};
-            }
+                throw std::runtime_error(reply->errorString().toStdString());
 
-            class DataOwningBuffer : public QBuffer
+            class DataOwningBuffer : private QByteArray, public QBuffer
             {
             public:
-                DataOwningBuffer(const QByteArray &data) : m_data {data}
-                {
-                    setBuffer(&m_data);
-                }
-
-                ~DataOwningBuffer()
-                {
-                    close();
-                    setBuffer(nullptr);
-                }
-
-            private:
-                QByteArray m_data;
+                explicit DataOwningBuffer(const QByteArray &data)
+                    : QByteArray(data), QBuffer(this, nullptr) { }
             };
 
             auto file = std::make_unique<DataOwningBuffer>(reply->readAll());
             file->open(QIODevice::ReadOnly);
             return file;
-        }
+#else
+            throw std::runtime_error("Qt Network Library is not available!");
 #endif
-
-        auto file = std::make_unique<QFile>(getPath(url));
-        file->open(QIODevice::ReadOnly);
-        return file;
+        }
+        else
+        {
+            auto file = std::make_unique<QFile>(QQmlFile::urlToLocalFileOrQrc(url));
+            file->open(QIODevice::ReadOnly);
+            return file;
+        }
+    }
+    catch (const std::exception& error)
+    {
+        qWarning() << "Could not load source image:" << url << error.what();
+        return {};
     }
 }
 
