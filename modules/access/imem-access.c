@@ -28,12 +28,16 @@
 #include <vlc_access.h>
 #include <vlc_plugin.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+
 typedef struct
 {
     void *opaque;
-    ssize_t (*read_cb)(void *, unsigned char *, size_t);
-    int (*seek_cb)(void *, uint64_t);
-    void (*close_cb)(void *);
+    libvlc_media_read_cb read_cb;
+    libvlc_media_seek_cb seek_cb;
+    libvlc_media_close_cb close_cb;
     uint64_t size;
 } access_sys_t;
 
@@ -116,7 +120,7 @@ static int Open(vlc_object_t *object)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    int (*open_cb)(void *, void **, uint64_t *);
+    libvlc_media_open_cb open_cb;
     void *opaque;
 
     opaque = var_InheritAddress(access, "imem-data");
