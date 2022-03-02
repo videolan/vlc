@@ -129,7 +129,23 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLVideoFoldersModel::createLoader() c
 
 void MLVideoFoldersModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
-    // FIXME: Add support for folder events once the MediaLibrary supports them.
+    int type = event.i_type;
+
+    switch (type)
+    {
+        case VLC_ML_EVENT_FOLDER_ADDED:
+        case VLC_ML_EVENT_FOLDER_UPDATED:
+        case VLC_ML_EVENT_FOLDER_DELETED:
+        {
+            m_need_reset = true;
+
+            emit resetRequested();
+
+            break;
+        }
+        default:
+            break;
+    }
 
     MLBaseModel::onVlcMlEvent(event);
 }
