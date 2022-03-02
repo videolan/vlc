@@ -43,20 +43,18 @@ class RoundImage : public QQuickItem
 public:
     RoundImage(QQuickItem *parent = nullptr);
 
-    void classBegin() override;
     void componentComplete() override;
 
     QUrl source() const;
     qreal radius() const;
 
 public slots:
-    void setSource(QUrl source);
+    void setSource(const QUrl& source);
     void setRadius(qreal radius);
 
 signals:
-    void sourceChanged(QUrl source);
-    void radiusChanged(int radius);
-    void sourceSizeChanged(QSizeF sourceSize);
+    void sourceChanged(const QUrl&);
+    void radiusChanged(qreal);
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
@@ -90,7 +88,6 @@ private:
     TaskHandle<RoundImageGenerator> m_roundImageGenerator {};
 
     bool m_enqueuedGeneration = false;
-    bool m_isComponentComplete = true;
 };
 
 #endif

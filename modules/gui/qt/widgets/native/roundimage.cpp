@@ -170,19 +170,10 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     return node;
 }
 
-void RoundImage::classBegin()
-{
-    QQuickItem::classBegin();
-
-    m_isComponentComplete = false;
-}
-
 void RoundImage::componentComplete()
 {
     QQuickItem::componentComplete();
 
-    Q_ASSERT(!m_isComponentComplete); // classBegin is not called?
-    m_isComponentComplete = true;
     if (!m_source.isEmpty())
         regenerateRoundImage();
 }
@@ -197,7 +188,7 @@ qreal RoundImage::radius() const
     return m_radius;
 }
 
-void RoundImage::setSource(QUrl source)
+void RoundImage::setSource(const QUrl& source)
 {
     if (m_source == source)
         return;
@@ -236,7 +227,7 @@ void RoundImage::setDPR(const qreal value)
 
 void RoundImage::regenerateRoundImage()
 {
-    if (!m_isComponentComplete || m_enqueuedGeneration)
+    if (!isComponentComplete() || m_enqueuedGeneration)
         return;
 
     m_roundImageGenerator.reset();
