@@ -1114,14 +1114,23 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
         {
             msg_Dbg( p_sys->p_input, "Buffering %d%%", i_level );
             p_sys->i_prev_stream_level = i_level;
+           
+            if(i_level == 0)
+            {
+                msg_Dbg( p_sys->p_input, "TBP:END> key=START_TS_BUFFERING label='success'");
+                msg_Dbg( p_sys->p_input, "TBP:START> key=WAIT_TS_BUFFERING_DONE label='success'");
+            }
         }
 
         return;
     }
     input_SendEventCache( p_sys->p_input, 1.0 );
 
+    msg_Dbg( p_sys->p_input, "TBP:END> key=WAIT_TS_BUFFERING_DONE label='success'");
     msg_Dbg( p_sys->p_input, "Stream buffering done (%d ms in %d ms)",
               (int)MS_FROM_VLC_TICK(i_stream_duration), (int)MS_FROM_VLC_TICK(i_system_duration) );
+    
+    
     p_sys->b_buffering = false;
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
