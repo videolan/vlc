@@ -397,10 +397,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 }
 
 /**
- * Destroy everything.
- * This function requests the running threads to finish, waits for their
- * termination, and destroys their structure.
- * It stops the thread systems: no instance can run after this has run
+ * Destroy libvlc instance.
  * \param p_libvlc the instance to destroy
  */
 void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
