@@ -214,11 +214,11 @@ FileRead(stream_t *p_access, void *p_buf, size_t i_len)
                        p_access) < 0)
     {
         msg_Err(p_access, "nfs_read_async failed");
-        return -1;
+        return 0;
     }
 
     if (vlc_nfs_mainloop(p_access, nfs_read_finished_cb) < 0)
-        return -1;
+        return 0;
 
     return p_sys->res.read.i_len;
 }
