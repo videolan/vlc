@@ -351,17 +351,17 @@ QImage RoundImage::RoundImageGenerator::execute()
 
     target.fill(Qt::transparent);
 
-    QPainter painter;
-    painter.begin(&target);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    {
+        QPainter painter(&target);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-    QPainterPath path;
-    path.addRoundedRect(0, 0, width, height, radius, radius);
-    painter.setClipPath(path);
+        QPainterPath path;
+        path.addRoundedRect(0, 0, width, height, radius, radius);
+        painter.setClipPath(path);
 
-    painter.drawImage({alignedCenteredTopLeft, targetSize}, sourceReader.read());
-    painter.end();
+        painter.drawImage({alignedCenteredTopLeft, targetSize}, sourceReader.read());
+    }
 
     return target;
 }
