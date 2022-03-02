@@ -37,6 +37,10 @@ using std::memory_order_acq_rel;
 #endif
 # include <vlc_common.h>
 
+#define VLC_STATIC_RC { \
+    .refs = ATOMIC_VAR_INIT(0) \
+}
+
 typedef struct vlc_atomic_rc_t {
     atomic_uintptr_t refs;
 } vlc_atomic_rc_t;
