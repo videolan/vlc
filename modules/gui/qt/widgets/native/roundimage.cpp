@@ -339,7 +339,7 @@ QImage RoundImage::RoundImageGenerator::execute()
     const QPointF alignedCenteredTopLeft {(size.width() - targetSize.width()) / 2., (size.height() - targetSize.height()) / 2.};
     sourceReader.setScaledSize(targetSize.toSize());
 
-    QImage target(width, height, QImage::Format_ARGB32);
+    QImage target(width, height, QImage::Format_ARGB32_Premultiplied);
     if (target.isNull())
         return target;
 
