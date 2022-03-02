@@ -53,7 +53,6 @@ Item {
             Layout.preferredWidth: root.titleCover_width
 
             ListCoverShadow {
-                source: cover
                 anchors.fill: cover
             }
 

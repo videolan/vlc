@@ -109,7 +109,6 @@ FocusScope {
 
                         Widgets.ListCoverShadow {
                             anchors.fill: expand_cover_id
-                            source: expand_cover_id
                         }
                     }
 

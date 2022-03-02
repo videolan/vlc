@@ -76,8 +76,6 @@ FocusScope {
 
                 Widgets.ListCoverShadow {
                     anchors.fill: cover
-
-                    source: cover
                 }
             }
 

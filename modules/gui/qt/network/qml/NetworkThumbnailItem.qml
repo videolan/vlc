@@ -48,7 +48,6 @@ Item {
 
     Widgets.ListCoverShadow {
         anchors.fill: !item._showCustomCover ? artwork : background
-        source: !item._showCustomCover ? artwork : background
     }
 
     Rectangle {
