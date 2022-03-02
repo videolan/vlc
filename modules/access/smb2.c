@@ -278,10 +278,7 @@ FileRead(stream_t *access, void *buf, size_t len)
 {
     struct access_sys *sys = access->p_sys;
 
-    if (sys->error_status != 0)
-        return -1;
-
-    if (sys->eof)
+    if (sys->eof || sys->error_status != 0)
         return 0;
 
     /* Limit the read size since smb2_read_async() will complete only after
@@ -297,13 +294,13 @@ FileRead(stream_t *access, void *buf, size_t len)
                         smb2_read_cb, &op) < 0)
     {
         VLC_SMB2_SET_ERROR(&op, "smb2_read_async", 1);
-        return -1;
+        return 0;
     }
 
     if (vlc_smb2_mainloop(&op, false) < 0)
     {
         sys->error_status = op.error_status;
-        return -1;
+        return 0;
     }
 
     if (op.res.read.len == 0)
