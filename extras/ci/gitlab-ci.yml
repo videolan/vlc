@@ -84,8 +84,8 @@ variables:
 .base-template:
     stage: build
     rules:
-        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "3.0.x@videolan/vlc"'
+        - if: $CI_MERGE_REQUEST_IID
+        - if: '$CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_PATH == "videolan/vlc" && $CI_COMMIT_REF_NAME == "3.0.x"'
     artifacts:
         paths:
             - contrib/vlc-contrib-${TRIPLET}-*.tar.zst
