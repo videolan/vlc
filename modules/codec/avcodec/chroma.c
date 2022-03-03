@@ -28,9 +28,12 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 
+/*
+ * Common header for swscale, avcodec (and avformat).
+ * Only libavutil can be depended on here.
+ */
 #include <libavutil/avutil.h>
 #include <libavutil/pixfmt.h>
-#include "avcommon.h"
 #include "chroma.h"
 
 /*****************************************************************************
