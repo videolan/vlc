@@ -42,7 +42,7 @@ static int InitPlatform(vlc_vk_platform_t *vk)
         return VLC_EGENERIC;
 
     vk->platform_ext = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
-    vk->platform_ops = &platform_ops;
+    vk->ops = &platform_ops;
     return VLC_SUCCESS;
 }
 
