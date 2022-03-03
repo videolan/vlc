@@ -139,6 +139,74 @@ int SegmentList_test()
         delete segmentList2;
         segmentList2 = nullptr;
 
+        /* gap updates, relative timings */
+        segmentList = new SegmentList(nullptr, true);
+        segmentList->addAttribute(new TimescaleAttr(timescale));
+        segmentList->addAttribute(new DurationAttr(100));
+        Expect(segmentList->inheritDuration());
+        for(int i=0; i<2; i++)
+        {
+            seg = new Segment(nullptr);
+            seg->setSequenceNumber(123 + i);
+            seg->startTime.Set(START + 100 * i);
+            seg->duration.Set(100);
+            segmentList->addSegment(seg);
+        }
+        segmentList2 = new SegmentList(nullptr, true);
+        for(int i=0; i<2; i++)
+        {
+            seg = new Segment(nullptr);
+            seg->setSequenceNumber(128 + i);
+            seg->startTime.Set(START + 100 * i);
+            seg->duration.Set(100);
+            segmentList2->addSegment(seg);
+        }
+        segmentList->updateWith(segmentList2);
+        Expect(segmentList->getStartSegmentNumber() == 128);
+        Expect(segmentList->getSegments().size() == 2);
+        Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
+        Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 129);
+        Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
+        Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
+
+        delete segmentList;
+        delete segmentList2;
+        segmentList2 = nullptr;
+
+        /* gap updates, absolute media timings */
+        segmentList = new SegmentList(nullptr, false);
+        segmentList->addAttribute(new TimescaleAttr(timescale));
+        segmentList->addAttribute(new DurationAttr(999));
+        Expect(segmentList->inheritDuration());
+        for(int i=0; i<2; i++)
+        {
+            seg = new Segment(nullptr);
+            seg->setSequenceNumber(123 + i);
+            seg->startTime.Set(START + 100 * i);
+            seg->duration.Set(100);
+            segmentList->addSegment(seg);
+        }
+        segmentList2 = new SegmentList(nullptr, false);
+        for(int i=5; i<7; i++)
+        {
+            seg = new Segment(nullptr);
+            seg->setSequenceNumber(123 + i);
+            seg->startTime.Set(START + 100 * i);
+            seg->duration.Set(100);
+            segmentList2->addSegment(seg);
+        }
+        segmentList->updateWith(segmentList2);
+        Expect(segmentList->getStartSegmentNumber() == 128);
+        Expect(segmentList->getSegments().size() == 2);
+        Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
+        Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 129);
+        Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
+        Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
+
+        delete segmentList;
+        delete segmentList2;
+        segmentList2 = nullptr;
+
         /* Tricky now, check timelined */
         segmentList = new SegmentList(nullptr);
         segmentList->addAttribute(new TimescaleAttr(timescale));
