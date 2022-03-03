@@ -83,8 +83,8 @@ VideoAll {
     // VideoAll reimplementation
 
     function setCurrentItemFocus(reason) {
-        if (modelRecent.count)
-            headerItem.setCurrentItemFocus(reason)
+        if (headerItem && headerItem.focus)
+            headerItem.forceActiveFocus(reason)
         else
             _currentView.setCurrentItemFocus(reason)
     }
@@ -187,78 +187,17 @@ VideoAll {
         }
     }
 
-    // Children
-
-    MLRecentsVideoModel {
-        id: modelRecent
-
-        ml: MediaLib
-    }
-
-    header: Column {
-        property Item focusItem: (loader.status === Loader.Ready) ? loader.item.focusItem
-                                                                  : null
-
-        property alias loader: loader
-
+    header: VideoDisplayRecentVideos {
         width: root.width
 
-        topPadding: VLCStyle.margin_normal
-        bottomPadding: VLCStyle.margin_normal
+        // NOTE: We want grid items to be visible on the sides.
+        leftPadding: root.contentMargin
 
-        // NOTE: We want the header to be visible when we have at least one media visible.
-        //       Otherwise it overlaps the default caption.
-        visible: (root.model.count && modelRecent.count)
+        Navigation.parentItem: root
 
-        function setCurrentItemFocus(reason) {
-            var item = loader.item;
-
-            if (item)
-                item.setCurrentItemFocus(reason);
+        Navigation.downAction: function() {
+            _currentView.setCurrentItemFocus(Qt.TabFocusReason);
         }
 
-        Loader {
-            id: loader
-
-            anchors.left : parent.left
-            anchors.right: parent.right
-
-            anchors.margins: root.contentMargin
-
-            height: (status === Loader.Ready) ? item.implicitHeight : 0
-
-            active: (modelRecent.count)
-
-            visible: active
-
-            sourceComponent: VideoDisplayRecentVideos {
-                id: component
-
-                width: parent.width
-
-                // NOTE: We want grid items to be visible on the sides.
-                displayMargins: root.contentMargin
-
-                model: modelRecent
-
-                focus: true
-
-                Navigation.parentItem: root
-
-                Navigation.downAction: function() {
-                    _currentView.setCurrentItemFocus(Qt.TabFocusReason);
-                }
-            }
-        }
-
-        Widgets.SubtitleLabel {
-            anchors.left: loader.left
-            anchors.right: loader.right
-
-            // NOTE: We want this to be properly aligned with the grid items.
-            anchors.leftMargin: VLCStyle.margin_normal
-
-            text: I18n.qtr("Videos")
-        }
     }
 }

@@ -30,34 +30,16 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    // Properties
-
-    property Item focusItem: listView
-
-    property alias currentIndex: listView.currentIndex
-
-    property alias model: listView.model
-
-    // Properties
-
-    property int displayMargins: 0
+    property alias leftPadding: recentVideosColumn.leftPadding
+    property alias rightPadding: recentVideosColumn.rightPadding
 
     // Settings
 
     implicitHeight: recentVideosColumn.height
 
-    // Events
-
-    onFocusChanged: {
-        if (activeFocus && root.currentIndex === -1 && root.model.count > 0)
-            root.currentIndex = 0
-    }
+    focus: listView.count > 0
 
     // Functions
-
-    function setCurrentItemFocus(reason) {
-        listView.setCurrentItemFocus(reason)
-    }
 
     function _actionAtIndex(index) {
         g_mainDisplay.showPlayer()
@@ -69,7 +51,7 @@ FocusScope {
     VideoContextMenu {
         id: contextMenu
 
-        model: root.model
+        model: listView.model
     }
 
     Column {
@@ -79,22 +61,20 @@ FocusScope {
 
         spacing: VLCStyle.margin_xsmall
 
+        topPadding: VLCStyle.margin_normal
+
+        bottomPadding: VLCStyle.margin_normal
+
         Widgets.SubtitleLabel {
-            id: continueWatchingLabel
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            // NOTE: We want this to be properly aligned with the grid items.
-            anchors.leftMargin: VLCStyle.margin_normal
-
             text: I18n.qtr("Continue Watching")
+
+            visible: listView.visible
         }
 
         Widgets.KeyNavigableListView {
             id: listView
 
-            width: parent.width
+            width: root.width - root.leftPadding - root.rightPadding
 
             implicitHeight: VLCStyle.gridItem_video_height + VLCStyle.gridItemSelectedBorder
                             +
@@ -103,8 +83,8 @@ FocusScope {
             spacing: VLCStyle.column_margin_width
 
             // NOTE: Sometimes, we want items to be visible on the sides.
-            displayMarginBeginning: root.displayMargins
-            displayMarginEnd: root.displayMargins
+            displayMarginBeginning: root.leftPadding
+            displayMarginEnd: root.leftPadding
 
             // NOTE: We want navigation buttons to be centered on the item cover.
             buttonMargin: VLCStyle.margin_xsmall + VLCStyle.gridCover_video_height / 2 - buttonLeft.height / 2
@@ -116,6 +96,12 @@ FocusScope {
             fadeColor: VLCStyle.colors.bg
 
             Navigation.parentItem: root
+
+            visible: listView.count > 0
+
+            model: MLRecentsVideoModel {
+                ml: MediaLib
+            }
 
             header: Item {
                 width: VLCStyle.margin_normal
@@ -191,6 +177,10 @@ FocusScope {
                 coverWidth: VLCStyle.gridCover_video_width
                 coverHeight: VLCStyle.gridCover_video_height
             }
+        }
+
+        Widgets.SubtitleLabel {
+            text: I18n.qtr("Videos")
         }
     }
 }
