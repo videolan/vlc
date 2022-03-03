@@ -55,7 +55,7 @@ static int InitPlatform(vlc_vk_platform_t *vk)
 
     vk->platform_sys = conn;
     vk->platform_ext = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
-    vk->platform_ops = &platform_ops;
+    vk->ops = &platform_ops;
 
     return VLC_SUCCESS;
 }
