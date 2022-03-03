@@ -33,7 +33,7 @@ static void ClosePlatform(vlc_vk_platform_t *vk)
     VLC_UNUSED(vk);
 }
 
-static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst)
+static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out)
 {
     // Get current win32 HINSTANCE
     HINSTANCE hInst = GetModuleHandle(NULL);
@@ -44,7 +44,7 @@ static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst)
          .hwnd = (HWND) vk->window->handle.hwnd,
     };
 
-    VkResult res = vkCreateWin32SurfaceKHR(vkinst, &winfo, NULL, &vk->surface);
+    VkResult res = vkCreateWin32SurfaceKHR(vkinst, &winfo, NULL, surface_out);
     if (res != VK_SUCCESS) {
         msg_Err(vk, "Failed creating Win32 surface");
         return VLC_EGENERIC;
