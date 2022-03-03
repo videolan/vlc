@@ -42,6 +42,10 @@
 extern int CGSMainConnectionID();
 extern CGImageRef CGSCreateRegisteredCursorImage(int, char*, CGPoint*);
 
+static void screen_CloseCapture(screen_data_t *);
+static block_t *screen_Capture(demux_t *);
+
+
 struct screen_data_t
 {
     block_t *p_block;
@@ -128,14 +132,16 @@ int screen_InitCapture(demux_t *p_demux)
     p_sys->fmt.video.i_frame_rate      = 1000 * p_data->rate;
     p_sys->fmt.video.i_frame_rate_base = 1000;
 
+    static const struct screen_capture_operations ops = {
+        screen_Capture, screen_CloseCapture,
+    };
+    p_sys->ops = &ops;
+
     return VLC_SUCCESS;
 }
 
-int screen_CloseCapture(demux_t *p_demux)
+static static void screen_CloseCapture(screen_data_t *p_data)
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    screen_data_t *p_data = p_sys->p_data;
-
     if (p_data->offscreen_context)
         CFRelease(p_data->offscreen_context);
 
@@ -146,8 +152,6 @@ int screen_CloseCapture(demux_t *p_demux)
         block_Release(p_data->p_block);
 
     free(p_data);
-
-    return VLC_SUCCESS;
 }
 
 block_t *screen_Capture(demux_t *p_demux)

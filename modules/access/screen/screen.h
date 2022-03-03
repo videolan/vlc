@@ -38,6 +38,12 @@
 
 typedef struct screen_data_t screen_data_t;
 
+struct screen_capture_operations
+{
+    block_t* (*capture)( demux_t * );
+    void (*close)( screen_data_t * );
+};
+
 typedef struct
 {
     es_format_t fmt;
@@ -72,11 +78,10 @@ typedef struct
 #endif
 
     screen_data_t *p_data;
+    const struct screen_capture_operations *ops;
 } demux_sys_t;
 
 int      screen_InitCapture ( demux_t * );
-int      screen_CloseCapture( demux_t * );
-block_t *screen_Capture( demux_t * );
 
 #ifdef SCREEN_SUBSCREEN
 void FollowMouse( demux_sys_t *, int, int );

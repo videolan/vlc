@@ -256,7 +256,8 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    screen_CloseCapture( p_demux );
+    if (p_sys->ops)
+        p_sys->ops->close( p_sys->p_data );
 #ifdef SCREEN_MOUSE
     if( p_sys->p_mouse )
         picture_Release( p_sys->p_mouse );
@@ -286,7 +287,7 @@ static int Demux( demux_t *p_demux )
     p_sys->i_next_date += extra_frames * p_sys->i_incr;
 
     vlc_tick_wait( p_sys->i_next_date );
-    p_block = screen_Capture( p_demux );
+    p_block = p_sys->ops->capture( p_demux );
     if( !p_block )
     {
         p_sys->i_next_date += p_sys->i_incr;

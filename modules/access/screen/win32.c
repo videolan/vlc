@@ -32,6 +32,10 @@
 
 #include "screen.h"
 
+
+static void screen_CloseCapture(screen_data_t *);
+static block_t *screen_Capture(demux_t *);
+
 struct screen_data_t
 {
     HDC hdc_src;
@@ -162,14 +166,16 @@ int screen_InitCapture( demux_t *p_demux )
     p_data->ptl.x = - GetSystemMetrics( SM_XVIRTUALSCREEN );
     p_data->ptl.y = - GetSystemMetrics( SM_YVIRTUALSCREEN );
 
+    static const struct screen_capture_operations ops = {
+        screen_Capture, screen_CloseCapture,
+    };
+    p_sys->ops = &ops;
+
     return VLC_SUCCESS;
 }
 
-int screen_CloseCapture( demux_t *p_demux )
+void screen_CloseCapture( screen_data_t *p_data )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    screen_data_t *p_data = p_sys->p_data;
-
     if( p_data->p_block ) block_Release( p_data->p_block );
 
     if( p_data->hgdi_backup)
@@ -178,8 +184,6 @@ int screen_CloseCapture( demux_t *p_demux )
     DeleteDC( p_data->hdc_dst );
     ReleaseDC( 0, p_data->hdc_src );
     free( p_data );
-
-    return VLC_SUCCESS;
 }
 
 struct block_sys_t
