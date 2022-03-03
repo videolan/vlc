@@ -47,8 +47,6 @@
 #include "avcodec.h"
 #include "avcommon.h"
 
-#include <libavutil/channel_layout.h>
-
 #define HURRY_UP_GUARD1 VLC_TICK_FROM_MS(450)
 #define HURRY_UP_GUARD2 VLC_TICK_FROM_MS(300)
 #define HURRY_UP_GUARD3 VLC_TICK_FROM_MS(100)
