@@ -321,7 +321,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 break;
 
             case SingleValueTag::EXTXPLAYLISTTYPE:
-                rep->b_live = (static_cast<const SingleValueTag *>(tag)->getValue().value != "VOD");
+                rep->b_live = !b_vod && (static_cast<const SingleValueTag *>(tag)->getValue().value != "VOD");
                 break;
 
             case SingleValueTag::EXTXBYTERANGE:
