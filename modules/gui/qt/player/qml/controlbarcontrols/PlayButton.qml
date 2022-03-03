@@ -134,9 +134,12 @@ T.Control {
 
             PropertyChanges {
                 target: hoverShadow
+                opacity: 0.0
+            }
 
-                radius: VLCStyle.dp(18, VLCStyle.scale)
-                opacity: 1
+            PropertyChanges {
+                target: focusShadow
+                opacity: 1.0
             }
         },
         State {
@@ -145,9 +148,12 @@ T.Control {
 
             PropertyChanges {
                 target: hoverShadow
+                opacity: 1.0
+            }
 
-                radius: VLCStyle.dp(14, VLCStyle.scale)
-                opacity: 0.5
+            PropertyChanges {
+                target: focusShadow
+                opacity: 0.0
             }
         }
     ]
@@ -156,7 +162,7 @@ T.Control {
         from: ""; to: "*"
         reversible: true
         NumberAnimation {
-            properties: "radius, opacity"
+            properties: "opacity"
             easing.type: Easing.InOutSine
             duration: VLCStyle.duration_veryShort
         }
@@ -176,8 +182,10 @@ T.Control {
                 return VLCIcons.play
         }
 
-        color: cursorInside ? hoverShadow.color :
-                              (paintOnly || enabled ? colors.buttonPlayIcon
+        color: cursorInside ? VLCStyle.colors.blendColors(VLCStyle.colors.buttonPlayA,
+                                                          VLCStyle.colors.buttonPlayB,
+                                                          0.5)
+                            : (paintOnly || enabled ? colors.buttonPlayIcon
                                                     : colors.textInactive)
 
         font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
@@ -195,18 +203,45 @@ T.Control {
     }
 
     background: Item {
-        DropShadow {
+        // TODO: Qt >= 5.15 use inline component for the drop shadows
+        Widgets.DropShadowImage {
             id: hoverShadow
-            anchors.fill: parent
 
-            visible: radius > 4
+            anchors.centerIn: parent
 
-            radius: 0
-            samples: 49 // should be a fixed number
-            source: opacityMask
-            spread: colors.isThemeDark && playBtn.state === "focused" ? 0.4 : 0.2
+            z: -1
+            visible: opacity > 0
+            opacity: 0
 
-            color: "#FF610A"
+            blurRadius: VLCStyle.dp(9)
+            yOffset: VLCStyle.dp(4)
+
+            color: Qt.rgba(255 / 255, 97 / 255, 10 / 255, 0.29)
+
+            xRadius: sourceSize.width
+            yRadius: xRadius
+
+            sourceSize: Qt.size(parent.width, parent.height)
+        }
+
+        Widgets.DropShadowImage {
+            id: focusShadow
+
+            anchors.centerIn: parent
+
+            z: -1
+            visible: opacity > 0
+            opacity: 0
+
+            blurRadius: VLCStyle.dp(14)
+            yOffset: VLCStyle.dp(1)
+
+            color: Qt.rgba(255 / 255, 97 / 255, 10 / 255, 1.0)
+
+            xRadius: sourceSize.width
+            yRadius: xRadius
+
+            sourceSize: Qt.size(parent.width, parent.height)
         }
 
         Rectangle {
