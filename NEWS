@@ -80,6 +80,7 @@ Video output:
  * Remove RealRTSP plugin
  * Remove Real demuxer plugin
  * Fix washed out black on NVIDIA cards with Direct3D9
+ * On-Screen-Display is off by default in libvlc
 
 Audio filter:
  * Add RNNoise recurrent neural network denoiser
