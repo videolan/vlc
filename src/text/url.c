@@ -51,7 +51,7 @@ char *vlc_uri_decode_duplicate (const char *str)
     return buf;
 }
 
-static char hex_to_char(unsigned char c)
+static int_fast8_t hex_to_char(unsigned char c)
 {
     uint_fast8_t v = c - '0';
     if ( v < 10 )
@@ -76,7 +76,7 @@ char *vlc_uri_decode (char *str)
     {
         if (c == '%')
         {
-            char a, b;
+            int_fast8_t a, b;
 
             if ((a = hex_to_char(*(in++))) < 0 ||
                 (b = hex_to_char(*(in++))) < 0)
