@@ -346,8 +346,7 @@ FocusScope {
 
             onItemDoubleClicked: root.onDoubleClick(model)
 
-            onContextMenuButtonClicked: root.contextMenu.popup(modelSelect.selectedIndexes,
-                                                               menuParent.mapToGlobal(0,0))
+            onContextMenuButtonClicked: root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
 
             onRightClick: root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
 
