@@ -438,6 +438,7 @@ FocusScope {
                     source: rootPlayer.coverSource
                     fillMode: Image.PreserveAspectFit
                     mipmap: height < sourceSize.height * .3
+                    cache: false
                 }
 
                 Widgets.CoverShadow {
