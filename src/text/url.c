@@ -53,7 +53,7 @@ char *vlc_uri_decode_duplicate (const char *str)
 
 static char hex_to_char(unsigned char c)
 {
-    unsigned char v = c - '0';
+    uint_fast8_t v = c - '0';
     if ( v < 10 )
         return v;
     v = c - 'a';
