@@ -196,7 +196,7 @@ T.Control {
 
                 iconText: VLCIcons.ellipsis
 
-                size: VLCStyle.icon_medium
+                size: root._contextButtonHorizontalSpace
 
                 visible: delegate.hovered
 
