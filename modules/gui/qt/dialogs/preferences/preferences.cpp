@@ -111,7 +111,7 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     simple_split_widget->layout()->addWidget( simple_panels_stack );
 
     simple_tree_panel->layout()->setMargin( 1 );
-    simple_panels_stack->layout()->setContentsMargins( 6, 0, 0, 3 );
+    simple_panels_stack->setContentsMargins( 6, 0, 0, 3 );
     simple_split_widget->layout()->setMargin( 0 );
 
     stack->insertWidget( SIMPLE, simple_split_widget );
