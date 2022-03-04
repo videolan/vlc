@@ -50,6 +50,15 @@ T.Control {
     
     ListView.delayRemove: dragActive
 
+    function selectAndFocus(modifiers, focusReason) {
+        selectionDelegateModel.updateSelection(modifiers, view.currentIndex, index)
+
+        view.currentIndex = index
+        view.positionViewAtIndex(index, ListView.Contain)
+
+        delegate.forceActiveFocus(focusReason)
+    }
+
     // Connections
 
     Connections {
@@ -104,14 +113,7 @@ T.Control {
             onClicked: {
                 if ((mouse.button === Qt.LeftButton)
                         || !selectionDelegateModel.isSelected(root.model.index(index, 0))) {
-
-                    selectionDelegateModel.updateSelection(mouse.modifiers, view.currentIndex, index)
-
-                    view.positionViewAtIndex(index, ListView.Contain)
-
-                    view.currentIndex = index
-
-                    delegate.forceActiveFocus(Qt.MouseFouseReason)
+                    delegate.selectAndFocus(mouse.modifiers, Qt.MouseFocusReason)
                 }
 
                 if (mouse.button === Qt.RightButton)
@@ -200,8 +202,12 @@ T.Control {
 
                 visible: delegate.hovered
 
-                onClicked: root.contextMenuButtonClicked(this, delegate.rowModel
-                                                         , contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal))
+                onClicked: {
+                    delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
+
+                    var pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
+                    root.contextMenuButtonClicked(this, delegate.rowModel, pos)
+                }
             }
         }
     }
