@@ -181,7 +181,7 @@ vlc_decoder_device *
 vlc_decoder_device_Create(vlc_object_t *o, vout_window_t *window)
 {
     struct vlc_decoder_device_priv *priv =
-            vlc_object_create(o, sizeof (*priv));
+            vlc_custom_create(o, sizeof (*priv), "decoder device");
     if (!priv)
         return NULL;
     char *name = var_InheritString(o, "dec-dev");
