@@ -352,6 +352,7 @@ Item {
             fillMode: Image.PreserveAspectCrop
             width: coverSize
             height: coverSize
+            asynchronous: true
         }
     }
 }

@@ -439,6 +439,7 @@ FocusScope {
                     fillMode: Image.PreserveAspectFit
                     mipmap: height < sourceSize.height * .3
                     cache: false
+                    asynchronous: true
                 }
 
                 Widgets.CoverShadow {

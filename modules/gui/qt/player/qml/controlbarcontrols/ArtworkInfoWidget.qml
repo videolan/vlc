@@ -106,6 +106,8 @@ AbstractButton {
 
                 mipmap: true
 
+                asynchronous: true
+
                 ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
                                  && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
                 ToolTip.delay: VLCStyle.delayToolTipAppear
