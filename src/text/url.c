@@ -51,15 +51,15 @@ char *vlc_uri_decode_duplicate (const char *str)
     return buf;
 }
 
-static char hex_to_char( char c )
+static char hex_to_char(unsigned char c)
 {
-    unsigned char v = (unsigned char)c - '0';
+    unsigned char v = c - '0';
     if ( v < 10 )
         return v;
-    v = (unsigned)c - 'a';
+    v = c - 'a';
     if ( v <= 5 )
         return v + 10;
-    v = (unsigned)c - 'A';
+    v = c - 'A';
     if ( v <= 5 )
         return v + 10;
     return -1;
