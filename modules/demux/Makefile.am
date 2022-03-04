@@ -194,20 +194,25 @@ libmkv_plugin_la_SOURCES = \
 	demux/mkv/chapters.hpp demux/mkv/chapters.cpp \
 	demux/mkv/chapter_command.hpp demux/mkv/chapter_command.cpp \
 	demux/mkv/stream_io_callback.hpp demux/mkv/stream_io_callback.cpp \
-	demux/mp4/libmp4.c demux/vobsub.h \
+	demux/vobsub.h \
 	demux/mkv/mkv.hpp demux/mkv/mkv.cpp \
         demux/av1_unpack.h codec/webvtt/helpers.h \
 	demux/windows_audio_commons.h
 libmkv_plugin_la_SOURCES += packetizer/dts_header.h packetizer/dts_header.c
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CFLAGS_mkv)
 libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
-libmkv_plugin_la_LIBADD = $(LIBS_mkv) $(LIBZ)
+libmkv_plugin_la_LIBADD = $(LIBS_mkv) $(LIBZ) libvlc_mp4.la
 demux_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
+libvlc_mp4_la_SOURCES = demux/mp4/libmp4.c demux/mp4/libmp4.h
+libvlc_mp4_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/demux/mp4
+libvlc_mp4_la_LIBADD = $(LIBM) $(LIBZ)
+libvlc_mp4_la_LDFLAGS = -static
+noinst_LTLIBRARIES += libvlc_mp4.la
+
 libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
                            demux/mp4/fragments.c demux/mp4/fragments.h \
-                           demux/mp4/libmp4.c demux/mp4/libmp4.h \
                            demux/mp4/attachments.c demux/mp4/attachments.h \
                            demux/mp4/languages.h \
                            demux/mp4/heif.c demux/mp4/heif.h \
@@ -220,7 +225,7 @@ libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
                            demux/asf/asfpacket.c demux/asf/asfpacket.h \
                            packetizer/iso_color_tables.h \
                            meta_engine/ID3Genres.h
-libmp4_plugin_la_LIBADD = $(LIBM) $(LIBZ)
+libmp4_plugin_la_LIBADD = libvlc_mp4.la
 libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 demux_LTLIBRARIES += libmp4_plugin.la
 
@@ -407,8 +412,6 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/xml/Node.cpp \
     demux/adaptive/xml/Node.h
 libvlc_adaptive_la_SOURCES += \
-     demux/mp4/libmp4.c \
-     demux/mp4/libmp4.h \
      meta_engine/ID3Tag.h
 # DASH specific
 libvlc_adaptive_la_SOURCES += \
@@ -484,9 +487,9 @@ libvlc_adaptive_la_SOURCES += \
     packetizer/h264_nal.c \
     packetizer/hevc_nal.c
 libvlc_adaptive_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/demux/adaptive
-libvlc_adaptive_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
+libvlc_adaptive_la_LIBADD = $(SOCKET_LIBS) $(LIBM) libvlc_mp4.la
 libvlc_adaptive_la_LDFLAGS = -static
-libvlc_adaptive_la_LIBADD += libvlc_http.la $(LIBZ)
+libvlc_adaptive_la_LIBADD += libvlc_http.la
 if HAVE_GCRYPT
 libvlc_adaptive_la_CXXFLAGS += $(GCRYPT_CFLAGS)
 libvlc_adaptive_la_LIBADD += $(GCRYPT_LIBS)
