@@ -147,6 +147,7 @@ libv4l2_plugin_la_SOURCES = \
 	access/v4l2/linux/v4l2-common.h \
 	access/v4l2/linux/v4l2-controls.h \
 	access/v4l2/v4l2.c \
+	access/v4l2/buffers.c \
 	access/v4l2/video.c \
 	access/v4l2/vbi.c \
 	access/v4l2/demux.c \
