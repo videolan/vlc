@@ -121,6 +121,9 @@
               <property name="readOnly">
                <bool>true</bool>
               </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
               <property name="suffix">
                <string> %</string>
               </property>
