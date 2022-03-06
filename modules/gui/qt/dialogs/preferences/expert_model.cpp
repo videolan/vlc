@@ -229,7 +229,11 @@ ExpertPrefsTableModel::ExpertPrefsTableModel( module_t **mod_list, size_t mod_co
         unsigned confsize;
         module_config_t *const config = module_config_get( mod, &confsize );
         if( confsize == 0 )
+        {
+            /* If has items but none are visible, we still need to deallocate */
+            module_config_free( config );
             continue;
+        }
         config_sets.append( config );
 
         bool is_core = module_is_main( mod );
@@ -281,7 +285,10 @@ ExpertPrefsTableModel::ExpertPrefsTableModel( module_t **mod_list, size_t mod_co
 
 ExpertPrefsTableModel::~ExpertPrefsTableModel()
 {
-    items.clear(); /* We must destroy the items before releasing the config set */
+    /* We must destroy the items before releasing the config set */
+    foreach ( ExpertPrefsTableItem *item, items )
+        delete item;
+    items.clear();
     foreach ( module_config_t *config_set, config_sets )
         module_config_free( config_set );
 }
