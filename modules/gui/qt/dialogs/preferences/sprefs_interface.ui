@@ -754,6 +754,7 @@
   <tabstop>updatesBox</tabstop>
   <tabstop>updatesDays</tabstop>
   <tabstop>saveRecentlyPlayed</tabstop>
+  <tabstop>clearRecent</tabstop>
   <tabstop>MetadataNetworkAccessMode</tabstop>
   <tabstop>assoButton</tabstop>
  </tabstops>
