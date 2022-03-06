@@ -565,7 +565,12 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             CONFIG_BOOL( "spdif", spdifBox );
 
-            CONFIG_GENERIC( "norm-max-level" , Float, nullptr, volNormSpin );
+            if( !module_exists( "normvol" ) )
+                ui.volNormBox->setEnabled( false );
+            else
+            {
+                CONFIG_GENERIC( "norm-max-level" , Float, nullptr, volNormSpin );
+            }
             CONFIG_GENERIC( "audio-replay-gain-mode", StringList, ui.replayLabel,
                             replayCombo );
             CONFIG_GENERIC( "audio-visual" , StringList, ui.visuLabel,
@@ -633,7 +638,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             bool b_enabled = ( qs_filter.contains( "normvol" ) );
             ui.volNormBox->setChecked( b_enabled );
-            ui.volNormSpin->setEnabled( b_enabled );
+            ui.volNormSpin->setEnabled( b_enabled && ui.volNormBox->isEnabled() );
 
             /* Volume Label */
             updateAudioVolume( ui.defaultVolume->value() ); // First time init
