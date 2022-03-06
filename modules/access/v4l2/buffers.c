@@ -102,6 +102,7 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
         .memory = V4L2_MEMORY_MMAP,
     };
+    uint32_t mask;
 
     /* Wait for next frame */
     if (v4l2_ioctl(fd, VIDIOC_DQBUF, &buf_req) < 0)
@@ -120,24 +121,24 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
     }
 
     assert(buf_req.index < pool->count);
-    atomic_fetch_or_explicit(&pool->inflight, 1U << buf_req.index,
-                             memory_order_relaxed);
+    mask = atomic_fetch_or_explicit(&pool->inflight, 1U << buf_req.index,
+                                    memory_order_relaxed);
 
     struct vlc_v4l2_buffer *buf = pool->bufs + buf_req.index;
+    block_t *block = &buf->block;
     /* Reinitialise the buffer */
-    buf->block.p_buffer = buf->block.p_start;
-    assert(buf_req.bytesused <= buf->block.i_size);
-    buf->block.i_buffer = buf_req.bytesused;
-    buf->block.p_next = NULL;
+    block->p_buffer = block->p_start;
+    assert(buf_req.bytesused <= block->i_size);
+    block->i_buffer = buf_req.bytesused;
+    block->p_next = NULL;
 
-    /* Copy frame */
-    block_t *block = block_Duplicate(&buf->block);
-    if (unlikely(block == NULL))
-        return NULL;
+    if ((size_t)vlc_popcount(mask) == pool->count - 1) {
+        /* Running out of buffers! Memory copy forced. */
+        block = block_Duplicate(block);
+        block_Release(&buf->block);
+    }
+
     block->i_pts = block->i_dts = GetBufferPTS(&buf_req);
-
-    /* Unlock */
-    block_Release(&buf->block);
     return block;
 }
 
