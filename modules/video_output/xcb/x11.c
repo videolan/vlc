@@ -307,6 +307,7 @@ static int Open (vout_display_t *vd,
     const uint32_t mask =
         XCB_CW_BACK_PIXEL |
         XCB_CW_BORDER_PIXEL |
+        XCB_CW_BIT_GRAVITY |
         XCB_CW_EVENT_MASK |
         XCB_CW_COLORMAP;
     const uint32_t values[] = {
@@ -314,6 +315,8 @@ static int Open (vout_display_t *vd,
         scr->black_pixel,
         /* XCB_CW_BORDER_PIXEL */
         scr->black_pixel,
+        /* XCB_CW_BIT_GRAVITY */
+        XCB_GRAVITY_NORTH_WEST,
         /* XCB_CW_EVENT_MASK */
         0,
         /* XCB_CW_COLORMAP */
