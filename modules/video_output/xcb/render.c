@@ -655,13 +655,10 @@ static int Open(vout_display_t *vd,
 
     xcb_colormap_t cmap = xcb_generate_id(conn);
     uint32_t cw_mask =
-        XCB_CW_BACK_PIXEL |
         XCB_CW_BORDER_PIXEL |
         XCB_CW_EVENT_MASK |
         XCB_CW_COLORMAP;
     const uint32_t cw_list[] = {
-        /* XCB_CW_BACK_PIXEL */
-        screen->black_pixel,
         /* XCB_CW_BORDER_PIXEL */
         screen->black_pixel,
         /* XCB_CW_EVENT_MASK */
