@@ -308,6 +308,8 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     if (SetupVideo(VLC_OBJECT(demux), fd, caps, &es_fmt,
                    &sys->blocksize, &sys->block_flags))
         return -1;
+    if (es_fmt.i_codec == 0)
+        return -1; /* defer to access */
 
     sys->interval = vlc_tick_from_samples(es_fmt.video.i_frame_rate,
                                           es_fmt.video.i_frame_rate_base);

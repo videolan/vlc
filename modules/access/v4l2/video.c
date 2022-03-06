@@ -661,11 +661,11 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     { V4L2_PIX_FMT_MPEG1,   VLC_CODEC_MPGV, 0, 0, 0, 0 },
     { V4L2_PIX_FMT_VC1_ANNEX_G, VLC_CODEC_VC1, 0, 0, 0, 0 },
     { V4L2_PIX_FMT_VC1_ANNEX_L, VLC_CODEC_VC1, 0, 0, 0, 0 },
-    //{ V4L2_PIX_FMT_MPEG,    0,              0, 0, 0, 0 },
+    { V4L2_PIX_FMT_MPEG,    0,              0, 0, 0, 0 },
 
     /* Reserved formats */
     { V4L2_PIX_FMT_MJPEG,   VLC_CODEC_MJPG, 0, 0, 0, 0 },
-    //{ V4L2_PIX_FMT_DV,      0,              0, 0, 0, 0 },
+    { V4L2_PIX_FMT_DV,      0,              0, 0, 0, 0 },
 
     /* Grey scale */
     { V4L2_PIX_FMT_Y16,     VLC_CODEC_GREY_16L, 2, 0, 0, 0 },
