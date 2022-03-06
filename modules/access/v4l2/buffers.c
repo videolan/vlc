@@ -56,9 +56,10 @@ vlc_tick_t GetBufferPTS(const struct v4l2_buffer *buf)
     return pts;
 }
 
-block_t *GrabVideo(vlc_object_t *demux, int fd,
+block_t *GrabVideo(vlc_object_t *demux,
                    struct vlc_v4l2_buffers *restrict pool)
 {
+    int fd = pool->fd;
     struct v4l2_buffer buf_req = {
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
         .memory = V4L2_MEMORY_MMAP,
@@ -131,6 +132,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
     if (unlikely(pool == NULL))
         return NULL;
 
+    pool->fd = fd;
     pool->count = 0;
 
     while (pool->count < req.count)
@@ -179,16 +181,16 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
     }
     return pool;
 error:
-    StopMmap(fd, pool);
+    StopMmap(pool);
     return NULL;
 }
 
-void StopMmap(int fd, struct vlc_v4l2_buffers *pool)
+void StopMmap(struct vlc_v4l2_buffers *pool)
 {
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     /* STREAMOFF implicitly dequeues all buffers */
-    v4l2_ioctl(fd, VIDIOC_STREAMOFF, &type);
+    v4l2_ioctl(pool->fd, VIDIOC_STREAMOFF, &type);
 
     for (size_t i = 0; i < pool->count; i++)
         v4l2_munmap(pool->bufs[i].block.p_start, pool->bufs[i].block.i_size);

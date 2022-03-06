@@ -181,7 +181,7 @@ static void *MmapThread(void *data)
         if (ufd[0].revents)
         {
             int canc = vlc_savecancel();
-            block_t *block = GrabVideo(VLC_OBJECT(demux), fd, sys->pool);
+            block_t *block = GrabVideo(VLC_OBJECT(demux), sys->pool);
             if (block != NULL)
             {
                 block->i_flags |= sys->block_flags;
@@ -366,7 +366,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
             CloseVBI (sys->vbi);
 #endif
         if (sys->pool != NULL)
-            StopMmap(sys->fd, sys->pool);
+            StopMmap(sys->pool);
         return -1;
     }
     return 0;
@@ -380,7 +380,7 @@ void DemuxClose( vlc_object_t *obj )
     vlc_cancel (sys->thread);
     vlc_join (sys->thread, NULL);
     if (sys->pool != NULL)
-        StopMmap(sys->fd, sys->pool);
+        StopMmap(sys->pool);
     ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close (sys->fd);
 

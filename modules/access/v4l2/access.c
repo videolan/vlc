@@ -66,7 +66,7 @@ static block_t *MMapBlock(stream_t *access, bool *restrict eof)
     if (AccessPoll(access))
         return NULL;
 
-    block_t *block = GrabVideo(VLC_OBJECT(access), sys->fd, sys->pool);
+    block_t *block = GrabVideo(VLC_OBJECT(access), sys->pool);
     if (block != NULL)
     {
         block->i_pts = block->i_dts = vlc_tick_now();
@@ -133,7 +133,7 @@ void AccessClose(vlc_object_t *obj)
     access_sys_t *sys = access->p_sys;
 
     if (sys->pool != NULL)
-        StopMmap(sys->fd, sys->pool);
+        StopMmap(sys->pool);
     ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close(sys->fd);
     free(sys);

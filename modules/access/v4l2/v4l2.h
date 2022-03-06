@@ -45,6 +45,7 @@ struct vlc_v4l2_buffer {
 };
 
 struct vlc_v4l2_buffers {
+    int fd;
     size_t count;
     struct vlc_v4l2_buffer bufs[];
 };
@@ -61,10 +62,10 @@ int SetupVideo(vlc_object_t *, int fd, uint32_t,
 
 int StartUserPtr (vlc_object_t *, int);
 struct vlc_v4l2_buffers *StartMmap(vlc_object_t *, int, unsigned int);
-void StopMmap(int, struct vlc_v4l2_buffers *);
+void StopMmap(struct vlc_v4l2_buffers *);
 
 vlc_tick_t GetBufferPTS (const struct v4l2_buffer *);
-block_t* GrabVideo(vlc_object_t *, int, struct vlc_v4l2_buffers *);
+block_t* GrabVideo(vlc_object_t *, struct vlc_v4l2_buffers *);
 
 #ifdef ZVBI_COMPILED
 /* vbi.c */
