@@ -365,6 +365,11 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 control =  new type ## ConfigControl(                     \
                            p_config, label, qcontrol, qbutton );          \
                 controls.append( control );                               \
+            }                                                             \
+            else {                                                        \
+                qcontrol->setEnabled( false );                            \
+                if( label ) label->setEnabled( false );                   \
+                if( qbutton ) qbutton->setEnabled( false );               \
             }
 
 #define START_SPREFS_CAT( name , label )    \
