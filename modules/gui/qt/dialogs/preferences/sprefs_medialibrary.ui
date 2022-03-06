@@ -158,6 +158,12 @@
    <header>widgets/native/mlfolderseditor.hpp</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>entryPoints</tabstop>
+  <tabstop>addButton</tabstop>
+  <tabstop>bannedEntryPoints</tabstop>
+  <tabstop>banButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
