@@ -658,18 +658,21 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                          "for DVD, VCD, and CDDA are set.\n"
                          "You can define a unique one or configure them \n"
                          "individually in the advanced preferences." ) );
-                char *psz_dvddiscpath = config_GetPsz( "dvd" );
-                char *psz_vcddiscpath = config_GetPsz( "vcd" );
-                char *psz_cddadiscpath = config_GetPsz( "cd-audio" );
-                if( psz_dvddiscpath && psz_vcddiscpath && psz_cddadiscpath )
-                if( !strcmp( psz_cddadiscpath, psz_dvddiscpath ) &&
-                    !strcmp( psz_dvddiscpath, psz_vcddiscpath ) )
+                bool have_cdda = module_exists( "cdda" );
+                char *dvd_discpath = config_GetPsz( "dvd" );
+                char *vcd_discpath = config_GetPsz( "vcd" );
+                char *cdda_discpath = have_cdda ? config_GetPsz( "cd-audio" ) : nullptr;
+                if( dvd_discpath && vcd_discpath && ( !have_cdda || cdda_discpath ) )
                 {
-                    ui.DVDDeviceComboBox->setEditText( qfu( psz_dvddiscpath ) );
+                    if( !strcmp( dvd_discpath, vcd_discpath ) &&
+                        ( !have_cdda || !strcmp( cdda_discpath, dvd_discpath ) ) )
+                    {
+                        ui.DVDDeviceComboBox->setEditText( qfu( dvd_discpath ) );
+                    }
                 }
-                free( psz_cddadiscpath );
-                free( psz_dvddiscpath );
-                free( psz_vcddiscpath );
+                free( cdda_discpath );
+                free( dvd_discpath );
+                free( vcd_discpath );
             }
 #ifndef _WIN32
             QStringList DVDDeviceComboBoxStringList = QStringList();
@@ -1169,7 +1172,8 @@ void SPrefsPanel::apply()
         {
             config_PutPsz( "dvd", devicepath );
             config_PutPsz( "vcd", devicepath );
-            config_PutPsz( "cd-audio", devicepath );
+            if( module_exists( "cdda" ) )
+                config_PutPsz( "cd-audio", devicepath );
         }
 
 #define CaC( name, factor ) config_PutInt( name, i_comboValue * factor )
