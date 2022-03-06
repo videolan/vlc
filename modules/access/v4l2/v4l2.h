@@ -46,6 +46,7 @@ struct vlc_v4l2_buffer {
 
 struct vlc_v4l2_buffers {
     int fd;
+    uint32_t inflight;
     size_t count;
     struct vlc_v4l2_buffer bufs[];
 };

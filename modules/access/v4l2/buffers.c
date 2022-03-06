@@ -56,8 +56,43 @@ vlc_tick_t GetBufferPTS(const struct v4l2_buffer *buf)
     return pts;
 }
 
-block_t *GrabVideo(vlc_object_t *demux,
-                   struct vlc_v4l2_buffers *restrict pool)
+static void ReleaseBuffer(block_t *block)
+{
+    struct vlc_v4l2_buffer *buf = container_of(block, struct vlc_v4l2_buffer,
+                                               block);
+    struct vlc_v4l2_buffers *pool = buf->pool;
+    uint32_t index = buf - pool->bufs;
+    struct v4l2_buffer buf_req = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_MMAP,
+        .index = index,
+    };
+    uint32_t mask;
+    int fd;
+
+    mask = pool->inflight;
+    pool->inflight &= ~(1U << index);
+    fd = pool->fd;
+
+    assert(mask & (1U << index));
+
+    if (likely(fd >= 0)) {
+        /* Requeue the freed buffer */
+        v4l2_ioctl(pool->fd, VIDIOC_QBUF, &buf_req);
+        return;
+    }
+
+    v4l2_munmap(block->p_start, block->i_size);
+
+    if (vlc_popcount(mask) == 1) /* last active buffer? */
+        free(pool);
+}
+
+static const struct vlc_block_callbacks vlc_v4l2_buffer_cbs = {
+    ReleaseBuffer,
+};
+
+block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
 {
     int fd = pool->fd;
     struct v4l2_buffer buf_req = {
@@ -82,23 +117,23 @@ block_t *GrabVideo(vlc_object_t *demux,
     }
 
     assert(buf_req.index < pool->count);
+    pool->inflight |= 1U << buf_req.index;
+
+    struct vlc_v4l2_buffer *buf = pool->bufs + buf_req.index;
+    /* Reinitialise the buffer */
+    buf->block.p_buffer = buf->block.p_start;
+    assert(buf_req.bytesused <= buf->block.i_size);
+    buf->block.i_buffer = buf_req.bytesused;
+    buf->block.p_next = NULL;
 
     /* Copy frame */
-    struct vlc_v4l2_buffer *buf = pool->bufs + buf_req.index;
-    block_t *block = block_Alloc(buf_req.bytesused);
+    block_t *block = block_Duplicate(&buf->block);
     if (unlikely(block == NULL))
         return NULL;
     block->i_pts = block->i_dts = GetBufferPTS(&buf_req);
-    assert(buf_req.bytesused <= buf->block.i_size);
-    memcpy(block->p_buffer, buf->block.p_start, buf_req.bytesused);
 
     /* Unlock */
-    if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf_req) < 0)
-    {
-        msg_Err(demux, "queue error: %s", vlc_strerror_c(errno));
-        block_Release(block);
-        block = NULL;
-    }
+    block_Release(&buf->block);
     return block;
 }
 
@@ -133,6 +168,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
         return NULL;
 
     pool->fd = fd;
+    pool->inflight = 0;
     pool->count = 0;
 
     while (pool->count < req.count)
@@ -160,7 +196,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
             goto error;
         }
 
-        block_Init(&buf->block, NULL, base, buf_req.length);
+        block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
         buf->pool = pool;
         pool->count++;
 
@@ -188,14 +224,20 @@ error:
 void StopMmap(struct vlc_v4l2_buffers *pool)
 {
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    const size_t count = pool->count;
+    uint32_t unused;
 
     /* STREAMOFF implicitly dequeues all buffers */
     v4l2_ioctl(pool->fd, VIDIOC_STREAMOFF, &type);
+    pool->fd = -1;
 
-    for (size_t i = 0; i < pool->count; i++)
-        v4l2_munmap(pool->bufs[i].block.p_start, pool->bufs[i].block.i_size);
+    unused = (~pool->inflight) & ((UINT64_C(1) << count) - 1);
+    pool->inflight |= unused;
 
-    free(pool);
+    for (size_t i = 0; i < count; i++)
+        if (unused & (1u << i))
+            block_Release(&pool->bufs[i].block);
+    /* Pool is freed whence all buffers are released (possibly here) */
 }
 
 /**
