@@ -50,49 +50,96 @@ typedef struct
     vlc_v4l2_ctrl_t *controls;
 } access_sys_t;
 
-static block_t *MMapBlock (stream_t *, bool *);
-static block_t *ReadBlock (stream_t *, bool *);
-static int AccessControl( stream_t *, int, va_list );
-static int InitVideo(stream_t *, int, uint32_t);
-
-int AccessOpen( vlc_object_t *obj )
+/* Wait for data */
+static int AccessPoll(stream_t *access)
 {
-    stream_t *access = (stream_t *)obj;
+    access_sys_t *sys = access->p_sys;
+    struct pollfd ufd;
 
-    if( access->b_preparsing )
-        return VLC_EGENERIC;
+    ufd.fd = sys->fd;
+    ufd.events = POLLIN;
 
-    access_sys_t *sys = calloc (1, sizeof (*sys));
-    if( unlikely(sys == NULL) )
-        return VLC_ENOMEM;
-    access->p_sys = sys;
+    return vlc_poll_i11e(&ufd, 1, -1);
+}
 
-    ParseMRL( obj, access->psz_location );
+static block_t *MMapBlock(stream_t *access, bool *restrict eof)
+{
+    access_sys_t *sys = access->p_sys;
 
-    char *path = var_InheritString (obj, CFG_PREFIX"dev");
-    if (unlikely(path == NULL))
-        goto error; /* probably OOM */
+    if (AccessPoll(access))
+        return NULL;
 
-    uint32_t caps;
-    int fd = OpenDevice (obj, path, &caps);
-    free (path);
-    if (fd == -1)
-        goto error;
-    sys->fd = fd;
-
-    if (InitVideo (access, fd, caps))
+    block_t *block = GrabVideo(VLC_OBJECT(access), sys->fd, sys->bufv);
+    if (block != NULL)
     {
-        v4l2_close (fd);
-        goto error;
+        block->i_pts = block->i_dts = vlc_tick_now();
+        block->i_flags |= sys->block_flags;
+    }
+    (void) eof;
+    return block;
+}
+
+static block_t *ReadBlock(stream_t *access, bool *restrict eof)
+{
+    access_sys_t *sys = access->p_sys;
+
+    if (AccessPoll(access))
+        return NULL;
+
+    block_t *block = block_Alloc(sys->blocksize);
+    if (unlikely(block == NULL))
+        return NULL;
+
+    ssize_t val = v4l2_read(sys->fd, block->p_buffer, block->i_buffer);
+    if (val < 0)
+    {
+        block_Release(block);
+        msg_Err(access, "cannot read buffer: %s", vlc_strerror_c(errno));
+        *eof = true;
+        return NULL;
     }
 
-    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
-    access->pf_seek = NULL;
-    access->pf_control = AccessControl;
+    block->i_buffer = val;
+    return block;
+}
+
+static int AccessControl(stream_t *access, int query, va_list args)
+{
+    switch (query)
+    {
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+        case STREAM_CAN_PAUSE:
+        case STREAM_CAN_CONTROL_PACE:
+            *va_arg(args, bool *) = false;
+            break;
+
+        case STREAM_GET_PTS_DELAY:
+            *va_arg(args,vlc_tick_t *) = VLC_TICK_FROM_MS(
+                var_InheritInteger(access, "live-caching"));
+            break;
+
+        case STREAM_SET_PAUSE_STATE:
+            /* Nothing to do */
+            break;
+
+        default:
+            return VLC_EGENERIC;
+
+    }
     return VLC_SUCCESS;
-error:
-    free (sys);
-    return VLC_EGENERIC;
+}
+
+void AccessClose(vlc_object_t *obj)
+{
+    stream_t *access = (stream_t *)obj;
+    access_sys_t *sys = access->p_sys;
+
+    if (sys->bufv != NULL)
+        StopMmap(sys->fd, sys->bufv, sys->bufc);
+    ControlsDeinit(vlc_object_parent(obj), sys->controls);
+    v4l2_close(sys->fd);
+    free(sys);
 }
 
 int InitVideo (stream_t *access, int fd, uint32_t caps)
@@ -185,95 +232,42 @@ int InitVideo (stream_t *access, int fd, uint32_t caps)
     return 0;
 }
 
-void AccessClose( vlc_object_t *obj )
+int AccessOpen(vlc_object_t *obj)
 {
     stream_t *access = (stream_t *)obj;
-    access_sys_t *sys = access->p_sys;
 
-    if (sys->bufv != NULL)
-        StopMmap (sys->fd, sys->bufv, sys->bufc);
-    ControlsDeinit(vlc_object_parent(obj), sys->controls);
-    v4l2_close (sys->fd);
-    free( sys );
-}
+    if (access->b_preparsing)
+        return VLC_EGENERIC;
 
-/* Wait for data */
-static int AccessPoll (stream_t *access)
-{
-    access_sys_t *sys = access->p_sys;
-    struct pollfd ufd;
+    access_sys_t *sys = calloc(1, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    access->p_sys = sys;
 
-    ufd.fd = sys->fd;
-    ufd.events = POLLIN;
+    ParseMRL(obj, access->psz_location);
 
-    return vlc_poll_i11e (&ufd, 1, -1);
-}
+    char *path = var_InheritString(obj, CFG_PREFIX"dev");
+    if (unlikely(path == NULL))
+        goto error; /* probably OOM */
 
+    uint32_t caps;
+    int fd = OpenDevice(obj, path, &caps);
+    free(path);
+    if (fd == -1)
+        goto error;
+    sys->fd = fd;
 
-static block_t *MMapBlock (stream_t *access, bool *restrict eof)
-{
-    access_sys_t *sys = access->p_sys;
-
-    if (AccessPoll (access))
-        return NULL;
-
-    block_t *block = GrabVideo (VLC_OBJECT(access), sys->fd, sys->bufv);
-    if( block != NULL )
+    if (InitVideo(access, fd, caps))
     {
-        block->i_pts = block->i_dts = vlc_tick_now();
-        block->i_flags |= sys->block_flags;
-    }
-    (void) eof;
-    return block;
-}
-
-static block_t *ReadBlock (stream_t *access, bool *restrict eof)
-{
-    access_sys_t *sys = access->p_sys;
-
-    if (AccessPoll (access))
-        return NULL;
-
-    block_t *block = block_Alloc (sys->blocksize);
-    if (unlikely(block == NULL))
-        return NULL;
-
-    ssize_t val = v4l2_read (sys->fd, block->p_buffer, block->i_buffer);
-    if (val < 0)
-    {
-        block_Release (block);
-        msg_Err (access, "cannot read buffer: %s", vlc_strerror_c(errno));
-        *eof = true;
-        return NULL;
+        v4l2_close(fd);
+        goto error;
     }
 
-    block->i_buffer = val;
-    return block;
-}
-
-static int AccessControl( stream_t *access, int query, va_list args )
-{
-    switch( query )
-    {
-        case STREAM_CAN_SEEK:
-        case STREAM_CAN_FASTSEEK:
-        case STREAM_CAN_PAUSE:
-        case STREAM_CAN_CONTROL_PACE:
-            *va_arg( args, bool* ) = false;
-            break;
-
-        case STREAM_GET_PTS_DELAY:
-            *va_arg(args,vlc_tick_t *) = VLC_TICK_FROM_MS(
-                var_InheritInteger( access, "live-caching" ) );
-            break;
-
-        case STREAM_SET_PAUSE_STATE:
-            /* Nothing to do */
-            break;
-
-        default:
-            return VLC_EGENERIC;
-
-    }
+    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
+    access->pf_seek = NULL;
+    access->pf_control = AccessControl;
     return VLC_SUCCESS;
+error:
+    free(sys);
+    return VLC_EGENERIC;
 }
