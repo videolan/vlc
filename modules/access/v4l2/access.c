@@ -156,9 +156,12 @@ static int InitVideo(stream_t *access, int fd, uint32_t caps)
     if (SetupInput (VLC_OBJECT(access), fd, &std))
         return -1;
 
-    /* NOTE: The V4L access_demux expects a VLC FOURCC as "chroma". It is used to set the
-     * es_format_t structure correctly. However, the V4L access (*here*) has no use for a
-     * VLC FOURCC and expects a V4L2 format directly instead. That is confusing :-( */
+    /*
+     * NOTE: The V4L access_demux expects a VLC FOURCC as "chroma". It is used
+     * to set the es_format_t structure correctly. However, the V4L access
+     * (*here*) has no use for a VLC FOURCC and expects a V4L2 format directly
+     * instead. That is confusing :-(
+     */
     uint32_t pixfmt = 0;
     char *fmtstr = var_InheritString (access, CFG_PREFIX"chroma");
     if (fmtstr != NULL && strlen (fmtstr) <= 4)
