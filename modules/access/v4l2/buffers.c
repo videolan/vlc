@@ -88,8 +88,8 @@ block_t *GrabVideo(vlc_object_t *demux, int fd,
     if (unlikely(block == NULL))
         return NULL;
     block->i_pts = block->i_dts = GetBufferPTS(&buf_req);
-    assert(buf_req.bytesused <= buf->length);
-    memcpy(block->p_buffer, buf->base, buf_req.bytesused);
+    assert(buf_req.bytesused <= buf->block.i_size);
+    memcpy(block->p_buffer, buf->block.p_start, buf_req.bytesused);
 
     /* Unlock */
     if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf_req) < 0)
@@ -149,17 +149,17 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
             goto error;
         }
 
-        buf->pool = pool;
-        buf->length = buf_req.length;
-        buf->base = v4l2_mmap(NULL, buf->length, PROT_READ | PROT_WRITE,
-                              MAP_SHARED, fd, buf_req.m.offset);
-        if (buf->base == MAP_FAILED)
+        void *base = v4l2_mmap(NULL, buf_req.length, PROT_READ | PROT_WRITE,
+                               MAP_SHARED, fd, buf_req.m.offset);
+        if (base == MAP_FAILED)
         {
             msg_Err(obj, "cannot map buffer %"PRIu32": %s", buf_req.index,
                     vlc_strerror_c(errno));
             goto error;
         }
 
+        block_Init(&buf->block, NULL, base, buf_req.length);
+        buf->pool = pool;
         pool->count++;
 
         /* Some drivers refuse to queue buffers before they are mapped. Bug? */
@@ -191,7 +191,7 @@ void StopMmap(int fd, struct vlc_v4l2_buffers *pool)
     v4l2_ioctl(fd, VIDIOC_STREAMOFF, &type);
 
     for (size_t i = 0; i < pool->count; i++)
-        v4l2_munmap(pool->bufs[i].base, pool->bufs[i].length);
+        v4l2_munmap(pool->bufs[i].block.p_start, pool->bufs[i].block.i_size);
 
     free(pool);
 }

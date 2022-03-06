@@ -37,9 +37,10 @@ extern int (*v4l2_munmap) (void *, size_t);
 
 typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
 
+#include <vlc_block.h>
+
 struct vlc_v4l2_buffer {
-    void *base;
-    size_t length;
+    block_t block;
     struct vlc_v4l2_buffers *pool;
 };
 
