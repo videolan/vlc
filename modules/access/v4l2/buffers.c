@@ -70,9 +70,12 @@ static void ReleaseBuffer(block_t *block)
     uint32_t mask;
     int fd;
 
-    mask = pool->inflight;
-    pool->inflight &= ~(1U << index);
+    vlc_mutex_lock(&pool->lock);
+    mask = atomic_fetch_and_explicit(&pool->inflight, ~(1U << index),
+                                     memory_order_relaxed);
     fd = pool->fd;
+    vlc_mutex_unlock(&pool->lock);
+    assert(mask & (1U << index));
 
     assert(mask & (1U << index));
 
@@ -117,7 +120,8 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
     }
 
     assert(buf_req.index < pool->count);
-    pool->inflight |= 1U << buf_req.index;
+    atomic_fetch_or_explicit(&pool->inflight, 1U << buf_req.index,
+                             memory_order_relaxed);
 
     struct vlc_v4l2_buffer *buf = pool->bufs + buf_req.index;
     /* Reinitialise the buffer */
@@ -170,6 +174,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
     pool->fd = fd;
     pool->inflight = 0;
     pool->count = 0;
+    vlc_mutex_init(&pool->lock);
 
     while (pool->count < req.count)
     {
@@ -229,10 +234,13 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
 
     /* STREAMOFF implicitly dequeues all buffers */
     v4l2_ioctl(pool->fd, VIDIOC_STREAMOFF, &type);
-    pool->fd = -1;
 
-    unused = (~pool->inflight) & ((UINT64_C(1) << count) - 1);
-    pool->inflight |= unused;
+    vlc_mutex_lock(&pool->lock);
+    pool->fd = -1;
+    unused = (~atomic_load_explicit(&pool->inflight, memory_order_relaxed))
+             & ((UINT64_C(1) << count) - 1);
+    atomic_fetch_or_explicit(&pool->inflight, unused, memory_order_relaxed);
+    vlc_mutex_unlock(&pool->lock);
 
     for (size_t i = 0; i < count; i++)
         if (unused & (1u << i))
