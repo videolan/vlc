@@ -1078,8 +1078,11 @@ int StartUserPtr (vlc_object_t *obj, int fd)
 
     if (v4l2_ioctl (fd, VIDIOC_REQBUFS, &reqbuf) < 0)
     {
-        msg_Dbg (obj, "cannot reserve user buffers: %s",
-                 vlc_strerror_c(errno));
+        if (errno != EINVAL)
+            msg_Err(obj, "cannot reserve user buffers: %s",
+                    vlc_strerror_c(errno));
+        else
+            msg_Dbg(obj, "user buffers not supported");
         return -1;
     }
     if (v4l2_ioctl (fd, VIDIOC_STREAMON, &reqbuf.type) < 0)
