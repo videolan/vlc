@@ -49,11 +49,6 @@ int OpenDevice (vlc_object_t *, const char *, uint32_t *);
 v4l2_std_id var_InheritStandard (vlc_object_t *, const char *);
 
 /* video.c */
-int SetupInput (vlc_object_t *, int fd, v4l2_std_id *std);
-int SetupFormat (vlc_object_t *, int, uint32_t,
-                 struct v4l2_format *, struct v4l2_streamparm *);
-#define SetupFormat(o,fd,fcc,fmt,p) \
-        SetupFormat(VLC_OBJECT(o),fd,fcc,fmt,p)
 int SetupTuner (vlc_object_t *, int fd, uint32_t);
 int SetupVideo(vlc_object_t *, int fd, uint32_t,
                es_format_t *, uint32_t *, uint32_t *);

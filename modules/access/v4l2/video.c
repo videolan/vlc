@@ -245,7 +245,7 @@ static int ResetCrop (vlc_object_t *obj, int fd)
     return 0;
 }
 
-int SetupInput (vlc_object_t *obj, int fd, v4l2_std_id *std)
+static int SetupInput(vlc_object_t *obj, int fd, v4l2_std_id *std)
 {
     struct v4l2_input input;
 
@@ -408,7 +408,6 @@ static int FindMaxRate (vlc_object_t *obj, int fd,
     return 0;
 }
 
-#undef SetupFormat
 /**
  * Finds the best possible frame rate and resolution.
  * @param fourcc pixel format
@@ -416,9 +415,9 @@ static int FindMaxRate (vlc_object_t *obj, int fd,
  * @param parm V4L2 capture streaming parameters [OUT]
  * @return 0 on success, -1 on failure.
  */
-int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
-                 struct v4l2_format *restrict fmt,
-                 struct v4l2_streamparm *restrict parm)
+static int SetupFormat(vlc_object_t *obj, int fd, uint32_t fourcc,
+                       struct v4l2_format *restrict fmt,
+                       struct v4l2_streamparm *restrict parm)
 {
     memset (fmt, 0, sizeof (*fmt));
     fmt->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
