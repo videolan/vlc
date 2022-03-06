@@ -40,6 +40,7 @@ typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
 struct vlc_v4l2_buffer {
     void *base;
     size_t length;
+    struct vlc_v4l2_buffers *pool;
 };
 
 struct vlc_v4l2_buffers {

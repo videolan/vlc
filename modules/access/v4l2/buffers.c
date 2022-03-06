@@ -149,6 +149,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
             goto error;
         }
 
+        buf->pool = pool;
         buf->length = buf_req.length;
         buf->base = v4l2_mmap(NULL, buf->length, PROT_READ | PROT_WRITE,
                               MAP_SHARED, fd, buf_req.m.offset);
