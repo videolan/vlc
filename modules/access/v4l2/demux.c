@@ -65,52 +65,238 @@ typedef struct
 #endif
 } demux_sys_t;
 
-static void *UserPtrThread (void *);
-static void *MmapThread (void *);
-static void *ReadThread (void *);
-static int DemuxControl( demux_t *, int, va_list );
-static int InitVideo (demux_t *, int fd, uint32_t caps);
-
-int DemuxOpen( vlc_object_t *obj )
+/** Allocates and queue a user buffer using mmap(). */
+static block_t *UserPtrQueue(vlc_object_t *obj, int fd, size_t length)
 {
-    demux_t *demux = (demux_t *)obj;
-    if (demux->out == NULL)
-        return VLC_EGENERIC;
-
-    demux_sys_t *sys = malloc (sizeof (*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-    demux->p_sys = sys;
-#ifdef ZVBI_COMPILED
-    sys->vbi = NULL;
-#endif
-
-    ParseMRL( obj, demux->psz_location );
-
-    char *path = var_InheritString (obj, CFG_PREFIX"dev");
-    if (unlikely(path == NULL))
-        goto error; /* probably OOM */
-
-    uint32_t caps;
-    int fd = OpenDevice (obj, path, &caps);
-    free (path);
-    if (fd == -1)
-        goto error;
-    sys->fd = fd;
-
-    if (InitVideo (demux, fd, caps))
+    void *ptr = mmap(NULL, length, PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (ptr == MAP_FAILED)
     {
-        v4l2_close (fd);
-        goto error;
+        msg_Err(obj, "cannot allocate %zu-bytes buffer: %s", length,
+                vlc_strerror_c(errno));
+        return NULL;
     }
 
-    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
-    sys->start = vlc_tick_now ();
-    demux->pf_demux = NULL;
-    demux->pf_control = DemuxControl;
-    return VLC_SUCCESS;
-error:
-    free (sys);
+    block_t *block = block_mmap_Alloc(ptr, length);
+    if (unlikely(block == NULL))
+    {
+        munmap(ptr, length);
+        return NULL;
+    }
+
+    struct v4l2_buffer buf = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_USERPTR,
+        .m = {
+            .userptr = (uintptr_t)ptr,
+        },
+        .length = length,
+    };
+
+    if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf) < 0)
+    {
+        msg_Err(obj, "cannot queue buffer: %s", vlc_strerror_c(errno));
+        block_Release(block);
+        return NULL;
+    }
+    return block;
+}
+
+static void *UserPtrThread(void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->fd;
+    struct pollfd ufd[2];
+    nfds_t numfds = 1;
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN;
+
+    int canc = vlc_savecancel();
+    for (;;)
+    {
+        struct v4l2_buffer buf = {
+            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+            .memory = V4L2_MEMORY_USERPTR,
+        };
+        block_t *block = UserPtrQueue(VLC_OBJECT(demux), fd, sys->blocksize);
+        if (block == NULL)
+            break;
+
+        /* Wait for data */
+        vlc_restorecancel(canc);
+        block_cleanup_push(block);
+        while (poll(ufd, numfds, -1) == -1)
+           if (errno != EINTR)
+               msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
+        vlc_cleanup_pop();
+        canc = vlc_savecancel();
+
+        if (v4l2_ioctl(fd, VIDIOC_DQBUF, &buf) < 0)
+        {
+            msg_Err(demux, "cannot dequeue buffer: %s",
+                    vlc_strerror_c(errno));
+            block_Release(block);
+            continue;
+        }
+
+        assert(block->p_buffer == (void *)buf.m.userptr);
+        block->i_buffer = buf.length;
+        block->i_pts = block->i_dts = GetBufferPTS(&buf);
+        block->i_flags |= sys->block_flags;
+        es_out_SetPCR(demux->out, block->i_pts);
+        es_out_Send(demux->out, sys->es, block);
+    }
+    vlc_restorecancel(canc); /* <- hmm, this is purely cosmetic */
+    return NULL;
+}
+
+static void *MmapThread(void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->fd;
+    struct pollfd ufd[2];
+    nfds_t numfds = 1;
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN;
+
+#ifdef ZVBI_COMPILED
+    if (sys->vbi != NULL)
+    {
+        ufd[1].fd = GetFdVBI(sys->vbi);
+        ufd[1].events = POLLIN;
+        numfds++;
+    }
+#endif
+
+    for (;;)
+    {
+        /* Wait for data */
+        if (poll(ufd, numfds, -1) == -1)
+        {
+           if (errno != EINTR)
+               msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
+           continue;
+        }
+
+        if (ufd[0].revents)
+        {
+            int canc = vlc_savecancel();
+            block_t *block = GrabVideo(VLC_OBJECT(demux), fd, sys->bufv);
+            if (block != NULL)
+            {
+                block->i_flags |= sys->block_flags;
+                es_out_SetPCR(demux->out, block->i_pts);
+                es_out_Send(demux->out, sys->es, block);
+            }
+            vlc_restorecancel(canc);
+        }
+#ifdef ZVBI_COMPILED
+        if (sys->vbi != NULL && ufd[1].revents)
+            GrabVBI(demux, sys->vbi);
+#endif
+    }
+
+    vlc_assert_unreachable();
+}
+
+static void *ReadThread(void *data)
+{
+    demux_t *demux = data;
+    demux_sys_t *sys = demux->p_sys;
+    int fd = sys->fd;
+    struct pollfd ufd[2];
+    nfds_t numfds = 1;
+
+    ufd[0].fd = fd;
+    ufd[0].events = POLLIN;
+
+#ifdef ZVBI_COMPILED
+    if (sys->vbi != NULL)
+    {
+        ufd[1].fd = GetFdVBI(sys->vbi);
+        ufd[1].events = POLLIN;
+        numfds++;
+    }
+#endif
+
+    for (;;)
+    {
+        /* Wait for data */
+        if (poll(ufd, numfds, -1) == -1)
+        {
+           if (errno != EINTR)
+               msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
+           continue;
+        }
+
+        if (ufd[0].revents)
+        {
+            block_t *block = block_Alloc(sys->blocksize);
+            if (unlikely(block == NULL))
+            {
+                msg_Err(demux, "read error: %s", vlc_strerror_c(errno));
+                v4l2_read(fd, NULL, 0); /* discard frame */
+                continue;
+            }
+            block->i_pts = block->i_dts = vlc_tick_now();
+            block->i_flags |= sys->block_flags;
+
+            int canc = vlc_savecancel();
+            ssize_t val = v4l2_read(fd, block->p_buffer, block->i_buffer);
+            if (val != -1)
+            {
+                block->i_buffer = val;
+                es_out_SetPCR(demux->out, block->i_pts);
+                es_out_Send(demux->out, sys->es, block);
+            }
+            else
+                block_Release(block);
+            vlc_restorecancel(canc);
+        }
+#ifdef ZVBI_COMPILED
+        if (sys->vbi != NULL && ufd[1].revents)
+            GrabVBI(demux, sys->vbi);
+#endif
+    }
+    vlc_assert_unreachable();
+}
+
+static int DemuxControl( demux_t *demux, int query, va_list args )
+{
+    demux_sys_t *sys = demux->p_sys;
+
+    switch( query )
+    {
+        /* Special for access_demux */
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_SEEK:
+        case DEMUX_CAN_CONTROL_PACE:
+            *va_arg( args, bool * ) = false;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_PTS_DELAY:
+        {
+            vlc_tick_t *pd = va_arg(args, vlc_tick_t *);
+
+            *pd = VLC_TICK_FROM_MS(var_InheritInteger(demux, "live-caching"));
+            if (*pd > sys->interval)
+                *pd = sys->interval; /* cap at one frame, more than enough */
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_GET_TIME:
+            *va_arg (args, vlc_tick_t *) = vlc_tick_now() - sys->start;
+            return VLC_SUCCESS;
+
+        /* TODO implement others */
+        default:
+            return VLC_EGENERIC;
+    }
+
     return VLC_EGENERIC;
 }
 
@@ -639,237 +825,45 @@ void DemuxClose( vlc_object_t *obj )
     free( sys );
 }
 
-/** Allocates and queue a user buffer using mmap(). */
-static block_t *UserPtrQueue (vlc_object_t *obj, int fd, size_t length)
+int DemuxOpen( vlc_object_t *obj)
 {
-    void *ptr = mmap (NULL, length, PROT_READ | PROT_WRITE,
-                      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (ptr == MAP_FAILED)
-    {
-        msg_Err (obj, "cannot allocate %zu-bytes buffer: %s", length,
-                 vlc_strerror_c(errno));
-        return NULL;
-    }
+    demux_t *demux = (demux_t *)obj;
+    if (demux->out == NULL)
+        return VLC_EGENERIC;
 
-    block_t *block = block_mmap_Alloc (ptr, length);
-    if (unlikely(block == NULL))
-    {
-        munmap (ptr, length);
-        return NULL;
-    }
-
-    struct v4l2_buffer buf = {
-        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-        .memory = V4L2_MEMORY_USERPTR,
-        .m = {
-            .userptr = (uintptr_t)ptr,
-        },
-        .length = length,
-    };
-
-    if (v4l2_ioctl (fd, VIDIOC_QBUF, &buf) < 0)
-    {
-        msg_Err (obj, "cannot queue buffer: %s", vlc_strerror_c(errno));
-        block_Release (block);
-        return NULL;
-    }
-    return block;
-}
-
-static void *UserPtrThread (void *data)
-{
-    demux_t *demux = data;
-    demux_sys_t *sys = demux->p_sys;
-    int fd = sys->fd;
-    struct pollfd ufd[2];
-    nfds_t numfds = 1;
-
-    ufd[0].fd = fd;
-    ufd[0].events = POLLIN;
-
-    int canc = vlc_savecancel ();
-    for (;;)
-    {
-        struct v4l2_buffer buf = {
-            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-            .memory = V4L2_MEMORY_USERPTR,
-        };
-        block_t *block = UserPtrQueue (VLC_OBJECT(demux), fd, sys->blocksize);
-        if (block == NULL)
-            break;
-
-        /* Wait for data */
-        vlc_restorecancel (canc);
-        block_cleanup_push (block);
-        while (poll (ufd, numfds, -1) == -1)
-           if (errno != EINTR)
-               msg_Err (demux, "poll error: %s", vlc_strerror_c(errno));
-        vlc_cleanup_pop ();
-        canc = vlc_savecancel ();
-
-        if (v4l2_ioctl (fd, VIDIOC_DQBUF, &buf) < 0)
-        {
-            msg_Err (demux, "cannot dequeue buffer: %s",
-                     vlc_strerror_c(errno));
-            block_Release (block);
-            continue;
-        }
-
-        assert (block->p_buffer == (void *)buf.m.userptr);
-        block->i_buffer = buf.length;
-        block->i_pts = block->i_dts = GetBufferPTS (&buf);
-        block->i_flags |= sys->block_flags;
-        es_out_SetPCR(demux->out, block->i_pts);
-        es_out_Send (demux->out, sys->es, block);
-    }
-    vlc_restorecancel (canc); /* <- hmm, this is purely cosmetic */
-    return NULL;
-}
-
-static void *MmapThread (void *data)
-{
-    demux_t *demux = data;
-    demux_sys_t *sys = demux->p_sys;
-    int fd = sys->fd;
-    struct pollfd ufd[2];
-    nfds_t numfds = 1;
-
-    ufd[0].fd = fd;
-    ufd[0].events = POLLIN;
-
+    demux_sys_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+    demux->p_sys = sys;
 #ifdef ZVBI_COMPILED
-    if (sys->vbi != NULL)
-    {
-        ufd[1].fd = GetFdVBI (sys->vbi);
-        ufd[1].events = POLLIN;
-        numfds++;
-    }
+    sys->vbi = NULL;
 #endif
 
-    for (;;)
-    {
-        /* Wait for data */
-        if (poll (ufd, numfds, -1) == -1)
-        {
-           if (errno != EINTR)
-               msg_Err (demux, "poll error: %s", vlc_strerror_c(errno));
-           continue;
-        }
+    ParseMRL(obj, demux->psz_location);
 
-        if( ufd[0].revents )
-        {
-            int canc = vlc_savecancel ();
-            block_t *block = GrabVideo (VLC_OBJECT(demux), fd, sys->bufv);
-            if (block != NULL)
-            {
-                block->i_flags |= sys->block_flags;
-                es_out_SetPCR(demux->out, block->i_pts);
-                es_out_Send (demux->out, sys->es, block);
-            }
-            vlc_restorecancel (canc);
-        }
-#ifdef ZVBI_COMPILED
-        if (sys->vbi != NULL && ufd[1].revents)
-            GrabVBI (demux, sys->vbi);
-#endif
+    char *path = var_InheritString(obj, CFG_PREFIX"dev");
+    if (unlikely(path == NULL))
+        goto error; /* probably OOM */
+
+    uint32_t caps;
+    int fd = OpenDevice(obj, path, &caps);
+    free(path);
+    if (fd == -1)
+        goto error;
+    sys->fd = fd;
+
+    if (InitVideo(demux, fd, caps))
+    {
+        v4l2_close(fd);
+        goto error;
     }
 
-    vlc_assert_unreachable ();
-}
-
-static void *ReadThread (void *data)
-{
-    demux_t *demux = data;
-    demux_sys_t *sys = demux->p_sys;
-    int fd = sys->fd;
-    struct pollfd ufd[2];
-    nfds_t numfds = 1;
-
-    ufd[0].fd = fd;
-    ufd[0].events = POLLIN;
-
-#ifdef ZVBI_COMPILED
-    if (sys->vbi != NULL)
-    {
-        ufd[1].fd = GetFdVBI (sys->vbi);
-        ufd[1].events = POLLIN;
-        numfds++;
-    }
-#endif
-
-    for (;;)
-    {
-        /* Wait for data */
-        if (poll (ufd, numfds, -1) == -1)
-        {
-           if (errno != EINTR)
-               msg_Err (demux, "poll error: %s", vlc_strerror_c(errno));
-           continue;
-        }
-
-        if( ufd[0].revents )
-        {
-            block_t *block = block_Alloc (sys->blocksize);
-            if (unlikely(block == NULL))
-            {
-                msg_Err (demux, "read error: %s", vlc_strerror_c(errno));
-                v4l2_read (fd, NULL, 0); /* discard frame */
-                continue;
-            }
-            block->i_pts = block->i_dts = vlc_tick_now ();
-            block->i_flags |= sys->block_flags;
-
-            int canc = vlc_savecancel ();
-            ssize_t val = v4l2_read (fd, block->p_buffer, block->i_buffer);
-            if (val != -1)
-            {
-                block->i_buffer = val;
-                es_out_SetPCR(demux->out, block->i_pts);
-                es_out_Send (demux->out, sys->es, block);
-            }
-            else
-                block_Release (block);
-            vlc_restorecancel (canc);
-        }
-#ifdef ZVBI_COMPILED
-        if (sys->vbi != NULL && ufd[1].revents)
-            GrabVBI (demux, sys->vbi);
-#endif
-    }
-    vlc_assert_unreachable ();
-}
-
-static int DemuxControl( demux_t *demux, int query, va_list args )
-{
-    demux_sys_t *sys = demux->p_sys;
-
-    switch( query )
-    {
-        /* Special for access_demux */
-        case DEMUX_CAN_PAUSE:
-        case DEMUX_CAN_SEEK:
-        case DEMUX_CAN_CONTROL_PACE:
-            *va_arg( args, bool * ) = false;
-            return VLC_SUCCESS;
-
-        case DEMUX_GET_PTS_DELAY:
-        {
-            vlc_tick_t *pd = va_arg(args, vlc_tick_t *);
-
-            *pd = VLC_TICK_FROM_MS(var_InheritInteger(demux, "live-caching"));
-            if (*pd > sys->interval)
-                *pd = sys->interval; /* cap at one frame, more than enough */
-            return VLC_SUCCESS;
-        }
-
-        case DEMUX_GET_TIME:
-            *va_arg (args, vlc_tick_t *) = vlc_tick_now() - sys->start;
-            return VLC_SUCCESS;
-
-        /* TODO implement others */
-        default:
-            return VLC_EGENERIC;
-    }
-
+    sys->controls = ControlsInit(vlc_object_parent(obj), fd);
+    sys->start = vlc_tick_now();
+    demux->pf_demux = NULL;
+    demux->pf_control = DemuxControl;
+    return VLC_SUCCESS;
+error:
+    free(sys);
     return VLC_EGENERIC;
 }
