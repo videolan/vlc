@@ -142,7 +142,7 @@ void AccessClose(vlc_object_t *obj)
     free(sys);
 }
 
-int InitVideo (stream_t *access, int fd, uint32_t caps)
+static int InitVideo(stream_t *access, int fd, uint32_t caps)
 {
     access_sys_t *sys = access->p_sys;
 
