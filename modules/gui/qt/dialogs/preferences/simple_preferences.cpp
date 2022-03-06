@@ -319,8 +319,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }                                                             \
             else {                                                        \
+                QWidget *label_ = label;                                  \
                 ui.qcontrol->setEnabled( false );                         \
-                if( label ) label->setEnabled( false );                   \
+                if( label_ ) label_->setEnabled( false );                 \
             }
 
 #define CONFIG_BOOL( option, qcontrol )                           \
@@ -332,7 +333,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }                                                             \
             else { ui.qcontrol->setEnabled( false ); }
-
 
 #define CONFIG_GENERIC_NO_UI( option, type, label, qcontrol )             \
             p_config =  config_FindConfig( option );                      \
@@ -346,16 +346,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 QWidget *widget = label;                                  \
                 qcontrol->setVisible( false );                            \
                 if( widget ) widget->setEnabled( false );                 \
-            }
-
-
-#define CONFIG_GENERIC_NO_BOOL( option, type, label, qcontrol )           \
-            p_config =  config_FindConfig( option );                      \
-            if( p_config )                                                \
-            {                                                             \
-                control =  new type ## ConfigControl(                     \
-                           p_config, label, ui.qcontrol );                \
-                controls.append( control );                               \
             }
 
 #define CONFIG_GENERIC_FILE( option, type, label, qcontrol, qbutton )     \
@@ -575,8 +565,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             CONFIG_BOOL( "spdif", spdifBox );
 
-            CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float, NULL,
-                                    volNormSpin );
+            CONFIG_GENERIC( "norm-max-level" , Float, nullptr, volNormSpin );
             CONFIG_GENERIC( "audio-replay-gain-mode", StringList, ui.replayLabel,
                             replayCombo );
             CONFIG_GENERIC( "audio-visual" , StringList, ui.visuLabel,
@@ -694,8 +683,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                                  ui.recordPath, ui.recordBrowse );
 
             CONFIG_GENERIC( "http-proxy", String , ui.httpProxyLabel, proxy );
-            CONFIG_GENERIC_NO_BOOL( "postproc-q", Integer, ui.ppLabel,
-                                    PostProcLevel );
+            CONFIG_GENERIC( "postproc-q", Integer, ui.ppLabel, PostProcLevel );
             CONFIG_GENERIC( "avi-index", IntegerList, ui.aviLabel, AviRepair );
 
             /* live555 module prefs */
@@ -902,8 +890,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             /* UPDATE options */
 #ifdef UPDATE_CHECK
             CONFIG_BOOL( "qt-updates-notif", updatesBox );
-            CONFIG_GENERIC_NO_BOOL( "qt-updates-days", Integer, NULL,
-                    updatesDays );
+            CONFIG_GENERIC( "qt-updates-days", Integer, nullptr, updatesDays );
             ui.updatesDays->setEnabled( ui.updatesBox->isChecked() );
             connect( ui.updatesBox, &QCheckBox::toggled,
                      ui.updatesDays, &QSpinBox::setEnabled );
@@ -974,15 +961,14 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
                             ui.fontSizeLabel, fontSize );
 
-            CONFIG_GENERIC_NO_BOOL( "freetype-font", Font, ui.fontLabel, font );
-            CONFIG_GENERIC_NO_BOOL( "freetype-color", Color, ui.fontColorLabel,
-                            fontColor );
+            CONFIG_GENERIC( "freetype-font", Font, ui.fontLabel, font );
+            CONFIG_GENERIC( "freetype-color", Color, ui.fontColorLabel, fontColor );
             CONFIG_GENERIC( "freetype-outline-thickness", IntegerList,
                             ui.fontEffectLabel, effect );
-            CONFIG_GENERIC_NO_BOOL( "freetype-outline-color", Color, ui.outlineColorLabel,
+            CONFIG_GENERIC( "freetype-outline-color", Color, ui.outlineColorLabel,
                             outlineColor );
 
-            CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
+            CONFIG_GENERIC( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
 
             ui.shadowCheck->setChecked( config_GetInt( "freetype-shadow-opacity" ) > 0 );
             ui.backgroundCheck->setChecked( config_GetInt( "freetype-background-opacity" ) > 0 );
@@ -991,7 +977,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "secondary-sub-alignment", IntegerList,
                             ui.secondarySubsAlignmentLabel, secondarySubsAlignment );
-            CONFIG_GENERIC_NO_BOOL( "secondary-sub-margin", Integer, ui.secondarySubsPosLabel, secondarySubsPosition );
+            CONFIG_GENERIC( "secondary-sub-margin", Integer, ui.secondarySubsPosLabel, secondarySubsPosition );
         END_SPREFS_CAT;
 
         /********************************
@@ -1075,7 +1061,6 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 #undef END_SPREFS_CAT
 #undef START_SPREFS_CAT
 #undef CONFIG_GENERIC_FILE
-#undef CONFIG_GENERIC_NO_BOOL
 #undef CONFIG_GENERIC_NO_UI
 #undef CONFIG_GENERIC
 #undef CONFIG_BOOL
