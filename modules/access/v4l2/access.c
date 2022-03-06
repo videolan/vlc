@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_es.h>
 #include <vlc_interrupt.h>
 
 #include "v4l2.h"
@@ -145,71 +146,11 @@ void AccessClose(vlc_object_t *obj)
 static int InitVideo(stream_t *access, int fd, uint32_t caps)
 {
     access_sys_t *sys = access->p_sys;
+    es_format_t es_fmt;
 
-    if (!(caps & V4L2_CAP_VIDEO_CAPTURE))
-    {
-        msg_Err (access, "not a video capture device");
+    if (SetupVideo(VLC_OBJECT(access), fd, caps, &es_fmt, &sys->blocksize,
+                   &sys->block_flags))
         return -1;
-    }
-
-    v4l2_std_id std;
-    if (SetupInput (VLC_OBJECT(access), fd, &std))
-        return -1;
-
-    /*
-     * NOTE: The V4L access_demux expects a VLC FOURCC as "chroma". It is used
-     * to set the es_format_t structure correctly. However, the V4L access
-     * (*here*) has no use for a VLC FOURCC and expects a V4L2 format directly
-     * instead. That is confusing :-(
-     */
-    uint32_t pixfmt = 0;
-    char *fmtstr = var_InheritString (access, CFG_PREFIX"chroma");
-    if (fmtstr != NULL && strlen (fmtstr) <= 4)
-    {
-        memcpy (&pixfmt, fmtstr, strlen (fmtstr));
-        free (fmtstr);
-    }
-    else
-    /* Use the default^Wprevious format if none specified */
-    {
-        struct v4l2_format fmt = { .type = V4L2_BUF_TYPE_VIDEO_CAPTURE };
-        if (v4l2_ioctl (fd, VIDIOC_G_FMT, &fmt) < 0)
-        {
-            msg_Err (access, "cannot get default format: %s",
-                     vlc_strerror_c(errno));
-            return -1;
-        }
-        pixfmt = fmt.fmt.pix.pixelformat;
-    }
-    msg_Dbg (access, "selected format %4.4s", (const char *)&pixfmt);
-
-    struct v4l2_format fmt;
-    struct v4l2_streamparm parm;
-    if (SetupFormat (access, fd, pixfmt, &fmt, &parm))
-        return -1;
-
-    msg_Dbg (access, "%"PRIu32" bytes for complete image", fmt.fmt.pix.sizeimage);
-    /* Check interlacing */
-    switch (fmt.fmt.pix.field)
-    {
-        case V4L2_FIELD_INTERLACED:
-            msg_Dbg (access, "Interlacing setting: interleaved");
-            /*if (NTSC)
-                sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            else*/
-                sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
-            break;
-        case V4L2_FIELD_INTERLACED_TB:
-            msg_Dbg (access, "Interlacing setting: interleaved top bottom" );
-            sys->block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
-            break;
-        case V4L2_FIELD_INTERLACED_BT:
-            msg_Dbg (access, "Interlacing setting: interleaved bottom top" );
-            sys->block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            break;
-        default:
-            break;
-    }
 
     /* Init I/O method */
     if (caps & V4L2_CAP_STREAMING)
@@ -222,7 +163,6 @@ static int InitVideo(stream_t *access, int fd, uint32_t caps)
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
-        sys->blocksize = fmt.fmt.pix.sizeimage;
         sys->bufv = NULL;
         access->pf_block = ReadBlock;
     }
