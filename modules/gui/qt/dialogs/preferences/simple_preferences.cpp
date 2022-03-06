@@ -979,8 +979,16 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
 
-            ui.shadowCheck->setChecked( config_GetInt( "freetype-shadow-opacity" ) > 0 );
-            ui.backgroundCheck->setChecked( config_GetInt( "freetype-background-opacity" ) > 0 );
+            if( module_exists( "freetype" ) )
+            {
+                ui.shadowCheck->setChecked( config_GetInt( "freetype-shadow-opacity" ) > 0 );
+                ui.backgroundCheck->setChecked( config_GetInt( "freetype-background-opacity" ) > 0 );
+            }
+            else
+            {
+                ui.shadowCheck->setEnabled( false );
+                ui.backgroundCheck->setEnabled( false );
+            }
             optionWidgets["shadowCB"] = ui.shadowCheck;
             optionWidgets["backgroundCB"] = ui.backgroundCheck;
 
