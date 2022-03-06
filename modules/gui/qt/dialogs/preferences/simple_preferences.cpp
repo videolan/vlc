@@ -776,17 +776,25 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.osGroupBox->hide();
 #endif
 
-            /* interface */
-            char *psz_intf = config_GetPsz( "intf" );
-            if( psz_intf )
+            if( !module_exists( "skins2" ) )
             {
-                if( strstr( psz_intf, "skin" ) )
-                    ui.skins->setChecked( true );
-            } else {
-                /* defaults to qt */
-                ui.qt->setChecked( true );
+                ui.LooknfeelSelection->hide();
+                ui.mainPreview->hide();
             }
-            free( psz_intf );
+            else
+            {
+                /* interface */
+                char *psz_intf = config_GetPsz( "intf" );
+                if( psz_intf )
+                {
+                    if( strstr( psz_intf, "skin" ) )
+                        ui.skins->setChecked( true );
+                } else {
+                    /* defaults to qt */
+                    ui.qt->setChecked( true );
+                }
+                free( psz_intf );
+            }
 
             optionWidgets["skinRB"] = ui.skins;
             optionWidgets["qtRB"] = ui.qt;
