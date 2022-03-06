@@ -906,7 +906,11 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             /* ONE INSTANCE options */
 #if !defined( _WIN32 ) && !defined(__APPLE__) && !defined(__OS2__)
             if( !module_exists( "dbus" ) )
-                ui.OneInterfaceBox->hide();
+            {
+                ui.OneInterfaceMode->hide();
+                ui.EnqueueOneInterfaceMode->hide();
+                ui.oneInstanceFromFile->hide();
+            }
             else
 #endif
             {

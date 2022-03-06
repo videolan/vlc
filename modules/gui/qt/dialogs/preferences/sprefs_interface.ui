@@ -491,7 +491,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="OneInterfaceBox">
+    <widget class="QGroupBox" name="PlaylistAndInstancesBox">
      <property name="title">
       <string>Playlist and Instances</string>
      </property>
