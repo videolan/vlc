@@ -729,7 +729,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             TestCaC( "network-caching", 10/3 );
             TestCaC( "disc-caching", 1);
             TestCaC( "live-caching", 1 );
-            if( b_cache_equal == 1 )
+            if( b_cache_equal )
                 ui.cachingCombo->setCurrentIndex(
                     ui.cachingCombo->findData( QVariant( i_cache ) ) );
 #undef TestCaC
