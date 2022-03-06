@@ -41,13 +41,9 @@
 typedef struct
 {
     int fd;
+    struct vlc_v4l2_buffers *pool;
+    uint32_t blocksize;
     uint32_t block_flags;
-    union
-    {
-        uint32_t bufc;
-        uint32_t blocksize;
-    };
-    struct buffer_t *bufv;
     vlc_v4l2_ctrl_t *controls;
 } access_sys_t;
 
@@ -70,7 +66,7 @@ static block_t *MMapBlock(stream_t *access, bool *restrict eof)
     if (AccessPoll(access))
         return NULL;
 
-    block_t *block = GrabVideo(VLC_OBJECT(access), sys->fd, sys->bufv);
+    block_t *block = GrabVideo(VLC_OBJECT(access), sys->fd, sys->pool);
     if (block != NULL)
     {
         block->i_pts = block->i_dts = vlc_tick_now();
@@ -136,8 +132,8 @@ void AccessClose(vlc_object_t *obj)
     stream_t *access = (stream_t *)obj;
     access_sys_t *sys = access->p_sys;
 
-    if (sys->bufv != NULL)
-        StopMmap(sys->fd, sys->bufv, sys->bufc);
+    if (sys->pool != NULL)
+        StopMmap(sys->fd, sys->pool);
     ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close(sys->fd);
     free(sys);
@@ -155,15 +151,13 @@ static int InitVideo(stream_t *access, int fd, uint32_t caps)
     /* Init I/O method */
     if (caps & V4L2_CAP_STREAMING)
     {
-        sys->bufc = 4;
-        sys->bufv = StartMmap (VLC_OBJECT(access), fd, &sys->bufc);
-        if (sys->bufv == NULL)
+        sys->pool = StartMmap (VLC_OBJECT(access), fd, 4);
+        if (sys->pool == NULL)
             return -1;
         access->pf_block = MMapBlock;
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
-        sys->bufv = NULL;
         access->pf_block = ReadBlock;
     }
     else

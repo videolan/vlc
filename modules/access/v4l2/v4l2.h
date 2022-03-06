@@ -37,10 +37,14 @@ extern int (*v4l2_munmap) (void *, size_t);
 
 typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
 
-struct buffer_t
-{
-    void *  start;
-    size_t  length;
+struct vlc_v4l2_buffer {
+    void *base;
+    size_t length;
+};
+
+struct vlc_v4l2_buffers {
+    size_t count;
+    struct vlc_v4l2_buffer bufs[];
 };
 
 /* v4l2.c */
@@ -54,11 +58,11 @@ int SetupVideo(vlc_object_t *, int fd, uint32_t,
                es_format_t *, uint32_t *, uint32_t *);
 
 int StartUserPtr (vlc_object_t *, int);
-struct buffer_t *StartMmap (vlc_object_t *, int, uint32_t *);
-void StopMmap (int, struct buffer_t *, uint32_t);
+struct vlc_v4l2_buffers *StartMmap(vlc_object_t *, int, unsigned int);
+void StopMmap(int, struct vlc_v4l2_buffers *);
 
 vlc_tick_t GetBufferPTS (const struct v4l2_buffer *);
-block_t* GrabVideo (vlc_object_t *, int, const struct buffer_t *);
+block_t* GrabVideo(vlc_object_t *, int, struct vlc_v4l2_buffers *);
 
 #ifdef ZVBI_COMPILED
 /* vbi.c */

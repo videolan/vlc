@@ -47,12 +47,8 @@ typedef struct
     int fd;
     vlc_thread_t thread;
 
-    struct buffer_t *bufv;
-    union
-    {
-        uint32_t bufc;
-        uint32_t blocksize;
-    };
+    struct vlc_v4l2_buffers *pool;
+    uint32_t blocksize;
     uint32_t block_flags;
 
     es_out_id_t *es;
@@ -185,7 +181,7 @@ static void *MmapThread(void *data)
         if (ufd[0].revents)
         {
             int canc = vlc_savecancel();
-            block_t *block = GrabVideo(VLC_OBJECT(demux), fd, sys->bufv);
+            block_t *block = GrabVideo(VLC_OBJECT(demux), fd, sys->pool);
             if (block != NULL)
             {
                 block->i_flags |= sys->block_flags;
@@ -326,26 +322,25 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
              * page size, block->i_size can be set optimally. */
             const long pagemask = sysconf (_SC_PAGE_SIZE) - 1;
 
+            sys->pool = NULL;
             sys->blocksize = (sys->blocksize + pagemask) & ~pagemask;
-            sys->bufv = NULL;
             entry = UserPtrThread;
             msg_Dbg (demux, "streaming with %"PRIu32"-bytes user buffers",
                      sys->blocksize);
         }
         else /* fall back to memory map */
         {
-            sys->bufc = 4;
-            sys->bufv = StartMmap (VLC_OBJECT(demux), fd, &sys->bufc);
-            if (sys->bufv == NULL)
+            sys->pool = StartMmap(VLC_OBJECT(demux), fd, 4);
+            if (sys->pool == NULL)
                 return -1;
             entry = MmapThread;
-            msg_Dbg (demux, "streaming with %"PRIu32" memory-mapped buffers",
-                     sys->bufc);
+            msg_Dbg(demux, "streaming with %zu memory-mapped buffers",
+                    sys->pool->count);
         }
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
-        sys->bufv = NULL;
+        sys->pool = NULL;
         entry = ReadThread;
         msg_Dbg (demux, "reading %"PRIu32" bytes at a time", sys->blocksize);
     }
@@ -370,8 +365,8 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
         if (sys->vbi != NULL)
             CloseVBI (sys->vbi);
 #endif
-        if (sys->bufv != NULL)
-            StopMmap (sys->fd, sys->bufv, sys->bufc);
+        if (sys->pool != NULL)
+            StopMmap(sys->fd, sys->pool);
         return -1;
     }
     return 0;
@@ -384,8 +379,8 @@ void DemuxClose( vlc_object_t *obj )
 
     vlc_cancel (sys->thread);
     vlc_join (sys->thread, NULL);
-    if (sys->bufv != NULL)
-        StopMmap (sys->fd, sys->bufv, sys->bufc);
+    if (sys->pool != NULL)
+        StopMmap(sys->fd, sys->pool);
     ControlsDeinit(vlc_object_parent(obj), sys->controls);
     v4l2_close (sys->fd);
 
