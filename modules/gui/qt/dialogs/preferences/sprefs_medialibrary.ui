@@ -48,6 +48,9 @@
           <height>16</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Add scanned folder</string>
+        </property>
         <property name="text">
          <string>+</string>
         </property>
@@ -60,6 +63,9 @@
           <width>16</width>
           <height>16</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Add banned folder</string>
         </property>
         <property name="text">
          <string>+</string>
