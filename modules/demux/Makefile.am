@@ -152,11 +152,8 @@ if ENABLE_SOUT
 libavformat_plugin_la_SOURCES += demux/avformat/mux.c
 endif
 libavformat_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
-libavformat_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM) libavcodec_common.la
+libavformat_plugin_la_LIBADD = $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM) $(LIBZ) libavcodec_common.la
 libavformat_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
-if HAVE_ZLIB
-libavformat_plugin_la_LIBADD += -lz
-endif
 if HAVE_AVFORMAT
 if !MERGE_FFMPEG
 demux_LTLIBRARIES += libavformat_plugin.la
