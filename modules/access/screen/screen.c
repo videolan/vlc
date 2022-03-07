@@ -281,8 +281,9 @@ static int Demux( demux_t *p_demux )
     if( !p_sys->i_next_date ) p_sys->i_next_date = vlc_tick_now();
 
     /* Frame skipping if necessary */
-    while( vlc_tick_now() >= p_sys->i_next_date + p_sys->i_incr )
-        p_sys->i_next_date += p_sys->i_incr;
+    int64_t extra_frames;
+    extra_frames = (vlc_tick_now() - p_sys->i_next_date) / p_sys->i_incr;
+    p_sys->i_next_date += extra_frames * p_sys->i_incr;
 
     vlc_tick_wait( p_sys->i_next_date );
     p_block = screen_Capture( p_demux );
@@ -291,6 +292,10 @@ static int Demux( demux_t *p_demux )
         p_sys->i_next_date += p_sys->i_incr;
         return 1;
     }
+
+    // ensure the output DTS matches our ticks if the capture took too long
+    extra_frames = (vlc_tick_now() - p_sys->i_next_date) / p_sys->i_incr;
+    p_sys->i_next_date += extra_frames * p_sys->i_incr;
 
     p_block->i_dts = p_block->i_pts = p_sys->i_next_date;
 
