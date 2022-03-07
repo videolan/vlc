@@ -171,7 +171,7 @@ win64-arm-llvm:
     variables:
         <<: *variables-win64-arm
         LIBVLC_EXTRA_BUILD_FLAGS: -z
-        UWP_EXTRA_BUILD_FLAGS: -u -w -x
+        UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000006
 
 uwp64-libvlc-llvm:
     extends: .win-common
@@ -180,7 +180,7 @@ uwp64-libvlc-llvm:
     variables:
         <<: *variables-win64
         LIBVLC_EXTRA_BUILD_FLAGS: -z
-        UWP_EXTRA_BUILD_FLAGS: -u -w -x
+        UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000006
 
 .nightly-win-common:
     extends: .win-common
