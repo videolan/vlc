@@ -38,6 +38,7 @@
 #include <d3d11.h>
 #include <assert.h>
 #include <initguid.h>
+#include <dxgi1_2.h>
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
 # include <dxgidebug.h>
 #endif
@@ -802,7 +803,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
 
 #undef AllocateTextures
 int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
-                      const d3d_format_t *cfg, const video_format_t *fmt,
+                      const d3d_format_t *cfg, const video_format_t *fmt, bool shared,
                       ID3D11Texture2D *textures[],
                       plane_t out_planes[] )
 {
@@ -814,7 +815,8 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
     ZeroMemory(&texDesc, sizeof(texDesc));
     texDesc.MipLevels = 1;
     texDesc.SampleDesc.Count = 1;
-    texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
+    if (shared)
+        texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     texDesc.ArraySize = 1;
     if (is_d3d11_opaque(fmt->i_chroma)) {
@@ -945,6 +947,8 @@ void d3d11_pic_context_destroy(picture_context_t *ctx)
 {
     struct d3d11_pic_context *pic_ctx = D3D11_PICCONTEXT_FROM_PICCTX(ctx);
     ReleaseD3D11PictureSys(&pic_ctx->picsys);
+    if (pic_ctx->picsys.sharedHandle != INVALID_HANDLE_VALUE)
+        CloseHandle(pic_ctx->picsys.sharedHandle);
     free(pic_ctx);
 }
 
@@ -960,7 +964,8 @@ picture_context_t *d3d11_pic_context_copy(picture_context_t *ctx)
 }
 
 picture_t *D3D11_AllocPicture(vlc_object_t *obj,
-                              const video_format_t *fmt, vlc_video_context *vctx_out, const d3d_format_t *cfg)
+                              const video_format_t *fmt, vlc_video_context *vctx_out,
+                              bool shared, const d3d_format_t *cfg)
 {
     if (unlikely(cfg == NULL))
         return NULL;
@@ -968,6 +973,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
     struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx == NULL))
         return NULL;
+    pic_ctx->picsys.sharedHandle = INVALID_HANDLE_VALUE;
 
     picture_t *pic = picture_NewFromFormat( fmt );
     if (unlikely(pic == NULL))
@@ -978,7 +984,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
 
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(vctx_out);
     if (AllocateTextures(obj, &dev_sys->d3d_dev, cfg,
-                         fmt, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
+                         fmt, shared, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
     {
         picture_Release(pic);
         free(pic_ctx);
@@ -986,6 +992,22 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
     }
 
     D3D11_AllocateResourceView(obj, dev_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+
+    if (shared)
+    {
+        HRESULT hr;
+        void *pv;
+        IDXGIResource1 *sharedResource;
+        hr = ID3D11Texture2D_QueryInterface(pic_ctx->picsys.texture[0], &IID_IDXGIResource1,&pv);
+        if (likely(SUCCEEDED(hr)))
+        {
+            sharedResource = pv;
+            IDXGIResource1_CreateSharedHandle(sharedResource, NULL,
+                                              DXGI_SHARED_RESOURCE_READ/*|DXGI_SHARED_RESOURCE_WRITE*/,
+                                              NULL, &pic_ctx->picsys.sharedHandle);
+            IDXGIResource1_Release(sharedResource);
+        }
+    }
 
     pic_ctx->s = (picture_context_t) {
         d3d11_pic_context_destroy, d3d11_pic_context_copy,

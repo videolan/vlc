@@ -318,7 +318,8 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
         if (!is_d3d11_opaque(fmt->i_chroma))
             texture_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
 
-        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt, textures, sys->stagingPlanes))
+        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt,
+                             false, textures, sys->stagingPlanes))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
@@ -1321,7 +1322,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad = d3dquad;
-            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.generic.textureFormat, &r->p_picture->format, d3dquad->picSys.texture, NULL)) {
+            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.generic.textureFormat, &r->p_picture->format,
+                                 false, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<DXGI_MAX_SHADER_VIEW; j++)

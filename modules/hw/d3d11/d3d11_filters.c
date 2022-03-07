@@ -202,7 +202,9 @@ static picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(cfg == NULL))
         return NULL;
 
-    return D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
+    return D3D11_AllocPicture(VLC_OBJECT(p_filter),
+                              &p_filter->fmt_out.video, p_filter->vctx_out,
+                              false, cfg);
 }
 
 static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)

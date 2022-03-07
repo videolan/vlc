@@ -193,7 +193,7 @@ picture_t *AllocPicture( filter_t *p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     picture_t *pic = D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video,
-                                        p_filter->vctx_out, p_sys->output_format);
+                                        p_filter->vctx_out, false, p_sys->output_format);
     if (pic == NULL)
         return NULL;
 
