@@ -46,6 +46,7 @@
 #include "util/varchoicemodel.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlrecentsmodel.hpp"
+#include "medialibrary/mlbookmarkmodel.hpp"
 
 
 #include <QMenu>
@@ -480,15 +481,23 @@ void VLCMenuBar::NavigMenu( qt_intf_t *p_intf, QMenu *menu )
     menu->addMenu( submenu );
     menu->addMenu( new CheckableListMenu( qtr("&Program") , THEMIM->getPrograms(), CheckableListMenu::GROUPED , menu) );
 
-    if (p_intf->p_mi && p_intf->p_mi->hasMediaLibrary() )
+    MainCtx * mi = p_intf->p_mi;
+
+    if (mi && p_intf->p_mi->hasMediaLibrary() )
     {
-        submenu = new QMenu( qfut( I_MENU_BOOKMARK ), menu );
-        submenu->setTearOffEnabled( true );
-        addDPStaticEntry( submenu, qtr( "&Manage" ), "",
-                          &DialogsProvider::bookmarksDialog, "Ctrl+B" );
-        submenu->addSeparator();
-        action = menu->addMenu( submenu );
-        action->setData( "bookmark" );
+        MediaLib * mediaLib = mi->getMediaLibrary();
+
+        MLBookmarkModel * model = new MLBookmarkModel(mediaLib, p_intf->p_player, nullptr);
+
+        BookmarkMenu * bookmarks = new BookmarkMenu(model, mediaLib, menu);
+
+        model->setParent(bookmarks);
+
+        bookmarks->setTitle(qfut(I_MENU_BOOKMARK));
+
+        action = menu->addMenu(bookmarks);
+
+        action->setData("bookmark");
     }
 
     menu->addSeparator();
