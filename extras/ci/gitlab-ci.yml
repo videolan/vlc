@@ -51,7 +51,7 @@ variables:
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
-.variables-uwp-arm64: &variables-uwp-arm64
+.variables-win64-arm: &variables-win64-arm
         SHORTARCH: arm64
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
@@ -164,14 +164,14 @@ win64-llvm:
         name: $VLC_WIN_LLVM_IMAGE
     variables: *variables-win64
 
-win64-ucrt-llvm:
+win64-arm-llvm:
     extends: .win-common
     image:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
-        <<: *variables-win64
-        TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
-        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
+        <<: *variables-win64-arm
+        LIBVLC_EXTRA_BUILD_FLAGS: -z
+        UWP_EXTRA_BUILD_FLAGS: -u -w -x
 
 uwp64-libvlc-llvm:
     extends: .win-common
@@ -179,15 +179,6 @@ uwp64-libvlc-llvm:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
         <<: *variables-win64
-        LIBVLC_EXTRA_BUILD_FLAGS: -z
-        UWP_EXTRA_BUILD_FLAGS: -u -w -x
-
-uwp-arm64-libvlc-llvm:
-    extends: .win-common
-    image:
-        name: $VLC_UWP_LLVM_IMAGE
-    variables:
-        <<: *variables-uwp-arm64
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w -x
 
