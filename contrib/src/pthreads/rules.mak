@@ -58,6 +58,7 @@ pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 .winrt_headers: pthreads
 	mkdir -p -- "$(PREFIX)/include"
 	cd $< && cp mingw-w64-headers/include/windows.storage.h "$(PREFIX)/include"
+	cd $< && cp mingw-w64-headers/include/eventtoken.h "$(PREFIX)/include"
 	touch $@
 
 .sum-dxvahd: .sum-pthreads
