@@ -2037,7 +2037,7 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
     vlc_mutex_lock(&ov->lock);
 
     /* ARGB in word order -> byte order */
-#ifdef WORDS_BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
     const vlc_fourcc_t rgbchroma = VLC_CODEC_ARGB;
 #else
     const vlc_fourcc_t rgbchroma = VLC_CODEC_BGRA;
