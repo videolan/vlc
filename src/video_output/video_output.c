@@ -77,6 +77,7 @@ typedef struct vout_thread_sys_t
     const char      *str_id;
 
     vlc_mutex_t clock_lock;
+    bool clock_nowait; /* protected by vlc_clock_Lock()/vlc_clock_Unlock() */
 
     vlc_clock_t     *clock;
     float           rate;
@@ -220,6 +221,21 @@ static void VoutFixFormat(video_format_t *dst, const video_format_t *src)
     dst->i_chroma = vlc_fourcc_GetCodec(VIDEO_ES, src->i_chroma);
     VoutFixFormatAR( dst );
     video_format_FixRgb(dst);
+}
+
+static void VoutRenderWakeUpUrgent(vout_thread_sys_t *sys)
+{
+    /* The assignment to sys->clock is protected by sys->lock */
+    vlc_mutex_lock(&sys->clock_lock);
+    if (sys->clock)
+    {
+        /* Wake up the clock-wait between prepare() and display() */
+        vlc_clock_Lock(sys->clock);
+        sys->clock_nowait = true;
+        vlc_clock_Wake(sys->clock);
+        vlc_clock_Unlock(sys->clock);
+    }
+    vlc_mutex_unlock(&sys->clock_lock);
 }
 
 static bool VideoFormatIsCropArEqual(video_format_t *dst,
@@ -472,6 +488,8 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
 
     assert(!sys->dummy);
+
+    VoutRenderWakeUpUrgent(sys);
 
     /* DO NOT call this outside the vout window callbacks */
     vlc_queuedmutex_lock(&sys->display_lock);
@@ -1251,6 +1269,9 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     if (!filtered)
         return VLC_EGENERIC;
 
+    vlc_clock_Lock(sys->clock);
+    sys->clock_nowait = false;
+    vlc_clock_Unlock(sys->clock);
     vlc_queuedmutex_lock(&sys->display_lock);
 
     picture_t *todisplay;
@@ -1321,10 +1342,14 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
                         deadline = max_deadline;
                 }
 
+                if (sys->clock_nowait)
+                    /* A caller (the UI thread) awaits for the rendering to
+                     * complete urgently, do not wait. */
+                    break;
+
                 system_pts = deadline;
                 timed_out = vlc_clock_Wait(sys->clock, deadline);
             }
-
             vlc_clock_Unlock(sys->clock);
         }
         sys->displayed.date = system_pts;
@@ -2013,6 +2038,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vlc_mutex_init(&sys->filter.lock);
 
     vlc_mutex_init(&sys->clock_lock);
+    sys->clock_nowait = false;
 
     /* Display */
     sys->display = NULL;
