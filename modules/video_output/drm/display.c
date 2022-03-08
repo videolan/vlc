@@ -262,7 +262,6 @@ static void CheckFourCCList(uint32_t drmfourcc, uint32_t plane_id)
     }
 }
 
-
 static bool ChromaNegotiation(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -433,19 +432,6 @@ static void CustomDestroyPicture(vout_display_t *vd)
         DestroyFB(vd, c);
 }
 
-static int OpenDisplay(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!ChromaNegotiation(vd))
-        return VLC_EGENERIC;
-
-    msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
-            (char*)&sys->vlc_fourcc, (char*)&sys->drm_fourcc);
-    return VLC_SUCCESS;
-}
-
-
 static int Control(vout_display_t *vd, int query)
 {
     (void) vd;
@@ -579,10 +565,13 @@ static int Open(vout_display_t *vd,
         chroma = NULL;
     }
 
-    if (OpenDisplay(vd) != VLC_SUCCESS) {
+    if (!ChromaNegotiation(vd)) {
         Close(vd);
         return VLC_EGENERIC;
     }
+
+    msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
+            (char*)&sys->vlc_fourcc, (char*)&sys->drm_fourcc);
 
     video_format_ApplyRotation(&fmt, vd->fmt);
 
