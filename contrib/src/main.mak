@@ -142,7 +142,7 @@ endif
 
 LN_S = ln -s
 ifdef HAVE_WIN32
-MINGW_W64_VERSION := $(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E -m 1 __MINGW64_VERSION_MAJOR | sed -e 's/\#define\s__MINGW64_VERSION_MAJOR\s//')
+MINGW_W64_VERSION := $(shell echo "__MINGW64_VERSION_MAJOR" | $(CC) $(CFLAGS) -E -include _mingw.h - | tail -n 1)
 ifneq ($(MINGW_W64_VERSION),)
 HAVE_MINGW_W64 := 1
 mingw_at_least = $(shell [ $(MINGW_W64_VERSION) -gt $(1) ] && echo true)
