@@ -1,3 +1,12 @@
+Changes between 3.0.17 and 3.0.17.2:
+----------------------------------
+
+Interface:
+ * Qt: Fix right click support on video
+
+Misc:
+ * Update YouTube script
+
 Changes between 3.0.16 and 3.0.17:
 ----------------------------------
 
