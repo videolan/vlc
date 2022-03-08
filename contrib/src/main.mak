@@ -146,8 +146,8 @@ MINGW_W64_VERSION := $(shell echo "__MINGW64_VERSION_MAJOR" | $(CC) $(CFLAGS) -E
 ifneq ($(MINGW_W64_VERSION),)
 HAVE_MINGW_W64 := 1
 mingw_at_least = $(shell [ $(MINGW_W64_VERSION) -gt $(1) ] && echo true)
-HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
 endif
+HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
 ifndef HAVE_CROSS_COMPILE
 LN_S = cp -R
 endif
