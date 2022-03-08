@@ -275,8 +275,20 @@ void MLBookmarkModel::add()
 
     m_mediaLib->runOnMLThread(this,
     //ML thread
-    [mediaId = m_currentMediaId, currentTime](vlc_medialibrary_t* ml){
-        vlc_ml_media_add_bookmark( ml, mediaId, MS_FROM_VLC_TICK( currentTime ) );
+    [mediaId = m_currentMediaId, currentTime, count = rowCount()](vlc_medialibrary_t* ml)
+    {
+        int64_t time = MS_FROM_VLC_TICK(currentTime);
+
+        vlc_ml_media_add_bookmark(ml, mediaId, time);
+
+        ml_unique_ptr<vlc_ml_media_t> media { vlc_ml_get_media(ml, mediaId) };
+
+        if (media)
+        {
+            QString name = QString("%1 #%2").arg(media->psz_title).arg(count);
+
+            vlc_ml_media_update_bookmark(ml, mediaId, time, qtu(name), nullptr);
+        }
     },
     //UI thread
     [this](){
