@@ -363,7 +363,7 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
     if (sys->forced_drm_fourcc) {
         for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
             if (fourccmatching[c].drm == sys->drm_fourcc) {
-                fourcc = fourccmatching[c].vlc;
+                fourcc = vlc_fourcc_drm(sys->drm_fourcc);
                 break;
             }
         }
@@ -406,7 +406,7 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
                 sys->plane_id = fourccmatching[c].plane_id;
              }
 
-            return fourccmatching[c].vlc;
+            return vlc_fourcc_drm(fourccmatching[c].drm);
         }
     }
 
@@ -418,7 +418,7 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
                 sys->plane_id = fourccmatching[c].plane_id;
              }
 
-            return fourccmatching[c].vlc;
+            return vlc_fourcc_drm(fourccmatching[c].drm);
         }
     }
 
