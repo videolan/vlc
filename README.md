@@ -96,7 +96,7 @@ streaming and conversion of multimedia files and streams.
 
 Some useful links that might help you:
 
-- [VLC web site](http://www.videolan.org/vlc/)
+- [VLC web site](https://www.videolan.org/vlc/)
 - [Support](https://www.videolan.org/support/)
 - [Forums](https://forum.videolan.org/)
 - [Wiki](https://wiki.videolan.org/)

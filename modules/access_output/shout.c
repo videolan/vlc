@@ -120,7 +120,7 @@ vlc_module_begin ()
                 MP3_TEXT, MP3_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "genre", "Alternative",
                 GENRE_TEXT, GENRE_LONGTEXT )
-    add_string( SOUT_CFG_PREFIX "url", "http://www.videolan.org/vlc",
+    add_string( SOUT_CFG_PREFIX "url", "https://www.videolan.org/vlc",
                 URL_TEXT, URL_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "bitrate", "",
                 BITRATE_TEXT, BITRATE_LONGTEXT )

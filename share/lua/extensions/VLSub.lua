@@ -93,7 +93,7 @@ local options = {
     int_os_password = 'Password',
     int_help_mess =[[
       Download subtitles from
-      <a href='http://www.opensubtitles.org/'>
+      <a href='https://www.opensubtitles.org/'>
       opensubtitles.org
       </a> and display them while watching a video.<br>
       <br>
@@ -130,7 +130,7 @@ local options = {
       they're important.<br>
       <br>
       Find more VLC extensions at
-      <a href='http://addons.videolan.org'>addons.videolan.org</a>.
+      <a href='https://addons.videolan.org'>addons.videolan.org</a>.
       ]],
     int_no_support_mess = [[
       <strong>VLSub is not working with VLC 2.1.x on
@@ -332,7 +332,7 @@ function descriptor()
     title = "VLsub 0.11.1",
     version = "0.11.1",
     author = "exebetche",
-    url = 'http://www.opensubtitles.org/',
+    url = 'https://www.opensubtitles.org/',
     shortdesc = "VLsub";
     description = options.translation.int_descr,
     capabilities = {"menu", "input-listener" }

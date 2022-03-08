@@ -6,7 +6,7 @@
         name="VideoLAN.VLC"
         type="win32"
     />
-    <description>see http://www.videolan.org/</description>
+    <description>see https://www.videolan.org/</description>
      <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
         <security>
             <requestedPrivileges>

@@ -97,7 +97,7 @@ void FingerprintDialog::handleResults()
         QLabel *label = new QLabel(
                     QString( "<h3 style=\"margin: 0\"><a style=\"text-decoration:none\" href=\"%1\">%2</a></h3>"
                              "<span style=\"padding-left:20px\">%3</span>" )
-                    .arg( QString( "http://mb.videolan.org/recording/%1" ).arg( mb_id ) )
+                    .arg( QString( "https://mb.videolan.org/recording/%1" ).arg( mb_id ) )
                     .arg( qfu( vlc_meta_Get( p_meta, vlc_meta_Title ) ) )
                     .arg( qfu( vlc_meta_Get( p_meta, vlc_meta_Artist ) ) )
         );
