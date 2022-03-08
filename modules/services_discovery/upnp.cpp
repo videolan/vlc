@@ -733,7 +733,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
      * MasterList is a list of usual Satellites */
 
     char *psz_url;
-    if (asprintf( &psz_url, "http://www.satip.info/Playlists/%s.m3u",
+    if (asprintf( &psz_url, "https://www.satip.info/Playlists/%s.m3u",
                 psz_satip_channellist ) < 0 ) {
         vlc_UrlClean( &url );
         free( psz_satip_channellist );
