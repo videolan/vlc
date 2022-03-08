@@ -928,7 +928,7 @@ function get_available_translations()
 -- causing error  with github https CA certficate on OS X an XP)
 -- https://github.com/exebetche/vlsub/tree/master/locale
 
-  local translations_url = "http://addons.videolan.org/CONTENT/"..
+  local translations_url = "https://addons.videolan.org/CONTENT/"..
     "content-files/148752-vlsub_translations.xml"
 
   if input_table['intLangBut']:get_text() == lang["int_search_transl"]
@@ -1012,7 +1012,7 @@ openSub = {
   itemStore = nil,
   actionLabel = "",
   conf = {
-    url = "http://api.opensubtitles.org/xml-rpc",
+    url = "https://api.opensubtitles.org/xml-rpc",
     path = nil,
     userAgentHTTP = "VLSub",
     useragent = "VLSub 0.11.1",
