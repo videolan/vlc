@@ -45,6 +45,7 @@
 #include <vlc_picture_pool.h>
 #include <vlc_fs.h>
 #include <vlc_vout_window.h>
+#include "vlc_drm.h"
 
 #include <assert.h>
 
@@ -378,8 +379,10 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
      * favor yuv format according to YUVFormat flag.
      * check for exact match first, then YUVFormat and then !YUVFormat
      */
+    uint_fast32_t drm_fourcc = vlc_drm_format(vd->source);
+
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
-        if (fourccmatching[c].vlc == fourcc) {
+        if (fourccmatching[c].drm == drm_fourcc) {
             if (!sys->forced_drm_fourcc && fourccmatching[c].present) {
                 sys->drm_fourcc = fourccmatching[c].drm;
                 sys->plane_id = fourccmatching[c].plane_id;
