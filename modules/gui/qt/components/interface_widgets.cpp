@@ -341,7 +341,7 @@ void VideoWidget::mouseReleaseEvent( QMouseEvent *event )
 
 void VideoWidget::mousePressEvent( QMouseEvent* event )
 {
-    if ( !p_window || enable_mouse_events )
+    if ( !p_window || !enable_mouse_events )
     {
         event->ignore();
         return;
