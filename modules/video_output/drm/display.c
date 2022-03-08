@@ -214,7 +214,6 @@ err_destroy:
  * listed in order of preference.
  *
  * fourccmatching::drm DRM fourcc code from drm_fourcc.h
- * fourccmatching::vlc VLC fourcc code from vlc_fourcc.h under title 'Chromas'
  * fourccmatching::plane_id from which plane this DRM fourcc was found
  * fourccmatching::present if this mode was available in HW
  * fourccmatching::isYUV as name suggest..
@@ -222,21 +221,20 @@ err_destroy:
 static struct
 {
     uint32_t     drm;
-    vlc_fourcc_t vlc;
     uint32_t     plane_id;
     bool         present;
     bool         isYUV;
 } fourccmatching[] = {
-    { .drm = DRM_FORMAT_XRGB8888, .vlc = VLC_CODEC_RGB32, .isYUV = false },
-    { .drm = DRM_FORMAT_RGB565, .vlc = VLC_CODEC_RGB16, .isYUV = false },
+    { .drm = DRM_FORMAT_XRGB8888, .isYUV = false },
+    { .drm = DRM_FORMAT_RGB565, .isYUV = false },
 #if defined DRM_FORMAT_P010
-    { .drm = DRM_FORMAT_P010, .vlc = VLC_CODEC_P010, .isYUV = true },
+    { .drm = DRM_FORMAT_P010, .isYUV = true },
 #endif
-    { .drm = DRM_FORMAT_NV12, .vlc = VLC_CODEC_NV12, .isYUV = true },
-    { .drm = DRM_FORMAT_YUYV, .vlc = VLC_CODEC_YUYV, .isYUV = true },
-    { .drm = DRM_FORMAT_YVYU, .vlc = VLC_CODEC_YVYU, .isYUV = true },
-    { .drm = DRM_FORMAT_UYVY, .vlc = VLC_CODEC_UYVY, .isYUV = true },
-    { .drm = DRM_FORMAT_VYUY, .vlc = VLC_CODEC_VYUY, .isYUV = true },
+    { .drm = DRM_FORMAT_NV12, .isYUV = true },
+    { .drm = DRM_FORMAT_YUYV, .isYUV = true },
+    { .drm = DRM_FORMAT_YVYU, .isYUV = true },
+    { .drm = DRM_FORMAT_UYVY, .isYUV = true },
+    { .drm = DRM_FORMAT_VYUY, .isYUV = true },
 };
 
 
