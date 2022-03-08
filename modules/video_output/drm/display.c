@@ -52,9 +52,6 @@
  * Local prototypes
  *****************************************************************************/
 
-#define VLC_CHROMA_TEXT "Image format used by VLC"
-#define VLC_CHROMA_LONGTEXT "Chroma fourcc request to VLC for output format"
-
 #define DRM_CHROMA_TEXT "Image format used by DRM"
 #define DRM_CHROMA_LONGTEXT "Chroma fourcc override for DRM framebuffer format selection"
 
@@ -514,7 +511,6 @@ static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     vout_display_sys_t *sys;
-    vlc_fourcc_t local_vlc_chroma;
     uint32_t local_drm_chroma;
     video_format_t fmt = {};
     char *chroma;
@@ -529,24 +525,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    chroma = var_InheritString(vd, "kms-vlc-chroma");
-    if (chroma) {
-        local_vlc_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
-
-        if (local_vlc_chroma) {
-            sys->vlc_fourcc = local_vlc_chroma;
-            msg_Dbg(vd, "Forcing VLC to use chroma '%4s'", chroma);
-         } else {
-            sys->vlc_fourcc = vd->source->i_chroma;
-            msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
-         }
-
-        free(chroma);
-        chroma = NULL;
-    } else {
-        sys->vlc_fourcc = vd->source->i_chroma;
-        msg_Dbg(vd, "Chroma not defined, using default");
-    }
+    sys->vlc_fourcc = vd->source->i_chroma;
 
     chroma = var_InheritString(vd, "kms-drm-chroma");
     if (chroma) {
@@ -622,7 +601,7 @@ vlc_module_begin ()
     add_shortcut("drm", "kms_drm", "kms")
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
-    add_string( "kms-vlc-chroma", NULL, VLC_CHROMA_TEXT, VLC_CHROMA_LONGTEXT)
+    add_obsolete_string("kms-vlc-chroma") /* since 4.0.0 */
     add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT)
     set_description("Direct rendering management video output")
     set_callback_display(Open, 30)
