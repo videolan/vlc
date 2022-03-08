@@ -83,7 +83,6 @@ typedef struct vout_display_sys_t {
 
     bool            forced_drm_fourcc;
     uint32_t        drm_fourcc;
-    vlc_fourcc_t    vlc_fourcc;
 
 /*
  * modeset information
@@ -259,7 +258,7 @@ static void CheckFourCCList(uint32_t drmfourcc, uint32_t plane_id)
     }
 }
 
-static bool ChromaNegotiation(vout_display_t *vd)
+static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
@@ -277,7 +276,7 @@ static bool ChromaNegotiation(vout_display_t *vd)
 
     drmModeRes *resources = drmModeGetResources(drm_fd);
     if (resources == NULL)
-        return false;
+        return 0;
 
     int crtc_index = -1;
     for (int crtc_id=0; crtc_id < resources->count_crtcs; ++crtc_id)
@@ -352,25 +351,27 @@ static bool ChromaNegotiation(vout_display_t *vd)
             } else {
                 msg_Err(vd, "Couldn't get list of DRM formats");
                 drmModeFreePlaneResources(plane_res);
-                return false;
+                return 0;
             }
         }
         drmModeFreePlaneResources(plane_res);
     }
 
+    vlc_fourcc_t fourcc = vd->source->i_chroma;
+
     if (sys->forced_drm_fourcc) {
         for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
             if (fourccmatching[c].drm == sys->drm_fourcc) {
-                sys->vlc_fourcc = fourccmatching[c].vlc;
+                fourcc = fourccmatching[c].vlc;
                 break;
             }
         }
         if (sys->plane_id == 0) {
             msg_Err(vd, "Forced DRM fourcc (%.4s) not available in kernel.",
                     (char*)&sys->drm_fourcc);
-            return false;
+            return 0;
         }
-        return true;
+        return fourcc;
     }
 
     /*
@@ -378,7 +379,7 @@ static bool ChromaNegotiation(vout_display_t *vd)
      * check for exact match first, then YUVFormat and then !YUVFormat
      */
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
-        if (fourccmatching[c].vlc == sys->vlc_fourcc) {
+        if (fourccmatching[c].vlc == fourcc) {
             if (!sys->forced_drm_fourcc && fourccmatching[c].present) {
                 sys->drm_fourcc = fourccmatching[c].drm;
                 sys->plane_id = fourccmatching[c].plane_id;
@@ -386,14 +387,14 @@ static bool ChromaNegotiation(vout_display_t *vd)
 
             if (!sys->drm_fourcc) {
                 msg_Err(vd, "Forced VLC fourcc (%.4s) not matching anything available in kernel, please set manually",
-                        (char*)&sys->vlc_fourcc);
-                return false;
+                        (char*)&fourcc);
+                return 0;
             }
-            return true;
+            return fourcc;
         }
     }
 
-    YUVFormat = vlc_fourcc_IsYUV(sys->vlc_fourcc);
+    YUVFormat = vlc_fourcc_IsYUV(fourcc);
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
         if (fourccmatching[c].isYUV == YUVFormat
                 && fourccmatching[c].present) {
@@ -402,8 +403,7 @@ static bool ChromaNegotiation(vout_display_t *vd)
                 sys->plane_id = fourccmatching[c].plane_id;
              }
 
-            sys->vlc_fourcc = fourccmatching[c].vlc;
-            return true;
+            return fourccmatching[c].vlc;
         }
     }
 
@@ -415,12 +415,11 @@ static bool ChromaNegotiation(vout_display_t *vd)
                 sys->plane_id = fourccmatching[c].plane_id;
              }
 
-            sys->vlc_fourcc = fourccmatching[c].vlc;
-            return true;
+            return fourccmatching[c].vlc;
         }
     }
 
-    return false;
+    return 0;
 }
 
 static void CustomDestroyPicture(vout_display_t *vd)
@@ -525,8 +524,6 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->vlc_fourcc = vd->source->i_chroma;
-
     chroma = var_InheritString(vd, "kms-drm-chroma");
     if (chroma) {
         local_drm_chroma = VLC_FOURCC(chroma[0], chroma[1], chroma[2],
@@ -544,13 +541,14 @@ static int Open(vout_display_t *vd,
         chroma = NULL;
     }
 
-    if (!ChromaNegotiation(vd)) {
+    vlc_fourcc_t fourcc = ChromaNegotiation(vd);
+    if (!fourcc) {
         Close(vd);
         return VLC_EGENERIC;
     }
 
     msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
-            (char*)&sys->vlc_fourcc, (char*)&sys->drm_fourcc);
+            (char*)&fourcc, (char*)&sys->drm_fourcc);
 
     video_format_ApplyRotation(&fmt, vd->fmt);
 
@@ -569,7 +567,7 @@ static int Open(vout_display_t *vd,
     picture_resource_t rsc = { 0 };
     fmt.i_width = fmt.i_visible_width  = sys->width;
     fmt.i_height = fmt.i_visible_height = sys->height;
-    fmt.i_chroma = sys->vlc_fourcc;
+    fmt.i_chroma = fourcc;
 
     sys->picture = picture_NewFromResource(&fmt, &rsc);
 
