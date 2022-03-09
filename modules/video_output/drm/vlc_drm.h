@@ -28,6 +28,7 @@
 #include <sys/ioctl.h>
 #include <vlc_common.h>
 
+struct vlc_logger;
 struct video_format_t;
 
 /**
@@ -60,6 +61,28 @@ uint_fast32_t vlc_drm_format(const struct video_format_t *fmt);
  * \return the corresponding VLC pixel format, or 0 if not found.
  */
 vlc_fourcc_t vlc_fourcc_drm(uint_fast32_t drm_fourcc);
+
+/**
+ * Allocates a DRM dumb buffer.
+ *
+ * \param fd DRM device file descriptor
+ * \param fmt picture format
+ * \return a DRM dumb frame buffer as picture, or NULL on error.
+ */
+picture_t *vlc_drm_dumb_alloc(struct vlc_logger *, int fd,
+                              const video_format_t *restrict fmt);
+
+/**
+ * Allocates a DRM dumb frame buffer.
+ *
+ * \param fd DRM device file descriptor
+ * \param fmt picture format
+ * \return a DRM dumb frame buffer as picture, or NULL on error.
+ */
+picture_t *vlc_drm_dumb_alloc_fb(struct vlc_logger *, int fd,
+                                 const video_format_t *restrict fmt);
+
+uint32_t vlc_drm_dumb_get_fb_id(const picture_t *pic);
 
 static inline int vlc_drm_ioctl(int fd, unsigned long cmd, void *argp)
 {

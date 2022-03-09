@@ -321,6 +321,7 @@ libkms_plugin_la_LIBADD = $(KMS_LIBS)
 libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/vlc_drm.h \
 	video_output/drm/fourcc.c \
+	video_output/drm/buffers.c \
 	video_output/drm/display.c
 libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(KMS_CFLAGS)
 libdrm_display_plugin_la_LIBADD = $(KMS_LIBS)
