@@ -257,14 +257,14 @@ void vlc_css_parser_Init( vlc_css_parser_t *p_parser )
 bool vlc_css_parser_ParseBytes( vlc_css_parser_t *p_parser, const uint8_t *p_data, size_t i_data )
 {
     yyscan_t yy;
-    yylex_init(&yy);
+    csslex_init(&yy);
 
-    YY_BUFFER_STATE buf = yy_scan_bytes( (const char*) p_data, i_data, yy );
+    YY_BUFFER_STATE buf = css_scan_bytes( (const char*) p_data, i_data, yy );
 
-    bool b_ret = !yyparse( yy, p_parser );
+    bool b_ret = !cssparse( yy, p_parser );
 
-    yy_delete_buffer( buf, yy );
-    yylex_destroy( yy );
+    css_delete_buffer( buf, yy );
+    csslex_destroy( yy );
 
     return b_ret;
 }
@@ -272,14 +272,14 @@ bool vlc_css_parser_ParseBytes( vlc_css_parser_t *p_parser, const uint8_t *p_dat
 bool vlc_css_parser_ParseString( vlc_css_parser_t *p_parser, const char *psz_css )
 {
     yyscan_t yy;
-    yylex_init(&yy);
+    csslex_init(&yy);
 
-    YY_BUFFER_STATE buf = yy_scan_string( psz_css, yy );
+    YY_BUFFER_STATE buf = css_scan_string( psz_css, yy );
 
-    bool b_ret = !yyparse( yy, p_parser );
+    bool b_ret = !cssparse( yy, p_parser );
 
-    yy_delete_buffer( buf, yy );
-    yylex_destroy( yy );
+    css_delete_buffer( buf, yy );
+    csslex_destroy( yy );
 
     return b_ret;
 }

@@ -22,6 +22,7 @@
 
 //#define YYDEBUG 1
 //#define CSS_PARSER_DEBUG
+#define YYSTYPE CSSSTYPE
 
 typedef struct vlc_css_parser_t vlc_css_parser_t;
 typedef struct vlc_css_selector_t vlc_css_selector_t;

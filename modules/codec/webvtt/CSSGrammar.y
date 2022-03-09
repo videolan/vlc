@@ -27,6 +27,7 @@
  *
  */
 %define api.pure full
+%define api.prefix {css}
 
 %param { yyscan_t scanner }
 %parse-param { vlc_css_parser_t *css_parser }
