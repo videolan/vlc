@@ -62,13 +62,9 @@ StackView {
             root.currentItem.dismiss()
 
         if (view === _currentView) {
-            if (Object.keys(viewProperties).length === 0 && root.currentItem.hasOwnProperty("loadDefaultView") ) {
-                root.currentItem.loadDefaultView()
-            } else {
-                for ( var viewProp in viewProperties ) {
-                    if ( root.currentItem.hasOwnProperty(viewProp) ) {
-                        root.currentItem[viewProp] = viewProperties[viewProp]
-                    }
+            for ( var viewProp in viewProperties ) {
+                if ( root.currentItem.hasOwnProperty(viewProp) ) {
+                    root.currentItem[viewProp] = viewProperties[viewProp]
                 }
             }
             return true
