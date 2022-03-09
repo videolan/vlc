@@ -196,10 +196,15 @@ BUILT_SOURCES += access/screen/screenshooter-client-protocol.h
 access_LTLIBRARIES += libwl_screenshooter_plugin.la
 endif
 
-libscreen_win_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h
+libscreen_win_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h \
+	access/screen/dxgi.cpp
+libscreen_win_plugin_la_LIBADD = libd3d11_common.la $(LIBCOM) -luuid
+if HAVE_WINSTORE
+libscreen_win_plugin_la_LIBADD += -ld3d11
+endif
 if HAVE_WIN32_DESKTOP
 libscreen_win_plugin_la_SOURCES += access/screen/win32.c
-libscreen_win_plugin_la_LIBADD = -lgdi32
+libscreen_win_plugin_la_LIBADD += -lgdi32
 endif
 if HAVE_WIN32
 access_LTLIBRARIES += libscreen_win_plugin.la

@@ -84,6 +84,15 @@ struct d3d11_pic_context
     picture_sys_d3d11_t       picsys;
 };
 
+struct block_sys_d3d11_t
+{
+    block_t       self;
+    picture_t     *d3d11_pic;
+};
+
+#define D3D11BLOCK_FROM_BLOCK(block)  \
+    container_of((block), struct block_sys_d3d11_t, self)
+
 typedef struct
 {
     d3d11_device_t      d3d_dev;

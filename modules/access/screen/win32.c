@@ -82,7 +82,7 @@ static inline void ToScreenCoordinates( demux_t *p_demux, POINT *p_point )
     p_point->y -= p_data->ptl.y;
 }
 
-int screen_InitCapture( demux_t *p_demux )
+int screen_InitCaptureGDI( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data;

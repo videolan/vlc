@@ -36,6 +36,10 @@
 #   include <vlc_image.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct screen_data_t screen_data_t;
 
 struct screen_capture_operations
@@ -82,10 +86,17 @@ typedef struct
 } demux_sys_t;
 
 int      screen_InitCapture ( demux_t * );
+#if defined(_WIN32) && !defined(VLC_WINSTORE_APP)
+int      screen_InitCaptureGDI ( demux_t * );
+#endif
 
 #ifdef SCREEN_SUBSCREEN
 void FollowMouse( demux_sys_t *, int, int );
 #endif
 #ifdef SCREEN_MOUSE
 void RenderCursor( demux_t *, int, int, uint8_t * );
+#endif
+
+#ifdef __cplusplus
+}
 #endif
