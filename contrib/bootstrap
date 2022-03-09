@@ -36,6 +36,7 @@ usage()
 	echo "                   (USE AT YOUR OWN LEGAL RISKS)"
 	echo "  --disable-optim  disable optimization in libraries"
 	echo "  --enable-pdb     generate debug information in PDB format"
+	echo "  --enable-bitcode generate bitcode information"
 }
 
 BUILD=
@@ -51,6 +52,7 @@ GNUV3="1"
 AD_CLAUSES=
 WITH_OPTIMIZATION="1"
 ENABLE_PDB=
+ENABLE_BITCODE=
 
 while test -n "$1"
 do
@@ -82,6 +84,9 @@ do
 			;;
 		--enable-pdb)
 			ENABLE_PDB=1
+			;;
+		--enable-bitcode)
+			ENABLE_BITCODE=1
 			;;
 		--enable-small)
 			ENABLE_SMALL=1
@@ -305,6 +310,10 @@ case "${OS}" in
 		if test "$BUILDFORTVOS"
 		then
 			add_make_enabled "HAVE_TVOS"
+		fi
+		if test "$ENABLE_BITCODE"
+		then
+			add_make_enabled "HAVE_BITCODE_ENABLED"
 		fi
 		;;
 	*bsd*)
