@@ -314,6 +314,11 @@ CFLAGS := $(CFLAGS) -g -O2
 CXXFLAGS := $(CXXFLAGS) -g -O2
 endif
 
+ifdef HAVE_BITCODE_ENABLED
+CFLAGS := $(CFLAGS) -fembed-bitcode
+CXXFLAGS := $(CXXFLAGS) -fembed-bitcode
+endif
+
 ifdef ENABLE_PDB
 ifdef HAVE_CLANG
 ifneq ($(findstring $(ARCH),i686 x86_64),)
@@ -431,6 +436,9 @@ ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else
 MESONFLAGS += --buildtype debugoptimized
+endif
+ifdef HAVE_BITCODE_ENABLED
+MESONFLAGS += -Db_bitcode=true
 endif
 
 ifdef HAVE_CROSS_COMPILE
