@@ -26,6 +26,7 @@
 %option nostdinit
 %option nounput
 %option noyywrap
+%option prefix="json" outfile="lex.yy.c"
 
 %{
 

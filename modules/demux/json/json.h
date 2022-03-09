@@ -24,6 +24,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define YYSTYPE JSONSTYPE
+
 enum json_type {
     JSON_NULL,
     JSON_BOOLEAN,

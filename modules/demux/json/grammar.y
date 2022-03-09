@@ -19,6 +19,8 @@
  *****************************************************************************/
 
 %define api.pure full
+%define api.prefix {json}
+
 %lex-param { void *scanner }
 %parse-param { void *log }
 %parse-param { void *scanner }
@@ -153,9 +155,9 @@ static void yyerror(void *log, void *scanner, struct json_object *result,
 	(void) scanner; (void) result;
 }
 
-extern int yylex_init_extra(void *, void **);
+extern int jsonlex_init_extra(void *, void **);
 extern int yylex(YYSTYPE *value, void *scanner);
-extern int yylex_destroy(void *);
+extern int jsonlex_destroy(void *);
 
 %}
 
@@ -216,12 +218,12 @@ value:
 int json_parse(void *opaque, struct json_object *result)
 {
 	void *scanner;
-	int ret = yylex_init_extra(opaque, &scanner);
+	int ret = jsonlex_init_extra(opaque, &scanner);
 
 	if (ret)
 		return ret;
 
 	ret = yyparse(opaque, scanner, result);
-	yylex_destroy(scanner);
+	jsonlex_destroy(scanner);
 	return ret;
 }
