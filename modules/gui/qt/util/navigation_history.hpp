@@ -79,6 +79,14 @@ public slots:
      */
     Q_INVOKABLE void update(QVariantList itemList);
 
+    /**
+     * @brief same as @a push(QVariantList) but modify the last (current) item's tail instead of insterting a new one
+     *
+     * @see push
+     */
+    Q_INVOKABLE void addLeaf(QVariantMap itemMap);
+
+
     // Go to previous page
     void previous( PostAction = PostAction::Go );
 

@@ -3,6 +3,7 @@
 #include "network/networkmediamodel.hpp"
 #include "medialibrary/mlqmltypes.hpp"
 
+
 NavigationHistory::NavigationHistory(QObject *parent)
     : QObject(parent)
 {
@@ -46,6 +47,39 @@ static void pushListRec(QVariantMap& itemMap, QVariantList::const_iterator it, Q
             itemMap[kv.key()] = kv.value();
         pushListRec(itemMap, ++it, end);
     }
+}
+
+static void addLeafRec(QVariant &item, const QVariantMap &leaf)
+{
+    auto itemMap = item.toMap();
+    if (itemMap.contains("view"))
+    {
+        QVariant viewProps = itemMap.value("view");
+        addLeafRec(viewProps, leaf);
+        itemMap["view"] = viewProps;
+    }
+    else if (itemMap.contains("properties"))
+    {
+        QVariant propsVar = itemMap.value("properties");
+        const auto propsMap = propsVar.toMap();
+        if (propsMap.empty())
+        {
+            itemMap["properties"] = leaf;
+        }
+        else
+        {
+            addLeafRec(propsVar, leaf);
+            itemMap["properties"] = propsVar;
+        }
+    }
+    else
+    {
+        // invalid node?
+        return;
+    }
+
+    //overwrite item QVariant
+    item = itemMap;
 }
 
 
@@ -94,7 +128,6 @@ static bool isNodeValid(QVariant& value)
     return false;
 }
 
-
 void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostAction postAction)
 {
     QVariantMap itemMap;
@@ -125,6 +158,12 @@ void NavigationHistory::update(QVariantList itemList)
     if (!rootView.canConvert(QVariant::Map))
         return;
     update(rootView.toMap());
+}
+
+void NavigationHistory::addLeaf(QVariantMap itemMap)
+{
+    assert(m_history.size() >= 1);
+    addLeafRec(m_history.back(), itemMap);
 }
 
 void NavigationHistory::previous(PostAction postAction)
