@@ -196,16 +196,19 @@ BUILT_SOURCES += access/screen/screenshooter-client-protocol.h
 access_LTLIBRARIES += libwl_screenshooter_plugin.la
 endif
 
-libscreen_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h
-libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+libscreen_win_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h
 if HAVE_WIN32_DESKTOP
-libscreen_plugin_la_SOURCES += access/screen/win32.c
-libscreen_plugin_la_LIBADD = -lgdi32
-access_LTLIBRARIES += libscreen_plugin.la
+libscreen_win_plugin_la_SOURCES += access/screen/win32.c
+libscreen_win_plugin_la_LIBADD = -lgdi32
 endif
+if HAVE_WIN32
+access_LTLIBRARIES += libscreen_win_plugin.la
+endif
+
 if HAVE_MAC_SCREEN
-libscreen_plugin_la_SOURCES += access/screen/mac.c
-libscreen_plugin_la_LDFLAGS += "-Wl,-framework,OpenGL,-framework,ApplicationServices"
+libscreen_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h \
+	access/screen/mac.c
+libscreen_plugin_la_LDFLAGS = $(AM_LDFLAGS) "-Wl,-framework,OpenGL,-framework,ApplicationServices"
 access_LTLIBRARIES += libscreen_plugin.la
 endif
 
