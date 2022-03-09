@@ -226,20 +226,16 @@ static int Open( vlc_object_t *p_this )
 
     get_path( p_access );
 
-    smb_session_interrupt_register( p_sys );
-
     if( login( p_access ) != VLC_SUCCESS )
     {
         msg_Err( p_access, "Unable to open file with path %s (in share %s)",
                  p_sys->psz_path, p_sys->psz_share );
-        smb_session_interrupt_unregister();
         goto error;
     }
 
     /* If there is no shares, browse them */
     if( !p_sys->psz_share )
     {
-        smb_session_interrupt_unregister();
         return BrowserInit( p_access );
     }
 
@@ -247,6 +243,8 @@ static int Open( vlc_object_t *p_this )
 
     msg_Dbg( p_access, "Path: Share name = %s, path = %s", p_sys->psz_share,
              p_sys->psz_path );
+
+    smb_session_interrupt_register( p_sys );
 
     st = smb_stat_fd( p_sys->p_session, p_sys->i_fd );
     if( smb_stat_get( st, SMB_STAT_ISDIR ) )
@@ -468,8 +466,11 @@ static int login( stream_t *p_access )
     {
         struct dsm_cache_context *context = cache_entry->context;
 
+        smb_session_interrupt_register( p_sys );
         int ret = smb_fopen( context->session, context->tid,
                              p_sys->psz_path, SMB_MOD_RO, &p_sys->i_fd );
+        smb_session_interrupt_unregister();
+
         if( ret == DSM_SUCCESS )
         {
             p_sys->cache_entry = cache_entry;
@@ -484,6 +485,8 @@ static int login( stream_t *p_access )
         }
     }
 
+    smb_session_interrupt_register( p_sys );
+
     /* Now that we have the required data, let's establish a session */
     int status = smb_session_connect( p_sys->p_session, p_sys->netbios_name,
                                       p_sys->addr.s_addr, SMB_TRANSPORT_TCP );
@@ -492,13 +495,19 @@ static int login( stream_t *p_access )
         msg_Err( p_access, "Unable to connect/negotiate SMB session");
         /* FIXME: libdsm wrongly return network error when the server can't
          * handle the SMBv1 protocol */
+        smb_session_interrupt_unregister();
         goto error;
     }
 
     /* Try to authenticate on the remote machine */
     int connect_err = smb_connect( p_access, psz_login, psz_password, psz_domain );
     if( connect_err == ENOENT )
+    {
+        smb_session_interrupt_unregister();
         goto error;
+    }
+
+    smb_session_interrupt_unregister();
 
     if( connect_err == EACCES )
     {
@@ -518,7 +527,10 @@ static int login( stream_t *p_access )
             psz_password = credential.psz_password;
             psz_domain = credential.psz_realm ? credential.psz_realm
                                               : p_sys->netbios_name;
+
+            smb_session_interrupt_register( p_sys );
             connect_err = smb_connect( p_access, psz_login, psz_password, psz_domain );
+            smb_session_interrupt_unregister();
         }
 
         if( connect_err != 0 )
