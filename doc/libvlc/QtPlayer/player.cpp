@@ -200,7 +200,7 @@ void Mwindow::updateInterface() { //Update interface and check if song is finish
     slider->setValue((int)(pos*1000.0));
 
     /* Stop the media */
-    if (libvlc_media_player_get_state(vlcPlayer) == libvlc_Ended)
+    if (libvlc_media_player_get_state(vlcPlayer) == libvlc_Stopped)
         this->stop();
 }
 

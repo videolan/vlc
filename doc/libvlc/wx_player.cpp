@@ -122,7 +122,7 @@ MainWindow::MainWindow(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     vlc_inst = libvlc_new(0, NULL);
     media_player = libvlc_media_player_new(vlc_inst);
     vlc_evt_man = libvlc_media_player_event_manager(media_player);
-    libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerEndReached, ::OnEndReached_VLC, NULL);
+    libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerStopped, ::OnEndReached_VLC, NULL);
     libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerPositionChanged, ::OnPositionChanged_VLC, NULL);
     Connect(wxID_ANY, vlcEVT_END, wxCommandEventHandler(MainWindow::OnEndReached_VLC));
     Connect(wxID_ANY, vlcEVT_POS, wxCommandEventHandler(MainWindow::OnPositionChanged_VLC));
