@@ -1602,7 +1602,7 @@ libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
         case VLC_PLAYER_STATE_STOPPED:
             return libvlc_Stopped;
         case VLC_PLAYER_STATE_STOPPING:
-            return libvlc_Ended;
+            return libvlc_Stopping;
         case VLC_PLAYER_STATE_STARTED:
             return libvlc_Opening;
         case VLC_PLAYER_STATE_PLAYING:
