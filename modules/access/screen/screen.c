@@ -35,6 +35,9 @@
 #include <vlc_filter.h>
 #include <vlc_url.h>
 #include "screen.h"
+#ifdef SCREEN_MOUSE
+#   include <vlc_image.h>
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -261,12 +264,6 @@ static void Close( vlc_object_t *p_this )
 #ifdef SCREEN_MOUSE
     if( p_sys->p_mouse )
         picture_Release( p_sys->p_mouse );
-    if( p_sys->p_blend )
-    {
-        filter_Close( p_sys->p_blend );
-        module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
-        vlc_object_delete(p_sys->p_blend);
-    }
 #endif
     free( p_sys );
 }
@@ -354,68 +351,5 @@ void FollowMouse( demux_sys_t *p_sys, int i_x, int i_y )
     if( i_y < 0 ) i_y = 0;
     p_sys->i_top = __MIN( (unsigned int)i_y,
     p_sys->i_screen_height - p_sys->i_height );
-}
-#endif
-
-#ifdef SCREEN_MOUSE
-void RenderCursor( demux_t *p_demux, int i_x, int i_y,
-                   uint8_t *p_dst )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    if( !p_sys->dst.i_planes )
-        picture_Setup( &p_sys->dst, &p_sys->fmt.video );
-
-    if( !p_sys->dst.i_planes )
-        return;
-
-#ifdef _WIN32
-    /* Bitmaps here created by CreateDIBSection: stride rounded up to the nearest DWORD */
-    p_sys->dst.p[ 0 ].i_pitch = p_sys->dst.p[ 0 ].i_visible_pitch =
-        ( ( ( ( p_sys->fmt.video.i_width * p_sys->fmt.video.i_bits_per_pixel ) + 31 ) & ~31 ) >> 3 );
-#endif
-
-    if( !p_sys->p_blend )
-    {
-        p_sys->p_blend = vlc_object_create( p_demux, sizeof(filter_t) );
-        if( p_sys->p_blend )
-        {
-            es_format_Init( &p_sys->p_blend->fmt_in, VIDEO_ES,
-                            VLC_CODEC_RGBA );
-            p_sys->p_blend->fmt_in.video = p_sys->p_mouse->format;
-            p_sys->p_blend->fmt_out = p_sys->fmt;
-            p_sys->p_blend->p_module =
-                module_need( p_sys->p_blend, "video blending", NULL, false );
-            if( !p_sys->p_blend->p_module )
-            {
-                msg_Err( p_demux, "Could not load video blending module" );
-                vlc_object_delete(p_sys->p_blend);
-                p_sys->p_blend = NULL;
-            }
-            assert( p_sys->p_blend->ops != NULL );
-        }
-    }
-    if( p_sys->p_blend )
-    {
-        p_sys->dst.p->p_pixels = p_dst;
-        p_sys->p_blend->ops->blend_video( p_sys->p_blend,
-                                        &p_sys->dst,
-                                        p_sys->p_mouse,
-#ifdef SCREEN_SUBSCREEN
-                                        i_x-p_sys->i_left,
-#else
-                                        i_x,
-#endif
-#ifdef SCREEN_SUBSCREEN
-                                        i_y-p_sys->i_top,
-#else
-                                        i_y,
-#endif
-                                        255 );
-    }
-    else
-    {
-        picture_Release( p_sys->p_mouse );
-        p_sys->p_mouse = NULL;
-    }
 }
 #endif

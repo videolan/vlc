@@ -32,10 +32,6 @@
 #define SCREEN_SUBSCREEN
 #define SCREEN_MOUSE
 
-#ifdef SCREEN_MOUSE
-#   include <vlc_image.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -72,7 +68,6 @@ typedef struct
 
 #ifdef SCREEN_MOUSE
     picture_t *p_mouse;
-    filter_t *p_blend;
     picture_t dst;
 #endif
 
@@ -92,9 +87,6 @@ int      screen_InitCaptureGDI ( demux_t * );
 
 #ifdef SCREEN_SUBSCREEN
 void FollowMouse( demux_sys_t *, int, int );
-#endif
-#ifdef SCREEN_MOUSE
-void RenderCursor( demux_t *, int, int, uint8_t * );
 #endif
 
 #ifdef __cplusplus
