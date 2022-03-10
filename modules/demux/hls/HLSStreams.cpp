@@ -77,16 +77,23 @@ bool HLSStream::setPosition(const StreamPosition &pos, bool b)
     return ok;
 }
 
-bool HLSStream::isContiguousMux() const
+void HLSStream::trackerEvent(const TrackerEvent &e)
 {
-    if(format == StreamFormat::Type::WebVTT)
-        return false;
-    if(format == StreamFormat::Type::Unknown)
+    AbstractStream::trackerEvent(e);
+
+    if(e.getType() == TrackerEvent::Type::FormatChange)
     {
-        const Role r = segmentTracker->getStreamRole();
-        return !(r == Role::Value::Caption || r == Role::Value::Subtitle);
+        if(format == StreamFormat::Type::WebVTT)
+        {
+            contiguous = false;
+        }
+        else if(format == StreamFormat::Type::Unknown)
+        {
+            const Role r = segmentTracker->getStreamRole();
+            contiguous = !(r == Role::Value::Caption || r == Role::Value::Subtitle);
+        }
+        else contiguous = true;
     }
-    return true;
 }
 
 int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
