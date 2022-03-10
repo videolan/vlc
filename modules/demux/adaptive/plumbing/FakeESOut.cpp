@@ -341,6 +341,13 @@ void FakeESOut::setSegmentStartTimes(const SegmentTimes &t)
     startTimes = t;
 }
 
+void FakeESOut::setSegmentProgressTimes(const SegmentTimes &t)
+{
+    AbstractCommand *c = commandsFactory()->createEsOutMediaProgressCommand(t);
+    if(c)
+        commandsQueue()->Schedule(c);
+}
+
 bool FakeESOut::hasSynchronizationReference() const
 {
     return synchronizationReference.second.continuous != VLC_TS_INVALID;
