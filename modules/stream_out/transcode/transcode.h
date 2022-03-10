@@ -2,6 +2,7 @@
 #include <vlc_filter.h>
 #include <vlc_codec.h>
 #include "encoder/encoder.h"
+#include "pcr_helper.h"
 
 /*100ms is around the limit where people are noticing lipsync issues*/
 #define MASTER_SYNC_MAX_DRIFT VLC_TICK_FROM_MS(100)
@@ -64,6 +65,7 @@ typedef struct
     /* Spu's video */
     sout_stream_id_sys_t *id_video;
 
+    vlc_pcr_sync_t *pcr_sync;
 } sout_stream_sys_t;
 
 struct aout_filters;
@@ -147,6 +149,8 @@ struct sout_stream_id_sys_t
     /* Sync */
     date_t          next_input_pts; /**< Incoming calculated PTS */
     vlc_tick_t      i_drift; /** how much buffer is ahead of calculated PTS */
+
+    transcode_track_pcr_helper_t *pcr_helper;
 };
 
 struct decoder_owner
