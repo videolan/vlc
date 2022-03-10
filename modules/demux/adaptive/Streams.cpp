@@ -805,6 +805,8 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
 
         case TrackerEvent::Type::SegmentGap:
             segmentgap = true;
+            prevEndTimeContext = SegmentTimes();
+            currentTimeContext = SegmentTimes(); /* fired before segmentchanged */
             break;
 
         case TrackerEvent::Type::FormatChange:
