@@ -25,10 +25,6 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
-#ifdef __APPLE__
-#   define SCREEN_DISPLAY_ID
-#endif
-
 #define SCREEN_SUBSCREEN
 #define SCREEN_MOUSE
 
@@ -69,11 +65,6 @@ typedef struct
 #ifdef SCREEN_MOUSE
     picture_t *p_mouse;
     picture_t dst;
-#endif
-
-#ifdef SCREEN_DISPLAY_ID
-  unsigned int i_display_id;
-  unsigned int i_screen_index;
 #endif
 
     screen_data_t *p_data;

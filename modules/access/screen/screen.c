@@ -78,7 +78,7 @@
     "capture." )
 #endif
 
-#ifdef SCREEN_DISPLAY_ID
+#ifdef __APPLE__
 #define DISPLAY_ID_TEXT N_( "Display ID" )
 #define DISPLAY_ID_LONGTEXT N_( \
     "Display ID. If not specified, main display ID is used." )
@@ -121,7 +121,7 @@ vlc_module_begin ()
     add_integer( "screen-fragment-size", 0, FRAGS_TEXT, FRAGS_LONGTEXT )
 #endif
 
-#ifdef SCREEN_DISPLAY_ID
+#ifdef __APPLE__
     add_integer( "screen-display-id", 0, DISPLAY_ID_TEXT, DISPLAY_ID_LONGTEXT )
     add_integer( "screen-index", 0, INDEX_TEXT, INDEX_LONGTEXT )
 #endif
@@ -164,11 +164,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_left = var_CreateGetInteger( p_demux, "screen-left" );
     p_sys->i_width = var_CreateGetInteger( p_demux, "screen-width" );
     p_sys->i_height = var_CreateGetInteger( p_demux, "screen-height" );
-#endif
-
-#ifdef SCREEN_DISPLAY_ID
-    p_sys->i_display_id = var_CreateGetInteger( p_demux, "screen-display-id" );
-    p_sys->i_screen_index = var_CreateGetInteger( p_demux, "screen-index" );
 #endif
 
     if( screen_InitCapture( p_demux ) != VLC_SUCCESS )

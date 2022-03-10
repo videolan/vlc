@@ -73,10 +73,15 @@ int screen_InitCapture(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
     CGLError returnedError;
+    unsigned int i_display_id;
+    unsigned int i_screen_index;
 
     p_sys->p_data = p_data = calloc(1, sizeof(screen_data_t));
     if (!p_data)
         return VLC_ENOMEM;
+
+    i_display_id = var_CreateGetInteger( p_demux, "screen-display-id" );
+    i_screen_index = var_CreateGetInteger( p_demux, "screen-index" );
 
     /* fetch the screen we should capture */
     p_data->display_id = kCGDirectMainDisplay;
@@ -89,15 +94,15 @@ int screen_InitCapture(demux_t *p_demux)
         ids = vlc_alloc(displayCount, sizeof(CGDirectDisplayID));
         returnedError = CGGetOnlineDisplayList(displayCount, ids, &displayCount);
         if (!returnedError) {
-            if (p_sys->i_display_id > 0) {
+            if (i_display_id > 0) {
                 for (unsigned int i = 0; i < displayCount; i++) {
-                    if (p_sys->i_display_id == ids[i]) {
+                    if (i_display_id == ids[i]) {
                         p_data->display_id = ids[i];
                         break;
                     }
                 }
-            } else if (p_sys->i_screen_index > 0 && p_sys->i_screen_index <= displayCount)
-                p_data->display_id = ids[p_sys->i_screen_index - 1];
+            } else if (i_screen_index > 0 && i_screen_index <= displayCount)
+                p_data->display_id = ids[i_screen_index - 1];
         }
         free(ids);
     }
