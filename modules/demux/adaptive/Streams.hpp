@@ -120,11 +120,11 @@ namespace adaptive
                                            es_out_t *, AbstractSourceStream *) const  override;
         virtual bool startDemux();
         virtual bool restartDemux();
-        virtual bool isContiguousMux() const;
 
         virtual void prepareRestart(bool = true);
         bool resetForNewPosition(vlc_tick_t);
 
+        bool contiguous;
         bool segmentgap;
         bool discontinuity;
         bool needrestart;
