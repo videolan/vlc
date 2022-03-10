@@ -147,6 +147,16 @@ namespace adaptive
             AbstractFakeEsOut *out;
     };
 
+    class EsOutMediaProgressCommand : public AbstractCommand
+    {
+         friend class CommandsFactory;
+        public:
+            virtual void Execute() override;
+
+        protected:
+            EsOutMediaProgressCommand( const SegmentTimes & );
+    };
+
     /* Factory so we can alter behaviour and filter on execution */
     class CommandsFactory
     {
@@ -164,6 +174,7 @@ namespace adaptive
             virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
             virtual EsOutMetaCommand * createEsOutMetaCommand( AbstractFakeEsOut *, int, const vlc_meta_t * ) const;
             virtual EsOutMilestoneCommand * createEsOutMilestoneCommand( AbstractFakeEsOut * ) const;
+            virtual EsOutMediaProgressCommand * createEsOutMediaProgressCommand( const SegmentTimes & ) const;
     };
 
     using Queueentry = std::pair<uint64_t, AbstractCommand *>;
@@ -184,6 +195,7 @@ namespace adaptive
             bool isDraining() const;
             bool isEOF() const;
             virtual Times getDemuxedAmount(Times) const  = 0;
+            virtual Times getDemuxedMediaAmount(const Times &) const = 0;
             virtual Times getBufferingLevel() const  = 0;
             virtual Times getFirstTimes() const  = 0;
             virtual Times getPCR() const = 0;
@@ -207,6 +219,7 @@ namespace adaptive
             virtual bool isEmpty() const override;
             virtual void setDraining() override;
             virtual Times getDemuxedAmount(Times) const override;
+            virtual Times getDemuxedMediaAmount(const Times &) const override;
             virtual Times getBufferingLevel() const override;
             virtual Times getFirstTimes() const override;
             virtual Times getPCR() const override;
@@ -216,6 +229,7 @@ namespace adaptive
             void LockedSetDraining();
             std::list<Queueentry> incoming;
             std::list<Queueentry> commands;
+            SegmentTimes bufferinglevel_media;
             Times bufferinglevel;
             Times pcr;
             uint64_t nextsequence;

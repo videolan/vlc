@@ -108,6 +108,7 @@ namespace adaptive
             void scheduleNecessaryMilestone();
             bool hasSegmentStartTimes() const;
             void setSegmentStartTimes(const SegmentTimes &);
+            void setSegmentProgressTimes(const SegmentTimes &);
             bool hasSynchronizationReference() const;
             void setSynchronizationReference(const SynchronizationReference &);
             void schedulePCRReset();
