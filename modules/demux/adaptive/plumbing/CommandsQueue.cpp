@@ -509,6 +509,7 @@ Times CommandsQueue::getDemuxedAmount(Times from) const
     Times bufferingstart = getFirstTimes();
     if( bufferinglevel.continuous == VLC_TS_INVALID ||
         bufferingstart.continuous == VLC_TS_INVALID ||
+        from.continuous == VLC_TS_INVALID ||
         from.continuous > bufferinglevel.continuous )
         return Times(SegmentTimes(0,0),0);
     if( from.continuous > bufferingstart.continuous )
