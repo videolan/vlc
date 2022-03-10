@@ -538,8 +538,18 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
             vlc_mutex_unlock(&lock);
             return BufferingStatus::End;
         }
-        i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(deadline).continuous;
-        segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
+
+        if(deadline.continuous != VLC_TICK_INVALID)
+        {
+            i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(deadline).continuous;
+            segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
+        }
+        else
+        {
+            /* On initial pass, there's no demux time known, we need to fake it */
+            if(fakeEsOut()->commandsQueue()->getBufferingLevel().continuous != VLC_TICK_INVALID)
+                i_demuxed = i_min_buffering;
+        }
     }
     vlc_mutex_unlock(&lock);
 
