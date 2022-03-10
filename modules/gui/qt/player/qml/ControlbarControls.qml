@@ -44,6 +44,7 @@ QtObject {
         { id: ControlListModel.RECORD_BUTTON, file: "RecordButton.qml", label: VLCIcons.record, text: I18n.qtr("Record") },
         { id: ControlListModel.ATOB_BUTTON, file: "AtoBButton.qml", label: VLCIcons.atob, text: I18n.qtr("A-B Loop") },
         { id: ControlListModel.FRAME_BUTTON, file: "FrameButton.qml", label: VLCIcons.frame_by_frame, text: I18n.qtr("Frame By Frame") },
+        { id: ControlListModel.REVERSE_BUTTON, file: "ReverseButton.qml", label: VLCIcons.play_reverse, text: I18n.qtr("Trickplay Reverse") },
         { id: ControlListModel.SKIP_BACK_BUTTON, file: "SkipBackButton.qml", label: VLCIcons.skip_back, text: I18n.qtr("Step backward") },
         { id: ControlListModel.SKIP_FW_BUTTON, file: "SkipForwardButton.qml", label: VLCIcons.skip_for, text: I18n.qtr("Step forward") },
         { id: ControlListModel.QUIT_BUTTON, file: "QuitButton.qml", label: VLCIcons.clear, text: I18n.qtr("Quit") },
