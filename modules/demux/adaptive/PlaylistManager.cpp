@@ -235,10 +235,6 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(Times deadline,
         PrioritizedAbstractStream &p = *it;
         p.st = *sit;
         p.status = p.st->getBufferAndStatus(deadline, i_min_buffering, i_max_buffering, &p.demuxed_amount);
-        p.demuxed_amount = p.st->getDemuxedAmount(deadline).continuous;
-        mtime_t mediaAmount;
-        if(p.st->getMediaAdvanceAmount(&mediaAmount) && mediaAmount > p.demuxed_amount)
-            p.demuxed_amount = mediaAmount;
         ++it;
     }
     std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);

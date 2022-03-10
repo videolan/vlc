@@ -86,7 +86,7 @@ namespace adaptive
         BufferingStatus bufferize(Times, mtime_t, mtime_t,
                                   mtime_t, bool = false);
         BufferingStatus getBufferAndStatus(const Times &, mtime_t, mtime_t, mtime_t *);
-        Times getDemuxedAmount(Times) const;
+        mtime_t getDemuxedAmount(Times) const;
         Status dequeue(Times, Times *);
         bool decodersDrained();
 
