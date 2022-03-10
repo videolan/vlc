@@ -511,21 +511,11 @@ Times CommandsQueue::getDemuxedAmount(Times from) const
         bufferingstart.continuous == VLC_TS_INVALID ||
         from.continuous == VLC_TS_INVALID ||
         from.continuous > bufferinglevel.continuous )
-        return Times(SegmentTimes(0,0),0);
-    if( from.continuous > bufferingstart.continuous )
-    {
-        Times t = bufferinglevel;
-        t.segment.offsetBy( -from.continuous );
-        t.continuous -= from.continuous;
-        return t;
-    }
-    else
-    {
-        Times t = bufferinglevel;
-        t.segment.offsetBy( -bufferingstart.continuous );
-        t.continuous -= bufferingstart.continuous;
-        return t;
-    }
+        return Times(SegmentTimes(0,0),0); /* durations */
+
+    Times t = bufferinglevel;
+    t.offsetBy( - from.continuous );
+    return t;
 }
 
 Times CommandsQueue::getDemuxedMediaAmount(const Times &from) const
