@@ -64,8 +64,6 @@ targets:
             lipo -create \
                 -output "${FRAMEWORK_BIN_PATH}" \
                 "${INPUT_FILES[@]}"
-            # We have to generate dSYM bundle here because Xcode might
-            # already have generated them before script execution
             dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
 
   vlc:
@@ -126,7 +124,5 @@ targets:
             lipo -create \
                 -output "${FRAMEWORK_BIN_PATH}" \
                 "${INPUT_FILES[@]}"
-            # We have to generate dSYM bundle here because Xcode might
-            # already have generated them before script execution
             dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
 
