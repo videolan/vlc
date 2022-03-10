@@ -26,7 +26,8 @@ libstream_out_transcode_plugin_la_SOURCES = \
         stream_out/transcode/encoder/video.c \
 	stream_out/transcode/spu.c \
 	stream_out/transcode/audio.c stream_out/transcode/video.c \
-	stream_out/transcode/pcr_sync.h stream_out/transcode/pcr_sync.c
+	stream_out/transcode/pcr_sync.h stream_out/transcode/pcr_sync.c \
+	stream_out/transcode/pcr_helper.h stream_out/transcode/pcr_helper.c
 libstream_out_transcode_plugin_la_LIBADD = $(LIBM)
 libstream_out_udp_plugin_la_SOURCES = \
 	stream_out/sdp_helper.c stream_out/sdp_helper.h \
