@@ -109,9 +109,12 @@ int screen_InitCapture(demux_t *p_demux)
     p_data->screen_width = rect.size.width;
     p_data->screen_height = rect.size.height;
 
+#ifdef SCREEN_SUBSCREEN
     p_data->width = p_sys->i_width;
     p_data->height = p_sys->i_height;
-    if (p_data->width <= 0 || p_data->height <= 0) {
+    if (p_data->width <= 0 || p_data->height <= 0)
+#endif
+    {
         p_data->width = p_data->screen_width;
         p_data->height = p_data->screen_height;
     }
@@ -172,11 +175,16 @@ block_t *screen_Capture(demux_t *p_demux)
     cursor_pos.x -= p_data->screen_left;
     cursor_pos.y -= p_data->screen_top;
 
+#ifdef SCREEN_SUBSCREEN
     if (p_sys->b_follow_mouse)
         FollowMouse(p_sys, cursor_pos.x, cursor_pos.y);
 
     capture_rect.origin.x = p_sys->i_left;
     capture_rect.origin.y = p_sys->i_top;
+#else // !SCREEN_SUBSCREEN
+    capture_rect.origin.x = 0;
+    capture_rect.origin.y = 0;
+#endif // !SCREEN_SUBSCREEN
     capture_rect.size.width = p_data->width;
     capture_rect.size.height = p_data->height;
 
@@ -223,9 +231,15 @@ block_t *screen_Capture(demux_t *p_demux)
     CGRect cursor_rect;
     cursor_rect.size.width = CGImageGetWidth(cursor_image);
     cursor_rect.size.height = CGImageGetHeight(cursor_image);
+#ifdef SCREEN_SUBSCREEN
     cursor_rect.origin.x = cursor_pos.x - p_sys->i_left - outHotSpot.x;
     cursor_rect.origin.y = p_data->offscreen_rect.size.height
         - (cursor_pos.y + cursor_rect.size.height - p_sys->i_top - outHotSpot.y);
+#else // !SCREEN_SUBSCREEN
+    cursor_rect.origin.x = cursor_pos.x - outHotSpot.x;
+    cursor_rect.origin.y = p_data->offscreen_rect.size.height
+        - (cursor_pos.y + cursor_rect.size.height - outHotSpot.y);
+#endif // !SCREEN_SUBSCREEN
 
     CGContextDrawImage(p_data->offscreen_context, p_data->offscreen_rect, image);
     CGContextDrawImage(p_data->offscreen_context, cursor_rect, cursor_image);

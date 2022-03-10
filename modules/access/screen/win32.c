@@ -57,6 +57,7 @@ struct screen_data_t
 #endif
 };
 
+#if defined(SCREEN_SUBSCREEN) || defined(SCREEN_MOUSE)
 /*
  * In screen coordinates the origin is the upper-left corner of the primary
  * display, and points can have negative x/y when other displays are located
@@ -80,7 +81,9 @@ static inline void FromScreenCoordinates( demux_t *p_demux, POINT *p_point )
     p_point->x += p_data->ptl.x;
     p_point->y += p_data->ptl.y;
 }
+#endif
 
+#if defined(SCREEN_SUBSCREEN)
 static inline void ToScreenCoordinates( demux_t *p_demux, POINT *p_point )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -88,6 +91,7 @@ static inline void ToScreenCoordinates( demux_t *p_demux, POINT *p_point )
     p_point->x -= p_data->ptl.x;
     p_point->y -= p_data->ptl.y;
 }
+#endif
 
 int screen_InitCaptureGDI( demux_t *p_demux )
 {
@@ -369,16 +373,24 @@ block_t *screen_Capture( demux_t *p_demux )
         }
     }
 
+    POINT pos;
+#if defined(SCREEN_SUBSCREEN) || defined(SCREEN_MOUSE)
+    GetCursorPos( &pos );
+    FromScreenCoordinates( p_demux, &pos );
+#endif // SCREEN_SUBSCREEN || SCREEN_MOUSE
+#if defined(SCREEN_SUBSCREEN)
     if( p_sys->b_follow_mouse )
     {
-        POINT pos;
-        GetCursorPos( &pos );
-        FromScreenCoordinates( p_demux, &pos );
         FollowMouse( p_sys, pos.x, pos.y );
     }
+#endif // SCREEN_SUBSCREEN
 
+#if defined(SCREEN_SUBSCREEN)
     POINT top_left = { p_sys->i_left, p_sys->i_top };
     ToScreenCoordinates( p_demux, &top_left );
+#else // !SCREEN_SUBSCREEN
+    POINT top_left = { 0, 0 };
+#endif // !SCREEN_SUBSCREEN
 
     if( !BitBlt( p_data->hdc_dst, 0,
                  p_data->i_fragment * p_data->i_fragment_size,

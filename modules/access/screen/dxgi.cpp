@@ -99,7 +99,7 @@ static block_t *screen_Capture(demux_t *p_demux)
         goto error;
     }
 
-#ifndef VLC_WINSTORE_APP
+#if defined(SCREEN_SUBSCREEN) && !defined(VLC_WINSTORE_APP)
     if( p_sys->b_follow_mouse )
     {
         POINT pos;
@@ -108,7 +108,7 @@ static block_t *screen_Capture(demux_t *p_demux)
         pos.y -= p_data->screen_y;
         FollowMouse( p_sys, pos.x, pos.y );
     }
-#endif // !VLC_WINSTORE_APP
+#endif // SCREEN_SUBSCREEN && !VLC_WINSTORE_APP
 
     /* copy the texture into the block texture */
     hr = resource.As(&d3d11res);
@@ -118,10 +118,17 @@ static block_t *screen_Capture(demux_t *p_demux)
         goto error;
     }
     pic_sys = ActiveD3D11PictureSys(d3d11_block->d3d11_pic);
+#ifdef SCREEN_SUBSCREEN
     copyBox.left   = p_sys->i_left;
     copyBox.right  = copyBox.left + p_sys->i_width;
     copyBox.top    = p_sys->i_top;
     copyBox.bottom = copyBox.top + p_sys->i_height;
+#else // !SCREEN_SUBSCREEN
+    copyBox.left   = 0;
+    copyBox.right  = p_sys->fmt.video.i_width;
+    copyBox.top    = 0;
+    copyBox.bottom = p_sys->fmt.video.i_height;
+#endif // !SCREEN_SUBSCREEN
     copyBox.front = 0;
     copyBox.back = 1;
     d3d11_device_lock( &d3d_dev->d3d_dev );
