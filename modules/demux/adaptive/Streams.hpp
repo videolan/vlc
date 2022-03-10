@@ -158,7 +158,7 @@ namespace adaptive
 
         SegmentTimes startTimeContext;
         SegmentTimes currentTimeContext;
-        SegmentTimes prevTimeContext;
+        SegmentTimes prevEndTimeContext;
         mtime_t currentDuration;
         uint64_t currentSequence;
 
