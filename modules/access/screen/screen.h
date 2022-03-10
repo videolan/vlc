@@ -26,7 +26,9 @@
 #include <vlc_demux.h>
 
 #define SCREEN_SUBSCREEN
+#ifdef _WIN32
 #define SCREEN_MOUSE
+#endif
 
 #ifdef __cplusplus
 extern "C" {
