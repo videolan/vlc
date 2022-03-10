@@ -614,6 +614,7 @@ AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
             fakeEsOut()->commandsQueue()->getDemuxedMediaAmount(deadline).segment.media > 0)
     {
         *times = deadline;
+        fakeEsOut()->commandsQueue()->Process(Times()); /* handle untimed events (es add) */
         return Status::Demuxed;
     }
 
