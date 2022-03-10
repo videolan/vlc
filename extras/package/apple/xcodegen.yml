@@ -66,8 +66,6 @@ targets:
             lipo -create \
                 -output "${FRAMEWORK_BIN_PATH}" \
                 "${INPUT_FILES[@]}"
-            # We have to generate dSYM bundle here because Xcode might
-            # already have generated them before script execution
             dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
 
                 # mv ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/libvlc_plugin.dylib \
@@ -138,7 +136,5 @@ targets:
             lipo -create \
                 -output "${FRAMEWORK_BIN_PATH}" \
                 "${INPUT_FILES[@]}"
-            # We have to generate dSYM bundle here because Xcode might
-            # already have generated them before script execution
             dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
 
