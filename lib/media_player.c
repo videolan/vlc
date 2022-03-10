@@ -92,7 +92,7 @@ on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
             event.type = libvlc_MediaPlayerStopped;
             break;
         case VLC_PLAYER_STATE_STOPPING:
-            event.type = libvlc_MediaPlayerEndReached;
+            event.type = libvlc_MediaPlayerStopping;
             break;
         case VLC_PLAYER_STATE_STARTED:
             event.type = libvlc_MediaPlayerOpening;
