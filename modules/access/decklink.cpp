@@ -545,6 +545,7 @@ static int Open(vlc_object_t *p_this)
     int         physical_channels = 0;
     int         rate;
     BMDVideoInputFlags flags = bmdVideoInputFlagDefault;
+    void *pv;
 
     if (demux->out == NULL)
         return VLC_EGENERIC;
@@ -593,21 +594,24 @@ static int Open(vlc_object_t *p_this)
     msg_Dbg(demux, "Opened DeckLink PCI card %d (%s)", card_index, model_name);
     free(model_name);
 
-    if (sys->card->QueryInterface(IID_IDeckLinkInput, (void**)&sys->input) != S_OK) {
+    if (sys->card->QueryInterface(IID_IDeckLinkInput, &pv) != S_OK) {
         msg_Err(demux, "Card has no inputs");
         goto finish;
     }
+    sys->input = static_cast<IDeckLinkInput*>(pv);
 
     /* Set up the video and audio sources. */
-    if (sys->card->QueryInterface(IID_IDeckLinkConfiguration, (void**)&sys->config) != S_OK) {
+    if (sys->card->QueryInterface(IID_IDeckLinkConfiguration, &pv) != S_OK) {
         msg_Err(demux, "Failed to get configuration interface");
         goto finish;
     }
+    sys->config = static_cast<IDeckLinkConfiguration*>(pv);
 
-    if (sys->card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&sys->attributes) != S_OK) {
+    if (sys->card->QueryInterface(IID_IDeckLinkProfileAttributes, &pv) != S_OK) {
         msg_Err(demux, "Failed to get attributes interface");
         goto finish;
     }
+    sys->attributes = static_cast<IDeckLinkProfileAttributes*>(pv);
 
     if (GetVideoConn(demux) || GetAudioConn(demux))
         goto finish;

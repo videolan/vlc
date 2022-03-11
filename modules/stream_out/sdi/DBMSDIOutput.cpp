@@ -213,8 +213,10 @@ int DBMSDIOutput::Open()
     msg_Dbg(p_stream, "Opened DeckLink PCI card %s", psz_model_name);
     free(psz_model_name);
 
-    result = p_card->QueryInterface(IID_IDeckLinkOutput, (void**)&p_output);
+    void *pv;
+    result = p_card->QueryInterface(IID_IDeckLinkOutput, &pv);
     CHECK("No outputs");
+    p_output = static_cast<IDeckLinkOutput*>(pv);
 
     decklink_iterator->Release();
 
@@ -258,8 +260,10 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
     {
         uint8_t maxchannels = audioMultiplex->config.getMultiplexedFramesCount() * 2;
 
-        result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
+        void *pv;
+        result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, &pv);
         CHECK("Could not get IDeckLinkAttributes");
+        p_attributes = static_cast<IDeckLinkProfileAttributes*>(pv);
 
         int64_t i64;
         result = p_attributes->GetInt(BMDDeckLinkMaximumAudioChannels, &i64);
@@ -333,6 +337,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     IDeckLinkDisplayMode *p_display_mode = NULL;
     char *psz_string = NULL;
     video_format_t *fmt = &video.configuredfmt.video;
+    void *pv;
 
     if(FAKE_DRIVER)
     {
@@ -354,8 +359,9 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     if(!p_output)
         return VLC_EGENERIC;
 
-    result = p_card->QueryInterface(IID_IDeckLinkConfiguration, (void**)&p_config);
+    result = p_card->QueryInterface(IID_IDeckLinkConfiguration, &pv);
     CHECK("Could not get config interface");
+    p_config = static_cast<IDeckLinkConfiguration*>(pv);
 
     psz_string = var_InheritString(p_stream, CFG_PREFIX "mode");
     if(psz_string)
@@ -372,8 +378,9 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     }
 
     /* Read attributes */
-    result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
+    result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, &pv);
     CHECK("Could not get IDeckLinkAttributes");
+    p_attributes = static_cast<IDeckLinkProfileAttributes*>(pv);
 
 #ifdef _WIN32
     LONGLONG iconn;

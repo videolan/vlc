@@ -418,6 +418,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     IDeckLinkConfiguration *p_config = NULL;
     IDeckLinkProfileAttributes *p_attributes = NULL;
     IDeckLink *p_card = NULL;
+    void *pv;
     union {
         BMDDisplayMode id;
         char str[4];
@@ -480,8 +481,9 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
 
     /* Read attributes */
 
-    result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
+    result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, &pv);
     CHECK("Could not get IDeckLinkAttributes");
+    p_attributes = static_cast<IDeckLinkProfileAttributes*>(pv);
 
 #ifdef _WIN32
     LONGLONG iconn;
@@ -492,13 +494,13 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     result = p_attributes->GetInt(BMDDeckLinkVideoOutputConnections, &iconn); /* reads mask */
     CHECK("Could not get BMDDeckLinkVideoOutputConnections");
 
-    result = p_card->QueryInterface(IID_IDeckLinkOutput,
-        (void**)&sys->p_output);
+    result = p_card->QueryInterface(IID_IDeckLinkOutput, &pv);
     CHECK("No outputs");
+    sys->p_output = static_cast<IDeckLinkOutput*>(pv);
 
-    result = p_card->QueryInterface(IID_IDeckLinkConfiguration,
-        (void**)&p_config);
+    result = p_card->QueryInterface(IID_IDeckLinkConfiguration, &pv);
     CHECK("Could not get config interface");
+    p_config = static_cast<IDeckLinkConfiguration*>(pv);
 
     /* Now configure card */
 
