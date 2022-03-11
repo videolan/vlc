@@ -28,6 +28,8 @@ librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
 librtp_plugin_la_DEPENDENCIES += libvlc_srtp.la
 endif
 
+noinst_HEADERS += access/rtp/fmtp.h
+
 # RTP payload parser plugins
 rtpparsedir = $(accessdir)/rtp
 rtpparse_LTLIBRARIES = \
