@@ -40,6 +40,8 @@
 #include "dtv.h"
 #undef DEBUG_MONIKER_NAME
 
+using Microsoft::WRL::ComPtr;
+
 static ModulationType dvb_parse_modulation (const char *mod)
 {
     if (!strcmp (mod, "16QAM"))   return BDA_MOD_16QAM;
@@ -396,8 +398,6 @@ BDAGraph::BDAGraph( vlc_object_t *p_this ):
     systems(0),
     d_graph_register( 0 )
 {
-    p_media_control = NULL;
-
     p_tuning_space = NULL;
 
     p_filter_graph = NULL;
@@ -1117,11 +1117,11 @@ int BDAGraph::SetDVBT2(long l_frequency, uint32_t fec,
     if( pinInput0)
     {
         msg_Dbg( p_access, "SetDVBT: pin Input0 found on tuner filter, trying to get IKsPropertySet interface for TBS tuner..." );
-        IKsPropertySet* p_ksPropertySet;
-        hr = pinInput0->QueryInterface(IID_IKsPropertySet, reinterpret_cast<void**>(&p_ksPropertySet));
+        ComPtr<IKsPropertySet> p_ksPropertySet;
+        hr = pinInput0->QueryInterface(__uuidof(p_ksPropertySet), &p_ksPropertySet);
         if( FAILED( hr ))
         {
-                msg_Dbg( p_access, "SetDVBT: Cannot query for IKsPropertySet (this can be normal if not TBS tuner)  : hr=0x%8lx", hr );
+            msg_Dbg( p_access, "SetDVBT: Cannot query for IKsPropertySet (this can be normal if not TBS tuner)  : hr=0x%8lx", hr );
         }
         else
         {
@@ -1136,7 +1136,6 @@ int BDAGraph::SetDVBT2(long l_frequency, uint32_t fec,
                                       &plp_info,
                                       sizeof( TBS_PLP_INFO ));
                 msg_Dbg( p_access, "SetDVBT: TBS tuner set PLP: %d", plp);
-                p_ksPropertySet->Release();
         }
         pinInput0->Release();
     }
@@ -2353,11 +2352,7 @@ HRESULT BDAGraph::Build()
     }
 
     /* The Media Control is used to Run and Stop the Graph */
-    if( p_media_control )
-        p_media_control->Release();
-    p_media_control = NULL;
-    hr = p_filter_graph->QueryInterface( IID_IMediaControl,
-        reinterpret_cast<void**>( &p_media_control ) );
+    hr = p_filter_graph->QueryInterface(__uuidof(p_media_control), &p_media_control);
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
@@ -3226,17 +3221,16 @@ HRESULT BDAGraph::Destroy()
     }
 
 //    msg_Dbg( p_access, "Destroy: media control 2" );
-    if( p_media_control )
+    if( p_media_control.Get() )
     {
         msg_Dbg( p_access, "Destroy: release media control" );
-        mem_ref = p_media_control->Release();
+        mem_ref = p_media_control.Reset();
         if( mem_ref != 0 )
         {
             msg_Dbg( p_access, "Destroy: "\
                 "Media control mem_ref: mem_ref=%ld", mem_ref );
         }
         msg_Dbg( p_access, "Destroy: force media control to NULL" );
-        p_media_control = NULL;
     }
 
     d_graph_register = 0;

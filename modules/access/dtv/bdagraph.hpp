@@ -38,6 +38,8 @@
 #include "bdadefs.h"
 #include <stdexcept>
 
+#include <wrl/client.h>
+
 
 // TBS tuner extension headers
 
@@ -137,7 +139,7 @@ private:
 
     BDAOutput       output;
 
-    IMediaControl*  p_media_control;
+    Microsoft::WRL::ComPtr<IMediaControl> p_media_control;
     IGraphBuilder*  p_filter_graph;
     ITuningSpace*               p_tuning_space;
     ITuneRequest*               p_tune_request;
