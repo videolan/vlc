@@ -25,7 +25,6 @@
 #endif
 
 #include "dialogs/open/openurl.hpp"
-#include "widgets/native/searchlineedit.hpp"
 #include "util/validators.hpp"
 
 #include <QPushButton>
@@ -35,6 +34,7 @@
 #include <QFile>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QLineEdit>
 
 #include <assert.h>
 
@@ -59,7 +59,8 @@ OpenUrlDialog::OpenUrlDialog( qt_intf_t *_p_intf,
     connect( box, &QDialogButtonBox::rejected, this, &OpenUrlDialog::reject );
 
     /* Info label and line edit */
-    edit = new ClickLineEdit( qtr( "Enter URL here..." ), this );
+    edit = new QLineEdit( this );
+    edit->setPlaceholderText( qtr( "Enter URL here..." ) );
     edit->setValidator( new UrlValidator( edit ) );
 
     QLabel *info = new QLabel( qtr( "Please enter the URL or path "

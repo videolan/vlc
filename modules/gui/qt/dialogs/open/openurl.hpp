@@ -31,7 +31,7 @@
 #include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
 
-class ClickLineEdit;
+class QLineEdit;
 
 class OpenUrlDialog : public QVLCDialog
 {
@@ -40,7 +40,7 @@ class OpenUrlDialog : public QVLCDialog
 private:
     QString lastUrl;
     bool bClipboard, bShouldEnqueue;
-    ClickLineEdit *edit;
+    QLineEdit *edit;
 
 private slots:
     void enqueue();

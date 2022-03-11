@@ -2,11 +2,8 @@
  * searchlineedit.hpp: Custom widgets
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * Copyright (C) 2004 Daniel Molkentin <molkentin@kde.org>
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- * The "ClickLineEdit" control is based on code by  Daniel Molkentin
- * <molkentin@kde.org> for libkdepim
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,16 +25,6 @@
 
 #include "qt.hpp"
 #include <QLineEdit>
-
-class ClickLineEdit : public QLineEdit
-{
-    Q_OBJECT
-public:
-    ClickLineEdit( const QString &msg, QWidget *parent ) : QLineEdit( parent )
-    {
-        QLineEdit::setPlaceholderText ( msg );
-    }
-};
 
 class QFramelessButton;
 class SearchLineEdit : public QLineEdit
