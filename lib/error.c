@@ -97,9 +97,11 @@ void libvlc_clearerr (void)
 /**
  * Sets the LibVLC error status and message for the current thread.
  * Any previous error is overridden.
- * @return a nul terminated string (always)
+ * \param fmt the format string
+ * \param ap the arguments
+ * \return a nul terminated string in any case
  */
-const char *libvlc_vprinterr (const char *fmt, va_list ap)
+static const char *libvlc_vprinterr (const char *fmt, va_list ap)
 {
     char *msg;
 

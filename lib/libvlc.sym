@@ -1,7 +1,5 @@
 libvlc_errmsg
 libvlc_clearerr
-libvlc_printerr
-libvlc_vprinterr
 libvlc_add_intf
 libvlc_audio_equalizer_get_amp_at_index
 libvlc_audio_equalizer_get_band_count
