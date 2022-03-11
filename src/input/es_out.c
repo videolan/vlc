@@ -3394,6 +3394,11 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         }
         input_thread_private_t *priv = input_priv(p_sys->p_input);
 
+        if ( priv->p_sout != NULL )
+        {
+            sout_StreamSetPCR( priv->p_sout, i_pcr );
+        }
+
         /* TODO do not use vlc_tick_now() but proper stream acquisition date */
         const bool b_low_delay = priv->b_low_delay;
         bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed( out );
