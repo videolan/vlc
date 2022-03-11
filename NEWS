@@ -1,3 +1,9 @@
+Changes between 3.0.17.2 and 3.0.17.3:
+----------------------------------
+
+Demux:
+ * Fix a regression causing a lack of audio in adaptive streaming
+
 Changes between 3.0.17 and 3.0.17.2:
 ----------------------------------
 
