@@ -199,6 +199,7 @@ endif
 
 libscreen_win_plugin_la_SOURCES = access/screen/screen.c access/screen/screen.h \
 	access/screen/dxgi.cpp
+libscreen_win_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libscreen_win_plugin_la_LIBADD = libd3d11_common.la $(LIBCOM) -luuid
 if HAVE_WINSTORE
 libscreen_win_plugin_la_LIBADD += -ld3d11
