@@ -142,6 +142,8 @@ private:
     MLRecentsModel* m_model = nullptr;
     QAction* m_separator = nullptr;
     MediaLib* m_ml = nullptr;
+
+    QList<QAction *> m_actions;
 };
 
 

@@ -339,27 +339,45 @@ RecentMenu::RecentMenu(MLRecentsModel* model, MediaLib* ml,  QWidget* parent)
 
 void RecentMenu::onRowsAboutToBeRemoved(const QModelIndex&, int first, int last)
 {
-    for (int i = last; i >= first; i--)
+    for (int i = first; i <= last; i++)
     {
-        QAction* action = actions()[i];
-        delete action;
+        delete m_actions.at(i);
     }
-    if (actions().count() == 0)
+
+    QList<QAction *>::iterator begin = m_actions.begin();
+
+    m_actions.erase(begin + first, begin + last);
+
+    if (m_actions.isEmpty())
         setEnabled(false);
 }
 
 void RecentMenu::onRowInserted(const QModelIndex&, int first, int last)
 {
+    QAction * before;
+
+    if (first < m_actions.count())
+        before = m_actions.at(first);
+    else
+        // NOTE: In that case we insert *before* the 'Clear' separator.
+        before = m_separator;
+
     for (int i = first; i <= last; i++)
     {
         QModelIndex index = m_model->index(i);
         QString url = m_model->data(index, MLRecentsModel::RECENT_MEDIA_URL).toString();
 
         QAction *choiceAction = new QAction(url, this);
-        insertAction(m_separator , choiceAction);
-        connect(choiceAction, &QAction::triggered, [this, i](){
-            QModelIndex dataIndex = m_model->index(i);
-            MLItemId id = m_model->data(dataIndex, MLRecentsModel::RECENT_MEDIA_ID).value<MLItemId>();
+
+        // NOTE: We are adding sequentially *before* the next action in the list.
+        insertAction(before, choiceAction);
+
+        m_actions.insert(i, choiceAction);
+
+        connect(choiceAction, &QAction::triggered, [this, choiceAction](){
+            QModelIndex index = m_model->index(m_actions.indexOf(choiceAction));
+
+            MLItemId id = m_model->data(index, MLRecentsModel::RECENT_MEDIA_ID).value<MLItemId>();
             m_ml->addAndPlay(id);
         });
         setEnabled(true);
@@ -370,23 +388,22 @@ void RecentMenu::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
 {
     for (int i = topLeft.row(); i <= bottomRight.row(); i++)
     {
-        QAction *choiceAction = actions()[i];
-
         QModelIndex index = m_model->index(i);
         QString title = m_model->data(index, MLRecentsModel::RECENT_MEDIA_URL).toString();
 
-        choiceAction->setText(title);
+        m_actions.at(i)->setText(title);
     }
 }
 
 void RecentMenu::onModelAboutToBeReset()
 {
-    for (QAction* action  :actions())
+    for (QAction * action : m_actions)
     {
-        if (action == m_separator)
-            break;
         delete action;
     }
+
+    m_actions.clear();
+
     setEnabled(false);
 }
 
