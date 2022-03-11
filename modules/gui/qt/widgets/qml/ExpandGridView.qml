@@ -593,6 +593,9 @@ FocusScope {
         Loader {
             id: headerItemLoader
 
+            x: 0
+            y: root.topMargin
+
             //load the header early (when the first row is visible)
             visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.topMargin)
             focus: item.focus
@@ -602,10 +605,6 @@ FocusScope {
 
                 // when we gain the focus ensure the widget is fully visible
                 animateFlickableContentY(0);
-            }
-            onLoaded: {
-                item.x = 0
-                item.y = root.topMargin
             }
         }
 
