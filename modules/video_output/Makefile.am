@@ -25,6 +25,7 @@ libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
 libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklinkoutput)
 if HAVE_WIN32
 libdecklinkoutput_plugin_la_LIBADD += $(LIBCOM)
+libdecklinkoutput_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
 endif
 if HAVE_LINUX
 libdecklinkoutput_plugin_la_LIBADD += $(LIBDL)

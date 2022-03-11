@@ -130,6 +130,7 @@ libdecklink_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklink)
 libdecklink_plugin_la_LIBADD = $(LIBS_decklink)
 if HAVE_WIN32
 libdecklink_plugin_la_LIBADD += $(LIBCOM)
+libdecklink_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
 endif
 if HAVE_LINUX
 libdecklink_plugin_la_LIBADD += $(LIBDL)
