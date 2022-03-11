@@ -645,7 +645,7 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
             rtp_fmt->pf_packetize = rtp_packetize_vp8;
             break;
         case VLC_CODEC_R420:
-            rtp_fmt->ptname = "RAW";
+            rtp_fmt->ptname = "raw";
             rtp_fmt->pf_packetize = rtp_packetize_r420;
             if( asprintf( &rtp_fmt->fmtp,
                     "sampling=YCbCr-4:2:0; width=%d; height=%d; "
