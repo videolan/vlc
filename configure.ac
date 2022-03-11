@@ -130,14 +130,17 @@ case "${host_os}" in
   linux*)
     SYS=linux
     CFLAGS="${CFLAGS} -pthread"
+    CXXFLAGS="${CXXFLAGS} -pthread"
     ;;
   bsdi*)
     SYS=bsdi
     CFLAGS="${CFLAGS} -pthread"
+    CXXFLAGS="${CXXFLAGS} -pthread"
     ;;
   freebsd*)
     SYS=freebsd
     CFLAGS="${CFLAGS} -pthread"
+    CXXFLAGS="${CXXFLAGS} -pthread"
     CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
     LDFLAGS="${LDFLAGS} -L/usr/local/lib"
     ac_cv_ld_z_defs=no
