@@ -486,9 +486,6 @@ libvlc_adaptive_la_SOURCES += \
 libvlc_adaptive_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/demux/adaptive
 libvlc_adaptive_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 libvlc_adaptive_la_LDFLAGS = -static
-if !HAVE_WIN32
-libvlc_adaptive_la_LDFLAGS += -lpthread
-endif
 libvlc_adaptive_la_LIBADD += libvlc_http.la $(LIBZ)
 if HAVE_GCRYPT
 libvlc_adaptive_la_CXXFLAGS += $(GCRYPT_CFLAGS)
