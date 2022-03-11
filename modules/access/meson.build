@@ -259,11 +259,6 @@ endif
 if get_option('vcd_module')
     vcd_cdda_flags = []
 
-    libcddb_dep = dependency('libcddb', version: '>= 0.9.5', required: get_option('libcddb'))
-    if libcddb_dep.found()
-        vcd_cdda_flags += '-DHAVE_LIBCDDB'
-    endif
-
     if cc.has_header_symbol('linux/cdrom.h', 'struct cdrom_msf0')
         needed_vcd_unix_headers_present = true
     elif cc.has_header_symbol('sys/scsiio.h', 'struct scsireq')
@@ -293,7 +288,7 @@ if get_option('vcd_module')
             ),
             'c_args' : vcd_cdda_flags,
             'link_with' : vlc_json_lib,
-            'dependencies' : [libcddb_dep, vcd_cdda_darwin_deps, gcrypt_dep]
+            'dependencies' : [vcd_cdda_darwin_deps, gcrypt_dep]
         }
 
         vlc_modules += {
@@ -303,7 +298,7 @@ if get_option('vcd_module')
                 'vcd/cdrom.c',
             ),
             'c_args' : vcd_cdda_flags,
-            'dependencies' : [libcddb_dep, vcd_cdda_darwin_deps]
+            'dependencies' : [vcd_cdda_darwin_deps]
         }
 
     endif

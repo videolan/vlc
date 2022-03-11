@@ -2330,10 +2330,6 @@ AC_ARG_ENABLE([vcd],
   AS_HELP_STRING([--disable-vcd],
     [disable built-in VCD and CD-DA support (default enabled)]))
 
-AC_ARG_ENABLE([libcddb],
-  AS_HELP_STRING([--disable-libcddb],
-    [disable CDDB for Audio CD (default enabled)]))
-
 if test "${enable_vcd}" != "no" -a "${enable_winstore_app}" != "yes"
 then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
@@ -2365,17 +2361,6 @@ then
   if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32" -o "${SYS}" = "os2" -o "${SYS}" = "darwin"
   then
     VLC_ADD_PLUGIN([vcd cdda])
-  fi
-
-  if test "$enable_libcddb" != "no"; then
-    PKG_CHECK_MODULES(LIBCDDB, [libcddb >= 0.9.5], [
-      HAVE_LIBCDDB=yes
-      AC_DEFINE(HAVE_LIBCDDB, 1, [Define this if you have libcddb installed])
-      VLC_ADD_LIBS([cdda],[$LIBCDDB_LIBS])
-      VLC_ADD_CFLAGS([cdda],[$LIBCDDB_CFLAGS])
-      ],:
-      [AC_MSG_WARN([${LIBCDDB_PKG_ERRORS}: CDDB access disabled.])
-      HAVE_LIBCDDB=no])
   fi
 fi
 

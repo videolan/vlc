@@ -23,7 +23,6 @@
 
 /**
  * Todo:
- *   - Improve CDDB support (non-blocking, ...)
  *   - Fix tracknumber in MRL
  */
 
@@ -61,11 +60,6 @@
 #include "vcd/cdrom.h"  /* For CDDA_DATA_SIZE */
 #include "../misc/webservices/musicbrainz.h"
 
-
-#ifdef HAVE_LIBCDDB
- #include <cddb/cddb.h>
- #include <errno.h>
-#endif
 
 #define INVALID_SECTOR ((unsigned) -1)
 
@@ -379,9 +373,6 @@ typedef struct
     int          i_cdda_last;                       /* Last .. */
     int          cdtextc;
     vlc_meta_t **cdtextv;
-#ifdef HAVE_LIBCDDB
-    cddb_disc_t *cddb;
-#endif
     musicbrainz_recording_t *mbrecord;
 } access_sys_t;
 
@@ -519,112 +510,6 @@ static musicbrainz_recording_t * GetMusicbrainzInfo( vlc_object_t *obj,
     return recording;
 }
 
-#ifdef HAVE_LIBCDDB
-static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
-{
-    msg_Dbg( obj, "retrieving metadata with CDDB" );
-
-    /* */
-    cddb_conn_t *p_cddb = cddb_new();
-    if( !p_cddb )
-    {
-        msg_Warn( obj, "unable to use CDDB" );
-        return NULL;
-    }
-
-    /* */
-
-    cddb_http_enable( p_cddb );
-
-    char *psz_tmp = var_InheritString( obj, "cddb-server" );
-    if( psz_tmp )
-    {
-        cddb_set_server_name( p_cddb, psz_tmp );
-        free( psz_tmp );
-    }
-
-    cddb_set_server_port( p_cddb, var_InheritInteger( obj, "cddb-port" ) );
-
-    cddb_set_email_address( p_cddb, "vlc@videolan.org" );
-
-    cddb_set_http_path_query( p_cddb, "/~cddb/cddb.cgi" );
-    cddb_set_http_path_submit( p_cddb, "/~cddb/submit.cgi" );
-
-
-    char *psz_cachedir;
-    char *psz_temp = config_GetUserDir( VLC_CACHE_DIR );
-    if (likely(psz_temp != NULL))
-    {
-        if( asprintf( &psz_cachedir, "%s" DIR_SEP "cddb", psz_temp ) > 0 ) {
-            cddb_cache_enable( p_cddb );
-            cddb_cache_set_dir( p_cddb, psz_cachedir );
-            free( psz_cachedir );
-        }
-        free( psz_temp );
-    }
-
-    cddb_set_timeout( p_cddb, 10 );
-
-    /* */
-    cddb_disc_t *p_disc = cddb_disc_new();
-    if( !p_disc )
-    {
-        msg_Err( obj, "unable to create CDDB disc structure." );
-        goto error;
-    }
-
-    for( int i = 0; i < p_toc->i_tracks; i++ )
-    {
-        int cddb_offset = LBAPregap(p_toc->p_sectors[i].i_lba); // 2s Pregap offset
-        cddb_track_t *t = cddb_track_new();
-        cddb_track_set_frame_offset( t, cddb_offset );
-
-        cddb_disc_add_track( p_disc, t );
-
-        msg_Dbg( obj, "Track %i offset: %i", i, cddb_offset );
-    }
-    const int64_t i_size = p_toc->p_sectors[p_toc->i_tracks].i_lba - p_toc->p_sectors[0].i_lba;
-    int i_length = (int)(i_size * CDDA_DATA_SIZE / 4 / 44100) + 2 ; // 2s Pregap
-
-    msg_Dbg( obj, "Total length: %i", i_length );
-    cddb_disc_set_length( p_disc, i_length );
-
-    if( !cddb_disc_calc_discid( p_disc ) )
-    {
-        msg_Err( obj, "CDDB disc ID calculation failed" );
-        goto error;
-    }
-
-    const int i_matches = cddb_query( p_cddb, p_disc );
-    if( i_matches < 0 )
-    {
-        msg_Warn( obj, "CDDB error: %s", cddb_error_str(errno) );
-        goto error;
-    }
-    else if( i_matches == 0 )
-    {
-        msg_Dbg( obj, "Couldn't find any matches in CDDB." );
-        goto error;
-    }
-    else if( i_matches > 1 )
-        msg_Warn( obj, "found %d matches in CDDB. Using first one.", i_matches );
-
-    cddb_read( p_cddb, p_disc );
-
-    msg_Dbg( obj, "disc ID: 0x%08x", cddb_disc_get_discid(p_disc) );
-
-    cddb_destroy( p_cddb);
-    return p_disc;
-
-error:
-    if( p_disc )
-        cddb_disc_destroy( p_disc );
-    cddb_destroy( p_cddb );
-    msg_Dbg( obj, "CDDB failure" );
-    return NULL;
-}
-#endif /* HAVE_LIBCDDB */
-
 static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 {
     access_sys_t *sys = access->p_sys;
@@ -639,52 +524,6 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
 #define NONEMPTY( psz ) ( (psz) && *(psz) )
 /* If the given string is NULL or empty, fill it by the return value of 'code' */
 #define ON_EMPTY( psz, code ) do { if( !NONEMPTY( psz) ) { (psz) = code; } } while(0)
-
-    /* Retrieve CDDB information (preferred over CD-TEXT) */
-#ifdef HAVE_LIBCDDB
-    if (sys->cddb != NULL)
-    {
-        const char *str = cddb_disc_get_title(sys->cddb);
-        if (NONEMPTY(str))
-            vlc_meta_SetTitle(meta, str);
-
-        str = cddb_disc_get_genre(sys->cddb);
-        if (NONEMPTY(str))
-            vlc_meta_SetGenre(meta, str);
-
-        const unsigned year = cddb_disc_get_year(sys->cddb);
-        if (year != 0)
-        {
-            char yearbuf[5];
-
-            int ret = snprintf(yearbuf, sizeof (yearbuf), "%u", year);
-            if (ret >= 0 && (size_t) ret < sizeof (yearbuf))
-                vlc_meta_SetDate(meta, yearbuf);
-        }
-
-        /* Set artist only if identical across tracks */
-        str = cddb_disc_get_artist(sys->cddb);
-        if (NONEMPTY(str))
-        {
-            for (int i = 0; i < sys->p_toc->i_tracks; i++)
-            {
-                cddb_track_t *t = cddb_disc_get_track(sys->cddb, i);
-                if (t == NULL)
-                    continue;
-
-                const char *track_artist = cddb_track_get_artist(t);
-                if (NONEMPTY(track_artist))
-                {
-                    if (strcmp(str, track_artist))
-                    {
-                        str = NULL;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-#endif
 }
 
 static int ReadDir(stream_t *access, input_item_node_t *node)
@@ -753,23 +592,6 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
         const char *arranger = NULL;
         const char *isrc = NULL;
         int year = 0;
-
-#ifdef HAVE_LIBCDDB
-        if (sys->cddb != NULL)
-        {
-            cddb_track_t *t = cddb_disc_get_track(sys->cddb, i);
-            if (t != NULL)
-            {
-                title = cddb_track_get_title(t);
-                artist = cddb_track_get_artist(t);
-            }
-
-            ON_EMPTY(artist, cddb_disc_get_artist(sys->cddb));
-            album = cddb_disc_get_title(sys->cddb);
-            genre = cddb_disc_get_genre(sys->cddb);
-            year = cddb_disc_get_year(sys->cddb);
-        }
-#endif
 
         /* Per track CDText */
         if(sys->cdtextc > 0)
@@ -924,18 +746,11 @@ static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
     }
 
     sys->mbrecord = NULL;
-#ifdef HAVE_LIBCDDB
-    sys->cddb = NULL;
-#endif
 
     if(var_InheritBool(obj, "metadata-network-access"))
     {
         sys->mbrecord = GetMusicbrainzInfo(obj, sys->p_toc, sys->i_cdda_tracks,
                                            sys->i_cdda_first, sys->i_cdda_last );
-#ifdef HAVE_LIBCDDB
-        if(!sys->mbrecord)
-            sys->cddb = GetCDDBInfo(obj, sys->p_toc);
-#endif
     }
     else msg_Dbg(obj, "album art policy set to manual: not fetching");
 
@@ -962,10 +777,6 @@ static void AccessClose(access_sys_t *sys)
     }
     free(sys->cdtextv);
 
-#ifdef HAVE_LIBCDDB
-    if (sys->cddb != NULL)
-        cddb_disc_destroy(sys->cddb);
-#endif
     if(sys->mbrecord)
         musicbrainz_recording_release(sys->mbrecord);
     vcddev_toc_Free(sys->p_toc);
@@ -1043,13 +854,6 @@ vlc_module_begin ()
     add_string( "musicbrainz-server", MUSICBRAINZ_DEFAULT_SERVER,
                 N_( "Musicbrainz Server" ),
                 N_( "Address of the musicbrainz server to use." ) )
-#ifdef HAVE_LIBCDDB
-    add_string( "cddb-server", "freedb.videolan.org", N_( "CDDB Server" ),
-            N_( "Address of the CDDB server to use." ) )
-    add_integer( "cddb-port", 80, N_( "CDDB port" ),
-            N_( "CDDB Server port to use." ) )
-        change_integer_range( 1, 65535 )
-#endif
 
     add_shortcut( "cdda", "cddasimple" )
 vlc_module_end ()

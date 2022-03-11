@@ -70,7 +70,7 @@ Access:
  * Added support for the Gopher Protocol
  * Added avaudiocapture module as a replacement for qtsound, which is removed now
  * Audio CD data tracks are now correctly detected and skipped
- * Deprecates Audio CD CDDB lookups in favor of more accurate Musicbrainz
+ * Replace Audio CD CDDB lookups in favor of more accurate Musicbrainz
  * Improved CD-TEXT and added Shift-JIS encoding support
  * Support for YoutubeDL (where available).
  * On-the-fly Zstandard (zstd) file decompression (where available).

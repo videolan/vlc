@@ -474,11 +474,6 @@ option('taglib',
     value : 'auto',
     description : 'Enable/disable taglib support')
 
-option('libcddb',
-    type : 'feature',
-    value : 'auto',
-    description : 'Enable/disable libcddb support')
-
 option('libass',
     type : 'feature',
     value : 'auto',

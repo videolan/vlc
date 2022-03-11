@@ -246,8 +246,8 @@ libcdda_plugin_la_SOURCES = access/cdda.c access/disc_helper.h access/vcd/cdrom.
                             access/vcd/cdrom_internals.h \
                             misc/webservices/json_helper.h misc/webservices/musicbrainz.c \
                             misc/webservices/musicbrainz.h
-libcdda_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBCDDB_CFLAGS)
-libcdda_plugin_la_LIBADD = libvlc_json.la $(LIBCDDB_LIBS) $(LIBM)
+libcdda_plugin_la_CFLAGS = $(AM_CFLAGS)
+libcdda_plugin_la_LIBADD = libvlc_json.la $(LIBM)
 libcdda_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 if HAVE_DARWIN
 libcdda_plugin_la_LIBADD += -liconv
