@@ -45,6 +45,7 @@ using namespace adaptive::playlist;
 using namespace hls::playlist;
 
 #define vlc_tick_from_sec(a) (CLOCK_FREQ * (a))
+#define SEC_FROM_VLC_TICK(a) ((a)/CLOCK_FREQ)
 
 static M3U8 * ParseM3U8(vlc_object_t *obj, const char *psz, size_t isz)
 {
@@ -375,6 +376,41 @@ int M3U8Playlist_test()
         Expect(bufferingLogic.getStartSegmentNumber(rep) == 13);
         m3u->presentationStartOffset.Set(11.5 * CLOCK_FREQ);
         Expect(bufferingLogic.getStartSegmentNumber(rep) == 11);
+
+        delete m3u;
+    }
+    catch (...)
+    {
+        delete m3u;
+        return 1;
+    }
+
+    /* Manifest 5 */
+    const char manifest5[] =
+    "#EXTM3U\n"
+    "#EXT-X-MEDIA-SEQUENCE:10\n"
+    "#EXTINF:1\n"
+    "foobar.ts\n"
+    "#EXTINF:1\n"
+    "foobar.ts\n"
+    "#EXTINF:1\n"
+    "foobar.ts\n"
+    "#EXTINF:1\n"
+    "foobar.ts\n"
+    "#EXTINF:1\n"
+    "foobar.ts\n";
+
+    m3u = ParseM3U8(obj, manifest5, sizeof(manifest5));
+    try
+    {
+        bufferingLogic = DefaultBufferingLogic();
+        bufferingLogic.setLowDelay(true);
+        Expect(m3u);
+        Expect(m3u->isLive() == true);
+        BaseRepresentation *rep = m3u->getFirstPeriod()->getAdaptationSets().front()->
+                                  getRepresentations().front();
+        Expect(bufferingLogic.getStartSegmentNumber(rep) ==
+               (UINT64_C(14) - SEC_FROM_VLC_TICK(DefaultBufferingLogic::BUFFERING_LOWEST_LIMIT)));
 
         delete m3u;
     }
