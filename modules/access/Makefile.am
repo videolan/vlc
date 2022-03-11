@@ -312,6 +312,7 @@ if HAVE_WIN32_DESKTOP
 # Work-around automake bug:
 # Use an import library for C++ to retain C linker on other platforms.
 libbda_la_SOURCES = access/dtv/bdadefs.h access/dtv/bdagraph.cpp access/dtv/bdagraph.hpp
+libbda_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libbda_la_LDFLAGS = -static
 libbda_la_LIBADD = -lstrmiids $(LIBCOM) -luuid
 noinst_LTLIBRARIES += libbda.la
