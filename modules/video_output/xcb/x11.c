@@ -106,15 +106,30 @@ static void Display (vout_display_t *vd, picture_t *pic)
                                XCB_IMAGE_FORMAT_Z_PIXMAP, 0,
                                segment, buf->offset);
     else {
-        const size_t offset = sys->fmt.i_y_offset * pic->p->i_pitch;
-        const unsigned lines = pic->p->i_lines - sys->fmt.i_y_offset;
+        const size_t offset = sys->fmt.i_x_offset * pic->p->i_pixel_pitch
+                            + sys->fmt.i_y_offset * pic->p->i_pitch;
+        unsigned int lines = pic->p->i_lines - sys->fmt.i_y_offset;
+
+        if (sys->fmt.i_x_offset > 0) {
+            /*
+             * Draw the last line separately as the scan line padding would
+             * potentially reach beyond the end of the picture buffer.
+             */
+            lines--;
+            xcb_put_image(conn, XCB_IMAGE_FORMAT_Z_PIXMAP, sys->window,
+                          sys->gc, pic->p->i_visible_pitch, 1,
+                          sys->place.x, sys->place.y + sys->place.height - 1,
+                          0, sys->depth, pic->p->i_visible_pitch,
+                          pic->p->p_pixels + offset + lines * pic->p->i_pitch);
+        }
 
         ck = xcb_put_image_checked(conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
-                               sys->window, sys->gc,
-                               pic->p->i_pitch / pic->p->i_pixel_pitch,
-                               lines, -sys->fmt.i_x_offset, 0, 0, sys->depth,
-                               pic->p->i_pitch * lines,
-                               pic->p->p_pixels + offset);
+                                   sys->window, sys->gc,
+                                   pic->p->i_pitch / pic->p->i_pixel_pitch,
+                                   lines, sys->place.x, sys->place.y,
+                                   0, sys->depth, pic->p->i_pitch * lines,
+                                   pic->p->p_pixels + offset);
+
     }
 
     /* Wait for reply. This makes sure that the X server gets CPU time to
