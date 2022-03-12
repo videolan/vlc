@@ -48,6 +48,7 @@ typedef struct vout_display_sys_t
     bool attached;
     uint8_t depth; /* useful bits per pixel */
     video_format_t fmt;
+    vout_display_place_t place;
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
@@ -153,18 +154,18 @@ static int Control(vout_display_t *vd, int query)
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
         video_format_t src, *fmt = &sys->fmt;
-        vout_display_place_t place;
+        vout_display_place_t *place = &sys->place;
         int ret = VLC_SUCCESS;
 
-        vout_display_PlacePicture(&place, vd->source, vd->cfg);
+        vout_display_PlacePicture(place, vd->source, vd->cfg);
 
         uint32_t mask = XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y;
         const uint32_t values[] = {
-            place.x, place.y, place.width, place.height
+            place->x, place->y, place->width, place->height
         };
 
-        if (place.width  != sys->fmt.i_visible_width
-         || place.height != sys->fmt.i_visible_height)
+        if (place->width  != sys->fmt.i_visible_width
+         || place->height != sys->fmt.i_visible_height)
         {
             mask |= XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
             ret = VLC_EGENERIC;
@@ -174,13 +175,13 @@ static int Control(vout_display_t *vd, int query)
         xcb_configure_window(sys->conn, sys->window, mask, values);
 
         video_format_ApplyRotation(&src, vd->source);
-        fmt->i_width  = src.i_width  * place.width / src.i_visible_width;
-        fmt->i_height = src.i_height * place.height / src.i_visible_height;
+        fmt->i_width  = src.i_width  * place->width / src.i_visible_width;
+        fmt->i_height = src.i_height * place->height / src.i_visible_height;
 
-        fmt->i_visible_width  = place.width;
-        fmt->i_visible_height = place.height;
-        fmt->i_x_offset = src.i_x_offset * place.width / src.i_visible_width;
-        fmt->i_y_offset = src.i_y_offset * place.height / src.i_visible_height;
+        fmt->i_visible_width  = place->width;
+        fmt->i_visible_height = place->height;
+        fmt->i_x_offset = src.i_x_offset * place->width / src.i_visible_width;
+        fmt->i_y_offset = src.i_y_offset * place->height / src.i_visible_height;
 
         return ret;
     }
@@ -322,14 +323,14 @@ static int Open (vout_display_t *vd,
         /* XCB_CW_COLORMAP */
         cmap,
     };
-    vout_display_place_t place;
+    vout_display_place_t *place = &sys->place;
 
-    vout_display_PlacePicture(&place, vd->source, vd->cfg);
+    vout_display_PlacePicture(place, vd->source, vd->cfg);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
 
     xcb_create_window(conn, sys->depth, sys->window, vd->cfg->window->handle.xid,
-        place.x, place.y, place.width, place.height, 0,
+        place->x, place->y, place->width, place->height, 0,
         XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, mask, values);
     xcb_map_window(conn, sys->window);
     /* Create graphic context (I wonder why the heck do we need this) */
