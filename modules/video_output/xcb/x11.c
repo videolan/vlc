@@ -94,6 +94,42 @@ static void Display (vout_display_t *vd, picture_t *pic)
 
     vlc_xcb_Manage(vd, sys->conn);
 
+    /* Black out the borders */
+    xcb_rectangle_t rectv[4], *rect;
+    unsigned int rectc = 0;
+
+    if (sys->place.x > 0) {
+        rect = &rectv[rectc++];
+        rect->x = 0;
+        rect->y = 0;
+        rect->width = sys->place.x;
+        rect->height = vd->cfg->display.height;
+    }
+    if (sys->place.x + sys->place.width < vd->cfg->display.width) {
+        rect = &rectv[rectc++];
+        rect->x = sys->place.x + sys->place.width;
+        rect->y = 0;
+        rect->width = vd->cfg->display.width - rect->x;
+        rect->height = vd->cfg->display.height;
+    }
+    if (sys->place.y > 0) {
+        rect = &rectv[rectc++];
+        rect->x = sys->place.x;
+        rect->y = 0;
+        rect->width = sys->place.width;
+        rect->height = sys->place.y;
+    }
+    if (sys->place.y + sys->place.height < vd->cfg->display.height) {
+        rect = &rectv[rectc++];
+        rect->x = sys->place.x;
+        rect->y = sys->place.y + sys->place.height;
+        rect->width = sys->place.width;
+        rect->height = vd->cfg->display.height - rect->y;
+    }
+
+    xcb_poly_fill_rectangle(conn, sys->window, sys->gc, rectc, rectv);
+
+    /* Draw the picture */
     if (sys->attached)
         ck = xcb_shm_put_image_checked(conn, sys->window, sys->gc,
               /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
