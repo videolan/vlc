@@ -147,7 +147,15 @@ static int Control(vout_display_t *vd, int query)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE: {
+        uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+        const uint32_t values[] = {
+            vd->cfg->display.width, vd->cfg->display.height,
+        };
+
+        xcb_configure_window(sys->conn, sys->window, mask, values);
+    }
+        /* fall through */
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -159,20 +167,9 @@ static int Control(vout_display_t *vd, int query)
 
         vout_display_PlacePicture(place, vd->source, vd->cfg);
 
-        uint32_t mask = XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y;
-        const uint32_t values[] = {
-            place->x, place->y, place->width, place->height
-        };
-
         if (place->width  != sys->fmt.i_visible_width
          || place->height != sys->fmt.i_visible_height)
-        {
-            mask |= XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
             ret = VLC_EGENERIC;
-        }
-
-        /* Move the picture within the window */
-        xcb_configure_window(sys->conn, sys->window, mask, values);
 
         video_format_ApplyRotation(&src, vd->source);
         fmt->i_width  = src.i_width  * place->width / src.i_visible_width;
@@ -328,10 +325,10 @@ static int Open (vout_display_t *vd,
     vout_display_PlacePicture(place, vd->source, vd->cfg);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
-
-    xcb_create_window(conn, sys->depth, sys->window, vd->cfg->window->handle.xid,
-        place->x, place->y, place->width, place->height, 0,
-        XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, mask, values);
+    xcb_create_window(conn, sys->depth, sys->window,
+                      vd->cfg->window->handle.xid,
+                      0, 0, vd->cfg->display.width, vd->cfg->display.height, 0,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, mask, values);
     xcb_map_window(conn, sys->window);
     /* Create graphic context (I wonder why the heck do we need this) */
     xcb_create_gc(conn, sys->gc, sys->window, 0, NULL);
