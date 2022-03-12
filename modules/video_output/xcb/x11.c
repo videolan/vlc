@@ -102,8 +102,9 @@ static void Display (vout_display_t *vd, picture_t *pic)
                        /* y */ sys->fmt.i_y_offset,
                    /* width */ sys->fmt.i_visible_width,
                   /* height */ sys->fmt.i_visible_height,
-                               0, 0, sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
-                               0, segment, buf->offset);
+                               sys->place.x, sys->place.y, sys->depth,
+                               XCB_IMAGE_FORMAT_Z_PIXMAP, 0,
+                               segment, buf->offset);
     else {
         const size_t offset = sys->fmt.i_y_offset * pic->p->i_pitch;
         const unsigned lines = pic->p->i_lines - sys->fmt.i_y_offset;
