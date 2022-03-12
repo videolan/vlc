@@ -31,7 +31,10 @@ OPTIONS:
    -r            Rebuild everything (tools, contribs, vlc)
    -c            Recompile contribs from sources
    -p            Build packages for all artifacts
-   -i <n|u>      Create an installable package (n: nightly, u: unsigned stripped release archive)
+   -i <n|u|z>    Create an installable package
+                     n: nightly
+                     u: unsigned stripped release archive
+                     z: zip
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $HOST_ARCH)
    -C            Use the specified VLC build dir
@@ -273,6 +276,9 @@ if [ "$PACKAGETYPE" = "u" ]; then
     shasum -a 512 vlc-*-release.zip
     shasum -a 512 vlc-macos-sdk-*.tar.gz
 
+elif [ "$PACKAGETYPE" = "z" ]; then
+    info "Packaging VLC zip archive"
+    make package-macosx-zip
 elif [ "$PACKAGETYPE" = "n" -o "$PACKAGE" = "yes" ]; then
     info "Building VLC dmg package"
     make package-macosx
