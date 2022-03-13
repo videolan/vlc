@@ -23,7 +23,9 @@
 # include <config.h>
 #endif
 
+#include <errno.h>
 #include <stdint.h>
+#include <sys/ioctl.h>
 #include <vlc_common.h>
 
 struct video_format_t;
@@ -58,3 +60,14 @@ uint_fast32_t vlc_drm_format(const struct video_format_t *fmt);
  * \return the corresponding VLC pixel format, or 0 if not found.
  */
 vlc_fourcc_t vlc_fourcc_drm(uint_fast32_t drm_fourcc);
+
+static inline int vlc_drm_ioctl(int fd, unsigned long cmd, void *argp)
+{
+    int ret;
+
+    do
+        ret = ioctl(fd, cmd, argp);
+    while (ret < 0 && (errno == EINTR || errno == EAGAIN));
+
+    return ret;
+}
