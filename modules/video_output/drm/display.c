@@ -32,9 +32,6 @@
 # include "config.h"
 #endif
 
-#include <fcntl.h>
-#include <sys/mman.h>
-
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include <drm_fourcc.h>
@@ -42,8 +39,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
-#include <vlc_fs.h>
+#include <vlc_picture.h>
 #include <vlc_vout_window.h>
 #include "vlc_drm.h"
 
@@ -65,20 +61,7 @@ typedef enum { drvSuccess, drvTryNext, drvFail } deviceRval;
 #define   MAXHWBUF 3
 
 typedef struct vout_display_sys_t {
-/*
- * buffer information
- */
-    uint32_t        width;
-    uint32_t        height;
-    uint32_t        stride;
-    uint32_t        size;
-    uint32_t        offsets[PICTURE_PLANE_MAX];
-
-    uint32_t        handle[MAXHWBUF];
-    uint8_t         *map[MAXHWBUF];
-
-    uint32_t        fb[MAXHWBUF];
-    picture_t       *picture;
+    picture_t       *buffers[MAXHWBUF];
 
     unsigned int    front_buf;
 
@@ -90,124 +73,6 @@ typedef struct vout_display_sys_t {
  */
     uint32_t        plane_id;
 } vout_display_sys_t;
-
-static void DestroyFB(vout_display_t *vd, uint32_t const buf)
-{
-    struct vout_window_t *wnd = vd->cfg->window;
-    vout_display_sys_t *sys = vd->sys;
-    int drm_fd = wnd->display.drm_fd;
-
-    struct drm_mode_destroy_dumb destroy_req = { .handle = sys->handle[buf] };
-
-    munmap(sys->map[buf], sys->size);
-    drmModeRmFB(drm_fd, sys->fb[buf]);
-    drmIoctl(drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
-}
-
-static deviceRval CreateFB(vout_display_t *vd, const int buf)
-{
-    struct vout_window_t *wnd = vd->cfg->window;
-    vout_display_sys_t *sys = vd->sys;
-    int drm_fd = wnd->display.drm_fd;
-
-    struct drm_mode_create_dumb create_req = { .width = sys->width,
-                                               .height = sys->height,
-                                               .bpp = 32 };
-    struct drm_mode_destroy_dumb destroy_req;
-    struct drm_mode_map_dumb modify_req = {};
-    unsigned int tile_width = 512, tile_height = 16;
-    deviceRval ret;
-    uint32_t i;
-    uint32_t offsets[] = {0,0,0,0}, handles[] = {0,0,0,0},
-            pitches[] = {0,0,0,0};
-
-    switch(sys->drm_fourcc) {
-#ifdef DRM_FORMAT_P010
-    case DRM_FORMAT_P010:
-#endif
-#ifdef DRM_FORMAT_P012
-    case DRM_FORMAT_P012:
-#endif
-#ifdef DRM_FORMAT_P016
-    case DRM_FORMAT_P016:
-#endif
-#if defined(DRM_FORMAT_P010) || defined(DRM_FORMAT_P012) || defined(DRM_FORMAT_P016)
-        sys->stride = vlc_align(sys->width*2, tile_width);
-        sys->offsets[1] = sys->stride*vlc_align(sys->height, tile_height);
-        create_req.height = 2*vlc_align(sys->height, tile_height);
-        break;
-#endif
-    case DRM_FORMAT_NV12:
-        sys->stride = vlc_align(sys->width, tile_width);
-        sys->offsets[1] = sys->stride*vlc_align(sys->height, tile_height);
-        create_req.height = 2*vlc_align(sys->height, tile_height);
-        break;
-    default:
-        create_req.height = vlc_align(sys->height, tile_height);
-
-        /*
-         * width *4 so there's enough space for anything.
-         */
-        sys->stride = vlc_align(sys->width*4, tile_width);
-        break;
-    }
-
-    ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &create_req);
-    if (ret < 0) {
-        msg_Err(vd, "Cannot create dumb buffer");
-        return drvFail;
-    }
-
-    sys->size = create_req.size;
-    sys->handle[buf] = create_req.handle;
-
-    /*
-     * create framebuffer object for the dumb-buffer
-     * index 0 has to be filled in any case.
-     */
-    for (i = 0; i < ARRAY_SIZE(handles) && (sys->offsets[i] || i < 1); i++) {
-        handles[i] = create_req.handle;
-        pitches[i] = sys->stride;
-        offsets[i] = sys->offsets[i];
-    }
-
-    ret = drmModeAddFB2(drm_fd, sys->width, sys->height, sys->drm_fourcc,
-                        handles, pitches, offsets, &sys->fb[buf], 0);
-
-    if (ret) {
-        msg_Err(vd, "Cannot create frame buffer");
-        ret = drvFail;
-        goto err_destroy;
-    }
-
-    modify_req.handle = sys->handle[buf];
-    ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_MAP_DUMB, &modify_req);
-    if (ret) {
-        msg_Err(vd, "Cannot map dumb buffer");
-        ret = drvFail;
-        goto err_fb;
-    }
-
-    sys->map[buf] = mmap(0, sys->size, PROT_READ | PROT_WRITE, MAP_SHARED,
-                         drm_fd, modify_req.offset);
-
-    if (sys->map[buf] == MAP_FAILED) {
-        msg_Err(vd, "Cannot mmap dumb buffer");
-        ret = drvFail;
-        goto err_fb;
-    }
-    return drvSuccess;
-
-err_fb:
-    drmModeRmFB(drm_fd, sys->fb[buf]);
-    sys->fb[buf] = 0;
-
-err_destroy:
-    memset(&destroy_req, 0, sizeof(destroy_req));
-    destroy_req.handle = sys->handle[buf];
-    drmIoctl(drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
-    return ret;
-}
 
 /** fourccmatching, matching drm to vlc fourccs and see if it was present
  * in HW. Here really is two lists, one in RGB and second in YUV. They're
@@ -423,12 +288,6 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
     return 0;
 }
 
-static void CustomDestroyPicture(vout_display_t *vd)
-{
-    for (int c = 0; c < MAXHWBUF; c++)
-        DestroyFB(vd, c);
-}
-
 static int Control(vout_display_t *vd, int query)
 {
     (void) vd;
@@ -450,7 +309,8 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 {
     VLC_UNUSED(subpic); VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
-    picture_Copy( sys->picture, pic );
+
+    picture_Copy(sys->buffers[sys->front_buf], pic);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -458,30 +318,28 @@ static void Display(vout_display_t *vd, picture_t *picture)
     VLC_UNUSED(picture);
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
+    picture_t *pic = sys->buffers[sys->front_buf];
+    uint32_t fb_id = vlc_drm_dumb_get_fb_id(pic);
 
     vout_display_place_t place;
     vout_display_PlacePicture(&place, vd->fmt, vd->cfg);
 
     int ret = drmModeSetPlane(wnd->display.drm_fd,
-            sys->plane_id, wnd->handle.crtc, sys->fb[sys->front_buf], 0,
+            sys->plane_id, wnd->handle.crtc, fb_id, 0,
             place.x, place.y, place.width, place.height,
             vd->fmt->i_x_offset << 16, vd->fmt->i_y_offset << 16,
             vd->fmt->i_visible_width << 16, vd->fmt->i_visible_height << 16);
     if (ret != drvSuccess)
     {
-        msg_Err(vd, "Cannot do set plane for plane id %u, fb %x",
-                sys->plane_id,
-                sys->fb[sys->front_buf]);
+        msg_Err(vd, "Cannot do set plane for plane id %u, fb %"PRIu32,
+                sys->plane_id, fb_id);
         assert(ret != -EINVAL);
         return;
     }
 
     sys->front_buf++;
-    sys->front_buf %= MAXHWBUF;
-
-    for (int i = 0; i < PICTURE_PLANE_MAX; i++)
-        sys->picture->p[i].p_pixels =
-                sys->map[sys->front_buf]+sys->offsets[i];
+    if (sys->front_buf == MAXHWBUF)
+        sys->front_buf = 0;
 }
 
 /**
@@ -491,10 +349,8 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->picture)
-        picture_Release(sys->picture);
-    CustomDestroyPicture(vd);
-
+    for (size_t i = 0; i < ARRAY_SIZE(sys->buffers); i++)
+        picture_Release(sys->buffers[i]);
 }
 
 static const struct vlc_display_operations ops = {
@@ -542,43 +398,24 @@ static int Open(vout_display_t *vd,
         chroma = NULL;
     }
 
+    int fd = vd->cfg->window->display.drm_fd;
     vlc_fourcc_t fourcc = ChromaNegotiation(vd);
-    if (!fourcc) {
-        Close(vd);
+    if (!fourcc)
         return VLC_EGENERIC;
-    }
 
     msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
             (char*)&fourcc, (char*)&sys->drm_fourcc);
 
     video_format_ApplyRotation(&fmt, vd->fmt);
-
-    sys->width  = fmt.i_visible_width;
-    sys->height = fmt.i_visible_height;
-
-    for (int c = 0; c < MAXHWBUF; c++) {
-        int ret = CreateFB(vd, c);
-        if (ret != drvSuccess) {
-            for (int c2 = 0; c2 < c; c2++)
-                DestroyFB(vd, c2);
-            return ret;
-        }
-    }
-
-    picture_resource_t rsc = { 0 };
-    fmt.i_width = fmt.i_visible_width  = sys->width;
-    fmt.i_height = fmt.i_visible_height = sys->height;
     fmt.i_chroma = fourcc;
 
-    sys->picture = picture_NewFromResource(&fmt, &rsc);
-
-    if (!sys->picture)
-        goto error;
-
-    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
-        sys->picture->p[i].p_pixels = sys->map[0] + sys->offsets[i];
-        sys->picture->p[i].i_lines  = sys->height;
-        sys->picture->p[i].i_pitch  = sys->stride;
+    for (size_t i = 0; i < ARRAY_SIZE(sys->buffers); i++) {
+        sys->buffers[i] = vlc_drm_dumb_alloc_fb(vd->obj.logger, fd, &fmt);
+        if (sys->buffers[i] == NULL) {
+            while (i > 0)
+                picture_Release(sys->buffers[--i]);
+            return -ENOBUFS;
+        }
     }
 
     *fmtp = fmt;
@@ -586,9 +423,6 @@ static int Open(vout_display_t *vd,
 
     (void) context;
     return VLC_SUCCESS;
-
-error:
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
