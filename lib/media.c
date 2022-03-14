@@ -513,8 +513,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     vlc_mutex_init(&p_md->subitems_lock);
     atomic_init(&p_md->worker_count, 0);
 
-    p_md->state = libvlc_NothingSpecial;
-
     /* A media descriptor can be a playlist. When you open a playlist
      * It can give a bunch of item to read. */
     p_md->p_subitems        = NULL;
@@ -734,31 +732,6 @@ int libvlc_media_save_meta( libvlc_media_t *p_md )
     assert( p_md );
     vlc_object_t *p_obj = VLC_OBJECT(p_md->p_libvlc_instance->p_libvlc_int);
     return input_item_WriteMeta( p_obj, p_md->p_input_item ) == VLC_SUCCESS;
-}
-
-// Getter for state information
-libvlc_state_t
-libvlc_media_get_state( libvlc_media_t *p_md )
-{
-    assert( p_md );
-    return p_md->state;
-}
-
-// Setter for state information (LibVLC Internal)
-void
-libvlc_media_set_state( libvlc_media_t *p_md,
-                                   libvlc_state_t state )
-{
-    libvlc_event_t event;
-
-    p_md->state = state;
-
-    /* Construct the event */
-    event.type = libvlc_MediaStateChanged;
-    event.u.media_state_changed.new_state = state;
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
 }
 
 // Get subitems of media descriptor object.

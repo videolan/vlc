@@ -72,17 +72,12 @@ enum libvlc_event_e {
     libvlc_MediaParsedChanged,
 
     /* Removed: libvlc_MediaFreed, */
+    /* Removed: libvlc_MediaStateChanged */
 
-    /**
-     * \link #libvlc_state_t State\endlink of the \link
-     * #libvlc_media_t media item\endlink changed
-     * \see libvlc_media_get_state()
-     */
-    libvlc_MediaStateChanged = libvlc_MediaParsedChanged + 2,
     /**
      * Subitem tree was added to a \link #libvlc_media_t media item\endlink
      */
-    libvlc_MediaSubItemTreeAdded,
+    libvlc_MediaSubItemTreeAdded = libvlc_MediaParsedChanged + 3,
     /**
      * A thumbnail generation for this \link #libvlc_media_t media \endlink completed.
      * \see libvlc_media_thumbnail_request_by_time()

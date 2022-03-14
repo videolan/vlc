@@ -38,7 +38,6 @@
 #include <vlc_actions.h>
 
 #include "libvlc_internal.h"
-#include "media_internal.h" // libvlc_media_set_state()
 #include "media_player_internal.h"
 #include "renderer_discoverer_internal.h"
 
