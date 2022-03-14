@@ -368,7 +368,7 @@ static int Open(vout_display_t *vd,
 {
     vout_display_sys_t *sys;
     uint32_t local_drm_chroma;
-    video_format_t fmt = {};
+    video_format_t fmt;
     char *chroma;
 
     if (vd->cfg->window->type != VOUT_WINDOW_TYPE_KMS)
