@@ -65,6 +65,8 @@ struct intf_sys_t
     std::atomic<unsigned int> upnp_update_id;
 
     std::vector<std::unique_ptr<cds::Object>> obj_hierarchy;
+
+    bool extra_verbose;
 };
 
 static void medialibrary_event_callback(void *p_data, const struct vlc_ml_event_t *p_event)
@@ -185,7 +187,8 @@ static bool cds_browse(UpnpActionRequest *request, intf_thread_t *intf)
         &p_answer, action_name, service_type, "UpdateID", str_update_id.c_str());
 
     UpnpActionRequest_set_ActionResult(request, p_answer);
-    msg_Dbg(intf, "Sending response to client: \n%s", up_reponse_str.get());
+    if (sys->extra_verbose)
+        msg_Dbg(intf, "Sending response to client: \n%s", up_reponse_str.get());
 
     return true;
 }
@@ -501,7 +504,10 @@ static bool init_upnp(intf_thread_t *intf)
     assert(server_name);
     const auto presentation_doc = make_server_identity(sys->uuid.get(), server_name.get());
     const auto up_presentation_str = presentation_doc.to_wrapped_cstr();
-    msg_Dbg(intf, "%s", up_presentation_str.get());
+
+    if (sys->extra_verbose)
+        msg_Dbg(intf, "%s", up_presentation_str.get());
+
     res = UpnpRegisterRootDevice2(UPNPREG_BUF_DESC,
                                   up_presentation_str.get(),
                                   strlen(up_presentation_str.get()),
@@ -570,6 +576,7 @@ int open(vlc_object_t *p_this)
                                [](UpnpInstanceWrapper *p_upnp) { p_upnp->release(); });
 
     sys->obj_hierarchy = cds::init_hierarchy(sys->p_ml);
+    sys->extra_verbose = var_InheritInteger(p_this, "verbose") >= 4;
 
     if (!init_upnp(intf))
     {
