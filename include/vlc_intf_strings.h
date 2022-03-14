@@ -55,7 +55,7 @@
 #define I_MENU_CODECINFO  N_("&Codec Information")
 #define I_MENU_MSG   N_("&Messages")
 #define I_MENU_GOTOTIME N_("Jump to Specific &Time")
-#define I_MENU_BOOKMARK N_("Custom &Bookmarks")
+#define I_MENU_BOOKMARK N_("&Bookmarks")
 #define I_MENU_VLM N_("&VLM Configuration")
 
 #define I_MENU_ABOUT N_("&About")
