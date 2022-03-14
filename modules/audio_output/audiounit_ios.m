@@ -741,7 +741,15 @@ Open(vlc_object_t *obj)
     [eaglContext release];
 
     for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
+    {
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
+        if (au_devs[i].au_dev == sys->au_dev)
+        {
+            aout_DeviceReport(aout, au_devs[i].psz_id);
+            msg_Info(aout, "selected audiounit device: %s", au_devs[i].psz_id);
+        }
+    }
+
 
     return VLC_SUCCESS;
 }
