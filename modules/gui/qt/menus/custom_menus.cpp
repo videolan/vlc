@@ -327,17 +327,16 @@ RecentMenu::RecentMenu(MLRecentsModel* model, MediaLib* ml,  QWidget* parent)
     , m_model(model)
     , m_ml(ml)
 {
-    connect(m_model, &MLRecentsModel::rowsAboutToBeRemoved, this, &RecentMenu::onRowsAboutToBeRemoved);
+    connect(m_model, &MLRecentsModel::rowsRemoved, this, &RecentMenu::onRowsRemoved);
     connect(m_model, &MLRecentsModel::rowsInserted, this, &RecentMenu::onRowInserted);
     connect(m_model, &MLRecentsModel::dataChanged, this, &RecentMenu::onDataChanged);
-    connect(m_model, &MLRecentsModel::modelAboutToBeReset, this, &RecentMenu::onModelAboutToBeReset);
     connect(m_model, &MLRecentsModel::modelReset, this, &RecentMenu::onModelReset);
     m_separator = addSeparator();
     addAction( qtr("&Clear"), m_model, &MLRecentsModel::clearHistory );
     onModelReset();
 }
 
-void RecentMenu::onRowsAboutToBeRemoved(const QModelIndex&, int first, int last)
+void RecentMenu::onRowsRemoved(const QModelIndex&, int first, int last)
 {
     for (int i = first; i <= last; i++)
     {
@@ -395,7 +394,7 @@ void RecentMenu::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bo
     }
 }
 
-void RecentMenu::onModelAboutToBeReset()
+void RecentMenu::onModelReset()
 {
     for (QAction * action : m_actions)
     {
@@ -404,11 +403,6 @@ void RecentMenu::onModelAboutToBeReset()
 
     m_actions.clear();
 
-    setEnabled(false);
-}
-
-void RecentMenu::onModelReset()
-{
     int nb_rows = m_model->rowCount();
     if (nb_rows == 0)
         setEnabled(false);

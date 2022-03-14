@@ -132,10 +132,9 @@ public:
     RecentMenu(MLRecentsModel* model, MediaLib* ml, QWidget *parent = nullptr);
 
 private slots:
-    void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
+    void onRowsRemoved(const QModelIndex &parent, int first, int last);
     void onRowInserted(const QModelIndex &parent, int first, int last);
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-    void onModelAboutToBeReset();
     void onModelReset();
 
 private:
