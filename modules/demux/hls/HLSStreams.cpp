@@ -67,7 +67,7 @@ void HLSStream::setMetadataTimeOffset(vlc_tick_t i_offset)
     }
 }
 
-void HLSStream::setMetadataTimeOffset(vlc_tick_t mpegts, vlc_tick_t muxed)
+void HLSStream::setMetadataTimeMapping(vlc_tick_t mpegts, vlc_tick_t muxed)
 {
     fakeEsOut()->setAssociatedTimestamp(mpegts, muxed);
 }
@@ -171,7 +171,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
                 if(mpegts != std::numeric_limits<uint64_t>::max() &&
                    local != std::numeric_limits<vlc_tick_t>::max())
                 {
-                    setMetadataTimeOffset(mpegts * 100/9, local);
+                    setMetadataTimeMapping(mpegts * 100/9, local);
                 }
             }
         }
