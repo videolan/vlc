@@ -73,6 +73,7 @@ public:
         ASPECT_RATIO_COMBOBOX,
         DVD_MENUS_BUTTON,
         REVERSE_BUTTON,
+        BOOKMARK_BUTTON,
         SPECIAL_MAX,
 
         WIDGET_SPACER = 0x40,

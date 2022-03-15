@@ -360,6 +360,7 @@
         <file alias="AspectRatioWidget.qml">player/qml/controlbarcontrols/AspectRatioWidget.qml</file>
         <file alias="AtoBButton.qml">player/qml/controlbarcontrols/AtoBButton.qml</file>
         <file alias="BackButton.qml">player/qml/controlbarcontrols/BackButton.qml</file>
+        <file alias="BookmarkButton.qml">player/qml/controlbarcontrols/BookmarkButton.qml</file>
         <file alias="ChapterNextButton.qml">player/qml/controlbarcontrols/ChapterNextButton.qml</file>
         <file alias="ChapterPreviousButton.qml">player/qml/controlbarcontrols/ChapterPreviousButton.qml</file>
         <file alias="DvdMenuButton.qml">player/qml/controlbarcontrols/DvdMenuButton.qml</file>
