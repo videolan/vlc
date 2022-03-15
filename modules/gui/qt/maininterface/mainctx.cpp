@@ -154,8 +154,6 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     /* VideoWidget connects for asynchronous calls */
     connect( this, &MainCtx::askToQuit, THEDP, &DialogsProvider::quit, Qt::QueuedConnection  );
 
-    connect(this, &MainCtx::interfaceFullScreenChanged, this, &MainCtx::useClientSideDecorationChanged);
-
     QMetaObject::invokeMethod(this, [this]()
     {
         // *** HACKY ***
@@ -239,7 +237,7 @@ bool MainCtx::hasVLM() const {
 bool MainCtx::useClientSideDecoration() const
 {
     //don't show CSD when interface is fullscreen
-    return !m_windowTitlebar && m_windowVisibility != QWindow::FullScreen;
+    return !m_windowTitlebar;
 }
 
 bool MainCtx::hasFirstrun() const {
