@@ -1177,7 +1177,6 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         { "pulse",  ITEM_TYPE_CARD, false },
         { "qam",    ITEM_TYPE_CARD, false },
         { "qpsk",   ITEM_TYPE_CARD, false },
-        { "qtcapt", ITEM_TYPE_CARD, false }, /* qtcapture */
         { "qtsound",ITEM_TYPE_CARD, false },
         { "raw139", ITEM_TYPE_CARD, false }, /* raw1394 */
         { "rt",     ITEM_TYPE_STREAM, true }, /* rtp, rtsp, rtmp */
