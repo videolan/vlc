@@ -195,9 +195,7 @@ static const struct {
     { DRM_FORMAT_NV61,     VLC_CODEC_NV61 },
     { DRM_FORMAT_NV24,     VLC_CODEC_NV24 },
     { DRM_FORMAT_NV42,     VLC_CODEC_NV42 },
-#ifndef WORDS_BIGENDIAN
     { DRM_FORMAT_P016,     VLC_CODEC_P016 },
-#endif
 
     /* Planar YUV */
     { DRM_FORMAT_YUV410,   VLC_CODEC_I410 },
