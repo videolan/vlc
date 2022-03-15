@@ -171,14 +171,14 @@ FakeESOut::~FakeESOut()
 
 void FakeESOut::resetTimestamps()
 {
-    setExpectedTimestamp(-1);
-    setAssociatedTimestamp(-1);
+    setExpectedTimestamp(VLC_TS_INVALID);
+    setAssociatedTimestamp(VLC_TS_INVALID);
     startTimes = SegmentTimes();
 }
 
 void FakeESOut::setExpectedTimestamp(mtime_t ts)
 {
-    if(ts < 0)
+    if(ts == VLC_TS_INVALID)
     {
         expected.b_timestamp_set = false;
         timestamps_offset = 0;
@@ -193,7 +193,7 @@ void FakeESOut::setExpectedTimestamp(mtime_t ts)
 
 void FakeESOut::setAssociatedTimestamp(mtime_t ts)
 {
-    if(ts < 0)
+    if(ts == VLC_TS_INVALID)
     {
         associated.b_timestamp_set = false;
         timestamps_offset = 0;
@@ -208,7 +208,7 @@ void FakeESOut::setAssociatedTimestamp(mtime_t ts)
 
 void FakeESOut::setAssociatedTimestamp(mtime_t mpegts, mtime_t muxed)
 {
-    if(mpegts < 0)
+    if(mpegts == VLC_TS_INVALID)
     {
         setAssociatedTimestamp(mpegts);
     }
