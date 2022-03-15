@@ -1,0 +1,30 @@
+From de5cd603acd5c81ec947fd9664817231a3d2c418 Mon Sep 17 00:00:00 2001
+From: Jean-Francois Dockes <jf@dockes.org>
+Date: Sun, 27 Jan 2019 10:44:17 +0100
+Subject: [PATCH] Do not try to detach detached thread, the result is
+ undefined. Fixes issue #102
+
+(cherry picked from commit 386b7ed79146ecf7a3bba49f48cb8f41a9b49170)
+---
+ threadutil/src/ThreadPool.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/threadutil/src/ThreadPool.c b/threadutil/src/ThreadPool.c
+index fcf71087..8c6cd092 100644
+--- a/threadutil/src/ThreadPool.c
++++ b/threadutil/src/ThreadPool.c
+@@ -651,11 +651,6 @@ static int CreateWorker(
+ 	rc = ithread_create(&temp, &attr, WorkerThread, tp);
+ 	ithread_attr_destroy(&attr);
+ 	if (rc == 0) {
+-		rc = ithread_detach(temp);
+-		/* ithread_detach will return EINVAL if thread has been
+-		 successfully detached by ithread_create */
+-		if (rc == EINVAL)
+-			rc = 0;
+ 		tp->pendingWorkerThreadStart = 1;
+ 		/* wait until the new worker thread starts */
+ 		while (tp->pendingWorkerThreadStart) {
+-- 
+2.27.0.windows.1
+
