@@ -1142,6 +1142,7 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         /* Short match work, not just exact match */
         { "alsa",   ITEM_TYPE_CARD, false },
         { "atsc",   ITEM_TYPE_CARD, false },
+        { "avcapt", ITEM_TYPE_CARD, false }, /* AVCapture */
         { "bd",     ITEM_TYPE_DISC, false },
         { "bluray", ITEM_TYPE_DISC, false },
         { "cable",  ITEM_TYPE_CARD, false },
