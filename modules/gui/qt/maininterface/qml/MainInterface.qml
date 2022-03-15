@@ -30,9 +30,9 @@ import "qrc:///style/"
 import "qrc:///dialogs/" as DG
 import "qrc:///playlist/" as PL
 
-Rectangle {
+Item {
     id: root
-    color: "transparent"
+
     property bool _interfaceReady: false
     property bool _playlistReady: false
 
