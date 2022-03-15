@@ -44,7 +44,7 @@ namespace hls
             int ParseID3Tag(uint32_t, const uint8_t *, size_t);
             int ParseID3PrivTag(const uint8_t *, size_t);
             void setMetadataTimeOffset(mtime_t);
-            void setMetadataTimeOffset(mtime_t, mtime_t);
+            void setMetadataTimeMapping(mtime_t, mtime_t);
             bool b_id3_timestamps_offset_set;
             vlc_meta_t *p_meta;
             bool b_meta_updated;
