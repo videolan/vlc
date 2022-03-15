@@ -28,6 +28,7 @@
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
 #include "medialibrary/mlurlmodel.hpp"
+#include "medialibrary/mlbookmarkmodel.hpp"
 #include "network/networkdevicemodel.hpp"
 #include "network/networkmediamodel.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -381,6 +382,93 @@ void QmlMenuBar::onMenuClosed()
 {
     if (!m_openMenuOnHover)
         emit menuClosed();
+}
+
+// QmlBookmarkMenu
+
+/* explicit */ QmlBookmarkMenu::QmlBookmarkMenu(QObject * parent) : QObject(parent) {}
+
+QmlBookmarkMenu::~QmlBookmarkMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+// Interface
+
+/* Q_INVOKABLE */ void QmlBookmarkMenu::popup(QPoint pos)
+{
+    if (m_ctx == nullptr || m_player == nullptr)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QMenu;
+
+    connect(m_menu, &QMenu::aboutToHide, this, &QmlBookmarkMenu::aboutToHide);
+    connect(m_menu, &QMenu::aboutToShow, this, &QmlBookmarkMenu::aboutToShow);
+
+    QAction * sectionTitles    = m_menu->addSection(qtr("Titles"));
+    QAction * sectionChapters  = m_menu->addSection(qtr("Chapters"));
+    QAction * sectionBookmarks = m_menu->addSection(qtr("Bookmarks"));
+
+    // Titles
+
+    TitleListModel * titles = m_player->getTitles();
+
+    sectionTitles->setVisible(titles->rowCount() != 0);
+
+    ListMenuHelper * helper = new ListMenuHelper(m_menu, titles, sectionChapters, m_menu);
+
+    connect(helper, &ListMenuHelper::select, [titles](int index)
+    {
+        titles->setData(titles->index(index), true, Qt::CheckStateRole);
+    });
+
+    connect(helper, &ListMenuHelper::countChanged, [sectionTitles](int count)
+    {
+        // NOTE: The section should only be visible when the model has content.
+        sectionTitles->setVisible(count != 0);
+    });
+
+    // Chapters
+
+    ChapterListModel * chapters = m_player->getChapters();
+
+    sectionChapters->setVisible(chapters->rowCount() != 0);
+
+    helper = new ListMenuHelper(m_menu, chapters, sectionBookmarks, m_menu);
+
+    connect(helper, &ListMenuHelper::select, [chapters](int index)
+    {
+        chapters->setData(chapters->index(index), true, Qt::CheckStateRole);
+    });
+
+    connect(helper, &ListMenuHelper::countChanged, [sectionChapters](int count)
+    {
+        // NOTE: The section should only be visible when the model has content.
+        sectionChapters->setVisible(count != 0);
+    });
+
+    // Bookmarks
+
+    // FIXME: Do we really need a translation call for the string shortcut ?
+    m_menu->addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog, qtr("Ctrl+B"));
+
+    m_menu->addSeparator();
+
+    MLBookmarkModel * bookmarks = new MLBookmarkModel(m_ctx->getMediaLibrary(),
+                                                      m_player->getPlayer(), m_menu);
+
+    helper = new ListMenuHelper(m_menu, bookmarks, nullptr, m_menu);
+
+    connect(helper, &ListMenuHelper::select, [bookmarks](int index)
+    {
+        bookmarks->select(bookmarks->index(index, 0));
+    });
+
+    m_menu->popup(pos);
 }
 
 BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
