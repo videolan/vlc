@@ -93,7 +93,8 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker)
                 segmentTracker = tracker;
                 segmentTracker->registerListener(this);
                 segmentTracker->notifyBufferingState(true);
-                fakeesout->setExpectedTimestamp(VLC_TICK_0 + segmentTracker->getPlaybackTime());
+                if(mightalwaysstartfromzero)
+                    fakeesout->setExpectedTimestamp(VLC_TICK_0 + segmentTracker->getPlaybackTime());
                 declaredCodecs();
                 return true;
             }
