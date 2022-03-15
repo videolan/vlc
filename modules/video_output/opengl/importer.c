@@ -341,8 +341,14 @@ vlc_gl_importer_Update(struct vlc_gl_importer *importer, picture_t *picture)
 
         /* The transformation is the same for all planes, even with power-of-two
          * textures. */
-        float scale_w = glfmt->tex_widths[0];
-        float scale_h = glfmt->tex_heights[0];
+        /* FIXME The first plane may have a ratio != 1:1, because with YUV 4:2:2
+         * formats, the Y2 value is ignored so half the horizontal resolution
+         * is lost, see interop_yuv_base_init(). Once this is fixed, the
+         * multiplication by den/num may be removed. */
+        float scale_w = glfmt->tex_widths[0] * interop->texs[0].w.den
+                                             / interop->texs[0].w.num;
+        float scale_h = glfmt->tex_heights[0] * interop->texs[0].h.den
+                                              / interop->texs[0].h.num;
 
         /* Warning: if NPOT is not supported a larger texture is
            allocated. This will cause right and bottom coordinates to
