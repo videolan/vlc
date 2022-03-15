@@ -191,7 +191,7 @@ Rectangle {
         active: (MainCtx.clientSideDecoration
                  &&
                  // NOTE: We don't want to steal the mouse when we are maximized or in fullscreen
-                 !((MainCtx.intfMainWindow.visibility & Window.Maximized) || MainCtx.interfaceFullScreen))
+                 !((MainCtx.intfMainWindow.visibility === Window.Maximized) || MainCtx.interfaceFullScreen))
 
         source: "qrc:///widgets/CSDMouseStealer.qml"
     }
