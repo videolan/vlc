@@ -34,6 +34,7 @@ FocusScope {
     visible: false
 
     property alias effectSource: effect.source
+    property alias effectSourceRect: effect.sourceRect
 
     state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? ""
                                                                   : "expanded"
@@ -69,11 +70,6 @@ FocusScope {
     Widgets.FrostedGlassEffect {
         id: effect
         anchors.fill: parent
-
-        sourceRect: Qt.rect(root.x,
-                            root.y,
-                            root.width,
-                            root.height)
 
         tint: VLCStyle.colors.lowerBanner
     }

@@ -463,7 +463,12 @@ FocusScope {
                         stackView.forceActiveFocus()
                 }
 
-                effectSource: mainColumn
+                effectSource: stackView
+                effectSourceRect: effectSource.mapFromItem(parent,
+                                                           x,
+                                                           y,
+                                                           width,
+                                                           height)
             }
 
             Connections {
