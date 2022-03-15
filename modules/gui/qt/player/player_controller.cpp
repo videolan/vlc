@@ -1108,6 +1108,13 @@ PlayerController::~PlayerController()
 
 // PLAYBACK
 
+vlc_player_t * PlayerController::getPlayer() const
+{
+    Q_D(const PlayerController);
+
+    return d->m_player;
+}
+
 input_item_t *PlayerController::getInput()
 {
     Q_D(PlayerController);
