@@ -30,8 +30,6 @@
 
 #include <QObject>
 
-class QMenu;
-
 class VLCMenuBar : public QObject
 {
     Q_OBJECT

@@ -34,6 +34,9 @@
 // Dialogs includes
 #include "dialogs/dialogs_provider.hpp"
 
+// Menus includes
+#include "menus/menus.hpp"
+
 // Qt includes
 #include <QMenu>
 #include <QAction>
@@ -543,95 +546,22 @@ void RecentMenu::onModelReset()
 
 // BookmarkMenu
 
-BookmarkMenu::BookmarkMenu(MLBookmarkModel * model, MediaLib * ml, QWidget * parent)
-    : QMenu(parent), m_model(model), m_ml(ml)
+BookmarkMenu::BookmarkMenu(MediaLib * mediaLib, vlc_player_t * player, QWidget * parent)
+    : QMenu(parent)
 {
-    setTearOffEnabled(true);
-
     // FIXME: Do we really need a translation call for the string shortcut ?
     addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog, qtr("Ctrl+B"));
 
     addSeparator();
 
-    onModelReset();
+    MLBookmarkModel * model = new MLBookmarkModel(mediaLib, player, this);
 
-    connect(m_model, &MLBookmarkModel::rowsInserted, this, &BookmarkMenu::onRowsInserted);
-    connect(m_model, &MLBookmarkModel::rowsRemoved,  this, &BookmarkMenu::onRowsRemoved);
+    ListMenuHelper * helper = new ListMenuHelper(this, model, nullptr, this);
 
-    connect(m_model, &MLBookmarkModel::dataChanged, this, &BookmarkMenu::onDataChanged);
-
-    connect(m_model, &MLBookmarkModel::modelReset, this, &BookmarkMenu::onModelReset);
-}
-
-// Private slots
-
-void BookmarkMenu::onRowsInserted(const QModelIndex &, int first, int last)
-{
-    QAction * before;
-
-    if (first < m_actions.count())
-        before = m_actions.at(first);
-    else
-        before = nullptr;
-
-    for (int i = first; i <= last; i++)
+    connect(helper, &ListMenuHelper::select, [model](int index)
     {
-        QModelIndex index = m_model->index(i, 0);
+        model->select(model->index(index, 0));
+    });
 
-        QString name = m_model->data(index, Qt::DisplayRole).toString();
-
-        QAction * action = new QAction(name, this);
-
-        // NOTE: We are adding sequentially *before* the next action in the list.
-        insertAction(before, action);
-
-        m_actions.insert(i, action);
-
-        connect(action, &QAction::triggered, [this, action]()
-        {
-            QModelIndex index = m_model->index(m_actions.indexOf(action), 0);
-
-            m_model->select(index);
-        });
-    }
-}
-
-void BookmarkMenu::onRowsRemoved(const QModelIndex &, int first, int last)
-{
-    for (int i = first; i <= last; i++)
-    {
-        delete m_actions.at(i);
-    }
-
-    QList<QAction *>::iterator begin = m_actions.begin();
-
-    m_actions.erase(begin + first, begin + last);
-}
-
-void BookmarkMenu::onDataChanged(const QModelIndex & topLeft,
-                                 const QModelIndex & bottomRight, const QVector<int> &)
-{
-    for (int i = topLeft.row(); i <= bottomRight.row(); i++)
-    {
-        QModelIndex index = m_model->index(i, 0);
-
-        QString name = m_model->data(index, Qt::DisplayRole).toString();
-
-        m_actions.at(i)->setText(name);
-    }
-}
-
-void BookmarkMenu::onModelReset()
-{
-    for (QAction * action : m_actions)
-    {
-        delete action;
-    }
-
-    m_actions.clear();
-
-    int count = m_model->rowCount();
-
-    if (count)
-        onRowsInserted(QModelIndex(), 0, count - 1);
+    setTearOffEnabled(true);
 }

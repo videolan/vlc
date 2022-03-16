@@ -487,11 +487,7 @@ void VLCMenuBar::NavigMenu( qt_intf_t *p_intf, QMenu *menu )
     {
         MediaLib * mediaLib = mi->getMediaLibrary();
 
-        MLBookmarkModel * model = new MLBookmarkModel(mediaLib, p_intf->p_player, nullptr);
-
-        BookmarkMenu * bookmarks = new BookmarkMenu(model, mediaLib, menu);
-
-        model->setParent(bookmarks);
+        BookmarkMenu * bookmarks = new BookmarkMenu(mediaLib, p_intf->p_player, menu);
 
         bookmarks->setTitle(qfut(I_MENU_BOOKMARK));
 
