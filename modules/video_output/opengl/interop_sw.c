@@ -111,7 +111,7 @@ pbo_picture_create(const struct vlc_gl_interop *interop)
     }
 
     assert(pic->i_planes > 0
-        && (unsigned) pic->i_planes == interop->tex_count);
+        && (unsigned) pic->i_planes <= interop->tex_count);
 
     for (int i = 0; i < pic->i_planes; ++i)
     {
@@ -208,6 +208,18 @@ tc_pbo_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
 
+    if (pic->i_planes == 1 && interop->tex_count == 2)
+    {
+        /* For YUV 4:2:2 formats, a single plane is uploaded into 2 textures */
+        priv->gl.ActiveTexture(GL_TEXTURE1);
+        priv->gl.BindTexture(interop->tex_target, textures[1]);
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[0].i_pitch
+            * tex_width[1] / (pic->p[0].i_visible_pitch ? pic->p[0].i_visible_pitch : 1));
+        priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, tex_width[1], tex_height[1],
+                               interop->texs[1].format, interop->texs[1].type, NULL);
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    }
+
     /* turn off pbo */
     priv->gl.BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
@@ -294,7 +306,7 @@ tc_common_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 {
     const struct priv *priv = interop->priv;
     int ret = VLC_SUCCESS;
-    for (unsigned i = 0; i < interop->tex_count && ret == VLC_SUCCESS; i++)
+    for (int i = 0; i < pic->i_planes && ret == VLC_SUCCESS; i++)
     {
         assert(textures[i] != 0);
         priv->gl.ActiveTexture(GL_TEXTURE0 + i);
@@ -306,6 +318,21 @@ tc_common_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         ret = upload_plane(interop, i, tex_width[i], tex_height[i],
                            pic->p[i].i_pitch, pic->p[i].i_visible_pitch, pixels);
     }
+
+    if (pic->i_planes == 1 && interop->tex_count == 2)
+    {
+        /* For YUV 4:2:2 formats, a single plane is uploaded into 2 textures */
+        assert(textures[1] != 0);
+        priv->gl.ActiveTexture(GL_TEXTURE1);
+        priv->gl.BindTexture(interop->tex_target, textures[1]);
+        const void *pixels = plane_offset != NULL ?
+                             &pic->p[0].p_pixels[plane_offset[0]] :
+                             pic->p[0].p_pixels;
+
+        ret = upload_plane(interop, 1, tex_width[1], tex_height[1],
+                           pic->p[0].i_pitch, pic->p[0].i_visible_pitch, pixels);
+    }
+
     return ret;
 }
 

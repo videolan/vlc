@@ -449,6 +449,8 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
     else if (desc->plane_count == 1)
     {
         /*
+         * One plane, but uploaded into two separate textures for Y and UV.
+         *
          * Set swizzling in Y1 U V order
          * R  G  B  A
          * U  Y1 V  Y2 => GRB
@@ -459,16 +461,20 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
         switch (chroma)
         {
             case VLC_CODEC_UYVY:
-                swizzle_per_tex[0] = "grb";
+                swizzle_per_tex[0] = "g";
+                swizzle_per_tex[1] = "rb";
                 break;
             case VLC_CODEC_YUYV:
-                swizzle_per_tex[0] = "rga";
+                swizzle_per_tex[0] = "r";
+                swizzle_per_tex[1] = "ga";
                 break;
             case VLC_CODEC_VYUY:
-                swizzle_per_tex[0] = "gbr";
+                swizzle_per_tex[0] = "g";
+                swizzle_per_tex[1] = "br";
                 break;
             case VLC_CODEC_YVYU:
-                swizzle_per_tex[0] = "rag";
+                swizzle_per_tex[0] = "r";
+                swizzle_per_tex[1] = "ag";
                 break;
             default:
                 assert(!"missing chroma");
@@ -636,8 +642,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     if (desc == NULL)
         return VLC_EGENERIC;
 
-    unsigned tex_count = desc->plane_count;
-    assert(tex_count == glfmt->tex_count);
+    unsigned tex_count = glfmt->tex_count;
 
     if (expose_planes)
         return sampler_planes_init(sampler);

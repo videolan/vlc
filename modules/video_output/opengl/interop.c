@@ -276,20 +276,18 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     else if (desc->plane_count == 1)
     {
         /* Only YUV 4:2:2 formats */
-        /* Y1 U Y2 V fits in R G B A */
-        interop->tex_count = 1;
+        /* The pictures have only 1 plane, but it is uploaded twice, once to
+         * access the Y components, once to access the UV components. See
+         * #26712. */
+        interop->tex_count = 2;
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
-            { desc->p[0].w.num, desc->p[0].w.den },
-            { desc->p[0].h.num, desc->p[0].h.den },
+            { 1, 1 }, { 1, 1 },
+            twoplanes_texfmt, twoplanes_texfmt, GL_UNSIGNED_BYTE
+        };
+        interop->texs[1] = (struct vlc_gl_tex_cfg) {
+            { 1, 2 }, { 1, 1 },
             GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
         };
-
-        /*
-         * Currently, Y2 is ignored, so the texture is stored at chroma
-         * resolution. In other words, half the horizontal resolution is lost,
-         * so we must adapt the horizontal scaling.
-         */
-        DivideRationalByTwo(&interop->texs[0].w);
     }
     else
         return VLC_EGENERIC;
