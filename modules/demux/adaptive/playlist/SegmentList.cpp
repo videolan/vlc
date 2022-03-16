@@ -32,7 +32,6 @@
 
 #include <limits>
 #include <cassert>
-#include <algorithm>
 
 using namespace adaptive;
 using namespace adaptive::playlist;
@@ -117,12 +116,7 @@ void SegmentList::updateWith(AbstractMultipleSegmentBaseType *updated_,
         const uint64_t oldest = updated->segments.front()->getSequenceNumber();
 
         /* filter out known segments from the update */
-        updated->segments.erase(
-            std::remove_if(updated->segments.begin(), updated->segments.end(),
-                [updated, prevSegment](Segment *s){
-                    return s->getSequenceNumber() <= prevSegment->getSequenceNumber();
-                }),
-            updated->segments.end());
+        updated->pruneBySegmentNumber(prevSegment->getSequenceNumber());
 
         if(updated->segments.empty())
             return;
@@ -146,10 +140,7 @@ void SegmentList::updateWith(AbstractMultipleSegmentBaseType *updated_,
         updated->segments.clear();
 
         /* prune previous list using update window start */
-        segments.erase(std::remove_if(segments.begin(), segments.end(),
-                            [this, oldest](Segment *s){return s->getSequenceNumber() < oldest;}),
-                       segments.end());
-
+        pruneBySegmentNumber(oldest);
     }
 }
 
