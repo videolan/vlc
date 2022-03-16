@@ -22,13 +22,17 @@
 # include "config.h"
 #endif
 
+#include "interop_sw.h"
+
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 
-#include "interop_sw.h"
-
 #include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_opengl.h>
+#include <vlc_opengl_interop.h>
+
 #include "gl_util.h"
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
@@ -705,3 +709,28 @@ error:
     interop->priv = NULL;
     return VLC_EGENERIC;
 }
+
+static int OpenInteropSW(vlc_object_t *obj)
+{
+    struct vlc_gl_interop *interop = (void *) obj;
+    return opengl_interop_generic_init(interop, false);
+}
+
+static int OpenInteropDirectRendering(vlc_object_t *obj)
+{
+    struct vlc_gl_interop *interop = (void *) obj;
+    return opengl_interop_generic_init(interop, true);
+}
+
+vlc_module_begin ()
+    set_description("Software OpenGL interop")
+    set_capability("opengl sw interop", 1)
+    set_callback(OpenInteropSW)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    add_shortcut("sw")
+
+    add_submodule()
+    set_callback(OpenInteropDirectRendering)
+    set_capability("opengl sw interop", 2)
+    add_shortcut("pbo")
+vlc_module_end ()
