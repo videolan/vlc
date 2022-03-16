@@ -27,8 +27,6 @@
 
 #include "gl_util.h"
 #include "interop.h"
-#include "interop_sw.h"
-#include "vout_helper.h"
 
 struct vlc_gl_interop_private
 {
@@ -184,17 +182,14 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
         /* Opaque chroma: load a module to handle it */
         interop->vctx = context;
         interop->module = module_need_var(interop, "glinterop", "glinterop");
-        if (interop->module == NULL)
-            goto error;
     }
     else
     {
-        /* No opengl interop module found: use a generic interop. */
-        int ret = opengl_interop_generic_init(interop, true);
-        if (ret != VLC_SUCCESS)
-            goto error;
+        interop->module = module_need(interop, "opengl sw interop", NULL, false);
     }
 
+    if (interop->module == NULL)
+        goto error;
 
     return interop;
 
@@ -222,14 +217,15 @@ vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl)
     OPENGL_VTABLE_F(LOAD_SYMBOL);
 #undef LOAD_SYMBOL
 
-    int ret = opengl_interop_generic_init(interop, false);
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_object_delete(interop);
-        return NULL;
-    }
+    interop->module = module_need(interop, "opengl sw interop", "sw", true);
+
+    if (interop->module == NULL)
+        goto error;
 
     return interop;
+error:
+    vlc_object_delete(interop);
+    return NULL;
 }
 
 void

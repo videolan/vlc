@@ -14,8 +14,6 @@ OPENGL_COMMONSOURCES = \
        video_output/opengl/importer_priv.h \
        video_output/opengl/interop.h \
        video_output/opengl/interop.c \
-       video_output/opengl/interop_sw.c \
-       video_output/opengl/interop_sw.h \
        video_output/opengl/picture.c \
        video_output/opengl/picture.h \
        video_output/opengl/sampler.c \
@@ -57,6 +55,33 @@ libvlc_opengles_la_CFLAGS += $(GLES2_CFLAGS)
 libvlc_opengles_la_LIBADD += $(GLES2_LIBS)
 if HAVE_GLES2
 noinst_LTLIBRARIES += libvlc_opengles.la
+endif
+
+libglinterop_sw_plugin_la_SOURCES = video_output/opengl/interop_sw.c
+libglinterop_sw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_GL
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
+else
+if HAVE_GLES2
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
+libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+endif
+endif
+
+if HAVE_DARWIN
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
+if HAVE_OSX
+libglinterop_sw_plugin_la_LIBADD = libvlc_opengl.la
+else
+libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
+libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+endif
+endif
+
+if HAVE_ANDROID
+libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
+libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
 endif
 
 ### OpenGL ###
