@@ -214,9 +214,13 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
     es_format_Init(&fmt, VIDEO_ES, VLC_CODEC_H264);
     es_out_id_t *id = es_out_Add(out, &fmt);
 
+    /* ensure ES is created */
+    const Times drainTimes(SegmentTimes(),std::numeric_limits<vlc_tick_t>::max());
+    fakees->commandsQueue()->Commit();
+    fakees->commandsQueue()->Process(drainTimes);
+
     try
     {
-        const Times drainTimes(SegmentTimes(),std::numeric_limits<vlc_tick_t>::max());
         vlc_tick_t mediaref = TMS(10000);
         SegmentTimes segmentTimes(VLC_TICK_INVALID, mediaref, mediaref);
         fakees->setSegmentStartTimes(segmentTimes);
