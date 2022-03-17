@@ -1104,9 +1104,16 @@ void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
  * This only works in combination with libvlc_audio_set_callbacks(),
  * and is mutually exclusive with libvlc_audio_set_format_callbacks().
  *
+ * The supported formats are:
+ * - "S16N" for signed 16-bit PCM
+ * - "S32N" for signed 32-bit PCM
+ * - "FL32" for single precision IEEE 754
+ *
+ * All supported formats use the native endianess.
+ * If there are more than one channel, samples are interleaved.
+ *
  * \param mp the media player
  * \param format a four-characters string identifying the sample format
- *               (e.g. "S16N" or "f32l")
  * \param rate sample rate (expressed in Hz)
  * \param channels channels count
  * \version LibVLC 2.0.0 or later
