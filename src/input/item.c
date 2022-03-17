@@ -1156,7 +1156,6 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         { "dtv",    ITEM_TYPE_CARD, false },
         { "dvb",    ITEM_TYPE_CARD, false },
         { "dvd",    ITEM_TYPE_DISC, false },
-        { "eyetv",  ITEM_TYPE_CARD, false },
         { "fd",     ITEM_TYPE_UNKNOWN, false },
         { "file",   ITEM_TYPE_FILE, false },
         { "ftp",    ITEM_TYPE_FILE, true },
