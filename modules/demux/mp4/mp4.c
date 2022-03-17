@@ -1933,7 +1933,7 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
     else if( FragGetMoofBySidxIndex( p_demux, i_nztime, &i64, &i_sync_time ) == VLC_SUCCESS )
     {
         /* provides base offset */
-        i_segment_time = i_sync_time;
+        i_segment_time = MP4_rescale_qtime( i_sync_time, p_sys->i_timescale );
         msg_Dbg( p_demux, "seeking to sidx moof pos %" PRId64 " %" PRId64, i64, i_sync_time );
     }
     else
