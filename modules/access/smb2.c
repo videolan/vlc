@@ -627,7 +627,7 @@ vlc_smb2_open_share(stream_t *access, struct smb2_context *smb2,
         else
         {
             msg_Err(access, "smb2_stat_cb: file type not handled");
-            op.error_status = 1;
+            op.error_status = -ENOENT;
             goto error;
         }
     }
@@ -652,8 +652,7 @@ vlc_smb2_open_share(stream_t *access, struct smb2_context *smb2,
 
     return 0;
 error:
-    sys->error_status = op.error_status;
-    return -1;
+    return op.error_status;
 }
 
 static int
@@ -700,14 +699,10 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     if (err < 0)
     {
         VLC_SMB2_SET_ERROR(&op, "smb2_connect_share_async", err);
-        sys->error_status = op.error_status;
         goto error;
     }
     if (vlc_smb2_mainloop(&op, false) != 0)
-    {
-        sys->error_status = op.error_status;
         goto error;
-    }
 
     sys->smb2_connected = true;
 
@@ -715,7 +710,10 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
 
     err = vlc_smb2_open_share(access, sys->smb2, smb2_url, do_enum);
     if (err < 0)
+    {
+        op.error_status = err;
         goto error;
+    }
 
     smb2_destroy_url(smb2_url);
     return 0;
@@ -734,7 +732,7 @@ error:
         smb2_destroy_context(sys->smb2);
         sys->smb2 = NULL;
     }
-    return -1;
+    return op.error_status;
 }
 
 static char *
@@ -787,6 +785,7 @@ Open(vlc_object_t *p_obj)
     stream_t *access = (stream_t *)p_obj;
     struct access_sys *sys = vlc_obj_calloc(p_obj, 1, sizeof (*sys));
     char *var_domain = NULL;
+    int ret;
 
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -819,10 +818,10 @@ Open(vlc_object_t *p_obj)
     {
         free(url);
         free(resolved_host);
+        ret = -ENOMEM;
         goto error;
     }
 
-    int ret = -1;
     vlc_credential credential;
     vlc_credential_init(&credential, &sys->encoded_url);
     var_domain = var_InheritString(access, "smb-domain");
@@ -834,15 +833,11 @@ Open(vlc_object_t *p_obj)
                        NULL);
     ret = vlc_smb2_connect_open_share(access, url, &credential);
 
-    while (ret == -1
-        && (!sys->error_status || VLC_SMB2_STATUS_DENIED(sys->error_status))
+    while (VLC_SMB2_STATUS_DENIED(ret)
         && vlc_credential_get(&credential, access, "smb-user", "smb-pwd",
                               SMB_LOGIN_DIALOG_TITLE, SMB_LOGIN_DIALOG_TEXT,
                               sys->encoded_url.psz_host))
-    {
-        sys->error_status = 0;
         ret = vlc_smb2_connect_open_share(access, url, &credential);
-    }
     free(resolved_host);
     free(url);
     if (ret == 0)
@@ -898,8 +893,7 @@ error:
      * case of network error (EIO) or when the user asked to cancel it
      * (vlc_killed()). Indeed, in these cases, it is useless to try next smb
      * modules. */
-    return vlc_killed() || sys->error_status == -EIO ? VLC_ETIMEOUT
-         : VLC_EGENERIC;
+    return vlc_killed() || ret == -EIO ? VLC_ETIMEOUT : VLC_EGENERIC;
 }
 
 static void
