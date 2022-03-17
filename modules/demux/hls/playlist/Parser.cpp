@@ -153,6 +153,7 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
     HLSRepresentation *rep  = createRepresentation(adaptSet, tag);
     if(rep)
     {
+        rep->addAttribute(new TimescaleAttr(Timescale(1000000)));
         parseSegments(p_obj, rep, tagslist);
         adaptSet->addRepresentation(rep);
     }
@@ -221,9 +222,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
     bool b_vod = tagslist.size() && tagslist.back()->getType() == SingleValueTag::EXTXENDLIST;
 
     SegmentList *segmentList = new SegmentList(rep, !b_vod && !b_pdt);
+    const Timescale timescale = rep->inheritTimescale();
 
-    Timescale timescale(1000000);
-    rep->addAttribute(new TimescaleAttr(timescale));
     rep->b_loaded = true;
     rep->b_live = !b_vod;
 
