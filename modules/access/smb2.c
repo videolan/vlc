@@ -221,8 +221,6 @@ smb2_service_fd(struct smb2_context *smb2, int fd, int revents)
 static int
 vlc_smb2_mainloop(struct vlc_smb2_op *op)
 {
-    int timeout = -1;
-
     while (op->error_status == 0 && !op->res_done)
     {
         int ret, smb2_timeout;
@@ -236,10 +234,8 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op)
             p_fds[i].events = events;
             p_fds[i].fd = fds[i];
         }
-        if (smb2_timeout != -1)
-            timeout = smb2_timeout;
 
-        if (fds == NULL || (ret = vlc_poll_i11e(p_fds, fd_count, timeout)) < 0)
+        if (fds == NULL || (ret = vlc_poll_i11e(p_fds, fd_count, smb2_timeout)) < 0)
         {
             if (op->log && errno == EINTR)
                 msg_Warn(op->log, "vlc_poll_i11e interrupted");
