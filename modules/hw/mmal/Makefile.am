@@ -1,4 +1,12 @@
 mmaldir = $(pluginsdir)/mmal
+mmal_LTLIBRARIES =
+mmal_PLUGINS =
+
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(mmal_PLUGINS)
+else
+mmal_LTLIBRARIES += $(mmal_PLUGINS)
+endif
 
 libvlc_mmal_la_SOURCES = hw/mmal/subpic.c hw/mmal/subpic.h \
 	hw/mmal/mmal_picture.c hw/mmal/mmal_picture.h \
@@ -28,7 +36,7 @@ libmmal_device_plugin_la_LIBADD = libvlc_mmal.la
 
 if HAVE_MMAL
 noinst_LTLIBRARIES += libvlc_mmal.la
-mmal_LTLIBRARIES = \
+mmal_PLUGINS += \
 	libmmal_device_plugin.la \
 	libmmal_deinterlace_plugin.la \
 	libmmal_converter_plugin.la \

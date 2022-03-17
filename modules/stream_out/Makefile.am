@@ -1,6 +1,14 @@
 soutdir = $(pluginsdir)/stream_out
+sout_PLUGINS =
+sout_LTLIBRARIES =
 sout_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(sout_PLUGINS)
+else
+sout_LTLIBRARIES += $(sout_PLUGINS)
 sout_RPATH += -rpath '$(soutdir)'
+endif
+
 
 libstream_out_dummy_plugin_la_SOURCES = stream_out/dummy.c
 libstream_out_cycle_plugin_la_SOURCES = stream_out/cycle.c
@@ -36,7 +44,7 @@ libstream_out_udp_plugin_la_SOURCES = \
 	stream_out/udp.c
 libstream_out_udp_plugin_la_LIBADD = $(SOCKET_LIBS)
 
-sout_LTLIBRARIES = \
+sout_PLUGINS += \
 	libstream_out_dummy_plugin.la \
 	libstream_out_cycle_plugin.la \
 	libstream_out_delay_plugin.la \
@@ -85,11 +93,11 @@ libstream_out_sdi_plugin_la_SOURCES = stream_out/sdi/sdiout.cpp \
         stream_out/sdi/SDIStream.hpp \
         stream_out/sdi/V210.cpp \
         stream_out/sdi/V210.hpp
-sout_LTLIBRARIES += libstream_out_sdi_plugin.la
+sout_PLUGINS += libstream_out_sdi_plugin.la
 endif
 
 # RTP plugin
-sout_LTLIBRARIES += libstream_out_rtp_plugin.la
+sout_PLUGINS += libstream_out_rtp_plugin.la
 libstream_out_rtp_plugin_la_SOURCES = \
 	stream_out/sdp_helper.c stream_out/sdp_helper.h \
 	stream_out/rtp.c stream_out/rtp.h stream_out/rtpfmt.c \
@@ -110,7 +118,7 @@ libstream_out_chromaprint_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CHROMAPRINT_CFLA
 libstream_out_chromaprint_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sout_RPATH)
 libstream_out_chromaprint_plugin_la_LIBADD = $(CHROMAPRINT_LIBS)
 EXTRA_LTLIBRARIES += libstream_out_chromaprint_plugin.la
-sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
+sout_PLUGINS += $(LTLIBstream_out_chromaprint)
 
 # Chromecast plugin
 SUFFIXES += .proto .pb.cc
@@ -140,7 +148,7 @@ if ENABLE_SOUT
 if BUILD_CHROMECAST
 BUILT_SOURCES += stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc \
                  stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.h
-sout_LTLIBRARIES += libstream_out_chromecast_plugin.la
-demux_LTLIBRARIES += libdemux_chromecast_plugin.la
+sout_PLUGINS += libstream_out_chromecast_plugin.la
+demux_PLUGINS += libdemux_chromecast_plugin.la
 endif
 endif

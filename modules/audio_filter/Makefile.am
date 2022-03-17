@@ -1,6 +1,15 @@
 audio_filterdir = $(pluginsdir)/audio_filter
+audio_filter_PLUGINS =
+audio_filter_LTLIBRARIES =
 audio_filter_RPATH =
+
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(audio_filter_PLUGINS)
+else
+audio_filter_LTLIBRARIES += $(audio_filter_PLUGINS)
 audio_filter_RPATH += -rpath '$(audio_filterdir)'
+endif
+
 
 libaudiobargraph_a_plugin_la_SOURCES = audio_filter/audiobargraph_a.c
 libaudiobargraph_a_plugin_la_LIBADD = $(LIBM)
@@ -40,7 +49,7 @@ libcenter_plugin_la_LIBADD  = $(LIBM)
 libstereopan_plugin_la_SOURCES = audio_filter/stereo_pan.c
 libstereopan_plugin_la_LIBADD = $(LIBM)
 
-audio_filter_LTLIBRARIES = \
+audio_filter_PLUGINS += \
 	libaudiobargraph_a_plugin.la \
 	libchorus_flanger_plugin.la \
 	libcompressor_plugin.la \
@@ -85,7 +94,7 @@ libsimple_channel_mixer_plugin_la_SOURCES += \
 	audio_filter/channel_mixer/simple_neon.h
 endif
 
-audio_filter_LTLIBRARIES += \
+audio_filter_PLUGINS += \
 	libdolby_surround_decoder_plugin.la \
 	libheadphone_channel_mixer_plugin.la \
 	libmono_plugin.la \
@@ -100,7 +109,7 @@ libspatialaudio_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(SPATIALAUDIO_CFLAGS)
 libspatialaudio_plugin_la_LIBADD = $(SPATIALAUDIO_LIBS)
 libspatialaudio_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(audio_filter_RPATH)
 EXTRA_LTLIBRARIES += libspatialaudio_plugin.la
-audio_filter_LTLIBRARIES += $(LTLIBspatialaudio)
+audio_filter_PLUGINS += $(LTLIBspatialaudio)
 
 # Converters
 libaudio_format_plugin_la_SOURCES = audio_filter/converter/format.c
@@ -111,7 +120,7 @@ libtospdif_plugin_la_SOURCES = audio_filter/converter/tospdif.c \
 	packetizer/a52.h \
 	packetizer/dts_header.c packetizer/dts_header.h
 
-audio_filter_LTLIBRARIES += \
+audio_filter_PLUGINS += \
 	libtospdif_plugin.la \
 	libaudio_format_plugin.la
 
@@ -135,7 +144,7 @@ libebur128_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EBUR128_CFLAGS)
 libebur128_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(audio_filter_RPATH)
 libebur128_plugin_la_LIBADD = $(EBUR128_LIBS)
 
-audio_filter_LTLIBRARIES += \
+audio_filter_PLUGINS += \
 	$(LTLIBsamplerate) \
 	$(LTLIBsoxr) \
 	$(LTLIBebur128) \
@@ -150,7 +159,7 @@ libspeex_resampler_plugin_la_SOURCES = audio_filter/resampler/speex.c
 libspeex_resampler_plugin_la_CFLAGS = $(AM_CFLAGS) $(SPEEXDSP_CFLAGS)
 libspeex_resampler_plugin_la_LIBADD = $(SPEEXDSP_LIBS)
 if HAVE_SPEEXDSP
-audio_filter_LTLIBRARIES += libspeex_resampler_plugin.la
+audio_filter_PLUGINS += libspeex_resampler_plugin.la
 endif
 
 librnnoise_plugin_la_SOURCES = audio_filter/rnnoise.c
@@ -158,5 +167,5 @@ librnnoise_plugin_la_CFLAGS = $(AM_CFLAGS) $(RNNOISE_CFLAGS)
 librnnoise_plugin_la_LIBADD = $(RNNOISE_LIBS) $(LIBM)
 librnnoise_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(audio_filter_RPATH)
 
-audio_filter_LTLIBRARIES += $(LTLIBrnnoise)
+audio_filter_PLUGINS += $(LTLIBrnnoise)
 EXTRA_LTLIBRARIES += librnnoise_plugin.la

@@ -1,4 +1,11 @@
 controldir = $(pluginsdir)/control
+control_PLUGINS =
+control_LTLIBRARIES =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(control_PLUGINS)
+else
+control_LTLIBRARIES += $(control_PLUGINS)
+endif
 
 libdummy_plugin_la_SOURCES = control/dummy.c control/intromsg.h
 libgestures_plugin_la_SOURCES = control/gestures.c
@@ -14,7 +21,7 @@ librc_plugin_la_SOURCES = \
 	control/cli/cli.c control/cli/cli.h
 librc_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 
-control_LTLIBRARIES = \
+control_PLUGINS += \
 	libdummy_plugin.la \
 	libgestures_plugin.la \
 	libhotkeys_plugin.la \
@@ -23,7 +30,7 @@ control_LTLIBRARIES = \
 liblirc_plugin_la_SOURCES = control/lirc.c
 liblirc_plugin_la_LIBADD = -llirc_client
 if HAVE_LIRC
-control_LTLIBRARIES += liblirc_plugin.la
+control_PLUGINS += liblirc_plugin.la
 endif
 
 libvlc_motion_la_SOURCES = control/motionlib.c control/motionlib.h
@@ -43,7 +50,7 @@ libdbus_plugin_la_SOURCES = \
 libdbus_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
 libdbus_plugin_la_LIBADD = $(DBUS_LIBS) $(LIBM)
 if HAVE_DBUS
-control_LTLIBRARIES += libdbus_plugin.la
+control_PLUGINS += libdbus_plugin.la
 endif
 
 libxcb_hotkeys_plugin_la_SOURCES = control/globalhotkeys/xcb.c
@@ -51,13 +58,13 @@ libxcb_hotkeys_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_KEYSYMS_CFLAGS) $(XCB_CFLAGS)
 libxcb_hotkeys_plugin_la_LIBADD = $(XCB_KEYSYMS_LIBS) $(XCB_LIBS)
 if HAVE_XCB_KEYSYMS
-control_LTLIBRARIES += libxcb_hotkeys_plugin.la
+control_PLUGINS += libxcb_hotkeys_plugin.la
 endif
 
 libntservice_plugin_la_SOURCES = control/ntservice.c
 libwin_hotkeys_plugin_la_SOURCES = control/globalhotkeys/win32.c
 libwin_msg_plugin_la_SOURCES = control/win_msg.c
 if HAVE_WIN32_DESKTOP
-control_LTLIBRARIES += libntservice_plugin.la
-control_LTLIBRARIES += libwin_hotkeys_plugin.la libwin_msg_plugin.la
+control_PLUGINS += libntservice_plugin.la
+control_PLUGINS += libwin_hotkeys_plugin.la libwin_msg_plugin.la
 endif

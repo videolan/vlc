@@ -1,7 +1,15 @@
 aoutdir = $(pluginsdir)/audio_output
+aout_PLUGINS =
 aout_LTLIBRARIES =
 aout_RPATH =
+
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(aout_PLUGINS)
+else
+aout_LTLIBRARIES += $(aout_PLUGINS)
 aout_RPATH += -rpath '$(aoutdir)'
+endif
+
 
 libopensles_android_plugin_la_SOURCES = audio_output/android/opensles.c
 libopensles_android_plugin_la_LIBADD = libandroid_utils.la $(LIBDL) $(LIBM)
@@ -15,7 +23,7 @@ libandroid_aaudio_plugin_la_LIBADD = libandroid_utils.la $(LIBDL)
 libandroid_audiodevice_plugin_la_SOURCES = audio_output/android/device.c audio_output/android/device.h
 
 if HAVE_ANDROID
-aout_LTLIBRARIES += libandroid_audiodevice_plugin.la libopensles_android_plugin.la \
+aout_PLUGINS += libandroid_audiodevice_plugin.la libopensles_android_plugin.la \
 	libandroid_audiotrack_plugin.la libandroid_aaudio_plugin.la
 endif
 
@@ -26,7 +34,7 @@ libafile_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 libamem_plugin_la_SOURCES = audio_output/amem.c
 
-aout_LTLIBRARIES += \
+aout_PLUGINS += \
 	libadummy_plugin.la \
 	libafile_plugin.la \
 	libamem_plugin.la
@@ -34,14 +42,14 @@ aout_LTLIBRARIES += \
 liboss_plugin_la_SOURCES = audio_output/oss.c audio_output/volume.h
 liboss_plugin_la_LIBADD = $(OSS_LIBS) $(LIBM)
 if HAVE_OSS
-aout_LTLIBRARIES += liboss_plugin.la
+aout_PLUGINS += liboss_plugin.la
 endif
 
 libalsa_plugin_la_SOURCES = audio_output/alsa.c audio_output/volume.h
 libalsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)
 libalsa_plugin_la_LIBADD = $(ALSA_LIBS) $(LIBM)
 if HAVE_ALSA
-aout_LTLIBRARIES += libalsa_plugin.la
+aout_PLUGINS += libalsa_plugin.la
 endif
 
 libvlc_pulse_la_SOURCES = audio_output/vlcpulse.c audio_output/vlcpulse.h
@@ -56,14 +64,14 @@ libpulse_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulse_plugin_la_LIBADD = libvlc_pulse.la $(PULSE_LIBS) $(LIBM)
 if HAVE_PULSE
 pkglib_LTLIBRARIES += libvlc_pulse.la
-aout_LTLIBRARIES += libpulse_plugin.la
+aout_PLUGINS += libpulse_plugin.la
 endif
 
 libjack_plugin_la_SOURCES = audio_output/jack.c audio_output/volume.h
 libjack_plugin_la_CFLAGS = $(AM_CFLAGS) $(JACK_CFLAGS)
 libjack_plugin_la_LIBADD = $(JACK_LIBS) $(LIBM)
 if HAVE_JACK
-aout_LTLIBRARIES += libjack_plugin.la
+aout_PLUGINS += libjack_plugin.la
 endif
 
 libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h
@@ -73,31 +81,31 @@ libwinstore_plugin_la_LIBADD = $(LIBCOM) -lmmdevapi
 libwasapi_plugin_la_SOURCES = audio_output/wasapi.c
 libwasapi_plugin_la_LIBADD = $(LIBCOM) -lksuser
 if HAVE_WASAPI
-aout_LTLIBRARIES += libwasapi_plugin.la
+aout_PLUGINS += libwasapi_plugin.la
 if !HAVE_WINSTORE
-aout_LTLIBRARIES += libmmdevice_plugin.la
+aout_PLUGINS += libmmdevice_plugin.la
 else
-aout_LTLIBRARIES += libwinstore_plugin.la
+aout_PLUGINS += libwinstore_plugin.la
 endif
 endif
 
 libkai_plugin_la_SOURCES = audio_output/kai.c
 libkai_plugin_la_LIBADD = $(KAI_LIBS)
 if HAVE_KAI
-aout_LTLIBRARIES += libkai_plugin.la
+aout_PLUGINS += libkai_plugin.la
 endif
 
 libsndio_plugin_la_SOURCES = audio_output/sndio.c
 libsndio_plugin_la_LIBADD = -lsndio $(LIBM)
 if HAVE_SNDIO
-aout_LTLIBRARIES += libsndio_plugin.la
+aout_PLUGINS += libsndio_plugin.la
 endif
 
 libwaveout_plugin_la_SOURCES = audio_output/waveout.c \
 	audio_output/windows_audio_common.h
 libwaveout_plugin_la_LIBADD = -lwinmm
 if HAVE_WIN32_DESKTOP
-aout_LTLIBRARIES += libwaveout_plugin.la
+aout_PLUGINS += libwaveout_plugin.la
 endif
 
 libauhal_plugin_la_SOURCES = audio_output/auhal.c \
@@ -105,15 +113,15 @@ libauhal_plugin_la_SOURCES = audio_output/auhal.c \
 libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices
 if HAVE_OSX
-aout_LTLIBRARIES += libauhal_plugin.la
+aout_PLUGINS += libauhal_plugin.la
 endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/audiounit_ios.m \
 	audio_output/coreaudio_common.c audio_output/coreaudio_common.h
 libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreAudio,-framework,AudioToolbox,-framework,UIKit,-framework,AVFoundation
 if HAVE_IOS
-aout_LTLIBRARIES += libaudiounit_ios_plugin.la
+aout_PLUGINS += libaudiounit_ios_plugin.la
 endif
 if HAVE_TVOS
-aout_LTLIBRARIES += libaudiounit_ios_plugin.la
+aout_PLUGINS += libaudiounit_ios_plugin.la
 endif

@@ -1,7 +1,13 @@
 voutdir = $(pluginsdir)/video_output
+vout_PLUGINS =
 vout_LTLIBRARIES =
 vout_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(vout_PLUGINS)
+else
+vout_LTLIBRARIES += $(vout_PLUGINS)
 vout_RPATH += -rpath '$(voutdir)'
+endif
 
 EXTRA_DIST += video_output/README
 
@@ -32,7 +38,7 @@ endif
 if HAVE_LINUX
 libdecklinkoutput_plugin_la_LIBADD += $(LIBDL)
 endif
-vout_LTLIBRARIES += libdecklinkoutput_plugin.la
+vout_PLUGINS += libdecklinkoutput_plugin.la
 endif
 
 libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
@@ -48,7 +54,7 @@ else
 libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 endif
-vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
+vout_PLUGINS += libglinterop_cvpx_plugin.la
 endif
 
 if HAVE_OSX
@@ -72,7 +78,7 @@ libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
-vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
+vout_PLUGINS += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c $(OPENGL_VOUT_COMMONSOURCES)
@@ -105,16 +111,16 @@ libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
 endif
-vout_LTLIBRARIES += libcvpx_gl_plugin.la
+vout_PLUGINS += libcvpx_gl_plugin.la
 endif
 
 if HAVE_IOS
-vout_LTLIBRARIES += libvout_ios_plugin.la \
+vout_PLUGINS += libvout_ios_plugin.la \
 	libuiview_window_plugin.la \
 	libcaeagl_ios_plugin.la
 endif
 if HAVE_TVOS
-vout_LTLIBRARIES += \
+vout_PLUGINS += \
 	libvout_ios_plugin.la \
 	libuiview_window_plugin.la \
 	libcaeagl_ios_plugin.la
@@ -134,12 +140,12 @@ libglinterop_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE
 if HAVE_GL
 if HAVE_EGL
 if HAVE_VAAPI
-vout_LTLIBRARIES += libglinterop_vaapi_plugin.la
+vout_PLUGINS += libglinterop_vaapi_plugin.la
 endif
 endif # HAVE_EGL
 
 if HAVE_VDPAU
-vout_LTLIBRARIES += libglinterop_vdpau_plugin.la
+vout_PLUGINS += libglinterop_vdpau_plugin.la
 endif
 endif # HAVE_GL
 
@@ -168,10 +174,10 @@ libglinterop_dxva2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libglinterop_dxva2_plugin_la_LIBADD = libd3d9_common.la -lopengl32
 
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBdirect3d9)
+vout_PLUGINS += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 if HAVE_GL
-vout_LTLIBRARIES += libglinterop_dxva2_plugin.la
+vout_PLUGINS += libglinterop_dxva2_plugin.la
 endif
 endif
 
@@ -195,8 +201,8 @@ else
 libdirect3d11_plugin_la_LIBADD += -ld3d11
 libdirect3d11_plugin_la_LIBADD += -ld3dcompiler_47
 endif
-vout_LTLIBRARIES += $(LTLIBdirect3d11)
 libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
+vout_PLUGINS += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
 libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
@@ -217,7 +223,7 @@ libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBglwin32) $(LTLIBwgl)
+vout_PLUGINS += $(LTLIBglwin32) $(LTLIBwgl)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la libwgl_plugin.la
 endif
 
@@ -227,12 +233,12 @@ libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libwingdi_plugin_la_LIBADD = libchroma_copy.la -lgdi32 $(LIBCOM) -luuid
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libwingdi_plugin.la
+vout_PLUGINS += libwingdi_plugin.la
 endif
 
 libwinhibit_plugin_la_SOURCES = video_output/win32/inhibit.c
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libwinhibit_plugin.la
+vout_PLUGINS += libwinhibit_plugin.la
 endif
 
 libegl_win32_plugin_la_SOURCES = video_output/opengl/egl.c
@@ -241,39 +247,39 @@ libegl_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
 libegl_win32_plugin_la_LIBADD = $(EGL_LIBS)
 if HAVE_WIN32
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_win32_plugin.la
+vout_PLUGINS += libegl_win32_plugin.la
 endif
 endif
 
 libdrawable_plugin_la_SOURCES = video_output/win32/drawable.c \
 	video_output/wasync_resize_compressor.h
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libdrawable_plugin.la
+vout_PLUGINS += libdrawable_plugin.la
 endif
 
 libwin32_window_plugin_la_SOURCES = video_output/win32/window.c \
 	video_output/wasync_resize_compressor.h
 libwin32_window_plugin_la_LIBADD = -lgdi32
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libwin32_window_plugin.la
+vout_PLUGINS += libwin32_window_plugin.la
 endif
 
 
 ### OS/2 ###
 libdrawable_os2_plugin_la_SOURCES = video_output/drawable_os2.c
 if HAVE_OS2
-vout_LTLIBRARIES += libdrawable_os2_plugin.la
+vout_PLUGINS += libdrawable_os2_plugin.la
 endif
 
 libwindow_os2_plugin_la_SOURCES = video_output/window_os2.c
 if HAVE_OS2
-vout_LTLIBRARIES += libwindow_os2_plugin.la
+vout_PLUGINS += libwindow_os2_plugin.la
 endif
 
 libkva_plugin_la_SOURCES = video_output/kva.c
 libkva_plugin_la_LIBADD = $(KVA_LIBS)
 if HAVE_KVA
-vout_LTLIBRARIES += libkva_plugin.la
+vout_PLUGINS += libkva_plugin.la
 endif
 
 
@@ -302,9 +308,11 @@ libglinterop_android_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 libglinterop_android_plugin_la_LIBADD = libandroid_utils.la
 
 if HAVE_ANDROID
-vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
+vout_PLUGINS += libandroid_window_plugin.la libandroid_display_plugin.la
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_android_plugin.la libglinterop_android_plugin.la
+vout_PLUGINS += \
+	libegl_android_plugin.la \
+	libglinterop_android_plugin.la
 endif
 endif
 
@@ -322,11 +330,11 @@ libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/display.c
 libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_DRM
-vout_LTLIBRARIES += libdrm_display_plugin.la
+vout_PLUGINS += libdrm_display_plugin.la
 endif
 if HAVE_LIBDRM
 libdrm_display_plugin_la_CPPFLAGS += $(LIBDRM_CFLAGS) -DHAVE_LIBDRM
-vout_LTLIBRARIES += libkms_plugin.la libdrm_display_plugin.la
+vout_PLUGINS += libkms_plugin.la libdrm_display_plugin.la
 endif
 
 ### Coloured ASCII art ###
@@ -340,7 +348,7 @@ endif
 endif
 libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 EXTRA_LTLIBRARIES += libcaca_plugin.la
-vout_LTLIBRARIES += $(LTLIBcaca)
+vout_PLUGINS += $(LTLIBcaca)
 
 ### Common ###
 
@@ -355,7 +363,7 @@ libwextern_plugin_la_SOURCES = video_output/wextern.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
 libvgl_plugin_la_SOURCES = video_output/vgl.c
 
-vout_LTLIBRARIES += \
+vout_PLUGINS += \
 	libflaschen_plugin.la \
 	libvdummy_plugin.la \
 	libvideo_splitter_plugin.la \

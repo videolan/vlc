@@ -1,6 +1,13 @@
 video_filterdir = $(pluginsdir)/video_filter
 video_filter_RPATH =
+video_filter_PLUGINS =
+video_filter_LTLIBRARIES =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(video_filter_PLUGINS)
+else
+video_filter_LTLIBRARIES += $(video_filter_PLUGINS)
 video_filter_RPATH += -rpath '$(video_filterdir)'
+endif
 
 noinst_HEADERS += video_filter/filter_picture.h
 
@@ -72,7 +79,7 @@ libvhs_plugin_la_SOURCES = video_filter/vhs.c
 libwave_plugin_la_SOURCES = video_filter/wave.c
 libwave_plugin_la_LIBADD = $(LIBM)
 
-video_filter_LTLIBRARIES = \
+video_filter_PLUGINS += \
 	libadjust_plugin.la \
 	libalphamask_plugin.la \
 	libball_plugin.la \
@@ -118,14 +125,15 @@ libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c cod
 libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH) \
 	-Wl,-framework,Foundation -Wl,-framework,CoreGraphics -Wl,-framework,CoreImage \
 	-Wl,-framework,CoreVideo
+
 if HAVE_OSX
 libci_filters_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
-video_filter_LTLIBRARIES += libci_filters_plugin.la
+video_filter_PLUGINS += libci_filters_plugin.la
 endif
 
 if HAVE_IOS
 libci_filters_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
-video_filter_LTLIBRARIES += libci_filters_plugin.la
+video_filter_PLUGINS += libci_filters_plugin.la
 endif
 
 libopengl_filter_plugin_la_SOURCES = video_filter/opengl.c
@@ -134,11 +142,11 @@ if HAVE_LINUX
 if HAVE_ANDROID
 libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
 libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+video_filter_PLUGINS += libopengl_filter_plugin.la
 else
 libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
 if HAVE_GL
-video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+video_filter_PLUGINS += libopengl_filter_plugin.la
 endif
 endif
 endif
@@ -146,18 +154,18 @@ endif
 if HAVE_IOS
 libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
 libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+video_filter_PLUGINS += libopengl_filter_plugin.la
 endif
 
 if HAVE_TVOS
 libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
 libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+video_filter_PLUGINS += libopengl_filter_plugin.la
 endif
 
 if HAVE_OSX
 libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
-video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+video_filter_PLUGINS += libopengl_filter_plugin.la
 endif
 
 libdeinterlace_common_la_SOURCES = video_filter/deinterlace/common.c video_filter/deinterlace/common.h
@@ -185,17 +193,17 @@ if HAVE_ALTIVEC
 libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_C_ALTIVEC
 endif
 libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
-video_filter_LTLIBRARIES += libdeinterlace_plugin.la
+video_filter_PLUGINS += libdeinterlace_plugin.la
 
 libglblend_plugin_la_SOURCES = video_filter/deinterlace/glblend.c
 libglblend_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_GL
 libglblend_plugin_la_LIBADD = libvlc_opengl.la
-video_filter_LTLIBRARIES += libglblend_plugin.la
+video_filter_PLUGINS += libglblend_plugin.la
 endif
 
 if HAVE_DARWIN
-video_filter_LTLIBRARIES += libglblend_plugin.la
+video_filter_PLUGINS += libglblend_plugin.la
 if HAVE_OSX
 libglblend_plugin_la_LIBADD = libvlc_opengl.la
 else
@@ -207,30 +215,30 @@ endif
 if HAVE_ANDROID
 libglblend_plugin_la_LIBADD = libvlc_opengles.la
 libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-video_filter_LTLIBRARIES += libglblend_plugin.la
+video_filter_PLUGINS += libglblend_plugin.la
 endif
 
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c
 libopencv_wrapper_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)
-video_filter_LTLIBRARIES += $(LTLIBopencv_wrapper)
 libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
+video_filter_PLUGINS += $(LTLIBopencv_wrapper)
 EXTRA_LTLIBRARIES += libopencv_wrapper_plugin.la
 
 libpostproc_plugin_la_SOURCES = video_filter/postproc.c
 libpostproc_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(POSTPROC_CFLAGS) $(AVUTIL_CFLAGS)
 libpostproc_plugin_la_LIBADD = $(LIBM) $(POSTPROC_LIBS) $(AVUTIL_LIBS)
-video_filter_LTLIBRARIES += $(LTLIBpostproc)
 libpostproc_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
+video_filter_PLUGINS += $(LTLIBpostproc)
 EXTRA_LTLIBRARIES += libpostproc_plugin.la
 
 # misc
 libblend_plugin_la_SOURCES = video_filter/blend.cpp
-video_filter_LTLIBRARIES += libblend_plugin.la
+video_filter_PLUGINS += libblend_plugin.la
 
 libopencv_example_plugin_la_SOURCES = video_filter/opencv_example.cpp video_filter/filter_event_info.h
 libopencv_example_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_example_plugin_la_LIBADD = $(OPENCV_LIBS)
-video_filter_LTLIBRARIES += $(LTLIBopencv_example)
 libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
+video_filter_PLUGINS += $(LTLIBopencv_example)
 EXTRA_LTLIBRARIES += libopencv_example_plugin.la

@@ -1,4 +1,11 @@
 vdpaudir = $(pluginsdir)/vdpau
+vdpau_PLUGINS =
+vdpau_LTLIBRARIES =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(vdpau_PLUGINS)
+else
+vdpau_LTLIBRARIES += $(vdpau_PLUGINS)
+endif
 
 libvlc_vdpau_la_SOURCES = hw/vdpau/vlc_vdpau.c hw/vdpau/vlc_vdpau.h
 libvlc_vdpau_la_CFLAGS = $(VDPAU_CFLAGS)
@@ -36,10 +43,10 @@ libvdpau_chroma_plugin_la_LIBADD = libvlc_vdpau.la
 
 if HAVE_VDPAU
 pkglib_LTLIBRARIES += libvlc_vdpau.la
-vdpau_LTLIBRARIES = libvdpau_instance_plugin.la \
+vdpau_PLUGINS += libvdpau_instance_plugin.la \
 	libvdpau_deinterlace_plugin.la libvdpau_adjust_plugin.la \
 	libvdpau_sharpen_plugin.la libvdpau_chroma_plugin.la
 if HAVE_AVCODEC_VDPAU
-vdpau_LTLIBRARIES += libvdpau_avcodec_plugin.la
+vdpau_PLUGINS += libvdpau_avcodec_plugin.la
 endif
 endif

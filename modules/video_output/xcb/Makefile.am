@@ -56,7 +56,7 @@ libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 
 if HAVE_XCB
 pkglib_LTLIBRARIES += libvlc_xcb_events.la
-vout_LTLIBRARIES += \
+vout_PLUGINS += \
 	libxcb_x11_plugin.la \
 	libxcb_render_plugin.la \
 	libxcb_window_plugin.la
@@ -67,12 +67,12 @@ libxcb_window_plugin_la_SOURCES += \
 libxcb_window_plugin_la_CFLAGS += -DHAVE_XKBCOMMON
 endif
 if HAVE_VULKAN
-vout_LTLIBRARIES += libvk_x11_plugin.la
+vout_PLUGINS += libvk_x11_plugin.la
 endif
 if HAVE_EGL
-vout_LTLIBRARIES += libxcb_egl_plugin.la libegl_x11_plugin.la
+vout_PLUGINS += libxcb_egl_plugin.la libegl_x11_plugin.la
 endif
 if HAVE_GL
-vout_LTLIBRARIES += libglx_plugin.la
+vout_PLUGINS += libglx_plugin.la
 endif
 endif

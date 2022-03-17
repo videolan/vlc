@@ -357,7 +357,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 libmacosx_plugin_la_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES)
 
 if ENABLE_MACOSX_UI
-gui_LTLIBRARIES += libmacosx_plugin.la
+gui_PLUGINS += libmacosx_plugin.la
 BUILT_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES:.xib=.nib)
 endif
 

@@ -1,5 +1,16 @@
+rtpparse_LTLIBRARIES =
+rtpparse_PLUGINS =
+rtpparse_RPATH =
+
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(rtpparse_PLUGINS)
+else
+rtpparse_LTLIBRARIES += $(rtpparse_PLUGINS)
+rtpparse_RPATH += -rpath '$(rtpparsedir)'
+endif
+
 # RTP plugin
-access_LTLIBRARIES += librtp_plugin.la
+access_PLUGINS += librtp_plugin.la
 librtp_plugin_la_SOURCES = \
 	access/rtp/input.c \
 	access/rtp/session.c \
@@ -32,7 +43,7 @@ noinst_HEADERS += access/rtp/fmtp.h
 
 # RTP payload parser plugins
 rtpparsedir = $(accessdir)/rtp
-rtpparse_LTLIBRARIES = \
+rtpparse_PLUGINS += \
 	librtp_ac3_plugin.la \
 	librtp_mpeg12_plugin.la \
 	librtp_pcm_plugin.la \

@@ -1,9 +1,16 @@
 textdir = $(pluginsdir)/text_renderer
+text_PLUGINS =
+text_LTLIBRARIES =
 text_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(text_PLUGINS)
+else
+text_LTLIBRARIES += $(text_PLUGINS)
 text_RPATH += -rpath '$(textdir)'
+endif
 
 libtdummy_plugin_la_SOURCES = text_renderer/tdummy.c
-text_LTLIBRARIES = libtdummy_plugin.la
+text_PLUGINS += libtdummy_plugin.la
 
 libfreetype_plugin_la_SOURCES = \
 	text_renderer/freetype/platform_fonts.c text_renderer/freetype/platform_fonts.h \
@@ -56,7 +63,7 @@ endif
 libfreetype_plugin_la_LINK += $(libfreetype_plugin_la_LDFLAGS)
 libfreetype_plugin_la_LIBADD += $(FREETYPE_LIBS)
 if HAVE_FREETYPE
-text_LTLIBRARIES += libfreetype_plugin.la
+text_PLUGINS += libfreetype_plugin.la
 endif
 
 # SVG plugin
@@ -65,13 +72,13 @@ libsvg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SVG_CFLAGS)
 libsvg_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(text_RPATH)
 libsvg_plugin_la_LIBADD = $(SVG_LIBS)
 EXTRA_LTLIBRARIES += libsvg_plugin.la
-text_LTLIBRARIES += $(LTLIBsvg)
+text_PLUGINS += $(LTLIBsvg)
 
 # OS X TTS
 libnsspeechsynthesizer_plugin_la_SOURCES = text_renderer/nsspeechsynthesizer.m
 libnsspeechsynthesizer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,Cocoa
 if HAVE_OSX
-text_LTLIBRARIES += libnsspeechsynthesizer_plugin.la
+text_PLUGINS += libnsspeechsynthesizer_plugin.la
 endif
 
 # SAPI TTS (win32)
@@ -79,5 +86,5 @@ libsapi_plugin_la_SOURCES = text_renderer/sapi.cpp
 libsapi_plugin_la_LIBADD = $(LIBCOM)
 libsapi_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 if HAVE_SAPI
-text_LTLIBRARIES += libsapi_plugin.la
+text_PLUGINS += libsapi_plugin.la
 endif
