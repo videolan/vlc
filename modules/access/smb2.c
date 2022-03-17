@@ -174,9 +174,13 @@ smb2_check_status(struct vlc_smb2_op *op, int status, const char *psz_func)
 static void
 smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
 {
-    if (op->log)
+    if (op->log && err != -EINTR)
         vlc_error(op->log, "%s failed: %d, %s", psz_func, err, smb2_get_error(op->smb2));
-    op->error_status = err;
+
+    if (err != 0)
+        op->error_status = err;
+    else if (op->error_status == 0) /* don't override if set via smb2_check_status */
+        op->error_status = -EINVAL;
 }
 
 #define VLC_SMB2_CHECK_STATUS(op, status) \
@@ -242,21 +246,17 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op, bool teardown)
                     poll_func = (void *) poll;
                 }
                 else
-                    op->error_status = -errno;
+                    VLC_SMB2_SET_ERROR(op, "poll", -errno);
             }
             else
-            {
-                if (op->log)
-                    vlc_error(op->log, "vlc_poll_i11e failed");
-                op->error_status = -errno;
-            }
+                VLC_SMB2_SET_ERROR(op, "poll", -errno);
         }
         else if (ret == 0)
         {
             if (teardown)
-                op->error_status = -ETIMEDOUT;
+                VLC_SMB2_SET_ERROR(op, "poll", -ETIMEDOUT);
             else if (smb2_service_fd(op->smb2, -1, 0) < 0)
-                VLC_SMB2_SET_ERROR(op, "smb2_service", 1);
+                VLC_SMB2_SET_ERROR(op, "smb2_service", 0);
         }
         else
         {
@@ -264,7 +264,7 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op, bool teardown)
             {
                 if (p_fds[i].revents
                  && smb2_service_fd(op->smb2, p_fds[i].fd, p_fds[i].revents) < 0)
-                    VLC_SMB2_SET_ERROR(op, "smb2_service", 1);
+                    VLC_SMB2_SET_ERROR(op, "smb2_service", 0);
             }
         }
     }
@@ -316,10 +316,11 @@ FileRead(stream_t *access, void *buf, size_t len)
     struct vlc_smb2_op op = VLC_SMB2_OP(access, sys->smb2);
     op.res.read.len = 0;
 
-    if (smb2_read_async(sys->smb2, sys->smb2fh, buf, len,
-                        smb2_read_cb, &op) < 0)
+    int err = smb2_read_async(sys->smb2, sys->smb2fh, buf, len,
+                              smb2_read_cb, &op);
+    if (err < 0)
     {
-        VLC_SMB2_SET_ERROR(&op, "smb2_read_async", 1);
+        VLC_SMB2_SET_ERROR(&op, "smb2_read_async", err);
         return 0;
     }
 
@@ -345,11 +346,11 @@ FileSeek(stream_t *access, uint64_t i_pos)
 
     struct vlc_smb2_op op = VLC_SMB2_OP(access, sys->smb2);
 
-    if (smb2_lseek(op.smb2, sys->smb2fh, i_pos, SEEK_SET, NULL) < 0)
+    int err = smb2_lseek(op.smb2, sys->smb2fh, i_pos, SEEK_SET, NULL);
+    if (err < 0)
     {
-        VLC_SMB2_SET_ERROR(&op, "smb2_seek_async", 1);
-        sys->error_status = op.error_status;
-        return VLC_EGENERIC;
+        VLC_SMB2_SET_ERROR(&op, "smb2_seek_async", err);
+        return err;
     }
     sys->eof = false;
 
@@ -525,9 +526,10 @@ vlc_smb2_close_fh(stream_t *access, struct smb2_context *smb2,
 {
     struct vlc_smb2_op op = VLC_SMB2_OP(access, smb2);
 
-    if (smb2_close_async(smb2, smb2fh, smb2_generic_cb, &op) < 0)
+    int err = smb2_close_async(smb2, smb2fh, smb2_generic_cb, &op);
+    if (err < 0)
     {
-        VLC_SMB2_SET_ERROR(&op, "smb2_close_async", 1);
+        VLC_SMB2_SET_ERROR(&op, "smb2_close_async", err);
         return -1;
     }
 
@@ -539,9 +541,10 @@ vlc_smb2_disconnect_share(stream_t *access, struct smb2_context *smb2)
 {
     struct vlc_smb2_op op = VLC_SMB2_OP(access, smb2);
 
-    if (smb2_disconnect_share_async(smb2, smb2_generic_cb, &op) < 0)
+    int err = smb2_disconnect_share_async(smb2, smb2_generic_cb, &op);
+    if (err < 0)
     {
-        VLC_SMB2_SET_ERROR(&op, "smb2_connect_share_async", 1);
+        VLC_SMB2_SET_ERROR(&op, "smb2_connect_share_async", err);
         return -1;
     }
 
@@ -603,9 +606,13 @@ vlc_smb2_open_share(stream_t *access, struct smb2_context *smb2,
         ret = smb2_share_enum_async(smb2, smb2_open_cb, &op);
     else
     {
-        if (smb2_stat_async(smb2, smb2_url->path, &smb2_stat,
-                            smb2_generic_cb, &op) < 0)
-            VLC_SMB2_SET_ERROR(&op, "smb2_stat_async", 1);
+        ret = smb2_stat_async(smb2, smb2_url->path, &smb2_stat,
+                              smb2_generic_cb, &op);
+        if (ret < 0)
+        {
+            VLC_SMB2_SET_ERROR(&op, "smb2_stat_async", ret);
+            goto error;
+        }
 
         if (vlc_smb2_mainloop(&op, false) != 0)
             goto error;
@@ -627,14 +634,13 @@ vlc_smb2_open_share(stream_t *access, struct smb2_context *smb2,
         else
         {
             msg_Err(access, "smb2_stat_cb: file type not handled");
-            op.error_status = -ENOENT;
-            goto error;
+            ret = -ENOENT;
         }
     }
 
     if (ret < 0)
     {
-        VLC_SMB2_SET_ERROR(&op, "smb2_open*_async", 1);
+        VLC_SMB2_SET_ERROR(&op, "smb2_open*_async", ret);
         goto error;
     }
 
