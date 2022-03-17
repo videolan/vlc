@@ -153,8 +153,7 @@ int FrontendOpen( vlc_object_t *p_access, dvb_sys_t *p_sys, const char *psz_acce
             psz_expected = "DVB-T";
         }
 
-        if( (!strncmp( psz_access, "usdigital", 9 ) ||
-             !strncmp( psz_access, "atsc", 4 ) ) &&
+        if( !strncmp( psz_access, "atsc", 4 ) &&
              (p_frontend->info.type != FE_ATSC) )
         {
             psz_expected = "ATSC";
@@ -184,8 +183,7 @@ int FrontendOpen( vlc_object_t *p_access, dvb_sys_t *p_sys, const char *psz_acce
         else if( !strncmp( psz_access, "terrestrial", 11 ) ||
                  !strncmp( psz_access, "dvb-t", 5 ) )
             p_frontend->info.type = FE_OFDM;
-        else if( !strncmp( psz_access, "usdigital", 9 ) ||
-                 !strncmp( psz_access, "atsc", 4 ) )
+        else if( !strncmp( psz_access, "atsc", 4 ) )
             p_frontend->info.type = FE_ATSC;
     }
 
