@@ -38,7 +38,6 @@ vlc_access_cache_entry_Delete(struct vlc_access_cache_entry *entry)
     free(entry->url);
     free(entry->username);
 
-    entry->free_cb(entry->context);
     free(entry);
 }
 
@@ -86,6 +85,7 @@ vlc_access_cache_Thread(void *data)
 
                 vlc_mutex_unlock(&cache->lock);
 
+                entry->free_cb(entry->context);
                 vlc_access_cache_entry_Delete(entry);
 
                 vlc_mutex_lock(&cache->lock);
@@ -133,7 +133,10 @@ vlc_access_cache_Destroy(struct vlc_access_cache *cache)
 
     struct vlc_access_cache_entry *entry;
     vlc_list_foreach(entry, &cache->entries, node)
+    {
+        entry->free_cb(entry->context);
         vlc_access_cache_entry_Delete(entry);
+    }
 }
 
 void
@@ -147,6 +150,7 @@ vlc_access_cache_AddEntry(struct vlc_access_cache *cache,
     if (!cache->running)
     {
         vlc_mutex_unlock(&cache->lock);
+        entry->free_cb(entry->context);
         vlc_access_cache_entry_Delete(entry);
         return;
     }

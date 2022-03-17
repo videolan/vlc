@@ -85,6 +85,7 @@ vlc_access_cache_entry_NewSmb(void *context, const char *server,
     return entry;
 }
 
+/* Delete the cache entry without firing the free_cb */
 void
 vlc_access_cache_entry_Delete(struct vlc_access_cache_entry *entry);
 
