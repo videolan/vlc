@@ -260,6 +260,16 @@ static void vout_display_window_VisibilityChanged(
     }
 }
 
+static void vout_display_window_VsyncReached(
+        vlc_window_t *window, vlc_tick_t next_vsync)
+{
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
+    vout_NotifyVsyncReached(vout, next_vsync);
+}
+
+
 static const struct vlc_window_callbacks vout_display_window_cbs = {
     .resized = vout_display_window_ResizeNotify,
     .closed = vout_display_window_CloseNotify,
@@ -271,6 +281,7 @@ static const struct vlc_window_callbacks vout_display_window_cbs = {
     .output_event = vout_display_window_OutputEvent,
     .icc_event = vout_display_window_IccEvent,
     .visibility_changed = vout_display_window_VisibilityChanged,
+    .vsync_reached = vout_display_window_VsyncReached,
 };
 
 void vout_display_window_SetMouseHandler(vlc_window_t *window,
