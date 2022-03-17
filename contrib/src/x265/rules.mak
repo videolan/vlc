@@ -1,8 +1,8 @@
 # x265
 
 #X265_GITURL := https://github.com/videolan/x265
-X265_VERSION := 2.7
-X265_SNAPURL := https://bitbucket.org/multicoreware/x265/downloads/x265_$(X265_VERSION).tar.gz
+X265_VERSION := 2.9
+X265_SNAPURL := https://bitbucket.org/multicoreware/x265_git/downloads/x265_$(X265_VERSION).tar.gz
 
 ifdef BUILD_ENCODERS
 ifdef GPL
