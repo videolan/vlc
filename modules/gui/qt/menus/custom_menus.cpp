@@ -298,6 +298,130 @@ void CheckableListMenu::onModelReset()
         onRowInserted({}, 0, nb_rows - 1);
 }
 
+// ListMenuHelper
+
+ListMenuHelper::ListMenuHelper(QMenu * menu, QAbstractListModel * model, QAction * before,
+                               QObject * parent)
+    : QObject(parent), m_menu(menu), m_model(model), m_before(before)
+{
+    m_group = new QActionGroup(this);
+
+    onModelReset();
+
+    connect(m_model, &QAbstractListModel::rowsInserted, this, &ListMenuHelper::onRowsInserted);
+    connect(m_model, &QAbstractListModel::rowsRemoved,  this, &ListMenuHelper::onRowsRemoved);
+
+    connect(m_model, &QAbstractListModel::dataChanged, this, &ListMenuHelper::onDataChanged);
+
+    connect(m_model, &QAbstractListModel::modelReset, this, &ListMenuHelper::onModelReset);
+}
+
+// Interface
+
+int ListMenuHelper::count() const
+{
+    return m_actions.count();
+}
+
+// Private slots
+
+void ListMenuHelper::onRowsInserted(const QModelIndex &, int first, int last)
+{
+    QAction * before;
+
+    if (first < m_actions.count())
+        before = m_actions.at(first);
+    else
+        before = m_before;
+
+    for (int i = first; i <= last; i++)
+    {
+        QModelIndex index = m_model->index(i, 0);
+
+        QString name = m_model->data(index, Qt::DisplayRole).toString();
+
+        QAction * action = new QAction(name, this);
+
+        action->setCheckable(true);
+
+        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
+
+        action->setChecked(checked);
+
+        // NOTE: We are adding sequentially *before* the next action in the list.
+        m_menu->insertAction(before, action);
+
+        m_group->addAction(action);
+
+        m_actions.insert(i, action);
+
+        connect(action, &QAction::triggered, this, &ListMenuHelper::onTriggered);
+    }
+
+    emit countChanged(m_actions.count());
+}
+
+void ListMenuHelper::onRowsRemoved(const QModelIndex &, int first, int last)
+{
+    for (int i = first; i <= last; i++)
+    {
+        QAction * action = m_actions.at(i);
+
+        m_group->removeAction(action);
+
+        delete action;
+    }
+
+    QList<QAction *>::iterator begin = m_actions.begin();
+
+    m_actions.erase(begin + first, begin + last);
+
+    emit countChanged(m_actions.count());
+}
+
+void ListMenuHelper::onDataChanged(const QModelIndex & topLeft,
+                                   const QModelIndex & bottomRight, const QVector<int> &)
+{
+    for (int i = topLeft.row(); i <= bottomRight.row(); i++)
+    {
+        QAction * action = m_actions.at(i);
+
+        QModelIndex index = m_model->index(i, 0);
+
+        QString name = m_model->data(index, Qt::DisplayRole).toString();
+
+        action->setText(name);
+
+        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
+
+        action->setChecked(checked);
+    }
+}
+
+void ListMenuHelper::onModelReset()
+{
+    for (QAction * action : m_actions)
+    {
+        m_group->removeAction(action);
+
+        delete action;
+    }
+
+    m_actions.clear();
+
+    int count = m_model->rowCount();
+
+    if (count)
+        onRowsInserted(QModelIndex(), 0, count - 1);
+}
+
+void ListMenuHelper::onTriggered(bool checked)
+{
+    QAction * action = static_cast<QAction *> (sender());
+
+    emit select(m_actions.indexOf(action));
+}
+
 /*     BooleanPropertyAction    */
 
 BooleanPropertyAction::BooleanPropertyAction(QString title, QObject *model, QString propertyName, QWidget *parent)

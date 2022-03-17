@@ -102,6 +102,46 @@ private:
     QActionGroup* m_actionGroup = nullptr;
 };
 
+// NOTE: This class is a helper to populate and maintain a QMenu from an QAbstractListModel.
+class ListMenuHelper : public QObject
+{
+    Q_OBJECT
+
+public:
+    // NOTE: The model actions will be inserted before 'before' or at the end if it's NULL.
+    ListMenuHelper(QMenu * menu, QAbstractListModel * model, QAction * before = nullptr,
+                   QObject * parent = nullptr);
+
+public: // Interface
+    int count() const;
+
+private slots:
+    void onRowsInserted(const QModelIndex & parent, int first, int last);
+    void onRowsRemoved (const QModelIndex & parent, int first, int last);
+
+    void onDataChanged(const QModelIndex & topLeft, const QModelIndex & bottomRight,
+                       const QVector<int> & roles = QVector<int>());
+
+    void onModelReset();
+
+    void onTriggered(bool checked);
+
+signals:
+    void select(int index);
+
+    void countChanged(int count);
+
+private:
+    QMenu * m_menu = nullptr;
+
+    QActionGroup * m_group = nullptr;
+
+    QAbstractListModel * m_model = nullptr;
+
+    QList<QAction *> m_actions;
+
+    QAction * m_before = nullptr;
+};
 
 /**
  * @brief The BooleanPropertyAction class allows to bind a boolean Q_PROPRERTY to a QAction
