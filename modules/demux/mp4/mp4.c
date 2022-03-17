@@ -1652,6 +1652,7 @@ static void FragTrunSeekToTime( mp4_track_t *p_track, stime_t i_target_time )
     p_track->context.i_trun_sample = i_sample;
     p_track->context.i_trun_sample_pos = i_pos;
     p_track->context.runs.i_current = i_run;
+    p_track->i_time = i_time;
 }
 
 static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime, bool b_accurate )
