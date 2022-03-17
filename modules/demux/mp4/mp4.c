@@ -4624,12 +4624,13 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
             }
 
             /* Use global sidx moof time, in case moof does not carry tfdt */
-            if( !b_has_base_media_decode_time && i_moof_time != INT64_MAX )
-                i_traf_start_time = MP4_rescale( i_moof_time, p_sys->i_timescale, p_track->i_timescale );
-
-            /* That should not happen */
             if( !b_has_base_media_decode_time )
-                i_traf_start_time = MP4_rescale( p_sys->i_nztime, CLOCK_FREQ, p_track->i_timescale );
+            {
+                if( i_moof_time != INT64_MAX )
+                    i_traf_start_time = MP4_rescale( i_moof_time, p_sys->i_timescale, p_track->i_timescale );
+                else /* That should not happen */
+                    i_traf_start_time = MP4_rescale( p_sys->i_nztime, CLOCK_FREQ, p_track->i_timescale );
+            }
         }
 
         /* Parse TRUN data */
