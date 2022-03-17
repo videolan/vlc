@@ -1194,7 +1194,6 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         { "udp",    ITEM_TYPE_STREAM, true },  /* udplite too */
         { "unsv",   ITEM_TYPE_STREAM, true },
         { "upnp",   ITEM_TYPE_FILE, true },
-        { "usdigi", ITEM_TYPE_CARD, false }, /* usdigital */
         { "v4l",    ITEM_TYPE_CARD, false },
         { "vcd",    ITEM_TYPE_DISC, false },
         { "vdr",    ITEM_TYPE_STREAM, true },
