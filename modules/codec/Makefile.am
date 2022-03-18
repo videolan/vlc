@@ -158,9 +158,9 @@ EXTRA_LTLIBRARIES += libbpg_plugin.la
 codec_PLUGINS += $(LTLIBbpg)
 
 libsvgdec_plugin_la_SOURCES = codec/svg.c
-libsvgdec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_svgdec)
-libsvgdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_svg) $(codec_RPATH)
-libsvgdec_plugin_la_LIBADD = $(LIBS_svgdec)
+libsvgdec_plugin_la_CFLAGS = $(AM_CFLAGS) $(SVGDEC_CFLAGS)
+libsvgdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(codec_RPATH)
+libsvgdec_plugin_la_LIBADD = $(SVGDEC_LIBS)
 EXTRA_LTLIBRARIES += libsvgdec_plugin.la
 codec_PLUGINS += $(LTLIBsvgdec)
 
