@@ -40,10 +40,51 @@ static struct scenario_data
     unsigned encoder_picture_count;
     bool converter_opened;
     bool encoder_opened;
+    bool error_reported;
 } scenario_data;
 
+static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
+        unsigned width, unsigned height)
+{
+    dec->fmt_out.video.i_chroma
+        = dec->fmt_out.i_codec
+        = chroma;
+    dec->fmt_out.video.i_visible_width
+        = dec->fmt_out.video.i_width
+        = width;
+    dec->fmt_out.video.i_visible_height
+        = dec->fmt_out.video.i_height
+        = height;
+}
+
+static void decoder_i420_800_600(decoder_t *dec)
+    { decoder_fixed_size(dec, VLC_CODEC_I420, 800, 600); }
+
+static int decoder_decode_error(decoder_t *dec, picture_t *pic)
+{
+    (void)dec;
+    picture_Release(pic);
+    return VLC_EGENERIC;
+}
+
+static void wait_error_reported(sout_stream_t *stream)
+{
+    (void)stream;
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
 const char source_800_600[] = "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600";
-struct transcode_scenario transcode_scenarios[] = {};
+struct transcode_scenario transcode_scenarios[] =
+{{
+    /* Ensure that error are correctly forwarded back to the stream output
+     * pipeline. */
+    .source = source_800_600,
+    .sout = "sout=#error_checker:transcode:dummy",
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_decode = decoder_decode_error,
+    .report_error = wait_error_reported,
+}};
+
 size_t transcode_scenarios_count = ARRAY_SIZE(transcode_scenarios);
 
 void transcode_scenario_init(void)

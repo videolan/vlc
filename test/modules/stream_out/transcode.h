@@ -38,6 +38,7 @@ struct transcode_scenario {
     void (*encoder_encode)(encoder_t *, picture_t *);
     void (*filter_setup)(filter_t *);
     void (*converter_setup)(filter_t *);
+    void (*report_error)(sout_stream_t *);
 };
 
 

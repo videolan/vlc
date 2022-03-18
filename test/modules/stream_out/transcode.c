@@ -42,6 +42,7 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_player.h>
 #include <vlc_filter.h>
 #include <vlc_threads.h>
+#include <vlc_sout.h>
 
 #include <limits.h>
 
@@ -200,6 +201,33 @@ static int OpenEncoder(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
+static int ErrorCheckerSend(sout_stream_t *stream, void *id, block_t *b)
+{
+    struct transcode_scenario *scenario = &transcode_scenarios[current_scenario];
+
+    int ret = sout_StreamIdSend(stream->p_next, id, b);
+    if (ret != VLC_SUCCESS)
+        scenario->report_error(stream);
+    return VLC_SUCCESS;
+}
+
+static void* ErrorCheckerAdd(sout_stream_t *stream, const es_format_t *fmt)
+    { return sout_StreamIdAdd(stream->p_next, fmt); }
+
+static void ErrorCheckerDel(sout_stream_t *stream, void *id)
+    { sout_StreamIdDel(stream->p_next, id); };
+
+static int OpenErrorChecker(vlc_object_t *obj)
+{
+    sout_stream_t *stream = (sout_stream_t *)obj;
+    static const struct sout_stream_operations ops = {
+        .add = ErrorCheckerAdd,
+        .del = ErrorCheckerDel,
+        .send = ErrorCheckerSend,
+    };
+    stream->ops = &ops;
+    return VLC_SUCCESS;
+}
 
 static void on_state_changed(vlc_player_t *player, enum vlc_player_state state, void *opaque)
 {
@@ -286,6 +314,11 @@ static int OpenIntf(vlc_object_t *obj)
 vlc_module_begin()
     set_callbacks(OpenDecoder, CloseDecoder)
     set_capability("video decoder", INT_MAX)
+
+    add_submodule()
+        set_callback(OpenErrorChecker)
+        set_capability("sout filter", 0)
+        add_shortcut("error_checker")
 
     add_submodule()
         set_callback(OpenDecoderDevice)
