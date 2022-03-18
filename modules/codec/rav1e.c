@@ -28,7 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <rav1e/rav1e.h>
+#include <rav1e.h>
 
 #define SOUT_CFG_PREFIX "sout-rav1e-"
 
