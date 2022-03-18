@@ -1320,8 +1320,8 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
      * open callback or midstream (from the demux callback). Therefore, we
      * can't handle the clock source selection after the program is created
      * since input_CanPaceControl() might not be initialized. To fix this
-     * issue, handle clock source selection after/when the es_out is activated
-     * (from ES_OUT_PRIV_SET_MODE) or when a program is created. */
+     * issue, handle clock source selection when the first PCR is sent (from
+     * ES_OUT_SET_PCR). */
     assert( p_sys->b_active );
 
     switch( p_sys->user_clock_source )
@@ -1521,9 +1521,6 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         free( p_pgrm );
         return NULL;
     }
-
-    if( p_sys->b_active )
-        EsOutProgramHandleClockSource( out, p_pgrm );
 
     if( p_sys->b_paused )
         input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
@@ -3354,6 +3351,12 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         if( !p_pgrm )
             return VLC_EGENERIC;
 
+        if( p_pgrm->active_clock_source == VLC_CLOCK_MASTER_AUTO )
+        {
+            EsOutProgramHandleClockSource( out, p_pgrm );
+            assert( p_pgrm->active_clock_source != VLC_CLOCK_MASTER_AUTO );
+        }
+
         i_pcr = va_arg( args, vlc_tick_t );
         if( i_pcr == VLC_TICK_INVALID )
         {
@@ -3700,19 +3703,6 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         }
         p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
         p_sys->i_mode = i_mode;
-
-        if( p_sys->b_active && i_mode != ES_OUT_MODE_END )
-        {
-            es_out_pgrm_t *p_pgrm;
-            vlc_list_foreach(p_pgrm, &p_sys->programs, node)
-            {
-                if( p_pgrm->active_clock_source == VLC_CLOCK_MASTER_AUTO )
-                {
-                    EsOutProgramHandleClockSource( out, p_pgrm );
-                    assert( p_pgrm->active_clock_source != VLC_CLOCK_MASTER_AUTO );
-                }
-            }
-        }
 
         /* Reapply policy mode */
         es_out_id_t *es;
