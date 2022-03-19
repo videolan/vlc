@@ -127,13 +127,9 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
 
-    unsigned i, c, propi;
-    uint32_t planetype;
-    const char types[][16] = { "OVERLAY", "PRIMARY", "CURSOR", "UNKNOWN" };
+    unsigned i, c;
     drmModePlaneRes *plane_res = NULL;
     drmModePlane *plane;
-    drmModeObjectProperties *props;
-    drmModePropertyPtr pp;
     bool YUVFormat;
 
     int drm_fd = wnd->display.drm_fd;
@@ -161,34 +157,13 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
     sys->plane_id = 0;
 
     if (plane_res != NULL && plane_res->count_planes > 0) {
-        msg_Dbg(vd, "List of DRM supported modes on this machine:");
         for (c = 0; c < plane_res->count_planes; c++) {
-
             plane = drmModeGetPlane(drm_fd, plane_res->planes[c]);
             if (plane != NULL && plane->count_formats > 0) {
                 if ((plane->possible_crtcs & (1 << crtc_index)) == 0)
                 {
                     drmModeFreePlane(plane);
                     continue;
-                }
-
-                props = drmModeObjectGetProperties(drm_fd,
-                                                   plane->plane_id,
-                                                   DRM_MODE_OBJECT_PLANE);
-
-                planetype = 3;
-                pp = NULL;
-                for (propi = 0; propi < props->count_props; propi++) {
-                    pp = drmModeGetProperty(drm_fd, props->props[propi]);
-                    if (strcmp(pp->name, "type") == 0) {
-                        break;
-                    }
-                    drmModeFreeProperty(pp);
-                }
-
-                if (pp != NULL) {
-                    drmModeFreeProperty(pp);
-                    planetype = props->prop_values[propi];
                 }
 
                 for (i = 0; i < plane->count_formats; i++) {
@@ -198,20 +173,8 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
                             plane->formats[i] == sys->drm_fourcc) {
                         sys->plane_id = plane->plane_id;
                     }
-
-                    /*
-                     * we don't advertise about cursor plane because
-                     * of its special limitations.
-                     */
-                    if (planetype != DRM_PLANE_TYPE_CURSOR) {
-                        msg_Dbg(vd, "plane id %d type %s pipe %c format %2d: %.4s",
-                                plane->plane_id, types[planetype],
-                                ('@'+ffs(plane->possible_crtcs)), i,
-                                (char*)&plane->formats[i]);
-                    }
                 }
                 drmModeFreePlane(plane);
-                drmModeFreeObjectProperties(props);
             } else {
                 msg_Err(vd, "Couldn't get list of DRM formats");
                 drmModeFreePlaneResources(plane_res);
