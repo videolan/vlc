@@ -3,6 +3,7 @@
  *****************************************************************************
  * Copyright © 2018 Intel Corporation
  * Copyright © 2021 Videolabs
+ * Copyright © 2022 Rémi Denis-Courmont
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,6 +35,7 @@
 
 #include <xf86drm.h>
 #include <xf86drmMode.h>
+#include <drm_mode.h>
 #include <drm_fourcc.h>
 
 #include <vlc_common.h>
@@ -318,22 +320,29 @@ static void Display(vout_display_t *vd, picture_t *picture)
     VLC_UNUSED(picture);
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
+    const video_format_t *fmt = vd->fmt;
     picture_t *pic = sys->buffers[sys->front_buf];
-    uint32_t fb_id = vlc_drm_dumb_get_fb_id(pic);
-
     vout_display_place_t place;
+
     vout_display_PlacePicture(&place, vd->fmt, vd->cfg);
 
-    int ret = drmModeSetPlane(wnd->display.drm_fd,
-            sys->plane_id, wnd->handle.crtc, fb_id, 0,
-            place.x, place.y, place.width, place.height,
-            vd->fmt->i_x_offset << 16, vd->fmt->i_y_offset << 16,
-            vd->fmt->i_visible_width << 16, vd->fmt->i_visible_height << 16);
-    if (ret != drvSuccess)
-    {
-        msg_Err(vd, "Cannot do set plane for plane id %u, fb %"PRIu32,
-                sys->plane_id, fb_id);
-        assert(ret != -EINVAL);
+    struct drm_mode_set_plane sp = {
+        .plane_id = sys->plane_id,
+        .crtc_id = wnd->handle.crtc,
+        .fb_id = vlc_drm_dumb_get_fb_id(pic),
+        .crtc_x = place.x,
+        .crtc_y = place.y,
+        .crtc_w = place.width,
+        .crtc_h = place.height,
+        /* Source values as U16.16 fixed point */
+        .src_x = fmt->i_x_offset << 16,
+        .src_y = fmt->i_y_offset << 16,
+        .src_w = fmt->i_visible_width << 16,
+        .src_h = fmt->i_visible_height << 16,
+    };
+
+    if (vlc_drm_ioctl(wnd->display.drm_fd, DRM_IOCTL_MODE_SETPLANE, &sp) < 0) {
+        msg_Err(vd, "DRM plane setting error: %s", vlc_strerror_c(errno));
         return;
     }
 
