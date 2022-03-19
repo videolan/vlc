@@ -478,7 +478,7 @@ static const vlc_fourcc_t p_VYUY_fallback[] = {
     VLC_CODEC_FALLBACK_PACKED, 0
 };
 
-static const vlc_fourcc_t *pp_YUV_fallback[] = {
+static const vlc_fourcc_t *const pp_YUV_fallback[] = {
     p_YV12_fallback,
     p_I420_fallback,
     p_I420_9L_fallback,
@@ -608,7 +608,7 @@ static const vlc_fourcc_t p_RGB8_fallback[] = {
     VLC_CODEC_RGB32,
     0,
 };
-static const vlc_fourcc_t *pp_RGB_fallback[] = {
+static const vlc_fourcc_t *const pp_RGB_fallback[] = {
     p_RGB32_fallback,
     p_RGB24_fallback,
     p_RGB16_fallback,
@@ -623,7 +623,7 @@ static const vlc_fourcc_t *pp_RGB_fallback[] = {
 
 /* */
 static const vlc_fourcc_t *GetFallback( vlc_fourcc_t i_fourcc,
-                                        const vlc_fourcc_t *pp_fallback[],
+                                        const vlc_fourcc_t *const *pp_fallback,
                                         const vlc_fourcc_t p_list[] )
 {
     for( unsigned i = 0; pp_fallback[i]; i++ )
