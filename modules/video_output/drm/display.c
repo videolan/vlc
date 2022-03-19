@@ -54,8 +54,6 @@
 #define DRM_CHROMA_TEXT "Image format used by DRM"
 #define DRM_CHROMA_LONGTEXT "Chroma fourcc override for DRM framebuffer format selection"
 
-typedef enum { drvSuccess, drvTryNext, drvFail } deviceRval;
-
 /*
  * how many hw buffers are allocated for page flipping. I think
  * 3 is enough so we shouldn't get unexpected stall from kernel.
