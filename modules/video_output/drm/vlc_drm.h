@@ -92,8 +92,8 @@ uint32_t vlc_drm_dumb_get_fb_id(const picture_t *pic);
  *
  * \param fd DRM device file descriptor
  * \param crtc_id CRTC object ID
- * \return On success, the index (between 0 and 31) of object is returned;
- * on error, a negated error code.
+ * \return On success, the index (between 0 and 31) of object is returned,
+ * On error, -1 is returned and @c errno is set.
  */
 int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id);
 

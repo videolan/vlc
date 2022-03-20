@@ -122,7 +122,7 @@ static void CheckFourCCList(uint32_t drmfourcc, uint32_t plane_id)
     }
 }
 
-static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
+static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd, int crtc_index)
 {
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
@@ -133,21 +133,6 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
     bool YUVFormat;
 
     int drm_fd = wnd->display.drm_fd;
-
-    drmModeRes *resources = drmModeGetResources(drm_fd);
-    if (resources == NULL)
-        return 0;
-
-    int crtc_index = -1;
-    for (int crtc_id=0; crtc_id < resources->count_crtcs; ++crtc_id)
-    {
-        if (resources->crtcs[crtc_id] == wnd->handle.crtc)
-        {
-            crtc_index = crtc_id;
-            break;
-        }
-    }
-    drmModeFreeResources(resources);
 
     /*
      * For convenience print out in debug prints all supported
@@ -336,12 +321,13 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
+    vout_window_t *wnd = vd->cfg->window;
     vout_display_sys_t *sys;
     uint32_t local_drm_chroma;
     video_format_t fmt;
     char *chroma;
 
-    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_KMS)
+    if (wnd->type != VOUT_WINDOW_TYPE_KMS)
         return VLC_EGENERIC;
 
     /*
@@ -368,8 +354,19 @@ static int Open(vout_display_t *vd,
         chroma = NULL;
     }
 
-    int fd = vd->cfg->window->display.drm_fd;
-    vlc_fourcc_t fourcc = ChromaNegotiation(vd);
+    int fd = wnd->display.drm_fd;
+
+    int crtc_index = vlc_drm_get_crtc_index(fd, wnd->handle.crtc);
+    if (crtc_index < 0) {
+        msg_Err(vd, "DRM CRTC object ID %"PRIu32" error: %s",
+                wnd->handle.crtc, vlc_strerror_c(errno));
+        return -errno;
+    }
+
+    msg_Dbg(vd, "using DRM CRTC object ID %"PRIu32", index %d",
+            wnd->handle.crtc, crtc_index);
+
+    vlc_fourcc_t fourcc = ChromaNegotiation(vd, crtc_index);
     if (!fourcc)
         return VLC_EGENERIC;
 
