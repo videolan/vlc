@@ -84,6 +84,19 @@ picture_t *vlc_drm_dumb_alloc_fb(struct vlc_logger *, int fd,
 
 uint32_t vlc_drm_dumb_get_fb_id(const picture_t *pic);
 
+/**
+ * Finds the index of a CRTC.
+ *
+ * The DRM API represents sets of CRTCs as 32-bit bit masks.
+ * This function determines the bit index of a given CRTC.
+ *
+ * \param fd DRM device file descriptor
+ * \param crtc_id CRTC object ID
+ * \return On success, the index (between 0 and 31) of object is returned;
+ * on error, a negated error code.
+ */
+int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id);
+
 static inline int vlc_drm_ioctl(int fd, unsigned long cmd, void *argp)
 {
     int ret;
