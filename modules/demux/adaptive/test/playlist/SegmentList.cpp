@@ -31,17 +31,18 @@
 #include "../test.hpp"
 
 #include <limits>
+#include <memory>
 
 using namespace adaptive;
 using namespace adaptive::playlist;
 
 int SegmentList_test()
 {
-    SegmentList *segmentList = nullptr;
-    SegmentList *segmentList2 = nullptr;
     try
     {
-        segmentList = new SegmentList(nullptr);
+        std::unique_ptr<SegmentList> segmentList;
+        std::unique_ptr<SegmentList> segmentList2;
+        segmentList = std::make_unique<SegmentList>(nullptr);
         Timescale timescale(100);
         segmentList->addAttribute(new TimescaleAttr(timescale));
         /* Check failures */
@@ -104,7 +105,7 @@ int SegmentList_test()
         Expect(segmentList->getMinAheadTime(123+8) == timescale.ToTime(100));
 
         /* merge */
-        segmentList2 = new SegmentList(nullptr);
+        segmentList2 = std::make_unique<SegmentList>(nullptr);
         for(int i=5; i<20; i++)
         {
             seg = new Segment(nullptr);
@@ -113,7 +114,7 @@ int SegmentList_test()
             seg->duration.Set(100);
             segmentList2->addSegment(seg);
         }
-        segmentList->updateWith(segmentList2);
+        segmentList->updateWith(segmentList2.get());
         Expect(segmentList->getStartSegmentNumber() == 123 + 5);
         Expect(segmentList->getTotalLength() == 100 * 15);
 
@@ -135,12 +136,11 @@ int SegmentList_test()
         Expect(segmentList->getStartSegmentNumber() == 123 + 10);
         Expect(segmentList->getTotalLength() == 100 * 10);
 
-        delete segmentList;
-        delete segmentList2;
-        segmentList2 = nullptr;
+        segmentList.reset();
+        segmentList2.reset();
 
         /* gap updates, relative timings */
-        segmentList = new SegmentList(nullptr, true);
+        segmentList = std::make_unique<SegmentList>(nullptr, true);
         segmentList->addAttribute(new TimescaleAttr(timescale));
         segmentList->addAttribute(new DurationAttr(100));
         Expect(segmentList->inheritDuration());
@@ -152,7 +152,7 @@ int SegmentList_test()
             seg->duration.Set(100);
             segmentList->addSegment(seg);
         }
-        segmentList2 = new SegmentList(nullptr, true);
+        segmentList2 = std::make_unique<SegmentList>(nullptr, true);
         for(int i=0; i<2; i++)
         {
             seg = new Segment(nullptr);
@@ -161,7 +161,7 @@ int SegmentList_test()
             seg->duration.Set(100);
             segmentList2->addSegment(seg);
         }
-        segmentList->updateWith(segmentList2);
+        segmentList->updateWith(segmentList2.get());
         Expect(segmentList->getStartSegmentNumber() == 128);
         Expect(segmentList->getSegments().size() == 2);
         Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
@@ -169,12 +169,11 @@ int SegmentList_test()
         Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
         Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
 
-        delete segmentList;
-        delete segmentList2;
-        segmentList2 = nullptr;
+        segmentList.reset();
+        segmentList2.reset();
 
         /* gap updates, absolute media timings */
-        segmentList = new SegmentList(nullptr, false);
+        segmentList = std::make_unique<SegmentList>(nullptr, false);
         segmentList->addAttribute(new TimescaleAttr(timescale));
         segmentList->addAttribute(new DurationAttr(999));
         Expect(segmentList->inheritDuration());
@@ -186,7 +185,7 @@ int SegmentList_test()
             seg->duration.Set(100);
             segmentList->addSegment(seg);
         }
-        segmentList2 = new SegmentList(nullptr, false);
+        segmentList2 = std::make_unique<SegmentList>(nullptr, false);
         for(int i=5; i<7; i++)
         {
             seg = new Segment(nullptr);
@@ -195,7 +194,7 @@ int SegmentList_test()
             seg->duration.Set(100);
             segmentList2->addSegment(seg);
         }
-        segmentList->updateWith(segmentList2);
+        segmentList->updateWith(segmentList2.get());
         Expect(segmentList->getStartSegmentNumber() == 128);
         Expect(segmentList->getSegments().size() == 2);
         Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 128);
@@ -203,12 +202,11 @@ int SegmentList_test()
         Expect(segmentList->getSegments().at(0)->startTime.Get() == START + 100 * (128 - 123));
         Expect(segmentList->getSegments().at(1)->startTime.Get() == START + 100 * (129 - 123));
 
-        delete segmentList;
-        delete segmentList2;
-        segmentList2 = nullptr;
+        segmentList.reset();
+        segmentList2.reset();
 
         /* Tricky now, check timelined */
-        segmentList = new SegmentList(nullptr);
+        segmentList = std::make_unique<SegmentList>(nullptr);
         segmentList->addAttribute(new TimescaleAttr(timescale));
         for(int i=0; i<10; i++)
         {
@@ -237,11 +235,9 @@ int SegmentList_test()
         Expect(seg);
         Expect(seg == allsegments.at(1));
 
-        delete segmentList;
+        segmentList.reset();
 
     } catch (...) {
-        delete segmentList;
-        delete segmentList2;
         return 1;
     }
 
