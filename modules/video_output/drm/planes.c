@@ -26,9 +26,17 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <drm_mode.h>
 #include <vlc_common.h>
 #include "vlc_drm.h"
+
+enum { /* DO NOT CHANGE. MUST MATCH KERNEL ABI. */
+    VLC_DRM_PLANE_TYPE_OVERLAY=0,
+    VLC_DRM_PLANE_TYPE_PRIMARY=1,
+    VLC_DRM_PLANE_TYPE_CURSOR=2,
+};
 
 int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id)
 {
@@ -52,4 +60,135 @@ int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id)
 
     errno = ENXIO;
     return -1;
+}
+
+static bool vlc_drm_prop_match(int fd, uint_fast32_t pid, const char *name)
+{
+    struct drm_mode_get_property prop = {
+        .prop_id = pid,
+    };
+
+    if (vlc_drm_ioctl(fd, DRM_IOCTL_MODE_GETPROPERTY, &prop) < 0)
+        return false;
+    return strcmp(name, prop.name) == 0;
+}
+
+static int vlc_drm_get_prop(int fd, uint_fast32_t oid, uint_fast32_t tid,
+                            const char *name, uint64_t *restrict valp)
+{
+    struct drm_mode_obj_get_properties counter = {
+        .obj_id = oid,
+        .obj_type = tid,
+    };
+    int ret = -1;
+
+    if (vlc_drm_ioctl(fd, DRM_IOCTL_MODE_OBJ_GETPROPERTIES, &counter) < 0)
+        return -1;
+
+    size_t count = counter.count_props;
+    uint32_t *ids = vlc_alloc(count, sizeof (*ids));
+    uint64_t *values = vlc_alloc(count, sizeof (*values));
+
+    if (unlikely(ids == NULL || values == NULL))
+        goto out;
+
+    struct drm_mode_obj_get_properties props = {
+        .props_ptr = (uintptr_t)(void *)ids,
+        .prop_values_ptr = (uintptr_t)(void *)values,
+        .count_props = count,
+        .obj_id = oid,
+        .obj_type = tid,
+    };
+
+    if (vlc_drm_ioctl(fd, DRM_IOCTL_MODE_OBJ_GETPROPERTIES, &props) < 0)
+        goto out;
+    if (unlikely(count < props.count_props)) {
+        /*
+         * Properties should not be created asynchronously. It could
+         * theoretically occur if the underlying object was hot-unplugged, then
+         * different object with the same type was hot-plugged and got the same
+         * object identifier. But if so, everything we thought we knew till now
+         * has potentially become invalid, so we might as well fail safely.
+         */
+        errno = ENOBUFS;
+        goto out;
+    }
+
+    /* NOTE: if more than one property is needed, rethink this function */
+    for (size_t i = 0; i < props.count_props; i++) {
+        if (vlc_drm_prop_match(fd, ids[i], name)) {
+            *valp = values[i];
+            ret = 0;
+            goto out;
+        }
+    }
+    errno = ENXIO;
+out:
+    free(values);
+    free(ids);
+    return ret;
+}
+
+static int vlc_drm_get_plane_prop(int fd, uint_fast32_t plane,
+                                  const char *name, uint64_t *restrict valp)
+{
+    return vlc_drm_get_prop(fd, plane, DRM_MODE_OBJECT_PLANE, name, valp);
+}
+
+static ssize_t vlc_drm_get_planes(int fd, uint32_t **restrict listp)
+{
+    size_t count = 32;
+
+    for (;;) {
+        uint32_t *planes = vlc_alloc(count, sizeof (*planes));
+        if (unlikely(planes == NULL))
+            return -1;
+
+        struct drm_mode_get_plane_res res = {
+            .plane_id_ptr = (uintptr_t)(void *)planes,
+            .count_planes = count,
+        };
+
+        if (vlc_drm_ioctl(fd, DRM_IOCTL_MODE_GETPLANERESOURCES, &res) < 0) {
+            free(planes);
+            return -1;
+        }
+
+        if (likely(count >= res.count_planes)) {
+            *listp = planes;
+            return res.count_planes;
+        }
+        free(planes);
+    }
+}
+
+uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx)
+{
+    assert(idx < 32); /* Don't mix up object IDs and indices! */
+
+    uint32_t *planes;
+    ssize_t count = vlc_drm_get_planes(fd, &planes);
+    if (count < 0)
+        return -1;
+
+    uint_fast32_t ret = 0;
+
+    for (ssize_t i = 0; i < count; i++) {
+        struct drm_mode_get_plane plane = {
+            .plane_id = planes[i],
+        };
+        uint64_t planetype;
+
+        if (vlc_drm_ioctl(fd, DRM_IOCTL_MODE_GETPLANE, &plane) >= 0
+         && ((plane.possible_crtcs >> idx) & 1)
+         && vlc_drm_get_plane_prop(fd, planes[i], "type", &planetype) == 0
+         && planetype == VLC_DRM_PLANE_TYPE_PRIMARY) {
+            ret = planes[i];
+            goto out;
+        }
+    }
+    errno = ENXIO;
+out:
+    free(planes);
+    return ret;
 }

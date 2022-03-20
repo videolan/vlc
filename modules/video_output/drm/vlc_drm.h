@@ -97,6 +97,15 @@ uint32_t vlc_drm_dumb_get_fb_id(const picture_t *pic);
  */
 int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id);
 
+/**
+ * Finds the primary plane of a CRTC.
+ *
+ * \param fd DRM device file descriptor
+ * \param idx CRTC object index (as returned by vlc_drm_get_crtc_index())
+ * \return the primary plane object ID or zero on error
+ */
+uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx);
+
 static inline int vlc_drm_ioctl(int fd, unsigned long cmd, void *argp)
 {
     int ret;
