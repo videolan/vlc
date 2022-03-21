@@ -1317,17 +1317,19 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
     /* XXX: The clock source selection depends on input_CanPaceControl() but
      * this variable is only initialized from the input_thread_t after the
      * demux is opened. Programs and ES tracks can be created from the demux
-     * open callback or midstream (from the demux callback). Therefore, we
-     * can't handle the clock source selection after the program is created
-     * since input_CanPaceControl() might not be initialized. To fix this
-     * issue, handle clock source selection when the first PCR is sent (from
+     * open callback or midstream (from the demux callback). To fix this issue,
+     * handle clock source selection when the first PCR is sent (from
      * ES_OUT_SET_PCR). */
-    assert( p_sys->b_active );
 
     switch( p_sys->user_clock_source )
     {
         case VLC_CLOCK_MASTER_AUTO:
-            if (input_CanPaceControl(p_input))
+            /* If not active, input_CanPaceControl() returns an uninitialized
+             * value. If not active while sending a PCR, it means the demux
+             * module is pacing itself (via a thread or API callbacks).
+             * Therefore, we can assume that the input can't control its pace.
+             * */
+            if( p_sys->b_active && input_CanPaceControl( p_input ) )
             {
                 p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUDIO;
                 break;
