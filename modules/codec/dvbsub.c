@@ -140,7 +140,9 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
+#ifdef ENABLE_SOUT
 static const char *const ppsz_enc_options[] = { "x", "y", NULL };
+#endif
 
 /****************************************************************************
  * Local structures
