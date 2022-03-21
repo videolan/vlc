@@ -304,7 +304,28 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->s.n_threads = var_InheritInteger(p_this, "dav1d-thread-frames");
     if (p_sys->s.n_threads == 0)
         p_sys->s.n_threads = (i_core_count < 16) ? i_core_count : 16;
-#else
+
+#if DAV1D_API_VERSION_MAJOR > 6 || DAV1D_API_VERSION_MINOR >= 7
+    // after dav1d 1.0.0
+    p_sys->s.max_frame_delay = dav1d_get_frame_delay( &p_sys->s );
+#else // 1.0.0
+    // corresponds to c->n_fc when max_frame_delay is 0 in dav1d 1.0.0
+    static const uint8_t fc_lut[49] = {
+        1,                                     /*     1 */
+        2, 2, 2,                               /*  2- 4 */
+        3, 3, 3, 3, 3,                         /*  5- 9 */
+        4, 4, 4, 4, 4, 4, 4,                   /* 10-16 */
+        5, 5, 5, 5, 5, 5, 5, 5, 5,             /* 17-25 */
+        6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,       /* 26-36 */
+        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, /* 37-49 */
+    };
+    if (p_sys->s.n_threads >= 50)
+        p_sys->s.max_frame_delay = 8;
+    else
+        p_sys->s.max_frame_delay = fc_lut[p_sys->s.n_threads - 1];
+#endif
+
+#else // before dav1d 1.0.0
     p_sys->s.n_tile_threads = var_InheritInteger(p_this, "dav1d-thread-tiles");
     if (p_sys->s.n_tile_threads == 0)
         p_sys->s.n_tile_threads =
@@ -329,7 +350,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     msg_Dbg(p_this, "Using dav1d version %s with %d threads",
             dav1d_version(), p_sys->s.n_threads);
 
-    dec->i_extra_picture_buffers = (p_sys->s.n_threads - 1);
+    dec->i_extra_picture_buffers = p_sys->s.max_frame_delay;
 #else
     msg_Dbg(p_this, "Using dav1d version %s with %d/%d frame/tile threads",
             dav1d_version(), p_sys->s.n_frame_threads, p_sys->s.n_tile_threads);
