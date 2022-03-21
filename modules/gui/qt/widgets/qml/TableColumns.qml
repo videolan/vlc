@@ -87,13 +87,33 @@ Item {
             }
         }
 
-        Widgets.ListLabel {
-            text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || I18n.qtr("Unknown Title"))
+        Widgets.ScrollingText {
+            id: textRect
+
+            label: text
+            scroll: textHoverArea.containsMouse || parent.currentlyFocused
+            clip: animationRunning
             visible: root.showTitleText
-            color: foregroundColor
 
             Layout.fillHeight: true
             Layout.fillWidth: true
+
+            Widgets.ListLabel {
+                id: text
+
+                anchors.verticalCenter: parent.verticalCenter
+                text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || I18n.qtr("Unknown Title"))
+                color: foregroundColor
+                elide: textRect.scroll ?  Text.ElideNone : Text.ElideRight
+                width: parent.width
+            }
+
+            MouseArea {
+                id: textHoverArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+            }
         }
     }
 
