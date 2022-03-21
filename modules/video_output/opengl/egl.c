@@ -50,6 +50,7 @@ typedef struct vlc_gl_sys_t
     EGLContext context;
 #if defined (USE_PLATFORM_X11)
     Display *x11;
+    bool restore_forget_gravity;
 #endif
 #if defined (USE_PLATFORM_WAYLAND)
     struct wl_egl_window *window;
@@ -211,8 +212,15 @@ static void Close (vlc_object_t *obj)
         eglTerminate(sys->display);
     }
 #ifdef USE_PLATFORM_X11
-    if (sys->x11 != NULL)
+    if (sys->x11 != NULL) {
+        if (sys->restore_forget_gravity) {
+            XSetWindowAttributes swa;
+            swa.bit_gravity = ForgetGravity;
+            XChangeWindowAttributes (sys->x11, gl->surface->handle.xid,
+                                     CWBitGravity, &swa);
+        }
         XCloseDisplay(sys->x11);
+    }
 #endif
 #ifdef USE_PLATFORM_WAYLAND
     if (sys->window != NULL)
@@ -261,10 +269,18 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     int snum;
     {
         XWindowAttributes wa;
+        XSetWindowAttributes swa;
 
+        sys->restore_forget_gravity = false;
         if (!XGetWindowAttributes(sys->x11, wnd->handle.xid, &wa))
             goto error;
         snum = XScreenNumberOfScreen(wa.screen);
+        if (wa.bit_gravity == ForgetGravity) {
+            swa.bit_gravity = NorthWestGravity;
+            XChangeWindowAttributes(sys->x11, wnd->handle.xid, CWBitGravity,
+                                    &swa);
+            sys->restore_forget_gravity = true;
+        }
     }
 # ifdef EGL_EXT_platform_x11
     if (CheckClientExt("EGL_EXT_platform_x11"))
