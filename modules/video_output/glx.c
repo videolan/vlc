@@ -40,6 +40,7 @@ typedef struct vlc_gl_sys_t
     Display *display;
     GLXWindow win;
     GLXContext ctx;
+    bool restore_forget_gravity;
 } vlc_gl_sys_t;
 
 static int MakeCurrent (vlc_gl_t *gl)
@@ -201,6 +202,16 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
+    /* Set bit gravity if necessary */
+    if (wa.bit_gravity == ForgetGravity) {
+        XSetWindowAttributes swa;
+        swa.bit_gravity = NorthWestGravity;
+        XChangeWindowAttributes (dpy, gl->surface->handle.xid, CWBitGravity,
+                                 &swa);
+        sys->restore_forget_gravity = true;
+    } else
+        sys->restore_forget_gravity = false;
+
     /* Initialize OpenGL callbacks */
     gl->sys = sys;
     gl->makeCurrent = MakeCurrent;
@@ -263,6 +274,12 @@ static void Close (vlc_object_t *obj)
 
     glXDestroyContext (dpy, sys->ctx);
     glXDestroyWindow (dpy, sys->win);
+    if (sys->restore_forget_gravity) {
+        XSetWindowAttributes swa;
+        swa.bit_gravity = ForgetGravity;
+        XChangeWindowAttributes (dpy, gl->surface->handle.xid, CWBitGravity,
+                                 &swa);
+    }
     XCloseDisplay (dpy);
     free (sys);
 }
