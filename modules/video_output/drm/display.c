@@ -86,7 +86,6 @@ typedef struct vout_display_sys_t {
 static struct
 {
     uint32_t     drm;
-    uint32_t     plane_id;
     bool         present;
     bool         isYUV;
 } fourccmatching[] = {
@@ -103,7 +102,7 @@ static struct
 };
 
 
-static void CheckFourCCList(uint32_t drmfourcc, uint32_t plane_id)
+static void CheckFourCCList(uint32_t drmfourcc)
 {
     unsigned i;
 
@@ -116,20 +115,17 @@ static void CheckFourCCList(uint32_t drmfourcc, uint32_t plane_id)
                 break;
 
             fourccmatching[i].present = true;
-            fourccmatching[i].plane_id = plane_id;
             break;
         }
     }
 }
 
-static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd, int crtc_index)
+static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
 
     unsigned i, c;
-    drmModePlaneRes *plane_res = NULL;
-    drmModePlane *plane;
     bool YUVFormat;
 
     int drm_fd = wnd->display.drm_fd;
@@ -138,35 +134,14 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd, int crtc_index)
      * For convenience print out in debug prints all supported
      * DRM modes so they can be seen if use verbose mode.
      */
-    plane_res = drmModeGetPlaneResources(drm_fd);
-    sys->plane_id = 0;
-
-    if (plane_res != NULL && plane_res->count_planes > 0) {
-        for (c = 0; c < plane_res->count_planes; c++) {
-            plane = drmModeGetPlane(drm_fd, plane_res->planes[c]);
-            if (plane != NULL && plane->count_formats > 0) {
-                if ((plane->possible_crtcs & (1 << crtc_index)) == 0)
-                {
-                    drmModeFreePlane(plane);
-                    continue;
-                }
-
-                for (i = 0; i < plane->count_formats; i++) {
-                    CheckFourCCList(plane->formats[i], plane->plane_id);
-
-                    if (sys->forced_drm_fourcc && sys->plane_id == 0 &&
-                            plane->formats[i] == sys->drm_fourcc) {
-                        sys->plane_id = plane->plane_id;
-                    }
-                }
-                drmModeFreePlane(plane);
-            } else {
-                msg_Err(vd, "Couldn't get list of DRM formats");
-                drmModeFreePlaneResources(plane_res);
-                return 0;
-            }
-        }
-        drmModeFreePlaneResources(plane_res);
+    drmModePlane *plane = drmModeGetPlane(drm_fd, sys->plane_id);
+    if (plane != NULL) {
+        for (i = 0; i < plane->count_formats; i++)
+            CheckFourCCList(plane->formats[i]);
+        drmModeFreePlane(plane);
+    } else {
+        msg_Err(vd, "Couldn't get list of DRM formats");
+        return 0;
     }
 
     vlc_fourcc_t fourcc = vd->source->i_chroma;
@@ -194,10 +169,8 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd, int crtc_index)
 
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
         if (fourccmatching[c].drm == drm_fourcc) {
-            if (!sys->forced_drm_fourcc && fourccmatching[c].present) {
+            if (!sys->forced_drm_fourcc && fourccmatching[c].present)
                 sys->drm_fourcc = fourccmatching[c].drm;
-                sys->plane_id = fourccmatching[c].plane_id;
-             }
 
             if (!sys->drm_fourcc) {
                 msg_Err(vd, "Forced VLC fourcc (%.4s) not matching anything available in kernel, please set manually",
@@ -212,10 +185,8 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd, int crtc_index)
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
         if (fourccmatching[c].isYUV == YUVFormat
                 && fourccmatching[c].present) {
-            if (!sys->forced_drm_fourcc) {
+            if (!sys->forced_drm_fourcc)
                 sys->drm_fourcc = fourccmatching[c].drm;
-                sys->plane_id = fourccmatching[c].plane_id;
-             }
 
             return vlc_fourcc_drm(fourccmatching[c].drm);
         }
@@ -224,10 +195,8 @@ static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd, int crtc_index)
     for (i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
         if (!fourccmatching[c].isYUV != YUVFormat
                 && fourccmatching[c].present) {
-            if (!sys->forced_drm_fourcc) {
+            if (!sys->forced_drm_fourcc)
                 sys->drm_fourcc = fourccmatching[c].drm;
-                sys->plane_id = fourccmatching[c].plane_id;
-             }
 
             return vlc_fourcc_drm(fourccmatching[c].drm);
         }
@@ -366,7 +335,17 @@ static int Open(vout_display_t *vd,
     msg_Dbg(vd, "using DRM CRTC object ID %"PRIu32", index %d",
             wnd->handle.crtc, crtc_index);
 
-    vlc_fourcc_t fourcc = ChromaNegotiation(vd, crtc_index);
+    sys->plane_id = vlc_drm_get_crtc_primary_plane(fd, crtc_index);
+    if (sys->plane_id == 0) {
+        /* Most likely the window provider failed to set universal mode, or
+         * failed to lease a primary plane. */
+        msg_Err(vd, "DRM primary plane not found: %s", vlc_strerror_c(errno));
+        return -errno;
+    }
+
+    msg_Dbg(vd, "using DRM plane ID %"PRIu32, sys->plane_id);
+
+    vlc_fourcc_t fourcc = ChromaNegotiation(vd);
     if (!fourcc)
         return VLC_EGENERIC;
 
