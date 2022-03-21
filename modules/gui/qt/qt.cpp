@@ -809,7 +809,6 @@ void WindowResized(vout_window_t *wnd, const QSize& size)
     if (QX11Info::isPlatformX11())
     {
         XResizeWindow(sys->dpy, wnd->handle.xid, size.width(), size.height());
-        XClearWindow(sys->dpy, wnd->handle.xid);
         XSync(sys->dpy, True);
     }
 #endif
