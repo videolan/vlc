@@ -253,4 +253,3 @@ static block_t *PacketizeClosed ( decoder_t *p_dec, block_t **pp_block )
         block_Release( *pp_block );
     return NULL;
 }
-
