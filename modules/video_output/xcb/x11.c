@@ -251,6 +251,7 @@ found_format:;
             XCB_CW_BACK_PIXEL |
             XCB_CW_BORDER_PIXMAP |
             XCB_CW_BORDER_PIXEL |
+            XCB_CW_BIT_GRAVITY |
             XCB_CW_EVENT_MASK |
             XCB_CW_COLORMAP;
         const uint32_t values[] = {
@@ -262,6 +263,8 @@ found_format:;
             pixmap,
             /* XCB_CW_BORDER_PIXEL */
             scr->black_pixel,
+            /* XCB_CW_BIT_GRAVITY */
+            XCB_GRAVITY_NORTH_WEST,
             /* XCB_CW_EVENT_MASK */
             XCB_EVENT_MASK_VISIBILITY_CHANGE,
             /* XCB_CW_COLORMAP */
