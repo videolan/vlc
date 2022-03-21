@@ -52,7 +52,7 @@ if HAVE_OSX
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 else
 libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
-libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGLES
 endif
 vout_PLUGINS += libglinterop_cvpx_plugin.la
 endif
