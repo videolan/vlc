@@ -497,7 +497,7 @@ VLC_USED;
  *
  * \param p_chain pointer to filter chain
  */
-VLC_API void filter_chain_Delete( filter_chain_t * );
+VLC_API void filter_chain_Delete( filter_chain_t *p_chain );
 
 /**
  * Reset filter chain will delete all filters in the chain and
@@ -518,7 +518,7 @@ VLC_API void filter_chain_Reset( filter_chain_t *p_chain,
  *
  * \param p_chain pointer to filter chain
  */
-VLC_API void filter_chain_Clear(filter_chain_t *);
+VLC_API void filter_chain_Clear(filter_chain_t *p_chain);
 
 /**
  * Append a filter to the chain.

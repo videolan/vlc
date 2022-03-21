@@ -84,7 +84,7 @@ void *vlc_module_map(struct vlc_logger *log, module_t *mod);
  * support arbitrary prototypes for the module entry point.
  *
  * \param log logger for debugging (or NULL to ignore)
- * \param capability capability, i.e. class of module
+ * \param cap capability, i.e. class of module
  * \param name name of the module asked, if any
  * \param strict if true, do not fallback to plugin with a different name
  *                 but the same capability
@@ -171,7 +171,7 @@ VLC_API void module_config_free( module_config_t *tab);
  *
  * \param list list obtained by module_list_get()
  */
-VLC_API void module_list_free(module_t **);
+VLC_API void module_list_free(module_t **list);
 
 /**
  * Gets the flat list of VLC modules.
