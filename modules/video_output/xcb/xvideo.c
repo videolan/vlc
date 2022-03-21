@@ -468,6 +468,7 @@ static int Open (vlc_object_t *obj)
                 XCB_CW_BACK_PIXEL |
                 XCB_CW_BORDER_PIXMAP |
                 XCB_CW_BORDER_PIXEL |
+                XCB_CW_BIT_GRAVITY |
                 XCB_CW_EVENT_MASK |
                 XCB_CW_COLORMAP;
             const uint32_t list[] = {
@@ -479,6 +480,8 @@ static int Open (vlc_object_t *obj)
                 pixmap,
                 /* XCB_CW_BORDER_PIXEL */
                 screen->black_pixel,
+                /* XCB_CW_BIT_GRAVITY */
+                XCB_GRAVITY_NORTH_WEST,
                 /* XCB_CW_EVENT_MASK */
                 XCB_EVENT_MASK_VISIBILITY_CHANGE,
                 /* XCB_CW_COLORMAP */
