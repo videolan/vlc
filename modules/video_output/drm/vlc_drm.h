@@ -108,6 +108,21 @@ int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id);
 uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx,
                                              size_t *nfmts);
 
+/**
+ * Finds the best matching DRM format.
+ *
+ * This determines the DRM format of a plane given by ID, which best matches
+ * a given VLC pixel format. If there is an exact match, it will be returned.
+ *
+ * \param fd DRM device file descriptor
+ * \param plane_id DRM plane object ID
+ * \param nfmt number of DRM pixel formats for the plane
+ * \param chroma VLC pixel format to match
+ * \return the matched DRM format on success, zero on failure
+ */
+uint_fast32_t vlc_drm_find_best_format(int fd, uint_fast32_t plane_id,
+                                       size_t nfmt, vlc_fourcc_t chroma);
+
 static inline int vlc_drm_ioctl(int fd, unsigned long cmd, void *argp)
 {
     int ret;

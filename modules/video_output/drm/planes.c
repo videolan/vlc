@@ -30,6 +30,7 @@
 #include <string.h>
 #include <drm_mode.h>
 #include <vlc_common.h>
+#include <vlc_fourcc.h>
 #include "vlc_drm.h"
 
 enum { /* DO NOT CHANGE. MUST MATCH KERNEL ABI. */
@@ -193,4 +194,67 @@ uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx,
 out:
     free(planes);
     return ret;
+}
+
+static uint_fast32_t vlc_drm_find_format(vlc_fourcc_t vlc_fourcc, size_t n,
+                                         const uint32_t *restrict drm_fourccs)
+{
+    assert(vlc_fourcc != 0);
+
+    const uint_fast32_t drm_fourcc = vlc_drm_fourcc(vlc_fourcc);
+
+    if (drm_fourcc != 0) {
+        /* Linear search for YUV(A) and RGBA formats */
+        for (size_t i = 0; i < n; i++)
+            if (drm_fourccs[i] == drm_fourcc)
+                return drm_fourcc;
+    }
+
+    /* Quadratic search for RGB formats */
+    for (size_t i = 0; i < n; i++)
+        if (vlc_fourcc_drm(drm_fourccs[i]) == vlc_fourcc)
+            return drm_fourccs[i];
+
+     return 0;
+}
+
+uint_fast32_t vlc_drm_find_best_format(int fd, uint_fast32_t plane_id,
+                                       size_t nfmt, vlc_fourcc_t chroma)
+{
+    uint32_t *fmts = vlc_alloc(nfmt, sizeof (*fmts));
+    if (unlikely(fmts == NULL))
+        return 0;
+
+    struct drm_mode_get_plane plane = {
+        .plane_id = plane_id,
+        .count_format_types = nfmt,
+        .format_type_ptr = (uintptr_t)(void *)fmts,
+    };
+
+    if (vlc_drm_ioctl(fd, DRM_IOCTL_MODE_GETPLANE, &plane) < 0) {
+        free(fmts);
+        return 0;
+    }
+
+    if (nfmt > plane.count_format_types)
+        nfmt = plane.count_format_types;
+
+    /* Look for an exact match first */
+    uint_fast32_t drm_fourcc = vlc_drm_find_format(chroma, nfmt, fmts);
+    if (drm_fourcc != 0)
+        goto out;
+
+    /* Fallback to decreasingly optimal formats */
+    const vlc_fourcc_t *list = vlc_fourcc_GetFallback(chroma);
+    assert(list != NULL);
+
+    for (size_t i = 0; list[i] != 0; i++) {
+        drm_fourcc = vlc_drm_find_format(list[i], nfmt, fmts);
+        if (drm_fourcc != 0)
+            goto out;
+    }
+    errno = ENOTSUP;
+out:
+    free(fmts);
+    return drm_fourcc;
 }
