@@ -25,7 +25,6 @@
 
 #include <vlc_es.h>
 #include <vlc_picture.h>
-#include <vlc_picture_pool.h>
 #include <vlc_subpicture.h>
 #include <vlc_actions.h>
 #include <vlc_mouse.h>
