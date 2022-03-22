@@ -233,13 +233,10 @@ bool SegmentTemplate::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
         if( playlist->isLive() )
         {
             mtime_t now = CLOCK_FREQ * ::time(nullptr);
-            if(playlist->availabilityStartTime.Get())
-            {
-                if(time >= playlist->availabilityStartTime.Get() && time < now)
-                    *ret = getLiveTemplateNumber(time, true);
-                else if(now - playlist->availabilityStartTime.Get() > time)
-                    *ret = getLiveTemplateNumber(time, false);
-            }
+            if(time >= playlist->availabilityStartTime.Get() && time < now)
+                *ret = getLiveTemplateNumber(time, true);
+            else if(now - playlist->availabilityStartTime.Get() > time)
+                *ret = getLiveTemplateNumber(time, false);
             else return false;
         }
         else
