@@ -73,6 +73,7 @@ EXTRA_DIST = \
 	strings.txt \
 	translations.txt \
 	demo.sh \
+	doc_helper.sh \
 	$(NULL)
 
 DISTCLEANFILES = Doxyfile
