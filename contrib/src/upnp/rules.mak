@@ -22,7 +22,11 @@ endif
 ifdef HAVE_WINSTORE
 CONFIGURE_ARGS=--disable-ipv6 --enable-unspecified_server
 else
+ifdef HAVE_IOS
+CONFIGURE_ARGS=--disable-ipv6 --enable-unspecified_server
+else
 CONFIGURE_ARGS=--enable-ipv6
+endif
 endif
 ifndef WITH_OPTIMIZATION
 CONFIGURE_ARGS += --enable-debug
