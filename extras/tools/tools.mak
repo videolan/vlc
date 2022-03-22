@@ -414,7 +414,7 @@ ninja: ninja-$(NINJA_VERSION).tar.gz
 	$(MOVE)
 
 .buildninja: ninja
-	(cd $<; ./configure.py --bootstrap && mv ninja $(PREFIX)/bin/)
+	(cd $<; python3 ./configure.py --bootstrap && mv ninja $(PREFIX)/bin/)
 	touch $@
 
 CLEAN_PKG += ninja
