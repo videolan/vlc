@@ -346,6 +346,8 @@ FocusScope {
                         clip: contentWidth > width
                         contentWidth: localMenuGroup.width
                         contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
+
+                        anchors.right: playlistGroup.left
                         anchors.rightMargin: VLCStyle.margin_xxsmall // only applied when right aligned
 
                         on_AlignHCenterChanged: {
