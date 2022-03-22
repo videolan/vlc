@@ -167,7 +167,7 @@ static int Open(vout_display_t *vd,
 
     char *chroma = var_InheritString(vd, "kms-drm-chroma");
     if (chroma) {
-        drm_fourcc = VLC_FOURCC(chroma[0], chroma[1], chroma[2], chroma[3]);
+        memcpy(&drm_fourcc, chroma, strnlen(chroma, sizeof (drm_fourcc)));
         msg_Dbg(vd, "Setting DRM chroma to '%4s'", chroma);
         free(chroma);
     }
