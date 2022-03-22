@@ -73,6 +73,7 @@ vlc_window_t *vlc_window_New(vlc_object_t *obj, const char *module,
     memset(&window->handle, 0, sizeof(window->handle));
     window->info.has_double_click = false;
     window->sys = NULL;
+    window->ops = NULL;
     assert(owner != NULL);
     window->owner = *owner;
 
