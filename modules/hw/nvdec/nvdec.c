@@ -28,8 +28,6 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_messages.h>
-#include <vlc_picture_pool.h>
-#include <vlc_atomic.h>
 
 #define FFNV_LOG_FUNC(logctx, msg, ...)        msg_Err((vlc_object_t*)logctx, msg, __VA_ARGS__)
 #define FFNV_DEBUG_LOG_FUNC(logctx, msg, ...)  msg_Dbg((vlc_object_t*)logctx, msg, __VA_ARGS__)
