@@ -346,15 +346,26 @@ static int Open(vout_display_t *vd,
 
     msg_Dbg(vd, "using DRM plane ID %"PRIu32, sys->plane_id);
 
-    vlc_fourcc_t fourcc = ChromaNegotiation(vd);
-    if (!fourcc)
-        return VLC_EGENERIC;
+    if (!sys->forced_drm_fourcc) {
+        sys->drm_fourcc = vlc_drm_find_best_format(fd, sys->plane_id, nfmt,
+                                                   vd->fmt->i_chroma);
+        if (sys->drm_fourcc == 0) {
+            msg_Err(vd, "DRM plane format error: %s", vlc_strerror_c(errno));
+            return -errno;
+        }
+    }
 
-    msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
-            (char*)&fourcc, (char*)&sys->drm_fourcc);
+    msg_Dbg(vd, "using DRM pixel format %4.4s (0x%08"PRIX32")",
+            (char *)&sys->drm_fourcc, sys->drm_fourcc);
 
     video_format_ApplyRotation(&fmt, vd->fmt);
-    fmt.i_chroma = fourcc;
+    if (!vlc_video_format_drm(&fmt, sys->drm_fourcc)) {
+        /* This can only occur if $vlc-drm-chroma is unknown. */
+        assert(sys->forced_drm_fourcc);
+        msg_Err(vd, "unknown DRM pixel format %4.4s (0x%08"PRIX32")",
+                (char *)&sys->drm_fourcc, sys->drm_fourcc);
+        return -ENOTSUP;
+    }
 
     for (size_t i = 0; i < ARRAY_SIZE(sys->buffers); i++) {
         sys->buffers[i] = vlc_drm_dumb_alloc_fb(vd->obj.logger, fd, &fmt);
