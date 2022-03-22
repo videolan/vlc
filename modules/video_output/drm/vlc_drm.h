@@ -24,6 +24,7 @@
 #endif
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <sys/ioctl.h>
 #include <vlc_common.h>
@@ -61,6 +62,17 @@ uint_fast32_t vlc_drm_format(const struct video_format_t *fmt);
  * \return the corresponding VLC pixel format, or 0 if not found.
  */
 vlc_fourcc_t vlc_fourcc_drm(uint_fast32_t drm_fourcc);
+
+/**
+ * Converts a DRM pixel format to a VLC video format.
+ *
+ * \param [in,out] fmt VLC video format
+ * \param drm_fourcc DRM pixel format identifier
+ * \retval true the conversion succeeded (i.e. DRM format is recognised)
+ * \retval false the conversion failed (i.e. DRM format is unknown)
+ */
+bool vlc_video_format_drm(video_format_t *restrict fmt,
+                          uint_fast32_t drm_fourcc);
 
 /**
  * Allocates a DRM dumb buffer.
