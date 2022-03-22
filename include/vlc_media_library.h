@@ -1223,6 +1223,11 @@ static inline vlc_ml_group_t* vlc_ml_get_group( vlc_medialibrary_t* p_ml, int64_
     return (vlc_ml_group_t*)vlc_ml_get( p_ml, VLC_ML_GET_GROUP, i_group_id );
 }
 
+static inline vlc_ml_folder_t* vlc_ml_get_folder( vlc_medialibrary_t* p_ml, int64_t i_folder_id )
+{
+    return (vlc_ml_folder_t*)vlc_ml_get( p_ml, VLC_ML_GET_FOLDER, i_folder_id);
+}
+
 static inline vlc_ml_playlist_t* vlc_ml_get_playlist( vlc_medialibrary_t* p_ml, int64_t i_playlist_id )
 {
     return (vlc_ml_playlist_t*)vlc_ml_get( p_ml, VLC_ML_GET_PLAYLIST, i_playlist_id );
