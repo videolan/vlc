@@ -676,7 +676,10 @@ static void Del( sout_stream_t *p_stream, void *_id )
             transcode_audio_clean( p_stream, id );
             break;
         case VIDEO_ES:
-            Send( p_stream, id, NULL );
+            /* Drain if we didn't receive an error, otherwise the
+             * decoder/encoder might not even exist. */
+            if(!id->b_error)
+                Send( p_stream, id, NULL );
             decoder_Destroy( id->p_decoder );
             vlc_mutex_lock( &p_sys->lock );
             if( id == p_sys->id_video )
@@ -737,6 +740,9 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     if( p_out &&
         sout_StreamIdSend( p_stream->p_next, id->downstream_id, p_out ) )
         i_ret = VLC_EGENERIC;
+
+    if (i_ret != VLC_SUCCESS)
+        id->b_error = true;
 
     return i_ret;
 error:
