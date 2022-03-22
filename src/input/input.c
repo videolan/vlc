@@ -1834,7 +1834,6 @@ static void ControlUpdateRenderer( input_thread_t *p_input, bool b_enable )
         input_priv(p_input)->p_sout = NULL;
     }
 }
-#endif
 
 static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_demux_chain )
 {
@@ -1845,6 +1844,7 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
     else if ( psz_demux_chain != NULL )
         msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
 }
+#endif
 
 void input_SetProgramId(input_thread_t *input, int group_id)
 
