@@ -46,6 +46,7 @@
 		{"key":"volume_high", "path": "./toolbar/volume-high.svg"},
 		{"key":"volume_slider_inside", "path": "./toolbar/volume-slider-inside.svg"},
 		{"key":"volume_muted", "path": "./toolbar/volume-muted.svg"},
+		{"key":"bookmark", "path": "./toolbar/bookmark.svg"},
 		{"key":"previous", "path": "./previous.svg"},
 		{"key":"type_node", "path": "./types/type_node.svg"},
 		{"key":"type_unknown", "path": "./types/type_unknown.svg"},
