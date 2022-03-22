@@ -232,13 +232,10 @@ bool SegmentTemplate::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) con
         if( playlist->isLive() )
         {
             vlc_tick_t now = vlc_tick_from_sec(::time(nullptr));
-            if(playlist->availabilityStartTime.Get())
-            {
-                if(time >= playlist->availabilityStartTime.Get() && time < now)
-                    *ret = getLiveTemplateNumber(time, true);
-                else if(now - playlist->availabilityStartTime.Get() > time)
-                    *ret = getLiveTemplateNumber(time, false);
-            }
+            if(time >= playlist->availabilityStartTime.Get() && time < now)
+                *ret = getLiveTemplateNumber(time, true);
+            else if(now - playlist->availabilityStartTime.Get() > time)
+                *ret = getLiveTemplateNumber(time, false);
             else return false;
         }
         else
