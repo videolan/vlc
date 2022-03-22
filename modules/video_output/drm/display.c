@@ -61,10 +61,6 @@ typedef struct vout_display_sys_t {
     picture_t       *buffers[MAXHWBUF];
 
     unsigned int    front_buf;
-
-    bool            forced_drm_fourcc;
-    uint32_t        drm_fourcc;
-
 /*
  * modeset information
  */
@@ -157,9 +153,8 @@ static int Open(vout_display_t *vd,
 {
     vout_window_t *wnd = vd->cfg->window;
     vout_display_sys_t *sys;
-    uint32_t local_drm_chroma;
+    uint_fast32_t drm_fourcc = 0;
     video_format_t fmt;
-    char *chroma;
 
     if (wnd->type != VOUT_WINDOW_TYPE_KMS)
         return VLC_EGENERIC;
@@ -171,21 +166,11 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    chroma = var_InheritString(vd, "kms-drm-chroma");
+    char *chroma = var_InheritString(vd, "kms-drm-chroma");
     if (chroma) {
-        local_drm_chroma = VLC_FOURCC(chroma[0], chroma[1], chroma[2],
-                                      chroma[3]);
-
-        if (local_drm_chroma) {
-            sys->forced_drm_fourcc = true;
-            sys->drm_fourcc = local_drm_chroma;
-            msg_Dbg(vd, "Setting DRM chroma to '%4s'", chroma);
-        }
-        else
-            msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
-
+        drm_fourcc = VLC_FOURCC(chroma[0], chroma[1], chroma[2], chroma[3]);
+        msg_Dbg(vd, "Setting DRM chroma to '%4s'", chroma);
         free(chroma);
-        chroma = NULL;
     }
 
     int fd = wnd->display.drm_fd;
@@ -211,24 +196,24 @@ static int Open(vout_display_t *vd,
 
     msg_Dbg(vd, "using DRM plane ID %"PRIu32, sys->plane_id);
 
-    if (!sys->forced_drm_fourcc) {
-        sys->drm_fourcc = vlc_drm_find_best_format(fd, sys->plane_id, nfmt,
-                                                   vd->fmt->i_chroma);
-        if (sys->drm_fourcc == 0) {
+    if (drm_fourcc == 0) {
+        drm_fourcc = vlc_drm_find_best_format(fd, sys->plane_id, nfmt,
+                                              vd->fmt->i_chroma);
+        if (drm_fourcc == 0) {
             msg_Err(vd, "DRM plane format error: %s", vlc_strerror_c(errno));
             return -errno;
         }
     }
 
-    msg_Dbg(vd, "using DRM pixel format %4.4s (0x%08"PRIX32")",
-            (char *)&sys->drm_fourcc, sys->drm_fourcc);
+    msg_Dbg(vd, "using DRM pixel format %4.4s (0x%08"PRIXFAST32")",
+            (char *)&drm_fourcc, drm_fourcc);
 
     video_format_ApplyRotation(&fmt, vd->fmt);
-    if (!vlc_video_format_drm(&fmt, sys->drm_fourcc)) {
+    if (!vlc_video_format_drm(&fmt, drm_fourcc)) {
         /* This can only occur if $vlc-drm-chroma is unknown. */
-        assert(sys->forced_drm_fourcc);
-        msg_Err(vd, "unknown DRM pixel format %4.4s (0x%08"PRIX32")",
-                (char *)&sys->drm_fourcc, sys->drm_fourcc);
+        assert(chroma != NULL);
+        msg_Err(vd, "unknown DRM pixel format %4.4s (0x%08"PRIXFAST32")",
+                (char *)&drm_fourcc, drm_fourcc);
         return -ENOTSUP;
     }
 
