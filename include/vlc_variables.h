@@ -654,7 +654,7 @@ static inline char *var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
 }
 
 VLC_USED
-static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
+static inline size_t var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
 {
     size_t count;
     if( var_Change( p_obj, psz_name, VLC_VAR_CHOICESCOUNT, &count ) )
