@@ -456,7 +456,7 @@ vlc_dictionary_has_key( const vlc_dictionary_t * p_dict, const char * psz_key )
     if( !p_dict->p_entries )
         return 0;
 
-    int i_pos = DictHash( psz_key, p_dict->i_size );
+    uint64_t i_pos = DictHash( psz_key, p_dict->i_size );
     const vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
     for( ; p_entry != NULL; p_entry = p_entry->p_next )
     {
@@ -472,7 +472,7 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
     if( !p_dict->p_entries )
         return kVLCDictionaryNotFound;
 
-    int i_pos = DictHash( psz_key, p_dict->i_size );
+    uint64_t i_pos = DictHash( psz_key, p_dict->i_size );
     vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
 
     if( !p_entry )
@@ -542,7 +542,7 @@ vlc_dictionary_insert_impl_( vlc_dictionary_t * p_dict, const char * psz_key,
     if( !p_dict->p_entries )
         vlc_dictionary_init( p_dict, 1 );
 
-    int i_pos = DictHash( psz_key, p_dict->i_size );
+    uint64_t i_pos = DictHash( psz_key, p_dict->i_size );
     vlc_dictionary_entry_t * p_entry;
 
     p_entry = (vlc_dictionary_entry_t *)malloc(sizeof(*p_entry));
@@ -596,7 +596,7 @@ vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char
     if( !p_dict->p_entries )
         return;
 
-    int i_pos = DictHash( psz_key, p_dict->i_size );
+    uint64_t i_pos = DictHash( psz_key, p_dict->i_size );
     vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
     vlc_dictionary_entry_t * p_prev;
 
