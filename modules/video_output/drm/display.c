@@ -33,10 +33,7 @@
 # include "config.h"
 #endif
 
-#include <xf86drm.h>
-#include <xf86drmMode.h>
 #include <drm_mode.h>
-#include <drm_fourcc.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -74,137 +71,6 @@ typedef struct vout_display_sys_t {
     uint32_t        plane_id;
 } vout_display_sys_t;
 
-/** fourccmatching, matching drm to vlc fourccs and see if it was present
- * in HW. Here really is two lists, one in RGB and second in YUV. They're
- * listed in order of preference.
- *
- * fourccmatching::drm DRM fourcc code from drm_fourcc.h
- * fourccmatching::plane_id from which plane this DRM fourcc was found
- * fourccmatching::present if this mode was available in HW
- * fourccmatching::isYUV as name suggest..
- */
-static struct
-{
-    uint32_t     drm;
-    bool         present;
-    bool         isYUV;
-} fourccmatching[] = {
-    { .drm = DRM_FORMAT_XRGB8888, .isYUV = false },
-    { .drm = DRM_FORMAT_RGB565, .isYUV = false },
-#if defined DRM_FORMAT_P010
-    { .drm = DRM_FORMAT_P010, .isYUV = true },
-#endif
-    { .drm = DRM_FORMAT_NV12, .isYUV = true },
-    { .drm = DRM_FORMAT_YUYV, .isYUV = true },
-    { .drm = DRM_FORMAT_YVYU, .isYUV = true },
-    { .drm = DRM_FORMAT_UYVY, .isYUV = true },
-    { .drm = DRM_FORMAT_VYUY, .isYUV = true },
-};
-
-
-static void CheckFourCCList(uint32_t drmfourcc)
-{
-    unsigned i;
-
-    for (i = 0; i < ARRAY_SIZE(fourccmatching); i++) {
-        if (fourccmatching[i].drm == drmfourcc) {
-            if (fourccmatching[i].present)
-                /* this drmfourcc already has a plane_id found where it
-                 * could be used, we'll stay with earlier findings.
-                 */
-                break;
-
-            fourccmatching[i].present = true;
-            break;
-        }
-    }
-}
-
-static vlc_fourcc_t ChromaNegotiation(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    vout_window_t *wnd = vd->cfg->window;
-
-    unsigned i, c;
-    bool YUVFormat;
-
-    int drm_fd = wnd->display.drm_fd;
-
-    /*
-     * For convenience print out in debug prints all supported
-     * DRM modes so they can be seen if use verbose mode.
-     */
-    drmModePlane *plane = drmModeGetPlane(drm_fd, sys->plane_id);
-    if (plane != NULL) {
-        for (i = 0; i < plane->count_formats; i++)
-            CheckFourCCList(plane->formats[i]);
-        drmModeFreePlane(plane);
-    } else {
-        msg_Err(vd, "Couldn't get list of DRM formats");
-        return 0;
-    }
-
-    vlc_fourcc_t fourcc = vd->source->i_chroma;
-
-    if (sys->forced_drm_fourcc) {
-        for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
-            if (fourccmatching[c].drm == sys->drm_fourcc) {
-                fourcc = vlc_fourcc_drm(sys->drm_fourcc);
-                break;
-            }
-        }
-        if (sys->plane_id == 0) {
-            msg_Err(vd, "Forced DRM fourcc (%.4s) not available in kernel.",
-                    (char*)&sys->drm_fourcc);
-            return 0;
-        }
-        return fourcc;
-    }
-
-    /*
-     * favor yuv format according to YUVFormat flag.
-     * check for exact match first, then YUVFormat and then !YUVFormat
-     */
-    uint_fast32_t drm_fourcc = vlc_drm_format(vd->source);
-
-    for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
-        if (fourccmatching[c].drm == drm_fourcc) {
-            if (!sys->forced_drm_fourcc && fourccmatching[c].present)
-                sys->drm_fourcc = fourccmatching[c].drm;
-
-            if (!sys->drm_fourcc) {
-                msg_Err(vd, "Forced VLC fourcc (%.4s) not matching anything available in kernel, please set manually",
-                        (char*)&fourcc);
-                return 0;
-            }
-            return fourcc;
-        }
-    }
-
-    YUVFormat = vlc_fourcc_IsYUV(fourcc);
-    for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
-        if (fourccmatching[c].isYUV == YUVFormat
-                && fourccmatching[c].present) {
-            if (!sys->forced_drm_fourcc)
-                sys->drm_fourcc = fourccmatching[c].drm;
-
-            return vlc_fourcc_drm(fourccmatching[c].drm);
-        }
-    }
-
-    for (i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
-        if (!fourccmatching[c].isYUV != YUVFormat
-                && fourccmatching[c].present) {
-            if (!sys->forced_drm_fourcc)
-                sys->drm_fourcc = fourccmatching[c].drm;
-
-            return vlc_fourcc_drm(fourccmatching[c].drm);
-        }
-    }
-
-    return 0;
-}
-
 static int Control(vout_display_t *vd, int query)
 {
     (void) vd;
@@ -219,7 +85,6 @@ static int Control(vout_display_t *vd, int query)
     }
     return VLC_EGENERIC;
 }
-
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)

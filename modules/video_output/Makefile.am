@@ -327,7 +327,6 @@ libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/planes.c \
 	video_output/drm/display.c
 libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(KMS_CFLAGS)
-libdrm_display_plugin_la_LIBADD = $(KMS_LIBS)
 if HAVE_KMS
 vout_LTLIBRARIES += libkms_plugin.la libdrm_display_plugin.la
 endif
