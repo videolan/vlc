@@ -119,9 +119,9 @@ vlc_player_OpenNextMedia(vlc_player_t *player)
 static void
 vlc_player_CancelWaitError(vlc_player_t *player)
 {
-    if (player->error_count != 0)
+    if (player->eos_burst_count != 0)
     {
-        player->error_count = 0;
+        player->eos_burst_count = 0;
         vlc_cond_signal(&player->start_delay_cond);
     }
 }
@@ -1952,7 +1952,8 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     player->global_state = VLC_PLAYER_STATE_STOPPED;
     player->started = false;
 
-    player->error_count = 0;
+    player->last_eos = VLC_TICK_INVALID;
+    player->eos_burst_count = 0;
 
     player->releasing_media = false;
     player->next_media_requested = false;

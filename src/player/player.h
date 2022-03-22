@@ -267,7 +267,14 @@ struct vlc_player_t
     enum vlc_player_state global_state;
     bool started;
 
-    unsigned error_count;
+    /**
+     * Playing a tiny stream (either empty, or with unreported errors) in a loop
+     * would cause high CPU usage. To mitigate the problem, temporize if
+     * several EOS are received too quickly.
+     */
+#define VLC_PLAYER_EOS_BURST_THRESHOLD VLC_TICK_FROM_MS(250)
+    vlc_tick_t last_eos;
+    unsigned eos_burst_count;
 
     bool deleting;
     struct
