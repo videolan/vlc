@@ -335,7 +335,8 @@ static int Open(vout_display_t *vd,
     msg_Dbg(vd, "using DRM CRTC object ID %"PRIu32", index %d",
             wnd->handle.crtc, crtc_index);
 
-    sys->plane_id = vlc_drm_get_crtc_primary_plane(fd, crtc_index);
+    size_t nfmt;
+    sys->plane_id = vlc_drm_get_crtc_primary_plane(fd, crtc_index, &nfmt);
     if (sys->plane_id == 0) {
         /* Most likely the window provider failed to set universal mode, or
          * failed to lease a primary plane. */

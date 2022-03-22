@@ -162,7 +162,8 @@ static ssize_t vlc_drm_get_planes(int fd, uint32_t **restrict listp)
     }
 }
 
-uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx)
+uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx,
+                                             size_t *restrict nfmt)
 {
     assert(idx < 32); /* Don't mix up object IDs and indices! */
 
@@ -184,6 +185,7 @@ uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx)
          && vlc_drm_get_plane_prop(fd, planes[i], "type", &planetype) == 0
          && planetype == VLC_DRM_PLANE_TYPE_PRIMARY) {
             ret = planes[i];
+            *nfmt = plane.count_format_types;
             goto out;
         }
     }

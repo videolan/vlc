@@ -102,9 +102,11 @@ int vlc_drm_get_crtc_index(int fd, uint_fast32_t crtc_id);
  *
  * \param fd DRM device file descriptor
  * \param idx CRTC object index (as returned by vlc_drm_get_crtc_index())
+ * }param[out] nfmts storage space for the plane's count of pixel formats
  * \return the primary plane object ID or zero on error
  */
-uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx);
+uint_fast32_t vlc_drm_get_crtc_primary_plane(int fd, unsigned int idx,
+                                             size_t *nfmts);
 
 static inline int vlc_drm_ioctl(int fd, unsigned long cmd, void *argp)
 {
