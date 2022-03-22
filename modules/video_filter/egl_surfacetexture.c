@@ -28,6 +28,7 @@
 #include <vlc_filter.h>
 #include <vlc_opengl.h>
 #include <vlc_vout_display.h>
+#include <vlc_picture_pool.h>
 #include <vlc_atomic.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
