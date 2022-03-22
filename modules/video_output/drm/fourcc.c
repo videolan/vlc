@@ -225,8 +225,8 @@ uint_fast32_t vlc_drm_format(const video_format_t *restrict fmt)
     for (size_t i = 0; i < ARRAY_SIZE(rgb_fourcc_list); i++)
         if (rgb_fourcc_list[i].vlc_fourcc == fmt->i_chroma
          && rgb_fourcc_list[i].red == fmt->i_rmask
-         && rgb_fourcc_list[i].red == fmt->i_gmask
-         && rgb_fourcc_list[i].red == fmt->i_bmask)
+         && rgb_fourcc_list[i].green == fmt->i_gmask
+         && rgb_fourcc_list[i].blue == fmt->i_bmask)
             return rgb_fourcc_list[i].drm_fourcc;
 
     return DRM_FORMAT_INVALID;
