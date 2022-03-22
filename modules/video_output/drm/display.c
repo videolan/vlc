@@ -152,7 +152,6 @@ static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     vout_window_t *wnd = vd->cfg->window;
-    vout_display_sys_t *sys;
     uint_fast32_t drm_fourcc = 0;
     video_format_t fmt;
 
@@ -162,8 +161,8 @@ static int Open(vout_display_t *vd,
     /*
      * Allocate instance and initialize some members
      */
-    vd->sys = sys = vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof(*sys));
-    if (!sys)
+    vout_display_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(vd), sizeof (*sys));
+    if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
     char *chroma = var_InheritString(vd, "kms-drm-chroma");
@@ -226,7 +225,9 @@ static int Open(vout_display_t *vd,
         }
     }
 
+    sys->front_buf = 0;
     *fmtp = fmt;
+    vd->sys = sys;
     vd->ops = &ops;
 
     (void) context;
