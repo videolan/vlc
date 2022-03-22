@@ -95,12 +95,18 @@ static inline vlc_tick_t vlc_tick_rate_duration(float frame_rate)
     return CLOCK_FREQ / frame_rate;
 }
 
+static inline vlc_tick_t vlc_tick_from_frac(uint64_t num, uint64_t den)
+{
+    lldiv_t d = lldiv (num, den);
+    return vlc_tick_from_sec( d.quot ) + CLOCK_FREQ * d.rem / den;
+}
+
 /*
  * samples<>vlc_tick_t
  */
 static inline vlc_tick_t vlc_tick_from_samples(int64_t samples, int samp_rate)
 {
-    return CLOCK_FREQ * samples / samp_rate;
+    return vlc_tick_from_frac(samples, samp_rate);
 }
 static inline int64_t samples_from_vlc_tick(vlc_tick_t t, int samp_rate)
 {
@@ -108,11 +114,6 @@ static inline int64_t samples_from_vlc_tick(vlc_tick_t t, int samp_rate)
 }
 
 
-static inline vlc_tick_t vlc_tick_from_frac(uint64_t num, uint64_t den)
-{
-    lldiv_t d = lldiv (num, den);
-    return vlc_tick_from_sec( d.quot ) + vlc_tick_from_samples(d.rem, den);
-}
 
 
 /*
