@@ -46,6 +46,11 @@ MLBaseModel::~MLBaseModel() = default;
 
 void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 {
+    vlc_ml_sorting_criteria_t sort = nameToCriteria(name);
+    bool desc = (order == Qt::SortOrder::DescendingOrder);
+    if (m_sort_desc == desc && m_sort == sort)
+        return;
+
     m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
     m_sort = nameToCriteria(name);
     resetCache();
@@ -299,7 +304,10 @@ Qt::SortOrder MLBaseModel::getSortOrder() const
 
 void MLBaseModel::setSortOder(Qt::SortOrder order)
 {
-    m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
+    bool desc = (order == Qt::SortOrder::DescendingOrder);
+    if (m_sort_desc == desc)
+        return;
+    m_sort_desc = desc;
     resetCache();
     emit sortOrderChanged();
 }
@@ -311,13 +319,19 @@ const QString MLBaseModel::getSortCriteria() const
 
 void MLBaseModel::setSortCriteria(const QString& criteria)
 {
-    m_sort = nameToCriteria(criteria.toUtf8());
+    vlc_ml_sorting_criteria_t sort = nameToCriteria(qtu(criteria));
+    if (m_sort == sort)
+        return;
+    m_sort = sort;
     resetCache();
     emit sortCriteriaChanged();
 }
 
 void MLBaseModel::unsetSortCriteria()
 {
+    if (m_sort == VLC_ML_SORTING_DEFAULT)
+        return;
+
     m_sort = VLC_ML_SORTING_DEFAULT;
     resetCache();
     emit sortCriteriaChanged();
