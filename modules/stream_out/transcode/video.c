@@ -340,9 +340,12 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
 
 void transcode_video_clean( sout_stream_id_sys_t *id )
 {
-    /* Close encoder */
-    transcode_encoder_close( id->encoder );
-    transcode_encoder_delete( id->encoder );
+    /* Close encoder, but only if one was opened. */
+    if ( id->encoder )
+    {
+        transcode_encoder_close( id->encoder );
+        transcode_encoder_delete( id->encoder );
+    }
 
     es_format_Clean( &id->decoder_out );
 
