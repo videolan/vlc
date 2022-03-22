@@ -126,8 +126,6 @@ typedef struct vout_display_sys_t {
     // included with the main pic
     MMAL_BUFFER_HEADER_T * subpic_bufs[SUBS_MAX];
 
-    picture_pool_t * pic_pool;
-
     struct vout_isp_conf_s {
         MMAL_COMPONENT_T *component;
         MMAL_PORT_T * input;
@@ -585,14 +583,6 @@ static int configure_display(vout_display_t *vd, const video_format_t *fmt)
     return 0;
 }
 
-static void kill_pool(vout_display_sys_t * const sys)
-{
-    if (sys->pic_pool != NULL) {
-        picture_pool_Release(sys->pic_pool);
-        sys->pic_pool = NULL;
-    }
-}
-
 static void vd_display(vout_display_t *vd, picture_t *p_pic)
 {
     vout_display_sys_t * const sys = vd->sys;
@@ -691,7 +681,6 @@ static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t * const sys = vd->sys;
     msg_Warn(vd, "Reset Pictures");
-    kill_pool(sys);
     *fmt = *vd->source; // Take (nearly) whatever source wants to give us
     fmt->i_chroma = req_chroma(fmt);  // Adjust chroma to something we can actually deal with
     return VLC_SUCCESS;
@@ -1005,8 +994,6 @@ static void CloseMmalVout(vout_display_t * vd)
 {
     vout_display_sys_t * const sys = vd->sys;
     char response[20]; /* answer is hvs_update_fields=%1d */
-
-    kill_pool(sys);
 
     vc_tv_unregister_callback_full(tvservice_cb, vd);
 
