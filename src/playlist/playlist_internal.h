@@ -87,7 +87,15 @@ typedef struct playlist_private_t
 
     int      i_last_playlist_id; /**< Last id to an item */
     bool     b_reset_currently_playing; /** Reset current item array */
-    unsigned i_consecutive_errors; /**< Number of consecutive items in error */
+
+    /**
+     * Playing a tiny stream (either empty, or with unreported errors) in a loop
+     * would cause high CPU usage. To mitigate the problem, temporize if
+     * several EOS are received too quickly.
+     */
+#define VLC_PLAYLIST_EOS_BURST_THRESHOLD (CLOCK_FREQ / 4) /* 250 ms */
+    mtime_t  last_eos;
+    unsigned eos_burst_count;
 
     bool     b_tree; /**< Display as a tree */
     bool     b_preparse; /**< Preparse items */

@@ -261,7 +261,8 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->status.p_item = NULL;
     pl_priv(p_playlist)->status.p_node = p_playlist->p_playing;
     pl_priv(p_playlist)->request.b_request = false;
-    pl_priv(p_playlist)->i_consecutive_errors = 0;
+    pl_priv(p_playlist)->last_eos = 0;
+    pl_priv(p_playlist)->eos_burst_count = 0;
     p->request.input_dead = false;
 
     if (ml != NULL)
