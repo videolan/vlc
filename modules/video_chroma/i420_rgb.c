@@ -258,7 +258,7 @@ static int Activate( filter_t *p_filter )
     video_format_t vfmt;
     video_format_Init( &vfmt, p_filter->fmt_out.video.i_chroma );
     video_format_Copy( &vfmt, &p_filter->fmt_out.video );
-    if( !vfmt.i_bmask || !vfmt.i_gmask || !vfmt.i_bmask )
+    if( !vfmt.i_rmask || !vfmt.i_gmask || !vfmt.i_bmask )
         msg_Warn( p_filter, "source did not set proper target RGB masks, using default" );
     video_format_FixRgb( &vfmt );
     SetYUV( p_filter, &vfmt );
