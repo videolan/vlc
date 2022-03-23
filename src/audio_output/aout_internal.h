@@ -41,6 +41,7 @@ enum {
 };
 
 typedef struct aout_volume aout_volume_t;
+typedef struct vlc_aout_stream vlc_aout_stream;
 
 typedef struct
 {
@@ -84,7 +85,7 @@ typedef struct
     int requested_mix_mode; /**< Requested mix mode set by the user */
 
     /* Original input format and profile, won't change for the lifetime of a
-     * stream (between aout_DecNew() and aout_DecDelete()). */
+     * stream (between vlc_aout_stream_New() and vlc_aout_stream_Delete()). */
     int                   input_profile;
     audio_sample_format_t input_format;
 
@@ -165,19 +166,21 @@ void aout_FormatsPrint(vlc_object_t *, const char *,
 #define AOUT_DEC_CHANGED 1
 #define AOUT_DEC_FAILED VLC_EGENERIC
 
-int aout_DecNew(audio_output_t *, const audio_sample_format_t *, int profile,
-                struct vlc_clock_t *clock, const audio_replay_gain_t *);
-void aout_DecDelete(audio_output_t *);
-int aout_DecPlay(audio_output_t *aout, block_t *block);
-void aout_DecGetResetStats(audio_output_t *, unsigned *, unsigned *);
-void aout_DecChangePause(audio_output_t *, bool b_paused, vlc_tick_t i_date);
-void aout_DecChangeRate(audio_output_t *aout, float rate);
-void aout_DecChangeDelay(audio_output_t *aout, vlc_tick_t delay);
-void aout_DecFlush(audio_output_t *);
-void aout_DecDrain(audio_output_t *);
-/* Contrary to other aout_Dec*() functions, this function can be called from
+vlc_aout_stream *vlc_aout_stream_New(audio_output_t *p_aout,
+                                     const audio_sample_format_t *p_format,
+                                     int profile, struct vlc_clock_t *clock,
+                                     const audio_replay_gain_t *p_replay_gain);
+void vlc_aout_stream_Delete(vlc_aout_stream *);
+int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block);
+void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *, unsigned *);
+void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool b_paused, vlc_tick_t i_date);
+void vlc_aout_stream_ChangeRate(vlc_aout_stream *stream, float rate);
+void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay);
+void vlc_aout_stream_Flush(vlc_aout_stream *stream);
+void vlc_aout_stream_Drain(vlc_aout_stream *stream);
+/* Contrary to other vlc_aout_stream_*() functions, this function can be called from
  * any threads */
-bool aout_DecIsDrained(audio_output_t *);
+bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream);
 
 void aout_RequestRestart (audio_output_t *, unsigned);
 void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
