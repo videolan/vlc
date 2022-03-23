@@ -137,10 +137,9 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
         },
         //UI thread
         [this, playlistId, high, low, r = std::move(ranges)](quint64, Ctx& ctx) mutable {
-            beginMoveRows(QModelIndex(), low, high, QModelIndex(), r.lowTo);
+            moveRangeInCache(low, high, r.lowTo);
             r.lowTo = ctx.newTo;
             --r.lowRangeIt;
-            endMoveRows();
             moveImpl(playlistId, std::move(r));
         });
     }
@@ -162,10 +161,9 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
         },
         //UI thread
         [this, playlistId, low, high, r = std::move(ranges)](quint64, Ctx& ctx) mutable {
-            beginMoveRows(QModelIndex(), low, high, QModelIndex(), r.highTo);
+            moveRangeInCache(low, high, r.highTo);
             r.highTo = ctx.newTo;
             ++r.highRangeIt;
-            endMoveRows();
             moveImpl(playlistId, std::move(r));
         });
     }
@@ -263,8 +261,7 @@ void MLPlaylistModel::removeImpl(int64_t playlistId, const std::vector<std::pair
     },
     //UI thread
     [this, playlistId, range, rows = std::move(rangeList), index]() {
-        beginRemoveRows(QModelIndex(), range.first, range.second);
-        endRemoveRows();
+        deleteRangeInCache(range.first, range.second);
         removeImpl(playlistId, std::move(rows), index+1);
     });
 }
