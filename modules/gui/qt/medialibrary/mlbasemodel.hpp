@@ -123,6 +123,9 @@ protected:
     //this is only to reflect changes from the ML, it won't alter the database
     void deleteItemInCache(const MLItemId& mlid);
 
+    void moveRangeInCache(int first, int last, int to);
+    void deleteRangeInCache(int first, int last);
+
     virtual void onVlcMlEvent( const MLEvent &event );
 
 

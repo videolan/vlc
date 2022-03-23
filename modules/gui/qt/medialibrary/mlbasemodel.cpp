@@ -574,6 +574,27 @@ void MLBaseModel::deleteItemInCache(const MLItemId& mlid)
     m_cache->deleteItem(mlid);
 }
 
+
+void MLBaseModel::moveRangeInCache(int first, int last, int to)
+{
+    if (!m_cache)
+    {
+        emit resetRequested();
+        return;
+    }
+    m_cache->moveRange(first, last, to);
+}
+
+void MLBaseModel::deleteRangeInCache(int first, int last)
+{
+    if (!m_cache)
+    {
+        emit resetRequested();
+        return;
+    }
+    m_cache->deleteRange(first, last);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 MLBaseModel::BaseLoader::BaseLoader(MLItemId parent, QString searchPattern,

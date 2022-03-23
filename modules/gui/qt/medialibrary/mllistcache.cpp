@@ -151,6 +151,48 @@ int MLListCache::deleteItem(const MLItemId& mlid)
     return pos;
 }
 
+void MLListCache::moveRange(int first, int last, int to)
+{
+    assert(first <= last);
+    if (first <= to && to <= last)
+        return;
+
+    emit beginMoveRows(first, last, to);
+    auto it = m_cachedData->list.begin();
+    //build a temporary list with the items in order
+    std::vector<ItemType> tmpList;
+    if (to < first)
+    {
+        std::move(it, it+to, std::back_inserter(tmpList));
+        std::move(it+first, it+(last+1), std::back_inserter(tmpList));
+        std::move(it+to, it+first, std::back_inserter(tmpList));
+        std::move(it+(last+1), m_cachedData->list.end(), std::back_inserter(tmpList));
+    }
+    else //last < to
+    {
+        std::move(it, it+first, std::back_inserter(tmpList));
+        std::move(it+last+1, it+to, std::back_inserter(tmpList));
+        std::move(it+first, it+(last+1), std::back_inserter(tmpList));
+        std::move(it+to, m_cachedData->list.end(), std::back_inserter(tmpList));
+    }
+
+    m_cachedData->list = std::move(tmpList);
+    emit endMoveRows();
+}
+
+void MLListCache::deleteRange(int first, int last)
+{
+    assert(first <= last);
+    emit beginRemoveRows(first, last);
+    auto it = m_cachedData->list.begin();
+    m_cachedData->list.erase(it+first, it+(last+1));
+    size_t delta = m_cachedData->loadedCount - m_cachedData->list.size();
+    m_cachedData->loadedCount -= delta;
+    m_cachedData->totalCount -= delta;
+    emit endRemoveRows();
+    emit localSizeChanged(m_cachedData->totalCount);
+}
+
 ssize_t MLListCache::count() const
 {
     if (!m_cachedData)

@@ -155,6 +155,19 @@ public:
      */
     int deleteItem(const MLItemId& mlid);
 
+
+    /**
+     * move items in the cache contained between @a first
+     * and @a last to the index @a to
+     */
+    void moveRange(int first, int last, int to);
+
+    /**
+     * remove items in the cache from the index @a first up to the
+     * index @a last
+     */
+    void deleteRange(int first, int last);
+
     /**
      * Return the number of items or `COUNT_UNINITIALIZED`
      *
