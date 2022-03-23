@@ -1,0 +1,34 @@
+From b2e89bd9c548d899ec2fecfc1aa550e9ddfe9777 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 23 Mar 2022 14:52:31 +0100
+Subject: [PATCH] dxva2_hevc: don't use frames as reference if they are not
+ marked as such
+
+Similar to how a frame is considered for referencing for the RefPicList array.
+This will do the same for RefPicSetStCurrBefore, RefPicSetStCurrAfter and
+RefPicSetLtCurr.
+
+Fixes playback of http://www.gbbsoft.pl/!download/!/Film1.mp4
+Ref. VLC issue https://code.videolan.org/videolan/vlc/-/issues/26738
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ libavcodec/dxva2_hevc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/dxva2_hevc.c b/libavcodec/dxva2_hevc.c
+index 98b3e74bd7..28c0b26733 100644
+--- a/libavcodec/dxva2_hevc.c
++++ b/libavcodec/dxva2_hevc.c
+@@ -249,7 +249,7 @@ static void fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *
+             const HEVCFrame *frame = NULL; \
+             while (!frame && j < rpl->nb_refs) \
+                 frame = rpl->ref[j++]; \
+-            if (frame) \
++            if (frame && frame->flags & (HEVC_FRAME_FLAG_LONG_REF | HEVC_FRAME_FLAG_SHORT_REF)) \
+                 pp->ref_list[i] = get_refpic_index(pp, ff_dxva2_get_surface_index(avctx, ctx, frame->frame)); \
+             else \
+                 pp->ref_list[i] = 0xff; \
+-- 
+2.27.0.windows.1
+
