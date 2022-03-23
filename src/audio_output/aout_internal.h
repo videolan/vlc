@@ -114,9 +114,15 @@ typedef struct
     aout_owner_t   owner;
 } aout_instance_t;
 
+static inline aout_instance_t *aout_instance (audio_output_t *aout)
+{
+    return container_of(aout, aout_instance_t, output);
+}
+
 static inline aout_owner_t *aout_owner (audio_output_t *aout)
 {
-    return &((aout_instance_t *)aout)->owner;
+    aout_instance_t *instance = aout_instance(aout);
+    return &instance->owner;
 }
 
 /****************************************************************************
