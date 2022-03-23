@@ -33,6 +33,7 @@ struct MLEvent
             int64_t i_entity_id;
             union {
                 struct {
+                    vlc_ml_media_type_t i_type;
                     vlc_ml_media_subtype_t i_subtype;
                 } media;
             };
@@ -66,6 +67,7 @@ struct MLEvent
         {
             case VLC_ML_EVENT_MEDIA_ADDED:
                 creation.i_entity_id = event->creation.p_media->i_id;
+                creation.media.i_type = event->creation.p_media->i_type;
                 creation.media.i_subtype = event->creation.p_media->i_subtype;
                 break;
             case VLC_ML_EVENT_ARTIST_ADDED:
