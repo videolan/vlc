@@ -511,7 +511,7 @@ static int vout_update_format( decoder_t *p_dec )
             dpb_size = 18;
             break;
         case VLC_CODEC_AV1:
-            dpb_size = 10;
+            dpb_size = 8; /* NUM_REF_FRAMES from the AV1 spec */
             break;
         case VLC_CODEC_VP5:
         case VLC_CODEC_VP6:
