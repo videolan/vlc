@@ -125,7 +125,10 @@ struct vlc_input_decoder_t
      * The input thread can read these variables in order to stop outputs, when
      * both ModuleThread and DecoderThread are stopped (from DeleteDecoder()).
      */
+
+    /* If p_aout is valid, then p_astream is valid too */
     audio_output_t *p_aout;
+    vlc_aout_stream *p_astream; 
 
     vout_thread_t   *p_vout;
     bool             vout_started;
@@ -249,11 +252,14 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
     {
         assert( p_owner->fmt.i_cat == AUDIO_ES );
         audio_output_t *p_aout = p_owner->p_aout;
+        vlc_aout_stream *p_astream = p_owner->p_astream;
         // no need to lock, the decoder and ModuleThread are dead
         p_owner->p_aout = NULL;
+        p_owner->p_astream = NULL;
         if( p_aout )
         {
-            aout_DecDelete( p_aout );
+            assert( p_astream );
+            vlc_aout_stream_Delete( p_astream );
             input_resource_PutAout( p_owner->p_resource, p_aout );
         }
     }
@@ -330,12 +336,14 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
          p_dec->fmt_out.i_profile != p_owner->fmt.i_profile ) )
     {
         audio_output_t *p_aout = p_owner->p_aout;
+        vlc_aout_stream *p_astream = p_owner->p_astream;
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
+        p_owner->p_astream = NULL;
         p_owner->p_aout = NULL; // the DecoderThread should not use the old aout anymore
         vlc_mutex_unlock( &p_owner->lock );
-        aout_DecDelete( p_aout );
+        vlc_aout_stream_Delete( p_astream );
 
         input_resource_PutAout( p_owner->p_resource, p_aout );
     }
@@ -370,13 +378,16 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         }
 
         audio_output_t *p_aout;
+        vlc_aout_stream *p_astream;
 
         p_aout = input_resource_GetAout( p_owner->p_resource );
         if( p_aout )
         {
-            if( aout_DecNew( p_aout, &format, p_dec->fmt_out.i_profile,
-                             p_owner->p_clock,
-                             &p_dec->fmt_out.audio_replay_gain ) )
+            p_astream = vlc_aout_stream_New( p_aout, &format,
+                                             p_dec->fmt_out.i_profile,
+                                             p_owner->p_clock,
+                                             &p_dec->fmt_out.audio_replay_gain );
+            if( p_astream == NULL )
             {
                 input_resource_PutAout( p_owner->p_resource, p_aout );
                 p_aout = NULL;
@@ -385,6 +396,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_aout = p_aout;
+        p_owner->p_astream = p_astream;
 
         DecoderUpdateFormatLocked( p_owner );
         aout_FormatPrepare( &p_owner->fmt.audio );
@@ -1226,8 +1238,8 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, block_t *p_audi
     {
         msg_Dbg( p_dec, "end of audio preroll" );
 
-        if( p_owner->p_aout )
-            aout_DecFlush( p_owner->p_aout );
+        if( p_owner->p_astream )
+            vlc_aout_stream_Flush( p_owner->p_astream );
     }
 
     /* */
@@ -1243,16 +1255,16 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, block_t *p_audi
     DecoderWaitUnblock( p_owner );
     vlc_mutex_unlock( &p_owner->lock );
 
-    audio_output_t *p_aout = p_owner->p_aout;
+    vlc_aout_stream *p_astream = p_owner->p_astream;
 
-    if( p_aout == NULL )
+    if( p_astream == NULL )
     {
         msg_Dbg( p_dec, "discarded audio buffer" );
         block_Release( p_audio );
         return VLC_EGENERIC;
     }
 
-    int status = aout_DecPlay( p_aout, p_audio );
+    int status = vlc_aout_stream_Play( p_astream, p_audio );
     if( status == AOUT_DEC_CHANGED )
     {
         /* Only reload the decoder */
@@ -1273,9 +1285,9 @@ static void ModuleThread_UpdateStatAudio( vlc_input_decoder_t *p_owner,
 {
     unsigned played = 0;
     unsigned aout_lost = 0;
-    if( p_owner->p_aout != NULL )
+    if( p_owner->p_astream != NULL )
     {
-        aout_DecGetResetStats( p_owner->p_aout, &aout_lost, &played );
+        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played );
     }
     if (lost) aout_lost++;
 
@@ -1538,8 +1550,8 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
 #endif
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        if( p_owner->p_aout )
-            aout_DecFlush( p_owner->p_aout );
+        if( p_owner->p_astream )
+            vlc_aout_stream_Flush( p_owner->p_astream );
     }
     else if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
@@ -1579,8 +1591,8 @@ static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused
             break;
         case AUDIO_ES:
             vlc_mutex_lock( &p_owner->lock );
-            if( p_owner->p_aout != NULL )
-                aout_DecChangePause( p_owner->p_aout, paused, date );
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_ChangePause( p_owner->p_astream, paused, date );
             vlc_mutex_unlock( &p_owner->lock );
             break;
         case SPU_ES:
@@ -1603,8 +1615,8 @@ static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
                 vout_ChangeRate( p_owner->p_vout, rate );
             break;
         case AUDIO_ES:
-            if( p_owner->p_aout != NULL )
-                aout_DecChangeRate( p_owner->p_aout, rate );
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_ChangeRate( p_owner->p_astream, rate );
             break;
         case SPU_ES:
             if( p_owner->p_vout != NULL )
@@ -1637,8 +1649,8 @@ static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t 
             break;
         case AUDIO_ES:
             vlc_mutex_lock( &p_owner->lock );
-            if( p_owner->p_aout != NULL )
-                aout_DecChangeDelay( p_owner->p_aout, delay );
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_ChangeDelay( p_owner->p_astream, delay );
             vlc_mutex_unlock( &p_owner->lock );
             break;
         case SPU_ES:
@@ -1774,8 +1786,8 @@ static void *DecoderThread( void *p_data )
         if( p_block == NULL && p_owner->dec.fmt_in.i_cat == AUDIO_ES && !p_owner->flushing )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
-            if( p_owner->p_aout != NULL )
-                aout_DecDrain( p_owner->p_aout );
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_Drain( p_owner->p_astream );
         }
 
         /* TODO? Wait for draining instead of polling. */
@@ -1868,6 +1880,7 @@ CreateDecoder( vlc_object_t *p_parent,
     p_owner->cbs = cbs;
     p_owner->cbs_userdata = cbs_userdata;
     p_owner->p_aout = NULL;
+    p_owner->p_astream = NULL;
     p_owner->p_vout = NULL;
     p_owner->vout_started = false;
     p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
@@ -2036,7 +2049,8 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
             if( p_owner->p_aout )
             {
                 /* TODO: REVISIT gap-less audio */
-                aout_DecDelete( p_owner->p_aout );
+                assert( p_owner->p_astream );
+                vlc_aout_stream_Delete( p_owner->p_astream );
                 input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
             }
             break;
@@ -2330,8 +2344,8 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
 #endif
     if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
-    else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->p_aout != NULL )
-        b_empty = aout_DecIsDrained( p_owner->p_aout );
+    else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->p_astream != NULL )
+        b_empty = vlc_aout_stream_IsDrained( p_owner->p_astream );
     else
         b_empty = true; /* TODO subtitles support */
     vlc_mutex_unlock( &p_owner->lock );

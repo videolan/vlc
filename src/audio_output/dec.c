@@ -38,12 +38,29 @@
 #include "clock/clock.h"
 #include "libvlc.h"
 
+static void aout_Flush(audio_output_t *aout);
+
+struct vlc_aout_stream
+{
+    aout_instance_t *instance;
+};
+
+static inline aout_owner_t *aout_stream_owner(vlc_aout_stream *stream)
+{
+    return &stream->instance->owner;
+}
+
+static inline audio_output_t *aout_stream_aout(vlc_aout_stream *stream)
+{
+    return &stream->instance->output;
+}
 /**
  * Creates an audio output
  */
-int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
-                int profile, vlc_clock_t *clock,
-                const audio_replay_gain_t *p_replay_gain)
+vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
+                                      const audio_sample_format_t *p_format,
+                                      int profile, vlc_clock_t *clock,
+                                      const audio_replay_gain_t *p_replay_gain)
 {
     assert(p_aout);
     assert(p_format);
@@ -57,7 +74,7 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
            || i_map_channels > AOUT_CHAN_MAX || p_format->i_channels > INPUT_CHAN_MAX )
         {
             msg_Err( p_aout, "invalid audio channels count" );
-            return -1;
+            return NULL;
         }
     }
 
@@ -65,16 +82,21 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
     {
         msg_Err( p_aout, "excessive audio sample frequency (%u)",
                  p_format->i_rate );
-        return -1;
+        return NULL;
     }
     if( p_format->i_rate < 4000 )
     {
         msg_Err( p_aout, "too low audio sample frequency (%u)",
                  p_format->i_rate );
-        return -1;
+        return NULL;
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
+
+    vlc_aout_stream *stream = malloc(sizeof(*stream));
+    if (stream == NULL)
+        return NULL;
+    stream->instance = aout_instance(p_aout);
 
     /* Create the audio output stream */
     if (!owner->bitexact)
@@ -109,7 +131,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
 error:
             aout_volume_Delete (owner->volume);
             owner->volume = NULL;
-            return -1;
+            free(stream);
+            return NULL;
         }
     }
 
@@ -122,25 +145,27 @@ error:
     atomic_init (&owner->buffers_lost, 0);
     atomic_init (&owner->buffers_played, 0);
     atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
-    return 0;
+    return stream;
 }
 
 /**
  * Stops all plugins involved in the audio output.
  */
-void aout_DecDelete (audio_output_t *aout)
+void vlc_aout_stream_Delete (vlc_aout_stream *stream)
 {
-    aout_owner_t *owner = aout_owner (aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
+    audio_output_t *aout = aout_stream_aout(stream);
 
     if (owner->mixer_format.i_format)
     {
-        aout_DecFlush(aout);
+        aout_Flush(aout);
         if (owner->filters)
             aout_FiltersDelete (aout, owner->filters);
         aout_OutputDelete (aout);
     }
     aout_volume_Delete (owner->volume);
     owner->volume = NULL;
+    free(stream);
 }
 
 static int aout_CheckReady (audio_output_t *aout)
@@ -317,7 +342,7 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
         vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
 
     if (unlikely(drift == VLC_TICK_MAX) || owner->bitexact)
-        return; /* cf. VLC_TICK_MAX comment in aout_DecPlay() */
+        return; /* cf. VLC_TICK_MAX comment in vlc_aout_stream_Play() */
 
     /* Following calculations expect an opposite drift. Indeed,
      * vlc_clock_Update() returns a positive relative time, corresponding to
@@ -340,7 +365,7 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
         else
             msg_Dbg (aout, "playback too late (%"PRId64"): "
                      "flushing buffers", drift);
-        aout_DecFlush(aout);
+        aout_Flush(aout);
         aout_StopResampling (aout);
 
         return; /* nothing can be done if timing is unknown */
@@ -412,11 +437,12 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
 }
 
 /*****************************************************************************
- * aout_DecPlay : filter & mix the decoded buffer
+ * vlc_aout_stream_Play : filter & mix the decoded buffer
  *****************************************************************************/
-int aout_DecPlay(audio_output_t *aout, block_t *block)
+int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
 {
-    aout_owner_t *owner = aout_owner (aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
+    audio_output_t *aout = aout_stream_aout(stream);
 
     assert (block->i_pts != VLC_TICK_INVALID);
 
@@ -505,10 +531,10 @@ drop:
     return ret;
 }
 
-void aout_DecGetResetStats(audio_output_t *aout, unsigned *restrict lost,
+void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *restrict lost,
                            unsigned *restrict played)
 {
-    aout_owner_t *owner = aout_owner (aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
 
     *lost = atomic_exchange_explicit(&owner->buffers_lost, 0,
                                      memory_order_relaxed);
@@ -516,9 +542,10 @@ void aout_DecGetResetStats(audio_output_t *aout, unsigned *restrict lost,
                                        memory_order_relaxed);
 }
 
-void aout_DecChangePause (audio_output_t *aout, bool paused, vlc_tick_t date)
+void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_t date)
 {
-    aout_owner_t *owner = aout_owner (aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
+    audio_output_t *aout = aout_stream_aout(stream);
 
     if (owner->mixer_format.i_format)
     {
@@ -529,21 +556,21 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, vlc_tick_t date)
     }
 }
 
-void aout_DecChangeRate(audio_output_t *aout, float rate)
+void vlc_aout_stream_ChangeRate(vlc_aout_stream *stream, float rate)
 {
-    aout_owner_t *owner = aout_owner(aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
 
     owner->sync.rate = rate;
 }
 
-void aout_DecChangeDelay(audio_output_t *aout, vlc_tick_t delay)
+void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay)
 {
-    aout_owner_t *owner = aout_owner(aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
 
     owner->sync.request_delay = delay;
 }
 
-void aout_DecFlush(audio_output_t *aout)
+static void aout_Flush(audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
@@ -583,9 +610,16 @@ void aout_DecFlush(audio_output_t *aout)
     owner->original_pts = VLC_TICK_INVALID;
 }
 
-bool aout_DecIsDrained(audio_output_t *aout)
+void vlc_aout_stream_Flush(vlc_aout_stream *stream)
 {
-    aout_owner_t *owner = aout_owner (aout);
+    audio_output_t *aout = aout_stream_aout(stream);
+    aout_Flush(aout);
+}
+
+bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream)
+{
+    aout_owner_t *owner = aout_stream_owner(stream);
+    audio_output_t *aout = aout_stream_aout(stream);
 
     if (aout->drain_async == NULL)
     {
@@ -598,9 +632,10 @@ bool aout_DecIsDrained(audio_output_t *aout)
         return atomic_load_explicit(&owner->drained, memory_order_relaxed);
 }
 
-void aout_DecDrain(audio_output_t *aout)
+void vlc_aout_stream_Drain(vlc_aout_stream *stream)
 {
-    aout_owner_t *owner = aout_owner (aout);
+    aout_owner_t *owner = aout_stream_owner(stream);
+    audio_output_t *aout = aout_stream_aout(stream);
 
     if (!owner->mixer_format.i_format)
         return;
@@ -633,8 +668,8 @@ void aout_DecDrain(audio_output_t *aout)
         vlc_tick_t delay;
         if (aout_TimeGet(aout, &delay) == 0)
             drain_deadline += delay;
-        /* else the deadline is now, and aout_DecIsDrained() will return true
-         * on the first call. */
+        /* else the deadline is now, and vlc_aout_stream_IsDrained() will
+         * return true on the first call. */
 
         atomic_store_explicit(&owner->drain_deadline, drain_deadline,
                               memory_order_relaxed);
