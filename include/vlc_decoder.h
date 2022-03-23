@@ -60,21 +60,5 @@ VLC_API input_resource_t * input_resource_New( vlc_object_t * ) VLC_USED;
  */
 VLC_API void input_resource_Release( input_resource_t * );
 
-/**
- * \return the current audio output if any.
- * Use aout_Release() to drop the reference.
- */
-VLC_API audio_output_t *input_resource_HoldAout( input_resource_t * );
-
-/**
- * This function creates or recycles an audio output.
- */
-VLC_API audio_output_t *input_resource_GetAout( input_resource_t * );
-
-/**
- * This function retains or destroys an audio output.
- */
-VLC_API void input_resource_PutAout( input_resource_t *, audio_output_t * );
-
 /** @} */
 #endif
