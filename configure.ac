@@ -422,8 +422,7 @@ AC_ARG_ENABLE([pdb],
 AS_IF([test "${SYS}" = "mingw32"],[
   AS_IF([test "${enable_pdb}" = "yes"], [
     vlc_build_pdb=1
-    AX_APPEND_FLAG([-g -gcodeview],[CFLAGS])
-    AX_APPEND_FLAG([-g -gcodeview],[CXXFLAGS])
+    AX_APPEND_FLAG([-g -gcodeview],[CPPFLAGS])
     LDFLAGS="${LDFLAGS} -Wl,-pdb="
   ],[])
 ])
