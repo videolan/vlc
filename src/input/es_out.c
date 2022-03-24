@@ -2803,7 +2803,7 @@ static void EsOutSelectListFromProps( es_out_t *out, enum es_format_category_e c
 
         /* EsOutIdMatchStrIds will modify str_ids */
         strcpy( buffer, esprops->str_ids );
-        if( !EsOutIdMatchStrIds( other, buffer ) && EsIsSelected( other ) ) 
+        if( !EsOutIdMatchStrIds( other, buffer ) && EsIsSelected( other ) )
             EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
     }
 
