@@ -32,10 +32,13 @@ Item {
         id: custom_cover
 
         anchors.centerIn: parent
-        visible: !networkModel.artwork || networkModel.artwork.toString() === ""
+        visible: !networkModel || !networkModel.artwork || networkModel.artwork.toString() === ""
         height: iconSize
         sourceSize: Qt.size(width, height)
         source: {
+            if (!networkModel)
+                return ""
+
             switch (networkModel.type) {
             case NetworkMediaModel.TYPE_DISC:
                 return "qrc:///type/disc.svg"
@@ -58,6 +61,7 @@ Item {
         source: custom_cover
         color: VLCStyle.colors.text
         visible: custom_cover.visible
+                 && !!networkModel
                  && networkModel.type !== NetworkMediaModel.TYPE_DISC
                  && networkModel.type !== NetworkMediaModel.TYPE_CARD
                  && networkModel.type !== NetworkMediaModel.TYPE_STREAM
