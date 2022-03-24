@@ -219,7 +219,9 @@ case "${host_os}" in
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     dnl Force libtool to not link to (shared) libgcc_s when detecting C++ dependencies
     dnl When doing this test with -static-libgcc it will link on (static) libgcc_eh
-    CXXFLAGS="${CXXFLAGS} -static-libgcc"
+    AC_LANG_PUSH(C++)
+    AX_APPEND_COMPILE_FLAGS([-static-libgcc], [CXXFLAGS], [-Werror])
+    AC_LANG_POP(C++)
     AC_CHECK_TOOL(WINDRES, windres, :)
     AC_CHECK_TOOL(OBJCOPY, objcopy, :)
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
