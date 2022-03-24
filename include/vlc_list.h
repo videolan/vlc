@@ -62,7 +62,7 @@ static inline void vlc_list_init(struct vlc_list *restrict head)
 /**
  * Inserts an element in a list.
  *
- * \param node Node pointer of the element to insert [OUT].
+ * \param node [out] Node pointer of the element to insert.
  * \param prev Node pointer of the previous element.
  * \param next Node pointer of the next element.
  */
@@ -79,7 +79,7 @@ static inline void vlc_list_add_between(struct vlc_list *restrict node,
 /**
  * Inserts an element after another.
  *
- * \param node Node pointer of the element to insert [OUT].
+ * \param node [out] Node pointer of the element to insert
  * \param prev Node pointer of the previous element.
  */
 static inline void vlc_list_add_after(struct vlc_list *restrict node,
@@ -91,7 +91,7 @@ static inline void vlc_list_add_after(struct vlc_list *restrict node,
 /**
  * Inserts an element before another.
  *
- * \param node Node pointer of the element to insert [OUT].
+ * \param node [out] Node pointer of the element to insert.
  * \param next Node pointer of the next element.
  */
 static inline void vlc_list_add_before(struct vlc_list *restrict node,
@@ -103,7 +103,7 @@ static inline void vlc_list_add_before(struct vlc_list *restrict node,
 /**
  * Appends an element into a list.
  *
- * \param node Node pointer of the element to append to the list [OUT].
+ * \param node [out] Node pointer of the element to append to the list.
  * \param head Head pointer of the list to append the element to.
  */
 static inline void vlc_list_append(struct vlc_list *restrict node,
@@ -115,7 +115,7 @@ static inline void vlc_list_append(struct vlc_list *restrict node,
 /**
  * Prepends an element into a list.
  *
- * \param node Node pointer of the element to prepend to the list [OUT].
+ * \param node [out] Node pointer of the element to prepend to the list.
  * \param head Head pointer of the list to prepend the element to.
  */
 static inline void vlc_list_prepend(struct vlc_list *restrict node,
@@ -143,8 +143,8 @@ static inline void vlc_list_remove(struct vlc_list *restrict node)
 /**
  * Replaces an element with another one.
  *
- * \param original Node pointer of the element to remove from the list [IN].
- * \param substitute Node pointer of the replacement [OUT].
+ * \param original [in] Node pointer of the element to remove from the list.
+ * \param substitute [out] Node pointer of the replacement.
  */
 static inline void vlc_list_replace(const struct vlc_list *original,
                                     struct vlc_list *restrict substitute)
@@ -155,7 +155,7 @@ static inline void vlc_list_replace(const struct vlc_list *original,
 /**
  * Checks if a list is empty.
  *
- * \param head Head of the list to be checked [IN].
+ * \param head [in] Head of the list to be checked.
  *
  * \retval false The list is not empty.
  * \retval true The list is empty.
@@ -171,8 +171,8 @@ static inline bool vlc_list_is_empty(const struct vlc_list *head)
 /**
  * Checks if an element is first in a list.
  *
- * \param node List node of the element [IN].
- * \param head Head of the list to be checked [IN].
+ * \param node [in] List node of the element.
+ * \param head [in] Head of the list to be checked.
  *
  * \retval false The element is not first (or is in another list).
  * \retval true The element is first.
@@ -186,8 +186,8 @@ static inline bool vlc_list_is_first(const struct vlc_list *node,
 /**
  * Checks if an element is last in a list.
  *
- * \param node List node of the element [IN].
- * \param head Head of the list to be checked [IN].
+ * \param node [in] List node of the element.
+ * \param head [in] Head of the list to be checked.
  *
  * \retval false The element is not last (or is in another list).
  * \retval true The element is last.
@@ -269,7 +269,7 @@ static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
  * For each iteration, it sets the cursor variable to the current element.
  *
  * \param pos Cursor pointer variable identifier.
- * \param head Head pointer of the list to iterate [IN].
+ * \param head [in] Head pointer of the list to iterate.
  * \param member Identifier of the member of the data type
  *               serving as list node.
  * \note It it safe to delete the current item while iterating.
@@ -291,7 +291,7 @@ static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
  * For each iteration, it sets the cursor variable to the current element.
  *
  * \param pos Cursor pointer variable identifier.
- * \param head Head pointer of the list to iterate [IN].
+ * \param head [in] Head pointer of the list to iterate.
  * \param member Identifier of the member of the data type
  *               serving as list node.
  * \note It it safe to delete the current item while iterating.
@@ -350,7 +350,7 @@ static inline void *vlc_list_next_or_null(const struct vlc_list *head,
 /**
  * Gets the first element.
  *
- * \param head Head of list whose last element to get [IN].
+ * \param head [in] Head of list whose last element to get.
  *
  * \return the first entry in a list or NULL if empty.
  */
@@ -360,7 +360,7 @@ static inline void *vlc_list_next_or_null(const struct vlc_list *head,
 /**
  * Gets the last element.
  *
- * \param head Head of list whose last element to get [IN].
+ * \param head [in] Head of list whose last element to get.
  *
  * \return the last entry in a list or NULL if empty.
  */
