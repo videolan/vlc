@@ -2222,8 +2222,7 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
             return NULL;
         }
         /* Increase ref count for program */
-        if( p_pgrm )
-            p_pgrm->i_es++;
+        p_pgrm->i_es++;
 
         /* The group 0 is the default one and can be used by different contexts */
         assert( fmt->i_group == 0 || p_pgrm->source == es->id.source );
