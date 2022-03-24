@@ -246,20 +246,6 @@ static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
     it->next = next->prev;
 }
 
-#define vlc_list_entry_aligned_size(p) \
-    ((sizeof (*(p)) + sizeof (max_align_t) - 1) / sizeof (max_align_t))
-
-#define vlc_list_entry_dummy(p) \
-    (0 ? (p) : ((void *)( \
-        &(max_align_t[vlc_list_entry_aligned_size(p)]){ (max_align_t){0} } \
-    )))
-
-#define vlc_list_offset_p(p, member) \
-    ((p) = vlc_list_entry_dummy(p), (char *)(&(p)->member) - (char *)(p))
-
-#define vlc_list_entry_p(node, p, member) \
-    (0 ? (p) : (void *)(((char *)(node)) - vlc_list_offset_p(p, member)))
-
 /**
  * List iteration macro.
  *
@@ -278,8 +264,8 @@ static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
 #define vlc_list_foreach(pos, head, member) \
     for (struct vlc_list_it vlc_list_it__##pos = vlc_list_it_start(head); \
          vlc_list_it_continue(&(vlc_list_it__##pos)) \
-          && ((pos) = vlc_list_entry_p((vlc_list_it__##pos).current, \
-                                       pos, member), true); \
+          && ((pos) = container_of((vlc_list_it__##pos).current, \
+                                   typeof (*(pos)), member), true); \
          vlc_list_it_next(&(vlc_list_it__##pos)))
 
 /**
@@ -300,8 +286,8 @@ static inline void vlc_list_it_prev(struct vlc_list_it *restrict it)
 #define vlc_list_reverse_foreach(pos, head, member) \
     for (struct vlc_list_it vlc_list_it_##pos = vlc_list_it_reverse_start(head); \
          vlc_list_it_continue(&(vlc_list_it_##pos)) \
-          && ((pos) = vlc_list_entry_p((vlc_list_it_##pos).current, \
-                                       pos, member), true); \
+          && ((pos) = container_of((vlc_list_it_##pos).current, \
+                                   typeof (*(pos)), member), true); \
          vlc_list_it_prev(&(vlc_list_it_##pos)))
 
 /**
