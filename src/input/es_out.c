@@ -2122,8 +2122,7 @@ static char *EsOutCreateStrId( es_out_id_t *es, bool stable, const char *id,
                                es_out_id_t *p_master )
 {
     struct vlc_memstream ms;
-    int ret = vlc_memstream_open( &ms );
-    if( ret != 0 )
+    if( vlc_memstream_open( &ms ) != 0 )
         return NULL;
 
     if( p_master )
@@ -2153,9 +2152,10 @@ static char *EsOutCreateStrId( es_out_id_t *es, bool stable, const char *id,
         vlc_memstream_puts( &ms, "auto/" );
 
     vlc_memstream_printf( &ms, "/%d", es->fmt.i_id );
-    ret = vlc_memstream_close( &ms );
+    if( vlc_memstream_close( &ms ) != 0 )
+        return NULL;
 
-    return ret == 0 ? ms.ptr : NULL;
+    return ms.ptr;
 }
 
 static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
