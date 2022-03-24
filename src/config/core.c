@@ -40,7 +40,7 @@
 #include "misc/rcu.h"
 
 vlc_mutex_t config_lock = VLC_STATIC_MUTEX;
-atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
+static atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
 
 int config_GetType(const char *name)
 {

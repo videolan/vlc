@@ -69,7 +69,6 @@ int config_SortConfig (void);
 void config_UnsortConfig (void);
 
 extern vlc_mutex_t config_lock;
-extern _Atomic bool config_dirty;
 
 bool config_IsSafe (const char *);
 
