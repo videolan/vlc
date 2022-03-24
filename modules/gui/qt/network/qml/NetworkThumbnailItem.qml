@@ -88,7 +88,8 @@ Item {
                  && item.rowModel.artwork.toString() !== ""
 
         Widgets.PlayCover {
-            anchors.centerIn: parent
+            x: (artwork.paintedWidth - width) / 2
+            y: (artwork.paintedHeight - height) / 2
 
             width: VLCStyle.play_cover_small
 
