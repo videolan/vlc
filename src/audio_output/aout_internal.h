@@ -77,7 +77,6 @@ typedef struct
         bool discontinuity;
         vlc_tick_t request_delay;
         vlc_tick_t delay;
-        vlc_tick_t first_pts;
     } sync;
     vlc_tick_t original_pts;
 
