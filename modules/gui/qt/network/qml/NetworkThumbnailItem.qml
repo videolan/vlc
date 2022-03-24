@@ -35,6 +35,13 @@ Item {
     readonly property bool containsMouse: parent.containsMouse
     readonly property int index: parent.index
 
+    readonly property string artworkSource: !!rowModel ? rowModel.artwork : ""
+
+    readonly property bool _showPlayCover: (currentlyFocused || containsMouse)
+                                           && !!rowModel
+                                           && (rowModel.type !== NetworkMediaModel.TYPE_NODE)
+                                           && (rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
+
     signal playClicked(int index)
 
     Widgets.ListCoverShadow {
@@ -63,11 +70,7 @@ Item {
 
             width: VLCStyle.play_cover_small
 
-            visible: ((currentlyFocused || containsMouse)
-                      &&
-                      (rowModel.type !== NetworkMediaModel.TYPE_NODE
-                       &&
-                       rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY))
+            visible: item._showPlayCover
 
             onClicked: playClicked(item.index)
         }
@@ -83,9 +86,8 @@ Item {
         fillMode: Image.PreserveAspectFit
         horizontalAlignment: Image.AlignLeft
         verticalAlignment: Image.AlignTop
-        source: item.rowModel.artwork
-        visible: item.rowModel.artwork
-                 && item.rowModel.artwork.toString() !== ""
+        source: item.artworkSource
+        visible: item.artworkSource !== ""
 
         Widgets.PlayCover {
             x: (artwork.paintedWidth - width) / 2
@@ -93,11 +95,7 @@ Item {
 
             width: VLCStyle.play_cover_small
 
-            visible: ((currentlyFocused || containsMouse)
-                      &&
-                      (rowModel.type !== NetworkMediaModel.TYPE_NODE
-                       &&
-                       rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY))
+            visible: item._showPlayCover
 
             onClicked: playClicked(item.index)
         }
