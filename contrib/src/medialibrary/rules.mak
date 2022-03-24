@@ -17,7 +17,7 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 	$(UNPACK)
 	$(MOVE)
 
-.medialibrary: medialibrary
+.medialibrary: medialibrary crossfile.meson
 	cd $< && $(HOSTVARS_MESON) $(MESON) -Dlibvlc=disabled -Dlibtool_workaround=true build
 	ninja -C $</build
 	cd $< && cd build && ninja install
