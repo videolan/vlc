@@ -79,8 +79,8 @@ Item {
     Widgets.ScaledImage {
         id: artwork
 
-        x: (width - paintedWidth) / 2
-        y: (parent.height - paintedHeight) / 2
+        x: Math.round((width - paintedWidth) / 2)
+        y: Math.round((parent.height - paintedHeight) / 2)
         width: VLCStyle.listAlbumCover_width
         height: VLCStyle.listAlbumCover_height
         fillMode: Image.PreserveAspectFit
@@ -90,8 +90,8 @@ Item {
         visible: item.artworkSource !== ""
 
         Widgets.PlayCover {
-            x: (artwork.paintedWidth - width) / 2
-            y: (artwork.paintedHeight - height) / 2
+            x: Math.round((artwork.paintedWidth - width) / 2)
+            y: Math.round((artwork.paintedHeight - height) / 2)
 
             width: VLCStyle.play_cover_small
 
