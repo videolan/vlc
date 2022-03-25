@@ -220,14 +220,17 @@ vlc_player_osd_Tracks(vlc_player_t *player, vlc_es_id_t * const *selected, vlc_e
 
         const struct vlc_player_track *track =
             vlc_player_GetTrack(player, selected[i]);
-        if (track)
-        {
-            if (tracks_count != 0)
-                vlc_memstream_puts(&stream, ", ");
-            vlc_memstream_puts(&stream, track->name);
-            tracks_count++;
-        }
+        /* The track can be NULL if it was terminated by the playback.
+         * In this case, we have nothing to display for it. */
+        if (unlikely(track == NULL))
+            continue;
+
+        if (tracks_count != 0)
+            vlc_memstream_puts(&stream, ", ");
+        vlc_memstream_puts(&stream, track->name);
+        tracks_count++;
     }
+
     if (vlc_memstream_close(&stream) == 0 && tracks_count != 0)
     {
         if (tracks_count == 1)
