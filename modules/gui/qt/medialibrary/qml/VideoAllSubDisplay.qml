@@ -40,16 +40,7 @@ VideoAll {
 
     // Private
 
-    property var _meta: {
-        var grouping = MainCtx.grouping;
-
-        if (grouping === MainCtx.GROUPING_NONE)
-            return metaVideo
-        else if (grouping === MainCtx.GROUPING_NAME)
-            return metaGroup
-        else if (grouping === MainCtx.GROUPING_FOLDER)
-            return metaFolder
-    }
+    property var _meta: null
 
     // Signals
 
@@ -59,11 +50,24 @@ VideoAll {
 
     anchors.fill: parent
 
-    model: _meta.model
+    model: !!_meta ? _meta.model : null
 
-    contextMenu: _meta.contextMenu
+    contextMenu: !!_meta ? _meta.contextMenu : null
 
     // Functions
+
+    function _updateMetaModel(groupping) {
+        if (root._meta)
+            root._meta.destroy()
+
+        if (groupping === MainCtx.GROUPING_NAME) {
+            root._meta = groupComponent.createObject(root)
+        } else if (groupping === MainCtx.GROUPING_FOLDER) {
+            root._meta = folderComponent.createObject(root)
+        } else {
+            root._meta = videoComponent.createObject(root)
+        }
+    }
 
     function getLabelGroup(model, string) {
         if (!model) return ""
@@ -100,90 +104,109 @@ VideoAll {
 
     // Children
 
-    QtObject {
-        id: metaVideo
-
-        property var model: MLVideoModel { ml: MediaLib }
-
-        property var contextMenu: VideoContextMenu { model: metaVideo.model }
-
-        function onAction(indexes) {
-            g_mainDisplay.showPlayer()
-
-            MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
-        }
-
-        function onDoubleClick(object) { g_mainDisplay.play(MediaLib, object.id) }
-
-        function onLabelGrid(object) { return root.getLabel(object) }
-        function onLabelList(object) { return root.getLabel(object) }
+    Connections {
+        target: MainCtx
+        onGroupingChanged: root._updateMetaModel(MainCtx.grouping)
     }
 
-    QtObject {
-        id: metaGroup
+    Component.onCompleted: root._updateMetaModel(MainCtx.grouping)
 
-        property var model: MLVideoGroupsModel { ml: MediaLib }
+    Component {
+        id: videoComponent
 
-        property var contextMenu: VideoGroupsContextMenu { model: metaGroup.model }
+        QtObject {
+            id: metaVideo
 
-        function onAction(indexes) {
-            var index = indexes[0]
+            property var model: MLVideoModel { ml: MediaLib }
 
-            var object = model.getDataAt(index);
+            property var contextMenu: VideoContextMenu { model: metaVideo.model }
 
-            if (object.isVideo) {
+            function onAction(indexes) {
                 g_mainDisplay.showPlayer()
 
                 MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
-
-                return
             }
 
-            root.showList(object, Qt.TabFocusReason)
-        }
+            function onDoubleClick(object) { g_mainDisplay.play(MediaLib, object.id) }
 
-        function onDoubleClick(object) {
-            if (object.isVideo) {
-                g_mainDisplay.play(MediaLib, object.id)
-
-                return
-            }
-
-            root.showList(object, Qt.MouseFocusReason)
-        }
-
-        function onLabelGrid(object) {
-            return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
-        }
-
-        function onLabelList(object) {
-            return root.getLabelGroup(object, I18n.qtr("%1"))
+            function onLabelGrid(object) { return root.getLabel(object) }
+            function onLabelList(object) { return root.getLabel(object) }
         }
     }
 
-    QtObject {
-        id: metaFolder
+    Component {
+        id: groupComponent
 
-        property var model: MLVideoFoldersModel { ml: MediaLib }
+        QtObject {
+            id: metaGroup
 
-        property var contextMenu: VideoFoldersContextMenu { model: metaFolder.model }
+            property var model: MLVideoGroupsModel { ml: MediaLib }
 
-        function onAction(indexes) {
-            var index = indexes[0]
+            property var contextMenu: VideoGroupsContextMenu { model: metaGroup.model }
 
-            root.showList(model.getDataAt(index), Qt.TabFocusReason)
+            function onAction(indexes) {
+                var index = indexes[0]
+
+                var object = model.getDataAt(index);
+
+                if (object.isVideo) {
+                    g_mainDisplay.showPlayer()
+
+                    MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+
+                    return
+                }
+
+                root.showList(object, Qt.TabFocusReason)
+            }
+
+            function onDoubleClick(object) {
+                if (object.isVideo) {
+                    g_mainDisplay.play(MediaLib, object.id)
+
+                    return
+                }
+
+                root.showList(object, Qt.MouseFocusReason)
+            }
+
+            function onLabelGrid(object) {
+                return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
+            }
+
+            function onLabelList(object) {
+                return root.getLabelGroup(object, I18n.qtr("%1"))
+            }
         }
+    }
 
-        function onDoubleClick(object) {
-            root.showList(object, Qt.MouseFocusReason)
-        }
+    Component {
+        id: folderComponent
 
-        function onLabelGrid(object) {
-            return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
-        }
+        QtObject {
+            id: metaFolder
 
-        function onLabelList(object) {
-            return root.getLabelGroup(object, I18n.qtr("%1"))
+            property var model: MLVideoFoldersModel { ml: MediaLib }
+
+            property var contextMenu: VideoFoldersContextMenu { model: metaFolder.model }
+
+            function onAction(indexes) {
+                var index = indexes[0]
+
+                root.showList(model.getDataAt(index), Qt.TabFocusReason)
+            }
+
+            function onDoubleClick(object) {
+                root.showList(object, Qt.MouseFocusReason)
+            }
+
+            function onLabelGrid(object) {
+                return root.getLabelGroup(object, I18n.qtr("%1 Videos"))
+            }
+
+            function onLabelList(object) {
+                return root.getLabelGroup(object, I18n.qtr("%1"))
+            }
         }
     }
 
