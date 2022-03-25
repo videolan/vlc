@@ -106,7 +106,6 @@ void aout_volume_Delete(aout_volume_t *);
 /* From output.c : */
 audio_output_t *aout_New (vlc_object_t *);
 #define aout_New(a) aout_New(VLC_OBJECT(a))
-void aout_Destroy (audio_output_t *);
 
 int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
                    audio_sample_format_t *fmt, int input_profile,

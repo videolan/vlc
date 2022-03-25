@@ -272,7 +272,7 @@ void input_resource_PutAout( input_resource_t *p_resource,
     vlc_mutex_unlock( &p_resource->lock_hold );
 
     if( p_aout != NULL )
-        aout_Destroy( p_aout );
+        aout_Release( p_aout );
 }
 
 audio_output_t *input_resource_HoldAout( input_resource_t *p_resource )
@@ -301,7 +301,7 @@ void input_resource_ResetAout( input_resource_t *p_resource )
     vlc_mutex_unlock( &p_resource->lock_hold );
 
     if( p_aout != NULL )
-        aout_Destroy( p_aout );
+        aout_Release( p_aout );
 }
 
 /* Common */
@@ -335,7 +335,7 @@ void input_resource_Release( input_resource_t *p_resource )
     DestroySout( p_resource );
     DestroyVout( p_resource );
     if( p_resource->p_aout != NULL )
-        aout_Destroy( p_resource->p_aout );
+        aout_Release( p_resource->p_aout );
 
     vout_Release( p_resource->p_vout_dummy );
     free( p_resource );

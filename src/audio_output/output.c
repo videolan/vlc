@@ -397,7 +397,7 @@ audio_output_t *aout_Hold(audio_output_t *aout)
 /**
  * Deinitializes an audio output module and destroys an audio output object.
  */
-void aout_Destroy (audio_output_t *aout)
+static void aout_Destroy (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
@@ -418,7 +418,6 @@ void aout_Destroy (audio_output_t *aout)
     var_DelCallback(aout, "volume", var_Copy, vlc_object_parent(aout));
     var_DelCallback (aout, "stereo-mode", StereoModeCallback, NULL);
     var_DelCallback (aout, "mix-mode", MixModeCallback, NULL);
-    aout_Release(aout);
 }
 
 void aout_Release(audio_output_t *aout)
@@ -427,6 +426,8 @@ void aout_Release(audio_output_t *aout)
 
     if (!vlc_atomic_rc_dec(&owner->rc))
         return;
+
+    aout_Destroy(aout);
 
     aout_dev_t *dev;
     vlc_list_foreach(dev, &owner->dev.list, node)
