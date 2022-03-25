@@ -47,12 +47,9 @@ typedef struct
 {
     vlc_mutex_t lock;
     module_t *module; /**< Output plugin (or NULL if inactive) */
-    aout_filters_t *filters;
-    aout_volume_t *volume;
     bool bitexact;
 
-    atomic_bool drained;
-    _Atomic vlc_tick_t drain_deadline;
+    vlc_aout_stream *main_stream;
 
     struct
     {
@@ -68,42 +65,10 @@ typedef struct
         vlc_viewpoint_t value;
     } vp;
 
-    struct
-    {
-        struct vlc_clock_t *clock;
-        float rate; /**< Play-out speed rate */
-        vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
-        int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
-        bool discontinuity;
-        vlc_tick_t request_delay;
-        vlc_tick_t delay;
-    } sync;
-    vlc_tick_t original_pts;
-
     int requested_stereo_mode; /**< Requested stereo mode set by the user */
     int requested_mix_mode; /**< Requested mix mode set by the user */
 
-    /* Original input format and profile, won't change for the lifetime of a
-     * stream (between vlc_aout_stream_New() and vlc_aout_stream_Delete()). */
-    int                   input_profile;
-    audio_sample_format_t input_format;
-
-    /* Format used to configure the conversion filters. It is based on the
-     * input_format but its fourcc can be different when the module is handling
-     * codec passthrough. Indeed, in case of DTSHD->DTS or EAC3->AC3 fallback,
-     * the filter need to know which codec is handled by the output. */
-    audio_sample_format_t filter_format;
-
-    /* Output format used and modified by the module. */
-    audio_sample_format_t mixer_format;
-
-    aout_filters_cfg_t filters_cfg;
-
     struct vlc_audio_meter meter;
-
-    atomic_uint buffers_lost;
-    atomic_uint buffers_played;
-    atomic_uchar restart;
 
     vlc_atomic_rc_t rc;
 } aout_owner_t;
@@ -143,7 +108,10 @@ audio_output_t *aout_New (vlc_object_t *);
 #define aout_New(a) aout_New(VLC_OBJECT(a))
 void aout_Destroy (audio_output_t *);
 
-int aout_OutputNew(audio_output_t *);
+int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
+                   audio_sample_format_t *fmt, int input_profile,
+                   audio_sample_format_t *filter_fmt,
+                   aout_filters_cfg_t *filters_cfg);
 void aout_OutputDelete( audio_output_t * p_aout );
 
 vlc_audio_meter_plugin *
@@ -180,15 +148,15 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream);
 /* Contrary to other vlc_aout_stream_*() functions, this function can be called from
  * any threads */
 bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream);
+/* Called from output.c */
+void vlc_aout_stream_NotifyDrained(vlc_aout_stream *stream);
+void vlc_aout_stream_NotifyGain(vlc_aout_stream *stream, float gain);
 
-void aout_RequestRestart (audio_output_t *, unsigned);
-void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
-                          vlc_tick_t audio_ts);
+void vlc_aout_stream_RequestRestart(vlc_aout_stream *stream, unsigned);
+void vlc_aout_stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
+                                     vlc_tick_t audio_ts);
 
-static inline void aout_InputRequestRestart(audio_output_t *aout)
-{
-    aout_RequestRestart(aout, AOUT_RESTART_FILTERS);
-}
+void aout_InputRequestRestart(audio_output_t *aout);
 
 static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
 {
