@@ -43,12 +43,41 @@ bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNe
 
 }
 
-MLListCache::MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, size_t chunkSize)
+MLListCache::MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, bool useMove, size_t chunkSize)
     : m_medialib(medialib)
+    , m_useMove(useMove)
     , m_loader(loader.release())
     , m_chunkSize(chunkSize)
 {
     assert(medialib);
+}
+
+size_t MLListCache::fixupIndexForMove(size_t index) const
+{
+    //theses elements have already been moved
+    for (const PartialIndexRedirect& hole : m_partialIndexRedirect)
+    {
+        if (hole.op == PartialIndexRedirect::Operation::DEL)
+        {
+            if (hole.index <= index)
+                index += hole.count;
+            else
+                break;
+        }
+        else
+        {
+            if (hole.index <= index)
+            {
+                if (index <= hole.index + hole.count - 1)
+                    return hole.val.add.x + (index - hole.index);
+                else
+                    index -= hole.count;
+            }
+            else
+                break;
+        }
+    }
+    return index;
 }
 
 const MLListCache::ItemType* MLListCache::get(size_t index) const
@@ -63,7 +92,13 @@ const MLListCache::ItemType* MLListCache::get(size_t index) const
             if (index >= m_partialLoadedCount)
                 return nullptr;
             else if (index >= m_partialIndex)
-                return &m_oldData->list.at(index - m_partialIndex + m_partialX);
+            {
+                if (m_useMove)
+                {
+                    index = fixupIndexForMove(index);
+                }
+                return &m_oldData->list.at(index + (m_partialX - m_partialIndex));
+            }
             else
                 return &m_cachedData->list.at(index);
         }
@@ -275,9 +310,13 @@ void MLListCache::partialUpdate()
     };
 
     diffutil_snake_t* snake = vlc_diffutil_build_snake(&diffOp, &m_oldData->list, &m_cachedData->list);
+    int diffutilFlags = VLC_DIFFUTIL_RESULT_AGGREGATE;
+    if (m_useMove)
+        diffutilFlags |= VLC_DIFFUTIL_RESULT_MOVE;
+
     vlc_diffutil_changelist_t* changes = vlc_diffutil_build_change_list(
         snake, &diffOp, &m_oldData->list, &m_cachedData->list,
-        VLC_DIFFUTIL_RESULT_AGGREGATE);
+        diffutilFlags);
 
     m_partialIndex = 0;
     m_partialLoadedCount = m_oldData->loadedCount;
@@ -311,8 +350,22 @@ void MLListCache::partialUpdate()
             emit localSizeChanged(partialTotalCount);
             break;
         case VLC_DIFFUTIL_OP_MOVE:
-            emit beginMoveRows(op.op.move.from, op.op.move.from + op.count - 1, op.op.move.to);
-            //TODO
+            m_partialX = op.op.move.x;
+            if (op.op.move.from > op.op.move.to)
+            {
+                m_partialIndex = op.op.move.to;
+                emit beginMoveRows(op.op.move.from, op.op.move.from + op.count - 1, op.op.move.to);
+                m_partialIndexRedirect.insert(PartialIndexRedirect(PartialIndexRedirect::Operation::DEL, op.op.move.from, op.count));
+                m_partialIndex += op.count;
+            }
+            else
+            {
+                m_partialIndex = op.op.move.from + op.count - 1;
+                emit beginMoveRows(op.op.move.from, op.op.move.from + op.count - 1, op.op.move.to);
+                m_partialIndexRedirect.insert(PartialIndexRedirect(PartialIndexRedirect::Operation::ADD, op.op.move.to, op.count, op.op.move.x));
+                m_partialIndex = op.op.move.from + 1;
+                m_partialX += op.count;
+            }
             emit endMoveRows();
             break;
         }
@@ -321,6 +374,8 @@ void MLListCache::partialUpdate()
     vlc_diffutil_free_snake(snake);
 
     //ditch old model
+    if (m_useMove)
+        m_partialIndexRedirect.clear();
     m_oldData.reset();
 
     //if we have change outside our cache

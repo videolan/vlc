@@ -437,7 +437,7 @@ void MLBaseModel::validateCache() const
         return;
 
     auto loader = createLoader();
-    m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader));
+    m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader), false);
     connect(m_cache.get(), &MLListCache::localSizeChanged,
             this, &MLBaseModel::onLocalSizeChanged);
 

@@ -27,6 +27,7 @@
 #include <cassert>
 #include <memory>
 #include <vector>
+#include <set>
 #include <QObject>
 #include <QSharedPointer>
 #include "util/listcacheloader.hpp"
@@ -123,7 +124,7 @@ public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
     MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
-              size_t chunkSize = 100);
+        bool useMove, size_t chunkSize = 100);
 
     /**
      * Return the item at specified index
@@ -212,8 +213,11 @@ private:
     void asyncFetchMore();
     void asyncCountAndLoad();
     void partialUpdate();
+    size_t fixupIndexForMove(size_t index) const;
 
     MediaLib* m_medialib = nullptr;
+
+    bool m_useMove = false;
 
     /* Ownershipshared between this cache and the runnable spawned to execute
      * loader callbacks */
@@ -251,6 +255,45 @@ private:
     size_t m_partialIndex = 0;
     size_t m_partialX = 0;
     size_t m_partialLoadedCount = 0;
+
+    //represent a redirection of items that are after m_partialIndex
+    struct PartialIndexRedirect {
+        enum class Operation
+        {
+            ADD,
+            DEL
+        };
+
+        explicit PartialIndexRedirect(Operation op_, size_t index_, size_t count_, size_t x_ = 0)
+            : op(op_)
+            , index(index_)
+            , count(count_)
+        {
+            if (op == Operation::ADD)
+            {
+                val.add.x = x_;
+            }
+        }
+        Operation op;
+        union {
+            struct {
+                size_t x;
+            } add;
+            struct {
+            } del;
+        } val;
+        size_t index;
+        size_t count;
+
+        //for set ordering
+        friend bool operator<(const PartialIndexRedirect& l, const PartialIndexRedirect& r)
+        {
+            return l.index < r.index;
+        }
+
+    };
+    //store index redirection keeping index order
+    std::set<PartialIndexRedirect> m_partialIndexRedirect;
 };
 
 #endif
