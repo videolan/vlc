@@ -210,7 +210,6 @@ vlc_player_osd_Tracks(vlc_player_t *player, vlc_es_id_t * const *selected, vlc_e
     const char *cat_name = es_format_category_to_string(cat);
     int tracks_count = 0;
     struct vlc_memstream stream;
-    vlc_memstream_open(&stream);
 
     for (size_t i = 0; selected[i] != NULL; i++)
     {
@@ -225,23 +224,37 @@ vlc_player_osd_Tracks(vlc_player_t *player, vlc_es_id_t * const *selected, vlc_e
         if (unlikely(track == NULL))
             continue;
 
-        if (tracks_count != 0)
+        /* Open the stream for the first track, and exit in case of error.
+         * On the next tracks, add comma to separate the track names. */
+        if (tracks_count == 0)
+        {
+            if (vlc_memstream_open(&stream) != 0)
+                return;
+        }
+        else
             vlc_memstream_puts(&stream, ", ");
+
         vlc_memstream_puts(&stream, track->name);
         tracks_count++;
     }
 
-    if (vlc_memstream_close(&stream) == 0 && tracks_count != 0)
+    if (tracks_count == 0)
     {
-        if (tracks_count == 1)
-            vlc_player_osd_Message(player, _("%s track: %s"), cat_name,
-                                   stream.ptr);
-        else
-            vlc_player_osd_Message(player, _("%s tracks: %s"), cat_name,
-                                   stream.ptr);
-        free(stream.ptr);
-    } else if (tracks_count == 0)
         vlc_player_osd_Message(player, _("%s track: %s"), cat_name, _("N/A"));
+        return;
+    }
+
+    /* The vlc_memstream is opened only if tracks_count != 0. */
+    if (vlc_memstream_close(&stream) != 0)
+        return;
+
+    if (tracks_count == 1)
+        vlc_player_osd_Message(player, _("%s track: %s"), cat_name,
+                               stream.ptr);
+    else
+        vlc_player_osd_Message(player, _("%s tracks: %s"), cat_name,
+                               stream.ptr);
+    free(stream.ptr);
 }
 
 void
