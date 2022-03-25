@@ -829,7 +829,9 @@ static void *Run( void *data )
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+#ifndef _WIN32
     struct cli_client *cl;
+#endif
     char *psz_host;
     int  *pi_socket = NULL;
 
