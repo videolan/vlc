@@ -408,10 +408,58 @@ inline char *getPreferedAdapter()
 #endif
 #else
 
-inline char *getIpv4ForMulticast()
+#ifdef __APPLE__
+
+inline bool necessaryFlagsSetOnInterface(struct ifaddrs *anInterface)
+{
+    unsigned int flags = anInterface->ifa_flags;
+    if( (flags & IFF_UP) && (flags & IFF_RUNNING) && !(flags & IFF_LOOPBACK) && !(flags & IFF_POINTOPOINT) ) {
+        return true;
+    }
+    return false;
+}
+
+static char *getIpv4ForMulticast()
+{
+    struct ifaddrs *listOfInterfaces;
+    struct ifaddrs *anInterface;
+    int ret = getifaddrs(&listOfInterfaces);
+    char *bestIP = NULL;
+
+    if (ret != 0) {
+        return NULL;
+    }
+
+    anInterface = listOfInterfaces;
+    while (anInterface != NULL) {
+        if (anInterface->ifa_addr->sa_family == AF_INET) {
+            bool ret = necessaryFlagsSetOnInterface(anInterface);
+            if (ret) {
+                /* ignore sockets connecting to the touchbar on MacBooks */
+                if (strncmp(anInterface->ifa_name, "bridge", 6) != 0) {
+                    if (bestIP) {
+                        FREENULL(bestIP);
+                    }
+                    bestIP = strdup(inet_ntoa(((struct sockaddr_in *)anInterface->ifa_addr)->sin_addr));
+                }
+            }
+        }
+
+        anInterface = anInterface->ifa_next;
+    }
+    freeifaddrs(listOfInterfaces);
+
+    return bestIP;
+}
+
+#else
+
+static char *getIpv4ForMulticast()
 {
     return NULL;
 }
+
+#endif
 
 #endif
 
