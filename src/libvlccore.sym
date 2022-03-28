@@ -42,7 +42,7 @@ vlc_audio_meter_Process
 vlc_audio_meter_Flush
 vlc_fifo_Get
 vlc_fifo_New
-vlc_fifo_Release
+vlc_fifo_Delete
 vlc_fifo_Show
 vlc_frame_Alloc
 vlc_frame_AttachAncillary

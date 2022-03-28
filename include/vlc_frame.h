@@ -563,20 +563,20 @@ static inline vlc_frame_t *vlc_frame_ChainGather( vlc_frame_t *p_list )
  * Creates a thread-safe FIFO queue of blocks.
  *
  * See also vlc_fifo_Put() and vlc_fifo_Get().
- * The created queue must be released with vlc_fifo_Release().
+ * The created queue must be deleted with vlc_fifo_Delete().
  *
  * @return the FIFO or NULL on memory error
  */
 VLC_API vlc_fifo_t *vlc_fifo_New(void) VLC_USED VLC_MALLOC;
 
 /**
- * Destroys a FIFO created by vlc_fifo_New().
+ * Delete a FIFO created by vlc_fifo_New().
  *
- * @note Any queued blocks are also destroyed.
+ * @note Any queued blocks are also deleted.
  * @warning No other threads may be using the FIFO when this function is
  * called. Otherwise, undefined behaviour will occur.
  */
-VLC_API void vlc_fifo_Release(vlc_fifo_t *);
+VLC_API void vlc_fifo_Delete(vlc_fifo_t *);
 
 /**
  * Dequeue the first block from the FIFO. If necessary, wait until there is

@@ -100,7 +100,7 @@ block_fifo_t *vlc_fifo_New( void )
     return p_fifo;
 }
 
-void vlc_fifo_Release( block_fifo_t *p_fifo )
+void vlc_fifo_Delete( block_fifo_t *p_fifo )
 {
     vlc_fifo_Empty(p_fifo);
     free( p_fifo );

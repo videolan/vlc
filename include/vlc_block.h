@@ -102,7 +102,7 @@
 
 #define block_FifoPut vlc_fifo_Put
 #define block_FifoNew vlc_fifo_New
-#define block_FifoRelease vlc_fifo_Release
+#define block_FifoRelease vlc_fifo_Delete
 #define block_FifoSize vlc_fifo_Size
 #define block_FifoGet vlc_fifo_Get
 #define block_FifoCount vlc_fifo_Count
