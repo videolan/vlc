@@ -179,6 +179,7 @@ Item {
     property color buffer: "#696969";
 
     property color seekpoint: "red";
+    property color record: "red";
 
     property color windowCSDButtonDarkBg:  "#80484848"
     property color windowCSDButtonLightBg: "#80DADADA"

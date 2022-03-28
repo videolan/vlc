@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
 
@@ -23,12 +24,45 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Widgets.IconControlButton {
-    id: recordBtn
+Widgets.IconToolButton {
+    id: control
+
+    enabled: !paintOnly && Player.isPlaying
+
     size: VLCStyle.icon_medium
-    iconText: VLCIcons.record
-    enabled: Player.isPlaying
-    checked: Player.isRecording
-    onClicked: Player.toggleRecord()
+    color: VLCStyle.colors.record
     text: I18n.qtr("record")
+
+    onClicked: Player.toggleRecord()
+
+    contentItem: T.Label {
+        id: content
+
+        anchors.centerIn: parent
+
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
+        text: VLCIcons.record
+        color: control.color
+
+        ColorAnimation on color {
+            from:  "transparent"
+            to: control.color
+            duration: VLCStyle.ms1000
+            loops: Animation.Infinite
+            easing.type: Easing.InOutSine
+            running: control.enabled && Player.recording
+
+            onStopped: {
+                content.color = control.color
+            }
+        }
+
+        font.pixelSize: VLCIcons.pixelSize(size)
+        font.family: VLCIcons.fontFamily
+        font.underline: control.font.underline
+
+        Accessible.ignored: true
+    }
 }
