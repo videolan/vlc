@@ -148,7 +148,8 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     if (aout_OutputNew(p_aout, stream, &stream->mixer_format, stream->input_profile,
                        &stream->filter_format, &stream->filters_cfg))
         goto error;
-    aout_volume_SetFormat (stream->volume, stream->mixer_format.i_format);
+    if (stream->volume != NULL)
+        aout_volume_SetFormat(stream->volume, stream->mixer_format.i_format);
 
     vlc_audio_meter_Reset(&owner->meter, &stream->mixer_format);
 
@@ -165,8 +166,8 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
             vlc_audio_meter_Reset(&owner->meter, NULL);
 
 error:
-            aout_volume_Delete (stream->volume);
-            stream->volume = NULL;
+            if (stream->volume != NULL)
+                aout_volume_Delete(stream->volume);
             free(stream);
             return NULL;
         }
@@ -202,7 +203,8 @@ void vlc_aout_stream_Delete (vlc_aout_stream *stream)
             aout_FiltersDelete (aout, stream->filters);
         aout_OutputDelete (aout);
     }
-    aout_volume_Delete (stream->volume);
+    if (stream->volume != NULL)
+        aout_volume_Delete(stream->volume);
     free(stream);
 }
 
@@ -232,8 +234,9 @@ static int stream_CheckReady (vlc_aout_stream *stream)
             if (aout_OutputNew(aout, stream, &stream->mixer_format, stream->input_profile,
                                &stream->filter_format, &stream->filters_cfg))
                 stream->mixer_format.i_format = 0;
-            aout_volume_SetFormat (stream->volume,
-                                   stream->mixer_format.i_format);
+            if (stream->volume != NULL)
+                aout_volume_SetFormat(stream->volume,
+                                      stream->mixer_format.i_format);
 
             /* Notify the decoder that the aout changed in order to try a new
              * suitable codec (like an HDMI audio format). However, keep the
@@ -528,7 +531,8 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     stream->original_pts = VLC_TICK_INVALID;
 
     /* Software volume */
-    aout_volume_Amplify(stream->volume, block);
+    if (stream->volume != NULL)
+        aout_volume_Amplify(stream->volume, block);
 
     /* Update delay */
     if (stream->sync.request_delay != stream->sync.delay)
@@ -647,7 +651,8 @@ void vlc_aout_stream_Flush(vlc_aout_stream *stream)
 
 void vlc_aout_stream_NotifyGain(vlc_aout_stream *stream, float gain)
 {
-    aout_volume_SetVolume(stream->volume, gain);
+    if (stream->volume != NULL)
+        aout_volume_SetVolume(stream->volume, gain);
 }
 
 void vlc_aout_stream_NotifyDrained(vlc_aout_stream *stream)
