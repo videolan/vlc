@@ -382,6 +382,7 @@
         <file alias="PreviousButton.qml">player/qml/controlbarcontrols/PreviousButton.qml</file>
         <file alias="QuitButton.qml">player/qml/controlbarcontrols/QuitButton.qml</file>
         <file alias="RandomButton.qml">player/qml/controlbarcontrols/RandomButton.qml</file>
+        <file alias="RendererButton.qml">player/qml/controlbarcontrols/RendererButton.qml</file>
         <file alias="RecordButton.qml">player/qml/controlbarcontrols/RecordButton.qml</file>
         <file alias="ReverseButton.qml">player/qml/controlbarcontrols/ReverseButton.qml</file>
         <file alias="SkipBackButton.qml">player/qml/controlbarcontrols/SkipBackButton.qml</file>

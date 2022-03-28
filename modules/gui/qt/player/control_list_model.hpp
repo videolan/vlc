@@ -74,6 +74,7 @@ public:
         DVD_MENUS_BUTTON,
         REVERSE_BUTTON,
         BOOKMARK_BUTTON,
+        RENDERER_BUTTON,
         SPECIAL_MAX,
 
         WIDGET_SPACER = 0x40,

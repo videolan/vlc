@@ -845,6 +845,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/controlbarcontrols/PreviousButton.qml \
 	gui/qt/player/qml/controlbarcontrols/QuitButton.qml \
 	gui/qt/player/qml/controlbarcontrols/RandomButton.qml \
+	gui/qt/player/qml/controlbarcontrols/RendererButton.qml \
 	gui/qt/player/qml/controlbarcontrols/RecordButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ReverseButton.qml \
 	gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml \
