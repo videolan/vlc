@@ -58,6 +58,7 @@ aout_volume_t *aout_volume_New(vlc_object_t *parent,
     if (unlikely(vol == NULL))
         return NULL;
     vol->module = NULL;
+    atomic_init(&vol->gain_factor, 1.f);
     atomic_init(&vol->output_factor, 1.f);
 
     //audio_volume_t *obj = &vol->object;
