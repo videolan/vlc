@@ -148,13 +148,14 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     if (aout_OutputNew(p_aout, stream, &stream->mixer_format, stream->input_profile,
                        &stream->filter_format, &stream->filters_cfg))
         goto error;
-    if (stream->volume != NULL)
-        aout_volume_SetFormat(stream->volume, stream->mixer_format.i_format);
 
     vlc_audio_meter_Reset(&owner->meter, &stream->mixer_format);
 
     if (!owner->bitexact)
     {
+        if (stream->volume != NULL)
+            aout_volume_SetFormat(stream->volume, stream->mixer_format.i_format);
+
         /* Create the audio filtering "input" pipeline */
         stream->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock,
                                                    &stream->filter_format,
