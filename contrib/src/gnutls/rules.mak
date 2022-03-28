@@ -41,6 +41,12 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(APPLY) $(SRC)/gnutls/0001-fix-mingw64-detection.patch
 
 	$(call pkg_static,"lib/gnutls.pc.in")
+
+	# fix AArch64 builds for Apple OS by removing unsupported compiler flag (gnutls#1347, gnutls#1317)
+ifdef HAVE_DARWIN_OS
+	$(APPLY) $(SRC)/gnutls/gnutls-fix-aarch64-compilation-appleos.patch
+endif
+
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

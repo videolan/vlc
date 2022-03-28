@@ -1,0 +1,12 @@
+diff -ru gnutls/lib/accelerated/aarch64/Makefile.in gnutls/lib/accelerated/aarch64/Makefile.in
+--- gnutls/lib/accelerated/aarch64/Makefile.in	2021-05-24 10:05:49.000000000 +0200
++++ gnutls/lib/accelerated/aarch64/Makefile.in	2022-03-28 15:06:23.000000000 +0200
+@@ -1634,7 +1634,7 @@
+ 	-I$(srcdir)/../../ -I$(srcdir)/../ $(am__append_1)
+ 
+ #ensure that we have all aarch64 instruction sets enabled for the assembler
+-AM_CCASFLAGS = -Wa,-march=all
++AM_CCASFLAGS = -Wa
+ EXTRA_DIST = README
+ noinst_LTLIBRARIES = libaarch64.la
+ libaarch64_la_SOURCES = aarch64-common.c aarch64-common.h \
