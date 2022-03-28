@@ -204,6 +204,28 @@ private:
     QMenu * m_menu = nullptr;
 };
 
+class QmlRendererMenu : public QObject
+{
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
+
+public:
+    explicit QmlRendererMenu(QObject * parent = nullptr);
+
+    ~QmlRendererMenu();
+
+public: // Interface
+    Q_INVOKABLE void popup(QPoint pos);
+
+signals:
+    void aboutToHide();
+    void aboutToShow();
+
+private:
+    RendererMenu * m_menu = nullptr;
+};
+
 class BaseMedialibMenu : public QObject
 {
     Q_OBJECT

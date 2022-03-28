@@ -471,6 +471,34 @@ QmlBookmarkMenu::~QmlBookmarkMenu()
     m_menu->popup(pos);
 }
 
+// QmlRendererMenu
+
+/* explicit */ QmlRendererMenu::QmlRendererMenu(QObject * parent) : QObject(parent) {}
+
+QmlRendererMenu::~QmlRendererMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+// Interface
+
+/* Q_INVOKABLE */ void QmlRendererMenu::popup(QPoint pos)
+{
+    if (m_ctx == nullptr)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new RendererMenu(nullptr, m_ctx->getIntf());
+
+    connect(m_menu, &QMenu::aboutToHide, this, &QmlRendererMenu::aboutToHide);
+    connect(m_menu, &QMenu::aboutToShow, this, &QmlRendererMenu::aboutToShow);
+
+    m_menu->popup(pos);
+}
+
 BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
     : QObject(parent)
 {}
