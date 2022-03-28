@@ -60,6 +60,7 @@ QtObject {
         { id: ControlListModel.VOLUME, file: "VolumeWidget.qml", label: VLCIcons.volume_high, text: I18n.qtr("Volume Widget") },
         { id: ControlListModel.DVD_MENUS_BUTTON, file: "DvdMenuButton.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("DVD menus") },
         { id: ControlListModel.TELETEXT_BUTTONS, file: "TeletextWidget.qml", label: VLCIcons.tvtelx, text: I18n.qtr("Teletext") },
+        { id: ControlListModel.RENDERER_BUTTON, file: "RendererButton.qml", label: VLCIcons.renderer, text: I18n.qtr("Renderer Button") },
         { id: ControlListModel.ASPECT_RATIO_COMBOBOX, file: "AspectRatioWidget.qml", label: VLCIcons.aspect_ratio, text: I18n.qtr("Aspect Ratio") },
         { id: ControlListModel.WIDGET_SPACER, file: "SpacerWidget.qml", label: VLCIcons.space, text: I18n.qtr("Spacer") },
         { id: ControlListModel.WIDGET_SPACER_EXTEND, file: "ExpandingSpacerWidget.qml", label: VLCIcons.space, text: I18n.qtr("Expanding Spacer") },
