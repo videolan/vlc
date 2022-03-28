@@ -39,7 +39,7 @@ struct aout_volume
     audio_volume_t object;
     audio_replay_gain_t replay_gain;
     _Atomic float gain_factor;
-    float output_factor;
+    _Atomic float output_factor;
     module_t *module;
 };
 
@@ -58,7 +58,7 @@ aout_volume_t *aout_volume_New(vlc_object_t *parent,
     if (unlikely(vol == NULL))
         return NULL;
     vol->module = NULL;
-    vol->output_factor = 1.f;
+    atomic_init(&vol->output_factor, 1.f);
 
     //audio_volume_t *obj = &vol->object;
 
@@ -124,7 +124,7 @@ void aout_volume_SetVolume(aout_volume_t *vol, float factor)
     if (unlikely(vol == NULL))
         return;
 
-    vol->output_factor = factor;
+    atomic_store_explicit(&vol->output_factor, factor, memory_order_relaxed);
 }
 
 /**
@@ -135,7 +135,8 @@ int aout_volume_Amplify(aout_volume_t *vol, block_t *block)
     if (unlikely(vol == NULL) || vol->module == NULL)
         return -1;
 
-    float amp = vol->output_factor * atomic_load(&vol->gain_factor);
+    float amp = atomic_load_explicit(&vol->output_factor, memory_order_relaxed)
+              * atomic_load(&vol->gain_factor);
 
     vol->object.amplify(&vol->object, block, amp);
     return 0;
