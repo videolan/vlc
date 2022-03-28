@@ -1,6 +1,6 @@
 # faad2
 
-FAAD2_VERSION := 2.9.2
+FAAD2_VERSION := 2.10.0
 FAAD2_VERSION_FIXED := $(subst .,_,$(FAAD2_VERSION))
 FAAD2_URL := $(GITHUB)/knik0/faad2/archive/$(FAAD2_VERSION_FIXED).tar.gz
 
