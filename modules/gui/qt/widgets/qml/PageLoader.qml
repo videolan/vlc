@@ -36,6 +36,12 @@ FocusScope {
         loadView()
     }
 
+    // loads the 'defaultPage'
+    // this will also apend History.current with the 'defaultPage' entry
+    function loadDefaultView() {
+        view = null
+    }
+
     function loadView() {
         if (view === null) {
             var defaultView = {"name": defaultPage, "properties": {}}
