@@ -99,7 +99,8 @@ struct ts_es_t
     struct
     {
         uint8_t i_service_id;
-        uint32_t i_format;
+        uint32_t i_application_format_identifier;
+        uint32_t i_format_identifier;
     } metadata;
 };
 

@@ -633,22 +633,48 @@ static void SetupISO14496Descriptors( demux_t *p_demux, ts_stream_t *p_pes,
 static void SetupMetadataDescriptors( demux_t *p_demux, ts_stream_t *p_stream, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
     ts_es_t *p_es = p_stream->p_es;
-    const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x26 );
-    if( p_dr && p_dr->i_length >= 13 )
+    for( const dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x26 );
+                                   p_dr; p_dr = p_dr->p_next )
     {
-        /* app format 0xFFFF
-         * metadata_application_format_identifier ID3\x20
-         * i_metadata_format 0xFF
-         * metadata_format_identifier ID3\x20 */
-        if( !memcmp( p_dr->p_data, "\xFF\xFFID3 \xFFID3 ", 11 ) &&
-            (p_dr->p_data[12] & 0xF0) == 0x00 )
+        if( p_dr->i_tag != 0x26 || p_dr->i_length < 5 )
+            continue;
+
+        const uint8_t *p_data = p_dr->p_data;
+        size_t i_data = p_dr->i_length;
+
+        if( GetWBE(p_data) == 0xFFFF ) /* metadata_application_format */
         {
-            p_es->metadata.i_format = VLC_FOURCC('I', 'D', '3', ' ');
-            p_es->metadata.i_service_id = p_dr->p_data[11];
+            if( i_data < 9 )
+                return;
+            p_es->metadata.i_application_format_identifier = VLC_FOURCC(p_data[2], p_data[3], p_data[4], p_data[5]);
+            p_data += 4; i_data -= 4;
+        }
+        p_data += 2; i_data -= 2;
+
+        if(p_data[0] == 0xFF) /* metadata_format */
+        {
+            if( i_data < 7 )
+                return;
+            p_es->metadata.i_format_identifier = VLC_FOURCC(p_data[1], p_data[2], p_data[3], p_data[4]);
+            p_data += 4; i_data -= 4;
+        }
+        p_data += 1; i_data -= 1;
+
+        p_es->metadata.i_service_id = p_data[0];
+        const uint8_t flags = p_data[1];
+        p_data += 2; i_data -= 2;
+
+        /* metadata_application_format_identifier ID3\x20
+         * metadata_format_identifier ID3\x20 */
+        if( p_es->metadata.i_application_format_identifier == METADATA_IDENTIFIER_ID3 &&
+            p_es->metadata.i_format_identifier == METADATA_IDENTIFIER_ID3 &&
+            (flags & 0xF0) == 0x00 )
+        {
             msg_Dbg( p_demux, "     - found Metadata_descriptor type ID3 with service_id=0x%"PRIx8,
-                     p_dr->p_data[11] );
+                     p_es->metadata.i_service_id );
             if( !p_stream->p_proc )
                 p_stream->p_proc = Metadata_stream_processor_New( p_stream, p_demux->out );
+            break;
         }
     }
 }
