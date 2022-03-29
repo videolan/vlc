@@ -62,13 +62,8 @@ static block_t * Metadata_stream_processor_Push( ts_stream_processor_t *h, uint8
     Metadata_stream_processor_context_t *ctx = (Metadata_stream_processor_context_t *) h->priv;
     ts_es_t *p_es = ctx->p_stream->p_es;
 
-    if( i_stream_id != 0xbd )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
-
-    if( p_es->metadata.i_format_identifier == METADATA_IDENTIFIER_ID3 )
+    if( i_stream_id == 0xbd && /* Transport in PES packets, 2.12.3 */
+        p_es->metadata.i_format_identifier == METADATA_IDENTIFIER_ID3 )
     {
         vlc_meta_t *p_meta = vlc_meta_New();
         if( p_meta )
