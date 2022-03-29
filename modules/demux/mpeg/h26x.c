@@ -205,7 +205,7 @@ static int ProbeH264( const uint8_t *p_peek, size_t i_peek, void *p_priv )
     }
     else if( i_nal_type == H264_NAL_AU_DELIMITER )
     {
-        if( i_ref_idc || p_ctx->b_pps || p_ctx->b_sps )
+        if( i_ref_idc )
             return -1;
     }
     else if ( i_nal_type == H264_NAL_SEI )
