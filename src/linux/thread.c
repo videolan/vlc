@@ -105,9 +105,9 @@ void vlc_atomic_wait(void *addr, unsigned val)
 
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 {
-    struct timespec ts = timespec_from_vlc_tick(deadline);
+    struct timespec ts;
 
-    if (vlc_futex_wait(addr, 0, val, &ts) == 0)
+    if (vlc_futex_wait(addr, 0, val, vlc_tick_to_timespec(&ts, deadline)) == 0)
         return 0;
 
     switch (errno) {

@@ -84,8 +84,8 @@ void vlc_atomic_wait(void *addr, unsigned val)
 
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 {
-    struct timespec ts = timespec_from_vlc_tick(delay);
-    int ret = vlc_umtx_wait(addr, val, &ts);
+    struct timespec ts;
+    int ret = vlc_umtx_wait(addr, val, vlc_tick_to_timespec(&ts, deadline));
 
     assert(ret == 0 || ret == ETIMEDOUT || ret == EINTR || ret == ERESTART);
     return (ret != ETIMEDOUT) ? 0 : ret;

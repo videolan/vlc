@@ -129,8 +129,9 @@ static void vlc_timespec_adjust(clockid_t cid, struct timespec *restrict ts)
 
 int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
 {
-    struct timespec ts = timespec_from_vlc_tick(deadline);
+    struct timespec ts;
 
+    vlc_tick_to_timespec(&ts, deadline);
     vlc_timespec_adjust(CLOCK_MONOTONIC, &ts);
     return vlc_atomic_timedwait_timespec(addr, value, &ts);
 }

@@ -268,16 +268,18 @@ void vlc_tick_wait (vlc_tick_t deadline)
     pthread_once(&vlc_clock_once, vlc_clock_setup_once);
     deadline -= vlc_clock_prec;
 
-    struct timespec ts = timespec_from_vlc_tick (deadline);
+    struct timespec ts;
 
+    vlc_tick_to_timespec(&ts, deadline);
     while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL) == EINTR);
 }
 
 #undef vlc_tick_sleep
 void vlc_tick_sleep (vlc_tick_t delay)
 {
-    struct timespec ts = timespec_from_vlc_tick (delay);
+    struct timespec ts;
 
+    vlc_tick_to_timespec(&ts, delay);
     while (clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, &ts) == EINTR);
 }
 
