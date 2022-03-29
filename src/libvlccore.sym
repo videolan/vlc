@@ -255,6 +255,7 @@ vlc_uri_resolve
 vlc_uri_fixup
 vlc_tick_now
 vlc_tick_to_str
+vlc_tick_to_timespec
 module_config_free
 module_config_get
 module_find
