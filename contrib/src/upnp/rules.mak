@@ -16,7 +16,7 @@ $(TARBALLS)/pupnp-release-$(UPNP_VERSION).tar.gz:
 
 UPNP_CFLAGS := $(CFLAGS) -DUPNP_STATIC_LIB
 UPNP_CXXFLAGS := $(CXXFLAGS) -DUPNP_STATIC_LIB
-UPNP_CONF := --disable-samples --without-documentation
+UPNP_CONF := --disable-samples
 
 ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
