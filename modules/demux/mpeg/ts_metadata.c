@@ -68,7 +68,7 @@ static block_t * Metadata_stream_processor_Push( ts_stream_processor_t *h, uint8
         return NULL;
     }
 
-    if( p_es->metadata.i_format == VLC_FOURCC('I', 'D', '3', ' ') )
+    if( p_es->metadata.i_format_identifier == METADATA_IDENTIFIER_ID3 )
     {
         vlc_meta_t *p_meta = vlc_meta_New();
         if( p_meta )
