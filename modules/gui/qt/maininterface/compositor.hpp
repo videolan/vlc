@@ -94,6 +94,7 @@ public:
     class QmlUISurface
     {
     public:
+        virtual ~QmlUISurface() = default;
         virtual QQmlEngine* engine() const = 0;
         virtual void setContent(QQmlComponent *component, QQuickItem *item) = 0;
 

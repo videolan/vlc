@@ -150,6 +150,8 @@ template <typename T>
 class AsyncTask : public BaseAsyncTask
 {
 public:
+    virtual ~AsyncTask() = default;
+
     virtual T execute() = 0;
 
     /**

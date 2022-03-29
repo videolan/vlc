@@ -218,6 +218,7 @@ class RunOnMLThreadBaseRunner : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
+    virtual ~RunOnMLThreadBaseRunner() = default;
     virtual void runUICallback() = 0;
     virtual void cancel() = 0;
 signals:

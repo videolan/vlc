@@ -55,6 +55,7 @@ public:
     };
 
     MLFoldersBaseModel( QObject *parent = nullptr );
+    virtual ~MLFoldersBaseModel() = default;
 
     void setCtx(MainCtx* ctx);
     inline MainCtx* getCtx() { return m_ctx; }

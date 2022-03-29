@@ -32,6 +32,8 @@ public:
     SelectableListModel(QObject *parent = nullptr) :
         QAbstractListModel(parent) {}
 
+    virtual ~SelectableListModel() = default;
+
     Q_INVOKABLE bool isSelected(int index) const;
     Q_INVOKABLE void setSelected(int index, bool selected);
     Q_INVOKABLE void toggleSelected(int index);

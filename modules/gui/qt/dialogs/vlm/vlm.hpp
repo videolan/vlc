@@ -149,6 +149,7 @@ public:
     VLMAWidget( VLMWrapper *, const QString& name, const QString& input,
                 const QString& inputOptions, const QString& output,
                 bool _enable, VLMDialog *parent, int _type = QVLM_Broadcast );
+    virtual ~VLMAWidget() = default;
     virtual void update() = 0;
 protected:
     QLabel *nameLabel;
