@@ -127,11 +127,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 }
 
-static void Stop(audio_output_t *aout)
-{
-    (void) aout;
-}
-
 static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -153,7 +148,7 @@ static int Open(vlc_object_t *obj)
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
-    aout->stop = Stop;
+    aout->stop = Flush;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
     return VLC_SUCCESS;
