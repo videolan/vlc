@@ -423,20 +423,12 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                     vlc_fourcc_t chroma,
                     const vlc_chroma_description_t *desc)
 {
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-
-    GLint oneplane_texfmt;
-    if (vlc_gl_HasExtension(&priv->extension_vt, "GL_ARB_texture_rg"))
-        oneplane_texfmt = GL_RED;
-    else
-        oneplane_texfmt = GL_LUMINANCE;
-
     if (desc->plane_count == 3)
         swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = "r";
     else if (desc->plane_count == 2)
     {
         swizzle_per_tex[0] = "r";
-        if (oneplane_texfmt == GL_RED)
+        if (sampler->glfmt.formats[1] == GL_RG)
             swizzle_per_tex[1] = "rg";
         else
             swizzle_per_tex[1] = "ra";

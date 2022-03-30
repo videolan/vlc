@@ -253,6 +253,8 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
             glfmt->tex_widths[j]  = vlc_align_pot(w);
             glfmt->tex_heights[j] = vlc_align_pot(h);
         }
+
+        glfmt->formats[j] = interop->texs[j].format;
     }
 
     if (!interop->handle_texs_gen)

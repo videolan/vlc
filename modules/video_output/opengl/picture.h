@@ -43,6 +43,8 @@ struct vlc_gl_format {
 
     GLsizei visible_widths[PICTURE_PLANE_MAX];
     GLsizei visible_heights[PICTURE_PLANE_MAX];
+
+    uint32_t formats[PICTURE_PLANE_MAX];
 };
 
 /**
