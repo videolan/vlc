@@ -62,7 +62,16 @@ Item {
 
                 anchors.fill: parent
 
-                source: (rowModel ? (root.showTitleText ? rowModel.cover : rowModel[model.criteria]) : VLCStyle.noArtCover) || VLCStyle.noArtCover
+                source: {
+                    var cover = null
+                    if (!!rowModel) {
+                        if (root.showTitleText)
+                            cover = rowModel.cover
+                        else
+                            cover = rowModel[model.criteria]
+                    }
+                    return cover || model.placeHolder || VLCStyle.noArtAlbumCover
+                }
                 playCoverVisible: (currentlyFocused || containsMouse)
                 playIconSize: VLCStyle.play_cover_small
                 onPlayIconClicked: g_mainDisplay.play(MediaLib, rowModel.id)
