@@ -33,6 +33,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsBlurEffect>
 #include <QUrl>
+#include <QQmlFile>
 
 // Qt private exported function
 QT_BEGIN_NAMESPACE
@@ -269,7 +270,10 @@ void CoverGenerator::draw(QPainter & painter,
 
 void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, const QRect & target)
 {
-    QFile file(fileName);
+    //QFile expect the :/ instead of qrc:// for resources files
+    QString adaptedFilename = QQmlFile::urlToLocalFileOrQrc(fileName);
+
+    QFile file(adaptedFilename);
 
     if (file.open(QIODevice::ReadOnly) == false)
     {
