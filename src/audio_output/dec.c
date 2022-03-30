@@ -604,9 +604,8 @@ void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay)
     stream->sync.request_delay = delay;
 }
 
-void vlc_aout_stream_Flush(vlc_aout_stream *stream)
+static void stream_Reset(vlc_aout_stream *stream)
 {
-    audio_output_t *aout = aout_stream_aout(stream);
     aout_owner_t *owner = aout_stream_owner(stream);
 
     if (stream->mixer_format.i_format)
@@ -616,7 +615,6 @@ void vlc_aout_stream_Flush(vlc_aout_stream *stream)
         if (stream->filters)
             aout_FiltersFlush (stream->filters);
 
-        aout->flush(aout);
         vlc_clock_Reset(stream->sync.clock);
         if (stream->filters)
             aout_FiltersResetClock(stream->filters);
@@ -643,6 +641,15 @@ void vlc_aout_stream_Flush(vlc_aout_stream *stream)
 
     stream->sync.discontinuity = true;
     stream->original_pts = VLC_TICK_INVALID;
+}
+
+void vlc_aout_stream_Flush(vlc_aout_stream *stream)
+{
+    audio_output_t *aout = aout_stream_aout(stream);
+
+    stream_Reset(stream);
+    if (stream->mixer_format.i_format)
+        aout->flush(aout);
 }
 
 void vlc_aout_stream_NotifyGain(vlc_aout_stream *stream, float gain)
