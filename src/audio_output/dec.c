@@ -89,6 +89,46 @@ static inline audio_output_t *aout_stream_aout(vlc_aout_stream *stream)
 {
     return &stream->instance->output;
 }
+
+static void stream_Reset(vlc_aout_stream *stream)
+{
+    aout_owner_t *owner = aout_stream_owner(stream);
+
+    if (stream->mixer_format.i_format)
+    {
+        vlc_audio_meter_Flush(&owner->meter);
+
+        if (stream->filters)
+            aout_FiltersFlush (stream->filters);
+
+        vlc_clock_Reset(stream->sync.clock);
+        if (stream->filters)
+            aout_FiltersResetClock(stream->filters);
+
+        if (stream->sync.delay > 0)
+        {
+            /* Also reset the delay in case of a positive delay. This will
+             * trigger a silence playback before the next play. Consequently,
+             * the first play date won't be (delay + dejitter) but only
+             * dejitter. This will allow the aout to update the master clock
+             * sooner.
+             */
+            vlc_clock_SetDelay(stream->sync.clock, 0);
+            if (stream->filters)
+                aout_FiltersSetClockDelay(stream->filters, 0);
+            stream->sync.request_delay = stream->sync.delay;
+            stream->sync.delay = 0;
+        }
+    }
+
+    atomic_store_explicit(&stream->drained, false, memory_order_relaxed);
+    atomic_store_explicit(&stream->drain_deadline, VLC_TICK_INVALID,
+                          memory_order_relaxed);
+
+    stream->sync.discontinuity = true;
+    stream->original_pts = VLC_TICK_INVALID;
+}
+
 /**
  * Creates an audio output
  */
@@ -602,45 +642,6 @@ void vlc_aout_stream_ChangeRate(vlc_aout_stream *stream, float rate)
 void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay)
 {
     stream->sync.request_delay = delay;
-}
-
-static void stream_Reset(vlc_aout_stream *stream)
-{
-    aout_owner_t *owner = aout_stream_owner(stream);
-
-    if (stream->mixer_format.i_format)
-    {
-        vlc_audio_meter_Flush(&owner->meter);
-
-        if (stream->filters)
-            aout_FiltersFlush (stream->filters);
-
-        vlc_clock_Reset(stream->sync.clock);
-        if (stream->filters)
-            aout_FiltersResetClock(stream->filters);
-
-        if (stream->sync.delay > 0)
-        {
-            /* Also reset the delay in case of a positive delay. This will
-             * trigger a silence playback before the next play. Consequently,
-             * the first play date won't be (delay + dejitter) but only
-             * dejitter. This will allow the aout to update the master clock
-             * sooner.
-             */
-            vlc_clock_SetDelay(stream->sync.clock, 0);
-            if (stream->filters)
-                aout_FiltersSetClockDelay(stream->filters, 0);
-            stream->sync.request_delay = stream->sync.delay;
-            stream->sync.delay = 0;
-        }
-    }
-
-    atomic_store_explicit(&stream->drained, false, memory_order_relaxed);
-    atomic_store_explicit(&stream->drain_deadline, VLC_TICK_INVALID,
-                          memory_order_relaxed);
-
-    stream->sync.discontinuity = true;
-    stream->original_pts = VLC_TICK_INVALID;
 }
 
 void vlc_aout_stream_Flush(vlc_aout_stream *stream)
