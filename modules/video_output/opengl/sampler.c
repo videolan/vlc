@@ -435,8 +435,16 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
         swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = "r";
     else if (desc->plane_count == 2)
     {
-        swizzle_per_tex[0] = "r";
-        swizzle_per_tex[1] = "rg";
+        if (oneplane_texfmt == GL_RED)
+        {
+            swizzle_per_tex[0] = "r";
+            swizzle_per_tex[1] = "rg";
+        }
+        else
+        {
+            swizzle_per_tex[0] = "x";
+            swizzle_per_tex[1] = "xy";
+        }
     }
     else if (desc->plane_count == 1)
     {
