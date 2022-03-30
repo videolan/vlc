@@ -27,7 +27,7 @@ Widgets.GridItem {
     property var model: ({})
     property int index: -1
 
-    image: model.cover || VLCStyle.noArtAlbum
+    image: model.cover || VLCStyle.noArtAlbumCover
     title: model.title || I18n.qtr("Unknown title")
     subtitle: model.main_artist || I18n.qtr("Unknown artist")
     pictureWidth: VLCStyle.gridCover_music_width

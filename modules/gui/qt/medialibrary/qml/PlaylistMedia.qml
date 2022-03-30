@@ -62,7 +62,9 @@ MainInterface.MainTableView {
         type: "image",
 
         headerDelegate: table.titleHeaderDelegate,
-        colDelegate   : table.titleDelegate
+        colDelegate   : table.titleDelegate,
+
+        placeHolder: VLCStyle.noArtAlbumCover,
     }, {
         isPrimary: true,
 

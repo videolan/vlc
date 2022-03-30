@@ -55,6 +55,8 @@ MainInterface.MainTableView {
 
         showSection: "",
 
+        placeHolder: VLCStyle.noArtVideoCover,
+
         headerDelegate: tableColumns.titleHeaderDelegate,
         colDelegate   : tableColumns.titleDelegate,
     }, {

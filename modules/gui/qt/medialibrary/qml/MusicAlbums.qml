@@ -227,7 +227,7 @@ FocusScope {
             headerTopPadding: VLCStyle.margin_normal
 
             sortModel:  [
-                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: I18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: I18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate, placeHolder: VLCStyle.noArtAlbumCover },
                 { criteria: "main_artist", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: I18n.qtr("Artist") },
                 { criteria: "duration", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
             ]

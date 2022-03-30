@@ -41,7 +41,7 @@ Widgets.GridItem {
         }
     }
 
-    image: model.thumbnail || VLCStyle.noArtCover
+    image: model.thumbnail || VLCStyle.noArtVideoCover
     title: model.title || I18n.qtr("Unknown title")
     subtitle: Helpers.msToString(model.duration) || ""
     pictureWidth: VLCStyle.gridCover_video_width
