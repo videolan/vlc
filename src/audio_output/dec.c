@@ -237,7 +237,7 @@ void vlc_aout_stream_Delete (vlc_aout_stream *stream)
 
     if (stream->mixer_format.i_format)
     {
-        vlc_aout_stream_Flush(stream);
+        stream_Reset(stream);
         if (stream->filters)
             aout_FiltersDelete (aout, stream->filters);
         aout_OutputDelete (aout);
