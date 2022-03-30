@@ -198,8 +198,16 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         else
             return VLC_EGENERIC;
 
-        swizzle_per_tex[0] = "r";
-        swizzle_per_tex[1] = "rg";
+        if (oneplane_texfmt == GL_RED)
+        {
+            swizzle_per_tex[0] = "r";
+            swizzle_per_tex[1] = "rg";
+        }
+        else
+        {
+            swizzle_per_tex[0] = "x";
+            swizzle_per_tex[1] = "xy";
+        }
     }
     else if (desc->plane_count == 1)
     {
