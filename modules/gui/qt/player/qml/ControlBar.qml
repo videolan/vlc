@@ -44,7 +44,6 @@ Control {
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
-    property alias sliderProgressColor: trackPositionSlider.progressBarColor
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
@@ -178,7 +177,6 @@ Control {
 
         visible: false
         backgroundColor: Qt.lighter(colors.playerBg, 1.6180)
-        progressBarColor: activeFocus ? colors.accent : colors.playerControlBarFg
         barHeight: VLCStyle.heightBar_xxsmall
         enabled: Player.playingState == Player.PLAYING_STATE_PLAYING || Player.playingState == Player.PLAYING_STATE_PAUSED
         colors: root.colors

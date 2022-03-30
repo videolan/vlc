@@ -131,7 +131,7 @@ Slider {
             id: progressRect
             width: control.visualPosition * parent.width
             height: control.barHeight
-            color: control.activeFocus ? control.colors.accent : control.colors.bgHover
+            color: control.colors.accent
             radius: control.barHeight
         }
 
