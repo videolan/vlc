@@ -21,7 +21,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_fixups.h>
 #include <cinttypes>
 
 #include "HLSRepresentation.hpp"

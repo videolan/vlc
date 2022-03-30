@@ -30,7 +30,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_fixups.h>
 #include <cinttypes>
 
 #include <vlc_common.h>
