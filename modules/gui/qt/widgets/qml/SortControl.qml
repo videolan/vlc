@@ -54,6 +54,7 @@ FocusScope {
 
     // Aliases
 
+    property alias checked: button.checked
     property alias focusPolicy: button.focusPolicy
     property alias iconSize: button.size
 
