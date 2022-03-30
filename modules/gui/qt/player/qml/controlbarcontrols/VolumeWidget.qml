@@ -29,7 +29,7 @@ T.Pane {
     id: root
 
     property VLCColors colors: VLCStyle.colors
-    property color color: colors.buttonText
+    property color color: colors.accent
     property bool paintOnly: false
     readonly property var _player: paintOnly ? ({ muted: false, volume: .5 }) : Player
 
@@ -66,7 +66,7 @@ T.Pane {
                 else
                     VLCIcons.volume_high
             text: I18n.qtr("Mute")
-            color: root.color
+            color: colors.buttonText
             colorHover: colors.buttonTextHover
             colorFocus: colors.bgFocus
             onClicked: Player.muted = !Player.muted
@@ -198,17 +198,6 @@ T.Pane {
                     height: parent.height
                     radius: VLCStyle.dp(4, VLCStyle.scale)
                     color: root.color
-                    layer.enabled: (paintOnly || volControl.hovered || volControl.activeFocus)
-                    layer.effect: LinearGradient {
-                        start: Qt.point(0, 0)
-                        end: Qt.point(sliderBg.width, 0)
-                        gradient: Gradient {
-                            GradientStop { position: 0.30; color: colors.volbelowmid }
-                            GradientStop { position: 0.80; color: colors.volabovemid }
-                            GradientStop { position: 0.85; color: colors.volhigh }
-                            GradientStop { position: 1.00; color: colors.volmax }
-                        }
-                    }
                 }
                 Rectangle{
                     id: tickmark
