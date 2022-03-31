@@ -91,8 +91,8 @@ Item {
             id: textRect
 
             label: text
-            scroll: textHoverArea.containsMouse || parent.currentlyFocused
-            clip: animationRunning
+            forceScroll: parent.currentlyFocused
+            clip: scrolling
             visible: root.showTitleText
 
             Layout.fillHeight: true
@@ -104,16 +104,6 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || I18n.qtr("Unknown Title"))
                 color: foregroundColor
-                elide: textRect.scroll ?  Text.ElideNone : Text.ElideRight
-                width: parent.width
-            }
-
-            MouseArea {
-                id: textHoverArea
-
-                anchors.fill: parent
-                hoverEnabled: true
-                acceptedButtons: Qt.NoButton
             }
         }
     }

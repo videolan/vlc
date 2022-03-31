@@ -243,10 +243,11 @@ T.Control {
             }
         }
 
-        Column {
+        ColumnLayout {
             id: layout
 
             anchors.centerIn: parent
+            spacing: 0
 
             Widgets.MediaCover {
                 id: picture
@@ -264,19 +265,19 @@ T.Control {
                 id: titleTextRect
 
                 label: titleLabel
-                scroll: highlighted
-                height: titleLabel.height
-                width: titleLabel.width
+                forceScroll: highlighted
                 visible: root.title !== ""
-                clip: animationRunning
+                clip: scrolling
+
+                Layout.preferredWidth: Math.min(titleLabel.implicitWidth, pictureWidth)
+                Layout.preferredHeight: titleLabel.height
+                Layout.topMargin: root.titleMargin
+                Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
 
                 Widgets.ListLabel {
                     id: titleLabel
 
-                    elide: titleTextRect.scroll ?  Text.ElideNone : Text.ElideRight
-                    width: pictureWidth
-                    horizontalAlignment: root.textAlignHCenter && titleLabel.contentWidth <= titleLabel.width ? Text.AlignHCenter : Text.AlignLeft
-                    topPadding: root.titleMargin
+                    height: implicitHeight
                     color: background.foregroundColor
                 }
             }
@@ -286,11 +287,12 @@ T.Control {
 
                 visible: text !== ""
                 text: root.subtitle
-                width: pictureWidth
-                topPadding: VLCStyle.margin_xsmall
                 elide: Text.ElideRight
-                horizontalAlignment: root.textAlignHCenter && subtitleTxt.contentWidth <= subtitleTxt.width ? Text.AlignHCenter : Text.AlignLeft
                 color: background.foregroundColor
+
+                Layout.preferredWidth: Math.min(pictureWidth, implicitWidth)
+                Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
+                Layout.topMargin: VLCStyle.margin_xsmall
 
                 // this is based on that MenuCaption.color.a == .6, color of this component is animated (via binding with background.foregroundColor),
                 // to save operation during animation, directly set the opacity

@@ -42,9 +42,9 @@ FocusScope {
         property color foregroundColor: parent.foregroundColor
 
         label: text
-        scroll: hoverArea.containsMouse || parent.currentlyFocused
+        forceScroll: parent.currentlyFocused
         width: parent.width
-        clip: animationRunning
+        clip: scrolling
 
         Widgets.ListLabel {
             id: text
@@ -52,16 +52,6 @@ FocusScope {
             anchors.verticalCenter: parent.verticalCenter
             text: !rowModel ? "" : (rowModel[model.criteria] || "")
             color: textRect.foregroundColor
-            elide: textRect.scroll ?  Text.ElideNone : Text.ElideRight
-            width: parent.width
-        }
-
-        MouseArea {
-            id: hoverArea
-
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
         }
     }
 

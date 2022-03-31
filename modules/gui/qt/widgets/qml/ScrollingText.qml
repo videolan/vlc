@@ -23,17 +23,39 @@ import "qrc:///style/"
 Item {
     id: control
 
-    readonly property alias animationRunning: scrollAnimation.running
+    readonly property alias scrolling: scrollAnimation.running
 
     property Text label: undefined
-    property bool scroll: false
+    property bool forceScroll: false
+    property alias hoverScroll: hoverArea.enabled
 
     readonly property bool _needsToScroll: (label.width < label.contentWidth)
+
+    ToolTip.delay: VLCStyle.delayToolTipAppear
+    ToolTip.visible: scrolling && hoverArea.containsMouse
+    ToolTip.text: label.text
+
+    onLabelChanged: {
+        label.width = Qt.binding(function () { return Math.min(label.implicitWidth, control.width) })
+
+        label.elide = Qt.binding(function () {
+            return (control.forceScroll || hoverArea.containsMouse) ? Text.ElideNone : Text.ElideRight
+        })
+    }
+
+    MouseArea {
+        id: hoverArea
+
+        anchors.fill: parent
+        acceptedButtons: Qt.NoButton
+        cursorShape: undefined
+        hoverEnabled: true
+    }
 
     SequentialAnimation {
         id: scrollAnimation
 
-        running: control.scroll && control._needsToScroll
+        running: (control.forceScroll || hoverArea.containsMouse) && control._needsToScroll
         loops: Animation.Infinite
 
         onStopped: {
@@ -64,6 +86,5 @@ Item {
             value: 0
         }
     }
-
 }
 

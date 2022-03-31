@@ -318,10 +318,10 @@ Item {
 
         ScrollingText {
             label: titleLabel
-            scroll: true
+            forceScroll: true
             height: titleLabel.height
             width: parent.width
-            clip: animationRunning
+            clip: scrolling
 
             T.Label {
                 id: titleLabel
