@@ -66,3 +66,9 @@ function enforceFocus(item, reason) {
 function pointInRadius(x, y, radius) {
      return (x * x + y * y < radius * radius)
 }
+
+// checks if point `pos` lies in rect `rect`
+function contains(rect, pos) {
+    return (clamp(pos.x, rect.x, rect.x + rect.width) === pos.x)
+            && (clamp(pos.y, rect.y, rect.y + rect.height) === pos.y)
+}
