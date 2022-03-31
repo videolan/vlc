@@ -224,12 +224,73 @@ static int Open(vlc_object_t *obj)
         default:                         render_chroma = VLC_CODEC_NV12; break;
     }
 
-    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, render_chroma, interop->fmt_in.space);
-    if (ret != VLC_SUCCESS)
+    switch (render_chroma)
     {
-        vlc_decoder_device_Release(device);
-        return ret;
+        case VLC_CODEC_P010:
+        case VLC_CODEC_P016:
+            interop->tex_count = 2;
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 1},
+                .h = {1, 1},
+                .internal = GL_R16,
+                .format = GL_RED,
+                .type = GL_UNSIGNED_BYTE,
+            };
+            interop->texs[1] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 1},
+                .h = {1, 2},
+                .internal = GL_RG16,
+                .format = GL_RG,
+                .type = GL_UNSIGNED_BYTE,
+            };
+
+            break;
+        case VLC_CODEC_I444:
+            interop->tex_count = 3;
+            interop->texs[0] = interop->texs[1] = interop->texs[2] =
+                (struct vlc_gl_tex_cfg) {
+                    .w = {1, 1},
+                    .h = {1, 1},
+                    .internal = GL_RED,
+                    .format = GL_RED,
+                    .type = GL_UNSIGNED_BYTE,
+                };
+
+            break;
+        case VLC_CODEC_I444_16L:
+            interop->tex_count = 3;
+            interop->texs[0] = interop->texs[1] = interop->texs[2] =
+                (struct vlc_gl_tex_cfg) {
+                    .w = {1, 1},
+                    .h = {1, 1},
+                    .internal = GL_R16,
+                    .format = GL_RED,
+                    .type = GL_UNSIGNED_BYTE,
+                };
+
+            break;
+        case VLC_CODEC_NV12:
+            interop->tex_count = 2;
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 1},
+                .h = {1, 1},
+                .internal = GL_RED,
+                .format = GL_RED,
+                .type = GL_UNSIGNED_BYTE,
+            };
+            interop->texs[1] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 2},
+                .h = {1, 2},
+                .internal = GL_RG,
+                .format = GL_RG,
+                .type = GL_UNSIGNED_BYTE,
+            };
+
+            break;
     }
+
+    interop->fmt_out.i_chroma = render_chroma;
+    interop->fmt_out.space = interop->fmt_in.space;
 
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_nvdec_gl_allocate_texture,

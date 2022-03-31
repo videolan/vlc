@@ -240,15 +240,18 @@ Open(vlc_object_t *obj)
     };
     interop->ops = &ops;
 
-    int ret = opengl_interop_init(interop, GL_TEXTURE_EXTERNAL_OES,
-                                  VLC_CODEC_RGB32,
-                                  COLOR_SPACE_UNDEF);
+    interop->tex_target = GL_TEXTURE_EXTERNAL_OES;
+    interop->fmt_out.i_chroma = VLC_CODEC_RGB32;
+    interop->fmt_out.space = COLOR_SPACE_UNDEF;
 
-    if (ret != VLC_SUCCESS)
-    {
-        free(priv);
-        return VLC_EGENERIC;
-    }
+    interop->tex_count = 1;
+    interop->texs[0] = (struct vlc_gl_tex_cfg) {
+        .w = {1, 1},
+        .h = {1, 1},
+        .internal = GL_RGBA,
+        .format = GL_RGBA,
+        .type = GL_UNSIGNED_BYTE,
+    };
 
     return VLC_SUCCESS;
 }

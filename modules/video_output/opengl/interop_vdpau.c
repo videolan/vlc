@@ -191,13 +191,18 @@ Open(vlc_object_t *obj)
     /* The pictures are uploaded upside-down */
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
-    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, VLC_CODEC_RGB32,
-                                  COLOR_SPACE_UNDEF);
-    if (ret != VLC_SUCCESS)
-    {
-        Close(interop);
-        return VLC_EGENERIC;
-    }
+    interop->tex_target = GL_TEXTURE_2D;
+    interop->fmt_out.i_chroma = VLC_CODEC_RGB32;
+    interop->fmt_out.space = COLOR_SPACE_UNDEF;
+
+    interop->tex_count = 1;
+    interop->texs[0] = (struct vlc_gl_tex_cfg) {
+        .w = {1, 1},
+        .h = {1, 1},
+        .internal = GL_RGBA,
+        .format = GL_RGBA,
+        .type = GL_UNSIGNED_BYTE,
+    };
 
     static const struct vlc_gl_interop_ops ops = {
         .update_textures = tc_vdpau_gl_update,

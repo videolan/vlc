@@ -464,10 +464,48 @@ Open(vlc_object_t *obj)
         case VLC_CODEC_VAAPI_420:
             va_fourcc = VA_FOURCC_NV12;
             vlc_sw_chroma = VLC_CODEC_NV12;
+
+            interop->tex_count = 2;
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 1},
+                .h = {1, 1},
+                .internal = GL_RED,
+                .format = GL_RED,
+                .type = GL_UNSIGNED_BYTE,
+            };
+            interop->texs[1] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 2},
+                .h = {1, 2},
+                .internal = GL_RG,
+                .format = GL_RG,
+                .type = GL_UNSIGNED_BYTE,
+            };
+
             break;
         case VLC_CODEC_VAAPI_420_10BPP:
             va_fourcc = VA_FOURCC_P010;
             vlc_sw_chroma = VLC_CODEC_P010;
+
+            if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, GL_RG,
+                                                GL_RG16, GL_UNSIGNED_SHORT) != 16)
+                goto error;
+
+            interop->tex_count = 2;
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 1},
+                .h = {1, 1},
+                .internal = GL_R16,
+                .format = GL_RED,
+                .type = GL_UNSIGNED_BYTE,
+            };
+            interop->texs[1] = (struct vlc_gl_tex_cfg) {
+                .w = {1, 1},
+                .h = {1, 2},
+                .internal = GL_RG16,
+                .format = GL_RG,
+                .type = GL_UNSIGNED_BYTE,
+            };
+
             break;
         default:
             vlc_assert_unreachable();
@@ -525,10 +563,9 @@ Open(vlc_object_t *obj)
     /* The pictures are uploaded upside-down */
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
-    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, vlc_sw_chroma,
-                                  interop->fmt_in.space);
-    if (ret != VLC_SUCCESS)
-        goto error;
+    interop->tex_target = GL_TEXTURE_2D;
+    interop->fmt_out.i_chroma = vlc_sw_chroma;
+    interop->fmt_out.space = interop->fmt_in.space;
 
     static const struct vlc_gl_interop_ops ops = {
         .update_textures = tc_vaegl_update,
