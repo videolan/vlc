@@ -257,14 +257,14 @@ MLItemId MLBaseModel::parentId() const
 void MLBaseModel::setParentId(MLItemId parentId)
 {
     m_parent = parentId;
-    invalidateCache();
+    resetCache();
     emit parentIdChanged();
 }
 
 void MLBaseModel::unsetParentId()
 {
     m_parent = MLItemId();
-    invalidateCache();
+    resetCache();
     emit parentIdChanged();
 }
 
@@ -294,7 +294,7 @@ void MLBaseModel::setSearchPattern( const QString& pattern )
         return;
 
     m_search_pattern = patternToApply;
-    invalidateCache();
+    resetCache();
 }
 
 Qt::SortOrder MLBaseModel::getSortOrder() const
