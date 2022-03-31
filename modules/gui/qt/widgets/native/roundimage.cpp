@@ -303,6 +303,9 @@ QImage RoundImage::RoundImageGenerator::execute()
     if (width <= 0 || height <= 0)
         return {};
 
+    if (source.isEmpty())
+        return {};
+
     auto file = getReadable(source);
     if (!file || !file->isOpen())
         return {};
