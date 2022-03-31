@@ -137,6 +137,37 @@ int SegmentList_test() try
     segmentList.reset();
     segmentList2.reset();
 
+    /* overlapping updates, relative timings */
+    segmentList = std::make_unique<SegmentList>(nullptr, true);
+    segmentList->addAttribute(new TimescaleAttr(timescale));
+    segmentList->addAttribute(new DurationAttr(100));
+    Expect(segmentList->inheritDuration());
+    for(int i=0; i<2; i++)
+    {
+        seg = std::make_unique<Segment>(nullptr);
+        seg->setSequenceNumber(123 + i);
+        seg->startTime.Set(START + 100 * i);
+        seg->duration.Set(100);
+        segmentList->addSegment(seg.release());
+    }
+    segmentList2 = std::make_unique<SegmentList>(nullptr, true);
+    for(int i=0; i<3; i++)
+    {
+        seg = std::make_unique<Segment>(nullptr);
+        seg->setSequenceNumber(123 + i);
+        seg->startTime.Set(START + 100 * i);
+        seg->duration.Set(100);
+        segmentList2->addSegment(seg.release());
+    }
+    segmentList->updateWith(segmentList2.get());
+    Expect(segmentList->getSegments().size() == 3);
+    Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 123);
+    Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 124);
+    Expect(segmentList->getSegments().at(2)->getSequenceNumber() == 125);
+
+    segmentList.reset();
+    segmentList2.reset();
+
     /* gap updates, relative timings */
     segmentList = std::make_unique<SegmentList>(nullptr, true);
     segmentList->addAttribute(new TimescaleAttr(timescale));
