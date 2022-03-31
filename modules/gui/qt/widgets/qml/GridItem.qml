@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.2
@@ -23,6 +24,7 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 T.Control {
@@ -297,6 +299,16 @@ T.Control {
                 // this is based on that MenuCaption.color.a == .6, color of this component is animated (via binding with background.foregroundColor),
                 // to save operation during animation, directly set the opacity
                 opacity: .6
+
+                ToolTip.delay: VLCStyle.delayToolTipAppear
+                ToolTip.text: subtitleTxt.text
+                ToolTip.visible: {
+                    if (!mouseArea.containsMouse)
+                        return false
+
+                    var pos = mouseArea.mapToItem(subtitleTxt, mouseArea.mouseX, mouseArea.mouseY)
+                    return Helpers.contains(Qt.rect(0, 0, width, height), pos)
+                }
             }
         }
     }
