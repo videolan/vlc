@@ -316,7 +316,8 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 
         generator.setSize(coverSize);
 
-        generator.setDefaultThumbnail(coverDefault);
+        if (!coverDefault.isEmpty())
+            generator.setDefaultThumbnail(coverDefault);
 
         generator.setPrefix(coverPrefix);
 

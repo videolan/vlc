@@ -176,7 +176,7 @@ FocusScope {
         coverSize: (isMusic) ? Qt.size(512, 512)
                              : Qt.size(1024, 640)
 
-        coverDefault: (isMusic) ? ":/noart_album.svg" : ":/noart_videoCover.svg"
+        coverDefault: (isMusic) ? VLCStyle.noArtAlbumCover : VLCStyle.noArtVideoCover
 
         coverPrefix: (isMusic) ? "playlist-music" : "playlist-video"
 

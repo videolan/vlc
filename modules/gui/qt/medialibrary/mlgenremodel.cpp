@@ -82,6 +82,20 @@ QHash<int, QByteArray> MLGenreModel::roleNames() const
     };
 }
 
+
+QString MLGenreModel::getCoverDefault() const
+{
+    return m_coverDefault;
+}
+
+void MLGenreModel::setCoverDefault(const QString& defaultCover)
+{
+    if (m_coverDefault == defaultCover)
+        return;
+    m_coverDefault = defaultCover;
+    emit coverDefaultChanged();
+}
+
 void MLGenreModel::onVlcMlEvent(const MLEvent &event)
 {
     switch (event.i_type)
@@ -137,7 +151,7 @@ QString MLGenreModel::getCover(MLGenre * genre) const
     genre->setGenerator(true);
     m_mediaLib->runOnMLThread<Context>(this,
     //ML thread
-    [genreId]
+    [genreId, coverDefault = m_coverDefault]
     (vlc_medialibrary_t* ml, Context& ctx)
     {
         CoverGenerator generator{ml, genreId};
@@ -152,7 +166,8 @@ QString MLGenreModel::getCover(MLGenre * genre) const
 
         generator.setBlur(MLGENREMODEL_COVER_BLUR);
 
-        generator.setDefaultThumbnail(":/noart_album.svg");
+        if (!coverDefault.isEmpty())
+            generator.setDefaultThumbnail(coverDefault);
 
         if (generator.cachedFileAvailable())
             ctx.cover = generator.cachedFileURL();

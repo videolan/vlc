@@ -31,6 +31,9 @@ class MLGenreModel : public MLBaseModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString coverDefault READ getCoverDefault WRITE setCoverDefault
+               NOTIFY coverDefaultChanged FINAL)
+
 public:
     enum Roles
     {
@@ -49,6 +52,12 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+    QString getCoverDefault() const;
+    void setCoverDefault(const QString& defaultCover);
+
+signals:
+    void coverDefaultChanged() const;
+
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
 
@@ -60,6 +69,8 @@ private:
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
     QString getCover(MLGenre * genre) const;
+
+    QString m_coverDefault;
 
 private:
     struct Loader : public BaseLoader

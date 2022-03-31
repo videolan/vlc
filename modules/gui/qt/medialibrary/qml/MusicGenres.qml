@@ -74,6 +74,8 @@ FocusScope {
         id: genreModel
         ml: MediaLib
 
+        coverDefault: VLCStyle.noArtAlbumCover
+
         onCountChanged: {
             if (genreModel.count > 0 && !selectionModel.hasSelection) {
                 root.resetFocus()
