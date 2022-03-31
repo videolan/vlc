@@ -173,6 +173,38 @@ int SegmentList_test()
         delete segmentList2;
         segmentList2 = nullptr;
 
+	/* overlapping updates, relative timings */
+	segmentList = new SegmentList(nullptr, true);
+	segmentList->addAttribute(new TimescaleAttr(timescale));
+	segmentList->addAttribute(new DurationAttr(100));
+	Expect(segmentList->inheritDuration());
+	for(int i=0; i<2; i++)
+	{
+		seg = new Segment(nullptr);
+		seg->setSequenceNumber(123 + i);
+		seg->startTime.Set(START + 100 * i);
+		seg->duration.Set(100);
+		segmentList->addSegment(seg);
+	}
+	segmentList2 = new SegmentList(nullptr, true);
+	for(int i=0; i<3; i++)
+	{
+		seg = new Segment(nullptr);
+		seg->setSequenceNumber(123 + i);
+		seg->startTime.Set(START + 100 * i);
+		seg->duration.Set(100);
+		segmentList2->addSegment(seg);
+	}
+	segmentList->updateWith(segmentList2);
+	Expect(segmentList->getSegments().size() == 3);
+	Expect(segmentList->getSegments().at(0)->getSequenceNumber() == 123);
+	Expect(segmentList->getSegments().at(1)->getSequenceNumber() == 124);
+	Expect(segmentList->getSegments().at(2)->getSequenceNumber() == 125);
+
+	delete segmentList;
+	delete segmentList2;
+        segmentList2 = nullptr;
+
         /* gap updates, absolute media timings */
         segmentList = new SegmentList(nullptr, false);
         segmentList->addAttribute(new TimescaleAttr(timescale));

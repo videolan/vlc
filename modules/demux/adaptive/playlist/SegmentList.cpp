@@ -116,7 +116,7 @@ void SegmentList::updateWith(AbstractMultipleSegmentBaseType *updated_,
         const uint64_t oldest = updated->segments.front()->getSequenceNumber();
 
         /* filter out known segments from the update */
-        updated->pruneBySegmentNumber(prevSegment->getSequenceNumber());
+        updated->pruneBySegmentNumber(prevSegment->getSequenceNumber() + 1);
 
         if(updated->segments.empty())
             return;
