@@ -102,8 +102,8 @@ vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
     memset(textures, 0, interop->tex_count * sizeof(GLuint));
 }
 
-static int GetTexFormatSize(struct vlc_gl_interop *interop, int target,
-                            int tex_format, int tex_internal, int tex_type)
+static int GetTexFormatSize(struct vlc_gl_interop *interop, GLenum target,
+                            GLenum tex_format, GLint tex_internal, GLenum tex_type)
 {
     struct vlc_gl_interop_private *priv =
         container_of(interop, struct vlc_gl_interop_private, interop);
@@ -379,6 +379,7 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
     struct vlc_gl_interop *interop = &priv->interop;
 
     interop->init = opengl_interop_init_impl;
+    interop->get_tex_format_size = GetTexFormatSize;
     interop->ops = NULL;
     interop->fmt_out = interop->fmt_in = *fmt;
     interop->gl = gl;

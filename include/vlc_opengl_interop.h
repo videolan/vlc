@@ -156,6 +156,20 @@ struct vlc_gl_interop {
     int
     (*init)(struct vlc_gl_interop *interop, uint32_t tex_target,
             vlc_fourcc_t chroma, video_color_space_t yuv_space);
+
+    /* This avoids each module to link against GetTexFormatSize() directly. */
+    int
+    (*get_tex_format_size)(struct vlc_gl_interop *interop, uint32_t target,
+                           uint32_t format, int32_t internal, uint32_t type);
 };
+
+static inline int
+vlc_gl_interop_GetTexFormatSize(struct vlc_gl_interop *interop, uint32_t target,
+                                uint32_t format, int32_t internal,
+                                uint32_t type)
+{
+    return interop->get_tex_format_size(interop, target, format, internal,
+                                        type);
+}
 
 #endif
