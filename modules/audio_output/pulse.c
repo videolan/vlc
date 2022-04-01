@@ -86,6 +86,22 @@ static void VolumeReport(audio_output_t *aout)
     aout_VolumeReport(aout, (float)volume / PA_VOLUME_NORM);
 }
 
+static void drain_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
+                              const struct timeval *tv, void *userdata)
+{
+    audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
+
+    assert(sys->drain_trigger == e);
+
+    vlc_pa_rttime_free(sys->mainloop, sys->drain_trigger);
+    sys->drain_trigger = NULL;
+    sys->draining = false;
+
+    aout_DrainedReport(aout);
+    (void) api; (void) e; (void) tv;
+}
+
 /*** Sink ***/
 static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
@@ -571,21 +587,6 @@ static void Flush(audio_output_t *aout)
     stream_stop(s, aout);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
-}
-
-static void drain_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
-                              const struct timeval *tv, void *userdata)
-{
-    audio_output_t *aout = userdata;
-    aout_sys_t *sys = aout->sys;
-
-    assert(sys->drain_trigger == e);
-
-    vlc_pa_rttime_free(sys->mainloop, sys->drain_trigger);
-    sys->drain_trigger = NULL;
-
-    aout_DrainedReport(aout);
-    (void) api; (void) e; (void) tv;
 }
 
 static void Drain(audio_output_t *aout)
