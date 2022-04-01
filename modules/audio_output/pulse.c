@@ -102,6 +102,21 @@ static void drain_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
     (void) api; (void) e; (void) tv;
 }
 
+static int TriggerDrain(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    assert(sys->drain_trigger == NULL);
+
+    vlc_tick_t delay = vlc_pa_get_latency(aout, sys->context, sys->stream);
+    if (delay == VLC_TICK_INVALID)
+        return VLC_EGENERIC;
+
+    delay += pa_rtclock_now();
+    sys->drain_trigger = pa_context_rttime_new(sys->context, delay,
+                                               drain_trigger_cb, aout);
+    return sys->drain_trigger ? VLC_SUCCESS : VLC_ENOMEM;
+}
+
 /*** Sink ***/
 static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
@@ -617,15 +632,7 @@ static void Drain(audio_output_t *aout)
 
     /* XXX: Loosy drain emulation.
      * See #18141: drain callback is never received */
-    assert(sys->drain_trigger == NULL);
-    vlc_tick_t delay = vlc_pa_get_latency(aout, sys->context, s);
-    if (delay != VLC_TICK_INVALID)
-    {
-        delay += pa_rtclock_now();
-        sys->drain_trigger = pa_context_rttime_new(sys->context, delay,
-                                                   drain_trigger_cb, aout);
-    }
-
+    TriggerDrain(aout);
     if (sys->drain_trigger == NULL)
         aout_DrainedReport(aout);
 
