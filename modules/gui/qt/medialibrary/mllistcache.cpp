@@ -143,6 +143,10 @@ int MLListCache::updateItem(std::unique_ptr<MLItem>&& newItem)
     if (m_oldData)
         return -1;
 
+    //we can't update an item before we have any cache
+    if (unlikely(!m_cachedData))
+        return -1;
+
     MLItemId mlid = newItem->getId();
     //this may be inneficient to look at every items, maybe we can have a hashmap to access the items by id
     auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [mlid](const ItemType& item) {
@@ -163,6 +167,10 @@ int MLListCache::deleteItem(const MLItemId& mlid)
     //we can't update an item locally while the model has pending updates
     //no worry, we'll receive the update once the actual model notifies us
     if (m_oldData)
+        return -1;
+
+    //we can't remove an item before we have any cache
+    if (unlikely(!m_cachedData))
         return -1;
 
     auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [mlid](const ItemType& item) {
@@ -192,6 +200,9 @@ void MLListCache::moveRange(int first, int last, int to)
     if (first <= to && to <= last)
         return;
 
+    if (unlikely(!m_cachedData))
+        return;
+
     emit beginMoveRows(first, last, to);
     auto it = m_cachedData->list.begin();
     //build a temporary list with the items in order
@@ -217,6 +228,9 @@ void MLListCache::moveRange(int first, int last, int to)
 
 void MLListCache::deleteRange(int first, int last)
 {
+    if (unlikely(!m_cachedData))
+        return;
+
     assert(first <= last);
     emit beginRemoveRows(first, last);
     auto it = m_cachedData->list.begin();
