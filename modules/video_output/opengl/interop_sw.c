@@ -354,11 +354,20 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     if (unlikely(priv == NULL))
         return VLC_ENOMEM;
 
+    interop->priv = priv;
+
 #define LOAD_SYMBOL(type, name) \
     priv->gl.name = vlc_gl_GetProcAddress(interop->gl, "gl" # name); \
     assert(priv->gl.name != NULL);
 
     OPENGL_VTABLE_F(LOAD_SYMBOL);
+
+    struct vlc_gl_extension_vt extension_vt;
+    vlc_gl_LoadExtensionFunctions(interop->gl, &extension_vt);
+
+    /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
+    priv->has_unpack_subimage = interop->gl->api_type == VLC_OPENGL
+        || vlc_gl_HasExtension(&extension_vt, "GL_EXT_unpack_subimage");
 
     video_color_space_t space;
     const vlc_fourcc_t *list;
@@ -432,16 +441,8 @@ interop_init:
         .update_textures = tc_common_update,
         .close = opengl_interop_generic_deinit,
     };
-    interop->priv = priv;
     interop->ops = &ops;
     interop->fmt_in.i_chroma = i_chroma;
-
-    struct vlc_gl_extension_vt extension_vt;
-    vlc_gl_LoadExtensionFunctions(interop->gl, &extension_vt);
-
-    /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
-    priv->has_unpack_subimage = interop->gl->api_type == VLC_OPENGL
-        || vlc_gl_HasExtension(&extension_vt, "GL_EXT_unpack_subimage");
 
     if (allow_dr && priv->has_unpack_subimage)
     {
@@ -471,5 +472,6 @@ interop_init:
 
 error:
     free(priv);
+    interop->priv = NULL;
     return VLC_EGENERIC;
 }
