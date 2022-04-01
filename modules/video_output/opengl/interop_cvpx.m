@@ -235,7 +235,15 @@ Open(vlc_object_t *obj)
     }
 #endif
 
-    bool has_texture_rg = vlc_gl_HasExtension(&priv->extension_vt, "GL_ARB_texture_rg");
+    struct vlc_gl_extension_vt extension_vt;
+    vlc_gl_LoadExtensionFunctions(interop->gl, &extension_vt);
+
+    /* RG textures are available natively since OpenGL 3.0 and OpenGL ES 3.0 */
+    bool has_texture_rg = vlc_gl_GetVersionMajor(&extension_vt) >= 3
+        || (interop->gl->api_type == VLC_OPENGL
+            && vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_rg"))
+        || (interop->gl->api_type == VLC_OPENGL_ES2
+            && vlc_gl_HasExtension(&extension_vt, "GL_EXT_texture_rg"));
 
     interop->tex_target = tex_target;
 
@@ -320,15 +328,15 @@ Open(vlc_object_t *obj)
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 .w = {1, 1},
                 .h = {1, 1},
-                .internal = has_rg_texture ? GL_RED : GL_LUMINANCE,
-                .format = has_rg_texture ? GL_RED : GL_LUMINANCE,
+                .internal = has_texture_rg ? GL_RED : GL_LUMINANCE,
+                .format = has_texture_rg ? GL_RED : GL_LUMINANCE,
                 .type = GL_UNSIGNED_BYTE,
             };
             interop->texs[1] = interop->texs[2] = (struct vlc_gl_tex_cfg) {
                 .w = {1, 2},
                 .h = {1, 2},
-                .internal = has_rg_texture ? GL_RED : GL_LUMINANCE,
-                .format = has_rg_texture ? GL_RED : GL_LUMINANCE,
+                .internal = has_texture_rg ? GL_RED : GL_LUMINANCE,
+                .format = has_texture_rg ? GL_RED : GL_LUMINANCE,
                 .type = GL_UNSIGNED_BYTE,
             };
 

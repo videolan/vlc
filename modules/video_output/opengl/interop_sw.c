@@ -586,8 +586,12 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     priv->has_unpack_subimage = interop->gl->api_type == VLC_OPENGL
         || vlc_gl_HasExtension(&extension_vt, "GL_EXT_unpack_subimage");
 
-    priv->has_texture_rg =
-        vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_rg");
+    /* RG textures are available natively since OpenGL 3.0 and OpenGL ES 3.0 */
+    priv->has_texture_rg = vlc_gl_GetVersionMajor(&extension_vt) >= 3
+        || (interop->gl->api_type == VLC_OPENGL
+            && vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_rg"))
+        || (interop->gl->api_type == VLC_OPENGL_ES2
+            && vlc_gl_HasExtension(&extension_vt, "GL_EXT_texture_rg"));
 
     video_color_space_t space;
     const vlc_fourcc_t *list;
