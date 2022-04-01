@@ -41,9 +41,15 @@ FocusScope {
     property bool pinVideoControls: rootPlayer.hasEmbededVideo && MainCtx.pinVideoControls
     property bool hasEmbededVideo: MainCtx.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
-    readonly property string coverSource: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                          ? mainPlaylistController.currentItem.artwork
-                                          : VLCStyle.noArtCover
+    readonly property string coverSource: {
+        if (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+            mainPlaylistController.currentItem.artwork
+        else if (Player.hasVideoOutput)
+            VLCStyle.noArtVideoCover
+        else
+            VLCStyle.noArtAlbumCover
+
+    }
 
     // NOTE: We force the night theme when playing a video.
     readonly property VLCColors colors: (MainCtx.hasEmbededVideo) ? VLCStyle.nightColors

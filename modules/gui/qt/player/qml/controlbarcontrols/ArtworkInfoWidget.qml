@@ -91,12 +91,12 @@ AbstractButton {
                 id: cover
 
                 source: {
-                    if (paintOnly)
-                        VLCStyle.noArtAlbum
+                    if (!paintOnly
+                        && mainPlaylistController.currentItem.artwork
+                        && mainPlaylistController.currentItem.artwork.toString())
+                        mainPlaylistController.currentItem.artwork
                     else
-                        (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                                        ? mainPlaylistController.currentItem.artwork
-                                                        : VLCStyle.noArtAlbum
+                        VLCStyle.noArtAlbumCover
                 }
 
                 fillMode: Image.PreserveAspectFit
