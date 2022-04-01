@@ -97,14 +97,9 @@ struct vlc_gl_extension_vt {
     PFNGLGETERRORPROC       GetError;
 };
 
-static inline void
-vlc_gl_LoadExtensionFunctions(vlc_gl_t *gl, struct vlc_gl_extension_vt *vt)
+static inline unsigned
+vlc_gl_GetVersionMajor(struct vlc_gl_extension_vt *vt)
 {
-    vt->GetString = vlc_gl_GetProcAddress(gl, "glGetString");
-    vt->GetIntegerv = vlc_gl_GetProcAddress(gl, "glGetIntegerv");
-    vt->GetError = vlc_gl_GetProcAddress(gl, "glGetError");
-    vt->GetStringi = NULL;
-
     GLint version;
     vt->GetIntegerv(GL_MAJOR_VERSION, &version);
     uint32_t error = vt->GetError();
@@ -115,6 +110,20 @@ vlc_gl_LoadExtensionFunctions(vlc_gl_t *gl, struct vlc_gl_extension_vt *vt)
     /* Drain the errors before continuing. */
     while (error != GL_NO_ERROR)
         error = vt->GetError();
+
+    return version;
+}
+
+
+static inline void
+vlc_gl_LoadExtensionFunctions(vlc_gl_t *gl, struct vlc_gl_extension_vt *vt)
+{
+    vt->GetString = vlc_gl_GetProcAddress(gl, "glGetString");
+    vt->GetIntegerv = vlc_gl_GetProcAddress(gl, "glGetIntegerv");
+    vt->GetError = vlc_gl_GetProcAddress(gl, "glGetError");
+    vt->GetStringi = NULL;
+
+    unsigned version = vlc_gl_GetVersionMajor(vt);
 
     /* glGetStringi is available in OpenGL>=3 and GLES>=3.
      * https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGetString.xhtml
