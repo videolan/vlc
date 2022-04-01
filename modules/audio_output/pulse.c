@@ -634,12 +634,18 @@ static void Drain(audio_output_t *aout)
     pa_operation *op = pa_stream_drain(s, NULL, NULL);
     if (op != NULL)
         pa_operation_unref(op);
-    sys->last_date = VLC_TICK_INVALID;
 
-    /* XXX: Loosy drain emulation.
-     * See #18141: drain callback is never received */
-    sys->draining = true;
-    TriggerDrain(aout);
+    if (sys->last_date == VLC_TICK_INVALID)
+        aout_DrainedReport(aout);
+    else
+    {
+        sys->last_date = VLC_TICK_INVALID;
+
+        /* XXX: Loosy drain emulation.
+         * See #18141: drain callback is never received */
+        sys->draining = true;
+        TriggerDrain(aout);
+    }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
