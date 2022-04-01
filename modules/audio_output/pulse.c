@@ -617,8 +617,8 @@ static void Drain(audio_output_t *aout)
     /* XXX: Loosy drain emulation.
      * See #18141: drain callback is never received */
     assert(sys->drain_trigger == NULL);
-    vlc_tick_t delay;
-    if (TimeGet(aout, &delay) == 0)
+    vlc_tick_t delay = vlc_pa_get_latency(aout, sys->context, s);
+    if (delay != VLC_TICK_INVALID)
     {
         delay += pa_rtclock_now();
         sys->drain_trigger = pa_context_rttime_new(sys->context, delay,
