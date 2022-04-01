@@ -3382,7 +3382,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     if( ret != VLC_SUCCESS )
     {
         msg_Warn( p_input, "failed to add %s as slave", psz_uri );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( i_type == SLAVE_TYPE_GENERIC )
