@@ -150,13 +150,6 @@ struct vlc_gl_interop {
     void *priv;
     const struct vlc_gl_interop_ops *ops;
 
-    /* Set by the caller to opengl_interop_init_impl().
-     * This avoids each module to link against opengl_interop_init_impl()
-     * directly. */
-    int
-    (*init)(struct vlc_gl_interop *interop, uint32_t tex_target,
-            vlc_fourcc_t chroma, video_color_space_t yuv_space);
-
     /* This avoids each module to link against GetTexFormatSize() directly. */
     int
     (*get_tex_format_size)(struct vlc_gl_interop *interop, uint32_t target,
