@@ -3395,18 +3395,14 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
             if( demux_Control( priv->master->p_demux, DEMUX_GET_TIME, &i_time ) )
             {
                 msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
-                InputSourceDestroy( p_source );
-                input_source_Release( p_source );
-                return VLC_EGENERIC;
+                goto error;
             }
 
             if( demux_Control( p_source->p_demux,
                                DEMUX_SET_TIME, i_time, true ) )
             {
                 msg_Err( p_input, "seek failed for new slave" );
-                InputSourceDestroy( p_source );
-                input_source_Release( p_source );
-                return VLC_EGENERIC;
+                goto error;
             }
         }
 
@@ -3419,6 +3415,11 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     TAB_APPEND( priv->i_slave, priv->slave, p_source );
 
     return VLC_SUCCESS;
+
+error:
+    InputSourceDestroy( p_source );
+    input_source_Release( p_source );
+    return VLC_EGENERIC;
 }
 
 static char *input_SubtitleFile2Uri( input_thread_t *p_input,
