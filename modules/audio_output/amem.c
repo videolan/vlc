@@ -205,6 +205,8 @@ static void Stop (audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
 
     vlc_mutex_lock(&sys->lock);
+    if (sys->flush != NULL)
+        sys->flush (sys->opaque);
     if (sys->cleanup != NULL)
         sys->cleanup (sys->opaque);
 
