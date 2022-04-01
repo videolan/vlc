@@ -418,7 +418,7 @@ void ListMenuHelper::onModelReset()
         onRowsInserted(QModelIndex(), 0, count - 1);
 }
 
-void ListMenuHelper::onTriggered(bool checked)
+void ListMenuHelper::onTriggered(bool)
 {
     QAction * action = static_cast<QAction *> (sender());
 
