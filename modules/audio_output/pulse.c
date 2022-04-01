@@ -68,6 +68,7 @@ typedef struct
     pa_threaded_mainloop *mainloop; /**< PulseAudio thread */
     pa_time_event *trigger; /**< Deferred stream trigger */
     pa_time_event *drain_trigger; /**< Drain stream trigger */
+    bool draining;
     pa_cvolume cvolume; /**< actual sink input volume */
     vlc_tick_t last_date; /**< Play system timestamp of last buffer */
 
@@ -290,7 +291,11 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
 
     /* This callback is _never_ called while paused. */
     if (sys->last_date == VLC_TICK_INVALID)
+    {
+        if (sys->draining && sys->drain_trigger == NULL)
+            TriggerDrain(aout);
         return; /* nothing to do if buffers are (still) empty */
+    }
     if (pa_stream_is_corked(s) > 0)
         stream_start(s, aout, sys->last_date);
 }
@@ -593,6 +598,7 @@ static void Flush(audio_output_t *aout)
     {
         vlc_pa_rttime_free(sys->mainloop, sys->drain_trigger);
         sys->drain_trigger = NULL;
+        sys->draining = false;
     }
 
     pa_operation *op = pa_stream_flush(s, NULL, NULL);
@@ -632,9 +638,8 @@ static void Drain(audio_output_t *aout)
 
     /* XXX: Loosy drain emulation.
      * See #18141: drain callback is never received */
+    sys->draining = true;
     TriggerDrain(aout);
-    if (sys->drain_trigger == NULL)
-        aout_DrainedReport(aout);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
@@ -863,6 +868,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     sys->trigger = sys->drain_trigger = NULL;
+    sys->draining = false;
     pa_cvolume_init(&sys->cvolume);
     sys->last_date = VLC_TICK_INVALID;
 
