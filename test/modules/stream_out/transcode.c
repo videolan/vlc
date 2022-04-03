@@ -179,6 +179,13 @@ static block_t *EncodeVideo(encoder_t *enc, picture_t *pic)
     return block;
 }
 
+static void CloseEncoder(encoder_t *enc)
+{
+    struct transcode_scenario *scenario = &transcode_scenarios[current_scenario];
+    if (scenario->encoder_close != NULL)
+        scenario->encoder_close(enc);
+}
+
 static int OpenEncoder(vlc_object_t *obj)
 {
     encoder_t *enc = (encoder_t *)obj;
@@ -195,7 +202,10 @@ static int OpenEncoder(vlc_object_t *obj)
             enc->fmt_out.video.i_width, enc->fmt_out.video.i_height);
 
     static const struct vlc_encoder_operations ops =
-        { .encode_video = EncodeVideo };
+    {
+        .encode_video = EncodeVideo,
+        .close = CloseEncoder,
+    };
     enc->ops = &ops;
 
     return VLC_SUCCESS;

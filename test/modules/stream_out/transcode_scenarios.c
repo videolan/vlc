@@ -40,6 +40,7 @@ static struct scenario_data
     unsigned encoder_picture_count;
     bool converter_opened;
     bool encoder_opened;
+    bool encoder_closed;
     bool error_reported;
 } scenario_data;
 
@@ -209,6 +210,12 @@ static void encoder_encode_wait_10_images(encoder_t *enc, picture_t *pic)
         vlc_sem_post(&scenario_data.wait_stop);
 }
 
+static void encoder_close(encoder_t *enc)
+{
+    (void)enc;
+    scenario_data.encoder_closed = true;
+}
+
 static void converter_fixed_size(filter_t *filter, vlc_fourcc_t chroma_in,
         vlc_fourcc_t chroma_out, unsigned width, unsigned height)
 {
@@ -255,6 +262,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_dummy,
     .encoder_setup = encoder_i420_800_600,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
 },{
     .source = source_800_600,
     .sout = "sout=#transcode:dummy",
@@ -262,6 +270,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_dummy,
     .encoder_setup = encoder_nv12_800_600,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
 },{
     .source = source_800_600,
     .sout = "sout=#transcode:dummy",
@@ -269,6 +278,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_dummy,
     .encoder_setup = encoder_nv12_800_600,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
     .converter_setup = converter_i420_to_nv12_800_600,
 },{
     .source = source_800_600,
@@ -277,6 +287,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_dummy,
     .encoder_setup = encoder_i420_800_600,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
     .converter_setup = converter_nv12_to_i420_800_600,
 },{
     .source = source_800_600,
@@ -285,6 +296,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_vctx,
     .encoder_setup = encoder_i420_800_600_vctx,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
 },{
     .source = source_800_600,
     .sout = "sout=#transcode:dummy",
@@ -292,6 +304,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_vctx,
     .encoder_setup = encoder_nv12_800_600,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
     .converter_setup = converter_i420_to_nv12_800_600,
 },{
     /* Make sure fps filter in transcode will forward the video context */
@@ -301,6 +314,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_vctx,
     .encoder_setup = encoder_i420_800_600_vctx,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
 },{
     // - Decoder format with video context
     // - Encoder format request a different chroma
@@ -313,6 +327,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_vctx,
     .encoder_setup = encoder_nv12_800_600,
     .encoder_encode = encoder_encode_dummy,
+    .encoder_close = encoder_close,
     .converter_setup = converter_i420_to_nv12_800_600_vctx,
 },{
     /* Make sure a change in format will lead to the addition of a converter.
@@ -324,6 +339,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_decode = decoder_decode_vctx_update,
     .encoder_setup = encoder_i420_800_600,
     .encoder_encode = encoder_encode_wait_10_images,
+    .encoder_close = encoder_close,
     .converter_setup = converter_nv12_to_i420_800_600_vctx,
 },{
     /* Ensure that error are correctly forwarded back to the stream output
@@ -333,6 +349,7 @@ struct transcode_scenario transcode_scenarios[] =
     .decoder_setup = decoder_i420_800_600,
     .decoder_decode = decoder_decode_error,
     .report_error = wait_error_reported,
+    .encoder_close = encoder_close,
 }};
 size_t transcode_scenarios_count = ARRAY_SIZE(transcode_scenarios);
 
@@ -358,4 +375,7 @@ void transcode_scenario_check(struct transcode_scenario *scenario)
 
     if (scenario->encoder_setup != NULL)
         assert(scenario_data.encoder_opened);
+
+    if (scenario_data.encoder_opened && scenario->encoder_close != NULL)
+        assert(scenario_data.encoder_closed);
 }

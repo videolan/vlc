@@ -35,6 +35,7 @@ struct transcode_scenario {
     void (*decoder_setup)(decoder_t *);
     int (*decoder_decode)(decoder_t *, picture_t *);
     void (*encoder_setup)(encoder_t *);
+    void (*encoder_close)(encoder_t *);
     void (*encoder_encode)(encoder_t *, picture_t *);
     void (*filter_setup)(filter_t *);
     void (*converter_setup)(filter_t *);
