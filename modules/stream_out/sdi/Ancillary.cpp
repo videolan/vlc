@@ -69,12 +69,6 @@ AFD::~AFD()
 
 }
 
-static inline void put_le32(uint8_t **p, uint32_t d)
-{
-    SetDWLE(*p, d);
-    (*p) += 4;
-}
-
 AFD::AFDData::AFDData(uint8_t code, uint8_t ar)
 {
     payload.resize(8);
