@@ -173,6 +173,11 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
 
     ID3D11Texture2D* sharedTex;
     hr = d3d11VLC1->OpenSharedResource1(pic_sys->sharedHandle, IID_GRAPHICS_PPV_ARGS(&sharedTex));
+    if (unlikely(FAILED(hr)))
+    {
+        block_Release( p_block );
+        return VLCDEC_SUCCESS;
+    }
 
     ID3D11Texture2D *srcTex = src_sys->texture[0];
     auto *srcVctx = p_pic->context->vctx;
