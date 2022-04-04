@@ -39,8 +39,18 @@
 #include "modules/modules.h"
 #include "misc/rcu.h"
 
-vlc_mutex_t config_lock = VLC_STATIC_MUTEX;
+static vlc_mutex_t config_lock = VLC_STATIC_MUTEX;
 static atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
+
+void config_Lock(void)
+{
+    vlc_mutex_lock(&config_lock);
+}
+
+void config_Unlock(void)
+{
+    vlc_mutex_unlock(&config_lock);
+}
 
 int config_GetType(const char *name)
 {

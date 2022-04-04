@@ -64,11 +64,11 @@ int config_LoadConfigFile( vlc_object_t * );
 #define config_LoadCmdLine(a,b,c,d) config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
 #define config_LoadConfigFile(a) config_LoadConfigFile(VLC_OBJECT(a))
 bool config_PrintHelp (vlc_object_t *);
+void config_Lock(void);
+void config_Unlock(void);
 
 int config_SortConfig (void);
 void config_UnsortConfig (void);
-
-extern vlc_mutex_t config_lock;
 
 bool config_IsSafe (const char *);
 
