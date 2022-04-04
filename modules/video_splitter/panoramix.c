@@ -835,7 +835,7 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
 
     /* */
     int i_output = 0;
-    for( int y = 0, i_src_y = 0, i_dst_y = 0; y < i_row; y++ )
+    for( int y = 0, i_src_y = 0; y < i_row; y++ )
     {
         const bool b_row_first = y == 0;
         const bool b_row_last  = y == i_row - 1;
@@ -845,7 +845,7 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
         if( b_row_last )
             i_win_height = i_src_height - y * i_win_height;
 
-        for( int x = 0, i_src_x = 0, i_dst_x = 0; x < i_col; x++ )
+        for( int x = 0, i_src_x = 0; x < i_col; x++ )
         {
             const bool b_col_first = x == 0;
             const bool b_col_last  = x == i_col - 1;
@@ -910,10 +910,8 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
 
             /* */
             i_src_x += i_win_width;
-            i_dst_x += p_output->i_width;
         }
         i_src_y += i_win_height;
-        i_dst_y += pp_output[0][y].i_height;
     }
     return i_output;
 }
