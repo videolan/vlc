@@ -2154,8 +2154,8 @@ REPORT_LIST
         .program_switch_count = 1,
         .extra_start_count = 0,
         .rate = 1.f,
-        .wait = VLC_STATIC_COND,
     };
+    vlc_cond_init(&ctx->wait);
     reports_init(&ctx->report);
 
     /* Force wdummy window */
