@@ -161,25 +161,60 @@ static int spu_channel_Push(struct spu_channel *channel, subpicture_t *subpic,
     return vlc_vector_push(&channel->entries, entry) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
+static void spu_Channel_CleanEntry(spu_private_t *sys, spu_render_entry_t *entry)
+{
+    assert(entry->subpic);
+
+    picture_t *pic;
+    vlc_vector_foreach(pic, &entry->scaled_region_pics)
+    {
+        if (pic != NULL)
+            picture_Release(pic);
+    }
+    vlc_vector_clear(&entry->scaled_region_pics);
+
+    spu_PrerenderCancel(sys, entry->subpic);
+    subpicture_Delete(entry->subpic);
+}
+
 static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
 {
     spu_render_entry_t *entry;
     vlc_vector_foreach_ref(entry, &channel->entries)
-    {
-        assert(entry->subpic);
-
-        picture_t *pic;
-        vlc_vector_foreach(pic, &entry->scaled_region_pics)
-        {
-            if (pic != NULL)
-                picture_Release(pic);
-        }
-        vlc_vector_clear(&entry->scaled_region_pics);
-
-        spu_PrerenderCancel(sys, entry->subpic);
-        subpicture_Delete(entry->subpic);
-    }
+        spu_Channel_CleanEntry(sys, entry);
     vlc_vector_clear(&channel->entries);
+}
+
+static bool spu_HasAlreadyExpired(vlc_tick_t start, vlc_tick_t stop,
+                                  vlc_tick_t system_now)
+{
+    bool b_stop_is_valid = (stop >= start);
+    /* we can't include ephemere SPU without end date
+           as the joining gap would be dropped due to the
+           asynchronous update between the drop and the displayed SPU */
+    if(b_stop_is_valid && stop < system_now)
+        return true;
+    return false;
+}
+
+static void spu_channel_EarlyRemoveLate(spu_private_t *sys,
+                                        struct spu_channel *channel,
+                                        vlc_tick_t system_now)
+{
+    /* Trying to have a reasonable hint to remove early from queue
+     * SPU that have no chance to be rendered */
+    for (size_t i = 0; i < channel->entries.size;)
+    {
+        const spu_render_entry_t *entry = &channel->entries.data[i];
+
+        if(spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
+        {
+            spu_Channel_CleanEntry(sys, &channel->entries.data[i]);
+            vlc_vector_remove(&channel->entries, i);
+        }
+        else
+            i++;
+    }
 }
 
 static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id)
@@ -1976,6 +2011,16 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
             vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
                                             orgstop, channel->rate);
         vlc_clock_Unlock(channel->clock);
+
+        spu_channel_EarlyRemoveLate(sys, channel, system_now);
+
+        /* Maybe the new one is also already expired */
+        if(spu_HasAlreadyExpired(subpic->i_start, subpic->i_stop, system_now))
+        {
+            vlc_mutex_unlock(&sys->lock);
+            subpicture_Delete(subpic);
+            return;
+        }
     }
 
     if (spu_channel_Push(channel, subpic, orgstart, orgstop))
