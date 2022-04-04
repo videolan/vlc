@@ -3297,17 +3297,13 @@ static void Ogg_ReadSkeletonIndex( demux_t *p_demux, ogg_packet *p_oggpacket )
     p_stream->p_skel->i_indexlastnum = GetQWLE( &p_oggpacket->packet[32] );
     unsigned const char *p_fwdbyte = &p_oggpacket->packet[42];
     unsigned const char *p_boundary = p_oggpacket->packet + p_oggpacket->bytes;
-    uint64_t i_offset = 0;
-    uint64_t i_time = 0;
     uint64_t i_keypoints_found = 0;
 
     while( p_fwdbyte < p_boundary && i_keypoints_found < i_keypoints )
     {
         uint64_t i_val;
         p_fwdbyte = Read7BitsVariableLE( p_fwdbyte, p_boundary, &i_val );
-        i_offset += i_val;
         p_fwdbyte = Read7BitsVariableLE( p_fwdbyte, p_boundary, &i_val );
-        i_time += i_val * p_stream->p_skel->i_indexstampden;
         i_keypoints_found++;
     }
 
