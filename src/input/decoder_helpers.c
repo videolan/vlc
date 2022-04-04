@@ -306,11 +306,10 @@ void vlc_encoder_Destroy(encoder_t *encoder)
 {
     if (encoder->ops != NULL && encoder->ops->close != NULL)
         encoder->ops->close(encoder);
-    if (encoder->p_module != NULL)
-        module_unneed(encoder, encoder->p_module);
 
     es_format_Clean(&encoder->fmt_in);
     es_format_Clean(&encoder->fmt_out);
 
+    vlc_objres_clear(VLC_OBJECT(encoder));
     vlc_object_delete(encoder);
 }
