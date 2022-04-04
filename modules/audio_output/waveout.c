@@ -643,7 +643,8 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 {
     (void) h_waveout;
     (void) dwParam2;
-    aout_sys_t *sys = ((audio_output_t *)_p_aout)->sys;
+    audio_output_t *p_aout = (audio_output_t *)_p_aout;
+    aout_sys_t *sys = p_aout->sys;
     struct lkwavehdr * p_waveheader =  (struct lkwavehdr *) dwParam1;
 
     if( uMsg != WOM_DONE ) return;
@@ -655,7 +656,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
     if( sys->i_frames == 0 && sys->draining )
     {
-        aout_DrainedReport( _p_aout );
+        aout_DrainedReport( p_aout );
         sys->draining = false;
     }
 
