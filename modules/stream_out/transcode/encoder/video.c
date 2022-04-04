@@ -334,12 +334,6 @@ int transcode_encoder_video_test( encoder_t *p_encoder,
                  p_cfg->psz_name ? p_cfg->psz_name : "any",
                  (char *)&p_cfg->i_codec );
     }
-    else
-    {
-        /* Close the encoder.
-         * We'll open it only when we have the first frame. */
-        module_unneed( p_encoder, p_module );
-    }
 
     if( likely(!p_encoder->fmt_in.video.i_chroma) ) /* always missing, and required by filter chain */
         p_encoder->fmt_in.video.i_chroma = p_encoder->fmt_in.i_codec;
