@@ -109,7 +109,6 @@ namespace sdi_sout
 
         private:
             vlc_object_t *p_obj;
-            unsigned count;
             AES3AudioFrameSource framesources[MAX_AES3_AUDIO_FRAMES];
     };
 }
