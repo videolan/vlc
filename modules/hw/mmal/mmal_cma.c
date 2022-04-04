@@ -298,20 +298,15 @@ static cma_buf_t * cma_pool_alloc_cb(cma_buf_pool_t * const v, size_t size)
 {
     cma_buf_pool_t * const cbp = v;
 
-    cma_buf_t * const cb = malloc(sizeof(cma_buf_t));
+    cma_buf_t * const cb = calloc(1, sizeof(cma_buf_t));
     if (cb == NULL)
         return NULL;
 
-    *cb = (cma_buf_t){
-        .ref_count = ATOMIC_VAR_INIT(0),
-        .cbp = cbp,
-        .in_flight = 0,
-        .size = size,
-        .vcsm_h = 0,
-        .vc_h = 0,
-        .fd = -1,
-        .mmap = MAP_FAILED,
-    };
+    atomic_init(&cb->ref_count, 0);
+    cb->cbp = cbp;
+    cb->size = size;
+    cb->fd = -1;
+    cb->mmap = MAP_FAILED;
 
     // 0x80 is magic value to force full ARM-side mapping - otherwise
     // cache requests can cause kernel crashes
