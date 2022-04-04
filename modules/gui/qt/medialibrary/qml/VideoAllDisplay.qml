@@ -38,8 +38,6 @@ Widgets.PageLoader {
 
     // Settings
 
-    defaultPage: "base"
-
     pageModel: [{
         name: "base",
         component: componentBase
@@ -47,6 +45,11 @@ Widgets.PageLoader {
         name: "group",
         component: componentGroup
     }]
+
+    loadDefaultView: function () {
+        History.update(["mc", "video", "all", "base"])
+        loadPage("base")
+    }
 
     // Events
 

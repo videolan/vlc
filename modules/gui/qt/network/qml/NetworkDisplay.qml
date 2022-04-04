@@ -38,8 +38,6 @@ Widgets.PageLoader {
 
     // Settings
 
-    defaultPage: "home"
-
     pageModel: [{
         name: "home",
         url: "qrc:///network/NetworkHomeDisplay.qml"
@@ -48,6 +46,11 @@ Widgets.PageLoader {
         component: browseComponent,
         guard: function (prop) { return !!prop.tree }
     }]
+
+    loadDefaultView: function() {
+        History.update(["mc", "network", "home"])
+        loadPage("home")
+    }
 
     // Events
     onCurrentItemChanged: {

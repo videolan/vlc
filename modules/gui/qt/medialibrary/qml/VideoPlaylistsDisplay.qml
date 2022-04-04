@@ -43,8 +43,6 @@ Widgets.PageLoader {
     // Settings
     //---------------------------------------------------------------------------------------------
 
-    defaultPage: "all"
-
     pageModel: [{
         name: "all",
         component: componentAll
@@ -52,6 +50,11 @@ Widgets.PageLoader {
         name: "list",
         component: componentList
     }]
+
+    loadDefaultView: function () {
+        History.update(["mc", "video", "playlists", "all"])
+        loadPage("all")
+    }
 
     //---------------------------------------------------------------------------------------------
     // Events

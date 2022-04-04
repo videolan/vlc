@@ -28,7 +28,9 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    defaultPage: "all"
+    property var sortModel
+    property var model
+
     pageModel: [{
         name: "all",
         component: genresComponent
@@ -37,8 +39,10 @@ Widgets.PageLoader {
         component: albumGenreComponent
     }]
 
-    property var sortModel
-    property var model
+    loadDefaultView: function () {
+        History.update(["mc", "music", "genres", "all"])
+        loadPage("all")
+    }
 
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel

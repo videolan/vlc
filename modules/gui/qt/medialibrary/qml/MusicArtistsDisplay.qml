@@ -34,7 +34,6 @@ Widgets.PageLoader {
 
     property MLModel model
 
-    defaultPage: "all"
     pageModel: [{
         name: "all",
         component: allArtistsComponent
@@ -42,6 +41,11 @@ Widgets.PageLoader {
         name: "albums",
         component: artistAlbumsComponent
     }]
+
+    loadDefaultView: function () {
+        History.update(["mc", "music", "artists", "all"])
+        loadPage("all")
+    }
 
     onCurrentItemChanged: {
         model = currentItem.model

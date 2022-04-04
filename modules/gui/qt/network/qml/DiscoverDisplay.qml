@@ -33,9 +33,6 @@ Widgets.PageLoader {
     property var contentModel
     property bool isViewMultiView: false
 
-    //name and properties of the tab to be initially loaded
-    defaultPage: "services"
-
     pageModel: [{
             displayText: I18n.qtr("Services"),
             name: "services",
@@ -46,6 +43,11 @@ Widgets.PageLoader {
             url: "qrc:///network/DiscoverUrlDisplay.qml"
         }
     ]
+
+    loadDefaultView: function () {
+        History.update(["mc", "discover", "services"])
+        loadPage("services")
+    }
 
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel

@@ -36,7 +36,6 @@ Widgets.PageLoader {
     property var model
     property Component localMenuDelegate: null
 
-    defaultPage: "all"
     pageModel: [{
         name: "all",
         component: allSourcesComponent
@@ -51,6 +50,11 @@ Widgets.PageLoader {
         component: sourceBrowseComponent,
         guard: function (prop) { return !!prop.tree }
     }]
+
+    loadDefaultView: function() {
+        History.update(["mc", "discover", "services", "all"])
+        loadPage("all")
+    }
 
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel

@@ -22,9 +22,14 @@ FocusScope {
     id: root
 
     property var view: null
-    property string defaultPage: ""
 
     property var pageModel: []
+
+    // loadDefaultView - function ()
+    // a function that loads the default page,
+    // must be implemented by the user of the class
+    // one may use `loadPage(string pageName)` to load the page from 'pageModel'
+    property var loadDefaultView: null
 
     property alias stackView: stackView
 
@@ -36,17 +41,12 @@ FocusScope {
         loadView()
     }
 
-    // loads the 'defaultPage'
-    // this will also apend History.current with the 'defaultPage' entry
-    function loadDefaultView() {
-        view = null
-    }
-
     function loadView() {
         if (view === null) {
-            var defaultView = {"name": defaultPage, "properties": {}}
-            History.addLeaf({"view": defaultView})
-            root.view = defaultView
+            if (!loadDefaultView)
+                console.error("both 'view' and 'loadDefaultView' is null, history -", JSON.stringify(History.current))
+            else
+                loadDefaultView()
             return
         }
 
@@ -66,6 +66,10 @@ FocusScope {
 
         stackView.currentItem.Navigation.parentItem = root
         root.currentItemChanged(stackView.currentItem)
+    }
+
+    function loadPage(page) {
+        view = {"name": page, "properties": {}}
     }
 
     function setCurrentItemFocus(reason) {

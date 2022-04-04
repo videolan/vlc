@@ -64,8 +64,6 @@ Widgets.PageLoader {
     // Settings
     //---------------------------------------------------------------------------------------------
 
-    defaultPage: "all"
-
     pageModel: [{
             name: "all",
             displayText: I18n.qtr("All"),
@@ -76,6 +74,11 @@ Widgets.PageLoader {
             url: "qrc:///medialibrary/VideoPlaylistsDisplay.qml"
         }
     ]
+
+    loadDefaultView: function () {
+        History.update(["mc", "video", "all"])
+        loadPage("all")
+    }
 
     onCurrentItemChanged: {
         isViewMultiView = (currentItem.isViewMultiView === undefined

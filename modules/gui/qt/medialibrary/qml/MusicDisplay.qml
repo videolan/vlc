@@ -33,7 +33,6 @@ Widgets.PageLoader {
     property var contentModel
     property bool isViewMultiView: true
 
-    defaultPage: "artists"
     pageModel: [{
             displayText: I18n.qtr("Artists"),
             name: "artists",
@@ -56,6 +55,11 @@ Widgets.PageLoader {
             url: "qrc:///medialibrary/MusicPlaylistsDisplay.qml"
         }
     ]
+
+    loadDefaultView: function () {
+        History.update(["mc", "music", "artists"])
+        loadPage("artists")
+    }
 
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel
