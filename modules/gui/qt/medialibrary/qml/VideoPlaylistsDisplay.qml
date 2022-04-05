@@ -96,6 +96,8 @@ Widgets.PageLoader {
         PlaylistMediaList {
             anchors.fill: parent
 
+            isMusic: false
+
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
 
             onShowList: {
@@ -114,6 +116,8 @@ Widgets.PageLoader {
             id: playlist
 
             anchors.fill: parent
+
+            isMusic: false
 
             onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
             onParentIdChanged    : _updateHistoryPlaylist(playlist)

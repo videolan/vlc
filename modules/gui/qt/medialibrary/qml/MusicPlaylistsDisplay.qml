@@ -117,6 +117,8 @@ Widgets.PageLoader {
 
             anchors.fill: parent
 
+            isMusic: true
+
             onCurrentIndexChanged: _updateHistoryPlaylist(playlist)
             onParentIdChanged    : _updateHistoryPlaylist(playlist)
             onNameChanged        : _updateHistoryPlaylist(playlist)

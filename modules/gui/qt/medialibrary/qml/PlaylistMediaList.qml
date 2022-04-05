@@ -59,6 +59,9 @@ FocusScope {
     property int _heightCover: (isMusic) ? VLCStyle.gridCover_music_height
                                          : VLCStyle.gridCover_video_height
 
+    property string _placeHolder: (isMusic) ? VLCStyle.noArtAlbumCover
+                                            : VLCStyle.noArtVideoCover
+
     //---------------------------------------------------------------------------------------------
     // Alias
     //---------------------------------------------------------------------------------------------
@@ -176,7 +179,7 @@ FocusScope {
         coverSize: (isMusic) ? Qt.size(512, 512)
                              : Qt.size(1024, 640)
 
-        coverDefault: (isMusic) ? VLCStyle.noArtAlbumCover : VLCStyle.noArtVideoCover
+        coverDefault: root._placeHolder
 
         coverPrefix: (isMusic) ? "playlist-music" : "playlist-video"
 
@@ -206,6 +209,8 @@ FocusScope {
         indexes: modelSelect.selectedIndexes
 
         coverRole: "thumbnail"
+
+        defaultCover: root._placeHolder
 
         titleRole: "name"
     }

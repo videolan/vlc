@@ -48,6 +48,10 @@ FocusScope {
 
     property Item headerItem: view.headerItem
 
+    property bool isMusic: true
+    property string _placeHolder: isMusic ? VLCStyle.noArtAlbumCover : VLCStyle.noArtVideoCover
+
+
     // Aliases
 
     // NOTE: This is used to determine which media(s) shall be displayed.
@@ -139,6 +143,8 @@ FocusScope {
         indexes: modelSelect.selectedIndexes
 
         coverRole: "thumbnail"
+
+        defaultCover: root._placeHolder
     }
 
     Util.SelectableDelegateModel {
@@ -213,7 +219,7 @@ FocusScope {
 
         text: I18n.qtr("No media found")
 
-        cover: VLCStyle.noArtAlbumCover
+        cover: root._placeHolder
 
         Navigation.parentItem: root
     }
