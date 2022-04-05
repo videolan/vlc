@@ -75,6 +75,7 @@ public:
         REVERSE_BUTTON,
         BOOKMARK_BUTTON,
         RENDERER_BUTTON,
+        NAVIGATION_BUTTONS,
         SPECIAL_MAX,
 
         WIDGET_SPACER = 0x40,

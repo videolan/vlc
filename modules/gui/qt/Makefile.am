@@ -836,6 +836,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/controlbarcontrols/LangButton.qml \
 	gui/qt/player/qml/controlbarcontrols/LoopButton.qml \
 	gui/qt/player/qml/controlbarcontrols/MenuButton.qml \
+	gui/qt/player/qml/controlbarcontrols/NavigationWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/NextButton.qml \
 	gui/qt/player/qml/controlbarcontrols/OpenButton.qml \
 	gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml \
