@@ -140,9 +140,15 @@ static bool SkipTag(stream_t *s, uint_fast32_t (*skipper)(stream_t *),
     }
 
     // Tag too big, skip the entire tag
+    while(size)
     {
         /* Skip the entire tag */
-        ssize_t read = vlc_stream_Read(s, NULL, size);
+#if SSIZE_MAX < UINT_FAST32_MAX
+        ssize_t skip = __MIN(size, SSIZE_MAX);
+#else
+        ssize_t skip = size;
+#endif
+        ssize_t read = vlc_stream_Read(s, NULL, skip);
 
         if (unlikely(read < 0))
         {   /* I/O error, try to restore offset. If it fails, screwed. */
@@ -150,11 +156,12 @@ static bool SkipTag(stream_t *s, uint_fast32_t (*skipper)(stream_t *),
                 msg_Err(s, "seek failure");
             return false;
         }
-        if(read < size)
+        if(read < skip)
         {
             // unexpected EOF
             return false;
         }
+        size -= read;
     }
     return true;
 }
