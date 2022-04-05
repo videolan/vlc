@@ -361,57 +361,6 @@ static void stream_Silence (vlc_aout_stream *stream, vlc_tick_t length, vlc_tick
     aout->play(aout, block, system_pts);
 }
 
-static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
-                               vlc_tick_t dec_pts)
-{
-    /**
-     * Depending on the drift between the actual and intended playback times,
-     * the audio core may ignore the drift, trigger upsampling or downsampling,
-     * insert silence or even discard samples.
-     * Future VLC versions may instead adjust the input rate.
-     *
-     * The audio output plugin is responsible for estimating its actual
-     * playback time, or rather the estimated time when the next sample will
-     * be played. (The actual playback time is always the current time, that is
-     * to say vlc_tick_now(). It is not an useful statistic.)
-     *
-     * Most audio output plugins can estimate the delay until playback of
-     * the next sample to be written to the buffer, or equally the time until
-     * all samples in the buffer will have been played. Then:
-     *    pts = vlc_tick_now() + delay
-     */
-    vlc_tick_t delay;
-    audio_output_t *aout = aout_stream_aout(stream);
-
-    if (aout_TimeGet(aout, &delay) != 0)
-        return; /* nothing can be done if timing is unknown */
-
-    if (stream->sync.discontinuity)
-    {
-        /* Chicken-egg situation for most aout modules that can't be started
-         * deferred (all except PulseAudio). These modules will start to play
-         * data immediately and ignore the given play_date (that take the clock
-         * jitter into account). We don't want to let vlc_aout_stream_RequestRetiming()
-         * handle the first silence (from the "Early audio output" case) since
-         * this function will first update the clock without taking the jitter
-         * into account. Therefore, we manually insert silence that correspond
-         * to the clock jitter value before updating the clock.
-         */
-        vlc_tick_t play_date =
-            vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay,
-                                      dec_pts, stream->sync.rate);
-        vlc_tick_t jitter = play_date - system_now;
-        if (jitter > 0)
-        {
-            stream_Silence(stream, jitter, dec_pts - delay);
-            if (aout_TimeGet(aout, &delay) != 0)
-                return;
-        }
-    }
-
-    vlc_aout_stream_RequestRetiming(stream, system_now + delay, dec_pts);
-}
-
 void vlc_aout_stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
                                      vlc_tick_t audio_ts)
 {
@@ -515,6 +464,57 @@ void vlc_aout_stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_
         stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
         msg_Dbg (aout, "resampling stopped (drift: %"PRId64" us)", drift);
     }
+}
+
+static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
+                               vlc_tick_t dec_pts)
+{
+    /**
+     * Depending on the drift between the actual and intended playback times,
+     * the audio core may ignore the drift, trigger upsampling or downsampling,
+     * insert silence or even discard samples.
+     * Future VLC versions may instead adjust the input rate.
+     *
+     * The audio output plugin is responsible for estimating its actual
+     * playback time, or rather the estimated time when the next sample will
+     * be played. (The actual playback time is always the current time, that is
+     * to say vlc_tick_now(). It is not an useful statistic.)
+     *
+     * Most audio output plugins can estimate the delay until playback of
+     * the next sample to be written to the buffer, or equally the time until
+     * all samples in the buffer will have been played. Then:
+     *    pts = vlc_tick_now() + delay
+     */
+    vlc_tick_t delay;
+    audio_output_t *aout = aout_stream_aout(stream);
+
+    if (aout_TimeGet(aout, &delay) != 0)
+        return; /* nothing can be done if timing is unknown */
+
+    if (stream->sync.discontinuity)
+    {
+        /* Chicken-egg situation for most aout modules that can't be started
+         * deferred (all except PulseAudio). These modules will start to play
+         * data immediately and ignore the given play_date (that take the clock
+         * jitter into account). We don't want to let vlc_aout_stream_RequestRetiming()
+         * handle the first silence (from the "Early audio output" case) since
+         * this function will first update the clock without taking the jitter
+         * into account. Therefore, we manually insert silence that correspond
+         * to the clock jitter value before updating the clock.
+         */
+        vlc_tick_t play_date =
+            vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay,
+                                      dec_pts, stream->sync.rate);
+        vlc_tick_t jitter = play_date - system_now;
+        if (jitter > 0)
+        {
+            stream_Silence(stream, jitter, dec_pts - delay);
+            if (aout_TimeGet(aout, &delay) != 0)
+                return;
+        }
+    }
+
+    vlc_aout_stream_RequestRetiming(stream, system_now + delay, dec_pts);
 }
 
 /*****************************************************************************
