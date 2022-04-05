@@ -56,13 +56,9 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
         = static_cast<ControlListModel::ControlType> (variant.toInt());
 
     // NOTE: These controls are completely hidden when the current media does not support them.
-    if (type == ControlListModel::TELETEXT_BUTTONS)
+    if (type == ControlListModel::NAVIGATION_BUTTONS)
     {
-        return m_player->isTeletextAvailable();
-    }
-    else if (type == ControlListModel::DVD_MENUS_BUTTON)
-    {
-        return m_player->hasMenu();
+        return (m_player->hasMenu() || m_player->isTeletextAvailable());
     }
 
     return true;
