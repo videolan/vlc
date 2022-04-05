@@ -153,8 +153,6 @@ void vlc_aout_stream_NotifyDrained(vlc_aout_stream *stream);
 void vlc_aout_stream_NotifyGain(vlc_aout_stream *stream, float gain);
 
 void vlc_aout_stream_RequestRestart(vlc_aout_stream *stream, unsigned);
-void vlc_aout_stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
-                                     vlc_tick_t audio_ts);
 
 void aout_InputRequestRestart(audio_output_t *aout);
 
