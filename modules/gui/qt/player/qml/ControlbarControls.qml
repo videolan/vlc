@@ -56,6 +56,7 @@ QtObject {
         { id: ControlListModel.CHAPTER_PREVIOUS_BUTTON, file: "ChapterPreviousButton.qml", label: VLCIcons.dvd_prev, text: I18n.qtr("Previous chapter") },
         { id: ControlListModel.CHAPTER_NEXT_BUTTON, file: "ChapterNextButton.qml", label: VLCIcons.dvd_next, text: I18n.qtr("Next chapter") },
         { id: ControlListModel.VOLUME, file: "VolumeWidget.qml", label: VLCIcons.volume_high, text: I18n.qtr("Volume Widget") },
+        { id: ControlListModel.NAVIGATION_BUTTONS, file: "NavigationWidget.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("Navigation") },
         { id: ControlListModel.DVD_MENUS_BUTTON, file: "DvdMenuButton.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("DVD menus") },
         { id: ControlListModel.TELETEXT_BUTTONS, file: "TeletextWidget.qml", label: VLCIcons.tvtelx, text: I18n.qtr("Teletext") },
         { id: ControlListModel.RENDERER_BUTTON, file: "RendererButton.qml", label: VLCIcons.renderer, text: I18n.qtr("Renderer Button") },
