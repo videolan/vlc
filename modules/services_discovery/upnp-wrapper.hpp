@@ -128,7 +128,7 @@ inline IP_ADAPTER_MULTICAST_ADDRESS* getMulticastAddress(IP_ADAPTER_ADDRESSES* p
     return NULL;
 }
 
-inline bool isAdapterSuitable(IP_ADAPTER_ADDRESSES* p_adapter, bool ipv6)
+inline bool isAdapterSuitable(IP_ADAPTER_ADDRESSES* p_adapter)
 {
     if ( p_adapter->OperStatus != IfOperStatusUp )
         return false;
@@ -136,16 +136,20 @@ inline bool isAdapterSuitable(IP_ADAPTER_ADDRESSES* p_adapter, bool ipv6)
     {
         IP_ADAPTER_ADDRESSES_XP* p_adapter_xp = reinterpret_cast<IP_ADAPTER_ADDRESSES_XP*>( p_adapter );
         // On Windows Server 2003 and Windows XP, this member is zero if IPv4 is not available on the interface.
-        if (ipv6)
-            return p_adapter_xp->Ipv6IfIndex != 0;
+#if defined( UPNP_ENABLE_IPV6 )
+        return p_adapter_xp->Ipv6IfIndex != 0;
+#else
         return p_adapter_xp->IfIndex != 0;
+#endif
     }
     IP_ADAPTER_ADDRESSES_LH* p_adapter_lh = reinterpret_cast<IP_ADAPTER_ADDRESSES_LH*>( p_adapter );
     if (p_adapter_lh->FirstGatewayAddress == NULL)
         return false;
-    if (ipv6)
-        return p_adapter_lh->Ipv6Enabled;
+#if defined( UPNP_ENABLE_IPV6 )
+    return p_adapter_lh->Ipv6Enabled;
+#else
     return p_adapter_lh->Ipv4Enabled;
+#endif
 }
 
 inline IP_ADAPTER_ADDRESSES* ListAdapters()
@@ -192,7 +196,7 @@ inline char* getPreferedAdapter()
     p_adapter = addresses;
     while (p_adapter != NULL)
     {
-        if (isAdapterSuitable( p_adapter, true ))
+        if (isAdapterSuitable( p_adapter ))
         {
             /* make sure it supports 239.255.255.250 */
             IP_ADAPTER_MULTICAST_ADDRESS *p_multicast = getMulticastAddress( p_adapter );
