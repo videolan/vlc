@@ -139,10 +139,6 @@ private:
     HWND m_hParentWindow;
     /// Structure for the system tray
     NOTIFYICONDATA m_trayIcon;
-    /// Handle on msimg32.dll (for TransparentBlt)
-    HINSTANCE m_hMsimg32;
-    /// Handle on user32.dll (for SetLayeredWindowAttributes)
-    HINSTANCE m_hUser32;
     /// Directory separator
     const std::string m_dirSep;
     /// Resource path

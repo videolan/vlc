@@ -339,11 +339,11 @@ OSTimer *Win32Factory::createOSTimer( CmdGeneric &rCmd )
 
 
 OSWindow *Win32Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
-                                        bool playOnDrop, OSWindow *pParent,
+                                        bool, OSWindow *pParent,
                                         GenericWindow::WindowType_t type )
 {
     return new Win32Window( getIntf(), rWindow, m_hInst, m_hParentWindow,
-                            dragDrop, playOnDrop, (Win32Window*)pParent, type );
+                            dragDrop, (Win32Window*)pParent, type );
 }
 
 

@@ -31,9 +31,9 @@
 
 
 Win32DragDrop::Win32DragDrop( intf_thread_t *pIntf,
-                              bool playOnDrop, GenericWindow* pWin )
+                              GenericWindow* pWin )
     : SkinObject( pIntf ), IDropTarget(), m_references( 1 ),
-      m_playOnDrop( playOnDrop ), m_pWin( pWin), m_format( { 0, NULL} )
+      m_pWin( pWin), m_format( { 0, NULL} )
 {
 }
 

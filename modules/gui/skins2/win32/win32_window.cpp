@@ -45,11 +45,11 @@
 
 Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
-                          bool dragDrop, bool playOnDrop,
+                          bool dragDrop,
                           Win32Window *pParentWindow,
                           GenericWindow::WindowType_t type ):
     OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false ),
-    m_pParent( pParentWindow ), m_type ( type )
+    m_type ( type )
 {
     (void)hParentWindow;
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
@@ -113,7 +113,7 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     if( m_dragDrop )
     {
         m_pDropTarget = (LPDROPTARGET)
-            new Win32DragDrop( getIntf(), playOnDrop, &rWindow );
+            new Win32DragDrop( getIntf(), &rWindow );
         // Register the window as a drop target
         RegisterDragDrop( m_hWnd, m_pDropTarget );
     }

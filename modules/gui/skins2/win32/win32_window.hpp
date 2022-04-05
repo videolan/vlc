@@ -39,7 +39,7 @@ class Win32Window: public OSWindow
 public:
     Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                  HINSTANCE hInst, HWND hParentWindow,
-                 bool dragDrop, bool playOnDrop,
+                 bool dragDrop,
                  Win32Window *pParentWindow, GenericWindow::WindowType_t );
     virtual ~Win32Window();
 
@@ -88,8 +88,6 @@ private:
     LPDROPTARGET m_pDropTarget;
     /// Indicates whether the window is layered
     mutable bool m_isLayered;
-    /// Parent window
-    Win32Window *m_pParent;
     /// window type
     GenericWindow::WindowType_t m_type;
 
