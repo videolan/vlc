@@ -2,9 +2,9 @@
 
 "NSCameraUsageDescription" = "사용자의 요청에 따라 VLC가 카메라 접근 권한을 요구합니다.";
 "NSMicrophoneUsageDescription" = "사용자의 요청에 따라 VLC가 마이크 접근 권한을 요구합니다.";
-"NSAppleEventsUsageDescription" = "VLC가 외부 미디어 플레이어를 일시중지 및 재시작하기를 원합니다.";
+"NSAppleEventsUsageDescription" = "VLC가 외부 미디어 재생기를 일시중지 및 재시작하기를 원합니다.";
 "NSDesktopFolderUsageDescription" = "사용자의 요청에 따라 VLC가 데스크톱 폴더 접근 권한을 요구합니다.";
 "NSDocumentsFolderUsageDescription" = "사용자의 요청에 따라 VLC가 문서 폴더 접근 권한을 요구합니다.";
 "NSDownloadsFolderUsageDescription" = "사용자의 요청에 따라 VLC가 다운로드 폴더 접근 권한을 요구합니다.";
-"NSNetworkVolumesUsageDescription" = "사용자의 요청에 따라 VLC가 네트워크 볼륨 접근 권한을 요구합니다.";
-"NSRemovableVolumesUsageDescription" = "사용자의 요청에 따라 VLC가 연결식 볼륨 접근 권한을 요구합니다.";
+"NSNetworkVolumesUsageDescription" = "사용자의 요청에 따라 VLC가 네트워크 음량 접근 권한을 요구합니다.";
+"NSRemovableVolumesUsageDescription" = "사용자의 요청에 따라 VLC가 연결식 음량 접근 권한을 요구합니다.";
