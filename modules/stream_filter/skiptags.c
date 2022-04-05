@@ -97,15 +97,17 @@ static uint_fast32_t SkipAPETag(stream_t *s)
         return 0;
 
     uint_fast32_t size = GetDWLE(peek + 12);
-    if (size > SSIZE_MAX - 32u)
-        return 0; /* impossibly long tag */
 
     uint_fast32_t flags = GetDWLE(peek + 16);
     if ((flags & (1u << 29)) == 0)
         return 0;
 
     if (flags & (1u << 30))
+    {
+        if (size > UINT32_MAX - 32u)
+            return 0; /* impossibly long tag */
         size += 32;
+    }
 
     msg_Dbg(s, "AP2 v%"PRIuFAST32" tag found, "
             "skipping %"PRIuFAST32" bytes", version / 1000, size);
