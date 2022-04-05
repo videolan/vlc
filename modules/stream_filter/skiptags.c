@@ -117,34 +117,46 @@ static bool SkipTag(stream_t *s, uint_fast32_t (*skipper)(stream_t *),
 {
     uint_fast64_t offset = vlc_stream_Tell(s);
     uint_fast32_t size = skipper(s);
-    if(size> 0)
+    if (size == 0)
+        return false;
+    if (*pi_tags_count < MAX_TAGS && size <= MAX_TAG_SIZE)
     {
-        /* Skip the entire tag */
-        ssize_t read;
-        if(*pi_tags_count < MAX_TAGS && size <= MAX_TAG_SIZE)
-        {
-            *pp_block = vlc_stream_Block(s, size);
-            read = *pp_block ? (ssize_t)(*pp_block)->i_buffer : -1;
+        *pp_block = vlc_stream_Block(s, size);
+        if (unlikely(!*pp_block))
+        {   /* I/O error, try to restore offset. If it fails, screwed. */
+            if (vlc_stream_Seek(s, offset))
+                msg_Err(s, "seek failure");
+            return false;
         }
-        else
+        if((*pp_block)->i_buffer < size)
         {
-            read = vlc_stream_Read(s, NULL, size);
-        }
-
-        if(read < (ssize_t)size)
-        {
+            // unexpected EOF, tag not fully read
             block_ChainRelease(*pp_block);
             *pp_block = NULL;
-            if (unlikely(read < 0))
-            {   /* I/O error, try to restore offset. If it fails, screwed. */
-                if (vlc_stream_Seek(s, offset))
-                    msg_Err(s, "seek failure");
-                return false;
-            }
+            return false;
         }
-        else (*pi_tags_count)++;
+        (*pi_tags_count)++;
+        return true;
     }
-    return size != 0;
+
+    // Tag too big, skip the entire tag
+    {
+        /* Skip the entire tag */
+        ssize_t read = vlc_stream_Read(s, NULL, size);
+
+        if (unlikely(read < 0))
+        {   /* I/O error, try to restore offset. If it fails, screwed. */
+            if (vlc_stream_Seek(s, offset))
+                msg_Err(s, "seek failure");
+            return false;
+        }
+        if(read < size)
+        {
+            // unexpected EOF
+            return false;
+        }
+    }
+    return true;
 }
 
 static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
