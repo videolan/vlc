@@ -95,64 +95,12 @@ private:
 
 };
 
-char *getServerIPAddress() {
-    char *ip = nullptr;
-#ifdef UPNP_ENABLE_IPV6
-#ifdef _WIN32
-    IP_ADAPTER_UNICAST_ADDRESS *p_best_ip = nullptr;
-    wchar_t psz_uri[32];
-    DWORD strSize;
-    IP_ADAPTER_ADDRESSES *p_adapter, *addresses;
-
-    addresses = ListAdapters();
-    if (addresses == nullptr)
-        return nullptr;
-
-    p_adapter = addresses;
-    while (p_adapter != nullptr)
-    {
-        if (isAdapterSuitable(p_adapter, false))
-        {
-            IP_ADAPTER_UNICAST_ADDRESS *p_unicast = p_adapter->FirstUnicastAddress;
-            while (p_unicast != nullptr)
-            {
-                strSize = sizeof( psz_uri ) / sizeof( wchar_t );
-                if( WSAAddressToString( p_unicast->Address.lpSockaddr,
-                                        p_unicast->Address.iSockaddrLength,
-                                        nullptr, psz_uri, &strSize ) == 0 )
-                {
-                    if ( p_best_ip == nullptr ||
-                         p_best_ip->ValidLifetime > p_unicast->ValidLifetime )
-                    {
-                        p_best_ip = p_unicast;
-                    }
-                }
-                p_unicast = p_unicast->Next;
-            }
-        }
-        p_adapter = p_adapter->Next;
+static char *getServerIPAddress() {
+    const char *ip = UpnpGetServerIpAddress();
+    if (ip == nullptr) {
+        ip = UpnpGetServerIp6Address();
     }
-
-    if (p_best_ip != nullptr)
-    {
-        strSize = sizeof( psz_uri ) / sizeof( wchar_t );
-        WSAAddressToString( p_best_ip->Address.lpSockaddr,
-                            p_best_ip->Address.iSockaddrLength,
-                            nullptr, psz_uri, &strSize );
-        free(addresses);
-        return FromWide( psz_uri );
-    }
-    free(addresses);
-    return nullptr;
-#endif /* _WIN32 */
-#else /* UPNP_ENABLE_IPV6 */
-    ip = getIpv4ForMulticast();
-#endif /* UPNP_ENABLE_IPV6 */
-    if (ip == nullptr)
-    {
-        ip = strdup(UpnpGetServerIpAddress());
-    }
-    return ip;
+    return ip != nullptr ? strdup(ip) : nullptr;
 }
 
 std::string dlna_write_protocol_info (const protocol_info_t info)
