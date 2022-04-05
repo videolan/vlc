@@ -64,6 +64,7 @@ vlc_access_cache_entry_New(void *context, const char *url, const char *username,
     return entry;
 }
 
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
 static void *
 vlc_access_cache_Thread(void *data)
 {
@@ -104,7 +105,6 @@ vlc_access_cache_InitOnce(void *data)
 {
     struct vlc_access_cache *cache = data;
 
-#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
     vlc_mutex_lock(&cache->lock);
 
     cache->running = true;
@@ -114,7 +114,6 @@ vlc_access_cache_InitOnce(void *data)
         cache->running = false;
 
     vlc_mutex_unlock(&cache->lock);
-#endif
 }
 
 void
@@ -138,15 +137,19 @@ vlc_access_cache_Destroy(struct vlc_access_cache *cache)
         vlc_access_cache_entry_Delete(entry);
     }
 }
+#endif
 
 void
 vlc_access_cache_AddEntry(struct vlc_access_cache *cache,
                           struct vlc_access_cache_entry *entry)
 {
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
     vlc_once(&cache->once, vlc_access_cache_InitOnce, cache);
+#endif
 
     vlc_mutex_lock(&cache->lock);
 
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
     if (!cache->running)
     {
         vlc_mutex_unlock(&cache->lock);
@@ -154,6 +157,7 @@ vlc_access_cache_AddEntry(struct vlc_access_cache *cache,
         vlc_access_cache_entry_Delete(entry);
         return;
     }
+#endif
 
     struct vlc_access_cache_entry *it;
     size_t count = 0;
@@ -171,7 +175,9 @@ vlc_access_cache_AddEntry(struct vlc_access_cache *cache,
     entry->timeout = vlc_tick_now() + VLC_ACCESS_CACHE_TTL;
     vlc_list_append(&entry->node, &cache->entries);
 
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
     vlc_cond_signal(&cache->cond);
+#endif
     vlc_mutex_unlock(&cache->lock);
 }
 
@@ -179,7 +185,9 @@ struct vlc_access_cache_entry *
 vlc_access_cache_GetEntry(struct vlc_access_cache *cache,
                           const char *url, const char *username)
 {
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
     vlc_once(&cache->once, vlc_access_cache_InitOnce, cache);
+#endif
 
     vlc_mutex_lock(&cache->lock);
 
@@ -193,7 +201,9 @@ vlc_access_cache_GetEntry(struct vlc_access_cache *cache,
          && (username != NULL ? strcmp(username, it->username) == 0 : true))
         {
             vlc_list_remove(&it->node);
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
             vlc_cond_signal(&cache->cond);
+#endif
             vlc_mutex_unlock(&cache->lock);
             return it;
         }

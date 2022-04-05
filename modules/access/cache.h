@@ -38,17 +38,26 @@ struct vlc_access_cache_entry
     struct vlc_list node;
 };
 
+#ifdef __has_attribute
+  #if __has_attribute(destructor)
+    #define VLC_ACCESS_CACHE_CAN_REGISTER
+  #endif
+#endif
+
 struct vlc_access_cache
 {
-    vlc_once_t once;
     vlc_mutex_t lock;
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
+    vlc_once_t once;
     vlc_cond_t cond;
     vlc_thread_t thread;
     bool running;
+#endif
 
     struct vlc_list entries;
 };
 
+#ifdef VLC_ACCESS_CACHE_CAN_REGISTER
 #define VLC_ACCESS_CACHE_INITIALIZER(name) { \
     .once = VLC_STATIC_ONCE, \
     .lock = VLC_STATIC_MUTEX, \
@@ -56,6 +65,12 @@ struct vlc_access_cache
     .running = false, \
     .entries = VLC_LIST_INITIALIZER(&name.entries), \
 }
+#else
+#define VLC_ACCESS_CACHE_INITIALIZER(name) { \
+    .lock = VLC_STATIC_MUTEX, \
+    .entries = VLC_LIST_INITIALIZER(&name.entries), \
+}
+#endif
 
 static inline char *
 vlc_access_cache_entry_CreateSmbUrl(const char *server, const char *share)
@@ -90,9 +105,6 @@ void
 vlc_access_cache_entry_Delete(struct vlc_access_cache_entry *entry);
 
 void
-vlc_access_cache_Destroy(struct vlc_access_cache *cache);
-
-void
 vlc_access_cache_AddEntry(struct vlc_access_cache *cache,
                           struct vlc_access_cache_entry *entry);
 
@@ -116,13 +128,10 @@ vlc_access_cache_GetSmbEntry(struct vlc_access_cache *cache,
     return entry;
 }
 
-#ifdef __has_attribute
-  #if __has_attribute(destructor)
-    #define VLC_ACCESS_CACHE_CAN_REGISTER
-  #endif
-#endif
-
 #ifdef VLC_ACCESS_CACHE_CAN_REGISTER
+void
+vlc_access_cache_Destroy(struct vlc_access_cache *cache);
+
 #define VLC_ACCESS_CACHE_REGISTER(name) \
 static struct vlc_access_cache name = VLC_ACCESS_CACHE_INITIALIZER(name); \
 __attribute__((destructor)) static void vlc_access_cache_destructor_##name(void) \
