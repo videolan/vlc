@@ -109,7 +109,7 @@ FocusScope {
 
         mlModel: albumModelId
         indexes: selectionModel.selectedIndexes
-        defaultCover: VLCStyle.noArtAlbum
+        defaultCover: VLCStyle.noArtAlbumCover
     }
 
     AlbumContextMenu {

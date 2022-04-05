@@ -176,6 +176,8 @@ FocusScope {
         indexes: modelSelect.selectedIndexes
 
         coverRole: "thumbnail"
+
+        defaultCover: VLCStyle.noArtVideoCover
     }
 
     Util.SelectableDelegateModel {

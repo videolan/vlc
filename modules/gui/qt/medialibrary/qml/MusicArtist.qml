@@ -271,7 +271,7 @@ FocusScope {
 
         mlModel: albumModel
         indexes: albumSelectionModel.selectedIndexes
-        defaultCover: VLCStyle.noArtAlbum
+        defaultCover: VLCStyle.noArtAlbumCover
     }
 
     MLAlbumTrackModel {
@@ -434,7 +434,7 @@ FocusScope {
 
                 titleRole: "name"
 
-                defaultCover: VLCStyle.noArtCover
+                defaultCover: VLCStyle.noArtArtistCover
             }
 
             Widgets.TableColumns {

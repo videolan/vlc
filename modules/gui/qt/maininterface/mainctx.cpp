@@ -39,6 +39,8 @@
 
 #include "playlist/playlist_controller.hpp"
 
+#include "dialogs/dialogs_provider.hpp"
+
 #include "videosurface.hpp"
 
 #include "menus/menus.hpp"                            // Menu creation

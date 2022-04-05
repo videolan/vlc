@@ -29,69 +29,14 @@
 # include "config.h"
 #endif
 
-#include "maininterface/mainctx.hpp" /* Interface integration */
-#include "player/player_controller.hpp"  /* Speed control */
-
-#include "dialogs/dialogs_provider.hpp"
-#include "dialogs/mediainfo/info_panels.hpp"
-
-#include <QFrame>
 #include <QLabel>
 
 class QWidget;
-class QTimer;
 class QMouseEvent;
+class MetaPanel;
 
-struct vout_window_t;
-
-/******************** Video Widget ****************/
-class VideoWidget : public QFrame
-{
-    Q_OBJECT
-public:
-    VideoWidget( qt_intf_t *, QWidget* p_parent );
-    virtual ~VideoWidget();
-
-    void request( struct vout_window_t * );
-    void release( void );
-    void sync( void );
-
-protected:
-    QPaintEngine *paintEngine() const Q_DECL_OVERRIDE
-    {
-        return NULL;
-    }
-
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
-    void mousePressEvent(QMouseEvent *) Q_DECL_OVERRIDE;
-    void mouseMoveEvent(QMouseEvent *) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QMouseEvent *) Q_DECL_OVERRIDE;
-    void mouseDoubleClickEvent(QMouseEvent *) Q_DECL_OVERRIDE;
-    QSize physicalSize() const;
-
-private:
-    int qtMouseButton2VLC( Qt::MouseButton );
-    qt_intf_t *p_intf;
-    vout_window_t *p_window;
-
-    QWidget *stable;
-    QLayout *layout;
-    QTimer *cursorTimer;
-    int cursorTimeout;
-
-    void reportSize();
-    void showCursor();
-
-signals:
-    void sizeChanged( int, int );
-
-public slots:
-    void setSize( unsigned int, unsigned int );
-
-private slots:
-    void hideCursor();
-};
+struct qt_intf_t;
+struct input_item_t;
 
 class CoverArtLabel : public QLabel
 {
@@ -102,14 +47,8 @@ public:
     virtual ~CoverArtLabel();
 
 protected:
-    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
-    {
-        if( ! p_item && qobject_cast<MetaPanel *>(this->window()) == NULL )
-        {
-            THEDP->mediaInfoDialog();
-        }
-        event->accept();
-    }
+    virtual void mouseDoubleClickEvent( QMouseEvent *event ) override;
+
 private:
     qt_intf_t *p_intf;
     input_item_t *p_item;

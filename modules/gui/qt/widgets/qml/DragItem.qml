@@ -46,7 +46,7 @@ Item {
     // data from last setData
     readonly property alias indexesData: dragItem._data
 
-    property string defaultCover: VLCStyle.noArtCover
+    property string defaultCover: VLCStyle.noArtAlbumCover
 
     property string defaultText: I18n.qtr("Unknown")
 

@@ -45,6 +45,8 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QTextEdit>
+#include <QApplication>
+#include <QPushButton>
 
 /************************************************************************
  * Single panels

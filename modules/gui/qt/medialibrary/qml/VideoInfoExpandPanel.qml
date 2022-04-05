@@ -103,7 +103,7 @@ FocusScope {
                             id: expand_cover_id
 
                             anchors.fill: parent
-                            source: model.thumbnail || VLCStyle.noArtCover
+                            source: model.thumbnail || VLCStyle.noArtVideoCover
                             radius: VLCStyle.gridCover_radius
                         }
 
