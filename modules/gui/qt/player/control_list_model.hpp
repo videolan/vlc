@@ -57,8 +57,8 @@ public:
         LOOP_BUTTON,
         INFO_BUTTON,
         LANG_BUTTON,
-        MENU_BUTTON,
-        BACK_BUTTON,
+        MENU_BUTTON, // deprecated
+        BACK_BUTTON, // deprecated
         CHAPTER_PREVIOUS_BUTTON,
         CHAPTER_NEXT_BUTTON,
         BUTTON_MAX,
