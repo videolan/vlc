@@ -5,7 +5,7 @@ UPNP_URL := $(GITHUB)/pupnp/pupnp/archive/refs/tags/release-$(UPNP_VERSION).tar.
 ifdef BUILD_NETWORK
 PKGS += upnp
 endif
-ifeq ($(call need_pkg,"libupnp >= 1.6.19"),)
+ifeq ($(call need_pkg,"libupnp >= 1.8.3"),)
 PKGS_FOUND += upnp
 endif
 
