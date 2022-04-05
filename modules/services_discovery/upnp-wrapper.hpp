@@ -39,11 +39,7 @@
 #include <upnp.h>
 #include <upnptools.h>
 
-#if UPNP_VERSION < 10800
-typedef void* UpnpEventPtr;
-#else
 typedef const void* UpnpEventPtr;
-#endif
 
 /**
  * libUpnp allows only one instance per process, so we create a wrapper
@@ -92,30 +88,6 @@ private:
 // **************************
 // Helper functions
 // **************************
-
-#if UPNP_VERSION < 10623
-/*
- * Compat functions and typedefs for libupnp prior to 1.8
- */
-
-typedef Upnp_Discovery UpnpDiscovery;
-typedef Upnp_Action_Complete UpnpActionComplete;
-
-inline const char* UpnpDiscovery_get_Location_cstr( const UpnpDiscovery* p_discovery )
-{
-  return p_discovery->Location;
-}
-
-inline const char* UpnpDiscovery_get_DeviceID_cstr( const UpnpDiscovery* p_discovery )
-{
-  return p_discovery->DeviceId;
-}
-
-inline static IXML_Document* UpnpActionComplete_get_ActionResult( const UpnpActionComplete* p_result )
-{
-  return p_result->ActionResult;
-}
-#endif
 
 /*
  * Returns the value of a child element, or NULL on error
