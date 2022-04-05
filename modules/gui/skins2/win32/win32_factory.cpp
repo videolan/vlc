@@ -87,7 +87,7 @@ LRESULT CALLBACK Win32Factory::Win32Proc( HWND hwnd, UINT uMsg,
             }
             else
             {
-                msg_Dbg( p_intf, "WM_SYSCOMMAND %i", (wParam  & 0xFFF0) );
+                msg_Dbg( p_intf, "WM_SYSCOMMAND %i", (int)(wParam  & 0xFFF0) );
             }
         }
         // Handle systray notifications
