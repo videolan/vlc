@@ -23,6 +23,9 @@
 #ifndef VLC_VIDEOCHROMA_NVDEC_FMT_H_
 #define VLC_VIDEOCHROMA_NVDEC_FMT_H_
 
+#define FFNV_LOG_FUNC(logctx, msg, ...)        msg_Err((vlc_object_t*)logctx, msg, __VA_ARGS__)
+#define FFNV_DEBUG_LOG_FUNC(logctx, msg, ...)  msg_Dbg((vlc_object_t*)logctx, msg, __VA_ARGS__)
+
 #include <ffnvcodec/dynlink_loader.h>
 
 typedef struct {

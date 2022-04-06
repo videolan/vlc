@@ -31,8 +31,6 @@
 #include <vlc_codec.h>
 #include <vlc_plugin.h>
 
-#include <ffnvcodec/dynlink_loader.h>
-
 #include "nvdec_fmt.h"
 
 #include "../../video_output/opengl/interop.h"
