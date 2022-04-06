@@ -22,6 +22,13 @@
 #include "mlbasemodel.hpp"
 #include "mlitemcover.hpp"
 
+namespace
+{
+
+const int VIDEO_THUMBNAIL_COUNT = 2;
+
+}
+
 QString MsToString( int64_t time , bool doShort )
 {
     if (time < 0)
@@ -47,6 +54,39 @@ QString MsToString( int64_t time , bool doShort )
 
 }
 
+QStringList extractMediaThumbnails(vlc_medialibrary_t *p_ml, const int count, const MLItemId &itemID)
+{
+    QStringList thumbnails;
+
+    vlc_ml_query_params_t params;
+
+    memset(&params, 0, sizeof(vlc_ml_query_params_t));
+
+    // NOTE: We retrieve twice the count to maximize our chances to get a valid thumbnail.
+    params.i_nbResults = count * 2;
+
+    ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_media_of(p_ml, &params, itemID.type, itemID.id));
+
+    for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
+    {
+        if (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
+            continue;
+
+        QUrl url(media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
+
+        // NOTE: We only want local files to compose the cover.
+        if (url.isLocalFile() == false)
+            continue;
+
+        thumbnails.append(url.toLocalFile());
+
+        if (thumbnails.count() == count)
+            return thumbnails;
+    }
+
+    return thumbnails;
+}
+
 QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int width, int height,
                            int role )
 {
@@ -69,6 +109,9 @@ QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int widt
     {
         CoverGenerator generator{ ml, itemId };
 
+        generator.setCountX(VIDEO_THUMBNAIL_COUNT);
+        generator.setCountY(VIDEO_THUMBNAIL_COUNT);
+
         generator.setSize(QSize(width, height));
 
         generator.setDefaultThumbnail(":/noart_videoCover.svg");
@@ -76,7 +119,7 @@ QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int widt
         if (generator.cachedFileAvailable())
             ctx.cover = generator.cachedFileURL();
         else
-            ctx.cover = generator.execute();
+            ctx.cover = generator.execute(extractMediaThumbnails(ml, VIDEO_THUMBNAIL_COUNT * VIDEO_THUMBNAIL_COUNT, itemId));
     },
     //UI Thread
     [model, itemId, role]

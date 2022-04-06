@@ -31,6 +31,7 @@
 // Forward declarations
 class MLBaseModel;
 class MLItemCover;
+class MLItemId;
 
 template<typename T>
 class MLDeleter
@@ -76,6 +77,8 @@ MLListRange<T> ml_range_iterate(L& list)
 }
 
 QString MsToString( int64_t time, bool doShort = false );
+
+QStringList extractMediaThumbnails(vlc_medialibrary_t *p_ml, const int count, const MLItemId &itemID);
 
 QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int width, int height,
                            int role );

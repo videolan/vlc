@@ -76,8 +76,7 @@ public: // Interface
 
     QString cachedFileURL() const;
 
-public:
-    QString execute();
+    QString execute(QStringList thumbnails);
 
 private: // Functions
     QString fileName() const;
@@ -89,9 +88,6 @@ private: // Functions
     void blur(QImage &image);
 
     QString getPrefix(vlc_ml_parent_type type) const;
-
-    QStringList getMedias(int count, int64_t id, vlc_ml_parent_type type) const;
-    QStringList getGenre (int count, int64_t id) const;
 
 private:
     vlc_medialibrary_t * m_ml;

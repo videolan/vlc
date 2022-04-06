@@ -33,11 +33,15 @@
 //-------------------------------------------------------------------------------------------------
 // Static variables
 
-// NOTE: We multiply by 2 to cover most dpi settings.
-static const int MLPLAYLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
-static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
 
 namespace  {
+
+// NOTE: We multiply by 2 to cover most dpi settings.
+const int MLPLAYLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
+const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
+
+const int PLAYLIST_COVERX = 2;
+const int PLAYLIST_COVERY = 2;
 
 void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const std::vector<MLItemId>& itemList)
 {
@@ -314,6 +318,9 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
     {
         CoverGenerator generator{ml, playlistId};
 
+        generator.setCountX(PLAYLIST_COVERX);
+        generator.setCountY(PLAYLIST_COVERY);
+
         generator.setSize(coverSize);
 
         if (!coverDefault.isEmpty())
@@ -324,7 +331,7 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
         if (generator.cachedFileAvailable())
             ctx.cover = generator.cachedFileURL();
         else
-            ctx.cover = generator.execute();
+            ctx.cover = generator.execute(extractMediaThumbnails(ml, PLAYLIST_COVERX * PLAYLIST_COVERY, playlistId));
     },
     //UI thread
     [this, playlistId]

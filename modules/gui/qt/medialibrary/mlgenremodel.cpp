@@ -38,6 +38,44 @@ static const int MLGENREMODEL_COVER_BLUR = 4;
 
 //-------------------------------------------------------------------------------------------------
 
+namespace
+{
+
+QStringList getGenreMediaThumbnails(vlc_medialibrary_t* p_ml, const int count, const int64_t id)
+{
+    QStringList thumbnails;
+
+    vlc_ml_query_params_t params;
+
+    memset(&params, 0, sizeof(vlc_ml_query_params_t));
+
+    // NOTE: We retrieve twice the count to maximize our chances to get a valid thumbnail.
+    params.i_nbResults = count * 2;
+
+    ml_unique_ptr<vlc_ml_album_list_t> list(vlc_ml_list_genre_albums(p_ml, &params, id));
+
+    for (const vlc_ml_album_t & album : ml_range_iterate<vlc_ml_album_t>(list))
+    {
+        if (album.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
+            continue;
+
+        QUrl url(album.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
+
+        // NOTE: We only want local files to compose the cover.
+        if (url.isLocalFile() == false)
+            continue;
+
+        thumbnails.append(url.toLocalFile());
+
+        if (thumbnails.count() == count)
+            return thumbnails;
+    }
+
+    return thumbnails;
+}
+
+}
+
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLGenreModel::M_names_to_criteria = {
     {"title", VLC_ML_SORTING_ALPHA}
 };
@@ -172,7 +210,8 @@ QString MLGenreModel::getCover(MLGenre * genre) const
         if (generator.cachedFileAvailable())
             ctx.cover = generator.cachedFileURL();
         else
-            ctx.cover = generator.execute();
+            ctx.cover = generator.execute(getGenreMediaThumbnails(ml, MLGENREMODEL_COVER_COUNTX * MLGENREMODEL_COVER_COUNTY, genreId.id));
+
         vlc_ml_media_set_genre_thumbnail(ml, genreId.id, qtu(ctx.cover), VLC_ML_THUMBNAIL_SMALL);
     },
     //UI thread
