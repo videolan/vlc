@@ -1770,7 +1770,9 @@ static void *DecoderThread( void *p_data )
 
         DecoderThread_ProcessInput( p_owner, p_block );
 
-        if( p_block == NULL && p_owner->dec.fmt_in.i_cat == AUDIO_ES )
+        vlc_mutex_lock( &p_owner->lock );
+        vlc_fifo_Lock( p_owner->p_fifo );
+        if( p_block == NULL && p_owner->dec.fmt_in.i_cat == AUDIO_ES && !p_owner->flushing )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
             if( p_owner->p_aout != NULL )
@@ -1778,8 +1780,6 @@ static void *DecoderThread( void *p_data )
         }
 
         /* TODO? Wait for draining instead of polling. */
-        vlc_mutex_lock( &p_owner->lock );
-        vlc_fifo_Lock( p_owner->p_fifo );
         if( p_owner->b_draining && (p_block == NULL) )
         {
             p_owner->b_draining = false;
