@@ -90,7 +90,6 @@ struct nvdec_ctx {
         int                     vc1_header_offset;
     };
     bool                        b_is_hxxx;
-    int                         i_nb_surface; ///<  number of GPU surfaces allocated
     bool                        b_xps_pushed; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
     block_t *                   (*process_block)(decoder_t *, block_t *);
     cudaVideoDeinterlaceMode    deintMode;
@@ -279,6 +278,28 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
         p_sys->cudecoder = NULL;
     }
 
+    int i_nb_surface;
+    switch (p_dec->fmt_in.i_codec) {
+        case VLC_CODEC_H264:
+        case VLC_CODEC_HEVC:
+        case VLC_CODEC_VC1:
+        case VLC_CODEC_WMV3:
+            i_nb_surface = MAX_HXXX_SURFACES;
+            break;
+        case VLC_CODEC_MP1V:
+        case VLC_CODEC_MP2V:
+        case VLC_CODEC_MPGV:
+        case VLC_CODEC_MP4V:
+        case VLC_CODEC_VP8:
+            i_nb_surface = 3;
+            break;
+        case VLC_CODEC_VP9:
+            i_nb_surface = 10;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
     CUVIDDECODECREATEINFO dparams = {
         .ulWidth             = p_format->coded_width,
         .ulHeight            = p_format->coded_height,
@@ -288,7 +309,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
         .OutputFormat        = MapSurfaceFmt(p_dec->fmt_out.video.i_chroma),
         .CodecType           = p_format->codec,
         .ChromaFormat        = p_format->chroma_format,
-        .ulNumDecodeSurfaces = p_sys->i_nb_surface,
+        .ulNumDecodeSurfaces = __MAX(i_nb_surface, p_format->min_num_decode_surfaces),
         .ulNumOutputSurfaces = 1,
         .DeinterlaceMode     = p_sys->deintMode
     };
@@ -371,7 +392,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
 
     ret = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
-    return (ret == VLC_SUCCESS);
+    return (ret == VLC_SUCCESS) ? i_nb_surface : 0;
 
 cuda_error:
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
@@ -749,7 +770,6 @@ static int OpenDecoder(vlc_object_t *p_this)
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
             p_sys->b_is_hxxx = true;
-            p_sys->i_nb_surface = MAX_HXXX_SURFACES;
             hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
                              p_dec->fmt_in.i_codec, 0, 0);
             result = hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
@@ -776,7 +796,6 @@ static int OpenDecoder(vlc_object_t *p_this)
                 if (p_sys->vc1_header_offset < p_dec->fmt_in.i_extra - 4)
                 {
                     p_sys->process_block = ProcessVC1Block;
-                    p_sys->i_nb_surface = MAX_HXXX_SURFACES;
                     break;
                 }
             }
@@ -786,7 +805,6 @@ static int OpenDecoder(vlc_object_t *p_this)
         case VLC_CODEC_MPGV:
         case VLC_CODEC_MP4V:
         case VLC_CODEC_VP8:
-            p_sys->i_nb_surface = 3;
             break;
         case VLC_CODEC_VP9:
             if (p_dec->fmt_in.i_profile != 0 && p_dec->fmt_in.i_profile != 2)
@@ -794,7 +812,6 @@ static int OpenDecoder(vlc_object_t *p_this)
                 msg_Warn(p_dec, "Unsupported VP9 profile %d", p_dec->fmt_in.i_profile);
                 goto early_exit;
             }
-            p_sys->i_nb_surface = 10;
             break;
         default:
             goto early_exit;
@@ -832,7 +849,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         .CodecType               = MapCodecID(p_dec->fmt_in.i_codec),
         .ulClockRate             = CLOCK_FREQ,
         .ulMaxDisplayDelay       = NVDEC_DISPLAY_SURFACES,
-        .ulMaxNumDecodeSurfaces  = p_sys->i_nb_surface,
+        .ulMaxNumDecodeSurfaces  = 1,
         .pUserData               = p_dec,
         .pfnSequenceCallback     = HandleVideoSequence,
         .pfnDecodePicture        = HandlePictureDecode,
