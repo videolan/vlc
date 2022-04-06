@@ -914,11 +914,12 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             if (SUCCEEDED(hr))
             {
                 ID3D11Texture2D *d3d11Res;
-                void *pv;
-                hr = spDXGIBuffer->GetResource(__uuidof(d3d11Res), &pv);
+                hr = spDXGIBuffer->GetResource(IID_PPV_ARGS(&d3d11Res));
                 if (SUCCEEDED(hr))
                 {
-                    d3d11Res = static_cast<ID3D11Texture2D *>(pv);
+                    D3D11_TEXTURE2D_DESC desc;
+                    d3d11Res->GetDesc(&desc);
+
                     hr = spDXGIBuffer->GetSubresourceIndex(&sliceIndex);
                     if (!p_sys->vctx_out)
                     {
@@ -926,9 +927,6 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                         d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueDevice(dec_dev);
                         if (dev_sys != NULL)
                         {
-                            D3D11_TEXTURE2D_DESC desc;
-                            d3d11Res->GetDesc(&desc);
-
                             p_sys->vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format );
                             vlc_decoder_device_Release(dec_dev);
                             if (unlikely(p_sys->vctx_out == NULL))
@@ -969,6 +967,29 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                                 }
                             }
                             p_sys->cached_tex = d3d11Res;
+                        }
+                    }
+                    else if (desc.ArraySize == 1)
+                    {
+                        assert(sliceIndex == 0);
+
+                        d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(p_sys->vctx_out);
+
+                        ID3D11Texture2D *tex[DXGI_MAX_SHADER_VIEW] = {
+                            d3d11Res, d3d11Res, d3d11Res, d3d11Res
+                        };
+
+                        for (size_t j=0; j < ARRAY_SIZE(p_sys->cachedSRV[sliceIndex]); j++)
+                        {
+                            if (p_sys->cachedSRV[sliceIndex][j] != nullptr)
+                                p_sys->cachedSRV[sliceIndex][j]->Release();
+                        }
+
+                        if (D3D11_AllocateResourceView(p_dec, dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
+                                                       tex, sliceIndex, p_sys->cachedSRV[sliceIndex]) != VLC_SUCCESS)
+                        {
+                            d3d11Res->Release();
+                            goto error;
                         }
                     }
                     else if (p_sys->cached_tex.Get() != d3d11Res)
