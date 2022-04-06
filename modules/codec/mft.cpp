@@ -259,6 +259,8 @@ typedef struct
     const GUID   *guid;
 } pair_format_guid;
 
+DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_AV1, FCC('AV01'));
+
 /*
  * We need this table since the FOURCC used for GUID is not the same
  * as the FOURCC used by VLC, for instance h264 vs H264.
@@ -274,6 +276,7 @@ static const pair_format_guid video_format_table[] =
     { VLC_CODEC_WMV2, &MFVideoFormat_WMV2 },
     { VLC_CODEC_WMV3, &MFVideoFormat_WMV3 },
     { VLC_CODEC_VC1,  &MFVideoFormat_WVC1 },
+    { VLC_CODEC_AV1,  &vlc_MFVideoFormat_AV1 },
     { 0, NULL }
 };
 
