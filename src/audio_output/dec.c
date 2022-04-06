@@ -334,8 +334,6 @@ static void stream_StopResampling(vlc_aout_stream *stream)
     aout_FiltersAdjustResampling (stream->filters, 0);
 }
 
-static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
-                               vlc_tick_t dec_pts);
 static void stream_Silence (vlc_aout_stream *stream, vlc_tick_t length, vlc_tick_t pts)
 {
     audio_output_t *aout = aout_stream_aout(stream);
