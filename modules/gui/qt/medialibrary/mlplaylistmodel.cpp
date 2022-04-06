@@ -340,11 +340,13 @@ QVariant MLPlaylistModel::itemRoleData(MLItem *item, int role) const /* override
         {
             vlc_ml_thumbnail_status_t status;
             QString thumbnail = media->getThumbnail(&status);
-            if (media->getType() == VLC_ML_MEDIA_TYPE_AUDIO
-                && (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE))
+            if ((media->getType() == VLC_ML_MEDIA_TYPE_VIDEO)
+                && (status == VLC_ML_THUMBNAIL_STATUS_MISSING
+                    || status == VLC_ML_THUMBNAIL_STATUS_FAILURE))
             {
                 generateThumbnail(item->getId());
             }
+
             return QVariant::fromValue(thumbnail);
         }
         case MEDIA_DURATION:
