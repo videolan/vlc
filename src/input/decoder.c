@@ -393,6 +393,8 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
                 p_aout = NULL;
             }
         }
+        else
+            p_astream = NULL;
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_aout = p_aout;
