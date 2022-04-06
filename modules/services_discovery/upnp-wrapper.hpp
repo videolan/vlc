@@ -135,9 +135,10 @@ inline bool isAdapterSuitable(IP_ADAPTER_ADDRESSES* p_adapter)
     if (p_adapter->Length == sizeof(IP_ADAPTER_ADDRESSES_XP))
     {
         IP_ADAPTER_ADDRESSES_XP* p_adapter_xp = reinterpret_cast<IP_ADAPTER_ADDRESSES_XP*>( p_adapter );
-        // On Windows Server 2003 and Windows XP, this member is zero if IPv4 is not available on the interface.
+        // On Windows Server 2003 and Windows XP, those members are zero if the IPv* implementation
+        // is not available on the interface.
 #if defined( UPNP_ENABLE_IPV6 )
-        return p_adapter_xp->Ipv6IfIndex != 0;
+        return p_adapter_xp->Ipv6IfIndex != 0 || p_adapter_xp->IfIndex != 0;
 #else
         return p_adapter_xp->IfIndex != 0;
 #endif
@@ -146,7 +147,7 @@ inline bool isAdapterSuitable(IP_ADAPTER_ADDRESSES* p_adapter)
     if (p_adapter_lh->FirstGatewayAddress == NULL)
         return false;
 #if defined( UPNP_ENABLE_IPV6 )
-    return p_adapter_lh->Ipv6Enabled;
+    return p_adapter_lh->Ipv6Enabled || p_adapter_lh->Ipv4Enabled;
 #else
     return p_adapter_lh->Ipv4Enabled;
 #endif
