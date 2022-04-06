@@ -21,11 +21,40 @@
 // MediaLibrary includes
 #include "mlbasemodel.hpp"
 #include "mlitemcover.hpp"
+#include "thumbnailcollector.hpp"
 
 namespace
 {
 
-const int VIDEO_THUMBNAIL_COUNT = 2;
+struct ThumbnailList
+{
+    QSet<int64_t> toGenerate;
+    QStringList existing;
+};
+
+ThumbnailList extractChildMediaThumbnailsOrIDs(vlc_medialibrary_t *p_ml, const int count, const MLItemId &itemID)
+{
+    ThumbnailList result;
+
+    vlc_ml_query_params_t params {};
+    params.i_nbResults = count;
+
+    ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_media_of(p_ml, &params, itemID.type, itemID.id));
+
+    for (const auto &media : ml_range_iterate<vlc_ml_media_t>(list))
+    {
+        const bool isThumbnailAvailable = (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE);
+        if (isThumbnailAvailable)
+        {
+            result.existing.push_back(toValidLocalFile(media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl));
+        } else if (media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
+        {
+            result.toGenerate.insert(media.i_id);
+        }
+    }
+
+    return result;
+}
 
 }
 
@@ -56,77 +85,85 @@ QString MsToString( int64_t time , bool doShort )
 
 QStringList extractMediaThumbnails(vlc_medialibrary_t *p_ml, const int count, const MLItemId &itemID)
 {
-    QStringList thumbnails;
-
-    vlc_ml_query_params_t params;
-
-    memset(&params, 0, sizeof(vlc_ml_query_params_t));
-
     // NOTE: We retrieve twice the count to maximize our chances to get a valid thumbnail.
-    params.i_nbResults = count * 2;
-
-    ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_media_of(p_ml, &params, itemID.type, itemID.id));
-
-    thumbnailCopy(ml_range_iterate<vlc_ml_media_t>(list), std::back_inserter(thumbnails), count);
-
-    return thumbnails;
+    return extractChildMediaThumbnailsOrIDs(p_ml, count * 2, itemID).existing;
 }
 
-QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int width, int height,
-                           int role )
+QString createGroupMediaCover(const MLBaseModel* model, MLItemCover* parent
+                              , int role
+                              , const std::shared_ptr<CoverGenerator> generator)
 {
-    QString cover = item->getCover();
+    QString cover = parent->getCover();
 
     // NOTE: Making sure we're not already generating a cover.
-    if (cover.isNull() == false || item->hasGenerator())
+    if (cover.isNull() == false || parent->hasGenerator())
         return cover;
 
-    MLItemId itemId = item->getId();
+    if (generator->cachedFileAvailable())
+        return generator->cachedFileURL();
 
-    struct Context { QString cover; };
+    MLItemId itemId = parent->getId();
+    parent->setGenerator(true);
 
-    item->setGenerator(true);
-
-    model->ml()->runOnMLThread<Context>(model,
-    //ML thread
-    [itemId, width, height]
-    (vlc_medialibrary_t * ml, Context & ctx)
+    const auto generateCover = [=](const QStringList &childCovers)
     {
-        CoverGenerator generator{ ml, itemId };
+        struct Context { QString cover; };
 
-        generator.setCountX(VIDEO_THUMBNAIL_COUNT);
-        generator.setCountY(VIDEO_THUMBNAIL_COUNT);
+        model->ml()->runOnMLThread<Context>(model,
+            //ML thread
+            [generator, childCovers]
+            (vlc_medialibrary_t * , Context & ctx)
+            {
+                ctx.cover = generator->execute(childCovers);
+            },
+            //UI Thread
+            [model, itemId, role]
+            (quint64, Context & ctx)
+            {
+                int row;
 
-        generator.setSize(QSize(width, height));
+                // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+                auto item = static_cast<MLItemCover *>(model->findInCache(itemId, &row));
+                if (!item)
+                    return;
 
-        generator.setDefaultThumbnail(":/noart_videoCover.svg");
+                item->setCover(ctx.cover);
+                item->setGenerator(false);
 
-        if (generator.cachedFileAvailable())
-            ctx.cover = generator.cachedFileURL();
-        else
-            ctx.cover = generator.execute(extractMediaThumbnails(ml, VIDEO_THUMBNAIL_COUNT * VIDEO_THUMBNAIL_COUNT, itemId));
-    },
-    //UI Thread
-    [model, itemId, role]
-    (quint64, Context & ctx)
-    {
-        int row;
+                QModelIndex modelIndex = model->index(row);
+                emit const_cast<MLBaseModel *>(model)->dataChanged(modelIndex, modelIndex, { role });
+            }
+        );
+    };
 
-        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-        auto item = static_cast<MLItemCover *>(model->findInCache(itemId, &row));
+    model->ml()->runOnMLThread<ThumbnailList>(model,
+        //ML thread (get child thumbnails or ids)
+        [itemId, generator](vlc_medialibrary_t *p_ml, ThumbnailList &ctx)
+        {
+            ctx = extractChildMediaThumbnailsOrIDs(p_ml, generator->requiredNoOfThumbnails(), itemId);
+        }
+        //UI Thread
+        , [=](quint64, ThumbnailList & ctx)
+        {
+            if (ctx.toGenerate.empty())
+            {
+                generateCover(ctx.existing);
+                return;
+            }
 
-        if (!item)
-            return;
+            // request child thumbnail generation, when finished generate the cover
+            auto collector = new ThumbnailCollector(const_cast<MLBaseModel *>(model));
+            QObject::connect(collector, &ThumbnailCollector::finished, model, [=]()
+            {
+                const auto thumbnails = ctx.existing + collector->allGenerated().values();
+                generateCover(thumbnails);
 
-        item->setCover(ctx.cover);
+                collector->deleteLater();
+            });
 
-        item->setGenerator(false);
-
-        QModelIndex modelIndex = model->index(row);
-
-        //we're running in a callback
-        emit const_cast<MLBaseModel *>(model)->dataChanged(modelIndex, modelIndex, { role });
-    });
+            collector->start(model->ml(), ctx.toGenerate);
+        }
+    );
 
     return cover;
 }

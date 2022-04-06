@@ -72,6 +72,8 @@ public: // Interface
     // NOTE: This lets us enforce a specific prefix for the cover fileName.
     void setPrefix(const QString & prefix);
 
+    int requiredNoOfThumbnails() const;
+
     bool cachedFileAvailable() const;
 
     QString cachedFileURL() const;

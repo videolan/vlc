@@ -92,8 +92,15 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
             case VIDEO_TITLE:
                 return QVariant::fromValue(group->getTitle());
             case VIDEO_THUMBNAIL:
-                return getVideoListCover(this, group, MLVIDEOGROUPSMODEL_COVER_WIDTH,
-                                         MLVIDEOGROUPSMODEL_COVER_HEIGHT, VIDEO_THUMBNAIL);
+            {
+                auto generator = std::make_shared<CoverGenerator>(group->getId());
+                generator->setSize(QSize(MLVIDEOGROUPSMODEL_COVER_WIDTH, MLVIDEOGROUPSMODEL_COVER_HEIGHT));
+                generator->setDefaultThumbnail(":/noart_videoCover.svg");
+
+                return createGroupMediaCover(this, group
+                                             , VIDEO_THUMBNAIL
+                                             , generator);
+            }
             case VIDEO_DURATION:
                 return QVariant::fromValue(group->getDuration());
             case GROUP_IS_VIDEO:

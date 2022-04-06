@@ -85,8 +85,13 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
         case FOLDER_TITLE:
             return QVariant::fromValue(folder->getTitle());
         case FOLDER_THUMBNAIL:
-            return getVideoListCover(this, folder, MLVIDEOFOLDERSMODEL_COVER_WIDTH,
-                                     MLVIDEOFOLDERSMODEL_COVER_HEIGHT, FOLDER_THUMBNAIL);
+        {
+            auto generator = std::make_shared<CoverGenerator>(folder->getId());
+            generator->setSize(QSize(MLVIDEOFOLDERSMODEL_COVER_WIDTH, MLVIDEOFOLDERSMODEL_COVER_HEIGHT));
+            generator->setDefaultThumbnail(":/noart_videoCover.svg");
+
+            return createGroupMediaCover(this, folder, FOLDER_THUMBNAIL, generator);
+        }
         case FOLDER_DURATION:
             return QVariant::fromValue(folder->getDuration());
         case FOLDER_COUNT:

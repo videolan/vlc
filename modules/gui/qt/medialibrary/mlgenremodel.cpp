@@ -177,7 +177,7 @@ QString MLGenreModel::getCover(MLGenre * genre) const
     [genreId, coverDefault = m_coverDefault]
     (vlc_medialibrary_t* ml, Context& ctx)
     {
-        CoverGenerator generator{ml, genreId};
+        CoverGenerator generator {genreId};
 
         generator.setSize(QSize(MLGENREMODEL_COVER_WIDTH,
                                  MLGENREMODEL_COVER_HEIGHT));

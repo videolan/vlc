@@ -113,6 +113,11 @@ void CoverGenerator::setPrefix(const QString & prefix)
     m_prefix = prefix;
 }
 
+int CoverGenerator::requiredNoOfThumbnails() const
+{
+    return m_countX * m_countY;
+}
+
 bool CoverGenerator::cachedFileAvailable() const
 {
     return QFile::exists(fileName());

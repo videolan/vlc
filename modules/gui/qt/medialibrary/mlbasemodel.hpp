@@ -39,6 +39,7 @@
 class MLListCache;
 class MediaLib;
 class MLItemCover;
+class CoverGenerator;
 
 class MLBaseModel : public QAbstractListModel
 {
@@ -195,7 +196,9 @@ protected:
     std::shared_ptr<BaseLoader> m_itemLoader;
 
 private: // Friends
-    friend QString getVideoListCover(const MLBaseModel*, MLItemCover*, int, int, int);
+    friend QString createGroupMediaCover(const MLBaseModel* model, MLItemCover* parent
+                                         , int role
+                                         , const std::shared_ptr<CoverGenerator> generator);
 };
 
 #endif // MLBASEMODEL_HPP
