@@ -1852,7 +1852,7 @@ static void *DecoderThread( void *p_data )
         {
             p_owner->b_draining = false;
 
-            if( p_owner->dec.fmt_in->i_cat == AUDIO_ES && p_owner->p_astream != NULL )
+            if( p_owner->dec.fmt_in->i_cat == AUDIO_ES && p_owner->p_astream != NULL && !p_owner->flushing )
             {   /* Draining: the decoder is drained and all decoded buffers are
                  * queued to the output at this point. Now drain the output. */
                 vlc_aout_stream_Drain( p_owner->p_astream );
