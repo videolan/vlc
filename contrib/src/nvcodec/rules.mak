@@ -1,4 +1,4 @@
-NVCODEC_HASH := b6600f507de70d223101fe98f9c3c351b724e2fa
+NVCODEC_HASH := 84483da70d903239d4536763fde8c7e6c4e80784
 NVCODEC_GITURL := https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
 
 ifndef HAVE_DARWIN_OS
@@ -9,6 +9,8 @@ $(TARBALLS)/nvcodec-$(NVCODEC_HASH).tar.xz:
 	$(call download_git,$(NVCODEC_GITURL),,$(NVCODEC_HASH))
 
 .sum-nvcodec: nvcodec-$(NVCODEC_HASH).tar.xz
+	$(call check_githash,$(NVCODEC_HASH))
+	touch $@
 
 nvcodec: nvcodec-$(NVCODEC_HASH).tar.xz .sum-nvcodec
 	$(UNPACK)
