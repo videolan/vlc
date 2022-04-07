@@ -46,6 +46,7 @@
 #include <vlc_charset.h>
 #include <vlc_interrupt.h>
 #include <vlc_keystore.h>
+#include <vlc_strings.h>
 
 #ifndef IPPORT_FTP
 # define IPPORT_FTP 21u
@@ -909,6 +910,43 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
     return i_read;
 }
 
+/**
+ * Parse MLST facts list
+ *
+ * Parses a MLST facts list (without the trailing space/filename)
+ * pointed to by linep and fills the key/value variables.
+ * If a not properly formatted fact is encountered, the
+ * whole fact value will be in key and val will be NULL.
+ *
+ * \note This function modifies the linep pointer, so
+ *       the original value for it must be saved to free
+ *       it once done.
+ * \retval false if at the end of the list
+ * \retval true  if there are more list items to process
+ */
+static bool mlst_facts_iter(char **linep, const char **key, const char **val)
+{
+    // MLST format parsed here is 'key=val;key=val...;'
+    // Lack of trailing ; at the end is accepted too, even though
+    // not permitted by the standard.
+    char *fact = strsep(linep, ";");
+    *key = NULL;
+    *val = NULL;
+
+    if (fact == NULL || fact[0] == '\0')
+        return false;
+
+    // Separate key and value
+    char *sep = strchr(fact, '=');
+    if (sep) {
+        *sep++ = '\0';
+    }
+    *key = fact;
+    *val = sep;
+
+    return true;
+}
+
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
@@ -934,21 +972,30 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
 
         if( p_sys->features.b_mlst )
         {
-            /* MLST Format is key=val;key=val...; FILENAME */
-            if( strstr( psz_line, "type=dir" ) )
-                type = ITEM_TYPE_DIRECTORY;
-            if( strstr( psz_line, "type=file" ) )
-                type = ITEM_TYPE_FILE;
+            const char *key, *val;
+            char *facts = psz_line;
 
-            /* Get the filename or fail */
-            psz_file = strchr( psz_line, ' ' );
-            if( psz_file )
-                psz_file++;
-            else
-            {
-                msg_Warn( p_access, "Empty filename in MLST list" );
+            // Separate MLST and filename
+            psz_file = strchr(psz_line, ' ');
+            if (likely(psz_file)) {
+                *psz_file++ = '\0';
+            } else {
+                msg_Warn( p_access, "No filename in MLST list found" );
                 free( psz_line );
                 continue;
+            }
+
+            while (mlst_facts_iter( &facts, &key, &val )) {
+                if (val == NULL) {
+                    msg_Warn( p_access, "Skipping invalid MLST fact '%s'", key);
+                    continue;
+                }
+                if (!vlc_ascii_strcasecmp( key, "type" )) {
+                    if (!vlc_ascii_strcasecmp( val, "dir" ))
+                        type = ITEM_TYPE_DIRECTORY;
+                    else if (!vlc_ascii_strcasecmp( val, "file" ))
+                        type = ITEM_TYPE_FILE;
+                }
             }
         }
         else
