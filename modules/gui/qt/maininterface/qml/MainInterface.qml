@@ -117,8 +117,6 @@ Item {
 
     DropArea {
         anchors.fill: parent
-        onEntered: console.log("drop Enter")
-        onExited: console.log("drop exit")
         onDropped: {
             if (drop.hasUrls) {
                 var list = []
