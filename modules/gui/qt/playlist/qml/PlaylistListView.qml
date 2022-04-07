@@ -165,7 +165,10 @@ Control {
             indexes = selection
             setData(identifier, indexes.map(function (index) {
                 var item = root.model.itemAt(index)
-                return {"title": item.title, "cover": item.artwork}
+                return {
+                    "title": item.title,
+                    "cover": (!!item.artwork && item.artwork.toString() !== "") ? item.artwork : VLCStyle.noArtAlbumCover
+                }
             }))
         }
     }
