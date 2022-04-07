@@ -321,16 +321,16 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
     // ensure the output surfaces have the same pitch so copies can work properly
     if ( is_nvdec_opaque(p_dec->fmt_out.video.i_chroma) )
     {
-        // get the real decoder pitch
-        CUdeviceptr frameDevicePtr = 0;
-        CUVIDPROCPARAMS params = {
-            .progressive_frame = 1,
-            .top_field_first = 1,
-        };
-        ret = CALL_CUVID( cuvidMapVideoFrame, p_sys->cudecoder, 0, &frameDevicePtr, &p_sys->outputPitch, &params );
+        int tex_alignment;
+        CUdevice cuDev;
+        ret = CALL_CUDA_DEC(cuDeviceGet, &cuDev, 0); // this should come from devsys
         if (ret != VLC_SUCCESS)
             goto cuda_error;
-        CALL_CUVID(cuvidUnmapVideoFrame, p_sys->cudecoder, frameDevicePtr);
+
+        ret = CALL_CUDA_DEC(cuDeviceGetAttribute, &tex_alignment, CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT, cuDev);
+        if (ret != VLC_SUCCESS || tex_alignment < 0)
+            goto cuda_error;
+        p_sys->outputPitch = (p_dec->fmt_out.video.i_width + tex_alignment - 1) / tex_alignment * tex_alignment;
 
         unsigned int ByteWidth = p_sys->outputPitch;
         unsigned int Height = p_dec->fmt_out.video.i_height;
