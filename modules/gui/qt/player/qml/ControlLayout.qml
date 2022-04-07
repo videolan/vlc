@@ -167,7 +167,8 @@ FocusScope {
                     // so it can be set here unlike leftItem and rightItem:
                     item.Navigation.parentItem = controlLayout
 
-                    if (item instanceof Widgets.IconToolButton)
+                    // FIXME: Do we really need to enforce a defaultSize ?
+                    if (item.size !== undefined)
                         item.size = Qt.binding(function() { return defaultSize; })
 
                     // force colors:
