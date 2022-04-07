@@ -21,14 +21,14 @@ import QtQuick 2.11
 import org.videolan.vlc 0.1
 
 Item {
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+O"; onActivated: { enabled = false; DialogsProvider.simpleOpenDialog(); enabled = true } }
+    Shortcut{ context: Qt.WindowShortcut; sequence:"Ctrl+O"; onActivated: { DialogsProvider.simpleOpenDialog()} }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+O"; onActivated: DialogsProvider.openFileDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+F"; onActivated: { enabled = false; DialogsProvider.PLOpenDir(); enabled = true; } }
+    Shortcut{ context: Qt.WindowShortcut; sequence:"Ctrl+F"; onActivated: { DialogsProvider.PLOpenDir(); } }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+D"; onActivated: DialogsProvider.openDiscDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+N"; onActivated: DialogsProvider.openNetDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+C"; onActivated: DialogsProvider.openCaptureDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+V"; onActivated: DialogsProvider.openUrlDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Y"; onActivated: { enabled = false; DialogsProvider.savePlayingToPlaylist(); enabled = true; } }
+    Shortcut{ context: Qt.WindowShortcut; sequence:"Ctrl+Y"; onActivated: { DialogsProvider.savePlayingToPlaylist(); } }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+R"; onActivated: DialogsProvider.openAndTranscodingDialogs(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+S"; onActivated: DialogsProvider.openAndStreamingDialogs(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Q"; onActivated: DialogsProvider.quit(); }
