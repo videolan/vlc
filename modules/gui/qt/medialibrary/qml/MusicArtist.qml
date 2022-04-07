@@ -134,7 +134,7 @@ FocusScope {
                         }
 
                         delegate: Widgets.GridItem {
-                            image: model.cover || VLCStyle.noArtAlbum
+                            image: model.cover || VLCStyle.noArtAlbumCover
                             title: model.title || I18n.qtr("Unknown title")
                             subtitle: model.release_year || ""
                             textAlignHCenter: true

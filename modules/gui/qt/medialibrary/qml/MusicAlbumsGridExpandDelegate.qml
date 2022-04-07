@@ -124,7 +124,7 @@ FocusScope {
                         height: VLCStyle.expandCover_music_height
                         width: VLCStyle.expandCover_music_width
                         radius: VLCStyle.expandCover_music_radius
-                        source: Helpers.get(model, "cover", VLCStyle.noArtAlbum)
+                        source: Helpers.get(model, "cover", VLCStyle.noArtAlbumCover)
                     }
 
                     Widgets.ListCoverShadow {

@@ -157,7 +157,7 @@ FocusScope {
                 height: width / 2
                 pictureWidth: width
                 pictureHeight: height
-                image: model.cover || VLCStyle.noArtAlbum
+                image: model.cover || VLCStyle.noArtAlbumCover
                 playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
                 unselectedUnderlay: shadows.unselected

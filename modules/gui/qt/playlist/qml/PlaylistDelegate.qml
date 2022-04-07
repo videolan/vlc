@@ -136,7 +136,7 @@ T.Control {
 
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtCover
+                source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtAlbumCover
                 visible: !statusIcon.visible
             }
 

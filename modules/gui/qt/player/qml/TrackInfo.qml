@@ -36,7 +36,7 @@ Item {
             Layout.preferredHeight: VLCStyle.heightAlbumCover_small
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             fillMode    : Image.PreserveAspectFit
-            source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString()) ? mainPlaylistController.currentItem.artwork : VLCStyle.noArtCover
+            source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString()) ? mainPlaylistController.currentItem.artwork : VLCStyle.noArtAlbumCover
         }
 
         ColumnLayout {
