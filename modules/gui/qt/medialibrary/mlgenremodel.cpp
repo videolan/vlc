@@ -54,22 +54,7 @@ QStringList getGenreMediaThumbnails(vlc_medialibrary_t* p_ml, const int count, c
 
     ml_unique_ptr<vlc_ml_album_list_t> list(vlc_ml_list_genre_albums(p_ml, &params, id));
 
-    for (const vlc_ml_album_t & album : ml_range_iterate<vlc_ml_album_t>(list))
-    {
-        if (album.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
-            continue;
-
-        QUrl url(album.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
-
-        // NOTE: We only want local files to compose the cover.
-        if (url.isLocalFile() == false)
-            continue;
-
-        thumbnails.append(url.toLocalFile());
-
-        if (thumbnails.count() == count)
-            return thumbnails;
-    }
+    thumbnailCopy(ml_range_iterate<vlc_ml_album_t>(list), std::back_inserter(thumbnails), count);
 
     return thumbnails;
 }

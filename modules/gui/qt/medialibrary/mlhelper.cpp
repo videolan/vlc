@@ -67,22 +67,7 @@ QStringList extractMediaThumbnails(vlc_medialibrary_t *p_ml, const int count, co
 
     ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_media_of(p_ml, &params, itemID.type, itemID.id));
 
-    for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
-    {
-        if (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
-            continue;
-
-        QUrl url(media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
-
-        // NOTE: We only want local files to compose the cover.
-        if (url.isLocalFile() == false)
-            continue;
-
-        thumbnails.append(url.toLocalFile());
-
-        if (thumbnails.count() == count)
-            return thumbnails;
-    }
+    thumbnailCopy(ml_range_iterate<vlc_ml_media_t>(list), std::back_inserter(thumbnails), count);
 
     return thumbnails;
 }
@@ -144,4 +129,10 @@ QString getVideoListCover( const MLBaseModel* model, MLItemCover* item, int widt
     });
 
     return cover;
+}
+
+QString toValidLocalFile(const char *mrl)
+{
+    QUrl url(mrl);
+    return url.isLocalFile() ? url.toLocalFile() : QString {};
 }
