@@ -21,6 +21,7 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_renderer_discoverer.h \
 	../include/vlc/libvlc_picture.h \
 	../include/vlc/libvlc_version.h \
+	../include/vlc/libvlc_video.h \
 	../include/vlc/vlc.h
 
 lib_LTLIBRARIES = libvlc.la

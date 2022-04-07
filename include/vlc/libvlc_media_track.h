@@ -25,6 +25,8 @@
 #ifndef VLC_LIBVLC_MEDIA_TRACK_H
 #define VLC_LIBVLC_MEDIA_TRACK_H 1
 
+# include "libvlc_video.h"
+
 # ifdef __cplusplus
 extern "C" {
 # else
@@ -53,26 +55,6 @@ typedef struct libvlc_audio_track_t
     unsigned    i_rate;
 } libvlc_audio_track_t;
 
-typedef enum libvlc_video_orient_t
-{
-    libvlc_video_orient_top_left,       /**< Normal. Top line represents top, left column left. */
-    libvlc_video_orient_top_right,      /**< Flipped horizontally */
-    libvlc_video_orient_bottom_left,    /**< Flipped vertically */
-    libvlc_video_orient_bottom_right,   /**< Rotated 180 degrees */
-    libvlc_video_orient_left_top,       /**< Transposed */
-    libvlc_video_orient_left_bottom,    /**< Rotated 90 degrees clockwise (or 270 anti-clockwise) */
-    libvlc_video_orient_right_top,      /**< Rotated 90 degrees anti-clockwise */
-    libvlc_video_orient_right_bottom    /**< Anti-transposed */
-} libvlc_video_orient_t;
-
-typedef enum libvlc_video_projection_t
-{
-    libvlc_video_projection_rectangular,
-    libvlc_video_projection_equirectangular, /**< 360 spherical */
-
-    libvlc_video_projection_cubemap_layout_standard = 0x100,
-} libvlc_video_projection_t;
-
 /**
  * Viewpoint
  *
@@ -85,17 +67,6 @@ typedef struct libvlc_video_viewpoint_t
     float f_roll;          /**< view point roll in degrees ]-180;180] */
     float f_field_of_view; /**< field of view in degrees ]0;180[ (default 80.)*/
 } libvlc_video_viewpoint_t;
-
-typedef enum libvlc_video_multiview_t
-{
-    libvlc_video_multiview_2d,                  /**< No stereoscopy: 2D picture. */
-    libvlc_video_multiview_stereo_sbs,          /**< Side-by-side */
-    libvlc_video_multiview_stereo_tb,           /**< Top-bottom */
-    libvlc_video_multiview_stereo_row,          /**< Row sequential */
-    libvlc_video_multiview_stereo_col,          /**< Column sequential */
-    libvlc_video_multiview_stereo_frame,        /**< Frame sequential */
-    libvlc_video_multiview_stereo_checkerboard, /**< Checkerboard pattern */
-} libvlc_video_multiview_t;
 
 typedef struct libvlc_video_track_t
 {

@@ -14,6 +14,7 @@ install_headers(
     'vlc/libvlc_renderer_discoverer.h',
     'vlc/deprecated.h',
     'vlc/libvlc_version.h',
+    'vlc/libvlc_video.h',
     subdir: 'vlc')
 
 # Install VLC plugin headers
