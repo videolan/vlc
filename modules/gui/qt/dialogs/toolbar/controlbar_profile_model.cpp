@@ -54,7 +54,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::WIDGET_SPACER,
                                     ControlListModel::RECORD_BUTTON,
                                     ControlListModel::WIDGET_SPACER,
-                                    ControlListModel::TELETEXT_BUTTONS,
+                                    ControlListModel::NAVIGATION_BUTTONS,
                                     ControlListModel::WIDGET_SPACER,
                                     ControlListModel::PLAYLIST_BUTTON,
                                     ControlListModel::WIDGET_SPACER,
