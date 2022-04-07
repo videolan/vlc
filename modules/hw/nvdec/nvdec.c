@@ -104,7 +104,7 @@ struct nvdec_ctx {
     vlc_video_context           *vctx_out;
 };
 
-#define CALL_CUDA_DEC(func, ...) CudaCheckErr(VLC_OBJECT(p_dec),  p_sys->devsys->cudaFunctions, p_sys->devsys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA_DEC(func, ...) CudaCheckErr(VLC_OBJECT(p_dec),  devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
 #define CALL_CUDA_DEV(func, ...) CudaCheckErr(VLC_OBJECT(device), p_sys->cudaFunctions, p_sys->cudaFunctions->func(__VA_ARGS__), #func)
 #define CALL_CUVID(func, ...)    CudaCheckErr(VLC_OBJECT(p_dec),  p_sys->devsys->cudaFunctions, p_sys->cuvidFunctions->func(__VA_ARGS__), #func)
 
@@ -248,6 +248,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
 {
     decoder_t *p_dec = (decoder_t *) p_opaque;
     nvdec_ctx_t *p_sys = p_dec->p_sys;
+    decoder_device_nvdec_t *devsys = p_sys->devsys;
     int ret;
 
     if ( is_nvdec_opaque(p_dec->fmt_out.video.i_chroma) )
@@ -405,9 +406,10 @@ static int CUDAAPI HandlePictureDecode(void *p_opaque, CUVIDPICPARAMS *p_picpara
 {
     decoder_t *p_dec = (decoder_t *) p_opaque;
     nvdec_ctx_t *p_sys = p_dec->p_sys;
+    decoder_device_nvdec_t *devsys = p_sys->devsys;
     int ret;
 
-    ret = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
+    ret = CALL_CUDA_DEC(cuCtxPushCurrent, devsys->cuCtx);
     if (ret != VLC_SUCCESS)
         return 0;
 
@@ -421,6 +423,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
 {
     decoder_t *p_dec = (decoder_t *) p_opaque;
     nvdec_ctx_t *p_sys = p_dec->p_sys;
+    decoder_device_nvdec_t *devsys = p_sys->devsys;
     picture_t *p_pic = NULL;
     CUdeviceptr frameDevicePtr = 0;
     CUVIDPROCPARAMS params = {
@@ -729,7 +732,8 @@ static cudaVideoChromaFormat MapChomaIDC(uint8_t chroma_idc)
 static int ProbeDecoder(decoder_t *p_dec, uint8_t bitDepth, cudaVideoChromaFormat chroma)
 {
     nvdec_ctx_t *p_sys = p_dec->p_sys;
-    int result = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
+    decoder_device_nvdec_t *devsys = p_sys->devsys;
+    int result = CALL_CUDA_DEC(cuCtxPushCurrent, devsys->cuCtx);
     if (unlikely(result != VLC_SUCCESS))
         return result;
 
@@ -1027,7 +1031,8 @@ static void CloseDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *) p_this;
     nvdec_ctx_t *p_sys = p_dec->p_sys;
-    CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
+    decoder_device_nvdec_t *devsys = p_sys->devsys;
+    CALL_CUDA_DEC(cuCtxPushCurrent, devsys->cuCtx);
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
 
     if (p_sys->cudecoder)
