@@ -250,7 +250,6 @@ QtObject {
     readonly property int delayToolTipAppear: 500
 
     //default arts
-    readonly property url noArtCover: "qrc:///noart.png";
     readonly property url noArtAlbum: "qrc:///noart_album.svg";
     readonly property url noArtArtist: "qrc:///noart_artist.svg";
     readonly property url noArtArtistSmall: "qrc:///noart_artist_small.svg";
