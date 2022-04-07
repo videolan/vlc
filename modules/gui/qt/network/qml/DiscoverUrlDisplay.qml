@@ -95,6 +95,15 @@ FocusScope {
 
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: searchFieldContainer.Navigation.defaultKeyAction(event)
+
+                //ideally we should use Keys.onShortcutOverride but it doesn't
+                //work with TextField before 5.13 see QTBUG-68711
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                        MainCtx.useGlobalShortcuts = false
+                    else
+                        MainCtx.useGlobalShortcuts = true
+                }
             }
         }
 

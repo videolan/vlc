@@ -130,6 +130,15 @@ FocusScope {
             Navigation.rightItem: clearButton.visible ? clearButton : iconButton
             Navigation.cancelAction: function() { root.state = "" }
 
+            //ideally we should use Keys.onShortcutOverride but it doesn't
+            //work with TextField before 5.13 see QTBUG-68711
+            onActiveFocusChanged: {
+                if (activeFocus)
+                    MainCtx.useGlobalShortcuts = false
+                else
+                    MainCtx.useGlobalShortcuts = true
+            }
+
             Keys.priority: Keys.AfterItem
             Keys.onPressed: {
                 //we don't want Navigation.cancelAction to match Backspace
