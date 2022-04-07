@@ -862,6 +862,12 @@ void VLCMenuBar::updateSystrayMenu( MainCtx *mi,
 {
     /* Get the systray menu and clean it */
     QMenu *sysMenu = mi->getSysTrayMenu();
+    // explictly delete submenus, see QTBUG-11070
+    for (QAction *action : sysMenu->actions()) {
+        if (action->menu()) {
+            delete action->menu();
+        }
+    }
     sysMenu->clear();
 
 #ifndef Q_OS_MAC
