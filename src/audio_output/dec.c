@@ -234,10 +234,12 @@ error:
 void vlc_aout_stream_Delete (vlc_aout_stream *stream)
 {
     audio_output_t *aout = aout_stream_aout(stream);
+    aout_owner_t *owner = aout_stream_owner(stream);
 
     if (stream->mixer_format.i_format)
     {
         stream_Reset(stream);
+        vlc_audio_meter_Reset(&owner->meter, NULL);
         if (stream->filters)
             aout_FiltersDelete (aout, stream->filters);
         aout_OutputDelete (aout);
