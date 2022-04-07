@@ -173,6 +173,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool smoothScroll READ smoothScroll NOTIFY smoothScrollChanged FINAL)
     Q_PROPERTY(QWindow* intfMainWindow READ intfMainWindow CONSTANT FINAL)
     Q_PROPERTY(QScreen* screen READ screen NOTIFY screenChanged)
+    Q_PROPERTY(bool useGlobalShortcuts READ getUseGlobalShortcuts WRITE setUseGlobalShortcuts NOTIFY useGlobalShortcutsChanged FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -252,6 +253,8 @@ public:
     inline bool hasAcrylicSurface() const { return m_hasAcrylicSurface; }
     inline void reloadFromSettings() { loadFromSettingsImpl(true); }
     inline QScreen* screen() const { return intfMainWindow()->screen(); }
+    inline bool getUseGlobalShortcuts() const { return m_useGlobalShortcuts; }
+    void setUseGlobalShortcuts(bool useGlobalShortcuts );
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -333,6 +336,7 @@ protected:
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
     bool                 m_pinVideoControls = false;
+    bool                 m_useGlobalShortcuts = true;
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
@@ -427,6 +431,8 @@ signals:
     void preferHotkeysChanged();
 
     void screenChanged();
+
+    void useGlobalShortcutsChanged( bool );
 
 private:
     void loadPrefs(bool callSignals);

@@ -246,6 +246,14 @@ bool MainCtx::hasFirstrun() const {
     return config_GetInt( "qt-privacy-ask" );
 }
 
+void MainCtx::setUseGlobalShortcuts( bool useShortcuts )
+{
+    if (m_useGlobalShortcuts == useShortcuts)
+        return;
+    m_useGlobalShortcuts = useShortcuts;
+    emit useGlobalShortcutsChanged(m_useGlobalShortcuts);
+}
+
 /*****************************
  *   Main UI handling        *
  *****************************/

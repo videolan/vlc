@@ -789,6 +789,7 @@ libqt_plugin_la_QML = \
 	gui/qt/menus/qml/GlobalShortcuts.qml \
 	gui/qt/menus/qml/GlobalShortcutsMedialib.qml \
 	gui/qt/menus/qml/Menubar.qml \
+	gui/qt/menus/qml/ShortcutExt.qml \
 	gui/qt/network/qml/AddressbarButton.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/DiscoverUrlDisplay.qml \
