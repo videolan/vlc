@@ -66,7 +66,6 @@ class VideoSurface : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
-    Q_PROPERTY(QSize sourceSize READ getSourceSize NOTIFY sourceSizeChanged FINAL)
     Q_PROPERTY(Qt::CursorShape cursorShape READ getCursorShape WRITE setCursorShape RESET unsetCursor FINAL)
 
 public:
@@ -74,8 +73,6 @@ public:
 
     MainCtx* getCtx();
     void setCtx(MainCtx* ctx);
-
-    QSize getSourceSize() const;
 
 protected:
     int qtMouseButton2VLC( Qt::MouseButton qtButton );
@@ -100,7 +97,6 @@ protected:
 
 signals:
     void ctxChanged(MainCtx*);
-    void sourceSizeChanged(QSize);
     void surfaceSizeChanged(QSizeF);
     void surfacePositionChanged(QPointF);
 
@@ -120,8 +116,6 @@ protected slots:
 private:
     MainCtx* m_ctx = nullptr;
 
-    bool m_sourceSizeChanged = false;
-    QSize m_sourceSize;
     QPointF m_oldHoverPos;
 
     VideoSurfaceProvider* m_provider = nullptr;

@@ -150,11 +150,6 @@ void VideoSurface::setCtx(MainCtx* ctx)
     emit ctxChanged(ctx);
 }
 
-QSize VideoSurface::getSourceSize() const
-{
-    return m_sourceSize;
-}
-
 int VideoSurface::qtMouseButton2VLC( Qt::MouseButton qtButton )
 {
     switch( qtButton )
@@ -206,9 +201,7 @@ void VideoSurface::hoverMoveEvent(QHoverEvent* event)
     QPointF current_pos = event->posF();
     if (current_pos != m_oldHoverPos)
     {
-        float scaleW = m_sourceSize.width() / width();
-        float scaleH = m_sourceSize.height() / height();
-        emit mouseMoved(current_pos.x() * scaleW, current_pos.y() * scaleH);
+        emit mouseMoved(current_pos.x(), current_pos.y());
         m_oldHoverPos = current_pos;
     }
     event->accept();
