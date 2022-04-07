@@ -25,11 +25,23 @@
 #ifndef VLC_LIBVLC_MEDIA_PLAYER_H
 #define VLC_LIBVLC_MEDIA_PLAYER_H 1
 
+/* Definitions of enum properties for video */
+#include "libvlc_video.h"
+
 # ifdef __cplusplus
 extern "C" {
 # else
 #  include <stdbool.h>
 # endif
+
+typedef struct libvlc_video_viewpoint_t libvlc_video_viewpoint_t;
+typedef enum libvlc_media_slave_type_t libvlc_media_slave_type_t;
+typedef struct libvlc_media_t libvlc_media_t;
+typedef struct libvlc_media_track_t libvlc_media_track_t;
+typedef struct libvlc_media_tracklist_t libvlc_media_tracklist_t;
+typedef enum libvlc_track_type_t libvlc_track_type_t;
+typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
+typedef enum libvlc_state_t libvlc_state_t;
 
 /** \defgroup libvlc_media_player LibVLC media player
  * \ingroup libvlc
