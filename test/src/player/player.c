@@ -2752,6 +2752,8 @@ test_audio_loudness_meter_cb(vlc_tick_t date, double momentary_loudness,
 static void
 test_audio_loudness_meter(struct ctx *ctx)
 {
+    test_log("test_audio_loudness_meter\n");
+
     vlc_player_t *player = ctx->player;
 
     static const union vlc_player_metadata_cbs cbs = {
