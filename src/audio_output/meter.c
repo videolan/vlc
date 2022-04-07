@@ -103,16 +103,19 @@ vlc_audio_meter_AddPlugin(struct vlc_audio_meter *meter, const char *chain,
     if (plugin->name == NULL)
         goto error;
 
+    vlc_mutex_lock(&meter->lock);
     if (meter->fmt != NULL)
     {
         plugin->filter = vlc_audio_meter_CreatePluginFilter(meter, plugin);
         if (plugin->filter == NULL)
+        {
+            vlc_mutex_unlock(&meter->lock);
             goto error;
+        }
 
         assert(plugin->filter->ops->drain_audio == NULL); /* Not supported */
     }
 
-    vlc_mutex_lock(&meter->lock);
     vlc_list_append(&plugin->node, &meter->plugins);
     vlc_mutex_unlock(&meter->lock);
 
@@ -153,9 +156,9 @@ vlc_audio_meter_Reset(struct vlc_audio_meter *meter, const audio_sample_format_t
 {
     int ret = VLC_SUCCESS;
 
-    meter->fmt = fmt;
-
     vlc_mutex_lock(&meter->lock);
+
+    meter->fmt = fmt;
 
     /* Reload every plugins using the new fmt */
     vlc_audio_meter_plugin *plugin;
