@@ -169,6 +169,8 @@ bool AV1_get_colorimetry( const av1_OBU_sequence_header_t *,
 bool AV1_get_frame_rate(const av1_OBU_sequence_header_t *, unsigned *, unsigned *);
 vlc_fourcc_t AV1_get_chroma(const av1_OBU_sequence_header_t *);
 
+bool AV1_sequence_header_equal(const av1_OBU_sequence_header_t *,const av1_OBU_sequence_header_t *);
+
 
 
 /* FRAME_HEADER properties */
