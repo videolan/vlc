@@ -23,9 +23,17 @@
 #ifndef LIBVLC_MEDIA_LIST_PLAYER_H
 #define LIBVLC_MEDIA_LIST_PLAYER_H 1
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_media.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif
+
+typedef struct libvlc_instance_t libvlc_instance_t;
+typedef struct libvlc_media_player_t libvlc_media_player_t;
+typedef struct libvlc_media_list_t libvlc_media_list_t;
+typedef struct libvlc_media_t libvlc_media_t;
 
 /** \defgroup libvlc_media_list_player LibVLC media list player
  * \ingroup libvlc
