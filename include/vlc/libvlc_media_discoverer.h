@@ -29,6 +29,8 @@
 extern "C" {
 # endif
 
+typedef struct libvlc_media_list_t libvlc_media_list_t;
+
 /**
  * Category of a media discoverer
  * \see libvlc_media_discoverer_list_get()
