@@ -657,3 +657,88 @@ size_t AV1_create_DecoderConfigurationRecord(uint8_t **pp_buffer,
     *pp_buffer = p_buffer;
     return i_buffer;
 }
+
+bool AV1_sequence_header_equal(const av1_OBU_sequence_header_t *seq1,const av1_OBU_sequence_header_t *seq2)
+{
+#define DIFF(field) \
+        seq1->field != seq2->field ||
+
+    if (
+        DIFF(obu_header.obu_type)
+        DIFF(obu_header.temporal_id)
+        DIFF(obu_header.spatial_id)
+        DIFF(seq_profile)
+        DIFF(still_picture)
+        DIFF(reduced_still_picture_header)
+        DIFF(timing_info_present_flag)
+        DIFF(timing_info.num_units_in_display_tick)
+        DIFF(timing_info.time_scale)
+        DIFF(timing_info.equal_picture_interval)
+        DIFF(timing_info.num_ticks_per_picture_minus_1)
+        DIFF(decoder_model_info_present_flag)
+        DIFF(decoder_model_info.buffer_delay_length_minus_1)
+        DIFF(decoder_model_info.num_units_in_decoding_tick)
+        DIFF(decoder_model_info.buffer_removal_time_length_minus_1)
+        DIFF(decoder_model_info.frame_presentation_time_length_minus_1)
+        DIFF(initial_display_delay_present_flag)
+        DIFF(operating_points_cnt_minus_1)
+        DIFF(max_frame_width_minus_1)
+        DIFF(max_frame_height_minus_1)
+        DIFF(frame_id_numbers_present_flag)
+        DIFF(delta_frame_id_length_minus_2)
+        DIFF(additional_frame_id_length_minus_1)
+        DIFF(use_128x128_superblock)
+        DIFF(enable_filter_intra)
+        DIFF(enable_intra_edge_filter)
+
+        DIFF(enable_interintra_compound)
+        DIFF(enable_masked_compound)
+        DIFF(enable_warped_motion)
+        DIFF(enable_dual_filter)
+        DIFF(enable_order_hint)
+        DIFF(enable_jnt_comp)
+        DIFF(enable_ref_frame_mvs)
+        DIFF(seq_force_screen_content_tools)
+        DIFF(seq_force_integer_mv)
+        DIFF(order_hint_bits_minus_1)
+
+        DIFF(enable_superres)
+        DIFF(enable_cdef)
+        DIFF(enable_restoration)
+        DIFF(color_config.high_bitdepth)
+        DIFF(color_config.twelve_bit)
+        DIFF(color_config.mono_chrome)
+        DIFF(color_config.color_description_present_flag)
+        DIFF(color_config.color_primaries)
+        DIFF(color_config.transfer_characteristics)
+        DIFF(color_config.matrix_coefficients)
+        DIFF(color_config.color_range)
+        DIFF(color_config.subsampling_x)
+        DIFF(color_config.subsampling_y)
+        DIFF(color_config.chroma_sample_position)
+        DIFF(color_config.separate_uv_delta_q)
+        DIFF(color_config.i_chroma)
+        DIFF(film_grain_params_present)
+        false
+    )
+        return false;
+
+    for (size_t i=0; i<ARRAY_SIZE(seq1->operating_points); i++)
+    {
+        if (
+            DIFF(operating_points[i].operating_point_idc)
+            DIFF(operating_points[i].seq_level_idx)
+            DIFF(operating_points[i].seq_tier)
+            DIFF(operating_points[i].decoder_model_present_for_this_op)
+            DIFF(operating_points[i].operating_parameters_info.decoder_buffer_delay)
+            DIFF(operating_points[i].operating_parameters_info.encoder_buffer_delay)
+            DIFF(operating_points[i].operating_parameters_info.low_delay_mode_flag)
+            DIFF(operating_points[i].initial_display_delay_present_for_this_op)
+            DIFF(operating_points[i].initial_display_delay_minus_1)
+            false
+        )
+            return false;
+    }
+
+    return true;
+}
