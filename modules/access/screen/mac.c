@@ -148,7 +148,7 @@ int screen_InitCapture(demux_t *p_demux)
     return VLC_SUCCESS;
 }
 
-static static void screen_CloseCapture(screen_data_t *p_data)
+static void screen_CloseCapture(screen_data_t *p_data)
 {
     if (p_data->offscreen_context)
         CFRelease(p_data->offscreen_context);
