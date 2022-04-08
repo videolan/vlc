@@ -561,6 +561,8 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
     {
         video_format_t v1 = p_fmt1->video;
         video_format_t v2 = p_fmt2->video;
+        if( p_fmt1->i_profile != p_fmt2->i_profile )
+            return false;
         if( !v1.i_chroma )
             v1.i_chroma = vlc_fourcc_GetCodec( p_fmt1->i_cat, p_fmt1->i_codec );
         if( !v2.i_chroma )
