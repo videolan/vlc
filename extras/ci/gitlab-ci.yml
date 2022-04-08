@@ -375,6 +375,7 @@ nightly-snap:
         else
             EXTRA_BUILD_FLAGS="-c -p"
         fi
+        export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
         ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS -a $HOST_ARCH -k $VLC_SDK_PATH $NIGHTLY_EXTRA_BUILD_FLAGS
 
