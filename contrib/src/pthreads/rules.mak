@@ -1,6 +1,6 @@
 # winpthreads, dxvahd
 
-MINGW64_VERSION := 9.0.0
+MINGW64_VERSION := 10.0.0
 MINGW64_URL := https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v$(MINGW64_VERSION).tar.bz2/download
 MINGW64_HASH=2c35e8ff0d33916bd490e8932cba2049cd1af3d0
 MINGW64_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
@@ -32,13 +32,13 @@ $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 	$(call download_pkg,$(MINGW64_URL),winpthreads)
 
-# .sum-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2
-.sum-pthreads: mingw-w64-$(MINGW64_HASH).tar.xz
-	$(call check_githash,$(MINGW64_HASH))
-	touch $@
+.sum-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2
+# .sum-pthreads: mingw-w64-$(MINGW64_HASH).tar.xz
+# 	$(call check_githash,$(MINGW64_HASH))
+# 	touch $@
 
-# pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
-pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
+pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
+# pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
 	$(UNPACK)
 	$(APPLY) $(SRC)/pthreads/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
 	$(APPLY) $(SRC)/pthreads/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
