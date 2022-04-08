@@ -141,10 +141,11 @@ static const struct vlc_display_operations ops = {
 static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_sys_t *sys = calloc (1, sizeof(*sys));
 
     if (vd->cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
+
+    vout_display_sys_t *sys = vlc_obj_calloc (vd, 1, sizeof(*sys));
 
     if (!sys)
         return VLC_ENOMEM;
@@ -294,8 +295,6 @@ static void Close(vout_display_t *vd)
             [glView removeFromSuperview];
             [glView release];
         });
-
-        free (sys);
     }
 }
 
