@@ -663,6 +663,11 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                     memcpy( es_fmt.p_extra, p_extra, i_extra );
                 }
             }
+            else if ( cp->codec_id == AV_CODEC_ID_AV1 )
+            {
+                // raw AV1, we need a packetizer to detect configuration changes
+                es_fmt.b_packetized = false;
+            }
 
             p_track->p_es = es_out_Add( p_demux->out, &es_fmt );
             if( p_track->p_es && (s->disposition & AV_DISPOSITION_DEFAULT) )
