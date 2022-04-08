@@ -40,7 +40,7 @@ FocusScope{
     property int groupAlignment: TopBar.GroupAlignment.Vertical
     property Item _currentTitleText: null
 
-    signal tooglePlaylistVisibility()
+    signal togglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock, var source)
 
     implicitHeight: topcontrollerMouseArea.implicitHeight
@@ -284,7 +284,7 @@ FocusScope{
 
             Navigation.parentItem: topFocusScope
             Navigation.leftItem: menuSelector
-            onClicked: tooglePlaylistVisibility()
+            onClicked: togglePlaylistVisibility()
         }
     }
 }

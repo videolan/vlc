@@ -118,6 +118,29 @@ FocusScope {
         }
     }
 
+    PlayerPlaylistVisiblityFSM {
+        id: playlistVisibility
+
+        onShowPlaylist: {
+            rootPlayer.lockUnlockAutoHide(true, playlistVisibility)
+            MainCtx.playlistVisible = true
+        }
+
+        onHidePlaylist: {
+            rootPlayer.lockUnlockAutoHide(false, playlistVisibility)
+            MainCtx.playlistVisible = false
+        }
+    }
+
+    Connections {
+        target: MainCtx
+
+        //playlist
+        onPlaylistDockedChanged: playlistVisibility.updatePlaylistDocked()
+        onPlaylistVisibleChanged: playlistVisibility.updatePlaylistVisible()
+        onHasEmbededVideoChanged: playlistVisibility.updateVideoEmbed()
+    }
+
     VideoSurface {
         id: videoSurface
 
@@ -354,12 +377,7 @@ FocusScope {
                 Navigation.parentItem: rootPlayer
                 Navigation.downItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
-                onTooglePlaylistVisibility: {
-                    if (MainCtx.playlistDocked)
-                        playlistpopup.showPlaylist = !playlistpopup.showPlaylist
-                    else
-                        MainCtx.playlistVisible = !MainCtx.playlistVisible
-                }
+                onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
                 onRequestLockUnlockAutoHide: {
                     rootPlayer.lockUnlockAutoHide(lock, source)
@@ -576,7 +594,7 @@ FocusScope {
         }
         focus: false
         edge: Widgets.DrawerExt.Edges.Right
-        state: showPlaylist && MainCtx.playlistDocked ? "visible" : "hidden"
+        state: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
         component: Rectangle {
             color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
             width: (rootPlayer.width + playlistView.rightPadding) / 4
@@ -599,7 +617,7 @@ FocusScope {
                 Navigation.cancelAction: closePlaylist
 
                 function closePlaylist() {
-                    playlistpopup.showPlaylist = false
+                    playlistVisibility.togglePlaylistVisibility()
                     if (audioControls.visible)
                         audioControls.forceActiveFocus()
                     else
