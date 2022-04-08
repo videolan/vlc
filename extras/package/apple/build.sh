@@ -323,7 +323,7 @@ set_host_envvars()
     local bitcode_flag=""
     if [ "$VLC_USE_BITCODE" -gt "0" ]; then
         clike_flags+=" $VLC_BITCODE_FLAG"
-        bitcode_flag=" $VLC_BTICODE_FLAG"
+        bitcode_flag=" $VLC_BITCODE_FLAG"
     fi
 
     export CPPFLAGS="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
@@ -367,10 +367,6 @@ write_config_mak()
 {
     # Flags to be used for C-like compilers (C, C++, Obj-C)
     local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
-    if [ "$VLC_USE_BITCODE" -gt "0" ]; then
-        # We use bitcode for contribs in every case, no dylib or executable built from them
-        clike_flags+=" -fembed-bitcode"
-    fi
 
     local vlc_cppflags="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
     local vlc_cflags="$clike_flags"
@@ -632,6 +628,10 @@ mkdir -p "$VLC_CONTRIB_INSTALL_DIR"
 # Write config.mak with flags for the build and compiler overrides
 # Set flag to error on partial availability
 write_config_mak "-Werror=partial-availability"
+
+if [ "$VLC_USE_BITCODE" -gt "0" ]; then
+    VLC_CONTRIB_OPTIONS+=" --enable-bitcode"
+fi
 
 # Bootstrap contribs
 ../bootstrap \
