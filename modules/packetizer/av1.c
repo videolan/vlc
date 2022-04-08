@@ -52,6 +52,7 @@ typedef struct
 
     block_t *p_sequence_header_block;
     av1_OBU_sequence_header_t *p_sequence_header;
+    bool b_sequence_header_changed;
     struct
     {
         bool b_has_visible_frame;
@@ -116,7 +117,8 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
     unsigned wnum, hden;
     AV1_get_frame_max_dimensions(p_sys->p_sequence_header, &wnum, &hden);
     if((!p_dec->fmt_in.video.i_visible_height ||
-        !p_dec->fmt_in.video.i_visible_width) &&
+        !p_dec->fmt_in.video.i_visible_width ||
+        p_sys->b_sequence_header_changed) &&
        (p_dec->fmt_out.video.i_visible_width != wnum ||
         p_dec->fmt_out.video.i_visible_width != hden))
     {
@@ -153,6 +155,12 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
         p_dec->fmt_out.video.color_range = full;
     }
 
+    if (p_sys->b_sequence_header_changed && p_dec->fmt_out.p_extra)
+    {
+        free(p_dec->fmt_out.p_extra);
+        p_dec->fmt_out.i_extra = 0;
+    }
+
     if(!p_dec->fmt_in.i_extra && !p_dec->fmt_out.i_extra)
     {
         p_dec->fmt_out.i_extra =
@@ -162,6 +170,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
                                                       (const uint8_t **)&p_sys->p_sequence_header_block->p_buffer,
                                                       &p_sys->p_sequence_header_block->i_buffer);
     }
+    p_sys->b_sequence_header_changed = false;
 }
 
 static block_t * OutputQueues(decoder_t *p_dec, bool b_valid)
@@ -289,9 +298,21 @@ static block_t *ParseOBUBlock(decoder_t *p_dec, block_t *p_obu)
                     p_sys->p_sequence_header_block = block_Duplicate(p_obu);
                 }
 
-                if(p_sys->p_sequence_header)
-                    AV1_release_sequence_header(p_sys->p_sequence_header);
-                p_sys->p_sequence_header = AV1_OBU_parse_sequence_header(p_obu->p_buffer, p_obu->i_buffer);
+                av1_OBU_sequence_header_t *new_seq_header;
+                new_seq_header = AV1_OBU_parse_sequence_header(p_obu->p_buffer, p_obu->i_buffer);
+                if (likely(new_seq_header))
+                {
+                    if (!p_sys->p_sequence_header ||
+                        !AV1_sequence_header_equal(p_sys->p_sequence_header, new_seq_header))
+                    {
+                        if (p_sys->p_sequence_header)
+                        {
+                            AV1_release_sequence_header(p_sys->p_sequence_header);
+                            p_sys->b_sequence_header_changed = true;
+                        }
+                        p_sys->p_sequence_header = new_seq_header;
+                    }
+                }
             }
             PUSHQ(tu.pre, p_obu);
         } break;
@@ -383,6 +404,7 @@ static void PacketizeFlush(decoder_t *p_dec)
     {
         AV1_release_sequence_header(p_sys->p_sequence_header);
         p_sys->p_sequence_header = NULL;
+        p_sys->b_sequence_header_changed = true;
     }
     if(p_sys->p_sequence_header_block)
     {
@@ -531,6 +553,7 @@ static int Open(vlc_object_t *p_this)
     INITQ(obus);
     p_sys->p_sequence_header_block = NULL;
     p_sys->p_sequence_header = NULL;
+    p_sys->b_sequence_header_changed = false;
     p_sys->tu.b_has_visible_frame = false;
     p_sys->tu.dts = VLC_TICK_INVALID;
     p_sys->tu.pts = VLC_TICK_INVALID;
