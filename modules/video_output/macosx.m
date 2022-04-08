@@ -105,7 +105,6 @@ typedef struct vout_display_sys_t
     VLCOpenGLVideoView *glView;
     id<VLCVideoViewEmbedding> container;
 
-    vout_window_t *embed;
     vlc_gl_t *gl;
     vout_display_opengl_t *vgl;
 
@@ -156,13 +155,11 @@ static int Open (vout_display_t *vd,
             msg_Err (vd, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
 
         vd->sys = sys;
-        sys->embed = NULL;
         sys->vgl = NULL;
         sys->gl = NULL;
 
         /* Get the drawable object */
         id container = vd->cfg->window->handle.nsobject;
-        sys->embed = vd->cfg->window;
         assert(container != nil);
 
         /* This will be released in Close(), on
