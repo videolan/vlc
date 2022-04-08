@@ -315,7 +315,7 @@ static block_t *ParseOBUBlock(decoder_t *p_dec, block_t *p_obu)
                     if(p_fh)
                     {
                         if((p_sys->i_seen & AV1_OBU_TEMPORAL_DELIMITER) && p_sys->tu.b_has_visible_frame)
-                            p_output = OutputQueues(p_dec, p_sys->p_sequence_header != NULL);
+                            p_output = OutputQueues(p_dec, true);
 
                         switch(AV1_get_frame_type(p_fh))
                         {
