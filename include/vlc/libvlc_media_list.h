@@ -23,6 +23,8 @@
 #ifndef LIBVLC_MEDIA_LIST_H
 #define LIBVLC_MEDIA_LIST_H 1
 
+typedef struct libvlc_media_t libvlc_media_t;
+
 # ifdef __cplusplus
 extern "C" {
 # endif
