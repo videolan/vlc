@@ -36,6 +36,11 @@ Window {
     title: I18n.qtr("Playlist")
     color: VLCStyle.colors.bg
 
+    Loader {
+        asynchronous: true
+        source: "qrc:///menus/GlobalShortcuts.qml"
+    }
+
     Component.onCompleted: {
         if (!!parentWindow) {
             height = parentWindow.height
