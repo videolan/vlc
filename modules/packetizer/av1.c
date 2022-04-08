@@ -224,7 +224,7 @@ static block_t *GatherAndValidateChain(decoder_t *p_dec, block_t *p_outputchain)
     if(p_outputchain)
     {
 #ifdef DEBUG_AV1_PACKETIZER
-        msg_Dbg(p_dec, "TU output %ld", p_outputchain->i_dts);
+        msg_Dbg(p_dec, "TU output %" PRId64, p_outputchain->i_dts);
         for(block_t *p = p_outputchain; p; p=p->p_next)
         {
             enum av1_obu_type_e OBUtype = AV1_OBUGetType(p->p_buffer);
@@ -237,7 +237,7 @@ static block_t *GatherAndValidateChain(decoder_t *p_dec, block_t *p_outputchain)
                                                       p_sys->p_sequence_header);
                     if(p_fh)
                     {
-                        msg_Dbg(p_dec,"OBU TYPE %d sz %ld dts %ld type %d %d",
+                        msg_Dbg(p_dec,"OBU TYPE %d sz %zu dts %" PRId64 " type %d %d",
                                 OBUtype, p->i_buffer, p->i_dts,
                                 AV1_get_frame_type(p_fh),
                                 AV1_get_frame_visibility(p_fh));
@@ -245,7 +245,7 @@ static block_t *GatherAndValidateChain(decoder_t *p_dec, block_t *p_outputchain)
                     AV1_release_frame_header(p_fh);
                 }
             }
-            else msg_Dbg(p_dec, "OBU TYPE %d sz %ld dts %ld", OBUtype, p->i_buffer, p->i_dts);
+            else msg_Dbg(p_dec, "OBU TYPE %d sz %zu dts %" PRId64, OBUtype, p->i_buffer, p->i_dts);
         }
 #endif
         if(p_outputchain->i_flags & BLOCK_FLAG_DROP)
