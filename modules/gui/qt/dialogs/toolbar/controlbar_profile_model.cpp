@@ -56,10 +56,11 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::WIDGET_SPACER,
                                     ControlListModel::NAVIGATION_BUTTONS,
                                     ControlListModel::WIDGET_SPACER,
-                                    ControlListModel::PLAYLIST_BUTTON,
-                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PLAYLIST_BUTTON
+                                }, {},
+                                {
                                     ControlListModel::VOLUME
-                                }, {}, {}
+                                }
                             }
                         }
                     },
@@ -78,10 +79,11 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::WIDGET_SPACER,
                                     ControlListModel::NAVIGATION_BUTTONS,
                                     ControlListModel::WIDGET_SPACER,
-                                    ControlListModel::PLAYLIST_BUTTON,
-                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PLAYLIST_BUTTON
+                                }, {},
+                                {
                                     ControlListModel::VOLUME
-                                }, {}, {}
+                                }
                             }
                         }
                     },
@@ -90,11 +92,14 @@ decltype (ControlbarProfileModel::m_defaults)
                         {
                             {
                                 {
+                                    ControlListModel::ARTWORK_INFO
+                                },
+                                {
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::STOP_BUTTON,
                                     ControlListModel::NEXT_BUTTON
-                                }, {}, {}
+                                }, {}
                             }
                         }
                     }
@@ -119,15 +124,15 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::PLAYLIST_BUTTON,
                                     ControlListModel::EXTENDED_BUTTON,
                                     ControlListModel::WIDGET_SPACER,
-                                    ControlListModel::WIDGET_SPACER,
                                     ControlListModel::RECORD_BUTTON,
                                     ControlListModel::SNAPSHOT_BUTTON,
                                     ControlListModel::ATOB_BUTTON,
                                     ControlListModel::FRAME_BUTTON
                                 },
+                                {},
                                 {
                                     ControlListModel::VOLUME
-                                }, {}
+                                }
                             }
                         }
                     },
@@ -146,15 +151,15 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::PLAYLIST_BUTTON,
                                     ControlListModel::EXTENDED_BUTTON,
                                     ControlListModel::WIDGET_SPACER,
-                                    ControlListModel::WIDGET_SPACER,
                                     ControlListModel::RECORD_BUTTON,
                                     ControlListModel::SNAPSHOT_BUTTON,
                                     ControlListModel::ATOB_BUTTON,
                                     ControlListModel::FRAME_BUTTON
                                 },
+                                {},
                                 {
                                     ControlListModel::VOLUME
-                                }, {}
+                                }
                             }
                         }
                     },
@@ -163,13 +168,16 @@ decltype (ControlbarProfileModel::m_defaults)
                         {
                             {
                                 {
+                                    ControlListModel::ARTWORK_INFO
+                                },
+                                {
                                     ControlListModel::RANDOM_BUTTON,
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::STOP_BUTTON,
                                     ControlListModel::NEXT_BUTTON,
                                     ControlListModel::LOOP_BUTTON
-                                }, {}, {}
+                                }, {}
                             }
                         }
                     }
@@ -220,10 +228,13 @@ decltype (ControlbarProfileModel::m_defaults)
                         {
                             {
                                 {
+                                    ControlListModel::ARTWORK_INFO
+                                },
+                                {
                                     ControlListModel::PREVIOUS_BUTTON,
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::NEXT_BUTTON
-                                }, {}, {}
+                                }, {}
                             }
                         }
                     }
@@ -288,6 +299,9 @@ decltype (ControlbarProfileModel::m_defaults)
                         {
                             {
                                 {
+                                    ControlListModel::ARTWORK_INFO
+                                },
+                                {
                                     ControlListModel::PLAY_BUTTON,
                                     ControlListModel::WIDGET_SPACER,
                                     ControlListModel::PREVIOUS_BUTTON,
@@ -301,7 +315,6 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::LOOP_BUTTON,
                                     ControlListModel::RANDOM_BUTTON
                                 },
-                                {},
                                 {
                                     ControlListModel::VOLUME
                                 }
