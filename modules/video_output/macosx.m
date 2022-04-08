@@ -161,16 +161,9 @@ static int Open (vout_display_t *vd,
         sys->gl = NULL;
 
         /* Get the drawable object */
-        id container = var_CreateGetAddress (vd, "drawable-nsobject");
-        if (!container) {
-            sys->embed = vd->cfg->window;
-            container = sys->embed->handle.nsobject;
-
-            if (!container) {
-                msg_Err(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
-                goto error;
-            }
-        }
+        id container = vd->cfg->window->handle.nsobject;
+        sys->embed = vd->cfg->window;
+        assert(container != nil);
 
         /* This will be released in Close(), on
          * main thread, after we are done using it. */
