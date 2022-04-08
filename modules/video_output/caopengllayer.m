@@ -225,7 +225,7 @@ static int Open (vout_display_t *vd,
             outputSize = [container currentOutputSize];
         else
             outputSize = [sys->container visibleRect].size;
-        vout_window_ReportSize(sys->embed, (int)outputSize.width, (int)outputSize.height);
+        vout_window_ReportSize(vd->cfg->window, (int)outputSize.width, (int)outputSize.height);
 
         return VLC_SUCCESS;
 
@@ -433,10 +433,7 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     CGSize boundsSize = self.visibleRect.size;
 
     if (_voutDisplay)
-    {
-        vout_display_sys_t *sys = _voutDisplay->sys;
-        vout_window_ReportSize(sys->embed, boundsSize.width, boundsSize.height);
-    }
+        vout_window_ReportSize(_voutDisplay->cfg->window, boundsSize.width, boundsSize.height);
 }
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
