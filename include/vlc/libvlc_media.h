@@ -25,6 +25,7 @@
 #ifndef VLC_LIBVLC_MEDIA_H
 #define VLC_LIBVLC_MEDIA_H 1
 
+#include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media_track.h>
 
 # ifdef __cplusplus
