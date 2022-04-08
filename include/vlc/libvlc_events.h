@@ -24,6 +24,11 @@
 #ifndef LIBVLC_EVENTS_H
 #define LIBVLC_EVENTS_H 1
 
+# include <vlc/libvlc.h>
+# include <vlc/libvlc_picture.h>
+# include <vlc/libvlc_media_track.h>
+# include <vlc/libvlc_media.h>
+
 /**
  * \file
  * This file defines libvlc_event external API
@@ -37,6 +42,10 @@ extern "C" {
 
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
 typedef struct libvlc_title_description_t libvlc_title_description_t;
+typedef struct libvlc_picture_t libvlc_picture_t;
+typedef struct libvlc_picture_list_t libvlc_picture_list_t;
+typedef struct libvlc_media_t libvlc_media_t;
+typedef struct libvlc_media_list_t libvlc_media_list_t;
 
 /**
  * \ingroup libvlc_event
