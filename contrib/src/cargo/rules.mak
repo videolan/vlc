@@ -2,7 +2,7 @@
 
 RUST_VERSION=1.59.0
 CARGOC_VERSION=0.9.7
-RUSTUP_VERSION=1.22.1
+RUSTUP_VERSION=1.24.3
 RUSTUP_URL=https://github.com/rust-lang/rustup/archive/$(RUSTUP_VERSION).tar.gz
 
 RUSTUP = . $(CARGO_HOME)/env && \
