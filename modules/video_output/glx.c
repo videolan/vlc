@@ -44,7 +44,7 @@ typedef struct vlc_gl_sys_t
     Display *display;
     GLXWindow win;
     GLXContext ctx;
-    bool restore_forget_gravity;
+    Window x11_win;
 } vlc_gl_sys_t;
 
 static int MakeCurrent (vlc_gl_t *gl)
@@ -61,6 +61,22 @@ static void ReleaseCurrent (vlc_gl_t *gl)
     vlc_gl_sys_t *sys = gl->sys;
 
     glXMakeContextCurrent (sys->display, None, None, NULL);
+}
+
+static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (MakeCurrent(gl) == VLC_SUCCESS) {
+        glXWaitGL();
+        unsigned long init_serial = LastKnownRequestProcessed(sys->display);
+        unsigned long resize_serial = NextRequest(sys->display);
+        XResizeWindow(sys->display, sys->x11_win, width, height);
+        glXWaitX();
+        if (LastKnownRequestProcessed(sys->display) - init_serial < resize_serial - init_serial)
+            XSync(sys->display, False);
+        ReleaseCurrent(gl);
+    }
 }
 
 static void SwapBuffers (vlc_gl_t *gl)
@@ -121,12 +137,6 @@ static void Close(vlc_gl_t *gl)
 
     glXDestroyContext(dpy, sys->ctx);
     glXDestroyWindow(dpy, sys->win);
-    if (sys->restore_forget_gravity) {
-        XSetWindowAttributes swa;
-        swa.bit_gravity = ForgetGravity;
-        XChangeWindowAttributes (dpy, gl->surface->handle.xid, CWBitGravity,
-                                 &swa);
-    }
     XCloseDisplay(dpy);
     free(sys);
 }
@@ -159,6 +169,22 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     XWindowAttributes wa;
     if (!XGetWindowAttributes (dpy, gl->surface->handle.xid, &wa))
         goto error;
+
+    XSetWindowAttributes swa;
+    unsigned long mask =
+        CWBackPixel |
+        CWBorderPixel |
+        CWBitGravity |
+        CWColormap;
+    swa.background_pixel = BlackPixelOfScreen(wa.screen);
+    swa.border_pixel = BlackPixelOfScreen(wa.screen);
+    swa.bit_gravity = NorthWestGravity;
+    swa.colormap = DefaultColormapOfScreen(wa.screen);
+    sys->x11_win = XCreateWindow(dpy, gl->surface->handle.xid, 0, 0,
+                                 width, height, 0,
+                                 DefaultDepthOfScreen(wa.screen), InputOutput,
+                                 DefaultVisualOfScreen(wa.screen), mask, &swa);
+    XMapWindow(dpy, sys->x11_win);
 
     const int snum = XScreenNumberOfScreen (wa.screen);
     const VisualID visual = XVisualIDFromVisual (wa.visual);
@@ -203,7 +229,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     }
 
     /* Create a drawing surface */
-    sys->win = glXCreateWindow (dpy, conf, gl->surface->handle.xid, NULL);
+    sys->win = glXCreateWindow (dpy, conf, sys->x11_win, NULL);
     if (sys->win == None)
     {
         msg_Err (obj, "cannot create GLX window");
@@ -219,22 +245,12 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         goto error;
     }
 
-    /* Set bit gravity if necessary */
-    if (wa.bit_gravity == ForgetGravity) {
-        XSetWindowAttributes swa;
-        swa.bit_gravity = NorthWestGravity;
-        XChangeWindowAttributes (dpy, gl->surface->handle.xid, CWBitGravity,
-                                 &swa);
-        sys->restore_forget_gravity = true;
-    } else
-        sys->restore_forget_gravity = false;
-
     /* Initialize OpenGL callbacks */
     static const struct vlc_gl_operations gl_ops =
     {
         .make_current = MakeCurrent,
         .release_current = ReleaseCurrent,
-        .resize = NULL,
+        .resize = Resize,
         .swap = SwapBuffers,
         .get_proc_address = GetSymbol,
         .close = Close,
@@ -278,7 +294,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         var_SetString(gl->surface, "gl", "glx");
     }
 
-    (void) width; (void) height;
     return VLC_SUCCESS;
 
 error:
