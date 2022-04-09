@@ -54,11 +54,11 @@ typedef struct vlc_gl_sys_t
     EGLContext context;
 #if defined (USE_PLATFORM_X11)
     Display *x11;
-    bool restore_forget_gravity;
+    Window x11_win;
 #endif
 #if defined (USE_PLATFORM_XCB)
     xcb_connection_t *conn;
-    bool restore_forget_gravity;
+    xcb_window_t xcb_win;
 #endif
 #if defined (USE_PLATFORM_WAYLAND)
     struct wl_egl_window *window;
@@ -106,6 +106,41 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     vlc_gl_sys_t *sys = gl->sys;
 
     wl_egl_window_resize(sys->window, width, height, 0, 0);
+}
+#elif defined(USE_PLATFORM_X11)
+static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+    EGLint val;
+
+    if (MakeCurrent(gl) == VLC_SUCCESS) {
+        eglWaitClient();
+        unsigned long init_serial = LastKnownRequestProcessed(sys->x11);
+        unsigned long resize_serial = NextRequest(sys->x11);
+        XResizeWindow(sys->x11, sys->x11_win, width, height);
+        eglQuerySurface(sys->display, sys->surface, EGL_HEIGHT, &val); /* force Mesa to see new size in time for next draw */
+        eglWaitNative(EGL_CORE_NATIVE_ENGINE);
+        if (LastKnownRequestProcessed(sys->x11) - init_serial < resize_serial - init_serial)
+            XSync(sys->x11, False);
+        ReleaseCurrent(gl);
+    }
+}
+#elif defined(USE_PLATFORM_XCB)
+static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+    EGLint val;
+
+    if (MakeCurrent(gl) == VLC_SUCCESS) {
+        eglWaitClient();
+        uint16_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+        const uint32_t values[] = { width, height };
+        xcb_void_cookie_t cookie = xcb_configure_window_checked(sys->conn, sys->xcb_win, mask, values);
+        eglQuerySurface(sys->display, sys->surface, EGL_HEIGHT, &val); /* force Mesa to see new size in time for next draw */
+        eglWaitNative(EGL_CORE_NATIVE_ENGINE);
+        free(xcb_request_check(sys->conn, cookie));
+        ReleaseCurrent(gl);
+    }
 }
 #else
 # define Resize (NULL)
@@ -200,26 +235,11 @@ static void Close(vlc_gl_t *gl)
         eglTerminate(sys->display);
     }
 #ifdef USE_PLATFORM_X11
-    if (sys->x11 != NULL) {
-        if (sys->restore_forget_gravity) {
-            vlc_window_t *wnd = gl->surface;
-            XSetWindowAttributes swa;
-            swa.bit_gravity = ForgetGravity;
-            XChangeWindowAttributes(sys->x11, wnd->handle.xid, CWBitGravity,
-                                    &swa);
-        }
+    if (sys->x11 != NULL)
         XCloseDisplay(sys->x11);
-    }
 #elif defined (USE_PLATFORM_XCB)
-    if (sys->conn != NULL) {
-        if (sys->restore_forget_gravity) {
-            const uint32_t values[] = { XCB_GRAVITY_BIT_FORGET };
-
-            xcb_change_window_attributes(sys->conn, gl->surface->handle.xid,
-                                         XCB_CW_BIT_GRAVITY, values);
-        }
+    if (sys->conn != NULL)
         xcb_disconnect(sys->conn);
-    }
 #endif
 #ifdef USE_PLATFORM_WAYLAND
     if (sys->window != NULL)
@@ -271,7 +291,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     if (wnd->type != VLC_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
         goto error;
 
-    window = &wnd->handle.xid;
     sys->x11 = XOpenDisplay(wnd->display.x11);
     if (sys->x11 == NULL)
         goto error;
@@ -281,17 +300,25 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         XWindowAttributes wa;
         XSetWindowAttributes swa;
 
-        sys->restore_forget_gravity = false;
         if (!XGetWindowAttributes(sys->x11, wnd->handle.xid, &wa))
             goto error;
         snum = XScreenNumberOfScreen(wa.screen);
-        if (wa.bit_gravity == ForgetGravity) {
-            swa.bit_gravity = NorthWestGravity;
-            XChangeWindowAttributes(sys->x11, wnd->handle.xid, CWBitGravity,
-                                    &swa);
-            sys->restore_forget_gravity = true;
-        }
+        unsigned long mask =
+            CWBackPixel |
+            CWBorderPixel |
+            CWBitGravity |
+            CWColormap;
+        swa.background_pixel = BlackPixelOfScreen(wa.screen);
+        swa.border_pixel = BlackPixelOfScreen(wa.screen);
+        swa.bit_gravity = NorthWestGravity;
+        swa.colormap = DefaultColormapOfScreen(wa.screen);
+        sys->x11_win = XCreateWindow(
+                sys->x11, wnd->handle.xid, 0, 0, width, height, 0,
+                DefaultDepthOfScreen(wa.screen), InputOutput,
+                DefaultVisualOfScreen(wa.screen), mask, &swa);
+        XMapWindow(sys->x11, sys->x11_win);
     }
+    window = &sys->x11_win;
 # ifdef EGL_EXT_platform_x11
     if (CheckClientExt("EGL_EXT_platform_x11"))
     {
@@ -310,14 +337,12 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
             sys->display = eglGetDisplay(sys->x11);
 # endif
     }
-    (void) width; (void) height;
 
 #elif defined (USE_PLATFORM_XCB)
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
 
     sys->conn = NULL;
-    sys->restore_forget_gravity = false;
 
     if (wnd->type != VLC_WINDOW_TYPE_XID)
         goto error;
@@ -329,16 +354,32 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     ret = vlc_xcb_parent_Create(gl->obj.logger, wnd, &conn, &scr);
     if (ret == VLC_SUCCESS)
     {
+        sys->xcb_win = xcb_generate_id(conn);
         xcb_get_window_attributes_reply_t *r =
             xcb_get_window_attributes_reply(conn,
                 xcb_get_window_attributes(conn, wnd->handle.xid), NULL);
 
-        if (r != NULL && r->bit_gravity == XCB_GRAVITY_BIT_FORGET) {
-            const uint32_t values[] = { XCB_GRAVITY_NORTH_WEST };
-
-            xcb_change_window_attributes(sys->conn, gl->surface->handle.xid,
-                                         XCB_CW_BIT_GRAVITY, values);
-            sys->restore_forget_gravity = true;
+        if (r != NULL) {
+            uint32_t mask =
+                XCB_CW_BACK_PIXEL |
+                XCB_CW_BORDER_PIXEL |
+                XCB_CW_BIT_GRAVITY |
+                XCB_CW_COLORMAP;
+            const uint32_t values[] = {
+                /* XCB_CW_BACK_PIXEL */
+                scr->black_pixel,
+                /* XCB_CW_BORDER_PIXEL */
+                scr->black_pixel,
+                /* XCB_CW_BIT_GRAVITY */
+                XCB_GRAVITY_NORTH_WEST,
+                /* XCB_CW_COLORMAP */
+                scr->default_colormap,
+            };
+            xcb_create_window(conn, scr->root_depth, sys->xcb_win,
+                              wnd->handle.xid, 0, 0, width, height, 0,
+                              XCB_WINDOW_CLASS_INPUT_OUTPUT, scr->root_visual,
+                              mask, values);
+            xcb_map_window(conn, sys->xcb_win);
         }
         free(r);
     }
@@ -346,7 +387,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         goto error;
 
     sys->conn = conn;
-    window = &wnd->handle.xid;
+    window = &sys->xcb_win;
 
     {
         const EGLint attrs[] = {
@@ -357,7 +398,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         createSurface = CreateWindowSurfaceEXT;
     }
 # endif
-    (void) width; (void) height;
 
 #elif defined (USE_PLATFORM_WAYLAND)
     sys->window = NULL;
