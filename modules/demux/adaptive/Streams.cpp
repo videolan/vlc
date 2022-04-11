@@ -459,7 +459,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
             }
             else
             {
-                msg_Dbg(p_realdemux, "Waiting sync reference for seq %ld", currentSequence);
+                msg_Dbg(p_realdemux, "Waiting sync reference for seq %" PRIu64, currentSequence);
                 vlc_mutex_unlock(&lock);
                 return BufferingStatus::Suspended;
             }
