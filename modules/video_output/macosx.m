@@ -112,6 +112,7 @@ typedef struct vout_display_sys_t
     bool has_first_frame;
 
     vout_display_cfg_t cfg;
+    vout_display_place_t place;
 } vout_display_sys_t;
 
 struct gl_sys
@@ -237,10 +238,6 @@ static int Open (vout_display_t *vd,
 
         vd->ops = &ops;
 
-        /* */
-        // FIXME: this call leads to a fatal mutex locking error in vout_ChangeDisplaySize()
-        // vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
-
         return VLC_SUCCESS;
 
     error:
@@ -337,11 +334,14 @@ static int Control (vout_display_t *vd, int query)
     @autoreleasepool {
         switch (query)
         {
+            /* We handle the resizing ourselves, nothing to report either. */
+            case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+                return VLC_SUCCESS;
+
             case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
             case VOUT_DISPLAY_CHANGE_ZOOM:
             case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             {
                 /* we always use our current frame here, because we have some size constraints
                  in the ui vout provider */
@@ -365,11 +365,10 @@ static int Control (vout_display_t *vd, int query)
 
                 /* For resize, we call glViewport in reshape and not here.
                  This has the positive side effect that we avoid erratic sizing as we animate every resize. */
-                if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                    // x / y are top left corner, but we need the lower left one
-                    vout_display_opengl_Viewport(sys->vgl, place.x,
-                                                 cfg_tmp.display.height - (place.y + place.height),
-                                                 place.width, place.height);
+                // x / y are top left corner, but we need the lower left one
+                vout_display_opengl_Viewport(sys->vgl, place.x,
+                                             cfg_tmp.display.height - (place.y + place.height),
+                                             place.width, place.height);
                 vlc_gl_ReleaseCurrent (sys->gl);
 
                 return VLC_SUCCESS;
@@ -615,10 +614,8 @@ static void OpenglSwap (vlc_gl_t *gl)
             vout_display_sys_t *sys = vd->sys;
             sys->cfg.display.width  = bounds.size.width;
             sys->cfg.display.height = bounds.size.height;
-
             vout_display_PlacePicture(&place, vd->source, &sys->cfg);
-            // FIXME: this call leads to a fatal mutex locking error in vout_ChangeDisplaySize()
-            // vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
+            sys->place = place;
         }
     }
 
