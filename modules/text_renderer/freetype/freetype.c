@@ -273,20 +273,22 @@ static FT_Vector GetAlignedOffset( const line_desc_t *p_line,
                                    int i_align )
 {
     FT_Vector offsets = { 0, 0 };
+
+    /* aligns left to textbbox's min first */
+    offsets.x = p_textbbox->xMin - p_line->bbox.xMin;
+
     const int i_text_width = p_textbbox->xMax - p_textbbox->xMin;
     if ( p_line->i_width < i_text_width &&
         (i_align & SUBPICTURE_ALIGN_LEFT) == 0 )
     {
         /* Left offset to take into account alignment */
         if( i_align & SUBPICTURE_ALIGN_RIGHT )
-            offsets.x = ( i_text_width - p_line->i_width );
+            offsets.x += ( i_text_width - p_line->i_width );
         else /* center */
-            offsets.x = ( i_text_width - p_line->i_width ) / 2;
+            offsets.x += ( i_text_width - p_line->i_width ) / 2;
     }
-    else
-    {
-        offsets.x = p_textbbox->xMin - p_line->bbox.xMin;
-    }
+    /* else already left aligned */
+
     return offsets;
 }
 
