@@ -39,6 +39,8 @@
 #include <QKeyEvent>
 #include "widgets/native/customwidgets.hpp"
 
+#include <algorithm>
+
 static void DialogCallback( extension_dialog_t *p_ext_dialog,
                             void *p_data );
 
@@ -493,8 +495,8 @@ void ExtensionDialog::UpdateWidgets()
         }
         else if( col < 0 )
             col = layout->columnCount();
-        int hsp = __MAX( 1, p_widget->i_horiz_span );
-        int vsp = __MAX( 1, p_widget->i_vert_span );
+        int hsp = std::max( 1, p_widget->i_horiz_span );
+        int vsp = std::max( 1, p_widget->i_vert_span );
         if( !p_widget->p_sys_intf && !p_widget->b_kill )
         {
             widget = CreateWidget( p_widget );
