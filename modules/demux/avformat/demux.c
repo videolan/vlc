@@ -57,6 +57,13 @@
 # define AVF_MAYBE_CONST
 #endif
 
+#if (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(57, 80, 100))
+static void avio_context_free(AVIOContext **io)
+{
+    av_freep(io);
+}
+#endif
+
 struct avformat_track_s
 {
     es_out_id_t *p_es;
@@ -392,7 +399,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                  vlc_strerror_c(AVUNERROR(error)) );
         av_dict_free( &options );
         av_free( pb->buffer );
-        av_free( pb );
+        avio_context_free( &pb );
         p_sys->ic = NULL;
         avformat_CloseDemux( p_this );
         return VLC_EGENERIC;
@@ -775,7 +782,7 @@ void avformat_CloseDemux( vlc_object_t *p_this )
         if( p_sys->ic->pb )
         {
             av_free( p_sys->ic->pb->buffer );
-            av_free( p_sys->ic->pb );
+            avio_context_free( &p_sys->ic->pb );
         }
         avformat_close_input( &p_sys->ic );
     }
