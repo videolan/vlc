@@ -47,7 +47,7 @@ static const char * ID3TextConv( const uint8_t *p_buf, size_t i_buf,
                     psz = p_alloc = (char *) malloc( i_buf + 1 );
                     if( p_alloc )
                     {
-                        memcpy( p_alloc, p_buf, i_buf - 1 );
+                        memcpy( p_alloc, p_buf, i_buf );
                         p_alloc[i_buf] = '\0';
                     }
                 }
