@@ -1478,7 +1478,6 @@ Stop(audio_output_t *p_aout)
 static int
 Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
-    UInt32                  i_param_size = 0;
     aout_sys_t              *p_sys = NULL;
 
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
@@ -1528,7 +1527,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                                  CFRangeMake(0, count), deviceNumber))
         {
             /* Check if the desired device is alive and usable */
-            i_param_size = sizeof(b_alive);
             int ret = AO_GET1PROP(p_sys->i_selected_dev, int, &b_alive,
                                   kAudioDevicePropertyDeviceIsAlive,
                                   kAudioObjectPropertyScopeGlobal);
