@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+#include <algorithm>
+
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include <vlc_picture.h>
@@ -709,7 +711,7 @@ int DBMSDIOutput::ProcessAudio(block_t *p_block)
         msg_Err(p_stream, "Failed to schedule audio sample:0x%" PRIHR, result);
     else
     {
-        lasttimestamp = __MAX(p_block->i_pts, lasttimestamp);
+        lasttimestamp = std::max(p_block->i_pts, lasttimestamp);
         if (sampleFrameCount != written)
             msg_Err(p_stream, "Written only %d samples out of %d", written, sampleFrameCount);
     }
@@ -828,7 +830,7 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
                 picture->date, result);
         goto error;
     }
-    lasttimestamp = __MAX(scheduleTime, lasttimestamp);
+    lasttimestamp = std::max(scheduleTime, lasttimestamp);
 
     if(!b_running) /* preroll */
     {
