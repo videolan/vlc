@@ -78,6 +78,13 @@ else
 FFMPEGCONF += --disable-encoders --disable-muxers
 endif
 
+# Postproc
+MAYBE_POSTPROC =
+ifdef GPL
+FFMPEGCONF += --enable-gpl --enable-postproc
+MAYBE_POSTPROC = libpostproc
+endif
+
 # Small size
 ifdef WITH_OPTIMIZATION
 ifdef ENABLE_SMALL
@@ -220,7 +227,7 @@ endif
 
 # Build
 PKGS += ffmpeg
-ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale"),)
+ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale $(MAYBE_POSTPROC)"),)
 PKGS_FOUND += ffmpeg
 endif
 
