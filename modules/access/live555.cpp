@@ -32,6 +32,7 @@
 #endif
 
 #include <inttypes.h>
+#include <algorithm>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -1458,12 +1459,12 @@ static int Demux( demux_t *p_demux )
             }
             if( p_sys->i_pcr != VLC_TICK_INVALID )
                 es_out_SetPCR( p_demux->out, VLC_TICK_0 +
-                               __MAX(0, p_sys->i_pcr - PCR_OFF) );
+                               std::max<vlc_tick_t>(0, p_sys->i_pcr - PCR_OFF) );
         }
         else if( p_sys->i_pcr == VLC_TICK_INVALID ||
                  i_minpcr > p_sys->i_pcr + PCR_OBS )
         {
-            p_sys->i_pcr = __MAX(0, i_minpcr - PCR_OFF);
+            p_sys->i_pcr = std::max<vlc_tick_t>(0, i_minpcr - PCR_OFF);
             if( p_sys->i_pcr != VLC_TICK_INVALID )
                 es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_pcr );
         }
@@ -1875,7 +1876,7 @@ static block_t *StreamParseAsf( demux_t *p_demux, live_track_t *tk,
          */
         unsigned i_payload;
         if( b_length )
-            i_payload = __MIN( i_length_offset, i_size - i_header_size);
+            i_payload = std::min( i_length_offset, i_size - i_header_size);
         else
             i_payload = i_size - i_header_size;
 
