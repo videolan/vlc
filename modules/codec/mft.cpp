@@ -50,6 +50,7 @@ extern "C" {
 #define _VIDEOINFOHEADER_
 #include <vlc_codecs.h>
 
+#include <algorithm>
 #include <atomic>
 #include <new>
 
@@ -610,7 +611,7 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSamp
     if (FAILED(hr))
         goto error;
 
-    allocation_size = __MAX(input_info.cbSize, size);
+    allocation_size = std::max<DWORD>(input_info.cbSize, size);
     hr = MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
     if (FAILED(hr))
         goto error;
