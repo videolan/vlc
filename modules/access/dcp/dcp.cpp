@@ -59,6 +59,7 @@
 #include <AS_DCP.h>
 
 #include <vector>
+#include <algorithm>
 
 #include "dcpparser.h"
 
@@ -818,7 +819,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
             break;
 
         case DEMUX_GET_TIME:
-            *va_arg( args, vlc_tick_t * ) = __MAX(p_sys->i_pts, 0);
+            *va_arg( args, vlc_tick_t * ) = std::max<vlc_tick_t>(p_sys->i_pts, 0);
             break;
 
         case DEMUX_SET_TIME:
