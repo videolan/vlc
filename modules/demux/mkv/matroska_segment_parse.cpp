@@ -732,7 +732,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoFrameRate, vfps )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->f_fps = __MAX( static_cast<float>( vfps ), 1 );
+            vars.tk->f_fps = std::max( static_cast<float>(vfps) , 1.0f );
             debug( vars, "fps=%f", vars.tk->f_fps );
         }
         E_CASE( KaxVideoColourSpace, colourspace )
