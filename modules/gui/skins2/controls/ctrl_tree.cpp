@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <algorithm>
 #include <math.h>
 #include "../utils/var_bool.hpp"
 #include "ctrl_tree.hpp"
@@ -87,16 +88,16 @@ int CtrlTree::itemHeight()
     {
         if( m_pClosedBitmap )
         {
-            itemHeight = __MAX( m_pClosedBitmap->getHeight(), itemHeight );
+            itemHeight = std::max( m_pClosedBitmap->getHeight(), itemHeight );
         }
         if( m_pOpenBitmap )
         {
-            itemHeight = __MAX( m_pOpenBitmap->getHeight(), itemHeight );
+            itemHeight = std::max( m_pOpenBitmap->getHeight(), itemHeight );
         }
     }
     if( m_pItemBitmap )
     {
-        itemHeight = __MAX( m_pItemBitmap->getHeight(), itemHeight );
+        itemHeight = std::max( m_pItemBitmap->getHeight(), itemHeight );
     }
     itemHeight += LINE_INTERVAL;
     return itemHeight;
@@ -109,16 +110,16 @@ int CtrlTree::itemImageWidth()
     {
         if( m_pClosedBitmap )
         {
-            bitmapWidth = __MAX( m_pClosedBitmap->getWidth(), bitmapWidth );
+            bitmapWidth = std::max( m_pClosedBitmap->getWidth(), bitmapWidth );
         }
         if( m_pOpenBitmap )
         {
-            bitmapWidth = __MAX( m_pOpenBitmap->getWidth(), bitmapWidth );
+            bitmapWidth = std::max( m_pOpenBitmap->getWidth(), bitmapWidth );
         }
     }
     if( m_pItemBitmap )
     {
-        bitmapWidth = __MAX( m_pItemBitmap->getWidth(), bitmapWidth );
+        bitmapWidth = std::max( m_pItemBitmap->getWidth(), bitmapWidth );
     }
     return bitmapWidth + 2;
 }
@@ -599,7 +600,7 @@ void CtrlTree::makeImage()
         {
             if( it->isSelected() )
             {
-                int rectHeight = __MIN( i_itemHeight, height - yPos );
+                int rectHeight = std::min( i_itemHeight, height - yPos );
                 m_pImage->fillRect( 0, yPos, width, rectHeight, m_selColor );
             }
         }
@@ -612,7 +613,7 @@ void CtrlTree::makeImage()
         // Overwrite with alternate colors (bgColor1, bgColor2)
         for( int yPos = 0; yPos < height; yPos += i_itemHeight )
         {
-            int rectHeight = __MIN( i_itemHeight, height - yPos );
+            int rectHeight = std::min( i_itemHeight, height - yPos );
             if( it == m_rTree.end() )
                 m_pImage->fillRect( 0, yPos, width, rectHeight, bgColor );
             else
@@ -661,7 +662,7 @@ void CtrlTree::makeImage()
                 m_pImage->drawBitmap( *m_pCurBitmap, 0, 0,
                                       bitmapWidth * (depth - 1 ), yPos2,
                                       m_pCurBitmap->getWidth(),
-                                      __MIN( m_pCurBitmap->getHeight(),
+                                      std::min( m_pCurBitmap->getHeight(),
                                              height -  yPos2), true );
             }
             yPos += (i_itemHeight - pText->getHeight());
@@ -677,7 +678,7 @@ void CtrlTree::makeImage()
                 ySrc = - yPos;
                 yPos = 0;
             }
-            int lineHeight = __MIN( pText->getHeight() - ySrc, height - yPos );
+            int lineHeight = std::min( pText->getHeight() - ySrc, height - yPos );
             // Draw the text
             m_pImage->drawBitmap( *pText, 0, ySrc, bitmapWidth * depth, yPos,
                                   pText->getWidth(),
@@ -689,7 +690,7 @@ void CtrlTree::makeImage()
                 // Draw the underline bar below the text for drag&drop
                 m_pImage->fillRect(
                     bitmapWidth * (depth - 1 ), yPos - 2,
-                    bitmapWidth + pText->getWidth(), __MAX( lineHeight/5, 3 ),
+                    bitmapWidth + pText->getWidth(), std::max( lineHeight/5, 3 ),
                     m_selColor );
             }
             delete pText;

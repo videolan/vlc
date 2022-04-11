@@ -203,8 +203,8 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
 
         pos[n] = penX;
         width1 = penX + glyph.m_size.xMax - glyph.m_size.xMin;
-        yMin = __MIN( yMin, glyph.m_size.yMin );
-        yMax = __MAX( yMax, glyph.m_size.yMax );
+        yMin = std::min<int>( yMin, glyph.m_size.yMin );
+        yMax = std::max<int>( yMax, glyph.m_size.yMax );
 
         // Next position
         penX += glyph.m_advance;
@@ -254,11 +254,11 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
 #endif
 
     // Adjust the size for vertical padding
-    yMax = __MAX( yMax, m_ascender );
-    yMin = __MIN( yMin, m_descender );
+    yMax = std::max<int>( yMax, m_ascender );
+    yMin = std::min<int>( yMin, m_descender );
 
     // Create the bitmap
-    FT2Bitmap *pBmp = new FT2Bitmap( getIntf(), __MIN( width1, width2 ),
+    FT2Bitmap *pBmp = new FT2Bitmap( getIntf(), std::min( width1, width2 ),
                                      yMax - yMin );
 
     // Draw the glyphs on the bitmap
