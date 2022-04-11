@@ -155,7 +155,7 @@ vlc_smb2_op_reset(struct vlc_smb2_op *op, struct smb2_context **smb2p)
 }
 
 static int
-smb2_check_status(struct vlc_smb2_op *op, int status, const char *psz_func)
+smb2_check_status(struct vlc_smb2_op *op, const char *psz_func, int status)
 {
     if (status < 0)
     {
@@ -188,7 +188,7 @@ smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
 }
 
 #define VLC_SMB2_CHECK_STATUS(op, status) \
-    smb2_check_status(op, status, __func__)
+    smb2_check_status(op, __func__, status)
 
 #define VLC_SMB2_SET_ERROR(op, func, err) \
     smb2_set_error(op, func, err)
