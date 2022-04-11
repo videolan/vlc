@@ -427,8 +427,8 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 
             int row = widget->i_row - 1;
             int col = widget->i_column - 1;
-            int hsp = __MAX(1, widget->i_horiz_span);
-            int vsp = __MAX(1, widget->i_vert_span);
+            int hsp = MAX(1, widget->i_horiz_span);
+            int vsp = MAX(1, widget->i_vert_span);
             if (row < 0) {
                 row = 4;
                 col = 0;
