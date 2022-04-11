@@ -289,7 +289,7 @@ struct demux_cc
         return ret;
     }
 
-    int Control( demux_t *p_demux_filter, int i_query, va_list args )
+    int Control( demux_t *, int i_query, va_list args )
     {
         if( !m_enabled && i_query != DEMUX_FILTER_ENABLE )
             return demux_vaControl( p_demux->s, i_query, args );
