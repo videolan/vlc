@@ -41,6 +41,7 @@ const char vlc_module_name[] = "xcb";
 int vlc_xcb_error_Check(vout_display_t *vd, xcb_connection_t *conn,
                         const char *str, xcb_void_cookie_t ck)
 {
+    struct vlc_logger *log = vd->obj.logger;
     xcb_generic_error_t *err;
 
     err = xcb_request_check (conn, ck);
@@ -49,7 +50,7 @@ int vlc_xcb_error_Check(vout_display_t *vd, xcb_connection_t *conn,
         int code = err->error_code;
 
         free (err);
-        msg_Err (vd, "%s: X11 error %d", str, code);
+        vlc_error(log, "%s: X11 error %d", str, code);
         assert (code != 0);
         return code;
     }
@@ -59,32 +60,32 @@ int vlc_xcb_error_Check(vout_display_t *vd, xcb_connection_t *conn,
 /**
  * Connect to the X server.
  */
-static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
+static xcb_connection_t *Connect(struct vlc_logger *log, const char *display)
 {
     xcb_connection_t *conn = xcb_connect (display, NULL);
     if (xcb_connection_has_error (conn) /*== NULL*/)
     {
-        msg_Err (obj, "cannot connect to X server (%s)",
-                 (display != NULL) ? display : "default");
+        vlc_error(log, "cannot connect to X server (%s)",
+                  (display != NULL) ? display : "default");
         xcb_disconnect (conn);
         return NULL;
     }
 
     const xcb_setup_t *setup = xcb_get_setup (conn);
-    msg_Dbg (obj, "connected to X%"PRIu16".%"PRIu16" server",
-             setup->protocol_major_version, setup->protocol_minor_version);
-    msg_Dbg (obj, " vendor : %.*s", (int)setup->vendor_len,
-             xcb_setup_vendor (setup));
-    msg_Dbg (obj, " version: %"PRIu32, setup->release_number);
+    vlc_debug(log, "connected to X%"PRIu16".%"PRIu16" server",
+              setup->protocol_major_version, setup->protocol_minor_version);
+    vlc_debug(log, " vendor : %.*s", (int)setup->vendor_len,
+              xcb_setup_vendor(setup));
+    vlc_debug(log, " version: %"PRIu32, setup->release_number);
     return conn;
 }
 
 /**
  * Find screen matching a given root window.
  */
-static const xcb_screen_t *FindScreen (vlc_object_t *obj,
-                                       xcb_connection_t *conn,
-                                       xcb_window_t root)
+static const xcb_screen_t *FindScreen(struct vlc_logger *log,
+                                      xcb_connection_t *conn,
+                                      xcb_window_t root)
 {
     /* Find the selected screen */
     const xcb_setup_t *setup = xcb_get_setup (conn);
@@ -93,11 +94,11 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
     {
         if (i.data->root == root)
         {
-            msg_Dbg (obj, "using screen 0x%"PRIx32, root);
+            vlc_debug(log, "using screen 0x%"PRIx32, root);
             return i.data;
         }
     }
-    msg_Err (obj, "window screen not found");
+    vlc_error(log, "window screen not found");
     return NULL;
 }
 
@@ -105,13 +106,15 @@ int vlc_xcb_parent_Create(vout_display_t *vd, const vout_window_t *wnd,
                           xcb_connection_t **restrict pconn,
                           const xcb_screen_t **restrict pscreen)
 {
+    struct vlc_logger *log = vd->obj.logger;
+
     if (wnd->type != VOUT_WINDOW_TYPE_XID)
     {
-        msg_Err (vd, "window not available");
+        vlc_error(log, "window not available");
         return VLC_ENOTSUP;
     }
 
-    xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->display.x11);
+    xcb_connection_t *conn = Connect(log, wnd->display.x11);
     if (conn == NULL)
         goto error;
     *pconn = conn;
@@ -121,11 +124,11 @@ int vlc_xcb_parent_Create(vout_display_t *vd, const vout_window_t *wnd,
                                 NULL);
     if (geo == NULL)
     {
-        msg_Err (vd, "window not valid");
+        vlc_error(log, "window not valid");
         goto error;
     }
 
-    const xcb_screen_t *screen = FindScreen (VLC_OBJECT(vd), conn, geo->root);
+    const xcb_screen_t *screen = FindScreen(log, conn, geo->root);
     free (geo);
     if (screen == NULL)
         goto error;
@@ -141,7 +144,7 @@ error:
 /**
  * Process an X11 event.
  */
-static int ProcessEvent(vout_display_t *vd, xcb_generic_event_t *ev)
+static int ProcessEvent(struct vlc_logger *log, xcb_generic_event_t *ev)
 {
     switch (ev->response_type & 0x7f)
     {
@@ -149,7 +152,7 @@ static int ProcessEvent(vout_display_t *vd, xcb_generic_event_t *ev)
             break;
 
         default:
-            msg_Dbg (vd, "unhandled event %"PRIu8, ev->response_type);
+            vlc_debug(log, "unhandled event %"PRIu8, ev->response_type);
     }
 
     free (ev);
@@ -158,14 +161,15 @@ static int ProcessEvent(vout_display_t *vd, xcb_generic_event_t *ev)
 
 int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn)
 {
+    struct vlc_logger *log = vd->obj.logger;
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (conn)) != NULL)
-        ProcessEvent(vd, ev);
+        ProcessEvent(log, ev);
 
     if (xcb_connection_has_error (conn))
     {
-        msg_Err (vd, "X server failure");
+        vlc_error(log, "X server failure");
         return VLC_EGENERIC;
     }
 
