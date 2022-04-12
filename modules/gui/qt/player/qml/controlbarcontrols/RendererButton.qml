@@ -31,8 +31,8 @@ Widgets.IconControlButton {
     iconText: VLCIcons.renderer
     text: I18n.qtr("Renderer")
 
-    // NOTE: We want to pop the menu after the button.
-    onClicked: menu.popup(this.mapToGlobal(width, 0))
+    // NOTE: We want to pop the menu above the button.
+    onClicked: menu.popup(this.mapToGlobal(0, 0), true)
 
     QmlRendererMenu {
         id: menu
