@@ -49,8 +49,6 @@ typedef xcb_atom_t Atom;
 #include <vlc_actions.h>
 #include <vlc_vout_window.h>
 
-#include "events.h"
-
 typedef struct
 {
     xcb_connection_t *conn;
