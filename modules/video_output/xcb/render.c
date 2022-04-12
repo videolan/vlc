@@ -244,7 +244,7 @@ static void Display(vout_display_t *vd, picture_t *pic)
     xcb_connection_t *conn = sys->conn;
     xcb_void_cookie_t ck;
 
-    vlc_xcb_Manage(vd, conn);
+    vlc_xcb_Manage(vd->obj.logger, conn);
 
     /* Copy the scaled picture into the target picture, in other words
      * copy the rendered pixmap into the window.
@@ -554,6 +554,7 @@ static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *ctx)
 {
     vlc_object_t *obj = VLC_OBJECT(vd);
+    struct vlc_logger *log = obj->logger;
 
     vout_display_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -565,8 +566,9 @@ static int Open(vout_display_t *vd,
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
 
-    if (vlc_xcb_parent_Create(vd, vd->cfg->window, &conn, &screen) != VLC_SUCCESS)
-        return VLC_EGENERIC;
+    int ret = vlc_xcb_parent_Create(log, vd->cfg->window, &conn, &screen);
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     sys->conn = conn;
     sys->root = screen->root;

@@ -38,10 +38,9 @@ const char vlc_module_name[] = "xcb";
 
 #pragma GCC visibility push(default)
 
-int vlc_xcb_error_Check(vout_display_t *vd, xcb_connection_t *conn,
+int vlc_xcb_error_Check(struct vlc_logger *log, xcb_connection_t *conn,
                         const char *str, xcb_void_cookie_t ck)
 {
-    struct vlc_logger *log = vd->obj.logger;
     xcb_generic_error_t *err;
 
     err = xcb_request_check (conn, ck);
@@ -102,12 +101,10 @@ static const xcb_screen_t *FindScreen(struct vlc_logger *log,
     return NULL;
 }
 
-int vlc_xcb_parent_Create(vout_display_t *vd, const vout_window_t *wnd,
+int vlc_xcb_parent_Create(struct vlc_logger *log, const vout_window_t *wnd,
                           xcb_connection_t **restrict pconn,
                           const xcb_screen_t **restrict pscreen)
 {
-    struct vlc_logger *log = vd->obj.logger;
-
     if (wnd->type != VOUT_WINDOW_TYPE_XID)
     {
         vlc_error(log, "window not available");
@@ -159,9 +156,8 @@ static int ProcessEvent(struct vlc_logger *log, xcb_generic_event_t *ev)
     return VLC_SUCCESS;
 }
 
-int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn)
+int vlc_xcb_Manage(struct vlc_logger *log, xcb_connection_t *conn)
 {
-    struct vlc_logger *log = vd->obj.logger;
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (conn)) != NULL)

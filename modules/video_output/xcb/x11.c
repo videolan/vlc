@@ -92,7 +92,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
     xcb_shm_seg_t segment = sys->segment;
     xcb_void_cookie_t ck;
 
-    vlc_xcb_Manage(vd, sys->conn);
+    vlc_xcb_Manage(vd->obj.logger, sys->conn);
 
     /* Black out the borders */
     xcb_rectangle_t rectv[4], *rect;
@@ -321,12 +321,14 @@ static int Open (vout_display_t *vd,
     vd->sys = sys;
 
     /* Get window, connect to X server */
+    struct vlc_logger *log = vd->obj.logger;
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    if (vlc_xcb_parent_Create(vd, vd->cfg->window, &conn, &scr) != VLC_SUCCESS)
+    int ret = vlc_xcb_parent_Create(log, vd->cfg->window, &conn, &scr);
+    if (ret != VLC_SUCCESS)
     {
         free (sys);
-        return VLC_EGENERIC;
+        return ret;
     }
     sys->conn = conn;
 

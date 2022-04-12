@@ -24,14 +24,14 @@
 # define XCB_CURSOR_NONE ((xcb_cursor_t) 0U)
 #endif
 
-#include <vlc_vout_display.h>
+struct vlc_logger;
 
 /* events.c */
 
 /**
  * Checks for an XCB error.
  */
-int vlc_xcb_error_Check(vout_display_t *, xcb_connection_t *conn,
+int vlc_xcb_error_Check(struct vlc_logger *, xcb_connection_t *conn,
                         const char *str, xcb_void_cookie_t);
 
 /**
@@ -40,10 +40,10 @@ int vlc_xcb_error_Check(vout_display_t *, xcb_connection_t *conn,
  * Creates a VLC video X window object, connects to the corresponding X server,
  * finds the corresponding X server screen.
  */
-int vlc_xcb_parent_Create(vout_display_t *obj, const vout_window_t *wnd,
+int vlc_xcb_parent_Create(struct vlc_logger *, const vout_window_t *wnd,
                           xcb_connection_t **connp,
                           const xcb_screen_t **screenp);
 /**
  * Processes XCB events.
  */
-int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn);
+int vlc_xcb_Manage(struct vlc_logger *, xcb_connection_t *conn);

@@ -298,11 +298,13 @@ static int Open(vout_display_t *vd,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    struct vlc_logger *log = vd->obj.logger;
     const xcb_screen_t *screen;
-    if (vlc_xcb_parent_Create(vd, vd->cfg->window, &sys->conn, &screen) != VLC_SUCCESS)
+    int ret = vlc_xcb_parent_Create(log, vd->cfg->window, &sys->conn, &screen);
+    if (ret != VLC_SUCCESS)
     {
         free(sys);
-        return VLC_EGENERIC;
+        return ret;
     }
 
     vlc_decoder_device *dec_device = context ? vlc_video_context_HoldDevice(context) : NULL;
@@ -437,7 +439,7 @@ static int Open(vout_display_t *vd,
                 sys->window, vd->cfg->window->handle.xid, place.x, place.y,
                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
                 screen->root_visual, mask, values);
-        if (vlc_xcb_error_Check(vd, sys->conn, "window creation failure", c))
+        if (vlc_xcb_error_Check(log, sys->conn, "window creation failure", c))
             goto error;
         msg_Dbg(vd, "using X11 window 0x%08"PRIx32, sys->window);
         xcb_map_window(sys->conn, sys->window);
