@@ -380,10 +380,14 @@ void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
         }
         case VLC_ML_EVENT_DISCOVERY_PROGRESS:
         {
-            QString entryPoint{ event->discovery_progress.psz_entry_point };
-            QMetaObject::invokeMethod(self, [self, entryPoint]() {
-                self->m_discoveryEntryPoint = entryPoint;
-                self->emit discoveryEntryPointChanged(entryPoint);
+            const QUrl entryPoint{ event->discovery_progress.psz_entry_point };
+            const QString entryPointStr = entryPoint.isLocalFile()
+                                              ? entryPoint.toLocalFile()
+                                              : entryPoint.toDisplayString();
+
+            QMetaObject::invokeMethod(self, [self, entryPointStr]() {
+                self->m_discoveryEntryPoint = entryPointStr;
+                self->emit discoveryEntryPointChanged(entryPointStr);
             });
             break;
         }
