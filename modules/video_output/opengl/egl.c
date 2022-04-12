@@ -489,16 +489,23 @@ static int OpenGL(vlc_gl_t *gl, unsigned width, unsigned height)
     return Open(gl, &api, width, height);
 }
 
+#ifdef USE_PLATFORM_XCB
+# define VLC_PRIORITY 60
+#endif
+#ifndef VLC_PRIORITY
+# define VLC_PRIORITY 50
+#endif
+
 vlc_module_begin ()
     set_shortname (N_("EGL"))
     set_description (N_("EGL extension for OpenGL"))
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("opengl", 50)
+    set_capability("opengl", VLC_PRIORITY)
     set_callback(OpenGL)
     add_shortcut ("egl")
 
     add_submodule ()
-    set_capability ("opengl es2", 50)
+    set_capability("opengl es2", VLC_PRIORITY)
     set_callback(OpenGLES2)
     add_shortcut ("egl")
 
