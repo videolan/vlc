@@ -233,13 +233,15 @@ public:
     ~QmlRendererMenu();
 
 public: // Interface
-    Q_INVOKABLE void popup(QPoint pos);
+    Q_INVOKABLE void popup(const QPoint & position, bool above = false);
 
 signals:
     void aboutToHide();
     void aboutToShow();
 
 private:
+    QmlMenuPositioner m_positioner;
+
     RendererMenu * m_menu = nullptr;
 };
 

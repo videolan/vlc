@@ -525,7 +525,7 @@ QmlRendererMenu::~QmlRendererMenu()
 
 // Interface
 
-/* Q_INVOKABLE */ void QmlRendererMenu::popup(QPoint pos)
+/* Q_INVOKABLE */ void QmlRendererMenu::popup(const QPoint & position, bool above)
 {
     if (m_ctx == nullptr)
         return;
@@ -538,7 +538,7 @@ QmlRendererMenu::~QmlRendererMenu()
     connect(m_menu, &QMenu::aboutToHide, this, &QmlRendererMenu::aboutToHide);
     connect(m_menu, &QMenu::aboutToShow, this, &QmlRendererMenu::aboutToShow);
 
-    m_menu->popup(pos);
+    m_positioner.popup(m_menu, position, above);
 }
 
 BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
