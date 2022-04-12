@@ -368,7 +368,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         GLint max_texture_units = 0;
         priv->gl.GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
         if (max_texture_units < 3)
-            return VLC_EGENERIC;
+            goto error;
 
         list = vlc_fourcc_GetYUVFallback(interop->fmt_in.i_chroma);
         space = interop->fmt_in.space;
@@ -406,7 +406,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         list++;
     }
 
-    return VLC_EGENERIC;
+    goto error;
 
 interop_init:
     /* We found a chroma with matching parameters for OpenGL. The interop can
@@ -468,4 +468,8 @@ interop_init:
     }
 
     return VLC_SUCCESS;
+
+error:
+    free(priv);
+    return VLC_EGENERIC;
 }
