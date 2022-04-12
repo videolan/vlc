@@ -31,8 +31,8 @@ Widgets.IconControlButton {
     iconText: VLCIcons.bookmark
     text: I18n.qtr("Bookmarks")
 
-    // NOTE: We want to pop the menu after the button.
-    onClicked: menu.popup(this.mapToGlobal(width, 0))
+    // NOTE: We want to pop the menu above the button.
+    onClicked: menu.popup(this.mapToGlobal(0, 0), true)
 
     QmlBookmarkMenu {
         id: menu
