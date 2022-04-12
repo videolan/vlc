@@ -148,6 +148,8 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     VdpOutputSurface surface = p_sys->surface;
     VdpStatus err;
 
+    vlc_xcb_Manage(vd->obj.logger, sys->conn);
+
     VdpPresentationQueueStatus status;
     VdpTime ts;
     err = vdp_presentation_queue_query_surface_status(sys->vdp, sys->queue,
