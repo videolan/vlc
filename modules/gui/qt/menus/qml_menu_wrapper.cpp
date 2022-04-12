@@ -438,7 +438,7 @@ QmlBookmarkMenu::~QmlBookmarkMenu()
 
 // Interface
 
-/* Q_INVOKABLE */ void QmlBookmarkMenu::popup(QPoint pos)
+/* Q_INVOKABLE */ void QmlBookmarkMenu::popup(const QPoint & position, bool above)
 {
     if (m_ctx == nullptr || m_player == nullptr)
         return;
@@ -510,7 +510,7 @@ QmlBookmarkMenu::~QmlBookmarkMenu()
         bookmarks->select(bookmarks->index(index, 0));
     });
 
-    m_menu->popup(pos);
+    m_positioner.popup(m_menu, position, above);
 }
 
 // QmlRendererMenu

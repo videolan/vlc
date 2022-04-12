@@ -209,13 +209,15 @@ public:
     ~QmlBookmarkMenu();
 
 public: // Interface
-    Q_INVOKABLE void popup(QPoint pos);
+    Q_INVOKABLE void popup(const QPoint & position, bool above = false);
 
 signals:
     void aboutToHide();
     void aboutToShow();
 
 private:
+    QmlMenuPositioner m_positioner;
+
     QMenu * m_menu = nullptr;
 };
 
