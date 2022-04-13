@@ -16,6 +16,6 @@ game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
 	$(MOVE)
 
 .gme: game-music-emu toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) .
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) . -DENABLE_UBSAN=OFF
 	+$(CMAKEBUILD) $< --target install
 	touch $@
