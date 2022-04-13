@@ -586,6 +586,11 @@ VLC_API block_t *aout_FiltersDrain(aout_filters_t *);
 VLC_API void     aout_FiltersFlush(aout_filters_t *);
 VLC_API void     aout_FiltersChangeViewpoint(aout_filters_t *, const vlc_viewpoint_t *vp);
 
+/**
+ * Create a vout from an "visualization" audio filter.
+ *
+ * @warning Can only be called once, from the probe function (Open).
+ */
 VLC_API vout_thread_t *aout_filter_GetVout(filter_t *, const video_format_t *);
 
 /** @} */

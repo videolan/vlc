@@ -43,11 +43,13 @@
 struct aout_filter
 {
     filter_t *f;
+    vlc_clock_t *clock;
 };
 
 static inline void aout_filter_Init(struct aout_filter *tab, filter_t *f)
 {
     tab->f = f;
+    tab->clock = NULL;
 }
 
 filter_t *aout_filter_Create(vlc_object_t *obj, const filter_owner_t *restrict owner,
@@ -136,6 +138,8 @@ static void aout_FiltersPipelineDestroy(struct aout_filter *tab, unsigned n)
         filter_t *p_filter = tab[i].f;
 
         aout_FilterDestroy(p_filter);
+        if (tab[i].clock != NULL)
+            vlc_clock_Delete(tab[i].clock);
     }
 }
 
@@ -361,7 +365,7 @@ struct aout_filters
         (either the scaletempo filter or a resampler) */
     struct aout_filter resampler; /**< The resampler */
     int resampling; /**< Current resampling (Hz) */
-    vlc_clock_t *clock;
+    const vlc_clock_t *clock_source;
 
     unsigned count; /**< Number of filters */
     struct aout_filter tab[AOUT_MAX_FILTERS]; /**< Configured user filters
@@ -395,15 +399,32 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
+struct filter_owner_sys
+{
+    const vlc_clock_t *clock_source;
+    vlc_clock_t *clock;
+};
+
 vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 {
+    struct filter_owner_sys *owner_sys = filter->owner.sys;
+    assert(owner_sys->clock_source != NULL);
+    assert(owner_sys->clock == NULL);
+
+    vlc_clock_t *clock = vlc_clock_CreateSlave(owner_sys->clock_source, AUDIO_ES);
+    if (clock == NULL)
+        return NULL;
+
     vout_thread_t *vout = vout_Create(VLC_OBJECT(filter), NULL, NULL);
     if (unlikely(vout == NULL))
+    {
+        vlc_clock_Delete(clock);
         return NULL;
+    }
 
     video_format_t adj_fmt = *fmt;
     vout_configuration_t cfg = {
-        .vout = vout, .clock = filter->owner.sys, .fmt = &adj_fmt,
+        .vout = vout, .clock = clock, .fmt = &adj_fmt,
     };
 
     video_format_AdjustColorSpace(&adj_fmt);
@@ -412,7 +433,10 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
     if (vout_Request(&cfg, NULL, NULL, &started)) {
         vout_Close(vout);
         vout = NULL;
+        vlc_clock_Delete(clock);
     }
+
+    owner_sys->clock = clock;
     return vout;
 }
 
@@ -429,7 +453,11 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    const filter_owner_t owner = { .sys = filters->clock };
+    struct filter_owner_sys owner_sys = {
+        .clock_source = filters->clock_source,
+        .clock = NULL,
+    };
+    const filter_owner_t owner = { .sys = &owner_sys };
     filter_t *filter = aout_filter_Create(obj, &owner, type, name,
                                           infmt, outfmt, cfg, false);
     if (filter == NULL)
@@ -444,11 +472,14 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
         aout_FilterDestroy(filter);
+        if (owner_sys.clock != NULL)
+            vlc_clock_Delete(owner_sys.clock);
         return -1;
     }
 
     assert (filters->count < max);
     aout_filter_Init(&filters->tab[filters->count], filter);
+    filters->tab[filters->count].clock = owner_sys.clock;
     filters->count++;
     *infmt = filter->fmt_out.audio;
     return 0;
@@ -513,14 +544,7 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *c
     aout_filter_Init(&filters->resampler, NULL);
     filters->resampling = 0;
     filters->count = 0;
-    if (clock)
-    {
-        filters->clock = vlc_clock_CreateSlave(clock, AUDIO_ES);
-        if (!filters->clock)
-            goto error;
-    }
-    else
-        filters->clock = NULL;
+    filters->clock_source = clock;
 
     /* Prepare format structure */
     aout_FormatPrint (obj, "input", infmt);
@@ -654,22 +678,42 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *c
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback(obj, "visual", VisualizationCallback, NULL);
-    if (filters->clock)
-        vlc_clock_Delete(filters->clock);
     free (filters);
     return NULL;
 }
 
+static void aout_FiltersPipelineResetClock(const struct aout_filter *tab,
+                                           unsigned count)
+{
+    for (unsigned i = 0; i < count; i++)
+    {
+        vlc_clock_t *clock = tab[i].clock;
+        if (clock != NULL)
+            vlc_clock_Reset(clock);
+    }
+}
+
 void aout_FiltersResetClock(aout_filters_t *filters)
 {
-    assert(filters->clock);
-    vlc_clock_Reset(filters->clock);
+    assert(filters->clock_source);
+    aout_FiltersPipelineResetClock(filters->tab, filters->count);
+}
+
+static void aout_FiltersPipelineSetClockDelay(const struct aout_filter *tab,
+                                              unsigned count, vlc_tick_t delay)
+{
+    for (unsigned i = 0; i < count; i++)
+    {
+        vlc_clock_t *clock = tab[i].clock;
+        if (clock != NULL)
+            vlc_clock_SetDelay(clock, delay);
+    }
 }
 
 void aout_FiltersSetClockDelay(aout_filters_t *filters, vlc_tick_t delay)
 {
-    assert(filters->clock);
-    vlc_clock_SetDelay(filters->clock, delay);
+    assert(filters->clock_source);
+    aout_FiltersPipelineSetClockDelay(filters->tab, filters->count, delay);
 }
 
 #undef aout_FiltersNew
@@ -701,8 +745,6 @@ void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
         aout_FiltersPipelineDestroy(&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
     var_DelCallback(obj, "visual", VisualizationCallback, NULL);
-    if (filters->clock)
-        vlc_clock_Delete(filters->clock);
     free (filters);
 }
 
