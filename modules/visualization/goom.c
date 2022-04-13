@@ -354,8 +354,6 @@ static void Close( filter_t *p_filter )
     vlc_join( p_thread->thread, NULL );
 
     /* Free data */
-    vout_Close( p_thread->p_vout );
-
     while( p_thread->i_blocks-- )
     {
         block_Release( p_thread->pp_blocks[p_thread->i_blocks] );

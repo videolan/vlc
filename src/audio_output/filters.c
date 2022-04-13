@@ -44,12 +44,14 @@ struct aout_filter
 {
     filter_t *f;
     vlc_clock_t *clock;
+    vout_thread_t *vout;
 };
 
 static inline void aout_filter_Init(struct aout_filter *tab, filter_t *f)
 {
     tab->f = f;
     tab->clock = NULL;
+    tab->vout = NULL;
 }
 
 filter_t *aout_filter_Create(vlc_object_t *obj, const filter_owner_t *restrict owner,
@@ -138,6 +140,8 @@ static void aout_FiltersPipelineDestroy(struct aout_filter *tab, unsigned n)
         filter_t *p_filter = tab[i].f;
 
         aout_FilterDestroy(p_filter);
+        if (tab[i].vout != NULL)
+            vout_Close(tab[i].vout);
         if (tab[i].clock != NULL)
             vlc_clock_Delete(tab[i].clock);
     }
@@ -403,6 +407,7 @@ struct filter_owner_sys
 {
     const vlc_clock_t *clock_source;
     vlc_clock_t *clock;
+    vout_thread_t *vout;
 };
 
 vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
@@ -410,6 +415,7 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
     struct filter_owner_sys *owner_sys = filter->owner.sys;
     assert(owner_sys->clock_source != NULL);
     assert(owner_sys->clock == NULL);
+    assert(owner_sys->vout == NULL);
 
     vlc_clock_t *clock = vlc_clock_CreateSlave(owner_sys->clock_source, AUDIO_ES);
     if (clock == NULL)
@@ -437,6 +443,7 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
     }
 
     owner_sys->clock = clock;
+    owner_sys->vout = vout;
     return vout;
 }
 
@@ -456,6 +463,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     struct filter_owner_sys owner_sys = {
         .clock_source = filters->clock_source,
         .clock = NULL,
+        .vout = NULL,
     };
     const filter_owner_t owner = { .sys = &owner_sys };
     filter_t *filter = aout_filter_Create(obj, &owner, type, name,
@@ -472,6 +480,8 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
         aout_FilterDestroy(filter);
+        if (owner_sys.vout != NULL)
+            vout_Close(owner_sys.vout);
         if (owner_sys.clock != NULL)
             vlc_clock_Delete(owner_sys.clock);
         return -1;
@@ -480,6 +490,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
     assert (filters->count < max);
     aout_filter_Init(&filters->tab[filters->count], filter);
     filters->tab[filters->count].clock = owner_sys.clock;
+    filters->tab[filters->count].vout = owner_sys.vout;
     filters->count++;
     *infmt = filter->fmt_out.audio;
     return 0;
