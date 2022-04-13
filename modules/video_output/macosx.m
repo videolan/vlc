@@ -93,7 +93,6 @@ vlc_module_end ()
 @interface VLCOpenGLVideoView : NSOpenGLView
 {
     vout_display_t *vd;
-    BOOL _hasPendingReshape;
 }
 - (void)setVoutDisplay:(vout_display_t *)vd;
 - (void)setVoutFlushing:(BOOL)flushing;
@@ -527,26 +526,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     if (!flushing)
         return;
-    @synchronized(self) {
-        _hasPendingReshape = NO;
-    }
 }
-
-/**
- * Can -drawRect skip rendering?.
- */
-- (BOOL)canSkipRendering
-{
-    VLCAssertMainThread();
-
-    @synchronized(self) {
-        if (!vd)
-            return false;
-        vout_display_sys_t *sys = vd->sys;
-        return !_hasPendingReshape && sys->has_first_frame;
-    }
-}
-
 
 /**
  * Local method that locks the gl context.
@@ -578,10 +558,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     VLCAssertMainThread();
 
-    // We may have taken some times to take the opengl Lock.
-    // Check here to see if we can just skip the frame as well.
-    if ([self canSkipRendering])
-        return;
 
     vout_display_sys_t *sys;
 
@@ -661,8 +637,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     VLCAssertMainThread();
 
-    if ([self canSkipRendering])
-        return;
 
     BOOL success = [self lockgl];
     if (!success)
