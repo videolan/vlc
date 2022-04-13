@@ -57,6 +57,8 @@
 #define KEEPALIVE_INTERVAL 60
 #define KEEPALIVE_MARGIN 5
 
+#define SATIP_USERAGENT "LibVLC/" VERSION " (SatIP)"
+
 static int satip_open(vlc_object_t *);
 static void satip_close(vlc_object_t *);
 
@@ -709,6 +711,7 @@ static int satip_open(vlc_object_t *obj)
         net_Printf(access, sys->tcp_sock,
                 "SETUP %s RTSP/1.0\r\n"
                 "CSeq: %d\r\n"
+                "User-Agent: " SATIP_USERAGENT "\r\n"
                 "Transport: RTP/AVP;multicast\r\n\r\n",
                 psz_setup_url, sys->cseq++);
     } else {
@@ -721,6 +724,7 @@ static int satip_open(vlc_object_t *obj)
         net_Printf(access, sys->tcp_sock,
                 "SETUP %s RTSP/1.0\r\n"
                 "CSeq: %d\r\n"
+                "User-Agent: " SATIP_USERAGENT "\r\n"
                 "Transport: RTP/AVP;unicast;client_port=%d-%d\r\n\r\n",
                 psz_setup_url, sys->cseq++, sys->udp_port, sys->udp_port + 1);
     }
@@ -765,6 +769,7 @@ static int satip_open(vlc_object_t *obj)
     net_Printf(access, sys->tcp_sock,
             "PLAY %s RTSP/1.0\r\n"
             "CSeq: %d\r\n"
+            "User-Agent: " SATIP_USERAGENT "\r\n"
             "Session: %s\r\n\r\n",
             sys->control, sys->cseq++, sys->session_id);
 
