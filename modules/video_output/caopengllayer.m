@@ -496,6 +496,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     switch (query)
     {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+            return VLC_SUCCESS;
+
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -834,8 +836,11 @@ shouldInheritContentsScale:(CGFloat)newScale
         if (!_voutDisplay)
             return;
 
-        vout_display_SendEventDisplaySize(_voutDisplay,
-                                          newSize.width, newSize.height);
+        vout_display_sys_t *sys = _voutDisplay->sys;
+        @synchronized(sys->videoLayer) {
+            sys->cfg.display.width = newSize.width;
+            sys->cfg.display.height = newSize.height;
+        }
     }
 }
 
