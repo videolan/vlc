@@ -77,7 +77,6 @@ static int Control          (vout_display_t *vd, int);
 }
 
 - (instancetype)initWithVoutDisplay:(vout_display_t *)vd;
-- (void)placePictureWithConfig:(const vout_display_cfg_t *)cfg;
 - (void)displayFromVout;
 - (void)reportCurrentLayerSize;
 - (void)reportCurrentLayerSizeWithScale:(CGFloat)scale;
@@ -114,6 +113,7 @@ typedef struct vout_display_sys_t {
     vout_display_opengl_t *vgl;
 
     vout_display_place_t place;
+    vout_display_cfg_t cfg;
 
     bool  b_frame_available;
     atomic_bool is_ready;
@@ -345,6 +345,13 @@ static int Open (vout_display_t *vd,
         glsys->cgl_prev = NULL;
 
         dispatch_sync(dispatch_get_main_queue(), ^{
+            // Reverse vertical alignment as the GL tex are Y inverted
+           sys->cfg = *vd->cfg;
+           if (sys->cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
+               sys->cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+           else if (sys->cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+               sys->cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+
             // Create video view
             sys->videoView = [[VLCVideoLayerView alloc] initWithVoutDisplay:vd];
             sys->videoLayer = (VLCCAOpenGLLayer*)[[sys->videoView layer] retain];
@@ -362,6 +369,8 @@ static int Open (vout_display_t *vd,
                 sys->videoView = nil;
                 sys->videoLayer = nil;
             }
+
+            vout_display_PlacePicture(&sys->place, vd->source, &sys->cfg);
         });
 
         if (sys->videoView == nil) {
@@ -484,7 +493,21 @@ static int Control (vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            [sys->videoLayer placePictureWithConfig:vd->cfg];
+            @synchronized(sys->videoLayer)
+            {
+                vout_display_cfg_t cfg = *vd->cfg;
+                cfg.display.width = sys->cfg.display.width;
+                cfg.display.height = sys->cfg.display.height;
+
+                // Reverse vertical alignment as the GL tex are Y inverted
+                if (cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
+                    cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+                else if (cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+                    cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+                sys->cfg = cfg;
+
+                vout_display_PlacePicture(&sys->place, vd->source, &cfg);
+            }
 
             // Note!
             // No viewport or aspect ratio is set here, as that needs to be set
@@ -758,24 +781,6 @@ shouldInheritContentsScale:(CGFloat)newScale
     [super dealloc];
 }
 
-- (void)placePictureWithConfig:(const vout_display_cfg_t *)cfg
-{
-    vout_display_sys_t *sys = _voutDisplay->sys;
-    vout_display_cfg_t tmp_cfg = *cfg;
-
-    // Reverse vertical alignment as the GL tex are Y inverted
-    if (tmp_cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-        tmp_cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (tmp_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        tmp_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
-
-    // Synchronization not for _voutDisplay but for sys->place
-    // as this method can be called either from the Control()
-    // function or the layer draw method.
-    @synchronized(self) {
-        vout_display_PlacePicture(&sys->place, _voutDisplay->source, &tmp_cfg);
-    }
-}
 
 - (void)layoutSublayers
 {
@@ -881,12 +886,13 @@ shouldInheritContentsScale:(CGFloat)newScale
                 newSize.height *= scale;
             }
 
-            vout_display_cfg_t cfg = *_voutDisplay->cfg;
+            @synchronized(sys->videoView)
+            {
+                sys->cfg.display.width = newSize.width;
+                sys->cfg.display.height = newSize.height;
 
-            cfg.display.width = newSize.width;
-            cfg.display.height = newSize.height;
-
-            [self placePictureWithConfig:&cfg];
+                vout_display_PlacePicture(&sys->place, _voutDisplay->source, &sys->cfg);
+            }
         }
 
         // Ensure viewport and aspect ratio is correct
