@@ -51,6 +51,9 @@ SpinBox{
     }
 
     contentItem: TextInput {
+        // NOTE: This is required for InterfaceWindowHandler::applyKeyEvent.
+        property bool visualFocus: control.visualFocus
+
         text: control.textFromValue(control.value, control.locale)
 
         font: control.font
@@ -62,6 +65,13 @@ SpinBox{
         autoScroll: false
         readOnly: !control.editable
         validator: control.validator
+
+        Keys.priority: Keys.AfterItem
+
+        Keys.onPressed: Navigation.defaultKeyAction(event)
+        Keys.onReleased: Navigation.defaultKeyReleaseAction(event)
+
+        Navigation.parentItem: control
     }
     up.indicator: Rectangle {
         x: parent.width - width
