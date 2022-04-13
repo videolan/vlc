@@ -3201,7 +3201,6 @@ dnl  Xlib
 dnl
 
 AC_PATH_XTRA()
-AC_CHECK_HEADERS([X11/Xlib.h])
 
 dnl
 dnl  X C Bindings modules
