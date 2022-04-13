@@ -119,6 +119,13 @@ static filter_t *FindResampler (vlc_object_t *obj,
     return filter;
 }
 
+static void aout_FilterDestroy(filter_t *filter)
+{
+    filter_Close(filter);
+    module_unneed(filter, filter->p_module);
+    vlc_object_delete(filter);
+}
+
 /**
  * Destroys a chain of audio filters.
  */
@@ -128,9 +135,7 @@ static void aout_FiltersPipelineDestroy(struct aout_filter *tab, unsigned n)
     {
         filter_t *p_filter = tab[i].f;
 
-        filter_Close( p_filter );
-        module_unneed( p_filter, p_filter->p_module );
-        vlc_object_delete(p_filter);
+        aout_FilterDestroy(p_filter);
     }
 }
 
@@ -438,9 +443,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
                                     max - 1, infmt, &filter->fmt_in.audio))
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
-        filter_Close( filter );
-        module_unneed (filter, filter->p_module);
-        vlc_object_delete(filter);
+        aout_FilterDestroy(filter);
         return -1;
     }
 
