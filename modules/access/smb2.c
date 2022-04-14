@@ -173,10 +173,9 @@ smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
     if (op->log && err != -EINTR)
         msg_Err(op->log, "%s failed: %d, %s", psz_func, err, smb2_get_error(op->smb2));
 
-    if (err != 0)
+    /* Don't override if set via smb2_check_status */
+    if (op->error_status == 0)
         op->error_status = err;
-    else if (op->error_status == 0) /* don't override if set via smb2_check_status */
-        op->error_status = -EINVAL;
 
     smb2_destroy_context(op->smb2);
     *op->smb2p = NULL;
@@ -244,7 +243,7 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op)
         else if (ret == 0)
         {
             if (smb2_service_fd(op->smb2, -1, 0) < 0)
-                VLC_SMB2_SET_ERROR(op, "smb2_service", 0);
+                VLC_SMB2_SET_ERROR(op, "smb2_service", -EINVAL);
         }
         else
         {
@@ -252,7 +251,7 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op)
             {
                 if (p_fds[i].revents
                  && smb2_service_fd(op->smb2, p_fds[i].fd, p_fds[i].revents) < 0)
-                    VLC_SMB2_SET_ERROR(op, "smb2_service", 0);
+                    VLC_SMB2_SET_ERROR(op, "smb2_service", -EINVAL);
             }
         }
     }
