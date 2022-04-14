@@ -234,6 +234,16 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op)
         }
     }
 
+    if (op->error_status != 0 && op->smb2 != NULL)
+    {
+        /* An error was signalled from a smb2 cb. Destroy the smb2 context now
+         * since this call might still trigger callbacks using the current op
+         * (that is allocated on the stack). */
+        smb2_destroy_context(op->smb2);
+        op->smb2 = NULL;
+        *op->smb2p = NULL;
+    }
+
     return op->error_status;
 }
 
