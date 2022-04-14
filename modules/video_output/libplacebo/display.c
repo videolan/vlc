@@ -474,7 +474,7 @@ static void UpdateColorspaceHint(vout_display_t *vd, const video_format_t *fmt)
     vout_display_sys_t *sys = vd->sys;
     struct pl_swapchain_colors hint = {0};
 
-    switch (var_InheritBool(vd, "pl-output-hint")) {
+    switch (var_InheritInteger(vd, "pl-output-hint")) {
     case OUTPUT_AUTO: ;
         const struct pl_color_space csp = vlc_placebo_ColorSpace(fmt);
         hint.primaries = csp.primaries;
