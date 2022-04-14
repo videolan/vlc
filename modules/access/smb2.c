@@ -233,8 +233,7 @@ vlc_smb2_mainloop(struct vlc_smb2_op *op)
         }
     }
 
-    int ret = op->error_status == 0 ? 0 : -1;
-    return ret;
+    return op->error_status;
 }
 
 #define VLC_SMB2_GENERIC_CB() \
