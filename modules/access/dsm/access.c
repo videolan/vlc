@@ -306,6 +306,8 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->cache_entry )
         vlc_access_cache_AddEntry( &dsm_cache, p_sys->cache_entry );
+    else if( p_sys->p_session != NULL )
+        smb_session_destroy( p_sys->p_session );
 
     free( p_sys );
 }
