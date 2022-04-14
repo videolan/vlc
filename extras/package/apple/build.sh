@@ -630,7 +630,7 @@ mkdir -p "$VLC_CONTRIB_INSTALL_DIR"
 write_config_mak "-Werror=partial-availability"
 
 if [ "$VLC_USE_BITCODE" -gt "0" ]; then
-    VLC_CONTRIB_OPTIONS+=" --enable-bitcode"
+    VLC_CONTRIB_OPTIONS+=( "--enable-bitcode" )
 fi
 
 # Bootstrap contribs
