@@ -183,6 +183,7 @@ smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
         op->error_status = err;
 
     smb2_destroy_context(op->smb2);
+    op->smb2 = NULL;
     *op->smb2p = NULL;
 }
 
