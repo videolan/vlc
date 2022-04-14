@@ -598,7 +598,8 @@ FocusScope {
 
             //load the header early (when the first row is visible)
             visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.topMargin)
-            focus: item.focus
+
+            focus: (status === Loader.Ready) ? item.focus : false
             onFocusChanged: {
                 if (!focus)
                     return;
@@ -610,6 +611,7 @@ FocusScope {
 
         Loader {
             id: footerItemLoader
+
             focus: (status === Loader.Ready) ? item.focus : false
 
             y: root.topMargin + root.headerHeight + (root._effectiveCellHeight * (Math.ceil(model.count / root._nbItemPerRow))) +
