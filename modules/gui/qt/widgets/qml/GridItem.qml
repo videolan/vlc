@@ -254,11 +254,12 @@ T.Control {
             Widgets.MediaCover {
                 id: picture
 
-                width: pictureWidth
-                height: pictureHeight
                 playCoverVisible: false
                 playCoverOpacity: 0
                 radius: VLCStyle.gridCover_radius
+
+                Layout.preferredWidth: pictureWidth
+                Layout.preferredHeight: pictureHeight
 
                 onPlayIconClicked: root.playClicked()
             }
