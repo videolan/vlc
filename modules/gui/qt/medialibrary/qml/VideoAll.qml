@@ -99,7 +99,7 @@ FocusScope {
     }
 
     function resetFocus() {
-        if (model.count === 0) return
+        if (!model || model.count === 0) return
 
         var initialIndex = root.initialIndex
 
