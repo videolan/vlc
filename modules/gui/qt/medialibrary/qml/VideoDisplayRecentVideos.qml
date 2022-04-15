@@ -84,7 +84,7 @@ FocusScope {
 
             // NOTE: Sometimes, we want items to be visible on the sides.
             displayMarginBeginning: root.leftPadding
-            displayMarginEnd: root.leftPadding
+            displayMarginEnd: root.rightPadding
 
             // NOTE: We want navigation buttons to be centered on the item cover.
             buttonMargin: VLCStyle.margin_xsmall + VLCStyle.gridCover_video_height / 2 - buttonLeft.height / 2
