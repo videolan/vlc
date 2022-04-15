@@ -105,7 +105,6 @@ static int Control          (vout_display_t *vd, int);
 
 typedef struct vout_display_sys_t {
 
-    vout_window_t *embed;
     id<VLCOpenGLVideoViewEmbedding> container;
 
     VLCVideoLayerView *videoView; // Layer-backed view that creates videoLayer
@@ -307,9 +306,7 @@ static int Open (vout_display_t *vd,
         // Obtain container NSObject
         id container = var_CreateGetAddress(vd, "drawable-nsobject");
         if (!container) {
-            sys->embed = vd->cfg->window;
-            container = sys->embed->handle.nsobject;
-
+            container = vd->cfg->window->handle.nsobject;
             if (!container) {
                 msg_Err(vd, "No drawable-nsobject found!");
                 goto error;
