@@ -97,8 +97,18 @@ T.Pane {
 
         Widgets.SpinBoxExt{
             id: telePageNumber
+
+            // NOTE: We want a fixed size for the TextInput.
+            width: VLCStyle.dp(64, VLCStyle.scale)
+
             from: 100
             to: 899
+
+            validator: IntValidator {
+                bottom: telePageNumber.from
+                top: telePageNumber.to
+            }
+
             editable: true
             textColor: colors.text
             bgColor: colors.bg
