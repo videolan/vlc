@@ -213,6 +213,8 @@ VideoAll {
     header: VideoDisplayRecentVideos {
         width: root.width
 
+        subtitleText: (root.model && root.model.count > 0) ? I18n.qtr("Videos") : ""
+
         // NOTE: We want grid items to be visible on the sides.
         leftPadding: root.contentMargin
 

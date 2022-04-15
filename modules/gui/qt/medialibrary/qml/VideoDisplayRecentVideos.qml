@@ -33,6 +33,8 @@ FocusScope {
     property alias leftPadding: recentVideosColumn.leftPadding
     property alias rightPadding: recentVideosColumn.rightPadding
 
+    property alias subtitleText : subtitleLabel.text
+
     // Settings
 
     implicitHeight: recentVideosColumn.height
@@ -180,7 +182,9 @@ FocusScope {
         }
 
         Widgets.SubtitleLabel {
-            text: I18n.qtr("Videos")
+            id: subtitleLabel
+
+            visible: text !== ""
         }
     }
 }
