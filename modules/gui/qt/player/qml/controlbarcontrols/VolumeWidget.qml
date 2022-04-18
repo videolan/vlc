@@ -114,6 +114,11 @@ T.Pane {
                 volControl._inhibitPlayerVolumeUpdate = false
             }
 
+            function _adjustPlayerVolume() {
+                Player.muted = false
+                Player.volume = volControl.value
+            }
+
             Component.onCompleted: {
                 root.paintOnlyChanged.connect(_syncVolumeWithPlayer)
                 volControl._syncVolumeWithPlayer()
@@ -159,10 +164,7 @@ T.Pane {
                     return
 
                 if (!volControl._inhibitPlayerVolumeUpdate) {
-                    if (Player.muted)
-                        Player.muted = false
-
-                    Player.volume = volControl.value
+                    Qt.callLater(volControl._adjustPlayerVolume)
                 }
             }
 
