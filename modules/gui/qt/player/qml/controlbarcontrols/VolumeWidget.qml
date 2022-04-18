@@ -248,18 +248,42 @@ T.Pane {
                 }
 
                 onWheel: {
-                    var x = wheel.angleDelta.x
-                    var y = wheel.angleDelta.y
+                    var delta = 0, fineControl = false
 
-                    if (x > 0 || y > 0) {
-                        volControl.increase()
-                        wheel.accepted = true
-                    } else if (x < 0 || y < 0) {
-                        volControl.decrease()
-                        wheel.accepted = true
-                    } else {
-                        wheel.accepted = false
+                    if ((Math.abs(wheel.pixelDelta.x) % 120 > 0) || (Math.abs(wheel.pixelDelta.y) % 120 > 0)) {
+                        if (Math.abs(wheel.pixelDelta.x) > Math.abs(wheel.pixelDelta.y))
+                            delta = wheel.pixelDelta.x
+                        else
+                            delta = wheel.pixelDelta.y
+                        fineControl = true
                     }
+                    else if (wheel.angleDelta.x)
+                        delta = wheel.angleDelta.x
+                    else if (wheel.angleDelta.y)
+                        delta = wheel.angleDelta.y
+
+                    if (delta === 0)
+                        return
+
+                    if (wheel.inverted)
+                        delta = -delta
+
+                    if (fineControl)
+                        volControl.value += 0.001 * delta
+                    else {
+                        // Degrees to steps for standard mouse
+                        delta = delta / 8 / 15
+
+                        var func = delta > 0 ? volControl.increase
+                                             : volControl.decrease
+
+                        // Even if the reported angle delta is less
+                        // than 120, func will be called once
+                        for (var i = 0; i < Math.abs(delta); ++i)
+                            func()
+                    }
+
+                    wheel.accepted = true
                 }
             }
         }
