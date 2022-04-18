@@ -89,7 +89,6 @@ T.Pane {
 
             from: 0
             to: maxvolpos
-            stepSize: 0.05
             opacity: _player.muted ? 0.5 : 1
 
             Accessible.name: I18n.qtr("Volume")
@@ -173,7 +172,7 @@ T.Pane {
                 active: !paintOnly
 
                 sourceComponent: Widgets.PointingTooltip {
-                    visible: tooltipShower.running || sliderMouseArea.pressed || sliderMouseArea.containsMouse
+                    visible: tooltipShower.running || sliderMouseArea.pressed || volControl.pressed || volControl.hovered
 
                     text: Math.round(volControl.value * 100) + "%"
 
@@ -227,8 +226,7 @@ T.Pane {
                 id: sliderMouseArea
                 anchors.fill: parent
 
-                hoverEnabled: true
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                acceptedButtons: Qt.RightButton
 
                 Component.onCompleted: {
                     positionChanged.connect(adjustVolume)
@@ -236,33 +234,17 @@ T.Pane {
                 }
 
                 function adjustVolume(mouse) {
-                    if (pressedButtons === Qt.LeftButton) {
-                        // The slider itself can handle this,
-                        // but then the top&bottom margins need to be
-                        // set there instead of here. Also, if handled
-                        // there stepSize will be respected.
-                        volControl.value = volControl.maxvolpos * (mouse.x - handle.width)
-                                                                / (sliderBg.width - handle.width)
+                    var pos = mouse.x * volControl.maxvolpos / width
+                    if (pos < 0.25)
+                        volControl.value = 0
+                    else if (pos < 0.75)
+                        volControl.value = 0.5
+                    else if (pos < 1.125)
+                        volControl.value = 1
+                    else
+                        volControl.value = 1.25
 
-                        mouse.accepted = true
-                    } else if (pressedButtons === Qt.RightButton) {
-                        var pos = mouse.x * volControl.maxvolpos / width
-                        if (pos < 0.25)
-                            volControl.value = 0
-                        else if (pos < 0.75)
-                            volControl.value = 0.5
-                        else if (pos < 1.125)
-                            volControl.value = 1
-                        else
-                            volControl.value = 1.25
-
-                        mouse.accepted = true
-                    }
-                }
-
-                onPressed: {
-                    if (!volControl.activeFocus)
-                        volControl.forceActiveFocus(Qt.MouseFocusReason)
+                    mouse.accepted = true
                 }
 
                 onWheel: {
