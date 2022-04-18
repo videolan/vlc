@@ -142,12 +142,14 @@ T.Pane {
             Navigation.parentItem: root
 
             Keys.onUpPressed: {
-                volControl.increase()
+                Player.muted = false
+                Player.setVolumeUp()
                 tooltipShower.restart()
             }
 
             Keys.onDownPressed: {
-                volControl.decrease()
+                Player.muted = false
+                Player.setVolumeDown()
                 tooltipShower.restart()
             }
 
@@ -274,13 +276,14 @@ T.Pane {
                         // Degrees to steps for standard mouse
                         delta = delta / 8 / 15
 
-                        var func = delta > 0 ? volControl.increase
-                                             : volControl.decrease
+                        var steps = Math.ceil(Math.abs(delta))
 
-                        // Even if the reported angle delta is less
-                        // than 120, func will be called once
-                        for (var i = 0; i < Math.abs(delta); ++i)
-                            func()
+                        Player.muted = false
+
+                        if (delta > 0)
+                            Player.setVolumeUp(steps)
+                        else
+                            Player.setVolumeDown(steps)
                     }
 
                     wheel.accepted = true
