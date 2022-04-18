@@ -2,7 +2,7 @@
 # Copyright (C) Marvin Scholz
 #
 # Script to help build VLC or libVLC for Apple OSes
-# Supported OSes: macOS, tvOS, macOS
+# Supported OSes: iOS, tvOS, macOS
 #
 # Currently this script builds a full static library,
 # with all modules and contribs combined into one .a
