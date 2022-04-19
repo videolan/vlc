@@ -69,7 +69,6 @@ EXTRA_DIST += \
 	extras/tools/libtool-2.4.6-bitcode.patch \
 	extras/tools/libtool-2.4.6-clang-libs.patch \
 	extras/tools/libtool-2.4.6-response-files.patch \
-	extras/tools/libtool-2.4.6-san.patch \
 	extras/tools/ragel-6.8-javacodegen.patch
 
 ###############################################################################
