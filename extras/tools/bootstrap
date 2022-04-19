@@ -28,9 +28,9 @@ check_version() {
     needminor=`echo $3|cut -d. -f2`
     needmicro=`echo $3|cut -d. -f3`
     [ -z "$needmicro" ] && needmicro=0
-    if [ "$needmajor" -ne "$gotmajor" \
-         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" \
-         -o "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ]
+    if [ "$needmajor" -ne "$gotmajor" ] ||
+       [ "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" ] ||
+       [ "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ];
     then
         echo "$1 too old"
         NEEDED="$NEEDED $1"
