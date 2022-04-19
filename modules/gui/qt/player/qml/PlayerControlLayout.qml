@@ -59,7 +59,8 @@ FocusScope {
             top: parent.top
             bottom: parent.bottom
 
-            rightMargin: layoutSpacing
+            // Spacing for the filler item acts as padding
+            rightMargin: layoutSpacing - spacing
         }
 
         active: !!playerControlLayout.model
@@ -124,7 +125,8 @@ FocusScope {
             top: parent.top
             bottom: parent.bottom
 
-            leftMargin: layoutSpacing
+            // Spacing for the filler item acts as padding
+            leftMargin: layoutSpacing - spacing
         }
 
         active: !!playerControlLayout.model

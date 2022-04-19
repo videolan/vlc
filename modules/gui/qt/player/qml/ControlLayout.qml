@@ -83,7 +83,7 @@ FocusScope {
 
         anchors.fill: parent
 
-        spacing: 0
+        spacing: playerControlLayout.spacing
 
         Item {
             Layout.fillWidth: rightAligned
@@ -113,17 +113,6 @@ FocusScope {
                 Layout.minimumWidth: minimumWidth
                 Layout.fillWidth: expandable
                 Layout.maximumWidth: item.implicitWidth
-                // This is a workaround of not using RowLayout's built-in `spacing`
-                // RowLayout adds an unwanted spacing at the end of the layout so
-                // this is used instead.
-                Layout.rightMargin: {
-                    for (var i = index + 1; i < repeater.count; ++i) {
-                        var item = repeater.itemAt(i)
-                        if (!!item && item.visible)
-                            return playerControlLayout.spacing
-                    }
-                    return 0
-                }
 
                 readonly property real minimumWidth: (expandable ? item.minimumWidth : item.implicitWidth)
                 readonly property bool expandable: (item.minimumWidth !== undefined)
