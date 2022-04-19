@@ -78,6 +78,8 @@ T.Pane {
 
             paintOnly: root.paintOnly
 
+            enabled: teleActivateBtn.checked
+
             opacity: 0.5
 
             iconText: VLCIcons.tvtelx
@@ -100,6 +102,8 @@ T.Pane {
 
             // NOTE: We want a fixed size for the TextInput.
             width: VLCStyle.dp(64, VLCStyle.scale)
+
+            enabled: teleActivateBtn.checked
 
             from: 100
             to: 899
@@ -148,6 +152,8 @@ T.Pane {
 
             paintOnly: root.paintOnly
 
+            enabled: teleActivateBtn.checked
+
             iconText: VLCIcons.record
             text: I18n.qtr("Index key")
 
@@ -170,6 +176,8 @@ T.Pane {
             size: VLCStyle.icon_normal
 
             paintOnly: root.paintOnly
+
+            enabled: teleActivateBtn.checked
 
             iconText: VLCIcons.record
             text: I18n.qtr("Red key")
@@ -194,6 +202,8 @@ T.Pane {
 
             paintOnly: root.paintOnly
 
+            enabled: teleActivateBtn.checked
+
             iconText: VLCIcons.record
             text: I18n.qtr("Green key")
 
@@ -217,6 +227,8 @@ T.Pane {
 
             paintOnly: root.paintOnly
 
+            enabled: teleActivateBtn.checked
+
             iconText: VLCIcons.record
             text: I18n.qtr("Yellow key")
 
@@ -239,6 +251,8 @@ T.Pane {
             size: VLCStyle.icon_normal
 
             paintOnly: root.paintOnly
+
+            enabled: teleActivateBtn.checked
 
             iconText: VLCIcons.record
             text: I18n.qtr("Blue key")
