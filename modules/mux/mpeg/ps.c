@@ -328,6 +328,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
             break;
+        case VLC_CODEC_MPEGH:
+            p_stream->i_stream_id =
+                    StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
+            p_stream->i_stream_type = 0x2d; /* ISO/IEC 23008-3 Main */
+            break;
         case VLC_CODEC_SPU:
             p_stream->i_stream_id =
                 0xbd00 | StreamIdGet( p_sys->stream_id_spu, 0x20, 0x3f );
