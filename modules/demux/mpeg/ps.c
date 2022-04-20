@@ -121,6 +121,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 static int      ps_pkt_resynch( stream_t *, int, bool );
 static block_t *ps_pkt_read   ( stream_t * );
 
+static void CreateOrUpdateES( demux_t*p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    for( int i = 0; i < PS_TK_COUNT; i++ )
+    {
+        ps_track_t *tk = &p_sys->tk[i];
+        if( !tk->b_updated )
+            continue;
+
+        if( tk->es )
+            es_out_Del( p_demux->out, tk->es );
+
+        if( tk->fmt.i_cat != UNKNOWN_ES )
+            tk->es = es_out_Add( p_demux->out, &tk->fmt );
+        tk->b_updated = false;
+    }
+}
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -483,23 +502,8 @@ static int Demux( demux_t *p_demux )
         break;
 
     case PS_STREAM_ID_SYSTEM_HEADER:
-        if( !ps_pkt_parse_system( p_pkt->p_buffer, p_pkt->i_buffer,
-                                  &p_sys->psm, p_sys->tk ) )
-        {
-            int i;
-            for( i = 0; i < PS_TK_COUNT; i++ )
-            {
-                ps_track_t *tk = &p_sys->tk[i];
-
-                if( !tk->b_configured && tk->fmt.i_cat != UNKNOWN_ES )
-                {
-                    if( tk->b_seen )
-                        tk->es = es_out_Add( p_demux->out, &tk->fmt );
-                     /* else create when seeing packet */
-                    tk->b_configured = true;
-                }
-            }
-        }
+        ps_pkt_parse_system( p_pkt->p_buffer, p_pkt->i_buffer,
+                            &p_sys->psm, p_sys->tk );
         block_Release( p_pkt );
         break;
 
@@ -572,9 +576,9 @@ static int Demux( demux_t *p_demux )
 #endif
                     }
 
-                    tk->es = es_out_Add( p_demux->out, &tk->fmt );
                     b_new = true;
                     tk->b_configured = true;
+                    tk->b_updated = true;
                 }
                 else
                 {
@@ -582,16 +586,13 @@ static int Demux( demux_t *p_demux )
                 }
             }
 
-            /* Late creation from system header */
-            if( !tk->b_seen && tk->b_configured && !tk->es && tk->fmt.i_cat != UNKNOWN_ES )
-                tk->es = es_out_Add( p_demux->out, &tk->fmt );
-
-            tk->b_seen = true;
+            /* Create all configured/updated ES when seeing a track packet */
+            if( tk->b_updated )
+                CreateOrUpdateES( p_demux );
 
             /* The popular VCD/SVCD subtitling WinSubMux does not
              * renumber the SCRs when merging subtitles into the PES */
-            if( tk->b_seen && !p_sys->b_bad_scr &&
-                p_sys->format == MPEG_PS &&
+            if( !p_sys->b_bad_scr && p_sys->format == MPEG_PS &&
                 ( tk->fmt.i_codec == VLC_CODEC_OGT ||
                   tk->fmt.i_codec == VLC_CODEC_CVD ) )
             {

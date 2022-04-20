@@ -57,7 +57,7 @@ static inline const uint8_t *ps_id_to_lang( const ps_psm_t *, uint16_t );
 typedef struct
 {
     bool        b_configured;
-    bool        b_seen;
+    bool        b_updated;
     int         i_skip;
     int         i_id;
     int         i_next_block_flags;
@@ -75,7 +75,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
         tk[i].b_configured = false;
-        tk[i].b_seen = false;
+        tk[i].b_updated = false;
         tk[i].i_skip = 0;
         tk[i].i_id   = 0;
         tk[i].i_next_block_flags = 0;
@@ -710,7 +710,8 @@ static inline int ps_psm_fill( ps_psm_t *p_psm,
     /* Check/Modify our existing tracks */
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
-        if( !tk[i].b_configured || !tk[i].es ) continue;
+        if( !tk[i].b_configured )
+            continue;
 
         ps_track_t tk_tmp;
         es_format_Init( &tk_tmp.fmt, UNKNOWN_ES, 0 );
@@ -725,12 +726,12 @@ static inline int ps_psm_fill( ps_psm_t *p_psm,
             continue;
         }
 
-        es_out_Del( out, tk[i].es );
-        es_format_Clean( &tk[i].fmt );
-
+        /* replace with new version */
         tk_tmp.b_configured = true;
+        tk_tmp.b_updated = true;
+        tk_tmp.es = tk[i].es;
+        es_format_Clean( &tk[i].fmt );
         tk[i] = tk_tmp;
-        tk[i].es = es_out_Add( out, &tk[i].fmt );
     }
 
     return VLC_SUCCESS;
