@@ -670,8 +670,8 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     if (!username)
     {
         username = "Guest";
-        /* A NULL password enable ntlmssp anonymous login */
-        password = NULL;
+        /* An empty password enable ntlmssp anonymous login */
+        password = "";
     }
 
     struct vlc_access_cache_entry *cache_entry =
