@@ -112,11 +112,11 @@ libtool-$(LIBTOOL_VERSION).tar.gz:
 libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(UNPACK)
 	(cd $(UNPACK_DIR) && chmod u+w build-aux/ltmain.sh)
-	$(APPLY) $(TOOLS)/libtool-2.4.6-bitcode.patch
-	$(APPLY) $(TOOLS)/libtool-2.4.6-clang-libs.patch
-	$(APPLY) $(TOOLS)/libtool-2.4.6-response-files.patch
-	$(APPLY) $(TOOLS)/libtool-2.4.6-lpthread.patch
-	$(APPLY) $(TOOLS)/libtool-2.4.6-embed-bitcode.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.7-bitcode.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.7-clang-libs.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.7-response-files.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.7-lpthread.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.7-embed-bitcode.patch
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
