@@ -1819,37 +1819,35 @@ static const struct decoder_owner_callbacks dec_spu_cbs =
  * \return the decoder object
  */
 static vlc_input_decoder_t *
-CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
-               const char *psz_id, vlc_clock_t *p_clock,
-               input_resource_t *p_resource, sout_stream_t *p_sout,
-               enum input_type input_type, const struct vlc_input_decoder_callbacks *cbs,
-               void *cbs_userdata )
+CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 {
     decoder_t *p_dec;
     vlc_input_decoder_t *p_owner;
     static_assert(offsetof(vlc_input_decoder_t, dec) == 0,
                   "the decoder must be first in the owner structure");
 
-    assert(input_type != INPUT_TYPE_PREPARSING);
+    assert(cfg->input_type != INPUT_TYPE_PREPARSING);
+
+    const es_format_t *fmt = cfg->fmt;
 
     p_owner = vlc_custom_create( p_parent, sizeof( *p_owner ), "decoder" );
     if( p_owner == NULL )
         return NULL;
     p_dec = &p_owner->dec;
 
-    p_owner->psz_id = psz_id;
-    p_owner->p_clock = p_clock;
+    p_owner->psz_id = cfg->str_id;
+    p_owner->p_clock = cfg->clock;
     p_owner->i_preroll_end = PREROLL_NONE;
-    p_owner->p_resource = p_resource;
-    p_owner->cbs = cbs;
-    p_owner->cbs_userdata = cbs_userdata;
+    p_owner->p_resource = cfg->resource;
+    p_owner->cbs = cfg->cbs;
+    p_owner->cbs_userdata = cfg->cbs_data;
     p_owner->p_aout = NULL;
     p_owner->p_astream = NULL;
     p_owner->p_vout = NULL;
     p_owner->vout_started = false;
     p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
     p_owner->i_spu_order = 0;
-    p_owner->p_sout = p_sout;
+    p_owner->p_sout = cfg->sout;
     p_owner->p_sout_input = NULL;
     p_owner->p_packetizer = NULL;
 
@@ -1894,7 +1892,7 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
     vlc_cond_init( &p_owner->wait_fifo );
 
     /* Load a packetizer module if the input is not already packetized */
-    if( p_sout == NULL && !fmt->b_packetized )
+    if( cfg->sout == NULL && !fmt->b_packetized )
     {
         p_owner->p_packetizer =
             vlc_custom_create( p_parent, sizeof( decoder_t ), "packetizer" );
@@ -1916,7 +1914,7 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
     switch( fmt->i_cat )
     {
         case VIDEO_ES:
-            if( input_type == INPUT_TYPE_THUMBNAILING )
+            if( cfg->input_type == INPUT_TYPE_THUMBNAILING )
                 p_dec->cbs = &dec_thumbnailer_cbs;
             else
                 p_dec->cbs = &dec_video_cbs;
@@ -1933,7 +1931,7 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
     }
 
     /* Find a suitable decoder/packetizer module */
-    if( LoadDecoder( p_dec, p_sout != NULL, fmt ) )
+    if( LoadDecoder( p_dec, cfg->sout != NULL, fmt ) )
         return p_owner;
 
     assert( p_dec->fmt_in.i_cat == p_dec->fmt_out.i_cat && fmt->i_cat == p_dec->fmt_in.i_cat);
@@ -1957,7 +1955,7 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
     }
 
     /* */
-    p_owner->cc.b_supported = ( p_sout == NULL );
+    p_owner->cc.b_supported = ( cfg->sout == NULL );
 
     p_owner->cc.desc.i_608_channels = 0;
     p_owner->cc.desc.i_708_channels = 0;
@@ -2081,21 +2079,16 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt, b
 
 /* TODO: pass p_sout through p_resource? -- Courmisch */
 static vlc_input_decoder_t *
-decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
-             vlc_clock_t *p_clock, input_resource_t *p_resource,
-             sout_stream_t *p_sout, enum input_type input_type,
-             const struct vlc_input_decoder_callbacks *cbs, void *userdata)
+decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 {
-    const char *psz_type = p_sout ? N_("packetizer") : N_("decoder");
+    const char *psz_type = cfg->sout ? N_("packetizer") : N_("decoder");
     int i_priority;
 
     /* Create the decoder configuration structure */
-    vlc_input_decoder_t *p_owner =
-        CreateDecoder( p_parent, fmt, psz_id, p_clock, p_resource, p_sout,
-                       input_type, cbs, userdata );
+    vlc_input_decoder_t *p_owner = CreateDecoder( p_parent, cfg );
     if( p_owner == NULL )
     {
-        msg_Err( p_parent, "could not create %s", psz_type );
+        msg_Err( p_parent, "could not create %s", cfg->str_id );
         vlc_dialog_display_error( p_parent, _("Streaming / Transcoding failed"),
             _("VLC could not open the %s module."), vlc_gettext( psz_type ) );
         return NULL;
@@ -2104,10 +2097,10 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
     decoder_t *p_dec = &p_owner->dec;
     if( !p_dec->p_module )
     {
-        DecoderUnsupportedCodec( p_dec, fmt, !p_sout );
+        DecoderUnsupportedCodec( p_dec, cfg->fmt, !cfg->sout );
 
         /* Don't use dec->fmt_in.i_cat since it may not be initialized here. */
-        DeleteDecoder( p_owner, fmt->i_cat );
+        DeleteDecoder( p_owner, cfg->fmt->i_cat );
         return NULL;
     }
 
@@ -2122,14 +2115,14 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
 
 #ifdef ENABLE_SOUT
     /* Do not delay sout creation for SPU or DATA. */
-    if( p_sout && fmt->b_packetized &&
-        (fmt->i_cat != VIDEO_ES && fmt->i_cat != AUDIO_ES) )
+    if( cfg->sout && cfg->fmt->b_packetized &&
+        (cfg->fmt->i_cat != VIDEO_ES && cfg->fmt->i_cat != AUDIO_ES) )
     {
-        p_owner->p_sout_input = sout_InputNew( p_owner->p_sout, fmt );
+        p_owner->p_sout_input = sout_InputNew( p_owner->p_sout, cfg->fmt );
         if( p_owner->p_sout_input == NULL )
         {
             msg_Err( p_dec, "cannot create sout input (%4.4s)",
-                     (char *)&fmt->i_codec );
+                     (char *)&cfg->fmt->i_codec );
             p_owner->error = true;
         }
     }
@@ -2155,15 +2148,9 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
  * \return the spawned decoder object
  */
 vlc_input_decoder_t *
-vlc_input_decoder_New( vlc_object_t *parent, const es_format_t *fmt,
-                  const char *psz_id, vlc_clock_t *p_clock,
-                  input_resource_t *resource,
-                  sout_stream_t *p_sout, enum input_type input_type,
-                  const struct vlc_input_decoder_callbacks *cbs,
-                  void *cbs_userdata)
+vlc_input_decoder_New( vlc_object_t *parent, const struct vlc_input_decoder_cfg *cfg )
 {
-    return decoder_New( parent, fmt, psz_id, p_clock, resource, p_sout, input_type,
-                        cbs, cbs_userdata );
+    return decoder_New( parent, cfg );
 }
 
 /**
@@ -2171,10 +2158,18 @@ vlc_input_decoder_New( vlc_object_t *parent, const es_format_t *fmt,
  */
 vlc_input_decoder_t *
 vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt,
-                     input_resource_t *p_resource )
+                          input_resource_t *p_resource )
 {
-    return decoder_New( p_parent, fmt, NULL, NULL, p_resource, NULL, INPUT_TYPE_NONE,
-                        NULL, NULL );
+    const struct vlc_input_decoder_cfg cfg = {
+        .fmt = fmt,
+        .str_id = NULL,
+        .clock = NULL,
+        .resource = p_resource,
+        .sout = NULL,
+        .input_type = INPUT_TYPE_NONE,
+        .cbs = NULL, .cbs_data = NULL,
+    };
+    return decoder_New( p_parent, &cfg );
 }
 
 
@@ -2426,9 +2421,18 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
         es_format_Init( &fmt, SPU_ES, codec );
         fmt.subs.cc.i_channel = i_channel;
         fmt.subs.cc.i_reorder_depth = p_owner->cc.desc.i_reorder_depth;
-        p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &fmt, p_owner->psz_id,
-                                      p_owner->p_clock, p_owner->p_resource, p_owner->p_sout,
-                                      INPUT_TYPE_NONE, NULL, NULL );
+
+        const struct vlc_input_decoder_cfg cfg = {
+            .fmt = &fmt,
+            .str_id = p_owner->psz_id,
+            .clock = p_owner->p_clock,
+            .resource = p_owner->p_resource,
+            .sout = p_owner->p_sout,
+            .input_type = INPUT_TYPE_NONE,
+            .cbs = NULL, .cbs_data = NULL,
+        };
+
+        p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &cfg );
         if( !p_ccowner )
         {
             msg_Err( p_dec, "could not create decoder" );

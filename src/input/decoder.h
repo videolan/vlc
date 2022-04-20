@@ -50,11 +50,21 @@ struct vlc_input_decoder_callbacks {
                            void *userdata);
 };
 
+struct vlc_input_decoder_cfg
+{
+    const es_format_t *fmt;
+    const char *str_id;
+    vlc_clock_t *clock;
+    input_resource_t *resource;
+    sout_stream_t *sout;
+    enum input_type input_type;
+    const struct vlc_input_decoder_callbacks *cbs;
+    void *cbs_data;
+};
+
 vlc_input_decoder_t *
-vlc_input_decoder_New( vlc_object_t *parent, const es_format_t *, const char *psz_id, vlc_clock_t *,
-                       input_resource_t *, sout_stream_t *, enum input_type input_type,
-                       const struct vlc_input_decoder_callbacks *cbs,
-                       void *userdata ) VLC_USED;
+vlc_input_decoder_New( vlc_object_t *parent,
+                       const struct vlc_input_decoder_cfg *cfg );
 
 /**
  * This function changes the pause state.
