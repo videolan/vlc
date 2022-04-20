@@ -292,6 +292,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
             p_stream->i_stream_type = 0x1b;
             break;
+        case VLC_CODEC_HEVC:
+            p_stream->i_stream_id =
+                StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
+            p_stream->i_stream_type = 0x24;
+            break;
         case VLC_CODEC_DVD_LPCM:
             p_stream->i_stream_id =
                 0xbd00 | StreamIdGet( p_sys->stream_id_lpcm, 0xa0, 0xaf );
