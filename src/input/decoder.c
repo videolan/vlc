@@ -2155,7 +2155,7 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
  * \return the spawned decoder object
  */
 vlc_input_decoder_t *
-vlc_input_decoder_New( vlc_object_t *parent, es_format_t *fmt,
+vlc_input_decoder_New( vlc_object_t *parent, const es_format_t *fmt,
                   const char *psz_id, vlc_clock_t *p_clock,
                   input_resource_t *resource,
                   sout_stream_t *p_sout, enum input_type input_type,
