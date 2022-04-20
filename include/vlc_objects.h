@@ -253,6 +253,7 @@ static inline void vlc_object_release(vlc_object_t *o)
  * @return a pointer to the allocated memory, or NULL on error (errno is set).
  */
 VLC_API VLC_MALLOC void *vlc_obj_malloc(vlc_object_t *obj, size_t size);
+#define vlc_obj_malloc(o, s) vlc_obj_malloc(VLC_OBJECT(o), s)
 
 /**
  * Allocates a zero-initialized table for a module.
@@ -268,6 +269,7 @@ VLC_API VLC_MALLOC void *vlc_obj_malloc(vlc_object_t *obj, size_t size);
  */
 VLC_API VLC_MALLOC void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb,
                                         size_t size);
+#define vlc_obj_calloc(o, n, s) vlc_obj_calloc(VLC_OBJECT(o), n, s)
 
 /**
  * Duplicates a string for a module.
@@ -281,6 +283,7 @@ VLC_API VLC_MALLOC void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb,
  * @return a pointer to the copy, or NULL on error (errno is set).
  */
 VLC_API VLC_MALLOC char *vlc_obj_strdup(vlc_object_t *obj, const char *str);
+#define vlc_obj_strdup(o, s) vlc_obj_strdup(VLC_OBJECT(o), s)
 
 /**
  * Manually frees module memory.
@@ -293,6 +296,7 @@ VLC_API VLC_MALLOC char *vlc_obj_strdup(vlc_object_t *obj, const char *str);
  * @param ptr pointer to the allocated resource
  */
 VLC_API void vlc_obj_free(vlc_object_t *obj, void *ptr);
+#define vlc_obj_free(o, p) vlc_obj_free(VLC_OBJECT(o), p)
 
 /** @} */
 /** @} */
