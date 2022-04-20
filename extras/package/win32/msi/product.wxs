@@ -25,7 +25,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product
         Id='*'
-        Name='$(var.ProductName) $(var.Version) ($(var.PlatformString))'
+        Name='$(var.ProductName)'
         Language='1033'
         Version='$(var.VersionLong)'
         Manufacturer='$(var.Manufacturer)'
@@ -408,5 +408,3 @@
     <ProgressText Action="RegisterAxvlc">Registering DirectX plugin...</ProgressText>
     <ProgressText Action="UnregisterAxvlc">Removing DirectX plugin...</ProgressText>
 -->
-
-
