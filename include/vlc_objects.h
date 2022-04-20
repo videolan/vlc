@@ -222,6 +222,7 @@ static inline void vlc_object_release(vlc_object_t *o)
     if (!strcmp(tn, "video output"))
         vout_Release((vout_thread_t *)o);
 }
+#define vlc_object_release(o) vlc_object_release(VLC_OBJECT(o))
 
 /**
  * @defgroup objres Object resources
