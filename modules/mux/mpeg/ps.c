@@ -310,9 +310,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->i_stream_type = 0x03; /* ISO/IEC 11172 Audio */
             break;
         case VLC_CODEC_MP4A:
+            if( p_input->p_fmt->i_original_fourcc == VLC_FOURCC('A','D','T','S') )
+            {
+                p_stream->i_stream_type = 0x0f; /* ISO/IEC 13818-7 */
+            }
+            else if( p_input->p_fmt->i_original_fourcc == VLC_FOURCC('L','A','T','M') )
+            {
+                p_stream->i_stream_type = 0x11; /* ISO/IEC 14496-3 */
+            }
+            else
+                goto error;
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
-            p_stream->i_stream_type = 0x0f;
             break;
         case VLC_CODEC_SPU:
             p_stream->i_stream_id =
