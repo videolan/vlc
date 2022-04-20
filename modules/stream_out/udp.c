@@ -231,7 +231,7 @@ static int Open(vlc_object_t *obj)
              if (strcmp(c->psz_name, "access") == 0)
                  break;
 
-        if (c == NULL) /* default is file, not for us */
+        if (c == NULL || c->psz_value == NULL) /* default is file, not for us */
             return VLC_ENOTSUP;
         if (strcmp(c->psz_value, "udp"))
             return VLC_ENOTSUP;
