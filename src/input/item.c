@@ -483,9 +483,9 @@ void input_item_Release( input_item_t *p_item )
         vlc_epg_Delete( p_item->pp_epg[i] );
     TAB_CLEAN( p_item->i_epg, p_item->pp_epg );
 
-    for( int i = 0; i < p_item->i_categories; i++ )
-        info_category_Delete( p_item->pp_categories[i] );
-    TAB_CLEAN( p_item->i_categories, p_item->pp_categories );
+    info_category_t *cat;
+    vlc_list_foreach( cat, &p_item->categories, node )
+        info_category_Delete( cat );
 
     for( int i = 0; i < p_item->i_slaves; i++ )
         input_item_slave_Delete( p_item->pp_slaves[i] );
@@ -664,19 +664,17 @@ int input_item_AddSlave(input_item_t *p_item, input_item_slave_t *p_slave)
 }
 
 static info_category_t *InputItemFindCat( input_item_t *p_item,
-                                          int *pi_index, const char *psz_cat )
+                                          const char *psz_cat )
 {
     vlc_mutex_assert( &p_item->lock );
-    for( int i = 0; i < p_item->i_categories && psz_cat; i++ )
-    {
-        info_category_t *p_cat = p_item->pp_categories[i];
+    if( !psz_cat )
+        return NULL;
 
+    info_category_t *p_cat;
+    vlc_list_foreach( p_cat, &p_item->categories, node )
+    {
         if( !strcmp( p_cat->psz_name, psz_cat ) )
-        {
-            if( pi_index )
-                *pi_index = i;
             return p_cat;
-        }
     }
     return NULL;
 }
@@ -697,7 +695,7 @@ char *input_item_GetInfo( input_item_t *p_i,
 {
     vlc_mutex_lock( &p_i->lock );
 
-    const info_category_t *p_cat = InputItemFindCat( p_i, NULL, psz_cat );
+    const info_category_t *p_cat = InputItemFindCat( p_i, psz_cat );
     if( p_cat )
     {
         info_t *p_info = info_category_FindInfo( p_cat, psz_name );
@@ -719,13 +717,13 @@ static int InputItemVaAddInfo( input_item_t *p_i,
 {
     vlc_mutex_assert( &p_i->lock );
 
-    info_category_t *p_cat = InputItemFindCat( p_i, NULL, psz_cat );
+    info_category_t *p_cat = InputItemFindCat( p_i, psz_cat );
     if( !p_cat )
     {
         p_cat = info_category_New( psz_cat );
         if( !p_cat )
             return VLC_ENOMEM;
-        TAB_APPEND(p_i->i_categories, p_i->pp_categories, p_cat);
+        vlc_list_append( &p_cat->node, &p_i->categories );
     }
     info_t *p_info = info_category_VaAddInfo( p_cat, psz_name, psz_format, args );
     if( !p_info || !p_info->psz_value )
@@ -761,8 +759,7 @@ int input_item_DelInfo( input_item_t *p_i,
                         const char *psz_name )
 {
     vlc_mutex_lock( &p_i->lock );
-    int i_cat;
-    info_category_t *p_cat = InputItemFindCat( p_i, &i_cat, psz_cat );
+    info_category_t *p_cat = InputItemFindCat( p_i, psz_cat );
     if( !p_cat )
     {
         vlc_mutex_unlock( &p_i->lock );
@@ -782,8 +779,8 @@ int input_item_DelInfo( input_item_t *p_i,
     else
     {
         /* Remove the complete categorie */
+        vlc_list_remove( &p_cat->node );
         info_category_Delete( p_cat );
-        TAB_ERASE(p_i->i_categories, p_i->pp_categories, i_cat);
     }
     vlc_mutex_unlock( &p_i->lock );
 
@@ -795,15 +792,15 @@ int input_item_DelInfo( input_item_t *p_i,
 void input_item_ReplaceInfos( input_item_t *p_item, info_category_t *p_cat )
 {
     vlc_mutex_lock( &p_item->lock );
-    int i_cat;
-    info_category_t *p_old = InputItemFindCat( p_item, &i_cat, p_cat->psz_name );
+    info_category_t *p_old = InputItemFindCat( p_item, p_cat->psz_name );
     if( p_old )
     {
+        vlc_list_add_after( &p_cat->node, &p_old->node );
+        vlc_list_remove( &p_old->node );
         info_category_Delete( p_old );
-        p_item->pp_categories[i_cat] = p_cat;
     }
     else
-        TAB_APPEND(p_item->i_categories, p_item->pp_categories, p_cat);
+        vlc_list_append( &p_cat->node, &p_item->categories );
     vlc_mutex_unlock( &p_item->lock );
 
     vlc_event_send( &p_item->event_manager,
@@ -813,7 +810,7 @@ void input_item_ReplaceInfos( input_item_t *p_item, info_category_t *p_cat )
 void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
 {
     vlc_mutex_lock( &p_item->lock );
-    info_category_t *p_old = InputItemFindCat( p_item, NULL, p_cat->psz_name );
+    info_category_t *p_old = InputItemFindCat( p_item, p_cat->psz_name );
     if( p_old )
     {
         info_t *info;
@@ -824,7 +821,7 @@ void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
         info_category_Delete( p_cat );
     }
     else
-        TAB_APPEND(p_item->i_categories, p_item->pp_categories, p_cat);
+        vlc_list_append( &p_cat->node, &p_item->categories );
     vlc_mutex_unlock( &p_item->lock );
 
     vlc_event_send( &p_item->event_manager,
@@ -1062,7 +1059,7 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     p_input->opaques = NULL;
 
     p_input->i_duration = duration;
-    TAB_INIT( p_input->i_categories, p_input->pp_categories );
+    vlc_list_init( &p_input->categories );
     TAB_INIT( p_input->i_es, p_input->es );
     p_input->p_stats = NULL;
     TAB_INIT( p_input->i_epg, p_input->pp_epg );

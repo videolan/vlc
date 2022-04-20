@@ -352,8 +352,8 @@
         // build list of streams
         NSMutableArray *streams = [NSMutableArray array];
 
-        for (int i = 0; i < p_input->i_categories; i++) {
-            info_category_t *cat = p_input->pp_categories[i];
+        info_category_t *cat;
+        vlc_list_foreach(cat, &p_input->categories, node) {
             info_t *info;
 
             if (info_category_IsHidden(cat))

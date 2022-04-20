@@ -62,13 +62,17 @@ static input_item_t* vlclua_input_item_get_internal( lua_State *L );
 static int vlclua_input_item_info( lua_State *L )
 {
     input_item_t *p_item = vlclua_input_item_get_internal( L );
-    int i_cat;
     int i;
-    i_cat = p_item->i_categories;
+    int i_cat = 0;
+
+    info_category_t *p_category;
+    vlc_list_foreach( p_category, &p_item->categories, node )
+        i_cat++;
+
     lua_createtable( L, 0, i_cat );
-    for( i = 0; i < i_cat; i++ )
+
+    vlc_list_foreach( p_category, &p_item->categories, node )
     {
-        info_category_t *p_category = p_item->pp_categories[i];
         info_t *p_info;
 
         if (info_category_IsHidden(p_category))

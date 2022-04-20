@@ -53,6 +53,7 @@ struct info_category_t
 {
     char   *psz_name;      /**< Name of this category */
     struct vlc_list infos; /**< Infos in the category */
+    struct vlc_list node;  /**< node, to put this category in a list */
 };
 
 /**
@@ -97,8 +98,7 @@ struct input_item_t
     vlc_tick_t i_duration;           /**< Duration in vlc ticks */
 
 
-    int        i_categories;         /**< Number of info categories */
-    info_category_t **pp_categories; /**< Pointer to the first info category */
+    struct vlc_list categories;      /**< List of categories */
 
     int         i_es;                /**< Number of es format descriptions */
     es_format_t **es;                /**< Es formats */

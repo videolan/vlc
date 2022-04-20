@@ -500,15 +500,16 @@ void InfoPanel::update( input_item_t *p_item)
 
     vlc_mutex_locker locker( &p_item->lock );
 
-    for( int i = 0; i< p_item->i_categories ; i++)
+    info_category_t *cat;
+    vlc_list_foreach(cat, &p_item->categories, node)
     {
-        if (info_category_IsHidden(p_item->pp_categories[i]))
+        if (info_category_IsHidden(cat))
             continue;
 
-        struct vlc_list *const head = &p_item->pp_categories[i]->infos;
+        struct vlc_list *const head = &cat->infos;
 
         current_item = new QTreeWidgetItem();
-        current_item->setText( 0, qfu(p_item->pp_categories[i]->psz_name) );
+        current_item->setText( 0, qfu(cat->psz_name) );
         InfoTree->addTopLevelItem( current_item );
 
         for (info_t *info = vlc_list_first_entry_or_null(head, info_t, node);

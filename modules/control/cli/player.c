@@ -508,9 +508,9 @@ static int PlayerItemInfo(struct cli_client *cl, const char *const *args,
     if (item != NULL)
     {
         vlc_mutex_lock(&item->lock);
-        for (int i = 0; i < item->i_categories; i++)
+        info_category_t *category;
+        vlc_list_foreach(category, &item->categories, node)
         {
-            info_category_t *category = item->pp_categories[i];
             info_t *info;
 
             if (info_category_IsHidden(category))

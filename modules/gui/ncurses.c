@@ -649,8 +649,8 @@ static int DrawInfo(intf_thread_t *intf)
         return 0;
 
     vlc_mutex_lock(&item->lock);
-    for (int i = 0; i < item->i_categories; i++) {
-        info_category_t *p_category = item->pp_categories[i];
+    info_category_t *p_category;
+    vlc_list_foreach(p_category, &item->categories, node) {
         info_t *p_info;
 
         if (info_category_IsHidden(p_category))
