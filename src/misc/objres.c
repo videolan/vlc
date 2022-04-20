@@ -134,7 +134,7 @@ static bool ptrcmp(void *a, void *b)
     return a == b;
 }
 
-void *vlc_obj_malloc(vlc_object_t *obj, size_t size)
+void *(vlc_obj_malloc)(vlc_object_t *obj, size_t size)
 {
     void *ptr = vlc_objres_new(size, dummy_release);
     if (likely(ptr != NULL))
@@ -142,7 +142,7 @@ void *vlc_obj_malloc(vlc_object_t *obj, size_t size)
     return ptr;
 }
 
-void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb, size_t size)
+void *(vlc_obj_calloc)(vlc_object_t *obj, size_t nmemb, size_t size)
 {
     size_t tabsize;
     if (unlikely(mul_overflow(nmemb, size, &tabsize)))
@@ -165,12 +165,12 @@ static void *vlc_obj_memdup(vlc_object_t *obj, const void *base, size_t len)
     return ptr;
 }
 
-char *vlc_obj_strdup(vlc_object_t *obj, const char *str)
+char *(vlc_obj_strdup)(vlc_object_t *obj, const char *str)
 {
     return vlc_obj_memdup(obj, str, strlen(str) + 1);
 }
 
-void vlc_obj_free(vlc_object_t *obj, void *ptr)
+void (vlc_obj_free)(vlc_object_t *obj, void *ptr)
 {
     vlc_objres_remove(obj, ptr, ptrcmp);
 }
