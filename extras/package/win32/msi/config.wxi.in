@@ -10,8 +10,9 @@
     <?define VerMajor = "@VERSION_MAJOR@" ?>
     <?define VerMinor = "@VERSION_MINOR@" ?>
     <?define VerPatch = "@VERSION_REVISION@" ?>
+    <?define VerExtra = "@VERSION_EXTRA@" ?>
     <?define Version = "$(var.VerMajor).$(var.VerMinor).$(var.VerPatch)" ?>
-    <?define VersionLong = "$(var.Version).0" ?>
+    <?define VersionLong = "$(var.Version).$(var.VerExtra)" ?>
 
     <?define SourceDir = "vlc-@VERSION@" ?>
     <!--<?define PluginsPath = "$(var.BinPath)\plugins" ?>
