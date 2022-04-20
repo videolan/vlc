@@ -33,6 +33,10 @@
 #include "nvdec_fmt.h"
 #include "hw_pool.h"
 
+#ifndef CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT
+# define CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT 14
+#endif
+
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 static int DecoderContextOpen(vlc_decoder_device *, vout_window_t *);
