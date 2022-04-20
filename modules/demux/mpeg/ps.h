@@ -293,6 +293,10 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
                 es_format_Change( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
                 tk->fmt.i_original_fourcc = VLC_FOURCC('L','A','T','M');
             }
+            else if( i_type == 0x2d )
+            {
+                es_format_Change( &tk->fmt, AUDIO_ES, VLC_CODEC_MPEGH );
+            }
             else if( tk->fmt.i_cat == UNKNOWN_ES )
             {
                 es_format_Change( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
