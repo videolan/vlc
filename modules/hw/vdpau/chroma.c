@@ -461,14 +461,21 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
         return NULL;
     }
 
-    /* Update history and take "present" picture field */
+    /* Update history and put "present" picture field as future */
     sys->history[MAX_PAST + MAX_FUTURE] = src;
 
+    /* future position pic slides as current at end of the call (skip:) */
     picture_t *pic_f = sys->history[MAX_PAST];
-    if (pic_f == NULL)
-    {   /* If the picture is forced, ignore deinterlacing and fast forward. */
+    if (pic_f == NULL) /* If we just started, there is no future pic */
+    {
+        /* If the picture is not forced (first pic is), we ignore deinterlacing
+         * and fast forward, as there's nothing to output for this call. */
+        if(!src->b_force)
+            goto skip;
         /* FIXME: Remove the forced hack pictures in video output core and
-         * allow the last field of a video to be rendered properly. */
+         * allow the last field of a video to be rendered properly.
+         * As we're working with a MAX_FUTURE frame delay, we'll need a signal
+         * to solve those single frame and last frame issues. */
         while (sys->history[MAX_PAST] == NULL)
         {
             pic_f = sys->history[0];
