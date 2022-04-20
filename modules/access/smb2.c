@@ -660,8 +660,8 @@ vlc_smb2_connect_open_share(stream_t *access, const char *url,
     if (!username)
     {
         username = "Guest";
-        /* A NULL password enable ntlmssp anonymous login */
-        password = NULL;
+        /* An empty password enable ntlmssp anonymous login */
+        password = "";
     }
 
     smb2_set_security_mode(sys->smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
