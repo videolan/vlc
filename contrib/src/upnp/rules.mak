@@ -42,6 +42,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win64.patch
 	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
+	$(APPLY) $(SRC)/upnp/win32-gettimeofday.patch
 endif
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID
