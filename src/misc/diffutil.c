@@ -379,6 +379,7 @@ static void buildResultInsert(void* cbData, const void* listOld, uint32_t oldPos
         if (previousOp->type == VLC_DIFFUTIL_OP_INSERT
             && previousOp->op.insert.y + previousOp->count == newPos)
         {
+            ctx->head++;
             previousOp->count += 1;
             return;
         }

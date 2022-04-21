@@ -221,8 +221,11 @@ int main()
 
     CHECK_SIMPLE("____", "__AA__", {'+', 2, "A"}, {'+', 3, "A"});
     CHECK_SIMPLE("____", "__A_A_", {'+', 2, "A"}, {'+', 4, "A"});
+    CHECK_SIMPLE("__", "A__A", {'+', 0, "A"}, {'+', 3, "A"});
+    CHECK_SIMPLE("____", "AA____AA", {'+', 0, "A"}, {'+', 1, "A"}, {'+', 6, "A"}, {'+', 7, "A"});
     CHECK_SIMPLE("__DD__", "____", {'-', 2, "D"}, {'-', 2, "D"});
     CHECK_SIMPLE("__D_D_", "____", {'-', 2, "D"}, {'-', 3, "D"});
+    CHECK_SIMPLE("D__D", "__", {'-', 0, "D"}, {'-', 2, "D"});
     CHECK_SIMPLE("__DD__", "__A__", {'-', 2, "D"}, {'-', 2, "D"}, {'+', 2, "A"});
     CHECK_SIMPLE("__DD____", "____A__", {'-', 2, "D"}, {'-', 2, "D"}, {'+', 4, "A"});
     CHECK_SIMPLE("____DD__", "__A____", {'+', 2, "A"}, {'-', 5, "D"}, {'-', 5, "D"});
@@ -236,11 +239,17 @@ int main()
     CHECK_AGGREG("DDDD", "AAA", {'-', 0, "DDDD"}, {'+', 0, "AAA"});
     CHECK_AGGREG("____", "__AA__", {'+', 2, "AA"});
     CHECK_AGGREG("____", "__A_A_", {'+', 2, "A"}, {'+', 4, "A"});
+    CHECK_AGGREG("____", "AA____AA", {'+', 0, "AA"}, {'+', 6, "AA"});
+    CHECK_AGGREG("____", "AA__AA__AA", {'+', 0, "AA"}, {'+', 4, "AA"}, {'+', 8, "AA"});
     CHECK_AGGREG("__DD__", "____", {'-', 2, "DD"});
     CHECK_AGGREG("__D_D_", "____", {'-', 2, "D"}, {'-', 3, "D"});
+    CHECK_AGGREG("DD____DD", "____", {'-', 0, "DD"}, {'-', 4, "DD"});
+    CHECK_AGGREG("DD__DD__DD", "____", {'-', 0, "DD"}, {'-', 2, "DD"}, {'-', 4, "DD"});
     CHECK_AGGREG("__DD__", "__A__", {'-', 2, "DD"}, {'+', 2, "A"});
     CHECK_AGGREG("__DD____", "____A__", {'-', 2, "DD"}, {'+', 4, "A"});
     CHECK_AGGREG("____DD__", "__A____", {'+', 2, "A"}, {'-', 5, "DD"});
+    CHECK_AGGREG("__DD__", "AA____AA", {'+', 0, "AA"}, {'-', 4, "DD"}, {'+', 6, "AA"});
+    CHECK_AGGREG("DD____DD", "__AA__", {'-', 0, "DD"}, {'+', 2, "AA"}, {'-', 6, "DD"});
 
 
     //move forward
@@ -282,6 +291,12 @@ int main()
     CHECK_MOVE_AG("__DD__", "__A__", {'-', 2, "DD"}, {'+', 2, "A"});
     CHECK_MOVE_AG("__DD____", "____A__", {'-', 2, "DD"}, {'+', 4, "A"});
     CHECK_MOVE_AG("____DD__", "__A____", {'+', 2, "A"}, {'-', 5, "DD"});
+    CHECK_MOVE_AG("____", "AA____AA", {'+', 0, "AA"}, {'+', 6, "AA"});
+    CHECK_MOVE_AG("____", "AA__AA__AA", {'+', 0, "AA"}, {'+', 4, "AA"}, {'+', 8, "AA"});
+    CHECK_MOVE_AG("DD____DD", "____", {'-', 0, "DD"}, {'-', 4, "DD"});
+    CHECK_MOVE_AG("DD__DD__DD", "____", {'-', 0, "DD"}, {'-', 2, "DD"}, {'-', 4, "DD"});
+    CHECK_MOVE_AG("__DD__", "AA____AA", {'+', 0, "AA"}, {'-', 4, "DD"}, {'+', 6, "AA"});
+    CHECK_MOVE_AG("DD____DD", "__AA__", {'-', 0, "DD"}, {'+', 2, "AA"}, {'-', 6, "DD"});
 
     CHECK_MOVE_AG("_123______", "______123_", {'m', CHECK_MOVE_PACK(1, 9), "123"});
     CHECK_MOVE_AG("______123_", "_123______", {'m', CHECK_MOVE_PACK(6, 1), "123"});
