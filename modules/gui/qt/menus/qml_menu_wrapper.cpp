@@ -384,6 +384,48 @@ void QmlMenuBar::onMenuClosed()
         emit menuClosed();
 }
 
+// QmlMenuPositioner
+
+/* explicit */ QmlMenuPositioner::QmlMenuPositioner(QObject * parent) : QObject(parent) {}
+
+// Interface
+
+void QmlMenuPositioner::popup(QMenu * menu, const QPoint & position, bool above)
+{
+    menu->removeEventFilter(this);
+
+    if (above == false)
+    {
+        menu->popup(position);
+
+        return;
+    }
+
+    m_position = position;
+
+    menu->installEventFilter(this);
+
+    // NOTE: QMenu::height() returns an invalid height until the initial popup call.
+    menu->popup(position);
+}
+
+// Public events
+
+bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
+{
+    if (event->type() == QEvent::Resize)
+    {
+        QMenu * menu = static_cast<QMenu *> (object);
+
+        int x = m_position.x();
+        int y = m_position.y();
+
+        menu->move(QPoint(x, y - menu->height()));
+    }
+
+    return QObject::eventFilter(object, event);
+}
+
 // QmlBookmarkMenu
 
 /* explicit */ QmlBookmarkMenu::QmlBookmarkMenu(QObject * parent) : QObject(parent) {}

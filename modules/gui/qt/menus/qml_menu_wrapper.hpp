@@ -180,6 +180,21 @@ private:
     QmlMenuBar* m_menubar = nullptr;
 };
 
+class QmlMenuPositioner : public QObject
+{
+public:
+    explicit QmlMenuPositioner(QObject * parent = nullptr);
+
+public: // Interface
+    void popup(QMenu * menu, const QPoint & position, bool above);
+
+public: // Events
+    bool eventFilter(QObject * object, QEvent * event);
+
+private:
+    QPoint m_position;
+};
+
 class QmlBookmarkMenu : public QObject
 {
     Q_OBJECT
