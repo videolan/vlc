@@ -354,11 +354,10 @@ void MLListCache::partialUpdate()
             break;
         case VLC_DIFFUTIL_OP_REMOVE:
             m_partialX = op.op.remove.x;
-            m_partialIndex = op.op.remove.index + op.count - 1;
+            m_partialIndex = op.op.remove.index;
             emit beginRemoveRows(op.op.remove.index, op.op.remove.index + op.count - 1);
             m_partialLoadedCount -= op.count;
             m_partialX += op.count;
-            m_partialIndex = op.op.remove.index + 1;
             partialTotalCount -= op.count;
             emit endRemoveRows();
             emit localSizeChanged(partialTotalCount);
