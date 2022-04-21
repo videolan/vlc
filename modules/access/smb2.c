@@ -341,7 +341,7 @@ FileSeek(stream_t *access, uint64_t i_pos)
     int err = smb2_lseek(op.smb2, sys->smb2fh, i_pos, SEEK_SET, NULL);
     if (err < 0)
     {
-        VLC_SMB2_SET_ERROR(&op, "smb2_seek_async", err);
+        VLC_SMB2_SET_ERROR(&op, "smb2_lseek", err);
         return err;
     }
     sys->eof = false;
