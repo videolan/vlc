@@ -205,6 +205,15 @@ FocusScope {
         }
     }
 
+    Component {
+        id: acrylicBackground
+
+        Widgets.AcrylicBackground {
+            width: rootPlayer.width
+            alternativeColor: rootPlayer.colors.playerBg
+        }
+    }
+
     /* top control bar background */
     Widgets.DrawerExt {
         edge: Widgets.DrawerExt.Edges.Top
@@ -215,7 +224,7 @@ FocusScope {
 
         component: {
             if (rootPlayer.pinVideoControls)
-                return backgroundForPinnedControls
+                return acrylicBackground
             else if (topcontrolView.contentItem.isResumeDialogVisible)
                 return topcontrolViewResumeBg
             else
