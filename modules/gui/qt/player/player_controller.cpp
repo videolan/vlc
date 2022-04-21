@@ -1573,6 +1573,8 @@ void PlayerController::setVolumeDown(int steps)
 void PlayerController::setMuted(bool muted)
 {
     Q_D(PlayerController);
+    if( d->m_muted == muted )
+        return;
     vlc_player_locker lock{ d->m_player };
     vlc_player_aout_Mute( d->m_player, muted );
 }
