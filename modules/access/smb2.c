@@ -313,6 +313,13 @@ FileSeek(stream_t *access, uint64_t i_pos)
     if (sys->smb2 == NULL)
         return VLC_EGENERIC;
 
+    if (i_pos > INT64_MAX)
+    {
+        msg_Err(access, "can't seek past INT64_MAX (requested: %"PRIu64")\n",
+                i_pos);
+        return VLC_EGENERIC;
+    }
+
     struct vlc_smb2_op op = VLC_SMB2_OP(access, &sys->smb2);
 
     int64_t err = smb2_lseek(op.smb2, sys->smb2fh, i_pos, SEEK_SET, NULL);
