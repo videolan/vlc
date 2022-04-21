@@ -315,7 +315,7 @@ FileSeek(stream_t *access, uint64_t i_pos)
 
     struct vlc_smb2_op op = VLC_SMB2_OP(access, &sys->smb2);
 
-    int err = smb2_lseek(op.smb2, sys->smb2fh, i_pos, SEEK_SET, NULL);
+    int64_t err = smb2_lseek(op.smb2, sys->smb2fh, i_pos, SEEK_SET, NULL);
     if (err < 0)
     {
         VLC_SMB2_SET_ERROR(&op, "smb2_lseek", err);
