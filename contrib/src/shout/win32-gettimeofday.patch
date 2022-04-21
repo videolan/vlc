@@ -1,0 +1,22 @@
+--- libshout/src/common/timing/timing.c.orig	2022-04-21 15:00:39.729501137 +0300
++++ libshout/src/common/timing/timing.c	2022-04-21 15:00:43.565527749 +0300
+@@ -37,6 +37,9 @@
+ #include <mmsystem.h>
+ #include <winsock2.h>
+ #else
++#include <unistd.h>
++#endif
++
+ #ifdef TIME_WITH_SYS_TIME
+ #  include <sys/time.h>
+ #  include <time.h>
+@@ -48,9 +51,6 @@
+ #  endif
+ #endif
+ 
+-#include <unistd.h>
+-#endif
+-
+ #ifdef HAVE_SYS_SELECT_H
+ #include <sys/select.h>
+ #endif

@@ -29,6 +29,7 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(APPLY) $(SRC)/shout/no-examples.patch
 	$(APPLY) $(SRC)/shout/no-force-libwsock.patch
 	$(APPLY) $(SRC)/shout/should-win32-ws2tcpip.patch
+	$(APPLY) $(SRC)/shout/win32-gettimeofday.patch
 	$(call pkg_static,"shout.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
