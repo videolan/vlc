@@ -1,0 +1,11 @@
+--- regex/regex.c.orig	2022-04-21 17:46:06.786845467 +0300
++++ regex/regex.c	2022-04-21 16:46:41.670051683 +0300
+@@ -127,6 +127,8 @@
+ #  else
+ char *malloc ();
+ char *realloc ();
++void abort ();
++void free ();
+ #  endif
+ 
+ /* When used in Emacs's lib-src, we need to get bzero and bcopy somehow.
