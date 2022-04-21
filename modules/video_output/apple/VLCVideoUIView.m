@@ -221,16 +221,17 @@
 
 - (void)displayLinkUpdate:(CADisplayLink *)sender
 {
+    vlc_tick_t now = vlc_tick_now();
+
+    CFTimeInterval ca_now = CACurrentMediaTime();
+    CFTimeInterval ca_current = [sender timestamp];
+    CFTimeInterval ca_target = [sender targetTimestamp];
+
+    vlc_tick_t ca_now_ts = vlc_tick_from_sec(ca_now);
+    vlc_tick_t ca_current_ts = vlc_tick_from_sec(ca_current);
+    vlc_tick_t ca_target_ts = vlc_tick_from_sec(ca_target);
+
     [self reportEvent:^{
-        vlc_tick_t now = vlc_tick_now();
-
-        CFTimeInterval ca_now = CACurrentMediaTime();
-        CFTimeInterval ca_current = [sender timestamp];
-        CFTimeInterval ca_target = [sender targetTimestamp];
-
-        vlc_tick_t ca_now_ts = vlc_tick_from_sec(ca_now);
-        vlc_tick_t ca_current_ts = vlc_tick_from_sec(ca_current);
-        vlc_tick_t ca_target_ts = vlc_tick_from_sec(ca_target);
 
         /*if (@available(iOS 10, *))
             target_ts = [sender targetTimestamp]; */
