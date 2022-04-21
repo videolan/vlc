@@ -1,0 +1,11 @@
+--- librist/contrib/mbedtls/library/timing.c.orig	2022-04-21 15:15:32.479888797 +0300
++++ librist/contrib/mbedtls/library/timing.c	2022-04-21 15:15:46.615589264 +0300
+@@ -195,7 +195,7 @@
+ #endif /* !HAVE_HARDCLOCK && MBEDTLS_HAVE_ASM &&
+           __GNUC__ && __ia64__ */
+ 
+-#if !defined(HAVE_HARDCLOCK) && defined(_MSC_VER) && \
++#if !defined(HAVE_HARDCLOCK) && defined(_WIN32) && \
+     !defined(EFIX64) && !defined(EFI32)
+ 
+ #define HAVE_HARDCLOCK
