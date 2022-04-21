@@ -20,6 +20,7 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2 .sum-zvbi
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-static-linking.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/zvbi/zvbi-win32.patch
+	$(APPLY) $(SRC)/zvbi/zvbi-win32-undefined.patch
 endif
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-clang-support.patch
 ifdef HAVE_ANDROID
