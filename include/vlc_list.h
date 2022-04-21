@@ -328,7 +328,7 @@ static inline void *vlc_list_last_or_null(const struct vlc_list *head,
 }
 
 static inline void *vlc_list_prev_or_null(const struct vlc_list *head,
-                                          struct vlc_list *node,
+                                          const struct vlc_list *node,
                                           size_t offset)
 {
     if (vlc_list_is_first(node, head))
@@ -337,7 +337,7 @@ static inline void *vlc_list_prev_or_null(const struct vlc_list *head,
 }
 
 static inline void *vlc_list_next_or_null(const struct vlc_list *head,
-                                          struct vlc_list *node,
+                                          const struct vlc_list *node,
                                           size_t offset)
 {
     if (vlc_list_is_last(node, head))
