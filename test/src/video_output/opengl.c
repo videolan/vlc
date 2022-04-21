@@ -125,18 +125,29 @@ OpenOpenGLCommon(
         bool offscreen, enum vlc_gl_api_type api_type)
 {
     (void)width; (void)height;
-    gl->make_current = OpenGLMakeCurrent;
-    gl->release_current = OpenGLReleaseCurrent;
-    gl->resize = NULL;
-    gl->get_proc_address = OpenGLGetSymbol;
-    gl->destroy = OpenGLClose;
-
-    if (offscreen)
-        gl->swap_offscreen = OpenGLSwapOffscreen;
-    else
-        gl->swap = OpenGLSwap;
-
     assert(gl->api_type == api_type);
+
+    static const struct vlc_gl_operations onscreen_ops =
+    {
+        .make_current = OpenGLMakeCurrent,
+        .release_current = OpenGLReleaseCurrent,
+        .resize = NULL,
+        .get_proc_address = OpenGLGetSymbol,
+        .swap = OpenGLSwap,
+        .close = OpenGLClose,
+    };
+
+    static const struct vlc_gl_operations offscreen_ops =
+    {
+        .make_current = OpenGLMakeCurrent,
+        .release_current = OpenGLReleaseCurrent,
+        .resize = NULL,
+        .get_proc_address = OpenGLGetSymbol,
+        .swap_offscreen = OpenGLSwapOffscreen,
+        .close = OpenGLClose,
+    };
+
+    gl->ops = offscreen ? &offscreen_ops : &onscreen_ops;
     return VLC_SUCCESS;
 }
 
