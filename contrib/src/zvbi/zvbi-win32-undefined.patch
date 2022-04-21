@@ -1,0 +1,88 @@
+--- zvbi/src/io.h.orig	2022-04-27 13:12:22.154124296 +0300
++++ zvbi/src/io.h	2022-04-27 13:12:54.706349113 +0300
+@@ -28,6 +28,12 @@
+ #include "decoder.h"
+ #include "bit_slicer.h"
+ 
++#if defined(_WIN32) && defined(__has_include_next)
++# if __has_include_next(<io.h>)
++#  include_next <io.h>
++# endif
++#endif
++
+ /* Public */
+ 
+ #include <sys/time.h> /* struct timeval */
+--- zvbi/src/io.c.orig	2022-04-21 14:52:30.294105422 +0300
++++ zvbi/src/io.c	2022-04-21 14:39:26.424663785 +0300
+@@ -556,7 +556,6 @@
+ 		return ret;
+ 	}
+ }
+-#endif
+ /* Helper functions to log the communication between the library and drivers.
+    FIXME remove fp arg, call user log function instead (0.3). */
+ 
+@@ -777,7 +776,6 @@
+ 	return err;
+ }
+ 
+-#ifndef _WIN32
+ /**
+  * @internal
+  * Drop-in for mmap(). Logs the request on fp if not NULL.
+@@ -827,7 +825,7 @@
+ 
+ 	return r;
+ }
+-#endif
++
+ /**
+  * @internal
+  * Drop-in for munmap(). Logs the request on fp if not NULL.
+@@ -860,6 +858,7 @@
+ 
+ 	return r;
+ }
++#endif
+ 
+ /*
+ Local variables:
+--- zvbi/src/page_table.c.orig	2022-04-21 14:52:22.018047995 +0300
++++ zvbi/src/page_table.c	2022-04-21 14:48:38.224494983 +0300
+@@ -35,6 +35,17 @@
+ #include "misc.h"
+ #include "page_table.h"
+ 
++#ifdef _WIN32
++#include <intrin.h>
++static inline int ffs(int value) {
++	unsigned long index;
++	if (value == 0)
++		return 0;
++	_BitScanForward(&index, value);
++	return index + 1;
++}
++#endif
++
+ /**
+  * addtogroup PageTable Teletext Page Number Table
+  * ingroup LowDec
+--- zvbi/src/pdc.c.orig	2022-04-21 14:52:12.297980549 +0300
++++ zvbi/src/pdc.c	2022-04-21 14:51:40.529760109 +0300
+@@ -35,6 +35,7 @@
+ #include "pdc.h"
+ #include "conv.h"
+ 
++#ifndef _WIN32
+ /**
+  * @addtogroup ProgramID VPS/PDC Program ID
+  * @ingroup LowDec
+@@ -1460,6 +1461,7 @@
+ 		}
+ 	}
+ }
++#endif
+ 
+ /*
+ Local variables:
