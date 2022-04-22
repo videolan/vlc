@@ -1556,18 +1556,18 @@ void PlayerController::setVolume(float volume)
     vlc_player_aout_SetVolume( d->m_player, volume );
 }
 
-void PlayerController::setVolumeUp()
+void PlayerController::setVolumeUp(int steps)
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    vlc_player_aout_IncrementVolume( d->m_player, 1, NULL );
+    vlc_player_aout_IncrementVolume( d->m_player, steps, NULL );
 }
 
-void PlayerController::setVolumeDown()
+void PlayerController::setVolumeDown(int steps)
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    vlc_player_aout_DecrementVolume( d->m_player, 1, NULL );
+    vlc_player_aout_DecrementVolume( d->m_player, steps, NULL );
 }
 
 void PlayerController::setMuted(bool muted)

@@ -220,8 +220,8 @@ public slots:
     void toggleFullscreen();
 
     //aout properties
-    void setVolumeUp();
-    void setVolumeDown();
+    void setVolumeUp( int steps = 1 );
+    void setVolumeDown( int steps = 1 );
     void toggleMuted();
 
     //misc
