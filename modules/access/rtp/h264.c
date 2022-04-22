@@ -24,92 +24,10 @@
 
 #include <assert.h>
 
-#include <vlc_common.h>
+#include "h26x.h"
+
 #include <vlc_plugin.h>
-#include <vlc_block.h>
-#include <vlc_strings.h>
 #include <vlc_codec.h>
-
-#include "rtp.h"
-#include "sdp.h"
-
-struct rtp_h26x_sys
-{
-    vlc_tick_t pts;
-    block_t **pp_packets_next;
-    block_t *p_packets;
-    block_t *xps;
-    struct vlc_rtp_es *es;
-};
-
-static void rtp_h26x_clear(struct rtp_h26x_sys *sys)
-{
-    block_ChainRelease(sys->p_packets);
-    if(sys->xps)
-        block_Release(sys->xps);
-}
-
-static void rtp_h26x_init(struct rtp_h26x_sys *sys)
-{
-    sys->pts = VLC_TICK_INVALID;
-    sys->p_packets = NULL;
-    sys->pp_packets_next = &sys->p_packets;
-    sys->xps = NULL;
-    sys->es = NULL;
-}
-
-static const uint8_t annexbheader[] = { 0, 0, 0, 1 };
-
-static block_t * h26x_wrap_prefix(block_t *block, bool b_annexb)
-{
-    block = block_Realloc(block, 4, block->i_buffer);
-    if(block)
-    {
-        if(b_annexb)
-            memcpy(block->p_buffer, annexbheader, 4);
-        else
-            SetDWBE(block->p_buffer, block->i_buffer - 4);
-    }
-    return block;
-}
-
-static void h26x_extractbase64xps(const char *psz64,
-                                  const char *pszend,
-                                  void(*pf_output)(void *, uint8_t *, size_t),
-                                  void *outputsys)
-{
-    do
-    {
-        psz64 += strspn(psz64, " ");
-        uint8_t *xps = NULL;
-        size_t xpssz = vlc_b64_decode_binary(&xps, psz64);
-        pf_output(outputsys, xps, xpssz);
-        psz64 = strchr(psz64, ',');
-        if(psz64)
-            ++psz64;
-    } while(psz64 && *psz64 && psz64 < pszend);
-}
-
-static void h264_add_xps(void *priv, uint8_t *xps, size_t xpssz)
-{
-    block_t *b = block_heap_Alloc(xps, xpssz);
-    if(!b || !(b = h26x_wrap_prefix(b, true)))
-        return;
-
-    block_t ***ppp_append = priv;
-    **ppp_append = b;
-    *ppp_append = &((**ppp_append)->p_next);
-}
-
-static block_t * h264_fillextradata (const char *psz)
-{
-    block_t *xps = NULL;
-    block_t **pxps = &xps;
-    h26x_extractbase64xps(psz, strchr(psz, ';'), h264_add_xps, &pxps);
-    if(xps)
-        xps = block_ChainGather(xps);
-    return xps;
-}
 
 static void *rtp_h264_init(struct vlc_rtp_pt *pt)
 {
@@ -224,41 +142,6 @@ static block_t * h264_chainsplit_MTAP(block_t *block, bool b_24ext,
     }
     block_Release(block);
     return p_chain;
-}
-
-static void h26x_output(struct rtp_h26x_sys *sys,
-                        block_t *block,
-                        vlc_tick_t pts, bool pcr, bool au_end)
-{
-//    if(pcr)
-//        es_out_SetPCR(out, pts);
-
-    if(!block)
-        return;
-
-    if(sys->xps)
-    {
-        block_t *xps = sys->xps;
-        sys->xps = NULL;
-        h26x_output(sys, xps, pts, pcr, false);
-    }
-
-    block->i_pts = pts;
-    block->i_dts = VLC_TICK_INVALID; /* RTP does not specify this */
-    if(au_end)
-        block->i_flags |= BLOCK_FLAG_AU_END;
-    vlc_rtp_es_send(sys->es, block);
-}
-
-static void h26x_output_blocks(struct rtp_h26x_sys *sys, bool b_annexb)
-{
-    if(!sys->p_packets)
-        return;
-    block_t *out = block_ChainGather(sys->p_packets);
-    sys->p_packets = NULL;
-    sys->pp_packets_next = &sys->p_packets;
-    out = h26x_wrap_prefix(out, b_annexb);
-    h26x_output(sys, out, sys->pts, true, false);
 }
 
 static void rtp_h264_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
@@ -385,7 +268,7 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     {
         psz = strstr(desc->parameters, "sprop-parameter-sets=");
         if(psz)
-            pt->opaque = h264_fillextradata(psz + 21);
+            pt->opaque = h26x_fillextradata(psz + 21);
     }
 
     return VLC_SUCCESS;

@@ -52,7 +52,7 @@ librtp_pcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
 
 librtp_raw_plugin_la_SOURCES = access/rtp/raw.c
 
-librtp_h264_plugin_la_SOURCES = access/rtp/h264.c
+librtp_h264_plugin_la_SOURCES = access/rtp/h264.c access/rtp/h26x.h
 
 librtp_opus_plugin_la_SOURCES = access/rtp/opus.c
 
