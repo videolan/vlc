@@ -480,10 +480,6 @@ static int Demux( demux_t *p_demux)
             bool frame = p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK;
             const vlc_tick_t i_frame_length = p_block_out->i_length;
 
-            /* first output */
-            if( date_Get( &p_sys->output_dts ) == VLC_TICK_0 )
-                es_out_SetPCR( p_demux->out, date_Get( &p_sys->output_dts ) );
-
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             vlc_tick_t pcr = b_eof ? dts : date_Get( &p_sys->output_dts );
@@ -502,8 +498,6 @@ static int Demux( demux_t *p_demux)
                     date_Increment( &p_sys->output_dts, i_nb_fields );
                 }
             }
-
-            es_out_SetPCR( p_demux->out, pcr );
 
             p_block_out = p_next;
         }

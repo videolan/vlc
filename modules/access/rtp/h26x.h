@@ -31,6 +31,7 @@ static const uint8_t annexbheader[] = { 0, 0, 0, 1 };
 
 struct rtp_h26x_sys
 {
+    unsigned flags;
     vlc_tick_t pts;
     block_t **pp_packets_next;
     block_t *p_packets;
@@ -49,6 +50,7 @@ static void rtp_h26x_clear(struct rtp_h26x_sys *sys)
 
 static void rtp_h26x_init(struct rtp_h26x_sys *sys)
 {
+    sys->flags = 0;
     sys->pts = VLC_TICK_INVALID;
     sys->p_packets = NULL;
     sys->pp_packets_next = &sys->p_packets;
