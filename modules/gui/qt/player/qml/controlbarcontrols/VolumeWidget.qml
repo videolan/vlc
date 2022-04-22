@@ -130,27 +130,17 @@ T.Pane {
                 onVolumeChanged: volControl._syncVolumeWithPlayer()
             }
 
-            Timer {
-                // useful for keyboard volume alteration
-                id: tooltipShower
-                running: false
-                repeat: false
-                interval: 1000
-            }
-
             Navigation.leftItem: volumeBtn
             Navigation.parentItem: root
 
             Keys.onUpPressed: {
                 Player.muted = false
                 Player.setVolumeUp()
-                tooltipShower.restart()
             }
 
             Keys.onDownPressed: {
                 Player.muted = false
                 Player.setVolumeDown()
-                tooltipShower.restart()
             }
 
             Keys.priority: Keys.BeforeItem
@@ -174,7 +164,7 @@ T.Pane {
                 active: !paintOnly
 
                 sourceComponent: Widgets.PointingTooltip {
-                    visible: tooltipShower.running || sliderMouseArea.pressed || volControl.pressed || volControl.hovered
+                    visible: sliderMouseArea.pressed || volControl.pressed || volControl.hovered || volControl.visualFocus
 
                     text: Math.round(volControl.value * 100) + "%"
 
