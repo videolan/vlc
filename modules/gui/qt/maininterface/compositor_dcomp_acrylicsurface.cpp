@@ -355,8 +355,8 @@ void CompositorDCompositionAcrylicSurface::sync()
         frameY = GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
     }
 
-    m_translateTransform->SetOffsetX(-1 * (float)rect.left - frameX - dx);
-    m_translateTransform->SetOffsetY(-1 * (float)rect.top - frameY - dy);
+    m_translateTransform->SetOffsetX(-1 * ((float)rect.left + frameX + dx));
+    m_translateTransform->SetOffsetY(-1 * ((float)rect.top + frameY + dy));
     m_rootVisual->SetTransform(m_translateTransform.Get());
 }
 
@@ -366,9 +366,11 @@ void CompositorDCompositionAcrylicSurface::updateVisual()
     if (!w || !w->screen())
         return;
 
+    RECT sourceRect {};
+    GetWindowRect(GetShellWindow(), &sourceRect);
+
     const int desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
     const int desktopHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-    RECT sourceRect {0, 0, desktopWidth, desktopHeight};
     SIZE destinationSize {desktopWidth, desktopHeight};
 
     HWND hwndExclusionList[2];
