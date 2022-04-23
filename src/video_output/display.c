@@ -73,19 +73,19 @@ static int vout_display_Control(vout_display_t *vd, int query)
 /* */
 void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
-                                        const vout_display_cfg_t *cfg)
+                                        const struct vout_display_placement *dp)
 {
     /* Use the original video size */
     if (source->i_sar_num >= source->i_sar_den) {
-        *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.sar.den / source->i_sar_den / cfg->display.sar.num;
+        *width  = (int64_t)source->i_visible_width * source->i_sar_num * dp->sar.den / source->i_sar_den / dp->sar.num;
         *height = source->i_visible_height;
     } else {
         *width  = source->i_visible_width;
-        *height = (int64_t)source->i_visible_height * source->i_sar_den * cfg->display.sar.num / source->i_sar_num / cfg->display.sar.den;
+        *height = (int64_t)source->i_visible_height * source->i_sar_den * dp->sar.num / source->i_sar_num / dp->sar.den;
     }
 
-    *width  = *width  * cfg->display.zoom.num / cfg->display.zoom.den;
-    *height = *height * cfg->display.zoom.num / cfg->display.zoom.den;
+    *width  = *width  * dp->zoom.num / dp->zoom.den;
+    *height = *height * dp->zoom.num / dp->zoom.den;
 
     if (ORIENT_IS_SWAP(source->orientation)) {
         /* Apply the source orientation only if the dimensions are initialized
@@ -118,7 +118,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         display_height = cfg->display.height;
     } else
         vout_display_GetDefaultDisplaySize(&display_width, &display_height,
-                                           source, cfg);
+                                           source, &cfg->display);
 
     const unsigned width  = source->i_visible_width;
     const unsigned height = source->i_visible_height;
@@ -634,7 +634,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         msg_Warn(parent, "window size missing");
         vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
                                            &osys->cfg.display.height,
-                                           source, cfg);
+                                           source, &cfg->display);
     }
 
     osys->pool = NULL;

@@ -454,8 +454,10 @@ static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
  *
  * This assumes that the picture is already cropped.
  */
-VLC_API void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height, const video_format_t *source, const vout_display_cfg_t *);
-
+VLC_API
+void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
+                                        const video_format_t *source,
+                                        const struct vout_display_placement *);
 
 /**
  * Video placement.

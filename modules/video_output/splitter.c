@@ -214,7 +214,7 @@ static vlc_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
     };
 
     vout_display_GetDefaultDisplaySize(&cfg.width, &cfg.height, source,
-                                       vdcfg);
+                                       &vdcfg->display);
 
     vlc_window_t *window = vlc_window_New(obj, NULL, &owner, &cfg);
     if (window != NULL) {
