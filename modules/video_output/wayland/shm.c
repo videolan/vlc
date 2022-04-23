@@ -156,7 +156,7 @@ static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
     vout_display_sys_t *sys = vd->sys;
     assert(sys->viewport == NULL);
 
-    vout_display_PlacePicture(&place, vd->source, vd->cfg);
+    vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
     video_format_ApplyRotation(&src, vd->source);
 
     fmt->i_width  = src.i_width * place.width
@@ -190,7 +190,8 @@ static int Control(vout_display_t *vd, int query)
                 vout_display_place_t place;
 
                 video_format_ApplyRotation(&fmt, vd->source);
-                vout_display_PlacePicture(&place, vd->source, vd->cfg);
+                vout_display_PlacePicture(&place, vd->source,
+                                          &vd->cfg->display);
 
                 wp_viewport_set_source(sys->viewport,
                                 wl_fixed_from_int(fmt.i_x_offset),

@@ -515,17 +515,16 @@ place_dest(vout_display_t *vd, const video_format_t * fmt)
 {
     vout_display_sys_t * const sys = vd->sys;
     // Ignore what VLC thinks might be going on with display size
-    vout_display_cfg_t tcfg = *vd->cfg;
+    struct vout_display_placement dp = vd->cfg->display;
     vout_display_place_t place;
-    tcfg.display.width = sys->display_width;
-    tcfg.display.height = sys->display_height;
-    tcfg.display.autoscale = true;
-    vout_display_PlacePicture(&place, fmt, &tcfg);
+
+    dp.width = sys->display_width;
+    dp.height = sys->display_height;
+    dp.autoscale = true;
+    vout_display_PlacePicture(&place, fmt, &dp);
 
     sys->dest_rect = place_to_mmal_rect(place);
 }
-
-
 
 static int configure_display(vout_display_t *vd, const video_format_t *fmt)
 {

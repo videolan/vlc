@@ -230,7 +230,7 @@ static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
     vout_display_place_t place;
 
     msg_Dbg(vd, "resetting pictures");
-    vout_display_PlacePicture(&place, src, vd->cfg);
+    vout_display_PlacePicture(&place, src, &vd->cfg->display);
 
     fmt->i_width = src->i_width * place.width / src->i_visible_width;
     fmt->i_height = src->i_height * place.height / src->i_visible_height;
@@ -259,7 +259,7 @@ static int Control(vout_display_t *vd, int query)
     {
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, vd->source, vd->cfg);
+        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
         if (place.width  != vd->fmt->i_visible_width
          || place.height != vd->fmt->i_visible_height)
             return VLC_EGENERIC;
@@ -395,7 +395,7 @@ static int Open(vout_display_t *vd,
         };
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, vd->source, vd->cfg);
+        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
         sys->window = xcb_generate_id(sys->conn);
 
         xcb_void_cookie_t c =

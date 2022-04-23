@@ -100,7 +100,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     picture_t *pic = sys->buffers[sys->front_buf];
     vout_display_place_t place;
 
-    vout_display_PlacePicture(&place, vd->fmt, vd->cfg);
+    vout_display_PlacePicture(&place, vd->fmt, &vd->cfg->display);
 
     struct drm_mode_set_plane sp = {
         .plane_id = sys->plane_id,

@@ -281,7 +281,7 @@ static void CreateBuffers(vout_display_t *vd)
                               sys->format.argb, 0, NULL);
 
     vout_display_place_t *place = &sys->place;
-    vout_display_PlacePicture(place, fmt, vd->cfg);
+    vout_display_PlacePicture(place, fmt, &vd->cfg->display);
 
     /* Homogeneous coordinates transform from destination(place)
      * to source(fmt) */

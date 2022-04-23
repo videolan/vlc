@@ -494,7 +494,10 @@ static inline bool vout_display_PlaceEquals(const vout_display_place_t *p1,
  * \param source Video source format
  * \param cfg Display configuration
  */
-VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_format_t *source, const vout_display_cfg_t *cfg);
+VLC_API
+void vout_display_PlacePicture(vout_display_place_t *restrict place,
+                               const video_format_t *restrict source,
+                               const struct vout_display_placement *cfg);
 
 /**
  * Translates coordinates.

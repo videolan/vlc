@@ -409,7 +409,7 @@ static int Control( vout_display_t *vd, int query )
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     {
         vout_display_place_t place;
-        vout_display_PlacePicture(&place, vd->source, vd->cfg);
+        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
 
         sys->kvas.ulAspectWidth  = place.width;
         sys->kvas.ulAspectHeight = place.height;
@@ -893,7 +893,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             i_movie_height = movie_rect.yTop - movie_rect.yBottom;
 
             vout_display_place_t place;
-            vout_display_PlacePicture(&place, vd->source, vd->cfg);
+            vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
 
             int x = ( i_mouse_x - movie_rect.xLeft ) *
                     place.width / i_movie_width + place.x;

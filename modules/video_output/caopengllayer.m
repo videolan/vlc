@@ -370,7 +370,7 @@ static int Open (vout_display_t *vd,
                 sys->videoLayer = nil;
             }
 
-            vout_display_PlacePicture(&sys->place, vd->source, &sys->cfg);
+            vout_display_PlacePicture(&sys->place, vd->source, &sys->cfg.display);
         });
 
         if (sys->videoView == nil) {
@@ -508,7 +508,7 @@ static int Control (vout_display_t *vd, int query)
                     cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
                 sys->cfg = cfg;
 
-                vout_display_PlacePicture(&sys->place, vd->source, &cfg);
+                vout_display_PlacePicture(&sys->place, vd->source, &cfg.display);
             }
 
             // Note!

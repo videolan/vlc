@@ -1134,7 +1134,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     video_format_t fmt_spu;
     if (do_dr_spu) {
         vout_display_place_t place;
-        vout_display_PlacePicture(&place, vd->source, vd->cfg);
+        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
 
         fmt_spu = *vd->source;
         if (fmt_spu.i_width * fmt_spu.i_height < place.width * place.height) {

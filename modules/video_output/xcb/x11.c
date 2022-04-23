@@ -217,7 +217,7 @@ static int Control(vout_display_t *vd, int query)
         vout_display_place_t *place = &sys->place;
         int ret = VLC_SUCCESS;
 
-        vout_display_PlacePicture(place, vd->source, vd->cfg);
+        vout_display_PlacePicture(place, vd->source, &vd->cfg->display);
 
         if (place->width  != sys->fmt.i_visible_width
          || place->height != sys->fmt.i_visible_height)
@@ -376,7 +376,7 @@ static int Open (vout_display_t *vd,
     };
     vout_display_place_t *place = &sys->place;
 
-    vout_display_PlacePicture(place, vd->source, vd->cfg);
+    vout_display_PlacePicture(place, vd->source, &vd->cfg->display);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
     xcb_create_window(conn, sys->depth, sys->window,

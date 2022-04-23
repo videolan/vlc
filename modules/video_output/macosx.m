@@ -331,7 +331,7 @@ static void UpdatePlace (vout_display_t *vd, const vout_display_cfg_t *cfg)
     vout_display_sys_t *sys = vd->sys;
     vout_display_place_t place;
     /* We never receive resize from the core, so provide the size ourselves */
-    vout_display_PlacePicture(&place, vd->source, cfg);
+    vout_display_PlacePicture(&place, vd->source, &cfg->display);
     sys->place = place;
 }
 

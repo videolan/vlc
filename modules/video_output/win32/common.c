@@ -97,7 +97,7 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
 {
     /* Update the window position and size */
     vout_display_place_t before_place = area->place;
-    vout_display_PlacePicture(&area->place, vd->source, vd->cfg);
+    vout_display_PlacePicture(&area->place, vd->source, &vd->cfg->display);
 
     /* Signal the change in size/position */
     if (!vout_display_PlaceEquals(&before_place, &area->place))

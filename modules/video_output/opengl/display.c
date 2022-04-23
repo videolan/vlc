@@ -104,13 +104,13 @@ static const struct vlc_display_operations ops = {
 };
 
 static void
-FlipVerticalAlign(vout_display_cfg_t *cfg)
+FlipVerticalAlign(struct vout_display_placement *dp)
 {
     /* Reverse vertical alignment as the GL tex are Y inverted */
-    if (cfg->display.align.vertical == VLC_VIDEO_ALIGN_TOP)
-        cfg->display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (cfg->display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        cfg->display.align.vertical = VLC_VIDEO_ALIGN_TOP;
+    if (dp->align.vertical == VLC_VIDEO_ALIGN_TOP)
+        dp->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+    else if (dp->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+        dp->align.vertical = VLC_VIDEO_ALIGN_TOP;
 }
 
 /**
@@ -164,9 +164,9 @@ static int Open(vout_display_t *vd,
     if (sys->vt.Flush == NULL)
         goto error;
 
-    vout_display_cfg_t flipped_cfg = *vd->cfg;
-    FlipVerticalAlign(&flipped_cfg);
-    vout_display_PlacePicture(&sys->place, vd->source, &flipped_cfg);
+    struct vout_display_placement flipped_dp = vd->cfg->display;
+    FlipVerticalAlign(&flipped_dp);
+    vout_display_PlacePicture(&sys->place, vd->source, &flipped_dp);
     sys->place_changed = true;
     vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
 
@@ -257,24 +257,24 @@ static int Control (vout_display_t *vd, int query)
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
-        vout_display_cfg_t cfg = *vd->cfg;
+        struct vout_display_placement dp = vd->cfg->display;
 
-        FlipVerticalAlign(&cfg);
+        FlipVerticalAlign(&dp);
 
-        vout_display_PlacePicture(&sys->place, vd->source, &cfg);
+        vout_display_PlacePicture(&sys->place, vd->source, &dp);
         sys->place_changed = true;
-        vlc_gl_Resize (sys->gl, cfg.display.width, cfg.display.height);
+        vlc_gl_Resize (sys->gl, dp.width, dp.height);
         return VLC_SUCCESS;
       }
 
       case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
       case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
       {
-        vout_display_cfg_t cfg = *vd->cfg;
+        struct vout_display_placement dp = vd->cfg->display;
 
-        FlipVerticalAlign(&cfg);
+        FlipVerticalAlign(&dp);
 
-        vout_display_PlacePicture(&sys->place, vd->source, &cfg);
+        vout_display_PlacePicture(&sys->place, vd->source, &dp);
         sys->place_changed = true;
         return VLC_SUCCESS;
       }

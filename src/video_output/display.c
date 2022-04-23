@@ -97,12 +97,12 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
 }
 
 /* */
-void vout_display_PlacePicture(vout_display_place_t *place,
-                               const video_format_t *source,
-                               const vout_display_cfg_t *cfg)
+void vout_display_PlacePicture(vout_display_place_t *restrict place,
+                               const video_format_t *restrict source,
+                               const struct vout_display_placement *restrict dp)
 {
     memset(place, 0, sizeof(*place));
-    if (cfg->display.width == 0 || cfg->display.height == 0)
+    if (dp->width == 0 || dp->height == 0)
         return;
 
     /* */
@@ -113,23 +113,23 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     video_format_ApplyRotation(&source_rot, source);
     source = &source_rot;
 
-    if (cfg->display.autoscale) {
-        display_width  = cfg->display.width;
-        display_height = cfg->display.height;
+    if (dp->autoscale) {
+        display_width  = dp->width;
+        display_height = dp->height;
     } else
         vout_display_GetDefaultDisplaySize(&display_width, &display_height,
-                                           source, &cfg->display);
+                                           source, dp);
 
     const unsigned width  = source->i_visible_width;
     const unsigned height = source->i_visible_height;
     /* Compute the height if we use the width to fill up display_width */
-    const int64_t scaled_height = (int64_t)height * display_width  * cfg->display.sar.num * source->i_sar_den / (width  * source->i_sar_num * cfg->display.sar.den);
+    const int64_t scaled_height = (int64_t)height * display_width  * dp->sar.num * source->i_sar_den / (width  * source->i_sar_num * dp->sar.den);
     /* And the same but switching width/height */
-    const int64_t scaled_width  = (int64_t)width  * display_height * cfg->display.sar.den * source->i_sar_num / (height * source->i_sar_den * cfg->display.sar.num);
+    const int64_t scaled_width  = (int64_t)width  * display_height * dp->sar.den * source->i_sar_num / (height * source->i_sar_den * dp->sar.num);
 
     if (source->projection_mode == PROJECTION_MODE_RECTANGULAR) {
         /* We keep the solution that avoid filling outside the display */
-        if (scaled_width <= cfg->display.width) {
+        if (scaled_width <= dp->width) {
             place->width  = scaled_width;
             place->height = display_height;
         } else {
@@ -144,27 +144,27 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     }
 
     /*  Compute position */
-    switch (cfg->display.align.horizontal) {
+    switch (dp->align.horizontal) {
     case VLC_VIDEO_ALIGN_LEFT:
         place->x = 0;
         break;
     case VLC_VIDEO_ALIGN_RIGHT:
-        place->x = cfg->display.width - place->width;
+        place->x = dp->width - place->width;
         break;
     default:
-        place->x = ((int)cfg->display.width - (int)place->width) / 2;
+        place->x = ((int)dp->width - (int)place->width) / 2;
         break;
     }
 
-    switch (cfg->display.align.vertical) {
+    switch (dp->align.vertical) {
     case VLC_VIDEO_ALIGN_TOP:
         place->y = 0;
         break;
     case VLC_VIDEO_ALIGN_BOTTOM:
-        place->y = cfg->display.height - place->height;
+        place->y = dp->height - place->height;
         break;
     default:
-        place->y = ((int)cfg->display.height - (int)place->height) / 2;
+        place->y = ((int)dp->height - (int)place->height) / 2;
         break;
     }
 }
@@ -176,7 +176,7 @@ void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
 {
     vout_display_place_t place;
 
-    vout_display_PlacePicture(&place, source, cfg);
+    vout_display_PlacePicture(&place, source, &cfg->display);
 
     if (place.width <= 0 || place.height <= 0)
         return;
