@@ -358,10 +358,10 @@ static int Control (vout_display_t *vd, int query)
                     vout_display_cfg_t cfg;
                     cfg = *vd->cfg;
                     /* Reverse vertical alignment as the GL tex are Y inverted */
-                    if (cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-                        cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-                    else if (cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-                        cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+                    if (cfg.display.align.vertical == VLC_VIDEO_ALIGN_TOP)
+                        cfg.display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+                    else if (cfg.display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+                        cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
                     cfg.display.width = sys->cfg.display.width;
                     cfg.display.height = sys->cfg.display.height;
                     sys->cfg = cfg;

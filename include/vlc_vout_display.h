@@ -84,6 +84,10 @@ struct vout_display_placement {
     unsigned width; /**< Requested display pixel width (0 by default). */
     unsigned height; /**< Requested display pixel height (0 by default). */
     vlc_rational_t sar; /**< Requested sample aspect ratio */
+
+    vlc_video_align_t align; /**< Alignment within the window */
+    bool autoscale; /**< Automatic scaling/fitting flag */
+    vlc_rational_t zoom; /**< Zoom ratio (if autoscale is disabled) */
 };
 
 /**
@@ -91,7 +95,7 @@ struct vout_display_placement {
  *
  * This primarily controls the size of the display area within the video
  * window, as follows:
- * - If \ref vout_display_cfg::is_display_filled "is_display_filled" is set,
+ * - If \ref vout_display_cfg::display::autoscale is set,
  *   the video size is fitted to the display size.
  * - If \ref vout_display_cfg::window "window" size is valid, the video size
  *   is set to the window size,
@@ -101,16 +105,6 @@ struct vout_display_placement {
 typedef struct vout_display_cfg {
     struct vlc_window *window; /**< Window */
     struct vout_display_placement display; /**< Display placement properties */
-
-    /** Alignment of the video within the window */
-    vlc_video_align_t align;
-
-    /** Automatic scaling/fitting flag */
-    bool is_display_filled;
-
-    /** Zoom ratio */
-    vlc_rational_t zoom;
-
     vlc_viewpoint_t viewpoint;
 } vout_display_cfg_t;
 

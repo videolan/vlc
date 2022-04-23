@@ -84,8 +84,8 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
         *height = (int64_t)source->i_visible_height * source->i_sar_den * cfg->display.sar.num / source->i_sar_num / cfg->display.sar.den;
     }
 
-    *width  = *width  * cfg->zoom.num / cfg->zoom.den;
-    *height = *height * cfg->zoom.num / cfg->zoom.den;
+    *width  = *width  * cfg->display.zoom.num / cfg->display.zoom.den;
+    *height = *height * cfg->display.zoom.num / cfg->display.zoom.den;
 
     if (ORIENT_IS_SWAP(source->orientation)) {
         /* Apply the source orientation only if the dimensions are initialized
@@ -113,7 +113,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     video_format_ApplyRotation(&source_rot, source);
     source = &source_rot;
 
-    if (cfg->is_display_filled) {
+    if (cfg->display.autoscale) {
         display_width  = cfg->display.width;
         display_height = cfg->display.height;
     } else
@@ -144,7 +144,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     }
 
     /*  Compute position */
-    switch (cfg->align.horizontal) {
+    switch (cfg->display.align.horizontal) {
     case VLC_VIDEO_ALIGN_LEFT:
         place->x = 0;
         break;
@@ -156,7 +156,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         break;
     }
 
-    switch (cfg->align.vertical) {
+    switch (cfg->display.align.vertical) {
     case VLC_VIDEO_ALIGN_TOP:
         place->y = 0;
         break;
@@ -539,10 +539,10 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (is_filled == osys->cfg.is_display_filled)
+    if (is_filled == osys->cfg.display.autoscale)
         return; /* nothing to do */
 
-    osys->cfg.is_display_filled = is_filled;
+    osys->cfg.display.autoscale = is_filled;
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED))
         vout_display_Reset(vd);
 }
@@ -551,12 +551,12 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (!osys->cfg.is_display_filled
-     && osys->cfg.zoom.num == num && osys->cfg.zoom.den == den)
+    if (!osys->cfg.display.autoscale
+     && osys->cfg.display.zoom.num == num && osys->cfg.display.zoom.den == den)
         return; /* nothing to do */
 
-    osys->cfg.zoom.num = num;
-    osys->cfg.zoom.den = den;
+    osys->cfg.display.zoom.num = num;
+    osys->cfg.display.zoom.den = den;
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM))
         vout_display_Reset(vd);
 }

@@ -278,10 +278,14 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
     for (int i = 0; i < splitter->i_output; i++) {
         const video_splitter_output_t *output = &splitter->p_output[i];
         vout_display_cfg_t vdcfg = {
-            .display = { 0, 0, { 1, 1 } },
-            .align = { 0, 0 } /* TODO */,
-            .is_display_filled = true,
-            .zoom = { 1, 1 },
+            .display = {
+                .width = 0,
+                .height = 0,
+                .sar = { 1, 1 },
+                .align = { 0, 0 } /* TODO */,
+                .autoscale = true,
+                .zoom = { 1, 1 },
+            },
         };
         const char *modname = output->psz_module;
         struct vlc_vidsplit_part *part = &sys->parts[i];

@@ -519,7 +519,7 @@ place_dest(vout_display_t *vd, const video_format_t * fmt)
     vout_display_place_t place;
     tcfg.display.width = sys->display_width;
     tcfg.display.height = sys->display_height;
-    tcfg.is_display_filled = true;
+    tcfg.display.autoscale = true;
     vout_display_PlacePicture(&place, fmt, &tcfg);
 
     sys->dest_rect = place_to_mmal_rect(place);

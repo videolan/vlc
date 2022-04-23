@@ -107,10 +107,10 @@ static void
 FlipVerticalAlign(vout_display_cfg_t *cfg)
 {
     /* Reverse vertical alignment as the GL tex are Y inverted */
-    if (cfg->align.vertical == VLC_VIDEO_ALIGN_TOP)
-        cfg->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (cfg->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
+    if (cfg->display.align.vertical == VLC_VIDEO_ALIGN_TOP)
+        cfg->display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+    else if (cfg->display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+        cfg->display.align.vertical = VLC_VIDEO_ALIGN_TOP;
 }
 
 /**

@@ -220,10 +220,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         vout_display_place_t place;
 
         /* Reverse vertical alignment as the GL tex are Y inverted */
-        if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-            place_cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-        else if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-            place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+        if (place_cfg.display.align.vertical == VLC_VIDEO_ALIGN_TOP)
+            place_cfg.display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+        else if (place_cfg.display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+            place_cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
         vout_display_PlacePicture(&place, vd->source, &place_cfg);
 

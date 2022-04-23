@@ -527,7 +527,7 @@ void vout_ChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    sys->display_cfg.is_display_filled = is_filled;
+    sys->display_cfg.display.autoscale = is_filled;
     /* no window size update here */
 
     vlc_mutex_lock(&sys->display_lock);
@@ -559,8 +559,8 @@ void vout_ChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
     }
 
     vlc_mutex_lock(&sys->window_lock);
-    sys->display_cfg.zoom.num = num;
-    sys->display_cfg.zoom.den = den;
+    sys->display_cfg.display.zoom.num = num;
+    sys->display_cfg.display.zoom.den = den;
 
     vout_UpdateWindowSizeLocked(sys);
 
@@ -700,7 +700,7 @@ static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *f
     const int display_height = var_GetInteger(vout, "height");
     cfg->display.width   = display_width > 0  ? display_width  : 0;
     cfg->display.height  = display_height > 0 ? display_height : 0;
-    cfg->is_display_filled  = var_GetBool(vout, "autoscale");
+    cfg->display.autoscale = var_GetBool(vout, "autoscale");
     unsigned msar_num, msar_den;
     if (var_InheritURational(vout, &msar_num, &msar_den, "monitor-par") ||
         msar_num <= 0 || msar_den <= 0) {
@@ -712,19 +712,19 @@ static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *f
     unsigned zoom_den = 1000;
     unsigned zoom_num = zoom_den * var_GetFloat(vout, "zoom");
     vlc_ureduce(&zoom_num, &zoom_den, zoom_num, zoom_den, 0);
-    cfg->zoom.num = zoom_num;
-    cfg->zoom.den = zoom_den;
-    cfg->align.vertical = VLC_VIDEO_ALIGN_CENTER;
-    cfg->align.horizontal = VLC_VIDEO_ALIGN_CENTER;
+    cfg->display.zoom.num = zoom_num;
+    cfg->display.zoom.den = zoom_den;
+    cfg->display.align.vertical = VLC_VIDEO_ALIGN_CENTER;
+    cfg->display.align.horizontal = VLC_VIDEO_ALIGN_CENTER;
     const int align_mask = var_GetInteger(vout, "align");
     if (align_mask & VOUT_ALIGN_LEFT)
-        cfg->align.horizontal = VLC_VIDEO_ALIGN_LEFT;
+        cfg->display.align.horizontal = VLC_VIDEO_ALIGN_LEFT;
     else if (align_mask & VOUT_ALIGN_RIGHT)
-        cfg->align.horizontal = VLC_VIDEO_ALIGN_RIGHT;
+        cfg->display.align.horizontal = VLC_VIDEO_ALIGN_RIGHT;
     if (align_mask & VOUT_ALIGN_TOP)
-        cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
+        cfg->display.align.vertical = VLC_VIDEO_ALIGN_TOP;
     else if (align_mask & VOUT_ALIGN_BOTTOM)
-        cfg->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+        cfg->display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
 }
 
 /* */

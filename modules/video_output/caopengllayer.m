@@ -347,10 +347,10 @@ static int Open (vout_display_t *vd,
         dispatch_sync(dispatch_get_main_queue(), ^{
             // Reverse vertical alignment as the GL tex are Y inverted
            sys->cfg = *vd->cfg;
-           if (sys->cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-               sys->cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-           else if (sys->cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-               sys->cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+           if (sys->cfg.display.align.vertical == VLC_VIDEO_ALIGN_TOP)
+               sys->cfg.display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+           else if (sys->cfg.display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+               sys->cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
             // Create video view
             sys->videoView = [[VLCVideoLayerView alloc] initWithVoutDisplay:vd];
@@ -502,10 +502,10 @@ static int Control (vout_display_t *vd, int query)
                 cfg.display.height = sys->cfg.display.height;
 
                 // Reverse vertical alignment as the GL tex are Y inverted
-                if (cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-                    cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-                else if (cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-                    cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+                if (cfg.display.align.vertical == VLC_VIDEO_ALIGN_TOP)
+                    cfg.display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+                else if (cfg.display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+                    cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
                 sys->cfg = cfg;
 
                 vout_display_PlacePicture(&sys->place, vd->source, &cfg);

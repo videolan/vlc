@@ -286,10 +286,15 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     cfg.display.width = frame.fbo->params.w;
     cfg.display.height = frame.fbo->params.h;
     if (need_vflip) {
-        switch (cfg.align.vertical) {
-        case VLC_VIDEO_ALIGN_TOP: cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM; break;
-        case VLC_VIDEO_ALIGN_BOTTOM: cfg.align.vertical = VLC_VIDEO_ALIGN_TOP; break;
-        default: break;
+        switch (cfg.display.align.vertical) {
+        case VLC_VIDEO_ALIGN_TOP:
+            cfg.display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+            break;
+        case VLC_VIDEO_ALIGN_BOTTOM:
+            cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
+            break;
+        default:
+            break;
         }
     }
     vout_display_PlacePicture(&place, vd->fmt, &cfg);

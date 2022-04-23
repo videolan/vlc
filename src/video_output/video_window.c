@@ -274,8 +274,8 @@ void vout_display_SizeWindow(unsigned *restrict width,
     }
 
     /* If neither width nor height are forced, use the requested zoom. */
-    *width = (w * cfg->zoom.num) / cfg->zoom.den;
-    *height = (h * cfg->zoom.num) / cfg->zoom.den;
+    *width = (w * cfg->display.zoom.num) / cfg->display.zoom.den;
+    *height = (h * cfg->display.zoom.num) / cfg->display.zoom.den;
 }
 
 /**
