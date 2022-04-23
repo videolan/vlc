@@ -78,6 +78,15 @@ typedef struct vlc_video_align {
 /** @} */
 
 /**
+ * Display placement and zoom configuration.
+ */
+struct vout_display_placement {
+    unsigned width; /**< Requested display pixel width (0 by default). */
+    unsigned height; /**< Requested display pixel height (0 by default). */
+    vlc_rational_t sar; /**< Requested sample aspect ratio */
+};
+
+/**
  * User configuration for a video output display (\ref vout_display_t)
  *
  * This primarily controls the size of the display area within the video
@@ -91,13 +100,7 @@ typedef struct vlc_video_align {
  */
 typedef struct vout_display_cfg {
     struct vlc_window *window; /**< Window */
-
-    /** Display properties */
-    struct {
-        unsigned width; /**< Requested display pixel width (0 by default). */
-        unsigned height; /**< Requested display pixel height (0 by default). */
-        vlc_rational_t sar; /**< Requested sample aspect ratio */
-    } display;
+    struct vout_display_placement display; /**< Display placement properties */
 
     /** Alignment of the video within the window */
     vlc_video_align_t align;
