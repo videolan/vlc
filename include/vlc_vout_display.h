@@ -508,11 +508,11 @@ void vout_display_PlacePicture(vout_display_place_t *restrict place,
  * \param x pointer to abscissa to be translated
  * \param y pointer to ordinate to be translated
  * \param fmt video format
- * \param cfg display configuration
+ * \param dp display configuration
  */
 void vout_display_TranslateCoordinates(int *x, int *y,
                                        const video_format_t *fmt,
-                                       const vout_display_cfg_t *cfg);
+                                       const struct vout_display_placement *dp);
 
 /**
  * Translates mouse state.

@@ -172,11 +172,11 @@ void vout_display_PlacePicture(vout_display_place_t *restrict place,
 /** Translates window coordinates to video coordinates */
 void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
                                        const video_format_t *restrict source,
-                                       const vout_display_cfg_t *restrict cfg)
+                                       const struct vout_display_placement *restrict dp)
 {
     vout_display_place_t place;
 
-    vout_display_PlacePicture(&place, source, &cfg->display);
+    vout_display_PlacePicture(&place, source, dp);
 
     if (place.width <= 0 || place.height <= 0)
         return;
@@ -234,7 +234,7 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
 {
     *video = *window;
     vout_display_TranslateCoordinates(&video->i_x, &video->i_y, vd->source,
-                                      vd->cfg);
+                                      &vd->cfg->display);
 }
 
 typedef struct {
