@@ -28,4 +28,4 @@ void vout_display_SizeWindow(unsigned *restrict width,
                              const video_format_t *restrict original,
                              const vlc_rational_t *restrict dar,
                              const struct vout_crop *restrict crop,
-                             const vout_display_cfg_t *restrict cfg);
+                             const struct vout_display_placement *restrict dp);

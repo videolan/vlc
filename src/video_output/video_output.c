@@ -232,7 +232,7 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
 
     vlc_mutex_assert(&sys->window_lock);
     vout_display_SizeWindow(&width, &height, &sys->original, &sys->source.dar,
-                            &sys->source.crop, &sys->display_cfg);
+                            &sys->source.crop, &sys->display_cfg.display);
     msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
     vlc_window_SetSize(sys->display_cfg.window, width, height);
 }

@@ -199,7 +199,7 @@ void vout_display_SizeWindow(unsigned *restrict width,
                              const video_format_t *restrict original,
                              const vlc_rational_t *restrict dar,
                              const struct vout_crop *restrict crop,
-                             const vout_display_cfg_t *restrict cfg)
+                             const struct vout_display_placement *restrict dp)
 {
     unsigned w = original->i_visible_width;
     unsigned h = original->i_visible_height;
@@ -239,8 +239,8 @@ void vout_display_SizeWindow(unsigned *restrict width,
             break;
     }
 
-    *width = cfg->display.width;
-    *height = cfg->display.height;
+    *width = dp->width;
+    *height = dp->height;
 
     /* If both width and height are forced, keep them as is. */
     if (*width != 0 && *height != 0)
@@ -258,8 +258,8 @@ void vout_display_SizeWindow(unsigned *restrict width,
         h = x;
     }
 
-    if (cfg->display.sar.num > 0 && cfg->display.sar.den > 0)
-        w = (w * cfg->display.sar.den) / cfg->display.sar.num;
+    if (dp->sar.num > 0 && dp->sar.den > 0)
+        w = (w * dp->sar.den) / dp->sar.num;
 
     /* If width is forced, adjust height according to the aspect ratio */
     if (*width != 0) {
@@ -274,8 +274,8 @@ void vout_display_SizeWindow(unsigned *restrict width,
     }
 
     /* If neither width nor height are forced, use the requested zoom. */
-    *width = (w * cfg->display.zoom.num) / cfg->display.zoom.den;
-    *height = (h * cfg->display.zoom.num) / cfg->display.zoom.den;
+    *width = (w * dp->zoom.num) / dp->zoom.den;
+    *height = (h * dp->zoom.num) / dp->zoom.den;
 }
 
 /**
