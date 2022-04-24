@@ -303,14 +303,10 @@ static int Open (vout_display_t *vd,
                 return VLC_EGENERIC;
         }
 
-        // Obtain container NSObject
-        id container = var_CreateGetAddress(vd, "drawable-nsobject");
+        id container = vd->cfg->window->handle.nsobject;
         if (!container) {
-            container = vd->cfg->window->handle.nsobject;
-            if (!container) {
-                msg_Err(vd, "No drawable-nsobject found!");
-                goto error;
-            }
+            msg_Err(vd, "No drawable-nsobject found!");
+            goto error;
         }
 
         // Retain container, released in Close
