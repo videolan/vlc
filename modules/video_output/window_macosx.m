@@ -580,6 +580,30 @@ int Open(vout_window_t *wnd)
     }
 }
 
+static void DrawableClose(vout_window_t *wnd)
+{
+    id drawable = (__bridge_transfer id)wnd->handle.nsobject;
+    wnd->handle.nsobject = nil;
+    (void)drawable;
+}
+
+static const struct vout_window_operations drawable_ops =
+{
+    .destroy = DrawableClose,
+};
+
+static int DrawableOpen(vout_window_t *wnd)
+{
+    id drawable = (__bridge id)
+        var_InheritAddress(wnd, "drawable-nsobject");
+    if (drawable == nil)
+        return VLC_EGENERIC;
+
+    wnd->ops = &drawable_ops;
+    wnd->handle.nsobject = (__bridge_retained void*)drawable;
+    return VLC_SUCCESS;
+}
+
 /*
  * Module declaration
  */
@@ -587,4 +611,11 @@ vlc_module_begin()
     set_description("macOS Video Output Window")
     set_capability("vout window", 1000)
     set_callback(Open)
+
+    add_submodule()
+    set_shortname(N_("NSObject Drawable"))
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("vout window", 10000)
+    set_callback(DrawableOpen)
+    add_shortcut("embed-nsobject")
 vlc_module_end()
