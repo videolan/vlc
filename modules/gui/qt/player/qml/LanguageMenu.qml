@@ -28,8 +28,11 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
 
+// FIXME: Keyboard navigation needs to be fixed for this Popup.
 T.Popup {
-    id: control
+    id: root
+
+    // Settings
 
     height: VLCStyle.dp(296, VLCStyle.scale)
     width: rootPlayer.width
@@ -37,16 +40,33 @@ T.Popup {
     // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
     modal: true
-    T.Overlay.modal: Rectangle {
-        color: "transparent"
+
+    // Animations
+
+    Behavior on width {
+        SmoothedAnimation {
+            duration: VLCStyle.ms64
+            easing.type: Easing.InOutSine
+        }
+    }
+
+    // Children
+
+    T.Overlay.modal: null
+
+    background: Rectangle {
+        opacity: 0.8
+        color: "#212121"
     }
 
     contentItem: StackView {
         id: view
 
-        initialItem: frontPage
-        clip: true
         focus: true
+        clip: true
+
+        initialItem: frontPage
+
 
         onCurrentItemChanged: currentItem.forceActiveFocus()
 
@@ -84,103 +104,81 @@ T.Popup {
         }
     }
 
-    background: Rectangle {
-        color: "#212121"
-        opacity: .8
-    }
-
-    function _updateWidth(isFirstPage) {
-        if (isFirstPage)
-            control.width = Qt.binding(function () {
-                return rootPlayer.width
-            })
-        else
-            control.width = Qt.binding(function () {
-                return Math.min(VLCStyle.dp(624, VLCStyle.scale),
-                                rootPlayer.width)
-            })
-    }
-
-    Behavior on width {
-        SmoothedAnimation {
-            duration: VLCStyle.ms64
-            easing.type: Easing.InOutSine
-        }
-    }
-
     Component {
         id: frontPage
 
         RowLayout {
-            id: frontPageRoot
+            id: frontRoot
+
+            property var currentItem: StackView.view.currentItem
 
             spacing: 0
+
             focus: true
-            onActiveFocusChanged: if (activeFocus) btnsCol.forceActiveFocus()
+
+            onActiveFocusChanged: if (activeFocus) column.forceActiveFocus()
+
+            Connections {
+                target: frontRoot.StackView.view
+
+                onCurrentItemChanged: {
+                    if (currentItem instanceof TracksPage)
+                        root.width = Qt.binding(function () {
+                            return Math.min(currentItem.preferredWidth, rootPlayer.width)
+                        })
+                    else
+                        root.width = Qt.binding(function () { return rootPlayer.width })
+                }
+            }
+
+            Connections {
+                target: (currentItem && currentItem instanceof TracksPage) ? currentItem : null
+
+                onBackRequested: frontRoot.StackView.view.pop()
+            }
 
             Widgets.NavigableCol {
-                id: btnsCol
+                id: column
 
                 focus: true
+
                 Layout.preferredWidth: VLCStyle.dp(72, VLCStyle.scale)
                 Layout.alignment: Qt.AlignTop | Qt.AlignLeft
                 Layout.topMargin: VLCStyle.margin_large
-                Navigation.rightItem: tracksListRow
+
+                Navigation.rightItem: row
 
                 model: [{
-                        "icon": VLCIcons.download,
-                        "tooltip": I18n.qtr("Download Subtitles"),
-                        "component": undefined
-                    }, {
-                        "icon": VLCIcons.time,
-                        "tooltip": I18n.qtr("Delay"),
-                        "component": delayPage
-                    }, {
-                        "icon": VLCIcons.sync,
-                        "tooltip": I18n.qtr("Sync"),
-                        "component": syncPage
-                    }, {
-                        "icon": VLCIcons.multiselect,
-                        "tooltip": I18n.qtr("Select Multiple Subtitles"),
-                        "component": undefined
-                    }]
+                    "tooltip": I18n.qtr("Playback Speed"),
+                    "source": "qrc:///player/TracksPageSpeed.qml"
+                }]
 
                 delegate: Widgets.IconTrackButton {
-                    iconText: modelData.icon
+                    size: (index === 0) ? VLCStyle.dp(24, VLCStyle.scale)
+                                        : VLCStyle.dp(40, VLCStyle.scale)
 
-                    size: VLCStyle.dp(40, VLCStyle.scale)
-                    x: (btnsCol.width - width) / 2
-                    highlighted: index === 3
-                                 && Player.subtitleTracks.multiSelect
+                    x: (column.width - width) / 2
+
+                    iconText: (index === 0) ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
+                                            : modelData.icon
 
                     T.ToolTip.visible: (hovered || activeFocus)
                     T.ToolTip.text: modelData.tooltip
                     T.ToolTip.delay: 1000
 
-                    Navigation.parentItem: btnsCol
+                    Navigation.parentItem: column
 
-                    onClicked: {
-                        if (index === 0) {
-                            Player.openVLsub()
-                        } else if (index === 3) {
-                            Player.subtitleTracks.multiSelect = !Player.subtitleTracks.multiSelect
-                            focus = false
-                        } else {
-                            control._updateWidth(false)
-                            frontPageRoot.StackView.view.push(
-                                        modelData.component)
-                        }
-                    }
+                    onClicked: frontRoot.StackView.view.push(modelData.source)
                 }
             }
 
             Widgets.NavigableRow {
-                id: tracksListRow
+                id: row
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                Navigation.leftItem: btnsCol
+                Navigation.leftItem: column
 
                 model: [{
                         "title": I18n.qtr("Subtitle"),
@@ -198,8 +196,9 @@ T.Popup {
 
                     property var tracksModel: modelData.tracksModel
 
-                    width: tracksListRow.width / 3
-                    height: tracksListRow.height
+                    width: row.width / 3
+                    height: row.height
+
                     focus: true
 
                     onActiveFocusChanged: if (activeFocus) tracksList.forceActiveFocus(focusReason)
@@ -224,44 +223,52 @@ T.Popup {
 
                         width: tracksListContainer.width
                         height: implicitHeight
-                        focus: true
+
+                        padding: VLCStyle.margin_xsmall
 
                         topPadding: VLCStyle.margin_large
                         leftPadding: VLCStyle.margin_xxlarge + separator.width
-                        padding: VLCStyle.margin_xsmall
+
+                        focus: true
+
                         clip: true
 
                         Widgets.SubtitleLabel {
                             id: titleText
 
+                            width: parent.width - button.width - parent.leftPadding
+                                   - parent.rightPadding
+
                             text: modelData.title
                             color: "white"
-                            width: parent.width - addBtn.width
-                                   - parent.leftPadding - parent.rightPadding
                         }
 
                         Widgets.IconTrackButton {
-                            id: addBtn
+                            id: button
 
-                            iconText: VLCIcons.add
                             size: VLCStyle.icon_normal
+
                             focus: true
+
+                            iconText: (index === 2) ? VLCIcons.add
+                                                    : VLCIcons.expand
+
+                            Navigation.parentItem: tracksListContainer
+                            Navigation.downItem: tracksList
+
                             onClicked: {
                                 switch (index) {
                                 case 0:
-                                    DialogsProvider.loadSubtitlesFile()
+                                    menuSubtitle.popup(mapToGlobal(0, height))
                                     break
                                 case 1:
-                                    DialogsProvider.loadAudioFile()
+                                    menuAudio.popup(mapToGlobal(0, height))
                                     break
                                 case 2:
                                     DialogsProvider.loadVideoFile()
                                     break
                                 }
                             }
-
-                            Navigation.parentItem: tracksListContainer
-                            Navigation.downItem: tracksList
                         }
                     }
 
@@ -276,7 +283,7 @@ T.Popup {
                         clip: true
 
                         Navigation.parentItem: tracksListContainer
-                        Navigation.upItem: addBtn
+                        Navigation.upItem: button
                         Keys.priority: Keys.AfterItem
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
@@ -308,373 +315,33 @@ T.Popup {
         }
     }
 
-    Component {
-        id: delayPage
+    QmlSubtitleMenu {
+        id: menuSubtitle
 
-        RowLayout {
-            id: delayPageRoot
+        player: Player
 
-            spacing: 0
-            focus: true
-            onActiveFocusChanged: if (activeFocus) backBtn.forceActiveFocus()
-
-            Item {
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                Layout.preferredWidth: VLCStyle.dp(72, VLCStyle.scale)
-                Layout.topMargin: VLCStyle.margin_large
-                Layout.fillHeight: true
-
-                Widgets.IconTrackButton {
-                    id: backBtn
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    size: VLCStyle.dp(36, VLCStyle.scale)
-                    iconText: VLCIcons.back
-
-                    onClicked: {
-                        control._updateWidth(true)
-                        delayPageRoot.StackView.view.pop()
-                    }
-                    Navigation.rightItem: audioDelaySpin
-                }
+        onTriggered: {
+            if (action === QmlSubtitleMenu.Open) {
+                DialogsProvider.loadSubtitlesFile()
             }
-
-            Rectangle {
-                Layout.preferredWidth: VLCStyle.margin_xxxsmall
-                Layout.fillHeight: true
-                color: "white"
-                opacity: .1
+            else if (action === QmlSubtitleMenu.Synchronize) {
+                contentItem.currentItem.StackView.view.push("qrc:///player/TracksPageSubtitle.qml")
             }
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                Layout.leftMargin: VLCStyle.margin_xxlarge
-                Layout.rightMargin: VLCStyle.margin_xxlarge
-                Layout.topMargin: VLCStyle.margin_large
-                spacing: VLCStyle.margin_xxsmall
-
-                Navigation.leftItem: backBtn
-
-                Widgets.SubtitleLabel {
-                    Layout.fillWidth: true
-                    text: I18n.qtr("Audio track synchronization")
-                    color: "white"
-                }
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: VLCStyle.margin_xsmall
-
-                    Widgets.MenuCaption {
-                        text: I18n.qtr("Audio track delay")
-                        color: "white"
-
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-
-                    Widgets.TransparentSpinBox {
-                        id: audioDelaySpin
-
-                        property bool inhibitUpdate: true
-
-                        textFromValue: function (value, locale) {
-                            return I18n.qtr("%1 ms").arg(
-                                        Number(value).toLocaleString(locale,
-                                                                     'f', 0))
-                        }
-                        valueFromText: function (text, locale) {
-                            return Number.fromLocaleString(
-                                        locale, text.substring(0,
-                                                               text.length - 3))
-                        }
-                        stepSize: 50
-                        from: -10000
-
-                        Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-
-                        onValueChanged: {
-                            if (inhibitUpdate)
-                                return
-                            Player.audioDelayMS = value
-                        }
-
-                        Component.onCompleted: {
-                            value = Player.audioDelayMS
-                            inhibitUpdate = false
-                        }
-
-                        Connections {
-                            target: Player
-                            onAudioDelayChanged: {
-                                inhibitUpdate = true
-                                value = Player.audioDelayMS
-                                inhibitUpdate = false
-                            }
-                        }
-
-                        Navigation.rightItem: audioDelaySpinReset
-                    }
-
-                    Widgets.ActionButtonOverlay {
-                        id: audioDelaySpinReset
-
-                        text: I18n.qtr("Reset")
-
-                        onClicked: audioDelaySpin.value = 0
-                        Navigation.leftItem: audioDelaySpin
-                        Navigation.rightItem: primarySubSpin
-                        Navigation.downItem: primarySubSpinReset
-                    }
-                }
-
-                Widgets.SubtitleLabel {
-                    Layout.fillWidth: true
-                    Layout.topMargin: VLCStyle.margin_large
-                    text: I18n.qtr("Subtitle synchronization")
-                    color: "white"
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: VLCStyle.margin_xsmall
-
-                    Widgets.MenuCaption {
-                        text: I18n.qtr("Primary subtitle delay")
-                        color: "white"
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-
-                    Widgets.TransparentSpinBox {
-                        id: primarySubSpin
-
-                        property bool inhibitUpdate: true
-
-                        textFromValue: audioDelaySpin.textFromValue
-                        valueFromText: audioDelaySpin.valueFromText
-                        stepSize: 50
-                        from: -10000
-
-                        Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-
-                        onValueChanged: {
-                            if (inhibitUpdate)
-                                return
-                            Player.subtitleDelayMS = value
-                        }
-
-                        Component.onCompleted: {
-                            value = Player.subtitleDelayMS
-                            inhibitUpdate = false
-                        }
-
-                        Connections {
-                            target: Player
-                            onSubtitleDelayChanged: {
-                                inhibitUpdate = true
-                                value = Player.subtitleDelayMS
-                                inhibitUpdate = false
-                            }
-                        }
-
-                        Navigation.rightItem: primarySubSpinReset
-                    }
-
-                    Widgets.ActionButtonOverlay {
-                        id: primarySubSpinReset
-
-                        text: I18n.qtr("Reset")
-                        focus: true
-                        onClicked: primarySubSpin.value = 0
-                        Navigation.leftItem: primarySubSpin
-                        Navigation.rightItem: secondarySubSpin
-                        Navigation.upItem: audioDelaySpinReset
-                        Navigation.downItem: secondarySubSpinReset
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: VLCStyle.margin_xsmall
-
-                    Widgets.MenuCaption {
-                        text: I18n.qtr("Secondary subtitle delay")
-                        color: "white"
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-
-                    Widgets.TransparentSpinBox {
-                        id: secondarySubSpin
-
-                        property bool inhibitUpdate: true
-
-                        textFromValue: primarySubSpin.textFromValue
-                        valueFromText: primarySubSpin.valueFromText
-                        stepSize: 50
-                        from: -10000
-
-                        Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-
-                        onValueChanged: {
-                            if (inhibitUpdate)
-                                return
-                            Player.secondarySubtitleDelayMS = value
-                        }
-
-                        Component.onCompleted: {
-                            value = Player.secondarySubtitleDelayMS
-                            inhibitUpdate = false
-                        }
-
-                        Connections {
-                            target: Player
-                            onSecondarySubtitleDelayChanged: {
-                                inhibitUpdate = true
-                                value = Player.secondarySubtitleDelayMS
-                                inhibitUpdate = false
-                            }
-                        }
-
-                        Navigation.rightItem: secondarySubSpinReset
-                    }
-
-                    Widgets.ActionButtonOverlay {
-                        id: secondarySubSpinReset
-
-                        text: I18n.qtr("Reset")
-                        onClicked: secondarySubSpin.value = 0
-                        Navigation.leftItem: secondarySubSpin
-                        Navigation.upItem: primarySubSpinReset
-                    }
-                }
+            else if (action === QmlSubtitleMenu.Download) {
+                Player.openVLsub()
             }
         }
     }
 
-    Component {
-        id: syncPage
+    QmlAudioMenu {
+        id: menuAudio
 
-        RowLayout {
-            id: syncPageRoot
-
-            spacing: 0
-            focus: true
-            onActiveFocusChanged: if (activeFocus) backBtn.forceActiveFocus()
-
-            Item {
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                Layout.preferredWidth: VLCStyle.dp(72, VLCStyle.scale)
-                Layout.topMargin: VLCStyle.margin_large
-                Layout.fillHeight: true
-
-                Widgets.IconTrackButton {
-                    id: backBtn
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    size: VLCStyle.dp(36, VLCStyle.scale)
-                    iconText: VLCIcons.back
-
-                    onClicked: {
-                        control._updateWidth(true)
-                        syncPageRoot.StackView.view.pop()
-                    }
-                    Navigation.rightItem: subSpeedSpin
-                }
+        onTriggered: {
+            if (action === QmlSubtitleMenu.Open) {
+                DialogsProvider.loadAudioFile()
             }
-
-            Rectangle {
-                Layout.preferredWidth: VLCStyle.margin_xxxsmall
-                Layout.fillHeight: true
-                color: "white"
-                opacity: .1
-            }
-
-            ColumnLayout {
-                id: subtitleSyncLayout
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                Layout.leftMargin: VLCStyle.margin_xxlarge
-                Layout.rightMargin: VLCStyle.margin_xxlarge
-                Layout.topMargin: VLCStyle.margin_large
-                spacing: VLCStyle.margin_xsmall
-
-                Navigation.leftItem: backBtn
-
-                Widgets.SubtitleLabel {
-                    Layout.fillWidth: true
-                    text: I18n.qtr("Subtitles")
-                    color: "white"
-                }
-                RowLayout {
-                    width: parent.width
-                    spacing: VLCStyle.margin_xsmall
-
-                    Widgets.MenuCaption {
-                        text: I18n.qtr("Subtitle Speed")
-                        color: "white"
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-
-                    Widgets.TransparentSpinBox {
-                        id: subSpeedSpin
-
-                        property bool inhibitUpdate: true
-
-                        stepSize: 1
-                        textFromValue: function (value, locale) {
-                            return I18n.qtr("%1 fps").arg(
-                                        Number(value / 10).toLocaleString(
-                                            locale, 'f', 3))
-                        }
-                        valueFromText: function (text, locale) {
-                            return Number.fromLocaleString(
-                                        locale,
-                                        text.substring(0, text.length - 4)) * 10
-                        }
-
-                        Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-
-                        onValueChanged: {
-                            if (inhibitUpdate)
-                                return
-                            Player.subtitleFPS = value / 10
-                        }
-
-                        Component.onCompleted: {
-                            value = Player.subtitleFPS * 10
-                            inhibitUpdate = false
-                        }
-
-                        Connections {
-                            target: Player
-                            onSecondarySubtitleDelayChanged: {
-                                inhibitUpdate = true
-                                value = Player.subtitleFPS / 10
-                                inhibitUpdate = false
-                            }
-                        }
-
-                        Navigation.parentItem: subtitleSyncLayout
-                        Navigation.rightItem: subSpeedSpinReset
-                    }
-
-                    Widgets.ActionButtonOverlay {
-                        id: subSpeedSpinReset
-
-                        text: I18n.qtr("Reset")
-                        onClicked: subSpeedSpin.value = 10
-
-
-                        Navigation.parentItem: subtitleSyncLayout
-                        Navigation.leftItem: subSpeedSpin
-                    }
-                }
+            else if (action === QmlSubtitleMenu.Synchronize) {
+                contentItem.currentItem.StackView.view.push("qrc:///player/TracksPageAudio.qml")
             }
         }
     }
