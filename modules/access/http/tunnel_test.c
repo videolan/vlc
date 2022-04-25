@@ -174,7 +174,7 @@ int main(void)
     }
 
     vlc_thread_t th;
-    if (vlc_clone(&th, proxy_thread, lfd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&th, proxy_thread, lfd))
         assert(!"Thread error");
 
     /* Test proxy error */

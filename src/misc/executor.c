@@ -157,7 +157,7 @@ SpawnThread(vlc_executor_t *executor)
     thread->owner = executor;
     thread->current_task = NULL;
 
-    if (vlc_clone(&thread->thread, ThreadRun, thread, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&thread->thread, ThreadRun, thread))
     {
         free(thread);
         return VLC_EGENERIC;

@@ -95,8 +95,7 @@ static int Open( vlc_object_t *p_this )
     vlc_sem_init( &p_intf->p_sys->init_wait, 0 );
     p_intf->p_sys->b_error = false;
 
-    if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf,
-                               VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf ) )
     {
         free( p_intf->p_sys );
         return VLC_EGENERIC;

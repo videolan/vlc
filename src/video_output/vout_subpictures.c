@@ -1708,7 +1708,7 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     sys->last_sort_date = -1;
     sys->vout = vout;
 
-    if(vlc_clone(&sys->prerender.thread, spu_PrerenderThread, spu, VLC_THREAD_PRIORITY_VIDEO))
+    if(vlc_clone(&sys->prerender.thread, spu_PrerenderThread, spu))
     {
         spu_Cleanup(spu);
         vlc_object_delete(spu);

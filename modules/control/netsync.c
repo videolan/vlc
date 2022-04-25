@@ -304,8 +304,7 @@ static int PlaylistEvent(vlc_object_t *object, char const *cmd,
     sys->input = input;
 
     if (input != NULL) {
-        if (vlc_clone(&sys->thread, sys->is_master ? Master : Slave, intf,
-                      VLC_THREAD_PRIORITY_INPUT))
+        if (vlc_clone(&sys->thread, sys->is_master ? Master : Slave, intf))
             sys->input = NULL;
     }
     return VLC_SUCCESS;

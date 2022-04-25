@@ -407,7 +407,7 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
     p_uct->pf_callback = pf_callback;
     p_uct->p_data = p_data;
 
-    vlc_clone( &p_uct->thread, update_CheckReal, p_uct, VLC_THREAD_PRIORITY_LOW );
+    vlc_clone( &p_uct->thread, update_CheckReal, p_uct );
 }
 
 void* update_CheckReal( void *obj )
@@ -519,7 +519,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
     p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
     atomic_store(&p_udt->aborted, false);
-    vlc_clone( &p_udt->thread, update_DownloadReal, p_udt, VLC_THREAD_PRIORITY_LOW );
+    vlc_clone( &p_udt->thread, update_DownloadReal, p_udt );
 }
 
 static void* update_DownloadReal( void *obj )

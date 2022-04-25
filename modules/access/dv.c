@@ -209,8 +209,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;
     vlc_mutex_init( &p_sys->p_ev->lock );
-    if( vlc_clone( &p_sys->p_ev->thread, Raw1394EventThread,
-               p_sys->p_ev, VLC_THREAD_PRIORITY_OUTPUT ) )
+    if( vlc_clone( &p_sys->p_ev->thread, Raw1394EventThread, p_sys->p_ev ) )
     {
         msg_Err( p_access, "failed to clone event thread" );
         Close( p_this );

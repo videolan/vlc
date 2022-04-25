@@ -75,7 +75,7 @@ int vlc_getaddrinfo_i11e(const char *name, unsigned port,
 
     vlc_sem_init(&req.done, 0);
 
-    if (vlc_clone(&th, vlc_gai_thread, &req, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&th, vlc_gai_thread, &req))
         return EAI_SYSTEM;
 
     vlc_sem_wait_i11e(&req.done);

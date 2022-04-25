@@ -445,7 +445,7 @@ static void vlc_entry( void *p )
 }
 
 int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
-               void *data, int priority)
+               void *data)
 {
     struct vlc_thread *th = malloc (sizeof (*th));
     if (unlikely(th == NULL))
@@ -471,16 +471,6 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
 
     if (p_handle != NULL)
         *p_handle = th;
-
-    if (priority)
-    {
-        LONG delta = PRTYD_MAXIMUM;
-
-        if (priority != VLC_THREAD_PRIORITY_HIGHEST)
-            delta >>= 1;
-
-        DosSetPriority(PRTYS_THREAD, PRTYC_REGULAR, delta, th->tid );
-    }
 
     return 0;
 

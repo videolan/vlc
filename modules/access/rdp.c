@@ -471,7 +471,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux, VLC_THREAD_PRIORITY_INPUT ) != VLC_SUCCESS )
+    if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux ) != VLC_SUCCESS )
     {
         msg_Err( p_demux, "can't spawn thread" );
         freerdp_disconnect( p_sys->p_instance );

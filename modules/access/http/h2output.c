@@ -320,7 +320,7 @@ struct vlc_h2_output *vlc_h2_output_create(struct vlc_tls *tls, bool client)
 
     void *(*cb)(void *) = client ? vlc_h2_client_output_thread
                                  : vlc_h2_output_thread;
-    if (vlc_clone(&out->thread, cb, out, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone(&out->thread, cb, out))
     {
         free(out);
         out = NULL;

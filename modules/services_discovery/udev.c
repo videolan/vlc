@@ -274,7 +274,7 @@ static int Open (vlc_object_t *obj, const struct subsys *subsys)
     }
     udev_enumerate_unref (devenum);
 
-    if (vlc_clone (&p_sys->thread, Run, sd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Run, sd))
     {   /* Fallback without thread */
         udev_monitor_unref (mon);
         udev_unref (udev);

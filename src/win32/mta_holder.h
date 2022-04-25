@@ -76,7 +76,7 @@ static inline bool vlc_mta_acquire( vlc_object_t *p_parent )
         vlc_sem_init( &p_mta->ready_sem, 0 );
         vlc_sem_init( &p_mta->release_sem, 0 );
         p_mta->i_refcount = 1;
-        if ( vlc_clone( &p_mta->thread, MtaMainLoop, p_mta, VLC_THREAD_PRIORITY_LOW ) )
+        if ( vlc_clone( &p_mta->thread, MtaMainLoop, p_mta ) )
         {
             free( p_mta );
             p_mta = NULL;

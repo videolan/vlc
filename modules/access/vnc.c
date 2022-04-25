@@ -474,7 +474,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_starttime = vlc_tick_now();
     vlc_sem_init( &p_sys->closing, 0 );
 
-    if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux, VLC_THREAD_PRIORITY_INPUT ) != VLC_SUCCESS )
+    if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux ) != VLC_SUCCESS )
     {
         msg_Err( p_demux, "can't spawn thread" );
         return VLC_EGENERIC;

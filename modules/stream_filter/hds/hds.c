@@ -1683,7 +1683,7 @@ static int Open( vlc_object_t *p_this )
     s->pf_seek = NULL;
     s->pf_control = Control;
 
-    if( vlc_clone( &p_sys->dl_thread, download_thread, s, VLC_THREAD_PRIORITY_INPUT ) )
+    if( vlc_clone( &p_sys->dl_thread, download_thread, s ) )
     {
         goto error;
     }
@@ -1691,7 +1691,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->live ) {
         msg_Info( p_this, "Live stream detected" );
 
-        if( vlc_clone( &p_sys->live_thread, live_thread, s, VLC_THREAD_PRIORITY_INPUT ) )
+        if( vlc_clone( &p_sys->live_thread, live_thread, s ) )
         {
             goto error;
         }

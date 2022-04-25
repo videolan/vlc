@@ -134,7 +134,7 @@ static int Open( vlc_object_t *p_this )
     }
     Register( p_intf );
 
-    if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Thread, p_intf ) )
     {
         if( p_sys->p_map )
         {

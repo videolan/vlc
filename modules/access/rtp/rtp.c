@@ -440,8 +440,7 @@ static int OpenSDP(vlc_object_t *obj)
     if (err > 0 && module_exists("live555")) /* Bail out to live555 */
         goto error;
 
-    if (vlc_clone(&sys->thread, rtp_dgram_thread, demux,
-                  VLC_THREAD_PRIORITY_INPUT)) {
+    if (vlc_clone(&sys->thread, rtp_dgram_thread, demux)) {
         rtp_session_destroy(demux, sys->session);
         goto error;
     }
@@ -611,8 +610,7 @@ static int OpenURL(vlc_object_t *obj)
     }
 #endif
 
-    if (vlc_clone (&p_sys->thread, rtp_dgram_thread,
-                   demux, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone (&p_sys->thread, rtp_dgram_thread, demux))
         goto error;
     return VLC_SUCCESS;
 

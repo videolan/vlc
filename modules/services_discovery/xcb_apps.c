@@ -176,7 +176,7 @@ static int Open (vlc_object_t *obj)
 
     UpdateApps (sd);
 
-    if (vlc_clone (&p_sys->thread, Run, sd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Run, sd))
         goto error;
     return VLC_SUCCESS;
 
@@ -310,7 +310,7 @@ static int cmpapp (const void *a, const void *b)
     if (wa < wb)
         return -1;
     return 0;
-} 
+}
 
 static void UpdateApps (services_discovery_t *sd)
 {

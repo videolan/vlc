@@ -118,8 +118,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     timer->live = true;
     atomic_init(&timer->overruns, 0);
 
-    if (vlc_clone (&timer->thread, vlc_timer_thread, timer,
-                   VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone (&timer->thread, vlc_timer_thread, timer))
     {
         free (timer);
         return ENOMEM;

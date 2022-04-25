@@ -498,7 +498,7 @@ static int Open (vlc_object_t *obj)
     sys->es = es_out_Add (demux->out, &fmt);
     demux->p_sys = sys;
 
-    if (vlc_clone (&sys->thread, Thread, demux, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone (&sys->thread, Thread, demux))
     {
         es_out_Del (demux->out, sys->es);
         goto error;

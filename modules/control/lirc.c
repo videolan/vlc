@@ -116,7 +116,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_intf ) )
     {
         lirc_freeconfig( p_sys->config );
         lirc_deinit();

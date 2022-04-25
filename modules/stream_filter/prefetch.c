@@ -488,7 +488,7 @@ static int Open(vlc_object_t *obj)
 
     stream->p_sys = sys;
 
-    if (vlc_clone(&sys->thread, Thread, stream, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, Thread, stream))
     {
         vlc_interrupt_destroy(sys->interrupt);
         goto error;

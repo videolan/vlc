@@ -40,8 +40,7 @@ Downloader::Downloader()
 bool Downloader::start()
 {
     if(!thread_handle_valid &&
-       vlc_clone(&thread_handle, downloaderThread,
-                 static_cast<void *>(this), VLC_THREAD_PRIORITY_INPUT))
+       vlc_clone(&thread_handle, downloaderThread, static_cast<void *>(this)))
     {
         return false;
     }

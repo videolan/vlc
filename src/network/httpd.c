@@ -982,8 +982,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     host->p_tls    = p_tls;
 
     /* create the thread */
-    if (vlc_clone(&host->thread, httpd_HostThread, host,
-                   VLC_THREAD_PRIORITY_LOW)) {
+    if (vlc_clone(&host->thread, httpd_HostThread, host)) {
         msg_Err(p_this, "cannot spawn http host thread");
         goto error;
     }

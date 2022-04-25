@@ -475,8 +475,7 @@ static int Open(vout_display_t *vd,
     sys->dead = false;
     vlc_queue_Init(&sys->q, offsetof (vlc_caca_event_t, next));
 
-    if (vlc_clone(&sys->thread, VoutDisplayEventKeyDispatch, vd,
-                  VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, VoutDisplayEventKeyDispatch, vd))
         goto error;
 
     sys->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(vd, "mouse-hide-timeout") );

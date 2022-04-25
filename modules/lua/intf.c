@@ -367,7 +367,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 
     p_sys->L = L;
 
-    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_intf ) )
     {
         vlclua_fd_cleanup( &p_sys->dtable );
         lua_close( p_sys->L );

@@ -2018,7 +2018,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     vlc_player_InitTimer(player);
 
     if (vlc_clone(&player->destructor.thread, vlc_player_destructor_Thread,
-                  player, VLC_THREAD_PRIORITY_LOW) != 0)
+                  player) != 0)
     {
         vlc_player_DestroyTimer(player);
         goto error;

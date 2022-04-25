@@ -181,8 +181,7 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     atomic_store( &p_event->b_done, false);
     p_event->b_error = false;
 
-    if( vlc_clone( &p_event->thread, EventThread, p_event,
-                   VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_event->thread, EventThread, p_event ) )
     {
         msg_Err( p_event->obj, "cannot create Vout EventThread" );
         return VLC_EGENERIC;

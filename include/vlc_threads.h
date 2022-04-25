@@ -656,12 +656,11 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
  *           [OUT]
  * @param entry entry point for the thread
  * @param data data parameter given to the entry point
- * @param priority thread priority value
  * @return 0 on success, a standard error code on error.
  * @note In case of error, the value of *th is undefined.
  */
-VLC_API int vlc_clone(vlc_thread_t *th, void *(*entry)(void *), void *data,
-                      int priority) VLC_USED;
+VLC_API int vlc_clone(vlc_thread_t *th, void *(*entry)(void *),
+                      void *data) VLC_USED;
 
 /**
  * Marks a thread as cancelled.

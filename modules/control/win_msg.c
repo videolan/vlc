@@ -178,7 +178,7 @@ static int Open(vlc_object_t *obj)
     /* Run the helper thread */
     sys->ready = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-    if (vlc_clone(&sys->thread, HelperThread, intf, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, HelperThread, intf))
     {
         free(sys);
         msg_Err(intf, "one instance mode DISABLED "

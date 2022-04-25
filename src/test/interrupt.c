@@ -177,16 +177,16 @@ int main (void)
 
     test_context_simple(ctx);
 
-    assert(!vlc_clone(&th, test_thread_simple, ctx, VLC_THREAD_PRIORITY_LOW));
+    assert(!vlc_clone(&th, test_thread_simple, ctx));
     vlc_interrupt_raise(ctx);
     vlc_sem_post(&sem);
     vlc_sem_post(&sem);
     vlc_join(th, NULL);
 
-    assert(!vlc_clone(&th, test_thread_cleanup, ctx, VLC_THREAD_PRIORITY_LOW));
+    assert(!vlc_clone(&th, test_thread_cleanup, ctx));
     vlc_join(th, NULL);
 
-    assert(!vlc_clone(&th, test_thread_cancel, ctx, VLC_THREAD_PRIORITY_LOW));
+    assert(!vlc_clone(&th, test_thread_cancel, ctx));
     vlc_cancel(th);
     vlc_join(th, NULL);
 

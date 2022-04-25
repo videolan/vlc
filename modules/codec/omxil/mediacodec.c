@@ -1002,8 +1002,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         goto bailout;
     }
 
-    if (vlc_clone(&p_sys->out_thread, OutThread, p_dec,
-                  VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&p_sys->out_thread, OutThread, p_dec))
     {
         msg_Err(p_dec, "vlc_clone failed");
         vlc_mutex_unlock(&p_sys->lock);

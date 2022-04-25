@@ -220,7 +220,7 @@ int DBMSDIOutput::Open()
 
     decklink_iterator->Release();
 
-    if(vlc_clone(&feeder.thread, feederThreadCallback, this, VLC_THREAD_PRIORITY_INPUT))
+    if(vlc_clone(&feeder.thread, feederThreadCallback, this))
         goto error;
 
     return VLC_SUCCESS;

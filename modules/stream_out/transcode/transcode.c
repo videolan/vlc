@@ -211,7 +211,7 @@ vlc_module_begin ()
         change_integer_range( 0, 32 )
     add_integer( SOUT_CFG_PREFIX "pool-size", 10, POOL_TEXT, POOL_LONGTEXT )
         change_integer_range( 1, 1000 )
-    add_bool( SOUT_CFG_PREFIX "high-priority", false, HP_TEXT, HP_LONGTEXT )
+    add_obsolete_bool( SOUT_CFG_PREFIX "high-priority" ) // Since 4.0.0
 
 vlc_module_end ()
 
@@ -322,13 +322,6 @@ static void SetVideoEncoderConfig( sout_stream_t *p_stream, transcode_encoder_co
 
     p_cfg->video.threads.i_count = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
     p_cfg->video.threads.pool_size = var_GetInteger( p_stream, SOUT_CFG_PREFIX "pool-size" );
-
-#if VLC_THREAD_PRIORITY_OUTPUT != VLC_THREAD_PRIORITY_VIDEO
-    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" ) )
-        p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_OUTPUT;
-    else
-#endif
-        p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_VIDEO;
 }
 
 static void SetSPUEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )

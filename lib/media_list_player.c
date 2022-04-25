@@ -490,8 +490,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
         goto error;
     install_media_player_observer(p_mlp);
 
-    if (vlc_clone(&p_mlp->thread, playlist_thread, p_mlp,
-                  VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&p_mlp->thread, playlist_thread, p_mlp))
     {
         libvlc_media_player_release(p_mlp->p_mi);
         goto error;

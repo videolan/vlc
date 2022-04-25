@@ -1568,8 +1568,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     /* Run AudioTrack_Thread */
     p_sys->b_thread_running = true;
     p_sys->b_thread_paused = false;
-    if ( vlc_clone( &p_sys->thread, AudioTrack_Thread, p_aout,
-                    VLC_THREAD_PRIORITY_LOW ) )
+    if ( vlc_clone( &p_sys->thread, AudioTrack_Thread, p_aout ) )
     {
         msg_Err(p_aout, "vlc clone failed");
         goto error;

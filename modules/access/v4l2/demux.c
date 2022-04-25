@@ -359,7 +359,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     }
 #endif
 
-    if (vlc_clone (&sys->thread, entry, demux, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone (&sys->thread, entry, demux))
     {
 #ifdef ZVBI_COMPILED
         if (sys->vbi != NULL)

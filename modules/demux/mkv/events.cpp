@@ -76,7 +76,7 @@ void event_thread_t::SetPci(const pci_t *data)
     if( !is_running )
     {
         b_abort = false;
-        is_running = !vlc_clone( &thread, EventThread, this, VLC_THREAD_PRIORITY_LOW );
+        is_running = !vlc_clone( &thread, EventThread, this );
     }
 }
 void event_thread_t::ResetPci()

@@ -130,7 +130,7 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
 }
 
 static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
-                           void *(*entry) (void *), void *data, int priority)
+                           void *(*entry) (void *), void *data)
 {
     int ret;
 
@@ -179,17 +179,15 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
     ret = pthread_create(&th->handle, attr, entry, data);
     pthread_sigmask (SIG_SETMASK, &oldset, NULL);
     pthread_attr_destroy (attr);
-    (void) priority;
     return ret;
 }
 
-int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
-               int priority)
+int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data)
 {
     pthread_attr_t attr;
 
     pthread_attr_init (&attr);
-    return vlc_clone_attr (th, &attr, entry, data, priority);
+    return vlc_clone_attr (th, &attr, entry, data);
 }
 
 void vlc_join(vlc_thread_t th, void **result)

@@ -315,8 +315,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->dead = false;
     vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
 
-    if( vlc_clone( &p_sys->thread, Thread, p_filter,
-                   VLC_THREAD_PRIORITY_VIDEO ) )
+    if( vlc_clone( &p_sys->thread, Thread, p_filter ) )
     {
         vout_Close( p_sys->p_vout );
         goto error;

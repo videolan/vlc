@@ -721,7 +721,7 @@ static int Open(vout_window_t *wnd)
     vlc_sem_init( &sys->ready, 0 );
 
     wnd->sys = sys;
-    if( vlc_clone( &sys->thread, EventThread, wnd, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &sys->thread, EventThread, wnd ) )
     {
         Close(wnd);
         return VLC_EGENERIC;

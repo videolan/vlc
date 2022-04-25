@@ -1726,7 +1726,7 @@ static int Open(vlc_object_t *p_this)
     if (!sys->playlist_listener)
         return err;
 
-    if (vlc_clone(&sys->thread, Run, intf, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, Run, intf))
     {
         vlc_playlist_Lock(sys->playlist);
         vlc_playlist_RemoveListener(sys->playlist, sys->playlist_listener);

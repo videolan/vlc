@@ -1299,7 +1299,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->it = pv;
 
-    if (vlc_clone(&sys->thread, MMThread, aout, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, MMThread, aout))
     {
         IMMDeviceEnumerator_Release(sys->it);
         LeaveMTA();

@@ -1057,8 +1057,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
                     msg_Err( p_stream, "passive COMEDIA RTP socket failed" );
                     goto error;
                 }
-                if( vlc_clone( &id->listen.thread, rtp_listen_thread, id,
-                               VLC_THREAD_PRIORITY_LOW ) )
+                if( vlc_clone( &id->listen.thread, rtp_listen_thread, id ) )
                 {
                     net_ListenClose( id->listen.fd );
                     id->listen.fd = NULL;
@@ -1125,7 +1124,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
                                  id->rtp_fmt.clock_rate, mcast_fd );
 
     id->dead = false;
-    if( vlc_clone( &id->thread, ThreadSend, id, VLC_THREAD_PRIORITY_HIGHEST ) )
+    if( vlc_clone( &id->thread, ThreadSend, id ) )
     {
         id->dead = true;
         goto error;

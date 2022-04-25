@@ -347,7 +347,7 @@ __stdcall vlc_entry (void *p)
 }
 
 int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
-               void *data, int priority)
+               void *data)
 {
     struct vlc_thread *th = malloc (sizeof (*th));
     if (unlikely(th == NULL))
@@ -379,9 +379,6 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
 
     if (p_handle != NULL)
         *p_handle = th;
-
-    if (priority)
-        SetThreadPriority (th->id, priority);
 
     return 0;
 }

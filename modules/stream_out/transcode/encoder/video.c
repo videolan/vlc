@@ -468,7 +468,7 @@ int transcode_encoder_video_open( transcode_encoder_t *p_enc,
 
     if( p_cfg->video.threads.i_count > 0 )
     {
-        if( vlc_clone( &p_enc->thread, EncoderThread, p_enc, p_cfg->video.threads.i_priority ) )
+        if( vlc_clone( &p_enc->thread, EncoderThread, p_enc ) )
         {
             module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
             p_enc->p_encoder->p_module = NULL;

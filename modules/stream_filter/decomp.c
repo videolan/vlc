@@ -273,8 +273,7 @@ static int Open (stream_t *stream, const char *path)
 
             if (vlc_spawnp(&p_sys->pid, path, fdv, argv) == 0)
             {
-                if (vlc_clone(&p_sys->thread, Thread, stream,
-                              VLC_THREAD_PRIORITY_INPUT) == 0)
+                if (vlc_clone(&p_sys->thread, Thread, stream) == 0)
                     ret = VLC_SUCCESS;
             }
             else

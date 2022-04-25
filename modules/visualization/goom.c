@@ -148,8 +148,7 @@ static int Open( vlc_object_t *p_this )
     date_Set( &p_thread->date, VLC_TICK_0 );
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
-    if( vlc_clone( &p_thread->thread,
-                   Thread, p_thread, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_thread->thread, Thread, p_thread ) )
     {
         msg_Err( p_filter, "cannot launch goom thread" );
         vout_Close( p_thread->p_vout );

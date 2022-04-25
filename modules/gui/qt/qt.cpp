@@ -511,7 +511,7 @@ static int OpenInternal( qt_intf_t *p_intf )
     libvlc_SetExitHandler( vlc_object_instance(p_intf), Abort, p_intf );
     Thread( (void *)p_intf );
 #else
-    if( vlc_clone( &p_intf->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_intf->thread, Thread, p_intf ) )
     {
         return VLC_ENOMEM;
     }

@@ -481,7 +481,7 @@ static struct cli_client *cli_client_new(intf_thread_t *intf, int fd,
     cl->intf = intf;
     vlc_mutex_init(&cl->output_lock);
 
-    if (vlc_clone(&cl->thread, cli_client_thread, cl, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&cl->thread, cli_client_thread, cl))
     {
         free(cl);
         cl = NULL;
@@ -954,7 +954,7 @@ static int Activate( vlc_object_t *p_this )
         intf_consoleIntroMsg( p_intf );
 #endif
 #endif
-    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_intf ) )
         goto error;
 
     msg_print(p_intf, "%s",

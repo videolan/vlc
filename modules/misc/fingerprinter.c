@@ -266,8 +266,7 @@ static int Open(vlc_object_t *p_this)
     p_fingerprinter->pf_apply = ApplyResult;
 
     var_Create( p_fingerprinter, "results-available", VLC_VAR_BOOL );
-    if( vlc_clone( &p_sys->thread, Run, p_fingerprinter,
-                   VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_fingerprinter ) )
     {
         msg_Err( p_fingerprinter, "cannot spawn fingerprinter thread" );
         goto error;

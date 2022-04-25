@@ -143,8 +143,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
         var_SetAddress( vlc_object_parent(vlc_object_parent(m_module)), CC_SHARED_VAR_NAME, &m_common );
 
     // Start the Chromecast event thread.
-    if (vlc_clone(&m_chromecastThread, ChromecastThread, this,
-                  VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&m_chromecastThread, ChromecastThread, this))
     {
         vlc_interrupt_destroy( m_ctl_thread_interrupt );
         var_SetAddress( vlc_object_parent(vlc_object_parent(m_module)), CC_SHARED_VAR_NAME, NULL );
@@ -226,7 +225,7 @@ void intf_sys_t::reinit()
     }
 
     m_state = Authenticating;
-    if( vlc_clone( &m_chromecastThread, ChromecastThread, this, VLC_THREAD_PRIORITY_LOW) )
+    if( vlc_clone( &m_chromecastThread, ChromecastThread, this) )
     {
         m_state = Dead;
         delete m_communication;

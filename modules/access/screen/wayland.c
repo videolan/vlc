@@ -418,7 +418,7 @@ static int Open(vlc_object_t *obj)
     /* Initializes demux */
     sys->start = vlc_tick_now();
 
-    if (vlc_clone(&sys->thread, Thread, demux, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_clone(&sys->thread, Thread, demux))
         goto error;
 
     demux->pf_demux = NULL;

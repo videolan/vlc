@@ -137,10 +137,8 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
     return ret;
 }
 
-int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
-               int priority)
+int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data)
 {
-    (void) priority;
     return vlc_clone_attr (th, entry, data);
 }
 

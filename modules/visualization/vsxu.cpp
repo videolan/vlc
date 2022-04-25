@@ -139,8 +139,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
 
     /* Create the thread */
-    if( vlc_clone( &p_sys->thread, Thread, p_filter,
-                   VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Thread, p_filter ) )
     {
         vlc_gl_surface_Destroy( p_sys->gl );
         goto error;

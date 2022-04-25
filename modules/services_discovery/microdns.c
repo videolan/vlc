@@ -607,8 +607,7 @@ OpenCommon( vlc_object_t *p_obj, struct discovery_sys *p_sys, bool b_renderer )
         goto error;
     }
 
-    if( vlc_clone( &p_sys->thread, b_renderer ? RunRD : RunSD, p_obj,
-                   VLC_THREAD_PRIORITY_LOW) )
+    if( vlc_clone( &p_sys->thread, b_renderer ? RunRD : RunSD, p_obj) )
     {
         msg_Err( p_obj, "Can't run the lookup thread" );
         goto error;

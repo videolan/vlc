@@ -94,7 +94,7 @@ static int OpenInhibit (vlc_object_t *obj)
     sys->exit = false;
 
     /* SetThreadExecutionState always needs to be called from the same thread */
-    if (vlc_clone(&sys->thread, Run, ih, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, Run, ih))
         return VLC_EGENERIC;
 
     ih->inhibit = Inhibit;

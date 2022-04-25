@@ -1603,8 +1603,7 @@ static void KeepAliveStart( stream_t *p_access )
 
     vlc_sem_init( &p_sys->keep_alive.sem, 0 );
     p_sys->b_keep_alive = !vlc_clone( &p_sys->keep_alive.thread,
-                                      KeepAliveThread, p_access,
-                                      VLC_THREAD_PRIORITY_LOW );
+                                      KeepAliveThread, p_access );
 }
 
 static void KeepAliveStop( stream_t *p_access )

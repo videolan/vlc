@@ -322,8 +322,7 @@ static int OpenSD( vlc_object_t *p_this )
     /* XXX: Contrary to what the libupnp doc states, UpnpSearchAsync is
      * blocking (select() and send() are called). Therefore, Call
      * UpnpSearchAsync from an other thread. */
-    if ( vlc_clone( &p_sys->thread, SearchThread, p_this,
-                    VLC_THREAD_PRIORITY_LOW ) )
+    if ( vlc_clone( &p_sys->thread, SearchThread, p_this ) )
     {
         p_sys->p_upnp->removeListener( p_sys->p_server_list );
         p_sys->p_upnp->release();
@@ -1632,8 +1631,7 @@ try
     p_sys->p_renderer_list = std::make_shared<RD::MediaRendererList>( p_rd );
     p_sys->p_upnp->addListener( p_sys->p_renderer_list );
 
-    if( vlc_clone( &p_sys->thread, SearchThread, (void*)p_rd,
-                    VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, SearchThread, (void*)p_rd ) )
         {
             msg_Err( p_rd, "Can't run the lookup thread" );
             p_sys->p_upnp->removeListener( p_sys->p_renderer_list );

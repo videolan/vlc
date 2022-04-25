@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( pl, "podcast-request", VLC_VAR_STRING );
     var_AddCallback( pl, "podcast-request", Request, p_sys );
 
-    if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Run, p_sd))
     {
         var_DelCallback( pl, "podcast-request", Request, p_sys );
         free (p_sys);

@@ -42,7 +42,6 @@ typedef struct
             struct
             {
                 unsigned int i_count;
-                int          i_priority;
                 uint32_t     pool_size;
             } threads;
         } video;

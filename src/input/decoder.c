@@ -131,7 +131,7 @@ struct vlc_input_decoder_t
 
     /* If p_aout is valid, then p_astream is valid too */
     audio_output_t *p_aout;
-    vlc_aout_stream *p_astream; 
+    vlc_aout_stream *p_astream;
 
     vout_thread_t   *p_vout;
     bool             vout_started;
@@ -2082,7 +2082,6 @@ static vlc_input_decoder_t *
 decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 {
     const char *psz_type = cfg->sout ? N_("packetizer") : N_("decoder");
-    int i_priority;
 
     /* Create the decoder configuration structure */
     vlc_input_decoder_t *p_owner = CreateDecoder( p_parent, cfg );
@@ -2106,13 +2105,6 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 
     assert( p_dec->fmt_in.i_cat != UNKNOWN_ES );
 
-#if VLC_THREAD_PRIORITY_AUDIO != VLC_THREAD_PRIORITY_VIDEO
-    if( p_dec->fmt_in.i_cat == AUDIO_ES )
-        i_priority = VLC_THREAD_PRIORITY_AUDIO;
-    else
-#endif
-        i_priority = VLC_THREAD_PRIORITY_VIDEO;
-
 #ifdef ENABLE_SOUT
     /* Do not delay sout creation for SPU or DATA. */
     if( cfg->sout && cfg->fmt->b_packetized &&
@@ -2129,7 +2121,7 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
 #endif
 
     /* Spawn the decoder thread */
-    if( vlc_clone( &p_owner->thread, DecoderThread, p_owner, i_priority ) )
+    if( vlc_clone( &p_owner->thread, DecoderThread, p_owner ) )
     {
         msg_Err( p_dec, "cannot spawn decoder thread" );
         DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );

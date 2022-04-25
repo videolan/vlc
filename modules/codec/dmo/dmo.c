@@ -265,8 +265,7 @@ found:
     p_sys->b_ready = false;
     p_sys->p_input = NULL;
 
-    if( vlc_clone( &p_sys->thread, DecoderThread, p_dec,
-                   VLC_THREAD_PRIORITY_INPUT ) )
+    if( vlc_clone( &p_sys->thread, DecoderThread, p_dec ) )
         goto error;
 
     vlc_mutex_lock( &p_sys->lock );

@@ -2116,7 +2116,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         return -1;
     }
     atomic_store(&sys->control_is_terminated, false);
-    if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
+    if (vlc_clone(&sys->thread, Thread, vout)) {
         vout_ReleaseDisplay(vout);
         vout_DisableWindow(vout);
         return -1;

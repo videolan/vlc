@@ -54,7 +54,7 @@ static int thread_return_magic = 0x4321;
 
 // Spawn thread
 #define TEST_THREAD_CLONE(th, f, data) \
-    assert(vlc_clone(th, f, data, VLC_THREAD_PRIORITY_LOW) == 0)
+    assert(vlc_clone(th, f, data) == 0)
 
 // Spawn thread with magic data
 #define TEST_THREAD_CLONE_MAGIC(th, f) \

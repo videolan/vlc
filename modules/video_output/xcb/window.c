@@ -680,7 +680,7 @@ static int OpenCommon(vout_window_t *wnd, char *display,
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
-    if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, Thread, wnd))
     {
         DeinitKeyboardExtension(wnd);
         return VLC_ENOMEM;

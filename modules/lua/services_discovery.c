@@ -239,7 +239,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     p_sys->dead = false;
     vlc_queue_Init( &p_sys->queue, offsetof (struct sd_query, next) );
 
-    if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_sd ) )
     {
         goto error;
     }

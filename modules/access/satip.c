@@ -770,7 +770,7 @@ static int satip_open(vlc_object_t *obj)
 
     vlc_queue_Init(&sys->queue, offsetof (block_t, p_next));
 
-    if (vlc_clone(&sys->thread, satip_thread, access, VLC_THREAD_PRIORITY_INPUT)) {
+    if (vlc_clone(&sys->thread, satip_thread, access)) {
         msg_Err(access, "Failed to create worker thread.");
         goto error;
     }
