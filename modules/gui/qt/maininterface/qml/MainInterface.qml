@@ -51,6 +51,19 @@ Item {
         value: root.height
     }
 
+    Widgets.ToolTipExt {
+        id: attachedToolTip
+
+        parent: null
+        z: 99
+        colors: parent && parent.colors ? parent.colors
+                                        : VLCStyle.colors
+
+        Component.onCompleted: {
+            MainCtx.setAttachedToolTip(this)
+        }
+    }
+
     Loader {
         id: playlistWindowLoader
         asynchronous: true
