@@ -50,7 +50,6 @@ T.ToolButton {
 
     // Aliases
 
-    property alias toolTip: toolTip
 
     // active border color
     property alias colorFocus: background.activeBorderColor
@@ -75,11 +74,8 @@ T.ToolButton {
 
     // Childs
 
-    Widgets.ToolTipExt {
-        id: toolTip
-        text: control.text
-        delay: 500
-    }
+    T.ToolTip.text: control.text
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
     background: AnimatedBackground {
         id: background

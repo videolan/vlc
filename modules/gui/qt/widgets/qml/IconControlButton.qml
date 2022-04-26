@@ -34,6 +34,4 @@ IconToolButton {
                              : colors.blendColors(colors.playerBg, colors.playerControlBarFg, 0.75)
 
     colorFocus: colors.bgFocus
-
-    toolTip.colors: colors
 }

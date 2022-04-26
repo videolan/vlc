@@ -63,7 +63,7 @@ T.Pane {
             colors: root.colors
             color: colors.text
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.rightItem: teleTransparencyBtn
@@ -88,7 +88,7 @@ T.Pane {
             colors: root.colors
             color: colors.text
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.leftItem: teleActivateBtn
@@ -161,7 +161,7 @@ T.Pane {
             color: "grey"
             colorDisabled: "grey"
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.leftItem: telePageNumber
@@ -186,7 +186,7 @@ T.Pane {
             color: "red"
             colorDisabled: "grey"
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.leftItem: indexKeyBtn
@@ -211,7 +211,7 @@ T.Pane {
             color: "green"
             colorDisabled: "grey"
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.leftItem: redKeyBtn
@@ -236,7 +236,7 @@ T.Pane {
             color: "yellow"
             colorDisabled: "grey"
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.leftItem: greenKeyBtn
@@ -261,7 +261,7 @@ T.Pane {
             color: "blue"
             colorDisabled: "grey"
 
-            toolTip.visible: hovered || visualFocus
+            T.ToolTip.visible: hovered || visualFocus
 
             Navigation.parentItem: root
             Navigation.leftItem: yellowKeyBtn
