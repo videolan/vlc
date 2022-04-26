@@ -1061,11 +1061,53 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         });
     }
 
-    action = m_menu->addAction( qtr("Clear the playlist") );
-    action->setIcon(QIcon(":/toolbar/clear.svg"));
-    connect(action, &QAction::triggered, [this]( ) {
-        m_controler->clear();
-    });
+
+    if (m_model->rowCount() > 0)
+    {
+        action = m_menu->addAction( qtr("Clear the playlist") );
+        action->setIcon(QIcon(":/toolbar/clear.svg"));
+        connect(action, &QAction::triggered, [this]( ) {
+            m_controler->clear();
+        });
+
+        m_menu->addSeparator();
+
+        using namespace vlc::playlist;
+        PlaylistControllerModel::SortKey currentKey = m_controler->getSortKey();
+        PlaylistControllerModel::SortOrder currentOrder = m_controler->getSortOrder();
+
+        QMenu* sortMenu = m_menu->addMenu(qtr("Sort by"));
+        QActionGroup * group = new QActionGroup(sortMenu);
+
+        auto addSortAction = [&](const QString& label, PlaylistControllerModel::SortKey key, PlaylistControllerModel::SortOrder order) {
+            QAction* action = sortMenu->addAction(label);
+            connect(action, &QAction::triggered, this, [this, key, order]( ) {
+                m_controler->sort(key, order);
+            });
+            action->setCheckable(true);
+            action->setActionGroup(group);
+            if (key == currentKey && currentOrder == order)
+                action->setChecked(true);
+        };
+
+        for (const QVariant& it: m_controler->getSortKeyTitleList())
+        {
+            const QVariantMap varmap = it.toMap();
+
+            auto key = static_cast<PlaylistControllerModel::SortKey>(varmap.value("key").toInt());
+            QString label = varmap.value("title").toString();
+
+            addSortAction(qtr("%1 Ascending").arg(label), key, PlaylistControllerModel::SORT_ORDER_ASC);
+            addSortAction(qtr("%1 Descending").arg(label), key, PlaylistControllerModel::SORT_ORDER_DESC);
+        }
+
+        action = m_menu->addAction( qtr("Shuffle the playlist") );
+        action->setIcon(QIcon(":/buttons/playlist/shuffle_on.svg"));
+        connect(action, &QAction::triggered, this, [this]( ) {
+            m_controler->shuffle();
+        });
+
+    }
 
     m_menu->popup(pos);
 }
