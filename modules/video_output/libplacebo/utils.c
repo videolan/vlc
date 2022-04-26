@@ -469,7 +469,7 @@ void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
     memcpy(dst->nonlinear.m[0], src->nonlinear_matrix, sizeof(dst->nonlinear.m));
     memcpy(dst->linear.m[0], src->linear_matrix, sizeof(dst->linear.m));
 
-    for (int c = 0; c < ARRAY_SIZE(dst->comp); c++) {
+    for (size_t c = 0; c < ARRAY_SIZE(dst->comp); c++) {
         const struct vlc_dovi_reshape_t *csrc = &src->curves[c];
         struct pl_reshape_data *cdst = &dst->comp[c];
         cdst->num_pivots = csrc->num_pivots;
@@ -483,7 +483,7 @@ void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
             cdst->method[i] = csrc->mapping_idc[i];
             switch (csrc->mapping_idc[i]) {
             case VLC_DOVI_RESHAPE_POLYNOMIAL:
-                for (int k = 0; k < ARRAY_SIZE(cdst->poly_coeffs[i]); k++) {
+                for (size_t k = 0; k < ARRAY_SIZE(cdst->poly_coeffs[i]); k++) {
                     cdst->poly_coeffs[i][k] = (k <= csrc->poly_order[i])
                         ? scale * csrc->poly_coef[i][k]
                         : 0.0f;
@@ -493,7 +493,7 @@ void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
                 cdst->mmr_order[i] = csrc->mmr_order[i];
                 cdst->mmr_constant[i] = scale * csrc->mmr_constant[i];
                 for (int j = 0; j < csrc->mmr_order[i]; j++) {
-                    for (int k = 0; k < ARRAY_SIZE(cdst->mmr_coeffs[i][j]); k++)
+                    for (size_t k = 0; k < ARRAY_SIZE(cdst->mmr_coeffs[i][j]); k++)
                         cdst->mmr_coeffs[i][j][k] = scale * csrc->mmr_coef[i][j][k];
                 }
                 break;
