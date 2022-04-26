@@ -100,9 +100,11 @@ stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
     return s;
 }
 
+#define stream_priv(s) container_of(s, stream_priv_t, stream)
+
 void *vlc_stream_Private(stream_t *stream)
 {
-    return ((stream_priv_t *)stream)->private_data;
+    return stream_priv(stream)->private_data;
 }
 
 stream_t *vlc_stream_CommonNew(vlc_object_t *parent,
@@ -113,7 +115,7 @@ stream_t *vlc_stream_CommonNew(vlc_object_t *parent,
 
 void stream_CommonDelete(stream_t *s)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
 
     if (priv->text.conv != (vlc_iconv_t)(-1))
         vlc_iconv_close(priv->text.conv);
@@ -132,7 +134,7 @@ void stream_CommonDelete(stream_t *s)
  */
 void vlc_stream_Delete(stream_t *s)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
 
     priv->destroy(s);
     stream_CommonDelete(s);
@@ -186,7 +188,7 @@ stream_t *(vlc_stream_NewMRL)(vlc_object_t* parent, const char* mrl )
 #define STREAM_LINE_MAX (2048*100)
 char *vlc_stream_ReadLine( stream_t *s )
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
 
     /* Let's fail quickly if this is a readdir access */
     if( s->pf_read == NULL && s->pf_block == NULL )
@@ -418,7 +420,7 @@ static ssize_t vlc_stream_CopyBlock(block_t **restrict pp,
 
 static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
     ssize_t ret;
 
     assert(len <= SSIZE_MAX);
@@ -462,7 +464,7 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
 
 ssize_t vlc_stream_ReadPartial(stream_t *s, void *buf, size_t len)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
     ssize_t ret;
 
     ret = vlc_stream_CopyBlock(&priv->peek, buf, len);
@@ -506,7 +508,7 @@ ssize_t vlc_stream_Read(stream_t *s, void *buf, size_t len)
 
 ssize_t vlc_stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
     block_t *peek;
 
     peek = priv->peek;
@@ -560,7 +562,7 @@ ssize_t vlc_stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 
 block_t *vlc_stream_ReadBlock(stream_t *s)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
     block_t *block;
 
     if (vlc_killed())
@@ -610,21 +612,21 @@ block_t *vlc_stream_ReadBlock(stream_t *s)
 
 uint64_t vlc_stream_Tell(const stream_t *s)
 {
-    const stream_priv_t *priv = (const stream_priv_t *)s;
+    const stream_priv_t *priv = stream_priv(s);
 
     return priv->offset;
 }
 
 bool vlc_stream_Eof(const stream_t *s)
 {
-    const stream_priv_t *priv = (const stream_priv_t *)s;
+    const stream_priv_t *priv = stream_priv(s);
 
     return priv->eof;
 }
 
 int vlc_stream_Seek(stream_t *s, uint64_t offset)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
 
     priv->eof = false;
 
@@ -686,7 +688,7 @@ int vlc_stream_Seek(stream_t *s, uint64_t offset)
  */
 int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
 {
-    stream_priv_t *priv = (stream_priv_t *)s;
+    stream_priv_t *priv = stream_priv(s);
 
     switch (cmd)
     {
