@@ -717,7 +717,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     static const struct vlc_encoder_operations ops =
     {
         .close = CloseEncoder,
-        .encoder_video = Encode,
+        .encode_video = Encode,
     };
     p_enc->ops = &ops;
 
