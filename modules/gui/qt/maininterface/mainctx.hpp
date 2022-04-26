@@ -289,6 +289,8 @@ public:
     Q_INVOKABLE QVariant settingValue(const QString &key, const QVariant &defaultValue) const;
     Q_INVOKABLE void setSettingValue(const QString &key, const QVariant &value);
 
+    Q_INVOKABLE static void setAttachedToolTip(QObject* toolTip);
+
 protected:
     /* Systray */
     void createSystray();
