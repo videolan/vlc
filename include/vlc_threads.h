@@ -62,13 +62,6 @@ typedef struct vlc_thread *vlc_thread_t;
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
-# define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT    THREAD_PRIORITY_ABOVE_NORMAL
-# define VLC_THREAD_PRIORITY_AUDIO    THREAD_PRIORITY_HIGHEST
-# define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT   THREAD_PRIORITY_ABOVE_NORMAL
-# define VLC_THREAD_PRIORITY_HIGHEST  THREAD_PRIORITY_TIME_CRITICAL
-
 static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
 {
     int val;
@@ -89,13 +82,6 @@ typedef struct vlc_thread *vlc_thread_t;
 
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
-
-# define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT    1
-# define VLC_THREAD_PRIORITY_AUDIO    VLC_THREAD_PRIORITY_HIGHEST
-# define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT   1
-# define VLC_THREAD_PRIORITY_HIGHEST  2
 
 # define pthread_sigmask  sigprocmask
 
@@ -129,13 +115,6 @@ typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED ((void*) UINTPTR_MAX)
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
-
-# define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT    0
-# define VLC_THREAD_PRIORITY_AUDIO    0
-# define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT   0
-# define VLC_THREAD_PRIORITY_HIGHEST  0
 
 static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
@@ -197,16 +176,6 @@ typedef pthread_key_t   vlc_threadvar_t;
  * \ingroup timer
  */
 typedef struct vlc_timer *vlc_timer_t;
-
-/* Thread priorities.
- * No effect for POSIX threads
- */
-# define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT    0
-# define VLC_THREAD_PRIORITY_AUDIO    0
-# define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT   0
-# define VLC_THREAD_PRIORITY_HIGHEST  0
 
 #endif
 
