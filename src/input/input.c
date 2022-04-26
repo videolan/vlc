@@ -495,13 +495,6 @@ static void *Run( void *data )
 
     if( !Init( p_input ) )
     {
-        if( priv->master->b_can_pace_control && priv->b_out_pace_control )
-        {
-            /* We don't want a high input priority here or we'll
-             * end-up sucking up all the CPU time */
-            vlc_set_priority( priv->thread, VLC_THREAD_PRIORITY_LOW );
-        }
-
         MainLoop( p_input, true ); /* FIXME it can be wrong (like with VLM) */
 
         /* Clean up */
