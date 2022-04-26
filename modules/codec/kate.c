@@ -192,7 +192,8 @@ static void UpdateTigerFontDesc( decoder_t *p_dec );
 
 #ifdef HAVE_TIGER
 
-static const tiger_font_effect pi_font_effects[] = { tiger_font_plain, tiger_font_shadow, tiger_font_outline };
+static const tiger_font_effect pp_font_effects[] = { tiger_font_plain, tiger_font_shadow, tiger_font_outline };
+static const int pi_font_effects[] = { 0, 1, 2 };
 static const char * const ppsz_font_effect_names[] = { N_("None"), N_("Shadow"), N_("Outline") };
 
 /* nicked off freetype.c */
@@ -368,7 +369,12 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     /* get initial value of configuration */
     p_sys->i_tiger_default_font_color = GetTigerColor( p_dec, "kate-tiger-default-font" );
     p_sys->i_tiger_default_background_color = GetTigerColor( p_dec, "kate-tiger-default-background" );
-    p_sys->e_tiger_default_font_effect = var_InheritInteger( p_dec, "kate-tiger-default-font-effect" );
+
+    int font_effect_idx = var_InheritInteger( p_dec, "kate-tiger-default-font-effect" );
+    if (font_effect_idx < 0 || (size_t)font_effect_idx >= ARRAY_SIZE(pp_font_effects))
+        font_effect_idx = TIGER_DEFAULT_FONT_EFFECT_DEFAULT;
+
+    p_sys->e_tiger_default_font_effect = pp_font_effects[font_effect_idx];
     p_sys->f_tiger_default_font_effect_strength = var_InheritFloat( p_dec, "kate-tiger-default-font-effect-strength" );
     p_sys->psz_tiger_default_font_desc = var_InheritString( p_dec, "kate-tiger-default-font-desc" );
     p_sys->f_tiger_quality = var_InheritFloat( p_dec, "kate-tiger-quality" );
