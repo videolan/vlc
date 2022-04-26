@@ -152,12 +152,6 @@ void vlc_join (vlc_thread_t handle, void **result)
     free(th);
 }
 
-int vlc_set_priority (vlc_thread_t th, int priority)
-{
-    (void) th; (void) priority;
-    return VLC_SUCCESS;
-}
-
 void vlc_cancel (vlc_thread_t thread_id)
 {
     atomic_store(&thread_id->killed, true);

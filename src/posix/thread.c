@@ -204,12 +204,6 @@ VLC_WEAK unsigned long vlc_thread_id(void)
      return (uintptr_t)(void *)&dummy;
 }
 
-int vlc_set_priority (vlc_thread_t th, int priority)
-{
-    (void) th; (void) priority;
-    return VLC_SUCCESS;
-}
-
 void vlc_cancel(vlc_thread_t th)
 {
     pthread_cancel(th.handle);

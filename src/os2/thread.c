@@ -504,16 +504,6 @@ void vlc_join (vlc_thread_t th, void **result)
     free( th );
 }
 
-int vlc_set_priority (vlc_thread_t th, int priority)
-{
-    if (DosSetPriority(PRTYS_THREAD,
-                       HIBYTE(priority),
-                       LOBYTE(priority),
-                       th->tid))
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-
 unsigned long vlc_thread_id (void)
 {
     return _gettid();

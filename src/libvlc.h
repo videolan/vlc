@@ -44,8 +44,6 @@ void vlc_CPU_dump(vlc_object_t *);
  * Threads subsystem
  */
 
-int vlc_set_priority( vlc_thread_t, int );
-
 void vlc_threads_setup (libvlc_int_t *);
 
 void vlc_trace (const char *fn, const char *file, unsigned line);

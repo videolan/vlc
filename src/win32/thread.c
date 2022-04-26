@@ -405,13 +405,6 @@ unsigned long vlc_thread_id (void)
     return GetCurrentThreadId ();
 }
 
-int vlc_set_priority (vlc_thread_t th, int priority)
-{
-    if (!SetThreadPriority (th->id, priority))
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-
 /*** Thread cancellation ***/
 
 /* APC procedure for thread cancellation */
