@@ -106,18 +106,14 @@ AbstractButton {
 
                 mipmap: true
 
-                Widgets.ToolTipExt {
-                    x: parent.x
+                ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
+                                 && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
+                ToolTip.delay: VLCStyle.delayToolTipAppear
+                ToolTip.text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text)
+                                                    .arg(artistLabel.text)
+                                                    .arg(progressIndicator.text)
 
-                    visible: artworkInfoItem.visible
-                             && infoColumn.width < infoColumn.implicitWidth
-                             && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
-                    delay: 500
-
-                    text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text).arg(artistLabel.text).arg(progressIndicator.text)
-
-                    colors: artworkInfoItem.colors
-                }
+                property alias colors: artworkInfoItem.colors
             }
         }
 
