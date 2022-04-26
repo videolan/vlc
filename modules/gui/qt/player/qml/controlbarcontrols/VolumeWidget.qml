@@ -166,7 +166,7 @@ T.Pane {
                 sourceComponent: Widgets.PointingTooltip {
                     visible: sliderMouseArea.pressed || volControl.pressed || volControl.hovered || volControl.visualFocus
 
-                    text: Math.round(volControl.value * 100) + "%"
+                    text: Math.round(Player.volume * 100) + "%"
 
                     pos: Qt.point(handle.x + handle.width / 2, handle.y)
 
