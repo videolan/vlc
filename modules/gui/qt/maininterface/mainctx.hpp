@@ -174,6 +174,7 @@ class MainCtx : public QObject
     Q_PROPERTY(QWindow* intfMainWindow READ intfMainWindow CONSTANT FINAL)
     Q_PROPERTY(QScreen* screen READ screen NOTIFY screenChanged)
     Q_PROPERTY(bool useGlobalShortcuts READ getUseGlobalShortcuts WRITE setUseGlobalShortcuts NOTIFY useGlobalShortcutsChanged FINAL)
+    Q_PROPERTY(int maxVolume READ maxVolume NOTIFY maxVolumeChanged FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -255,6 +256,7 @@ public:
     inline QScreen* screen() const { return intfMainWindow()->screen(); }
     inline bool getUseGlobalShortcuts() const { return m_useGlobalShortcuts; }
     void setUseGlobalShortcuts(bool useGlobalShortcuts );
+    inline int maxVolume() const { return m_maxVolume; };
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -354,6 +356,8 @@ protected:
 
     bool m_preferHotkeys = false;
 
+    int m_maxVolume = 125;
+
 public slots:
     void toggleUpdateSystrayMenu();
     void showUpdateSystrayMenu();
@@ -433,6 +437,8 @@ signals:
     void screenChanged();
 
     void useGlobalShortcutsChanged( bool );
+    
+    void maxVolumeChanged();
 
 private:
     void loadPrefs(bool callSignals);

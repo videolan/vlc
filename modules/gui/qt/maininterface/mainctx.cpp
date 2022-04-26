@@ -293,6 +293,8 @@ void MainCtx::loadPrefs(const bool callSignals)
 #endif
 
     loadFromVLCOption(m_smoothScroll, "qt-smooth-scrolling", &MainCtx::smoothScrollChanged);
+
+    loadFromVLCOption(m_maxVolume, "qt-max-volume", &MainCtx::maxVolumeChanged);
 }
 
 void MainCtx::loadFromSettingsImpl(const bool callSignals)

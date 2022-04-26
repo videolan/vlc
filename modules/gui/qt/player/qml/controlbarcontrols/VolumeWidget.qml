@@ -146,7 +146,7 @@ T.Pane {
             Keys.priority: Keys.BeforeItem
 
             readonly property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : root.color
-            readonly property int maxvol: 125
+            readonly property int maxvol: MainCtx.maxVolume
             readonly property real fullvolpos: 100 / maxvol
             readonly property real maxvolpos: maxvol / 100
 
