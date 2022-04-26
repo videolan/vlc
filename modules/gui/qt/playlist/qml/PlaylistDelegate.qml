@@ -43,6 +43,8 @@ T.Control {
 
     readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
 
+    readonly property VLCColors colors: root.colors
+
     // Settings
 
     topPadding: VLCStyle.margin_xxsmall
@@ -61,32 +63,19 @@ T.Control {
 
     ListView.delayRemove: mouseArea.drag.active
 
+    T.ToolTip.visible: ( (visualFocus || hovered) &&
+                         !overlayMenu.shown && MainCtx.playlistVisible &&
+                         (textInfoColumn.implicitWidth > textInfoColumn.width) )
+
+    T.ToolTip.timeout: (hovered ? 0 : VLCStyle.ms2000)
+
+    T.ToolTip.text: (textInfo.text + '\n' + textArtist.text)
+
+    T.ToolTip.delay: VLCStyle.delayToolTipAppear
+
     // Events
 
-    onHoveredChanged: {
-        if (hovered)
-            adjustTooltip()
-    }
-
-    onVisualFocusChanged: {
-        if (visualFocus)
-            adjustTooltip()
-    }
-
     // Functions
-
-    function adjustTooltip() {
-        plInfoTooltip.close()
-        plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
-        plInfoTooltip.parent = textInfoColumn
-        if (hovered)
-            plInfoTooltip.timeout = 0
-        else
-            plInfoTooltip.timeout = 2000
-        plInfoTooltip.visible = Qt.binding(function() { return ( (visualFocus || hovered) && !mouseArea.drag.active &&
-                                                                !overlayMenu.shown && MainCtx.playlistVisible &&
-                                                                (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width) ) })
-    }
 
     // Childs
 

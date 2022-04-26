@@ -392,13 +392,6 @@ Control {
                 }
             }
 
-            Widgets.ToolTipExt {
-                id: plInfoTooltip
-                delay: 750
-
-                colors: root.colors
-            }
-
             Rectangle {
                 id: dropIndicator
 
