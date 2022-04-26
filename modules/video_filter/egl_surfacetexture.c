@@ -275,10 +275,9 @@ static picture_t *SwapOffscreen(vlc_gl_t *gl)
     return current_picture;
 }
 
-static void Close( vlc_gl_t *gl )
+static void Close(vlc_gl_t *gl)
 {
     struct surfacetexture_sys *sys = gl->sys;
-    struct video_ctx *vctx = GetVCtx(gl);
 
     picture_Release(sys->current_picture);
     vlc_video_context_Release(gl->offscreen_vctx_out);
