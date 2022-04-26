@@ -62,7 +62,6 @@ static input_item_t* vlclua_input_item_get_internal( lua_State *L );
 static int vlclua_input_item_info( lua_State *L )
 {
     input_item_t *p_item = vlclua_input_item_get_internal( L );
-    int i;
     int i_cat = 0;
 
     info_category_t *p_category;
