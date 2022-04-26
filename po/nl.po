@@ -1,12 +1,12 @@
 # Dutch translation
-# Copyright (C) 2021 VideoLAN
+# Copyright (C) 2022 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
 # Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
-# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2021
+# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2022
 # 
 #, fuzzy
 msgid ""
@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-04-15 00:18+0200\n"
-"PO-Revision-Date: 2021-09-01 20:08+0200\n"
-"Last-Translator: Thomas De Rocker, 2021\n"
+"PO-Revision-Date: 2017-12-10 22:48+0000\n"
+"Last-Translator: Thomas De Rocker, 2022\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,7 +36,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "VLC voorkeuren"
+msgstr "VLC-voorkeuren"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -594,7 +594,7 @@ msgstr ""
 "de <a href=\"http://wiki.videolan.org\">wiki</a>-website van "
 "Videolan.</p><p>Begint u nog maar net met VLC Media Player, lees dan de "
 "<br><a "
-"href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>Introductie"
+"href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\"><em>introductie"
 " van VLC Media Player</em></a>.</p><p>U vindt informatie over hoe u de "
 "speler moet gebruiken in het document <br>\"<a "
 "href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Hoe speel ik "
@@ -791,36 +791,36 @@ msgid ""
 "\n"
 msgstr ""
 "Gebruik: %s [opties] [stream] ...\n"
-"U kunt meerdere streams in de opdrachtregel ingeven.\n"
+"U kunt meerdere streams opgeven op de opdrachtregel.\n"
 "Ze worden achter elkaar in de afspeellijst geplaatst.\n"
-"Het eerste element wordt als eerste afgespeeld.\n"
+"Het eerste item wordt als eerste afgespeeld.\n"
 "\n"
 "Opties-stijlen:\n"
-"  --optie  Een algemene optie die voor de duur van het programma actief is.\n"
-"   -optie  Een eenletterige versie van een algemene --optie.\n"
-"   :optie  Een optie die alleen van toepassing zal zijn op de stream \n"
-"           die er aan voorafgaat en algemene opties negeert.\n"
+"  --optie  Een globale optie die voor de duur van het programma actief is.\n"
+"   -optie  Een eenletterige versie van een globale --optie.\n"
+"   :optie  Een optie die alleen van toepassing is op de stream \n"
+"           die er aan voorafgaat en algemene opties overschrijft.\n"
 "\n"
-"Stream MRL syntax::\n"
-"  [[toegang][/demux]://]URL[@[titel][:hoofdstuk][-[titel][:hoofdstuk]]]\n"
+"Stream MRL-syntax::\n"
+"  [[toegang][/demux]://]URL[#[titel][:hoofdstuk][-[titel][:hoofdstuk]]]\n"
 "   [:optie=waarde ...]\n"
 "\n"
-"  Veel van de algemene --opties kunnen ook als MRL specifieke :opties gebruikt worden.\n"
-"  Meerdere :optie=waarde paren kunnen opgegeven worden.\n"
+"  Veel van de globale --opties kunnen ook als MRL-specifieke :opties gebruikt worden.\n"
+"  Meerdere paren :optie=waarde kunnen opgegeven worden.\n"
 "\n"
 "URL syntax:\n"
-"  [file://]bestandsnaam          Gewoon mediabestand\n"
-"  http://host[:poort]/bestand        HTTP URL\n"
-"  ftp://host[:poort]/bestand         FTP URL\n"
-"  mms://host[:poort]/bestand         MMS URL\n"
+"  file:///pad/bestand            Gewoon mediabestand\n"
+"  http://host[:poort]/bestand    HTTP-URL\n"
+"  ftp://host[:poort]/bestand     FTP-URL\n"
+"  mms://host[:poort]/bestand     MMS-URL\n"
 "  screen://                      Schermopname\n"
-"  [dvd://][apparaat[@raw_device] dvd-apparaat\n"
-"  [vcd://][apparaat]             vcd-apparaat\n"
-"  [cdda://][apparaat]            audio-cd-apparaat\n"
-"  udp:[[<bron adres>]@[<bind adres>][:<bind poort>]]\n"
-"                                 UDP stream verzonden door streamingserver\n"
-"  vlc://pause:<seconden>                      Speciaal item om VLC voor bepaalde tijd te pauzeren\n"
-"  vlc://quit                       Speciaal item om VLC af te sluiten\n"
+"  dvd://[apparaat]               Dvd-apparaat\n"
+"  vcd://[apparaat]               Vcd-apparaat\n"
+"  cdda://[apparaat]              Audio-cd-apparaat\n"
+"  udp://[[<bron-adres>]@[<bind-adres>][:<bind-poort>]]\n"
+"                                 UDP-stream verzonden door streamingserver\n"
+"  vlc://pause:<seconden>         De afspeellijst voor een bepaalde tijd pauzeren\n"
+"  vlc://quit                     Speciaal item om VLC af te sluiten\n"
 "\n"
 
 #: src/config/help.c:490
@@ -838,7 +838,7 @@ msgstr "Opmerking:"
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
-"voeg --advanced aan uw opdrachtregel toe om de geavanceerde opties te zien."
+"voeg --advanced aan uw opdrachtregel toe om geavanceerde opties te zien."
 
 #: src/config/help.c:656
 #, c-format
@@ -846,8 +846,7 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
-"%u module werd niet weergegeven omdat ze alleen geavanceerde opties "
-"hebben.\n"
+"%u module werd niet weergegeven omdat ze alleen geavanceerde opties heeft.\n"
 msgstr[1] ""
 "%u modules werden niet weergegeven omdat ze alleen geavanceerde opties "
 "hebben.\n"
@@ -857,8 +856,8 @@ msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
 msgstr ""
-"Geen overeenkomende module gevonden. Gebruik --list of --list-verbose voor "
-"een lijst van alle beschikbare modules."
+"Geen passende module gevonden. Gebruik --list of --list-verbose om een lijst"
+" van beschikbare modules te krijgen."
 
 #: src/config/help.c:721
 #, c-format
@@ -882,7 +881,7 @@ msgid ""
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 "\n"
-"Inhoud tijdelijk opgeslagen in het bestand vlc-help.txt.\n"
+"Inhoud gedumpt naar het bestand vlc-help.txt.\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -943,7 +942,7 @@ msgstr "VLC kon de module %s niet openen."
 
 #: src/input/decoder.c:2201
 msgid "VLC could not open the decoder module."
-msgstr "VLC kon decodermodule niet openen."
+msgstr "VLC kon de decodermodule niet openen."
 
 #: src/input/es_out.c:968 src/input/es_out.c:973 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
@@ -987,7 +986,7 @@ msgstr "Gesloten ondertitels %u"
 
 #: src/input/es_out.c:3096
 msgid "Original ID"
-msgstr "Originele ID"
+msgstr "Oorspronkelijke ID"
 
 #: src/input/es_out.c:3104 src/input/es_out.c:3107 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
@@ -1080,7 +1079,7 @@ msgstr "Buffer-afmetingen"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:164
 #: modules/video_filter/fps.c:42
 msgid "Frame rate"
-msgstr "Beeldsnelheid"
+msgstr "Framerate"
 
 #: src/input/es_out.c:3194
 msgid "Decoded format"
@@ -1088,35 +1087,35 @@ msgstr "Gedecodeerd formaat"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr "Linksboven"
+msgstr "Bovenaan links"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr "Linksboven"
+msgstr "Links bovenaan"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr "Rechtsonder"
+msgstr "Rechts onderaan"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr "Rechtsboven"
+msgstr "Bovenaan rechts"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr "Linksonder"
+msgstr "Onderaan links"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr "Rechtsonder"
+msgstr "Onderaan rechts"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr "Linksonder"
+msgstr "Links onderaan"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr "Rechtsboven"
+msgstr "Rechts bovenaan"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
@@ -1175,11 +1174,11 @@ msgstr "Volledig"
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 msgid "Center"
-msgstr "Gecentreerd"
+msgstr "Midden"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr "Linksboven"
+msgstr "Bovenaan links"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
@@ -1187,7 +1186,7 @@ msgstr "Bovenaan midden"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr "Linksonder"
+msgstr "Onderaan links"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
@@ -1203,7 +1202,7 @@ msgstr "Rechthoekig"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr "Gelijk rechthoekig"
+msgstr "Gelijkzijdig"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
@@ -1255,7 +1254,7 @@ msgstr "Primaire B"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr "Wit punt"
+msgstr "Witpunt"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1264,16 +1263,18 @@ msgstr "Ondertitel"
 #: src/input/input.c:1841 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr "Volume %ld%%"
+msgstr "Volume %ld %%"
 
 #: src/input/input.c:2745
 msgid "Your input can't be opened"
-msgstr "Uw invoer kan niet geopend worden"
+msgstr "Uw invoer kan niet worden geopend"
 
 #: src/input/input.c:2746
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr "VLC kon de MRL '%s' niet openen. Controleer het logboek voor details."
+msgstr ""
+"VLC is niet in staat om de MRL '%s' te openen. Controleer het logboek voor "
+"details."
 
 #: src/input/meta.c:55 src/input/var.c:170
 #: modules/gui/macosx/VLCMainMenu.m:409 modules/gui/macosx/VLCMainMenu.m:410
@@ -1299,7 +1300,7 @@ msgstr "Genre"
 
 #: src/input/meta.c:58 modules/mux/asf.c:60 modules/mux/avi.c:52
 msgid "Copyright"
-msgstr "Auteursrechten"
+msgstr "Auteursrecht"
 
 #: src/input/meta.c:59 src/libvlc-module.c:239
 #: modules/gui/macosx/VLCPlaylist.m:95
@@ -1330,7 +1331,7 @@ msgstr "URL"
 
 #: src/input/meta.c:67 src/input/meta.c:68 modules/notify/notify.c:314
 msgid "Now Playing"
-msgstr "Nu afspelend"
+msgstr "Nu aan het afspelen"
 
 #: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
@@ -1342,7 +1343,7 @@ msgstr "Gecodeerd door"
 
 #: src/input/meta.c:71
 msgid "Artwork URL"
-msgstr "Albumhoes-url"
+msgstr "Albumhoes-URL"
 
 #: src/input/meta.c:72
 msgid "Track ID"
@@ -1490,19 +1491,19 @@ msgstr "Zoomen"
 
 #: src/libvlc.h:167 src/libvlc-module.c:1346 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
-msgstr "Kwart grootte"
+msgstr "1:4 Kwart"
 
 #: src/libvlc.h:168 src/libvlc-module.c:1347 src/video_output/vout_intf.c:88
 msgid "1:2 Half"
-msgstr "Halve grootte"
+msgstr "1:2 Half"
 
 #: src/libvlc.h:169 src/libvlc-module.c:1348 src/video_output/vout_intf.c:89
 msgid "1:1 Original"
-msgstr "Normale grootte"
+msgstr "1:1 Oorspronkelijk"
 
 #: src/libvlc.h:170 src/libvlc-module.c:1349 src/video_output/vout_intf.c:90
 msgid "2:1 Double"
-msgstr "Dubbele grootte"
+msgstr "2:1 Dubbel"
 
 #: src/libvlc-module.c:64
 msgid ""
@@ -1537,10 +1538,10 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), "
 "\"http\", \"gestures\" ...)"
 msgstr ""
-"U kunt \"extra interfaces\" selecteren voor VLC. Ze worden in de achtergrond"
-" geopend als aanvulling op de standaardinterface. Gebruik een lijst van door"
-" dubbele punten gescheiden interfacemodules. (veelgebruikte waarden zijn: "
-"\"rc\" (afstandbediening), \"http\", \"gestures\" ...)"
+"U kunt \"extra interfaces\" voor VLC selecteren. Deze zullen op de "
+"achtergrond worden opgestart naast de standaard interface. Gebruik een door "
+"dubbele punten gescheiden lijst van interfacemodules (veel voorkomende "
+"waarden zijn \"rc\" (afstandsbediening), \"http\", \"gestures\",...)."
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -1548,35 +1549,35 @@ msgstr "U kunt bedieningsinterfaces voor VLC selecteren."
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
-msgstr "Informatieniveau (0,1,2)"
+msgstr "Informatieniveau (0, 1, 2)"
 
 #: src/libvlc-module.c:87
 msgid ""
 "This is the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
-"Dit is het informatieniveau (0 = alleen foutmeldingen en standaardberichten,"
-" 1 = waarschuwingen, 2 = debug)."
+"Dit is het informatieniveau (0 = alleen fouten en standaardberichten, 1 = "
+"waarschuwingen, 2 = debug)."
 
 #: src/libvlc-module.c:90
 msgid "Default stream"
-msgstr "Standaardstream"
+msgstr "Standaard stream"
 
 #: src/libvlc-module.c:92
 msgid "This stream will always be opened at VLC startup."
-msgstr "Deze stream zal altijd geopend worden als VLC opstart."
+msgstr "Deze stream zal altijd geopend worden bij het opstarten van VLC."
 
 #: src/libvlc-module.c:94
 msgid "Color messages"
-msgstr "Gekleurde meldingen"
+msgstr "Gekleurde berichten"
 
 #: src/libvlc-module.c:96
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal"
 " needs Linux color support for this to work."
 msgstr ""
-"Dit activeert gekleurde meldingen in de console. Uw terminal moet hiervoor "
-"Linux-kleurondersteuning hebben."
+"Dit schakelt het inkleuren in van de berichten die naar de console worden "
+"gestuurd. Uw terminal moet hiervoor Linux kleurenondersteuning hebben."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1587,8 +1588,9 @@ msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
 msgstr ""
-"Indien actief worden alle opties in de voorkeuren en/of interfaces "
-"weergegeven, ook opties die de meeste gebruikers beter niet kunnen wijzigen."
+"Wanneer dit is ingeschakeld, zullen de voorkeuren en/of interfaces alle "
+"beschikbare opties weergeven, ook de opties die de meeste gebruikers beter "
+"niet wijzigen."
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
@@ -1599,8 +1601,8 @@ msgid ""
 "When this is enabled, the interface will show a dialog box each time some "
 "user input is required."
 msgstr ""
-"Indien actief zal de interface een dialoogvenster geven als er "
-"gebruikersinvoer vereist is."
+"Wanneer dit is ingeschakeld, zal de interface een dialoogvenster weergeven "
+"als er gebruikersinvoer vereist is."
 
 #: src/libvlc-module.c:117
 msgid ""
@@ -1609,10 +1611,10 @@ msgid ""
 " (spectrum analyzer, etc.). Enable these filters here, and configure them in"
 " the \"audio filters\" modules section."
 msgstr ""
-"Deze instellingen beïnvloeden het gedrag van geluid en u kunt hier "
-"audiofilters voor nabewerking en visuele effecten (spectrum-analyse, etc.) "
-"activeren. Schakel deze filters hier in en configureer ze in de "
-"modulesectie\"'audiofilters\"."
+"Met deze opties kunt u het gedrag van het audio-subsysteem wijzigen en "
+"audiofilters toevoegen die kunnen worden gebruikt voor nabewerking of "
+"visuele effecten (spectrum analyzer, enz.). Schakel deze filters hier in en "
+"configureer ze in de modulesectie \"audiofilters\"."
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
@@ -1623,8 +1625,8 @@ msgid ""
 "This is the audio output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"Dit is de audio-uitvoermethode die gebruikt wordt door VLC. Standaard wordt "
-"automatisch de beste beschikbare methode gekozen."
+"Dit is de audio-uitvoermethode die door VLC wordt gebruikt. Het standaard "
+"gedrag is om automatisch de beste beschikbare methode te selecteren."
 
 #: src/libvlc-module.c:129
 msgid "Media role"
@@ -1632,7 +1634,7 @@ msgstr "Media-rol"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr "Media(speler) rol voor besturingssysteem-beleid."
+msgstr "Media(speler)-rol voor besturingssysteem-beleid."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:409
@@ -1644,8 +1646,8 @@ msgid ""
 "You can completely disable the audio output. The audio decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
-"De audio-uitvoer kan volledig uitgeschakeld worden. De audiodecodering wordt"
-" dan overgeslagen en dit bespaart wat rekenkracht."
+"U kunt de audio-uitvoer volledig uitschakelen. De audio-decoderingsfase "
+"vindt dan niet plaats, waardoor wat rekenkracht wordt bespaard."
 
 #: src/libvlc-module.c:142
 msgid "Music"
@@ -1685,16 +1687,15 @@ msgstr "Audioversterking"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
-msgstr "Deze lineaire versterking zal toegepast worden op uitgevoerde audio."
+msgstr "Deze lineaire versterking wordt toegepast op de uitgevoerde audio."
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
-msgstr "Audiouitvoer volumestap"
+msgstr "Volumestap audio-uitvoer"
 
 #: src/libvlc-module.c:153
 msgid "The step size of the volume is adjustable using this option."
-msgstr ""
-"De stapgrootte van het volume is instelbaar door deze optie te gebruiken."
+msgstr "De stapgrootte van het volume is instelbaar met deze optie."
 
 #: src/libvlc-module.c:156
 msgid "Remember the audio volume"
@@ -1704,33 +1705,34 @@ msgstr "Audiovolume onthouden"
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
 msgstr ""
-"Het volume kan opgeslagen worden en de volgende keer dat VLC gebruikt wordt,"
-" hersteld worden."
+"Het volume kan worden opgeslagen en de volgende keer dat VLC wordt gebruikt "
+"automatisch worden hersteld."
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr "Audiodesynchronisatie compenseren"
+msgstr "Compensatie audio-desynchronisatie"
 
 #: src/libvlc-module.c:163
 msgid ""
 "This delays the audio output. The delay must be given in milliseconds. This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
-"Dit vertraagt de audio-uitvoer. De vertraging moet in milliseconden "
-"opgegeven worden. Deze optie is handig als audio en video niet synchroon "
-"lopen."
+"Dit vertraagt de audio-uitvoer. De vertraging moet in milliseconden worden "
+"opgegeven. Dit kan handig zijn als u een vertraging opmerkt tussen de video "
+"en de audio."
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
-msgstr "Dit selecteert welke plugin gebruikt wordt voor audio-resampling."
+msgstr ""
+"Dit selecteert welke plug-in wordt gebruikt voor het resamplen van audio."
 
 #: src/libvlc-module.c:171
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"Stelt de modus voor audiouitvoerkanalen in die standaard wordt gebruikt als "
-"uw hardware en de audiostream compatibel zijn."
+"Stelt de modus voor audio-uitvoerkanalen in die standaard wordt gebruikt als"
+" uw hardware en de audiostream compatibel zijn."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1755,10 +1757,10 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
-"Gebruik dit als u weet dat uw stream (niet) met Dolby Surround geëncodeerd "
-"is, maar de detectie daarvan faalt. Zelfs als de stream niet met Dolby "
-"Surround geëncodeerd is, kan het aanzetten van deze instelling uw beleving "
-"verbeteren. Dit is vooral het geval in combinatie met de koptelefoon-"
+"Gebruik deze optie wanneer u weet dat uw stream (al dan niet) gecodeerd is "
+"met Dolby Surround maar niet als zodanig wordt gedetecteerd. Zelfs als de "
+"stream niet met Dolby Surround is gecodeerd, kan het inschakelen van deze "
+"optie uw ervaring verbeteren, vooral in combinatie met de koptelefoon-"
 "kanalenmixer."
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:957
@@ -1790,7 +1792,7 @@ msgstr "Uit"
 
 #: src/libvlc-module.c:189
 msgid "Stereo audio output mode"
-msgstr "Stereo audio-uitvoermodus"
+msgstr "Stereo-audio uitvoermodus"
 
 #: src/libvlc-module.c:195 src/misc/actions.c:112
 #: modules/gui/qt/components/preferences_widgets.cpp:1429
@@ -1802,14 +1804,11 @@ msgstr "Niet ingesteld"
 msgid ""
 "This adds audio post processing filters, to modify the sound rendering."
 msgstr ""
-"Hier kunnen audionabewerkingsfilters worden toegevoegd om het geluid te "
-"wijzigen."
+"Dit voegt audio-nabewerkingsfilters toe om de geluidsweergave te wijzigen."
 
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr ""
-"Hiermee kunnen audiovisualisatiefilters worden toegevoegd (spectrumanalyzer,"
-" etc)."
+msgstr "Dit voegt visualisatiemodules toe (spectrum analyzer, enz)."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
@@ -1821,7 +1820,7 @@ msgstr "Selecteer de modus voor replay gain"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr "Replay-preamp"
+msgstr "Replay-voorversterking"
 
 #: src/libvlc-module.c:218
 msgid ""
@@ -1858,8 +1857,8 @@ msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
-"Hiermee kunt u audio langzamer of sneller afspelen zonder de toonhoogte van "
-"de audio te beïnvloeden"
+"Hierdoor kan audio met een lagere of hogere snelheid worden afgespeeld "
+"zonder dat de toonhoogte wordt beïnvloed"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
@@ -1885,9 +1884,11 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video"
 " options."
 msgstr ""
-"Met deze instellingen kunnen opties voor de video-uitvoer gewijzigd worden. "
-"Videofilters zoals deïnterlacing etc. kunnen hier geactiveerd worden. "
-"Configureer deze modules in de modulesectie \"videofilters\"."
+"Met deze opties kunt u het gedrag van het video-uitvoer-subsysteem wijzigen."
+" U kunt bijvoorbeeld videofilters inschakelen (deïnterliniëring, "
+"beeldaanpassing, enz). Schakel deze filters hier in en configureer ze in de "
+"modulesectie \"videofilters\". U kunt ook veel verschillende video-opties "
+"instellen."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
@@ -1898,8 +1899,8 @@ msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
-"Dit is de video-uitvoermethode die door VLC gebruikt wordt. Het "
-"standaardgedrag is om automatisch de best beschikbare methode te selecteren."
+"Dit is de video-uitvoermethode die door VLC wordt gebruikt. Het standaard "
+"gedrag is om automatisch de beste beschikbare methode te selecteren."
 
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:313
@@ -1911,8 +1912,8 @@ msgid ""
 "You can completely disable the video output. The video decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
-"De video-uitvoer kan volledig uitgeschakeld worden. De videodecodering wordt"
-" dan overgeslagen en dit bespaart wat rekenkracht."
+"U kunt de video-uitvoer volledig uitschakelen. De video-decoderingsfase "
+"vindt dan niet plaats, waardoor wat rekenkracht wordt bespaard."
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
@@ -1926,8 +1927,8 @@ msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video"
 " characteristics."
 msgstr ""
-"U kunt de videobreedte vastleggen. Standaard (-1) probeert VLC zich aan de "
-"eigenschappen van de video aan te passen."
+"U kunt de videobreedte afdwingen. Standaard (-1) zal VLC zich aanpassen aan "
+"de videokenmerken."
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
@@ -1941,32 +1942,32 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"U kunt de videohoogte vastleggen. Standaard (-1) probeert VLC zich aan de "
-"eigenschappen van de video aan te passen."
+"U kunt de videohoogte afdwingen. Standaard (-1) zal VLC zich aanpassen aan "
+"de videokenmerken."
 
 #: src/libvlc-module.c:273
 msgid "Video X coordinate"
-msgstr "Video x-coördinaat"
+msgstr "X-coördinaat video"
 
 #: src/libvlc-module.c:275
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
 msgstr ""
-"U kunt de positie van de linkerbovenhoek van het videoscherm (x-coördinaat) "
-"vastleggen."
+"U kunt de positie van de linkerbovenhoek van het videovenster afdwingen "
+"(X-coördinaat)."
 
 #: src/libvlc-module.c:278
 msgid "Video Y coordinate"
-msgstr "Video y-coördinaat"
+msgstr "Y-coördinaat video"
 
 #: src/libvlc-module.c:280
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
 msgstr ""
-"U kunt de positie van de linkerbovenhoek van het videoscherm (y-coördinaat) "
-"vastleggen."
+"U kunt de positie van de linkerbovenhoek van het videovenster afdwingen "
+"(Y-coördinaat)."
 
 #: src/libvlc-module.c:283
 msgid "Video title"
@@ -1977,8 +1978,8 @@ msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
-"Aangepaste titel voor het videovenster (als de video niet in de interface "
-"ingebed is)."
+"Aangepaste titel voor het videovenster (als de video niet in de interface is"
+" ingebed)."
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
@@ -1990,10 +1991,10 @@ msgid ""
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
-"De uitlijning van de video in zijn venster vastleggen. Standaard (0) zal het"
-" beeld gecentreerd zijn. (0 = midden, 1 = links, 2 = rechts, 4 = boven, 8 = "
-"beneden. Combinaties van deze waarden zijn ook mogelijk, zoals 6 = 4 + 2 "
-"betekent rechtsboven)."
+"De uitlijning van de video in zijn venster afdwingen. Standaard (0) wordt "
+"het beeld gecentreerd (0 = midden, 1 = links, 2 = rechts, 4 = boven, 8 = "
+"onder. U kunt ook combinaties van deze waarden gebruiken, zoals 6 = 4 + 2 "
+"wat rechtsboven betekent)."
 
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:83
@@ -2061,7 +2062,7 @@ msgstr "Video zoomen"
 
 #: src/libvlc-module.c:300
 msgid "You can zoom the video by the specified factor."
-msgstr "U kunt de video met deze factor zoomen."
+msgstr "U kunt de video zoomen met de opgegeven factor."
 
 #: src/libvlc-module.c:302
 msgid "Grayscale video output"
@@ -2072,8 +2073,8 @@ msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can"
 " save some processing power."
 msgstr ""
-"Video in grijswaarden uitvoeren. Omdat de kleurinformatie niet gedecodeerd "
-"wordt kan dit verwerkingskracht besparen."
+"Video in grijswaarden uitvoeren. Aangezien de kleurinformatie niet "
+"gedecodeerd wordt kan dit wat rekenkracht besparen."
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
@@ -2081,7 +2082,7 @@ msgstr "Ingebedde video"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
-msgstr "Video-uitvoer inbedden in de hoofdinterface."
+msgstr "De video-uitvoer inbedden in de hoofdinterface."
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
@@ -2108,8 +2109,8 @@ msgid ""
 "The wallpaper mode allows you to display the video as the desktop "
 "background."
 msgstr ""
-"De bureaubladachtergrond-modus laat u de video weergeven als de "
-"bureaubladachtergrond."
+"Met de bureaubladachtergrond-modus kunt u de video als bureaubladachtergrond"
+" weergeven."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
@@ -2146,7 +2147,7 @@ msgstr "Cursor en bediening volledig scherm verbergen na x milliseconden"
 #: src/libvlc-module.c:339
 msgid "Hide mouse cursor and fullscreen controller after n milliseconds."
 msgstr ""
-"Muisaanwijzer en bediening volledig scherm na n milliseconden verbergen."
+"Muisaanwijzer en bediening volledig scherm verbergen na n milliseconden."
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
@@ -2156,18 +2157,18 @@ msgstr ""
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr "Deïnterlace"
+msgstr "Deïnterliniëring"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
 #: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
-msgstr "Deïnterlace-modus"
+msgstr "Modus voor deïnterliniëring"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr "Deïnterlacemethode om te gebruiken bij videoverwerking."
+msgstr "Deïnterliniëringsmethode om te gebruiken voor videoverwerking."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2213,8 +2214,8 @@ msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr ""
-"VLC kan voorkomen dat er vensterranden, titelbalken, etc... rond een video "
-"aangemaakt worden, zodat er een \"minimaal\" venster verkregen wordt."
+"VLC kan voorkomen dat er vensterranden, titelbalken, enz... rond de video "
+"worden gemaakt, waardoor een \"minimaal\" venster ontstaat."
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
@@ -2222,7 +2223,7 @@ msgstr "Videosplittermodule"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr "Dit voegt videosplitters zoals kloon en wand toe"
+msgstr "Dit voegt videosplitters toe zoals kloon of wand"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
@@ -2233,12 +2234,12 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
-"Dit voegt nabewerkingsfilters toe om de beeldkwaliteit te verhogen, "
-"bijvoorbeeld deïnterlacing of vervormen van de video."
+"Dit voegt nabewerkingsfilters toe om de beeldkwaliteit te verbeteren, "
+"bijvoorbeeld deïnterliniëring, of de video te vervormen."
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr "Video-momentopnamemap (of bestandsnaam)"
+msgstr "Map (of bestandsnaam) video-momentopname"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
@@ -2246,7 +2247,7 @@ msgstr "De map waarin de gemaakte momentopnamen zullen worden opgeslagen."
 
 #: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
-msgstr "Video-momentopname bestandsprefix"
+msgstr "Bestandsprefix video-momentopname "
 
 #: src/libvlc-module.c:397
 msgid "Video snapshot format"
@@ -2263,7 +2264,7 @@ msgstr "Voorbeeld van video-momentopname weergeven"
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
 msgstr ""
-"Voorbeeld van de videomomentopname weergeven in de linkerbovenhoek van het "
+"Voorbeeld van de video-momentopname weergeven in de linkerbovenhoek van het "
 "scherm."
 
 #: src/libvlc-module.c:405
@@ -2278,20 +2279,20 @@ msgstr ""
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
-msgstr "Breedte videomomentopname"
+msgstr "Breedte video-momentopname"
 
 #: src/libvlc-module.c:411
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the"
 " original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
-"U kunt de breedte van een videomomentopname vastleggen. Standaard zal het de"
-" originele breedte (-1) behouden. Gebruik 0 om de breedte met de "
-"beeldverhouding te schalen."
+"U kunt de breedte van de video-momentopname afdwingen. Standaard blijft de "
+"oorspronkelijke breedte behouden (-1). Door 0 te gebruiken wordt de breedte "
+"geschaald om de beeldverhouding te behouden."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
-msgstr "Hoogte videomomentopname"
+msgstr "Hoogte video-momentopname"
 
 #: src/libvlc-module.c:417
 msgid ""
@@ -2299,9 +2300,9 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
-"U kunt de hoogte van een videomomentopname vastleggen. Standaard zal het de "
-"originele hoogte (-1) behouden. Gebruik 0 om de hoogte met de "
-"beeldverhouding te schalen."
+"U kunt de hoogte van de video-momentopname afdwingen. Standaard blijft de "
+"oorspronkelijke hoogte behouden (-1). Door 0 te gebruiken wordt de hoogte "
+"geschaald om de beeldverhouding te behouden."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
@@ -2312,8 +2313,8 @@ msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3,"
 " 16:9, etc.) expressing the global image aspect."
 msgstr ""
-"Dit forceert het bijsnijden van de bronvideo. Geaccepteerde verhoudingen "
-"voor de algemene beeldverhouding zijn x:y (4:3, 16:9, ...)."
+"Dit forceert het bijsnijden van de bronvideo. Geaccepteerde formaten zijn "
+"x:y (4:3, 16:9, enz.) die de globale beeldverhouding uitdrukken."
 
 #: src/libvlc-module.c:427
 msgid "Source aspect ratio"
@@ -2327,12 +2328,12 @@ msgid ""
 "x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
-"Dit legt de beeldverhouding vast. Bijvoorbeeld: sommige dvd's zeggen 16:9 "
-"groot te zijn terwijl ze eigenlijk maar 4:3 leveren. Dit kan als hint worden"
-" gebruikt door VLC wanneer een film geen informatie over de beeldverhouding "
-"bevat. Geldige waarden zijn x:y (4:3, 16:9, enz.) voor de algemene "
-"beeldverhouding, of een gebroken getal (float) (1.25, 1.3333, etc.) om de "
-"haaksheid van de pixels uit te drukken."
+"Dit forceert de beeldverhouding van de bron. Sommige dvd's beweren "
+"bijvoorbeeld dat ze 16:9 zijn, terwijl ze eigenlijk 4:3 zijn. Dit kan ook "
+"gebruikt worden als een hint voor VLC wanneer een film geen informatie over "
+"de beeldverhouding bevat. Geaccepteerde formaten zijn x:y (4:3, 16:9, enz.) "
+"die de globale beeldverhouding uitdrukken, of een kommagetal (float) (1.25, "
+"1.3333, enz.) om de afmetingen van pixels uit te drukken."
 
 #: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
@@ -2340,9 +2341,7 @@ msgstr "Video automatisch schalen"
 
 #: src/libvlc-module.c:438
 msgid "Let the video scale to fit a given window or fullscreen."
-msgstr ""
-"Laat de video schalen zodat hij in het venster past of het scherm helemaal "
-"vult."
+msgstr "Laat de video schalen naar een bepaald venster of volledig scherm."
 
 #: src/libvlc-module.c:440
 msgid "Video scaling factor"
@@ -2353,20 +2352,20 @@ msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
 msgstr ""
-"Schaalfactor om te gebruiken als autoschalen uitgeschakeld is.\n"
-"Standaardwaarde is 1.0 (originele videogrootte)."
+"Schaalfactor die wordt gebruikt wanneer automatisch schalen is uitgeschakeld.\n"
+"Standaardwaarde is 1.0 (oorspronkelijke videogrootte)."
 
 #: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
-msgstr "Aangepaste lijst bijsnijdverhoudingen"
+msgstr "Aangepaste lijst bijsnijverhoudingen"
 
 #: src/libvlc-module.c:447
 msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
 msgstr ""
-"Een lijst met door komma's gescheiden waarden van bijsnijdverhoudingen die "
-"toegevoegd zullen worden aan de lijst met bijsnijdverhoudingen van de "
+"Een lijst met door komma's gescheiden waarden van bijsnijverhoudingen die "
+"toegevoegd zullen worden aan de lijst met bijsnijverhoudingen van de "
 "interface."
 
 #: src/libvlc-module.c:450
@@ -2392,10 +2391,10 @@ msgid ""
 " incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
-"Dit zorgt voor het goed afspelen van het HDTV-1080 videoformaat, zelfs als "
-"een defecte encoder de hoogte onjuist instelt op 1088 lijnen. Schakel deze "
-"optie alleen uit als uw video een niet-standaard formaat heeft dat alle 1088"
-" lijnen vereist."
+"Hierdoor kan het HDTV-1080 videoformaat correct worden behandeld, zelfs als "
+"de kapotte encoder de hoogte onjuist instelt op 1088 lijnen. U moet deze "
+"optie alleen uitschakelen als uw video een niet-standaard formaat heeft dat "
+"alle 1088 lijnen vereist."
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
@@ -2407,33 +2406,33 @@ msgid ""
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
 "order to keep proportions."
 msgstr ""
-"Dit forceert de monitor-beeldverhouding. De meeste monitors hebben vierkante"
-" pixels (1:1). Als u een 16:9 scherm hebt, moet u wellicht dit naar 4:3 "
-"veranderen om de juiste verhouding te behouden."
+"Dit forceert de beeldverhouding van de monitor. De meeste monitoren hebben "
+"vierkante pixels (1:1). Als u een 16:9-scherm hebt, moet u dit misschien "
+"veranderen in 4:3 om de verhoudingen te behouden."
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
 msgid "Skip frames"
-msgstr "Beelden overslaan"
+msgstr "Frames overslaan"
 
 #: src/libvlc-module.c:470
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
-"Schakelt beelduitval in op MPEG2-streams. Beelduitval doet zich voor als uw "
-"computer niet krachtig genoeg is"
+"Schakelt framedropping in op MPEG2-streams. Framedropping treedt op wanneer "
+"uw computer niet krachtig genoeg is"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
-msgstr "Late beelden overslaan"
+msgstr "Late frames overslaan"
 
 #: src/libvlc-module.c:475
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
 msgstr ""
-"Hiermee slaat u beelden over die te laat arriveren (arriveren bij de video-"
-"uitvoer na hun bedoelde afspeeltijd)."
+"Dit slaat te late frames over (frames die bij de video-uitvoer aankomen na "
+"de geplande weergavetijd)."
 
 #: src/libvlc-module.c:478
 msgid "Quiet synchro"
@@ -2444,8 +2443,8 @@ msgid ""
 "This avoids flooding the message log with debug output from the video output"
 " synchronization mechanism."
 msgstr ""
-"Dit voorkomt dat het logvenster overspoeld wordt met debug-uitvoer van het "
-"video-uitvoer-synchronisatiemechanisme."
+"Dit voorkomt dat de berichtenlog wordt overspoeld met debug-uitvoer van het "
+"synchronisatiemechanisme voor video-uitvoer."
 
 #: src/libvlc-module.c:483
 msgid "Key press events"
@@ -2453,15 +2452,17 @@ msgstr "Toetsdrukgebeurtenissen"
 
 #: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
-msgstr "Dit activeert VLC-sneltoetsen in het (niet-ingebedde) videovenster."
+msgstr ""
+"Dit schakelt VLC-sneltoetsen in vanuit het (niet-geïntegreerde) "
+"videovenster."
 
 #: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
-msgstr "Muisacties"
+msgstr "Muisgebeurtenissen"
 
 #: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
-msgstr "Dit activeert het gebruik van muisklikken op de video."
+msgstr "Dit schakelt het verwerken van muisklikken op de video in."
 
 #: src/libvlc-module.c:497
 msgid ""
@@ -2469,12 +2470,13 @@ msgid ""
 "as the DVD or VCD device, the network interface settings or the subtitle "
 "channel."
 msgstr ""
-"Met deze opties kan het gedrag van de invoer gewijzigd worden. Bijvoorbeeld "
-"het dvd- of vcd-apparaat, netwerkinstellingen of de ondertitels."
+"Met deze opties kunt u het gedrag van het invoer-subsysteem wijzigen, zoals "
+"het dvd- of vcd-apparaat, de instellingen van de netwerkinterface of het "
+"ondertitelkanaal."
 
 #: src/libvlc-module.c:501
 msgid "File caching (ms)"
-msgstr "Bestandsbuffergrootte (ms)"
+msgstr "Buffergrootte bestanden (ms)"
 
 #: src/libvlc-module.c:503
 msgid "Caching value for local files, in milliseconds."
@@ -2490,7 +2492,7 @@ msgstr "Buffergrootte voor camera's en microfoons, in milliseconden."
 
 #: src/libvlc-module.c:509
 msgid "Disc caching (ms)"
-msgstr "Schijfbuffergrootte (ms)"
+msgstr "Buffergrootte schijven (ms)"
 
 #: src/libvlc-module.c:511
 msgid "Caching value for optical media, in milliseconds."
@@ -2498,7 +2500,7 @@ msgstr "Buffergrootte voor optische media, in milliseconden."
 
 #: src/libvlc-module.c:513
 msgid "Network caching (ms)"
-msgstr "Netwerkbuffergrootte (ms)"
+msgstr "Buffergrootte netwerk (ms)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for network resources, in milliseconds."
@@ -2506,15 +2508,15 @@ msgstr "Buffergrootte voor netwerkbronnen, in milliseconden."
 
 #: src/libvlc-module.c:517
 msgid "Clock reference average counter"
-msgstr "Gemiddelden bijhouden ter referentie"
+msgstr "Klokreferentie-gemiddelden bijhouden"
 
 #: src/libvlc-module.c:519
 msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
 msgstr ""
-"Bij gebruik van de PVR-invoer (of een zeer ongebruikelijke bron) dient u "
-"deze optie op 10000 te zetten."
+"Wanneer u de PVR-invoer gebruikt (of een zeer onregelmatige bron), moet u "
+"dit instellen op 10000."
 
 #: src/libvlc-module.c:522
 msgid "Clock synchronisation"
@@ -2525,21 +2527,21 @@ msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
-"Het is mogelijk om de invoerkloksynchronisatie voor real-time bronnen uit te"
-" schakelen. Gebruik dit als het afspelen van netwerkstreams heel erg "
-"stotterig is."
+"Het is mogelijk om de synchronisatie van de ingangsklok voor realtime "
+"bronnen uit te schakelen. Gebruik dit als u last heeft van schokkerige "
+"weergave van netwerkstreams."
 
 #: src/libvlc-module.c:528
 msgid "Clock jitter"
-msgstr "Klokruis"
+msgstr "Klok-jitter"
 
 #: src/libvlc-module.c:530
 msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
 msgstr ""
-"Dit bepaalt de maximale invoervertragingsjitter die de synchronisatie-"
-"algoritmes moeten proberen compenseren (in milliseconden)."
+"Dit definieert de maximale invoervertragingsjitter die de synchronisatie-"
+"algoritmes moeten proberen te compenseren (in milliseconden)."
 
 #: src/libvlc-module.c:533
 msgid "Network synchronisation"
@@ -2550,8 +2552,9 @@ msgid ""
 "This allows you to remotely synchronise clocks for server and client. The "
 "detailed settings are available in Advanced / Network Sync."
 msgstr ""
-"Hiermee kunt u de klokken van de server en client gelijk zetten. De "
-"gedetailleerde instellingen zijn beschikbaar in Geavanceerd/Netwerksync."
+"Hiermee kunt u de klokken voor server en client op afstand synchroniseren. "
+"De gedetailleerde instellingen zijn beschikbaar in "
+"Geavanceerd/Netwerksynchronisatie."
 
 #: src/libvlc-module.c:540 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
@@ -2592,12 +2595,12 @@ msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
 msgstr ""
-"Dit is de maximale toepassingslaag-pakketgrootte (in bytes) die over een "
-"netwerkinterface verstuurd kan worden."
+"Dit is de maximale pakketgrootte van de toepassingslaag die over het netwerk"
+" kan worden verzonden (in bytes)."
 
 #: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
-msgstr "Hoplimiet (TTL)"
+msgstr "Hop-limiet (TTL)"
 
 #: src/libvlc-module.c:551 modules/stream_out/rtp.c:126
 msgid ""
@@ -2605,17 +2608,17 @@ msgid ""
 "multicast packets sent by the stream output (-1 = use operating system "
 "built-in default)."
 msgstr ""
-"Dit is de hoplimiet (ook wel bekend als \"Time-To-Live\" of TTL) van de "
-"multicastpaketten die door de streamuitvoer verzonden worden (-1 = gebruik "
-"standaard van besturingssysteem)."
+"Dit is de hop-limiet (ook bekend als \"Time-To-Live\" of TTL) van de "
+"multicast-pakketten die door de stream-uitvoer worden verzonden (-1 = "
+"gebruik de ingebouwde standaard van het besturingssysteem)."
 
 #: src/libvlc-module.c:555
 msgid "Multicast output interface"
-msgstr "Multicast uitvoerinterface"
+msgstr "Multicast-uitvoerinterface"
 
 #: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
-msgstr "Standaard multicastinterface. Dit overschrijft de routeertabel."
+msgstr "Standaard multicast-interface. Dit overschrijft de routeringstabel."
 
 #: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
@@ -2627,8 +2630,8 @@ msgid ""
 " Service, or IPv6 Traffic Class). This is used for network Quality of "
 "Service."
 msgstr ""
-"Differentiated Services Code Point voor uitgaande udp-streams (of IPv4 Type "
-"of Service, of IPv6 Traffic Class). Dit wordt gebruikt voor netwerk Quality "
+"Differentiated Services Code Point voor uitgaande UDP-streams (of IPv4 Type "
+"Of Service, of IPv6 Traffic Class). Dit wordt gebruikt voor netwerk Quality "
 "of Service."
 
 #: src/libvlc-module.c:566
@@ -2637,7 +2640,7 @@ msgid ""
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
 "Kies het te selecteren programma door zijn Service ID op te geven. Gebruik "
-"deze optie alleen als u multi-programmastreams wilt lezen (zoals "
+"deze optie alleen als u een multi-programma-stream wilt lezen (zoals "
 "bijvoorbeeld DVB-streams)."
 
 #: src/libvlc-module.c:572
@@ -2646,9 +2649,9 @@ msgid ""
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
-"Kies de programma's om te selecteren door een lijst van Service ID's (SIDs),"
-" gescheiden door een komma, op te geven. Gebruik deze optie alleen als u "
-"multi-programmastreams wilt lezen (zoals bijvoorbeeld DVB-streams)."
+"Kies de te selecteren programma's door een lijst van Service ID's (SID's) op"
+" te geven, gescheiden door komma's. Gebruik deze optie alleen als u een "
+"multi-programma-stream wilt lezen (zoals bijvoorbeeld DVB-streams)."
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:311
 msgid "Audio track"
@@ -2676,21 +2679,22 @@ msgid ""
 "letter country code, you may use 'none' to avoid a fallback to another "
 "language)."
 msgstr ""
-"Taal van het audiospoor dat u wilt gebruiken (gescheiden door komma's, twee-"
-" of drie-letterige landcode, u kunt 'none' gebruiken om te voorkomen dat op "
-"andere talen teruggevallen wordt)."
+"Taal van het audiospoor dat u wilt gebruiken (door komma's gescheiden, "
+"landcode van twee of drie letters, u kunt 'none' gebruiken om te voorkomen "
+"dat op een andere taal wordt teruggevallen)."
 
 #: src/libvlc-module.c:593
 msgid "Subtitle language"
-msgstr "Taal ondertitel"
+msgstr "Ondertiteltaal"
 
 #: src/libvlc-module.c:595
 msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"Taal van het ondertitelspoor dat u wilt gebruiken (gescheiden door komma's, "
-"twee- of drie-letterige landcode, u kunt 'any' als noodoplossing gebruiken)."
+"Taal van het ondertitelspoor dat u wilt gebruiken (door komma's gescheiden, "
+"landcode van twee of drie letters, u kunt 'any' gebruiken als "
+"noodoplossing)."
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
@@ -2701,13 +2705,13 @@ msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"Taal van de menu's die u wilt gebruiken met dvd/BluRay (gescheiden door "
-"komma's, twee- of drieletterige landcode, u kunt 'any' gebruiken als "
+"Taal van de menu's die u wilt gebruiken met dvd/BluRay (door komma's "
+"gescheiden, landcode van twee of drie letters, u kunt 'any' gebruiken als "
 "noodoplossing)."
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
-msgstr "Audiospoor-ID"
+msgstr "ID audiospoor"
 
 #: src/libvlc-module.c:606
 msgid "Stream ID of the audio track to use."
@@ -2727,7 +2731,7 @@ msgstr "Voorkeursdecoder voor gesloten ondertitels"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
-msgstr "Voorkeursvideoresolutie"
+msgstr "Voorkeursresolutie video"
 
 #: src/libvlc-module.c:618
 msgid ""
@@ -2736,14 +2740,14 @@ msgid ""
 "option if you don't have enough CPU power or network bandwidth to play "
 "higher resolutions."
 msgstr ""
-"Wanneer verschillende videoformaten beschikbaar zijn, selecteert u een "
-"resolutie het dichtst bij (maar niet hoger dan) deze instelling zit, in "
-"aantal lijnen. Gebruik deze optie als u niet genoeg rekenkracht of "
+"Wanneer verschillende videoformaten beschikbaar zijn, selecteert u er een "
+"waarvan de resolutie het dichtst bij (maar niet hoger dan) deze instelling "
+"ligt, in aantal lijnen. Gebruik deze optie als u niet genoeg rekenkracht of "
 "netwerkbandbreedte hebt om hogere resoluties af te spelen."
 
 #: src/libvlc-module.c:624
 msgid "Best available"
-msgstr "Beste beschikbaar"
+msgstr "Best beschikbare"
 
 #: src/libvlc-module.c:624
 msgid "Full HD (1080p)"
@@ -2811,11 +2815,11 @@ msgstr "Afspeelsnelheid"
 
 #: src/libvlc-module.c:652
 msgid "This defines the playback speed (nominal speed is 1.0)."
-msgstr "Dit definieert de afspeelsnelheid (normale snelheid is 1.0)."
+msgstr "Dit definieert de afspeelsnelheid (nominale snelheid is 1.0)."
 
 #: src/libvlc-module.c:654
 msgid "Input list"
-msgstr "Invoerlijst"
+msgstr "Lijst van invoeren"
 
 #: src/libvlc-module.c:656
 msgid ""
@@ -2823,7 +2827,7 @@ msgid ""
 "together after the normal one."
 msgstr ""
 "U kunt een door komma's gescheiden lijst van invoeren opgeven die "
-"samengevoegd zal worden na de normale."
+"samengevoegd zullen worden na de normale invoer."
 
 #: src/libvlc-module.c:659
 msgid "Input slave (experimental)"
@@ -2835,9 +2839,9 @@ msgid ""
 "is experimental, not all formats are supported. Use a '#' separated list of "
 "inputs."
 msgstr ""
-"Dit staat u toe om van verschillende invoerbronnen tegelijk af te spelen. "
-"Deze optie is experimenteel, niet alle formaten worden ondersteund. Gebruik "
-"een met '#' gescheiden lijst van invoerbronnen."
+"Hierdoor kunt u vanaf verschillende invoerbronnen tegelijk afspelen. Deze "
+"functie is experimenteel, niet alle formaten worden ondersteund. Gebruik een"
+" door ' #' gescheiden lijst van invoerbronnen."
 
 #: src/libvlc-module.c:665
 msgid "Bookmarks list for a stream"
@@ -2845,12 +2849,13 @@ msgstr "Lijst van bladwijzers voor een stream"
 
 #: src/libvlc-module.c:667
 msgid ""
-"You can manually give a list of bookmarks for a stream in the form \"{name"
-"=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},{...}\""
+"You can manually give a list of bookmarks for a stream in the form "
+"\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-"
+"offset},{...}\""
 msgstr ""
-"U kunt handmatig een lijst van bladwijzers maken voor een stream in de "
-"volgende vorm \"{name=bladwijzer-naam,time=optionele-tijd-offset,bytes"
-"=optionele-byte-offset},{...}\""
+"U kunt handmatig een lijst van bladwijzers voor een stream opgeven in de "
+"vorm \"{name=bladwijzer-naam,time=optionele-tijd-offset,bytes=optionele-"
+"byte-offset},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -2858,19 +2863,19 @@ msgstr "Opnamemap"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr "Map waar de opnames in opgeslagen zullen worden"
+msgstr "Map waar de opnames zullen worden opgeslagen"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
-msgstr "Voorkeur voor oorspronkelijke streamopname"
+msgstr "Voorkeur voor opname van oorspronkelijke stream"
 
 #: src/libvlc-module.c:677
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream"
 " output module"
 msgstr ""
-"Indien mogelijk zal de invoerstream opgenomen worden in plaats van de "
-"streamuitvoermodule te gebruiken"
+"Indien mogelijk wordt de invoerstream opgenomen in plaats van de stream-"
+"uitvoermodule te gebruiken"
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -2882,19 +2887,19 @@ msgstr "Map om de tijdelijke tijdverschuivingsbestanden op te slaan."
 
 #: src/libvlc-module.c:684
 msgid "Timeshift granularity"
-msgstr "Tijdverschuivingsdichtheid"
+msgstr "Fijnheid van tijdverschuiving"
 
 #: src/libvlc-module.c:686
 msgid ""
 "This is the maximum size in bytes of the temporary files that will be used "
 "to store the timeshifted streams."
 msgstr ""
-"Dit is de maximale grootte in bytes van de tijdelijke bestanden die gebruikt"
-" worden om tijdverschoven streams in op te slaan."
+"Dit is de maximale grootte in bytes van de tijdelijke bestanden die zullen "
+"worden gebruikt om de tijdverschoven streams op te slaan."
 
 #: src/libvlc-module.c:689
 msgid "Change title according to current media"
-msgstr "Titel wijzigen naargelang de huidige media"
+msgstr "Titel wijzigen volgens huidige media"
 
 #: src/libvlc-module.c:690
 msgid ""
@@ -2903,10 +2908,11 @@ msgid ""
 "Genre<br>$n: Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>$Z:"
 " \"Now playing\" (Fall back on Title - Artist)"
 msgstr ""
-"Deze optie laat u de titel instellen naargelang wat afgespeeld wordt<br>$a: "
-"Artiest<br>$b: Album<br>$c: Copyright<br>$t: Titel<br>$g: Genre<br>$n: Track"
-" num<br>$p: Nu afspelend<br>$A: Datum<br>$D: Duur<br>$Z: \"Nu afspelend\" "
-"(Val terug op Titel - Artiest)"
+"Met deze optie kunt u de titel instellen volgens wat er wordt "
+"afgespeeld<br>$a: Artiest<br>$b: Album<br>$c: Auteursrecht<br>$t: "
+"Titel<br>$g: Genre<br>$n: Tracknummer<br>$p: Nu aan het afspelen<br>$A: "
+"Datum<br>$D: Duur<br>$Z: \"Nu aan het afspelen\" (terugval op Titel - "
+"Artiest)"
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
@@ -2919,10 +2925,11 @@ msgid ""
 "filters here and configure them in the \"subsources filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
-"Deze opties staan u toe om het gedrag van de subafbeeldingen te wijzigen. U "
-"kunt bijvoorbeeld subafbeeldingfilters inschakelen (logo,...). Schakel deze "
-"filters hier in en configureer ze in de \"subpictures filters\" "
-"modulesectie. U kunt ook vele verschillende opties instellen."
+"Met deze opties kunt u het gedrag van het subafbeeldingen-subsysteem "
+"wijzigen. U kunt bijvoorbeeld subafbeelding-bronnen inschakelen (logo, "
+"enz.). Schakel deze filters hier in en configureer ze in de modulesectie "
+"\"subbron-filters\". U kunt ook veel verschillende opties voor "
+"subafbeeldingen instellen."
 
 #: src/libvlc-module.c:705 modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Force subtitle position"
@@ -2933,12 +2940,12 @@ msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
 msgstr ""
-"Plaats de ondertitels onder de film in plaats van eroverheen. Probeer "
-"verschillende waarden uit om het beste resultaat te bereiken."
+"U kunt deze optie gebruiken om de ondertitels onder de film te plaatsen in "
+"plaats van over de film. Probeer verschillende posities uit."
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
-msgstr "Tekst-schaalfactor ondertitels"
+msgstr "Schaalfactor ondertiteltekst"
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
@@ -2963,8 +2970,8 @@ msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
 msgstr ""
-"VLC kan boodschappen op het videoscherm weergeven, dit wordt \"On Screen "
-"Display\" (OSD) genoemd."
+"VLC kan berichten op de video weergeven. Dit wordt OSD (\"On Screen "
+"Display\") genoemd."
 
 #: src/libvlc-module.c:722
 msgid "Text rendering module"
@@ -2975,8 +2982,8 @@ msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for"
 " instance."
 msgstr ""
-"VLC gebruikt normaal Freetype voor weergave, maar hiermee kunt u "
-"bijvoorbeeld svg gebruiken."
+"VLC gebruikt normaal Freetype voor rendering, maar dit laat u toe om "
+"bijvoorbeeld svg te gebruiken."
 
 #: src/libvlc-module.c:726
 msgid "Subpictures source module"
@@ -2988,7 +2995,8 @@ msgid ""
 "images or text over the video (like a logo, arbitrary text, ...)."
 msgstr ""
 "Dit voegt zogenaamde \"subafbeeldingsbronnen\" toe. Deze filters plaatsen "
-"afbeeldingen of tekst over de video (zoals een logo, arbitraire tekst, ...)."
+"afbeeldingen of tekst over de video (zoals een logo, willekeurige tekst, "
+"...)."
 
 #: src/libvlc-module.c:731
 msgid "Subpictures filter module"
@@ -2999,7 +3007,7 @@ msgid ""
 "This adds so-called \"subpicture filters\". These filter subpictures created"
 " by subtitle decoders or other subpictures sources."
 msgstr ""
-"Dit voegt zogenaamde \"subafbeeldingsfilters\" toe. Deze filteren "
+"Dit voegt zogenaamde \"subafbeelding-filters\" toe. Deze filteren "
 "subafbeeldingen die aangemaakt zijn door ondertiteldecoders of andere "
 "subafbeeldingsbronnen."
 
@@ -3012,12 +3020,13 @@ msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr ""
-"Detecteer automatisch een ondertitelbestand, indien er geen opgegeven is "
-"(gebaseerd op de bestandsnaam van de film)."
+"Automatisch een ondertitelbestand detecteren indien geen "
+"ondertitelbestandsnaam is opgegeven (gebaseerd op de bestandsnaam van de "
+"film)."
 
 #: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
-msgstr "Intelligentie van autodetectie ondertitelbestanden"
+msgstr "Intelligentie voor autodetectie van ondertitels"
 
 #: src/libvlc-module.c:743
 msgid ""
@@ -3029,23 +3038,23 @@ msgid ""
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
 "Dit bepaalt de nauwkeurigheid van de vergelijking van de bestandsnamen van ondertitels en film. Mogelijkheden zijn:\n"
-"0 = geen autodetectie\n"
-"1 = elk ondertitelbestand\n"
-"2 = elke ondertitel die de filmnaam bevat\n"
-"3 = elke ondertitel die de filmnaam bevat en meer\n"
-"4 = elke ondertitel die exact de filmnaam heeft"
+"0 = geen automatische detectie van ondertitels\n"
+"1 = om het even welk ondertitelbestand\n"
+"2 = om het even welk ondertitelbestand dat de filmnaam bevat\n"
+"3 = ondertitelbestand dat overeenkomt met de filmnaam met extra tekens\n"
+"4 = ondertitelbestand dat exact overeenkomt met de filmnaam"
 
 #: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
-msgstr "Zoekpad voor ondertitelbestanden"
+msgstr "Paden voor automatische detectie van ondertitels"
 
 #: src/libvlc-module.c:753
 msgid ""
 "Look for a subtitle file in those paths too, if your subtitle file was not "
 "found in the current directory."
 msgstr ""
-"Ook zoeken naar ondertitelbestanden in deze mappen, als uw ondertitel niet "
-"teruggevonden werd in de huidige map."
+"Ook zoeken naar ondertitelbestanden in deze mappen als uw ondertitel niet in"
+" de huidige map werd gevonden."
 
 #: src/libvlc-module.c:756
 msgid "Use subtitle file"
@@ -3056,8 +3065,8 @@ msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
 msgstr ""
-"Laad dit ondertitelbestand. Forceert een bestand en kan gebruikt worden als "
-"autodectectie niet werkt."
+"Dit ondertitelbestand laden. Te gebruiken wanneer autodetectie uw "
+"ondertitelbestand niet kan detecteren."
 
 #: src/libvlc-module.c:762
 msgid "DVD device"
@@ -3076,36 +3085,36 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after"
 " the drive letter (e.g. D:)"
 msgstr ""
-"Het standaard dvd-apparaat (of -bestand) dat gebruikt moet worden. Vergeet "
-"niet de dubbele punt achter de apparaatletter (bijvoorbeeld D:)"
+"Dit is het standaard dvd-station (of -bestand) dat gebruikt moet worden. "
+"Vergeet de dubbele punt na de stationsletter niet (bijvoorbeeld D:)"
 
 #: src/libvlc-module.c:771
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after"
 " the drive letter (e.g. D:)"
 msgstr ""
-"Het standaard vcd-apparaat (of -bestand) dat gebruikt moet worden. Vergeet "
-"niet de dubbele punt achter de apparaatletter (bijvoorbeeld D:)"
+"Dit is het standaard VCD-station (of -bestand) dat gebruikt moet worden. "
+"Vergeet de dubbele punt na de stationsletter niet (bijvoorbeeld D:)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:711
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
-"Het standaard audio-cd-apparaat (of -bestand) dat gebruikt moet worden. "
-"Vergeet niet de dubbele punt achter de apparaatletter (bijvoorbeeld D:)"
+"Dit is het standaard audio-cd-station (of -bestand) dat gebruikt moet "
+"worden. Vergeet de dubbele punt na de stationsletter niet (bijvoorbeeld D:)"
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
-msgstr "Standaard dvd-apparaat dat gebruikt wordt."
+msgstr "Dit is het standaard dvd-apparaat dat gebruikt moet worden."
 
 #: src/libvlc-module.c:783
 msgid "This is the default VCD device to use."
-msgstr "Standaard vcd-apparaat dat gebruikt wordt."
+msgstr "Dit is het standaard VCD-apparaat dat gebruikt moet worden."
 
 #: src/libvlc-module.c:785 modules/access/cdda.c:716
 msgid "This is the default Audio CD device to use."
-msgstr "Standaard audio-cd-apparaat dat gebruikt wordt."
+msgstr "Dit is het standaard audio-cd-apparaat dat gebruikt moet worden."
 
 #: src/libvlc-module.c:799
 msgid "TCP connection timeout"
@@ -3141,11 +3150,11 @@ msgid ""
 "127.0.0.1) or a host name (e.g. localhost) to restrict them to a specific "
 "network interface."
 msgstr ""
-"Dit definieert het adres waarop de rtsp-server zal luisteren, samen met het "
-"basispad van de RTSP VOD media. Syntax is adres/pad. De server zal standaard"
-" luisteren op elk lokaal IP-adres. Geef een IP-adres op (bijvoorbeeld ::1 or"
-" 127.0.0.1) of een hostnaam (bijvoorbeeld localhost) om ze te beperken tot "
-"een specifieke netwerkinterface."
+"Dit definieert het adres waarop de RTSP-server zal luisteren, samen met het "
+"basispad van de RTSP VOD media. De syntaxis is adres/pad. Standaard zal de "
+"server luisteren op elk lokaal IP-adres. Geef een IP-adres op (bijvoorbeeld "
+"::1 of 127.0.0.1) of een hostnaam (bijvoorbeeld localhost) om deze te "
+"beperken tot een specifieke netwerkinterface."
 
 #: src/libvlc-module.c:817
 msgid "HTTP server port"
@@ -3157,9 +3166,9 @@ msgid ""
 "is 80. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
-"De http-server zal luisteren op deze tcp-poort. De standaard http-poort is "
-"80. Toewijzing van poortnummers onder 1025 is echter over het algemeen "
-"beperkt door het besturingssysteem."
+"De HTTP-server zal op deze TCP-poort luisteren. Het standaard HTTP-"
+"poortnummer is 80. Toewijzing van poortnummers onder 1025 wordt echter "
+"meestal beperkt door het besturingssysteem."
 
 #: src/libvlc-module.c:824
 msgid "HTTPS server port"
@@ -3171,9 +3180,9 @@ msgid ""
 "number is 443. However allocation of port numbers below 1025 is usually "
 "restricted by the operating system."
 msgstr ""
-"De https-server zal luisteren op deze tcp-poort. De standaard https-poort is"
-" 443. Toewijzing van poortnummers onder 1025 is echter over het algemeen "
-"beperkt door het besturingssysteem."
+"De HTTPS-server zal op deze TCP-poort luisteren. Het standaard HTTPS-"
+"poortnummer is 443. Toewijzing van poortnummers onder 1025 wordt echter "
+"meestal beperkt door het besturingssysteem."
 
 #: src/libvlc-module.c:831
 msgid "RTSP server port"
@@ -3185,32 +3194,31 @@ msgid ""
 "is 554. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
-"De https-server zal luisteren op deze tcp-poort. De standaard rtsp-poort is "
-"554. Toewijzing van poortnummers onder 1025 is echter over het algemeen "
-"beperkt door het besturingssysteem."
+"De RTSP-server zal op deze TCP-poort luisteren. Het standaard RTSP-"
+"poortnummer is 554. Toewijzing van poortnummers onder 1025 wordt echter "
+"meestal beperkt door het besturingssysteem."
 
 #: src/libvlc-module.c:838
 msgid "HTTP/TLS server certificate"
-msgstr "HTTP/TLS-server certificaat"
+msgstr "HTTP/TLS-server-certificaat"
 
 #: src/libvlc-module.c:840
 msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X,"
 " the string is used as a label to search the certificate in the keychain."
 msgstr ""
-"Dit X.509 certicaatbestand (PEM-formaat) wordt gebruikt voor TLS langs de "
-"kant van de server. Op OS X wordt de string gebruikt als een label om het "
-"certificaat in de keychain te zoeken."
+"Dit X.509-certificaatbestand (PEM-formaat) wordt gebruikt voor server-side "
+"TLS. Op OS X wordt de string gebruikt als label om het certificaat in de "
+"keychain te zoeken."
 
 #: src/libvlc-module.c:843
 msgid "HTTP/TLS server private key"
-msgstr "HTTP/TLS-server private sleutel"
+msgstr "HTTP/TLS server privésleutel"
 
 #: src/libvlc-module.c:845
 msgid "This private key file (PEM format) is used for server-side TLS."
 msgstr ""
-"Dit privaat sleutelbestand (PEM-formaat) wordt gebruikt voor TLS langs de "
-"kant van de server."
+"Dit privésleutelbestand (PEM-formaat) wordt gebruikt voor server-side TLS."
 
 #: src/libvlc-module.c:847
 msgid "HTTP proxy"
@@ -3222,9 +3230,9 @@ msgid ""
 "http://[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy "
 "environment variable will be tried."
 msgstr ""
-"HTTP-proxy om te gebruiken. Moet in het formaat "
-"http://[gebruiker@]mijnproxy.mijndomein:mijnpoort/ zijn; indien leeg zal de "
-"http_proxy omgevingsvariabele geprobeerd worden."
+"HTTP-proxy die moet worden gebruikt. Het moet in het formaat "
+"http://[user@]myproxy.mydomain:myport/ zijn; indien leeg, zal de http_proxy "
+"omgevingsvariabele worden geprobeerd."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -3232,7 +3240,7 @@ msgstr "HTTP-proxy wachtwoord"
 
 #: src/libvlc-module.c:855
 msgid "If your HTTP proxy requires a password, set it here."
-msgstr "Als uw HTTP-proxy een wachtwoord nodig heeft, stel dat hier in."
+msgstr "Als uw HTTP proxy een wachtwoord vereist, stel het hier in."
 
 #: src/libvlc-module.c:857
 msgid "SOCKS server"
@@ -3244,7 +3252,7 @@ msgid ""
 " used for all TCP connections"
 msgstr ""
 "SOCKS-proxyserver die gebruikt moet worden. Dit moet in het formaat "
-"adres:poort. Hij zal gebruikt worden voor alle TCP-verbindingen"
+"adres:poort zijn. Hij zal gebruikt worden voor alle TCP-verbindingen"
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -3253,7 +3261,8 @@ msgstr "SOCKS-gebruikersnaam"
 #: src/libvlc-module.c:864
 msgid "User name to be used for connection to the SOCKS proxy."
 msgstr ""
-"Gebruikersnaam om te gebruiken voor een verbinding met de SOCKS-proxy."
+"Gebruikersnaam die moet worden gebruikt voor de verbinding met de SOCKS-"
+"proxy."
 
 #: src/libvlc-module.c:866
 msgid "SOCKS password"
@@ -3261,7 +3270,8 @@ msgstr "SOCKS-wachtwoord"
 
 #: src/libvlc-module.c:868
 msgid "Password to be used for connection to the SOCKS proxy."
-msgstr "Wachtwoord om te gebruiken voor een verbinding met de SOCKS-proxy."
+msgstr ""
+"Wachtwoord dat moet worden gebruikt voor verbinding met de SOCKS-proxy."
 
 #: src/libvlc-module.c:870
 msgid "Title metadata"
@@ -3269,7 +3279,7 @@ msgstr "Titel-metadata"
 
 #: src/libvlc-module.c:872
 msgid "Allows you to specify a \"title\" metadata for an input."
-msgstr "Geef een titel op voor een invoer."
+msgstr "Hiermee kunt u \"titel\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:874
 msgid "Author metadata"
@@ -3277,7 +3287,7 @@ msgstr "Auteur-metadata"
 
 #: src/libvlc-module.c:876
 msgid "Allows you to specify an \"author\" metadata for an input."
-msgstr "Geef een auteur op voor een invoer."
+msgstr "Hiermee kunt u \"auteur\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:878
 msgid "Artist metadata"
@@ -3285,7 +3295,7 @@ msgstr "Artiest-metadata"
 
 #: src/libvlc-module.c:880
 msgid "Allows you to specify an \"artist\" metadata for an input."
-msgstr "Geef een artiest op voor een invoer."
+msgstr "Hiermee kunt u \"artiest\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:882
 msgid "Genre metadata"
@@ -3293,15 +3303,15 @@ msgstr "Genre-metadata"
 
 #: src/libvlc-module.c:884
 msgid "Allows you to specify a \"genre\" metadata for an input."
-msgstr "Geef een genre op voor een invoer."
+msgstr "Hiermee kunt u \"genre\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:886
 msgid "Copyright metadata"
-msgstr "Auteursrechten-metadata"
+msgstr "Auteursrecht-metadata"
 
 #: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
-msgstr "Geef auteursrechten op voor een invoer."
+msgstr "Hiermee kunt u \"auteursrecht\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:890
 msgid "Description metadata"
@@ -3309,7 +3319,7 @@ msgstr "Beschrijving-metadata"
 
 #: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
-msgstr "Geef een beschrijving op voor een invoer."
+msgstr "Hiermee kunt u \"beschrijving\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:894
 msgid "Date metadata"
@@ -3317,7 +3327,7 @@ msgstr "Datum-metadata"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr "Geef een datum op voor een invoer."
+msgstr "Hiermee kunt u \"datum\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
@@ -3325,7 +3335,7 @@ msgstr "URL-metadata"
 
 #: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
-msgstr "Geef een url op voor een invoer."
+msgstr "Hiermee kunt u \"url\"-metadata voor een invoer opgeven."
 
 #: src/libvlc-module.c:904
 msgid ""
@@ -3333,14 +3343,14 @@ msgid ""
 "(decompression methods). Only advanced users should alter this option as it "
 "can break playback of all your streams."
 msgstr ""
-"Deze optie kan gebruikt worden om de methode waarop VLC zijn codecs "
-"(decompressiemethoden) selecteert te wijzigen. Het gebruik van deze optie is"
-" enkel voor gevorderde gebruikers aangezien hiermee het afspelen van video "
-"onmogelijk kan worden."
+"Deze optie kan worden gebruikt om de manier te veranderen waarop VLC zijn "
+"codecs (decompressiemethoden) selecteert. Deze optie wordt best alleen door "
+"gevorderde gebruikers aangepast, omdat ze het afspelen van al uw streams kan"
+" onmogelijk maken."
 
 #: src/libvlc-module.c:908
 msgid "Preferred decoders list"
-msgstr "Voorkeurslijst van decoders"
+msgstr "Lijst van voorkeurdecoders"
 
 #: src/libvlc-module.c:910
 msgid ""
@@ -3348,10 +3358,11 @@ msgid ""
 " try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
-"Lijst van codecs die VLC in volgorde zal gebruiken. Bijvoorbeeld, "
-"'dummy,a52' zal de dummy en a52 codecs eerst proberen voordat anderen "
-"geprobeerd worden.  Alleen geavanceerde gebruikers mogen deze optie "
-"aanpassen, aangezien dit het afspelen van alle streams onmogelijk kan maken."
+"Lijst van codecs die VLC in volgorde van prioriteit zal gebruiken. "
+"Bijvoorbeeld, 'dummy,a52' zal de dummy- en a52-codecs proberen voordat de "
+"andere worden geprobeerd. Deze optie wordt best alleen door gevorderde "
+"gebruikers aangepast, omdat ze het afspelen van al uw streams kan onmogelijk"
+" maken."
 
 #: src/libvlc-module.c:915
 msgid "Preferred encoders list"
@@ -3361,14 +3372,16 @@ msgstr "Lijst van voorkeursencoders"
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority."
 msgstr ""
-"Hiermee kan een lijst van codecs worden gemaakt die VLC opeenvolgend zal "
-"gebruiken."
+"Hiermee kunt u een lijst van encoders selecteren die VLC in volgorde van "
+"prioriteit zal gebruiken."
 
 #: src/libvlc-module.c:926
 msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
-msgstr "Stel standaard algemene opties in voor de streamuitvoer."
+msgstr ""
+"Met deze opties kunt u standaard globale opties instellen voor het "
+"streamuitvoer-subsysteem."
 
 #: src/libvlc-module.c:929
 msgid "Default stream output chain"
@@ -3380,9 +3393,9 @@ msgid ""
 " to learn how to build such chains. Warning: this chain will be enabled for "
 "all streams."
 msgstr ""
-"U kunt hier een standaard streamuitvoerketen invoeren. Lees de documentatie "
-"om te leren hoe u dergelijke ketens bouwt. Waarschuwing: deze keten zal voor"
-" alle streams gelden."
+"U kunt hier een standaard streamuitvoerketen invoeren. Raadpleeg de "
+"documentatie om te leren hoe u dergelijke ketens kunt bouwen. Waarschuwing: "
+"deze keten zal voor alle streams worden ingeschakeld."
 
 #: src/libvlc-module.c:935
 msgid "Enable streaming of all ES"
@@ -3409,8 +3422,8 @@ msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Kies hier of u de videostream wilt omleiden naar de streamuitvoerfaciliteit "
-"indien deze actief is."
+"Kies of de videostream moet worden omgeleid naar de streamuitvoer-faciliteit"
+" wanneer deze laatste is ingeschakeld."
 
 #: src/libvlc-module.c:948
 msgid "Enable audio stream output"
@@ -3421,8 +3434,8 @@ msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Kies hier of u de audiostream wilt omleiden naar de streamuitvoerfaciliteit "
-"indien deze actief is."
+"Kies of de audiostream moet worden omgeleid naar de streamuitvoer-faciliteit"
+" wanneer deze laatste is ingeschakeld."
 
 #: src/libvlc-module.c:953
 msgid "Enable SPU stream output"
@@ -3433,8 +3446,8 @@ msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Kies hier of u de SPU-streams wilt omleiden naar de streamuitvoerfaciliteit "
-"indien deze actief is."
+"Kies of de SPU-streams moeten worden omgeleid naar de streamuitvoer-"
+"faciliteit wanneer deze laatste is ingeschakeld."
 
 #: src/libvlc-module.c:958
 msgid "Keep stream output open"
@@ -3446,43 +3459,45 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
-"Hiermee wordt een unieke stream-uitvoer over meerdere afspeellijstonderdelen"
-" in stand gehouden (voegt automatisch de verzamelstreamuitvoer indien niet "
-"opgegeven)"
+"Hiermee kunt u een unieke stream-uitvoerinstantie behouden voor meerdere "
+"afspeellijst-items (voegt automatisch de verzamelde stream-uitvoer in indien"
+" niet opgegeven)"
 
 #: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
-msgstr "Streamuitvoer muxerbuffer (ms)"
+msgstr "Buffergrootte streamuitvoer-muxer (ms)"
 
 #: src/libvlc-module.c:966
 msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
 msgstr ""
-"Hier kunt u de initiële buffergrootte voor de streamuitvoermuxer instellen. "
-"Deze waarde moet in milliseconden opgegeven worden."
+"Hiermee kunt u de initiële bufferhoeveelheid voor de streamuitvoermuxer "
+"configureren. Deze waarde moet worden ingesteld in milliseconden."
 
 #: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
-msgstr "Voorkeurspacketizerlijst"
+msgstr "Lijst van voorkeurspacketizers"
 
 #: src/libvlc-module.c:971
 msgid ""
 "This allows you to select the order in which VLC will choose its "
 "packetizers."
-msgstr "Stel de volgorde in waarin VLC packetizers zal kiezen."
+msgstr ""
+"Hiermee kunt u de volgorde kiezen waarin VLC zijn packetizers zal kiezen."
 
 #: src/libvlc-module.c:974
 msgid "Mux module"
-msgstr "Muxmodule"
+msgstr "Mux-module"
 
 #: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr "Dit is een compatibiliteitsoptie voor het configureren van muxmodules"
+msgstr ""
+"Dit is een compatibiliteitsoptie voor het configureren van mux-modules"
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
-msgstr "Uitvoermethodemodule"
+msgstr "Toegangsuitvoer-module"
 
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
@@ -3495,9 +3510,8 @@ msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
 msgstr ""
-"Als deze optie actief is, zal de uitvoer van SAP multicastadressen "
-"gecontroleerd worden. Dit is nodig als u aanmeldingen op de MBone wilt "
-"maken."
+"Als deze optie is ingeschakeld, zal de flow op het SAP-multicast-adres "
+"worden geregeld. Dit is nodig als u aankondigingen wilt doen op de MBone."
 
 #: src/libvlc-module.c:987
 msgid "SAP announcement interval"
@@ -3508,16 +3522,16 @@ msgid ""
 "When the SAP flow control is disabled, this lets you set the fixed interval "
 "between SAP announcements."
 msgstr ""
-"Wanneer SAP-flowbediening is uitgeschakeld, kunt u hiermee een vast interval"
-" tussen de SAP-aankondigingen instellen."
+"Wanneer de SAP-flowbediening is uitgeschakeld, kunt u hiermee het vaste "
+"interval tussen SAP-aankondigingen instellen."
 
 #: src/libvlc-module.c:998
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
-"Met deze opties kunnen de standaardmodules gekozen worden. Laat deze opties "
-"met rust tenzij u weet wat u doet."
+"Met deze opties kunt u standaardmodules selecteren. Laat deze met rust "
+"tenzij u echt weet wat u aan het doen bent."
 
 #: src/libvlc-module.c:1001
 msgid "Access module"
@@ -3529,10 +3543,9 @@ msgid ""
 "access is not automatically detected. You should not set this as a global "
 "option unless you really know what you are doing."
 msgstr ""
-"Hiermee kunt u VLC forceren een specifieke toegangsmodule te gebruiken. U "
-"kunt dit gebruiken als de juiste toegang niet automatisch gedetecteerd "
-"wordt. U moet dit niet als algemene optie instellen, tenzij u zeker weet wat"
-" u doet."
+"Hiermee kunt u een toegangsmodule forceren. U kunt dit gebruiken als de "
+"juiste toegang niet automatisch wordt gedetecteerd. U stelt dit beter niet "
+"in als een globale optie, tenzij u echt weet wat u doet."
 
 #: src/libvlc-module.c:1007
 msgid "Stream filter module"
@@ -3541,7 +3554,7 @@ msgstr "Streamfiltermodule"
 #: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr ""
-"Streamfilters worden gebruikt om de stream die gelezen wordt aan te passen."
+"Streamfilters worden gebruikt om de stream die wordt gelezen te wijzigen."
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
@@ -3551,12 +3564,12 @@ msgstr "Demux-filtermodule"
 msgid ""
 "Demux filters are used to modify/control the stream that is being read."
 msgstr ""
-"Demuxfilters worden gebruikt om de stream te wijzigen/bedienen die gelezen "
-"wordt."
+"Demux-filters worden gebruikt om de stream die wordt gelezen te "
+"wijzigen/bedienen."
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
-msgstr "Demuxmodule"
+msgstr "Demux-module"
 
 #: src/libvlc-module.c:1017
 msgid ""
@@ -3566,9 +3579,9 @@ msgid ""
 "you really know what you are doing."
 msgstr ""
 "Demultiplexers worden gebruikt om de \"elementaire\" streams (zoals audio- "
-"en videostreams) te scheiden. U kunt dit gebruiken om de juiste demuxer aan "
-"te geven als die niet automatisch gedetecteerd wordt. U moet dit niet als "
-"een algemene optie instellen, tenzij u zeker weet wat u doet."
+"en videostreams) te scheiden. U kunt dit gebruiken als de juiste demuxer "
+"niet automatisch wordt gedetecteerd. U stelt dit beter niet in als een "
+"globale optie, tenzij u echt weet wat u doet."
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
@@ -3580,11 +3593,11 @@ msgid ""
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
 "U kunt selecteren welke VoD-servermodule u wilt gebruiken. Stel dit in op "
-"'vod_rtsp' om terug te gaan naar de oude, vroegere module."
+"'vod_rtsp' om terug te schakelen naar de oude, vroegere module."
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
-msgstr "Gebruik real-time prioriteit"
+msgstr "Realtime-prioriteit toestaan"
 
 #: src/libvlc-module.c:1029
 msgid ""
@@ -3593,9 +3606,10 @@ msgid ""
 "however lock up your whole machine, or make it very very slow. You should "
 "only activate this if you know what you're doing."
 msgstr ""
-"Indien VLC met real-time prioriteit draait is het in staat om veel beter te "
-"presteren, vooral bij het streamen. Het kan echter ook de hele machine laten"
-" vastlopen of hem erg traag maken. Activeer dit enkel als u weet wat u doet."
+"VLC in realtime prioriteit laten draaien maakt een veel preciezere planning "
+"mogelijk en levert betere resultaten op, vooral bij het streamen van inhoud."
+" Het kan echter uw hele machine laten vastlopen of ze heel erg traag maken. "
+"U schakelt dit best alleen in als u weet wat u doet."
 
 #: src/libvlc-module.c:1035
 msgid "Adjust VLC priority"
@@ -3607,15 +3621,15 @@ msgid ""
 " You can use it to tune VLC priority against other programs, or against "
 "other VLC instances."
 msgstr ""
-"Hiermee wordt een waarde (positief of negatief) aan de standaardprioriteit "
-"van VLC toegevoegd. Het wordt gebruikt om de prioriteit van VLC ten opzichte"
-" van andere programma's of andere VLC-instanties te regelen."
+"Deze optie voegt een afwijking toe (positief of negatief) aan de "
+"standaardprioriteit van VLC. U kunt deze gebruiken om de prioriteit van VLC "
+"af te stemmen op andere programma's of op andere instanties van VLC."
 
 #: src/libvlc-module.c:1042
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr ""
-"Deze optie is handig als u een kleinere vertraging wilt bij het lezen van "
+"Deze optie is nuttig als u de vertraging wilt verkleinen bij het lezen van "
 "een stream"
 
 #: src/libvlc-module.c:1045
@@ -3624,21 +3638,22 @@ msgstr "VLM-configuratiebestand"
 
 #: src/libvlc-module.c:1047
 msgid "Read a VLM configuration file as soon as VLM is started."
-msgstr "Lees een VLM-configuratiebestand zodra VLM opgestart is."
+msgstr "Een VLM-configuratiebestand lezen zodra VLM wordt gestart."
 
 #: src/libvlc-module.c:1049
 msgid "Use a plugins cache"
-msgstr "Gebruik een pluginbuffer"
+msgstr "Een pluginbuffer gebruiken"
 
 #: src/libvlc-module.c:1051
 msgid ""
 "Use a plugins cache which will greatly improve the startup time of VLC."
 msgstr ""
-"Gebruik een pluginbuffer waardoor VLC aanzienlijk sneller kan starten."
+"Een pluginbuffer gebruiken zal de opstarttijd van VLC aanzienlijk "
+"verbeteren."
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr "Scannen voor nieuwe plugins"
+msgstr "Scannen op nieuwe plugins"
 
 #: src/libvlc-module.c:1055
 msgid ""
@@ -3650,11 +3665,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
-msgstr "Lijst van voorkeurs-keystores"
+msgstr "Lijst van voorkeur-keystores"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
-msgstr "Lijst van keystores die VLC prioritair zal gebruiken."
+msgstr "Lijst van keystores die VLC in volgorde van prioriteit zal gebruiken."
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3662,19 +3677,19 @@ msgstr "Lokaal statistieken verzamelen"
 
 #: src/libvlc-module.c:1064
 msgid "Collect miscellaneous local statistics about the playing media."
-msgstr "Verzamel diverse lokale statistieken over de afspelende media."
+msgstr "Diverse lokale statistieken over de afspelende media verzamelen."
 
 #: src/libvlc-module.c:1066
 msgid "Run as daemon process"
-msgstr "Draai als serverproces"
+msgstr "Als daemon-proces uitvoeren"
 
 #: src/libvlc-module.c:1068
 msgid "Runs VLC as a background daemon process."
-msgstr "Draait VLC als een serverproces op de achtergrond."
+msgstr "Voert VLC als een daemon-proces op de achtergrond uit."
 
 #: src/libvlc-module.c:1070
 msgid "Write process id to file"
-msgstr "Schrijf proces-id naar bestand"
+msgstr "Proces-id naar bestand schrijven"
 
 #: src/libvlc-module.c:1072
 msgid "Writes process id into specified file."
@@ -3682,7 +3697,7 @@ msgstr "Schrijft proces-id naar opgegeven bestand."
 
 #: src/libvlc-module.c:1074
 msgid "Allow only one running instance"
-msgstr "Slechts een instantie van VLC toelaten"
+msgstr "Slechts een actieve instantie van VLC toestaan"
 
 #: src/libvlc-module.c:1076
 msgid ""
@@ -3692,11 +3707,11 @@ msgid ""
 "manager. This option will allow you to play the file with the already "
 "running instance or enqueue it."
 msgstr ""
-"Het kan handig zijn om VLC maar een enkele keer te laten draaien, "
-"bijvoorbeeld indien u bestanden met bepaalde extensies hebt verbonden aan "
-"VLC en u VLC niet nogmaals wilt starten als u dubbelklikt op een bestand in "
-"verkenner. Met deze optie wordt het bestand dan in de afspeellijst van de "
-"reeds geopende versie van VLC opgenomen."
+"Het toestaan van slechts een draaiende instantie van VLC kan soms nuttig "
+"zijn, bijvoorbeeld als u VLC hebt geassocieerd met bepaalde mediatypes en u "
+"niet wilt dat een nieuwe instantie van VLC wordt geopend telkens als u een "
+"bestand opent in uw bestandsbeheerder. Met deze optie kunt u het bestand "
+"afspelen met de reeds draaiende instantie of het in de wachtrij plaatsen."
 
 #: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
@@ -3705,7 +3720,7 @@ msgstr "VLC is gestart via bestandsassociatie"
 #: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr ""
-"VLC vertellen dat het opgestart wordt via bestandsassociatie in het "
+"VLC vertellen dat het opgestart wordt door een bestandsassociatie in het "
 "besturingssysteem"
 
 #: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:549
@@ -3715,7 +3730,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1089
 msgid "Increase the priority of the process"
-msgstr "Prioriteit van het proces verhogen"
+msgstr "De prioriteit van het proces verhogen"
 
 #: src/libvlc-module.c:1091
 msgid ""
@@ -3726,8 +3741,12 @@ msgid ""
 "render the whole system unresponsive which might require a reboot of your "
 "machine."
 msgstr ""
-"Het verhogen van de prioriteit van het proces verbetert zeer waarschijnlijk de prestaties van VLC omdat het niet zo snel gestoord zal worden door andere applicaties die anders teveel processorkracht zouden gebruiken.\n"
-"Maar onder bepaalde omstandigheden (bugs) kan VLC de volledige processor in beslag nemen en de computer erg traag maken. Herstarten van de computer kan noodzakelijk zijn."
+"Het verhogen van de prioriteit van het proces zal zeer waarschijnlijk uw "
+"afspeelervaring verbeteren omdat het VLC toelaat niet gestoord te worden "
+"door andere toepassingen die anders te veel processortijd in beslag zouden "
+"kunnen nemen. In bepaalde omstandigheden (bugs) kan VLC echter alle "
+"processortijd in beslag nemen en ervoor zorgen dat het hele systeem niet "
+"meer reageert. Dit kan een herstart van uw machine vereisen."
 
 #: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Enqueue items into playlist in one instance mode"
@@ -3739,9 +3758,8 @@ msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
-"Bij gebruik van de optie om VLC niet nogmaals te starten als VLC al draait, "
-"voegt items aan de afspeellijst toe en het afspelen van het huidige item "
-"gaat door."
+"Bij gebruik van de optie om slechts een instantie toe te laten, items aan de"
+" afspeellijst toevoegen en het huidige item blijven afspelen."
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
@@ -3751,20 +3769,19 @@ msgstr "Mediaspeler blootstellen via D-Bus"
 msgid ""
 "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr ""
-"Toelaten dat andere toepassingen VLC bedienen door het D-Bus MPRIS-protocol "
-"te gebruiken."
+"Toestaan dat andere toepassingen VLC besturen via het D-Bus MPRIS-protocol."
 
 #: src/libvlc-module.c:1114
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
 msgstr ""
-"Deze instellingen betreffen het gedrag van de afspeellijst. Sommige daarvan "
-"kunnen in de afspeellijst worden gewijzigd."
+"Deze opties bepalen het gedrag van de afspeellijst. Sommige kunnen worden "
+"overschreven in het afspeellijst-dialoogvenster."
 
 #: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
-msgstr "Automatisch items voorverwerken"
+msgstr "Items automatisch voorverwerken"
 
 #: src/libvlc-module.c:1119
 msgid ""
@@ -3808,10 +3825,10 @@ msgid ""
 "collapse: subdirectories appear but are expanded on first play.\n"
 "expand: all subdirectories are expanded.\n"
 msgstr ""
-"Selecteer of onderliggende mapstructuur geopend moeten worden.\n"
-"geen: onderliggende mappen worden niet getoond in de afspeellijst.\n"
-"inklappen: onderliggende mappen worden getoond, maar pas geopend bij afspelen.\n"
-"uitklappen: onderliggende mappen worden geopend.\n"
+"Selecteer of submappen moeten worden uitgeklapt.\n"
+"Geen: submappen verschijnen niet in de afspeellijst.\n"
+"Inklappen: submappen verschijnen, maar worden bij de eerste keer afspelen uitgeklapt.\n"
+"Uitklappen: alle submappen worden uitgeklapt.\n"
 
 #: src/libvlc-module.c:1140
 msgid "Ignored extensions"
@@ -3822,8 +3839,8 @@ msgid ""
 "Files with these extensions will not be added to playlist when opening a directory.\n"
 "This is useful if you add directories that contain playlist files for instance. Use a comma-separated list of extensions."
 msgstr ""
-"Bestanden met deze extensies zullen niet aan de afspeellijst toegevoegd worden als een map wordt geopend.\n"
-"Dit is handig als u mappen toe wilt voegen die bijvoorbeeld afspeellijsten bevatten. Gebruik een komma-gescheiden lijst met extensies."
+"Bestanden met deze extensies worden niet aan de afspeellijst toegevoegd bij het openen van een map.\n"
+"Dit is handig als u bijvoorbeeld mappen toevoegt die afspeellijstbestanden bevatten. Gebruik een lijst van door komma's gescheiden extensies."
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
@@ -3831,7 +3848,7 @@ msgstr "Verborgen bestanden weergeven"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr "Bestanden negeren die beginnen met \".\""
+msgstr "Bestanden die beginnen met '.' negeren"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3842,17 +3859,17 @@ msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
 msgstr ""
-"Geeft de vooraf te laden dienstontdekkingmodules op, gescheiden door "
-"dubbelepunten. Typische waarde is \"sap\"."
+"Bepaalt welke dienstontdekkingsmodules vooraf moeten worden geladen, "
+"gescheiden door dubbele punten. Typische waarde is \"sap\"."
 
 #: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
-msgstr "Bestanden continu in willekeurige volgorde afspelen"
+msgstr "Bestanden eindeloos in willekeurige volgorde afspelen"
 
 #: src/libvlc-module.c:1158
 msgid "VLC will randomly play files in the playlist until interrupted."
 msgstr ""
-"VLC zal in willekeurige volgorde bestanden in de afspeellijst afspelen "
+"VLC zal bestanden in de afspeellijst in willekeurige volgorde afspelen "
 "totdat u onderbreekt."
 
 #: src/libvlc-module.c:1160
@@ -3861,9 +3878,7 @@ msgstr "Alles herhalen"
 
 #: src/libvlc-module.c:1162
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr ""
-"Schakel deze optie in als VLC de afspeellijst oneindig moet blijven "
-"herhalen."
+msgstr "VLC zal de afspeellijst voor onbepaalde tijd blijven afspelen."
 
 #: src/libvlc-module.c:1164
 msgid "Repeat current item"
@@ -3871,7 +3886,7 @@ msgstr "Huidig item herhalen"
 
 #: src/libvlc-module.c:1166
 msgid "VLC will keep playing the current playlist item."
-msgstr "VLC zal het huidige afspeellijstonderdeel blijven herhalen."
+msgstr "VLC zal het huidige item in de afspeellijst blijven afspelen."
 
 #: src/libvlc-module.c:1168
 msgid "Play and stop"
@@ -3879,7 +3894,7 @@ msgstr "Afspelen en stoppen"
 
 #: src/libvlc-module.c:1170
 msgid "Stop the playlist after each played playlist item."
-msgstr "Stop de afspeellijst na elk afgespeeld onderdeel."
+msgstr "De afspeellijst na elk afgespeeld item stoppen."
 
 #: src/libvlc-module.c:1172
 msgid "Play and exit"
@@ -3887,7 +3902,7 @@ msgstr "Afspelen en afsluiten"
 
 #: src/libvlc-module.c:1174
 msgid "Exit if there are no more items in the playlist."
-msgstr "Afsluiten als er geen items in de afspeellijst meer zijn."
+msgstr "Afsluiten als er geen items meer zijn in de afspeellijst."
 
 #: src/libvlc-module.c:1176
 msgid "Play and pause"
@@ -3895,7 +3910,7 @@ msgstr "Afspelen en pauzeren"
 
 #: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
-msgstr "Elk item in de afspeellijst pauzeren op het laatste beeld."
+msgstr "Elk item in de afspeellijst op het laatste frame pauzeren."
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
@@ -3903,7 +3918,7 @@ msgstr "Gepauzeerd starten"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr "Elk item in de afspeellijst pauzeren op het eerste beeld."
+msgstr "Elk item in de afspeellijst op het eerste frame pauzeren."
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3911,7 +3926,9 @@ msgstr "Automatisch starten"
 
 #: src/libvlc-module.c:1185
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr "Automatisch afspelen als de inhoud van de afspeellijst geladen is."
+msgstr ""
+"De inhoud van de afspeellijst automatisch beginnen afspelen zodra deze is "
+"geladen."
 
 #: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
@@ -4202,7 +4219,7 @@ msgstr "Selecteer de sneltoets om een grote sprong vooruit te gaan."
 
 #: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
-msgstr "Volgende beeld"
+msgstr "Volgend frame"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
@@ -4396,7 +4413,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr "Tekst-schaalfactor ondertitels herstellen"
+msgstr "Schaal ondertiteltekst herstellen"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
@@ -4623,8 +4640,7 @@ msgstr "Afspeellijstbladwijzer 10"
 
 #: src/libvlc-module.c:1387
 msgid "This allows you to define playlist bookmarks."
-msgstr ""
-"Met deze opties kunnen bladwijzers voor een afspeelijst worden ingesteld."
+msgstr "Hiermee kunt u bladwijzers voor afspeellijsten definiëren."
 
 #: src/libvlc-module.c:1389
 msgid "Cycle audio track"
@@ -4632,15 +4648,15 @@ msgstr "Audiospoor veranderen"
 
 #: src/libvlc-module.c:1390
 msgid "Cycle through the available audio tracks(languages)."
-msgstr "Tussen beschikbare audiosporen (talen) schakelen."
+msgstr "De beschikbare audiosporen (talen) doorlopen."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr "Ondertitelsporen in omgekeerde volgorde schakelen"
+msgstr "Ondertitelspoor in omgekeerde volgorde veranderen"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Tussen beschikbare ondertitelsporen schakelen in omgekeerde volgorde."
+msgstr "De beschikbare ondertitelsporen in omgekeerde volgorde doorlopen."
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -4648,7 +4664,7 @@ msgstr "Ondertitelspoor veranderen"
 
 #: src/libvlc-module.c:1394
 msgid "Cycle through the available subtitle tracks."
-msgstr "Tussen beschikbare ondertitelsporen schakelen."
+msgstr "De beschikbare ondertitelsporen doorlopen."
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
@@ -4660,21 +4676,19 @@ msgstr "Zichtbaarheid ondertitelspoor aan/uit."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr "Naar volgende programma-service ID schakelen"
+msgstr "Naar volgende programma-service ID wisselen"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr ""
-"Tussen de beschikbare volgende programma-service-ID's (SID's) schakelen."
+msgstr "De beschikbare volgende programma-service-ID's (SID's) doorlopen."
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
-msgstr "Naar vorige programma-service ID schakelen"
+msgstr "Naar vorige programma-service ID wisselen"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
-"Tussen de beschikbare vorige programma-service-id's (SID's) schakelen."
+msgstr "De beschikbare vorige programma-service-ID's (SID's) doorlopen."
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
@@ -4682,8 +4696,7 @@ msgstr "Beeldverhouding veranderen"
 
 #: src/libvlc-module.c:1402
 msgid "Cycle through a predefined list of source aspect ratios."
-msgstr ""
-"Tussen een voorgedefinieerde lijst van bronbeeldverhoudingen wisselen."
+msgstr "Een voorgedefinieerde lijst van bronbeeldverhoudingen doorlopen."
 
 #: src/libvlc-module.c:1403
 msgid "Cycle video crop"
@@ -4691,7 +4704,7 @@ msgstr "Video-bijsnijding veranderen"
 
 #: src/libvlc-module.c:1404
 msgid "Cycle through a predefined list of crop formats."
-msgstr "Tussen een voorgedefinieerde lijst van bijsnijdingsformaten wisselen."
+msgstr "Een voorgedefinieerde lijst van bijsnijdingsformaten doorlopen."
 
 #: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
@@ -4711,19 +4724,19 @@ msgstr "Schaalfactor verkleinen"
 
 #: src/libvlc-module.c:1411
 msgid "Toggle deinterlacing"
-msgstr "Deïnterlacemodus"
+msgstr "Deïnterliniëring aan/uit"
 
 #: src/libvlc-module.c:1412
 msgid "Activate or deactivate deinterlacing."
-msgstr "Deïnterlacing in- of uitschakelen."
+msgstr "Deïnterliniëren in- of uitschakelen."
 
 #: src/libvlc-module.c:1413
 msgid "Cycle deinterlace modes"
-msgstr "Deïnterlacemodus veranderen"
+msgstr "Modus voor deïnterliniëring veranderen"
 
 #: src/libvlc-module.c:1414
 msgid "Cycle through available deinterlace modes."
-msgstr "Schakel tussen beschikbare deïnterlacemodussen."
+msgstr "Beschikbare modi voor deïnterliniëring doorlopen."
 
 #: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
@@ -4747,7 +4760,7 @@ msgstr "Contextueel popup-menu weergeven."
 
 #: src/libvlc-module.c:1420
 msgid "Take video snapshot"
-msgstr "Videomomentopname maken"
+msgstr "Video-momentopname maken"
 
 #: src/libvlc-module.c:1421
 msgid "Takes a video snapshot and writes it to disk."
@@ -4838,11 +4851,11 @@ msgstr "Bureaubladachtergrondmodus in video-uitvoer aan/uit."
 
 #: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
-msgstr "Schakelen tussen audio-apparaten"
+msgstr "Audio-apparaat veranderen"
 
 #: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
-msgstr "Schakelen tussen beschikbare audio-apparaten"
+msgstr "Beschikbare audio-apparaten doorlopen"
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
@@ -5358,7 +5371,7 @@ msgid ""
 "Downloading... %s/%s %.1f%% done"
 msgstr ""
 "%s\n"
-"Downloaden... %s/%s %.1f%% opgehaald"
+"Downloaden... %s/%s %.1f %% opgehaald"
 
 #: src/misc/update.c:649
 msgid "File could not be verified"
@@ -6095,7 +6108,7 @@ msgstr "Zoeloe"
 
 #: src/video_output/vout_intf.c:169
 msgid "Autoscale video"
-msgstr "Autoschalen video"
+msgstr "Video automatisch schalen"
 
 #: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:439
 #: modules/gui/macosx/VLCMainMenu.m:440
@@ -6690,15 +6703,15 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
-msgstr "Video-invoer beeldsnelheid"
+msgstr "Video-invoer framerate"
 
 #: modules/access/dshow/dshow.cpp:153
 msgid ""
 "Force the DirectShow video input to use a specific frame rate (eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
-"Forceer de DirectShow video-invoer om een specifieke beeldsnelheid te "
-"gebruiken (bijv. 0 betekent standaard, 25, 29.97, 50, 59.94, etc.)"
+"Forceer de DirectShow video-invoer om een specifieke framerate te gebruiken "
+"(bijv. 0 betekent standaard, 25, 29.97, 50, 59.94, etc.)"
 
 #: modules/access/dshow/dshow.cpp:155
 msgid "Device properties"
@@ -8291,8 +8304,8 @@ msgstr "SRTP-salt (hexadecimaal)"
 
 #: modules/access/rtp/rtp.c:57 modules/stream_out/rtp.c:152
 msgid ""
-"Secure RTP requires a (non-secret) master salt value. This must be a 28"
-"-character-long hexadecimal string."
+"Secure RTP requires a (non-secret) master salt value. This must be a "
+"28-character-long hexadecimal string."
 msgstr ""
 "Beveiligde RTP vereist een (niet-geheime) master saltwaarde. Dit moet een 28"
 " tekens lange hexadecimale string zijn."
@@ -8425,7 +8438,7 @@ msgstr "SAT>IP-ontvanger-plugin"
 #: modules/access/screen/screen.c:45
 #: modules/gui/qt/components/open_panels.cpp:1109
 msgid "Desired frame rate for the capture."
-msgstr "Gewenste beeldsnelheid voor de opname."
+msgstr "Gewenste framerate voor de opname."
 
 #: modules/access/screen/screen.c:48
 msgid "Capture fragment size"
@@ -8778,7 +8791,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr "Maximaal te gebruiken beeldsnelheid (0 = ongelimiteerd)"
+msgstr "Maximaal te gebruiken framerate (0 = ongelimiteerd)"
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -8915,11 +8928,11 @@ msgstr "Gamma"
 
 #: modules/access/v4l2/v4l2.c:113
 msgid "Gamma adjust."
-msgstr "Gamma-regeling."
+msgstr "Gamma-aanpassing."
 
 #: modules/access/v4l2/v4l2.c:114
 msgid "Automatic gain"
-msgstr "Automatische gain"
+msgstr "Automatische versterking"
 
 #: modules/access/v4l2/v4l2.c:116
 msgid "Automatically set the video gain."
@@ -8931,7 +8944,7 @@ msgstr "Versterking"
 
 #: modules/access/v4l2/v4l2.c:119
 msgid "Picture gain."
-msgstr "Afbeeldingsgain."
+msgstr "Beeldversterking."
 
 #: modules/access/v4l2/v4l2.c:120
 msgid "Sharpness"
@@ -8943,7 +8956,7 @@ msgstr "Scherptefilter aanpassen."
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Chroma gain"
-msgstr "Chroma-gain"
+msgstr "Chroma-versterking"
 
 #: modules/access/v4l2/v4l2.c:123
 msgid "Chroma gain control."
@@ -8951,11 +8964,11 @@ msgstr "Regeling chroma-versterking."
 
 #: modules/access/v4l2/v4l2.c:124
 msgid "Automatic chroma gain"
-msgstr "Automatische chroma-gain"
+msgstr "Automatische chroma-versterking"
 
 #: modules/access/v4l2/v4l2.c:126
 msgid "Automatically control the chroma gain."
-msgstr "De chroma-gain automatisch regelen."
+msgstr "De chroma-versterking automatisch regelen."
 
 #: modules/access/v4l2/v4l2.c:127
 msgid "Power line frequency"
@@ -9295,11 +9308,11 @@ msgstr "Certificaat voor cliënt-verificatie"
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
-msgstr "X.509-cliënt private sleutel"
+msgstr "X.509-cliënt privésleutel"
 
 #: modules/access/vnc.c:55
 msgid "Private key for authentication by certificate"
-msgstr "Private sleutel voor verificatie met certificaat"
+msgstr "Privésleutel voor verificatie met certificaat"
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9521,9 +9534,9 @@ msgstr "Bestand waar vlc sleutel-uri en sleutelbestand-locatie leest"
 
 #: modules/access_output/livehttp.c:98
 msgid ""
-"File is read when segment starts and is assumed to be in format: key-uri"
-"\\nkey-file. File is read on the segment opening and values are used on that"
-" segment."
+"File is read when segment starts and is assumed to be in format: key-"
+"uri\\nkey-file. File is read on the segment opening and values are used on "
+"that segment."
 msgstr ""
 "Bestand is gelezen wanneer segment start, en wordt verondersteld in formaat "
 "te zijn: sleutel-uri\\nsleutelbestand. Bestand wordt gelezen bij het openen "
@@ -9555,7 +9568,7 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:824
 msgid "RIST data output caching size (ms)"
-msgstr "RIST data-uitvoer buffergrootte (ms)"
+msgstr "Buffergrootte RIST data-uitvoer (ms)"
 
 #: modules/access_output/rist.c:826
 msgid ""
@@ -10363,7 +10376,7 @@ msgstr "Lage frequentie (Hz)"
 
 #: modules/audio_filter/param_eq.c:60
 msgid "Low freq gain (dB)"
-msgstr "Lage frequentie versterking (dB)"
+msgstr "Versterking lage frequentie (dB)"
 
 #: modules/audio_filter/param_eq.c:61
 msgid "High freq (Hz)"
@@ -10371,7 +10384,7 @@ msgstr "Hoge frequentie (Hz)"
 
 #: modules/audio_filter/param_eq.c:63
 msgid "High freq gain (dB)"
-msgstr "Hoge frequentie versterking (dB)"
+msgstr "Versterking hoge frequentie (dB)"
 
 #: modules/audio_filter/param_eq.c:64
 msgid "Freq 1 (Hz)"
@@ -10379,7 +10392,7 @@ msgstr "Frequentie 1 (Hz)"
 
 #: modules/audio_filter/param_eq.c:66
 msgid "Freq 1 gain (dB)"
-msgstr "Frequentie 1 versterking (dB)"
+msgstr "Versterking frequentie 1 (dB)"
 
 #: modules/audio_filter/param_eq.c:68
 msgid "Freq 1 Q"
@@ -10391,7 +10404,7 @@ msgstr "Frequentie 2 (Hz)"
 
 #: modules/audio_filter/param_eq.c:71
 msgid "Freq 2 gain (dB)"
-msgstr "Frequentie 2 versterking (dB)"
+msgstr "Versterking frequentie 2 (dB)"
 
 #: modules/audio_filter/param_eq.c:73
 msgid "Freq 2 Q"
@@ -10403,7 +10416,7 @@ msgstr "Frequentie 3 (Hz)"
 
 #: modules/audio_filter/param_eq.c:76
 msgid "Freq 3 gain (dB)"
-msgstr "Frequentie 3 (dB)"
+msgstr "Versterking frequentie 3 (dB)"
 
 #: modules/audio_filter/param_eq.c:78
 msgid "Freq 3 Q"
@@ -11251,7 +11264,7 @@ msgstr "Hardwaredecodering"
 
 #: modules/codec/avcodec/avcodec.h:114
 msgid "This allows hardware decoding when available."
-msgstr "Dit laat u hardwaredecodering gebruiken indien dit beschikbaar is."
+msgstr "Dit maakt hardwaredecodering mogelijk, indien beschikbaar."
 
 #: modules/codec/avcodec/avcodec.h:116
 msgid "Threads"
@@ -11263,7 +11276,7 @@ msgstr "Aantal threads om te gebruiken voor transcoderen, 0 betekent auto"
 
 #: modules/codec/avcodec/avcodec.h:124
 msgid "Ratio of key frames"
-msgstr "Verhouding van sleutelbeelden"
+msgstr "Verhouding van keyframes"
 
 #: modules/codec/avcodec/avcodec.h:125
 msgid "Number of frames that will be coded for one key frame."
@@ -11271,12 +11284,12 @@ msgstr "Aantal beelden dat gecodeerd zal worden voor een sleutelbeeld."
 
 #: modules/codec/avcodec/avcodec.h:128
 msgid "Ratio of B frames"
-msgstr "Verhouding B-beelden"
+msgstr "Verhouding B-frames"
 
 #: modules/codec/avcodec/avcodec.h:129
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr ""
-"Aantal B-beelden dat gecodeerd zal worden tussen twee referentiebeelden."
+"Aantal B-frames dat gecodeerd zal worden tussen twee referentiebeelden."
 
 #: modules/codec/avcodec/avcodec.h:132
 msgid "Video bitrate tolerance"
@@ -11343,8 +11356,8 @@ msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 =>"
 " same qscale for I and P frames)."
 msgstr ""
-"Quantisatiefactor van I-beelden, vergeleken met P-beelden (bijvoorbeeld 1.0 "
-"=> dezelfde kwaliteitsschaal voor I- en P-beelden)."
+"Quantisatiefactor van I-frames, vergeleken met P-frames (bijvoorbeeld 1.0 =>"
+" dezelfde kwaliteitsschaal voor I- en P-frames)."
 
 #: modules/codec/avcodec/avcodec.h:161 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
@@ -11885,15 +11898,15 @@ msgstr "Chorus"
 
 #: modules/codec/fluidsynth.c:53
 msgid "Synthesis gain"
-msgstr "Synthesis-gain"
+msgstr "Synthesis-versterking"
 
 #: modules/codec/fluidsynth.c:54
 msgid ""
 "This gain is applied to synthesis output. High values may cause saturation "
 "when many notes are played at a time."
 msgstr ""
-"Deze gain wordt toegepast op de synthese-uitvoer. Hoge waarden kunnen "
-"verzadiging veroorzaken wanneer veel noten tegelijk gespeeld worden."
+"Deze versterking wordt toegepast op de synthese-uitvoer. Hoge waarden kunnen"
+" verzadiging veroorzaken wanneer veel noten tegelijk gespeeld worden."
 
 #: modules/codec/fluidsynth.c:57
 msgid "Polyphony"
@@ -12767,8 +12780,8 @@ msgid ""
 "Field coding is where interlaced fields are coded separately as opposed to a"
 " pseudo-progressive frame"
 msgstr ""
-"Veldcodering is waar geïnterlacete velden in tegenstelling tot een pseudo-"
-"progressief beeld apart gecodeerd worden"
+"Veldcodering is waar geïnterlinieerde velden in tegenstelling tot een "
+"pseudo-progressief beeld apart gecodeerd worden"
 
 #: modules/codec/schroedinger.c:166
 msgid "auto - let encoder decide based upon input (Best)"
@@ -12780,7 +12793,7 @@ msgstr "forceer beeldcodering als een enkele afbeelding"
 
 #: modules/codec/schroedinger.c:168
 msgid "force coding frame as separate interlaced fields"
-msgstr "forceer beeldcodering in afzonderlijke geïnterlacete velden"
+msgstr "forceer beeldcodering in afzonderlijke geïnterlinieerde velden"
 
 #: modules/codec/schroedinger.c:173
 msgid "Size of motion compensation blocks"
@@ -13701,7 +13714,7 @@ msgstr ""
 
 #: modules/codec/x264.c:105
 msgid "B-frames between I and P"
-msgstr "B-beelden tussen I en P"
+msgstr "B-frames tussen I en P"
 
 #: modules/codec/x264.c:106
 msgid "Number of consecutive B-frames between I and P-frames. Range 1 to 16."
@@ -14128,15 +14141,15 @@ msgstr ""
 
 #: modules/codec/x264.c:285
 msgid "Weighted prediction for B-frames"
-msgstr "Gewogen voorspelling voor B-beelden"
+msgstr "Gewogen voorspelling voor B-frames"
 
 #: modules/codec/x264.c:286
 msgid "Weighted prediction for B-frames."
-msgstr "Gewogen voorspelling voor B-beelden."
+msgstr "Gewogen voorspelling voor B-frames."
 
 #: modules/codec/x264.c:288
 msgid "Weighted prediction for P-frames"
-msgstr "Gewogen voorspelling voor P-vensters"
+msgstr "Gewogen voorspelling voor P-frames"
 
 #: modules/codec/x264.c:289
 msgid ""
@@ -14238,7 +14251,7 @@ msgstr ""
 msgid ""
 "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
-"RD-gebaseerde modusbepaling voor B-beelden. Dit vereist subme 6 (of hoger)."
+"RD-gebaseerde modusbepaling voor B-frames. Dit vereist subme 6 (of hoger)."
 
 #: modules/codec/x264.c:330
 msgid "Decide references on a per partition basis"
@@ -14287,28 +14300,28 @@ msgstr ""
 "Trellis RD quantisatie: \n"
 " - 0: uitgeschakeld\n"
 " - 1: alleen ingeschakeld bij de laatste codering van een MB\n"
-" - 2: ingeschakeld bij alle modussen\n"
+" - 2: ingeschakeld bij alle modi\n"
 "Dit vereist CABAC."
 
 #: modules/codec/x264.c:352
 msgid "Early SKIP detection on P-frames"
-msgstr "Vroege SKIP detectie op P-beelden"
+msgstr "Vroege SKIP detectie op P-frames"
 
 #: modules/codec/x264.c:353
 msgid "Early SKIP detection on P-frames."
-msgstr "Vroege SKIP detectie op P-beelden."
+msgstr "Vroege SKIP detectie op P-frames."
 
 #: modules/codec/x264.c:355
 msgid "Coefficient thresholding on P-frames"
-msgstr "Drempelcoëfficiënt voor P-beelden"
+msgstr "Drempelcoëfficiënt voor P-frames"
 
 #: modules/codec/x264.c:356
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a"
 " small single coefficient."
 msgstr ""
-"Drempelcoëfficiënt voor P-beelden. Elimineer dct-blocks die slechts 1 kleine"
-" coëfficiënt bevatten."
+"Drempelcoëfficiënt voor P-frames. Elimineer dct-blocks die slechts 1 kleine "
+"coëfficiënt bevatten."
 
 #: modules/codec/x264.c:359
 msgid "Use Psy-optimizations"
@@ -14408,7 +14421,7 @@ msgstr "Statistieken"
 
 #: modules/codec/x264.c:398
 msgid "Print stats for each frame."
-msgstr "Druk status voor ieder beeld af."
+msgstr "Statistieken voor elk beeld afdrukken."
 
 #: modules/codec/x264.c:400
 msgid "SPS and PPS id numbers"
@@ -14823,11 +14836,11 @@ msgstr "Zoommodus: %s"
 
 #: modules/control/hotkeys.c:1237 modules/control/hotkeys.c:1294
 msgid "Deinterlace off"
-msgstr "Deïnterlace uit"
+msgstr "Deïnterliniëring uit"
 
 #: modules/control/hotkeys.c:1256 modules/control/hotkeys.c:1289
 msgid "Deinterlace on"
-msgstr "Deïnterlace aan"
+msgstr "Deïnterliniëring aan"
 
 #: modules/control/hotkeys.c:1319
 msgid "Subtitle position: no active subtitle"
@@ -14841,7 +14854,7 @@ msgstr "Ondertitelpositie %d px"
 #: modules/control/hotkeys.c:1356
 #, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "Tekstschaal ondertitels %d%%"
+msgstr "Tekstschaal ondertitels %d %%"
 
 #: modules/control/hotkeys.c:1517
 #, c-format
@@ -14923,7 +14936,7 @@ msgstr "Wachttijd (in ms) vóór het afbreken van gegevensontvangst."
 
 #: modules/control/netsync.c:70
 msgid "Network Sync"
-msgstr "Netwerksync"
+msgstr "Netwerksynchronisatie"
 
 #: modules/control/netsync.c:71
 msgid "Network synchronization"
@@ -15102,17 +15115,15 @@ msgstr ""
 
 #: modules/control/oldrc.c:795
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
-msgstr ""
-"| repeat [on|off] . . . .  herhalen van item in afspeellijst in/uitschakelen"
+msgstr "| repeat [on|off] . . . .  herhalen van item in afspeellijst aan/uit"
 
 #: modules/control/oldrc.c:796
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
-msgstr ""
-"| loop [on|off] . . . . . . . . . herhalen van afspeellijst in/uitschakelen"
+msgstr "| loop [on|off] . . . . . . . . . herhalen van afspeellijst aan/uit"
 
 #: modules/control/oldrc.c:797
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
-msgstr "| random [on|off] . . . . . . .  willekeurig afspelen in/uitschakelen"
+msgstr "| random [on|off] . . . . . . .  willekeurig afspelen aan/uit"
 
 #: modules/control/oldrc.c:798
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
@@ -15152,7 +15163,7 @@ msgstr "| seek X . . . zoeken in seconden, bijvoorbeeld `seek 12'"
 
 #: modules/control/oldrc.c:808
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
-msgstr "| pause  . . . . . . . . . . . . . . . .  pauzeren in/uitschakelen"
+msgstr "| pause  . . . . . . . . . . . . . . . .  pauzeren aan/uit"
 
 #: modules/control/oldrc.c:809
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
@@ -15182,7 +15193,7 @@ msgstr "| frame . . . . . . . . . beeld voor beeld afspelen"
 
 #: modules/control/oldrc.c:815
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
-msgstr "| f [on|off] . . . . . . . schermvullende modus in/uitschakelen"
+msgstr "| f [on|off] . . . . . . . schermvullende modus aan/uit"
 
 #: modules/control/oldrc.c:816
 msgid "| info . . . . .  information about the current stream"
@@ -15251,7 +15262,7 @@ msgstr "| vzoom [X]  . . . . . . . . . . .  zoomen instellen/ophalen"
 
 #: modules/control/oldrc.c:833
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
-msgstr "| snapshot . . . . . . . . . . . . video-snapshot maken"
+msgstr "| momentopname. . . . . . . . . . . . videomomentopname maken"
 
 #: modules/control/oldrc.c:834
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
@@ -15715,9 +15726,8 @@ msgid ""
 "This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
 "is the default value) for a live stream (from a camera)."
 msgstr ""
-"Dit is de gewenste beeldsnelheid voor het afspelen van MJPEG van een "
-"bestand. Gebruik 0 (dit is de standaardwaarde) voor een live stream (van een"
-" camera)."
+"Dit is de gewenste framerate voor het afspelen van MJPEG van een bestand. "
+"Gebruik 0 (dit is de standaardwaarde) voor een live stream (van een camera)."
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
@@ -16045,7 +16055,7 @@ msgid ""
 "This is the frame rate used as a fallback when playing MPEG video elementary"
 " streams."
 msgstr ""
-"Dit is de terugval-beeldsnelheid bij het afspelen van elementaire MPEG-"
+"Dit is de terugval-framerate bij het afspelen van elementaire MPEG-"
 "videostreams."
 
 #: modules/demux/mpeg/es.c:60
@@ -16062,7 +16072,7 @@ msgstr "MPEG-4 video"
 
 #: modules/demux/mpeg/h26x.c:47
 msgid "Desired frame rate for the stream."
-msgstr "Gewenste beeldsnelheid voor de stream."
+msgstr "Gewenste framerate voor de stream."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
@@ -16483,8 +16493,8 @@ msgid ""
 "This is the desired frame rate when playing raw video streams. In the form "
 "30000/1001 or 29.97"
 msgstr ""
-"Dit is de gewenste beeldnselheid bij het afspelen van raw videostreams. In "
-"de vorm 30000/1001 of 29.97"
+"Dit is de gewenste framerate bij het afspelen van raw videostreams. In de "
+"vorm 30000/1001 of 29.97"
 
 #: modules/demux/rawvid.c:48
 msgid "This specifies the width in pixels of the raw video stream."
@@ -16590,7 +16600,7 @@ msgstr "Gesloten ondertitels 4"
 
 #: modules/demux/vc1.c:44
 msgid "Desired frame rate for the VC-1 stream."
-msgstr "Gewenste beeldsnelheid voor de VC-1 stream."
+msgstr "Gewenste framerate voor de VC-1 stream."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
@@ -16783,7 +16793,7 @@ msgstr "Deïnstalleren"
 #: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:535
 msgid "Skins"
-msgstr "Thema"
+msgstr "Thema's"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
@@ -16834,7 +16844,7 @@ msgstr "Spatializer inschakelen"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:246
 msgid "Headphone virtualization"
-msgstr "Koptelefoon virtualizatie"
+msgstr "Koptelefoon virtualisatie"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:253
 msgid "Volume normalization"
@@ -18251,7 +18261,7 @@ msgstr "Weergegeven beelden"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:89
 msgid "Lost frames"
-msgstr "Verloren frames"
+msgstr "Verloren beelden"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:93
 msgid "Played buffers"
@@ -18348,7 +18358,7 @@ msgstr "Algemene audio"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 msgid "Preferred Audio language"
-msgstr "Audiotaal-voorkeur"
+msgstr "Voorkeurstaal audio"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:276
 msgid "Enable Last.fm submissions"
@@ -18592,7 +18602,7 @@ msgstr "Standaard schermvullende modus gebruiken"
 #: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Video snapshots"
-msgstr "Video-snapshots"
+msgstr "Video-momentopnames"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/meta_engine/folder.c:70
@@ -18689,7 +18699,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1169
 msgid "Choose the folder to save your video snapshots to."
-msgstr "Kies de map om uw video snapshots in op te slaan."
+msgstr "Kies de map om uw video-momentopnames in op te slaan."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1171
 #: modules/gui/macosx/VLCSimplePrefsController.m:1270
@@ -18855,7 +18865,7 @@ msgstr "Kleur"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:203
 msgid "Image Adjust"
-msgstr "Beeldeigenschappen"
+msgstr "Beeldaanpassing"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:207
 #: modules/gui/qt/ui/video_effects.h:1217
@@ -19252,8 +19262,8 @@ msgstr "Automatische pictogramwijzigingen toestaan"
 msgid ""
 "This option allows the interface to change its icon on various occasions."
 msgstr ""
-"Deze optie staat toe dat het pictogram van de interface in verschillende "
-"gevallen wijzigt."
+"Met deze optie kan de interface zijn pictogram bij verschillende "
+"gelegenheden veranderen."
 
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
@@ -19401,7 +19411,9 @@ msgstr "Beginpunt bestandenkiezer"
 msgid ""
 "This option allows you to specify the directory the ncurses filebrowser will"
 " show you initially."
-msgstr "Geeft de map op die de ncurses bestandenkiezer eerst zal tonen."
+msgstr ""
+"Met deze optie kunt u de map opgeven die de ncurses bestandsbrowser u in "
+"eerste instantie zal tonen."
 
 #: modules/gui/ncurses.c:78
 msgid "Ncurses interface"
@@ -19479,19 +19491,19 @@ msgstr "     <spatie>    Pauzeren/afspelen"
 
 #: modules/gui/ncurses.c:879
 msgid " f                      Toggle Fullscreen"
-msgstr " f                      Fullscreen in/uitschakelen"
+msgstr " f                      Fullscreen aan/uit"
 
 #: modules/gui/ncurses.c:880
 msgid " c                      Cycle through audio tracks"
-msgstr " c                      Tussen audiosporen schakelen"
+msgstr " c                      Audiosporen doorlopen"
 
 #: modules/gui/ncurses.c:881
 msgid " v                      Cycle through subtitles tracks"
-msgstr " v                      Tussen ondertitelsporen schakelen"
+msgstr " v                      Ondertitelsporen doorlopen"
 
 #: modules/gui/ncurses.c:882
 msgid " b                      Cycle through video tracks"
-msgstr " b                      Tussen videosporen schakelen"
+msgstr " b                      Videosporen doorlopen"
 
 #: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
@@ -19509,7 +19521,7 @@ msgstr "     <, >        Volgende/Vorige hoofdstuk"
 #: modules/gui/ncurses.c:887
 #, c-format
 msgid " <left>,<right>         Seek -/+ 1%%"
-msgstr " <links>,<rechts>    Zoek -/+ 1%%"
+msgstr " <links>,<rechts>    Zoek -/+ 1 %%"
 
 #: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
@@ -19540,15 +19552,15 @@ msgstr "[Afspeellijst]"
 
 #: modules/gui/ncurses.c:901
 msgid " r                      Toggle Random playing"
-msgstr "     r           Random afspelen in/uitschakelen"
+msgstr "     r           Random afspelen aan/uit"
 
 #: modules/gui/ncurses.c:902
 msgid " l                      Toggle Loop Playlist"
-msgstr "     l           Afspeellijst herhalen in/uitschakelen"
+msgstr "     l           Afspeellijst herhalen aan/uit"
 
 #: modules/gui/ncurses.c:903
 msgid " R                      Toggle Repeat item"
-msgstr "     R           Huidige item herhalen in/uitschakelen"
+msgstr "     R           Huidige item herhalen aan/uit"
 
 #: modules/gui/ncurses.c:904
 msgid " o                      Order Playlist by title"
@@ -19608,7 +19620,7 @@ msgstr "[Speler]"
 #: modules/gui/ncurses.c:927
 #, c-format
 msgid " <up>,<down>            Seek +/-5%%"
-msgstr "     <omhoog>,<omlaag>     Zoek +/-5%%"
+msgstr "     <omhoog>,<omlaag>     Zoek +/-5 %%"
 
 #: modules/gui/ncurses.c:1046
 msgid "[Repeat]"
@@ -19639,7 +19651,7 @@ msgstr " Volume   : Dempen"
 #: modules/gui/ncurses.c:1096
 #, c-format
 msgid " Volume   : %3ld%%"
-msgstr " Volume   : %3ld%%"
+msgstr " Volume   : %3ld %%"
 
 #: modules/gui/ncurses.c:1096
 msgid " Volume   : ----"
@@ -19783,11 +19795,11 @@ msgstr "Uitgebreide opties weergeven"
 
 #: modules/gui/qt/components/controller.hpp:120
 msgid "Toggle playlist"
-msgstr "Afspeellijst in-/uitschakelen"
+msgstr "Afspeellijst aan/uit"
 
 #: modules/gui/qt/components/controller.hpp:121
 msgid "Take a snapshot"
-msgstr "Maak video snapshot"
+msgstr "Een momentopname maken"
 
 #: modules/gui/qt/components/controller.hpp:122
 msgid "Loop from point A to point B continuously."
@@ -19803,7 +19815,7 @@ msgstr "Omkeren"
 
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Change the loop and repeat modes"
-msgstr "Verander de lus- en herhalen-modussen"
+msgstr "Verander de lus- en herhalen-modi"
 
 #: modules/gui/qt/components/controller.hpp:125
 msgid "Previous media in the playlist"
@@ -20505,7 +20517,7 @@ msgstr ""
 
 #: modules/gui/qt/components/simple_preferences.cpp:747
 msgid "VLC skins website"
-msgstr "VLC-skins website"
+msgstr "website met VLC-thema's"
 
 #: modules/gui/qt/components/simple_preferences.cpp:771
 msgid "System's default"
@@ -20833,7 +20845,7 @@ msgstr "Netwerktoegang-beleid"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr "Regelmatig op VLC-updates controleren"
+msgstr "Regelmatig controleren op VLC-updates"
 
 #: modules/gui/qt/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -21065,8 +21077,8 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
-"Skins passen het uiterlijk van de speler aan. U kunt ze activeren via "
-"voorkeuren."
+"Thema's passen het uiterlijk van de speler aan. U kunt ze inschakelen via de"
+" voorkeuren."
 
 #: modules/gui/qt/dialogs/plugins.cpp:383
 msgid ""
@@ -21209,7 +21221,7 @@ msgid ""
 "This wizard will allow you to stream or convert your media for use locally, on your private network, or on the Internet.\n"
 "You should start by checking that source matches what you want your input to be and then press the \"Next\" button to continue.\n"
 msgstr ""
-"Met deze wizard kunt u uw media streamen of converteren voor lokaal gebruik, gebruik op een privé netwerk of op het internet.\n"
+"Met deze wizard kunt u uw media streamen of converteren voor lokaal gebruik, gebruik op een privé-netwerk of op het internet.\n"
 "Begin met na te gaan of deze bron klopt met wat u als invoer wilt gebruiken en klik dan op \"Volgende \" om verder te gaan.\n"
 
 #: modules/gui/qt/dialogs/sout.cpp:58
@@ -21698,15 +21710,15 @@ msgstr "Bijsnijden"
 
 #: modules/gui/qt/menus.cpp:693
 msgid "&Deinterlace"
-msgstr "Deïnterlace"
+msgstr "Deïnterliniëring"
 
 #: modules/gui/qt/menus.cpp:694
 msgid "&Deinterlace mode"
-msgstr "Deïnterlace-methode"
+msgstr "Deïnterliniëringsmethode"
 
 #: modules/gui/qt/menus.cpp:698
 msgid "Take &Snapshot"
-msgstr "Snapshot maken"
+msgstr "Momentopname maken"
 
 #: modules/gui/qt/menus.cpp:717
 msgid "T&itle"
@@ -22034,8 +22046,8 @@ msgid ""
 "This option allows the interface to be raised automatically when a "
 "video/audio playback starts, or never."
 msgstr ""
-"Deze optie staat toe dat de interface automatisch naar voor gebracht wordt "
-"wanneer het afspelen van video/audio begint, of nooit."
+"Deze optie maakt het mogelijk dat de interface automatisch of nooit naar "
+"voor wordt gebracht wanneer het afspelen van video/audio begint."
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -22068,7 +22080,7 @@ msgstr "Wissen"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
-msgstr "Open een themabestand"
+msgstr "Een themabestand openen"
 
 #: modules/gui/skins2/src/dialogs.cpp:213
 msgid "Skin files |*.vlt;*.wsz;*.xml"
@@ -22084,7 +22096,7 @@ msgstr "|Alle bestanden |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
-msgstr "Open afspeellijst"
+msgstr "Afspeellijst openen"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "Save playlist"
@@ -22093,7 +22105,7 @@ msgstr "Afspeellijst opslaan"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
-"XSPF afspeellijst |*.xspf|M3U-bestand |*.m3u|HTML-afspeellijst |*.html"
+"XSPF-afspeellijst |*.xspf|M3U-bestand |*.m3u|HTML-afspeellijst |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -22101,7 +22113,7 @@ msgstr "Te gebruiken thema"
 
 #: modules/gui/skins2/src/skin_main.cpp:495
 msgid "Path to the skin to use."
-msgstr "Pad naar te gebruiken thema."
+msgstr "Pad naar het te gebruiken thema."
 
 #: modules/gui/skins2/src/skin_main.cpp:496
 msgid "Config of last used skin"
@@ -22112,8 +22124,8 @@ msgid ""
 "Windows configuration of the last skin used. This option is updated "
 "automatically, do not touch it."
 msgstr ""
-"Windows configuratie van het laatstgebruikte thema. Deze optie wordt "
-"automatisch ververst, blijf ervan af."
+"Vensterconfiguratie van het laatst gebruikte thema. Deze optie wordt "
+"automatisch bijgewerkt, niet aankomen."
 
 #: modules/gui/skins2/src/skin_main.cpp:500
 msgid "Show a systray icon for VLC"
@@ -22122,7 +22134,7 @@ msgstr "Systeemvak-pictogram weergeven voor VLC"
 #: modules/gui/skins2/src/skin_main.cpp:501
 #: modules/gui/skins2/src/skin_main.cpp:502
 msgid "Show VLC on the taskbar"
-msgstr "VLC op taakbalk weergeven"
+msgstr "VLC op de taakbalk weergeven"
 
 #: modules/gui/skins2/src/skin_main.cpp:503
 msgid "Enable transparency effects"
@@ -22133,25 +22145,25 @@ msgid ""
 "You can disable all transparency effects if you want. This is mainly useful "
 "when moving windows does not behave correctly."
 msgstr ""
-"Alle transparantie-effecten kunnen als u wilt uitgezet worden. Dit is vooral"
-" handig als bewegende vensters zich niet correct gedragen."
+"U kunt alle transparantie-effecten uitschakelen als u dat wilt. Dit is "
+"vooral nuttig wanneer het verplaatsen van vensters niet correct werkt."
 
 #: modules/gui/skins2/src/skin_main.cpp:507
 #: modules/gui/skins2/src/skin_main.cpp:508
 msgid "Use a skinned playlist"
-msgstr "Gebruik een afspeellijst met thema"
+msgstr "Een afspeellijst met thema gebruiken"
 
 #: modules/gui/skins2/src/skin_main.cpp:509
 msgid "Display video in a skinned window if any"
-msgstr "Indien mogelijk video in een gedecoreerde venster weergeven"
+msgstr "Video weergeven in een venster met thema, indien aanwezig"
 
 #: modules/gui/skins2/src/skin_main.cpp:511
 msgid ""
 "When set to 'no', this parameter is intended to give old skins a chance to "
 "play back video even though no video tag is implemented"
 msgstr ""
-"Als dit op 'no' staat, zal deze parameter oude thema's een kans geven om "
-"video af te spelen zelfs als er geen video tag vermeld is"
+"Indien ingesteld op 'no', is deze parameter bedoeld om oude thema's een kans"
+" te geven om video af te spelen, ook al is er geen video-tag geïmplementeerd"
 
 #: modules/gui/skins2/src/skin_main.cpp:536
 msgid "Skinnable Interface"
@@ -22159,11 +22171,11 @@ msgstr "Interface met thema's"
 
 #: modules/gui/skins2/src/theme_repository.cpp:58
 msgid "Select skin"
-msgstr "Selecteer thema"
+msgstr "Thema selecteren"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr "Skin openen..."
+msgstr "Thema openen..."
 
 #: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -22176,8 +22188,8 @@ msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
 "threshold value will be the brightness defined below."
 msgstr ""
-"Als deze modus actief is, zullen pixels in zwart of wit weergegeven worden. "
-"De drempelwaarde zal de hieronder gedefinieerde helderheid zijn."
+"Als deze modus is ingeschakeld, worden pixels als zwart of wit weergegeven. "
+"De drempelwaarde is de hieronder opgegeven helderheid."
 
 #: modules/hw/d3d11/d3d11_filters.c:90 modules/hw/d3d9/d3d9_filters.c:72
 #: modules/video_filter/adjust.c:65
@@ -22187,7 +22199,7 @@ msgstr "Contrast van het beeld (0-2)"
 #: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:73
 #: modules/video_filter/adjust.c:66
 msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr "Zet het contrast van de afbeelding, tussen 0 en 2. Standaard is 1."
+msgstr "Het contrast van het beeld instellen, tussen 0 en 2. Standaard op 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:74
 msgid "Image hue (0-360)"
@@ -22195,17 +22207,18 @@ msgstr "Tint van het beeld (0-360)"
 
 #: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:75
 msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr "Zet de tint van de afbeelding, tussen 0 en 360. Standaard is 0."
+msgstr "De tint van het beeld instellen, tussen 0 en 360. Standaard op 0."
 
 #: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:76
 #: modules/video_filter/adjust.c:69
 msgid "Image saturation (0-3)"
-msgstr "Kleurverzadiging van het beeld (0-3)"
+msgstr "Verzadiging van het beeld (0-3)"
 
 #: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:77
 #: modules/video_filter/adjust.c:70
 msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr "Zet de verzadiging van de afbeelding, tussen 0 en 3. Standaard is 1."
+msgstr ""
+"De verzadiging van het beeld instellen, tussen 0 en 3. Standaard op 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:78
 #: modules/video_filter/adjust.c:71
@@ -22215,21 +22228,21 @@ msgstr "Helderheid van het beeld (0-2)"
 #: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:79
 #: modules/video_filter/adjust.c:72
 msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr "Zet de helderheid van de afbeelding, tussen 0 en 2. Standaard is 1."
+msgstr "De helderheid van het beeld instellen, tussen 0 en 2. Standaard op 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:80
 #: modules/video_filter/adjust.c:73
 msgid "Image gamma (0-10)"
-msgstr "Gamma correctie op het beeld (0-10)"
+msgstr "Gamma van het beeld (0-10)"
 
 #: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:81
 #: modules/video_filter/adjust.c:74
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Zet de gamma van de afbeelding, tussen 0.01 en 10. Standaard is 1."
+msgstr "Het gamma van het beeld instellen, tussen 0.01 en 10. Standaard op 1."
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
-msgstr "Direct3D9-wijziging-filter"
+msgstr "Direct3D9-aanpassingsfilter"
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -22254,22 +22267,22 @@ msgstr "MMAL-gebaseerde decoderplugin voor Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr "QPU's gebruiken voor geavanceerd hd-deïnterlacing."
+msgstr "QPU's gebruiken voor geavanceerd hd-deïnterliniëren."
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
-"Gebruik maken van de QPU's om deïnterlacing van hogere kwaliteit van hd-"
+"Gebruik maken van de QPU's om deïnterliniëring van hogere kwaliteit van hd-"
 "inhoud toe te laten."
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
-msgstr "MMAL-deïnterlace"
+msgstr "MMAL-deïnterliniëring"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr "MMAL-gebaseerde deïnterlace-filterplugin"
+msgstr "MMAL-gebaseerde deïnterliniëring-filterplugin"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -22325,7 +22338,7 @@ msgstr "Video Accelerated API-filters"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
-msgstr "VDPAU-wijziging videofilter"
+msgstr "VDPAU-aanpassingsvideofilter"
 
 #: modules/hw/vdpau/avcodec.c:220
 msgid "VDPAU video decoder"
@@ -22345,7 +22358,7 @@ msgstr "VDPAU-oppervlakteconversies"
 
 #: modules/hw/vdpau/chroma.c:896
 msgid "Deinterlacing algorithm"
-msgstr "Deïnterlace-algoritme"
+msgstr "Deïnterliniëring-algoritme"
 
 #: modules/hw/vdpau/chroma.c:899
 msgid "Inverse telecine"
@@ -22353,11 +22366,11 @@ msgstr "Omgekeerde telecine"
 
 #: modules/hw/vdpau/chroma.c:901
 msgid "Deinterlace chroma skip"
-msgstr "Deïnterlace chroma overslaan"
+msgstr "Deïnterliniëring chroma overslaan"
 
 #: modules/hw/vdpau/chroma.c:902
 msgid "Whether temporal deinterlacing applies to luma only"
-msgstr "Of tijdelijke deïnterlacing alleen invloed heeft op luma"
+msgstr "Of tijdelijke deïnterliniëring alleen invloed heeft op luma"
 
 #: modules/hw/vdpau/chroma.c:904
 msgid "Noise reduction level"
@@ -22373,7 +22386,7 @@ msgstr "Hoge kwaliteit schaalniveau"
 
 #: modules/hw/vdpau/deinterlace.c:134
 msgid "VDPAU deinterlacing filter"
-msgstr "VDPAU deïnterlacing-filter"
+msgstr "VDPAU deïnterliniëring-filter"
 
 #: modules/hw/vdpau/display.c:46
 msgid "VDPAU output"
@@ -22554,7 +22567,7 @@ msgstr "Geef het logformaat op."
 
 #: modules/logger/file.c:214
 msgid "Verbosity"
-msgstr "Informatiehoeveelheid"
+msgstr "Informatieniveau"
 
 #: modules/logger/file.c:215
 msgid ""
@@ -23712,9 +23725,9 @@ msgid ""
 "Windows Media Player will cache streamed content. Set to audio+video bitrate"
 " in bytes"
 msgstr ""
-"Probeer ASF-bitrate niet te raden. Zet dit om te bepalen hoe Windows Media "
-"Player gestreamde inhoud moet bufferen. Zet naar audio+video bitrate in "
-"bytes"
+"De ASF-bitrate niet proberen te raden. Als u dit instelt, kunt u bepalen hoe"
+" Windows Media Player gestreamde inhoud buffert. Instellen op audio+video "
+"bitrate in bytes"
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
@@ -23772,9 +23785,9 @@ msgid ""
 "the data in the stream, compared to the SCRs. This allows for some buffering"
 " inside the client decoder."
 msgstr ""
-"Vertraag de DTS (decoding time stamps) en PTS (presentation timestamps) van "
-"de gegevens in de stream, vergeleken met de SCR's. Hiermee kan iets "
-"gebufferd worden in de decoder van de afspeler."
+"De DTS (decoding time stamps) en PTS (presentation timestamps) van de "
+"gegevens in de stream vertragen ten opzichte van de SCR's. Dit maakt enige "
+"buffering binnen de client-decoder mogelijk."
 
 #: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
@@ -23919,7 +23932,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
-msgstr "Gebruik sleutelbeelden"
+msgstr "Keyframes gebruiken"
 
 #: modules/mux/mpeg/ts.c:144
 msgid ""
@@ -24058,7 +24071,7 @@ msgstr "Nieuwe invoer wordt afgespeeld"
 
 #: modules/notify/osx_notifications.m:377
 msgid "Now playing"
-msgstr "Nu speelt"
+msgstr "Nu aan het afspelen"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
@@ -24134,7 +24147,7 @@ msgstr "MPEG audiolaag I/II/III packetizer"
 
 #: modules/packetizer/mpegvideo.c:60
 msgid "Sync on Intra Frame"
-msgstr "Synchronizeer op intra-beeld"
+msgstr "Synchroniseren op intra-beeld"
 
 #: modules/packetizer/mpegvideo.c:61
 msgid ""
@@ -26109,27 +26122,27 @@ msgstr "Schalingsfactor om toe te passen tijdens transcoderen (bijv.: 0.25)"
 
 #: modules/stream_out/transcode/transcode.c:58
 msgid "Video frame-rate"
-msgstr "Videobeeldsnelheid"
+msgstr "Framerate video"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
-msgstr "Doel uitvoer beeldsnelheid voor de videostream."
+msgstr "Doel uitvoer framerate voor de videostream."
 
 #: modules/stream_out/transcode/transcode.c:61
 msgid "Deinterlace video"
-msgstr "Deïnterlace video"
+msgstr "Video deïnterliniëren "
 
 #: modules/stream_out/transcode/transcode.c:63
 msgid "Deinterlace the video before encoding."
-msgstr "Deïnterlace de video voor de codering."
+msgstr "De video deïnterliniëren voor de codering."
 
 #: modules/stream_out/transcode/transcode.c:64
 msgid "Deinterlace module"
-msgstr "Deïnterlace module"
+msgstr "Deïnterliniëring-module"
 
 #: modules/stream_out/transcode/transcode.c:66
 msgid "Specify the deinterlace module to use."
-msgstr "Stel de deïnterlacemodule in."
+msgstr "Stel de deïnterliniëring-module in."
 
 #: modules/stream_out/transcode/transcode.c:73
 msgid "Maximum video width"
@@ -26571,19 +26584,19 @@ msgstr "YUVP converter"
 
 #: modules/video_filter/adjust.c:67
 msgid "Image hue (-180..180)"
-msgstr "Beeldtint (-180..180)"
+msgstr "Tint van het beeld (-180..180)"
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr "Beeldtint instellen, tussen -180 en 180. Standaard is 0."
+msgstr "De tint van het beeld instellen, tussen -180 en 180. Standaard is 0."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
-msgstr "Beeldeigenschappen"
+msgstr "Beeldeigenschappen-filter"
 
 #: modules/video_filter/adjust.c:78 modules/gui/qt/ui/video_effects.h:1214
 msgid "Image adjust"
-msgstr "Beeldeigenschappen"
+msgstr "Beeldaanpassing"
 
 #: modules/video_filter/alphamask.c:41
 msgid "Use an image's alpha channel as a transparency mask."
@@ -26928,35 +26941,37 @@ msgstr "Gelijkheidsdrempel"
 
 #: modules/video_filter/croppadd.c:47
 msgid "Pixels to crop from top"
-msgstr "Pixels snijden van boven"
+msgstr "Pixels bijsnijden van boven"
 
 #: modules/video_filter/croppadd.c:49
 msgid "Number of pixels to crop from the top of the image."
-msgstr "Aantal pixels om te snijden vanaf de bovenkant van de afbeelding."
+msgstr "Aantal pixels om bij te snijden vanaf de bovenkant van de afbeelding."
 
 #: modules/video_filter/croppadd.c:50
 msgid "Pixels to crop from bottom"
-msgstr "Pixels snijden van beneden"
+msgstr "Pixels bijsnijden van beneden"
 
 #: modules/video_filter/croppadd.c:52
 msgid "Number of pixels to crop from the bottom of the image."
-msgstr "Aantal pixels om te snijden vanaf de onderkant van de afbeelding."
+msgstr "Aantal pixels om bij te snijden vanaf de onderkant van de afbeelding."
 
 #: modules/video_filter/croppadd.c:53
 msgid "Pixels to crop from left"
-msgstr "Pixels snijden van links"
+msgstr "Pixels bijsnijden van links"
 
 #: modules/video_filter/croppadd.c:55
 msgid "Number of pixels to crop from the left of the image."
-msgstr "Aantal pixels om te snijden vanaf de linkerzijde van de afbeelding."
+msgstr ""
+"Aantal pixels om bij te snijden vanaf de linkerzijde van de afbeelding."
 
 #: modules/video_filter/croppadd.c:56
 msgid "Pixels to crop from right"
-msgstr "Pixels snijden van rechts"
+msgstr "Pixels bijsnijden van rechts"
 
 #: modules/video_filter/croppadd.c:58
 msgid "Number of pixels to crop from the right of the image."
-msgstr "Aantal pixels om te snijden vanaf de rechterzijde van de afbeelding."
+msgstr ""
+"Aantal pixels om bij te snijden vanaf de rechterzijde van de afbeelding."
 
 #: modules/video_filter/croppadd.c:60
 msgid "Pixels to padd to top"
@@ -27031,11 +27046,11 @@ msgstr "Hoog"
 
 #: modules/video_filter/deinterlace/deinterlace.c:258
 msgid "Streaming deinterlace mode"
-msgstr "Deïnterlace-modus voor streamen"
+msgstr "Deïnterliniëring-modus voor streamen"
 
 #: modules/video_filter/deinterlace/deinterlace.c:259
 msgid "Deinterlace method to use for streaming."
-msgstr "Deïnterlace-methode om te gebruiken voor streamen."
+msgstr "Deïnterliniëringsmethode om te gebruiken voor streamen."
 
 #: modules/video_filter/deinterlace/deinterlace.c:268
 msgid "Phosphor chroma mode for 4:2:0 input"
@@ -27076,12 +27091,12 @@ msgid ""
 "Default: Low."
 msgstr ""
 "Dit regelt de sterkte van het verdonkerende filter dat het verval van CRT-tv"
-" fosforlicht simuleert voor het oude veld in de Phosphor-"
-"beeldsnelheidverdubbelaar Standaard: laag."
+" fosforlicht simuleert voor het oude veld in de Phosphor-framerate-"
+"verdubbelaar Standaard: laag."
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
-msgstr "Deïnterlace"
+msgstr "Deïnterliniëring-videofilter"
 
 #: modules/video_filter/edgedetection.c:39
 msgid "Edge detection video filter"
@@ -27985,11 +28000,11 @@ msgstr "Inbedde venstervideo"
 
 #: modules/video_output/fb.c:56
 msgid "Framebuffer device"
-msgstr "Beeldbufferapparaat"
+msgstr "Framebuffer-apparaat"
 
 #: modules/video_output/fb.c:58
 msgid "Framebuffer device to use for rendering (usually /dev/fb0)."
-msgstr "Beeldbufferapparaat voor weergave (meestal /dev/fb0)."
+msgstr "Framebuffer-apparaat voor weergave (meestal /dev/fb0)."
 
 #: modules/video_output/fb.c:60
 msgid "Run fb on current tty"
@@ -29134,7 +29149,7 @@ msgstr "Bestandsnaam"
 #: share/lua/http/dialogs/equalizer_window.html:49
 #: share/lua/http/mobile_equalizer.html:63
 msgid "Preamp:"
-msgstr "Preamp:"
+msgstr "Voorversterking:"
 
 #: share/lua/http/dialogs/mosaic_window.html:104
 msgid "Row border"
@@ -29316,7 +29331,7 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/messages_panel.h:138
 msgid "&Verbosity:"
-msgstr "Breedsprakigheid:"
+msgstr "Informatieniveau:"
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Filter:"
@@ -29700,7 +29715,7 @@ msgstr "Nummers"
 
 #: modules/gui/qt/ui/sprefs_audio.h:425
 msgid "Preferred audio language:"
-msgstr "Audiotaal-voorkeur:"
+msgstr "Voorkeurstaal audio:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:426
 msgid "Password:"
@@ -29934,7 +29949,7 @@ msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:326
 msgid "Deinterlacing"
-msgstr "Deïnterlacing"
+msgstr "Deïnterliniëring"
 
 #: modules/gui/qt/ui/sprefs_video.h:328
 msgid "Force Aspect Ratio"
