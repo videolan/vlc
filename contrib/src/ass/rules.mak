@@ -36,6 +36,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
+	$(APPLY) $(SRC)/ass/libass-freetype-fix.patch
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
 	$(APPLY) $(SRC)/ass/0001-configure-add-Core-Text-and-DirectWrite-to-Libs.priv.patch
 ifdef HAVE_WIN32
