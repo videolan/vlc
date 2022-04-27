@@ -793,9 +793,9 @@ libvlc_media_player_new_with_logger( libvlc_instance_t *instance,
     var_Create (mp, "amem-flush", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-drain", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-set-volume", VLC_VAR_ADDRESS);
-    var_Create (mp, "amem-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    var_Create (mp, "amem-rate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "amem-channels", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create (mp, "amem-format", VLC_VAR_STRING);
+    var_Create (mp, "amem-rate", VLC_VAR_INTEGER);
+    var_Create (mp, "amem-channels", VLC_VAR_INTEGER);
 
     /* Video Title */
     var_Create (mp, "video-title-show", VLC_VAR_BOOL);
