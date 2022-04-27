@@ -703,10 +703,10 @@ libvlc_media_player_new_with_logger( libvlc_instance_t *instance,
     var_Create (mp, "vmem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-setup", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-cleanup", VLC_VAR_ADDRESS);
-    var_Create (mp, "vmem-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    var_Create (mp, "vmem-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "vmem-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "vmem-pitch", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create (mp, "vmem-chroma", VLC_VAR_STRING);
+    var_Create (mp, "vmem-width", VLC_VAR_INTEGER);
+    var_Create (mp, "vmem-height", VLC_VAR_INTEGER);
+    var_Create (mp, "vmem-pitch", VLC_VAR_INTEGER);
 
     var_Create (mp, "vout-cb-type", VLC_VAR_INTEGER );
     var_Create( mp, "vout-cb-opaque", VLC_VAR_ADDRESS );
