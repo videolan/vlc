@@ -42,7 +42,6 @@ typedef struct
     struct vlc_vdp_device *device;
     VdpVideoMixer mixer;
     VdpChromaType chroma;
-    VdpYCbCrFormat format;
     picture_pool_t *pool;
 
     picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
@@ -672,23 +671,13 @@ static int OutputOpen(filter_t *filter)
     filter->p_sys = sys;
 
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
-    {
         sys->chroma = VDP_CHROMA_TYPE_444;
-        sys->format = VDP_YCBCR_FORMAT_NV12;
-    }
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
-    {
         sys->chroma = VDP_CHROMA_TYPE_422;
-        /* TODO: check if the drivery supports NV12 or UYVY */
-        sys->format = VDP_YCBCR_FORMAT_UYVY;
-    }
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_420)
-    {
         sys->chroma = VDP_CHROMA_TYPE_420;
-        sys->format = VDP_YCBCR_FORMAT_NV12;
-    }
     else
     {
         vlc_decoder_device_Release(dec_device);
