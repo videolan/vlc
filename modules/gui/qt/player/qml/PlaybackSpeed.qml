@@ -56,7 +56,7 @@ ColumnLayout {
         clip: true
         implicitHeight: VLCStyle.heightBar_small
 
-        Navigation.parentItem: root.Navigation.parentItem
+        Navigation.parentItem: root
         Navigation.downItem: resetButton
         Keys.priority: Keys.AfterItem
         Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -117,7 +117,7 @@ ColumnLayout {
 
         spacing: 0
 
-        Navigation.parentItem: root.Navigation.parentItem
+        Navigation.parentItem: root
         Navigation.upItem: speedSlider
 
         Widgets.IconControlButton {

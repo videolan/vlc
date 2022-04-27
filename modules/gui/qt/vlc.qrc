@@ -347,6 +347,7 @@
         <file alias="SliderBar.qml">player/qml/SliderBar.qml</file>
         <file alias="TrackInfo.qml">player/qml/TrackInfo.qml</file>
         <file alias="TracksPage.qml">player/qml/TracksPage.qml</file>
+        <file alias="TracksPageSpeed.qml">player/qml/TracksPageSpeed.qml</file>
         <file alias="ControlbarControls.qml">player/qml/ControlbarControls.qml</file>
         <file alias="MiniPlayer.qml">player/qml/MiniPlayer.qml</file>
         <file alias="TopBar.qml">player/qml/TopBar.qml</file>
