@@ -26,168 +26,151 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-Popup {
+// FIXME: We should refactor this item with a list of presets.
+ColumnLayout {
     id: root
 
     property VLCColors colors: VLCStyle.nightColors
 
-    height: implicitHeight
-    width: implicitWidth
-    padding: VLCStyle.margin_small
+    Widgets.ListLabel {
+        text: I18n.qtr("Playback Speed")
+        color: root.colors.text
+        font.pixelSize: VLCStyle.fontSize_large
 
-    // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
-    closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
-    modal: true
-    Overlay.modal: Rectangle {
-       color: "transparent"
+        Layout.fillWidth: true
+        Layout.bottomMargin: VLCStyle.margin_xsmall
+
+        Layout.alignment: Qt.AlignTop
     }
 
-    background: Rectangle {
-        color: colors.bg
-        opacity: .85
-    }
+    Slider {
+        id: speedSlider
 
-    contentItem: ColumnLayout {
-        spacing: VLCStyle.margin_xsmall
+        // '_inhibitPlayerUpdate' is used to guard against double update
+        // initialize with true so that we don't update the Player till
+        // we initialize `value` property
+        property bool _inhibitPlayerUpdate: true
 
-        Widgets.ListLabel {
-            text: I18n.qtr("Playback Speed")
-            color: root.colors.text
-            font.pixelSize: VLCStyle.fontSize_large
+        from: 0.25
+        to: 4
+        clip: true
+        implicitHeight: VLCStyle.heightBar_small
 
-            Layout.fillWidth: true
-            Layout.bottomMargin: VLCStyle.margin_xsmall
-        }
+        Navigation.parentItem: root.Navigation.parentItem
+        Navigation.downItem: resetButton
+        Keys.priority: Keys.AfterItem
+        Keys.onPressed: Navigation.defaultKeyAction(event)
 
-        Slider {
-            id: speedSlider
+        background: Rectangle {
+            x: speedSlider.leftPadding
+            y: speedSlider.topPadding + speedSlider.availableHeight / 2 - height / 2
+            implicitWidth: 200
+            implicitHeight: 4
+            width: speedSlider.availableWidth
+            height: implicitHeight
+            radius: 2
+            color: root.colors.bgAlt
 
-            // '_inhibitPlayerUpdate' is used to guard against double update
-            // initialize with true so that we don't update the Player till
-            // we initialize `value` property
-            property bool _inhibitPlayerUpdate: true
-
-            from: 0.25
-            to: 4
-            clip: true
-            implicitHeight: VLCStyle.heightBar_small
-
-            Navigation.parentItem: root.Navigation.parentItem
-            Navigation.downItem: resetButton
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed: Navigation.defaultKeyAction(event)
-
-            background: Rectangle {
-                x: speedSlider.leftPadding
-                y: speedSlider.topPadding + speedSlider.availableHeight / 2 - height / 2
-                implicitWidth: 200
-                implicitHeight: 4
-                width: speedSlider.availableWidth
-                height: implicitHeight
+            Rectangle {
+                width: speedSlider.visualPosition * parent.width
+                height: parent.height
                 radius: 2
-                color: root.colors.bgAlt
-
-                Rectangle {
-                    width: speedSlider.visualPosition * parent.width
-                    height: parent.height
-                    radius: 2
-                    color: (speedSlider.visualFocus || speedSlider.pressed)
-                           ? root.colors.accent
-                           : root.colors.text
-                }
+                color: (speedSlider.visualFocus || speedSlider.pressed)
+                       ? root.colors.accent
+                       : root.colors.text
             }
-
-            handle: Rectangle {
-                x: speedSlider.leftPadding + speedSlider.visualPosition * (speedSlider.availableWidth - width)
-                y: speedSlider.topPadding + speedSlider.availableHeight / 2 - height / 2
-                width: speedSlider.implicitHeight
-                height: speedSlider.implicitHeight
-                radius: speedSlider.implicitHeight
-                color: (speedSlider.visualFocus || speedSlider.pressed) ? root.colors.accent : root.colors.text
-            }
-
-            onValueChanged:  {
-                if (_inhibitPlayerUpdate)
-                    return
-                Player.rate = value
-            }
-
-            function _updateFromPlayer() {
-                _inhibitPlayerUpdate = true
-                value = Player.rate
-                _inhibitPlayerUpdate = false
-            }
-
-            Connections {
-                target: Player
-                onRateChanged: speedSlider._updateFromPlayer()
-            }
-
-            Layout.fillWidth: true
-
-            Component.onCompleted: speedSlider._updateFromPlayer()
         }
 
-        RowLayout {
-            id: buttonLayout
+        handle: Rectangle {
+            x: speedSlider.leftPadding + speedSlider.visualPosition * (speedSlider.availableWidth - width)
+            y: speedSlider.topPadding + speedSlider.availableHeight / 2 - height / 2
+            width: speedSlider.implicitHeight
+            height: speedSlider.implicitHeight
+            radius: speedSlider.implicitHeight
+            color: (speedSlider.visualFocus || speedSlider.pressed) ? root.colors.accent : root.colors.text
+        }
 
-            spacing: 0
+        onValueChanged:  {
+            if (_inhibitPlayerUpdate)
+                return
+            Player.rate = value
+        }
 
-            Navigation.parentItem: root.Navigation.parentItem
-            Navigation.upItem: speedSlider
+        function _updateFromPlayer() {
+            _inhibitPlayerUpdate = true
+            value = Player.rate
+            _inhibitPlayerUpdate = false
+        }
 
-            Widgets.IconControlButton {
-                id: slowerButton
+        Connections {
+            target: Player
+            onRateChanged: speedSlider._updateFromPlayer()
+        }
 
-                iconText: VLCIcons.slower
-                colors: root.colors
+        Layout.fillWidth: true
 
-                Navigation.parentItem: buttonLayout
-                Navigation.rightItem: resetButton
+        Component.onCompleted: speedSlider._updateFromPlayer()
+    }
 
-                onClicked: speedSlider.decrease()
+    RowLayout {
+        id: buttonLayout
+
+        spacing: 0
+
+        Navigation.parentItem: root.Navigation.parentItem
+        Navigation.upItem: speedSlider
+
+        Widgets.IconControlButton {
+            id: slowerButton
+
+            iconText: VLCIcons.slower
+            colors: root.colors
+
+            Navigation.parentItem: buttonLayout
+            Navigation.rightItem: resetButton
+
+            onClicked: speedSlider.decrease()
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        Widgets.IconControlButton {
+            id: resetButton
+
+            colors: root.colors
+
+            Navigation.parentItem: buttonLayout
+            Navigation.leftItem: slowerButton
+            Navigation.rightItem: fasterButton
+
+            onClicked: speedSlider.value = 1.0
+
+            focus: true
+
+            T.Label {
+                anchors.centerIn: parent
+                font.pixelSize: VLCStyle.fontSize_normal
+                text: I18n.qtr("1x")
+                color: resetButton.background.foregroundColor // IconToolButton.background is a AnimatedBackground
             }
+        }
 
-            Item {
-                Layout.fillWidth: true
-            }
+        Item {
+            Layout.fillWidth: true
+        }
 
-            Widgets.IconControlButton {
-                id: resetButton
+        Widgets.IconControlButton {
+            id: fasterButton
 
-                colors: root.colors
+            iconText: VLCIcons.faster
+            colors: root.colors
 
-                Navigation.parentItem: buttonLayout
-                Navigation.leftItem: slowerButton
-                Navigation.rightItem: fasterButton
+            Navigation.parentItem: buttonLayout
+            Navigation.leftItem: resetButton
 
-                onClicked: speedSlider.value = 1.0
-
-                focus: true
-
-                T.Label {
-                    anchors.centerIn: parent
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    text: I18n.qtr("1x")
-                    color: resetButton.background.foregroundColor // IconToolButton.background is a AnimatedBackground
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            Widgets.IconControlButton {
-                id: fasterButton
-
-                iconText: VLCIcons.faster
-                colors: root.colors
-
-                Navigation.parentItem: buttonLayout
-                Navigation.leftItem: resetButton
-
-                onClicked: speedSlider.increase()
-            }
+            onClicked: speedSlider.increase()
         }
     }
 }

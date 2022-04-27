@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
+import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
@@ -26,66 +28,104 @@ import "qrc:///player/" as P
 import "qrc:///util/Helpers.js" as Helpers
 
 Widgets.IconControlButton {
-    id: playbackSpeedButton
+    id: root
 
     readonly property bool _isCurrentViewPlayer: !paintOnly && (History.current.name === "player")
 
     size: VLCStyle.icon_medium
+
     text: I18n.qtr("Playback Speed")
-    color: playbackSpeedPopup.visible ? colors.accent : colors.playerControlBarFg
 
-    onClicked: playbackSpeedPopup.open()
+    color: (popup.visible) ? colors.accent : colors.playerControlBarFg
 
-    P.PlaybackSpeed {
-        id: playbackSpeedPopup
+    onClicked: popup.open()
+
+    Popup {
+        id: popup
+
+        parent: root.paintOnly
+                ? root // button is not part of main display (ToolbarEditorDialog)
+                : root._isCurrentViewPlayer ? rootPlayer : g_root
+
+        width: implicitWidth
+        height: implicitHeight
+
+        padding: VLCStyle.margin_small
 
         z: 1
-        colors: playbackSpeedButton.colors
-        focus: true
-        parent: playbackSpeedButton.paintOnly
-                ? playbackSpeedButton // button is not part of main display (ToolbarEditorDialog)
-                : playbackSpeedButton._isCurrentViewPlayer ? rootPlayer : g_root
 
-        Navigation.parentItem: playbackSpeedButton
+        focus: true
+
+        // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
+        closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
+
+        modal: true
 
         onOpened: {
             // update popup coordinates
             //
-            // mapFromItem is affected by various properties of source and target objects
-            // which can't be represented in a binding expression so a initial setting in
-            // object definition (x: clamp(...)) doesn't work, so we set x and y on initial open
+            // mapFromItem is affected by various properties of source and target objects which
+            // can't be represented in a binding expression so a initial setting in object
+            // definition (x: clamp(...)) doesn't work, so we set x and y on initial open
             x = Qt.binding(function () {
-                // coords are mapped through playbackSpeedButton.parent so that binding is generated based on playbackSpeedButton.x
-                var mappedParentCoordinates = parent.mapFromItem(playbackSpeedButton.parent, playbackSpeedButton.x, 0)
-                return Helpers.clamp(mappedParentCoordinates.x  - ((width - playbackSpeedButton.width) / 2),
-                                     VLCStyle.margin_xxsmall + VLCStyle.applicationHorizontalMargin,
-                                     parent.width - VLCStyle.applicationHorizontalMargin - VLCStyle.margin_xxsmall - width)
+                // coords are mapped through root.parent so that binding is
+                // generated based on root.x
+                var position = parent.mapFromItem(root.parent, root.x, 0)
+
+                var minimum = VLCStyle.margin_xxsmall + VLCStyle.applicationHorizontalMargin
+
+                var maximum = parent.width - VLCStyle.applicationHorizontalMargin
+                               - VLCStyle.margin_xxsmall - width
+
+                return Helpers.clamp(position.x - ((width - root.width) / 2), minimum, maximum)
             })
 
             y = Qt.binding(function () {
-                // coords are mapped through playbackSpeedButton.parent so that binding is generated based on playbackSpeedButton.y
-                var mappedParentCoordinates = parent.mapFromItem(playbackSpeedButton.parent, 0, playbackSpeedButton.y)
-                return mappedParentCoordinates.y - playbackSpeedPopup.height - VLCStyle.margin_xxsmall
+                // coords are mapped through root.parent so that binding is
+                // generated based on root.y
+                var position = parent.mapFromItem(root.parent, 0, root.y)
+
+                return position.y - popup.height - VLCStyle.margin_xxsmall
             })
 
             // player related --
             playerControlLayout.requestLockUnlockAutoHide(true, playerControlLayout)
-            if (playbackSpeedButton._isCurrentViewPlayer)
-                rootPlayer.menu = playbackSpeedPopup
+
+            if (root._isCurrentViewPlayer)
+                rootPlayer.menu = popup
         }
 
         onClosed: {
             playerControlLayout.requestLockUnlockAutoHide(false, playerControlLayout)
-            playbackSpeedButton.forceActiveFocus()
-            if (playbackSpeedButton._isCurrentViewPlayer)
+
+            root.forceActiveFocus()
+
+            if (root._isCurrentViewPlayer)
                 rootPlayer.menu = undefined
+        }
+
+        Overlay.modal: null
+
+        background: Rectangle {
+            color: colors.bg
+            opacity: .85
+        }
+
+        contentItem: P.PlaybackSpeed {
+            colors: root.colors
+
+            Navigation.parentItem: root
         }
     }
 
     T.Label {
         anchors.centerIn: parent
         font.pixelSize: VLCStyle.fontSize_normal
-        text: !playbackSpeedButton.paintOnly ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2)) : I18n.qtr("1x")
-        color: playbackSpeedButton.background.foregroundColor // IconToolButton.background is a AnimatedBackground
+
+        text: !root.paintOnly ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
+                              : I18n.qtr("1x")
+
+        // IconToolButton.background is a AnimatedBackground
+        color: root.background.foregroundColor
     }
 }
