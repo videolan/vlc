@@ -51,7 +51,7 @@ T.Control {
 
         // Next item
         if (focusReason === Qt.TabFocusReason) {
-            for (var i = 0; i < count; i++) {
+            for (var i = 0; i < repeater.count; i++) {
                 var item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
@@ -63,7 +63,7 @@ T.Control {
         }
         // Previous item
         else if (focusReason === Qt.BacktabFocusReason) {
-            for (var i = count -1; i >= 0; i--) {
+            for (var i = repeater.count - 1; i >= 0; i--) {
                 var item= repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
@@ -77,7 +77,7 @@ T.Control {
         else {
             var itemFocus = undefined;
 
-            for (var i = 0 ; i < count; i++) {
+            for (var i = 0 ; i < repeater.count; i++) {
                 var item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
