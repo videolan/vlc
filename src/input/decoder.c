@@ -884,15 +884,6 @@ static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const vlc_frame
 }
 
 #ifdef ENABLE_SOUT
-static int DecoderThread_PlaySout( vlc_input_decoder_t *p_owner, vlc_frame_t *sout_frame )
-{
-    assert( !sout_frame->p_next );
-
-    /* FIXME --VLC_TICK_INVALID inspect stream_output*/
-    return sout_InputSendBuffer( p_owner->p_sout, p_owner->p_sout_input,
-                                 sout_frame );
-}
-
 /* This function process a frame for sout
  */
 static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t *frame )
@@ -976,7 +967,9 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t
                 }
             }
 
-            if( DecoderThread_PlaySout( p_owner, sout_frame ) == VLC_EGENERIC )
+            /* FIXME --VLC_TICK_INVALID inspect stream_output*/
+            if ( sout_InputSendBuffer( p_owner->p_sout, p_owner->p_sout_input, sout_frame ) ==
+                 VLC_EGENERIC )
             {
                 msg_Err( p_dec, "cannot continue streaming due to errors with codec %4.4s",
                                 (char *)&p_owner->fmt.i_codec );
