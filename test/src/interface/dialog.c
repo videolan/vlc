@@ -294,7 +294,6 @@ main(int i_argc, char *ppsz_argv[])
 
     printf("testing dialog callbacks\n");
     const vlc_dialog_cbs cbs = {
-        .pf_display_error = display_error_cb,
         .pf_display_login = display_login_cb,
         .pf_display_question = display_question_cb,
         .pf_display_progress = display_progress_cb,
@@ -303,7 +302,9 @@ main(int i_argc, char *ppsz_argv[])
     };
     struct cb_answer ans = { 0 };
     vlc_dialog_provider_set_callbacks(p_libvlc->p_libvlc_int, &cbs, &ans);
+    vlc_dialog_provider_set_error_callback(p_libvlc->p_libvlc_int, &display_error_cb, &ans);
     test_dialogs(VLC_OBJECT(p_libvlc->p_libvlc_int), &ans, 100000);
+    vlc_dialog_provider_set_error_callback(p_libvlc->p_libvlc_int, NULL, NULL);
     vlc_dialog_provider_set_callbacks(p_libvlc->p_libvlc_int, NULL, NULL);
 
     libvlc_release(p_libvlc);

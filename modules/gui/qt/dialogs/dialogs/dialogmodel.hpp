@@ -134,6 +134,7 @@ public: // Enums
 
 public:
     explicit DialogModel(qt_intf_t * intf, QObject * parent = nullptr);
+    ~DialogModel();
 
 public: // Interface
     Q_INVOKABLE void post_login(DialogId dialogId, const QString & username,

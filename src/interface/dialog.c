@@ -40,6 +40,9 @@ struct vlc_dialog_provider
     vlc_dialog_cbs              cbs;
     void *                      p_cbs_data;
 
+    vlc_dialog_error_cbs        err_cbs;
+    void *                      p_err_cbs_data;
+
     vlc_dialog_ext_update_cb    pf_ext_update;
     void *                      p_ext_data;
 };
@@ -157,6 +160,9 @@ libvlc_InternalDialogInit(libvlc_int_t *p_libvlc)
     memset(&p_provider->cbs, 0, sizeof(p_provider->cbs));
     p_provider->p_cbs_data = NULL;
 
+    p_provider->err_cbs = NULL;
+    p_provider->p_err_cbs_data = NULL;
+
     p_provider->pf_ext_update = NULL;
     p_provider->p_ext_data = NULL;
     libvlc_priv(p_libvlc)->p_dialog_provider = p_provider;
@@ -271,6 +277,29 @@ vlc_dialog_provider_set_callbacks(vlc_object_t *p_obj,
     vlc_mutex_unlock(&p_provider->lock);
 }
 
+#undef vlc_dialog_provider_set_error_callback
+void
+vlc_dialog_provider_set_error_callback(vlc_object_t *p_obj,
+                                  vlc_dialog_error_cbs p_cbs, void *p_data)
+{
+    assert(p_obj != NULL);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+
+    vlc_mutex_lock(&p_provider->lock);
+
+    if (p_cbs == NULL)
+    {
+        p_provider->err_cbs  = NULL;
+        p_provider->p_err_cbs_data = NULL;
+    }
+    else
+    {
+        p_provider->err_cbs = p_cbs;
+        p_provider->p_err_cbs_data = p_data;
+    }
+    vlc_mutex_unlock(&p_provider->lock);
+}
+
 static void
 dialog_wait_interrupted(void *p_data)
 {
@@ -328,7 +357,7 @@ dialog_display_error_va(vlc_dialog_provider *p_provider, const char *psz_title,
                         const char *psz_fmt, va_list ap)
 {
     vlc_mutex_lock(&p_provider->lock);
-    if (p_provider->cbs.pf_display_error == NULL)
+    if (p_provider->err_cbs == NULL)
     {
         vlc_mutex_unlock(&p_provider->lock);
         return VLC_EGENERIC;
@@ -341,7 +370,7 @@ dialog_display_error_va(vlc_dialog_provider *p_provider, const char *psz_title,
         return VLC_ENOMEM;
     }
 
-    p_provider->cbs.pf_display_error(p_provider->p_cbs_data, psz_title, psz_text);
+    p_provider->err_cbs(p_provider->p_err_cbs_data, psz_title, psz_text);
     free(psz_text);
     vlc_mutex_unlock(&p_provider->lock);
 

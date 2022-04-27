@@ -107,11 +107,19 @@ int DialogErrorModel::count() const
 
     const vlc_dialog_cbs cbs =
     {
-        onError, onLogin, onQuestion, onProgress, onCancelled, onProgressUpdated
+        onLogin, onQuestion, onProgress, onCancelled, onProgressUpdated
     };
 
+    vlc_dialog_provider_set_error_callback(intf, onError, this);
     vlc_dialog_provider_set_callbacks(intf, &cbs, this);
 }
+
+DialogModel::~DialogModel()
+{
+    vlc_dialog_provider_set_callbacks(m_intf, nullptr, nullptr);
+    vlc_dialog_provider_set_error_callback(m_intf, nullptr, nullptr);
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // Interface

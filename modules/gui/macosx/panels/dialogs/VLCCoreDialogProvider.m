@@ -186,7 +186,6 @@ static void updateProgressCallback(void *p_data,
         /* subscribe to various interactive dialogues */
 
         const vlc_dialog_cbs cbs = {
-            displayErrorCallback,
             displayLoginCallback,
             displayQuestionCallback,
             displayProgressCallback,
@@ -194,6 +193,7 @@ static void updateProgressCallback(void *p_data,
             updateProgressCallback
         };
 
+        vlc_dialog_provider_set_error_callback(p_intf, displayErrorCallback, (__bridge void *)self);
         vlc_dialog_provider_set_callbacks(p_intf, &cbs, (__bridge void *)self);
     }
 
@@ -206,6 +206,7 @@ static void updateProgressCallback(void *p_data,
 
     intf_thread_t *p_intf = getIntf();
     vlc_dialog_provider_set_callbacks(p_intf, NULL, NULL);
+    vlc_dialog_provider_set_error_callback(p_intf, NULL, NULL);
 }
 
 -(void)awakeFromNib

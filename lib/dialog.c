@@ -45,15 +45,6 @@ vlc_to_libvlc_dialog_question_type(vlc_dialog_question_type i_type)
 }
 
 static void
-display_error_cb(void *p_data, const char *psz_title, const char *psz_text)
-{
-    libvlc_instance_t *p_instance = p_data;
-
-    p_instance->dialog.cbs.pf_display_error(p_instance->dialog.data, psz_title,
-                                            psz_text);
-}
-
-static void
 display_login_cb(void *p_data, vlc_dialog_id *p_id, const char *psz_title,
                  const char *psz_text, const char *psz_default_username,
                  bool b_ask_store)
@@ -124,8 +115,6 @@ libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance,
     if (p_cbs != NULL)
     {
         const vlc_dialog_cbs dialog_cbs = {
-            .pf_display_error = p_cbs->pf_display_error != NULL ?
-                                display_error_cb : NULL,
             .pf_display_login = p_cbs->pf_display_login ?
                                 display_login_cb : NULL,
             .pf_display_question = p_cbs->pf_display_question != NULL ?
@@ -144,6 +133,14 @@ libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance,
     }
     else
         vlc_dialog_provider_set_callbacks(p_libvlc, NULL, NULL);
+}
+
+void
+libvlc_dialog_set_error_callback(libvlc_instance_t *p_instance,
+                                 libvlc_dialog_error_cbs p_cbs, void *p_data)
+{
+    libvlc_int_t *p_libvlc = p_instance->p_libvlc_int;
+    vlc_dialog_provider_set_error_callback(p_libvlc, p_cbs, p_data);
 }
 
 void

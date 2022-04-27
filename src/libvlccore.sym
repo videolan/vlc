@@ -533,6 +533,7 @@ vlc_dialog_id_post_login
 vlc_dialog_id_set_context
 vlc_dialog_is_cancelled
 vlc_dialog_provider_set_callbacks
+vlc_dialog_provider_set_error_callback
 vlc_dialog_provider_set_ext_callback
 vlc_dialog_release
 vlc_dialog_update_progress
