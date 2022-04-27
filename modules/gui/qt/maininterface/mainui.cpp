@@ -126,7 +126,7 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     SingletonRegisterHelper<NavigationHistory>::setInstance( new NavigationHistory(this) );
     SingletonRegisterHelper<I18n>::setInstance( new I18n(this) );
     SingletonRegisterHelper<SystemPalette>::setInstance( new SystemPalette(this) );
-    SingletonRegisterHelper<DialogModel>::setInstance( new DialogModel(m_intf, this));
+    SingletonRegisterHelper<DialogErrorModel>::setInstance( new DialogErrorModel(m_intf, this));
     SingletonRegisterHelper<QmlKeyHelper>::setInstance( new QmlKeyHelper(this) );
 
     if (m_mainCtx->hasMediaLibrary())
@@ -207,7 +207,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::callback);
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::callback);
-        qmlRegisterSingletonType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", SingletonRegisterHelper<DialogModel>::callback);
+        qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
 
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
@@ -245,6 +245,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
 
         qmlRegisterUncreatableType<DialogErrorModel>( uri, versionMajor, versionMinor, "DialogErrorModel", "");
+        qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
         qRegisterMetaType<DialogId>();
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
 

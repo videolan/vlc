@@ -35,11 +35,6 @@ Item {
     property Item bgContent: null
 
     //---------------------------------------------------------------------------------------------
-    // Private
-
-    readonly property DialogErrorModel _model: DialogModel.model
-
-    //---------------------------------------------------------------------------------------------
     // Signal
     //---------------------------------------------------------------------------------------------
 
@@ -49,14 +44,14 @@ Item {
     // Events
     //---------------------------------------------------------------------------------------------
 
-    Component.onCompleted: if (_model.count) errorPopup.state = "visible"
+    Component.onCompleted: if (DialogErrorModel.count) errorPopup.state = "visible"
 
     Component.onDestruction: {
         if (questionDialog.dialogId !== null) {
-            DialogModel.dismiss(questionDialog.dialogId)
+            dialogModel.dismiss(questionDialog.dialogId)
             questionDialog.dialogId = null
         } if (loginDialog.dialogId !== null) {
-            DialogModel.dismiss(loginDialog.dialogId)
+            dialogModel.dismiss(loginDialog.dialogId)
             loginDialog.dialogId = null
         }
     }
@@ -75,7 +70,7 @@ Item {
 
     Connections
     {
-        target: DialogModel
+        target: dialogModel
 
         onLogin: {
             loginDialog.dialogId = dialogId
@@ -106,20 +101,20 @@ Item {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
                 questionDialog.dialogId = null
-                DialogModel.dismiss(dialogId)
+                dialogModel.dismiss(dialogId)
             } else if (loginDialog.dialogId === dialogId)  {
                 loginDialog.close()
                 loginDialog.dialogId = null
-                DialogModel.dismiss(dialogId)
+                dialogModel.dismiss(dialogId)
             } else {
-                DialogModel.dismiss(dialogId)
+                dialogModel.dismiss(dialogId)
             }
         }
     }
 
     Connections
     {
-        target: _model
+        target: DialogErrorModel
 
         onCountChanged: errorPopup.state = "visible"
     }
@@ -127,6 +122,12 @@ Item {
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
+
+    DialogModel {
+        id: dialogModel
+        ctx: MainCtx
+    }
+
 
     Widgets.DrawerExt {
         id: errorPopup
@@ -149,13 +150,13 @@ Item {
                 anchors.fill: parent
                 anchors.margins: VLCStyle.fontHeight_normal / 2
                 ScrollBar.vertical: ScrollBar{}
-                contentY: VLCStyle.fontHeight_normal * ((_model.count * 2) - 4)
+                contentY: VLCStyle.fontHeight_normal * ((DialogErrorModel.count * 2) - 4)
                 clip: true
 
                 ListView {
                     width: parent.width
-                    height: VLCStyle.fontHeight_normal * _model.count * 2
-                    model: _model
+                    height: VLCStyle.fontHeight_normal * DialogErrorModel.count * 2
+                    model: DialogErrorModel
                     delegate: Column {
                         Text {
                             text: model.title
@@ -305,13 +306,13 @@ Item {
 
         onAccepted: {
             if (loginDialog.dialogId !== null) {
-                DialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
+                dialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
                 loginDialog.dialogId = null
             }
         }
         onRejected: {
             if (loginDialog.dialogId !== null) {
-                DialogModel.dismiss(loginDialog.dialogId)
+                dialogModel.dismiss(loginDialog.dialogId)
                 loginDialog.dialogId = null
             }
         }
@@ -366,7 +367,7 @@ Item {
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            DialogModel.dismiss(questionDialog.dialogId)
+                            dialogModel.dismiss(questionDialog.dialogId)
                             questionDialog.dialogId = null
                             questionDialog.close()
                         }
@@ -385,7 +386,7 @@ Item {
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            DialogModel.post_action1(questionDialog.dialogId)
+                            dialogModel.post_action1(questionDialog.dialogId)
                             questionDialog.dialogId = null
                             questionDialog.close()
                         }
@@ -402,7 +403,7 @@ Item {
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            DialogModel.post_action2(questionDialog.dialogId)
+                            dialogModel.post_action2(questionDialog.dialogId)
                             questionDialog.dialogId = null
                             questionDialog.close()
                         }

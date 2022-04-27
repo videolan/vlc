@@ -24,11 +24,23 @@
 #include <vlc_dialog.h>
 #include <qt.hpp>
 
+#include "maininterface/mainctx.hpp"
+
 //=================================================================================================
 // DialogErrorModel
 //=================================================================================================
 
-/* explicit */ DialogErrorModel::DialogErrorModel(QObject * parent) : QAbstractListModel(parent) {}
+DialogErrorModel::DialogErrorModel(qt_intf_t * intf, QObject * parent)
+    : QAbstractListModel(parent)
+    , m_intf(intf)
+{
+    vlc_dialog_provider_set_error_callback(intf, &DialogErrorModel::onError, this);
+}
+
+DialogErrorModel::~DialogErrorModel()
+{
+    vlc_dialog_provider_set_error_callback(m_intf, nullptr, nullptr);
+}
 
 //-------------------------------------------------------------------------------------------------
 // QAbstractItemModel implementation
@@ -74,6 +86,19 @@ QHash<int, QByteArray> DialogErrorModel::roleNames() const /* override */
 // Private functions
 //-------------------------------------------------------------------------------------------------
 
+void DialogErrorModel::onError(void * p_data,
+                               const char * psz_title, const char * psz_text)
+{
+    auto model = static_cast<DialogErrorModel *>(p_data);
+
+    DialogErrorModel::DialogError error { psz_title, psz_text };
+
+    QMetaObject::invokeMethod(model, [model, error = std::move(error)]()
+    {
+        model->pushError(error);
+    });
+}
+
 void DialogErrorModel::pushError(const DialogError & error)
 {
     int row = m_data.count();
@@ -100,26 +125,42 @@ int DialogErrorModel::count() const
 // DialogModel
 //=================================================================================================
 
-/* explicit */ DialogModel::DialogModel(qt_intf_t * intf, QObject * parent)
-    : QObject(parent), m_intf(intf)
+DialogModel::DialogModel(QObject* parent)
+    : QObject(parent)
 {
-    m_model = new DialogErrorModel(this);
-
-    const vlc_dialog_cbs cbs =
-    {
-        onLogin, onQuestion, onProgress, onCancelled, onProgressUpdated
-    };
-
-    vlc_dialog_provider_set_error_callback(intf, onError, this);
-    vlc_dialog_provider_set_callbacks(intf, &cbs, this);
 }
 
 DialogModel::~DialogModel()
 {
-    vlc_dialog_provider_set_callbacks(m_intf, nullptr, nullptr);
-    vlc_dialog_provider_set_error_callback(m_intf, nullptr, nullptr);
+    if (m_ctx)
+        vlc_dialog_provider_set_callbacks(m_ctx->getIntf(), nullptr, nullptr);
 }
 
+MainCtx* DialogModel::getCtx() const
+{
+    return m_ctx;
+}
+
+void DialogModel::setCtx(MainCtx* ctx)
+{
+    if (ctx == m_ctx)
+        return;
+    if (ctx) {
+        m_ctx = ctx;
+
+        const vlc_dialog_cbs cbs =
+        {
+            onLogin, onQuestion, onProgress, onCancelled, onProgressUpdated
+        };
+        vlc_dialog_provider_set_callbacks(ctx->getIntf(), &cbs, this);
+    } else {
+        if (m_ctx)
+            vlc_dialog_provider_set_callbacks(m_ctx->getIntf(), nullptr, nullptr);
+
+        m_ctx = nullptr;
+    }
+    emit ctxChanged();
+}
 
 //-------------------------------------------------------------------------------------------------
 // Interface
@@ -150,18 +191,6 @@ DialogModel::~DialogModel()
 // Private static functions
 //-------------------------------------------------------------------------------------------------
 
-/* static */ void DialogModel::onError(void * p_data,
-                                       const char * psz_title, const char * psz_text)
-{
-    DialogModel * model = static_cast<DialogModel *>(p_data);
-
-    DialogErrorModel::DialogError error { psz_title, psz_text };
-
-    QMetaObject::invokeMethod(model, [model, error = std::move(error)]()
-    {
-        model->m_model->pushError(error);
-    });
-}
 
 /* static */ void DialogModel::onLogin(void * p_data, vlc_dialog_id * dialogId,
                                        const char * psz_title, const char * psz_text,
@@ -207,13 +236,4 @@ DialogModel::~DialogModel()
     DialogModel * model = static_cast<DialogModel *>(p_data);
 
     emit model->cancelled(dialogId);
-}
-
-//-------------------------------------------------------------------------------------------------
-// Properties
-//-------------------------------------------------------------------------------------------------
-
-DialogErrorModel * DialogModel::model() const
-{
-    return m_model;
 }

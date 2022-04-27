@@ -34,14 +34,6 @@
 
 #include "qt.hpp"
 
-// Forward declarations
-class DialogModel;
-
-
-//-------------------------------------------------------------------------------------------------
-// DialogId
-//-------------------------------------------------------------------------------------------------
-
 class DialogId
 {
     Q_GADGET
@@ -61,9 +53,6 @@ public: // Variables
 
 Q_DECLARE_METATYPE(DialogId)
 
-//-------------------------------------------------------------------------------------------------
-// DialogErrorModel
-//-------------------------------------------------------------------------------------------------
 
 class DialogErrorModel : public QAbstractListModel
 {
@@ -88,7 +77,8 @@ private:
     };
 
 public:
-    explicit DialogErrorModel(QObject * parent = nullptr);
+    explicit DialogErrorModel(qt_intf_t* intf, QObject * parent = nullptr);
+    ~DialogErrorModel();
 
 public: // QAbstractItemModel implementation
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
@@ -101,6 +91,8 @@ public: // QAbstractItemModel reimplementation
 private: // Functions
     void pushError(const DialogError & error);
 
+    static void onError(void * p_data, const char * psz_title, const char * psz_text);
+
 signals:
     void modelChanged();
 
@@ -111,14 +103,8 @@ public: // Properties
 
 private: // Variables
     QList<DialogError> m_data;
-
-private:
-    friend class DialogModel;
+    qt_intf_t* m_intf = nullptr;
 };
-
-//-------------------------------------------------------------------------------------------------
-// DialogModel
-//-------------------------------------------------------------------------------------------------
 
 class DialogModel : public QObject
 {
@@ -126,14 +112,14 @@ class DialogModel : public QObject
 
     Q_ENUMS(QuestionType)
 
-    Q_PROPERTY(DialogErrorModel * model READ model CONSTANT FINAL)
+    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
 
 public: // Enums
     // NOTE: Is it really useful to have this declared here ?
     enum QuestionType { QUESTION_NORMAL, QUESTION_WARNING, QUESTION_CRITICAL };
 
 public:
-    explicit DialogModel(qt_intf_t * intf, QObject * parent = nullptr);
+    explicit DialogModel(QObject *parent = nullptr);
     ~DialogModel();
 
 public: // Interface
@@ -146,8 +132,6 @@ public: // Interface
     Q_INVOKABLE void dismiss(DialogId dialogId);
 
 private: // Static functions
-    static void onError(void * p_data, const char * psz_title, const char * psz_text);
-
     static void onLogin(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
                         const char * psz_text, const char * psz_default_username,
                         bool b_ask_store);
@@ -166,11 +150,11 @@ private: // Static functions
 
     static void onCancelled(void * p_data, vlc_dialog_id * dialogId);
 
+public:
+    MainCtx* getCtx() const;
+    void setCtx(MainCtx*);
 
 signals:
-    void errorBegin();
-    void errorEnd  ();
-
     void login(DialogId dialogId, const QString & title,
                const QString & text, const QString & defaultUsername,
                bool b_ask_store);
@@ -185,13 +169,10 @@ signals:
 
     void cancelled(DialogId dialogId);
 
-public: // Properties
-    DialogErrorModel * model() const;
+    void ctxChanged();
 
-private: // Variables
-    DialogErrorModel * m_model;
-
-    qt_intf_t * m_intf;
+private:
+    MainCtx* m_ctx = nullptr;
 };
 
 #endif // DIALOGMODEL_HPP
