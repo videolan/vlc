@@ -296,6 +296,11 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
+    if (fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+     && fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+     && fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+        return VLC_ENOTSUP;
+
     vout_display_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -330,52 +335,9 @@ static int Open(vout_display_t *vd,
 
     /* Check source format */
     video_format_t fmt;
-    VdpChromaType chroma;
-    VdpYCbCrFormat format;
     VdpStatus err;
 
     video_format_ApplyRotation(&fmt, fmtp);
-
-    if (fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
-     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
-        ;
-    else
-    if (vlc_fourcc_to_vdp_ycc(fmt.i_chroma, &chroma, &format))
-    {
-        uint32_t w, h;
-        VdpBool ok;
-
-        err = vdp_video_surface_query_capabilities(sys->vdp, sys->device,
-                                                   chroma, &ok, &w, &h);
-        if (err != VDP_STATUS_OK)
-        {
-            msg_Err(vd, "%s capabilities query failure: %s", "video surface",
-                    vdp_get_error_string(sys->vdp, err));
-            goto error;
-        }
-        if (!ok || w < fmt.i_width || h < fmt.i_height)
-        {
-            msg_Err(vd, "source video %s not supported", "chroma type");
-            goto error;
-        }
-
-        err = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
-                                   sys->vdp, sys->device, chroma, format, &ok);
-        if (err != VDP_STATUS_OK)
-        {
-            msg_Err(vd, "%s capabilities query failure: %s", "video surface",
-                    vdp_get_error_string(sys->vdp, err));
-            goto error;
-        }
-        if (!ok)
-        {
-            msg_Err(vd, "source video %s not supported", "YCbCr format");
-            goto error;
-        }
-    }
-    else
-        goto error;
 
     /* Check video mixer capabilities */
     {
