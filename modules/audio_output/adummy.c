@@ -109,6 +109,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             fmt->i_frame_length = 1;
             break;
         case VLC_CODEC_DTS:
+        case VLC_CODEC_DTSHD:
         case VLC_CODEC_TRUEHD:
         case VLC_CODEC_MLP:
             fmt->i_format = VLC_CODEC_SPDIFL;
