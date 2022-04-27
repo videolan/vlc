@@ -771,10 +771,14 @@ libvlc_media_player_new_with_logger( libvlc_instance_t *instance,
     var_Create (mp, "logo-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
     var_Create (mp, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
+    var_SetFloat(mp, "contrast", 1.f);
     var_Create (mp, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
+    var_SetFloat(mp, "brightness", 1.f);
     var_Create (mp, "hue", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     var_Create (mp, "saturation", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
+    var_SetFloat(mp, "saturation", 1.f);
     var_Create (mp, "gamma", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
+    var_SetFloat(mp, "gamma", 1.f);
 
      /* Audio */
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
