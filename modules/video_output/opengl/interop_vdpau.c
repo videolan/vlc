@@ -41,9 +41,9 @@
 #include "interop.h"
 
 #define INTEROP_CALL(sys, fct, ...) \
-    _##fct(__VA_ARGS__); \
+    ((sys)->gl.fct(__VA_ARGS__)); \
     { \
-        GLenum ret = ((converter_sys_t*)sys)->gl.GetError(); \
+        GLenum ret = (sys)->gl.GetError(); \
         if (ret != GL_NO_ERROR) \
         { \
             msg_Err(interop->gl, #fct " failed: 0x%x", ret); \
@@ -51,20 +51,19 @@
         } \
     }
 
-static PFNGLVDPAUINITNVPROC                     _glVDPAUInitNV;
-static PFNGLVDPAUFININVPROC                     _glVDPAUFiniNV;
-static PFNGLVDPAUREGISTEROUTPUTSURFACENVPROC    _glVDPAURegisterOutputSurfaceNV;
-static PFNGLVDPAUISSURFACENVPROC                _glVDPAUIsSurfaceNV;
-static PFNGLVDPAUUNREGISTERSURFACENVPROC        _glVDPAUUnregisterSurfaceNV;
-static PFNGLVDPAUGETSURFACEIVNVPROC             _glVDPAUGetSurfaceivNV;
-static PFNGLVDPAUSURFACEACCESSNVPROC            _glVDPAUSurfaceAccessNV;
-static PFNGLVDPAUMAPSURFACESNVPROC              _glVDPAUMapSurfacesNV;
-static PFNGLVDPAUUNMAPSURFACESNVPROC            _glVDPAUUnmapSurfacesNV;
-
 typedef struct {
     vlc_decoder_device *dec_device;
     struct {
         PFNGLGETERRORPROC GetError;
+        PFNGLVDPAUINITNVPROC                     VDPAUInitNV;
+        PFNGLVDPAUFININVPROC                     VDPAUFiniNV;
+        PFNGLVDPAUREGISTEROUTPUTSURFACENVPROC    VDPAURegisterOutputSurfaceNV;
+        PFNGLVDPAUISSURFACENVPROC                VDPAUIsSurfaceNV;
+        PFNGLVDPAUUNREGISTERSURFACENVPROC        VDPAUUnregisterSurfaceNV;
+        PFNGLVDPAUGETSURFACEIVNVPROC             VDPAUGetSurfaceivNV;
+        PFNGLVDPAUSURFACEACCESSNVPROC            VDPAUSurfaceAccessNV;
+        PFNGLVDPAUMAPSURFACESNVPROC              VDPAUMapSurfacesNV;
+        PFNGLVDPAUUNMAPSURFACESNVPROC            VDPAUUnmapSurfacesNV;
     } gl;
 } converter_sys_t;
 
@@ -86,24 +85,24 @@ tc_vdpau_gl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
     if (gl_nv_surface)
     {
-        assert(_glVDPAUIsSurfaceNV(gl_nv_surface) == GL_TRUE);
+        assert(convsys->gl.VDPAUIsSurfaceNV(gl_nv_surface) == GL_TRUE);
 
         GLint state;
         GLsizei num_val;
-        INTEROP_CALL(convsys, glVDPAUGetSurfaceivNV, gl_nv_surface,
+        INTEROP_CALL(convsys, VDPAUGetSurfaceivNV, gl_nv_surface,
                      GL_SURFACE_STATE_NV, 1, &num_val, &state);
         assert(num_val == 1); assert(state == GL_SURFACE_MAPPED_NV);
 
-        INTEROP_CALL(convsys, glVDPAUUnmapSurfacesNV, 1, &gl_nv_surface);
-        INTEROP_CALL(convsys, glVDPAUUnregisterSurfaceNV, gl_nv_surface);
+        INTEROP_CALL(convsys, VDPAUUnmapSurfacesNV, 1, &gl_nv_surface);
+        INTEROP_CALL(convsys, VDPAUUnregisterSurfaceNV, gl_nv_surface);
     }
 
     gl_nv_surface =
-        INTEROP_CALL(convsys, glVDPAURegisterOutputSurfaceNV,
+        INTEROP_CALL(convsys, VDPAURegisterOutputSurfaceNV,
                      (void *)(size_t)p_sys->surface,
                      GL_TEXTURE_2D, interop->tex_count, textures);
-    INTEROP_CALL(convsys, glVDPAUSurfaceAccessNV, gl_nv_surface, GL_READ_ONLY);
-    INTEROP_CALL(convsys, glVDPAUMapSurfacesNV, 1, &gl_nv_surface);
+    INTEROP_CALL(convsys, VDPAUSurfaceAccessNV, gl_nv_surface, GL_READ_ONLY);
+    INTEROP_CALL(convsys, VDPAUMapSurfacesNV, 1, &gl_nv_surface);
 
     p_sys->gl_nv_surface = gl_nv_surface;
     return VLC_SUCCESS;
@@ -114,7 +113,7 @@ Close(struct vlc_gl_interop *interop)
 {
     converter_sys_t *sys = interop->priv;
 
-    _glVDPAUFiniNV();
+    sys->gl.VDPAUFiniNV();
     assert(sys->gl.GetError() == GL_NO_ERROR);
     vlc_decoder_device *dec_device = sys->dec_device;
     vlc_decoder_device_Release(dec_device);
@@ -169,24 +168,24 @@ Open(vlc_object_t *obj)
     }
 
 #define SAFE_GPA(fct) \
-    _##fct = vlc_gl_GetProcAddress(interop->gl, #fct); \
-    if (!_##fct) \
+    sys->gl.fct = vlc_gl_GetProcAddress(interop->gl, "gl" #fct); \
+    if (sys->gl.fct == NULL) \
     { \
         vlc_decoder_device_Release(dec_device); \
         return VLC_EGENERIC; \
     }
-    SAFE_GPA(glVDPAUInitNV);
-    SAFE_GPA(glVDPAUFiniNV);
-    SAFE_GPA(glVDPAURegisterOutputSurfaceNV);
-    SAFE_GPA(glVDPAUIsSurfaceNV);
-    SAFE_GPA(glVDPAUUnregisterSurfaceNV);
-    SAFE_GPA(glVDPAUGetSurfaceivNV);
-    SAFE_GPA(glVDPAUSurfaceAccessNV);
-    SAFE_GPA(glVDPAUMapSurfacesNV);
-    SAFE_GPA(glVDPAUUnmapSurfacesNV);
+    SAFE_GPA(VDPAUInitNV);
+    SAFE_GPA(VDPAUFiniNV);
+    SAFE_GPA(VDPAURegisterOutputSurfaceNV);
+    SAFE_GPA(VDPAUIsSurfaceNV);
+    SAFE_GPA(VDPAUUnregisterSurfaceNV);
+    SAFE_GPA(VDPAUGetSurfaceivNV);
+    SAFE_GPA(VDPAUSurfaceAccessNV);
+    SAFE_GPA(VDPAUMapSurfacesNV);
+    SAFE_GPA(VDPAUUnmapSurfacesNV);
 #undef SAFE_GPA
 
-    INTEROP_CALL(sys, glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
+    INTEROP_CALL(sys, VDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
     /* The pictures are uploaded upside-down */
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
