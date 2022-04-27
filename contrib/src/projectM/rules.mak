@@ -28,6 +28,7 @@ ifdef HAVE_WIN32
 endif
 	$(APPLY) $(SRC)/projectM/gcc6.patch
 	$(APPLY) $(SRC)/projectM/clang6.patch
+	$(APPLY) $(SRC)/projectM/missing-includes.patch
 	$(MOVE)
 
 DEPS_projectM = glew $(DEPS_glew)

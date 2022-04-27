@@ -1,0 +1,10 @@
+--- projectM/Renderer/Waveform.cpp.orig	2022-04-27 10:54:35.706616587 +0300
++++ projectM/Renderer/Waveform.cpp	2022-04-27 10:54:43.374663065 +0300
+@@ -17,6 +17,7 @@
+ 
+ #include "Waveform.hpp"
+ #include <algorithm>
++#include <functional>
+ #include "BeatDetect.hpp"
+ 
+ Waveform::Waveform(int samples)
