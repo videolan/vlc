@@ -41,7 +41,6 @@ typedef struct
 {
     struct vlc_vdp_device *device;
     VdpVideoMixer mixer;
-    VdpChromaType chroma;
     picture_pool_t *pool;
 
     picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
@@ -106,7 +105,7 @@ static VdpStatus MixerSetupColors(filter_t *filter, const VdpProcamp *procamp,
 }
 
 /** Create VDPAU video mixer */
-static VdpVideoMixer MixerCreate(filter_t *filter)
+static VdpVideoMixer MixerCreate(filter_t *filter, VdpChromaType chroma)
 {
     vlc_vdp_mixer_t *sys = filter->p_sys;
     vdp_t *vdp = sys->device->vdp;
@@ -199,7 +198,7 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
     };
     uint32_t width = filter->fmt_in.video.i_width;
     uint32_t height = filter->fmt_in.video.i_height;
-    const void *values[3] = { &width, &height, &sys->chroma, };
+    const void *values[3] = { &width, &height, &chroma, };
 
     err = vdp_video_mixer_create(vdp, device, featc, featv,
                                  3, parms, values, &mixer);
@@ -670,14 +669,16 @@ static int OutputOpen(filter_t *filter)
 
     filter->p_sys = sys;
 
+    VdpChromaType chroma;
+
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
-        sys->chroma = VDP_CHROMA_TYPE_444;
+        chroma = VDP_CHROMA_TYPE_444;
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
-        sys->chroma = VDP_CHROMA_TYPE_422;
+        chroma = VDP_CHROMA_TYPE_422;
     else
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_420)
-        sys->chroma = VDP_CHROMA_TYPE_420;
+        chroma = VDP_CHROMA_TYPE_420;
     else
     {
         vlc_decoder_device_Release(dec_device);
@@ -702,7 +703,7 @@ static int OutputOpen(filter_t *filter)
     }
 
     /* Create the video-to-output mixer */
-    sys->mixer = MixerCreate(filter);
+    sys->mixer = MixerCreate(filter, chroma);
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         picture_pool_Release(sys->pool);
