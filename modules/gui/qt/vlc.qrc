@@ -354,7 +354,7 @@
         <file alias="LanguageMenu.qml">player/qml/LanguageMenu.qml</file>
         <file alias="ControlLayout.qml">player/qml/ControlLayout.qml</file>
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
-        <file alias="PlayerPlaylistVisiblityFSM.qml">player/qml/PlayerPlaylistVisiblityFSM.qml</file>
+        <file alias="PlayerPlaylistVisibilityFSM.qml">player/qml/PlayerPlaylistVisibilityFSM.qml</file>
     </qresource>
     <qresource prefix="/player/controlbarcontrols">
         <file alias="HighResolutionTimeWidget.qml">player/qml/controlbarcontrols/HighResolutionTimeWidget.qml</file>

@@ -118,7 +118,7 @@ FocusScope {
         }
     }
 
-    PlayerPlaylistVisiblityFSM {
+    PlayerPlaylistVisibilityFSM {
         id: playlistVisibility
 
         onShowPlaylist: {
