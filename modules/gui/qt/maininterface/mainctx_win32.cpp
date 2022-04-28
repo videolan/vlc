@@ -523,7 +523,7 @@ InterfaceWindowHandlerWin32::~InterfaceWindowHandlerWin32()
     QApplication::instance()->removeNativeEventFilter(this);
 }
 
-void InterfaceWindowHandlerWin32::toggleWindowVisiblity()
+void InterfaceWindowHandlerWin32::toggleWindowVisibility()
 {
 
     switch ( m_window->visibility() )

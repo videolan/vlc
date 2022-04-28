@@ -82,7 +82,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
              this, &InterfaceWindowHandler::setInterfaceFullScreen);
 
     connect( m_mainCtx, &MainCtx::toggleWindowVisibility,
-             this, &InterfaceWindowHandler::toggleWindowVisiblity);
+             this, &InterfaceWindowHandler::toggleWindowVisibility);
 
     connect( m_mainCtx, &MainCtx::setInterfaceVisibible,
              this, &InterfaceWindowHandler::setInterfaceVisible);
@@ -271,7 +271,7 @@ void InterfaceWindowHandler::onVideoEmbedChanged(bool embed)
 }
 
 
-void InterfaceWindowHandler::toggleWindowVisiblity()
+void InterfaceWindowHandler::toggleWindowVisibility()
 {
     switch ( m_window->visibility() )
     {
