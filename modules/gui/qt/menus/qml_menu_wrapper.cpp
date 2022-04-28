@@ -516,6 +516,79 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     m_positioner.popup(m_menu.get(), position, above);
 }
 
+// Tracks
+
+// QmlTrackMenu
+
+/* explicit */ QmlTrackMenu::QmlTrackMenu(QObject * parent) : QObject(parent) {}
+
+// Interface
+
+/* Q_INVOKABLE */ void QmlTrackMenu::popup(const QPoint & position)
+{
+    m_menu = std::make_unique<QMenu>();
+
+    beforePopup(m_menu.get());
+
+    m_menu->popup(position);
+}
+
+// QmlSubtitleMenu
+
+/* explicit */ QmlSubtitleMenu::QmlSubtitleMenu(QObject * parent) : QmlTrackMenu(parent) {}
+
+// Protected QmlTrackMenu implementation
+
+void QmlSubtitleMenu::beforePopup(QMenu * menu) /* override */
+{
+    menu->addAction(qtr("Open file"), this, [this]()
+    {
+        emit triggered(Open);
+    });
+
+    menu->addAction(QIcon(":/sync.svg"), qtr("Synchronize"), this, [this]()
+    {
+        emit triggered(Synchronize);
+    });
+
+    menu->addAction(QIcon(":/download.svg"), qtr("Search online"), this, [this]()
+    {
+        emit triggered(Download);
+    });
+
+    menu->addSeparator();
+
+    QAction * action = menu->addAction(qtr("Select multiple"), this, [this]()
+    {
+        TrackListModel * tracks = this->m_player->getSubtitleTracks();
+
+        tracks->setMultiSelect(!(tracks->getMultiSelect()));
+    });
+
+    action->setCheckable(true);
+
+    action->setChecked(m_player->getSubtitleTracks()->getMultiSelect());
+}
+
+// QmlAudioMenu
+
+/* explicit */ QmlAudioMenu::QmlAudioMenu(QObject * parent) : QmlTrackMenu(parent) {}
+
+// Protected QmlTrackMenu implementation
+
+void QmlAudioMenu::beforePopup(QMenu * menu) /* override */
+{
+    menu->addAction(qtr("Open file"), this, [this]()
+    {
+        emit triggered(Open);
+    });
+
+    menu->addAction(QIcon(":/sync.svg"), qtr("Synchronize"), this, [this]()
+    {
+        emit triggered(Synchronize);
+    });
+}
+
 BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
     : QObject(parent)
 {}

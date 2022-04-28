@@ -104,6 +104,7 @@
         <file alias="file_black.svg">pixmaps/types/file_black.svg</file>
     </qresource>
     <qresource prefix="/">
+        <file alias="download.svg">pixmaps/download.svg</file>
         <file alias="update.svg">pixmaps/update.svg</file>
         <file alias="noart.png">pixmaps/noart.png</file>
         <file alias="noart64.png">pixmaps/noart-64.png</file>
@@ -123,6 +124,7 @@
         <file alias="noart_videoCover.svg">pixmaps/noart_videoCover.svg</file>
         <file alias="play_button.svg">pixmaps/play_button.svg</file>
         <file alias="back.svg">pixmaps/back.svg</file>
+        <file alias="sync.svg">pixmaps/sync.svg</file>
         <file alias="theme_dark.svg">pixmaps/theme_dark.svg</file>
         <file alias="theme_daynight.svg">pixmaps/theme_daynight.svg</file>
         <file alias="theme_light.svg">pixmaps/theme_light.svg</file>

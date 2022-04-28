@@ -237,6 +237,62 @@ private:
     std::unique_ptr<RendererMenu> m_menu;
 };
 
+// Tracks
+
+class QmlTrackMenu : public QObject
+{
+    Q_OBJECT
+
+public: // Enums
+    enum Action
+    {
+        Open,
+        Synchronize,
+        Download
+    };
+
+    Q_ENUM(Action)
+
+public:
+    QmlTrackMenu(QObject * parent = nullptr);
+
+public: // Interface
+    Q_INVOKABLE void popup(const QPoint & position);
+
+protected: // Abstract functions
+    virtual void beforePopup(QMenu * menu) = 0;
+
+signals:
+    void triggered(Action action);
+
+private:
+    std::unique_ptr<QMenu> m_menu;
+};
+
+class QmlSubtitleMenu : public QmlTrackMenu
+{
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(PlayerController *, player, nullptr)
+
+public:
+    QmlSubtitleMenu(QObject * parent = nullptr);
+
+protected: // QmlTrackMenu implementation
+    void beforePopup(QMenu * menu) override;
+};
+
+class QmlAudioMenu : public QmlTrackMenu
+{
+    Q_OBJECT
+
+public:
+    QmlAudioMenu(QObject * parent = nullptr);
+
+protected: // QmlTrackMenu implementation
+    void beforePopup(QMenu * menu) override;
+};
+
 class BaseMedialibMenu : public QObject
 {
     Q_OBJECT
@@ -422,7 +478,6 @@ public slots:
 private:
     std::unique_ptr<QMenu> m_menu;
 };
-
 
 class PlaylistContextMenu : public QObject {
     Q_OBJECT
