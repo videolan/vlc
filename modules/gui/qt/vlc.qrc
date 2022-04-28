@@ -32,6 +32,7 @@
         <file alias="ViewDragAutoScrollHandler.qml">util/qml/ViewDragAutoScrollHandler.qml</file>
         <file alias="BindingRev8.qml">util/qml/BindingRev8.qml</file>
         <file alias="BindingRev14.qml">util/qml/BindingRev14.qml</file>
+        <file alias="VanillaObject.qml">util/qml/VanillaObject.qml</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="faster.svg">pixmaps/faster.svg</file>
