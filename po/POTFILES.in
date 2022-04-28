@@ -873,6 +873,7 @@ modules/gui/qt/player/qml/LanguageMenu.qml
 modules/gui/qt/player/qml/Player.qml
 modules/gui/qt/player/qml/ResumeDialog.qml
 modules/gui/qt/player/qml/TopBar.qml
+modules/gui/qt/player/qml/TracksPageSubtitle.qml
 modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml
