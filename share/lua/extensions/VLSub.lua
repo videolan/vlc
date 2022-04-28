@@ -1543,6 +1543,10 @@ function download_subtitles()
     if not target or not file_touch(target) then
       if openSub.conf.dirPath then
         target =  openSub.conf.dirPath..slash..subfileName
+        -- If the file still can't be written to, use tmp placeholder
+        if not file_touch(target) then
+          target = openSub.conf.dirPath..slash.."vlcsub."..item.SubFormat
+        end
         message = "<br>"..
           warn_tag(lang["mess_save_warn"].." &nbsp;"..
           "<a href='"..vlc.strings.make_uri(
