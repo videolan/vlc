@@ -670,6 +670,7 @@ static int OutputOpen(filter_t *filter)
     filter->p_sys = sys;
 
     VdpChromaType chroma;
+    struct vlc_video_context *vctx_out;
 
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
         chroma = VDP_CHROMA_TYPE_444;
@@ -686,19 +687,18 @@ static int OutputOpen(filter_t *filter)
     }
 
     sys->device = GetVDPAUOpaqueDevice(dec_device);
-    filter->vctx_out = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VDPAU,
-                                                0, &vdpau_vctx_ops);
+    vctx_out = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VDPAU,
+                                        0, &vdpau_vctx_ops);
     vlc_decoder_device_Release(dec_device);
-    if (unlikely(filter->vctx_out == NULL))
+    if (unlikely(vctx_out == NULL))
         return VLC_EGENERIC;
 
     /* Allocate the output surface picture pool */
-    sys->pool = OutputPoolAlloc(VLC_OBJECT(filter), filter->vctx_out,
+    sys->pool = OutputPoolAlloc(VLC_OBJECT(filter), vctx_out,
                                 &filter->fmt_out.video);
     if (sys->pool == NULL)
     {
-        vlc_video_context_Release(filter->vctx_out);
-        filter->vctx_out = NULL;
+        vlc_video_context_Release(vctx_out);
         return VLC_EGENERIC;
     }
 
@@ -707,8 +707,7 @@ static int OutputOpen(filter_t *filter)
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         picture_pool_Release(sys->pool);
-        vlc_video_context_Release(filter->vctx_out);
-        filter->vctx_out = NULL;
+        vlc_video_context_Release(vctx_out);
         return VLC_EGENERIC;
     }
 
@@ -721,6 +720,7 @@ static int OutputOpen(filter_t *filter)
     sys->procamp.hue = 0.f;
 
     filter->ops = &filter_output_opaque_ops;
+    filter->vctx_out = vctx_out;
     return VLC_SUCCESS;
 }
 
