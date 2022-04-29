@@ -669,18 +669,12 @@ static int OutputOpen(filter_t *filter)
 
     filter->p_sys = sys;
 
-    VdpChromaType chroma;
+    const VdpChromaType *chroma;
     struct vlc_video_context *vctx_out;
 
-    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
-        chroma = VDP_CHROMA_TYPE_444;
-    else
-    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
-        chroma = VDP_CHROMA_TYPE_422;
-    else
-    if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_420)
-        chroma = VDP_CHROMA_TYPE_420;
-    else
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420)
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
@@ -703,7 +697,9 @@ static int OutputOpen(filter_t *filter)
     }
 
     /* Create the video-to-output mixer */
-    sys->mixer = MixerCreate(filter, chroma);
+    chroma = vlc_video_context_GetPrivate(filter->vctx_in,
+                                          VLC_VIDEO_CONTEXT_VDPAU);
+    sys->mixer = MixerCreate(filter, *chroma);
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         picture_pool_Release(sys->pool);
