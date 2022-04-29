@@ -137,7 +137,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
             return VLC_EGENERIC;
         }
 
-        if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) != VLC_SUCCESS )
+        if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
         {
             block_Release( p_block );
             return VLCDEC_SUCCESS;
@@ -284,7 +284,7 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
             return VLC_EGENERIC;
         }
 
-        if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) != VLC_SUCCESS )
+        if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
         {
             vlc_video_context_Release(p_sys->vctx);
             vlc_decoder_device_Release(dec_dev);
