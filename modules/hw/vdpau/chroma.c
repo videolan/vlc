@@ -650,8 +650,9 @@ static const struct vlc_filter_operations filter_output_opaque_ops = {
 
 static int OutputOpen(filter_t *filter)
 {
-    if (filter->fmt_out.video.i_chroma != VLC_CODEC_VDPAU_OUTPUT)
-        return VLC_EGENERIC;
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO
+     || filter->fmt_out.video.i_chroma != VLC_CODEC_VDPAU_OUTPUT)
+        return VLC_ENOTSUP;
 
     assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT
         || filter->fmt_in.video.orientation == filter->fmt_out.video.orientation);
@@ -671,14 +672,6 @@ static int OutputOpen(filter_t *filter)
 
     const VdpChromaType *chroma;
     struct vlc_video_context *vctx_out;
-
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420)
-    {
-        vlc_decoder_device_Release(dec_device);
-        return VLC_EGENERIC;
-    }
 
     sys->device = GetVDPAUOpaqueDevice(dec_device);
     vctx_out = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VDPAU,
@@ -752,9 +745,7 @@ static int YCbCrOpen(filter_t *filter)
     VdpChromaType type;
     VdpYCbCrFormat format;
 
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO)
         return VLC_ENOTSUP;
     if (filter->vctx_in == NULL)
         return VLC_EINVAL;

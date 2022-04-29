@@ -1204,17 +1204,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_IMM5, "Infinity IMM5"),
         A("IMM5"),
 
-    B(VLC_CODEC_VDPAU_VIDEO_420, "4:2:0 VDPAU opaque"),
-        A("VDV0"),
+    B(VLC_CODEC_VDPAU_VIDEO, "VDPAU video"),
 
-    B(VLC_CODEC_VDPAU_VIDEO_422, "4:2:2 VDPAU opaque"),
-        A("VDV2"),
-
-    B(VLC_CODEC_VDPAU_VIDEO_444, "4:4:4 VDPAU opaque"),
-        A("VDV4"),
-
-    B(VLC_CODEC_VDPAU_OUTPUT, "VDPAU opaque"),
-        A("VDVR"),
+    B(VLC_CODEC_VDPAU_OUTPUT, "VDPAU output"),
 
     B(VLC_CODEC_VAAPI_420, "4:2:0 VAAPI opaque"),
         A("VAOP"),

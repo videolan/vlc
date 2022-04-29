@@ -397,12 +397,8 @@
 #define VLC_CODEC_GREY_16L        VLC_FOURCC('G','R','F','L')
 #define VLC_CODEC_GREY_16B        VLC_FOURCC('G','R','F','B')
 
-/* VDPAU video surface YCbCr 4:2:0 */
-#define VLC_CODEC_VDPAU_VIDEO_420 VLC_FOURCC('V','D','V','0')
-/* VDPAU video surface YCbCr 4:2:2 */
-#define VLC_CODEC_VDPAU_VIDEO_422 VLC_FOURCC('V','D','V','2')
-/* VDPAU video surface YCbCr 4:4:4 */
-#define VLC_CODEC_VDPAU_VIDEO_444 VLC_FOURCC('V','D','V','4')
+/* VDPAU video surface YCbCr */
+#define VLC_CODEC_VDPAU_VIDEO     VLC_FOURCC('V','D','V','Y')
 /* VDPAU output surface RGBA */
 #define VLC_CODEC_VDPAU_OUTPUT    VLC_FOURCC('V','D','O','R')
 

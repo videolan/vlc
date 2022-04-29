@@ -136,9 +136,7 @@ static int Open(vout_display_t *vd,
     {
         switch (vd->source->i_chroma)
         {
-            case VLC_CODEC_VDPAU_VIDEO_444:
-            case VLC_CODEC_VDPAU_VIDEO_422:
-            case VLC_CODEC_VDPAU_VIDEO_420:
+            case VLC_CODEC_VDPAU_VIDEO:
             {
                 /* Force the option only if it was not previously set */
                 if (gl_name == NULL || gl_name[0] == 0

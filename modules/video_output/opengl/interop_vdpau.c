@@ -131,9 +131,7 @@ Open(vlc_object_t *obj)
 
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (GetVDPAUOpaqueDevice(dec_device) == NULL
-     || (interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-      && interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-      && interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+     || interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO
      || !vlc_gl_HasExtension(&extension_vt, "GL_NV_vdpau_interop"))
     {
         vlc_decoder_device_Release(dec_device);

@@ -117,9 +117,7 @@ VdpStatus vlc_vdp_video_attach(struct vlc_video_context *vctx,
     if (unlikely(field == NULL))
         return VDP_STATUS_RESOURCES;
 
-    assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-        || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
-        || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_444);
+    assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO);
     assert(pic->context == NULL);
     pic->context = &field->context;
     return VDP_STATUS_OK;

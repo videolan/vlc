@@ -296,9 +296,7 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-    if (fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-     && fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+    if (fmtp->i_chroma != VLC_CODEC_VDPAU_VIDEO)
         return VLC_ENOTSUP;
 
     vout_display_sys_t *sys = malloc(sizeof (*sys));

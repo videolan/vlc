@@ -117,9 +117,7 @@ static int Open(filter_t *filter)
     if ( filter->vctx_in == NULL ||
          vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_VDPAU )
         return VLC_EGENERIC;
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO)
         return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
