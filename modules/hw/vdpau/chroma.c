@@ -743,21 +743,6 @@ static picture_t *VideoExport_Filter(filter_t *filter, picture_t *src)
     return VideoExport(filter, src, dst, sys->format);
 }
 
-static bool ChromaMatches(VdpChromaType vdp_type, vlc_fourcc_t vlc_chroma)
-{
-    switch (vlc_chroma)
-    {
-        case VLC_CODEC_VDPAU_VIDEO_420:
-            return vdp_type == VDP_CHROMA_TYPE_420;
-        case VLC_CODEC_VDPAU_VIDEO_422:
-            return vdp_type == VDP_CHROMA_TYPE_422;
-        case VLC_CODEC_VDPAU_VIDEO_444:
-            return vdp_type == VDP_CHROMA_TYPE_444;
-        default:
-            return false;
-    }
-}
-
 static const struct vlc_filter_operations filter_ycbcr_ops = {
     .filter_video = VideoExport_Filter,
 };
@@ -767,8 +752,18 @@ static int YCbCrOpen(filter_t *filter)
     VdpChromaType type;
     VdpYCbCrFormat format;
 
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+        return VLC_ENOTSUP;
+    if (filter->vctx_in == NULL)
+        return VLC_EINVAL;
+
+    const VdpChromaType *chroma = vlc_video_context_GetPrivate(filter->vctx_in,
+                                                      VLC_VIDEO_CONTEXT_VDPAU);
+
     if (!vlc_fourcc_to_vdp_ycc(filter->fmt_out.video.i_chroma, &type, &format)
-      || !ChromaMatches(type, filter->fmt_in.video.i_chroma))
+     || type != *chroma)
         return VLC_EGENERIC;
 
     if (filter->fmt_in.video.i_visible_width
