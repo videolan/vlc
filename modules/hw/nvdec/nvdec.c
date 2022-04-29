@@ -397,7 +397,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
 
     ret = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
-    return (ret == VLC_SUCCESS) ? i_nb_surface : 0;
+    return (ret == 0) ? i_nb_surface : 0;
 
 cuda_error:
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
@@ -995,18 +995,19 @@ static int OpenDecoder(vlc_object_t *p_this)
     output_chromas[chroma_idx++] = MapSurfaceChroma(cudaChroma, i_depth_luma);
     output_chromas[chroma_idx++] = 0;
 
+    result = -1;
     for (chroma_idx = 0; output_chromas[chroma_idx] != 0; chroma_idx++)
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma = output_chromas[chroma_idx];
         result = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
-        if (result == VLC_SUCCESS)
+        if (result == 0)
         {
             msg_Dbg(p_dec, "using chroma %4.4s", (char*)&p_dec->fmt_out.video.i_chroma);
             break;
         }
         msg_Warn(p_dec, "Failed to use output chroma %4.4s", (char*)&p_dec->fmt_out.video.i_chroma);
     }
-    if (result != VLC_SUCCESS)
+    if (result != 0)
         goto error;
 
     int deinterlace_mode    = var_InheritInteger(p_dec, "nvdec-deint");
