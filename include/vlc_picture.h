@@ -91,7 +91,7 @@ struct vlc_video_context_operations
 enum vlc_video_context_type
 {
     VLC_VIDEO_CONTEXT_VAAPI = 1, //!< private: vaapi_vctx* or empty
-    VLC_VIDEO_CONTEXT_VDPAU,     //!< empty
+    VLC_VIDEO_CONTEXT_VDPAU,     //!< private: chroma type (YUV) or empty (RGB)
     VLC_VIDEO_CONTEXT_DXVA2,     //!< private: d3d9_video_context_t*
     VLC_VIDEO_CONTEXT_D3D11VA,   //!< private: d3d11_video_context_t*
     VLC_VIDEO_CONTEXT_AWINDOW,   //!< private: android_video_context_t*

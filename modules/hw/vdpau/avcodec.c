@@ -146,7 +146,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, c
     (void) desc;
     void *func;
     VdpStatus err;
-    VdpChromaType type;
+    VdpChromaType type, *chroma;
     uint32_t width, height;
 
     if (av_vdpau_get_surface_parameters(avctx, &type, &width, &height))
@@ -193,13 +193,16 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, c
        return VLC_ENOMEM;
 
     sys->vctx = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VDPAU,
-                                         0, &vdpau_vctx_ops);
+                                         sizeof (VdpChromaType),
+                                         &vdpau_vctx_ops);
     if (sys->vctx == NULL)
     {
         free(sys);
         return VLC_ENOMEM;
     }
 
+    chroma = vlc_video_context_GetPrivate(sys->vctx, VLC_VIDEO_CONTEXT_VDPAU);
+    *chroma = type;
     sys->type = type;
     sys->width = width;
     sys->height = height;
