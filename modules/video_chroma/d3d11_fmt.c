@@ -97,8 +97,7 @@ void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys)
 }
 
 /* map texture planes to resource views */
-#undef D3D11_AllocateResourceView
-int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
+int D3D11_AllocateResourceView(struct vlc_logger *obj, ID3D11Device *d3ddevice,
                               const d3d_format_t *format,
                               ID3D11Texture2D *p_texture[DXGI_MAX_SHADER_VIEW], UINT slice_index,
                               ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW])
@@ -132,7 +131,7 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
         {
             hr = ID3D11Device_CreateShaderResourceView(d3ddevice, (ID3D11Resource*)p_texture[i], &resviewDesc, &renderSrc[i]);
             if (FAILED(hr)) {
-                msg_Err(obj, "Could not Create the Texture ResourceView %d slice %d. (hr=0x%lX)", i, slice_index, hr);
+                vlc_error(obj, "Could not Create the Texture ResourceView %d slice %d. (hr=0x%lX)", i, slice_index, hr);
                 break;
             }
         }
@@ -991,7 +990,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
         return NULL;
     }
 
-    D3D11_AllocateResourceView(obj, dev_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+    D3D11_AllocateResourceView(vlc_object_logger(obj), dev_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
     if (shared)
     {

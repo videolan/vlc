@@ -325,7 +325,7 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
             return VLC_EGENERIC;
         }
 
-        if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->picQuad.generic.textureFormat,
+        if (D3D11_AllocateResourceView(vlc_object_logger(vd), sys->d3d_dev->d3ddevice, sys->picQuad.generic.textureFormat,
                                     textures, 0, sys->stagingSys.renderSrc))
         {
             msg_Err(vd, "Failed to allocate the staging shader view");
@@ -1333,7 +1333,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->regionQuad.generic.textureFormat,
+            if (D3D11_AllocateResourceView(vlc_object_logger(vd), sys->d3d_dev->d3ddevice, sys->regionQuad.generic.textureFormat,
                                            d3dquad->picSys.texture, 0,
                                            d3dquad->picSys.renderSrc)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",

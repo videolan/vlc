@@ -962,7 +962,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                                     d3d11Res, d3d11Res, d3d11Res, d3d11Res
                                 };
 
-                                if (D3D11_AllocateResourceView(p_dec, dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
+                                if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
                                                                 tex, slice, p_sys->cachedSRV[slice]) != VLC_SUCCESS)
                                 {
                                     d3d11Res->Release();
@@ -988,7 +988,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
                                 p_sys->cachedSRV[sliceIndex][j]->Release();
                         }
 
-                        if (D3D11_AllocateResourceView(p_dec, dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
+                        if (D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, p_sys->cfg,
                                                        tex, sliceIndex, p_sys->cachedSRV[sliceIndex]) != VLC_SUCCESS)
                         {
                             d3d11Res->Release();

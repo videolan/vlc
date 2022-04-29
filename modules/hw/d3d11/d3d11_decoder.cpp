@@ -191,7 +191,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
         if (src_sys->renderSrc[j])
             src_sys->renderSrc[j]->Release();
     }
-    D3D11_AllocateResourceView(p_dec, dev_sys->d3d_dev.d3ddevice, p_sys->output_format,
+    D3D11_AllocateResourceView(vlc_object_logger(p_dec), dev_sys->d3d_dev.d3ddevice, p_sys->output_format,
                                src_sys->texture, src_sys->slice_index, src_sys->renderSrc);
 
     picture_Hold( p_pic ); // hold the picture we got from the block
