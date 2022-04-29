@@ -1255,6 +1255,12 @@ openSub = {
   end,
   getMovieInfo = function()
   -- Clean video file name and check for season/episode pattern in title
+    local movie_info_patterns = {
+      "(.+)[sS](%d+)[eE](%d+).*",
+      "(.+)(%d+)[xX](%d%d).*",
+      "(.+)[%s%p]*[Ss]eason[%s%p]*(%d+)[%s%p]*[Ee]pisode[%s%p]*(%d+).*",
+      "(.+)[%s%p]*[Ss]eries[%s%p]*(%d+)[%s%p]*[Ee]pisode[%s%p]*(%d+).*"
+    }
     if not openSub.file.name then
       openSub.movie.title = ""
       openSub.movie.seasonNumber = ""
@@ -1262,14 +1268,21 @@ openSub = {
       return false
     end
 
-    local showName, seasonNumber, episodeNumber = string.match(
-      openSub.file.cleanName or "",
-      "(.+)[sS](%d%d)[eE](%d%d).*")
+    local item = openSub.getInputItem()
+    -- try cleaned file name as well as meta information (e.g. from youtube)
+    local names = { openSub.file.cleanName, item:metas()['title'] }
 
-    if not showName then
-      showName, seasonNumber, episodeNumber = string.match(
-      openSub.file.cleanName or "",
-      "(.+)(%d)[xX](%d%d).*")
+    local showName, seasonNumber, episodeNumber
+    for _,name in ipairs(names) do
+      if name then 
+        -- try matching the pattern, stop if a match is found
+        for _,pattern in ipairs(movie_info_patterns) do
+          showName, seasonNumber, episodeNumber = string.match(name, pattern)
+          if showName then
+            break
+          end
+        end
+      end
     end
 
     if showName then
