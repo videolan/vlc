@@ -45,10 +45,15 @@ struct output_data
     vout_window_t *owner;
     struct wl_output *wl_output;
 
-    uint32_t name;
+    uint32_t id;
     uint32_t version;
+    char *name;
+    char *description;
+
     struct wl_list node;
 };
+
+static void output_done_cb(void *data, struct wl_output *output);
 
 static void output_geometry_cb(void *data, struct wl_output *output,
                                int32_t x, int32_t y, int32_t w, int32_t h,
@@ -57,19 +62,19 @@ static void output_geometry_cb(void *data, struct wl_output *output,
 {
     struct output_data *od = data;
     vout_window_t *wnd = od->owner;
-    char idstr[11];
-    char *name;
 
     msg_Dbg(wnd, "output %"PRIu32" geometry: %"PRId32"x%"PRId32"mm"
             "+%"PRId32"+%"PRId32", subpixel %"PRId32", transform %"PRId32,
-            od->name, w, h, x, y, sp, transform);
+            od->id, w, h, x, y, sp, transform);
 
-    sprintf(idstr, "%"PRIu32, od->name);
-    if (likely(asprintf(&name, "%s - %s", make, model) >= 0))
-    {
-        vout_window_ReportOutputDevice(wnd, idstr, name);
-        free(name);
-    }
+    free(od->description);
+    free(od->name);
+
+    if (unlikely(asprintf(&od->name, "%"PRIu32, od->id) < 0))
+        od->name = NULL;
+    if (unlikely(asprintf(&od->description, "%s - %s", make, model) < 0))
+        od->description = NULL;
+
     (void) output;
 }
 
@@ -81,13 +86,27 @@ static void output_mode_cb(void *data, struct wl_output *output,
     div_t d = div(vr, 1000);
 
     msg_Dbg(wnd, "output %"PRIu32" mode: 0x%"PRIx32" %"PRId32"x%"PRId32
-            ", %d.%03d Hz", od->name, flags, w, h, d.quot, d.rem);
+            ", %d.%03d Hz", od->id, flags, w, h, d.quot, d.rem);
+
+    if (od->version < WL_OUTPUT_DONE_SINCE_VERSION)
+        output_done_cb(data, output); /* Ancient display server */
+
     (void) output;
 }
 
 static void output_done_cb(void *data, struct wl_output *output)
 {
-    (void) data; (void) output;
+    struct output_data *od = data;
+    vout_window_t *wnd = od->owner;
+    const char *name = od->name;
+    const char *description = od->description;
+
+    if (unlikely(description == NULL))
+        description = name;
+    if (likely(name != NULL))
+        vout_window_ReportOutputDevice(wnd, name, description);
+
+    (void) output;
 }
 
 static void output_scale_cb(void *data, struct wl_output *output, int32_t f)
@@ -95,7 +114,7 @@ static void output_scale_cb(void *data, struct wl_output *output, int32_t f)
     struct output_data *od = data;
     vout_window_t *wnd = od->owner;
 
-    msg_Dbg(wnd, "output %"PRIu32" scale: %"PRId32, od->name, f);
+    msg_Dbg(wnd, "output %"PRIu32" scale: %"PRId32, od->id, f);
     (void) output;
 }
 
@@ -140,8 +159,10 @@ int output_create(struct output_list *ol, struct wl_registry *registry,
     }
 
     od->owner = ol->owner;
-    od->name = name;
+    od->id = name;
     od->version = version;
+    od->name = NULL;
+    od->description = NULL;
 
     wl_output_add_listener(od->wl_output, &wl_output_cbs, od);
     wl_list_insert(&ol->outputs, &od->node);
@@ -150,10 +171,12 @@ int output_create(struct output_list *ol, struct wl_registry *registry,
 
 static void output_destroy(struct output_list *ol, struct output_data *od)
 {
-    char idstr[11];
+    free(od->description);
 
-    sprintf(idstr, "%"PRIu32, od->name);
-    vout_window_ReportOutputDevice(ol->owner, idstr, NULL);
+    if (od->name != NULL) {
+        vout_window_ReportOutputDevice(ol->owner, od->name, NULL);
+        free(od->name);
+    }
 
     wl_list_remove(&od->node);
 
@@ -174,7 +197,7 @@ int output_destroy_by_name(struct output_list *ol, uint32_t name)
 
     wl_list_for_each(od, list, node)
     {
-        if (od->name == name)
+        if (od->id == name)
         {
             output_destroy(ol, od);
             /* Note: return here so no needs for safe walk variant */
