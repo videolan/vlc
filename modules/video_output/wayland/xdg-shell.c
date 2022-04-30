@@ -557,8 +557,12 @@ static void registry_global_remove_cb(void *data, struct wl_registry *registry,
 
     if (seat_destroy_one(&sys->seats, name) == 0)
         return;
-    if (output_destroy_by_name(sys->outputs, name) == 0)
+
+    struct wl_output *output = output_find_by_id(sys->outputs, name);
+    if (output != NULL) {
+        output_destroy(sys->outputs, output);
         return;
+    }
 
     (void) registry;
 }
