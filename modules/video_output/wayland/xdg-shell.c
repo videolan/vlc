@@ -497,7 +497,7 @@ struct registry_handler
 static const struct registry_handler global_handlers[] =
 {
      { "wl_compositor", register_wl_compositor, 2 },
-     { "wl_output", register_wl_output, 1},
+     { "wl_output", register_wl_output, 4 },
      { "wl_seat", register_wl_seat, UINT32_C(-1) },
 #ifndef XDG_SHELL
      { "wl_shell", register_wl_shell, 1 },

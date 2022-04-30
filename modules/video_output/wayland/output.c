@@ -33,8 +33,6 @@
 
 #include "output.h"
 
-/* TODO: xdg_output protocol */
-
 struct output_list
 {
     vout_window_t *owner;
@@ -68,13 +66,19 @@ static void output_geometry_cb(void *data, struct wl_output *output,
             "+%"PRId32"+%"PRId32", subpixel %"PRId32", transform %"PRId32,
             od->id, w, h, x, y, sp, transform);
 
-    free(od->description);
-    free(od->name);
+    if (od->version < WL_OUTPUT_NAME_SINCE_VERSION)
+    {
+        free(od->name);
+        if (unlikely(asprintf(&od->name, "%"PRIu32, od->id) < 0))
+            od->name = NULL;
+    }
 
-    if (unlikely(asprintf(&od->name, "%"PRIu32, od->id) < 0))
-        od->name = NULL;
-    if (unlikely(asprintf(&od->description, "%s - %s", make, model) < 0))
-        od->description = NULL;
+    if (od->version < WL_OUTPUT_DESCRIPTION_SINCE_VERSION)
+    {
+        free(od->description);
+        if (unlikely(asprintf(&od->description, "%s - %s", make, model) < 0))
+            od->description = NULL;
+    }
 
     (void) output;
 }
@@ -119,12 +123,35 @@ static void output_scale_cb(void *data, struct wl_output *output, int32_t f)
     (void) output;
 }
 
+static void output_name_cb(void *data, struct wl_output *output,
+                           const char *name)
+{
+    struct output_data *od = data;
+
+    free(od->name);
+    od->name = strdup(name);
+    (void) output;
+}
+
+static void output_description_cb(void *data, struct wl_output *output,
+                                  const char *description)
+{
+    struct output_data *od = data;
+
+    free(od->description);
+    od->description = strdup(description);
+    (void) output;
+}
+
+
 static const struct wl_output_listener wl_output_cbs =
 {
     output_geometry_cb,
     output_mode_cb,
     output_done_cb,
     output_scale_cb,
+    output_name_cb,
+    output_description_cb,
 };
 
 struct output_list *output_list_create(vout_window_t *wnd)
