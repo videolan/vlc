@@ -3328,7 +3328,7 @@ AS_IF([test "${enable_wayland}" != "no"], [
   wl_err=""
 
   dnl wayland
-  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91],, [
+  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.19.91],, [
     wl_err="$wl_err ${WAYLAND_CLIENT_PKG_ERRORS}."
   ])
   PKG_CHECK_MODULES([WAYLAND_CURSOR], [wayland-cursor],, [
