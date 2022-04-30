@@ -210,6 +210,22 @@ struct wl_output *output_find_by_id(struct output_list *ol, uint32_t id)
     return NULL;
 }
 
+struct wl_output *output_find_by_name(struct output_list *ol, const char *name)
+{
+    if (unlikely(ol == NULL))
+        return NULL;
+
+    struct wl_list *list = &ol->outputs;
+    struct output_data *od;
+
+    wl_list_for_each(od, list, node)
+        if (strcmp(od->name, name) == 0)
+            return od->wl_output;
+
+    return NULL;
+
+}
+
 void output_list_destroy(struct output_list *ol)
 {
     if (ol == NULL)
