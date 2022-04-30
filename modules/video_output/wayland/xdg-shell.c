@@ -219,24 +219,12 @@ static void SetFullscreen(vout_window_t *wnd, const char *idstr)
     struct wl_output *output = NULL;
 
     if (idstr != NULL)
-    {
-        char *end;
-        unsigned long name = strtoul(idstr, &end, 10);
-
-        assert(*end == '\0' && name <= UINT32_MAX);
-        output = wl_registry_bind(sys->registry, name,
-                                  &wl_output_interface, 1);
-    }
+        output = output_find_by_name(sys->outputs, idstr);
     else
     if (sys->default_output != 0)
-        output = wl_registry_bind(sys->registry, sys->default_output,
-                                  &wl_output_interface, 1);
+        output = output_find_by_id(sys->outputs, sys->default_output);
 
     xdg_toplevel_set_fullscreen(sys->toplevel, output);
-
-    if (output != NULL)
-        wl_output_destroy(output);
-
     wl_display_flush(wnd->display.wl);
 }
 
