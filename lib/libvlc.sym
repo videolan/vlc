@@ -44,6 +44,7 @@ libvlc_dialog_post_action
 libvlc_dialog_post_login
 libvlc_dialog_set_callbacks
 libvlc_dialog_set_context
+libvlc_dialog_set_error_callback
 libvlc_event_attach
 libvlc_event_detach
 libvlc_free
