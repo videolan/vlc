@@ -1180,33 +1180,49 @@ ViewpointMovedCallback(vlc_object_t *obj, char const *var,
 }
 
 static void
+player_on_vout_started(vlc_player_t *player, vout_thread_t *vout, void *data)
+{
+    intf_thread_t *intf = data;
+
+    var_AddCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
+    var_AddCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
+
+    if (var_GetBool(vout, "viewpoint-changeable"))
+        var_AddCallback(vout, "viewpoint-moved",
+                        ViewpointMovedCallback, player);
+}
+
+static void
+player_on_vout_stopped(vlc_player_t *player, vout_thread_t *vout, void *data)
+{
+    intf_thread_t *intf = data;
+
+    if (var_GetBool(vout, "viewpoint-changeable"))
+        var_DelCallback(vout, "viewpoint-moved",
+                        ViewpointMovedCallback, player);
+
+    var_DelCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
+    var_DelCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
+}
+
+static void
 player_on_vout_changed(vlc_player_t *player,
                        enum vlc_player_vout_action action, vout_thread_t *vout,
                        enum vlc_vout_order order, vlc_es_id_t *es_id,
                        void *data)
 {
     VLC_UNUSED(order);
-    intf_thread_t *intf = data;
 
     if (vlc_es_id_GetCat(es_id) != VIDEO_ES)
         return;
 
-    bool vrnav = var_GetBool(vout, "viewpoint-changeable");
     switch (action)
     {
         case VLC_PLAYER_VOUT_STARTED:
-            var_AddCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
-            var_AddCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
-            if (vrnav)
-                var_AddCallback(vout, "viewpoint-moved",
-                                ViewpointMovedCallback, player);
+            player_on_vout_started(player, vout, data);
             break;
         case VLC_PLAYER_VOUT_STOPPED:
-            var_DelCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
-            var_DelCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
-            if (vrnav)
-                var_DelCallback(vout, "viewpoint-moved",
-                                ViewpointMovedCallback, player);
+            player_on_vout_stopped(player, vout, data);
             break;
         default:
             vlc_assert_unreachable();
