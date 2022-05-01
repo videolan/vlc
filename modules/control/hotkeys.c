@@ -43,6 +43,7 @@ struct intf_sys_t
 {
     vlc_playlist_t *playlist;
     vlc_player_listener_id *player_listener;
+    vlc_array_t vouts;
     struct
     {
         bool btn_pressed;
@@ -1183,9 +1184,13 @@ static void
 player_on_vout_started(vlc_player_t *player, vout_thread_t *vout, void *data)
 {
     intf_thread_t *intf = data;
+    intf_sys_t *sys = intf->p_sys;
+
+    if (unlikely(vlc_array_append(&sys->vouts, vout) != 0))
+        return;
 
     var_AddCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
-    var_AddCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
+    var_AddCallback(vout, "mouse-moved", MouseMovedCallback, sys);
 
     if (var_GetBool(vout, "viewpoint-changeable"))
         var_AddCallback(vout, "viewpoint-moved",
@@ -1196,12 +1201,19 @@ static void
 player_on_vout_stopped(vlc_player_t *player, vout_thread_t *vout, void *data)
 {
     intf_thread_t *intf = data;
+    intf_sys_t *sys = intf->p_sys;
+    ssize_t idx = vlc_array_index_of_item(&sys->vouts, vout);
+
+    if (unlikely(idx < 0))
+        return;
+
+    vlc_array_remove(&sys->vouts, idx);
 
     if (var_GetBool(vout, "viewpoint-changeable"))
         var_DelCallback(vout, "viewpoint-moved",
                         ViewpointMovedCallback, player);
 
-    var_DelCallback(vout, "mouse-moved", MouseMovedCallback, intf->p_sys);
+    var_DelCallback(vout, "mouse-moved", MouseMovedCallback, sys);
     var_DelCallback(vout, "mouse-button-down", MouseButtonCallback, intf);
 }
 
@@ -1251,6 +1263,7 @@ Open(vlc_object_t *this)
         return VLC_ENOMEM;
     sys->vrnav.btn_pressed = false;
     sys->playlist = vlc_intf_GetMainPlaylist(intf);
+    vlc_array_init(&sys->vouts);
     sys->subsync.audio_time = sys->subsync.subtitle_time = VLC_TICK_INVALID;
     sys->spu_channel_order = VLC_VOUT_ORDER_PRIMARY;
     static struct vlc_player_cbs const player_cbs =
@@ -1279,7 +1292,12 @@ Close(vlc_object_t *this)
     vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
     vlc_player_Lock(player);
     vlc_player_RemoveListener(player, sys->player_listener);
+
+    while (sys->vouts.i_count > 0)
+        player_on_vout_stopped(player, vlc_array_item_at_index(&sys->vouts, 0),
+                               intf);
     vlc_player_Unlock(player);
+
     var_DelCallback(vlc_object_instance(intf), "key-action", ActionCallback, intf);
     free(sys);
 }
