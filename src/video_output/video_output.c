@@ -410,17 +410,21 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
 void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    vlc_mouse_t video_mouse;
+    bool has_display;
+
     assert(!sys->dummy);
     assert(mouse);
 
     /* Translate window coordinates to video coordinates */
     vlc_mutex_lock(&sys->display_lock);
-    vlc_mouse_t video_mouse;
-    if (sys->display)
+    has_display = sys->display != NULL;
+    if (has_display)
         vout_display_TranslateMouseState(sys->display, &video_mouse, mouse);
-    else
-        video_mouse = *mouse;
     vlc_mutex_unlock(&sys->display_lock);
+
+    if (!has_display)
+        return;
 
     vout_control_PushMouse(&sys->control, &video_mouse);
 }
