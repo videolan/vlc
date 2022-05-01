@@ -1604,7 +1604,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
 
     sys->mouse_event = cfg->mouse_event;
     sys->mouse_opaque = cfg->mouse_opaque;
-    vlc_mouse_Init(&sys->mouse);
 
     sys->decoder_fifo = picture_fifo_New();
     sys->private.display_pool = NULL;
@@ -1897,7 +1896,7 @@ static vout_thread_sys_t *vout_CreateCommon(vlc_object_t *object)
 
     vout_thread_sys_t *sys = vout;
     vlc_atomic_rc_init(&sys->rc);
-
+    vlc_mouse_Init(&sys->mouse);
     return vout;
 }
 
