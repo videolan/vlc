@@ -50,10 +50,12 @@ FocusScope {
 
     // Childs
 
-    VideoContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
 
         model: listView.model
+
+        showPlayAsAudioAction: true
     }
 
     Column {
