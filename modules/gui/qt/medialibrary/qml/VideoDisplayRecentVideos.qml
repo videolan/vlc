@@ -134,7 +134,7 @@ FocusScope {
 
                 // NOTE: contextMenu.popup wants a list of indexes.
                 onContextMenuButtonClicked: {
-                    contextMenu.popup([root.model.index(index, 0)],
+                    contextMenu.popup([listView.model.index(index, 0)],
                                       globalMousePos,
                                       { "player-options": [":restore-playback-pos=2"] })
                 }
