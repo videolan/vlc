@@ -50,7 +50,7 @@ function isValidInstanceOf(object, type) {
 // or the value is invalid, returns defaultValue
 function get(dict, key, defaultValue) {
     var v = typeof dict !== "undefined" ? dict[key] : undefined
-    return !v ? defaultValue : v
+    return typeof v === "undefined" ? defaultValue : v
 }
 
 // NOTE: This allows us to force another 'reason' even when the item has activeFocus.
