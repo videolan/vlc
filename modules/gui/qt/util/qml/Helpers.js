@@ -72,3 +72,7 @@ function contains(rect, pos) {
     return (clamp(pos.x, rect.x, rect.x + rect.width) === pos.x)
             && (clamp(pos.y, rect.y, rect.y + rect.height) === pos.y)
 }
+
+function isInteger(data) {
+    return (typeof data === 'number' && (data % 1) === 0)
+}
