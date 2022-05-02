@@ -353,6 +353,7 @@ Item {
             width: coverSize
             height: coverSize
             asynchronous: true
+            cache: false
         }
     }
 }
