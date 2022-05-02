@@ -883,6 +883,7 @@ libqt_plugin_la_QML = \
 	gui/qt/util/qml/BindingRev8.qml \
 	gui/qt/util/qml/BindingRev14.qml \
 	gui/qt/util/qml/VanillaObject.qml \
+	gui/qt/util/qml/NativeMenu.qml \
 	gui/qt/widgets/qml/ActionButtonOverlay.qml \
 	gui/qt/widgets/qml/ActionButtonPrimary.qml \
 	gui/qt/widgets/qml/BannerTabButton.qml \
