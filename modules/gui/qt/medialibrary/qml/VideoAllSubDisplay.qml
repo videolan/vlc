@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/" as Util
 import "qrc:///style/"
 
 VideoAll {
@@ -52,7 +53,7 @@ VideoAll {
 
     model: !!_meta ? _meta.model : null
 
-    contextMenu: !!_meta ? _meta.contextMenu : null
+    contextMenu: Util.MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
 
     // Functions
 
@@ -119,8 +120,6 @@ VideoAll {
 
             property var model: MLVideoModel { ml: MediaLib }
 
-            property var contextMenu: VideoContextMenu { model: metaVideo.model }
-
             function onAction(indexes) {
                 g_mainDisplay.showPlayer()
 
@@ -141,8 +140,6 @@ VideoAll {
             id: metaGroup
 
             property var model: MLVideoGroupsModel { ml: MediaLib }
-
-            property var contextMenu: VideoGroupsContextMenu { model: metaGroup.model }
 
             function onAction(indexes) {
                 var index = indexes[0]
@@ -187,8 +184,6 @@ VideoAll {
             id: metaFolder
 
             property var model: MLVideoFoldersModel { ml: MediaLib }
-
-            property var contextMenu: VideoFoldersContextMenu { model: metaFolder.model }
 
             function onAction(indexes) {
                 var index = indexes[0]

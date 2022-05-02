@@ -23,6 +23,7 @@ import QtQuick 2.11
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/" as Util
 import "qrc:///style/"
 
 VideoAll {
@@ -53,7 +54,7 @@ VideoAll {
         parentId: initialId
     }
 
-    contextMenu: VideoContextMenu { model: modelVideo }
+    contextMenu: Util.MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
 
     header: Column {
         width: root.width

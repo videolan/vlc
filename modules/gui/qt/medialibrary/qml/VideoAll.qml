@@ -27,6 +27,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
 import "qrc:///util/"    as Util
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 FocusScope {
@@ -282,8 +283,11 @@ FocusScope {
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);
 
-                    root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos,
-                                           { "information" : index });
+                    var options = {}
+                    if (Helpers.get(model, "isVideo", true))
+                        options["information"] = index
+
+                    root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos, options);
                 }
 
                 // Animations
