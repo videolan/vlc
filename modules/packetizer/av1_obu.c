@@ -194,6 +194,8 @@ static bool av1_parse_color_config(bs_t *p_bs,
     {
         p_cc->color_range = bs_read1(p_bs) ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
         p_cc->i_chroma = VLC_CODEC_GREY;
+        p_cc->subsampling_x = 1;
+        p_cc->subsampling_y = 1;
     }
     else if( p_cc->color_primaries == 1 &&
              p_cc->transfer_characteristics == 13 &&
@@ -201,6 +203,8 @@ static bool av1_parse_color_config(bs_t *p_bs,
     {
         p_cc->color_range = COLOR_RANGE_FULL;
         p_cc->i_chroma = VLC_CODEC_I444;
+        p_cc->subsampling_x = 0;
+        p_cc->subsampling_y = 0;
     }
     else
     {
@@ -210,12 +214,12 @@ static bool av1_parse_color_config(bs_t *p_bs,
             if(BitDepth == 12)
             {
                 p_cc->subsampling_x = bs_read1(p_bs);
-                if(p_cc->subsampling_x)
-                    p_cc->subsampling_y = bs_read1(p_bs);
+                p_cc->subsampling_y = p_cc->subsampling_x ? bs_read1(p_bs) : 0;
             }
             else
             {
                 p_cc->subsampling_x = 1;
+                p_cc->subsampling_y = 0;
             }
             p_cc->i_chroma = p_cc->subsampling_x ?
                              p_cc->subsampling_y ? VLC_CODEC_I420 :
@@ -223,9 +227,17 @@ static bool av1_parse_color_config(bs_t *p_bs,
                                                    VLC_CODEC_I444;
         }
         else if(seq_profile == 1)
+        {
             p_cc->i_chroma = VLC_CODEC_I444;
+            p_cc->subsampling_x = 0;
+            p_cc->subsampling_y = 0;
+        }
         else
+        {
             p_cc->i_chroma = VLC_CODEC_I420;
+            p_cc->subsampling_x = 1;
+            p_cc->subsampling_y = 1;
+        }
 
         if(p_cc->subsampling_x && p_cc->subsampling_y)
             p_cc->chroma_sample_position = bs_read(p_bs, 2);
