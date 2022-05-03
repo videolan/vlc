@@ -92,7 +92,7 @@ static void decoder_decode_change_chroma(decoder_t *dec, block_t *block)
         = chroma_list[index];
 
     int ret = decoder_UpdateVideoOutput(dec, NULL);
-    if (ret != VLC_SUCCESS)
+    if (ret != 0)
     {
         scenario_data.test_finished = true;
         vlc_sem_post(&scenario_data.wait_stop);
