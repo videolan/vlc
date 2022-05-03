@@ -172,6 +172,13 @@ static inline void vlc_tracer_TraceRender(struct vlc_tracer *tracer, const char 
                      VLC_TRACE("render_ts", NS_FROM_VLC_TICK(now)), VLC_TRACE_END);
 }
 
+static inline void vlc_tracer_TraceEvent(struct vlc_tracer *tracer, const char *type,
+                                         const char *id, const char *event)
+{
+    vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                     VLC_TRACE("event", event), VLC_TRACE_END);
+}
+
 static inline void vlc_tracer_TracePCR( struct vlc_tracer *tracer, const char *type,
                                     const char *id, vlc_tick_t pcr)
 {
