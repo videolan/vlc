@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_tracer.h>
 
 #include "aout_internal.h"
 #include "clock/clock.h"
@@ -59,6 +60,8 @@ struct vlc_aout_stream
         vlc_tick_t delay;
     } sync;
     vlc_tick_t original_pts;
+
+    const char *str_id;
 
     /* Original input format and profile, won't change for the lifetime of a
      * stream (between vlc_aout_stream_New() and vlc_aout_stream_Delete()). */
@@ -88,6 +91,12 @@ static inline aout_owner_t *aout_stream_owner(vlc_aout_stream *stream)
 static inline audio_output_t *aout_stream_aout(vlc_aout_stream *stream)
 {
     return &stream->instance->output;
+}
+
+static inline struct vlc_tracer *aout_stream_tracer(vlc_aout_stream *stream)
+{
+    return stream->str_id == NULL ? NULL :
+        vlc_object_get_tracer(VLC_OBJECT(aout_stream_aout(stream)));
 }
 
 static void stream_Reset(vlc_aout_stream *stream)
@@ -182,6 +191,7 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     stream->filter_format = stream->mixer_format = stream->input_format = *p_format;
 
     stream->sync.clock = cfg->clock;
+    stream->str_id = cfg->str_id;
 
     stream->filters = NULL;
     stream->filters_cfg = AOUT_FILTERS_CFG_INIT;
@@ -195,7 +205,7 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     if (!owner->bitexact)
     {
         /* Create the audio filtering "input" pipeline */
-        stream->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock,
+        stream->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), cfg->clock,
                                                    &stream->filter_format,
                                                    &stream->mixer_format,
                                                    &stream->filters_cfg);
@@ -264,8 +274,13 @@ static int stream_CheckReady (vlc_aout_stream *stream)
             stream->filters = NULL;
         }
 
+        struct vlc_tracer *tracer = aout_stream_tracer(stream);
+
         if (restart & AOUT_RESTART_OUTPUT)
         {   /* Reinitializes the output */
+            if (tracer != NULL)
+                vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "restart");
+
             msg_Dbg (aout, "restarting output...");
             if (stream->mixer_format.i_format)
                 aout_OutputDelete (aout);
@@ -284,6 +299,8 @@ static int stream_CheckReady (vlc_aout_stream *stream)
             if (restart == AOUT_RESTART_OUTPUT)
                 status = AOUT_DEC_CHANGED;
         }
+        else if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "filters_restart");
 
         msg_Dbg (aout, "restarting filters...");
         stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
@@ -374,6 +391,8 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
     if (unlikely(drift == VLC_TICK_MAX) || owner->bitexact)
         return; /* cf. VLC_TICK_MAX comment in vlc_aout_stream_Play() */
 
+    struct vlc_tracer *tracer = aout_stream_tracer(stream);
+
     /* Following calculations expect an opposite drift. Indeed,
      * vlc_clock_Update() returns a positive relative time, corresponding to
      * the time when audio_ts is expected to be played (in the future when not
@@ -389,6 +408,9 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
     if (drift > (stream->sync.discontinuity ? 0
                 : lroundf(+3 * AOUT_MAX_PTS_DELAY / rate)))
     {
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "late_flush");
+
         if (!stream->sync.discontinuity)
             msg_Warn (aout, "playback way too late (%"PRId64"): "
                       "flushing buffers", drift);
@@ -407,8 +429,13 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
                 : lroundf(-3 * AOUT_MAX_PTS_ADVANCE / rate)))
     {
         if (!stream->sync.discontinuity)
+        {
+            if (tracer != NULL)
+                vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "early_silence");
+
             msg_Warn (aout, "playback way too early (%"PRId64"): "
                       "playing silence", drift);
+        }
         stream_Silence(stream, -drift, audio_ts);
 
         stream_StopResampling(stream);
@@ -423,6 +450,8 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
     if (drift > +AOUT_MAX_PTS_DELAY
      && stream->sync.resamp_type != AOUT_RESAMPLING_UP)
     {
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "late_upsampling");
         msg_Warn (aout, "playback too late (%"PRId64"): up-sampling",
                   drift);
         stream->sync.resamp_type = AOUT_RESAMPLING_UP;
@@ -431,6 +460,8 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
     if (drift < -AOUT_MAX_PTS_ADVANCE
      && stream->sync.resamp_type != AOUT_RESAMPLING_DOWN)
     {
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "early_downsampling");
         msg_Warn (aout, "playback too early (%"PRId64"): down-sampling",
                   drift);
         stream->sync.resamp_type = AOUT_RESAMPLING_DOWN;
@@ -443,6 +474,9 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
     if (llabs (drift) > 2 * stream->sync.resamp_start_drift)
     {   /* If the drift is ever increasing, then something is seriously wrong.
          * Cease resampling and hope for the best. */
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "timing_screwed");
+
         msg_Warn (aout, "timing screwed (drift: %"PRId64" us): "
                   "stopping resampling", drift);
         stream_StopResampling(stream);
@@ -462,6 +496,9 @@ static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts
     if (!aout_FiltersAdjustResampling (stream->filters, adj))
     {   /* Everything is back to normal: stop resampling. */
         stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
+
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "stop_resampling");
         msg_Dbg (aout, "resampling stopped (drift: %"PRId64" us)", drift);
     }
 }
@@ -627,6 +664,11 @@ void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_
 
     if (stream->mixer_format.i_format)
     {
+        struct vlc_tracer *tracer = aout_stream_tracer(stream);
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id,
+                                  paused ? "paused" : "resumed");
+
         if (aout->pause != NULL)
             aout->pause(aout, paused, date);
         else if (paused)
@@ -647,6 +689,10 @@ void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay)
 void vlc_aout_stream_Flush(vlc_aout_stream *stream)
 {
     audio_output_t *aout = aout_stream_aout(stream);
+
+    struct vlc_tracer *tracer = aout_stream_tracer(stream);
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "flushed");
 
     stream_Reset(stream);
     if (stream->mixer_format.i_format)
@@ -684,6 +730,11 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
 
     if (!stream->mixer_format.i_format)
         return;
+
+    struct vlc_tracer *tracer = aout_stream_tracer(stream);
+
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "drain");
 
     if (stream->filters)
     {
