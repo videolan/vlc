@@ -47,6 +47,6 @@ void vout_control_Hold(vout_control_t *);
 void vout_control_Release(vout_control_t *);
 
 /* control inside of the vout thread */
-int vout_control_Pop(vout_control_t *, vlc_mouse_t *, vlc_tick_t deadline);
+int vout_control_Pop(vout_control_t *, vlc_tick_t deadline);
 
 #endif

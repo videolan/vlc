@@ -1592,41 +1592,6 @@ void vout_ChangeSpuRate(vout_thread_t *vout, size_t channel_id, float rate)
     spu_SetClockRate(sys->spu, channel_id, rate);
 }
 
-static void ProcessMouseState(vout_thread_sys_t *p_vout,
-                              const vlc_mouse_t *win_mouse)
-{
-    vlc_mouse_t tmp1, tmp2;
-    const vlc_mouse_t *m;
-    vout_thread_t *vout = &p_vout->obj;
-    vout_thread_sys_t *sys = p_vout;
-
-    /* pass mouse coordinates in the filter chains. */
-    m = win_mouse;
-    vlc_mutex_lock(&sys->filter.lock);
-    if (sys->filter.chain_static && sys->filter.chain_interactive) {
-        if (!filter_chain_MouseFilter(sys->filter.chain_interactive,
-                                      &tmp1, m))
-            m = &tmp1;
-        if (!filter_chain_MouseFilter(sys->filter.chain_static,
-                                      &tmp2, m))
-            m = &tmp2;
-    }
-    vlc_mutex_unlock(&sys->filter.lock);
-
-    if (vlc_mouse_HasMoved(&sys->mouse, m))
-        var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
-
-    if (vlc_mouse_HasButton(&sys->mouse, m))
-        var_SetInteger(vout, "mouse-button-down", m->i_pressed);
-
-    if (m->b_double_click)
-        var_ToggleBool(vout, "fullscreen");
-    sys->mouse = *m;
-
-    if (sys->mouse_event)
-        sys->mouse_event(m, sys->mouse_opaque);
-}
-
 static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vout_configuration_t *cfg)
 {
     vout_thread_sys_t *sys = vout;
@@ -1755,11 +1720,9 @@ static void *Thread(void *object)
     vlc_tick_t deadline = VLC_TICK_INVALID;
 
     for (;;) {
-        vlc_mouse_t video_mouse;
-        while (vout_control_Pop(&sys->control, &video_mouse, deadline) == VLC_SUCCESS) {
+        while (vout_control_Pop(&sys->control, deadline) == VLC_SUCCESS) {
             if (atomic_load(&sys->control_is_terminated))
                 break;
-            ProcessMouseState(vout, &video_mouse);
         }
 
         if (atomic_load(&sys->control_is_terminated))

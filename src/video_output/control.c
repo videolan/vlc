@@ -73,7 +73,7 @@ void vout_control_Release(vout_control_t *ctrl)
     vlc_mutex_unlock(&ctrl->lock);
 }
 
-int vout_control_Pop(vout_control_t *ctrl, vlc_mouse_t *mouse, vlc_tick_t deadline)
+int vout_control_Pop(vout_control_t *ctrl, vlc_tick_t deadline)
 {
     bool has_cmd = false;
     vlc_mutex_lock(&ctrl->lock);
