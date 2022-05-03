@@ -137,6 +137,7 @@ struct vlc_aout_stream_cfg
     const audio_sample_format_t *fmt;
     int profile;
     struct vlc_clock_t *clock;
+    const char *str_id;
     const audio_replay_gain_t *replay_gain;
 };
 
