@@ -78,6 +78,9 @@ void vout_control_Wait(vout_control_t *ctrl, vlc_tick_t deadline)
     vlc_mutex_lock(&ctrl->lock);
 
     bool timed_out = false;
+
+    ctrl->yielding = true;
+
     for (;;)
     {
         if (ctrl->forced_awake)
@@ -86,24 +89,22 @@ void vout_control_Wait(vout_control_t *ctrl, vlc_tick_t deadline)
         if (ctrl->pending_count != 0)
         {
             /* Let vout_control_Hold() callers pass */
-            ctrl->yielding = true;
             vlc_cond_signal(&ctrl->wait_available);
             vlc_cond_wait(&ctrl->wait_request, &ctrl->lock);
-            ctrl->yielding = false;
         }
         else if (timed_out)
             break;
         else if (deadline != VLC_TICK_INVALID)
         {
-            ctrl->yielding = true;
             vlc_cond_signal(&ctrl->wait_available);
             timed_out =
                 vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
-            ctrl->yielding = false;
         }
         else
             break;
     }
+
+    ctrl->yielding = false;
 
     while (ctrl->is_held)
         vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
