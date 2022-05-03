@@ -88,15 +88,15 @@ void vout_control_Wait(vout_control_t *ctrl, vlc_tick_t deadline)
 
     if (deadline != VLC_TICK_INVALID)
     {
-        for (;;)
+        do
         {
             if (ctrl->forced_awake)
                 break;
 
             vlc_cond_signal(&ctrl->wait_available);
-            if (vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline))
-                break;
         }
+        while (vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock,
+                                  deadline) == 0);
     }
 
     ctrl->yielding = false;
