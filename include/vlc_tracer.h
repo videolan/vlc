@@ -167,9 +167,14 @@ static inline void vlc_tracer_TraceStreamDTS(struct vlc_tracer *tracer, const ch
 static inline void vlc_tracer_TraceRender(struct vlc_tracer *tracer, const char *type,
                                 const char *id, vlc_tick_t now, vlc_tick_t pts)
 {
-    vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
-                     VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
-                     VLC_TRACE("render_ts", NS_FROM_VLC_TICK(now)), VLC_TRACE_END);
+    if (now != VLC_TICK_MAX && now != VLC_TICK_INVALID)
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                         VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
+                         VLC_TRACE("render_ts", NS_FROM_VLC_TICK(now)), VLC_TRACE_END);
+    else
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                         VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
+                         VLC_TRACE_END);
 }
 
 static inline void vlc_tracer_TraceEvent(struct vlc_tracer *tracer, const char *type,
