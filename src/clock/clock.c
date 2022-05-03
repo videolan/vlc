@@ -281,9 +281,8 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
                               clock->cbs_data);
 
     if (main_clock->tracer != NULL && clock->track_str_id)
-    {
-        vlc_tracer_TraceRender(main_clock->tracer, "RENDER", clock->track_str_id, ts, system_now);
-    }
+        vlc_tracer_TraceRender(main_clock->tracer, "RENDER", clock->track_str_id,
+                               system_now, ts);
 }
 
 static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
