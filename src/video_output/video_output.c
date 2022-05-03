@@ -1902,8 +1902,6 @@ void vout_Release(vout_thread_t *vout)
     assert(!sys->window_enabled);
     vout_display_window_Delete(sys->display_cfg.window);
 
-    vout_control_Clean(&sys->control);
-
     /* */
     vout_statistic_Clean(&sys->statistic);
 

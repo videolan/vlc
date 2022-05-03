@@ -42,12 +42,6 @@ void vout_control_Init(vout_control_t *ctrl)
     ctrl->pending_count = 0;
 }
 
-void vout_control_Clean(vout_control_t *ctrl)
-{
-    /* */
-    (void) ctrl;
-}
-
 void vout_control_Wake(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
