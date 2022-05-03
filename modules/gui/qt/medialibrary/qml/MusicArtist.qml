@@ -287,8 +287,9 @@ FocusScope {
         model: albumModel
     }
 
-    AlbumTrackContextMenu {
+    Util.MLContextMenu {
         id: trackContextMenu
+
         model: trackModel
     }
 

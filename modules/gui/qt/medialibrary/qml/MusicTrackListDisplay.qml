@@ -104,8 +104,9 @@ Widgets.KeyNavigableTableView {
         model: rootmodel
     }
 
-    AlbumTrackContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
+
         model: rootmodel
     }
 }
