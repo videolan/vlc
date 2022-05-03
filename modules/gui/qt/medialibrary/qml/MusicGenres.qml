@@ -124,8 +124,9 @@ FocusScope {
         }
     }
 
-    GenreContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
+
         model: genreModel
     }
 
