@@ -85,8 +85,9 @@ FocusScope {
         model: artistModel
     }
 
-    ArtistContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
+
         model: artistModel
     }
 
