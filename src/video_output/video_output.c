@@ -264,7 +264,8 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
 void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    vlc_mouse_t video_mouse;
+    vlc_mouse_t video_mouse, tmp[2];
+    const vlc_mouse_t *m = &video_mouse;
     bool has_display;
 
     assert(!sys->dummy);
@@ -280,7 +281,36 @@ void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
     if (!has_display)
         return;
 
-    vout_control_PushMouse(&sys->control, &video_mouse);
+    /* Pass mouse events through the filter chains. */
+    vlc_mutex_lock(&sys->filter.lock);
+    if (sys->filter.chain_static != NULL
+     && sys->filter.chain_interactive != NULL) {
+        if (!filter_chain_MouseFilter(sys->filter.chain_interactive,
+                                      &tmp[0], m))
+            m = &tmp[0];
+        if (!filter_chain_MouseFilter(sys->filter.chain_static,
+                                      &tmp[1], m))
+            m = &tmp[1];
+    }
+    vlc_mutex_unlock(&sys->filter.lock);
+
+    /* Check if the mouse state actually changed and emit events. */
+    /* NOTE: sys->mouse is only used here, so no need to lock. */
+
+    if (vlc_mouse_HasMoved(&sys->mouse, m))
+        var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
+    if (vlc_mouse_HasButton(&sys->mouse, m))
+        var_SetInteger(vout, "mouse-button-down", m->i_pressed);
+    if (m->b_double_click)
+        var_ToggleBool(vout, "fullscreen");
+
+    sys->mouse = *m;
+
+    vlc_mutex_lock(&sys->display_lock);
+    /* Mouse events are only initialised if the display exists. */
+    if (sys->display != NULL && sys->mouse_event != NULL)
+        sys->mouse_event(m, sys->mouse_opaque);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
