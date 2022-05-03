@@ -377,6 +377,7 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     else
         return VLC_ENOTSUP;
 
+    pt->opaque = NULL;
     if(desc->parameters)
     {
         psz = strstr(desc->parameters, "sprop-parameter-sets=");
