@@ -383,10 +383,13 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         p_aout = input_resource_GetAout( p_owner->p_resource );
         if( p_aout )
         {
-            p_astream = vlc_aout_stream_New( p_aout, &format,
-                                             p_dec->fmt_out.i_profile,
-                                             p_owner->p_clock,
-                                             &p_dec->fmt_out.audio_replay_gain );
+            const struct vlc_aout_stream_cfg cfg = {
+                .fmt = &format,
+                .profile = p_dec->fmt_out.i_profile,
+                .clock = p_owner->p_clock,
+                .replay_gain = &p_dec->fmt_out.audio_replay_gain
+            };
+            p_astream = vlc_aout_stream_New( p_aout, &cfg );
             if( p_astream == NULL )
             {
                 input_resource_PutAout( p_owner->p_resource, p_aout );

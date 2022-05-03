@@ -133,13 +133,13 @@ static void stream_Reset(vlc_aout_stream *stream)
  * Creates an audio output
  */
 vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
-                                      const audio_sample_format_t *p_format,
-                                      int profile, vlc_clock_t *clock,
-                                      const audio_replay_gain_t *p_replay_gain)
+                                      const struct vlc_aout_stream_cfg *cfg)
 {
     assert(p_aout);
-    assert(p_format);
-    assert(clock);
+    assert(cfg->fmt);
+    assert(cfg->clock);
+    const audio_sample_format_t *p_format = cfg->fmt;
+
     if( p_format->i_bitspersample > 0 )
     {
         /* Sanitize audio format, input need to have a valid physical channels
@@ -175,13 +175,13 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
 
     stream->volume = NULL;
     if (!owner->bitexact)
-        stream->volume = aout_volume_New (p_aout, p_replay_gain);
+        stream->volume = aout_volume_New (p_aout, cfg->replay_gain);
 
     atomic_init(&stream->restart, 0);
-    stream->input_profile = profile;
+    stream->input_profile = cfg->profile;
     stream->filter_format = stream->mixer_format = stream->input_format = *p_format;
 
-    stream->sync.clock = clock;
+    stream->sync.clock = cfg->clock;
 
     stream->filters = NULL;
     stream->filters_cfg = AOUT_FILTERS_CFG_INIT;

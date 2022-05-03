@@ -133,10 +133,16 @@ void aout_FormatsPrint(vlc_object_t *, const char *,
 #define AOUT_DEC_CHANGED 1
 #define AOUT_DEC_FAILED VLC_EGENERIC
 
+struct vlc_aout_stream_cfg
+{
+    const audio_sample_format_t *fmt;
+    int profile;
+    struct vlc_clock_t *clock;
+    const audio_replay_gain_t *replay_gain;
+};
+
 vlc_aout_stream *vlc_aout_stream_New(audio_output_t *p_aout,
-                                     const audio_sample_format_t *p_format,
-                                     int profile, struct vlc_clock_t *clock,
-                                     const audio_replay_gain_t *p_replay_gain);
+                                     const struct vlc_aout_stream_cfg *cfg);
 void vlc_aout_stream_Delete(vlc_aout_stream *);
 int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block);
 void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *, unsigned *);
