@@ -45,6 +45,9 @@ T.SpinBox {
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
     contentItem: TextInput {
+        // NOTE: This is required for InterfaceWindowHandler::applyKeyEvent.
+        property bool visualFocus: control.activeFocus
+
         z: 2
         text: control.textFromValue(control.value, control.locale)
         color: control.color

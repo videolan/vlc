@@ -52,7 +52,7 @@ SpinBox{
 
     contentItem: TextInput {
         // NOTE: This is required for InterfaceWindowHandler::applyKeyEvent.
-        property bool visualFocus: control.visualFocus
+        property bool visualFocus: control.activeFocus
 
         text: control.textFromValue(control.value, control.locale)
 
