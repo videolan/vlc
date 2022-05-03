@@ -281,8 +281,9 @@ FocusScope {
         parentId: albumModel.parentId
     }
 
-    AlbumContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
+
         model: albumModel
     }
 

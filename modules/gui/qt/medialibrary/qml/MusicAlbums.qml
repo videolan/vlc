@@ -112,8 +112,9 @@ FocusScope {
         defaultCover: VLCStyle.noArtAlbumCover
     }
 
-    AlbumContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
+
         model: albumModelId
     }
 
