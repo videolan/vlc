@@ -347,14 +347,6 @@ void MainUI::registerQMLTypes()
         registerAnonymousType<MLArtist>(uri, versionMajor);
         registerAnonymousType<MLAlbumTrack>(uri, versionMajor);
 
-        qmlRegisterType<AlbumContextMenu>( uri, versionMajor, versionMinor, "AlbumContextMenu" );
-        qmlRegisterType<ArtistContextMenu>( uri, versionMajor, versionMinor, "ArtistContextMenu" );
-        qmlRegisterType<GenreContextMenu>( uri, versionMajor, versionMinor, "GenreContextMenu" );
-        qmlRegisterType<AlbumTrackContextMenu>( uri, versionMajor, versionMinor, "AlbumTrackContextMenu" );
-        qmlRegisterType<URLContextMenu>( uri, versionMajor, versionMinor, "URLContextMenu" );
-        qmlRegisterType<VideoContextMenu>( uri, versionMajor, versionMinor, "VideoContextMenu" );
-        qmlRegisterType<VideoGroupsContextMenu>( uri, versionMajor, versionMinor, "VideoGroupsContextMenu" );
-        qmlRegisterType<VideoFoldersContextMenu>( uri, versionMajor, versionMinor, "VideoFoldersContextMenu" );
         qmlRegisterType<PlaylistListContextMenu>( uri, versionMajor, versionMinor, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( uri, versionMajor, versionMinor, "PlaylistMediaContextMenu" );
 
