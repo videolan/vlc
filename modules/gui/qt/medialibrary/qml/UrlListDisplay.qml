@@ -78,8 +78,9 @@ Widgets.KeyNavigableTableView {
         model: urlModel
     }
 
-    URLContextMenu {
+    Util.MLContextMenu {
         id: contextMenu
+
         model: urlModel
     }
 
