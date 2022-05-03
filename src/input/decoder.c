@@ -488,7 +488,9 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     }
 
     vout_configuration_t cfg = {
-        .vout = p_owner->p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
+        .vout = p_owner->p_vout, .clock = p_owner->p_clock,
+        .str_id = p_owner->psz_id,
+        .fmt = &p_dec->fmt_out.video,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
     enum input_resource_vout_state vout_state;

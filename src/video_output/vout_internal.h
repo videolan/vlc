@@ -43,6 +43,7 @@ typedef struct vlc_clock_t vlc_clock_t;
 typedef struct {
     vout_thread_t        *vout;
     vlc_clock_t          *clock;
+    const char           *str_id;
     const video_format_t *fmt;
     vlc_mouse_event      mouse_event;
     void                 *mouse_opaque;

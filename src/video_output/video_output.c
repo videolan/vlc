@@ -48,6 +48,7 @@
 #include <vlc_image.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_tracer.h>
 #include <vlc_atomic.h>
 
 #include <libvlc.h>
@@ -73,6 +74,7 @@ typedef struct vout_thread_sys_t
     /* Splitter module if used */
     char            *splitter_name;
 
+    const char      *str_id;
     vlc_clock_t     *clock;
     float           rate;
     vlc_tick_t      delay;
@@ -186,6 +188,12 @@ typedef struct vout_thread_sys_t
 #define VOUT_MWAIT_TOLERANCE VLC_TICK_FROM_MS(4)
 
 /* */
+static inline struct vlc_tracer *GetTracer(vout_thread_sys_t *sys)
+{
+    return sys->str_id == NULL ? NULL :
+        vlc_object_get_tracer(VLC_OBJECT(&sys->obj));
+}
+
 static bool VoutCheckFormat(const video_format_t *src)
 {
     if (src->i_width == 0  || src->i_width  > 8192 ||
@@ -902,6 +910,10 @@ static bool IsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
     else
         late_threshold = VOUT_DISPLAY_LATE_THRESHOLD;
     if (late > late_threshold) {
+        struct vlc_tracer *tracer = GetTracer(vout);
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "toolate");
+
         msg_Warn(&vout->obj, "picture is too late to be displayed (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
         return true;
     }
@@ -1276,6 +1288,9 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         const vlc_tick_t late = system_now - system_pts;
         if (unlikely(late > 0))
         {
+            struct vlc_tracer *tracer = GetTracer(sys);
+            if (tracer != NULL)
+                vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "late");
             msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
             vout_statistic_AddLate(&sys->statistic, 1);
 
@@ -1478,6 +1493,11 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
     sys->pause.date  = date;
     vout_control_Release(&sys->control);
 
+    struct vlc_tracer *tracer = GetTracer(sys);
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id,
+                              is_paused ? "paused" : "resumed");
+
     vlc_mutex_lock(&sys->window_lock);
     vout_window_SetInhibition(sys->display_cfg.window, !is_paused);
     vlc_mutex_unlock(&sys->window_lock);
@@ -1528,6 +1548,10 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(sys, false, date);
     vout_control_Release(&sys->control);
+
+    struct vlc_tracer *tracer = GetTracer(sys);
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "flushed");
 }
 
 void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
@@ -1787,6 +1811,7 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     if (sys->spu)
         spu_Detach(sys->spu);
     sys->clock = NULL;
+    sys->str_id = NULL;
 }
 
 void vout_StopDisplay(vout_thread_t *vout)
@@ -2099,6 +2124,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
 
     sys->delay = 0;
     sys->rate = 1.f;
+    sys->str_id = cfg->str_id;
     sys->clock = cfg->clock;
     sys->delay = 0;
 
