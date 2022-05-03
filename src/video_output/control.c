@@ -73,9 +73,8 @@ void vout_control_Release(vout_control_t *ctrl)
     vlc_mutex_unlock(&ctrl->lock);
 }
 
-int vout_control_Pop(vout_control_t *ctrl, vlc_tick_t deadline)
+void vout_control_Wait(vout_control_t *ctrl, vlc_tick_t deadline)
 {
-    bool has_cmd = false;
     vlc_mutex_lock(&ctrl->lock);
 
     bool timed_out = false;
@@ -111,7 +110,5 @@ int vout_control_Pop(vout_control_t *ctrl, vlc_tick_t deadline)
 
     ctrl->forced_awake = false;
     vlc_mutex_unlock(&ctrl->lock);
-
-    return has_cmd ? VLC_SUCCESS : VLC_EGENERIC;
 }
 

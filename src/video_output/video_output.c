@@ -1720,10 +1720,7 @@ static void *Thread(void *object)
     vlc_tick_t deadline = VLC_TICK_INVALID;
 
     for (;;) {
-        while (vout_control_Pop(&sys->control, deadline) == VLC_SUCCESS) {
-            if (atomic_load(&sys->control_is_terminated))
-                break;
-        }
+        vout_control_Wait(&sys->control, deadline);
 
         if (atomic_load(&sys->control_is_terminated))
             break;
