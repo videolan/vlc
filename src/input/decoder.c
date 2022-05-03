@@ -516,6 +516,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         /* Vout owner part */
         .video.opaque = p_owner,
         .video.cbs = &vout_thread_cbs,
+        .str_id = p_owner->psz_id,
     };
     bool has_started;
 
