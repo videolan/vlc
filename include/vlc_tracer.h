@@ -165,7 +165,7 @@ static inline void vlc_tracer_TraceStreamDTS(struct vlc_tracer *tracer, const ch
 }
 
 static inline void vlc_tracer_TraceRender(struct vlc_tracer *tracer, const char *type,
-                                const char *id, vlc_tick_t pts, vlc_tick_t now)
+                                const char *id, vlc_tick_t now, vlc_tick_t pts)
 {
     vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
                      VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
