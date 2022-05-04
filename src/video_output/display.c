@@ -677,6 +677,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
         int ret = cb(vd, &osys->display_fmt, vctx);
         if (ret == VLC_SUCCESS) {
+            assert(vd->ops->prepare != NULL || vd->ops->display != NULL);
             if (VoutDisplayCreateRender(vd) == 0) {
                 msg_Dbg(vd, "using %s module \"%s\"", "vout display",
                         module_get_object(mods[i]));
