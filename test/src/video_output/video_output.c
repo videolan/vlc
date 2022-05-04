@@ -170,11 +170,18 @@ static void CloseDisplay(vout_display_t *vd)
 
 }
 
+static void Display(vout_display_t *vd, picture_t *picture)
+{
+    (void) vd;
+    (void) picture;
+}
+
 static int OpenDisplay(vout_display_t *vd, video_format_t *fmtp,
                        struct vlc_video_context *vctx)
 {
     static const struct vlc_display_operations ops =
     {
+        .display = Display,
         .close = CloseDisplay,
     };
     vd->ops = &ops;
