@@ -83,7 +83,14 @@ static void Open(vout_display_t *vd, video_format_t *fmt)
     }
 }
 
+static void Display(vout_display_t *vd, picture_t *picture)
+{
+    (void) vd;
+    (void) picture;
+}
+
 static const struct vlc_display_operations ops_dummy = {
+    .display = Display,
     .control = Control,
 };
 
