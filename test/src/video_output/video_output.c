@@ -165,11 +165,6 @@ static int OpenWindow(vout_window_t *wnd)
     return VLC_SUCCESS;
 }
 
-static void CloseDisplay(vout_display_t *vd)
-{
-
-}
-
 static void Display(vout_display_t *vd, picture_t *picture)
 {
     (void) vd;
@@ -182,7 +177,6 @@ static int OpenDisplay(vout_display_t *vd, video_format_t *fmtp,
     static const struct vlc_display_operations ops =
     {
         .display = Display,
-        .close = CloseDisplay,
     };
     vd->ops = &ops;
 
