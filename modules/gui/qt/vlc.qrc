@@ -345,6 +345,7 @@
         <file alias="ControlBar.qml">player/qml/ControlBar.qml</file>
         <file alias="ResumeDialog.qml">player/qml/ResumeDialog.qml</file>
         <file alias="SliderBar.qml">player/qml/SliderBar.qml</file>
+        <file alias="TracksMenu.qml">player/qml/TracksMenu.qml</file>
         <file alias="TrackInfo.qml">player/qml/TrackInfo.qml</file>
         <file alias="TracksPage.qml">player/qml/TracksPage.qml</file>
         <file alias="TracksPageSpeed.qml">player/qml/TracksPageSpeed.qml</file>
@@ -357,7 +358,6 @@
         <file alias="PlayerControlLayout.qml">player/qml/PlayerControlLayout.qml</file>
         <file alias="PlayerMenu.qml">player/qml/PlayerMenu.qml</file>
         <file alias="PlayerMenuItem.qml">player/qml/PlayerMenuItem.qml</file>
-        <file alias="LanguageMenu.qml">player/qml/LanguageMenu.qml</file>
         <file alias="ControlLayout.qml">player/qml/ControlLayout.qml</file>
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
         <file alias="PlayerPlaylistVisibilityFSM.qml">player/qml/PlayerPlaylistVisibilityFSM.qml</file>

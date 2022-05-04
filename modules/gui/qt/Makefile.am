@@ -806,7 +806,6 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/qmldir \
 	gui/qt/player/qml/ControlBar.qml \
 	gui/qt/player/qml/ControlbarControls.qml \
-	gui/qt/player/qml/LanguageMenu.qml \
 	gui/qt/player/qml/PlaybackSpeed.qml \
 	gui/qt/player/qml/MiniPlayer.qml \
 	gui/qt/player/qml/PIPPlayer.qml \
@@ -819,6 +818,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/SliderBar.qml \
 	gui/qt/player/qml/TopBar.qml \
 	gui/qt/player/qml/TrackInfo.qml \
+	gui/qt/player/qml/TracksMenu.qml \
 	gui/qt/player/qml/TracksPage.qml \
 	gui/qt/player/qml/TracksPageAudio.qml \
 	gui/qt/player/qml/TracksPageSpeed.qml \

@@ -29,18 +29,18 @@ Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     iconText: VLCIcons.audiosub
 
-    enabled: langMenuLoader.status === Loader.Ready
-    onClicked: langMenuLoader.item.open()
+    enabled: menuLoader.status === Loader.Ready
+    onClicked: menuLoader.item.open()
 
     text: I18n.qtr("Languages and tracks")
 
     Loader {
-        id: langMenuLoader
+        id: menuLoader
 
         active: (typeof rootPlayer !== 'undefined') && (rootPlayer !== null)
 
-        sourceComponent: Player.LanguageMenu {
-            id: langMenu
+        sourceComponent: Player.TracksMenu {
+            id: menu
 
             parent: rootPlayer
             focus: true
@@ -51,7 +51,7 @@ Widgets.IconControlButton {
             onOpened: {
                 playerControlLayout.requestLockUnlockAutoHide(true, playerControlLayout)
                 if (!!rootPlayer)
-                    rootPlayer.menu = langMenu
+                    rootPlayer.menu = menu
             }
 
             onClosed: {
