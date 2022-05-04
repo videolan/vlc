@@ -372,9 +372,9 @@ static int AllocatePluginFramework (module_bank_t *bank, const char *file,
     size_t len_name = strlen (file);
 
     /* Skip frameworks not matching plugins naming conventions. */
-    if (len_name < sizeof "_plugin.framework"
-      || strncmp(file + len_name - sizeof "_plugin.framework" + 1,
-                 "_plugin", sizeof "_plugin" - 1) != 0)
+    if (len_name < strlen("_plugin.framework")
+      || strncmp(file + len_name - strlen("_plugin.framework"),
+                 "_plugin", strlen("_plugin")) != 0)
     {
         /* The framework doesn't contain plugins, there's no need to
          * browse the rest of the framework folder. */
@@ -382,7 +382,7 @@ static int AllocatePluginFramework (module_bank_t *bank, const char *file,
     }
 
     /* The framework is a plugin, extract the dylib from it. */
-    int filename_len = len_name - sizeof ".framework" - 1;
+    int filename_len = len_name - strlen(".framework");
 
     char *framework_relpath = NULL, *framework_abspath = NULL;
     /* Compute absolute path */
@@ -484,12 +484,12 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
 #ifdef __APPLE__
             size_t len_name = strlen (file);
             const char *framework_extension =
-                file + len_name - sizeof ".framework" + 1;
+                file + len_name - strlen(".framework");
 
-            if (len_name > sizeof ".framework" - 1
+            if (len_name > strlen(".framework")
              && strcmp(framework_extension, ".framework") == 0)
             {
-                AllocatePluginFramework (bank, file, abspath, relpath);
+                AllocatePluginFramework (bank, file, relpath, abspath);
                 /* Don't browse framework directories. */
                 goto skip;
             }
