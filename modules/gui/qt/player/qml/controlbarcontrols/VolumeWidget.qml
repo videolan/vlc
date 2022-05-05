@@ -87,6 +87,12 @@ T.Pane {
 
             property bool _inhibitPlayerVolumeUpdate: false
 
+            // FIXME: Currently we are not updating the ShiftModifier status while dragging. This
+            //        could be fixed with a custom Slider based on a MouseArea.
+            property bool _shiftPressed: false
+
+            property real _clamp: 0.01
+
             from: 0
             to: maxvolpos
             opacity: _player.muted ? 0.5 : 1
@@ -115,7 +121,20 @@ T.Pane {
 
             function _adjustPlayerVolume() {
                 Player.muted = false
-                Player.volume = volControl.value
+
+                var value = volControl.value
+
+                // NOTE: We are clamping the value to make it easier to restore the default volume.
+                if (_shiftPressed === false) {
+                    if (Math.abs(value - 1.0) < _clamp)
+                        value = 1.0
+                    else
+                        _clamp = 0.01
+                }
+
+                Player.volume = value
+
+                volControl.value = value
             }
 
             Component.onCompleted: {
@@ -198,7 +217,29 @@ T.Pane {
                     width: VLCStyle.dp(1, VLCStyle.scale)
                     height: parent.height
                     radius: VLCStyle.dp(2, VLCStyle.scale)
+
+                    // NOTE: This shouldn't be visible when the volume stops before a 100.
+                    visible: (volControl.maxvol > 100)
+
                     color: root.color
+
+                    // NOTE: This is a helper to select the default volume when clicking on the
+                    //       tickmark. We apply a higher clamp value to achieve that behavior on
+                    //       the Slider.
+                    MouseArea {
+                        anchors.fill: parent
+
+                        anchors.margins: -(VLCStyle.dp(4, VLCStyle.scale))
+
+                        onPressed: {
+                            mouse.accepted = false
+
+                            if (mouse.modifiers === Qt.ShiftModifier)
+                                return
+
+                            volControl._clamp = 0.1
+                        }
+                    }
                 }
             }
 
@@ -218,26 +259,21 @@ T.Pane {
                 id: sliderMouseArea
                 anchors.fill: parent
 
-                acceptedButtons: Qt.RightButton
+                acceptedButtons: (Qt.LeftButton | Qt.RightButton)
 
-                Component.onCompleted: {
-                    positionChanged.connect(adjustVolume)
-                    onPressed.connect(adjustVolume)
+                onPressed: {
+                    volControl._shiftPressed = (mouse.modifiers === Qt.ShiftModifier)
+
+                    if (mouse.button === Qt.LeftButton) {
+                        mouse.accepted = false
+
+                        return
+                    }
+
+                    adjustVolume(mouse)
                 }
 
-                function adjustVolume(mouse) {
-                    var pos = mouse.x * volControl.maxvolpos / width
-                    if (pos < 0.25)
-                        volControl.value = 0
-                    else if (pos < 0.75)
-                        volControl.value = 0.5
-                    else if (pos < 1.125)
-                        volControl.value = 1
-                    else
-                        volControl.value = 1.25
-
-                    mouse.accepted = true
-                }
+                onPositionChanged: if (mouse.buttons & Qt.RightButton) adjustVolume(mouse)
 
                 onWheel: {
                     var delta = 0, fineControl = false
@@ -277,6 +313,21 @@ T.Pane {
                     }
 
                     wheel.accepted = true
+                }
+
+                function adjustVolume(mouse) {
+                    mouse.accepted = true
+
+                    var pos = mouse.x * volControl.maxvolpos / width
+
+                    if (pos < 0.25)
+                        volControl.value = 0
+                    else if (pos < 0.75)
+                        volControl.value = 0.5
+                    else if (pos < 1.125)
+                        volControl.value = 1
+                    else
+                        volControl.value = 1.25
                 }
             }
         }
