@@ -35,7 +35,9 @@
 #include "playlist/playlist_model.hpp"
 #include "dialogs/dialogs_provider.hpp"
 
+// Qt includes
 #include <QSignalMapper>
+#include <QScreen>
 
 namespace
 {
@@ -386,12 +388,28 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 {
     if (event->type() == QEvent::Resize)
     {
+        QScreen * screen = QGuiApplication::screenAt(m_position);
+
+        if (screen == nullptr)
+            return QObject::eventFilter(object, event);
+
         QMenu * menu = static_cast<QMenu *> (object);
 
-        int x = m_position.x();
-        int y = m_position.y();
+        int width  = menu->width();
+        int height = menu->height();
 
-        menu->move(QPoint(x, y - menu->height()));
+        QRect geometry = screen->availableGeometry();
+
+        int x = geometry.x();
+        int y = geometry.y();
+
+        // NOTE: We want a position within the screen boundaries.
+
+        x = qBound(x, m_position.x(), x + geometry.width() - width);
+
+        y = qBound(y, m_position.y() - height, y + geometry.height() - height);
+
+        menu->move(QPoint(x, y));
     }
 
     return QObject::eventFilter(object, event);
