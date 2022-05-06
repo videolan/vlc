@@ -52,6 +52,7 @@ else
 endif
 
 endif
+	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
 	$(MOVE)
 
 
