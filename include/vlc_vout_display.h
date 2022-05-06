@@ -514,15 +514,5 @@ void vout_display_TranslateCoordinates(int *x, int *y,
                                        const video_format_t *fmt,
                                        const struct vout_display_placement *dp);
 
-/**
- * Translates mouse state.
- *
- * This translates the mouse (pointer) state from window coordinates to
- * video coordinates.
- * @note @c video and @c window pointers may alias.
- */
-void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
-                                      const vlc_mouse_t *window);
-
 /** @} */
 #endif /* VLC_VOUT_DISPLAY_H */

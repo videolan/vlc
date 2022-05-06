@@ -229,14 +229,6 @@ void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
     *yp = y;
 }
 
-void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
-                                      const vlc_mouse_t *window)
-{
-    *video = *window;
-    vout_display_TranslateCoordinates(&video->i_x, &video->i_y, vd->source,
-                                      &vd->cfg->display);
-}
-
 typedef struct {
     vout_display_t  display;
 
