@@ -267,7 +267,6 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
                  VLC_TICK_FROM_MS(sys->title.timeout), title);
 }
 
-static
 void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
@@ -290,27 +289,11 @@ void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse)
         *mouse = *m;
 }
 
-void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
+void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *m)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    vlc_mouse_t video_mouse;
-    const vlc_mouse_t *m = &video_mouse;
-    bool has_display;
 
     assert(!sys->dummy);
-    assert(mouse);
-
-    /* Translate window coordinates to video coordinates */
-    vlc_mutex_lock(&sys->display_lock);
-    has_display = sys->display != NULL;
-    if (has_display)
-        vout_display_TranslateMouseState(sys->display, &video_mouse, mouse);
-    vlc_mutex_unlock(&sys->display_lock);
-
-    if (!has_display)
-        return;
-
-    vout_FilterMouse(vout, &video_mouse);
 
     /* Check if the mouse state actually changed and emit events. */
     /* NOTE: sys->mouse is only used here, so no need to lock. */

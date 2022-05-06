@@ -175,7 +175,18 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
             vlc_assert_unreachable();
     }
 
-    vout_MouseState(vout, m);
+    vlc_mouse_t video_mouse = *m;
+
+    vlc_mutex_lock(&state->lock);
+    if (likely(state->format.i_visible_width != 0
+            && state->format.i_visible_height != 0
+            && state->display.width != 0 && state->display.height != 0))
+        vout_display_TranslateCoordinates(&video_mouse.i_x, &video_mouse.i_y,
+                                          &state->format, &state->display);
+    vlc_mutex_unlock(&state->lock);
+
+    vout_FilterMouse(vout, &video_mouse);
+    vout_MouseState(vout, &video_mouse);
 }
 
 static void vout_display_window_KeyboardEvent(vlc_window_t *window,

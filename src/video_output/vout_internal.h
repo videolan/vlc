@@ -164,6 +164,8 @@ void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
 void vout_ChangeSpuChannelMargin(vout_thread_t *, enum vlc_vout_order order, int);
 void vout_ChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
 
+void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse);
+
 /* */
 void vout_CreateVars( vout_thread_t * );
 void vout_IntfInit( vout_thread_t * );
