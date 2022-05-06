@@ -119,6 +119,10 @@ typedef struct vout_display_cfg {
     struct vlc_window *window; /**< Window */
     struct vout_display_placement display; /**< Display placement properties */
     vlc_icc_profile_t *icc_profile; /**< Currently active ICC profile */
+    /** Final source projection requested for display. */
+    video_projection_mode_t projection;
+
+    /** Initial viewpoint when projection != PROJECTION_MODE_RECTANGULAR */
     vlc_viewpoint_t viewpoint;
 } vout_display_cfg_t;
 
@@ -323,6 +327,18 @@ struct vlc_display_operations
      */
     int (*update_format)(vout_display_t *, const video_format_t *fmt,
                          vlc_video_context *ctx);
+
+    /**
+     * Set the source projection used by the display.
+     *
+     * May be NULL.
+     *
+     * \param display the display to change projection for
+     * \param projection the new projection mode considered for the source
+     * \return VLC_SUCCESS on succes, another value if changing projection failed
+     */
+    int (*change_source_projection)(vout_display_t *display,
+                                    video_projection_mode_t projection);
 };
 
 /**
@@ -490,6 +506,13 @@ static inline void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t 
 static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
 {
     return cfg->window->type != VLC_WINDOW_TYPE_DUMMY;
+}
+
+static inline int vout_display_ChangeProjection(vout_display_t *vd, video_projection_mode_t projection)
+{
+    if (vd->ops->change_source_projection == NULL)
+        return VLC_ENOTSUP;
+    return vd->ops->change_source_projection(vd, projection);
 }
 
 /**
