@@ -53,6 +53,11 @@ static void vlc_window_Ack(void *data)
 typedef struct vout_display_window
 {
     vout_thread_t *vout;
+
+    video_format_t format;
+    struct vout_display_placement display;
+    vlc_mutex_t lock;
+
     vlc_mouse_t mouse;
     vlc_tick_t last_left_press;
 } vout_display_window_t;
@@ -65,6 +70,11 @@ static void vout_display_window_ResizeNotify(vlc_window_t *window,
     vout_display_window_t *state = window->owner.sys;
     vout_thread_t *vout = state->vout;
     struct vlc_window_ack_data data = { window, cb, width, height, opaque };
+
+    vlc_mutex_lock(&state->lock);
+    state->display.width = width;
+    state->display.height = height;
+    vlc_mutex_unlock(&state->lock);
 
     msg_Dbg(window, "resized to %ux%u", width, height);
     vout_ChangeDisplaySize(vout, width, height, vlc_window_Ack, &data);
@@ -283,11 +293,22 @@ void vout_display_ResizeWindow(struct vlc_window *window,
                                const video_format_t *restrict original,
                                const vlc_rational_t *restrict dar,
                                const struct vout_crop *restrict crop,
-                               const struct vout_display_placement *restrict cfg)
+                               const struct vout_display_placement *restrict dp)
 {
+    vout_display_window_t *state = window->owner.sys;
     unsigned width, height;
 
-    vout_display_SizeWindow(&width, &height, original, dar, crop, cfg);
+    vlc_mutex_lock(&state->lock);
+    video_format_Clean(&state->format);
+    video_format_Copy(&state->format, original);
+    width = state->display.width;
+    height = state->display.height;
+    state->display = *dp;
+    state->display.width = width;
+    state->display.height = height;
+    vlc_mutex_unlock(&state->lock);
+
+    vout_display_SizeWindow(&width, &height, original, dar, crop, dp);
     msg_Dbg(window, "requested window size: %ux%u", width, height);
     vlc_window_SetSize(window, width, height);
 }
@@ -301,6 +322,9 @@ vlc_window_t *vout_display_window_New(vout_thread_t *vout)
     if (state == NULL)
         return NULL;
 
+    video_format_Init(&state->format, 0);
+    state->display.width = state->display.height = 0;
+    vlc_mutex_init(&state->lock);
     vlc_mouse_Init(&state->mouse);
     state->last_left_press = INT64_MIN;
     state->vout = vout;
@@ -344,5 +368,6 @@ void vout_display_window_Delete(vlc_window_t *window)
     var_Destroy(vout, "window-fullscreen-output");
     var_Destroy(vout, "window-fullscreen");
     var_Destroy(vout, "window-state");
+    video_format_Clean(&state->format);
     free(state);
 }
