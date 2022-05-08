@@ -87,8 +87,10 @@ static void ReleaseBuffer(block_t *block)
 
     v4l2_munmap(block->p_start, block->i_size);
 
-    if (vlc_popcount(mask) == 1) /* last active buffer? */
+    if (vlc_popcount(mask) == 1) { /* last active buffer? */
+        free(pool->bufs);
         free(pool);
+    }
 }
 
 static const struct vlc_block_callbacks vlc_v4l2_buffer_cbs = {
@@ -167,9 +169,15 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         return NULL;
     }
 
-    pool = malloc(sizeof (*pool) + req.count * sizeof (pool->bufs[0]));
+    pool = malloc(sizeof (*pool));
     if (unlikely(pool == NULL))
         return NULL;
+
+    pool->bufs = calloc(req.count, sizeof (pool->bufs[0]));
+    if (unlikely(pool->bufs == NULL)) {
+        free(pool);
+        return NULL;
+    }
 
     pool->fd = fd;
     pool->inflight = 0;
