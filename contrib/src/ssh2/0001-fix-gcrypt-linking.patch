@@ -1,0 +1,10 @@
+--- ssh2/acinclude.m4.orig	2022-05-08 22:01:39.704273920 +0200
++++ ssh2/acinclude.m4	2022-05-27 15:24:17.697253672 +0200
+@@ -434,6 +434,7 @@
+ [libgcrypt], [
+   LIBSSH2_LIB_HAVE_LINKFLAGS([gcrypt], [], [#include <gcrypt.h>], [
+     AC_DEFINE(LIBSSH2_LIBGCRYPT, 1, [Use $1])
++    LIBS="$LIBS -lgcrypt -lgpg-error"
+     found_crypto="$1"
+   ])
+ ],

@@ -1,6 +1,6 @@
 # ssh2
 
-LIBSSH2_VERSION := 1.8.0
+LIBSSH2_VERSION := 1.10.0
 LIBSSH2_URL := http://www.libssh2.org/download/libssh2-$(LIBSSH2_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -22,8 +22,7 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(UNPACK)
 	$(APPLY) $(SRC)/ssh2/no-tests.patch
-	$(APPLY) $(SRC)/ssh2/ced924b78a40126606797ef57a74066eb3b4b83f.patch
-	$(APPLY) $(SRC)/ssh2/0001-Add-lgpg-error-to-.pc-to-facilitate-static-linking.patch
+	$(APPLY) $(SRC)/ssh2/0001-fix-gcrypt-linking.patch
 	$(call pkg_static,"libssh2.pc.in")
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/ssh2/winrt-no-agent.patch
