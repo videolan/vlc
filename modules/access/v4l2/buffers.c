@@ -62,6 +62,7 @@ static void DestroyBuffer(struct vlc_v4l2_buffers *pool,
     block_t *block = &buf->block;
 
     v4l2_munmap(block->p_start, block->i_size);
+    free(buf);
 
     if (vlc_atomic_rc_dec(&pool->refs)) {
         free(pool->bufs);
@@ -127,7 +128,7 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
 
     assert(buf_req.index < pool->count);
 
-    struct vlc_v4l2_buffer *buf = pool->bufs + buf_req.index;
+    struct vlc_v4l2_buffer *const buf = pool->bufs[buf_req.index];
     block_t *block = &buf->block;
     /* Reinitialise the buffer */
     block->p_buffer = block->p_start;
@@ -190,18 +191,22 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
 
     while (pool->count < req.count)
     {
+        struct vlc_v4l2_buffer *buf = malloc(sizeof (*buf));
         uint32_t index = pool->count;
-        struct vlc_v4l2_buffer *const buf = pool->bufs + index;
         struct v4l2_buffer buf_req = {
             .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
             .memory = V4L2_MEMORY_MMAP,
             .index = index,
         };
 
+        if (unlikely(buf == NULL))
+            goto error;
+
         if (v4l2_ioctl(fd, VIDIOC_QUERYBUF, &buf_req) < 0)
         {
             msg_Err(obj, "cannot query buffer %zu: %s", pool->count,
                     vlc_strerror_c(errno));
+            free(buf);
             goto error;
         }
 
@@ -211,6 +216,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         {
             msg_Err(obj, "cannot map buffer %"PRIu32": %s", buf_req.index,
                     vlc_strerror_c(errno));
+            free(buf);
             goto error;
         }
 
@@ -218,6 +224,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         atomic_init(&buf->inflight, false);
         buf->pool = pool;
         buf->index = index;
+        pool->bufs[index] = buf;
         pool->count++;
         vlc_atomic_rc_inc(&pool->refs);
 
@@ -258,7 +265,7 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
     v4l2_ioctl(fd, VIDIOC_STREAMOFF, &type);
 
     for (size_t i = 0; i < count; i++) {
-        struct vlc_v4l2_buffer *const buf = &pool->bufs[i];
+        struct vlc_v4l2_buffer *const buf = pool->bufs[i];
 
         if (!atomic_load_explicit(&buf->inflight, memory_order_acquire))
             DestroyBuffer(pool, buf);

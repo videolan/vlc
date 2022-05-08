@@ -49,7 +49,7 @@ struct vlc_v4l2_buffer {
 
 struct vlc_v4l2_buffers {
     size_t count;
-    struct vlc_v4l2_buffer *bufs;
+    struct vlc_v4l2_buffer **bufs;
 
     int fd;
     vlc_atomic_rc_t refs;
