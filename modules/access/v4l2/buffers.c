@@ -286,31 +286,3 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
         free(pool);
     }
 }
-
-/**
- * Allocates user pointer buffers, and start streaming.
- */
-int StartUserPtr(vlc_object_t *obj, int fd)
-{
-    struct v4l2_requestbuffers reqbuf = {
-        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-        .memory = V4L2_MEMORY_USERPTR,
-        .count = 2,
-    };
-
-    if (v4l2_ioctl(fd, VIDIOC_REQBUFS, &reqbuf) < 0)
-    {
-        if (errno != EINVAL)
-            msg_Err(obj, "cannot reserve user buffers: %s",
-                    vlc_strerror_c(errno));
-        else
-            msg_Dbg(obj, "user buffers not supported");
-        return -1;
-    }
-    if (v4l2_ioctl(fd, VIDIOC_STREAMON, &reqbuf.type) < 0)
-    {
-        msg_Err(obj, "cannot start streaming: %s", vlc_strerror_c(errno));
-        return -1;
-    }
-    return 0;
-}

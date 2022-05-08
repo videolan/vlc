@@ -66,7 +66,6 @@ int SetupTuner (vlc_object_t *, int fd, uint32_t);
 int SetupVideo(vlc_object_t *, int fd, uint32_t,
                es_format_t *, uint32_t *, uint32_t *);
 
-int StartUserPtr (vlc_object_t *, int);
 struct vlc_v4l2_buffers *StartMmap(vlc_object_t *, int);
 void StopMmap(struct vlc_v4l2_buffers *);
 

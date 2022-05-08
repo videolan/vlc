@@ -31,10 +31,6 @@
 #include <errno.h>
 #include <assert.h>
 #include <sys/ioctl.h>
-#include <sys/mman.h>
-#ifndef MAP_ANONYMOUS
-# define MAP_ANONYMOUS MAP_ANON
-#endif
 #include <poll.h>
 
 #include <vlc_common.h>
@@ -60,93 +56,6 @@ typedef struct
     vlc_v4l2_vbi_t *vbi;
 #endif
 } demux_sys_t;
-
-/** Allocates and queue a user buffer using mmap(). */
-static block_t *UserPtrQueue(vlc_object_t *obj, int fd, size_t length)
-{
-    void *ptr = mmap(NULL, length, PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (ptr == MAP_FAILED)
-    {
-        msg_Err(obj, "cannot allocate %zu-bytes buffer: %s", length,
-                vlc_strerror_c(errno));
-        return NULL;
-    }
-
-    block_t *block = block_mmap_Alloc(ptr, length);
-    if (unlikely(block == NULL))
-    {
-        munmap(ptr, length);
-        return NULL;
-    }
-
-    struct v4l2_buffer buf = {
-        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-        .memory = V4L2_MEMORY_USERPTR,
-        .m = {
-            .userptr = (uintptr_t)ptr,
-        },
-        .length = length,
-    };
-
-    if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf) < 0)
-    {
-        msg_Err(obj, "cannot queue buffer: %s", vlc_strerror_c(errno));
-        block_Release(block);
-        return NULL;
-    }
-    return block;
-}
-
-static void *UserPtrThread(void *data)
-{
-    demux_t *demux = data;
-    demux_sys_t *sys = demux->p_sys;
-    int fd = sys->fd;
-    struct pollfd ufd[2];
-    nfds_t numfds = 1;
-
-    ufd[0].fd = fd;
-    ufd[0].events = POLLIN;
-
-    int canc = vlc_savecancel();
-    for (;;)
-    {
-        struct v4l2_buffer buf = {
-            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-            .memory = V4L2_MEMORY_USERPTR,
-        };
-        block_t *block = UserPtrQueue(VLC_OBJECT(demux), fd, sys->blocksize);
-        if (block == NULL)
-            break;
-
-        /* Wait for data */
-        vlc_restorecancel(canc);
-        block_cleanup_push(block);
-        while (poll(ufd, numfds, -1) == -1)
-           if (errno != EINTR)
-               msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
-        vlc_cleanup_pop();
-        canc = vlc_savecancel();
-
-        if (v4l2_ioctl(fd, VIDIOC_DQBUF, &buf) < 0)
-        {
-            msg_Err(demux, "cannot dequeue buffer: %s",
-                    vlc_strerror_c(errno));
-            block_Release(block);
-            continue;
-        }
-
-        assert(block->p_buffer == (void *)buf.m.userptr);
-        block->i_buffer = buf.length;
-        block->i_pts = block->i_dts = GetBufferPTS(&buf);
-        block->i_flags |= sys->block_flags;
-        es_out_SetPCR(demux->out, block->i_pts);
-        es_out_Send(demux->out, sys->es, block);
-    }
-    vlc_restorecancel(canc); /* <- hmm, this is purely cosmetic */
-    return NULL;
-}
 
 static void *MmapThread(void *data)
 {
@@ -315,28 +224,12 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     void *(*entry) (void *);
     if (caps & V4L2_CAP_STREAMING)
     {
-        if (StartUserPtr(VLC_OBJECT(demux), fd) == 0)
-        {
-            /* In principles, mmap() will pad the length to a multiple of the
-             * page size, so there is no need to care. Nevertheless with the
-             * page size, block->i_size can be set optimally. */
-            const long pagemask = sysconf (_SC_PAGE_SIZE) - 1;
-
-            sys->pool = NULL;
-            sys->blocksize = (sys->blocksize + pagemask) & ~pagemask;
-            entry = UserPtrThread;
-            msg_Dbg (demux, "streaming with %"PRIu32"-bytes user buffers",
-                     sys->blocksize);
-        }
-        else /* fall back to memory map */
-        {
-            sys->pool = StartMmap(VLC_OBJECT(demux), fd);
-            if (sys->pool == NULL)
-                return -1;
-            entry = MmapThread;
-            msg_Dbg(demux, "streaming with %zu memory-mapped buffers",
-                    sys->pool->count);
-        }
+        sys->pool = StartMmap(VLC_OBJECT(demux), fd);
+        if (sys->pool == NULL)
+            return -1;
+        entry = MmapThread;
+        msg_Dbg(demux, "streaming with %zu memory-mapped buffers",
+                sys->pool->count);
     }
     else if (caps & V4L2_CAP_READWRITE)
     {
