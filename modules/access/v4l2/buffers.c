@@ -56,6 +56,19 @@ vlc_tick_t GetBufferPTS(const struct v4l2_buffer *buf)
     return pts;
 }
 
+static void DestroyBuffer(struct vlc_v4l2_buffers *pool,
+                          struct vlc_v4l2_buffer *buf)
+{
+    block_t *block = &buf->block;
+
+    v4l2_munmap(block->p_start, block->i_size);
+
+    if (vlc_atomic_rc_dec(&pool->refs)) {
+        free(pool->bufs);
+        free(pool);
+    }
+}
+
 static void ReleaseBuffer(block_t *block)
 {
     struct vlc_v4l2_buffer *buf = container_of(block, struct vlc_v4l2_buffer,
@@ -85,12 +98,7 @@ static void ReleaseBuffer(block_t *block)
         return;
     }
 
-    v4l2_munmap(block->p_start, block->i_size);
-
-    if (vlc_atomic_rc_dec(&pool->refs)) {
-        free(pool->bufs);
-        free(pool);
-    }
+    DestroyBuffer(pool, buf);
 }
 
 static const struct vlc_block_callbacks vlc_v4l2_buffer_cbs = {
@@ -254,7 +262,7 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
 
     for (size_t i = 0; i < count; i++)
         if (unused & (1u << i))
-            block_Release(&pool->bufs[i].block);
+            DestroyBuffer(pool, &pool->bufs[i]);
 
     if (vlc_atomic_rc_dec(&pool->refs)) {
         free(pool->bufs);
