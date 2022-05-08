@@ -330,7 +330,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
         }
         else /* fall back to memory map */
         {
-            sys->pool = StartMmap(VLC_OBJECT(demux), fd, 16);
+            sys->pool = StartMmap(VLC_OBJECT(demux), fd);
             if (sys->pool == NULL)
                 return -1;
             entry = MmapThread;

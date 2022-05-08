@@ -144,14 +144,13 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
 
 /**
  * Allocates memory-mapped buffers, queues them and start streaming.
- * @param n requested buffers count
  * @return array of allocated buffers (use free()), or NULL on error.
  */
-struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd, unsigned int n)
+struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
 {
     struct vlc_v4l2_buffers *pool;
     struct v4l2_requestbuffers req = {
-        .count = n,
+        .count = 16,
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
         .memory = V4L2_MEMORY_MMAP,
     };

@@ -151,7 +151,7 @@ static int InitVideo(stream_t *access, int fd, uint32_t caps)
     /* Init I/O method */
     if (caps & V4L2_CAP_STREAMING)
     {
-        sys->pool = StartMmap (VLC_OBJECT(access), fd, 16);
+        sys->pool = StartMmap (VLC_OBJECT(access), fd);
         if (sys->pool == NULL)
             return -1;
         access->pf_block = MMapBlock;
