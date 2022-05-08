@@ -52,7 +52,7 @@ struct vlc_v4l2_buffers {
 
     int fd;
     vlc_atomic_rc_t refs;
-    _Atomic uint32_t inflight;
+    _Atomic size_t unused;
     vlc_mutex_t lock;
 };
 
