@@ -83,6 +83,9 @@ static void ReleaseBuffer(block_t *block)
     uint32_t mask;
     int fd;
 
+    assert(atomic_load_explicit(&buf->inflight, memory_order_relaxed));
+    atomic_store_explicit(&buf->inflight, false, memory_order_release);
+
     vlc_mutex_lock(&pool->lock);
     mask = atomic_fetch_and_explicit(&pool->inflight, ~(1U << index),
                                      memory_order_relaxed);
@@ -141,6 +144,9 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
     assert(buf_req.bytesused <= block->i_size);
     block->i_buffer = buf_req.bytesused;
     block->p_next = NULL;
+
+    assert(!atomic_load_explicit(&buf->inflight, memory_order_relaxed));
+    atomic_init(&buf->inflight, true);
 
     if ((size_t)vlc_popcount(mask) == pool->count - 1) {
         /* Running out of buffers! Memory copy forced. */
@@ -219,6 +225,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         }
 
         block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
+        atomic_init(&buf->inflight, false);
         buf->pool = pool;
         pool->count++;
         vlc_atomic_rc_inc(&pool->refs);
@@ -260,9 +267,12 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
     atomic_fetch_or_explicit(&pool->inflight, unused, memory_order_relaxed);
     vlc_mutex_unlock(&pool->lock);
 
-    for (size_t i = 0; i < count; i++)
-        if (unused & (1u << i))
-            DestroyBuffer(pool, &pool->bufs[i]);
+    for (size_t i = 0; i < count; i++) {
+        struct vlc_v4l2_buffer *const buf = &pool->bufs[i];
+
+        if (!atomic_load_explicit(&buf->inflight, memory_order_acquire))
+            DestroyBuffer(pool, buf);
+    }
 
     if (vlc_atomic_rc_dec(&pool->refs)) {
         free(pool->bufs);
