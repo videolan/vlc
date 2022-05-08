@@ -87,16 +87,15 @@ static void ReleaseBuffer(block_t *block)
 
     vlc_mutex_lock(&pool->lock);
     fd = pool->fd;
-    vlc_mutex_unlock(&pool->lock);
 
     if (likely(fd >= 0)) {
-        /* Requeue the freed buffer */
         v4l2_ioctl(pool->fd, VIDIOC_QBUF, &buf_req);
         atomic_fetch_add(&pool->unused, 1);
-        return;
     }
+    vlc_mutex_unlock(&pool->lock);
 
-    DestroyBuffer(pool, buf);
+    if (unlikely(fd < 0))
+        DestroyBuffer(pool, buf);
 }
 
 static const struct vlc_block_callbacks vlc_v4l2_buffer_cbs = {
@@ -248,13 +247,14 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
 {
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     const size_t count = pool->count;
-
-    /* STREAMOFF implicitly dequeues all buffers */
-    v4l2_ioctl(pool->fd, VIDIOC_STREAMOFF, &type);
+    int fd = pool->fd;
 
     vlc_mutex_lock(&pool->lock);
     pool->fd = -1;
     vlc_mutex_unlock(&pool->lock);
+
+    /* STREAMOFF implicitly dequeues all buffers */
+    v4l2_ioctl(fd, VIDIOC_STREAMOFF, &type);
 
     for (size_t i = 0; i < count; i++) {
         struct vlc_v4l2_buffer *const buf = &pool->bufs[i];
