@@ -103,6 +103,47 @@ static const struct vlc_block_callbacks vlc_v4l2_buffer_cbs = {
     ReleaseBuffer,
 };
 
+static struct vlc_v4l2_buffer *AllocateBuffer(struct vlc_v4l2_buffers *pool,
+                                              uint32_t index)
+{
+    struct v4l2_buffer buf_req = {
+        .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        .memory = V4L2_MEMORY_MMAP,
+        .index = index,
+    };
+    int fd = pool->fd;
+
+    if (v4l2_ioctl(fd, VIDIOC_QUERYBUF, &buf_req) < 0)
+        return NULL;
+
+    struct vlc_v4l2_buffer *buf = malloc(sizeof (*buf));
+    if (unlikely(buf == NULL))
+        return NULL;
+
+    void *base = v4l2_mmap(NULL, buf_req.length, PROT_READ | PROT_WRITE,
+                           MAP_SHARED, fd, buf_req.m.offset);
+    if (base == MAP_FAILED) {
+        free(buf);
+        return NULL;
+    }
+
+    block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
+    buf->pool = pool;
+    buf->index = index;
+    vlc_atomic_rc_inc(&pool->refs);
+
+    assert(buf->index < pool->count);
+    assert(pool->bufs[index] == NULL);
+    pool->bufs[index] = buf;
+
+    if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf_req) < 0) {
+        DestroyBuffer(pool, buf);
+        buf = NULL;
+    }
+
+    return buf;
+}
+
 block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
 {
     int fd = pool->fd;
@@ -197,45 +238,11 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
 
     for (uint32_t index = 0; index < req.count; index++)
     {
-        struct vlc_v4l2_buffer *buf = malloc(sizeof (*buf));
-        struct v4l2_buffer buf_req = {
-            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
-            .memory = V4L2_MEMORY_MMAP,
-            .index = index,
-        };
+        struct vlc_v4l2_buffer *buf = AllocateBuffer(pool, index);
 
-        if (unlikely(buf == NULL))
-            goto error;
-
-        if (v4l2_ioctl(fd, VIDIOC_QUERYBUF, &buf_req) < 0)
-        {
-            msg_Err(obj, "cannot query buffer %zu: %s", pool->count,
+        if (unlikely(buf == NULL)) {
+            msg_Err(obj, "cannot allocate buffer %"PRIu32": %s", index,
                     vlc_strerror_c(errno));
-            free(buf);
-            goto error;
-        }
-
-        void *base = v4l2_mmap(NULL, buf_req.length, PROT_READ | PROT_WRITE,
-                               MAP_SHARED, fd, buf_req.m.offset);
-        if (base == MAP_FAILED)
-        {
-            msg_Err(obj, "cannot map buffer %"PRIu32": %s", buf_req.index,
-                    vlc_strerror_c(errno));
-            free(buf);
-            goto error;
-        }
-
-        block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
-        buf->pool = pool;
-        buf->index = index;
-        pool->bufs[index] = buf;
-        vlc_atomic_rc_inc(&pool->refs);
-
-        /* Some drivers refuse to queue buffers before they are mapped. Bug? */
-        if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf_req) < 0)
-        {
-            msg_Err(obj, "cannot queue buffer %"PRIu32": %s", buf_req.index,
-                     vlc_strerror_c(errno));
             goto error;
         }
     }
