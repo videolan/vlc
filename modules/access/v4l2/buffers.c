@@ -82,13 +82,14 @@ static void ReleaseBuffer(block_t *block)
     };
     int fd;
 
-    assert(atomic_load_explicit(&buf->inflight, memory_order_relaxed));
-    atomic_store_explicit(&buf->inflight, false, memory_order_release);
+    assert(buf->index < pool->count);
+    assert(pool->bufs[buf->index] == NULL);
 
     vlc_mutex_lock(&pool->lock);
     fd = pool->fd;
 
     if (likely(fd >= 0)) {
+        pool->bufs[buf->index] = buf;
         v4l2_ioctl(pool->fd, VIDIOC_QBUF, &buf_req);
         atomic_fetch_add(&pool->unused, 1);
     }
@@ -129,15 +130,17 @@ block_t *GrabVideo(vlc_object_t *demux, struct vlc_v4l2_buffers *restrict pool)
     assert(buf_req.index < pool->count);
 
     struct vlc_v4l2_buffer *const buf = pool->bufs[buf_req.index];
+
+    assert(buf != NULL);
+    assert(buf->index == buf_req.index);
+    pool->bufs[buf_req.index] = NULL;
+
     block_t *block = &buf->block;
     /* Reinitialise the buffer */
     block->p_buffer = block->p_start;
     assert(buf_req.bytesused <= block->i_size);
     block->i_buffer = buf_req.bytesused;
     block->p_next = NULL;
-
-    assert(!atomic_load_explicit(&buf->inflight, memory_order_relaxed));
-    atomic_init(&buf->inflight, true);
 
     if (atomic_fetch_sub(&pool->unused, 1) <= 2) {
         /* Running out of buffers! Memory copy forced. */
@@ -184,15 +187,17 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         return NULL;
     }
 
+    pool->count = req.count;
+    for (size_t i = 0; i < req.count; i++)
+        pool->bufs[i] = NULL;
+
     pool->fd = fd;
     vlc_atomic_rc_init(&pool->refs);
-    pool->count = 0;
     vlc_mutex_init(&pool->lock);
 
-    while (pool->count < req.count)
+    for (uint32_t index = 0; index < req.count; index++)
     {
         struct vlc_v4l2_buffer *buf = malloc(sizeof (*buf));
-        uint32_t index = pool->count;
         struct v4l2_buffer buf_req = {
             .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
             .memory = V4L2_MEMORY_MMAP,
@@ -221,11 +226,9 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         }
 
         block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
-        atomic_init(&buf->inflight, false);
         buf->pool = pool;
         buf->index = index;
         pool->bufs[index] = buf;
-        pool->count++;
         vlc_atomic_rc_inc(&pool->refs);
 
         /* Some drivers refuse to queue buffers before they are mapped. Bug? */
@@ -267,7 +270,7 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
     for (size_t i = 0; i < count; i++) {
         struct vlc_v4l2_buffer *const buf = pool->bufs[i];
 
-        if (!atomic_load_explicit(&buf->inflight, memory_order_acquire))
+        if (buf != NULL)
             DestroyBuffer(pool, buf);
     }
 
