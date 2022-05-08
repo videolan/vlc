@@ -43,6 +43,7 @@ typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
 struct vlc_v4l2_buffer {
     block_t block;
     struct vlc_v4l2_buffers *pool;
+    uint32_t index;
     atomic_bool inflight;
 };
 

@@ -74,11 +74,10 @@ static void ReleaseBuffer(block_t *block)
     struct vlc_v4l2_buffer *buf = container_of(block, struct vlc_v4l2_buffer,
                                                block);
     struct vlc_v4l2_buffers *pool = buf->pool;
-    uint32_t index = buf - pool->bufs;
     struct v4l2_buffer buf_req = {
         .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
         .memory = V4L2_MEMORY_MMAP,
-        .index = index,
+        .index = buf->index,
     };
     int fd;
 
@@ -191,11 +190,12 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
 
     while (pool->count < req.count)
     {
-        struct vlc_v4l2_buffer *const buf = pool->bufs + pool->count;
+        uint32_t index = pool->count;
+        struct vlc_v4l2_buffer *const buf = pool->bufs + index;
         struct v4l2_buffer buf_req = {
             .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
             .memory = V4L2_MEMORY_MMAP,
-            .index = pool->count,
+            .index = index,
         };
 
         if (v4l2_ioctl(fd, VIDIOC_QUERYBUF, &buf_req) < 0)
@@ -217,6 +217,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
         atomic_init(&buf->inflight, false);
         buf->pool = pool;
+        buf->index = index;
         pool->count++;
         vlc_atomic_rc_inc(&pool->refs);
 
