@@ -87,7 +87,7 @@ static void ReleaseBuffer(block_t *block)
 
     v4l2_munmap(block->p_start, block->i_size);
 
-    if (vlc_popcount(mask) == 1) { /* last active buffer? */
+    if (vlc_atomic_rc_dec(&pool->refs)) {
         free(pool->bufs);
         free(pool);
     }
@@ -180,6 +180,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
     }
 
     pool->fd = fd;
+    vlc_atomic_rc_init(&pool->refs);
     pool->inflight = 0;
     pool->count = 0;
     vlc_mutex_init(&pool->lock);
@@ -212,6 +213,7 @@ struct vlc_v4l2_buffers *StartMmap(vlc_object_t *obj, int fd)
         block_Init(&buf->block, &vlc_v4l2_buffer_cbs, base, buf_req.length);
         buf->pool = pool;
         pool->count++;
+        vlc_atomic_rc_inc(&pool->refs);
 
         /* Some drivers refuse to queue buffers before they are mapped. Bug? */
         if (v4l2_ioctl(fd, VIDIOC_QBUF, &buf_req) < 0)
@@ -253,7 +255,11 @@ void StopMmap(struct vlc_v4l2_buffers *pool)
     for (size_t i = 0; i < count; i++)
         if (unused & (1u << i))
             block_Release(&pool->bufs[i].block);
-    /* Pool is freed whence all buffers are released (possibly here) */
+
+    if (vlc_atomic_rc_dec(&pool->refs)) {
+        free(pool->bufs);
+        free(pool);
+    }
 }
 
 /**

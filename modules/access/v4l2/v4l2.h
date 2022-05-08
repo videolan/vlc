@@ -37,6 +37,7 @@ extern int (*v4l2_munmap) (void *, size_t);
 
 typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
 
+#include <vlc_atomic.h>
 #include <vlc_block.h>
 
 struct vlc_v4l2_buffer {
@@ -49,6 +50,7 @@ struct vlc_v4l2_buffers {
     struct vlc_v4l2_buffer *bufs;
 
     int fd;
+    vlc_atomic_rc_t refs;
     _Atomic uint32_t inflight;
     vlc_mutex_t lock;
 };
