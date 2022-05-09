@@ -171,6 +171,9 @@
         vlc_window_ReportSize(_wnd, size.width, size.height);
     }];
 
+    _displayLink = [CADisplayLink displayLinkWithTarget:self
+                                               selector:@selector(displayLinkUpdate:)];
+
     return self;
 }
 
@@ -288,6 +291,10 @@
      * all events have been reported in the _eventq
      */
     dispatch_sync(_eventq, ^{
+        /* CADisplayLink will hold the send after creation, which is this view
+         * so delete it before. */
+        _displayLink = nil;
+
         /* The UIView must not be attached before releasing. Disable() is doing
          * exactly this asynchronously in the main thread so ensure it was called
          * here before detaching from the parent. */
@@ -306,32 +313,39 @@
 
 - (void)enable
 {
-    assert(!_enabled);
-    _enabled = YES;
-
-    /**
-     * Given -[UIView addGestureRecognizer:] can raise an exception if
-     * tapRecognizer is nil and given tapRecognizer can be nil if
-     * "mouse-events" var == false, then add tapRecognizer to the view only if
-     * it's not nil
-     */
-    if (_tapRecognizer != nil) {
-        [self addGestureRecognizer:_tapRecognizer];
-    }
-    [_viewContainer addSubview:self];
-    _displayLink = [CADisplayLink displayLinkWithTarget:self
-                                               selector:@selector(displayLinkUpdate:)];
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        assert(!_enabled);
+        _enabled = YES;
+
+        /**
+         * Given -[UIView addGestureRecognizer:] can raise an exception if
+         * tapRecognizer is nil and given tapRecognizer can be nil if
+         * "mouse-events" var == false, then add tapRecognizer to the view only if
+         * it's not nil
+         */
+        if (_tapRecognizer != nil)
+            [self addGestureRecognizer:_tapRecognizer];
+
+        [_viewContainer addSubview:self];
+    });
+
 }
 
 - (void)disable
 {
-    assert(_enabled);
-    _enabled = NO;
-    [self removeFromSuperview];
-    _constraints = nil;
+    [_displayLink invalidate];
+    _last_ca_target_ts = VLC_TICK_INVALID;
 
-    [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        assert(_enabled);
+        _enabled = NO;
+        [self removeFromSuperview];
+        _constraints = nil;
+
+        [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
+    });
 }
 
 /**
@@ -404,14 +418,6 @@
     [self reshape];
 }
 
-- (void)pause
-{
-    dispatch_sync(_eventq, ^{
-        [_displayLink invalidate];
-        _displayLink = nil;
-    });
-}
-
 - (void)applicationStateChanged:(NSNotification *)notification
 {
     [self reportEvent:^{
@@ -455,19 +461,14 @@
 static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
 {
     VLCVideoUIView *sys = (__bridge VLCVideoUIView *)wnd->sys;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [sys enable];
-    });
+    [sys enable];
     return VLC_SUCCESS;
 }
 
 static void Disable(vlc_window_t *wnd)
 {
     VLCVideoUIView *sys = (__bridge VLCVideoUIView *)wnd->sys;
-    [sys pause];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [sys disable];
-    });
+    [sys disable];
 }
 
 static int OnAvstatChanged(vlc_object_t *obj, const char *name, vlc_value_t oldv,
