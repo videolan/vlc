@@ -269,10 +269,33 @@ void vout_DisplayTitle(vout_thread_t *vout, const char *title)
                  VLC_TICK_FROM_MS(sys->title.timeout), title);
 }
 
+static
+void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    vlc_mouse_t tmp[2], *m = mouse;
+
+    /* Pass mouse events through the filter chains. */
+    vlc_mutex_lock(&sys->filter.lock);
+    if (sys->filter.chain_static != NULL
+     && sys->filter.chain_interactive != NULL) {
+        if (!filter_chain_MouseFilter(sys->filter.chain_interactive,
+                                      &tmp[0], m))
+            m = &tmp[0];
+        if (!filter_chain_MouseFilter(sys->filter.chain_static,
+                                      &tmp[1], m))
+            m = &tmp[1];
+    }
+    vlc_mutex_unlock(&sys->filter.lock);
+
+    if (mouse != m)
+        *mouse = *m;
+}
+
 void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    vlc_mouse_t video_mouse, tmp[2];
+    vlc_mouse_t video_mouse;
     const vlc_mouse_t *m = &video_mouse;
     bool has_display;
 
@@ -289,18 +312,7 @@ void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
     if (!has_display)
         return;
 
-    /* Pass mouse events through the filter chains. */
-    vlc_mutex_lock(&sys->filter.lock);
-    if (sys->filter.chain_static != NULL
-     && sys->filter.chain_interactive != NULL) {
-        if (!filter_chain_MouseFilter(sys->filter.chain_interactive,
-                                      &tmp[0], m))
-            m = &tmp[0];
-        if (!filter_chain_MouseFilter(sys->filter.chain_static,
-                                      &tmp[1], m))
-            m = &tmp[1];
-    }
-    vlc_mutex_unlock(&sys->filter.lock);
+    vout_FilterMouse(vout, &video_mouse);
 
     /* Check if the mouse state actually changed and emit events. */
     /* NOTE: sys->mouse is only used here, so no need to lock. */
