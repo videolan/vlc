@@ -113,17 +113,11 @@ static int Open(vout_display_t *vd,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    if (vd->cfg->window == NULL)
-    {
-        msg_Err(vd, "parent window not available");
-        goto error;
-    }
-
     char *name = var_InheritString(vd, "pl-gpu");
     sys->pl = vlc_placebo_Create(vd->cfg, name);
     free(name);
     if (sys->pl == NULL)
-        goto error;
+        return VLC_EGENERIC;
 
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
         goto error;
@@ -189,8 +183,7 @@ static int Open(vout_display_t *vd,
 
 error:
     pl_renderer_destroy(&sys->renderer);
-    if (sys->pl != NULL)
-        vlc_placebo_Release(sys->pl);
+    vlc_placebo_Release(sys->pl);
     return VLC_EGENERIC;
 }
 
