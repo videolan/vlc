@@ -271,6 +271,7 @@
     dispatch_sync(_eventq, ^{
         /* CADisplayLink will hold the send after creation, which is this view
          * so delete it before. */
+        [_displayLink invalidate];
         _displayLink = nil;
 
         /* The UIView must not be attached before releasing. Disable() is doing
@@ -306,7 +307,7 @@
 
 - (void)disable
 {
-    [_displayLink invalidate];
+    [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     _last_ca_target_ts = VLC_TICK_INVALID;
 
     dispatch_async(dispatch_get_main_queue(), ^{
