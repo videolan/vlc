@@ -176,17 +176,17 @@ int input_Start( input_thread_t *p_input )
     /* Create thread and wait for its readiness. */
     priv->is_running = !vlc_clone( &priv->thread, func, priv,
                                    VLC_THREAD_PRIORITY_INPUT );
-    
-   
+
+
     char name[128];
     vlc_thread_t *vlc_th =(vlc_thread_t*)&priv->thread;
     mach_port_t tid = pthread_mach_thread_np(vlc_th->handle);
     uint64_t tid_np;
     pthread_threadid_np(vlc_th->handle, &tid_np);
-    
-    sprintf(name,"vlc-player-end, %x-%x-%qx",tid,tid_np,priv->thread);
-    pthread_setname_np(name);
-    
+
+    //sprintf(name,"vlc-player-end, %x-%x-%qx",tid,tid_np,priv->thread);
+    //pthread_setname_np(name);
+
     if( !priv->is_running )
     {
         msg_Err( p_input, "cannot create input thread" );
