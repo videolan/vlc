@@ -491,8 +491,6 @@ static int Open(vout_display_t *vd,
     if (embed->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         return VLC_EGENERIC;
 
-    if (embed == NULL)
-        return VLC_EGENERIC;
     assert(embed->handle.anativewindow);
     AWindowHandler *p_awh = embed->handle.anativewindow;
 
