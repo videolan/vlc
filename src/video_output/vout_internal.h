@@ -215,11 +215,6 @@ void vout_ChangeSpuDelay( vout_thread_t *, size_t channel_id, vlc_tick_t delay )
 
 
 /**
- * Updates the pointing device state.
- */
-void vout_MouseState(vout_thread_t *, const vlc_mouse_t *);
-
-/**
  * This function will return and reset internal statistics.
  */
 void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,

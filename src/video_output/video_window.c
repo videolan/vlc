@@ -60,6 +60,7 @@ typedef struct vout_display_window
 
     struct {
         vlc_mouse_t window;
+        vlc_mouse_t video;
         vlc_tick_t last_left_press;
         vlc_mouse_event event;
         void *opaque;
@@ -190,7 +191,23 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
     vlc_mutex_unlock(&state->lock);
 
     vout_FilterMouse(vout, &video_mouse);
-    vout_MouseState(vout, &video_mouse);
+
+    /* Check if the mouse state actually changed and emit events. */
+    /* NOTE: sys->mouse is only used here, so no need to lock. */
+    if (vlc_mouse_HasMoved(&state->mouse.video, &video_mouse))
+        var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
+    if (vlc_mouse_HasButton(&state->mouse.video, &video_mouse))
+        var_SetInteger(vout, "mouse-button-down", m->i_pressed);
+    if (m->b_double_click)
+        var_ToggleBool(vout, "fullscreen");
+
+    state->mouse.video = video_mouse;
+
+    vlc_mutex_lock(&state->lock);
+    /* Mouse events are only initialised if the display exists. */
+    if (state->mouse.event != NULL)
+        state->mouse.event(&video_mouse, state->mouse.opaque);
+    vlc_mutex_unlock(&state->lock);
 }
 
 static void vout_display_window_KeyboardEvent(vlc_window_t *window,
@@ -229,6 +246,9 @@ void vout_display_window_SetMouseHandler(vlc_window_t *window,
      * reentrant, but better not rely on this in calling code.
      */
     vlc_mutex_lock(&state->lock);
+    if (state->mouse.event != NULL)
+        state->mouse.event(NULL, state->mouse.opaque);
+
     state->mouse.event = event;
     state->mouse.opaque = opaque;
     vlc_mutex_unlock(&state->lock);
@@ -356,6 +376,7 @@ vlc_window_t *vout_display_window_New(vout_thread_t *vout)
     state->display.width = state->display.height = 0;
     vlc_mutex_init(&state->lock);
     vlc_mouse_Init(&state->mouse.window);
+    vlc_mouse_Init(&state->mouse.video);
     state->mouse.last_left_press = INT64_MIN;
     state->mouse.event = NULL;
     state->vout = vout;

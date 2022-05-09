@@ -289,31 +289,6 @@ void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse)
         *mouse = *m;
 }
 
-void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *m)
-{
-    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-
-    assert(!sys->dummy);
-
-    /* Check if the mouse state actually changed and emit events. */
-    /* NOTE: sys->mouse is only used here, so no need to lock. */
-
-    if (vlc_mouse_HasMoved(&sys->mouse, m))
-        var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
-    if (vlc_mouse_HasButton(&sys->mouse, m))
-        var_SetInteger(vout, "mouse-button-down", m->i_pressed);
-    if (m->b_double_click)
-        var_ToggleBool(vout, "fullscreen");
-
-    sys->mouse = *m;
-
-    vlc_mutex_lock(&sys->display_lock);
-    /* Mouse events are only initialised if the display exists. */
-    if (sys->display != NULL && sys->mouse_event != NULL)
-        sys->mouse_event(m, sys->mouse_opaque);
-    vlc_mutex_unlock(&sys->display_lock);
-}
-
 void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
@@ -1827,10 +1802,7 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->mouse_event)
-    {
-        sys->mouse_event(NULL, sys->mouse_opaque);
         sys->mouse_event = NULL;
-    }
 
     if (sys->spu)
         spu_Detach(sys->spu);
