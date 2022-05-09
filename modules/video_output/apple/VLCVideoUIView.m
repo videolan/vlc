@@ -299,8 +299,6 @@
 {
     assert(_enabled);
     _enabled = NO;
-    [_displayLink invalidate];
-    _displayLink = nil;
     [self removeFromSuperview];
     _constraints = nil;
 
@@ -355,6 +353,14 @@
     [self reshape];
 }
 
+- (void)pause
+{
+    dispatch_sync(_eventq, ^{
+        [_displayLink invalidate];
+        _displayLink = nil;
+    });
+}
+
 - (void)applicationStateChanged:(NSNotification *)notification
 {
     [self reportEvent:^{
@@ -407,6 +413,7 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 static void Disable(vout_window_t *wnd)
 {
     VLCVideoUIView *sys = (__bridge VLCVideoUIView *)wnd->sys;
+    [sys pause];
     dispatch_async(dispatch_get_main_queue(), ^{
         [sys disable];
     });
