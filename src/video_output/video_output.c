@@ -1727,7 +1727,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
 
     bool render_now = true;
-    const vlc_tick_t system_now = vlc_tick_now();
+    vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
     const bool first = !sys->displayed.current;
 
@@ -1744,7 +1744,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
     if (!paused && !first)
     {
-        const vlc_tick_t new_next_pts =
+        vlc_tick_t new_next_pts =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
                                       sys->displayed.next->date, sys->rate);
 
@@ -1769,7 +1769,14 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                && (sys->vsync.last_date == sys->vsync.next_date
                 || sys->vsync.missed == true) )
         {
-            vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+            system_now = vlc_tick_now();
+            vlc_cond_timedwait(&sys->vsync.cond_update, &sys->vsync.lock, new_next_pts);
+            system_now = vlc_tick_now();
+            if (system_now > new_next_pts) {
+                sys->vsync.current_date = system_now;
+                sys->vsync.next_date = system_now + VLC_TICK_FROM_MS(16);
+                sys->vsync.missed = false;
+            }
         }
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
@@ -1800,7 +1807,14 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                && (sys->vsync.last_date == sys->vsync.next_date
                 || sys->vsync.missed == true) )
         {
-            vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+            system_now = vlc_tick_now();
+            vlc_cond_timedwait(&sys->vsync.cond_update, &sys->vsync.lock, new_next_pts);
+            system_now = vlc_tick_now();
+            if (system_now > new_next_pts) {
+                sys->vsync.current_date = system_now;
+                sys->vsync.next_date = system_now + VLC_TICK_FROM_MS(16);
+                sys->vsync.missed = false;
+            }
         }
 
         vsync_date = sys->vsync.next_date;
@@ -1821,8 +1835,24 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         while ( sys->vsync.next_date != VLC_TICK_INVALID
                && !atomic_load(&sys->control_is_terminated)
                && !atomic_load(&sys->vsync_halted)
-               && (sys->vsync.last_date == sys->vsync.next_date))
-            vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+               && (sys->vsync.last_date == sys->vsync.next_date)) 
+        {
+            if (sys->displayed.next) {
+                const vlc_tick_t deadline =
+                            vlc_clock_ConvertToSystem(sys->clock, vlc_tick_now(),
+                                                      sys->displayed.next->date, sys->rate);
+                vlc_cond_timedwait(&sys->vsync.cond_update, &sys->vsync.lock, deadline);
+                system_now = vlc_tick_now();
+                if (system_now > deadline ) {
+                    sys->vsync.current_date = system_now;
+                    sys->vsync.next_date = system_now + VLC_TICK_FROM_MS(16);
+                    sys->vsync.missed = false;
+                }
+            } else {
+                vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+            }
+        }
+            
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
         if (atomic_load(&sys->control_is_terminated) || !no_vsync_halted)
