@@ -860,7 +860,11 @@ static int SessionsSetup( demux_t *p_demux )
             if( !p_sys->b_multicast )
             {
                 /* We need different rollover behaviour for multicast */
-                p_sys->b_multicast = IsMulticastAddress( sub->connectionEndpointAddress() );
+                // p_sys->b_multicast = IsMulticastAddress( sub->connectionEndpointAddress() );
+                sockaddr_storage* addr = new sockaddr_storage();
+                sub->getConnectionEndpointAddress(*addr);
+                p_sys->b_multicast = IsMulticastAddress( *addr );
+                delete addr;
             }
 
             tk = (live_track_t*)malloc( sizeof( live_track_t ) );
