@@ -33,6 +33,7 @@
 #include <vlc_playlist.h>
 #include <vlc_threads.h>
 #include <vlc_window.h>
+#include <vlc_cxx_helpers.hpp>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"
@@ -64,6 +65,9 @@ static void Close ( vlc_object_t * );
 static void *Run  ( void * );
 
 static std::atomic<intf_thread_t *> skin_load_intf;
+static vlc::threads::mutex skin_load_lock;
+static vlc::threads::condition_variable skin_load_wait;
+static uintptr_t skin_load_rc = 0;
 
 //---------------------------------------------------------------------------
 // Open: initialize interface
@@ -110,6 +114,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    vlc::threads::mutex_locker guard {skin_load_lock};
     skin_load_intf = p_intf;
     return VLC_SUCCESS;
 }
@@ -129,7 +134,15 @@ static void Close( vlc_object_t *p_this )
     vlc_playlist_Stop ( playlist );
     vlc_playlist_Unlock( playlist );
 
-    skin_load_intf = NULL;
+    {
+        vlc::threads::mutex_locker guard {skin_load_lock};
+        while (skin_load_rc != 0)
+            skin_load_wait.wait(skin_load_lock);
+
+        /* We don't need the skin_load_lock anymore since the interface
+         * will signaled that it doesn't exist anymore below. */
+        skin_load_intf = NULL;
+    }
 
     AsyncQueue *pQueue = p_intf->p_sys->p_queue;
     if( pQueue )
@@ -311,7 +324,15 @@ static void WindowSetFullscreen( vlc_window_t *pWnd, const char * );
 static int WindowEnable( vlc_window_t *pWnd, const vlc_window_cfg_t *cfg )
 {
     vout_window_skins_t* sys = static_cast<vout_window_skins_t*>(pWnd->sys);
-    intf_thread_t *pIntf = sys->pIntf;
+
+    /* Protect from races against the main interface closing. */
+    vlc::threads::mutex_locker guard {skin_load_lock};
+
+    /* If the interface has already been closed, we cannot enable the window
+     * anymore and we need to report that. */
+    if (skin_load_intf == NULL)
+        return VLC_EGENERIC;
+    intf_thread_t *pIntf = skin_load_intf;
 
     sys->cfg = *cfg;
 
@@ -328,24 +349,17 @@ static int WindowEnable( vlc_window_t *pWnd, const vlc_window_cfg_t *cfg )
 
     if (cfg->is_fullscreen)
         WindowSetFullscreen( pWnd, NULL );
+
+    /* Prevent the interface from closing before we get disabled. */
+    skin_load_rc++;
     return VLC_SUCCESS;
 }
 
 static void WindowDisable( vlc_window_t *pWnd )
 {
-    // vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
-
-    // Design issue
-    // In the process of quitting vlc, the interfaces are destroyed first,
-    // then comes the playlist along with the player and possible vouts.
-    // problem: the interface is no longer active to properly deallocate
-    // resources allocated as a vout window submodule.
+    /* Protect from races against the main interface closing. */
+    vlc::threads::mutex_locker guard {skin_load_lock};
     intf_thread_t *pIntf = skin_load_intf;
-    if( pIntf == NULL )
-    {
-        msg_Err( pWnd, "Design issue: the interface no longer exists !!!!" );
-        return;
-    }
 
     // force execution in the skins2 thread context
     CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
@@ -353,6 +367,10 @@ static void WindowDisable( vlc_window_t *pWnd )
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
     pWnd->type = VLC_WINDOW_TYPE_DUMMY;
+
+    /* Now the interface can be closed. */
+    skin_load_rc--;
+    skin_load_wait.signal();
 }
 
 static void WindowResize( vlc_window_t *pWnd,
@@ -424,10 +442,12 @@ static int WindowOpen( vlc_window_t *pWnd )
 
     vout_window_skins_t* sys;
 
-    intf_thread_t *pIntf = skin_load_intf;
-
-    if( pIntf == NULL )
+    /* Prevent the interface from closing behind our back. */
+    vlc::threads::mutex_locker guard {skin_load_lock};
+    if (skin_load_intf == NULL)
         return VLC_EGENERIC;
+
+    intf_thread_t *pIntf = skin_load_intf;
 
     if( !var_InheritBool( pIntf, "skinned-video") )
         return VLC_EGENERIC;
