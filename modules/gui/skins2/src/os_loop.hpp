@@ -31,8 +31,6 @@
 class OSLoop: public SkinObject
 {
 public:
-    virtual ~OSLoop() { }
-
     /// Enter the main loop
     virtual void run() = 0;
 
