@@ -208,42 +208,50 @@ static CFHashCode DisplayLinkDummySourceHash(const void *info) {
 }
 
 - (void)prepareDisplayLinkRunLoop {
-    dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL, QOS_CLASS_USER_INTERACTIVE, 0);
+    dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL, QOS_CLASS_DEFAULT, 0);
     _displayLinkRunLoopQueue = dispatch_queue_create("org.videolan.vout.displayLinkRunLoopQueue", attributes);
     __block NSRunLoop *displayLinkRunLoop;
+    __block CFRunLoopSourceRef displayLinkRunLoopDummySource;
     
-    /// We have to dispatch async and wait to get the queue's thread runloop
+    /// We need a semaphore to dispatch async and wait for the queue's thread runloop run
     dispatch_semaphore_t waitForRunLoopSem = dispatch_semaphore_create(0);
     dispatch_async(_displayLinkRunLoopQueue, ^{
+        /**
+         * We must do all setup of the runloop in a single dispatch block
+         * to keep the queue's active thread until we start the runloop run
+         * or we may loose the thread's runloop reference
+         */
         displayLinkRunLoop = [NSRunLoop currentRunLoop];
-        /// We signal the runloop ref availability
-        dispatch_semaphore_signal(waitForRunLoopSem);
-    });
-    /// We wait for the display link runloop ref
-    dispatch_semaphore_wait(waitForRunLoopSem, DISPATCH_TIME_FOREVER);
-    
-    _displayLinkRunLoop = displayLinkRunLoop;
-    
-    CFRunLoopRef runloop = displayLinkRunLoop.getCFRunLoop;
-    
-    /// We need at least one source to be able to run the runloop continuously
-    CFRunLoopSourceContext dummyContext = {
-        .retain = DisplayLinkDummySourceRetain,
-        .release = DisplayLinkDummySourceRelease,
-        .copyDescription = DisplayLinkDummySourceCopyDescription,
-        .equal = DisplayLinkDummySourceEqual,
-        .hash = DisplayLinkDummySourceHash,
-        .schedule = DisplayLinkDummySourceSchedule,
-        .cancel = DisplayLinkDummySourceCancel,
-        .perform = DisplayLinkDummySourcePerform
-    };
-    _displayLinkRunLoopDummySource = CFRunLoopSourceCreate(NULL, 0, &dummyContext);
-    CFRunLoopAddSource(runloop, _displayLinkRunLoopDummySource, kCFRunLoopDefaultMode);
-    
-    /// We dispatch async to run the runloop in its own thread
-    dispatch_async(_displayLinkRunLoopQueue, ^{
+        
+        CFRunLoopRef runloop = displayLinkRunLoop.getCFRunLoop;
+        
+        /// We have to attach at least one source to be able to run the runloop
+        /// before adding the CADisplayLink
+        CFRunLoopSourceContext dummyContext = {
+            .retain = DisplayLinkDummySourceRetain,
+            .release = DisplayLinkDummySourceRelease,
+            .copyDescription = DisplayLinkDummySourceCopyDescription,
+            .equal = DisplayLinkDummySourceEqual,
+            .hash = DisplayLinkDummySourceHash,
+            .schedule = DisplayLinkDummySourceSchedule,
+            .cancel = DisplayLinkDummySourceCancel,
+            .perform = DisplayLinkDummySourcePerform
+        };
+        displayLinkRunLoopDummySource = CFRunLoopSourceCreate(NULL, 0, &dummyContext);
+        CFRunLoopAddSource(runloop, displayLinkRunLoopDummySource, kCFRunLoopDefaultMode);
+        
+        /// This block will be performed once the runloop runs
+        [displayLinkRunLoop performBlock:^{
+            /// We signal the runloop run
+            dispatch_semaphore_signal(waitForRunLoopSem);
+        }];
         [displayLinkRunLoop run];
     });
+    
+    /// Wait for the runloop run
+    dispatch_semaphore_wait(waitForRunLoopSem, DISPATCH_TIME_FOREVER);
+    _displayLinkRunLoop = displayLinkRunLoop;
+    _displayLinkRunLoopDummySource = displayLinkRunLoopDummySource;
 }
 
 - (void)didMoveToSuperview
