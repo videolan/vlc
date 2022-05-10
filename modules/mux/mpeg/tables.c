@@ -812,8 +812,8 @@ int FillPMTESParams( ts_mux_standard standard, const es_format_t *fmt,
     case VLC_CODEC_OPUS:
         if (fmt->audio.i_channels > 8)
             return VLC_EGENERIC;
+        ts->i_stream_type = 0x06;
         pes->i_stream_id = 0xbd;
-        pes->i_stream_id = 0x06;
         break;
     case VLC_CODEC_EAC3:
         pes->i_stream_id = 0xbd;
