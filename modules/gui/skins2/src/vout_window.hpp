@@ -27,6 +27,7 @@
 #include "dialogs.hpp"
 #include "../commands/cmd_generic.hpp"
 #include <vlc_vout_window.h>
+#include <memory>
 
 class OSGraphics;
 class OSTimer;
@@ -40,7 +41,7 @@ public:
 
     VoutWindow( intf_thread_t *pIntf, struct vout_window_t* pWnd,
                 int width, int height, GenericWindow* pParent = NULL );
-    virtual ~VoutWindow();
+    ~VoutWindow();
 
     /// Make some functions public
     //@{
@@ -98,7 +99,7 @@ private:
     GenericWindow* m_pParentWindow;
 
     // Cursor timer
-    OSTimer *m_pTimer;
+    std::unique_ptr<OSTimer> m_pTimer;
     int mouse_hide_timeout;
     DEFINE_CALLBACK( VoutWindow, HideMouse );
 };

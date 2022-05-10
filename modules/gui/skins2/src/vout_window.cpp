@@ -50,19 +50,11 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
     {
         updateWindowConfiguration( m_pWnd );
 
-        m_pTimer = pOsFactory->createOSTimer( m_cmdHideMouse );
+        m_pTimer.reset(pOsFactory->createOSTimer( m_cmdHideMouse ));
     }
 }
 
-
-VoutWindow::~VoutWindow()
-{
-    if( m_pWnd )
-    {
-        delete m_pTimer;
-    }
-}
-
+VoutWindow::~VoutWindow() = default;
 
 void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
 {
