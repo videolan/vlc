@@ -308,7 +308,7 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * );
 
 static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
-    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    vout_window_skins_t* sys = static_cast<vout_window_skins_t*>(pWnd->sys);
     intf_thread_t *pIntf = sys->pIntf;
 
     sys->cfg = *cfg;
