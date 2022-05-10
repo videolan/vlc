@@ -105,12 +105,6 @@ X11Loop::X11Loop( intf_thread_t *pIntf, X11Display &rDisplay ):
     }
 }
 
-
-X11Loop::~X11Loop()
-{
-}
-
-
 OSLoop *X11Loop::instance( intf_thread_t *pIntf, X11Display &rDisplay )
 {
     if( pIntf->p_sys->p_osLoop == NULL )
