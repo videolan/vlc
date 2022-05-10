@@ -83,7 +83,6 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_dialogs = NULL;
     p_intf->p_sys->p_interpreter = NULL;
     p_intf->p_sys->p_osFactory = NULL;
-    p_intf->p_sys->p_osLoop = NULL;
     p_intf->p_sys->p_varManager = NULL;
     p_intf->p_sys->p_voutManager = NULL;
     p_intf->p_sys->p_vlcProc = NULL;

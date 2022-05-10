@@ -36,6 +36,7 @@
 #include <vlc_fs.h>
 
 #include <string>
+#include <memory>
 
 class AsyncQueue;
 class Logger;
@@ -98,7 +99,7 @@ struct intf_sys_t
     /// Factory for OS specific classes
     OSFactory *p_osFactory;
     /// Main OS specific message loop
-    OSLoop *p_osLoop;
+    std::unique_ptr<OSLoop> p_osLoop;
     /// Variable manager
     VarManager *p_varManager;
     /// VLC state handler

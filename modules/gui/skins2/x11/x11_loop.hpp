@@ -28,6 +28,7 @@
 #include "../src/os_loop.hpp"
 
 #include <map>
+#include <memory>
 
 class X11Display;
 class GenericWindow;

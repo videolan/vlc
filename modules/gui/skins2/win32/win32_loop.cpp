@@ -101,19 +101,17 @@ Win32Loop::Win32Loop( intf_thread_t *pIntf ): OSLoop( pIntf )
 
 OSLoop *Win32Loop::instance( intf_thread_t *pIntf )
 {
+
     if( pIntf->p_sys->p_osLoop == NULL )
-    {
-        OSLoop *pOsLoop = new Win32Loop( pIntf );
-        pIntf->p_sys->p_osLoop = pOsLoop;
-    }
-    return pIntf->p_sys->p_osLoop;
+        pIntf->p_sys->p_osLoop = std::make_unique<Win32Loop>(pIntf);
+    return pIntf->p_sys->p_osLoop.get();
 }
 
 
 void Win32Loop::destroy( intf_thread_t *pIntf )
 {
-    delete pIntf->p_sys->p_osLoop;
-    pIntf->p_sys->p_osLoop = NULL;
+    assert(pIntf->p_sys->p_osLoop);
+    pIntf->p_sys->p_osLoop.reset();
 }
 
 
