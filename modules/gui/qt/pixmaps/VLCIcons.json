@@ -153,6 +153,7 @@
 		{"key":"play_outline", "path": "./play_outline.svg"},
 		{"key":"enqueue", "path": "./enqueue.svg"},
 		{"key":"back", "path": "./back.svg"},
+		{"key":"expand", "path": "./expand.svg"},
 		{"key":"history", "path": "./history.svg"},
 		{"key": "window_close", "path": "./topbar/window_close.svg" },
 		{"key": "window_maximize", "path": "./topbar/window_maximize.svg" },
