@@ -56,7 +56,7 @@ public:
 
 private:
     /// Command queue
-    typedef std::list<CmdGenericPtr> cmdList_t;
+    using cmdList_t = std::list<CmdGenericPtr>;
     cmdList_t m_cmdList;
     /// Timer
     std::unique_ptr<OSTimer> m_pTimer;
