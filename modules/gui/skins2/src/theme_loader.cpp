@@ -111,7 +111,7 @@ bool ThemeLoader::load( const std::string &fileName )
     if( ! extract( fileName ) && ! parse( path, fileName ) )
         return false;
 
-    Theme *pNewTheme = getIntf()->p_sys->p_theme;
+    auto &pNewTheme = getIntf()->p_sys->p_theme;
     if( !pNewTheme )
         return false;
 
@@ -308,7 +308,7 @@ bool ThemeLoader::parse( const std::string &path, const std::string &xmlFile )
 
     // Build and store the theme
     Builder builder( getIntf(), parser.getData(), path );
-    getIntf()->p_sys->p_theme = builder.build();
+    getIntf()->p_sys->p_theme.reset(builder.build());
 
     return true;
 }

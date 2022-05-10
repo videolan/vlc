@@ -112,7 +112,7 @@ struct intf_sys_t
     ThemeRepository *p_repository;
 
     /// Current theme
-    Theme *p_theme;
+    std::unique_ptr<Theme> p_theme;
 
     /// synchronisation at start of interface
     vlc_thread_t thread;

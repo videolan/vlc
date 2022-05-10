@@ -159,8 +159,8 @@ static void *Run( void * p_obj )
 
     bool b_error = false;
     char *skin_last = NULL;
-    ThemeLoader *pLoader = NULL;
     OSLoop *loop = NULL;
+    std::unique_ptr<ThemeLoader> pLoader;
 
     // Initialize singletons
     if( OSFactory::instance( p_intf ) == NULL )
@@ -220,7 +220,7 @@ static void *Run( void * p_obj )
 
     // Load a theme
     skin_last = config_GetPsz( "skins2-last" );
-    pLoader = new ThemeLoader( p_intf );
+    pLoader = std::make_unique<ThemeLoader>(p_intf);
 
     if( !skin_last || !pLoader->load( skin_last ) )
     {
@@ -231,7 +231,7 @@ static void *Run( void * p_obj )
         msg_Err( p_intf, "no skins found : exiting");
     }
 
-    delete pLoader;
+    pLoader.reset();
     free( skin_last );
 
     // Get the instance of OSLoop
@@ -251,10 +251,7 @@ static void *Run( void * p_obj )
     if( p_intf->p_sys->p_theme )
     {
         p_intf->p_sys->p_theme->saveConfig();
-
-        delete p_intf->p_sys->p_theme;
-        p_intf->p_sys->p_theme = NULL;
-
+        p_intf->p_sys->p_theme.reset();
         msg_Dbg( p_intf, "current theme deleted" );
     }
 

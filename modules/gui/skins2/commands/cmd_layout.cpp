@@ -34,7 +34,7 @@ CmdLayout::CmdLayout( intf_thread_t *pIntf, TopWindow &rWindow,
 
 void CmdLayout::execute()
 {
-    Theme *p_theme = getIntf()->p_sys->p_theme;
+    auto &p_theme = getIntf()->p_sys->p_theme;
     if( p_theme )
         p_theme->getWindowManager().setActiveLayout( m_rWindow, m_rLayout );
 }

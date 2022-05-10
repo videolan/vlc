@@ -36,7 +36,7 @@
 void CmdChangeSkin::execute()
 {
     // Save the old theme to restore it in case of problem
-    Theme *pOldTheme = getIntf()->p_sys->p_theme;
+    auto pOldTheme = std::move(getIntf()->p_sys->p_theme);
 
     if( pOldTheme )
     {
@@ -52,7 +52,7 @@ void CmdChangeSkin::execute()
         // Everything went well
         msg_Info( getIntf(), "new theme successfully loaded (%s)",
                  m_file.c_str() );
-        delete pOldTheme;
+        pOldTheme.reset();
 
         // restore vout config
         VoutManager::instance( getIntf() )->restoreVoutConfig( true );
@@ -61,9 +61,9 @@ void CmdChangeSkin::execute()
     {
         msg_Warn( getIntf(), "a problem occurred when loading the new theme,"
                   " restoring the previous one" );
-        getIntf()->p_sys->p_theme = pOldTheme;
+        getIntf()->p_sys->p_theme = std::move(pOldTheme);
         VoutManager::instance( getIntf() )->restoreVoutConfig( false );
-        pOldTheme->getWindowManager().restoreVisibility();
+        getIntf()->p_sys->p_theme->getWindowManager().restoreVisibility();
     }
     else
     {
