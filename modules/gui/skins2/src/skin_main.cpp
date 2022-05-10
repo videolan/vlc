@@ -155,8 +155,6 @@ static void Close( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 static void *Run( void * p_obj )
 {
-    int canc = vlc_savecancel();
-
     intf_thread_t *p_intf = (intf_thread_t *)p_obj;
 
     bool b_error = false;
@@ -281,7 +279,6 @@ end:
         vlc_sem_post( &p_intf->p_sys->init_wait );
     }
 
-    vlc_restorecancel(canc);
     return NULL;
 }
 
