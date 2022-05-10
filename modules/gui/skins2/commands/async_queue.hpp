@@ -30,6 +30,8 @@
 #include <string>
 #include <memory>
 
+#include <vlc_cxx_helpers.hpp>
+
 class OSTimer;
 
 
@@ -61,7 +63,7 @@ private:
     /// Timer
     std::unique_ptr<OSTimer> m_pTimer;
     /// Mutex
-    vlc_mutex_t m_lock;
+    vlc::threads::mutex m_lock;
 
     // Private because it is a singleton
     AsyncQueue( intf_thread_t *pIntf );
