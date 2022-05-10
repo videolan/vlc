@@ -71,6 +71,31 @@
 #import <assert.h>
 #import "../../../src/darwin/runloop.h"
 
+static void DisplayLinkDummySourcePerform(void *info) {
+    (void)info;
+}
+static void DisplayLinkDummySourceSchedule(void *info, CFRunLoopRef rl, CFRunLoopMode mode) {
+    (void)info;
+}
+static void DisplayLinkDummySourceCancel(void *info, CFRunLoopRef rl, CFRunLoopMode mode) {
+    (void)info;
+}
+static const void *DisplayLinkDummySourceRetain(const void *info) {
+    return NULL;
+}
+static void DisplayLinkDummySourceRelease(const void *info) {
+    (void)info;
+}
+static CFStringRef DisplayLinkDummySourceCopyDescription(const void *info) {
+    return CFSTR("DisplayLinkDummySource");
+}
+static Boolean DisplayLinkDummySourceEqual(const void *info1, const void *info2) {
+    return false;
+}
+static CFHashCode DisplayLinkDummySourceHash(const void *info) {
+    return 12345;
+}
+
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _eventq sync dispatch when closed. */
     vlc_window_t *_wnd;
@@ -101,6 +126,10 @@
 
     /* Other */
     CADisplayLink *_displayLink;
+    dispatch_queue_t _displayLinkRunLoopQueue;
+    NSRunLoop *_displayLinkRunLoop;
+    CFRunLoopSourceRef _displayLinkRunLoopDummySource;
+
     vlc_tick_t _last_ca_target_ts;
 }
 
@@ -173,8 +202,48 @@
 
     _displayLink = [CADisplayLink displayLinkWithTarget:self
                                                selector:@selector(displayLinkUpdate:)];
-
+    
+    [self prepareDisplayLinkRunLoop];
     return self;
+}
+
+- (void)prepareDisplayLinkRunLoop {
+    dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL, QOS_CLASS_USER_INTERACTIVE, 0);
+    _displayLinkRunLoopQueue = dispatch_queue_create("org.videolan.vout.displayLinkRunLoopQueue", attributes);
+    __block NSRunLoop *displayLinkRunLoop;
+    
+    /// We have to dispatch async and wait to get the queue's thread runloop
+    dispatch_semaphore_t waitForRunLoopSem = dispatch_semaphore_create(0);
+    dispatch_async(_displayLinkRunLoopQueue, ^{
+        displayLinkRunLoop = [NSRunLoop currentRunLoop];
+        /// We signal the runloop ref availability
+        dispatch_semaphore_signal(waitForRunLoopSem);
+    });
+    /// We wait for the display link runloop ref
+    dispatch_semaphore_wait(waitForRunLoopSem, DISPATCH_TIME_FOREVER);
+    
+    _displayLinkRunLoop = displayLinkRunLoop;
+    
+    CFRunLoopRef runloop = displayLinkRunLoop.getCFRunLoop;
+    
+    /// We need at least one source to be able to run the runloop continuously
+    CFRunLoopSourceContext dummyContext = {
+        .retain = DisplayLinkDummySourceRetain,
+        .release = DisplayLinkDummySourceRelease,
+        .copyDescription = DisplayLinkDummySourceCopyDescription,
+        .equal = DisplayLinkDummySourceEqual,
+        .hash = DisplayLinkDummySourceHash,
+        .schedule = DisplayLinkDummySourceSchedule,
+        .cancel = DisplayLinkDummySourceCancel,
+        .perform = DisplayLinkDummySourcePerform
+    };
+    _displayLinkRunLoopDummySource = CFRunLoopSourceCreate(NULL, 0, &dummyContext);
+    CFRunLoopAddSource(runloop, _displayLinkRunLoopDummySource, kCFRunLoopDefaultMode);
+    
+    /// We dispatch async to run the runloop in its own thread
+    dispatch_async(_displayLinkRunLoopQueue, ^{
+        [displayLinkRunLoop run];
+    });
 }
 
 - (void)didMoveToSuperview
@@ -234,30 +303,27 @@
     vlc_tick_t ca_current_ts = vlc_tick_from_sec(ca_current);
     vlc_tick_t ca_target_ts = vlc_tick_from_sec(ca_target);
 
-    [self reportEvent:^{
+    /*if (@available(iOS 10, *))
+        target_ts = [sender targetTimestamp]; */
 
-        /*if (@available(iOS 10, *))
-            target_ts = [sender targetTimestamp]; */
+    /* this compute the length of the VSYNC and the next date for the
+     * VSYNC. */
+    vlc_tick_t last_ca_target_ts =_last_ca_target_ts == VLC_TICK_INVALID ?
+        ca_current_ts : _last_ca_target_ts;
+    vlc_tick_t clock_offset = ca_current_ts - ca_now_ts;
+    vlc_tick_t vsync_length = ca_target_ts - last_ca_target_ts;
+    _last_ca_target_ts = ca_target_ts;
 
-        /* this compute the length of the VSYNC and the next date for the
-         * VSYNC. */
-        vlc_tick_t last_ca_target_ts =_last_ca_target_ts == VLC_TICK_INVALID ?
-            ca_current_ts : _last_ca_target_ts;
-        vlc_tick_t clock_offset = ca_current_ts - ca_now_ts;
-        vlc_tick_t vsync_length = ca_target_ts - last_ca_target_ts;
-        _last_ca_target_ts = ca_target_ts;
-
-        if (atomic_load(&_avstatEnabled))
-            msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
-                     "clock_offset=%" PRId64 " prev_ts=%" PRId64 " target_ts=%" PRId64,
-                     NS_FROM_VLC_TICK(now),
-                     NS_FROM_VLC_TICK(clock_offset),
-                     NS_FROM_VLC_TICK(ca_current_ts),
-                     NS_FROM_VLC_TICK(ca_target_ts));
-
+    if (atomic_load(&_avstatEnabled))
+        msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
+                 "clock_offset=%" PRId64 " prev_ts=%" PRId64 " target_ts=%" PRId64,
+                 NS_FROM_VLC_TICK(now),
+                 NS_FROM_VLC_TICK(clock_offset),
+                 NS_FROM_VLC_TICK(ca_current_ts),
+                 NS_FROM_VLC_TICK(ca_target_ts));
+    dispatch_async(_eventq, ^{
         vlc_window_ReportVsyncReached(_wnd, now + clock_offset + vsync_length);
-    }];
-
+    });
 }
 
 - (void)reportEventAsync:(void(^)())eventBlock
@@ -287,6 +353,12 @@
 
 - (void)detachFromParent
 {
+    /// We have to invalidate the dummy source to remove it from the display link runloop
+    CFRunLoopSourceInvalidate(_displayLinkRunLoopDummySource);
+    CFRelease(_displayLinkRunLoopDummySource);
+    _displayLinkRunLoopDummySource = NULL;
+    _displayLinkRunLoop = nil;
+    
     /* We need to dispatch synchronously to ensure _wnd is set to null after
      * all events have been reported in the _eventq
      */
@@ -295,7 +367,7 @@
          * so delete it before. */
         [_displayLink invalidate];
         _displayLink = nil;
-
+        
         /* The UIView must not be attached before releasing. Disable() is doing
          * exactly this asynchronously in the main thread so ensure it was called
          * here before detaching from the parent. */
@@ -314,7 +386,7 @@
 
 - (void)enable
 {
-    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    [_displayLink addToRunLoop:_displayLinkRunLoop forMode:NSDefaultRunLoopMode];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         assert(!_enabled);
@@ -336,7 +408,7 @@
 
 - (void)disable
 {
-    [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    [_displayLink removeFromRunLoop:_displayLinkRunLoop forMode:NSDefaultRunLoopMode];
     _last_ca_target_ts = VLC_TICK_INVALID;
 
     dispatch_async(dispatch_get_main_queue(), ^{
