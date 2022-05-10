@@ -35,18 +35,11 @@ AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     // Create a timer
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pTimer = pOsFactory->createOSTimer( m_cmdFlush );
+    m_pTimer.reset(pOsFactory->createOSTimer(m_cmdFlush));
 
     // Flush the queue every 10 ms
     m_pTimer->start( 10, false );
 }
-
-
-AsyncQueue::~AsyncQueue()
-{
-    delete( m_pTimer );
-}
-
 
 AsyncQueue *AsyncQueue::instance( intf_thread_t *pIntf )
 {
