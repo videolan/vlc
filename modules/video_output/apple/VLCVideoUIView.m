@@ -364,6 +364,9 @@ static CFHashCode DisplayLinkDummySourceHash(const void *info) {
     /// We have to invalidate the dummy source to remove it from the display link runloop
     CFRunLoopSourceInvalidate(_displayLinkRunLoopDummySource);
     CFRelease(_displayLinkRunLoopDummySource);
+    /// We have to wake up the runloop to ensure the source removal is effective
+    /// and to have the runloop being stopped
+    CFRunLoopWakeUp(_displayLinkRunLoop.getCFRunLoop);
     _displayLinkRunLoopDummySource = NULL;
     _displayLinkRunLoop = nil;
     
