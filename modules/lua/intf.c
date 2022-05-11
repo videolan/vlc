@@ -424,11 +424,6 @@ int Open_LuaHTTP( vlc_object_t *p_this )
     return Start_LuaIntf( p_this, "http" );
 }
 
-int Open_LuaCLI( vlc_object_t *p_this )
-{
-    return Start_LuaIntf( p_this, "cli" );
-}
-
 int Open_LuaTelnet( vlc_object_t *p_this )
 {
     char *pw = var_CreateGetNonEmptyString( p_this, "telnet-password" );
