@@ -1479,17 +1479,18 @@ void SPrefsPanel::assoDialog()
                             : Qt::Unchecked );
 
     i_temp = 0;
-    aTv( ".3g2" ); aTv( ".3gp" ); aTv( ".3gp2" ); aTv( ".3gpp" ); aTv( ".amv" );
-    aTv( ".asf" ); aTv( ".avi" ); aTv( ".bik" ); aTv( ".divx" ); aTv( ".drc" );
-    aTv( ".dv" ); aTv( ".f4v" ); aTv( ".flv" ); aTv( ".gvi" ); aTv( ".gxf" );
-    aTv( ".m1v" ); aTv( ".m2t" ); aTv( ".m2v" ); aTv( ".m2ts" ); aTv( ".m4v" );
-    aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2v" ); aTv( ".mp4" ); aTv( ".mp4v" );
-    aTv( ".mpa" ); aTv( ".mpe" ); aTv( ".mpeg" ); aTv( ".mpeg1" ); aTv( ".mpeg2" );
-    aTv( ".mpeg4" ); aTv( ".mpg" ); aTv( ".mpv2" ); aTv( ".mts" ); aTv( ".mtv" );
-    aTv( ".mxf" ); aTv( ".nsv" ); aTv( ".nuv" ); aTv( ".ogg" ); aTv( ".ogm" );
-    aTv( ".ogx" ); aTv( ".ogv" ); aTv( ".rec" ); aTv( ".rm" ); aTv( ".rmvb" );
-    aTv( ".rpl" ); aTv( ".thp" ); aTv( ".tod" ); aTv( ".ts" ); aTv( ".tts" );
-    aTv( ".vob" ); aTv( ".vro" ); aTv( ".webm" ); aTv( ".wmv" ); aTv( ".xesc" );
+    aTv( ".3g2" ); aTv( ".3gp" ); aTv( ".3gp2" ); aTv( ".3gpp" ); aTv( ".amrec" );
+    aTv( ".amv" ); aTv( ".asf" ); aTv( ".avi" ); aTv( ".bik" ); aTv( ".divx" );
+    aTv( ".drc" ); aTv( ".dv" ); aTv( ".f4v" ); aTv( ".flv" ); aTv( ".gvi" );
+    aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2t" ); aTv( ".m2v" ); aTv( ".m2ts" );
+    aTv( ".m4v" ); aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2v" ); aTv( ".mp4" );
+    aTv( ".mp4v" ); aTv( ".mpa" ); aTv( ".mpe" ); aTv( ".mpeg" ); aTv( ".mpeg1" );
+    aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" ); aTv( ".mpv2" ); aTv( ".mts" );
+    aTv( ".mtv" ); aTv( ".mxf" ); aTv( ".nsv" ); aTv( ".nuv" ); aTv( ".ogg" );
+    aTv( ".ogm" ); aTv( ".ogx" ); aTv( ".ogv" ); aTv( ".rec" ); aTv( ".rm" );
+    aTv( ".rmvb" ); aTv( ".rpl" ); aTv( ".thp" ); aTv( ".tod" ); aTv( ".ts" );
+    aTv( ".tts" ); aTv( ".vob" ); aTv( ".vro" ); aTv( ".webm" ); aTv( ".wmv" );
+    aTv( ".xesc" );
     videoType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == videoType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )

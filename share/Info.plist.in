@@ -1035,6 +1035,7 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>amrec</string>
 				<string>tp</string>
 				<string>ts</string>
 				<string>m2t</string>
@@ -2205,6 +2206,7 @@
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
+					<string>amrec</string>
 					<string>m2p</string>
 					<string>ps</string>
 					<string>tp</string>

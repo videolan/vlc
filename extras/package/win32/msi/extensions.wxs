@@ -405,6 +405,14 @@
                         <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
                     </Extension>
                 </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".amrec" Value="VLC.ts.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".amrec" Value="" Type="string" />
+                <ProgId Id='VLC.amrec.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='amrec'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
                 <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".amv" Value="VLC.amv.Document" Type="string" />
                 <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".amv" Value="" Type="string" />
                 <ProgId Id='VLC.amv.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>

@@ -188,6 +188,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".3gp"
   !insertmacro ${_action} Video ".3gp2"
   !insertmacro ${_action} Video ".3gpp"
+  !insertmacro ${_action} Video ".amrec"
   !insertmacro ${_action} Video ".amv"
   !insertmacro ${_action} Video ".asf"
   !insertmacro ${_action} Video ".avi"
