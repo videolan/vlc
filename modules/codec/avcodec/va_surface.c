@@ -122,13 +122,10 @@ static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 {
     for (unsigned i = 0; i < va_pool->surface_count; i++) {
         vlc_va_surface_t *surface = &va_pool->surface[i];
-        uintptr_t expected = 1;
+        uintptr_t expected = 1; // exists but unused
 
         if (atomic_compare_exchange_strong(&surface->refcount, &expected, 2))
         {
-            /* the copy should have added an extra reference */
-            atomic_fetch_sub(&surface->refcount, 1);
-            va_surface_AddRef(surface);
             return surface;
         }
     }
@@ -139,7 +136,7 @@ vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
 {
     vlc_va_surface_t *surface;
 
-    if (va_pool->surface_count == 0)
+    if (unlikely(va_pool->surface_count == 0))
         return NULL;
 
     vlc_sem_wait(&va_pool->available_surfaces);
