@@ -161,7 +161,7 @@ static void TraceJson(void *opaque, va_list entries)
 
     flockfile(stream);
     JsonStartObjectSection(stream, NULL);
-    JsonPrintKeyValueNumber(stream, "Timestamp", US_FROM_VLC_TICK(vlc_tick_now()));
+    JsonPrintKeyValueNumber(stream, "Timestamp", VLC_TRACER_TIME_FROM_TICK(vlc_tick_now()));
     fputc(',', stream);
 
     JsonStartObjectSection(stream, "Body");
