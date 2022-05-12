@@ -402,16 +402,17 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
 
-static const struct vout_window_operations window_ops = {
-    WindowEnable,
-    WindowDisable,
-    WindowResize,
-    WindowClose,
-    WindowSetState,
-    WindowUnsetFullscreen,
-    WindowSetFullscreen,
-    NULL,
-};
+static const auto window_ops = []{
+    struct vout_window_operations ops {};
+    ops.enable = WindowEnable;
+    ops.disable = WindowDisable;
+    ops.resize = WindowResize;
+    ops.destroy = WindowClose;
+    ops.set_state = WindowSetState;
+    ops.unset_fullscreen = WindowUnsetFullscreen;
+    ops.set_fullscreen = WindowSetFullscreen;
+    return ops;
+}();
 
 static int WindowOpen( vout_window_t *pWnd )
 {
