@@ -43,16 +43,16 @@
 enum vlc_tracer_value
 {
     VLC_TRACER_INT,
+    VLC_TRACER_TICK,
     VLC_TRACER_STRING
 };
 
 typedef union
 {
     int64_t integer;
+    vlc_tick_t tick;
     const char *string;
 } vlc_tracer_value_t;
-
-#define VLC_TRACER_TIME_FROM_TICK(ts) NS_FROM_VLC_TICK(ts)
 
 /**
  * Trace message
@@ -102,8 +102,8 @@ VLC_API void vlc_tracer_Trace(struct vlc_tracer *tracer, ...);
 static inline struct vlc_tracer_entry vlc_tracer_entry_FromTick(const char *key, vlc_tick_t value)
 {
     vlc_tracer_value_t tracer_value;
-    tracer_value.integer = VLC_TRACER_TIME_FROM_TICK(value);
-    struct vlc_tracer_entry trace = { key, tracer_value, VLC_TRACER_INT };
+    tracer_value.integer = value;
+    struct vlc_tracer_entry trace = { key, tracer_value, VLC_TRACER_TICK };
     return trace;
 }
 
