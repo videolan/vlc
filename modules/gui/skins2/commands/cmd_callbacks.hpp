@@ -38,9 +38,6 @@ public:
           m_label( label ), m_pfExecute( func )
     {
     }
-    virtual ~CmdCallback()
-    {
-    }
     virtual void execute()
     {
         if( !m_pfExecute )
@@ -66,10 +63,6 @@ public:
     {
         vlc_mutex_init( &m_lock );
         vlc_cond_init( &m_wait );
-    }
-
-    virtual ~CmdExecuteBlock()
-    {
     }
 
     static void executeWait( const CmdGenericPtr& rcCommand  )
