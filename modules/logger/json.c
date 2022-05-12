@@ -39,6 +39,8 @@
 
 #define JSON_FILENAME "vlc-log.json"
 
+#define TIME_FROM_TICK(ts) NS_FROM_VLC_TICK(ts)
+
 typedef struct
 {
     FILE *stream;
@@ -161,7 +163,7 @@ static void TraceJson(void *opaque, va_list entries)
 
     flockfile(stream);
     JsonStartObjectSection(stream, NULL);
-    JsonPrintKeyValueNumber(stream, "Timestamp", VLC_TRACER_TIME_FROM_TICK(vlc_tick_now()));
+    JsonPrintKeyValueNumber(stream, "Timestamp", TIME_FROM_TICK(vlc_tick_now()));
     fputc(',', stream);
 
     JsonStartObjectSection(stream, "Body");
@@ -173,6 +175,10 @@ static void TraceJson(void *opaque, va_list entries)
         {
             case VLC_TRACER_INT:
                 JsonPrintKeyValueNumber(stream, entry.key, entry.value.integer);
+                break;
+            case VLC_TRACER_TICK:
+                JsonPrintKeyValueNumber(stream, entry.key,
+                                        TIME_FROM_TICK(entry.value.tick));
                 break;
             case VLC_TRACER_STRING:
                 JsonPrintKeyValueLabel(stream, entry.key, entry.value.string);
