@@ -73,7 +73,7 @@ struct vlc_tracer;
  * should be ended by a \ref vlc_tracer_entry with a NULL key.
  * \param data data pointer as provided to vlc_tracer_Trace().
  */
-typedef void (*vlc_trace_cb) (void *data, va_list entries);
+typedef void (*vlc_trace_cb) (void *data, vlc_tick_t ts, va_list entries);
 
 struct vlc_tracer_operations
 {
