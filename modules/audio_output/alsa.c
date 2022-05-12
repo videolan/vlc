@@ -40,16 +40,11 @@
 #include <alsa/version.h>
 
 /** Helper for ALSA -> VLC debugging output */
-static void Dump(struct vlc_logger *log, const char *msg,
-                 int (*cb)(void *, snd_output_t *), void *p)
+static void DumpPost(struct vlc_logger *log, snd_output_t *output,
+                     const char *msg, int val)
 {
-    snd_output_t *output;
     char *str;
 
-    if (unlikely(snd_output_buffer_open (&output)))
-        return;
-
-    int val = cb (p, output);
     if (val)
     {
         vlc_warning(log, "cannot get info: %s", snd_strerror(val));
@@ -62,8 +57,14 @@ static void Dump(struct vlc_logger *log, const char *msg,
     vlc_debug(log, "%s%.*s", msg, (int)len, str);
     snd_output_close (output);
 }
+
 #define Dump(o, m, cb, p) \
-        Dump(o, m, (int (*)(void *, snd_output_t *))(cb), p)
+    do { \
+        snd_output_t *output; \
+\
+        if (likely(snd_output_buffer_open(&output) == 0)) \
+            DumpPost(o, output, m, (cb)(p, output)); \
+    } while (0)
 
 static void DumpDevice(struct vlc_logger *log, snd_pcm_t *pcm)
 {
