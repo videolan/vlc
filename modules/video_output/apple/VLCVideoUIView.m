@@ -208,7 +208,7 @@ static CFHashCode DisplayLinkDummySourceHash(const void *info) {
 }
 
 - (void)prepareDisplayLinkRunLoop {
-    dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL, QOS_CLASS_DEFAULT, 0);
+    dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL, QOS_CLASS_USER_INTERACTIVE, 0);
     _displayLinkRunLoopQueue = dispatch_queue_create("org.videolan.vout.displayLinkRunLoopQueue", attributes);
     __block NSRunLoop *displayLinkRunLoop;
     __block CFRunLoopSourceRef displayLinkRunLoopDummySource;
