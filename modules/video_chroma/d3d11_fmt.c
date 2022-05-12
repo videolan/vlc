@@ -147,31 +147,31 @@ int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hKey;
-    TCHAR key[128];
-    TCHAR szData[256], lookup[256];
+    CHAR key[128];
+    CHAR szData[256], lookup[256];
     DWORD len = 256;
     LSTATUS ret;
 
-    _sntprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x"), adapterDesc->VendorId, adapterDesc->DeviceId);
+    _snprintf(lookup, 256, "pci\\ven_%04x&dev_%04x", adapterDesc->VendorId, adapterDesc->DeviceId);
     for (int i=0;;i++)
     {
-        _sntprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
-        ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
+        _snprintf(key, 128, "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d", i);
+        ret = RegOpenKeyExA(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
         if ( ret != ERROR_SUCCESS )
         {
-            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%d)", i, ret);
+            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%ld)", i, ret);
             return NULL;
         }
 
         len = sizeof(szData);
-        ret = RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len );
+        ret = RegQueryValueExA( hKey, "MatchingDeviceId", NULL, NULL, (LPBYTE) &szData, &len );
         if ( ret == ERROR_SUCCESS ) {
-            if (_tcsnicmp(lookup, szData, _tcslen(lookup)) == 0)
+            if (_strnicmp(lookup, szData, strlen(lookup)) == 0)
                 return hKey;
             msg_Dbg(obj, "different %d device %s vs %s", i, lookup, szData);
         }
         else
-            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%d)", i, ret);
+            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%ld)", i, ret);
 
         RegCloseKey(hKey);
     }
@@ -199,7 +199,7 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     }
 
     LONG err = ERROR_ACCESS_DENIED;
-    TCHAR szData[256];
+    CHAR szData[256];
     DWORD len = 256;
     HKEY hKey = GetAdapterRegistry(obj, &adapterDesc);
     if (hKey == NULL)
@@ -208,7 +208,7 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
         return;
     }
 
-    err = RegQueryValueEx( hKey, TEXT("DriverVersion"), NULL, NULL, (LPBYTE) &szData, &len );
+    err = RegQueryValueExA( hKey, "DriverVersion", NULL, NULL, (LPBYTE) &szData, &len );
     RegCloseKey(hKey);
 
     if (err != ERROR_SUCCESS )
@@ -219,7 +219,7 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 
     int wddm, d3d_features, revision, build;
     /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
-    if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
+    if (sscanf(szData, "%d.%d.%d.%d", &wddm, &d3d_features, &revision, &build) != 4)
     {
         msg_Warn(obj, "the adapter DriverVersion '%s' doesn't match the expected format", szData);
         return;
