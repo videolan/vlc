@@ -40,8 +40,8 @@
 #include <alsa/version.h>
 
 /** Helper for ALSA -> VLC debugging output */
-static void Dump (vlc_object_t *obj, const char *msg,
-                  int (*cb)(void *, snd_output_t *), void *p)
+static void Dump(struct vlc_logger *log, const char *msg,
+                 int (*cb)(void *, snd_output_t *), void *p)
 {
     snd_output_t *output;
     char *str;
@@ -52,43 +52,42 @@ static void Dump (vlc_object_t *obj, const char *msg,
     int val = cb (p, output);
     if (val)
     {
-        msg_Warn (obj, "cannot get info: %s", snd_strerror (val));
+        vlc_warning(log, "cannot get info: %s", snd_strerror(val));
         return;
     }
 
     size_t len = snd_output_buffer_string (output, &str);
     if (len > 0 && str[len - 1])
         len--; /* strip trailing newline */
-    msg_Dbg (obj, "%s%.*s", msg, (int)len, str);
+    vlc_debug(log, "%s%.*s", msg, (int)len, str);
     snd_output_close (output);
 }
 #define Dump(o, m, cb, p) \
-        Dump(VLC_OBJECT(o), m, (int (*)(void *, snd_output_t *))(cb), p)
+        Dump(o, m, (int (*)(void *, snd_output_t *))(cb), p)
 
-static void DumpDevice (vlc_object_t *obj, snd_pcm_t *pcm)
+static void DumpDevice(struct vlc_logger *log, snd_pcm_t *pcm)
 {
     snd_pcm_info_t *info;
 
-    Dump (obj, " ", snd_pcm_dump, pcm);
+    Dump(log, " ", snd_pcm_dump, pcm);
     snd_pcm_info_alloca (&info);
     if (snd_pcm_info (pcm, info) == 0)
     {
-        msg_Dbg (obj, " device name   : %s", snd_pcm_info_get_name (info));
-        msg_Dbg (obj, " device ID     : %s", snd_pcm_info_get_id (info));
-        msg_Dbg (obj, " subdevice name: %s",
-                snd_pcm_info_get_subdevice_name (info));
+        vlc_debug(log, " device name   : %s", snd_pcm_info_get_name (info));
+        vlc_debug(log, " device ID     : %s", snd_pcm_info_get_id (info));
+        vlc_debug(log, " subdevice name: %s",
+                  snd_pcm_info_get_subdevice_name (info));
     }
 }
 
-static void DumpDeviceStatus (vlc_object_t *obj, snd_pcm_t *pcm)
+static void DumpDeviceStatus(struct vlc_logger *log, snd_pcm_t *pcm)
 {
     snd_pcm_status_t *status;
 
     snd_pcm_status_alloca (&status);
     snd_pcm_status (pcm, status);
-    Dump (obj, "current status:\n", snd_pcm_status_dump, status);
+    Dump(log, "current status:\n", snd_pcm_status_dump, status);
 }
-#define DumpDeviceStatus(o, p) DumpDeviceStatus(VLC_OBJECT(o), p)
 
 /** Private data for an ALSA PCM playback stream */
 typedef struct
@@ -158,7 +157,7 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
             {
                 msg_Err(aout, "cannot recover playback stream: %s",
                         snd_strerror (val));
-                DumpDeviceStatus(aout, pcm);
+                DumpDeviceStatus(aout->obj.logger, pcm);
                 break;
             }
             msg_Warn(aout, "cannot write samples: %s", snd_strerror(frames));
@@ -373,6 +372,7 @@ enum {
 /** Initializes an ALSA playback stream */
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
+    struct vlc_logger *log = aout->obj.logger;
     aout_sys_t *sys = aout->sys;
     snd_pcm_format_t pcm_format; /* ALSA sample format */
     unsigned channels;
@@ -509,7 +509,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     /* Print some potentially useful debug */
     msg_Dbg (aout, "using ALSA device: %s", device);
     free (devbuf);
-    DumpDevice (VLC_OBJECT(aout), pcm);
+    DumpDevice(log, pcm);
 
     /* Get Initial hardware parameters */
     snd_pcm_hw_params_t *hw;
@@ -517,7 +517,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     snd_pcm_hw_params_alloca (&hw);
     snd_pcm_hw_params_any (pcm, hw);
-    Dump (aout, "initial hardware setup:\n", snd_pcm_hw_params_dump, hw);
+    Dump(log, "initial hardware setup:\n", snd_pcm_hw_params_dump, hw);
 
     val = snd_pcm_hw_params_set_rate_resample(pcm, hw, 0);
     if (val)
@@ -644,14 +644,14 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                  snd_strerror (val));
         goto error;
     }
-    Dump (aout, "final HW setup:\n", snd_pcm_hw_params_dump, hw);
+    Dump(log, "final HW setup:\n", snd_pcm_hw_params_dump, hw);
 
     /* Get Initial software parameters */
     snd_pcm_sw_params_t *sw;
 
     snd_pcm_sw_params_alloca (&sw);
     snd_pcm_sw_params_current (pcm, sw);
-    Dump (aout, "initial software parameters:\n", snd_pcm_sw_params_dump, sw);
+    Dump(log, "initial software parameters:\n", snd_pcm_sw_params_dump, sw);
 
     /* START REVISIT */
     //snd_pcm_sw_params_set_avail_min( pcm, sw, i_period_size );
@@ -673,7 +673,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                  snd_strerror (val));
         goto error;
     }
-    Dump (aout, "final software parameters:\n", snd_pcm_sw_params_dump, sw);
+    Dump(log, "final software parameters:\n", snd_pcm_sw_params_dump, sw);
 
     val = snd_pcm_prepare (pcm);
     if (val)
