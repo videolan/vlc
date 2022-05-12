@@ -89,8 +89,12 @@ struct vlc_tracer_operations
  * Value has to be defined with one of the type defined
  * in the \ref vlc_tracer_entry union.
  * \param tracer tracer emitting the traces
+ * \param ts timestamp of the current trace
  */
-VLC_API void vlc_tracer_Trace(struct vlc_tracer *tracer, ...);
+VLC_API void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ...);
+
+#define vlc_tracer_Trace(tracer, ...) \
+    vlc_tracer_TraceWithTs(tracer, vlc_tick_now(), __VA_ARGS__)
 
 /**
  * \defgroup tracer Tracer

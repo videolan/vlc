@@ -285,7 +285,7 @@ vlc_memstream_printf
 vlc_Log
 vlc_LogSet
 vlc_vaLog
-vlc_tracer_Trace
+vlc_tracer_TraceWithTs
 vlc_LogHeaderCreate
 vlc_LogDestroy
 vlc_strerror
