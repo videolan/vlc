@@ -55,7 +55,7 @@ void vlc_tracer_Trace(struct vlc_tracer *tracer, ...)
     /* Pass message to the callback */
     va_list entries;
     va_start(entries, tracer);
-    tracer->ops->trace(module->opaque, entries);
+    tracer->ops->trace(module->opaque, vlc_tick_now(), entries);
     va_end(entries);
 }
 
