@@ -1192,6 +1192,78 @@ AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format )
     }
 }
 
+static int GetPassthroughFmt( audio_sample_format_t *fmt, int *at_format )
+{
+    if( jfields.AudioFormat.has_ENCODING_IEC61937 )
+    {
+        *at_format = jfields.AudioFormat.ENCODING_IEC61937;
+        switch( fmt->i_format )
+        {
+            case VLC_CODEC_TRUEHD:
+            case VLC_CODEC_MLP:
+                fmt->i_rate = 192000;
+                fmt->i_bytes_per_frame = 16;
+
+                /* AudioFormat.ENCODING_IEC61937 documentation says that the
+                 * channel layout must be stereo. Well, not for TrueHD
+                 * apparently */
+                fmt->i_physical_channels = AOUT_CHANS_7_1;
+                break;
+            case VLC_CODEC_DTS:
+                fmt->i_bytes_per_frame = 4;
+                fmt->i_physical_channels = AOUT_CHANS_STEREO;
+                break;
+            case VLC_CODEC_DTSHD:
+                fmt->i_bytes_per_frame = 4;
+                fmt->i_physical_channels = AOUT_CHANS_STEREO;
+                fmt->i_rate = 192000;
+                fmt->i_bytes_per_frame = 16;
+                break;
+            case VLC_CODEC_EAC3:
+                fmt->i_rate = 192000;
+            case VLC_CODEC_A52:
+                fmt->i_physical_channels = AOUT_CHANS_STEREO;
+                fmt->i_bytes_per_frame = 4;
+                break;
+            default:
+                return VLC_EGENERIC;
+        }
+        fmt->i_frame_length = 1;
+        fmt->i_channels = aout_FormatNbChannels( fmt );
+        fmt->i_format = VLC_CODEC_SPDIFL;
+    }
+    else
+    {
+        switch( fmt->i_format )
+        {
+            case VLC_CODEC_A52:
+                if( !jfields.AudioFormat.has_ENCODING_AC3 )
+                    return VLC_EGENERIC;
+                *at_format = jfields.AudioFormat.ENCODING_AC3;
+                break;
+            case VLC_CODEC_EAC3:
+                if( !jfields.AudioFormat.has_ENCODING_E_AC3 )
+                    return VLC_EGENERIC;
+                *at_format = jfields.AudioFormat.ENCODING_E_AC3;
+                break;
+            case VLC_CODEC_DTS:
+                if( !jfields.AudioFormat.has_ENCODING_DTS )
+                    return VLC_EGENERIC;
+                *at_format = jfields.AudioFormat.ENCODING_DTS;
+                break;
+            default:
+                return VLC_EGENERIC;
+        }
+        fmt->i_bytes_per_frame = 4;
+        fmt->i_frame_length = 1;
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        fmt->i_channels = 2;
+        fmt->i_format = VLC_CODEC_SPDIFB;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int
 StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
 {
@@ -1201,76 +1273,13 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
     if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format ) )
         return VLC_EGENERIC;
 
-    if( jfields.AudioFormat.has_ENCODING_IEC61937 )
-    {
-        i_at_format = jfields.AudioFormat.ENCODING_IEC61937;
-        switch( p_sys->fmt.i_format )
-        {
-            case VLC_CODEC_TRUEHD:
-            case VLC_CODEC_MLP:
-                p_sys->fmt.i_rate = 192000;
-                p_sys->fmt.i_bytes_per_frame = 16;
-
-                /* AudioFormat.ENCODING_IEC61937 documentation says that the
-                 * channel layout must be stereo. Well, not for TrueHD
-                 * apparently */
-                p_sys->fmt.i_physical_channels = AOUT_CHANS_7_1;
-                break;
-            case VLC_CODEC_DTS:
-                p_sys->fmt.i_bytes_per_frame = 4;
-                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-                break;
-            case VLC_CODEC_DTSHD:
-                p_sys->fmt.i_bytes_per_frame = 4;
-                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-                p_sys->fmt.i_rate = 192000;
-                p_sys->fmt.i_bytes_per_frame = 16;
-                break;
-            case VLC_CODEC_EAC3:
-                p_sys->fmt.i_rate = 192000;
-            case VLC_CODEC_A52:
-                p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-                p_sys->fmt.i_bytes_per_frame = 4;
-                break;
-            default:
-                return VLC_EGENERIC;
-        }
-        p_sys->fmt.i_frame_length = 1;
-        p_sys->fmt.i_channels = aout_FormatNbChannels( &p_sys->fmt );
-        p_sys->fmt.i_format = VLC_CODEC_SPDIFL;
-    }
-    else
-    {
-        switch( p_sys->fmt.i_format )
-        {
-            case VLC_CODEC_A52:
-                if( !jfields.AudioFormat.has_ENCODING_AC3 )
-                    return VLC_EGENERIC;
-                i_at_format = jfields.AudioFormat.ENCODING_AC3;
-                break;
-            case VLC_CODEC_EAC3:
-                if( !jfields.AudioFormat.has_ENCODING_E_AC3 )
-                    return VLC_EGENERIC;
-                i_at_format = jfields.AudioFormat.ENCODING_E_AC3;
-                break;
-            case VLC_CODEC_DTS:
-                if( !jfields.AudioFormat.has_ENCODING_DTS )
-                    return VLC_EGENERIC;
-                i_at_format = jfields.AudioFormat.ENCODING_DTS;
-                break;
-            default:
-                return VLC_EGENERIC;
-        }
-        p_sys->fmt.i_bytes_per_frame = 4;
-        p_sys->fmt.i_frame_length = 1;
-        p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-        p_sys->fmt.i_channels = 2;
-        p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
-    }
+    int i_ret = GetPassthroughFmt( &p_sys->fmt, &i_at_format );
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
 
     p_sys->b_passthrough = true;
-    int i_ret = AudioTrack_Create( env, p_aout, p_sys->fmt.i_rate, i_at_format,
-                                   p_sys->fmt.i_physical_channels );
+    i_ret = AudioTrack_Create( env, p_aout, p_sys->fmt.i_rate, i_at_format,
+                               p_sys->fmt.i_physical_channels );
     if( i_ret != VLC_SUCCESS )
     {
         p_sys->b_passthrough = false;
