@@ -46,7 +46,7 @@ else
 ASS_CONF += --disable-fontconfig --disable-require-system-font-provider
 endif
 
-ifneq ($(WITH_DWRITE), 0)
+ifeq ($(WITH_DWRITE), 1)
 ASS_CONF += --enable-directwrite
 endif
 
