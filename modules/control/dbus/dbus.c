@@ -847,6 +847,8 @@ static void *Run( void *data )
     intf_thread_t *p_intf = data;
     intf_sys_t    *p_sys = p_intf->p_sys;
 
+    vlc_thread_set_name("vlc-ctrl-dbus");
+
     int canc = vlc_savecancel();
 
     vlc_tick_t events_last_date = VLC_TICK_INVALID;

@@ -238,6 +238,8 @@ static void *Thread(void *data)
     struct pollfd ufd[1];
     unsigned interval = lroundf(CLOCK_FREQ / (sys->rate * 1000.f));
 
+    vlc_thread_set_name("vlc-scr-wayland");
+
     int canc = vlc_savecancel();
     vlc_cleanup_push(cleanup_wl_display_read, display);
 

@@ -68,6 +68,8 @@ typedef struct vlc_caca_event {
 
 static void *VoutDisplayEventKeyDispatch(void *data)
 {
+    vlc_thread_set_name("vlc-caca");
+
     vout_display_t *vd = data;
     vout_display_sys_t *sys = vd->sys;
     vlc_caca_event_t *event;

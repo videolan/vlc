@@ -136,6 +136,8 @@ static void *HelperThread(void *data)
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
+    vlc_thread_set_name("vlc-ctrl-win");
+
     HWND ipcwindow =
         CreateWindow(L"STATIC",                      /* name of window class */
                   L"VLC ipc " TEXT(VERSION),        /* window title bar text */

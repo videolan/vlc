@@ -448,6 +448,8 @@ static void *cli_client_thread(void *data)
     intf_thread_t *intf = cl->intf;
     char cmd[MAX_LINE_LENGTH + 1];
 
+    vlc_thread_set_name("vlc-cli-client");
+
     while (fgets(cmd, sizeof (cmd), cl->stream) != NULL)
     {
         int canc = vlc_savecancel();
@@ -533,6 +535,8 @@ static void *Run(void *data)
 {
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
+
+    vlc_thread_set_name("vlc-cli-server");
 
     assert(sys->pi_socket_listen != NULL);
 
@@ -752,6 +756,8 @@ static void *Run( void *data )
 {
     intf_thread_t *p_intf = data;
     intf_sys_t *p_sys = p_intf->p_sys;
+
+    vlc_thread_set_name("vlc-cli-server");
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
 

@@ -1402,6 +1402,8 @@ static void *OutThread(void *data)
     decoder_t *p_dec = data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    vlc_thread_set_name("vlc-mediacodec");
+
     vlc_mutex_lock(&p_sys->lock);
     while (!p_sys->b_aborted)
     {

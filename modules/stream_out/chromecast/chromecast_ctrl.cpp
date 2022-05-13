@@ -608,6 +608,8 @@ intf_sys_t::httpd_info_t::~httpd_info_t()
  *****************************************************************************/
 void* intf_sys_t::ChromecastThread(void* p_data)
 {
+    vlc_thread_set_name("vlc-chromecast");
+
     intf_sys_t *p_sys = static_cast<intf_sys_t*>(p_data);
     p_sys->mainLoop();
     return NULL;

@@ -752,6 +752,7 @@ void PlaylistManager::Run()
 
 void * PlaylistManager::managerThread(void *opaque)
 {
+    vlc_thread_set_name("vlc-adapt-mngr");
     static_cast<PlaylistManager *>(opaque)->Run();
     return nullptr;
 }

@@ -336,6 +336,8 @@ static void *DemuxThread( void *p_data )
     vlc_tick_t i_next_frame_date = vlc_tick_now() + p_sys->i_frame_interval;
     int i_ret;
 
+    vlc_thread_set_name("vlc-rdp");
+
     for(;;)
     {
         i_ret = 0;

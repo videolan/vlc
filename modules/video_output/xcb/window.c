@@ -321,6 +321,8 @@ static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
 /** Background thread for X11 events handling */
 static void *Thread (void *data)
 {
+    vlc_thread_set_name("vlc-window-x11");
+
     vlc_window_t *wnd = data;
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;

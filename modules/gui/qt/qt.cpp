@@ -655,6 +655,8 @@ static void *Thread( void *obj )
     char *argv[3] = { nullptr };
     int argc = 0;
 
+    vlc_thread_set_name("vlc-qt");
+
     auto argvReleaser = vlc::wrap_carray<char*>(argv, [](char* ptr[]) {
         for ( int i = 0; ptr[i] != nullptr; ++i )
             free(ptr[i]);

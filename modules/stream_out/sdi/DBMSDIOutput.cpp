@@ -579,6 +579,8 @@ int DBMSDIOutput::FeedAudio(vlc_tick_t start, vlc_tick_t preroll, bool b_truncat
 
 void * DBMSDIOutput::feederThreadCallback(void *me)
 {
+    vlc_thread_set_name("vlc-DBMSDI");
+
     reinterpret_cast<DBMSDIOutput *>(me)->feederThread();
     return NULL;
 }

@@ -65,6 +65,8 @@ static void *MmapThread(void *data)
     struct pollfd ufd[2];
     nfds_t numfds = 1;
 
+    vlc_thread_set_name("vlc-axs-v4lmmap");
+
     ufd[0].fd = fd;
     ufd[0].events = POLLIN;
 
@@ -115,6 +117,8 @@ static void *ReadThread(void *data)
     int fd = sys->fd;
     struct pollfd ufd[2];
     nfds_t numfds = 1;
+
+    vlc_thread_set_name("vlc-axs-v4l");
 
     ufd[0].fd = fd;
     ufd[0].events = POLLIN;

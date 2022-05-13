@@ -89,6 +89,7 @@ void Downloader::cancel(HTTPChunkBufferedSource *source)
 
 void * Downloader::downloaderThread(void *opaque)
 {
+    vlc_thread_set_name("vlc-adapt-dl");
     Downloader *instance = static_cast<Downloader *>(opaque);
     instance->Run();
     return nullptr;

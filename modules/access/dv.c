@@ -323,6 +323,8 @@ static void* Raw1394EventThread( void *obj )
     int result = 0;
     int canc = vlc_savecancel();
 
+    vlc_thread_set_name("vlc-dv-1394");
+
     AVCPlay( p_access, p_sys->i_node );
     vlc_cleanup_push( Raw1394EventThreadCleanup, p_ev );
     vlc_restorecancel( canc );

@@ -409,6 +409,8 @@ error:
 
 static void *Run( void *data )
 {
+    vlc_thread_set_name("vlc-sap");
+
     services_discovery_t *p_sd = data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     char *psz_addr;

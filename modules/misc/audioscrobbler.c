@@ -669,6 +669,8 @@ static void HandleInterval(vlc_tick_t *next, unsigned int *i_interval)
  *****************************************************************************/
 static void *Run(void *data)
 {
+    vlc_thread_set_name("vlc-scrobbler");
+
     intf_thread_t          *p_intf = data;
     uint8_t                 p_buffer[1024];
     bool                    b_handshaked = false;

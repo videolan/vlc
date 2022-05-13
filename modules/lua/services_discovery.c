@@ -273,6 +273,8 @@ void Close_LuaSD( vlc_object_t *p_this )
  ****************************************************************************/
 static void* Run( void *data )
 {
+    vlc_thread_set_name("vlc-lua-service");
+
     services_discovery_t *p_sd = ( services_discovery_t * )data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     lua_State *L = p_sys->L;

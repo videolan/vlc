@@ -96,6 +96,8 @@ static void cleanup_mmap (void *addr)
 
 static void *Thread (void *data)
 {
+    vlc_thread_set_name("vlc-decomp");
+
     stream_t *stream = data;
     stream_sys_t *p_sys = stream->p_sys;
 #ifdef HAVE_VMSPLICE

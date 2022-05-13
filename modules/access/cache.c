@@ -70,6 +70,8 @@ vlc_access_cache_Thread(void *data)
 {
     struct vlc_access_cache *cache = data;
 
+    vlc_thread_set_name("vlc-axs-cache");
+
     vlc_mutex_lock(&cache->lock);
     while (cache->running)
     {

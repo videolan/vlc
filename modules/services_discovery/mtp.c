@@ -290,6 +290,8 @@ UpdateDevices( services_discovery_t *p_sd,
  *****************************************************************************/
 static void *Run( void *data )
 {
+    vlc_thread_set_name("vlc-mtp");
+
     LIBMTP_raw_device_t *p_rawdevices;
     int i_numrawdevices;
     services_discovery_t *p_sd = data;

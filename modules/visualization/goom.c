@@ -278,6 +278,8 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
  *****************************************************************************/
 static void *Thread( void *p_thread_data )
 {
+    vlc_thread_set_name("vlc-goom");
+
     goom_thread_t *p_thread = (goom_thread_t*)p_thread_data;
     date_t i_pts;
     int16_t p_data[2][512];

@@ -155,6 +155,8 @@ static void *Run( void *data )
     intf_thread_t *p_intf = data;
     intf_sys_t *p_sys = p_intf->p_sys;
 
+    vlc_thread_set_name("vlc-lirc");
+
     struct pollfd ufd;
     ufd.fd = p_sys->i_fd;
     ufd.events = POLLIN;

@@ -441,6 +441,9 @@ static void *satip_thread(void *data) {
     vlc_tick_t last_recv = vlc_tick_now();
     ssize_t len;
     vlc_tick_t next_keepalive = vlc_tick_now() + vlc_tick_from_sec(sys->keepalive_interval);
+
+    vlc_thread_set_name("vlc-satip");
+
 #ifdef HAVE_RECVMMSG
     struct mmsghdr msgs[VLEN];
     struct iovec iovecs[VLEN];

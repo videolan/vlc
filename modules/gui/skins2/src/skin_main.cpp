@@ -155,6 +155,8 @@ static void Close( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 static void *Run( void * p_obj )
 {
+    vlc_thread_set_name("vlc-skins2");
+
     intf_thread_t *p_intf = (intf_thread_t *)p_obj;
 
     bool b_error = false;

@@ -1326,6 +1326,8 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
  ****************************************************************************/
 static void* ThreadSend( void *data )
 {
+    vlc_thread_set_name("vlc-rt-send");
+
 #ifdef _WIN32
 # define ENOBUFS      WSAENOBUFS
 # define EAGAIN       WSAEWOULDBLOCK
@@ -1402,6 +1404,8 @@ static void* ThreadSend( void *data )
 /* This thread dequeues incoming connections (DCCP streaming) */
 static void *rtp_listen_thread( void *data )
 {
+    vlc_thread_set_name("vlc-rtp-listen");
+
     sout_stream_id_sys_t *id = data;
 
     assert( id->listen.fd != NULL );

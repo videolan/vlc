@@ -89,6 +89,8 @@ static void Win32VoutCloseWindow ( event_thread_t * );
  *****************************************************************************/
 static void *EventThread( void *p_this )
 {
+    vlc_thread_set_name("vlc-vout-hwnd");
+
     event_thread_t *p_event = (event_thread_t *)p_this;
     MSG msg;
     int canc = vlc_savecancel ();

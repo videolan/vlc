@@ -1907,6 +1907,8 @@ AudioTrack_Thread( void *p_data )
     JNIEnv *env = GET_ENV();
     vlc_tick_t i_last_time_blocked = 0;
 
+    vlc_thread_set_name("vlc-audiotrack");
+
     if( !env )
         return NULL;
 

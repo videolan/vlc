@@ -580,6 +580,8 @@ static inline bool isMouseEvent( WPARAM type )
 
 static void *EventThread( void *p_this )
 {
+    vlc_thread_set_name("vlc-window-win");
+
     vlc_window_t *wnd = (vlc_window_t *)p_this;
     vout_window_sys_t *sys = wnd->sys;
 

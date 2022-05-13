@@ -850,6 +850,8 @@ static uint8_t* download_chunk( stream_t *s,
 
 static void* download_thread( void* p )
 {
+    vlc_thread_set_name("vlc-hds-dl");
+
     vlc_object_t* p_this = (vlc_object_t*)p;
     stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;
@@ -1097,6 +1099,8 @@ static void maintain_live_chunks(
 
 static void* live_thread( void* p )
 {
+    vlc_thread_set_name("vlc-hds-live");
+
     vlc_object_t* p_this = (vlc_object_t*)p;
     stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;

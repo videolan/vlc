@@ -125,6 +125,8 @@ int event_thread_t::EventKey( vlc_object_t *p_this, char const *,
 
 void event_thread_t::EventThread()
 {
+    vlc_thread_set_name("vlc-mkv-events");
+
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_demux));
     int canc = vlc_savecancel ();
 

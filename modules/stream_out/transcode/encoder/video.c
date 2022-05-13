@@ -297,6 +297,8 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
 
 static void* EncoderThread( void *obj )
 {
+    vlc_thread_set_name("vlc-encoder");
+
     transcode_encoder_t *p_enc = obj;
     picture_t *p_pic = NULL;
     int canc = vlc_savecancel ();

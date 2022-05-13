@@ -791,6 +791,8 @@ static void *vlc_h2_recv_thread(void *data)
     struct vlc_h2_parser *parser;
     int canc, val;
 
+    vlc_thread_set_name("vlc-h2-recv");
+
     canc = vlc_savecancel();
     parser = vlc_h2_parse_init(conn, &vlc_h2_parser_callbacks);
     if (unlikely(parser == NULL))

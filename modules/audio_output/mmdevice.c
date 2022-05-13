@@ -1055,6 +1055,8 @@ static void *MMThread(void *data)
     aout_sys_t *sys = aout->sys;
     IMMDeviceEnumerator *it = sys->it;
 
+    vlc_thread_set_name("vlc-mmdevice");
+
     EnterMTA();
     IMMDeviceEnumerator_RegisterEndpointNotificationCallback(it,
                                                           &sys->device_events);

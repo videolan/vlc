@@ -1655,6 +1655,8 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
  *****************************************************************************/
 static void *Run(void *data)
 {
+    vlc_thread_set_name("vlc-ncurses");
+
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 

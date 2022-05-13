@@ -157,6 +157,8 @@ static void *Thread (void *data)
     size_t bytes;
     int canc, val;
 
+    vlc_thread_set_name("vlc-alsa");
+
     canc = vlc_savecancel ();
     bytes = snd_pcm_frames_to_bytes (pcm, sys->period_size);
     val = snd_pcm_start (pcm);

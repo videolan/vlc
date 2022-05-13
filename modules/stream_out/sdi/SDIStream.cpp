@@ -294,6 +294,8 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
 
 void * AbstractDecodedStream::decoderThreadCallback(void *me)
 {
+    vlc_thread_set_name("vlc-SDI");
+
     reinterpret_cast<AbstractDecodedStream *>(me)->decoderThread();
     return NULL;
 }

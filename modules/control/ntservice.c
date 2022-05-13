@@ -144,6 +144,8 @@ static void *Run( void *data )
         { NULL, NULL }
     };
 
+    vlc_thread_set_name("vlc-ntservice");
+
     p_global_intf = p_intf;
     p_intf->p_sys->psz_service = var_InheritString( p_intf, "ntservice-name" );
     p_intf->p_sys->psz_service = p_intf->p_sys->psz_service ?

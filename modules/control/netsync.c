@@ -191,6 +191,7 @@ static void *Master(void *handle)
 {
     intf_thread_t *intf = handle;
     intf_sys_t *sys = intf->p_sys;
+    vlc_thread_set_name("vlc-netsyncboss");
     for (;;) {
         struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
         uint64_t data[2];
@@ -233,6 +234,8 @@ static void *Slave(void *handle)
 {
     intf_thread_t *intf = handle;
     intf_sys_t *sys = intf->p_sys;
+
+    vlc_thread_set_name("vlc-netsyncrecv");
 
     for (;;) {
         struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };

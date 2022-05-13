@@ -371,6 +371,8 @@ static block_t *DoRealWork( filter_t *p_filter, block_t *p_in_buf )
 
 static void *Thread( void *data )
 {
+    vlc_thread_set_name("vlc-visual");
+
     filter_t *p_filter = data;
     filter_sys_t *sys = p_filter->p_sys;
     block_t *block;

@@ -105,6 +105,8 @@ void *rtp_dgram_thread (void *opaque)
     vlc_tick_t deadline = VLC_TICK_INVALID;
     struct vlc_dtls *rtp_sock = sys->rtp_sock;
 
+    vlc_thread_set_name("vlc-rtp");
+
     for (;;)
     {
         struct pollfd ufd[1];

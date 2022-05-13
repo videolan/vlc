@@ -266,6 +266,8 @@ static void* Run( void *data )
     extension_t *p_ext = data;
     extensions_manager_t *p_mgr = p_ext->p_sys->p_mgr;
 
+    vlc_thread_set_name("vlc-lua-ext");
+
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
 
     while( !p_ext->p_sys->b_exiting )

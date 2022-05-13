@@ -266,6 +266,8 @@ namespace SD
 static void *
 SearchThread( void *p_data )
 {
+    vlc_thread_set_name("vlc-upnp-servis");
+
     services_discovery_t *p_sd = ( services_discovery_t* )p_data;
     services_discovery_sys_t *p_sys = reinterpret_cast<services_discovery_sys_t *>( p_sd->p_sys );
 
@@ -1602,6 +1604,8 @@ int MediaRendererList::onEvent( Upnp_EventType event_type,
 
 void *SearchThread(void *data)
 {
+    vlc_thread_set_name("vlc-upnp-render");
+
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t*)data;
     renderer_discovery_sys_t *p_sys = (renderer_discovery_sys_t*)p_rd->p_sys;
     int i_res;

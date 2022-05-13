@@ -125,6 +125,8 @@ static int ThreadControl(stream_t *stream, int query, ...)
 
 static void *Thread(void *data)
 {
+    vlc_thread_set_name("vlc-prefetch");
+
     stream_t *stream = data;
     stream_sys_t *sys = stream->p_sys;
     bool paused = false;

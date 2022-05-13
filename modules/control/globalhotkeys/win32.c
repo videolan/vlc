@@ -113,6 +113,8 @@ static void *Thread( void *p_data )
 {
     MSG message;
 
+    vlc_thread_set_name("vlc-hotkeys-win");
+
     intf_thread_t *p_intf = p_data;
     intf_sys_t *p_sys = p_intf->p_sys;
 

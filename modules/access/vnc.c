@@ -341,6 +341,8 @@ static void *DemuxThread( void *p_data )
     vlc_tick_t i_next_frame_date = vlc_tick_now() + p_sys->i_frame_interval;
     int i_status;
 
+    vlc_thread_set_name("vlc-vnc");
+
     for(;;)
     {
         i_status = WaitForMessage( p_sys->p_client, p_sys->i_frame_interval );

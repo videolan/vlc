@@ -1109,6 +1109,8 @@ static void * PlayedDataEraser( void * data )
     vlc_tick_t ticksleep;
     HRESULT dsresult;
 
+    vlc_thread_set_name("vlc-directsound");
+
     for(;;)
     {
         int canc = vlc_savecancel();

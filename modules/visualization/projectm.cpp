@@ -273,6 +273,8 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
  */
 static void *Thread( void *p_data )
 {
+    vlc_thread_set_name("vlc-projectm");
+
     filter_t  *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
     vlc_gl_t *gl = p_sys->gl;
