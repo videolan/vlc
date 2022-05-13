@@ -54,3 +54,4 @@ build*/
 contrib-*
 install-*
 !extras/package/apple/build.sh
+contrib/arm64-appletvos/
