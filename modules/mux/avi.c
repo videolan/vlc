@@ -911,7 +911,7 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
 
     /* Now set hdrl size */
     bo_set_32le( &bo, offsets.i_hdrllistsize,
-                 bo.b->i_buffer - offsets.i_hdrldatastart );
+                 bo.b->i_buffer + 4 - offsets.i_hdrldatastart );
 
     avi_HeaderAdd_INFO( p_mux, &bo );
 
