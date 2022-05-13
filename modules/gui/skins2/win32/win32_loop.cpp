@@ -99,12 +99,6 @@ Win32Loop::Win32Loop( intf_thread_t *pIntf ): OSLoop( pIntf )
     virtKeyToVlcKey[VK_MEDIA_PLAY_PAUSE] = KEY_MEDIA_PLAY_PAUSE;
 }
 
-
-Win32Loop::~Win32Loop()
-{
-}
-
-
 OSLoop *Win32Loop::instance( intf_thread_t *pIntf )
 {
     if( pIntf->p_sys->p_osLoop == NULL )

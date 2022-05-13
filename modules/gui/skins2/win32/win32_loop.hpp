@@ -35,6 +35,8 @@ class GenericWindow;
 class Win32Loop: public OSLoop
 {
 public:
+    Win32Loop( intf_thread_t *pIntf );
+
     /// Get the instance of Win32Loop
     static OSLoop *instance( intf_thread_t *pIntf );
 
@@ -52,9 +54,6 @@ public:
                                            WPARAM wParam, LPARAM lParam );
 
 private:
-    // Private because it is a singleton
-    Win32Loop( intf_thread_t *pIntf );
-    virtual ~Win32Loop();
 
     /// Map associating special (i.e. non ascii) virtual key codes with
     /// internal vlc key codes
