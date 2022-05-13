@@ -41,7 +41,6 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(APPLY) $(SRC)/ass/0001-configure-add-Core-Text-and-DirectWrite-to-Libs.priv.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/ass/use-topendir.patch
-#	$(APPLY) $(SRC)/ass/libass-no-tchar.patch
 endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
