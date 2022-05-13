@@ -1,7 +1,7 @@
-From f26a12597c0a3a907bd30547daa35153ed3aa11c Mon Sep 17 00:00:00 2001
+From e20ef56993823cfdbf29825a686e7632285111c6 Mon Sep 17 00:00:00 2001
 From: Naohiro Koriyama <nkoriyama@gmail.com>
 Date: Wed, 29 Aug 2012 16:44:16 +0200
-Subject: [PATCH 2/4] added fontconfig font search paths for OS X.
+Subject: [PATCH] added fontconfig font search paths for OS X.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
