@@ -1,6 +1,23 @@
---- libass-0.13.0/libass/ass_fontconfig.c.orig	2015-10-06 16:03:01.104710780 +0200
-+++ libass-0.13.0/libass/ass_fontconfig.c	2015-10-06 16:03:00.216719387 +0200
-@@ -282,6 +282,9 @@
+From f26a12597c0a3a907bd30547daa35153ed3aa11c Mon Sep 17 00:00:00 2001
+From: Naohiro Koriyama <nkoriyama@gmail.com>
+Date: Wed, 29 Aug 2012 16:44:16 +0200
+Subject: [PATCH 2/4] added fontconfig font search paths for OS X.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On OS X, fontconfig searches font only from /System/Library/Fonts, so this patch adds more search paths to its initialization.
+
+Signed-off-by: Felix Paul Kühne <fkuehne@videolan.org>
+---
+ libass/ass_fontconfig.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libass/ass_fontconfig.c b/libass/ass_fontconfig.c
+index fd6ea33..10a17ed 100644
+--- a/libass/ass_fontconfig.c
++++ b/libass/ass_fontconfig.c
+@@ -336,6 +336,9 @@ ass_fontconfig_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
                  "file found, using fallback.");
          FcConfigDestroy(fc->config);
          fc->config = FcInitLoadConfig();
@@ -10,3 +27,6 @@
      }
      if (fc->config)
          rc = FcConfigBuildFonts(fc->config);
+-- 
+2.27.0.windows.1
+
