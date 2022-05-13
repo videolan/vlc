@@ -1020,9 +1020,9 @@ AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format,
     }
 }
 
-static int GetPassthroughFmt( audio_sample_format_t *fmt, bool b_dtshd, int *at_format )
+static int GetPassthroughFmt( bool compat, audio_sample_format_t *fmt, bool b_dtshd, int *at_format )
 {
-    if( jfields.AudioFormat.has_ENCODING_IEC61937 )
+    if( !compat && jfields.AudioFormat.has_ENCODING_IEC61937 )
     {
         *at_format = jfields.AudioFormat.ENCODING_IEC61937;
         switch( fmt->i_format )
@@ -1095,28 +1095,40 @@ static int
 StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    int i_at_format;
 
     bool b_dtshd;
     if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format, &b_dtshd ) )
         return VLC_EGENERIC;
 
-    int i_ret = GetPassthroughFmt( &p_sys->fmt, b_dtshd, &i_at_format );
-    if( i_ret != VLC_SUCCESS )
-        return i_ret;
-
-    p_sys->b_passthrough = true;
-    i_ret = AudioTrack_Create( env, p_aout, p_sys->fmt.i_rate, i_at_format,
-                               p_sys->fmt.i_physical_channels );
-    if( i_ret != VLC_SUCCESS )
+    /* Try ENCODING_IEC61937 first, then fallback to ENCODING_[AC3|DTS|...] */
+    unsigned nb_fmt = jfields.AudioFormat.has_ENCODING_IEC61937 ? 2 : 1;
+    int i_ret;
+    for( unsigned i = 0; i < nb_fmt; ++i )
     {
-        p_sys->b_passthrough = false;
-        msg_Warn( p_aout, "SPDIF configuration failed" );
-    }
-    else
-        p_sys->i_chans_to_reorder = 0;
+        int i_at_format;
+        bool compat = i == 1;
+        audio_sample_format_t fmt = p_sys->fmt;
 
-    return i_ret;
+        i_ret = GetPassthroughFmt( compat, &fmt, b_dtshd, &i_at_format );
+        if( i_ret != VLC_SUCCESS )
+            return i_ret;
+
+        p_sys->b_passthrough = true;
+        i_ret = AudioTrack_Create( env, p_aout, fmt.i_rate, i_at_format,
+                                   fmt.i_physical_channels );
+
+        if( i_ret == VLC_SUCCESS )
+        {
+            msg_Dbg( p_aout, "Using passthrough format: %d", i_at_format );
+            p_sys->i_chans_to_reorder = 0;
+            p_sys->fmt = fmt;
+            return VLC_SUCCESS;
+        }
+    }
+
+    p_sys->b_passthrough = false;
+    msg_Warn( p_aout, "SPDIF configuration failed" );
+    return VLC_EGENERIC;
 }
 
 static int
