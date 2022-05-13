@@ -1,8 +1,8 @@
-From 0915955733bd236ecc44645ee968fb7a55ad5079 Mon Sep 17 00:00:00 2001
+From b7e8314560f03d252182c051df1f04175299118e Mon Sep 17 00:00:00 2001
 From: Oleg Oshmyan <chortos@inbox.lv>
 Date: Mon, 20 Sep 2021 23:37:23 +0300
-Subject: [PATCH] Add strikeout/underline to ASS_Outline, not FreeType-owned
- memory
+Subject: [PATCH 1/4] Add strikeout/underline to ASS_Outline, not
+ FreeType-owned memory
 
 ass_strike_outline_glyph was realloc()ing memory that was
 allocated by FreeType, not us. This isn't generally safe.
@@ -23,7 +23,7 @@ Fixes the crash in https://github.com/mpv-player/mpv/issues/9227.
  3 files changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/libass/ass_font.c b/libass/ass_font.c
-index 221a7b4a7..46b797598 100644
+index 221a7b4..46b7975 100644
 --- a/libass/ass_font.c
 +++ b/libass/ass_font.c
 @@ -357,29 +357,25 @@ void ass_font_get_asc_desc(ASS_Font *font, int face_index,
@@ -143,7 +143,7 @@ index 221a7b4a7..46b797598 100644
  }
  
 diff --git a/libass/ass_font.h b/libass/ass_font.h
-index 98ac1c85b..57f832d67 100644
+index 98ac1c8..57f832d 100644
 --- a/libass/ass_font.h
 +++ b/libass/ass_font.h
 @@ -30,6 +30,7 @@ typedef struct ass_font ASS_Font;
@@ -166,7 +166,7 @@ index 98ac1c85b..57f832d67 100644
                        const char *postscript_name, int index);
  FT_Face ass_face_stream(ASS_Library *lib, FT_Library ftlib, const char *name,
 diff --git a/libass/ass_render.c b/libass/ass_render.c
-index 59c54b923..5fcbe968b 100644
+index 0bf6676..0558066 100644
 --- a/libass/ass_render.c
 +++ b/libass/ass_render.c
 @@ -1173,6 +1173,10 @@ size_t ass_outline_construct(void *key, void *value, void *priv)
@@ -180,3 +180,6 @@ index 59c54b923..5fcbe968b 100644
                  FT_Done_Glyph(glyph);
                  ass_font_get_asc_desc(k->font, k->face_index,
                                        &v->asc, &v->desc);
+-- 
+2.27.0.windows.1
+

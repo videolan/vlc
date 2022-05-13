@@ -1,5 +1,16 @@
---- a/libass/ass_fontselect.c.orig	2021-09-11 23:27:04.000000000 +0200
-+++ b/libass/ass_fontselect.c	2021-12-29 17:18:47.535670604 +0100
+From 3024055a3a7da6ebbf5b843420aa5bf47ef66d13 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Thu, 7 Apr 2016 14:59:34 +0200
+Subject: [PATCH 4/4] Use wopendir when possible
+
+---
+ libass/ass_fontselect.c | 50 ++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/libass/ass_fontselect.c b/libass/ass_fontselect.c
+index b47c4bc..47a5d0b 100644
+--- a/libass/ass_fontselect.c
++++ b/libass/ass_fontselect.c
 @@ -47,6 +47,9 @@
  #include "ass_font.h"
  #include "ass_string.h"
@@ -10,7 +21,7 @@
  #define ABS(x) ((x) < 0 ? -(x) : (x))
  #define MAX_FULLNAME 100
  
-@@ -166,21 +169,55 @@
+@@ -166,21 +169,55 @@ static ASS_FontProviderFuncs ft_funcs = {
      .destroy_font      = destroy_font_ft,
  };
  
@@ -69,7 +80,7 @@
          if (namelen < 2 || namelen - 2 < dirlen)
              continue;
          if (namelen > namemax) {
-@@ -190,17 +227,18 @@
+@@ -190,17 +227,18 @@ static void load_fonts_from_dir(ASS_Library *library, const char *dir)
              else
                  continue;
          }
@@ -91,3 +102,6 @@
  }
  
  /**
+-- 
+2.27.0.windows.1
+
