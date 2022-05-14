@@ -133,8 +133,6 @@ typedef struct vout_thread_sys_t
 
     /* */
     vlc_mouse_t     mouse;
-    vlc_mouse_event mouse_event;
-    void            *mouse_opaque;
 
     /* Video output window */
     bool            window_enabled;
@@ -1595,8 +1593,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     vout_display_window_SetMouseHandler(sys->display_cfg.window,
                                         cfg->mouse_event, cfg->mouse_opaque);
     vlc_mutex_unlock(&sys->window_lock);
-    sys->mouse_event = cfg->mouse_event;
-    sys->mouse_opaque = cfg->mouse_opaque;
 
     sys->decoder_fifo = picture_fifo_New();
     sys->private.display_pool = NULL;
@@ -1800,9 +1796,6 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     vlc_mutex_lock(&sys->window_lock);
     vout_display_window_SetMouseHandler(sys->display_cfg.window, NULL, NULL);
     vlc_mutex_unlock(&sys->window_lock);
-
-    if (sys->mouse_event)
-        sys->mouse_event = NULL;
 
     if (sys->spu)
         spu_Detach(sys->spu);
