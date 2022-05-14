@@ -61,6 +61,8 @@ typedef struct vout_display_window
     struct {
         vlc_mouse_t window;
         vlc_tick_t last_left_press;
+        vlc_mouse_event event;
+        void *opaque;
     } mouse;
 } vout_display_window_t;
 
@@ -217,6 +219,21 @@ static const struct vlc_window_callbacks vout_display_window_cbs = {
     .output_event = vout_display_window_OutputEvent,
 };
 
+void vout_display_window_SetMouseHandler(vlc_window_t *window,
+                                         vlc_mouse_event event, void *opaque)
+{
+    vout_display_window_t *state = window->owner.sys;
+
+    /*
+     * Note that the current implementation of this function is technically
+     * reentrant, but better not rely on this in calling code.
+     */
+    vlc_mutex_lock(&state->lock);
+    state->mouse.event = event;
+    state->mouse.opaque = opaque;
+    vlc_mutex_unlock(&state->lock);
+}
+
 static
 void vout_display_SizeWindow(unsigned *restrict width,
                              unsigned *restrict height,
@@ -340,6 +357,7 @@ vlc_window_t *vout_display_window_New(vout_thread_t *vout)
     vlc_mutex_init(&state->lock);
     vlc_mouse_Init(&state->mouse.window);
     state->mouse.last_left_press = INT64_MIN;
+    state->mouse.event = NULL;
     state->vout = vout;
 
     char *modlist = var_InheritString(vout, "window");

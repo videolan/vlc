@@ -1616,6 +1616,10 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
 
     assert(!sys->dummy);
 
+    vlc_mutex_lock(&sys->window_lock);
+    vout_display_window_SetMouseHandler(sys->display_cfg.window,
+                                        cfg->mouse_event, cfg->mouse_opaque);
+    vlc_mutex_unlock(&sys->window_lock);
     sys->mouse_event = cfg->mouse_event;
     sys->mouse_opaque = cfg->mouse_opaque;
 
@@ -1730,6 +1734,9 @@ error:
         picture_fifo_Delete(sys->decoder_fifo);
         sys->decoder_fifo = NULL;
     }
+    vlc_mutex_lock(&sys->window_lock);
+    vout_display_window_SetMouseHandler(sys->display_cfg.window, NULL, NULL);
+    vlc_mutex_unlock(&sys->window_lock);
     return VLC_EGENERIC;
 }
 
@@ -1814,6 +1821,10 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
         sys->decoder_fifo = NULL;
     }
     assert(sys->private.display_pool == NULL);
+
+    vlc_mutex_lock(&sys->window_lock);
+    vout_display_window_SetMouseHandler(sys->display_cfg.window, NULL, NULL);
+    vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->mouse_event)
     {
