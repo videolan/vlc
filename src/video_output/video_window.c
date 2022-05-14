@@ -58,8 +58,10 @@ typedef struct vout_display_window
     struct vout_display_placement display;
     vlc_mutex_t lock;
 
-    vlc_mouse_t mouse;
-    vlc_tick_t last_left_press;
+    struct {
+        vlc_mouse_t window;
+        vlc_tick_t last_left_press;
+    } mouse;
 } vout_display_window_t;
 
 static void vout_display_window_ResizeNotify(vlc_window_t *window,
@@ -131,7 +133,7 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
 {
     vout_display_window_t *state = window->owner.sys;
     vout_thread_t *vout = state->vout;
-    vlc_mouse_t *m = &state->mouse;
+    vlc_mouse_t *m = &state->mouse.window;
 
     m->b_double_click = false;
 
@@ -139,7 +141,7 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
     {
         case VLC_WINDOW_MOUSE_MOVED:
             vlc_mouse_SetPosition(m, ev->x, ev->y);
-            state->last_left_press = INT64_MIN;
+            state->mouse.last_left_press = INT64_MIN;
             break;
 
         case VLC_WINDOW_MOUSE_PRESSED:
@@ -149,14 +151,14 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
             {
                 const vlc_tick_t now = vlc_tick_now();
 
-                if (state->last_left_press != INT64_MIN
-                 && now - state->last_left_press < DOUBLE_CLICK_TIME)
+                if (state->mouse.last_left_press != INT64_MIN
+                 && now - state->mouse.last_left_press < DOUBLE_CLICK_TIME)
                 {
                     m->b_double_click = true;
-                    state->last_left_press = INT64_MIN;
+                    state->mouse.last_left_press = INT64_MIN;
                 }
                 else
-                    state->last_left_press = now;
+                    state->mouse.last_left_press = now;
             }
 
             vlc_mouse_SetPressed(m, ev->button_mask);
@@ -336,8 +338,8 @@ vlc_window_t *vout_display_window_New(vout_thread_t *vout)
     video_format_Init(&state->format, 0);
     state->display.width = state->display.height = 0;
     vlc_mutex_init(&state->lock);
-    vlc_mouse_Init(&state->mouse);
-    state->last_left_press = INT64_MIN;
+    vlc_mouse_Init(&state->mouse.window);
+    state->mouse.last_left_press = INT64_MIN;
     state->vout = vout;
 
     char *modlist = var_InheritString(vout, "window");
