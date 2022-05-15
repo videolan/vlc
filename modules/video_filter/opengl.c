@@ -27,7 +27,7 @@
 #include <vlc_picture.h>
 #include <vlc_filter.h>
 #include <vlc_opengl.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <vlc_vout_display.h>
 #include <vlc_atomic.h>
 #include "../video_output/opengl/vout_helper.h"

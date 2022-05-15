@@ -21,7 +21,7 @@
 #include <QtQuick/QQuickItem>
 #include <QMutex>
 #include "qt.hpp"
-#include "vlc_vout_window.h"
+#include "vlc_window.h"
 
 class MainCtx;
 class VideoSurfaceProvider : public QObject

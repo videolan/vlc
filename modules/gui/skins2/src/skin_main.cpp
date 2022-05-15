@@ -32,7 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
 #include <vlc_threads.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"

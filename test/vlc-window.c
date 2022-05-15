@@ -17,7 +17,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 #include "../lib/libvlc_internal.h"
 

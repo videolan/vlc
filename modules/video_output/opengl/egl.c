@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_opengl.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #ifdef USE_PLATFORM_X11
 # include <vlc_xlib.h>
 #endif

@@ -26,7 +26,7 @@
 #include "generic_window.hpp"
 #include "dialogs.hpp"
 #include "../commands/cmd_generic.hpp"
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <memory>
 
 class OSGraphics;

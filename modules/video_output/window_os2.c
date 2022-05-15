@@ -30,7 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_plugin.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <vlc_mouse.h>
 #include <vlc_actions.h>
 

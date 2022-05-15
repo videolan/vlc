@@ -171,7 +171,7 @@ void vlc_gl_Delete(vlc_gl_t *gl)
     vlc_object_delete(gl);
 }
 
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 typedef struct vlc_gl_surface
 {

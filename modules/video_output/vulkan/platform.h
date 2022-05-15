@@ -22,7 +22,7 @@
 #define VLC_VULKAN_PLATFORM_H
 
 #include <vlc_common.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 #include <vulkan/vulkan.h>
 

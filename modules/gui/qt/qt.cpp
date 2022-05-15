@@ -65,7 +65,7 @@ extern "C" char **environ;
 #include "playlist/playlist_item.hpp"
 
 #include <vlc_plugin.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <vlc_cxx_helpers.hpp>
 
 #ifdef QT_STATIC /* For static builds */

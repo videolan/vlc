@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <vlc_vout.h>
 #include <vlc_vout_display.h>
 #include "video_window.h"

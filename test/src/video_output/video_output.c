@@ -37,7 +37,7 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_codec.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <vlc_interface.h>
 #include <vlc_player.h>
 #include <vlc_filter.h>

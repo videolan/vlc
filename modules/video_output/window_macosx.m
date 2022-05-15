@@ -30,7 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 #define VLC_ASSERT_MAINTHREAD NSAssert([[NSThread currentThread] isMainThread], \
     @"Must be called from the main thread!")

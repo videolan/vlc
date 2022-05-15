@@ -34,7 +34,7 @@
 
 #import <vlc_common.h>
 #import <vlc_interface.h>
-#import <vlc_vout_window.h>
+#import <vlc_window.h>
 
 #import "VLCMinimalVoutWindow.h"
 

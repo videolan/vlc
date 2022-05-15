@@ -21,7 +21,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include <vlc_vout_display.h>
 
 /**

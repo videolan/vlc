@@ -39,7 +39,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 #include "vlc_drm.h"
 
 #include <assert.h>

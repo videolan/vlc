@@ -66,7 +66,7 @@
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>
 #import <vlc_mouse.h>
-#import <vlc_vout_window.h>
+#import <vlc_window.h>
 
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _mutex lock when closing. */

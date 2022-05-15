@@ -28,7 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
 {

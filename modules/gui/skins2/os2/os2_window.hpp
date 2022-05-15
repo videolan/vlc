@@ -28,7 +28,7 @@
 #include "../src/generic_window.hpp"
 #include "../src/os_window.hpp"
 
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 
 /// OS2 implementation of OSWindow

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_vout_window.h: vlc_window definitions
+ * vlc_window.h: vlc_window definitions
  *****************************************************************************
  * Copyright (C) 2008 Rémi Denis-Courmont
  * Copyright (C) 2009 Laurent Aimar
@@ -737,4 +737,4 @@ static inline void vlc_window_ReportOutputDevice(vlc_window_t *window,
 
 /** @} */
 /** @} */
-#endif /* VLC_VOUT_WINDOW_H */
+#endif /* VLC_WINDOW_H */

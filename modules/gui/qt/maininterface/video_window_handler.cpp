@@ -21,7 +21,7 @@
 #include <QApplication>
 #include <QScreen>
 
-#include <vlc_vout_window.h>
+#include <vlc_window.h>
 
 VideoWindowHandler::VideoWindowHandler(qt_intf_t* intf, QObject *parent)
     : QObject(parent)

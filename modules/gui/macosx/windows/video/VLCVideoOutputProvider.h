@@ -23,7 +23,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <vlc_vout_window.h>
+#import <vlc_window.h>
 
 @class VLCControlsBarCommon;
 @class VLCVideoWindowCommon;
