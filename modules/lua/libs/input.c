@@ -368,13 +368,18 @@ static int vlclua_player_toggle_track_(lua_State *L,
 
     vlc_player_Lock(player);
 
-    const struct vlc_player_track *track = FindTrack(player, cat, id);
-    if (track) {
-        if (track->selected)
-            vlc_player_UnselectTrack(player, track);
-        else
-            vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
-    }
+    if (id != -1) {
+        const struct vlc_player_track *track = FindTrack(player, cat, id);
+
+        if (track != NULL) {
+            if (track->selected)
+                vlc_player_UnselectTrack(player, track);
+            else
+                vlc_player_SelectTrack(player, track,
+                                       VLC_PLAYER_SELECT_EXCLUSIVE);
+        }
+    } else
+        vlc_player_UnselectTrackCategory(player, cat);
 
     vlc_player_Unlock(player);
 
