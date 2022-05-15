@@ -434,7 +434,14 @@ static int PlayerSetTrack(struct cli_client *cl, const char *const *args,
     {
         int idx = atoi(args[1]);
         if (idx < 0)
+        {
+            if (idx == -1)
+            {
+                vlc_player_UnselectTrackCategory(player, cat);
+                ret = 0;
+            }
             goto out;
+        }
 
         size_t track_count = vlc_player_GetTrackCount(player, cat);
         if ((unsigned)idx >= track_count)
