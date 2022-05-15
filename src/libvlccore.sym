@@ -573,6 +573,12 @@ vlc_keystore_find
 vlc_keystore_remove
 vlc_keystore_store
 vlc_keystore_release_entries
+vlc_latch_init
+vlc_latch_is_ready
+vlc_latch_count_down
+vlc_latch_count_down_and_wait
+vlc_latch_is_ready
+vlc_latch_wait
 vlc_ml_instance_get
 vlc_ml_get
 vlc_ml_control

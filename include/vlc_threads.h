@@ -570,6 +570,86 @@ VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
 
 #ifndef __cplusplus
 /**
+ * \defgroup latch Latches
+ *
+ * The latch is a downward counter used to synchronise threads.
+ *
+ * @{
+ */
+/**
+ * Latch.
+ *
+ * Storage space for a thread-safe latch.
+ */
+typedef struct
+{
+    atomic_size_t value;
+    atomic_uint ready;
+} vlc_latch_t;
+
+/**
+ * Initializes a latch.
+ *
+ * @param value initial latch value (typically 1)
+ */
+VLC_API void vlc_latch_init(vlc_latch_t *, size_t value);
+
+/**
+ * Decrements the value of a latch.
+ *
+ * This function atomically decrements the value of a latch by the given
+ * quantity. If the result is zero, then any thread waiting on the latch is
+ * woken up.
+ *
+ * \warning If the result is (arithmetically) strictly negative, the behaviour
+ * is undefined.
+ *
+ * \param n quantity to subtract from the latch value (typically 1)
+ *
+ * \note This function is not a cancellation point.
+ */
+VLC_API void vlc_latch_count_down(vlc_latch_t *, size_t n);
+
+/**
+ * Decrements the value of a latch and waits on it.
+ *
+ * This function atomically decrements the value of a latch by the given
+ * quantity. Then, if the result of the subtraction is strictly positive,
+ * it waits until the value reaches zero.
+ *
+ * This function is equivalent to the succession of vlc_latch_count_down()
+ * then vlc_latch_wait(), and is only an optimisation to combine the two.
+ *
+ * \warning If the result is strictly negative, the behaviour is undefined.
+ *
+ * @param n number of times to decrement the value (typically 1)
+ *
+ * \note This function may be a cancellation point.
+ */
+VLC_API void vlc_latch_count_down_and_wait(vlc_latch_t *, size_t n);
+
+/**
+ * Checks if a latch is ready.
+ *
+ * This function compares the value of a latch with zero.
+ *
+ * \retval false if the latch value is non-zero
+ * \retval true if the latch value equals zero
+ */
+VLC_API bool vlc_latch_is_ready(const vlc_latch_t *latch) VLC_USED;
+
+/**
+ * Waits on a latch.
+ *
+ * This function waits until the value of the latch reaches zero.
+ *
+ * \note This function may be a point of cancellation.
+ */
+VLC_API void vlc_latch_wait(vlc_latch_t *);
+
+/** @} */
+
+/**
  * One-time initialization.
  *
  * A one-time initialization object must always be initialized assigned to

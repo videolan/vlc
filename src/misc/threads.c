@@ -517,6 +517,49 @@ int vlc_sem_trywait(vlc_sem_t *sem)
     return 0;
 }
 
+void vlc_latch_init(vlc_latch_t *latch, size_t value)
+{
+    atomic_init(&latch->ready, !value);
+    atomic_init(&latch->value, value);
+}
+
+static bool vlc_latch_count_down_ready(vlc_latch_t *latch, size_t n)
+{
+    size_t value;
+
+    value = atomic_fetch_sub_explicit(&latch->value, n, memory_order_acq_rel);
+    assert(value >= n);
+
+    if (value != n)
+        return false;
+
+    atomic_store_explicit(&latch->ready, true, memory_order_release);
+    vlc_atomic_notify_all(&latch->ready);
+    return true;
+}
+
+void vlc_latch_count_down(vlc_latch_t *latch, size_t n)
+{
+    (void) vlc_latch_count_down_ready(latch, n);
+}
+
+void vlc_latch_count_down_and_wait(vlc_latch_t *latch, size_t n)
+{
+    if (!vlc_latch_count_down_ready(latch, n))
+        vlc_latch_wait(latch);
+}
+
+bool vlc_latch_is_ready(const vlc_latch_t *latch)
+{
+    return atomic_load_explicit(&latch->ready, memory_order_acquire);
+}
+
+void vlc_latch_wait(vlc_latch_t *latch)
+{
+    while (!vlc_latch_is_ready(latch))
+        vlc_atomic_wait(&latch->ready, false);
+}
+
 enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
 static_assert (VLC_ONCE_DONE == 3, "Check vlc_once in header file");
