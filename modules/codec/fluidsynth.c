@@ -129,6 +129,23 @@ static int Open (vlc_object_t *p_this)
         glob_t gl;
         int flags = GLOB_NOESCAPE;
 
+        char *udd = config_GetUserDir(VLC_USERDATA_DIR);
+        if (likely(udd != NULL))
+        {
+            char *path;
+            int len;
+
+            if (asprintf(&path, "%s/sound%ns/sf2/*.sf2", udd, &len) >= 0)
+            {
+                glob(path, flags, NULL, &gl);
+                flags |= GLOB_APPEND;
+                memcpy(path + len, "fonts", 5); /* "s/sf2" -> "fonts" */
+                glob(path, flags, NULL, &gl);
+                free(path);
+            }
+            free(udd);
+        }
+
         glob(DATADIR "/sounds/sf2/*.sf2", flags, NULL, &gl);
         flags |= GLOB_APPEND;
         glob(DATADIR "/soundfonts/*.sf2", flags, NULL, &gl);
