@@ -61,7 +61,7 @@ static const struct vlc_vk_platform_operations platform_ops =
 
 static int InitPlatform(vlc_vk_platform_t *vk)
 {
-    if (vk->window->type != VOUT_WINDOW_TYPE_HWND)
+    if (vk->window->type != VLC_WINDOW_TYPE_HWND)
         return VLC_EGENERIC;
 
     vk->platform_ext = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;

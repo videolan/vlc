@@ -47,7 +47,7 @@ using namespace Microsoft::WRL;
 //Signature for DCompositionCreateDevice
 typedef HRESULT (*DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID iid, void** dcompositionDevice);
 
-int CompositorDirectComposition::windowEnable(const vout_window_cfg_t *)
+int CompositorDirectComposition::windowEnable(const vlc_window_cfg_t *)
 {
     if (!m_videoVisual)
     {
@@ -337,7 +337,7 @@ void CompositorDirectComposition::unloadGUI()
     commonGUIDestroy();
 }
 
-bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
+bool CompositorDirectComposition::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
     //Only the first video is embedded
     if (m_videoVisual.Get())
@@ -351,7 +351,7 @@ bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDest
     }
 
     commonSetupVoutWindow(p_wnd, destroyCb);
-    p_wnd->type = VOUT_WINDOW_TYPE_DCOMP;
+    p_wnd->type = VLC_WINDOW_TYPE_DCOMP;
     p_wnd->display.dcomp_device = m_dcompDevice.Get();
     p_wnd->handle.dcomp_visual = m_videoVisual.Get();
     return true;

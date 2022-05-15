@@ -44,7 +44,7 @@
 NSString *VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
 NSString *VLCWindowLevelKey = @"VLCWindowLevelKey";
 
-static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+static int WindowEnable(vlc_window_t *p_wnd, const vlc_window_cfg_t *cfg)
 {
     @autoreleasepool {
         msg_Dbg(p_wnd, "Opening video window");
@@ -70,11 +70,11 @@ static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
     }
     if (cfg->is_fullscreen)
-        vout_window_SetFullScreen(p_wnd, NULL);
+        vlc_window_SetFullScreen(p_wnd, NULL);
     return VLC_SUCCESS;
 }
 
-static void WindowDisable(vout_window_t *p_wnd)
+static void WindowDisable(vlc_window_t *p_wnd)
 {
     @autoreleasepool {
         VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
@@ -85,7 +85,7 @@ static void WindowDisable(vout_window_t *p_wnd)
     }
 }
 
-static void WindowResize(vout_window_t *p_wnd,
+static void WindowResize(vlc_window_t *p_wnd,
                          unsigned i_width, unsigned i_height)
 {
     @autoreleasepool {
@@ -98,17 +98,17 @@ static void WindowResize(vout_window_t *p_wnd,
     }
 }
 
-static void WindowSetState(vout_window_t *p_wnd, unsigned i_state)
+static void WindowSetState(vlc_window_t *p_wnd, unsigned i_state)
 {
-    if (i_state & VOUT_WINDOW_STATE_BELOW)
-        msg_Dbg(p_wnd, "Ignore change to VOUT_WINDOW_STATE_BELOW");
+    if (i_state & VLC_WINDOW_STATE_BELOW)
+        msg_Dbg(p_wnd, "Ignore change to VLC_WINDOW_STATE_BELOW");
 
     @autoreleasepool {
         VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
 
         NSInteger i_cocoa_level = NSNormalWindowLevel;
 
-        if (i_state & VOUT_WINDOW_STATE_ABOVE)
+        if (i_state & VLC_WINDOW_STATE_ABOVE)
             i_cocoa_level = NSStatusWindowLevel;
 
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -119,7 +119,7 @@ static void WindowSetState(vout_window_t *p_wnd, unsigned i_state)
 
 static const char windowed;
 
-static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
+static void WindowSetFullscreen(vlc_window_t *p_wnd, const char *psz_id)
 {
     if (var_InheritBool(getIntf(), "video-wallpaper")) {
         msg_Dbg(p_wnd, "Ignore fullscreen event as video-wallpaper is on");
@@ -140,14 +140,14 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
     }
 }
 
-static void WindowUnsetFullscreen(vout_window_t *wnd)
+static void WindowUnsetFullscreen(vlc_window_t *wnd)
 {
     WindowSetFullscreen(wnd, &windowed);
 }
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     WindowEnable,
     WindowDisable,
     WindowResize,
@@ -157,14 +157,14 @@ static const struct vout_window_operations ops = {
     WindowSetFullscreen,
 };
 
-int WindowOpen(vout_window_t *p_wnd)
+int WindowOpen(vlc_window_t *p_wnd)
 {
     if (!atomic_load(&b_intf_starting)) {
         msg_Err(p_wnd, "Cannot create vout as Mac OS X interface was not found");
         return VLC_EGENERIC;
     }
 
-    p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
+    p_wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
     p_wnd->ops = &ops;
     return VLC_SUCCESS;
 }
@@ -215,7 +215,7 @@ int WindowOpen(vout_window_t *p_wnd)
 #pragma mark -
 #pragma mark Methods for vout provider
 
-- (VLCVoutView *)setupVoutForWindow:(vout_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
+- (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playerController = [[mainInstance playlistController] playerController];
@@ -430,7 +430,7 @@ int WindowOpen(vout_window_t *p_wnd)
 }
 
 
-- (void)setNativeVideoSize:(NSSize)size forWindow:(vout_window_t *)p_wnd
+- (void)setNativeVideoSize:(NSSize)size forWindow:(vlc_window_t *)p_wnd
 {
     VLCVideoWindowCommon *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
     if (!o_window) {
@@ -441,7 +441,7 @@ int WindowOpen(vout_window_t *p_wnd)
     [o_window setNativeVideoSize:size];
 }
 
-- (void)setWindowLevel:(NSInteger)i_level forWindow:(vout_window_t *)p_wnd
+- (void)setWindowLevel:(NSInteger)i_level forWindow:(vlc_window_t *)p_wnd
 {
     VLCVideoWindowCommon *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
     if (!o_window) {
@@ -467,7 +467,7 @@ int WindowOpen(vout_window_t *p_wnd)
     [o_window setWindowLevel:i_level];
 }
 
-- (void)setFullscreen:(int)i_full forWindow:(vout_window_t *)p_wnd withAnimation:(BOOL)b_animation
+- (void)setFullscreen:(int)i_full forWindow:(vlc_window_t *)p_wnd withAnimation:(BOOL)b_animation
 {
     intf_thread_t *p_intf = getIntf();
     BOOL b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");

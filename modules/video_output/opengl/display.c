@@ -126,13 +126,13 @@ static int Open(vout_display_t *vd,
     sys->gl = NULL;
     sys->is_dirty = false;
 
-    vout_window_t *surface = vd->cfg->window;
+    vlc_window_t *surface = vd->cfg->window;
     char *gl_name = var_InheritString(surface, MODULE_VARNAME);
 
     /* VDPAU GL interop works only with GLX. Override the "gl" option to force
      * it. */
 #ifndef USE_OPENGL_ES2
-    if (surface->type == VOUT_WINDOW_TYPE_XID)
+    if (surface->type == VLC_WINDOW_TYPE_XID)
     {
         switch (vd->source->i_chroma)
         {

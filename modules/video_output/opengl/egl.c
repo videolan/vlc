@@ -202,7 +202,7 @@ static void Close(vlc_gl_t *gl)
 #ifdef USE_PLATFORM_X11
     if (sys->x11 != NULL) {
         if (sys->restore_forget_gravity) {
-            vout_window_t *wnd = gl->surface;
+            vlc_window_t *wnd = gl->surface;
             XSetWindowAttributes swa;
             swa.bit_gravity = ForgetGravity;
             XChangeWindowAttributes(sys->x11, wnd->handle.xid, CWBitGravity,
@@ -250,7 +250,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->context = EGL_NO_CONTEXT;
     sys->is_current = false;
 
-    vout_window_t *wnd = gl->surface;
+    vlc_window_t *wnd = gl->surface;
     EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
         = CreateWindowSurface;
     void *window;
@@ -268,7 +268,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 #ifdef USE_PLATFORM_X11
     sys->x11 = NULL;
 
-    if (wnd->type != VOUT_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
+    if (wnd->type != VLC_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
         goto error;
 
     window = &wnd->handle.xid;
@@ -319,7 +319,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->conn = NULL;
     sys->restore_forget_gravity = false;
 
-    if (wnd->type != VOUT_WINDOW_TYPE_XID)
+    if (wnd->type != VLC_WINDOW_TYPE_XID)
         goto error;
 
 # ifdef EGL_EXT_platform_xcb
@@ -362,7 +362,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 #elif defined (USE_PLATFORM_WAYLAND)
     sys->window = NULL;
 
-    if (wnd->type != VOUT_WINDOW_TYPE_WAYLAND)
+    if (wnd->type != VLC_WINDOW_TYPE_WAYLAND)
         goto error;
 
 # ifdef EGL_EXT_platform_wayland
@@ -381,7 +381,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 # endif
 
 #elif defined (USE_PLATFORM_WIN32)
-    if (wnd->type != VOUT_WINDOW_TYPE_HWND)
+    if (wnd->type != VLC_WINDOW_TYPE_HWND)
         goto error;
 
     window = &wnd->handle.hwnd;
@@ -392,7 +392,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     (void) width; (void) height;
 
 #elif defined (USE_PLATFORM_ANDROID)
-    if (wnd->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+    if (wnd->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
         goto error;
 
     ANativeWindow *anw =

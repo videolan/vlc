@@ -38,9 +38,9 @@
 
 #include "utils.h"
 
-static int Open(vout_window_t *);
-static void Close(vout_window_t *);
-static int OpenDecDevice(vlc_decoder_device *device, vout_window_t *window);
+static int Open(vlc_window_t *);
+static void Close(vlc_window_t *);
+static int OpenDecDevice(vlc_decoder_device *device, vlc_window_t *window);
 
 /*
  * Module descriptor
@@ -57,37 +57,37 @@ vlc_module_begin()
 vlc_module_end()
 
 
-static void OnNewWindowSize(vout_window_t *wnd,
+static void OnNewWindowSize(vlc_window_t *wnd,
                             unsigned i_width, unsigned i_height)
 {
-    vout_window_ReportSize(wnd, i_width, i_height);
+    vlc_window_ReportSize(wnd, i_width, i_height);
 }
 
-static void OnNewMouseCoords(vout_window_t *wnd,
+static void OnNewMouseCoords(vlc_window_t *wnd,
                              const struct awh_mouse_coords *coords)
 {
-    vout_window_ReportMouseMoved(wnd, coords->i_x, coords->i_y);
+    vlc_window_ReportMouseMoved(wnd, coords->i_x, coords->i_y);
     switch (coords->i_action)
     {
         case AMOTION_EVENT_ACTION_DOWN:
-            vout_window_ReportMousePressed(wnd, coords->i_button);
+            vlc_window_ReportMousePressed(wnd, coords->i_button);
             break;
         case AMOTION_EVENT_ACTION_UP:
-            vout_window_ReportMouseReleased(wnd, coords->i_button);
+            vlc_window_ReportMouseReleased(wnd, coords->i_button);
             break;
         case AMOTION_EVENT_ACTION_MOVE:
             break;
     }
 }
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .destroy = Close,
 };
 
 /**
  * Create an Android native window.
  */
-static int Open(vout_window_t *wnd)
+static int Open(vlc_window_t *wnd)
 {
     /* We cannot create a window without the associated AWindow instance. */
     jobject jobj = var_InheritAddress(wnd, "drawable-androidwindow");
@@ -99,7 +99,7 @@ static int Open(vout_window_t *wnd)
     if (p_awh == NULL)
         return VLC_EGENERIC;
 
-    wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
+    wnd->type = VLC_WINDOW_TYPE_ANDROID_NATIVE;
     wnd->handle.anativewindow = p_awh;
     wnd->ops = &ops;
 
@@ -110,16 +110,16 @@ static int Open(vout_window_t *wnd)
 /**
  * Destroys the Android native window.
  */
-static void Close(vout_window_t *wnd)
+static void Close(vlc_window_t *wnd)
 {
     AWindowHandler_destroy(wnd->handle.anativewindow);
 }
 
 static int
-OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
+OpenDecDevice(vlc_decoder_device *device, vlc_window_t *window)
 {
     AWindowHandler *awh;
-    if (window && window->type == VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+    if (window && window->type == VLC_WINDOW_TYPE_ANDROID_NATIVE)
         awh = window->handle.anativewindow;
     else
         awh = AWindowHandler_new(VLC_OBJECT(device), NULL, NULL);

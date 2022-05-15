@@ -183,7 +183,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_nb_samples  = 0;
 
     /* Create the OpenGL context */
-    vout_window_cfg_t cfg;
+    vlc_window_cfg_t cfg;
 
     memset(&cfg, 0, sizeof (cfg));
     cfg.is_decorated = true;

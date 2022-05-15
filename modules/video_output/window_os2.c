@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int Open( vout_window_t *wnd );
+static int Open( vlc_window_t *wnd );
 
 vlc_module_begin ()
     set_shortname( N_("OS/2 window"))
@@ -71,21 +71,21 @@ typedef struct vout_window_sys_t
  * Local prototypes
  *****************************************************************************/
 static int ConvertKey( USHORT i_pmkey );
-static void MousePressed( vout_window_t *wnd, HWND hwnd, unsigned button );
-static void MouseReleased( vout_window_t *wnd, unsigned button );
+static void MousePressed( vlc_window_t *wnd, HWND hwnd, unsigned button );
+static void MouseReleased( vlc_window_t *wnd, unsigned button );
 static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg,
                                  MPARAM mp1, MPARAM mp2 );
 static void MorphToPM( void );
 static void PMThread( void *arg );
 
-static int Enable( vout_window_t *wnd, const vout_window_cfg_t *cfg );
-static void Disable( struct vout_window_t *wnd );
-static void Resize( vout_window_t *wnd, unsigned width, unsigned height );
-static void Close(vout_window_t *wnd );
-static void SetState( vout_window_t *wnd, unsigned state );
-static void UnsetFullscreen( vout_window_t *wnd );
-static void SetFullscreen( vout_window_t *wnd, const char *id );
-static void SetTitle( vout_window_t *wnd, const char *title );
+static int Enable( vlc_window_t *wnd, const vlc_window_cfg_t *cfg );
+static void Disable( struct vlc_window *wnd );
+static void Resize( vlc_window_t *wnd, unsigned width, unsigned height );
+static void Close(vlc_window_t *wnd );
+static void SetState( vlc_window_t *wnd, unsigned state );
+static void UnsetFullscreen( vlc_window_t *wnd );
+static void SetFullscreen( vlc_window_t *wnd, const char *id );
+static void SetTitle( vlc_window_t *wnd, const char *title );
 
 #define WC_VLC_WINDOW_OS2 "WC_VLC_WINDOW_OS2"
 
@@ -172,7 +172,7 @@ static int ConvertKey( USHORT i_pmkey )
     return 0;
 }
 
-static void MousePressed( vout_window_t *wnd, HWND hwnd, unsigned button )
+static void MousePressed( vlc_window_t *wnd, HWND hwnd, unsigned button )
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -184,10 +184,10 @@ static void MousePressed( vout_window_t *wnd, HWND hwnd, unsigned button )
 
     sys->button_pressed |= 1 << button;
 
-    vout_window_ReportMousePressed( wnd, button );
+    vlc_window_ReportMousePressed( wnd, button );
 }
 
-static void MouseReleased( vout_window_t *wnd, unsigned button )
+static void MouseReleased( vlc_window_t *wnd, unsigned button )
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -195,14 +195,14 @@ static void MouseReleased( vout_window_t *wnd, unsigned button )
     if( !sys->button_pressed )
         WinSetCapture( HWND_DESKTOP, NULLHANDLE );
 
-    vout_window_ReportMouseReleased(wnd, button);
+    vlc_window_ReportMouseReleased(wnd, button);
 }
 
 #define WM_MOUSELEAVE   0x41F
 
 static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 {
-    vout_window_t *wnd = WinQueryWindowPtr( hwnd, 0 );
+    vlc_window_t *wnd = WinQueryWindowPtr( hwnd, 0 );
     MRESULT result = ( MRESULT )TRUE;
 
     if ( !wnd )
@@ -228,13 +228,13 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     {
         /* the user wants to close the window */
         case WM_CLOSE:
-            vout_window_ReportClose( wnd );
+            vlc_window_ReportClose( wnd );
             WinPostMsg( hwnd, WM_QUIT, 0, 0 );
             result = 0;
             break;
 
         case WM_SIZE:
-            vout_window_ReportSize( wnd,
+            vlc_window_ReportSize( wnd,
                                     SHORT1FROMMP( mp2 ), SHORT2FROMMP( mp2 ));
             result = 0;
             break;
@@ -250,7 +250,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             int h = rcl.yTop - rcl.yBottom;
             i_mouse_y = ( h - i_mouse_y ) - 1;
 
-            vout_window_ReportMouseMoved( wnd, i_mouse_x, i_mouse_y );
+            vlc_window_ReportMouseMoved( wnd, i_mouse_x, i_mouse_y );
 
             result = WinDefWindowProc( hwnd, msg, mp1, mp2 );
             break;
@@ -281,15 +281,15 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             break;
 
         case WM_BUTTON1DBLCLK :
-            vout_window_ReportMouseDoubleClick( wnd, MOUSE_BUTTON_LEFT );
+            vlc_window_ReportMouseDoubleClick( wnd, MOUSE_BUTTON_LEFT );
             break;
 
         case WM_BUTTON2DBLCLK :
-            vout_window_ReportMouseDoubleClick( wnd, MOUSE_BUTTON_RIGHT );
+            vlc_window_ReportMouseDoubleClick( wnd, MOUSE_BUTTON_RIGHT );
             break;
 
         case WM_BUTTON3DBLCLK :
-            vout_window_ReportMouseDoubleClick( wnd, MOUSE_BUTTON_CENTER );
+            vlc_window_ReportMouseDoubleClick( wnd, MOUSE_BUTTON_CENTER );
             break;
 
         case WM_TRANSLATEACCEL :
@@ -323,7 +323,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     if( i_flags & KC_ALT )
                         i_key |= KEY_MODIFIER_ALT;
 
-                    vout_window_ReportKeyPress( wnd, i_key );
+                    vlc_window_ReportKeyPress( wnd, i_key );
                 }
             }
             break;
@@ -357,7 +357,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             }
 
             /* Enable */
-            vout_window_cfg_t *cfg = PVOIDFROMMP( mp2 );
+            vlc_window_cfg_t *cfg = PVOIDFROMMP( mp2 );
 
             if( cfg->is_decorated )
             {
@@ -494,7 +494,7 @@ static void MorphToPM( void )
 
 static void PMThread( void *arg )
 {
-    vout_window_t *wnd = arg;
+    vlc_window_t *wnd = arg;
     vout_window_sys_t *sys = wnd->sys;
     ULONG i_frame_flags;
     QMSG qm;
@@ -564,7 +564,7 @@ exit_error:
     DosPostEventSem( sys->ack_event );
 }
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .enable  = Enable,
     .disable = Disable,
     .resize = Resize,
@@ -575,7 +575,7 @@ static const struct vout_window_operations ops = {
     .set_title = SetTitle,
 };
 
-static int Open( vout_window_t *wnd )
+static int Open( vlc_window_t *wnd )
 {
     vout_window_sys_t *sys;
 
@@ -597,7 +597,7 @@ static int Open( vout_window_t *wnd )
         return VLC_EGENERIC;
     }
 
-    wnd->type = VOUT_WINDOW_TYPE_HWND;
+    wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = ( void * )sys->client;
     wnd->ops = &ops;
     wnd->info.has_double_click = true;
@@ -605,11 +605,11 @@ static int Open( vout_window_t *wnd )
     return VLC_SUCCESS;
 }
 
-static int Enable( vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Enable( vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
 {
     vout_window_sys_t *sys = wnd->sys;
 
-    vout_window_cfg_t *config = malloc( sizeof( *config ));
+    vlc_window_cfg_t *config = malloc( sizeof( *config ));
     if( !config )
         return VLC_ENOMEM;
 
@@ -620,14 +620,14 @@ static int Enable( vout_window_t *wnd, const vout_window_cfg_t *cfg)
     return VLC_SUCCESS;
 }
 
-static void Disable( struct vout_window_t *wnd )
+static void Disable( struct vlc_window *wnd )
 {
     vout_window_sys_t *sys = wnd->sys;
 
     WinPostMsg( sys->client, WM_VLC_ENABLE, MPFROMLONG( FALSE ), 0 );
 }
 
-static void Resize( vout_window_t *wnd, unsigned width, unsigned height )
+static void Resize( vlc_window_t *wnd, unsigned width, unsigned height )
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -635,7 +635,7 @@ static void Resize( vout_window_t *wnd, unsigned width, unsigned height )
                 MPFROMLONG( width ), MPFROMLONG( height ));
 }
 
-static void Close( vout_window_t *wnd )
+static void Close( vlc_window_t *wnd )
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -648,21 +648,21 @@ static void Close( vout_window_t *wnd )
     free( sys );
 }
 
-static void SetState( vout_window_t *wnd, unsigned state )
+static void SetState( vlc_window_t *wnd, unsigned state )
 {
     vout_window_sys_t *sys = wnd->sys;
 
     WinPostMsg( sys->client, WM_VLC_SETSTATE, MPFROMLONG( state ), 0 );
 }
 
-static void UnsetFullscreen(vout_window_t *wnd)
+static void UnsetFullscreen(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
     WinPostMsg( sys->client, WM_VLC_FULLSCREEN, MPFROMLONG( FALSE ), 0 );
 }
 
-static void SetFullscreen(vout_window_t *wnd, const char *id)
+static void SetFullscreen(vlc_window_t *wnd, const char *id)
 {
     VLC_UNUSED( id );
     vout_window_sys_t *sys = wnd->sys;
@@ -670,7 +670,7 @@ static void SetFullscreen(vout_window_t *wnd, const char *id)
     WinPostMsg( sys->client, WM_VLC_FULLSCREEN, MPFROMLONG( TRUE ), 0 );
 }
 
-static void SetTitle(vout_window_t *wnd, const char *title)
+static void SetTitle(vlc_window_t *wnd, const char *title)
 {
     vout_window_sys_t *sys = wnd->sys;
 

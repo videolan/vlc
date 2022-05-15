@@ -193,7 +193,7 @@ static int Open(vlc_object_t * p_this)
     p_sys->dead = false;
 
     /* Create the openGL provider */
-    vout_window_cfg_t cfg = {
+    vlc_window_cfg_t cfg = {
         .is_decorated = true,
         .width = var_InheritInteger(p_filter, "glspectrum-width"),
         .height = var_InheritInteger(p_filter, "glspectrum-height"),

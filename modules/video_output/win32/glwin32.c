@@ -87,19 +87,19 @@ static int Control(vout_display_t *vd, int query)
     return CommonControl(vd, &sys->area, &sys->sys, query);
 }
 
-static const struct vout_window_operations embedVideoWindow_Ops =
+static const struct vlc_window_operations embedVideoWindow_Ops =
 {
 };
 
-static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
+static vlc_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_window_t *wnd = vlc_object_create(vd, sizeof(vout_window_t));
+    vlc_window_t *wnd = vlc_object_create(vd, sizeof(vlc_window_t));
     if (!wnd)
         return NULL;
 
-    wnd->type = VOUT_WINDOW_TYPE_HWND;
+    wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = sys->sys.hvideownd;
     wnd->ops = &embedVideoWindow_Ops;
     return wnd;
@@ -139,7 +139,7 @@ static int Open(vout_display_t *vd,
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
-    vout_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
+    vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
 
     vout_display_cfg_t embed_cfg = *vd->cfg;
     embed_cfg.window = EmbedVideoWindow_Create(vd);
@@ -188,7 +188,7 @@ static void Close(vout_display_t *vd)
 
     if (gl)
     {
-        vout_window_t *surface = gl->surface;
+        vlc_window_t *surface = gl->surface;
         if (sys->vgl)
         {
             vlc_gl_MakeCurrent (gl);

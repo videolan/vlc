@@ -36,8 +36,8 @@
     "Video will be embedded in this pre-existing window. " \
     "If zero, a new window will be created.")
 
-static int Open(vout_window_t *);
-static void Close(vout_window_t *);
+static int Open(vlc_window_t *);
+static void Close(vlc_window_t *);
 
 /*
  * Module descriptor
@@ -59,7 +59,7 @@ vlc_module_end ()
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 static uintptr_t *used = NULL;
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .destroy = Close,
 };
 
@@ -90,7 +90,7 @@ static void RemoveDrawable(uintptr_t val)
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open(vout_window_t *wnd)
+static int Open(vlc_window_t *wnd)
 {
     uintptr_t val = var_InheritInteger (wnd, "drawable-hwnd");
     if (val == 0)
@@ -124,7 +124,7 @@ skip:
     if (val == 0)
         return VLC_EGENERIC;
 
-    wnd->type = VOUT_WINDOW_TYPE_HWND;
+    wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = (void *)val;
     wnd->ops = &ops;
     wnd->sys = (void *)val;
@@ -134,7 +134,7 @@ skip:
 /**
  * Release the drawable.
  */
-static void Close (vout_window_t *wnd)
+static void Close (vlc_window_t *wnd)
 {
     uintptr_t val = (uintptr_t)wnd->sys;
 

@@ -45,7 +45,7 @@ public:
     void destroyMainInterface() override;
     void unloadGUI() override;
 
-    bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)  override;
+    bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)  override;
 
     inline Type type() const override { return X11Compositor; };
 
@@ -54,7 +54,7 @@ public:
     QQuickItem * activeFocusItem() const override;
 
 private:
-    int windowEnable(const vout_window_cfg_t *)  override;
+    int windowEnable(const vlc_window_cfg_t *)  override;
     void windowDisable() override;
 
 private slots:

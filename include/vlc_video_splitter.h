@@ -35,7 +35,7 @@
 
 typedef struct video_splitter_t video_splitter_t;
 
-struct vout_window_mouse_event_t;
+struct vlc_window_mouse_event;
 
 /** Structure describing a video splitter output properties
  */
@@ -80,7 +80,7 @@ struct video_splitter_t
     int             (*pf_filter)( video_splitter_t *, picture_t *pp_dst[],
                                   picture_t *p_src );
     int (*mouse)(video_splitter_t *, int idx,
-                 struct vout_window_mouse_event_t *);
+                 struct vlc_window_mouse_event *);
 
     void *p_sys;
 };
@@ -131,7 +131,7 @@ static inline int video_splitter_Filter( video_splitter_t *p_splitter,
 }
 
 static inline int video_splitter_Mouse(video_splitter_t *splitter, int index,
-                                       struct vout_window_mouse_event_t *ev)
+                                       struct vlc_window_mouse_event *ev)
 {
     return (splitter->mouse != NULL)
         ? splitter->mouse(splitter, index, ev) : VLC_SUCCESS;

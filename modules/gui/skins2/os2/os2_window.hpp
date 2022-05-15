@@ -63,8 +63,8 @@ public:
     HWND getHandle() const { return m_hWndClient; }
 
     /// Set the window handler
-    void setOSHandle( vout_window_t *pWnd ) const {
-        pWnd->type = VOUT_WINDOW_TYPE_HWND;
+    void setOSHandle( vlc_window_t *pWnd ) const {
+        pWnd->type = VLC_WINDOW_TYPE_HWND;
         pWnd->info.has_double_click = true;
         pWnd->handle.hwnd = ( void * )getHandle();
     }

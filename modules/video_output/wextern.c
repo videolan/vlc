@@ -36,7 +36,7 @@
 #include <vlc/libvlc_renderer_discoverer.h>
 #include <vlc/libvlc_media_player.h>
 
-static int Open(vout_window_t *);
+static int Open(vlc_window_t *);
 
 vlc_module_begin()
     set_shortname(N_("Callback window"))
@@ -53,11 +53,11 @@ typedef struct {
 
 static void WindowResize(void *opaque, unsigned width, unsigned height)
 {
-    vout_window_t *window = opaque;
-    vout_window_ReportSize(window, width, height);
+    vlc_window_t *window = opaque;
+    vlc_window_ReportSize(window, width, height);
 }
 
-static int Enable(struct vout_window_t *wnd, const vout_window_cfg_t *wcfg)
+static int Enable(struct vlc_window *wnd, const vlc_window_cfg_t *wcfg)
 {
     wextern_t *sys = wnd->sys;
 
@@ -69,7 +69,7 @@ static int Enable(struct vout_window_t *wnd, const vout_window_cfg_t *wcfg)
     return VLC_SUCCESS;
 }
 
-static void Disable(struct vout_window_t *wnd)
+static void Disable(struct vlc_window *wnd)
 {
     wextern_t *sys = wnd->sys;
 
@@ -77,14 +77,14 @@ static void Disable(struct vout_window_t *wnd)
         sys->setResizeCb( sys->opaque, NULL, NULL );
 }
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .enable  = Enable,
     .disable = Disable,
     // .resize: don't let the core resize us on zoom/crop/ar changes
     //          the display module should do the ReportSize for us
 };
 
-static int Open(vout_window_t *wnd)
+static int Open(vlc_window_t *wnd)
 {
     wextern_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof(*sys));
     if (unlikely(sys==NULL))
@@ -93,7 +93,7 @@ static int Open(vout_window_t *wnd)
     sys->setResizeCb     = var_InheritAddress( wnd, "vout-cb-resize-cb" );
 
     wnd->sys = sys;
-    wnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    wnd->type = VLC_WINDOW_TYPE_DUMMY;
     wnd->ops = &ops;
     return VLC_SUCCESS;
 }

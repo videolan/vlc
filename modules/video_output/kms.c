@@ -114,7 +114,7 @@ struct vout_window_sys_t {
     uint32_t main_buffer;
 };
 
-static deviceRval FindCRTC(vout_window_t *wnd, drmModeRes const *res,
+static deviceRval FindCRTC(vlc_window_t *wnd, drmModeRes const *res,
                              drmModeConnector const *conn)
 {
     struct vout_window_sys_t *sys = wnd->sys;
@@ -159,7 +159,7 @@ static deviceRval FindCRTC(vout_window_t *wnd, drmModeRes const *res,
 }
 
 
-static deviceRval SetupDevice(vout_window_t *wnd, drmModeRes const *res,
+static deviceRval SetupDevice(vlc_window_t *wnd, drmModeRes const *res,
                              drmModeConnector const *conn)
 {
     struct vout_window_sys_t *sys = wnd->sys;
@@ -182,7 +182,7 @@ static deviceRval SetupDevice(vout_window_t *wnd, drmModeRes const *res,
     return drvSuccess;
 }
 
-static void UpdateOutputs(vout_window_t *wnd)
+static void UpdateOutputs(vlc_window_t *wnd)
 {
     struct vout_window_sys_t *sys = wnd->sys;
     drmModeRes *modeRes = sys->modeRes;
@@ -217,7 +217,7 @@ static void UpdateOutputs(vout_window_t *wnd)
             if ((enc->possible_crtcs & (1 << crtc_index)) != 0) {
 
                 drmModeFreeEncoder(enc);
-                vout_window_ReportOutputDevice(wnd, name, name);
+                vlc_window_ReportOutputDevice(wnd, name, name);
                 break;
             }
             drmModeFreeEncoder(enc);
@@ -226,7 +226,7 @@ static void UpdateOutputs(vout_window_t *wnd)
     }
 }
 
-static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int WindowEnable(vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
 {
     struct vout_window_sys_t *sys = wnd->sys;
     (void)cfg;
@@ -324,7 +324,7 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->framebuffer = new_fb;
     sys->main_buffer = request.handle;
 
-    vout_window_ReportSize(wnd, sys->width, sys->height);
+    vlc_window_ReportSize(wnd, sys->width, sys->height);
 
     return VLC_SUCCESS;
 
@@ -352,7 +352,7 @@ error_create_dumb:
     return VLC_EGENERIC;
 }
 
-static void WindowDisable(vout_window_t *wnd)
+static void WindowDisable(vlc_window_t *wnd)
 {
     struct vout_window_sys_t *sys = wnd->sys;
     sys->crtc = 0;
@@ -385,7 +385,7 @@ static void WindowDisable(vout_window_t *wnd)
     (void)ret;
 }
 
-static void WindowClose(vout_window_t *wnd)
+static void WindowClose(vlc_window_t *wnd)
 {
     struct vout_window_sys_t *sys = wnd->sys;
     drmModeFreeResources(sys->modeRes);
@@ -395,14 +395,14 @@ static void WindowClose(vout_window_t *wnd)
     free(sys);
 }
 
-static const struct vout_window_operations window_ops =
+static const struct vlc_window_operations window_ops =
 {
     .destroy = WindowClose,
     .enable = WindowEnable,
     .disable = WindowDisable,
 };
 
-static int OpenWindow(vout_window_t *wnd)
+static int OpenWindow(vlc_window_t *wnd)
 {
     char *psz_device;
 
@@ -461,7 +461,7 @@ static int OpenWindow(vout_window_t *wnd)
     }
 
     wnd->ops = &window_ops;
-    wnd->type = VOUT_WINDOW_TYPE_KMS;
+    wnd->type = VLC_WINDOW_TYPE_KMS;
     wnd->display.drm_fd = sys->drm_fd;
     /* Note: wnd->handle.crtc will be initialized later */
 

@@ -42,7 +42,7 @@ static const struct vlc_decoder_device_operations d3d9_dev_ops = {
     .close = D3D9CloseDecoderDevice,
 };
 
-int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
+int D3D9OpenDecoderDevice(vlc_decoder_device *device, vlc_window_t *wnd)
 {
     VLC_UNUSED(wnd);
 

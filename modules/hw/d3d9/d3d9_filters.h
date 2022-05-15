@@ -32,6 +32,6 @@ int  D3D9OpenDeinterlace(filter_t *);
 int  D3D9OpenConverter(filter_t *);
 int  D3D9OpenCPUConverter(filter_t *);
 
-int D3D9OpenDecoderDevice(vlc_decoder_device *, vout_window_t *);
+int D3D9OpenDecoderDevice(vlc_decoder_device *, vlc_window_t *);
 
 #endif /* VLC_D3D9_FILTERS_H */

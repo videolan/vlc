@@ -243,7 +243,7 @@ static void Close(vlc_gl_t *gl)
     return self;
 }
 
-- (BOOL)attachToWindow:(vout_window_t*)wnd
+- (BOOL)attachToWindow:(vlc_window_t*)wnd
 {
     @try {
         UIView *viewContainer = (__bridge UIView*)wnd->handle.nsobject;
@@ -493,10 +493,10 @@ static void Close(vlc_gl_t *gl)
 
 static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
-    vout_window_t *wnd = gl->surface;
+    vlc_window_t *wnd = gl->surface;
 
     /* We only support UIView container window. */
-    if (wnd->type != VOUT_WINDOW_TYPE_NSOBJECT)
+    if (wnd->type != VLC_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
     @autoreleasepool {

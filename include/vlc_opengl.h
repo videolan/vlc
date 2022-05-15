@@ -33,8 +33,8 @@ extern "C" {
  * This file defines GL structures and functions.
  */
 
-struct vout_window_t;
-struct vout_window_cfg_t;
+struct vlc_window;
+struct vlc_window_cfg;
 struct vout_display_cfg;
 
 /**
@@ -72,7 +72,7 @@ struct vlc_gl_t
     struct vlc_decoder_device *device;
     union {
         struct { /* on-screen */
-            struct vout_window_t *surface;
+            struct vlc_window *surface;
         };
         struct { /* off-screen */
             vlc_fourcc_t offscreen_chroma_out;
@@ -140,8 +140,8 @@ static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 }
 
 VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,
-                                        const struct vout_window_cfg_t *,
-                                        struct vout_window_t **) VLC_USED;
+                                        const struct vlc_window_cfg *,
+                                        struct vlc_window **) VLC_USED;
 VLC_API bool vlc_gl_surface_CheckSize(vlc_gl_t *, unsigned *w, unsigned *h);
 VLC_API void vlc_gl_surface_Destroy(vlc_gl_t *);
 

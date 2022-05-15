@@ -39,7 +39,7 @@ typedef struct vlc_vk_platform_t
 {
     // set by platform.c
     struct vlc_object_t obj;
-    struct vout_window_t *window;
+    struct vlc_window *window;
     module_t *module;
 
     // set by the platform
@@ -48,7 +48,7 @@ typedef struct vlc_vk_platform_t
     const struct vlc_vk_platform_operations *ops;
 } vlc_vk_platform_t;
 
-vlc_vk_platform_t *vlc_vk_platform_Create(struct vout_window_t *, const char *) VLC_USED;
+vlc_vk_platform_t *vlc_vk_platform_Create(struct vlc_window *, const char *) VLC_USED;
 void vlc_vk_platform_Release(vlc_vk_platform_t *);
 
 // Create a vulkan surface and store it to `surface_out`

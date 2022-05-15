@@ -103,7 +103,7 @@ struct qt_intf_t
     class MainCtx *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
     class QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
 
-    unsigned voutWindowType; /* Type of vout_window_t provided */
+    unsigned voutWindowType; /* Type of vlc_window_t provided */
     bool b_isDialogProvider; /* Qt mode or Skins mode */
 
     vlc_playlist_t *p_playlist;  /* playlist */

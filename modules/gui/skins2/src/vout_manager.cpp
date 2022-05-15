@@ -189,7 +189,7 @@ CtrlVideo* VoutManager::getBestCtrlVideo( )
 // Functions called by window provider
 // ///////////////////////////////////
 
-void VoutManager::acceptWnd( vout_window_t* pWnd, int width, int height )
+void VoutManager::acceptWnd( vlc_window_t* pWnd, int width, int height )
 {
     // Creation of a dedicated Window per vout thread
     VoutWindow* pVoutWindow = new VoutWindow( getIntf(), pWnd, width, height,
@@ -216,7 +216,7 @@ void VoutManager::acceptWnd( vout_window_t* pWnd, int width, int height )
 }
 
 
-void VoutManager::releaseWnd( vout_window_t* pWnd )
+void VoutManager::releaseWnd( vlc_window_t* pWnd )
 {
     // remove vout thread from savedVec
     std::vector<SavedWnd>::iterator it;
@@ -245,7 +245,7 @@ void VoutManager::releaseWnd( vout_window_t* pWnd )
 }
 
 
-void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
+void VoutManager::setSizeWnd( vlc_window_t *pWnd, int width, int height )
 {
    msg_Dbg( pWnd, "setSize (%ix%i) received from vout thread",
                   width, height );
@@ -271,7 +271,7 @@ void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
 }
 
 
-void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
+void VoutManager::setFullscreenWnd( vlc_window_t *pWnd, bool b_fullscreen )
 {
     msg_Dbg( pWnd, "setFullscreen (%i) received from vout thread",
                    b_fullscreen );
@@ -296,7 +296,7 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
 }
 
 
-void VoutManager::hideMouseWnd( vout_window_t *pWnd, bool hide )
+void VoutManager::hideMouseWnd( vlc_window_t *pWnd, bool hide )
 {
     msg_Dbg( pWnd, "hide mouse (%i) received from vout thread", hide );
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );

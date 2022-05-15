@@ -167,7 +167,7 @@ void GenericWindow::innerHide()
 }
 
 
-void GenericWindow::updateWindowConfiguration( vout_window_t * pWnd ) const
+void GenericWindow::updateWindowConfiguration( struct vlc_window *pWnd ) const
 {
     m_pOsWindow->setOSHandle( pWnd );
 }

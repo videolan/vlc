@@ -40,7 +40,7 @@ static const struct vlc_vk_platform_operations platform_ops =
 
 static int InitPlatform(vlc_vk_platform_t *vk)
 {
-    if (vk->window->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+    if (vk->window->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
         return VLC_EGENERIC;
 
     vk->platform_ext = VK_KHR_ANDROID_SURFACE_EXTENSION_NAME;

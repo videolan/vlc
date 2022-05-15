@@ -20,8 +20,8 @@
 
 struct vout_crop;
 
-vout_window_t *vout_display_window_New(vout_thread_t *);
-void vout_display_window_Delete(vout_window_t *);
+vlc_window_t *vout_display_window_New(vout_thread_t *);
+void vout_display_window_Delete(vlc_window_t *);
 
 void vout_display_SizeWindow(unsigned *restrict width,
                              unsigned *restrict height,

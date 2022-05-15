@@ -95,7 +95,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
 {
     VLC_UNUSED(picture);
     vout_display_sys_t *sys = vd->sys;
-    vout_window_t *wnd = vd->cfg->window;
+    vlc_window_t *wnd = vd->cfg->window;
     const video_format_t *fmt = vd->fmt;
     picture_t *pic = sys->buffers[sys->front_buf];
     vout_display_place_t place;
@@ -151,11 +151,11 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_window_t *wnd = vd->cfg->window;
+    vlc_window_t *wnd = vd->cfg->window;
     uint_fast32_t drm_fourcc = 0;
     video_format_t fmt;
 
-    if (wnd->type != VOUT_WINDOW_TYPE_KMS)
+    if (wnd->type != VLC_WINDOW_TYPE_KMS)
         return VLC_EGENERIC;
 
     /*

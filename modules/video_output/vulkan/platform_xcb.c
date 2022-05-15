@@ -40,7 +40,7 @@ static const struct vlc_vk_platform_operations platform_ops =
 
 static int InitPlatform(vlc_vk_platform_t *vk)
 {
-    if (vk->window->type != VOUT_WINDOW_TYPE_XID)
+    if (vk->window->type != VLC_WINDOW_TYPE_XID)
         return VLC_EGENERIC;
 
     const char *display = vk->window->display.x11;

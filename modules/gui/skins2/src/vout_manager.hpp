@@ -37,20 +37,20 @@
 class VarBool;
 class GenericWindow;
 class FscWindow;
-struct vout_window_t;
+struct vlc_window;
 
 #include <stdio.h>
 
 class SavedWnd
 {
 public:
-    SavedWnd( struct vout_window_t* pWnd, VoutWindow* pVoutWindow = NULL,
+    SavedWnd( struct vlc_window *pWnd, VoutWindow* pVoutWindow = NULL,
                CtrlVideo* pCtrlVideo = NULL, int height = -1, int width = -1 )
             : pWnd( pWnd ), pVoutWindow( pVoutWindow ),
               pCtrlVideo( pCtrlVideo ), height( height ), width( width ) { }
     ~SavedWnd() { }
 
-    struct vout_window_t* pWnd;
+    struct vlc_window *pWnd;
     VoutWindow *pVoutWindow;
     CtrlVideo *pCtrlVideo;
     int height;
@@ -106,19 +106,19 @@ public:
     static void destroy( intf_thread_t *pIntf );
 
     /// accept window request (vout window provider)
-    void acceptWnd( struct vout_window_t *pWnd, int width, int height );
+    void acceptWnd( struct vlc_window *pWnd, int width, int height );
 
     // release window (vout window provider)
-    void releaseWnd( struct vout_window_t *pWnd );
+    void releaseWnd( struct vlc_window *pWnd );
 
     /// set window size (vout window provider)
-    void setSizeWnd( struct vout_window_t* pWnd, int width, int height );
+    void setSizeWnd( struct vlc_window *pWnd, int width, int height );
 
     /// set fullscreen mode (vout window provider)
-    void setFullscreenWnd( struct vout_window_t* pWnd, bool b_fullscreen );
+    void setFullscreenWnd( struct vlc_window *pWnd, bool b_fullscreen );
 
     /// hide mouse (vout window provider)
-    void hideMouseWnd( struct vout_window_t* pWnd, bool hide );
+    void hideMouseWnd( struct vlc_window *pWnd, bool hide );
 
     // Register Video Controls (when building theme)
     void registerCtrlVideo( CtrlVideo* p_CtrlVideo );

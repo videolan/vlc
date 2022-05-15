@@ -53,7 +53,7 @@ public:
     virtual bool makeMainInterface(MainCtx*) override;
     virtual void destroyMainInterface() override;
     virtual void unloadGUI() override;
-    virtual bool setupVoutWindow(vout_window_t*, VoutDestroyCb destroyCb) override;
+    virtual bool setupVoutWindow(vlc_window_t*, VoutDestroyCb destroyCb) override;
     virtual QWindow* interfaceMainWindow() const override;
 
     Type type() const override;
@@ -64,7 +64,7 @@ protected:
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
 private:
-    int windowEnable(const vout_window_cfg_t *) override;
+    int windowEnable(const vlc_window_cfg_t *) override;
     void windowDisable() override;
 
 private slots:

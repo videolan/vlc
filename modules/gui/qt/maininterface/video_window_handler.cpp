@@ -74,7 +74,7 @@ void VideoWindowHandler::requestVideoFullScreen(const char * )
 
 void VideoWindowHandler::requestVideoState(  unsigned i_arg )
 {
-    bool on_top = (i_arg & VOUT_WINDOW_STATE_ABOVE) != 0;
+    bool on_top = (i_arg & VLC_WINDOW_STATE_ABOVE) != 0;
     emit askVideoOnTop( on_top );
 }
 
@@ -86,7 +86,7 @@ void VideoWindowHandler::setVideoSize(unsigned int w, unsigned int h)
     if ((states & (Qt::WindowFullScreen | Qt::WindowMaximized)) == 0)
     {
         /* Resize video widget to video size, or keep it at the same
-         * size. Call setSize() either way so that vout_window_ReportSize
+         * size. Call setSize() either way so that vlc_window_ReportSize
          * will always get called.
          * If the video size is too large for the screen, resize it
          * to the screen size.

@@ -38,7 +38,7 @@ static int decoder_device_Open(void *func, bool forced, va_list ap)
     VLC_UNUSED(forced);
     vlc_decoder_device_Open open = func;
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
-    vout_window_t *window = va_arg(ap, vout_window_t *);
+    vlc_window_t *window = va_arg(ap, vlc_window_t *);
     int ret = open(device, window);
     if (ret != VLC_SUCCESS)
         vlc_objres_clear(&device->obj);
@@ -46,7 +46,7 @@ static int decoder_device_Open(void *func, bool forced, va_list ap)
 }
 
 vlc_decoder_device *
-vlc_decoder_device_Create(vlc_object_t *o, vout_window_t *window)
+vlc_decoder_device_Create(vlc_object_t *o, vlc_window_t *window)
 {
     struct vlc_decoder_device_priv *priv =
             vlc_custom_create(o, sizeof (*priv), "decoder device");

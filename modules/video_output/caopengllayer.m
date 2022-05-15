@@ -281,7 +281,7 @@ static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
     vout_display_sys_t *sys;
-    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
     @autoreleasepool {

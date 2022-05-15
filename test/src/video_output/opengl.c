@@ -53,7 +53,7 @@ static const struct vlc_decoder_device_operations decoder_device_ops =
 
 static int OpenDecoderDevice(
         struct vlc_decoder_device *device,
-        vout_window_t *window
+        vlc_window_t *window
 ) {
     VLC_UNUSED(window);
 
@@ -67,13 +67,13 @@ static int OpenDecoderDevice(
 /**
  * Dummy vout_window implementation
  */
-static const struct vout_window_operations wnd_ops = {
+static const struct vlc_window_operations wnd_ops = {
     .destroy = NULL,
 };
 
-static int OpenWindow(vout_window_t *wnd)
+static int OpenWindow(vlc_window_t *wnd)
 {
-    wnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    wnd->type = VLC_WINDOW_TYPE_DUMMY;
     wnd->ops = &wnd_ops;
     return VLC_SUCCESS;
 }
@@ -228,9 +228,9 @@ static void test_opengl_offscreen(vlc_object_t *root, enum vlc_gl_api_type api_t
 
 static void test_opengl(vlc_object_t *root, enum vlc_gl_api_type api_type)
 {
-    const vout_window_cfg_t wnd_cfg = { .width = 800, .height = 600, };
-    const vout_window_owner_t owner = { .sys = NULL };
-    vout_window_t *wnd = vout_window_New(root, MODULE_STRING, &owner, &wnd_cfg);
+    const vlc_window_cfg_t wnd_cfg = { .width = 800, .height = 600, };
+    const vlc_window_owner_t owner = { .sys = NULL };
+    vlc_window_t *wnd = vlc_window_New(root, MODULE_STRING, &owner, &wnd_cfg);
     assert(wnd != NULL && wnd->ops == &wnd_ops);
 
     const vout_display_cfg_t cfg = {
@@ -250,7 +250,7 @@ static void test_opengl(vlc_object_t *root, enum vlc_gl_api_type api_type)
     assert(swapped == true);
 
     vlc_gl_Delete(gl);
-    vout_window_Delete(wnd);
+    vlc_window_Delete(wnd);
 }
 
 int main( int argc, char **argv )

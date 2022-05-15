@@ -42,7 +42,7 @@ class EvtDragLeave;
 class EvtDragOver;
 class EvtDragDrop;
 class WindowManager;
-struct vout_window_t;
+struct vlc_window;
 
 
 /// Generic window class
@@ -112,7 +112,7 @@ public:
     virtual std::string getType() const { return "Generic"; }
 
     /// window handle
-    void updateWindowConfiguration( struct vout_window_t *pWnd ) const;
+    void updateWindowConfiguration( struct vlc_window *pWnd ) const;
 
     /// window type
     WindowType_t getType() { return m_type; }

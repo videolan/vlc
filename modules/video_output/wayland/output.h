@@ -18,11 +18,11 @@
 
 #include <stdint.h>
 
-struct vout_window_t;
+struct vlc_window;
 struct wl_registry;
 struct output_list;
 
-struct output_list *output_list_create(struct vout_window_t *wnd);
+struct output_list *output_list_create(struct vlc_window *wnd);
 void output_list_destroy(struct output_list *);
 
 struct wl_output *output_create(struct output_list *, struct wl_registry *,

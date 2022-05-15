@@ -41,7 +41,7 @@
 
 class OSTimer;
 class VarBool;
-struct vout_window_t;
+struct vlc_window;
 
 
 /// Singleton object handling VLC internal state and playlist

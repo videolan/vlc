@@ -39,7 +39,7 @@
 
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
-static int DecoderContextOpen(vlc_decoder_device *, vout_window_t *);
+static int DecoderContextOpen(vlc_decoder_device *, vlc_window_t *);
 
 #define DEINTERLACE_MODULE_TEXT N_("Integrated deinterlacing")
 #define DEINTERLACE_MODULE_LONGTEXT N_( "Specify the deinterlace mode to use." )
@@ -1080,7 +1080,7 @@ static void initCuda(void *opaque)
 }
 
 static int
-DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
+DecoderContextOpen(vlc_decoder_device *device, vlc_window_t *window)
 {
     VLC_UNUSED(window);
 

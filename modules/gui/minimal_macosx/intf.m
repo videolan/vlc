@@ -99,7 +99,7 @@ static void Run(intf_thread_t *p_intf)
  * Vout window management
  *****************************************************************************/
 
-static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+static int WindowEnable(vlc_window_t *p_wnd, const vlc_window_cfg_t *cfg)
 {
     @autoreleasepool {
         VLCMinimalVoutWindow __block *o_window;
@@ -120,11 +120,11 @@ static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     }
 
     if (cfg->is_fullscreen)
-        vout_window_SetFullScreen(p_wnd, NULL);
+        vlc_window_SetFullScreen(p_wnd, NULL);
     return VLC_SUCCESS;
 }
 
-static void WindowDisable(vout_window_t *p_wnd)
+static void WindowDisable(vlc_window_t *p_wnd)
 {
     @autoreleasepool {
         NSWindow * o_window = [(__bridge id)p_wnd->handle.nsobject window];
@@ -133,7 +133,7 @@ static void WindowDisable(vout_window_t *p_wnd)
     }
 }
 
-static void WindowResize(vout_window_t *p_wnd,
+static void WindowResize(vlc_window_t *p_wnd,
                          unsigned i_width, unsigned i_height)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
@@ -148,14 +148,14 @@ static void WindowResize(vout_window_t *p_wnd,
     }
 }
 
-static void WindowSetState(vout_window_t *p_wnd, unsigned state)
+static void WindowSetState(vlc_window_t *p_wnd, unsigned state)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
 
     [o_window setLevel:state];
 }
 
-static void WindowUnsetFullscreen(vout_window_t *p_wnd)
+static void WindowUnsetFullscreen(vlc_window_t *p_wnd)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
 
@@ -166,7 +166,7 @@ static void WindowUnsetFullscreen(vout_window_t *p_wnd)
     }
 }
 
-static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
+static void WindowSetFullscreen(vlc_window_t *p_wnd, const char *psz_id)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
 
@@ -177,9 +177,9 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
     }
 }
 
-static void WindowClose(vout_window_t *);
+static void WindowClose(vlc_window_t *);
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     WindowEnable,
     WindowDisable,
     WindowResize,
@@ -190,9 +190,9 @@ static const struct vout_window_operations ops = {
     NULL,
 };
 
-int WindowOpen(vout_window_t *p_wnd)
+int WindowOpen(vlc_window_t *p_wnd)
 {
-    p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
+    p_wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
     p_wnd->ops = &ops;
     return VLC_SUCCESS;
 }

@@ -43,7 +43,7 @@ static const struct vlc_decoder_device_operations d3d11_dev_ops = {
     .close = D3D11CloseDecoderDevice,
 };
 
-static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_window_t *wnd)
+static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vlc_window_t *wnd)
 {
     VLC_UNUSED(wnd);
 
@@ -61,12 +61,12 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
     return VLC_SUCCESS;
 }
 
-int D3D11OpenDecoderDeviceW8(vlc_decoder_device *device, vout_window_t *wnd)
+int D3D11OpenDecoderDeviceW8(vlc_decoder_device *device, vlc_window_t *wnd)
 {
     return D3D11OpenDecoderDevice(device, false, wnd);
 }
 
-int D3D11OpenDecoderDeviceAny(vlc_decoder_device *device, vout_window_t *wnd)
+int D3D11OpenDecoderDeviceAny(vlc_decoder_device *device, vlc_window_t *wnd)
 {
     return D3D11OpenDecoderDevice(device, true, wnd);
 }

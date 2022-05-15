@@ -35,13 +35,13 @@
 
 struct output_list
 {
-    vout_window_t *owner;
+    vlc_window_t *owner;
     struct wl_list outputs;
 };
 
 struct output_data
 {
-    vout_window_t *owner;
+    vlc_window_t *owner;
     struct wl_output *wl_output;
 
     uint32_t id;
@@ -60,7 +60,7 @@ static void output_geometry_cb(void *data, struct wl_output *output,
                                int32_t transform)
 {
     struct output_data *od = data;
-    vout_window_t *wnd = od->owner;
+    vlc_window_t *wnd = od->owner;
 
     msg_Dbg(wnd, "output %"PRIu32" geometry: %"PRId32"x%"PRId32"mm"
             "+%"PRId32"+%"PRId32", subpixel %"PRId32", transform %"PRId32,
@@ -87,7 +87,7 @@ static void output_mode_cb(void *data, struct wl_output *output,
                            uint32_t flags, int32_t w, int32_t h, int32_t vr)
 {
     struct output_data *od = data;
-    vout_window_t *wnd = od->owner;
+    vlc_window_t *wnd = od->owner;
     div_t d = div(vr, 1000);
 
     msg_Dbg(wnd, "output %"PRIu32" mode: 0x%"PRIx32" %"PRId32"x%"PRId32
@@ -102,14 +102,14 @@ static void output_mode_cb(void *data, struct wl_output *output,
 static void output_done_cb(void *data, struct wl_output *output)
 {
     struct output_data *od = data;
-    vout_window_t *wnd = od->owner;
+    vlc_window_t *wnd = od->owner;
     const char *name = od->name;
     const char *description = od->description;
 
     if (unlikely(description == NULL))
         description = name;
     if (likely(name != NULL))
-        vout_window_ReportOutputDevice(wnd, name, description);
+        vlc_window_ReportOutputDevice(wnd, name, description);
 
     (void) output;
 }
@@ -117,7 +117,7 @@ static void output_done_cb(void *data, struct wl_output *output)
 static void output_scale_cb(void *data, struct wl_output *output, int32_t f)
 {
     struct output_data *od = data;
-    vout_window_t *wnd = od->owner;
+    vlc_window_t *wnd = od->owner;
 
     msg_Dbg(wnd, "output %"PRIu32" scale: %"PRId32, od->id, f);
     (void) output;
@@ -154,7 +154,7 @@ static const struct wl_output_listener wl_output_cbs =
     output_description_cb,
 };
 
-struct output_list *output_list_create(vout_window_t *wnd)
+struct output_list *output_list_create(vlc_window_t *wnd)
 {
     struct output_list *ol = malloc(sizeof (*ol));
     if (unlikely(ol == NULL))
@@ -209,7 +209,7 @@ void output_destroy(struct output_list *ol, struct wl_output *wo)
     free(od->description);
 
     if (od->name != NULL) {
-        vout_window_ReportOutputDevice(ol->owner, od->name, NULL);
+        vlc_window_ReportOutputDevice(ol->owner, od->name, NULL);
         free(od->name);
     }
 

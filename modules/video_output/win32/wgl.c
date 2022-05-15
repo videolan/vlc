@@ -162,8 +162,8 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     int nVidiaAffinity = var_InheritInteger(gl, "gpu-affinity");
     if (nVidiaAffinity >= 0) CreateGPUAffinityDC(gl, nVidiaAffinity);
 
-    vout_window_t *wnd = gl->surface;
-    if (wnd->type != VOUT_WINDOW_TYPE_HWND || wnd->handle.hwnd == 0)
+    vlc_window_t *wnd = gl->surface;
+    if (wnd->type != VLC_WINDOW_TYPE_HWND || wnd->handle.hwnd == 0)
         goto error;
 
     sys->hvideownd = wnd->handle.hwnd;

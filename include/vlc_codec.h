@@ -630,7 +630,7 @@ typedef struct vlc_decoder_device
  * @param window pointer to a window to help device initialization (can be NULL)
  **/
 typedef int (*vlc_decoder_device_Open)(vlc_decoder_device *device,
-                                        vout_window_t *window);
+                                        vlc_window_t *window);
 
 #define set_callback_dec_device(activate, priority) \
     { \
@@ -648,7 +648,7 @@ typedef int (*vlc_decoder_device_Open)(vlc_decoder_device *device,
  * module as a transition.
  */
 VLC_API vlc_decoder_device *
-vlc_decoder_device_Create(vlc_object_t *, vout_window_t *window) VLC_USED;
+vlc_decoder_device_Create(vlc_object_t *, vlc_window_t *window) VLC_USED;
 
 /**
  * Hold a decoder device

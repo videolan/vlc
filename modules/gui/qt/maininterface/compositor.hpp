@@ -56,7 +56,7 @@ public:
         X11Compositor
     };
 
-    typedef void (*VoutDestroyCb)(vout_window_t *p_wnd);
+    typedef void (*VoutDestroyCb)(vlc_window_t *p_wnd);
 
 public:
     virtual ~Compositor() = default;
@@ -68,7 +68,7 @@ public:
 
     virtual void unloadGUI() = 0;
 
-    virtual bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
+    virtual bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
 
     virtual Type type() const = 0;
 
@@ -105,7 +105,7 @@ public:
     virtual ~CompositorVideo();
 
 public:
-    virtual int windowEnable(const vout_window_cfg_t *) = 0;
+    virtual int windowEnable(const vlc_window_cfg_t *) = 0;
     virtual void windowDisable() = 0;
     virtual void windowDestroy();
     virtual void windowResize(unsigned width, unsigned height);
@@ -114,7 +114,7 @@ public:
     virtual void windowSetFullscreen(const char *id);
 
 protected:
-    void commonSetupVoutWindow(vout_window_t* p_wnd, VoutDestroyCb destroyCb);
+    void commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb);
     void commonWindowEnable();
     void commonWindowDisable();
 
@@ -133,7 +133,7 @@ protected slots:
 
 protected:
     qt_intf_t *m_intf = nullptr;
-    vout_window_t* m_wnd = nullptr;
+    vlc_window_t* m_wnd = nullptr;
 
     MainCtx* m_mainCtx = nullptr;
 

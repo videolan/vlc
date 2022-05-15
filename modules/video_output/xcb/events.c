@@ -101,11 +101,11 @@ static const xcb_screen_t *FindScreen(struct vlc_logger *log,
     return NULL;
 }
 
-int vlc_xcb_parent_Create(struct vlc_logger *log, const vout_window_t *wnd,
+int vlc_xcb_parent_Create(struct vlc_logger *log, const vlc_window_t *wnd,
                           xcb_connection_t **restrict pconn,
                           const xcb_screen_t **restrict pscreen)
 {
-    if (wnd->type != VOUT_WINDOW_TYPE_XID)
+    if (wnd->type != VLC_WINDOW_TYPE_XID)
     {
         vlc_error(log, "window not available");
         return VLC_ENOTSUP;

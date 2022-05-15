@@ -40,7 +40,7 @@ int vlc_xcb_error_Check(struct vlc_logger *, xcb_connection_t *conn,
  * Creates a VLC video X window object, connects to the corresponding X server,
  * finds the corresponding X server screen.
  */
-int vlc_xcb_parent_Create(struct vlc_logger *, const vout_window_t *wnd,
+int vlc_xcb_parent_Create(struct vlc_logger *, const vlc_window_t *wnd,
                           xcb_connection_t **connp,
                           const xcb_screen_t **screenp);
 /**

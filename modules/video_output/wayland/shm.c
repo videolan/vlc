@@ -46,7 +46,7 @@
 
 typedef struct vout_display_sys_t
 {
-    vout_window_t *embed; /* VLC window */
+    vlc_window_t *embed; /* VLC window */
     struct wl_event_queue *eventq;
     struct wl_shm *shm;
     struct wp_viewporter *viewporter;
@@ -267,7 +267,7 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_WAYLAND)
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_WAYLAND)
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = malloc(sizeof (*sys));

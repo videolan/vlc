@@ -724,7 +724,7 @@ static void vd_manage(vout_display_t *vd)
         if (query_resolution(vd, sys->display_id, &width, &height) >= 0) {
             sys->display_width = width;
             sys->display_height = height;
-//            vout_window_ReportSize(vd->cfg->window, width, height);
+//            vlc_window_ReportSize(vd->cfg->window, width, height);
         }
 
         sys->need_configure_display = false;

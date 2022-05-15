@@ -69,8 +69,8 @@ public:
     Window getDrawable() const { return m_wnd; }
 
     /// Set the window handler
-    void setOSHandle( vout_window_t *pWnd ) const {
-        pWnd->type = VOUT_WINDOW_TYPE_XID;
+    void setOSHandle( vlc_window_t *pWnd ) const {
+        pWnd->type = VLC_WINDOW_TYPE_XID;
         pWnd->info.has_double_click = true;
         pWnd->handle.xid = m_wnd;
         pWnd->display.x11 = NULL;

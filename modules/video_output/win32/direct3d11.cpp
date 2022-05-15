@@ -388,7 +388,7 @@ static int Open(vout_display_t *vd,
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
 #ifndef VLC_WINSTORE_APP
-        if (vd->cfg->window->type == VOUT_WINDOW_TYPE_HWND)
+        if (vd->cfg->window->type == VLC_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area, &sys->sys,
                        vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
@@ -399,7 +399,7 @@ static int Open(vout_display_t *vd,
 
         /* use our internal swapchain callbacks */
 #if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
-        if (vd->cfg->window->type == VOUT_WINDOW_TYPE_DCOMP)
+        if (vd->cfg->window->type == VLC_WINDOW_TYPE_DCOMP)
             sys->outside_opaque =
                 D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd),
                                                       vd->cfg->window->display.dcomp_device,
@@ -426,7 +426,7 @@ static int Open(vout_display_t *vd,
         goto error;
     }
 
-    vout_window_SetTitle(vd->cfg->window, VOUT_TITLE " (Direct3D11 output)");
+    vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (Direct3D11 output)");
     msg_Dbg(vd, "Direct3D11 display adapter successfully initialized");
 
     vd->info.can_scale_spu        = true;

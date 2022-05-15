@@ -105,7 +105,7 @@ struct buffer_bounds
 
 typedef struct vout_display_sys_t
 {
-    vout_window_t *embed;
+    vlc_window_t *embed;
 
     AWindowHandler *p_awh;
     native_window_api_t *anw;
@@ -487,8 +487,8 @@ static int Open(vout_display_t *vd,
     vout_display_sys_t *sys;
     video_format_t fmt, sub_fmt;
 
-    vout_window_t *embed = vd->cfg->window;
-    if (embed->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+    vlc_window_t *embed = vd->cfg->window;
+    if (embed->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
         return VLC_EGENERIC;
 
     assert(embed->handle.anativewindow);

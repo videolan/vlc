@@ -61,7 +61,7 @@ static const struct vlc_decoder_device_operations decoder_device_ops =
 
 static int OpenDecoderDevice(
         struct vlc_decoder_device *device,
-        vout_window_t *window
+        vlc_window_t *window
 ) {
     VLC_UNUSED(window);
     device->ops = &decoder_device_ops;

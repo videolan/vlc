@@ -77,7 +77,7 @@ typedef struct vout_window_sys_t
 } vout_window_sys_t;
 
 
-static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
+static void Resize(vlc_window_t *wnd, unsigned width, unsigned height)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -96,7 +96,7 @@ static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
                  SWP_NOZORDER|SWP_NOMOVE);
 }
 
-static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -123,19 +123,19 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     return VLC_SUCCESS;
 }
 
-static void Disable(struct vout_window_t *wnd)
+static void Disable(struct vlc_window *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
     ShowWindow( sys->hwnd, SW_HIDE );
 }
 
-static void SetState(vout_window_t *wnd, unsigned state)
+static void SetState(vlc_window_t *wnd, unsigned state)
 {
     vout_window_sys_t *sys = wnd->sys;
     PostMessage( sys->hwnd, WM_VLC_SET_TOP_STATE, state, 0);
 }
 
-static void SetTitle(vout_window_t *wnd, const char *title)
+static void SetTitle(vlc_window_t *wnd, const char *title)
 {
     vout_window_sys_t *sys = wnd->sys;
     char *psz_title = var_InheritString( wnd, "video-title" );
@@ -150,7 +150,7 @@ static void SetTitle(vout_window_t *wnd, const char *title)
     PostMessage( sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 }
 
-static void SetFullscreen(vout_window_t *wnd, const char *id)
+static void SetFullscreen(vlc_window_t *wnd, const char *id)
 {
     VLC_UNUSED(id);
     msg_Dbg(wnd, "entering fullscreen mode");
@@ -178,7 +178,7 @@ static void SetFullscreen(vout_window_t *wnd, const char *id)
                      SWP_NOZORDER|SWP_FRAMECHANGED);
 }
 
-static void UnsetFullscreen(vout_window_t *wnd)
+static void UnsetFullscreen(vlc_window_t *wnd)
 {
     msg_Dbg(wnd, "leaving fullscreen mode");
     vout_window_sys_t *sys = wnd->sys;
@@ -193,11 +193,11 @@ static void UnsetFullscreen(vout_window_t *wnd)
     ShowWindow(sys->hwnd, SW_SHOWNORMAL);
 }
 
-static void SetAbove( vout_window_t *wnd, enum vout_window_state state )
+static void SetAbove( vlc_window_t *wnd, enum vlc_window_state state )
 {
     vout_window_sys_t *sys = wnd->sys;
     switch (state) {
-    case VOUT_WINDOW_STATE_NORMAL:
+    case VLC_WINDOW_STATE_NORMAL:
         if ((GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
         {
             HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
@@ -205,7 +205,7 @@ static void SetAbove( vout_window_t *wnd, enum vout_window_state state )
             SetWindowPos(sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
         }
         break;
-    case VOUT_WINDOW_STATE_ABOVE:
+    case VLC_WINDOW_STATE_ABOVE:
         if (!(GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST))
         {
             HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
@@ -213,29 +213,29 @@ static void SetAbove( vout_window_t *wnd, enum vout_window_state state )
             SetWindowPos(sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
         }
         break;
-    case VOUT_WINDOW_STATE_BELOW:
+    case VLC_WINDOW_STATE_BELOW:
         SetWindowPos(sys->hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
         break;
 
     }
 }
 
-static void MousePressed( vout_window_t *wnd, HWND hwnd, unsigned button )
+static void MousePressed( vlc_window_t *wnd, HWND hwnd, unsigned button )
 {
     vout_window_sys_t *sys = wnd->sys;
     if( !sys->button_pressed )
         SetCapture( hwnd );
     sys->button_pressed |= 1 << button;
-    vout_window_ReportMousePressed(wnd, button);
+    vlc_window_ReportMousePressed(wnd, button);
 }
 
-static void MouseReleased( vout_window_t *wnd, unsigned button )
+static void MouseReleased( vlc_window_t *wnd, unsigned button )
 {
     vout_window_sys_t *sys = wnd->sys;
     sys->button_pressed &= ~(1 << button);
     if( !sys->button_pressed )
         ReleaseCapture();
-    vout_window_ReportMouseReleased(wnd, button);
+    vlc_window_ReportMouseReleased(wnd, button);
 }
 
 
@@ -332,12 +332,12 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
     if( p_user_data == 0 )
         return DefWindowProc(hwnd, message, wParam, lParam);
-    vout_window_t *wnd = (vout_window_t *)p_user_data;
+    vlc_window_t *wnd = (vlc_window_t *)p_user_data;
 
     switch( message )
     {
     case WM_CLOSE:
-        vout_window_ReportClose(wnd);
+        vlc_window_ReportClose(wnd);
         break;
 
     case WM_DESTROY:
@@ -345,11 +345,11 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         break;
 
     case WM_SIZE:
-        vout_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
+        vlc_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
 
     case WM_MOUSEMOVE:
-        vout_window_ReportMouseMoved(wnd, LOWORD(lParam), HIWORD(lParam));
+        vlc_window_ReportMouseMoved(wnd, LOWORD(lParam), HIWORD(lParam));
         break;
     case WM_NCMOUSEMOVE:
         break;
@@ -361,7 +361,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         {
             unsigned m = 1 << button;
             if( sys->button_pressed & m )
-                vout_window_ReportMouseReleased(wnd, button);
+                vlc_window_ReportMouseReleased(wnd, button);
             sys->button_pressed &= ~m;
         }
         sys->button_pressed = 0;
@@ -375,7 +375,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         MouseReleased( wnd, MOUSE_BUTTON_LEFT );
         return 0;
     case WM_LBUTTONDBLCLK:
-        vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_LEFT);
+        vlc_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_LEFT);
         return 0;
 
     case WM_MBUTTONDOWN:
@@ -385,7 +385,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         MouseReleased( wnd, MOUSE_BUTTON_CENTER );
         return 0;
     case WM_MBUTTONDBLCLK:
-        vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_CENTER);
+        vlc_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_CENTER);
         return 0;
 
     case WM_RBUTTONDOWN:
@@ -395,7 +395,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         MouseReleased( wnd, MOUSE_BUTTON_RIGHT );
         return 0;
     case WM_RBUTTONDBLCLK:
-        vout_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_RIGHT);
+        vlc_window_ReportMouseDoubleClick(wnd, MOUSE_BUTTON_RIGHT);
         return 0;
 
     case WM_KEYDOWN:
@@ -426,7 +426,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
                 i_key |= KEY_MODIFIER_ALT;
             }
 
-            vout_window_ReportKeyPress(wnd, i_key);
+            vlc_window_ReportKeyPress(wnd, i_key);
         }
         break;
     }
@@ -438,7 +438,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         {
             HMENU hMenu = GetSystemMenu(hwnd, FALSE);
             const bool is_on_top = (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) == 0;
-            SetAbove( wnd, is_on_top ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL );
+            SetAbove( wnd, is_on_top ? VLC_WINDOW_STATE_ABOVE : VLC_WINDOW_STATE_NORMAL );
             return 0;
         }
         default:
@@ -447,7 +447,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         break;
 
     case WM_VLC_SET_TOP_STATE:
-        SetAbove( wnd, (enum vout_window_state) wParam);
+        SetAbove( wnd, (enum vlc_window_state) wParam);
         return 0;
 
     case WM_VLC_CHANGE_TEXT:
@@ -467,7 +467,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-static void Close(vout_window_t *wnd)
+static void Close(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -520,7 +520,7 @@ static HWND GetDesktopHandle(vlc_object_t *obj)
     return hwnd;
 }
 
-static void UpdateCursor( vout_window_t *wnd, bool b_show )
+static void UpdateCursor( vlc_window_t *wnd, bool b_show )
 {
     vout_window_sys_t *sys = wnd->sys;
     if( sys->is_cursor_hidden == !b_show )
@@ -539,12 +539,12 @@ static void CALLBACK HideMouse(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
     VLC_UNUSED(uMsg); VLC_UNUSED(dwTime);
     if (hwnd)
     {
-        vout_window_t *wnd = (vout_window_t *)idEvent;
+        vlc_window_t *wnd = (vlc_window_t *)idEvent;
         UpdateCursor( wnd, false );
     }
 }
 
-static void UpdateCursorMoved( vout_window_t *wnd )
+static void UpdateCursorMoved( vlc_window_t *wnd )
 {
     vout_window_sys_t *sys = wnd->sys;
     UpdateCursor( wnd, true );
@@ -580,7 +580,7 @@ static inline bool isMouseEvent( WPARAM type )
 
 static void *EventThread( void *p_this )
 {
-    vout_window_t *wnd = (vout_window_t *)p_this;
+    vlc_window_t *wnd = (vlc_window_t *)p_this;
     vout_window_sys_t *sys = wnd->sys;
 
     int canc = vlc_savecancel ();
@@ -668,7 +668,7 @@ static void *EventThread( void *p_this )
     return NULL;
 }
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .enable  = Enable,
     .disable = Disable,
     .resize = Resize,
@@ -679,7 +679,7 @@ static const struct vout_window_operations ops = {
     .destroy = Close,
 };
 
-static int Open(vout_window_t *wnd)
+static int Open(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = vlc_obj_calloc(VLC_OBJECT(wnd), 1, sizeof(vout_window_sys_t));
     if (unlikely(sys == NULL))
@@ -736,7 +736,7 @@ static int Open(vout_window_t *wnd)
     }
 
     wnd->sys = sys;
-    wnd->type = VOUT_WINDOW_TYPE_HWND;
+    wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = sys->hwnd;
     wnd->ops = &ops;
     wnd->info.has_double_click = true;

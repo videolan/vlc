@@ -28,7 +28,7 @@
 
 using namespace vlc;
 
-int CompositorX11::windowEnable(const vout_window_cfg_t *)
+int CompositorX11::windowEnable(const vlc_window_cfg_t *)
 {
     commonWindowEnable();
     m_renderWindow->enableVideoWindow();
@@ -219,9 +219,9 @@ void CompositorX11::onSurfaceSizeChanged(const QSizeF& size)
     m_renderWindow->setVideoSize((size / m_videoWidget->window()->devicePixelRatioF()).toSize());
 }
 
-bool CompositorX11::setupVoutWindow(vout_window_t* p_wnd, VoutDestroyCb destroyCb)
+bool CompositorX11::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb)
 {
-    p_wnd->type = VOUT_WINDOW_TYPE_XID;
+    p_wnd->type = VLC_WINDOW_TYPE_XID;
     p_wnd->handle.xid = m_videoWidget->winId();
     commonSetupVoutWindow(p_wnd, destroyCb);
     return true;

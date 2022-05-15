@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_vout_window.h: vout_window_t definitions
+ * vlc_vout_window.h: vlc_window definitions
  *****************************************************************************
  * Copyright (C) 2008 Rémi Denis-Courmont
  * Copyright (C) 2009 Laurent Aimar
@@ -33,14 +33,14 @@
  * Window management
  *
  * Window management provides a partial abstraction for windowing systems and
- * rendering targets (i.e. "windows"). See \ref vout_window_t.
+ * rendering targets (i.e. "windows"). See \ref vlc_window_t.
  *
  * @{
  * \file
  * Window modules interface
  */
 
-struct vout_window_t;
+struct vlc_window;
 struct wl_display;
 struct wl_surface;
 
@@ -49,47 +49,47 @@ struct wl_surface;
  *
  * The window handle type specifies the window system protocol that the
  * window was created with. It determines which members of the
- * vout_window_t::handle and vout_window_t::display unions are defined
+ * vlc_window_t::handle and vlc_window_t::display unions are defined
  * for the given window.
  *
  * It also establishes some protocol-dependent semantics such as the exact
- * interpretation of the window state (\ref vout_window_state)
+ * interpretation of the window state (\ref vlc_window_state)
  * and the window size.
  */
-enum vout_window_type {
-    VOUT_WINDOW_TYPE_DUMMY /**< Dummy window (not an actual window) */,
-    VOUT_WINDOW_TYPE_XID /**< X11 window */,
-    VOUT_WINDOW_TYPE_HWND /**< Win32 or OS/2 window */,
-    VOUT_WINDOW_TYPE_NSOBJECT /**< macOS/iOS view */,
-    VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
-    VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
-    VOUT_WINDOW_TYPE_DCOMP /**< Win32 DirectComposition */,
-    VOUT_WINDOW_TYPE_KMS /**< DRM KMS CRTC */,
+enum vlc_window_type {
+    VLC_WINDOW_TYPE_DUMMY /**< Dummy window (not an actual window) */,
+    VLC_WINDOW_TYPE_XID /**< X11 window */,
+    VLC_WINDOW_TYPE_HWND /**< Win32 or OS/2 window */,
+    VLC_WINDOW_TYPE_NSOBJECT /**< macOS/iOS view */,
+    VLC_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
+    VLC_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
+    VLC_WINDOW_TYPE_DCOMP /**< Win32 DirectComposition */,
+    VLC_WINDOW_TYPE_KMS /**< DRM KMS CRTC */,
 };
 
 /**
  * Window states.
  *
  * Currently, this only handles different window stacking orders.
- * See also \ref vout_window_SetState().
+ * See also \ref vlc_window_SetState().
  */
-enum vout_window_state {
-    VOUT_WINDOW_STATE_NORMAL /**< Normal stacking */,
-    VOUT_WINDOW_STATE_ABOVE /**< Stacking above (a.k.a. always on top) */,
-    VOUT_WINDOW_STATE_BELOW /**< Stacking below (a.k.a. wall paper mode) */,
+enum vlc_window_state {
+    VLC_WINDOW_STATE_NORMAL /**< Normal stacking */,
+    VLC_WINDOW_STATE_ABOVE /**< Stacking above (a.k.a. always on top) */,
+    VLC_WINDOW_STATE_BELOW /**< Stacking below (a.k.a. wall paper mode) */,
 };
 
 /**
  * Window mouse event types.
  *
  * This enumeration defines the possible event types
- * vout_window_mouse_event_t::type.
+ * vlc_window_mouse_event_t::type.
  */
-enum vout_window_mouse_event_type {
-    VOUT_WINDOW_MOUSE_MOVED /**< Pointer position change */,
-    VOUT_WINDOW_MOUSE_PRESSED /**< Pointer button press or single click */,
-    VOUT_WINDOW_MOUSE_RELEASED /**< Pointer button release */,
-    VOUT_WINDOW_MOUSE_DOUBLE_CLICK /**< Double click */,
+enum vlc_window_mouse_event_type {
+    VLC_WINDOW_MOUSE_MOVED /**< Pointer position change */,
+    VLC_WINDOW_MOUSE_PRESSED /**< Pointer button press or single click */,
+    VLC_WINDOW_MOUSE_RELEASED /**< Pointer button release */,
+    VLC_WINDOW_MOUSE_DOUBLE_CLICK /**< Double click */,
 };
 
 /**
@@ -97,9 +97,9 @@ enum vout_window_mouse_event_type {
  *
  * This structure describes a pointer input event on a window.
  */
-typedef struct vout_window_mouse_event_t
+typedef struct vlc_window_mouse_event
 {
-    enum vout_window_mouse_event_type type; /**< Event type. */
+    enum vlc_window_mouse_event_type type; /**< Event type. */
 
     /**
      * Pointer abscissa.
@@ -111,7 +111,7 @@ typedef struct vout_window_mouse_event_t
      * A negative abscissa refers to pixels to the left of the window, and
      * an abscissa of width or larger refers to pixels to the right.
      *
-     * This is only set if @c event equals \ref VOUT_WINDOW_MOUSE_MOVED.
+     * This is only set if @c event equals \ref VLC_WINDOW_MOUSE_MOVED.
      */
     int x;
 
@@ -125,7 +125,7 @@ typedef struct vout_window_mouse_event_t
      * A negative ordinate refers to pixels above the window, and
      * an ordinate of height or larger refers to pixels below the window.
      *
-     * This is only set if @c event equals \ref VOUT_WINDOW_MOUSE_MOVED.
+     * This is only set if @c event equals \ref VLC_WINDOW_MOUSE_MOVED.
      */
     int y;
 
@@ -134,18 +134,18 @@ typedef struct vout_window_mouse_event_t
      *
      * See \ref vlc_mouse_button for possible values.
      *
-     * This is set if @c event does not equal \ref VOUT_WINDOW_MOUSE_MOVED.
+     * This is set if @c event does not equal \ref VLC_WINDOW_MOUSE_MOVED.
      */
     int button_mask;
-} vout_window_mouse_event_t;
+} vlc_window_mouse_event_t;
 
 /**
  * Window (desired) configuration.
  *
  * This structure describes the intended initial configuration
- * of a \ref vout_window_t.
+ * of a \ref vlc_window_t.
  */
-typedef struct vout_window_cfg_t {
+typedef struct vlc_window_cfg {
     /**
      * Whether the window should be in full screen mode or not.
      */
@@ -172,34 +172,34 @@ typedef struct vout_window_cfg_t {
      */
     unsigned height;
 
-} vout_window_cfg_t;
+} vlc_window_cfg_t;
 
 /**
  * Callback prototype for window event acknowledgement.
  *
- * @param width pixel width as supplied to vout_window_callbacks::resized
- * @param height pixel height as supplied to vout_window_callbacks::resized
- * @param data opaque pointer as supplied to vout_window_callbacks::resized
+ * @param width pixel width as supplied to vlc_window_callbacks::resized
+ * @param height pixel height as supplied to vlc_window_callbacks::resized
+ * @param data opaque pointer as supplied to vlc_window_callbacks::resized
  */
-typedef void (*vout_window_ack_cb)(struct vout_window_t *, unsigned width,
+typedef void (*vlc_window_ack_cb)(struct vlc_window *, unsigned width,
                                    unsigned height, void *data);
 
 /**
  * Window event callbacks structure.
  *
- * This structure provided to vout_window_New() conveys callbacks to handle
+ * This structure provided to vlc_window_New() conveys callbacks to handle
  * window events.
  *
  * As a general rule, the events can occur synchronously or asynchronously from
- * the time that the window is (successfully) being created by vout_window_New()
- * until the time that the window has been deleted by vout_window_Delete().
+ * the time that the window is (successfully) being created by vlc_window_New()
+ * until the time that the window has been deleted by vlc_window_Delete().
  *
  * \warning
  * Also, a window object functions are not reentrant, so the callbacks must not
  * invoke the window object functions.
  * Otherwise a deadlock or infinite recursion may occur.
  */
-struct vout_window_callbacks {
+struct vlc_window_callbacks {
     /**
      * Callback for window size changes.
      *
@@ -221,8 +221,8 @@ struct vout_window_callbacks {
      * \param cb optional acknowledgement callback function (NULL to ignore)
      * \param opaque opaque data pointer for the acknowledgement callback
      */
-    void (*resized)(struct vout_window_t *, unsigned width, unsigned height,
-                    vout_window_ack_cb cb, void *opaque);
+    void (*resized)(struct vlc_window *, unsigned width, unsigned height,
+                    vlc_window_ack_cb cb, void *opaque);
 
     /**
      * Callback for window closing.
@@ -231,25 +231,25 @@ struct vout_window_callbacks {
      * to close the window. Not all windowing systems support this.
      *
      * Soon after this callback, the window should be disabled with
-     * vout_window_Disable().
+     * vlc_window_Disable().
      *
      * \warning Do not disable the window within the callback.
      * That could lead to a dead lock.
      */
-    void (*closed)(struct vout_window_t *);
+    void (*closed)(struct vlc_window *);
 
     /**
      * Callback for window state change.
      *
      * This callback function (if non-NULL) is invoked when the window state
-     * as changed, either as a consequence of vout_window_SetSate() or external
+     * as changed, either as a consequence of vlc_window_SetSate() or external
      * events.
      *
      * \bug Many window back-ends fail to invoke this callback when due.
      *
-     * \param state new window state (see \ref vout_window_state).
+     * \param state new window state (see \ref vlc_window_state).
      */
-    void (*state_changed)(struct vout_window_t *, unsigned state);
+    void (*state_changed)(struct vlc_window *, unsigned state);
 
     /**
      * Callback for windowed mode.
@@ -259,7 +259,7 @@ struct vout_window_callbacks {
      *
      * \bug Many window back-ends fail to invoke this callback when due.
      */
-    void (*windowed)(struct vout_window_t *);
+    void (*windowed)(struct vlc_window *);
 
     /**
      * Callback for fullscreen mode.
@@ -272,18 +272,18 @@ struct vout_window_callbacks {
      *
      * \param id fullscreen output identifier (NULL if unspecified)
      */
-    void (*fullscreened)(struct vout_window_t *, const char *id);
+    void (*fullscreened)(struct vlc_window *, const char *id);
 
     /**
      * Callback for pointer input events.
      *
      * This callback function (if non-NULL) is invoked upon any pointer input
-     * event on the window. See \ref vout_window_mouse_event_t.
+     * event on the window. See \ref vlc_window_mouse_event_t.
      *
      * \param mouse pointer to the input event.
      */
-    void (*mouse_event)(struct vout_window_t *,
-                        const vout_window_mouse_event_t *mouse);
+    void (*mouse_event)(struct vlc_window *,
+                        const vlc_window_mouse_event_t *mouse);
 
     /**
      * Callback for keyboard input events.
@@ -295,7 +295,7 @@ struct vout_window_callbacks {
      *
      * \param key VLC key code
      */
-    void (*keyboard_event)(struct vout_window_t *, unsigned key);
+    void (*keyboard_event)(struct vlc_window *, unsigned key);
 
     /**
      * Callback for fullscreen output enumeration.
@@ -309,37 +309,37 @@ struct vout_window_callbacks {
      * \param desc nul-terminated human-readable description,
      *             or NULL if the output has become unavailable
      */
-    void (*output_event)(struct vout_window_t *,
+    void (*output_event)(struct vlc_window *,
                          const char *id, const char *desc);
 };
 
 /**
  * Window callbacks and opaque data.
  */
-typedef struct vout_window_owner {
-    const struct vout_window_callbacks *cbs; /**< Callbacks */
+typedef struct vlc_window_owner {
+    const struct vlc_window_callbacks *cbs; /**< Callbacks */
     void *sys; /**< Opaque data / private pointer for callbacks */
-} vout_window_owner_t;
+} vlc_window_owner_t;
 
 /**
  * Window implementation callbacks.
  */
-struct vout_window_operations {
-    int (*enable)(struct vout_window_t *, const vout_window_cfg_t *);
-    void (*disable)(struct vout_window_t *);
-    void (*resize)(struct vout_window_t *, unsigned width, unsigned height);
+struct vlc_window_operations {
+    int (*enable)(struct vlc_window *, const vlc_window_cfg_t *);
+    void (*disable)(struct vlc_window *);
+    void (*resize)(struct vlc_window *, unsigned width, unsigned height);
 
     /**
      * Destroy the window.
      *
      * Destroys the window and releases all associated resources.
      */
-    void (*destroy)(struct vout_window_t *);
+    void (*destroy)(struct vlc_window *);
 
-    void (*set_state)(struct vout_window_t *, unsigned state);
-    void (*unset_fullscreen)(struct vout_window_t *);
-    void (*set_fullscreen)(struct vout_window_t *, const char *id);
-    void (*set_title)(struct vout_window_t *, const char *id);
+    void (*set_state)(struct vlc_window *, unsigned state);
+    void (*unset_fullscreen)(struct vlc_window *);
+    void (*set_fullscreen)(struct vlc_window *, const char *id);
+    void (*set_title)(struct vlc_window *, const char *id);
 };
 
 /**
@@ -355,7 +355,7 @@ struct vout_window_operations {
  *
  * Finally, it must support some control requests such as for fullscreen mode.
  */
-typedef struct vout_window_t {
+typedef struct vlc_window {
     struct vlc_object_t obj;
 
      /**
@@ -365,14 +365,14 @@ typedef struct vout_window_t {
       * needs to use. This also selects which member of the \ref handle union
       * and the \ref display union are to be set.
       *
-      * The possible values are defined in \ref vout_window_type.
+      * The possible values are defined in \ref vlc_window_type.
       */
     unsigned type;
 
     /**
      * Window handle (mandatory)
      *
-     * This must be filled by the plugin upon successful vout_window_Enable().
+     * This must be filled by the plugin upon successful vlc_window_Enable().
      *
      * Depending on the \ref type above, a different member of this union is
      * used.
@@ -402,7 +402,7 @@ typedef struct vout_window_t {
         int      drm_fd; /**< KMS DRM device */
     } display;
 
-    const struct vout_window_operations *ops; /**< operations handled by the
+    const struct vlc_window_operations *ops; /**< operations handled by the
                              window. Once this is set it MUST NOT be changed */
 
     struct {
@@ -410,14 +410,14 @@ typedef struct vout_window_t {
                                     or need to be emulated */
     } info;
 
-    /* Private place holder for the vout_window_t module (optional)
+    /* Private place holder for the vlc_window_t module (optional)
      *
      * A module is free to use it as it wishes.
      */
     void *sys;
 
-    vout_window_owner_t owner;
-} vout_window_t;
+    vlc_window_owner_t owner;
+} vlc_window_t;
 
 /**
  * Creates a new window.
@@ -431,19 +431,19 @@ typedef struct vout_window_t {
  * \param cfg initial window configuration, NULL for defaults
  * \return a new window, or NULL on error.
  */
-VLC_API vout_window_t *vout_window_New(vlc_object_t *obj,
+VLC_API vlc_window_t *vlc_window_New(vlc_object_t *obj,
                                        const char *module,
-                                       const vout_window_owner_t *owner,
-                                       const vout_window_cfg_t *cfg);
+                                       const vlc_window_owner_t *owner,
+                                       const vlc_window_cfg_t *cfg);
 
 /**
  * Deletes a window.
  *
- * This deletes a window created by vout_window_New().
+ * This deletes a window created by vlc_window_New().
  *
  * \param window window object to delete
  */
-VLC_API void vout_window_Delete(vout_window_t *window);
+VLC_API void vlc_window_Delete(vlc_window_t *window);
 
 /**
  * Inhibits or deinhibits the screensaver.
@@ -452,18 +452,18 @@ VLC_API void vout_window_Delete(vout_window_t *window);
  *               or deinhibited
  * \param enabled true to inhibit, false to deinhibit
  */
-void vout_window_SetInhibition(vout_window_t *window, bool enabled);
+void vlc_window_SetInhibition(vlc_window_t *window, bool enabled);
 
 /**
  * Requests a new window state.
  *
  * This requests a change of the state of a window from the windowing system.
- * See \ref vout_window_state for possible states.
+ * See \ref vlc_window_state for possible states.
  *
  * @param window window whose state to change
  * @param state requested state
  */
-static inline void vout_window_SetState(vout_window_t *window, unsigned state)
+static inline void vlc_window_SetState(vlc_window_t *window, unsigned state)
 {
     if (window->ops->set_state != NULL)
         window->ops->set_state(window, state);
@@ -478,8 +478,8 @@ static inline void vout_window_SetState(vout_window_t *window, unsigned state)
  *
  * There is no return value as the request may be processed asynchronously,
  * ignored and/or modified by the window system. The actual size of the window
- * is determined by the vout_window_callbacks::resized callback function that
- * was supplied to vout_window_New().
+ * is determined by the vlc_window_callbacks::resized callback function that
+ * was supplied to vlc_window_New().
  *
  * \note The size is expressed in terms of the "useful" area,
  * i.e. it excludes any side decoration added by the windowing system.
@@ -488,7 +488,7 @@ static inline void vout_window_SetState(vout_window_t *window, unsigned state)
  * \param width pixel width
  * \param height height width
  */
-VLC_API void vout_window_SetSize(vout_window_t *window,
+VLC_API void vlc_window_SetSize(vlc_window_t *window,
                                  unsigned width, unsigned height);
 
 /**
@@ -497,14 +497,14 @@ VLC_API void vout_window_SetSize(vout_window_t *window,
  * \param window window to be brought to fullscreen mode.
  * \param id nul-terminated output identifier, NULL for default
  */
-VLC_API void vout_window_SetFullScreen(vout_window_t *window, const char *id);
+VLC_API void vlc_window_SetFullScreen(vlc_window_t *window, const char *id);
 
 /**
  * Requests windowed mode.
  *
  * \param window window to be brought into windowed mode.
  */
-VLC_API void vout_window_UnsetFullScreen(vout_window_t *window);
+VLC_API void vlc_window_UnsetFullScreen(vlc_window_t *window);
 
 /**
  * Request a new window title.
@@ -512,7 +512,7 @@ VLC_API void vout_window_UnsetFullScreen(vout_window_t *window);
  * \param window window to change the title.
  * \param title window title to use.
  */
-static inline void vout_window_SetTitle(vout_window_t *window, const char *title)
+static inline void vlc_window_SetTitle(vlc_window_t *window, const char *title)
 {
     if (window->ops->set_title != NULL)
         window->ops->set_title(window, title);
@@ -526,14 +526,14 @@ static inline void vout_window_SetTitle(vout_window_t *window, const char *title
  * window provider can provide a persistent connection to the display server,
  * and track any useful events, such as monitors hotplug.
  *
- * The window handle (vout_window_t.handle) must remain valid and constant
+ * The window handle (vlc_window_t.handle) must remain valid and constant
  * while the window is enabled.
  *
  * \param window window to enable
  * \param cfg initial configuration for the window
  */
 VLC_API
-int vout_window_Enable(vout_window_t *window);
+int vlc_window_Enable(vlc_window_t *window);
 
 /**
  * Disables a window.
@@ -541,12 +541,12 @@ int vout_window_Enable(vout_window_t *window);
  * This informs the window provider that the window is no longer needed.
  *
  * \note
- * The window may be re-enabled later by a call to vout_window_Enable().
+ * The window may be re-enabled later by a call to vlc_window_Enable().
  *
  * \param window window to disable
  */
 VLC_API
-void vout_window_Disable(vout_window_t *window);
+void vlc_window_Disable(vlc_window_t *window);
 
 /**
  * \defgroup video_window_reporting Window event reporting
@@ -576,7 +576,7 @@ void vout_window_Disable(vout_window_t *window);
  * \param width width of the usable window area in pixels
  * \param height height of the usable window area in pixels
  */
-static inline void vout_window_ReportSize(vout_window_t *window,
+static inline void vlc_window_ReportSize(vlc_window_t *window,
                                           unsigned width, unsigned height)
 {
     window->owner.cbs->resized(window, width, height, NULL, NULL);
@@ -590,7 +590,7 @@ static inline void vout_window_ReportSize(vout_window_t *window,
  *
  * \param window window implementation that reports the event
  */
-static inline void vout_window_ReportClose(vout_window_t *window)
+static inline void vlc_window_ReportClose(vlc_window_t *window)
 {
     if (window->owner.cbs->closed != NULL)
         window->owner.cbs->closed(window);
@@ -603,9 +603,9 @@ static inline void vout_window_ReportClose(vout_window_t *window)
  * the window that the state of the window changed.
  *
  * \param window the window reporting the state change
- * \param state \see vout_window_state
+ * \param state \see vlc_window_state
  */
-static inline void vout_window_ReportState(vout_window_t *window,
+static inline void vlc_window_ReportState(vlc_window_t *window,
                                            unsigned state)
 {
     if (window->owner.cbs->state_changed != NULL)
@@ -620,7 +620,7 @@ static inline void vout_window_ReportState(vout_window_t *window,
  *
  * \param wnd window implementation that reports the event
  */
-VLC_API void vout_window_ReportWindowed(vout_window_t *wnd);
+VLC_API void vlc_window_ReportWindowed(vlc_window_t *wnd);
 
 /**
  * Reports that the window is in full screen.
@@ -628,10 +628,10 @@ VLC_API void vout_window_ReportWindowed(vout_window_t *wnd);
  * \param wnd the window reporting the fullscreen state
  * \param id fullscreen output nul-terminated identifier, NULL for default
  */
-VLC_API void vout_window_ReportFullscreen(vout_window_t *wnd, const char *id);
+VLC_API void vlc_window_ReportFullscreen(vlc_window_t *wnd, const char *id);
 
-static inline void vout_window_SendMouseEvent(vout_window_t *window,
-                                              const vout_window_mouse_event_t *mouse)
+static inline void vlc_window_SendMouseEvent(vlc_window_t *window,
+                                              const vlc_window_mouse_event_t *mouse)
 {
     if (window->owner.cbs->mouse_event != NULL)
         window->owner.cbs->mouse_event(window, mouse);
@@ -641,19 +641,19 @@ static inline void vout_window_SendMouseEvent(vout_window_t *window,
  * Reports a pointer movement.
  *
  * The mouse position must be expressed in window pixel units.
- * See also \ref vout_window_mouse_event_t.
+ * See also \ref vlc_window_mouse_event_t.
  *
  * \param window window in focus
  * \param x abscissa
  * \param y ordinate
  */
-static inline void vout_window_ReportMouseMoved(vout_window_t *window,
+static inline void vlc_window_ReportMouseMoved(vlc_window_t *window,
                                                 int x, int y)
 {
-    const vout_window_mouse_event_t mouse = {
-        VOUT_WINDOW_MOUSE_MOVED, x, y, 0
+    const vlc_window_mouse_event_t mouse = {
+        VLC_WINDOW_MOUSE_MOVED, x, y, 0
     };
-    vout_window_SendMouseEvent(window, &mouse);
+    vlc_window_SendMouseEvent(window, &mouse);
 }
 
 /**
@@ -662,13 +662,13 @@ static inline void vout_window_ReportMouseMoved(vout_window_t *window,
  * \param window window in focus
  * \param button pressed button (see \ref vlc_mouse_button)
  */
-static inline void vout_window_ReportMousePressed(vout_window_t *window,
+static inline void vlc_window_ReportMousePressed(vlc_window_t *window,
                                                   int button)
 {
-    const vout_window_mouse_event_t mouse = {
-        VOUT_WINDOW_MOUSE_PRESSED, 0, 0, button,
+    const vlc_window_mouse_event_t mouse = {
+        VLC_WINDOW_MOUSE_PRESSED, 0, 0, button,
     };
-    vout_window_SendMouseEvent(window, &mouse);
+    vlc_window_SendMouseEvent(window, &mouse);
 }
 
 /**
@@ -677,13 +677,13 @@ static inline void vout_window_ReportMousePressed(vout_window_t *window,
  * \param window window in focus
  * \param button released button (see \ref vlc_mouse_button)
  */
-static inline void vout_window_ReportMouseReleased(vout_window_t *window,
+static inline void vlc_window_ReportMouseReleased(vlc_window_t *window,
                                                    int button)
 {
-    const vout_window_mouse_event_t mouse = {
-        VOUT_WINDOW_MOUSE_RELEASED, 0, 0, button,
+    const vlc_window_mouse_event_t mouse = {
+        VLC_WINDOW_MOUSE_RELEASED, 0, 0, button,
     };
-    vout_window_SendMouseEvent(window, &mouse);
+    vlc_window_SendMouseEvent(window, &mouse);
 }
 
 /**
@@ -692,13 +692,13 @@ static inline void vout_window_ReportMouseReleased(vout_window_t *window,
  * \param window window in focus
  * \param button double-clicked button (see \ref vlc_mouse_button)
  */
-static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window,
+static inline void vlc_window_ReportMouseDoubleClick(vlc_window_t *window,
                                                       int button)
 {
-    const vout_window_mouse_event_t mouse = {
-        VOUT_WINDOW_MOUSE_DOUBLE_CLICK, 0, 0, button,
+    const vlc_window_mouse_event_t mouse = {
+        VLC_WINDOW_MOUSE_DOUBLE_CLICK, 0, 0, button,
     };
-    vout_window_SendMouseEvent(window, &mouse);
+    vlc_window_SendMouseEvent(window, &mouse);
 }
 
 /**
@@ -707,7 +707,7 @@ static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window,
  * \param window window in focus
  * \param key VLC key code
  */
-static inline void vout_window_ReportKeyPress(vout_window_t *window, int key)
+static inline void vlc_window_ReportKeyPress(vlc_window_t *window, int key)
 {
     if (window->owner.cbs->keyboard_event != NULL)
         window->owner.cbs->keyboard_event(window, key);
@@ -727,7 +727,7 @@ static inline void vout_window_ReportKeyPress(vout_window_t *window, int key)
  * \param id unique nul-terminated identifier for the output
  * \param name human-readable name
  */
-static inline void vout_window_ReportOutputDevice(vout_window_t *window,
+static inline void vlc_window_ReportOutputDevice(vlc_window_t *window,
                                                   const char *id,
                                                   const char *name)
 {

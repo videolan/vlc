@@ -2250,7 +2250,7 @@ end:
 }
 
 static int
-OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
+OpenDecDevice(vlc_decoder_device *device, vlc_window_t *window)
 {
     VLC_UNUSED(window);
     static const struct vlc_decoder_device_operations ops =

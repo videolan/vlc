@@ -107,7 +107,7 @@ Compositor* CompositorFactory::createCompositor()
 extern "C"
 {
 
-static int windowEnableCb(vout_window_t* p_wnd, const vout_window_cfg_t * cfg)
+static int windowEnableCb(vlc_window_t* p_wnd, const vlc_window_cfg_t * cfg)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
@@ -118,7 +118,7 @@ static int windowEnableCb(vout_window_t* p_wnd, const vout_window_cfg_t * cfg)
     return ret;
 }
 
-static void windowDisableCb(vout_window_t* p_wnd)
+static void windowDisableCb(vlc_window_t* p_wnd)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
@@ -127,35 +127,35 @@ static void windowDisableCb(vout_window_t* p_wnd)
     }, Qt::BlockingQueuedConnection);
 }
 
-static void windowResizeCb(vout_window_t* p_wnd, unsigned width, unsigned height)
+static void windowResizeCb(vlc_window_t* p_wnd, unsigned width, unsigned height)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
     that->windowResize(width, height);
 }
 
-static void windowDestroyCb(struct vout_window_t * p_wnd)
+static void windowDestroyCb(struct vlc_window * p_wnd)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
     that->windowDestroy();
 }
 
-static void windowSetStateCb(vout_window_t* p_wnd, unsigned state)
+static void windowSetStateCb(vlc_window_t* p_wnd, unsigned state)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
     that->windowSetState(state);
 }
 
-static void windowUnsetFullscreenCb(vout_window_t* p_wnd)
+static void windowUnsetFullscreenCb(vlc_window_t* p_wnd)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
     that->windowUnsetFullscreen();
 }
 
-static void windowSetFullscreenCb(vout_window_t* p_wnd, const char *id)
+static void windowSetFullscreenCb(vlc_window_t* p_wnd, const char *id)
 {
     assert(p_wnd->sys);
     auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
@@ -175,9 +175,9 @@ CompositorVideo::~CompositorVideo()
 
 }
 
-void CompositorVideo::commonSetupVoutWindow(vout_window_t* p_wnd, VoutDestroyCb destroyCb)
+void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb)
 {
-    static const struct vout_window_operations ops = {
+    static const struct vlc_window_operations ops = {
         windowEnableCb,
         windowDisableCb,
         windowResizeCb,
@@ -208,7 +208,7 @@ void CompositorVideo::windowResize(unsigned width, unsigned height)
 
 void CompositorVideo::windowSetState(unsigned state)
 {
-    m_videoWindowHandler->requestVideoState(static_cast<vout_window_state>(state));
+    m_videoWindowHandler->requestVideoState(static_cast<vlc_window_state>(state));
 }
 
 void CompositorVideo::windowUnsetFullscreen()

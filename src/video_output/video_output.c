@@ -234,7 +234,7 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
     vout_display_SizeWindow(&width, &height, &sys->original, &sys->source.dar,
                             &sys->source.crop, &sys->display_cfg);
     msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
-    vout_window_SetSize(sys->display_cfg.window, width, height);
+    vlc_window_SetSize(sys->display_cfg.window, width, height);
 }
 
 /* */
@@ -463,7 +463,7 @@ void vout_ChangeFullscreen(vout_thread_t *vout, const char *id)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     vlc_mutex_lock(&sys->window_lock);
-    vout_window_SetFullScreen(sys->display_cfg.window, id);
+    vlc_window_SetFullScreen(sys->display_cfg.window, id);
     vlc_mutex_unlock(&sys->window_lock);
 }
 
@@ -472,7 +472,7 @@ void vout_ChangeWindowed(vout_thread_t *vout)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     vlc_mutex_lock(&sys->window_lock);
-    vout_window_UnsetFullScreen(sys->display_cfg.window);
+    vlc_window_UnsetFullScreen(sys->display_cfg.window);
     /* Attempt to reset the intended window size */
     vout_UpdateWindowSizeLocked(sys);
     vlc_mutex_unlock(&sys->window_lock);
@@ -483,7 +483,7 @@ void vout_ChangeWindowState(vout_thread_t *vout, unsigned st)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     vlc_mutex_lock(&sys->window_lock);
-    vout_window_SetState(sys->display_cfg.window, st);
+    vlc_window_SetState(sys->display_cfg.window, st);
     vlc_mutex_unlock(&sys->window_lock);
 }
 
@@ -1499,7 +1499,7 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
                               is_paused ? "paused" : "resumed");
 
     vlc_mutex_lock(&sys->window_lock);
-    vout_window_SetInhibition(sys->display_cfg.window, !is_paused);
+    vlc_window_SetInhibition(sys->display_cfg.window, !is_paused);
     vlc_mutex_unlock(&sys->window_lock);
 }
 
@@ -1830,7 +1830,7 @@ static void vout_DisableWindow(vout_thread_sys_t *sys)
 {
     vlc_mutex_lock(&sys->window_lock);
     if (sys->window_enabled) {
-        vout_window_Disable(sys->display_cfg.window);
+        vlc_window_Disable(sys->display_cfg.window);
         sys->window_enabled = false;
     }
     vlc_mutex_unlock(&sys->window_lock);
@@ -2008,9 +2008,9 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vout_chrono_Init(&sys->chrono.static_filter, 4, VLC_TICK_FROM_MS(0));
 
     if (var_InheritBool(vout, "video-wallpaper"))
-        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
+        vlc_window_SetState(sys->display_cfg.window, VLC_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
-        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
+        vlc_window_SetState(sys->display_cfg.window, VLC_WINDOW_STATE_ABOVE);
 
     return vout;
 }
@@ -2052,7 +2052,7 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
     vout_UpdateWindowSizeLocked(vout);
 
     if (!sys->window_enabled) {
-        if (vout_window_Enable(sys->display_cfg.window)) {
+        if (vlc_window_Enable(sys->display_cfg.window)) {
             msg_Err(&vout->obj, "failed to enable window");
             return -1;
         }

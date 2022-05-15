@@ -127,7 +127,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->vsxu_cyclic_buffer = new cyclic_block_queue();
 
     /* Create the openGL provider */
-    vout_window_cfg_t cfg;
+    vlc_window_cfg_t cfg;
 
     memset( &cfg, 0, sizeof(cfg) );
     cfg.is_decorated = true;

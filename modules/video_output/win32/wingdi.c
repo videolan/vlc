@@ -131,7 +131,7 @@ static int Open(vout_display_t *vd,
     if (Init(vd, fmtp))
         goto error;
 
-    vout_window_SetTitle(vd->cfg->window, VOUT_TITLE " (WinGDI output)");
+    vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (WinGDI output)");
 
     /* */
     vd->ops = &ops;

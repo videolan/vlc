@@ -90,7 +90,7 @@ typedef struct vlc_video_align {
  *   multiplied by the zoom factor.
  */
 typedef struct vout_display_cfg {
-    struct vout_window_t *window; /**< Window */
+    struct vlc_window *window; /**< Window */
 
     /** Display properties */
     struct {
@@ -420,11 +420,11 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height);
 
 static inline void vout_display_SendEventMousePressed(vout_display_t *vd, int button)
 {
-    vout_window_ReportMousePressed(vd->cfg->window, button);
+    vlc_window_ReportMousePressed(vd->cfg->window, button);
 }
 static inline void vout_display_SendEventMouseReleased(vout_display_t *vd, int button)
 {
-    vout_window_ReportMouseReleased(vd->cfg->window, button);
+    vlc_window_ReportMouseReleased(vd->cfg->window, button);
 }
 static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
                                                         const vlc_viewpoint_t *vp)
@@ -443,12 +443,12 @@ static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
  */
 static inline void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y)
 {
-    vout_window_ReportMouseMoved(vd->cfg->window, m_x, m_y);
+    vlc_window_ReportMouseMoved(vd->cfg->window, m_x, m_y);
 }
 
 static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
 {
-    return cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
+    return cfg->window->type != VLC_WINDOW_TYPE_DUMMY;
 }
 
 /**

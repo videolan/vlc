@@ -279,18 +279,18 @@ end:
     return NULL;
 }
 
-static int  WindowOpen( vout_window_t * );
-static void WindowClose( vout_window_t * );
+static int  WindowOpen( vlc_window_t * );
+static void WindowClose( vlc_window_t * );
 
 typedef struct
 {
     intf_thread_t*     pIntf;
-    vout_window_cfg_t  cfg;
+    vlc_window_cfg_t  cfg;
 } vout_window_skins_t;
 
 static void WindowOpenLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 {
-    vout_window_t* pWnd = (vout_window_t*)pObj;
+    vlc_window_t* pWnd = (vlc_window_t*)pObj;
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     int width = sys->cfg.width;
     int height = sys->cfg.height;
@@ -300,13 +300,13 @@ static void WindowOpenLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 
 static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 {
-    vout_window_t* pWnd = (vout_window_t*)pObj;
+    vlc_window_t* pWnd = (vlc_window_t*)pObj;
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
-static void WindowSetFullscreen( vout_window_t *pWnd, const char * );
+static void WindowSetFullscreen( vlc_window_t *pWnd, const char * );
 
-static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
+static int WindowEnable( vlc_window_t *pWnd, const vlc_window_cfg_t *cfg )
 {
     vout_window_skins_t* sys = static_cast<vout_window_skins_t*>(pWnd->sys);
     intf_thread_t *pIntf = sys->pIntf;
@@ -318,7 +318,7 @@ static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
                                                 WindowOpenLocal );
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
-    if( pWnd->type == VOUT_WINDOW_TYPE_DUMMY )
+    if( pWnd->type == VLC_WINDOW_TYPE_DUMMY )
     {
         msg_Dbg( pIntf, "Vout window creation failed" );
         return VLC_EGENERIC;
@@ -329,7 +329,7 @@ static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     return VLC_SUCCESS;
 }
 
-static void WindowDisable( vout_window_t *pWnd )
+static void WindowDisable( vlc_window_t *pWnd )
 {
     // vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
 
@@ -350,10 +350,10 @@ static void WindowDisable( vout_window_t *pWnd )
                                                 WindowCloseLocal );
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
-    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    pWnd->type = VLC_WINDOW_TYPE_DUMMY;
 }
 
-static void WindowResize( vout_window_t *pWnd,
+static void WindowResize( vlc_window_t *pWnd,
                           unsigned i_width, unsigned i_height )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
@@ -369,19 +369,19 @@ static void WindowResize( vout_window_t *pWnd,
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
 
-static void WindowSetState( vout_window_t *pWnd, unsigned i_arg )
+static void WindowSetState( vlc_window_t *pWnd, unsigned i_arg )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
     AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-    bool on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
+    bool on_top = i_arg & VLC_WINDOW_STATE_ABOVE;
 
     // Post a SetOnTop command
     CmdSetOnTop* pCmd = new CmdSetOnTop( pIntf, on_top );
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
 
-static void WindowUnsetFullscreen( vout_window_t *pWnd )
+static void WindowUnsetFullscreen( vlc_window_t *pWnd )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
@@ -391,7 +391,7 @@ static void WindowUnsetFullscreen( vout_window_t *pWnd )
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
 
-static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
+static void WindowSetFullscreen( vlc_window_t *pWnd, const char * )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
@@ -403,7 +403,7 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
 }
 
 static const auto window_ops = []{
-    struct vout_window_operations ops {};
+    struct vlc_window_operations ops {};
     ops.enable = WindowEnable;
     ops.disable = WindowDisable;
     ops.resize = WindowResize;
@@ -414,7 +414,7 @@ static const auto window_ops = []{
     return ops;
 }();
 
-static int WindowOpen( vout_window_t *pWnd )
+static int WindowOpen( vlc_window_t *pWnd )
 {
     if( var_InheritBool( pWnd, "video-wallpaper" )
      || !var_InheritBool( pWnd, "embedded-video" ) )
@@ -437,11 +437,11 @@ static int WindowOpen( vout_window_t *pWnd )
     pWnd->sys = sys;
     sys->pIntf = pIntf;
     pWnd->ops = &window_ops;
-    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
+    pWnd->type = VLC_WINDOW_TYPE_DUMMY;
     return VLC_SUCCESS;
 }
 
-static void WindowClose( vout_window_t *pWnd )
+static void WindowClose( vlc_window_t *pWnd )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
 

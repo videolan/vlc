@@ -56,7 +56,7 @@ class QSize;
 class QScreen;
 class QTimer;
 class StandardPLPanel;
-struct vout_window_t;
+struct vlc_window;
 class VideoSurfaceProvider;
 class ControlbarProfileModel;
 namespace vlc {

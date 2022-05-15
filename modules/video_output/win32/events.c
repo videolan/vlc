@@ -66,7 +66,7 @@ struct event_thread_t
     RECT window_area;
 
     /* */
-    vout_window_t *parent_window;
+    vlc_window_t *parent_window;
     WCHAR class_video[256];
     HWND hparent;
     HWND hvideownd;
@@ -136,9 +136,9 @@ static void *EventThread( void *p_this )
     return NULL;
 }
 
-event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_window)
+event_thread_t *EventThreadCreate( vlc_object_t *obj, vlc_window_t *parent_window)
 {
-    if (parent_window->type != VOUT_WINDOW_TYPE_HWND)
+    if (parent_window->type != VLC_WINDOW_TYPE_HWND)
         return NULL;
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -248,7 +248,7 @@ static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
     {
     /* the user wants to close the window */
     case WM_CLOSE:
-        vout_window_ReportClose(p_event->parent_window);
+        vlc_window_ReportClose(p_event->parent_window);
         return 0;
 
     /* the window has been closed so shut down everything now */
@@ -298,7 +298,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     hInstance = GetModuleHandle(NULL);
 
     /* If an external window was specified, we'll draw in it. */
-    assert( p_event->parent_window->type == VOUT_WINDOW_TYPE_HWND );
+    assert( p_event->parent_window->type == VLC_WINDOW_TYPE_HWND );
     p_event->hparent = p_event->parent_window->handle.hwnd;
 
     /* Fill in the window class structure */

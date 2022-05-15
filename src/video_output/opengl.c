@@ -55,7 +55,7 @@ static int vlc_gl_start(void *func, bool forced, va_list ap)
 vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
                         unsigned flags, const char *name)
 {
-    vout_window_t *wnd = cfg->window;
+    vlc_window_t *wnd = cfg->window;
     struct vlc_gl_priv_t *glpriv;
     const char *type;
 
@@ -180,9 +180,9 @@ typedef struct vlc_gl_surface
     vlc_mutex_t lock;
 } vlc_gl_surface_t;
 
-static void vlc_gl_surface_ResizeNotify(vout_window_t *surface,
+static void vlc_gl_surface_ResizeNotify(vlc_window_t *surface,
                                         unsigned width, unsigned height,
-                                        vout_window_ack_cb cb, void *opaque)
+                                        vlc_window_ack_cb cb, void *opaque)
 {
     vlc_gl_surface_t *sys = surface->owner.sys;
 
@@ -198,8 +198,8 @@ static void vlc_gl_surface_ResizeNotify(vout_window_t *surface,
 }
 
 vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
-                                const vout_window_cfg_t *cfg,
-                                struct vout_window_t **restrict wp)
+                                const vlc_window_cfg_t *cfg,
+                                struct vlc_window **restrict wp)
 {
     vlc_gl_surface_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -209,21 +209,21 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
     sys->height = cfg->height;
     vlc_mutex_init(&sys->lock);
 
-    static const struct vout_window_callbacks cbs = {
+    static const struct vlc_window_callbacks cbs = {
         .resized = vlc_gl_surface_ResizeNotify,
     };
-    vout_window_owner_t owner = {
+    vlc_window_owner_t owner = {
         .cbs = &cbs,
         .sys = sys,
     };
     char *modlist = var_InheritString(obj, "window");
 
-    vout_window_t *surface = vout_window_New(obj, modlist, &owner, cfg);
+    vlc_window_t *surface = vlc_window_New(obj, modlist, &owner, cfg);
     free(modlist);
     if (surface == NULL)
         goto error;
-    if (vout_window_Enable(surface)) {
-        vout_window_Delete(surface);
+    if (vlc_window_Enable(surface)) {
+        vlc_window_Delete(surface);
         goto error;
     }
     if (wp != NULL)
@@ -246,8 +246,8 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
 
     vlc_gl_t *gl = vlc_gl_Create(&dcfg, VLC_OPENGL, NULL);
     if (gl == NULL) {
-        vout_window_Disable(surface);
-        vout_window_Delete(surface);
+        vlc_window_Disable(surface);
+        vlc_window_Delete(surface);
         goto error;
     }
 
@@ -269,7 +269,7 @@ error:
 bool vlc_gl_surface_CheckSize(vlc_gl_t *gl, unsigned *restrict width,
                               unsigned *restrict height)
 {
-    vout_window_t *surface = gl->surface;
+    vlc_window_t *surface = gl->surface;
     vlc_gl_surface_t *sys = surface->owner.sys;
     bool ret = false;
 
@@ -290,11 +290,11 @@ bool vlc_gl_surface_CheckSize(vlc_gl_t *gl, unsigned *restrict width,
 
 void vlc_gl_surface_Destroy(vlc_gl_t *gl)
 {
-    vout_window_t *surface = gl->surface;
+    vlc_window_t *surface = gl->surface;
     vlc_gl_surface_t *sys = surface->owner.sys;
 
     vlc_gl_Delete(gl);
-    vout_window_Disable(surface);
-    vout_window_Delete(surface);
+    vlc_window_Disable(surface);
+    vlc_window_Delete(surface);
     free(sys);
 }

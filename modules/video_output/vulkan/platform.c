@@ -48,7 +48,7 @@ static int vlc_vk_start(void *func, bool forced, va_list ap)
  * @param name module name (or "any")
  * @return a new platform object, or NULL on failure
  */
-vlc_vk_platform_t *vlc_vk_platform_Create(struct vout_window_t *wnd, const char *name)
+vlc_vk_platform_t *vlc_vk_platform_Create(struct vlc_window *wnd, const char *name)
 {
     vlc_object_t *parent = (vlc_object_t *) wnd;
     struct vlc_vk_platform_t *vk;

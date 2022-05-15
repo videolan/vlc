@@ -36,7 +36,7 @@ bool VideoSurfaceProvider::hasVideoEmbed() const
     return m_videoEmbed;
 }
 
-void VideoSurfaceProvider::enable(vout_window_t* voutWindow)
+void VideoSurfaceProvider::enable(vlc_window_t* voutWindow)
 {
     assert(voutWindow);
     {
@@ -66,35 +66,35 @@ void VideoSurfaceProvider::onWindowClosed()
 {
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportClose(m_voutWindow);
+        vlc_window_ReportClose(m_voutWindow);
 }
 
 void VideoSurfaceProvider::onMousePressed(int vlcButton)
 {
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportMousePressed(m_voutWindow, vlcButton);
+        vlc_window_ReportMousePressed(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onMouseReleased(int vlcButton)
 {
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportMouseReleased(m_voutWindow, vlcButton);
+        vlc_window_ReportMouseReleased(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onMouseDoubleClick(int vlcButton)
 {
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportMouseDoubleClick(m_voutWindow, vlcButton);
+        vlc_window_ReportMouseDoubleClick(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onMouseMoved(float x, float y)
 {
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportMouseMoved(m_voutWindow, x, y);
+        vlc_window_ReportMouseMoved(m_voutWindow, x, y);
 }
 
 void VideoSurfaceProvider::onMouseWheeled(const QWheelEvent& event)
@@ -102,7 +102,7 @@ void VideoSurfaceProvider::onMouseWheeled(const QWheelEvent& event)
     int vlckey = qtWheelEventToVLCKey(event);
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportKeyPress(m_voutWindow, vlckey);
+        vlc_window_ReportKeyPress(m_voutWindow, vlckey);
 }
 
 void VideoSurfaceProvider::onKeyPressed(int key, Qt::KeyboardModifiers modifiers)
@@ -111,7 +111,7 @@ void VideoSurfaceProvider::onKeyPressed(int key, Qt::KeyboardModifiers modifiers
     int vlckey = qtEventToVLCKey(&event);
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportKeyPress(m_voutWindow, vlckey);
+        vlc_window_ReportKeyPress(m_voutWindow, vlckey);
 
 }
 
@@ -120,7 +120,7 @@ void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
     emit surfaceSizeChanged(size);
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vout_window_ReportSize(m_voutWindow, size.width(), size.height());
+        vlc_window_ReportSize(m_voutWindow, size.width(), size.height());
 }
 
 

@@ -50,7 +50,7 @@ public:
     void destroyMainInterface() override;
     void unloadGUI() override;
 
-    bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) override;
+    bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) override;
     virtual QWindow* interfaceMainWindow() const override;
 
     Type type() const override;
@@ -65,7 +65,7 @@ private slots:
     void onSurfaceSizeChanged(const QSizeF& size) override;
 
 protected:
-    int windowEnable(const vout_window_cfg_t *) override;
+    int windowEnable(const vlc_window_cfg_t *) override;
     void windowDisable() override;
     void windowDestroy() override;
 

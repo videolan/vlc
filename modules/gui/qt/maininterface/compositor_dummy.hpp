@@ -55,7 +55,7 @@ public:
      */
     virtual void unloadGUI() override;
 
-    bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) override;
+    bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) override;
 
     QWindow* interfaceMainWindow() const override;
 

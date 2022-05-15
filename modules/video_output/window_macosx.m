@@ -70,13 +70,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCVideoWindowModuleDelegate : NSObject {
     @private
     // VLC window object, only use it on the eventQueue
-    vout_window_t*     vlc_vout_window;
+    vlc_window_t*     vlc_vout_window;
     dispatch_queue_t   eventQueue;
 
     BOOL               _isViewSet;
 }
 
-- (instancetype)initWithVLCVoutWindow:(vout_window_t *)vout_window;
+- (instancetype)initWithVLCVoutWindow:(vlc_window_t *)vout_window;
 
 /// Reports that the window is fullscreen now
 - (void)reportFullscreen;
@@ -131,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (instancetype)initWithModuleDelegate:(VLCVideoWindowModuleDelegate *)delegate;
-- (void)showWindowWithConfig:(const vout_window_cfg_t *restrict)config;
+- (void)showWindowWithConfig:(const vlc_window_cfg_t *restrict)config;
 
 /* Methods called by the callbacks to change properties of the Window */
 - (void)setWindowDecorated:(BOOL)decorated;
@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation VLCVideoWindowModuleDelegate : NSObject
 
-- (instancetype)initWithVLCVoutWindow:(vout_window_t *)vout_window
+- (instancetype)initWithVLCVoutWindow:(vlc_window_t *)vout_window
 {
     NSAssert(vout_window != NULL,
              @"VLCVideoWindowDelegate must be initialized with a valid vout_window");
@@ -169,28 +169,28 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSAssert(_isViewSet == NO,
              @"VLCVideoWindowDelegate's viewObject must only bet set once");
-    vlc_vout_window->type = VOUT_WINDOW_TYPE_NSOBJECT;
+    vlc_vout_window->type = VLC_WINDOW_TYPE_NSOBJECT;
     vlc_vout_window->handle.nsobject = (__bridge void*)view;
 }
 
 - (void)reportFullscreen
 {
     [self enqueueEventBlock:^void (void) {
-        vout_window_ReportFullscreen(vlc_vout_window, NULL);
+        vlc_window_ReportFullscreen(vlc_vout_window, NULL);
     }];
 }
 
 - (void)reportWindowed
 {
     [self enqueueEventBlock:^void (void) {
-        vout_window_ReportWindowed(vlc_vout_window);
+        vlc_window_ReportWindowed(vlc_vout_window);
     }];
 }
 
 - (void)reportSizeChanged:(NSSize)newSize
 {
     [self enqueueEventBlock:^void (void) {
-        vout_window_ReportSize(vlc_vout_window,
+        vlc_window_ReportSize(vlc_vout_window,
                                (unsigned int)newSize.width,
                                (unsigned int)newSize.height);
     }];
@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportClose
 {
     [self enqueueEventBlock:^void (void) {
-        vout_window_ReportClose(vlc_vout_window);
+        vlc_window_ReportClose(vlc_vout_window);
     }];
 }
 
@@ -268,7 +268,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Applies the given config to the window and shows it.
  */
-- (void)showWindowWithConfig:(const vout_window_cfg_t *restrict)config
+- (void)showWindowWithConfig:(const vlc_window_cfg_t *restrict)config
 {
     VLC_ASSERT_MAINTHREAD;
 
@@ -416,7 +416,7 @@ typedef struct
 
 /* Enable Window
  */
-static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
+static int WindowEnable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -431,7 +431,7 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *restrict cf
 }
 
 /* Request to close the window */
-static void WindowDisable(vout_window_t *wnd)
+static void WindowDisable(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -444,7 +444,7 @@ static void WindowDisable(vout_window_t *wnd)
 }
 
 /* Request to resize the window */
-static void WindowResize(vout_window_t *wnd, unsigned width, unsigned height)
+static void WindowResize(vlc_window_t *wnd, unsigned width, unsigned height)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -464,7 +464,7 @@ static void WindowResize(vout_window_t *wnd, unsigned width, unsigned height)
 }
 
 /* Request to enable/disable Window decorations */
-static void SetDecoration(vout_window_t *wnd, bool decorated)
+static void SetDecoration(vlc_window_t *wnd, bool decorated)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -477,7 +477,7 @@ static void SetDecoration(vout_window_t *wnd, bool decorated)
 }
 
 /* Request to enter fullscreen */
-static void WindowSetFullscreen(vout_window_t *wnd, const char *idstr)
+static void WindowSetFullscreen(vlc_window_t *wnd, const char *idstr)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -490,7 +490,7 @@ static void WindowSetFullscreen(vout_window_t *wnd, const char *idstr)
 }
 
 /* Request to exit fullscreen */
-static void WindowUnsetFullscreen(vout_window_t *wnd)
+static void WindowUnsetFullscreen(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -502,7 +502,7 @@ static void WindowUnsetFullscreen(vout_window_t *wnd)
     }
 }
 
-static void WindowSetTitle(struct vout_window_t *wnd, const char *title)
+static void WindowSetTitle(struct vlc_window *wnd, const char *title)
 {
     vout_window_sys_t *sys = wnd->sys;
     @autoreleasepool {
@@ -516,7 +516,7 @@ static void WindowSetTitle(struct vout_window_t *wnd, const char *title)
 /*
  * Module destruction
  */
-void Close(vout_window_t *wnd)
+void Close(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
@@ -529,7 +529,7 @@ void Close(vout_window_t *wnd)
 /*
  * Callbacks
  */
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .enable = WindowEnable,
     .disable = WindowDisable,
     .resize = WindowResize,
@@ -543,7 +543,7 @@ static const struct vout_window_operations ops = {
 /*
  * Module initialization
  */
-int Open(vout_window_t *wnd)
+int Open(vlc_window_t *wnd)
 {
     @autoreleasepool {
         msg_Info(wnd, "using the macOS new video output window module");
@@ -580,19 +580,19 @@ int Open(vout_window_t *wnd)
     }
 }
 
-static void DrawableClose(vout_window_t *wnd)
+static void DrawableClose(vlc_window_t *wnd)
 {
     id drawable = (__bridge_transfer id)wnd->handle.nsobject;
     wnd->handle.nsobject = nil;
     (void)drawable;
 }
 
-static const struct vout_window_operations drawable_ops =
+static const struct vlc_window_operations drawable_ops =
 {
     .destroy = DrawableClose,
 };
 
-static int DrawableOpen(vout_window_t *wnd)
+static int DrawableOpen(vlc_window_t *wnd)
 {
     id drawable = (__bridge id)
         var_InheritAddress(wnd, "drawable-nsobject");

@@ -29,7 +29,7 @@
 
 /**
  * @file VLCVideoUIView.m
- * @brief UIView-based vout_window_t provider
+ * @brief UIView-based vlc_window_t provider
  *
  * This UIView window provider mostly handles resizing constraints from parent
  * views and provides event forwarding to VLC. It is usable for any kind of
@@ -70,7 +70,7 @@
 
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _mutex lock when closing. */
-    vout_window_t *_wnd;
+    vlc_window_t *_wnd;
     vlc_mutex_t _mutex;
 
     /* Parent view defined by libvlc_media_player_set_nsobject. */
@@ -86,7 +86,7 @@
     dispatch_queue_t _eventq;
 }
 
-- (id)initWithWindow:(vout_window_t *)wnd;
+- (id)initWithWindow:(vlc_window_t *)wnd;
 - (BOOL)fetchViewContainer;
 - (void)detachFromParent;
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer;
@@ -99,7 +99,7 @@
  *****************************************************************************/
 @implementation VLCVideoUIView
 
-- (id)initWithWindow:(vout_window_t *)wnd
+- (id)initWithWindow:(vlc_window_t *)wnd
 {
     _wnd = wnd;
     _enabled = NO;
@@ -125,7 +125,7 @@
 
     CGSize size = _viewContainer.bounds.size;
     [self reportEvent:^{
-        vout_window_ReportSize(_wnd, size.width, size.height);
+        vlc_window_ReportSize(_wnd, size.width, size.height);
     }];
 
     return self;
@@ -219,7 +219,7 @@
 {
     /* We need to lock because we consider that _wnd might be destroyed
      * after this function returns, typically as it will be called in the
-     * Close() operation which preceed the vout_window_t destruction in
+     * Close() operation which preceed the vlc_window_t destruction in
      * the core. */
     vlc_mutex_lock(&_mutex);
     /* The UIView must not be attached before releasing. Disable() is doing
@@ -323,7 +323,7 @@
     }
 
     [self reportEvent:^{
-        vout_window_ReportSize(_wnd,
+        vlc_window_ReportSize(_wnd,
                 viewSize.width * scaleFactor,
                 viewSize.height * scaleFactor);
     }];
@@ -345,10 +345,10 @@
     }
 
     [self reportEvent:^{
-        vout_window_ReportMouseMoved(_wnd,
+        vlc_window_ReportMouseMoved(_wnd,
                 (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor);
-        vout_window_ReportMousePressed(_wnd, MOUSE_BUTTON_LEFT);
-        vout_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
+        vlc_window_ReportMousePressed(_wnd, MOUSE_BUTTON_LEFT);
+        vlc_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
     }];
     vlc_mutex_unlock(&_mutex);
 }
@@ -378,7 +378,7 @@
  * C core wrapper of the vout window operations for the ObjC module.
  */
 
-static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
 {
     VLCVideoUIView *sys = (__bridge VLCVideoUIView *)wnd->sys;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -387,7 +387,7 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     return VLC_SUCCESS;
 }
 
-static void Disable(vout_window_t *wnd)
+static void Disable(vlc_window_t *wnd)
 {
     VLCVideoUIView *sys = (__bridge VLCVideoUIView *)wnd->sys;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -395,7 +395,7 @@ static void Disable(vout_window_t *wnd)
     });
 }
 
-static void Close(vout_window_t *wnd)
+static void Close(vlc_window_t *wnd)
 {
     VLCVideoUIView *sys = (__bridge_transfer VLCVideoUIView*)wnd->sys;
 
@@ -404,14 +404,14 @@ static void Close(vout_window_t *wnd)
     [sys detachFromParent];
 }
 
-static const struct vout_window_operations window_ops =
+static const struct vlc_window_operations window_ops =
 {
     .enable = Enable,
     .disable = Disable,
     .destroy = Close,
 };
 
-static int Open(vout_window_t *wnd)
+static int Open(vlc_window_t *wnd)
 {
     dispatch_sync(dispatch_get_main_queue(), ^{
         VLCVideoUIView *sys = [[VLCVideoUIView alloc] initWithWindow:wnd];
@@ -424,7 +424,7 @@ static int Open(vout_window_t *wnd)
         return VLC_EGENERIC;
     }
 
-    wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
+    wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
     wnd->handle.nsobject = wnd->sys;
     wnd->ops = &window_ops;
 

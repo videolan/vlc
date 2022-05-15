@@ -723,7 +723,7 @@ bool MainCtx::onWindowClose( QWindow* )
     //We need to make sure that noting is playing anymore otherwise the vout will be closed
     //after the main interface, and it requires (at least with OpenGL) that the OpenGL context
     //from the main window is still valid.
-    //vout_window_ReportClose is currently stubbed
+    //vlc_window_ReportClose is currently stubbed
     if (playerController && playerController->hasVideoOutput()) {
         connect(playerController, &PlayerController::playingStateChanged, [this](PlayerController::PlayingState state){
             if (state == PlayerController::PLAYING_STATE_STOPPED) {

@@ -43,7 +43,7 @@ void CmdResize::execute()
 
 
 
-CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
+CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, vlc_window_t* pWnd,
                               int width, int height )
     : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_width( width ),
       m_height( height ) { }
@@ -55,7 +55,7 @@ void CmdResizeVout::execute()
 }
 
 CmdSetFullscreen::CmdSetFullscreen( intf_thread_t *pIntf,
-                                    vout_window_t * pWnd, bool fullscreen )
+                                    vlc_window_t * pWnd, bool fullscreen )
     : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_bFullscreen( fullscreen ) { }
 
 

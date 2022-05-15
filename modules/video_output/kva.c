@@ -325,7 +325,7 @@ static int Open ( vout_display_t *vd,
 
     sys->b_fixt23 = var_CreateGetBool( vd, "kva-fixt23");
 
-    if( !sys->b_fixt23 && vd->cfg->window->type != VOUT_WINDOW_TYPE_HWND )
+    if( !sys->b_fixt23 && vd->cfg->window->type != VLC_WINDOW_TYPE_HWND )
     {
         free( sys );
         return VLC_ENOTSUP;
@@ -832,7 +832,7 @@ static void MousePressed( vout_display_t *vd, HWND hwnd, unsigned button )
 
     sys->button_pressed |= 1 << button;
 
-    vout_window_ReportMousePressed( vd->cfg->window, button );
+    vlc_window_ReportMousePressed( vd->cfg->window, button );
 }
 
 static void MouseReleased( vout_display_t *vd, unsigned button )
@@ -843,7 +843,7 @@ static void MouseReleased( vout_display_t *vd, unsigned button )
     if( !sys->button_pressed )
         WinSetCapture( HWND_DESKTOP, NULLHANDLE );
 
-    vout_window_ReportMouseReleased( vd->cfg->window, button );
+    vlc_window_ReportMouseReleased( vd->cfg->window, button );
 }
 
 #define WM_MOUSELEAVE   0x41F
@@ -876,7 +876,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     {
         /* the user wants to close the window */
         case WM_CLOSE:
-            vout_window_ReportClose(vd->cfg->window);
+            vlc_window_ReportClose(vd->cfg->window);
             result = 0;
             break;
 
@@ -903,7 +903,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             /* Invert Y coordinate and add y offset */
             y = ( place.height - y ) + place.y;
 
-            vout_window_ReportMouseMoved( vd->cfg->window, x, y );
+            vlc_window_ReportMouseMoved( vd->cfg->window, x, y );
 
             result = WinDefWindowProc( hwnd, msg, mp1,mp2 );
             break;
@@ -934,7 +934,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             break;
 
         case WM_BUTTON1DBLCLK :
-            vout_window_ReportMouseDoubleClick( vd->cfg->window, MOUSE_BUTTON_LEFT );
+            vlc_window_ReportMouseDoubleClick( vd->cfg->window, MOUSE_BUTTON_LEFT );
             break;
 
         case WM_TRANSLATEACCEL :
@@ -975,7 +975,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     if( i_flags & KC_ALT )
                         i_key |= KEY_MODIFIER_ALT;
 
-                    vout_window_ReportKeyPress(vd->cfg->window, i_key);
+                    vlc_window_ReportKeyPress(vd->cfg->window, i_key);
                 }
             }
             break;

@@ -290,7 +290,7 @@ typedef struct
 /* */
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
 
-static int Mouse( video_splitter_t *, int, vout_window_mouse_event_t * );
+static int Mouse( video_splitter_t *, int, vlc_window_mouse_event_t * );
 
 /* */
 static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
@@ -771,7 +771,7 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
  * It converts mouse events
  */
 static int Mouse( video_splitter_t *p_splitter, int i_index,
-                  vout_window_mouse_event_t *restrict ev )
+                  vlc_window_mouse_event_t *restrict ev )
 {
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
 

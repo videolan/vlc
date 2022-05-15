@@ -115,7 +115,7 @@ struct AWindowHandler
 {
     JavaVM *p_jvm;
     jobject jobj;
-    vout_window_t *wnd;
+    vlc_window_t *wnd;
 
     struct vlc_android_jfields jfields;
 
@@ -813,7 +813,7 @@ AWindowHandler_getEnv(AWindowHandler *p_awh)
 }
 
 AWindowHandler *
-AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events)
+AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
 {
 #define AWINDOW_REGISTER_FLAGS_SUCCESS 0x1
 #define AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER 0x2

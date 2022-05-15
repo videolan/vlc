@@ -39,8 +39,8 @@
 
 typedef struct
 {
-    vout_window_t wnd;
-    vout_window_cfg_t cfg;
+    vlc_window_t wnd;
+    vlc_window_cfg_t cfg;
     module_t *module;
     bool inhibit_windowed;
 
@@ -51,10 +51,10 @@ typedef struct
     vlc_mutex_t lock;
 } window_t;
 
-static int vout_window_start(void *func, bool forced, va_list ap)
+static int vlc_window_start(void *func, bool forced, va_list ap)
 {
-    int (*activate)(vout_window_t *) = func;
-    vout_window_t *wnd = va_arg(ap, vout_window_t *);
+    int (*activate)(vlc_window_t *) = func;
+    vlc_window_t *wnd = va_arg(ap, vlc_window_t *);
 
     int ret = activate(wnd);
     if (ret)
@@ -63,12 +63,12 @@ static int vout_window_start(void *func, bool forced, va_list ap)
     return ret;
 }
 
-vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
-                               const vout_window_owner_t *owner,
-                               const vout_window_cfg_t *restrict cfg)
+vlc_window_t *vlc_window_New(vlc_object_t *obj, const char *module,
+                               const vlc_window_owner_t *owner,
+                               const vlc_window_cfg_t *restrict cfg)
 {
     window_t *w = vlc_custom_create(obj, sizeof(*w), "window");
-    vout_window_t *window = &w->wnd;
+    vlc_window_t *window = &w->wnd;
 
     memset(&window->handle, 0, sizeof(window->handle));
     window->info.has_double_click = false;
@@ -90,7 +90,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     vlc_mutex_init(&w->lock);
 
     w->module = vlc_module_load(window, "vout window", module, false,
-                                vout_window_start, window);
+                                vlc_window_start, window);
     if (!w->module) {
         vlc_object_delete(window);
         return NULL;
@@ -108,9 +108,9 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     /* Apply initial configuration */
     if (cfg != NULL) {
         if (cfg->is_fullscreen)
-            vout_window_SetFullScreen(window, NULL);
+            vlc_window_SetFullScreen(window, NULL);
         if (cfg->width != 0 && cfg->height != 0)
-            vout_window_SetSize(window, cfg->width, cfg->height);
+            vlc_window_SetSize(window, cfg->width, cfg->height);
 
         /* This will be applied whence the window is enabled. */
         w->cfg.is_decorated = cfg->is_decorated;
@@ -119,7 +119,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     return window;
 }
 
-int vout_window_Enable(vout_window_t *window)
+int vlc_window_Enable(vlc_window_t *window)
 {
     window_t *w = container_of(window, window_t, wnd);
 
@@ -129,19 +129,19 @@ int vout_window_Enable(vout_window_t *window)
             return err;
     }
 
-    vout_window_SetInhibition(window, true);
+    vlc_window_SetInhibition(window, true);
     return VLC_SUCCESS;
 }
 
-void vout_window_Disable(vout_window_t *window)
+void vlc_window_Disable(vlc_window_t *window)
 {
-    vout_window_SetInhibition(window, false);
+    vlc_window_SetInhibition(window, false);
 
     if (window->ops->disable != NULL)
         window->ops->disable(window);
 }
 
-void vout_window_SetSize(vout_window_t *window, unsigned width,
+void vlc_window_SetSize(vlc_window_t *window, unsigned width,
                          unsigned height)
 {
     window_t *w = container_of(window, window_t, wnd);
@@ -153,7 +153,7 @@ void vout_window_SetSize(vout_window_t *window, unsigned width,
         window->ops->resize(window, width, height);
 }
 
-void vout_window_Delete(vout_window_t *window)
+void vlc_window_Delete(vlc_window_t *window)
 {
     if (!window)
         return;
@@ -178,7 +178,7 @@ void vout_window_Delete(vout_window_t *window)
     vlc_object_delete(window);
 }
 
-static void vout_window_UpdateInhibitionUnlocked(vout_window_t *window)
+static void vlc_window_UpdateInhibitionUnlocked(vlc_window_t *window)
 {
     window_t *w = container_of(window, window_t, wnd);
     unsigned flags = VLC_INHIBIT_NONE;
@@ -191,18 +191,18 @@ static void vout_window_UpdateInhibitionUnlocked(vout_window_t *window)
         vlc_inhibit_Set(w->inhibit, flags);
 }
 
-void vout_window_SetInhibition(vout_window_t *window, bool enabled)
+void vlc_window_SetInhibition(vlc_window_t *window, bool enabled)
 {
     window_t *w = container_of(window, window_t, wnd);
 
     vlc_mutex_lock(&w->lock);
     w->active = enabled;
 
-    vout_window_UpdateInhibitionUnlocked(window);
+    vlc_window_UpdateInhibitionUnlocked(window);
     vlc_mutex_unlock(&w->lock);
 }
 
-void vout_window_ReportWindowed(vout_window_t *window)
+void vlc_window_ReportWindowed(vlc_window_t *window)
 {
     window_t *w = container_of(window, window_t, wnd);
 
@@ -210,7 +210,7 @@ void vout_window_ReportWindowed(vout_window_t *window)
         vlc_mutex_lock(&w->lock);
         w->fullscreen = false;
 
-        vout_window_UpdateInhibitionUnlocked(window);
+        vlc_window_UpdateInhibitionUnlocked(window);
         vlc_mutex_unlock(&w->lock);
     }
 
@@ -218,14 +218,14 @@ void vout_window_ReportWindowed(vout_window_t *window)
         window->owner.cbs->windowed(window);
 }
 
-void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
+void vlc_window_ReportFullscreen(vlc_window_t *window, const char *id)
 {
     window_t *w = container_of(window, window_t, wnd);
 
     if (!w->inhibit_windowed) {
         vlc_mutex_lock(&w->lock);
         w->fullscreen = true;
-        vout_window_UpdateInhibitionUnlocked(window);
+        vlc_window_UpdateInhibitionUnlocked(window);
         vlc_mutex_unlock(&w->lock);
     }
 
@@ -233,7 +233,7 @@ void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
         window->owner.cbs->fullscreened(window, id);
 }
 
-void vout_window_UnsetFullScreen(vout_window_t *window)
+void vlc_window_UnsetFullScreen(vlc_window_t *window)
 {
     window_t *w = container_of(window, window_t, wnd);
 
@@ -243,7 +243,7 @@ void vout_window_UnsetFullScreen(vout_window_t *window)
         window->ops->unset_fullscreen(window);
 }
 
-void vout_window_SetFullScreen(vout_window_t *window, const char *id)
+void vlc_window_SetFullScreen(vlc_window_t *window, const char *id)
 {
     window_t *w = container_of(window, window_t, wnd);
 

@@ -36,8 +36,8 @@
     "Video will be embedded in this pre-existing window. " \
     "If zero, a new window will be created.")
 
-static int Open(vout_window_t *);
-static void Close(vout_window_t *);
+static int Open(vlc_window_t *);
+static void Close(vlc_window_t *);
 
 /*
  * Module descriptor
@@ -59,7 +59,7 @@ vlc_module_end ()
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 static HWND *used = NULL;
 
-static const struct vout_window_operations ops = {
+static const struct vlc_window_operations ops = {
     .destroy = Close,
 };
 
@@ -72,7 +72,7 @@ struct drawable_sys
 {
     vlc_sem_t hwnd_set;
 
-    vout_window_t *wnd;
+    vlc_window_t *wnd;
     HWND hWnd;
     HWND embed_hwnd;
     RECT rect_parent;
@@ -94,7 +94,7 @@ static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
     struct drawable_sys *sys = (struct drawable_sys *)p_user_data;
 
-    vout_window_t *wnd = sys->wnd;
+    vlc_window_t *wnd = sys->wnd;
 
     RECT clientRect;
     GetClientRect(sys->embed_hwnd, &clientRect);
@@ -120,7 +120,7 @@ static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
         break;
 
     case WM_CLOSE:
-        vout_window_ReportClose(wnd);
+        vlc_window_ReportClose(wnd);
         return 0;
 
     /* the window has been closed so shut down everything now */
@@ -130,7 +130,7 @@ static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
         return 0;
 
     case WM_SIZE:
-        vout_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
+        vlc_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
 
     default:
@@ -208,7 +208,7 @@ static void RemoveDrawable(HWND val)
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open(vout_window_t *wnd)
+static int Open(vlc_window_t *wnd)
 {
     uintptr_t drawable = var_InheritInteger (wnd, "drawable-hwnd");
     if (drawable == 0)
@@ -282,7 +282,7 @@ static int Open(vout_window_t *wnd)
         goto error;
     }
 
-    wnd->type = VOUT_WINDOW_TYPE_HWND;
+    wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = (void *)sys->hWnd;
     wnd->ops = &ops;
     wnd->sys = (void *)sys;
@@ -297,7 +297,7 @@ error:
 /**
  * Release the drawable.
  */
-static void Close (vout_window_t *wnd)
+static void Close (vlc_window_t *wnd)
 {
     struct drawable_sys *sys = wnd->sys;
 

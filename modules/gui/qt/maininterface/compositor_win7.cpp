@@ -27,7 +27,7 @@
 
 using namespace vlc;
 
-int CompositorWin7::windowEnable(const vout_window_cfg_t *)
+int CompositorWin7::windowEnable(const vlc_window_cfg_t *)
 {
     commonWindowEnable();
     return VLC_SUCCESS;
@@ -164,7 +164,7 @@ void CompositorWin7::unloadGUI()
     commonGUIDestroy();
 }
 
-bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
+bool CompositorWin7::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
     BOOL isCompositionEnabled;
     HRESULT hr = DwmIsCompositionEnabled(&isCompositionEnabled);
@@ -175,7 +175,7 @@ bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroy
         return false;
 
     commonSetupVoutWindow(p_wnd, destroyCb);
-    p_wnd->type = VOUT_WINDOW_TYPE_HWND;
+    p_wnd->type = VLC_WINDOW_TYPE_HWND;
     p_wnd->handle.hwnd = (HWND)m_stable->winId();
     p_wnd->display.x11 = nullptr;
     return true;

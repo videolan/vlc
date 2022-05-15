@@ -81,7 +81,7 @@ static libvlc_instance_t *create_libvlc(void)
 }
 
 static void ReportOutput(
-        struct vout_window_t *wnd,
+        struct vlc_window *wnd,
         const char *id,
         const char *desc)
 {
@@ -93,9 +93,9 @@ static void ReportOutput(
 }
 
 static void ReportResized(
-        struct vout_window_t *wnd,
+        struct vlc_window *wnd,
         unsigned width, unsigned height,
-        vout_window_ack_cb ack_cb, void *opaque)
+        vlc_window_ack_cb ack_cb, void *opaque)
 {
     if (ack_cb)
         ack_cb(wnd, width, height, opaque);
@@ -120,35 +120,35 @@ int main(int argc, char *argv[])
     assert(libvlc);
 
     vlc_object_t *root = &libvlc->p_libvlc_int->obj;
-    const struct vout_window_callbacks list_cbs = {
+    const struct vlc_window_callbacks list_cbs = {
         .output_event = ReportOutput,
         .resized = ReportResized,
     };
 
-    const struct vout_window_callbacks win_cbs = {
+    const struct vlc_window_callbacks win_cbs = {
         .resized = ReportResized,
     };
 
-    const vout_window_owner_t owner = {
+    const vlc_window_owner_t owner = {
         .sys = NULL,
         .cbs = (current_mode == LIST_OUTPUT) ? &list_cbs : &win_cbs,
     };
 
-    const struct vout_window_cfg_t cfg = {
+    const struct vlc_window_cfg cfg = {
         .width = 800, .height = 600,
     };
-    vout_window_t *wnd = vout_window_New(root, window_name, &owner, &cfg);
+    vlc_window_t *wnd = vlc_window_New(root, window_name, &owner, &cfg);
 
     int ret = VLC_SUCCESS;
     if (current_mode == OPEN_CLOSE)
     {
-        ret = vout_window_Enable(wnd);
+        ret = vlc_window_Enable(wnd);
 
         if (ret == VLC_SUCCESS)
-            vout_window_Disable(wnd);
+            vlc_window_Disable(wnd);
     }
 
-    vout_window_Delete(wnd);
+    vlc_window_Delete(wnd);
 
     libvlc_release(libvlc);
 

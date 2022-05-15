@@ -38,8 +38,8 @@ int  D3D11OpenCPUConverter(filter_t *);
 int  D3D11OpenBlockDecoder(vlc_object_t *);
 void D3D11CloseBlockDecoder(vlc_object_t *);
 
-int  D3D11OpenDecoderDeviceW8(vlc_decoder_device *, vout_window_t *);
-int  D3D11OpenDecoderDeviceAny(vlc_decoder_device *, vout_window_t *);
+int  D3D11OpenDecoderDeviceW8(vlc_decoder_device *, vlc_window_t *);
+int  D3D11OpenDecoderDeviceAny(vlc_decoder_device *, vlc_window_t *);
 
 #ifdef __cplusplus
 }

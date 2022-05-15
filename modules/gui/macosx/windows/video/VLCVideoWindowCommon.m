@@ -356,7 +356,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)resizeWindow
 {
-    // VOUT_WINDOW_SET_SIZE is triggered when exiting fullscreen. This event is ignored here
+    // VLC_WINDOW_SET_SIZE is triggered when exiting fullscreen. This event is ignored here
     // to avoid interference with the animation.
     if ([self fullscreen] || _inFullscreenTransition)
         return;

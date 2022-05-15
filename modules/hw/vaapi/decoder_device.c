@@ -105,7 +105,7 @@ x11_native_destroy_cb(VANativeDisplay native)
 }
 
 static struct vaapi_instance *
-x11_init_vaapi_instance(vlc_decoder_device *device, vout_window_t *window,
+x11_init_vaapi_instance(vlc_decoder_device *device, vlc_window_t *window,
                         VADisplay *vadpyp)
 {
     if (!vlc_xlib_init(VLC_OBJECT(window)))
@@ -199,7 +199,7 @@ drm_init_vaapi_instance(vlc_decoder_device *device, VADisplay *vadpyp)
 
 #ifdef HAVE_VA_WL
 static struct vaapi_instance *
-wl_init_vaapi_instance(vlc_decoder_device *device, vout_window_t *window,
+wl_init_vaapi_instance(vlc_decoder_device *device, vlc_window_t *window,
                        VADisplay *vadpyp)
 {
     VADisplay vadpy = *vadpyp = vaGetDisplayWl(window->display.wl);
@@ -221,15 +221,15 @@ static const struct vlc_decoder_device_operations ops = {
 };
 
 static int
-Open(vlc_decoder_device *device, vout_window_t *window)
+Open(vlc_decoder_device *device, vlc_window_t *window)
 {
     VADisplay vadpy = NULL;
     struct vaapi_instance *vainst = NULL;
 #if defined (HAVE_VA_X11)
-    if (window && window->type == VOUT_WINDOW_TYPE_XID)
+    if (window && window->type == VLC_WINDOW_TYPE_XID)
         vainst = x11_init_vaapi_instance(device, window, &vadpy);
 #elif defined(HAVE_VA_WL)
-    if (window && window->type == VOUT_WINDOW_TYPE_WAYLAND)
+    if (window && window->type == VLC_WINDOW_TYPE_WAYLAND)
         vainst = wl_init_vaapi_instance(device, window, &vadpy);
 #elif defined (HAVE_VA_DRM)
     (void) window;

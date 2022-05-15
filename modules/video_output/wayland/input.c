@@ -43,7 +43,7 @@
 
 struct seat_data
 {
-    vout_window_t *owner;
+    vlc_window_t *owner;
     struct wl_seat *seat;
 
     struct wl_pointer *pointer;
@@ -98,7 +98,7 @@ static void pointer_motion_cb(void *data, struct wl_pointer *pointer,
     struct seat_data *sd = data;
 
     pointer_show(sd, pointer);
-    vout_window_ReportMouseMoved(sd->owner,
+    vlc_window_ReportMouseMoved(sd->owner,
                                  wl_fixed_to_int(sx), wl_fixed_to_int(sy));
     (void) time;
 }
@@ -130,10 +130,10 @@ static void pointer_button_cb(void *data, struct wl_pointer *pointer,
     switch (state)
     {
         case WL_POINTER_BUTTON_STATE_RELEASED:
-            vout_window_ReportMouseReleased(sd->owner, button);
+            vlc_window_ReportMouseReleased(sd->owner, button);
             break;
         case WL_POINTER_BUTTON_STATE_PRESSED:
-            vout_window_ReportMousePressed(sd->owner, button);
+            vlc_window_ReportMousePressed(sd->owner, button);
             break;
     }
 
@@ -144,7 +144,7 @@ static void pointer_axis_cb(void *data, struct wl_pointer *pointer,
                             uint32_t serial, uint32_t type, wl_fixed_t value)
 {
     struct seat_data *sd = data;
-    vout_window_t *wnd = sd->owner;
+    vlc_window_t *wnd = sd->owner;
     int button;
     bool plus = value > 0;
 
@@ -165,8 +165,8 @@ static void pointer_axis_cb(void *data, struct wl_pointer *pointer,
 
     while (value > 0)
     {
-        vout_window_ReportMousePressed(wnd, button);
-        vout_window_ReportMouseReleased(wnd, button);
+        vlc_window_ReportMousePressed(wnd, button);
+        vlc_window_ReportMouseReleased(wnd, button);
         value -= wl_fixed_from_int(10);
     }
     (void) serial;
@@ -239,7 +239,7 @@ static void keyboard_keymap_cb(void *data, struct wl_keyboard *keyboard,
                                uint32_t format, int fd, uint32_t size)
 {
     struct seat_data *sd = data;
-    vout_window_t *wnd = sd->owner;
+    vlc_window_t *wnd = sd->owner;
     void *map;
 
     msg_Dbg(wnd, "format %"PRIu32" keymap of %"PRIu32" bytes", format, size);
@@ -289,7 +289,7 @@ static void keyboard_key_cb(void *data, struct wl_keyboard *keyboard,
                             uint32_t state)
 {
     struct seat_data *sd = data;
-    vout_window_t *wnd = sd->owner;
+    vlc_window_t *wnd = sd->owner;
     uint_fast32_t vk;
 
     if (state != WL_KEYBOARD_KEY_STATE_PRESSED)
@@ -302,7 +302,7 @@ static void keyboard_key_cb(void *data, struct wl_keyboard *keyboard,
     {
         msg_Dbg(wnd, "key: 0x%08"PRIxFAST32" (XKB: 0x%04"PRIx32")",
                 vk, keycode);
-        vout_window_ReportKeyPress(wnd, vk);
+        vlc_window_ReportKeyPress(wnd, vk);
     }
 
     (void) keyboard; (void) serial; (void) time;
@@ -328,7 +328,7 @@ static void keyboard_repeat_info_cb(void *data, struct wl_keyboard *keyboard,
                                     int32_t rate, int32_t delay)
 {
     struct seat_data *sd = data;
-    vout_window_t *wnd = sd->owner;
+    vlc_window_t *wnd = sd->owner;
 
     msg_Dbg(wnd, "keyboard repeat info: %d Hz after %d ms", rate, delay);
     (void) keyboard;
@@ -382,7 +382,7 @@ static void seat_capabilities_cb(void *data, struct wl_seat *seat,
                                  uint32_t capabilities)
 {
     struct seat_data *sd = data;
-    struct vout_window_t *wnd = sd->owner;
+    struct vlc_window *wnd = sd->owner;
 
     msg_Dbg(wnd, "seat capabilities: 0x%"PRIx32, capabilities);
     (void) seat;
@@ -420,7 +420,7 @@ static const struct wl_seat_listener seat_cbs =
     seat_name_cb,
 };
 
-int seat_create(vout_window_t *wnd, struct wl_registry *registry,
+int seat_create(vlc_window_t *wnd, struct wl_registry *registry,
                 uint32_t name, uint32_t version, struct wl_list *list)
 {
     struct seat_data *sd = malloc(sizeof (*sd));

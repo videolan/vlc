@@ -56,7 +56,7 @@ public:
     virtual void toggleOnTop( bool onTop ) const = 0;
 
     /// getter for handler
-    virtual void setOSHandle( vout_window_t* pWnd ) const = 0;
+    virtual void setOSHandle( struct vlc_window *pWnd ) const = 0;
 
     /// reparent the window
     virtual void reparent( OSWindow *window,

@@ -109,7 +109,7 @@ static void CloseInternal( qt_intf_t * );
 static int  OpenIntf     ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static int  WindowOpen   ( vout_window_t * );
+static int  WindowOpen   ( vlc_window_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 
@@ -800,13 +800,13 @@ static void *Thread( void *obj )
 
         QString platform = app.platformName();
         if( platform == qfu("xcb") )
-            p_intf->voutWindowType = VOUT_WINDOW_TYPE_XID;
+            p_intf->voutWindowType = VLC_WINDOW_TYPE_XID;
         else if( platform == qfu("wayland") || platform == qfu("wayland-egl") )
-            p_intf->voutWindowType = VOUT_WINDOW_TYPE_WAYLAND;
+            p_intf->voutWindowType = VLC_WINDOW_TYPE_WAYLAND;
         else if( platform == qfu("windows") )
-            p_intf->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+            p_intf->voutWindowType = VLC_WINDOW_TYPE_HWND;
         else if( platform == qfu("cocoa" ) )
-            p_intf->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+            p_intf->voutWindowType = VLC_WINDOW_TYPE_NSOBJECT;
         else
         {
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
@@ -939,7 +939,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
     QApplication::postEvent( THEDP, event );
 }
 
-static void WindowCloseCb( vout_window_t * )
+static void WindowCloseCb( vlc_window_t * )
 {
     qt_intf_t *p_intf = nullptr;
     bool shutdown = false;
@@ -960,7 +960,7 @@ static void WindowCloseCb( vout_window_t * )
 /**
  * Video output window provider
  */
-static int WindowOpen( vout_window_t *p_wnd )
+static int WindowOpen( vlc_window_t *p_wnd )
 {
     if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
@@ -985,8 +985,8 @@ static int WindowOpen( vout_window_t *p_wnd )
 
         switch( p_intf->voutWindowType )
         {
-            case VOUT_WINDOW_TYPE_XID:
-            case VOUT_WINDOW_TYPE_HWND:
+            case VLC_WINDOW_TYPE_XID:
+            case VLC_WINDOW_TYPE_HWND:
                 if( var_InheritBool( p_wnd, "video-wallpaper" ) )
                     return VLC_EGENERIC;
                 break;

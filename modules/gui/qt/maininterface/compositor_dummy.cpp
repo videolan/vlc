@@ -81,7 +81,7 @@ void CompositorDummy::unloadGUI()
     m_qmlWidget.reset();
 }
 
-bool CompositorDummy::setupVoutWindow(vout_window_t*, VoutDestroyCb)
+bool CompositorDummy::setupVoutWindow(vlc_window_t*, VoutDestroyCb)
 {
     //dummy compositor doesn't handle window integration
     return false;

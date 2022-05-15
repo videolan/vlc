@@ -142,7 +142,7 @@ static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
 
-    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = vlc_obj_calloc (vd, 1, sizeof(*sys));
