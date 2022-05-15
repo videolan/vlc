@@ -2101,6 +2101,8 @@ static void ProcessMouseState(vout_thread_sys_t *p_vout,
 static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vout_configuration_t *cfg)
 {
     vout_thread_sys_t *sys = vout;
+    filter_chain_t *cs, *ci;
+
     assert(!sys->dummy);
 
     sys->mouse_event = cfg->mouse_event;
@@ -2125,10 +2127,16 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
         .video = &static_cbs,
         .sys = vout,
     };
-    sys->filter.chain_static = filter_chain_NewVideo(&vout->obj, true, &owner);
+
+    cs = filter_chain_NewVideo(&vout->obj, true, &owner);
 
     owner.video = &interactive_cbs;
-    sys->filter.chain_interactive = filter_chain_NewVideo(&vout->obj, true, &owner);
+    ci = filter_chain_NewVideo(&vout->obj, true, &owner);
+
+    vlc_mutex_lock(&sys->filter.lock);
+    sys->filter.chain_static = cs;
+    sys->filter.chain_interactive = ci;
+    vlc_mutex_unlock(&sys->filter.lock);
 
     vout_display_cfg_t dcfg;
     struct vout_crop crop;
@@ -2200,12 +2208,17 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     return VLC_SUCCESS;
 error:
     if (sys->filter.chain_interactive != NULL)
-    {
         DelAllFilterCallbacks(vout);
-        filter_chain_Delete(sys->filter.chain_interactive);
-    }
-    if (sys->filter.chain_static != NULL)
-        filter_chain_Delete(sys->filter.chain_static);
+    vlc_mutex_lock(&sys->filter.lock);
+    ci = sys->filter.chain_interactive;
+    cs = sys->filter.chain_static;
+    sys->filter.chain_interactive = NULL;
+    sys->filter.chain_static = NULL;
+    vlc_mutex_unlock(&sys->filter.lock);
+    if (ci != NULL)
+        filter_chain_Delete(ci);
+    if (cs != NULL)
+        filter_chain_Delete(cs);
     video_format_Clean(&sys->filter.src_fmt);
     if (sys->filter.src_vctx)
     {
@@ -2338,6 +2351,7 @@ static void *Thread(void *object)
 static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
 {
     vout_thread_sys_t *sys = vout;
+    filter_chain_t *ci, *cs;
 
     assert(sys->display != NULL);
 
@@ -2355,8 +2369,14 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
 
     /* Destroy the video filters */
     DelAllFilterCallbacks(vout);
-    filter_chain_Delete(sys->filter.chain_interactive);
-    filter_chain_Delete(sys->filter.chain_static);
+    vlc_mutex_lock(&sys->filter.lock);
+    ci = sys->filter.chain_interactive;
+    cs = sys->filter.chain_static;
+    sys->filter.chain_interactive = NULL;
+    sys->filter.chain_static = NULL;
+    vlc_mutex_unlock(&sys->filter.lock);
+    filter_chain_Delete(ci);
+    filter_chain_Delete(cs);
     video_format_Clean(&sys->filter.src_fmt);
     if (sys->filter.src_vctx)
     {
