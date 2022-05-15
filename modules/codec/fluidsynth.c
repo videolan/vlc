@@ -127,10 +127,17 @@ static int Open (vlc_object_t *p_this)
     else
     {
         glob_t gl;
+        int flags = GLOB_NOESCAPE;
 
-        glob("/usr/share/sounds/sf2/*.sf2", GLOB_NOESCAPE, NULL, &gl);
-        glob("/usr/share/soundfonts/*.sf2", GLOB_NOESCAPE | GLOB_APPEND, NULL,
-             &gl);
+        glob(DATADIR "/sounds/sf2/*.sf2", flags, NULL, &gl);
+        flags |= GLOB_APPEND;
+        glob(DATADIR "/soundfonts/*.sf2", flags, NULL, &gl);
+
+        if (strcmp("/usr/share", DATADIR) != 0)
+        {
+            glob("/usr/share/sounds/sf2/*.sf2", flags, NULL, &gl);
+            glob("/usr/share/soundfonts/*.sf2", flags, NULL, &gl);
+        }
 
         for (size_t i = 0; i < gl.gl_pathc; i++)
         {
