@@ -124,6 +124,13 @@ ifdef HAVE_WIN32
 	# Vista styling
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Widgets plugins/styles qwindowsvistastyle
 endif
+
+ifdef HAVE_MACOSX
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/platforms qcocoa
+	# Qt Cocoa plugins depend on printer support...
+	cd $< && cp ./lib/libQt5PrintSupport.a "$(PREFIX)/lib/"
+endif
+
 	#fix host tools headers to avoid collusion with target headers
 	mkdir -p $(PREFIX)/lib/qt5/include
 	cp -R $(PREFIX)/include/QtCore $(PREFIX)/lib/qt5/include
