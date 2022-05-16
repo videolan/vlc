@@ -719,12 +719,14 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/close.svg \
 	gui/qt/pixmaps/rename.svg \
 	gui/qt/pixmaps/del.svg \
+	gui/qt/pixmaps/download.svg \
 	gui/qt/pixmaps/ellipsis.svg \
 	gui/qt/pixmaps/topbar/grid.svg \
 	gui/qt/pixmaps/topbar/list.svg \
 	gui/qt/pixmaps/cone.svg \
 	gui/qt/pixmaps/album_cover.svg \
 	gui/qt/pixmaps/back.svg \
+	gui/qt/pixmaps/sync.svg \
 	gui/qt/pixmaps/time.svg \
 	gui/qt/pixmaps/theme_dark.svg \
 	gui/qt/pixmaps/theme_daynight.svg \
