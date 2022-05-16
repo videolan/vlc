@@ -48,7 +48,7 @@ else
 	$(APPLY) $(SRC)/qt/qt-fix-msys-long-pathes.patch
 	$(APPLY) $(SRC)/qt/0003-fix-angle-compilation.patch
 	cd $(UNPACK_DIR); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
-		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
+		sed -i.orig -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
 endif
 
 endif
@@ -106,7 +106,7 @@ ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 
 .qt: qt
 	# Prevent all Qt contribs from generating and installing libtool .la files
-	cd $< && sed -i "/CONFIG/ s/ create_libtool/ -create_libtool/g" mkspecs/features/qt_module.prf
+	cd $< && sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" mkspecs/features/qt_module.prf
 	+cd $< && $(ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
 	# Make && Install libraries
 	cd $< && $(ENV_VARS) $(MAKE)
@@ -126,7 +126,7 @@ endif
 	#fix host tools headers to avoid collusion with target headers
 	mkdir -p $(PREFIX)/lib/qt5/include
 	cp -R $(PREFIX)/include/QtCore $(PREFIX)/lib/qt5/include
-	sed -i -e "s#\$\$QT_MODULE_INCLUDE_BASE#$(PREFIX)/lib/qt5/include#g" $(PREFIX)/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
+	sed -i.orig -e "s#\$\$QT_MODULE_INCLUDE_BASE#$(PREFIX)/lib/qt5/include#g" $(PREFIX)/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
 	# Install a qmake with correct paths set
 	cd $< && $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
 	touch $@
