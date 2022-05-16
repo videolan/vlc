@@ -289,6 +289,44 @@ static void test__cond_wait_timeout()
     TEST_THREAD_JOIN_MAGIC(th);
 }
 
+/*
+ * Test latch synchronisation
+ */
+static void *thread_latch(void *data)
+{
+    vlc_latch_t *l = data;
+
+    assert(!vlc_latch_is_ready(l));
+    vlc_latch_count_down(l, 1);
+    vlc_latch_wait(l);
+    assert(vlc_latch_is_ready(l));
+    return NULL;
+}
+
+static void test__latch(void)
+{
+    vlc_latch_t l;
+    vlc_thread_t th;
+
+    vlc_latch_init(&l, 0);
+    assert(vlc_latch_is_ready(&l));
+    vlc_latch_wait(&l);
+    assert(vlc_latch_is_ready(&l));
+
+    vlc_latch_init(&l, 5);
+    assert(!vlc_latch_is_ready(&l));
+    vlc_latch_count_down(&l, 3);
+    assert(!vlc_latch_is_ready(&l));
+    vlc_latch_count_down_and_wait(&l, 2);
+    assert(vlc_latch_is_ready(&l));
+    vlc_latch_wait(&l);
+    assert(vlc_latch_is_ready(&l));
+
+    vlc_latch_init(&l, 2);
+    TEST_THREAD_CLONE(&th, thread_latch, &l);
+    vlc_latch_count_down_and_wait(&l, 1);
+    TEST_THREAD_JOIN(th, NULL);
+}
 
 /*
  * Test cancelling vlc_tick_sleep
@@ -335,6 +373,7 @@ int main(void)
     test__cond_wait();
     test__cond_wait_timeout();
     test__cond_broadcast();
+    test__latch();
     test__vlc_tick_sleep_cancelation();
     test__vlc_tick_sleep();
 
