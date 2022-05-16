@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_threads.h>
 
-void vlc_thread_set_name(const char *name)
+void (vlc_thread_set_name)(const char *name)
 {
     pthread_setname_np(name);
 }

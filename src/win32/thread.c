@@ -407,7 +407,7 @@ unsigned long vlc_thread_id (void)
     return GetCurrentThreadId ();
 }
 
-void vlc_thread_set_name(const char *name)
+void (vlc_thread_set_name)(const char *name)
 {
     if (SetThreadDescription_)
     {

@@ -51,7 +51,7 @@ unsigned long vlc_thread_id(void)
      return tid;
 }
 
-void vlc_thread_set_name(const char *name)
+void (vlc_thread_set_name)(const char *name)
 {
     prctl(PR_SET_NAME, name);
 }

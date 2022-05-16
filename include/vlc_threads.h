@@ -631,6 +631,20 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
 VLC_API int vlc_clone(vlc_thread_t *th, void *(*entry)(void *),
                       void *data) VLC_USED;
 
+#if defined(__GNUC__)
+static
+VLC_UNUSED_FUNC
+VLC_WARN_CALL("thread name too big")
+const char * vlc_thread_name_too_big( const char * thread_name )
+{
+    return thread_name;
+}
+
+# define check_name_length( thread_name ) \
+    ((__builtin_constant_p(strlen(thread_name) > 15)) ? \
+        vlc_thread_name_too_big(thread_name) : thread_name)
+#endif
+
 /**
  * Set the thread name of the current thread.
  *
@@ -640,6 +654,9 @@ VLC_API int vlc_clone(vlc_thread_t *th, void *(*entry)(void *),
  *       nul character. If larger, the name will be truncated.
  */
 VLC_API void vlc_thread_set_name(const char *name);
+#if defined(check_name_length)
+# define vlc_thread_set_name(name)  vlc_thread_set_name(check_name_length(name))
+#endif
 
 /**
  * Marks a thread as cancelled.

@@ -509,7 +509,7 @@ unsigned long vlc_thread_id (void)
     return _gettid();
 }
 
-void vlc_thread_set_name(const char *name)
+void (vlc_thread_set_name)(const char *name)
 {
     VLC_UNUSED(name);
 }
