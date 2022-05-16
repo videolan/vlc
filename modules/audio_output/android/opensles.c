@@ -22,10 +22,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -79,9 +75,9 @@ typedef SLresult (*slCreateEngine_t)(
 #define SetVolumeLevel(a, b) (*a)->SetVolumeLevel(a, b)
 #define SetMute(a, b) (*a)->SetMute(a, b)
 
-/*****************************************************************************
- *
- *****************************************************************************/
+static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt);
+static void Stop(audio_output_t *aout);
+
 typedef struct
 {
     /* OpenSL objects */
@@ -121,30 +117,6 @@ typedef struct
     block_t                       **pp_buffer_last;
     size_t                          samples;
 } aout_sys_t;
-
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static int  Open  (vlc_object_t *);
-static void Close (vlc_object_t *);
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-
-vlc_module_begin ()
-    set_description("OpenSLES audio output")
-    set_shortname("OpenSLES")
-    set_subcategory(SUBCAT_AUDIO_AOUT)
-
-    set_capability("audio output", 170)
-    add_shortcut("opensles", "android")
-    set_callbacks(Open, Close)
-vlc_module_end ()
-
-/*****************************************************************************
- *
- *****************************************************************************/
 
 static inline int bytesPerSample(void)
 {
@@ -321,9 +293,6 @@ static int WriteBuffer(audio_output_t *aout)
     }
 }
 
-/*****************************************************************************
- * Play: play a sound
- *****************************************************************************/
 static void Play(audio_output_t *aout, block_t *p_buffer, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
@@ -380,9 +349,122 @@ static int aout_get_native_sample_rate(audio_output_t *aout)
 }
 #endif
 
-/*****************************************************************************
- *
- *****************************************************************************/
+static int Open (vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys;
+    SLresult result;
+
+    aout->sys = sys = calloc(1, sizeof(*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    sys->p_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
+    if (sys->p_so_handle == NULL)
+    {
+        msg_Err(aout, "Failed to load libOpenSLES");
+        goto error;
+    }
+
+    sys->slCreateEnginePtr = dlsym(sys->p_so_handle, "slCreateEngine");
+    if (unlikely(sys->slCreateEnginePtr == NULL))
+    {
+        msg_Err(aout, "Failed to load symbol slCreateEngine");
+        goto error;
+    }
+
+#define OPENSL_DLSYM(dest, name)                       \
+    do {                                                       \
+        const SLInterfaceID *sym = dlsym(sys->p_so_handle, "SL_IID_"name);        \
+        if (unlikely(sym == NULL))                             \
+        {                                                      \
+            msg_Err(aout, "Failed to load symbol SL_IID_"name); \
+            goto error;                                        \
+        }                                                      \
+        sys->dest = *sym;                                           \
+    } while(0)
+
+    OPENSL_DLSYM(SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
+    OPENSL_DLSYM(SL_IID_ENGINE, "ENGINE");
+    OPENSL_DLSYM(SL_IID_PLAY, "PLAY");
+    OPENSL_DLSYM(SL_IID_VOLUME, "VOLUME");
+#undef OPENSL_DLSYM
+
+    // create engine
+    result = sys->slCreateEnginePtr(&sys->engineObject, 0, NULL, 0, NULL, NULL);
+    CHECK_OPENSL_ERROR("Failed to create engine");
+
+    // realize the engine in synchronous mode
+    result = Realize(sys->engineObject, SL_BOOLEAN_FALSE);
+    CHECK_OPENSL_ERROR("Failed to realize engine");
+
+    // get the engine interface, needed to create other objects
+    result = GetInterface(sys->engineObject, sys->SL_IID_ENGINE, &sys->engineEngine);
+    CHECK_OPENSL_ERROR("Failed to get the engine interface");
+
+    // create output mix, with environmental reverb specified as a non-required interface
+    const SLInterfaceID ids1[] = { sys->SL_IID_VOLUME };
+    const SLboolean req1[] = { SL_BOOLEAN_FALSE };
+    result = CreateOutputMix(sys->engineEngine, &sys->outputMixObject, 1, ids1, req1);
+    CHECK_OPENSL_ERROR("Failed to create output mix");
+
+    // realize the output mix in synchronous mode
+    result = Realize(sys->outputMixObject, SL_BOOLEAN_FALSE);
+    CHECK_OPENSL_ERROR("Failed to realize output mix");
+
+    vlc_mutex_init(&sys->lock);
+
+    aout->start      = Start;
+    aout->stop       = Stop;
+    aout->time_get   = TimeGet;
+    aout->play       = Play;
+    aout->pause      = Pause;
+    aout->flush      = Flush;
+    aout->mute_set   = MuteSet;
+    aout->volume_set = VolumeSet;
+
+    return VLC_SUCCESS;
+
+error:
+    if (sys->outputMixObject)
+        Destroy(sys->outputMixObject);
+    if (sys->engineObject)
+        Destroy(sys->engineObject);
+    if (sys->p_so_handle)
+        dlclose(sys->p_so_handle);
+    free(sys);
+    return VLC_EGENERIC;
+}
+
+static void Close(vlc_object_t *obj)
+{
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_sys_t *sys = aout->sys;
+
+    Destroy(sys->outputMixObject);
+    Destroy(sys->engineObject);
+    dlclose(sys->p_so_handle);
+    free(sys);
+}
+
+static void Stop(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
+    //Flush remaining buffers if any.
+    Clear(sys->playerBufferQueue);
+
+    free(sys->buf);
+    block_ChainRelease(sys->p_buffer_chain);
+
+    Destroy(sys->playerObject);
+    sys->playerObject = NULL;
+    sys->playerBufferQueue = NULL;
+    sys->volumeItf = NULL;
+    sys->playerPlay = NULL;
+}
+
 static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     if (aout_FormatNbChannels(fmt) == 0 || !AOUT_FMT_LINEAR(fmt))
@@ -502,121 +584,12 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Stop(audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
+vlc_module_begin ()
+    set_description("OpenSLES audio output")
+    set_shortname("OpenSLES")
+    set_subcategory(SUBCAT_AUDIO_AOUT)
 
-    SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);
-    //Flush remaining buffers if any.
-    Clear(sys->playerBufferQueue);
-
-    free(sys->buf);
-    block_ChainRelease(sys->p_buffer_chain);
-
-    Destroy(sys->playerObject);
-    sys->playerObject = NULL;
-    sys->playerBufferQueue = NULL;
-    sys->volumeItf = NULL;
-    sys->playerPlay = NULL;
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-static void Close(vlc_object_t *obj)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys = aout->sys;
-
-    Destroy(sys->outputMixObject);
-    Destroy(sys->engineObject);
-    dlclose(sys->p_so_handle);
-    free(sys);
-}
-
-static int Open (vlc_object_t *obj)
-{
-    audio_output_t *aout = (audio_output_t *)obj;
-    aout_sys_t *sys;
-    SLresult result;
-
-    aout->sys = sys = calloc(1, sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return VLC_ENOMEM;
-
-    sys->p_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
-    if (sys->p_so_handle == NULL)
-    {
-        msg_Err(aout, "Failed to load libOpenSLES");
-        goto error;
-    }
-
-    sys->slCreateEnginePtr = dlsym(sys->p_so_handle, "slCreateEngine");
-    if (unlikely(sys->slCreateEnginePtr == NULL))
-    {
-        msg_Err(aout, "Failed to load symbol slCreateEngine");
-        goto error;
-    }
-
-#define OPENSL_DLSYM(dest, name)                       \
-    do {                                                       \
-        const SLInterfaceID *sym = dlsym(sys->p_so_handle, "SL_IID_"name);        \
-        if (unlikely(sym == NULL))                             \
-        {                                                      \
-            msg_Err(aout, "Failed to load symbol SL_IID_"name); \
-            goto error;                                        \
-        }                                                      \
-        sys->dest = *sym;                                           \
-    } while(0)
-
-    OPENSL_DLSYM(SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
-    OPENSL_DLSYM(SL_IID_ENGINE, "ENGINE");
-    OPENSL_DLSYM(SL_IID_PLAY, "PLAY");
-    OPENSL_DLSYM(SL_IID_VOLUME, "VOLUME");
-#undef OPENSL_DLSYM
-
-    // create engine
-    result = sys->slCreateEnginePtr(&sys->engineObject, 0, NULL, 0, NULL, NULL);
-    CHECK_OPENSL_ERROR("Failed to create engine");
-
-    // realize the engine in synchronous mode
-    result = Realize(sys->engineObject, SL_BOOLEAN_FALSE);
-    CHECK_OPENSL_ERROR("Failed to realize engine");
-
-    // get the engine interface, needed to create other objects
-    result = GetInterface(sys->engineObject, sys->SL_IID_ENGINE, &sys->engineEngine);
-    CHECK_OPENSL_ERROR("Failed to get the engine interface");
-
-    // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids1[] = { sys->SL_IID_VOLUME };
-    const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = CreateOutputMix(sys->engineEngine, &sys->outputMixObject, 1, ids1, req1);
-    CHECK_OPENSL_ERROR("Failed to create output mix");
-
-    // realize the output mix in synchronous mode
-    result = Realize(sys->outputMixObject, SL_BOOLEAN_FALSE);
-    CHECK_OPENSL_ERROR("Failed to realize output mix");
-
-    vlc_mutex_init(&sys->lock);
-
-    aout->start      = Start;
-    aout->stop       = Stop;
-    aout->time_get   = TimeGet;
-    aout->play       = Play;
-    aout->pause      = Pause;
-    aout->flush      = Flush;
-    aout->mute_set   = MuteSet;
-    aout->volume_set = VolumeSet;
-
-    return VLC_SUCCESS;
-
-error:
-    if (sys->outputMixObject)
-        Destroy(sys->outputMixObject);
-    if (sys->engineObject)
-        Destroy(sys->engineObject);
-    if (sys->p_so_handle)
-        dlclose(sys->p_so_handle);
-    free(sys);
-    return VLC_EGENERIC;
-}
+    set_capability("audio output", 170)
+    add_shortcut("opensles", "android")
+    set_callbacks(Open, Close)
+vlc_module_end ()
