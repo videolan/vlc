@@ -869,9 +869,8 @@ VLC_API void vlc_tick_sleep(vlc_tick_t delay);
  */
 
 static
-__attribute__((unused))
-__attribute__((noinline))
-__attribute__((error("sorry, cannot sleep for such short a time")))
+VLC_UNUSED_FUNC
+VLC_ERROR_CALL("sorry, cannot sleep for such short a time")
 vlc_tick_t impossible_delay( vlc_tick_t delay )
 {
     (void) delay;
@@ -879,9 +878,8 @@ vlc_tick_t impossible_delay( vlc_tick_t delay )
 }
 
 static
-__attribute__((unused))
-__attribute__((noinline))
-__attribute__((warning("use proper event handling instead of short delay")))
+VLC_UNUSED_FUNC
+VLC_WARN_CALL("use proper event handling instead of short delay")
 vlc_tick_t harmful_delay( vlc_tick_t delay )
 {
     return delay;
@@ -897,9 +895,8 @@ vlc_tick_t harmful_delay( vlc_tick_t delay )
            : d))
 
 static
-__attribute__((unused))
-__attribute__((noinline))
-__attribute__((error("deadlines can not be constant")))
+VLC_UNUSED_FUNC
+VLC_ERROR_CALL("deadlines can not be constant")
 vlc_tick_t impossible_deadline( vlc_tick_t deadline )
 {
     return deadline;
