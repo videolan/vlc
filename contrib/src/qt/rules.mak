@@ -103,14 +103,14 @@ ifdef HAVE_MINGW_W64
 QT_CONFIG += -no-direct2d
 endif
 
-ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
+QT_ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 
 .qt: qt
 	# Prevent all Qt contribs from generating and installing libtool .la files
 	cd $< && sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" mkspecs/features/qt_module.prf
-	+cd $< && $(ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
+	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
 	# Make && Install libraries
-	cd $< && $(ENV_VARS) $(MAKE)
+	cd $< && $(QT_ENV_VARS) $(MAKE)
 	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets
 	# Install tools
 	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets sub-qlalr-install_subtargets
