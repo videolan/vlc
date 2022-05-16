@@ -186,6 +186,10 @@ public:
 
     inline int getCount() const { return (m_title == nullptr) ?  0 : m_title->chapter_count; }
 
+    Q_INVOKABLE void selectChapter(int index);
+
+    Q_INVOKABLE int getClosestChapterFromPos(float pos, float threshold) const;
+
 signals:
     void countChanged();
 

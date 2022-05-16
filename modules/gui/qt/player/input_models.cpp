@@ -383,6 +383,16 @@ void ChapterListModel::resetTitle(const vlc_player_title *newTitle)
     emit countChanged();
 }
 
+void ChapterListModel::selectChapter(int index)
+{
+    if (!m_title || index < 0 || static_cast<size_t>(index) >= m_title->chapter_count)
+        return;
+    {
+        vlc_player_locker lock{ m_player };
+        vlc_player_SelectChapter(m_player, m_title, index);
+    }
+}
+
 QString ChapterListModel::getNameAtPosition(float pos) const
 {
     if(m_title != nullptr){
@@ -405,6 +415,42 @@ QString ChapterListModel::getNameAtPosition(float pos) const
     }
     return QString();
 }
+
+int ChapterListModel::getClosestChapterFromPos(float pos, float threshold) const
+{
+    if(m_title == nullptr)
+        return -1;
+
+    vlc_tick_t posTime = pos * m_title->length;
+    vlc_tick_t closestTime = VLC_TICK_INVALID;
+    int chapterIndex = -1;
+
+    for(size_t i=0; i<m_title->chapter_count; i++){
+
+        vlc_tick_t currentChapterTime = m_title->chapters[i].time;
+        if (currentChapterTime == VLC_TICK_INVALID)
+            continue;
+        if (closestTime == VLC_TICK_INVALID
+            || qAbs(currentChapterTime - posTime) < qAbs(closestTime - posTime))
+        {
+            closestTime = currentChapterTime;
+            chapterIndex = i;
+        }
+    }
+
+    if (closestTime == VLC_TICK_INVALID)
+        return -1;
+    else
+    {
+        float chapterPos = closestTime / (float)m_title->length;
+
+        if (qAbs(chapterPos - pos) < threshold)
+            return chapterIndex;
+        return -1;
+    }
+
+}
+
 
 //***************************
 //  ProgramListModel
