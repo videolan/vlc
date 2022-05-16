@@ -178,7 +178,7 @@ Control {
         visible: false
         backgroundColor: Qt.lighter(colors.playerBg, 1.6180)
         barHeight: VLCStyle.heightBar_xxsmall
-        enabled: Player.playingState == Player.PLAYING_STATE_PLAYING || Player.playingState == Player.PLAYING_STATE_PAUSED
+        enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
         colors: root.colors
 
         Navigation.parentItem: root

@@ -24,12 +24,12 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 Slider {
     id: control
 
     property int barHeight: VLCStyle.dp(5, VLCStyle.scale)
-    property bool _isHold: false
     property bool _isSeekPointsShown: true
     property real _tooltipPosition: timeTooltip.pos.x / sliderRectMouseArea.width
 
@@ -67,13 +67,71 @@ Slider {
         colors: control.colors
     }
 
-    Connections {    
-        /* only update the control position when the player position actually change, this avoid the slider
-         * to jump around when clicking
-         */
+    Item {
+        id: fsm
+
+        signal playerUpdatePosition(real position)
+        signal pressControl(real position, bool forcePrecise)
+        signal releaseControl(real position, bool forcePrecise)
+        signal moveControl(real position, bool forcePrecise)
+
+        property var _state: fsmReleased
+
+        function _changeState(state) {
+            _state.enabled = false
+            _state = state
+            _state.enabled = true
+        }
+
+        function _seekToPosition(position, threshold, forcePrecise) {
+            position = Helpers.clamp(position, 0., 1.)
+            control.value = position
+            if (!forcePrecise) {
+                var chapter = Player.chapters.getClosestChapterFromPos(position, threshold)
+                if (chapter !== -1) {
+                    Player.chapters.selectChapter(chapter)
+                    return
+                }
+            }
+            Player.position = position
+        }
+
+        Item {
+            id: fsmReleased
+            enabled: true
+
+            Connections {
+                enabled: fsmReleased.enabled
+                target: fsm
+
+                onPlayerUpdatePosition: control.value = position
+
+                onPressControl: {
+                    control.forceActiveFocus()
+                    fsm._seekToPosition(position, VLCStyle.dp(4) / control.width, forcePrecise)
+                    fsm._changeState(fsmHeld)
+                }
+            }
+        }
+
+        Item {
+            id: fsmHeld
+            enabled: false
+
+            Connections {
+                enabled: fsmHeld.enabled
+                target: fsm
+
+                onMoveControl: fsm._seekToPosition(position, VLCStyle.dp(2) / control.width, forcePrecise)
+
+                onReleaseControl: fsm._changeState(fsmReleased)
+            }
+        }
+    }
+
+    Connections {
         target: Player
-        enabled: !_isHold
-        onPositionChanged: control.value = Player.position
+        onPositionChanged: fsm.playerUpdatePosition(Player.position)
     }
 
     height: control.barHeight
@@ -96,27 +154,17 @@ Slider {
 
         MouseArea {
             id: sliderRectMouseArea
-            property bool isEntered: false
 
             anchors.fill: parent
+
             hoverEnabled: true
 
-            onPressed: function (event) {
-                control.forceActiveFocus()
-                control._isHold = true
-                control.value = event.x / control.width
-                Player.position = control.value
-            }
-            onReleased: control._isHold = false
-            onPositionChanged: function (event) {
-                if (pressed) {
-                    if (event.x < 0) event.x = 0;
-                    else if (event.x > control.width) event.x = control.width;
+            onPressed: fsm.pressControl(mouse.x / control.width, mouse.modifiers === Qt.ShiftModifier)
 
-                    control.value = event.x / control.width
-                    Player.position = control.value
-                }
-            }
+            onReleased: fsm.releaseControl(mouse.x / control.width, mouse.modifiers === Qt.ShiftModifier)
+
+            onPositionChanged: fsm.moveControl(mouse.x / control.width, mouse.modifiers === Qt.ShiftModifier)
+
             onEntered: {
                 if(Player.hasChapters)
                     control._isSeekPointsShown = true
