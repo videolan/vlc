@@ -341,6 +341,14 @@ void d3d11_quad_t::UpdateViewport(const RECT *rect, const d3d_format_t *display)
     case DXGI_FORMAT_UNKNOWN:
         switch ( generic.textureFormat->fourcc )
         {
+        case VLC_CODEC_I444:
+            if ( display->formatTexture != DXGI_FORMAT_NV12 &&
+                 display->formatTexture != DXGI_FORMAT_P010 )
+            {
+                cropViewport[1] = cropViewport[0];
+                break;
+            }
+            break;
         case VLC_CODEC_YUVA:
             if ( display->formatTexture != DXGI_FORMAT_NV12 &&
                  display->formatTexture != DXGI_FORMAT_P010 )
