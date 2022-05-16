@@ -570,6 +570,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     aout_FormatPrepare(fmt);
 
+    msg_Dbg(aout, "using OpenSL ES API");
+
     return VLC_SUCCESS;
 
 error:
