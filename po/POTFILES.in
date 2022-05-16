@@ -797,6 +797,7 @@ modules/gui/qt/medialibrary/mlvideogroupsmodel.cpp
 modules/gui/qt/medialibrary/mlvideogroupsmodel.hpp
 modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml
 modules/gui/qt/medialibrary/qml/AudioGridItem.qml
+modules/gui/qt/medialibrary/qml/EmptyLabel.qml
 modules/gui/qt/medialibrary/qml/MediaGroupDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbums.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml
@@ -845,6 +846,7 @@ modules/gui/qt/player/control_list_filter.hpp
 modules/gui/qt/player/player_controlbar_model.cpp
 modules/gui/qt/player/player_controlbar_model.hpp
 modules/gui/qt/player/qml/ControlbarControls.qml
+modules/gui/qt/player/qml/PlaybackSpeed.qml
 modules/gui/qt/player/qml/Player.qml
 modules/gui/qt/player/qml/ResumeDialog.qml
 modules/gui/qt/player/qml/TopBar.qml
@@ -855,11 +857,13 @@ modules/gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/AtoBButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/BackButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/BookmarkButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/DvdMenuButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/Fallback.qml
 modules/gui/qt/player/qml/controlbarcontrols/FasterButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/FrameButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/FullscreenButton.qml
@@ -877,6 +881,7 @@ modules/gui/qt/player/qml/controlbarcontrols/PreviousButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/QuitButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/RandomButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/RendererButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/ReverseButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SkipForwardButton.qml
@@ -893,6 +898,7 @@ modules/gui/qt/playlist/qml/PlaylistOverlayMenu.qml
 modules/gui/qt/playlist/qml/PlaylistToolbar.qml
 modules/gui/qt/qt.cpp
 modules/gui/qt/qt.hpp
+modules/gui/qt/util/color_scheme_model.cpp
 modules/gui/qt/util/covergenerator.cpp
 modules/gui/qt/util/covergenerator.hpp
 modules/gui/qt/util/imagehelper.cpp
@@ -911,6 +917,7 @@ modules/gui/qt/widgets/native/customwidgets.cpp
 modules/gui/qt/widgets/native/customwidgets.hpp
 modules/gui/qt/widgets/native/interface_widgets.cpp
 modules/gui/qt/widgets/native/interface_widgets.hpp
+modules/gui/qt/widgets/native/mlfolderseditor.cpp
 modules/gui/qt/widgets/native/qvlcframe.hpp
 modules/gui/qt/widgets/native/searchlineedit.cpp
 modules/gui/qt/widgets/native/searchlineedit.hpp
