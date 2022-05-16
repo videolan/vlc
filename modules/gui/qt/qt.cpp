@@ -93,6 +93,8 @@ extern "C" char **environ;
   #ifdef _WIN32
    Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+  #elif defined(Q_OS_MACOS)
+   Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin)
   #endif
  #endif
 #endif
