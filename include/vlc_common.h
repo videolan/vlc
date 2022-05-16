@@ -113,11 +113,66 @@
 # else
 #  define VLC_NOINLINE_FUNC
 # endif
+
+# if __has_attribute(deprecated)
+#  define VLC_DEPRECATED  __attribute__((deprecated))
+# else
+/**
+ * Deprecated functions or compound members annotation
+ *
+ * Use this macro in front of a function declaration or compound member
+ * within a compound type declaration.
+ * The compiler may emit a warning every time the function or member is used.
+ *
+ * Use \ref VLC_DEPRECATED_ENUM instead for enumeration members.
+ */
+#  define VLC_DEPRECATED
+# endif
+
+# if __has_attribute(malloc)
+#  define VLC_MALLOC  __attribute__((malloc))
+# else
+/**
+ * Heap allocated result function annotation
+ *
+ * Use this macro to annotate a function that returns a pointer to memory that
+ * cannot alias any other valid pointer.
+ *
+ * This is primarily used for functions that return a pointer to heap-allocated
+ * memory, but it can be used for other applicable purposes.
+ *
+ * \warning Do not use this annotation if the returned pointer can in any way
+ * alias a valid pointer at the time the function exits. This could lead to
+ * very weird memory corruption bugs.
+ */
+#  define VLC_MALLOC
+# endif
+
+# if __has_attribute(warn_unused_result)
+#  define VLC_USED  __attribute__((warn_unused_result))
+# else
+/**
+ * Used result function annotation
+ *
+ * Use this macro to annotate a function whose result must be used.
+ *
+ * There are several cases where this is useful:
+ * - If a function has no side effects (or no useful side effects), such that
+ *   the only useful purpose of calling said function is to obtain its
+ *   return value.
+ * - If ignoring the function return value would lead to a resource leak
+ *   (including but not limited to a memory leak).
+ * - If a function cannot be used correctly without checking its return value.
+ *   For instance, if the function can fail at any time.
+ *
+ * The compiler may warn if the return value of a function call is ignored.
+ */
+#  define VLC_USED
+# endif
 #endif
 
 
 #ifdef __GNUC__
-# define VLC_DEPRECATED __attribute__((deprecated))
 # if VLC_GCC_VERSION(6,0)
 #  define VLC_DEPRECATED_ENUM __attribute__((deprecated))
 # else
@@ -130,21 +185,8 @@
 #  define VLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
 # endif
 # define VLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
-# define VLC_MALLOC __attribute__ ((malloc))
-# define VLC_USED __attribute__ ((warn_unused_result))
 
 #else
-/**
- * Deprecated functions or compound members annotation
- *
- * Use this macro in front of a function declaration or compound member
- * within a compound type declaration.
- * The compiler may emit a warning every time the function or member is used.
- *
- * Use \ref VLC_DEPRECATED_ENUM instead for enumeration members.
- */
-# define VLC_DEPRECATED
-
 /**
  * Deprecated enum member annotation
  *
@@ -177,39 +219,6 @@
  * This is primarily intended for localization functions such as gettext().
  */
 # define VLC_FORMAT_ARG(x)
-
-/**
- * Heap allocated result function annotation
- *
- * Use this macro to annotate a function that returns a pointer to memory that
- * cannot alias any other valid pointer.
- *
- * This is primarily used for functions that return a pointer to heap-allocated
- * memory, but it can be used for other applicable purposes.
- *
- * \warning Do not use this annotation if the returned pointer can in any way
- * alias a valid pointer at the time the function exits. This could lead to
- * very weird memory corruption bugs.
- */
-# define VLC_MALLOC
-
-/**
- * Used result function annotation
- *
- * Use this macro to annotate a function whose result must be used.
- *
- * There are several cases where this is useful:
- * - If a function has no side effects (or no useful side effects), such that
- *   the only useful purpose of calling said function is to obtain its
- *   return value.
- * - If ignoring the function return value would lead to a resource leak
- *   (including but not limited to a memory leak).
- * - If a function cannot be used correctly without checking its return value.
- *   For instance, if the function can fail at any time.
- *
- * The compiler may warn if the return value of a function call is ignored.
- */
-# define VLC_USED
 #endif
 
 #if defined (__ELF__) || defined (__MACH__)
