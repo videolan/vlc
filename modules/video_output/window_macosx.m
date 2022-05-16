@@ -601,6 +601,7 @@ static int DrawableOpen(vlc_window_t *wnd)
 
     wnd->ops = &drawable_ops;
     wnd->handle.nsobject = (__bridge_retained void*)drawable;
+    wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
     return VLC_SUCCESS;
 }
 
