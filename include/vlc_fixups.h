@@ -697,4 +697,11 @@ int clock_nanosleep(clockid_t clock_id, int flags,
 } /* extern "C" */
 #endif
 
+#if defined(__cplusplus)
+#ifndef HAVE_CXX_TYPEOF
+# include <type_traits>
+# define typeof(t) std::remove_reference<decltype(t)>::type
+#endif
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
