@@ -862,7 +862,8 @@ VLC_API void vlc_tick_sleep(vlc_tick_t delay);
 #define VLC_HARD_MIN_SLEEP  VLC_TICK_FROM_MS(10)   /* 10 milliseconds = 1 tick at 100Hz */
 #define VLC_SOFT_MIN_SLEEP  VLC_TICK_FROM_SEC(9)   /* 9 seconds */
 
-#if defined (__GNUC__) && !defined (__clang__)
+#if defined(__GNUC__)
+
 /* Linux has 100, 250, 300 or 1000Hz
  *
  * HZ=100 by default on FreeBSD, but some architectures use a 1000Hz timer
@@ -904,13 +905,14 @@ vlc_tick_t impossible_deadline( vlc_tick_t deadline )
 
 # define check_deadline( d ) \
     (__builtin_constant_p(d) ? impossible_deadline(d) : d)
-#else
-# define check_delay(d) (d)
-# define check_deadline(d) (d)
 #endif
 
+#if defined(check_delay)
 #define vlc_tick_sleep(d) vlc_tick_sleep(check_delay(d))
+#endif
+#if defined(check_deadline)
 #define vlc_tick_wait(d) vlc_tick_wait(check_deadline(d))
+#endif
 
 /**
  * \defgroup timer Asynchronous/threaded timers
