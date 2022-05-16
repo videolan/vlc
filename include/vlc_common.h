@@ -89,6 +89,33 @@
 #endif
 
 /* Function attributes for compiler warnings */
+#if defined __has_attribute
+# if __has_attribute(warning)
+#  define VLC_WARN_CALL(w)  VLC_NOINLINE_FUNC __attribute__((warning((w))))
+# else
+#  define VLC_WARN_CALL(w)
+# endif
+
+# if __has_attribute(error)
+#  define VLC_ERROR_CALL(e)  VLC_NOINLINE_FUNC __attribute__((error((e))))
+# else
+#  define VLC_ERROR_CALL(e)
+# endif
+
+# if __has_attribute(unused)
+#  define VLC_UNUSED_FUNC  __attribute__((unused))
+# else
+#  define VLC_UNUSED_FUNC
+# endif
+
+# if __has_attribute(noinline)
+#  define VLC_NOINLINE_FUNC  __attribute__((noinline))
+# else
+#  define VLC_NOINLINE_FUNC
+# endif
+#endif
+
+
 #ifdef __GNUC__
 # define VLC_DEPRECATED __attribute__((deprecated))
 # if VLC_GCC_VERSION(6,0)
