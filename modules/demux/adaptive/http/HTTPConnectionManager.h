@@ -102,8 +102,8 @@ namespace adaptive
                 AbstractConnection * reuseConnection(ConnectionParams &);
                 Downloader * getDownloadQueue(const AbstractChunkSource *) const;
                 std::list<HTTPChunkBufferedSource *> cache;
-                unsigned cache_total;
-                unsigned cache_max;
+                size_t cache_total;
+                size_t cache_max;
         };
     }
 }
