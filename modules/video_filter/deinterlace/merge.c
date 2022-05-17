@@ -179,6 +179,7 @@ void Merge16BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
 #endif
 
 #ifdef CAN_COMPILE_C_ALTIVEC
+VLC_ALTIVEC
 void MergeAltivec( void *_p_dest, const void *_p_s1,
                    const void *_p_s2, size_t i_bytes )
 {
