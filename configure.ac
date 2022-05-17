@@ -1665,22 +1665,6 @@ have_altivec="no"
 AS_IF([test "${enable_altivec}" = "yes"], [
   ARCH="${ARCH} altivec";
   VLC_SAVE_FLAGS
-  AC_CACHE_CHECK([if $CC groks AltiVec inline assembly],
-    [ac_cv_altivec_inline],
-    [AC_COMPILE_IFELSE([
-        AC_LANG_PROGRAM([[]],
-            [[asm volatile("vperm 0,1,2,3");]])],
-     [ac_cv_altivec_inline="yes"],
-     [CFLAGS="${CFLAGS} -Wa,-maltivec"
-      AC_COMPILE_IFELSE([
-         AC_LANG_PROGRAM([[]],
-            [[asm volatile("vperm 0,1,2,3");]])],
-            [ac_cv_altivec_inline="-Wa,-maltivec"],
-            ac_cv_altivec_inline=no)
-         ])])
-  VLC_RESTORE_FLAGS
-
-  VLC_SAVE_FLAGS
   AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
   [ac_cv_c_altivec], [
     CFLAGS="${CFLAGS} -maltivec"
