@@ -1662,7 +1662,6 @@ AC_ARG_ENABLE([altivec],
         [enable_altivec=yes], [enable_altivec=no])
 ])
 have_altivec="no"
-ALTIVEC_CFLAGS=""
 AS_IF([test "${enable_altivec}" = "yes"], [
   ARCH="${ARCH} altivec";
   VLC_SAVE_FLAGS
@@ -1680,12 +1679,6 @@ AS_IF([test "${enable_altivec}" = "yes"], [
             ac_cv_altivec_inline=no)
          ])])
   VLC_RESTORE_FLAGS
-  AS_IF([test "${ac_cv_altivec_inline}" != "no"], [
-    AS_IF([test "${ac_cv_altivec_inline}" != "yes"], [
-      ALTIVEC_CFLAGS="${ac_cv_altivec_inline}"
-    ])
-    have_altivec="yes"
-  ])
 
   VLC_SAVE_FLAGS
   AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
@@ -1703,13 +1696,11 @@ AS_IF([test "${enable_altivec}" = "yes"], [
   AS_IF([test "${ac_cv_c_altivec}" != "no"], [
     CPPFLAGS="${CPPFLAGS} ${ac_cv_c_altivec}"
     AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, [Define to 1 if C AltiVec extensions are available.])
-    ALTIVEC_CFLAGS="$ALTIVEC_CFLAGS ${ac_cv_c_altivec}"
     VLC_ADD_CFLAGS([deinterlace],[${ac_cv_c_altivec}])
     have_altivec="yes"
   ])
   AC_CHECK_HEADERS([altivec.h])
 ])
-AC_SUBST([ALTIVEC_CFLAGS])
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
 
 
