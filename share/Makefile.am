@@ -97,13 +97,11 @@ skins2_default_vlt_FILES = \
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	$(AM_V_at)mkdir -p skins2
 	$(AM_V_at)rm -f -- skins2/default.vlt.tmp
-	$(AM_V_GEN)tarsort= ; \
-	tar --help|grep -q sort=ORDER && tarsort=--sort=name ; \
-	GZIP=--no-name \
+	$(AM_V_GEN)GZIP=--no-name \
 	tar cvvzf skins2/default.vlt.tmp \
 		--format=ustar $$tarsort \
 		--owner=root --group=root --directory="$(srcdir)/skins2" \
-		default/
+		$$(cd "$(srcdir)/skins2" && find default/ -type f | LC_ALL=C sort)
 	$(AM_V_at)mv -f -- skins2/default.vlt.tmp skins2/default.vlt
 
 #
