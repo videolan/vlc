@@ -70,7 +70,6 @@ EXTRA_LTLIBRARIES += libswscale_plugin.la libchroma_omx_plugin.la
 libi420_yuy2_altivec_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
 libi420_yuy2_altivec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i420_yuy2_altivec
-libi420_yuy2_altivec_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALTIVEC_CFLAGS)
 
 if HAVE_ALTIVEC
 chroma_LTLIBRARIES += \
