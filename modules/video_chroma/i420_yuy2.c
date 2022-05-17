@@ -51,7 +51,7 @@
 #    define VLC_TARGET VLC_SSE
 #elif defined (PLUGIN_ALTIVEC)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
-#    define VLC_TARGET
+#    define VLC_TARGET VLC_ALTIVEC
 #endif
 
 /*****************************************************************************
