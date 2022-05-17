@@ -350,6 +350,34 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
+    /* Copy picture surface into texture surface
+        * color space conversion happen here */
+    RECT source_visible_rect = {
+        .left   = vd->source->i_x_offset,
+        .right  = vd->source->i_x_offset + vd->source->i_visible_width,
+        .top    = vd->source->i_y_offset,
+        .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
+    };
+    RECT texture_visible_rect = {
+        .left   = 0,
+        .right  = vd->source->i_visible_width,
+        .top    = 0,
+        .bottom = vd->source->i_visible_height,
+    };
+    // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
+    // When copying the entire buffer, the margin end up being blended in the actual picture
+    // on nVidia (regardless of even/odd dimensions)
+    if (texture_visible_rect.right & 1)
+    {
+        texture_visible_rect.right++;
+        source_visible_rect.right++;
+    }
+    if (texture_visible_rect.bottom & 1)
+    {
+        texture_visible_rect.bottom++;
+        source_visible_rect.bottom++;
+    }
+
     if (sys->processor.proc)
     {
         DXVAHD_STREAM_DATA inputStream = { 0 };
@@ -368,34 +396,6 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     }
     else
     {
-        /* Copy picture surface into texture surface
-         * color space conversion happen here */
-        RECT source_visible_rect = {
-            .left   = vd->source->i_x_offset,
-            .right  = vd->source->i_x_offset + vd->source->i_visible_width,
-            .top    = vd->source->i_y_offset,
-            .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
-        };
-        RECT texture_visible_rect = {
-            .left   = 0,
-            .right  = vd->source->i_visible_width,
-            .top    = 0,
-            .bottom = vd->source->i_visible_height,
-        };
-        // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
-        // When copying the entire buffer, the margin end up being blended in the actual picture
-        // on nVidia (regardless of even/odd dimensions)
-        if (texture_visible_rect.right & 1)
-        {
-            texture_visible_rect.right++;
-            source_visible_rect.right++;
-        }
-        if (texture_visible_rect.bottom & 1)
-        {
-            texture_visible_rect.bottom++;
-            source_visible_rect.bottom++;
-        }
-
         hr = IDirect3DDevice9_StretchRect(sys->d3d9_device->d3ddev.dev, source, &source_visible_rect,
                                         destination, &texture_visible_rect,
                                         D3DTEXF_NONE);
@@ -410,25 +410,13 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->sceneTexture;
-    RECT texture_rect = {
-        .left   = 0,
-        .right  = vd->source->i_width,
-        .top    = 0,
-        .bottom = vd->source->i_height,
-    };
     RECT rect_in_display = {
         .left   = sys->area.place.x,
         .right  = sys->area.place.x + sys->area.place.width,
         .top    = sys->area.place.y,
         .bottom = sys->area.place.y + sys->area.place.height,
     };
-    RECT texture_visible_rect = {
-        .left   = vd->source->i_x_offset,
-        .right  = vd->source->i_x_offset + vd->source->i_visible_width,
-        .top    = vd->source->i_y_offset,
-        .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
-    };
-    Direct3D9SetupVertices(region->vertex, &texture_rect, &texture_visible_rect,
+    Direct3D9SetupVertices(region->vertex, &texture_visible_rect, &source_visible_rect,
                            &rect_in_display, 255, vd->source->orientation);
     return VLC_SUCCESS;
 }
@@ -583,8 +571,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     }
 
 #ifndef NDEBUG
-    msg_Dbg(vd, "Direct3D created texture: %ix%i",
-                fmt->i_width, fmt->i_height);
+    msg_Dbg(vd, "Direct3D created texture: %ix%i", width, height);
 #endif
 
     /*
