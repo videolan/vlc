@@ -410,7 +410,7 @@ static inline int demux_SetTime( demux_t *p_demux, vlc_tick_t time, bool precise
  * The provided es_format_t will be cleaned on error or by
  * demux_PacketizerDestroy.
  */
-VLC_API decoder_t * demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) VLC_USED;
+VLC_API decoder_t * demux_PacketizerNew( vlc_object_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) VLC_USED;
 
 /**
  * This function will destroy a packetizer create by demux_PacketizerNew.

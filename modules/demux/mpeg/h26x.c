@@ -360,7 +360,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
         fmt.video.i_frame_rate = p_sys->feed_dts.i_divider_num;
         fmt.video.i_frame_rate_base = p_sys->feed_dts.i_divider_den;
     }
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, psz_module );
+    p_sys->p_packetizer = demux_PacketizerNew( VLC_OBJECT(p_demux), &fmt, psz_module );
     if( !p_sys->p_packetizer )
     {
         free( p_sys );

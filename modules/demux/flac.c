@@ -161,7 +161,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
 
     /* Load the FLAC packetizer */
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "flac" );
+    p_sys->p_packetizer = demux_PacketizerNew( VLC_OBJECT(p_demux), &fmt, "flac" );
     if( !p_sys->p_packetizer )
         goto error;
 

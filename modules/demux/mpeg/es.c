@@ -257,7 +257,7 @@ static int OpenCommon( demux_t *p_demux,
     /* Load the audio packetizer */
     es_format_Init( &fmt, i_cat, p_sys->codec.i_codec );
     fmt.i_original_fourcc = p_sys->i_original;
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, p_sys->codec.psz_name );
+    p_sys->p_packetizer = demux_PacketizerNew( VLC_OBJECT(p_demux), &fmt, p_sys->codec.psz_name );
     if( !p_sys->p_packetizer )
     {
         free( p_sys );

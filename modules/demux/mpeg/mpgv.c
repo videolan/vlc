@@ -135,7 +135,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "mpeg video" );
+    p_sys->p_packetizer = demux_PacketizerNew( VLC_OBJECT(p_demux), &fmt, "mpeg video" );
     if( !p_sys->p_packetizer )
     {
         free( p_sys );
