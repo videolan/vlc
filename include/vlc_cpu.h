@@ -98,8 +98,10 @@ unsigned vlc_CPU_raw(void);
 
 #  ifdef ALTIVEC
 #   define vlc_CPU_ALTIVEC() (1)
+#   define VLC_ALTIVEC
 #  else
 #   define vlc_CPU_ALTIVEC() ((vlc_CPU() & VLC_CPU_ALTIVEC) != 0)
+#   define VLC_ALTIVEC __attribute__ ((__target__ ("altivec")))
 #  endif
 
 # elif defined (__arm__)
