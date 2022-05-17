@@ -1681,8 +1681,6 @@ AS_IF([test "${enable_altivec}" = "yes"], [
          ])])
   VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_altivec_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_ALTIVEC, 1,
-              [Define to 1 if AltiVec inline assembly is available.])
     AS_IF([test "${ac_cv_altivec_inline}" != "yes"], [
       ALTIVEC_CFLAGS="${ac_cv_altivec_inline}"
       VLC_ADD_CFLAGS([libvlccore],[${ac_cv_altivec_inline}])
