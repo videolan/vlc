@@ -300,57 +300,21 @@ void MLPlaylistListModel::endTransaction()
 
 QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 {
-    QString cover = playlist->getCover();
+    auto generator = std::make_shared<CoverGenerator>(playlist->getId());
 
-    // NOTE: Making sure we're not already generating a cover.
-    if (cover.isNull() == false || playlist->hasGenerator())
-        return cover;
+    generator->setCountX(PLAYLIST_COVERX);
+    generator->setCountY(PLAYLIST_COVERY);
 
-    MLItemId playlistId = playlist->getId();
-    struct Context{
-        QString cover;
-    };
-    playlist->setGenerator(true);
-    m_mediaLib->runOnMLThread<Context>(this,
-    //ML thread
-    [playlistId, coverSize = m_coverSize, coverDefault = m_coverDefault, coverPrefix = m_coverPrefix]
-    (vlc_medialibrary_t* ml, Context& ctx)
-    {
-        CoverGenerator generator{ml, playlistId};
+    generator->setSize(m_coverSize);
 
-        generator.setCountX(PLAYLIST_COVERX);
-        generator.setCountY(PLAYLIST_COVERY);
+    if (!m_coverDefault.isEmpty())
+        generator->setDefaultThumbnail(m_coverDefault);
 
-        generator.setSize(coverSize);
+    generator->setPrefix(m_coverPrefix);
 
-        if (!coverDefault.isEmpty())
-            generator.setDefaultThumbnail(coverDefault);
-
-        generator.setPrefix(coverPrefix);
-
-        if (generator.cachedFileAvailable())
-            ctx.cover = generator.cachedFileURL();
-        else
-            ctx.cover = generator.execute(extractMediaThumbnails(ml, PLAYLIST_COVERX * PLAYLIST_COVERY, playlistId));
-    },
-    //UI thread
-    [this, playlistId]
-    (quint64, Context& ctx)
-    {
-        int row;
-        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-        auto playlist = static_cast<MLPlaylist *>(findInCache(playlistId, &row));
-        if (!playlist)
-            return;
-        playlist->setCover(ctx.cover);
-        playlist->setGenerator(false);
-
-        //we're running in a callback
-        QModelIndex modelIndex = index(row);
-        emit const_cast<MLPlaylistListModel*>(this)->dataChanged(modelIndex, modelIndex, { PLAYLIST_THUMBNAIL });
-    });
-
-    return cover;
+    return createGroupMediaCover(this, playlist
+                                 , PLAYLIST_THUMBNAIL
+                                 , generator);
 }
 
 //-------------------------------------------------------------------------------------------------
