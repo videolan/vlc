@@ -137,7 +137,7 @@ QString CoverGenerator::fileName() const
 // QRunnable implementation
 //-------------------------------------------------------------------------------------------------
 
-QString CoverGenerator::execute(QStringList thumbnails)
+QString CoverGenerator::execute(QStringList thumbnails) const
 {
     QDir dir(config_GetUserDir(VLC_CACHE_DIR) + COVERGENERATOR_STORAGE);
 
@@ -221,7 +221,7 @@ QString CoverGenerator::execute(QStringList thumbnails)
 //-------------------------------------------------------------------------------------------------
 
 void CoverGenerator::draw(QPainter & painter,
-                          const QStringList & fileNames, int countX, int countY)
+                          const QStringList & fileNames, int countX, int countY) const
 {
     int count = fileNames.count();
 
@@ -256,7 +256,7 @@ void CoverGenerator::draw(QPainter & painter,
     }
 }
 
-void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, const QRect & target)
+void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, const QRect & target) const
 {
     //QFile expect the :/ instead of qrc:// for resources files
     const QUrl fileURL {fileName};
@@ -317,7 +317,7 @@ void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, con
 
 //-------------------------------------------------------------------------------------------------
 
-void CoverGenerator::blur(QImage& image)
+void CoverGenerator::blur(QImage& image) const
 {
     if (Q_LIKELY(&qt_blurImage))
     {

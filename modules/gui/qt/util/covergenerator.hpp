@@ -76,16 +76,16 @@ public: // Interface
 
     QString cachedFileURL() const;
 
-    QString execute(QStringList thumbnails);
+    QString execute(QStringList thumbnails) const;
 
 private: // Functions
     QString fileName() const;
 
-    void draw(QPainter & painter, const QStringList & fileNames, int countX, int countY);
+    void draw(QPainter & painter, const QStringList & fileNames, int countX, int countY) const;
 
-    void drawImage(QPainter & painter, const QString & fileName, const QRect & rect);
+    void drawImage(QPainter & painter, const QString & fileName, const QRect & rect) const;
 
-    void blur(QImage &image);
+    void blur(QImage &image) const;
 
     QString getPrefix(vlc_ml_parent_type type) const;
 
