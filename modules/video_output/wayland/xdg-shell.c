@@ -343,7 +343,7 @@ static void xdg_toplevel_configure_bounds_cb(
         int32_t width, int32_t height
 ){
     // TODO for tiling window managers
-    vout_window_t *wnd = data;
+    vlc_window_t *wnd = data;
     vout_window_sys_t *sys = wnd->sys;
 
     msg_Dbg(wnd, "window configure bounds: %" PRId32 "x%" PRId32,
