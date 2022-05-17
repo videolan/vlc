@@ -85,6 +85,15 @@ HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_)
 
 HTTPConnectionManager::~HTTPConnectionManager   ()
 {
+    while(!cache.empty())
+    {
+        HTTPChunkBufferedSource *purged = cache.back();
+        cache.pop_back();
+        cache_total -= purged->contentLength;
+        CacheDebug(msg_Dbg(p_object, "Cache DEL '%s' usage %u bytes",
+                            purged->getStorageID().c_str(), cache_total));
+        deleteSource(purged);
+    }
     delete downloader;
     delete downloaderhp;
     this->closeAllConnections();
