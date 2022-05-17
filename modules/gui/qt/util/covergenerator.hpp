@@ -48,7 +48,7 @@ public: // Enums
     };
 
 public:
-    CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId);
+    CoverGenerator(const MLItemId & itemId);
 
 public: // Interface
     MLItemId getId();
@@ -90,8 +90,6 @@ private: // Functions
     QString getPrefix(vlc_ml_parent_type type) const;
 
 private:
-    vlc_medialibrary_t * m_ml;
-
     MLItemId m_id;
 
     QSize m_size;

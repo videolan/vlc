@@ -53,9 +53,8 @@ static const QString COVERGENERATOR_DEFAULT = ":/noart_albumCover.svg";
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId)
-    : m_ml(ml)
-    , m_id(itemId)
+CoverGenerator::CoverGenerator(const MLItemId & itemId)
+    : m_id(itemId)
     , m_countX(COVERGENERATOR_COUNT)
     , m_countY(COVERGENERATOR_COUNT)
     , m_split(Divide)
