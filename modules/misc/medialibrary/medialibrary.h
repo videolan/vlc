@@ -189,7 +189,6 @@ private:
     MediaLibrary( vlc_medialibrary_module_t* vlc_ml, medialibrary::IMediaLibrary* ml );
 
     vlc_medialibrary_module_t* m_vlc_ml;
-    std::unique_ptr<Logger> m_logger;
     std::unique_ptr<medialibrary::IMediaLibrary> m_ml;
 
     vlc::threads::mutex m_mutex;
@@ -202,7 +201,6 @@ public:
     virtual void onMediaAdded(std::vector<medialibrary::MediaPtr> media) override;
     virtual void onMediaModified(std::set<int64_t> media) override;
     virtual void onMediaDeleted(std::set<int64_t> mediaIds) override;
-    virtual void onMediaConvertedToExternal(std::set<int64_t> mediaIds) override;
     virtual void onArtistsAdded(std::vector<medialibrary::ArtistPtr> artists) override;
     virtual void onArtistsModified(std::set<int64_t> artists) override;
     virtual void onArtistsDeleted(std::set<int64_t> artistsIds) override;

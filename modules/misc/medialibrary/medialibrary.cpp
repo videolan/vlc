@@ -150,10 +150,6 @@ void MediaLibrary::onMediaDeleted( std::set<int64_t> mediaIds )
     wrapEntityDeletedEventCallback( m_vlc_ml, mediaIds, VLC_ML_EVENT_MEDIA_DELETED );
 }
 
-void MediaLibrary::onMediaConvertedToExternal(std::set<int64_t>)
-{
-}
-
 void MediaLibrary::onArtistsAdded( std::vector<medialibrary::ArtistPtr> artists )
 {
     wrapEntityCreatedEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_ADDED );
@@ -416,6 +412,9 @@ MediaLibrary* MediaLibrary::create( vlc_medialibrary_module_t* vlc_ml )
     cfg.parserServices = {
         std::make_shared<MetadataExtractor>( VLC_OBJECT( vlc_ml ) )
     };
+    cfg.logLevel = var_InheritBool( VLC_OBJECT( vlc_ml ), "ml-verbose" ) ?
+                        medialibrary::LogLevel::Debug : medialibrary::LogLevel::Warning;
+    cfg.logger = std::make_shared<Logger>( VLC_OBJECT( vlc_ml ) );
 
     auto ml = NewMediaLibrary( dbPath.c_str(), mlFolderPath.c_str(), true, &cfg );
     if ( !ml )
@@ -429,10 +428,6 @@ MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* vlc_ml,
     : m_vlc_ml( vlc_ml )
     , m_ml( ml )
 {
-    m_logger.reset( new Logger( VLC_OBJECT( m_vlc_ml ) ) );
-    m_ml->setVerbosity( var_InheritBool( VLC_OBJECT( m_vlc_ml ), "ml-verbose" ) ?
-                          medialibrary::LogLevel::Debug : medialibrary::LogLevel::Warning );
-    m_ml->setLogger( m_logger.get() );
 }
 
 bool MediaLibrary::Init()
