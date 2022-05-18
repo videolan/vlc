@@ -36,6 +36,7 @@
 #include <vlc_vout.h>
 #include <vlc_aout.h>
 #include <vlc_actions.h>
+#include <vlc_modules.h>
 
 #include "libvlc_internal.h"
 #include "media_player_internal.h"
@@ -577,6 +578,7 @@ libvlc_media_player_t *
 libvlc_media_player_new( libvlc_instance_t *instance )
 {
     libvlc_media_player_t * mp;
+    int doinherit;
 
     assert(instance);
 
@@ -654,15 +656,16 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
     var_Create (mp, "osd", VLC_VAR_BOOL); // off
 
-    var_Create (mp, "marq-marquee", VLC_VAR_STRING);
-    var_Create (mp, "marq-color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-opacity", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-refresh", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-size", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "marq-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    doinherit = module_exists("marq") ? VLC_VAR_DOINHERIT : 0;
+    var_Create(mp, "marq-marquee", VLC_VAR_STRING);
+    var_Create(mp, "marq-color", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-opacity", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-position", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-refresh", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-size", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-timeout", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-x", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "marq-y", VLC_VAR_INTEGER | doinherit);
 
     var_Create (mp, "logo-file", VLC_VAR_STRING);
     var_Create (mp, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
