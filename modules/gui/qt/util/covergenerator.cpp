@@ -272,8 +272,8 @@ void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, con
 {
     //QFile expect the :/ instead of qrc:// for resources files
     const QUrl fileURL {fileName};
-    const QString adaptedFilename = fileURL.scheme().isEmpty() ? fileName : QQmlFile::urlToLocalFileOrQrc(fileURL);
-    QFile file(adaptedFilename);
+    const QString adaptedFilename = QQmlFile::urlToLocalFileOrQrc(fileURL);
+    QFile file(adaptedFilename.isEmpty() ? fileName : adaptedFilename);
 
     if (file.open(QIODevice::ReadOnly) == false)
     {
