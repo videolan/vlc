@@ -518,8 +518,12 @@ static int PlaylistItemInfo(struct cli_client *cl, const char *const *args,
     input_item_t *item;
 
     vlc_playlist_Lock(playlist);
-    idx = vlc_playlist_GetCurrentIndex(playlist);
-    if (idx >= 0)
+    if (count >= 2)
+        idx = atoi(args[1]);
+    else
+        idx = vlc_playlist_GetCurrentIndex(playlist);
+
+    if ((size_t)idx < vlc_playlist_Count(playlist))
         item = vlc_playlist_item_GetMedia(vlc_playlist_Get(playlist, idx));
     else
         item = NULL;
