@@ -493,6 +493,7 @@ static void ItemPrint(struct cli_client *cl, input_item_t *item)
 {
     vlc_meta_t *meta;
     info_category_t *category;
+    char **extras;
 
     vlc_mutex_lock(&item->lock);
     meta = item->p_meta;
@@ -504,6 +505,16 @@ static void ItemPrint(struct cli_client *cl, input_item_t *item)
 
         if (s != NULL)
             cli_printf(cl, "| %s: %s", vlc_meta_TypeToString(i), s);
+    }
+
+    extras = vlc_meta_CopyExtraNames(meta);
+    if (extras != NULL) {
+        for (size_t i = 0; extras[i] != NULL; i++) {
+             cli_printf(cl, "| %s: %s", extras[i],
+                        vlc_meta_GetExtra(meta, extras[i]));
+             free(extras[i]);
+        }
+        free(extras);
     }
 
     cli_printf(cl, "| ");
