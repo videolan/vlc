@@ -68,7 +68,10 @@ dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
+AC_LANG_PUSH([C++])
 AX_CXX_COMPILE_STDCXX_14([noext], [mandatory])
+AX_CXX_TYPEOF
+AC_LANG_POP([C++])
 
 dnl Check the compiler supports atomics in C
 AC_MSG_CHECKING([C atomics])
