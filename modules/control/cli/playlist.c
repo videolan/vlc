@@ -506,7 +506,7 @@ static void ItemPrint(struct cli_client *cl, input_item_t *item)
             cli_printf(cl, "| %s: %s", info->psz_name, info->psz_value);
         cli_printf(cl, "| ");
     }
-    cli_printf(cl, "+----[ end of stream info ]");
+    cli_printf(cl, "+----[ %s ]", "end of stream info");
     vlc_mutex_unlock(&item->lock);
 }
 
