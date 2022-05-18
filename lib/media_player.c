@@ -667,13 +667,14 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create(mp, "marq-x", VLC_VAR_INTEGER | doinherit);
     var_Create(mp, "marq-y", VLC_VAR_INTEGER | doinherit);
 
-    var_Create (mp, "logo-file", VLC_VAR_STRING);
-    var_Create (mp, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "logo-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "logo-repeat", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "logo-opacity", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-    var_Create (mp, "logo-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    doinherit = module_exists("logo") ? VLC_VAR_DOINHERIT : 0;
+    var_Create(mp, "logo-file", VLC_VAR_STRING);
+    var_Create(mp, "logo-x", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "logo-y", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "logo-delay", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "logo-repeat", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "logo-opacity", VLC_VAR_INTEGER | doinherit);
+    var_Create(mp, "logo-position", VLC_VAR_INTEGER | doinherit);
 
     var_Create (mp, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     var_Create (mp, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
