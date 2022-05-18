@@ -895,7 +895,7 @@ shouldInheritContentsScale:(CGFloat)newScale
                 sys->cfg.display.width = newSize.width;
                 sys->cfg.display.height = newSize.height;
 
-                vout_display_PlacePicture(&sys->place, _voutDisplay->source, &sys->cfg);
+                vout_display_PlacePicture(&sys->place, _voutDisplay->source, &sys->cfg.display);
             }
         }
 
