@@ -489,6 +489,50 @@ static int PlaylistMove(struct cli_client *cl, const char *const *args,
     return ret;
 }
 
+static void ItemPrint(struct cli_client *cl, input_item_t *item)
+{
+    info_category_t *category;
+
+    vlc_mutex_lock(&item->lock);
+    vlc_list_foreach(category, &item->categories, node) {
+        info_t *info;
+
+        if (info_category_IsHidden(category))
+            continue;
+
+        cli_printf(cl, "+----[ %s ]", category->psz_name);
+        cli_printf(cl, "| ");
+        info_foreach(info, &category->infos)
+            cli_printf(cl, "| %s: %s", info->psz_name, info->psz_value);
+        cli_printf(cl, "| ");
+    }
+    cli_printf(cl, "+----[ end of stream info ]");
+    vlc_mutex_unlock(&item->lock);
+}
+
+static int PlaylistItemInfo(struct cli_client *cl, const char *const *args,
+                            size_t count, void *data)
+{
+    vlc_playlist_t *playlist = data;
+    ssize_t idx;
+    input_item_t *item;
+
+    vlc_playlist_Lock(playlist);
+    idx = vlc_playlist_GetCurrentIndex(playlist);
+    if (idx >= 0)
+        item = vlc_playlist_item_GetMedia(vlc_playlist_Get(playlist, idx));
+    else
+        item = NULL;
+
+    if (item != NULL)
+        ItemPrint(cl, item);
+    else
+        cli_printf(cl, "no input");
+    vlc_playlist_Unlock(playlist);
+    (void) args; (void) count;
+    return (item != NULL) ? 0 : VLC_ENOENT;
+}
+
 static const struct cli_handler cmds[] =
 {
     { "playlist", PlaylistList },
@@ -505,6 +549,7 @@ static const struct cli_handler cmds[] =
     { "enqueue", PlaylistEnqueue },
     { "goto", PlaylistGoto },
     { "move", PlaylistMove },
+    { "info", PlaylistItemInfo },
 };
 
 void RegisterPlaylist(intf_thread_t *intf)
