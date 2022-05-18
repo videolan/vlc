@@ -491,9 +491,23 @@ static int PlaylistMove(struct cli_client *cl, const char *const *args,
 
 static void ItemPrint(struct cli_client *cl, input_item_t *item)
 {
+    vlc_meta_t *meta;
     info_category_t *category;
 
     vlc_mutex_lock(&item->lock);
+    meta = item->p_meta;
+    cli_printf(cl, "+----[ %s ]", "Meta data");
+    cli_printf(cl, "| ");
+
+    for (int i = 0; i < VLC_META_TYPE_COUNT; i++) {
+        const char *s = vlc_meta_Get(meta, i);
+
+        if (s != NULL)
+            cli_printf(cl, "| %s: %s", vlc_meta_TypeToString(i), s);
+    }
+
+    cli_printf(cl, "| ");
+
     vlc_list_foreach(category, &item->categories, node) {
         info_t *info;
 
