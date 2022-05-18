@@ -45,10 +45,9 @@ struct vlc_meta_t
     int i_status;
 };
 
-/* FIXME bad name convention */
-const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
+const char *vlc_meta_TypeToString(vlc_meta_type_t meta_type)
 {
-    static const char posix_names[][18] =
+    static const char posix_names[VLC_META_TYPE_COUNT][18] =
     {
         [vlc_meta_Title]       = N_("Title"),
         [vlc_meta_Artist]      = N_("Artist"),
@@ -79,9 +78,15 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
         [vlc_meta_DiscTotal]   = N_("Total disc number")
     };
 
-    assert (meta_type < ARRAY_SIZE(posix_names));
-    assert (strlen(posix_names[meta_type]));
-    return vlc_gettext (posix_names[meta_type]);
+    assert(meta_type < ARRAY_SIZE(posix_names));
+    assert(posix_names[meta_type][0] != '\0');
+    return posix_names[meta_type];
+}
+
+/* FIXME bad name convention */
+const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
+{
+    return vlc_gettext(vlc_meta_TypeToString(meta_type));
 }
 
 

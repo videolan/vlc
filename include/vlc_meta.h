@@ -91,6 +91,8 @@ VLC_API void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src );
 VLC_API int vlc_meta_GetStatus( vlc_meta_t *m );
 VLC_API void vlc_meta_SetStatus( vlc_meta_t *m, int status );
 
+VLC_API const char *vlc_meta_TypeToString(vlc_meta_type_t meta_type);
+
 /**
  * Returns a localizes string describing the meta
  */
