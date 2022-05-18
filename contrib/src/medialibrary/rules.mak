@@ -1,8 +1,8 @@
-MEDIALIBRARY_VERSION := 0.11.2
+MEDIALIBRARY_VERSION := 0.12.0
 MEDIALIBRARY_URL := https://code.videolan.org/videolan/medialibrary/-/archive/$(MEDIALIBRARY_VERSION)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
 
 PKGS += medialibrary
-ifeq ($(call need_pkg,"medialibrary >= 0.11.0"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.12.0"),)
 PKGS_FOUND += medialibrary
 endif
 
