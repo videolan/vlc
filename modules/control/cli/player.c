@@ -503,6 +503,27 @@ static int PlayerRecord(struct cli_client *cl, const char *const *args,
     return 0;
 }
 
+static void ItemPrint(struct cli_client *cl, input_item_t *item)
+{
+    info_category_t *category;
+
+    vlc_mutex_lock(&item->lock);
+    vlc_list_foreach(category, &item->categories, node) {
+        info_t *info;
+
+        if (info_category_IsHidden(category))
+            continue;
+
+        cli_printf(cl, "+----[ %s ]", category->psz_name);
+        cli_printf(cl, "| ");
+        info_foreach(info, &category->infos)
+            cli_printf(cl, "| %s: %s", info->psz_name, info->psz_value);
+        cli_printf(cl, "| ");
+    }
+    cli_printf(cl, "+----[ end of stream info ]");
+    vlc_mutex_unlock(&item->lock);
+}
+
 static int PlayerItemInfo(struct cli_client *cl, const char *const *args,
                           size_t count, void *data)
 {
@@ -511,28 +532,8 @@ static int PlayerItemInfo(struct cli_client *cl, const char *const *args,
 
     vlc_player_Lock(player);
     item = vlc_player_GetCurrentMedia(player);
-
     if (item != NULL)
-    {
-        vlc_mutex_lock(&item->lock);
-        info_category_t *category;
-        vlc_list_foreach(category, &item->categories, node)
-        {
-            info_t *info;
-
-            if (info_category_IsHidden(category))
-                continue;
-
-            cli_printf(cl, "+----[ %s ]", category->psz_name);
-            cli_printf(cl, "| ");
-            info_foreach(info, &category->infos)
-                cli_printf(cl, "| %s: %s", info->psz_name,
-                           info->psz_value);
-            cli_printf(cl, "| ");
-        }
-        cli_printf(cl, "+----[ end of stream info ]");
-        vlc_mutex_unlock(&item->lock);
-    }
+        ItemPrint(cl, item);
     else
         cli_printf(cl, "no input");
     vlc_player_Unlock(player);
