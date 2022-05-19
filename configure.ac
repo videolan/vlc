@@ -454,7 +454,7 @@ AM_COND_IF([HAVE_X86ASM], [
 dnl  Because DOLT is not able to handle --with-pic
 dnl  correctly, manually add -DPIC to the options for
 dnl  nasm / yasm here.
-AS_IF([test x$with_pic = xyes], [X86ASMDEFS="${X86ASMDEFS} -DPIC"])
+AS_IF([test "$with_pic" = "yes"], [X86ASMDEFS="${X86ASMDEFS} -DPIC"])
 
 AC_SUBST([X86ASMFLAGS])
 AC_SUBST([X86ASMDEFS])
@@ -699,7 +699,7 @@ AC_PREPROC_IFELSE([AC_LANG_SOURCE([
   AC_MSG_RESULT([not present])
 ], [
   AC_MSG_RESULT([found])
-  AS_IF([test "x${enable_nls}" != "xno"], [
+  AS_IF([test "${enable_nls}" != "no"], [
     AC_MSG_ERROR([Buggy GNU/libc (version 2.5 - 2.7) present. VLC would crash; there is no viable
 work-around for this. Check with your distribution vendor on how to update the
 glibc run-time. Alternatively, build with --disable-nls.])
@@ -1782,7 +1782,7 @@ then
        AC_CHECK_HEADERS([lua.h lauxlib.h lualib.h], [ have_lua=yes ], []) ])
   ])
 
-  if test "x${have_lua}" != "xyes" ;  then
+  if test "${have_lua}" != "yes" ;  then
       AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
   AC_ARG_VAR([LUAC], [LUA byte compiler])
@@ -2147,7 +2147,7 @@ if test "${enable_screen}" != "no"; then
     ])
   fi
 fi
-AM_CONDITIONAL([HAVE_MAC_SCREEN], [test "${SYS}" = "darwin" -a "x${enable_screen}" != "xno"])
+AM_CONDITIONAL([HAVE_MAC_SCREEN], [test "${SYS}" = "darwin" -a "${enable_screen}" != "no"])
 
 dnl
 dnl  VNC/RFB access module
@@ -2163,7 +2163,7 @@ dnl AVFoundation
 AC_SUBST([have_avfoundation], ["no"])
 AC_ARG_ENABLE([macosx-avfoundation],
   AS_HELP_STRING([--enable-macosx-avfoundation], [Mac OS X avcapture (video) module (default enabled on Mac OS X)]))
-if test "x${enable_macosx_avfoundation}" != "xno" &&
+if test "${enable_macosx_avfoundation}" != "no" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_avfoundation}" = "yes")
 then
   SAVED_LIBS="${LIBS}"
@@ -2245,7 +2245,7 @@ AS_IF([test "${enable_sid}" != "no"], [
         CPPFLAGS="$oldCPPFLAGS"
         AC_LANG_POP(C++)
     ], [
-        AS_IF([test "x${enable_sid}" = "xyes"],
+        AS_IF([test "${enable_sid}" = "yes"],
             [AC_MSG_ERROR([${SID_PKG_ERRORS} (required for sid).])],
             [AC_MSG_WARN([${SID_PKG_ERRORS} (required for sid).])]
             )
@@ -2482,7 +2482,7 @@ AC_ARG_ENABLE([dxva2],
 have_avcodec_dxva2="no"
 AS_IF([test "${enable_dxva2}" != "no"], [
   if test "${SYS}" = "mingw32"; then
-  AS_IF([test "x${have_avcodec}" = "xyes"], [
+  AS_IF([test "${have_avcodec}" = "yes"], [
     AC_CHECK_HEADERS([dxva2api.h],
       [
         AC_CHECK_HEADERS([libavcodec/dxva2.h], [
@@ -2516,7 +2516,7 @@ AC_ARG_ENABLE([d3d11va],
 have_avcodec_d3d11va="no"
 AS_IF([test "${enable_d3d11va}" != "no"], [
   if test "${SYS}" = "mingw32"; then
-  AS_IF([test "x${have_avcodec}" = "xyes"], [
+  AS_IF([test "${have_avcodec}" = "yes"], [
         AC_CHECK_TYPES([ID3D11VideoDecoder],
           [
             AC_CHECK_HEADERS([dxva2api.h],
@@ -2655,7 +2655,7 @@ PKG_WITH_MODULES([FAAD],[faad2],
   VLC_ADD_PLUGIN(faad)
   VLC_ADD_CFLAGS(faad, [$FAAD_CFLAGS])
   VLC_ADD_LIBS(faad,[$FAAD_LIBS]),
-  AS_IF([test "x${enable_faad}" != "xno"],[
+  AS_IF([test "${enable_faad}" != "no"],[
     AC_CHECK_HEADERS([neaacdec.h], [
       AC_CHECK_LIB([faad], [NeAACDecOpen],[
                       VLC_ADD_PLUGIN([faad])
@@ -2663,8 +2663,8 @@ PKG_WITH_MODULES([FAAD],[faad2],
                       found_faad="yes"
                    ],[], [$LIBM])
     ])
-    AS_IF([test "x${found_faad}" != "xyes"],
-        AS_IF([test "x${enable_faad}" == "xyes"],
+    AS_IF([test "${found_faad}" != "yes"],
+        AS_IF([test "${enable_faad}" == "yes"],
             AC_MSG_ERROR([${FAAD_PKG_ERRORS}.]),
             AC_MSG_WARN([${FAAD_PKG_ERRORS}.]))
     )
@@ -3021,7 +3021,7 @@ AS_IF( [test "${enable_aribsub}" != "no" ],[
       have_aribb24="no"
   ])
 ])
-AM_CONDITIONAL([HAVE_ARIBB24], [test x"${have_aribb24}" = x"yes"])
+AM_CONDITIONAL([HAVE_ARIBB24], [test "${have_aribb24}" = "yes"])
 
 dnl
 dnl ARIB B25
@@ -3783,14 +3783,14 @@ dnl
 AC_ARG_VAR(PROTOC, [protobuf compiler])
 dnl Intentionally using prefixed binaries for native tool in contribs
 AC_CHECK_TOOL(PROTOC, protoc, no)
-AS_IF([test "x${PROTOC}" != "xno"], [
+AS_IF([test "${PROTOC}" != "no"], [
     protoc_ver="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '//)"
 ],[
     protoc_ver="3.1.0"
 ])
 m4_pushdef([protobuf_lite_version], ${protoc_ver})
 PKG_WITH_MODULES([CHROMECAST],[protobuf-lite = protobuf_lite_version], [
-    AS_IF([test "x${PROTOC}" != "xno"], [
+    AS_IF([test "${PROTOC}" != "no"], [
         build_chromecast="yes"
     ], [
     AC_MSG_ERROR(protoc compiler needed for [chromecast] was not found)
@@ -3836,7 +3836,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(QMLCACHE, [qmlcachegen-qt5 qmlcachegen], no, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
-      AS_IF([test "x${QMLCACHE}" = "xno"], [
+      AS_IF([test "${QMLCACHE}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
     ], [
@@ -3852,7 +3852,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 AC_ARG_ENABLE([qt-qml-cache],
   AS_HELP_STRING([--enable-qt-qml-cache],
     [enable qml cache generation]))
-AM_CONDITIONAL([HAVE_QMLCACHE], [test "${enable_qt_qml_cache}" = "yes" && test "x$QMLCACHE" != "xno"])
+AM_CONDITIONAL([HAVE_QMLCACHE], [test "${enable_qt_qml_cache}" = "yes" && test "$QMLCACHE" != "no"])
 
 AC_ARG_ENABLE([qt-qml-debug],
   AS_HELP_STRING([--enable-qt-qml-debug], [enable qml debuger]))
@@ -3934,7 +3934,7 @@ dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE([macosx],
   AS_HELP_STRING([--enable-macosx], [Mac OS X gui support (default enabled on Mac OS X)]))
-if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
+if test "${enable_macosx}" != "no" -a "${SYS}" = "darwin"
 then
 
   dnl
@@ -3942,7 +3942,7 @@ then
   dnl
 
   AC_PATH_PROG([XCRUN], [xcrun], [no])
-  AS_IF([test ! "x${XCRUN}" = "xno"], [
+  AS_IF([test ! "${XCRUN}" = "no"], [
     AC_MSG_CHECKING([for ibtool (using xcrun)])
     XIB="$(eval $XCRUN -f ibtool 2>/dev/null || echo no)"
     AC_MSG_RESULT([${XIB}])
@@ -3950,9 +3950,9 @@ then
     AC_MSG_WARN([Looking for tools without using xcrun])
   ])
 
-  AS_IF([test "x${XIB}" = "xno"], [
+  AS_IF([test "${XIB}" = "no"], [
     AC_PATH_PROG(XIB, [ibtool], [no])
-    AS_IF([test "x${XIB}" = "xno"], [
+    AS_IF([test "${XIB}" = "no"], [
       AC_MSG_ERROR([ibtool was not found, but is required for --enable-macosx])
     ])
   ])
@@ -3964,7 +3964,7 @@ dnl  MacOS X sparkle update support
 dnl
 AC_ARG_ENABLE([sparkle],
   AS_HELP_STRING([--enable-sparkle], [Sparkle update support for OS X (default enabled on Mac OS X)]))
-if test "x${enable_sparkle}" != "xno" -a "${HAVE_OSX}" = "1"
+if test "${enable_sparkle}" != "no" -a "${HAVE_OSX}" = "1"
 then
   if test ! -d ${CONTRIB_DIR}/Sparkle.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Sparkle.framework
   then
@@ -4027,11 +4027,11 @@ dnl
 if test "${HAVE_OSX}" = "1"
 then
   AC_PATH_PROG(DMGBUILD, dmgbuild, no)
-  AS_IF([test "x${DMGBUILD}" = "xno"], [
+  AS_IF([test "${DMGBUILD}" = "no"], [
     AC_MSG_WARN([dmgbuild not found -- unable to build fancy DMGs])
   ])
 fi
-AM_CONDITIONAL([HAVE_DMGBUILD], [test "x$DMGBUILD" != "xno" -a "${HAVE_OSX}" = "1"])
+AM_CONDITIONAL([HAVE_DMGBUILD], [test "$DMGBUILD" != "no" -a "${HAVE_OSX}" = "1"])
 
 dnl
 dnl  VideoToolbox plugins
@@ -4366,7 +4366,7 @@ AS_IF([test "${SYS}" = "mingw32"], [
     dnl
     AC_PATH_PROG([SEVENZIP], [7z], [7z])
 ])
-AM_CONDITIONAL([HAVE_MAKENSIS], [test "x$MAKENSIS" != "xno" && test "$nsis_version_ok" = "yes"])
+AM_CONDITIONAL([HAVE_MAKENSIS], [test "$MAKENSIS" != "no" && test "$nsis_version_ok" = "yes"])
 
 dnl
 dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY
