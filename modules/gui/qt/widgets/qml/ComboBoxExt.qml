@@ -95,6 +95,10 @@ ComboBox {
 
     popup: Popup {
         y: control.height - 1
+
+        // NOTE: This Popup should be on top of other Popup(s) most of the time.
+        z: 100
+
         width: control.width
         implicitHeight: contentItem.implicitHeight
         padding: 1
