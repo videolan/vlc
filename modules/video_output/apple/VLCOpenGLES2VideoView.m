@@ -145,7 +145,7 @@ static void Close(vlc_gl_t *gl)
 {
     _gl = gl;
 
-    _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
+    _appActive = ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground);
     if (unlikely(!_appActive))
         return nil;
 
