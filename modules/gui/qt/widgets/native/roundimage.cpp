@@ -131,6 +131,13 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     auto node = static_cast<QSGImageNode *>(oldNode);
 
+    if (m_roundImage.isNull())
+    {
+        delete oldNode;
+        m_dirty = false;
+        return nullptr;
+    }
+
     if (!node)
     {
         assert(window());
@@ -141,28 +148,25 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
     if (m_dirty)
     {
-        if (!m_roundImage.isNull())
-        {
-            assert(window());
-
-            QSGTexture* texture = window()->createTextureFromImage(m_roundImage,
-                static_cast<QQuickWindow::CreateTextureOptions>((Q_LIKELY(m_roundImage.hasAlphaChannel()) ? QQuickWindow::TextureHasAlphaChannel
-                                                                                                          : 0) |
-                                                                QQuickWindow::TextureCanUseAtlas));
-
-            if (texture)
-            {
-                // No need to delete the old texture manually as it is owned by the node.
-                node->setTexture(texture);
-                node->markDirty(QSGNode::DirtyMaterial);
-            }
-            else
-            {
-                qmlWarning(this) << "Could not generate texture from " << m_roundImage;
-            }
-        }
-
         m_dirty = false;
+        assert(window());
+
+        QQuickWindow::CreateTextureOptions flags = QQuickWindow::TextureCanUseAtlas;
+        if (Q_LIKELY(m_roundImage.hasAlphaChannel()))
+            flags |= QQuickWindow::TextureHasAlphaChannel;
+
+        QSGTexture* texture = window()->createTextureFromImage(m_roundImage, flags);
+
+        if (texture)
+        {
+            // No need to delete the old texture manually as it is owned by the node.
+            node->setTexture(texture);
+            node->markDirty(QSGNode::DirtyMaterial);
+        }
+        else
+        {
+            qmlWarning(this) << "Could not generate texture from " << m_roundImage;
+        }
     }
 
     node->setRect(boundingRect());
@@ -229,6 +233,12 @@ void RoundImage::regenerateRoundImage()
 {
     if (!isComponentComplete() || m_enqueuedGeneration)
         return;
+
+    // remove old contents
+    m_dirty = true;
+    m_roundImage = {};
+    update();
+    setFlag(ItemHasContents, false); // update() is still required
 
     m_roundImageGenerator.reset();
 
