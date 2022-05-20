@@ -1952,6 +1952,11 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
     vlc_mutex_lock(&sys->display_lock);
     if (sys->display != NULL)
         vout_FilterFlush(sys->display);
+
+    /* Arbitrary initial time */
+    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
+    vout_chrono_Init(&sys->static_filter, 4, VLC_TICK_FROM_MS(0));
+
     vlc_mutex_unlock(&sys->display_lock);
 
     if (sys->clock != NULL)
@@ -2593,10 +2598,6 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     sys->window_enabled = false;
     vlc_mutex_init(&sys->window_lock);
 
-    /* Arbitrary initial time */
-    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
-    vout_chrono_Init(&sys->static_filter, 4, VLC_TICK_FROM_MS(0));
-
     if (var_InheritBool(vout, "video-wallpaper"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
@@ -2745,6 +2746,10 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     sys->delay = 0;
     sys->rate = 1.f;
     sys->clock = cfg->clock;
+
+    /* Arbitrary initial time */
+    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
+    vout_chrono_Init(&sys->static_filter, 4, VLC_TICK_FROM_MS(0));
 
     if (vout_Start(vout, vctx, cfg))
     {
