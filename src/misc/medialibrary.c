@@ -274,11 +274,16 @@ void vlc_ml_media_release( vlc_ml_media_t* p_media )
     free( p_media );
 }
 
+static void vlc_folder_release_inner( vlc_ml_folder_t* p_folder )
+{
+    free( p_folder->psz_mrl );
+}
+
 void vlc_ml_folder_release( vlc_ml_folder_t* p_folder )
 {
     if ( p_folder == NULL )
         return;
-    free( p_folder->psz_mrl );
+    vlc_folder_release_inner( p_folder );
     free( p_folder );
 }
 
@@ -371,7 +376,7 @@ void vlc_ml_folder_list_release( vlc_ml_folder_list_t* p_list )
     if ( p_list == NULL )
         return;
     for ( size_t i = 0; i < p_list->i_nb_items; ++i )
-        free( p_list->p_items[i].psz_mrl );
+        vlc_folder_release_inner( &p_list->p_items[i] );
     free( p_list );
 }
 
