@@ -276,6 +276,7 @@ void vlc_ml_media_release( vlc_ml_media_t* p_media )
 
 static void vlc_folder_release_inner( vlc_ml_folder_t* p_folder )
 {
+    free( p_folder->psz_name );
     free( p_folder->psz_mrl );
 }
 
