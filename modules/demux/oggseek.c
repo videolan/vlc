@@ -48,6 +48,7 @@
 #define SEGMENT_NOT_FOUND -1
 
 #define MAX_PAGE_SIZE 65307
+#define MIN_PAGE_SIZE 27
 typedef struct packetStartCoordinates
 {
     int64_t i_pos;
@@ -980,7 +981,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
     {
         /* Otherwise, we just sync to the next keyframe we meet */
         i_pagepos = OggForwardSeekToFrame( p_demux,
-                __MAX ( i_size - MAX_PAGE_SIZE, p_stream->i_data_start ),
+                __MAX ( i_size - MIN_PAGE_SIZE, p_stream->i_data_start ),
                 stream_Size( p_demux->s ),
                 p_stream, i_granule, false );
     }
