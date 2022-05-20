@@ -578,6 +578,29 @@ void vlc_latch_wait(vlc_latch_t *latch)
     while (!vlc_latch_is_ready(latch));
 }
 
+void vlc_queuedmutex_init(vlc_queuedmutex_t *m)
+{
+    atomic_init(&m->head, 0);
+    atomic_init(&m->tail, 0);
+}
+
+void vlc_queuedmutex_lock(vlc_queuedmutex_t *m)
+{
+    uint_fast32_t ticket = atomic_fetch_add_explicit(&m->tail, 1,
+                                                     memory_order_relaxed);
+    uint_fast32_t head;
+
+    while ((head = atomic_load_explicit(&m->head,
+                                        memory_order_acquire)) != ticket)
+        vlc_atomic_wait(&m->head, head);
+}
+
+void vlc_queuedmutex_unlock(vlc_queuedmutex_t *m)
+{
+    atomic_fetch_add_explicit(&m->head, 1, memory_order_release);
+    vlc_atomic_notify_all(&m->head);
+}
+
 enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
 static_assert (VLC_ONCE_DONE == 3, "Check vlc_once in header file");

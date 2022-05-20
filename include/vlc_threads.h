@@ -649,6 +649,33 @@ VLC_API void vlc_latch_wait(vlc_latch_t *);
 
 /** @} */
 
+/*
+ * Queued mutex
+ *
+ * A queued mutex is a type of thread-safe mutual exclusion lock that is
+ * acquired in strict FIFO order.
+ *
+ * In most cases, a regular mutex (\ref vlc_mutex_t) should be used instead.
+ * There are important differences:
+ * - A queued mutex is generally slower, especially on the fast path.
+ * - A queued mutex cannot be combined with a condition variable.
+ *   Indeed, the scheduling policy of the condition variable would typically
+ *   conflict with that of the queued mutex, leading to a dead lock.
+ * - The try-lock operation is not implemented.
+ */
+typedef struct {
+    atomic_uint head;
+    atomic_uint tail;
+} vlc_queuedmutex_t;
+
+#define VLC_STATIC_QUEUEDMUTEX { ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0) }
+
+void vlc_queuedmutex_init(vlc_queuedmutex_t *m);
+
+void vlc_queuedmutex_lock(vlc_queuedmutex_t *m);
+
+void vlc_queuedmutex_unlock(vlc_queuedmutex_t *m);
+
 /**
  * One-time initialization.
  *
