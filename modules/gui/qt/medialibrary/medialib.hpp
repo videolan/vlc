@@ -245,7 +245,7 @@ public:
         setAutoDelete(false);
     }
 
-    void run()
+    void run() override
     {
         if (m_canceled)
         {
