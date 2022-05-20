@@ -28,7 +28,8 @@ TracksPage {
     // Children
 
     PlaybackSpeed {
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
 
         Navigation.parentItem: root
     }
