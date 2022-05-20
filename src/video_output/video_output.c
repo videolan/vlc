@@ -1182,6 +1182,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                     if (system_pts != VLC_TICK_MAX &&
                         IsPictureLate(vout, decoded, system_now, system_pts, vsync_date))
                     {
+                        filter_chain_VideoFlush(sys->filter.chain_static);
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
                         continue;
