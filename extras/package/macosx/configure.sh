@@ -27,6 +27,7 @@ OPTIONS="
         --disable-pulse
         --disable-vnc
         --with-macosx-version-min=10.11
+        --without-x
 "
 
 export CFLAGS
