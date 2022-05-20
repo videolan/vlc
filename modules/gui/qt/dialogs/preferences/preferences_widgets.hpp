@@ -112,8 +112,8 @@ class VIntConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual int getValue() const = 0;
-    virtual void doApply() Q_DECL_OVERRIDE;
-    virtual void storeValue() Q_DECL_OVERRIDE;
+    virtual void doApply() override;
+    virtual void storeValue() override;
 protected:
     VIntConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };
@@ -223,8 +223,8 @@ class VFloatConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual float getValue() const = 0;
-    void doApply() Q_DECL_OVERRIDE;
-    void storeValue() Q_DECL_OVERRIDE;
+    void doApply() override;
+    void storeValue() override;
 protected:
     VFloatConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };
@@ -266,8 +266,8 @@ class VStringConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual QString getValue() const = 0;
-    void doApply() Q_DECL_OVERRIDE;
-    void storeValue() Q_DECL_OVERRIDE;
+    void doApply() override;
+    void storeValue() override;
 protected:
     VStringConfigControl( module_config_t *i ) : ConfigControl(i) {}
 };
