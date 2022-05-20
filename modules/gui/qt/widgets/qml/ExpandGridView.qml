@@ -458,7 +458,8 @@ FocusScope {
 
     function _containsItem(id) {
         var i = id - _currentRange[0]
-        return i >= 0 && i < _idChildrenList.length && typeof _idChildrenList[i] !== "undefined"
+        var childrenList = _idChildrenList
+        return i >= 0 && i < childrenList.length && typeof childrenList[i] !== "undefined"
     }
 
     function _repositionItem(id, x, y) {
