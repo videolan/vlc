@@ -422,7 +422,7 @@ public:
     KeySelectorControl( QWidget * );
     void insertInto( QGridLayout*, int row = 0 ) Q_DECL_OVERRIDE;
     void doApply() Q_DECL_OVERRIDE;
-    void storeValue() {};
+    void storeValue() override {};
     enum ColumnIndex
     {
         ACTION_COL = 0,
