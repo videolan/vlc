@@ -1044,6 +1044,7 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
                     if (system_pts != VLC_TICK_MAX &&
                         IsPictureLate(vout, decoded, system_now, system_pts))
                     {
+                        filter_chain_VideoFlush(sys->filter.chain_static);
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
 
