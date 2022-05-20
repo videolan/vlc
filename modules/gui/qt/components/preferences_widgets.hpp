@@ -116,8 +116,8 @@ class VIntConfigControl : public ConfigControl
 Q_OBJECT
 public:
     virtual int getValue() const = 0;
-    virtual int getType() const Q_DECL_OVERRIDE;
-    virtual void doApply() Q_DECL_OVERRIDE;
+    virtual int getType() const override;
+    virtual void doApply() override;
 protected:
     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {}
@@ -252,8 +252,8 @@ class VFloatConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual float getValue() const = 0;
-    int getType() const Q_DECL_OVERRIDE;
-    void doApply() Q_DECL_OVERRIDE;
+    int getType() const override;
+    void doApply() override;
 protected:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {};
@@ -301,8 +301,8 @@ class VStringConfigControl : public ConfigControl
     Q_OBJECT
 public:
     virtual QString getValue() const = 0;
-    int getType() const Q_DECL_OVERRIDE;
-    void doApply() Q_DECL_OVERRIDE;
+    int getType() const override;
+    void doApply() override;
 protected:
     VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
                 ConfigControl(a,b) {}
