@@ -282,6 +282,7 @@ T.Control {
 
                     height: implicitHeight
                     color: background.foregroundColor
+                    textFormat: Text.PlainText
                 }
             }
 
@@ -292,6 +293,7 @@ T.Control {
                 text: root.subtitle
                 elide: Text.ElideRight
                 color: background.foregroundColor
+                textFormat: Text.PlainText
 
                 Layout.preferredWidth: Math.min(pictureWidth, implicitWidth)
                 Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
