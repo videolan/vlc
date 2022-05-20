@@ -305,12 +305,13 @@ T.Control {
 
                 ToolTip.delay: VLCStyle.delayToolTipAppear
                 ToolTip.text: subtitleTxt.text
-                ToolTip.visible: {
-                    if (!mouseArea.containsMouse)
-                        return false
+                ToolTip.visible: subtitleTxtMouseArea.containsMouse
 
-                    var pos = mouseArea.mapToItem(subtitleTxt, mouseArea.mouseX, mouseArea.mouseY)
-                    return Helpers.contains(Qt.rect(0, 0, width, height), pos)
+                MouseArea {
+                    id: subtitleTxtMouseArea
+
+                    anchors.fill: parent
+                    hoverEnabled: true
                 }
             }
         }
