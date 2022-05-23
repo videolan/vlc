@@ -208,10 +208,10 @@ static int Open( vlc_object_t *p_this )
          || shout_set_mount( p_shout, url.psz_path ) != SHOUTERR_SUCCESS
          || shout_set_user( p_shout, url.psz_username ) != SHOUTERR_SUCCESS
          || shout_set_agent( p_shout, "VLC media player " VERSION ) != SHOUTERR_SUCCESS
-         || shout_set_name( p_shout, psz_name ) != SHOUTERR_SUCCESS
-         || shout_set_description( p_shout, psz_description ) != SHOUTERR_SUCCESS
-         || shout_set_genre( p_shout, psz_genre ) != SHOUTERR_SUCCESS
-         || shout_set_url( p_shout, psz_url ) != SHOUTERR_SUCCESS
+         || shout_set_meta( p_shout, SHOUT_META_NAME, psz_name ) != SHOUTERR_SUCCESS
+         || shout_set_meta( p_shout, SHOUT_META_DESCRIPTION, psz_description ) != SHOUTERR_SUCCESS
+         || shout_set_meta( p_shout, SHOUT_META_GENRE, psz_genre ) != SHOUTERR_SUCCESS
+         || shout_set_meta( p_shout, SHOUT_META_URL, psz_url ) != SHOUTERR_SUCCESS
          /* || shout_set_nonblocking( p_shout, 1 ) != SHOUTERR_SUCCESS */
       )
     {
