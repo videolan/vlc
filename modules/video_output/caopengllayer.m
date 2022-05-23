@@ -140,16 +140,13 @@ CGLContextObj vlc_CreateCGLContext()
         kCGLPFAColorSize, 24,
         kCGLPFAAlphaSize, 8,
         kCGLPFADepthSize, 24,
-        0, // If ever extending this list, adjust the offset below!
-        0
-    };
 
-    if (@available(macOS 10.8, *)) {
         // Enable automatic graphics switching support, important on Macs
         // with dedicated GPUs, as it allows to not always use the dedicated
         // GPU which has more power consumption
-        attribs[10] = kCGLPFASupportsAutomaticGraphicsSwitching;
-    }
+        kCGLPFASupportsAutomaticGraphicsSwitching,
+        0
+    };
 
     err = CGLChoosePixelFormat(attribs, &pix, &npix);
     if (err != kCGLNoError || pix == NULL) {
