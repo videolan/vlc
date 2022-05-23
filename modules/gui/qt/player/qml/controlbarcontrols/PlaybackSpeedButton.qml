@@ -47,7 +47,7 @@ Widgets.IconControlButton {
                 ? root // button is not part of main display (ToolbarEditorDialog)
                 : root._isCurrentViewPlayer ? rootPlayer : g_root
 
-        width: implicitWidth
+        width: VLCStyle.dp(256, VLCStyle.scale)
         height: implicitHeight
 
         padding: VLCStyle.margin_small
