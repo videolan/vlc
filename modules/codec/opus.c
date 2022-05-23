@@ -357,9 +357,22 @@ static int ProcessHeaders( decoder_t *p_dec )
     const uint8_t *p_extra = p_dec->fmt_in.p_extra;
     uint8_t *p_alloc = NULL;
 
+    /* Xiph headers as extradata */
+    if( i_extra > 21 && !memcmp( &p_extra[2], "OpusHead", 8 ) )
+    {
+        if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
+                               i_extra, p_extra ) || i_count < 2 )
+        {
+            /* Borked Xiph headers */
+            free( p_alloc );
+            return VLC_EGENERIC;
+        }
+
+        oggpacket.bytes  = pi_size[0];
+        oggpacket.packet = (unsigned char *) pp_data[0];
+    }
     /* If we have no header (e.g. from RTP), make one. */
-    if( !i_extra ||
-        (i_extra > 10 && memcmp( &p_extra[2], "OpusHead", 8 )) ) /* Borked muxers */
+    else if( i_extra < 19 || memcmp( p_extra, "OpusHead", 8 ) )
     {
         OpusHeader header;
         opus_header_init(&header);
@@ -369,29 +382,25 @@ static int ProcessHeaders( decoder_t *p_dec )
         int ret = opus_write_header( &p_alloc, &i_extra, &header,
                                      opus_get_version_string() );
         opus_header_clean(&header);
-        if(ret != 0)
+        if(ret != 0 || i_extra < 21)
         {
             free( p_alloc );
             return VLC_ENOMEM;
         }
-        p_extra = p_alloc;
+        oggpacket.bytes  = p_alloc[1]; /* Xiph header is type8/size8 */
+        oggpacket.packet = (unsigned char *) p_alloc + 2; /* Point directly to opus header start */
     }
-
-    if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
-                           i_extra, p_extra ) || i_count < 2 )
+    else /* raw header in extradata */
     {
-        free( p_alloc );
-        return VLC_EGENERIC;
+        oggpacket.bytes  = i_extra;
+        oggpacket.packet  = (unsigned char *) p_extra;
     }
 
+    /* Take care of the initial Opus header */
     oggpacket.granulepos = -1;
     oggpacket.e_o_s = 0;
     oggpacket.packetno = 0;
-
-    /* Take care of the initial Opus header */
     oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
-    oggpacket.bytes  = pi_size[0];
-    oggpacket.packet = (void *)pp_data[0];
     int ret = ProcessInitialHeader( p_dec, &oggpacket );
 
     if (ret != VLC_SUCCESS)
