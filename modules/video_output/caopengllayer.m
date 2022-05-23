@@ -902,25 +902,23 @@ shouldInheritContentsScale:(CGFloat)newScale
         if (vlc_gl_MakeCurrent(sys->gl))
             return;
 
-        if (self.asynchronous) {
-            GLint dims[4] = { 0, 0, 0, 0 };
-            glGetIntegerv(GL_VIEWPORT, dims);
-            NSSize newSize = NSMakeSize(dims[2], dims[3]);
+        GLint dims[4] = { 0, 0, 0, 0 };
+        glGetIntegerv(GL_VIEWPORT, dims);
+        NSSize newSize = NSMakeSize(dims[2], dims[3]);
 
-            if (NSEqualSizes(newSize, NSZeroSize)) {
-                newSize = self.bounds.size;
-                CGFloat scale = self.contentsScale;
-                newSize.width *= scale;
-                newSize.height *= scale;
-            }
+        if (NSEqualSizes(newSize, NSZeroSize)) {
+            newSize = self.bounds.size;
+            CGFloat scale = self.contentsScale;
+            newSize.width *= scale;
+            newSize.height *= scale;
+        }
 
-            @synchronized(sys->videoView)
-            {
-                sys->cfg.display.width = newSize.width;
-                sys->cfg.display.height = newSize.height;
+        @synchronized(sys->videoView)
+        {
+            sys->cfg.display.width = newSize.width;
+            sys->cfg.display.height = newSize.height;
 
-                vout_display_PlacePicture(&sys->place, &_voutDisplay->source, &sys->cfg, false);
-            }
+            vout_display_PlacePicture(&sys->place, &_voutDisplay->source, &sys->cfg, false);
         }
 
         // Ensure viewport and aspect ratio is correct
