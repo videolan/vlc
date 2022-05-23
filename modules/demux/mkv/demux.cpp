@@ -483,9 +483,9 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
     }
 
     EDocTypeReadVersion doc_read_version = GetChild<EDocTypeReadVersion>(*static_cast<EbmlHead*>(p_l0));
-    if (uint64(doc_read_version) > 2)
+    if (uint64(doc_read_version) > 5)
     {
-        msg_Err( p_demux, "matroska file needs version %" PRId64 " but only versions 1 & 2 supported", uint64(doc_read_version));
+        msg_Err( p_demux, "matroska file needs version %" PRId64 " but only versions 1 to 4 supported", uint64(doc_read_version));
         return false;
     }
 
