@@ -78,8 +78,6 @@ static int Control          (vout_display_t *vd, int);
 
 - (instancetype)initWithVoutDisplay:(vout_display_t *)vd;
 - (void)displayFromVout;
-- (void)reportCurrentLayerSize;
-- (void)reportCurrentLayerSizeWithScale:(CGFloat)scale;
 - (void)vlcClose;
 @end
 
@@ -362,7 +360,6 @@ static int Open (vout_display_t *vd,
                 NSView *containerView = container;
                 [containerView addSubview:sys->videoView];
                 [sys->videoView setFrame:containerView.bounds];
-                [sys->videoLayer reportCurrentLayerSize];
             } else {
                 [sys->videoView release];
                 [sys->videoLayer release];
@@ -570,9 +567,6 @@ static int Control (vout_display_t *vd, int query)
 - (void)viewDidEndLiveResize
 {
     [(VLCCAOpenGLLayer *)self.layer setAsynchronous:NO];
-
-    // After a live resize we need to tell the core about our new size
-    [(VLCCAOpenGLLayer *)self.layer reportCurrentLayerSize];
 }
 
 - (CALayer *)makeBackingLayer
@@ -594,17 +588,6 @@ static int Control (vout_display_t *vd, int query)
 shouldInheritContentsScale:(CGFloat)newScale
    fromWindow:(NSWindow *)window
 {
-    // If the scale changes, from the OpenGL point of view
-    // the size changes, so we need to indicate a resize
-    if (layer == self.layer) {
-        [(VLCCAOpenGLLayer *)self.layer
-            reportCurrentLayerSizeWithScale:newScale];
-        // FIXME
-        // For a brief moment the old image with a wrong scale
-        // is still visible, thats because the resize event is not
-        // processed immediately. Ideally this would be handled similar
-        // to how the live resize is done, to avoid this.
-    }
     return YES;
 }
 
@@ -781,48 +764,6 @@ shouldInheritContentsScale:(CGFloat)newScale
     CGLReleaseContext(_glContext);
     [_displayLock release];
     [super dealloc];
-}
-
-
-- (void)layoutSublayers
-{
-    [super layoutSublayers];
-
-    if (self.asynchronous) {
-        // During live resize, the size is updated in the
-        // OpenGL draw callback, to ensure atomic size changes
-        // that are in sync with the real layer size.
-        // This bypasses the core but is needed for resizing
-        // without glitches or lags.
-        return;
-    }
-
-    [self reportCurrentLayerSize];
-}
-
-- (void)reportCurrentLayerSizeWithScale:(CGFloat)scale
-{
-    CGSize newSize = self.visibleRect.size;
-
-    // Calculate pixel values
-    newSize.width *= scale;
-    newSize.height *= scale;
-
-    @synchronized(self) {
-        if (!_voutDisplay)
-            return;
-        vout_display_sys_t *sys = _voutDisplay->sys;
-        @synchronized(sys->videoLayer) {
-            sys->cfg.display.width = newSize.width;
-            sys->cfg.display.height = newSize.height;
-        }
-    }
-}
-
-- (void)reportCurrentLayerSize
-{
-    CGFloat scale = self.contentsScale;
-    [self reportCurrentLayerSizeWithScale:scale];
 }
 
 - (void)display
