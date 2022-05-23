@@ -374,7 +374,7 @@ static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
             last_ptr = &(*last_ptr)->p_next;
     }
 
-    if(p_sys->time)
+    if(p_sys->time && p_sys->epg->p_current)
     {
         f_progress = (p_sys->time - p_sys->epg->p_current->i_start) /
                      (float)p_sys->epg->p_current->i_duration;
