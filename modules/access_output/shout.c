@@ -230,8 +230,10 @@ static int Open( vlc_object_t *p_this )
     free( psz_genre );
     free( psz_url );
 
-    i_ret = shout_set_format( p_shout, var_GetBool( p_access, SOUT_CFG_PREFIX "mp3" ) ?
-                                       SHOUT_FORMAT_MP3 : SHOUT_FORMAT_OGG );
+    unsigned format = var_GetBool( p_access, SOUT_CFG_PREFIX "mp3" ) ?
+        SHOUT_FORMAT_MP3 : SHOUT_FORMAT_OGG;
+
+    i_ret = shout_set_format( p_shout, format );
 
     if( i_ret != SHOUTERR_SUCCESS )
     {
