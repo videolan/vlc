@@ -641,8 +641,9 @@ const char * vlc_thread_name_too_big( const char * thread_name )
 }
 
 # define check_name_length( thread_name ) \
-    ((__builtin_constant_p(strlen(thread_name) > 15)) ? \
-        vlc_thread_name_too_big(thread_name) : thread_name)
+    ((__builtin_constant_p(__builtin_strlen(thread_name) > 15) && \
+      __builtin_strlen(thread_name) > 15) \
+      ? vlc_thread_name_too_big(thread_name): thread_name)
 #endif
 
 /**
