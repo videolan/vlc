@@ -113,7 +113,6 @@ typedef struct vout_display_sys_t {
     vout_display_place_t place;
     vout_display_cfg_t cfg;
 
-    bool  b_frame_available;
     atomic_bool is_ready;
 } vout_display_sys_t;
 
