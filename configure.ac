@@ -2294,7 +2294,7 @@ PKG_CHECK_MODULES(LIBVORBIS, [vorbis >= 1.1], [
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto], [${LIBVORBIS_CFLAGS}], [${LIBVORBIS_LIBS}])
 if test "${enable_sout}" != "no"; then
 dnl Check for libshout
-    PKG_ENABLE_MODULES_VLC([SHOUT], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
+    PKG_ENABLE_MODULES_VLC([SHOUT], [access_output_shout], [shout >= 2.4.3], [libshout output plugin], [auto])
 fi
 
 dnl
