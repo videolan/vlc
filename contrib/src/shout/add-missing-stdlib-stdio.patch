@@ -1,0 +1,22 @@
+--- a/src/legacy.c	2022-04-10 12:10:14.000000000 +0200
++++ b/src/legacy.c	2022-09-14 16:16:30.000000000 +0200
+@@ -28,6 +28,8 @@
+ #include "shout_private.h"
+ #include "util.h"
+ 
++#include <stdlib.h>
++
+ int shout_set_format(shout_t *self, unsigned int format)
+ {
+     if (!self)
+--- a/src/icy.c	2022-04-10 12:10:14.000000000 +0200
++++ b/src/icy.c	2022-09-14 16:19:42.000000000 +0200
+@@ -25,6 +25,8 @@
+ 
+ #include <stdbool.h>
+ #include <string.h>
++#include <stdlib.h>
++#include <stdio.h>
+ 
+ #include <shout/shout.h>
+ 
