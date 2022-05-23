@@ -363,8 +363,9 @@ static int ProcessHeaders( decoder_t *p_dec )
     {
         OpusHeader header;
         opus_header_init(&header);
-        opus_prepare_header( p_dec->fmt_in.audio.i_channels,
-                             p_dec->fmt_in.audio.i_rate, &header );
+        opus_prepare_header( p_dec->fmt_in.audio.i_channels ? p_dec->fmt_in.audio.i_channels : 2,
+                             p_dec->fmt_in.audio.i_rate ? p_dec->fmt_in.audio.i_rate : 48000,
+                             &header );
         int ret = opus_write_header( &p_alloc, &i_extra, &header,
                                      opus_get_version_string() );
         opus_header_clean(&header);
