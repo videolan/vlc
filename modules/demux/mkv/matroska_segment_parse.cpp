@@ -520,7 +520,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
 
             unsigned int h_crop;
-            if (!add_overflow(i_crop_left, i_crop_right, &h_crop))
+            if (add_overflow(i_crop_left, i_crop_right, &h_crop))
             {
                 debug( vars, "invalid horizontal crop %u+%u",
                               i_crop_left, i_crop_right );
@@ -535,7 +535,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
 
             unsigned int v_crop;
-            if (!add_overflow(i_crop_top, i_crop_bottom, &v_crop))
+            if (add_overflow(i_crop_top, i_crop_bottom, &v_crop))
             {
                 debug( vars, "invalid vertical crop %u+%u",
                               i_crop_top, i_crop_bottom);
