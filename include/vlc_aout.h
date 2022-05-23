@@ -125,6 +125,7 @@
  */
 
 struct vlc_audio_output_events {
+    void (*timing_report)(audio_output_t *, vlc_tick_t system_ts, vlc_tick_t audio_ts);
     void (*drained_report)(audio_output_t *);
     void (*volume_report)(audio_output_t *, float);
     void (*mute_report)(audio_output_t *, bool);
@@ -197,6 +198,9 @@ struct audio_output
       * initial delay (the hw latency). Most modules won't be able to know this
       * latency before the first play. In that case, they should return -1 and
       * handle the first play() date, cf. play() documentation.
+      *
+      * \warning It is recommended to report the audio delay via
+      * aout_TimingReport(). In that case, time_get should not be implemented.
       *
       * \param delay pointer to the delay until the next sample to be written
       *              to the playback buffer is rendered [OUT]
@@ -295,6 +299,23 @@ struct audio_output
 
     const struct vlc_audio_output_events *events;
 };
+
+/**
+ * Report a new timing point
+ *
+ * system_ts doesn't have to be close to vlc_tick_now(). Any valid { system_ts,
+ * audio_ts } points in the past are sufficient to update the clock.
+ *
+ * It is important to report the first point as soon as possible (and the
+ * following points if the audio delay take some time to be stabilized). Once
+ * the audio is stabilized, it is recommended to report timing points every few
+ * seconds.
+ */
+static inline void aout_TimingReport(audio_output_t *aout, vlc_tick_t system_ts,
+                                     vlc_tick_t audio_ts)
+{
+    return aout->events->timing_report(aout, system_ts, audio_ts);
+}
 
 /**
  * Report than the stream is drained (after a call to aout->drain_async)

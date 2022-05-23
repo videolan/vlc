@@ -39,6 +39,13 @@
 #include "clock/clock.h"
 #include "libvlc.h"
 
+#define MAX_TIMING_POINT 16
+struct timing_point
+{
+    vlc_tick_t system_ts;
+    vlc_tick_t audio_ts;
+};
+
 struct vlc_aout_stream
 {
     aout_instance_t *instance;
@@ -60,6 +67,15 @@ struct vlc_aout_stream
         vlc_tick_t delay;
     } sync;
     vlc_tick_t original_pts;
+
+    struct
+    {
+        vlc_mutex_t lock; /* Guard data, write and read */
+        struct timing_point data[MAX_TIMING_POINT];
+        size_t write, read; /* Circular buffer */
+
+        struct timing_point last;
+    } timing_points;
 
     const char *str_id;
 
@@ -104,7 +120,15 @@ static int stream_TimeGet(vlc_aout_stream *stream, vlc_tick_t *delay)
     audio_output_t *aout = aout_stream_aout(stream);
 
     if (aout->time_get == NULL)
-        return -1;
+    {
+        /* Interpolate the last updated point. */
+        const struct timing_point *p = &stream->timing_points.last;
+        if (p->audio_ts == VLC_TICK_INVALID)
+            return -1;
+
+        *delay = (p->audio_ts + vlc_tick_now() - p->system_ts) * stream->sync.rate;
+        return 0;
+    }
     return aout->time_get(aout, delay);
 }
 
@@ -112,6 +136,13 @@ static void stream_Discontinuity(vlc_aout_stream *stream)
 {
     stream->sync.discontinuity = true;
     stream->original_pts = VLC_TICK_INVALID;
+
+    vlc_mutex_lock(&stream->timing_points.lock);
+    stream->timing_points.read = stream->timing_points.write = 0;
+    vlc_mutex_unlock(&stream->timing_points.lock);
+
+    stream->timing_points.last.audio_ts =
+    stream->timing_points.last.system_ts = VLC_TICK_INVALID;
 }
 
 static void stream_Reset(vlc_aout_stream *stream)
@@ -206,6 +237,8 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
 
     stream->sync.clock = cfg->clock;
     stream->str_id = cfg->str_id;
+
+    vlc_mutex_init(&stream->timing_points.lock);
 
     stream->sync.rate = 1.f;
     stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
@@ -567,6 +600,69 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
     stream_HandleDrift(stream, drift, dec_pts);
 }
 
+void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
+                                  vlc_tick_t audio_ts)
+{
+    /* This function might be called from high priority audio threads (so, no
+     * mutexes, allocation, IO, debug, wait...). That is why we use a circular
+     * buffer of points. The vlc_aout_stream user will read these points and
+     * update the clock from vlc_aout_stream_Play(). */
+
+    /* VLC mutexes use atomic and the reader will only do very fast
+     * operations (copy of the timing_point data). */
+    vlc_mutex_lock(&stream->timing_points.lock);
+    size_t write = (stream->timing_points.write++) % MAX_TIMING_POINT;
+
+    struct timing_point *p = &stream->timing_points.data[write];
+    p->system_ts = system_ts;
+    p->audio_ts = audio_ts;
+
+    if (stream->timing_points.write >= MAX_TIMING_POINT)
+        stream->timing_points.read++;
+    vlc_mutex_unlock(&stream->timing_points.lock);
+}
+
+static vlc_tick_t
+stream_ReadTimingPoints(vlc_aout_stream *stream)
+{
+    struct timing_point points[MAX_TIMING_POINT];
+    size_t count = 0;
+
+    vlc_mutex_lock(&stream->timing_points.lock);
+    assert(stream->timing_points.write - stream->timing_points.read < MAX_TIMING_POINT);
+
+    size_t initial_read = stream->timing_points.read;
+    for (size_t read = stream->timing_points.read;
+         read < stream->timing_points.write; ++read, ++count)
+        points[count] = stream->timing_points.data[read % MAX_TIMING_POINT];
+
+    stream->timing_points.write = stream->timing_points.read = 0;
+    vlc_mutex_unlock(&stream->timing_points.lock);
+
+    if (count == 0)
+        return 0;
+
+    stream->timing_points.last = points[count - 1];
+
+    if (initial_read > 0)
+    {
+        /* This is not critical to miss timing points, the more important is
+         * to get the last ones. Log it anyway since it can help identifying
+         * buggy audio outputs spamming timing points. */
+
+        audio_output_t *aout = aout_stream_aout(stream);
+        msg_Dbg(aout, "Missed %zu timing points", initial_read);
+    }
+    vlc_tick_t drift = 0; /* Use only the last updated drift */
+    float rate = stream->sync.rate; /* TODO: match rate with audio_ts */
+
+    for (size_t i = 0; i < count; ++i)
+        drift = vlc_clock_Update(stream->sync.clock, points[i].system_ts,
+                                 points[i].audio_ts, rate);
+
+    return drift;
+}
+
 /*****************************************************************************
  * vlc_aout_stream_Play : filter & mix the decoded buffer
  *****************************************************************************/
@@ -630,7 +726,13 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
 
     /* Drift correction */
     vlc_tick_t system_now = vlc_tick_now();
-    stream_Synchronize(stream, system_now, original_pts);
+    if (aout->time_get != NULL)
+        stream_Synchronize(stream, system_now, original_pts);
+    else
+    {
+        vlc_tick_t drift = stream_ReadTimingPoints(stream);
+        stream_HandleDrift(stream, drift, original_pts);
+    }
 
     vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(stream->sync.clock, system_now, original_pts,
