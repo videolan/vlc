@@ -139,18 +139,19 @@ static int Open(vout_display_t *vd,
     vlc_placebo_ReleaseCurrent(sys->pl);
 
     // Attempt using the input format as the display format
-    if (vlc_placebo_FormatSupported(gpu, vd->fmt->i_chroma)) {
-        fmt->i_chroma = vd->fmt->i_chroma;
+    if (vlc_placebo_FormatSupported(gpu, vd->source->i_chroma)) {
+        fmt->i_chroma = vd->source->i_chroma;
     } else {
+        fmt->i_chroma = 0;
         const vlc_fourcc_t *fcc;
-        for (fcc = vlc_fourcc_GetFallback(vd->fmt->i_chroma); *fcc; fcc++) {
+        for (fcc = vlc_fourcc_GetFallback(vd->source->i_chroma); *fcc; fcc++) {
             if (vlc_placebo_FormatSupported(gpu, *fcc)) {
                 fmt->i_chroma = *fcc;
                 break;
             }
         }
 
-        if (!fmt->i_chroma) {
+        if (fmt->i_chroma == 0) {
             fmt->i_chroma = VLC_CODEC_RGBA;
             msg_Warn(vd, "Failed picking any suitable input format, falling "
                      "back to RGBA for sanity!");
