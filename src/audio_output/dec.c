@@ -635,7 +635,8 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     /* This function might be called from high priority audio threads (so, no
      * mutexes, allocation, IO, debug, wait...). That is why we use a circular
      * buffer of points. The vlc_aout_stream user will read these points and
-     * update the clock from vlc_aout_stream_Play(). */
+     * update the clock from vlc_aout_stream_Play() and
+     * vlc_aout_stream_UpdateLatency(). */
 
     /* VLC mutexes use atomic and the reader will only do very fast
      * operations (copy of the timing_point data). */
@@ -714,6 +715,12 @@ stream_ReadTimingPoints(vlc_aout_stream *stream)
     }
 
     return drift;
+}
+
+void vlc_aout_stream_UpdateLatency(vlc_aout_stream *stream)
+{
+    if (stream->timing_points.running)
+        stream_ReadTimingPoints(stream);
 }
 
 /*****************************************************************************
