@@ -1743,6 +1743,15 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     return sample_buf;
 }
 
+// Error enum values introduced in macOS 12 / iOS 15 SDKs
+#if ((TARGET_OS_OSX && __MAC_OS_X_VERSION_MAX_ALLOWED < 120000) || \
+     (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED < 150000) || \
+     (TARGET_OS_IOS && __IPHONE_OS_VERSION_MAX_ALLOWED < 150000))
+enum {
+    kVTVideoDecoderReferenceMissingErr      = -17694
+}
+#endif
+
 static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                           enum vtsession_status * p_vtsession_status)
 {
@@ -1789,6 +1798,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
         VTERRCASE(kVTCouldNotFindTemporalFilterErr)
         VTERRCASE(kVTPixelTransferNotPermittedErr)
         VTERRCASE(kVTColorCorrectionImageRotationFailedErr)
+        VTERRCASE(kVTVideoDecoderReferenceMissingErr)
 
         /* Legacy error codes defined in the old Carbon MacErrors.h */
         VTERRCASE_LEGACY(-8960, "codecErr")
@@ -1813,6 +1823,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case -8960 /* codecErr */:
             case kVTVideoDecoderMalfunctionErr:
             case kVTInvalidSessionErr:
+            case kVTVideoDecoderReferenceMissingErr:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
                 break;
             case kVTVideoDecoderBadDataErr:
