@@ -28,6 +28,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_ancillary.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_fs.h>
@@ -255,6 +256,16 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
 #if PL_API_VER >= 185
     vlc_placebo_DoviMetadata(&img, pic, &sys->dovi_metadata);
+#endif
+
+#if PL_API_VER >= 96
+    struct vlc_ancillary *iccp = picture_GetAncillary(pic, VLC_ANCILLARY_ID_ICC);
+    if (iccp) {
+        vlc_icc_profile_t *icc = vlc_ancillary_GetData(iccp);
+        img.profile.data = icc->data;
+        img.profile.len = icc->size;
+        pl_icc_profile_compute_signature(&img.profile);
+    }
 #endif
 
     // Upload the image data for each plane
