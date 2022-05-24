@@ -297,11 +297,6 @@ struct audio_output
     const struct vlc_audio_output_events *events;
 };
 
-static inline int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
-{
-    return aout->time_get(aout, delay);
-}
-
 /**
  * Report than the stream is drained (after a call to aout->drain_async)
  */
