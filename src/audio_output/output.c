@@ -758,9 +758,10 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
     for (size_t i = 0; formats[i] != 0 && ret != VLC_SUCCESS; ++i)
     {
         filter_fmt->i_format = fmt->i_format = formats[i];
+        owner->main_stream = stream;
         ret = aout->start(aout, fmt);
-        if (ret == 0)
-            owner->main_stream = stream;
+        if (ret != 0)
+            owner->main_stream = NULL;
     }
     vlc_mutex_unlock(&owner->lock);
     if (ret)
