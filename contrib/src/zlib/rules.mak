@@ -1,6 +1,6 @@
 # ZLIB
-ZLIB_VERSION := 1.2.11
-ZLIB_URL := $(SF)/libpng/zlib-$(ZLIB_VERSION).tar.gz
+ZLIB_VERSION := 1.2.12
+ZLIB_URL := https://www.zlib.net/zlib-$(ZLIB_VERSION).tar.gz
 
 PKGS += zlib
 ifeq ($(call need_pkg,"zlib"),)
