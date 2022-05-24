@@ -918,9 +918,9 @@ void vlc_aout_stream_Flush(vlc_aout_stream *stream)
     if (tracer != NULL)
         vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "flushed");
 
-    stream_Reset(stream);
     if (stream->mixer_format.i_format)
         aout->flush(aout);
+    stream_Reset(stream);
 }
 
 void vlc_aout_stream_NotifyGain(vlc_aout_stream *stream, float gain)
