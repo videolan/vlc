@@ -519,9 +519,12 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         goto error;
     }
 
+#define ICC_JPEG_MARKER (JPEG_APP0+2)
+
     jpeg_create_decompress(&p_sys->p_jpeg);
     jpeg_mem_src(&p_sys->p_jpeg, p_block->p_buffer, p_block->i_buffer);
     jpeg_save_markers( &p_sys->p_jpeg, EXIF_JPEG_MARKER, 0xffff );
+    jpeg_save_markers( &p_sys->p_jpeg, ICC_JPEG_MARKER, 0xffff );
     jpeg_read_header(&p_sys->p_jpeg, TRUE);
 
     p_sys->p_jpeg.out_color_space = JCS_RGB;
@@ -554,6 +557,24 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         goto error;
     }
 
+    /* Read ICC profile */
+#if defined(LIBJPEG_TURBO_VERSION_NUMBER) && LIBJPEG_TURBO_VERSION_NUMBER >= 1005090
+    JOCTET *p_icc;
+    unsigned int icc_len;
+    if (jpeg_read_icc_profile(&p_sys->p_jpeg, &p_icc, &icc_len))
+    {
+        vlc_icc_profile_t *icc;
+        icc = picture_AttachNewAncillary(p_pic, VLC_ANCILLARY_ID_ICC, sizeof(*icc) + icc_len);
+        if (!icc) {
+            free(p_icc);
+            goto error;
+        }
+        memcpy(icc->data, p_icc, icc_len);
+        icc->size = icc_len;
+        free(p_icc);
+    }
+#endif /* LIBJPEG_TURBO_VERSION_NUMBER */
+
     /* Decode picture */
     p_sys->p_row_pointers = vlc_alloc(p_sys->p_jpeg.output_height, sizeof(JSAMPROW));
     if (!p_sys->p_row_pointers)
@@ -583,6 +604,8 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
 error:
 
+    if (p_pic)
+        picture_Release(p_pic);
     jpeg_destroy_decompress(&p_sys->p_jpeg);
     free(p_sys->p_row_pointers);
 
