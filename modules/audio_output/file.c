@@ -162,7 +162,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         return VLC_EGENERIC;
     }
 
-    p_aout->time_get = aout_TimeGetDefault;
+    p_aout->time_get = NULL;
     p_aout->play = Play;
     p_aout->pause = Pause;
     p_aout->flush = Flush;
