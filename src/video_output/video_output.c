@@ -192,6 +192,15 @@ static inline struct vlc_tracer *GetTracer(vout_thread_sys_t *sys)
         vlc_object_get_tracer(VLC_OBJECT(&sys->obj));
 }
 
+static inline void VoutResetChronoLocked(vout_thread_sys_t *sys)
+{
+    vlc_mutex_assert(&sys->display_lock);
+
+    /* Arbitrary initial time */
+    vout_chrono_Init(&sys->chrono.render, 5, VLC_TICK_FROM_MS(10));
+    vout_chrono_Init(&sys->chrono.static_filter, 4, VLC_TICK_FROM_MS(0));
+}
+
 static bool VoutCheckFormat(const video_format_t *src)
 {
     if (src->i_width == 0  || src->i_width  > 8192 ||
@@ -1501,6 +1510,8 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
     vlc_mutex_lock(&sys->display_lock);
     if (sys->display != NULL)
         vout_FilterFlush(sys->display);
+    /* Reinitialize chrono to ensure we re-compute any new render timing. */
+    VoutResetChronoLocked(sys);
     vlc_mutex_unlock(&sys->display_lock);
 
     if (sys->clock != NULL)
@@ -1648,6 +1659,9 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     den = sys->source.dar.den;
     vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
+
+    /* Reinitialize chrono to ensure we re-compute any new render timing. */
+    VoutResetChronoLocked(sys);
 
     /* Setup the window size, protected by the display_lock */
     dcfg.display.width = sys->window_width;
@@ -1995,10 +2009,6 @@ vout_thread_t *vout_Create(vlc_object_t *object)
         var_Destroy(vout, "window");
     sys->window_enabled = false;
     vlc_mutex_init(&sys->window_lock);
-
-    /* Arbitrary initial time */
-    vout_chrono_Init(&sys->chrono.render, 5, VLC_TICK_FROM_MS(10));
-    vout_chrono_Init(&sys->chrono.static_filter, 4, VLC_TICK_FROM_MS(0));
 
     if (var_InheritBool(vout, "video-wallpaper"))
         vlc_window_SetState(sys->display_cfg.window, VLC_WINDOW_STATE_BELOW);
