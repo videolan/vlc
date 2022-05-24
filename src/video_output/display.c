@@ -43,24 +43,6 @@
 #include "display.h"
 #include "vout_internal.h"
 
-/*****************************************************************************
- * FIXME/TODO see how to have direct rendering here (interact with vout.c)
- *****************************************************************************/
-static picture_t *VideoBufferNew(filter_t *filter)
-{
-    vout_display_t *vd = filter->owner.sys;
-    const video_format_t *fmt = &filter->fmt_out.video;
-
-    assert(vd->fmt->i_chroma == fmt->i_chroma &&
-           vd->fmt->i_width  == fmt->i_width  &&
-           vd->fmt->i_height == fmt->i_height);
-
-    picture_pool_t *pool = vout_GetPool(vd, 3);
-    if (!pool)
-        return NULL;
-    return picture_pool_Get(pool);
-}
-
 static int vout_display_Control(vout_display_t *vd, int query)
 {
     return vd->ops->control(vd, query);
@@ -264,6 +246,25 @@ typedef struct {
     picture_pool_t *pool;
 } vout_display_priv_t;
 
+/*****************************************************************************
+ * FIXME/TODO see how to have direct rendering here (interact with vout.c)
+ *****************************************************************************/
+static picture_t *VideoBufferNew(filter_t *filter)
+{
+    vout_display_t *vd = filter->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    const video_format_t *fmt = &filter->fmt_out.video;
+
+    assert(osys->display_fmt.i_chroma == fmt->i_chroma &&
+           osys->display_fmt.i_width  == fmt->i_width  &&
+           osys->display_fmt.i_height == fmt->i_height);
+
+    picture_pool_t *pool = vout_GetPool(vd, 3);
+    if (!pool)
+        return NULL;
+    return picture_pool_Get(pool);
+}
+
 static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
 {
     VLC_UNUSED(o);
@@ -292,7 +293,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     v_src.i_sar_num = 0;
     v_src.i_sar_den = 0;
 
-    video_format_t v_dst = *vd->fmt;
+    video_format_t v_dst = osys->display_fmt;
     v_dst.i_sar_num = 0;
     v_dst.i_sar_den = 0;
 
@@ -352,7 +353,7 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->pool == NULL)
-        osys->pool = picture_pool_NewFromFormat(vd->fmt, count);
+        osys->pool = picture_pool_NewFromFormat(&osys->display_fmt, count);
     return osys->pool;
 }
 
