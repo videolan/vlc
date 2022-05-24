@@ -75,7 +75,9 @@ static void ReleaseCurrent(vlc_gl_t *gl)
 static void VglSwapBuffers(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
+    MakeCurrent(gl);
     sys->swapCb(sys->opaque);
+    ReleaseCurrent(gl);
 }
 
 static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
