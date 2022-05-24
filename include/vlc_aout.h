@@ -364,16 +364,6 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
 }
 
 /**
- * Default implementation for audio_output_t.time_get
- */
-static inline int aout_TimeGetDefault(audio_output_t *aout,
-                                      vlc_tick_t *restrict delay)
-{
-    (void) aout; (void) delay;
-    return -1;
-}
-
-/**
  * Default implementation for audio_output_t.pause
  *
  * \warning This default callback implementation is suboptimal as it will
