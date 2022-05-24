@@ -771,7 +771,7 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
                       "failing back to linear format");
         return -1;
     }
-    assert(aout->flush && aout->play && aout->time_get && aout->pause);
+    assert(aout->flush && aout->play && aout->pause);
 
     /* Autoselect the headphones mode if available and if the user didn't
      * request any mode */
