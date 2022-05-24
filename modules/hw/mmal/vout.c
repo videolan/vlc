@@ -1086,9 +1086,9 @@ static int OpenMmalVout(vout_display_t *vd,
     MMAL_STATUS_T status;
     int ret = VLC_EGENERIC;
     // At the moment all copy is via I420
-    const bool needs_copy = !hw_mmal_chroma_is_mmal(vd->fmt->i_chroma);
+    const bool needs_copy = !hw_mmal_chroma_is_mmal(vd->source->i_chroma);
     const MMAL_FOURCC_T enc_in = needs_copy ? MMAL_ENCODING_I420 :
-        vout_vlc_to_mmal_pic_fourcc(vd->fmt->i_chroma);
+        vout_vlc_to_mmal_pic_fourcc(vd->source->i_chroma);
 
     sys = calloc(1, sizeof(struct vout_display_sys_t));
     if (!sys)
