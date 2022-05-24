@@ -138,7 +138,7 @@ typedef struct vout_display_sys_t {
     uint8_t     *video_ptr;                                 /* base address */
     size_t      video_size;                                    /* page size */
 
-    picture_t       *picture;
+    plane_t         packed_rgb;
 } vout_display_sys_t;
 
 
@@ -242,7 +242,7 @@ static int Open(vout_display_t *vd,
 
     /* */
     sys->video_ptr = MAP_FAILED;
-    sys->picture = NULL;
+    sys->packed_rgb = (plane_t) { 0 };
 
     if (OpenDisplay(vd, force_resolution)) {
         Close(vd);
@@ -308,9 +308,6 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->picture != NULL)
-        picture_Release(sys->picture);
-
     CloseDisplay(vd);
 
     if (sys->is_tty)
@@ -341,7 +338,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
         }
     }
 
-    picture_Copy(sys->picture, picture);
+    plane_CopyPixels(&sys->packed_rgb, picture->p);
 }
 
 static int Control(vout_display_t *vd, int query)
@@ -596,17 +593,11 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         return VLC_EGENERIC;
     }
 
-    picture_resource_t rsc = { 0 };
-
-    sys->picture = picture_NewFromResource(vd->fmt, &rsc);
-    if (unlikely(sys->picture == NULL)) {
-        munmap(sys->video_ptr, sys->video_size);
-        ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
-        return VLC_ENOMEM;
-    }
-    sys->picture->p[0].p_pixels = sys->video_ptr;
-    sys->picture->p[0].i_lines = sys->var_info.yres;
-    sys->picture->p[0].i_pitch = fix_info.line_length;
+    sys->packed_rgb.p_pixels = sys->video_ptr;
+    sys->packed_rgb.i_visible_lines =
+    sys->packed_rgb.i_lines = sys->var_info.yres;
+    sys->packed_rgb.i_visible_pitch =
+    sys->packed_rgb.i_pitch = fix_info.line_length;
 
     ClearScreen(sys);
 
