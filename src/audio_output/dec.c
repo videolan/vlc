@@ -101,6 +101,8 @@ static inline struct vlc_tracer *aout_stream_tracer(vlc_aout_stream *stream)
 
 static int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
 {
+    if (aout->time_get == NULL)
+        return -1;
     return aout->time_get(aout, delay);
 }
 

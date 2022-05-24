@@ -181,7 +181,7 @@ struct audio_output
       */
 
     int (*time_get)(audio_output_t *, vlc_tick_t *delay);
-    /**< Estimates playback buffer latency (mandatory, cannot be NULL).
+    /**< Estimates playback buffer latency (can be NULL).
       *
       * This callback computes an estimation of the delay until the current
       * tail of the audio output buffer would be rendered. This is essential
@@ -189,10 +189,9 @@ struct audio_output
       * clock and the media upstream clock (if any).
       *
       * If the audio output clock is exactly synchronized with the system
-      * monotonic clock (i.e. vlc_tick_now()), then aout_TimeGetDefault() can
-      * implement this callback. In that case, drain must be implemented (since
-      * the default implementation uses the delay to wait for the end of the
-      * stream).
+      * monotonic clock (i.e. vlc_tick_now()), then this callback is not
+      * mandatory.  In that case, drain must be implemented (since the default
+      * implementation uses the delay to wait for the end of the stream).
       *
       * This callback is called before the first play() in order to get the
       * initial delay (the hw latency). Most modules won't be able to know this
