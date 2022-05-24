@@ -602,6 +602,18 @@ typedef struct vlc_video_dovi_metadata_t
 } vlc_video_dovi_metadata_t;
 
 /**
+ * Embedded ICC profiles
+ */
+
+#define VLC_ANCILLARY_ID_ICC VLC_FOURCC('i','C','C','P')
+
+typedef struct vlc_icc_profile_t
+{
+    size_t size;
+    uint8_t data[]; /* binary profile data, see ICC.1:2022 (or later) */
+} vlc_icc_profile_t;
+
+/**
  * subtitles format description
  */
 struct subs_format_t
