@@ -25,6 +25,7 @@
 #include <vlc_demux.h>
 
 #include "rtp.h"
+#include "../live555_dtsgen.h"
 
 static const uint8_t annexbheader[] = { 0, 0, 0, 1 };
 
@@ -36,6 +37,7 @@ struct rtp_h26x_sys
     block_t *xps;
     struct vlc_rtp_es *es;
     decoder_t *p_packetizer;
+    struct dtsgen_t dtsgen;
 };
 
 static void rtp_h26x_clear(struct rtp_h26x_sys *sys)
@@ -53,6 +55,7 @@ static void rtp_h26x_init(struct rtp_h26x_sys *sys)
     sys->xps = NULL;
     sys->es = NULL;
     sys->p_packetizer = NULL;
+    dtsgen_Init(&sys->dtsgen);
 }
 
 static void h26x_extractbase64xps(const char *psz64,
@@ -110,9 +113,6 @@ static void h26x_output(struct rtp_h26x_sys *sys,
                         block_t *block,
                         vlc_tick_t pts, bool pcr, bool au_end)
 {
-//    if(pcr)
-//        es_out_SetPCR(out, pts);
-
     if(!block)
         return;
 
@@ -122,6 +122,9 @@ static void h26x_output(struct rtp_h26x_sys *sys,
         sys->xps = NULL;
         h26x_output(sys, xps, pts, pcr, false);
     }
+
+    if(block->i_flags & BLOCK_FLAG_DISCONTINUITY)
+        dtsgen_Resync(&sys->dtsgen);
 
     block->i_pts = pts;
     block->i_dts = VLC_TICK_INVALID; /* RTP does not specify this */
@@ -134,6 +137,9 @@ static void h26x_output(struct rtp_h26x_sys *sys,
         while((p_out = sys->p_packetizer->pf_packetize(sys->p_packetizer,
                                                        block ? &block : NULL)))
         {
+            dtsgen_AddNextPTS(&sys->dtsgen, p_out->i_pts);
+            vlc_tick_t dts = dtsgen_GetDTS(&sys->dtsgen);
+            p_out->i_dts = dts;
             vlc_rtp_es_send(sys->es, p_out);
         }
         block = NULL; // for drain iteration
