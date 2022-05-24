@@ -337,6 +337,12 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
         context->last = clock_point_Create(system_now, ts);
 
+        if (main_clock->tracer != NULL && clock->track_str_id)
+            vlc_tracer_Trace(main_clock->tracer, VLC_TRACE("type", "RENDER"),
+                             VLC_TRACE("id", clock->track_str_id),
+                             VLC_TRACE("offset", context->offset),
+                             VLC_TRACE_END);
+
         context->rate = rate;
         vlc_cond_broadcast(&main_clock->cond);
     }
