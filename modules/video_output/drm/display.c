@@ -207,7 +207,7 @@ static int Open(vout_display_t *vd,
     msg_Dbg(vd, "using DRM pixel format %4.4s (0x%08"PRIXFAST32")",
             (char *)&drm_fourcc, drm_fourcc);
 
-    video_format_ApplyRotation(&fmt, vd->fmt);
+    video_format_ApplyRotation(&fmt, vd->source);
     if (!vlc_video_format_drm(&fmt, drm_fourcc)) {
         /* This can only occur if $vlc-drm-chroma is unknown. */
         assert(chroma != NULL);
