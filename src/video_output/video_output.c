@@ -75,6 +75,9 @@ typedef struct vout_thread_sys_t
     char            *splitter_name;
 
     const char      *str_id;
+
+    vlc_mutex_t clock_lock;
+
     vlc_clock_t     *clock;
     float           rate;
     vlc_tick_t      delay;
@@ -1831,7 +1834,10 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
 
     if (sys->spu)
         spu_Detach(sys->spu);
+
+    vlc_mutex_lock(&sys->clock_lock);
     sys->clock = NULL;
+    vlc_mutex_unlock(&sys->clock_lock);
     sys->str_id = NULL;
 }
 
@@ -2006,6 +2012,8 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     vlc_mutex_init(&sys->filter.lock);
 
+    vlc_mutex_init(&sys->clock_lock);
+
     /* Display */
     sys->display = NULL;
     sys->display_cfg.icc_profile = NULL;
@@ -2147,7 +2155,11 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     sys->delay = 0;
     sys->rate = 1.f;
     sys->str_id = cfg->str_id;
+
+    vlc_mutex_lock(&sys->clock_lock);
     sys->clock = cfg->clock;
+    vlc_mutex_unlock(&sys->clock_lock);
+
     sys->delay = 0;
 
     if (vout_Start(vout, vctx, cfg))
