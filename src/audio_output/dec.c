@@ -387,15 +387,13 @@ static void stream_Silence (vlc_aout_stream *stream, vlc_tick_t length, vlc_tick
     aout->play(aout, block, system_pts);
 }
 
-static void stream_RequestRetiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
-                                   vlc_tick_t audio_ts)
+static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
+                               vlc_tick_t audio_ts)
 {
     aout_owner_t *owner = aout_stream_owner(stream);
     audio_output_t *aout = aout_stream_aout(stream);
 
     float rate = stream->sync.rate;
-    vlc_tick_t drift =
-        vlc_clock_Update(stream->sync.clock, system_ts, audio_ts, rate);
 
     if (unlikely(drift == VLC_TICK_MAX) || owner->bitexact)
         return; /* cf. VLC_TICK_MAX comment in vlc_aout_stream_Play() */
@@ -541,7 +539,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         /* Chicken-egg situation for most aout modules that can't be started
          * deferred (all except PulseAudio). These modules will start to play
          * data immediately and ignore the given play_date (that take the clock
-         * jitter into account). We don't want to let stream_RequestRetiming()
+         * jitter into account). We don't want to let stream_HandleDrift()
          * handle the first silence (from the "Early audio output" case) since
          * this function will first update the clock without taking the jitter
          * into account. Therefore, we manually insert silence that correspond
@@ -559,7 +557,10 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         }
     }
 
-    stream_RequestRetiming(stream, system_now + delay, dec_pts);
+    vlc_tick_t drift = vlc_clock_Update(stream->sync.clock, system_now + delay,
+                                        dec_pts, stream->sync.rate);
+
+    stream_HandleDrift(stream, drift, dec_pts);
 }
 
 /*****************************************************************************
