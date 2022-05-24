@@ -108,6 +108,12 @@ static int stream_TimeGet(vlc_aout_stream *stream, vlc_tick_t *delay)
     return aout->time_get(aout, delay);
 }
 
+static void stream_Discontinuity(vlc_aout_stream *stream)
+{
+    stream->sync.discontinuity = true;
+    stream->original_pts = VLC_TICK_INVALID;
+}
+
 static void stream_Reset(vlc_aout_stream *stream)
 {
     aout_owner_t *owner = aout_stream_owner(stream);
@@ -143,8 +149,7 @@ static void stream_Reset(vlc_aout_stream *stream)
     atomic_store_explicit(&stream->drain_deadline, VLC_TICK_INVALID,
                           memory_order_relaxed);
 
-    stream->sync.discontinuity = true;
-    stream->original_pts = VLC_TICK_INVALID;
+    stream_Discontinuity(stream);
 }
 
 /**
@@ -233,9 +238,8 @@ error:
 
     stream->sync.rate = 1.f;
     stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
-    stream->sync.discontinuity = true;
     stream->sync.delay = stream->sync.request_delay = 0;
-    stream->original_pts = VLC_TICK_INVALID;
+    stream_Discontinuity(stream);
 
     atomic_init (&stream->buffers_lost, 0);
     atomic_init (&stream->buffers_played, 0);
@@ -581,10 +585,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
-    {
-        stream->sync.discontinuity = true;
-        stream->original_pts = VLC_TICK_INVALID;
-    }
+        stream_Discontinuity(stream);
 
     if (stream->original_pts == VLC_TICK_INVALID)
     {
@@ -651,8 +652,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     atomic_fetch_add_explicit(&stream->buffers_played, 1, memory_order_relaxed);
     return ret;
 drop:
-    stream->sync.discontinuity = true;
-    stream->original_pts = VLC_TICK_INVALID;
+    stream_Discontinuity(stream);
     block_Release (block);
     atomic_fetch_add_explicit(&stream->buffers_lost, 1, memory_order_relaxed);
     return ret;
@@ -778,6 +778,5 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
     if (stream->filters)
         aout_FiltersResetClock(stream->filters);
 
-    stream->sync.discontinuity = true;
-    stream->original_pts = VLC_TICK_INVALID;
+    stream_Discontinuity(stream);
 }
