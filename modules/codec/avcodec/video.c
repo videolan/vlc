@@ -923,6 +923,17 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     }
 #endif
 
+    const AVFrameSideData *p_icc = av_frame_get_side_data( frame, AV_FRAME_DATA_ICC_PROFILE );
+    if( p_icc )
+    {
+        vlc_icc_profile_t *icc;
+        icc = picture_AttachNewAncillary( p_pic, VLC_ANCILLARY_ID_ICC, sizeof(*icc) + p_icc->size );
+        if( !icc )
+            return VLC_ENOMEM;
+        memcpy( icc->data, p_icc->data, p_icc->size );
+        icc->size = p_icc->size;
+    }
+
     return 0;
 }
 
