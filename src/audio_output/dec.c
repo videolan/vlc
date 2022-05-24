@@ -99,6 +99,11 @@ static inline struct vlc_tracer *aout_stream_tracer(vlc_aout_stream *stream)
         vlc_object_get_tracer(VLC_OBJECT(aout_stream_aout(stream)));
 }
 
+static int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
+{
+    return aout->time_get(aout, delay);
+}
+
 static void stream_Reset(vlc_aout_stream *stream)
 {
     aout_owner_t *owner = aout_stream_owner(stream);
