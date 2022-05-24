@@ -207,6 +207,18 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     stream->sync.clock = cfg->clock;
     stream->str_id = cfg->str_id;
 
+    stream->sync.rate = 1.f;
+    stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
+    stream->sync.delay = stream->sync.request_delay = 0;
+    stream_Discontinuity(stream);
+
+    atomic_init (&stream->buffers_lost, 0);
+    atomic_init (&stream->buffers_played, 0);
+    atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
+
+    atomic_init(&stream->drained, false);
+    atomic_init(&stream->drain_deadline, VLC_TICK_INVALID);
+
     stream->filters = NULL;
     stream->filters_cfg = AOUT_FILTERS_CFG_INIT;
     if (aout_OutputNew(p_aout, stream, &stream->mixer_format, stream->input_profile,
@@ -235,18 +247,6 @@ error:
             return NULL;
         }
     }
-
-    stream->sync.rate = 1.f;
-    stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
-    stream->sync.delay = stream->sync.request_delay = 0;
-    stream_Discontinuity(stream);
-
-    atomic_init (&stream->buffers_lost, 0);
-    atomic_init (&stream->buffers_played, 0);
-    atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
-
-    atomic_init(&stream->drained, false);
-    atomic_init(&stream->drain_deadline, VLC_TICK_INVALID);
 
     return stream;
 }
