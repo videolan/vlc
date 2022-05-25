@@ -279,6 +279,7 @@ noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 #include <errno.h>
 #include <vlc_spawn.h>
 
+#if !defined(_WIN32) || defined(VLC_WINSTORE_APP)
 VLC_WEAK
 int vlc_spawn(pid_t *pid, const char *file, const int *fds,
               const char *const *args)
@@ -301,3 +302,4 @@ int vlc_waitpid(pid_t pid)
     (void) pid;
     vlc_assert_unreachable();
 }
+#endif
