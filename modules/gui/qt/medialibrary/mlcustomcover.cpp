@@ -241,7 +241,7 @@ private:
             [data = this->data, thumbnails]
             (vlc_medialibrary_t * , Context & ctx)
             {
-                CoverGenerator generator {data.id};
+                CoverGenerator generator;
                 generator.setCountX(data.countX);
                 generator.setCountY(data.countY);
                 generator.setSize(data.size);

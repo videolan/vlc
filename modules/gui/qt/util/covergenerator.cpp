@@ -53,9 +53,8 @@ static const QString COVERGENERATOR_DEFAULT = ":/noart_albumCover.svg";
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-CoverGenerator::CoverGenerator(const MLItemId & itemId)
-    : m_id(itemId)
-    , m_countX(COVERGENERATOR_COUNT)
+CoverGenerator::CoverGenerator()
+    : m_countX(COVERGENERATOR_COUNT)
     , m_countY(COVERGENERATOR_COUNT)
     , m_split(Divide)
     , m_smooth(true)
@@ -64,13 +63,6 @@ CoverGenerator::CoverGenerator(const MLItemId & itemId)
 
 //-------------------------------------------------------------------------------------------------
 // Interface
-//-------------------------------------------------------------------------------------------------
-
-MLItemId CoverGenerator::getId()
-{
-    return m_id;
-}
-
 //-------------------------------------------------------------------------------------------------
 
 void CoverGenerator::setSize(const QSize & size)
@@ -108,34 +100,9 @@ void CoverGenerator::setDefaultThumbnail(const QString & fileName)
     m_default = fileName;
 }
 
-void CoverGenerator::setPrefix(const QString & prefix)
-{
-    m_prefix = prefix;
-}
-
 int CoverGenerator::requiredNoOfThumbnails() const
 {
     return m_countX * m_countY;
-}
-
-bool CoverGenerator::cachedFileAvailable() const
-{
-    return QFile::exists(fileName());
-}
-
-QString CoverGenerator::cachedFileURL() const
-{
-    return QUrl::fromLocalFile(fileName()).toString();
-}
-
-QString CoverGenerator::fileName() const
-{
-    QDir dir(config_GetUserDir(VLC_CACHE_DIR) + COVERGENERATOR_STORAGE);
-    return dir.absoluteFilePath(QString("%1_thumbnail_%2_%3x%4.jpg")
-                                .arg((m_prefix.isEmpty() ? getPrefix(m_id.type) : m_prefix)
-                                     , QString::number(m_id.id)
-                                     , QString::number(m_size.width())
-                                     , QString::number(m_size.height())));
 }
 
 //-------------------------------------------------------------------------------------------------
