@@ -73,6 +73,9 @@ struct vlc_aout_stream
         vlc_mutex_t lock; /* Guard data, write and read */
         struct timing_point data[MAX_TIMING_POINT];
         size_t write, read; /* Circular buffer */
+#ifndef NDEBUG
+        bool running;
+#endif
 
         struct timing_point last;
         void (*notify_latency_cb)(void *data);
@@ -141,6 +144,9 @@ static void stream_Discontinuity(vlc_aout_stream *stream)
 
     vlc_mutex_lock(&stream->timing_points.lock);
     stream->timing_points.read = stream->timing_points.write = 0;
+#ifndef NDEBUG
+    stream->timing_points.running = false;
+#endif
     vlc_mutex_unlock(&stream->timing_points.lock);
 
     stream->timing_points.last.audio_ts =
@@ -616,6 +622,8 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     /* VLC mutexes use atomic and the reader will only do very fast
      * operations (copy of the timing_point data). */
     vlc_mutex_lock(&stream->timing_points.lock);
+    assert(stream->timing_points.running);
+
     size_t write = (stream->timing_points.write++) % MAX_TIMING_POINT;
 
     struct timing_point *p = &stream->timing_points.data[write];
@@ -760,6 +768,15 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     }
 
     vlc_audio_meter_Process(&owner->meter, block, play_date);
+
+#ifndef NDEBUG
+    if (stream->sync.discontinuity)
+    {
+        vlc_mutex_lock(&stream->timing_points.lock);
+        stream->timing_points.running = true;
+        vlc_mutex_unlock(&stream->timing_points.lock);
+    }
+#endif
 
     /* Output */
     stream->sync.discontinuity = false;
