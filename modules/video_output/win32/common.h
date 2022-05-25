@@ -73,7 +73,7 @@ int  CommonWindowInit(vout_display_t *, display_win32_area_t *, vout_display_sys
                       bool projection_gestures);
 void CommonWindowClean(vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
-int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int );
+void CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int );
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 

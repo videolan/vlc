@@ -84,7 +84,8 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
-    return CommonControl(vd, &sys->area, &sys->sys, query);
+    CommonControl(vd, &sys->area, &sys->sys, query);
+    return VLC_SUCCESS;
 }
 
 static const struct vlc_window_operations embedVideoWindow_Ops =

@@ -466,7 +466,7 @@ static void Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    int res = CommonControl( vd, &sys->area, &sys->sys, query );
+    CommonControl( vd, &sys->area, &sys->sys, query );
 
     if ( sys->area.place_changed )
     {
@@ -474,7 +474,7 @@ static int Control(vout_display_t *vd, int query)
         sys->area.place_changed =false;
     }
 
-    return res;
+    return VLC_SUCCESS;
 }
 
 static bool SelectRenderPlane(void *opaque, size_t plane, ID3D11RenderTargetView **targetView)

@@ -1682,7 +1682,8 @@ static void Direct3D9Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
-    return CommonControl(vd, &sys->area, &sys->sys, query);
+    CommonControl(vd, &sys->area, &sys->sys, query);
+    return VLC_SUCCESS;
 }
 
 typedef struct

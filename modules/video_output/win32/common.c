@@ -126,7 +126,7 @@ void CommonWindowClean(vout_display_sys_win32_t *sys)
 }
 #endif /* !VLC_WINSTORE_APP */
 
-int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query)
+void CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
@@ -134,7 +134,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
         CommonPlacePicture(vd, area);
-        return VLC_SUCCESS;
+        break;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {   /* Update dimensions */
@@ -150,10 +150,10 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
         }
 #endif /* !VLC_WINSTORE_APP */
         CommonPlacePicture(vd, area);
-        return VLC_SUCCESS;
+        break;
     }
 
     default:
-        return VLC_EGENERIC;
+        vlc_assert_unreachable();
     }
 }
