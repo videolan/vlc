@@ -668,6 +668,7 @@ void vout_ChangeViewpoint(vout_thread_t *vout,
     /* no window size update here */
     vlc_mutex_unlock(&sys->window_lock);
 
+    VoutRenderWakeUpUrgent(sys);
     vlc_queuedmutex_lock(&sys->display_lock);
     if (sys->display != NULL)
         vout_SetDisplayViewpoint(sys->display, p_viewpoint);
