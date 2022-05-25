@@ -780,15 +780,17 @@ void DialogsProvider::streamingDialog( QWindow *parent,
     }
 
     /* Get SoutChain(s) */
-    if( !outputMRLs.isEmpty() )
+    QVector<vlc::playlist::Media> outputMedias;
+
+    for( auto it = outputMRLs.cbegin(); it != outputMRLs.cend(); ++it )
     {
-        QVector<vlc::playlist::Media> outputMedias;
-        std::transform(outputMRLs.cbegin(), outputMRLs.cend(), std::back_inserter(outputMedias), [&](const QString& mrl) {
-            QString title = "Converting " + mrl;
-            return vlc::playlist::Media(mrl, title, options);
-        });
-        THEMPL->append(outputMedias, true);
+        const QString &mrl = mrls[std::distance(outputMRLs.cbegin(), it)];
+        QString title = "Converting " + mrl;
+        outputMedias.append(vlc::playlist::Media(mrl, title, options + (*it).split(" :")));
     }
+
+    if( !outputMedias.empty() )
+        THEMPL->append(outputMedias, true);
 }
 
 void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
