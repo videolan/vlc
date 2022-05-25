@@ -1037,8 +1037,11 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
                                                                : IPPORT_FTPS))
             vlc_memstream_printf(&ms, ":%d", p_sys->url.i_port);
 
+        vlc_memstream_putc(&ms, '/');
+
         if (p_sys->url.psz_path != NULL)
-            vlc_memstream_printf(&ms, "/%s", p_sys->url.psz_path);
+            vlc_memstream_puts(&ms, p_sys->url.psz_path);
+
         vlc_memstream_puts(&ms, psz_filename);
         free(psz_filename);
 
