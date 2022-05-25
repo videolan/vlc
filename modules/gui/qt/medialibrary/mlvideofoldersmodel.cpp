@@ -31,7 +31,7 @@
 #include "util/covergenerator.hpp"
 
 // MediaLibrary includes
-#include "mlhelper.hpp"
+#include "mlcustomcover.hpp"
 #include "mlfolder.hpp"
 
 // Static variables
@@ -86,11 +86,9 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
             return QVariant::fromValue(folder->getTitle());
         case FOLDER_THUMBNAIL:
         {
-            auto generator = std::make_shared<CoverGenerator>(folder->getId());
-            generator->setSize(QSize(MLVIDEOFOLDERSMODEL_COVER_WIDTH, MLVIDEOFOLDERSMODEL_COVER_HEIGHT));
-            generator->setDefaultThumbnail(":/noart_videoCover.svg");
-
-            return createGroupMediaCover(this, folder, FOLDER_THUMBNAIL, generator);
+            return ml()->customCover()->get(folder->getId()
+                                            , QSize(MLVIDEOFOLDERSMODEL_COVER_WIDTH, MLVIDEOFOLDERSMODEL_COVER_HEIGHT)
+                                            , QStringLiteral(":/noart_videoCover.svg"));
         }
         case FOLDER_DURATION:
             return QVariant::fromValue(folder->getDuration());

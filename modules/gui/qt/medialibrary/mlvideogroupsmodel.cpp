@@ -31,7 +31,7 @@
 #include "util/covergenerator.hpp"
 
 // MediaLibrary includes
-#include "mlhelper.hpp"
+#include "mlcustomcover.hpp"
 #include "mlgroup.hpp"
 #include "mlvideo.hpp"
 
@@ -93,13 +93,9 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
                 return QVariant::fromValue(group->getTitle());
             case VIDEO_THUMBNAIL:
             {
-                auto generator = std::make_shared<CoverGenerator>(group->getId());
-                generator->setSize(QSize(MLVIDEOGROUPSMODEL_COVER_WIDTH, MLVIDEOGROUPSMODEL_COVER_HEIGHT));
-                generator->setDefaultThumbnail(":/noart_videoCover.svg");
-
-                return createGroupMediaCover(this, group
-                                             , VIDEO_THUMBNAIL
-                                             , generator);
+                return ml()->customCover()->get(group->getId()
+                                                , QSize(MLVIDEOGROUPSMODEL_COVER_WIDTH, MLVIDEOGROUPSMODEL_COVER_HEIGHT)
+                                                , QStringLiteral(":/noart_videoCover.svg"));
             }
             case VIDEO_DURATION:
                 return QVariant::fromValue(group->getDuration());

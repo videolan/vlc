@@ -78,7 +78,7 @@ public: // Interface
 
     QString cachedFileURL() const;
 
-    QString execute(QStringList thumbnails) const;
+    QImage execute(QStringList thumbnails) const;
 
 private: // Functions
     QString fileName() const;

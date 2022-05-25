@@ -142,18 +142,8 @@ QString CoverGenerator::fileName() const
 // QRunnable implementation
 //-------------------------------------------------------------------------------------------------
 
-QString CoverGenerator::execute(QStringList thumbnails) const
+QImage CoverGenerator::execute(QStringList thumbnails) const
 {
-    QDir dir(config_GetUserDir(VLC_CACHE_DIR) + COVERGENERATOR_STORAGE);
-
-    dir.mkpath(dir.absolutePath());
-
-    QString fileName = this->fileName();
-    if (dir.exists(fileName))
-    {
-        return QUrl::fromLocalFile(fileName).toString();
-    }
-
     int count = m_countX * m_countY;
 
     int countX;
@@ -216,9 +206,7 @@ QString CoverGenerator::execute(QStringList thumbnails) const
     if (m_blur > 0)
         blur(image);
 
-    image.save(fileName, "jpg");
-
-    return QUrl::fromLocalFile(fileName).toString();
+    return image;
 }
 
 //-------------------------------------------------------------------------------------------------

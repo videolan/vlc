@@ -101,9 +101,4 @@ void thumbnailCopy(const MLListRange<T> &list, O dst, const int max)
 
 QString MsToString( int64_t time, bool doShort = false );
 
-QStringList extractMediaThumbnails(vlc_medialibrary_t *p_ml, const int count, const MLItemId &itemID);
-
-QString createGroupMediaCover(const MLBaseModel* model, MLItemCover* parent
-                              , int role, const std::shared_ptr<CoverGenerator> generator);
-
 #endif // MLHELPER_HPP
