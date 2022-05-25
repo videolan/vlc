@@ -31,6 +31,8 @@
 #include <QQuickItem>
 #include <QUrl>
 
+class QQuickImageResponse;
+
 class RoundImage : public QQuickItem
 {
     Q_OBJECT
@@ -42,6 +44,7 @@ class RoundImage : public QQuickItem
 
 public:
     RoundImage(QQuickItem *parent = nullptr);
+    ~RoundImage();
 
     void componentComplete() override;
 
@@ -64,18 +67,20 @@ private:
     class RoundImageGenerator : public AsyncTask<QImage>
     {
     public:
-        RoundImageGenerator(const QUrl &source, qreal width, qreal height, qreal radius);
+        RoundImageGenerator(const QImage &sourceImage, qreal width, qreal height, qreal radius);
 
         QImage execute();
 
     private:
-        QUrl source;
+        QImage sourceImage;
         qreal width;
         qreal height;
         qreal radius;
     };
 
     void setDPR(qreal value);
+    void handleImageRequestFinished();
+    void resetImageRequest();
     void load();
     void setRoundImage(QImage image);
     void regenerateRoundImage();
@@ -88,6 +93,7 @@ private:
     bool m_dirty = false;
 
     TaskHandle<RoundImageGenerator> m_roundImageGenerator {};
+    QQuickImageResponse *m_activeImageRequest {};
 
     bool m_enqueuedGeneration = false;
 };
