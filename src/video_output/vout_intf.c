@@ -468,6 +468,8 @@ exit:
 
 bool vout_ParseCrop(struct vout_crop *restrict cfg, const char *crop_str)
 {
+    float fnum, fden;
+
     if (sscanf(crop_str, "%u:%u", &cfg->ratio.num, &cfg->ratio.den) == 2) {
         if (cfg->ratio.num != 0 && cfg->ratio.den != 0)
             cfg->mode = VOUT_CROP_RATIO;
@@ -481,6 +483,14 @@ bool vout_ParseCrop(struct vout_crop *restrict cfg, const char *crop_str)
                       &cfg->border.left, &cfg->border.top,
                       &cfg->border.right, &cfg->border.bottom) == 4) {
         cfg->mode = VOUT_CROP_BORDER;
+    } else if (vlc_sscanf_c(crop_str, "%f:%f", &fnum, &fden) == 2) {
+        long num = lroundf(ldexp(fnum, 24/*-bit mantissa */));
+        long den = lroundf(ldexp(fden, 24));
+        long gcd = GCD(num, den);
+
+        cfg->mode = VOUT_CROP_RATIO;
+        cfg->ratio.num = num / gcd;
+        cfg->ratio.den = den / gcd;
     } else if (*crop_str == '\0') {
         cfg->mode = VOUT_CROP_NONE;
     } else {
