@@ -145,7 +145,7 @@ enum vout_display_query {
     VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
 
     /**
-     * Notifies a change of the display fill display flag by the user.
+     * Notifies a change of the display fitting mode by the user.
      *
      * \retval VLC_SUCCESS if the display handled the change
      * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures

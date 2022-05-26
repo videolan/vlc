@@ -545,15 +545,14 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
         vout_display_Reset(vd);
 }
 
-void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
+void vout_SetDisplayFitting(vout_display_t *vd, enum vlc_video_fitting fit)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (is_filled == (osys->cfg.display.fitting != VLC_VIDEO_FIT_NONE))
+    if (fit == osys->cfg.display.fitting)
         return; /* nothing to do */
 
-    osys->cfg.display.fitting = is_filled ? VLC_VIDEO_FIT_SMALLER
-                                          : VLC_VIDEO_FIT_NONE;
+    osys->cfg.display.fitting = fit;
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED))
         vout_display_Reset(vd);
 }
