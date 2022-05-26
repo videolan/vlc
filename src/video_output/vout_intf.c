@@ -536,9 +536,11 @@ static int AutoScaleCallback( vlc_object_t *obj, char const *name,
                               vlc_value_t prev, vlc_value_t cur, void *data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)obj;
+    enum vlc_video_fitting fit = cur.b_bool ? VLC_VIDEO_FIT_SMALLER
+                                            : VLC_VIDEO_FIT_NONE;
 
     (void) name; (void) prev; (void) data;
-    vout_ChangeDisplayFilled(p_vout, cur.b_bool);
+    vout_ChangeDisplayFitting(p_vout, fit);
     return VLC_SUCCESS;
 }
 

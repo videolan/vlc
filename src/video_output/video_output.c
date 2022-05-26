@@ -484,11 +484,9 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->display_lock);
 }
 
-void vout_ChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
+void vout_ChangeDisplayFitting(vout_thread_t *vout, enum vlc_video_fitting fit)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    enum vlc_video_fitting fit = is_filled ? VLC_VIDEO_FIT_SMALLER
-                                           : VLC_VIDEO_FIT_NONE;
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
