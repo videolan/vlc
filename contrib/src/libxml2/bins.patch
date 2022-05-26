@@ -1,17 +1,17 @@
---- libxml2/Makefile.am.orig	2013-08-20 13:57:37.911178174 +0200
-+++ libxml2/Makefile.am	2013-08-20 13:57:44.543177895 +0200
+--- libxml2-2.9.14/Makefile.am.orig	2022-05-02 12:52:41.000000000 +0200
++++ libxml2-2.9.14/Makefile.am	2022-05-26 19:38:23.251503583 +0200
 @@ -2,7 +2,7 @@
  
  ACLOCAL_AMFLAGS = -I m4
  
--SUBDIRS = include . doc example xstc $(PYTHON_SUBDIR)
-+SUBDIRS = include . xstc $(PYTHON_SUBDIR)
+-SUBDIRS = include . doc example fuzz xstc $(PYTHON_SUBDIR)
++SUBDIRS = include . fuzz xstc $(PYTHON_SUBDIR)
  
- DIST_SUBDIRS = include . doc example python xstc
+ DIST_SUBDIRS = include . doc example fuzz python xstc
  
 @@ -15,7 +15,7 @@
- #                 testReader testapi testModule runtest runsuite testchar \
- # 		testdict runxmlconf testrecurse testlimits
+                testReader testapi testModule runtest runsuite testchar \
+ 	       testdict runxmlconf testrecurse testlimits
  
 -bin_PROGRAMS = xmllint xmlcatalog
 +bin_PROGRAMS =

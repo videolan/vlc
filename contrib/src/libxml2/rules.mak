@@ -1,17 +1,17 @@
 # libxml2
 
-LIBXML2_VERSION := 2.9.8
-LIBXML2_URL := http://xmlsoft.org/sources/libxml2-$(LIBXML2_VERSION).tar.gz
+LIBXML2_VERSION := 2.9.14
+LIBXML2_URL := https://download.gnome.org/sources/libxml2/2.9/libxml2-$(LIBXML2_VERSION).tar.xz
 
 PKGS += libxml2
 ifeq ($(call need_pkg,"libxml-2.0"),)
 PKGS_FOUND += libxml2
 endif
 
-$(TARBALLS)/libxml2-$(LIBXML2_VERSION).tar.gz:
+$(TARBALLS)/libxml2-$(LIBXML2_VERSION).tar.xz:
 	$(call download_pkg,$(LIBXML2_URL),libxml2)
 
-.sum-libxml2: libxml2-$(LIBXML2_VERSION).tar.gz
+.sum-libxml2: libxml2-$(LIBXML2_VERSION).tar.xz
 
 XMLCONF = --with-minimal     \
           --with-catalog     \
@@ -35,7 +35,7 @@ ifdef WITH_OPTIMIZATION
 XMLCONF+= --without-debug
 endif
 
-libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
+libxml2: libxml2-$(LIBXML2_VERSION).tar.xz .sum-libxml2
 	$(UNPACK)
 	$(APPLY) $(SRC)/libxml2/win32.patch
 	$(APPLY) $(SRC)/libxml2/bins.patch
