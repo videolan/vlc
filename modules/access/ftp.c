@@ -965,6 +965,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
     {
         char *psz_file;
         int type = ITEM_TYPE_UNKNOWN;
+        long long size = 0;
 
         char *psz_line = vlc_tls_GetLine( p_sys->data );
         if( psz_line == NULL )
@@ -995,6 +996,8 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
                         type = ITEM_TYPE_DIRECTORY;
                     else if (!vlc_ascii_strcasecmp( val, "file" ))
                         type = ITEM_TYPE_FILE;
+                } else if (!vlc_ascii_strcasecmp( key, "size" )) {
+                    size = atoll(val);
                 }
             }
         }
@@ -1043,8 +1046,13 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         {
             msg_Err(p_access, "%s -> %s", p_sys->url.psz_path, ms.ptr);
 
+            input_item_t *p_item;
             i_ret = vlc_readdir_helper_additem( &rdh, ms.ptr, NULL, psz_file,
-                                                type, ITEM_NET, NULL );
+                                                type, ITEM_NET, &p_item );
+
+            if (i_ret == VLC_SUCCESS && p_item && size > 0) {
+                input_item_AddStat(p_item, "size", size);
+            }
             free(ms.ptr);
         }
         free( psz_line );
