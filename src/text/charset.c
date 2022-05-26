@@ -99,3 +99,31 @@ int vlc_asprintf_c(char **restrict ret, const char *restrict format, ...)
 
     return i_rc;
 }
+
+int vlc_vsscanf_c(const char *restrict buf, const char *restrict format,
+                  va_list ap)
+{
+    locale_t loc = newlocale(LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale(loc);
+    int ret = vsscanf(buf, format, ap);
+
+    if (loc != (locale_t)0)
+    {
+        uselocale(oldloc);
+        freelocale(loc);
+    }
+
+    return ret;
+}
+
+int vlc_sscanf_c(const char *restrict buf, const char *restrict format, ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, format);
+    ret = vlc_vsscanf_c(buf, format, ap);
+    va_end( ap );
+
+    return ret;
+}

@@ -430,6 +430,13 @@ VLC_API int vlc_vasprintf_c(char **restrict p, const char *restrict fmt,
  */
 VLC_API int vlc_asprintf_c( char **, const char *, ... ) VLC_USED;
 
+int vlc_vsscanf_c(const char *, const char *, va_list) VLC_USED;
+int vlc_sscanf_c(const char*, const char*, ...) VLC_USED
+#ifdef __GNUC__
+__attribute__((format(scanf, 2, 3)))
+#endif
+;
+
 /** @} */
 /** @} */
 
