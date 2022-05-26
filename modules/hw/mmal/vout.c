@@ -520,7 +520,7 @@ place_dest(vout_display_t *vd, const video_format_t * fmt)
 
     dp.width = sys->display_width;
     dp.height = sys->display_height;
-    dp.autoscale = true;
+    dp.fitting = VLC_VIDEO_FIT_SMALLER;
     vout_display_PlacePicture(&place, fmt, &dp);
 
     sys->dest_rect = place_to_mmal_rect(place);

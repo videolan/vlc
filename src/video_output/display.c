@@ -113,7 +113,7 @@ void vout_display_PlacePicture(vout_display_place_t *restrict place,
     video_format_ApplyRotation(&source_rot, source);
     source = &source_rot;
 
-    if (dp->autoscale) {
+    if (dp->fitting != VLC_VIDEO_FIT_NONE) {
         display_width  = dp->width;
         display_height = dp->height;
     } else
@@ -128,8 +128,26 @@ void vout_display_PlacePicture(vout_display_place_t *restrict place,
     const int64_t scaled_width  = (int64_t)width  * display_height * dp->sar.den * source->i_sar_num / (height * source->i_sar_den * dp->sar.num);
 
     if (source->projection_mode == PROJECTION_MODE_RECTANGULAR) {
-        /* We keep the solution that avoid filling outside the display */
-        if (scaled_width <= dp->width) {
+        bool fit_height;
+
+        switch (dp->fitting) {
+            case VLC_VIDEO_FIT_NONE:
+            case VLC_VIDEO_FIT_SMALLER:
+                /* We keep the solution fitting within the display */
+                fit_height = scaled_width <= dp->width;
+                break;
+            case VLC_VIDEO_FIT_LARGER:
+                fit_height = scaled_width >= dp->width;
+                break;
+            case VLC_VIDEO_FIT_WIDTH:
+                fit_height = false;
+                break;
+            case VLC_VIDEO_FIT_HEIGHT:
+                fit_height = true;
+                break;
+        }
+
+        if (fit_height) {
             place->width  = scaled_width;
             place->height = display_height;
         } else {
@@ -531,10 +549,11 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (is_filled == osys->cfg.display.autoscale)
+    if (is_filled == (osys->cfg.display.fitting != VLC_VIDEO_FIT_NONE))
         return; /* nothing to do */
 
-    osys->cfg.display.autoscale = is_filled;
+    osys->cfg.display.fitting = is_filled ? VLC_VIDEO_FIT_SMALLER
+                                          : VLC_VIDEO_FIT_NONE;
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED))
         vout_display_Reset(vd);
 }
@@ -546,7 +565,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
     osys->cfg.display.zoom.num = num;
     osys->cfg.display.zoom.den = den;
 
-    if (osys->cfg.display.autoscale)
+    if (osys->cfg.display.fitting != VLC_VIDEO_FIT_NONE)
         return; /* zoom has no effects */
     if (osys->cfg.display.zoom.num * den == num * osys->cfg.display.zoom.den)
         return; /* zoom has not changed */

@@ -78,6 +78,17 @@ typedef struct vlc_video_align {
 /** @} */
 
 /**
+ * Video automatic scale fitting.
+ */
+enum vlc_video_fitting {
+    VLC_VIDEO_FIT_NONE /**< No automatic scaling (use explicit zoom ratio) */,
+    VLC_VIDEO_FIT_SMALLER /**< Fit inside / to smallest dimension */,
+    VLC_VIDEO_FIT_LARGER /**< Fit outside / to largest dimension */,
+    VLC_VIDEO_FIT_WIDTH /**< Fit to width */,
+    VLC_VIDEO_FIT_HEIGHT /**< Fit to height */,
+};
+
+/**
  * Display placement and zoom configuration.
  */
 struct vout_display_placement {
@@ -86,8 +97,8 @@ struct vout_display_placement {
     vlc_rational_t sar; /**< Requested sample aspect ratio */
 
     vlc_video_align_t align; /**< Alignment within the window */
-    bool autoscale; /**< Automatic scaling/fitting flag */
-    vlc_rational_t zoom; /**< Zoom ratio (if autoscale is disabled) */
+    enum vlc_video_fitting fitting; /**< Scaling/fitting mode */
+    vlc_rational_t zoom; /**< Zoom ratio (if fitting is disabled) */
 };
 
 /**
@@ -95,7 +106,7 @@ struct vout_display_placement {
  *
  * This primarily controls the size of the display area within the video
  * window, as follows:
- * - If \ref vout_display_cfg::display::autoscale is set,
+ * - If \ref vout_display_cfg::display::fitting is not disabled,
  *   the video size is fitted to the display size.
  * - If \ref vout_display_cfg::window "window" size is valid, the video size
  *   is set to the window size,

@@ -490,7 +490,8 @@ void vout_ChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    sys->display_cfg.display.autoscale = is_filled;
+    sys->display_cfg.display.fitting = is_filled ? VLC_VIDEO_FIT_SMALLER
+                                                 : VLC_VIDEO_FIT_NONE;
     /* no window size update here */
 
     vlc_mutex_lock(&sys->display_lock);
@@ -663,7 +664,8 @@ static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *f
     const int display_height = var_GetInteger(vout, "height");
     cfg->display.width   = display_width > 0  ? display_width  : 0;
     cfg->display.height  = display_height > 0 ? display_height : 0;
-    cfg->display.autoscale = var_GetBool(vout, "autoscale");
+    cfg->display.fitting = var_GetBool(vout, "autoscale")
+        ? VLC_VIDEO_FIT_SMALLER : VLC_VIDEO_FIT_NONE;
     unsigned msar_num, msar_den;
     if (var_InheritURational(vout, &msar_num, &msar_den, "monitor-par") ||
         msar_num <= 0 || msar_den <= 0) {
