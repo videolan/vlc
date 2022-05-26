@@ -341,7 +341,7 @@ vlc_player_vout_OSDCallback(vlc_object_t *this, const char *var,
             bool found =  vout_osd_PrintVariableText(vout, var, VLC_VAR_FLOAT,
                                                      newval, _("Zoom mode: %s"));
             if (!found)
-                vouts_osd_Message(&vout, 1, _("Zoom: x%f"), newval.f_float);
+                vouts_osd_Message(&vout, 1, _("Zoom: x%.2f"), newval.f_float);
         }
     }
 
