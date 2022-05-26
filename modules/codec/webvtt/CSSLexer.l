@@ -32,10 +32,10 @@
 # include "config.h"
 #endif
 #include <vlc_common.h>
+#include <vlc_charset.h>
 #include "css_parser.h"
 #include "CSSGrammar.h"
 #define VAL(a, b) { yylval->term.val = (a); yylval->term.type = TYPE_ ## b; }
-#define vlc_strtof_c strtof
 char *d;
 %}
 
