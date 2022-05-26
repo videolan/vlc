@@ -1467,7 +1467,8 @@ static size_t ControlGetReducedIndexLocked( input_thread_t *p_input,
              i_ct == INPUT_CONTROL_SET_TIME ||
              i_ct == INPUT_CONTROL_SET_PROGRAM ||
              i_ct == INPUT_CONTROL_SET_TITLE ||
-             i_ct == INPUT_CONTROL_SET_SEEKPOINT )
+             i_ct == INPUT_CONTROL_SET_SEEKPOINT ||
+             i_ct == INPUT_CONTROL_SET_VIEWPOINT )
         {
             return sys->i_control - 1;
         }
@@ -1479,6 +1480,14 @@ static size_t ControlGetReducedIndexLocked( input_thread_t *p_input,
         else if ( i_ct == INPUT_CONTROL_JUMP_POSITION )
         {
             c->param.pos.f_val += prev_control->param.pos.f_val;
+            return sys->i_control - 1;
+        }
+        else if ( i_ct == INPUT_CONTROL_UPDATE_VIEWPOINT )
+        {
+            c->param.viewpoint.yaw += prev_control->param.viewpoint.yaw;
+            c->param.viewpoint.pitch += prev_control->param.viewpoint.pitch;
+            c->param.viewpoint.roll += prev_control->param.viewpoint.roll;
+            c->param.viewpoint.fov += prev_control->param.viewpoint.fov;
             return sys->i_control - 1;
         }
     }
