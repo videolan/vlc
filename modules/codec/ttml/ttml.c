@@ -106,7 +106,7 @@ static tt_time_t tt_ParseTime( const char *s )
     else /* Offset Time */
     {
         char *psz_end = (char *) s;
-        double v = us_strtod( s, &psz_end );
+        double v = vlc_strtod_c( s, &psz_end );
         if( psz_end != s && *psz_end )
         {
             if( *psz_end == 'm' )

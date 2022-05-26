@@ -223,7 +223,7 @@ static ttml_length_t ttml_read_length( const char *psz )
     ttml_length_t len = { 0.0, TTML_UNIT_UNKNOWN };
 
     char* psz_end = NULL;
-    float size = us_strtof( psz, &psz_end );
+    float size = vlc_strtof_c( psz, &psz_end );
     len.i_value = size;
     if( psz_end )
     {

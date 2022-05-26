@@ -1013,7 +1013,7 @@ static int ParseMicroDvd( vlc_object_t *p_obj, subs_properties_t *p_props,
 
             /* We found a possible setting of the framerate "{1}{1}23.976" */
             /* Check if it's usable, and if the sub-original-fps is not set */
-            float f_fps = us_strtof( psz_text, NULL );
+            float f_fps = vlc_strtof_c( psz_text, NULL );
             if( f_fps > 0.f && var_GetFloat( p_obj, "sub-original-fps" ) <= 0.f )
                 p_props->i_microsecperframe = llroundf((float)CLOCK_FREQ / f_fps);
         }
@@ -1740,7 +1740,7 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
 
             if( sscanf( s, "FORMAT=%[^\r\n]", psz_temp ) )
             {
-                float f_fps = us_strtof( psz_temp, NULL );
+                float f_fps = vlc_strtof_c( psz_temp, NULL );
 
                 if( f_fps > 0.f && var_GetFloat( p_obj, "sub-original-fps" ) <= 0.f )
                     var_SetFloat( p_obj, "sub-original-fps", f_fps );
@@ -1753,10 +1753,10 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         }
 
         /* Data Lines */
-        float f1 = us_strtof( s, &psz_temp );
+        float f1 = vlc_strtof_c( s, &psz_temp );
         if( *psz_temp )
         {
-            float f2 = us_strtof( psz_temp, NULL );
+            float f2 = vlc_strtof_c( psz_temp, NULL );
             p_props->mpsub.f_total += f1 * p_props->mpsub.i_factor;
             p_subtitle->i_start = llroundf(10000.f * p_props->mpsub.f_total);
             p_props->mpsub.f_total += f2 * p_props->mpsub.i_factor;

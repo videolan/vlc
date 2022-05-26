@@ -183,7 +183,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
                 if( bo_size( &box ) != i_start + 8 )
                     bo_add_8( &box, ' ' );
                 char *psz;
-                int i_printed = us_asprintf( &psz, "line:%2.2f%%", offset );
+                int i_printed = vlc_asprintf_c( &psz, "line:%2.2f%%", offset );
                 if( i_printed >= 0 )
                 {
                     if( i_printed > 0 )

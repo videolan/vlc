@@ -396,7 +396,7 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                                      NULL, 0 );
                 break;
             case CONFIG_ITEM_FLOAT:
-                val.f_float = us_atof( cfg->psz_value ? cfg->psz_value : "0" );
+                val.f_float = vlc_atof_c( cfg->psz_value ? cfg->psz_value : "0" );
                 break;
             case CONFIG_ITEM_STRING:
                 val.psz_string = cfg->psz_value;

@@ -175,7 +175,7 @@ nop:
     /* Check for a "vlc://pause:***" command */
     if( !strncasecmp( psz_name, "pause:", 6 ) )
     {
-        double f = us_atof( psz_name + 6 );
+        double f = vlc_atof_c( psz_name + 6 );
         vlc_tick_t length = vlc_tick_from_sec( f );
 
         msg_Info( p_demux, "command `pause %f'", f );

@@ -1193,7 +1193,7 @@ void httpd_MsgAdd(httpd_message_t *msg, const char *name, const char *psz_value,
 
     va_list args;
     va_start(args, psz_value);
-    int ret = us_vasprintf(&h->value, psz_value, args);
+    int ret = vlc_vasprintf_c(&h->value, psz_value, args);
     va_end(args);
 
     if (ret == -1) {

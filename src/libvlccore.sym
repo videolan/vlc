@@ -430,10 +430,10 @@ update_Download
 update_GetRelease
 update_NeedUpgrade
 update_New
-us_asprintf
-us_strtod
-us_strtof
-us_vasprintf
+vlc_asprintf_c
+vlc_strtod_c
+vlc_strtof_c
+vlc_vasprintf_c
 vlc_close
 vlc_fopen
 utf8_fprintf

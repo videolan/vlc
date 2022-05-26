@@ -436,7 +436,7 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
             else
             {
                 /* Percent */
-                double d_new_position = us_atof( psz_argument ) / 100.0;
+                double d_new_position = vlc_atof_c( psz_argument ) / 100.0;
 
                 if( b_relative )
                 {

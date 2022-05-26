@@ -290,26 +290,26 @@ void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
         (psz_value = vlc_meta_GetExtra(p_meta, "RG_RADIO")) )
     {
         p_dst->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
-        p_dst->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz_value );
+        p_dst->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( psz_value );
     }
 
     if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_TRACK_PEAK" )) ||
              (psz_value = vlc_meta_GetExtra(p_meta, "RG_PEAK" )) )
     {
         p_dst->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
-        p_dst->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz_value );
+        p_dst->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( psz_value );
     }
 
     if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_ALBUM_GAIN" )) ||
              (psz_value = vlc_meta_GetExtra(p_meta, "RG_AUDIOPHILE" )) )
     {
         p_dst->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
-        p_dst->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz_value );
+        p_dst->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( psz_value );
     }
 
     if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_ALBUM_PEAK" )) )
     {
         p_dst->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
-        p_dst->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz_value );
+        p_dst->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( psz_value );
     }
 }

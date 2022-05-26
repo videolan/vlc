@@ -3040,14 +3040,14 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 const char *psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_gain" );
                 if( psz_meta )
                 {
-                    double f_gain = us_atof( psz_meta );
+                    double f_gain = vlc_atof_c( psz_meta );
                     p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
                     p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain != 0;
                 }
                 psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_peak" );
                 if( psz_meta )
                 {
-                    double f_gain = us_atof( psz_meta );
+                    double f_gain = vlc_atof_c( psz_meta );
                     p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
                     p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
                 }

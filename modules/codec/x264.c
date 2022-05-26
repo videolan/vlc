@@ -1008,11 +1008,11 @@ static int  Open ( vlc_object_t *p_this )
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "psy-rd" );
     if( psz_val )
     {
-        if( us_atof( psz_val ) != 1.0 )
+        if( vlc_atof_c( psz_val ) != 1.0 )
         {
             char *p = strchr( psz_val, ':' );
-            p_sys->param.analyse.f_psy_rd = us_atof( psz_val );
-            p_sys->param.analyse.f_psy_trellis = p ? us_atof( p+1 ) : 0;
+            p_sys->param.analyse.f_psy_rd = vlc_atof_c( psz_val );
+            p_sys->param.analyse.f_psy_trellis = p ? vlc_atof_c( p+1 ) : 0;
         }
         free( psz_val );
     }
@@ -1023,8 +1023,8 @@ static int  Open ( vlc_object_t *p_this )
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "level" );
     if( psz_val )
     {
-        if( us_atof (psz_val) < 6 && us_atof (psz_val) > 0 )
-            p_sys->param.i_level_idc = (int) (10 * us_atof (psz_val)
+        if( vlc_atof_c(psz_val) < 6 && vlc_atof_c(psz_val) > 0 )
+            p_sys->param.i_level_idc = (int) (10 * vlc_atof_c(psz_val)
                                               + .5);
         else if( atoi(psz_val) >= 10 && atoi(psz_val) <= 51 )
             p_sys->param.i_level_idc = atoi (psz_val);

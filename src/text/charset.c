@@ -43,7 +43,7 @@
 #include "libvlc.h"
 #include <vlc_charset.h>
 
-double us_strtod( const char *str, char **end )
+double vlc_strtod_c(const char *restrict str, char **restrict end)
 {
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
@@ -57,7 +57,7 @@ double us_strtod( const char *str, char **end )
     return res;
 }
 
-float us_strtof( const char *str, char **end )
+float vlc_strtof_c(const char *restrict str, char **restrict end)
 {
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
@@ -71,7 +71,8 @@ float us_strtof( const char *str, char **end )
     return res;
 }
 
-int us_vasprintf( char **ret, const char *format, va_list ap )
+int vlc_vasprintf_c(char **restrict ret, const char *restrict format,
+                    va_list ap)
 {
     locale_t loc = newlocale( LC_NUMERIC_MASK, "C", NULL );
     locale_t oldloc = uselocale( loc );
@@ -87,13 +88,13 @@ int us_vasprintf( char **ret, const char *format, va_list ap )
     return i_rc;
 }
 
-int us_asprintf( char **ret, const char *format, ... )
+int vlc_asprintf_c(char **restrict ret, const char *restrict format, ...)
 {
     va_list ap;
     int i_rc;
 
     va_start( ap, format );
-    i_rc = us_vasprintf( ret, format, ap );
+    i_rc = vlc_vasprintf_c(ret, format, ap);
     va_end( ap );
 
     return i_rc;

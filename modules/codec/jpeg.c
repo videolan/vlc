@@ -277,7 +277,7 @@ static bool getRDFFloat(const char *psz_rdf, float *out, const char *psz_var)
     if (unlikely(p_end == NULL || p_end == p_start + 1))
         return false;
 
-    *out = us_strtof(p_start, NULL);
+    *out = vlc_strtof_c(p_start, NULL);
     return true;
 }
 

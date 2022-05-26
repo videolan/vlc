@@ -625,7 +625,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
                 r->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
-                r->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz_value );
+                r->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( psz_value );
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_PEAK" ) ||
                      !strcasecmp( psz_name, "RG_PEAK" ) )
@@ -633,7 +633,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
                 r->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
-                r->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz_value );
+                r->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( psz_value );
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_GAIN" ) ||
                      !strcasecmp( psz_name, "RG_AUDIOPHILE" ) )
@@ -641,14 +641,14 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
                 r->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
-                r->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz_value );
+                r->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( psz_value );
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_PEAK" ) )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
 
                 r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
-                r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz_value );
+                r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( psz_value );
             }
             else if( !strcasecmp( psz_name, "METADATA_BLOCK_PICTURE" ) )
             { /* Do nothing, for now */ }

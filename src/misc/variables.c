@@ -990,7 +990,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         break;
 
     case VLC_VAR_FLOAT:
-        val.f_float = us_atof( psz_value );
+        val.f_float = vlc_atof_c( psz_value );
         break;
 
     case VLC_VAR_STRING:

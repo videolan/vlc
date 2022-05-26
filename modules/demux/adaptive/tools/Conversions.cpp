@@ -47,7 +47,7 @@ static vlc_tick_t str_duration( const char *psz_duration )
         return -1;
     do
     {
-        double number = us_strtod( psz_duration, &end_ptr );
+        double number = vlc_strtod_c( psz_duration, &end_ptr );
         double      mul = 0;
         if ( psz_duration != end_ptr )
             psz_duration = end_ptr;

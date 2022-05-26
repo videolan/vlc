@@ -35,7 +35,7 @@
 #include "css_parser.h"
 #include "CSSGrammar.h"
 #define VAL(a, b) { yylval->term.val = (a); yylval->term.type = TYPE_ ## b; }
-#define us_strtof strtof
+#define vlc_strtof_c strtof
 char *d;
 %}
 
@@ -79,24 +79,24 @@ range		\?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
 
 "!{w}important"		{return IMPORTANT_SYM;}
 
-{num}em			{ VAL( us_strtof(yytext, &d), EMS ); return LENGTH;}
+{num}em			{ VAL( vlc_strtof_c(yytext, &d), EMS ); return LENGTH;}
 {num}ex			{ VAL( atoi(yytext), EXS ); return LENGTH;}
 {num}px			{ VAL( atoi(yytext), PIXELS ); return LENGTH;}
-{num}cm			{ VAL( us_strtof(yytext, &d) * 10, MILLIMETERS ); return LENGTH;}
+{num}cm			{ VAL( vlc_strtof_c(yytext, &d) * 10, MILLIMETERS ); return LENGTH;}
 {num}mm			{ VAL( atoi(yytext), MILLIMETERS ); return LENGTH;}
-{num}in			{ VAL( us_strtof(yytext, &d) * 25.4, MILLIMETERS ); return LENGTH;}
-{num}pt			{ VAL( us_strtof(yytext, &d), POINTS ); return LENGTH;}
-{num}pc			{ VAL( us_strtof(yytext, &d), POINTS ); return LENGTH;}
-{num}deg		{ VAL( us_strtof(yytext, &d), DEGREES ); return ANGLE;}
-{num}rad		{ VAL( us_strtof(yytext, &d) * 0.0174533, DEGREES ); return ANGLE;}
-{num}grad		{ VAL( us_strtof(yytext, &d) * 1.1111111, DEGREES ); return ANGLE;}
+{num}in			{ VAL( vlc_strtof_c(yytext, &d) * 25.4, MILLIMETERS ); return LENGTH;}
+{num}pt			{ VAL( vlc_strtof_c(yytext, &d), POINTS ); return LENGTH;}
+{num}pc			{ VAL( vlc_strtof_c(yytext, &d), POINTS ); return LENGTH;}
+{num}deg		{ VAL( vlc_strtof_c(yytext, &d), DEGREES ); return ANGLE;}
+{num}rad		{ VAL( vlc_strtof_c(yytext, &d) * 0.0174533, DEGREES ); return ANGLE;}
+{num}grad		{ VAL( vlc_strtof_c(yytext, &d) * 1.1111111, DEGREES ); return ANGLE;}
 {num}ms			{ VAL( atoi(yytext), MILLISECONDS ); return TIME;}
 {num}s			{ VAL( atoi(yytext) * 1000, MILLISECONDS ); return TIME;}
 {num}Hz			{ VAL( atoi(yytext), HERTZ ); return FREQ;}
 {num}kHz		{ VAL( atoi(yytext) * 1000, HERTZ ); return FREQ;}
 {num}{ident}	{ VAL( 0, DIMENSION ); return DIMEN;}
 {num}%			{ VAL( atoi(yytext), PERCENT ); return PERCENTAGE;}
-{num}			{ VAL( us_strtof(yytext, &d), NONE ); return NUMBER;}
+{num}			{ VAL( vlc_strtof_c(yytext, &d), NONE ); return NUMBER;}
 
 "url("{w}{string}{w}")"	{ yylval->string = vlc_css_unquotedunescaped(yytext); return URI;}
 "url("{w}{url}{w}")"	{ yylval->string = vlc_css_unquotedunescaped(yytext); return URI;}

@@ -1095,7 +1095,7 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
                         {
                             const char *psz_val = vlc_meta_GetExtra( p_meta, ppsz_keys[i] );
                             if( psz_val )
-                                *pf = us_atof( psz_val );
+                                *pf = vlc_atof_c( psz_val );
                         }
                         free( ppsz_keys[i] );
                     }

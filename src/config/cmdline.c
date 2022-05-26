@@ -311,7 +311,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         var_Change( p_this, psz_name, VLC_VAR_SETMINMAX,
                             (vlc_value_t){ .f_float = p_conf->min.f },
                             (vlc_value_t){ .f_float = p_conf->max.f } );
-                        var_SetFloat( p_this, psz_name, us_atof(state.arg) );
+                        var_SetFloat( p_this, psz_name, vlc_atof_c(state.arg) );
                         break;
                     case CONFIG_ITEM_BOOL:
                         var_Create( p_this, psz_name, VLC_VAR_BOOL );
@@ -347,7 +347,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     break;
                 case CONFIG_ITEM_FLOAT:
                     var_Create( p_this, name, VLC_VAR_FLOAT );
-                    var_SetFloat( p_this, name, us_atof(state.arg) );
+                    var_SetFloat( p_this, name, vlc_atof_c(state.arg) );
                     break;
                 case CONFIG_ITEM_BOOL:
                     var_Create( p_this, name, VLC_VAR_BOOL );

@@ -494,19 +494,19 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
             if (!p) goto next_comment;
             if ( !strncasecmp(psz_comment, "REPLAYGAIN_TRACK_GAIN=", 22) )
             {
-                (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
+                (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( ++p );
             }
             else if ( !strncasecmp(psz_comment, "REPLAYGAIN_ALBUM_GAIN=", 22) )
             {
-                (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( ++p );
+                (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( ++p );
             }
             else if ( !strncasecmp(psz_comment, "REPLAYGAIN_ALBUM_PEAK=", 22) )
             {
-                (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( ++p );
+                (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( ++p );
             }
             else if ( !strncasecmp(psz_comment, "REPLAYGAIN_TRACK_PEAK=", 22) )
             {
-                (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
+                (*ppf_replay_peak)[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( ++p );
             }
         }
         else if( !strncasecmp(psz_comment, "CHAPTER", 7) )

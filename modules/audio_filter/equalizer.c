@@ -547,7 +547,7 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         char *next;
         /* Read dB -20/20 */
-        float f = us_strtof( p, &next );
+        float f = vlc_strtof_c( p, &next );
         if( next == p || isnan( f ) )
             break; /* no conversion */
 

@@ -363,7 +363,7 @@ static inline char *FromLatin1 (const char *latin)
  *                 (or NULL to discard it)
  * \return the parsed double value (zero if no character could be parsed)
  */
-VLC_API double us_strtod(const char *restrict str, char **restrict end)
+VLC_API double vlc_strtod_c(const char *restrict str, char **restrict end)
 VLC_USED;
 
 /**
@@ -379,7 +379,7 @@ VLC_USED;
  *                 (or NULL to discard it)
  * \return the parsed double value (zero if no character could be parsed)
  */
-VLC_API float us_strtof(const char *restrict str, char **restrict end)
+VLC_API float vlc_strtof_c(const char *restrict str, char **restrict end)
 VLC_USED;
 
 /**
@@ -393,9 +393,9 @@ VLC_USED;
  * \param str nul-terminated string to parse
  * \return the parsed double value (zero if no character could be parsed)
  */
-VLC_USED static inline double us_atof(const char *str)
+VLC_USED static inline double vlc_atof_c(const char *str)
 {
-    return us_strtod(str, NULL);
+    return vlc_strtod_c(str, NULL);
 }
 
 /**
@@ -412,8 +412,8 @@ VLC_USED static inline double us_atof(const char *str)
  * \return number of bytes formatted (excluding the nul terminator)
  *        or -1 on error
  */
-VLC_API int us_vasprintf(char **restrict p, const char *restrict fmt,
-                         va_list ap) VLC_USED;
+VLC_API int vlc_vasprintf_c(char **restrict p, const char *restrict fmt,
+                            va_list ap) VLC_USED;
 
 /**
  * Formats a string using the C locale.
@@ -428,7 +428,7 @@ VLC_API int us_vasprintf(char **restrict p, const char *restrict fmt,
  * \return number of bytes formatted (excluding the nul terminator)
  *        or -1 on error
  */
-VLC_API int us_asprintf( char **, const char *, ... ) VLC_USED;
+VLC_API int vlc_asprintf_c( char **, const char *, ... ) VLC_USED;
 
 /** @} */
 /** @} */
