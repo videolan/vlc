@@ -543,12 +543,13 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (!osys->cfg.display.autoscale
-     && osys->cfg.display.zoom.num == num && osys->cfg.display.zoom.den == den)
-        return; /* nothing to do */
-
     osys->cfg.display.zoom.num = num;
     osys->cfg.display.zoom.den = den;
+
+    if (osys->cfg.display.autoscale)
+        return; /* zoom has no effects */
+    if (osys->cfg.display.zoom.num * den == num * osys->cfg.display.zoom.den)
+        return; /* zoom has not changed */
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM))
         vout_display_Reset(vd);
 }
