@@ -1044,8 +1044,6 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
 
         if (likely(vlc_memstream_close(&ms) == 0))
         {
-            msg_Err(p_access, "%s -> %s", p_sys->url.psz_path, ms.ptr);
-
             input_item_t *p_item;
             i_ret = vlc_readdir_helper_additem( &rdh, ms.ptr, NULL, psz_file,
                                                 type, ITEM_NET, &p_item );
