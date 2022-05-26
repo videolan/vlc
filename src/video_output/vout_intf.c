@@ -151,6 +151,21 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
     }
 }
 
+enum vlc_video_fitting var_InheritFit(vlc_object_t *obj)
+{
+    int64_t v = var_InheritInteger(obj, "fit");
+    /* Safe variable => paranoid checks */
+    switch (v) {
+        case VLC_VIDEO_FIT_SMALLER:
+        case VLC_VIDEO_FIT_LARGER:
+        case VLC_VIDEO_FIT_WIDTH:
+        case VLC_VIDEO_FIT_HEIGHT:
+            return v;
+        default:
+            return VLC_VIDEO_FIT_SMALLER;
+    }
+}
+
 void vout_CreateVars( vout_thread_t *p_vout )
 {
     vlc_value_t val;
@@ -536,7 +551,7 @@ static int AutoScaleCallback( vlc_object_t *obj, char const *name,
                               vlc_value_t prev, vlc_value_t cur, void *data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)obj;
-    enum vlc_video_fitting fit = cur.b_bool ? VLC_VIDEO_FIT_SMALLER
+    enum vlc_video_fitting fit = cur.b_bool ? var_InheritFit(obj)
                                             : VLC_VIDEO_FIT_NONE;
 
     (void) name; (void) prev; (void) data;

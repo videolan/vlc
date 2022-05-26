@@ -664,7 +664,7 @@ static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *f
     cfg->display.width   = display_width > 0  ? display_width  : 0;
     cfg->display.height  = display_height > 0 ? display_height : 0;
     cfg->display.fitting = var_GetBool(vout, "autoscale")
-        ? VLC_VIDEO_FIT_SMALLER : VLC_VIDEO_FIT_NONE;
+        ? var_InheritFit(VLC_OBJECT(vout)) : VLC_VIDEO_FIT_NONE;
     unsigned msar_num, msar_den;
     if (var_InheritURational(vout, &msar_num, &msar_den, "monitor-par") ||
         msar_num <= 0 || msar_den <= 0) {

@@ -171,6 +171,7 @@ void vout_CreateVars( vout_thread_t * );
 void vout_IntfInit( vout_thread_t * );
 void vout_IntfReinit( vout_thread_t * );
 void vout_IntfDeinit(vlc_object_t *);
+enum vlc_video_fitting var_InheritFit(vlc_object_t *);
 
 /* */
 ssize_t vout_RegisterSubpictureChannelInternal( vout_thread_t *,

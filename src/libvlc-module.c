@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
+#include <vlc_vout_display.h>
 #include "libvlc.h"
 #include "modules/modules.h"
 
@@ -453,6 +454,18 @@ static const char *const screensaver_texts[] = {
 #define AUTOSCALE_TEXT N_("Video Auto Scaling")
 #define AUTOSCALE_LONGTEXT N_( \
     "Let the video scale to fit a given window or fullscreen.")
+
+#define FIT_TEXT N_("Video fitting")
+#define FIT_LONGTEXT N_( \
+    "This selects the dimension according to which the video will be scaled.")
+
+static const int fit_values[] = {
+    VLC_VIDEO_FIT_SMALLER, VLC_VIDEO_FIT_LARGER,
+    VLC_VIDEO_FIT_WIDTH, VLC_VIDEO_FIT_HEIGHT,
+};
+static const char *const fit_descriptions[] = {
+    N_("Smaller"), N_("Larger"), N_("Width"), N_("Height"),
+};
 
 #define CUSTOM_CROP_RATIOS_TEXT N_("Custom crop ratios list")
 #define CUSTOM_CROP_RATIOS_LONGTEXT N_( \
@@ -1690,6 +1703,9 @@ vlc_module_begin ()
     add_bool( "autoscale", true, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT )
         change_safe ()
     add_obsolete_float( "scale" ) /* since 3.0.0 */
+    add_integer("fit", VLC_VIDEO_FIT_SMALLER, FIT_TEXT, FIT_LONGTEXT)
+        change_integer_list(fit_values, fit_descriptions)
+        change_safe()
     add_string( "monitor-par", NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT )
     add_string( "custom-aspect-ratios", NULL, CUSTOM_ASPECT_RATIOS_TEXT,
