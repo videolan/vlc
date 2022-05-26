@@ -393,7 +393,10 @@ VLC_USED;
  * \param str nul-terminated string to parse
  * \return the parsed double value (zero if no character could be parsed)
  */
-VLC_API double us_atof(const char *str) VLC_USED;
+VLC_USED static inline double us_atof(const char *str)
+{
+    return us_strtod(str, NULL);
+}
 
 /**
  * Formats a string using the C locale.
