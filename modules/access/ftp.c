@@ -1018,6 +1018,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
 
         struct vlc_memstream ms;
 
+        // Scheme
         vlc_memstream_open(&ms);
         vlc_memstream_puts(&ms, "ftp");
         if (p_sys->tlsmode != NONE)
@@ -1028,20 +1029,27 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         }
         vlc_memstream_puts(&ms, "://");
 
+        // Host
+        // In case of IPv6, enclose in []
         if (strchr(p_sys->url.psz_host, ':') != NULL)
             vlc_memstream_printf(&ms, "[%s]", p_sys->url.psz_host);
         else
             vlc_memstream_puts(&ms, p_sys->url.psz_host);
 
+        // Port
+        // Only print if not the default for the scheme
         if (p_sys->url.i_port != ((p_sys->tlsmode != IMPLICIT) ? IPPORT_FTP
                                                                : IPPORT_FTPS))
             vlc_memstream_printf(&ms, ":%d", p_sys->url.i_port);
 
+        // Separating / after host[:port]
         vlc_memstream_putc(&ms, '/');
 
+        // Path to the current location, if any
         if (p_sys->url.psz_path != NULL)
             vlc_memstream_puts(&ms, p_sys->url.psz_path);
 
+        // Filename
         vlc_memstream_puts(&ms, psz_filename);
         free(psz_filename);
 
