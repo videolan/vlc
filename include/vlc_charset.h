@@ -349,11 +349,84 @@ static inline char *FromLatin1 (const char *latin)
  * \defgroup c_locale C/POSIX locale functions
  * @{
  */
-VLC_API double us_strtod( const char *, char ** ) VLC_USED;
-VLC_API float us_strtof( const char *, char ** ) VLC_USED;
-VLC_API double us_atof( const char * ) VLC_USED;
-VLC_API int us_vasprintf( char **, const char *, va_list );
+
+/**
+ * Parses a double in C locale.
+ *
+ * This function parses a double-precision floating point number from a string
+ * just like the standard strtod() but it uses the C locale. In other words, it
+ * expects the POSIX/C/American decimal format regardless of the current
+ * numeric locale.
+ *
+ * \param str nul-terminated string to parse
+ * \param[out] end storage space for a pointer to the first unparsed byte
+ *                 (or NULL to discard it)
+ * \return the parsed double value (zero if no character could be parsed)
+ */
+VLC_API double us_strtod(const char *restrict str, char **restrict end)
+VLC_USED;
+
+/**
+ * Parses a float in C locale.
+ *
+ * This function parses a single-precision floating point number from a string
+ * just like the standard strtof() but it uses the C locale. In other words, it
+ * expects the POSIX/C/American decimal format regardless of the current
+ * numeric locale.
+ *
+ * \param str nul-terminated string to parse
+ * \param[out] end storage space for a pointer to the first unparsed byte
+ *                 (or NULL to discard it)
+ * \return the parsed double value (zero if no character could be parsed)
+ */
+VLC_API float us_strtof(const char *restrict str, char **restrict end)
+VLC_USED;
+
+/**
+ * Parses a double in C locale.
+ *
+ * This function parses a double-precision floating point number from a string
+ * just like the standard atof() but it uses the C locale. In other words, it
+ * expects the POSIX/C/American decimal format regardless of the current
+ * numeric locale.
+ *
+ * \param str nul-terminated string to parse
+ * \return the parsed double value (zero if no character could be parsed)
+ */
+VLC_API double us_atof(const char *str) VLC_USED;
+
+/**
+ * Formats a string using the C locale.
+ *
+ * This function formats a string from a format string and a variable argument
+ * list, just like the standard vasprintf() but using the C locale for the
+ * formatting of numerals.
+ *
+ * \param[out] p storage space for a pointer to the heap-allocated formatted
+ *               string (undefined on error)
+ * \param fmt format string
+ * \param ap variable argument list
+ * \return number of bytes formatted (excluding the nul terminator)
+ *        or -1 on error
+ */
+VLC_API int us_vasprintf(char **restrict p, const char *restrict fmt,
+                         va_list ap) VLC_USED;
+
+/**
+ * Formats a string using the C locale.
+ *
+ * This function formats a string from a format string and a variable argument
+ * list, just like the standard vasprintf() but using the C locale for the
+ * formatting of numerals.
+ *
+ * \param[out] p storage space for a pointer to the heap-allocated formatted
+ *               string (undefined on error)
+ * \param fmt format string
+ * \return number of bytes formatted (excluding the nul terminator)
+ *        or -1 on error
+ */
 VLC_API int us_asprintf( char **, const char *, ... ) VLC_USED;
+
 /** @} */
 /** @} */
 
