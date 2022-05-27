@@ -181,12 +181,12 @@ void ConvertDialog::close()
 
         if( dumpRadio->isChecked() )
         {
-            mrl.header("demux=dump :demuxdump-file=" + fileLine->text());
+            mrl.header(" :demux=dump :demuxdump-file=" + fileLine->text());
         }
         else
         {
             mrl = profile->getTranscode();
-            mrl.header( "sout=#" + mrl.getHeader() );
+            mrl.header( " :sout=#" + mrl.getHeader() );
             if( deinterBox->isChecked() )
             {
                 mrl.option("deinterlace");
