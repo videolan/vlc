@@ -467,6 +467,12 @@ void vlc_queuedmutex_init(vlc_queuedmutex_t *m)
 {
     atomic_init(&m->head, 0);
     atomic_init(&m->tail, 0);
+    atomic_init(&m->owner, 0);
+}
+
+bool vlc_queuedmutex_held(vlc_queuedmutex_t *m)
+{
+    return (vlc_thread_id() == atomic_load_explicit(&m->owner, memory_order_relaxed));
 }
 
 void vlc_queuedmutex_lock(vlc_queuedmutex_t *m)
@@ -478,10 +484,13 @@ void vlc_queuedmutex_lock(vlc_queuedmutex_t *m)
     while ((head = atomic_load_explicit(&m->head,
                                         memory_order_acquire)) != ticket)
         vlc_atomic_wait(&m->head, head);
+
+    atomic_store_explicit(&m->owner, vlc_thread_id(), memory_order_relaxed);
 }
 
 void vlc_queuedmutex_unlock(vlc_queuedmutex_t *m)
 {
+    atomic_store_explicit(&m->owner, 0, memory_order_relaxed);
     atomic_fetch_add_explicit(&m->head, 1, memory_order_release);
     vlc_atomic_notify_all(&m->head);
 }
