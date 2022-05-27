@@ -86,6 +86,7 @@ static void VoutDisplayEventKey(vout_display_sys_t *sys, int key)
     vlc_caca_event_t *event = malloc(sizeof (*event));
 
     if (likely(event != NULL)) {
+        event->next = NULL;
         event->key = key;
         vlc_queue_Enqueue(&sys->q, event);
     }
