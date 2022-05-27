@@ -68,16 +68,7 @@ public:
         nestedModule(module)
     {}
 
-    QString to_string() const{
-        if( kind == String )
-        {
-            return stringValue;
-        }
-        else
-        {
-            return nestedModule.to_string();
-        }
-    }
+    QString to_string() const;
 
 private:
     enum Kind{ String, Nested };

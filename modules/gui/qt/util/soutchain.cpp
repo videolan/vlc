@@ -22,6 +22,30 @@
 
 #include "soutchain.hpp"
 
+QString SoutOption::to_string() const
+{
+    QString ret = "";
+    if( kind == String )
+    {
+        if( !stringValue.isEmpty() )
+        {
+            QString quotes = stringValue.toStdString().find_first_of("=, \t")
+                           != std::string::npos ? "'" : "";
+            char *psz = config_StringEscape( qtu(stringValue) );
+            if( psz )
+            {
+                ret = quotes + qfu( psz ) + quotes;
+                free( psz );
+            }
+        }
+    }
+    else
+    {
+        ret = nestedModule.to_string();
+    }
+    return ret;
+}
+
 QString SoutModule::to_string() const
 {
     QString s = moduleName;
@@ -34,15 +58,9 @@ QString SoutModule::to_string() const
     for( it=options.begin(); it!=options.end(); )
     {
         s += it->first;
-        if( it->second.to_string().compare("") != 0 )
-        {
-            char *psz = config_StringEscape( qtu(it->second.to_string()) );
-            if( psz )
-            {
-                s += "=" + qfu( psz );
-                free( psz );
-            }
-        }
+        QString value = it->second.to_string();
+        if( !value.isEmpty() )
+            s += "=" + value;
         ++it;
         if( it != options.end() )
         {
