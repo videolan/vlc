@@ -105,7 +105,9 @@ QVariant MLBookmarkModel::data( const QModelIndex &index, int role ) const
     }
 
     const auto& bookmark = m_bookmarks->p_items[index.row()];
-    if ( role != Qt::DisplayRole )
+
+    // NOTE: We want to keep the current value when editing.
+    if ( role != Qt::DisplayRole && role != Qt::EditRole )
         return QVariant{};
 
     switch ( index.column() )
