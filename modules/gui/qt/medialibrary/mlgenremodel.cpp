@@ -28,9 +28,9 @@
 //-------------------------------------------------------------------------------------------------
 // Static variables
 
-// NOTE: We multiply by 2 to cover most dpi settings.
-static const int MLGENREMODEL_COVER_WIDTH  = 260 * 2;
-static const int MLGENREMODEL_COVER_HEIGHT = 130 * 2;
+// NOTE: We multiply by 3 to cover most dpi settings.
+static const int MLGENREMODEL_COVER_WIDTH  = 260 * 3;
+static const int MLGENREMODEL_COVER_HEIGHT = 130 * 3;
 
 static const int MLGENREMODEL_COVER_COUNTX = 4;
 static const int MLGENREMODEL_COVER_COUNTY = 2;

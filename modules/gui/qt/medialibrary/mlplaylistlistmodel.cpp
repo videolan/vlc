@@ -37,9 +37,9 @@
 
 namespace  {
 
-// NOTE: We multiply by 2 to cover most dpi settings.
-const int MLPLAYLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
-const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
+// NOTE: We multiply by 3 to cover most dpi settings.
+const int MLPLAYLISTMODEL_COVER_WIDTH  = 260 * 3; // 16 / 10 ratio
+const int MLPLAYLISTMODEL_COVER_HEIGHT = 162 * 3;
 
 const int PLAYLIST_COVERX = 2;
 const int PLAYLIST_COVERY = 2;

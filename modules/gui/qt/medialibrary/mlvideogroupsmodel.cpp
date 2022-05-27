@@ -38,9 +38,9 @@
 //-------------------------------------------------------------------------------------------------
 // Static variables
 
-// NOTE: We multiply by 2 to cover most dpi settings.
-static const int MLVIDEOGROUPSMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
-static const int MLVIDEOGROUPSMODEL_COVER_HEIGHT = 320 * 2;
+// NOTE: We multiply by 3 to cover most dpi settings.
+static const int MLVIDEOGROUPSMODEL_COVER_WIDTH  = 260 * 3; // 16 / 10 ratio
+static const int MLVIDEOGROUPSMODEL_COVER_HEIGHT = 162 * 3;
 
 static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 {
