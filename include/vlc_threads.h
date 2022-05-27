@@ -666,9 +666,10 @@ VLC_API void vlc_latch_wait(vlc_latch_t *);
 typedef struct {
     atomic_uint head;
     atomic_uint tail;
+    atomic_ulong owner;
 } vlc_queuedmutex_t;
 
-#define VLC_STATIC_QUEUEDMUTEX { ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0) }
+#define VLC_STATIC_QUEUEDMUTEX { ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0), ATOMIC_VAR_INIT(0) }
 
 void vlc_queuedmutex_init(vlc_queuedmutex_t *m);
 
@@ -676,6 +677,22 @@ void vlc_queuedmutex_lock(vlc_queuedmutex_t *m);
 
 void vlc_queuedmutex_unlock(vlc_queuedmutex_t *m);
 
+/**
+ * Checks if a queued mutex is locked.
+ *
+ * This function checks if the calling thread holds a given queued mutual
+ * exclusion lock. It has no side effects and is essentially intended for
+ * run-time debugging.
+ *
+ * @note To assert that the calling thread holds a lock, the helper macro
+ * vlc_queuedmutex_assert() should be used instead of this function.
+ *
+ * @retval false the mutex is not locked by the calling thread
+ * @retval true the mutex is locked by the calling thread
+ */
+bool vlc_queuedmutex_held(vlc_queuedmutex_t *m);
+
+#define vlc_queuedmutex_assert(m) assert(vlc_queuedmutex_held(m))
 /**
  * One-time initialization.
  *
