@@ -227,16 +227,13 @@ void ConvertDialog::close()
                 newFileName = newFileName.append(fileExtension);
             }
 
-            newFileName.replace( QChar('\''), "\\\'" );
-
-
             mrl.end();
             SoutModule dstModule("std");
             SoutModule file("file");
             file.option("no-overwrite");
             dstModule.option("access", file);
             dstModule.option("mux", profile->getMux());
-            dstModule.option("dst", "'" + newFileName + "'");
+            dstModule.option("dst", newFileName);
 
             if( displayBox->isChecked() )
             {
