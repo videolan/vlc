@@ -3519,13 +3519,6 @@ AS_IF([test "${enable_directx}" != "no"], [
 ])
 
 dnl
-dnl  Linux framebuffer module
-dnl
-AC_CHECK_HEADER([linux/fb.h], [
-  VLC_ADD_PLUGIN([fb])
-])
-
-dnl
 dnl  Direct Rendering Manager (DRM) plugins
 dnl
 AC_CHECK_HEADER([drm/drm_mode.h], [

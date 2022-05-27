@@ -304,14 +304,6 @@ endif
 endif
 
 
-### FrameBuffer ###
-
-libfb_plugin_la_SOURCES = video_output/fb.c
-libfb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libfb_plugin.la
-vout_LTLIBRARIES += $(LTLIBfb)
-
-
 ### Direct Rendering Manager (DRM) ###
 
 libkms_plugin_la_SOURCES = video_output/kms.c
