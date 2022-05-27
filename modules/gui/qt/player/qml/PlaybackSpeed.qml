@@ -310,25 +310,10 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.topMargin: VLCStyle.margin_xsmall
 
-        implicitHeight: buttonSlower.height
+        implicitHeight: comboBox.height
 
         Navigation.parentItem: root
         Navigation.upItem: slider
-
-        Widgets.IconControlButton {
-            id: buttonSlower
-
-            autoRepeat: true
-
-            iconText: VLCIcons.slower
-
-            colors: root.colors
-
-            Navigation.parentItem: rowB
-            Navigation.rightItem: comboBox
-
-            onClicked: slider.decrease()
-        }
 
         Widgets.ComboBoxExt {
             id: comboBox
@@ -350,8 +335,6 @@ ColumnLayout {
 
             // NOTE: Applying the right theme to the ComboBox.
             Navigation.parentItem: rowB
-            Navigation.leftItem: buttonSlower
-            Navigation.rightItem: buttonFaster
 
             // NOTE: This makes the navigation convenient since 'up' is changing the comboBox value.
             Navigation.leftItem: slider
@@ -376,23 +359,6 @@ ColumnLayout {
 
                 root._applySlider(_model[currentIndex].value)
             }
-        }
-
-        Widgets.IconControlButton {
-            id: buttonFaster
-
-            anchors.right: parent.right
-
-            autoRepeat: true
-
-            iconText: VLCIcons.faster
-
-            colors: root.colors
-
-            Navigation.parentItem: rowB
-            Navigation.leftItem: comboBox
-
-            onClicked: slider.increase()
         }
     }
 }
