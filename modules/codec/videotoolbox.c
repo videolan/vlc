@@ -1749,7 +1749,7 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
      (TARGET_OS_IOS && __IPHONE_OS_VERSION_MAX_ALLOWED < 150000))
 enum {
     kVTVideoDecoderReferenceMissingErr      = -17694
-}
+};
 #endif
 
 static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
