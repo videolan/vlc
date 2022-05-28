@@ -63,6 +63,9 @@ ComboBox {
         }
 
         onPaint: {
+            if (context === null)
+                return
+
             context.reset();
             context.moveTo(0, 0);
             context.lineTo(width, 0);
