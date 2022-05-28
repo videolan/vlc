@@ -335,6 +335,7 @@ static void *Thread (void *data)
     xcb_cursor_t cursor = CursorCreate(conn, p_sys->root); /* blank cursor */
     vlc_tick_t lifetime = VLC_TICK_FROM_MS( var_InheritInteger(wnd, "mouse-hide-timeout") );
     vlc_tick_t deadline = VLC_TICK_MAX;
+    xcb_generic_event_t *ev;
 
     if (ufd.fd == -1)
         return NULL;
@@ -343,14 +344,19 @@ static void *Thread (void *data)
     xcb_query_pointer_cookie_t qpc = xcb_query_pointer(conn, window);
     /* Report initial window size (for the embedded case). */
     xcb_get_geometry_cookie_t ggc = xcb_get_geometry(conn, window);
-    xcb_query_pointer_reply_t *qpr = xcb_query_pointer_reply(conn, qpc, NULL);
-    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply(conn, ggc, NULL);
 
+    xcb_query_pointer_reply_t *qpr = xcb_query_pointer_reply(conn, qpc, NULL);
     if (qpr != NULL) {
+        while ((ev = xcb_poll_for_queued_event(conn)) != NULL)
+            ProcessEvent(wnd, ev);
         vlc_window_ReportMouseMoved(wnd, qpr->win_x, qpr->win_y);
         free(qpr);
     }
-    if (geo != NULL) { /* FIXME: racy - compare seq.no.with configure event */
+
+    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply(conn, ggc, NULL);
+    if (geo != NULL) {
+        while ((ev = xcb_poll_for_queued_event(conn)) != NULL)
+            ProcessEvent(wnd, ev);
         vlc_window_ReportSize(wnd, geo->width, geo->height);
         free(geo);
     }
@@ -378,7 +384,6 @@ static void *Thread (void *data)
         }
         else
         {
-            xcb_generic_event_t *ev;
             bool show_cursor = false;
 
             while ((ev = xcb_poll_for_event (conn)) != NULL)
@@ -919,8 +924,6 @@ static int EmOpen (vlc_window_t *wnd)
         goto error;
     }
     root = geo->root;
-    /* FIXME: racy - compare seq.no.with configure event */
-    vlc_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
     /* Try to subscribe to keyboard and mouse events (only one X11 client can
