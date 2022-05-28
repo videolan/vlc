@@ -538,6 +538,7 @@ static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
     vout_window_sys_t *sys = wnd->sys;
     xcb_connection_t *conn = sys->conn;
     xcb_window_t window = wnd->handle.xid;
+    xcb_void_cookie_t ck;
 
     /* Set initial window state */
     if (cfg->is_decorated)
@@ -552,7 +553,8 @@ static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
     }
 
     /* Make the window visible */
-    xcb_map_window(conn, window);
+    ck = xcb_map_window_checked(conn, window);
+    free(xcb_request_check(conn, ck));
 
     /* Report initial pointer position.
      * This will implicitly flush the XCB connection so that the window gets
