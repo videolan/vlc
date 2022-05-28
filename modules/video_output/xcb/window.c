@@ -591,9 +591,8 @@ static const struct vlc_window_operations ops = {
     .set_state = SetState,
 };
 
-static int OpenCommon(vlc_window_t *wnd, char *display,
-                      xcb_connection_t *conn,
-                      xcb_window_t root, xcb_window_t window)
+static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
+                      xcb_window_t root, xcb_window_t window, uint32_t events)
 {
     vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
     if (sys == NULL)
@@ -754,7 +753,7 @@ static int Open(vlc_window_t *wnd)
         goto error;
     }
 
-    ret = OpenCommon(wnd, display, conn, scr->root, window);
+    ret = OpenCommon(wnd, display, conn, scr->root, window, values[1]);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -925,7 +924,7 @@ static int EmOpen (vlc_window_t *wnd)
 
     xcb_change_window_attributes(conn, window, XCB_CW_EVENT_MASK, &value);
 
-    ret = OpenCommon(wnd, NULL, conn, root, window);
+    ret = OpenCommon(wnd, NULL, conn, root, window, value);
     if (ret != VLC_SUCCESS)
         goto error;
 
