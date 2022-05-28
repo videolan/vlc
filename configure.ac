@@ -1868,7 +1868,7 @@ PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread > 4.9.0], [dvdread input module],
 dnl
 dnl libdvdnav plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav > 5.0.3], [DVD with navigation input module (dvdnav)], [auto])
+PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav > 4.9.0], [DVD with navigation input module (dvdnav)], [auto])
 AS_IF([test "${enable_dvdnav}" != "no"], [
   AC_MSG_CHECKING(for dvdnav_stream_cb in dvdnav/dvdnav.h)
     AC_EGREP_HEADER(dvdnav_stream_cb,dvdnav/dvdnav.h,[
