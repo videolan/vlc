@@ -99,7 +99,8 @@ void vout_StopDisplay(vout_thread_t *);
  * \retval 0 on success
  * \retval -1 on error, the vout needs to be restarted to handle the format
  */
-int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt );
+int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt,
+                       const vlc_video_context * );
 
 enum vout_crop_mode {
     VOUT_CROP_NONE, VOUT_CROP_RATIO, VOUT_CROP_WINDOW, VOUT_CROP_BORDER,

@@ -2027,11 +2027,14 @@ vout_thread_t *vout_Hold( vout_thread_t *vout)
     return vout;
 }
 
-int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original )
+int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original,
+                       const vlc_video_context *vctx )
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
 
     if (sys->display == NULL)
+        return -1;
+    if (sys->filter.src_vctx != vctx)
         return -1;
 
      /* TODO: If dimensions are equal or slightly smaller, update the aspect
@@ -2100,7 +2103,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
 
-    if (vout_ChangeSource(cfg->vout, &original) == 0)
+    if (vout_ChangeSource(cfg->vout, &original, vctx) == 0)
     {
         video_format_Clean(&original);
         return 0;
