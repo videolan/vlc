@@ -76,3 +76,7 @@ function contains(rect, pos) {
 function isInteger(data) {
     return (typeof data === 'number' && (data % 1) === 0)
 }
+
+function compareFloat(a, b) {
+    return (Math.abs(a - b) < Number.EPSILON)
+}
