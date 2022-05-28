@@ -53,6 +53,7 @@ typedef struct
 {
     xcb_connection_t *conn;
     vlc_thread_t thread;
+    vlc_latch_t ready;
 
     xcb_window_t root;
     xcb_atom_t wm_state;
@@ -353,6 +354,7 @@ static void *Thread (void *data)
         vlc_window_ReportSize(wnd, geo->width, geo->height);
         free(geo);
     }
+    vlc_latch_count_down(&p_sys->ready, 1);
 
     for (;;)
     {
@@ -570,6 +572,7 @@ static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
     /* Make the window visible */
     ck = xcb_map_window_checked(conn, window);
     free(xcb_request_check(conn, ck));
+    vlc_latch_wait(&sys->ready);
     return VLC_SUCCESS;
 }
 
@@ -682,6 +685,7 @@ static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
     sys->wm_state_fullscreen = get_atom(conn, wm_state_fs_ck);
     sys->motif_wm_hints = get_atom(conn, motif_wm_hints_ck);
 
+    vlc_latch_init(&sys->ready, 1);
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
     if (vlc_clone(&sys->thread, Thread, wnd))
