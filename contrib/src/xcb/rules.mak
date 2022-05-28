@@ -9,7 +9,7 @@ PKGS += xcb
 endif
 endif
 
-ifeq ($(call need_pkg,"xcb >= 1.6 xcb-shm xcb-composite xcb-xv >= 1.1.90.1"),)
+ifeq ($(call need_pkg,"xcb >= 1.8 xcb-shm xcb-composite xcb-xv >= 1.1.90.1"),)
 # xcb-randr >= 1.3 is not that useful
 PKGS_FOUND += xcb
 endif
