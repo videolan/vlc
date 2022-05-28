@@ -3194,7 +3194,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   xcb_err=""
 
   dnl libxcb
-  PKG_CHECK_MODULES([XCB], [xcb >= 1.6],, [
+  PKG_CHECK_MODULES([XCB], [xcb >= 1.8],, [
     xcb_err="$xcb_err ${XCB_PKG_ERRORS}."])
   PKG_CHECK_MODULES([XCB_COMPOSITE], [xcb-composite],, [
     xcb_err="$xcb_err ${XCB_COMPOSITE_PKG_ERRORS}."])
