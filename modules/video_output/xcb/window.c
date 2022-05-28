@@ -340,11 +340,18 @@ static void *Thread (void *data)
 
     /* Report initial pointer position. */
     xcb_query_pointer_cookie_t qpc = xcb_query_pointer(conn, window);
+    /* Report initial window size (for the embedded case). */
+    xcb_get_geometry_cookie_t ggc = xcb_get_geometry(conn, window);
     xcb_query_pointer_reply_t *qpr = xcb_query_pointer_reply(conn, qpc, NULL);
+    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply(conn, ggc, NULL);
 
     if (qpr != NULL) {
         vlc_window_ReportMouseMoved(wnd, qpr->win_x, qpr->win_y);
         free(qpr);
+    }
+    if (geo != NULL) { /* FIXME: racy - compare seq.no.with configure event */
+        vlc_window_ReportSize(wnd, geo->width, geo->height);
+        free(geo);
     }
 
     for (;;)
