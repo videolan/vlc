@@ -506,16 +506,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->is_current = false;
 
     vlc_window_t *wnd = gl->surface;
-    EGLAttrib refs_name = EGL_NONE;
-    EGLAttrib refs_value = EGL_FALSE;
-
-#ifdef EGL_KHR_display_reference
-    if (CheckClientExt("EGL_KHR_display_reference"))
-    {
-        refs_name = EGL_TRACK_REFERENCES_KHR;
-        refs_value = EGL_TRUE;
-    }
-#endif
 
 #if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB) \
  || defined (USE_PLATFORM_WAYLAND)
@@ -571,7 +561,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         EGL_GREEN_SIZE, 5,
         EGL_BLUE_SIZE, 5,
         EGL_RENDERABLE_TYPE, api->render_bit,
-        refs_name, refs_value,
         EGL_NONE
     };
     EGLConfig cfgv[1];
