@@ -204,8 +204,67 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
 
-    if (sys->x11 != NULL)
-        XCloseDisplay(sys->x11);
+    XCloseDisplay(sys->x11);
+}
+
+static EGLDisplay OpenDisplay(vlc_gl_t *gl)
+{
+    vlc_window_t *surface = gl->surface;
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (surface->type != VLC_WINDOW_TYPE_XID || !vlc_xlib_init(VLC_OBJECT(gl)))
+        return EGL_NO_DISPLAY;
+
+    Display *x11 = XOpenDisplay(surface->display.x11);
+    if (x11 == NULL)
+        return EGL_NO_DISPLAY;
+
+    XWindowAttributes wa;
+
+    if (!XGetWindowAttributes(x11, surface->handle.xid, &wa))
+        goto error;
+
+    EGLDisplay display;
+    int snum = XScreenNumberOfScreen(wa.screen);
+
+# ifdef EGL_EXT_platform_x11
+    if (CheckClientExt("EGL_EXT_platform_x11")) {
+        const EGLint attrs[] = {
+            EGL_PLATFORM_X11_SCREEN_EXT, snum,
+            EGL_NONE
+        };
+
+        display = GetDisplayEXT(EGL_PLATFORM_X11_EXT, x11, attrs);
+    } else
+# endif
+# ifdef __unix__
+    if (snum == XDefaultScreen(x11))
+        display = eglGetDisplay(x11);
+    else
+# endif
+        display = EGL_NO_DISPLAY;
+
+    if (display == EGL_NO_DISPLAY)
+        goto error;
+
+    unsigned long mask =
+        CWBackPixel | CWBorderPixel | CWBitGravity | CWColormap;
+    XSetWindowAttributes swa = {
+        .background_pixel = BlackPixelOfScreen(wa.screen),
+        .border_pixel = BlackPixelOfScreen(wa.screen),
+        .bit_gravity = NorthWestGravity,
+        .colormap = DefaultColormapOfScreen(wa.screen),
+    };
+
+    sys->x11 = x11;
+    sys->x11_win = XCreateWindow(x11, surface->handle.xid, 0, 0, wa.width,
+                                 wa.height, 0, DefaultDepthOfScreen(wa.screen),
+                                 InputOutput, DefaultVisualOfScreen(wa.screen),
+                                 mask, &swa);
+    return display;
+error:
+    XCloseDisplay(x11);
+    return EGL_NO_DISPLAY;
 }
 
 #elif defined(USE_PLATFORM_XCB)
@@ -377,53 +436,10 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 #endif
 
 #ifdef USE_PLATFORM_X11
-    sys->x11 = NULL;
-
-    if (wnd->type != VLC_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
-        goto error;
-
-    sys->x11 = XOpenDisplay(wnd->display.x11);
-    if (sys->x11 == NULL)
-        goto error;
-
-    int snum;
-    {
-        XWindowAttributes wa;
-        XSetWindowAttributes swa;
-
-        if (!XGetWindowAttributes(sys->x11, wnd->handle.xid, &wa))
-            goto error;
-        snum = XScreenNumberOfScreen(wa.screen);
-        unsigned long mask =
-            CWBackPixel |
-            CWBorderPixel |
-            CWBitGravity |
-            CWColormap;
-        swa.background_pixel = BlackPixelOfScreen(wa.screen);
-        swa.border_pixel = BlackPixelOfScreen(wa.screen);
-        swa.bit_gravity = NorthWestGravity;
-        swa.colormap = DefaultColormapOfScreen(wa.screen);
-        sys->x11_win = XCreateWindow(
-                sys->x11, wnd->handle.xid, 0, 0, wa.width, wa.height, 0,
-                DefaultDepthOfScreen(wa.screen), InputOutput,
-                DefaultVisualOfScreen(wa.screen), mask, &swa);
-    }
-# ifdef EGL_EXT_platform_x11
-    if (CheckClientExt("EGL_EXT_platform_x11"))
-    {
-        const EGLint attrs[] = {
-            EGL_PLATFORM_X11_SCREEN_EXT, snum,
-            EGL_NONE
-        };
-        sys->display = GetDisplayEXT(EGL_PLATFORM_X11_EXT, sys->x11, attrs);
-    }
-    else
-# endif
-    {
-# ifdef __unix__
-        if (snum == XDefaultScreen(sys->x11))
-            sys->display = eglGetDisplay(sys->x11);
-# endif
+    sys->display = OpenDisplay(gl);
+    if (sys->display == EGL_NO_DISPLAY) {
+        free(sys);
+        return VLC_ENOTSUP;
     }
 
 #elif defined (USE_PLATFORM_XCB)
