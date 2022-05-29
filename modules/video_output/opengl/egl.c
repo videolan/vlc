@@ -179,12 +179,14 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     vlc_gl_sys_t *sys = gl->sys;
+    Window win = sys->x11_win;
 
-    (void) width; (void) height;
+    XResizeWindow(sys->x11, win, width, height);
+    XMapWindow(sys->x11, win);
 
     if (CheckClientExt("EGL_EXT_platform_x11"))
-        return CreateWindowSurfaceEXT(dpy, config, &sys->x11_win, NULL);
-    return eglCreateWindowSurface(dpy, config, sys->x11_win, NULL);
+        return CreateWindowSurfaceEXT(dpy, config, &win, NULL);
+    return eglCreateWindowSurface(dpy, config, win, NULL);
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -391,10 +393,9 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         swa.bit_gravity = NorthWestGravity;
         swa.colormap = DefaultColormapOfScreen(wa.screen);
         sys->x11_win = XCreateWindow(
-                sys->x11, wnd->handle.xid, 0, 0, width, height, 0,
+                sys->x11, wnd->handle.xid, 0, 0, wa.width, wa.height, 0,
                 DefaultDepthOfScreen(wa.screen), InputOutput,
                 DefaultVisualOfScreen(wa.screen), mask, &swa);
-        XMapWindow(sys->x11, sys->x11_win);
     }
 # ifdef EGL_EXT_platform_x11
     if (CheckClientExt("EGL_EXT_platform_x11"))
