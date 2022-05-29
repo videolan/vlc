@@ -420,7 +420,8 @@ out:
 
 static void DestroySurface(vlc_gl_t *gl)
 {
-    (void) gl;
+    AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
+                                        AWindow_Video);
 }
 
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
@@ -437,8 +438,7 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
 
 static void ReleaseDisplay(vlc_gl_t *gl)
 {
-    AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
-                                        AWindow_Video);
+    (void) gl;
 }
 
 static EGLDisplay OpenDisplay(vlc_gl_t *gl)
