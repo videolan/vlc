@@ -142,10 +142,21 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     vlc_gl_sys_t *sys = gl->sys;
+    struct wl_egl_window *window;
+    EGLSurface surface;
 
-    (void) width; (void) height;
+    window = wl_egl_window_create(gl->surface->handle.wl, width, height);
+    if (window == NULL)
+        return EGL_NO_SURFACE;
+
     assert(CheckClientExt("EGL_EXT_platform_wayland"));
-    return CreateWindowSurfaceEXT(dpy, config, sys->window, NULL);
+
+    surface = CreateWindowSurfaceEXT(dpy, config, sys->window, NULL);
+    if (surface == EGL_NO_SURFACE)
+        wl_egl_window_destroy(window);
+    else
+        sys->window = window;
+    return surface;
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -480,10 +491,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 
 # ifdef EGL_EXT_platform_wayland
     if (!CheckClientExt("EGL_EXT_platform_wayland"))
-        goto error;
-
-    sys->window = wl_egl_window_create(wnd->handle.wl, width, height);
-    if (sys->window == NULL)
         goto error;
 
     sys->display = GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, wnd->display.wl,
