@@ -66,6 +66,58 @@ typedef struct vlc_gl_sys_t
     bool is_current;
 } vlc_gl_sys_t;
 
+static bool CheckAPI(EGLDisplay dpy, const char *api)
+{
+    const char *apis = eglQueryString(dpy, EGL_CLIENT_APIS);
+    return vlc_gl_StrHasToken(apis, api);
+}
+
+static bool CheckClientExt(const char *name)
+{
+    const char *exts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+    return vlc_gl_StrHasToken(exts, name);
+}
+
+#ifdef EGL_EXT_platform_base
+static EGLDisplay GetDisplayEXT(EGLenum plat, void *dpy, const EGLint *attrs)
+{
+    PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay =
+        (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+        eglGetProcAddress("eglGetPlatformDisplayEXT");
+
+    assert(getDisplay != NULL);
+    return getDisplay(plat, dpy, attrs);
+}
+
+static EGLSurface CreateWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config,
+                                         void *window, const EGLint *attrs)
+{
+    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface =
+        (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
+        eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
+
+    assert(createSurface != NULL);
+    return createSurface(dpy, config, window, attrs);
+}
+#endif
+
+static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
+                                      void *window, const EGLint *attrs)
+{
+    EGLNativeWindowType *native = window;
+
+    return eglCreateWindowSurface(dpy, config, *native, attrs);
+}
+
+struct gl_api
+{
+   const char name[10];
+   EGLenum    api;
+   EGLint     min_minor;
+   EGLint     render_bit;
+   EGLint     attr[3];
+};
+
 static int MakeCurrent (vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
@@ -85,20 +137,6 @@ static void ReleaseCurrent (vlc_gl_t *gl)
                     EGL_NO_CONTEXT);
     sys->is_current = false;
 }
-
-#ifdef USE_PLATFORM_XCB
-static int GetScreenNum(xcb_connection_t *conn, const xcb_screen_t *scr)
-{
-    xcb_screen_iterator_t i = xcb_setup_roots_iterator(xcb_get_setup(conn));
-    int n = 0;
-
-    while (scr != i.data) {
-         xcb_screen_next(&i);
-         n++;
-    }
-    return n;
-}
-#endif
 
 #ifdef USE_PLATFORM_WAYLAND
 static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
@@ -126,6 +164,18 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     }
 }
 #elif defined(USE_PLATFORM_XCB)
+static int GetScreenNum(xcb_connection_t *conn, const xcb_screen_t *scr)
+{
+    xcb_screen_iterator_t i = xcb_setup_roots_iterator(xcb_get_setup(conn));
+    int n = 0;
+
+    while (scr != i.data) {
+         xcb_screen_next(&i);
+         n++;
+    }
+    return n;
+}
+
 static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vlc_gl_sys_t *sys = gl->sys;
@@ -168,58 +218,6 @@ static void *GetSymbol(vlc_gl_t *gl, const char *procname)
 {
     (void) gl;
     return (void *)eglGetProcAddress (procname);
-}
-
-static bool CheckAPI (EGLDisplay dpy, const char *api)
-{
-    const char *apis = eglQueryString (dpy, EGL_CLIENT_APIS);
-    return vlc_gl_StrHasToken(apis, api);
-}
-
-static bool CheckClientExt(const char *name)
-{
-    const char *exts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-    return vlc_gl_StrHasToken(exts, name);
-}
-
-struct gl_api
-{
-   const char name[10];
-   EGLenum    api;
-   EGLint     min_minor;
-   EGLint     render_bit;
-   EGLint     attr[3];
-};
-
-#ifdef EGL_EXT_platform_base
-static EGLDisplay GetDisplayEXT(EGLenum plat, void *dpy, const EGLint *attrs)
-{
-    PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay =
-        (PFNEGLGETPLATFORMDISPLAYEXTPROC)
-        eglGetProcAddress("eglGetPlatformDisplayEXT");
-
-    assert(getDisplay != NULL);
-    return getDisplay(plat, dpy, attrs);
-}
-
-static EGLSurface CreateWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config,
-                                         void *window, const EGLint *attrs)
-{
-    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface =
-        (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
-        eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
-
-    assert(createSurface != NULL);
-    return createSurface(dpy, config, window, attrs);
-}
-#endif
-
-static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
-                                      void *window, const EGLint *attrs)
-{
-    EGLNativeWindowType *native = window;
-
-    return eglCreateWindowSurface(dpy, config, *native, attrs);
 }
 
 static void Close(vlc_gl_t *gl)
