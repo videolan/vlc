@@ -459,11 +459,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     if (ret == VLC_SUCCESS)
     {
         sys->xcb_win = xcb_generate_id(conn);
-        xcb_get_window_attributes_reply_t *r =
-            xcb_get_window_attributes_reply(conn,
-                xcb_get_window_attributes(conn, wnd->handle.xid), NULL);
 
-        if (r != NULL) {
             uint32_t mask =
                 XCB_CW_BACK_PIXEL |
                 XCB_CW_BORDER_PIXEL |
@@ -483,8 +479,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
                               wnd->handle.xid, 0, 0, 1, 1, 0,
                               XCB_WINDOW_CLASS_INPUT_OUTPUT, scr->root_visual,
                               mask, values);
-        }
-        free(r);
     }
     else
         goto error;
