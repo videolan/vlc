@@ -213,6 +213,10 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    const char *ext = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+    if (*ext)
+        msg_Dbg(obj, "EGL client extensions: %s", ext);
+
     gl->sys = sys;
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
@@ -334,9 +338,9 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
             eglQueryString(sys->display, EGL_VERSION),
             eglQueryString(sys->display, EGL_VENDOR));
 
-    const char *ext = eglQueryString(sys->display, EGL_EXTENSIONS);
+    ext = eglQueryString(sys->display, EGL_EXTENSIONS);
     if (*ext)
-        msg_Dbg(obj, " extensions: %s", ext);
+        msg_Dbg(obj, "EGL display extensions: %s", ext);
 
     if (major != 1 || minor < api->min_minor
      || !CheckAPI(sys->display, api->name))
