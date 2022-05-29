@@ -317,8 +317,63 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
 
-    if (sys->conn != NULL)
-        xcb_disconnect(sys->conn);
+    xcb_disconnect(sys->conn);
+}
+
+static EGLDisplay OpenDisplay(vlc_gl_t *gl)
+{
+# ifdef EGL_EXT_platform_xcb
+    vlc_window_t *surface = gl->surface;
+    vlc_gl_sys_t *sys = gl->sys;
+    xcb_connection_t *conn;
+    const xcb_screen_t *scr;
+
+    if (surface->type != VLC_WINDOW_TYPE_XID)
+        return EGL_NO_DISPLAY;
+    if (!CheckClientExt("EGL_EXT_platform_xcb"))
+        return EGL_NO_DISPLAY;
+    if (vlc_xcb_parent_Create(gl->obj.logger, surface, &conn,
+                              &scr) != VLC_SUCCESS)
+        return EGL_NO_DISPLAY;
+
+    const EGLint attrs[] = {
+        EGL_PLATFORM_XCB_SCREEN_EXT, GetScreenNum(conn, scr),
+        EGL_NONE
+    };
+
+    EGLDisplay display = GetDisplayEXT(EGL_PLATFORM_XCB_EXT, conn, attrs);
+    if (display == EGL_NO_DISPLAY) {
+        xcb_disconnect(conn);
+        goto out;
+    }
+
+    xcb_window_t win = xcb_generate_id(conn);
+    uint32_t mask =
+        XCB_CW_BACK_PIXEL |
+        XCB_CW_BORDER_PIXEL |
+        XCB_CW_BIT_GRAVITY |
+        XCB_CW_COLORMAP;
+    const uint32_t values[] = {
+        /* XCB_CW_BACK_PIXEL */
+        scr->black_pixel,
+        /* XCB_CW_BORDER_PIXEL */
+        scr->black_pixel,
+        /* XCB_CW_BIT_GRAVITY */
+        XCB_GRAVITY_NORTH_WEST,
+        /* XCB_CW_COLORMAP */
+        scr->default_colormap,
+    };
+
+    xcb_create_window(conn, scr->root_depth, win, surface->handle.xid, 0, 0, 1,
+                      1, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, scr->root_visual,
+                      mask, values);
+    sys->conn = conn;
+    sys->xcb_win = win;
+out:
+    return display;
+# else
+    return EGL_NO_DISPLAY;
+# endif
 }
 
 #elif defined (USE_PLATFORM_ANDROID)
@@ -435,63 +490,12 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     }
 #endif
 
-#ifdef USE_PLATFORM_X11
+#if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB)
     sys->display = OpenDisplay(gl);
     if (sys->display == EGL_NO_DISPLAY) {
         free(sys);
         return VLC_ENOTSUP;
     }
-
-#elif defined (USE_PLATFORM_XCB)
-    xcb_connection_t *conn;
-    const xcb_screen_t *scr;
-
-    sys->conn = NULL;
-
-    if (wnd->type != VLC_WINDOW_TYPE_XID)
-        goto error;
-
-# ifdef EGL_EXT_platform_xcb
-    if (!CheckClientExt("EGL_EXT_platform_xcb"))
-        goto error;
-
-    ret = vlc_xcb_parent_Create(gl->obj.logger, wnd, &conn, &scr);
-    if (ret == VLC_SUCCESS)
-    {
-        sys->xcb_win = xcb_generate_id(conn);
-
-            uint32_t mask =
-                XCB_CW_BACK_PIXEL |
-                XCB_CW_BORDER_PIXEL |
-                XCB_CW_BIT_GRAVITY |
-                XCB_CW_COLORMAP;
-            const uint32_t values[] = {
-                /* XCB_CW_BACK_PIXEL */
-                scr->black_pixel,
-                /* XCB_CW_BORDER_PIXEL */
-                scr->black_pixel,
-                /* XCB_CW_BIT_GRAVITY */
-                XCB_GRAVITY_NORTH_WEST,
-                /* XCB_CW_COLORMAP */
-                scr->default_colormap,
-            };
-            xcb_create_window(conn, scr->root_depth, sys->xcb_win,
-                              wnd->handle.xid, 0, 0, 1, 1, 0,
-                              XCB_WINDOW_CLASS_INPUT_OUTPUT, scr->root_visual,
-                              mask, values);
-    }
-    else
-        goto error;
-
-    sys->conn = conn;
-    {
-        const EGLint attrs[] = {
-            EGL_PLATFORM_XCB_SCREEN_EXT, GetScreenNum(sys->conn, scr),
-            EGL_NONE
-        };
-        sys->display = GetDisplayEXT(EGL_PLATFORM_XCB_EXT, sys->conn, attrs);
-    }
-# endif
 
 #elif defined (USE_PLATFORM_WAYLAND)
     sys->window = NULL;
