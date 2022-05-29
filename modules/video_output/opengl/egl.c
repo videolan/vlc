@@ -138,40 +138,38 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     wl_egl_window_resize(sys->window, width, height, 0, 0);
 }
 
+static void DestroySurface(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    wl_egl_window_destroy(sys->window);
+}
+
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     vlc_gl_sys_t *sys = gl->sys;
-    struct wl_egl_window *window;
     EGLSurface surface;
 
-    window = wl_egl_window_create(gl->surface->handle.wl, width, height);
-    if (window == NULL)
+    sys->window = wl_egl_window_create(gl->surface->handle.wl, width, height);
+    if (sys->window == NULL)
         return EGL_NO_SURFACE;
 
     assert(CheckClientExt("EGL_EXT_platform_wayland"));
 
     surface = CreateWindowSurfaceEXT(dpy, config, sys->window, NULL);
     if (surface == EGL_NO_SURFACE)
-        wl_egl_window_destroy(window);
-    else
-        sys->window = window;
+        wl_egl_window_destroy(sys->window);
     return surface;
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
 {
-    vlc_gl_sys_t *sys = gl->sys;
-
-    if (sys->window != NULL)
-        wl_egl_window_destroy(sys->window);
+    (void) gl;
 }
 
 static EGLDisplay OpenDisplay(vlc_gl_t *gl)
 {
-    vlc_gl_sys_t *sys = gl->sys;
-
-    sys->window = NULL;
 # ifdef EGL_EXT_platform_wayland
     vlc_window_t *surface = gl->surface;
     EGLint attrs[] = {
@@ -211,6 +209,13 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
             XSync(sys->x11, False);
         ReleaseCurrent(gl);
     }
+}
+
+static void DestroySurface(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    XUnmapWindow(sys->x11, sys->x11_win);
 }
 
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
@@ -324,6 +329,13 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     }
 }
 
+static void DestroySurface(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    xcb_unmap_window(sys->conn, sys->xcb_win);
+}
+
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
@@ -406,6 +418,11 @@ out:
 #elif defined (USE_PLATFORM_ANDROID)
 # define Resize (NULL)
 
+static void DestroySurface(vlc_gl_t *gl)
+{
+    (void) gl;
+}
+
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
@@ -435,6 +452,11 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
 
 #else
 # define Resize (NULL)
+
+static void DestroySurface(vlc_gl_t *gl)
+{
+    (void) gl;
+}
 
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
@@ -491,8 +513,10 @@ static void Close(vlc_gl_t *gl)
 
     if (sys->context != EGL_NO_CONTEXT)
         eglDestroyContext(sys->display, sys->context);
-    if (sys->surface != EGL_NO_SURFACE)
+    if (sys->surface != EGL_NO_SURFACE) {
         eglDestroySurface(sys->display, sys->surface);
+        DestroySurface(gl);
+    }
     eglTerminate(sys->display);
     ReleaseDisplay(gl);
     free (sys);
