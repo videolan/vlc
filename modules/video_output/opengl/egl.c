@@ -174,12 +174,21 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
     sys->window = NULL;
 # ifdef EGL_EXT_platform_wayland
     vlc_window_t *surface = gl->surface;
+    EGLint attrs[] = {
+        EGL_NONE, EGL_TRUE,
+        EGL_NONE
+    };
+
+#  ifdef EGL_KHR_display_reference
+    if (CheckClientExt("EGL_KHR_display_reference"))
+        attrs[0] = EGL_TRACK_REFERENCES_KHR;
+#  endif
 
     if (surface->type != VLC_WINDOW_TYPE_WAYLAND)
         return EGL_NO_DISPLAY;
     if (!CheckClientExt("EGL_EXT_platform_wayland"))
         return EGL_NO_DISPLAY;
-    return GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, surface->display.wl, NULL);
+    return GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, surface->display.wl, attrs);
 # else
     return EGL_NO_DISPLAY;
 # endif
