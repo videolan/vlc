@@ -229,10 +229,16 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     vlc_gl_sys_t *sys = gl->sys;
+    xcb_connection_t *conn = sys->conn;
+    xcb_window_t win = sys->xcb_win;
+    uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+    const uint32_t values[] = { width, height, };
 
-    (void) width; (void) height;
+    xcb_configure_window(conn, win, mask, values);
+    xcb_map_window(conn, win);
+
     assert(CheckClientExt("EGL_EXT_platform_xcb"));
-    return CreateWindowSurfaceEXT(dpy, config, &sys->xcb_win, NULL);
+    return CreateWindowSurfaceEXT(dpy, config, &win, NULL);
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -446,10 +452,9 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
                 scr->default_colormap,
             };
             xcb_create_window(conn, scr->root_depth, sys->xcb_win,
-                              wnd->handle.xid, 0, 0, width, height, 0,
+                              wnd->handle.xid, 0, 0, 1, 1, 0,
                               XCB_WINDOW_CLASS_INPUT_OUTPUT, scr->root_visual,
                               mask, values);
-            xcb_map_window(conn, sys->xcb_win);
         }
         free(r);
     }
