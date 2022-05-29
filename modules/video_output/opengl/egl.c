@@ -424,6 +424,15 @@ static void ReleaseDisplay(vlc_gl_t *gl)
                                         AWindow_Video);
 }
 
+static EGLDisplay OpenDisplay(vlc_gl_t *gl)
+{
+# if defined (__ANDROID__) || defined (ANDROID)
+    if (gl->surface->type == VLC_WINDOW_TYPE_ANDROID_NATIVE)
+        return eglGetDisplay(EGL_DEFAULT_DISPLAY);
+# endif
+    return EGL_NO_DISPLAY;
+}
+
 #else
 # define Resize (NULL)
 
@@ -518,21 +527,13 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     vlc_window_t *wnd = gl->surface;
 
 #if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB) \
- || defined (USE_PLATFORM_WAYLAND) || defined (USE_PLATFORM_WIN32)
+ || defined (USE_PLATFORM_WAYLAND) || defined (USE_PLATFORM_WIN32) \
+ || defined (USE_PLATFORM_ANDROID)
     sys->display = OpenDisplay(gl);
     if (sys->display == EGL_NO_DISPLAY) {
         free(sys);
         return VLC_ENOTSUP;
     }
-
-#elif defined (USE_PLATFORM_ANDROID)
-    if (wnd->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
-        goto error;
-
-# if defined (__ANDROID__) || defined (ANDROID)
-    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-# endif
-
 #endif
 
     if (sys->display == EGL_NO_DISPLAY)
