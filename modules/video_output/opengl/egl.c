@@ -145,6 +145,15 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
 
     wl_egl_window_resize(sys->window, width, height, 0, 0);
 }
+
+static void ReleaseDisplay(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (sys->window != NULL)
+        wl_egl_window_destroy(sys->window);
+}
+
 #elif defined(USE_PLATFORM_X11)
 static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
 {
@@ -163,6 +172,15 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
         ReleaseCurrent(gl);
     }
 }
+
+static void ReleaseDisplay(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (sys->x11 != NULL)
+        XCloseDisplay(sys->x11);
+}
+
 #elif defined(USE_PLATFORM_XCB)
 static int GetScreenNum(xcb_connection_t *conn, const xcb_screen_t *scr)
 {
@@ -192,8 +210,31 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
         ReleaseCurrent(gl);
     }
 }
+
+static void ReleaseDisplay(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (sys->conn != NULL)
+        xcb_disconnect(sys->conn);
+}
+
+#elif defined (USE_PLATFORM_ANDROID)
+# define Resize (NULL)
+
+static void ReleaseDisplay(vlc_gl_t *gl)
+{
+    AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
+                                        AWindow_Video);
+}
+
 #else
 # define Resize (NULL)
+
+static void ReleaseDisplay(vlc_gl_t *gl)
+{
+    (void) gl;
+}
 #endif
 
 static void SwapBuffers (vlc_gl_t *gl)
@@ -232,21 +273,8 @@ static void Close(vlc_gl_t *gl)
             eglDestroySurface(sys->display, sys->surface);
         eglTerminate(sys->display);
     }
-#ifdef USE_PLATFORM_X11
-    if (sys->x11 != NULL)
-        XCloseDisplay(sys->x11);
-#elif defined (USE_PLATFORM_XCB)
-    if (sys->conn != NULL)
-        xcb_disconnect(sys->conn);
-#endif
-#ifdef USE_PLATFORM_WAYLAND
-    if (sys->window != NULL)
-        wl_egl_window_destroy(sys->window);
-#endif
-#ifdef USE_PLATFORM_ANDROID
-    AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
-                                        AWindow_Video);
-#endif
+
+    ReleaseDisplay(gl);
     free (sys);
 }
 
