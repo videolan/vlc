@@ -440,6 +440,16 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 {
     (void) gl;
 }
+
+static EGLDisplay OpenDisplay(vlc_gl_t *gl)
+{
+# if defined (_WIN32) || defined (__VC32__) \
+  && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__)
+    if (gl->surface->type == VLC_WINDOW_TYPE_HWND)
+        return eglGetDisplay(EGL_DEFAULT_DISPLAY);
+# endif
+    return EGL_NO_DISPLAY;
+}
 #endif
 
 static void SwapBuffers (vlc_gl_t *gl)
@@ -508,21 +518,12 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     vlc_window_t *wnd = gl->surface;
 
 #if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB) \
- || defined (USE_PLATFORM_WAYLAND)
+ || defined (USE_PLATFORM_WAYLAND) || defined (USE_PLATFORM_WIN32)
     sys->display = OpenDisplay(gl);
     if (sys->display == EGL_NO_DISPLAY) {
         free(sys);
         return VLC_ENOTSUP;
     }
-
-#elif defined (USE_PLATFORM_WIN32)
-    if (wnd->type != VLC_WINDOW_TYPE_HWND)
-        goto error;
-
-# if defined (_WIN32) || defined (__VC32__) \
-  && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__)
-    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-# endif
 
 #elif defined (USE_PLATFORM_ANDROID)
     if (wnd->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
