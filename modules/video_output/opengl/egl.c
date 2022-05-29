@@ -524,20 +524,11 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->context = EGL_NO_CONTEXT;
     sys->is_current = false;
 
-    vlc_window_t *wnd = gl->surface;
-
-#if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB) \
- || defined (USE_PLATFORM_WAYLAND) || defined (USE_PLATFORM_WIN32) \
- || defined (USE_PLATFORM_ANDROID)
     sys->display = OpenDisplay(gl);
     if (sys->display == EGL_NO_DISPLAY) {
         free(sys);
         return VLC_ENOTSUP;
     }
-#endif
-
-    if (sys->display == EGL_NO_DISPLAY)
-        goto error;
 
     /* Initialize EGL display */
     EGLint major, minor;
