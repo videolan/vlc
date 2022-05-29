@@ -167,6 +167,24 @@ static void ReleaseDisplay(vlc_gl_t *gl)
         wl_egl_window_destroy(sys->window);
 }
 
+static EGLDisplay OpenDisplay(vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    sys->window = NULL;
+# ifdef EGL_EXT_platform_wayland
+    vlc_window_t *surface = gl->surface;
+
+    if (surface->type != VLC_WINDOW_TYPE_WAYLAND)
+        return EGL_NO_DISPLAY;
+    if (!CheckClientExt("EGL_EXT_platform_wayland"))
+        return EGL_NO_DISPLAY;
+    return GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, surface->display.wl, NULL);
+# else
+    return EGL_NO_DISPLAY;
+# endif
+}
+
 #elif defined(USE_PLATFORM_X11)
 static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
 {
@@ -490,27 +508,13 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     }
 #endif
 
-#if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB)
+#if defined (USE_PLATFORM_X11) || defined (USE_PLATFORM_XCB) \
+ || defined (USE_PLATFORM_WAYLAND)
     sys->display = OpenDisplay(gl);
     if (sys->display == EGL_NO_DISPLAY) {
         free(sys);
         return VLC_ENOTSUP;
     }
-
-#elif defined (USE_PLATFORM_WAYLAND)
-    sys->window = NULL;
-
-    if (wnd->type != VLC_WINDOW_TYPE_WAYLAND)
-        goto error;
-
-# ifdef EGL_EXT_platform_wayland
-    if (!CheckClientExt("EGL_EXT_platform_wayland"))
-        goto error;
-
-    sys->display = GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, wnd->display.wl,
-                                 NULL);
-
-# endif
 
 #elif defined (USE_PLATFORM_WIN32)
     if (wnd->type != VLC_WINDOW_TYPE_HWND)
