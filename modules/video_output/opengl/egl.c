@@ -101,14 +101,6 @@ static EGLSurface CreateWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config,
 }
 #endif
 
-static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
-                                      void *window, const EGLint *attrs)
-{
-    EGLNativeWindowType *native = window;
-
-    return eglCreateWindowSurface(dpy, config, *native, attrs);
-}
-
 struct gl_api
 {
    const char name[10];
@@ -146,6 +138,16 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     wl_egl_window_resize(sys->window, width, height, 0, 0);
 }
 
+static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
+                                unsigned int width, unsigned int height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    (void) width; (void) height;
+    assert(CheckClientExt("EGL_EXT_platform_wayland"));
+    return CreateWindowSurfaceEXT(dpy, config, sys->window, NULL);
+}
+
 static void ReleaseDisplay(vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
@@ -171,6 +173,18 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
             XSync(sys->x11, False);
         ReleaseCurrent(gl);
     }
+}
+
+static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
+                                unsigned int width, unsigned int height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    (void) width; (void) height;
+
+    if (CheckClientExt("EGL_EXT_platform_x11"))
+        return CreateWindowSurfaceEXT(dpy, config, &sys->x11_win, NULL);
+    return eglCreateWindowSurface(dpy, config, sys->x11_win, NULL);
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -211,6 +225,16 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     }
 }
 
+static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
+                                unsigned int width, unsigned int height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    (void) width; (void) height;
+    assert(CheckClientExt("EGL_EXT_platform_xcb"));
+    return CreateWindowSurfaceEXT(dpy, config, &sys->xcb_win, NULL);
+}
+
 static void ReleaseDisplay(vlc_gl_t *gl)
 {
     vlc_gl_sys_t *sys = gl->sys;
@@ -222,6 +246,18 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 #elif defined (USE_PLATFORM_ANDROID)
 # define Resize (NULL)
 
+static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
+                                unsigned int width, unsigned int height)
+{
+    ANativeWindow *anw =
+        AWindowHandler_getANativeWindow(gl->surface->handle.anativewindow,
+                                        AWindow_Video);
+
+    (void) width; (void) height;
+    return (anw != NULL) ? eglCreateWindowSurface(dpy, config, anw, NULL)
+                         : EGL_NO_SURFACE;
+}
+
 static void ReleaseDisplay(vlc_gl_t *gl)
 {
     AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
@@ -230,6 +266,15 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 
 #else
 # define Resize (NULL)
+
+static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
+                                unsigned int width, unsigned int height)
+{
+    HWND window = gl->surface->handle.hwnd;
+
+    (void) width; (void) height;
+    return eglCreateWindowSurface(dpy, config, window, NULL);
+}
 
 static void ReleaseDisplay(vlc_gl_t *gl)
 {
@@ -301,9 +346,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->is_current = false;
 
     vlc_window_t *wnd = gl->surface;
-    EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
-        = CreateWindowSurface;
-    void *window;
     EGLAttrib refs_name = EGL_NONE;
     EGLAttrib refs_value = EGL_FALSE;
 
@@ -348,7 +390,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
                 DefaultVisualOfScreen(wa.screen), mask, &swa);
         XMapWindow(sys->x11, sys->x11_win);
     }
-    window = &sys->x11_win;
 # ifdef EGL_EXT_platform_x11
     if (CheckClientExt("EGL_EXT_platform_x11"))
     {
@@ -357,7 +398,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
             EGL_NONE
         };
         sys->display = GetDisplayEXT(EGL_PLATFORM_X11_EXT, sys->x11, attrs);
-        createSurface = CreateWindowSurfaceEXT;
     }
     else
 # endif
@@ -417,15 +457,12 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         goto error;
 
     sys->conn = conn;
-    window = &sys->xcb_win;
-
     {
         const EGLint attrs[] = {
             EGL_PLATFORM_XCB_SCREEN_EXT, GetScreenNum(sys->conn, scr),
             EGL_NONE
         };
         sys->display = GetDisplayEXT(EGL_PLATFORM_XCB_EXT, sys->conn, attrs);
-        createSurface = CreateWindowSurfaceEXT;
     }
 # endif
 
@@ -439,14 +476,12 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     if (!CheckClientExt("EGL_EXT_platform_wayland"))
         goto error;
 
-    window = wl_egl_window_create(wnd->handle.wl, width, height);
-    if (window == NULL)
+    sys->window = wl_egl_window_create(wnd->handle.wl, width, height);
+    if (sys->window == NULL)
         goto error;
-    sys->window = window;
 
     sys->display = GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, wnd->display.wl,
                                  NULL);
-    createSurface = CreateWindowSurfaceEXT;
 
 # endif
 
@@ -454,27 +489,18 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     if (wnd->type != VLC_WINDOW_TYPE_HWND)
         goto error;
 
-    window = &wnd->handle.hwnd;
 # if defined (_WIN32) || defined (__VC32__) \
   && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
-    (void) width; (void) height;
 
 #elif defined (USE_PLATFORM_ANDROID)
     if (wnd->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
         goto error;
 
-    ANativeWindow *anw =
-        AWindowHandler_getANativeWindow(wnd->handle.anativewindow,
-                                        AWindow_Video);
-    if (anw == NULL)
-        goto error;
-    window = &anw;
 # if defined (__ANDROID__) || defined (ANDROID)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
-    (void) width; (void) height;
 
 #endif
 
@@ -519,7 +545,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     }
 
     /* Create a drawing surface */
-    sys->surface = createSurface(sys->display, cfgv[0], window, NULL);
+    sys->surface = CreateSurface(gl, sys->display, cfgv[0], width, height);
     if (sys->surface == EGL_NO_SURFACE)
     {
         msg_Err (obj, "cannot create EGL window surface");
