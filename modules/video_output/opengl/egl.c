@@ -230,9 +230,14 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
     XResizeWindow(sys->x11, win, width, height);
     XMapWindow(sys->x11, win);
 
-# ifdef EGL_EXT_platform_base
+# if defined(EGL_VERSION_1_5)
+    if (CheckClientExt("EGL_KHR_platform_x11"))
+        return eglCreatePlatformWindowSurface(dpy, config, &win, NULL);
+
+# elif defined(EGL_EXT_platform_base)
     if (CheckClientExt("EGL_EXT_platform_x11"))
         return createPlatformWindowSurfaceEXT(dpy, config, &win, NULL);
+
 # endif
     return eglCreateWindowSurface(dpy, config, win, NULL);
 }
@@ -264,7 +269,18 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
     EGLDisplay display;
     int snum = XScreenNumberOfScreen(wa.screen);
 
-# ifdef EGL_EXT_platform_x11
+# if defined(EGL_VERSION_1_5)
+#  ifdef EGL_KHR_paltform_x11
+    if (CheckClientExt("EGL_KHR_platform_x11")) {
+        const EGLAttrib attrs[] = {
+            EGL_PLATFORM_X11_SCREEN_KHR, snum,
+            EGL_NONE
+        };
+
+        display = getPlatformDisplayEXT(EGL_PLATFORM_X11_KHR, x11, attrs);
+    } else
+#  endif
+# elif defined(EGL_EXT_platform_x11)
     if (CheckClientExt("EGL_EXT_platform_x11")) {
         const EGLint attrs[] = {
             EGL_PLATFORM_X11_SCREEN_EXT, snum,
