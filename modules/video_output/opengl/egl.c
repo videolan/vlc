@@ -130,7 +130,6 @@ static void DestroySurface(vlc_gl_t *gl)
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
-# ifdef EGL_EXT_platform_base
     vlc_gl_sys_t *sys = gl->sys;
     EGLSurface surface;
 
@@ -138,16 +137,22 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
     if (sys->window == NULL)
         return EGL_NO_SURFACE;
 
+# if defined(EGL_VERSION_1_5)
+    assert(CheckClientExt("EGL_KHR_platform_wayland"));
+    surface = eglCreatePlatformWindowSurface(dpy, config, sys->window, NULL);
+
+# elif defined(EGL_EXT_platform_base)
     assert(CheckClientExt("EGL_EXT_platform_wayland"));
     surface = createPlatformWindowSurfaceEXT(dpy, config, sys->window, NULL);
+
+# else
+    surface = EGL_NO_SURFACE;
+# endif
 
     if (surface == EGL_NO_SURFACE)
         wl_egl_window_destroy(sys->window);
 
     return surface;
-# else
-    return EGL_NO_SURFACE;
-# endif
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -157,27 +162,37 @@ static void ReleaseDisplay(vlc_gl_t *gl)
 
 static EGLDisplay OpenDisplay(vlc_gl_t *gl)
 {
-# ifdef EGL_EXT_platform_wayland
     vlc_window_t *surface = gl->surface;
-    EGLint attrs[] = {
-        EGL_NONE, EGL_TRUE,
-        EGL_NONE
-    };
+    EGLint ref_attr = EGL_NONE;
 
-#  ifdef EGL_KHR_display_reference
+# ifdef EGL_KHR_display_reference
     if (CheckClientExt("EGL_KHR_display_reference"))
-        attrs[0] = EGL_TRACK_REFERENCES_KHR;
-#  endif
+        ref_attr = EGL_TRACK_REFERENCES_KHR;
+# endif
 
     if (surface->type != VLC_WINDOW_TYPE_WAYLAND)
         return EGL_NO_DISPLAY;
-    if (!CheckClientExt("EGL_EXT_platform_wayland"))
-        return EGL_NO_DISPLAY;
-    return getPlatformDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, surface->display.wl,
-                                 attrs);
-# else
-    return EGL_NO_DISPLAY;
+
+# if defined(EGL_VERSION_1_5)
+#  ifdef EGL_KHR_platform_wayland
+    if (CheckClientExt("EGL_KHR_platform_wayland")) {
+        const EGLAttrib attrs[] = { ref_attr, EGL_TRUE, EGL_NONE };
+
+        return eglGetPlatformDisplay(EGL_PLATFORM_WAYLAND_KHR,
+                                     surface->display.wl, attrs);
+    }
+#  endif
+
+# elif defined(EGL_EXT_platform_wayland)
+    if (CheckClientExt("EGL_EXT_platform_wayland")) {
+        const EGLint attrs[] = { ref_attr, EGL_TRUE, EGL_NONE };
+
+        return getPlatformDisplayEXT(EGL_PLATFORM_WAYLAND_EXT,
+                                     surface->display.wl, attrs);
+    }
+
 # endif
+    return EGL_NO_DISPLAY;
 }
 
 #elif defined(USE_PLATFORM_X11)
