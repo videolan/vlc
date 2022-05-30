@@ -180,6 +180,12 @@ static block_t *Decode(demux_t *demux,
         }
     }
 
+    // Preserve important metadata
+    struct vlc_ancillary *ancillary;
+    ancillary = picture_GetAncillary(image, VLC_ANCILLARY_ID_ICC);
+    if (ancillary)
+        vlc_frame_AttachAncillary(data, ancillary);
+
     picture_Release(image);
     return data;
 }
