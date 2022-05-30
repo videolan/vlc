@@ -254,6 +254,11 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
+    struct vlc_ancillary *ancillary;
+    ancillary = vlc_frame_GetAncillary( p_block, VLC_ANCILLARY_ID_ICC );
+    if( ancillary )
+        picture_AttachAncillary( p_pic, ancillary );
+
     FillPicture( p_dec, p_block, p_pic );
     p_pic->date = p_block->i_pts;
 
