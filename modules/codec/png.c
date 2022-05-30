@@ -345,6 +345,31 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) goto error;
 
+    /* Decode ICC profile */
+#ifdef PNG_iCCP_SUPPORTED
+    if (png_get_valid( p_png, p_info, PNG_INFO_iCCP ))
+    {
+        vlc_icc_profile_t *icc;
+        png_charp name;
+        int compression;
+# if PNG_LIBPNG_VER < 10500
+        png_charp iccdata;
+# else
+        png_bytep iccdata;
+# endif
+        png_uint_32 icclen;
+        png_get_iCCP( p_png, p_info, &name, &compression, &iccdata, &icclen);
+        if( compression != PNG_COMPRESSION_TYPE_BASE )
+            goto error; /* impossible with current libpng */
+        icc = picture_AttachNewAncillary( p_pic, VLC_ANCILLARY_ID_ICC, sizeof(*icc) + icclen );
+        if ( !icc )
+            goto error;
+        memcpy( icc->data, iccdata, icclen );
+        icc->size = icclen;
+    }
+#endif
+
+
     /* Decode picture */
     p_row_pointers = vlc_alloc( i_height, sizeof(png_bytep) );
     if( !p_row_pointers )
@@ -368,6 +393,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
  error:
 
+    if( p_pic )
+        picture_Release( p_pic );
     free( p_row_pointers );
     png_destroy_read_struct( &p_png, &p_info, &p_end_info );
     block_Release( p_block );
