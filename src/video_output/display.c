@@ -561,13 +561,15 @@ void vout_SetDisplayFitting(vout_display_t *vd, enum vlc_video_fitting fit)
 void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    unsigned onum = osys->cfg.display.zoom.num;
+    unsigned oden = osys->cfg.display.zoom.den;
 
     osys->cfg.display.zoom.num = num;
     osys->cfg.display.zoom.den = den;
 
     if (osys->cfg.display.fitting != VLC_VIDEO_FIT_NONE)
         return; /* zoom has no effects */
-    if (osys->cfg.display.zoom.num * den == num * osys->cfg.display.zoom.den)
+    if (onum * den == num * oden)
         return; /* zoom has not changed */
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM))
         vout_display_Reset(vd);
