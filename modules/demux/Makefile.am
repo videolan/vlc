@@ -119,7 +119,7 @@ EXTRA_LTLIBRARIES += libgme_plugin.la
 demux_LTLIBRARIES += $(LTLIBgme)
 
 libsid_plugin_la_SOURCES = demux/sid.cpp
-libsid_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sid)
+libsid_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CXXFLAGS_sid)
 libsid_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libsid_plugin_la_LIBADD = $(LIBS_sid)
 EXTRA_LTLIBRARIES += libsid_plugin.la

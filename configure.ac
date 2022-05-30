@@ -2237,7 +2237,7 @@ AS_IF([test "${enable_sid}" != "no"], [
         CPPFLAGS="$CPPFLAGS $SID_CFLAGS"
         AC_CHECK_HEADER([sidplay/builders/resid.h], [
             VLC_ADD_PLUGIN([sid])
-            VLC_ADD_CFLAGS([sid], [$SID_CFLAGS])
+            VLC_ADD_CXXFLAGS([sid], [$SID_CFLAGS])
             VLC_ADD_LIBS([sid], [$SID_LIBS] [-lresid-builder])
         ], [
             AS_IF([test -n "${enable_sid}"],
