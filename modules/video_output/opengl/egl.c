@@ -517,7 +517,7 @@ static void Close(vlc_gl_t *gl)
     free (sys);
 }
 
-static void InitEGL(void)
+static bool InitEGL(void)
 {
     static vlc_once_t once = VLC_STATIC_ONCE;
 
@@ -531,6 +531,7 @@ static void InitEGL(void)
 #endif
         vlc_once_complete(&once);
     }
+    return clientExts != NULL; /* check if EGL version is 1.4 or later */
 }
 
 /**
@@ -539,7 +540,8 @@ static void InitEGL(void)
 static int Open(vlc_gl_t *gl, const struct gl_api *api,
                 unsigned width, unsigned height)
 {
-    InitEGL();
+    if (!InitEGL())
+        return VLC_ENOTSUP;
 
     int ret = VLC_EGENERIC;
     vlc_object_t *obj = VLC_OBJECT(gl);
