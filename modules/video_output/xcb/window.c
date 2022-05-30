@@ -608,7 +608,7 @@ static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
     sys->root = root;
 
 #ifdef HAVE_XKBCOMMON
-    if (var_InheritBool(wnd, "keyboard-events"))
+    if (events & XCB_EVENT_MASK_KEY_PRESS)
         InitKeyboardExtension(wnd);
     else
         sys->xkb.ctx = NULL;
@@ -732,10 +732,11 @@ static int Open(vlc_window_t *wnd)
         /* XCB_CW_BACK_PIXEL */
         scr->black_pixel,
         /* XCB_CW_EVENT_MASK */
-        XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_POINTER_MOTION |
-        XCB_EVENT_MASK_STRUCTURE_NOTIFY,
+        XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_STRUCTURE_NOTIFY,
     };
 
+    if (var_InheritBool(wnd, "keyboard-events"))
+        values[1] |= XCB_EVENT_MASK_KEY_PRESS;
     if (var_InheritBool(wnd, "mouse-events"))
         values[1] |= XCB_EVENT_MASK_BUTTON_PRESS
                    | XCB_EVENT_MASK_BUTTON_RELEASE;
@@ -917,8 +918,8 @@ static int EmOpen (vlc_window_t *wnd)
 
     /* Try to subscribe to keyboard and mouse events (only one X11 client can
      * subscribe to input events, so this can fail). */
-    value |= XCB_EVENT_MASK_KEY_PRESS;
-
+    if (var_InheritBool(wnd, "keyboard-events"))
+        value |= XCB_EVENT_MASK_KEY_PRESS;
     if (var_InheritBool(wnd, "mouse-events"))
         value |= XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
 
