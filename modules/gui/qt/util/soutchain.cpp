@@ -24,9 +24,13 @@
 
 QString SoutOption::to_string() const
 {
-    QString ret = "";
+    if( kind == EscapedString )
+    {
+        return stringValue;
+    }
     if( kind == String )
     {
+        QString ret = "";
         if( !stringValue.isEmpty() )
         {
             QString quotes = stringValue.toStdString().find_first_of("=, \t")
@@ -38,12 +42,12 @@ QString SoutOption::to_string() const
                 free( psz );
             }
         }
+        return ret;
     }
     else
     {
-        ret = nestedModule.to_string();
+        return nestedModule.to_string();
     }
-    return ret;
 }
 
 QString SoutModule::to_string() const
@@ -78,6 +82,12 @@ void SoutModule::option( const QString& option, const SoutOption& value )
 {
     options.append( OptionPairType( option, value ) );
 }
+
+void SoutModule::option( const QString& option, const QString& value, bool escaped )
+{
+    options.append( OptionPairType( option, SoutOption(value, escaped) ) );
+}
+
 void SoutModule::option( const QString& option )
 {
     options.append( OptionPairType( option, "" ) );
@@ -103,11 +113,11 @@ QString SoutChain::to_string() const
     return chain;
 }
 
-void SoutChain::option( const QString& name, const QString& value )
+void SoutChain::option( const QString& name, const QString& value, bool escaped )
 {
     if( modules.size() > 0 )
     {
-        modules.back().option( name, value );
+        modules.back().option( name, value, escaped );
     }
 }
 void SoutChain::option( const QString& name, const int i_value, const int i_precision )

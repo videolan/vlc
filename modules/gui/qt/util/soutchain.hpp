@@ -38,8 +38,9 @@ public:
     {
     }
 
-    void option( const QString& option, const SoutOption& value );
-    void option( const QString& option );
+    void option( const QString& name, const SoutOption& value );
+    void option( const QString& name, const QString& value, bool escaped );
+    void option( const QString& name );
     QString to_string() const;
 
 private:
@@ -53,14 +54,14 @@ private:
 class SoutOption
 {
 public:
-    SoutOption( const QString& value ) :
-        kind( String ),
+    SoutOption( const QString& value, bool escaped = false ) :
+        kind( escaped ? EscapedString : String ),
         stringValue( value ),
         nestedModule("")
     {}
 
-    SoutOption( const char* s ) :
-        SoutOption( QString(s) )
+    SoutOption( const char* s, bool escaped = false ) :
+        SoutOption( QString(s), escaped )
     {}
 
     SoutOption( const SoutModule& module ) :
@@ -71,7 +72,7 @@ public:
     QString to_string() const;
 
 private:
-    enum Kind{ String, Nested };
+    enum Kind{ String, EscapedString, Nested };
     Kind kind;
     QString stringValue;
     SoutModule nestedModule;
@@ -124,7 +125,7 @@ public:
     }
 
     // These should be only in SoutModule, but they are kept in this parent class for compatibility with an older API
-    void option( const QString& name, const QString& value = "" );
+    void option( const QString& name, const QString& value = "", bool escaped = false );
     void option( const QString& name, const int i_value, const int i_precision = 10 );
     void option( const QString& name, const double f_value );
     void option( const QString& name, const QString& base, const int i_value, const int i_precision = 10 );

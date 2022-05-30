@@ -197,7 +197,7 @@ void SoutDialog::updateChain()
         if( tempMRL.isEmpty() ) continue;
 
         if( multi )
-            smrl.option( "dst", tempMRL );
+            smrl.option( "dst", tempMRL, true );
         else
         {
             smrl.begin( tempMRL);
