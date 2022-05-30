@@ -47,6 +47,12 @@
 # include "../android/utils.h"
 #endif
 
+static const char *clientExts;
+#ifdef EGL_EXT_platform_base
+static PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplayEXT;
+static PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createPlatformWindowSurfaceEXT;
+#endif
+
 typedef struct vlc_gl_sys_t
 {
     EGLDisplay display;
@@ -74,32 +80,8 @@ static bool CheckAPI(EGLDisplay dpy, const char *api)
 
 static bool CheckClientExt(const char *name)
 {
-    const char *exts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-    return vlc_gl_StrHasToken(exts, name);
+    return vlc_gl_StrHasToken(clientExts, name);
 }
-
-#ifdef EGL_EXT_platform_base
-static EGLDisplay GetDisplayEXT(EGLenum plat, void *dpy, const EGLint *attrs)
-{
-    PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay =
-        (PFNEGLGETPLATFORMDISPLAYEXTPROC)
-        eglGetProcAddress("eglGetPlatformDisplayEXT");
-
-    assert(getDisplay != NULL);
-    return getDisplay(plat, dpy, attrs);
-}
-
-static EGLSurface CreateWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config,
-                                         void *window, const EGLint *attrs)
-{
-    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface =
-        (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
-        eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
-
-    assert(createSurface != NULL);
-    return createSurface(dpy, config, window, attrs);
-}
-#endif
 
 struct gl_api
 {
@@ -148,6 +130,7 @@ static void DestroySurface(vlc_gl_t *gl)
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
+# ifdef EGL_EXT_platform_base
     vlc_gl_sys_t *sys = gl->sys;
     EGLSurface surface;
 
@@ -156,11 +139,15 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
         return EGL_NO_SURFACE;
 
     assert(CheckClientExt("EGL_EXT_platform_wayland"));
+    surface = createPlatformWindowSurfaceEXT(dpy, config, sys->window, NULL);
 
-    surface = CreateWindowSurfaceEXT(dpy, config, sys->window, NULL);
     if (surface == EGL_NO_SURFACE)
         wl_egl_window_destroy(sys->window);
+
     return surface;
+# else
+    return EGL_NO_SURFACE;
+# endif
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -186,7 +173,8 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
         return EGL_NO_DISPLAY;
     if (!CheckClientExt("EGL_EXT_platform_wayland"))
         return EGL_NO_DISPLAY;
-    return GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, surface->display.wl, attrs);
+    return getPlatformDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, surface->display.wl,
+                                 attrs);
 # else
     return EGL_NO_DISPLAY;
 # endif
@@ -227,8 +215,10 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
     XResizeWindow(sys->x11, win, width, height);
     XMapWindow(sys->x11, win);
 
+# ifdef EGL_EXT_platform_base
     if (CheckClientExt("EGL_EXT_platform_x11"))
-        return CreateWindowSurfaceEXT(dpy, config, &win, NULL);
+        return createPlatformWindowSurfaceEXT(dpy, config, &win, NULL);
+# endif
     return eglCreateWindowSurface(dpy, config, win, NULL);
 }
 
@@ -266,7 +256,7 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
             EGL_NONE
         };
 
-        display = GetDisplayEXT(EGL_PLATFORM_X11_EXT, x11, attrs);
+        display = getPlatformDisplayEXT(EGL_PLATFORM_X11_EXT, x11, attrs);
     } else
 # endif
 # ifdef __unix__
@@ -339,6 +329,7 @@ static void DestroySurface(vlc_gl_t *gl)
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
+# ifdef EGL_EXT_platform_base
     vlc_gl_sys_t *sys = gl->sys;
     xcb_connection_t *conn = sys->conn;
     xcb_window_t win = sys->xcb_win;
@@ -349,7 +340,10 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
     xcb_map_window(conn, win);
 
     assert(CheckClientExt("EGL_EXT_platform_xcb"));
-    return CreateWindowSurfaceEXT(dpy, config, &win, NULL);
+    return createPlatformWindowSurfaceEXT(dpy, config, &win, NULL);
+# else
+    return EGL_NO_SURFACE;
+# endif
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
@@ -380,7 +374,8 @@ static EGLDisplay OpenDisplay(vlc_gl_t *gl)
         EGL_NONE
     };
 
-    EGLDisplay display = GetDisplayEXT(EGL_PLATFORM_XCB_EXT, conn, attrs);
+    EGLDisplay display = getPlatformDisplayEXT(EGL_PLATFORM_XCB_EXT, conn,
+                                               attrs);
     if (display == EGL_NO_DISPLAY) {
         xcb_disconnect(conn);
         goto out;
@@ -522,21 +517,37 @@ static void Close(vlc_gl_t *gl)
     free (sys);
 }
 
+static void InitEGL(void)
+{
+    static vlc_once_t once = VLC_STATIC_ONCE;
+
+    if (unlikely(!vlc_once_begin(&once))) {
+        clientExts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+#ifdef EGL_EXT_platform_base
+        getPlatformDisplayEXT =
+            (void *) eglGetProcAddress("eglGetPlatformDisplayEXT");
+        createPlatformWindowSurfaceEXT =
+            (void *) eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
+#endif
+        vlc_once_complete(&once);
+    }
+}
+
 /**
  * Probe EGL display availability
  */
 static int Open(vlc_gl_t *gl, const struct gl_api *api,
                 unsigned width, unsigned height)
 {
+    InitEGL();
+
     int ret = VLC_EGENERIC;
     vlc_object_t *obj = VLC_OBJECT(gl);
     vlc_gl_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    const char *ext = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-    if (*ext)
-        msg_Dbg(obj, "EGL client extensions: %s", ext);
+    msg_Dbg(obj, "EGL client extensions: %s", clientExts);
 
     gl->sys = sys;
     sys->display = EGL_NO_DISPLAY;
@@ -558,7 +569,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
             eglQueryString(sys->display, EGL_VERSION),
             eglQueryString(sys->display, EGL_VENDOR));
 
-    ext = eglQueryString(sys->display, EGL_EXTENSIONS);
+    const char *ext = eglQueryString(sys->display, EGL_EXTENSIONS);
     if (*ext)
         msg_Dbg(obj, "EGL display extensions: %s", ext);
 
