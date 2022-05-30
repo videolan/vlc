@@ -76,6 +76,8 @@ private:
     };
 
     void setDPR(qreal value);
+    void load();
+    void setRoundImage(QImage image);
     void regenerateRoundImage();
 
     QUrl m_source;

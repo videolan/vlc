@@ -229,16 +229,68 @@ void RoundImage::setDPR(const qreal value)
     regenerateRoundImage();
 }
 
+void RoundImage::load()
+{
+    m_enqueuedGeneration = false;
+    assert(!m_roundImageGenerator);
+
+    const qreal scaledWidth = this->width() * m_dpr;
+    const qreal scaledHeight = this->height() * m_dpr;
+    const qreal scaledRadius = this->radius() * m_dpr;
+
+    const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
+    if (auto image = imageCache.object(key)) // should only by called in mainthread
+    {
+        setRoundImage(*image);
+        return;
+    }
+
+    // Image is generated in size factor of `m_dpr` to avoid scaling artefacts when
+    // generated image is set with device pixel ratio
+    m_roundImageGenerator.reset(new RoundImageGenerator(m_source, scaledWidth, scaledHeight, scaledRadius));
+    connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this, key]()
+    {
+        const auto image = new QImage(m_roundImageGenerator->takeResult());
+
+        m_roundImageGenerator.reset();
+
+        if (image->isNull())
+        {
+            delete image;
+            setRoundImage({});
+            return;
+        }
+
+        image->setDevicePixelRatio(m_dpr);
+        setRoundImage(*image);
+
+        imageCache.insert(key, image, image->sizeInBytes());
+    });
+
+    m_roundImageGenerator->start(*QThreadPool::globalInstance());
+}
+
+void RoundImage::setRoundImage(QImage image)
+{
+    m_dirty = true;
+    m_roundImage = image;
+
+    // remove old contents, setting ItemHasContent to false will
+    // inhibit updatePaintNode() call and old content will remain
+    if (image.isNull())
+        update();
+
+    setFlag(ItemHasContents, not image.isNull());
+    update();
+}
+
 void RoundImage::regenerateRoundImage()
 {
     if (!isComponentComplete() || m_enqueuedGeneration)
         return;
 
     // remove old contents
-    m_dirty = true;
-    m_roundImage = {};
-    update();
-    setFlag(ItemHasContents, false); // update() is still required
+    setRoundImage({});
 
     m_roundImageGenerator.reset();
 
@@ -246,58 +298,7 @@ void RoundImage::regenerateRoundImage()
     // subsequent updates can be merged, f.e when VLCStyle.scale changes
     m_enqueuedGeneration = true;
 
-    QMetaObject::invokeMethod(this, [this] ()
-    {
-        m_enqueuedGeneration = false;
-        assert(!m_roundImageGenerator);
-
-        const qreal scaledWidth = this->width() * m_dpr;
-        const qreal scaledHeight = this->height() * m_dpr;
-        const qreal scaledRadius = this->radius() * m_dpr;
-
-        const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
-        if (auto image = imageCache.object(key)) // should only by called in mainthread
-        {
-            m_roundImage = *image;
-            m_dirty = true;
-            setFlag(ItemHasContents, true);
-            update();
-            return;
-        }
-
-        // Image is generated in size factor of `m_dpr` to avoid scaling artefacts when
-        // generated image is set with device pixel ratio
-        m_roundImageGenerator.reset(new RoundImageGenerator(m_source, scaledWidth, scaledHeight, scaledRadius));
-        connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this, key]()
-        {
-            const auto image = new QImage(m_roundImageGenerator->takeResult());
-
-            m_roundImageGenerator.reset();
-
-            if (!image->isNull())
-            {
-                image->setDevicePixelRatio(m_dpr);
-
-                imageCache.insert(key, image, image->sizeInBytes());
-
-                setFlag(ItemHasContents, true);
-
-                m_roundImage = *image;
-
-                m_dirty = true;
-            }
-            else
-            {
-                delete image;
-                m_dirty = false;
-                setFlag(ItemHasContents, false);
-            }
-
-            update();
-        });
-
-        m_roundImageGenerator->start(*QThreadPool::globalInstance());
-    }, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, &RoundImage::load, Qt::QueuedConnection);
 }
 
 RoundImage::RoundImageGenerator::RoundImageGenerator(const QUrl &source, qreal width, qreal height, qreal radius)
