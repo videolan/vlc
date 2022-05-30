@@ -21,6 +21,8 @@
 #ifndef VLC_ANCILLARY_H
 #define VLC_ANCILLARY_H 1
 
+#include <stdint.h>
+
 /**
  * \defgroup ancillary Ancillary
  * \ingroup input
