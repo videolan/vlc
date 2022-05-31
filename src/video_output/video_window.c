@@ -225,6 +225,20 @@ static void vout_display_window_OutputEvent(vlc_window_t *window,
         msg_Dbg(window, "fullscreen output %s removed", name);
 }
 
+static void vout_display_window_IccEvent(vlc_window_t *window,
+                                         vlc_icc_profile_t *profile)
+{
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
+    if (profile != NULL)
+        msg_Dbg(window, "window got ICC profile (%zu bytes)", profile->size);
+    else
+        msg_Dbg(window, "window ICC profile cleared");
+
+    vout_ChangeIccProfile(vout, profile);
+}
+
 static const struct vlc_window_callbacks vout_display_window_cbs = {
     .resized = vout_display_window_ResizeNotify,
     .closed = vout_display_window_CloseNotify,
@@ -234,6 +248,7 @@ static const struct vlc_window_callbacks vout_display_window_cbs = {
     .mouse_event = vout_display_window_MouseEvent,
     .keyboard_event = vout_display_window_KeyboardEvent,
     .output_event = vout_display_window_OutputEvent,
+    .icc_event = vout_display_window_IccEvent,
 };
 
 void vout_display_window_SetMouseHandler(vlc_window_t *window,

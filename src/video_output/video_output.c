@@ -652,6 +652,24 @@ void vout_ChangeViewpoint(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->display_lock);
 }
 
+void vout_ChangeIccProfile(vout_thread_t *vout,
+                           vlc_icc_profile_t *profile)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    vlc_mutex_lock(&sys->window_lock);
+    free(sys->display_cfg.icc_profile);
+    sys->display_cfg.icc_profile = profile;
+
+    vlc_mutex_lock(&sys->display_lock);
+    vlc_mutex_unlock(&sys->window_lock);
+
+    if (sys->display != NULL)
+        vout_SetDisplayIccProfile(sys->display, profile);
+    vlc_mutex_unlock(&sys->display_lock);
+}
+
 /* */
 static void VoutGetDisplayCfg(vout_thread_sys_t *p_vout, const video_format_t *fmt, vout_display_cfg_t *cfg)
 {
@@ -1883,6 +1901,7 @@ void vout_Release(vout_thread_t *vout)
     }
 
     free(sys->splitter_name);
+    free(sys->display_cfg.icc_profile);
 
     if (sys->dec_device)
         vlc_decoder_device_Release(sys->dec_device);
@@ -1989,6 +2008,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     /* Display */
     sys->display = NULL;
+    sys->display_cfg.icc_profile = NULL;
     vlc_mutex_init(&sys->display_lock);
 
     /* Window */

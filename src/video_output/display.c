@@ -629,6 +629,15 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
     }
 }
 
+void vout_SetDisplayIccProfile(vout_display_t *vd,
+                               const vlc_icc_profile_t *profile)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    if (vd->ops->set_icc_profile)
+        vd->ops->set_icc_profile(vd, profile);
+}
+
 vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const video_format_t *source,
                                  vlc_video_context *vctx,

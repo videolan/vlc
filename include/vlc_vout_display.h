@@ -116,6 +116,7 @@ struct vout_display_placement {
 typedef struct vout_display_cfg {
     struct vlc_window *window; /**< Window */
     struct vout_display_placement display; /**< Display placement properties */
+    vlc_icc_profile_t *icc_profile; /**< Currently active ICC profile */
     vlc_viewpoint_t viewpoint;
 } vout_display_cfg_t;
 
@@ -310,6 +311,15 @@ struct vlc_display_operations
      * \param vp viewpoint to use on the next render
      */
     int        (*set_viewpoint)(vout_display_t *, const vlc_viewpoint_t *vp);
+
+    /**
+     * Notifies a change in output ICC profile.
+     *
+     * May be NULL. Memory owned by the caller.
+     *
+     * \param prof new ICC profile associated with display, or NULL for none
+     */
+    void       (*set_icc_profile)(vout_display_t *, const vlc_icc_profile_t *prof);
 };
 
 struct vout_display_t {
