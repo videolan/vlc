@@ -312,11 +312,11 @@ EXTRA_LTLIBRARIES += libfb_plugin.la
 vout_LTLIBRARIES += $(LTLIBfb)
 
 
-### Kernel Mode Setting ###
+### Direct Rendering Manager (DRM) ###
 
 libkms_plugin_la_SOURCES = video_output/kms.c
-libkms_plugin_la_CFLAGS = $(AM_CFLAGS) $(KMS_CFLAGS)
-libkms_plugin_la_LIBADD = $(KMS_LIBS)
+libkms_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBDRM_CFLAGS)
+libkms_plugin_la_LIBADD = $(LIBDRM_LIBS)
 
 libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/vlc_drm.h \
@@ -324,8 +324,8 @@ libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/buffers.c \
 	video_output/drm/planes.c \
 	video_output/drm/display.c
-libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(KMS_CFLAGS)
-if HAVE_KMS
+libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBDRM_CFLAGS)
+if HAVE_LIBDRM
 vout_LTLIBRARIES += libkms_plugin.la libdrm_display_plugin.la
 endif
 

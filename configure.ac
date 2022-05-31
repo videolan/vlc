@@ -3526,9 +3526,9 @@ AC_CHECK_HEADER([linux/fb.h], [
 ])
 
 dnl
-dnl  Linux kernel mode setting module
+dnl  Direct Rendering Manager (DRM) plugins
 dnl
-PKG_HAVE_WITH_MODULES([KMS], [libdrm >= 2.4.83], [Linux kernel mode setting output], [auto])
+PKG_HAVE_WITH_MODULES([LIBDRM], [libdrm >= 2.4.83], [Linux kernel mode setting output], [auto])
 
 dnl
 dnl  libcaca plugin
