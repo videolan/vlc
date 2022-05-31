@@ -240,6 +240,9 @@ ListView {
 
             selectionUpdated(event.modifiers, oldIndex, newIndex);
 
+            // NOTE: If we skip this call the item might end up under the header.
+            positionViewAtIndex(currentIndex, ItemView.Contain);
+
             // NOTE: We make sure we have the proper visual focus on components.
             if (oldIndex < currentIndex)
                 Helpers.enforceFocus(currentItem, Qt.TabFocusReason);
