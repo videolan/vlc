@@ -137,6 +137,8 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
 
 static void Delete(vlc_va_t *va, AVCodecContext* ctx)
 {
+    if (ctx)
+        av_buffer_unref(&ctx->hw_frames_ctx);
     vlc_video_context_Release(va->sys);
 }
 
