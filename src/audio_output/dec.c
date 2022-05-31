@@ -86,6 +86,9 @@ struct vlc_aout_stream
 
         struct timing_point rate_point;
         float rate;
+
+        void (*notify_latency_cb)(void *data);
+        void *notify_latency_data;
     } timing_points;
 
     const char *str_id;
@@ -263,6 +266,8 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     stream->timing_points.rate = 1.f;
 
     vlc_mutex_init(&stream->timing_points.lock);
+    stream->timing_points.notify_latency_cb = cfg->notify_latency_cb;
+    stream->timing_points.notify_latency_data = cfg->notify_latency_data;
 
     stream->sync.rate = 1.f;
     stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
@@ -657,6 +662,10 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     p->audio_ts = audio_ts;
 
     vlc_mutex_unlock(&stream->timing_points.lock);
+
+    if (stream->timing_points.notify_latency_cb != NULL)
+        stream->timing_points.notify_latency_cb(
+                stream->timing_points.notify_latency_data);
 }
 
 static vlc_tick_t
