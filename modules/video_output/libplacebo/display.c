@@ -73,6 +73,7 @@ typedef struct vout_display_sys_t
     struct pl_dither_params dither;
     struct pl_render_params params;
     struct pl_color_space target;
+    uint64_t target_icc_signature;
     struct pl_peak_detect_params peak_detect;
     enum pl_chroma_location yuv_chroma_loc;
     int dither_depth;
@@ -98,12 +99,14 @@ static int Control(vout_display_t *, int);
 static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 static void UpdateColorspaceHint(vout_display_t *, const video_format_t *);
+static void UpdateIccProfile(vout_display_t *, const vlc_icc_profile_t *);
 
 static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = PictureRender,
     .display = PictureDisplay,
     .control = Control,
+    .set_icc_profile = UpdateIccProfile,
 };
 
 static int Open(vout_display_t *vd,
@@ -291,6 +294,11 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     struct pl_render_target target;
     pl_render_target_from_swapchain(&target, &frame);
+    if (vd->cfg->icc_profile) {
+        target.profile.signature = sys->target_icc_signature;
+        target.profile.data = vd->cfg->icc_profile->data;
+        target.profile.len = vd->cfg->icc_profile->size;
+    }
 
     // Set the target crop dynamically based on the swapchain flip state
     vout_display_place_t place;
@@ -522,6 +530,13 @@ static void UpdateColorspaceHint(vout_display_t *vd, const video_format_t *fmt)
     VLC_UNUSED(vd);
     VLC_UNUSED(fmt);
 #endif
+}
+
+static void UpdateIccProfile(vout_display_t *vd, const vlc_icc_profile_t *prof)
+{
+    vout_display_sys_t *sys = vd->sys;
+    sys->target_icc_signature++;
+    (void) prof; /* we get the current value from vout_display_cfg_t */
 }
 
 static int Control(vout_display_t *vd, int query)
