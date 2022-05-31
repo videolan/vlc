@@ -140,6 +140,8 @@ struct vlc_aout_stream_cfg
     struct vlc_clock_t *clock;
     const char *str_id;
     const audio_replay_gain_t *replay_gain;
+    void (*notify_latency_cb)(void *data);
+    void *notify_latency_data;
 };
 
 vlc_aout_stream *vlc_aout_stream_New(audio_output_t *p_aout,
