@@ -1345,7 +1345,7 @@ void EndVideoDec( vlc_object_t *obj )
 
     if( p_sys->p_va )
     {
-        vlc_va_Delete( p_sys->p_va );
+        vlc_va_Delete( p_sys->p_va, NULL );
         vlc_video_context_Release( p_sys->vctx_out );
         p_sys->vctx_out = NULL;
     }
@@ -1667,7 +1667,7 @@ no_reuse:
     if (p_sys->p_va != NULL)
     {
         msg_Err(p_dec, "existing hardware acceleration cannot be reused");
-        vlc_va_Delete(p_sys->p_va);
+        vlc_va_Delete(p_sys->p_va, NULL);
         p_sys->p_va = NULL;
         vlc_video_context_Release( p_sys->vctx_out );
         p_sys->vctx_out = NULL;
@@ -1744,8 +1744,7 @@ no_reuse:
 
         if (decoder_UpdateVideoOutput(p_dec, vctx_out))
         {
-            vlc_va_Delete(va);
-            p_context->hwaccel_context = NULL;
+            vlc_va_Delete(va, p_context);
             continue; /* Unsupported codec profile or such */
         }
 

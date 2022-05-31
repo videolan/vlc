@@ -135,7 +135,7 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
     return VLC_SUCCESS;
 }
 
-static void Delete(vlc_va_t *va)
+static void Delete(vlc_va_t *va, AVCodecContext* ctx)
 {
     vlc_video_context_Release(va->sys);
 }

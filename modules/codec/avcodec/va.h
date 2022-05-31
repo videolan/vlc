@@ -32,7 +32,7 @@ typedef struct vlc_video_context vlc_video_context;
 
 struct vlc_va_operations {
     int (*get)(vlc_va_t *, picture_t *pic, AVCodecContext *ctx, AVFrame *frame);
-    void (*close)(vlc_va_t *);
+    void (*close)(vlc_va_t *, AVCodecContext* ctx);
 };
 
 struct vlc_va_t {
@@ -103,7 +103,9 @@ static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx,
 /**
  * Destroys a libavcodec hardware acceleration back-end.
  * All allocated surfaces shall have been released beforehand.
+ *
+ * @param avctx pointer to the current AVCodecContext if it needs to be cleaned, NULL otherwise [IN]
  */
-void vlc_va_Delete(vlc_va_t *);
+void vlc_va_Delete(vlc_va_t *, AVCodecContext * avctx);
 
 #endif

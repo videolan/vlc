@@ -209,7 +209,7 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_va_t *va)
+static void Close(vlc_va_t *va, AVCodecContext* ctx)
 {
     vlc_va_sys_t *sys = va->sys;
 
@@ -218,6 +218,9 @@ static void Close(vlc_va_t *va)
 
     if (sys->va_pool)
         va_pool_Close(sys->va_pool);
+
+    if (ctx)
+        ctx->hwaccel_context = NULL;
 }
 
 static const struct vlc_va_operations ops = { Get, Close, };
@@ -297,7 +300,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, con
     return VLC_SUCCESS;
 
 error:
-    Close(va);
+    Close(va, ctx);
     return err;
 }
 
