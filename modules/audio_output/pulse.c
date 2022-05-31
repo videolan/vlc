@@ -103,6 +103,12 @@ static void drain_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
     (void) api; (void) e; (void) tv;
 }
 
+static void stream_wait_cb(pa_stream *s, int success, void *userdata)
+{
+    (void) s; (void) success;
+    pa_threaded_mainloop_signal(userdata, 0);
+}
+
 static int TriggerDrain(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
@@ -228,9 +234,13 @@ static void stream_stop(pa_stream *s, audio_output_t *aout)
         sys->trigger = NULL;
     }
 
-    op = pa_stream_cork(s, 1, NULL, NULL);
+    op = pa_stream_cork(s, 1, stream_wait_cb, sys->mainloop);
     if (op != NULL)
+    {
+        while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
         pa_operation_unref(op);
+    }
 }
 
 static void stream_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
