@@ -324,8 +324,12 @@ libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/buffers.c \
 	video_output/drm/planes.c \
 	video_output/drm/display.c
-libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBDRM_CFLAGS)
+libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_DRM
+vout_LTLIBRARIES += libdrm_display_plugin.la
+endif
 if HAVE_LIBDRM
+libdrm_display_plugin_la_CPPFLAGS += $(LIBDRM_CFLAGS) -DHAVE_LIBDRM
 vout_LTLIBRARIES += libkms_plugin.la libdrm_display_plugin.la
 endif
 

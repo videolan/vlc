@@ -25,7 +25,11 @@
 #endif
 
 #include <stdint.h>
-#include <drm_fourcc.h>
+#ifndef HAVE_LIBDRM
+# include <drm/drm_fourcc.h>
+#else
+# include <drm_fourcc.h>
+#endif
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include "vlc_drm.h"

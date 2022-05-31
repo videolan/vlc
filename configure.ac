@@ -3528,6 +3528,13 @@ AC_CHECK_HEADER([linux/fb.h], [
 dnl
 dnl  Direct Rendering Manager (DRM) plugins
 dnl
+AC_CHECK_HEADER([drm/drm_mode.h], [
+  have_drm="yes"
+], [
+  have_drm="no"
+])
+AM_CONDITIONAL([HAVE_DRM], [test "$have_drm" = "yes"])
+
 PKG_HAVE_WITH_MODULES([LIBDRM], [libdrm >= 2.4.83], [Linux kernel mode setting output], [auto])
 
 dnl

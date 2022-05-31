@@ -33,7 +33,11 @@
 # include "config.h"
 #endif
 
-#include <drm_mode.h>
+#ifndef HAVE_LIBDRM
+# include <drm/drm_mode.h>
+#else
+# include <drm_mode.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
