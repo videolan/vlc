@@ -536,7 +536,13 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     sys->last_date = date;
 
     if (pa_stream_is_corked(s) > 0)
-        stream_start(s, aout, date);
+    {
+        /* Trigger a latency update, that will update the stream_start timer
+         * using the last date. */
+        pa_operation *op = pa_stream_update_timing_info(s, NULL, NULL);
+        if (op != NULL)
+            pa_operation_unref(op);
+    }
 
 #if 0 /* Fault injector to test underrun recovery */
     static volatile unsigned u = 0;
@@ -645,7 +651,13 @@ static void Drain(audio_output_t *aout)
         /* XXX: Loosy drain emulation.
          * See #18141: drain callback is never received */
         sys->draining = true;
-        TriggerDrain(aout);
+
+        /* Trigger a latency update, that will update the drain timer */
+        op = pa_stream_update_timing_info(s, NULL, NULL);
+        if (op != NULL)
+            pa_operation_unref(op);
+        else
+            aout_DrainedReport(aout);
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
@@ -852,7 +864,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     /* Stream parameters */
     pa_stream_flags_t flags = sys->flags_force
                             | PA_STREAM_START_CORKED
-                            | PA_STREAM_INTERPOLATE_TIMING
                             | PA_STREAM_NOT_MONOTONIC
                             | PA_STREAM_AUTO_TIMING_UPDATE
                             | PA_STREAM_FIX_RATE;
