@@ -27,6 +27,7 @@
 #include <vlc_keystore.h>
 #include <vlc_modules.h>
 #include <vlc_url.h>
+#include <vlc_interrupt.h>
 #include <libvlc.h>
 
 #include <assert.h>
@@ -451,6 +452,9 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
             if (p_credential->p_keystore != NULL)
                 credential_find_keystore(p_credential, p_credential->p_keystore);
 
+            if (vlc_killed())
+                return -EINTR;
+
             p_credential->i_get_order++;
             break;
 
@@ -483,7 +487,7 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
             if (i_ret != 1)
             {
                 p_credential->psz_username = p_credential->psz_password = NULL;
-                return -ENOENT;
+                return vlc_killed() ? -EINTR : -ENOENT;
             }
 
             p_credential->psz_username = p_credential->psz_dialog_username;
