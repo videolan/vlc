@@ -174,7 +174,7 @@ Item {
     Behavior on opacity {
         NumberAnimation {
             easing.type: Easing.InOutSine
-            duration: VLCStyle.ms128
+            duration: VLCStyle.duration_short
         }
     }
 

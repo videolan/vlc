@@ -45,7 +45,7 @@ MouseArea {
         enabled: (pressed === false)
 
         NumberAnimation {
-            duration: VLCStyle.duration_faster
+            duration: VLCStyle.duration_short
 
             easing.type: Easing.OutQuad
         }
@@ -53,7 +53,7 @@ MouseArea {
 
     Behavior on opacity {
         NumberAnimation {
-            duration: VLCStyle.duration_fast
+            duration: VLCStyle.duration_short
 
             easing.type: Easing.OutQuad
         }

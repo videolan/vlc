@@ -49,7 +49,8 @@ Widgets.IconToolButton {
         ColorAnimation on color {
             from:  "transparent"
             to: control.color
-            duration: VLCStyle.ms1000
+            //this is an animation and not a transisition, we explicitly want a long duration
+            duration: 1000
             loops: Animation.Infinite
             easing.type: Easing.InOutSine
             running: control.enabled && Player.recording

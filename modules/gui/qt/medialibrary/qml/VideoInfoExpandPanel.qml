@@ -207,7 +207,7 @@ FocusScope {
 
                                 Behavior on rotation {
                                     NumberAnimation {
-                                        duration: VLCStyle.duration_faster
+                                        duration: VLCStyle.duration_short
                                     }
                                 }
                             }
@@ -236,7 +236,7 @@ FocusScope {
 
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: VLCStyle.duration_faster
+                                duration: VLCStyle.duration_short
                             }
                         }
 
@@ -274,7 +274,7 @@ FocusScope {
 
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: VLCStyle.duration_faster
+                                duration: VLCStyle.duration_short
                             }
                         }
 

@@ -65,7 +65,7 @@ FocusScope {
         reversible: true
 
         SequentialAnimation {
-            NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_normal; }
+            NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
             PropertyAction { property: "highlighted" }
             PropertyAction { property: "focus" }
         }

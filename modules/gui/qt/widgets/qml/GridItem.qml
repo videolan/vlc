@@ -122,7 +122,7 @@ T.Control {
 
                 NumberAnimation {
                     properties: "opacity, playCoverOpacity"
-                    duration: VLCStyle.duration_slow
+                    duration: VLCStyle.duration_long
                     easing.type: Easing.InSine
                 }
 
@@ -145,7 +145,7 @@ T.Control {
 
                 NumberAnimation {
                     properties: "opacity, playCoverOpacity"
-                    duration: VLCStyle.duration_normal
+                    duration: VLCStyle.duration_long
                     easing.type: Easing.OutSine
                 }
 

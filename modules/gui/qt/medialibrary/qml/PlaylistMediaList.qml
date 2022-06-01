@@ -293,7 +293,7 @@ FocusScope {
                 //---------------------------------------------------------------------------------
                 // Animations
 
-                Behavior on opacity { NumberAnimation { duration: VLCStyle.duration_faster } }
+                Behavior on opacity { NumberAnimation { duration: VLCStyle.duration_short } }
             }
 
             //-------------------------------------------------------------------------------------

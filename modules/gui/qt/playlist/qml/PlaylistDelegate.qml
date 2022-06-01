@@ -67,7 +67,7 @@ T.Control {
                          !overlayMenu.shown && MainCtx.playlistVisible &&
                          (textInfoColumn.implicitWidth > textInfoColumn.width) )
 
-    T.ToolTip.timeout: (hovered ? 0 : VLCStyle.ms2000)
+    T.ToolTip.timeout: (hovered ? 0 : VLCStyle.duration_humanMoment)
 
     T.ToolTip.text: (textInfo.text + '\n' + textArtist.text)
 

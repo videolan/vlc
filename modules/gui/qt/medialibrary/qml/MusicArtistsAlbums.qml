@@ -173,7 +173,7 @@ FocusScope {
             Behavior on width {
                 SmoothedAnimation {
                     easing.type: Easing.InSine
-                    duration: VLCStyle.ms10
+                    duration: VLCStyle.duration_veryShort
                 }
             }
 

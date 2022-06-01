@@ -25,7 +25,7 @@ BusyIndicator {
     palette.text: VLCStyle.colors.text
     running: false
 
-    property int delay: 1000 //ms
+    property int delay: VLCStyle.duration_humanMoment
     property bool runningDelayed: false
     onRunningDelayedChanged: {
         if (runningDelayed) {

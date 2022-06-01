@@ -32,7 +32,7 @@ Item {
 
     Behavior on uiTransluency {
         NumberAnimation {
-            duration: VLCStyle.duration_normal
+            duration: VLCStyle.duration_long
             easing.type: Easing.InOutSine
         }
     }

@@ -318,7 +318,7 @@ FocusScope {
 
                                 NumberAnimation {
                                     property: "width"
-                                    duration: VLCStyle.duration_fast
+                                    duration: VLCStyle.duration_short
                                     easing.type: Easing.InOutSine
                                 }
                             }

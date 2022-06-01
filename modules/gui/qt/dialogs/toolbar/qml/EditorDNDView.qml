@@ -50,7 +50,7 @@ ListView {
         NumberAnimation {
             property: "opacity"; from: 1.0; to: 0
 
-            duration: VLCStyle.duration_normal
+            duration: VLCStyle.duration_long
         }
     }
 
@@ -62,7 +62,7 @@ ListView {
         NumberAnimation {
             property: "opacity"; from: 0; to: 1.0
 
-            duration: VLCStyle.duration_normal
+            duration: VLCStyle.duration_long
         }
     }
 
@@ -70,7 +70,7 @@ ListView {
         NumberAnimation {
             properties: "x"
 
-            duration: VLCStyle.duration_normal
+            duration: VLCStyle.duration_long
             easing.type: Easing.OutSine
         }
 

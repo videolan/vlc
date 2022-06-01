@@ -45,7 +45,7 @@ T.Popup {
 
     Behavior on width {
         SmoothedAnimation {
-            duration: VLCStyle.ms64
+            duration: VLCStyle.duration_veryShort
             easing.type: Easing.InOutSine
         }
     }
@@ -75,7 +75,7 @@ T.Popup {
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: VLCStyle.duration_normal
+                duration: VLCStyle.duration_long
             }
         }
         pushExit: Transition {
@@ -83,7 +83,7 @@ T.Popup {
                 property: "opacity"
                 from: 1
                 to: 0
-                duration: VLCStyle.duration_normal
+                duration: VLCStyle.duration_long
             }
         }
         popEnter: Transition {
@@ -91,7 +91,7 @@ T.Popup {
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: VLCStyle.duration_normal
+                duration: VLCStyle.duration_long
             }
         }
         popExit: Transition {
@@ -99,7 +99,7 @@ T.Popup {
                 property: "opacity"
                 from: 1
                 to: 0
-                duration: VLCStyle.duration_normal
+                duration: VLCStyle.duration_long
             }
         }
     }
@@ -164,7 +164,7 @@ T.Popup {
 
                     T.ToolTip.visible: (hovered || activeFocus)
                     T.ToolTip.text: modelData.tooltip
-                    T.ToolTip.delay: 1000
+                    T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
                     Navigation.parentItem: column
 

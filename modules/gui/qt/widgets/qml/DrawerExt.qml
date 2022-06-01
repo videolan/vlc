@@ -97,7 +97,7 @@ FocusScope {
                 NumberAnimation {
                     target: container; property: toChange
 
-                    duration: VLCStyle.duration_fast; easing.type: Easing.InSine
+                    duration: VLCStyle.duration_short; easing.type: Easing.InSine
                 }
 
                 PropertyAction{ target: container; property: "visible" }
@@ -111,7 +111,7 @@ FocusScope {
                 NumberAnimation {
                     target: container; property: toChange
 
-                    duration: VLCStyle.duration_fast; easing.type: Easing.OutSine
+                    duration: VLCStyle.duration_short; easing.type: Easing.OutSine
                 }
             }
         }

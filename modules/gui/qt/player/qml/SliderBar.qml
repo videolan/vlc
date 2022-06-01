@@ -249,20 +249,20 @@ Slider {
                 PropertyAnimation {
                     from: 0.0
                     to: bufferRect.bufferFrames
-                    duration: VLCStyle.ms2000
+                    duration: VLCStyle.durationSliderBouncing
                     easing.type: "OutBounce"
                 }
                 PauseAnimation {
-                    duration: VLCStyle.ms500
+                    duration: VLCStyle.duration_veryLong
                 }
                 PropertyAnimation {
                     from: bufferRect.bufferFrames
                     to: 0.0
-                    duration: VLCStyle.ms2000
+                    duration: VLCStyle.durationSliderBouncing
                     easing.type: "OutBounce"
                 }
                 PauseAnimation {
-                    duration: VLCStyle.ms500
+                    duration: VLCStyle.duration_veryLong
                 }
             }
         }
@@ -321,7 +321,7 @@ Slider {
 
                         to: 0
 
-                        duration: VLCStyle.duration_fast; easing.type: Easing.OutSine
+                        duration: VLCStyle.duration_short; easing.type: Easing.OutSine
                     }
 
                     PropertyAction { target: sliderHandle; property: "visible"; value: false; }
@@ -337,7 +337,7 @@ Slider {
 
                         to: VLCStyle.margin_small
 
-                        duration: VLCStyle.duration_fast; easing.type: Easing.InSine
+                        duration: VLCStyle.duration_short; easing.type: Easing.InSine
                     }
                 }
             }

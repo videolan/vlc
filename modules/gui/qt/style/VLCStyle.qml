@@ -217,27 +217,38 @@ QtObject {
 
     readonly property int dragDelta: dp(12, scale)
 
-    // duration
-    readonly property int duration_slower: 300
-    readonly property int duration_slow  : 250
-    readonly property int duration_normal: 200
-    readonly property int duration_fast  : 150
-    readonly property int duration_faster: 100
+    // durations. Values are aligned on Kirigami
 
-    readonly property int ms2000: 2000
-    readonly property int ms1000: 1000
+    //should be used for animation that benefits from a longer animation than duration_long
+    readonly property int duration_veryLong: 400
 
-    readonly property int ms500: 500
-    readonly property int ms140: 140
-    readonly property int ms128: 128
-    readonly property int ms125: 125
+    //should be used for longer animation (opening/closing panes & dialogs)
+    readonly property int duration_long: 200
 
-    readonly property int ms75: 75
-    readonly property int ms64: 64
-    readonly property int ms10: 10
+    //should be used for short animations (hovering, accuenting UI event)
+    readonly property int duration_short: 100
 
-    //timings
-    readonly property int delayToolTipAppear: 500
+    //should be used for near instant animations
+    readonly property int duration_veryShort: 50
+
+    /* human time reaction, how much time before the user should be informed that something
+     * is going on, or before something should be automatically automated,
+     * this should not be used for animations
+     *
+     * Some examples:
+     *
+     * - When the user types text in a search field, wait no longer than this duration after
+     *   the user completes typing before starting the search
+     * - When loading data which would commonly arrive rapidly enough to not require interaction,
+     *   wait this long before showing a spinner
+     */
+    readonly property int duration_humanMoment: 2000
+
+    //timing before showing up a tooltip
+    readonly property int delayToolTipAppear: 700
+
+    //timing for the progressbar/scanbar bouncing animation, explicitly very long
+    readonly property int durationSliderBouncing: 2000
 
     //default arts
     readonly property url noArtAlbum: "qrc:///noart_album.svg";

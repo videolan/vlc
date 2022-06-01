@@ -441,7 +441,7 @@ Control {
                 NumberAnimation {
                     property: "opacity"; from: 0; to: 1.0
 
-                    duration: VLCStyle.duration_normal
+                    duration: VLCStyle.duration_long
                 }
             }
 
@@ -449,7 +449,7 @@ Control {
                 NumberAnimation {
                     properties: "x,y"
 
-                    duration: VLCStyle.duration_normal; easing.type: Easing.OutSine
+                    duration: VLCStyle.duration_long; easing.type: Easing.OutSine
                 }
 
                 NumberAnimation { property: "opacity"; to: 1.0 }

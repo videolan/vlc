@@ -63,7 +63,7 @@ Item {
         }
 
         PauseAnimation {
-            duration: VLCStyle.ms1000
+            duration: VLCStyle.duration_veryLong
         }
 
         SmoothedAnimation {
@@ -77,7 +77,7 @@ Item {
         }
 
         PauseAnimation {
-            duration: VLCStyle.ms1000
+            duration: VLCStyle.duration_veryLong
         }
 
         PropertyAction {

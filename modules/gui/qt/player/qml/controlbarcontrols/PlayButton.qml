@@ -158,7 +158,7 @@ T.Control {
         NumberAnimation {
             properties: "radius, opacity"
             easing.type: Easing.InOutSine
-            duration: VLCStyle.ms75
+            duration: VLCStyle.duration_veryShort
         }
     }
 
@@ -188,7 +188,7 @@ T.Control {
 
         Behavior on color {
             ColorAnimation {
-                duration: VLCStyle.ms75
+                duration: VLCStyle.duration_veryShort
                 easing.type: Easing.InOutSine
             }
         }

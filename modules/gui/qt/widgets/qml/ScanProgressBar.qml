@@ -96,23 +96,23 @@ T.ProgressBar {
                     NumberAnimation {
                         from: - 1
                         to: 1
-                        duration: VLCStyle.ms2000
+                        duration: VLCStyle.durationSliderBouncing
                         easing.type: Easing.OutBounce
                     }
 
                     PauseAnimation {
-                        duration: VLCStyle.ms500
+                        duration: VLCStyle.duration_veryLong
                     }
 
                     NumberAnimation {
                         to: - 1
                         from: 1
-                        duration: VLCStyle.ms2000
+                        duration: VLCStyle.durationSliderBouncing
                         easing.type: Easing.OutBounce
                     }
 
                     PauseAnimation {
-                        duration: VLCStyle.ms500
+                        duration: VLCStyle.duration_veryLong
                     }
                 }
             }

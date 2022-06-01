@@ -375,7 +375,7 @@ ListView {
 
             NumberAnimation {
                 property: "opacity"
-                duration: VLCStyle.duration_fast
+                duration: VLCStyle.duration_short
                 easing.type: Easing.InOutSine
             }
         }
@@ -450,7 +450,7 @@ ListView {
 
             NumberAnimation {
                 property: "opacity"
-                duration: VLCStyle.duration_fast
+                duration: VLCStyle.duration_short
                 easing.type: Easing.InOutSine
             }
         }

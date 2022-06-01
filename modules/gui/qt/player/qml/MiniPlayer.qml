@@ -56,7 +56,7 @@ FocusScope {
         SequentialAnimation {
             // visible should change first, in order for inner layouts to calculate implicitHeight correctly
             PropertyAction { property: "visible" }
-            NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_normal; }
+            NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
         }
     }
 

@@ -78,7 +78,7 @@ T.Control {
 
         active: visualFocus
 
-        animationDuration: VLCStyle.ms140
+        animationDuration: VLCStyle.duration_short
 
         backgroundColor: {
             if (delegate.selected)

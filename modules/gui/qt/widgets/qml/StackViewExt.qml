@@ -33,7 +33,7 @@ StackView {
             property: "opacity"
             from: 0.0
             to: 1.0
-            duration: VLCStyle.duration_slow
+            duration: VLCStyle.duration_long
             easing.type: Easing.InSine
         }
     }
@@ -43,7 +43,7 @@ StackView {
             property: "opacity"
             from: 1.0
             to: 0.0
-            duration: VLCStyle.duration_slow
+            duration: VLCStyle.duration_long
             easing.type: Easing.OutSine
         }
     }
