@@ -358,7 +358,11 @@ static int get_address( stream_t *p_access )
 
         int ret = netbios_ns_resolve( p_ns, p_sys->url.psz_host,
                                       NETBIOS_FILESERVER, &ip4_addr);
-        netbios_ns_interrupt_unregister();
+        if (netbios_ns_interrupt_unregister() == EINTR)
+        {
+            netbios_ns_destroy( p_ns );
+            return -EINTR;
+        }
         netbios_ns_destroy( p_ns );
 
         if( ret == 0 )
@@ -395,6 +399,11 @@ static int get_address( stream_t *p_access )
     const char *psz_nbt = netbios_ns_inverse( p_ns, p_sys->addr.s_addr );
 
     netbios_ns_interrupt_unregister();
+    if (netbios_ns_interrupt_unregister() == EINTR)
+    {
+        netbios_ns_destroy( p_ns );
+        return -EINTR;
+    }
     netbios_ns_destroy( p_ns );
 
     if( psz_nbt != NULL )
