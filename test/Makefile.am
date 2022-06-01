@@ -28,6 +28,7 @@ check_PROGRAMS = \
 	test_src_input_stream \
 	test_src_input_stream_fifo \
 	test_src_input_thumbnail \
+	test_src_input_decoder \
 	test_src_player \
 	test_src_interface_dialog \
 	test_src_media_source \
@@ -189,6 +190,12 @@ test_modules_stream_out_pcr_sync_SOURCES = modules/stream_out/pcr_sync.c \
 	../modules/stream_out/transcode/pcr_sync.c \
 	../modules/stream_out/transcode/pcr_sync.h
 test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
+
+test_src_input_decoder_SOURCES = \
+	src/input/decoder/input_decoder.c \
+	src/input/decoder/input_decoder.h \
+	src/input/decoder/input_decoder_scenarios.c
+test_src_input_decoder_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
