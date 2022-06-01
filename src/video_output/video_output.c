@@ -1371,7 +1371,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 
     UpdateDeinterlaceFilter(sys);
 
-    bool render_now = true;
     const vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
     const bool first = !sys->displayed.current;
@@ -1427,7 +1426,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         // next frame will still need some waiting before display, we don't need
         // to render now
         // display forced picture immediately
-        render_now = sys->displayed.current->b_force;
+        bool render_now = sys->displayed.current->b_force;
 
         RenderPicture(vout, render_now);
         if (render_now)
