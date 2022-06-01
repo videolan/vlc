@@ -311,10 +311,17 @@ RequestStatus LibVLCHTTPConnection::request(const std::string &path,
     vlc_UrlParse(&crd_url, params.getUrl().c_str());
 
     vlc_credential_init(&crd, &crd_url);
-    if (vlc_credential_get(&crd, p_object, NULL, NULL, NULL, NULL) == 0)
+    int ret = vlc_credential_get(&crd, p_object, NULL, NULL, NULL, NULL);
+    if (ret == 0)
     {
         vlc_http_res_set_login(source->http_res,
                                crd.psz_username, crd.psz_password);
+    }
+    else if (ret == -EINTR)
+    {
+        vlc_credential_clean(&crd);
+        vlc_UrlClean(&crd_url);
+        return RequestStatus::GenericError;
     }
 
     int status = vlc_http_res_get_status(source->http_res);

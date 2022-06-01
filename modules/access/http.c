@@ -259,11 +259,16 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_reconnect = var_InheritBool( p_access, "http-reconnect" );
 
-    if( vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL ) == 0 )
+    ret = vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL );
+    if( ret == 0 )
     {
         p_sys->url.psz_username = (char *) credential.psz_username;
         p_sys->url.psz_password = (char *) credential.psz_password;
     }
+    else if( ret == -EINTR )
+        goto error;
+
+    ret = VLC_EGENERIC;
 
 connect:
     /* Connect */

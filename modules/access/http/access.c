@@ -190,9 +190,12 @@ static int Open(vlc_object_t *obj)
     if (sys->resource == NULL)
         goto error;
 
-    if (vlc_credential_get(&crd, obj, NULL, NULL, NULL, NULL) == 0)
+    ret = vlc_credential_get(&crd, obj, NULL, NULL, NULL, NULL);
+    if (ret == 0)
         vlc_http_res_set_login(sys->resource,
                                crd.psz_username, crd.psz_password);
+    else if (ret == -EINTR)
+        goto error;
 
     ret = VLC_EGENERIC;
 

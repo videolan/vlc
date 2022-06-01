@@ -294,7 +294,14 @@ static int Open(vlc_object_t *obj)
     vlc_credential_init(&credential, &url);
     psz_var_domain = var_InheritString(access, "smb-domain");
     credential.psz_realm = psz_var_domain;
-    vlc_credential_get(&credential, access, "smb-user", "smb-pwd", NULL, NULL);
+    if (vlc_credential_get(&credential, access, "smb-user", "smb-pwd", NULL, NULL) == -EINTR)
+    {
+        vlc_credential_clean(&credential);
+        free(psz_var_domain);
+        free(psz_decoded_path);
+        vlc_UrlClean(&url);
+        return VLC_EGENERIC;
+    }
 
     for (;;)
     {

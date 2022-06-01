@@ -444,8 +444,10 @@ static int login( stream_t *p_access )
     psz_var_domain = var_InheritString( p_access, "smb-domain" );
     credential.psz_realm = psz_var_domain ? psz_var_domain : NULL;
 
-    vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
-                        NULL, NULL );
+    if (vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
+                            NULL, NULL ) == -EINTR )
+        goto error;
+
 
     if( !credential.psz_username )
     {

@@ -403,8 +403,10 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
-                        NULL, NULL );
+    if (vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
+                            NULL, NULL) == -EINTR)
+        goto error;
+
     char* psz_userauthlist = NULL;
     bool b_publickey_tried = false;
     do
