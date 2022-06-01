@@ -1420,12 +1420,14 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         if (likely(swap_next_pts != VLC_TICK_MAX))
             date_refresh = swap_next_pts - render_delay;
 
-        // next frame will still need some waiting before display
-        render_now = false;
-
         if (likely(sys->displayed.current != NULL))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
+
+        // next frame will still need some waiting before display, we don't need
+        // to render now
+        // display forced picture immediately
+        render_now = sys->displayed.current->b_force;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
@@ -1449,9 +1451,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
         return __MIN(date_refresh, max_deadline);
     }
-
-    /* display the picture immediately */
-    render_now |= sys->displayed.current->b_force;
 
     RenderPicture(vout, render_now);
     if (render_now)
