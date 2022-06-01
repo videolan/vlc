@@ -623,7 +623,7 @@ static int Connect( demux_t *p_demux )
 
     /* Credentials can be NULL since they may not be needed */
     if( vlc_credential_get( &credential, p_demux, "rtsp-user", "rtsp-pwd",
-                            NULL, NULL) )
+                            NULL, NULL) == 0 )
     {
         psz_user = credential.psz_username;
         psz_pwd = credential.psz_password;
@@ -678,7 +678,7 @@ describe:
 
             if( vlc_credential_get( &credential, p_demux, "rtsp-user", "rtsp-pwd",
                                     _("RTSP authentication"),
-                                    _("Please enter a valid login name and a password.") ) )
+                                    _("Please enter a valid login name and a password.") ) == 0 )
             {
                 psz_user = credential.psz_username;
                 psz_pwd = credential.psz_password;

@@ -190,7 +190,7 @@ static int Open(vlc_object_t *obj)
     if (sys->resource == NULL)
         goto error;
 
-    if (vlc_credential_get(&crd, obj, NULL, NULL, NULL, NULL))
+    if (vlc_credential_get(&crd, obj, NULL, NULL, NULL, NULL) == 0)
         vlc_http_res_set_login(sys->resource,
                                crd.psz_username, crd.psz_password);
 
@@ -207,9 +207,9 @@ static int Open(vlc_object_t *obj)
         if (psz_realm == NULL)
             break;
         crd.psz_realm = psz_realm;
-        if (!vlc_credential_get(&crd, obj, NULL, NULL, _("HTTP authentication"),
-                                _("Please enter a valid login name and "
-                                  "a password for realm %s."), crd.psz_realm))
+        if (vlc_credential_get(&crd, obj, NULL, NULL, _("HTTP authentication"),
+                               _("Please enter a valid login name and "
+                                 "a password for realm %s."), crd.psz_realm) != 0)
             break;
 
         vlc_http_res_set_login(sys->resource,

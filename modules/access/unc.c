@@ -326,9 +326,9 @@ static int Open(vlc_object_t *obj)
             break;
 
         errno = 0;
-        if (!vlc_credential_get(&credential, access, "smb-user",
-                                "smb-pwd", SMB_LOGIN_DIALOG_TITLE,
-                                SMB_LOGIN_DIALOG_TEXT, url.psz_host))
+        if (vlc_credential_get(&credential, access, "smb-user",
+                               "smb-pwd", SMB_LOGIN_DIALOG_TITLE,
+                               SMB_LOGIN_DIALOG_TEXT, url.psz_host) != 0)
             break;
     }
 

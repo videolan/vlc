@@ -298,7 +298,7 @@ test(vlc_object_t *p_obj, unsigned int i_id, const struct testcase *p_test)
 
     bool b_found = false;
     while (vlc_credential_get(&credential, p_obj, psz_opt_user, psz_opt_pwd,
-                              "test authentication", "this a test"))
+                              "test authentication", "this a test") == 0)
     {
         bool realm_match = !p_test->result.psz_realm
             || (credential.psz_realm

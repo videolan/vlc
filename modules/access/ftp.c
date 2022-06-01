@@ -471,7 +471,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys, const char *path 
     }
     while( vlc_credential_get( &credential, p_access, "ftp-user", "ftp-pwd",
                                LOGIN_DIALOG_TITLE, LOGIN_DIALOG_TEXT,
-                               url.psz_host ) );
+                               url.psz_host ) == 0 );
 
     if( b_logged )
     {

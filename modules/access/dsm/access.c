@@ -522,7 +522,7 @@ static int login( stream_t *p_access )
         while( connect_err == EACCES
             && vlc_credential_get( &credential, p_access, "smb-user", "smb-pwd",
                                    SMB1_LOGIN_DIALOG_TITLE,
-                                   SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) )
+                                   SMB_LOGIN_DIALOG_TEXT, p_sys->netbios_name ) == 0 )
         {
             b_guest = false;
             psz_login = credential.psz_username;

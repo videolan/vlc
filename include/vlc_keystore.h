@@ -231,11 +231,11 @@ vlc_credential_clean(vlc_credential *p_credential);
  * keystore or the dialog
  * @param psz_dialog_fmt dialog text using format
  *
- * @return true if vlc_credential.psz_username and vlc_credential.psz_password
- * are valid, otherwise this function should not be called again.
+ * @return 0 if vlc_credential.psz_username and vlc_credential.psz_password
+ * are valid, or a negative errno code.
  */
 
-VLC_API bool
+VLC_API int
 vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
                    const char *psz_option_username,
                    const char *psz_option_password,

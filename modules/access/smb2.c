@@ -864,7 +864,7 @@ Open(vlc_object_t *p_obj)
     while (VLC_SMB2_STATUS_DENIED(ret)
         && vlc_credential_get(&credential, access, "smb-user", "smb-pwd",
                               SMB_LOGIN_DIALOG_TITLE, SMB_LOGIN_DIALOG_TEXT,
-                              sys->encoded_url.psz_host))
+                              sys->encoded_url.psz_host) == 0)
         ret = vlc_smb2_connect_open_share(access, url, &credential);
     free(resolved_host);
     free(url);

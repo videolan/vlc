@@ -259,7 +259,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_reconnect = var_InheritBool( p_access, "http-reconnect" );
 
-    if( vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL ) )
+    if( vlc_credential_get( &credential, p_access, NULL, NULL, NULL, NULL ) == 0 )
     {
         p_sys->url.psz_username = (char *) credential.psz_username;
         p_sys->url.psz_password = (char *) credential.psz_password;
@@ -297,7 +297,7 @@ connect:
         if( vlc_credential_get( &credential, p_access, NULL, NULL,
                                _("HTTP authentication"),
                                _("Please enter a valid login name and a "
-                               "password for realm %s."), p_sys->auth.psz_realm ) )
+                               "password for realm %s."), p_sys->auth.psz_realm ) == 0 )
         {
             p_sys->psz_username = strdup(credential.psz_username);
             p_sys->psz_password = strdup(credential.psz_password);
