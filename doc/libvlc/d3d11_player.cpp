@@ -560,8 +560,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             }
             ReleaseSRWLockExclusive(&ctx->swapchainLock);
 
-            ctx->width  = unsigned(LOWORD(lParam) * (BORDER_RIGHT - BORDER_LEFT) / 2.0f); // remove the orange part !
-            ctx->height = unsigned(HIWORD(lParam) * (BORDER_TOP - BORDER_BOTTOM) / 2.0f);
+            ctx->width  = unsigned(ctx->client_area.width * (BORDER_RIGHT - BORDER_LEFT) / 2.0f); // remove the orange part !
+            ctx->height = unsigned(ctx->client_area.height * (BORDER_TOP - BORDER_BOTTOM) / 2.0f);
 
             // tell libvlc we want a new rendering size
             // we could also match the source video size and scale in swapchain render
