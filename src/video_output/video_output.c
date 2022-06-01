@@ -1439,6 +1439,8 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
             vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
             return __MIN(date_refresh, max_deadline);
         }
+        RenderPicture(vout, true);
+        return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
     }
     else
     {
