@@ -1434,7 +1434,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         refresh = date_refresh <= system_now;
         render_now = refresh;
     }
-    else if (!first && !refresh && next == NULL)
+    else
     {
         // nothing changed, wait until the next deadline or a control
         return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
