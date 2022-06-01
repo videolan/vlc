@@ -1376,8 +1376,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
     const bool first = !sys->displayed.current;
 
-    bool dropped_current_frame = false;
-
     /* FIXME/XXX we must redisplay the last decoded picture (because
     * of potential vout updated, or filters update or SPU update)
     * For now a high update period is needed but it could be removed
@@ -1423,7 +1421,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
             date_refresh = swap_next_pts - render_delay;
 
         // next frame will still need some waiting before display
-        dropped_current_frame = sys->displayed.current != NULL;
         render_now = false;
 
         if (likely(sys->displayed.current != NULL))
@@ -1438,7 +1435,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         render_now = refresh;
     }
 
-    if (!first && !refresh && !dropped_current_frame) {
+    if (!first && !refresh && next == NULL) {
         // nothing changed, wait until the next deadline or a control
         vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
         return __MIN(date_refresh, max_deadline);
