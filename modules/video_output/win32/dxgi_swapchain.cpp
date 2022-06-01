@@ -456,6 +456,10 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
                            IUnknown *pFactoryDevice,
                            const d3d_format_t *newPixelFormat, const libvlc_video_render_cfg_t *cfg )
 {
+    // 0 dimensions are not allowed, a value of 8 is used otherwise
+    UINT width = cfg->width ? cfg->width : 8;
+    UINT height = cfg->height ? cfg->height : 8;
+
 #ifndef VLC_WINSTORE_APP
     if (display->dxgiswapChain.Get() && display->pixelFormat != newPixelFormat)
     {
@@ -471,11 +475,11 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
 #if defined(HAVE_DCOMP_H)
         if (display->swapchainSurfaceType == SWAPCHAIN_SURFACE_DCOMP)
             DXGI_CreateSwapchainDComp(display, dxgiadapter, pFactoryDevice,
-                                      cfg->width, cfg->height);
+                                      width, height);
         else // SWAPCHAIN_TARGET_HWND
 #endif // HAVE_DCOMP_H
             DXGI_CreateSwapchainHwnd(display, dxgiadapter, pFactoryDevice,
-                                     cfg->width, cfg->height);
+                                     width, height);
 
     }
 #else /* VLC_WINSTORE_APP */
@@ -489,7 +493,7 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
 
     /* TODO detect is the size is the same as the output and switch to fullscreen mode */
     HRESULT hr;
-    hr = display->dxgiswapChain->ResizeBuffers(0, cfg->width, cfg->height,
+    hr = display->dxgiswapChain->ResizeBuffers(0, width, height,
                                         DXGI_FORMAT_UNKNOWN, 0 );
     if ( FAILED( hr ) ) {
         msg_Err( display->obj, "Failed to resize the backbuffer. (hr=0x%lX)", hr );
