@@ -1426,7 +1426,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         dropped_current_frame = sys->displayed.current != NULL;
         render_now = false;
 
-        if (likely(dropped_current_frame))
+        if (likely(sys->displayed.current != NULL))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
     }
