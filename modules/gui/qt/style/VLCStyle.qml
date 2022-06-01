@@ -217,34 +217,24 @@ QtObject {
 
     readonly property int dragDelta: dp(12, scale)
 
-    // Speed
-
-    property bool animate: true
-
-    property real speed: 1.0
-
-    // NOTE: This ratio is useful because we want a 1.2 speed to be *faster* than 1.0.
-    readonly property real ratioSpeed: (animate && speed) ? 1 / speed : 0.0
-
     // duration
+    readonly property int duration_slower: 300
+    readonly property int duration_slow  : 250
+    readonly property int duration_normal: 200
+    readonly property int duration_fast  : 150
+    readonly property int duration_faster: 100
 
-    readonly property int duration_slower: 300 * ratioSpeed
-    readonly property int duration_slow  : 250 * ratioSpeed
-    readonly property int duration_normal: 200 * ratioSpeed
-    readonly property int duration_fast  : 150 * ratioSpeed
-    readonly property int duration_faster: 100 * ratioSpeed
+    readonly property int ms2000: 2000
+    readonly property int ms1000: 1000
 
-    readonly property int ms2000: 2000 * ratioSpeed
-    readonly property int ms1000: 1000 * ratioSpeed
+    readonly property int ms500: 500
+    readonly property int ms140: 140
+    readonly property int ms128: 128
+    readonly property int ms125: 125
 
-    readonly property int ms500: 500 * ratioSpeed
-    readonly property int ms140: 140 * ratioSpeed
-    readonly property int ms128: 128 * ratioSpeed
-    readonly property int ms125: 125 * ratioSpeed
-
-    readonly property int ms75: 75 * ratioSpeed
-    readonly property int ms64: 64 * ratioSpeed
-    readonly property int ms10: 10 * ratioSpeed
+    readonly property int ms75: 75
+    readonly property int ms64: 64
+    readonly property int ms10: 10
 
     //timings
     readonly property int delayToolTipAppear: 500
