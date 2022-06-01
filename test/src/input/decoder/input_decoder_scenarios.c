@@ -82,10 +82,113 @@ static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
 
     return VLC_SUCCESS;
 }
+
+struct picture_watcher_context {
+    picture_context_t context;
+    vlc_sem_t wait_picture;
+    vlc_sem_t wait_prepare;
+    vlc_atomic_rc_t rc;
+};
+
+static void context_destroy(picture_context_t *context)
+{
+    struct picture_watcher_context *watcher =
+        container_of(context, struct picture_watcher_context, context);
+
+    if (vlc_atomic_rc_dec(&watcher->rc))
+        vlc_sem_post(&watcher->wait_picture);
+}
+
+static picture_context_t * context_copy(picture_context_t *context)
+{
+    struct picture_watcher_context *watcher =
+        container_of(context, struct picture_watcher_context, context);
+    vlc_atomic_rc_inc(&watcher->rc);
+    return context;
+}
+
+static int decoder_decode_check_flush_video(decoder_t *dec, picture_t *pic)
+{
+    if (scenario_data.skip_decoder)
+    {
+        picture_Release(pic);
+        return VLC_SUCCESS;
+    }
+
+    int ret = decoder_UpdateVideoOutput(dec, NULL);
+    assert(ret == VLC_SUCCESS);
+
+    struct picture_watcher_context context1 = {
+        .context.destroy = context_destroy,
+        .context.copy = context_copy,
+    };
+    vlc_sem_init(&context1.wait_picture, 0);
+    vlc_atomic_rc_init(&context1.rc);
+
+    picture_t *second_pic = picture_Clone(pic);
+    second_pic->b_force = true;
+    second_pic->date = VLC_TICK_0;
+    second_pic->b_progressive = true;
+    second_pic->context = &context1.context;
+
+    msg_Info(dec, "Send first frame from decoder to video output");
+    decoder_QueueVideo(dec, second_pic);
+
+    msg_Info(dec, "Wait for the display to prepare the frame");
+    vlc_sem_wait(&context1.wait_prepare);
+
+    msg_Info(dec, "Trigger decoder and vout flush");
+    vlc_sem_post(&scenario_data.wait_ready_to_flush);
+
+    /* Wait for the picture to be flushed by the vout. */
+    msg_Info(dec, "Wait for the picture to be flushed from the vout");
+    vlc_sem_wait(&context1.wait_picture);
+
+    /* Reinit the picture context waiter. */
+
+    struct picture_watcher_context context2 = {
+        .context.destroy = context_destroy,
+        .context.copy = context_copy,
+    };
+    vlc_sem_init(&context2.wait_picture, 0);
+    vlc_atomic_rc_init(&context2.rc);
+
+    picture_t *third_pic = picture_Clone(pic);
+    third_pic->b_force = true;
+    third_pic->date = VLC_TICK_0 + 1;
+    third_pic->b_progressive = true;
+    third_pic->context = &context2.context;
+
+    msg_Info(dec, "Re-queue the picture to the vout before decoder::pf_flush is called");
+    decoder_QueueVideo(dec, third_pic);
+
+    /* Wait for the picture to be flushed by the input decoder. */
+    msg_Info(dec, "Ensure the picture has been discarded by the input decoder");
+    vlc_sem_wait(&context2.wait_picture);
+
+    /* Ok, since the picture has been released, we should have decode succeed
+     * and we can now check that flush is called. */
+
+    picture_Release(pic);
+
+    msg_Info(dec, "Nothing to do from pf_decode, let pf_flush be called by the input decoder");
+    scenario_data.skip_decoder = true;
+    return VLC_SUCCESS;
+}
+
 static void decoder_flush_signal(decoder_t *dec)
 {
     (void)dec;
     vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static void display_prepare_signal(vout_display_t *vd, picture_t *pic)
+{
+    (void)vd;
+
+    struct picture_watcher_context *watcher =
+        container_of(pic->context, struct picture_watcher_context, context);
+    vlc_sem_post(&watcher->wait_prepare);
 }
 
 static void PlayerOnTrackListChanged(vlc_player_t *player,
@@ -127,6 +230,16 @@ static void interface_setup_select_cc(intf_thread_t *intf)
     vlc_player_Unlock(player);
 }
 
+static void interface_setup_check_flush(intf_thread_t *intf)
+{
+    vlc_player_t *player = (vlc_player_t *)intf->p_sys;
+    vlc_sem_wait(&scenario_data.wait_ready_to_flush);
+
+    vlc_player_Lock(player);
+    vlc_player_SetPosition(player, 0);
+    vlc_player_Unlock(player);
+}
+
 const char source_800_600[] = "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600";
 struct input_decoder_scenario input_decoder_scenarios[] =
 {{
@@ -135,6 +248,14 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .decoder_flush = decoder_flush_signal,
     .decoder_decode = decoder_decode_check_cc,
     .interface_setup = interface_setup_select_cc,
+},
+{
+    .source = source_800_600,
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_decode = decoder_decode_check_flush_video,
+    .decoder_flush = decoder_flush_signal,
+    .display_prepare = display_prepare_signal,
+    .interface_setup = interface_setup_check_flush,
 }};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 
