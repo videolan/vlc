@@ -1413,7 +1413,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         if (!render_now)
             /* Prepare the next picture immediately without waiting */
             return VLC_TICK_INVALID;
-        return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
@@ -1434,13 +1433,10 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
             return __MIN(date_refresh, max_deadline);
         }
         RenderPicture(vout, true);
-        return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
     }
-    else
-    {
-        // nothing changed, wait until the next deadline or a control
-        return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
-    }
+
+    // wait until the next deadline or a control
+    return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
 }
 
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
