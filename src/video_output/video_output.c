@@ -1379,8 +1379,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     if (first)
     {
         next = PreparePicture(vout, true, false);
-        if (!next)
-            return vlc_tick_now() + VOUT_REDISPLAY_DELAY; /* Unknown deadline */
     }
     else if (!paused)
     {
