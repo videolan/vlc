@@ -1375,17 +1375,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
     const bool first = !sys->displayed.current;
 
-    /* FIXME/XXX we must redisplay the last decoded picture (because
-    * of potential vout updated, or filters update or SPU update)
-    * For now a high update period is needed but it could be removed
-    * if and only if:
-    * - vout module emits events from themselves.
-    * - *and* SPU is modified to emit an event or a deadline when needed.
-    *
-    * So it will be done later.
-    */
-    bool refresh = false;
-
     picture_t *next = NULL;
     if (first)
     {
@@ -1431,7 +1420,16 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     {
         // next date we need to display again the current picture
         vlc_tick_t date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
-        refresh = date_refresh <= system_now;
+        /* FIXME/XXX we must redisplay the last decoded picture (because
+        * of potential vout updated, or filters update or SPU update)
+        * For now a high update period is needed but it could be removed
+        * if and only if:
+        * - vout module emits events from themselves.
+        * - *and* SPU is modified to emit an event or a deadline when needed.
+        *
+        * So it will be done later.
+        */
+        bool refresh = date_refresh <= system_now;
         if (!refresh) {
             // nothing changed, wait until the next deadline or a control
             vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
