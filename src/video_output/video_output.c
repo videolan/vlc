@@ -1428,6 +1428,12 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         // to render now
         // display forced picture immediately
         render_now = sys->displayed.current->b_force;
+
+        if (!first && !refresh && next == NULL) {
+            // nothing changed, wait until the next deadline or a control
+            vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
+            return __MIN(date_refresh, max_deadline);
+        }
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
