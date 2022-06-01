@@ -416,7 +416,7 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
                 const int i_y = p_output->i_top  * p->i_visible_pitch / p0->i_visible_pitch;
                 const int i_x = p_output->i_left * p->i_visible_lines / p0->i_visible_lines;
 
-                p->p_pixels += i_y * p->i_pitch + ( i_x - (i_x % p->i_pixel_pitch));
+                p->p_pixels += i_y * p->i_pitch + i_x * p->i_pixel_pitch;
             }
             picture_Copy( p_dst, &tmp );
         }
