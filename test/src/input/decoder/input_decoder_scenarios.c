@@ -45,8 +45,97 @@ static struct scenario_data
     bool skip_decoder;
 } scenario_data;
 
+static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
+        unsigned width, unsigned height)
+{
+    dec->fmt_out.video.i_chroma
+        = dec->fmt_out.i_codec
+        = chroma;
+    dec->fmt_out.video.i_visible_width
+        = dec->fmt_out.video.i_width
+        = width;
+    dec->fmt_out.video.i_visible_height
+        = dec->fmt_out.video.i_height
+        = height;
+}
+
+static void decoder_i420_800_600(decoder_t *dec)
+    { decoder_fixed_size(dec, VLC_CODEC_I420, 800, 600); }
+
+static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
+{
+    vlc_tick_t date = pic->date;
+    picture_Release(pic);
+
+    block_t *p_cc = block_Alloc( 1 );
+    if (p_cc == NULL)
+        return VLC_ENOMEM;
+
+    p_cc->i_dts = p_cc->i_pts = date;
+
+    decoder_cc_desc_t desc = {
+        .i_608_channels = 1,
+    };
+    decoder_QueueCc( dec, p_cc, &desc );
+
+    vlc_sem_post(&scenario_data.wait_ready_to_flush);
+
+    return VLC_SUCCESS;
+}
+static void decoder_flush_signal(decoder_t *dec)
+{
+    (void)dec;
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
+static void PlayerOnTrackListChanged(vlc_player_t *player,
+        enum vlc_player_list_action action,
+        const struct vlc_player_track *track,
+        void *data)
+{
+    (void)data;
+
+    if (action != VLC_PLAYER_LIST_ADDED ||
+        track->fmt.i_cat != SPU_ES)
+        return;
+
+    vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
+}
+
+static void interface_setup_select_cc(intf_thread_t *intf)
+{
+    vlc_player_t *player = (vlc_player_t *)intf->p_sys;
+
+    static const struct vlc_player_cbs player_cbs =
+    {
+        .on_track_list_changed = PlayerOnTrackListChanged,
+    };
+
+    vlc_player_Lock(player);
+    vlc_player_listener_id *listener_id =
+        vlc_player_AddListener(player, &player_cbs, NULL);
+    vlc_player_Unlock(player);
+
+    vlc_sem_wait(&scenario_data.wait_ready_to_flush);
+    vlc_player_Lock(player);
+    vlc_player_SetPosition(player, 0);
+    vlc_player_Unlock(player);
+
+    vlc_sem_wait(&scenario_data.wait_ready_to_flush);
+    vlc_player_Lock(player);
+    vlc_player_RemoveListener(player, listener_id);
+    vlc_player_Unlock(player);
+}
+
+const char source_800_600[] = "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600";
 struct input_decoder_scenario input_decoder_scenarios[] =
-{};
+{{
+    .source = source_800_600,
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_flush = decoder_flush_signal,
+    .decoder_decode = decoder_decode_check_cc,
+    .interface_setup = interface_setup_select_cc,
+}};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 
 void input_decoder_scenario_init(void)
