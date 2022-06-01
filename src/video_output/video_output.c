@@ -1413,12 +1413,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 
     if (next != NULL)
     {
-        const vlc_tick_t swap_next_pts =
-            vlc_clock_ConvertToSystem(sys->clock, vlc_tick_now(),
-                                        next->date, sys->rate);
-        if (likely(swap_next_pts != VLC_TICK_MAX))
-            date_refresh = swap_next_pts - render_delay;
-
         if (likely(sys->displayed.current != NULL))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
