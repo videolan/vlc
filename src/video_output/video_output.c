@@ -1410,11 +1410,10 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         bool render_now = sys->displayed.current->b_force;
 
         RenderPicture(vout, render_now);
-        if (render_now)
-            return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
-
-        /* Prepare the next picture immediately without waiting */
-        return VLC_TICK_INVALID;
+        if (!render_now)
+            /* Prepare the next picture immediately without waiting */
+            return VLC_TICK_INVALID;
+        return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
