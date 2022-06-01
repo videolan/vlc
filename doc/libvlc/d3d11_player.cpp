@@ -390,6 +390,13 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg,
     texDesc.Width  = cfg->width;
     texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
 
+    // we reported a size of 0, we have to handle it
+    // 0 dimensions are not allowed, a value of 8 is used otherwise
+    if (cfg->width == 0)
+        texDesc.Width = 8;
+    if (cfg->height == 0)
+        texDesc.Height = 8;
+
     hr = ctx->d3device->CreateTexture2D( &texDesc, NULL, &ctx->resized.texture );
     if (FAILED(hr)) return false;
 
