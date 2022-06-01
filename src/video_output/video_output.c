@@ -1409,8 +1409,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         }
     }
 
-    vlc_tick_t date_refresh = VLC_TICK_MAX;
-
     if (next != NULL)
     {
         if (likely(sys->displayed.current != NULL))
@@ -1432,7 +1430,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
         // next date we need to display again the current picture
-        date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+        vlc_tick_t date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
         refresh = date_refresh <= system_now;
         if (!refresh) {
             // nothing changed, wait until the next deadline or a control
