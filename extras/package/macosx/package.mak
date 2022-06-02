@@ -52,7 +52,7 @@ endif
 	find $(prefix)/lib -name 'libvlc*.dylib' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/lib \;
 	## Copy plugins
 	mkdir -p $@/Contents/MacOS/plugins
-	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/MacOS/plugins \;
+	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 3 -exec cp -a {} $@/Contents/MacOS/plugins \;
 	## Copy libbluray jar
 	find "$(CONTRIB_DIR)/share/java/" -name 'libbluray*.jar' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/plugins \; || true
 	## Install binary
