@@ -44,6 +44,7 @@ void AvgInit(average_t *, int range);
 void AvgClean(average_t *);
 
 void AvgReset(average_t *);
+void AvgResetAndFill(average_t *, double value);
 
 /*  calculates (previous_average * (range - 1) + new_value)/range */
 void AvgUpdate(average_t *, double value);

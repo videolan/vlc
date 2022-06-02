@@ -47,6 +47,12 @@ void AvgReset(average_t *avg)
     avg->count = 0;
 }
 
+void AvgResetAndFill(average_t *avg, double value)
+{
+    avg->value = value;
+    avg->count = avg->range;
+}
+
 void AvgUpdate(average_t *avg, double value)
 {
     const int new_value_weight = 1;
