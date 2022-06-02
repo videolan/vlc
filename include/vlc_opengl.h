@@ -153,6 +153,24 @@ static inline picture_t *vlc_gl_SwapOffscreen(vlc_gl_t *gl)
     return gl->swap_offscreen(gl);
 }
 
+/**
+ * Fetch a symbol or pointer function from the OpenGL implementation.
+ *
+ * Return a pointer from the OpenGL implementation, which can be part of
+ * either the underlying OpenGL provider or an OpenGL function matching
+ * the version requested.
+ *
+ * If the symbol name is not matching the underlying implementation of
+ * OpenGL, an invalid pointer or NULL can be returned.
+ *
+ * @note This function must be called between MakeCurrent and ReleaseCurrent.
+ *
+ * @param gl the OpenGL provider to fetch the function from
+ * @param name the symbol name to fetch from the implementation
+ *
+ * @return A pointer corresponding to the symbol, or a potentially invalid
+ *         value or NULL in case of error.
+ */
 static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 {
     return gl->get_proc_address(gl, name);
