@@ -158,10 +158,6 @@ static int Open(vout_display_t *vd,
     if (sys->gl == NULL)
         goto error;
 
-    sys->vt.Flush = vlc_gl_GetProcAddress(sys->gl, "glFlush");
-    if (sys->vt.Flush == NULL)
-        goto error;
-
     struct vout_display_placement flipped_dp = vd->cfg->display;
     FlipVerticalAlign(&flipped_dp);
     vout_display_PlacePicture(&sys->place, vd->source, &flipped_dp);
@@ -173,6 +169,13 @@ static int Open(vout_display_t *vd,
 
     if (vlc_gl_MakeCurrent (sys->gl))
         goto error;
+
+    sys->vt.Flush = vlc_gl_GetProcAddress(sys->gl, "glFlush");
+    if (sys->vt.Flush == NULL)
+    {
+        vlc_gl_ReleaseCurrent (sys->gl);
+        goto error;
+    }
 
     sys->vgl = vout_display_opengl_New (fmt, &spu_chromas, sys->gl,
                                         &vd->cfg->viewpoint, context);
