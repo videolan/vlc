@@ -275,7 +275,7 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
         connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::onMouseReleased);
         connect(this, &VideoSurface::mouseWheeled, m_provider, &VideoSurfaceProvider::onMouseWheeled);
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
-        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
+        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged, Qt::QueuedConnection);
         connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged);
 
         connect(m_provider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &VideoSurface::onProviderVideoChanged);
