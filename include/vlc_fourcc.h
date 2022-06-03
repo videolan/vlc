@@ -361,6 +361,8 @@
 #define VLC_CODEC_ARGB            VLC_FOURCC('A','R','G','B')
 /* 32-bit ARGB, in memory address order: "BGRA" */
 #define VLC_CODEC_BGRA            VLC_FOURCC('B','G','R','A')
+/* 32-bit RGBA, in memory address order: "ABGR" */
+#define VLC_CODEC_ABGR            VLC_FOURCC('A','B','G','R')
 /* 32 bits BGRA 10:10:10:2 */
 #define VLC_CODEC_RGBA10          VLC_FOURCC('R','G','A','0')
 /* 64 bits RGBA */
