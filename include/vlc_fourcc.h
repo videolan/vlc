@@ -338,27 +338,28 @@
 /* Packed YUV 4:4:4 V:U:Y:A */
 #define VLC_CODEC_VUYA            VLC_FOURCC('V','U','Y','A')
 
-/* RGB */
+/* RGB / RGBA */
 
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
-/* 8 bits RGB */
+/* 8-bit RGB (using explicit masks) */
 #define VLC_CODEC_RGB8            VLC_FOURCC('R','G','B','8')
-/* 12 bits RGB padded to 16 bits */
+/* 12-bit RGB padded to 16 bits (using explicit masks) */
 #define VLC_CODEC_RGB12           VLC_FOURCC('R','V','1','2')
-/* 15 bits RGB padded to 16 bits */
+/* 15-bit RGB padded to 16 bits (using explicit masks) */
 #define VLC_CODEC_RGB15           VLC_FOURCC('R','V','1','5')
-/* 16 bits RGB */
+/* 16-bit RGB (using explit masks) */
 #define VLC_CODEC_RGB16           VLC_FOURCC('R','V','1','6')
-/* 24 bits RGB */
+/* 24-bit RGB (using explicit masks) */
 #define VLC_CODEC_RGB24           VLC_FOURCC('R','V','2','4')
-/* 24 bits RGB padded to 32 bits */
+/* 24-bit RGB padded to 32 bits (using explicit masks) */
 #define VLC_CODEC_RGB32           VLC_FOURCC('R','V','3','2')
-/* 32 bits RGBA */
+
+/* 32-bit RGBA, in memory address order: "RGBA" */
 #define VLC_CODEC_RGBA            VLC_FOURCC('R','G','B','A')
-/* 32 bits ARGB */
+/* 32-bit ARGB, in memory address order: "ARGB" */
 #define VLC_CODEC_ARGB            VLC_FOURCC('A','R','G','B')
-/* 32 bits BGRA */
+/* 32-bit ARGB, in memory address order: "BGRA" */
 #define VLC_CODEC_BGRA            VLC_FOURCC('B','G','R','A')
 /* 32 bits BGRA 10:10:10:2 */
 #define VLC_CODEC_RGBA10          VLC_FOURCC('R','G','A','0')
