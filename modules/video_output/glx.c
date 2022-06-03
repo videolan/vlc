@@ -67,16 +67,27 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vlc_gl_sys_t *sys = gl->sys;
 
-    if (MakeCurrent(gl) == VLC_SUCCESS) {
+    Display* old_display = glXGetCurrentDisplay();
+    GLXContext old_ctx = glXGetCurrentContext();
+    GLXDrawable old_draw = glXGetCurrentDrawable();
+    GLXDrawable old_read = glXGetCurrentReadDrawable();
+
+    Bool made_current = glXMakeContextCurrent (sys->display, sys->win, sys->win, sys->ctx);
+    if (made_current)
         glXWaitGL();
-        unsigned long init_serial = LastKnownRequestProcessed(sys->display);
-        unsigned long resize_serial = NextRequest(sys->display);
-        XResizeWindow(sys->display, sys->x11_win, width, height);
+    unsigned long init_serial = LastKnownRequestProcessed(sys->display);
+    unsigned long resize_serial = NextRequest(sys->display);
+    XResizeWindow(sys->display, sys->x11_win, width, height);
+    if (made_current)
+    {
         glXWaitX();
-        if (LastKnownRequestProcessed(sys->display) - init_serial < resize_serial - init_serial)
-            XSync(sys->display, False);
-        ReleaseCurrent(gl);
+        if (old_display)
+            glXMakeContextCurrent(old_display, old_draw, old_read, old_ctx);
+        else
+            glXMakeContextCurrent(sys->display, None, None, NULL);
     }
+    if (LastKnownRequestProcessed(sys->display) - init_serial < resize_serial - init_serial)
+        XSync(sys->display, False);
 }
 
 static void SwapBuffers (vlc_gl_t *gl)
