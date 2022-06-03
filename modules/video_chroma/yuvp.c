@@ -65,7 +65,8 @@ static int Open( filter_t *p_filter )
         ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_YUVA &&
           p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA &&
           p_filter->fmt_out.video.i_chroma != VLC_CODEC_ARGB &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_BGRA ) ||
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_BGRA &&
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_ABGR) ||
         p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
         p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
@@ -129,6 +130,7 @@ static void Convert( filter_t *p_filter, picture_t *p_source,
             case VLC_CODEC_ARGB: r = 1, g = 2, b = 3, a = 0; break;
             case VLC_CODEC_RGBA: r = 0, g = 1, b = 2, a = 3; break;
             case VLC_CODEC_BGRA: r = 2, g = 1, b = 0, a = 3; break;
+            case VLC_CODEC_ABGR: r = 3, g = 2, b = 1, a = 0; break;
             default:
                 vlc_assert_unreachable();
         }
