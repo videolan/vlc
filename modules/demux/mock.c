@@ -363,7 +363,8 @@ Control(demux_t *demux, int query, va_list args)
         case DEMUX_SET_POSITION:
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->pts = sys->video_pts = sys->audio_pts = va_arg(args, double) * sys->length;
+            sys->pts = sys->video_pts = sys->audio_pts =
+                VLC_TICK_0 + va_arg(args, double) * sys->length;
             return VLC_SUCCESS;
         case DEMUX_GET_LENGTH:
             *va_arg(args, vlc_tick_t *) = sys->length;
