@@ -1008,6 +1008,12 @@ static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
                            const decoder_cc_desc_t *p_desc )
 {
     vlc_fifo_Lock(p_owner->p_fifo);
+    if (p_owner->flushing)
+    {
+        vlc_fifo_Unlock(p_owner->p_fifo);
+        vlc_frame_Release(p_cc);
+        return;
+    }
 
     vlc_mutex_lock(&p_owner->cc.lock);
     p_owner->cc.desc = *p_desc;
@@ -1086,6 +1092,13 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     }
 
     vlc_fifo_Lock( p_owner->p_fifo );
+    if (p_owner->flushing)
+    {
+        vlc_fifo_Unlock(p_owner->p_fifo);
+        picture_Release(p_picture);
+        return VLC_SUCCESS;
+    }
+
     vout_thread_t  *p_vout = p_owner->p_vout;
 
     assert( p_owner->vout_started );
@@ -1226,6 +1239,13 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     }
 
     vlc_fifo_Lock(p_owner->p_fifo);
+    if (p_owner->flushing)
+    {
+        vlc_fifo_Unlock(p_owner->p_fifo);
+        block_Release(p_audio);
+        return VLC_SUCCESS;
+    }
+
     bool prerolled = p_owner->i_preroll_end != PREROLL_NONE;
     if( prerolled && p_owner->i_preroll_end > p_audio->i_pts )
     {
@@ -1536,39 +1556,9 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
     }
     vlc_mutex_unlock(&p_owner->cc.lock);
 
-    vlc_fifo_Lock( p_owner->p_fifo );
-#ifdef ENABLE_SOUT
-    if ( p_owner->p_sout_input != NULL )
-    {
-        sout_InputFlush( p_owner->p_sout, p_owner->p_sout_input );
-    }
-#endif
-    if( p_dec->fmt_in.i_cat == AUDIO_ES )
-    {
-        if( p_owner->p_astream )
-            vlc_aout_stream_Flush( p_owner->p_astream );
-    }
-    else if( p_dec->fmt_in.i_cat == VIDEO_ES )
-    {
-        if( p_owner->p_vout && p_owner->vout_started )
-            vout_FlushAll( p_owner->p_vout );
-
-        /* Reset the pool cancel state, previously set by
-         * vlc_input_decoder_Flush() */
-        if( p_owner->out_pool != NULL )
-            picture_pool_Cancel( p_owner->out_pool, false );
-    }
-    else if( p_dec->fmt_in.i_cat == SPU_ES )
-    {
-        if( p_owner->p_vout )
-        {
-            assert( p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID );
-            vout_FlushSubpictureChannel( p_owner->p_vout, p_owner->i_spu_channel );
-        }
-    }
-
+    vlc_fifo_Lock(p_owner->p_fifo);
     p_owner->i_preroll_end = PREROLL_NONE;
-    vlc_fifo_Unlock( p_owner->p_fifo );
+    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
 static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
@@ -2213,9 +2203,6 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     if( p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout != NULL
      && p_owner->vout_started )
     {
-        if (p_owner->out_pool)
-            picture_pool_Cancel( p_owner->out_pool, true );
-
         if( p_owner->paused )
         {
             /* The DecoderThread could be stuck in pf_decode(). This is likely the
@@ -2351,12 +2338,6 @@ void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
  */
 void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 {
-    if( vlc_input_decoder_IsSynchronous( p_owner ) )
-    {
-        DecoderThread_Flush( p_owner );
-        return;
-    }
-
     enum es_format_category_e cat = p_owner->dec.fmt_in.i_cat;
 
     vlc_fifo_Lock( p_owner->p_fifo );
@@ -2376,33 +2357,43 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
      && p_owner->frames_countdown == 0 )
         p_owner->frames_countdown++;
 
-    if ( cat == VIDEO_ES )
+    if ( p_owner->p_sout_input != NULL )
     {
-        /* Set the pool cancel state. This will unblock the module if it is
-         * waiting for new pictures (likely). This state will be reset back
-         * from the DecoderThread once the flush request is processed. */
-        if( p_owner->out_pool != NULL )
-            picture_pool_Cancel( p_owner->out_pool, true );
+#ifdef ENABLE_SOUT
+        sout_InputFlush( p_owner->p_sout, p_owner->p_sout_input );
+#endif
     }
-
-    if( p_owner->paused )
+    else if( cat == AUDIO_ES )
     {
-        /* The DecoderThread could be stuck in pf_decode(). This is likely the
-         * case with paused asynchronous decoder modules that have a limited
-         * input and output pool size. Indeed, with such decoders, you have to
-         * release an output buffer to get an input buffer. So, when paused and
-         * flushed, the DecoderThread could be waiting for an output buffer to
-         * be released (or rendered). In that case, the DecoderThread will
-         * never be flushed since it be never leave pf_decode(). To fix this
-         * issue, pre-flush the vout from here. The vout will have to be
-         * flushed again since the module could be outputting more buffers just
-         * after being unstuck. */
-
-        if( cat == VIDEO_ES && p_owner->p_vout && p_owner->vout_started )
+        if( p_owner->p_astream )
+            vlc_aout_stream_Flush( p_owner->p_astream );
+    }
+    else if( cat == VIDEO_ES )
+    {
+        if( p_owner->p_vout && p_owner->vout_started )
             vout_FlushAll( p_owner->p_vout );
+    }
+    else if( cat == SPU_ES )
+    {
+        if( p_owner->p_vout )
+        {
+            assert( p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID );
+            vout_FlushSubpictureChannel( p_owner->p_vout, p_owner->i_spu_channel );
+        }
     }
     vlc_fifo_Signal( p_owner->p_fifo );
     vlc_fifo_Unlock( p_owner->p_fifo );
+
+    if (vlc_input_decoder_IsSynchronous(p_owner))
+    {
+        /* With a synchronous decoder,there is no decoder thread which
+         * can process the flush request. We flush synchronously from
+         * here and reset the flushing state. */
+        DecoderThread_Flush(p_owner);
+        vlc_fifo_Lock(p_owner->p_fifo);
+        p_owner->flushing = false;
+        vlc_fifo_Unlock(p_owner->p_fifo);
+    }
 }
 
 static bool vlc_input_decoder_HasCCChanFlag( vlc_input_decoder_t *p_owner,
