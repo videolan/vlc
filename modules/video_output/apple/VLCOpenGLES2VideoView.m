@@ -63,10 +63,13 @@
     vlc_cond_t  _cond;
     vlc_cond_t  _gl_attached_wait;
     BOOL        _gl_attached;
+    
+    vlc_mutex_t _can_render_mutex;
 
     BOOL _bufferNeedReset;
     BOOL _appActive;
     BOOL _eaglEnabled;
+    BOOL _canRender;
 
     GLuint _renderBuffer;
     GLuint _frameBuffer;
@@ -155,8 +158,10 @@ static void Close(vlc_gl_t *gl)
 
     _eaglEnabled = YES;
     _bufferNeedReset = YES;
+    _canRender = NO;
 
     vlc_mutex_init(&_mutex);
+    vlc_mutex_init(&_can_render_mutex);
     vlc_cond_init(&_gl_attached_wait);
     vlc_cond_init(&_cond);
 
@@ -195,7 +200,39 @@ static void Close(vlc_gl_t *gl)
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
 
+    /*
+     * We observe this event in case the gl context buffer creation failed
+     * @see [VLCOpenGLES2VideoView applicationDidBecomeActive:]
+     */
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationDidBecomeActive:)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+    
     return self;
+}
+
+- (void)applicationDidBecomeActive:(NSNotification*)notification {
+    /**
+     * It appears the GL context buffer allocation is failing on tvOS when the
+     * display isn't connected. The UIApplicationDidBecomeActiveNotification
+     * notification is dispatched when the display is connected hence we can
+     * observe it to allocate the buffers if their allocation previously failed
+     */
+    [self prepareBuffersIfNeeded];
+}
+
+- (void)prepareBuffersIfNeeded {
+    
+    vlc_mutex_lock(&_can_render_mutex);
+    if (_canRender) {
+        vlc_mutex_unlock(&_can_render_mutex);
+        return;
+    }
+    
+    _canRender = [self genAndBindBuffers];
+    
+    vlc_mutex_unlock(&_can_render_mutex);
 }
 
 - (BOOL)attachToWindow:(vout_window_t*)wnd
@@ -235,7 +272,11 @@ static void Close(vlc_gl_t *gl)
     glDeleteFramebuffers(1, &_frameBuffer);
     glDeleteRenderbuffers(1, &_renderBuffer);
     [EAGLContext setCurrentContext:previous_context];
-
+    
+    vlc_mutex_lock(&_can_render_mutex);
+    _canRender = NO;
+    vlc_mutex_unlock(&_can_render_mutex);
+    
     /* Flush the OpenGL pipeline before leaving. */
     vlc_mutex_lock(&_mutex);
     if (_eaglEnabled)
@@ -265,8 +306,26 @@ static void Close(vlc_gl_t *gl)
     vlc_mutex_unlock(&_mutex);
 }
 
-- (BOOL)doResetBuffers
+- (BOOL)allocateAndAttachBuffers {
+    if (![_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:_layer]) {
+        msg_Err(_gl, "Failed to create GL context render buffer");
+        return NO;
+    }
+
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        msg_Err(_gl, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)genAndBindBuffers
 {
+    EAGLContext *previousContext = [EAGLContext currentContext];
+    [EAGLContext setCurrentContext:_eaglContext];
     if (_frameBuffer != 0)
     {
         /* clear frame buffer */
@@ -287,22 +346,28 @@ static void Close(vlc_gl_t *gl)
     glGenRenderbuffers(1, &_renderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
 
-    msg_Info(_gl, "Size: %fx%f", self.bounds.size.width, self.bounds.size.height);
-    [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:_layer];
-
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        msg_Err(_gl, "Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
-        return NO;
+    BOOL success = [self allocateAndAttachBuffers];
+    if (!success) {
+        /**
+         * We delete buffers when allocaion or attachment fails to prevent
+         * GL errors when next draw happens
+         */
+        [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:nil];
+        glDeleteFramebuffers(1, &_frameBuffer);
+        _frameBuffer = 0;
+        glDeleteRenderbuffers(1, &_renderBuffer);
+        _renderBuffer = 0;
     }
-    return YES;
+    [EAGLContext setCurrentContext:previousContext];
+    return success;
 }
 
 - (BOOL)makeCurrent
 {
     assert(![NSThread isMainThread]);
-
+    
+    [self prepareBuffersIfNeeded];
+    
     vlc_mutex_lock(&_mutex);
     assert(!_gl_attached);
 
@@ -363,10 +428,9 @@ static void Close(vlc_gl_t *gl)
     /* If size is NULL, rendering must be disabled */
     if (size.width != 0 && size.height != 0)
     {
-        EAGLContext *previousContext = [EAGLContext currentContext];
-        [EAGLContext setCurrentContext:_eaglContext];
-        [self doResetBuffers];
-        [EAGLContext setCurrentContext:previousContext];
+        vlc_mutex_lock(&_can_render_mutex);
+        _canRender = [self genAndBindBuffers];
+        vlc_mutex_unlock(&_can_render_mutex);
     }
 }
 
