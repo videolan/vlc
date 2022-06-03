@@ -813,7 +813,13 @@ vlc_smb2_resolve(stream_t *access, const char *host, unsigned port,
             ret = 0;
         }
     }
-    netbios_ns_interrupt_unregister();
+    if (netbios_ns_interrupt_unregister() == EINTR)
+    {
+        if (unlikely(ret == 0))
+            free(*out_host);
+        netbios_ns_destroy(ns);
+        return -EINTR;
+    }
     netbios_ns_destroy(ns);
     return ret;
 #else
