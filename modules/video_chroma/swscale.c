@@ -297,6 +297,10 @@ static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_
         *pi_fmt = AV_PIX_FMT_RGB32;
         *pb_has_a = true;
         break;
+    case VLC_CODEC_ABGR:
+        *pi_fmt = AV_PIX_FMT_RGB32_1;
+        *pb_has_a = true;
+        break;
     case VLC_CODEC_YV12:
         *pi_fmt = AV_PIX_FMT_YUV420P;
         *pb_swap_uv = true;
@@ -702,7 +706,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* We extract the A plane to rescale it, and then we reinject it. */
         if( p_fmti->i_chroma == VLC_CODEC_RGBA || p_fmti->i_chroma == VLC_CODEC_BGRA )
             ExtractA( p_sys->p_src_a, p_src, OFFSET_A );
-        else if( p_fmti->i_chroma == VLC_CODEC_ARGB )
+        else if( p_fmti->i_chroma == VLC_CODEC_ARGB || p_fmti->i_chroma == VLC_CODEC_ABGR )
             ExtractA( p_sys->p_src_a, p_src, 0 );
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
@@ -711,7 +715,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                  p_fmti->i_visible_height, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA || p_fmto->i_chroma == VLC_CODEC_BGRA )
             InjectA( p_dst, p_sys->p_dst_a, OFFSET_A );
-        else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
+        else if( p_fmto->i_chroma == VLC_CODEC_ARGB || p_fmto->i_chroma == VLC_CODEC_ABGR )
             InjectA( p_dst, p_sys->p_dst_a, 0 );
         else
             plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
@@ -721,7 +725,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* We inject a complete opaque alpha plane */
         if( p_fmto->i_chroma == VLC_CODEC_RGBA || p_fmto->i_chroma == VLC_CODEC_BGRA )
             FillA( &p_dst->p[0], OFFSET_A );
-        else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
+        else if( p_fmto->i_chroma == VLC_CODEC_ARGB || p_fmto->i_chroma == VLC_CODEC_ABGR )
             FillA( &p_dst->p[0], 0 );
         else
             FillA( &p_dst->p[A_PLANE], 0 );
