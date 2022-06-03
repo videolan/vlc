@@ -854,7 +854,9 @@ Open(vlc_object_t *p_obj)
     /* smb2_* functions need a decoded url. Re compose the url from the
      * modified sys->encoded_url (with the resolved host). */
     char *url;
-    if (ret == 0)
+    if (ret == -EINTR)
+        goto error;
+    else if (ret == 0)
     {
         vlc_url_t resolved_url = sys->encoded_url;
         resolved_url.psz_host = resolved_host;
