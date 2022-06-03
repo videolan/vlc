@@ -1369,16 +1369,14 @@ static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
 
     assert(sys->clock);
 
+    if (sys->displayed.current == NULL)
+        return PreparePicture(sys, true, false);
+
     const vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
-    const bool first = !sys->displayed.current;
 
     picture_t *next = NULL;
-    if (first)
-    {
-        next = PreparePicture(vout, true, false);
-    }
-    else if (!paused)
+    if (!paused)
     {
         const vlc_tick_t system_swap_current =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
