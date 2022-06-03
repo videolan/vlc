@@ -288,6 +288,8 @@ static void *AddVideo( sout_stream_t *p_stream, const es_format_t *p_fmt )
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGBA:
         case VLC_CODEC_ARGB:
+        case VLC_CODEC_BGRA:
+        case VLC_CODEC_ABGR:
             i_bits_per_pixel = 32;
             break;
         case VLC_CODEC_I444:
