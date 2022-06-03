@@ -62,7 +62,7 @@ static int Create( filter_t *p_filter )
 
     if( fourcc == VLC_CODEC_YUVP || fourcc == VLC_CODEC_RGBP
      || fourcc == VLC_CODEC_RGBA || fourcc == VLC_CODEC_ARGB
-     || fourcc == VLC_CODEC_BGRA )
+     || fourcc == VLC_CODEC_BGRA || fourcc == VLC_CODEC_ABGR )
         return VLC_EGENERIC;
 
     const vlc_chroma_description_t *p_chroma =
