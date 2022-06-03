@@ -249,7 +249,8 @@ if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libdrawable_plugin.la
 endif
 
-libwin32_window_plugin_la_SOURCES = video_output/win32/window.c
+libwin32_window_plugin_la_SOURCES = video_output/win32/window.c \
+	video_output/wasync_resize_compressor.h
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwin32_window_plugin.la
 endif

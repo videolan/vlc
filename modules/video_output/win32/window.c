@@ -39,6 +39,7 @@
 #include <vlc_actions.h>
 
 #include <shellapi.h>                                         /* ExtractIcon */
+#include "../wasync_resize_compressor.h"
 
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
 #define RECTHeight(r)  (LONG)((r).bottom - (r).top)
@@ -74,6 +75,9 @@ typedef struct vout_window_sys_t
 
     /* Title */
     wchar_t *_Atomic pwz_title;
+
+    vlc_wasync_resize_compressor_t compressor;
+
 } vout_window_sys_t;
 
 
@@ -337,17 +341,23 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     switch( message )
     {
     case WM_CLOSE:
+    {
+        vout_window_sys_t *sys = wnd->sys;
+        /* wait for all pending timers */
+        vlc_wasync_resize_compressor_dropOrWait(&sys->compressor);
         vlc_window_ReportClose(wnd);
         break;
-
+    }
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
 
     case WM_SIZE:
-        vlc_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
+    {
+        vout_window_sys_t *sys = wnd->sys;
+        vlc_wasync_resize_compressor_reportSize(&sys->compressor, LOWORD(lParam), HIWORD(lParam));
         return 0;
-
+    }
     case WM_MOUSEMOVE:
         vlc_window_ReportMouseMoved(wnd, LOWORD(lParam), HIWORD(lParam));
         break;
@@ -475,6 +485,8 @@ static void Close(vlc_window_t *wnd)
         PostMessage( sys->hwnd, WM_CLOSE, 0, 0 );
     vlc_join(sys->thread, NULL);
     free(atomic_load(&sys->pwz_title));
+
+    vlc_wasync_resize_compressor_destroy(&sys->compressor);
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
     UnregisterClass( sys->class_main, hInstance );
@@ -721,8 +733,15 @@ static int Open(vlc_window_t *wnd)
         return VLC_EGENERIC;
     }
     vlc_sem_init( &sys->ready, 0 );
-
     wnd->sys = sys;
+
+    if( vlc_wasync_resize_compressor_init( &sys->compressor, wnd ) )
+    {
+        msg_Err( wnd, "Failed to init compressor" );
+        Close(wnd);
+        return VLC_EGENERIC;
+    }
+
     if( vlc_clone( &sys->thread, EventThread, wnd ) )
     {
         Close(wnd);
@@ -737,7 +756,6 @@ static int Open(vlc_window_t *wnd)
         return VLC_EGENERIC;
     }
 
-    wnd->sys = sys;
     wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = sys->hwnd;
     wnd->ops = &ops;
