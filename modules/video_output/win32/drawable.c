@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_window.h>
+#include "../wasync_resize_compressor.h"
 
 #define HWND_TEXT N_("Window handle (HWND)")
 #define HWND_LONGTEXT N_( \
@@ -70,12 +71,15 @@ static const TCHAR *EMBED_HWND_CLASS = TEXT("VLC embedded HWND");
 
 struct drawable_sys
 {
+    vlc_thread_t thread;
     vlc_sem_t hwnd_set;
 
     vlc_window_t *wnd;
     HWND hWnd;
     HWND embed_hwnd;
     RECT rect_parent;
+
+    vlc_wasync_resize_compressor_t compressor;
 };
 
 static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
@@ -120,6 +124,8 @@ static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
         break;
 
     case WM_CLOSE:
+        /* wait for all pending timers */
+        vlc_wasync_resize_compressor_dropOrWait(&sys->compressor);
         vlc_window_ReportClose(wnd);
         return 0;
 
@@ -130,9 +136,8 @@ static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
         return 0;
 
     case WM_SIZE:
-        vlc_window_ReportSize(wnd, LOWORD(lParam), HIWORD(lParam));
+        vlc_wasync_resize_compressor_reportSize(&sys->compressor, LOWORD(lParam), HIWORD(lParam));
         return 0;
-
     default:
         break;
     }
@@ -141,7 +146,7 @@ static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-static DWORD WINAPI WindowLoopThread(LPVOID lpParameter)
+static void *WindowLoopThread(void *lpParameter)
 {
     struct drawable_sys *sys = lpParameter;
 
@@ -165,7 +170,7 @@ static DWORD WINAPI WindowLoopThread(LPVOID lpParameter)
     vlc_sem_post(&sys->hwnd_set);
 
     if (sys->hWnd == NULL)
-        return 1;
+        return NULL;
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
@@ -175,7 +180,7 @@ static DWORD WINAPI WindowLoopThread(LPVOID lpParameter)
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    return 0;
+    return NULL;
 }
 
 static void RemoveDrawable(HWND val)
@@ -267,10 +272,16 @@ static int Open(vlc_window_t *wnd)
         }
     }
 
-    // Create a Thread for the window event loop
-    if (CreateThread(NULL, 0, WindowLoopThread, sys, 0, NULL) == NULL)
+    if (vlc_wasync_resize_compressor_init(&sys->compressor, wnd))
     {
-        msg_Err( sys->wnd, "CreateThread failed (err=%lu)", GetLastError() );
+        msg_Err(wnd, "Failed to init async resize compressor");
+        goto error;
+    }
+
+    // Create a Thread for the window event loop
+    if (vlc_clone(&sys->thread, WindowLoopThread, sys))
+    {
+        msg_Err( sys->wnd, "Failed to start WindowLoopThread");
         goto error;
     }
 
@@ -289,8 +300,7 @@ static int Open(vlc_window_t *wnd)
     return VLC_SUCCESS;
 
 error:
-    RemoveDrawable(sys->embed_hwnd);
-
+    Close(wnd);
     return VLC_EGENERIC;
 }
 
@@ -300,6 +310,14 @@ error:
 static void Close (vlc_window_t *wnd)
 {
     struct drawable_sys *sys = wnd->sys;
+
+    if (sys->hWnd)
+        PostMessage( sys->hWnd, WM_CLOSE, 0, 0 );
+
+    if (sys->thread != NULL)
+        vlc_join(sys->thread, NULL);
+
+    vlc_wasync_resize_compressor_destroy(&sys->compressor);
 
     RemoveDrawable(sys->embed_hwnd);
 }

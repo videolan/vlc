@@ -244,7 +244,8 @@ vout_LTLIBRARIES += libegl_win32_plugin.la
 endif
 endif
 
-libdrawable_plugin_la_SOURCES = video_output/win32/drawable.c
+libdrawable_plugin_la_SOURCES = video_output/win32/drawable.c \
+	video_output/wasync_resize_compressor.h
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libdrawable_plugin.la
 endif
