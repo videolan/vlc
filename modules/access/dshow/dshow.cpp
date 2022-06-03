@@ -641,7 +641,6 @@ static void SetRGBMasks( vlc_fourcc_t i_fourcc, es_format_t *fmt )
             fmt->video.i_rmask = 0x000000ff;
             break;
         case VLC_CODEC_RGB32:
-        case VLC_CODEC_RGBA:
             /* This is in BGRx format */
             fmt->video.i_bmask = 0xff000000;
             fmt->video.i_gmask = 0x00ff0000;
