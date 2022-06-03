@@ -258,11 +258,13 @@ static int Open( vlc_object_t *p_this )
     if( smb_stat_get( st, SMB_STAT_ISDIR ) )
     {
         smb_fclose( p_sys->p_session, p_sys->i_fd );
-        smb_session_interrupt_unregister();
+        if (smb_session_interrupt_unregister() == EINTR)
+            goto error;
         return BrowserInit( p_access );
     }
 
-    smb_session_interrupt_unregister();
+    if (smb_session_interrupt_unregister() == EINTR)
+        goto error;
 
     msg_Dbg( p_access, "Successfully opened smb://%s", p_access->psz_location );
 
@@ -478,7 +480,8 @@ static int login( stream_t *p_access )
         goto error;
     }
 
-    smb_session_interrupt_unregister();
+    if (smb_session_interrupt_unregister() == EINTR)
+        goto error;
 
     if( connect_err == EACCES )
     {
@@ -621,7 +624,8 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 
     smb_session_interrupt_register( p_sys );
     i_read = smb_fread( p_sys->p_session, p_sys->i_fd, p_buffer, i_len );
-    smb_session_interrupt_unregister();
+    if (smb_session_interrupt_unregister() == EINTR)
+        errno = EINTR;
 
     if( i_read < 0 )
     {
