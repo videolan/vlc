@@ -65,16 +65,26 @@ netbios_ns_interrupt_register(netbios_ns *ns)
     vlc_interrupt_register(netbios_ns_interrupt_callback, ns);
 }
 
-static inline void
+static inline int
 netbios_ns_interrupt_unregister(void)
 {
-    vlc_interrupt_unregister();
+    return vlc_interrupt_unregister();
 }
 
 #else
 
-#define netbios_ns_interrupt_register( ns ) do {} while (0)
-#define netbios_ns_interrupt_unregister() do {} while (0)
+static inline void
+netbios_ns_interrupt_register(netbios_ns *ns)
+{
+    (void) ns;
+}
+
+static inline int
+netbios_ns_interrupt_unregister(void)
+{
+    return 0;
+}
+
 #endif
 
 #endif
