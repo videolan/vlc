@@ -1166,10 +1166,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  *p_chroma,
                                  &p_region_out->fmt,
                                  drawfuncs[DRAW_RGBA] );
-            else if( *p_chroma == VLC_CODEC_ARGB )
+            else if( *p_chroma == VLC_CODEC_ARGB
+                  || *p_chroma == VLC_CODEC_ABGR)
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
-                                 VLC_CODEC_ARGB,
+                                 *p_chroma,
                                  &p_region_out->fmt,
                                  drawfuncs[DRAW_ARGB] );
 
