@@ -1362,12 +1362,15 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
     return RenderPicture(sys, true);
 }
 
-static picture_t *GetNewCurrentPicture(vout_thread_sys_t *sys)
+static picture_t *UpdateCurrentPicture(vout_thread_sys_t *sys)
 {
     assert(sys->clock);
 
     if (sys->displayed.current == NULL)
-        return PreparePicture(sys, true, false);
+    {
+        sys->displayed.current = PreparePicture(sys, true, false);
+        return sys->displayed.current;
+    }
 
     if (sys->pause.is_on)
         return NULL;
@@ -1388,7 +1391,14 @@ static picture_t *GetNewCurrentPicture(vout_thread_sys_t *sys)
         return NULL;
 
     // the current frame will be late, look for the next not late one
-    return PreparePicture(sys, false, false);
+    picture_t *next = PreparePicture(sys, false, false);
+    if (next == NULL)
+        return NULL;
+
+    picture_Release(sys->displayed.current);
+    sys->displayed.current = next;
+
+    return sys->displayed.current;
 }
 
 static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
@@ -1401,13 +1411,9 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 
-    picture_t *next = GetNewCurrentPicture(sys);
-    if (next != NULL)
+    picture_t *next = UpdateCurrentPicture(sys);
+    if (next)
     {
-        if (likely(sys->displayed.current != NULL))
-            picture_Release(sys->displayed.current);
-        sys->displayed.current = next;
-
         // next frame will still need some waiting before display, we don't need
         // to render now
         // display forced picture immediately
