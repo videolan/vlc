@@ -445,6 +445,9 @@ static vlc_fourcc_t ParseFormat(const xcb_setup_t *setup,
                 if (d->red_shift == 16 && d->green_shift == 8
                  && d->blue_shift == 0)
                     return VLC_CODEC_ARGB;
+                if (d->red_shift == 0 && d->green_shift == 8
+                 && d->blue_shift == 16)
+                    return VLC_CODEC_ABGR;
 #else
                 if (d->red_shift == 0 && d->green_shift == 8
                  && d->blue_shift == 16)
@@ -455,6 +458,9 @@ static vlc_fourcc_t ParseFormat(const xcb_setup_t *setup,
                 if (d->red_shift == 8 && d->green_shift == 16
                  && d->blue_shift == 24)
                     return VLC_CODEC_ARGB;
+                if (d->red_shift == 24 && d->green_shift == 16
+                 && d->blue_shift == 8)
+                    return VLC_CODEC_ABGR;
 #endif
             }
             break;
