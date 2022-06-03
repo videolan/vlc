@@ -201,17 +201,30 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     vlc_gl_sys_t *sys = gl->sys;
     EGLint val;
 
-    if (MakeCurrent(gl) == VLC_SUCCESS) {
+    EGLDisplay old_display = eglGetCurrentDisplay();
+    EGLSurface old_draw = eglGetCurrentSurface(EGL_DRAW);
+    EGLSurface old_read = eglGetCurrentSurface(EGL_READ);
+    EGLContext old_ctx = eglGetCurrentContext();
+
+    bool made_current = eglMakeCurrent(sys->display, sys->surface, sys->surface, sys->context);
+    if (made_current)
         eglWaitClient();
-        unsigned long init_serial = LastKnownRequestProcessed(sys->x11);
-        unsigned long resize_serial = NextRequest(sys->x11);
-        XResizeWindow(sys->x11, sys->x11_win, width, height);
+
+    unsigned long init_serial = LastKnownRequestProcessed(sys->x11);
+    unsigned long resize_serial = NextRequest(sys->x11);
+    XResizeWindow(sys->x11, sys->x11_win, width, height);
+
+    if (made_current)
+    {
         eglQuerySurface(sys->display, sys->surface, EGL_HEIGHT, &val); /* force Mesa to see new size in time for next draw */
         eglWaitNative(EGL_CORE_NATIVE_ENGINE);
-        if (LastKnownRequestProcessed(sys->x11) - init_serial < resize_serial - init_serial)
-            XSync(sys->x11, False);
-        ReleaseCurrent(gl);
+        if (old_display != EGL_NO_DISPLAY)
+            eglMakeCurrent(old_display, old_draw, old_read, old_ctx);
+        else
+            eglMakeCurrent(sys->display, NULL, NULL, NULL);
     }
+    if (LastKnownRequestProcessed(sys->x11) - init_serial < resize_serial - init_serial)
+        XSync(sys->x11, False);
 }
 
 static void DestroySurface(vlc_gl_t *gl)
@@ -338,16 +351,29 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     vlc_gl_sys_t *sys = gl->sys;
     EGLint val;
 
-    if (MakeCurrent(gl) == VLC_SUCCESS) {
+    EGLDisplay old_display = eglGetCurrentDisplay();
+    EGLSurface old_draw = eglGetCurrentSurface(EGL_DRAW);
+    EGLSurface old_read = eglGetCurrentSurface(EGL_READ);
+    EGLContext old_ctx = eglGetCurrentContext();
+
+    bool made_current = eglMakeCurrent(sys->display, sys->surface, sys->surface, sys->context);
+    if (made_current)
         eglWaitClient();
-        uint16_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
-        const uint32_t values[] = { width, height };
-        xcb_void_cookie_t cookie = xcb_configure_window_checked(sys->conn, sys->xcb_win, mask, values);
+
+    uint16_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+    const uint32_t values[] = { width, height };
+    xcb_void_cookie_t cookie = xcb_configure_window_checked(sys->conn, sys->xcb_win, mask, values);
+
+    if (made_current)
+    {
         eglQuerySurface(sys->display, sys->surface, EGL_HEIGHT, &val); /* force Mesa to see new size in time for next draw */
         eglWaitNative(EGL_CORE_NATIVE_ENGINE);
-        free(xcb_request_check(sys->conn, cookie));
-        ReleaseCurrent(gl);
+        if (old_display != EGL_NO_DISPLAY)
+            eglMakeCurrent(old_display, old_draw, old_read, old_ctx);
+        else
+            eglMakeCurrent(sys->display, NULL, NULL, NULL);
     }
+    free(xcb_request_check(sys->conn, cookie));
 }
 
 static void DestroySurface(vlc_gl_t *gl)
