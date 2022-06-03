@@ -916,7 +916,7 @@ error:
      * case of network error (EIO) or when the user asked to cancel it
      * (vlc_killed()). Indeed, in these cases, it is useless to try next smb
      * modules. */
-    return vlc_killed() || ret == -EIO ? VLC_ETIMEOUT : VLC_EGENERIC;
+    return ret == -EINTR || ret == -EIO || vlc_killed() ? VLC_ETIMEOUT : VLC_EGENERIC;
 }
 
 static void
