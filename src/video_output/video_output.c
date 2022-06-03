@@ -1362,14 +1362,12 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
     return RenderPicture(sys, true);
 }
 
-static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
+static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
 {
     vout_thread_sys_t *sys = vout;
     bool paused = sys->pause.is_on;
 
     assert(sys->clock);
-
-    UpdateDeinterlaceFilter(sys);
 
     const vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
@@ -1395,7 +1393,20 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
             }
         }
     }
+    return next;
+}
 
+static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
+{
+    vout_thread_sys_t *sys = vout;
+
+    assert(sys->clock);
+
+    UpdateDeinterlaceFilter(sys);
+
+    const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
+
+    picture_t *next = GetNewCurrentPicture(sys);
     if (next != NULL)
     {
         if (likely(sys->displayed.current != NULL))
