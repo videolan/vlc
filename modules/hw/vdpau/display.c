@@ -62,6 +62,8 @@ typedef struct vout_display_sys_t
 
     unsigned width;
     unsigned height;
+
+    vlc_fourcc_t spu_formats[2];
 } vout_display_sys_t;
 
 static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
@@ -407,29 +409,6 @@ static int Open(vout_display_t *vd,
         xcb_map_window(sys->conn, sys->window);
     }
 
-    /* Check bitmap capabilities (for SPU) */
-    const vlc_fourcc_t *spu_chromas = NULL;
-    {
-#ifdef WORDS_BIGENDIAN
-        static const vlc_fourcc_t subpicture_chromas[] = { VLC_CODEC_ARGB, 0 };
-#else
-        static const vlc_fourcc_t subpicture_chromas[] = { VLC_CODEC_RGBA, 0 };
-#endif
-        uint32_t w, h;
-        VdpBool ok;
-
-        err = vdp_bitmap_surface_query_capabilities(sys->vdp, sys->device,
-                                        VDP_RGBA_FORMAT_R8G8B8A8, &ok, &w, &h);
-        if (err != VDP_STATUS_OK)
-        {
-            msg_Err(vd, "%s capabilities query failure: %s", "output surface",
-                    vdp_get_error_string(sys->vdp, err));
-            ok = VDP_FALSE;
-        }
-        if (ok)
-            spu_chromas = subpicture_chromas;
-    }
-
     /* Initialize VDPAU queue */
     err = vdp_presentation_queue_target_create_x11(sys->vdp, sys->device,
                                                    sys->window, &sys->target);
@@ -450,10 +429,30 @@ static int Open(vout_display_t *vd,
         goto error;
     }
 
+    /* Check bitmap capabilities (for SPU) */
+    {
+        uint32_t w, h;
+        VdpBool ok;
+        unsigned int n = 0;
+
+        err = vdp_bitmap_surface_query_capabilities(sys->vdp, sys->device,
+                                                    VDP_RGBA_FORMAT_R8G8B8A8,
+                                                    &ok, &w, &h);
+        if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+#ifdef WORDS_BIGENDIAN
+            sys->spu_formats[n++] = VLC_CODEC_ARGB;
+#else
+            sys->spu_formats[n++] = VLC_CODEC_RGBA;
+#endif
+        if (n > 0) {
+            sys->spu_formats[n] = 0;
+            vd->info.subpicture_chromas = sys->spu_formats;
+        }
+    }
+
     /* */
     sys->current = NULL;
     vd->sys = sys;
-    vd->info.subpicture_chromas = spu_chromas;
     *fmtp = fmt;
 
     vd->ops = &ops;
