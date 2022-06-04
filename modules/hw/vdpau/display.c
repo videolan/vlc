@@ -179,8 +179,8 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
 
     /* Create GPU surface for sub-picture */
     err = vdp_bitmap_surface_create(sys->vdp, sys->device, fmt,
-        reg->fmt.i_visible_width, reg->fmt.i_visible_height, VDP_FALSE,
-                                    &surface);
+                                    reg->fmt.i_width, reg->fmt.i_height,
+                                    VDP_FALSE, &surface);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(vd, "%s creation failure: %s", "bitmap surface",
@@ -203,7 +203,7 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
     }
 
     /* Render onto main surface */
-    VdpRect area = {
+    VdpRect dst_area = {
         reg->i_x * vd->fmt.i_visible_width
             / subpic->i_original_picture_width,
         reg->i_y * vd->fmt.i_visible_height
@@ -212,6 +212,12 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
             / subpic->i_original_picture_width,
         (reg->i_y + reg->fmt.i_visible_height) * vd->fmt.i_visible_height
             / subpic->i_original_picture_height,
+    };
+    VdpRect src_area = {
+        reg->fmt.i_x_offset,
+        reg->fmt.i_y_offset,
+        reg->fmt.i_x_offset + reg->fmt.i_visible_width,
+        reg->fmt.i_y_offset + reg->fmt.i_visible_height,
     };
     VdpColor color = { 1.f, 1.f, 1.f,
         reg->i_alpha * subpic->i_alpha / 65535.f };
@@ -230,8 +236,9 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
         .blend_constant = { 0.f, 0.f, 0.f, 0.f },
     };
 
-    err = vdp_output_surface_render_bitmap_surface(sys->vdp, target, &area,
-                                             surface, NULL, &color, &state, 0);
+    err = vdp_output_surface_render_bitmap_surface(sys->vdp, target, &dst_area,
+                                                   surface, &src_area, &color,
+                                                   &state, 0);
     if (err != VDP_STATUS_OK)
         msg_Err(vd, "blending failure: %s",
                 vdp_get_error_string(sys->vdp, err));
