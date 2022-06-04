@@ -455,17 +455,20 @@ static int Open(vout_display_t *vd,
         VdpBool ok;
         unsigned int n = 0;
 
-#ifdef WORDS_BIGENDIAN
         err = vdp_bitmap_surface_query_capabilities(sys->vdp, sys->device,
                                                     VDP_RGBA_FORMAT_R8G8B8A8,
                                                     &ok, &w, &h);
         if (err == VDP_STATUS_OK && ok == VDP_TRUE)
+#ifdef WORDS_BIGENDIAN
+            sys->spu_formats[n++] = VLC_CODEC_ABGR;
+#else
             sys->spu_formats[n++] = VLC_CODEC_RGBA;
+#endif
         if (n > 0) {
             sys->spu_formats[n] = 0;
             vd->info.subpicture_chromas = sys->spu_formats;
         }
-#endif
+
         err = vdp_bitmap_surface_query_capabilities(sys->vdp, sys->device,
                                                     VDP_RGBA_FORMAT_B8G8R8A8,
                                                     &ok, &w, &h);
