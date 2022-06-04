@@ -172,7 +172,10 @@ static void RenderRegion(vout_display_t *vd, const subpicture_t *subpic,
 
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
                          sys->picture.subpic, sys->picture.alpha,
-                         sys->picture.scale, 0, 0, 0, 0, dx, dy, dw, dh);
+                         sys->picture.scale,
+                         reg->fmt.i_x_offset, reg->fmt.i_y_offset,
+                         reg->fmt.i_x_offset, reg->fmt.i_y_offset,
+                         dx, dy, dw, dh);
 
     xcb_render_free_picture(conn, sys->picture.alpha);
     xcb_render_free_picture(conn, sys->picture.subpic);
