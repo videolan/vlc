@@ -72,12 +72,25 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
 {
     vout_display_sys_t *sys = vd->sys;
     VdpBitmapSurface surface;
-#ifdef WORDS_BIGENDIAN
-    VdpRGBAFormat fmt = VDP_RGBA_FORMAT_B8G8R8A8;
-#else
-    VdpRGBAFormat fmt = VDP_RGBA_FORMAT_R8G8B8A8;
-#endif
+    VdpRGBAFormat fmt;
     VdpStatus err;
+
+    switch (reg->fmt.i_chroma) {
+#ifdef WORDS_BIGENDIAN
+        case VLC_CODEC_ARGB:
+            fmt = VDP_RGBA_FORMAT_B8G8R8A8;
+            break;
+#else
+        case VLC_CODEC_RGBA:
+            fmt = VDP_RGBA_FORMAT_R8G8B8A8;
+            break;
+        case VLC_CODEC_BGRA:
+            fmt = VDP_RGBA_FORMAT_B8G8R8A8;
+            break;
+#endif
+        default:
+            vlc_assert_unreachable();
+    }
 
     /* Create GPU surface for sub-picture */
     err = vdp_bitmap_surface_create(sys->vdp, sys->device, fmt,
