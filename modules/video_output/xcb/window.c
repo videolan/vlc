@@ -49,6 +49,7 @@ typedef xcb_atom_t Atom;
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 #include <vlc_window.h>
+#include <vlc_es.h>
 
 typedef struct
 {
@@ -73,6 +74,8 @@ typedef struct
         int height;
     } *displays;
     int num_displays;
+    int current_display;
+    xcb_atom_t icc_atom;
 
 #ifdef HAVE_XKBCOMMON
     struct
@@ -290,6 +293,7 @@ static int UpdateDisplays(vlc_window_t *wnd)
 
     const xcb_randr_output_t *outs = xcb_randr_get_screen_resources_outputs(res);
     sys->num_displays = 0;
+    sys->current_display = -1;
     sys->displays = vlc_reallocarray(sys->displays, res->num_outputs,
                                      sizeof(sys->displays[0]));
     if (sys->displays == NULL) {
@@ -365,6 +369,96 @@ static void ProcessRandREvent(vlc_window_t *wnd, xcb_generic_event_t *gev)
     }
 }
 
+static void UpdateICCProfile(vlc_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+
+    if (sys->icc_atom == XCB_ATOM_NONE) {
+        vlc_window_ReportICCProfile(wnd, NULL);
+        return;
+    }
+
+    long max_length = 32 * 1024 * 1024; /* corresponds to 128 MiB */
+    xcb_get_property_reply_t *r =
+        xcb_get_property_reply(conn,
+            xcb_get_property(conn, false, sys->root, sys->icc_atom,
+                             XCB_ATOM_CARDINAL, 0, max_length), NULL);
+    if (!r || r->response_type == XCB_ATOM_NONE || !r->length || r->bytes_after) {
+        vlc_window_ReportICCProfile(wnd, NULL);
+        free(r);
+        return;
+    }
+
+    int len = xcb_get_property_value_length(r);
+    struct vlc_icc_profile_t *icc = malloc(sizeof(*icc) + len);
+    if (icc) {
+        icc->size = len;
+        memcpy(icc->data, xcb_get_property_value(r), len);
+        vlc_window_ReportICCProfile(wnd, icc);
+    }
+    free(r);
+}
+
+/** Get ID of closest display to a position, or -1 if no displays */
+static int DisplayForCoords(vlc_window_t *wnd, int xpos, int ypos)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    if (sys->num_displays == 0)
+        return -1;
+
+    int best = 0, idx = -1;
+    for (int i = 0; i < sys->num_displays; i++) {
+        int xclip = VLC_CLIP(xpos, sys->displays[i].x,
+                             sys->displays[i].x + sys->displays[i].width);
+        int yclip = VLC_CLIP(xpos, sys->displays[i].y,
+                             sys->displays[i].y + sys->displays[i].height);
+        int delta = abs(xpos - xclip) + abs(ypos - yclip);
+        if (delta == 0)
+            return i; /* display contains point */
+
+        if (i == 0 || best < delta) {
+            best = delta;
+            idx = i;
+        }
+    }
+
+    return idx;
+}
+
+static void DisplayChanged(vlc_window_t *wnd, int new_display)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+
+    char icc_prop[32];
+    if (new_display > 0) {
+        snprintf(icc_prop, sizeof(icc_prop), "_ICC_PROFILE_%d", new_display);
+    } else {
+        assert(new_display == 0);
+        strcpy(icc_prop, "_ICC_PROFILE");
+    }
+
+    sys->icc_atom = get_atom(conn, intern_string(conn, icc_prop));
+    UpdateICCProfile(wnd);
+}
+
+static void UpdateGeometry(vlc_window_t *wnd, unsigned x, unsigned y,
+                           unsigned width, unsigned height)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    vlc_window_ReportSize(wnd, width, height);
+
+    /* Detect window center moving across display boundaries */
+    unsigned xcenter = x + (width >> 1);
+    unsigned ycenter = y + (height >> 1);
+    int disp = DisplayForCoords(wnd, xcenter, ycenter);
+    if (disp != -1 && disp != sys->current_display) {
+        sys->current_display = disp;
+        DisplayChanged(wnd, disp);
+    }
+}
+
 static xcb_cursor_t CursorCreate(xcb_connection_t *conn, xcb_window_t root)
 {
     xcb_cursor_t cur = xcb_generate_id(conn);
@@ -432,7 +526,7 @@ static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
         case XCB_CONFIGURE_NOTIFY:
         {
             xcb_configure_notify_event_t *cne = (void *)ev;
-            vlc_window_ReportSize (wnd, cne->width, cne->height);
+            UpdateGeometry(wnd, cne->x, cne->y, cne->width, cne->height);
             break;
         }
         case XCB_DESTROY_NOTIFY:
@@ -451,6 +545,14 @@ static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
 
         case XCB_MAPPING_NOTIFY:
             break;
+
+        case XCB_PROPERTY_NOTIFY:
+        {
+            xcb_property_notify_event_t *pne = (void *)ev;
+            if (pne->atom == sys->icc_atom)
+                UpdateICCProfile(wnd);
+            break;
+        }
 
         default:
 #ifdef HAVE_XKBCOMMON
@@ -516,7 +618,7 @@ static void *Thread (void *data)
     if (geo != NULL) {
         while ((ev = xcb_poll_for_queued_event(conn)) != NULL)
             ProcessEvent(wnd, ev);
-        vlc_window_ReportSize(wnd, geo->width, geo->height);
+        UpdateGeometry(wnd, geo->x, geo->y, geo->width, geo->height);
         free(geo);
     }
     vlc_latch_count_down(&p_sys->ready, 1);
@@ -739,7 +841,8 @@ static const struct vlc_window_operations ops = {
 };
 
 static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
-                      xcb_window_t root, xcb_window_t window, uint32_t events)
+                      xcb_window_t root, xcb_window_t window, uint32_t events,
+                      uint32_t evroot)
 {
     vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
     if (sys == NULL)
@@ -761,7 +864,12 @@ static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
         sys->xkb.ctx = NULL;
 #endif
 
-    InitRandR(wnd);
+    if (InitRandR(wnd) == VLC_SUCCESS) {
+        /* Start tracking ICC profile changes */
+        evroot |= XCB_EVENT_MASK_PROPERTY_CHANGE;
+        xcb_change_window_attributes(conn, sys->root, XCB_CW_EVENT_MASK, &evroot);
+        sys->icc_atom = XCB_ATOM_NONE;
+    }
 
     /* ICCCM */
     /* No cut&paste nor drag&drop, only Window Manager communication. */
@@ -904,7 +1012,7 @@ static int Open(vlc_window_t *wnd)
         goto error;
     }
 
-    ret = OpenCommon(wnd, display, conn, scr->root, window, values[1]);
+    ret = OpenCommon(wnd, display, conn, scr->root, window, values[1], 0);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -1073,7 +1181,8 @@ static int EmOpen (vlc_window_t *wnd)
 
     xcb_change_window_attributes(conn, window, XCB_CW_EVENT_MASK, &value);
 
-    ret = OpenCommon(wnd, NULL, conn, root, window, value);
+    uint32_t evroot = (root == window) ? value : 0;
+    ret = OpenCommon(wnd, NULL, conn, root, window, value, evroot);
     if (ret != VLC_SUCCESS)
         goto error;
 
