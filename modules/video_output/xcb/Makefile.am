@@ -28,9 +28,10 @@ libxcb_window_plugin_la_SOURCES = video_output/xcb/window.c
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(CFLAGS_xcb_window) \
 	$(XPROTO_CFLAGS) $(XCB_CFLAGS) \
-	$(XCB_XKB_CFLAGS) $(XKBCOMMON_X11_CFLAGS)
+	$(XCB_XKB_CFLAGS) $(XKBCOMMON_X11_CFLAGS) \
+	$(XCB_RANDR_CFLAGS)
 libxcb_window_plugin_la_LIBADD = $(XPROTO_LIBS) $(XCB_LIBS) \
-	$(XCB_XKB_LIBS) $(XKBCOMMON_X11_LIBS)
+	$(XCB_XKB_LIBS) $(XKBCOMMON_X11_LIBS) $(XCB_RANDR_LIBS)
 
 libxcb_egl_plugin_la_SOURCES = video_output/opengl/egl.c
 libxcb_egl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_XCB=1

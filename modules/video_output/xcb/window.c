@@ -36,6 +36,7 @@
 #endif
 
 #include <xcb/xcb.h>
+#include <xcb/randr.h>
 #ifdef HAVE_XKBCOMMON
 # include <xcb/xkb.h>
 # include <xkbcommon/xkbcommon-x11.h>
@@ -61,6 +62,17 @@ typedef struct
     xcb_atom_t wm_state_below;
     xcb_atom_t wm_state_fullscreen;
     xcb_atom_t motif_wm_hints;
+
+    uint8_t event_randr; /* event id of XCB_RANDR_NOTIFY, or 0 if disabled */
+    struct
+    {
+        xcb_randr_crtc_t crtc;
+        int x;
+        int y;
+        int width;
+        int height;
+    } *displays;
+    int num_displays;
 
 #ifdef HAVE_XKBCOMMON
     struct
@@ -215,6 +227,121 @@ static void DeinitKeyboardExtension(vlc_window_t *wnd)
 # define DeinitKeyboardExtension(w) ((void)(w))
 #endif
 
+static int InitRandR(vlc_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+    sys->event_randr = 0;
+
+    const xcb_query_extension_reply_t *e =
+        xcb_get_extension_data(conn, &xcb_randr_id);
+    if (!e || !e->present)
+        return VLC_ENOTSUP;
+
+    xcb_randr_query_version_reply_t *v =
+        xcb_randr_query_version_reply(conn,
+            xcb_randr_query_version(conn, 1, 2), NULL);
+    if (v == NULL)
+        return VLC_ENOTSUP;
+
+    sys->event_randr = e->first_event + XCB_RANDR_NOTIFY;
+    msg_Dbg(wnd, "using X RandR extension v%"PRIu32".%"PRIu32,
+            v->major_version, v->minor_version);
+
+    free(v);
+    xcb_randr_select_input(conn, sys->root, XCB_RANDR_NOTIFY_MASK_CRTC_CHANGE |
+                                            XCB_RANDR_NOTIFY_MASK_RESOURCE_CHANGE);
+    return VLC_SUCCESS;
+}
+
+static int UpdateDisplays(vlc_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+
+    xcb_randr_get_screen_resources_reply_t *res =
+        xcb_randr_get_screen_resources_reply(conn,
+            xcb_randr_get_screen_resources(conn, sys->root), NULL);
+    if (res == NULL)
+        return VLC_EGENERIC;
+
+    const xcb_randr_output_t *outs = xcb_randr_get_screen_resources_outputs(res);
+    sys->num_displays = 0;
+    sys->displays = vlc_reallocarray(sys->displays, res->num_outputs,
+                                     sizeof(sys->displays[0]));
+    if (sys->displays == NULL) {
+        free(res);
+        return VLC_ENOMEM;
+    }
+
+    struct {
+        xcb_randr_get_output_info_reply_t *info;
+        xcb_randr_get_output_info_cookie_t oic;
+        xcb_randr_get_crtc_info_cookie_t cic;
+    } *tmp = vlc_reallocarray(NULL, res->num_outputs, sizeof(tmp[0]));
+    if (tmp == NULL) {
+        free(res);
+        return VLC_ENOMEM;
+    }
+
+    for (unsigned i = 0; i < res->num_outputs; i++)
+        tmp[i].oic = xcb_randr_get_output_info(conn, outs[i], res->config_timestamp);
+
+    for (unsigned i = 0; i < res->num_outputs; i++) {
+        tmp[i].info = xcb_randr_get_output_info_reply(conn, tmp[i].oic, NULL);
+        if (tmp[i].info) {
+            tmp[i].cic = xcb_randr_get_crtc_info(conn, tmp[i].info->crtc,
+                                                 res->config_timestamp);
+        }
+    }
+
+    for (unsigned i = 0; i < res->num_outputs; i++) {
+        if (!tmp[i].info)
+            continue;
+        xcb_randr_get_crtc_info_reply_t *crtc =
+            xcb_randr_get_crtc_info_reply(conn, tmp[i].cic, NULL);
+        if (crtc) {
+            int idx = sys->num_displays++;
+            assert(idx < res->num_outputs);
+            sys->displays[idx].crtc = tmp[i].info->crtc;
+            sys->displays[idx].x = crtc->x;
+            sys->displays[idx].y = crtc->y;
+            sys->displays[idx].width = crtc->width;
+            sys->displays[idx].height = crtc->height;
+            free(crtc);
+        }
+        free(tmp[i].info);
+    }
+
+    free(tmp);
+    free(res);
+    return VLC_SUCCESS;
+}
+
+static void ProcessRandREvent(vlc_window_t *wnd, xcb_generic_event_t *gev)
+{
+    xcb_randr_notify_event_t *ev = (xcb_randr_notify_event_t *) gev;
+    vout_window_sys_t *sys = wnd->sys;
+
+    switch (ev->subCode) {
+    case XCB_RANDR_NOTIFY_RESOURCE_CHANGE:
+        UpdateDisplays(wnd);
+        break;
+    case XCB_RANDR_NOTIFY_CRTC_CHANGE:
+        for (int i = 0; i < sys->num_displays; i++) {
+            const xcb_randr_crtc_change_t *cc = &ev->u.cc;
+            if (sys->displays[i].crtc != cc->crtc)
+                continue;
+            sys->displays[i].x = cc->x;
+            sys->displays[i].y = cc->y;
+            sys->displays[i].width = cc->width;
+            sys->displays[i].height = cc->height;
+            break;
+        }
+        break;
+    }
+}
+
 static xcb_cursor_t CursorCreate(xcb_connection_t *conn, xcb_window_t root)
 {
     xcb_cursor_t cur = xcb_generate_id(conn);
@@ -227,9 +354,7 @@ static xcb_cursor_t CursorCreate(xcb_connection_t *conn, xcb_window_t root)
 
 static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
 {
-#ifdef HAVE_XKBCOMMON
     vout_window_sys_t *sys = wnd->sys;
-#endif
     int ret = 0;
 
     switch (ev->response_type & 0x7f)
@@ -312,6 +437,12 @@ static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
                 break;
             }
 #endif
+            if (sys->event_randr && ev->response_type == sys->event_randr)
+            {
+                ProcessRandREvent(wnd, ev);
+                break;
+            }
+
             msg_Dbg (wnd, "unhandled event %"PRIu8, ev->response_type);
     }
 
@@ -344,6 +475,11 @@ static void *Thread (void *data)
     xcb_query_pointer_cookie_t qpc = xcb_query_pointer(conn, window);
     /* Report initial window size (for the embedded case). */
     xcb_get_geometry_cookie_t ggc = xcb_get_geometry(conn, window);
+
+    if (p_sys->event_randr) {
+        p_sys->displays = NULL;
+        UpdateDisplays(wnd);
+    }
 
     xcb_query_pointer_reply_t *qpr = xcb_query_pointer_reply(conn, qpc, NULL);
     if (qpr != NULL) {
@@ -624,6 +760,8 @@ static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
     else
         sys->xkb.ctx = NULL;
 #endif
+
+    InitRandR(wnd);
 
     /* ICCCM */
     /* No cut&paste nor drag&drop, only Window Manager communication. */
