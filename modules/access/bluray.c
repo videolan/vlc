@@ -297,7 +297,7 @@ typedef struct
 
     /* Titles */
     unsigned int        i_title;
-    unsigned int        i_longest_title;
+    unsigned int        i_main_title;
     input_title_t       **pp_title;
     unsigned            cur_title;
     unsigned            cur_seekpoint;
@@ -1032,8 +1032,8 @@ static int blurayOpen(vlc_object_t *object)
 
     } else {
         /* set start title number */
-        if (bluraySetTitle(p_demux, p_sys->i_longest_title) != VLC_SUCCESS) {
-            msg_Err(p_demux, "Could not set the title %d", p_sys->i_longest_title);
+        if (bluraySetTitle(p_demux, p_sys->i_main_title) != VLC_SUCCESS) {
+            msg_Err(p_demux, "Could not set the title %d", p_sys->i_main_title);
             goto error;
         }
     }
@@ -2236,7 +2236,7 @@ static void blurayInitTitles(demux_t *p_demux, uint32_t menu_titles)
 
     if (!p_sys->b_menu) {
         i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT, 60);
-        p_sys->i_longest_title = bd_get_main_title(p_sys->bluray);
+        p_sys->i_main_title = bd_get_main_title(p_sys->bluray);
     }
 
     for (uint32_t i = 0; i < i_title; i++) {
@@ -2328,9 +2328,9 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
         return VLC_SUCCESS;
     }
 
-    /* Looking for the main title, ie the longest duration */
+    /* Looking for the main title */
     if (i_title < 0)
-        i_title = p_sys->i_longest_title;
+        i_title = p_sys->i_main_title;
     else if ((unsigned)i_title > p_sys->i_title)
         return VLC_EGENERIC;
 
