@@ -949,6 +949,8 @@ struct vlc_player_chapter
 #define VLC_PLAYER_TITLE_MENU         0x01
 /** vlc_player_title.flags: The title is interactive. */
 #define VLC_PLAYER_TITLE_INTERACTIVE  0x02
+/** vlc_player_title.flags: The title is the main one. */
+#define VLC_PLAYER_TITLE_MAIN         0x04
 
 /** Player title structure */
 struct vlc_player_title

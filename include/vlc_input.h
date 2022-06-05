@@ -88,6 +88,7 @@ static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
 /* input_title_t.i_flags field */
 #define INPUT_TITLE_MENU         0x01   /* Menu title */
 #define INPUT_TITLE_INTERACTIVE  0x02   /* Interactive title. Playback position has no meaning. */
+#define INPUT_TITLE_MAIN         0x04   /* Main title */
 
 typedef struct input_title_t
 {

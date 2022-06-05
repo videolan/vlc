@@ -44,7 +44,8 @@ static_assert(VLC_PLAYER_CAP_SEEK == VLC_INPUT_CAPABILITIES_SEEKABLE &&
               "player/input capabilities mismatch");
 
 static_assert(VLC_PLAYER_TITLE_MENU == INPUT_TITLE_MENU &&
-              VLC_PLAYER_TITLE_INTERACTIVE == INPUT_TITLE_INTERACTIVE,
+              VLC_PLAYER_TITLE_INTERACTIVE == INPUT_TITLE_INTERACTIVE &&
+              VLC_PLAYER_TITLE_MAIN == INPUT_TITLE_MAIN,
               "player/input title flag mismatch");
 
 #define vlc_player_foreach_inputs(it) \
