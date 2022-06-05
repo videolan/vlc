@@ -3830,11 +3830,11 @@ AC_ARG_ENABLE([pulse],
     [use the PulseAudio client library (default auto)]))
 have_pulse="no"
 AS_IF([test "${enable_pulse}" != "no"], [
-  PKG_CHECK_MODULES([PULSE], [libpulse >= 1.0], [
+  PKG_CHECK_MODULES([PULSE], [libpulse >= 6.0], [
     have_pulse="yes"
   ], [
     AS_IF([test "x${enable_pulse}" != "x"], [
-      AC_MSG_ERROR([$PULSE_PKG_ERRORS. PulseAudio 1.0 or later required.])
+      AC_MSG_ERROR([$PULSE_PKG_ERRORS. PulseAudio 6.0 or later required.])
     ])
   ])
 ])
