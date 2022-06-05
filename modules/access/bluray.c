@@ -2271,6 +2271,9 @@ static void blurayInitTitles(demux_t *p_demux, uint32_t menu_titles)
 
         TAB_APPEND(p_sys->i_title, p_sys->pp_title, t);
     }
+
+    if (p_sys->i_main_title < p_sys->i_title)
+        p_sys->pp_title[p_sys->i_main_title]->i_flags |= INPUT_TITLE_MAIN;
 }
 
 static void blurayRestartParser(demux_t *p_demux, bool b_flush, bool b_random_access)
