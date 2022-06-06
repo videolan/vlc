@@ -885,6 +885,47 @@ static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const vlc_frame
 }
 
 #ifdef ENABLE_SOUT
+
+static void DecoderSendSubstream(vlc_input_decoder_t *p_owner)
+{
+    decoder_t *p_dec = &p_owner->dec;
+    if (p_dec->pf_get_cc == NULL)
+        return;
+
+    bool b_wants_substreams;
+    int ret = sout_StreamControl(p_owner->p_sout,
+                                 SOUT_STREAM_WANTS_SUBSTREAMS,
+                                 &b_wants_substreams);
+
+    if (ret != VLC_SUCCESS || !b_wants_substreams)
+        return;
+
+    if (p_owner->cc.p_sout_input == NULL && p_owner->cc.b_sout_created)
+        return;
+
+    decoder_cc_desc_t desc;
+    vlc_frame_t *p_cc = p_dec->pf_get_cc( p_dec, &desc );
+    if (p_cc == NULL)
+        return;
+
+    if (!p_owner->cc.b_sout_created)
+    {
+        es_format_t ccfmt;
+        es_format_Init(&ccfmt, SPU_ES, VLC_CODEC_CEA608);
+        ccfmt.i_group = p_owner->fmt.i_group;
+        ccfmt.subs.cc.i_reorder_depth = desc.i_reorder_depth;
+        p_owner->cc.p_sout_input = sout_InputNew( p_owner->p_sout, &ccfmt );
+        es_format_Clean(&ccfmt);
+        p_owner->cc.b_sout_created = true;
+    }
+
+    if (!p_owner->cc.p_sout_input ||
+        sout_InputSendBuffer(p_owner->p_sout, p_owner->cc.p_sout_input, p_cc))
+    {
+        block_Release(p_cc);
+    }
+}
+
 /* This function process a frame for sout
  */
 static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t *frame )
@@ -931,42 +972,10 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t
         while( sout_frame )
         {
             vlc_frame_t *p_next = sout_frame->p_next;
-            bool b_wants_substreams;
 
             sout_frame->p_next = NULL;
 
-            if( p_dec->pf_get_cc
-             && sout_StreamControl( p_owner->p_sout,
-                                    SOUT_STREAM_WANTS_SUBSTREAMS,
-                                    &b_wants_substreams ) == VLC_SUCCESS
-             && b_wants_substreams )
-            {
-                if( p_owner->cc.p_sout_input ||
-                    !p_owner->cc.b_sout_created )
-                {
-                    decoder_cc_desc_t desc;
-                    vlc_frame_t *p_cc = p_dec->pf_get_cc( p_dec, &desc );
-                    if( p_cc )
-                    {
-                        if(!p_owner->cc.b_sout_created)
-                        {
-                            es_format_t ccfmt;
-                            es_format_Init(&ccfmt, SPU_ES, VLC_CODEC_CEA608);
-                            ccfmt.i_group = p_owner->fmt.i_group;
-                            ccfmt.subs.cc.i_reorder_depth = desc.i_reorder_depth;
-                            p_owner->cc.p_sout_input = sout_InputNew( p_owner->p_sout, &ccfmt );
-                            es_format_Clean(&ccfmt);
-                            p_owner->cc.b_sout_created = true;
-                        }
-
-                        if( !p_owner->cc.p_sout_input ||
-                            sout_InputSendBuffer( p_owner->p_sout, p_owner->cc.p_sout_input, p_cc ) )
-                        {
-                            block_Release( p_cc );
-                        }
-                    }
-                }
-            }
+            DecoderSendSubstream( p_owner );
 
             /* FIXME --VLC_TICK_INVALID inspect stream_output*/
             if ( sout_InputSendBuffer( p_owner->p_sout, p_owner->p_sout_input, sout_frame ) ==
