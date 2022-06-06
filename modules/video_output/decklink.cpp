@@ -779,9 +779,13 @@ static int ControlVideo(vout_display_t *vd, int query)
     return VLC_EGENERIC;
 }
 
-static const struct vlc_display_operations ops = {
-    CloseVideo, PrepareVideo, NULL, ControlVideo, NULL, NULL,
-};
+static const auto ops = []{
+    struct vlc_display_operations ops {};
+    ops.close = CloseVideo;
+    ops.prepare = PrepareVideo;
+    ops.control = ControlVideo;
+    return ops;
+}();
 
 static int OpenVideo(vout_display_t *vd,
                      video_format_t *fmtp, vlc_video_context *context)
