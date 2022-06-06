@@ -76,49 +76,6 @@ namespace
     // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
     QCache<ImageCacheKey, QImage> imageCache(2 * 1024 * 1024); // 2 MiB
 
-    std::unique_ptr<QIODevice> getReadable(const QUrl &url)
-    try
-    {
-        if (!QQmlFile::isLocalFile(url))
-        {
-#ifdef QT_NETWORK_LIB
-            QNetworkAccessManager networkMgr;
-            networkMgr.setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
-            auto reply = networkMgr.get(QNetworkRequest(url));
-            QEventLoop loop;
-            QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-            loop.exec();
-
-            if (reply->error() != QNetworkReply::NoError)
-                throw std::runtime_error(reply->errorString().toStdString());
-
-            class DataOwningBuffer : private QByteArray, public QBuffer
-            {
-            public:
-                explicit DataOwningBuffer(const QByteArray &data)
-                    : QByteArray(data), QBuffer(this, nullptr) { }
-            };
-
-            auto file = std::make_unique<DataOwningBuffer>(reply->readAll());
-            file->open(QIODevice::ReadOnly);
-            return file;
-#else
-            throw std::runtime_error("Qt Network Library is not available!");
-#endif
-        }
-        else
-        {
-            auto file = std::make_unique<QFile>(QQmlFile::urlToLocalFileOrQrc(url));
-            file->open(QIODevice::ReadOnly);
-            return file;
-        }
-    }
-    catch (const std::exception& error)
-    {
-        qWarning() << "Could not load source image:" << url << error.what();
-        return {};
-    }
-
     QRectF doPreserveAspectCrop(const QSizeF &sourceSize, const QSizeF &size)
     {
         const qreal ratio = std::max(size.width() / sourceSize.width(), size.height() / sourceSize.height());
@@ -131,8 +88,8 @@ namespace
     {
     public:
         // requestedSize is only taken as hint, the Image is resized with PreserveAspectCrop
-        ImageReader(const QUrl &url, QSize requestedSize)
-            : url {url}
+        ImageReader(QIODevice *device, QSize requestedSize)
+            : device {device}
             , requestedSize {requestedSize}
         {
         }
@@ -141,12 +98,8 @@ namespace
 
         QImage execute()
         {
-            auto file = getReadable(url);
-            if (!file || !file->isOpen())
-                return {};
-
             QImageReader reader;
-            reader.setDevice(file.get());
+            reader.setDevice(device);
             const QSize sourceSize = reader.size();
 
             if (requestedSize.isValid())
@@ -158,7 +111,7 @@ namespace
         }
 
     private:
-        QUrl url;
+        QIODevice *device;
         QSize requestedSize;
         QString errorStr;
     };
@@ -166,9 +119,12 @@ namespace
     class LocalImageResponse : public QQuickImageResponse
     {
     public:
-        LocalImageResponse(const QUrl &url, const QSize &requestedSize)
+        LocalImageResponse(const QString &fileName, const QSize &requestedSize)
         {
-            reader.reset(new ImageReader(url, requestedSize));
+            auto file = new QFile(fileName);
+            reader.reset(new ImageReader(file, requestedSize));
+            file->setParent(reader.get());
+
             connect(reader.get(), &ImageReader::result, this, &LocalImageResponse::handleImageRead);
 
             reader->start(*QThreadPool::globalInstance());
@@ -198,6 +154,65 @@ namespace
         TaskHandle<ImageReader> reader;
         QString errorStr;
     };
+
+#ifdef QT_NETWORK_LIB
+    class NetworkImageResponse : public QQuickImageResponse
+    {
+    public:
+        NetworkImageResponse(QNetworkReply *reply, QSize requestedSize) : reply {reply}, requestedSize {requestedSize}
+        {
+            QObject::connect(reply, &QNetworkReply::finished
+                             , this, &NetworkImageResponse::handleNetworkReplyFinished);
+        }
+
+        QQuickTextureFactory *textureFactory() const override
+        {
+            return result.isNull() ? nullptr : QQuickTextureFactory::textureFactoryForImage(result);
+        }
+
+        QString errorString() const override
+        {
+            return error;
+        }
+
+        void cancel() override
+        {
+            if (reply->isRunning())
+                reply->abort();
+
+            reader.reset();
+        }
+
+    private:
+        void handleNetworkReplyFinished()
+        {
+            if (reply->error() != QNetworkReply::NoError)
+            {
+                error = reply->errorString();
+                emit finished();
+                return;
+            }
+
+            reader.reset(new ImageReader(reply, requestedSize));
+            QObject::connect(reader.get(), &ImageReader::result, this, [this]()
+            {
+                result = reader->takeResult();
+                error = reader->errorString();
+                reader.reset();
+
+                emit finished();
+            });
+
+            reader->start(*QThreadPool::globalInstance());
+        }
+
+        QNetworkReply *reply;
+        QSize requestedSize;
+        TaskHandle<ImageReader> reader;
+        QImage result;
+        QString error;
+    };
+#endif
 
     class ImageProviderAsyncAdaptor : public QQuickImageResponse
     {
@@ -268,10 +283,19 @@ namespace
 
             return nullptr;
         }
+        else if (QQmlFile::isLocalFile(url))
+        {
+            return new LocalImageResponse(QQmlFile::urlToLocalFileOrQrc(url), requestedSize);
+        }
+#ifdef QT_NETWORK_LIB
         else
         {
-            return new LocalImageResponse(url, requestedSize);
+            QNetworkRequest request(url);
+            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+            auto reply = engine->networkAccessManager()->get(request);
+            return new NetworkImageResponse(reply, requestedSize);
         }
+#endif
     }
 }
 
