@@ -212,6 +212,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlplaylistmodel.hpp \
 	gui/qt/medialibrary/thumbnailcollector.hpp \
 	gui/qt/medialibrary/thumbnailcollector.cpp \
+	gui/qt/medialibrary/mlcustomcover.hpp \
+	gui/qt/medialibrary/mlcustomcover.cpp \
 	gui/qt/menus/custom_menus.cpp \
 	gui/qt/menus/custom_menus.hpp \
 	gui/qt/menus/qml_menu_wrapper.cpp \
