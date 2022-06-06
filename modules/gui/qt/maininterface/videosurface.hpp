@@ -20,10 +20,34 @@
 
 #include "widgets/native/viewblockingrectangle.hpp"
 #include <QMutex>
+#include <QRunnable>
 #include "qt.hpp"
 #include "vlc_window.h"
 
 class MainCtx;
+
+class WindowResizer :
+    public QRunnable
+{
+public:
+    WindowResizer(vlc_window_t* window);
+    virtual ~WindowResizer();
+
+    void run() override;
+    void reportSize(float width, float height);
+    void waitForCompletion();
+
+private:
+    vlc_mutex_t m_lock;
+    vlc_cond_t m_cond;
+    unsigned m_requestedWidth;
+    unsigned m_requestedHeight;
+    unsigned m_currentWidth;
+    unsigned m_currentHeight;
+    bool m_running;
+    vlc_window_t* m_voutWindow;
+};
+
 class VideoSurfaceProvider : public QObject
 {
     Q_OBJECT
@@ -58,6 +82,7 @@ public slots:
 protected:
     QMutex m_voutlock;
     vlc_window_t* m_voutWindow = nullptr;
+    WindowResizer * m_resizer = nullptr;
     bool m_videoEmbed = false;
 };
 

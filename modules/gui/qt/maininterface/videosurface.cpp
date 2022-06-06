@@ -19,6 +19,70 @@
 #include "maininterface/mainctx.hpp"
 #include "widgets/native/customwidgets.hpp" //for qtEventToVLCKey
 #include <QSGRectangleNode>
+#include <QThreadPool>
+
+WindowResizer::WindowResizer(vlc_window_t* window):
+    m_requestedWidth(0),
+    m_requestedHeight(0),
+    m_currentWidth(0),
+    m_currentHeight(0),
+    m_running(false),
+    m_voutWindow(window)
+{
+    vlc_mutex_init(&m_lock);
+    vlc_cond_init(&m_cond);
+    setAutoDelete(false);
+}
+
+WindowResizer::~WindowResizer()
+{
+}
+
+void WindowResizer::run()
+{
+    vlc_mutex_lock(&m_lock);
+    while (m_requestedWidth != m_currentWidth ||
+           m_requestedHeight != m_currentHeight)
+    {
+        unsigned width = m_requestedWidth;
+        unsigned height = m_requestedHeight;
+        vlc_mutex_unlock(&m_lock);
+
+        vlc_window_ReportSize(m_voutWindow, width, height);
+
+        vlc_mutex_lock(&m_lock);
+        m_currentWidth = width;
+        m_currentHeight = height;
+    }
+    m_running = false;
+    vlc_cond_signal(&m_cond);
+    vlc_mutex_unlock(&m_lock);
+}
+
+void WindowResizer::reportSize(float width, float height)
+{
+    if (width < 0 || height < 0)
+        return;
+
+    vlc_mutex_lock(&m_lock);
+    m_requestedWidth = static_cast<unsigned>(width);
+    m_requestedHeight = static_cast<unsigned>(height);
+    if (m_running == false)
+    {
+        m_running = true;
+        QThreadPool::globalInstance()->start(this);
+    }
+    vlc_mutex_unlock(&m_lock);
+}
+
+/* Must called under m_voutlock before deletion */
+void WindowResizer::waitForCompletion()
+{
+    vlc_mutex_lock(&m_lock);
+    while (m_running)
+        vlc_cond_wait(&m_cond, &m_lock);
+    vlc_mutex_unlock(&m_lock);
+}
 
 VideoSurfaceProvider::VideoSurfaceProvider(QObject* parent)
     : QObject(parent)
@@ -42,6 +106,7 @@ void VideoSurfaceProvider::enable(vlc_window_t* voutWindow)
     {
         QMutexLocker lock(&m_voutlock);
         m_voutWindow = voutWindow;
+        m_resizer = new (std::nothrow) WindowResizer(voutWindow);
     }
     emit videoEnabledChanged(true);
 }
@@ -51,6 +116,12 @@ void VideoSurfaceProvider::disable()
     setVideoEmbed(false);
     {
         QMutexLocker lock(&m_voutlock);
+        if (m_resizer != nullptr)
+        {
+            m_resizer->waitForCompletion();
+            delete m_resizer;
+            m_resizer = nullptr;
+        }
         m_voutWindow = nullptr;
     }
     emit videoEnabledChanged(false);
@@ -65,6 +136,8 @@ void VideoSurfaceProvider::setVideoEmbed(bool embed)
 void VideoSurfaceProvider::onWindowClosed()
 {
     QMutexLocker lock(&m_voutlock);
+    if (m_resizer != nullptr)
+        m_resizer->waitForCompletion();
     if (m_voutWindow)
         vlc_window_ReportClose(m_voutWindow);
 }
@@ -119,7 +192,9 @@ void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
 {
     emit surfaceSizeChanged(size);
     QMutexLocker lock(&m_voutlock);
-    if (m_voutWindow)
+    if (m_resizer)
+        m_resizer->reportSize(size.width(), size.height());
+    else if (m_voutWindow)
         vlc_window_ReportSize(m_voutWindow, size.width(), size.height());
 }
 
@@ -268,7 +343,7 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
         connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::onMouseReleased);
         connect(this, &VideoSurface::mouseWheeled, m_provider, &VideoSurfaceProvider::onMouseWheeled);
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
-        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged, Qt::QueuedConnection);
+        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
         connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged);
 
         connect(m_provider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &VideoSurface::onProviderVideoChanged);
