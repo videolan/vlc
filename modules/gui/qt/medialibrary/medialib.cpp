@@ -520,3 +520,13 @@ void MediaLib::runOnMLThreadTargetDestroyed(QObject * object)
         //no need to disconnect QObject::destroyed, as object is currently being destroyed
     }
 }
+
+MLCustomCover *MediaLib::customCover() const
+{
+    return m_customCover;
+}
+
+void MediaLib::setCustomCover(MLCustomCover *newCustomCover)
+{
+    m_customCover = newCustomCover;
+}

@@ -4,6 +4,7 @@
 
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlqmltypes.hpp"
+#include "medialibrary/mlcustomcover.hpp"
 #include "medialibrary/mlalbummodel.hpp"
 #include "medialibrary/mlartistmodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
@@ -62,6 +63,8 @@
 using  namespace vlc::playlist;
 
 namespace {
+
+const QString MLCUSTOMCOVER_PROVIDERID = "mlcustomcover";
 
 template<class T>
 class SingletonRegisterHelper
@@ -147,6 +150,14 @@ bool MainUI::setup(QQmlEngine* engine)
 {
     engine->setOutputWarningsToStandardError(false);
     connect(engine, &QQmlEngine::warnings, this, &MainUI::onQmlWarning);
+
+    if (m_mainCtx->hasMediaLibrary())
+    {
+        auto customCover = new MLCustomCover(MLCUSTOMCOVER_PROVIDERID, m_mainCtx->getMediaLibrary());
+        m_mainCtx->getMediaLibrary()->setCustomCover(customCover);
+
+        engine->addImageProvider(MLCUSTOMCOVER_PROVIDERID, customCover);
+    }
 
     m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/main/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())
