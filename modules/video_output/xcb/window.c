@@ -85,6 +85,29 @@ typedef struct
 #endif
 } vout_window_sys_t;
 
+/** Request the X11 server to internalize a string into an atom */
+static inline
+xcb_intern_atom_cookie_t intern_string (xcb_connection_t *c, const char *s)
+{
+    return xcb_intern_atom (c, 0, strlen (s), s);
+}
+
+/** Extract the X11 atom from an intern request cookie */
+static
+xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
+{
+    xcb_intern_atom_reply_t *reply;
+    xcb_atom_t atom;
+
+    reply = xcb_intern_atom_reply (conn, ck, NULL);
+    if (reply == NULL)
+        return 0;
+
+    atom = reply->atom;
+    free (reply);
+    return atom;
+}
+
 #ifdef HAVE_XKBCOMMON
 static int InitKeyboard(vlc_window_t *wnd)
 {
@@ -666,29 +689,6 @@ void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
         set_ascii_prop (conn, window, XA_WM_CLIENT_MACHINE, hostname);
     }
     free(hostname);
-}
-
-/** Request the X11 server to internalize a string into an atom */
-static inline
-xcb_intern_atom_cookie_t intern_string (xcb_connection_t *c, const char *s)
-{
-    return xcb_intern_atom (c, 0, strlen (s), s);
-}
-
-/** Extract the X11 atom from an intern request cookie */
-static
-xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
-{
-    xcb_intern_atom_reply_t *reply;
-    xcb_atom_t atom;
-
-    reply = xcb_intern_atom_reply (conn, ck, NULL);
-    if (reply == NULL)
-        return 0;
-
-    atom = reply->atom;
-    free (reply);
-    return atom;
 }
 
 static int Enable(vlc_window_t *wnd, const vlc_window_cfg_t *restrict cfg)
