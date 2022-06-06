@@ -25,15 +25,6 @@ MLGenre::MLGenre(const vlc_ml_genre_t *_data )
 
 {
     assert(_data);
-
-    for (int i = VLC_ML_THUMBNAIL_SMALL; i < VLC_ML_THUMBNAIL_SIZE_COUNT; ++i)
-    {
-        if (_data->thumbnails[i].psz_mrl)
-        {
-            setCover(_data->thumbnails[i].psz_mrl);
-            break;
-        }
-    }
 }
 
 QString MLGenre::getName() const
