@@ -1335,12 +1335,7 @@ void EndVideoDec( vlc_object_t *obj )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
 
-    /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
-    if( avcodec_is_open( ctx ) )
-        avcodec_flush_buffers( ctx );
-
     cc_Flush( &p_sys->cc );
-
     avcodec_free_context( &ctx );
 
     if( p_sys->p_va )
