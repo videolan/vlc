@@ -193,7 +193,8 @@ libskins2_plugin_la_SOURCES = \
 	gui/skins2/vars/time.cpp \
 	gui/skins2/vars/time.hpp \
 	gui/skins2/vars/volume.cpp \
-	gui/skins2/vars/volume.hpp
+	gui/skins2/vars/volume.hpp \
+	video_output/wasync_resize_compressor.h
 
 if HAVE_WIN32
 libskins2_plugin_la_SOURCES += \

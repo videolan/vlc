@@ -51,10 +51,15 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vlc_window_t* pWnd,
         updateWindowConfiguration( m_pWnd );
 
         m_pTimer.reset(pOsFactory->createOSTimer( m_cmdHideMouse ));
+        vlc_wasync_resize_compressor_init(&m_compressor, m_pWnd);
     }
 }
 
-VoutWindow::~VoutWindow() = default;
+VoutWindow::~VoutWindow()
+{
+    if (m_pWnd)
+        vlc_wasync_resize_compressor_destroy(&m_compressor);
+}
 
 void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
 {
@@ -91,7 +96,7 @@ void VoutWindow::resize( int width, int height )
     GenericWindow::resize( width, height );
 
     if( m_pWnd )
-        vlc_window_ReportSize( m_pWnd, width, height );
+        vlc_wasync_resize_compressor_reportSize(&m_compressor, width, height);
 }
 
 

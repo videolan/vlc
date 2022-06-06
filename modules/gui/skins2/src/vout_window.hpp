@@ -28,6 +28,7 @@
 #include "../commands/cmd_generic.hpp"
 #include <vlc_window.h>
 #include <memory>
+#include "../../../video_output/wasync_resize_compressor.h"
 
 class OSGraphics;
 class OSTimer;
@@ -102,6 +103,8 @@ private:
     std::unique_ptr<OSTimer> m_pTimer;
     int mouse_hide_timeout;
     DEFINE_CALLBACK( VoutWindow, HideMouse );
+
+    vlc_wasync_resize_compressor_t m_compressor;
 };
 
 typedef CountedPtr<VoutWindow> VoutWindowPtr;
