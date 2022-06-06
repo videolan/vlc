@@ -23,7 +23,7 @@
 // Ctor / dtor
 
 MLFolder::MLFolder(const vlc_ml_folder_t * data)
-    : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_FOLDER))
+    : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_FOLDER))
     , m_present(data->b_present)
     , m_banned(data->b_banned)
     , m_title(data->psz_name)

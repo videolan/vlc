@@ -24,9 +24,9 @@
 #endif
 
 // MediaLibrary includes
-#include "mlitemcover.hpp"
+#include "mlqmltypes.hpp"
 
-class MLGenre : public MLItemCover
+class MLGenre : public MLItem
 {
 public:
     MLGenre(const vlc_ml_genre_t * _data);

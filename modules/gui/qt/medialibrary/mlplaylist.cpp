@@ -26,7 +26,7 @@
 //-------------------------------------------------------------------------------------------------
 
 MLPlaylist::MLPlaylist(const vlc_ml_playlist_t * data)
-    : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_PLAYLIST))
+    : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_PLAYLIST))
     , m_name(qfu(data->psz_name))
     , m_duration(0) // TODO m_duration
     , m_count(data->i_nb_media)

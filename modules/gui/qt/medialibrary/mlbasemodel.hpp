@@ -38,7 +38,6 @@
 // Fordward declarations
 class MLListCache;
 class MediaLib;
-class MLItemCover;
 
 class MLBaseModel : public QAbstractListModel
 {

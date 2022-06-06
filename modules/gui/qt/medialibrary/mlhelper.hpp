@@ -30,7 +30,6 @@
 
 // Forward declarations
 class MLBaseModel;
-class MLItemCover;
 class MLItemId;
 class CoverGenerator;
 

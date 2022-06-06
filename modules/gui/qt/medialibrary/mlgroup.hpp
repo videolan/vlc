@@ -26,9 +26,9 @@
 #endif
 
 // MediaLibrary includes
-#include "mlitemcover.hpp"
+#include "mlqmltypes.hpp"
 
-class MLGroup : public MLItemCover
+class MLGroup : public MLItem
 {
 public:
     MLGroup(const vlc_ml_group_t * data);

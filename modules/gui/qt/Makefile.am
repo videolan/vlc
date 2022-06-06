@@ -179,8 +179,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlgroup.hpp \
 	gui/qt/medialibrary/mlhelper.cpp \
 	gui/qt/medialibrary/mlhelper.hpp \
-	gui/qt/medialibrary/mlitemcover.cpp \
-	gui/qt/medialibrary/mlitemcover.hpp \
 	gui/qt/medialibrary/mllistcache.cpp \
 	gui/qt/medialibrary/mllistcache.hpp \
 	gui/qt/medialibrary/mlthreadpool.cpp \

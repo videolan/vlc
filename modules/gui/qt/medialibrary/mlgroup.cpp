@@ -28,7 +28,7 @@
 //-------------------------------------------------------------------------------------------------
 
 MLGroup::MLGroup(const vlc_ml_group_t * data)
-    : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
+    : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
     , m_title(qfu(data->psz_name))
     , m_duration(data->i_duration)
     , m_date(data->i_creation_date)

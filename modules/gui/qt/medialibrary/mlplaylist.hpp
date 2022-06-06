@@ -24,9 +24,9 @@
 #endif
 
 // MediaLibrary includes
-#include "mlitemcover.hpp"
+#include "mlqmltypes.hpp"
 
-class MLPlaylist : public MLItemCover
+class MLPlaylist : public MLItem
 {
 public:
     MLPlaylist(const vlc_ml_playlist_t * data);
