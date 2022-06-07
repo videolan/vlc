@@ -1409,7 +1409,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 
     UpdateDeinterlaceFilter(sys);
 
-    const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 
     bool current_changed = UpdateCurrentPicture(sys);
     if (current_changed)
@@ -1426,6 +1425,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
+        const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
         // next date we need to display again the current picture
         vlc_tick_t date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
         const vlc_tick_t system_now = vlc_tick_now();
