@@ -9,6 +9,7 @@ Demux:
 Decoders:
  * fix DxVA/D3D11 crashes on HEVC files with bogus references
  * fix libass storage size and crash
+ * fix decoding errors on macOS hw decoding on some HEVC files
 
 Video Output:
  * Fix color regression with VAAPI/iOS and OpenGL output
@@ -21,9 +22,12 @@ Playlist:
 Misc:
  * Misc fixes for the extension UI on macOS
  * Improve SMBv1 and SMBv2 behaviours
+ * Improve FTP compatibility
+ * Support RISC-V
 
 Contribs:
- * update bluray, upnp, pthread, x265, freetype, libsmb2, aom, dav1d, libass
+ * update FFmpeg, bluray, upnp, pthread, x265, freetype, libsmb2, aom, dav1d,
+   libass, libxml2 (contains CVE), dvdread, harfbuzz, zlib, gme
 
 
 Changes between 3.0.17.3 and 3.0.17.4:
