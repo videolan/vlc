@@ -179,8 +179,8 @@ void CoverGenerator::draw(QPainter & painter,
 {
     int count = fileNames.count();
 
-    int width  = m_size.width()  / countX;
-    int height = m_size.height() / countY;
+    const int width  = std::ceil(m_size.width()  / static_cast<double>(countX));
+    const int height = std::ceil(m_size.height() / static_cast<double>(countY));
 
     for (int y = 0; y < countY; y++)
     {
@@ -237,8 +237,8 @@ void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, con
     reader.setScaledSize(size);
     QImage image = reader.read();
 
-    int x = (image.width () - target.width ()) / 2;
-    int y = (image.height() - target.height()) / 2;
+    int x = std::ceil((image.width() - target.width()) / 2.);
+    int y = std::ceil((image.height() - target.height()) / 2.);
 
     QRect source(x, y, target.width(), target.height());
 
