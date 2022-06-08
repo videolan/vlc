@@ -1362,18 +1362,18 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
     return RenderPicture(sys, true);
 }
 
-static picture_t *UpdateCurrentPicture(vout_thread_sys_t *sys)
+static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
 {
     assert(sys->clock);
 
     if (sys->displayed.current == NULL)
     {
         sys->displayed.current = PreparePicture(sys, true, false);
-        return sys->displayed.current;
+        return sys->displayed.current != NULL;
     }
 
     if (sys->pause.is_on)
-        return NULL;
+        return false;
 
     const vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t system_swap_current =
@@ -1381,24 +1381,24 @@ static picture_t *UpdateCurrentPicture(vout_thread_sys_t *sys)
                                   sys->displayed.current->date, sys->rate);
     if (unlikely(system_swap_current == VLC_TICK_MAX))
         // the clock is paused but the vout thread is not ?
-        return NULL;
+        return false;
 
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
     vlc_tick_t system_prepare_current = system_swap_current - render_delay;
     if (unlikely(system_prepare_current > system_now))
         // the current frame is not late, we still have time to display it
         // no need to get a new picture
-        return NULL;
+        return false;
 
     // the current frame will be late, look for the next not late one
     picture_t *next = PreparePicture(sys, false, false);
     if (next == NULL)
-        return NULL;
+        return false;
 
     picture_Release(sys->displayed.current);
     sys->displayed.current = next;
 
-    return sys->displayed.current;
+    return true;
 }
 
 static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
@@ -1411,8 +1411,8 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 
-    picture_t *next = UpdateCurrentPicture(sys);
-    if (next)
+    bool current_changed = UpdateCurrentPicture(sys);
+    if (current_changed)
     {
         // next frame will still need some waiting before display, we don't need
         // to render now
