@@ -1375,13 +1375,16 @@ static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
         return NULL;
 
     const vlc_tick_t system_now = vlc_tick_now();
+    const vlc_tick_t system_swap_current =
+        vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                  sys->displayed.current->date, sys->rate);
+    if (unlikely(system_swap_current == VLC_TICK_MAX))
+        // the clock is paused but the vout thread is not ?
+        return NULL;
+
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 
     picture_t *next = NULL;
-    const vlc_tick_t system_swap_current =
-        vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                    sys->displayed.current->date, sys->rate);
-    if (likely(system_swap_current != VLC_TICK_MAX))
     {
         vlc_tick_t system_prepare_current = system_swap_current - render_delay;
         if (system_prepare_current <= system_now)
