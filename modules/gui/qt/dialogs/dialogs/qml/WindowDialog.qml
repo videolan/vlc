@@ -76,9 +76,7 @@ Window {
         DialogButtonBox {
             id: buttonBox
 
-            bottomPadding: 0
-            topPadding: 0
-            padding: VLCStyle.margin_small
+            padding: 0
             spacing: VLCStyle.margin_small
 
             Layout.fillWidth: true
@@ -86,17 +84,28 @@ Window {
 
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
+            background: null
+
             onAccepted: root.accepted()
             onRejected: root.rejected(true)
             onApplied: root.applied()
             onDiscarded: root.discarded()
             onReset: root.reset()
 
-            Component.onCompleted: {
-                background.color = Qt.binding(function() { return VLCStyle.colors.bgAlt })
-            }
+            delegate: Widgets.TextToolButton {
+                id: button
 
-            delegate: Widgets.TextToolButton { }
+                // NOTE: We specify a dedicated background with borders to improve clarity.
+                background: Widgets.AnimatedBackground {
+                    backgroundColor: (button.hovered) ? VLCStyle.colors.buttonHover
+                                                      : VLCStyle.colors.bgAlt
+
+                    border.width: VLCStyle.border
+
+                    border.color: (button.visualFocus) ? activeBorderColor
+                                                       : VLCStyle.colors.buttonBorder
+                }
+            }
         }
     }
 }
