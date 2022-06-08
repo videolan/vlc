@@ -1365,18 +1365,19 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
 static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
 {
     vout_thread_sys_t *sys = vout;
-    bool paused = sys->pause.is_on;
 
     assert(sys->clock);
 
     if (sys->displayed.current == NULL)
         return PreparePicture(sys, true, false);
 
+    if (sys->pause.is_on)
+        return NULL;
+
     const vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 
     picture_t *next = NULL;
-    if (!paused)
     {
         const vlc_tick_t system_swap_current =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
