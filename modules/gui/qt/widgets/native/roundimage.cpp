@@ -74,7 +74,7 @@ namespace
     }
 
     // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
-    QCache<ImageCacheKey, QImage> imageCache(2 * 1024 * 1024); // 2 MiB
+    QCache<ImageCacheKey, QImage> imageCache(32 * 1024 * 1024); // 32 MiB
 
     QRectF doPreserveAspectCrop(const QSizeF &sourceSize, const QSizeF &size)
     {
