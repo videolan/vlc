@@ -1416,6 +1416,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     {
         // next date we need to display again the current picture
         vlc_tick_t date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+        const vlc_tick_t system_now = vlc_tick_now();
         /* FIXME/XXX we must redisplay the last decoded picture (because
         * of potential vout updated, or filters update or SPU update)
         * For now a high update period is needed but it could be removed
@@ -1427,7 +1428,7 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         */
         if (date_refresh > system_now) {
             // nothing changed, wait until the next deadline or a control
-            vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
+            vlc_tick_t max_deadline = system_now + VOUT_REDISPLAY_DELAY;
             return __MIN(date_refresh, max_deadline);
         }
         RenderPicture(vout, true);
