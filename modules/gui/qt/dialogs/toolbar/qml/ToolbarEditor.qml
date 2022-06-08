@@ -237,7 +237,7 @@ Rectangle{
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.margins: VLCStyle.margin_xxsmall
+            Layout.topMargin: VLCStyle.margin_xxsmall
 
             color: VLCStyle.colors.bgAlt
 
