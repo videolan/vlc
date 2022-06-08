@@ -1362,10 +1362,8 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
     return RenderPicture(sys, true);
 }
 
-static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
+static picture_t *GetNewCurrentPicture(vout_thread_sys_t *sys)
 {
-    vout_thread_sys_t *sys = vout;
-
     assert(sys->clock);
 
     if (sys->displayed.current == NULL)
@@ -1389,12 +1387,8 @@ static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
         // no need to get a new picture
         return NULL;
 
-    picture_t *next = NULL;
-    {
-        // the current frame will be late, look for the next not late one
-        next = PreparePicture(vout, false, false);
-    }
-    return next;
+    // the current frame will be late, look for the next not late one
+    return PreparePicture(sys, false, false);
 }
 
 static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
