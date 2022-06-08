@@ -1388,7 +1388,7 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
     if (unlikely(system_prepare_current > system_now))
         // the current frame is not late, we still have time to display it
         // no need to get a new picture
-        return false;
+        return true;
 
     // the current frame will be late, look for the next not late one
     picture_t *next = PreparePicture(sys, false, false);
