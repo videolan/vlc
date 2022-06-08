@@ -57,7 +57,6 @@ CoverGenerator::CoverGenerator()
     : m_countX(COVERGENERATOR_COUNT)
     , m_countY(COVERGENERATOR_COUNT)
     , m_split(Divide)
-    , m_smooth(true)
     , m_blur(0)
     , m_default(COVERGENERATOR_DEFAULT) {}
 
@@ -83,11 +82,6 @@ void CoverGenerator::setCountY(int y)
 void CoverGenerator::setSplit(Split split)
 {
     m_split = split;
-}
-
-void CoverGenerator::setSmooth(bool enabled)
-{
-    m_smooth = enabled;
 }
 
 void CoverGenerator::setBlur(int radius)
@@ -240,32 +234,8 @@ void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, con
     QSize size = reader.size().scaled(target.width(),
                                       target.height(), Qt::KeepAspectRatioByExpanding);
 
-    QImage image;
-
-    if (fileName.endsWith(".svg", Qt::CaseInsensitive))
-    {
-        if (size.isEmpty() == false)
-        {
-            reader.setScaledSize(size);
-        }
-
-        if (reader.read(&image) == false)
-            return;
-    }
-    else
-    {
-        if (reader.read(&image) == false)
-            return;
-
-        if (size.isEmpty() == false)
-        {
-            // NOTE: Should we use Qt::SmoothTransformation or favor efficiency ?
-            if (m_smooth)
-                image = image.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            else
-                image = image.scaled(size, Qt::IgnoreAspectRatio);
-        }
-    }
+    reader.setScaledSize(size);
+    QImage image = reader.read();
 
     int x = (image.width () - target.width ()) / 2;
     int y = (image.height() - target.height()) / 2;

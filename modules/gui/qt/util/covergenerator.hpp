@@ -92,8 +92,6 @@ private:
 
     Split m_split;
 
-    bool m_smooth;
-
     int m_blur;
 
     QString m_default;
