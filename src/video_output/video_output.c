@@ -1385,13 +1385,11 @@ static picture_t *GetNewCurrentPicture(vout_thread_sys_t *vout)
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 
     picture_t *next = NULL;
+    vlc_tick_t system_prepare_current = system_swap_current - render_delay;
+    if (system_prepare_current <= system_now)
     {
-        vlc_tick_t system_prepare_current = system_swap_current - render_delay;
-        if (system_prepare_current <= system_now)
-        {
-            // the current frame will be late, look for the next not late one
-            next = PreparePicture(vout, false, false);
-        }
+        // the current frame will be late, look for the next not late one
+        next = PreparePicture(vout, false, false);
     }
     return next;
 }
