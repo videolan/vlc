@@ -312,6 +312,7 @@ T.Control {
 
                     anchors.fill: parent
                     hoverEnabled: true
+                    acceptedButtons: Qt.NoButton
                 }
             }
         }
