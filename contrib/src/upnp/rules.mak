@@ -54,6 +54,7 @@ ifdef HAVE_ANDROID
 endif
 	$(APPLY) $(SRC)/upnp/miniserver.patch
 	$(APPLY) $(SRC)/upnp/upnp-no-debugfile.patch
+	$(APPLY) $(SRC)/upnp/miniserver-pton-error.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
