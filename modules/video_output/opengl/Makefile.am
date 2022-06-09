@@ -77,6 +77,10 @@ if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 endif # HAVE_GL
 
+if HAVE_OSX
+vout_LTLIBRARIES += libgl_plugin.la
+endif
+
 libglfilter_draw_plugin_la_SOURCES = video_output/opengl/filter_draw.c
 libglfilter_draw_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_GL
