@@ -268,7 +268,7 @@ static int Open (stream_t *stream, const char *path)
         int uncomp[2];
         if (vlc_pipe (uncomp) == 0)
         {
-            int fdv[] = { comp[0], uncomp[1], 2, -1 };
+            int fdv[] = { comp[0], uncomp[1], STDERR_FILENO, -1 };
             const char *argv[] = { path, NULL };
 
             p_sys->read_fd = uncomp[0];

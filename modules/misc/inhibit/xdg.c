@@ -41,7 +41,7 @@ vlc_module_end ()
 static void Timer (void *data)
 {
     static const char *const argv[] = { "xdg-screensaver", "reset", NULL };
-    static const int fdv[] = { -1, 2, 2, -1 };
+    static const int fdv[] = { -1, STDERR_FILENO, STDERR_FILENO, -1 };
     vlc_inhibit_t *ih = data;
     pid_t pid;
 
