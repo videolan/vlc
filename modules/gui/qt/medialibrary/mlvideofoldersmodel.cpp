@@ -95,7 +95,7 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
         case FOLDER_DURATION:
             return QVariant::fromValue(folder->getDuration());
         case FOLDER_COUNT:
-            return QVariant::fromValue(folder->getCount());
+            return QVariant::fromValue(folder->getVideoCount());
         default:
             return QVariant();
     }
