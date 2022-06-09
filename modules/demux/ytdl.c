@@ -71,7 +71,7 @@ static int ytdl_popen(pid_t *restrict pid, const char *argv[])
     if (vlc_pipe(fds))
         return -1;
 
-    int fdv[] = { -1, fds[1], 2, -1 };
+    int fdv[] = { -1, fds[1], STDERR_FILENO, -1 };
     int val = vlc_spawn(pid, argv[0], fdv, argv);
 
     vlc_close(fds[1]);
