@@ -26,6 +26,11 @@ libfilesystem_plugin_la_LIBADD = -lshlwapi
 endif
 access_LTLIBRARIES += libfilesystem_plugin.la
 
+if HAVE_EMSCRIPTEN
+libemjsfile_plugin_la_SOURCES = access/emjsfile.c
+access_LTLIBRARIES += libemjsfile_plugin.la
+endif
+
 libidummy_plugin_la_SOURCES = access/idummy.c
 access_LTLIBRARIES += libidummy_plugin.la
 
