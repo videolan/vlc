@@ -344,17 +344,10 @@ FocusScope {
     //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
     //mode is ignored at the moment
     function positionViewAtIndex(index, mode) {
-        if (flickable.width === 0 || flickable.height === 0)
+        if (flickable.width === 0 || flickable.height === 0
+            ||
+            index < 0 || index >= _count)
             return
-
-        if (index <= 0) {
-            animateFlickableContentY(0)
-            return
-        } else if (index >= _count) {
-            return
-        }
-
-        var newContentY = flickable.contentY
 
         var itemTopY = getItemPos(index)[1]
         var itemBottomY = itemTopY + _effectiveCellHeight
@@ -362,16 +355,16 @@ FocusScope {
         var viewTopY = flickable.contentY
         var viewBottomY = viewTopY + flickable.height
 
-        if (index < _nbItemPerRow) {
-            //force to see the header when on the first row
-            newContentY = 0
-        } else if ( itemTopY < viewTopY ) {
-            //item above view
+        var newContentY
+
+        if (itemTopY < viewTopY)
+             //item above view
             newContentY = itemTopY - topMargin
-        } else if (itemBottomY > viewBottomY) {
-            //item below view
+        else if (itemBottomY > viewBottomY)
+             //item below view
             newContentY = itemBottomY + bottomMargin - flickable.height
-        }
+        else
+            newContentY = flickable.contentY
 
         if (newContentY !== flickable.contentY)
             animateFlickableContentY(newContentY)
