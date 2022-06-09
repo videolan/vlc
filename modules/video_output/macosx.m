@@ -75,7 +75,7 @@ vlc_module_begin ()
     set_shortname ("Mac OS X")
     set_description (N_("Mac OS X OpenGL video output"))
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_callback_display(Open, 250)
+    set_callback_display(Open, 290)
     add_shortcut ("macosx", "vout_macosx")
     add_glopts ()
 
