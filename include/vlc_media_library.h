@@ -362,6 +362,8 @@ typedef struct vlc_ml_folder_t
     char* psz_name; /**< The folder's name */
     char* psz_mrl; /**< The folder's MRL. Will be NULL if b_present is false */
     unsigned int i_nb_media; /**< The media count */
+    unsigned int i_nb_video; /**< The number of video for this folder */
+    unsigned int i_nb_audio; /**< The number of audio for this volder */
     bool b_present; /**< The folder's presence state */
     bool b_banned; /**< Will be true if the user required this folder to be excluded */
 } vlc_ml_folder_t;

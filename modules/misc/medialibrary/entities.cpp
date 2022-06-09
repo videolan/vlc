@@ -480,6 +480,8 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
     output.i_id = input->id();
 
     output.i_nb_media = input->nbMedia();
+    output.i_nb_audio = input->nbAudio();
+    output.i_nb_video = input->nbVideo();
 
     output.b_banned = input->isBanned();
 
