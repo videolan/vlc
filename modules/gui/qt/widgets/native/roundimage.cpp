@@ -26,6 +26,7 @@
 #endif
 
 #include "roundimage.hpp"
+#include "util/asynctask.hpp"
 
 #include <qhashfunctions.h>
 
@@ -76,21 +77,41 @@ namespace
     // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
     QCache<ImageCacheKey, QImage> imageCache(32 * 1024 * 1024); // 32 MiB
 
-    QRectF doPreserveAspectCrop(const QSizeF &sourceSize, const QSizeF &size)
+    QImage applyRadius(const QSize &targetSize, const qreal radius, const QImage sourceImage)
     {
-        const qreal ratio = std::max(size.width() / sourceSize.width(), size.height() / sourceSize.height());
-        const QSizeF imageSize = sourceSize * ratio;
-        const QPointF alignedCenteredTopLeft {(size.width() - imageSize.width()) / 2., (size.height() - imageSize.height()) / 2.};
-        return {alignedCenteredTopLeft, imageSize};
+        QImage target(targetSize, QImage::Format_ARGB32_Premultiplied);
+        if (target.isNull())
+            return target;
+
+        target.fill(Qt::transparent);
+
+        {
+            QPainter painter(&target);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+            QPainterPath path;
+            path.addRoundedRect(0, 0, targetSize.width(), targetSize.height(), radius, radius);
+            painter.setClipPath(path);
+
+            // do PreserveAspectCrop
+            const auto imageSize = sourceImage.size();
+            const QPointF alignedCenteredTopLeft {(targetSize.width() - imageSize.width()) / 2.
+                                                 , (targetSize.height() - imageSize.height()) / 2.};
+            painter.drawImage(QRectF {alignedCenteredTopLeft, imageSize}, sourceImage);
+        }
+
+        return target;
     }
 
     class ImageReader : public AsyncTask<QImage>
     {
     public:
         // requestedSize is only taken as hint, the Image is resized with PreserveAspectCrop
-        ImageReader(QIODevice *device, QSize requestedSize)
+        ImageReader(QIODevice *device, QSize requestedSize, const qreal radius)
             : device {device}
             , requestedSize {requestedSize}
+            , radius {radius}
         {
         }
 
@@ -103,26 +124,31 @@ namespace
             const QSize sourceSize = reader.size();
 
             if (requestedSize.isValid())
-                reader.setScaledSize(doPreserveAspectCrop(sourceSize, requestedSize).size().toSize());
+                reader.setScaledSize(sourceSize.scaled(requestedSize, Qt::KeepAspectRatioByExpanding));
 
             auto img = reader.read();
             errorStr = reader.errorString();
+
+            if (!errorStr.isEmpty())
+                img = applyRadius(requestedSize.isValid() ? requestedSize : img.size(), radius, img);
+
             return img;
         }
 
     private:
         QIODevice *device;
         QSize requestedSize;
+        qreal radius;
         QString errorStr;
     };
 
     class LocalImageResponse : public QQuickImageResponse
     {
     public:
-        LocalImageResponse(const QString &fileName, const QSize &requestedSize)
+        LocalImageResponse(const QString &fileName, const QSize &requestedSize, const qreal radius)
         {
             auto file = new QFile(fileName);
-            reader.reset(new ImageReader(file, requestedSize));
+            reader.reset(new ImageReader(file, requestedSize, radius));
             file->setParent(reader.get());
 
             connect(reader.get(), &ImageReader::result, this, &LocalImageResponse::handleImageRead);
@@ -159,7 +185,10 @@ namespace
     class NetworkImageResponse : public QQuickImageResponse
     {
     public:
-        NetworkImageResponse(QNetworkReply *reply, QSize requestedSize) : reply {reply}, requestedSize {requestedSize}
+        NetworkImageResponse(QNetworkReply *reply, QSize requestedSize, const qreal radius)
+            : reply {reply}
+            , requestedSize {requestedSize}
+            , radius {radius}
         {
             QObject::connect(reply, &QNetworkReply::finished
                              , this, &NetworkImageResponse::handleNetworkReplyFinished);
@@ -193,7 +222,7 @@ namespace
                 return;
             }
 
-            reader.reset(new ImageReader(reply, requestedSize));
+            reader.reset(new ImageReader(reply, requestedSize, radius));
             QObject::connect(reader.get(), &ImageReader::result, this, [this]()
             {
                 result = reader->takeResult();
@@ -208,6 +237,7 @@ namespace
 
         QNetworkReply *reply;
         QSize requestedSize;
+        qreal radius;
         TaskHandle<ImageReader> reader;
         QImage result;
         QString error;
@@ -217,9 +247,9 @@ namespace
     class ImageProviderAsyncAdaptor : public QQuickImageResponse
     {
     public:
-        ImageProviderAsyncAdaptor(QQuickImageProvider *provider, const QString &id, const QSize &requestedSize)
+        ImageProviderAsyncAdaptor(QQuickImageProvider *provider, const QString &id, const QSize &requestedSize, const qreal radius)
         {
-            task.reset(new ProviderImageGetter(provider, id, requestedSize));
+            task.reset(new ProviderImageGetter(provider, id, requestedSize, radius));
             connect(task.get(), &ProviderImageGetter::result, this, [this]()
             {
                 result = task->takeResult();
@@ -240,22 +270,34 @@ namespace
         class ProviderImageGetter : public AsyncTask<QImage>
         {
         public:
-            ProviderImageGetter(QQuickImageProvider *provider, const QString &id, const QSize &requestedSize)
+            ProviderImageGetter(QQuickImageProvider *provider, const QString &id, const QSize &requestedSize, const qreal radius)
                 : provider {provider}
                 , id{id}
                 , requestedSize{requestedSize}
+                , radius {radius}
             {
             }
 
             QImage execute() override
             {
-                return provider->requestImage(id, &sourceSize, requestedSize);
+                auto img = provider->requestImage(id, &sourceSize, requestedSize);
+                if (!img.isNull())
+                {
+                    QSize targetSize = sourceSize;
+                    if (requestedSize.isValid())
+                        targetSize.scale(requestedSize, Qt::KeepAspectRatioByExpanding);
+
+                    applyRadius(targetSize, radius, img);
+                }
+
+                return img;
             }
 
         private:
             QQuickImageProvider *provider;
             QString id;
             QSize requestedSize;
+            qreal radius;
             QSize sourceSize;
         };
 
@@ -263,7 +305,77 @@ namespace
         QImage result;
     };
 
-    QQuickImageResponse *getAsyncImageResponse(const QUrl &url, const QSize &requestedSize, QQmlEngine *engine)
+
+    // adapts a given QQuickImageResponse to produce a image with radius
+    class ImageResponseRadiusAdaptor : public QQuickImageResponse
+    {
+    public:
+        ImageResponseRadiusAdaptor(QQuickImageResponse *response, const qreal radius) : response {response}, radius {radius}
+        {
+            response->setParent(this);
+            connect(response, &QQuickImageResponse::finished
+                    , this, &ImageResponseRadiusAdaptor::handleResponseFinished);
+        }
+
+        QString errorString() const override { return errStr; }
+
+        QQuickTextureFactory *textureFactory() const override
+        {
+            return !result.isNull() ? QQuickTextureFactory::textureFactoryForImage(result) : nullptr;
+        }
+
+    private:
+        class RoundImageGenerator : public AsyncTask<QImage>
+        {
+        public:
+            RoundImageGenerator(const QImage &img, const qreal radius) : sourceImg {img}, radius{radius}
+            {
+            }
+
+            QImage execute()
+            {
+                return applyRadius(sourceImg.size(), radius, sourceImg);
+            }
+
+        private:
+            QImage sourceImg;
+            qreal radius;
+        };
+
+        void handleResponseFinished()
+        {
+            errStr = response->errorString();
+            auto textureFactory = std::unique_ptr<QQuickTextureFactory>(response->textureFactory());
+            auto img = !textureFactory ? QImage {} : textureFactory->image();
+            if (!textureFactory || img.isNull())
+                return;
+
+            response->disconnect(this);
+            response->deleteLater();
+            response = nullptr;
+
+            generator.reset(new RoundImageGenerator(img, radius));
+            connect(generator.get(), &RoundImageGenerator::result
+                    , this, &ImageResponseRadiusAdaptor::handleGeneratorFinished);
+
+            generator->start(*QThreadPool::globalInstance());
+        }
+
+        void handleGeneratorFinished()
+        {
+            result = generator->takeResult();
+
+            emit finished();
+        }
+
+        QQuickImageResponse *response;
+        QString errStr;
+        qreal radius;
+        QImage result;
+        TaskHandle<RoundImageGenerator> generator;
+    };
+
+    QQuickImageResponse *getAsyncImageResponse(const QUrl &url, const QSize &requestedSize, const qreal radius, QQmlEngine *engine)
     {
         if (url.scheme() == QStringLiteral("image"))
         {
@@ -277,15 +389,18 @@ namespace
             const auto imageId = url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority).mid(1);;
 
             if (provider->imageType() == QQmlImageProviderBase::Image)
-                return new ImageProviderAsyncAdaptor(static_cast<QQuickImageProvider *>(provider), imageId, requestedSize);
+                return new ImageProviderAsyncAdaptor(static_cast<QQuickImageProvider *>(provider), imageId, requestedSize, radius);
             if (provider->imageType() == QQmlImageProviderBase::ImageResponse)
-                return static_cast<QQuickAsyncImageProvider *>(provider)->requestImageResponse(imageId, requestedSize);
+            {
+                auto rawImageResponse = static_cast<QQuickAsyncImageProvider *>(provider)->requestImageResponse(imageId, requestedSize);
+                return new ImageResponseRadiusAdaptor(rawImageResponse, radius);
+            }
 
             return nullptr;
         }
         else if (QQmlFile::isLocalFile(url))
         {
-            return new LocalImageResponse(QQmlFile::urlToLocalFileOrQrc(url), requestedSize);
+            return new LocalImageResponse(QQmlFile::urlToLocalFileOrQrc(url), requestedSize, radius);
         }
 #ifdef QT_NETWORK_LIB
         else
@@ -293,7 +408,7 @@ namespace
             QNetworkRequest request(url);
             request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
             auto reply = engine->networkAccessManager()->get(request);
-            return new NetworkImageResponse(reply, requestedSize);
+            return new NetworkImageResponse(reply, requestedSize, radius);
         }
 #endif
     }
@@ -433,35 +548,15 @@ void RoundImage::handleImageRequestFinished()
         return;
     }
 
+    image.setDevicePixelRatio(m_dpr);
+    setRoundImage(image);
+
     const qreal scaledWidth = this->width() * m_dpr;
     const qreal scaledHeight = this->height() * m_dpr;
     const qreal scaledRadius = this->radius() * m_dpr;
 
     const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
-
-    // Image is generated in size factor of `m_dpr` to avoid scaling artefacts when
-    // generated image is set with device pixel ratio
-    m_roundImageGenerator.reset(new RoundImageGenerator(image, scaledWidth, scaledHeight, scaledRadius));
-    connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this, key]()
-    {
-        const auto image = new QImage(m_roundImageGenerator->takeResult());
-
-        m_roundImageGenerator.reset();
-
-        if (image->isNull())
-        {
-            delete image;
-            setRoundImage({});
-            return;
-        }
-
-        image->setDevicePixelRatio(m_dpr);
-        setRoundImage(*image);
-
-        imageCache.insert(key, image, image->sizeInBytes());
-    });
-
-    m_roundImageGenerator->start(*QThreadPool::globalInstance());
+    imageCache.insert(key, new QImage(image), image.sizeInBytes());
 }
 
 void RoundImage::resetImageRequest()
@@ -477,7 +572,6 @@ void RoundImage::resetImageRequest()
 void RoundImage::load()
 {
     m_enqueuedGeneration = false;
-    assert(!m_roundImageGenerator);
 
     auto engine = qmlEngine(this);
     if (!engine || m_source.isEmpty() || !size().isValid() || size().isEmpty())
@@ -494,7 +588,7 @@ void RoundImage::load()
         return;
     }
 
-    m_activeImageRequest = getAsyncImageResponse(source(), QSizeF {scaledWidth, scaledHeight}.toSize(), engine);
+    m_activeImageRequest = getAsyncImageResponse(source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius, engine);
     connect(m_activeImageRequest, &QQuickImageResponse::finished, this, &RoundImage::handleImageRequestFinished);
 }
 
@@ -522,48 +616,9 @@ void RoundImage::regenerateRoundImage()
 
     resetImageRequest();
 
-    m_roundImageGenerator.reset();
-
     // use Qt::QueuedConnection to delay generation, so that dependent properties
     // subsequent updates can be merged, f.e when VLCStyle.scale changes
     m_enqueuedGeneration = true;
 
     QMetaObject::invokeMethod(this, &RoundImage::load, Qt::QueuedConnection);
-}
-
-RoundImage::RoundImageGenerator::RoundImageGenerator(const QImage &sourceImage, qreal width, qreal height, qreal radius)
-    : sourceImage(sourceImage)
-    , width(width)
-    , height(height)
-    , radius(radius)
-{
-}
-
-QImage RoundImage::RoundImageGenerator::execute()
-{
-    if (width <= 0 || height <= 0 || sourceImage.isNull())
-        return {};
-
-    QImage target(width, height, QImage::Format_ARGB32_Premultiplied);
-    if (target.isNull())
-        return target;
-
-    target.fill(Qt::transparent);
-
-    {
-        QPainter painter(&target);
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
-        QPainterPath path;
-        path.addRoundedRect(0, 0, width, height, radius, radius);
-        painter.setClipPath(path);
-
-        // do PreserveAspectCrop
-        const auto imageSize = sourceImage.size();
-        const QPointF alignedCenteredTopLeft {(width - imageSize.width()) / 2., (height - imageSize.height()) / 2.};
-        painter.drawImage(QRectF {alignedCenteredTopLeft, imageSize}, sourceImage);
-    }
-
-    return target;
 }

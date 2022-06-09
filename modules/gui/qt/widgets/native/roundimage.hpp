@@ -25,8 +25,6 @@
 
 #include "qt.hpp"
 
-#include "util/asynctask.hpp"
-
 #include <QImage>
 #include <QQuickItem>
 #include <QUrl>
@@ -64,20 +62,6 @@ protected:
     QSGNode* updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *) override;
 
 private:
-    class RoundImageGenerator : public AsyncTask<QImage>
-    {
-    public:
-        RoundImageGenerator(const QImage &sourceImage, qreal width, qreal height, qreal radius);
-
-        QImage execute();
-
-    private:
-        QImage sourceImage;
-        qreal width;
-        qreal height;
-        qreal radius;
-    };
-
     void setDPR(qreal value);
     void handleImageRequestFinished();
     void resetImageRequest();
@@ -92,7 +76,6 @@ private:
     QImage m_roundImage;
     bool m_dirty = false;
 
-    TaskHandle<RoundImageGenerator> m_roundImageGenerator {};
     QQuickImageResponse *m_activeImageRequest {};
 
     bool m_enqueuedGeneration = false;
