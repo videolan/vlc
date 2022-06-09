@@ -370,6 +370,8 @@ FocusScope {
         component: FocusScope {
             readonly property bool isResumeDialogVisible: resumeDialog.visible
 
+            property alias topbar: topbar
+
             width: topcontrolView.width
             height: topbar.implicitHeight
             focus: true
@@ -378,6 +380,10 @@ FocusScope {
                 id: topbar
 
                 anchors.fill: parent
+
+                textWidth: (MainCtx.playlistVisible) ? rootPlayer.width - playlistpopup.width
+                                                     : rootPlayer.width
+
                 focus: true
                 visible: !resumeDialog.visible
                 title: mainPlaylistController.currentItem.title
@@ -607,19 +613,27 @@ FocusScope {
         property bool showPlaylist: false
 
         anchors {
-            top: parent.top
+            // NOTE: When the controls are pinned we display the playqueue under the topBar.
+            top: (rootPlayer.pinVideoControls) ? topcontrolView.bottom
+                                               : parent.top
             right: parent.right
             bottom: parent.bottom
-            bottomMargin: parent.height - rootPlayer.positionSliderY
+
             topMargin: VLCStyle.applicationVerticalMargin
+            bottomMargin: parent.height - rootPlayer.positionSliderY
         }
+
         focus: false
         edge: Widgets.DrawerExt.Edges.Right
         state: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
         component: Rectangle {
-            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
-            width: (rootPlayer.width + playlistView.rightPadding) / 4
+            // NOTE: Take the minimumWidth into account.
+            width: Math.max(playlistView.minimumWidth,
+                            (rootPlayer.width + playlistView.rightPadding) / 4)
+
             height: playlistpopup.height
+
+            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
 
             PL.PlaylistListView {
                 id: playlistView
@@ -630,6 +644,14 @@ FocusScope {
 
                 colors: rootPlayer.colors
                 rightPadding: VLCStyle.applicationHorizontalMargin
+
+                topPadding:  {
+                    if (rootPlayer.pinVideoControls)
+                        return VLCStyle.margin_normal
+                    else
+                        // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
+                        return topcontrolView.contentItem.topbar.reservedHeight
+                }
 
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: topcontrolView
