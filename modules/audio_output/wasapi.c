@@ -499,6 +499,29 @@ static void vlc_ToWave(WAVEFORMATEXTENSIBLE *restrict wf,
             wf->dwChannelMask |= chans_in[i];
 }
 
+static void LogWaveFormat(struct vlc_logger *l, const WAVEFORMATEX *restrict wf)
+{
+    vlc_debug(l, "nChannels %d", wf->nChannels);
+    vlc_debug(l, "wBitsPerSample %d", wf->wBitsPerSample);
+    vlc_debug(l, "nAvgBytesPerSec %d", wf->nAvgBytesPerSec);
+    vlc_debug(l, "nSamplesPerSec %d", wf->nSamplesPerSec);
+    vlc_debug(l, "nBlockAlign %d", wf->nBlockAlign);
+    vlc_debug(l, "cbSize %d", wf->cbSize);
+    vlc_debug(l, "wFormatTag 0x%04X", wf->wFormatTag);
+
+    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+    {
+        const WAVEFORMATEXTENSIBLE *wfe = container_of(wf, WAVEFORMATEXTENSIBLE, Format);
+        if (IsEqualIID(&wfe->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
+            vlc_debug(l, "SubFormat IEEE_FLOAT");
+        else if (IsEqualIID(&wfe->SubFormat, &KSDATAFORMAT_SUBTYPE_PCM))
+            vlc_debug(l, "SubFormat PCM");
+        else
+            vlc_debug(l, "SubFormat " GUID_FMT, GUID_PRINT(wfe->SubFormat));
+        vlc_debug(l, "wValidBitsPerSample %d", wfe->Samples.wValidBitsPerSample);
+    }
+}
+
 static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
                         audio_sample_format_t *restrict audio)
 {
@@ -796,7 +819,11 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
             /* Render Ambisonics on the native mix format */
             hr = IAudioClient_GetMixFormat(sys->client, &pwf_mix);
             if (FAILED(hr) || vlc_FromWave(pwf_mix, &fmt))
+            {
+                msg_Dbg(s, "failed to use mix format");
+                LogWaveFormat(vlc_object_logger(s), pwf_mix);
                 vlc_ToWave(pwfe, &fmt); /* failed, fallback to default */
+            }
             else
                 pwf = pwf_mix;
 
@@ -842,8 +869,9 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         assert(pwf_closest != NULL);
         if (vlc_FromWave(pwf_closest, &fmt))
         {
+            msg_Err(s, "unsupported closest audio format");
+            LogWaveFormat(vlc_object_logger(s), pwf_closest);
             CoTaskMemFree(pwf_closest);
-            msg_Err(s, "unsupported audio format");
             hr = E_INVALIDARG;
             goto error;
         }
