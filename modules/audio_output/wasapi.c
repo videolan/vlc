@@ -507,7 +507,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
 
     if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
     {
-        const WAVEFORMATEXTENSIBLE *wfe = (void *)wf;
+        const WAVEFORMATEXTENSIBLE *wfe = container_of(wf, WAVEFORMATEXTENSIBLE, Format);
 
         if (IsEqualIID(&wfe->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
         {

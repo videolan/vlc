@@ -496,7 +496,7 @@ static int Open( vlc_object_t * p_this )
                 if( p_auds->p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
                     p_auds->p_wf->cbSize >= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX) )
                 {
-                    WAVEFORMATEXTENSIBLE *p_wfe = (WAVEFORMATEXTENSIBLE *)p_auds->p_wf;
+                    WAVEFORMATEXTENSIBLE *p_wfe = container_of(p_auds->p_wf, WAVEFORMATEXTENSIBLE, Format);
                     tk->fmt.i_codec = AVI_FourccGetCodec( AUDIO_ES, p_wfe->SubFormat.Data1 );
                 }
                 else
