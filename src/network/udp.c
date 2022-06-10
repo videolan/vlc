@@ -101,19 +101,21 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
     /* Check windows version so we know if we need to increase receive buffers
      * for Windows 7 and earlier
 
-     * SetSocketMediaStreamingMode is present in win 8 and later, so we set
+     * GetCurrentThreadStackLimits is present in win 8 and later, so we set
      * receive buffer if that isn't present
      */
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-    HINSTANCE h_Network = LoadLibrary(TEXT("Windows.Networking.dll"));
-    if( (h_Network == NULL) ||
-        (GetProcAddress( h_Network, "SetSocketMediaStreamingMode" ) == NULL ) )
+    bool isWin8OrGreater = false;
+    HMODULE h = GetModuleHandle(TEXT("api-ms-win-core-processthreads-l1-1-1.dll"));
+    if (h == NULL)
+        h = GetModuleHandle(TEXT("kernel32.dll"));
+    if (likely(h != NULL))
+        isWin8OrGreater = GetProcAddress(h, "GetCurrentThreadStackLimits") != NULL;
+    if (!isWin8OrGreater)
     {
         setsockopt (fd, SOL_SOCKET, SO_RCVBUF,
                          (void *)&(int){ 0x80000 }, sizeof (int));
     }
-    if( h_Network )
-        FreeLibrary( h_Network );
 #endif
 
     if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
