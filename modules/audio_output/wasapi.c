@@ -400,7 +400,8 @@ static void LogWaveFormat(vlc_object_t *o, const WAVEFORMATEX *restrict wf)
     msg_Dbg(o, "cbSize %d", wf->cbSize);
     msg_Dbg(o, "wFormatTag 0x%04X", wf->wFormatTag);
 
-    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
+        wf->cbSize >= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))
     {
         const WAVEFORMATEXTENSIBLE *wfe = container_of(wf, WAVEFORMATEXTENSIBLE, Format);
         if (IsEqualIID(&wfe->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
@@ -419,7 +420,8 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     audio->i_rate = wf->nSamplesPerSec;
     audio->i_physical_channels = 0;
 
-    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+    if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
+        wf->cbSize >= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))
     {
         const WAVEFORMATEXTENSIBLE *wfe = container_of(wf, WAVEFORMATEXTENSIBLE, Format);
 
