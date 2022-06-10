@@ -200,6 +200,31 @@ static CFHashCode DisplayLinkDummySourceHash(const void *info) {
         vlc_window_ReportSize(_wnd, size.width, size.height);
     }];
 
+#if 0
+    {
+        int idx=1;
+        int ret;
+        //char *policy_name[] = {"SCHED_OTHER","SCHED_RR","SCHED_FIFO"};
+        int policy[] = {SCHED_OTHER, SCHED_RR, SCHED_FIFO};
+        pthread_t this_thread = pthread_self();
+        struct sched_param params;
+        params.sched_priority = sched_get_priority_max(policy[idx]);
+        ret = pthread_setschedparam(this_thread, policy[idx], &params);
+        if (ret != 0) {
+            ////LOG_info("Unsuccessful in setting thread prio");
+    //        dvb_tuner_logf("set thread priority failed.");
+            NSLog(@"pthread_setschedparam failure");
+        }
+        int ret_policy = 0;
+        ret = pthread_getschedparam(this_thread, &ret_policy, &params);
+        if (ret != 0) {
+            NSLog(@"pthread_getschedparam failure");
+            ////LOG_info("Couldn't retrieve real-time scheduling paramers");
+    //        dvb_tuner_logf("Couldn't retrieve real-time scheduling paramers.");
+        }
+    }
+#endif
+    
     _displayLink = [CADisplayLink displayLinkWithTarget:self
                                                selector:@selector(displayLinkUpdate:)];
     
@@ -325,10 +350,24 @@ static CFHashCode DisplayLinkDummySourceHash(const void *info) {
     if (atomic_load(&_avstatEnabled))
         msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
                  "clock_offset=%" PRId64 " prev_ts=%" PRId64 " target_ts=%" PRId64,
+        
                  NS_FROM_VLC_TICK(now),
                  NS_FROM_VLC_TICK(clock_offset),
                  NS_FROM_VLC_TICK(ca_current_ts),
                  NS_FROM_VLC_TICK(ca_target_ts));
+    
+   
+    static CFTimeInterval last_ca_now = -1;
+    
+    if (  last_ca_now != -1
+          && ( ca_now - last_ca_now > 0.0169 || ca_now - last_ca_now < 0.0163)
+       )
+    {
+        msg_Warn(_wnd, "[1] CADisplayLink/Vsync is irregular! offset = %llf ms ", ca_now - last_ca_now );
+    }
+   
+    last_ca_now = ca_now;
+    
     dispatch_async(_eventq, ^{
         vlc_window_ReportVsyncReached(_wnd, now + clock_offset + vsync_length);
     });
