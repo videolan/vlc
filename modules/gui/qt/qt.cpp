@@ -838,6 +838,7 @@ void WindowOrphaned(vout_window_t *wnd)
          * window, WindowOpen() will skip reparenting. Then this call will be
          * a no-op.
          */
+        XUnmapWindow (sys->dpy, wnd->handle.xid);
         XReparentWindow(sys->dpy, wnd->handle.xid,
                         RootWindow(sys->dpy, DefaultScreen(sys->dpy)), 0, 0);
         XSync(sys->dpy, True);
