@@ -145,6 +145,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
 
     /* As per MSDN, IAudioClient::GetMixFormat() always uses this format. */
     assert(wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE);
+    assert(wf->cbSize >= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX));
 
     const WAVEFORMATEXTENSIBLE *wfe = container_of(wf, WAVEFORMATEXTENSIBLE, Format);
 
