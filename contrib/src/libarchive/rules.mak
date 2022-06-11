@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.6.0
+LIBARCHIVE_VERSION := 3.6.1
 LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
