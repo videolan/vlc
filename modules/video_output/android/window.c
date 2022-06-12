@@ -37,6 +37,7 @@
 #include <jni.h>
 
 #include "utils.h"
+#include "../wasync_resize_compressor.h"
 
 static int Open(vlc_window_t *);
 static void Close(vlc_window_t *);
@@ -56,11 +57,16 @@ vlc_module_begin()
         add_shortcut("android")
 vlc_module_end()
 
+typedef struct
+{
+    vlc_wasync_resize_compressor_t compressor;
+} vout_window_sys_t;
 
 static void OnNewWindowSize(vlc_window_t *wnd,
                             unsigned i_width, unsigned i_height)
 {
-    vlc_window_ReportSize(wnd, i_width, i_height);
+    vout_window_sys_t *sys = (vout_window_sys_t *) wnd->sys;
+    vlc_wasync_resize_compressor_reportSize(&sys->compressor, i_width, i_height);
 }
 
 static void OnNewMouseCoords(vlc_window_t *wnd,
@@ -94,6 +100,15 @@ static int Open(vlc_window_t *wnd)
     if (jobj == NULL)
         return VLC_EGENERIC;
 
+    vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
+    if (sys == NULL)
+        return VLC_ENOMEM;
+
+    if (vlc_wasync_resize_compressor_init(&sys->compressor, wnd))
+        return VLC_EGENERIC;
+
+    wnd->sys = sys;
+
     AWindowHandler *p_awh = AWindowHandler_new(VLC_OBJECT(wnd), wnd,
         &(awh_events_t) { OnNewWindowSize, OnNewMouseCoords });
     if (p_awh == NULL)
@@ -112,6 +127,8 @@ static int Open(vlc_window_t *wnd)
  */
 static void Close(vlc_window_t *wnd)
 {
+    vout_window_sys_t *sys = (vout_window_sys_t *) wnd->sys;
+    vlc_wasync_resize_compressor_destroy(&sys->compressor);
     AWindowHandler_destroy(wnd->handle.anativewindow);
 }
 
