@@ -70,7 +70,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCVideoWindowModuleDelegate : NSObject {
     @private
     // VLC window object, only use it on the eventQueue
-    vlc_window_t*     vlc_vout_window;
+    vlc_mutex_t        _lock;
+    unsigned           _requested_width;
+    unsigned           _requested_height;
+    unsigned           _width;
+    unsigned           _height;
+    BOOL               _resizing;
+    vlc_window_t*      vlc_vout_window;
     dispatch_queue_t   eventQueue;
 
     BOOL               _isViewSet;
@@ -153,7 +159,12 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if (self) {
         eventQueue = dispatch_queue_create("org.videolan.vlc.vout", DISPATCH_QUEUE_SERIAL);
-
+        _requested_width = 0;
+        _requested_height = 0;
+        _width = 0;
+        _height = 0;
+        _resizing = NO;
+        vlc_mutex_init(&_lock);
         vlc_vout_window = vout_window;
     }
 
@@ -189,11 +200,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reportSizeChanged:(NSSize)newSize
 {
-    [self enqueueEventBlock:^void (void) {
-        vlc_window_ReportSize(vlc_vout_window,
-                               (unsigned int)newSize.width,
-                               (unsigned int)newSize.height);
-    }];
+    vlc_mutex_lock(&_lock);
+    _requested_width = (unsigned int)newSize.width;
+    _requested_height = (unsigned int)newSize.height;
+    if (_resizing == NO) {
+        _resizing = YES;
+        [self enqueueEventBlock:^void (void) {
+            unsigned w, h;
+            vlc_mutex_lock(&_lock);
+            while (_requested_width != _width ||
+                   _requested_height != _height) {
+                w = _requested_width;
+	        h = _requested_height;
+                vlc_mutex_unlock(&_lock);
+
+                vlc_window_ReportSize(vlc_vout_window, w, h);
+
+                vlc_mutex_lock(&_lock);
+		_width = w;
+                _height = h;
+            }
+            _resizing = NO;
+            vlc_mutex_unlock(&_lock);
+        }];
+    }
+    vlc_mutex_unlock(&_lock);
 }
 
 - (void)reportClose
