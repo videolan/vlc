@@ -1658,7 +1658,17 @@ static void *DecoderThread( void *p_data )
     vlc_tick_t delay = 0;
     bool paused = false;
 
-    vlc_thread_set_name("vlc-decoder");
+    const char *thread_name;
+    switch (p_owner->dec.fmt_in.i_cat)
+    {
+        case VIDEO_ES: thread_name = "vlc-dec-video"; break;
+        case AUDIO_ES: thread_name = "vlc-dec-audio"; break;
+        case SPU_ES:   thread_name = "vlc-dec-spu"; break;
+        case DATA_ES:  thread_name = "vlc-dec-data"; break;
+        default:       thread_name = "vlc-decoder"; break;
+    }
+
+    vlc_thread_set_name(thread_name);
 
     /* The decoder's main loop */
     vlc_fifo_Lock( p_owner->p_fifo );
