@@ -812,7 +812,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     vout.clear();
 
-    setWindowFlags( Qt::Tool | Qt::FramelessWindowHint );
+    setWindowFlags( Qt::Tool | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint );
     setAttribute( Qt::WA_ShowWithoutActivating );
     setMinimumWidth( FSC_WIDTH );
     isWideFSC = false;
@@ -1088,7 +1088,12 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
         int i_moveX = event->globalX() - i_mouse_last_x;
         int i_moveY = event->globalY() - i_mouse_last_y;
 
-        move( x() + i_moveX, y() + i_moveY );
+        const QRect screenRect = QApplication::desktop()->screenGeometry( targetScreen() );
+
+        const int i_x = qBound( screenRect.left(), x() + i_moveX, screenRect.right() - width() );
+        const int i_y = qBound( screenRect.top(),  y() + i_moveY, screenRect.bottom() - height() );
+
+        move( i_x, i_y );
 
         i_mouse_last_x = event->globalX();
         i_mouse_last_y = event->globalY();
