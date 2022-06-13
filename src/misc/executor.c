@@ -136,6 +136,8 @@ ThreadRun(void *userdata)
         vlc_mutex_lock(&executor->lock);
         thread->current_task = NULL;
 
+        vlc_thread_set_name("vlc-exec-runner");
+
         assert(executor->unfinished > 0);
         --executor->unfinished;
         if (!executor->unfinished)
