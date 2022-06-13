@@ -35,11 +35,9 @@ public:
     enum Roles
     {
         FOLDER_ID = Qt::UserRole + 1,
-        FOLDER_IS_NEW,
         FOLDER_TITLE,
         FOLDER_THUMBNAIL,
         FOLDER_DURATION,
-        FOLDER_PROGRESS,
         FOLDER_COUNT
     };
 

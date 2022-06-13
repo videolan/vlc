@@ -56,11 +56,9 @@ QHash<int, QByteArray> MLVideoFoldersModel::roleNames() const /* override */
 {
     return {
         { FOLDER_ID, "id" },
-        { FOLDER_IS_NEW, "isNew" },
         { FOLDER_TITLE, "title" },
         { FOLDER_THUMBNAIL, "thumbnail" },
         { FOLDER_DURATION, "duration" },
-        { FOLDER_PROGRESS, "progress" },
         { FOLDER_COUNT, "count"},
     };
 }
