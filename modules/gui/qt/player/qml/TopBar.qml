@@ -35,6 +35,8 @@ FocusScope{
         Vertical
     }
 
+    /* required */ property int textWidth
+
     property string title
     property VLCColors colors: VLCStyle.nightColors
     property int groupAlignment: TopBar.GroupAlignment.Vertical
@@ -211,6 +213,9 @@ FocusScope{
 
         //FIXME use the the right class
         T.Label {
+            Layout.fillWidth: true
+            Layout.maximumWidth: topFocusScope.textWidth - VLCStyle.margin_normal
+
             text: topFocusScope.title
             horizontalAlignment: Text.AlignLeft
             topPadding: VLCStyle.margin_large
@@ -219,8 +224,6 @@ FocusScope{
             font.weight: Font.DemiBold
             font.pixelSize: VLCStyle.dp(18, VLCStyle.scale)
             elide: Text.ElideRight
-
-            Layout.fillWidth: true
         }
     }
 
