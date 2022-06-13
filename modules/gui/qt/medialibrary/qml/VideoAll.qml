@@ -284,7 +284,7 @@ FocusScope {
                     gridView.rightClickOnItem(index);
 
                     var options = {}
-                    if (Helpers.get(model, "isVideo", true))
+                    if (root.isInfoExpandPanelAvailable(model))
                         options["information"] = index
 
                     root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos, options);

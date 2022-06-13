@@ -103,6 +103,10 @@ VideoAll {
     function onLabelGrid(object) { return _meta.onLabelGrid(object) }
     function onLabelList(object) { return _meta.onLabelList(object) }
 
+    function isInfoExpandPanelAvailable(modelIndexData) {
+        return _meta.isInfoExpandPanelAvailable(modelIndexData)
+    }
+
     // Children
 
     Connections {
@@ -130,6 +134,8 @@ VideoAll {
 
             function onLabelGrid(object) { return root.getLabel(object) }
             function onLabelList(object) { return root.getLabel(object) }
+
+            function isInfoExpandPanelAvailable(modelIndexData) { return true }
         }
     }
 
@@ -174,6 +180,10 @@ VideoAll {
             function onLabelList(object) {
                 return root.getLabelGroup(object, I18n.qtr("%1"))
             }
+
+            function isInfoExpandPanelAvailable(modelIndexData) {
+                return modelIndexData.isVideo
+            }
         }
     }
 
@@ -201,6 +211,10 @@ VideoAll {
 
             function onLabelList(object) {
                 return root.getLabelGroup(object, I18n.qtr("%1"))
+            }
+
+            function isInfoExpandPanelAvailable(modelIndexData) {
+                return false
             }
         }
     }
