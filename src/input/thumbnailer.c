@@ -178,6 +178,8 @@ on_thumbnailer_input_event( input_thread_t *input,
 static void
 RunnableRun(void *userdata)
 {
+    vlc_thread_set_name("vlc-run-thumb");
+
     task_t *task = userdata;
     vlc_thumbnailer_t *thumbnailer = task->thumbnailer;
 
