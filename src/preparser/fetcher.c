@@ -301,6 +301,8 @@ static void NotifyArtFetchEnded(struct task *task, bool fetched)
 
 static void RunDownloader(void *userdata)
 {
+    vlc_thread_set_name("vlc-run-fetcher");
+
     struct task *task = userdata;
     input_fetcher_t *fetcher = task->fetcher;
 
@@ -379,6 +381,8 @@ error:
 
 static void RunSearchLocal(void *userdata)
 {
+    vlc_thread_set_name("vlc-run-searchl");
+
     struct task *task = userdata;
     input_fetcher_t *fetcher = task->fetcher;
 
@@ -410,6 +414,8 @@ end:
 
 static void RunSearchNetwork(void *userdata)
 {
+    vlc_thread_set_name("vlc-run-searchn");
+
     struct task *task = userdata;
 
     vlc_interrupt_set(&task->interrupt);

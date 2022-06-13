@@ -233,6 +233,8 @@ Fetch(struct task *task)
 static void
 RunnableRun(void *userdata)
 {
+    vlc_thread_set_name("vlc-run-prepars");
+
     struct task *task = userdata;
 
     vlc_tick_t deadline = task->timeout ? vlc_tick_now() + task->timeout
