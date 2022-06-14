@@ -65,7 +65,7 @@ enum libvlc_event_e {
     libvlc_MediaDurationChanged,
     /**
      * Parsing state of a \link #libvlc_media_t media item\endlink changed
-     * \see libvlc_media_parse_with_options(),
+     * \see libvlc_media_parse_request(),
      *      libvlc_media_get_parsed_status(),
      *      libvlc_media_parse_stop()
      */

@@ -51,12 +51,12 @@ LIBVLC_DEPRECATED LIBVLC_API bool
 /**
  * Get media descriptor's elementary streams description
  *
- * Note, you need to call libvlc_media_parse_with_options() or play the media
- * at least once before calling this function.
+ * Note, you need to call libvlc_media_parse_request() or play the media at
+ * least once before calling this function.
  * Not doing this will result in an empty array.
  *
  * \version LibVLC 2.1.0 and later.
- * \see libvlc_media_parse_with_options
+ * \see libvlc_media_parse_request()
  *
  * \param p_md media descriptor object
  * \param tracks address to store an allocated array of Elementary Streams

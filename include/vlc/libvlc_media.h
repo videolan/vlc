@@ -140,9 +140,7 @@ typedef enum libvlc_media_type_t {
 } libvlc_media_type_t;
 
 /**
- * Parse flags used by libvlc_media_parse_with_options()
- *
- * \see libvlc_media_parse_with_options
+ * Parse flags used by libvlc_media_parse_request()
  */
 typedef enum libvlc_media_parse_flag_t
 {
@@ -171,11 +169,8 @@ typedef enum libvlc_media_parse_flag_t
 } libvlc_media_parse_flag_t;
 
 /**
- * Parse status used sent by libvlc_media_parse_with_options() or returned by
+ * Parse status used sent by libvlc_media_parse_request() or returned by
  * libvlc_media_get_parsed_status()
- *
- * \see libvlc_media_parse_with_options
- * \see libvlc_media_get_parsed_status
  */
 typedef enum libvlc_media_parsed_status_t
 {
@@ -461,11 +456,10 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
 /**
  * Read the meta of the media.
  *
- * Note, you need to call libvlc_media_parse_with_options() or play the media
+ * Note, you need to call libvlc_media_parse_request() or play the media
  * at least once before calling this function.
  * If the media has not yet been parsed this will return NULL.
  *
- * \see libvlc_media_parse_with_options
  * \see libvlc_MediaMetaChanged
  *
  * \param p_md the media descriptor
@@ -535,11 +529,9 @@ LIBVLC_API libvlc_event_manager_t *
 /**
  * Get duration (in ms) of media descriptor object item.
  *
- * Note, you need to call libvlc_media_parse_with_options() or play the media
+ * Note, you need to call libvlc_media_parse_request() or play the media
  * at least once before calling this function.
  * Not doing this will result in an undefined result.
- *
- * \see libvlc_media_parse_with_options
  *
  * \param p_md media descriptor object
  * \return duration of media item or -1 on error
@@ -552,7 +544,7 @@ LIBVLC_API libvlc_time_t
  *
  * \note 'stat' values are currently only parsed by directory accesses. This
  * mean that only sub medias of a directory media, parsed with
- * libvlc_media_parse_with_options() can have valid 'stat' properties.
+ * libvlc_media_parse_request() can have valid 'stat' properties.
  * \version LibVLC 4.0.0 and later.
  *
  * \param p_md media descriptor object
@@ -591,12 +583,12 @@ LIBVLC_API int
  * default "preparse-timeout" option will be used as a timeout. If 0, it will
  * wait indefinitely. If > 0, the timeout will be used (in milliseconds).
  * \return -1 in case of error, 0 otherwise
- * \version LibVLC 3.0.0 or later
+ * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API int
-libvlc_media_parse_with_options( libvlc_instance_t *inst, libvlc_media_t *p_md,
-                                 libvlc_media_parse_flag_t parse_flag,
-                                 int timeout );
+libvlc_media_parse_request( libvlc_instance_t *inst, libvlc_media_t *p_md,
+                            libvlc_media_parse_flag_t parse_flag,
+                            int timeout );
 
 /**
  * Stop the parsing of the media
@@ -604,7 +596,7 @@ libvlc_media_parse_with_options( libvlc_instance_t *inst, libvlc_media_t *p_md,
  * When the media parsing is stopped, the libvlc_MediaParsedChanged event will
  * be sent with the libvlc_media_parsed_status_timeout status.
  *
- * \see libvlc_media_parse_with_options
+ * \see libvlc_media_parse_request()
  *
  * \param inst LibVLC instance that is to cease or give up parsing the media
  * \param p_md media descriptor object
@@ -618,7 +610,7 @@ libvlc_media_parse_stop( libvlc_instance_t *inst, libvlc_media_t *p_md );
  *
  * \see libvlc_MediaParsedChanged
  * \see libvlc_media_parsed_status_t
- * \see libvlc_media_parse_with_options
+ * \see libvlc_media_parse_request()
  *
  * \param p_md media descriptor object
  * \return a value of the libvlc_media_parsed_status_t enum
@@ -654,11 +646,10 @@ LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
  *
  * \version LibVLC 4.0.0 and later.
  *
- * \note You need to call libvlc_media_parse_with_options() or play the media
+ * \note You need to call libvlc_media_parse_request() or play the media
  * at least once before calling this function.  Not doing this will result in
  * an empty list.
  *
- * \see libvlc_media_parse_with_options
  * \see libvlc_media_tracklist_count
  * \see libvlc_media_tracklist_at
  *
@@ -675,13 +666,12 @@ libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type );
 /**
  * Get codec description from media elementary stream
  *
- * Note, you need to call libvlc_media_parse_with_options() or play the media
+ * Note, you need to call libvlc_media_parse_request() or play the media
  * at least once before calling this function.
  *
  * \version LibVLC 3.0.0 and later.
  *
  * \see libvlc_media_track_t
- * \see libvlc_media_parse_with_options
  *
  * \param i_type i_type from libvlc_media_track_t
  * \param i_codec i_codec or i_original_fourcc from libvlc_media_track_t
@@ -821,7 +811,7 @@ libvlc_media_thumbnail_request_destroy( libvlc_media_thumbnail_request_t *p_req 
  * track (like a .srt) or an additional audio track (like a .ac3).
  *
  * \note This function must be called before the media is parsed (via
- * libvlc_media_parse_with_options()) or before the media is played (via
+ * libvlc_media_parse_request()) or before the media is played (via
  * libvlc_media_player_play())
  *
  * \version LibVLC 3.0.0 and later.

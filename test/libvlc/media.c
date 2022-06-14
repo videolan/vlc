@@ -126,7 +126,7 @@ static void test_media_preparsed(libvlc_instance_t *vlc, const char *path,
     libvlc_event_attach (em, libvlc_MediaParsedChanged, media_parse_ended, &sem);
 
     // Parse the media. This is synchronous.
-    int i_ret = libvlc_media_parse_with_options(vlc, media, parse_flags, -1);
+    int i_ret = libvlc_media_parse_request(vlc, media, parse_flags, -1);
     assert(i_ret == 0);
 
     // Wait for preparsed event
@@ -273,7 +273,7 @@ static void test_media_subitems_media(libvlc_instance_t *vlc,
 
     if (play)
     {
-        /* XXX: libvlc_media_parse_with_options won't work with fd, since it
+        /* XXX: libvlc_media_parse won't work with fd, since it
          * won't be preparsed because fd:// is an unknown type, so play the
          * file to force parsing. */
         libvlc_event_attach (em, libvlc_MediaSubItemTreeAdded, subitem_parse_ended, &sem);
@@ -288,7 +288,8 @@ static void test_media_subitems_media(libvlc_instance_t *vlc,
     {
         libvlc_event_attach (em, libvlc_MediaParsedChanged, subitem_parse_ended, &sem);
 
-        int i_ret = libvlc_media_parse_with_options(vlc, media, libvlc_media_parse_local, -1);
+        int i_ret = libvlc_media_parse_request(vlc, media,
+                                               libvlc_media_parse_local, -1);
         assert(i_ret == 0);
         vlc_sem_wait (&sem);
     }

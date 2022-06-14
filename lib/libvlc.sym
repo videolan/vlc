@@ -127,7 +127,7 @@ libvlc_media_new_fd
 libvlc_media_new_location
 libvlc_media_new_path
 libvlc_media_new_as_node
-libvlc_media_parse_with_options
+libvlc_media_parse_request
 libvlc_media_parse_stop
 libvlc_media_player_add_slave
 libvlc_media_player_can_pause

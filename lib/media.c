@@ -849,10 +849,9 @@ static const input_preparser_callbacks_t input_preparser_callbacks = {
     .on_subtree_added = input_item_subtree_added,
 };
 
-int libvlc_media_parse_with_options(libvlc_instance_t *inst,
-                                    libvlc_media_t *media,
-                                    libvlc_media_parse_flag_t parse_flag,
-                                    int timeout)
+int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
+                               libvlc_media_parse_flag_t parse_flag,
+                               int timeout)
 {
     bool needed;
 
