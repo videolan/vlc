@@ -162,8 +162,7 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
     libvlc_media_list_t *p_subitems;
     libvlc_event_t event;
 
-    p_md_child = libvlc_media_new_from_input_item( p_md->p_libvlc_instance,
-                                                   item );
+    p_md_child = libvlc_media_new_from_input_item( item );
 
     /* Add this to our media list */
     p_subitems = media_get_subitems( p_md, true );
@@ -468,9 +467,7 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
  *
  * That's the generic constructor
  */
-libvlc_media_t * libvlc_media_new_from_input_item(
-                                   libvlc_instance_t *p_instance,
-                                   input_item_t *p_input_item )
+libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
 {
     libvlc_media_t * p_md;
 
@@ -522,7 +519,7 @@ libvlc_media_t *libvlc_media_new_location( libvlc_instance_t *p_instance,
         return NULL;
     }
 
-    p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
+    p_md = libvlc_media_new_from_input_item( p_input_item );
 
     /* The p_input_item is retained in libvlc_media_new_from_input_item */
     input_item_Release( p_input_item );
@@ -592,7 +589,7 @@ libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
         return NULL;
     }
 
-    p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
+    p_md = libvlc_media_new_from_input_item( p_input_item );
     input_item_Release( p_input_item );
 
     p_subitems = media_get_subitems( p_md, true );
@@ -662,7 +659,7 @@ libvlc_media_duplicate( libvlc_media_t *p_md_orig )
     input_item_t *dup = input_item_Copy( p_md_orig->p_input_item );
     if( dup == NULL )
         return NULL;
-    return libvlc_media_new_from_input_item( p_md_orig->p_libvlc_instance, dup );
+    return libvlc_media_new_from_input_item( dup );
 }
 
 // Get mrl from a media descriptor object

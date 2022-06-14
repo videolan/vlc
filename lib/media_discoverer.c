@@ -65,8 +65,7 @@ static void services_discovery_item_added( services_discovery_t *sd,
     libvlc_media_discoverer_t *p_mdis = sd->owner.sys;
     libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
 
-    p_md = libvlc_media_new_from_input_item( p_mdis->p_libvlc_instance,
-                                             p_item );
+    p_md = libvlc_media_new_from_input_item( p_item );
 
     if( parent != NULL )
     {
