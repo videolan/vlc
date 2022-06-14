@@ -487,10 +487,12 @@ LIBVLC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
 /**
  * Save the meta previously set
  *
+ * \param inst LibVLC instance
  * \param p_md the media descriptor
  * \return true if the write operation was successful
  */
-LIBVLC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
+LIBVLC_API int libvlc_media_save_meta( libvlc_instance_t *inst,
+                                       libvlc_media_t *p_md );
 
 /**
  * Get the current statistics about the media

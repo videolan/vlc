@@ -706,10 +706,10 @@ void libvlc_media_set_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta, const ch
 }
 
 // Save the meta previously set
-int libvlc_media_save_meta( libvlc_media_t *p_md )
+int libvlc_media_save_meta( libvlc_instance_t *inst, libvlc_media_t *p_md )
 {
     assert( p_md );
-    vlc_object_t *p_obj = VLC_OBJECT(p_md->p_libvlc_instance->p_libvlc_int);
+    vlc_object_t *p_obj = VLC_OBJECT(inst->p_libvlc_int);
     return input_item_WriteMeta( p_obj, p_md->p_input_item ) == VLC_SUCCESS;
 }
 
