@@ -849,8 +849,9 @@ static const input_preparser_callbacks_t input_preparser_callbacks = {
     .on_subtree_added = input_item_subtree_added,
 };
 
-static int media_parse(libvlc_media_t *media,
-                       libvlc_media_parse_flag_t parse_flag, int timeout)
+int libvlc_media_parse_with_options(libvlc_media_t *media,
+                                    libvlc_media_parse_flag_t parse_flag,
+                                    int timeout)
 {
     bool needed;
 
@@ -875,7 +876,7 @@ static int media_parse(libvlc_media_t *media,
         do
         {
             if (unlikely(ref == UINT_MAX))
-                return -EOVERFLOW;
+                return -1;
         }
         while (!atomic_compare_exchange_weak_explicit(&media->worker_count,
                                                       &ref, ref + 1,
@@ -898,22 +899,13 @@ static int media_parse(libvlc_media_t *media,
         {
             atomic_fetch_sub_explicit(&media->worker_count, 1,
                                       memory_order_relaxed);
-            return ret;
+            return -1;
         }
     }
     else
-        return VLC_EGENERIC;
+        return -1;
 
-    return VLC_SUCCESS;
-}
-
-// Parse the media asynchronously with options
-int
-libvlc_media_parse_with_options( libvlc_media_t *media,
-                                 libvlc_media_parse_flag_t parse_flag,
-                                 int timeout )
-{
-    return media_parse( media, parse_flag, timeout ) == VLC_SUCCESS ? 0 : -1;
+    return 0;
 }
 
 // Stop parsing of the media
