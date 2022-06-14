@@ -487,7 +487,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         return NULL;
     }
 
-    p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
     vlc_atomic_rc_init(&p_md->rc);
 
@@ -505,8 +504,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     input_item_Hold( p_md->p_input_item );
 
     install_input_item_observer( p_md );
-
-    libvlc_retain( p_instance );
     return p_md;
 }
 
@@ -647,7 +644,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
     input_item_Release( p_md->p_input_item );
 
     libvlc_event_manager_destroy( &p_md->event_manager );
-    libvlc_release( p_md->p_libvlc_instance );
     free( p_md );
 }
 

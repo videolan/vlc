@@ -37,7 +37,6 @@ struct libvlc_media_t
     libvlc_event_manager_t event_manager;
 
     input_item_t      *p_input_item;
-    libvlc_instance_t *p_libvlc_instance;
     vlc_atomic_rc_t    rc;
 
     VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t*) p_subitems; /* A media descriptor can have Sub items. This is the only dependency we really have on media_list */
