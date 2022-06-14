@@ -311,13 +311,10 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_path(const char *path);
  *
  * \version LibVLC 1.1.5 and later.
  *
- * \param p_instance the instance
  * \param fd open file descriptor
  * \return the newly created media or NULL on error
  */
-LIBVLC_API libvlc_media_t *libvlc_media_new_fd(
-                                   libvlc_instance_t *p_instance,
-                                   int fd );
+LIBVLC_API libvlc_media_t *libvlc_media_new_fd(int fd);
 
 /**
  * Create a media with custom callbacks to read the data from.

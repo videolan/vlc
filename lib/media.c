@@ -542,7 +542,7 @@ libvlc_media_t *libvlc_media_new_path(const char *path)
 }
 
 // Create a media for an already open file descriptor
-libvlc_media_t *libvlc_media_new_fd( libvlc_instance_t *p_instance, int fd )
+libvlc_media_t *libvlc_media_new_fd(int fd)
 {
     char mrl[16];
     snprintf( mrl, sizeof(mrl), "fd://%d", fd );

@@ -337,7 +337,7 @@ static void test_media_subitems(libvlc_instance_t *vlc)
     int fd = open (subitems_path, O_RDONLY);
     test_log ("Testing media_subitems: fd: '%d'\n", fd);
     assert (fd >= 0);
-    media = libvlc_media_new_fd (vlc, fd);
+    media = libvlc_media_new_fd(fd);
     assert (media != NULL);
     test_media_subitems_media(vlc, media, true, true);
     libvlc_media_release (media);
