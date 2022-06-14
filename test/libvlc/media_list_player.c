@@ -137,9 +137,9 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     queue_expected_item(&check, md);
 
     // Add three more media
-    queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
-    queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
-    queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
+    queue_expected_item(&check, media_list_add_file_path(ml, file));
+    queue_expected_item(&check, media_list_add_file_path(ml, file));
+    queue_expected_item(&check, media_list_add_file_path(ml, file));
 
     // Add a node
     libvlc_media_t *node = libvlc_media_new_as_node("node");
@@ -149,9 +149,9 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
 
     // Add items to that node
     libvlc_media_list_t *subitems = libvlc_media_subitems(node);
-    queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
-    queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
-    queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
+    queue_expected_item(&check, media_list_add_file_path(subitems, file));
+    queue_expected_item(&check, media_list_add_file_path(subitems, file));
+    queue_expected_item(&check, media_list_add_file_path(subitems, file));
     libvlc_media_list_release(subitems);
 
     libvlc_media_list_player_set_media_list (mlp, ml);
@@ -198,9 +198,9 @@ static void test_media_list_player_previous(const char** argv, int argc)
     libvlc_media_list_add_media (ml, md);
 
     // Add three media
-    media_list_add_file_path (vlc, ml, file);
-    media_list_add_file_path (vlc, ml, file);
-    media_list_add_file_path (vlc, ml, file);
+    media_list_add_file_path(ml, file);
+    media_list_add_file_path(ml, file);
+    media_list_add_file_path(ml, file);
 
     libvlc_media_list_player_set_media_list (mlp, ml);
 
@@ -257,9 +257,9 @@ static void test_media_list_player_next(const char** argv, int argc)
     libvlc_media_list_add_media (ml, md);
 
     // Add three media
-    media_list_add_file_path (vlc, ml, file);
-    media_list_add_file_path (vlc, ml, file);
-    media_list_add_file_path (vlc, ml, file);
+    media_list_add_file_path(ml, file);
+    media_list_add_file_path(ml, file);
+    media_list_add_file_path(ml, file);
 
     libvlc_media_list_player_set_media_list (mlp, ml);
 
@@ -436,25 +436,25 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     ml6 = libvlc_media_list_new (vlc);
     assert (ml6 != NULL);
 
-    media_list_add_file_path (vlc, ml2, file);
-    media_list_add_file_path (vlc, ml2, file);
+    media_list_add_file_path(ml2, file);
+    media_list_add_file_path(ml2, file);
 
-    media_list_add_file_path (vlc, ml3, file);
-    media_list_add_file_path (vlc, ml3, file);
+    media_list_add_file_path(ml3, file);
+    media_list_add_file_path(ml3, file);
     libvlc_media_list_add_media (ml3, md4);
-    media_list_add_file_path (vlc, ml3, file);
-    media_list_add_file_path (vlc, ml3, file);
-    media_list_add_file_path (vlc, ml3, file);
+    media_list_add_file_path(ml3, file);
+    media_list_add_file_path(ml3, file);
+    media_list_add_file_path(ml3, file);
     libvlc_media_list_add_media (ml3, md5);
 
-    media_list_add_file_path (vlc, ml4, file);
-    media_list_add_file_path (vlc, ml4, file);
-    media_list_add_file_path (vlc, ml4, file);
+    media_list_add_file_path(ml4, file);
+    media_list_add_file_path(ml4, file);
+    media_list_add_file_path(ml4, file);
 
-    media_list_add_file_path (vlc, ml5, file);
+    media_list_add_file_path(ml5, file);
 
-    media_list_add_file_path (vlc, ml6, file);
-    media_list_add_file_path (vlc, ml6, file);
+    media_list_add_file_path(ml6, file);
+    media_list_add_file_path(ml6, file);
 
     md->p_subitems = ml2;
     md2->p_subitems = ml3;
