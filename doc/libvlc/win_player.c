@@ -45,7 +45,7 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
                 if (DragQueryFile(hDrop, 0, file_path, sizeof(file_path)))
                 {
-                    libvlc_media_t *p_media = libvlc_media_new_path( ctx->p_libvlc, file_path );
+                    libvlc_media_t *p_media = libvlc_media_new_path( file_path );
                     libvlc_media_t *p_old_media = libvlc_media_player_get_media( ctx->p_mediaplayer );
                     libvlc_media_player_set_media( ctx->p_mediaplayer, p_media );
                     libvlc_media_release( p_old_media );
@@ -116,7 +116,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
         file_path = _strdup( lpCmdLine );
 
     Context.p_libvlc = libvlc_new( 0, NULL );
-    p_media = libvlc_media_new_path( Context.p_libvlc, file_path );
+    p_media = libvlc_media_new_path( file_path );
     free( file_path );
     Context.p_mediaplayer = libvlc_media_player_new_from_media(
                                                    Context.p_libvlc, p_media );

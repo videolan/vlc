@@ -675,7 +675,7 @@ static void test_media_player_multiple_instance(const char** argv, int argc)
     libvlc_instance_t *instance2 = libvlc_new(argc, argv);
 
     /* ...with the media and the player being on different instances */
-    libvlc_media_t *media1 = libvlc_media_new_path(instance2, "foo");
+    libvlc_media_t *media1 = libvlc_media_new_path("foo");
     libvlc_media_player_t *player1 = libvlc_media_player_new(instance1);
     libvlc_media_player_set_media(player1, media1);
 

@@ -286,13 +286,10 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_location(const char * psz_mrl);
  *
  * \see libvlc_media_release
  *
- * \param p_instance the instance
  * \param path local filesystem path
  * \return the newly created media or NULL on error
  */
-LIBVLC_API libvlc_media_t *libvlc_media_new_path(
-                                   libvlc_instance_t *p_instance,
-                                   const char *path );
+LIBVLC_API libvlc_media_t *libvlc_media_new_path(const char *path);
 
 /**
  * Create a media for an already open file descriptor.

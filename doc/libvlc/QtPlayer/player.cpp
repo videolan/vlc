@@ -132,7 +132,7 @@ void Mwindow::openFile() {
         stop();
 
     /* Create a new Media */
-    libvlc_media_t *vlcMedia = libvlc_media_new_path(vlcInstance, qtu(fileOpen));
+    libvlc_media_t *vlcMedia = libvlc_media_new_path(qtu(fileOpen));
     if (!vlcMedia)
         return;
 

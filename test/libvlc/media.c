@@ -113,7 +113,7 @@ static void test_media_preparsed(libvlc_instance_t *vlc, const char *path,
 
     libvlc_media_t *media;
     if (path != NULL)
-        media = libvlc_media_new_path (vlc, path);
+        media = libvlc_media_new_path(path);
     else
         media = libvlc_media_new_location(location);
     assert (media != NULL);
@@ -311,7 +311,7 @@ static void test_media_subitems(libvlc_instance_t *vlc)
     libvlc_media_t *media;
 
     test_log ("Testing media_subitems: path: '%s'\n", subitems_path);
-    media = libvlc_media_new_path (vlc, subitems_path);
+    media = libvlc_media_new_path(subitems_path);
     assert (media != NULL);
     test_media_subitems_media(vlc, media, false, true);
     libvlc_media_release (media);

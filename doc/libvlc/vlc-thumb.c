@@ -189,7 +189,7 @@ int main(int argc, const char **argv)
     libvlc = create_libvlc();
     assert(libvlc);
 
-    m = libvlc_media_new_path(libvlc, in);
+    m = libvlc_media_new_path(in);
     assert(m);
 
     /* takes snapshot */

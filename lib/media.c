@@ -527,8 +527,7 @@ libvlc_media_t *libvlc_media_new_location(const char * psz_mrl)
 }
 
 // Create a media for a certain file path
-libvlc_media_t *libvlc_media_new_path( libvlc_instance_t *p_instance,
-                                       const char *path )
+libvlc_media_t *libvlc_media_new_path(const char *path)
 {
     char *mrl = vlc_path2uri( path, NULL );
     if( unlikely(mrl == NULL) )

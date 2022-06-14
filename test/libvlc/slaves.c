@@ -26,7 +26,7 @@
 static char *
 path_to_mrl(libvlc_instance_t *p_vlc, const char *psz_path)
 {
-    libvlc_media_t *p_m = libvlc_media_new_path(p_vlc, psz_path);
+    libvlc_media_t *p_m = libvlc_media_new_path(psz_path);
     char *psz_mrl = libvlc_media_get_mrl(p_m);
     libvlc_media_release(p_m);
     return psz_mrl;
@@ -80,7 +80,7 @@ test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
                                   libvlc_media_slave_t *p_expected_slaves,
                                   unsigned i_expected_slaves)
 {
-    libvlc_media_t *p_m = libvlc_media_new_path(p_vlc, SLAVES_DIR);
+    libvlc_media_t *p_m = libvlc_media_new_path(SLAVES_DIR);
     assert(p_m != NULL);
 
     printf("Parse media dir to get subitems\n");

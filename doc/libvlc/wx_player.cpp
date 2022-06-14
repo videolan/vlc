@@ -154,7 +154,7 @@ void MainWindow::OnOpen(wxCommandEvent& event) {
         libvlc_media_t *media;
         wxFileName filename = wxFileName::FileName(openFileDialog.GetPath());
         filename.MakeRelativeTo();
-        media = libvlc_media_new_path(vlc_inst, filename.GetFullPath().mb_str());
+        media = libvlc_media_new_path(filename.GetFullPath().mb_str());
         libvlc_media_player_set_media(media_player, media);
         play();
         libvlc_media_release(media);
