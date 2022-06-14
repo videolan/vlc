@@ -1129,7 +1129,8 @@ static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
 
 // Start an asynchronous thumbnail generation
 libvlc_media_thumbnail_request_t*
-libvlc_media_thumbnail_request_by_time( libvlc_media_t *md, libvlc_time_t time,
+libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
+                                        libvlc_media_t *md, libvlc_time_t time,
                                         libvlc_thumbnailer_seek_speed_t speed,
                                         unsigned int width, unsigned int height,
                                         bool crop, libvlc_picture_type_t picture_type,
@@ -1137,7 +1138,6 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md, libvlc_time_t time,
 {
     assert( md );
 
-    libvlc_instance_t *inst = md->p_libvlc_instance;
     libvlc_priv_t *p_priv = libvlc_priv(inst->p_libvlc_int);
     if( unlikely( p_priv->p_thumbnailer == NULL ) )
         return NULL;
@@ -1172,7 +1172,8 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md, libvlc_time_t time,
 
 // Start an asynchronous thumbnail generation
 libvlc_media_thumbnail_request_t*
-libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md, float pos,
+libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
+                                       libvlc_media_t *md, float pos,
                                        libvlc_thumbnailer_seek_speed_t speed,
                                        unsigned int width, unsigned int height,
                                        bool crop, libvlc_picture_type_t picture_type,
@@ -1180,7 +1181,6 @@ libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md, float pos,
 {
     assert( md );
 
-    libvlc_instance_t *inst = md->p_libvlc_instance;
     libvlc_priv_t *priv = libvlc_priv(inst->p_libvlc_int);
     if( unlikely( priv->p_thumbnailer == NULL ) )
         return NULL;

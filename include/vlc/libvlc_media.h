@@ -726,6 +726,7 @@ typedef enum libvlc_thumbnailer_seek_speed_t
  * - Derived from the media aspect ratio if only width or height is provided and
  *   the other one is set to 0.
  *
+ * \param inst LibVLC instance to generate the thumbnail with
  * \param md media descriptor object
  * \param time The time at which the thumbnail should be generated
  * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
@@ -745,8 +746,8 @@ typedef enum libvlc_thumbnailer_seek_speed_t
  * \see libvlc_picture_type_t
  */
 LIBVLC_API libvlc_media_thumbnail_request_t*
-libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
-                                        libvlc_time_t time,
+libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
+                                        libvlc_media_t *md, libvlc_time_t time,
                                         libvlc_thumbnailer_seek_speed_t speed,
                                         unsigned int width, unsigned int height,
                                         bool crop, libvlc_picture_type_t picture_type,
@@ -763,6 +764,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
  * - Derived from the media aspect ratio if only width or height is provided and
  *   the other one is set to 0.
  *
+ * \param inst LibVLC instance to generate the thumbnail with
  * \param md media descriptor object
  * \param pos The position at which the thumbnail should be generated
  * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
@@ -782,8 +784,8 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
  * \see libvlc_picture_type_t
  */
 LIBVLC_API libvlc_media_thumbnail_request_t*
-libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md,
-                                       float pos,
+libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
+                                       libvlc_media_t *md, float pos,
                                        libvlc_thumbnailer_seek_speed_t speed,
                                        unsigned int width, unsigned int height,
                                        bool crop, libvlc_picture_type_t picture_type,

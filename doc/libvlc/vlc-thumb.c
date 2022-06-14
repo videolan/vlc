@@ -128,7 +128,8 @@ static void callback(const libvlc_event_t *ev, void *param)
 
 #define VLC_THUMBNAIL_TIMEOUT   5 /* 5 secs */
 
-static void snapshot(libvlc_media_t *m, int width, char *out_with_ext)
+static void snapshot(libvlc_instance_t *vlc, libvlc_media_t *m,
+                     int width, char *out_with_ext)
 {
     libvlc_event_manager_t *em = libvlc_media_event_manager(m);
     assert(em);
@@ -137,7 +138,8 @@ static void snapshot(libvlc_media_t *m, int width, char *out_with_ext)
     libvlc_event_attach(em, libvlc_MediaThumbnailGenerated, callback, &pic);
     done = false;
     libvlc_media_thumbnail_request_t* req =
-            libvlc_media_thumbnail_request_by_pos(m, VLC_THUMBNAIL_POSITION,
+            libvlc_media_thumbnail_request_by_pos(vlc, m,
+                                          VLC_THUMBNAIL_POSITION,
                                           libvlc_media_thumbnail_seek_fast,
                                           width, 0, false, libvlc_picture_Png,
                                           VLC_THUMBNAIL_TIMEOUT * 1000);
@@ -191,7 +193,7 @@ int main(int argc, const char **argv)
     assert(m);
 
     /* takes snapshot */
-    snapshot(m, width, out_with_ext);
+    snapshot(libvlc, m, width, out_with_ext);
 
     /* clean up */
     if (out != out_with_ext) {
