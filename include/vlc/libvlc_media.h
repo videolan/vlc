@@ -353,13 +353,10 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_callbacks(
  *
  * \see libvlc_media_release
  *
- * \param p_instance the instance
  * \param psz_name the name of the node
  * \return the new empty media or NULL on error
  */
-LIBVLC_API libvlc_media_t *libvlc_media_new_as_node(
-                                   libvlc_instance_t *p_instance,
-                                   const char * psz_name );
+LIBVLC_API libvlc_media_t *libvlc_media_new_as_node(const char * psz_name);
 
 /**
  * Add an option to the media.

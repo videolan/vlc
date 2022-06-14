@@ -81,7 +81,7 @@ static void services_discovery_item_added( services_discovery_t *sd,
         if( p_mlist == kVLCDictionaryNotFound )
         {
             libvlc_media_t * p_catmd;
-            p_catmd = libvlc_media_new_as_node( p_mdis->p_libvlc_instance, psz_cat );
+            p_catmd = libvlc_media_new_as_node( psz_cat );
             p_mlist = libvlc_media_subitems( p_catmd );
             p_mlist->b_read_only = true;
 

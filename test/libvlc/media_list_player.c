@@ -142,7 +142,7 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
 
     // Add a node
-    libvlc_media_t *node = libvlc_media_new_as_node(vlc, "node");
+    libvlc_media_t *node = libvlc_media_new_as_node("node");
     assert(node);
     libvlc_media_list_add_media(ml, node);
     queue_expected_item(&check, node);

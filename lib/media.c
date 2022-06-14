@@ -571,8 +571,7 @@ libvlc_media_t *libvlc_media_new_callbacks(libvlc_media_open_cb open_cb,
 }
 
 // Create a media as an empty node with a given name
-libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
-                                           const char * psz_name )
+libvlc_media_t * libvlc_media_new_as_node(const char *psz_name)
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
