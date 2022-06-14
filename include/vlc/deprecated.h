@@ -34,46 +34,6 @@ extern "C" {
  */
 
 /**
- * Parse a media.
- *
- * This fetches (local) art, meta data and tracks information.
- * The method is synchronous.
- *
- * \deprecated This function could block indefinitely.
- *             Use libvlc_media_parse_with_options() instead
- *
- * \see libvlc_media_parse_with_options
- * \see libvlc_media_get_meta
- *
- * \param p_md media descriptor object
- */
-LIBVLC_DEPRECATED LIBVLC_API void
-libvlc_media_parse( libvlc_media_t *p_md );
-
-/**
- * Parse a media.
- *
- * This fetches (local) art, meta data and tracks information.
- * The method is the asynchronous of libvlc_media_parse().
- *
- * To track when this is over you can listen to libvlc_MediaParsedChanged
- * event. However if the media was already parsed you will not receive this
- * event.
- *
- * \deprecated You can't be sure to receive the libvlc_MediaParsedChanged
- *             event (you can wait indefinitely for this event).
- *             Use libvlc_media_parse_with_options() instead
- *
- * \see libvlc_media_parse
- * \see libvlc_MediaParsedChanged
- * \see libvlc_media_get_meta
- *
- * \param p_md media descriptor object
- */
-LIBVLC_DEPRECATED LIBVLC_API void
-libvlc_media_parse_async( libvlc_media_t *p_md );
-
-/**
  * Return true is the media descriptor object is parsed
  *
  * \deprecated This can return true in case of failure.

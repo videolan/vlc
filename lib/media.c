@@ -921,20 +921,6 @@ static int media_parse(libvlc_media_t *media, bool b_async,
     return VLC_SUCCESS;
 }
 
-// Parse the media and wait
-void
-libvlc_media_parse(libvlc_media_t *media)
-{
-    media_parse( media, false, libvlc_media_fetch_local, -1 );
-}
-
-// Parse the media but do not wait
-void
-libvlc_media_parse_async(libvlc_media_t *media)
-{
-    media_parse( media, true, libvlc_media_fetch_local, -1 );
-}
-
 // Parse the media asynchronously with options
 int
 libvlc_media_parse_with_options( libvlc_media_t *media,
