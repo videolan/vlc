@@ -849,7 +849,8 @@ static const input_preparser_callbacks_t input_preparser_callbacks = {
     .on_subtree_added = input_item_subtree_added,
 };
 
-int libvlc_media_parse_with_options(libvlc_media_t *media,
+int libvlc_media_parse_with_options(libvlc_instance_t *inst,
+                                    libvlc_media_t *media,
                                     libvlc_media_parse_flag_t parse_flag,
                                     int timeout)
 {
@@ -867,7 +868,7 @@ int libvlc_media_parse_with_options(libvlc_media_t *media,
 
     if (needed)
     {
-        libvlc_int_t *libvlc = media->p_libvlc_instance->p_libvlc_int;
+        libvlc_int_t *libvlc = inst->p_libvlc_int;
         input_item_t *item = media->p_input_item;
         input_item_meta_request_option_t parse_scope = META_REQUEST_OPTION_SCOPE_LOCAL;
         int ret;
@@ -910,9 +911,9 @@ int libvlc_media_parse_with_options(libvlc_media_t *media,
 
 // Stop parsing of the media
 void
-libvlc_media_parse_stop( libvlc_media_t *media )
+libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
 {
-    libvlc_MetadataCancel( media->p_libvlc_instance->p_libvlc_int, media );
+    libvlc_MetadataCancel(inst->p_libvlc_int, media);
 }
 
 // Get parsed status for media object (deprecated)

@@ -584,6 +584,7 @@ LIBVLC_API int
  * \see libvlc_media_get_parsed_status
  * \see libvlc_media_parse_flag_t
  *
+ * \param inst LibVLC instance that is to parse the media
  * \param p_md media descriptor object
  * \param parse_flag parse options:
  * \param timeout maximum time allowed to preparse the media. If -1, the
@@ -593,7 +594,7 @@ LIBVLC_API int
  * \version LibVLC 3.0.0 or later
  */
 LIBVLC_API int
-libvlc_media_parse_with_options( libvlc_media_t *p_md,
+libvlc_media_parse_with_options( libvlc_instance_t *inst, libvlc_media_t *p_md,
                                  libvlc_media_parse_flag_t parse_flag,
                                  int timeout );
 
@@ -605,11 +606,12 @@ libvlc_media_parse_with_options( libvlc_media_t *p_md,
  *
  * \see libvlc_media_parse_with_options
  *
+ * \param inst LibVLC instance that is to cease or give up parsing the media
  * \param p_md media descriptor object
  * \version LibVLC 3.0.0 or later
  */
 LIBVLC_API void
-libvlc_media_parse_stop( libvlc_media_t *p_md );
+libvlc_media_parse_stop( libvlc_instance_t *inst, libvlc_media_t *p_md );
 
 /**
  * Get Parsed status for media descriptor object.

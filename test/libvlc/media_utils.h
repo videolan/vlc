@@ -28,8 +28,8 @@ libvlc_media_parse_finished_event(const libvlc_event_t *p_ev, void *p_data)
 }
 
 static inline void
-libvlc_media_parse_sync(libvlc_media_t *p_m, libvlc_media_parse_flag_t parse_flag,
-                        int timeout)
+libvlc_media_parse_sync(libvlc_instance_t *vlc, libvlc_media_t *p_m,
+                        libvlc_media_parse_flag_t parse_flag, int timeout)
 {
     vlc_sem_t sem;
     vlc_sem_init(&sem, 0);
@@ -38,7 +38,7 @@ libvlc_media_parse_sync(libvlc_media_t *p_m, libvlc_media_parse_flag_t parse_fla
     libvlc_event_attach(p_em, libvlc_MediaParsedChanged,
                         libvlc_media_parse_finished_event, &sem);
 
-    int i_ret = libvlc_media_parse_with_options(p_m, parse_flag, timeout);
+    int i_ret = libvlc_media_parse_with_options(vlc, p_m, parse_flag, timeout);
     assert(i_ret == 0);
 
     vlc_sem_wait (&sem);

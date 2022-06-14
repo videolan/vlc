@@ -84,7 +84,7 @@ test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
     assert(p_m != NULL);
 
     printf("Parse media dir to get subitems\n");
-    libvlc_media_parse_sync(p_m, libvlc_media_parse_local, -1);
+    libvlc_media_parse_sync(p_vlc, p_m, libvlc_media_parse_local, -1);
 
     char *psz_main_media_mrl = path_to_mrl(p_vlc, psz_main_media);
     assert(psz_main_media_mrl != NULL);
