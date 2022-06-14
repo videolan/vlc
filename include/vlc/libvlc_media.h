@@ -319,7 +319,6 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_fd(int fd);
 /**
  * Create a media with custom callbacks to read the data from.
  *
- * \param instance LibVLC instance
  * \param open_cb callback to open the custom bitstream input media
  * \param read_cb callback to read data (must not be NULL)
  * \param seek_cb callback to seek, or NULL if seeking is not supported
@@ -343,7 +342,6 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_fd(int fd);
  * \version LibVLC 3.0.0 and later.
  */
 LIBVLC_API libvlc_media_t *libvlc_media_new_callbacks(
-                                   libvlc_instance_t *instance,
                                    libvlc_media_open_cb open_cb,
                                    libvlc_media_read_cb read_cb,
                                    libvlc_media_seek_cb seek_cb,

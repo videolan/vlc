@@ -551,8 +551,7 @@ libvlc_media_t *libvlc_media_new_fd(int fd)
 }
 
 // Create a media with custom callbacks to read the data from
-libvlc_media_t *libvlc_media_new_callbacks(libvlc_instance_t *p_instance,
-                                           libvlc_media_open_cb open_cb,
+libvlc_media_t *libvlc_media_new_callbacks(libvlc_media_open_cb open_cb,
                                            libvlc_media_read_cb read_cb,
                                            libvlc_media_seek_cb seek_cb,
                                            libvlc_media_close_cb close_cb,
