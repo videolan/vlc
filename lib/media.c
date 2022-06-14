@@ -373,13 +373,7 @@ static void send_parsed_changed( libvlc_media_t *p_md,
         return;
     }
 
-    /* Legacy: notify libvlc_media_parse */
-    if( !p_md->is_parsed )
-    {
-        p_md->is_parsed = true;
-        vlc_cond_broadcast( &p_md->parsed_cond );
-    }
-
+    p_md->is_parsed = true;
     p_md->parsed_status = new_status;
     if( p_md->parsed_status != libvlc_media_parsed_status_done )
         p_md->has_asked_preparse = false;
@@ -508,7 +502,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     p_md->p_input_item      = p_input_item;
     vlc_atomic_rc_init(&p_md->rc);
 
-    vlc_cond_init(&p_md->parsed_cond);
     vlc_mutex_init(&p_md->parsed_lock);
     vlc_mutex_init(&p_md->subitems_lock);
     atomic_init(&p_md->worker_count, 0);
