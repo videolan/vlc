@@ -23,8 +23,7 @@
 
 #define SLAVES_DIR SRCDIR "/samples/slaves"
 
-static char *
-path_to_mrl(libvlc_instance_t *p_vlc, const char *psz_path)
+static char *path_to_mrl(const char *psz_path)
 {
     libvlc_media_t *p_m = libvlc_media_new_path(psz_path);
     char *psz_mrl = libvlc_media_get_mrl(p_m);
@@ -86,7 +85,7 @@ test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
     printf("Parse media dir to get subitems\n");
     libvlc_media_parse_sync(p_vlc, p_m, libvlc_media_parse_local, -1);
 
-    char *psz_main_media_mrl = path_to_mrl(p_vlc, psz_main_media);
+    char *psz_main_media_mrl = path_to_mrl(psz_main_media);
     assert(psz_main_media_mrl != NULL);
     printf("Main media mrl: '%s'\n", psz_main_media_mrl);
 
@@ -159,7 +158,7 @@ main (void)
     /* Fill p_expected_slaves with correct VLC mrls */
     for (unsigned int i = 0; i < ARRAY_SIZE(p_expected_slaves); ++i)
     {
-        p_expected_slaves[i].psz_uri = path_to_mrl(p_vlc, pp_slave_paths[i]);
+        p_expected_slaves[i].psz_uri = path_to_mrl(pp_slave_paths[i]);
         assert(p_expected_slaves[i].psz_uri != NULL);
     }
 
