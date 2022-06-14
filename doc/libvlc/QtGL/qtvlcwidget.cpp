@@ -194,7 +194,7 @@ QtVLCWidget::QtVLCWidget(QWidget *parent)
 
 bool QtVLCWidget::playMedia(const char* url)
 {
-    m_media = libvlc_media_new_location (m_vlc, url);
+    m_media = libvlc_media_new_location(url);
     if (m_media == nullptr) {
         fprintf(stderr, "unable to create media %s", url);
         return false;

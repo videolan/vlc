@@ -121,7 +121,7 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_location (vlc, file);
+    md = libvlc_media_new_location(file);
     assert(md);
 
     ml = libvlc_media_list_new (vlc);
@@ -186,7 +186,7 @@ static void test_media_list_player_previous(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_location (vlc, file);
+    md = libvlc_media_new_location(file);
     assert(md);
 
     ml = libvlc_media_list_new (vlc);
@@ -245,7 +245,7 @@ static void test_media_list_player_next(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_location (vlc, file);
+    md = libvlc_media_new_location(file);
     assert(md);
 
     ml = libvlc_media_list_new (vlc);
@@ -304,7 +304,7 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_location (vlc, file);
+    md = libvlc_media_new_location(file);
     assert(md);
 
     ml = libvlc_media_list_new (vlc);
@@ -344,7 +344,7 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_location (vlc, file);
+    md = libvlc_media_new_location(file);
     assert(md);
 
     ml = libvlc_media_list_new (vlc);
@@ -403,19 +403,19 @@ static void test_media_list_player_playback_options (const char** argv, int argc
      *  ml5&6:            0                 0 -- 1
      */
 
-    md = libvlc_media_new_location (vlc, file);
+    md = libvlc_media_new_location(file);
     assert(md);
 
-    md2 = libvlc_media_new_location (vlc, file);
+    md2 = libvlc_media_new_location(file);
     assert(md2);
 
-    md3 = libvlc_media_new_location (vlc, file);
+    md3 = libvlc_media_new_location(file);
     assert(md3);
 
-    md4 = libvlc_media_new_location (vlc, file);
+    md4 = libvlc_media_new_location(file);
     assert(md4);
 
-    md5 = libvlc_media_new_location (vlc, file);
+    md5 = libvlc_media_new_location(file);
     assert(md5);
 
     ml = libvlc_media_list_new (vlc);

@@ -115,7 +115,7 @@ static void test_media_preparsed(libvlc_instance_t *vlc, const char *path,
     if (path != NULL)
         media = libvlc_media_new_path (vlc, path);
     else
-        media = libvlc_media_new_location (vlc, location);
+        media = libvlc_media_new_location(location);
     assert (media != NULL);
 
     vlc_sem_t sem;
@@ -324,7 +324,7 @@ static void test_media_subitems(libvlc_instance_t *vlc)
         char *location;
         assert (asprintf (&location, "%s%s", schemes[i], subitems_realpath) != -1);
         test_log ("Testing media_subitems: location: '%s'\n", location);
-        media = libvlc_media_new_location (vlc, location);
+        media = libvlc_media_new_location(location);
         assert (media != NULL);
         test_media_subitems_media(vlc, media, false, true);
         free (location);
@@ -347,7 +347,7 @@ static void test_media_subitems(libvlc_instance_t *vlc)
 #endif
 
     test_log ("Testing media_subitems failure\n");
-    media = libvlc_media_new_location (vlc, "wrongfile://test");
+    media = libvlc_media_new_location("wrongfile://test");
     assert (media != NULL);
     test_media_subitems_media(vlc, media, false, false);
     libvlc_media_release (media);

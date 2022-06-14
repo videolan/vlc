@@ -82,7 +82,7 @@
 
     NSArray *args = [[NSProcessInfo processInfo] arguments];
     NSString *location = [args objectAtIndex:1];
-    media = libvlc_media_new_location(instance, [location UTF8String]);
+    media = libvlc_media_new_location([location UTF8String]);
     libvlc_media_player_set_media(player, media);
 
     libvlc_media_player_set_nsobject(player, (__bridge void*)_view);

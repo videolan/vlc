@@ -67,7 +67,7 @@ public:
 
     bool playMedia(const char* url)
     {
-        m_media = libvlc_media_new_location (m_vlc, url);
+        m_media = libvlc_media_new_location(url);
         if (m_media == NULL) {
             fprintf(stderr, "unable to create media %s", url);
             return false;

@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
     inst = libvlc_new (0, NULL);
 
     /* Create a new item */
-    m = libvlc_media_new_location (inst, "http://mycool.movie.com/test.mov");
-    //m = libvlc_media_new_path (inst, "/path/to/test.mov");
+    m = libvlc_media_new_location("http://mycool.movie.com/test.mov");
+    //m = libvlc_media_new_path("/path/to/test.mov");
 
     /* Create a media player playing environement */
     mp = libvlc_media_player_new_from_media (inst, m);

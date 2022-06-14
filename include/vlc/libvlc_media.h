@@ -276,13 +276,10 @@ typedef void (*libvlc_media_close_cb)(void *opaque);
  *
  * \see libvlc_media_release
  *
- * \param p_instance the instance
  * \param psz_mrl the media location
  * \return the newly created media or NULL on error
  */
-LIBVLC_API libvlc_media_t *libvlc_media_new_location(
-                                   libvlc_instance_t *p_instance,
-                                   const char * psz_mrl );
+LIBVLC_API libvlc_media_t *libvlc_media_new_location(const char * psz_mrl);
 
 /**
  * Create a media for a certain file path.

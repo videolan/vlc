@@ -45,7 +45,7 @@ void on_open(GtkWidget *widget, gpointer data) {
 
 void open_media(const char* uri) {
     libvlc_media_t *media;
-    media = libvlc_media_new_location(vlc_inst, uri);
+    media = libvlc_media_new_location(uri);
     libvlc_media_player_set_media(media_player, media);
     play();
     libvlc_media_release(media);

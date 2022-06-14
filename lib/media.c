@@ -505,8 +505,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
 }
 
 // Create a media with a certain given media resource location
-libvlc_media_t *libvlc_media_new_location( libvlc_instance_t *p_instance,
-                                           const char * psz_mrl )
+libvlc_media_t *libvlc_media_new_location(const char * psz_mrl)
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
@@ -538,7 +537,7 @@ libvlc_media_t *libvlc_media_new_path( libvlc_instance_t *p_instance,
         return NULL;
     }
 
-    libvlc_media_t *m = libvlc_media_new_location( p_instance, mrl );
+    libvlc_media_t *m = libvlc_media_new_location(mrl);
     free( mrl );
     return m;
 }
@@ -549,7 +548,7 @@ libvlc_media_t *libvlc_media_new_fd( libvlc_instance_t *p_instance, int fd )
     char mrl[16];
     snprintf( mrl, sizeof(mrl), "fd://%d", fd );
 
-    return libvlc_media_new_location( p_instance, mrl );
+    return libvlc_media_new_location(mrl);
 }
 
 // Create a media with custom callbacks to read the data from
@@ -560,7 +559,7 @@ libvlc_media_t *libvlc_media_new_callbacks(libvlc_instance_t *p_instance,
                                            libvlc_media_close_cb close_cb,
                                            void *opaque)
 {
-    libvlc_media_t *m = libvlc_media_new_location(p_instance, "imem://");
+    libvlc_media_t *m = libvlc_media_new_location("imem://");
     if (unlikely(m == NULL))
         return NULL;
 
