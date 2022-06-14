@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     //m = libvlc_media_new_path (inst, "/path/to/test.mov");
 
     /* Create a media player playing environement */
-    mp = libvlc_media_player_new_from_media (m);
+    mp = libvlc_media_player_new_from_media (inst, m);
 
     /* No need to keep the media now */
     libvlc_media_release (m);

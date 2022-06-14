@@ -167,12 +167,13 @@ LIBVLC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *p
 /**
  * Create a Media Player object from a Media
  *
+ * \param inst LibVLC instance to create a media player with
  * \param p_md the media. Afterwards the p_md can be safely
  *        destroyed.
  * \return a new media player object, or NULL on error.
  * It must be released by libvlc_media_player_release().
  */
-LIBVLC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvlc_media_t *p_md );
+LIBVLC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvlc_instance_t *inst, libvlc_media_t *p_md );
 
 /**
  * Release a media_player after use

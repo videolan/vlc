@@ -199,7 +199,7 @@ bool QtVLCWidget::playMedia(const char* url)
         fprintf(stderr, "unable to create media %s", url);
         return false;
     }
-    m_mp = libvlc_media_player_new_from_media (m_media);
+    m_mp = libvlc_media_player_new_from_media (m_vlc, m_media);
     if (m_mp == nullptr) {
         fprintf(stderr, "unable to create media player");
         libvlc_media_release(m_media);

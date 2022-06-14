@@ -199,7 +199,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
     md = libvlc_media_new_location (vlc, file);
     assert (md != NULL);
 
-    mi = libvlc_media_player_new_from_media (md);
+    mi = libvlc_media_player_new_from_media (vlc, md);
     assert (mi != NULL);
 
     libvlc_media_release (md);
@@ -226,7 +226,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     md = libvlc_media_new_location (vlc, file);
     assert (md != NULL);
 
-    mi = libvlc_media_player_new_from_media (md);
+    mi = libvlc_media_player_new_from_media (vlc, md);
     assert (mi != NULL);
 
     libvlc_media_release (md);

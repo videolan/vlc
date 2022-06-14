@@ -769,11 +769,12 @@ error1:
  * Create a Media Instance object with a media descriptor.
  **************************************************************************/
 libvlc_media_player_t *
-libvlc_media_player_new_from_media( libvlc_media_t * p_md )
+libvlc_media_player_new_from_media( libvlc_instance_t *inst,
+                                    libvlc_media_t * p_md )
 {
     libvlc_media_player_t * p_mi;
 
-    p_mi = libvlc_media_player_new( p_md->p_libvlc_instance );
+    p_mi = libvlc_media_player_new( inst );
     if( !p_mi )
         return NULL;
 

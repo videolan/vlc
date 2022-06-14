@@ -278,7 +278,7 @@ static void test_media_subitems_media(libvlc_instance_t *vlc,
          * file to force parsing. */
         libvlc_event_attach (em, libvlc_MediaSubItemTreeAdded, subitem_parse_ended, &sem);
 
-        libvlc_media_player_t *mp = libvlc_media_player_new_from_media (media);
+        libvlc_media_player_t *mp = libvlc_media_player_new_from_media(vlc, media);
         assert (mp);
         assert (libvlc_media_player_play (mp) != -1);
         vlc_sem_wait (&sem);
