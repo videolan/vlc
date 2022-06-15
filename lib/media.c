@@ -374,9 +374,6 @@ static void send_parsed_changed( libvlc_media_t *p_md,
     }
 
     p_md->parsed_status = new_status;
-    if( p_md->parsed_status != libvlc_media_parsed_status_done )
-        p_md->has_asked_preparse = false;
-
     vlc_mutex_unlock( &p_md->parsed_lock );
 
     /* Construct the event */
@@ -853,8 +850,8 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
     bool needed;
 
     vlc_mutex_lock(&media->parsed_lock);
-    needed = !media->has_asked_preparse;
-    media->has_asked_preparse = true;
+    needed = media->parsed_status != libvlc_media_parsed_status_pending
+          && media->parsed_status != libvlc_media_parsed_status_done;
     if (needed)
         media->parsed_status = libvlc_media_parsed_status_pending;
     vlc_mutex_unlock(&media->parsed_lock);
