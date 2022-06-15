@@ -52,7 +52,6 @@ struct libvlc_media_t
     atomic_uint worker_count;
 
     libvlc_media_parsed_status_t parsed_status;
-    bool is_parsed;
     bool has_asked_preparse;
 };
 
