@@ -26,7 +26,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Widgets.GridItem {
-    id: item
+    id: root
 
     width: VLCStyle.gridItem_network_width
     height: VLCStyle.gridItem_network_height
@@ -48,6 +48,7 @@ Widgets.GridItem {
     pictureOverlay: NetworkCustomCover {
         networkModel: model
         iconSize: VLCStyle.icon_normal
+        visible: !root.isImageReady
     }
 
 }
