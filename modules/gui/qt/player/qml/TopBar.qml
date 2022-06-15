@@ -42,6 +42,8 @@ FocusScope{
     property int groupAlignment: TopBar.GroupAlignment.Vertical
     property Item _currentTitleText: null
 
+    property alias reservedHeight: rightColumn.height
+
     signal togglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock, var source)
 
