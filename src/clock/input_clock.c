@@ -143,6 +143,7 @@ struct input_clock_t
     vlc_tick_t i_offset;
 
     atomic_bool b_recovery;
+    atomic_bool b_enable_avstat;
 };
 
 static vlc_tick_t ClockStreamToSystem( input_clock_t *, vlc_tick_t i_stream );
@@ -158,6 +159,7 @@ static void UpdateListener( input_clock_t *cl, bool discontinuity )
             ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
             cl->i_pts_delay + ClockGetTsOffset( cl );
 
+        if (atomic_load(&cl->b_enable_avstat))
         vlc_debug(cl->logger, "avstats: [INPUT][CLOCK][UPDATEINPUT] ts=%" PRId64
                  " ck_system=%" PRId64 " ck_stream=%" PRId64,
                  vlc_tick_now(), system_expected, cl->last.stream);
@@ -185,6 +187,7 @@ input_clock_t *input_clock_New( struct vlc_logger *logger,
 
     // TODO: this should be init from constructor
     atomic_init(&cl->b_recovery, recovery);
+    atomic_init(&cl->b_enable_avstat, false);
 
     cl->last = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
 
@@ -218,6 +221,11 @@ void input_clock_Delete( input_clock_t *cl )
     free( cl );
 }
 
+void input_clock_EnableAvstat( input_clock_t *cl, bool enable)
+{
+    atomic_store( &cl->b_enable_avstat, enable );
+}
+
 void input_clock_AttachListener( input_clock_t *cl, vlc_clock_t *clock_listener )
 {
     assert( clock_listener && cl->clock_listener == NULL );
@@ -242,6 +250,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl,
 
     assert( i_ck_stream != VLC_TICK_INVALID && i_ck_system != VLC_TICK_INVALID );
 
+    if (atomic_load(&cl->b_enable_avstat))
     vlc_debug( cl->logger, "avstats: [INPUT][CLOCK][UPDATE] ts=%" PRId64
                " ck_system=%" PRId64 " ck_stream=%" PRId64,
               vlc_tick_now(), i_ck_system, i_ck_stream );
@@ -321,7 +330,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl,
         if( cl->i_buffering_duration > CR_BUFFERING_TARGET )
             cl->i_buffering_duration = CR_BUFFERING_TARGET;
     }
-
+    if (atomic_load(&cl->b_enable_avstat))
     vlc_debug( cl->logger, "avstats: [INPUT][CLOCK][BUFFERING_DURATION] ts=%" PRId64 " buffering_duration=%" PRId64,
              vlc_tick_now(), NS_FROM_VLC_TICK(cl->i_buffering_duration));
 
@@ -503,7 +512,7 @@ void input_clock_SetJitter( input_clock_t *cl,
 
     if( cl->drift.range != i_cr_average )
         AvgRescale( &cl->drift, i_cr_average );
-
+    if (atomic_load(&cl->b_enable_avstat))
     vlc_debug( cl->logger, "avstats: [INPUT][CLOCK][JITTER] ts=%" PRId64 " drift=%" PRId64 " cr_average=%d jitter=%" PRId64,
              vlc_tick_now(), NS_FROM_VLC_TICK(cl->i_buffering_duration), i_cr_average,
              NS_FROM_VLC_TICK(input_clock_GetJitter(cl)));
