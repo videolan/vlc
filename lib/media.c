@@ -647,9 +647,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     uninstall_input_item_observer( p_md );
 
-    /* Cancel asynchronous parsing (if any) */
-    libvlc_MetadataCancel( p_md->p_libvlc_instance->p_libvlc_int, p_md );
-
     /* Wait for all async tasks to stop. */
     while ((ref = atomic_load_explicit(&p_md->worker_count,
                                        memory_order_acquire)) > 0)
