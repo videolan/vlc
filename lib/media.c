@@ -855,7 +855,7 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
     needed = !media->has_asked_preparse;
     media->has_asked_preparse = true;
     if (needed)
-        media->parsed_status = 0;
+        media->parsed_status = libvlc_media_parsed_status_pending;
     vlc_mutex_unlock(&media->parsed_lock);
 
     if (!needed)

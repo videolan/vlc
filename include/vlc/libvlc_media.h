@@ -174,7 +174,8 @@ typedef enum libvlc_media_parse_flag_t
  */
 typedef enum libvlc_media_parsed_status_t
 {
-    libvlc_media_parsed_status_skipped = 1,
+    libvlc_media_parsed_status_pending,
+    libvlc_media_parsed_status_skipped,
     libvlc_media_parsed_status_failed,
     libvlc_media_parsed_status_timeout,
     libvlc_media_parsed_status_done,
