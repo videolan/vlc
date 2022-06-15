@@ -93,6 +93,8 @@ T.Pane {
 
             property real _clamp: 0.01
 
+            property bool _keyPressed: false
+
             from: 0
             to: maxvolpos
             opacity: _player.muted ? 0.5 : 1
@@ -102,12 +104,19 @@ T.Pane {
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event)) {
                     event.accepted = true
+
+                    _keyPressed = true
                 } else {
                     Navigation.defaultKeyAction(event)
                 }
             }
 
             Keys.onReleased: {
+                if (_keyPressed === false)
+                    return
+
+                _keyPressed = false
+
                 if (KeyHelper.matchOk(event)) {
                     Player.muted = !Player.muted
                 }

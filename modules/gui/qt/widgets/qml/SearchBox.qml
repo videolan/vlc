@@ -102,6 +102,8 @@ FocusScope {
         TextField {
             id: textField
 
+            property bool _keyPressed: false
+
             anchors.top: parent.top
             anchors.bottom: parent.bottom
 
@@ -140,17 +142,27 @@ FocusScope {
             }
 
             Keys.priority: Keys.AfterItem
+
             Keys.onPressed: {
+                _keyPressed = true
+
                 //we don't want Navigation.cancelAction to match Backspace
                 if (event.matches(StandardKey.Backspace))
                     event.accepted = true
+
                 Navigation.defaultKeyAction(event)
             }
 
             Keys.onReleased: {
+                if (_keyPressed === false)
+                    return
+
+                _keyPressed = false
+
                 //we don't want Navigation.cancelAction to match Backspace
                 if (event.matches(StandardKey.Backspace))
                     event.accepted = true
+
                 Navigation.defaultKeyReleaseAction(event)
             }
 

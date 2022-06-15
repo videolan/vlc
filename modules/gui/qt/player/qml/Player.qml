@@ -56,6 +56,8 @@ FocusScope {
     readonly property VLCColors colors: (MainCtx.hasEmbededVideo) ? VLCStyle.nightColors
                                                                   : VLCStyle.colors
 
+    property bool _keyPressed: false
+
     // Events
 
     Component.onCompleted: MainCtx.preferHotkeys = true
@@ -65,6 +67,9 @@ FocusScope {
     Keys.onPressed: {
         if (event.accepted)
             return
+
+        _keyPressed = true
+
         rootPlayer.Navigation.defaultKeyAction(event)
 
         //unhandled keys are forwarded as hotkeys
@@ -73,8 +78,11 @@ FocusScope {
     }
 
     Keys.onReleased: {
-        if (event.accepted)
+        if (event.accepted || _keyPressed === false)
             return
+
+        _keyPressed = false
+
         if (event.key === Qt.Key_Menu) {
             toolbarAutoHide.toggleForceVisible()
         } else {

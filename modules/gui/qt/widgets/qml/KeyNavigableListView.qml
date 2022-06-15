@@ -92,6 +92,10 @@ ListView {
         }
     }
 
+    // Private
+
+    property bool _keyPressed: false
+
     // Aliases
 
     //forward view properties
@@ -227,9 +231,11 @@ ListView {
             }
         }
 
-        if (KeyHelper.matchOk(event) || event.matches(StandardKey.SelectAll) ) {
-            //these events are matched on release
+        // these events are matched on release
+        if (event.matches(StandardKey.SelectAll) || KeyHelper.matchOk(event)) {
             event.accepted = true
+
+            _keyPressed = true
         }
 
         var oldIndex = currentIndex
@@ -256,10 +262,15 @@ ListView {
     }
 
     Keys.onReleased: {
+        if (_keyPressed === false)
+            return
+
+        _keyPressed = false
+
         if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
             selectAll()
-        } else if ( KeyHelper.matchOk(event) ) { //enter/return/space
+        } else if (KeyHelper.matchOk(event)) { //enter/return/space
             event.accepted = true
             actionAtIndex(currentIndex)
         }

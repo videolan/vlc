@@ -31,6 +31,10 @@ import "qrc:///widgets/" as Widgets
 T.MenuItem {
     id: control
 
+    property Item parentMenu: null
+
+    property bool _keyPressed: false
+
     //implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
     //                        implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: contentId.implicitHeight + topPadding + bottomPadding
@@ -45,8 +49,6 @@ T.MenuItem {
     font.pixelSize: VLCStyle.fontSize_normal
 
     leftPadding: VLCStyle.applicationHorizontalMargin
-
-    property Item parentMenu: null
 
     //workaround QTBUG-7018 for Qt < 5.12.2
     activeFocusOnTab: control.enabled
@@ -128,9 +130,17 @@ T.MenuItem {
         event.accepted = false
     }
 
+    Keys.onPressed: _keyPressed = true
+
     Keys.onReleased: {
+        if (_keyPressed === false)
+            return
+
+        _keyPressed = false
+
         if (KeyHelper.matchCancel(event)) {
             event.accepted = true
+
             parentMenu.dismiss()
         }
     }

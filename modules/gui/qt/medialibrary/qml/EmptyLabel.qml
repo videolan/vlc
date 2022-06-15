@@ -32,6 +32,8 @@ FocusScope {
     property alias coverWidth: coverContainer.width
     property alias coverHeight: coverContainer.height
 
+    property bool _keyPressed: false
+
     Column {
         anchors.verticalCenter: parent.verticalCenter
         width: root.width
@@ -86,11 +88,23 @@ FocusScope {
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+
+    Keys.onPressed: {
+        _keyPressed = true
+
+        Navigation.defaultKeyAction(event)
+    }
+
     Keys.onReleased: {
+        if (_keyPressed === false)
+            return
+
+        _keyPressed = false
+
         if (KeyHelper.matchOk(event)) {
             History.push(["mc", "network"])
         }
+
         Navigation.defaultKeyReleaseAction(event)
     }
 }

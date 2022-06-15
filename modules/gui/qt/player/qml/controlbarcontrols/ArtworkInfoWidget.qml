@@ -36,19 +36,30 @@ AbstractButton {
 
     readonly property real minimumWidth: cover.width + (leftPadding + rightPadding)
 
+    property bool _keyPressed: false
+
     padding: VLCStyle.focus_border
 
     Keys.onPressed: {
-        if (KeyHelper.matchOk(event))
+        if (KeyHelper.matchOk(event)) {
             event.accepted = true
 
-        Navigation.defaultKeyAction(event)
+            _keyPressed = true
+        } else {
+            Navigation.defaultKeyAction(event)
+        }
     }
 
     Keys.onReleased: {
+        if (_keyPressed === false)
+            return
+
+        _keyPressed = false
+
         if (KeyHelper.matchOk(event)) {
-            g_mainDisplay.showPlayer()
             event.accepted = true
+
+            g_mainDisplay.showPlayer()
         }
     }
 

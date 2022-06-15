@@ -62,6 +62,10 @@ FocusScope {
     GridView {
         id: view
 
+        property int _colCount: Math.floor(width / cellWidth)
+
+        property bool _keyPressed: false
+
         anchors.fill: parent
 
         clip: true
@@ -71,8 +75,6 @@ FocusScope {
 
         //key navigation is reimplemented for item selection
         keyNavigationEnabled: false
-
-        property int _colCount: Math.floor(width / cellWidth)
 
         Util.FlickableScrollHandler { }
 
@@ -101,6 +103,8 @@ FocusScope {
             } else if (KeyHelper.matchOk(event) || event.matches(StandardKey.SelectAll) ) {
                 //these events are matched on release
                 event.accepted = true
+
+                _keyPressed = true
             }
 
             if (newIndex >= 0 && newIndex < modelCount && newIndex != currentIndex) {
@@ -115,6 +119,11 @@ FocusScope {
         }
 
         Keys.onReleased: {
+            if (_keyPressed === false)
+                return
+
+            _keyPressed = false
+
             if (event.matches(StandardKey.SelectAll)) {
                 event.accepted = true
                 selectAll()

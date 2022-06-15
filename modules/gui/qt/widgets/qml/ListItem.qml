@@ -135,6 +135,9 @@ FocusScope {
                     }
                     FocusScope {
                         id: presentation
+
+                        property bool _keyPressed: false
+
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         focus: true
@@ -176,7 +179,14 @@ FocusScope {
                             root.Navigation.defaultNavigationLeft()
                         }
 
+                        Keys.onPressed: _keyPressed = true
+
                         Keys.onReleased: {
+                            if (_keyPressed === false)
+                                return
+
+                            _keyPressed = false
+
                             if (KeyHelper.matchOk(event)) {
                                 itemDoubleClicked(event.key, event.modifiers)
                             }
