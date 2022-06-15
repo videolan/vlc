@@ -81,8 +81,7 @@ static demux_index_entry_t *index_entry_new( void )
 {
     demux_index_entry_t *idx = xmalloc( sizeof( demux_index_entry_t ) );
     if ( !idx ) return NULL;
-    idx->p_next = idx->p_prev = NULL;
-    idx->i_pagepos_end = -1;
+    idx->p_next = NULL;
     return idx;
 }
 
@@ -125,17 +124,11 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
     {
         idx->p_next = last_idx->p_next;
         last_idx->p_next = idx;
-        idx->p_prev = last_idx;
     }
     else
     {
         idx->p_next = p_stream->idx;
         p_stream->idx = idx;
-    }
-
-    if ( idx->p_next != NULL )
-    {
-        idx->p_next->p_prev = idx;
     }
 
     idx->i_value = i_timestamp;
