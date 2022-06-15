@@ -60,6 +60,8 @@ void input_clock_AttachListener( input_clock_t *, vlc_clock_t *clock_listener );
  */
 void           input_clock_Delete( input_clock_t * );
 
+void input_clock_EnableAvstat( input_clock_t *, bool );
+
 /**
  * This function will update a input_clock_t with a new clock reference point.
  * It will also tell if the clock point is late regarding our buffering.
