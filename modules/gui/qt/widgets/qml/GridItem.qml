@@ -52,6 +52,7 @@ T.Control {
     // Aliases
 
     property alias image: picture.source
+    property alias isImageReady: picture.isImageReady
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
     property alias playCoverBorderWidth: picture.playCoverBorderWidth

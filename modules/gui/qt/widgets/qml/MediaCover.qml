@@ -40,6 +40,7 @@ Rectangle {
     // Aliases
 
     property alias source: image.source
+    property bool isImageReady: image.status == RoundImage.Ready
 
     property alias imageOverlay: overlay.sourceComponent
 
