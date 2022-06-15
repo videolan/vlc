@@ -782,6 +782,21 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
     OggDebug( msg_Dbg(p_demux, "Bisecting for time=%"PRId64" between %"PRId64" and %"PRId64,
             i_targettime, i_pos_lower, i_pos_upper ) );
 
+    /* Check lowest possible bound that will never be checked in bisection */
+    current.i_pos = find_first_page_granule( p_demux,
+                                             i_pos_lower,
+                                             __MIN(i_start_pos + PAGE_HEADER_BYTES, i_end_pos),
+                                             p_stream,
+                                             &current.i_granule );
+    if( current.i_granule != -1 )
+    {
+        current.i_timestamp = Oggseek_GranuleToAbsTimestamp( p_stream, current.i_granule, false );
+        if( current.i_timestamp <= i_targettime )
+            bestlower = current;
+        else
+            lowestupper = current;
+    }
+
     do
     {
         /* see if the frame lies in current segment */
@@ -850,7 +865,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
         i_segsize = ( i_end_pos - i_start_pos + 1 ) >> 1;
         i_start_pos += i_segsize;
 
-    } while ( i_segsize > 64 );
+    } while ( i_segsize > PAGE_HEADER_BYTES );
 
     if ( bestlower.i_granule == -1 )
     {
