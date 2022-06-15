@@ -42,11 +42,13 @@ Item {
                                            && (rowModel.type !== NetworkMediaModel.TYPE_NODE)
                                            && (rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
 
+    readonly property bool _showCustomCover: (!artworkSource) || (artwork.status != Image.Ready)
+
     signal playClicked(int index)
 
     Widgets.ListCoverShadow {
-        anchors.fill: artwork.visible ? artwork : background
-        source: artwork.visible ? artwork : background
+        anchors.fill: !item._showCustomCover ? artwork : background
+        source: !item._showCustomCover ? artwork : background
     }
 
     Rectangle {
@@ -57,7 +59,7 @@ Item {
         width: VLCStyle.listAlbumCover_width
         height: VLCStyle.listAlbumCover_height
         radius: VLCStyle.listAlbumCover_radius
-        visible: !artwork.visible
+        visible: item._showCustomCover
 
         NetworkCustomCover {
             networkModel: rowModel
@@ -87,7 +89,7 @@ Item {
         horizontalAlignment: Image.AlignLeft
         verticalAlignment: Image.AlignTop
         source: item.artworkSource
-        visible: item.artworkSource !== ""
+        visible: !item._showCustomCover
 
         Widgets.PlayCover {
             x: Math.round((artwork.paintedWidth - width) / 2)
