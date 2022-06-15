@@ -509,6 +509,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
      * It can give a bunch of item to read. */
     p_md->p_subitems        = NULL;
     p_md->p_input_item->libvlc_owner = p_md;
+    p_md->parsed_status = libvlc_media_parsed_status_none;
 
     libvlc_event_manager_init( &p_md->event_manager, p_md );
 
