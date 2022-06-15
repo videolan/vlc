@@ -40,7 +40,19 @@ class RoundImage : public QQuickItem
 
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged FINAL)
 
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged FINAL)
+
 public:
+    enum Status
+    {
+        Null,
+        Ready,
+        Loading,
+        Error
+    };
+
+    Q_ENUM(Status)
+
     RoundImage(QQuickItem *parent = nullptr);
     ~RoundImage();
 
@@ -48,6 +60,7 @@ public:
 
     QUrl source() const;
     qreal radius() const;
+    Status status() const;
 
 public slots:
     void setSource(const QUrl& source);
@@ -56,6 +69,7 @@ public slots:
 signals:
     void sourceChanged(const QUrl&);
     void radiusChanged(qreal);
+    void statusChanged();
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
@@ -67,11 +81,13 @@ private:
     void resetImageRequest();
     void load();
     void setRoundImage(QImage image);
+    void setStatus(const Status status);
     void regenerateRoundImage();
 
     QUrl m_source;
     qreal m_radius = 0.0;
     qreal m_dpr = 1.0; // device pixel ratio
+    Status m_status = Status::Null;
 
     QImage m_roundImage;
     bool m_dirty = false;

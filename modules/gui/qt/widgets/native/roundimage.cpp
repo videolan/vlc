@@ -493,6 +493,11 @@ qreal RoundImage::radius() const
     return m_radius;
 }
 
+RoundImage::Status RoundImage::status() const
+{
+    return m_status;
+}
+
 void RoundImage::setSource(const QUrl& source)
 {
     if (m_source == source)
@@ -544,12 +549,14 @@ void RoundImage::handleImageRequestFinished()
 
     if (image.isNull())
     {
+        setStatus(Status::Error);
         qDebug() << "failed to get image, error" << error << source();
         return;
     }
 
     image.setDevicePixelRatio(m_dpr);
     setRoundImage(image);
+    setStatus(Status::Ready);
 
     const qreal scaledWidth = this->width() * m_dpr;
     const qreal scaledHeight = this->height() * m_dpr;
@@ -585,6 +592,7 @@ void RoundImage::load()
     if (auto image = imageCache.object(key)) // should only by called in mainthread
     {
         setRoundImage(*image);
+        setStatus(Status::Ready);
         return;
     }
 
@@ -606,10 +614,21 @@ void RoundImage::setRoundImage(QImage image)
     update();
 }
 
+void RoundImage::setStatus(const RoundImage::Status status)
+{
+    if (status == m_status)
+        return;
+
+    m_status = status;
+    emit statusChanged();
+}
+
 void RoundImage::regenerateRoundImage()
 {
     if (!isComponentComplete() || m_enqueuedGeneration)
         return;
+
+    setStatus(source().isEmpty() ? Status::Null : Status::Loading);
 
     // remove old contents
     setRoundImage({});
