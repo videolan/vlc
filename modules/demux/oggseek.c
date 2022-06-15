@@ -752,7 +752,7 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
 
 /* returns pos */
 static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stream,
-            int64_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper)
+            int64_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper, int64_t *pi_seek_time)
 {
     int64_t i_start_pos;
     int64_t i_end_pos;
@@ -866,6 +866,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
                 __MAX ( bestlower.i_pos - OGGSEEK_BYTES_TO_READ, p_stream->i_data_start ),
                 bestlower.i_pos,
                 p_stream, bestlower.i_granule /* unused */ );
+        *pi_seek_time = bestlower.i_timestamp;
         return a;
     }
     /* If not each packet is usable as keyframe, query the codec for keyframe */
@@ -884,9 +885,11 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
         int64_t a = OggBackwardSeekToFrame( p_demux,
             __MAX ( bestlower.i_pos - OGGSEEK_BYTES_TO_READ, p_stream->i_data_start ),
             stream_Size( p_demux->s ), p_stream, i_keyframegranule );
+       *pi_seek_time = Oggseek_GranuleToAbsTimestamp(p_stream, i_keyframegranule, false);
         return a;
     }
 
+    *pi_seek_time = bestlower.i_timestamp;
     return bestlower.i_pos;
 }
 
@@ -926,8 +929,10 @@ int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_strea
     /* or search */
     if ( !b_found && b_fastseek )
     {
+        int64_t i_sync_time;
         i_lowerpos = OggBisectSearchByTime( p_demux, p_stream, i_time,
-                                            p_stream->i_data_start, p_sys->i_total_length );
+                                            p_stream->i_data_start, p_sys->i_total_length,
+                                            &i_sync_time );
         b_found = ( i_lowerpos != -1 );
     }
 
@@ -1018,8 +1023,9 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     i_offset_lower = __MAX( i_offset_lower, p_stream->i_data_start );
     i_offset_upper = __MIN( i_offset_upper, p_sys->i_total_length );
 
+    int64_t i_sync_time;
     int64_t i_pagepos = OggBisectSearchByTime( p_demux, p_stream, i_time,
-                                       i_offset_lower, i_offset_upper);
+                                       i_offset_lower, i_offset_upper, &i_sync_time );
     if ( i_pagepos >= 0 )
     {
         /* be sure to clear any state or read+pagein() will fail on same # */
@@ -1030,7 +1036,7 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     /* Insert keyframe position into index */
     OggNoDebug(
     if ( i_pagepos >= p_stream->i_data_start )
-        OggSeek_IndexAdd( p_stream, i_time, i_pagepos )
+        OggSeek_IndexAdd( p_stream, i_sync_time, i_pagepos )
     );
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeked To %"PRId64" time %"PRId64, i_pagepos, i_time ) );
