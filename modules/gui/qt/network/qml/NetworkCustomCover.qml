@@ -32,7 +32,6 @@ Item {
         id: custom_cover
 
         anchors.centerIn: parent
-        visible: !networkModel || !networkModel.artwork || networkModel.artwork.toString() === ""
         height: iconSize
         sourceSize: Qt.size(width, height)
         source: {
