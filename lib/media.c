@@ -936,47 +936,6 @@ libvlc_media_get_user_data( libvlc_media_t * p_md )
     return p_md->p_user_data;
 }
 
-// Get media descriptor's elementary streams description
-unsigned
-libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
-{
-    assert( p_md );
-
-    input_item_t *p_input_item = p_md->p_input_item;
-    vlc_mutex_lock( &p_input_item->lock );
-
-    const int i_es = p_input_item->i_es;
-    *pp_es = (i_es > 0) ? calloc( i_es, sizeof(**pp_es) ) : NULL;
-
-    if( !*pp_es ) /* no ES, or OOM */
-    {
-        vlc_mutex_unlock( &p_input_item->lock );
-        return 0;
-    }
-
-    /* Fill array */
-    for( int i = 0; i < i_es; i++ )
-    {
-        libvlc_media_trackpriv_t *p_trackpriv = calloc( 1, sizeof(*p_trackpriv) );
-        if ( !p_trackpriv )
-        {
-            libvlc_media_tracks_release( *pp_es, i_es );
-            *pp_es = NULL;
-            vlc_mutex_unlock( &p_input_item->lock );
-            return 0;
-        }
-        libvlc_media_track_t *p_mes = &p_trackpriv->t;
-        (*pp_es)[i] = p_mes;
-
-        const es_format_t *p_es = p_input_item->es[i];
-
-        libvlc_media_trackpriv_from_es( p_trackpriv, p_es );
-    }
-
-    vlc_mutex_unlock( &p_input_item->lock );
-    return i_es;
-}
-
 libvlc_media_tracklist_t *
 libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type )
 {
@@ -1000,19 +959,6 @@ libvlc_media_get_codec_description( libvlc_track_type_t i_type,
 {
     return vlc_fourcc_GetDescription( libvlc_track_type_to_escat( i_type),
                                       i_codec );
-}
-
-// Release media descriptor's elementary streams description array
-void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks, unsigned i_count )
-{
-    for( unsigned i = 0; i < i_count; ++i )
-    {
-        if ( !p_tracks[i] )
-            continue;
-        libvlc_media_track_clean( p_tracks[i] );
-        free( p_tracks[i] );
-    }
-    free( p_tracks );
 }
 
 // Get the media type of the media descriptor object

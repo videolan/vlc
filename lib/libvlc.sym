@@ -203,8 +203,6 @@ libvlc_media_slaves_release
 libvlc_media_set_meta
 libvlc_media_set_user_data
 libvlc_media_subitems
-libvlc_media_tracks_get
-libvlc_media_tracks_release
 libvlc_new
 libvlc_playlist_play
 libvlc_release

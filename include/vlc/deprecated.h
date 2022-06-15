@@ -29,46 +29,6 @@ extern "C" {
 # endif
 
 /**
- * \ingroup libvlc_media
- * @{
- */
-
-/**
- * Get media descriptor's elementary streams description
- *
- * Note, you need to call libvlc_media_parse_request() or play the media at
- * least once before calling this function.
- * Not doing this will result in an empty array.
- *
- * \version LibVLC 2.1.0 and later.
- * \see libvlc_media_parse_request()
- *
- * \param p_md media descriptor object
- * \param tracks address to store an allocated array of Elementary Streams
- *        descriptions (must be freed with libvlc_media_tracks_release
-          by the caller) [OUT]
- *
- * \return the number of Elementary Streams (zero on error)
- */
-LIBVLC_DEPRECATED LIBVLC_API
-unsigned libvlc_media_tracks_get( libvlc_media_t *p_md,
-                                  libvlc_media_track_t ***tracks );
-
-/**
- * Release media descriptor's elementary streams description array
- *
- * \version LibVLC 2.1.0 and later.
- *
- * \param p_tracks tracks info array to release
- * \param i_count number of elements in the array
- */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
-                                  unsigned i_count );
-
-/** @}*/
-
-/**
  * \ingroup libvlc_media_player
  * @{
  */
