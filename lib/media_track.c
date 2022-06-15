@@ -123,8 +123,7 @@ libvlc_media_trackpriv_new( void )
     return trackpriv;
 }
 
-void
-libvlc_media_track_clean( libvlc_media_track_t *track )
+static void libvlc_media_track_clean( libvlc_media_track_t *track )
 {
     free( track->psz_language );
     free( track->psz_description );
