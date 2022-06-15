@@ -104,6 +104,7 @@
 /* */
 struct input_clock_t
 {
+    struct vlc_logger *logger;
     vlc_clock_t *clock_listener;
 
     /* Last point
@@ -157,6 +158,10 @@ static void UpdateListener( input_clock_t *cl, bool discontinuity )
             ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
             cl->i_pts_delay + ClockGetTsOffset( cl );
 
+        vlc_debug(cl->logger, "avstats: [INPUT][CLOCK][UPDATEINPUT] ts=%" PRId64
+                 " ck_system=%" PRId64 " ck_stream=%" PRId64,
+                 vlc_tick_now(), system_expected, cl->last.stream);
+
         vlc_clock_UpdateInput( cl->clock_listener, system_expected, cl->last.stream,
                                cl->rate, discontinuity );
     }
@@ -165,11 +170,13 @@ static void UpdateListener( input_clock_t *cl, bool discontinuity )
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( float rate, bool recovery )
+input_clock_t *input_clock_New( struct vlc_logger *logger,
+                                float rate, bool recovery )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
         return NULL;
+    cl->logger = logger;
     cl->clock_listener = NULL;
 
     cl->b_has_reference = false;
@@ -225,7 +232,7 @@ void input_clock_AttachListener( input_clock_t *cl, vlc_clock_t *clock_listener 
  *  i_ck_stream: date in stream clock
  *  i_ck_system: date in system clock
  *****************************************************************************/
-vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
+vlc_tick_t input_clock_Update( input_clock_t *cl,
                          bool b_buffering,
                          bool b_can_pace_control, bool b_buffering_allowed,
                          vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
@@ -234,6 +241,10 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     bool b_discontinuity = false;
 
     assert( i_ck_stream != VLC_TICK_INVALID && i_ck_system != VLC_TICK_INVALID );
+
+    vlc_debug( cl->logger, "avstats: [INPUT][CLOCK][UPDATE] ts=%" PRId64
+               " ck_system=%" PRId64 " ck_stream=%" PRId64,
+              vlc_tick_now(), i_ck_system, i_ck_stream );
 
     if( !cl->b_has_reference )
     {
@@ -251,12 +262,12 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
              * stream ?). */
-            msg_Warn( p_log, "clock gap, unexpected stream discontinuity. Offset: %"PRId64
+            vlc_warning( cl->logger, "clock gap, unexpected stream discontinuity. Offset: %"PRId64
                       " stream: %"PRId64 " (%lf)",
                       cl->i_offset, stream_diff, stream_gap );
 
             /* */
-            msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
+            vlc_warning( cl->logger, "feeding synchro with a new reference point trying to recover from clock gap" );
             b_reset_reference= true;
             b_discontinuity = true;
         }
@@ -310,6 +321,10 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         if( cl->i_buffering_duration > CR_BUFFERING_TARGET )
             cl->i_buffering_duration = CR_BUFFERING_TARGET;
     }
+
+    vlc_debug( cl->logger, "avstats: [INPUT][CLOCK][BUFFERING_DURATION] ts=%" PRId64 " buffering_duration=%" PRId64,
+             vlc_tick_now(), NS_FROM_VLC_TICK(cl->i_buffering_duration));
+
     //fprintf( stderr, "input_clock_Update: %d :: %lld\n", b_buffering_allowed, cl->i_buffering_duration/1000 );
 
     /* */
@@ -488,6 +503,10 @@ void input_clock_SetJitter( input_clock_t *cl,
 
     if( cl->drift.range != i_cr_average )
         AvgRescale( &cl->drift, i_cr_average );
+
+    vlc_debug( cl->logger, "avstats: [INPUT][CLOCK][JITTER] ts=%" PRId64 " drift=%" PRId64 " cr_average=%d jitter=%" PRId64,
+             vlc_tick_now(), NS_FROM_VLC_TICK(cl->i_buffering_duration), i_cr_average,
+             NS_FROM_VLC_TICK(input_clock_GetJitter(cl)));
 }
 
 vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
