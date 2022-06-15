@@ -858,46 +858,43 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         media->parsed_status = 0;
     vlc_mutex_unlock(&media->parsed_lock);
 
-    if (needed)
-    {
-        libvlc_int_t *libvlc = inst->p_libvlc_int;
-        input_item_t *item = media->p_input_item;
-        input_item_meta_request_option_t parse_scope = META_REQUEST_OPTION_SCOPE_LOCAL;
-        int ret;
-        unsigned int ref = atomic_load_explicit(&media->worker_count,
-                                                memory_order_relaxed);
-        do
-        {
-            if (unlikely(ref == UINT_MAX))
-                return -1;
-        }
-        while (!atomic_compare_exchange_weak_explicit(&media->worker_count,
-                                                      &ref, ref + 1,
-                                                      memory_order_relaxed,
-                                                      memory_order_relaxed));
-
-        if (parse_flag & libvlc_media_parse_network)
-            parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
-        if (parse_flag & libvlc_media_fetch_local)
-            parse_scope |= META_REQUEST_OPTION_FETCH_LOCAL;
-        if (parse_flag & libvlc_media_fetch_network)
-            parse_scope |= META_REQUEST_OPTION_FETCH_NETWORK;
-        if (parse_flag & libvlc_media_do_interact)
-            parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
-
-        ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
-                                     &input_preparser_callbacks, media,
-                                     timeout, media);
-        if (ret != VLC_SUCCESS)
-        {
-            atomic_fetch_sub_explicit(&media->worker_count, 1,
-                                      memory_order_relaxed);
-            return -1;
-        }
-    }
-    else
+    if (!needed)
         return -1;
 
+    libvlc_int_t *libvlc = inst->p_libvlc_int;
+    input_item_t *item = media->p_input_item;
+    input_item_meta_request_option_t parse_scope = META_REQUEST_OPTION_SCOPE_LOCAL;
+    int ret;
+    unsigned int ref = atomic_load_explicit(&media->worker_count,
+                                            memory_order_relaxed);
+    do
+    {
+        if (unlikely(ref == UINT_MAX))
+            return -1;
+    }
+    while (!atomic_compare_exchange_weak_explicit(&media->worker_count,
+                                                  &ref, ref + 1,
+                                                  memory_order_relaxed,
+                                                  memory_order_relaxed));
+
+    if (parse_flag & libvlc_media_parse_network)
+        parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+    if (parse_flag & libvlc_media_fetch_local)
+        parse_scope |= META_REQUEST_OPTION_FETCH_LOCAL;
+    if (parse_flag & libvlc_media_fetch_network)
+        parse_scope |= META_REQUEST_OPTION_FETCH_NETWORK;
+    if (parse_flag & libvlc_media_do_interact)
+        parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
+
+    ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
+                                 &input_preparser_callbacks, media,
+                                 timeout, media);
+    if (ret != VLC_SUCCESS)
+    {
+        atomic_fetch_sub_explicit(&media->worker_count, 1,
+                                  memory_order_relaxed);
+        return -1;
+    }
     return 0;
 }
 
