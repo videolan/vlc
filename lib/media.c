@@ -912,17 +912,6 @@ libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
     libvlc_MetadataCancel(inst->p_libvlc_int, media);
 }
 
-// Get parsed status for media object (deprecated)
-bool libvlc_media_is_parsed(libvlc_media_t *media)
-{
-    bool parsed;
-
-    vlc_mutex_lock(&media->parsed_lock);
-    parsed = media->is_parsed;
-    vlc_mutex_unlock(&media->parsed_lock);
-    return parsed;
-}
-
 // Get Parsed status for media descriptor object
 libvlc_media_parsed_status_t
 libvlc_media_get_parsed_status(libvlc_media_t *media)

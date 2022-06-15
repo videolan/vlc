@@ -34,21 +34,6 @@ extern "C" {
  */
 
 /**
- * Return true is the media descriptor object is parsed
- *
- * \deprecated This can return true in case of failure.
- *             Use libvlc_media_get_parsed_status() instead
- *
- * \see libvlc_MediaParsedChanged
- *
- * \param p_md media descriptor object
- * \retval true media object has been parsed
- * \retval false otherwise
- */
-LIBVLC_DEPRECATED LIBVLC_API bool
-   libvlc_media_is_parsed( libvlc_media_t *p_md );
-
-/**
  * Get media descriptor's elementary streams description
  *
  * Note, you need to call libvlc_media_parse_request() or play the media at
