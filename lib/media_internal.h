@@ -51,7 +51,7 @@ struct libvlc_media_t
      * be blocking until no async code is using the media anymore. */
     atomic_uint worker_count;
 
-    libvlc_media_parsed_status_t parsed_status;
+    _Atomic libvlc_media_parsed_status_t parsed_status;
 };
 
 /* Media Descriptor */

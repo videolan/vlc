@@ -366,15 +366,8 @@ static void send_parsed_changed( libvlc_media_t *p_md,
 {
     libvlc_event_t event;
 
-    vlc_mutex_lock( &p_md->parsed_lock );
-    if( p_md->parsed_status == new_status )
-    {
-        vlc_mutex_unlock( &p_md->parsed_lock );
+    if (atomic_exchange(&p_md->parsed_status, new_status) == new_status)
         return;
-    }
-
-    p_md->parsed_status = new_status;
-    vlc_mutex_unlock( &p_md->parsed_lock );
 
     /* Construct the event */
     event.type = libvlc_MediaParsedChanged;
@@ -506,7 +499,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
      * It can give a bunch of item to read. */
     p_md->p_subitems        = NULL;
     p_md->p_input_item->libvlc_owner = p_md;
-    p_md->parsed_status = libvlc_media_parsed_status_none;
+    atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
 
     libvlc_event_manager_init( &p_md->event_manager, p_md );
 
@@ -847,17 +840,13 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
                                libvlc_media_parse_flag_t parse_flag,
                                int timeout)
 {
-    bool needed;
+    libvlc_media_parsed_status_t expected = libvlc_media_parsed_status_none;
 
-    vlc_mutex_lock(&media->parsed_lock);
-    needed = media->parsed_status != libvlc_media_parsed_status_pending
-          && media->parsed_status != libvlc_media_parsed_status_done;
-    if (needed)
-        media->parsed_status = libvlc_media_parsed_status_pending;
-    vlc_mutex_unlock(&media->parsed_lock);
-
-    if (!needed)
-        return -1;
+    while (!atomic_compare_exchange_weak(&media->parsed_status, &expected,
+                                        libvlc_media_parsed_status_pending))
+        if (expected == libvlc_media_parsed_status_pending
+         || expected == libvlc_media_parsed_status_done)
+            return -1;
 
     libvlc_int_t *libvlc = inst->p_libvlc_int;
     input_item_t *item = media->p_input_item;
@@ -907,12 +896,7 @@ libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
 libvlc_media_parsed_status_t
 libvlc_media_get_parsed_status(libvlc_media_t *media)
 {
-    libvlc_media_parsed_status_t status;
-
-    vlc_mutex_lock(&media->parsed_lock);
-    status = media->parsed_status;
-    vlc_mutex_unlock(&media->parsed_lock);
-    return status;
+    return atomic_load(&media->parsed_status);
 }
 
 // Sets media descriptor's user_data
