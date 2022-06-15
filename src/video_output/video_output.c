@@ -1217,14 +1217,28 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
         sys->displayed.is_interlaced = !decoded->b_progressive;
         sys->displayed.caption_reference = decoded;
 
+        // TODO
+
         vout_chrono_Start(&sys->static_filter);
+
+        if (atomic_load(&sys->b_display_avstat))
+        {
+            vlc_tick_t now_ts = vlc_tick_now();
+            // TODO rate is not protected here
+            vlc_tick_t system_pts = vlc_clock_ConvertToSystem(sys->clock, now_ts, sys->displayed.decoded->date, sys->rate);
+            msg_Info(&sys->obj, "avstats: [RENDER][BEGINSTATIC] ts=%" PRId64 " pts=%" PRId64 " system_pts=%" PRId64,
+                    NS_FROM_VLC_TICK(now_ts),
+                    NS_FROM_VLC_TICK(sys->displayed.decoded->date),
+                    NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
+        }
+
         picture = filter_chain_VideoFilter(sys->filter.chain_static, sys->displayed.decoded);
         if (atomic_load(&sys->b_display_avstat) && picture)
         {
             vlc_tick_t now_ts = vlc_tick_now();
             // TODO rate is not protected here
             vlc_tick_t system_pts = vlc_clock_ConvertToSystem(sys->clock, now_ts, picture->date, sys->rate);
-            msg_Info(&sys->obj, "avstats: [RENDER][STATIC] ts=%" PRId64 " pts=%" PRId64 " system_pts=%" PRId64,
+            msg_Info(&sys->obj, "avstats: [RENDER][ENDSTATIC] ts=%" PRId64 " pts=%" PRId64 " system_pts=%" PRId64,
                     NS_FROM_VLC_TICK(now_ts),
                     NS_FROM_VLC_TICK(picture->date),
                     NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));

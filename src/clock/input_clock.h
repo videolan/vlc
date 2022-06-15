@@ -40,7 +40,8 @@ typedef struct input_clock_t input_clock_t;
  *
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( float rate, bool recovery );
+input_clock_t *input_clock_New( struct vlc_logger *logger,
+                                float rate, bool recovery );
 
 /**
  * This function attach a clock listener to the input clock
@@ -67,7 +68,7 @@ void           input_clock_Delete( input_clock_t * );
  * advanced (if possible).
  * \return clock update delay
  */
-vlc_tick_t input_clock_Update( input_clock_t *, vlc_object_t *p_log,
+vlc_tick_t input_clock_Update( input_clock_t *,
                             bool b_buffering,
                             bool b_can_pace_control, bool b_buffering_allowed,
                             vlc_tick_t i_clock, vlc_tick_t i_system );

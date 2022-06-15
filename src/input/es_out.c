@@ -1569,8 +1569,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     }
 
     // TODO clock recovery
-    p_pgrm->p_input_clock = input_clock_New( p_sys->rate,
-            var_InheritBool( p_sys->p_input, "clock-recovery" ) );
+    p_pgrm->p_input_clock = input_clock_New( vlc_object_logger(p_sys->p_input),
+            p_sys->rate, var_InheritBool( p_sys->p_input, "clock-recovery" ) );
     var_AddCallback( p_sys->p_input, "clock-recovery", OnClockRecoveryChanged, p_pgrm->p_input_clock );
 
     if( !p_pgrm->p_input_clock )
@@ -1584,7 +1584,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
     const vlc_tick_t pts_delay = p_sys->i_pts_delay + p_sys->i_pts_jitter
                                + p_sys->i_tracks_pts_delay;
-    input_clock_SetJitter( p_pgrm->p_input_clock, pts_delay, p_sys->i_cr_average );
+    input_clock_SetJitter( p_pgrm->p_input_clock,
+                           pts_delay, p_sys->i_cr_average );
     vlc_clock_main_SetInputDejitter( p_pgrm->p_main_clock, pts_delay );
 
     /* In case of low delay: don't use any output dejitter. This may result on
@@ -3434,7 +3435,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         const bool b_low_delay = priv->b_low_delay;
         bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed( out );
         vlc_tick_t i_late = input_clock_Update(
-                            p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
+                            p_pgrm->p_input_clock,
                             p_sys->b_buffering,
                             input_CanPaceControl(p_sys->p_input) || p_sys->b_buffering,
                             b_extra_buffering_allowed,
@@ -3977,8 +3978,8 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
 
             vlc_list_foreach(pgrm, &p_sys->programs, node)
             {
-                input_clock_SetJitter(pgrm->p_input_clock, i_pts_delay,
-                                      i_cr_average);
+                input_clock_SetJitter(pgrm->p_input_clock,
+                                      i_pts_delay, i_cr_average);
                 vlc_clock_main_SetInputDejitter(pgrm->p_main_clock, i_pts_delay);
             }
         }
