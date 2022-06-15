@@ -30,23 +30,13 @@
 
 #define OGGSEEK_BYTES_TO_READ 8500
 
-/* index entries are structured as follows:
- *   - for theora, highest granulepos -> pagepos (bytes) where keyframe begins
- *  - for dirac, kframe (sync point) -> pagepos of sequence start (?)
- */
-
 /* this is typedefed to demux_index_entry_t in ogg.h */
 struct oggseek_index_entry
 {
     demux_index_entry_t *p_next;
-    demux_index_entry_t *p_prev;
-
     /* value is highest granulepos for theora, sync frame for dirac */
     int64_t i_value;
     int64_t i_pagepos;
-
-    /* not used for theora because the granulepos tells us this */
-    int64_t i_pagepos_end;
 };
 
 int64_t Ogg_GetKeyframeGranule ( logical_stream_t *p_stream, int64_t i_granule );
