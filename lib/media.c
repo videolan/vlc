@@ -491,7 +491,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     p_md->p_input_item      = p_input_item;
     vlc_atomic_rc_init(&p_md->rc);
 
-    vlc_mutex_init(&p_md->parsed_lock);
     vlc_mutex_init(&p_md->subitems_lock);
     atomic_init(&p_md->worker_count, 0);
 
