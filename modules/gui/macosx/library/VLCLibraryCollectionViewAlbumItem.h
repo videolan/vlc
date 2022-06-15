@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCLibraryCollectionViewAlbumItem.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
+@class VLCMediaLibraryAlbum;
 
-extern NSString *VLCLibraryCellIdentifier;
+extern NSString *VLCLibraryAlbumCellIdentifier;
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
+@interface VLCLibraryCollectionViewAlbumItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
 
-@property (readwrite, retain, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
+@property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
 
 @end
 
 NS_ASSUME_NONNULL_END
+

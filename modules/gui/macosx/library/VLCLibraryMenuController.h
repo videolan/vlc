@@ -25,12 +25,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaLibraryMediaItem;
+@class VLCMediaLibraryAlbum;
 
 @interface VLCLibraryMenuController : NSObject
 
-@property (readwrite, weak) VLCMediaLibraryMediaItem *representedMediaItem;
-
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;
+- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
+- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)album;
 
 @end
 

@@ -34,6 +34,9 @@
 {
     NSMenu *_libraryMenu;
     VLCLibraryInformationPanel *_informationPanel;
+    enum vlc_ml_parent_type _currentRepresentedType;
+    VLCMediaLibraryMediaItem *_representedMediaItem;
+    VLCMediaLibraryAlbum *_representedAlbum;
 }
 @end
 
@@ -69,7 +72,7 @@
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
 {
-    if (self.representedMediaItem != nil) {
+    if (_representedMediaItem != nil) {
         [NSMenu popUpContextMenu:_libraryMenu withEvent:theEvent forView:theView];
     } else {
         NSMenu *minimalMenu = [[NSMenu alloc] initWithTitle:@""];
@@ -82,14 +85,34 @@
 
 #pragma mark - actions
 
+- (void)addToPlaylist:(BOOL)playImmediately
+{
+    switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_ALBUM:
+        {
+            for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
+                [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+            }
+            break;
+        }
+        case VLC_ML_PARENT_UNKNOWN:
+        {
+            [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:_representedMediaItem playImmediately:playImmediately];
+            break;
+        }
+        default:
+            NSLog(@"No represented media type, cannot append nothing to playlist.");
+    }
+}
+
 - (void)play:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:self.representedMediaItem playImmediately:YES];
+    [self addToPlaylist:YES];
 }
 
 - (void)appendToPlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:self.representedMediaItem playImmediately:NO];
+    [self addToPlaylist:NO];
 }
 
 - (void)addMedia:(id)sender
@@ -111,12 +134,47 @@
 
 - (void)revealInFinder:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] showItemInFinder:self.representedMediaItem];
+    switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_ALBUM:
+        {
+            [[[VLCMain sharedInstance] libraryController] showItemInFinder:_representedAlbum.tracksAsMediaItems.firstObject];
+            break;
+        }
+        case VLC_ML_PARENT_UNKNOWN:
+        {
+            [[[VLCMain sharedInstance] libraryController] showItemInFinder:_representedMediaItem];
+            break;
+        }
+        default:
+            NSLog(@"No represented media type, nothing to show in Finder.");
+    }
 }
 
 - (void)moveToTrash:(id)sender
 {
-    NSArray *filesToTrash = self.representedMediaItem.files;
+    NSArray *filesToTrash;
+
+    switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_ALBUM:
+        {
+            NSMutableArray *allMediaItemFiles = [[NSMutableArray alloc] init];
+            for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
+                [allMediaItemFiles addObjectsFromArray: mediaItem.files];
+            }
+
+            filesToTrash = [allMediaItemFiles copy];
+            break;
+        }
+        case VLC_ML_PARENT_UNKNOWN:
+        {
+            filesToTrash = _representedMediaItem.files;
+            break;
+        }
+        default:
+            NSLog(@"No represented media type, not moving anything to trash.");
+            return;
+    }
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     for (VLCMediaLibraryFile *fileToTrash in filesToTrash) {
@@ -130,8 +188,31 @@
         _informationPanel = [[VLCLibraryInformationPanel alloc] initWithWindowNibName:@"VLCLibraryInformationPanel"];
     }
 
-    [_informationPanel setRepresentedMediaItem:self.representedMediaItem];
-    [_informationPanel showWindow:self];
+    if(_currentRepresentedType == VLC_ML_PARENT_UNKNOWN) {
+        [_informationPanel setRepresentedMediaItem:_representedMediaItem];
+        [_informationPanel showWindow:self];
+    }
+    
+}
+
+- (void)clearRepresentedMedia
+{
+    _representedMediaItem = nil;
+    _representedAlbum = nil;
+}
+
+- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+{
+    [self clearRepresentedMedia];
+    _representedMediaItem = mediaItem;
+    _currentRepresentedType = VLC_ML_PARENT_UNKNOWN;
+}
+
+- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)album
+{
+    [self clearRepresentedMedia];
+    _representedAlbum = album;
+    _currentRepresentedType = VLC_ML_PARENT_ALBUM;
 }
 
 @end

@@ -1,9 +1,10 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.h: MacOS X interface module
+ * VLCLibraryCollectionViewItemProtocl.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ *          Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +22,26 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "VLCLibraryCollectionViewItemProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
+@class VLCImageView;
+@class VLCLinearProgressIndicator;
 
-extern NSString *VLCLibraryCellIdentifier;
+@protocol VLCLibraryCollectionViewItemProtocol
+@required
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
+@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
+@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
+@property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
+@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
+@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
+@property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
 
-@property (readwrite, retain, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
+- (IBAction)playInstantly:(id)sender;
+- (IBAction)addToPlaylist:(id)sender;
 
 @end
 

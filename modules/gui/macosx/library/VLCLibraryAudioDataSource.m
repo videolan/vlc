@@ -30,6 +30,7 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewAlbumItem.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -65,7 +66,10 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
+
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [_collectionView registerClass:[VLCLibraryCollectionViewAlbumItem class] forItemWithIdentifier:VLCLibraryAlbumCellIdentifier];
+    
     NSCollectionViewFlowLayout *flowLayout = _collectionView.collectionViewLayout;
     flowLayout.itemSize = CGSizeMake(214., 260.);
     flowLayout.sectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
@@ -387,9 +391,11 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+
     switch (_currentParentType) {
         case VLC_ML_PARENT_ARTIST:
         {
+            // TODO: Have artist-specific view item
             VLCMediaLibraryArtist *artist = _displayedCollection[indexPath.item];
             viewItem.mediaTitleTextField.stringValue = artist.name;
             NSString *countMetadataString;
@@ -417,22 +423,10 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         }
         case VLC_ML_PARENT_ALBUM:
         {
+            VLCLibraryCollectionViewAlbumItem *viewAlbumItem = [collectionView makeItemWithIdentifier:VLCLibraryAlbumCellIdentifier forIndexPath:indexPath];
             VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
-            viewItem.mediaTitleTextField.stringValue = album.title;
-            if (album.numberOfTracks > 1) {
-                viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u songs"), album.numberOfTracks];
-            } else {
-                viewItem.durationTextField.stringValue = _NS("1 song");
-            }
-            NSImage *image;
-            if (album.artworkMRL.length > 0) {
-                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:album.artworkMRL]];
-            }
-            if (!image) {
-                image = [NSImage imageNamed: @"noart.png"];
-            }
-            viewItem.mediaImageView.image = image;
-            break;
+            viewAlbumItem.representedAlbum = album;
+            return viewAlbumItem;
         }
         case VLC_ML_PARENT_UNKNOWN:
         {
@@ -442,6 +436,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         }
         case VLC_ML_PARENT_GENRE:
         {
+            // TODO: Have genre-specific view item
             VLCMediaLibraryGenre *genre = _displayedCollection[indexPath.item];
             viewItem.mediaTitleTextField.stringValue = genre.name;
             if (genre.numberOfTracks > 1) {
@@ -450,8 +445,8 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
                 viewItem.durationTextField.stringValue = _NS("1 song");
             }
             viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+            break;
         }
-
         default:
             break;
     }

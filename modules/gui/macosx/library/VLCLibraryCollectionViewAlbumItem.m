@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItem.m: MacOS X interface module
+ * VLCLibraryCollectionViewAlbumItem.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryCollectionViewItem.h"
+#import "VLCLibraryCollectionViewAlbumItem.h"
 
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
@@ -35,18 +35,16 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 
-NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
-const CGFloat VLCLibraryCollectionViewItemMinimalDisplayedProgress = 0.05;
-const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
+NSString *VLCLibraryAlbumCellIdentifier = @"VLCLibraryAlbumCellIdentifier";
 
-@interface VLCLibraryCollectionViewItem()
+@interface VLCLibraryCollectionViewAlbumItem()
 {
     VLCLibraryController *_libraryController;
     VLCLibraryMenuController *_menuController;
 }
 @end
 
-@implementation VLCLibraryCollectionViewItem
+@implementation VLCLibraryCollectionViewAlbumItem
 
 @synthesize mediaTitleTextField = _mediaTitleTextField;
 @synthesize annotationTextField = _annotationTextField;
@@ -62,10 +60,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-        [notificationCenter addObserver:self
-                               selector:@selector(mediaItemUpdated:)
-                                   name:VLCLibraryModelMediaItemUpdated
-                                 object:nil];
+        // TODO: Update album on a VLCLibraryModelAlbumUpdated signal
         [notificationCenter addObserver:self
                                selector:@selector(updateFontBasedOnSetting:)
                                    name:VLCConfigurationChangedNotification
@@ -145,71 +140,52 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     _unplayedIndicatorTextField.hidden = YES;
 }
 
-- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)representedMediaItem
+- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
 {
     if (!_libraryController) {
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    _representedMediaItem = representedMediaItem;
+    _representedAlbum = representedAlbum;
     [self updateRepresentation];
 }
 
-- (void)mediaItemUpdated:(NSNotification *)aNotification
+- (void)albumUpdated:(NSNotification *)aNotification
 {
-    VLCMediaLibraryMediaItem *updatedMediaItem = aNotification.object;
-    if (updatedMediaItem == nil || _representedMediaItem == nil) {
+    VLCMediaLibraryAlbum *updatedAlbum = aNotification.object;
+    if (updatedAlbum == nil || _representedAlbum == nil) {
         return;
     }
-    if (updatedMediaItem.libraryID == _representedMediaItem.libraryID) {
+    if (updatedAlbum.albumID == _representedAlbum.albumID) {
         [self updateRepresentation];
     }
 }
 
 - (void)updateRepresentation
 {
-    if (_representedMediaItem == nil) {
+    if (_representedAlbum == nil) {
         NSAssert(1, @"no media item assigned for collection view item", nil);
         return;
     }
 
-    _mediaTitleTextField.stringValue = _representedMediaItem.title;
-    _durationTextField.stringValue = [NSString stringWithTime:_representedMediaItem.duration / VLCMediaLibraryMediaItemDurationDenominator];
+    _mediaTitleTextField.stringValue = _representedAlbum.title;
+    _durationTextField.stringValue = [NSString stringWithTime:_representedAlbum.duration / VLCMediaLibraryMediaItemDurationDenominator];
 
     _mediaImageView.image = [self imageForMedia];
 
-    VLCMediaLibraryTrack *videoTrack = _representedMediaItem.firstVideoTrack;
-    [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth andHeight:videoTrack.videoHeight];
-
-    CGFloat position = _representedMediaItem.progress;
-    if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
-        _progressIndicator.progress = position;
-        _progressIndicator.hidden = NO;
-    }
-
-    if (_representedMediaItem.playCount == 0) {
-        _unplayedIndicatorTextField.hidden = NO;
-    }
+    // TODO: Show album progress with progress indicator
 }
 
 - (NSImage *)imageForMedia
 {
-    NSImage *image = _representedMediaItem.smallArtworkImage;
+    NSImage *image;
+    if (_representedAlbum.artworkMRL.length > 0) {
+        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedAlbum.artworkMRL]];
+    }
     if (!image) {
         image = [NSImage imageNamed: @"noart.png"];
     }
     return image;
-}
-
-- (void)showVideoSizeIfNeededForWidth:(CGFloat)width andHeight:(CGFloat)height
-{
-    if (width >= VLCMediaLibrary4KWidth || height >= VLCMediaLibrary4KHeight) {
-        _annotationTextField.stringValue = _NS("4K");
-        _annotationTextField.hidden = NO;
-    } else if (width >= VLCMediaLibrary720pWidth || height >= VLCMediaLibrary720pHeight) {
-        _annotationTextField.stringValue = _NS("HD");
-        _annotationTextField.hidden = NO;
-    }
 }
 
 #pragma mark - actions
@@ -220,7 +196,16 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:YES];
+    // We want to add all the tracks to the playlist but only play the first one immediately,
+    // otherwise we will skip straight to the last track of the album
+    BOOL playImmediately = YES;
+    for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
+        [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+
+        if(playImmediately) {
+            playImmediately = NO;
+        }
+    }
 }
 
 - (IBAction)addToPlaylist:(id)sender
@@ -229,7 +214,9 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    [_libraryController appendItemToPlaylist:_representedMediaItem playImmediately:NO];
+    for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
+        [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
+    }
 }
 
 -(void)mouseDown:(NSEvent *)theEvent
@@ -238,7 +225,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         if (!_menuController) {
             _menuController = [[VLCLibraryMenuController alloc] init];
         }
-        [_menuController setRepresentedMediaItem:self.representedMediaItem];
+        [_menuController setRepresentedAlbum:self.representedAlbum];
         [_menuController popupMenuWithEvent:theEvent forView:self.view];
     }
 
@@ -250,7 +237,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     if (!_menuController) {
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
-    [_menuController setRepresentedMediaItem:self.representedMediaItem];
+    [_menuController setRepresentedAlbum:self.representedAlbum];
     [_menuController popupMenuWithEvent:theEvent forView:self.view];
 
     [super rightMouseDown:theEvent];
