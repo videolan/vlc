@@ -202,6 +202,8 @@ FocusScope {
             cellWidth : VLCStyle.gridItem_video_width
             cellHeight: VLCStyle.gridItem_video_height
 
+            topMargin: VLCStyle.margin_normal
+
             model: root.model
 
             selectionDelegateModel: modelSelect
@@ -330,6 +332,8 @@ FocusScope {
             dragItem: root.dragItem
 
             header: root.header
+
+            topMargin: VLCStyle.margin_normal
 
             headerTopPadding: VLCStyle.margin_normal
 

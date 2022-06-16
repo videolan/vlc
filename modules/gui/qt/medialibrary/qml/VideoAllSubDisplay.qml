@@ -227,6 +227,9 @@ VideoAll {
         // NOTE: We want grid items to be visible on the sides.
         leftPadding: root.contentMargin
 
+        // spacing between header and content
+        bottomPadding: VLCStyle.margin_normal
+
         Navigation.parentItem: root
 
         Navigation.downAction: function() {

@@ -32,6 +32,8 @@ FocusScope {
 
     property alias leftPadding: recentVideosColumn.leftPadding
     property alias rightPadding: recentVideosColumn.rightPadding
+    property alias topPadding: recentVideosColumn.topPadding
+    property alias bottomPadding: recentVideosColumn.bottomPadding
 
     property alias subtitleText : subtitleLabel.text
 
@@ -64,10 +66,6 @@ FocusScope {
         width: root.width
 
         spacing: VLCStyle.margin_xsmall
-
-        topPadding: VLCStyle.margin_normal
-
-        bottomPadding: VLCStyle.margin_normal
 
         Widgets.SubtitleLabel {
             text: I18n.qtr("Continue Watching")
