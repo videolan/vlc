@@ -266,7 +266,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                     if( i_length != VLC_TICK_INVALID )
                     {
                         /* We found at least a page with valid granule */
-                        p_sys->i_length = __MAX( p_sys->i_length, SEC_FROM_VLC_TICK(i_length - VLC_TICK_0) );
+                        p_sys->i_length = __MAX( p_sys->i_length, i_length - VLC_TICK_0 );
                         goto clean;
                     }
                     break;
@@ -911,8 +911,10 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     }
 
     /* Insert keyframe position into index */
-    vlc_tick_t index_interval = p_sys->i_length ? ceil(sqrt(p_sys->i_length) / 2) : vlc_tick_from_sec(5);
-    if ( i_pagepos >= p_stream->i_data_start && (i_sync_time - i_lower_index >= index_interval) )
+    vlc_tick_t index_interval = p_sys->i_length
+              ? vlc_tick_from_sec( ceil( sqrt( SEC_FROM_VLC_TICK( p_sys->i_length ) ) / 2 ) )
+              : vlc_tick_from_sec( 5 );
+    if ( i_pagepos >= p_stream->i_data_start && ( i_sync_time - i_lower_index >= index_interval ) )
         OggSeek_IndexAdd( p_stream, i_sync_time, i_pagepos );
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeked To %"PRId64" time %"PRId64, i_pagepos, i_time ) );
