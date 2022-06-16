@@ -111,8 +111,7 @@ T.Control {
             onPressed: _modifiersOnLastPress = mouse.modifiers
 
             onClicked: {
-                if ((mouse.button === Qt.LeftButton)
-                        || !selectionDelegateModel.isSelected(root.model.index(index, 0))) {
+                if ((mouse.button === Qt.LeftButton) || !delegate.selected) {
                     delegate.selectAndFocus(mouse.modifiers, Qt.MouseFocusReason)
                 }
 
@@ -138,17 +137,15 @@ T.Control {
             drag.onActiveChanged: {
                 // NOTE: Perform the "click" action because the click action is only executed on mouse
                 //       release (we are in the pressed state) but we will need the updated list on drop.
-                if (drag.active
-                    &&
-                    selectionDelegateModel.isSelected(root.model.index(index, 0)) == false) {
-
-                    selectionDelegateModel.updateSelection(_modifiersOnLastPress, view.currentIndex,
-                                                           index);
+                if (drag.active && !delegate.selected) {
+                    selectionDelegateModel.updateSelection(_modifiersOnLastPress
+                                                           , view.currentIndex
+                                                           , index)
                 } else if (root.dragItem) {
-                    root.dragItem.Drag.drop();
+                    root.dragItem.Drag.drop()
                 }
 
-                root.dragItem.Drag.active = drag.active;
+                root.dragItem.Drag.active = drag.active
             }
         }
     }
