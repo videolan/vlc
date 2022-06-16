@@ -77,11 +77,18 @@ void oggseek_index_entries_free ( demux_index_entry_t *idx )
 
 /* internal function to create a new list member */
 
-static demux_index_entry_t *index_entry_new( void )
+static demux_index_entry_t *index_entry_new( vlc_tick_t i_timestamp, int64_t i_pagepos )
 {
-    demux_index_entry_t *idx = xmalloc( sizeof( demux_index_entry_t ) );
-    if ( !idx ) return NULL;
-    idx->p_next = NULL;
+    if ( i_timestamp == VLC_TICK_INVALID || i_pagepos < 1 )
+        return NULL;
+
+    demux_index_entry_t *idx = malloc( sizeof(*idx) );
+    if ( idx )
+    {
+        idx->i_value = i_timestamp;
+        idx->i_pagepos = i_pagepos;
+        idx->p_next = NULL;
+    }
     return idx;
 }
 
@@ -91,50 +98,26 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
                                              vlc_tick_t i_timestamp,
                                              int64_t i_pagepos )
 {
-    demux_index_entry_t *idx;
-    demux_index_entry_t *last_idx = NULL;
-
-    if ( p_stream == NULL ) return NULL;
-
-    idx = p_stream->idx;
-
-    if ( i_timestamp == VLC_TICK_INVALID || i_pagepos < 1 ) return NULL;
-
-    if ( idx == NULL )
+    demux_index_entry_t **pp_next = &p_stream->idx;
+    for( ; *pp_next; )
     {
-        demux_index_entry_t *ie = index_entry_new();
-        if ( !ie ) return NULL;
-        ie->i_value = i_timestamp;
-        ie->i_pagepos = i_pagepos;
-        p_stream->idx = ie;
-        return ie;
+        if( (*pp_next)->i_pagepos >= i_pagepos )
+        {
+            if( (*pp_next)->i_pagepos == i_pagepos )
+                return NULL;
+            break;
+        }
+        pp_next = &((*pp_next)->p_next);
     }
 
-    while ( idx != NULL )
+    demux_index_entry_t *ie = index_entry_new( i_timestamp, i_pagepos );
+    if ( ie )
     {
-        if ( idx->i_pagepos > i_pagepos ) break;
-        last_idx = idx;
-        idx = idx->p_next;
+        ie->p_next = *pp_next;
+        *pp_next = ie;
     }
 
-    /* new entry; insert after last_idx */
-    idx = index_entry_new();
-    if ( !idx ) return NULL;
-    if ( last_idx != NULL )
-    {
-        idx->p_next = last_idx->p_next;
-        last_idx->p_next = idx;
-    }
-    else
-    {
-        idx->p_next = p_stream->idx;
-        p_stream->idx = idx;
-    }
-
-    idx->i_value = i_timestamp;
-    idx->i_pagepos = i_pagepos;
-
-    return idx;
+    return ie;
 }
 
 static bool OggSeekIndexFind ( logical_stream_t *p_stream, vlc_tick_t i_timestamp,
