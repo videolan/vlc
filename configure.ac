@@ -2865,8 +2865,19 @@ dnl
 AC_ARG_ENABLE([jpeg],
   AS_HELP_STRING([--enable-jpeg], [JPEG support (default enabled)]))
 AS_IF([test "${enable_jpeg}" != "no"], [
-AC_CHECK_HEADERS([jpeglib.h], [
-  VLC_ADD_PLUGIN([jpeg])
+  AC_CHECK_HEADERS([jpeglib.h], [
+    AC_MSG_CHECKING([for JPEG library source/destination support])
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM([[
+#include <jpeglib.h>
+#if (JPEG_LIB_VERSION < 80) && !defined(MEM_SRCDST_SUPPORTED)
+#error JPEG library too old
+#endif]],[[;]])
+    ],[
+      AC_MSG_RESULT([yes])
+      VLC_ADD_PLUGIN([jpeg])
+    ], [
+      AC_MSG_RESULT([no])
+    ])
   ])
 ])
 
