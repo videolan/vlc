@@ -230,7 +230,7 @@ struct demux_sys_t
     bool b_preparsing_done;
     bool b_es_created;
 
-    /* Length, if available. */
+    /* Time length, if available. 0 otherwise. */
     int64_t i_length;
 
     bool b_slave;

@@ -270,7 +270,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                         continue;
 
                     i_length = Oggseek_GranuleToAbsTimestamp( p_sys->pp_stream[i], i_granule, false );
-                    p_sys->i_length = __MAX( p_sys->i_length, i_length / 1000000 );
+                    p_sys->i_length = __MAX( p_sys->i_length, i_length );
                     break;
                 }
             }
@@ -1031,8 +1031,10 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     }
 
     /* Insert keyframe position into index */
-    int64_t index_interval = p_sys->i_length ? ceil(sqrt(p_sys->i_length) / 2) : CLOCK_FREQ * 5;
-    if ( i_pagepos >= p_stream->i_data_start && (i_sync_time - i_lower_index >= index_interval) )
+    int64_t index_interval = p_sys->i_length
+              ? CLOCK_FREQ * ceil( sqrt( p_sys->i_length / CLOCK_FREQ ) / 2 )
+              : CLOCK_FREQ * 5;
+    if ( i_pagepos >= p_stream->i_data_start && ( i_sync_time - i_lower_index >= index_interval ) )
         OggSeek_IndexAdd( p_stream, i_sync_time, i_pagepos );
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeked To %"PRId64" time %"PRId64, i_pagepos, i_time ) );

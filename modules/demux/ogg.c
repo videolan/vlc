@@ -229,7 +229,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_length = -1;
+    p_sys->i_length = 0;
     p_sys->b_preparsing_done = false;
 
     vlc_stream_Control( p_demux->s, STREAM_GET_PTS_DELAY,
@@ -843,8 +843,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pf = va_arg( args, double * );
             if( p_sys->i_length > 0 && p_sys->i_pcr > VLC_TS_INVALID )
             {
-                *pf =  (double) p_sys->i_pcr /
-                       (double) ( p_sys->i_length * (mtime_t)1000000 );
+                *pf =  (double) p_sys->i_pcr / (double) p_sys->i_length;
             }
             else if( stream_Size( p_demux->s ) > 0 )
             {
@@ -882,9 +881,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             assert( p_sys->i_length > 0 );
-            i64 = CLOCK_FREQ * p_sys->i_length * f;
+            i64 = p_sys->i_length * f;
             Ogg_ResetStreamsHelper( p_sys );
-            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, i64 ) >= 0 )
+            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TS_0 + i64 ) >= 0 )
             {
                 if( acc )
                     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
@@ -898,8 +897,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( p_sys->i_length < 0 )
                 return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
                                               1, i_query, args );
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = p_sys->i_length * 1000000;
+            *va_arg( args, int64_t * ) = p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
