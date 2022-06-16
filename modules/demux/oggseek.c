@@ -39,7 +39,7 @@
 
 #include <ogg/ogg.h>
 #include <limits.h>
-
+#include <math.h>
 #include <assert.h>
 
 #include "ogg.h"
@@ -122,7 +122,8 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
 }
 
 static bool OggSeekIndexFind ( logical_stream_t *p_stream, vlc_tick_t i_timestamp,
-                               int64_t *pi_pos_lower, int64_t *pi_pos_upper )
+                               int64_t *pi_pos_lower, int64_t *pi_pos_upper,
+                               vlc_tick_t *pi_lower_timestamp )
 {
     demux_index_entry_t *idx = p_stream->idx;
 
@@ -133,11 +134,13 @@ static bool OggSeekIndexFind ( logical_stream_t *p_stream, vlc_tick_t i_timestam
             if ( !idx->p_next ) /* found on last index */
             {
                 *pi_pos_lower = idx->i_pagepos;
+                *pi_lower_timestamp = idx->i_value;
                 return true;
             }
             if ( idx->p_next->i_value > i_timestamp )
             {
                 *pi_pos_lower = idx->i_pagepos;
+                *pi_lower_timestamp = idx->i_value;
                 *pi_pos_upper = idx->p_next->i_pagepos;
                 return true;
             }
@@ -785,7 +788,8 @@ int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_strea
     if ( i_lowerpos != -1 ) b_found = true;
 
     /* And also search in our own index */
-    if ( !b_found && OggSeekIndexFind( p_stream, i_time, &i_lowerpos, &i_upperpos ) )
+    vlc_tick_t foo;
+    if ( !b_found && OggSeekIndexFind( p_stream, i_time, &i_lowerpos, &i_upperpos, &foo ) )
     {
         b_found = true;
     }
@@ -892,9 +896,10 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
     }
     OggDebug( msg_Dbg( p_demux, "Search bounds set to %"PRId64" %"PRId64" using skeleton index", i_offset_lower, i_offset_upper ) );
 
-    OggNoDebug(
-        OggSeekIndexFind( p_stream, i_time, &i_offset_lower, &i_offset_upper )
-    );
+
+    vlc_tick_t i_lower_index;
+    if(!OggSeekIndexFind( p_stream, i_time, &i_offset_lower, &i_offset_upper, &i_lower_index ))
+        i_lower_index = 0;
 
     i_offset_lower = __MAX( i_offset_lower, p_stream->i_data_start );
     i_offset_upper = __MIN( i_offset_upper, p_sys->i_total_length );
@@ -909,11 +914,11 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
         p_sys->i_input_position = i_pagepos;
         seek_byte( p_demux, p_sys->i_input_position );
     }
+
     /* Insert keyframe position into index */
-    OggNoDebug(
-    if ( i_pagepos >= p_stream->i_data_start )
-        OggSeek_IndexAdd( p_stream, i_sync_time, i_pagepos )
-    );
+    vlc_tick_t index_interval = p_sys->i_length ? ceil(sqrt(p_sys->i_length) / 2) : vlc_tick_from_sec(5);
+    if ( i_pagepos >= p_stream->i_data_start && (i_sync_time - i_lower_index >= index_interval) )
+        OggSeek_IndexAdd( p_stream, i_sync_time, i_pagepos );
 
     OggDebug( msg_Dbg( p_demux, "=================== Seeked To %"PRId64" time %"PRId64, i_pagepos, i_time ) );
     return i_pagepos;
