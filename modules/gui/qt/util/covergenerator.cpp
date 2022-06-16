@@ -234,8 +234,31 @@ void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, con
     QSize size = reader.size().scaled(target.width(),
                                       target.height(), Qt::KeepAspectRatioByExpanding);
 
-    reader.setScaledSize(size);
-    QImage image = reader.read();
+    QImage image;
+
+    // NOTE: QImage::scaled provides a better quality compared to QImageReader::setScaledSize.
+    //       Except for svg(s).
+    if (fileName.endsWith(".svg", Qt::CaseInsensitive))
+    {
+        if (size.isEmpty() == false)
+        {
+            reader.setScaledSize(size);
+        }
+
+        if (reader.read(&image) == false)
+            return;
+    }
+    else
+    {
+        if (reader.read(&image) == false)
+            return;
+
+        if (size.isEmpty() == false)
+        {
+            // NOTE: We are using Qt::SmoothTransformation to favor quality.
+            image = image.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        }
+    }
 
     int x = std::ceil((image.width() - target.width()) / 2.);
     int y = std::ceil((image.height() - target.height()) / 2.);
