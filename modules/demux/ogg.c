@@ -241,7 +241,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_length = -1;
+    p_sys->i_length = 0;
     p_sys->b_preparsing_done = false;
 
     /* Set exported functions */
@@ -760,8 +760,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( p_sys->i_length > 0 && p_sys->i_pcr != VLC_TICK_INVALID )
             {
-                vlc_tick_t duration = vlc_tick_from_sec( p_sys->i_length );
-                pos = (double) p_sys->i_pcr / (double) duration;
+                pos = (double) p_sys->i_pcr / (double) p_sys->i_length;
             }
             else if( vlc_stream_GetSize( p_demux->s, &size ) == 0 && size > 0 )
             {
@@ -801,7 +800,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             assert( p_sys->i_length > 0 );
-            i64 = vlc_tick_from_sec( f * p_sys->i_length );
+            i64 = f * p_sys->i_length;
             Ogg_PreparePostSeek( p_sys );
             if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TICK_0 + i64 ) >= 0 )
             {
@@ -817,7 +816,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( p_sys->i_length < 0 )
                 return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
                                               1, i_query, args );
-            *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec(p_sys->i_length);
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
