@@ -203,7 +203,8 @@ T.Control {
                 visible: delegate.hovered
 
                 onClicked: {
-                    delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
+                    if (!delegate.selected)
+                        delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
 
                     var pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
                     root.contextMenuButtonClicked(this, delegate.rowModel, pos)
