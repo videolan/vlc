@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.11
 import QtGraphicalEffects 1.0
+import QtQuick.Window 2.11
 
 import org.videolan.vlc 0.1
 
@@ -38,7 +39,7 @@ FocusScope {
                                       && Player.hasVideoOutput
                                       && playlistpopup.state !== "visible"
 
-    property bool pinVideoControls: rootPlayer.hasEmbededVideo && MainCtx.pinVideoControls
+    property bool pinVideoControls: rootPlayer.hasEmbededVideo && MainCtx.pinVideoControls && ((MainCtx.intfMainWindow.visibility !== Window.FullScreen))
     property bool hasEmbededVideo: MainCtx.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
     readonly property string coverSource: {
