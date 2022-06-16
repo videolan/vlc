@@ -89,6 +89,11 @@ FocusScope {
 
     // Aliases
 
+    property alias topMargin: view.topMargin
+    property alias bottomMargin: view.bottomMargin
+    property alias leftMargin: view.leftMargin
+    property alias rightMargin: view.rightMargin
+
     property alias spacing: view.spacing
 
     property alias model: view.model
