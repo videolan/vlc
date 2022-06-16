@@ -427,7 +427,7 @@ signals:
     void requestInterfaceMinimized();
 
     void intfScaleFactorChanged();
-    void pinVideoControlsChanged( bool );
+    void pinVideoControlsChanged();
     void hasAcrylicSurfaceChanged();
 
     void acrylicActiveChanged();

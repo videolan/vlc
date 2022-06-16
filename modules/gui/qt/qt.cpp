@@ -236,6 +236,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_MENUBAR_TEXT N_( "Show the menu bar" )
 #define QT_MENUBAR_LONGTEXT N_( "This option displays the classic menu bar" )
 
+#define QT_PIN_CONTROLS_TEXT N_("Pin video controls")
+#define QT_PIN_CONTROLS_LONGTEXT N_("Place video controls above and below the video instead of above")
+
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
 #define QT_COMPOSITOR_TEXT N_("Select Qt video integration backend")
@@ -371,6 +374,8 @@ vlc_module_begin ()
 
     add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,
                nullptr )
+
+    add_bool( "qt-pin-controls", false, QT_PIN_CONTROLS_TEXT, QT_PIN_CONTROLS_LONGTEXT )
 
 
     add_obsolete_bool( "qt-advanced-pref" ) /* since 4.0.0 */

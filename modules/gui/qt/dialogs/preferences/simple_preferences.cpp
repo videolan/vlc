@@ -849,8 +849,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
             CONFIG_BOOL( "qt-menubar", menuBarCheck );
 
-            ui.pinVideoControlsCheckbox->setChecked( p_intf->p_mi->pinVideoControls() );
-            m_resetters.push_back(std::make_unique<PropertyResetter>(ui.pinVideoControlsCheckbox, "checked"));
+
+            CONFIG_BOOL( "qt-pin-controls", pinVideoControlsCheckbox );
             QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_mi, &MainCtx::setPinVideoControls );
 
             ui.colorSchemeComboBox->setModel( p_intf->p_mi->getColorScheme() );

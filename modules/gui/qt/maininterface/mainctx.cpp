@@ -200,7 +200,6 @@ MainCtx::~MainCtx()
     settings->setValue( "pl-dock-status", b_playlistDocked );
     settings->setValue( "ShowRemainingTime", m_showRemainingTime );
     settings->setValue( "interface-scale", m_intfUserScaleFactor );
-    settings->setValue( "pin-video-controls", m_pinVideoControls );
 
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
@@ -298,6 +297,9 @@ void MainCtx::loadPrefs(const bool callSignals)
     loadFromVLCOption(m_smoothScroll, "qt-smooth-scrolling", &MainCtx::smoothScrollChanged);
 
     loadFromVLCOption(m_maxVolume, "qt-max-volume", &MainCtx::maxVolumeChanged);
+
+    loadFromVLCOption(m_pinVideoControls, "qt-pin-controls", &MainCtx::pinVideoControlsChanged);
+
 }
 
 void MainCtx::loadFromSettingsImpl(const bool callSignals)
@@ -327,8 +329,6 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(m_grouping, "MainWindow/grouping", GROUPING_NONE, &MainCtx::groupingChanged);
 
     loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
-
-    loadFromSettings(m_pinVideoControls, "MainWindow/pin-video-controls", false, &MainCtx::pinVideoControlsChanged);
 
     const auto colorScheme = static_cast<ColorSchemeModel::ColorScheme>(getSettings()->value( "MainWindow/color-scheme", ColorSchemeModel::System ).toInt());
     if (m_colorScheme->currentScheme() != colorScheme)
@@ -426,7 +426,7 @@ void MainCtx::setPinVideoControls(bool pinVideoControls)
         return;
 
     m_pinVideoControls = pinVideoControls;
-    emit pinVideoControlsChanged(m_pinVideoControls);
+    emit pinVideoControlsChanged();
 }
 
 inline void MainCtx::initSystray()
