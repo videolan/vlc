@@ -335,8 +335,6 @@ FocusScope {
 
             topMargin: VLCStyle.margin_normal
 
-            headerTopPadding: VLCStyle.margin_normal
-
             headerPositioning: ListView.InlineHeader
 
             activeFocusOnTab: true
