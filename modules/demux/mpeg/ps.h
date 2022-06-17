@@ -630,7 +630,7 @@ static inline void ps_parse_descriptors( const uint8_t *p_data, size_t i_data,
 
 static inline int ps_psm_fill( ps_psm_t *p_psm,
                                const uint8_t *p_buffer, size_t i_pkt,
-                               ps_track_t tk[PS_TK_COUNT], es_out_t *out )
+                               ps_track_t tk[PS_TK_COUNT])
 {
     size_t i_length, i_info_length, i_es_base;
     uint8_t i_version;

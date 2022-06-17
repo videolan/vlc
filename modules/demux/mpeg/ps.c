@@ -513,7 +513,7 @@ static int Demux( demux_t *p_demux )
 
         ps_psm_fill( &p_sys->psm,
                      p_pkt->p_buffer, p_pkt->i_buffer,
-                     p_sys->tk, p_demux->out );
+                     p_sys->tk );
         block_Release( p_pkt );
         break;
 
