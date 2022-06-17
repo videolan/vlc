@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *VLCLibraryModelAudioMediaListUpdated;
 extern NSString *VLCLibraryModelArtistListUpdated;
 extern NSString *VLCLibraryModelAlbumListUpdated;
+extern NSString *VLCLibraryModelGenreListUpdated;
 extern NSString *VLCLibraryModelVideoMediaListUpdated;
 extern NSString *VLCLibraryModelRecentMediaListUpdated;
 extern NSString *VLCLibraryModelMediaItemUpdated;

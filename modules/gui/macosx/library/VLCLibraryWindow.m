@@ -218,6 +218,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(updateLibraryRepresentation:)
+                               name:VLCLibraryModelGenreListUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateLibraryRepresentation:)
                                name:VLCLibraryModelVideoMediaListUpdated
                              object:nil];
     [notificationCenter addObserver:self

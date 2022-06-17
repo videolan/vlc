@@ -29,6 +29,7 @@
 NSString *VLCLibraryModelAudioMediaListUpdated = @"VLCLibraryModelAudioMediaListUpdated";
 NSString *VLCLibraryModelArtistListUpdated = @"VLCLibraryModelArtistListUpdated";
 NSString *VLCLibraryModelAlbumListUpdated = @"VLCLibraryModelAlbumListUpdated";
+NSString *VLCLibraryModelGenreListUpdated = @"VLCLibraryModelGenreListUpdated";
 NSString *VLCLibraryModelVideoMediaListUpdated = @"VLCLibraryModelVideoMediaListUpdated";
 NSString *VLCLibraryModelRecentMediaListUpdated = @"VLCLibraryModelRecentMediaListUpdated";
 NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
@@ -242,7 +243,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_album_list_release(p_album_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_cachedAlbums = [mutableArray copy];
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelAlbumListUpdated object:self];
         });
     });
 }
@@ -276,7 +277,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_genre_list_release(p_genre_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_cachedGenres = [mutableArray copy];
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelArtistListUpdated object:self];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGenreListUpdated object:self];
         });
     });
 }
