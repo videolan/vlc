@@ -125,7 +125,7 @@ enum VLCTreeBranchType {
 - (id)initWithSubcategory:(enum vlc_config_subcat)subcategory;
 - (id)initWithPlugin:(module_t *)plugin;
 
-- (VLCTreeBranchItem *)childRepresentingSubcategory:(enum vlc_config_cat)category;
+- (VLCTreeBranchItem *)childRepresentingSubcategory:(enum vlc_config_subcat)category;
 
 - (enum VLCTreeBranchType)branchType;
 - (enum vlc_config_cat)category;
