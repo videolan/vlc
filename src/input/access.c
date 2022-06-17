@@ -79,7 +79,7 @@ static stream_t *accessNewAttachment(vlc_object_t *parent,
         vlc_stream_Delete(stream);
         return NULL;
     }
-    stream->psz_location = stream->psz_url + 13;
+    stream->psz_location = stream->psz_url + strlen("attachment://");
     return stream;
 }
 
