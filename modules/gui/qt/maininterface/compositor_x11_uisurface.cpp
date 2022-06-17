@@ -20,6 +20,7 @@
 #include <QQmlEngine>
 #include <QQuickWindow>
 #include <QQuickItem>
+#include <QOffscreenSurface>
 
 #include "compositor_x11_uisurface.hpp"
 
@@ -66,16 +67,31 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
 
 CompositorX11UISurface::~CompositorX11UISurface()
 {
+    auto surface = new QOffscreenSurface();
+    surface->setFormat(m_context->format());
+    surface->create();
+
+    // Make sure the context is current while doing cleanup. Note that we use the
+    // offscreen surface here because passing 'this' at this point is not safe: the
+    // underlying platform window may already be destroyed. To avoid all the trouble, use
+    // another surface that is valid for sure.
+    m_context->makeCurrent(surface);
+
     if (m_rootItem)
         delete m_rootItem;
-    if (m_uiWindow)
-        delete m_uiWindow;
     if (m_uiRenderControl)
         delete m_uiRenderControl;
-    if (m_context)
-        delete m_context;
+    if (m_uiWindow)
+        delete m_uiWindow;
     if (m_qmlEngine)
         delete m_qmlEngine;
+
+    m_context->doneCurrent();
+
+    delete surface;
+    if (m_context)
+        delete m_context;
+
 }
 
 
