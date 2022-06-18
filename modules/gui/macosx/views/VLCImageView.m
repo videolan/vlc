@@ -24,6 +24,12 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 
+@interface VLCImageView()
+{
+    NSURL *_currentArtworkURL;
+}
+@end
+
 @implementation VLCImageView
 
 - (instancetype)initWithFrame:(NSRect)frameRect
@@ -145,7 +151,13 @@
 
 - (void)setImageURL:(NSURL * _Nonnull)artworkURL placeholderImage:(NSImage * _Nullable)image
 {
+    if([_currentArtworkURL isEqual:artworkURL]) {
+        return;
+    }
+
+    _currentArtworkURL = artworkURL;
     [self setImage:image];
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         NSImage *downloadedImage = [[NSImage alloc] initWithContentsOfURL:artworkURL];
         dispatch_async(dispatch_get_main_queue(), ^{
