@@ -1633,33 +1633,29 @@ static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t 
 
     msg_Dbg( p_dec, "changing delay: %"PRId64, delay );
 
+    vlc_mutex_lock( &p_owner->lock );
     switch( p_dec->fmt_in.i_cat )
     {
         case VIDEO_ES:
-            vlc_mutex_lock( &p_owner->lock );
             if( p_owner->p_vout != NULL && p_owner->vout_started )
                 vout_ChangeDelay( p_owner->p_vout, delay );
-            vlc_mutex_unlock( &p_owner->lock );
             break;
         case AUDIO_ES:
-            vlc_mutex_lock( &p_owner->lock );
             if( p_owner->p_astream != NULL )
                 vlc_aout_stream_ChangeDelay( p_owner->p_astream, delay );
-            vlc_mutex_unlock( &p_owner->lock );
             break;
         case SPU_ES:
-            vlc_mutex_lock( &p_owner->lock );
             if( p_owner->p_vout != NULL )
             {
                 assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
                 vout_ChangeSpuDelay(p_owner->p_vout, p_owner->i_spu_channel,
                                     delay);
             }
-            vlc_mutex_unlock( &p_owner->lock );
             break;
         default:
             vlc_assert_unreachable();
     }
+    vlc_mutex_unlock( &p_owner->lock );
 }
 
 /**
