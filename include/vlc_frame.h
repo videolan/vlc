@@ -743,6 +743,28 @@ VLC_API size_t vlc_fifo_GetCount(const vlc_fifo_t *) VLC_USED;
  */
 VLC_API size_t vlc_fifo_GetBytes(const vlc_fifo_t *) VLC_USED;
 
+/**
+ * Checks whether the vlc_fifo_t object is being locked.
+ *
+ * This function checks if the calling thread holds a given vlc_fifo_t
+ * object. It has no side effects and is essentially intended for run-time
+ * debugging.
+ *
+ * @note This function is the vlc_fifo_t equivalent of vlc_mutex_held.
+ *
+ * @note To assert that the calling thread holds a lock, the helper macro
+ * vlc_fifo_Assert() should be used instead of this function.
+ *
+ * @retval false the fifo is not locked by the calling thread
+ * @retval true the fifo is locked by the calling thread
+ */
+VLC_API bool vlc_fifo_Held(const vlc_fifo_t *fifo) VLC_USED;
+
+/**
+ * Asserts that a vlc_fifo_t is locked by the calling thread.
+ */
+#define vlc_fifo_Assert(fifo) assert(vlc_fifo_Held(fifo))
+
 VLC_USED static inline bool vlc_fifo_IsEmpty(const vlc_fifo_t *fifo)
 {
     return vlc_queue_IsEmpty(vlc_fifo_queue(fifo));

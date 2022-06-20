@@ -44,6 +44,11 @@ struct vlc_fifo_t
 
 static_assert (offsetof (block_fifo_t, q) == 0, "Problems in <vlc_block.h>");
 
+bool vlc_fifo_Held(const block_fifo_t *fifo)
+{
+    return vlc_mutex_held(&fifo->q.lock);
+}
+
 size_t vlc_fifo_GetCount(const block_fifo_t *fifo)
 {
     vlc_mutex_assert(&fifo->q.lock);
