@@ -158,8 +158,8 @@ static int rtp_raw_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
      || vlc_sdp_fmtp_get(desc, "width", &sys->width)
      || vlc_sdp_fmtp_get(desc, "height", &sys->height)
      || vlc_sdp_fmtp_get(desc, "depth", &sys->depth)) {
+        vlc_error(obj->logger, "missing parameters for raw video");
         free(sys);
-        vlc_error(sys->log, "missing parameters for raw video");
         return VLC_EINVAL;
     }
 
