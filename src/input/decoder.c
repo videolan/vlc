@@ -55,6 +55,53 @@
 
 #include "../video_output/vout_internal.h"
 
+
+/**
+ * \file src/input/decoder.c
+ *
+ * The input decoder connects the input client pushing data to the
+ * decoder implementation (through the matching elementary stream)
+ * and the following output for audio, video and subtitles.
+ *
+ * It follows the locking rules below:
+ *
+ *  - The fifo cannot be locked when calling function from the
+ *    decoder module implementation.
+ *
+ *  - However, the decoder module implementation might indirectly
+ *    lock the fifo when calling the owner methods, in particular
+ *    to send a frame or update the output status.
+ *
+ *  - The input code can lock the fifo to modify the global state
+ *    of the input decoder.
+ *
+ * Backpressure preventing starvation is done by the pacing of the
+ * decoder, the calls into the decoder implementation, and the
+ * limits of the fifo queue.
+ *
+ * Basically a very fast decoder will often wait since the fifo will be
+ * consumed really quickly and thus almost never stay under the lock.
+ * Likewise, when the decoder is slower and the fifo can grow, it also
+ * means that the decoder thread will wait more often on the
+ * `decoder_t::pf_decode` call, which is done without the fifo lock as
+ * per above rules.
+ *
+ * In addition with the standard input/output cycle from the decoder,
+ * the video decoders can create sub-decoders for the closed captions
+ * support embedded in the supplementary information from the codecs.
+ *
+ * To do so, they need to create a `decoder_cc_desc_t` matching with the
+ * format that needs to be described (number of channels, type of
+ * channels) and they then create them along with the closed-captions
+ * content with `decoder_QueueCc`.
+ *
+ * In the `input/decoder.c` code, the access to the sub-decoders in the
+ * cc.pp_decoders table is protected through the `cc.lock` mutex.
+ * Taking this lock ensures that the sub-decoder won't get
+ * asynchronously removed while using it, and any mutex from the
+ * sub-decoder can then be taken under this lock.
+ **/
+
 /*
  * Possibles values set in p_owner->reload atomic
  */
