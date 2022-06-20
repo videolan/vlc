@@ -246,6 +246,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                             forKeyPath:@"effectiveAppearance"
                                                options:0
                                                context:nil];
+        
+        _mediaToolBar.centeredItemIdentifier = _segmentedTitleControlToolbarItem.itemIdentifier;
     }
 
     _fspanel = [[VLCFSPanelController alloc] init];
@@ -261,7 +263,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [_segmentedTitleControl setLabel:_NS("Streams") forSegment:3];
     [_segmentedTitleControl sizeToFit];
     [_segmentedTitleControl setSelectedSegment:0];
-    
 
     _playlistDragDropView.dropTarget = self;
     _playlistCounterTextField.useStrongRounding = YES;
@@ -349,6 +350,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     
     _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _mediaSourceCollectionViewScrollView.contentInsets = scrollViewEdgeInsets;
+
+    // HACK: The size of the segmented title buttons is not always correctly calculated
+    // especially when the text we are setting differs from what is set in the storyboard.
+    // Hiding and showing the toolbar again must trigger something that causes the width
+    // of the buttons to be correctly recalculated, working around this issue
+    [self toggleToolbarShown:self];
+    [self toggleToolbarShown:self];
 }
 
 - (void)dealloc
