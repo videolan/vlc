@@ -132,7 +132,7 @@ ca_Open(audio_output_t *p_aout)
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
     p_aout->flush = ca_Flush;
-    p_aout->time_get = ca_TimeGet;
+    p_aout->time_get = NULL;
 
     return VLC_SUCCESS;
 }
@@ -143,6 +143,8 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
           uint8_t *p_output, size_t i_requested, bool *is_silence)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    vlc_tick_t i_now_ticks = vlc_tick_now();
 
     lock_lock(p_sys);
 
@@ -230,6 +232,8 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         p_sys->pp_out_last = &p_sys->p_out_chain;
     p_sys->i_out_size -= i_copied;
 
+    p_sys->i_total_frames += i_copied;
+
     /* Pad with 0 */
     if (i_requested > 0)
     {
@@ -240,7 +244,25 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
 
     if (is_silence != NULL)
         *is_silence = p_sys->b_muted;
+
+    /* Convert host time to ticks */
+    vlc_tick_t i_host_ticks = HostTimeToTick(p_sys, i_host_time - mach_absolute_time())
+                            + i_now_ticks;
+
+    /* Report a timing every seconds */
+    if (p_sys->i_last_latency_ticks == VLC_TICK_INVALID
+     || i_host_ticks - p_sys->i_last_latency_ticks >= VLC_TICK_FROM_SEC(1))
+    {
+        vlc_tick_t frames_tick = FramesToTicks(p_sys,
+                                    BytesToFrames(p_sys, p_sys->i_total_frames))
+                               + p_sys->i_dev_latency_ticks;
+
+        aout_TimingReport(p_aout, i_host_ticks, frames_tick);
+        p_sys->i_last_latency_ticks = i_host_ticks;
+    }
+
     lock_unlock(p_sys);
+
     return;
 
 drop:
@@ -258,30 +280,6 @@ ca_GetLatencyLocked(audio_output_t *p_aout)
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
     return FramesToTicks(p_sys, i_out_frames + p_sys->i_render_frames)
            + p_sys->i_dev_latency_ticks;
-}
-
-int
-ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
-{
-    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
-    lock_lock(p_sys);
-
-    if (p_sys->i_render_host_time == 0 || p_sys->i_first_render_host_time == 0)
-    {
-        /* Not yet started (or reached the first_render host time) */
-        lock_unlock(p_sys);
-        return -1;
-    }
-
-    int64_t i_render_delay_host_time = p_sys->i_render_host_time
-                                     - mach_absolute_time();
-    const vlc_tick_t i_render_delay =
-        HostTimeToTick(p_sys, i_render_delay_host_time);
-
-    *delay = ca_GetLatencyLocked(p_aout) + i_render_delay;
-    lock_unlock(p_sys);
-    return 0;
 }
 
 void
@@ -304,6 +302,8 @@ ca_Flush(audio_output_t *p_aout)
 
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_render_frames = 0;
+    p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
+    p_sys->i_total_frames = 0;
     lock_unlock(p_sys);
 
     p_sys->b_played = false;
@@ -435,6 +435,8 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->b_muted = false;
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_render_frames = 0;
+    p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
+    p_sys->i_total_frames = 0;
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
