@@ -304,15 +304,23 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
         input_item_AddInfo( p_input, _( "Podcast Info" ), (info), "%s", \
                             (field) ); \
         FREENULL( field ); }
-                    ADD_INFO( _("Podcast Publication Date"), psz_item_date  );
-                    ADD_INFO( _("Podcast Author"), psz_item_author );
+#define ADD_INFO_META( info, field, meta ) \
+    if( field ) { \
+        input_item_AddInfo( p_input, _( "Podcast Info" ), (info), "%s", \
+                            (field) ); \
+        input_item_SetMeta( p_input, (meta), field ); \
+        FREENULL( field ); }
+
+                    ADD_INFO_META( _("Podcast Publication Date"), psz_item_date, vlc_meta_Date );
+                    ADD_INFO_META( _("Podcast Author"), psz_item_author, vlc_meta_Artist );
                     ADD_INFO( _("Podcast Subcategory"), psz_item_category );
                     ADD_INFO( _("Podcast Duration"), psz_item_duration );
                     ADD_INFO( _("Podcast Keywords"), psz_item_keywords );
                     ADD_INFO( _("Podcast Subtitle"), psz_item_subtitle );
-                    ADD_INFO( _("Podcast Summary"), psz_item_summary );
+                    ADD_INFO_META( _("Podcast Summary"), psz_item_summary, vlc_meta_Description );
                     ADD_INFO( _("Podcast Type"), psz_item_type );
 #undef ADD_INFO
+#undef ADD_INFO_META
 
                     /* Add the global art url to this item, if any */
                     if( psz_art_url )
