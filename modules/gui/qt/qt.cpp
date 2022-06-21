@@ -826,7 +826,7 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
     return sys->mi->controlVideo(i_query, args);
 }
 
-void WindowReleased(vout_window_t *wnd)
+void WindowOrphaned(vout_window_t *wnd)
 {
     vout_window_qt_t *sys = (vout_window_qt_t *)wnd->sys;
     QMutexLocker locker(&sys->lock);
