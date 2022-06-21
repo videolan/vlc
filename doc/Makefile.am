@@ -11,6 +11,7 @@ LIBVLC_SAMPLES = \
 	libvlc/vlc-thumb.c \
 	libvlc/wx_player.cpp \
 	libvlc/win_player.c \
+	libvlc/CMakeLists.txt \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
