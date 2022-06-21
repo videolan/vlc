@@ -178,25 +178,21 @@ error:
 
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
-    unsigned long long available;
 
     vlc_mutex_lock(&pool->lock);
     assert(vlc_atomic_rc_get(&pool->refs) > 0);
-    available = pool->available;
 
-    while (available != 0)
+    if (pool->available == 0)
     {
-        int i = ctz(available);
-
-        pool->available &= ~(1ULL << i);
         vlc_mutex_unlock(&pool->lock);
-        available &= ~(1ULL << i);
-
-        return picture_pool_ClonePicture(pool, i);
+        return NULL;
     }
 
+    int i = ctz(pool->available);
+    pool->available &= ~(1ULL << i);
     vlc_mutex_unlock(&pool->lock);
-    return NULL;
+
+    return picture_pool_ClonePicture(pool, i);
 }
 
 picture_t *picture_pool_Wait(picture_pool_t *pool)
