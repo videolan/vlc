@@ -291,6 +291,7 @@
     <qresource prefix="/medialibrary">
         <file alias="EmptyLabel.qml">medialibrary/qml/EmptyLabel.qml</file>
         <file alias="EmptyLabelButton.qml">medialibrary/qml/EmptyLabelButton.qml</file>
+        <file alias="EmptyLabelHint.qml">medialibrary/qml/EmptyLabelHint.qml</file>
         <file alias="MediaGroupDisplay.qml">medialibrary/qml/MediaGroupDisplay.qml</file>
         <file alias="MusicAlbums.qml">medialibrary/qml/MusicAlbums.qml</file>
         <file alias="MusicDisplay.qml">medialibrary/qml/MusicDisplay.qml</file>

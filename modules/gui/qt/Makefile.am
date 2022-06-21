@@ -763,6 +763,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/AudioGridItem.qml \
 	gui/qt/medialibrary/qml/EmptyLabel.qml \
 	gui/qt/medialibrary/qml/EmptyLabelButton.qml \
+	gui/qt/medialibrary/qml/EmptyLabelHint.qml \
 	gui/qt/medialibrary/qml/MediaGroupDisplay.qml \
 	gui/qt/medialibrary/qml/MusicAlbums.qml \
 	gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml \
