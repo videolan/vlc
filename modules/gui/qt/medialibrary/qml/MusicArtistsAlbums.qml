@@ -214,7 +214,7 @@ FocusScope {
         }
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
         visible: artistModel.count === 0
         focus: visible

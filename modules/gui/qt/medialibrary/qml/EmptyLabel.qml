@@ -26,85 +26,82 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: root
 
-    property alias text: label.text
-    property alias showBrowseButton: browseButton.visible
+    // Aliases
+
+    default property alias contents: column.data
+
+    property alias spacing: column.spacing
+
     property alias cover: cover.source
+
     property alias coverWidth: coverContainer.width
     property alias coverHeight: coverContainer.height
 
-    property bool _keyPressed: false
+    property alias text: label.text
+
+    property alias column: column
+
+    // Children
 
     Column {
+        id: column
+
         anchors.verticalCenter: parent.verticalCenter
+
         width: root.width
-        spacing: VLCStyle.margin_large
+
+        spacing: VLCStyle.margin_small
 
         Item {
-            id: coverContainer
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: VLCStyle.colWidth(1)
-            height: VLCStyle.colWidth(1)
-
-            Image {
-                id: cover
-
-                asynchronous: true
-                anchors.fill: parent
-                fillMode: Image.PreserveAspectFit
-            }
-
-            Widgets.ListCoverShadow {
-                anchors.fill: cover
-                source: cover
-            }
-        }
-
-        T.Label {
-            id: label
-
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: VLCStyle.fontSize_xxlarge
-            font.weight: Font.DemiBold
-            color:  VLCStyle.colors.text
-            wrapMode: Text.WordWrap
-            focus: false
+            height: label.y + label.height
+
+            Item {
+                id: coverContainer
+
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                width: VLCStyle.colWidth(1)
+                height: VLCStyle.colWidth(1)
+
+                Image {
+                    id: cover
+
+                    anchors.fill: parent
+
+                    asynchronous: true
+
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                Widgets.ListCoverShadow {
+                    anchors.fill: cover
+
+                    source: cover
+                }
+            }
+
+            T.Label {
+                id: label
+
+                anchors.top: coverContainer.bottom
+
+                anchors.topMargin: VLCStyle.margin_large
+
+                width: parent.width
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                focus: false
+
+                wrapMode: Text.WordWrap
+
+                color: VLCStyle.colors.text
+
+                font.pixelSize: VLCStyle.fontSize_xxlarge
+                font.weight: Font.DemiBold
+            }
         }
-
-        Widgets.TabButtonExt {
-            id: browseButton
-
-            text: I18n.qtr("Browse")
-            focus: true
-            iconTxt: VLCIcons.topbar_network
-            anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: History.push(["mc", "network"])
-            width: VLCStyle.dp(84, VLCStyle.scale)
-
-            Navigation.parentItem: root
-        }
-    }
-
-    Keys.priority: Keys.AfterItem
-
-    Keys.onPressed: {
-        _keyPressed = true
-
-        Navigation.defaultKeyAction(event)
-    }
-
-    Keys.onReleased: {
-        if (_keyPressed === false)
-            return
-
-        _keyPressed = false
-
-        if (KeyHelper.matchOk(event)) {
-            History.push(["mc", "network"])
-        }
-
-        Navigation.defaultKeyReleaseAction(event)
     }
 }

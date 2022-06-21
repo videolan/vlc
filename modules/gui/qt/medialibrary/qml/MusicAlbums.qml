@@ -278,7 +278,7 @@ FocusScope {
         }
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
         visible: albumModelId.count === 0
         focus: visible

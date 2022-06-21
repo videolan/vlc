@@ -210,7 +210,7 @@ FocusScope {
         Keys.onDeletePressed: onDelete()
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
 
         visible: (model.count === 0)

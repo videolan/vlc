@@ -302,7 +302,7 @@ FocusScope {
         }
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
         visible: genreModel.count === 0
         focus: genreModel.count === 0

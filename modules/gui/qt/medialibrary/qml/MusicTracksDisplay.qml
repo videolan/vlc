@@ -53,7 +53,7 @@ FocusScope {
         displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
         visible: tracklistdisplay_id.model.count === 0
         focus: tracklistdisplay_id.model.count === 0

@@ -364,7 +364,7 @@ FocusScope {
         }
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
 
         coverWidth : VLCStyle.dp(182, VLCStyle.scale)

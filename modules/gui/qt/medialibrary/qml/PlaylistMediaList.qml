@@ -419,7 +419,7 @@ FocusScope {
         }
     }
 
-    EmptyLabel {
+    EmptyLabelButton {
         anchors.fill: parent
 
         visible: (model.count === 0)
