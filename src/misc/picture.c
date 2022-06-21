@@ -497,6 +497,8 @@ picture_AttachNewAncillary(picture_t *pic, vlc_ancillary_id id, size_t size)
         return NULL;
     }
 
+    vlc_ancillary_Release(ancillary);
+
     return data;
 }
 
