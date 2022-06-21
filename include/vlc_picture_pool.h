@@ -105,14 +105,6 @@ VLC_API picture_t * picture_pool_Get( picture_pool_t * ) VLC_USED;
 VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
 
 /**
- * Cancel the picture pool.
- *
- * It won't return any pictures via picture_pool_Get or picture_pool_Wait if
- * canceled is true. This function will also unblock picture_pool_Wait.
- */
-void picture_pool_Cancel( picture_pool_t *, bool canceled );
-
-/**
  * Reserves pictures from a pool and creates a new pool with those.
  *
  * When the new pool is released, pictures are returned to the master pool.
