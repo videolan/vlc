@@ -419,7 +419,7 @@ FocusScope {
         }
     }
 
-    EmptyLabelButton {
+    EmptyLabelHint {
         anchors.fill: parent
 
         visible: (model.count === 0)
@@ -427,9 +427,8 @@ FocusScope {
         focus: visible
 
         text: I18n.qtr("No playlists found")
+        hint: I18n.qtr("Right click on a media to add it to a playlist")
 
         cover: VLCStyle.noArtAlbumCover
-
-        Navigation.parentItem: root
     }
 }
