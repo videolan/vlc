@@ -205,8 +205,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     connect( this, SIGNAL(askGetVideo(struct vout_window_t*, unsigned, unsigned, bool, bool*)),
              this, SLOT(getVideoSlot(struct vout_window_t*, unsigned, unsigned, bool, bool*)),
              Qt::BlockingQueuedConnection );
-    connect( this, SIGNAL(askReleaseVideo( void )),
-             this, SLOT(releaseVideoSlot( void )),
+    connect( this, SIGNAL(askReleaseVideo( bool )),
+             this, SLOT(releaseVideoSlot( bool )),
              Qt::BlockingQueuedConnection );
     CONNECT( this, askVideoOnTop(bool), this, setVideoOnTop(bool));
 
@@ -274,7 +274,7 @@ MainInterface::~MainInterface()
         showTab( bgWidget );
 
     if( videoWidget )
-        releaseVideoSlot();
+        releaseVideoSlot(true);
 
     /* Be sure to kill the actionsManager... Only used in the MI and control */
     ActionsManager::killInstance();
@@ -771,17 +771,17 @@ void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
 /* Asynchronous call from the WindowClose function */
 void MainInterface::releaseVideo( void )
 {
-    emit askReleaseVideo();
+    emit askReleaseVideo(false);
 }
 
 /* Function that is CONNECTED to the previous emit */
-void MainInterface::releaseVideoSlot( void )
+void MainInterface::releaseVideoSlot( bool forced )
 {
     /* This function is called when the embedded video window is destroyed,
      * or in the rare case that the embedded window is still here but the
      * Qt interface exits. */
     assert( videoWidget );
-    videoWidget->release();
+    videoWidget->release( forced );
     setVideoOnTop( false );
     setVideoFullScreen( false );
     hideResumePanel();
@@ -1674,7 +1674,7 @@ void MainInterface::closeEvent( QCloseEvent *e )
     if ( b_minimalView )
         setMinimalView( false );
     if( videoWidget )
-        releaseVideoSlot();
+        releaseVideoSlot( true );
     emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
     /* Accept session quit. Otherwise we break the desktop mamager. */
     e->accept();

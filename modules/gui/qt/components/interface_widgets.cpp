@@ -402,9 +402,9 @@ void VideoWidget::mouseDoubleClickEvent( QMouseEvent *event )
 }
 
 
-void VideoWidget::release( void )
+void VideoWidget::release( bool forced )
 {
-    msg_Dbg( p_intf, "Video is not needed anymore" );
+    msg_Dbg( p_intf, "video widget is %s", forced ? "orphaned" : "released" );
 
     if( stable )
     {

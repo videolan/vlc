@@ -217,7 +217,7 @@ public slots:
     /* Manage the Video Functions from the vout threads */
     void getVideoSlot( struct vout_window_t *,
                        unsigned i_width, unsigned i_height, bool, bool * );
-    void releaseVideoSlot( void );
+    void releaseVideoSlot( bool forced );
 
     void emitBoss();
     void emitRaise();
@@ -270,7 +270,7 @@ protected slots:
 signals:
     void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool,
                       bool * );
-    void askReleaseVideo( );
+    void askReleaseVideo( bool );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
     void askHideMouse( bool );

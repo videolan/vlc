@@ -60,7 +60,7 @@ public:
     virtual ~VideoWidget();
 
     bool request( struct vout_window_t * );
-    void release( void );
+    void release( bool forced );
     void sync( void );
 
 protected:
