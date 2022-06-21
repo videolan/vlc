@@ -47,6 +47,7 @@ check_PROGRAMS = \
 	test_modules_demux_ts_pes \
 	test_modules_playlist_m3u \
 	test_modules_stream_out_transcode \
+	test_modules_stream_out_pcr_sync \
 	$(NULL)
 
 if ENABLE_SOUT
@@ -183,6 +184,11 @@ test_modules_stream_out_transcode_SOURCES = \
 	modules/stream_out/transcode.h \
 	modules/stream_out/transcode_scenarios.c
 test_modules_stream_out_transcode_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_modules_stream_out_pcr_sync_SOURCES = modules/stream_out/pcr_sync.c \
+	../modules/stream_out/transcode/pcr_sync.c \
+	../modules/stream_out/transcode/pcr_sync.h
+test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
