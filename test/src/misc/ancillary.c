@@ -90,6 +90,11 @@ int main( void )
     assert(ancillary);
     picture_AttachAncillary(picture, ancillary);
 
+    const char test3[] = "test3";
+    void *data = picture_AttachNewAncillary(picture, VLC_ANCILLARY_ID('t','s','t','3'), sizeof(test3));
+    assert(data);
+    strcpy(data, test3);
+
     vlc_frame_Release(frame);
 
     /* Check that ancillaries are copied via a picture_Clone(). */
@@ -111,6 +116,10 @@ int main( void )
     ancillary = picture_GetAncillary(copy, VLC_ANCILLARY_ID('t','s','t','2'));
     assert(ancillary);
     assert(strcmp("test2", vlc_ancillary_GetData(ancillary)) == 0);
+
+    ancillary = picture_GetAncillary(copy, VLC_ANCILLARY_ID('t','s','t','3'));
+    assert(ancillary);
+    assert(strcmp("test3", vlc_ancillary_GetData(ancillary)) == 0);
 
     picture_Release(copy);
 
