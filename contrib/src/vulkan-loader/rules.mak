@@ -60,5 +60,5 @@ ifdef HAVE_WIN32
 endif
 
 	$(call pkg_static,"build/loader/vulkan.pc")
-	cd $</build && $(MAKE) install
+	+$(CMAKEBUILD) $</build --target install
 	touch $@
