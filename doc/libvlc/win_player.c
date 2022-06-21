@@ -3,6 +3,10 @@
 #include <windows.h>
 #include <assert.h>
 
+#ifdef _MSC_VER
+typedef int ssize_t;
+#endif
+
 #include <vlc/vlc.h>
 
 #define SCREEN_WIDTH  1500
