@@ -270,7 +270,7 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
         if (!ret)
             return false;
 
-        ret = commonGUICreate(m_rootWindow, m_uiSurface.get(), CompositorVideo::CAN_SHOW_PIP);
+        ret = commonGUICreate(m_rootWindow, nullptr, m_uiSurface.get(), CompositorVideo::CAN_SHOW_PIP);
         if (!ret)
             return false;
 

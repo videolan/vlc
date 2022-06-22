@@ -70,7 +70,7 @@ class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstr
 {
     Q_OBJECT
 public:
-    explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
+    explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandlerWin32();
     virtual void toggleWindowVisibility() override;
 

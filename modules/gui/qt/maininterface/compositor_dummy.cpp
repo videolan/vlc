@@ -54,7 +54,7 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
         m_qmlWidget->setFlag(Qt::FramelessWindowHint);
     m_qmlWidget->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, m_qmlWidget.get());
+    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, m_qmlWidget.get(), nullptr);
 
     MainUI* ui = new MainUI(m_intf, m_mainCtx, m_qmlWidget.get(), m_qmlWidget.get());
     ui->setup(m_qmlWidget->engine());

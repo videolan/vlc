@@ -25,10 +25,11 @@
 #include <QQmlProperty>
 
 
-InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
+InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent)
     : QObject(parent)
     , p_intf(_p_intf)
     , m_window(window)
+    , m_widget(widget)
     , m_mainCtx(mainCtx)
 {
     assert(m_window);
@@ -96,18 +97,13 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 #endif
 
     connect(m_mainCtx, &MainCtx::requestInterfaceMaximized,
-            m_window, &QWindow::showMaximized);
+            this, &InterfaceWindowHandler::setInterfaceMaximized);
 
     connect(m_mainCtx, &MainCtx::requestInterfaceNormal,
-            m_window, &QWindow::showNormal);
+            this, &InterfaceWindowHandler::setInterfaceNormal);
 
     connect(m_mainCtx, &MainCtx::requestInterfaceMinimized,
-            m_window, [this]()
-    {
-        // taking OR with the current state, we preserve the current state
-        // so with next active request, we restore window in it's pre-minimized state
-        m_window->setWindowStates(m_window->windowStates() | Qt::WindowMinimized);
-    });
+            this, &InterfaceWindowHandler::setInterfaceMinimized);
 
     m_window->installEventFilter(this);
 }
@@ -124,9 +120,18 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
 void InterfaceWindowHandler::updateCSDWindowSettings()
 {
-    m_window->hide(); // some window managers don't like to change frame window hint on visible window
-    m_window->setFlag(Qt::FramelessWindowHint, m_mainCtx->useClientSideDecoration());
-    m_window->show();
+    if (m_widget)
+    {
+        m_widget->hide(); // some window managers don't like to change frame window hint on visible window
+        m_widget->setWindowFlag(Qt::FramelessWindowHint, m_mainCtx->useClientSideDecoration());
+        m_widget->show();
+    }
+    else
+    {
+        m_window->hide(); // some window managers don't like to change frame window hint on visible window
+        m_window->setFlag(Qt::FramelessWindowHint, m_mainCtx->useClientSideDecoration());
+        m_window->show();
+    }
 }
 #endif
 
@@ -156,7 +161,7 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
             oldState & Qt::WindowFullScreen &&
             m_maximizedView )
         {
-            m_window->showMaximized();
+            setInterfaceMaximized();
             return false;
         }
 
@@ -277,15 +282,15 @@ void InterfaceWindowHandler::toggleWindowVisibility()
     {
     case QWindow::Hidden:
         /* If hidden, show it */
-        m_window->show();
-        m_window->requestActivate();
+        setInterfaceShown();
+        requestActivate();
         break;
     case QWindow::Minimized:
-        m_window->showNormal();
-        m_window->requestActivate();
+        setInterfaceNormal();
+        requestActivate();
         break;
     default:
-        m_window->hide();
+        setInterfaceHiden();
         break;
     }
 }
@@ -298,19 +303,19 @@ void InterfaceWindowHandler::setInterfaceVisible(bool visible)
         switch ( m_window->visibility() )
         {
         case QWindow::Hidden:
-            m_window->show();
+            setInterfaceShown();
             break;
         case QWindow::Minimized:
-            m_window->showNormal();
+            setInterfaceNormal();
             break;
         default:
             break;
         }
-        m_window->requestActivate();
+        requestActivate();
     }
     else
     {
-        m_window->hide();
+        setInterfaceHiden();
     }
 }
 
@@ -328,8 +333,11 @@ void InterfaceWindowHandler::setInterfaceFullScreen( bool fs )
 
 void InterfaceWindowHandler::setRaise()
 {
-    m_window->requestActivate();
-    m_window->raise();
+    requestActivate();
+    if (m_widget)
+        m_widget->raise();
+    else
+        m_window->raise();
 }
 
 void InterfaceWindowHandler::setBoss()
@@ -337,12 +345,61 @@ void InterfaceWindowHandler::setBoss()
     THEMPL->pause();
     if( m_mainCtx->getSysTray() )
     {
-        m_window->hide();
+        setInterfaceHiden();
     }
     else
     {
-        m_window->showMinimized();
+        setInterfaceMinimized();
     }
+}
+
+void InterfaceWindowHandler::setInterfaceHiden()
+{
+    if (m_widget)
+        m_widget->hide();
+    else
+        m_window->hide();
+}
+
+void InterfaceWindowHandler::setInterfaceShown()
+{
+    if (m_widget)
+        m_widget->show();
+    else
+        m_window->show();
+}
+
+void InterfaceWindowHandler::setInterfaceMinimized()
+{
+    if (m_widget)
+        m_widget->showMinimized();
+    else
+        m_window->showMinimized();
+}
+
+void InterfaceWindowHandler::setInterfaceMaximized()
+{
+    if (m_widget)
+        m_widget->showMaximized();
+    else
+        m_window->showMaximized();
+}
+
+void InterfaceWindowHandler::setInterfaceNormal()
+{
+    if (m_widget)
+        m_widget->showNormal();
+    else
+        m_window->showNormal();
+}
+
+
+void InterfaceWindowHandler::requestActivate()
+{
+    if (m_widget)
+        m_widget->activateWindow();
+    else
+        m_window->requestActivate();
 }
 
 void InterfaceWindowHandler::setInterfaceAlwaysOnTop( bool on_top )

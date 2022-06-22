@@ -185,7 +185,7 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP;
     if (m_renderWindow->hasAcrylic())
         flags |= CompositorVideo::HAS_ACRYLIC;
-    commonGUICreate(m_interfaceWindow, m_qmlView.get(), flags);
+    commonGUICreate(m_interfaceWindow, m_renderWindow.get(), m_qmlView.get(), flags);
 
     m_renderWindow->setInterfaceWindow(m_qmlView.get());
     m_renderWindow->setVideoWindow(m_videoWidget->windowHandle());

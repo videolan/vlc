@@ -119,13 +119,13 @@ protected:
     void commonWindowDisable();
 
 protected:
-    bool commonGUICreate(QWindow* window, QmlUISurface* , CompositorVideo::Flags flags);
-    bool commonGUICreate(QWindow* window, QQuickView* , CompositorVideo::Flags flags);
+    bool commonGUICreate(QWindow* window, QWidget* rootWidget, QmlUISurface* , CompositorVideo::Flags flags);
+    bool commonGUICreate(QWindow* window, QWidget* rootWidget, QQuickView* , CompositorVideo::Flags flags);
     void commonGUIDestroy();
     void commonIntfDestroy();
 
 private:
-    bool commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags);
+    bool commonGUICreateImpl(QWindow* window, QWidget* rootWidget, CompositorVideo::Flags flags);
 
 protected slots:
     virtual void onSurfacePositionChanged(const QPointF&) {}

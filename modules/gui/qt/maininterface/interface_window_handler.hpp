@@ -28,7 +28,7 @@ class InterfaceWindowHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
+    explicit InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandler();
 
 public slots:
@@ -40,10 +40,16 @@ protected slots:
     virtual void setInterfaceAlwaysOnTop( bool on_top );
     virtual void toggleWindowVisibility();
     virtual void setInterfaceVisible(bool);
-
+    virtual void setInterfaceHiden();
+    virtual void setInterfaceShown();
+    virtual void setInterfaceMinimized();
+    virtual void setInterfaceMaximized();
+    virtual void setInterfaceNormal();
 
     virtual void setRaise();
     virtual void setBoss();
+
+    void requestActivate();
 
     virtual bool eventFilter(QObject*, QEvent* event) override;
 
@@ -63,7 +69,11 @@ private:
 
 protected:
     qt_intf_t* p_intf = nullptr;
+    //some compositor uses a Window as the base interface, some uses a widget
+    //when a widget is used, perform window operation on it
     QWindow* m_window = nullptr;
+    QWidget* m_widget = nullptr;
+
     MainCtx* m_mainCtx = nullptr;
 
     bool m_hasPausedWhenMinimized = false;

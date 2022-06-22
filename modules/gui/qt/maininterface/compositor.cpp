@@ -235,7 +235,7 @@ void CompositorVideo::commonWindowDisable()
 }
 
 
-bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags)
+bool CompositorVideo::commonGUICreateImpl(QWindow* window, QWidget* rootWidget, CompositorVideo::Flags flags)
 {
     assert(m_mainCtx);
 
@@ -253,9 +253,9 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     m_videoWindowHandler->setWindow( window );
 
 #ifdef _WIN32
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainCtx, window);
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainCtx, window, rootWidget);
 #else
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, window);
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx,  window, rootWidget);
 #endif
     m_mainCtx->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
 
@@ -267,9 +267,9 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     return true;
 }
 
-bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface, CompositorVideo::Flags flags)
+bool CompositorVideo::commonGUICreate(QWindow* window, QWidget* rootWidget, QmlUISurface* qmlSurface, CompositorVideo::Flags flags)
 {
-    bool ret = commonGUICreateImpl(window, flags);
+    bool ret = commonGUICreateImpl(window, rootWidget, flags);
     if (!ret)
         return false;
     ret = m_ui->setup(qmlSurface->engine());
@@ -279,9 +279,9 @@ bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface,
     return true;
 }
 
-bool CompositorVideo::commonGUICreate(QWindow* window, QQuickView* qmlView, CompositorVideo::Flags flags)
+bool CompositorVideo::commonGUICreate(QWindow* window, QWidget* rootWidget, QQuickView* qmlView, CompositorVideo::Flags flags)
 {
-    bool ret = commonGUICreateImpl(window, flags);
+    bool ret = commonGUICreateImpl(window, rootWidget, flags);
     if (!ret)
         return false;
     ret = m_ui->setup(qmlView->engine());

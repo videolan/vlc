@@ -505,8 +505,8 @@ void MainCtxWin32::reloadPrefs()
 
 // InterfaceWindowHandlerWin32
 
-InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
-    : InterfaceWindowHandler(_p_intf, mainCtx, window, parent)
+InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent)
+    : InterfaceWindowHandler(_p_intf, mainCtx, window, widget, parent)
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx->useClientSideDecoration(),
@@ -530,12 +530,12 @@ void InterfaceWindowHandlerWin32::toggleWindowVisibility()
     {
     case QWindow::Hidden:
         /* If hidden, show it */
-        m_window->show();
-        m_window->requestActivate();
+        setInterfaceShown();
+        requestActivate();
         break;
     case QWindow::Minimized:
-        m_window->showNormal();
-        m_window->requestActivate();
+        setInterfaceMinimized();
+        requestActivate();
         break;
     default:
         {
@@ -556,9 +556,9 @@ void InterfaceWindowHandlerWin32::toggleWindowVisibility()
             {
             }
             if( !hwnd || !GetWindowInfo( hwnd, &wi ) || (wi.dwExStyle&WS_EX_TOPMOST) )
-                m_window->hide();
+                setInterfaceHiden();
             else
-                m_window->requestActivate();
+                requestActivate();
         }
         break;
     }
