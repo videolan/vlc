@@ -30,6 +30,6 @@
 @property NSColor *lightStroke;
 @property NSColor *darkStroke;
 
-@property (setter=setDark:) BOOL isDark;
+@property (readwrite) BOOL isDark;
 
 @end

@@ -147,13 +147,16 @@
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    [self setDark:self.shouldShowDarkAppearance];
-    [self setNeedsDisplay:YES];
-}
+    [super viewDidChangeEffectiveAppearance];
 
-- (BOOL)allowsVibrancy
-{
-    return YES;
+    BOOL setDark = NO;
+
+    if (@available(macOS 10.14, *) && [self.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
+        setDark = YES;
+    }
+    
+    _isDark = setDark;
+    [self setNeedsDisplay:YES];
 }
 
 @end
