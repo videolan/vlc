@@ -17,6 +17,8 @@ OPTIONS="
         --enable-shout
         --enable-ncurses
         --enable-twolame
+        --disable-libplacebo
+        --disable-medialibrary
         --enable-libass
         --enable-macosx-avfoundation
         --disable-skins2
