@@ -622,7 +622,7 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     /* VLC mutexes use atomic and the reader will only do very fast
      * operations (copy of the timing_point data). */
     vlc_mutex_lock(&stream->timing_points.lock);
-    assert(stream->timing_points.running);
+    //assert(stream->timing_points.running);
 
     size_t write = (stream->timing_points.write++) % MAX_TIMING_POINT;
 
