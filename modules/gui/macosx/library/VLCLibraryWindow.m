@@ -383,7 +383,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)updateColorsBasedOnAppearance
 {
-    if (self.contentView.shouldShowDarkAppearance) {
+    if ([self.contentView.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
         self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
         self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
         self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
@@ -513,6 +513,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     
     _librarySortButton.hidden = NO;
+    _optionBarView.hidden = YES;
     _audioSegmentedControl.hidden = YES;
 
 }
@@ -561,6 +562,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     
     _librarySortButton.hidden = NO;
+    _optionBarView.hidden = NO;
     _audioSegmentedControl.hidden = NO;
     
     self.gridVsListSegmentedControl.target = self;
@@ -587,6 +589,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     _mediaSourceDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 2 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
     _librarySortButton.hidden = YES;
+    _optionBarView.hidden = YES;
     _audioSegmentedControl.hidden = YES;
     [_mediaSourceDataSource reloadViews];
 }

@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTableView *audioGroupSelectionTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *audioCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet NSCollectionView *audioLibraryCollectionView;
+@property (readwrite, weak) IBOutlet NSVisualEffectView *optionBarView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *audioSegmentedControl;
 @property (readwrite, weak) IBOutlet NSView *mediaSourceView;
 @property (readwrite, weak) IBOutlet NSButton *mediaSourceHomeButton;
