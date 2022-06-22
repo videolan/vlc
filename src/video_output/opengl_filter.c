@@ -733,7 +733,7 @@ opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
 #ifdef HAVE_LIBPLACEBO
 #include <libplacebo/shaders.h>
 #include <libplacebo/shaders/colorspace.h>
-#include "../libplacebo/utils.h"
+#include "../../modules/video_output/libplacebo/utils.h"
 #endif
 
 #include "sampler_priv.h"

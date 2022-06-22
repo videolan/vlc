@@ -409,6 +409,10 @@ libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	$(LTLIBINTL) $(LTLIBICONV) \
 	$(IDN_LIBS) $(SOCKET_LIBS) $(ATOMIC_LIB) $(LIBRT) $(LIBDL) $(LIBM)
 
+if HAVE_LIBPLACEBO
+libvlccore_la_LIBADD += $(LIBPLACEBO_LIBS)
+endif
+
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
 	win32/error.c \
