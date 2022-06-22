@@ -79,7 +79,7 @@ static void vlc_LogCallback(vlc_logger_t *logger, int type,
 }
 
 #ifdef _WIN32
-static void Win32DebugOutputMsg (void *, int , const vlc_log_t *,
+static void Win32DebugOutputMsg (int , const vlc_log_t *,
                                  const char *, va_list);
 #endif
 
@@ -120,7 +120,7 @@ void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
     va_list ap;
 
     va_copy (ap, args);
-    Win32DebugOutputMsg (NULL, type, &msg, format, ap);
+    Win32DebugOutputMsg (type, &msg, format, ap);
     va_end (ap);
 #endif
 
@@ -144,14 +144,10 @@ void vlc_Log(struct vlc_logger *const *logger, int type,
 #ifdef _WIN32
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 
-static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
+static void Win32DebugOutputMsg (int type, const vlc_log_t *p_item,
                                  const char *format, va_list dol)
 {
     VLC_UNUSED(p_item);
-
-    const signed char *pverbose = d;
-    if (pverbose && (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR)))
-        return;
 
     va_list dol2;
     va_copy (dol2, dol);
