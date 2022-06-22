@@ -605,7 +605,7 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
 vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
 {
     /* The master has always the 0 priority */
-    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, NULL, 0, NULL, NULL);
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, "input", 0, NULL, NULL);
     if (!clock)
         return NULL;
 
