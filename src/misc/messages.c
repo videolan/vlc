@@ -43,6 +43,35 @@
 #include "rcu.h"
 #include "../libvlc.h"
 
+#ifdef _WIN32
+static const char msg_type[4][9] = { "", " error", " warning", " debug" };
+
+static void Win32DebugOutputMsg (int type, const vlc_log_t *p_item,
+                                 const char *format, va_list dol)
+{
+    char *msg = NULL;
+    int msg_len = vasprintf(&msg, format, dol);
+
+    if (unlikely(msg_len == -1))
+        return;
+
+    const char *ending = msg_len > 1 && msg[msg_len-1] == '\n' ? "" : "\n";
+
+    char* psz_msg = NULL;
+    if (asprintf(&psz_msg, "%s %s%s: %s%s", p_item->psz_module,
+                p_item->psz_object_type, msg_type[type], msg, ending) > 0) {
+        wchar_t* wmsg = ToWide(psz_msg);
+        if (likely(wmsg != NULL))
+        {
+            OutputDebugStringW(wmsg);
+            free(wmsg);
+        }
+        free(psz_msg);
+    }
+    free(msg);
+}
+#endif
+
 static void vlc_LogSpam(vlc_object_t *obj)
 {
     /* Announce who we are */
@@ -77,11 +106,6 @@ static void vlc_LogCallback(vlc_logger_t *logger, int type,
     vlc_vaLogCallback(logger, type, item, format, ap);
     va_end(ap);
 }
-
-#ifdef _WIN32
-static void Win32DebugOutputMsg (int , const vlc_log_t *,
-                                 const char *, va_list);
-#endif
 
 void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
                const char *typename, const char *module,
@@ -140,35 +164,6 @@ void vlc_Log(struct vlc_logger *const *logger, int type,
     vlc_vaLog(logger, type, typename, module, file, line, func, format, ap);
     va_end(ap);
 }
-
-#ifdef _WIN32
-static const char msg_type[4][9] = { "", " error", " warning", " debug" };
-
-static void Win32DebugOutputMsg (int type, const vlc_log_t *p_item,
-                                 const char *format, va_list dol)
-{
-    char *msg = NULL;
-    int msg_len = vasprintf(&msg, format, dol);
-
-    if (unlikely(msg_len == -1))
-        return;
-
-    const char *ending = msg_len > 1 && msg[msg_len-1] == '\n' ? "" : "\n";
-
-    char* psz_msg = NULL;
-    if (asprintf(&psz_msg, "%s %s%s: %s%s", p_item->psz_module,
-                p_item->psz_object_type, msg_type[type], msg, ending) > 0) {
-        wchar_t* wmsg = ToWide(psz_msg);
-        if (likely(wmsg != NULL))
-        {
-            OutputDebugStringW(wmsg);
-            free(wmsg);
-        }
-        free(psz_msg);
-    }
-    free(msg);
-}
-#endif
 
 /**
  * Early (latched) message log.
