@@ -236,5 +236,13 @@ VideoAll {
             _currentView.setCurrentItemFocus(Qt.TabFocusReason);
         }
 
+        onImplicitHeightChanged: {
+            // implicitHeight depends on underlying ml model initialization
+            // and may update after view did resetFocus on initialization which
+            // will break resetFocus's scrolling (because header height changed)
+            // try to reapply reset focus here (ref #27071)
+            if (root.currentIndex <= 0 || root.currentIndex === root.initialIndex)
+                root.resetFocus()
+        }
     }
 }
