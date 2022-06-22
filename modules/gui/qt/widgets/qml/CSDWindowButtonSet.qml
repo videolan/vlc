@@ -40,9 +40,9 @@ Row {
     }
 
     CSDWindowButton {
-        iconTxt: (MainCtx.intfMainWindow.visibility & Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
+        iconTxt: (MainCtx.intfMainWindow.visibility === Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
         onClicked: {
-            if (MainCtx.intfMainWindow & Window.Maximized) {
+            if (MainCtx.intfMainWindow.visibility === Window.Maximized) {
                 MainCtx.requestInterfaceNormal()
             } else {
                 MainCtx.requestInterfaceMaximized()
