@@ -193,10 +193,6 @@ FocusScope {
         MainInterface.MainGridView {
             id: gridView
 
-            // Properties
-
-            property Item currentItem: Item{}
-
             // Settings
 
             cellWidth : VLCStyle.gridItem_video_width
