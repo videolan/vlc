@@ -200,7 +200,7 @@ VLC_API ssize_t vlc_stream_Read(stream_t *, void *buf, size_t len) VLC_USED;
  *
  * \param buf start of buffer to read data into [OUT]
  * \param len buffer size (maximum number of bytes to read)
- * \return the number of bytes read or a negative value on error.
+ * \return the number of bytes read, 0 on end of stream or -1 if no data available
  */
 VLC_API ssize_t vlc_stream_ReadPartial(stream_t *, void *buf, size_t len)
 VLC_USED;
