@@ -25,6 +25,10 @@
 
 #include <assert.h>
 #include "vlc_list.h"
+#include "vlc_es.h"
+
+/* FIXME to remove once aout.h is cleaned a bit more */
+#include "vlc_block.h"
 
 /**
  * \defgroup audio_output Audio output
@@ -57,8 +61,6 @@
 
 /* Max acceptable resampling (in %) */
 #define AOUT_MAX_RESAMPLING             10
-
-#include "vlc_es.h"
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     ((p_first)->i_format == (p_second)->i_format)                           \
@@ -117,8 +119,10 @@
 /* Number of samples in an A/52 frame. */
 #define A52_FRAME_NB 1536
 
-/* FIXME to remove once aout.h is cleaned a bit more */
-#include "vlc_block.h"
+/**
+ * \defgroup audio_output_module Audio output modules
+ * @{
+ */
 
 struct vlc_audio_output_events {
     void (*timing_report)(audio_output_t *, vlc_tick_t system_now, vlc_tick_t pts);
@@ -300,122 +304,10 @@ struct audio_output
     const struct vlc_audio_output_events *events;
 };
 
-typedef enum
+static inline int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
 {
-    AOUT_CHANIDX_DISABLE = -1,
-    AOUT_CHANIDX_LEFT,
-    AOUT_CHANIDX_RIGHT,
-    AOUT_CHANIDX_MIDDLELEFT,
-    AOUT_CHANIDX_MIDDLERIGHT,
-    AOUT_CHANIDX_REARLEFT,
-    AOUT_CHANIDX_REARRIGHT,
-    AOUT_CHANIDX_REARCENTER,
-    AOUT_CHANIDX_CENTER,
-    AOUT_CHANIDX_LFE,
-    AOUT_CHANIDX_MAX
-} vlc_chan_order_idx_t;
-
-static_assert(AOUT_CHANIDX_MAX == AOUT_CHAN_MAX, "channel count mismatch");
-
-#define AOUT_CHAN_REMAP_INIT { \
-    AOUT_CHANIDX_LEFT,  \
-    AOUT_CHANIDX_RIGHT, \
-    AOUT_CHANIDX_MIDDLELEFT, \
-    AOUT_CHANIDX_MIDDLERIGHT, \
-    AOUT_CHANIDX_REARLEFT, \
-    AOUT_CHANIDX_REARRIGHT, \
-    AOUT_CHANIDX_REARCENTER, \
-    AOUT_CHANIDX_CENTER, \
-    AOUT_CHANIDX_LFE, \
+    return aout->time_get(aout, delay);
 }
-
-/**
- * It describes the audio channel order VLC expect.
- */
-static const uint32_t pi_vlc_chan_order_wg4[] =
-{
-    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
-    AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0
-};
-
-#define AOUT_RESTART_FILTERS        0x1
-#define AOUT_RESTART_OUTPUT         (AOUT_RESTART_FILTERS|0x2)
-#define AOUT_RESTART_STEREOMODE     (AOUT_RESTART_OUTPUT|0x4)
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-
-/**
- * This function computes the reordering needed to go from pi_chan_order_in to
- * pi_chan_order_out.
- * If pi_chan_order_in or pi_chan_order_out is NULL, it will assume that vlc
- * internal (WG4) order is requested.
- */
-VLC_API unsigned aout_CheckChannelReorder( const uint32_t *, const uint32_t *,
-                                           uint32_t mask, uint8_t *table );
-VLC_API void aout_ChannelReorder(void *, size_t, uint8_t, const uint8_t *, vlc_fourcc_t);
-
-VLC_API void aout_Interleave(void *dst, const void *const *planes,
-                             unsigned samples, unsigned channels,
-                             vlc_fourcc_t fourcc);
-VLC_API void aout_Deinterleave(void *dst, const void *src, unsigned samples,
-                             unsigned channels, vlc_fourcc_t fourcc);
-
-/**
- * This function will compute the extraction parameter into pi_selection to go
- * from i_channels with their type given by pi_order_src[] into the order
- * describe by pi_order_dst.
- * It will also set :
- * - *pi_channels as the number of channels that will be extracted which is
- * lower (in case of non understood channels type) or equal to i_channels.
- * - the layout of the channels (*pi_layout).
- *
- * It will return true if channel extraction is really needed, in which case
- * aout_ChannelExtract must be used
- *
- * XXX It must be used when the source may have channel type not understood
- * by VLC. In this case the channel type pi_order_src[] must be set to 0.
- * XXX It must also be used if multiple channels have the same type.
- */
-VLC_API bool aout_CheckChannelExtraction( int *pi_selection, uint32_t *pi_layout, int *pi_channels, const uint32_t pi_order_dst[AOUT_CHAN_MAX], const uint32_t *pi_order_src, int i_channels );
-
-/**
- * Do the actual channels extraction using the parameters created by
- * aout_CheckChannelExtraction.
- *
- * XXX this function does not work in place (p_dst and p_src must not overlap).
- * XXX Only 8, 16, 32, 64 bits per sample are supported.
- */
-VLC_API void aout_ChannelExtract( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample );
-
-/* */
-static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
-{
-    return vlc_popcount(fmt->i_physical_channels);
-}
-
-VLC_API unsigned int aout_BitsPerSample( vlc_fourcc_t i_format ) VLC_USED;
-VLC_API void aout_FormatPrepare( audio_sample_format_t * p_format );
-VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
-                              const audio_sample_format_t *);
-#define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
-VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
-
-#define AOUT_VOLUME_DEFAULT             256
-#define AOUT_VOLUME_MAX                 512
-
-VLC_API float aout_VolumeGet (audio_output_t *);
-VLC_API int aout_VolumeSet (audio_output_t *, float);
-VLC_API int aout_VolumeUpdate (audio_output_t *, int, float *);
-VLC_API int aout_MuteGet (audio_output_t *);
-VLC_API int aout_MuteSet (audio_output_t *, bool);
-VLC_API const char *aout_NameGet (audio_output_t *);
-VLC_API char *aout_DeviceGet (audio_output_t *);
-VLC_API int aout_DeviceSet (audio_output_t *, const char *);
-VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
 
 /**
  * Report than the stream is drained (after a call to aout->drain_async)
@@ -509,7 +401,122 @@ static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
     (void) date;
 }
 
-/* Audio output filters */
+#define AOUT_RESTART_FILTERS        0x1
+#define AOUT_RESTART_OUTPUT         (AOUT_RESTART_FILTERS|0x2)
+#define AOUT_RESTART_STEREOMODE     (AOUT_RESTART_OUTPUT|0x4)
+
+/** @} */
+
+/**
+ * \defgroup audio_format Audio formats
+ * @{
+ */
+/**
+ * It describes the audio channel order VLC expect.
+ */
+static const uint32_t pi_vlc_chan_order_wg4[] =
+{
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
+    AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0
+};
+
+/**
+ * This function computes the reordering needed to go from pi_chan_order_in to
+ * pi_chan_order_out.
+ * If pi_chan_order_in or pi_chan_order_out is NULL, it will assume that vlc
+ * internal (WG4) order is requested.
+ */
+VLC_API unsigned aout_CheckChannelReorder( const uint32_t *, const uint32_t *,
+                                           uint32_t mask, uint8_t *table );
+
+/**
+ * Reorders audio samples within a block of linear audio interleaved samples.
+ * \param ptr start address of the block of samples
+ * \param bytes size of the block in bytes (must be a multiple of the product
+ *              of the channels count and the sample size)
+ * \param channels channels count (also length of the chans_table table)
+ * \param chans_table permutation table to reorder the channels
+ *                    (usually computed by aout_CheckChannelReorder())
+ * \param fourcc sample format (must be a linear sample format)
+ * \note The samples must be naturally aligned in memory.
+ */
+VLC_API void aout_ChannelReorder(void *, size_t, uint8_t, const uint8_t *, vlc_fourcc_t);
+
+/**
+ * This function will compute the extraction parameter into pi_selection to go
+ * from i_channels with their type given by pi_order_src[] into the order
+ * describe by pi_order_dst.
+ * It will also set :
+ * - *pi_channels as the number of channels that will be extracted which is
+ * lower (in case of non understood channels type) or equal to i_channels.
+ * - the layout of the channels (*pi_layout).
+ *
+ * It will return true if channel extraction is really needed, in which case
+ * aout_ChannelExtract must be used
+ *
+ * XXX It must be used when the source may have channel type not understood
+ * by VLC. In this case the channel type pi_order_src[] must be set to 0.
+ * XXX It must also be used if multiple channels have the same type.
+ */
+VLC_API bool aout_CheckChannelExtraction( int *pi_selection, uint32_t *pi_layout, int *pi_channels, const uint32_t pi_order_dst[AOUT_CHAN_MAX], const uint32_t *pi_order_src, int i_channels );
+
+/**
+ * Do the actual channels extraction using the parameters created by
+ * aout_CheckChannelExtraction.
+ *
+ * XXX this function does not work in place (p_dst and p_src must not overlap).
+ * XXX Only 8, 16, 32, 64 bits per sample are supported.
+ */
+VLC_API void aout_ChannelExtract( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample );
+
+VLC_API void aout_Interleave(void *dst, const void *const *planes,
+                             unsigned samples, unsigned channels,
+                             vlc_fourcc_t fourcc);
+VLC_API void aout_Deinterleave(void *dst, const void *src, unsigned samples,
+                             unsigned channels, vlc_fourcc_t fourcc);
+
+/* */
+static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
+{
+    return vlc_popcount(fmt->i_physical_channels);
+}
+
+VLC_API unsigned int aout_BitsPerSample( vlc_fourcc_t i_format ) VLC_USED;
+VLC_API void aout_FormatPrepare( audio_sample_format_t * p_format );
+
+/**
+ * Prints an audio sample format in a human-readable form.
+ */
+VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
+                              const audio_sample_format_t *);
+#define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
+
+VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
+
+/** @} */
+
+#define AOUT_VOLUME_DEFAULT             256
+#define AOUT_VOLUME_MAX                 512
+
+VLC_API float aout_VolumeGet (audio_output_t *);
+VLC_API int aout_VolumeSet (audio_output_t *, float);
+VLC_API int aout_VolumeUpdate (audio_output_t *, int, float *);
+VLC_API int aout_MuteGet (audio_output_t *);
+VLC_API int aout_MuteSet (audio_output_t *, bool);
+VLC_API const char *aout_NameGet (audio_output_t *);
+VLC_API char *aout_DeviceGet (audio_output_t *);
+VLC_API int aout_DeviceSet (audio_output_t *, const char *);
+VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
+
+/** @} */
+
+/**
+ * \defgroup audio_filters Audio filters
+ * \ingroup filters
+ * @{
+ */
 
 /**
  * Enable or disable an audio filter ("audio-filter")
@@ -520,6 +527,35 @@ static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
  * \return 0 on success, non-zero on failure.
  */
 VLC_API int aout_EnableFilter(audio_output_t *aout, const char *name, bool add);
+
+typedef enum
+{
+    AOUT_CHANIDX_DISABLE = -1,
+    AOUT_CHANIDX_LEFT,
+    AOUT_CHANIDX_RIGHT,
+    AOUT_CHANIDX_MIDDLELEFT,
+    AOUT_CHANIDX_MIDDLERIGHT,
+    AOUT_CHANIDX_REARLEFT,
+    AOUT_CHANIDX_REARRIGHT,
+    AOUT_CHANIDX_REARCENTER,
+    AOUT_CHANIDX_CENTER,
+    AOUT_CHANIDX_LFE,
+    AOUT_CHANIDX_MAX
+} vlc_chan_order_idx_t;
+
+static_assert(AOUT_CHANIDX_MAX == AOUT_CHAN_MAX, "channel count mismatch");
+
+#define AOUT_CHAN_REMAP_INIT { \
+    AOUT_CHANIDX_LEFT,  \
+    AOUT_CHANIDX_RIGHT, \
+    AOUT_CHANIDX_MIDDLELEFT, \
+    AOUT_CHANIDX_MIDDLERIGHT, \
+    AOUT_CHANIDX_REARLEFT, \
+    AOUT_CHANIDX_REARRIGHT, \
+    AOUT_CHANIDX_REARCENTER, \
+    AOUT_CHANIDX_CENTER, \
+    AOUT_CHANIDX_LFE, \
+}
 
 typedef struct
 {
@@ -559,15 +595,11 @@ VLC_API void     aout_FiltersChangeViewpoint(aout_filters_t *, const vlc_viewpoi
 
 VLC_API vout_thread_t *aout_filter_GetVout(filter_t *, const video_format_t *);
 
-static inline int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
-{
-    return aout->time_get(aout, delay);
-}
-
 /** @} */
 
 /**
- * @defgroup audio_output__meter Audio meter API
+ * @defgroup audio_output_meter Audio meter API
+ * \ingroup audio_output
  * @{
  */
 
