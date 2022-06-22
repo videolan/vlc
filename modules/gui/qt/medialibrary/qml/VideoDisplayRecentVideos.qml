@@ -70,7 +70,7 @@ FocusScope {
         Widgets.SubtitleLabel {
             text: I18n.qtr("Continue Watching")
 
-            visible: listView.visible
+            visible: listView.count > 0
         }
 
         Widgets.KeyNavigableListView {
