@@ -230,7 +230,7 @@ FocusScope {
                 if (activeFocus == false || model.count === 0 || modelSelect.hasSelection)
                     return;
 
-                modelSelect.select(model.index(0,0), ItemSelectionModel.ClearAndSelect);
+                resetFocus() // restores initialIndex
             }
 
             onActionAtIndex: root.onAction(modelSelect.selectedIndexes)
