@@ -142,7 +142,7 @@ VLC_API void vlc_vaLog(struct vlc_logger *const *logger, int prio,
 
 /**
  * Message logging callback signature.
- * \param data data pointer as provided to vlc_msg_SetCallback().
+ * \param data data pointer as provided to vlc_LogSet().
  * \param type message type (VLC_MSG_* values from enum vlc_log_type)
  * \param item meta information
  * \param fmt format string
