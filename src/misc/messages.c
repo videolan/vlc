@@ -147,37 +147,24 @@ static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 static void Win32DebugOutputMsg (int type, const vlc_log_t *p_item,
                                  const char *format, va_list dol)
 {
-    VLC_UNUSED(p_item);
+    char *msg = NULL;
+    int msg_len = vasprintf(&msg, format, dol);
 
-    va_list dol2;
-    va_copy (dol2, dol);
-    int msg_len = vsnprintf(NULL, 0, format, dol2);
-    va_end (dol2);
-
-    if (msg_len <= 0)
+    if (unlikely(msg_len == -1))
         return;
 
-    char *msg = malloc(msg_len + 1 + 1);
-    if (!msg)
-        return;
+    const char *ending = msg_len > 1 && msg[msg_len-1] == '\n' ? "" : "\n";
 
-    msg_len = vsnprintf(msg, msg_len+1, format, dol);
-    if (msg_len > 0){
-        if (msg[msg_len-1] != '\n') {
-            msg[msg_len] = '\n';
-            msg[msg_len + 1] = '\0';
+    char* psz_msg = NULL;
+    if (asprintf(&psz_msg, "%s %s%s: %s%s", p_item->psz_module,
+                p_item->psz_object_type, msg_type[type], msg, ending) > 0) {
+        wchar_t* wmsg = ToWide(psz_msg);
+        if (likely(wmsg != NULL))
+        {
+            OutputDebugStringW(wmsg);
+            free(wmsg);
         }
-        char* psz_msg = NULL;
-        if (asprintf(&psz_msg, "%s %s%s: %s", p_item->psz_module,
-                    p_item->psz_object_type, msg_type[type], msg) > 0) {
-            wchar_t* wmsg = ToWide(psz_msg);
-            if (likely(wmsg != NULL))
-            {
-                OutputDebugStringW(wmsg);
-                free(wmsg);
-            }
-            free(psz_msg);
-        }
+        free(psz_msg);
     }
     free(msg);
 }
