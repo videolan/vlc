@@ -27,6 +27,7 @@
 
 #include "roundimage.hpp"
 #include "util/asynctask.hpp"
+#include "util/qsgroundedrectangularimagenode.hpp"
 
 #include <qhashfunctions.h>
 
@@ -361,6 +362,8 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 
     connect(this, &QQuickItem::heightChanged, this, &RoundImage::regenerateRoundImage);
     connect(this, &QQuickItem::widthChanged, this, &RoundImage::regenerateRoundImage);
+
+    connect(this, &QQuickItem::windowChanged, this, &RoundImage::adjustQSGCustomGeometry);
 }
 
 RoundImage::~RoundImage()
@@ -370,7 +373,17 @@ RoundImage::~RoundImage()
 
 QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    auto node = static_cast<QSGImageNode *>(oldNode);
+    auto customImageNode = dynamic_cast<QSGRoundedRectangularImageNode*>(oldNode);
+    auto imageNode = dynamic_cast<QSGImageNode*>(oldNode);
+
+    if (Q_UNLIKELY(oldNode && ((m_QSGCustomGeometry && !customImageNode)
+                               || (!m_QSGCustomGeometry && !imageNode))))
+    {
+        // This must be extremely unlikely.
+        // Assigned to different window with different renderer?
+        delete oldNode;
+        oldNode = nullptr;
+    }
 
     if (m_roundImage.isNull())
     {
@@ -379,12 +392,19 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         return nullptr;
     }
 
-    if (!node)
+    if (!oldNode)
     {
-        assert(window());
-        node = window()->createImageNode();
-        assert(node);
-        node->setOwnsTexture(true);
+        if (m_QSGCustomGeometry)
+        {
+            customImageNode = new QSGRoundedRectangularImageNode;
+        }
+        else
+        {
+            assert(window());
+            imageNode = window()->createImageNode();
+            assert(imageNode);
+            imageNode->setOwnsTexture(true);
+        }
     }
 
     if (m_dirty)
@@ -393,16 +413,21 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         assert(window());
 
         QQuickWindow::CreateTextureOptions flags = QQuickWindow::TextureCanUseAtlas;
-        if (Q_LIKELY(m_roundImage.hasAlphaChannel()))
-            flags |= QQuickWindow::TextureHasAlphaChannel;
 
-        QSGTexture* texture = window()->createTextureFromImage(m_roundImage, flags);
+        if (!m_roundImage.hasAlphaChannel())
+            flags |= QQuickWindow::TextureIsOpaque;
 
-        if (texture)
+        if (std::unique_ptr<QSGTexture> texture { window()->createTextureFromImage(m_roundImage, flags) })
         {
-            // No need to delete the old texture manually as it is owned by the node.
-            node->setTexture(texture);
-            node->markDirty(QSGNode::DirtyMaterial);
+            if (m_QSGCustomGeometry)
+            {
+                customImageNode->setTexture(std::move(texture));
+            }
+            else
+            {
+                // No need to delete the old texture manually as it is owned by the node.
+                imageNode->setTexture(texture.release());
+            }
         }
         else
         {
@@ -410,9 +435,20 @@ QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         }
     }
 
-    node->setRect(boundingRect());
-
-    return node;
+    // Geometry:
+    if (m_QSGCustomGeometry)
+    {
+        customImageNode->setShape({boundingRect(), radius()});
+        customImageNode->setSmooth(smooth());
+        assert(customImageNode->geometry() && customImageNode->material());
+        return customImageNode;
+    }
+    else
+    {
+        imageNode->setRect(boundingRect());
+        imageNode->setFiltering(smooth() ? QSGTexture::Linear : QSGTexture::Nearest);
+        return imageNode;
+    }
 }
 
 void RoundImage::componentComplete()
@@ -455,7 +491,6 @@ void RoundImage::setRadius(qreal radius)
 
     m_radius = radius;
     emit radiusChanged(m_radius);
-    regenerateRoundImage();
 }
 
 void RoundImage::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
@@ -498,9 +533,10 @@ void RoundImage::handleImageResponseFinished()
     setRoundImage(image);
     setStatus(Status::Ready);
 
+    // FIXME: These should be gathered from the generator:
     const qreal scaledWidth = this->width() * m_dpr;
     const qreal scaledHeight = this->height() * m_dpr;
-    const qreal scaledRadius = this->radius() * m_dpr;
+    const qreal scaledRadius = m_QSGCustomGeometry ? 0.0 : (this->radius() * m_dpr);
 
     const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
     imageCache.insert(key, new QImage(image), image.sizeInBytes());
@@ -528,7 +564,7 @@ void RoundImage::load()
 
     const qreal scaledWidth = this->width() * m_dpr;
     const qreal scaledHeight = this->height() * m_dpr;
-    const qreal scaledRadius = this->radius() * m_dpr;
+    const qreal scaledRadius = m_QSGCustomGeometry ? 0.0 : (this->radius() * m_dpr);
 
     const ImageCacheKey key {source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius};
     if (auto image = imageCache.object(key)) // should only by called in mainthread
@@ -584,4 +620,84 @@ void RoundImage::regenerateRoundImage()
     m_enqueuedGeneration = true;
 
     QMetaObject::invokeMethod(this, &RoundImage::load, Qt::QueuedConnection);
+}
+
+void RoundImage::adjustQSGCustomGeometry(const QQuickWindow* const window)
+{
+    if (!window) return;
+
+    // No need to check if the scene graph is initialized according to docs.
+
+    const auto enableCustomGeometry = [this, window]() {
+        if (m_QSGCustomGeometry)
+            return;
+
+        // Favor custom geometry instead of clipping the image.
+        // This allows making the texture opaque, as long as
+        // source image is also opaque, for optimization
+        // purposes.
+        if (window->format().samples() != -1)
+            m_QSGCustomGeometry = true;
+        // No need to regenerate as transparent part will not
+        // matter. However, in order for the material to not
+        // require blending, a regeneration is necessary.
+        // We could force the material to not require blending
+        // for the outer transparent part which is not within the
+        // geometry, but then inherently transparent images would
+        // not be rendered correctly due to the alpha channel.
+
+        QMetaObject::invokeMethod(this,
+                                  &RoundImage::regenerateRoundImage,
+                                  Qt::QueuedConnection);
+
+        // It might be tempting to not regenerate the image on size
+        // change. However;
+        // If upscaled, we don't know if the image can be provided
+        // in a higher resolution.
+        // If downscaled, we would like to free some used memory.
+        // On the other hand, there is no need to regenerate the
+        // image when the radius changes. This behavior does not
+        // mean that the radius can be animated. Although possible,
+        // the custom geometry node is not designed to handle animations.
+        disconnect(this, &RoundImage::radiusChanged, this, &RoundImage::regenerateRoundImage);
+        connect(this, &RoundImage::radiusChanged, this, &QQuickItem::update);
+    };
+
+    const auto disableCustomGeometry = [this]() {
+        if (!m_QSGCustomGeometry)
+            return;
+
+        m_QSGCustomGeometry = false;
+
+        QMetaObject::invokeMethod(this,
+                                  &RoundImage::regenerateRoundImage,
+                                  Qt::QueuedConnection);
+
+        connect(this, &RoundImage::radiusChanged, this, &RoundImage::regenerateRoundImage);
+        disconnect(this, &RoundImage::radiusChanged, this, &QQuickItem::update);
+    };
+
+
+    if (window->rendererInterface()->graphicsApi() == QSGRendererInterface::GraphicsApi::OpenGL)
+    {
+        // Direct OpenGL, enable custom geometry:
+        enableCustomGeometry();
+    }
+    else
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        // QSG(Opaque)TextureMaterial supports Qt RHI,
+        // so there is no obstacle using custom geometry
+        // if Qt RHI is in use.
+        if (QSGRendererInterface::isApiRhiBased(window->rendererInterface()->graphicsApi()))
+            enableCustomGeometry();
+        else
+            disableCustomGeometry();
+#else
+        // Qt RHI is introduced in Qt 5.14.
+        // QSG(Opaque)TextureMaterial does not support any graphics API other than OpenGL
+        // without the Qt RHI abstraction layer.
+        disableCustomGeometry();
+#endif
+    }
 }

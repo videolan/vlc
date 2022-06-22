@@ -83,11 +83,14 @@ private:
     void setRoundImage(QImage image);
     void setStatus(const Status status);
     void regenerateRoundImage();
+    Q_SLOT void adjustQSGCustomGeometry(const QQuickWindow* const window);
 
     QUrl m_source;
     qreal m_radius = 0.0;
     qreal m_dpr = 1.0; // device pixel ratio
     Status m_status = Status::Null;
+
+    bool m_QSGCustomGeometry = false;
 
     QImage m_roundImage;
     bool m_dirty = false;
