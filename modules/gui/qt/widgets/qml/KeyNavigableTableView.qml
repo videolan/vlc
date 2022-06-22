@@ -148,25 +148,6 @@ FocusScope {
 
     on_CurrentAvailableRowWidthChanged: availableRowWidthUpdater.enqueueUpdate()
 
-    /*
-     *define the initial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (activeFocus == false || view.count == 0)
-            return;
-
-        if (view.currentIndex == -1)
-            view.currentIndex = 0;
-
-        if (selectionDelegateModel.hasSelection === false)
-            selectionDelegateModel.select(model.index(view.currentIndex, 0),
-                                          ItemSelectionModel.ClearAndSelect);
-
-        view.forceActiveFocus();
-    }
-
     // Functions
 
     function setCurrentItemFocus(reason) {
