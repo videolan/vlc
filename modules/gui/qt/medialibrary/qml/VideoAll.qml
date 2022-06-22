@@ -109,8 +109,13 @@ FocusScope {
 
         modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
 
-        if (_currentView)
+        if (_currentView) {
             _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
+
+            // Table View require this for focus handling
+            if (!MainCtx.gridView)
+                _currentView.currentIndex = initialIndex
+        }
     }
 
     function getLabel(model) {
