@@ -594,13 +594,6 @@ FocusScope {
             visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.topMargin)
 
             focus: (status === Loader.Ready) ? item.focus : false
-            onFocusChanged: {
-                if (!focus)
-                    return;
-
-                // when we gain the focus ensure the widget is fully visible
-                animateFlickableContentY(0);
-            }
         }
 
         Loader {
@@ -613,9 +606,25 @@ FocusScope {
         }
 
         Connections {
-            target: headerItemLoader
+            target: headerItem
+
+            function _scrollToHeaderOnFocus() {
+                if (!headerItem.activeFocus)
+                    return;
+
+                // when we gain the focus ensure the widget is fully visible
+                animateFlickableContentY(0)
+            }
+
             onHeightChanged: {
                 flickable.layout(true)
+            }
+
+            onActiveFocusChanged: {
+                // when header loads because of setting headerItem.focus == true, it will suddenly attain the active focus
+                // but then a queued flickable.layout() may take away it's focus and assign it to current item,
+                // using Qt.callLater we save unnecessary scrolling
+                Qt.callLater(_scrollToHeaderOnFocus)
             }
         }
 
