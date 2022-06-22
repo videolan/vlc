@@ -90,6 +90,14 @@ static void vlc_vaLogCallback(vlc_logger_t *logger, int type,
                               va_list ap)
 {
     if (logger != NULL) {
+#ifdef _WIN32
+        va_list dol;
+
+        va_copy (dol, ap);
+        Win32DebugOutputMsg (type, item, format, dol);
+        va_end (dol);
+#endif
+
         int canc = vlc_savecancel();
 
         logger->ops->log(logger, type, item, format, ap);
@@ -139,14 +147,6 @@ void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
     msg.line = line;
     msg.func = func;
     msg.tid = vlc_thread_id();
-
-#ifdef _WIN32
-    va_list ap;
-
-    va_copy (ap, args);
-    Win32DebugOutputMsg (type, &msg, format, ap);
-    va_end (ap);
-#endif
 
     /* Pass message to the callback */
     if (logger != NULL)
