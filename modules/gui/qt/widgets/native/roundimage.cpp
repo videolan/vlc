@@ -77,8 +77,13 @@ namespace
     // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
     QCache<ImageCacheKey, QImage> imageCache(32 * 1024 * 1024); // 32 MiB
 
-    QImage applyRadius(const QSize &targetSize, const qreal radius, const QImage sourceImage)
+    QImage prepareImage(const QSize &targetSize, const qreal radius, const QImage sourceImage)
     {
+        if (qFuzzyIsNull(radius))
+        {
+            return sourceImage.scaled(targetSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        }
+
         QImage target(targetSize, QImage::Format_ARGB32_Premultiplied);
         if (target.isNull())
             return target;
@@ -130,7 +135,7 @@ namespace
             errorStr = reader.errorString();
 
             if (!errorStr.isEmpty())
-                img = applyRadius(requestedSize.isValid() ? requestedSize : img.size(), radius, img);
+                img = prepareImage(requestedSize.isValid() ? requestedSize : img.size(), radius, img);
 
             return img;
         }
@@ -272,7 +277,7 @@ namespace
 
             QImage execute()
             {
-                return applyRadius(sourceImg.size(), radius, sourceImg);
+                return prepareImage(sourceImg.size(), radius, sourceImg);
             }
 
         private:
