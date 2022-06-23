@@ -42,8 +42,16 @@ Widgets.GridItem {
 
     image: model.artwork && model.artwork.toString() !== "" ? model.artwork : ""
 
-    subtitle: model.mrl || ""
     title: model.name || I18n.qtr("Unknown share")
+    subtitle: {
+       if (!model.mrl) {
+         return ""
+       } else if ((model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY) && model.mrl.toString() === "vlc://nop") {
+         return ""
+      } else {
+         return model.mrl
+      }
+    }
 
     pictureOverlay: NetworkCustomCover {
         networkModel: model
