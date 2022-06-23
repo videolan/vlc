@@ -34,6 +34,7 @@ T.TabButton {
     width: VLCStyle.dp(40, VLCStyle.scale)
     implicitWidth: contentItem.implicitWidth
     implicitHeight: contentItem.implicitHeight
+    focusPolicy: Qt.NoFocus
 
     background: Rectangle {
         height: control.height
