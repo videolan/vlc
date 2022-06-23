@@ -258,7 +258,13 @@ FocusScope {
                             top: parent.top
                             left: parent.left
                             bottom: parent.bottom
-                            bottomMargin: miniPlayer.height
+
+                            // NOTE: The StackView must be above the indexing bar and the mini
+                            //       player.
+                            bottomMargin: (loaderProgress.active) ? miniPlayer.height
+                                                                    + loaderProgress.height
+                                                                  : miniPlayer.height
+
                             right: playlistColumn.visible ? playlistColumn.left : parent.right
                             rightMargin: (MainCtx.playlistDocked && MainCtx.playlistVisible)
                                          ? 0
@@ -286,21 +292,6 @@ FocusScope {
                         // Enable clipping so that the effect does not sit
                         // on top of the source.
                         clip: miniPlayer.visible && miniPlayer.effectAvailable
-
-                        Loader {
-                            z: 1
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.bottom
-                                rightMargin: VLCStyle.margin_small
-                                leftMargin: VLCStyle.margin_small
-                                topMargin: VLCStyle.dp(10, VLCStyle.scale)
-                                bottomMargin: VLCStyle.dp(10, VLCStyle.scale)
-                            }
-                            active: MainCtx.mediaLibraryAvailable && !MainCtx.mediaLibrary.idle
-                            source: "qrc:///widgets/ScanProgressBar.qml"
-                        }
                     }
 
                     FocusScope {
@@ -425,6 +416,30 @@ FocusScope {
                             }
                         }
                     }
+                }
+            }
+
+            Loader {
+                id: loaderProgress
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: miniPlayer.top
+
+                active: (MainCtx.mediaLibraryAvailable && MainCtx.mediaLibrary.idle === false)
+
+                source: "qrc:///widgets/ScanProgressBar.qml"
+
+                onItemChanged: {
+                    if (item === null) return
+
+                    // NOTE: These are required for the FrostedGlassEffect.
+
+                    item.source = Qt.binding(function() { return stackView })
+
+                    item.sourceRect = Qt.binding(function() {
+                        return stackView.mapFromItem(parent, x, y, width, height)
+                    })
                 }
             }
 
