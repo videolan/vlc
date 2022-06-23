@@ -15,113 +15,133 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
+import QtQuick.Layouts 1.11
 
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///style/"
 
-T.ProgressBar {
-    id: control
+FrostedGlassEffect {
+    // Settings
 
-    from: 0
-    to: 100
-    value: MediaLib.parsingProgress
-    indeterminate: MediaLib.discoveryPending
-    visible: !MediaLib.idle
-    height: contentItem.implicitHeight
-    width: implicitWidth
+    height: column.implicitHeight + VLCStyle.margin_small * 2
 
-    contentItem: Column {
-        spacing: VLCStyle.margin_normal
-        width: control.width
-        height: implicitHeight
-        visible: control.visible
+    tint: VLCStyle.colors.lowerBanner
 
-        Rectangle {
-            id: bg
+    // Children
 
-            width: parent.width
-            height: VLCStyle.heightBar_xsmall
-            color: VLCStyle.colors.bgAlt
+    ColumnLayout {
+        id: column
 
-            function fromRGB(r, g, b, a) {
-                return Qt.rgba( r / 255, g / 255, b / 255, a / 255)
-            }
+        anchors.fill: parent
 
-            Rectangle {
-                id: progressBar
+        anchors.leftMargin: VLCStyle.margin_large
+        anchors.rightMargin: VLCStyle.margin_large
+        anchors.topMargin: VLCStyle.margin_small
+        anchors.bottomMargin: VLCStyle.margin_small
 
-                width: parent.height
-                height: parent.width * control.visualPosition
-                rotation: -90
-                y: width
-                transformOrigin: Item.TopLeft
-                visible: !control.indeterminate
-                gradient: Gradient {
-                    GradientStop { position: 0.00; color: bg.fromRGB(248, 154, 6, 200) }
-                    GradientStop { position: 0.48; color: bg.fromRGB(226, 90, 1, 255) }
-                    GradientStop { position: 0.89; color: bg.fromRGB(248, 124, 6, 255) }
-                    GradientStop { position: 1.00; color: bg.fromRGB(255, 136, 0, 100) }
-                }
-            }
+        spacing: VLCStyle.margin_small
 
-            Rectangle {
-                id: indeterminateBar
+        T.ProgressBar {
+            id: control
 
-                property real pos: 0
+            Layout.fillWidth: true
 
-                anchors.centerIn: parent
-                anchors.horizontalCenterOffset: ((bg.width - indeterminateBar.height) / 2) * pos
-                width: parent.height
-                height: parent.width * .24
-                rotation: 90
-                visible: control.indeterminate
-                gradient: Gradient {
-                    GradientStop { position: 0.00; color: bg.fromRGB(248, 154, 6, 0) }
-                    GradientStop { position: 0.09; color: bg.fromRGB(253, 136, 0, 0) }
-                    GradientStop { position: 0.48; color: bg.fromRGB(226, 90, 1, 255) }
-                    GradientStop { position: 0.89; color: bg.fromRGB(248, 124, 6, 255) }
-                    GradientStop { position: 1.00; color: bg.fromRGB(255, 136, 0, 0) }
+            height: VLCStyle.heightBar_xxsmall
+
+            from: 0
+            to: 100
+
+            value: MediaLib.parsingProgress
+
+            indeterminate: MediaLib.discoveryPending
+
+            contentItem: Item {
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    height: VLCStyle.heightBar_xxxsmall
+
+                    color: VLCStyle.colors.sliderBarMiniplayerBgColor
                 }
 
-                SequentialAnimation on pos {
-                    id: loadingAnim
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
 
-                    loops: Animation.Infinite
-                    running: control.indeterminate
+                    width: parent.width * control.visualPosition
+                    height: VLCStyle.heightBar_xxsmall
 
-                    NumberAnimation {
-                        from: - 1
-                        to: 1
-                        duration: VLCStyle.durationSliderBouncing
-                        easing.type: Easing.OutBounce
-                    }
+                    // NOTE: We want round corners.
+                    radius: height
 
-                    PauseAnimation {
-                        duration: VLCStyle.duration_veryLong
-                    }
+                    visible: (control.indeterminate === false)
 
-                    NumberAnimation {
-                        to: - 1
-                        from: 1
-                        duration: VLCStyle.durationSliderBouncing
-                        easing.type: Easing.OutBounce
-                    }
+                    color: VLCStyle.colors.accent
+                }
 
-                    PauseAnimation {
-                        duration: VLCStyle.duration_veryLong
+                Rectangle {
+                    property real position: 0
+
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    // NOTE: Why 0.24 though ?
+                    width: parent.width * 0.24
+                    height: VLCStyle.heightBar_xxsmall
+
+                    x: Math.round((parent.width - width) * position)
+
+                    // NOTE: We want round corners.
+                    radius: height
+
+                    visible: control.indeterminate
+
+                    color: VLCStyle.colors.accent
+
+                    SequentialAnimation on position {
+                        loops: Animation.Infinite
+
+                        running: visible
+
+                        NumberAnimation {
+                            from: 0
+                            to: 1.0
+
+                            duration: VLCStyle.durationSliderBouncing
+                            easing.type: Easing.OutBounce
+                        }
+
+                        NumberAnimation {
+                            from: 1.0
+                            to: 0
+
+                            duration: VLCStyle.durationSliderBouncing
+                            easing.type: Easing.OutBounce
+                        }
                     }
                 }
             }
         }
 
         SubtitleLabel {
-            text:  MediaLib.discoveryPending ? MediaLib.discoveryEntryPoint : (MediaLib.parsingProgress + "%")
+            Layout.fillWidth: true
+
+            text: (MediaLib.discoveryPending) ? I18n.qtr("Scanning %1")
+                                                .arg(MediaLib.discoveryEntryPoint)
+                                              : I18n.qtr("Indexing Medias (%1%)")
+                                                .arg(MediaLib.parsingProgress)
+
+            elide: Text.ElideMiddle
+
+            font.pixelSize: VLCStyle.fontSize_large
             font.weight: Font.Normal
-            width: parent.width
         }
     }
 }
