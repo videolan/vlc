@@ -1,0 +1,29 @@
+From b2d7268a3e0725b282c9c5b798778489713b679d Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 8 May 2018 10:54:24 -0700
+Subject: [PATCH 14/14] QtTest: compile in C++17 mode: no more
+ std::unary_function
+
+Change-Id: I5d0ee9389a794d80983efffd152cbce4da448ddf
+Reviewed-by: Olivier Goffart (Woboq GmbH) <ogoffart@woboq.com>
+Backport-Of: 2c93ff91bebaffec5d1adc6575521f0d4507fe8a (v5.11.1)
+---
+ src/testlib/qtesttable.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/testlib/qtesttable.cpp b/src/testlib/qtesttable.cpp
+index 05cce37a47..4e50089898 100644
+--- a/src/testlib/qtesttable.cpp
++++ b/src/testlib/qtesttable.cpp
+@@ -132,7 +132,7 @@ QTestData *QTestTable::testData(int index) const
+     return size_t(index) < d->dataList.size() ? d->dataList[index] : Q_NULLPTR;
+ }
+ 
+-class NamePredicate : public std::unary_function<QTestTablePrivate::Element, bool>
++class NamePredicate
+ {
+ public:
+     explicit NamePredicate(const char *needle) : m_needle(needle) {}
+-- 
+2.25.1
+

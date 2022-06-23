@@ -35,6 +35,7 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0011-qCount-Leading-Trailing-ZeroBits-Use-__builtin_clzs-.patch
 	$(APPLY) $(SRC)/qt/0012-Remove-_bit_scan_-forward-reverse.patch
 	$(APPLY) $(SRC)/qt/0013-qsimd-Fix-compilation-with-trunk-clang-for-mingw.patch
+	$(APPLY) $(SRC)/qt/0014-QtTest-compile-in-C-17-mode-no-more-std-unary_functi.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
 	$(MOVE)
 
