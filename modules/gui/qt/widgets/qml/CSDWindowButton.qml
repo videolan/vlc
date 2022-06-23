@@ -39,7 +39,7 @@ T.TabButton {
         height: control.height
         width: control.width
         color: !control.hovered ? "transparent"
-               : control.pressed ? (VLCStyle.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
+               : control.pressed ? (VLCStyle.colors.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
                                       : Qt.darker(control.hoverColor, 1.2)
                                     )
                : control.hoverColor
