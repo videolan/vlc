@@ -390,7 +390,7 @@ FocusScope {
                 colors: rootPlayer.colors
 
                 pinControls: rootPlayer.pinVideoControls
-                showCSD: MainCtx.clientSideDecoration
+                showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
                 showToolbar: MainCtx.hasToolbarMenu
 
                 Navigation.parentItem: rootPlayer

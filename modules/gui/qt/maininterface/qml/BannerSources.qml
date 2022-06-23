@@ -22,6 +22,7 @@ import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
 import QtQml.Models 2.11
+import QtQuick.Window 2.11
 
 import org.videolan.vlc 0.1
 import org.videolan.compat 0.1
@@ -41,18 +42,19 @@ FocusScope {
 
     property int selectedIndex: 0
     property int subSelectedIndex: 0
-
-    signal itemClicked(int index)
-
     property alias sortMenu: sortControl.menu
     property alias sortModel: sortControl.model
     property var contentModel
     property alias isViewMultiView: list_grid_btn.visible
     property alias model: pLBannerSources.model
-    signal toogleMenu()
-
     property var extraLocalActions: undefined
     property alias localMenuDelegate: localMenuGroup.sourceComponent
+
+    property bool _showCSD: MainCtx.clientSideDecoration && !(MainCtx.intfMainWindow.visibility === Window.FullScreen)
+
+    signal itemClicked(int index)
+    signal toogleMenu()
+
 
     // Triggered when the toogleView button is selected
     function toggleView () {
@@ -117,7 +119,7 @@ FocusScope {
                 //drag and dbl click the titlebar in CSD mode
                 Loader {
                     anchors.fill: parent
-                    active: MainCtx.clientSideDecoration
+                    active: root._showCSD
                     source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
                 }
 
@@ -207,7 +209,7 @@ FocusScope {
                         rightMargin: VLCStyle.applicationHorizontalMargin
                     }
                     height: VLCStyle.globalToolbar_height
-                    active: MainCtx.clientSideDecoration
+                    active: root._showCSD
                     source: "qrc:///widgets/CSDWindowButtonSet.qml"
                 }
             }
