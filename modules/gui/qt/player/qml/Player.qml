@@ -388,7 +388,11 @@ FocusScope {
                 visible: !resumeDialog.visible
                 title: mainPlaylistController.currentItem.title
                 colors: rootPlayer.colors
-                groupAlignment: rootPlayer.pinVideoControls ? TopBar.GroupAlignment.Horizontal : TopBar.GroupAlignment.Vertical
+
+                pinControls: rootPlayer.pinVideoControls
+                showCSD: MainCtx.clientSideDecoration
+                showToolbar: MainCtx.hasToolbarMenu
+
                 Navigation.parentItem: rootPlayer
                 Navigation.downItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
@@ -396,6 +400,13 @@ FocusScope {
 
                 onRequestLockUnlockAutoHide: {
                     rootPlayer.lockUnlockAutoHide(lock, source)
+                }
+
+                onBackRequested: {
+                    if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
+                       mainPlaylistController.stop()
+                    }
+                    History.previous()
                 }
             }
 

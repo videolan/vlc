@@ -20,6 +20,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
+import QtQuick.Window 2.11
 
 import org.videolan.vlc 0.1
 
@@ -28,57 +29,116 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 
 FocusScope{
-    id: topFocusScope
-
-    enum GroupAlignment {
-        Horizontal,
-        Vertical
-    }
+    id: root
 
     /* required */ property int textWidth
 
     property string title
     property VLCColors colors: VLCStyle.nightColors
-    property int groupAlignment: TopBar.GroupAlignment.Vertical
-    property Item _currentTitleText: null
 
-    property alias reservedHeight: rightColumn.height
+    property bool showCSD: false
+    property bool showToolbar: false
+    property bool pinControls: false
+
+    property int reservedHeight: 0
 
     signal togglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock, var source)
+    signal backRequested()
 
-    implicitHeight: topcontrollerMouseArea.implicitHeight
+    Component.onCompleted:  root._layout()
 
-    Component.onCompleted: {
-        // if groupAlignment == Horizontal, then onGroupAlignment isn't called when Component is created
-        if (groupAlignment === TopBar.GroupAlignment.Horizontal)
-            _layout()
+    onShowCSDChanged: root._layout()
+    onPinControlsChanged: root._layout()
+    onShowToolbarChanged: root._layout()
+
+    function _layoutLine(c1, c2, offset)
+    {
+        var lineHeight =  Math.max(c1 !== undefined ? c1.implicitHeight : 0, c2 !== undefined ? c2.implicitHeight : 0)
+
+        if (c1) {
+            c1.height = lineHeight
+            c1.anchors.leftMargin = 0
+            c1.anchors.topMargin = offset
+        }
+
+        if (c2) {
+            c2.height = lineHeight
+            c2.anchors.topMargin = offset
+            c2.anchors.rightMargin = 0
+        }
+        return lineHeight
     }
 
-    onGroupAlignmentChanged: _layout()
-
     function _layout() {
-        if (topFocusScope._currentTitleText)
-            topFocusScope._currentTitleText.destroy()
+        var offset = 0
 
-        switch (groupAlignment) {
-            case TopBar.GroupAlignment.Horizontal:
-                leftColumn.children = [menubar, logoGroup]
+        if (root.pinControls && !root.showToolbar && root.showCSD) {
+            //place everything on one line
+            var lineHeight = Math.max(logoGroup.implicitHeight, playlistGroup.implicitHeight, csdDecorations.implicitHeight)
 
-                _currentTitleText = centerTitleTextComponent.createObject(topcontrollerMouseArea)
+            centerTitleText.y = 0
+            centerTitleText.height = lineHeight
 
-                var rightRow = Qt.createQmlObject("import QtQuick 2.11; Row {}", rightColumn, "TopBar")
-                rightRow.children = [playlistGroup, csdDecorations]
-                playlistGroup.anchors.verticalCenter = rightRow.verticalCenter
-                break;
+            csdDecorations.height  = lineHeight
 
-            case TopBar.GroupAlignment.Vertical:
-                _currentTitleText = leftTitleTextComponent.createObject()
-                leftColumn.children = [menubar, logoGroup, _currentTitleText]
-                playlistGroup.anchors.verticalCenter = undefined
-                rightColumn.children = [csdDecorations, playlistGroup]
-                playlistGroup.Layout.alignment = Qt.AlignRight
+            logoGroup.height =  lineHeight
+
+            playlistGroup.height = lineHeight
+            playlistGroup.anchors.topMargin = 0
+            playlistGroup.anchors.right = csdDecorations.left
+            playlistGroup.anchors.rightMargin = VLCStyle.margin_xsmall
+
+
+            root.implicitHeight = lineHeight
+            offset += lineHeight
+
+        } else {
+            playlistGroup.anchors.right = root.right
+            playlistGroup.anchors.rightMargin = VLCStyle.margin_xsmall
+
+            var left = undefined
+            var right = undefined
+            var logoPlaced = false
+
+            if (root.showToolbar) {
+                left = menubar
+            }
+
+            if (root.showCSD) {
+                right = csdDecorations
+                if (!left) {
+                    left = logoGroup
+                    logoPlaced = true
+                }
+            }
+
+            if (!!left || !!right) {
+                offset += root._layoutLine(left, right, offset)
+            }
+
+            if (!logoPlaced) {
+                left = logoGroup
+            } else {
+                left = undefined
+            }
+
+            right = playlistGroup
+
+            var secondLineOffset = offset
+            var secondLineHeight = root._layoutLine(left, right, offset)
+
+            offset += secondLineHeight
+
+            if (root.pinControls) {
+                centerTitleText.y = secondLineOffset
+                centerTitleText.height = secondLineHeight
+            }
+
         }
+
+        root.implicitHeight = offset
+        reservedHeight = offset
     }
 
     // Main Content Container
@@ -87,58 +147,42 @@ FocusScope{
 
         hoverEnabled: true
         anchors.fill: parent
-        implicitHeight: rowLayout.implicitHeight
 
-        onContainsMouseChanged: topFocusScope.requestLockUnlockAutoHide(containsMouse, topFocusScope)
+        onContainsMouseChanged: root.requestLockUnlockAutoHide(containsMouse, root)
 
         //drag and dbl click the titlebar in CSD mode
         Loader {
             anchors.fill: parent
-            active: MainCtx.clientSideDecoration
+            active: root.showCSD
             source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
         }
 
-        RowLayout {
-            id: rowLayout
-
-            anchors.fill: parent
-
-            ColumnLayout {
-                id: leftColumn
-
-                spacing: 0
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                Layout.leftMargin: VLCStyle.margin_xxsmall
-                Layout.topMargin: VLCStyle.margin_xxsmall
-                Layout.bottomMargin: VLCStyle.margin_xxsmall
-            }
-
-            ColumnLayout {
-                id: rightColumn
-
-                spacing: 0
-                Layout.alignment: Qt.AlignTop | Qt.AlignRight
-                // this column may contain CSD, don't apply margins directly
-            }
-        }
     }
 
     // Components -
     Menus.Menubar {
         id: menubar
 
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.leftMargin:  VLCStyle.margin_small
+
         width: implicitWidth
-        height: VLCStyle.icon_normal
-        visible: MainCtx.hasToolbarMenu
-        textColor: topFocusScope.colors.text
-        highlightedBgColor: topFocusScope.colors.bgHover
-        highlightedTextColor: topFocusScope.colors.bgHoverText
+
+        visible: root.showToolbar
+        textColor: root.colors.text
+        highlightedBgColor: root.colors.bgHover
+        highlightedTextColor: root.colors.bgHoverText
     }
 
     RowLayout {
         id: logoGroup
 
         spacing: VLCStyle.margin_xxsmall
+
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.leftMargin:  VLCStyle.margin_small
 
         Widgets.IconControlButton {
             id: backBtn
@@ -150,22 +194,18 @@ FocusScope{
             iconText: VLCIcons.topbar_previous
             text: I18n.qtr("Back")
             focus: true
-            colors: topFocusScope.colors
+            colors: root.colors
 
-            Navigation.parentItem: topFocusScope
+            Navigation.parentItem: root
             Navigation.rightItem: menuSelector
-            onClicked: {
-                if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
-                   mainPlaylistController.stop()
-                }
-                History.previous()
-            }
+            onClicked: root.backRequested()
         }
 
         Image {
             id: logo
 
             Layout.alignment: Qt.AlignVCenter
+
             sourceSize.width: VLCStyle.icon_small
             sourceSize.height: VLCStyle.icon_small
             source: "qrc:///logo/cone.svg"
@@ -173,74 +213,82 @@ FocusScope{
         }
     }
 
-    Component {
-        id: centerTitleTextComponent
+    //FIXME use the the right class
+    T.Label {
+        id: centerTitleText
 
-        T.Label {
-            id: centerTitleText
+        readonly property int _leftLimit: logoGroup.x + logoGroup.width
+        readonly property int _rightLimit: playlistGroup.x
+        readonly property int _availableWidth: _rightLimit - _leftLimit
+        readonly property int _centerX: ((topcontrollerMouseArea.width - centerTitleText.implicitWidth) / 2)
+        readonly property bool _alignHCenter: _centerX > _leftLimit
+                                              && _centerX + centerTitleText.implicitWidth < _rightLimit
 
-            readonly property int _availableWidth: rightColumn.x - (leftColumn.x + leftColumn.width)
-            readonly property int _centerX: ((topcontrollerMouseArea.width - centerTitleText.implicitWidth) / 2)
-            readonly property bool _alignHCenter: _centerX > leftColumn.x + leftColumn.width
-                                                  && _centerX + centerTitleText.implicitWidth < rightColumn.x
+        visible: root.pinControls
 
-            y: leftColumn.y
-            topPadding: VLCStyle.margin_xxsmall
-            leftPadding: VLCStyle.margin_small
-            rightPadding: VLCStyle.margin_small
-            text: topFocusScope.title
-            color: topFocusScope.colors.playerFg
-            font.pixelSize: VLCStyle.dp(13, VLCStyle.scale)
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            width: Math.min(centerTitleText._availableWidth, centerTitleText.implicitWidth)
+        width: Math.min(centerTitleText._availableWidth, centerTitleText.implicitWidth)
 
-            on_AlignHCenterChanged: _layout()
-            Component.onCompleted: _layout()
+        leftPadding: VLCStyle.margin_small
+        rightPadding: VLCStyle.margin_small
 
-            function _layout() {
-                if (_alignHCenter) {
-                    centerTitleText.x = 0
-                    centerTitleText.anchors.horizontalCenter = topcontrollerMouseArea.horizontalCenter
-                } else {
-                    centerTitleText.anchors.horizontalCenter = undefined
-                    centerTitleText.x = Qt.binding(function() { return leftColumn.x + leftColumn.width; })
-                }
+        text: root.title
+        color: root.colors.playerFg
+        font.pixelSize: VLCStyle.dp(13, VLCStyle.scale)
+        font.weight: Font.DemiBold
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+
+        on_AlignHCenterChanged: _layout()
+        Component.onCompleted: _layout()
+
+        function _layout() {
+            if (_alignHCenter) {
+                centerTitleText.x = 0
+                centerTitleText.anchors.horizontalCenter = topcontrollerMouseArea.horizontalCenter
+            } else {
+                centerTitleText.anchors.horizontalCenter = undefined
+                centerTitleText.x = Qt.binding(function() { return centerTitleText._leftLimit })
             }
         }
     }
 
-    Component {
-        id: leftTitleTextComponent
+    //FIXME use the the right class
+    T.Label {
+        id: leftTitleText
 
-        //FIXME use the the right class
-        T.Label {
-            Layout.fillWidth: true
-            Layout.maximumWidth: topFocusScope.textWidth - VLCStyle.margin_normal
+        anchors.left: parent.left
+        anchors.top: logoGroup.bottom
 
-            text: topFocusScope.title
-            horizontalAlignment: Text.AlignLeft
-            topPadding: VLCStyle.margin_large
-            leftPadding: logo.x
-            color: topFocusScope.colors.playerFg
-            font.weight: Font.DemiBold
-            font.pixelSize: VLCStyle.dp(18, VLCStyle.scale)
-            elide: Text.ElideRight
-        }
+        width: root.textWidth - VLCStyle.margin_normal
+
+        visible: !root.pinControls
+
+        topPadding: VLCStyle.margin_large
+        leftPadding: logo.x
+
+        text: root.title
+        horizontalAlignment: Text.AlignLeft
+        color: root.colors.playerFg
+        font.weight: Font.DemiBold
+        font.pixelSize: VLCStyle.dp(18, VLCStyle.scale)
+        elide: Text.ElideRight
     }
 
     Loader {
         id: csdDecorations
 
+        anchors.top: parent.top
+        anchors.right: parent.right
+
         focus: false
         height: VLCStyle.icon_normal
-        active: MainCtx.clientSideDecoration
-        enabled: MainCtx.clientSideDecoration
-        visible: MainCtx.clientSideDecoration
+        active: root.showCSD
+        enabled: root.showCSD
+        visible: root.showCSD
         source: "qrc:///widgets/CSDWindowButtonSet.qml"
         onLoaded: {
-            item.color = Qt.binding(function() { return topFocusScope.colors.playerFg })
-            item.hoverColor = Qt.binding(function() { return topFocusScope.colors.windowCSDButtonDarkBg })
+            item.color = Qt.binding(function() { return root.colors.playerFg })
+            item.hoverColor = Qt.binding(function() { return root.colors.windowCSDButtonDarkBg })
         }
     }
 
@@ -252,18 +300,24 @@ FocusScope{
         topPadding: VLCStyle.margin_xxsmall
         rightPadding: VLCStyle.margin_xxsmall
 
+        anchors.top: parent.top
+
         Widgets.IconControlButton {
             id: menuSelector
 
-            visible: !MainCtx.hasToolbarMenu
+            visible: !root.showToolbar
             enabled: visible
             focus: visible
             size: VLCStyle.banner_icon_size
+
+            width: VLCStyle.bannerButton_width
+            height: VLCStyle.bannerButton_height
+
             iconText: VLCIcons.ellipsis
             text: I18n.qtr("Menu")
-            colors: topFocusScope.colors
+            colors: root.colors
 
-            Navigation.parentItem: topFocusScope
+            Navigation.parentItem: root
             Navigation.leftItem: backBtn
             Navigation.rightItem: playlistButton
 
@@ -274,8 +328,8 @@ FocusScope{
 
                 ctx: MainCtx
 
-                onAboutToShow: topFocusScope.requestLockUnlockAutoHide(true, contextMenu)
-                onAboutToHide: topFocusScope.requestLockUnlockAutoHide(false, contextMenu)
+                onAboutToShow: root.requestLockUnlockAutoHide(true, contextMenu)
+                onAboutToHide: root.requestLockUnlockAutoHide(false, contextMenu)
             }
         }
 
@@ -286,10 +340,13 @@ FocusScope{
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.playlist
             text: I18n.qtr("Playlist")
-            colors: topFocusScope.colors
-            focus: MainCtx.hasToolbarMenu
+            colors: root.colors
+            focus: root.showToolbar
 
-            Navigation.parentItem: topFocusScope
+            width: VLCStyle.bannerButton_width
+            height: VLCStyle.bannerButton_height
+
+            Navigation.parentItem: root
             Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
             onClicked: togglePlaylistVisibility()
         }
