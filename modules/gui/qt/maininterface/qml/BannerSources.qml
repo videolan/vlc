@@ -428,6 +428,7 @@ FocusScope {
                             Widgets.IconToolButton {
                                 id: menu_selector
 
+                                visible: !MainCtx.hasToolbarMenu
                                 size: VLCStyle.banner_icon_size
                                 iconText: VLCIcons.ellipsis
                                 text: I18n.qtr("Menu")

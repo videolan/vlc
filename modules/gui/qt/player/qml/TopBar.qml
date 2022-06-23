@@ -255,7 +255,9 @@ FocusScope{
         Widgets.IconControlButton {
             id: menuSelector
 
-            focus: true
+            visible: !MainCtx.hasToolbarMenu
+            enabled: visible
+            focus: visible
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.ellipsis
             text: I18n.qtr("Menu")
@@ -285,10 +287,10 @@ FocusScope{
             iconText: VLCIcons.playlist
             text: I18n.qtr("Playlist")
             colors: topFocusScope.colors
-            focus: false
+            focus: MainCtx.hasToolbarMenu
 
             Navigation.parentItem: topFocusScope
-            Navigation.leftItem: menuSelector
+            Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
             onClicked: togglePlaylistVisibility()
         }
     }
