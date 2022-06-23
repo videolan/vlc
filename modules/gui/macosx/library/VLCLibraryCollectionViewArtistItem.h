@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryMenuController.h: MacOS X interface module
+ * VLCLibraryCollectionViewArtistItem.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,19 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "VLCLibraryCollectionViewItemProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
-@class VLCMediaLibraryAlbum;
 @class VLCMediaLibraryArtist;
 
-@interface VLCLibraryMenuController : NSObject
+extern NSString *VLCLibraryArtistCellIdentifier;
 
-- (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;
-- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)album;
-- (void)setRepresentedArtist:(VLCMediaLibraryArtist *)artist;
+@interface VLCLibraryCollectionViewArtistItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
+
+@property (readwrite, retain, nonatomic) VLCMediaLibraryArtist *representedArtist;
 
 @end
 
 NS_ASSUME_NONNULL_END
+

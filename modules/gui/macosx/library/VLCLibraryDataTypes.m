@@ -213,6 +213,26 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return self;
 }
 
+- (NSArray<VLCMediaLibraryAlbum *> *)albums
+{
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return @[];
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return @[];
+    }
+    vlc_ml_album_list_t *p_albumList = vlc_ml_list_artist_albums(p_mediaLibrary, NULL, _artistID);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
+    for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
+        VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
+        [mutableArray addObject:album];
+    }
+    vlc_ml_album_list_release(p_albumList);
+    return [mutableArray copy];
+}
+
 @end
 
 @implementation VLCMediaLibraryAlbum

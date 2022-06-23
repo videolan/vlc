@@ -37,6 +37,7 @@
     enum vlc_ml_parent_type _currentRepresentedType;
     VLCMediaLibraryMediaItem *_representedMediaItem;
     VLCMediaLibraryAlbum *_representedAlbum;
+    VLCMediaLibraryArtist *_representedArtist;
 }
 @end
 
@@ -88,6 +89,15 @@
 - (void)addToPlaylist:(BOOL)playImmediately
 {
     switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_ARTIST:
+        {
+            for(VLCMediaLibraryAlbum* album in _representedArtist.albums) {
+                for(VLCMediaLibraryMediaItem* mediaItem in album.tracksAsMediaItems) {
+                    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+                }
+            }
+            break;
+        }
         case VLC_ML_PARENT_ALBUM:
         {
             for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
@@ -135,6 +145,11 @@
 - (void)revealInFinder:(id)sender
 {
     switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_ARTIST:
+        {
+            [[[VLCMain sharedInstance] libraryController] showItemInFinder:_representedArtist.albums.firstObject.tracksAsMediaItems.firstObject];
+            break;
+        }
         case VLC_ML_PARENT_ALBUM:
         {
             [[[VLCMain sharedInstance] libraryController] showItemInFinder:_representedAlbum.tracksAsMediaItems.firstObject];
@@ -155,6 +170,18 @@
     NSArray *filesToTrash;
 
     switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_ARTIST:
+        {
+            NSMutableArray *allMediaItemFiles = [[NSMutableArray alloc] init];
+            for(VLCMediaLibraryAlbum* album in _representedArtist.albums) {
+                for(VLCMediaLibraryMediaItem* mediaItem in album.tracksAsMediaItems) {
+                    [allMediaItemFiles addObjectsFromArray: mediaItem.files];
+                }
+            }
+
+            filesToTrash = [allMediaItemFiles copy];
+            break;
+        }
         case VLC_ML_PARENT_ALBUM:
         {
             NSMutableArray *allMediaItemFiles = [[NSMutableArray alloc] init];
@@ -199,6 +226,8 @@
 {
     _representedMediaItem = nil;
     _representedAlbum = nil;
+    _representedArtist = nil;
+    _currentRepresentedType = VLC_ML_PARENT_UNKNOWN;
 }
 
 - (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
@@ -213,6 +242,13 @@
     [self clearRepresentedMedia];
     _representedAlbum = album;
     _currentRepresentedType = VLC_ML_PARENT_ALBUM;
+}
+
+- (void)setRepresentedArtist:(VLCMediaLibraryArtist *)artist
+{
+    [self clearRepresentedMedia];
+    _representedArtist = artist;
+    _currentRepresentedType = VLC_ML_PARENT_ARTIST;
 }
 
 @end

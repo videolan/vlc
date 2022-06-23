@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *VLCMediaLibraryMediaItemPasteboardType;
 
 @class VLCMediaLibraryMediaItem;
+@class VLCMediaLibraryAlbum;
 @class VLCInputItem;
 
 extern const CGFloat VLCMediaLibrary4KWidth;
@@ -106,6 +107,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSString *musicBrainzID;
 @property (readonly) unsigned int numberOfAlbums;
 @property (readonly) unsigned int numberOfTracks;
+@property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
 
 @end
 

@@ -31,6 +31,7 @@
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewAlbumItem.h"
+#import "library/VLCLibraryCollectionViewArtistItem.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -69,6 +70,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
     [_collectionView registerClass:[VLCLibraryCollectionViewAlbumItem class] forItemWithIdentifier:VLCLibraryAlbumCellIdentifier];
+    [_collectionView registerClass:[VLCLibraryCollectionViewArtistItem class] forItemWithIdentifier:VLCLibraryArtistCellIdentifier];
     
     NSCollectionViewFlowLayout *flowLayout = _collectionView.collectionViewLayout;
     flowLayout.itemSize = CGSizeMake(214., 260.);
@@ -395,31 +397,10 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     switch (_currentParentType) {
         case VLC_ML_PARENT_ARTIST:
         {
-            // TODO: Have artist-specific view item
+            VLCLibraryCollectionViewArtistItem *viewArtistItem = [collectionView makeItemWithIdentifier:VLCLibraryArtistCellIdentifier forIndexPath:indexPath];
             VLCMediaLibraryArtist *artist = _displayedCollection[indexPath.item];
-            viewItem.mediaTitleTextField.stringValue = artist.name;
-            NSString *countMetadataString;
-            if (artist.numberOfAlbums > 1) {
-                countMetadataString = [NSString stringWithFormat:_NS("%u albums"), artist.numberOfAlbums];
-            } else {
-                countMetadataString = _NS("1 album");
-            }
-            if (artist.numberOfTracks > 1) {
-                countMetadataString = [countMetadataString stringByAppendingFormat:@", %@", [NSString stringWithFormat:_NS("%u songs"), artist.numberOfTracks]];
-            } else {
-                countMetadataString = [countMetadataString stringByAppendingFormat:@", %@", _NS("1 song")];
-            }
-            viewItem.durationTextField.stringValue = countMetadataString;
-
-            NSImage *image;
-            if (artist.artworkMRL.length > 0) {
-                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artist.artworkMRL]];
-            }
-            if (!image) {
-                image = [NSImage imageNamed: @"noart.png"];
-            }
-            viewItem.mediaImageView.image = image;
-            break;
+            viewArtistItem.representedArtist = artist;
+            return viewArtistItem;
         }
         case VLC_ML_PARENT_ALBUM:
         {
