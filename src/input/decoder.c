@@ -169,6 +169,7 @@ struct vlc_input_decoder_t
 #define MAX_CC_DECODERS 64 /* The es_out only creates one type of es */
     struct
     {
+        vlc_mutex_t lock;
         bool b_supported;
         decoder_cc_desc_t desc;
         vlc_input_decoder_t *pp_decoder[MAX_CC_DECODERS];
@@ -996,6 +997,7 @@ static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
 {
     vlc_mutex_lock( &p_owner->lock );
 
+    vlc_mutex_lock(&p_owner->cc.lock);
     p_owner->cc.desc = *p_desc;
 
     /* Fanout data to all decoders. We do not know if es_out
@@ -1019,6 +1021,7 @@ static void DecoderPlayCc( vlc_input_decoder_t *p_owner, vlc_frame_t *p_cc,
             p_cc = NULL; /* was last dec */
         }
     }
+    vlc_mutex_unlock(&p_owner->cc.lock);
 
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -1509,6 +1512,7 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
         p_dec->pf_flush( p_dec );
 
     /* flush CC sub decoders */
+    vlc_mutex_lock(&p_owner->cc.lock);
     if( p_owner->cc.b_supported )
     {
         for( int i=0; i<MAX_CC_DECODERS; i++ )
@@ -1520,6 +1524,7 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
             vlc_input_decoder_Flush(p_ccowner);
         }
     }
+    vlc_mutex_unlock(&p_owner->cc.lock);
 
     vlc_mutex_lock( &p_owner->lock );
 #ifdef ENABLE_SOUT
@@ -1975,6 +1980,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     }
 
     /* */
+    vlc_mutex_init(&p_owner->cc.lock);
     p_owner->cc.b_supported = ( cfg->sout == NULL );
 
     p_owner->cc.desc.i_608_channels = 0;
@@ -2448,8 +2454,12 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
     decoder_t *p_dec = &p_owner->dec;
     //msg_Warn( p_dec, "vlc_input_decoder_SetCcState: %d @%x", b_decode, i_channel );
 
+    vlc_mutex_lock(&p_owner->cc.lock);
     if( !vlc_input_decoder_HasCCChanFlag( p_owner, codec, i_channel ) )
+    {
+        vlc_mutex_unlock(&p_owner->cc.lock);
         return VLC_EGENERIC;
+    }
 
     if( b_decode )
     {
@@ -2477,32 +2487,31 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
             vlc_dialog_display_error( p_dec,
                 _("Streaming / Transcoding failed"), "%s",
                 _("VLC could not open the decoder module.") );
+            vlc_mutex_unlock(&p_owner->cc.lock);
             return VLC_EGENERIC;
         }
         else if( !p_ccowner->dec.p_module )
         {
             DecoderUnsupportedCodec( p_dec, &fmt, true );
             vlc_input_decoder_Delete(p_ccowner);
+            vlc_mutex_unlock(&p_owner->cc.lock);
             return VLC_EGENERIC;
         }
         p_ccowner->p_clock = p_owner->p_clock;
 
-        vlc_mutex_lock( &p_owner->lock );
         p_owner->cc.pp_decoder[i_channel] = p_ccowner;
-        vlc_mutex_unlock( &p_owner->lock );
     }
     else
     {
         vlc_input_decoder_t *p_cc;
 
-        vlc_mutex_lock( &p_owner->lock );
         p_cc = p_owner->cc.pp_decoder[i_channel];
         p_owner->cc.pp_decoder[i_channel] = NULL;
-        vlc_mutex_unlock( &p_owner->lock );
 
         if( p_cc )
             vlc_input_decoder_Delete(p_cc);
     }
+    vlc_mutex_unlock(&p_owner->cc.lock);
     return VLC_SUCCESS;
 }
 
