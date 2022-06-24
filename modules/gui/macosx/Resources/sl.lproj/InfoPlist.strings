@@ -5,6 +5,6 @@
 "NSAppleEventsUsageDescription" = "VLC želi ustavljati in zaganjati zunanje predvajalnike.";
 "NSDesktopFolderUsageDescription" = "VLC želi dostopati do mape namizja, kot je zahteval uporabnik.";
 "NSDocumentsFolderUsageDescription" = "VLC želi dostopati do mape z dokumenti, kot je zahteval uporabnik.";
-"NSDownloadsFolderUsageDescription" = "VLC želi dostopati do mape za prenose, kot je zahteval uporabnik.";
+"NSDownloadsFolderUsageDescription" = "Na zahtevo uporabnika želi VLC želi dostopati do mape za prenose.";
 "NSNetworkVolumesUsageDescription" = "VLC želi dostopati do omrežnega pogona, kot je zahteval uporabnik.";
 "NSRemovableVolumesUsageDescription" = "VLC želi dostopati do izmenljivega pogona, kot je zahteval uporabnik.";
