@@ -301,8 +301,7 @@ macos-x86_64:
 macos-arm64:
     extends: .macos-common
     tags:
-        - amd64
-        - catalina
+        - monterey
     variables: *variables-macos-arm64
 
 .nightly-macos-common:
@@ -327,8 +326,7 @@ nightly-macos-x86_64:
 nightly-macos-arm64:
     extends: .nightly-macos-common
     tags:
-        - amd64
-        - catalina
+        - monterey
     variables: *variables-macos-arm64
 
 #
