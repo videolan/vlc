@@ -357,6 +357,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // of the buttons to be correctly recalculated, working around this issue
     [self toggleToolbarShown:self];
     [self toggleToolbarShown:self];
+
+    // The playlist toggle button's default state is OFF so we set it to ON if the playlist
+    // is not collapsed when we open the library window
+    if (![_mainSplitView isSubviewCollapsed:_playlistView]) {
+        _playQueueToggle.state = NSControlStateValueOn;
+    }
 }
 
 - (void)dealloc
@@ -697,6 +703,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)splitViewDidResizeSubviews:(NSNotification *)notification
 {
     _lastPlaylistWidthBeforeCollaps = [_playlistView frame].size.width;
+
+    if (![_mainSplitView isSubviewCollapsed:_playlistView]) {
+        _playQueueToggle.state = NSControlStateValueOn;
+    } else {
+        _playQueueToggle.state = NSControlStateValueOff;
+    }
 }
 
 - (void)togglePlaylist
@@ -705,8 +717,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     CGFloat splitViewWidth = _mainSplitView.frame.size.width;
     if ([_mainSplitView isSubviewCollapsed:_playlistView]) {
         [_mainSplitView setPosition:splitViewWidth - _lastPlaylistWidthBeforeCollaps ofDividerAtIndex:0];
+        _playQueueToggle.state = NSControlStateValueOn;
     } else {
         [_mainSplitView setPosition:splitViewWidth ofDividerAtIndex:0];
+        _playQueueToggle.state = NSControlStateValueOff;
     }
 }
 
