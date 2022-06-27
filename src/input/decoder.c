@@ -1555,10 +1555,6 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
         }
     }
     vlc_mutex_unlock(&p_owner->cc.lock);
-
-    vlc_fifo_Lock(p_owner->p_fifo);
-    p_owner->i_preroll_end = PREROLL_NONE;
-    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
 static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
@@ -1689,7 +1685,7 @@ static void *DecoderThread( void *p_data )
              * is called again. This will avoid a second useless flush (but
              * harmless). */
             p_owner->flushing = false;
-
+            p_owner->i_preroll_end = PREROLL_NONE;
             continue;
         }
 
@@ -2392,6 +2388,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
         DecoderThread_Flush(p_owner);
         vlc_fifo_Lock(p_owner->p_fifo);
         p_owner->flushing = false;
+        p_owner->i_preroll_end = PREROLL_NONE;
         vlc_fifo_Unlock(p_owner->p_fifo);
     }
 }
