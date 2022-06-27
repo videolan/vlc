@@ -250,3 +250,14 @@ vlc_demux_dec_libfuzzer_LDADD = libvlc_demux_dec_run.la
 if HAVE_LIBFUZZER
 noinst_PROGRAMS += vlc-demux-libfuzzer vlc-demux-dec-libfuzzer vlc-demux-run vlc-demux-dec-run
 endif
+
+vlccoreios_SOURCES = iosvlc.m
+vlccoreios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
+vlccoreios_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/Frameworks/"
+vlccoreios_OBJCFLAGS = -fobjc-arc
+vlccoreios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
+if HAVE_DARWIN
+if !HAVE_OSX
+noinst_PROGRAMS += vlccoreios
+endif
+endif
