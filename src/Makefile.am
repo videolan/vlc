@@ -427,8 +427,7 @@ libvlccore_la_SOURCES += \
 	win32/plugin.c \
 	win32/rand.c \
 	win32/specific.c \
-	win32/thread.c \
-	win32/winsock.c
+	win32/thread.c
 if HAVE_WINSTORE
 libvlccore_la_SOURCES += posix/timer.c win32/dirs-uap.c
 else
