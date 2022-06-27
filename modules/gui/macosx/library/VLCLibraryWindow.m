@@ -86,6 +86,7 @@ static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
     VLCFSPanelController *_fspanel;
     
     NSInteger _currentSelectedSegment;
+    NSInteger _currentSelectedViewModeSegment;
 }
 
 @property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
@@ -463,11 +464,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)segmentedControlAction:(id)sender
 {
-    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment) {
+    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment && 
+        _gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
         return;
     }
     
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
+    _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
+
     switch (_currentSelectedSegment) {
         case 0:
             [self showVideoLibrary];
@@ -522,6 +526,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _optionBarView.hidden = YES;
     _audioSegmentedControl.hidden = YES;
 
+    self.gridVsListSegmentedControl.target = self;
+    self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 }
 
 - (void)showAudioLibrary

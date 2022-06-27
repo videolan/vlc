@@ -114,7 +114,14 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 {
     self.gridVsListSegmentedControl.action = @selector(switchGridOrListMode:);
     self.gridVsListSegmentedControl.target = self;
-    self.gridVsListSegmentedControl.selectedSegment = _gridViewMode ? 0 : 1;
+
+    // Since we call switchGridOrListMode to do the actual reloading of the views,
+    // we set the gridViewMode to exactly what the segmented control ISN'T set to,
+    // as switchGridOrListMode will switch the state
+
+    // (The segmented control has the grid view button first, list view button second)
+    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == 1;
+    [self switchGridOrListMode:self];
 }
 
 - (void)loadMediaSources
@@ -430,10 +437,12 @@ referenceSizeForHeaderInSection:(NSInteger)section
     if (_gridViewMode) {
         self.collectionViewScrollView.hidden = NO;
         self.tableView.hidden = YES;
+        self.gridVsListSegmentedControl.selectedSegment = 0;
         [self.collectionView reloadData];
     } else {
         self.collectionViewScrollView.hidden = YES;
         self.tableView.hidden = NO;
+        self.gridVsListSegmentedControl.selectedSegment = 1;
         [self.tableView reloadData];
     }
 }
