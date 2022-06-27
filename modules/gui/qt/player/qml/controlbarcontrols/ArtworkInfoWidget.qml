@@ -34,7 +34,8 @@ AbstractButton {
 
     property VLCColors colors: VLCStyle.colors
 
-    readonly property real minimumWidth: cover.width + (leftPadding + rightPadding)
+    readonly property real minimumWidth: coverRect.implicitWidth +
+                                         + (leftPadding + rightPadding)
 
     property bool _keyPressed: false
 
@@ -75,18 +76,13 @@ AbstractButton {
     contentItem: RowLayout {
         spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
 
-        Item {
-            id: coverItem
+        Rectangle {
+            id: coverRect
 
-            implicitHeight: cover.height
-            implicitWidth: cover.width
+            implicitHeight: VLCStyle.dp(60, VLCStyle.scale)
+            implicitWidth: implicitHeight
 
-            Rectangle {
-                id: coverRect
-                anchors.fill: parent
-
-                color: colors.bg
-            }
+            color: colors.bg
 
             Widgets.DoubleShadow {
                 anchors.fill: parent
@@ -103,6 +99,8 @@ AbstractButton {
             Widgets.ScaledImage {
                 id: cover
 
+                anchors.fill: parent
+
                 source: {
                     if (!paintOnly
                         && mainPlaylistController.currentItem.artwork
@@ -113,9 +111,6 @@ AbstractButton {
                 }
 
                 fillMode: Image.PreserveAspectFit
-
-                width: VLCStyle.dp(60)
-                height: VLCStyle.dp(60)
 
                 asynchronous: true
 
@@ -133,10 +128,9 @@ AbstractButton {
         ColumnLayout {
             id: infoColumn
 
-            Layout.preferredHeight: coverItem.implicitHeight
             Layout.fillWidth: true
-
-            clip: true
+            Layout.preferredHeight: coverRect.height
+            Layout.minimumWidth: 0.1 // FIXME: Qt layout bug
 
             Widgets.MenuLabel {
                 id: titleLabel
