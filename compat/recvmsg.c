@@ -74,10 +74,50 @@ ssize_t recvmsg(int fd, struct msghdr *msg, int flags)
         return rcvd;
     }
 
-    switch (WSAGetLastError())
+    int err = WSAGetLastError();
+    switch (err)
     {
         case WSAEWOULDBLOCK:
             errno = EAGAIN;
+            break;
+        case WSA_NOT_ENOUGH_MEMORY:
+            errno = ENOMEM;
+            break;
+        case WSAEAFNOSUPPORT:
+            errno = EAFNOSUPPORT;
+            break;
+        case WSAENOBUFS:
+            errno = ENOBUFS;
+            break;
+        case WSAEINPROGRESS:
+            errno = EINPROGRESS;
+            break;
+        case WSAEINTR:
+            errno = EINTR;
+            break;
+        case WSAEBADF:
+            errno = EBADF;
+            break;
+        case WSAEACCES:
+            errno = EACCES;
+            break;
+        case WSAEFAULT:
+            errno = EFAULT;
+            break;
+        case WSAEINVAL:
+            errno = EINVAL;
+            break;
+        case WSAEMFILE:
+            errno = EMFILE;
+            break;
+        case WSAEALREADY:
+            errno = EALREADY;
+            break;
+        case WSAECONNRESET:
+            errno = ECONNRESET;
+            break;
+        default:
+            errno = err;
             break;
     }
     return -1;
