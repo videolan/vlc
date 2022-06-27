@@ -2518,12 +2518,15 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
 int vlc_input_decoder_GetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t codec,
                                   int i_channel, bool *pb_decode )
 {
+    vlc_mutex_lock(&p_owner->cc.lock);
     if( !vlc_input_decoder_HasCCChanFlag( p_owner, codec, i_channel ) )
+    {
+        vlc_mutex_unlock(&p_owner->cc.lock);
         return VLC_EGENERIC;
+    }
 
-    vlc_mutex_lock( &p_owner->lock );
     *pb_decode = p_owner->cc.pp_decoder[i_channel] != NULL;
-    vlc_mutex_unlock( &p_owner->lock );
+    vlc_mutex_unlock(&p_owner->cc.lock);
     return VLC_SUCCESS;
 }
 
