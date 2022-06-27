@@ -53,7 +53,7 @@ FocusScope {
     }
 
     // NOTE: We force the night theme when playing a video.
-    readonly property VLCColors colors: (MainCtx.hasEmbededVideo) ? VLCStyle.nightColors
+    readonly property VLCColors colors: (MainCtx.hasEmbededVideo && !MainCtx.pinVideoControls) ? VLCStyle.nightColors
                                                                   : VLCStyle.colors
 
     property bool _keyPressed: false
