@@ -100,7 +100,7 @@ AbstractButton {
                 secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
             }
 
-            Image {
+            Widgets.ScaledImage {
                 id: cover
 
                 source: {
@@ -116,8 +116,6 @@ AbstractButton {
 
                 width: VLCStyle.dp(60)
                 height: VLCStyle.dp(60)
-
-                mipmap: true
 
                 asynchronous: true
 
