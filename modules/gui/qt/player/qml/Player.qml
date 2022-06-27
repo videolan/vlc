@@ -39,7 +39,7 @@ FocusScope {
                                       && Player.hasVideoOutput
                                       && playlistpopup.state !== "visible"
 
-    property bool pinVideoControls: rootPlayer.hasEmbededVideo && MainCtx.pinVideoControls && ((MainCtx.intfMainWindow.visibility !== Window.FullScreen))
+    property bool pinVideoControls: MainCtx.pinVideoControls && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
     property bool hasEmbededVideo: MainCtx.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
     readonly property string coverSource: {
