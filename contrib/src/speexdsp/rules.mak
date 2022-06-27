@@ -1,6 +1,6 @@
 # speexdsp
 
-SPEEXDSP_VERSION := 1.2.0
+SPEEXDSP_VERSION := 1.2.1
 SPEEXDSP_URL := http://downloads.us.xiph.org/releases/speex/speexdsp-$(SPEEXDSP_VERSION).tar.gz
 
 PKGS += speexdsp
