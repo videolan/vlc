@@ -79,6 +79,9 @@
 #ifndef IPPROTO_UDPLITE
 # define IPPROTO_UDPLITE 136 /* IANA */
 #endif
+#ifndef ENOPROTOOPT
+# define ENOPROTOOPT 123
+#endif
 
 #if defined (HAVE_NETINET_UDPLITE_H)
 # include <netinet/udplite.h>
@@ -532,9 +535,7 @@ static int net_SetDSCP( int fd, uint8_t dscp )
             break;
 
         default:
-#ifdef ENOPROTOOPT
             errno = ENOPROTOOPT;
-#endif
             return -1;
     }
 
