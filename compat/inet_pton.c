@@ -31,8 +31,6 @@
 #elif defined(_WIN32)
 # include <winsock2.h>
 # include <ws2tcpip.h>
-# undef EAFNOSUPPORT
-# define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
 int inet_pton (int af, const char *src, void *dst)
