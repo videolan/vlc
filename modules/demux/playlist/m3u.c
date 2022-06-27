@@ -109,7 +109,7 @@ int Import_M3U( vlc_object_t *p_this )
     if (!match)
         return VLC_EGENERIC;
 
-    if (offset && vlc_stream_Read(p_stream->s, NULL, offset) < offset)
+    if (offset && vlc_stream_Read(p_stream->s, NULL, offset) != offset)
         return VLC_EGENERIC;
 
     msg_Dbg( p_stream, "found valid M3U playlist" );

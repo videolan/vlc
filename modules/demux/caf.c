@@ -817,7 +817,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( vlc_stream_Read( p_demux->s, NULL, 8 ) < 8 )
+    if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
         return VLC_EGENERIC; /* This would be very strange since we justed peeked at these bytes. */
 
     p_demux->p_sys = calloc( 1, sizeof( demux_sys_t ));

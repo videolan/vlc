@@ -398,7 +398,7 @@ static int Demux( demux_t *p_demux )
     {
         /* Skip the frame header */
         /* Skip "FRAME" */
-        if( vlc_stream_Read( p_demux->s, NULL, 5 ) < 5 )
+        if( vlc_stream_Read( p_demux->s, NULL, 5 ) != 5 )
             return VLC_DEMUXER_EOF;
         /* Find \n */
         for( ;; )

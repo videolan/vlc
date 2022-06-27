@@ -555,7 +555,7 @@ static int Open (vlc_object_t *obj)
         uint32_t riff_len = GetDWLE (peek + 4);
 
         msg_Dbg (demux, "detected RIFF MIDI file (%"PRIu32" bytes)", riff_len);
-        if ((vlc_stream_Read (stream, NULL, 12) < 12))
+        if (vlc_stream_Read( stream, NULL, 12 ) != 12 )
             return VLC_EGENERIC;
 
         /* Look for the RIFF data chunk */
@@ -577,7 +577,7 @@ static int Open (vlc_object_t *obj)
             if (!memcmp (chnk_hdr, "data", 4))
                 break; /* found! */
 
-            if (vlc_stream_Read (stream, NULL, chnk_len) < (ssize_t)chnk_len)
+            if (vlc_stream_Read( stream, NULL, chnk_len ) != chnk_len )
                 return VLC_EGENERIC;
         }
 
@@ -640,7 +640,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     /* We've had a valid SMF header - now skip it*/
-    if (vlc_stream_Read (stream, NULL, 14) < 14)
+    if (vlc_stream_Read( stream, NULL, 14 ) != 14 )
         goto error;
 
     demux->p_sys = sys;

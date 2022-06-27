@@ -257,7 +257,7 @@ int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
     else if( i_toread > (1<<17) )
         return VLC_EGENERIC;
 
-    if( vlc_stream_Read( p_stream, NULL, i_toread ) != (ssize_t)i_toread )
+    if( vlc_stream_Read( p_stream, NULL, i_toread ) != i_toread )
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -630,7 +630,7 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    if( p_box->i_size < 8 || vlc_stream_Read( p_stream, NULL, 8 ) < 8 )
+    if( p_box->i_size < 8 || vlc_stream_Read( p_stream, NULL, 8 ) != 8 )
         return 0;
 
     /* Find our handler */
@@ -3758,7 +3758,7 @@ static int MP4_ReadBox_Metadata( stream_t *p_stream, MP4_Box_t *p_box )
     const uint8_t *p_peek;
     if ( vlc_stream_Peek( p_stream, &p_peek, 16 ) < 16 )
         return 0;
-    if ( vlc_stream_Read( p_stream, NULL, 8 ) < 8 )
+    if ( vlc_stream_Read( p_stream, NULL, 8 ) != 8 )
         return 0;
     const uint32_t stoplist[] = { ATOM_data, 0 };
     return MP4_ReadBoxContainerChildren( p_stream, p_box, stoplist );
@@ -4064,7 +4064,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
 
     /* skip over box header */
-    if( vlc_stream_Read( p_stream, NULL, i_headersize ) < (ssize_t) i_headersize )
+    if( vlc_stream_Read( p_stream, NULL, i_headersize ) != i_headersize )
         return 0;
 
     /* meta content starts with a 4 byte version/flags value (should be 0) */
@@ -4073,7 +4073,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( !memcmp( p_peek, "\0\0\0", 4 ) ) /* correct header case */
     {
-        if( vlc_stream_Read( p_stream, NULL, 4 ) < 4 )
+        if( vlc_stream_Read( p_stream, NULL, 4 ) != 4 )
             return 0;
     }
     else if( memcmp( &p_peek[4], "hdlr", 4 ) ) /* Broken, headerless ones */

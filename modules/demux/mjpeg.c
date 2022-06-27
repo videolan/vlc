@@ -339,7 +339,7 @@ static int Open( vlc_object_t * p_this )
     if( b_matched )
     {
         p_demux->pf_demux = MimeDemux;
-        if( vlc_stream_Read( p_demux->s, NULL, i_size ) < i_size )
+        if( vlc_stream_Read( p_demux->s, NULL, i_size ) != i_size )
             return VLC_EGENERIC;
     }
     else if( i_size == 0 )

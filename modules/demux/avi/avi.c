@@ -332,8 +332,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( i_peeker > 0
-     && vlc_stream_Read( p_demux->s, NULL, i_peeker ) < i_peeker )
+    if( i_peeker > 0 && vlc_stream_Read( p_demux->s, NULL, i_peeker ) != i_peeker )
         return VLC_EGENERIC;
 
     /* Initialize input structures. */
@@ -833,7 +832,7 @@ aviindex:
             goto error;
     }
     /* Skip movi header */
-    if( vlc_stream_Read( p_demux->s, NULL, 12 ) < 12 )
+    if( vlc_stream_Read( p_demux->s, NULL, 12 ) != 12 )
         goto error;
 
     p_sys->i_movi_begin = p_movi->i_chunk_pos;
@@ -2252,8 +2251,7 @@ static int AVI_PacketNext( demux_t *p_demux )
     if( i_skip > SSIZE_MAX )
         return VLC_EGENERIC;
 
-    ssize_t i_ret = vlc_stream_Read( p_demux->s, NULL, i_skip );
-    if( i_ret < 0 || (size_t) i_ret != i_skip )
+    if( vlc_stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
     {
         return VLC_EGENERIC;
     }

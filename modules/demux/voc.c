@@ -104,7 +104,7 @@ static int Open( vlc_object_t * p_this )
              i_version & 0xff );
 
     /* skip VOC header */
-    if( vlc_stream_Read( p_demux->s, NULL, i_data_offset ) < i_data_offset )
+    if( vlc_stream_Read( p_demux->s, NULL, i_data_offset ) != i_data_offset )
         return VLC_EGENERIC;
 
     demux_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof (*p_sys) );
@@ -347,7 +347,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             i_block_size -= 12;
 
             if( ( vlc_stream_Read( p_demux->s, buf, 8 ) < 8 )
-             || ( vlc_stream_Read( p_demux->s, NULL, 4 ) < 4 ) )
+             ||  vlc_stream_Read( p_demux->s, NULL, 4 ) != 4 )
                 goto corrupt;
 
             new_fmt.audio.i_rate = GetDWLE( buf );
@@ -419,8 +419,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             /* fall through */
         case 4: /* blocks of non-audio types can be skipped */
         case 5:
-            if( vlc_stream_Read( p_demux->s, NULL,
-                                 i_block_size ) < i_block_size )
+            if(vlc_stream_Read( p_demux->s, NULL, i_block_size ) != i_block_size)
                 goto corrupt;
             i_block_size = 0;
             break;

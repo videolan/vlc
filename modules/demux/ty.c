@@ -1661,8 +1661,7 @@ static int parse_master(demux_t *p_demux)
         p_sys->seq_table[j].l_timestamp = U64_AT(&mst_buf[0]);
         if (i_map_size > 8) {
             msg_Err(p_demux, "Unsupported SEQ bitmap size in master chunk");
-            if (vlc_stream_Read(p_demux->s, NULL, i_map_size)
-                                       < (ssize_t)i_map_size)
+            if (vlc_stream_Read(p_demux->s, NULL, i_map_size) != i_map_size )
                 return VLC_EGENERIC;
         } else {
             if (vlc_stream_Read(p_demux->s, mst_buf + 8, i_map_size)

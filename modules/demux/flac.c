@@ -705,7 +705,7 @@ static int  ParseHeaders( demux_t *p_demux, es_format_t *p_fmt )
             if( p_fmt->p_extra == NULL )
                 return VLC_EGENERIC;
 
-            if( vlc_stream_Read( p_demux->s, NULL, 4) < 4)
+            if( vlc_stream_Read( p_demux->s, NULL, 4 ) != 4 )
             {
                 FREENULL( p_fmt->p_extra );
                 return VLC_EGENERIC;
@@ -751,7 +751,7 @@ static int  ParseHeaders( demux_t *p_demux, es_format_t *p_fmt )
                 ParsePicture( p_demux, p_peek, i_peek );
         }
 
-        if( vlc_stream_Read( p_demux->s, NULL, 4+i_len ) < 4+i_len )
+        if( vlc_stream_Read( p_demux->s, NULL, 4+i_len ) != (4+i_len) )
             break;
     }
 

@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* skip signature */
-    if( vlc_stream_Read( p_demux->s, NULL, 4 ) < 4 )
+    if( vlc_stream_Read( p_demux->s, NULL, 4 ) != 4 )
         return VLC_EGENERIC;
 
     /* read header */
@@ -144,7 +144,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
 #endif
         uint32_t skip = p_sys->i_header_size - 24;
-        if( vlc_stream_Read( p_demux->s, NULL, skip ) < (ssize_t)skip )
+        if( vlc_stream_Read( p_demux->s, NULL, skip ) != skip )
             return VLC_EGENERIC;
     }
 
