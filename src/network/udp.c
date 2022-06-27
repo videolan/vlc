@@ -38,8 +38,6 @@
 #include <vlc_network.h>
 
 #ifdef _WIN32
-#   undef EAFNOSUPPORT
-#   define EAFNOSUPPORT WSAEAFNOSUPPORT
 #   if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 6
 #    include <wincrypt.h>
 #   endif
