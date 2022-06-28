@@ -17,6 +17,7 @@ LIBVLC_SAMPLES = \
 	libvlc/d3d9_player.c \
 	libvlc/win_player.c \
 	libvlc/CMakeLists.txt \
+	libvlc/appkit_player.m \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
