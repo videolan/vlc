@@ -876,7 +876,7 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    int val = SeekCommon( (vlc_object_t *)p_access, p_sys, i_pos );
+    int val = SeekCommon( VLC_OBJECT(p_access), p_sys, i_pos );
     if( val )
         return val;
 
@@ -888,7 +888,7 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 #ifdef ENABLE_SOUT
 static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
 {
-    return SeekCommon((vlc_object_t *)p_access, GET_OUT_SYS(p_access), i_pos);
+    return SeekCommon(VLC_OBJECT(p_access), GET_OUT_SYS(p_access), i_pos);
 }
 #endif
 
