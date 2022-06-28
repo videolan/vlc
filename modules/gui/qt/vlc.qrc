@@ -110,7 +110,6 @@
         <file alias="download.svg">pixmaps/download.svg</file>
         <file alias="update.svg">pixmaps/update.svg</file>
         <file alias="noart.png">pixmaps/noart.png</file>
-        <file alias="noart64.png">pixmaps/noart-64.png</file>
         <file alias="go-next.svg">pixmaps/go-next.svg</file>
         <file alias="new.svg">pixmaps/profile_new.svg</file>
         <file alias="lock.svg">pixmaps/lock.svg</file>

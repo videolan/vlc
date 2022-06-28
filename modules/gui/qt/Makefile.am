@@ -594,7 +594,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menus/settings_16px.svg \
 	gui/qt/pixmaps/menus/stream_16px.svg \
 	gui/qt/pixmaps/next.svg \
-	gui/qt/pixmaps/noart-64.png \
 	gui/qt/pixmaps/noart.png \
 	gui/qt/pixmaps/noart_album.svg \
 	gui/qt/pixmaps/noart_albumCover.svg \
@@ -709,7 +708,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/types/type_stream.svg \
 	gui/qt/pixmaps/types/type_node.svg \
 	gui/qt/pixmaps/types/type_playlist.svg \
-	gui/qt/pixmaps/types/type_unknown.xpm \
 	gui/qt/pixmaps/util/wait1.svg \
 	gui/qt/pixmaps/util/wait2.svg \
 	gui/qt/pixmaps/util/wait3.svg \
