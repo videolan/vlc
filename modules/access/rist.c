@@ -278,7 +278,7 @@ static int Open(vlc_object_t *p_this)
         goto failed;
     }
 
-    if( !rist_add_peers((vlc_object_t *)p_access, p_sys->receiver_ctx, p_access->psz_url, 0, RIST_DEFAULT_VIRT_DST_PORT, i_recovery_length) )
+    if( !rist_add_peers(VLC_OBJECT(p_access), p_sys->receiver_ctx, p_access->psz_url, 0, RIST_DEFAULT_VIRT_DST_PORT, i_recovery_length) )
         goto failed;
 
     /* Start the rist protocol thread */

@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_max_packet_size = rist_get_max_packet_size((vlc_object_t *)p_access);
+    p_sys->i_max_packet_size = rist_get_max_packet_size(VLC_OBJECT(p_access));
 
     int i_rist_profile = var_InheritInteger(p_access, RIST_CFG_PREFIX RIST_URL_PARAM_PROFILE);
     int i_verbose_level = var_InheritInteger(p_access, RIST_CFG_PREFIX RIST_URL_PARAM_VERBOSE_LEVEL);
@@ -224,7 +224,7 @@ static int Open( vlc_object_t *p_this )
     int i_recovery_length = var_InheritInteger(p_access, RIST_CFG_PREFIX RIST_CFG_LATENCY);
     p_sys->i_recovery_buffer = i_recovery_length;
 
-    if ( !rist_add_peers((vlc_object_t *)p_access, p_sys->sender_ctx, p_access->psz_path, i_multipeer_mode, p_sys->gre_dst_port + 1, i_recovery_length) )
+    if ( !rist_add_peers(VLC_OBJECT(p_access), p_sys->sender_ctx, p_access->psz_path, i_multipeer_mode, p_sys->gre_dst_port + 1, i_recovery_length) )
         goto failed;
 
     if (rist_start(p_sys->sender_ctx) == -1) {
