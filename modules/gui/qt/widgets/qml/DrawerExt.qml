@@ -23,8 +23,6 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property Component component: Item {}
-
     enum Edges {
         Top,
         Bottom,
@@ -33,23 +31,25 @@ FocusScope {
     }
 
     property int edge: DrawerExt.Edges.Bottom
-    property bool expandHorizontally: edge === DrawerExt.Edges.Left || edge === DrawerExt.Edges.Right
-
     property alias contentItem: content.item
+    property alias component: content.sourceComponent
 
-    width:  (root.expandHorizontally) ? root._size : undefined
-    height: (!root.expandHorizontally) ? root._size : undefined
+    property bool _expandHorizontally: edge === DrawerExt.Edges.Left || edge === DrawerExt.Edges.Right
+    property int _size: _expandHorizontally ? content.item.width : content.item.height
+    property string _toChange: _expandHorizontally ? "contentX" : "contentY"
 
-    property int _size: (root.expandHorizontally) ?  content.item.width : content.item.height
-    property string toChange: expandHorizontally ? "contentX" : "contentY"
+    width: _expandHorizontally ? root._size : undefined
+    height: !_expandHorizontally ? root._size : undefined
 
     Flickable {
         id: container
+
         anchors.fill: parent
+
         Loader {
-            focus: true
             id: content
-            sourceComponent: root.component
+
+            focus: true
         }
     }
 
@@ -68,26 +68,33 @@ FocusScope {
             name: "hidden"
             PropertyChanges {
                 target: container
-                contentY: edgeToOffset(edge)
-                contentX: edgeToOffset(edge)
-                visible:false
+                contentY: root.edgeToOffset(root.edge)
+                contentX: root.edgeToOffset(root.edge)
+                visible: false
             }
         }
     ]
 
     function edgeToOffset(edge){
-        if(expandHorizontally)
-            switch(edge){
-            case DrawerExt.Edges.Left: return _size
-            case DrawerExt.Edges.Right: return -_size
-            default: return 0
+        if (root._expandHorizontally) {
+            switch (edge) {
+            case DrawerExt.Edges.Left:
+                return root._size
+            case DrawerExt.Edges.Right:
+                return -root._size
+            default:
+                return 0
             }
-        else
-            switch(edge){
-            case DrawerExt.Edges.Top: return _size
-            case DrawerExt.Edges.Bottom: return -_size
-            default: return 0
+        }  else {
+            switch (edge) {
+            case DrawerExt.Edges.Top:
+                return root._size
+            case DrawerExt.Edges.Bottom:
+                return -root._size
+            default:
+                return 0
             }
+        }
     }
 
     transitions: [
@@ -95,23 +102,33 @@ FocusScope {
             to: "hidden"
             SequentialAnimation {
                 NumberAnimation {
-                    target: container; property: toChange
+                    target: container
+                    property: root._toChange
 
-                    duration: VLCStyle.duration_short; easing.type: Easing.InSine
+                    duration: VLCStyle.duration_short
+                    easing.type: Easing.InSine
                 }
 
-                PropertyAction{ target: container; property: "visible" }
+                PropertyAction{
+                    target: container
+                    property: "visible"
+                }
             }
         },
         Transition {
             to: "visible"
             SequentialAnimation {
-                PropertyAction { target: container; property: "visible" }
+                PropertyAction {
+                    target: container
+                    property: "visible"
+                }
 
                 NumberAnimation {
-                    target: container; property: toChange
+                    target: container
+                    property: root._toChange
 
-                    duration: VLCStyle.duration_short; easing.type: Easing.OutSine
+                    duration: VLCStyle.duration_short
+                    easing.type: Easing.OutSine
                 }
             }
         }
