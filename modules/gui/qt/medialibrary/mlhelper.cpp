@@ -21,6 +21,8 @@
 // MediaLibrary includes
 #include "mlbasemodel.hpp"
 
+#include <QDir>
+
 QString MsToString( int64_t time , bool doShort )
 {
     if (time < 0)
@@ -50,4 +52,13 @@ QString toValidLocalFile(const char *mrl)
 {
     QUrl url(mrl);
     return url.isLocalFile() ? url.toLocalFile() : QString {};
+}
+
+QString urlToDisplayString(const QUrl &url)
+{
+    const QString displayString = url.toDisplayString(QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments);
+    if (url.isLocalFile())
+        return QDir::toNativeSeparators(displayString);
+
+    return displayString;
 }

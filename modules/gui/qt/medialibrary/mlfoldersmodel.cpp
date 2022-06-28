@@ -81,7 +81,7 @@ QVariant MLFoldersBaseModel::data( const QModelIndex &index ,
             QUrl url = QUrl::fromUserInput(m_mrls[index.row()].mrl);
             if (!url.isValid())
                 return {};
-            return QVariant::fromValue( url.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ) );
+            return QVariant::fromValue(urlToDisplayString(url));
         }
         default :
             return {};

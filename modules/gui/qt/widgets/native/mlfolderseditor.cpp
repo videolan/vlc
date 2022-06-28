@@ -26,6 +26,7 @@
 #endif
 
 #include "mlfolderseditor.hpp"
+#include "medialibrary/mlhelper.hpp"
 
 #include <QBoxLayout>
 #include <QHeaderView>
@@ -79,7 +80,7 @@ void MLFoldersEditor::commit()
 
 void MLFoldersEditor::handleOpFailure(int operation, const QUrl &url)
 {
-    const QString entryPoint = url.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments );
+    const QString entryPoint = urlToDisplayString(url);
 
     QString msg;
     switch (operation)
@@ -122,7 +123,7 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
     const int row = rowCount();
     setRowCount(row + 1);
 
-    const QString text = mrl.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments );
+    const QString text = urlToDisplayString(mrl);
     auto col1 = new QTableWidgetItem( text );
     col1->setData(Qt::UserRole, mrl);
     col1->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );

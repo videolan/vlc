@@ -32,6 +32,7 @@
 class MLBaseModel;
 class MLItemId;
 class CoverGenerator;
+class QUrl;
 
 template<typename T>
 class MLDeleter
@@ -99,5 +100,7 @@ void thumbnailCopy(const MLListRange<T> &list, O dst, const int max)
 }
 
 QString MsToString( int64_t time, bool doShort = false );
+
+QString urlToDisplayString(const QUrl &url);
 
 #endif // MLHELPER_HPP
