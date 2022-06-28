@@ -31,7 +31,10 @@ Row {
     property color color: VLCStyle.colors.text
     property color hoverColor: VLCStyle.colors.windowCSDButtonBg
 
+    property bool hovered: minimizeButton.hovered || maximizeButton.hovered || closeButton.hovered
+
     CSDWindowButton {
+        id: minimizeButton
         iconTxt: VLCIcons.window_minimize
         onClicked: MainCtx.requestInterfaceMinimized()
         height: windowButtonGroup.height
@@ -40,6 +43,7 @@ Row {
     }
 
     CSDWindowButton {
+        id: maximizeButton
         iconTxt: (MainCtx.intfMainWindow.visibility === Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
         onClicked: {
             if (MainCtx.intfMainWindow.visibility === Window.Maximized) {
