@@ -53,7 +53,7 @@
 #endif
 
 #if defined(__OpenBSD__) && defined(__powerpc__)
-#include <sys/param.h>
+#include <sys/types.h>
 #include <sys/sysctl.h>
 #include <machine/cpu.h>
 #endif
