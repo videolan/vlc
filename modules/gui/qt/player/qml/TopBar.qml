@@ -115,6 +115,10 @@ FocusScope{
 
             if (!!left || !!right) {
                 offset += root._layoutLine(left, right, offset)
+
+                if (root.showCSD) {
+                    tapNDrag.height = offset
+                }
             }
 
             if (!logoPlaced) {
@@ -141,22 +145,16 @@ FocusScope{
         reservedHeight = offset
     }
 
-    // Main Content Container
-    MouseArea {
-        id: topcontrollerMouseArea
+    //drag and dbl click the titlebar in CSD mode
+    Loader {
+        id: tapNDrag
 
-        hoverEnabled: true
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
 
-        onContainsMouseChanged: root.requestLockUnlockAutoHide(containsMouse, root)
-
-        //drag and dbl click the titlebar in CSD mode
-        Loader {
-            anchors.fill: parent
-            active: root.showCSD
-            source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
-        }
-
+        active: root.showCSD
+        source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
     }
 
     // Components -
@@ -173,6 +171,9 @@ FocusScope{
         textColor: root.colors.text
         highlightedBgColor: root.colors.bgHover
         highlightedTextColor: root.colors.bgHoverText
+
+        onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
+        onMenuOpenedChanged: root.requestLockUnlockAutoHide(menuOpened, root)
     }
 
     RowLayout {
@@ -199,6 +200,8 @@ FocusScope{
             Navigation.parentItem: root
             Navigation.rightItem: menuSelector
             onClicked: root.backRequested()
+
+            onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
         }
 
         Image {
@@ -290,6 +293,12 @@ FocusScope{
             item.color = Qt.binding(function() { return root.colors.playerFg })
             item.hoverColor = Qt.binding(function() { return root.colors.windowCSDButtonDarkBg })
         }
+
+        Connections {
+            target: csdDecorations.item
+            enabled: csdDecorations.loaded
+            onHoveredChanged: root.requestLockUnlockAutoHide(csdDecorations.item.hovered, root)
+        }
     }
 
     Row {
@@ -323,6 +332,8 @@ FocusScope{
 
             onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
+            onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
+
             QmlGlobalMenu {
                 id: contextMenu
 
@@ -349,6 +360,8 @@ FocusScope{
             Navigation.parentItem: root
             Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
             onClicked: togglePlaylistVisibility()
+
+            onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
         }
     }
 }
