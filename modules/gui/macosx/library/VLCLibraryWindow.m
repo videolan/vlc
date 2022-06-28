@@ -64,6 +64,7 @@ const CGFloat VLCLibraryWindowSmallPlaylistRowHeight = 45.;
 const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
 const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
+const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 
 static NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
@@ -683,17 +684,23 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     switch (dividerIndex) {
         case 0:
             return VLCLibraryWindowMinimalWidth;
-            break;
-
-        case 1:
-            return VLCLibraryWindowDefaultPlaylistWidth;
-            break;
-
         default:
             break;
     }
 
     return proposedMinimumPosition;
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMaximumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+    switch (dividerIndex) {
+        case 0:
+            return splitView.frame.size.width - VLCLibraryWindowMinimalPlaylistWidth;
+        default:
+            break;
+    }
+
+    return proposedMaximumPosition;
 }
 
 - (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
@@ -845,6 +852,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];
     [window setContentMinSize:NSMakeSize(VLCLibraryWindowMinimalWidth, VLCLibraryWindowMinimalHeight)];
+
+    // HACK: On initialisation, the window refuses to accept any border resizing. It seems the split view
+    // holds a monopoly on the edges of the window (which can be seen as the right-side of the split view
+    // lets you resize the playlist, and after doing so the window becomes resizeable.
+    
+    // This can be worked around by maximizing the window, or toggling the playlist.
+    // Toggling the playlist is simplest.
+    [window togglePlaylist];
+    [window togglePlaylist];
+
 }
 
 @end
