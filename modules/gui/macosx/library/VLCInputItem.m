@@ -482,7 +482,7 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 - (void)parseInputItem
 {
     _p_parserID = input_item_Parse(_vlcInputItem,
-                                   (vlc_object_t *)getIntf(),
+                                   VLC_OBJECT(getIntf()),
                                    &parserCallbacks,
                                    (__bridge void *) self);
 }
