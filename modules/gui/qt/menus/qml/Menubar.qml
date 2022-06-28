@@ -35,6 +35,9 @@ Item {
     property color textColor: VLCStyle.colors.text
     property color highlightedBgColor: VLCStyle.colors.bgHover
     property color highlightedTextColor: VLCStyle.colors.bgHoverText
+    property bool hovered: _countHovered !== 0
+    property bool menuOpened: _menuIndex !== -1
+
 
     Action{ id: mediaMenu;    text: I18n.qtr("&Media")    ; onTriggered: menubar.popupMediaMenu(source);   }
     Action{ id: playbackMenu; text: I18n.qtr("&Playback") ; onTriggered: menubar.popupPlaybackMenu(source);}
@@ -57,6 +60,8 @@ Item {
     ]
 
     property int _menuIndex: -1
+    property int _countHovered: 0
+
 
     function openMenu(obj, cb, index) {
         cb.trigger(obj)
@@ -64,6 +69,8 @@ Item {
     }
 
     function updateHover(obj, cb, index, hovered ) {
+        root._countHovered += hovered ? 1 : -1
+
         if (hovered && menubar.openMenuOnHover) {
             cb.trigger(obj)
             root._menuIndex = index
