@@ -308,14 +308,14 @@ Open(vlc_object_t *obj)
                 .h = {1, 1},
                 .internal = GL_R16,
                 .format = GL_RED,
-                .type = GL_UNSIGNED_BYTE,
+                .type = GL_UNSIGNED_SHORT,
             };
             interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 1},
+                .w = {1, 2},
                 .h = {1, 2},
                 .internal = GL_RG16,
                 .format = GL_RG,
-                .type = GL_UNSIGNED_BYTE,
+                .type = GL_UNSIGNED_SHORT,
             };
 
             break;
