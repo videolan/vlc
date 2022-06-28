@@ -36,21 +36,21 @@ FocusScope {
 
     property bool _expandHorizontally: edge === DrawerExt.Edges.Left || edge === DrawerExt.Edges.Right
     property int _size: _expandHorizontally ? content.item.width : content.item.height
-    property string _toChange: _expandHorizontally ? "contentX" : "contentY"
+    property string _toChange: _expandHorizontally ? "x" : "y"
 
     width: _expandHorizontally ? root._size : undefined
     height: !_expandHorizontally ? root._size : undefined
 
-    Flickable {
-        id: container
 
-        anchors.fill: parent
+    Loader {
+        id: content
 
-        Loader {
-            id: content
+        anchors.left: !_expandHorizontally ? parent.left : undefined
+        anchors.right: !_expandHorizontally ? parent.right : undefined
+        anchors.top: _expandHorizontally ? parent.top : undefined
+        anchors.bottom: _expandHorizontally ? parent.bottom : undefined
 
-            focus: true
-        }
+        focus: true
     }
 
     state: "hidden"
@@ -58,18 +58,18 @@ FocusScope {
         State {
             name: "visible"
             PropertyChanges {
-                target: container
-                contentY: 0
-                contentX: 0
+                target: content
+                y: 0
+                x: 0
                 visible: true
             }
         },
         State {
             name: "hidden"
             PropertyChanges {
-                target: container
-                contentY: root.edgeToOffset(root.edge)
-                contentX: root.edgeToOffset(root.edge)
+                target: content
+                y: root.edgeToOffset(root.edge)
+                x: root.edgeToOffset(root.edge)
                 visible: false
             }
         }
@@ -79,18 +79,18 @@ FocusScope {
         if (root._expandHorizontally) {
             switch (edge) {
             case DrawerExt.Edges.Left:
-                return root._size
-            case DrawerExt.Edges.Right:
                 return -root._size
+            case DrawerExt.Edges.Right:
+                return root._size
             default:
                 return 0
             }
         }  else {
             switch (edge) {
             case DrawerExt.Edges.Top:
-                return root._size
-            case DrawerExt.Edges.Bottom:
                 return -root._size
+            case DrawerExt.Edges.Bottom:
+                return root._size
             default:
                 return 0
             }
@@ -102,7 +102,7 @@ FocusScope {
             to: "hidden"
             SequentialAnimation {
                 NumberAnimation {
-                    target: container
+                    target: content
                     property: root._toChange
 
                     duration: VLCStyle.duration_short
@@ -110,7 +110,7 @@ FocusScope {
                 }
 
                 PropertyAction{
-                    target: container
+                    target: content
                     property: "visible"
                 }
             }
@@ -119,12 +119,12 @@ FocusScope {
             to: "visible"
             SequentialAnimation {
                 PropertyAction {
-                    target: container
+                    target: content
                     property: "visible"
                 }
 
                 NumberAnimation {
-                    target: container
+                    target: content
                     property: root._toChange
 
                     duration: VLCStyle.duration_short
