@@ -609,6 +609,7 @@ Open(filter_t *filter, char const *psz_filter)
     switch (filter->fmt_in.video.i_chroma)
     {
         case VLC_CODEC_CVPX_NV12:
+        case VLC_CODEC_CVPX_P010:
         case VLC_CODEC_CVPX_UYVY:
         case VLC_CODEC_CVPX_I420:
         case VLC_CODEC_CVPX_BGRA:
