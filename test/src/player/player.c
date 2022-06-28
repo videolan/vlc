@@ -1652,7 +1652,7 @@ test_error(struct ctx *ctx)
 static void
 test_unknown_uri(struct ctx *ctx)
 {
-    test_log("unknown_uri");
+    test_log("unknown_uri\n");
     vlc_player_t *player = ctx->player;
 
     input_item_t *media = input_item_New("unknownuri://foo", "fail");
