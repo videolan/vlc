@@ -185,7 +185,7 @@ libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
     };
 
     /* Here we go */
-    p_mdis->p_sd = vlc_sd_Create( (vlc_object_t *)p_mdis->p_libvlc_instance->p_libvlc_int,
+    p_mdis->p_sd = vlc_sd_Create( VLC_OBJECT(p_mdis->p_libvlc_instance->p_libvlc_int),
                                   p_mdis->name, &owner );
     if( p_mdis->p_sd == NULL )
     {
