@@ -454,21 +454,21 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->csa )
         {
             psz_csa2 = var_CreateGetStringCommand( p_demux, "ts-csa2-ck" );
-            i_res = csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_string, true );
+            i_res = csa_SetCW( VLC_OBJECT(p_demux), p_sys->csa, psz_string, true );
         }
         else
             i_res = VLC_ENOMEM;
 
         if( i_res == VLC_SUCCESS && psz_csa2 && *psz_csa2 )
         {
-            if( csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_csa2, false ) != VLC_SUCCESS )
+            if( csa_SetCW( VLC_OBJECT(p_demux), p_sys->csa, psz_csa2, false ) != VLC_SUCCESS )
             {
-                csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_string, false );
+                csa_SetCW( VLC_OBJECT(p_demux), p_sys->csa, psz_string, false );
             }
         }
         else if ( i_res == VLC_SUCCESS )
         {
-            csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_string, false );
+            csa_SetCW( VLC_OBJECT(p_demux), p_sys->csa, psz_string, false );
         }
         else
         {
