@@ -286,7 +286,7 @@ static enum rtsp_result rtsp_handle(stream_t *access, bool *interrupted) {
 
     /* Parse header */
     while (!have_header) {
-        in = net_readln_timeout((vlc_object_t*)access, sys->tcp_sock, 5000,
+        in = net_readln_timeout(VLC_OBJECT(access), sys->tcp_sock, 5000,
                 interrupted);
         if (in == NULL)
             break;
