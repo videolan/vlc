@@ -68,7 +68,7 @@ EmptyLabel {
 
         anchors.horizontalCenter: parent.horizontalCenter
 
-        width: VLCStyle.dp(84, VLCStyle.scale)
+        width: Math.max(VLCStyle.dp(84, VLCStyle.scale), implicitWidth)
 
         focus: true
 
