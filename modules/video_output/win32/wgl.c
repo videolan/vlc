@@ -301,6 +301,6 @@ static int MakeCurrent(vlc_gl_t *gl)
 
 static void ReleaseCurrent(vlc_gl_t *gl)
 {
-    vout_display_sys_t *sys = gl->sys;
+    VLC_UNUSED(gl);
     wglMakeCurrent(NULL, NULL);
 }
