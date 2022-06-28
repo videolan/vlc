@@ -91,7 +91,7 @@ static int Control(stream_t *p_stream, int i_query, va_list args)
 
 static bool srt_schedule_reconnect(stream_t *p_stream)
 {
-    vlc_object_t *strm_obj = (vlc_object_t *) p_stream;
+    vlc_object_t *strm_obj = VLC_OBJECT(p_stream);
     int i_latency=var_InheritInteger( p_stream, SRT_PARAM_LATENCY );
     int stat;
     char *psz_passphrase = var_InheritString( p_stream, SRT_PARAM_PASSPHRASE );

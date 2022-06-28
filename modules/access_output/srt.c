@@ -63,7 +63,7 @@ static void srt_wait_interrupted(void *p_data)
 
 static bool srt_schedule_reconnect(sout_access_out_t *p_access)
 {
-    vlc_object_t *access_obj = (vlc_object_t *) p_access;
+    vlc_object_t *access_obj = VLC_OBJECT(p_access);
     int stat;
     char *psz_dst_addr = NULL;
     int i_dst_port;
