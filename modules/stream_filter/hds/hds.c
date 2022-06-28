@@ -917,17 +917,16 @@ static void* download_thread( void* p )
 }
 
 static chunk_t* generate_new_chunk(
-    vlc_object_t* p_this,
+    stream_t* s,
     chunk_t* last_chunk,
     hds_stream_t* hds_stream )
 {
-    stream_t* s = (stream_t*) p_this;
     stream_sys_t *sys = s->p_sys;
     chunk_t *chunk = chunk_new();
     unsigned int frun_entry = 0;
 
     if( ! chunk ) {
-        msg_Err( p_this, "Couldn't allocate new chunk!" );
+        msg_Err( s, "Couldn't allocate new chunk!" );
         return NULL;
     }
 
@@ -963,7 +962,7 @@ static chunk_t* generate_new_chunk(
         {
             if( frun_entry == hds_stream->fragment_run_count - 1 )
             {
-                msg_Err( p_this, "Discontinuity but can't find next timestamp!");
+                msg_Err( s, "Discontinuity but can't find next timestamp!");
                 chunk_free( chunk );
                 return NULL;
             }
@@ -1005,7 +1004,7 @@ static chunk_t* generate_new_chunk(
 
     if( frun_entry == hds_stream->fragment_run_count )
     {
-        msg_Err( p_this, "Couldn'd find the fragment run!" );
+        msg_Err( s, "Couldn'd find the fragment run!" );
         chunk_free( chunk );
         return NULL;
     }
@@ -1046,7 +1045,7 @@ static chunk_t* generate_new_chunk(
 }
 
 static void maintain_live_chunks(
-    vlc_object_t* p_this,
+    stream_t *s,
     hds_stream_t* hds_stream
     )
 {
@@ -1057,7 +1056,7 @@ static void maintain_live_chunks(
          * but then we are right on the edge of buffering, esp for
          * small fragments */
         hds_stream->chunks_head = generate_new_chunk(
-            p_this, 0, hds_stream );
+            s, 0, hds_stream );
         hds_stream->chunks_livereadpos = hds_stream->chunks_head;
     }
 
@@ -1073,7 +1072,7 @@ static void maintain_live_chunks(
         }
         else
         {
-            chunk->next = generate_new_chunk( p_this, chunk, hds_stream );
+            chunk->next = generate_new_chunk( s, chunk, hds_stream );
             chunk = chunk->next;
             dl = true;
         }
@@ -1101,8 +1100,7 @@ static void* live_thread( void* p )
 {
     vlc_thread_set_name("vlc-hds-live");
 
-    vlc_object_t* p_this = (vlc_object_t*)p;
-    stream_t* s = (stream_t*) p_this;
+    stream_t *s = (stream_t*)p;
     stream_sys_t* sys = s->p_sys;
 
     if ( vlc_array_count( &sys->hds_streams ) == 0 )
@@ -1139,10 +1137,10 @@ static void* live_thread( void* p )
     while( ! sys->closed )
     {
         last_dl_start_time = vlc_tick_now();
-        stream_t* download_stream = vlc_stream_NewURL( p_this, abst_url );
+        stream_t* download_stream = vlc_stream_NewURL( s, abst_url );
         if( ! download_stream )
         {
-            msg_Err( p_this, "Failed to download abst %s", abst_url );
+            msg_Err( s, "Failed to download abst %s", abst_url );
         }
         else
         {
@@ -1152,17 +1150,17 @@ static void* live_thread( void* p )
                                     size );
             if( read < size )
             {
-                msg_Err( p_this, "Requested %"PRIi64" bytes, "  \
+                msg_Err( s, "Requested %"PRIi64" bytes, "  \
                          "but only got %d", size, read );
 
             }
             else
             {
                 vlc_mutex_lock( & hds_stream->abst_lock );
-                parse_BootstrapData( p_this, hds_stream,
+                parse_BootstrapData( VLC_OBJECT(s), hds_stream,
                                      data, data + read );
                 vlc_mutex_unlock( & hds_stream->abst_lock );
-                maintain_live_chunks( p_this, hds_stream );
+                maintain_live_chunks( s, hds_stream );
             }
 
             free( data );
@@ -1343,7 +1341,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
         case XML_READER_ENDELEM:
             if( current_element && ! strcmp( current_element, "bootstrapInfo") ) {
                 if( bootstrap_idx + 1 == MAX_BOOTSTRAP_INFO ) {
-                    msg_Warn( (vlc_object_t*) s, "Too many bootstraps, ignoring" );
+                    msg_Warn( s, "Too many bootstraps, ignoring" );
                 } else {
                     bootstrap_idx++;
                 }
@@ -1365,7 +1363,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
         {
             if( media_idx == MAX_MEDIA_ELEMENTS )
             {
-                msg_Err( (vlc_object_t*) s, "Too many media elements, quitting" );
+                msg_Err( s, "Too many media elements, quitting" );
                 free(media_id);
                 return VLC_EGENERIC;
             }
@@ -1448,7 +1446,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     vlc_b64_decode_binary( (uint8_t**)&bootstraps[bootstrap_idx].data, start );
                 if( ! bootstraps[bootstrap_idx].data )
                 {
-                    msg_Err( (vlc_object_t*) s, "Couldn't decode bootstrap info" );
+                    msg_Err( s, "Couldn't decode bootstrap info" );
                 }
             }
             else if( ! strcmp( current_element, "duration" ) )
@@ -1490,7 +1488,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     if ( ( end_marker < medias[mi].metadata ) ||
                          memcmp(end_marker, amf_object_end, sizeof(amf_object_end)) != 0 )
                     {
-                        msg_Dbg( (vlc_object_t*)s, "Ignoring invalid metadata packet on stream %d", mi );
+                        msg_Dbg( s, "Ignoring invalid metadata packet on stream %d", mi );
                         FREENULL( medias[mi].metadata );
                         medias[mi].metadata_len = 0;
                     }
@@ -1555,7 +1553,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
 
                 if( ! sys->live )
                 {
-                    parse_BootstrapData( (vlc_object_t*)s,
+                    parse_BootstrapData( VLC_OBJECT(s),
                                          new_stream,
                                          bootstraps[j].data,
                                          bootstraps[j].data + bootstraps[j].data_len );
@@ -1563,13 +1561,13 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     new_stream->download_leadtime = 15;
 
                     new_stream->chunks_head = generate_new_chunk(
-                        (vlc_object_t*) s, 0, new_stream );
+                        s, 0, new_stream );
                     chunk_t* chunk = new_stream->chunks_head;
                     uint64_t total_duration = chunk->duration;
                     while( chunk && total_duration/new_stream->afrt_timescale < new_stream->download_leadtime )
                     {
                         chunk->next = generate_new_chunk(
-                            (vlc_object_t*) s, chunk, new_stream );
+                            s, chunk, new_stream );
                         chunk = chunk->next;
                         if( chunk )
                             total_duration += chunk->duration;
@@ -1591,7 +1589,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
 
                 vlc_array_append_or_abort( &sys->hds_streams, new_stream );
 
-                msg_Info( (vlc_object_t*)s, "New track with quality_segment(%s), bitrate(%u), timescale(%u), movie_id(%s), segment_run_count(%d), fragment_run_count(%u)",
+                msg_Info( s, "New track with quality_segment(%s), bitrate(%u), timescale(%u), movie_id(%s), segment_run_count(%d), fragment_run_count(%u)",
                           new_stream->quality_segment_modifier?new_stream->quality_segment_modifier:"", new_stream->bitrate, new_stream->timescale,
                           new_stream->movie_id, new_stream->segment_run_count, new_stream->fragment_run_count );
 
@@ -1755,11 +1753,10 @@ static int send_flv_header( hds_stream_t *stream, stream_sys_t* p_sys,
 }
 
 static unsigned read_chunk_data(
-    vlc_object_t* p_this,
+    stream_t* s,
     uint8_t* buffer, unsigned read_len,
     hds_stream_t* stream )
 {
-    stream_t* s = (stream_t*) p_this;
     stream_sys_t* sys = s->p_sys;
     chunk_t* chunk = stream->chunks_head;
     uint8_t* buffer_start = buffer;
@@ -1793,7 +1790,7 @@ static unsigned read_chunk_data(
             /* make sure there is at least one chunk in the queue */
             if( ! chunk->next && ! chunk->eof )
             {
-                chunk->next = generate_new_chunk( p_this, chunk,  stream );
+                chunk->next = generate_new_chunk( s, chunk,  stream );
                 dl = true;
             }
 
@@ -1826,7 +1823,7 @@ static unsigned read_chunk_data(
             {
                 if( ! chunk->next && ! chunk->eof )
                 {
-                    chunk->next = generate_new_chunk( p_this, chunk, stream );
+                    chunk->next = generate_new_chunk( s, chunk, stream );
                     dl = true;
                 }
 
@@ -1868,7 +1865,7 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
     if ( header_unfinished( p_sys ) )
         return send_flv_header( stream, p_sys, buffer, i_read );
 
-    return read_chunk_data( (vlc_object_t*)s, buffer, i_read, stream );
+    return read_chunk_data( s, buffer, i_read, stream );
 }
 
 static int Control( stream_t *s, int i_query, va_list args )
