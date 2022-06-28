@@ -23,7 +23,7 @@ import QtQuick.Layouts 1.11
 import "qrc:///style/"
 
 
-T.TabButton {
+T.Button {
     id: control
 
     property color color: VLCStyle.colors.text
