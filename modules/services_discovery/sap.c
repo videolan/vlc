@@ -248,7 +248,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
 static int InitSocket( services_discovery_t *p_sd, const char *psz_address,
                        int i_port )
 {
-    int i_fd = net_ListenUDP1 ((vlc_object_t *)p_sd, psz_address, i_port);
+    int i_fd = net_ListenUDP1 (VLC_OBJECT(p_sd), psz_address, i_port);
     if (i_fd == -1)
         return VLC_EGENERIC;
 
