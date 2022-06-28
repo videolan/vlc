@@ -29,17 +29,24 @@ FocusScope {
 
         spacing: VLCStyle.margin_small
 
-        Image {
-            id: dropImg
-            source: "qrc:///dropzone.svg"
+        Widgets.IconLabel {
+            text: VLCIcons.dropzone
+            color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.text, 0.2)
             anchors.horizontalCenter: parent.horizontalCenter
-            height: VLCStyle.dp(150, VLCStyle.scale)
-            width: VLCStyle.dp(150, VLCStyle.scale)
+            font.pixelSize: VLCStyle.dp(100, VLCStyle.scale)
         }
 
         Widgets.MenuLabel {
             anchors .horizontalCenter: parent.horizontalCenter
-            text: I18n.qtr("Drag & Drop some content here!")
+            text: I18n.qtr("Drop some content here")
+        }
+
+        Widgets.ActionButtonPrimary {
+            id: openFileButton
+            text: I18n.qtr("Open File")
+            focus: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            onClicked: DialogsProvider.simpleOpenDialog()
         }
     }
 
