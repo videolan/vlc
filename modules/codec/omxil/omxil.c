@@ -1724,7 +1724,7 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
     unsigned int i;
     (void)omx_handle;
 
-    PrintOmxEvent((vlc_object_t *) p_dec, event, data_1, data_2, event_data);
+    PrintOmxEvent(VLC_OBJECT(p_dec), event, data_1, data_2, event_data);
     switch (event)
     {
     case OMX_EventError:
