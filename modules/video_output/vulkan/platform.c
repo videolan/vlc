@@ -50,7 +50,7 @@ static int vlc_vk_start(void *func, bool forced, va_list ap)
  */
 vlc_vk_platform_t *vlc_vk_platform_Create(struct vlc_window *wnd, const char *name)
 {
-    vlc_object_t *parent = (vlc_object_t *) wnd;
+    vlc_object_t *parent = VLC_OBJECT(wnd);
     struct vlc_vk_platform_t *vk;
 
     vk = vlc_object_create(parent, sizeof (*vk));
