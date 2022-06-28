@@ -1644,16 +1644,20 @@ void SPrefsPanel::saveAsso()
 #endif /* _WIN32 */
 
 void SPrefsPanel::MLaddNewFolder() {
-    QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
-                                             QUrl( QDir::homePath( ) ) );
+    const QUrl homeDirectory = QUrl::fromLocalFile(QDir::homePath());
+    QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this
+                                                              , qtr("Please choose an entry point folder")
+                                                              , homeDirectory );
 
     if(! newEntryPoint.isEmpty() )
         mlFoldersEditor->add( newEntryPoint );
 }
 
 void SPrefsPanel::MLBanFolder( ) {
-    QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
-                                             QUrl( QDir::homePath( ) ) );
+    const QUrl homeDirectory = QUrl::fromLocalFile(QDir::homePath());
+    QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this
+                                                              , qtr("Please choose an entry point folder")
+                                                              , homeDirectory );
 
     if(! newEntryPoint.isEmpty() )
         mlBannedFoldersEditor->add( newEntryPoint );
