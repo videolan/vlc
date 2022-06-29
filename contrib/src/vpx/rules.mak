@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.11.0
+VPX_VERSION := 1.12.0
 VPX_URL := http://github.com/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 PKGS += vpx
