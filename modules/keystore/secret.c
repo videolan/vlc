@@ -291,31 +291,38 @@ dbus_vanished_cb(GDBusConnection *connection, const gchar *name,
 }
 
 static int
+check_service_running(void)
+{
+    /* First, check if secrets service is running using g_bus_watch_name().
+     * Indeed, secret_service_get_sync will spawn a service if it's not
+     * running, even on non Gnome environments */
+    struct secrets_watch_data watch_data;
+    watch_data.b_running = false;
+    vlc_sem_init(&watch_data.sem, 0);
+
+    guint i_id = g_bus_watch_name(G_BUS_TYPE_SESSION,
+                                  "org.freedesktop.secrets",
+                                  G_BUS_NAME_WATCHER_FLAGS_NONE,
+                                  dbus_appeared_cb, dbus_vanished_cb,
+                                  &watch_data, NULL);
+
+    /* We are guaranteed that one of the callbacks will be invoked after
+     * calling g_bus_watch_name */
+    vlc_sem_wait_i11e(&watch_data.sem);
+
+    g_bus_unwatch_name(i_id);
+
+    return watch_data.b_running ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static int
 Open(vlc_object_t *p_this)
 {
     if (!p_this->force)
     {
-        /* First, check if secrets service is running using g_bus_watch_name().
-         * Indeed, secret_service_get_sync will spawn a service if it's not
-         * running, even on non Gnome environments */
-        struct secrets_watch_data watch_data;
-        watch_data.b_running = false;
-        vlc_sem_init(&watch_data.sem, 0);
-
-        guint i_id = g_bus_watch_name(G_BUS_TYPE_SESSION,
-                                      "org.freedesktop.secrets",
-                                      G_BUS_NAME_WATCHER_FLAGS_NONE,
-                                      dbus_appeared_cb, dbus_vanished_cb,
-                                      &watch_data, NULL);
-
-        /* We are guaranteed that one of the callbacks will be invoked after
-         * calling g_bus_watch_name */
-        vlc_sem_wait_i11e(&watch_data.sem);
-
-        g_bus_unwatch_name(i_id);
-
-        if (!watch_data.b_running)
-            return VLC_EGENERIC;
+        int ret = check_service_running();
+        if (ret != VLC_SUCCESS)
+            return ret;
     }
 
     GCancellable *p_canc = cancellable_register();
