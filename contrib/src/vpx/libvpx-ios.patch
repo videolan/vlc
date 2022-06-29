@@ -1,7 +1,8 @@
-diff -ruw libvpx-1.10.0/build/make/configure.sh libvpx-1.10.0-new/build/make/configure.sh
---- libvpx-1.10.0/build/make/configure.sh	2021-03-18 15:59:46.000000000 -0400
-+++ libvpx-1.10.0-new/build/make/configure.sh	2021-03-29 15:17:36.125564531 -0400
-@@ -839,100 +839,6 @@
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 581042e38..5b282d666 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -861,100 +861,6 @@ process_common_toolchain() {
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
  
@@ -84,9 +85,9 @@ diff -ruw libvpx-1.10.0/build/make/configure.sh libvpx-1.10.0-new/build/make/con
 -      add_cflags  "-mmacosx-version-min=10.15"
 -      add_ldflags "-mmacosx-version-min=10.15"
 -      ;;
--    *-darwin20-*)
--      add_cflags  "-mmacosx-version-min=10.16 -arch ${toolchain%%-*}"
--      add_ldflags "-mmacosx-version-min=10.16 -arch ${toolchain%%-*}"
+-    *-darwin2[0-1]-*)
+-      add_cflags  "-arch ${toolchain%%-*}"
+-      add_ldflags "-arch ${toolchain%%-*}"
 -      ;;
 -    *-iphonesimulator-*)
 -      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
@@ -102,7 +103,7 @@ diff -ruw libvpx-1.10.0/build/make/configure.sh libvpx-1.10.0-new/build/make/con
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1121,12 +1027,6 @@
+@@ -1143,12 +1049,6 @@ EOF
                add_cflags -isysroot ${alt_libc}
              fi
  
