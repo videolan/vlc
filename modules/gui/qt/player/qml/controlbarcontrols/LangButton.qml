@@ -32,6 +32,8 @@ Widgets.IconControlButton {
     enabled: menuLoader.status === Loader.Ready
     onClicked: menuLoader.item.open()
 
+    signal requestLockUnlockAutoHide(bool lock)
+
     text: I18n.qtr("Languages and tracks")
 
     Loader {
@@ -49,13 +51,13 @@ Widgets.IconControlButton {
             z: 1
 
             onOpened: {
-                playerControlLayout.requestLockUnlockAutoHide(true)
+                langBtn.requestLockUnlockAutoHide(true)
                 if (!!rootPlayer)
                     rootPlayer.menu = menu
             }
 
             onClosed: {
-                playerControlLayout.requestLockUnlockAutoHide(false)
+                langBtn.requestLockUnlockAutoHide(false)
                 langBtn.forceActiveFocus()
                 if (!!rootPlayer)
                     rootPlayer.menu = undefined

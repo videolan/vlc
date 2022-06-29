@@ -25,6 +25,9 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: menuBtn
+
+    signal requestLockUnlockAutoHide(bool lock)
+
     size: VLCStyle.icon_medium
     iconText: VLCIcons.ellipsis
     text: I18n.qtr("Menu")
@@ -36,7 +39,7 @@ Widgets.IconControlButton {
 
         ctx: MainCtx
 
-        onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true)
-        onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false)
+        onAboutToShow: menuBtn.requestLockUnlockAutoHide(true)
+        onAboutToHide: menuBtn.requestLockUnlockAutoHide(false)
     }
 }

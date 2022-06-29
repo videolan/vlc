@@ -81,6 +81,8 @@ FocusScope {
             focus: true
 
             altFocusAction: Navigation.defaultNavigationRight
+
+            onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
     }
 
@@ -113,6 +115,8 @@ FocusScope {
             focus: true
 
             altFocusAction: Navigation.defaultNavigationUp
+
+            onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
     }
 
@@ -147,6 +151,8 @@ FocusScope {
             focus: true
 
             altFocusAction: Navigation.defaultNavigationLeft
+
+            onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
     }
 }

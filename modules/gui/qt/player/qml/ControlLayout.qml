@@ -29,6 +29,8 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: controlLayout
 
+    signal requestLockUnlockAutoHide(bool lock)
+
     property alias model: repeater.model
 
     readonly property real minimumWidth: {
@@ -168,6 +170,12 @@ FocusScope {
                     item.width = Qt.binding(function() { return loader.width } )
 
                     item.visible = Qt.binding(function() { return loader.visible })
+
+                    if (item.requestLockUnlockAutoHide) {
+                        item.requestLockUnlockAutoHide.connect(function(lock) {
+                            controlLayout.requestLockUnlockAutoHide(lock)
+                        })
+                    }
                 }
 
                 function applyNavigation() {

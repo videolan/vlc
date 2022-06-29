@@ -26,6 +26,10 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Widgets.IconControlButton {
+    id: root
+
+    signal requestLockUnlockAutoHide(bool lock)
+
     size: VLCStyle.icon_medium
 
     iconText: VLCIcons.bookmark
@@ -41,7 +45,7 @@ Widgets.IconControlButton {
 
         player: Player
 
-        onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true)
-        onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false)
+        onAboutToShow: root.requestLockUnlockAutoHide(true)
+        onAboutToHide: root.requestLockUnlockAutoHide(false)
     }
 }

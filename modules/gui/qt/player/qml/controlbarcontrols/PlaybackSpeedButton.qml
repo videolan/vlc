@@ -30,6 +30,8 @@ import "qrc:///util/Helpers.js" as Helpers
 Widgets.IconControlButton {
     id: root
 
+    signal requestLockUnlockAutoHide(bool lock)
+
     readonly property bool _isCurrentViewPlayer: !paintOnly && (History.current.name === "player")
 
     size: VLCStyle.icon_medium
@@ -89,14 +91,14 @@ Widgets.IconControlButton {
             })
 
             // player related --
-            playerControlLayout.requestLockUnlockAutoHide(true)
+            root.requestLockUnlockAutoHide(true)
 
             if (root._isCurrentViewPlayer)
                 rootPlayer.menu = popup
         }
 
         onClosed: {
-            playerControlLayout.requestLockUnlockAutoHide(false)
+            root.requestLockUnlockAutoHide(false)
 
             root.forceActiveFocus()
 
