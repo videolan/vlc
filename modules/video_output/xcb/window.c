@@ -63,6 +63,10 @@ typedef struct
     xcb_atom_t wm_state_below;
     xcb_atom_t wm_state_fullscreen;
     xcb_atom_t motif_wm_hints;
+    unsigned x;
+    unsigned y;
+    unsigned width;
+    unsigned height;
 
     uint8_t event_randr; /* event id of XCB_RANDR_NOTIFY, or 0 if disabled */
     struct
@@ -443,19 +447,28 @@ static void DisplayChanged(vlc_window_t *wnd, int new_display)
     UpdateICCProfile(wnd);
 }
 
-static void UpdateGeometry(vlc_window_t *wnd, unsigned x, unsigned y,
-                           unsigned width, unsigned height)
+static void UpdateGeometry(vlc_window_t *wnd, unsigned *x, unsigned *y,
+                           unsigned *width, unsigned *height)
 {
     vout_window_sys_t *sys = wnd->sys;
-    vlc_window_ReportSize(wnd, width, height);
+
+    if (sys->width != *width || sys->height != *height) {
+        vlc_window_ReportSize(wnd, sys->width, sys->height);
+       *width = sys->width;
+       *height = sys->height;
+    }
 
     /* Detect window center moving across display boundaries */
-    unsigned xcenter = x + (width >> 1);
-    unsigned ycenter = y + (height >> 1);
-    int disp = DisplayForCoords(wnd, xcenter, ycenter);
-    if (disp != -1 && disp != sys->current_display) {
-        sys->current_display = disp;
-        DisplayChanged(wnd, disp);
+    if (sys->x != *x || sys->y != *y) {
+        unsigned xcenter = sys->x + (sys->width >> 1);
+        unsigned ycenter = sys->y + (sys->height >> 1);
+        int disp = DisplayForCoords(wnd, xcenter, ycenter);
+        if (disp != -1 && disp != sys->current_display) {
+            sys->current_display = disp;
+            DisplayChanged(wnd, disp);
+        }
+        *x = sys->x;
+        *y = sys->y;
     }
 }
 
@@ -526,7 +539,10 @@ static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
         case XCB_CONFIGURE_NOTIFY:
         {
             xcb_configure_notify_event_t *cne = (void *)ev;
-            UpdateGeometry(wnd, cne->x, cne->y, cne->width, cne->height);
+            sys->width = cne->width;
+            sys->height = cne->height;
+            sys->x = cne->x;
+            sys->y = cne->y;
             break;
         }
         case XCB_DESTROY_NOTIFY:
@@ -579,7 +595,10 @@ static int ProcessEvent(vlc_window_t *wnd, xcb_generic_event_t *ev)
 static void *Thread (void *data)
 {
     vlc_thread_set_name("vlc-window-x11");
-
+    unsigned x = 0;
+    unsigned y = 0;
+    unsigned width = 0;
+    unsigned height = 0;
     vlc_window_t *wnd = data;
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
@@ -618,7 +637,12 @@ static void *Thread (void *data)
     if (geo != NULL) {
         while ((ev = xcb_poll_for_queued_event(conn)) != NULL)
             ProcessEvent(wnd, ev);
-        UpdateGeometry(wnd, geo->x, geo->y, geo->width, geo->height);
+
+        p_sys->x = geo->x;
+        p_sys->y = geo->y;
+        p_sys->width = geo->width;
+        p_sys->height = geo->height;
+        UpdateGeometry(wnd, &x, &y, &width, &height);
         free(geo);
     }
     vlc_latch_count_down(&p_sys->ready, 1);
@@ -649,6 +673,8 @@ static void *Thread (void *data)
 
             while ((ev = xcb_poll_for_event (conn)) != NULL)
                 show_cursor = ProcessEvent(wnd, ev) || show_cursor;
+
+            UpdateGeometry(wnd, &x, &y, &width, &height);
 
             if (show_cursor)
             {
@@ -853,6 +879,11 @@ static int OpenCommon(vlc_window_t *wnd, char *display, xcb_connection_t *conn,
     wnd->display.x11 = display;
     wnd->ops = &ops;
     wnd->sys = sys;
+
+    sys->x = 0;
+    sys->y = 0;
+    sys->width = 0;
+    sys->height = 0;
 
     sys->conn = conn;
     sys->root = root;
