@@ -909,13 +909,12 @@ static void amt_send_relay_discovery_msg( stream_t *p_access, char *relay_ip )
 {
     char          chaSendBuffer[AMT_DISCO_MSG_LEN];
     unsigned int  ulNonce;
-    int           nRet;
+    ssize_t       nRet;
     access_sys_t *sys = p_access->p_sys;
 
     /* initialize variables */
     memset( chaSendBuffer, 0, sizeof(chaSendBuffer) );
     ulNonce = 0;
-    nRet = 0;
 
     /*
      * create AMT discovery message format
@@ -940,7 +939,7 @@ static void amt_send_relay_discovery_msg( stream_t *p_access, char *relay_ip )
             (struct sockaddr *)&sys->relayDiscoAddr, sizeof(struct sockaddr) );
 
     if( nRet < 0)
-        msg_Err( p_access, "Sendto failed to %s with error %d.", relay_ip, errno);
+        msg_Err( p_access, "Sendto failed to %s with error: %s.", relay_ip, vlc_strerror_c(errno));
 }
 
 /**
