@@ -325,7 +325,7 @@ int net_Accept(vlc_object_t *obj, int *fds)
     {
         while (poll(ufd, n, -1) == -1)
         {
-            if (net_errno != EINTR)
+            if (errno != EINTR)
             {
                 msg_Err(obj, "poll error: %s", vlc_strerror_c(net_errno));
                 return -1;
