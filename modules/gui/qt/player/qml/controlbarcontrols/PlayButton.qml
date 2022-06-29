@@ -17,7 +17,6 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
-import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -209,7 +208,6 @@ T.Control {
 
             anchors.centerIn: parent
 
-            z: -1
             visible: opacity > 0
             opacity: 0
 
@@ -229,7 +227,6 @@ T.Control {
 
             anchors.centerIn: parent
 
-            z: -1
             visible: opacity > 0
             opacity: 0
 
@@ -244,48 +241,9 @@ T.Control {
             sourceSize: Qt.size(parent.width, parent.height)
         }
 
-        Rectangle {
+        Widgets.ScaledImage {
             anchors.fill: parent
-            anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
-
-            radius: (width * 0.5)
-
-            color: VLCStyle.colors.white
-        }
-
-        Rectangle {
-            id: outerRect
-            anchors.fill: parent
-
-            visible: false
-
-            radius: (width * 0.5)
-
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: VLCStyle.colors.buttonPlayA }
-                GradientStop { position: 1.0; color: VLCStyle.colors.buttonPlayB }
-            }
-        }
-
-        Rectangle {
-            id: innerRect
-            anchors.fill: parent
-
-            radius: (width * 0.5)
-            border.width: VLCStyle.dp(2, VLCStyle.scale)
-
-            color: "transparent"
-            visible: false
-        }
-
-        OpacityMask {
-            id: opacityMask
-            anchors.fill: parent
-
-            source: outerRect
-            maskSource: innerRect
-
-            antialiasing: true
+            source: "qrc:/toolbar/play_button.svg"
         }
     }
 }
