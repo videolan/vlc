@@ -266,7 +266,7 @@ Remove(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX])
 
 struct secrets_watch_data
 {
-    vlc_sem_t sem;
+    GMainLoop *loop;
     bool b_running;
 };
 
@@ -277,7 +277,7 @@ dbus_appeared_cb(GDBusConnection *connection, const gchar *name,
     (void) connection; (void) name; (void)name_owner;
     struct secrets_watch_data *p_watch_data = user_data;
     p_watch_data->b_running = true;
-    vlc_sem_post(&p_watch_data->sem);
+    g_main_loop_quit(p_watch_data->loop);
 }
 
 static void
@@ -286,8 +286,13 @@ dbus_vanished_cb(GDBusConnection *connection, const gchar *name,
 {
     (void) connection; (void) name;
     struct secrets_watch_data *p_watch_data = user_data;
-    p_watch_data->b_running = false;
-    vlc_sem_post(&p_watch_data->sem);
+    g_main_loop_quit(p_watch_data->loop);
+}
+
+static void mainloop_interrupted(void *user_data)
+{
+    struct secrets_watch_data *p_watch_data = user_data;
+    g_main_loop_quit(p_watch_data->loop);
 }
 
 static int
@@ -296,9 +301,19 @@ check_service_running(void)
     /* First, check if secrets service is running using g_bus_watch_name().
      * Indeed, secret_service_get_sync will spawn a service if it's not
      * running, even on non Gnome environments */
-    struct secrets_watch_data watch_data;
-    watch_data.b_running = false;
-    vlc_sem_init(&watch_data.sem, 0);
+
+    GMainContext *ctx = g_main_context_default();
+    if (unlikely(ctx == NULL))
+        return VLC_ENOMEM;
+
+    GMainLoop *loop = g_main_loop_new(ctx, FALSE);
+    if (unlikely(loop == NULL))
+        return VLC_ENOMEM;
+
+    struct secrets_watch_data watch_data = {
+        .loop = loop,
+        .b_running = false,
+    };
 
     guint i_id = g_bus_watch_name(G_BUS_TYPE_SESSION,
                                   "org.freedesktop.secrets",
@@ -306,11 +321,15 @@ check_service_running(void)
                                   dbus_appeared_cb, dbus_vanished_cb,
                                   &watch_data, NULL);
 
-    /* We are guaranteed that one of the callbacks will be invoked after
-     * calling g_bus_watch_name */
-    vlc_sem_wait_i11e(&watch_data.sem);
+    vlc_interrupt_register(mainloop_interrupted, &watch_data);
+
+    g_main_loop_run(loop);
+
+    vlc_interrupt_unregister();
 
     g_bus_unwatch_name(i_id);
+
+    g_main_loop_unref(loop);
 
     return watch_data.b_running ? VLC_SUCCESS : VLC_EGENERIC;
 }
