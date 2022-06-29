@@ -36,7 +36,7 @@ Widgets.IconControlButton {
 
         ctx: MainCtx
 
-        onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true, contextMenu)
-        onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false, contextMenu)
+        onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true)
+        onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false)
     }
 }

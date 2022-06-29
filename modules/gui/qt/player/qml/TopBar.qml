@@ -43,7 +43,7 @@ FocusScope{
     property int reservedHeight: 0
 
     signal togglePlaylistVisibility()
-    signal requestLockUnlockAutoHide(bool lock, var source)
+    signal requestLockUnlockAutoHide(bool lock)
     signal backRequested()
 
     Component.onCompleted:  root._layout()
@@ -172,8 +172,8 @@ FocusScope{
         highlightedBgColor: root.colors.bgHover
         highlightedTextColor: root.colors.bgHoverText
 
-        onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
-        onMenuOpenedChanged: root.requestLockUnlockAutoHide(menuOpened, root)
+        onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
+        onMenuOpenedChanged: root.requestLockUnlockAutoHide(menuOpened)
     }
 
     RowLayout {
@@ -201,7 +201,7 @@ FocusScope{
             Navigation.rightItem: menuSelector
             onClicked: root.backRequested()
 
-            onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
+            onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
         }
 
         Image {
@@ -297,7 +297,7 @@ FocusScope{
         Connections {
             target: csdDecorations.item
             enabled: csdDecorations.loaded
-            onHoveredChanged: root.requestLockUnlockAutoHide(csdDecorations.item.hovered, root)
+            onHoveredChanged: root.requestLockUnlockAutoHide(csdDecorations.item.hovered)
         }
     }
 
@@ -332,15 +332,15 @@ FocusScope{
 
             onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
-            onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
+            onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
 
             QmlGlobalMenu {
                 id: contextMenu
 
                 ctx: MainCtx
 
-                onAboutToShow: root.requestLockUnlockAutoHide(true, contextMenu)
-                onAboutToHide: root.requestLockUnlockAutoHide(false, contextMenu)
+                onAboutToShow: root.requestLockUnlockAutoHide(true)
+                onAboutToHide: root.requestLockUnlockAutoHide(false)
             }
         }
 
@@ -361,7 +361,7 @@ FocusScope{
             Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
             onClicked: togglePlaylistVisibility()
 
-            onHoveredChanged: root.requestLockUnlockAutoHide(hovered, root)
+            onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
         }
     }
 }

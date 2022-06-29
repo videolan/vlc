@@ -89,14 +89,14 @@ Widgets.IconControlButton {
             })
 
             // player related --
-            playerControlLayout.requestLockUnlockAutoHide(true, playerControlLayout)
+            playerControlLayout.requestLockUnlockAutoHide(true)
 
             if (root._isCurrentViewPlayer)
                 rootPlayer.menu = popup
         }
 
         onClosed: {
-            playerControlLayout.requestLockUnlockAutoHide(false, playerControlLayout)
+            playerControlLayout.requestLockUnlockAutoHide(false)
 
             root.forceActiveFocus()
 

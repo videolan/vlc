@@ -98,7 +98,7 @@ FocusScope {
     }
 
     onPinVideoControlsChanged: {
-        lockUnlockAutoHide(pinVideoControls, "pinVideoControl")
+        lockUnlockAutoHide(pinVideoControls)
         if (pinVideoControls)
             toolbarAutoHide.setVisibleControlBar(true)
     }
@@ -112,7 +112,7 @@ FocusScope {
             menu.close()
     }
 
-    function lockUnlockAutoHide(lock, source /*unused*/) {
+    function lockUnlockAutoHide(lock) {
         _lockAutoHide += lock ? 1 : -1;
         console.assert(_lockAutoHide >= 0)
     }
@@ -132,12 +132,12 @@ FocusScope {
         id: playlistVisibility
 
         onShowPlaylist: {
-            rootPlayer.lockUnlockAutoHide(true, playlistVisibility)
+            rootPlayer.lockUnlockAutoHide(true)
             MainCtx.playlistVisible = true
         }
 
         onHidePlaylist: {
-            rootPlayer.lockUnlockAutoHide(false, playlistVisibility)
+            rootPlayer.lockUnlockAutoHide(false)
             MainCtx.playlistVisible = false
         }
     }
@@ -349,7 +349,7 @@ FocusScope {
                 onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
                 onRequestLockUnlockAutoHide: {
-                    rootPlayer.lockUnlockAutoHide(lock, source)
+                    rootPlayer.lockUnlockAutoHide(lock)
                 }
 
                 onBackRequested: {
@@ -375,7 +375,7 @@ FocusScope {
                 }
 
                 onVisibleChanged: {
-                    rootPlayer.lockUnlockAutoHide(visible, resumeDialog)
+                    rootPlayer.lockUnlockAutoHide(visible)
                 }
             }
         }
@@ -623,7 +623,7 @@ FocusScope {
                 controllerId.showChapterMarks()
             }
 
-            onContainsMouseChanged: rootPlayer.lockUnlockAutoHide(containsMouse, topcontrolView)
+            onContainsMouseChanged: rootPlayer.lockUnlockAutoHide(containsMouse)
 
             ControlBar {
                 id: controllerId
@@ -641,7 +641,7 @@ FocusScope {
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
 
-                onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock, source)
+                onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock)
 
                 identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
                                                     : PlayerControlbarModel.Audioplayer

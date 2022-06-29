@@ -41,7 +41,7 @@ Widgets.IconControlButton {
 
         player: Player
 
-        onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true, menu)
-        onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false, menu)
+        onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true)
+        onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false)
     }
 }

@@ -46,7 +46,7 @@ Control {
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
     property bool showRightTimeText: true
 
-    signal requestLockUnlockAutoHide(bool lock, var source)
+    signal requestLockUnlockAutoHide(bool lock)
 
     function showChapterMarks() {
         trackPositionSlider.showChapterMarks()
@@ -143,7 +143,7 @@ Control {
 
             colors: root.colors
 
-            onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock, source)
+            onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock)
         }
     }
 

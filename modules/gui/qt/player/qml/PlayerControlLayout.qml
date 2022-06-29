@@ -44,7 +44,7 @@ FocusScope {
             null
     }
 
-    signal requestLockUnlockAutoHide(bool lock, var source)
+    signal requestLockUnlockAutoHide(bool lock)
 
     Component.onCompleted: {
         console.assert(identifier >= 0)
