@@ -180,8 +180,7 @@ int (net_Connect)(vlc_object_t *obj, const char *host, int serv,
             switch (val)
             {
                  case -1: /* error */
-                     msg_Err(obj, "polling error: %s",
-                             vlc_strerror_c(net_errno));
+                     msg_Err(obj, "polling error: %s", vlc_strerror_c(errno));
                      goto next_ai;
 
                  case 0: /* timeout */
@@ -327,7 +326,7 @@ int net_Accept(vlc_object_t *obj, int *fds)
         {
             if (errno != EINTR)
             {
-                msg_Err(obj, "poll error: %s", vlc_strerror_c(net_errno));
+                msg_Err(obj, "poll error: %s", vlc_strerror_c(errno));
                 return -1;
             }
         }
