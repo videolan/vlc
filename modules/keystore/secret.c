@@ -297,6 +297,14 @@ static void mainloop_interrupted(void *user_data)
 static int
 check_service_running(void)
 {
+    /* Cache the return of this function that may take up to 200ms. This atomic
+     * doesn't prevent a cache miss (unlikely). This function can be called
+     * safely from any threads. */
+    static atomic_int cache_running = ATOMIC_VAR_INIT(0);
+    int running = atomic_load_explicit(&cache_running, memory_order_relaxed);
+    if (running != 0)
+        return running == 1 ? VLC_SUCCESS : VLC_EGENERIC;
+
     /* First, check if secrets service is running using g_bus_watch_name().
      * Indeed, secret_service_get_sync will spawn a service if it's not
      * running, even on non Gnome environments */
@@ -329,6 +337,9 @@ check_service_running(void)
     g_bus_unwatch_name(i_id);
 
     g_main_loop_unref(loop);
+
+    atomic_store_explicit(&cache_running, watch_data.b_running ? 1 : -1,
+                          memory_order_relaxed);
 
     return watch_data.b_running ? VLC_SUCCESS : VLC_EGENERIC;
 }
