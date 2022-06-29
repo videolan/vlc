@@ -172,7 +172,7 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
 
         /* Send */
         struct msghdr hdr = { .msg_iov = iov, .msg_iovlen = iovlen };
-        int val = sendmsg(sys->fd, &hdr, 0);
+        ssize_t val = sendmsg(sys->fd, &hdr, 0);
 
         if (val < 0)
             msg_Err(access, "send error: %s", vlc_strerror_c(errno));
