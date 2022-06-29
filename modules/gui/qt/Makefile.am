@@ -692,6 +692,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/toolbar/volume-muted.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-inside.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-outside.svg \
+	gui/qt/pixmaps/toolbar/play_button.svg \
 	gui/qt/pixmaps/types/capture-card_16px.svg \
 	gui/qt/pixmaps/types/disc_16px.svg \
 	gui/qt/pixmaps/types/file-asym_16px.svg \
