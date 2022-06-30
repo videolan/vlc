@@ -26,13 +26,19 @@ import "qrc:///util/Helpers.js" as Helpers
 NativeMenu {
     id: root
 
+    // Properties
+
     /* required */ property var model: null
 
     property string idDataRole: "id"
 
     property bool showPlayAsAudioAction: false
 
+    // Signals
+
     signal showMediaInformation(int index)
+
+    // Settings
 
     actions: [{
             "text": I18n.qtr("Play"),
@@ -48,10 +54,20 @@ NativeMenu {
             "text": I18n.qtr("Add to a playlist"),
             "action": addToAPlaylist
         }, {
+            "text": I18n.qtr("Mark as seen"),
+            "action": markSeen,
+            "visible": _showSeen
+        }, {
+            "text": I18n.qtr("Mark as unseen"),
+            "action": markUnseen,
+            "visible": _showUnseen
+        }, {
             "text": I18n.qtr("Information"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
         }]
+
+    // Events
 
     onRequestData: {
         model.getData(indexes, function (data) {
@@ -59,10 +75,7 @@ NativeMenu {
         })
     }
 
-    function showInformationAvailable(options, indexes) {
-        return indexes.length === 1
-                && Helpers.isInteger(Helpers.get(options, "information", null))
-    }
+    // Functions
 
     function addAndPlay(dataList, options, indexes) {
         model.ml.addAndPlay(_mlIDList(dataList), _playerOptions(options))
@@ -78,6 +91,32 @@ NativeMenu {
 
     function addToAPlaylist(dataList, options, indexes) {
         DialogsProvider.playlistsDialog(_mlIDList(dataList))
+    }
+
+    function markSeen(dataList, options, indexes) {
+        model.setItemPlayed(indexes[0], true)
+    }
+
+    function markUnseen(dataList, options, indexes) {
+        model.setItemPlayed(indexes[0], false)
+    }
+
+    function showInformationAvailable(options, indexes) {
+        return indexes.length === 1
+                && Helpers.isInteger(Helpers.get(options, "information", null))
+    }
+
+    // Private
+
+    function _showSeen(options, indexes) {
+        if (indexes.length !== 1)
+            return false
+
+        return model.getDataAt(indexes[0]).isNew
+    }
+
+    function _showUnseen(options, indexes) {
+        return (_showSeen(options, indexes) === false)
     }
 
     function _signalShowInformation(dataList, options) {
