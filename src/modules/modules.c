@@ -235,6 +235,7 @@ module_t *vlc_module_load(vlc_object_t *obj, const char *capability,
              capability, name, total);
     if (total <= 0)
     {
+        free(var);
         module_list_free (mods);
         msg_Dbg (obj, "no %s modules", capability);
         return NULL;
