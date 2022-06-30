@@ -493,6 +493,9 @@ static void GLESSwap(vlc_gl_t *gl)
         [_viewContainer addSubview:self];
 
         /* add tap gesture recognizer for DVD menus and stuff */
+        if (var_InheritBool( _voutDisplay, "mouse-events" ) == false) {
+            return YES;
+        }
         _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                  action:@selector(tapRecognized:)];
         if (_viewContainer.window
