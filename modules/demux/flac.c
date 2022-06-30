@@ -363,14 +363,12 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_out;
 
-    bool b_eof = false;
     if( p_sys->p_current_block == NULL )
-    {
         p_sys->p_current_block = vlc_stream_Block( p_demux->s, FLAC_PACKET_SIZE );
-        b_eof = (p_sys->p_current_block == NULL);
-    }
 
-    if ( p_sys->p_current_block )
+    bool b_eof = (p_sys->p_current_block == NULL);
+
+    if ( !b_eof )
     {
         p_sys->p_current_block->i_flags = p_sys->i_next_block_flags;
         p_sys->i_next_block_flags = 0;
