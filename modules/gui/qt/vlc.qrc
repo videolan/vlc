@@ -366,6 +366,8 @@
         <file alias="ControlLayout.qml">player/qml/ControlLayout.qml</file>
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
         <file alias="PlayerPlaylistVisibilityFSM.qml">player/qml/PlayerPlaylistVisibilityFSM.qml</file>
+        <file alias="PlayerBlurredBackground.qml">player/qml/PlayerBlurredBackground.qml</file>
+        <file alias="PlayerBlurredBackground.frag">player/qml/PlayerBlurredBackground.frag</file>
     </qresource>
     <qresource prefix="/player/controlbarcontrols">
         <file alias="HighResolutionTimeWidget.qml">player/qml/controlbarcontrols/HighResolutionTimeWidget.qml</file>

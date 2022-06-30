@@ -819,6 +819,8 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/MiniPlayer.qml \
 	gui/qt/player/qml/PIPPlayer.qml \
 	gui/qt/player/qml/Player.qml \
+	gui/qt/player/qml/PlayerBlurredBackground.qml \
+	gui/qt/player/qml/PlayerBlurredBackground.frag \
 	gui/qt/player/qml/PlayerControlLayout.qml \
 	gui/qt/player/qml/PlayerMenu.qml \
 	gui/qt/player/qml/PlayerMenuItem.qml \

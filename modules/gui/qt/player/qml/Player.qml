@@ -173,57 +173,20 @@ FocusScope {
         color: rootPlayer.colors.bg
         anchors.fill: parent
 
-        Item {
-            //destination aspect ration
+        PlayerBlurredBackground {
+            id: backgroundImage
+
+            //destination aspect ratio
             readonly property real dar: parent.width / parent.height
 
             anchors.centerIn: parent
             width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
             height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
 
-            GaussianBlur {
-                id: blur
+            source: cover
 
-                anchors.fill: parent
-                source: cover
-                samples: 102
-                radius: 50
-                visible: false
-            }
-
-            Rectangle {
-                id: blurOverlay
-
-                color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.playerBg, .55)
-                anchors.fill: parent
-                visible: false
-            }
-
-            Blend {
-                id:screen
-
-                anchors.fill: parent
-                foregroundSource: blurOverlay
-                source: blur
-                mode: "screen"
-                visible: false
-            }
-
-            Blend {
-                anchors.fill: parent
-                source: screen
-                foregroundSource: blurOverlay
-                mode: "multiply"
-            }
-
-            Rectangle {
-                id: colorOverlay
-
-                anchors.fill: parent
-                visible: true
-                opacity: .4
-                color: rootPlayer.colors.setColorAlpha(Qt.tint(rootPlayer.colors.playerFg, rootPlayer.colors.playerBg), 1)
-            }
+            screenColor: rootPlayer.colors.setColorAlpha(rootPlayer.colors.playerBg, .55)
+            overlayColor: rootPlayer.colors.setColorAlpha(Qt.tint(rootPlayer.colors.playerFg, rootPlayer.colors.playerBg), 0.4)
         }
     }
 
