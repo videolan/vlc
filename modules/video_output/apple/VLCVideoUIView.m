@@ -120,8 +120,10 @@
         return nil;
 
     /* add tap gesture recognizer for DVD menus and stuff */
-    _tapRecognizer = [[UITapGestureRecognizer alloc]
-        initWithTarget:self action:@selector(tapRecognized:)];
+    if (var_InheritBool( wnd, "mouse-events" ) == true) {
+        _tapRecognizer = [[UITapGestureRecognizer alloc]
+            initWithTarget:self action:@selector(tapRecognized:)];
+    }
 
     CGSize size = _viewContainer.bounds.size;
     [self reportEvent:^{
