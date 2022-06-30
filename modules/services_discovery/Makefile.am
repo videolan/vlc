@@ -89,3 +89,10 @@ libbonjour_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)' -Wl,-framework,Fo
 if HAVE_DARWIN
 sd_LTLIBRARIES += libbonjour_plugin.la
 endif
+
+libudisks_plugin_la_SOURCES = services_discovery/udisks.c
+libudisks_plugin_la_CFLAGS = $(AM_CFLAGS) $(SDBUS_CFLAGS)
+libudisks_plugin_la_LIBADD = $(SDBUS_LIBS)
+if HAVE_SDBUS
+sd_LTLIBRARIES += libudisks_plugin.la
+endif

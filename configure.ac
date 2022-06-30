@@ -1081,6 +1081,53 @@ PKG_CHECK_MODULES([SYSTEMD], [libsystemd], [
 ])
 AM_CONDITIONAL([HAVE_SYSTEMD], [test "${have_systemd}" = "yes"])
 
+dnl Check for sdbus
+
+have_sdbus="no"
+AS_IF([test "${have_systemd}" = "yes"], [
+SDBUS_CFLAGS="${SYSTEMD_CFLAGS} -DSDBUS_HEADER='<systemd/sd-bus.h>'"
+  SDBUS_LIBS="${SYSTEMD_LIBS}"
+  have_sdbus="yes"
+])
+
+dnl Check for elogind
+AC_ARG_ENABLE([elogind],
+  AS_HELP_STRING([--disable-elogind], [ignore elogind as a sd-bus provider]), [],  [enable_elogind="yes"])
+
+AS_IF([test "${have_sdbus}" != "yes" && test "${enable_elogind}" != "no"], [
+  PKG_CHECK_MODULES([ELOGIND], [libelogind], [
+      have_elogind="yes"
+      SDBUS_CFLAGS="${ELOGIND_CFLAGS} -DSDBUS_HEADER='<elogind/sd-bus.h>'"
+      SDBUS_LIBS="${ELOGIND_LIBS}"
+      have_sdbus="yes"
+    ], [
+      AC_MSG_WARN([${ELOGIND_PKG_ERRORS}.])
+    ])
+])
+
+dnl Check for basu
+AC_ARG_ENABLE([basu],
+  AS_HELP_STRING([--disable-basu], [ignore basu as a sd-bus provider]), [], [enable_basu="yes"])
+
+AS_IF([test "${have_sdbus}" != "yes" && test "${enable_basu}" != "no"], [
+  PKG_CHECK_MODULES([BASU], [basu], [
+      have_basu="yes"
+      SDBUS_CFLAGS="${BASU_CFLAGS} -DSDBUS_HEADER='<basu/sd-bus.h>'"
+      SDBUS_LIBS="${BASU_LIBS}"
+      have_sdbus="yes"
+    ], [
+      AC_MSG_WARN([${BASU_PKG_ERRORS}.])
+    ])
+])
+
+AS_IF([test "$have_sdbus" = "yes" ], [
+  AC_SUBST([SDBUS_CFLAGS])
+  AC_SUBST([SDBUS_LIBS])
+], [
+  AC_MSG_WARN([no sd-bus provider found.])
+])
+
+AM_CONDITIONAL([HAVE_SDBUS], [test "$have_sdbus" = "yes"])
 
 EXTEND_HELP_STRING([Optimization options:])
 dnl
@@ -4147,7 +4194,6 @@ dnl
 dnl mDNS using libmicrodns
 dnl
 PKG_ENABLE_MODULES_VLC([MICRODNS], [], [microdns >= 0.1.2], [mDNS services discovery], [auto])
-
 
 EXTEND_HELP_STRING([Misc options:])
 

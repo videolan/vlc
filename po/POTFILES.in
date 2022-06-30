@@ -1227,6 +1227,7 @@ modules/services_discovery/podcast.c
 modules/services_discovery/pulse.c
 modules/services_discovery/sap.c
 modules/services_discovery/udev.c
+modules/services_discovery/udisks.c
 modules/services_discovery/upnp.cpp
 modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
