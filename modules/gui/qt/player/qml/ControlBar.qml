@@ -44,6 +44,7 @@ Control {
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
+    property bool showRightTimeText: true
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
@@ -68,9 +69,11 @@ Control {
     function _layout() {
         trackPositionSlider.visible = true
         mediaTime.visible = true
-        mediaRemainingTime.visible = true
+
+        mediaRemainingTime.visible = Qt.binding(function() { return root.showRightTimeText && textPosition !== ControlBar.TimeTextPosition.Hide; })
         mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
         mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+
         row2.Layout.leftMargin = 0
         row2.Layout.rightMargin = 0
 
@@ -79,7 +82,6 @@ Control {
             row1.children = []
             row2.children = [trackPositionSlider]
             mediaTime.visible = false
-            mediaRemainingTime.visible = false
             break;
 
         case ControlBar.TimeTextPosition.AboveSlider:
