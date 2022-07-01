@@ -30,7 +30,8 @@ Item {
     GaussianBlur {
         id: blur
 
-        anchors.fill: parent
+        width: 512
+        height: 512
 
         samples: 102
         radius: 50
@@ -44,6 +45,7 @@ Item {
         sourceItem: blur
         smooth: false
         visible: false
+        mipmap: false
     }
 
     ShaderEffect {
