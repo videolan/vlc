@@ -189,13 +189,9 @@ void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */
     }
     case VLC_ML_EVENT_MEDIA_UPDATED:
     {
-        if (event.creation.media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
-        {
-            MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
-            updateItemInCache(itemId);
-            return;
-        }
-        break;
+        MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+        updateItemInCache(itemId);
+        return;
     }
     case VLC_ML_EVENT_GROUP_DELETED:
     {
@@ -205,11 +201,8 @@ void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */
     }
     case VLC_ML_EVENT_MEDIA_DELETED:
     {
-        if (event.creation.media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
-        {
-            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
-            deleteItemInCache(itemId);
-        }
+        MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+        deleteItemInCache(itemId);
         return;
     }
     default:
