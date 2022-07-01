@@ -144,32 +144,38 @@ QByteArray MLVideoModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) cons
 
 void MLVideoModel::onVlcMlEvent(const MLEvent &event)
 {
-    if (event.creation.media.i_type != VLC_ML_MEDIA_TYPE_VIDEO)
-        return MLBaseModel::onVlcMlEvent( event );
-
     switch (event.i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
         {
-            emit resetRequested();
+            if (event.creation.media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
+            {
+                emit resetRequested();
+
+                return;
+            }
+
             break;
         }
         case VLC_ML_EVENT_MEDIA_UPDATED:
         {
             MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
             updateItemInCache(itemId);
+
             return;
         }
         case VLC_ML_EVENT_MEDIA_DELETED:
         {
             MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
             deleteItemInCache(itemId);
+
             return;
         }
         default:
             break;
     }
-    MLBaseModel::onVlcMlEvent( event );
+
+    MLBaseModel::onVlcMlEvent(event);
 }
 
 void MLVideoModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status)
