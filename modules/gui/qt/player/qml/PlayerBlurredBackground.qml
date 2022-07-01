@@ -23,12 +23,35 @@ import QtGraphicalEffects 1.0
 Item {
     id: rootItem
 
-    property alias source: blur.source
+    property alias source: blurSource.sourceItem
     property alias screenColor: shaderItem.screenColor
     property alias overlayColor: shaderItem.overlayColor
 
+    function scheduleUpdate() {
+        blurSource.scheduleUpdate()
+    }
+
+    onSourceChanged: blurSource.scheduleUpdate()
+
+    ShaderEffectSource {
+        id: blurSource
+
+        width: 512
+        height: 512
+        textureSize: Qt.size(512,512)
+
+        visible: false
+
+        live: false
+        hideSource: false
+        smooth: false
+        mipmap: false
+    }
+
     GaussianBlur {
         id: blur
+
+        source: blurSource
 
         width: 512
         height: 512

@@ -439,6 +439,11 @@ FocusScope {
                                                                         : 1024
                     readonly property real maximumHeight: MainCtx.screen ? (MainCtx.screen.availableVirtualSize.height * MainCtx.screen.devicePixelRatio / parent.heightConstant)
                                                                          : 1024
+
+                    onStatusChanged: {
+                        if (status === Image.Ready)
+                            backgroundImage.scheduleUpdate()
+                    }
                 }
 
                 Widgets.CoverShadow {
