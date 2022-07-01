@@ -93,7 +93,7 @@ void MLArtistModel::onVlcMlEvent(const MLEvent &event)
             return;
         case VLC_ML_EVENT_ARTIST_UPDATED:
         {
-            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
             updateItemInCache(itemId);
             return;
         }
