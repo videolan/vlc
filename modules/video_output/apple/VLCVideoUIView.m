@@ -276,8 +276,15 @@
     assert(_subviews == 0);
     _enabled = YES;
 
-    /* Bind tapRecognizer. */
-    [self addGestureRecognizer:_tapRecognizer];
+    /**
+     * Given -[UIView addGestureRecognizer:] can raise an exception if
+     * tapRecognizer is nil and given tapRecognizer can be nil if
+     * "mouse-events" var == false, then add tapRecognizer to the view only if
+     * it's not nil
+     */
+    if (_tapRecognizer != nil) {
+        [self addGestureRecognizer:_tapRecognizer];
+    }
     _tapRecognizer.cancelsTouchesInView = NO;
 }
 
