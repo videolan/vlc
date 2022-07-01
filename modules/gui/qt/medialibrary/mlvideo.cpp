@@ -135,7 +135,7 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
 
 bool MLVideo::isNew() const
 {
-    return (m_playCount == 1 && m_progress <= 0);
+    return (m_playCount == 0 && m_progress <= 0);
 }
 
 QString MLVideo::getFileName() const
