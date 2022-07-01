@@ -27,6 +27,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
+import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
     id: rootPlayer
@@ -412,18 +413,27 @@ FocusScope {
             visible: !rootPlayer.hasEmbededVideo
 
             Item {
-                Layout.preferredHeight: rootPlayer.height / heightConstant
+                id: coverItem
+                Layout.preferredHeight: rootPlayer.height / sizeConstant
                 Layout.preferredWidth: cover.paintedWidth
                 Layout.maximumHeight: centerContent.height
                 Layout.alignment: Qt.AlignHCenter
 
-                readonly property real heightConstant: 2.7182
+                readonly property real sizeConstant: 2.7182
 
                 Image {
                     id: cover
 
                     //source aspect ratio
                     readonly property real sar: paintedWidth / paintedHeight
+                    readonly property int maximumWidth: MainCtx.screen
+                                                          ? Helpers.alignUp((MainCtx.screen.availableGeometry.width / coverItem.sizeConstant), 32)
+                                                          : 1024
+                    readonly property int maximumHeight: MainCtx.screen
+                                                          ? Helpers.alignUp((MainCtx.screen.availableGeometry.height / coverItem.sizeConstant), 32)
+                                                          : 1024
+
+                    readonly property int maximumSize: Math.min(maximumWidth, maximumHeight)
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
@@ -433,12 +443,8 @@ FocusScope {
                     mipmap: true
                     cache: false
                     asynchronous: true
-                    sourceSize: Qt.size(maximumWidth, maximumHeight)
 
-                    readonly property real maximumWidth: MainCtx.screen ? (MainCtx.screen.availableVirtualSize.width * MainCtx.screen.devicePixelRatio)
-                                                                        : 1024
-                    readonly property real maximumHeight: MainCtx.screen ? (MainCtx.screen.availableVirtualSize.height * MainCtx.screen.devicePixelRatio / parent.heightConstant)
-                                                                         : 1024
+                    sourceSize: Qt.size(maximumSize, maximumSize)
 
                     onStatusChanged: {
                         if (status === Image.Ready)
