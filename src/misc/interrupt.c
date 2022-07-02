@@ -594,8 +594,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 
 ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
 {
-    (void) fd; (void) iov; (void) count;
-    vlc_assert_unreachable();
+    return readv(fd, iov, count);
 }
 
 ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
