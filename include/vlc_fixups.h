@@ -232,6 +232,11 @@ struct iovec;
 ssize_t readv(int, const struct iovec *, int);
 #endif
 
+#ifndef HAVE_WRITEV
+struct iovec;
+ssize_t writev(int, const struct iovec *, int);
+#endif
+
 /* time.h */
 #ifndef HAVE_GMTIME_R
 struct tm *gmtime_r (const time_t *, struct tm *);
