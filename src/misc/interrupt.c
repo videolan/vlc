@@ -453,7 +453,6 @@ ssize_t vlc_read_i11e(int fd, void *buf, size_t count)
     return vlc_readv_i11e(fd, &iov, 1);
 }
 
-#ifndef _WIN32
 /**
  * Wrapper for write() that returns the EINTR error upon VLC I/O interruption.
  *
@@ -467,6 +466,7 @@ ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
     return vlc_writev_i11e(fd, &iov, 1);
 }
 
+#ifndef _WIN32
 ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
 {
     struct pollfd ufd;
@@ -602,11 +602,6 @@ ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
 ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
 {
     return writev(fd, iov, count);
-}
-
-ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
-{
-    return write(fd, buf, count);
 }
 
 ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
