@@ -538,7 +538,6 @@ ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
     return vlc_writev_i11e(fd, &iov, 1);
 }
 
-#ifndef _WIN32
 ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
 {
     if (vlc_poll_sock(fd, POLLIN) < 0)
@@ -548,6 +547,7 @@ ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
     return recvmsg(fd, msg, flags);
 }
 
+#ifndef _WIN32
 ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
                         struct sockaddr *addr, socklen_t *addrlen)
 {
@@ -564,6 +564,7 @@ ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
         *addrlen = msg.msg_namelen;
     return ret;
 }
+#endif
 
 ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
 {
@@ -573,6 +574,7 @@ ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
     return vlc_sendmsg(fd, msg, flags);
 }
 
+#ifndef _WIN32
 ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
                       const struct sockaddr *addr, socklen_t addrlen)
 {
@@ -597,12 +599,6 @@ int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
 
 #else /* _WIN32 */
 
-ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
-{
-    (void) fd; (void) msg; (void) flags;
-    vlc_assert_unreachable();
-}
-
 ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
                         struct sockaddr *addr, socklen_t *addrlen)
 {
@@ -613,12 +609,6 @@ ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
     if (ret < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
         errno = EAGAIN;
     return ret;
-}
-
-ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
-{
-    (void) fd; (void) msg; (void) flags;
-    vlc_assert_unreachable();
 }
 
 ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
