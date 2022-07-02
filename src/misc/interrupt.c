@@ -512,7 +512,7 @@ ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
 {
     if (vlc_poll_file(fd, POLLOUT) < 0)
         return -1;
-    return writev(fd, iov, count);
+    return vlc_writev(fd, iov, count);
 }
 
 /**
