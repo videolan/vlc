@@ -226,6 +226,12 @@ float strtof (const char *, char **);
 long long int strtoll (const char *, char **, int);
 #endif
 
+/* sys/uio.h */
+#ifndef HAVE_READV
+struct iovec;
+ssize_t readv(int, const struct iovec *, int);
+#endif
+
 /* time.h */
 #ifndef HAVE_GMTIME_R
 struct tm *gmtime_r (const time_t *, struct tm *);
