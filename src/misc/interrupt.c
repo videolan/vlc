@@ -397,6 +397,21 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
     }
     return ret;
 }
+
+static int vlc_poll_file(int fd, unsigned int mask)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = mask;
+    return vlc_poll_i11e(&ufd, 1, -1);
+}
+
+static int vlc_poll_sock(int sock, unsigned int mask)
+{
+    return vlc_poll_file(sock, mask);
+}
+
 #else /* !_WIN32 */
 static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
 {
@@ -450,6 +465,21 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
     CloseHandle(th);
     return ret;
 }
+
+static int vlc_poll_file(int fd, unsigned int mask)
+{
+    (void) fd; (void) mask;
+    return 1;
+}
+
+static int vlc_poll_sock(int sock, unsigned int mask)
+{
+    struct pollfd ufd;
+
+    ufd.fd = sock;
+    ufd.events = mask;
+    return vlc_poll_i11e(&ufd, 1, -1);
+}
 #endif /* _WIN32 */
 
 #ifndef _WIN32
@@ -468,12 +498,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
  */
 ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLIN;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_file(fd, POLLIN) < 0)
         return -1;
     return readv(fd, iov, count);
 }
@@ -487,12 +512,7 @@ ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
  */
 ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLOUT;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_file(fd, POLLOUT) < 0)
         return -1;
     return writev(fd, iov, count);
 }
@@ -524,12 +544,7 @@ ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
 #ifndef _WIN32
 ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLIN;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_sock(fd, POLLIN) < 0)
         return -1;
     /* NOTE: MSG_OOB and MSG_PEEK should work fine here.
      * MSG_WAITALL is not supported at this point. */
@@ -555,12 +570,7 @@ ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
 
 ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLOUT;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_sock(fd, POLLOUT) < 0)
         return -1;
     /* NOTE: MSG_EOR and MSG_OOB should all work fine here. */
     return vlc_sendmsg(fd, msg, flags);
@@ -583,14 +593,8 @@ ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
 int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
                   bool nonblock)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLIN;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_sock(fd, POLLIN) < 0)
         return -1;
-
     return vlc_accept(fd, addr, addrlen, nonblock);
 }
 
@@ -615,12 +619,7 @@ ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
 ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
                         struct sockaddr *addr, socklen_t *addrlen)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLIN;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_sock(fd, POLLIN) < 0)
         return -1;
 
     ssize_t ret = recvfrom(fd, buf, len, flags, addr, addrlen);
@@ -638,12 +637,7 @@ ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
 ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
                       const struct sockaddr *addr, socklen_t addrlen)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLOUT;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_sock(fd, POLLOUT) < 0)
         return -1;
 
     ssize_t ret = sendto(fd, buf, len, flags, addr, addrlen);
@@ -655,12 +649,7 @@ ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
 int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
                   bool nonblock)
 {
-    struct pollfd ufd;
-
-    ufd.fd = fd;
-    ufd.events = POLLIN;
-
-    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+    if (vlc_poll_sock(fd, POLLIN) < 0)
         return -1;
 
     int cfd = vlc_accept(fd, addr, addrlen, nonblock);
