@@ -279,6 +279,12 @@ int vlc_interrupt_forward_stop(void *const data[2])
 }
 
 #ifndef _WIN32
+# include <fcntl.h>
+# include <sys/uio.h>
+# ifdef HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+# endif
+
 static void vlc_poll_i11e_wake(void *opaque)
 {
     uint64_t value = 1;
@@ -391,13 +397,62 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
     }
     return ret;
 }
+#else /* !_WIN32 */
+static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
+{
+    (void) data; /* Nothing to do */
+}
 
-# include <fcntl.h>
-# include <sys/uio.h>
-# ifdef HAVE_SYS_SOCKET_H
-#  include <sys/socket.h>
-# endif
+static void vlc_poll_i11e_wake(void *opaque)
+{
+    HANDLE th = opaque;
+    QueueUserAPC(vlc_poll_i11e_wake_self, th, 0);
+}
 
+static void vlc_poll_i11e_cleanup(void *opaque)
+{
+    vlc_interrupt_t *ctx = opaque;
+    HANDLE th = ctx->data;
+
+    vlc_interrupt_finish(ctx);
+    CloseHandle(th);
+}
+
+int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
+{
+    vlc_interrupt_t *ctx = vlc_interrupt_var;
+    if (ctx == NULL)
+        return vlc_poll(fds, nfds, timeout);
+
+    int ret = -1;
+    HANDLE th;
+
+    if (!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
+                         GetCurrentProcess(), &th, 0, FALSE,
+                         DUPLICATE_SAME_ACCESS))
+    {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, th);
+
+    vlc_cleanup_push(vlc_poll_i11e_cleanup, ctx);
+    ret = vlc_poll(fds, nfds, timeout);
+    vlc_cleanup_pop();
+
+    if (vlc_interrupt_finish(ctx))
+    {
+        errno = EINTR;
+        ret = -1;
+    }
+
+    CloseHandle(th);
+    return ret;
+}
+#endif /* _WIN32 */
+
+#ifndef _WIN32
 
 /* There are currently no ways to atomically force a non-blocking read or write
  * operations. Even for sockets, the MSG_DONTWAIT flag is non-standard.
@@ -540,59 +595,6 @@ int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
 }
 
 #else /* _WIN32 */
-
-static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
-{
-    (void) data; /* Nothing to do */
-}
-
-static void vlc_poll_i11e_wake(void *opaque)
-{
-    HANDLE th = opaque;
-    QueueUserAPC(vlc_poll_i11e_wake_self, th, 0);
-}
-
-static void vlc_poll_i11e_cleanup(void *opaque)
-{
-    vlc_interrupt_t *ctx = opaque;
-    HANDLE th = ctx->data;
-
-    vlc_interrupt_finish(ctx);
-    CloseHandle(th);
-}
-
-int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
-{
-    vlc_interrupt_t *ctx = vlc_interrupt_var;
-    if (ctx == NULL)
-        return vlc_poll(fds, nfds, timeout);
-
-    int ret = -1;
-    HANDLE th;
-
-    if (!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
-                         GetCurrentProcess(), &th, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS))
-    {
-        errno = ENOMEM;
-        return -1;
-    }
-
-    vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, th);
-
-    vlc_cleanup_push(vlc_poll_i11e_cleanup, ctx);
-    ret = vlc_poll(fds, nfds, timeout);
-    vlc_cleanup_pop();
-
-    if (vlc_interrupt_finish(ctx))
-    {
-        errno = EINTR;
-        ret = -1;
-    }
-
-    CloseHandle(th);
-    return ret;
-}
 
 ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
 {
