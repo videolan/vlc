@@ -5,7 +5,9 @@ PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
 PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 
 PLACEBOCONF := -Dglslang=enabled \
-	-Dshaderc=disabled
+	-Dshaderc=disabled \
+	-Ddemos=false \
+	-Dtests=false
 
 DEPS_libplacebo = glslang
 
