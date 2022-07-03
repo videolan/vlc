@@ -1,80 +1,91 @@
-diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/CMakeLists.txt Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/CMakeLists.txt
---- Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/CMakeLists.txt	2017-04-05 00:36:39.000000000 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/CMakeLists.txt	2017-06-29 08:34:52.393725000 +0300
-@@ -153,6 +153,16 @@
+diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
+index 8bb10fd..fc38ecc 100644
+--- a/loader/CMakeLists.txt
++++ b/loader/CMakeLists.txt
+@@ -127,7 +127,7 @@ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG}Note that this may be unsafe, as the C co
+ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG} the stack frame for certain calls. If the compiler does not do this, then unknown device")
+ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG} extensions will suffer from a corrupted stack.")
+ if(WIN32)
+-    if(MINGW)
++    if(NOT MINGW)
+         find_program(JWASM_FOUND jwasm)
+         if (JWASM_FOUND)
+             set(CMAKE_ASM_MASM_COMPILER ${JWASM_FOUND})
+@@ -145,7 +145,7 @@ if(WIN32)
+     if (USE_MASM)
+       enable_language(ASM_MASM)
+     endif ()
+-    if(CMAKE_ASM_MASM_COMPILER_WORKS OR JWASM_FOUND)
++    if(MSVC AND CMAKE_ASM_MASM_COMPILER_WORKS OR JWASM_FOUND)
+         if(MINGW)
+             set(CMAKE_ASM_MASM_FLAGS ${CMAKE_ASM_MASM_FLAGS} ${JWASM_FLAGS})
+         elseif(NOT CMAKE_CL_64 AND NOT JWASM_FOUND)
+@@ -161,12 +161,14 @@ if(WIN32)
+         target_link_libraries(loader-unknown-chain Vulkan::Headers)
+         target_include_directories(loader-unknown-chain PUBLIC $<TARGET_PROPERTY:loader_asm_gen_files,BINARY_DIR>)
+         add_dependencies(loader-unknown-chain loader_asm_gen_files)
++        set_target_properties(loader-unknown-chain PROPERTIES DEFINE_SYMBOL "VK_BUILDING_DLL")
+     else()
+         message(WARNING "Could not find working MASM assebler\n${ASM_FAILURE_MSG}")
+         add_custom_target(loader_asm_gen_files)
+         add_library(loader-unknown-chain OBJECT unknown_ext_chain.c)
+         target_link_libraries(loader-unknown-chain loader_specific_options)
+         set_target_properties(loader-unknown-chain PROPERTIES CMAKE_C_FLAGS_DEBUG "${MODIFIED_C_FLAGS_DEBUG}")
++        set_target_properties(loader-unknown-chain PROPERTIES DEFINE_SYMBOL "VK_BUILDING_DLL")
      endif()
- endif()
- 
-+if (WIN32)
-+  if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
-+    set(DEFFILE_SUFFIX "")
-+    set(WINBITS Win64)
-+  else()
-+    set(DEFFILE_SUFFIX "-x86")
-+    set(WINBITS Win32)
-+  endif()
-+endif()
-+
- if(MSVC)
-     # /WX: Treat warnings as errors
-     # /GR-: Disable RTTI
-diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/CMakeLists.txt Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/loader/CMakeLists.txt
---- Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/CMakeLists.txt	2017-06-29 08:19:36.448133100 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/loader/CMakeLists.txt	2017-06-29 08:42:41.322355600 +0300
-@@ -137,6 +137,7 @@
- set_target_properties(loader_gen_files PROPERTIES FOLDER ${LOADER_HELPER_FOLDER})
+ elseif(APPLE)
+     # For MacOS, use the C code and force the compiler's tail-call optimization instead of using assembly code.
+@@ -261,6 +263,7 @@ endif()
  
  if(WIN32)
+     add_library(loader-opt STATIC ${OPT_LOADER_SRCS})
++    set_target_properties(loader-opt PROPERTIES DEFINE_SYMBOL "VK_BUILDING_DLL")
+     target_link_libraries(loader-opt PUBLIC loader_specific_options)
+     add_dependencies(loader-opt loader_asm_gen_files)
+     set_target_properties(loader-opt PROPERTIES CMAKE_C_FLAGS_DEBUG "${MODIFIED_C_FLAGS_DEBUG}")
+@@ -237,10 +240,17 @@ if(WIN32)
+     # when adding the suffix the import and runtime library names must be consistent
+     # mingw: libvulkan-1.dll.a / libvulkan-1.dll
+     # msvc: vulkan-1.lib / vulkan-1.dll
 +    if(MSVC)
-     # Use static MSVCRT libraries
-     foreach(configuration
-             in
-@@ -156,6 +157,7 @@
-                            "${${configuration}}")
-         endif()
-     endforeach()
+     set_target_properties(vulkan
+                           PROPERTIES
+                           OUTPUT_NAME vulkan-1)
+-
++    else()
++    set_target_properties(vulkan
++                          PROPERTIES
++                          LIBRARY_OUTPUT_NAME vulkan
++                          RUNTIME_OUTPUT_NAME vulkan-1
++                          ARCHIVE_OUTPUT_NAME vulkan)
 +    endif()
- 
-     if(ENABLE_WIN10_ONECORE)
-         # Note: When linking your app or driver to OneCore.lib, be sure to remove any links to non-umbrella libs (such as
-@@ -190,24 +192,32 @@
-                     $<TARGET_OBJECTS:loader-opt>
-                     $<TARGET_OBJECTS:loader-norm>
-                     $<TARGET_OBJECTS:loader-unknown-chain>
--                    ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-1.def
-+                    ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-1${DEFFILE_SUFFIX}.def
-                     ${CMAKE_CURRENT_SOURCE_DIR}/loader.rc)
-+        if(MSVC)
-         set_target_properties(vulkan
-                               PROPERTIES LINK_FLAGS_DEBUG
-                                          "/ignore:4098"
-                                          OUTPUT_NAME
-                                          vulkan-1)
-+        else()
-+        set_target_properties(vulkan
-+                              PROPERTIES
-+                              LIBRARY_OUTPUT_NAME vulkan
-+                              RUNTIME_OUTPUT_NAME vulkan-1
-+                              ARCHIVE_OUTPUT_NAME vulkan)
-+        endif()
-         target_link_libraries(vulkan Vulkan::Headers)
-     else()
-         add_library(vulkan
-                     STATIC
-                     $<TARGET_OBJECTS:loader-opt>
-                     $<TARGET_OBJECTS:loader-norm>
-                     $<TARGET_OBJECTS:loader-unknown-chain>)
-         set_target_properties(vulkan PROPERTIES OUTPUT_NAME VKstatic.1)
-     endif()
- 
--    if(ENABLE_WIN10_ONECORE)
-+    if(ENABLE_WIN10_ONECORE AND MSVC)
+     if(MSVC AND ENABLE_WIN10_ONECORE)
          target_link_libraries(vulkan OneCoreUAP.lib LIBCMT.LIB LIBCMTD.LIB LIBVCRUNTIME.LIB LIBUCRT.LIB)
          set_target_properties(vulkan PROPERTIES LINK_FLAGS "/NODEFAULTLIB")
-     else()
---- Vulkan-LoaderAndValidationLayers-sdk-1.1.73.0/loader/vulkan-1.def.orig	2018-05-16 11:55:36.673944400 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.1.73.0/loader/vulkan-1.def	2018-05-16 11:55:41.307152500 +0300
-@@ -21,7 +21,7 @@
+diff --git a/loader/vk_loader_platform.h b/loader/vk_loader_platform.h
+index 507a901..6b8fc48 100644
+--- a/loader/vk_loader_platform.h
++++ b/loader/vk_loader_platform.h
+@@ -77,7 +77,13 @@
+ #include "vk_layer_dispatch_table.h"
+ #include "vk_loader_extensions.h"
+ 
+-#if defined(__GNUC__) && __GNUC__ >= 4
++#if defined(_WIN32)
++#  if defined (VK_BUILDING_DLL)
++#    define LOADER_EXPORT __declspec(dllexport)
++#  else
++#    define LOADER_EXPORT
++#  endif
++#elif defined(__GNUC__) && __GNUC__ >= 4
+ #define LOADER_EXPORT __attribute__((visibility("default")))
+ #elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590)
+ #define LOADER_EXPORT __attribute__((visibility("default")))
+diff --git a/loader/vulkan-1.def b/loader/vulkan-1.def
+index 6a88b55..1d26b1f 100644
+--- a/loader/vulkan-1.def
++++ b/loader/vulkan-1.def
+@@ -22,7 +22,7 @@
  ;
  ;;;;  End Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  
@@ -83,319 +94,3 @@ diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/CMakeLists.
  EXPORTS
     vkCreateInstance
     vkDestroyInstance
-diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/vulkan-1-x86.def Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/loader/vulkan-1-x86.def
---- Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/vulkan-1-x86.def	1970-01-01 03:00:00.000000000 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/loader/vulkan-1-x86.def	2017-04-05 00:36:39.000000000 +0300
-@@ -0,0 +1,221 @@
-+
-+;;;; Begin Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-+;
-+; Copyright (c) 2015-2017 The Khronos Group Inc.
-+; Copyright (c) 2015-2017 Valve Corporation
-+; Copyright (c) 2015-2017 LunarG, Inc.
-+;
-+; Licensed under the Apache License, Version 2.0 (the "License");
-+; you may not use this file except in compliance with the License.
-+; You may obtain a copy of the License at
-+;
-+;     http://www.apache.org/licenses/LICENSE-2.0
-+;
-+; Unless required by applicable law or agreed to in writing, software
-+; distributed under the License is distributed on an "AS IS" BASIS,
-+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+; See the License for the specific language governing permissions and
-+; limitations under the License.
-+;
-+;  Author: Courtney Goeltzenleuchter <courtney@LunarG.com>
-+;
-+;;;;  End Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-+
-+LIBRARY libvulkan-1.dll
-+EXPORTS
-+   vkCreateInstance@12
-+   vkDestroyInstance@8
-+   vkEnumeratePhysicalDevices@12
-+   vkGetPhysicalDeviceFeatures@8
-+   vkGetPhysicalDeviceFormatProperties@12
-+   vkGetPhysicalDeviceImageFormatProperties@28
-+   vkGetPhysicalDeviceProperties@8
-+   vkGetPhysicalDeviceQueueFamilyProperties@12
-+   vkGetPhysicalDeviceMemoryProperties@8
-+   vkGetInstanceProcAddr@8
-+   vkGetDeviceProcAddr@8
-+   vkCreateDevice@16
-+   vkDestroyDevice@8
-+   vkEnumerateInstanceExtensionProperties@12
-+   vkEnumerateDeviceExtensionProperties@16
-+   vkEnumerateInstanceLayerProperties@8
-+   vkEnumerateDeviceLayerProperties@12
-+   vkGetDeviceQueue@16
-+   vkQueueSubmit@20
-+   vkQueueWaitIdle@4
-+   vkDeviceWaitIdle@4
-+   vkAllocateMemory@16
-+   vkFreeMemory@16
-+   vkMapMemory@36
-+   vkUnmapMemory@12
-+   vkFlushMappedMemoryRanges@12
-+   vkInvalidateMappedMemoryRanges@12
-+   vkGetDeviceMemoryCommitment@16
-+   vkBindBufferMemory@28
-+   vkBindImageMemory@28
-+   vkGetBufferMemoryRequirements@16
-+   vkGetImageMemoryRequirements@16
-+   vkGetImageSparseMemoryRequirements@20
-+   vkGetPhysicalDeviceSparseImageFormatProperties@32
-+   vkQueueBindSparse@20
-+   vkCreateFence@16
-+   vkDestroyFence@16
-+   vkResetFences@12
-+   vkGetFenceStatus@12
-+   vkWaitForFences@24
-+   vkCreateSemaphore@16
-+   vkDestroySemaphore@16
-+   vkCreateEvent@16
-+   vkDestroyEvent@16
-+   vkGetEventStatus@12
-+   vkSetEvent@12
-+   vkResetEvent@12
-+   vkCreateQueryPool@16
-+   vkDestroyQueryPool@16
-+   vkGetQueryPoolResults@40
-+   vkCreateBuffer@16
-+   vkDestroyBuffer@16
-+   vkCreateBufferView@16
-+   vkDestroyBufferView@16
-+   vkCreateImage@16
-+   vkDestroyImage@16
-+   vkGetImageSubresourceLayout@20
-+   vkCreateImageView@16
-+   vkDestroyImageView@16
-+   vkCreateShaderModule@16
-+   vkDestroyShaderModule@16
-+   vkCreatePipelineCache@16
-+   vkDestroyPipelineCache@16
-+   vkGetPipelineCacheData@20
-+   vkMergePipelineCaches@20
-+   vkCreateGraphicsPipelines@28
-+   vkCreateComputePipelines@28
-+   vkDestroyPipeline@16
-+   vkCreatePipelineLayout@16
-+   vkDestroyPipelineLayout@16
-+   vkCreateSampler@16
-+   vkDestroySampler@16
-+   vkCreateDescriptorSetLayout@16
-+   vkDestroyDescriptorSetLayout@16
-+   vkCreateDescriptorPool@16
-+   vkDestroyDescriptorPool@16
-+   vkResetDescriptorPool@16
-+   vkAllocateDescriptorSets@12
-+   vkFreeDescriptorSets@20
-+   vkUpdateDescriptorSets@20
-+   vkCreateFramebuffer@16
-+   vkDestroyFramebuffer@16
-+   vkCreateRenderPass@16
-+   vkDestroyRenderPass@16
-+   vkGetRenderAreaGranularity@16
-+   vkCreateCommandPool@16
-+   vkDestroyCommandPool@16
-+   vkResetCommandPool@16
-+   vkAllocateCommandBuffers@12
-+   vkFreeCommandBuffers@20
-+   vkBeginCommandBuffer@8
-+   vkEndCommandBuffer@4
-+   vkResetCommandBuffer@8
-+   vkCmdBindPipeline@16
-+   vkCmdSetViewport@16
-+   vkCmdSetScissor@16
-+   vkCmdSetLineWidth@8
-+   vkCmdSetDepthBias@16
-+   vkCmdSetBlendConstants@8
-+   vkCmdSetDepthBounds@12
-+   vkCmdSetStencilCompareMask@12
-+   vkCmdSetStencilWriteMask@12
-+   vkCmdSetStencilReference@12
-+   vkCmdBindDescriptorSets@36
-+   vkCmdBindIndexBuffer@24
-+   vkCmdBindVertexBuffers@20
-+   vkCmdDraw@20
-+   vkCmdDrawIndexed@24
-+   vkCmdDrawIndirect@28
-+   vkCmdDrawIndexedIndirect@28
-+   vkCmdDispatch@16
-+   vkCmdDispatchIndirect@20
-+   vkCmdCopyBuffer@28
-+   vkCmdCopyImage@36
-+   vkCmdBlitImage@40
-+   vkCmdCopyBufferToImage@32
-+   vkCmdCopyImageToBuffer@32
-+   vkCmdUpdateBuffer@32
-+   vkCmdFillBuffer@32
-+   vkCmdClearColorImage@28
-+   vkCmdClearDepthStencilImage@28
-+   vkCmdClearAttachments@20
-+   vkCmdResolveImage@36
-+   vkCmdSetEvent@16
-+   vkCmdResetEvent@16
-+   vkCmdWaitEvents@44
-+   vkCmdPipelineBarrier@40
-+   vkCmdBeginQuery@20
-+   vkCmdEndQuery@16
-+   vkCmdResetQueryPool@20
-+   vkCmdWriteTimestamp@20
-+   vkCmdCopyQueryPoolResults@48
-+   vkCmdPushConstants@28
-+   vkCmdBeginRenderPass@12
-+   vkCmdNextSubpass@8
-+   vkCmdEndRenderPass@4
-+   vkCmdExecuteCommands@12
-+   vkDestroySurfaceKHR@16
-+   vkGetPhysicalDeviceSurfaceSupportKHR@20
-+   vkGetPhysicalDeviceSurfaceCapabilitiesKHR@16
-+   vkGetPhysicalDeviceSurfaceFormatsKHR@20
-+   vkGetPhysicalDeviceSurfacePresentModesKHR@20
-+   vkCreateSwapchainKHR@16
-+   vkDestroySwapchainKHR@16
-+   vkGetSwapchainImagesKHR@20
-+   vkAcquireNextImageKHR@40
-+   vkQueuePresentKHR@8
-+   vkGetPhysicalDeviceDisplayPropertiesKHR@12
-+   vkGetPhysicalDeviceDisplayPlanePropertiesKHR@12
-+   vkGetDisplayPlaneSupportedDisplaysKHR@16
-+   vkGetDisplayModePropertiesKHR@20
-+   vkCreateDisplayModeKHR@24
-+   vkGetDisplayPlaneCapabilitiesKHR@20
-+   vkCreateDisplayPlaneSurfaceKHR@16
-+   vkCreateSharedSwapchainsKHR@20
-+   vkCreateWin32SurfaceKHR@16
-+   vkGetPhysicalDeviceWin32PresentationSupportKHR@8
-+
-+   vkEnumerateInstanceVersion@4
-+   vkEnumeratePhysicalDeviceGroups@12
-+   vkGetPhysicalDeviceFeatures2@8
-+   vkGetPhysicalDeviceProperties2@8
-+   vkGetPhysicalDeviceFormatProperties2@12
-+   vkGetPhysicalDeviceQueueFamilyProperties2@12
-+   vkGetPhysicalDeviceMemoryProperties2@8
-+   vkGetPhysicalDeviceSparseImageFormatProperties2@16
-+   vkGetPhysicalDeviceExternalBufferProperties@12
-+   vkGetPhysicalDeviceExternalSemaphoreProperties@12
-+   vkGetPhysicalDeviceExternalFenceProperties@12
-+   vkBindBufferMemory2@12
-+   vkBindImageMemory2@12
-+   vkGetDeviceGroupPeerMemoryFeatures@20
-+   vkCmdSetDeviceMask@8
-+   vkCmdDispatchBase@28
-+   vkGetImageMemoryRequirements2@12
-+   vkGetBufferMemoryRequirements2@12
-+   vkTrimCommandPool@16
-+   vkGetDeviceQueue2@12
-+   vkCreateSamplerYcbcrConversion@16
-+   vkDestroySamplerYcbcrConversion@16
-+   vkGetDescriptorSetLayoutSupport@12
-+   vkGetDeviceGroupPresentCapabilitiesKHR@8
-+   vkGetDeviceGroupSurfacePresentModesKHR@16
-+   vkGetPhysicalDevicePresentRectanglesKHR@20
-+   vkAcquireNextImage2KHR@12
-+   vkCreateDescriptorUpdateTemplate@16
-+   vkDestroyDescriptorUpdateTemplate@16
-+   vkUpdateDescriptorSetWithTemplate@24
-+
-+   vkGetPhysicalDeviceDisplayProperties2KHR@12
-+   vkGetPhysicalDeviceDisplayPlaneProperties2KHR@12
-+   vkGetDisplayModeProperties2KHR@20
-+   vkGetDisplayPlaneCapabilities2KHR@12
-+
-+   vkGetImageSparseMemoryRequirements2@16
-+   vkGetPhysicalDeviceImageFormatProperties2@12
-diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/tests/layers/CMakeLists.txt Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/tests/layers/CMakeLists.txt
---- Vulkan-LoaderAndValidationLayers-sdk-1.1.73.0-orig/tests/layers/CMakeLists.txt	2017-04-05 00:36:39.000000000 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.1.73.0/tests/layers/CMakeLists.txt	2017-06-29 08:39:07.115088000 +0300
-@@ -19,12 +19,12 @@
- 
- if(WIN32)
-     macro(AddVkLayer target)
--        file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${target}.def DEF_FILE)
-+        file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/VkLayer_${target}${DEFFILE_SUFFIX}.def DEF_FILE)
-         add_custom_target(copy-${target}-def-file ALL
--                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} VkLayer_${target}.def
-+                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DEF_FILE} VkLayer_${target}${DEFFILE_SUFFIX}.def
-                           VERBATIM)
-         set_target_properties(copy-${target}-def-file PROPERTIES FOLDER ${LOADER_HELPER_FOLDER})
--        add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}.def)
-+        add_library(VkLayer_${target} SHARED ${ARGN} VkLayer_${target}${DEFFILE_SUFFIX}.def)
-         target_compile_options(VkLayer_${target} PUBLIC ${MSVC_LOADER_COMPILE_OPTIONS})
-         add_dependencies(VkLayer_${target} generate_helper_files)
-     endmacro()
-diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/tests/layers/VkLayer_test-x86.def Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/tests/layers/VkLayer_test-x86.def
---- Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/tests/layers/VkLayer_test-x86.def	1970-01-01 03:00:00.000000000 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/tests/layers/VkLayer_test-x86.def	2017-04-05 00:36:39.000000000 +0300
-@@ -0,0 +1,32 @@
-+; THIS FILE IS GENERATED.  DO NOT EDIT.
-+
-+;;;; Begin Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-+; Vulkan
-+;
-+; Copyright (c) 2015-2016 The Khronos Group Inc.
-+; Copyright (c) 2015-2016 Valve Corporation
-+; Copyright (c) 2015-2016 LunarG, Inc.
-+;
-+; Licensed under the Apache License, Version 2.0 (the "License");
-+; you may not use this file except in compliance with the License.
-+; You may obtain a copy of the License at
-+;
-+;     http://www.apache.org/licenses/LICENSE-2.0
-+;
-+; Unless required by applicable law or agreed to in writing, software
-+; distributed under the License is distributed on an "AS IS" BASIS,
-+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+; See the License for the specific language governing permissions and
-+; limitations under the License.
-+;
-+;  Author: Courtney Goeltzenleuchter <courtney@LunarG.com>
-+;;;;  End Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-+
-+; The following is required on Windows, for exporting symbols from the DLL
-+
-+LIBRARY VkLayer_test
-+EXPORTS
-+vkGetInstanceProcAddr@8
-+vkGetDeviceProcAddr@8
-+vkEnumerateInstanceLayerProperties@8
-+vkEnumerateInstanceExtensionProperties@12
-diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/tests/layers/VkLayer_wrap_objects-x86.def Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/tests/layers/VkLayer_wrap_objects-x86.def
---- Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/tests/layers/VkLayer_wrap_objects-x86.def	1970-01-01 03:00:00.000000000 +0300
-+++ Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/tests/layers/VkLayer_wrap_objects-x86.def	2017-04-05 00:36:39.000000000 +0300
-@@ -0,0 +1,32 @@
-+; THIS FILE IS GENERATED.  DO NOT EDIT.
-+
-+;;;; Begin Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-+; Vulkan
-+;
-+; Copyright (c) 2015-2016 The Khronos Group Inc.
-+; Copyright (c) 2015-2016 Valve Corporation
-+; Copyright (c) 2015-2016 LunarG, Inc.
-+;
-+; Licensed under the Apache License, Version 2.0 (the "License");
-+; you may not use this file except in compliance with the License.
-+; You may obtain a copy of the License at
-+;
-+;     http://www.apache.org/licenses/LICENSE-2.0
-+;
-+; Unless required by applicable law or agreed to in writing, software
-+; distributed under the License is distributed on an "AS IS" BASIS,
-+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+; See the License for the specific language governing permissions and
-+; limitations under the License.
-+;
-+;  Author: Courtney Goeltzenleuchter <courtney@LunarG.com>
-+;;;;  End Copyright Notice ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-+
-+; The following is required on Windows, for exporting symbols from the DLL
-+
-+LIBRARY VkLayer_wrap_objects
-+EXPORTS
-+vkGetInstanceProcAddr@8
-+vkGetDeviceProcAddr@8
-+vkEnumerateInstanceLayerProperties@8
-+vkEnumerateInstanceExtensionProperties@12

@@ -1,0 +1,11 @@
+--- a/loader/CMakeLists.txt
++++ b/loader/CMakeLists.txt
+@@ -398,7 +398,7 @@
+     foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
+         set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+     endforeach()
+-    if(WIN32)
++    if(MSVC)
+         set(VULKAN_LIB_SUFFIX "-1")
+         # Set libdir path as in cmake's FindVulkan.cmake
+         # https://github.com/KhronosGroup/Vulkan-Loader/issues/668
