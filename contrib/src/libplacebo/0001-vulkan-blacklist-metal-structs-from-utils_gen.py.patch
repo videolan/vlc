@@ -1,0 +1,26 @@
+From db794a2fcc8214624c950752b04f6c23f8fc567d Mon Sep 17 00:00:00 2001
+From: Niklas Haas <git@haasn.dev>
+Date: Thu, 9 Jun 2022 21:32:36 +0200
+Subject: [PATCH] vulkan: blacklist metal structs from utils_gen.py
+
+Fixes https://code.videolan.org/videolan/libplacebo/-/issues/201
+---
+ src/vulkan/utils_gen.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vulkan/utils_gen.py b/src/vulkan/utils_gen.py
+index da565d45..7c0dad37 100644
+--- a/src/vulkan/utils_gen.py
++++ b/src/vulkan/utils_gen.py
+@@ -158,7 +158,7 @@ def get_vkstructs(registry):
+         # Strings for platform-specific crap we want to blacklist as they will
+         # most likely cause build failures
+         blacklist_strs = [
+-            'ANDROID', 'Surface', 'Win32', 'D3D12', 'GGP', 'FUCHSIA',
++            'ANDROID', 'Surface', 'Win32', 'D3D12', 'GGP', 'FUCHSIA', 'Metal',
+         ]
+ 
+         if any([ str in e.attrib['name'] for str in blacklist_strs ]):
+-- 
+2.36.1
+

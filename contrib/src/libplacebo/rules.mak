@@ -1,8 +1,11 @@
 # libplacebo
 
-PLACEBO_VERSION := 1.18.0
+PLACEBO_VERSION := 4.192.1
 PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
 PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
+
+PLACEBOCONF := -Dglslang=enabled \
+	-Dshaderc=disabled
 
 DEPS_libplacebo = glslang
 
@@ -23,11 +26,9 @@ ifndef HAVE_DARWIN_OS
 # cross-compilation setup. Test the raspbian build for instance of this issue.
 ifndef HAVE_LINUX
 DEPS_libplacebo += vulkan-loader $(DEPS_vulkan-loader) vulkan-headers $(DEPS_vulkan-headers)
+PLACEBOCONF += -Dvulkan-registry=${PREFIX}/share/vulkan/registry/vk.xml
 endif
 endif
-
-PLACEBOCONF := -Dglslang=enabled \
-	-Dshaderc=disabled
 
 $(TARBALLS)/$(PLACEBO_ARCHIVE):
 	$(call download_pkg,$(PLACEBO_URL),libplacebo)
@@ -36,7 +37,7 @@ $(TARBALLS)/$(PLACEBO_ARCHIVE):
 
 libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
-	$(APPLY) $(SRC)/libplacebo/0001-meson-fix-glslang-search-path.patch
+	$(APPLY) $(SRC)/libplacebo/0001-vulkan-blacklist-metal-structs-from-utils_gen.py.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson
