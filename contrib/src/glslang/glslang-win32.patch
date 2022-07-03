@@ -1,11 +1,13 @@
---- glslang/CMakeLists.txt.win32	2019-01-28 14:20:18.208266400 +0100
-+++ glslang/CMakeLists.txt	2019-01-28 14:19:39.874088600 +0100
-@@ -52,7 +52,7 @@ if(ENABLE_HLSL)
- endif(ENABLE_HLSL)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6a43f6ff..55914a73 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -144,7 +144,7 @@ if(ENABLE_GLSLANG_WEBMIN)
+ endif()
  
  if(WIN32)
 -    set(CMAKE_DEBUG_POSTFIX "d")
 +    #set(CMAKE_DEBUG_POSTFIX "d")
-     if(MSVC)
+     option(OVERRIDE_MSVCCRT "Overrides runtime of MSVC " ON)
+     if(MSVC AND OVERRIDE_MSVCCRT)
          include(ChooseMSVCCRT.cmake)
-     endif(MSVC)

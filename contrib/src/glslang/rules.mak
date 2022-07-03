@@ -1,5 +1,5 @@
 # GLSLANG
-GLSLANG_HASH := ef1f899b5d64a9628023f1bb129198674cba2b97
+GLSLANG_HASH := adbf0d3106b26daa237b10b9bf72b1af7c31092d
 GLSLANG_BRANCH := master
 GLSLANG_GITURL := https://github.com/KhronosGroup/glslang.git
 GLSLANG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(GLSLANG_HASH))))
@@ -19,7 +19,6 @@ $(TARBALLS)/glslang-$(GLSLANG_BASENAME).tar.xz:
 glslang: glslang-$(GLSLANG_BASENAME).tar.xz .sum-glslang
 	$(UNPACK)
 	$(APPLY) $(SRC)/glslang/glslang-win32.patch
-	$(APPLY) $(SRC)/glslang/remove-broken-code.patch
 	$(MOVE)
 
 .glslang: glslang toolchain.cmake
