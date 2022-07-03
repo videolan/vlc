@@ -3086,6 +3086,7 @@ AC_ARG_ENABLE([libplacebo],
   AS_HELP_STRING([--disable-libplacebo],
       [disable libplacebo support (default auto)]))
 
+have_libplacebo_glscale="no"
 AS_IF([test "$enable_libplacebo" != "no"], [
   PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 2.72], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
@@ -3093,6 +3094,10 @@ AS_IF([test "$enable_libplacebo" != "no"], [
     AC_CHECK_HEADER([libplacebo/opengl.h], [
         VLC_ADD_PLUGIN([placebo_gl])
         VLC_ADD_PLUGIN([placebo_gles2])
+        dnl Minimum version that the OpenGL filter pl_scale is compatible with
+        PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 4.167],
+            [have_libplacebo_glscale="yes"],
+            [have_libplacebo_glscale="no"])
     ])
   ], [
     AS_IF([test -n "${enable_libplacebo}"], [
@@ -3102,11 +3107,7 @@ AS_IF([test "$enable_libplacebo" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_LIBPLACEBO], [test "$enable_libplacebo" != "no"])
-
-dnl
-dnl  OpenGL filter pl_scale
-dnl
-PKG_HAVE_WITH_MODULES([LIBPLACEBO_SCALE], [libplacebo >= 4.167])
+AM_CONDITIONAL([HAVE_LIBPLACEBO_SCALE], [test "$have_libplacebo_glscale" = "yes"])
 
 dnl
 dnl  OpenGL
