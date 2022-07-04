@@ -42,6 +42,31 @@ MLVideoModel::MLVideoModel(QObject* parent)
 {
 }
 
+// Interface
+
+/* Q_INVOKABLE */ void MLVideoModel::setItemPlayed(const QModelIndex & index, bool played)
+{
+    MLVideo * video = static_cast<MLVideo *>(item(index.row()));
+
+    if (video == nullptr)
+        return;
+
+    assert(m_mediaLib);
+
+    const MLItemId & itemId = video->getId();
+
+    // ML thread
+    m_mediaLib->runOnMLThread(this, [itemId, played] (vlc_medialibrary_t * ml)
+    {
+        vlc_ml_media_set_played(ml, itemId.id, played);
+    });
+
+    // NOTE: We want the change to be visible right away.
+    video->setIsNew(played == false);
+
+    emit dataChanged(index, index, { VIDEO_IS_NEW });
+}
+
 QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
 {
     const auto video = static_cast<MLVideo *>(item);

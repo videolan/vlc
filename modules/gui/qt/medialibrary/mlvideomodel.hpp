@@ -62,6 +62,10 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+public: // Interface
+    // NOTE: This function is useful when we want to apply the change before the database event.
+    Q_INVOKABLE void setItemPlayed(const QModelIndex & index, bool played);
+
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
 
