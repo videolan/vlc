@@ -1,0 +1,53 @@
+From cce28e17f931c948c37467d9189ed96364691a83 Mon Sep 17 00:00:00 2001
+From: Niklas Haas <git@haasn.dev>
+Date: Mon, 4 Jul 2022 16:46:08 +0200
+Subject: [PATCH] pl_thread: use gettimeofday() for back-compat
+
+Some older platforms (particularly macOS) do not support
+clock_gettime(). Fortunately, this is identical to gettimeofday in the
+case of CLOCK_REALTIME.
+
+These systems also do not have pthread_condattr_setclock, so we can
+re-use this check.
+
+Also add proper error handling to this function.
+---
+ src/pl_thread_pthread.h | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/pl_thread_pthread.h b/src/pl_thread_pthread.h
+index e48f50fd..075a8305 100644
+--- a/src/pl_thread_pthread.h
++++ b/src/pl_thread_pthread.h
+@@ -17,7 +17,9 @@
+ 
+ #pragma once
+ 
++#include <errno.h>
+ #include <pthread.h>
++#include <sys/time.h>
+ #include <time.h>
+ 
+ typedef pthread_mutex_t pl_mutex;
+@@ -92,10 +94,16 @@ static inline int pl_cond_timedwait(pl_cond *cond, pl_mutex *mutex, uint64_t tim
+ 
+     struct timespec ts;
+ #ifdef PTHREAD_HAS_SETCLOCK
+-    clock_gettime(CLOCK_MONOTONIC, &ts);
++    if (clock_gettime(CLOCK_MONOTONIC, &ts) < 0)
++        return errno;
+ #else
+-    clock_gettime(CLOCK_REALTIME, &ts);
++    struct timeval tv;
++    if (gettimeofday(&tv, NULL) < 0) // equivalent to CLOCK_REALTIME
++        return errno;
++    ts.tv_sec = tv.tv_sec;
++    ts.tv_nsec = tv.tv_usec * 1000;
+ #endif
++
+     ts.tv_sec  += timeout / 1000000000LLU;
+     ts.tv_nsec += timeout % 1000000000LLU;
+ 
+-- 
+2.36.1
+
