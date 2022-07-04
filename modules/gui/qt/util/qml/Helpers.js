@@ -80,3 +80,11 @@ function isInteger(data) {
 function compareFloat(a, b) {
     return (Math.abs(a - b) < Number.EPSILON)
 }
+
+function alignUp(a, b) {
+    return Math.ceil(a / b) * b
+}
+
+function alignDown(a, b) {
+    return Math.floor(a / b) * b
+}
