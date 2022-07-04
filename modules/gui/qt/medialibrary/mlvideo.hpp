@@ -92,6 +92,7 @@ public:
     MLVideo(const vlc_ml_media_t *data);
 
     bool isNew() const;
+    void setIsNew(bool isNew);
     QString getFileName() const;
     QString getTitle() const;
     QString getThumbnail(vlc_ml_thumbnail_status_t* status);
@@ -108,6 +109,7 @@ public:
     QList<VideoDescription> getVideoDesc() const;
 
 private:
+    bool m_isNew;
     QString m_fileName;
     QString m_title;
     QString m_thumbnail;

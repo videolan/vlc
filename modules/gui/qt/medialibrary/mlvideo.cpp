@@ -83,6 +83,8 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
 {
     assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO || data->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN );
 
+    m_isNew = (m_playCount == 0 && m_progress <= 0);
+
     for( const vlc_ml_file_t& file: ml_range_iterate<vlc_ml_file_t>( data->p_files ) )
         if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
         {
@@ -135,7 +137,12 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
 
 bool MLVideo::isNew() const
 {
-    return (m_playCount == 0 && m_progress <= 0);
+    return m_isNew;
+}
+
+void MLVideo::setIsNew(bool isNew)
+{
+    m_isNew = isNew;
 }
 
 QString MLVideo::getFileName() const
