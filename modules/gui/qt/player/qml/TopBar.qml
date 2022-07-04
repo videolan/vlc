@@ -42,6 +42,8 @@ FocusScope{
 
     property int reservedHeight: 0
 
+    property int _sideMargin: VLCStyle.margin_small
+
     signal togglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock)
     signal backRequested()
@@ -58,14 +60,12 @@ FocusScope{
 
         if (c1) {
             c1.height = lineHeight
-            c1.anchors.leftMargin = 0
             c1.anchors.topMargin = offset
         }
 
         if (c2) {
             c2.height = lineHeight
             c2.anchors.topMargin = offset
-            c2.anchors.rightMargin = 0
         }
         return lineHeight
     }
@@ -86,16 +86,14 @@ FocusScope{
 
             playlistGroup.height = lineHeight
             playlistGroup.anchors.topMargin = 0
-            playlistGroup.anchors.right = csdDecorations.left
-            playlistGroup.anchors.rightMargin = VLCStyle.margin_xsmall
+            playlistGroup.extraRightMargin = Qt.binding(function() { return root.width - csdDecorations.x })
 
 
             root.implicitHeight = lineHeight
             offset += lineHeight
 
         } else {
-            playlistGroup.anchors.right = root.right
-            playlistGroup.anchors.rightMargin = VLCStyle.margin_xsmall
+            playlistGroup.extraRightMargin = 0
 
             var left = undefined
             var right = undefined
@@ -163,7 +161,7 @@ FocusScope{
 
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.leftMargin:  VLCStyle.margin_small
+        anchors.leftMargin: root._sideMargin
 
         width: implicitWidth
 
@@ -183,7 +181,7 @@ FocusScope{
 
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.leftMargin:  VLCStyle.margin_small
+        anchors.leftMargin:  root._sideMargin
 
         Widgets.IconControlButton {
             id: backBtn
@@ -261,6 +259,7 @@ FocusScope{
 
         anchors.left: parent.left
         anchors.top: logoGroup.bottom
+        anchors.leftMargin: root._sideMargin
 
         width: root.textWidth - VLCStyle.margin_normal
 
@@ -304,12 +303,14 @@ FocusScope{
     Row {
         id: playlistGroup
 
+        property int extraRightMargin: 0
+
         focus: true
         spacing: VLCStyle.margin_xxsmall
-        topPadding: VLCStyle.margin_xxsmall
-        rightPadding: VLCStyle.margin_xxsmall
 
         anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.rightMargin: root._sideMargin + extraRightMargin
 
         Widgets.IconControlButton {
             id: menuSelector
