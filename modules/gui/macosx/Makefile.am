@@ -64,6 +64,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryCollectionViewAlbumItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewArtistItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewArtistItem.m \
+	gui/macosx/library/VLCLibraryCollectionViewGenreItem.h \
+	gui/macosx/library/VLCLibraryCollectionViewGenreItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewItemProtocol.h \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m \
@@ -302,6 +304,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewAlbumItem.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewArtistItem.xib \
+	gui/macosx/UI/VLCLibraryCollectionViewGenreItem.xib \
 	gui/macosx/UI/VLCMediaSourceCollectionViewItem.xib \
 	gui/macosx/UI/VLCMediaSourceDeviceCollectionViewItem.xib \
 	gui/macosx/UI/VLCInformationWindow.xib \

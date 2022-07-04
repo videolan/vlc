@@ -32,6 +32,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewAlbumItem.h"
 #import "library/VLCLibraryCollectionViewArtistItem.h"
+#import "library/VLCLibraryCollectionViewGenreItem.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -71,6 +72,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
     [_collectionView registerClass:[VLCLibraryCollectionViewAlbumItem class] forItemWithIdentifier:VLCLibraryAlbumCellIdentifier];
     [_collectionView registerClass:[VLCLibraryCollectionViewArtistItem class] forItemWithIdentifier:VLCLibraryArtistCellIdentifier];
+    [_collectionView registerClass:[VLCLibraryCollectionViewGenreItem class] forItemWithIdentifier:VLCLibraryGenreCellIdentifier];
     
     NSCollectionViewFlowLayout *flowLayout = _collectionView.collectionViewLayout;
     flowLayout.itemSize = CGSizeMake(214., 260.);
@@ -411,22 +413,17 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         }
         case VLC_ML_PARENT_UNKNOWN:
         {
+            // This is the only one that uses the default VLCLibraryCollectionViewItem
             VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[indexPath.item];
             viewItem.representedMediaItem = mediaItem;
             break;
         }
         case VLC_ML_PARENT_GENRE:
         {
-            // TODO: Have genre-specific view item
+            VLCLibraryCollectionViewGenreItem *viewGenreItem = [collectionView makeItemWithIdentifier:VLCLibraryGenreCellIdentifier forIndexPath:indexPath];
             VLCMediaLibraryGenre *genre = _displayedCollection[indexPath.item];
-            viewItem.mediaTitleTextField.stringValue = genre.name;
-            if (genre.numberOfTracks > 1) {
-                viewItem.durationTextField.stringValue = [NSString stringWithFormat:_NS("%u songs"), genre.numberOfTracks];
-            } else {
-                viewItem.durationTextField.stringValue = _NS("1 song");
-            }
-            viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
-            break;
+            viewGenreItem.representedGenre = genre;
+            return viewGenreItem;
         }
         default:
             break;

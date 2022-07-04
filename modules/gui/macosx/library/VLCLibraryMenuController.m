@@ -38,6 +38,7 @@
     VLCMediaLibraryMediaItem *_representedMediaItem;
     VLCMediaLibraryAlbum *_representedAlbum;
     VLCMediaLibraryArtist *_representedArtist;
+    VLCMediaLibraryGenre *_representedGenre;
 }
 @end
 
@@ -92,6 +93,10 @@
     };
 
     switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_GENRE:
+        {
+            [_representedGenre iterateMediaItemsWithBlock:mediaItemPlaylistHandler];
+        }
         case VLC_ML_PARENT_ARTIST:
         {
             [_representedArtist iterateMediaItemsWithBlock:mediaItemPlaylistHandler];
@@ -173,6 +178,10 @@
     };
 
     switch(_currentRepresentedType) {
+        case VLC_ML_PARENT_GENRE:
+        {
+            [_representedGenre iterateMediaItemsWithBlock:mediaItemTrashHandler];
+        }
         case VLC_ML_PARENT_ARTIST:
         {
             [_representedArtist iterateMediaItemsWithBlock:mediaItemTrashHandler];
@@ -212,6 +221,7 @@
     _representedMediaItem = nil;
     _representedAlbum = nil;
     _representedArtist = nil;
+    _representedGenre = nil;
     _currentRepresentedType = VLC_ML_PARENT_UNKNOWN;
 }
 
@@ -234,6 +244,13 @@
     [self clearRepresentedMedia];
     _representedArtist = artist;
     _currentRepresentedType = VLC_ML_PARENT_ARTIST;
+}
+
+- (void)setRepresentedGenre:(VLCMediaLibraryGenre *)genre
+{
+    [self clearRepresentedMedia];
+    _representedGenre = genre;
+    _currentRepresentedType = VLC_ML_PARENT_GENRE;
 }
 
 @end

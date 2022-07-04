@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryMenuController.h: MacOS X interface module
+ * VLCLibraryCollectionViewGenreItem.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +21,19 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "VLCLibraryCollectionViewItemProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
-@class VLCMediaLibraryAlbum;
-@class VLCMediaLibraryArtist;
 @class VLCMediaLibraryGenre;
 
-@interface VLCLibraryMenuController : NSObject
+extern NSString *VLCLibraryGenreCellIdentifier;
 
-- (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;
-- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)album;
-- (void)setRepresentedArtist:(VLCMediaLibraryArtist *)artist;
-- (void)setRepresentedGenre:(VLCMediaLibraryGenre *)genre;
+@interface VLCLibraryCollectionViewGenreItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
+
+@property (readwrite, retain, nonatomic) VLCMediaLibraryGenre *representedGenre;
 
 @end
 
 NS_ASSUME_NONNULL_END
+

@@ -137,6 +137,12 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) int64_t genreID;
 @property (readonly) NSString *name;
 @property (readonly) size_t numberOfTracks;
+@property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
+@property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
+@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
+
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock orderedBy:(int)mediaItemParentType;
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
 @end
 
