@@ -482,8 +482,6 @@ static int vlc_poll_sock(int sock, unsigned int mask)
 }
 #endif /* _WIN32 */
 
-#ifndef _WIN32
-
 /* There are currently no ways to atomically force a non-blocking read or write
  * operations. Even for sockets, the MSG_DONTWAIT flag is non-standard.
  *
@@ -516,7 +514,6 @@ ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
         return -1;
     return writev(fd, iov, count);
 }
-#endif
 
 /**
  * Wrapper for read() that returns the EINTR error upon VLC I/O interruption.
@@ -599,20 +596,6 @@ int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
 }
 
 #else /* _WIN32 */
-
-ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
-{
-    if (vlc_poll_file(fd, POLLOUT) < 0)
-        return -1;
-    return readv(fd, iov, count);
-}
-
-ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
-{
-    if (vlc_poll_file(fd, POLLOUT) < 0)
-        return -1;
-    return writev(fd, iov, count);
-}
 
 ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
 {
