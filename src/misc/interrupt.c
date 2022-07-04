@@ -602,11 +602,15 @@ int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
 
 ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
 {
+    if (vlc_poll_file(fd, POLLOUT) < 0)
+        return -1;
     return readv(fd, iov, count);
 }
 
 ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
 {
+    if (vlc_poll_file(fd, POLLOUT) < 0)
+        return -1;
     return writev(fd, iov, count);
 }
 
