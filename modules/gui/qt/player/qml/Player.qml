@@ -290,27 +290,13 @@ FocusScope {
         Component {
             id: forMusicMedia
 
-            Item {
+            Rectangle {
                 width: controlBarView.width
                 height: controlBarView.height - (rootPlayer.positionSliderY - controlBarView.y)
-
-                Rectangle {
-                    id: controlBarBackground
-
-                    anchors.fill: parent
-                    visible: false
-                    color: rootPlayer.colors.isThemeDark
-                           ? Qt.darker(rootPlayer.colors.playerBg, 1.2)
-                           : Qt.lighter(rootPlayer.colors.playerBg, 1.2)
-                }
-
-                GaussianBlur {
-                    anchors.fill: parent
-                    source: controlBarBackground
-                    radius: 22
-                    samples: 46
-                    opacity: .7
-                }
+                color: rootPlayer.colors.isThemeDark
+                       ? Qt.darker(rootPlayer.colors.playerBg, 1.2)
+                       : Qt.lighter(rootPlayer.colors.playerBg, 1.2)
+                opacity: 0.7
             }
         }
     }
