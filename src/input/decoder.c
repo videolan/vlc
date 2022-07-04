@@ -585,7 +585,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
                vout_state == INPUT_RESOURCE_VOUT_STOPPED);
 
         if (vout_state == INPUT_RESOURCE_VOUT_STOPPED)
-            decoder_Notify(p_owner, on_vout_stopped, p_owner->p_vout);
+            decoder_Notify(p_owner, on_vout_stopped, cfg.vout);
     }
 
 error:
