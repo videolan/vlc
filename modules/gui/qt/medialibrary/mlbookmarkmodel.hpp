@@ -79,9 +79,6 @@ private:
     BookmarkListPtr m_bookmarks;
     uint64_t m_currentMediaId = 0;
 
-    //avoid starting two beginReset simultaneously
-    unsigned m_countPendingReset = 0;
-
     mutable vlc::threads::mutex m_mutex;
     uint64_t m_revision = 0;
     // current item & media id can be accessed by any thread and therefore
