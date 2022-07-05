@@ -48,7 +48,7 @@ Item {
         mipmap: false
     }
 
-    GaussianBlur {
+    FastBlur {
         id: blur
 
         source: blurSource
@@ -56,7 +56,6 @@ Item {
         width: 512
         height: 512
 
-        samples: 102
         radius: 50
         visible: false
     }
