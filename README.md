@@ -104,6 +104,7 @@ Some useful links that might help you:
 - [VLC hacking guide](https://wiki.videolan.org/Hacker_Guide)
 - [Bugtracker](https://code.videolan.org/videolan/vlc/-/issues)
 - [VideoLAN web site](https://www.videolan.org/)
+- [Google](https://www.google.com)
 
 ## Source Code sitemap
 ```
