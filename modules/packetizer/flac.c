@@ -429,7 +429,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
     }
 
     case STATE_GET_DATA:
-        if( p_sys->b_stream_info &&
+        if( pp_block != NULL &&
+            p_sys->b_stream_info &&
             p_sys->stream_info.min_framesize > p_sys->i_offset )
         {
             p_sys->i_offset += 1;
