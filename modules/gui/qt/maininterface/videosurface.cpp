@@ -125,7 +125,7 @@ void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
 
 
 VideoSurface::VideoSurface(QQuickItem* parent)
-    : QQuickItem(parent)
+    : ViewBlockingRectangle(parent)
 {
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -249,16 +249,9 @@ void VideoSurface::setCursorShape(Qt::CursorShape shape)
     setCursor(shape);
 }
 
-QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData*)
+QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* data)
 {
-    QSGRectangleNode* node = static_cast<QSGRectangleNode*>(oldNode);
-
-    if (!node)
-    {
-        node = this->window()->createRectangleNode();
-        node->setColor(Qt::transparent);
-    }
-    node->setRect(this->boundingRect());
+    const auto node = ViewBlockingRectangle::updatePaintNode(oldNode, data);
 
     if (m_provider == nullptr)
     {

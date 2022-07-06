@@ -18,7 +18,7 @@
 #ifndef VIDEOSURFACE_HPP
 #define VIDEOSURFACE_HPP
 
-#include <QtQuick/QQuickItem>
+#include "widgets/native/viewblockingrectangle.hpp"
 #include <QMutex>
 #include "qt.hpp"
 #include "vlc_window.h"
@@ -62,7 +62,7 @@ protected:
 };
 
 
-class VideoSurface : public QQuickItem
+class VideoSurface : public ViewBlockingRectangle
 {
     Q_OBJECT
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
