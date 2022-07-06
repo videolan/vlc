@@ -1514,8 +1514,10 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
         for( int i=0; i<MAX_CC_DECODERS; i++ )
         {
             vlc_input_decoder_t *p_ccowner = p_owner->cc.pp_decoder[i];
-            if( p_ccowner && p_ccowner->dec.pf_flush )
-                p_ccowner->dec.pf_flush( &p_ccowner->dec );
+            if(p_ccowner == NULL)
+                continue;
+
+            vlc_input_decoder_Flush(p_ccowner);
         }
     }
 
