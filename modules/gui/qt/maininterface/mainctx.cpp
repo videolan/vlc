@@ -208,7 +208,7 @@ MainCtx::~MainCtx()
     settings->setValue( "grid-view", m_gridView );
     settings->setValue( "grouping", m_grouping );
 
-    settings->setValue( "color-scheme", m_colorScheme->currentScheme() );
+    settings->setValue( "color-scheme-index", m_colorScheme->currentIndex() );
     /* Save the stackCentralW sizes */
     settings->endGroup();
 
@@ -330,9 +330,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
 
     loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
 
-    const auto colorScheme = static_cast<ColorSchemeModel::ColorScheme>(getSettings()->value( "MainWindow/color-scheme", ColorSchemeModel::System ).toInt());
-    if (m_colorScheme->currentScheme() != colorScheme)
-        m_colorScheme->setCurrentScheme(colorScheme);
+    const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", 0 ).toInt();
+    m_colorScheme->setCurrentIndex(colorSchemeIndex);
 
     /* user interface scale factor */
     auto userIntfScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");

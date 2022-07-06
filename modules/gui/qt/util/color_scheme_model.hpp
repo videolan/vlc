@@ -27,7 +27,7 @@ class ColorSchemeModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString current READ currentText NOTIFY currentChanged FINAL)
-    Q_PROPERTY(ColorScheme scheme READ currentScheme WRITE setCurrentScheme NOTIFY currentChanged FINAL)
+    Q_PROPERTY(ColorScheme scheme READ currentScheme NOTIFY currentChanged FINAL)
 
 public:
     enum ColorScheme
@@ -60,7 +60,6 @@ public:
     QString currentText() const;
     QVector<Item> getSchemes() const;
 
-    void setCurrentScheme(ColorScheme scheme);
     ColorScheme currentScheme() const;
 
 signals:

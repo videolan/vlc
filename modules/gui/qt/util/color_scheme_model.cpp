@@ -219,18 +219,6 @@ QVector<ColorSchemeModel::Item> ColorSchemeModel::getSchemes() const
     return vec;
 }
 
-void ColorSchemeModel::setCurrentScheme(const ColorScheme scheme)
-{
-    for (int i = 0; i < m_list->size(); ++i)
-    {
-        if (m_list->scheme(i) == scheme)
-        {
-            setCurrentIndex(i);
-            break;
-        }
-    }
-}
-
 ColorSchemeModel::ColorScheme ColorSchemeModel::currentScheme() const
 {
     return m_list->scheme(m_currentIndex);
