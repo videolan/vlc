@@ -32,7 +32,6 @@ VideoAll {
     // Properties
 
     // NOTE: We need 'var' for properties altered by StackView.replace().
-    property int    initialIndex: 0
     property var    initialId
     property string initialTitle
 
