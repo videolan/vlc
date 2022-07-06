@@ -56,6 +56,7 @@
 
 #include "widgets/native/roundimage.hpp"
 #include "widgets/native/navigation_attached.hpp"
+#include "widgets/native/viewblockingrectangle.hpp"
 
 #include "videosurface.hpp"
 
@@ -293,6 +294,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
+        qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
 
         qmlProtectModule(uri, versionMajor);
     }
