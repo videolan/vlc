@@ -24,8 +24,8 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 
-// This Component uses layering, avoid adding children to this widget
-Item {
+
+ViewBlockingRectangle {
     id: root
 
     readonly property bool usingAcrylic: visible && enabled && AcrylicController.enabled
@@ -36,14 +36,5 @@ Item {
 
     property real _blend: usingAcrylic ? AcrylicController.uiTransluency : 0
 
-    layer.enabled: true
-    layer.effect: ShaderEffect {
-        property color overlay: VLCStyle.colors.blendColors(root.tintColor, root.alternativeColor, root._blend)
-
-        blending: false
-        fragmentShader: "
-            uniform lowp vec4 overlay;
-            void main() { gl_FragColor = overlay; }
-        "
-    }
+    color: VLCStyle.colors.blendColors(root.tintColor, root.alternativeColor, root._blend)
 }
