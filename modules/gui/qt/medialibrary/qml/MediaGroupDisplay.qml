@@ -31,17 +31,13 @@ VideoAll {
 
     // Properties
 
-    // NOTE: We need 'var' for properties altered by StackView.replace().
-    property var    initialId
-    property string initialTitle
-
     // Aliases
 
     // NOTE: This is used to determine which media(s) shall be displayed.
     property alias parentId: modelVideo.parentId
 
     // NOTE: The title of the group.
-    property string title: initialTitle
+    property string title: ""
 
     // Children
 

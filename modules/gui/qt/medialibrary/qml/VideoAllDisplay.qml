@@ -67,8 +67,8 @@ Widgets.PageLoader {
     function _updateHistoryGroup(group) {
         History.update(["mc", "video", "all", "group", {
                             "initialIndex": group.currentIndex,
-                            "initialId"   : group.parentId,
-                            "initialTitle": group.title
+                            "parentId" : group.parentId,
+                            "title" : group.title
                         }])
     }
 
