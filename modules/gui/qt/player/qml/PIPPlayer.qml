@@ -58,13 +58,6 @@ Item {
         visible: root.visible
 
         ctx: MainCtx
-
-        //punch a transparent hole in the interface
-        layer.enabled: true
-        layer.effect: ShaderEffect {
-            blending: false
-            fragmentShader: "void main() { gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); }"
-        }
     }
 
     MouseArea {
