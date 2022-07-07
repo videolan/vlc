@@ -335,6 +335,8 @@ FocusScope {
             horizontalSpacing: root.horizontalSpacing
             leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
 
+            dragItem: root.dragItem
+
             onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
             onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
             onItemDoubleClicked: root.itemDoubleClicked(index, model)

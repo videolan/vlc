@@ -40,6 +40,8 @@ T.Control {
 
     property int horizontalSpacing: 0
 
+    property var dragItem
+
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
@@ -123,7 +125,7 @@ T.Control {
 
             acceptedButtons: Qt.RightButton | Qt.LeftButton
 
-            drag.target: root.dragItem
+            drag.target: delegate.dragItem
 
             drag.axis: Drag.XAndYAxis
 
@@ -162,11 +164,11 @@ T.Control {
                     selectionDelegateModel.updateSelection(_modifiersOnLastPress
                                                            , view.currentIndex
                                                            , index)
-                } else if (root.dragItem) {
-                    root.dragItem.Drag.drop()
+                } else if (delegate.dragItem) {
+                    delegate.dragItem.Drag.drop()
                 }
 
-                root.dragItem.Drag.active = drag.active
+                delegate.dragItem.Drag.active = drag.active
             }
         }
     }
