@@ -51,6 +51,13 @@ MainInterface.MainTableView {
     rowHeight: VLCStyle.tableCoverRow_height
 
     delegate: PlaylistMediaDelegate {
+
+        width: view.width
+        height: root.rowHeight
+
+        horizontalSpacing: root.horizontalSpacing
+        leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
+
         onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
         onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
         onItemDoubleClicked: root.itemDoubleClicked(index, model)

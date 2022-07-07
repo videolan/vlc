@@ -38,18 +38,13 @@ T.Control {
 
     readonly property bool dragActive: hoverArea.drag.active
 
+    property int horizontalSpacing: 0
 
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
     // Settings
-
-    width: Math.max(view.width, content.implicitWidth) + root.sectionWidth
-
-    height: root.rowHeight
-
-    leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
 
     hoverEnabled: true
     
@@ -161,7 +156,7 @@ T.Control {
         leftPadding: VLCStyle.margin_xxxsmall
         rightPadding: VLCStyle.margin_xxxsmall
 
-        spacing: root.horizontalSpacing
+        spacing: delegate.horizontalSpacing
 
         Repeater {
             model: sortModel
@@ -189,7 +184,7 @@ T.Control {
         }
 
         Item {
-            width: root._contextButtonHorizontalSpace
+            width: VLCStyle.icon_normal
 
             height: parent.height
 
@@ -200,7 +195,7 @@ T.Control {
 
                 iconText: VLCIcons.ellipsis
 
-                size: root._contextButtonHorizontalSpace
+                size: VLCStyle.icon_normal
 
                 visible: delegate.hovered
 

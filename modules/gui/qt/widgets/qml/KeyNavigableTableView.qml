@@ -331,7 +331,7 @@ FocusScope {
                     Item {
                         // placeholder for context button
 
-                        width: root._contextButtonHorizontalSpace
+                        width: VLCStyle.icon_normal
 
                         height: 1
                     }
@@ -349,6 +349,13 @@ FocusScope {
         }
 
         delegate: TableViewDelegate {
+
+            width: view.width
+            height: root.rowHeight
+
+            horizontalSpacing: root.horizontalSpacing
+            leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
+
             onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
             onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
             onItemDoubleClicked: root.itemDoubleClicked(index, model)
