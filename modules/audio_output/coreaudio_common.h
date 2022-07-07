@@ -65,7 +65,6 @@ struct aout_sys_common
     uint64_t            i_first_render_host_time;
     vlc_tick_t          i_last_latency_ticks;
     uint64_t            i_total_frames;
-    uint32_t            i_render_frames;
 
     vlc_sem_t           flush_sem;
 
@@ -89,7 +88,7 @@ struct aout_sys_common
 
 int ca_Open(audio_output_t *p_aout);
 
-void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint64_t i_host_time,
+void ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
                uint8_t *p_output, size_t i_requested, bool *is_silence);
 
 int  ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay);
