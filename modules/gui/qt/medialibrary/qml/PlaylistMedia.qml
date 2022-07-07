@@ -59,6 +59,9 @@ MainInterface.MainTableView {
         horizontalSpacing: root.horizontalSpacing
         leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
 
+        rowModel: model
+        sortModel: root.sortModel
+
         dragItem: root.dragItem
 
         selected: selectionDelegateModel.isSelected(root.model.index(index, 0))

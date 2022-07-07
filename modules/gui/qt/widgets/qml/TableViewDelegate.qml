@@ -28,7 +28,8 @@ T.Control {
 
     // Properties
 
-    property var rowModel: model
+    property var rowModel
+    property var sortModel
 
     property bool selected: false
 
@@ -51,7 +52,7 @@ T.Control {
     property Component defaultDelegate: Widgets.ScrollingText {
         id: defaultDelId
         property var rowModel: parent.rowModel
-        property var model: parent.colModel
+        property var colModel: parent.colModel
         property color foregroundColor: parent.foregroundColor
 
         label: text
@@ -104,7 +105,7 @@ T.Control {
 
             hoverEnabled: false
 
-            Keys.onMenuPressed: delegate.contextMenuButtonClicked(contextButton,rowModel)
+            Keys.onMenuPressed: delegate.contextMenuButtonClicked(contextButton, delegate.rowModel)
 
             acceptedButtons: Qt.RightButton | Qt.LeftButton
 
@@ -122,7 +123,7 @@ T.Control {
                 }
 
                 if (mouse.button === Qt.RightButton)
-                    delegate.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
+                    delegate.rightClick(delegate, delegate.rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
             }
 
             onPositionChanged: {
@@ -137,7 +138,7 @@ T.Control {
 
             onDoubleClicked: {
                 if (mouse.button === Qt.LeftButton)
-                    delegate.itemDoubleClicked(delegate._index, rowModel)
+                    delegate.itemDoubleClicked(delegate._index, delegate.rowModel)
             }
 
             drag.onActiveChanged: {
@@ -163,7 +164,7 @@ T.Control {
         spacing: delegate.horizontalSpacing
 
         Repeater {
-            model: sortModel
+            model: delegate.sortModel
 
             Loader{
                 property var rowModel: delegate.rowModel

@@ -338,6 +338,9 @@ FocusScope {
 
             dragItem: root.dragItem
 
+            rowModel: model
+            sortModel: root.sortModel
+
             selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
 
             onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
