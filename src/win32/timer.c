@@ -29,17 +29,19 @@
 
 struct vlc_timer
 {
-    HANDLE handle;
+    PTP_TIMER t;
     void (*func) (void *);
     void *data;
 };
 
-static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
+static VOID CALLBACK timer_callback(PTP_CALLBACK_INSTANCE instance,
+                                    PVOID context, PTP_TIMER t)
 {
-    struct vlc_timer *timer = val;
+    (void) instance;
+    (void) t; assert(t);
+    struct vlc_timer *timer = context;
 
-    assert (timeout);
-    timer->func (timer->data);
+    timer->func(timer->data);
 }
 
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
@@ -48,48 +50,79 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 
     if (timer == NULL)
         return ENOMEM;
+    timer->t = CreateThreadpoolTimer(timer_callback, timer, NULL);
+    if (timer->t == NULL)
+    {
+        free(timer);
+        return ENOMEM;
+    }
+    assert(func);
     timer->func = func;
     timer->data = data;
-    timer->handle = INVALID_HANDLE_VALUE;
     *id = timer;
     return 0;
 }
 
 void vlc_timer_destroy (vlc_timer_t timer)
 {
-    if (timer->handle != INVALID_HANDLE_VALUE)
-        DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
-    free (timer);
+    SetThreadpoolTimer(timer->t, NULL, 0, 0);
+    WaitForThreadpoolTimerCallbacks(timer->t, TRUE);
+    CloseThreadpoolTimer(timer->t);
+    free(timer);
 }
 
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          vlc_tick_t value, vlc_tick_t interval)
 {
-    if (timer->handle != INVALID_HANDLE_VALUE)
-    {
-        DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
-        timer->handle = INVALID_HANDLE_VALUE;
-    }
     if (value == VLC_TIMER_DISARM)
-        return; /* Disarm */
-
-    if (absolute)
     {
-        value -= vlc_tick_now ();
-        if (value < 0)
-            value = 0;
+        SetThreadpoolTimer(timer->t, NULL, 0, 0);
+        /* Cancel any pending callbacks */
+        WaitForThreadpoolTimerCallbacks(timer->t, TRUE);
+        return;
     }
 
-    DWORD val    = MS_FROM_VLC_TICK(value);
-    DWORD interv = MS_FROM_VLC_TICK(interval);
-    if (val == 0 && value != 0)
-        val = 1; /* rounding error */
-    if (interv == 0 && interval != 0)
-        interv = 1; /* rounding error */
+    /* Always use absolute FILETIME (positive) since "the time that the system
+     * spends in sleep or hibernation does count toward the expiration of the
+     * timer. */
 
-    if (!CreateTimerQueueTimer(&timer->handle, NULL, vlc_timer_do, timer,
-                               val, interv, WT_EXECUTEDEFAULT))
-        abort ();
+    /* Convert the tick value to a relative tick. */
+    if (absolute)
+        value -= vlc_tick_now();
+    if (value < 0)
+        value = 0;
+
+    /* Get the system FILETIME */
+    FILETIME time;
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && (!defined(VLC_WINSTORE_APP) || _WIN32_WINNT >= 0x0A00)
+    GetSystemTimePreciseAsFileTime(&time);
+#else
+    GetSystemTimeAsFileTime(&time);
+#endif
+
+    /* Convert it to ULARGE_INTEGER to allow calculation (addition here) */
+    ULARGE_INTEGER time_ul = {
+        .LowPart = time.dwLowDateTime,
+        .HighPart = time.dwHighDateTime,
+    };
+
+    /* Add the relative tick to the absolute time */
+    time_ul.QuadPart += MSFTIME_FROM_VLC_TICK(value);
+
+    /* Convert it back to a FILETIME*/
+    time.dwLowDateTime = time_ul.u.LowPart;
+    time.dwHighDateTime = time_ul.u.HighPart;
+
+    DWORD intervaldw;
+    if (interval == VLC_TIMER_FIRE_ONCE)
+        intervaldw = 0;
+    else
+    {
+        uint64_t intervalms = MS_FROM_VLC_TICK(interval);
+        intervaldw = unlikely(intervalms > UINT32_MAX) ? UINT32_MAX : intervalms;
+    }
+
+    SetThreadpoolTimer(timer->t, &time, intervaldw, 0);
 }
 
 unsigned vlc_timer_getoverrun (vlc_timer_t timer)
