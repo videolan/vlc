@@ -44,7 +44,7 @@ FocusScope {
     property string initialName
 
     // NOTE: Specify an optional header for the view.
-    property Component header: undefined
+    property Component header: null
 
     property Item headerItem: view.headerItem
 

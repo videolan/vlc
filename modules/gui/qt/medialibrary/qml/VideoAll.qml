@@ -39,9 +39,9 @@ FocusScope {
                                                                       : 0
 
     // NOTE: Specify an optional header for the view.
-    property Component header: undefined
+    property Component header: null
 
-    property Item headerItem: (_currentView) ? _currentView.headerItem : undefined
+    property Item headerItem: (_currentView) ? _currentView.headerItem : null
 
     readonly property int currentIndex: _currentView.currentIndex
 
