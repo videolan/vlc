@@ -959,7 +959,7 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
     uint64_t i_host_time = (inOutputTime->mFlags & kAudioTimeStampHostTimeValid)
                          ? inOutputTime->mHostTime : 0;
 
-    ca_Render(p_aout, 0, i_host_time, p_output, i_size, NULL);
+    ca_Render(p_aout, i_host_time, p_output, i_size, NULL);
 
     return noErr;
 }

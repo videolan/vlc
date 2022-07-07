@@ -139,7 +139,7 @@ ca_Open(audio_output_t *p_aout)
 
 /* Called from render callbacks. No lock, wait, and IO here */
 void
-ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
+ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
           uint8_t *p_output, size_t i_requested, bool *is_silence)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
@@ -196,9 +196,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
 
         /* Start the first rendering */
     }
-
     p_sys->i_render_host_time = i_host_time;
-    p_sys->i_render_frames = i_frames;
 
     size_t i_copied = 0;
     block_t *p_block = p_sys->p_out_chain;
@@ -278,7 +276,7 @@ ca_GetLatencyLocked(audio_output_t *p_aout)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
-    return FramesToTicks(p_sys, i_out_frames + p_sys->i_render_frames)
+    return FramesToTicks(p_sys, i_out_frames)
            + p_sys->i_dev_latency_ticks;
 }
 
@@ -301,7 +299,6 @@ ca_Flush(audio_output_t *p_aout)
     }
 
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
-    p_sys->i_render_frames = 0;
     p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
     p_sys->i_total_frames = 0;
     lock_unlock(p_sys);
@@ -434,7 +431,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->b_paused = false;
     p_sys->b_muted = false;
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
-    p_sys->i_render_frames = 0;
     p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
     p_sys->i_total_frames = 0;
 
@@ -549,12 +545,13 @@ RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(ioActionFlags);
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
+    VLC_UNUSED(inNumberFrames);
 
     uint64_t i_host_time = (inTimeStamp->mFlags & kAudioTimeStampHostTimeValid)
                          ? inTimeStamp->mHostTime : 0;
 
     bool is_silence;
-    ca_Render(p_data, inNumberFrames, i_host_time, ioData->mBuffers[0].mData,
+    ca_Render(p_data, i_host_time, ioData->mBuffers[0].mData,
               ioData->mBuffers[0].mDataByteSize, &is_silence);
     if (is_silence)
         *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
