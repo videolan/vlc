@@ -34,27 +34,6 @@ FocusScope {
 
     property var sortModel: []
 
-    property Component colDelegate: Widgets.ScrollingText {
-        id: textRect
-
-        property var rowModel: parent.rowModel
-        property var model: parent.colModel
-        property color foregroundColor: parent.foregroundColor
-
-        label: text
-        forceScroll: parent.currentlyFocused
-        width: parent.width
-        clip: scrolling
-
-        Widgets.ListLabel {
-            id: text
-
-            anchors.verticalCenter: parent.verticalCenter
-            text: !rowModel ? "" : (rowModel[model.criteria] || "")
-            color: textRect.foregroundColor
-        }
-    }
-
     property Component tableHeaderDelegate: Widgets.CaptionLabel {
         text: model.text || ""
     }

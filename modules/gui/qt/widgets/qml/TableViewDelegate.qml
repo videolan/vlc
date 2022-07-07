@@ -44,6 +44,27 @@ T.Control {
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
+    property Component defaultDelegate: Widgets.ScrollingText {
+        id: defaultDelId
+        property var rowModel: parent.rowModel
+        property var model: parent.colModel
+        property color foregroundColor: parent.foregroundColor
+
+        label: text
+        forceScroll: parent.currentlyFocused
+        width: parent.width
+        clip: scrolling
+
+        Widgets.ListLabel {
+            id: text
+
+            anchors.verticalCenter: parent.verticalCenter
+            text: defaultDelId.rowModel
+                    ? (defaultDelId.rowModel[defaultDelId.colModel.criteria] || "")
+                    : ""
+            color: defaultDelId.foregroundColor
+        }
+    }
     // Settings
 
     hoverEnabled: true
@@ -179,7 +200,7 @@ T.Control {
                 height: parent.height
 
                 sourceComponent: (colModel.colDelegate) ? colModel.colDelegate
-                                                        : root.colDelegate
+                                                        : delegate.defaultDelegate
             }
         }
 
