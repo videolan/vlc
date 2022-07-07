@@ -99,6 +99,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 + (nullable instancetype)artistWithID:(int64_t)artistID;
 - (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
 @property (readonly) int64_t artistID;
 @property (readonly) NSString *name;
@@ -114,6 +115,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @interface VLCMediaLibraryAlbum : NSObject
 
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album;
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
 @property (readonly) int64_t albumID;
 @property (readonly) NSString *title;

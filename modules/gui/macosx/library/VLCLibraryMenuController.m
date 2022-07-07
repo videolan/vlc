@@ -85,29 +85,26 @@
 }
 
 #pragma mark - actions
-
 - (void)addToPlaylist:(BOOL)playImmediately
 {
+    void (^mediaItemPlaylistHandler)(VLCMediaLibraryMediaItem*) = ^(VLCMediaLibraryMediaItem* mediaItem) {
+        [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+    };
+
     switch(_currentRepresentedType) {
         case VLC_ML_PARENT_ARTIST:
         {
-            for(VLCMediaLibraryAlbum* album in _representedArtist.albums) {
-                for(VLCMediaLibraryMediaItem* mediaItem in album.tracksAsMediaItems) {
-                    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:playImmediately];
-                }
-            }
+            [_representedArtist iterateMediaItemsWithBlock:mediaItemPlaylistHandler];
             break;
         }
         case VLC_ML_PARENT_ALBUM:
         {
-            for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
-                [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:playImmediately];
-            }
+            [_representedAlbum iterateMediaItemsWithBlock:mediaItemPlaylistHandler];
             break;
         }
         case VLC_ML_PARENT_UNKNOWN:
         {
-            [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:_representedMediaItem playImmediately:playImmediately];
+            mediaItemPlaylistHandler(_representedMediaItem);
             break;
         }
         default:
@@ -167,45 +164,33 @@
 
 - (void)moveToTrash:(id)sender
 {
-    NSArray *filesToTrash;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+
+    void (^mediaItemTrashHandler)(VLCMediaLibraryMediaItem*) = ^(VLCMediaLibraryMediaItem* mediaItem) {
+        for (VLCMediaLibraryFile *fileToTrash in mediaItem.files) {
+            [fileManager trashItemAtURL:fileToTrash.fileURL resultingItemURL:nil error:nil];
+        }
+    };
 
     switch(_currentRepresentedType) {
         case VLC_ML_PARENT_ARTIST:
         {
-            NSMutableArray *allMediaItemFiles = [[NSMutableArray alloc] init];
-            for(VLCMediaLibraryAlbum* album in _representedArtist.albums) {
-                for(VLCMediaLibraryMediaItem* mediaItem in album.tracksAsMediaItems) {
-                    [allMediaItemFiles addObjectsFromArray: mediaItem.files];
-                }
-            }
-
-            filesToTrash = [allMediaItemFiles copy];
+            [_representedArtist iterateMediaItemsWithBlock:mediaItemTrashHandler];
             break;
         }
         case VLC_ML_PARENT_ALBUM:
         {
-            NSMutableArray *allMediaItemFiles = [[NSMutableArray alloc] init];
-            for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
-                [allMediaItemFiles addObjectsFromArray: mediaItem.files];
-            }
-
-            filesToTrash = [allMediaItemFiles copy];
+            [_representedAlbum iterateMediaItemsWithBlock:mediaItemTrashHandler];
             break;
         }
         case VLC_ML_PARENT_UNKNOWN:
         {
-            filesToTrash = _representedMediaItem.files;
+            mediaItemTrashHandler(_representedMediaItem);
             break;
         }
         default:
             NSLog(@"No represented media type, not moving anything to trash.");
             return;
-    }
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    for (VLCMediaLibraryFile *fileToTrash in filesToTrash) {
-        [fileManager trashItemAtURL:fileToTrash.fileURL resultingItemURL:nil error:nil];
     }
 }
 

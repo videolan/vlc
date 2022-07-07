@@ -233,6 +233,14 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return [mutableArray copy];
 }
 
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
+{
+    for(VLCMediaLibraryAlbum* album in self.albums) {
+        [album iterateMediaItemsWithBlock:mediaItemBlock];
+    }
+}
+
+
 @end
 
 @implementation VLCMediaLibraryAlbum
@@ -272,6 +280,13 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     }
     vlc_ml_media_list_release(p_mediaList);
     return [mutableArray copy];
+}
+
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
+{
+    for(VLCMediaLibraryMediaItem* mediaItem in self.tracksAsMediaItems) {
+        mediaItemBlock(mediaItem);
+    }
 }
 
 @end

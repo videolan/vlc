@@ -198,14 +198,14 @@ NSString *VLCLibraryAlbumCellIdentifier = @"VLCLibraryAlbumCellIdentifier";
 
     // We want to add all the tracks to the playlist but only play the first one immediately,
     // otherwise we will skip straight to the last track of the album
-    BOOL playImmediately = YES;
-    for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
+    __block BOOL playImmediately = YES;
+    [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
 
         if(playImmediately) {
             playImmediately = NO;
         }
-    }
+    }];
 }
 
 - (IBAction)addToPlaylist:(id)sender
@@ -214,9 +214,9 @@ NSString *VLCLibraryAlbumCellIdentifier = @"VLCLibraryAlbumCellIdentifier";
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    for(VLCMediaLibraryMediaItem* mediaItem in _representedAlbum.tracksAsMediaItems) {
+    [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
-    }
+    }];
 }
 
 -(void)mouseDown:(NSEvent *)theEvent
