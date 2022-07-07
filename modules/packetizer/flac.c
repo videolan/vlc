@@ -347,6 +347,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_state = STATE_SYNC;
         }
 
+        /* First Sync is now on bytestream head, offset == 0 */
         block_SkipBytes(&p_sys->bytestream, p_sys->i_offset);
         block_BytestreamFlush(&p_sys->bytestream);
         p_sys->i_offset = 0;
@@ -393,6 +394,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
     case STATE_NEXT_SYNC:
     {
+        /* First Sync is on bytestream head, offset will be the position
+         * of the next sync code candidate */
         if(block_FindStartcodeFromOffset(&p_sys->bytestream, &p_sys->i_offset,
                                          NULL, 2,
                                          FLACStartcodeHelper,
@@ -401,6 +404,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             size_t i_remain = block_BytestreamRemaining( &p_sys->bytestream );
             if( pp_block == NULL && i_remain > FLAC_FRAME_SIZE_MIN ) /* EOF/Drain */
             {
+                /* There is no other synccode in the bytestream,
+                 * we assume the end of our flac frame is end of bytestream */
                 p_sys->i_offset = i_remain;
                 p_sys->i_state = STATE_GET_DATA;
                 continue;
@@ -420,6 +425,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                               p_sys->b_stream_info ? &p_sys->stream_info : NULL,
                               NULL, &dummy) == 0)
         {
+            /* Keep trying to find next sync point in bytestream */
             p_sys->i_offset++;
             continue;
         }
@@ -429,6 +435,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
     }
 
     case STATE_GET_DATA:
+        /* i_offset is the next sync point candidate
+         * our frame_size is the offset from the first sync */
         if( pp_block != NULL &&
             p_sys->b_stream_info &&
             p_sys->stream_info.min_framesize > p_sys->i_offset )
@@ -442,6 +450,9 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                  p_sys->stream_info.max_framesize < p_sys->i_offset )
         {
             /* Something went wrong, truncate stream head and restart */
+            msg_Warn(p_dec, "discarding bytes as we're over framesize %u, %zu",
+                     p_sys->stream_info.max_framesize,
+                     p_sys->i_offset);
             block_SkipBytes( &p_sys->bytestream, FLAC_HEADER_SIZE_MAX + 2 );
             block_BytestreamFlush( &p_sys->bytestream );
             p_sys->i_frame_size = 0;
@@ -477,6 +488,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             for( size_t i = p_sys->i_frame_size; i < p_sys->i_offset - 2; i++ )
                 p_sys->crc = flac_crc16( p_sys->crc, p_sys->p_buf[i] );
 
+            /* frame size between the two sync codes is now known */
             p_sys->i_frame_size = p_sys->i_offset;
 
             uint16_t stream_crc = GetWBE(&p_sys->p_buf[p_sys->i_offset - 2]);
