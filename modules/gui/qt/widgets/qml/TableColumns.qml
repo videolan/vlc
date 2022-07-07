@@ -40,10 +40,13 @@ Item {
     }
 
     property Component titleDelegate: RowLayout {
+        id: titleDel
+
         property var rowModel: parent.rowModel
         property var model: parent.colModel
         readonly property bool containsMouse: parent.containsMouse
         readonly property bool currentlyFocused: parent.currentlyFocused
+        readonly property color foregroundColor: parent.foregroundColor
 
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
@@ -63,17 +66,17 @@ Item {
 
                 source: {
                     var cover = null
-                    if (!!rowModel) {
+                    if (!!titleDel.rowModel) {
                         if (root.showTitleText)
-                            cover = rowModel.cover
+                            cover = titleDel.rowModel.cover
                         else
-                            cover = rowModel[model.criteria]
+                            cover = titleDel.rowModel[titleDel.model.criteria]
                     }
-                    return cover || model.placeHolder || VLCStyle.noArtAlbumCover
+                    return cover || titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
                 }
-                playCoverVisible: (currentlyFocused || containsMouse)
+                playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
                 playIconSize: VLCStyle.play_cover_small
-                onPlayIconClicked: g_mainDisplay.play(MediaLib, rowModel.id)
+                onPlayIconClicked: g_mainDisplay.play(MediaLib, titleDel.rowModel.id)
                 radius: root.titleCover_radius
 
                 imageOverlay: Item {
@@ -89,7 +92,7 @@ Item {
                             rightMargin: VLCStyle.margin_xxsmall
                         }
 
-                        labels: root.titlecoverLabels(rowModel)
+                        labels: root.titlecoverLabels(titleDel.rowModel)
                     }
                 }
             }
@@ -110,13 +113,18 @@ Item {
                 id: text
 
                 anchors.verticalCenter: parent.verticalCenter
-                text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || I18n.qtr("Unknown Title"))
-                color: foregroundColor
+                text: (titleDel.rowModel && root.showTitleText)
+                      ? (titleDel.rowModel[titleDel.model.criteria] || I18n.qtr("Unknown Title"))
+                      : ""
+                color: titleDel.foregroundColor
             }
         }
     }
 
     property Component titleHeaderDelegate: Row {
+        id: titleHeadDel
+        property var model: parent.colModel
+
         spacing: VLCStyle.margin_normal
 
         Widgets.IconLabel {
@@ -127,7 +135,9 @@ Item {
         }
 
         Widgets.CaptionLabel {
-            text: model.text || ""
+            text: titleHeadDel.model
+                    ? titleHeadDel.model.text || ""
+                    : ""
             visible: root.showTitleText
         }
     }
@@ -140,15 +150,20 @@ Item {
     }
 
     property Component timeColDelegate: Item {
+        id: timeDel
+
         property var rowModel: parent.rowModel
         property var model: parent.colModel
+        property color foregroundColor: parent.foregroundColor
 
         Widgets.ListLabel {
             width: timeTextMetric.width
             height: parent.height
             horizontalAlignment: Text.AlignHCenter
-            text: !rowModel || !rowModel[model.criteria] ? "" : Helpers.msToString(rowModel[model.criteria], true)
-            color: foregroundColor
+            text: (!timeDel.rowModel || !timeDel.rowModel[timeDel.model.criteria])
+                ? ""
+                : Helpers.msToString(timeDel.rowModel[timeDel.model.criteria], true)
+            color: timeDel.foregroundColor
         }
     }
 
