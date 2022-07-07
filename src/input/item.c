@@ -695,6 +695,19 @@ char *input_item_GetInfo( input_item_t *p_i,
 {
     vlc_mutex_lock( &p_i->lock );
 
+    char * result = input_item_GetInfoLocked( p_i, psz_cat, psz_name );
+
+    vlc_mutex_unlock( &p_i->lock );
+
+    return result;
+}
+
+char *input_item_GetInfoLocked( input_item_t *p_i,
+                                const char *psz_cat,
+                                const char *psz_name )
+{
+    vlc_mutex_assert( &p_i->lock );
+
     const info_category_t *p_cat = InputItemFindCat( p_i, psz_cat );
     if( p_cat )
     {
@@ -702,11 +715,10 @@ char *input_item_GetInfo( input_item_t *p_i,
         if( p_info && p_info->psz_value )
         {
             char *psz_ret = strdup( p_info->psz_value );
-            vlc_mutex_unlock( &p_i->lock );
             return psz_ret;
         }
     }
-    vlc_mutex_unlock( &p_i->lock );
+
     return strdup( "" );
 }
 

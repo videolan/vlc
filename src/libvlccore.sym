@@ -190,6 +190,7 @@ input_item_CreateFilename
 input_item_DelInfo
 input_item_GetDuration
 input_item_GetInfo
+input_item_GetInfoLocked
 input_item_GetMeta
 input_item_GetMetaLocked
 input_item_GetName
