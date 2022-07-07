@@ -348,7 +348,11 @@ FocusScope {
             color: VLCStyle.colors.accent
         }
 
-        delegate: TableViewDelegate {}
+        delegate: TableViewDelegate {
+            onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
+            onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
+            onItemDoubleClicked: root.itemDoubleClicked(index, model)
+        }
 
         flickableDirection: Flickable.AutoFlickDirection
         contentWidth: root.usedRowSpace + root.sectionWidth

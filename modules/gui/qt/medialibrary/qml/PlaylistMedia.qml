@@ -50,7 +50,11 @@ MainInterface.MainTableView {
 
     rowHeight: VLCStyle.tableCoverRow_height
 
-    delegate: PlaylistMediaDelegate {}
+    delegate: PlaylistMediaDelegate {
+        onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
+        onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
+        onItemDoubleClicked: root.itemDoubleClicked(index, model)
+    }
 
     headerColor: VLCStyle.colors.bg
 

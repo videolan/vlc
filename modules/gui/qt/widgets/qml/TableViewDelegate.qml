@@ -38,6 +38,11 @@ T.Control {
 
     readonly property bool dragActive: hoverArea.drag.active
 
+
+    signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
+    signal rightClick(Item menuParent, var menuModel, point globalMousePos)
+    signal itemDoubleClicked(var index, var model)
+
     // Settings
 
     width: Math.max(view.width, content.implicitWidth) + root.sectionWidth
@@ -98,7 +103,7 @@ T.Control {
 
             hoverEnabled: false
 
-            Keys.onMenuPressed: root.contextMenuButtonClicked(contextButton,rowModel)
+            Keys.onMenuPressed: delegate.contextMenuButtonClicked(contextButton,rowModel)
 
             acceptedButtons: Qt.RightButton | Qt.LeftButton
 
@@ -116,7 +121,7 @@ T.Control {
                 }
 
                 if (mouse.button === Qt.RightButton)
-                    root.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
+                    delegate.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y))
             }
 
             onPositionChanged: {
@@ -131,7 +136,7 @@ T.Control {
 
             onDoubleClicked: {
                 if (mouse.button === Qt.LeftButton)
-                    root.itemDoubleClicked(delegate._index, rowModel)
+                    delegate.itemDoubleClicked(delegate._index, rowModel)
             }
 
             drag.onActiveChanged: {
@@ -204,7 +209,7 @@ T.Control {
                         delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
 
                     var pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
-                    root.contextMenuButtonClicked(this, delegate.rowModel, pos)
+                    delegate.contextMenuButtonClicked(this, delegate.rowModel, pos)
                 }
             }
         }
