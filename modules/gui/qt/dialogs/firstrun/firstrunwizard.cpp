@@ -308,7 +308,7 @@ void FirstRunWizard::reject()
     config_PutInt( "qt-privacy-ask", 0 );
 
     /* Colour Page settings */
-    p_intf->p_mi->getColorScheme()->setCurrentIndex( p_intf->p_mi->getColorScheme()->getSchemes().at(0).scheme );
+    p_intf->p_mi->getColorScheme()->setCurrentIndex( 0 );
 
     /* Layout Page settings */
     config_PutInt( "qt-menubar", 0 );
