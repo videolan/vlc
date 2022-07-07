@@ -24,4 +24,5 @@ T.Label {
     font.pixelSize: VLCStyle.fontSize_xxxlarge
     font.weight: Font.Bold
     color: VLCStyle.colors.text
+    textFormat: Text.PlainText
 }

@@ -24,4 +24,5 @@ T.Label {
     font.pixelSize: VLCStyle.fontSize_normal
     color: VLCStyle.colors.menuCaption
     verticalAlignment: Text.AlignVCenter
+    textFormat: Text.PlainText
 }

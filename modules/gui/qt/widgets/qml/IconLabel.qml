@@ -27,4 +27,5 @@ T.Label {
         pixelSize: VLCStyle.icon_small
         family: VLCIcons.fontFamily
     }
+    textFormat: Text.PlainText
 }

@@ -25,4 +25,5 @@ T.Label {
     font.weight: Font.DemiBold
     color: VLCStyle.colors.text
     verticalAlignment: Text.AlignVCenter
+    textFormat: Text.PlainText
 }

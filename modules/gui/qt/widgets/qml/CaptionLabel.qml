@@ -23,4 +23,5 @@ T.Label {
     elide: Text.ElideRight
     font.pixelSize: VLCStyle.fontSize_normal
     color: VLCStyle.colors.caption
+    textFormat: Text.PlainText
 }
