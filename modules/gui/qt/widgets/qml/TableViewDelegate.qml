@@ -30,7 +30,7 @@ T.Control {
 
     property var rowModel: model
 
-    property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
+    property bool selected: false
 
     readonly property int _index: index
 
@@ -45,6 +45,8 @@ T.Control {
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
+
+    signal selectAndFocus(int modifiers, int focusReason)
 
     property Component defaultDelegate: Widgets.ScrollingText {
         id: defaultDelId
@@ -73,26 +75,7 @@ T.Control {
     
     ListView.delayRemove: dragActive
 
-    function selectAndFocus(modifiers, focusReason) {
-        selectionDelegateModel.updateSelection(modifiers, view.currentIndex, index)
 
-        view.currentIndex = index
-        view.positionViewAtIndex(index, ListView.Contain)
-
-        delegate.forceActiveFocus(focusReason)
-    }
-
-    // Connections
-
-    Connections {
-        target: selectionDelegateModel
-
-        onSelectionChanged: {
-            delegate.selected = Qt.binding(function() {
-              return  selectionDelegateModel.isSelected(root.model.index(index, 0))
-            })
-        }
-    }
 
     // Childs
 
@@ -161,9 +144,7 @@ T.Control {
                 // NOTE: Perform the "click" action because the click action is only executed on mouse
                 //       release (we are in the pressed state) but we will need the updated list on drop.
                 if (drag.active && !delegate.selected) {
-                    selectionDelegateModel.updateSelection(_modifiersOnLastPress
-                                                           , view.currentIndex
-                                                           , index)
+                    delegate.selectAndFocus(_modifiersOnLastPress, index)
                 } else if (delegate.dragItem) {
                     delegate.dragItem.Drag.drop()
                 }

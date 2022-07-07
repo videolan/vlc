@@ -328,6 +328,7 @@ FocusScope {
         }
 
         delegate: TableViewDelegate {
+            id: tableDelegate
 
             width: view.width
             height: root.rowHeight
@@ -337,9 +338,30 @@ FocusScope {
 
             dragItem: root.dragItem
 
+            selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
+
             onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
             onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
             onItemDoubleClicked: root.itemDoubleClicked(index, model)
+
+            onSelectAndFocus:  {
+                selectionDelegateModel.updateSelection(modifiers, view.currentIndex, index)
+
+                view.currentIndex = index
+                view.positionViewAtIndex(index, ListView.Contain)
+
+                tableDelegate.forceActiveFocus(focusReason)
+            }
+
+            Connections {
+                target: selectionDelegateModel
+
+                onSelectionChanged: {
+                    tableDelegate.selected = Qt.binding(function() {
+                      return  selectionDelegateModel.isSelected(root.model.index(index, 0))
+                    })
+                }
+            }
         }
 
         flickableDirection: Flickable.AutoFlickDirection
