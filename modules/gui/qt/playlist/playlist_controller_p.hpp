@@ -84,6 +84,7 @@ private:
         filler(PlaylistControllerModel::SORT_KEY_ALBUM, qtr("Album"));
         filler(PlaylistControllerModel::SORT_KEY_ALBUM_ARTIST, qtr( "Album Artist"));
         filler(PlaylistControllerModel::SORT_KEY_GENRE, qtr("Genre"));
+        filler(PlaylistControllerModel::SORT_KEY_DATE, qtr("Date"));
         filler(PlaylistControllerModel::SORT_KEY_TRACK_NUMBER, qtr( "Track Number"));
         filler(PlaylistControllerModel::SORT_KEY_DISC_NUMBER, qtr( "Disc Number"));
         filler(PlaylistControllerModel::SORT_KEY_URL, qtr("URL"));
