@@ -84,6 +84,8 @@ private:
         filler(PlaylistController::SORT_KEY_DISC_NUMBER, qtr( "Disc Number"));
         filler(PlaylistController::SORT_KEY_URL, qtr("URL"));
         filler(PlaylistController::SORT_KEY_RATING, qtr("Rating"));
+        filler(PlaylistController::SORT_KEY_FILE_SIZE, qtr("File size"));
+        filler(PlaylistController::SORT_KEY_FILE_MODIFIED, qtr("File modified"));
     }
 };
 
