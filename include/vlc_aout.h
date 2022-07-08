@@ -316,7 +316,7 @@ struct audio_output
 static inline void aout_TimingReport(audio_output_t *aout, vlc_tick_t system_ts,
                                      vlc_tick_t audio_ts)
 {
-    return aout->events->timing_report(aout, system_ts, audio_ts);
+    aout->events->timing_report(aout, system_ts, audio_ts);
 }
 
 /**
