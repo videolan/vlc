@@ -54,6 +54,15 @@
 #define T_HEIGHT N_("Height")
 #define LT_HEIGHT NULL
 
+#define T_OFFSET_X N_("Offset X")
+#define LT_OFFSET_X NULL
+
+#define T_OFFSET_Y N_("Offset Y")
+#define LT_OFFSET_Y NULL
+
+#define T_OFFSET_Z N_("Offset Z")
+#define LT_OFFSET_Z NULL
+
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context);
 static void Close(vout_display_t *vd);
@@ -68,6 +77,9 @@ vlc_module_begin ()
     add_string( "flaschen-display", NULL, T_FLDISPLAY, LT_FLDISPLAY )
     add_integer("flaschen-width", 25, T_WIDTH, LT_WIDTH)
     add_integer("flaschen-height", 20, T_HEIGHT, LT_HEIGHT)
+    add_integer("flaschen-offset-x", 0, T_OFFSET_X, LT_OFFSET_X)
+    add_integer("flaschen-offset-y", 0, T_OFFSET_Y, LT_OFFSET_Y)
+    add_integer("flaschen-offset-z", 0, T_OFFSET_Z, LT_OFFSET_Z)
 vlc_module_end ()
 
 
@@ -169,9 +181,17 @@ static void Display(vout_display_t *vd, picture_t *picture)
     int result;
 
     char buffer[64];
-    int header_len = snprintf(buffer, sizeof(buffer), "P6\n%d %d\n255\n",
-                              fmt->i_width, fmt->i_height);
-    /* TODO: support offset_{x,y,z}? (#FT:...) */
+    int header_len;
+    int offset_x = var_InheritInteger(vd, "flaschen-offset-x");
+    int offset_y = var_InheritInteger(vd, "flaschen-offset-y");
+    int offset_z = var_InheritInteger(vd, "flaschen-offset-z");
+
+    if (offset_x || offset_y || offset_z)
+        header_len = snprintf(buffer, sizeof(buffer), "P6\n%d %d\n#FT: %d %d %d\n255\n",
+                                  fmt->i_width, fmt->i_height, offset_x, offset_y, offset_z);
+    else
+        header_len = snprintf(buffer, sizeof(buffer), "P6\n%d %d\n255\n",
+                                  fmt->i_width, fmt->i_height);
     /* Note the protocol doesn't include any picture order field. */
     /* (maybe add as comment?) */
 
