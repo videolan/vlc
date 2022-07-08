@@ -52,6 +52,8 @@ struct vlc_playlist_item_meta {
     bool has_track_number;
     bool has_disc_number;
     bool has_rating;
+    int64_t file_size;
+    int64_t file_modified;
 };
 
 static int
@@ -65,6 +67,29 @@ vlc_playlist_item_meta_CopyString(const char **to, const char *from)
     }
     else
         *to = NULL;
+    return VLC_SUCCESS;
+}
+
+static int
+vlc_playlist_item_meta_GetNumber(const char * str, int64_t * to)
+{
+    // NOTE: When we have an empty string we apply the default value.
+    if (*str == '\0')
+    {
+        *to = 0;
+
+        return VLC_SUCCESS;
+    }
+
+    char *end;
+
+    int64_t value = strtoull(str, &end, 10);
+
+    if (*end != '\0')
+        return VLC_EGENERIC;
+
+    *to = value;
+
     return VLC_SUCCESS;
 }
 
@@ -153,6 +178,32 @@ vlc_playlist_item_meta_InitField(struct vlc_playlist_item_meta *meta,
             if (meta->has_rating)
                 meta->rating = atoll(str);
             return VLC_SUCCESS;
+        }
+        case VLC_PLAYLIST_SORT_KEY_FILE_SIZE:
+        {
+            char *str = input_item_GetInfoLocked(media, ".stat", "size");
+
+            if (str == NULL)
+                return VLC_EGENERIC;
+
+            int result = vlc_playlist_item_meta_GetNumber(str, &(meta->file_size));
+
+            free(str);
+
+            return result;
+        }
+        case VLC_PLAYLIST_SORT_KEY_FILE_MODIFIED:
+        {
+            char *str = input_item_GetInfoLocked(media, ".stat", "mtime");
+
+            if (str == NULL)
+                return VLC_EGENERIC;
+
+            int result = vlc_playlist_item_meta_GetNumber(str, &(meta->file_modified));
+
+            free(str);
+
+            return result;
         }
         default:
             assert(!"Unknown sort key");
@@ -305,6 +356,10 @@ CompareMetaByKey(const struct vlc_playlist_item_meta *a,
         case VLC_PLAYLIST_SORT_KEY_RATING:
             return CompareOptionalIntegers(a->has_rating, a->rating,
                                            b->has_rating, b->rating);
+        case VLC_PLAYLIST_SORT_KEY_FILE_SIZE:
+            return CompareIntegers(a->file_size, b->file_size);
+        case VLC_PLAYLIST_SORT_KEY_FILE_MODIFIED:
+            return CompareIntegers(a->file_modified, b->file_modified);
         default:
             assert(!"Unknown sort key");
             vlc_assert_unreachable();
