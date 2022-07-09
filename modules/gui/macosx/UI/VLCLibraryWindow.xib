@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -143,7 +144,7 @@
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cih-xp-HmY">
                                         <rect key="frame" x="173" y="12" width="15" height="17"/>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarDeleteTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="OjM-W9-IrQ">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="trash" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="OjM-W9-IrQ">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -154,6 +155,14 @@
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VFI-oW-dMZ" customClass="VLCDragDropView">
                                         <rect key="frame" x="0.0" y="55" width="208" height="34"/>
                                         <subviews>
+                                            <box boxType="custom" borderType="line" borderWidth="0.0" cornerRadius="10" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="AXk-h7-dZ0">
+                                                <rect key="frame" x="37" y="-50" width="134" height="134"/>
+                                                <view key="contentView" id="NSp-cB-V4X">
+                                                    <rect key="frame" x="0.0" y="0.0" width="134" height="134"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                </view>
+                                                <color key="borderColor" name="separatorColor" catalog="System" colorSpace="catalog"/>
+                                            </box>
                                             <imageView translatesAutoresizingMaskIntoConstraints="NO" id="cTV-Wf-TfJ" customClass="VLCDropDisabledImageView">
                                                 <rect key="frame" x="48" y="-39" width="112" height="112"/>
                                                 <constraints>
@@ -174,15 +183,19 @@
                                             </button>
                                         </subviews>
                                         <constraints>
+                                            <constraint firstItem="AXk-h7-dZ0" firstAttribute="centerX" secondItem="cTV-Wf-TfJ" secondAttribute="centerX" id="BA9-JV-1Yb"/>
+                                            <constraint firstItem="AXk-h7-dZ0" firstAttribute="width" secondItem="cTV-Wf-TfJ" secondAttribute="width" multiplier="1.2" id="Bk1-25-qhr"/>
                                             <constraint firstItem="cTV-Wf-TfJ" firstAttribute="centerY" secondItem="VFI-oW-dMZ" secondAttribute="centerY" id="OHT-tO-cJy"/>
-                                            <constraint firstItem="SWh-4E-Qtf" firstAttribute="top" secondItem="cTV-Wf-TfJ" secondAttribute="bottom" constant="10" id="eok-CR-lus"/>
+                                            <constraint firstItem="SWh-4E-Qtf" firstAttribute="top" secondItem="AXk-h7-dZ0" secondAttribute="bottom" constant="10" id="eok-CR-lus"/>
+                                            <constraint firstItem="AXk-h7-dZ0" firstAttribute="height" secondItem="cTV-Wf-TfJ" secondAttribute="height" multiplier="1.2" id="gww-c2-C40"/>
                                             <constraint firstItem="cTV-Wf-TfJ" firstAttribute="centerX" secondItem="VFI-oW-dMZ" secondAttribute="centerX" id="sOt-js-AM3"/>
                                             <constraint firstItem="SWh-4E-Qtf" firstAttribute="centerX" secondItem="cTV-Wf-TfJ" secondAttribute="centerX" id="xrf-SM-XAK"/>
+                                            <constraint firstItem="AXk-h7-dZ0" firstAttribute="centerY" secondItem="cTV-Wf-TfJ" secondAttribute="centerY" id="z0k-B1-O6R"/>
                                         </constraints>
                                     </customView>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="244-FS-P3T">
-                                        <rect key="frame" x="142" y="13" width="21" height="14"/>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTextRulerLineHeightIncrease" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="qDZ-84-3uy">
+                                        <rect key="frame" x="146" y="15" width="17" height="10"/>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="line.horizontal.3.decrease" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="qDZ-84-3uy">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -643,6 +656,7 @@
                 <outlet property="clearPlaylistButton" destination="cih-xp-HmY" id="PoU-co-0kn"/>
                 <outlet property="clearPlaylistSeparator" destination="nAW-KH-ipk" id="Af9-fg-u7m"/>
                 <outlet property="controlsBar" destination="Uzf-Tf-H8x" id="n0G-92-F2Q"/>
+                <outlet property="dragDropImageBackgroundBox" destination="AXk-h7-dZ0" id="h3h-Wh-0op"/>
                 <outlet property="emptyLibraryView" destination="YJf-1r-vaC" id="AJB-eN-4u6"/>
                 <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
                 <outlet property="librarySortButton" destination="Rja-6g-wNZ" id="FQ7-MU-hsk"/>
@@ -1119,8 +1133,6 @@
         <image name="NSLeftFacingTriangleTemplate" width="10" height="14"/>
         <image name="NSListViewTemplate" width="17" height="12"/>
         <image name="NSRightFacingTriangleTemplate" width="10" height="14"/>
-        <image name="NSTextRulerLineHeightIncrease" width="21" height="14"/>
-        <image name="NSTouchBarDeleteTemplate" width="15" height="17"/>
         <image name="VLC" width="512" height="512"/>
         <image name="VLCBackwardTemplate" width="128" height="128"/>
         <image name="VLCForwardTemplate" width="128" height="128"/>
@@ -1129,11 +1141,13 @@
         <image name="fullscreen-one-button" width="29" height="23"/>
         <image name="fullscreen-one-button-pressed" width="29" height="23"/>
         <image name="libraryPlay" width="64" height="64"/>
+        <image name="line.horizontal.3.decrease" catalog="system" width="17" height="10"/>
         <image name="music.note.list" catalog="system" width="17" height="15"/>
         <image name="repeatOff" width="24" height="24"/>
         <image name="shuffleOn" width="24" height="24"/>
         <image name="stop" width="29" height="23"/>
         <image name="stop-pressed" width="29" height="23"/>
+        <image name="trash" catalog="system" width="15" height="17"/>
         <image name="volume-high" width="13" height="11"/>
         <image name="volume-low" width="5" height="11"/>
     </resources>

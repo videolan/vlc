@@ -64,6 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTextField *upNextLabel;
 @property (readwrite, weak) IBOutlet VLCDragDropView *playlistDragDropView;
 @property (readwrite, weak) IBOutlet NSButton *openMediaButton;
+@property (readwrite, weak) IBOutlet NSBox *dragDropImageBackgroundBox;
 @property (readwrite, weak) IBOutlet NSBox *upNextSeparator;
 @property (readwrite, weak) IBOutlet NSButton *clearPlaylistButton;
 @property (readwrite, weak) IBOutlet NSBox *clearPlaylistSeparator;

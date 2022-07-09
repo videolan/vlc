@@ -337,6 +337,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.upNextLabel.stringValue = _NS("Playlist");
     [self updateColorsBasedOnAppearance];
     self.openMediaButton.title = _NS("Open media...");
+    self.dragDropImageBackgroundBox.fillColor = [NSColor VLClibrarySeparatorLightColor];
 
     _mainSplitView.delegate = self;
     _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
@@ -391,14 +392,19 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)updateColorsBasedOnAppearance
 {
-    if ([self.contentView.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
+    // If we try to pull the view's effectiveAppearance we are going to get the previous appearance's name despite
+    // responding to the effectiveAppearance change (???) so it is a better idea to pull from the general system
+    // theme preference, which is always up-to-date
+    if ([[[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"] isEqualToString:@"Dark"]) {
         self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
         self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
         self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
+        self.dragDropImageBackgroundBox.hidden = NO;
     } else {
         self.upNextLabel.textColor = [NSColor VLClibraryLightTitleColor];
         self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
         self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorLightColor];
+        self.dragDropImageBackgroundBox.hidden = YES;
     }
 }
 
