@@ -57,6 +57,9 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 - (void)updateCachedListOfAudioMedia;
 - (void)updateCachedListOfVideoMedia;
 - (void)updateCachedListOfRecentMedia;
+- (void)updateCachedListOfArtists;
+- (void)updateCachedListOfAlbums;
+- (void)updateCachedListOfGenres;
 - (void)mediaItemWasUpdated:(VLCMediaLibraryMediaItem *)mediaItem;
 
 @end
@@ -87,6 +90,36 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 });
             }
             break;
+        case VLC_ML_EVENT_ARTIST_ADDED:
+        case VLC_ML_EVENT_ARTIST_UPDATED:
+        case VLC_ML_EVENT_ARTIST_DELETED:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+                [libraryModel updateCachedListOfArtists];
+            });
+            break;
+        }
+        case VLC_ML_EVENT_ALBUM_ADDED:
+        case VLC_ML_EVENT_ALBUM_UPDATED:
+        case VLC_ML_EVENT_ALBUM_DELETED:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+                [libraryModel updateCachedListOfAlbums];
+            });
+            break;
+        }
+        case VLC_ML_EVENT_GENRE_ADDED:
+        case VLC_ML_EVENT_GENRE_UPDATED:
+        case VLC_ML_EVENT_GENRE_DELETED:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+                [libraryModel updateCachedListOfGenres];
+            });
+            break;
+        }
         default:
             break;
     }
