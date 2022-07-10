@@ -381,7 +381,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         }
 
         p_sys->i_state = STATE_NEXT_SYNC;
-        p_sys->i_offset = 1;
+        p_sys->i_offset = FLAC_FRAME_SIZE_MIN;
         p_sys->i_frame_size = 0;
         p_sys->crc = 0;
 
@@ -399,9 +399,10 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                                          FLACStartcodeHelper,
                                          FLACStartcodeMatcher) != VLC_SUCCESS)
         {
-            if( pp_block == NULL ) /* EOF/Drain */
+            size_t i_remain = block_BytestreamRemaining( &p_sys->bytestream );
+            if( pp_block == NULL && i_remain > FLAC_FRAME_SIZE_MIN ) /* EOF/Drain */
             {
-                p_sys->i_offset = block_BytestreamRemaining( &p_sys->bytestream );
+                p_sys->i_offset = i_remain;
                 p_sys->i_state = STATE_GET_DATA;
                 continue;
             }
@@ -429,9 +430,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
     }
 
     case STATE_GET_DATA:
-        if( p_sys->i_offset < FLAC_FRAME_SIZE_MIN ||
-            ( p_sys->b_stream_info &&
-              p_sys->stream_info.min_framesize > p_sys->i_offset ) )
+        if( p_sys->b_stream_info &&
+            p_sys->stream_info.min_framesize > p_sys->i_offset )
         {
             p_sys->i_offset += 1;
             p_sys->i_state = STATE_NEXT_SYNC;
