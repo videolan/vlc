@@ -121,7 +121,8 @@ static inline int FLAC_CheckFrameInfo(const struct flac_stream_info *stream_info
     /* Sanity check using stream info header when possible */
     if (stream_info)
     {
-        if (h->i_frame_length < stream_info->min_blocksize ||
+        if ((stream_info->min_blocksize != stream_info->max_blocksize &&
+             h->i_frame_length < stream_info->min_blocksize) ||
             h->i_frame_length > stream_info->max_blocksize)
             return 0;
         if (h->i_bits_per_sample != stream_info->bits_per_sample)
