@@ -76,7 +76,6 @@ typedef struct
     date_t pts;
     struct flac_header_info headerinfo;
 
-    size_t i_frame_size;
     size_t i_last_frame_size;
     uint16_t crc;
     size_t i_buf;
@@ -383,7 +382,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         p_sys->i_state = STATE_NEXT_SYNC;
         p_sys->i_offset = FLAC_FRAME_SIZE_MIN;
-        p_sys->i_frame_size = 0;
         p_sys->crc = 0;
 
         /* We have to read until next frame sync code to compute current frame size
@@ -456,7 +454,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                      p_sys->i_offset);
             block_SkipBytes( &p_sys->bytestream, FLAC_HEADER_SIZE_MAX + 2 );
             block_BytestreamFlush( &p_sys->bytestream );
-            p_sys->i_frame_size = 0;
             p_sys->crc = 0;
             p_sys->i_offset = 0;
             p_sys->i_state = STATE_NOSYNC;
@@ -480,17 +477,12 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                     return NULL;
             }
 
-            /* Copy from previous sync point (frame_size) up to to current (offset) */
-            block_PeekOffsetBytes( &p_sys->bytestream, p_sys->i_frame_size,
-                                   &p_sys->p_buf[p_sys->i_frame_size],
-                                    p_sys->i_offset - p_sys->i_frame_size );
+            /* Copy from previous sync point up to to current (offset) */
+            block_PeekOffsetBytes( &p_sys->bytestream, 0, p_sys->p_buf, p_sys->i_offset );
 
             /* update crc to include this data chunk */
-            for( size_t i = p_sys->i_frame_size; i < p_sys->i_offset - 2; i++ )
+            for( size_t i = 0; i < p_sys->i_offset - 2; i++ )
                 p_sys->crc = flac_crc16( p_sys->crc, p_sys->p_buf[i] );
-
-            /* frame size between the two sync codes is now known */
-            p_sys->i_frame_size = p_sys->i_offset;
 
             uint16_t stream_crc = GetWBE(&p_sys->p_buf[p_sys->i_offset - 2]);
             if( stream_crc != p_sys->crc )
@@ -506,10 +498,13 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
             p_sys->i_state = STATE_SEND_DATA;
 
+            /* frame size between the two sync codes is now known */
+            p_sys->i_last_frame_size = p_sys->i_offset;
+            p_sys->i_buf = p_sys->i_offset;
+
             /* clean */
             block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
             block_BytestreamFlush( &p_sys->bytestream );
-            p_sys->i_last_frame_size = p_sys->i_frame_size;
             p_sys->i_offset = 0;
             p_sys->crc = 0;
 
@@ -535,7 +530,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         }
 
 
-        out = block_heap_Alloc( p_sys->p_buf, p_sys->i_frame_size );
+        out = block_heap_Alloc( p_sys->p_buf, p_sys->i_buf );
         if( out )
         {
             out->i_dts = out->i_pts = date_Get( &p_sys->pts );
@@ -553,7 +548,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         p_sys->i_buf = 0;
         p_sys->p_buf = NULL;
-        p_sys->i_frame_size = 0;
         p_sys->i_offset = 0;
         p_sys->i_state = STATE_NOSYNC;
 
@@ -585,7 +579,6 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_offset      = 0;
     p_sys->b_stream_info = false;
     p_sys->i_last_frame_size = FLAC_FRAME_SIZE_MIN;
-    p_sys->i_frame_size  = 0;
     p_sys->headerinfo.i_pts  = VLC_TICK_INVALID;
     p_sys->i_buf         = 0;
     p_sys->p_buf         = NULL;
