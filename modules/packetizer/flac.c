@@ -369,10 +369,12 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             return NULL; /* Need more data */
 
         /* Check if frame is valid and get frame info */
-        int i_ret = FLAC_ParseSyncInfo(p_header, FLAC_HEADER_SIZE_MAX,
-                             p_sys->b_stream_info ? &p_sys->stream_info : NULL,
-                             flac_crc8, &p_sys->headerinfo);
-        if (!i_ret) {
+        const struct flac_stream_info *streaminfo =
+                p_sys->b_stream_info ? &p_sys->stream_info : NULL;
+        struct flac_header_info headerinfo;
+        int i_ret = FLAC_ParseSyncInfo(p_header, FLAC_HEADER_SIZE_MAX, streaminfo,
+                                       flac_crc8, &headerinfo);
+        if (!i_ret || !FLAC_CheckFrameInfo(streaminfo, &headerinfo)) {
             msg_Dbg(p_dec, "emulated sync word");
             block_SkipByte(&p_sys->bytestream);
             p_sys->i_offset = 0;
@@ -380,6 +382,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             break;
         }
 
+        p_sys->headerinfo = headerinfo;
         p_sys->i_state = STATE_NEXT_SYNC;
         p_sys->i_offset = FLAC_FRAME_SIZE_MIN;
         p_sys->crc = 0;
@@ -418,11 +421,12 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
                                   nextheader, FLAC_HEADER_SIZE_MAX))
             return NULL; /* Need more data */
 
+        const struct flac_stream_info *streaminfo =
+                p_sys->b_stream_info ? &p_sys->stream_info : NULL;
         struct flac_header_info dummy;
         /* Check if frame is valid and get frame info */
-        if(FLAC_ParseSyncInfo(nextheader, FLAC_HEADER_SIZE_MAX,
-                              p_sys->b_stream_info ? &p_sys->stream_info : NULL,
-                              NULL, &dummy) == 0)
+        if(!FLAC_ParseSyncInfo(nextheader, FLAC_HEADER_SIZE_MAX, streaminfo, NULL, &dummy)||
+           !FLAC_CheckFrameInfo(streaminfo, &dummy))
         {
             /* Keep trying to find next sync point in bytestream */
             p_sys->i_offset++;
