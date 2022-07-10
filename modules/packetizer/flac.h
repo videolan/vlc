@@ -115,6 +115,23 @@ static inline int64_t read_utf8(const uint8_t *p_buf, unsigned i_buf, int *pi_re
     return i_result;
 }
 
+static inline int FLAC_CheckFrameInfo(const struct flac_stream_info *stream_info,
+                                      const struct flac_header_info *h)
+{
+    /* Sanity check using stream info header when possible */
+    if (stream_info)
+    {
+        if (h->i_frame_length < stream_info->min_blocksize ||
+            h->i_frame_length > stream_info->max_blocksize)
+            return 0;
+        if (h->i_bits_per_sample != stream_info->bits_per_sample)
+            return 0;
+        if (h->i_rate != stream_info->sample_rate)
+            return 0;
+    }
+    return 1;
+}
+
 /*****************************************************************************
  * FLAC_ParseSyncInfo: parse FLAC sync info
  * - stream_info can be NULL
@@ -267,17 +284,6 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
     if (pf_crc8 &&
         pf_crc8(p_buf, i_header) != p_buf[i_header])
         return 0;
-
-    /* Sanity check using stream info header when possible */
-    if (stream_info) {
-        if (blocksize < stream_info->min_blocksize ||
-            blocksize > stream_info->max_blocksize)
-            return 0;
-        if ((unsigned)bits_per_sample != stream_info->bits_per_sample)
-            return 0;
-        if (samplerate != stream_info->sample_rate)
-            return 0;
-    }
 
     /* Compute from frame absolute time */
     if ( (p_buf[1] & 0x01) == 0  ) /* Fixed blocksize stream / Frames */
