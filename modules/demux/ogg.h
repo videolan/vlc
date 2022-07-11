@@ -202,7 +202,7 @@ struct demux_sys_t
     int64_t i_total_frames;
 
     /* length of file in bytes */
-    int64_t i_total_length;
+    int64_t i_total_bytes;
 
     /* offset position in file (for reading) */
     int64_t i_input_position;
