@@ -221,7 +221,7 @@ FocusScope{
         readonly property int _leftLimit: logoGroup.x + logoGroup.width
         readonly property int _rightLimit: playlistGroup.x
         readonly property int _availableWidth: _rightLimit - _leftLimit
-        readonly property int _centerX: ((topcontrollerMouseArea.width - centerTitleText.implicitWidth) / 2)
+        readonly property int _centerX: ((root.width - centerTitleText.implicitWidth) / 2)
         readonly property bool _alignHCenter: _centerX > _leftLimit
                                               && _centerX + centerTitleText.implicitWidth < _rightLimit
 
@@ -245,7 +245,7 @@ FocusScope{
         function _layout() {
             if (_alignHCenter) {
                 centerTitleText.x = 0
-                centerTitleText.anchors.horizontalCenter = topcontrollerMouseArea.horizontalCenter
+                centerTitleText.anchors.horizontalCenter = root.horizontalCenter
             } else {
                 centerTitleText.anchors.horizontalCenter = undefined
                 centerTitleText.x = Qt.binding(function() { return centerTitleText._leftLimit })
