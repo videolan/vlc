@@ -812,7 +812,6 @@ modules/gui/qt/medialibrary/qml/MusicPlaylistsDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicTrackListDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicTracksDisplay.qml
 modules/gui/qt/medialibrary/qml/PlaylistMedia.qml
-modules/gui/qt/medialibrary/qml/PlaylistMediaDelegate.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaDisplay.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml
 modules/gui/qt/medialibrary/qml/UrlListDisplay.qml
