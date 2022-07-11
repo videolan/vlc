@@ -21,6 +21,7 @@
 #ifndef TEMPLATEDURI_HPP
 #define TEMPLATEDURI_HPP
 
+#include <cstdint>
 #include <string>
 
 namespace dash
