@@ -181,11 +181,11 @@ static int64_t get_data( demux_t *p_demux, int64_t i_bytes_to_read )
     char *buf;
     int64_t i_result;
 
-    if ( p_sys->i_total_length > 0 )
+    if ( p_sys->i_total_bytes > 0 )
     {
-        if ( p_sys->i_input_position + i_bytes_to_read > p_sys->i_total_length )
+        if ( p_sys->i_input_position + i_bytes_to_read > p_sys->i_total_bytes )
         {
-            i_bytes_to_read = p_sys->i_total_length - p_sys->i_input_position;
+            i_bytes_to_read = p_sys->i_total_bytes - p_sys->i_input_position;
             if ( i_bytes_to_read <= 0 ) {
                 return 0;
             }
@@ -629,8 +629,8 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
     demux_sys_t *p_sys  = p_demux->p_sys;
 
     i_pos_lower = __MAX( i_pos_lower, p_stream->i_data_start );
-    i_pos_upper = __MIN( i_pos_upper, p_sys->i_total_length );
-    if ( i_pos_upper < 0 ) i_pos_upper = p_sys->i_total_length;
+    i_pos_upper = __MIN( i_pos_upper, p_sys->i_total_bytes );
+    if ( i_pos_upper < 0 ) i_pos_upper = p_sys->i_total_bytes;
 
     i_start_pos = i_pos_lower;
     i_end_pos = i_pos_upper;
@@ -809,14 +809,14 @@ int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_strea
     {
         int64_t i_sync_time;
         i_lowerpos = OggBisectSearchByTime( p_demux, p_stream, i_time,
-                                            p_stream->i_data_start, p_sys->i_total_length,
+                                            p_stream->i_data_start, p_sys->i_total_bytes,
                                             &i_sync_time );
         b_found = ( i_lowerpos != -1 );
     }
 
     if ( !b_found ) return -1;
 
-    if ( i_lowerpos < p_stream->i_data_start || i_upperpos > p_sys->i_total_length )
+    if ( i_lowerpos < p_stream->i_data_start || i_upperpos > p_sys->i_total_bytes )
         return -1;
 
     /* And really do seek */
@@ -858,7 +858,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
          * final seek time */
         i_pagepos = OggBackwardSeekToFrame( p_demux,
                 __MAX ( i_size - MAX_PAGE_SIZE, p_stream->i_data_start ),
-                __MIN ( i_size + MAX_PAGE_SIZE, p_sys->i_total_length ),
+                __MIN ( i_size + MAX_PAGE_SIZE, p_sys->i_total_bytes ),
                 p_stream, i_granule );
     }
     else
@@ -902,7 +902,7 @@ int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
         i_lower_index = 0;
 
     i_offset_lower = __MAX( i_offset_lower, p_stream->i_data_start );
-    i_offset_upper = __MIN( i_offset_upper, p_sys->i_total_length );
+    i_offset_upper = __MIN( i_offset_upper, p_sys->i_total_bytes );
 
     int64_t i_sync_time;
     int64_t i_pagepos = OggBisectSearchByTime( p_demux, p_stream, i_time,
