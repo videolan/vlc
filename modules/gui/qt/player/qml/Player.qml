@@ -308,9 +308,6 @@ FocusScope {
             top: parent.top
             left: parent.left
             right: parent.right
-            topMargin: VLCStyle.applicationVerticalMargin
-            leftMargin: VLCStyle.applicationHorizontalMargin
-            rightMargin: VLCStyle.applicationHorizontalMargin
         }
 
         z: 1
@@ -330,6 +327,9 @@ FocusScope {
                 id: topbar
 
                 anchors.fill: parent
+
+                topMargin: VLCStyle.applicationVerticalMargin
+                sideMargin: VLCStyle.applicationHorizontalMargin
 
                 textWidth: (MainCtx.playlistVisible) ? rootPlayer.width - playlistpopup.width
                                                      : rootPlayer.width
@@ -364,7 +364,11 @@ FocusScope {
                 id: resumeDialog
 
                 anchors.fill: parent
+                topMargin: VLCStyle.applicationVerticalMargin
+                sideMargin: VLCStyle.applicationHorizontalMargin
+
                 colors: rootPlayer.colors
+
                 Navigation.parentItem: rootPlayer
 
                 onHidden: {
@@ -536,7 +540,6 @@ FocusScope {
             right: parent.right
             bottom: parent.bottom
 
-            topMargin: VLCStyle.applicationVerticalMargin
             bottomMargin: parent.height - rootPlayer.positionSliderY
         }
 

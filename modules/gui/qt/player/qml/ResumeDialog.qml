@@ -30,9 +30,12 @@ FocusScope {
     id: resumePanel
 
     property VLCColors colors: VLCStyle.colors
+    property int topMargin: 0
+    property int sideMargin: 0
 
     implicitWidth: layout.implicitWidth
     implicitHeight: layout.implicitHeight
+
 
     visible: false
 
@@ -93,7 +96,9 @@ FocusScope {
         id: layout
 
         anchors.fill: parent
-        anchors.leftMargin: VLCStyle.margin_small
+        anchors.leftMargin: VLCStyle.margin_small + resumePanel.sideMargin
+        anchors.rightMargin: VLCStyle.margin_small + resumePanel.sideMargin
+        anchors.topMargin: resumePanel.topMargin
         spacing: VLCStyle.margin_small
 
         //FIXME use the right xxxLabel class

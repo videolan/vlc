@@ -40,9 +40,12 @@ FocusScope{
     property bool showToolbar: false
     property bool pinControls: false
 
+    property int topMargin: 0
+    property int sideMargin: 0
+
     property int reservedHeight: 0
 
-    property int _sideMargin: VLCStyle.margin_small
+    readonly property int _sideMargin: VLCStyle.margin_small + sideMargin
 
     signal togglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock)
@@ -53,6 +56,8 @@ FocusScope{
     onShowCSDChanged: root._layout()
     onPinControlsChanged: root._layout()
     onShowToolbarChanged: root._layout()
+    onTopMarginChanged: root._layout()
+    onSideMarginChanged: root._layout()
 
     function _layoutLine(c1, c2, offset)
     {
@@ -70,8 +75,10 @@ FocusScope{
         return lineHeight
     }
 
+    //FIXME: if CSD will be weirdly placed if application safe-area are used,
+    //if you need a safe area (kiosk mode), you probably don't need CSD
     function _layout() {
-        var offset = 0
+        var offset = root.topMargin
 
         if (root.pinControls && !root.showToolbar && root.showCSD) {
             //place everything on one line
