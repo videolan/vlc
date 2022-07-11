@@ -113,7 +113,7 @@ static int Open(vout_display_t *vd,
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
         goto error;
 
-    // Set colorsapce hint *before* first swapchain resize
+    // Set colorspace hint *before* first swapchain resize
     UpdateColorspaceHint(vd, fmt);
 
     // Set initial framebuffer size
