@@ -1094,6 +1094,7 @@ test_programs(struct ctx *ctx)
     test_log("programs\n");
 
     vlc_player_t *player = ctx->player;
+    /* Long duration but this test doesn't wait for EOS */
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(100));
     params.program_count = 3;
     player_set_next_mock_media(ctx, "media1", &params);
@@ -1261,6 +1262,7 @@ test_tracks(struct ctx *ctx, bool packetized)
     test_log("tracks (packetized: %d)\n", packetized);
 
     vlc_player_t *player = ctx->player;
+    /* Long duration but this test doesn't wait for EOS */
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(100));
     params.track_count[VIDEO_ES] = 1;
     params.track_count[AUDIO_ES] = 9;
@@ -1372,6 +1374,7 @@ test_tracks_ids(struct ctx *ctx)
 
     vlc_player_t *player = ctx->player;
 
+    /* Long duration but this test doesn't wait for EOS */
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(100));
     params.track_count[VIDEO_ES] = 9;
     params.track_count[AUDIO_ES] = 9;
@@ -1572,6 +1575,8 @@ test_titles(struct ctx *ctx, bool null_names)
     test_log("titles (null_names: %d)\n", null_names);
     vlc_player_t *player = ctx->player;
 
+    /* Long duration but this test seeks to the last chapter, so the test
+     * duration is 100sec / 2000 */
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(100));
     params.title_count = 5;
     params.chapter_count = 2000;
