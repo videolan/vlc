@@ -99,7 +99,7 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd,
                 video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_sys_t *sys = vd->sys =
+    vout_display_sys_t *sys =
         vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -109,6 +109,9 @@ static int Open(vout_display_t *vd,
     free(name);
     if (sys->pl == NULL)
         return VLC_EGENERIC;
+
+    /* From now on, the error label will reset this to NULL. */
+    vd->sys = sys;
 
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
         goto error;
@@ -176,6 +179,7 @@ static int Open(vout_display_t *vd,
 error:
     pl_renderer_destroy(&sys->renderer);
     vlc_placebo_Release(sys->pl);
+    vd->sys = NULL;
     return VLC_EGENERIC;
 }
 
