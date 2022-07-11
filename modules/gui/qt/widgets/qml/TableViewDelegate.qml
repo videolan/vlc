@@ -43,11 +43,18 @@ T.Control {
 
     property var dragItem
 
+    property bool acceptDrop: false
+
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
     signal selectAndFocus(int modifiers, int focusReason)
+
+    signal dropEntered(var drag, bool before)
+    signal dropUpdatePosition(var drag, bool before)
+    signal dropExited(var drag, bool before)
+    signal dropEvent(var drag, var drop, bool before)
 
     property Component defaultDelegate: Widgets.ScrollingText {
         id: defaultDelId
@@ -213,5 +220,24 @@ T.Control {
                 }
             }
         }
+    }
+
+    DropArea {
+        enabled: delegate.acceptDrop
+
+        anchors.fill: parent
+
+        function isBefore(drag) {
+            return drag.y < height/2
+        }
+
+        onEntered: delegate.dropEntered(drag, isBefore(drag))
+
+        onPositionChanged: delegate.dropUpdatePosition(drag, isBefore(drag))
+
+        onExited:delegate.dropExited(drag, isBefore(drag))
+
+        onDropped: delegate.dropEvent(drag, drop, isBefore(drag))
+
     }
 }

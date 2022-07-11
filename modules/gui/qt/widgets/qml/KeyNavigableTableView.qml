@@ -65,6 +65,7 @@ FocusScope {
                                                       - (VLCStyle.margin_xxxsmall * 2)
 
     property Item dragItem
+    property bool acceptDrop: false
 
     // Aliases
 
@@ -114,6 +115,11 @@ FocusScope {
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
+
+    signal dropUpdatePosition(Item delegate, int index, var drag, bool before)
+    signal dropEntered(Item delegate, int index, var drag, bool before)
+    signal dropExited(Item delegate, int index,  var drag, bool before)
+    signal dropEvent(Item delegate, int index,  var drag, var drop, bool before)
 
     // Settings
 
@@ -343,9 +349,16 @@ FocusScope {
 
             selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
 
+            acceptDrop: root.acceptDrop
+
             onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
             onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
             onItemDoubleClicked: root.itemDoubleClicked(index, model)
+
+            onDropEntered: root.dropEntered(tableDelegate, index, drag, before)
+            onDropUpdatePosition: root.dropUpdatePosition(tableDelegate, index, drag, before)
+            onDropExited: root.dropExited(tableDelegate, index, drag, before)
+            onDropEvent: root.dropEvent(tableDelegate, index, drag, drop, before)
 
             onSelectAndFocus:  {
                 selectionDelegateModel.updateSelection(modifiers, view.currentIndex, index)

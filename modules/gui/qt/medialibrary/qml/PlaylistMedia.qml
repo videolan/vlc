@@ -50,47 +50,9 @@ MainInterface.MainTableView {
 
     rowHeight: VLCStyle.tableCoverRow_height
 
-    delegate: PlaylistMediaDelegate {
-        id: tableDelegate
-
-        width: view.width
-        height: root.rowHeight
-
-        horizontalSpacing: root.horizontalSpacing
-        leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
-
-        rowModel: model
-        sortModel: root.sortModel
-
-        dragItem: root.dragItem
-
-        selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
-
-        onContextMenuButtonClicked: root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
-        onRightClick: root.rightClick(menuParent, menuModel, globalMousePos)
-        onItemDoubleClicked: root.itemDoubleClicked(index, model)
-
-        onSelectAndFocus:  {
-            selectionDelegateModel.updateSelection(modifiers, view.currentIndex, index)
-
-            view.currentIndex = index
-            view.positionViewAtIndex(index, ListView.Contain)
-
-            tableDelegate.forceActiveFocus(focusReason)
-        }
-
-        Connections {
-            target: selectionDelegateModel
-
-            onSelectionChanged: {
-                tableDelegate.selected = Qt.binding(function() {
-                  return  selectionDelegateModel.isSelected(root.model.index(index, 0))
-                })
-            }
-        }
-    }
-
     headerColor: VLCStyle.colors.bg
+
+    acceptDrop: true
 
     sortModel: [{
         criteria: "thumbnail",
@@ -127,6 +89,15 @@ MainInterface.MainTableView {
     onActionForSelection: MediaLib.addAndPlay(model.getIdsForIndexes(selection))
     onItemDoubleClicked: MediaLib.addAndPlay(model.id)
 
+
+    onDropEntered: root._dropUpdatePosition(drag, index, delegate, before)
+
+    onDropUpdatePosition: root._dropUpdatePosition(drag, index, delegate, before)
+
+    onDropExited: root.hideLine(delegate)
+
+    onDropEvent: root.applyDrop(drop, index, delegate, before)
+
     //---------------------------------------------------------------------------------------------
     // Connections
     //---------------------------------------------------------------------------------------------
@@ -143,28 +114,44 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
     // Drop interface
 
-    function isDroppable(drop, index) {
+    function isDroppable(drop) {
         // NOTE: Internal drop (intra-playlist).
         return Helpers.isValidInstanceOf(drop.source, Widgets.DragItem);
     }
 
-    function applyDrop(drop, index) {
+    function applyDrop(drop, index, delegate, before) {
+        if (root.isDroppable(drop) === false) {
+            root.hideLine(delegate)
+            return
+        }
+
         var item = drop.source;
+
+        var destinationIndex = before ? index : (index + 1)
 
         // NOTE: Move implementation.
         if (dragItem === item) {
-            model.move(modelSelect.selectedIndexes, index);
+            model.move(modelSelect.selectedIndexes, destinationIndex)
 
         // NOTE: Dropping medialibrary content into the playlist.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
             item.getSelectedInputItem(function(inputItems) {
-                model.insert(inputItems, index);
+                model.insert(inputItems, destinationIndex)
             })
         }
 
-        forceActiveFocus();
+        root.forceActiveFocus()
 
-        root.hideLine(_item);
+        root.hideLine(delegate)
+    }
+
+    function _dropUpdatePosition(drag, index, delegate, before) {
+        if (root.isDroppable(drag) === false) {
+            root.hideLine(delegate)
+            return
+        }
+
+        root.showLine(delegate, before)
     }
 
     //---------------------------------------------------------------------------------------------
@@ -183,8 +170,6 @@ MainInterface.MainTableView {
             line.y = view.mapFromItem(item, 0, 0).y;
         else
             line.y = view.mapFromItem(item, 0, item.height).y;
-
-        line.visible = true;
     }
 
     function hideLine(item)
@@ -194,8 +179,6 @@ MainInterface.MainTableView {
             return;
 
         _item = null;
-
-        line.visible = false;
     }
 
     //---------------------------------------------------------------------------------------------
@@ -230,7 +213,7 @@ MainInterface.MainTableView {
 
         height: VLCStyle.dp(1)
 
-        visible: false
+        visible: root._item !== null
 
         color: VLCStyle.colors.accent
     }
