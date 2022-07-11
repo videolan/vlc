@@ -17,7 +17,9 @@ typedef struct node {
     struct node  *llink, *rlink;
 } node_t;
 
-/*	$NetBSD: tdelete.c,v 1.4 2006/03/19 01:12:08 christos Exp $	*/
+typedef void (*cmp_fn_t)(const void *, VISIT, int);
+
+/*	$NetBSD: tdelete.c,v 1.8 2016/01/20 20:47:41 christos Exp $	*/
 
 /*
  * Tree search generalized from Knuth (6.2.2) Algorithm T just like
@@ -30,9 +32,10 @@ typedef struct node {
  * Totally public domain.
  */
 
-/* delete node with given key */
+/* find a node with key "vkey" in tree "vrootp" */
 void *
-tdelete(const void* vkey, void** vrootp, int (*compar)(const void*, const void*))
+tdelete(const void *vkey, void **vrootp,
+    int (*compar)(const void *, const void *))
 {
 	node_t **rootp = (node_t **)vrootp;
 	node_t *p, *q, *r;
@@ -67,8 +70,7 @@ tdelete(const void* vkey, void** vrootp, int (*compar)(const void*, const void*)
 			q->rlink = (*rootp)->rlink;
 		}
 	}
-	if (p != *rootp)
-		free(*rootp);			/* D4: Free node */
+	free(*rootp);				/* D4: Free node */
 	*rootp = q;				/* link parent to new node */
 	return p;
 }
@@ -110,7 +112,7 @@ tdestroy(void *vrootp, void (*freefct)(void*))
 }
 
 
-/*	$NetBSD: tfind.c,v 1.5 2005/03/23 08:16:53 kleink Exp $	*/
+/*	$NetBSD: tfind.c,v 1.7 2012/06/25 22:32:45 abs Exp $	*/
 
 /*
  * Tree search generalized from Knuth (6.2.2) Algorithm T just like
@@ -123,9 +125,10 @@ tdestroy(void *vrootp, void (*freefct)(void*))
  * Totally public domain.
  */
 
-/* find a node, or return 0 */
+/* find a node by key "vkey" in tree "vrootp", or return 0 */
 void *
-tfind(const void* vkey, void* const *vrootp, int (*compar) (const void *, const void *))
+tfind(const void *vkey, void * const *vrootp,
+    int (*compar)(const void *, const void *))
 {
 	node_t * const *rootp = (node_t * const*)vrootp;
 
@@ -148,7 +151,7 @@ tfind(const void* vkey, void* const *vrootp, int (*compar) (const void *, const 
 }
 
 
-/*	$NetBSD: tsearch.c,v 1.5 2005/11/29 03:12:00 christos Exp $	*/
+/*	$NetBSD: tsearch.c,v 1.7 2012/06/25 22:32:45 abs Exp $	*/
 
 /*
  * Tree search generalized from Knuth (6.2.2) Algorithm T just like
@@ -163,7 +166,8 @@ tfind(const void* vkey, void* const *vrootp, int (*compar) (const void *, const 
 
 /* find or insert datum into search tree */
 void *
-tsearch(const void* vkey, void** vrootp, int (*compar)(const void*, const void*))
+tsearch(const void *vkey, void **vrootp,
+    int (*compar)(const void *, const void *))
 {
 	node_t *q;
 	node_t **rootp = (node_t **)vrootp;
@@ -188,14 +192,14 @@ tsearch(const void* vkey, void** vrootp, int (*compar)(const void*, const void*)
 	q = malloc(sizeof(node_t));		/* T5: key not found */
 	if (q != 0) {				/* make new node */
 		*rootp = q;			/* link new node to old */
-		q->key = (void*)vkey;	/* initialize new node */
+		q->key = (void*)(vkey);	/* initialize new node */
 		q->llink = q->rlink = NULL;
 	}
 	return q;
 }
 
 
-/*	$NetBSD: twalk.c,v 1.2 1999/09/16 11:45:37 lukem Exp $	*/
+/*	$NetBSD: twalk.c,v 1.4 2012/03/20 16:38:45 matt Exp $	*/
 
 /*
  * Tree search generalized from Knuth (6.2.2) Algorithm T just like
@@ -210,7 +214,8 @@ tsearch(const void* vkey, void** vrootp, int (*compar)(const void*, const void*)
 
 /* Walk the nodes of a tree */
 static void
-twalk_recurse(const node_t* root, void (*action)(const void*, VISIT, int), int level)
+trecurse(const node_t *root,	/* Root of the tree to be walked */
+	cmp_fn_t action, int level)
 {
 	assert(root != NULL);
 	assert(action != NULL);
@@ -220,20 +225,20 @@ twalk_recurse(const node_t* root, void (*action)(const void*, VISIT, int), int l
 	else {
 		(*action)(root, preorder, level);
 		if (root->llink != NULL)
-			twalk_recurse(root->llink, action, level + 1);
+			trecurse(root->llink, action, level + 1);
 		(*action)(root, postorder, level);
 		if (root->rlink != NULL)
-			twalk_recurse(root->rlink, action, level + 1);
+			trecurse(root->rlink, action, level + 1);
 		(*action)(root, endorder, level);
 	}
 }
 
 /* Walk the nodes of a tree */
 void
-twalk(const void* vroot, void (*action)(const void*, VISIT, int))
+twalk(const void *vroot, cmp_fn_t action) /* Root of the tree to be walked */
 {
 	if (vroot != NULL && action != NULL)
-		twalk_recurse(vroot, action, 0);
+		trecurse(vroot, action, 0);
 }
 
 #endif // HAVE_SEARCH_H
