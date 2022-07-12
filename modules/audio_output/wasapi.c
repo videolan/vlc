@@ -177,7 +177,14 @@ static void StartDeferredCallback(void *val)
     aout_stream_t *s = val;
     aout_stream_sys_t *sys = s->sys;
 
-    HRESULT hr = IAudioClient_Start(sys->client);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    /* From a timer callback, so it's impossible that COM was init before */
+    assert(SUCCEEDED(hr));
+
+    hr = IAudioClient_Start(sys->client);
+
+    CoUninitialize();
+
     atomic_store(&sys->started_state,
                  SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
 }
