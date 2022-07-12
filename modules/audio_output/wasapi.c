@@ -181,29 +181,30 @@ static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
     aout_stream_sys_t *sys = s->sys;
     vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
     vlc_tick_t start_delay = date - vlc_tick_now() - written;
-    BOOL timer_updated = false;
 
     /* Create or update the current timer */
     if (start_delay > 0)
     {
         vlc_timer_schedule( sys->timer, false, start_delay, 0);
-        timer_updated = true;
+        msg_Dbg(s, "deferring start (%"PRId64" us)", start_delay);
     }
     else
+    {
         vlc_timer_disarm(sys->timer);
 
-    if (!timer_updated)
-    {
-        HRESULT hr = IAudioClient_Start(sys->client);
-        if (FAILED(hr))
+        /* Check started_state again, since the timer callback could have been
+         * called before or while disarming the timer */
+        if (atomic_load(&sys->started_state) == STARTED_STATE_INIT)
         {
-            atomic_store(&sys->started_state, STARTED_STATE_ERROR);
-            return hr;
+            HRESULT hr = IAudioClient_Start(sys->client);
+            if (FAILED(hr))
+            {
+                atomic_store(&sys->started_state, STARTED_STATE_ERROR);
+                return hr;
+            }
+            atomic_store(&sys->started_state, STARTED_STATE_OK);
         }
-        atomic_store(&sys->started_state, STARTED_STATE_OK);
     }
-    else
-        msg_Dbg(s, "deferring start (%"PRId64" us)", start_delay);
 
     return S_OK;
 }
