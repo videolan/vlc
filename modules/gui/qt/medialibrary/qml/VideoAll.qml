@@ -127,6 +127,11 @@ FocusScope {
         ].filter(function(a) { return a !== "" })
     }
 
+    // reimplement function to show "Info Panel" in grid view for the model index data
+    function isInfoExpandPanelAvailable(modelIndexData) {
+        return false
+    }
+
     // Events
 
     function onAction(indexes) {
