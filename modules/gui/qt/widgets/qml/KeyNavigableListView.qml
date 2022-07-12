@@ -58,37 +58,37 @@ ListView {
 
     readonly property Item firstVisibleItem: {
         if (transitionsRunning || !delegateItem)
-            null
+            return null
 
         var margin = -root.displayMarginBeginning
         if (orientation === Qt.Vertical) {
             if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
                 margin += headerItem.height
 
-            itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + margin)
+            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + margin)
         } else {
             if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
                 margin += headerItem.width
 
-            itemAt(contentX + margin, contentY + (delegateItem.y + delegateItem.height / 2))
+            return itemAt(contentX + margin, contentY + (delegateItem.y + delegateItem.height / 2))
         }
     }
 
     readonly property Item lastVisibleItem: {
         if (transitionsRunning || !delegateItem)
-            null
+            return null
 
         var margin = -root.displayMarginEnd
         if (orientation === Qt.Vertical) {
             if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
                 margin += footerItem.height
 
-            itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + height - margin - 1)
+            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + height - margin - 1)
         } else {
             if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
                 margin += footerItem.width
 
-            itemAt(contentX + width - margin - 1, contentY + (delegateItem.y + delegateItem.height / 2))
+            return itemAt(contentX + width - margin - 1, contentY + (delegateItem.y + delegateItem.height / 2))
         }
     }
 
