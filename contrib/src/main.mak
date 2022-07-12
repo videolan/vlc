@@ -157,7 +157,7 @@ ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)),)
 HAVE_CLANG := 1
 endif
 
-cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
+cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - | grep -E $(1))
 
 EXTRA_CFLAGS += -I$(PREFIX)/include
 CPPFLAGS := $(CPPFLAGS) $(EXTRA_CFLAGS)
