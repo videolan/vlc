@@ -314,73 +314,40 @@ FocusScope {
         edge: Widgets.DrawerExt.Edges.Top
         state: "visible"
 
-        component: FocusScope {
-            readonly property bool isResumeDialogVisible: resumeDialog.visible
-
-            property alias topbar: topbar
+        component: TopBar {
+            id: topbar
 
             width: topcontrolView.width
             height: topbar.implicitHeight
+
+            topMargin: VLCStyle.applicationVerticalMargin
+            sideMargin: VLCStyle.applicationHorizontalMargin
+
+            textWidth: (MainCtx.playlistVisible) ? rootPlayer.width - playlistpopup.width
+                                                 : rootPlayer.width
+
             focus: true
+            title: mainPlaylistController.currentItem.title
+            colors: rootPlayer.colors
 
-            TopBar {
-                id: topbar
+            pinControls: rootPlayer.pinVideoControls
+            showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
+            showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
 
-                anchors.fill: parent
+            Navigation.parentItem: rootPlayer
+            Navigation.downItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
-                topMargin: VLCStyle.applicationVerticalMargin
-                sideMargin: VLCStyle.applicationHorizontalMargin
+            onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
-                textWidth: (MainCtx.playlistVisible) ? rootPlayer.width - playlistpopup.width
-                                                     : rootPlayer.width
-
-                focus: true
-                visible: !resumeDialog.visible
-                title: mainPlaylistController.currentItem.title
-                colors: rootPlayer.colors
-
-                pinControls: rootPlayer.pinVideoControls
-                showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
-                showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
-
-                Navigation.parentItem: rootPlayer
-                Navigation.downItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
-
-                onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
-
-                onRequestLockUnlockAutoHide: {
-                    rootPlayer.lockUnlockAutoHide(lock)
-                }
-
-                onBackRequested: {
-                    if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
-                       mainPlaylistController.stop()
-                    }
-                    History.previous()
-                }
+            onRequestLockUnlockAutoHide: {
+                rootPlayer.lockUnlockAutoHide(lock)
             }
 
-            ResumeDialog {
-                id: resumeDialog
-
-                anchors.fill: parent
-                topMargin: VLCStyle.applicationVerticalMargin
-                sideMargin: VLCStyle.applicationHorizontalMargin
-
-                colors: rootPlayer.colors
-
-                Navigation.parentItem: rootPlayer
-
-                onHidden: {
-                    if (activeFocus) {
-                        topbar.focus = true
-                        controlBarView.forceActiveFocus()
-                    }
+            onBackRequested: {
+                if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
+                   mainPlaylistController.stop()
                 }
-
-                onVisibleChanged: {
-                    rootPlayer.lockUnlockAutoHide(visible)
-                }
+                History.previous()
             }
         }
     }

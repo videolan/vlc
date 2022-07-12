@@ -76,20 +76,20 @@ FocusScope{
     }
 
     //FIXME: if CSD will be weirdly placed if application safe-area are used,
-    //if you need a safe area (kiosk mode), you probably don't need CSD
+    //nota that if you need a safe area (kiosk mode), you probably don't need CSD
     function _layout() {
         var offset = root.topMargin
 
         if (root.pinControls && !root.showToolbar && root.showCSD) {
             //place everything on one line
-            var lineHeight = Math.max(logoGroup.implicitHeight, playlistGroup.implicitHeight, csdDecorations.implicitHeight)
+            var lineHeight = Math.max(logoOrResume.implicitHeight, playlistGroup.implicitHeight, csdDecorations.implicitHeight)
 
             centerTitleText.y = 0
             centerTitleText.height = lineHeight
 
             csdDecorations.height  = lineHeight
 
-            logoGroup.height =  lineHeight
+            logoOrResume.height =  lineHeight
 
             playlistGroup.height = lineHeight
             playlistGroup.anchors.topMargin = 0
@@ -113,7 +113,7 @@ FocusScope{
             if (root.showCSD) {
                 right = csdDecorations
                 if (!left) {
-                    left = logoGroup
+                    left = logoOrResume
                     logoPlaced = true
                 }
             }
@@ -127,7 +127,7 @@ FocusScope{
             }
 
             if (!logoPlaced) {
-                left = logoGroup
+                left = logoOrResume
             } else {
                 left = undefined
             }
@@ -173,6 +173,7 @@ FocusScope{
         width: implicitWidth
 
         visible: root.showToolbar
+        enabled: root.showToolbar
         textColor: root.colors.text
         highlightedBgColor: root.colors.bgHover
         highlightedTextColor: root.colors.bgHoverText
@@ -181,43 +182,85 @@ FocusScope{
         onMenuOpenedChanged: root.requestLockUnlockAutoHide(menuOpened)
     }
 
-    RowLayout {
-        id: logoGroup
 
-        spacing: VLCStyle.margin_xxsmall
+    Item {
+        id: logoOrResume
 
-        anchors.left: parent.left
-        anchors.top: parent.top
+        anchors.left: root.left
+        anchors.top: root.top
         anchors.leftMargin:  root._sideMargin
 
-        Widgets.IconControlButton {
-            id: backBtn
+        implicitWidth: resumeDialog.visible ? resumeDialog.implicitWidth
+                                            : logoGroup.implicitWidth
 
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+        implicitHeight: resumeDialog.visible ? resumeDialog.implicitHeight
+                                             : logoGroup.implicitHeight
 
-            objectName: "IconToolButton"
-            size: VLCStyle.banner_icon_size
-            iconText: VLCIcons.topbar_previous
-            text: I18n.qtr("Back")
-            focus: true
-            colors: root.colors
+        Item {
+            id: logoGroup
 
-            Navigation.parentItem: root
-            Navigation.rightItem: menuSelector
-            onClicked: root.backRequested()
+            anchors.fill: parent
+            visible: !resumeDialog.visible
 
-            onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
+            implicitHeight: VLCStyle.banner_icon_size + VLCStyle.margin_xxsmall * 2
+            implicitWidth: backBtn.implicitWidth + logo.implicitWidth + VLCStyle.margin_xxsmall
+
+            Widgets.IconControlButton {
+                id: backBtn
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+
+                objectName: "IconToolButton"
+                size: VLCStyle.banner_icon_size
+                iconText: VLCIcons.topbar_previous
+                text: I18n.qtr("Back")
+                focus: true
+                colors: root.colors
+
+
+                Navigation.parentItem: root
+                Navigation.rightItem: menuSelector
+                onClicked: root.backRequested()
+
+                onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
+            }
+
+            Image {
+                id: logo
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: backBtn.right
+                anchors.leftMargin: VLCStyle.margin_xxsmall
+
+                sourceSize.width: VLCStyle.icon_small
+                sourceSize.height: VLCStyle.icon_small
+                source: "qrc:///logo/cone.svg"
+                enabled: false
+            }
         }
 
-        Image {
-            id: logo
 
-            Layout.alignment: Qt.AlignVCenter
+        ResumeDialog {
+            id: resumeDialog
 
-            sourceSize.width: VLCStyle.icon_small
-            sourceSize.height: VLCStyle.icon_small
-            source: "qrc:///logo/cone.svg"
-            enabled: false
+            anchors.fill: parent
+            //add aditional margin so it align with menubar text when visible (see MenuBar.qml)
+            anchors.leftMargin: VLCStyle.margin_xsmall
+
+            colors: root.colors
+
+            Navigation.parentItem: rootPlayer
+
+            onHidden: {
+                if (activeFocus) {
+                    backBtn.forceActiveFocus()
+                }
+            }
+
+            onVisibleChanged: {
+                root.requestLockUnlockAutoHide(visible)
+            }
         }
     }
 
@@ -225,14 +268,14 @@ FocusScope{
     T.Label {
         id: centerTitleText
 
-        readonly property int _leftLimit: logoGroup.x + logoGroup.width
+        readonly property int _leftLimit: logoOrResume.x + logoOrResume.width
         readonly property int _rightLimit: playlistGroup.x
         readonly property int _availableWidth: _rightLimit - _leftLimit
         readonly property int _centerX: ((root.width - centerTitleText.implicitWidth) / 2)
         readonly property bool _alignHCenter: _centerX > _leftLimit
                                               && _centerX + centerTitleText.implicitWidth < _rightLimit
 
-        visible: root.pinControls
+        visible: root.pinControls && !resumeDialog.visible
 
         width: Math.min(centerTitleText._availableWidth, centerTitleText.implicitWidth)
 
@@ -265,7 +308,7 @@ FocusScope{
         id: leftTitleText
 
         anchors.left: parent.left
-        anchors.top: logoGroup.bottom
+        anchors.top: logoOrResume.bottom
         anchors.leftMargin: root._sideMargin
 
         width: root.textWidth - VLCStyle.margin_normal

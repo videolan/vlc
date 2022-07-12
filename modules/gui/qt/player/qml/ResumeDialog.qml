@@ -25,17 +25,15 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///menus/" as Menus
 
 FocusScope {
     id: resumePanel
 
     property VLCColors colors: VLCStyle.colors
-    property int topMargin: 0
-    property int sideMargin: 0
 
     implicitWidth: layout.implicitWidth
     implicitHeight: layout.implicitHeight
-
 
     visible: false
 
@@ -85,26 +83,19 @@ FocusScope {
         hideResumePanel()
     }
 
-    //drag and dbl click the titlebar in CSD mode
-    Loader {
-        anchors.fill: parent
-        active: MainCtx.clientSideDecoration
-        source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
-    }
-
     RowLayout {
         id: layout
 
         anchors.fill: parent
-        anchors.leftMargin: VLCStyle.margin_small + resumePanel.sideMargin
-        anchors.rightMargin: VLCStyle.margin_small + resumePanel.sideMargin
-        anchors.topMargin: resumePanel.topMargin
+
         spacing: VLCStyle.margin_small
 
         //FIXME use the right xxxLabel class
         T.Label {
             Layout.preferredHeight: implicitHeight
             Layout.preferredWidth: implicitWidth
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
 
             color: resumePanel.colors.playerFg
             font.pixelSize: VLCStyle.fontSize_normal
@@ -145,27 +136,6 @@ FocusScope {
             Navigation.leftItem: continueBtn
             Keys.priority: Keys.AfterItem
             Keys.onPressed: closeBtn.Navigation.defaultKeyAction(event)
-        }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
-        Loader {
-            id: csdDecorations
-
-            Layout.alignment: Qt.AlignTop | Qt.AlignRight
-
-            focus: false
-            height: VLCStyle.icon_normal
-            active: MainCtx.clientSideDecoration
-            enabled: MainCtx.clientSideDecoration
-            visible: MainCtx.clientSideDecoration
-            source: "qrc:///widgets/CSDWindowButtonSet.qml"
-            onLoaded: {
-                item.color = Qt.binding(function() { return resumePanel.colors.playerFg })
-                item.hoverColor = Qt.binding(function() { return resumePanel.colors.windowCSDButtonDarkBg })
-            }
         }
     }
 }
