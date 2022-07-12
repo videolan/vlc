@@ -4,7 +4,7 @@ GLSLANG_VERSION := 11.10.0
 GLSLANG_URL := https://github.com/KhronosGroup/glslang/archive/refs/tags/$(GLSLANG_VERSION).tar.gz
 
 PKGS += glslang
-ifeq ($(call need_pkg,"glslang"),)
+ifeq ($(call need_pkg,"glslang >= 10"),)
 PKGS_FOUND += glslang
 endif
 
