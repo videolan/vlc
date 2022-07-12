@@ -163,7 +163,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged FINAL)
     Q_PROPERTY(bool hasFirstrun READ hasFirstrun CONSTANT FINAL)
     Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged FINAL)
-    Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged FINAL)
+    Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu WRITE setHasToolbarMenu NOTIFY hasToolbarMenuChanged FINAL)
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged FINAL)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT FINAL)
@@ -337,6 +337,7 @@ protected:
     Grouping             m_grouping = GROUPING_NONE;
     ColorSchemeModel*    m_colorScheme = nullptr;
     bool                 m_windowTitlebar = true;
+    // NOTE: Ideally this should be a QVLCBool.
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
     bool                 m_pinVideoControls = false;
@@ -374,6 +375,7 @@ public slots:
     void setGrouping( Grouping );
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( double );
+    void setHasToolbarMenu( bool );
     void setPinVideoControls( bool );
     void updateIntfScaleFactor();
     void onWindowVisibilityChanged(QWindow::Visibility);

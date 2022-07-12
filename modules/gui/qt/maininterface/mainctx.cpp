@@ -419,6 +419,18 @@ void MainCtx::setIntfUserScaleFactor(double newValue)
     updateIntfScaleFactor();
 }
 
+void MainCtx::setHasToolbarMenu( bool hasToolbarMenu )
+{
+    if (m_hasToolbarMenu == hasToolbarMenu)
+        return;
+
+    m_hasToolbarMenu = hasToolbarMenu;
+
+    config_PutInt("qt-menubar", (int) hasToolbarMenu);
+
+    emit hasToolbarMenuChanged();
+}
+
 void MainCtx::setPinVideoControls(bool pinVideoControls)
 {
     if (m_pinVideoControls == pinVideoControls)
