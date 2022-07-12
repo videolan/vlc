@@ -232,7 +232,12 @@ T.Control {
                 Layout.preferredWidth: pictureWidth
                 Layout.preferredHeight: pictureHeight
 
-                onPlayIconClicked: root.playClicked()
+                onPlayIconClicked: {
+                    // emulate a mouse click before delivering the play signal as to select the item
+                    // this helps in updating the selection and restore of initial index in the parent views
+                    root.itemClicked(picture, mouse.button, mouse.modifiers)
+                    root.playClicked()
+                }
 
                 DoubleShadow {
                     id: unselectedShadow

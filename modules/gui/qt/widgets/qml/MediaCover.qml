@@ -49,7 +49,7 @@ Rectangle {
 
     // Signals
 
-    signal playIconClicked
+    signal playIconClicked(var /* MouseEvent */ mouse)
 
     // Settings
 
@@ -86,7 +86,7 @@ Rectangle {
         sourceComponent: Widgets.PlayCover {
             width: playIconSize
 
-            onClicked: playIconClicked()
+            onClicked: playIconClicked(mouse)
         }
 
         asynchronous: true
