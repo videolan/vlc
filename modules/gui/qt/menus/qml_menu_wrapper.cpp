@@ -428,7 +428,10 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
     QAction * sectionTitles    = m_menu->addSection(qtr("Titles"));
     QAction * sectionChapters  = m_menu->addSection(qtr("Chapters"));
-    QAction * sectionBookmarks = m_menu->addSection(qtr("Bookmarks"));
+    QAction * sectionBookmarks = nullptr;
+
+    if (m_ctx->hasMediaLibrary())
+        sectionBookmarks = m_menu->addSection(qtr("Bookmarks"));
 
     // Titles
 
@@ -469,21 +472,23 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     });
 
     // Bookmarks
-
-    // FIXME: Do we really need a translation call for the string shortcut ?
-    m_menu->addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog, qtr("Ctrl+B"));
-
-    m_menu->addSeparator();
-
-    MLBookmarkModel * bookmarks = new MLBookmarkModel(m_ctx->getMediaLibrary(),
-                                                      m_player->getPlayer(), m_menu.get());
-
-    helper = new ListMenuHelper(m_menu.get(), bookmarks, nullptr, m_menu.get());
-
-    connect(helper, &ListMenuHelper::select, [bookmarks](int index)
+    if (m_ctx->hasMediaLibrary())
     {
-        bookmarks->select(bookmarks->index(index, 0));
-    });
+        // FIXME: Do we really need a translation call for the string shortcut ?
+        m_menu->addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog, qtr("Ctrl+B"));
+
+        m_menu->addSeparator();
+
+        MLBookmarkModel * bookmarks = new MLBookmarkModel(m_ctx->getMediaLibrary(),
+                                                          m_player->getPlayer(), m_menu.get());
+
+        helper = new ListMenuHelper(m_menu.get(), bookmarks, nullptr, m_menu.get());
+
+        connect(helper, &ListMenuHelper::select, [bookmarks](int index)
+        {
+            bookmarks->select(bookmarks->index(index, 0));
+        });
+    }
 
     m_positioner.popup(m_menu.get(), position, above);
 }
