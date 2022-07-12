@@ -166,10 +166,21 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     return hr;
 }
 
+static HRESULT StartNow(aout_stream_t *s)
+{
+    aout_stream_sys_t *sys = s->sys;
+
+    HRESULT hr = IAudioClient_Start(sys->client);
+
+    atomic_store(&sys->started_state,
+                 SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
+
+    return hr;
+}
+
 static void StartDeferredCallback(void *val)
 {
     aout_stream_t *s = val;
-    aout_stream_sys_t *sys = s->sys;
 
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (unlikely(FAILED(hr)))
@@ -178,12 +189,9 @@ static void StartDeferredCallback(void *val)
         return;
     }
 
-    hr = IAudioClient_Start(sys->client);
+    StartNow(s);
 
     CoUninitialize();
-
-    atomic_store(&sys->started_state,
-                 SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
 }
 
 static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
@@ -205,15 +213,7 @@ static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
         /* Check started_state again, since the timer callback could have been
          * called before or while disarming the timer */
         if (atomic_load(&sys->started_state) == STARTED_STATE_INIT)
-        {
-            HRESULT hr = IAudioClient_Start(sys->client);
-            if (FAILED(hr))
-            {
-                atomic_store(&sys->started_state, STARTED_STATE_ERROR);
-                return hr;
-            }
-            atomic_store(&sys->started_state, STARTED_STATE_OK);
-        }
+            return StartNow(s);
     }
 
     return S_OK;
