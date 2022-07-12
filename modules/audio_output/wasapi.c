@@ -175,6 +175,9 @@ static HRESULT StartNow(aout_stream_t *s)
     atomic_store(&sys->started_state,
                  SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
 
+    if (FAILED(hr))
+        msg_Err(s, "stream failed to start: 0x%lX", hr);
+
     return hr;
 }
 
