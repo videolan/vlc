@@ -105,6 +105,10 @@ Widgets.PageLoader {
             onCurrentIndexChanged: root._updateHistoryGroup(group)
             onParentIdChanged    : root._updateHistoryGroup(group)
             onTitleChanged       : root._updateHistoryGroup(group)
+
+            function isInfoExpandPanelAvailable(/* modelIndexData */) {
+                return true
+            }
         }
     }
 }
