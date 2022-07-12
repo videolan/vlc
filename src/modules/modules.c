@@ -297,7 +297,8 @@ module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
 #undef module_unneed
 void module_unneed(vlc_object_t *obj, module_t *module)
 {
-    msg_Dbg(obj, "removing module \"%s\"", module_get_object(module));
+    msg_Dbg(obj, "removing \"%s\" module \"%s\"", module_get_capability(module),
+            module_get_object(module));
     var_Destroy(obj, "module-name");
 
     if (module->deactivate != NULL)
