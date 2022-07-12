@@ -3,8 +3,17 @@
 GLSLANG_VERSION := 11.10.0
 GLSLANG_URL := https://github.com/KhronosGroup/glslang/archive/refs/tags/$(GLSLANG_VERSION).tar.gz
 
+# glslang doesn't export a pkg-config file, so we check the header manually
+GLSLANG_MIN_VER := 10
+define GLSLANG_CHECK :=
+# include <glslang/build_info.h> \n
+# if GLSLANG_VERSION_MAJOR >= $(GLSLANG_MIN_VER) \n
+#  define GLSLANG_OK \n
+# endif
+endef
+
 PKGS += glslang
-ifeq ($(call need_pkg,"glslang >= 10"),)
+ifneq ($(call cppcheck, GLSLANG_OK, $(GLSLANG_CHECK)),)
 PKGS_FOUND += glslang
 endif
 
