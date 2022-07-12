@@ -1280,6 +1280,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
+    aout->time_get = s->time_get == NULL ? NULL : TimeGet;
 
     aout_GainRequest(aout, sys->gain);
     return 0;
@@ -1381,7 +1382,6 @@ static int Open(vlc_object_t *obj)
 
     aout->start = Start;
     aout->stop = Stop;
-    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
