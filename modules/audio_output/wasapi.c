@@ -125,12 +125,6 @@ typedef struct aout_stream_sys
     bool s24s32; /**< Output configured as S24N, but input as S32N */
 } aout_stream_sys_t;
 
-static void ResetTimer(aout_stream_t *s)
-{
-    aout_stream_sys_t *sys = s->sys;
-    vlc_timer_disarm(sys->timer);
-}
-
 /*** VLC audio output callbacks ***/
 static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
 {
@@ -206,7 +200,7 @@ static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
         timer_updated = true;
     }
     else
-        ResetTimer(s);
+        vlc_timer_disarm(sys->timer);
 
     if (!timer_updated)
     {
@@ -332,7 +326,7 @@ static HRESULT Pause(aout_stream_t *s, bool paused)
 
     if (paused)
     {
-        ResetTimer(s);
+        vlc_timer_disarm(sys->timer);
         if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
             hr = IAudioClient_Stop(sys->client);
         else
@@ -352,7 +346,7 @@ static HRESULT Flush(aout_stream_t *s)
     aout_stream_sys_t *sys = s->sys;
     HRESULT hr;
 
-    ResetTimer(s);
+    vlc_timer_disarm(sys->timer);
     /* Reset the timer state, the next start need to be deferred. */
     if (atomic_exchange(&sys->started_state, STARTED_STATE_INIT) == STARTED_STATE_OK)
     {
@@ -610,7 +604,7 @@ static void Stop(aout_stream_t *s)
 {
     aout_stream_sys_t *sys = s->sys;
 
-    ResetTimer(s);
+    vlc_timer_disarm(sys->timer);
 
     if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
         IAudioClient_Stop(sys->client);
