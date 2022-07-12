@@ -497,8 +497,11 @@ void *tsearch( const void *key, void **rootp, int(*cmp)(const void *, const void
 void *tfind( const void *key, void * const *rootp, int(*cmp)(const void *, const void *) );
 void *tdelete( const void *key, void **rootp, int(*cmp)(const void *, const void *) );
 void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int depth) );
+#ifndef _WIN64
+/* the Win32 prototype of lfind() expects an unsigned* for 'nelp' */
 void *lfind( const void *key, const void *base, size_t *nmemb,
              size_t size, int(*cmp)(const void *, const void *) );
+#endif
 #endif /* HAVE_SEARCH_H */
 
 #ifdef _WIN64
