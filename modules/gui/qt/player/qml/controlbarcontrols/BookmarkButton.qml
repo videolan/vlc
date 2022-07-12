@@ -38,6 +38,8 @@ Widgets.IconControlButton {
     // NOTE: We want to pop the menu above the button.
     onClicked: menu.popup(this.mapToGlobal(0, 0), true)
 
+    enabled: !paintOnly && (Player.hasChapters || Player.hasTitles || MainCtx.mediaLibraryAvailable)
+
     QmlBookmarkMenu {
         id: menu
 

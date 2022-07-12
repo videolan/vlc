@@ -73,6 +73,7 @@ FocusScope {
                 sourceModel: playerControlLayout.model.left
 
                 player: Player
+                ctx: MainCtx
             }
 
             Navigation.parentItem: playerControlLayout
@@ -106,6 +107,7 @@ FocusScope {
                 sourceModel: playerControlLayout.model.center
 
                 player: Player
+                ctx: MainCtx
             }
 
             Navigation.parentItem: playerControlLayout
@@ -141,6 +143,7 @@ FocusScope {
                 sourceModel: playerControlLayout.model.right
 
                 player: Player
+                ctx: MainCtx
             }
 
             rightAligned: true

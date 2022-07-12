@@ -23,6 +23,7 @@
 // Player includes
 #include "player_controller.hpp"
 #include "control_list_model.hpp"
+#include "maininterface/mainctx.hpp"
 
 // Ctor / dtor
 
@@ -60,6 +61,12 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
     {
         return (m_player->hasMenu() || m_player->isTeletextAvailable());
     }
+    else if (type == ControlListModel::BOOKMARK_BUTTON)
+    {
+        assert(m_ctx);
+        return (m_ctx->hasMediaLibrary() || m_player->hasChapters() || m_player->hasTitles());
+    }
+
 
     return true;
 }
@@ -82,8 +89,23 @@ void ControlListFilter::setPlayer(PlayerController * player)
 
     connect(player, &PlayerController::teletextAvailableChanged, this, &ControlListFilter::invalidate);
     connect(player, &PlayerController::hasMenuChanged,           this, &ControlListFilter::invalidate);
+    connect(player, &PlayerController::hasChaptersChanged,       this, &ControlListFilter::invalidate);
+    connect(player, &PlayerController::hasTitlesChanged,         this, &ControlListFilter::invalidate);
 
     invalidate();
 
     emit playerChanged();
+}
+
+MainCtx* ControlListFilter::ctx() const
+{
+    return m_ctx;
+}
+
+void ControlListFilter::setCtx(MainCtx* ctx)
+{
+    if (m_ctx == ctx)
+        return;
+    m_ctx = ctx;
+    emit ctxChanged();
 }

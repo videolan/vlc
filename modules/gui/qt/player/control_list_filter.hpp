@@ -26,12 +26,14 @@
 
 // Forward declarations
 class PlayerController;
+class MainCtx;
 
 class ControlListFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
 
     Q_PROPERTY(PlayerController * player READ player WRITE setPlayer NOTIFY playerChanged)
+    Q_PROPERTY(MainCtx* ctx READ ctx WRITE setCtx NOTIFY ctxChanged)
 
 public:
     explicit ControlListFilter(QObject * parent = nullptr);
@@ -44,13 +46,18 @@ protected: // QSortFilterProxyModel reimplementation
 
 signals:
     void playerChanged();
+    void ctxChanged();
 
 public: // Properties
     PlayerController * player();
     void setPlayer(PlayerController * player);
 
+    MainCtx* ctx() const;
+    void setCtx(MainCtx* ctx);
+
 private: // Variables
     PlayerController * m_player = nullptr;
+    MainCtx* m_ctx = nullptr;
 };
 
 #endif // CONTROLLISTFILTER_HPP
