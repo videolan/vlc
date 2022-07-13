@@ -990,10 +990,4 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
         atomic_store_explicit(&stream->drain_deadline, drain_deadline,
                               memory_order_relaxed);
     }
-
-    vlc_clock_Reset(stream->sync.clock);
-    if (stream->filters)
-        aout_FiltersResetClock(stream->filters);
-
-    stream_Discontinuity(stream);
 }
