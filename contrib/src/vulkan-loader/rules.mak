@@ -18,8 +18,10 @@ ifdef HAVE_ANDROID
 PKGS_FOUND += vulkan-loader
 endif
 
+ifndef HAVE_ANDROID
 ifdef HAVE_LINUX
 DEPS_vulkan-loader += xcb $(DEPS_xcb)
+endif
 endif
 
 VULKAN_LOADER_CONF := \
