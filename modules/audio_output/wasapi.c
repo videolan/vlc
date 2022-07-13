@@ -332,16 +332,17 @@ static HRESULT Pause(aout_stream_t *s, bool paused)
     {
         vlc_timer_disarm(sys->timer);
         if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
+        {
             hr = IAudioClient_Stop(sys->client);
+            if (FAILED(hr))
+                msg_Warn(s, "cannot stop stream (error 0x%lX)", hr);
+        }
         else
             hr = S_OK;
         /* Don't reset the timer state, we won't have to start deferred again. */
     }
     else
-        hr = IAudioClient_Start(sys->client);
-    if (FAILED(hr))
-        msg_Warn(s, "cannot %s stream (error 0x%lX)",
-                 paused ? "stop" : "start", hr);
+        hr = StartNow(s);
     return hr;
 }
 
