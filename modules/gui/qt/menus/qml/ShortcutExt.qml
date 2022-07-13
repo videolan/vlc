@@ -20,6 +20,6 @@ import QtQuick 2.11
 import org.videolan.vlc 0.1
 
 Shortcut {
-    context: Qt.WindowShortcut
+    context: Qt.ApplicationShortcut
     enabled: MainCtx.useGlobalShortcuts
 }
