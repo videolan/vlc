@@ -38,12 +38,13 @@ Item {
     ShortcutExt{ sequence:"Ctrl+M"; onActivated: DialogsProvider.messagesDialog(); }
     ShortcutExt{ sequence:"Ctrl+P"; onActivated: DialogsProvider.prefsDialog(); }
     ShortcutExt{ sequence:"Ctrl+T"; onActivated: DialogsProvider.gotoTimeDialog(); }
-    ShortcutExt{ sequence:"F1";     onActivated: DialogsProvider.helpDialog(); }
 
     ShortcutExt{ sequence:"Ctrl+Shift+W"; onActivated: DialogsProvider.vlmDialog(); }
 
     ShortcutExt{ sequence:"Ctrl+L"; onActivated: MainCtx.playlistVisible = !MainCtx.playlistVisible; }
-    ShortcutExt{ sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen(); }
+
+    ShortcutExt{ sequence:"F1"; onActivated: DialogsProvider.helpDialog() }
+    ShortcutExt{ sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen() }
 
     Loader {
         active: MainCtx.mediaLibraryAvailable
