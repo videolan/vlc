@@ -261,6 +261,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/audio_device_model.cpp  \
 	gui/qt/util/audio_device_model.hpp \
 	gui/qt/util/color_scheme_model.cpp gui/qt/util/color_scheme_model.hpp \
+	gui/qt/util/color_svg_image_provider.cpp gui/qt/util/color_svg_image_provider.hpp \
 	gui/qt/util/covergenerator.cpp \
 	gui/qt/util/covergenerator.hpp \
 	gui/qt/util/imageluminanceextractor.cpp gui/qt/util/imageluminanceextractor.hpp \
@@ -456,6 +457,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/asynctask.moc.cpp \
 	gui/qt/util/audio_device_model.moc.cpp \
 	gui/qt/util/color_scheme_model.moc.cpp \
+	gui/qt/util/color_svg_image_provider.moc.cpp \
 	gui/qt/util/imageluminanceextractor.moc.cpp \
 	gui/qt/util/i18n.moc.cpp \
 	gui/qt/util/keyhelper.moc.cpp \

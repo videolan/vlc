@@ -41,6 +41,7 @@
 #include "util/qmlinputitem.hpp"
 #include "util/mouse_event_filter.hpp"
 #include "util/flickable_scroll_handler.hpp"
+#include "util/color_svg_image_provider.hpp"
 #include "util/effects_image_provider.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
@@ -133,6 +134,7 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     SingletonRegisterHelper<SystemPalette>::setInstance( new SystemPalette(this) );
     SingletonRegisterHelper<DialogErrorModel>::setInstance( new DialogErrorModel(m_intf, this));
     SingletonRegisterHelper<QmlKeyHelper>::setInstance( new QmlKeyHelper(this) );
+    SingletonRegisterHelper<SVGColorImage>::setInstance( new SVGColorImage(this) );
 
     if (m_mainCtx->hasMediaLibrary())
     {
@@ -160,8 +162,9 @@ bool MainUI::setup(QQmlEngine* engine)
 
         engine->addImageProvider(MLCUSTOMCOVER_PROVIDERID, customCover);
     }
-    
+
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
+    engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider(m_intf));
 
     m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/main/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())
@@ -225,10 +228,13 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
+        qmlRegisterSingletonType<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", SingletonRegisterHelper<SVGColorImage>::callback);
 
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
+        qmlRegisterUncreatableType<SVGColorImageBuilder>(uri, versionMajor, versionMinor, "SVGColorImageBuilder", "");
+
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
