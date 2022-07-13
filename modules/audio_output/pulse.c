@@ -318,7 +318,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
             if (likely(rt >= sys->flush_rt))
             {
                 rt -= sys->flush_rt;
-                aout_TimingReport(aout, vlc_tick_now(), rt);
+                aout_TimingReport(aout, vlc_tick_now(), VLC_TICK_FROM_US(rt));
             }
 #ifndef NDEBUG
             else
