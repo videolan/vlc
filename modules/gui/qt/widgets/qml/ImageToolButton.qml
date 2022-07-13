@@ -16,37 +16,88 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
+
+import "qrc:///widgets/" as Widgets
 
 import "qrc:///style/"
 
-/* button to choose the view displayed (list or grid) */
-ToolButton {
+T.ToolButton {
     id: control
 
-    property url imageSource: undefined
+    property url imageSource: ""
 
-    contentItem:  Image {
-        source: control.imageSource
-        fillMode: Image.PreserveAspectFit
-        height: control.width
-        width: control.height
-        anchors.centerIn: control
-    }
+    property bool paintOnly: false
 
-    background: Rectangle {
-        height: control.width
-        width: control.height
-        color: "transparent"
-        Rectangle {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: 2
-            visible: control.activeFocus || control.checked
-            color: control.activeFocus ? VLCStyle.colors.accent  : VLCStyle.colors.bgHover
+    property size sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
+
+    // background colors
+    // NOTE: We want the background to be transparent for IconToolButton(s).
+    property color backgroundColor: "transparent"
+    property color backgroundColorHover: "transparent"
+
+    property color color: VLCStyle.colors.icon
+    property color colorHover: VLCStyle.colors.buttonTextHover
+    property color colorHighlighted: VLCStyle.colors.accent
+    property color colorDisabled: paintOnly ? color : VLCStyle.colors.textInactive
+    property alias colorFocus: background.activeBorderColor
+
+
+    padding: 0
+
+    enabled: !paintOnly
+
+    implicitWidth: control.sourceSize.width + leftPadding + rightPadding
+    implicitHeight: control.sourceSize.height + topPadding + bottomPadding
+    baselineOffset: contentItem.y + contentItem.baselineOffset
+
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
+
+    background: AnimatedBackground {
+        id: background
+
+        width: control.sourceSize.width
+        height: control.sourceSize.height
+
+        active: control.visualFocus
+
+        backgroundColor: {
+            if (control.hovered)
+                return control.backgroundColorHover;
+            // if base color is transparent, animation starts with black color
+            else if (control.backgroundColor.a === 0)
+                return VLCStyle.colors.setColorAlpha(control.backgroundColorHover, 0);
+            else
+                return control.backgroundColor;
         }
+
+        foregroundColor: {
+            if (control.highlighted)
+                return control.colorHighlighted;
+            else if (control.hovered)
+                return control.colorHover;
+            else if (!control.enabled)
+                return control.colorDisabled;
+            else
+                return control.color;
+        }
+
+        activeBorderColor: VLCStyle.colors.bgFocus
     }
+
+    contentItem: Image {
+        anchors.centerIn: control
+
+        source: control.imageSource
+
+        fillMode: Image.PreserveAspectFit
+
+        width: control.sourceSize.width
+        height: control.sourceSize.height
+        sourceSize: control.sourceSize
+
+    }
+
 }
