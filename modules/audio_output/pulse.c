@@ -317,8 +317,16 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         {
             if (likely(rt >= sys->flush_rt))
             {
+                /* Subtract the timestamp of the timing_info from the monotonic
+                 * time */
+                const pa_timing_info *ti = pa_stream_get_timing_info(s);
+                pa_usec_t ti_age_us = pa_timeval_age(&ti->timestamp);
+                vlc_tick_t system_ts = vlc_tick_now()
+                                     - VLC_TICK_FROM_US(ti_age_us);
+
                 rt -= sys->flush_rt;
-                aout_TimingReport(aout, vlc_tick_now(), VLC_TICK_FROM_US(rt));
+
+                aout_TimingReport(aout, system_ts, VLC_TICK_FROM_US(rt));
             }
 #ifndef NDEBUG
             else
