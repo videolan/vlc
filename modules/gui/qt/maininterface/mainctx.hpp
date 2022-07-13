@@ -365,6 +365,7 @@ public slots:
     void toggleUpdateSystrayMenu();
     void showUpdateSystrayMenu();
     void hideUpdateSystrayMenu();
+    void toggleToolbarMenu();
     void toggleInterfaceFullScreen();
     void setPlaylistDocked( bool );
     void setPlaylistVisible( bool );

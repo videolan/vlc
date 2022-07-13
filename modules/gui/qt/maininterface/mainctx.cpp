@@ -751,6 +751,11 @@ bool MainCtx::onWindowClose( QWindow* )
     }
 }
 
+void MainCtx::toggleToolbarMenu()
+{
+    setHasToolbarMenu(!m_hasToolbarMenu);
+}
+
 void MainCtx::toggleInterfaceFullScreen()
 {
     emit setInterfaceFullScreen( m_windowVisibility != QWindow::FullScreen );
