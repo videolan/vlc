@@ -346,7 +346,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
     
-    const NSEdgeInsets scrollViewEdgeInsets = NSEdgeInsetsMake(16.0, 32.0, 0.0, 0.0);
+    // Need to account for the audio collection switcher at the top
+    const NSEdgeInsets scrollViewEdgeInsets = NSEdgeInsetsMake(32., 16., 16., 0.);
     
     _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _audioCollectionViewScrollView.contentInsets = scrollViewEdgeInsets;
