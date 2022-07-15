@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryAlbumTableCellView.h: MacOS X interface module
+ * VLCLibraryCollectionViewSupplementaryDetailView.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,32 +19,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 #import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCImageView;
-@class VLCTrackingView;
 @class VLCMediaLibraryAlbum;
 
-@interface VLCLibraryAlbumTableCellView : NSTableCellView
+extern NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier;
+extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
 
-extern NSString *VLCAudioLibraryCellIdentifier;
+@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView : NSView <NSCollectionViewElement>
 
-+ (CGFloat)defaultHeight;
-+ (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album;
-
-@property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
-@property (readwrite, assign) IBOutlet VLCImageView *representedImageView;
-@property (readwrite, assign) IBOutlet NSTextField *albumNameTextField;
-@property (readwrite, assign) IBOutlet NSTextField *summaryTextField;
-@property (readwrite, assign) IBOutlet NSTextField *yearTextField;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-
-@property (readwrite, assign, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
-
-- (IBAction)playInstantly:(id)sender;
+@property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
+@property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *albumDetailsTextField;
+@property (readwrite, weak) IBOutlet NSImageView *albumArtworkImageView;
+@property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;
 
 @end
 

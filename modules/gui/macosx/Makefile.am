@@ -58,10 +58,16 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCLibraryAlbumTableCellView.h \
 	gui/macosx/library/VLCLibraryAlbumTableCellView.m \
+	gui/macosx/library/VLCLibraryAlbumTracksDataSource.h \
+	gui/macosx/library/VLCLibraryAlbumTracksDataSource.m \
 	gui/macosx/library/VLCLibraryAudioDataSource.h \
 	gui/macosx/library/VLCLibraryAudioDataSource.m \
+	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.h \
+	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
+	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h \
+	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m \
 	gui/macosx/library/VLCLibraryController.h \
@@ -297,6 +303,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
+	gui/macosx/UI/VLCLibraryCollectionViewAlbumSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCMediaSourceCollectionViewItem.xib \
 	gui/macosx/UI/VLCMediaSourceDeviceCollectionViewItem.xib \
 	gui/macosx/UI/VLCInformationWindow.xib \

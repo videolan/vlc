@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryAlbumTableCellView.h: MacOS X interface module
+ * VLCLibraryCollectionViewFlowLayout.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,27 +24,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCImageView;
-@class VLCTrackingView;
-@class VLCMediaLibraryAlbum;
+@interface VLCLibraryCollectionViewFlowLayout : NSCollectionViewFlowLayout
 
-@interface VLCLibraryAlbumTableCellView : NSTableCellView
-
-extern NSString *VLCAudioLibraryCellIdentifier;
-
-+ (CGFloat)defaultHeight;
-+ (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album;
-
-@property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
-@property (readwrite, assign) IBOutlet VLCImageView *representedImageView;
-@property (readwrite, assign) IBOutlet NSTextField *albumNameTextField;
-@property (readwrite, assign) IBOutlet NSTextField *summaryTextField;
-@property (readwrite, assign) IBOutlet NSTextField *yearTextField;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-
-@property (readwrite, assign, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
-
-- (IBAction)playInstantly:(id)sender;
+- (void)expandDetailSectionAtIndex:(NSIndexPath *)indexPath;
+- (void)collapseDetailSectionAtIndex:(NSIndexPath *)indexPath;
+- (void)resetLayout;
 
 @end
 

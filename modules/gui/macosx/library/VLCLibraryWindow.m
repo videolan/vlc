@@ -322,6 +322,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _audioGroupSelectionTableView.dataSource = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
+    _audioLibraryCollectionView.selectable = YES;
+    _audioLibraryCollectionView.allowsMultipleSelection = NO;
+    _audioLibraryCollectionView.allowsEmptySelection = YES;
 
     _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;

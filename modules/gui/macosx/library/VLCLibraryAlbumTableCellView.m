@@ -29,22 +29,17 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
 const CGFloat VLCLibraryTracksRowHeight = 50.;
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 const CGFloat LayoutSpacer;
 
-@interface VLCLibraryTracksDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
-
-@property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
-
-@end
-
 @interface VLCLibraryAlbumTableCellView ()
 {
     VLCLibraryController *_libraryController;
-    VLCLibraryTracksDataSource *_tracksDataSource;
+    VLCLibraryAlbumTracksDataSource *_tracksDataSource;
     NSTableView *_tracksTableView;
 }
 @end
@@ -75,7 +70,7 @@ const CGFloat LayoutSpacer;
     _tracksTableView.rowHeight = VLCLibraryTracksRowHeight;
     [_tracksTableView addTableColumn:column];
     _tracksTableView.translatesAutoresizingMaskIntoConstraints = NO;
-    _tracksDataSource = [[VLCLibraryTracksDataSource alloc] init];
+    _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
     _tracksTableView.dataSource = _tracksDataSource;
     _tracksTableView.delegate = _tracksDataSource;
     _tracksTableView.doubleAction = @selector(tracksTableViewDoubleClickAction:);
@@ -149,71 +144,6 @@ const CGFloat LayoutSpacer;
     if (clickedRow < trackCount) {
         [_libraryController appendItemToPlaylist:tracks[_tracksTableView.clickedRow] playImmediately:YES];
     }
-}
-
-@end
-
-@interface VLCLibraryTracksDataSource ()
-{
-    NSArray *_tracks;
-}
-@end
-
-@implementation VLCLibraryTracksDataSource
-
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
-{
-    _representedAlbum = representedAlbum;
-    _tracks = [_representedAlbum tracksAsMediaItems];
-}
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-    if (_representedAlbum != nil) {
-        return _representedAlbum.numberOfTracks;
-    }
-
-    return 0;
-}
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
-        NSArray *topLevelObjects;
-        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
-            NSAssert(1, @"Failed to load nib file to show audio library items");
-            return nil;
-        }
-
-        for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCLibraryTableCellView class]]) {
-                cellView = topLevelObject;
-                break;
-            }
-        }
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
-    }
-
-    VLCMediaLibraryMediaItem *mediaItem = _tracks[row];
-
-    NSImage *image = mediaItem.smallArtworkImage;
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    cellView.representedImageView.image = image;
-    cellView.representedMediaItem = mediaItem;
-
-    NSString *title = mediaItem.title;
-    cellView.primaryTitleTextField.hidden = NO;
-    cellView.secondaryTitleTextField.hidden = NO;
-    cellView.primaryTitleTextField.stringValue = title;
-    cellView.secondaryTitleTextField.stringValue = [NSString stringWithTime:mediaItem.duration / 1000];
-
-    return cellView;
 }
 
 @end

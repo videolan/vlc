@@ -30,14 +30,15 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
 
-static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
-
 @interface VLCLibraryAudioDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
 {
+    VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSInteger _currentSelectedSegment;
     NSArray<NSString *> *_placeholderImageNames;
     NSArray<NSString *> *_placeholderLabelStrings;
@@ -67,12 +68,19 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     _collectionView.delegate = self;
 
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
-    
-    NSCollectionViewFlowLayout *flowLayout = _collectionView.collectionViewLayout;
-    flowLayout.itemSize = CGSizeMake(214., 260.);
-    flowLayout.sectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
-    flowLayout.minimumLineSpacing = 20.;
-    flowLayout.minimumInteritemSpacing = 20.;
+
+    NSNib *albumSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAlbumSupplementaryDetailView" bundle:nil];
+    [_collectionView registerNib:albumSupplementaryDetailView
+      forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind 
+                  withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier];
+
+    _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _collectionView.collectionViewLayout = _collectionViewFlowLayout;
+
+    _collectionViewFlowLayout.itemSize = CGSizeMake(214., 260.);
+    _collectionViewFlowLayout.sectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
+    _collectionViewFlowLayout.minimumLineSpacing = 20.;
+    _collectionViewFlowLayout.minimumInteritemSpacing = 20.;
 
     _groupSelectionTableView.target = self;
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
@@ -112,6 +120,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
 - (IBAction)segmentedControlAction:(id)sender
 {
+    [_collectionViewFlowLayout resetLayout];
     _currentSelectedSegment = _segmentedControl.selectedSegment;
     switch (_currentSelectedSegment) {
         case 0:
@@ -398,6 +407,42 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     }
 
     return viewItem;
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath || _currentParentType != VLC_ML_PARENT_ALBUM) {
+        return;
+    }
+
+    [_collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath || _currentParentType != VLC_ML_PARENT_ALBUM) {
+        return;
+    }
+
+    [_collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
+}
+
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] && _currentParentType == VLC_ML_PARENT_ALBUM) {
+        VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
+
+        VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
+        albumSupplementaryDetailView.representedAlbum = album;
+
+        return albumSupplementaryDetailView;
+    }
+
+    return nil;
 }
 
 @end
