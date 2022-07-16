@@ -30,8 +30,8 @@
 
 #include "../opengl/gl_scale.h"
 
-// Create a libplacebo context, hooked up to the log system; or NULL on OOM
-struct pl_context *vlc_placebo_CreateContext(vlc_object_t *);
+// Create a libplacebo log object, hooked up to the log system
+pl_log vlc_placebo_CreateLog(vlc_object_t *);
 
 // Turn a video_format_t into the equivalent libplacebo values
 struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *);

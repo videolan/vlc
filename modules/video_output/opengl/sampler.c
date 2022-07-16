@@ -847,19 +847,17 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    priv->pl_ctx = vlc_placebo_CreateContext(VLC_OBJECT(gl));
-    if (priv->pl_ctx) {
-        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
-            .glsl = {
+    priv->pl_ctx = vlc_placebo_CreateLog(VLC_OBJECT(gl));
+    priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
+        .glsl = {
 #   ifdef USE_OPENGL_ES2
-                .version = 100,
-                .gles = true,
+            .version = 100,
+            .gles = true,
 #   else
-                .version = 120,
+            .version = 120,
 #   endif
-            },
-        });
-    }
+        },
+    });
 #endif
 
     int ret = opengl_fragment_shader_init(sampler, expose_planes);

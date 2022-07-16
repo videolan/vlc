@@ -56,7 +56,7 @@ vlc_placebo_t *vlc_placebo_Create(const vout_display_cfg_t *cfg, const char *nam
 
     pl->sys = NULL;
     pl->ops = NULL;
-    pl->ctx = vlc_placebo_CreateContext(VLC_OBJECT(pl));
+    pl->ctx = vlc_placebo_CreateLog(VLC_OBJECT(pl));
     pl->module = vlc_module_load(parent, "libplacebo gpu", name, false,
                                  vlc_placebo_start, pl, cfg);
 

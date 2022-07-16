@@ -272,9 +272,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     if (!sys)
         return VLC_EGENERIC;
 
-    sys->pl_log = vlc_placebo_CreateContext(VLC_OBJECT(filter));
-    if (!sys->pl_log)
-        goto error_free_sys;
+    sys->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(filter));
 
     struct pl_opengl_params opengl_params = {
         .debug = true,

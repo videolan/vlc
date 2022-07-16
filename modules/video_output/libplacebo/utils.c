@@ -44,9 +44,9 @@ static void Log(void *priv, enum pl_log_level level, const char *msg)
     }
 }
 
-struct pl_context *vlc_placebo_CreateContext(vlc_object_t *obj)
+pl_log vlc_placebo_CreateLog(vlc_object_t *obj)
 {
-    return pl_context_create(PL_API_VER, &(struct pl_context_params) {
+    return pl_log_create(PL_API_VER, &(struct pl_log_params) {
         .log_level = PL_LOG_DEBUG,
         .log_cb    = Log,
         .log_priv  = obj,
