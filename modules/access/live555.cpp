@@ -31,8 +31,8 @@
 # include "config.h"
 #endif
 
-#include <inttypes.h>
 #include <algorithm>
+#include <cstdint>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
