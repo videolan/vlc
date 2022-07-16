@@ -327,7 +327,7 @@ int vlc_placebo_PlaneFormat(const video_format_t *fmt, struct pl_plane_data data
 }
 
 int vlc_placebo_PlaneData(const picture_t *pic, struct pl_plane_data data[4],
-                          const struct pl_buf *buf)
+                          pl_buf buf)
 {
     int planes = vlc_placebo_PlaneFormat(&pic->format, data);
     if (!planes)
@@ -350,7 +350,7 @@ int vlc_placebo_PlaneData(const picture_t *pic, struct pl_plane_data data[4],
     return planes;
 }
 
-bool vlc_placebo_FormatSupported(const struct pl_gpu *gpu, vlc_fourcc_t fcc)
+bool vlc_placebo_FormatSupported(pl_gpu gpu, vlc_fourcc_t fcc)
 {
     const struct fmt_desc *desc = FindDesc(fcc);
     if (!desc)
