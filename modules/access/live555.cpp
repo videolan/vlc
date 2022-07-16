@@ -35,6 +35,7 @@
 #include <cassert>
 #include <climits>
 #include <cstdint>
+#include <new>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -47,8 +48,6 @@
 #include <vlc_keystore.h>
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
-
-#include <new>
 
 #if defined( _WIN32 )
 #   include <winsock2.h>
