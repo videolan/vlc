@@ -29,7 +29,7 @@
 # include "config.h"
 #endif
 
-#include <inttypes.h>
+#include <cinttypes>         /* PRId64 */
 #include <list>
 #include <string>
 #include <assert.h>
