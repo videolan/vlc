@@ -32,8 +32,8 @@
 #include <cassert>
 #include <cinttypes>         /* PRId64 */
 #include <list>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <vlc_common.h>
