@@ -20,8 +20,8 @@
 #ifndef ID_HPP
 #define ID_HPP
 
+#include <cstdint>
 #include <string>
-#include <inttypes.h>
 
 namespace adaptive
 {
