@@ -32,6 +32,7 @@
 #endif
 
 #include <algorithm>
+#include <cassert>
 #include <climits>
 #include <cstdint>
 
@@ -46,8 +47,6 @@
 #include <vlc_keystore.h>
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
-
-#include <assert.h>
 
 #include <new>
 
