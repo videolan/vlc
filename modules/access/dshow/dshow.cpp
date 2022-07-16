@@ -29,10 +29,10 @@
 # include "config.h"
 #endif
 
+#include <cassert>
 #include <cinttypes>         /* PRId64 */
 #include <list>
 #include <string>
-#include <assert.h>
 #include <stdexcept>
 #include <vector>
 
