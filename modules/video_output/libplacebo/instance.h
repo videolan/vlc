@@ -48,9 +48,9 @@ typedef struct vlc_placebo_t
     module_t *module;
     vlc_placebo_system_t *sys;
 
-    struct pl_context *ctx;
-    const struct pl_gpu *gpu;
-    const struct pl_swapchain *swapchain;
+    pl_log log;
+    pl_gpu gpu;
+    pl_swapchain swapchain;
 
     const struct vlc_placebo_operations *ops;
 } vlc_placebo_t;

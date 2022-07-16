@@ -35,8 +35,8 @@
 
 struct vlc_placebo_system_t {
     vlc_vk_platform_t *platform;
-    const struct pl_vk_inst *instance;
-    const struct pl_vulkan *vulkan;
+    pl_vk_inst instance;
+    pl_vulkan vulkan;
 };
 
 static void CloseInstance(vlc_placebo_t *pl);
@@ -58,7 +58,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
     if (!sys->platform)
         goto error;
 
-    sys->instance = pl_vk_inst_create(pl->ctx, &(struct pl_vk_inst_params) {
+    sys->instance = pl_vk_inst_create(pl->log, &(struct pl_vk_inst_params) {
         .debug = var_InheritBool(pl, "vk-debug"),
         .extensions = (const char *[]) {
             VK_KHR_SURFACE_EXTENSION_NAME,
@@ -76,7 +76,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
 
     // Create vulkan device
     char *device_name = var_InheritString(pl, "vk-device");
-    sys->vulkan = pl_vulkan_create(pl->ctx, &(struct pl_vulkan_params) {
+    sys->vulkan = pl_vulkan_create(pl->log, &(struct pl_vulkan_params) {
         .instance = sys->instance->instance,
         .surface = surface,
         .device_name = device_name,

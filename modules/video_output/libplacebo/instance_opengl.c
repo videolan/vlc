@@ -79,7 +79,7 @@ vlc_module_end()
 
 struct vlc_placebo_system_t {
     vlc_gl_t *gl;
-    const struct pl_opengl *opengl;
+    pl_opengl opengl;
 };
 
 static const struct vlc_placebo_operations instance_opts =
@@ -107,7 +107,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
     current = true;
 
     // Create OpenGL wrapper
-    sys->opengl = pl_opengl_create(pl->ctx, &(struct pl_opengl_params) {
+    sys->opengl = pl_opengl_create(pl->log, &(struct pl_opengl_params) {
 #if PL_API_VER >= 90
         .allow_software = var_InheritBool(pl, "gl-allow-sw"),
 #endif

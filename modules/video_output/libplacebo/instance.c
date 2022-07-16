@@ -56,7 +56,7 @@ vlc_placebo_t *vlc_placebo_Create(const vout_display_cfg_t *cfg, const char *nam
 
     pl->sys = NULL;
     pl->ops = NULL;
-    pl->ctx = vlc_placebo_CreateLog(VLC_OBJECT(pl));
+    pl->log = vlc_placebo_CreateLog(VLC_OBJECT(pl));
     pl->module = vlc_module_load(parent, "libplacebo gpu", name, false,
                                  vlc_placebo_start, pl, cfg);
 
@@ -74,7 +74,7 @@ void vlc_placebo_Release(vlc_placebo_t *pl)
     if (pl->ops)
         pl->ops->close(pl);
 
-    pl_context_destroy(&pl->ctx);
+    pl_log_destroy(&pl->log);
 
     /* TODO: use vlc_objres_clear */
     vlc_object_delete(pl);

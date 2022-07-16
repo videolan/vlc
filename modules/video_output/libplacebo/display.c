@@ -56,8 +56,8 @@
 typedef struct vout_display_sys_t
 {
     vlc_placebo_t *pl;
-    const struct pl_tex *plane_tex[4];
-    struct pl_renderer *renderer;
+    pl_renderer renderer;
+    pl_tex plane_tex[4];
 
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
@@ -135,8 +135,8 @@ static int Open(vout_display_t *vd,
     if (!pl_swapchain_resize(sys->pl->swapchain, &width, &height))
         goto error;
 
-    const struct pl_gpu *gpu = sys->pl->gpu;
-    sys->renderer = pl_renderer_create(sys->pl->ctx, gpu);
+    pl_gpu gpu = sys->pl->gpu;
+    sys->renderer = pl_renderer_create(sys->pl->log, gpu);
     if (!sys->renderer)
         goto error;
 
@@ -195,7 +195,7 @@ error:
 static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    const struct pl_gpu *gpu = sys->pl->gpu;
+    pl_gpu gpu = sys->pl->gpu;
 
     if (vlc_placebo_MakeCurrent(sys->pl) == VLC_SUCCESS) {
         for (int i = 0; i < 4; i++)
@@ -227,7 +227,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 {
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
-    const struct pl_gpu *gpu = sys->pl->gpu;
+    pl_gpu gpu = sys->pl->gpu;
     bool failed = false;
 
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
@@ -245,7 +245,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     bool need_vflip = frame.flipped;
 #endif
 
-    struct pl_image img = {
+    struct pl_frame img = {
         .num_planes = pic->i_planes,
         .color      = vlc_placebo_ColorSpace(vd->fmt),
         .repr       = vlc_placebo_ColorRepr(vd->fmt),
@@ -292,8 +292,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                                       &plane->shift_y);
     }
 
-    struct pl_render_target target;
-    pl_render_target_from_swapchain(&target, &frame);
+    struct pl_frame target;
+    pl_frame_from_swapchain(&target, &frame);
     if (vd->cfg->icc_profile) {
         target.profile.signature = sys->target_icc_signature;
         target.profile.data = vd->cfg->icc_profile->data;
@@ -619,7 +619,7 @@ static void LoadCustomLUT(vout_display_sys_t *sys, const char *filepath)
     ret = fread(lut_file, length, 1, fs);
     if (ret != 1)
         goto error;
-    sys->lut = pl_lut_parse_cube(sys->pl->ctx, lut_file, length);
+    sys->lut = pl_lut_parse_cube(sys->pl->log, lut_file, length);
     if (!sys->lut)
         goto error;
 
