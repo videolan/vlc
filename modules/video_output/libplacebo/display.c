@@ -61,7 +61,8 @@ typedef struct vout_display_sys_t
 
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
-    const struct pl_tex **overlay_tex;
+    struct pl_overlay_part *overlay_parts;
+    pl_tex *overlay_tex;
     int num_overlays;
 
     // Storage for rendering parameters
@@ -208,6 +209,7 @@ static void Close(vout_display_t *vd)
 
     if (sys->overlays) {
         free(sys->overlays);
+        free(sys->overlay_parts);
         free(sys->overlay_tex);
     }
 
@@ -388,8 +390,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         // Grow the overlays array if needed
         if (num_regions > sys->num_overlays) {
             sys->overlays = realloc(sys->overlays, num_regions * sizeof(struct pl_overlay));
-            sys->overlay_tex = realloc(sys->overlay_tex, num_regions * sizeof(struct pl_tex *));
-            if (!sys->overlays || !sys->overlay_tex) {
+            sys->overlay_parts = realloc(sys->overlay_parts, num_regions * sizeof(struct pl_overlay_part));
+            sys->overlay_tex = realloc(sys->overlay_tex, num_regions * sizeof(pl_tex));
+            if (!sys->overlays || !sys->overlay_parts || !sys->overlay_tex) {
                 // Unlikely OOM, just do whatever
                 sys->num_overlays = 0;
                 failed = true;
@@ -409,25 +412,34 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
             if (!vlc_placebo_PlaneData(r->p_picture, subdata, NULL))
                 assert(!"Failed processing the subpicture_t into pl_plane_data!?");
 
-            struct pl_overlay *overlay = &sys->overlays[i];
+            if (!pl_upload_plane(gpu, NULL, &sys->overlay_tex[i], subdata)) {
+                msg_Err(vd, "Failed uploading subpicture region!");
+                num_regions = i; // stop here
+                break;
+            }
+
             int ysign = need_vflip ? (-1) : 1;
-            *overlay = (struct pl_overlay) {
-                .rect = {
+            sys->overlays[i] = (struct pl_overlay) {
+                .tex   = sys->overlay_tex[i],
+                .mode  = PL_OVERLAY_NORMAL,
+                .color = vlc_placebo_ColorSpace(&r->fmt),
+                .repr  = vlc_placebo_ColorRepr(&r->fmt),
+                .parts = &sys->overlay_parts[i],
+                .num_parts = 1,
+            };
+
+            sys->overlay_parts[i] = (struct pl_overlay_part) {
+                .src = {
+                    .x1 = r->fmt.i_visible_width,
+                    .y1 = r->fmt.i_visible_height,
+                },
+                .dst = {
                     .x0 = place.x + r->i_x,
                     .y0 = place.y + r->i_y * ysign,
                     .x1 = place.x + r->i_x + r->fmt.i_visible_width,
                     .y1 = place.y + (r->i_y + r->fmt.i_visible_height) * ysign,
                 },
-                .mode = PL_OVERLAY_NORMAL,
-                .color = vlc_placebo_ColorSpace(&r->fmt),
-                .repr  = vlc_placebo_ColorRepr(&r->fmt),
             };
-
-            if (!pl_upload_plane(gpu, &overlay->plane, &sys->overlay_tex[i], subdata)) {
-                msg_Err(vd, "Failed uploading subpicture region!");
-                num_regions = i; // stop here
-                break;
-            }
         }
 
         // Update the target information to reference the subpictures
@@ -844,7 +856,6 @@ static void UpdateParams(vout_display_t *vd)
     sys->params.antiringing_strength = var_InheritFloat(vd, "pl-antiringing");
     sys->params.skip_anti_aliasing = var_InheritBool(vd, "pl-skip-aa");
     sys->params.polar_cutoff = var_InheritFloat(vd, "pl-polar-cutoff");
-    sys->params.disable_overlay_sampling = var_InheritBool(vd, "pl-overlay-direct");
     sys->params.disable_linear_scaling = var_InheritBool(vd, "pl-disable-linear");
     sys->params.disable_builtin_scalers = var_InheritBool(vd, "pl-force-general");
 
