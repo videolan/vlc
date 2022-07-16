@@ -346,7 +346,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         target.color.primaries = sys->target.primaries;
     if (sys->target.transfer) {
         target.color.transfer = sys->target.transfer;
+#if PL_API_VER < 189
         target.color.light = PL_COLOR_LIGHT_UNKNOWN; // re-infer
+#endif
     }
     if (sys->dither_depth > 0) {
         // override the sample depth without affecting the color encoding
