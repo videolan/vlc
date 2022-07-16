@@ -70,9 +70,7 @@ vlc_module_begin()
 #endif
 
     set_section("Context settings", NULL)
-#if PL_API_VER >= 90
     add_bool("gl-allow-sw", false, ALLOWSW_TEXT, ALLOWSW_LONGTEXT)
-#endif
     add_integer_with_range("gl-swap-depth", 0,
             0, 4, SWAP_DEPTH_TEXT, SWAP_DEPTH_LONGTEXT)
 vlc_module_end()
@@ -108,9 +106,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
 
     // Create OpenGL wrapper
     sys->opengl = pl_opengl_create(pl->log, &(struct pl_opengl_params) {
-#if PL_API_VER >= 90
         .allow_software = var_InheritBool(pl, "gl-allow-sw"),
-#endif
         .debug = true, // this only sets up the debug report callback
     });
     vlc_gl_ReleaseCurrent (sys->gl);

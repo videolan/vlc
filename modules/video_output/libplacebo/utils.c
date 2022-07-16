@@ -612,9 +612,7 @@ void vlc_placebo_ColorMapParams(vlc_object_t *obj, const char *prefix,
 #else
     case GAMUT_MODE_CLIP:   break;
     case GAMUT_MODE_WARN:   params->gamut_warning = true; break;
-# if PL_API_VER >= 80
     case GAMUT_MODE_DESAT:  params->gamut_clipping = true; break;
-# endif
 #endif
     }
 

@@ -39,19 +39,7 @@
 #include <libplacebo/renderer.h>
 #include <libplacebo/utils/upload.h>
 #include <libplacebo/swapchain.h>
-
-#if PL_API_VER >= 113
-# include <libplacebo/shaders/lut.h>
-#endif
-
-#if PL_API_VER >= 159
-// Forward compatibility with libplacebo v4+
-#define pl_image pl_frame
-#define pl_render_target pl_frame
-#define pl_render_target_from_swapchain pl_frame_from_swapchain
-#define src_rect crop
-#define dst_rect crop
-#endif
+#include <libplacebo/shaders/lut.h>
 
 typedef struct vout_display_sys_t
 {
@@ -79,11 +67,9 @@ typedef struct vout_display_sys_t
     enum pl_chroma_location yuv_chroma_loc;
     int dither_depth;
 
-#if PL_API_VER >= 113
     struct pl_custom_lut *lut;
     char *lut_path;
     int lut_mode;
-#endif
 
     const struct pl_hook *hook;
     char *hook_path;
@@ -213,10 +199,8 @@ static void Close(vout_display_t *vd)
         free(sys->overlay_tex);
     }
 
-#if PL_API_VER >= 113
     pl_lut_free(&sys->lut);
     free(sys->lut_path);
-#endif
 
     pl_mpv_user_shader_destroy(&sys->hook);
     free(sys->hook_path);
@@ -251,7 +235,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         .num_planes = pic->i_planes,
         .color      = vlc_placebo_ColorSpace(vd->fmt),
         .repr       = vlc_placebo_ColorRepr(vd->fmt),
-        .src_rect = {
+        .crop = {
             .x0 = pic->format.i_x_offset,
             .y0 = pic->format.i_y_offset,
             .x1 = pic->format.i_x_offset + pic->format.i_visible_width,
@@ -263,7 +247,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     vlc_placebo_DoviMetadata(&img, pic, &sys->dovi_metadata);
 #endif
 
-#if PL_API_VER >= 96
     struct vlc_ancillary *iccp = picture_GetAncillary(pic, VLC_ANCILLARY_ID_ICC);
     if (iccp) {
         vlc_icc_profile_t *icc = vlc_ancillary_GetData(iccp);
@@ -271,7 +254,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         img.profile.len = icc->size;
         pl_icc_profile_compute_signature(&img.profile);
     }
-#endif
 
     // Upload the image data for each plane
     struct pl_plane_data data[4];
@@ -355,17 +337,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     }
 #endif
 
-#if PL_API_VER >= 101
     target.crop = (struct pl_rect2df) {
         place.x, place.y, place.x + place.width, place.y + place.height,
     };
-#else
-    // Avoid using struct initializer for backwards compatibility
-    target.dst_rect.x0 = place.x;
-    target.dst_rect.y0 = place.y;
-    target.dst_rect.x1 = place.x + place.width;
-    target.dst_rect.y1 = place.y + place.height;
-#endif
 
     // Override the target colorimetry only if the user requests it
     if (sys->target.primaries)
@@ -456,7 +430,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 0.0, 0.0, 0.0, 0.0 });
     }
 
-#if PL_API_VER >= 113
     switch (sys->lut_mode) {
     case LUT_DECODING:
         img.lut_type = PL_LUT_CONVERSION;
@@ -467,7 +440,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         target.lut = sys->lut;
         break;
     }
-#endif
 
     // Dispatch the actual image rendering with the pre-configured parameters
     if (!pl_render_image(sys->renderer, &img, &target, &sys->params)) {
@@ -499,8 +471,6 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 
 static void UpdateColorspaceHint(vout_display_t *vd, const video_format_t *fmt)
 {
-#if PL_API_VER >= 155
-
     vout_display_sys_t *sys = vd->sys;
     struct pl_swapchain_colors hint = {0};
 
@@ -537,11 +507,6 @@ static void UpdateColorspaceHint(vout_display_t *vd, const video_format_t *fmt)
     }
 
     pl_swapchain_colorspace_hint(sys->pl->swapchain, &hint);
-
-#else // PL_API_VER
-    VLC_UNUSED(vd);
-    VLC_UNUSED(fmt);
-#endif
 }
 
 static void UpdateIccProfile(vout_display_t *vd, const vlc_icc_profile_t *prof)
@@ -597,7 +562,6 @@ static int Control(vout_display_t *vd, int query)
     return VLC_EGENERIC;
 }
 
-#if PL_API_VER >= 113
 static void LoadCustomLUT(vout_display_sys_t *sys, const char *filepath)
 {
     if (!filepath || !*filepath) {
@@ -645,7 +609,6 @@ error:
         fclose(fs);
     return;
 }
-#endif
 
 static void LoadUserShader(vout_display_sys_t *sys, const char *filepath)
 {
@@ -740,21 +703,17 @@ vlc_module_begin ()
             DEBAND_GRAIN_TEXT, DEBAND_GRAIN_LONGTEXT)
 
     set_section("Colorspace conversion", NULL)
-#if PL_API_VER >= 155
     add_integer("pl-output-hint", true, OUTPUT_HINT_TEXT, OUTPUT_HINT_LONGTEXT)
             change_integer_list(output_values, output_text)
-#endif
     add_placebo_color_map_opts("pl")
     add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT)
             change_integer_list(prim_values, prim_text)
     add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT)
             change_integer_list(trc_values, trc_text)
 
-#if PL_API_VER >= 113
     add_loadfile("pl-lut-file", NULL, LUT_FILE_TEXT, LUT_FILE_LONGTEXT)
     add_integer("pl-lut-mode", LUT_DISABLED, LUT_MODE_TEXT, LUT_MODE_LONGTEXT)
             change_integer_list(lut_mode_values, lut_mode_text)
-#endif
 
     // TODO: support for ICC profiles
 
@@ -911,7 +870,6 @@ static void UpdateParams(vout_display_t *vd)
         .transfer = var_InheritInteger(vd, "pl-target-trc"),
     };
 
-#if PL_API_VER >= 113
     sys->lut_mode = var_InheritInteger(vd, "pl-lut-mode");
     char *lut_file = var_InheritString(vd, "pl-lut-file");
     LoadCustomLUT(sys, lut_file);
@@ -927,7 +885,6 @@ static void UpdateParams(vout_display_t *vd)
             break;
         }
     }
-#endif
 
     char *shader_file = var_InheritString(vd, "pl-user-shader");
     LoadUserShader(sys, shader_file);

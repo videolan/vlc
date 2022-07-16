@@ -124,10 +124,8 @@ static const int prim_values[] = {
     PL_COLOR_PRIM_V_GAMUT,
     PL_COLOR_PRIM_S_GAMUT,
     PL_COLOR_PRIM_DISPLAY_P3,
-#if PL_API_VER >= 95
     PL_COLOR_PRIM_EBU_3213,
     PL_COLOR_PRIM_FILM_C,
-#endif
 };
 
 static const char * const prim_text[] = {
@@ -145,10 +143,8 @@ static const char * const prim_text[] = {
     "Panasonic V-Gamut (VARICAM)",
     "Sony S-Gamut",
     "Display-P3 (Digital Cinema with D65)",
-#if PL_API_VER >= 95
     "EBU Tech. 3213-E / JEDEC P22 phosphors",
     "Traditional film primaries with Illuminant C",
-#endif
 };
 
 #define TRC_TEXT "Override detected display gamma"
@@ -333,9 +329,7 @@ static const char * const tone_mode_text[] = {
 enum {
     GAMUT_MODE_CLIP,
     GAMUT_MODE_WARN,
-#if PL_API_VER >= 80
     GAMUT_MODE_DESAT,
-#endif
 #if PL_API_VER >= 190
     GAMUT_MODE_DARKEN,
 #endif
@@ -344,9 +338,7 @@ enum {
 static const int gamut_mode_values[] = {
     GAMUT_MODE_CLIP,
     GAMUT_MODE_WARN,
-#if PL_API_VER >= 80
     GAMUT_MODE_DESAT,
-#endif
 #if PL_API_VER >= 190
     GAMUT_MODE_DARKEN,
 #endif
@@ -355,9 +347,7 @@ static const int gamut_mode_values[] = {
 static const char * const gamut_mode_text[] = {
     "Hard clip",
     "Highlight invalid pixels",
-#if PL_API_VER >= 80
     "Colorimetrically desaturate",
-#endif
 #if PL_API_VER >= 190
     "Darken image",
 #endif
