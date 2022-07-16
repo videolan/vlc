@@ -34,6 +34,7 @@
 #include <string>
 #include <assert.h>
 #include <stdexcept>
+#include <vector>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
