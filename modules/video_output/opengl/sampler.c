@@ -57,10 +57,12 @@ struct vlc_gl_sampler_priv {
     bool yuv_color;
     GLfloat conv_matrix[4*4];
 
+#ifdef HAVE_LIBPLACEBO
     /* libplacebo context */
-    struct pl_context *pl_ctx;
-    struct pl_shader *pl_sh;
+    pl_log pl_log;
+    pl_shader pl_sh;
     const struct pl_shader_res *pl_sh_res;
+#endif
 
     /* If set, vlc_texture() exposes a single plane (without chroma
      * conversion), selected by vlc_gl_sampler_SetCurrentPlane(). */
@@ -661,7 +663,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
 #ifdef HAVE_LIBPLACEBO
     if (priv->pl_sh) {
-        struct pl_shader *sh = priv->pl_sh;
+        pl_shader sh = priv->pl_sh;
         struct pl_color_map_params color_params;
         vlc_placebo_ColorMapParams(VLC_OBJECT(priv->gl), "gl", &color_params);
 
@@ -669,12 +671,12 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         dst_space.primaries = var_InheritInteger(priv->gl, "target-prim");
         dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
-        struct pl_shader_obj *tone_map_state = NULL;
+        pl_shader_obj tone_map_state = NULL;
         pl_shader_color_map(sh, &color_params,
                 vlc_placebo_ColorSpace(fmt),
                 dst_space, &tone_map_state, false);
 
-        struct pl_shader_obj *dither_state = NULL;
+        pl_shader_obj dither_state = NULL;
         int method = var_InheritInteger(priv->gl, "dither-algo");
         if (method >= 0) {
 
@@ -821,11 +823,6 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     struct vlc_gl_sampler *sampler = &priv->sampler;
     vlc_gl_LoadExtensionFunctions(gl, &priv->extension_vt);
 
-    priv->uloc.pl_vars = NULL;
-    priv->pl_ctx = NULL;
-    priv->pl_sh = NULL;
-    priv->pl_sh_res = NULL;
-
     priv->gl = gl;
     priv->api = api;
     priv->vt = &api->vt;
@@ -846,9 +843,10 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     sampler->shader.body = NULL;
 
 #ifdef HAVE_LIBPLACEBO
-    // Create the main libplacebo context
-    priv->pl_ctx = vlc_placebo_CreateLog(VLC_OBJECT(gl));
-    priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
+    priv->uloc.pl_vars = NULL;
+    priv->pl_sh_res = NULL;
+    priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(gl));
+    priv->pl_sh = pl_shader_alloc(priv->pl_log, &(struct pl_shader_params) {
         .glsl = {
 #   ifdef USE_OPENGL_ES2
             .version = 100,
@@ -877,10 +875,8 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(priv->uloc.pl_vars);
-    if (priv->pl_sh)
-        pl_shader_free(&priv->pl_sh);
-    if (priv->pl_ctx)
-        pl_context_destroy(&priv->pl_ctx);
+    pl_shader_free(&priv->pl_sh);
+    pl_log_destroy(&priv->pl_log);
 #endif
 
     free(sampler->shader.extensions);

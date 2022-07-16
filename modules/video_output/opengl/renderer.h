@@ -37,10 +37,6 @@ extern "C"
 {
 #endif
 
-struct pl_context;
-struct pl_shader;
-struct pl_shader_res;
-
 #define add_opengl_submodule_renderer() \
     add_submodule() \
     add_shortcut("renderer") \
