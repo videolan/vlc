@@ -14,7 +14,7 @@ DEPS_libplacebo = glslang
 ifndef HAVE_WINSTORE
 PKGS += libplacebo
 endif
-ifeq ($(call need_pkg,"libplacebo >= 2.72"),)
+ifeq ($(call need_pkg,"libplacebo >= 4.157"),)
 PKGS_FOUND += libplacebo
 endif
 
