@@ -268,7 +268,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         return VLC_EGENERIC;
     }
 
-    struct sys *sys = filter->sys = malloc(sizeof(*sys));
+    struct sys *sys = filter->sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_EGENERIC;
 
@@ -280,12 +280,12 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->pl_opengl = pl_opengl_create(sys->pl_log, &opengl_params);
 
     if (!sys->pl_opengl)
-        goto error_destroy_pl_log;
+        goto error;
 
     pl_gpu gpu = sys->pl_opengl->gpu;
     sys->pl_renderer = pl_renderer_create(sys->pl_log, gpu);
     if (!sys->pl_renderer)
-        goto error_destroy_pl_opengl;
+        goto error;
 
     sys->frame_in = (struct pl_frame) {
         .num_planes = glfmt->tex_count,
@@ -299,7 +299,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     if ((unsigned) plane_count != glfmt->tex_count) {
         msg_Err(filter, "Unexpected plane count (%d) != tex count (%u)",
                         plane_count, glfmt->tex_count);
-        goto error_destroy_pl_opengl;
+        goto error;
     }
 
     sys->frame_out = (struct pl_frame) {
@@ -337,11 +337,10 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     return VLC_SUCCESS;
 
-error_destroy_pl_opengl:
+error:
+    pl_renderer_destroy(&sys->pl_renderer);
     pl_opengl_destroy(&sys->pl_opengl);
-error_destroy_pl_log:
     pl_log_destroy(&sys->pl_log);
-error_free_sys:
     free(sys);
 
     return VLC_EGENERIC;
