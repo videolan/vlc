@@ -3088,7 +3088,7 @@ AC_ARG_ENABLE([libplacebo],
 
 have_libplacebo_glscale="no"
 AS_IF([test "$enable_libplacebo" != "no"], [
-  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 2.72], [
+  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 4.157], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
     AC_CHECK_HEADER([libplacebo/vulkan.h], [VLC_ADD_PLUGIN([placebo_vk])])
     AC_CHECK_HEADER([libplacebo/opengl.h], [
