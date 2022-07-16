@@ -32,6 +32,7 @@
 #endif
 
 #include <algorithm>
+#include <climits>
 #include <cstdint>
 
 #include <vlc_common.h>
@@ -46,7 +47,6 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <limits.h>
 #include <assert.h>
 
 #include <new>
