@@ -30,9 +30,6 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryCollectionViewAlbumItem.h"
-#import "library/VLCLibraryCollectionViewArtistItem.h"
-#import "library/VLCLibraryCollectionViewGenreItem.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -70,9 +67,6 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     _collectionView.delegate = self;
 
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
-    [_collectionView registerClass:[VLCLibraryCollectionViewAlbumItem class] forItemWithIdentifier:VLCLibraryAlbumCellIdentifier];
-    [_collectionView registerClass:[VLCLibraryCollectionViewArtistItem class] forItemWithIdentifier:VLCLibraryArtistCellIdentifier];
-    [_collectionView registerClass:[VLCLibraryCollectionViewGenreItem class] forItemWithIdentifier:VLCLibraryGenreCellIdentifier];
     
     NSCollectionViewFlowLayout *flowLayout = _collectionView.collectionViewLayout;
     flowLayout.itemSize = CGSizeMake(214., 260.);
@@ -194,15 +188,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
             cellView.singlePrimaryTitleTextField.hidden = NO;
             cellView.singlePrimaryTitleTextField.stringValue = artist.name;
-
-            NSImage *image;
-            if (artist.artworkMRL.length > 0) {
-                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artist.artworkMRL]];
-            }
-            if (!image) {
-                image = [NSImage imageNamed: @"noart.png"];
-            }
-            cellView.representedImageView.image = image;
+            cellView.representedImageView.image = artist.smallArtworkImage;
             break;
         }
         case VLC_ML_PARENT_ALBUM:
@@ -213,26 +199,14 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             cellView.secondaryTitleTextField.hidden = NO;
             cellView.primaryTitleTextField.stringValue = album.title;
             cellView.secondaryTitleTextField.stringValue = album.artistName;
-
-            NSImage *image;
-            if (album.artworkMRL.length > 0) {
-                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:album.artworkMRL]];
-            }
-            if (!image) {
-                image = [NSImage imageNamed: @"noart.png"];
-            }
-            cellView.representedImageView.image = image;
+            cellView.representedImageView.image = album.smallArtworkImage;
             break;
         }
         case VLC_ML_PARENT_UNKNOWN:
         {
             VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[row];
 
-            NSImage *image = mediaItem.smallArtworkImage;
-            if (!image) {
-                image = [NSImage imageNamed: @"noart.png"];
-            }
-            cellView.representedImageView.image = image;
+            cellView.representedImageView.image = mediaItem.smallArtworkImage;
             cellView.representedMediaItem = mediaItem;
 
             NSString *title = mediaItem.title;
@@ -262,9 +236,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             cellView.secondaryTitleTextField.hidden = NO;
             cellView.primaryTitleTextField.stringValue = genre.name;
             cellView.secondaryTitleTextField.stringValue = [NSString stringWithFormat:_NS("%lli items"), genre.numberOfTracks];
-
-            NSImage *image = [NSImage imageNamed: @"noart.png"];
-            cellView.representedImageView.image = image;
+            cellView.representedImageView.image = genre.smallArtworkImage;
             break;
         }
         default:
@@ -399,31 +371,27 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     switch (_currentParentType) {
         case VLC_ML_PARENT_ARTIST:
         {
-            VLCLibraryCollectionViewArtistItem *viewArtistItem = [collectionView makeItemWithIdentifier:VLCLibraryArtistCellIdentifier forIndexPath:indexPath];
             VLCMediaLibraryArtist *artist = _displayedCollection[indexPath.item];
-            viewArtistItem.representedArtist = artist;
-            return viewArtistItem;
+            viewItem.representedItem = artist;
+            break;
         }
         case VLC_ML_PARENT_ALBUM:
         {
-            VLCLibraryCollectionViewAlbumItem *viewAlbumItem = [collectionView makeItemWithIdentifier:VLCLibraryAlbumCellIdentifier forIndexPath:indexPath];
             VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
-            viewAlbumItem.representedAlbum = album;
-            return viewAlbumItem;
+            viewItem.representedItem = album;
+            break;
         }
         case VLC_ML_PARENT_UNKNOWN:
         {
-            // This is the only one that uses the default VLCLibraryCollectionViewItem
             VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[indexPath.item];
-            viewItem.representedMediaItem = mediaItem;
+            viewItem.representedItem = mediaItem;
             break;
         }
         case VLC_ML_PARENT_GENRE:
         {
-            VLCLibraryCollectionViewGenreItem *viewGenreItem = [collectionView makeItemWithIdentifier:VLCLibraryGenreCellIdentifier forIndexPath:indexPath];
             VLCMediaLibraryGenre *genre = _displayedCollection[indexPath.item];
-            viewGenreItem.representedGenre = genre;
-            return viewGenreItem;
+            viewItem.representedItem = genre;
+            break;
         }
         default:
             break;

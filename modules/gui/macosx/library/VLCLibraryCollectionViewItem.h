@@ -21,17 +21,27 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "VLCLibraryCollectionViewItemProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
+@class VLCImageView;
+@class VLCLinearProgressIndicator;
+@protocol VLCMediaLibraryItemProtocol;
 
 extern NSString *VLCLibraryCellIdentifier;
 
-@interface VLCLibraryCollectionViewItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
+@interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
-@property (readwrite, retain, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
+@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
+@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
+@property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
+@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
+@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
+@property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
+
+@property (readwrite, retain, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 
 @end
 

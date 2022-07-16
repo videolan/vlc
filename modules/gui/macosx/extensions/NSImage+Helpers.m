@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewGenreItem.h: MacOS X interface module
+ * NSImage+Helpers.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,20 +20,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import "VLCLibraryCollectionViewItemProtocol.h"
+#import "NSImage+Helpers.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryGenre;
+@implementation NSImage (Helpers)
 
-extern NSString *VLCLibraryGenreCellIdentifier;
-
-@interface VLCLibraryCollectionViewGenreItem : NSCollectionViewItem<VLCLibraryCollectionViewItemProtocol>
-
-@property (readwrite, retain, nonatomic) VLCMediaLibraryGenre *representedGenre;
++ (instancetype)artworkOrPlaceholderFromMrl:(NSString *)artworkMRL
+{
+    NSImage *image = nil;
+    if (artworkMRL.length > 0) {
+        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artworkMRL]];
+    }
+    if (!image) {
+        image = [NSImage imageNamed: @"noart.png"];
+    }
+    return image;
+}
 
 @end
 
 NS_ASSUME_NONNULL_END
-

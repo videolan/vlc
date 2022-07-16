@@ -1,10 +1,9 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewItemProtocl.h: MacOS X interface module
+ * NSImage+Helpers.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
- *          Claudio Cambra <claudio.cambra@gmail.com>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,23 +24,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCImageView;
-@class VLCLinearProgressIndicator;
+@interface NSImage (Helpers)
 
-@protocol VLCLibraryCollectionViewItemProtocol
-@required
-
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
-@property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
-@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
-@property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
-
-- (IBAction)playInstantly:(id)sender;
-- (IBAction)addToPlaylist:(id)sender;
++ (instancetype)artworkOrPlaceholderFromMrl:(NSString *)artworkMRL;
 
 @end
 

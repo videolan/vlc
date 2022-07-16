@@ -128,21 +128,10 @@ const CGFloat LayoutSpacer;
     if (_representedAlbum.summary.length > 0) {
         self.summaryTextField.stringValue = _representedAlbum.summary;
     } else {
-        if (_representedAlbum.numberOfTracks > 1) {
-            self.summaryTextField.stringValue = [NSString stringWithFormat:_NS("%i tracks"), _representedAlbum.numberOfTracks];
-        } else {
-            self.summaryTextField.stringValue = _NS("1 track");
-        }
+        self.summaryTextField.stringValue = _representedAlbum.durationString;
     }
 
-    NSImage *image;
-    if (_representedAlbum.artworkMRL.length > 0) {
-        image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedAlbum.artworkMRL]];
-    }
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    self.representedImageView.image = image;
+    self.representedImageView.image = _representedAlbum.smallArtworkImage;
 
     _tracksDataSource.representedAlbum = _representedAlbum;
     [_tracksTableView reloadData];

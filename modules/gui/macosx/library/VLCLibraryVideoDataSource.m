@@ -62,7 +62,7 @@
         mediaArray = [_libraryModel listOfVideoMedia];
     }
 
-    viewItem.representedMediaItem = mediaArray[indexPath.item];
+    viewItem.representedItem = mediaArray[indexPath.item];
 
     return viewItem;
 }

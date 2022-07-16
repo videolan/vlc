@@ -24,18 +24,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
-@class VLCMediaLibraryAlbum;
-@class VLCMediaLibraryArtist;
-@class VLCMediaLibraryGenre;
+@protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryMenuController : NSObject
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;
-- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)album;
-- (void)setRepresentedArtist:(VLCMediaLibraryArtist *)artist;
-- (void)setRepresentedGenre:(VLCMediaLibraryGenre *)genre;
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item;
 
 @end
 
