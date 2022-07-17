@@ -77,11 +77,6 @@
     _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionView.collectionViewLayout = _collectionViewFlowLayout;
 
-    _collectionViewFlowLayout.itemSize = CGSizeMake(214., 260.);
-    _collectionViewFlowLayout.sectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
-    _collectionViewFlowLayout.minimumLineSpacing = 20.;
-    _collectionViewFlowLayout.minimumInteritemSpacing = 20.;
-
     _groupSelectionTableView.target = self;
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
     _collectionSelectionTableView.target = self;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,32 +15,33 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="169" height="176"/>
+            <rect key="frame" x="0.0" y="0.0" width="214" height="246"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jJ3-BQ-y8F">
-                    <rect key="frame" x="-2" y="4" width="37" height="15"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="Utm-F6-CKx">
-                        <font key="font" metaFont="systemBold" size="12"/>
+                    <rect key="frame" x="-2" y="0.0" width="56" height="24"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" title="Label" usesSingleLineMode="YES" id="Utm-F6-CKx">
+                        <font key="font" metaFont="systemBold" size="20"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="rko-Nc-j4c" customClass="VLCImageView">
-                    <rect key="frame" x="0.0" y="27" width="149" height="149"/>
+                    <rect key="frame" x="0.0" y="32" width="214" height="214"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="rko-Nc-j4c" secondAttribute="height" multiplier="1:1" id="tGe-gB-9im"/>
-                        <constraint firstAttribute="width" constant="149" id="wkF-ab-s15"/>
                     </constraints>
                 </customView>
             </subviews>
             <constraints>
                 <constraint firstItem="rko-Nc-j4c" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="4mg-zK-oCq"/>
                 <constraint firstItem="jJ3-BQ-y8F" firstAttribute="top" secondItem="rko-Nc-j4c" secondAttribute="bottom" constant="8" id="86t-IA-OYg"/>
+                <constraint firstAttribute="trailing" secondItem="rko-Nc-j4c" secondAttribute="trailing" id="QHi-3o-Z4u"/>
                 <constraint firstItem="rko-Nc-j4c" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="Va8-hk-LhR"/>
                 <constraint firstItem="jJ3-BQ-y8F" firstAttribute="leading" secondItem="rko-Nc-j4c" secondAttribute="leading" id="rFY-qw-fsf"/>
+                <constraint firstAttribute="bottom" secondItem="jJ3-BQ-y8F" secondAttribute="bottom" id="tms-ub-oAu"/>
             </constraints>
-            <point key="canvasLocation" x="-210.5" y="67"/>
+            <point key="canvasLocation" x="-211" y="66.5"/>
         </customView>
     </objects>
 </document>

@@ -350,13 +350,38 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self shuffleStateUpdated:nil];
     
     // Need to account for the audio collection switcher at the top
-    const NSEdgeInsets scrollViewEdgeInsets = NSEdgeInsetsMake(32., 16., 16., 0.);
+    const CGFloat audioCollectionScrollViewTopInset = 32.;
+    const CGFloat scrollViewTopInset = 16.;
+    const CGFloat scrollViewRightInset = 0.;
+    const CGFloat scrollViewBottomInset = 16.;
+    const CGFloat scrollViewLeftInset = 16.;
     
     _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioCollectionViewScrollView.contentInsets = scrollViewEdgeInsets;
+    _audioCollectionViewScrollView.contentInsets = NSEdgeInsetsMake(audioCollectionScrollViewTopInset,
+                                                                    scrollViewLeftInset,
+                                                                    scrollViewBottomInset,
+                                                                    scrollViewRightInset);
     
     _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _mediaSourceCollectionViewScrollView.contentInsets = scrollViewEdgeInsets;
+    _mediaSourceCollectionViewScrollView.contentInsets = NSEdgeInsetsMake(scrollViewTopInset,
+                                                                          scrollViewLeftInset,
+                                                                          scrollViewBottomInset,
+                                                                          scrollViewRightInset);
+
+    const CGFloat collectionItemSpacing = 20.;
+    const NSEdgeInsets collectionViewSectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
+
+    NSCollectionViewFlowLayout *audioLibraryCollectionViewLayout = _audioLibraryCollectionView.collectionViewLayout;
+    audioLibraryCollectionViewLayout.itemSize = CGSizeMake(214., 260.);
+    audioLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
+
+    NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = _mediaSourceCollectionView.collectionViewLayout;
+    mediaSourceCollectionViewLayout.itemSize = CGSizeMake(214., 246.);
+    mediaSourceCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    mediaSourceCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    mediaSourceCollectionViewLayout.sectionInset = collectionViewSectionInset;
 
     // HACK: The size of the segmented title buttons is not always correctly calculated
     // especially when the text we are setting differs from what is set in the storyboard.

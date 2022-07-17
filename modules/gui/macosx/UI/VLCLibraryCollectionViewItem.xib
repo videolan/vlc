@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -21,20 +21,20 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY" customClass="VLCTrackingView">
-            <rect key="frame" x="0.0" y="0.0" width="256" height="214"/>
+            <rect key="frame" x="0.0" y="0.0" width="214" height="263"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="2aB-sB-hfY" customClass="VLCImageView">
-                    <rect key="frame" x="0.0" y="49" width="256" height="165"/>
+                    <rect key="frame" x="0.0" y="49" width="214" height="214"/>
                     <subviews>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="dFt-oZ-h9P" customClass="VLCLinearProgressIndicator">
-                            <rect key="frame" x="0.0" y="0.0" width="256" height="4"/>
+                            <rect key="frame" x="0.0" y="0.0" width="214" height="4"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="4" id="lyQ-kl-gVk"/>
                             </constraints>
                         </customView>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S3I-5Z-qgS">
-                            <rect key="frame" x="96" y="51" width="64" height="64"/>
+                            <rect key="frame" x="75" y="75" width="64" height="64"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" inset="2" id="IHP-p1-d0R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -44,7 +44,7 @@
                             </connections>
                         </button>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tm2-NW-WsZ" customClass="VLCRoundedCornerTextField">
-                            <rect key="frame" x="8" y="141" width="37" height="17"/>
+                            <rect key="frame" x="8" y="191" width="37" height="16"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tyb-Ur-7J9">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -56,6 +56,7 @@
                         <constraint firstAttribute="bottom" secondItem="dFt-oZ-h9P" secondAttribute="bottom" id="4q3-3S-7PA"/>
                         <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerX" secondItem="2aB-sB-hfY" secondAttribute="centerX" id="Seo-tS-piW"/>
                         <constraint firstItem="S3I-5Z-qgS" firstAttribute="centerY" secondItem="2aB-sB-hfY" secondAttribute="centerY" id="ZWU-oW-OVa"/>
+                        <constraint firstAttribute="width" secondItem="2aB-sB-hfY" secondAttribute="height" multiplier="1:1" id="f7c-vp-30m"/>
                         <constraint firstItem="dFt-oZ-h9P" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="gTe-sx-hdP"/>
                         <constraint firstAttribute="trailing" secondItem="dFt-oZ-h9P" secondAttribute="trailing" id="kBI-UU-vnc"/>
                     </constraints>
@@ -63,13 +64,13 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
                     <rect key="frame" x="-2" y="21" width="52" height="24"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" title="Label" usesSingleLineMode="YES" id="7Hy-o3-LvX">
-                        <font key="font" size="20" name=".AppleSystemUIFont"/>
+                        <font key="font" metaFont="system" size="20"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="u2r-zy-XEW">
-                    <rect key="frame" x="224" y="1" width="34" height="17"/>
+                    <rect key="frame" x="182" y="2" width="34" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="NEW" id="NeT-5U-eZn">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -77,7 +78,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ubz-8I-W2F">
-                    <rect key="frame" x="222" y="187" width="20" height="20"/>
+                    <rect key="frame" x="180" y="236" width="20" height="20"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="20" id="XhX-7U-Nxj"/>
                         <constraint firstAttribute="height" constant="20" id="ZDT-YM-Cbr"/>
@@ -93,7 +94,7 @@
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-gF-QiZ">
                     <rect key="frame" x="-2" y="0.0" width="42" height="19"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="LSS-jh-llZ">
-                        <font key="font" size="15" name=".AppleSystemUIFont"/>
+                        <font key="font" metaFont="system" size="15"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -116,6 +117,7 @@
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="bottom" constant="4" id="vJy-Kf-4Jh"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="yvp-xr-geN"/>
             </constraints>
+            <point key="canvasLocation" x="118" y="135.5"/>
         </customView>
     </objects>
     <resources>

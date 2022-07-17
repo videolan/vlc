@@ -90,11 +90,6 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     [self.collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
                forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-    NSCollectionViewFlowLayout *flowLayout = (NSCollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
-    flowLayout.footerReferenceSize = NSZeroSize;
-    flowLayout.headerReferenceSize = NSMakeSize(200, 50);
-    flowLayout.itemSize = NSMakeSize(149, 176);
-    flowLayout.minimumInteritemSpacing = 24.;
 
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
@@ -283,19 +278,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
     }
     
     return [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
-}
-- (NSEdgeInsets)collectionView:(NSCollectionView *)collectionView
-                        layout:(NSCollectionViewLayout *)collectionViewLayout
-        insetForSectionAtIndex:(NSInteger)section
-{
-    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        VLCMediaSource *mediaSource = _mediaSources[section];
-        VLCInputNode *rootNode = mediaSource.rootNode;
-        
-        return rootNode.numberOfChildren == 0 ? NSEdgeInsetsZero : NSEdgeInsetsMake(16., 0., 48., 0.);
-    }
-    
-    return NSEdgeInsetsMake(16., 0., 48.0, 0.);
 }
 
 #pragma mark - table view data source and delegation
