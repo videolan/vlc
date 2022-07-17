@@ -406,7 +406,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
         // Upload all of the regions
         subpicture_region_t *r = subpicture->p_region;
-        for (int i = 0; i < num_regions; i++) {
+        for (int i = 0; i < num_regions; i++, r = r->p_next) {
             assert(r->p_picture->i_planes == 1);
             struct pl_plane_data subdata[4];
             if (!vlc_placebo_PlaneData(r->p_picture, subdata, NULL))
