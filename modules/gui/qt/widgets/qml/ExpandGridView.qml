@@ -455,6 +455,11 @@ FocusScope {
         return i >= 0 && i < childrenList.length && typeof childrenList[i] !== "undefined"
     }
 
+    function _indexToZ(id) {
+        var rowCol = getItemRowCol(id)
+        return rowCol[0] % 2 + 2 * (rowCol[1] % 2)
+    }
+
     function _repositionItem(id, x, y) {
         var item = _getItem(id)
         console.assert(item !== undefined, "wrong child: " + id)
@@ -462,6 +467,7 @@ FocusScope {
         //theses properties are always defined in Item
         item.x = x
         item.y = y
+        item.z = _indexToZ(id)
         item.selected = selectionDelegateModel.isSelected(model.index(id, 0))
 
         return item
@@ -476,6 +482,7 @@ FocusScope {
         item.selected = selectionDelegateModel.isSelected(model.index(id, 0))
         item.x = x
         item.y = y
+        item.z = _indexToZ(id)
         item.visible = true
 
         _setItem(id, item)
@@ -490,6 +497,7 @@ FocusScope {
                         model: model.getDataAt(id),
                         x: x,
                         y: y,
+                        z: _indexToZ(id),
                         visible: true
                     })
 
