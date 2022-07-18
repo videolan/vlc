@@ -185,8 +185,7 @@ static int ChunkSkip( demux_t *p_demux, uint32_t i_size )
                                 vlc_stream_Tell( p_demux->s ) + i_size );
     }
 
-    ssize_t i_ret = vlc_stream_Read( p_demux->s, NULL, i_size );
-    return i_ret < 0 || (size_t) i_ret != i_size ? VLC_EGENERIC : VLC_SUCCESS;
+    return vlc_stream_Read( p_demux->s, NULL, i_size ) != i_size ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 static int ChunkGetNext( demux_t *p_demux, enum wav_chunk_id *p_id,
