@@ -2225,7 +2225,7 @@ static int AVI_PacketGetHeader( demux_t *p_demux, avi_packet_t *p_pk )
 static int AVI_PacketNext( demux_t *p_demux )
 {
     avi_packet_t    avi_ck;
-    size_t          i_skip = 0;
+    uint32_t        i_skip = 0;
 
     if( AVI_PacketGetHeader( p_demux, &avi_ck ) )
     {
