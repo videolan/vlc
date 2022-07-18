@@ -356,7 +356,11 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
                 goto skip;
         }
 
-        SkipBytes( p_packetsys->s, pkt->i_skip );
+        if (pkt->i_skip && !SkipBytes( p_packetsys->s, pkt->i_skip ))
+        {
+            vlc_warning( p_packetsys->logger, "unexpected end of file" );
+            return -1;
+        }
 
         vlc_tick_t i_payload_pts;
         i_payload_pts = i_pkt_time + i_pkt_time_delta * i_subpayload_count;
