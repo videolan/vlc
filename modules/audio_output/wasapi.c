@@ -178,8 +178,11 @@ static void StartDeferredCallback(void *val)
     aout_stream_sys_t *sys = s->sys;
 
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    /* From a timer callback, so it's impossible that COM was init before */
-    assert(SUCCEEDED(hr));
+    if (unlikely(FAILED(hr)))
+    {
+        msg_Err(s, "cannot initialize COM (error 0x%lX)", hr);
+        return;
+    }
 
     hr = IAudioClient_Start(sys->client);
 
