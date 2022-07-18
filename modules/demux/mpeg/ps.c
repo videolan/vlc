@@ -865,7 +865,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int ps_pkt_resynch( stream_t *s, int format, bool b_pack )
 {
     const uint8_t *p_peek;
-    int     i_peek;
+    ssize_t      i_peek;
     unsigned int i_skip;
 
     if( vlc_stream_Peek( s, &p_peek, 4 ) < 4 )
