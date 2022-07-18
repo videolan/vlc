@@ -87,8 +87,7 @@ static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
             {
                 vlc_debug(p_packetsys->logger, "dropping duplicate num %"PRIu32" off %"PRIu32,
                           i_media_object_number , i_media_object_offset);
-                ssize_t skipped = vlc_stream_Read( p_packetsys->s, NULL, i_sub_payload_data_length );
-                return ( skipped >= 0 && (uint32_t) skipped == i_sub_payload_data_length ) ? 0 : -1;
+                return vlc_stream_Read( p_packetsys->s, NULL, i_sub_payload_data_length ) != i_sub_payload_data_length ? -1 : 0;
             }
         }
 
