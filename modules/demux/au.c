@@ -143,7 +143,7 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->i_header_size > SSIZE_MAX )
             return VLC_EGENERIC;
 #endif
-        size_t skip = p_sys->i_header_size - 24;
+        uint32_t skip = p_sys->i_header_size - 24;
         if( vlc_stream_Read( p_demux->s, NULL, skip ) < (ssize_t)skip )
             return VLC_EGENERIC;
     }
