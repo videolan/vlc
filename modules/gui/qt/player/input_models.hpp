@@ -165,7 +165,8 @@ public:
     //user role
     enum ChapterListRoles {
         TimeRole = Qt::UserRole + 1 ,
-        PositionRole
+        StartPositionRole,
+        EndPositionRole
     };
 public:
     ChapterListModel(vlc_player_t* player, QObject* parent = nullptr);

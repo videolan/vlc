@@ -325,8 +325,13 @@ QVariant ChapterListModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue<bool>(row == m_current);
     else if (role == ChapterListRoles::TimeRole )
         return QVariant::fromValue<vlc_tick_t>(chapter.time);
-    else if (role == ChapterListRoles::PositionRole && (m_title->length != 0) )
-        return QVariant::fromValue<float>(chapter.time /(float) m_title->length);
+    else if (role == ChapterListRoles::StartPositionRole && (m_title->length != 0))
+        return QVariant::fromValue<float>(chapter.time / (float) m_title->length);
+    else if (role == ChapterListRoles::EndPositionRole && (m_title->length != 0))
+        return (size_t)row + 1 == m_title->chapter_count
+                ? QVariant::fromValue<float> (1)
+                : QVariant::fromValue<float> (m_title->chapters[row+1].time / (float) m_title->length);
+
     return QVariant{};
 }
 
@@ -354,7 +359,8 @@ QHash<int, QByteArray> ChapterListModel::roleNames() const
         {Qt::DisplayRole, "display"},
         {Qt::CheckStateRole, "checked"},
         {ChapterListRoles::TimeRole, "time"},
-        {ChapterListRoles::PositionRole, "position"}
+        {ChapterListRoles::StartPositionRole, "startPosition"},
+        {ChapterListRoles::EndPositionRole, "endPosition"}
     };
 }
 
@@ -436,6 +442,8 @@ int ChapterListModel::getClosestChapterFromPos(float pos, float threshold) const
             closestTime = currentChapterTime;
             chapterIndex = i;
         }
+        else
+            break;
     }
 
     if (closestTime == VLC_TICK_INVALID)
