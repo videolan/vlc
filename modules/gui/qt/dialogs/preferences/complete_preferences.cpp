@@ -194,13 +194,13 @@ QTreeWidgetItem *PrefsTree::createCatNode( enum vlc_config_cat cat )
     switch( cat )
     {
 #define CI(a,b) case a: icon = QIcon( b );break
-        CI( CAT_AUDIO,     ":/prefsmenu/advanced/audio.svg"    );
-        CI( CAT_VIDEO,     ":/prefsmenu/advanced/video.svg"    );
-        CI( CAT_INPUT,     ":/prefsmenu/advanced/codec.svg"    );
-        CI( CAT_SOUT,      ":/prefsmenu/advanced/sout.svg"     );
-        CI( CAT_ADVANCED,  ":/prefsmenu/advanced/extended.svg" );
-        CI( CAT_PLAYLIST,  ":/prefsmenu/advanced/playlist.svg" );
-        CI( CAT_INTERFACE, ":/prefsmenu/advanced/intf.svg"     );
+        CI( CAT_AUDIO,     ":/prefsmenu/advprefs_audio.svg"    );
+        CI( CAT_VIDEO,     ":/prefsmenu/advprefs_video.svg"    );
+        CI( CAT_INPUT,     ":/prefsmenu/advprefs_codec.svg"    );
+        CI( CAT_SOUT,      ":/prefsmenu/advprefs_sout.svg"     );
+        CI( CAT_ADVANCED,  ":/prefsmenu/advprefs_extended.svg" );
+        CI( CAT_PLAYLIST,  ":/prefsmenu/advprefs_playlist.svg" );
+        CI( CAT_INTERFACE, ":/prefsmenu/advprefs_intf.svg"     );
 #undef CI
         default: break;
     }

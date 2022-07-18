@@ -643,18 +643,18 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/prefs/advprefs_playlist.svg \
 	gui/qt/pixmaps/prefs/advprefs_sout.svg \
 	gui/qt/pixmaps/prefs/advprefs_video.svg \
-	gui/qt/pixmaps/prefs/spref_cone_Audio_64.png \
-	gui/qt/pixmaps/prefs/spref_cone_Hotkeys_64.png \
-	gui/qt/pixmaps/prefs/spref_cone_Input_64.png \
-	gui/qt/pixmaps/prefs/spref_cone_Interface_64.png \
-	gui/qt/pixmaps/prefs/spref_cone_Medialibrary_64.png \
-	gui/qt/pixmaps/prefs/spref_cone_Subtitles_64.png \
-	gui/qt/pixmaps/prefs/spref_cone_Video_64.png \
+	gui/qt/pixmaps/prefs/sample_complete.png \
+	gui/qt/pixmaps/prefs/sample_minimal.png \
+	gui/qt/pixmaps/prefs/sample_skins.png \
+	gui/qt/pixmaps/prefs/spref_audio.png \
+	gui/qt/pixmaps/prefs/spref_hotkeys.png \
+	gui/qt/pixmaps/prefs/spref_input.png \
+	gui/qt/pixmaps/prefs/spref_interface.png \
+	gui/qt/pixmaps/prefs/spref_medialibrary.png \
+	gui/qt/pixmaps/prefs/spref_subtitles.png \
+	gui/qt/pixmaps/prefs/spref_video.png \
 	gui/qt/pixmaps/previous.svg \
 	gui/qt/pixmaps/profile_new.svg \
-	gui/qt/pixmaps/sample_complete.png \
-	gui/qt/pixmaps/sample_minimal.png \
-	gui/qt/pixmaps/sample_skins.png \
 	gui/qt/pixmaps/slower.svg \
 	gui/qt/pixmaps/slower2.svg \
 	gui/qt/pixmaps/space.svg \

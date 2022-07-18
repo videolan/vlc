@@ -135,25 +135,23 @@
         <file alias="new_indicator.svg">pixmaps/new_indicator.svg</file>
     </qresource>
     <qresource prefix="/prefsmenu">
-        <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>
-        <file alias="cone_hotkeys_64.png">pixmaps/prefs/spref_cone_Hotkeys_64.png</file>
-        <file alias="cone_input_64.png">pixmaps/prefs/spref_cone_Input_64.png</file>
-        <file alias="cone_interface_64.png">pixmaps/prefs/spref_cone_Interface_64.png</file>
-        <file alias="cone_medialibrary_64.png">pixmaps/prefs/spref_cone_Medialibrary_64.png</file>
-        <file alias="cone_subtitles_64.png">pixmaps/prefs/spref_cone_Subtitles_64.png</file>
-        <file alias="cone_video_64.png">pixmaps/prefs/spref_cone_Video_64.png</file>
-        <file alias="sample_complete.png">pixmaps/sample_complete.png</file>
-        <file alias="sample_minimal.png">pixmaps/sample_minimal.png</file>
-        <file alias="sample_skins.png">pixmaps/sample_skins.png</file>
-    </qresource>
-    <qresource prefix="/prefsmenu/advanced">
-        <file alias="audio.svg">pixmaps/prefs/advprefs_audio.svg</file>
-        <file alias="codec.svg">pixmaps/prefs/advprefs_codec.svg</file>
-        <file alias="extended.svg">pixmaps/prefs/advprefs_extended.svg</file>
-        <file alias="intf.svg">pixmaps/prefs/advprefs_intf.svg</file>
-        <file alias="playlist.svg">pixmaps/prefs/advprefs_playlist.svg</file>
-        <file alias="sout.svg">pixmaps/prefs/advprefs_sout.svg</file>
-        <file alias="video.svg">pixmaps/prefs/advprefs_video.svg</file>
+        <file alias="advprefs_audio.svg">pixmaps/prefs/advprefs_audio.svg</file>
+        <file alias="advprefs_codec.svg">pixmaps/prefs/advprefs_codec.svg</file>
+        <file alias="advprefs_extended.svg">pixmaps/prefs/advprefs_extended.svg</file>
+        <file alias="advprefs_intf.svg">pixmaps/prefs/advprefs_intf.svg</file>
+        <file alias="advprefs_playlist.svg">pixmaps/prefs/advprefs_playlist.svg</file>
+        <file alias="advprefs_sout.svg">pixmaps/prefs/advprefs_sout.svg</file>
+        <file alias="advprefs_video.svg">pixmaps/prefs/advprefs_video.svg</file>
+        <file alias="spref_audio.png">pixmaps/prefs/spref_audio.png</file>
+        <file alias="spref_hotkeys.png">pixmaps/prefs/spref_hotkeys.png</file>
+        <file alias="spref_input.png">pixmaps/prefs/spref_input.png</file>
+        <file alias="spref_interface.png">pixmaps/prefs/spref_interface.png</file>
+        <file alias="spref_medialibrary.png">pixmaps/prefs/spref_medialibrary.png</file>
+        <file alias="spref_subtitles.png">pixmaps/prefs/spref_subtitles.png</file>
+        <file alias="spref_video.png">pixmaps/prefs/spref_video.png</file>
+        <file alias="sample_complete.png">pixmaps/prefs/sample_complete.png</file>
+        <file alias="sample_minimal.png">pixmaps/prefs/sample_minimal.png</file>
+        <file alias="sample_skins.png">pixmaps/prefs/sample_skins.png</file>
     </qresource>
     <qresource prefix="/win7">
         <file alias="pause.svg">pixmaps/win7/pause.svg</file>
