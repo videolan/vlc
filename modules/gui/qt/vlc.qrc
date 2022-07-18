@@ -185,9 +185,9 @@
         <file alias="katsomo.svg">pixmaps/playlist/sidebar-icons/sd/katsomo.svg</file>
     </qresource>
     <qresource prefix="/addons">
-        <file alias="default.svg">pixmaps/addons/addon.svg</file>
-        <file alias="broken.svg">pixmaps/addons/addon_broken.svg</file>
-        <file alias="score.svg">pixmaps/addons/score.svg</file>
+        <file alias="addon_default.svg">pixmaps/addons/addon_default.svg</file>
+        <file alias="addon_broken.svg">pixmaps/addons/addon_broken.svg</file>
+        <file alias="addon_score.svg">pixmaps/addons/addon_score.svg</file>
         <file alias="addon_blue.svg">pixmaps/addons/addon_blue.svg</file>
         <file alias="addon_cyan.svg">pixmaps/addons/addon_cyan.svg</file>
         <file alias="addon_green.svg">pixmaps/addons/addon_green.svg</file>

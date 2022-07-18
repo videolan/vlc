@@ -256,9 +256,9 @@ ServicesDiscoveryModel::Item &ServicesDiscoveryModel::Item::operator=( ServicesD
         artworkUrl = QUrl::fromLocalFile( absoluteFilePath );
     }
     else if ( addon->e_flags & ADDON_BROKEN )
-        artworkUrl = QUrl( ":/addons/broken.svg" );
+        artworkUrl = QUrl( ":/addons/addon_broken.svg" );
     else
-        artworkUrl = QUrl( ":/addons/default.svg" );
+        artworkUrl = QUrl( ":/addons/addon_default.svg" );
 
     return *this;
 }

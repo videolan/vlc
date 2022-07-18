@@ -577,7 +577,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/faster.svg \
 	gui/qt/pixmaps/faster2.svg \
 	gui/qt/pixmaps/go-next.svg \
-	gui/qt/pixmaps/addons/addon.svg \
+	gui/qt/pixmaps/addons/addon_default.svg \
 	gui/qt/pixmaps/addons/addon_broken.svg \
 	gui/qt/pixmaps/addons/addon_blue.svg \
 	gui/qt/pixmaps/addons/addon_cyan.svg \
@@ -585,7 +585,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/addons/addon_magenta.svg \
 	gui/qt/pixmaps/addons/addon_red.svg \
 	gui/qt/pixmaps/addons/addon_yellow.svg \
-	gui/qt/pixmaps/addons/score.svg \
+	gui/qt/pixmaps/addons/addon_score.svg \
 	gui/qt/pixmaps/menu.svg \
 	gui/qt/pixmaps/menus/exit_16px.svg \
 	gui/qt/pixmaps/menus/help_16px.svg \

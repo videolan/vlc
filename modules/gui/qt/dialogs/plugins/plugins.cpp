@@ -799,9 +799,9 @@ QVariant AddonsListModel::Addon::data( int role ) const
             returnval = pixmap;
         }
         else if ( p_entry->e_flags & ADDON_BROKEN )
-            returnval = QPixmap( ":/addons/broken.svg" );
+            returnval = QPixmap( ":/addons/addon_broken.svg" );
         else
-            returnval = QPixmap( ":/addons/default.svg" );
+            returnval = QPixmap( ":/addons/addon_default.svg" );
         break;
     case Qt::ToolTipRole:
     {
@@ -1201,7 +1201,7 @@ void AddonItemDelegate::paint( QPainter *painter,
     {
         int i_scoreicon_height = newopt.fontMetrics.height();
         int i_scoreicon_width = i_scoreicon_height * SCORE_ICON_WIDTH_SCALE;
-        scoreicon = ImageHelper::loadSvgToPixmap( ":/addons/score.svg",
+        scoreicon = ImageHelper::loadSvgToPixmap( ":/addons/addon_score.svg",
                     i_scoreicon_width, i_scoreicon_height );
         int i_width = ( (float) i_score / ADDON_MAX_SCORE ) * i_scoreicon_width;
         /* Erase the end (value) of our pixmap with a shadow */
