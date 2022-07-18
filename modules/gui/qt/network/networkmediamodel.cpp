@@ -73,6 +73,10 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
             return item.mediaSource->description;
         case NETWORK_ARTWORK:
             return item.artworkUrl;
+        case NETWORK_FILE_SIZE:
+            return item.fileSize;
+        case NETWORK_FILE_MODIFIED:
+            return item.fileModified;
         default:
             return {};
     }
@@ -90,6 +94,8 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
         { NETWORK_TREE, "tree" },
         { NETWORK_SOURCE, "source" },
         { NETWORK_ARTWORK, "artwork" },
+        { NETWORK_FILE_SIZE, "fileSizeRaw64" },
+        { NETWORK_FILE_MODIFIED, "fileModified" }
     };
 }
 
@@ -567,11 +573,37 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
         item.canBeIndexed = canBeIndexed( item.mainMrl , item.type );
         item.mediaSource = mediaSource;
 
-        char* artwork = input_item_GetArtworkURL(it.get());
-        if (artwork)
+        input_item_t * inputItem = it.get();
+
+        char * str = input_item_GetArtworkURL(inputItem);
+
+        if (str)
         {
-            item.artworkUrl = QUrl::fromEncoded(artwork);
-            free(artwork);
+            item.artworkUrl = QUrl::fromEncoded(str);
+            free(str);
+        }
+
+        str = input_item_GetInfo(inputItem, ".stat", "size");
+
+        if (str)
+        {
+            item.fileSize = QString(str).toLongLong();
+            free(str);
+        }
+        else
+            item.fileSize = 0;
+
+        str = input_item_GetInfo(inputItem, ".stat", "mtime");
+
+        if (str)
+        {
+            bool ok;
+
+            qint64 time = QString(str).toLongLong(&ok);
+            free(str);
+
+            if (ok)
+                item.fileModified = QDateTime::fromSecsSinceEpoch(time);
         }
 
         if ( m_mediaLib && item.canBeIndexed == true )

@@ -34,6 +34,7 @@
 #include <maininterface/mainctx.hpp>
 
 #include <QSemaphore>
+#include <QDateTime>
 
 #include <memory>
 
@@ -116,6 +117,8 @@ public:
         NETWORK_TREE,
         NETWORK_SOURCE,
         NETWORK_ARTWORK,
+        NETWORK_FILE_SIZE,
+        NETWORK_FILE_MODIFIED,
     };
 
     enum ItemType{
@@ -209,8 +212,9 @@ private:
         NetworkTreeItem tree;
         MediaSourcePtr mediaSource;
         QUrl artworkUrl;
+        qint64 fileSize;
+        QDateTime fileModified;
     };
-
 
     bool initializeMediaSources();
     void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
