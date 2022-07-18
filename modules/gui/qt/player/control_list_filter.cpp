@@ -45,7 +45,7 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
 {
     QAbstractItemModel * model = sourceModel();
 
-    if (model == nullptr || m_player == nullptr)
+    if (model == nullptr || m_player == nullptr || m_ctx == nullptr)
         return true;
 
     QVariant variant = model->data(model->index(source_row, 0), ControlListModel::ID_ROLE);
@@ -63,10 +63,8 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
     }
     else if (type == ControlListModel::BOOKMARK_BUTTON)
     {
-        assert(m_ctx);
         return (m_ctx->hasMediaLibrary() || m_player->hasChapters() || m_player->hasTitles());
     }
-
 
     return true;
 }
@@ -87,10 +85,10 @@ void ControlListFilter::setPlayer(PlayerController * player)
 
     m_player = player;
 
-    connect(player, &PlayerController::teletextAvailableChanged, this, &ControlListFilter::invalidate);
-    connect(player, &PlayerController::hasMenuChanged,           this, &ControlListFilter::invalidate);
-    connect(player, &PlayerController::hasChaptersChanged,       this, &ControlListFilter::invalidate);
-    connect(player, &PlayerController::hasTitlesChanged,         this, &ControlListFilter::invalidate);
+    connect(player, &PlayerController::teletextAvailableChanged, this, &ControlListFilter::invalidateFilter);
+    connect(player, &PlayerController::hasMenuChanged,           this, &ControlListFilter::invalidateFilter);
+    connect(player, &PlayerController::hasChaptersChanged,       this, &ControlListFilter::invalidateFilter);
+    connect(player, &PlayerController::hasTitlesChanged,         this, &ControlListFilter::invalidateFilter);
 
     invalidate();
 
