@@ -114,12 +114,10 @@ static int AVI_GotoNextChunk( stream_t *s, const avi_chunk_t *p_chk )
     {
         return vlc_stream_Seek( s, i_offset );
     }
-    else
-    {
-        ssize_t i_read = i_offset - vlc_stream_Tell( s );
-        return (i_read >=0 && vlc_stream_Read( s, NULL, i_read ) == i_read) ?
-                    VLC_SUCCESS : VLC_EGENERIC;
-    }
+    ssize_t i_read = i_offset - vlc_stream_Tell( s );
+    if (i_read < 0)
+        return VLC_EGENERIC;
+    return vlc_stream_Read( s, NULL, i_read ) != i_read ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
