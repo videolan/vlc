@@ -259,8 +259,7 @@ static int Open( vlc_object_t * p_this )
         else
         {
             msg_Warn( p_demux, "unsupported 'D' frame (c=%c)", fh.i_compression );
-            if( vlc_stream_Read( p_demux->s, NULL,
-                                 fh.i_length ) != fh.i_length )
+            if( vlc_stream_Read( p_demux->s, NULL, fh.i_length ) != fh.i_length )
                 goto error;
         }
     }
@@ -380,8 +379,7 @@ static int Demux( demux_t *p_demux )
 
         if( fh.i_type != 'R' && fh.i_length > 0 )
         {
-            if( vlc_stream_Read( p_demux->s, NULL,
-                                 fh.i_length ) != fh.i_length )
+            if( vlc_stream_Read( p_demux->s, NULL, fh.i_length ) != fh.i_length )
                 return VLC_DEMUXER_EGENERIC;
         }
     }
@@ -609,8 +607,7 @@ static int ControlSetPosition(demux_t *p_demux, uint64_t offset, bool b_guess)
 
         if( fh.i_type != 'R' && fh.i_length > 0 )
         {
-            if( vlc_stream_Read( p_demux->s, NULL,
-                                 fh.i_length ) != fh.i_length )
+            if( vlc_stream_Read( p_demux->s, NULL, fh.i_length ) != fh.i_length )
                 return VLC_EGENERIC;
         }
     }
