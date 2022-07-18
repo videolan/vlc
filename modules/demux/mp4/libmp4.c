@@ -3930,7 +3930,7 @@ static int MP4_ReadBox_TrackReference( stream_t *p_stream, MP4_Box_t *p_box )
 static int MP4_ReadBox_tref( stream_t *p_stream, MP4_Box_t *p_box )
 {
     /* skip header */
-    ssize_t i_header = mp4_box_headersize( p_box );
+    size_t i_header = mp4_box_headersize( p_box );
     if( vlc_stream_Read( p_stream, NULL, i_header ) != i_header )
         return 0;
     /* read each reference atom with forced handler */
