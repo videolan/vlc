@@ -527,7 +527,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
 
     if( pkt.left > 0 )
     {
-        size_t toskip;
+        uint32_t toskip;
         if( pkt.left > pkt.padding_length &&
             !p_packetsys->b_can_hold_multiple_packets )
         {
