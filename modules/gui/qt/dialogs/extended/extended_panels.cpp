@@ -1481,8 +1481,8 @@ SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     connect( THEMIM, &PlayerController::subtitleFPSChanged, subSpeedSpin, &QDoubleSpinBox::setValue );
     connect( &m_SubsDelayCfgFactor, &QVLCFloat::valueChanged, subDurationSpin, &QDoubleSpinBox::setValue);
 
-    BUTTON_SET_ACT_I( updateButton, "", update,
-            qtr( "Force update of this dialog's values" ), &SyncControls::update );
+    BUTTON_SET_ACT( updateButton, "", qtr( "Eject the disc" ), &SyncControls::update );
+    updateButton->setIcon( QIcon( ":/update.svg") );
 
     initSubsDuration();
 

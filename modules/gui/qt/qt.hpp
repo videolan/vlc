@@ -156,20 +156,9 @@ struct vlc_player_locker {
 
 #define BUTTONACT( b, a ) connect( b, &QAbstractButton::clicked, this, a )
 
-#define BUTTON_SET( button, text, tooltip )  \
-    button->setText( text );                 \
-    button->setToolTip( tooltip );
-
 #define BUTTON_SET_ACT( button, text, tooltip, thisslot ) \
-    BUTTON_SET( button, text, tooltip );                  \
-    BUTTONACT( button, thisslot );
-
-#define BUTTON_SET_IMG( button, text, image, tooltip )    \
-    BUTTON_SET( button, text, tooltip );                  \
-    button->setIcon( QIcon( ":/"#image ".svg") );
-
-#define BUTTON_SET_ACT_I( button, text, image, tooltip, thisslot ) \
-    BUTTON_SET_IMG( button, text, image, tooltip );                \
+    button->setText( text );       \
+    button->setToolTip( tooltip ); \
     BUTTONACT( button, thisslot );
 
 #define getSettings() p_intf->mainSettings
