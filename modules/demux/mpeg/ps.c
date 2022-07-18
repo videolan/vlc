@@ -909,14 +909,14 @@ static int ps_pkt_resynch( stream_t *s, int format, bool b_pack )
             p_peek[3] >= PS_STREAM_ID_END_STREAM &&
             ( !b_pack || p_peek[3] == PS_STREAM_ID_PACK_HEADER ) )
         {
-            return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 1 : -1;
+            return vlc_stream_Read( s, NULL, i_skip ) != i_skip ? -1 : 1;
         }
 
         p_peek++;
         i_peek--;
         i_skip++;
     }
-    return vlc_stream_Read( s, NULL, i_skip ) == i_skip ? 0 : -1;
+    return vlc_stream_Read( s, NULL, i_skip ) != i_skip ? -1 : 0;
 }
 
 static block_t *ps_pkt_read( stream_t *s )
