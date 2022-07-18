@@ -151,7 +151,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     const uint8_t *p_peek;
     ssize_t i_peek = 0;
     ssize_t i_offset = 0;
-    ssize_t i_skip = 0;
+    uint64_t i_skip = 0;
     unsigned i_max_packets = PS_PACKET_PROBE;
     int format = MPEG_PS;
     int i_mux_rate = 0;
@@ -220,7 +220,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         i_offset += i_pessize;
     }
 
-    if( i_skip > 0 && !p_demux->b_preparsing &&
+    if( i_skip && !p_demux->b_preparsing &&
         vlc_stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
         return VLC_EGENERIC;
 
