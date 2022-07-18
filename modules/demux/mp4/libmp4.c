@@ -251,7 +251,7 @@ int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
     if ( i_current_pos < 0 || i_pos < (uint64_t)i_current_pos )
         return VLC_EGENERIC;
 
-    size_t i_toread = i_pos - i_current_pos;
+    uint64_t i_toread = i_pos - i_current_pos;
     if( i_toread == 0 )
         return VLC_SUCCESS;
     else if( i_toread > (1<<17) )
