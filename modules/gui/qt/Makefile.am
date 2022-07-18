@@ -715,10 +715,10 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/util/wait2.svg \
 	gui/qt/pixmaps/util/wait3.svg \
 	gui/qt/pixmaps/util/wait4.svg \
-	gui/qt/pixmaps/win7/win7thumbnail_pause.svg \
-	gui/qt/pixmaps/win7/win7thumbnail_prev.svg \
-	gui/qt/pixmaps/win7/win7thumbnail_next.svg \
-	gui/qt/pixmaps/win7/win7thumbnail_play.svg \
+	gui/qt/pixmaps/win7/pause.svg \
+	gui/qt/pixmaps/win7/prev.svg \
+	gui/qt/pixmaps/win7/next.svg \
+	gui/qt/pixmaps/win7/play.svg \
 	gui/qt/pixmaps/update.svg \
 	gui/qt/pixmaps/valid.svg \
 	gui/qt/pixmaps/search_clear.svg \

@@ -156,10 +156,10 @@
         <file alias="video.svg">pixmaps/prefs/advprefs_video.svg</file>
     </qresource>
     <qresource prefix="/win7">
-        <file alias="pause.svg">pixmaps/win7/win7thumbnail_pause.svg</file>
-        <file alias="prev.svg">pixmaps/win7/win7thumbnail_prev.svg</file>
-        <file alias="play.svg">pixmaps/win7/win7thumbnail_play.svg</file>
-        <file alias="next.svg">pixmaps/win7/win7thumbnail_next.svg</file>
+        <file alias="pause.svg">pixmaps/win7/pause.svg</file>
+        <file alias="prev.svg">pixmaps/win7/prev.svg</file>
+        <file alias="play.svg">pixmaps/win7/play.svg</file>
+        <file alias="next.svg">pixmaps/win7/next.svg</file>
     </qresource>
     <qresource prefix="/sidebar">
         <file alias="disc.svg">pixmaps/playlist/sidebar-icons/disc.svg</file>
