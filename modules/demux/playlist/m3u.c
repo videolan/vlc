@@ -60,7 +60,7 @@ int Import_M3U( vlc_object_t *p_this )
     stream_t *p_stream = (stream_t *)p_this;
     const uint8_t *p_peek;
     ssize_t i_peek;
-    int offset = 0;
+    unsigned int offset = 0;
 
     i_peek = vlc_stream_Peek( p_stream->s, &p_peek, 1024 );
     if( i_peek < 8 )
@@ -109,7 +109,7 @@ int Import_M3U( vlc_object_t *p_this )
     if (!match)
         return VLC_EGENERIC;
 
-    if (offset > 0 && vlc_stream_Read(p_stream->s, NULL, offset) < offset)
+    if (offset && vlc_stream_Read(p_stream->s, NULL, offset) < offset)
         return VLC_EGENERIC;
 
     msg_Dbg( p_stream, "found valid M3U playlist" );
