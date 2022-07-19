@@ -129,15 +129,15 @@ bool NetworkSourcesModel::initializeMediaSources()
 
         if ( item.name.startsWith( "podcast" ) )
         {
-            item.artworkUrl = QUrl::fromLocalFile(":/sidebar/podcast.svg");
+            item.artworkUrl = QUrl::fromLocalFile(":/sd/podcast.svg");
         }
         else if ( item.name.startsWith("lua{") )
         {
             int i_head = item.name.indexOf( "sd='" ) + 4;
             int i_tail = item.name.indexOf( '\'', i_head );
-            const QString iconName = QString( ":/sidebar/sd/%1.svg" ).arg( item.name.mid( i_head, i_tail - i_head ) );
+            const QString iconName = QString( ":/sd/%1.svg" ).arg( item.name.mid( i_head, i_tail - i_head ) );
             item.artworkUrl = QFileInfo::exists( iconName ) ? QUrl::fromLocalFile( iconName )
-                                                            : QUrl::fromLocalFile( ":/sidebar/network.svg" );
+                                                            : QUrl::fromLocalFile( ":/sd/network.svg" );
         }
 
         m_items.push_back( std::move(item) );

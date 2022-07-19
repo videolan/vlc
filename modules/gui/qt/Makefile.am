@@ -639,23 +639,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/volume-muted.svg \
 	gui/qt/pixmaps/playlist/active_indicator.svg \
 	gui/qt/pixmaps/playlist/dropzone.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/capture.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/pictures.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/disc.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/playlist.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/lan.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/podcast.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/library.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/screen.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/mtp.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/network.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/appletrailers.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/icecast.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/katsomo.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/fmc.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/frenchtv.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/jamendo.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/sd/assembleenationale.svg \
 	gui/qt/pixmaps/prefs/advprefs_audio.svg \
 	gui/qt/pixmaps/prefs/advprefs_codec.svg \
 	gui/qt/pixmaps/prefs/advprefs_extended.svg \
@@ -675,6 +658,30 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/prefs/spref_video.png \
 	gui/qt/pixmaps/slower.svg \
 	gui/qt/pixmaps/space.svg \
+	gui/qt/pixmaps/sd/appletrailers.svg \
+	gui/qt/pixmaps/sd/assembleenationale.svg \
+	gui/qt/pixmaps/sd/capture-card.svg \
+	gui/qt/pixmaps/sd/directory.svg \
+	gui/qt/pixmaps/sd/disc.svg \
+	gui/qt/pixmaps/sd/file.svg \
+	gui/qt/pixmaps/sd/fmc.svg \
+	gui/qt/pixmaps/sd/frenchtv.svg \
+	gui/qt/pixmaps/sd/harddisk.svg \
+	gui/qt/pixmaps/sd/icecast.svg \
+	gui/qt/pixmaps/sd/jamendo.svg \
+	gui/qt/pixmaps/sd/katsomo.svg \
+	gui/qt/pixmaps/sd/lan.svg \
+	gui/qt/pixmaps/sd/library.svg \
+	gui/qt/pixmaps/sd/metachannels.svg \
+	gui/qt/pixmaps/sd/mtp.svg \
+	gui/qt/pixmaps/sd/network.svg \
+	gui/qt/pixmaps/sd/node.svg \
+	gui/qt/pixmaps/sd/pictures.svg \
+	gui/qt/pixmaps/sd/playlist.svg \
+	gui/qt/pixmaps/sd/podcast.svg \
+	gui/qt/pixmaps/sd/screen.svg \
+	gui/qt/pixmaps/sd/stream.svg \
+	gui/qt/pixmaps/sd/unknown.svg \
 	gui/qt/pixmaps/toolbar/audiosub.svg \
 	gui/qt/pixmaps/toolbar/arrows.svg \
 	gui/qt/pixmaps/toolbar/aspect-ratio.svg \
@@ -707,22 +714,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/toolbar/volume-slider-inside.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-outside.svg \
 	gui/qt/pixmaps/toolbar/play_button.svg \
-	gui/qt/pixmaps/types/capture-card_16px.svg \
-	gui/qt/pixmaps/types/disc_16px.svg \
-	gui/qt/pixmaps/types/file-asym_16px.svg \
-	gui/qt/pixmaps/types/file-wide_16px.svg \
-	gui/qt/pixmaps/types/file_black.svg \
-	gui/qt/pixmaps/types/folder-blue_16px.svg \
-	gui/qt/pixmaps/types/folder-grey_16px.svg \
-	gui/qt/pixmaps/types/harddisk_16px.svg \
-	gui/qt/pixmaps/types/network_16px.svg \
-	gui/qt/pixmaps/types/tape_16px.svg \
-	gui/qt/pixmaps/types/type_directory.svg \
-	gui/qt/pixmaps/types/type_directory_black.svg \
-	gui/qt/pixmaps/types/type_file.svg \
-	gui/qt/pixmaps/types/type_stream.svg \
-	gui/qt/pixmaps/types/type_node.svg \
-	gui/qt/pixmaps/types/type_playlist.svg \
 	gui/qt/pixmaps/util/wait1.svg \
 	gui/qt/pixmaps/util/wait2.svg \
 	gui/qt/pixmaps/util/wait3.svg \

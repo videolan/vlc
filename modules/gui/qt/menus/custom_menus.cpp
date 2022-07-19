@@ -55,9 +55,9 @@ RendererAction::RendererAction( vlc_renderer_item_t *p_item_ )
     p_item = p_item_;
     vlc_renderer_item_hold( p_item );
     if( vlc_renderer_item_flags( p_item ) & VLC_RENDERER_CAN_VIDEO )
-        setIcon( QIcon( ":/sidebar/movie.svg" ) );
+        setIcon( QIcon( ":/menu/movie.svg" ) );
     else
-        setIcon( QIcon( ":/sidebar/music.svg" ) );
+        setIcon( QIcon( ":/menu/music.svg" ) );
     setText( vlc_renderer_item_name( p_item ) );
     setCheckable(true);
 }

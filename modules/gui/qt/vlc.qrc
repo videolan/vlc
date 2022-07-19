@@ -117,20 +117,23 @@
         <file alias="audiosub.svg">pixmaps/toolbar/audiosub.svg</file>
         <file alias="play_button.svg">pixmaps/toolbar/play_button.svg</file>
     </qresource>
-    <qresource prefix="/type">
-        <file alias="capture-card.svg">pixmaps/types/capture-card_16px.svg</file>
-        <file alias="disc.svg">pixmaps/types/disc_16px.svg</file>
-        <file alias="file-asym.svg">pixmaps/types/file-asym_16px.svg</file>
-        <file alias="file-wide.svg">pixmaps/types/file-wide_16px.svg</file>
-        <file alias="folder-grey.svg">pixmaps/types/folder-grey_16px.svg</file>
-        <file alias="network.svg">pixmaps/types/network_16px.svg</file>
-        <file alias="directory.svg">pixmaps/types/type_directory.svg</file>
-        <file alias="file.svg">pixmaps/types/type_file.svg</file>
-        <file alias="stream.svg">pixmaps/types/type_stream.svg</file>
-        <file alias="node.svg">pixmaps/types/type_node.svg</file>
-        <file alias="playlist.svg">pixmaps/types/type_playlist.svg</file>
-        <file alias="directory_black.svg">pixmaps/types/type_directory_black.svg</file>
-        <file alias="file_black.svg">pixmaps/types/file_black.svg</file>
+    <qresource prefix="/sd">
+        <file alias="capture-card.svg">pixmaps/sd/capture-card.svg</file>
+        <file alias="disc.svg">pixmaps/sd/disc.svg</file>
+        <file alias="file.svg">pixmaps/sd/file.svg</file>
+        <file alias="network.svg">pixmaps/sd/network.svg</file>
+        <file alias="directory.svg">pixmaps/sd/directory.svg</file>
+        <file alias="stream.svg">pixmaps/sd/stream.svg</file>
+        <file alias="node.svg">pixmaps/sd/node.svg</file>
+        <file alias="playlist.svg">pixmaps/sd/playlist.svg</file>
+        <file alias="icecast.svg">pixmaps/sd/icecast.svg</file>
+        <file alias="appletrailers.svg">pixmaps/sd/appletrailers.svg</file>
+        <file alias="assembleenationale.svg">pixmaps/sd/assembleenationale.svg</file>
+        <file alias="fmc.svg">pixmaps/sd/fmc.svg</file>
+        <file alias="podcast.svg">pixmaps/sd/podcast.svg</file>
+        <file alias="frenchtv.svg">pixmaps/sd/frenchtv.svg</file>
+        <file alias="jamendo.svg">pixmaps/sd/jamendo.svg</file>
+        <file alias="katsomo.svg">pixmaps/sd/katsomo.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="download.svg">pixmaps/download.svg</file>
@@ -183,27 +186,6 @@
         <file alias="prev.svg">pixmaps/win7/prev.svg</file>
         <file alias="play.svg">pixmaps/win7/play.svg</file>
         <file alias="next.svg">pixmaps/win7/next.svg</file>
-    </qresource>
-    <qresource prefix="/sidebar">
-        <file alias="disc.svg">pixmaps/playlist/sidebar-icons/disc.svg</file>
-        <file alias="playlist.svg">pixmaps/playlist/sidebar-icons/playlist.svg</file>
-        <file alias="mtp.svg">pixmaps/playlist/sidebar-icons/mtp.svg</file>
-        <file alias="network.svg">pixmaps/playlist/sidebar-icons/network.svg</file>
-        <file alias="podcast.svg">pixmaps/playlist/sidebar-icons/podcast.svg</file>
-        <file alias="pictures.svg">pixmaps/playlist/sidebar-icons/pictures.svg</file>
-        <file alias="screen.svg">pixmaps/playlist/sidebar-icons/screen.svg</file>
-        <file alias="library.svg">pixmaps/playlist/sidebar-icons/library.svg</file>
-        <file alias="capture.svg">pixmaps/playlist/sidebar-icons/capture.svg</file>
-        <file alias="lan.svg">pixmaps/playlist/sidebar-icons/lan.svg</file>
-    </qresource>
-    <qresource prefix="/sidebar/sd">
-        <file alias="icecast.svg">pixmaps/playlist/sidebar-icons/sd/icecast.svg</file>
-        <file alias="appletrailers.svg">pixmaps/playlist/sidebar-icons/sd/appletrailers.svg</file>
-        <file alias="assembleenationale.svg">pixmaps/playlist/sidebar-icons/sd/assembleenationale.svg</file>
-        <file alias="fmc.svg">pixmaps/playlist/sidebar-icons/sd/fmc.svg</file>
-        <file alias="frenchtv.svg">pixmaps/playlist/sidebar-icons/sd/frenchtv.svg</file>
-        <file alias="jamendo.svg">pixmaps/playlist/sidebar-icons/sd/jamendo.svg</file>
-        <file alias="katsomo.svg">pixmaps/playlist/sidebar-icons/sd/katsomo.svg</file>
     </qresource>
     <qresource prefix="/addons">
         <file alias="addon_default.svg">pixmaps/addons/addon_default.svg</file>

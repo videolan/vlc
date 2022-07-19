@@ -42,17 +42,17 @@ Widgets.ListItem {
 
             switch (model.type) {
             case NetworkMediaModel.TYPE_DISC:
-                return  "qrc:///type/disc.svg"
+                return  "qrc:///sd/disc.svg"
             case NetworkMediaModel.TYPE_CARD:
-                return  "qrc:///type/capture-card.svg"
+                return  "qrc:///sd/capture-card.svg"
             case NetworkMediaModel.TYPE_STREAM:
-                return  "qrc:///type/stream.svg"
+                return  "qrc:///sd/stream.svg"
             case NetworkMediaModel.TYPE_PLAYLIST:
-                return  "qrc:///type/playlist.svg"
+                return  "qrc:///sd/playlist.svg"
             case NetworkMediaModel.TYPE_FILE:
-                return  "qrc:///type/file_black.svg"
+                return  "qrc:///sd/file.svg"
             default:
-                return "qrc:///type/directory_black.svg"
+                return "qrc:///sd/directory.svg"
             }
         }
     }
