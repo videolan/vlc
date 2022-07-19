@@ -42,7 +42,9 @@ FocusScope {
     property var initialIndex: 0
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "name"},
-        { text: I18n.qtr("Url"), criteria: "mrl" }
+        { text: I18n.qtr("Url"), criteria: "mrl" },
+        { text: I18n.qtr("File size"), criteria: "fileSizeRaw64" },
+        { text: I18n.qtr("File modified"), criteria: "fileModified" }
     ]
 
     property alias _currentView: view.currentItem
