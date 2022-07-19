@@ -57,7 +57,7 @@ Widgets.OverlayMenu {
         id: exploreAction
         text: I18n.qtr("Show Containing Directory")
         onTriggered: mainPlaylistController.explore(root.model.itemAt(root.model.getSelection()[0]))
-        icon.source: "qrc:/type/folder-grey.svg"
+        icon.source: "qrc:/menu/folder.svg"
     }
 
     Action {
@@ -91,7 +91,7 @@ Widgets.OverlayMenu {
         id: clearAllAction
         text: I18n.qtr("Clear Playlist")
         onTriggered: mainPlaylistController.clear()
-        icon.source: "qrc:/toolbar/clear.svg"
+        icon.source: "qrc:/menu/clear.svg"
     }
 
     Action {

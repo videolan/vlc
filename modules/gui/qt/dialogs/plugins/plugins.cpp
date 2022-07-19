@@ -252,7 +252,7 @@ ExtensionTab::ExtensionTab( qt_intf_t *p_intf_ )
 
     // Reload button
     ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
-    QPushButton *reload = new QPushButton( QIcon( ":/update.svg" ),
+    QPushButton *reload = new QPushButton( QIcon( ":/menu/update.svg" ),
                                            qtr( "Reload extensions" ),
                                            this );
     connect( reload, &QPushButton::clicked, EM, &ExtensionsManager::reloadExtensions );
@@ -416,7 +416,7 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     switchStack->insertWidget( WITHONLINEADDONS, installedOnlyBox );
     connect( installedOnlyBox, &QCheckBox::stateChanged, this, &AddonsTab::installChecked );
 
-    QPushButton *reposyncButton = new QPushButton( QIcon( ":/update.svg" ),
+    QPushButton *reposyncButton = new QPushButton( QIcon( ":/menu/update.svg" ),
                                               qtr("Find more addons online") );
     reposyncButton->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     switchStack->insertWidget( ONLYLOCALADDONS, reposyncButton );
@@ -1286,10 +1286,10 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
          index.data( AddonsListModel::FlagsRole ).toInt() )
     {
         if ( index.data( AddonsListModel::StateRole ).toInt() == ADDON_INSTALLED )
-            installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_remove.svg" ),
+            installButton = new QPushButton( QIcon( ":/menu/remove.svg" ),
                                              qtr("&Uninstall"), parent );
         else
-            installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_add.svg" ),
+            installButton = new QPushButton( QIcon( ":/menu/add.svg" ),
                                              qtr("&Install"), parent );
         connect( installButton, &QPushButton::clicked, this, &AddonItemDelegate::editButtonClicked );
         editorWidget->layout()->addWidget( installButton );

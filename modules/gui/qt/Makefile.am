@@ -572,10 +572,7 @@ ui_%.h: %.ui
 
 libqt_plugin_la_RES = \
 	gui/qt/pixmaps/VLCIcons.ttf \
-	gui/qt/pixmaps/clear.svg \
-	gui/qt/pixmaps/eject.svg \
 	gui/qt/pixmaps/faster.svg \
-	gui/qt/pixmaps/faster2.svg \
 	gui/qt/pixmaps/go-next.svg \
 	gui/qt/pixmaps/addons/addon_default.svg \
 	gui/qt/pixmaps/addons/addon_broken.svg \
@@ -587,15 +584,9 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/addons/addon_yellow.svg \
 	gui/qt/pixmaps/addons/addon_score.svg \
 	gui/qt/pixmaps/menu.svg \
-	gui/qt/pixmaps/menus/exit_16px.svg \
-	gui/qt/pixmaps/menus/help_16px.svg \
-	gui/qt/pixmaps/menus/info_16px.svg \
-	gui/qt/pixmaps/menus/messages_16px.svg \
-	gui/qt/pixmaps/menus/playlist_16px.svg \
-	gui/qt/pixmaps/menus/preferences_16px.svg \
-	gui/qt/pixmaps/menus/settings_16px.svg \
-	gui/qt/pixmaps/menus/stream_16px.svg \
-	gui/qt/pixmaps/next.svg \
+	gui/qt/pixmaps/clear.svg \
+	gui/qt/pixmaps/faster.svg \
+	gui/qt/pixmaps/slower.svg \
 	gui/qt/pixmaps/noart.png \
 	gui/qt/pixmaps/noart_album.svg \
 	gui/qt/pixmaps/noart_albumCover.svg \
@@ -603,19 +594,50 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/noart_artist_small.svg \
 	gui/qt/pixmaps/noart_artistCover.svg \
 	gui/qt/pixmaps/noart_videoCover.svg \
-	gui/qt/pixmaps/pause.svg \
-	gui/qt/pixmaps/play.svg \
 	gui/qt/pixmaps/play_button.svg \
 	gui/qt/pixmaps/play_shadow.png \
-	gui/qt/pixmaps/new_indicator.svg \
-	gui/qt/pixmaps/playlist/add.svg \
-	gui/qt/pixmaps/playlist/playlist.svg \
-	gui/qt/pixmaps/playlist/remove.svg \
-	gui/qt/pixmaps/playlist/repeat_all.svg \
-	gui/qt/pixmaps/playlist/repeat_off.svg \
-	gui/qt/pixmaps/playlist/repeat_one.svg \
+	gui/qt/pixmaps/menu/add.svg \
+	gui/qt/pixmaps/menu/capture-card.svg \
+	gui/qt/pixmaps/menu/clear.svg \
+	gui/qt/pixmaps/menu/disc.svg \
+	gui/qt/pixmaps/menu/download.svg \
+	gui/qt/pixmaps/menu/eject.svg \
+	gui/qt/pixmaps/menu/exit.svg \
+	gui/qt/pixmaps/menu/faster.svg \
+	gui/qt/pixmaps/menu/file.svg \
+	gui/qt/pixmaps/menu/folder.svg \
+	gui/qt/pixmaps/menu/help.svg \
+	gui/qt/pixmaps/menu/info.svg \
+	gui/qt/pixmaps/menu/messages.svg \
+	gui/qt/pixmaps/menu/movie.svg \
+	gui/qt/pixmaps/menu/music.svg \
+	gui/qt/pixmaps/menu/network.svg \
+	gui/qt/pixmaps/menu/next.svg \
+	gui/qt/pixmaps/menu/pause.svg \
+	gui/qt/pixmaps/menu/play.svg \
+	gui/qt/pixmaps/menu/playlist.svg \
+	gui/qt/pixmaps/menu/preferences.svg \
+	gui/qt/pixmaps/menu/previous.svg \
+	gui/qt/pixmaps/menu/profile_new.svg \
+	gui/qt/pixmaps/menu/record.svg \
+	gui/qt/pixmaps/menu/remove.svg \
+	gui/qt/pixmaps/menu/repeat_all.svg \
+	gui/qt/pixmaps/menu/repeat_off.svg \
+	gui/qt/pixmaps/menu/repeat_one.svg \
+	gui/qt/pixmaps/menu/search_clear.svg \
+	gui/qt/pixmaps/menu/settings.svg \
+	gui/qt/pixmaps/menu/skip_for.svg \
+	gui/qt/pixmaps/menu/skip_back.svg \
+	gui/qt/pixmaps/menu/shuffle_on.svg \
+	gui/qt/pixmaps/menu/slower.svg \
+	gui/qt/pixmaps/menu/stop.svg \
+	gui/qt/pixmaps/menu/stream.svg \
+	gui/qt/pixmaps/menu/sync.svg \
+	gui/qt/pixmaps/menu/update.svg \
+	gui/qt/pixmaps/menu/volume-high.svg \
+	gui/qt/pixmaps/menu/volume-low.svg \
+	gui/qt/pixmaps/menu/volume-muted.svg \
 	gui/qt/pixmaps/playlist/active_indicator.svg \
-	gui/qt/pixmaps/playlist/shuffle_on.svg \
 	gui/qt/pixmaps/playlist/dropzone.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/capture.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/pictures.svg \
@@ -625,9 +647,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/playlist/sidebar-icons/podcast.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/library.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/screen.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/movie.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/mtp.svg \
-	gui/qt/pixmaps/playlist/sidebar-icons/music.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/network.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/sd/appletrailers.svg \
 	gui/qt/pixmaps/playlist/sidebar-icons/sd/icecast.svg \
@@ -653,12 +673,8 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/prefs/spref_medialibrary.png \
 	gui/qt/pixmaps/prefs/spref_subtitles.png \
 	gui/qt/pixmaps/prefs/spref_video.png \
-	gui/qt/pixmaps/previous.svg \
-	gui/qt/pixmaps/profile_new.svg \
 	gui/qt/pixmaps/slower.svg \
-	gui/qt/pixmaps/slower2.svg \
 	gui/qt/pixmaps/space.svg \
-	gui/qt/pixmaps/stop.svg \
 	gui/qt/pixmaps/toolbar/audiosub.svg \
 	gui/qt/pixmaps/toolbar/arrows.svg \
 	gui/qt/pixmaps/toolbar/aspect-ratio.svg \
@@ -688,10 +704,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/toolbar/tv.svg \
 	gui/qt/pixmaps/toolbar/tvtelx.svg \
 	gui/qt/pixmaps/toolbar/visu.svg \
-	gui/qt/pixmaps/toolbar/volume-high.svg \
-	gui/qt/pixmaps/toolbar/volume-low.svg \
-	gui/qt/pixmaps/toolbar/volume-medium.svg \
-	gui/qt/pixmaps/toolbar/volume-muted.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-inside.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-outside.svg \
 	gui/qt/pixmaps/toolbar/play_button.svg \
@@ -721,7 +733,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/win7/play.svg \
 	gui/qt/pixmaps/update.svg \
 	gui/qt/pixmaps/valid.svg \
-	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
 	gui/qt/pixmaps/close.svg \
 	gui/qt/pixmaps/rename.svg \

@@ -424,11 +424,11 @@ YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
     setStyleSheet("\
                   QCheckBox::indicator:unchecked:hover,\
                   QCheckBox::indicator:unchecked {\
-                      image: url(:/toolbar/clear.svg);\
+                      image: url(:/menu/clear.svg);\
                   }\
                   QCheckBox::indicator:checked:hover,\
                   QCheckBox::indicator:checked {\
-                      image: url(:/valid.svg);\
+                      image: url(:/menu/valid.svg);\
                   }\
         ");
 }

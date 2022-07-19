@@ -97,7 +97,7 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     getSettings()->endGroup();
 
     updateButton = new QToolButton;
-    updateButton->setIcon( QIcon(":/update.svg") );
+    updateButton->setIcon( QIcon(":/menu/update.svg") );
     updateButton->setAutoRaise( true );
     ui.mainTab->setCornerWidget( updateButton );
 
@@ -357,7 +357,7 @@ void MessagesDialog::updateOrClear()
 
 void MessagesDialog::tabChanged( int i )
 {
-    updateButton->setIcon( i != 0 ? QIcon(":/update.svg") : QIcon(":/toolbar/clear.svg") );
+    updateButton->setIcon( i != 0 ? QIcon(":/menu/update.svg") : QIcon(":/menu/clear.svg") );
     updateButton->setToolTip( i != 0 ? qtr("Update the tree")
                                      : qtr("Clear the messages") );
 }

@@ -544,12 +544,12 @@ void QmlSubtitleMenu::beforePopup(QMenu * menu) /* override */
         emit triggered(Open);
     });
 
-    menu->addAction(QIcon(":/sync.svg"), qtr("Synchronize"), this, [this]()
+    menu->addAction(QIcon(":/menu/sync.svg"), qtr("Synchronize"), this, [this]()
     {
         emit triggered(Synchronize);
     });
 
-    menu->addAction(QIcon(":/download.svg"), qtr("Search online"), this, [this]()
+    menu->addAction(QIcon(":/menu/download.svg"), qtr("Search online"), this, [this]()
     {
         emit triggered(Download);
     });
@@ -581,7 +581,7 @@ void QmlAudioMenu::beforePopup(QMenu * menu) /* override */
         emit triggered(Open);
     });
 
-    menu->addAction(QIcon(":/sync.svg"), qtr("Synchronize"), this, [this]()
+    menu->addAction(QIcon(":/menu/sync.svg"), qtr("Synchronize"), this, [this]()
     {
         emit triggered(Synchronize);
     });
@@ -692,7 +692,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
 
     action = m_menu->addAction(qtr("Remove Selected"));
 
-    action->setIcon(QIcon(":/buttons/playlist/playlist_remove.svg"));
+    action->setIcon(QIcon(":/menu/playlist_remove.svg"));
 
     connect(action, &QAction::triggered, [this, selected]() {
         m_model->remove(selected);
@@ -837,7 +837,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         m_menu->addSeparator();
 
         action = m_menu->addAction( qtr("Show Containing Directory...") );
-        action->setIcon(QIcon(":/type/folder-grey.svg"));
+        action->setIcon(QIcon(":/menu/folder.svg"));
         connect(action, &QAction::triggered, [this, currentItem]( ) {
             m_controler->explore(currentItem);
         });
@@ -846,19 +846,19 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
     }
 
     action = m_menu->addAction( qtr("Add File...") );
-    action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
+    action->setIcon(QIcon(":/menu/add.svg"));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->simpleOpenDialog(false);
     });
 
     action = m_menu->addAction( qtr("Add Directory...") );
-    action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
+    action->setIcon(QIcon(":/menu/add.svg"));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->PLAppendDir();
     });
 
     action = m_menu->addAction( qtr("Advanced Open...") );
-    action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
+    action->setIcon(QIcon(":/menu/add.svg"));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->PLAppendDialog();
     });
@@ -875,7 +875,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         m_menu->addSeparator();
 
         action = m_menu->addAction( qtr("Remove Selected") );
-        action->setIcon(QIcon(":/buttons/playlist/playlist_remove.svg"));
+        action->setIcon(QIcon(":/menu/remove.svg"));
         connect(action, &QAction::triggered, [this]( ) {
             m_model->removeItems(m_model->getSelection());
         });
@@ -885,7 +885,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
     if (m_model->rowCount() > 0)
     {
         action = m_menu->addAction( qtr("Clear the playlist") );
-        action->setIcon(QIcon(":/toolbar/clear.svg"));
+        action->setIcon(QIcon(":/menu/clear.svg"));
         connect(action, &QAction::triggered, [this]( ) {
             m_controler->clear();
         });
@@ -922,7 +922,7 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         }
 
         action = m_menu->addAction( qtr("Shuffle the playlist") );
-        action->setIcon(QIcon(":/buttons/playlist/shuffle_on.svg"));
+        action->setIcon(QIcon(":/menu/shuffle_on.svg"));
         connect(action, &QAction::triggered, this, [this]( ) {
             m_controler->shuffle();
         });

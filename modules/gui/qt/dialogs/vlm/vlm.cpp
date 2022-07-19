@@ -463,7 +463,7 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
     objLayout->addWidget( modifyButton, 0, 5 );
 
     QToolButton *deleteButton = new QToolButton;
-    deleteButton->setIcon( QIcon( ":/toolbar/clear.svg" ) );
+    deleteButton->setIcon( QIcon( ":/menu/clear.svg" ) );
     deleteButton->setToolTip( qtr("Delete") );
     objLayout->addWidget( deleteButton, 0, 6 );
 
@@ -504,13 +504,13 @@ VLMBroadcast::VLMBroadcast( VLMWrapper *vlm, const QString& _name,
     b_looped = _looped;
 
     playButton = new QToolButton;
-    playButton->setIcon( QIcon( ":/toolbar/play_b.svg" ) );
+    playButton->setIcon( QIcon( ":/menu/play.svg" ) );
     playButton->setToolTip( qtr("Play") );
     objLayout->addWidget( playButton, 1, 0 );
     b_playing = true;
 
     QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( ":/toolbar/stop_b.svg" ) );
+    stopButton->setIcon( QIcon( ":/menu/stop.svg" ) );
     stopButton->setToolTip( qtr("Stop") );
     objLayout->addWidget( stopButton, 1, 1 );
 
@@ -529,9 +529,9 @@ void VLMBroadcast::update()
 {
     vlm->EditBroadcast( name, input, inputOptions, output, b_enabled, b_looped );
     if( b_looped )
-        loopButton->setIcon( QIcon( ":/buttons/playlist/repeat_all.svg" ) );
+        loopButton->setIcon( QIcon( ":/menu/repeat_all.svg" ) );
     else
-        loopButton->setIcon( QIcon( ":/buttons/playlist/repeat_off.svg" ) );
+        loopButton->setIcon( QIcon( ":/menu/repeat_off.svg" ) );
 }
 
 void VLMBroadcast::togglePlayPause()
@@ -539,12 +539,12 @@ void VLMBroadcast::togglePlayPause()
     if( b_playing )
     {
         vlm->ControlBroadcast( name, ControlBroadcastPause );
-        playButton->setIcon( QIcon( ":/toolbar/pause_b.svg" ) );
+        playButton->setIcon( QIcon( ":/menu/pause.svg" ) );
     }
     else
     {
         vlm->ControlBroadcast( name, ControlBroadcastPlay );
-        playButton->setIcon( QIcon( ":/toolbar/play_b.svg" ) );
+        playButton->setIcon( QIcon( ":/menu/play.svg" ) );
     }
     b_playing = !b_playing;
 }

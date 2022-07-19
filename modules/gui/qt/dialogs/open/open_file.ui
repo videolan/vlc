@@ -113,7 +113,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/buttons/playlist/playlist_add.svg</normaloff>:/buttons/playlist/playlist_add.svg</iconset>
+          <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
         </property>
        </widget>
       </item>
@@ -133,7 +133,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/buttons/playlist/playlist_remove.svg</normaloff>:/buttons/playlist/playlist_remove.svg</iconset>
+          <normaloff>:/menu/remove.svg</normaloff>:/menu/remove.svg</iconset>
         </property>
        </widget>
       </item>

@@ -49,7 +49,7 @@
       <string>Add</string>
      </property>
      <property name="icon" >
-      <iconset resource="../vlc.qrc" >:/toolbar/play_b.svg</iconset>
+      <iconset resource="../vlc.qrc" >:/menu/play.svg</iconset>
      </property>
     </widget>
    </item>
@@ -59,7 +59,7 @@
       <string>Delete</string>
      </property>
      <property name="icon" >
-      <iconset resource="../vlc.qrc" >:/toolbar/clear.svg</iconset>
+      <iconset resource="../vlc.qrc" >:/menu/clear.svg</iconset>
      </property>
     </widget>
    </item>

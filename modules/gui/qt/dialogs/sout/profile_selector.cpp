@@ -61,12 +61,12 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     layout->addWidget( editButton );
 
     QToolButton *deleteButton = new QToolButton( this );
-    deleteButton->setIcon( QIcon( ":/toolbar/clear.svg" ) );
+    deleteButton->setIcon( QIcon( ":/menu/clear.svg" ) );
     deleteButton->setToolTip( qtr( "Delete selected profile" ) );
     layout->addWidget( deleteButton );
 
     QToolButton *newButton = new QToolButton( this );
-    newButton->setIcon( QIcon( ":/new.svg" ) );
+    newButton->setIcon( QIcon( ":/menu/profile_new.svg" ) );
     newButton->setToolTip( qtr( "Create a new profile" ) );
     layout->addWidget(newButton);
 
@@ -634,7 +634,7 @@ void VLCProfileEditor::muxSelected()
     else if ( !caps["muxers"].contains( current->property("module").toString() ) &&
               !caps["muxers"].contains( "mux_" + current->property("module").toString() ) )
         ui.muxerwarning->setText(
-                    QString( "<img src=\":/toobar/clear.svg\" width=%2 height=%2/> %1" )
+                    QString( "<img src=\":/menu/clear.svg\" width=%2 height=%2/> %1" )
                     .arg( qtr( "This muxer is missing. Using this profile will fail" ) )
                     .arg(textsize)
                     );

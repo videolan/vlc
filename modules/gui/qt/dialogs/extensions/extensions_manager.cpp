@@ -184,7 +184,7 @@ void ExtensionsManager::menu( QMenu *current )
             }
 
             submenu->addSeparator();
-            action = submenu->addAction( QIcon( ":/toolbar/clear.svg" ),
+            action = submenu->addAction( QIcon( ":/menu/clear.svg" ),
                                          qtr( "Deactivate" ) );
             menuMapper->setMapping( action, MENU_MAP( 0, i_ext ) );
             connect( action, &QAction::triggered, menuMapper, QOverload<>::of(&QSignalMapper::map) );

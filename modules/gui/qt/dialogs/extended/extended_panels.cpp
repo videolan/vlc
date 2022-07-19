@@ -1482,7 +1482,7 @@ SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     connect( &m_SubsDelayCfgFactor, &QVLCFloat::valueChanged, subDurationSpin, &QDoubleSpinBox::setValue);
 
     BUTTON_SET_ACT( updateButton, "", qtr( "Eject the disc" ), &SyncControls::update );
-    updateButton->setIcon( QIcon( ":/update.svg") );
+    updateButton->setIcon( QIcon( ":/menu/update.svg") );
 
     initSubsDuration();
 
