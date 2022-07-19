@@ -362,58 +362,138 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
     (void) chroma;
 
-    GLint oneplane_texfmt, oneplane16_texfmt,
-          twoplanes_texfmt, twoplanes16_texfmt;
+    struct interop_formats
+    {
+        GLint intfmt;
+        GLint fmt;
+        GLint plane2_intfmt;
+        GLint plane2_fmt;
+        GLint type;
+        GLint plane2_type;
+    } formats[] = {
+        // 3 planes
+            // 8 bits pixels
+                // OpenGL, no texture RG
+                { GL_LUMINANCE, GL_LUMINANCE, 0, 0,  GL_UNSIGNED_BYTE, 0 },
+                // OpenGL, texture RG available
+                { GL_RED, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
+                // OpenGLES, no texture RG
+                { GL_LUMINANCE, GL_LUMINANCE, 0, 0, GL_UNSIGNED_BYTE, 0 },
+                // OpenGLES, texture RG available
+                { GL_RED, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
+            // 16 bits pixels
+                // OpenGL, no texture RG
+                { GL_LUMINANCE16, GL_LUMINANCE16, 0, 0, GL_UNSIGNED_SHORT, 0 },
+                // OpenGL, texture RG available
+                { GL_R16, GL_RG16, 0, 0, GL_UNSIGNED_SHORT, 0 },
+                // OpenGLES, no texture RG
+                { GL_LUMINANCE16, GL_LUMINANCE16, 0, 0, GL_UNSIGNED_SHORT, 0 },
+                // OpenGLES, texture RG available
+                { GL_R16, GL_RG, 0, 0, GL_UNSIGNED_SHORT, 0 },
+        // 2 planes
+            // 8 bits pixels
+                // OpenGL, no texture RG
+                { GL_LUMINANCE, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
+                // OpenGL texture RG available
+                { GL_RED, GL_RED, GL_RG, GL_RG, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
+                // OpenGLES, no texture RG
+                { GL_LUMINANCE, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
+                // OpenGLES, texture RG available
+                { GL_RED, GL_RED, GL_RG, GL_RG, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
+            // 16 bits pixels
+                // OpenGL, no texture RG
+                { GL_LUMINANCE16, GL_LUMINANCE, GL_LUMINANCE16, GL_LUMINANCE, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
+                // OpenGL texture RG available
+                { GL_RG, GL_RG16, GL_RG, GL_RG16, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
+                // OpenGLES, no texture RG
+                { GL_LUMINANCE16, GL_LUMINANCE, GL_LUMINANCE16, GL_LUMINANCE, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
+                // OpenGLES, texture RG available
+                { GL_R16, GL_RG, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
+        // 1 plane is a special case that will be handled explicitly
+    };
 
+    if (desc->plane_count == 1)
+    {
+        /* Only YUV 4:2:2 formats */
+        /* The pictures have only 1 plane, but it is uploaded twice, once to
+         * access the Y components, once to access the UV components. See
+         * #26712. */
+        GLint fmt, intfmt;
+        if (priv->has_texture_rg)
+        {
+            intfmt = GL_RG8;
+            fmt = GL_RG;
+        }
+        else
+        {
+            intfmt = GL_LUMINANCE;
+            fmt = GL_LUMINANCE_ALPHA;
+        }
+        interop->tex_count = 2;
+        interop->texs[0] = (struct vlc_gl_tex_cfg) {
+            { 1, 1 }, { 1, 1 },
+            intfmt, fmt, GL_UNSIGNED_BYTE
+        };
+        interop->texs[1] = (struct vlc_gl_tex_cfg) {
+            { 1, 2 }, { 1, 1 },
+            GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
+        };
+        return VLC_SUCCESS;
+    }
+
+    uint8_t format_index = 0;
+    switch (desc->plane_count)
+    {
+    case 3:
+        break;
+    case 2:
+        format_index += 8;
+        break;
+    default:
+        vlc_assert_unreachable();
+        break;
+    }
+
+    switch (desc->pixel_size)
+    {
+    case 1:
+        break;
+    case 2:
+        format_index += 4;
+        break;
+    default:
+        return VLC_EGENERIC;
+    }
+    if (interop->gl->api_type != VLC_OPENGL)
+        format_index += 2;
     if (priv->has_texture_rg)
-    {
-        oneplane_texfmt = GL_RED;
-        oneplane16_texfmt = GL_R16;
-        twoplanes_texfmt = GL_RG;
-        twoplanes16_texfmt = GL_RG16;
-    }
-    else
-    {
-        oneplane_texfmt = GL_LUMINANCE;
-        oneplane16_texfmt = GL_LUMINANCE16;
-        twoplanes_texfmt = GL_LUMINANCE_ALPHA;
-        twoplanes16_texfmt = 0;
-    }
+        format_index += 1;
+    assert(format_index < ARRAY_SIZE(formats));
+
+    struct interop_formats* format = &formats[format_index];
+    msg_Dbg(interop, "Using format at index %u", format_index);
+    msg_Dbg(interop, "Plane1: fmt=%#x intfmt=%#x type=%#x", format->fmt,
+            format->intfmt, format->type);
+    msg_Dbg(interop, "Plane2: fmt=%#x intfmt=%#x type=%#x", format->plane2_fmt,
+            format->plane2_intfmt, format->plane2_type);
+
 
     if (desc->pixel_size == 2)
     {
-        if (vlc_gl_interop_GetTexFormatSize(interop, tex_target, oneplane_texfmt,
-                                            oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
+        if (vlc_gl_interop_GetTexFormatSize(interop, tex_target, format->fmt,
+                                            format->intfmt, GL_UNSIGNED_SHORT) != 16)
             return VLC_EGENERIC;
     }
 
     if (desc->plane_count == 3)
     {
-        GLint internal = 0;
-        GLenum type = 0;
-
-        if (desc->pixel_size == 1)
-        {
-            internal = oneplane_texfmt;
-            type = GL_UNSIGNED_BYTE;
-        }
-        else if (desc->pixel_size == 2)
-        {
-            internal = oneplane16_texfmt;
-            type = GL_UNSIGNED_SHORT;
-        }
-        else
-            return VLC_EGENERIC;
-
-        assert(internal != 0 && type != 0);
-
         interop->tex_count = 3;
         for (unsigned i = 0; i < interop->tex_count; ++i )
         {
             interop->texs[i] = (struct vlc_gl_tex_cfg) {
                 { desc->p[i].w.num, desc->p[i].w.den },
                 { desc->p[i].h.num, desc->p[i].h.den },
-                internal, oneplane_texfmt, type
+                format->intfmt, format->fmt, format->type
             };
         }
     }
@@ -421,38 +501,23 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     {
         interop->tex_count = 2;
 
-        if (desc->pixel_size == 1)
+        if (desc->pixel_size == 2 &&
+            vlc_gl_interop_GetTexFormatSize(interop, tex_target, format->plane2_fmt,
+                format->plane2_intfmt, format->plane2_type) != 16)
         {
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { desc->p[0].w.num, desc->p[0].w.den },
-                { desc->p[0].h.num, desc->p[0].h.den },
-                oneplane_texfmt, oneplane_texfmt, GL_UNSIGNED_BYTE
-            };
-            interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                { desc->p[1].w.num, desc->p[1].w.den },
-                { desc->p[1].h.num, desc->p[1].h.den },
-                twoplanes_texfmt, twoplanes_texfmt, GL_UNSIGNED_BYTE
-            };
-        }
-        else if (desc->pixel_size == 2)
-        {
-            if (twoplanes16_texfmt == 0
-             || vlc_gl_interop_GetTexFormatSize(interop, tex_target, twoplanes_texfmt,
-                                                twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
-                return VLC_EGENERIC;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { desc->p[0].w.num, desc->p[0].w.den },
-                { desc->p[0].h.num, desc->p[0].h.den },
-                oneplane16_texfmt, oneplane_texfmt, GL_UNSIGNED_SHORT
-            };
-            interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                { desc->p[1].w.num, desc->p[1].w.den },
-                { desc->p[1].h.num, desc->p[1].h.den },
-                twoplanes16_texfmt, twoplanes_texfmt, GL_UNSIGNED_SHORT
-            };
-        }
-        else
             return VLC_EGENERIC;
+        }
+
+        interop->texs[0] = (struct vlc_gl_tex_cfg) {
+            { desc->p[0].w.num, desc->p[0].w.den },
+            { desc->p[0].h.num, desc->p[0].h.den },
+            format->intfmt, format->fmt, format->type
+        };
+        interop->texs[1] = (struct vlc_gl_tex_cfg) {
+            { desc->p[1].w.num, desc->p[1].w.den },
+            { desc->p[1].h.num, desc->p[1].h.den },
+            format->plane2_intfmt, format->plane2_fmt, format->plane2_type
+        };
 
         /*
          * If plane_count == 2, then the chroma is semiplanar: the U and V
@@ -467,24 +532,6 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
          */
          DivideRationalByTwo(&interop->texs[1].w);
     }
-    else if (desc->plane_count == 1)
-    {
-        /* Only YUV 4:2:2 formats */
-        /* The pictures have only 1 plane, but it is uploaded twice, once to
-         * access the Y components, once to access the UV components. See
-         * #26712. */
-        interop->tex_count = 2;
-        interop->texs[0] = (struct vlc_gl_tex_cfg) {
-            { 1, 1 }, { 1, 1 },
-            twoplanes_texfmt, twoplanes_texfmt, GL_UNSIGNED_BYTE
-        };
-        interop->texs[1] = (struct vlc_gl_tex_cfg) {
-            { 1, 2 }, { 1, 1 },
-            GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
-        };
-    }
-    else
-        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
