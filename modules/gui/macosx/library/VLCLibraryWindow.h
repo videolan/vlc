@@ -72,6 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *shufflePlaylistButton;
 @property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *playlistCounterTextField;
 @property (readwrite, weak) IBOutlet NSButton *librarySortButton;
+@property (readwrite, weak) IBOutlet NSSearchField *librarySearchField;
+@property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
 @property (readwrite, weak) IBOutlet NSButton *playQueueToggle;
 
 @property (readonly) BOOL nativeFullscreenMode;
@@ -87,6 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)clearPlaylist:(id)sender;
 - (IBAction)sortPlaylist:(id)sender;
 - (IBAction)sortLibrary:(id)sender;
+- (IBAction)filterLibrary:(id)sender;
 - (IBAction)openMedia:(id)sender;
 - (IBAction)showAndHidePlaylist:(id)sender;
 

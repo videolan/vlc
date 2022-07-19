@@ -195,4 +195,9 @@
     [_libraryModel sortByCriteria:sortCriteria andDescending:descending];
 }
 
+- (void)filterByString:(NSString*)filterString
+{
+    [_libraryModel filterByString:filterString];
+}
+
 @end

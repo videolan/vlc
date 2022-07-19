@@ -49,6 +49,7 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 
     enum vlc_ml_sorting_criteria_t _sortCriteria;
     bool _sortDescending;
+    NSString *_filterString;
     
     size_t _initialVideoCount;
     size_t _initialAudioCount;
@@ -133,6 +134,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     if (self) {
         _sortCriteria = VLC_ML_SORTING_DEFAULT;
         _sortDescending = NO;
+        _filterString = @"";
         _p_mediaLibrary = library;
         _p_eventCallback = vlc_ml_event_register_callback(_p_mediaLibrary, libraryCallback, (__bridge void *)self);
         _defaultNotificationCenter = [NSNotificationCenter defaultCenter];
@@ -187,10 +189,18 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedAudioMedia.count;
 }
 
+- (vlc_ml_query_params_t)queryParams
+{
+    const vlc_ml_query_params_t queryParams = { .psz_pattern = self->_filterString.length > 0 ? [self->_filterString UTF8String] : NULL, 
+                                                .i_sort = self->_sortCriteria, 
+                                                .b_desc = self->_sortDescending };
+    return queryParams;
+}
+
 - (void)updateCachedListOfAudioMedia
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParams = { .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
+        const vlc_ml_query_params_t queryParams = [self queryParams];
         vlc_ml_media_list_t *p_media_list = vlc_ml_list_audio_media(self->_p_mediaLibrary, &queryParams);
         if (!p_media_list) {
             return;
@@ -230,7 +240,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateCachedListOfArtists
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParams = { .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
+        const vlc_ml_query_params_t queryParams = { .psz_pattern = [self->_filterString UTF8String], .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
         vlc_ml_artist_list_t *p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, NO);
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artist_list->i_nb_items];
         for (size_t x = 0; x < p_artist_list->i_nb_items; x++) {
@@ -266,7 +276,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateCachedListOfAlbums
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParams = { .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
+        const vlc_ml_query_params_t queryParams = [self queryParams];
         vlc_ml_album_list_t *p_album_list = vlc_ml_list_albums(self->_p_mediaLibrary, &queryParams);
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_album_list->i_nb_items];
         for (size_t x = 0; x < p_album_list->i_nb_items; x++) {
@@ -300,7 +310,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateCachedListOfGenres
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParams = { .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
+        const vlc_ml_query_params_t queryParams = [self queryParams];
         vlc_ml_genre_list_t *p_genre_list = vlc_ml_list_genres(self->_p_mediaLibrary, &queryParams);
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_genre_list->i_nb_items];
         for (size_t x = 0; x < p_genre_list->i_nb_items; x++) {
@@ -339,11 +349,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateCachedListOfVideoMedia
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParameters = {
-            .i_nbResults = 0,
-            .i_sort = self->_sortCriteria,
-            .b_desc = self->_sortDescending
-        };
+        const vlc_ml_query_params_t queryParameters = [self queryParams];
         vlc_ml_media_list_t *p_media_list = vlc_ml_list_video_media(self->_p_mediaLibrary, &queryParameters);
         if (p_media_list == NULL) {
             return;
@@ -440,7 +446,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 {
-    const vlc_ml_query_params_t queryParams = { .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
+    const vlc_ml_query_params_t queryParams = [self queryParams];
     vlc_ml_album_list_t *p_albumList = vlc_ml_list_albums_of(_p_mediaLibrary, &queryParams, parentType, ID);
     if (p_albumList == NULL) {
         return nil;
@@ -458,6 +464,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 {
     _sortCriteria = sortCriteria;
     _sortDescending = descending;
+    [self dropCaches];
+}
+
+- (void)filterByString:(NSString*)filterString
+{
+    if([filterString isEqualToString:_filterString]) {
+        return;
+    }
+
+    _filterString = filterString;
     [self dropCaches];
 }
 

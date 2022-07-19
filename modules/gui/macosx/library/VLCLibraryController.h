@@ -52,6 +52,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending;
 
 /**
+ * @brief Filter the entire library representation based on:
+ * @param filterString the string that will be used to filter items
+ */
+- (void)filterByString:(NSString*)filterString;
+
+/**
  * Initially, the library is unsorted until the user decides to do so
  * Until then, the unsorted state is retained.
  */

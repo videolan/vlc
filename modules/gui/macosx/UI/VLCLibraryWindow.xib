@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="Search Toolbar Item" minToolsVersion="12.0" minSystemVersion="11.0"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -596,22 +597,6 @@
                             </segmentedCell>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="9B15C9C0-73AC-4190-803C-5AF14952E903" label="Custom View" paletteLabel="Search Field" sizingBehavior="auto" id="hnO-hn-Ad3">
-                        <nil key="toolTip"/>
-                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="751" allowsCharacterPickerTouchBarItem="YES" textCompletion="NO" id="Uje-gs-XyH">
-                            <rect key="frame" x="0.0" y="14" width="96" height="22"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="22" id="bdi-0E-ZYl"/>
-                                <constraint firstAttribute="width" constant="96" id="pdg-70-JyS"/>
-                            </constraints>
-                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" id="hOD-ST-dRA">
-                                <font key="font" metaFont="message"/>
-                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </searchFieldCell>
-                        </searchField>
-                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="hs0-cc-34q"/>
                     <toolbarItem implicitItemIdentifier="FCCB897D-45D4-411A-91BF-302620882C8C" label="smallCone" paletteLabel="Toolbar Cone" tag="-1" image="VLC" navigational="YES" id="L28-Xw-ydE">
@@ -632,6 +617,21 @@
                             </segmentedCell>
                         </segmentedControl>
                     </toolbarItem>
+                    <searchToolbarItem implicitItemIdentifier="A132890F-6B3D-4523-A71B-B00F095057C4" label="Search" paletteLabel="Search" visibilityPriority="1001" id="dv4-Il-y8X">
+                        <nil key="toolTip"/>
+                        <searchField key="view" verticalHuggingPriority="750" textCompletion="NO" id="ab6-kR-8Io">
+                            <rect key="frame" x="0.0" y="0.0" width="100" height="21"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsSearchStringImmediately="YES" id="MW6-rQ-Qtr">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </searchFieldCell>
+                            <connections>
+                                <action selector="filterLibrary:" target="QvC-M9-y7g" id="VoD-A4-uwu"/>
+                            </connections>
+                        </searchField>
+                    </searchToolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="L28-Xw-ydE"/>
@@ -641,8 +641,8 @@
                     <toolbarItem reference="89f-AL-zuU"/>
                     <toolbarItem reference="KnW-Lr-R1d"/>
                     <toolbarItem reference="89f-AL-zuU"/>
+                    <searchToolbarItem reference="dv4-Il-y8X"/>
                     <toolbarItem reference="Lf2-ec-tHh"/>
-                    <toolbarItem reference="hnO-hn-Ad3"/>
                 </defaultToolbarItems>
             </toolbar>
             <connections>
@@ -659,6 +659,8 @@
                 <outlet property="dragDropImageBackgroundBox" destination="AXk-h7-dZ0" id="h3h-Wh-0op"/>
                 <outlet property="emptyLibraryView" destination="YJf-1r-vaC" id="AJB-eN-4u6"/>
                 <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
+                <outlet property="librarySearchField" destination="ab6-kR-8Io" id="Qf7-UM-lol"/>
+                <outlet property="librarySearchToolbarItem" destination="dv4-Il-y8X" id="Um3-s4-Ax4"/>
                 <outlet property="librarySortButton" destination="Rja-6g-wNZ" id="FQ7-MU-hsk"/>
                 <outlet property="libraryTargetView" destination="iSp-bV-w6B" id="a94-ux-wUc"/>
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>

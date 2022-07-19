@@ -190,6 +190,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self.gridVsListSegmentedControl setHidden:NO];
     [self.librarySortButton setHidden:NO];
+    [self.librarySearchField setEnabled:YES];
+
     self.videoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.videoView];
     [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeWidth multiplier:1. constant:1.]];
@@ -559,6 +561,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     
     _librarySortButton.hidden = NO;
+    _librarySearchField.enabled = YES;
     _optionBarView.hidden = YES;
     _audioSegmentedControl.hidden = YES;
 
@@ -610,6 +613,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     
     _librarySortButton.hidden = NO;
+    _librarySearchField.enabled = YES;
     _optionBarView.hidden = NO;
     _audioSegmentedControl.hidden = NO;
     
@@ -637,6 +641,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     _mediaSourceDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 2 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
     _librarySortButton.hidden = YES;
+    _librarySearchField.enabled = NO;
+    [self clearLibraryFilterString];
     _optionBarView.hidden = YES;
     _audioSegmentedControl.hidden = YES;
     [_mediaSourceDataSource reloadViews];
@@ -670,6 +676,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _librarySortingMenuController = [[VLCLibrarySortingMenuController alloc] init];
     }
     [NSMenu popUpContextMenu:_librarySortingMenuController.librarySortingMenu withEvent:[NSApp currentEvent] forView:sender];
+}
+
+- (IBAction)filterLibrary:(id)sender
+{
+    [[[VLCMain sharedInstance] libraryController] filterByString:_librarySearchField.stringValue];
+}
+
+- (void)clearLibraryFilterString
+{
+    _librarySearchField.stringValue = @"";
+    [self filterLibrary:self];
 }
 
 - (IBAction)openMedia:(id)sender
@@ -794,6 +811,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.videoView setHidden:NO];
     [self.gridVsListSegmentedControl setHidden:YES];
     [self.librarySortButton setHidden:YES];
+    [self.librarySearchField setEnabled:NO];
+    [self clearLibraryFilterString];
+
     if (self.nativeFullscreenMode) {
         if ([self hasActiveVideo] && [self fullscreen]) {
             [self hideControlsBar];
@@ -830,6 +850,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.videoView setHidden:YES];
     [self.gridVsListSegmentedControl setHidden:NO];
     [self.librarySortButton setHidden:NO];
+    [self.librarySearchField setEnabled:YES];
 
     [self segmentedControlAction:nil];
 
