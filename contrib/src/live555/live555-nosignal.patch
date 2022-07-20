@@ -2,9 +2,31 @@ Copyright (C) 2015 Rémi Denis-Courmont
 
 Licensed under the terms of the GNU LGPL version 2.1 or later.
 
+diff -ru live555.orig/groupsock/GroupsockHelper.cpp live555/groupsock/GroupsockHelper.cpp
+--- live555.orig/groupsock/GroupsockHelper.cpp	2022-06-16 11:14:03.000000000 +0000
++++ live555/groupsock/GroupsockHelper.cpp	2022-07-16 11:04:10.334840299 +0000
+@@ -47,6 +47,9 @@
+ #include <net/if.h>
+ #endif
+ #include <stdio.h>
++#ifndef MSG_NOSIGNAL
++# define MSG_NOSIGNAL 0
++#endif
+ 
+ // By default, use INADDR_ANY for the sending and receiving interfaces (IPv4 only):
+ ipv4AddressBits SendingInterfaceAddr = INADDR_ANY;
+@@ -447,7 +450,7 @@
+ 		    unsigned char* buffer, unsigned bufferSize) {
+   do {
+     SOCKLEN_T dest_len = addressSize(addressAndPort);
+-    int bytesSent = sendto(socket, (char*)buffer, bufferSize, 0,
++    int bytesSent = sendto(socket, (char*)buffer, bufferSize, MSG_NOSIGNAL,
+ 			   (struct sockaddr const*)&addressAndPort, dest_len);
+     if (bytesSent != (int)bufferSize) {
+       char tmpBuf[100];
 diff -ru live555.orig/liveMedia/RTPInterface.cpp live555/liveMedia/RTPInterface.cpp
---- live555.orig/liveMedia/RTPInterface.cpp	2015-05-21 20:34:45.855307019 +0300
-+++ live555/liveMedia/RTPInterface.cpp	2015-05-21 20:38:10.383305167 +0300
+--- live555.orig/liveMedia/RTPInterface.cpp	2022-06-16 11:14:03.000000000 +0000
++++ live555/liveMedia/RTPInterface.cpp	2022-07-16 11:05:59.904820188 +0000
 @@ -23,6 +23,9 @@
  #include "RTPInterface.hh"
  #include <GroupsockHelper.hh>
@@ -15,27 +37,27 @@ diff -ru live555.orig/liveMedia/RTPInterface.cpp live555/liveMedia/RTPInterface.
  
  ////////// Helper Functions - Definition //////////
  
-@@ -339,7 +339,7 @@
- #endif
- 
- Boolean RTPInterface::sendDataOverTCP(int socketNum, u_int8_t const* data, unsigned dataSize, Boolean forceSendToSucceed) {
--  int sendResult = send(socketNum, (char const*)data, dataSize, 0/*flags*/);
-+  int sendResult = send(socketNum, (char const*)data, dataSize, MSG_NOSIGNAL);
+@@ -382,7 +385,7 @@
+ 				      Boolean forceSendToSucceed) {
+   int sendResult = (tlsState != NULL && tlsState->isNeeded)
+     ? tlsState->write((char const*)data, dataSize)
+-    : send(socketNum, (char const*)data, dataSize, 0/*flags*/);
++    : send(socketNum, (char const*)data, dataSize, MSG_NOSIGNAL);
    if (sendResult < (int)dataSize) {
      // The TCP send() failed - at least partially.
  
-@@ -353,7 +353,7 @@
-       fprintf(stderr, "sendDataOverTCP: resending %d-byte send (blocking)\n", numBytesRemainingToSend); fflush(stderr);
- #endif
+@@ -398,7 +401,7 @@
        makeSocketBlocking(socketNum, RTPINTERFACE_BLOCKING_WRITE_TIMEOUT_MS);
--      sendResult = send(socketNum, (char const*)(&data[numBytesSentSoFar]), numBytesRemainingToSend, 0/*flags*/);
-+      sendResult = send(socketNum, (char const*)(&data[numBytesSentSoFar]), numBytesRemainingToSend, MSG_NOSIGNAL);
+       sendResult = (tlsState != NULL && tlsState->isNeeded)
+ 	? tlsState->write((char const*)(&data[numBytesSentSoFar]), numBytesRemainingToSend)
+-	: send(socketNum, (char const*)(&data[numBytesSentSoFar]), numBytesRemainingToSend, 0/*flags*/);
++	: send(socketNum, (char const*)(&data[numBytesSentSoFar]), numBytesRemainingToSend, MSG_NOSIGNAL);
+       makeSocketNonBlocking(socketNum);
        if ((unsigned)sendResult != numBytesRemainingToSend) {
  	// The blocking "send()" failed, or timed out.  In either case, we assume that the
- 	// TCP connection has failed (or is 'hanging' indefinitely), and we stop using it
 diff -ru live555.orig/liveMedia/RTSPClient.cpp live555/liveMedia/RTSPClient.cpp
---- live555.orig/liveMedia/RTSPClient.cpp	2015-05-21 20:34:45.855307019 +0300
-+++ live555/liveMedia/RTSPClient.cpp	2015-05-21 20:39:54.327304226 +0300
+--- live555.orig/liveMedia/RTSPClient.cpp	2022-06-16 11:14:03.000000000 +0000
++++ live555/liveMedia/RTSPClient.cpp	2022-07-16 11:09:59.856563940 +0000
 @@ -24,6 +24,9 @@
  #include "Locale.hh"
  #include <GroupsockHelper.hh>
@@ -44,96 +66,36 @@ diff -ru live555.orig/liveMedia/RTSPClient.cpp live555/liveMedia/RTSPClient.cpp
 +# define MSG_NOSIGNAL 0
 +#endif
  
- ////////// RTSPClient implementation //////////
- 
-@@ -497,7 +500,7 @@
-       delete[] origCmd;
-     }
- 
--    if (send(fOutputSocketNum, cmd, strlen(cmd), 0) < 0) {
-+    if (send(fOutputSocketNum, cmd, strlen(cmd), MSG_NOSIGNAL) < 0) {
-       char const* errFmt = "%s send() failed: ";
-       unsigned const errLength = strlen(errFmt) + strlen(request->commandName());
-       char* err = new char[errLength];
-@@ -939,7 +942,7 @@
-     char tmpBuf[2*RTSP_PARAM_STRING_MAX];
-     snprintf((char*)tmpBuf, sizeof tmpBuf,
-              "RTSP/1.0 405 Method Not Allowed\r\nCSeq: %s\r\n\r\n", cseq);
--    send(fOutputSocketNum, tmpBuf, strlen(tmpBuf), 0);
-+    send(fOutputSocketNum, tmpBuf, strlen(tmpBuf), MSG_NOSIGNAL);
-   }
+ RTSPClient* RTSPClient::createNew(UsageEnvironment& env, char const* rtspURL,
+ 				  int verbosityLevel,
+@@ -2022,7 +2025,7 @@
+       if (fOutputTLS->isNeeded) {
+ 	return fOutputTLS->write(data, count);
+       } else {
+-	return send(fOutputSocketNum, data, count, 0);
++	return send(fOutputSocketNum, data, count, MSG_NOSIGNAL);
+       }
  }
  
-diff -ru live555.orig/liveMedia/RTSPServerSupportingHTTPStreaming.cpp live555/liveMedia/RTSPServerSupportingHTTPStreaming.cpp
---- live555.orig/liveMedia/RTSPServerSupportingHTTPStreaming.cpp	2015-05-21 20:34:45.857307019 +0300
-+++ live555/liveMedia/RTSPServerSupportingHTTPStreaming.cpp	2015-05-21 20:39:44.568304314 +0300
-@@ -24,6 +24,9 @@
- #include <sys/stat.h>
- #endif
- #include <time.h>
+diff -ru live555.orig/liveMedia/RTSPServer.cpp live555/liveMedia/RTSPServer.cpp
+--- live555.orig/liveMedia/RTSPServer.cpp	2022-06-16 11:14:03.000000000 +0000
++++ live555/liveMedia/RTSPServer.cpp	2022-07-16 11:11:37.086888246 +0000
+@@ -23,6 +23,9 @@
+ #include "RTSPRegisterSender.hh"
+ #include "Base64.hh"
+ #include <GroupsockHelper.hh>
 +#ifndef MSG_NOSIGNAL
 +# define MSG_NOSIGNAL 0
 +#endif
  
- RTSPServerSupportingHTTPStreaming*
- RTSPServerSupportingHTTPStreaming::createNew(UsageEnvironment& env, Port rtspPort,
-@@ -140,7 +143,7 @@
- 	       lastModifiedHeader(streamName),
- 	       numTSBytesToStream);
-       // Send the response now, because we're about to add more data (from the source):
--      send(fClientOutputSocket, (char const*)fResponseBuffer, strlen((char*)fResponseBuffer), 0);
-+      send(fClientOutputSocket, (char const*)fResponseBuffer, strlen((char*)fResponseBuffer), MSG_NOSIGNAL);
-       fResponseBuffer[0] = '\0'; // We've already sent the response.  This tells the calling code not to send it again.
-       
-       // Ask the media source to deliver - to the TCP sink - the desired data:
-@@ -234,7 +237,7 @@
- 	   playlistLen);
+ ////////// RTSPServer implementation //////////
  
-   // Send the response header now, because we're about to add more data (the playlist):
--  send(fClientOutputSocket, (char const*)fResponseBuffer, strlen((char*)fResponseBuffer), 0);
-+  send(fClientOutputSocket, (char const*)fResponseBuffer, strlen((char*)fResponseBuffer), MSG_NOSIGNAL);
-   fResponseBuffer[0] = '\0'; // We've already sent the response.  This tells the calling code not to send it again.
- 
-   // Then, send the playlist.  Because it's large, we don't do so using "send()", because that might not send it all at once.
---- live/groupsock/GroupsockHelper.cpp.orig	2015-06-22 00:09:17.000000000 +0200
-+++ live/groupsock/GroupsockHelper.cpp	2015-06-22 10:56:08.673912904 +0200
-@@ -35,6 +35,9 @@
- #define USE_SIGNALS 1
- #endif
- #include <stdio.h>
-+#ifndef MSG_NOSIGNAL
-+# define MSG_NOSIGNAL 0
-+#endif
- 
- // By default, use INADDR_ANY for the sending and receiving interfaces:
- netAddressBits SendingInterfaceAddr = INADDR_ANY;
-@@ -342,7 +345,7 @@
- 		    unsigned char* buffer, unsigned bufferSize) {
-   do {
-     MAKE_SOCKADDR_IN(dest, address.s_addr, portNum);
--    int bytesSent = sendto(socket, (char*)buffer, bufferSize, 0,
-+    int bytesSent = sendto(socket, (char*)buffer, bufferSize, MSG_NOSIGNAL,
- 			   (struct sockaddr*)&dest, sizeof dest);
-     if (bytesSent != (int)bufferSize) {
-       char tmpBuf[100];
---- live/liveMedia/TCPStreamSink.cpp.orig	2015-06-22 00:09:17.000000000 +0200
-+++ live/liveMedia/TCPStreamSink.cpp	2015-06-22 11:01:32.669268927 +0200
-@@ -20,6 +20,9 @@
- 
- #include "TCPStreamSink.hh"
- #include <GroupsockHelper.hh> // for "ignoreSigPipeOnSocket()"
-+#ifndef MSG_NOSIGNAL
-+# define MSG_NOSIGNAL 0
-+#endif
- 
- TCPStreamSink* TCPStreamSink::createNew(UsageEnvironment& env, int socketNum) {
-   return new TCPStreamSink(env, socketNum);
-@@ -51,7 +54,7 @@
-   // First, try writing data to our output socket, if we can:
-   if (fOutputSocketIsWritable && numUnwrittenBytes() > 0) {
-     int numBytesWritten
--      = send(fOutputSocketNum, (const char*)&fBuffer[fUnwrittenBytesStart], numUnwrittenBytes(), 0);
-+      = send(fOutputSocketNum, (const char*)&fBuffer[fUnwrittenBytesStart], numUnwrittenBytes(), MSG_NOSIGNAL);
-     if (numBytesWritten < (int)numUnwrittenBytes()) {
-       // The output socket is no longer writable.  Set a handler to be called when it becomes writable again.
-       fOutputSocketIsWritable = False;
+@@ -976,7 +979,7 @@
+     if (fOutputTLS->isNeeded) {
+         fOutputTLS->write((char const*)fResponseBuffer, numBytesToWrite);
+     } else {
+-        send(fClientOutputSocket, (char const*)fResponseBuffer, numBytesToWrite, 0);
++        send(fClientOutputSocket, (char const*)fResponseBuffer, numBytesToWrite, MSG_NOSIGNAL);
+    }
+     
+     if (playAfterSetup) {
