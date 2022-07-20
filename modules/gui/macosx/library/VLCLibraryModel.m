@@ -462,6 +462,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending
 {
+    if(sortCriteria == _sortCriteria && descending == _sortDescending) {
+        return;
+    }
+    
     _sortCriteria = sortCriteria;
     _sortDescending = descending;
     [self dropCaches];
