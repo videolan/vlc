@@ -26,7 +26,6 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: abBtn
 
-    size: VLCStyle.icon_medium
     checked: Player.ABloopState !== Player.ABLOOP_STATE_NONE
     onClicked: Player.toggleABloopState()
     text: I18n.qtr("A to B")
@@ -42,6 +41,7 @@ Widgets.IconControlButton {
     Widgets.IconLabel {
         anchors.centerIn: abBtn.contentItem
 
+        font.pixelSize: abBtn.size
         color: abBtn.colors.accent
 
         text: {

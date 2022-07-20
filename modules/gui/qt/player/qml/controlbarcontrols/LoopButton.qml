@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: repeatBtn
-    size: VLCStyle.icon_medium
     checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
     iconText: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
           ? VLCIcons.repeat_one

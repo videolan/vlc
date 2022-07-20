@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: playlistBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.playlist
     onClicked: {
         MainCtx.playlistVisible = !MainCtx.playlistVisible

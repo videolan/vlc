@@ -25,8 +25,8 @@ import "qrc:///style/"
 Item {
     id: spacer
     enabled: false
-    implicitWidth: VLCStyle.icon_normal
-    implicitHeight: VLCStyle.icon_normal
+    implicitWidth: VLCStyle.icon_toolbar
+    implicitHeight: VLCStyle.icon_toolbar
     property alias spacetextExt: spacetext
     property bool paintOnly: false
     T.Label {
@@ -37,7 +37,7 @@ Item {
 
         anchors.centerIn: parent
 
-        font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
+        font.pixelSize: VLCStyle.icon_toolbar
         font.family: VLCIcons.fontFamily
 
         verticalAlignment: Text.AlignVCenter

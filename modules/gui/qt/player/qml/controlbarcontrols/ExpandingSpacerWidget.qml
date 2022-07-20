@@ -26,7 +26,7 @@ Item {
     enabled: false
 
     implicitWidth: paintOnly ? VLCStyle.widthExtendedSpacer : Number.MAX_VALUE
-    implicitHeight: VLCStyle.icon_normal
+    implicitHeight: VLCStyle.icon_toolbar
 
     property bool paintOnly: false
     property alias spacetextExt: spacetext
@@ -41,7 +41,7 @@ Item {
         color: VLCStyle.colors.buttonText
         visible: paintOnly
 
-        font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
+        font.pixelSize: VLCIcons.icon_toolbar
         font.family: VLCIcons.fontFamily
 
         verticalAlignment: Text.AlignVCenter

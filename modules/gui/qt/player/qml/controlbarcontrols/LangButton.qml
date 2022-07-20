@@ -26,7 +26,6 @@ import "qrc:///player/" as Player
 
 Widgets.IconControlButton {
     id: langBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.audiosub
 
     enabled: menuLoader.status === Loader.Ready

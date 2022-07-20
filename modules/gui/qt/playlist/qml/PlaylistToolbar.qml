@@ -40,7 +40,7 @@ RowLayout {
 
             anchors.centerIn: parent
 
-            size: VLCStyle.icon_normal
+            size: VLCStyle.icon_playlist
             iconText: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
                       ? VLCIcons.repeat_one
                       : VLCIcons.repeat_all
@@ -61,7 +61,7 @@ RowLayout {
             anchors.centerIn: parent
 
             checked: mainPlaylistController.random
-            size: VLCStyle.icon_normal
+            size: VLCStyle.icon_playlist
             iconText: VLCIcons.shuffle_on
             onClicked: mainPlaylistController.toggleRandom()
             focusPolicy: Qt.NoFocus
@@ -76,6 +76,8 @@ RowLayout {
             id: sort
 
             anchors.centerIn: parent
+
+            iconSize: VLCStyle.icon_playlist
 
             enabled: mainPlaylistController.count > 1
 
@@ -126,7 +128,7 @@ RowLayout {
 
             anchors.centerIn: parent
 
-            size: VLCStyle.icon_normal
+            size: VLCStyle.icon_playlist
             enabled: !mainPlaylistController.empty
             iconText: VLCIcons.playlist_clear
             onClicked: mainPlaylistController.clear()

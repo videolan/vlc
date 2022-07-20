@@ -28,7 +28,6 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.ellipsis
     text: I18n.qtr("Menu")
 

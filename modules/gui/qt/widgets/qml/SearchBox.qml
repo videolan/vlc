@@ -83,7 +83,7 @@ FocusScope {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
 
-            size: VLCStyle.banner_icon_size
+            size: VLCStyle.icon_banner
 
             iconText: VLCIcons.search
             text: I18n.qtr("Filter")
@@ -179,7 +179,7 @@ FocusScope {
                 anchors.right: parent.right
                 anchors.rightMargin: VLCStyle.margin_xxsmall
 
-                size: VLCStyle.icon_small
+                size: VLCStyle.icon_banner
                 iconText: VLCIcons.close
 
                 visible: (textField.text.length > 0)

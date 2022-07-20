@@ -89,14 +89,25 @@ QtObject {
     readonly property int tableRow_height: fontHeight_normal + margin_small * 2
 
     readonly property int icon_xsmall: dp(8, scale);
-    readonly property int icon_small: dp(16, scale);
-    readonly property int icon_normal: dp(32, scale);
+    readonly property int icon_small: dp(12, scale);
+    readonly property int icon_normal: dp(24, scale);
     readonly property int icon_medium: dp(48, scale);
     readonly property int icon_large: dp(64, scale);
     readonly property int icon_xlarge: dp(128, scale);
 
-    readonly property int icon_topbar: dp(38, scale)
-    readonly property int icon_checkedDelegate: dp(40, scale)
+    readonly property int icon_topbar: icon_normal
+    readonly property int icon_toolbar: icon_normal
+    readonly property int icon_audioPlayerButton: dp(32, scale)
+    readonly property int icon_playlist: icon_normal
+    readonly property int icon_track: icon_normal
+    readonly property int icon_tableHeader: icon_normal
+    readonly property int icon_playlistHeader: icon_normal
+    readonly property int icon_banner: dp(28, scale)
+    readonly property int icon_play: dp(28, scale)
+    readonly property int icon_addressBar: icon_normal
+    readonly property int icon_actionButton: icon_normal
+    readonly property int icon_PIP: icon_normal
+    readonly property int icon_CSD: icon_small
 
     readonly property int play_cover_small: dp(24, scale)
     readonly property int play_cover_normal: dp(48, scale)
@@ -205,13 +216,12 @@ QtObject {
 
     readonly property int globalToolbar_height: dp(40, scale)
     readonly property int localToolbar_height: dp(48, scale)
-    readonly property int banner_icon_size: dp(28, scale)
 
-    readonly property int bannerTabButton_width_small: banner_icon_size
+    readonly property int bannerTabButton_width_small: icon_banner
     readonly property int bannerTabButton_width_large: column_width
 
-    readonly property int bannerButton_height: dp(32, scale)
-    readonly property int bannerButton_width: dp(40, scale)
+    readonly property int bannerButton_height: icon_banner
+    readonly property int bannerButton_width: icon_banner
 
     // Drag and drop
 

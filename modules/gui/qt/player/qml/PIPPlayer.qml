@@ -89,7 +89,7 @@ Item {
             Widgets.IconButton {
                 anchors.centerIn: parent
 
-                font.pixelSize: VLCStyle.dp(60, VLCStyle.scale)
+                font.pixelSize: VLCStyle.icon_large
                 text: (Player.playingState !== Player.PLAYING_STATE_PAUSED
                        && Player.playingState !== Player.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause
@@ -106,7 +106,7 @@ Item {
                     rightMargin: VLCStyle.margin_small
                 }
 
-                font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
+                font.pixelSize: VLCStyle.icon_PIP
                 text: VLCIcons.close
 
                 onClicked: mainPlaylistController.stop()
@@ -121,7 +121,7 @@ Item {
                     leftMargin: VLCStyle.margin_small
                 }
 
-                font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
+                font.pixelSize: VLCStyle.icon_PIP
                 text: VLCIcons.fullscreen
 
                 onClicked: History.push(["player"])

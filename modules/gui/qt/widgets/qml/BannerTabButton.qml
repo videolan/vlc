@@ -42,7 +42,7 @@ T.TabButton {
     // Settings
 
     width: control.showText ? VLCStyle.bannerTabButton_width_large
-                            : VLCStyle.banner_icon_size
+                            : VLCStyle.icon_banner
 
     height: implicitHeight
 
@@ -108,7 +108,7 @@ T.TabButton {
                         control.selected) ? VLCStyle.colors.accent
                                           : VLCStyle.colors.text
 
-                font.pixelSize: VLCIcons.pixelSize(VLCStyle.banner_icon_size)
+                font.pixelSize: VLCStyle.icon_banner
             }
 
             T.Label {

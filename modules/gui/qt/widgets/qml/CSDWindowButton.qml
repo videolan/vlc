@@ -51,7 +51,7 @@ T.Button {
             id: icon
             anchors.centerIn: parent
             text: control.iconTxt
-            font.pixelSize: VLCIcons.pixelSize(VLCStyle.dp(20, VLCStyle.scale))
+            font.pixelSize: VLCStyle.icon_CSD
             color: control.color
         }
     }

@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: chapterPreviousBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.dvd_prev
     onClicked: Player.chapterPrev()
     enabled: Player.hasChapters

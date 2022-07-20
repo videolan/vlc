@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: randomBtn
-    size: VLCStyle.icon_medium
     checked: mainPlaylistController.random
     iconText: VLCIcons.shuffle_on
     onClicked: mainPlaylistController.toggleRandom()

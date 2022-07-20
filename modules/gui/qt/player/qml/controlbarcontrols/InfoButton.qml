@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: infoBtn
-    size: VLCStyle.icon_medium
     enabled: Player.isPlaying
     iconText: VLCIcons.info
     onClicked: DialogsProvider.mediaInfoDialog()

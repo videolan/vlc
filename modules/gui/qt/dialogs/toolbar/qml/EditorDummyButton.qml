@@ -25,7 +25,7 @@ import "qrc:///style/"
 Label {
     color: VLCStyle.colors.buttonText
 
-    font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
+    font.pixelSize: VLCStyle.icon_medium
     font.family: VLCIcons.fontFamily
 
     verticalAlignment: Text.AlignVCenter

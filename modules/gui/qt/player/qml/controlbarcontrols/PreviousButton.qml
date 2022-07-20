@@ -24,7 +24,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: prevBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.previous
     enabled: mainPlaylistController.hasPrev
     onClicked: mainPlaylistController.prev()

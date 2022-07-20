@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: snapshotBtn
-    size: VLCStyle.icon_medium
     enabled: Player.isPlaying
     iconText: VLCIcons.snapshot
     onClicked: Player.snapshot()

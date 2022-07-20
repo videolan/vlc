@@ -31,7 +31,7 @@ Templates.Pane {
 
     // Properties
 
-    property int size: VLCStyle.icon_medium
+    property int size: VLCStyle.icon_toolbar
 
     property VLCColors colors: VLCStyle.colors
 

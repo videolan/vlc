@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: chapterNextBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.dvd_next
     onClicked: Player.chapterNext()
     enabled: Player.hasChapters

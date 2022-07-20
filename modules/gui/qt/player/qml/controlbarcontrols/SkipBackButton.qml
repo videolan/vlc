@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: stepBackBtn
-    size: VLCStyle.icon_medium
 
     enabled: Player.seekable
 

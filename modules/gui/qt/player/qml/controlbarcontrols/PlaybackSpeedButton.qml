@@ -34,8 +34,6 @@ Widgets.IconControlButton {
 
     readonly property bool _isCurrentViewPlayer: !paintOnly && (History.current.name === "player")
 
-    size: VLCStyle.icon_medium
-
     text: I18n.qtr("Playback Speed")
 
     color: (popup.visible) ? colors.accent : colors.playerControlBarFg

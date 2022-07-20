@@ -62,8 +62,6 @@ RowLayout {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            size: VLCStyle.dp(36, VLCStyle.scale)
-
             iconText: VLCIcons.back
 
             Navigation.parentItem: root

@@ -187,7 +187,7 @@ T.Control {
                             : (paintOnly || enabled ? colors.buttonPlayIcon
                                                     : colors.textInactive)
 
-        font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
+        font.pixelSize: VLCStyle.icon_play
         font.family: VLCIcons.fontFamily
 
         verticalAlignment: Text.AlignVCenter

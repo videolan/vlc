@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: quitBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.clear
     onClicked: MainCtx.close()
     text: I18n.qtr("Quit")

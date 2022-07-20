@@ -26,8 +26,6 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Widgets.IconControlButton {
-    size: VLCStyle.icon_medium
-
     enabled: Player.rewindable
 
     iconText: VLCIcons.play_reverse

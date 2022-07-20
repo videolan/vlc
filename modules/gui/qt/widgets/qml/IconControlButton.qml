@@ -27,6 +27,7 @@ IconToolButton {
 
     // Style
 
+    size: VLCStyle.icon_toolbar
     color: colors.buttonPlayer
     colorHover: colors.buttonTextHover
     colorHighlighted: colors.accent

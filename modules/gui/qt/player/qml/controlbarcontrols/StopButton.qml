@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: stopBtn
-    size: VLCStyle.icon_medium
     enabled: Player.isPlaying
     iconText: VLCIcons.stop
     onClicked: mainPlaylistController.stop()

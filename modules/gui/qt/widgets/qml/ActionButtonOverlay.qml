@@ -24,6 +24,8 @@ import "qrc:///style/"
 
 TabButtonExt {
     // Style
+    iconSize: VLCStyle.icon_actionButton
+
     foregroundColor: (hovered) ? VLCStyle.colors.white
                                : VLCStyle.colors.buttonBannerDark
 

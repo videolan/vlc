@@ -24,7 +24,6 @@ import org.videolan.vlc 0.1
 
 Widgets.IconControlButton {
     id: backBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.back
     text: I18n.qtr("Back")
     onClicked: History.previous()

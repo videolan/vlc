@@ -449,8 +449,8 @@ FocusScope {
 
                 model: ObjectModel {
                     Widgets.IconToolButton {
-                        size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.skip_back
+                        size: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpBwd()
                         text: I18n.qtr("Step back")
                         color: rootPlayer.colors.playerFg
@@ -459,8 +459,8 @@ FocusScope {
                     }
 
                     Widgets.IconToolButton {
-                        size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.visualization
+                        size: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.toggleVisualization()
                         text: I18n.qtr("Visualization")
                         color: rootPlayer.colors.playerFg
@@ -469,8 +469,8 @@ FocusScope {
                     }
 
                     Widgets.IconToolButton{
-                        size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.skip_for
+                        size: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpFwd()
                         text: I18n.qtr("Step forward")
                         color: rootPlayer.colors.playerFg

@@ -49,8 +49,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: teleActivateBtn
 
-            size: VLCStyle.icon_normal
-
             paintOnly: root.paintOnly
 
             checked: Player.teletextEnabled
@@ -73,8 +71,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: teleTransparencyBtn
-
-            size: VLCStyle.icon_normal
 
             paintOnly: root.paintOnly
 
@@ -148,8 +144,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: indexKeyBtn
 
-            size: VLCStyle.icon_normal
-
             paintOnly: root.paintOnly
 
             enabled: teleActivateBtn.checked
@@ -172,8 +166,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: redKeyBtn
-
-            size: VLCStyle.icon_normal
 
             paintOnly: root.paintOnly
 
@@ -198,8 +190,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: greenKeyBtn
 
-            size: VLCStyle.icon_normal
-
             paintOnly: root.paintOnly
 
             enabled: teleActivateBtn.checked
@@ -223,8 +213,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: yellowKeyBtn
 
-            size: VLCStyle.icon_normal
-
             paintOnly: root.paintOnly
 
             enabled: teleActivateBtn.checked
@@ -247,8 +235,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: blueKeyBtn
-
-            size: VLCStyle.icon_normal
 
             paintOnly: root.paintOnly
 

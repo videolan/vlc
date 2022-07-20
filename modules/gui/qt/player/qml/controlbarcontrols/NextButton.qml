@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: nextBtn
-    size: VLCStyle.icon_medium
     iconText: VLCIcons.next
     enabled: mainPlaylistController.hasNext
     onClicked: mainPlaylistController.next()

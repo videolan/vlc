@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: fullScreenBtn
-    size: VLCStyle.icon_medium
     enabled: Player.hasVideoOutput
     iconText: Player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
     onClicked: Player.fullscreen = !Player.fullscreen

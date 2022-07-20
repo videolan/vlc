@@ -119,7 +119,7 @@ T.ToolButton {
 
         color: background.foregroundColor
 
-        font.pixelSize: VLCIcons.pixelSize(size)
+        font.pixelSize: control.size
         font.family: VLCIcons.fontFamily
         font.underline: control.font.underline
 
@@ -137,7 +137,7 @@ T.ToolButton {
 
             color: background.foregroundColor
 
-            font.pixelSize: VLCIcons.pixelSize(size)
+            font.pixelSize: control.size
             font.family: VLCIcons.fontFamily
 
             Accessible.ignored: true

@@ -47,7 +47,7 @@ T.AbstractButton {
 
     padding: VLCStyle.margin_xxsmall
 
-    font.pixelSize: (onlyIcon) ? VLCIcons.pixelSize(VLCStyle.icon_normal)
+    font.pixelSize: (onlyIcon) ? VLCStyle.icon_normal
                                : VLCStyle.fontSize_large
 
     // Children

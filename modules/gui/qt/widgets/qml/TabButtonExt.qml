@@ -119,7 +119,7 @@ T.TabButton {
 
                     color: background.foregroundColor
 
-                    font.pixelSize: VLCIcons.pixelSize(control.iconSize)
+                    font.pixelSize: control.iconSize
                 }
 
                 BusyIndicator {

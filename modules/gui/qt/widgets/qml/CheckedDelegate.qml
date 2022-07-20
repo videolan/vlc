@@ -69,7 +69,7 @@ T.ItemDelegate {
 
             color: "white"
 
-            font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_checkedDelegate)
+            font.pixelSize: VLCStyle.icon_track
         }
 
         MenuLabel {

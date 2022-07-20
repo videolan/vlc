@@ -190,8 +190,8 @@ Widgets.PageLoader {
 
                     Image {
 
-                        width: VLCIcons.pixelSize(VLCStyle.icon_large)
-                        height: VLCIcons.pixelSize(VLCStyle.icon_large)
+                        width: VLCStyle.icon_large
+                        height: VLCStyle.icon_large
                         fillMode: Image.PreserveAspectFit
                         source: model.artwork
 
@@ -386,7 +386,7 @@ Widgets.PageLoader {
 
                                 Widgets.IconLabel {
                                     text: VLCIcons.add
-                                    font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_large)
+                                    font.pixelSize: VLCStyle.icon_large
                                     anchors.centerIn: parent
                                     color: VLCStyle.colors.accent
                                 }

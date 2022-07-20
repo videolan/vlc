@@ -131,6 +131,7 @@ Item {
             width: root.titleCover_width
             horizontalAlignment: Text.AlignHCenter
             text: VLCIcons.album_cover
+            font.pixelSize: VLCStyle.icon_tableHeader
             color: VLCStyle.colors.caption
         }
 
@@ -146,6 +147,7 @@ Item {
         width: timeTextMetric.width
         horizontalAlignment: Text.AlignHCenter
         text: VLCIcons.time
+        font.pixelSize: VLCStyle.icon_tableHeader
         color: VLCStyle.colors.caption
     }
 

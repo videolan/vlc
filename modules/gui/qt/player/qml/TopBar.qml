@@ -202,7 +202,7 @@ FocusScope{
             anchors.fill: parent
             visible: !resumeDialog.visible
 
-            implicitHeight: VLCStyle.banner_icon_size + VLCStyle.margin_xxsmall * 2
+            implicitHeight: VLCStyle.icon_banner + VLCStyle.margin_xxsmall * 2
             implicitWidth: backBtn.implicitWidth + logo.implicitWidth + VLCStyle.margin_xxsmall
 
             Widgets.IconControlButton {
@@ -212,7 +212,7 @@ FocusScope{
                 anchors.left: parent.left
 
                 objectName: "IconToolButton"
-                size: VLCStyle.banner_icon_size
+                size: VLCStyle.icon_banner
                 iconText: VLCIcons.back
                 text: I18n.qtr("Back")
                 focus: true
@@ -233,8 +233,8 @@ FocusScope{
                 anchors.left: backBtn.right
                 anchors.leftMargin: VLCStyle.margin_xxsmall
 
-                sourceSize.width: VLCStyle.icon_small
-                sourceSize.height: VLCStyle.icon_small
+                sourceSize.width: VLCStyle.icon_normal
+                sourceSize.height: VLCStyle.icon_normal
                 source: "qrc:///logo/cone.svg"
                 enabled: false
             }
@@ -368,7 +368,7 @@ FocusScope{
             visible: !root.showToolbar
             enabled: visible
             focus: visible
-            size: VLCStyle.banner_icon_size
+            size: VLCStyle.icon_banner
 
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
@@ -399,7 +399,7 @@ FocusScope{
             id: playlistButton
 
             objectName: ControlListModel.PLAYLIST_BUTTON
-            size: VLCStyle.banner_icon_size
+            size: VLCStyle.icon_banner
             iconText: VLCIcons.playlist
             text: I18n.qtr("Playlist")
             colors: root.colors

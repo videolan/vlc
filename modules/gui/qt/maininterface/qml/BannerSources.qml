@@ -148,7 +148,7 @@ FocusScope {
 
                             Widgets.IconToolButton {
                                  id: history_back
-                                 size: VLCStyle.banner_icon_size
+                                 size: VLCStyle.icon_banner
                                  iconText: VLCIcons.back
                                  text: I18n.qtr("Previous")
                                  height: VLCStyle.bannerButton_height
@@ -163,8 +163,8 @@ FocusScope {
                              }
 
                             Image {
-                                sourceSize.width: VLCStyle.icon_small
-                                sourceSize.height: VLCStyle.icon_small
+                                sourceSize.width: VLCStyle.icon_normal
+                                sourceSize.height: VLCStyle.icon_normal
                                 source: "qrc:///logo/cone.svg"
                                 enabled: false
                             }
@@ -272,7 +272,7 @@ FocusScope {
 
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
-                                size: VLCStyle.banner_icon_size
+                                size: VLCStyle.icon_banner
                                 iconText: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
                                 text: I18n.qtr("List/Grid")
                                 onClicked: MainCtx.gridView = !MainCtx.gridView
@@ -285,7 +285,7 @@ FocusScope {
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
 
-                                iconSize: VLCStyle.banner_icon_size
+                                iconSize: VLCStyle.icon_banner
 
                                 visible: root.sortModel !== undefined && root.sortModel.length > 1
 
@@ -417,7 +417,7 @@ FocusScope {
                             Widgets.IconToolButton {
                                 id: playlist_btn
 
-                                size: VLCStyle.banner_icon_size
+                                size: VLCStyle.icon_banner
                                 iconText: VLCIcons.playlist
                                 text: I18n.qtr("Playlist")
                                 width: VLCStyle.bannerButton_width
@@ -431,7 +431,7 @@ FocusScope {
                                 id: menu_selector
 
                                 visible: !MainCtx.hasToolbarMenu
-                                size: VLCStyle.banner_icon_size
+                                size: VLCStyle.icon_banner
                                 iconText: VLCIcons.menu
                                 text: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width

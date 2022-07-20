@@ -30,8 +30,6 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    size: VLCStyle.icon_medium
-
     iconText: VLCIcons.renderer
     text: I18n.qtr("Renderer")
 

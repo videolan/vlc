@@ -55,7 +55,7 @@ T.Control {
         while (--i >= 0) {
             var textWidth = fontMetrics.advanceWidth(path[i].display)
                     + (i !== path.length - 1 ? iconMetrics.advanceWidth(
-                                                    VLCIcons.back) : 0) + VLCStyle.margin_xsmall * 4
+                                                    VLCIcons.breadcrumb_sep) : 0) + VLCStyle.margin_xsmall * 4
 
             if (i < path.length - 1 && textWidth > leftWidth)
                 menuModel.push(path[i])
@@ -82,6 +82,7 @@ T.Control {
             id: homeButton
 
             text: VLCIcons.home
+            font.pixelSize: VLCStyle.icon_addressBar
 
             Layout.fillHeight: true
 
@@ -102,8 +103,8 @@ T.Control {
             id: menuButton
 
             visible: !!control._menuModel && control._menuModel.length > 0
-            text: VLCIcons.back + VLCIcons.back
-            font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_small)
+            text: VLCIcons.breadcrumb_prev
+            font.pixelSize: VLCStyle.icon_addressBar
 
             Layout.fillHeight: true
 
@@ -166,9 +167,8 @@ T.Control {
                 Widgets.IconLabel {
                     Layout.fillHeight: true
                     visible: index !== contentRepeater.count - 1
-                    text: VLCIcons.back
-                    rotation: 180
-                    font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_small)
+                    text: VLCIcons.breadcrumb_sep
+                    font.pixelSize: VLCStyle.icon_addressBar
                     color: VLCStyle.colors.text
                     opacity: .6
                     verticalAlignment: Text.AlignVCenter

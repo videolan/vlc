@@ -154,7 +154,7 @@ T.Popup {
                 }]
 
                 delegate: Widgets.IconTrackButton {
-                    size: (index === 0) ? VLCStyle.dp(24, VLCStyle.scale)
+                    size: (index === 0) ? VLCStyle.fontSize_large
                                         : VLCStyle.dp(40, VLCStyle.scale)
 
                     x: (column.width - width) / 2
@@ -246,7 +246,7 @@ T.Popup {
                         Widgets.IconTrackButton {
                             id: button
 
-                            size: VLCStyle.icon_normal
+                            size: VLCStyle.icon_track
 
                             focus: true
 

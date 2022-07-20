@@ -25,7 +25,6 @@ import "qrc:///style/"
 
 Widgets.IconControlButton {
     id: frameBtn
-    size: VLCStyle.icon_medium
 
     enabled: Player.ratechangable
 

@@ -250,11 +250,13 @@ Control {
             spacing: VLCStyle.margin_large
 
             Widgets.IconLabel {
-                Layout.preferredWidth: VLCStyle.icon_normal
+                Layout.preferredWidth: VLCStyle.icon_playlistHeader
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: VLCIcons.album_cover
+                font.pixelSize: VLCStyle.icon_playlistHeader
+
                 color: colors.caption
             }
 
@@ -273,6 +275,7 @@ Control {
                 color: colors.caption
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+                font.pixelSize: VLCStyle.icon_playlistHeader
 
                 TextMetrics {
                     id: durationMetric

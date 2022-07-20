@@ -201,8 +201,9 @@ FocusScope {
                             spacing: VLCStyle.margin_xsmall
 
                             Widgets.IconLabel {
-                                text: VLCIcons.back
-                                rotation: _showMoreInfo ? 90 : 270
+                                text: VLCIcons.expand
+                                rotation: _showMoreInfo ? -180 : 0
+                                font.pixelSize: VLCStyle.icon_normal
 
                                 Behavior on rotation {
                                     NumberAnimation {

@@ -53,7 +53,6 @@ T.Pane {
 
             focus: true
             paintOnly: root.paintOnly
-            size: VLCStyle.icon_normal
             iconText:
                 if( _player.muted )
                     VLCIcons.volume_muted

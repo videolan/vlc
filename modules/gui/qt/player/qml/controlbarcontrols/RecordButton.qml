@@ -29,7 +29,6 @@ Widgets.IconToolButton {
 
     enabled: !paintOnly && Player.isPlaying
 
-    size: VLCStyle.icon_medium
     color: VLCStyle.colors.record
     text: I18n.qtr("record")
 
@@ -60,7 +59,7 @@ Widgets.IconToolButton {
             }
         }
 
-        font.pixelSize: VLCIcons.pixelSize(size)
+        font.pixelSize: control.size
         font.family: VLCIcons.fontFamily
         font.underline: control.font.underline
 
