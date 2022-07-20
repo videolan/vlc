@@ -572,7 +572,6 @@ ui_%.h: %.ui
 
 libqt_plugin_la_RES = \
 	gui/qt/pixmaps/VLCIcons.ttf \
-	gui/qt/pixmaps/faster.svg \
 	gui/qt/pixmaps/go-next.svg \
 	gui/qt/pixmaps/addons/addon_default.svg \
 	gui/qt/pixmaps/addons/addon_broken.svg \
@@ -583,10 +582,95 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/addons/addon_red.svg \
 	gui/qt/pixmaps/addons/addon_yellow.svg \
 	gui/qt/pixmaps/addons/addon_score.svg \
-	gui/qt/pixmaps/menu.svg \
-	gui/qt/pixmaps/clear.svg \
-	gui/qt/pixmaps/faster.svg \
-	gui/qt/pixmaps/slower.svg \
+	gui/qt/pixmaps/icons/active_indicator.svg \
+	gui/qt/pixmaps/icons/add.svg \
+	gui/qt/pixmaps/icons/album_cover.svg \
+	gui/qt/pixmaps/icons/aspect_ratio.svg \
+	gui/qt/pixmaps/icons/atob_bg_ab.svg \
+	gui/qt/pixmaps/icons/atob_bg_a.svg \
+	gui/qt/pixmaps/icons/atob_bg_b.svg \
+	gui/qt/pixmaps/icons/atob_bg_none.svg \
+	gui/qt/pixmaps/icons/atob_fg_ab.svg \
+	gui/qt/pixmaps/icons/atob_fg_a.svg \
+	gui/qt/pixmaps/icons/atob_fg_b.svg \
+	gui/qt/pixmaps/icons/atob_noa.svg \
+	gui/qt/pixmaps/icons/atob_nob.svg \
+	gui/qt/pixmaps/icons/atob.svg \
+	gui/qt/pixmaps/icons/audiosub.svg \
+	gui/qt/pixmaps/icons/back.svg \
+	gui/qt/pixmaps/icons/bookmark.svg \
+	gui/qt/pixmaps/icons/breadcrumb_prev.svg \
+	gui/qt/pixmaps/icons/breadcrumb_sep.svg \
+	gui/qt/pixmaps/icons/check.svg \
+	gui/qt/pixmaps/icons/clear.svg \
+	gui/qt/pixmaps/icons/close.svg \
+	gui/qt/pixmaps/icons/defullscreen.svg \
+	gui/qt/pixmaps/icons/del.svg \
+	gui/qt/pixmaps/icons/download.svg \
+	gui/qt/pixmaps/icons/dropzone.svg \
+	gui/qt/pixmaps/icons/dvd_menu.svg \
+	gui/qt/pixmaps/icons/dvd_next.svg \
+	gui/qt/pixmaps/icons/dvd_prev.svg \
+	gui/qt/pixmaps/icons/eject.svg \
+	gui/qt/pixmaps/icons/ellipsis.svg \
+	gui/qt/pixmaps/icons/enqueue.svg \
+	gui/qt/pixmaps/icons/expand.svg \
+	gui/qt/pixmaps/icons/extended.svg \
+	gui/qt/pixmaps/icons/faster.svg \
+	gui/qt/pixmaps/icons/frame-by-frame.svg \
+	gui/qt/pixmaps/icons/fullscreen.svg \
+	gui/qt/pixmaps/icons/grid.svg \
+	gui/qt/pixmaps/icons/history.svg \
+	gui/qt/pixmaps/icons/home.svg \
+	gui/qt/pixmaps/icons/info.svg \
+	gui/qt/pixmaps/icons/list.svg \
+	gui/qt/pixmaps/icons/menu.svg \
+	gui/qt/pixmaps/icons/multiselect.svg \
+	gui/qt/pixmaps/icons/next.svg \
+	gui/qt/pixmaps/icons/pause.svg \
+	gui/qt/pixmaps/icons/pip.svg \
+	gui/qt/pixmaps/icons/playlist_clear.svg \
+	gui/qt/pixmaps/icons/playlist.svg \
+	gui/qt/pixmaps/icons/play_outline.svg \
+	gui/qt/pixmaps/icons/play_reverse.svg \
+	gui/qt/pixmaps/icons/play.svg \
+	gui/qt/pixmaps/icons/podcast.svg \
+	gui/qt/pixmaps/icons/previous.svg \
+	gui/qt/pixmaps/icons/profile_new.svg \
+	gui/qt/pixmaps/icons/record.svg \
+	gui/qt/pixmaps/icons/remove.svg \
+	gui/qt/pixmaps/icons/renderer.svg \
+	gui/qt/pixmaps/icons/repeat_all.svg \
+	gui/qt/pixmaps/icons/repeat_one.svg \
+	gui/qt/pixmaps/icons/search.svg \
+	gui/qt/pixmaps/icons/shuffle_on.svg \
+	gui/qt/pixmaps/icons/skip_back.svg \
+	gui/qt/pixmaps/icons/skip_for.svg \
+	gui/qt/pixmaps/icons/slower.svg \
+	gui/qt/pixmaps/icons/snapshot.svg \
+	gui/qt/pixmaps/icons/space.svg \
+	gui/qt/pixmaps/icons/stop.svg \
+	gui/qt/pixmaps/icons/stream.svg \
+	gui/qt/pixmaps/icons/sync.svg \
+	gui/qt/pixmaps/icons/time.svg \
+	gui/qt/pixmaps/icons/topbar_discover.svg \
+	gui/qt/pixmaps/icons/topbar_filter.svg \
+	gui/qt/pixmaps/icons/topbar_music.svg \
+	gui/qt/pixmaps/icons/topbar_network.svg \
+	gui/qt/pixmaps/icons/topbar_sort.svg \
+	gui/qt/pixmaps/icons/topbar_video.svg \
+	gui/qt/pixmaps/icons/tv.svg \
+	gui/qt/pixmaps/icons/tvtelx.svg \
+	gui/qt/pixmaps/icons/visualization.svg \
+	gui/qt/pixmaps/icons/volume_high.svg \
+	gui/qt/pixmaps/icons/volume_low.svg \
+	gui/qt/pixmaps/icons/volume_medium.svg \
+	gui/qt/pixmaps/icons/volume_muted.svg \
+	gui/qt/pixmaps/icons/volume_zero.svg \
+	gui/qt/pixmaps/icons/window_close.svg \
+	gui/qt/pixmaps/icons/window_maximize.svg \
+	gui/qt/pixmaps/icons/window_minimize.svg \
+	gui/qt/pixmaps/icons/window_restore.svg \
 	gui/qt/pixmaps/noart.png \
 	gui/qt/pixmaps/noart_album.svg \
 	gui/qt/pixmaps/noart_albumCover.svg \
@@ -637,8 +721,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/volume-high.svg \
 	gui/qt/pixmaps/menu/volume-low.svg \
 	gui/qt/pixmaps/menu/volume-muted.svg \
-	gui/qt/pixmaps/playlist/active_indicator.svg \
-	gui/qt/pixmaps/playlist/dropzone.svg \
 	gui/qt/pixmaps/prefs/advprefs_audio.svg \
 	gui/qt/pixmaps/prefs/advprefs_codec.svg \
 	gui/qt/pixmaps/prefs/advprefs_extended.svg \
@@ -656,8 +738,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/prefs/spref_medialibrary.png \
 	gui/qt/pixmaps/prefs/spref_subtitles.png \
 	gui/qt/pixmaps/prefs/spref_video.png \
-	gui/qt/pixmaps/slower.svg \
-	gui/qt/pixmaps/space.svg \
 	gui/qt/pixmaps/sd/appletrailers.svg \
 	gui/qt/pixmaps/sd/assembleenationale.svg \
 	gui/qt/pixmaps/sd/capture-card.svg \
@@ -685,31 +765,17 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/toolbar/audiosub.svg \
 	gui/qt/pixmaps/toolbar/arrows.svg \
 	gui/qt/pixmaps/toolbar/aspect-ratio.svg \
-	gui/qt/pixmaps/toolbar/atob.svg \
-	gui/qt/pixmaps/toolbar/atob_noa.svg \
-	gui/qt/pixmaps/toolbar/atob_nob.svg \
-	gui/qt/pixmaps/toolbar/atob_bg_a.svg \
-	gui/qt/pixmaps/toolbar/atob_bg_ab.svg \
-	gui/qt/pixmaps/toolbar/atob_bg_b.svg \
-	gui/qt/pixmaps/toolbar/atob_bg_none.svg \
-	gui/qt/pixmaps/toolbar/atob_fg_a.svg \
-	gui/qt/pixmaps/toolbar/atob_fg_ab.svg \
-	gui/qt/pixmaps/toolbar/atob_fg_b.svg \
 	gui/qt/pixmaps/toolbar/renderer.svg \
 	gui/qt/pixmaps/toolbar/defullscreen.svg \
 	gui/qt/pixmaps/toolbar/dvd_menu.svg \
 	gui/qt/pixmaps/toolbar/dvd_next.svg \
 	gui/qt/pixmaps/toolbar/dvd_prev.svg \
 	gui/qt/pixmaps/toolbar/extended_16px.svg \
-	gui/qt/pixmaps/toolbar/frame-by-frame.svg \
 	gui/qt/pixmaps/toolbar/fullscreen.svg \
-	gui/qt/pixmaps/toolbar/play_reverse.svg \
 	gui/qt/pixmaps/toolbar/record_16px.svg \
 	gui/qt/pixmaps/toolbar/snapshot.svg \
 	gui/qt/pixmaps/toolbar/skip_for.svg \
 	gui/qt/pixmaps/toolbar/skip_back.svg \
-	gui/qt/pixmaps/toolbar/tv.svg \
-	gui/qt/pixmaps/toolbar/tvtelx.svg \
 	gui/qt/pixmaps/toolbar/visu.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-inside.svg \
 	gui/qt/pixmaps/toolbar/volume-slider-outside.svg \
