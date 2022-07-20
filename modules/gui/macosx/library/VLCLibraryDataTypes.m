@@ -442,29 +442,22 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock orderedBy:(int)mediaItemParentType
 {
+    NSArray<id<VLCMediaLibraryItemProtocol>> *childItems;
     switch(mediaItemParentType) {
         case VLC_ML_PARENT_ARTIST:
-        {
-            for(VLCMediaLibraryArtist *artist in self.artists) {
-                [artist iterateMediaItemsWithBlock:mediaItemBlock];
-            }
+            childItems = self.artists;
             break;
-        }
         case VLC_ML_PARENT_ALBUM:
-        {
-            for(VLCMediaLibraryAlbum *album in self.albums) {
-                [album iterateMediaItemsWithBlock:mediaItemBlock];
-            }
+            childItems = self.albums;
             break;
-        }
         case VLC_ML_PARENT_UNKNOWN:
         default:
-        {
-            for(VLCMediaLibraryMediaItem *mediaItem in self.tracksAsMediaItems) {
-                mediaItemBlock(mediaItem);
-            }
+            childItems = self.tracksAsMediaItems;
             break;
-        }
+    }
+
+    for(id<VLCMediaLibraryItemProtocol> childItem in childItems) {
+        [childItem iterateMediaItemsWithBlock:mediaItemBlock];
     }
 }
 
