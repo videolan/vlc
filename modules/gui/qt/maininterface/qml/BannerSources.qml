@@ -149,7 +149,7 @@ FocusScope {
                             Widgets.IconToolButton {
                                  id: history_back
                                  size: VLCStyle.banner_icon_size
-                                 iconText: VLCIcons.topbar_previous
+                                 iconText: VLCIcons.back
                                  text: I18n.qtr("Previous")
                                  height: VLCStyle.bannerButton_height
                                  width: VLCStyle.bannerButton_width
@@ -432,7 +432,7 @@ FocusScope {
 
                                 visible: !MainCtx.hasToolbarMenu
                                 size: VLCStyle.banner_icon_size
-                                iconText: VLCIcons.ellipsis
+                                iconText: VLCIcons.menu
                                 text: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height

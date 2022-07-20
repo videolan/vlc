@@ -213,7 +213,7 @@ FocusScope{
 
                 objectName: "IconToolButton"
                 size: VLCStyle.banner_icon_size
-                iconText: VLCIcons.topbar_previous
+                iconText: VLCIcons.back
                 text: I18n.qtr("Back")
                 focus: true
                 colors: root.colors
@@ -373,7 +373,7 @@ FocusScope{
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
 
-            iconText: VLCIcons.ellipsis
+            iconText: VLCIcons.menu
             text: I18n.qtr("Menu")
             colors: root.colors
 

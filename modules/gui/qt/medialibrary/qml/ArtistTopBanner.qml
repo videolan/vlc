@@ -128,7 +128,7 @@ FocusScope {
                 model: ObjectModel {
                     Widgets.ActionButtonPrimary {
                         id: playActionBtn
-                        iconTxt: VLCIcons.play
+                        iconTxt: VLCIcons.play_outline
                         text: I18n.qtr("Play all")
                         focus: true
                         // NOTE: In overlay, the focus rectangle is always white.
