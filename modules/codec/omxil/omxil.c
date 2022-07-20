@@ -1037,18 +1037,52 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra) )
         {
             size_t i_filled_len = 0;
-            p_header->pBuffer = h264_avcC_to_AnnexB_NAL(
+            uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(
                         p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                         &i_filled_len, NULL );
+
+            if( p_buf == NULL )
+            {
+                msg_Dbg(p_dec, "h264_avcC_to_AnnexB_NAL() failed");
+                goto error;
+            }
+
+            if( i_filled_len > p_header->nAllocLen )
+            {
+                msg_Dbg(p_dec, "buffer too small (%i,%i)", (int)i_filled_len,
+                        (int)p_header->nAllocLen);
+                free(p_buf);
+                goto error;
+            }
+
+            memcpy(p_header->pBuffer, p_buf, i_filled_len);
             p_header->nFilledLen = i_filled_len;
+            free(p_buf);
         }
         else if( p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {
             size_t i_filled_len = 0;
-            p_header->pBuffer = hevc_hvcC_to_AnnexB_NAL(
+            uint8_t *p_buf = hevc_hvcC_to_AnnexB_NAL(
                         p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                         &i_filled_len, &p_sys->i_nal_size_length );
+
+            if( p_buf == NULL )
+            {
+                msg_Dbg(p_dec, "hevc_hvcC_to_AnnexB_NAL() failed");
+                goto error;
+            }
+
+            if( i_filled_len > p_header->nAllocLen )
+            {
+                msg_Dbg(p_dec, "buffer too small (%i,%i)", (int)i_filled_len,
+                        (int)p_header->nAllocLen);
+                free(p_buf);
+                goto error;
+            }
+
+            memcpy(p_header->pBuffer, p_buf, i_filled_len);
             p_header->nFilledLen = i_filled_len;
+            free(p_buf);
         }
         else if(p_sys->in.b_direct)
         {
