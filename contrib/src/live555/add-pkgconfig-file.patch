@@ -28,7 +28,7 @@ diff --git a/Makefile.tail b/Makefile.tail
 +Name: live555
 +Description: multimedia RTSP streaming library
 +Version: @VERSION@
-+Cflags: -I${includedir}/liveMedia -I${includedir}/groupsock -I${includedir}/BasicUsageEnvironment -I${includedir}/UsageEnvironment
++Cflags: -I${includedir}/liveMedia -I${includedir}/groupsock -I${includedir}/BasicUsageEnvironment -I${includedir}/UsageEnvironment -DNO_OPENSSL=1
 +Libs: -L${libdir} -lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment
 --- live.2016.07.19/Makefile.head.orig	2017-01-19 18:47:50.376062631 +0100
 +++ live.2016.07.19/Makefile.head	2017-01-19 18:48:09.940063212 +0100

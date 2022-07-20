@@ -1,7 +1,7 @@
 diff -Naur live555/liveMedia/include/RTSPClient.hh live555.modified/liveMedia/include/RTSPClient.hh
---- live555/liveMedia/include/RTSPClient.hh	2017-11-30 19:34:25.210638324 +0100
-+++ live555.modified/liveMedia/include/RTSPClient.hh	2017-11-30 19:32:06.322693792 +0100
-@@ -36,6 +36,8 @@
+--- live555/liveMedia/include/RTSPClient.hh	2022-06-16 11:14:03.000000000 +0000
++++ live555.modified/liveMedia/include/RTSPClient.hh	2022-07-16 11:36:23.642103174 +0000
+@@ -39,6 +39,8 @@
  #endif
  #endif
  
@@ -10,7 +10,7 @@ diff -Naur live555/liveMedia/include/RTSPClient.hh live555.modified/liveMedia/in
  class RTSPClient: public Medium {
  public:
    static RTSPClient* createNew(UsageEnvironment& env, char const* rtspURL,
-@@ -186,6 +188,7 @@
+@@ -194,6 +196,7 @@
    unsigned sessionTimeoutParameter() const { return fSessionTimeoutParameter; }
  
    char const* url() const { return fBaseURL; }
@@ -18,7 +18,7 @@ diff -Naur live555/liveMedia/include/RTSPClient.hh live555.modified/liveMedia/in
  
    static unsigned responseBufferSize;
  
-@@ -238,6 +241,7 @@
+@@ -246,6 +249,7 @@
  
    void reset();
    void setBaseURL(char const* url);
@@ -26,7 +26,7 @@ diff -Naur live555/liveMedia/include/RTSPClient.hh live555.modified/liveMedia/in
    int grabSocket(); // allows a subclass to reuse our input socket, so that it won't get closed when we're deleted
    virtual unsigned sendRequest(RequestRecord* request);
    virtual Boolean setRequestFields(RequestRecord* request,
-@@ -334,6 +338,7 @@
+@@ -347,6 +351,7 @@
    unsigned fUserAgentHeaderStrLen;
    int fInputSocketNum, fOutputSocketNum;
    char* fBaseURL;
@@ -35,26 +35,26 @@ diff -Naur live555/liveMedia/include/RTSPClient.hh live555.modified/liveMedia/in
    char* fLastSessionId;
    unsigned fSessionTimeoutParameter; // optionally set in response "Session:" headers
 diff -Naur live555/liveMedia/RTSPClient.cpp live555.modified/liveMedia/RTSPClient.cpp
---- live555/liveMedia/RTSPClient.cpp	2017-11-30 19:34:25.210638324 +0100
-+++ live555.modified/liveMedia/RTSPClient.cpp	2017-11-30 19:28:18.691423659 +0100
-@@ -366,7 +366,7 @@
-     fAllowBasicAuthentication(True), fServerAddress(0),
-     fTunnelOverHTTPPortNum(tunnelOverHTTPPortNum),
+--- live555/liveMedia/RTSPClient.cpp	2022-06-16 11:14:03.000000000 +0000
++++ live555.modified/liveMedia/RTSPClient.cpp	2022-07-16 11:43:31.446232524 +0000
+@@ -397,7 +397,7 @@
+     desiredMaxIncomingPacketSize(0), fVerbosityLevel(verbosityLevel), fCSeq(1),
+     fAllowBasicAuthentication(True), fTunnelOverHTTPPortNum(tunnelOverHTTPPortNum),
      fUserAgentHeaderStr(NULL), fUserAgentHeaderStrLen(0),
 -    fInputSocketNum(-1), fOutputSocketNum(-1), fBaseURL(NULL), fTCPStreamIdCount(0),
 +    fInputSocketNum(-1), fOutputSocketNum(-1), fBaseURL(NULL), fserverString(NULL), fTCPStreamIdCount(0),
-     fLastSessionId(NULL), fSessionTimeoutParameter(0), fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False) {
-   setBaseURL(rtspURL);
- 
-@@ -416,6 +416,7 @@
-   fServerAddress = 0;
+     fLastSessionId(NULL), fSessionTimeoutParameter(0), fRequireStr(NULL),
+     fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False),
+     fTLS(*this), fPOSTSocketTLS(*this) {
+@@ -451,6 +451,7 @@
+   fRequestsAwaitingResponse.reset();
  
    setBaseURL(NULL);
 +  setServerString(NULL);
  
    fCurrentAuthenticator.reset();
  
-@@ -426,6 +427,10 @@
+@@ -461,6 +462,10 @@
    delete[] fBaseURL; fBaseURL = strDup(url);
  }
  
@@ -64,8 +64,8 @@ diff -Naur live555/liveMedia/RTSPClient.cpp live555.modified/liveMedia/RTSPClien
 +
  int RTSPClient::grabSocket() {
    int inputSocket = fInputSocketNum;
-   fInputSocketNum = -1;
-@@ -1655,6 +1660,7 @@
+   RTPInterface::clearServerRequestAlternativeByteHandler(envir(), fInputSocketNum); // in case we were receiving RTP-over-TCP
+@@ -1770,6 +1775,7 @@
      char const* rtpInfoParamsStr = NULL;
      char const* wwwAuthenticateParamsStr = NULL;
      char const* publicParamsStr = NULL;
@@ -73,12 +73,12 @@ diff -Naur live555/liveMedia/RTSPClient.cpp live555.modified/liveMedia/RTSPClien
      char* bodyStart = NULL;
      unsigned numBodyBytes = 0;
      responseSuccess = False;
-@@ -1725,6 +1731,8 @@
- 	} else if (checkForHeader(lineStart, "Transport:", 10, transportParamsStr)) {
- 	} else if (checkForHeader(lineStart, "Scale:", 6, scaleParamsStr)) {
- 	} else if (checkForHeader(lineStart, "Speed:", 6, speedParamsStr)) {
-+    } else if (checkForHeader(lineStart, "Server:", 7, serverStr)) {
-+        setServerString(serverStr);
- 	} else if (checkForHeader(lineStart, "Range:", 6, rangeParamsStr)) {
- 	} else if (checkForHeader(lineStart, "RTP-Info:", 9, rtpInfoParamsStr)) {
- 	} else if (checkForHeader(lineStart, "WWW-Authenticate:", 17, headerParamsStr)) {
+@@ -1847,6 +1853,8 @@
+ // (see http://live555.com/liveMedia/faq.html#mailing-list-address for details),
+ 				  )) {
+ // to check whether your proposed modification is appropriate/correct,
++	} else if (checkForHeader(lineStart, "Server:", 7, serverStr)) {
++	  setServerString(serverStr);
+ 	} else if (checkForHeader(lineStart, "Range:",
+ // and, if so, whether instead it could be included in
+ 				  6,

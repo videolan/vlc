@@ -1,0 +1,13 @@
+diff -ur live.orig/groupsock/GroupsockHelper.cpp live/groupsock/GroupsockHelper.cpp
+--- live.orig/groupsock/GroupsockHelper.cpp	2022-07-20 18:02:26.691125894 +0000
++++ live/groupsock/GroupsockHelper.cpp	2022-07-20 22:23:47.755304434 +0000
+@@ -42,6 +42,9 @@
+ #include <signal.h>
+ #define USE_SIGNALS 1
+ #endif
++#if (defined(__ANDROID__) && __ANDROID_API__ < 24)
++#define NO_GETIFADDRS
++#endif
+ #ifndef NO_GETIFADDRS
+ #include <ifaddrs.h>
+ #include <net/if.h>
