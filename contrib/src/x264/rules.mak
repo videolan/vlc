@@ -49,6 +49,7 @@ ifndef HAVE_DARWIN_OS
 X264CONF += --cross-prefix="$(HOST)-"
 endif
 ifdef HAVE_ANDROID
+X264CONF += --cross-prefix="$(subst ar,,$(AR))"
 # broken text relocations
 ifeq ($(ANDROID_ABI), x86)
 X264CONF += --disable-asm
