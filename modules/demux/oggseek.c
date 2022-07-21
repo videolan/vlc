@@ -316,9 +316,6 @@ static int64_t find_first_page_granule( demux_t *p_demux,
 
     seek_byte( p_demux, i_pos1 );
 
-    if ( i_pos1 == p_stream->i_data_start )
-        return p_sys->i_input_position;
-
     if ( i_bytes_to_read > OGGSEEK_BYTES_TO_READ ) i_bytes_to_read = OGGSEEK_BYTES_TO_READ;
 
     while ( 1 )
