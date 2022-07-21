@@ -283,6 +283,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/mouse_event_filter.hpp \
 	gui/qt/util/effects_image_provider.cpp \
 	gui/qt/util/effects_image_provider.hpp \
+	gui/qt/util/qsgroundedrectangularimagenode.cpp \
+	gui/qt/util/qsgroundedrectangularimagenode.hpp \
 	gui/qt/widgets/native/animators.cpp \
 	gui/qt/widgets/native/animators.hpp \
 	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
@@ -459,6 +461,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/variables.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
 	gui/qt/util/qmlinputitem.moc.cpp \
+	gui/qt/util/qsgroundedrectangularimagenode.moc.cpp \
 	gui/qt/widgets/native/animators.moc.cpp \
 	gui/qt/widgets/native/customwidgets.moc.cpp \
 	gui/qt/widgets/native/interface_widgets.moc.cpp \
