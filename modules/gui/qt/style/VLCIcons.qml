@@ -12,10 +12,6 @@ QtObject {
 
     readonly property string fontFamily: "VLCIcons"
 
-    function pixelSize(size) {
-        return size * 0.6
-    }
-
     // Icons
     readonly property string active_indicator : "\ue000"
     readonly property string add : "\ue001"

@@ -56,10 +56,6 @@ QtObject {
 
     readonly property string fontFamily: "{{font_name}}"
 
-    function pixelSize(size) {
-        return size * 0.6
-    }
-
     // Icons
 {% for f in glyphs %}    readonly property string {{f.key}} : "{{f.charcode}}"
 {% endfor %}
