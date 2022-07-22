@@ -524,7 +524,7 @@ FocusScope {
                         return VLCStyle.margin_normal
                     else
                         // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
-                        return topcontrolView.contentItem.topbar.reservedHeight
+                        return topcontrolView.contentItem.reservedHeight
                 }
 
                 Navigation.parentItem: rootPlayer
