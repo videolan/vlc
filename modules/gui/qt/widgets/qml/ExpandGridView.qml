@@ -229,6 +229,9 @@ FocusScope {
         onRowsInserted: _onModelCountChanged()
         onRowsRemoved: _onModelCountChanged()
         onModelReset: _onModelCountChanged()
+
+        // NOTE: This is useful for SortFilterProxyModel(s).
+        onLayoutChanged: _onModelCountChanged()
     }
 
     Connections {
