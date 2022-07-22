@@ -244,68 +244,6 @@ namespace
     };
 #endif
 
-    class ImageProviderAsyncAdaptor : public QQuickImageResponse
-    {
-    public:
-        ImageProviderAsyncAdaptor(QQuickImageProvider *provider, const QString &id, const QSize &requestedSize, const qreal radius)
-        {
-            task.reset(new ProviderImageGetter(provider, id, requestedSize, radius));
-            connect(task.get(), &ProviderImageGetter::result, this, [this]()
-            {
-                result = task->takeResult();
-                task.reset();
-
-                emit finished();
-            });
-
-            task->start(*QThreadPool::globalInstance());
-        }
-
-        QQuickTextureFactory *textureFactory() const override
-        {
-            return result.isNull() ? nullptr : QQuickTextureFactory::textureFactoryForImage(result);
-        }
-
-    private:
-        class ProviderImageGetter : public AsyncTask<QImage>
-        {
-        public:
-            ProviderImageGetter(QQuickImageProvider *provider, const QString &id, const QSize &requestedSize, const qreal radius)
-                : provider {provider}
-                , id{id}
-                , requestedSize{requestedSize}
-                , radius {radius}
-            {
-            }
-
-            QImage execute() override
-            {
-                auto img = provider->requestImage(id, &sourceSize, requestedSize);
-                if (!img.isNull())
-                {
-                    QSize targetSize = sourceSize;
-                    if (requestedSize.isValid())
-                        targetSize.scale(requestedSize, Qt::KeepAspectRatioByExpanding);
-
-                    applyRadius(targetSize, radius, img);
-                }
-
-                return img;
-            }
-
-        private:
-            QQuickImageProvider *provider;
-            QString id;
-            QSize requestedSize;
-            qreal radius;
-            QSize sourceSize;
-        };
-
-        TaskHandle<ProviderImageGetter> task;
-        QImage result;
-    };
-
-
     // adapts a given QQuickImageResponse to produce a image with radius
     class ImageResponseRadiusAdaptor : public QQuickImageResponse
     {
@@ -383,13 +321,10 @@ namespace
             if (!provider)
                 return nullptr;
 
-            assert(provider->imageType() == QQmlImageProviderBase::Image
-                   || provider->imageType() == QQmlImageProviderBase::ImageResponse);
+            assert(provider->imageType() == QQmlImageProviderBase::ImageResponse);
 
             const auto imageId = url.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority).mid(1);;
 
-            if (provider->imageType() == QQmlImageProviderBase::Image)
-                return new ImageProviderAsyncAdaptor(static_cast<QQuickImageProvider *>(provider), imageId, requestedSize, radius);
             if (provider->imageType() == QQmlImageProviderBase::ImageResponse)
             {
                 auto rawImageResponse = static_cast<QQuickAsyncImageProvider *>(provider)->requestImageResponse(imageId, requestedSize);
