@@ -375,7 +375,10 @@ extern "C" {
 #endif
 
 #ifndef HAVE_SWAB
+/* Android NDK25 have swab but configure fails to detect it */
+#ifndef __ANDROID__
 void swab (const void *, void *, ssize_t);
+#endif
 #endif
 
 /* Socket stuff */
