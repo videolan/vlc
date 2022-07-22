@@ -7,7 +7,6 @@
         <file alias="vlc128-xmas.png">../../../share/icons/128x128/vlc-xmas.png</file>
         <file alias="vlc48-xmas.png">../../../share/icons/48x48/vlc-xmas.png</file>
         <file alias="vlc128-kb.png">../../../share/icons/128x128/vlc-kb.png</file>
-        <file alias="cone.svg">pixmaps/cone.svg</file>
     </qresource>
     <qresource prefix="/menu">
         <file alias="add.svg">pixmaps/menu/add.svg</file>
@@ -52,11 +51,17 @@
         <file alias="volume-low.svg">pixmaps/menu/volume-low.svg</file>
         <file alias="volume-muted.svg">pixmaps/menu/volume-muted.svg</file>
     </qresource>
+    <qresource prefix="/misc">
+        <file alias="cone.svg">pixmaps/misc/cone.svg</file>
+        <file alias="play_button.svg">pixmaps/misc/play_button.svg</file>
+        <file alias="play_shadow.png">pixmaps/misc/play_shadow.png</file>
+        <file alias="new_indicator.svg">pixmaps/misc/new_indicator.svg</file>
+        <file alias="wait1.svg">pixmaps/misc/wait1.svg</file>
+        <file alias="wait2.svg">pixmaps/misc/wait2.svg</file>
+        <file alias="wait3.svg">pixmaps/misc/wait3.svg</file>
+        <file alias="wait4.svg">pixmaps/misc/wait4.svg</file>
+    </qresource>
     <qresource prefix="/util">
-        <file alias="wait1.svg">pixmaps/util/wait1.svg</file>
-        <file alias="wait2.svg">pixmaps/util/wait2.svg</file>
-        <file alias="wait3.svg">pixmaps/util/wait3.svg</file>
-        <file alias="wait4.svg">pixmaps/util/wait4.svg</file>
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
         <file alias="Helpers.js">util/qml/Helpers.js</file>
         <file alias="MultipleBinding.qml">util/qml/MultipleBinding.qml</file>
@@ -68,54 +73,6 @@
         <file alias="VanillaObject.qml">util/qml/VanillaObject.qml</file>
         <file alias="NativeMenu.qml">util/qml/NativeMenu.qml</file>
         <file alias="MLContextMenu.qml">util/qml/MLContextMenu.qml</file>
-    </qresource>
-    <qresource prefix="/toolbar">
-        <file alias="faster.svg">pixmaps/icons/faster.svg</file>
-        <file alias="slower.svg">pixmaps/icons/slower.svg</file>
-        <file alias="skip_fw.svg">pixmaps/toolbar/skip_for.svg</file>
-        <file alias="skip_back.svg">pixmaps/toolbar/skip_back.svg</file>
-        <file alias="pause_b.svg">pixmaps/pause.svg</file>
-        <file alias="play_b.svg">pixmaps/play.svg</file>
-        <file alias="stop_b.svg">pixmaps/stop.svg</file>
-        <file alias="next_b.svg">pixmaps/next.svg</file>
-        <file alias="previous_b.svg">pixmaps/previous.svg</file>
-        <file alias="eject.svg">pixmaps/icons/eject.svg</file>
-        <file alias="fullscreen.svg">pixmaps/toolbar/fullscreen.svg</file>
-        <file alias="renderer.svg">pixmaps/toolbar/renderer.svg</file>
-        <file alias="defullscreen.svg">pixmaps/toolbar/defullscreen.svg</file>
-        <file alias="extended.svg">pixmaps/toolbar/extended_16px.svg</file>
-        <file alias="playlist.svg">pixmaps/playlist/playlist.svg</file>
-        <file alias="snapshot.svg">pixmaps/toolbar/snapshot.svg</file>
-        <file alias="record.svg">pixmaps/toolbar/record_16px.svg</file>
-        <file alias="atob_nob.svg">pixmaps/icons/atob_nob.svg</file>
-        <file alias="frame.svg">pixmaps/icons/frame-by-frame.svg</file>
-        <file alias="reverse.svg">pixmaps/icons/play_reverse.svg</file>
-        <file alias="clear.svg">pixmaps/clear.svg</file>
-        <file alias="atob.svg">pixmaps/icons/atob.svg</file>
-        <file alias="atob_noa.svg">pixmaps/icons/atob_noa.svg</file>
-        <file alias="atob_bg_a.svg">pixmaps/icons/atob_bg_a.svg</file>
-        <file alias="atob_bg_ab.svg">pixmaps/icons/atob_bg_ab.svg</file>
-        <file alias="atob_bg_b.svg">pixmaps/icons/atob_bg_b.svg</file>
-        <file alias="atob_bg_none.svg">pixmaps/icons/atob_bg_none.svg</file>
-        <file alias="atob_fg_a.svg">pixmaps/icons/atob_fg_a.svg</file>
-        <file alias="atob_fg_ab.svg">pixmaps/icons/atob_fg_ab.svg</file>
-        <file alias="atob_fg_b.svg">pixmaps/icons/atob_fg_b.svg</file>
-        <file alias="dvd_menu.svg">pixmaps/toolbar/dvd_menu.svg</file>
-        <file alias="dvd_next.svg">pixmaps/toolbar/dvd_next.svg</file>
-        <file alias="dvd_prev.svg">pixmaps/toolbar/dvd_prev.svg</file>
-        <file alias="volslide-inside.svg">pixmaps/toolbar/volume-slider-inside.svg</file>
-        <file alias="volslide-outside.svg">pixmaps/toolbar/volume-slider-outside.svg</file>
-        <file alias="volume-high.svg">pixmaps/toolbar/volume-high.svg</file>
-        <file alias="volume-medium.svg">pixmaps/toolbar/volume-medium.svg</file>
-        <file alias="volume-low.svg">pixmaps/toolbar/volume-low.svg</file>
-        <file alias="volume-muted.svg">pixmaps/toolbar/volume-muted.svg</file>
-        <file alias="tv.svg">pixmaps/icons/tv.svg</file>
-        <file alias="tvtelx.svg">pixmaps/icons/tvtelx.svg</file>
-        <file alias="space.svg">pixmaps/icons/space.svg</file>
-        <file alias="slower2.svg">pixmaps/slower2.svg</file>
-        <file alias="faster2.svg">pixmaps/faster2.svg</file>
-        <file alias="audiosub.svg">pixmaps/toolbar/audiosub.svg</file>
-        <file alias="play_button.svg">pixmaps/toolbar/play_button.svg</file>
     </qresource>
     <qresource prefix="/sd">
         <file alias="capture-card.svg">pixmaps/sd/capture-card.svg</file>
@@ -135,32 +92,17 @@
         <file alias="jamendo.svg">pixmaps/sd/jamendo.svg</file>
         <file alias="katsomo.svg">pixmaps/sd/katsomo.svg</file>
     </qresource>
+    <qresource prefix="/placeholder">
+        <file alias="noart.png">pixmaps/placeholder/noart.png</file>
+        <file alias="noart_album.svg">pixmaps/placeholder/noart_album.svg</file>
+        <file alias="noart_albumCover.svg">pixmaps/placeholder/noart_albumCover.svg</file>
+        <file alias="noart_artist.svg">pixmaps/placeholder/noart_artist.svg</file>
+        <file alias="noart_artist_small.svg">pixmaps/placeholder/noart_artist_small.svg</file>
+        <file alias="noart_artistCover.svg">pixmaps/placeholder/noart_artistCover.svg</file>
+        <file alias="noart_videoCover.svg">pixmaps/placeholder/noart_videoCover.svg</file>
+    </qresource>
     <qresource prefix="/">
-        <file alias="download.svg">pixmaps/download.svg</file>
-        <file alias="update.svg">pixmaps/update.svg</file>
-        <file alias="noart.png">pixmaps/noart.png</file>
-        <file alias="go-next.svg">pixmaps/go-next.svg</file>
-        <file alias="new.svg">pixmaps/icons/profile_new.svg</file>
-        <file alias="lock.svg">pixmaps/lock.svg</file>
-        <file alias="search_clear.svg">pixmaps/search_clear.svg</file>
-        <file alias="dropzone.svg">pixmaps/icons/dropzone.svg</file>
-        <file alias="valid.svg">pixmaps/valid.svg</file>
-        <file alias="menu.svg">pixmaps/icons/menu.svg</file>
         <file alias="VLCIcons.ttf">pixmaps/VLCIcons.ttf</file>
-        <file alias="noart_album.svg">pixmaps/noart_album.svg</file>
-        <file alias="noart_albumCover.svg">pixmaps/noart_albumCover.svg</file>
-        <file alias="noart_artist.svg">pixmaps/noart_artist.svg</file>
-        <file alias="noart_artist_small.svg">pixmaps/noart_artist_small.svg</file>
-        <file alias="noart_artistCover.svg">pixmaps/noart_artistCover.svg</file>
-        <file alias="noart_videoCover.svg">pixmaps/noart_videoCover.svg</file>
-        <file alias="play_button.svg">pixmaps/play_button.svg</file>
-        <file alias="back.svg">pixmaps/back.svg</file>
-        <file alias="sync.svg">pixmaps/sync.svg</file>
-        <file alias="theme_dark.svg">pixmaps/theme_dark.svg</file>
-        <file alias="theme_daynight.svg">pixmaps/theme_daynight.svg</file>
-        <file alias="theme_light.svg">pixmaps/theme_light.svg</file>
-        <file alias="play_shadow.png">pixmaps/play_shadow.png</file>
-        <file alias="new_indicator.svg">pixmaps/new_indicator.svg</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="advprefs_audio.svg">pixmaps/prefs/advprefs_audio.svg</file>

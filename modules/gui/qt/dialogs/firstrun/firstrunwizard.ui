@@ -201,7 +201,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../vlc.qrc">
-          <normaloff>:/theme_light.svg</normaloff>:/theme_light.svg</iconset>
+          <normaloff>:/misc/theme_light.svg</normaloff>:/misc/theme_light.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -248,7 +248,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../vlc.qrc">
-          <normaloff>:/theme_dark.svg</normaloff>:/theme_dark.svg</iconset>
+          <normaloff>:/misc/theme_dark.svg</normaloff>:/misc/theme_dark.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -305,7 +305,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../vlc.qrc">
-          <normaloff>:/theme_daynight.svg</normaloff>:/theme_daynight.svg</iconset>
+          <normaloff>:/misc/theme_daynight.svg</normaloff>:/misc/theme_daynight.svg</iconset>
         </property>
         <property name="iconSize">
          <size>

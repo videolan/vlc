@@ -86,7 +86,7 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
         {
             return ml()->customCover()->get(folder->getId()
                                             , QSize(MLVIDEOFOLDERSMODEL_COVER_WIDTH, MLVIDEOFOLDERSMODEL_COVER_HEIGHT)
-                                            , QStringLiteral(":/noart_videoCover.svg"));
+                                            , QStringLiteral(":/placeholder/noart_videoCover.svg"));
         }
         case FOLDER_DURATION:
             return QVariant::fromValue(folder->getDuration());

@@ -572,7 +572,6 @@ ui_%.h: %.ui
 
 libqt_plugin_la_RES = \
 	gui/qt/pixmaps/VLCIcons.ttf \
-	gui/qt/pixmaps/go-next.svg \
 	gui/qt/pixmaps/addons/addon_default.svg \
 	gui/qt/pixmaps/addons/addon_broken.svg \
 	gui/qt/pixmaps/addons/addon_blue.svg \
@@ -671,15 +670,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/window_maximize.svg \
 	gui/qt/pixmaps/icons/window_minimize.svg \
 	gui/qt/pixmaps/icons/window_restore.svg \
-	gui/qt/pixmaps/noart.png \
-	gui/qt/pixmaps/noart_album.svg \
-	gui/qt/pixmaps/noart_albumCover.svg \
-	gui/qt/pixmaps/noart_artist.svg \
-	gui/qt/pixmaps/noart_artist_small.svg \
-	gui/qt/pixmaps/noart_artistCover.svg \
-	gui/qt/pixmaps/noart_videoCover.svg \
-	gui/qt/pixmaps/play_button.svg \
-	gui/qt/pixmaps/play_shadow.png \
 	gui/qt/pixmaps/menu/add.svg \
 	gui/qt/pixmaps/menu/capture-card.svg \
 	gui/qt/pixmaps/menu/clear.svg \
@@ -721,6 +711,24 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/menu/volume-high.svg \
 	gui/qt/pixmaps/menu/volume-low.svg \
 	gui/qt/pixmaps/menu/volume-muted.svg \
+	gui/qt/pixmaps/misc/cone.svg \
+	gui/qt/pixmaps/misc/new_indicator.svg \
+	gui/qt/pixmaps/misc/play_button.svg \
+	gui/qt/pixmaps/misc/play_shadow.png \
+	gui/qt/pixmaps/misc/theme_dark.svg \
+	gui/qt/pixmaps/misc/theme_daynight.svg \
+	gui/qt/pixmaps/misc/theme_light.svg \
+	gui/qt/pixmaps/misc/wait1.svg \
+	gui/qt/pixmaps/misc/wait2.svg \
+	gui/qt/pixmaps/misc/wait3.svg \
+	gui/qt/pixmaps/misc/wait4.svg \
+	gui/qt/pixmaps/placeholder/noart.png \
+	gui/qt/pixmaps/placeholder/noart_album.svg \
+	gui/qt/pixmaps/placeholder/noart_albumCover.svg \
+	gui/qt/pixmaps/placeholder/noart_artist.svg \
+	gui/qt/pixmaps/placeholder/noart_artistCover.svg \
+	gui/qt/pixmaps/placeholder/noart_artist_small.svg \
+	gui/qt/pixmaps/placeholder/noart_videoCover.svg \
 	gui/qt/pixmaps/prefs/advprefs_audio.svg \
 	gui/qt/pixmaps/prefs/advprefs_codec.svg \
 	gui/qt/pixmaps/prefs/advprefs_extended.svg \
@@ -762,50 +770,11 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/sd/screen.svg \
 	gui/qt/pixmaps/sd/stream.svg \
 	gui/qt/pixmaps/sd/unknown.svg \
-	gui/qt/pixmaps/toolbar/audiosub.svg \
-	gui/qt/pixmaps/toolbar/arrows.svg \
-	gui/qt/pixmaps/toolbar/aspect-ratio.svg \
-	gui/qt/pixmaps/toolbar/renderer.svg \
-	gui/qt/pixmaps/toolbar/defullscreen.svg \
-	gui/qt/pixmaps/toolbar/dvd_menu.svg \
-	gui/qt/pixmaps/toolbar/dvd_next.svg \
-	gui/qt/pixmaps/toolbar/dvd_prev.svg \
-	gui/qt/pixmaps/toolbar/extended_16px.svg \
-	gui/qt/pixmaps/toolbar/fullscreen.svg \
-	gui/qt/pixmaps/toolbar/record_16px.svg \
-	gui/qt/pixmaps/toolbar/snapshot.svg \
-	gui/qt/pixmaps/toolbar/skip_for.svg \
-	gui/qt/pixmaps/toolbar/skip_back.svg \
-	gui/qt/pixmaps/toolbar/visu.svg \
-	gui/qt/pixmaps/toolbar/volume-slider-inside.svg \
-	gui/qt/pixmaps/toolbar/volume-slider-outside.svg \
-	gui/qt/pixmaps/toolbar/play_button.svg \
-	gui/qt/pixmaps/util/wait1.svg \
-	gui/qt/pixmaps/util/wait2.svg \
-	gui/qt/pixmaps/util/wait3.svg \
-	gui/qt/pixmaps/util/wait4.svg \
 	gui/qt/pixmaps/win7/pause.svg \
 	gui/qt/pixmaps/win7/prev.svg \
 	gui/qt/pixmaps/win7/next.svg \
-	gui/qt/pixmaps/win7/play.svg \
-	gui/qt/pixmaps/update.svg \
-	gui/qt/pixmaps/valid.svg \
-	gui/qt/pixmaps/lock.svg \
-	gui/qt/pixmaps/close.svg \
-	gui/qt/pixmaps/rename.svg \
-	gui/qt/pixmaps/del.svg \
-	gui/qt/pixmaps/download.svg \
-	gui/qt/pixmaps/ellipsis.svg \
-	gui/qt/pixmaps/topbar/grid.svg \
-	gui/qt/pixmaps/topbar/list.svg \
-	gui/qt/pixmaps/cone.svg \
-	gui/qt/pixmaps/album_cover.svg \
-	gui/qt/pixmaps/back.svg \
-	gui/qt/pixmaps/sync.svg \
-	gui/qt/pixmaps/time.svg \
-	gui/qt/pixmaps/theme_dark.svg \
-	gui/qt/pixmaps/theme_daynight.svg \
-	gui/qt/pixmaps/theme_light.svg
+	gui/qt/pixmaps/win7/play.svg
+
 
 if HAVE_WIN32
 libqt_plugin_la_RES += gui/qt/pixmaps/windows-theme.conf

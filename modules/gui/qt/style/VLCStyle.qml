@@ -261,18 +261,18 @@ QtObject {
     readonly property int durationSliderBouncing: 2000
 
     //default arts
-    readonly property url noArtAlbum: "qrc:///noart_album.svg";
-    readonly property url noArtArtist: "qrc:///noart_artist.svg";
-    readonly property url noArtArtistSmall: "qrc:///noart_artist_small.svg";
-    readonly property url noArtAlbumCover: "qrc:///noart_albumCover.svg";
-    readonly property url noArtArtistCover: "qrc:///noart_artistCover.svg";
-    readonly property url noArtVideoCover: "qrc:///noart_videoCover.svg";
+    readonly property url noArtAlbum: "qrc:///placeholder/noart_album.svg";
+    readonly property url noArtArtist: "qrc:///placeholder/noart_artist.svg";
+    readonly property url noArtArtistSmall: "qrc:///placeholder/noart_artist_small.svg";
+    readonly property url noArtAlbumCover: "qrc:///placeholder/noart_albumCover.svg";
+    readonly property url noArtArtistCover: "qrc:///placeholder/noart_artistCover.svg";
+    readonly property url noArtVideoCover: "qrc:///placeholder/noart_videoCover.svg";
 
     // Play shadow
-    readonly property url playShadow: "qrc:///play_shadow.png";
+    readonly property url playShadow: "qrc:///misc/play_shadow.png";
 
     // New indicator
-    readonly property url newIndicator: "qrc:///new_indicator.svg";
+    readonly property url newIndicator: "qrc:///misc/new_indicator.svg";
 
     // Player controlbar
     readonly property int maxControlbarControlHeight: dp(64, scale)

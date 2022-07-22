@@ -47,7 +47,7 @@ static const QString COVERGENERATOR_STORAGE = "/art/qt-covers";
 
 static const int COVERGENERATOR_COUNT = 2;
 
-static const QString COVERGENERATOR_DEFAULT = ":/noart_albumCover.svg";
+static const QString COVERGENERATOR_DEFAULT = ":/placeholder/noart_albumCover.svg";
 
 //-------------------------------------------------------------------------------------------------
 // Ctor / dtor

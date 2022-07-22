@@ -243,7 +243,7 @@ T.Control {
 
         Widgets.ScaledImage {
             anchors.fill: parent
-            source: "qrc:/toolbar/play_button.svg"
+            source: "qrc:/misc/play_button.svg"
         }
     }
 }

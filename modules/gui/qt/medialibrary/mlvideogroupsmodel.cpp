@@ -95,7 +95,7 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
             {
                 return ml()->customCover()->get(group->getId()
                                                 , QSize(MLVIDEOGROUPSMODEL_COVER_WIDTH, MLVIDEOGROUPSMODEL_COVER_HEIGHT)
-                                                , QStringLiteral(":/noart_videoCover.svg"));
+                                                , QStringLiteral(":/placeholder/noart_videoCover.svg"));
             }
             case VIDEO_DURATION:
                 return QVariant::fromValue(group->getDuration());

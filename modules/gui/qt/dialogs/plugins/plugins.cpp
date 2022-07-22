@@ -475,10 +475,10 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
              model, SLOT(addonChanged( const addon_entry_t * )) );
 
     QList<QString> frames;
-    frames << ":/util/wait1.svg";
-    frames << ":/util/wait2.svg";
-    frames << ":/util/wait3.svg";
-    frames << ":/util/wait4.svg";
+    frames << ":/misc/wait1.svg";
+    frames << ":/misc/wait2.svg";
+    frames << ":/misc/wait3.svg";
+    frames << ":/misc/wait4.svg";
     spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
     connect( spinnerAnimation, &PixmapAnimator::pixmapReady,
              addonsView->viewport(), QOverload<>::of(&QWidget::update) );

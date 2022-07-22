@@ -108,7 +108,7 @@ void CoverArtLabel::showArtUpdate( const QString& url )
     }
     else
     {
-        pix = QPixmap( ":/noart.png" );
+        pix = QPixmap( ":/placeholder/noart.png" );
     }
     setPixmap( pix );
 }
