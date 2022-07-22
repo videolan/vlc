@@ -42,7 +42,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 @interface VLCLibraryCollectionViewAlbumSupplementaryDetailView () 
 {
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
+    VLCLibraryController *_libraryController;
 }
+
 @end
 
 @implementation VLCLibraryCollectionViewAlbumSupplementaryDetailView
@@ -79,6 +81,35 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _tracksDataSource.representedAlbum = _representedAlbum;
 
     [_albumTracksTableView reloadData];
+}
+
+- (IBAction)playAction:(id)sender
+{
+    if (!_libraryController) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+
+    // We want to add all the tracks to the playlist but only play the first one immediately,
+    // otherwise we will skip straight to the last track of the last album from the artist
+    __block BOOL playImmediately = YES;
+    [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+
+        if(playImmediately) {
+            playImmediately = NO;
+        }
+    }];
+}
+
+- (IBAction)enqueueAction:(id)sender
+{
+    if (!_libraryController) {
+        _libraryController = [[VLCMain sharedInstance] libraryController];
+    }
+
+    [_representedAlbum iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [_libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
+    }];
 }
 
 @end

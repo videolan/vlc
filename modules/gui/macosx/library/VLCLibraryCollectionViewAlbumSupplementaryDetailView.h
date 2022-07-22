@@ -24,6 +24,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaLibraryAlbum;
+@class VLCImageView;
 
 extern NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier;
 extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
@@ -33,8 +34,11 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAl
 @property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
 @property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
 @property (readwrite, weak) IBOutlet NSTextField *albumDetailsTextField;
-@property (readwrite, weak) IBOutlet NSImageView *albumArtworkImageView;
+@property (readwrite, weak) IBOutlet VLCImageView *albumArtworkImageView;
 @property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;
+
+- (IBAction)playAction:(id)sender;
+- (IBAction)enqueueAction:(id)sender;
 
 @end
 
