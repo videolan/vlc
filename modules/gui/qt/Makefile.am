@@ -769,15 +769,14 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/sd/podcast.svg \
 	gui/qt/pixmaps/sd/screen.svg \
 	gui/qt/pixmaps/sd/stream.svg \
-	gui/qt/pixmaps/sd/unknown.svg \
+	gui/qt/pixmaps/sd/unknown.svg
+
+if HAVE_WIN32
+libqt_plugin_la_RES += gui/qt/pixmaps/windows-theme.conf \
 	gui/qt/pixmaps/win7/pause.svg \
 	gui/qt/pixmaps/win7/prev.svg \
 	gui/qt/pixmaps/win7/next.svg \
 	gui/qt/pixmaps/win7/play.svg
-
-
-if HAVE_WIN32
-libqt_plugin_la_RES += gui/qt/pixmaps/windows-theme.conf
 endif
 
 #QML and JS resources

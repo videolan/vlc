@@ -123,12 +123,6 @@
         <file alias="sample_minimal.png">pixmaps/prefs/sample_minimal.png</file>
         <file alias="sample_skins.png">pixmaps/prefs/sample_skins.png</file>
     </qresource>
-    <qresource prefix="/win7">
-        <file alias="pause.svg">pixmaps/win7/pause.svg</file>
-        <file alias="prev.svg">pixmaps/win7/prev.svg</file>
-        <file alias="play.svg">pixmaps/win7/play.svg</file>
-        <file alias="next.svg">pixmaps/win7/next.svg</file>
-    </qresource>
     <qresource prefix="/addons">
         <file alias="addon_default.svg">pixmaps/addons/addon_default.svg</file>
         <file alias="addon_broken.svg">pixmaps/addons/addon_broken.svg</file>
