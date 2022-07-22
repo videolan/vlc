@@ -215,14 +215,12 @@ FocusScope {
         edge: Widgets.DrawerExt.Edges.Top
         state: topcontrolView.state
         width: parent.width
-        visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls || topcontrolView.contentItem.isResumeDialogVisible
+        visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls
         height: contentItem.height
 
         component: {
             if (rootPlayer.pinVideoControls)
                 return acrylicBackground
-            else if (topcontrolView.contentItem.isResumeDialogVisible)
-                return topcontrolViewResumeBg
             else
                 return topcontrolViewBackground
         }
@@ -242,17 +240,6 @@ FocusScope {
                     GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
                     GradientStop { position: 1; color: "transparent" }
                 }
-            }
-        }
-
-        Component {
-            id: topcontrolViewResumeBg
-
-            Rectangle {
-                width: rootPlayer.width
-                height: topcontrolView.height + topcontrolView.anchors.topMargin * 2
-                color: rootPlayer.colors.playerBg
-                opacity: .8
             }
         }
     }
