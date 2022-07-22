@@ -118,17 +118,19 @@ FocusScope {
                     height: VLCStyle.expandCover_music_height
                     width: VLCStyle.expandCover_music_width
 
+                    Widgets.ListCoverShadow {
+                        anchors.fill: parent
+                    }
+
                     RoundImage {
                         id: expand_cover_id
 
                         height: VLCStyle.expandCover_music_height
                         width: VLCStyle.expandCover_music_width
                         radius: VLCStyle.expandCover_music_radius
-                        source: Helpers.get(model, "cover", VLCStyle.noArtAlbumCover)
-                    }
-
-                    Widgets.ListCoverShadow {
-                        anchors.fill: parent
+                        source: (model && model.cover && model.cover !== "")
+                                  ?  model.cover
+                                  : VLCStyle.noArtAlbumCover
                     }
                 }
 
