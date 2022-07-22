@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="48" height="48" version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
- <defs>
-  <linearGradient id="gradient" x1="0" x2="0" y1="1" y2="0">
-   <stop stop-color="#e25b01" offset="0%"/>
-   <stop stop-color="#f89a06" offset="100%"/>
-  </linearGradient>
- </defs>
- <circle cx="24" cy="24" r="24" fill="url(#gradient)"/>
- <circle cx="24" cy="24" r="22" fill="#fff"/>
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="a" x2="0" y1="1">
+      <stop stop-color="#e25b01" offset="0"/>
+      <stop stop-color="#f89a06" offset="1"/>
+    </linearGradient>
+  </defs>
+  <circle cx="24" cy="24" r="24" fill="url(#a)"/>
+  <circle cx="24" cy="24" r="22" fill="#fff"/>
 </svg>
+

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
- <path d="m24.56 17.464-2.917 2.918A4 4 0 0 1 24 24.025a4 4 0 0 1-1.791 3.332l2.768 2.922A8 8 0 0 0 28 24.025a7.99 7.99 0 0 0-3.44-6.56z" fill="#ff950d"/>
- <path d="M4 16h4l8-8h4v32h-4l-8-8H4z" fill="#747474" fill-rule="evenodd"/>
+  <path d="m24.56 17.464-2.917 2.918A4 4 0 0 1 24 24.025a4 4 0 0 1-1.791 3.332l2.768 2.922A8 8 0 0 0 28 24.025a7.99 7.99 0 0 0-3.44-6.56z" fill="#ff950d"/>
+  <path d="M4 16h4l8-8h4v32h-4l-8-8H4z" fill="#747474" fill-rule="evenodd"/>
 </svg>
+

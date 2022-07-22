@@ -1,90 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="48"
-   height="48"
-   viewBox="0 0 48 48"
-   version="1.1"
-   id="svg5502"
-   inkscape:version="0.92.1 r15371"
-   sodipodi:docname="mtp.svg">
-  <defs
-     id="defs5496" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="14.481547"
-     inkscape:cx="10.885112"
-     inkscape:cy="26.784716"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="true"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
-     inkscape:window-x="1366"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     units="px">
-    <inkscape:grid
-       type="xygrid"
-       id="grid6077" />
-  </sodipodi:namedview>
-  <metadata
-     id="metadata5499">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-96.459526,-120.56071)">
-    <rect
-       y="132.52934"
-       x="119.95947"
-       height="2.9999981"
-       width="6.0000024"
-       id="rect11181"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.24999952;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate" />
-    <path
-       inkscape:connector-curvature="0"
-       id="path11183"
-       d="m 119.95952,134.56073 v 14.99999 h 3 v -14.99999 z"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.12132049;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate" />
-    <ellipse
-       ry="3.9999974"
-       rx="4.0000029"
-       cy="149.56056"
-       cx="118.95948"
-       id="ellipse11185"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.18181872;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate" />
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#757575;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.99999952;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="m 110.45952,124.56071 c -2.21601,0 -3.99999,1.78401 -3.99999,4.00002 v 31.99996 c 0,2.21601 1.78398,4.00002 3.99999,4.00002 h 20.00002 c 2.21601,0 3.99999,-1.78401 3.99999,-4.00002 v -31.99996 c 0,-2.21601 -1.78398,-4.00002 -3.99999,-4.00002 z m 0,5.00001 h 20.00002 v 26.99998 h -20.00002 z m 6,28.99999 h 8.00002 v 3 h -8.00002 z"
-       id="rect11033"
-       inkscape:connector-curvature="0" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+ <g transform="translate(-96.46 -120.56)" fill-rule="evenodd">
+  <path d="m119.96 132.53h6v3h-6z" fill="#ff950d"/>
+  <path d="m119.96 134.56v15h3v-15z" fill="#ff950d"/>
+  <circle cx="118.96" cy="149.56" r="4" fill="#ff950d"/>
+  <path d="m110.46 124.56c-2.216 0-4 1.785-4 4v32c0 2.217 1.784 4 4 4h20c2.216 0 4-1.783 4-4v-32c0-2.215-1.784-4-4-4zm0 5h20v27h-20zm6 29h8v3h-8z" fill="#757575"/>
+ </g>
 </svg>

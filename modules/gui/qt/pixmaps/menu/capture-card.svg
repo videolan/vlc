@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
- <g fill="#ff950d" fill-rule="evenodd">
-  <path d="M11 15h12v8.5H11zM26 15h8v3h-8zM11 26h12v3H11zM26 20.5h8v3h-8zm0 5.5h8v3h-8z"/>
- </g>
- <g fill-rule="evenodd">
-  <path d="m41 4-4 4H4v28h9v-4H8V12h29v20H25v4h12v4h4v-6h3v-7h-3v-4h3v-6h-3V9l2-2h1V4zM28 36H10v4h18z" fill="#747474"/>
-  <path d="M8 12v20h5v4h12v-4h12V12zm3 3h12v8.5H11zm15 0h8v3h-8zm0 5.5h8v3h-8zM11 26h12v3H11zm15 0h8v3h-8z" fill="#fafafa"/>
- </g>
+  <path d="M11 15h12v8.5H11zm15 0h8v3h-8zM11 26h12v3H11zm15-5.5h8v3h-8zm0 5.5h8v3h-8z" fill="#ff950d" fill-rule="evenodd"/>
+  <g fill-rule="evenodd">
+    <path d="m41 4-4 4H4v28h9v-4H8V12h29v20H25v4h12v4h4v-6h3v-7h-3v-4h3v-6h-3V9l2-2h1V4zM28 36H10v4h18z" fill="#747474"/>
+    <path d="M8 12v20h5v4h12v-4h12V12zm3 3h12v8.5H11zm15 0h8v3h-8zm0 5.5h8v3h-8zM11 26h12v3H11zm15 0h8v3h-8z" fill="#fafafa"/>
+  </g>
 </svg>
+

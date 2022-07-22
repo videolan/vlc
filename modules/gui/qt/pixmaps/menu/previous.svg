@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
- <g fill="#747474">
-  <path d="M42 36V12L27 24z" fill-rule="evenodd"/>
-  <path d="M28 36V12L13 24z" fill-rule="evenodd"/>
-  <rect x="6" y="12" width="8" height="24" ry="0"/>
- </g>
+  <g fill="#747474">
+    <path d="M42 36V12L27 24z" fill-rule="evenodd"/>
+    <path d="M28 36V12L13 24z" fill-rule="evenodd"/>
+    <rect x="6" y="12" width="8" height="24" ry="0"/>
+  </g>
 </svg>
+
