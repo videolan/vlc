@@ -46,6 +46,9 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 ifdef HAVE_DARWIN_OS
 	$(APPLY) $(SRC)/gnutls/gnutls-fix-aarch64-compilation-appleos.patch
 endif
+ifdef HAVE_ANDROID
+	$(APPLY) $(SRC)/gnutls/gnutls-fix-aarch64-compilation-appleos.patch
+endif
 
 	$(APPLY) $(SRC)/gnutls/0001-windows-Avoid-Wint-conversion-errors.patch
 
