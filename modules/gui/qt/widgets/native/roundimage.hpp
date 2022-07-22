@@ -77,8 +77,8 @@ protected:
 
 private:
     void setDPR(qreal value);
-    void handleImageRequestFinished();
-    void resetImageRequest();
+    void handleImageResponseFinished();
+    void resetImageResponse(bool cancel);
     void load();
     void setRoundImage(QImage image);
     void setStatus(const Status status);
@@ -92,7 +92,7 @@ private:
     QImage m_roundImage;
     bool m_dirty = false;
 
-    QQuickImageResponse *m_activeImageRequest {};
+    QQuickImageResponse *m_activeImageResponse {};
 
     bool m_enqueuedGeneration = false;
 };

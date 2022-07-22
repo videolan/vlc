@@ -360,7 +360,7 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 
 RoundImage::~RoundImage()
 {
-    resetImageRequest();
+    resetImageResponse(true);
 }
 
 QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -470,17 +470,17 @@ void RoundImage::setDPR(const qreal value)
     regenerateRoundImage();
 }
 
-void RoundImage::handleImageRequestFinished()
+void RoundImage::handleImageResponseFinished()
 {
-    const QString error = m_activeImageRequest->errorString();
+    const QString error = m_activeImageResponse->errorString();
     QImage image;
-    if (auto textureFactory = m_activeImageRequest->textureFactory())
+    if (auto textureFactory = m_activeImageResponse->textureFactory())
     {
         image = textureFactory->image();
         delete textureFactory;
     }
 
-    resetImageRequest();
+    resetImageResponse(false);
 
     if (image.isNull())
     {
@@ -501,14 +501,16 @@ void RoundImage::handleImageRequestFinished()
     imageCache.insert(key, new QImage(image), image.sizeInBytes());
 }
 
-void RoundImage::resetImageRequest()
+void RoundImage::resetImageResponse(bool cancel)
 {
-    if (!m_activeImageRequest)
+    if (!m_activeImageResponse)
         return;
 
-    m_activeImageRequest->disconnect(this);
-    m_activeImageRequest->deleteLater();
-    m_activeImageRequest = nullptr;
+    if (cancel)
+        m_activeImageResponse->cancel();
+
+    m_activeImageResponse->disconnect(this);
+    m_activeImageResponse = nullptr;
 }
 
 void RoundImage::load()
@@ -531,8 +533,10 @@ void RoundImage::load()
         return;
     }
 
-    m_activeImageRequest = getAsyncImageResponse(source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius, engine);
-    connect(m_activeImageRequest, &QQuickImageResponse::finished, this, &RoundImage::handleImageRequestFinished);
+    m_activeImageResponse = getAsyncImageResponse(source(), QSizeF {scaledWidth, scaledHeight}.toSize(), scaledRadius, engine);
+
+    connect(m_activeImageResponse, &QQuickImageResponse::finished, this, &RoundImage::handleImageResponseFinished);
+    connect(m_activeImageResponse, &QQuickImageResponse::finished, m_activeImageResponse, &QObject::deleteLater);
 }
 
 void RoundImage::setRoundImage(QImage image)
@@ -568,7 +572,7 @@ void RoundImage::regenerateRoundImage()
     // remove old contents
     setRoundImage({});
 
-    resetImageRequest();
+    resetImageResponse(true);
 
     // use Qt::QueuedConnection to delay generation, so that dependent properties
     // subsequent updates can be merged, f.e when VLCStyle.scale changes
