@@ -37,6 +37,9 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
 	$(APPLY) $(SRC)/libplacebo/0001-vulkan-blacklist-metal-structs-from-utils_gen.py.patch
 	$(APPLY) $(SRC)/libplacebo/0002-pl_thread-use-gettimeofday-for-back-compat.patch
+ifdef HAVE_ANDROID
+	$(APPLY) $(SRC)/libplacebo/fix-android-build.patch
+endif
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson

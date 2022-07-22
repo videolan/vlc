@@ -1,0 +1,12 @@
+diff -Naur libplacebo/src/meson.build libplacebo.new/src/meson.build
+--- libplacebo/src/meson.build	2022-02-03 16:30:55.000000000 +0100
++++ libplacebo.new/src/meson.build	2022-07-22 08:22:49.573761162 +0200
+@@ -69,7 +69,7 @@
+ endif
+ 
+ unwind = dependency('libunwind', required: get_option('unwind'))
+-has_execinfo = cc.has_header('execinfo.h')
++has_execinfo = false
+ conf_internal.set('PL_HAVE_UNWIND', unwind.found())
+ conf_internal.set('PL_HAVE_EXECINFO', has_execinfo)
+ if unwind.found()
