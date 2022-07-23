@@ -40,6 +40,7 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/libplacebo/fix-android-build.patch
 endif
+	$(APPLY) $(SRC)/libplacebo/0001-Fix-incompatible-pointer-integer-conversion-errors-o.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson
