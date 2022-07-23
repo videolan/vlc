@@ -1,0 +1,60 @@
+From 88d79b964d88730e316919d6ccd17ca0fe9b3244 Mon Sep 17 00:00:00 2001
+From: Martin Storsjo <martin@martin.st>
+Date: Mon, 15 Aug 2022 23:50:16 +0300
+Subject: [PATCH] windows: Avoid -Wint-conversion errors
+
+Clang 15 made "incompatible pointer to integer conversion" an error
+instead of a plain warning. This fixes errors like these:
+
+system/keys-win.c:257:13: error: incompatible pointer to integer conversion initializing 'HCRYPTHASH' (aka 'unsigned long') with an expression of type 'void *' [-Wint-conversion]
+        HCRYPTHASH hHash = NULL;
+                   ^       ~~~~
+
+Signed-off-by: Martin Storsjo <martin@martin.st>
+---
+ lib/system/keys-win.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/system/keys-win.c b/lib/system/keys-win.c
+index 4463c3b2d7..a0fffe249e 100644
+--- a/lib/system/keys-win.c
++++ b/lib/system/keys-win.c
+@@ -254,7 +254,7 @@ int capi_sign(gnutls_privkey_t key, void *userdata,
+ {
+ 	priv_st *priv = (priv_st *) userdata;
+ 	ALG_ID Algid;
+-	HCRYPTHASH hHash = NULL;
++	HCRYPTHASH hHash = 0;
+ 	uint8_t digest[MAX_HASH_SIZE];
+ 	unsigned int digest_size;
+ 	gnutls_digest_algorithm_t algo;
+@@ -441,7 +441,7 @@ static
+ int privkey_import_capi(gnutls_privkey_t pkey, const char *url, 
+ 		priv_st *priv, CRYPT_KEY_PROV_INFO *kpi)
+ {
+-	HCRYPTPROV hCryptProv = NULL;
++	HCRYPTPROV hCryptProv = 0;
+ 	int ret, enc_too = 0;
+ 	DWORD i, dwErrCode = 0;
+ 
+@@ -702,7 +702,7 @@ int privkey_import_ncrypt(gnutls_privkey_t pkey, const char *url,
+ 		priv_st *priv, CRYPT_KEY_PROV_INFO *kpi, NCRYPT_PROV_HANDLE *sctx)
+ {
+ 	SECURITY_STATUS r;
+-	NCRYPT_KEY_HANDLE nc = NULL;
++	NCRYPT_KEY_HANDLE nc = 0;
+ 	int ret, enc_too = 0;
+ 	WCHAR algo_str[64];
+ 	DWORD algo_str_size = 0;
+@@ -786,7 +786,7 @@ int _gnutls_privkey_import_system_url(gnutls_privkey_t pkey, const char *url)
+ 	const CERT_CONTEXT *cert = NULL;
+ 	CRYPT_HASH_BLOB blob;
+ 	CRYPT_KEY_PROV_INFO *kpi = NULL;
+-	NCRYPT_PROV_HANDLE sctx = NULL;
++	NCRYPT_PROV_HANDLE sctx = 0;
+ 	DWORD kpi_size;
+ 	SECURITY_STATUS r;
+ 	int ret;
+-- 
+2.25.1
+

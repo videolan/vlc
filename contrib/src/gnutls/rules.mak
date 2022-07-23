@@ -45,6 +45,8 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/gnutls-fix-aarch64-compilation-appleos.patch
 endif
 
+	$(APPLY) $(SRC)/gnutls/0001-windows-Avoid-Wint-conversion-errors.patch
+
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
