@@ -115,7 +115,8 @@
 
 - (IBAction)segmentedControlAction:(id)sender
 {
-    [_collectionViewFlowLayout resetLayout];
+    enum vlc_ml_parent_type oldParentType = _currentParentType;
+
     _currentSelectedSegment = _segmentedControl.selectedSegment;
     switch (_currentSelectedSegment) {
         case 0:
@@ -144,9 +145,14 @@
         [self reloadEmptyViewAppearance];
         return;
     }
+
+    if(oldParentType == _currentParentType) {
+        return;
+    }
+
+    [_collectionViewFlowLayout resetLayout];
     
     [self.collectionView reloadData];
-
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
 }
