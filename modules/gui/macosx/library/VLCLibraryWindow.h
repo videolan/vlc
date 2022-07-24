@@ -26,6 +26,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
+@class VLCLibraryNavigationStack;
+@class VLCLibraryAudioDataSource;
+@class VLCLibraryVideoDataSource;
+@class VLCLibraryGroupDataSource;
+@class VLCLibrarySortingMenuController;
+@class VLCMediaSourceBaseDataSource;
+@class VLCPlaylistDataSource;
+@class VLCPlaylistController;
+@class VLCPlaylistSortingMenuController;
+@class VLCFSPanelController;
 
 @interface VLCLibraryWindowController : NSWindowController
 
@@ -75,9 +85,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSSearchField *librarySearchField;
 @property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
 @property (readwrite, weak) IBOutlet NSButton *playQueueToggle;
+@property (readwrite, weak) IBOutlet NSButton *backwardsNavigationButton;
+@property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
+@property (readwrite) VLCLibraryNavigationStack *navigationStack;
+@property (readonly) VLCLibraryAudioDataSource *libraryAudioDataSource;
+@property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
+@property (readonly) VLCLibraryGroupDataSource *libraryAudioGroupDataSource;
+@property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
+@property (readonly) VLCMediaSourceBaseDataSource *mediaSourceDataSource;
+@property (readonly) VLCPlaylistDataSource *playlistDataSource;
+@property (readonly) VLCPlaylistSortingMenuController *playlistSortingMenuController;
+@property (readonly) VLCPlaylistController *playlistController;
+@property (readonly) VLCFSPanelController *fspanel;
 
 - (void)videoPlaybackWillBeStarted;
 - (void)enableVideoPlaybackAppearance;
@@ -92,7 +114,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)filterLibrary:(id)sender;
 - (IBAction)openMedia:(id)sender;
 - (IBAction)showAndHidePlaylist:(id)sender;
-
+- (IBAction)backwardsNavigationAction:(id)sender;
+- (IBAction)forwardsNavigationAction:(id)sender;
+- (IBAction)segmentedControlAction:(id)sender;
 @end
 
 NS_ASSUME_NONNULL_END

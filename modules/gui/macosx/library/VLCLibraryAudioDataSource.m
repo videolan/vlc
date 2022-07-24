@@ -24,6 +24,8 @@
 
 #import "main/VLCMain.h"
 
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
@@ -155,6 +157,10 @@
     [self.collectionView reloadData];
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
+
+    if(sender != [[[VLCMain sharedInstance] libraryWindow] navigationStack]) {
+        [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
+    }
 }
 
 - (NSString *)imageNameForCurrentSegment

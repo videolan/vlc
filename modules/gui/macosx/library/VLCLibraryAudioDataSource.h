@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, assign) NSTextField *placeholderLabel;
 @property (nonatomic, readonly, strong) NSString *imageNameForCurrentSegment;
 
+- (IBAction)segmentedControlAction:(id)sender;
 - (void)setupAppearance;
 - (void)reloadAppearance;
 - (void)reloadEmptyViewAppearance;

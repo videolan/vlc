@@ -565,22 +565,6 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="82C1CE3D-FCE3-49CB-B910-14456BAA94A2" label="Navigation Controls" paletteLabel="Navigation Controls" sizingBehavior="auto" navigational="YES" id="SXj-w1-2e4">
-                        <nil key="toolTip"/>
-                        <segmentedControl key="view" verticalHuggingPriority="750" id="Cd4-7b-wi1">
-                            <rect key="frame" x="25" y="14" width="61" height="24"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                            <segmentedCell key="cell" continuous="YES" refusesFirstResponder="YES" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="F1b-F8-QA5">
-                                <font key="font" metaFont="system"/>
-                                <segments>
-                                    <segment image="NSLeftFacingTriangleTemplate" width="32"/>
-                                    <segment image="NSRightFacingTriangleTemplate" enabled="NO">
-                                        <nil key="label"/>
-                                    </segment>
-                                </segments>
-                            </segmentedCell>
-                        </segmentedControl>
-                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="C6B452D8-BAA7-4410-A942-3096C5EBF6F7" label="Custom View" paletteLabel="Segmented Title Control" visibilityPriority="10" sizingBehavior="auto" id="KnW-Lr-R1d">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="W1M-0o-qYG">
@@ -595,6 +579,9 @@
                                     <segment label="Streams"/>
                                 </segments>
                             </segmentedCell>
+                            <connections>
+                                <action selector="segmentedControlAction:" target="QvC-M9-y7g" id="seg-Me-t1n"/>
+                            </connections>
                         </segmentedControl>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
@@ -632,10 +619,39 @@
                             </connections>
                         </searchField>
                     </searchToolbarItem>
+                    <toolbarItem implicitItemIdentifier="6FF10B75-9BCD-4E38-BBD1-FC28CD0651F8" label="Back" paletteLabel="Back" image="NSLeftFacingTriangleTemplate" sizingBehavior="auto" navigational="YES" id="6Ie-eu-GDn">
+                        <nil key="toolTip"/>
+                        <button key="view" verticalHuggingPriority="750" id="Bzq-ZV-i8j">
+                            <rect key="frame" x="7" y="14" width="20" height="19"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="NSLeftFacingTriangleTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="geC-DJ-rRh">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="systemBold" size="12"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="backwardsNavigationAction:" target="QvC-M9-y7g" id="for-Ac-t1n"/>
+                            </connections>
+                        </button>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="8EEF1426-308A-446D-AD89-6E8C7A2327AB" label="Forward" paletteLabel="Forward" image="NSRightFacingTriangleTemplate" sizingBehavior="auto" navigational="YES" id="g2e-7o-Qet">
+                        <nil key="toolTip"/>
+                        <button key="view" verticalHuggingPriority="750" id="jzy-je-h2k">
+                            <rect key="frame" x="15" y="14" width="20" height="19"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="NSRightFacingTriangleTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dAm-oA-OAD">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="systemBold" size="12"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="forwardsNavigationAction:" target="QvC-M9-y7g" id="bac-Ac-t1n"/>
+                            </connections>
+                        </button>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="L28-Xw-ydE"/>
-                    <toolbarItem reference="SXj-w1-2e4"/>
+                    <toolbarItem reference="6Ie-eu-GDn"/>
+                    <toolbarItem reference="g2e-7o-Qet"/>
                     <toolbarItem reference="kBa-MC-Mdq"/>
                     <toolbarItem reference="Tbc-Ik-FaO"/>
                     <toolbarItem reference="89f-AL-zuU"/>
@@ -653,11 +669,13 @@
                 <outlet property="audioLibrarySplitView" destination="llh-BF-BEJ" id="gvt-K1-cGw"/>
                 <outlet property="audioLibraryView" destination="lpg-UW-pTq" id="FYD-PV-Ce2"/>
                 <outlet property="audioSegmentedControl" destination="8iI-b7-Eag" id="ERG-nc-ziq"/>
+                <outlet property="backwardsNavigationButton" destination="Bzq-ZV-i8j" id="Bac-Kb-ut"/>
                 <outlet property="clearPlaylistButton" destination="cih-xp-HmY" id="PoU-co-0kn"/>
                 <outlet property="clearPlaylistSeparator" destination="nAW-KH-ipk" id="Af9-fg-u7m"/>
                 <outlet property="controlsBar" destination="Uzf-Tf-H8x" id="n0G-92-F2Q"/>
                 <outlet property="dragDropImageBackgroundBox" destination="AXk-h7-dZ0" id="h3h-Wh-0op"/>
                 <outlet property="emptyLibraryView" destination="YJf-1r-vaC" id="AJB-eN-4u6"/>
+                <outlet property="forwardsNavigationButton" destination="jzy-je-h2k" id="for-Wa-rd"/>
                 <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
                 <outlet property="librarySearchField" destination="ab6-kR-8Io" id="Qf7-UM-lol"/>
                 <outlet property="librarySearchToolbarItem" destination="dv4-Il-y8X" id="Um3-s4-Ax4"/>

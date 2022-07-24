@@ -40,6 +40,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
+#import "library/VLCLibraryNavigationStack.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 
@@ -71,20 +72,8 @@ static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
 
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
-    VLCPlaylistDataSource *_playlistDataSource;
-    VLCLibraryVideoDataSource *_libraryVideoDataSource;
-    VLCLibraryAudioDataSource *_libraryAudioDataSource;
-    VLCLibraryGroupDataSource *_libraryAudioGroupDataSource;
-    VLCLibrarySortingMenuController *_librarySortingMenuController;
-    VLCMediaSourceBaseDataSource *_mediaSourceDataSource;
-    VLCPlaylistSortingMenuController *_playlistSortingMenuController;
-
-    VLCPlaylistController *_playlistController;
-
     NSRect _windowFrameBeforePlayback;
     CGFloat _lastPlaylistWidthBeforeCollaps;
-
-    VLCFSPanelController *_fspanel;
     
     NSInteger _currentSelectedSegment;
     NSInteger _currentSelectedViewModeSegment;
@@ -147,6 +136,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     libvlc_int_t *libvlc = vlc_object_instance(getIntf());
     var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowFullscreenController, (__bridge void *)self);
     var_AddCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
+
+    self.navigationStack = [[VLCLibraryNavigationStack alloc] init];
+    self.navigationStack.delegate = self;
 
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
@@ -260,7 +252,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _currentSelectedSegment = 5; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 4;
     [_segmentedTitleControl setTarget:self];
-    [_segmentedTitleControl setAction:@selector(segmentedControlAction:)];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:0];
     [_segmentedTitleControl setLabel:_NS("Music") forSegment:1];
     [_segmentedTitleControl setLabel:_NS("Browse") forSegment:2];
@@ -500,17 +491,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 #pragma mark - misc. user interactions
 
-- (void)segmentedControlAction:(id)sender
+- (IBAction)segmentedControlAction:(id)sender
 {
     if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment && 
         _gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
         return;
     }
-    
+
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
 
-    switch (_currentSelectedSegment) {
+    switch (_segmentedTitleControl.selectedSegment) {
         case 0:
             [self showVideoLibrary];
             break;
@@ -522,6 +513,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         default:
             [self showMediaSourceAppearance];
             break;
+    }
+
+    if(sender != _navigationStack) {
+        [self.navigationStack appendCurrentLibraryState];
     }
 }
 
@@ -792,6 +787,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (IBAction)showAndHidePlaylist:(id)sender
 {
     [self togglePlaylist];
+}
+
+- (IBAction)backwardsNavigationAction:(id)sender
+{
+    [_navigationStack backwards];
+}
+
+- (IBAction)forwardsNavigationAction:(id)sender
+{
+    [_navigationStack forwards];
 }
 
 #pragma mark - video output controlling

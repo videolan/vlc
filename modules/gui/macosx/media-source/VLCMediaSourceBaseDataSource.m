@@ -30,6 +30,8 @@
 
 #import "main/VLCMain.h"
 #import "views/VLCImageView.h"
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableCellView.h"
@@ -40,7 +42,6 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray<VLCMediaSource *> *_mediaSources;
-    VLCMediaSourceDataSource *_childDataSource;
     NSArray *_discoveredLANdevices;
     BOOL _gridViewMode;
 }
@@ -95,28 +96,21 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.homeButton.target = self;
     self.pathControl.URL = nil;
 
-    self.gridVsListSegmentedControl.action = @selector(switchGridOrListMode:);
+    self.gridVsListSegmentedControl.action = @selector(setGridOrListMode:);
     self.gridVsListSegmentedControl.target = self;
-    self.gridVsListSegmentedControl.selectedSegment = 0;
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.hidden = YES;
-    _gridViewMode = YES;
+    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == 0;
 }
 
 - (void)reloadViews
 {
-    self.gridVsListSegmentedControl.action = @selector(switchGridOrListMode:);
+    self.gridVsListSegmentedControl.action = @selector(setGridOrListMode:);
     self.gridVsListSegmentedControl.target = self;
 
-    // Since we call switchGridOrListMode to do the actual reloading of the views,
-    // we set the gridViewMode to exactly what the segmented control ISN'T set to,
-    // as switchGridOrListMode will switch the state
-
-    // (The segmented control has the grid view button first, list view button second)
-    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == 1;
-    [self switchGridOrListMode:self];
+    [self setCurrentViewMode];
 }
 
 - (void)loadMediaSources
@@ -411,21 +405,28 @@ referenceSizeForHeaderInSection:(NSInteger)section
     [self reloadData];
 }
 
-- (void)switchGridOrListMode:(id)sender
+- (void)setCurrentViewMode
 {
-    _gridViewMode = !_gridViewMode;
-    _childDataSource.gridViewMode = _gridViewMode;
-
     if (_gridViewMode) {
         self.collectionViewScrollView.hidden = NO;
         self.tableView.hidden = YES;
-        self.gridVsListSegmentedControl.selectedSegment = 0;
         [self.collectionView reloadData];
     } else {
         self.collectionViewScrollView.hidden = YES;
         self.tableView.hidden = NO;
-        self.gridVsListSegmentedControl.selectedSegment = 1;
         [self.tableView reloadData];
+    }
+}
+
+- (void)setGridOrListMode:(id)sender
+{
+    _gridViewMode = self.gridVsListSegmentedControl.selectedSegment == 0;
+    _childDataSource.gridViewMode = _gridViewMode;
+
+    [self setCurrentViewMode];
+
+    if(sender != [[[VLCMain sharedInstance] libraryWindow] navigationStack]) {
+        [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
     }
 }
 
