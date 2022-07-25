@@ -265,6 +265,31 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return [mutableArray copy];
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+{
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return @[];
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return @[];
+    }
+    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_artist_tracks(p_mediaLibrary, NULL, _artistID);
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
+    for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
+        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
+        [mutableArray addObject:mediaItem];
+    }
+    vlc_ml_media_list_release(p_mediaList);
+    return [mutableArray copy];
+}
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return [[self tracksAsMediaItems] firstObject];
+}
+
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 {
     for(VLCMediaLibraryAlbum* album in self.albums) {
@@ -329,6 +354,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     }
     vlc_ml_media_list_release(p_mediaList);
     return [mutableArray copy];
+}
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return [[self tracksAsMediaItems] firstObject];
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
@@ -432,6 +462,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     }
     vlc_ml_media_list_release(p_mediaList);
     return [mutableArray copy];
+}
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return [[self tracksAsMediaItems] firstObject];
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
@@ -724,6 +759,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     }
     input_item_Release(p_inputItem);
     return inputItem;
+}
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return self;
 }
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;

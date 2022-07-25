@@ -126,11 +126,10 @@
         return;
     }
 
-    // TODO: Add handling for other types
-    if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-            [[[VLCMain sharedInstance] libraryController] showItemInFinder:mediaItem];
-        }];
+    VLCMediaLibraryMediaItem *firstMediaItem = _representedItem.firstMediaItem;
+
+    if(firstMediaItem) {
+        [[[VLCMain sharedInstance] libraryController] showItemInFinder:firstMediaItem];
     }
 }
 

@@ -121,6 +121,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) unsigned int numberOfAlbums;
 @property (readonly) unsigned int numberOfTracks;
 @property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
+@property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
 
 @end
 
