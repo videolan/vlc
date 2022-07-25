@@ -33,4 +33,8 @@ endif
 
 .rav1e: rav1e .cargo
 	+cd $< && $(CARGOC_INSTALL) --no-default-features $(RAV1E_FEATURES)
+# No gcc in Android NDK25
+ifdef HAVE_ANDROID
+	sed -i -e 's/ -lgcc//g' $(PREFIX)/lib/pkgconfig/rav1e.pc
+endif
 	touch $@
