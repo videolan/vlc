@@ -357,11 +357,18 @@ namespace
 
 RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 {
-    if (window() || qGuiApp)
-        setDPR(window() ? window()->devicePixelRatio() : qGuiApp->devicePixelRatio());
+    if (Q_LIKELY(qGuiApp))
+        setDPR(qGuiApp->devicePixelRatio());
 
     connect(this, &QQuickItem::heightChanged, this, &RoundImage::regenerateRoundImage);
     connect(this, &QQuickItem::widthChanged, this, &RoundImage::regenerateRoundImage);
+
+    connect(this, &QQuickItem::windowChanged, this, [this](const QQuickWindow* const window) {
+        if (window)
+            setDPR(window->devicePixelRatio());
+        else if (Q_LIKELY(qGuiApp))
+            setDPR(qGuiApp->devicePixelRatio());
+    });
 
     connect(this, &QQuickItem::windowChanged, this, &RoundImage::adjustQSGCustomGeometry);
 }
