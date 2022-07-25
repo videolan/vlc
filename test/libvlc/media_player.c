@@ -423,7 +423,7 @@ static void test_media_player_tracks(const char** argv, int argc)
         struct track *tracks = alltracks[i];
 
         libvlc_media_tracklist_t *tracklist =
-            libvlc_media_player_get_tracklist(mp, type);
+            libvlc_media_player_get_tracklist(mp, type, false);
         assert(tracklist);
         assert(libvlc_media_tracklist_count(tracklist) == track_count);
 
@@ -437,6 +437,17 @@ static void test_media_player_tracks(const char** argv, int argc)
             assert(libtrack->selected == track->selected);
         }
         libvlc_media_tracklist_delete(tracklist);
+
+        tracklist = libvlc_media_player_get_tracklist(mp, type, true);
+        assert(tracklist);
+        for (size_t j = 0; j < libvlc_media_tracklist_count(tracklist); ++j)
+        {
+            libtrack = libvlc_media_tracklist_at(tracklist, j);
+            assert(libtrack);
+            assert(libtrack->selected);
+        }
+        libvlc_media_tracklist_delete(tracklist);
+
     }
 
     /* Select (replace) a new audio track */
@@ -449,7 +460,7 @@ static void test_media_player_tracks(const char** argv, int argc)
 
     /* Add a new video track */
     libvlc_media_tracklist_t *tracklist =
-        libvlc_media_player_get_tracklist(mp, libvlc_track_video);
+        libvlc_media_player_get_tracklist(mp, libvlc_track_video, false);
     assert(tracklist);
 
     libvlc_media_track_t *vtrack1 =

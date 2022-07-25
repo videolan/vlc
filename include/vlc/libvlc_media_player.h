@@ -1339,6 +1339,8 @@ LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player
  *
  * \param p_mi the media player
  * \param type type of the track list to request
+ * \param selected filter only selected tracks if true (return all tracks, even
+ * selected ones if false)
  *
  * \return a valid libvlc_media_tracklist_t or NULL in case of error, if there
  * is no track for a category, the returned list will have a size of 0, delete
@@ -1346,8 +1348,7 @@ LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player
  */
 LIBVLC_API libvlc_media_tracklist_t *
 libvlc_media_player_get_tracklist( libvlc_media_player_t *p_mi,
-                                   libvlc_track_type_t type );
-
+                                   libvlc_track_type_t type, bool selected );
 
 /**
  * Get the selected track for one type

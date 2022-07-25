@@ -1895,14 +1895,14 @@ void libvlc_media_player_set_video_title_display( libvlc_media_player_t *p_mi, l
 
 libvlc_media_tracklist_t *
 libvlc_media_player_get_tracklist(libvlc_media_player_t *p_mi,
-                                  libvlc_track_type_t type)
+                                  libvlc_track_type_t type, bool selected)
 {
     vlc_player_t *player = p_mi->player;
 
     vlc_player_Lock(player);
 
     libvlc_media_tracklist_t *list =
-        libvlc_media_tracklist_from_player(player, type, false);
+        libvlc_media_tracklist_from_player(player, type, selected);
 
     vlc_player_Unlock(player);
 
