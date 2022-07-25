@@ -99,6 +99,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @protocol VLCMediaLibraryItemProtocol <NSObject>
 
+@property (readonly) BOOL smallArtworkGenerated;
 @property (readonly) NSImage *smallArtworkImage;
 @property (readonly) NSString *smallArtworkMRL;
 @property (readonly) NSString *displayString;
@@ -182,10 +183,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) float progress;
 @property (readonly) NSString *title;
 
-@property (readonly, nullable) NSString *smallArtworkMRL;
-@property (readonly, nullable) NSImage *smallArtworkImage;
-
-@property (readonly) BOOL smallArtworkGenerated;
 @property (readonly) BOOL favorited;
 
 @property (readonly, nullable) VLCMediaLibraryShowEpisode *showEpisode;

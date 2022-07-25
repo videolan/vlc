@@ -59,27 +59,29 @@ float kVLCDefaultThumbnailPosition = .15;
     return sharedImageCache;
 }
 
-+ (NSImage *)thumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
++ (NSImage *)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
-    return [[VLCLibraryImageCache sharedImageCache] imageForMediaItem:mediaItem];
+    return [[VLCLibraryImageCache sharedImageCache] imageForLibraryItem:libraryItem];
 }
 
-- (NSImage *)imageForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+- (NSImage *)imageForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
-    NSImage *cachedImage = [_imageCache objectForKey:mediaItem.smallArtworkMRL];
+    NSImage *cachedImage = [_imageCache objectForKey:libraryItem.smallArtworkMRL];
     if (cachedImage) {
         return cachedImage;
     }
-    return [self smallThumbnailForMediaItem:mediaItem];
+    return [self smallThumbnailForLibraryItem:libraryItem];
 }
 
-- (NSImage *)smallThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+- (NSImage *)smallThumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     NSImage *image;
-    NSString *artworkMRL = mediaItem.smallArtworkMRL;
-    if (mediaItem.smallArtworkGenerated) {
+    NSString *artworkMRL = libraryItem.smallArtworkMRL;
+    if (libraryItem.smallArtworkGenerated) {
         image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:artworkMRL]];
-    } else {
+    } else if ([libraryItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
+        VLCMediaLibraryMediaItem* mediaItem = (VLCMediaLibraryMediaItem*)libraryItem;
+        
         if (mediaItem.mediaType != VLC_ML_MEDIA_TYPE_AUDIO) {
             [self generateThumbnailForMediaItem:mediaItem.libraryID];
         }

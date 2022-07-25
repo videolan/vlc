@@ -23,7 +23,6 @@
 #import "VLCLibraryDataTypes.h"
 
 #import "main/VLCMain.h"
-#import "extensions/NSImage+Helpers.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryImageCache.h"
@@ -183,6 +182,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryArtist
 
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
 + (nullable instancetype)artistWithID:(int64_t)artistID
@@ -210,7 +210,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         _artistID = p_artist->i_id;
         _name = toNSStr(p_artist->psz_name);
         _shortBiography = toNSStr(p_artist->psz_shortbio);
-        _smallArtworkMRL = toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
+        _smallArtworkGenerated = p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
         _numberOfTracks = p_artist->i_nb_tracks;
@@ -220,7 +221,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSImage *)smallArtworkImage
 {
-    return [NSImage artworkOrPlaceholderFromMrl:_smallArtworkMRL];
+    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
+    if (!image) {
+        image = [NSImage imageNamed:@"noart.png"];
+    }
+    return image;
 }
 
 - (NSString *)displayString
@@ -301,6 +306,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryAlbum
 
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album
@@ -310,7 +316,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         _albumID = p_album->i_id;
         _title = toNSStr(p_album->psz_title);
         _summary = toNSStr(p_album->psz_summary);
-        _smallArtworkMRL = toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
+        _smallArtworkGenerated = p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
         _artistName = toNSStr(p_album->psz_artist);
         _artistID = p_album->i_artist_id;
         _numberOfTracks = p_album->i_nb_tracks;
@@ -322,7 +329,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSImage *)smallArtworkImage
 {
-    return [NSImage artworkOrPlaceholderFromMrl:_smallArtworkMRL];
+    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
+    if (!image) {
+        image = [NSImage imageNamed:@"noart.png"];
+    }
+    return image;
 }
 
 
@@ -372,6 +383,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryGenre
 
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre
@@ -381,13 +393,19 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         _genreID = p_genre->i_id;
         _name = toNSStr(p_genre->psz_name);
         _numberOfTracks = p_genre->i_nb_tracks;
+        _smallArtworkGenerated = p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
     }
     return self;
 }
 
 - (NSImage *)smallArtworkImage
 {
-    return [NSImage artworkOrPlaceholderFromMrl:_smallArtworkMRL];
+    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
+    if (!image) {
+        image = [NSImage imageNamed:@"noart.png"];
+    }
+    return image;
 }
 
 - (NSString *)displayString
@@ -508,6 +526,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 #pragma mark - initialization
 
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
@@ -597,11 +616,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         _progress = p_mediaItem->f_progress;
         _title = toNSStr(p_mediaItem->psz_title);
         _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
-        if (_smallArtworkGenerated) {
-            _smallArtworkMRL = toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl);
-        } else {
-            _smallArtworkMRL = nil;
-        }
+        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
         _favorited = p_mediaItem->b_is_favorite;
 
         switch (p_mediaItem->i_subtype) {
@@ -732,7 +747,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSImage *)smallArtworkImage
 {
-    NSImage *image = [VLCLibraryImageCache thumbnailForMediaItem:self];
+    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
     if (!image) {
         image = [NSImage imageNamed:@"noart.png"];
     }
