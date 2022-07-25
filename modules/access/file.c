@@ -73,7 +73,19 @@ typedef struct
 #if !defined (_WIN32) && !defined (__OS2__)
 static bool IsRemote (int fd)
 {
-#if defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
+#if defined(__APPLE__)
+    /* This has to preceed the general fstatvfs implmentation below,
+     * as even though Darwin has fstatvfs, it does not expose the
+     * MNT_LOCAL in the statvfs.f_flag field.
+     */
+    struct statfs sfs;
+
+    if (fstatfs (fd, &sfs))
+        return false;
+
+    return !((sfs.f_flags & MNT_LOCAL) == MNT_LOCAL);
+
+#elif defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
     struct statvfs stf;
 
     if (fstatvfs (fd, &stf))
