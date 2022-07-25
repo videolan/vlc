@@ -117,7 +117,7 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
 
 libvlc_media_tracklist_t *
 libvlc_media_tracklist_from_player( vlc_player_t *player,
-                                    libvlc_track_type_t type );
+                                    libvlc_track_type_t type, bool selected );
 
 void
 libvlc_media_track_clean( libvlc_media_track_t *track );

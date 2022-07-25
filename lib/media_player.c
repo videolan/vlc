@@ -1902,7 +1902,7 @@ libvlc_media_player_get_tracklist(libvlc_media_player_t *p_mi,
     vlc_player_Lock(player);
 
     libvlc_media_tracklist_t *list =
-        libvlc_media_tracklist_from_player(player, type);
+        libvlc_media_tracklist_from_player(player, type, false);
 
     vlc_player_Unlock(player);
 
