@@ -247,11 +247,26 @@ libvlc_media_track_create_from_player_track( const struct vlc_player_track *trac
 
 libvlc_media_tracklist_t *
 libvlc_media_tracklist_from_player( vlc_player_t *player,
-                                    libvlc_track_type_t type )
+                                    libvlc_track_type_t type, bool selected )
 {
     const enum es_format_category_e cat = libvlc_track_type_to_escat( type );
 
     size_t count = vlc_player_GetTrackCount( player, cat );
+
+    if( selected )
+    {
+        size_t selected_count = 0;
+        for( size_t i = 0; i < count; ++i )
+        {
+            const struct vlc_player_track *track =
+                vlc_player_GetTrackAt( player, cat, i );
+            assert( track );
+            if( track->selected )
+                selected_count++;
+        }
+        count = selected_count;
+    }
+
     libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
 
     if( count == 0 || list == NULL )
@@ -262,6 +277,9 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
         const struct vlc_player_track *track =
             vlc_player_GetTrackAt( player, cat, i );
         assert( track );
+
+        if( selected && !track->selected )
+            continue;
 
         libvlc_media_trackpriv_t *trackpriv = libvlc_media_trackpriv_new();
         if( trackpriv == NULL )
