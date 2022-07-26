@@ -182,12 +182,14 @@ FocusScope {
                     Widgets.MenuCaption {
                         text: "<b>" + I18n.qtr("File Name:") + "</b> " + expandRect.model.fileName
                         width: parent.width
+                        textFormat: Text.StyledText
                     }
 
                     Widgets.MenuCaption {
                         text: "<b>" + I18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
                         topPadding: VLCStyle.margin_xsmall
                         width: parent.width
+                        textFormat: Text.StyledText
                     }
 
                     MouseArea {
