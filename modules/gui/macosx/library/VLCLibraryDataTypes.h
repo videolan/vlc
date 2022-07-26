@@ -99,6 +99,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @protocol VLCMediaLibraryItemProtocol <NSObject>
 
+@property (readonly) int64_t libraryID;
 @property (readonly) BOOL smallArtworkGenerated;
 @property (readonly) NSImage *smallArtworkImage;
 @property (readonly) NSString *smallArtworkMRL;
@@ -115,7 +116,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 + (nullable instancetype)artistWithID:(int64_t)artistID;
 - (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
 
-@property (readonly) int64_t artistID;
 @property (readonly) NSString *name;
 @property (readonly) NSString *shortBiography;
 @property (readonly) NSString *musicBrainzID;
@@ -130,7 +130,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album;
 
-@property (readonly) int64_t albumID;
 @property (readonly) NSString *title;
 @property (readonly) NSString *summary;
 @property (readonly) NSString *artistName;
@@ -146,7 +145,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre;
 
-@property (readonly) int64_t genreID;
 @property (readonly) NSString *name;
 @property (readonly) size_t numberOfTracks;
 @property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
@@ -165,7 +163,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 - (nullable instancetype)initWithExternalURL:(NSURL *)url;
 - (nullable instancetype)initWithStreamURL:(NSURL *)url;
 
-@property (readonly) int64_t libraryID;
 @property (readonly) vlc_ml_media_type_t mediaType;
 @property (readonly) NSString *readableMediaType;
 @property (readonly) vlc_ml_media_subtype_t mediaSubType;

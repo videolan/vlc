@@ -182,6 +182,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryArtist
 
+@synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
@@ -207,7 +208,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 {
     self = [super init];
     if (self && p_artist != NULL) {
-        _artistID = p_artist->i_id;
+        _libraryID = p_artist->i_id;
         _name = toNSStr(p_artist->psz_name);
         _shortBiography = toNSStr(p_artist->psz_shortbio);
         _smallArtworkGenerated = p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
@@ -260,7 +261,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     if (!p_mediaLibrary) {
         return @[];
     }
-    vlc_ml_album_list_t *p_albumList = vlc_ml_list_artist_albums(p_mediaLibrary, NULL, _artistID);
+    vlc_ml_album_list_t *p_albumList = vlc_ml_list_artist_albums(p_mediaLibrary, NULL, _libraryID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
     for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
         VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
@@ -280,7 +281,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     if (!p_mediaLibrary) {
         return @[];
     }
-    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_artist_tracks(p_mediaLibrary, NULL, _artistID);
+    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_artist_tracks(p_mediaLibrary, NULL, _libraryID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
     for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
         VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
@@ -306,6 +307,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryAlbum
 
+@synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
@@ -313,7 +315,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 {
     self = [super init];
     if (self && p_album != NULL) {
-        _albumID = p_album->i_id;
+        _libraryID = p_album->i_id;
         _title = toNSStr(p_album->psz_title);
         _summary = toNSStr(p_album->psz_summary);
         _smallArtworkGenerated = p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
@@ -357,7 +359,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     if (!p_mediaLibrary) {
         return @[];
     }
-    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_album_tracks(p_mediaLibrary, NULL, _albumID);
+    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_album_tracks(p_mediaLibrary, NULL, _libraryID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
     for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
         VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
@@ -383,6 +385,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryGenre
 
+@synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 
@@ -390,7 +393,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 {
     self = [super init];
     if (self && p_genre != NULL) {
-        _genreID = p_genre->i_id;
+        _libraryID = p_genre->i_id;
         _name = toNSStr(p_genre->psz_name);
         _numberOfTracks = p_genre->i_nb_tracks;
         _smallArtworkGenerated = p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
@@ -432,7 +435,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     if (!p_mediaLibrary) {
         return @[];
     }
-    vlc_ml_album_list_t *p_albumList = vlc_ml_list_genre_albums(p_mediaLibrary, NULL, _genreID);
+    vlc_ml_album_list_t *p_albumList = vlc_ml_list_genre_albums(p_mediaLibrary, NULL, _libraryID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
     for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
         VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
@@ -452,7 +455,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     if (!p_mediaLibrary) {
         return @[];
     }
-    vlc_ml_artist_list_t *p_artistList = vlc_ml_list_genre_artists(p_mediaLibrary, NULL, _genreID);
+    vlc_ml_artist_list_t *p_artistList = vlc_ml_list_genre_artists(p_mediaLibrary, NULL, _libraryID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artistList->i_nb_items];
     for (size_t x = 0; x < p_artistList->i_nb_items; x++) {
         VLCMediaLibraryArtist *artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artistList->p_items[x]];
@@ -472,7 +475,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     if (!p_mediaLibrary) {
         return @[];
     }
-    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_genre_tracks(p_mediaLibrary, NULL, _genreID);
+    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_genre_tracks(p_mediaLibrary, NULL, _libraryID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
     for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
         VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
@@ -526,6 +529,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 #pragma mark - initialization
 
+@synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 

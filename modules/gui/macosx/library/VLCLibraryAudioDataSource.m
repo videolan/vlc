@@ -269,7 +269,7 @@
         case VLC_ML_PARENT_ARTIST:
         {
             VLCMediaLibraryArtist *artist = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            NSArray *albumsForArtist = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.artistID];
+            NSArray *albumsForArtist = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.libraryID];
             _groupDataSource.representedListOfAlbums = albumsForArtist;
             break;
         }
@@ -288,7 +288,7 @@
         case VLC_ML_PARENT_GENRE:
         {
             VLCMediaLibraryGenre *genre = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            NSArray *albumsForGenre = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.genreID];
+            NSArray *albumsForGenre = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.libraryID];
             _groupDataSource.representedListOfAlbums = albumsForGenre;
             break;
         }
@@ -329,7 +329,7 @@
         case VLC_ML_PARENT_ARTIST:
         {
             VLCMediaLibraryArtist *artist = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.artistID];
+            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.libraryID];
             break;
         }
         case VLC_ML_PARENT_ALBUM:
@@ -347,7 +347,7 @@
         case VLC_ML_PARENT_GENRE:
         {
             VLCMediaLibraryGenre *genre = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.genreID];
+            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.libraryID];
             break;
         }
         default:

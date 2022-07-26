@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryInformationPanel">
             <connections>
                 <outlet property="imageView" destination="N4h-LP-IRY" id="Ned-Ju-hyu"/>
-                <outlet property="multiLineTextLabel" destination="OhC-hA-R2H" id="Q6T-Ol-Gdc"/>
+                <outlet property="textView" destination="BG5-o2-dKa" id="Q6T-Ol-Gdc"/>
                 <outlet property="window" destination="oPi-wT-0nK" id="ODs-Hv-85I"/>
             </connections>
         </customObject>
@@ -17,36 +17,63 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="oPi-wT-0nK" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="136" y="189" width="595" height="512"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="contentRect" x="136" y="189" width="512" height="640"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <value key="minSize" type="size" width="386" height="227"/>
-            <view key="contentView" misplaced="YES" id="Nfs-rF-cUN">
-                <rect key="frame" x="0.0" y="0.0" width="595" height="403"/>
+            <view key="contentView" id="Nfs-rF-cUN">
+                <rect key="frame" x="0.0" y="0.0" width="512" height="640"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="N4h-LP-IRY">
-                        <rect key="frame" x="20" y="20" width="555" height="347"/>
+                        <rect key="frame" x="20" y="20" width="472" height="295"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="N4h-LP-IRY" secondAttribute="height" multiplier="16:10" id="bqe-XE-yWC"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="8o3-U6-XgQ"/>
                     </imageView>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="OhC-hA-R2H">
-                        <rect key="frame" x="18" y="367" width="559" height="16"/>
-                        <textFieldCell key="cell" selectable="YES" title="Multiline Label" id="caT-3r-bkd">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="selectedMenuItemTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qS0-eY-moI">
+                        <rect key="frame" x="20" y="335" width="472" height="285"/>
+                        <clipView key="contentView" drawsBackground="NO" id="a0y-wC-gCb">
+                            <rect key="frame" x="0.0" y="0.0" width="457" height="285"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="BG5-o2-dKa">
+                                    <rect key="frame" x="0.0" y="0.0" width="457" height="285"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" red="0.89527153969999995" green="0.9043967128" blue="0.92996197940000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <size key="minSize" width="457" height="285"/>
+                                    <size key="maxSize" width="555" height="10000000"/>
+                                    <attributedString key="textStorage">
+                                        <fragment content="Media info">
+                                            <attributes>
+                                                <color key="NSColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                <font key="NSFont" metaFont="system"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                    <color key="insertionPointColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="zeg-Td-OE6">
+                            <rect key="frame" x="-100" y="-100" width="225" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="b3U-Br-b1q">
+                            <rect key="frame" x="457" y="0.0" width="15" height="285"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="OhC-hA-R2H" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" constant="20" id="BVL-Xu-cDU"/>
+                    <constraint firstAttribute="trailing" secondItem="qS0-eY-moI" secondAttribute="trailing" constant="20" id="5zW-yH-q6o"/>
+                    <constraint firstItem="qS0-eY-moI" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" constant="20" id="XAb-wK-mSu"/>
                     <constraint firstAttribute="trailing" secondItem="N4h-LP-IRY" secondAttribute="trailing" constant="20" id="cEY-J9-usm"/>
                     <constraint firstItem="N4h-LP-IRY" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" constant="20" id="kKf-aB-0vG"/>
-                    <constraint firstItem="N4h-LP-IRY" firstAttribute="top" secondItem="OhC-hA-R2H" secondAttribute="bottom" id="mhR-pO-oDr"/>
-                    <constraint firstItem="OhC-hA-R2H" firstAttribute="top" secondItem="Nfs-rF-cUN" secondAttribute="top" constant="20" id="ugM-Yv-u0C"/>
-                    <constraint firstAttribute="trailing" secondItem="OhC-hA-R2H" secondAttribute="trailing" constant="20" id="yEE-lN-RaR"/>
+                    <constraint firstItem="qS0-eY-moI" firstAttribute="bottom" secondItem="N4h-LP-IRY" secondAttribute="top" constant="-20" id="mH4-ni-caL"/>
+                    <constraint firstItem="qS0-eY-moI" firstAttribute="top" secondItem="Nfs-rF-cUN" secondAttribute="top" constant="20" id="p0Y-Nb-dxf"/>
                     <constraint firstAttribute="bottom" secondItem="N4h-LP-IRY" secondAttribute="bottom" constant="20" id="zc5-8x-CjC"/>
                 </constraints>
             </view>

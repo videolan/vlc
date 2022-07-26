@@ -153,12 +153,8 @@
         _informationPanel = [[VLCLibraryInformationPanel alloc] initWithWindowNibName:@"VLCLibraryInformationPanel"];
     }
 
-    // TODO: Add handling for the other types
-    if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
-        [_informationPanel setRepresentedMediaItem:mediaItem];
-        [_informationPanel showWindow:self];
-    }
+    [_informationPanel setRepresentedItem:_representedItem];
+    [_informationPanel showWindow:self];
     
 }
 
