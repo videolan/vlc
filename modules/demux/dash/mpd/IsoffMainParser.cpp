@@ -507,6 +507,8 @@ void IsoffMainParser::parseTimeline(Node *node, AbstractMultipleSegmentBaseType 
         number = Integer<uint64_t>(node->getAttributeValue("startNumber"));
     else if(base->inheritStartNumber())
         number = base->inheritStartNumber();
+    if(number == std::numeric_limits<uint64_t>::max())
+        number = 1;
 
     SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(base);
     if(timeline)
