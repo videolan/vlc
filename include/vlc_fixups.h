@@ -105,7 +105,9 @@ typedef struct
 
 #if !defined (HAVE_GETDELIM) || \
     !defined (HAVE_GETPID)   || \
-    !defined (HAVE_SWAB)
+    !defined (HAVE_SWAB) || \
+    !defined (HAVE_WRITEV) || \
+    !defined (HAVE_READV)
 # include <sys/types.h> /* ssize_t, pid_t */
 #endif
 
