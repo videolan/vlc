@@ -162,6 +162,11 @@ ifdef HAVE_ANDROID
 ifneq ($(shell $(VPX_CROSS)gcc -v >/dev/null 2>&1 || echo FAIL),)
 VPX_HOSTVARS = $(HOSTVARS)
 endif
+
+# Depends on "arm-linux-androideabi-as" that is removed in NDK25
+ifeq ($(ARCH),arm)
+VPX_CONF += --disable-neon_asm
+endif
 endif
 
 .vpx: libvpx
