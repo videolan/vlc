@@ -34,6 +34,8 @@ Rectangle {
     property real noiseStrength: 0.02
     property real exclusionStrength: 0.09
 
+    opacity: source.opacity
+
     FastBlur {
         id: blurEffect
 
@@ -64,6 +66,8 @@ Rectangle {
                 uniform lowp sampler2D source; // this item
                 varying highp vec2 qt_TexCoord0;
 
+                uniform lowp float qt_Opacity;
+                
                 uniform lowp vec4  tint;
 
                 uniform lowp float exclusionStrength;
@@ -88,7 +92,7 @@ Rectangle {
 
                    blurred = exclude(blurred, exclColor);
 
-                   gl_FragColor = mix(blurred, tint, tintStrength) + noise;
+                   gl_FragColor = (mix(blurred, tint, tintStrength) + noise) * qt_Opacity;
                 }"
         }
     }
