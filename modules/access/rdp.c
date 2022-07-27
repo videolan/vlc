@@ -97,7 +97,7 @@ typedef struct
     vlc_thread_t thread;
     freerdp *p_instance;
     block_t *p_block;
-    int i_framebuffersize;
+    unsigned i_framebuffersize;
 
     float f_fps;
     int i_frame_interval;
@@ -166,7 +166,12 @@ static BOOL desktopResizeHandler( rdpContext *p_context )
     fmt.video.i_height = p_gdi->height;
     fmt.video.i_frame_rate_base = 1000;
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
-    p_sys->i_framebuffersize = p_gdi->width * p_gdi->height * (i_colordepth >> 3);
+    if ( umul_overflow( p_gdi->width, p_gdi->height, &p_sys->i_framebuffersize ) &&
+         umul_overflow( p_sys->i_framebuffersize, i_colordepth >> 3, &p_sys->i_framebuffersize) )
+    {
+        msg_Err( p_vlccontext->p_demux, "framebuffer size overflow");
+        return FALSE;
+    }
 
     if ( p_sys->p_block )
         p_sys->p_block = block_Realloc( p_sys->p_block, 0, p_sys->i_framebuffersize );
@@ -194,7 +199,7 @@ static BOOL endPaintHandler( rdpContext *p_context )
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
     rdpGdi *p_gdi = p_context->gdi;
 
-    if ( p_sys->p_block )
+    if ( p_sys->p_block && p_gdi->primary_buffer )
     {
         p_sys->p_block->i_buffer = p_sys->i_framebuffersize;
         memcpy( p_sys->p_block->p_buffer, p_gdi->primary_buffer, p_sys->p_block->i_buffer );
