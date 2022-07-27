@@ -300,9 +300,6 @@ Control {
 
             dragAutoScrollDragItem: dragItem
 
-            fadeColor: background.usingAcrylic ? undefined
-                                               : background.alternativeColor
-
             property int shiftIndex: -1
 
             property Item itemContainsDrag: null

@@ -25,17 +25,10 @@ import "qrc:///style/"
 import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
 
-ListView {
+FadingEdgeListView {
     id: root
 
     // Properties
-
-    property int fadeSize: root.delegateItem
-                           ? (orientation === Qt.Vertical ? root.delegateItem.height
-                                                          : root.delegateItem.width) / 2
-                           : (VLCStyle.margin_large * 2)
-
-    property var fadeColor: undefined // fading will only work when fade color is defined
 
     // NOTE: We want buttons to be centered vertically but configurable.
     property int buttonMargin: height / 2 - buttonLeft.height / 2
@@ -43,54 +36,6 @@ ListView {
     readonly property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
     property bool keyNavigationWraps : false
-
-    // TODO: Use itemAtIndex(0) Qt >= 5.13
-    // FIXME: Delegate with variable size
-    readonly property Item delegateItem: root.contentItem.children.length > 0
-                                         ? root.contentItem.children[root.contentItem.children.length - 1]
-                                         : null
-
-    readonly property bool transitionsRunning: ((root.add ? root.add.running : false) ||
-                                                (root.addDisplaced ? root.addDisplaced.running : false) ||
-                                                (root.populate ? root.populate.running : false) ||
-                                                (root.remove ? root.remove.running : false) ||
-                                                (root.removeDisplaced ? root.removeDisplaced.running : false))
-
-    readonly property Item firstVisibleItem: {
-        if (transitionsRunning || !delegateItem)
-            return null
-
-        var margin = -root.displayMarginBeginning
-        if (orientation === Qt.Vertical) {
-            if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
-                margin += headerItem.height
-
-            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + margin)
-        } else {
-            if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
-                margin += headerItem.width
-
-            return itemAt(contentX + margin, contentY + (delegateItem.y + delegateItem.height / 2))
-        }
-    }
-
-    readonly property Item lastVisibleItem: {
-        if (transitionsRunning || !delegateItem)
-            return null
-
-        var margin = -root.displayMarginEnd
-        if (orientation === Qt.Vertical) {
-            if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
-                margin += footerItem.height
-
-            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + height - margin - 1)
-        } else {
-            if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
-                margin += footerItem.width
-
-            return itemAt(contentX + width - margin - 1, contentY + (delegateItem.y + delegateItem.height / 2))
-        }
-    }
 
     // Private
 
@@ -124,9 +69,6 @@ ListView {
 
     property int _currentFocusReason: Qt.OtherFocusReason
 
-    readonly property bool _fadeRectEnoughSize: (root.orientation === Qt.Vertical
-                                                 ? root.height
-                                                 : root.width) > (fadeSize * 2 + VLCStyle.dp(25))
 
     // Settings
 
@@ -191,6 +133,9 @@ ListView {
 
     // NOTE: We always want a valid 'currentIndex' by default.
     onCountChanged: if (count && currentIndex === -1) currentIndex = 0
+
+    disableBeginningFade: (dragAutoScrollHandler.scrollingDirection === Util.ViewDragAutoScrollHandler.Backward)
+    disableEndFade: (dragAutoScrollHandler.scrollingDirection === Util.ViewDragAutoScrollHandler.Forward)
 
     Keys.onPressed: {
         var newIndex = -1
@@ -332,156 +277,6 @@ ListView {
             if (!headerItem.focus) {
                 currentItem.focus = true
             }
-        }
-    }
-
-    // TODO: Make fade rectangle inline component when Qt >= 5.15
-    LinearGradient {
-        id: fadeRectStart
-
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: root.orientation === Qt.Vertical ? parent.right : undefined
-            bottom: root.orientation === Qt.Horizontal ? root.bottom : undefined
-            topMargin: root.orientation === Qt.Vertical ? ((root.headerItem &&
-                                                            root.headerItem.visible &&
-                                                            (root.headerPositioning === ListView.OverlayHeader)) ? root.headerItem.height
-                                                                                                                 : 0) - root.displayMarginBeginning
-                                                        : 0
-            leftMargin: root.orientation === Qt.Horizontal ? ((root.headerItem &&
-                                                               root.headerItem.visible &&
-                                                               (root.headerPositioning === ListView.OverlayHeader)) ? root.headerItem.width
-                                                                                                                    : 0) - root.displayMarginBeginning
-                                                           : 0
-        }
-
-        implicitHeight: fadeSize
-        implicitWidth: fadeSize
-
-        visible: (opacity !== 0.0)
-        opacity: 0.0
-
-        readonly property bool requestShow: !root.firstVisibleItem ||
-                                            (!root.firstVisibleItem.activeFocus &&
-                                             // TODO: Qt >5.12 use HoverHandler within the fade:
-                                             !Helpers.get(root.firstVisibleItem, "hovered", false)) &&
-                                            (dragAutoScrollHandler.scrollingDirection !== Util.ViewDragAutoScrollHandler.Backward)
-
-        state: (!!root.fadeColor &&
-                root._fadeRectEnoughSize &&
-                requestShow &&
-                (orientation === ListView.Vertical ? !root.atYBeginning
-                                                   : !root.atXBeginning)) ? "shown"
-                                                                          : ""
-
-        states: State {
-            name: "shown"
-            PropertyChanges {
-                target: fadeRectStart
-                opacity: 1.0
-            }
-        }
-
-        transitions: Transition {
-            from: ""; to: "shown"
-            reversible: true
-
-            NumberAnimation {
-                property: "opacity"
-                duration: VLCStyle.duration_short
-                easing.type: Easing.InOutSine
-            }
-        }
-
-        start: Qt.point(0, 0)
-
-        end: {
-            if (root.orientation === ListView.Vertical) {
-                return Qt.point(0, fadeRectStart.height)
-            } else {
-                return Qt.point(fadeRectStart.width, 0)
-            }
-        }
-
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: !!fadeColor ? fadeColor : "transparent" }
-            GradientStop { position: 1.0; color: "transparent" }
-        }
-    }
-
-    LinearGradient {
-        id: fadeRectEnd
-
-        anchors {
-            top: root.orientation === Qt.Horizontal ? parent.top : undefined
-            left: root.orientation === Qt.Vertical ? parent.left : undefined
-            right: parent.right
-            bottom: parent.bottom
-
-            bottomMargin: root.orientation === Qt.Vertical ? ((root.footerItem &&
-                                                               root.footerItem.visible &&
-                                                               (root.footerPositioning === ListView.OverlayFooter)) ? root.footerItem.height
-                                                                                                                    : 0) - root.displayMarginEnd
-                                                           : 0
-            rightMargin: root.orientation === Qt.Horizontal ? ((root.footerItem &&
-                                                                root.footerItem.visible &&
-                                                                (root.headerPositioning === ListView.OverlayFooter)) ? root.footerItem.width
-                                                                                                                     : 0) - root.displayMarginEnd
-                                                            : 0
-        }
-
-        implicitHeight: fadeSize
-        implicitWidth: fadeSize
-
-        visible: opacity !== 0.0
-        opacity: 0.0
-
-        readonly property bool requestShow: !root.lastVisibleItem ||
-                                            (!root.lastVisibleItem.activeFocus &&
-                                             // TODO: Qt >5.12 use HoverHandler within the fade:
-                                             !Helpers.get(root.lastVisibleItem, "hovered", false)) &&
-                                            (dragAutoScrollHandler.scrollingDirection !== Util.ViewDragAutoScrollHandler.Forward)
-
-        state: (!!root.fadeColor &&
-                root._fadeRectEnoughSize &&
-                requestShow &&
-                (orientation === ListView.Vertical ? !root.atYEnd
-                                                   : !root.atXEnd)) ? "shown"
-                                                                    : ""
-
-        states: State {
-            name: "shown"
-            PropertyChanges {
-                target: fadeRectEnd
-                opacity: 1.0
-            }
-        }
-
-        transitions: Transition {
-            from: ""; to: "shown"
-            reversible: true
-
-            NumberAnimation {
-                property: "opacity"
-                duration: VLCStyle.duration_short
-                easing.type: Easing.InOutSine
-            }
-        }
-
-        start: Qt.point(0, 0)
-
-        end: {
-            if (root.orientation === ListView.Vertical) {
-                return Qt.point(0, fadeRectEnd.height)
-            } else {
-                return Qt.point(fadeRectEnd.width, 0)
-            }
-        }
-
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 1.0; color: !!fadeColor ? fadeColor : "transparent" }
         }
     }
 

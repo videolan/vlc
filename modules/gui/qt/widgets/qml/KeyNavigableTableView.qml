@@ -97,7 +97,6 @@ FocusScope {
     property alias footerItem: view.footerItem
     property alias footer: view.footer
 
-    property alias fadeColor: view.fadeColor
     property alias fadeSize: view.fadeSize
 
     property alias add:       view.add
@@ -211,8 +210,6 @@ FocusScope {
         focus: true
 
         headerPositioning: ListView.OverlayHeader
-
-        fadeColor: VLCStyle.colors.bg
 
         onDeselectAll: {
             if (selectionDelegateModel) {

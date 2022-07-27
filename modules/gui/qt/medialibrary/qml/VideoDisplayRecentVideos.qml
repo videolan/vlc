@@ -95,8 +95,6 @@ FocusScope {
 
             focus: true
 
-            fadeColor: VLCStyle.colors.bg
-
             Navigation.parentItem: root
 
             visible: listView.count > 0
