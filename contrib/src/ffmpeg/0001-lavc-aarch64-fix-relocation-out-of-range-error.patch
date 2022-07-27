@@ -1,0 +1,35 @@
+From 378ad2f8fd7c5b5d9d1b3170282ce6b8a289ba07 Mon Sep 17 00:00:00 2001
+From: Zhao Zhili <zhilizhao@tencent.com>
+Date: Mon, 13 Sep 2021 15:24:09 +0800
+Subject: [PATCH] lavc/aarch64: fix relocation out of range error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Use a temporary label instead of global function symbol for b.gt.
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+---
+ libavcodec/aarch64/videodsp.S | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libavcodec/aarch64/videodsp.S b/libavcodec/aarch64/videodsp.S
+index 24067cc2af..fe2da0658e 100644
+--- a/libavcodec/aarch64/videodsp.S
++++ b/libavcodec/aarch64/videodsp.S
+@@ -19,10 +19,11 @@
+ #include "libavutil/aarch64/asm.S"
+ 
+ function ff_prefetch_aarch64, export=1
++1:
+         subs            w2,  w2,  #2
+         prfm            pldl1strm, [x0]
+         prfm            pldl1strm, [x0,  x1]
+         add             x0,  x0,  x1,  lsl #1
+-        b.gt            X(ff_prefetch_aarch64)
++        b.gt            1b
+         ret
+ endfunc
+-- 
+2.35.1
+
