@@ -38,16 +38,19 @@
     if (!_libraryModel) {
         return 0;
     }
-    if (collectionView == self.recentMediaCollectionView) {
-        return [_libraryModel numberOfRecentMedia];
-    }
 
-    return [_libraryModel numberOfVideoMedia];
+    switch(section) {
+        case VLCVideoLibraryRecentsSection:
+            return [_libraryModel numberOfRecentMedia];
+        case VLCVideoLibraryLibrarySection:
+        default:
+            return [_libraryModel numberOfVideoMedia];
+    }
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
-    return 1;
+    return 2;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
@@ -56,10 +59,14 @@
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
 
     NSArray *mediaArray;
-    if (collectionView == self.recentMediaCollectionView) {
-        mediaArray = [_libraryModel listOfRecentMedia];
-    } else {
-        mediaArray = [_libraryModel listOfVideoMedia];
+    switch(indexPath.section) {
+        case VLCVideoLibraryRecentsSection:
+            mediaArray = [_libraryModel listOfRecentMedia];
+            break;
+        case VLCVideoLibraryLibrarySection:
+        default:
+            mediaArray = [_libraryModel listOfVideoMedia];
+            break;
     }
 
     viewItem.representedItem = mediaArray[indexPath.item];
@@ -74,11 +81,17 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     VLCLibraryCollectionViewSupplementaryElementView *view = [collectionView makeSupplementaryViewOfKind:kind
                                                                                           withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
                                                                                             forIndexPath:indexPath];
-    if (collectionView == self.recentMediaCollectionView) {
-        view.stringValue = _NS("Recent");
-    } else {
-        view.stringValue = _NS("Library");
+
+    switch(indexPath.section) {
+        case VLCVideoLibraryRecentsSection:
+            view.stringValue = _NS("Recent");
+            break;
+        case VLCVideoLibraryLibrarySection:
+        default:
+            view.stringValue = _NS("Library");
+            break;
     }
+
     return view;
 }
 
@@ -95,12 +108,7 @@ canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
           toPasteboard:(NSPasteboard *)pasteboard
 {
-    NSArray *mediaArray;
-    if (collectionView == self.recentMediaCollectionView) {
-        mediaArray = [_libraryModel listOfRecentMedia];
-    } else {
-        mediaArray = [_libraryModel listOfVideoMedia];
-    }
+    NSArray *mediaArray = [_libraryModel listOfVideoMedia];
 
     NSUInteger numberOfIndexPaths = indexPaths.count;
     NSMutableArray *encodedLibraryItemsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];

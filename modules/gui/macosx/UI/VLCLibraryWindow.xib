@@ -699,7 +699,6 @@
                 <outlet property="playlistDragDropView" destination="VFI-oW-dMZ" id="gVc-mu-f8T"/>
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="playlistView" destination="dus-WQ-AmE" id="fTF-HP-Chb"/>
-                <outlet property="recentVideoLibraryCollectionView" destination="hnE-Hj-MZo" id="Fko-5v-1bC"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
                 <outlet property="segmentedTitleControl" destination="W1M-0o-qYG" id="Gw1-T6-78k"/>
                 <outlet property="segmentedTitleControlToolbarItem" destination="KnW-Lr-R1d" id="Wg1-Y2-34a"/>
@@ -707,7 +706,8 @@
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
                 <outlet property="upNextSeparator" destination="qmL-Ar-cj1" id="GRX-ZE-2UG"/>
                 <outlet property="videoLibraryCollectionView" destination="B8x-e8-7zp" id="u1I-gn-IU1"/>
-                <outlet property="videoLibraryStackView" destination="vak-Gp-ljo" id="ulu-pc-ctF"/>
+                <outlet property="videoLibraryView" destination="vak-Gp-ljo" id="ulu-pc-ctF"/>
+                <outlet property="videoLibraryScrollView" destination="nXS-11-7iK" id="v1d-30-scr"/>
             </connections>
             <point key="canvasLocation" x="-609" y="325"/>
         </window>
@@ -733,48 +733,18 @@
                 <outlet property="volumeUpButton" destination="75c-FF-mgb" id="xRz-F4-n0Z"/>
             </connections>
         </customObject>
-        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" id="vak-Gp-ljo">
-            <rect key="frame" x="0.0" y="0.0" width="242" height="808"/>
+        <customView id="vak-Gp-ljo">
+            <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HmU-mL-Tjk">
-                    <rect key="frame" x="0.0" y="498" width="242" height="310"/>
-                    <clipView key="contentView" copiesOnScroll="NO" id="J5s-sy-il6">
-                        <rect key="frame" x="0.0" y="0.0" width="242" height="310"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <collectionView selectable="YES" id="hnE-Hj-MZo">
-                                <rect key="frame" x="0.0" y="0.0" width="242" height="310"/>
-                                <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" scrollDirection="horizontal" id="N2a-bI-WQc">
-                                    <size key="itemSize" width="354" height="270"/>
-                                    <edgeInsets key="sectionInset" left="20" right="20" top="20" bottom="20"/>
-                                </collectionViewFlowLayout>
-                                <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                <color key="secondaryBackgroundColor" name="controlAlternatingRowColor" catalog="System" colorSpace="catalog"/>
-                            </collectionView>
-                        </subviews>
-                    </clipView>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="310" id="Htb-Ql-chZ"/>
-                    </constraints>
-                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f2z-AL-CFF">
-                        <rect key="frame" x="-100" y="-100" width="233" height="15"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </scroller>
-                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="psR-Xx-0YH">
-                        <rect key="frame" x="-100" y="-100" width="16" height="218"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </scroller>
-                </scrollView>
                 <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nXS-11-7iK">
-                    <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
+                    <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="OKa-dt-1yY">
-                        <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
+                        <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView selectable="YES" id="B8x-e8-7zp">
-                                <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
+                                <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" id="Rag-cM-k1g">
                                     <size key="itemSize" width="256" height="214"/>
@@ -796,24 +766,13 @@
                 </scrollView>
             </subviews>
             <constraints>
-                <constraint firstItem="HmU-mL-Tjk" firstAttribute="leading" secondItem="vak-Gp-ljo" secondAttribute="leading" id="5co-en-4Uf"/>
-                <constraint firstAttribute="trailing" secondItem="HmU-mL-Tjk" secondAttribute="trailing" id="9Wn-DC-CFC"/>
+                <constraint firstItem="nXS-11-7iK" firstAttribute="top" secondItem="vak-Gp-ljo" secondAttribute="top" id="KNa-C4-CIY"/>
                 <constraint firstItem="nXS-11-7iK" firstAttribute="leading" secondItem="vak-Gp-ljo" secondAttribute="leading" id="LP8-Hf-WCx"/>
-                <constraint firstItem="HmU-mL-Tjk" firstAttribute="top" secondItem="vak-Gp-ljo" secondAttribute="top" id="XE0-gE-X8v"/>
                 <constraint firstAttribute="trailing" secondItem="nXS-11-7iK" secondAttribute="trailing" id="kmc-KU-iRY"/>
                 <constraint firstAttribute="bottom" secondItem="nXS-11-7iK" secondAttribute="bottom" id="tpH-Q7-TH4"/>
-                <constraint firstItem="nXS-11-7iK" firstAttribute="top" secondItem="HmU-mL-Tjk" secondAttribute="bottom" id="w6G-g6-ZtO"/>
             </constraints>
-            <visibilityPriorities>
-                <integer value="1000"/>
-                <integer value="1000"/>
-            </visibilityPriorities>
-            <customSpacing>
-                <real value="3.4028234663852886e+38"/>
-                <real value="3.4028234663852886e+38"/>
-            </customSpacing>
-            <point key="canvasLocation" x="585" y="10"/>
-        </stackView>
+            <point key="canvasLocation" x="748.5" y="10"/>
+        </customView>
         <customView id="eHd-Q9-F8D">
             <rect key="frame" x="0.0" y="0.0" width="528" height="411"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>

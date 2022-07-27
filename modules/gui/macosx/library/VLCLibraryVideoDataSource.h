@@ -22,6 +22,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+typedef NS_ENUM(NSUInteger, VLCVideoLibrarySection) {
+    VLCVideoLibraryRecentsSection = 0,
+    VLCVideoLibraryLibrarySection,
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
@@ -29,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryVideoDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
-@property (readwrite, assign) NSCollectionView *recentMediaCollectionView;
 @property (readwrite, assign) NSCollectionView *libraryMediaCollectionView;
 
 @end

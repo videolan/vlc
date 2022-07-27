@@ -280,7 +280,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = mainInstance.libraryController.libraryModel;
-    _libraryVideoDataSource.recentMediaCollectionView = _recentVideoLibraryCollectionView;
     _libraryVideoDataSource.libraryMediaCollectionView = _videoLibraryCollectionView;
     _videoLibraryCollectionView.dataSource = _libraryVideoDataSource;
     _videoLibraryCollectionView.delegate = _libraryVideoDataSource;
@@ -289,14 +288,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
     [(NSCollectionViewFlowLayout *)_videoLibraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
-    _recentVideoLibraryCollectionView.dataSource = _libraryVideoDataSource;
-    _recentVideoLibraryCollectionView.delegate = _libraryVideoDataSource;
-    [_recentVideoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
-    [_recentVideoLibraryCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
-               forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
-                           withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-    [(NSCollectionViewFlowLayout *)_recentVideoLibraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
-    [_recentVideoLibraryCollectionView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
@@ -348,6 +339,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     const CGFloat scrollViewRightInset = 0.;
     const CGFloat scrollViewBottomInset = 16.;
     const CGFloat scrollViewLeftInset = 16.;
+    const NSEdgeInsets defaultInsets = NSEdgeInsetsMake(scrollViewTopInset,
+                                                        scrollViewLeftInset,
+                                                        scrollViewBottomInset,
+                                                        scrollViewRightInset);
     
     _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _audioCollectionViewScrollView.contentInsets = NSEdgeInsetsMake(audioCollectionScrollViewTopInset,
@@ -355,11 +350,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                                                     scrollViewBottomInset,
                                                                     scrollViewRightInset);
     
+    _videoLibraryScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryScrollView.contentInsets = defaultInsets;
+
     _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _mediaSourceCollectionViewScrollView.contentInsets = NSEdgeInsetsMake(scrollViewTopInset,
-                                                                          scrollViewLeftInset,
-                                                                          scrollViewBottomInset,
-                                                                          scrollViewRightInset);
+    _mediaSourceCollectionViewScrollView.contentInsets = defaultInsets;
 
     const CGFloat collectionItemSpacing = 20.;
     const NSEdgeInsets collectionViewSectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
@@ -369,6 +364,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     audioLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
+
+    NSCollectionViewFlowLayout *videoLibraryCollectionViewLayout = _videoLibraryCollectionView.collectionViewLayout;
+    videoLibraryCollectionViewLayout.itemSize = CGSizeMake(214., 260.);
+    videoLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    videoLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    videoLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
 
     NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = _mediaSourceCollectionView.collectionViewLayout;
     mediaSourceCollectionViewLayout.itemSize = CGSizeMake(214., 246.);
@@ -544,15 +545,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
     }
     else {
-        _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_videoLibraryStackView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryStackView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryStackView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryStackView(>=444.)]|" options:0 metrics:0 views:dict]];
-        
+        _videoLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_videoLibraryView];
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
         
         [_videoLibraryCollectionView reloadData];
-        [_recentVideoLibraryCollectionView reloadData];
     }
     
     _librarySortButton.hidden = NO;
@@ -618,8 +617,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showMediaSourceAppearance
 {
-    if (_videoLibraryStackView.superview != nil) {
-        [_videoLibraryStackView removeFromSuperview];
+    if (_videoLibraryView.superview != nil) {
+        [_videoLibraryView removeFromSuperview];
     }
     if (_audioLibraryView.superview != nil) {
         [_audioLibraryView removeFromSuperview];
@@ -810,7 +809,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)enableVideoPlaybackAppearance
 {
     [_mediaSourceView removeFromSuperviewWithoutNeedingDisplay];
-    [_videoLibraryStackView removeFromSuperviewWithoutNeedingDisplay];
+    [_videoLibraryView removeFromSuperviewWithoutNeedingDisplay];
     [_audioLibraryView removeFromSuperviewWithoutNeedingDisplay];
 
     [self.videoView setHidden:NO];
@@ -868,9 +867,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 #pragma mark - library representation and interaction
 - (void)updateLibraryRepresentation:(NSNotification *)aNotification
 {
-    if (_videoLibraryStackView.superview != nil) {
+    if (_videoLibraryView.superview != nil) {
         [_videoLibraryCollectionView reloadData];
-        [_recentVideoLibraryCollectionView reloadData];
     } else if (_audioLibraryView.superview != nil) {
         [_libraryAudioDataSource reloadAppearance];
     }

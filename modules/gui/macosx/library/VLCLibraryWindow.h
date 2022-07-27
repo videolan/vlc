@@ -49,10 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
-@property (readwrite, weak) IBOutlet NSStackView *videoLibraryStackView;
+@property (readwrite, weak) IBOutlet NSView *videoLibraryView;
+@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryScrollView;
 @property (readwrite, strong) IBOutlet NSView *playlistView;
 @property (readwrite, weak) IBOutlet NSCollectionView *videoLibraryCollectionView;
-@property (readwrite, weak) IBOutlet NSCollectionView *recentVideoLibraryCollectionView;
 @property (readwrite, weak) IBOutlet NSCollectionView *mediaSourceCollectionView;
 @property (readwrite, weak) IBOutlet NSView *audioLibraryView;
 @property (readwrite, weak) IBOutlet NSSplitView *audioLibrarySplitView;
