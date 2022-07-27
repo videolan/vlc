@@ -1,4 +1,3 @@
-$Id$
 
 The following information is culled from information from Julio
 Sanchez Fernandez [1] by Rocky Bernstein.
