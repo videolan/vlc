@@ -29,16 +29,13 @@ description=
  It also provides a VLM interface copied from the telnet interface.
 
  Use on local term:
-    vlc -I cli
+    vlc -I luaintf --lua-intf cli
  Use on tcp connection:
-    vlc -I cli --lua-config "cli={host='localhost:4212'}"
+    vlc -I luaintf --lua-intf cli --lua-config "cli={host='localhost:4212'}"
  Use on telnet connection:
-    vlc -I cli --lua-config "cli={host='telnet://localhost:4212'}"
+    vlc -I luaintf --lua-intf cli --lua-config "cli={host='telnet://localhost:4212'}"
  Use on multiple hosts (term + plain tcp port + telnet):
-    vlc -I cli --lua-config "cli={hosts={'*console','localhost:4212','telnet://localhost:5678'}}"
-
- Note:
-    -I cli and -I luacli are aliases for -I luaintf --lua-intf cli
+    vlc -I luaintf --lua-intf cli --lua-config "cli={hosts={'*console','localhost:4212','telnet://localhost:5678'}}"
 
  Configuration options settable through the --lua-config option are:
     * hosts: A list of hosts to listen on.
