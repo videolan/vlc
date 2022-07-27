@@ -24,7 +24,7 @@
 #import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 
 #pragma mark - Private data
-static const NSUInteger kAnimationSteps = 16;
+static const NSUInteger kAnimationSteps = 32;
 static const NSUInteger kWrapAroundValue = (NSUInteger)-1;
 
 static const CGFloat kDetailViewMargin = 8.;
@@ -50,7 +50,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 @interface VLCLibraryCollectionViewFlowLayout ()
 {
     NSUInteger _lastHeightIndex;
-    CVDisplayLinkRef _displayLinkRef;    
+    CVDisplayLinkRef _displayLinkRef;
+    CGFloat _animationSteps[kAnimationSteps];
 }
 
 @property (nonatomic, readwrite) BOOL detailViewIsAnimating;
@@ -67,6 +68,13 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     self = [super init];
     if (self == nil) {
         return nil;
+    }
+
+    // Easing out cubic
+    for(int i = 0; i < kAnimationSteps; ++i) {
+        CGFloat progress = (CGFloat)i  / (CGFloat)kAnimationSteps;
+        progress -= 1;
+        _animationSteps[i] = kDetailViewExpandedHeight * (progress * progress * progress + 1) + kDetailViewCollapsedHeight;
     }
     
     [self resetLayout];
@@ -155,7 +163,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame),
                                                 selectedItemFrameMaxY + kDetailViewMargin,
                                                 self.collectionViewContentSize.width - 16.0,
-                                                (_animationIndex * kAnimationHeightIncrement));
+                                                _animationSteps[_animationIndex]);
 
         return detailViewAttributes;
     }
@@ -181,7 +189,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if (self.selectedIndexPath) {
         NSRect selectedItemFrame = [[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame];
         if (NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
-            attributesFrame.origin.y += (_animationIndex * kAnimationHeightIncrement) + kDetailViewMargin;
+            attributesFrame.origin.y += _animationSteps[_animationIndex] + kDetailViewMargin;
         }
     }
     return attributesFrame;
@@ -262,6 +270,8 @@ static CVReturn detailViewAnimationCallback(
         if (bridgedSelf.animationIsCollapse) {
             bridgedSelf.selectedIndexPath = nil;
             bridgedSelf.animationIndex = 0;
+        } else {
+            bridgedSelf.animationIndex = kAnimationSteps - 1;
         }
     }
 
