@@ -1,7 +1,6 @@
 --[[
  Gets an artwork from the Cover Art Archive or Amazon
 
- $Id$
  Copyright © 2007-2010 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify

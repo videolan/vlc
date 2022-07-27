@@ -2,7 +2,6 @@
  telnet.lua: wrapper for legacy telnet configuration
 --[==========================================================================[
  Copyright (C) 2011 the VideoLAN team
- $Id$
 
  Authors: Pierre Ynard
 

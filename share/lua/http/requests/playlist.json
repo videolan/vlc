@@ -5,7 +5,6 @@ vim:syntax=lua
 <  this should mirror the content of playlist.xml
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005-2006 the VideoLAN team
-<  $Id$
 <
 <  Authors: Rob Jonson <rob -at- hobbyistsoftware -dot- com>
 <

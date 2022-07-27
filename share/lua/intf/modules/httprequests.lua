@@ -2,7 +2,6 @@
  httprequests.lua: code for processing httprequests commands and output
 --[==========================================================================[
  Copyright (C) 2007 the VideoLAN team
- $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
  Rob Jonson <rob at hobbyistsoftware.com>

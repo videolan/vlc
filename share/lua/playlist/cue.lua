@@ -1,7 +1,6 @@
 --[[
    Parse CUE files
 
- $Id$
  Copyright (C) 2009 Laurent Aimar
 
  This program is free software; you can redistribute it and/or modify

@@ -2,7 +2,6 @@
  sandbox.lua: Lua sandboxing facilities
 --[==========================================================================[
  Copyright (C) 2007 the VideoLAN team
- $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
 

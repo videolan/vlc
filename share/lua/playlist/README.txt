@@ -1,5 +1,4 @@
 Instructions to code your own VLC Lua playlist script.
-$Id$
 
 See lua/README.txt for generic documentation about Lua usage in VLC.
 

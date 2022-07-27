@@ -5,7 +5,6 @@ vim:syntax=lua
 <  this should mirror the content and function of status.json
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005-2009 the VideoLAN team
-<  $Id$
 <
 <  Authors: Rob Jonson <rob -at- hobbyistsoftware -dot- com>
 <

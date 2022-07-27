@@ -2,7 +2,6 @@
 dumpmeta.lua: dump a file's meta data on stdout/stderr
 --[==========================================================================[
  Copyright (C) 2010 the VideoLAN team
- $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
 

@@ -1,7 +1,6 @@
 --[[
  Gets an artwork from last.fm
 
- $Id$
  Copyright © 2010 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify

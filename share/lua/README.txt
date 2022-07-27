@@ -1,5 +1,4 @@
 Instructions to code your own VLC Lua scripts and extensions
-$Id$
 
 1 - About Lua
 =============

@@ -2,7 +2,6 @@
    Translate trailers.apple.com video webpages URLs to the corresponding
    movie URL
 
- $Id$
  Copyright © 2007-2010 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
