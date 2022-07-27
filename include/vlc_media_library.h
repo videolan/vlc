@@ -205,6 +205,7 @@ typedef struct vlc_ml_media_t
     float f_progress;
     time_t i_last_played_date;
     char* psz_title;
+    char* psz_filename;
 
     vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
 

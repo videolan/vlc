@@ -249,6 +249,8 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
     output.p_files = ml_convert_list<vlc_ml_file_list_t, vlc_ml_file_t>( files );
     if ( output.p_files == nullptr )
         return false;
+    if ( strdup_helper( input->fileName(), output.psz_filename ) == false )
+        return false;
 
     if ( convertTracks( input, output ) == false )
         return false;

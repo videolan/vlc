@@ -172,6 +172,7 @@ static void vlc_ml_media_release_inner( vlc_ml_media_t* p_media )
 {
     vlc_ml_file_list_release( p_media->p_files );
     vlc_ml_media_release_tracks_inner( p_media->p_tracks );
+    free( p_media->psz_filename );
     free( p_media->psz_title );
     vlc_ml_thumbnails_release( p_media->thumbnails );
     switch( p_media->i_subtype )
