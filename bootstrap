@@ -29,7 +29,7 @@ if test -d ${VLC_TOOLS}/bin; then
 fi
 
 ###
-###  Get a sane environment, just in case
+###  Get a sane environment, just in the case
 ###
 CYGWIN=binmode
 export CYGWIN
