@@ -12,7 +12,7 @@ in the telnet interface and won't be set in other interfaces.
 
 User defined modules stored in the share/lua/intf/modules/ directory are
 available. For example, to use the sandbox module, just use
-'require "sandbox"' in your interface.
+'local sandbox = require "sandbox"' in your interface.
 
 VLC defines a global vlc object with the following members:
 All the VLC specific Lua modules are available.
