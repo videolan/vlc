@@ -1,4 +1,3 @@
-$Id$
 
 This file describes commands available through the requests/ file:
 

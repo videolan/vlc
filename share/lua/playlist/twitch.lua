@@ -1,7 +1,6 @@
 --[[
 Resolve Twitch channel and video URLs to the actual stream URL
 
- $Id$
  Copyright © 2017 the VideoLAN team
 
  Author: Marvin Scholz <epirat07 at gmail dot com>

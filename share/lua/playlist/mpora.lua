@@ -1,5 +1,4 @@
 --[[
- $Id$
 
  Copyright © 2009 the VideoLAN team
 

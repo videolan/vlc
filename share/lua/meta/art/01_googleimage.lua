@@ -1,7 +1,6 @@
 --[[
  Gets an artwork from images.google.com
 
- $Id$
  Copyright © 2007 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify

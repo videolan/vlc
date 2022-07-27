@@ -2,7 +2,6 @@
    Translate www.katsomo.fi video webpages URLs to the corresponding
    movie URL
 
- $Id$
  Copyright © 2009 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify

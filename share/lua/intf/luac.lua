@@ -2,7 +2,6 @@
  luac.lua: lua compilation module for VLC (duplicates luac)
 --[==========================================================================[
  Copyright (C) 2010 Antoine Cellerier
- $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
 

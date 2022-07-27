@@ -2,7 +2,6 @@
  http.lua: HTTP interface module for VLC
 --[==========================================================================[
  Copyright (C) 2007-2009 the VideoLAN team
- $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
 

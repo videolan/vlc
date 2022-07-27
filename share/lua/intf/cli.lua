@@ -2,7 +2,6 @@
  cli.lua: CLI module for VLC
 --[==========================================================================[
  Copyright (C) 2007-2011 the VideoLAN team
- $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
           Pierre Ynard
