@@ -154,6 +154,15 @@ static int vlclua_httpd_handler_callback(
         const char *psz_err = lua_tostring( L, -1 );
         msg_Err( p_this, "Error while running the lua HTTPd handler "
                  "callback: %s", psz_err );
+        char* psz_new;
+        if (asprintf(&psz_new, "Status: 500\n"
+                    "Content-Length: %zu\n\n%s", strlen(psz_err), psz_err) < 0)
+            *pi_data = 0;
+        else
+        {
+            *pp_data = (uint8_t*)psz_new;
+            *pi_data = strlen(psz_new);
+        }
         lua_settop( L, 2 );
         /* function data */
         return VLC_EGENERIC;
