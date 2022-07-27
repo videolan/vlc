@@ -435,6 +435,20 @@ httpd_HandlerCallBack(httpd_callback_sys_t *p_sys, httpd_client_t *cl,
                       psz_remote_addr, NULL,
                       &answer->p_body, &answer->i_body);
 
+    if (!answer->p_body) {
+        const char* psz_result = "Internal Server Error";
+        char* psz_new;
+        if (asprintf(&psz_new, "HTTP/1.0 500 \r\n"
+                     "Content-Length: %zu\r\n\r\n%s",
+                     strlen(psz_result), psz_result) < 0)
+            answer->i_body = 0;
+        else
+        {
+            answer->p_body = (uint8_t*)psz_new;
+            answer->i_body = strlen((const char*)answer->p_body);
+        }
+        return VLC_SUCCESS;
+    }
     if (query->i_type == HTTPD_MSG_HEAD) {
         char *p = (char *)answer->p_body;
 
