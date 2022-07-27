@@ -47,7 +47,6 @@ dist_icons128_DATA = icons/128x128/vlc.png icons/128x128/vlc-xmas.png \
 dist_icons256_DATA = icons/256x256/vlc.png
 
 nobase_dist_pkgdata_SCRIPTS = \
-	utils/gnome-vlc-default.sh \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
 	$(NULL)
