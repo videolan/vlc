@@ -45,18 +45,6 @@
 # include <freerdp/version.h>
 #endif
 
-#if !defined(FREERDP_VERSION_MAJOR) || \
-    (defined(FREERDP_VERSION_MAJOR) && !(FREERDP_VERSION_MAJOR > 1 || (FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR >= 1)))
-# define SoftwareGdi sw_gdi
-# define Fullscreen fullscreen
-# define ServerHostname hostname
-# define Username username
-# define Password password
-# define ServerPort port
-# define EncryptionMethods encryption
-# define ContextSize context_size
-#endif
-
 #include <errno.h>
 #ifdef HAVE_POLL_H
 # include <poll.h>
@@ -74,6 +62,8 @@
 #define RDP_FPS_LONGTEXT N_("Acquisition rate (in fps)")
 
 #define CFG_PREFIX "rdp-"
+
+#define FREERDP_PIXEL_BPP(_format) (_format >> 24)
 
 /*****************************************************************************
  * Module descriptor
@@ -136,11 +126,12 @@ typedef struct vlcrdp_context_t vlcrdp_context_t;
 
 /* updates handlers */
 
-static void desktopResizeHandler( rdpContext *p_context )
+static BOOL desktopResizeHandler( rdpContext *p_context )
 {
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_context;
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
     rdpGdi *p_gdi = p_context->gdi;
+    int i_colordepth = FREERDP_PIXEL_BPP( p_gdi->dstFormat );
 
     if ( p_sys->es )
     {
@@ -148,11 +139,13 @@ static void desktopResizeHandler( rdpContext *p_context )
         p_sys->es = NULL;
     }
 
-    /* Now init and fill es format */
     vlc_fourcc_t i_chroma;
-    switch( p_gdi->bytesPerPixel )
+    /* Now init and fill es format */
+    switch ( i_colordepth )
     {
         default:
+            msg_Dbg( p_vlccontext->p_demux, "invalid color depth %d", i_colordepth);
+            /* fallthrough */
         case 16:
             i_chroma = VLC_CODEC_RGB16;
             break;
@@ -160,7 +153,7 @@ static void desktopResizeHandler( rdpContext *p_context )
             i_chroma = VLC_CODEC_RGB24;
             break;
         case 32:
-            i_chroma = VLC_CODEC_RGB32;
+            i_chroma = VLC_CODEC_ARGB;
             break;
     }
     es_format_t fmt;
@@ -173,7 +166,7 @@ static void desktopResizeHandler( rdpContext *p_context )
     fmt.video.i_height = p_gdi->height;
     fmt.video.i_frame_rate_base = 1000;
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
-    p_sys->i_framebuffersize = p_gdi->width * p_gdi->height * p_gdi->bytesPerPixel;
+    p_sys->i_framebuffersize = p_gdi->width * p_gdi->height * (i_colordepth >> 3);
 
     if ( p_sys->p_block )
         p_sys->p_block = block_Realloc( p_sys->p_block, 0, p_sys->i_framebuffersize );
@@ -181,20 +174,21 @@ static void desktopResizeHandler( rdpContext *p_context )
         p_sys->p_block = block_Alloc( p_sys->i_framebuffersize );
 
     p_sys->es = es_out_Add( p_vlccontext->p_demux->out, &fmt );
+    return TRUE;
 }
 
-static void beginPaintHandler( rdpContext *p_context )
+static BOOL beginPaintHandler( rdpContext *p_context )
 {
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_context;
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
     rdpGdi *p_gdi = p_context->gdi;
-    p_gdi->primary->hdc->hwnd->invalid->null = 1;
-    p_gdi->primary->hdc->hwnd->ninvalid = 0;
+    p_gdi->primary->hdc->hwnd->invalid->null = TRUE;
     if ( ! p_sys->p_block && p_sys->i_framebuffersize )
         p_sys->p_block = block_Alloc( p_sys->i_framebuffersize );
+    return TRUE;
 }
 
-static void endPaintHandler( rdpContext *p_context )
+static BOOL endPaintHandler( rdpContext *p_context )
 {
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_context;
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
@@ -205,11 +199,12 @@ static void endPaintHandler( rdpContext *p_context )
         p_sys->p_block->i_buffer = p_sys->i_framebuffersize;
         memcpy( p_sys->p_block->p_buffer, p_gdi->primary_buffer, p_sys->p_block->i_buffer );
     }
+    return TRUE;
 }
 
 /* instance handlers */
 
-static bool preConnectHandler( freerdp *p_instance )
+static BOOL preConnectHandler( freerdp *p_instance )
 {
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
@@ -226,49 +221,54 @@ static bool preConnectHandler( freerdp *p_instance )
     p_instance->settings->EncryptionMethods =
             var_InheritBool( p_vlccontext->p_demux, CFG_PREFIX "encrypt" );
 
-    return true;
+    return TRUE;
 }
 
-static bool postConnectHandler( freerdp *p_instance )
+static BOOL postConnectHandler( freerdp *p_instance )
 {
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
 
     msg_Dbg( p_vlccontext->p_demux, "connected to desktop %dx%d (%d bpp)",
-#if defined(FREERDP_VERSION_MAJOR) && (FREERDP_VERSION_MAJOR > 1 || (FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR >= 1))
              p_instance->settings->DesktopWidth,
              p_instance->settings->DesktopHeight,
              p_instance->settings->ColorDepth
-#else
-             p_instance->settings->width,
-             p_instance->settings->height,
-             p_instance->settings->color_depth
-#endif
              );
 
     p_instance->update->DesktopResize = desktopResizeHandler;
     p_instance->update->BeginPaint = beginPaintHandler;
     p_instance->update->EndPaint = endPaintHandler;
+    UINT32 format;
+    switch ( p_instance->settings->ColorDepth )
+    {
+        default:
+            msg_Dbg( p_vlccontext->p_demux, "no valid pixel format found for color depth %d bpp", p_instance->settings->ColorDepth);
+            /* fallthrough */
+        case 16:
+            format = PIXEL_FORMAT_RGB16;
+            break;
+        case 24:
+            format = PIXEL_FORMAT_RGB24;
+            break;
+        case 32:
+            format = PIXEL_FORMAT_ARGB32;
+            break;
+    }
 
     gdi_init( p_instance,
-                CLRBUF_16BPP |
-#if defined(FREERDP_VERSION_MAJOR) && defined(FREERDP_VERSION_MINOR) && \
-    !(FREERDP_VERSION_MAJOR > 1 || (FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR >= 2))
-                CLRBUF_24BPP |
-#endif
-                CLRBUF_32BPP, NULL );
+                format );
 
     desktopResizeHandler( p_instance->context );
-    return true;
+    return TRUE;
 }
 
-static bool authenticateHandler( freerdp *p_instance, char** ppsz_username,
+static BOOL authenticateHandler( freerdp *p_instance, char** ppsz_username,
                                  char** ppsz_password, char** ppsz_domain )
 {
     VLC_UNUSED(ppsz_domain);
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
     *ppsz_username = var_InheritString( p_vlccontext->p_demux, CFG_PREFIX "user" );
     *ppsz_password = var_InheritString( p_vlccontext->p_demux, CFG_PREFIX "password" );
-    return true;
+    return TRUE;
 }
 
 /*****************************************************************************
@@ -431,10 +431,6 @@ static int Open( vlc_object_t *p_this )
     if ( p_sys->f_fps <= 0 ) p_sys->f_fps = 1.0;
     p_sys->i_frame_interval = CLOCK_FREQ / p_sys->f_fps;
 
-#if FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR < 2
-    freerdp_channels_global_init();
-#endif
-
     p_sys->p_instance = freerdp_new();
     if ( !p_sys->p_instance )
     {
@@ -507,9 +503,6 @@ static void Close( vlc_object_t *p_this )
 
     freerdp_disconnect( p_sys->p_instance );
     freerdp_free( p_sys->p_instance );
-#if FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR < 2
-    freerdp_channels_global_uninit();
-#endif
 
     if ( p_sys->p_block )
         block_Release( p_sys->p_block );
