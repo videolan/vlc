@@ -210,6 +210,7 @@
         <file alias="ScaledImage.qml">widgets/qml/ScaledImage.qml</file>
         <file alias="DropShadowImage.qml">widgets/qml/DropShadowImage.qml</file>
         <file alias="DoubleShadow.qml">widgets/qml/DoubleShadow.qml</file>
+        <file alias="FadingEdgeListView.qml">widgets/qml/FadingEdgeListView.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
