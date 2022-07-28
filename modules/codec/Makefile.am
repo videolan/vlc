@@ -62,7 +62,7 @@ endif
 
 libaudiotoolboxmidi_plugin_la_SOURCES = codec/audiotoolbox_midi.c
 libaudiotoolboxmidi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libaudiotoolboxmidi_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,AudioUnit,-framework,AudioToolbox
+libaudiotoolboxmidi_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,AudioToolbox
 EXTRA_LTLIBRARIES += libaudiotoolboxmidi_plugin.la
 codec_LTLIBRARIES += $(LTLIBaudiotoolboxmidi)
 
@@ -347,17 +347,19 @@ libvideotoolbox_plugin_la_SOURCES = \
 	packetizer/h264_slice.c packetizer/h264_slice.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
+libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 if HAVE_OSX
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -mmacosx-version-min=10.8
 endif
 if HAVE_IOS
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -miphoneos-version-min=8.0
+libvideotoolbox_plugin_la_LDFLAGS += -Wl,-framework,UIKit
 endif
 if HAVE_TVOS
 libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -mtvos-version-min=10.2
+libvideotoolbox_plugin_la_LDFLAGS += -Wl,-framework,UIKit
 endif
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la
-libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
 

@@ -481,6 +481,8 @@ libvlccore_la_LIBADD += $(DBUS_LIBS)
 endif
 if HAVE_DARWIN
 libvlccore_la_LDFLAGS += -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib
+
+libvlccore_la_LDFLAGS += -Wl,-framework,CFNetwork
 endif
 
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlc.dll.manifest
