@@ -1610,11 +1610,26 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
         goto end;
 
     size_t titles_count = vlc_player_title_list_GetCount(titles);
-    if (i_chapters_of_title >= (int) titles_count)
-       goto end;
+
+    ssize_t title_idx;
+    if (i_chapters_of_title < 0)
+    {
+        title_idx = vlc_player_GetSelectedTitleIdx(player);
+        if (title_idx == -1)
+            goto end;
+
+        assert((size_t)title_idx < titles_count);
+    }
+    else
+    {
+        title_idx = i_chapters_of_title;
+
+        if ((size_t) title_idx  >= titles_count)
+           goto end;
+    }
 
     const struct vlc_player_title *title =
-        vlc_player_title_list_GetAt(titles, i_chapters_of_title);
+        vlc_player_title_list_GetAt(titles, title_idx);
     assert(title);
 
     size_t i_chapter_count = title->chapter_count;
