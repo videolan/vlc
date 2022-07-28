@@ -240,7 +240,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateCachedListOfArtists
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParams = { .psz_pattern = [self->_filterString UTF8String], .i_sort = self->_sortCriteria, .b_desc = self->_sortDescending };
+        const vlc_ml_query_params_t queryParams = [self queryParams];
         vlc_ml_artist_list_t *p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, NO);
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artist_list->i_nb_items];
         for (size_t x = 0; x < p_artist_list->i_nb_items; x++) {
