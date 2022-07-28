@@ -422,6 +422,35 @@ d:set_encodedby(): the item's EncodedBy (OPTIONAL, meta data)
 d:set_arturl(): the item's ArtURL (OPTIONAL, meta data)
 d:set_trackid(): the item's TrackID (OPTIONAL, meta data)
 
+Medialibrary
+------------
+
+query_params = {
+  "limit": integer,
+  "offset": integer,
+  "desc": boolean,
+  "sort": integer,
+  "pattern": string,
+}
+
+vlc.ml.video(query_params): Get video media list
+vlc.ml.show_episodes(query_params): Get the list of show episodes
+vlc.ml.audio(query_params): Get audio media list
+vlc.ml.media_thumbnail(mediaId: integer): Get media thumbnail with media id parameter
+vlc.ml.albums(query_params): Get album list
+vlc.ml.album(albumId: integer): Get album with album id
+vlc.ml.album_tracks(albumId: integer, query_params): Get album tracks with album id parameter
+vlc.ml.artists(query_params): Get artist list
+vlc.ml.artist(artistId: integer): Get artist with artist id
+vlc.ml.genres(query_params): Get genres list
+vlc.ml.genre(genreId: integer): Get genre with genre id parameter
+vlc.ml.artist_albums(artistId: integer, query_params): Get artist albums with artist id parameter
+vlc.ml.genre_albums(genreId: integer, query_params): Get albums with genre id parameter
+vlc.ml.genre_artists(genreId: integer, query_params): Get artists with genre id parameter
+vlc.ml.artist_thumbnail(artistId: integer): Get artist thumbnail with artist id parameter
+vlc.ml.album_thumbnail(albumId: integer): Get album thumbnail with album id parameter
+vlc.ml.reload(): Reload folder
+
 Stream
 ------
 stream( url ): Instantiate a stream object for specific url.
