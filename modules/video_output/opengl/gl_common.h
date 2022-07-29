@@ -72,6 +72,9 @@
 #ifndef GL_R16
 # define GL_R16 0x822A
 #endif
+#ifndef GL_R16UI
+# define GL_R16UI 0x8234
+#endif
 #ifndef GL_BGRA
 # define GL_BGRA 0x80E1
 #endif
@@ -84,6 +87,24 @@
 #ifndef GL_LUMINANCE16
 # define GL_LUMINANCE16 0x8042
 #endif
+#ifndef GL_LUMINANCE16_ALPHA16
+# define GL_LUMINANCE16_ALPHA16 0x8048
+#endif
+#ifndef GL_R8
+# define GL_R8 0x8229
+#endif
+#ifndef GL_RG8
+# define GL_RG8 0x822B
+#endif
+#ifndef GL_RG_INTEGER
+# define GL_RG_INTEGER 0x8228
+#endif
+#ifndef GL_RED_INTEGER
+# define GL_RED_INTEGER 0x8D94
+#endif
+#ifndef GL_RG16UI
+# define GL_RG16UI 0x823A
+#endif
 #ifndef GL_TEXTURE_RED_SIZE
 # define GL_TEXTURE_RED_SIZE 0x805C
 #endif
@@ -93,7 +114,6 @@
 #ifndef GL_TEXTURE_WRAP_R
 # define GL_TEXTURE_WRAP_R 0x8072
 #endif
-
 #ifndef GL_CLAMP_TO_EDGE
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
