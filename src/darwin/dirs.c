@@ -35,6 +35,7 @@
 #include <mach-o/dyld.h>
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <TargetConditionals.h>
 
 char *config_GetLibDir (void)
 {
