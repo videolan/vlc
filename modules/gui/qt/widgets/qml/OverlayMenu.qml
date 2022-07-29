@@ -57,8 +57,6 @@ FocusScope {
         listView.resetStack()
     }
 
-    property alias effectSource: effect.source
-
     property alias scrollBarActive: scrollBar.active
 
     visible: false
@@ -103,8 +101,10 @@ FocusScope {
         }
     }
 
-    Item {
+    Rectangle {
         id: parentItem
+
+        color: root.colors.bg
 
         anchors {
             top: parent.top
@@ -114,23 +114,12 @@ FocusScope {
             left: isRight ? undefined : parent.left
         }
 
+        // TODO: Qt >= 5.12 use TapHandler
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
 
             acceptedButtons: Qt.NoButton
-        }
-
-        FrostedGlassEffect {
-            id: effect
-            anchors.fill: parent
-
-            source: backgroundItem
-
-            tint: VLCStyle.colors.topBanner
-
-            tintStrength: 0.0
-            exclusionStrength: 0.1
         }
 
         ListView {
