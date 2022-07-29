@@ -49,6 +49,10 @@
 #include "config/configuration.h"
 #include "modules/modules.h"
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 typedef struct vlc_modcap
 {
     char *name;
@@ -525,6 +529,11 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
 #if VLC_WINSTORE_APP
     /* Windows Store Apps can not load external plugins with absolute paths. */
     AllocatePluginPath (p_this, "plugins", mode);
+#elif defined(__APPLE__) && defined(HAVE_DYNAMIC_PLUGINS) && TARGET_OS_IPHONE
+    /* Redirect to the application folder, plugins/ is flattened. */
+    char *vlcpath = config_GetLibDir ();
+    AllocatePluginPath (p_this, vlcpath, mode);
+    free(vlcpath);
 #else
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/plugins. */
