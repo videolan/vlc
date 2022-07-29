@@ -35,6 +35,7 @@ FocusScope {
 
     property alias effectSource: effect.source
     property alias effectSourceRect: effect.sourceRect
+    property alias effectAvailable: effect.effectAvailable
 
     state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? ""
                                                                   : "expanded"

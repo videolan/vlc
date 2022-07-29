@@ -266,6 +266,27 @@ FocusScope {
                             leftMargin: VLCStyle.applicationHorizontalMargin
                         }
 
+                        // This item is the root of a large hierarchy
+                        // which requires many batches to be rendered.
+                        // When the miniPlayer effect is active, this
+                        // item (source item) gets rendered in an offscreen
+                        // surface. If we don't enable layer here,
+                        // it (along with children) gets rendered again
+                        // in the assigned window.
+                        // If layer is enabled, instead of rendering one
+                        // more time with many batches, a dynamic texture
+                        // from the offscreen surface is used. This behavior
+                        // reduces the amount of batches from 2x to x+1.
+                        // A side effect is having to draw a large texture
+                        // with blending on, but this must be cheaper redrawing
+                        // all the batches.
+                        // TODO: Reconsider this behavior when batching is optimized.
+                        layer.enabled: miniPlayer.visible && miniPlayer.effectAvailable
+
+                        // Enable clipping so that the effect does not sit
+                        // on top of the source.
+                        clip: miniPlayer.visible && miniPlayer.effectAvailable
+
                         Loader {
                             z: 1
                             anchors {
