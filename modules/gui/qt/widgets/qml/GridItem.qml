@@ -265,7 +265,7 @@ T.Control {
                     id: selectedShadow
 
                     anchors.fill: parent
-                    anchors.margins: VLCStyle.dp()
+                    anchors.margins: VLCStyle.dp(1)
                     z: -1
 
                     visible: opacity > 0
