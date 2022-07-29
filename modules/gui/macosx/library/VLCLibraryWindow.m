@@ -249,7 +249,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
 
-    _currentSelectedSegment = 5; // To enforce action on the selected segment
+    _currentSelectedSegment = -1; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 4;
     [_segmentedTitleControl setTarget:self];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:0];
@@ -257,7 +257,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [_segmentedTitleControl setLabel:_NS("Browse") forSegment:2];
     [_segmentedTitleControl setLabel:_NS("Streams") forSegment:3];
     [_segmentedTitleControl sizeToFit];
-    [_segmentedTitleControl setSelectedSegment:0];
 
     _playlistDragDropView.dropTarget = self;
     _playlistCounterTextField.useStrongRounding = YES;
@@ -403,6 +402,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     var_DelCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
 }
 
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
+{
+    [super encodeRestorableStateWithCoder:coder];
+    [coder encodeInteger:_segmentedTitleControl.selectedSegment forKey:@"macosx-library-selected-segment"];
+    [coder encodeInteger:_gridVsListSegmentedControl.selectedSegment forKey:@"macosx-library-view-mode-selected-segment"];
+    [coder encodeInteger:_libraryAudioDataSource.segmentedControl.selectedSegment forKey:@"macosx-library-audio-view-selected-segment"];
+}
+
 #pragma mark - appearance setters
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -501,6 +508,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
+
+    [self invalidateRestorableState];
 
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
@@ -720,7 +729,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (IBAction)goToBrowseSection:(id)sender
 {
     [_segmentedTitleControl setSelected:YES forSegment:2];
-    [self segmentedControlAction:nil];
+    [self segmentedControlAction:_segmentedTitleControl];
 }
 
 #pragma mark - split view delegation
@@ -907,7 +916,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)windowDidLoad
 {
     VLCLibraryWindow *window = (VLCLibraryWindow *)self.window;
-    [window setRestorable:NO];
+    [window setRestorationClass:[self class]];
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];
     [window setContentMinSize:NSMakeSize(VLCLibraryWindowMinimalWidth, VLCLibraryWindowMinimalHeight)];
@@ -920,7 +929,32 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // Toggling the playlist is simplest.
     [window togglePlaylist];
     [window togglePlaylist];
+}
 
++ (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier 
+                              state:(NSCoder *)state 
+                  completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
+{
+    if([VLCMain sharedInstance].libraryWindowController == nil) {
+        [VLCMain sharedInstance].libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
+    }
+
+    VLCLibraryWindow *libraryWindow = [VLCMain sharedInstance].libraryWindow;
+
+    if([identifier isEqualToString:[libraryWindow identifier]]) {
+        NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
+        NSInteger rememberedSelectedLibraryViewModeSegment = [state decodeIntegerForKey:@"macosx-library-view-mode-selected-segment"];
+        NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
+
+        [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
+        [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
+        [libraryWindow.libraryAudioDataSource.segmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
+
+        [libraryWindow segmentedControlAction:libraryWindow.navigationStack]; // Prevent actions being added to the nav stack
+        [libraryWindow.libraryAudioDataSource segmentedControlAction:libraryWindow.navigationStack];
+    }
+
+    completionHandler(libraryWindow, nil);
 }
 
 @end

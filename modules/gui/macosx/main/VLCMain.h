@@ -76,7 +76,7 @@ extern NSString *VLCConfigurationChangedNotification;
 @property (readonly) VLCLogWindowController *debugMsgPanel;
 @property (readonly) VLCLibraryController *libraryController;
 @property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) VLCLibraryWindowController *libraryWindowController;
+@property (readwrite) VLCLibraryWindowController *libraryWindowController;
 @property (readonly) VLCMainMenu *mainMenu;
 @property (readonly) VLCOpenWindowController *open;
 @property (readonly) VLCPlaylistController *playlistController;

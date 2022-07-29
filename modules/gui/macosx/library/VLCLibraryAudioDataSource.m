@@ -143,6 +143,8 @@
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
     
     _currentSelectedSegment = -1; // Force segmentedControlAction to do what it must
+    _segmentedControl.selectedSegment = 0;
+
     _placeholderImageNames = @[@"placeholder-group2", @"placeholder-music", @"placeholder-music", @"placeholder-music"];
     _placeholderLabelStrings = @[
         _NS("Your favorite artists will appear here.\nGo to the Browse section to add artists you love."),

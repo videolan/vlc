@@ -253,7 +253,11 @@ static VLCMain *sharedInstance = nil;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     _launched = YES;
-    _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
+
+    if (_libraryWindowController == nil) {
+        _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
+    }
+    
     [_libraryWindowController.window makeKeyAndOrderFront:nil];
 
     if (!_p_intf)

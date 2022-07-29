@@ -37,13 +37,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistSortingMenuController;
 @class VLCFSPanelController;
 
-@interface VLCLibraryWindowController : NSWindowController
+@interface VLCLibraryWindowController : NSWindowController<NSWindowRestoration>
 
 - (instancetype)initWithLibraryWindow;
 
 @end
 
-@interface VLCLibraryWindow : VLCVideoWindowCommon
+@interface VLCLibraryWindow : VLCVideoWindowCommon<NSUserInterfaceItemIdentification>
 
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
