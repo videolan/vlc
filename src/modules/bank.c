@@ -532,7 +532,12 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
 #elif defined(__APPLE__) && defined(HAVE_DYNAMIC_PLUGINS) && TARGET_OS_IPHONE
     /* Redirect to the application folder, plugins/ is flattened. */
     char *vlcpath = config_GetLibDir ();
-    AllocatePluginPath (p_this, vlcpath, mode);
+    if (likely(vlcpath != NULL))
+    {
+        size_t len = strlen(vlcpath);
+        vlcpath[len - strlen("vlccore.framework/vlc")] = '\0';
+        AllocatePluginPath (p_this, vlcpath, mode);
+    }
     free(vlcpath);
 #else
     /* Contruct the special search path for system that have a relocatable
