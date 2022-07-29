@@ -94,5 +94,14 @@
     return [NSFont systemFontOfSize:10. weight:NSFontWeightBold];
 }
 
++ (instancetype)VLCLibrarySupplementaryDetailViewTitleFont
+{
+    return [NSFont systemFontOfSize:20. weight:NSFontWeightSemibold];
+}
+
++ (instancetype)VLCLibrarySupplementaryDetailViewSubtitleFont
+{
+    return [NSFont systemFontOfSize:18. weight:NSFontWeightMedium];
+}
 
 @end

@@ -44,8 +44,6 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
-                                            <color key="bezelColor" red="0.96497207880000002" green="0.38123786450000002" blue="0.048660390079999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <color key="contentTintColor" red="0.96497207880000002" green="0.38123786450000002" blue="0.048660390079999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <connections>
                                                 <action selector="playAction:" target="HAc-or-XD8" id="edJ-21-Ej1"/>
                                             </connections>
@@ -96,7 +94,7 @@
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
                                     <rect key="frame" x="-2" y="230" width="124" height="52"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Album name" id="6RM-x8-Y4y">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album name" id="6RM-x8-Y4y">
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -104,7 +102,7 @@
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="HnP-Fk-juB">
                                     <rect key="frame" x="-2" y="206" width="87" height="16"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Album details" id="Nwk-76-Wx9">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album details" id="Nwk-76-Wx9">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -203,6 +201,7 @@
                 <outlet property="albumDetailsTextField" destination="HnP-Fk-juB" id="Hm3-l8-a9s"/>
                 <outlet property="albumTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="albumTracksTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
+                <outlet property="playAlbumButton" destination="ntd-VT-2KS" id="ah5-as-eqw"/>
             </connections>
             <point key="canvasLocation" x="-237.5" y="-284"/>
         </view>

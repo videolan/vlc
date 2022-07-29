@@ -60,6 +60,13 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
     _albumTracksTableView.dataSource = _tracksDataSource;
     _albumTracksTableView.delegate = _tracksDataSource;
+    _albumTitleTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];
+    _albumDetailsTextField.font = [ NSFont VLCLibrarySupplementaryDetailViewSubtitleFont];
+    _albumDetailsTextField.textColor = [NSColor VLCOrangeElementColor];
+
+    if(@available(macOS 10.12.2, *)) {
+        [_playAlbumButton setBezelColor:[NSColor VLCOrangeElementColor]];
+    }
 }
 
 - (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
