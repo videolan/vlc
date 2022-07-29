@@ -40,7 +40,7 @@ Item {
         label.width = Qt.binding(function () { return Math.min(label.implicitWidth, control.width) })
 
         label.elide = Qt.binding(function () {
-            return (control.forceScroll || hoverArea.containsMouse) ? Text.ElideNone : Text.ElideRight
+            return control.scrolling ? Text.ElideNone : Text.ElideRight
         })
     }
 
