@@ -127,7 +127,7 @@ FocusScope {
 
             source: backgroundItem
 
-            color: VLCStyle.colors.topBanner
+            tint: VLCStyle.colors.topBanner
 
             tintStrength: 0.0
             exclusionStrength: 0.1
