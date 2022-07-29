@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setupAppearance;
 - (void)reloadAppearance;
 - (void)reloadEmptyViewAppearance;
+- (void)reloadData;
 
 @end
 

@@ -54,7 +54,65 @@
 - (instancetype)init
 {
     self = [super init];
+    if(self) {
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAudioMediaListUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelArtistListUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAlbumListUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelGenreListUpdated
+                                 object:nil];
+    }
+
     return self;
+}
+
+- (void)libraryModelUpdated:(NSNotification *)aNotification
+{
+    if(self.libraryModel == nil) {
+        return;
+    }
+    
+    NSArray *collectionToDisplay;
+
+    switch(_currentParentType) {
+        case VLC_ML_PARENT_UNKNOWN:
+            collectionToDisplay = [self.libraryModel listOfAudioMedia];
+            break;
+        case VLC_ML_PARENT_ALBUM:
+            collectionToDisplay = [self.libraryModel listOfAlbums];
+            break;
+        case VLC_ML_PARENT_ARTIST:
+            collectionToDisplay = [self.libraryModel listOfArtists];
+            break;
+        case VLC_ML_PARENT_GENRE:
+            collectionToDisplay = [self.libraryModel listOfGenres];
+            break;
+        default:
+            return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSSet* originalCollectionSet = [[NSSet alloc] initWithArray:_displayedCollection];
+        NSSet* newCollectionSet = [[NSSet alloc] initWithArray:collectionToDisplay];
+
+        if([originalCollectionSet isEqual:newCollectionSet]) {
+            return;
+        }
+
+        _displayedCollection = collectionToDisplay;
+        [self reloadData];
+    });
 }
 
 - (void)setupAppearance
@@ -84,7 +142,7 @@
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
     
-    _currentSelectedSegment = _segmentedControl.indexOfSelectedItem;
+    _currentSelectedSegment = -1; // Force segmentedControlAction to do what it must
     _placeholderImageNames = @[@"placeholder-group2", @"placeholder-music", @"placeholder-music", @"placeholder-music"];
     _placeholderLabelStrings = @[
         _NS("Your favorite artists will appear here.\nGo to the Browse section to add artists you love."),
@@ -101,23 +159,36 @@
 {
     [self.segmentedControl setTarget:self];
     [self.segmentedControl setAction:@selector(segmentedControlAction:)];
-    [self segmentedControlAction:nil];
-
-    [self.collectionSelectionTableView reloadData];
-    [self.groupSelectionTableView reloadData];
-
-    [self.collectionView reloadData];
+    [self segmentedControlAction:self];
 }
 
 - (void)reloadEmptyViewAppearance
 {
-    _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[_currentSelectedSegment]];
-    _placeholderLabel.stringValue = _placeholderLabelStrings[_currentSelectedSegment];
+    if(_currentSelectedSegment < _placeholderImageNames.count && _currentSelectedSegment >= 0) {
+        _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[_currentSelectedSegment]];
+    }
+
+    if(_currentSelectedSegment < _placeholderLabelStrings.count && _currentSelectedSegment >= 0) {
+        _placeholderLabel.stringValue = _placeholderLabelStrings[_currentSelectedSegment];
+    }
+}
+
+- (void)reloadData
+{
+    [_collectionViewFlowLayout resetLayout];
+    [self.collectionView reloadData];
+    [self.collectionSelectionTableView reloadData];
+    [self.groupSelectionTableView reloadData];
 }
 
 - (IBAction)segmentedControlAction:(id)sender
 {
-    enum vlc_ml_parent_type oldParentType = _currentParentType;
+    if (_libraryModel.listOfAudioMedia.count == 0) {
+        [self reloadEmptyViewAppearance];
+        return;
+    } else if (_segmentedControl.selectedSegment == _currentSelectedSegment) {
+        return;
+    }
 
     _currentSelectedSegment = _segmentedControl.selectedSegment;
     switch (_currentSelectedSegment) {
@@ -142,21 +213,8 @@
             NSAssert(1, @"reached the unreachable");
             break;
     }
-    
-    if (_libraryModel.listOfAudioMedia.count == 0) {
-        [self reloadEmptyViewAppearance];
-        return;
-    }
 
-    if(oldParentType == _currentParentType) {
-        return;
-    }
-
-    [_collectionViewFlowLayout resetLayout];
-    
-    [self.collectionView reloadData];
-    [self.collectionSelectionTableView reloadData];
-    [self.groupSelectionTableView reloadData];
+    [self reloadData];
 
     if(sender != [[[VLCMain sharedInstance] libraryWindow] navigationStack]) {
         [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
