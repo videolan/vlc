@@ -40,9 +40,8 @@
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
 
-#if ( QT_VERSION < QT_VERSION_CHECK(5, 11, 0) )
-# error Update your Qt version to at least 5.11.0
-#endif
+static_assert (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0),
+               "Update your Qt version to at least 5.11.0");
 
 #if ( QT_VERSION < QT_VERSION_CHECK(5, 15, 0) )
 # define QSIGNALMAPPER_MAPPEDINT_SIGNAL QOverload<int>::of(&QSignalMapper::mapped)

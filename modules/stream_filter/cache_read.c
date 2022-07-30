@@ -520,9 +520,8 @@ static int Open(vlc_object_t *obj)
 
     sys->i_used   = 0;
     sys->i_read_size = STREAM_READ_ATONCE;
-#if STREAM_READ_ATONCE < 256
-#   error "Invalid STREAM_READ_ATONCE value"
-#endif
+    static_assert (STREAM_READ_ATONCE >= 256,
+                   "Invalid STREAM_READ_ATONCE value");
 
     for (unsigned i = 0; i < STREAM_CACHE_TRACK; i++)
     {

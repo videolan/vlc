@@ -33,9 +33,7 @@
 #  define _POSIX_CLOCK_SELECTION (-1)
 #endif
 
-#if (_POSIX_CLOCK_SELECTION < 0)
-#   error Clock selection is not available!
-#endif
+static_assert (_POSIX_CLOCK_SELECTION >= 0, "Clock selection unavailable!");
 
 #include <vlc/vlc.h>
 

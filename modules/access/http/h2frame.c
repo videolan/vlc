@@ -284,18 +284,16 @@ struct vlc_h2_frame *vlc_h2_frame_settings(void)
 #endif
 
 #if (VLC_H2_INIT_WINDOW != VLC_H2_DEFAULT_INIT_WINDOW)
-# if (VLC_H2_INIT_WINDOW > 2147483647)
-#  error Illegal initial window value
-# endif
+    static_assert (VLC_H2_INIT_WINDOW < 2147483648,
+                   "Illegal initial window value");
     SetWBE(p, VLC_H2_SETTING_INITIAL_WINDOW_SIZE);
     SetDWBE(p + 2, VLC_H2_INIT_WINDOW);
     p += 6;
 #endif
 
 #if (VLC_H2_MAX_FRAME != VLC_H2_DEFAULT_MAX_FRAME)
-# if (VLC_H2_MAX_FRAME < 16384 || VLC_H2_MAX_FRAME > 16777215)
-#  error Illegal maximum frame size
-# endif
+    static_assert (VLC_H2_MAX_FRAME >= 16384 && VLC_H2_MAX_FRAME < 16777216,
+                   "Illegal maximum frame size");
     SetWBE(p, VLC_H2_SETTING_MAX_FRAME_SIZE);
     SetDWBE(p + 2, VLC_H2_MAX_FRAME);
     p += 6;

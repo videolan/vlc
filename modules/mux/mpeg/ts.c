@@ -31,6 +31,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <limits.h>
 
 #include <vlc_common.h>
@@ -184,9 +185,8 @@ static const char *const ts_standards_list_text[] =
 #define SOUT_CFG_PREFIX "sout-ts-"
 #define MAX_PMT 64       /* Maximum number of programs. FIXME: I just chose an arbitrary number. Where is the maximum in the spec? */
 #define MAX_PMT_PID 64       /* Maximum pids in each pmt.  FIXME: I just chose an arbitrary number. Where is the maximum in the spec? */
-#if MAX_SDT_DESC < MAX_PMT
-  #error "MAX_SDT_DESC < MAX_PMT"
-#endif
+
+static_assert (MAX_SDT_DESC >= MAX_PMT, "MAX_SDT_DESC < MAX_PMT");
 
 #define BLOCK_FLAG_NO_KEYFRAME (1 << BLOCK_FLAG_PRIVATE_SHIFT) /* This is not a key frame for bitrate shaping */
 

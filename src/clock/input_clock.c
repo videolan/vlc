@@ -459,9 +459,8 @@ void input_clock_SetJitter( input_clock_t *cl,
 
 vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
 {
-#if INPUT_CLOCK_LATE_COUNT != 3
-#   error "unsupported INPUT_CLOCK_LATE_COUNT"
-#endif
+    static_assert (INPUT_CLOCK_LATE_COUNT == 3,
+                   "unsupported INPUT_CLOCK_LATE_COUNT");
     /* Find the median of the last late values
      * It works pretty well at rejecting bad values
      *
