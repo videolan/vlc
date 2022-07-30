@@ -66,10 +66,9 @@ typedef void* yyscan_t;
 /* See bison pure calling */
 int yylex(union YYSTYPE *, yyscan_t, vlc_css_parser_t *);
 
-static int yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
+static void yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
 {
     VLC_UNUSED(scanner);VLC_UNUSED(p);VLC_UNUSED(msg);
-    return 1;
 }
 
 %}
