@@ -67,10 +67,9 @@ typedef void* yyscan_t;
 #define YY_DECL int yylex(union YYSTYPE *, yyscan_t)
 YY_DECL;
 
-static int yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
+static void yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
 {
     VLC_UNUSED(scanner);VLC_UNUSED(p);VLC_UNUSED(msg);
-    return 1;
 }
 
 %}
