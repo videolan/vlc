@@ -1,0 +1,354 @@
+From bd851ae37c6dbd7b770bd5cab771f19c2da66a87 Mon Sep 17 00:00:00 2001
+From: Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+Date: Thu, 3 Nov 2016 16:08:55 +0000
+Subject: [PATCH 18/18] Remove qtypetraits.h's contents altogether
+
+So that QFlags can use an (un)signed int matching the
+underlying type as identified by the compiler and not by us.
+
+Requires fixing a few warnings about sign conversion due to
+QFlags misusages in qtbase that were either plain wrong, or
+were relying on the enum being backed by an (un)signed int
+when it wasn't.
+
+Keep qtypetraits.h in the source tree in order to prevent
+source breaks if some downstream #includes it (note however
+that it did not contain any public API).
+
+Change-Id: Ib3a92b98db7031e793a088fb2a3b306eff4d7a3c
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Backport-Of: 6255cb893d411b055758f2e64e94fde0bce91ea8 (v5.9.0)
+---
+ src/corelib/global/qflags.h                   |  9 +--
+ src/corelib/global/qtypetraits.h              | 55 +++----------------
+ src/corelib/io/qurl.h                         |  4 +-
+ src/corelib/itemmodels/qabstractitemmodel.cpp |  2 +-
+ src/corelib/kernel/qmetatype.cpp              |  2 +-
+ src/corelib/kernel/qmetatype_p.h              |  2 +-
+ src/gui/opengl/qopengltexturecache.cpp        |  2 +-
+ src/gui/opengl/qopengltexturecache_p.h        | 28 +++++-----
+ src/widgets/kernel/qwidgetwindow.cpp          |  4 +-
+ src/widgets/styles/qfusionstyle.cpp           |  4 +-
+ src/widgets/styles/qmacstyle_mac.mm           |  4 +-
+ .../auto/corelib/global/qflags/tst_qflags.cpp |  8 +--
+ tests/auto/other/modeltest/modeltest.cpp      |  2 +-
+ 13 files changed, 44 insertions(+), 82 deletions(-)
+
+diff --git a/src/corelib/global/qflags.h b/src/corelib/global/qflags.h
+index dc0873aaad..3faf8d5a65 100644
+--- a/src/corelib/global/qflags.h
++++ b/src/corelib/global/qflags.h
+@@ -36,13 +36,12 @@
+ #ifndef QFLAGS_H
+ #define QFLAGS_H
+ 
+-#include <QtCore/qtypeinfo.h>
+-#include <QtCore/qtypetraits.h>
+-
+ #ifdef Q_COMPILER_INITIALIZER_LISTS
+ #include <initializer_list>
+ #endif
+ 
++#include <type_traits>
++
+ QT_BEGIN_NAMESPACE
+ 
+ class QFlag
+@@ -88,6 +87,8 @@ class QFlags
+     Q_STATIC_ASSERT_X((sizeof(Enum) <= sizeof(int)),
+                       "QFlags uses an int as storage, so an enum with underlying "
+                       "long long will overflow.");
++    Q_STATIC_ASSERT_X((std::is_enum<Enum>::value), "QFlags is only usable on enumeration types.");
++
+     struct Private;
+     typedef int (Private::*Zero);
+ public:
+@@ -97,7 +98,7 @@ public:
+     typedef int Int;
+ #else
+     typedef typename std::conditional<
+-            QtPrivate::QIsUnsignedEnum<Enum>::value,
++            std::is_unsigned<typename std::underlying_type<Enum>::type>::value,
+             unsigned int,
+             signed int
+         >::type Int;
+diff --git a/src/corelib/global/qtypetraits.h b/src/corelib/global/qtypetraits.h
+index c5d7cacd8d..f7badd9aee 100644
+--- a/src/corelib/global/qtypetraits.h
++++ b/src/corelib/global/qtypetraits.h
+@@ -31,6 +31,12 @@
+ **
+ ****************************************************************************/
+ 
++// ### Qt 6: remove this header
++//
++// This header is deliberately empty. Although it did not contain any public API,
++// it was accidentally made public in Qt 5. So: do not remove it for the moment
++// being, to prevent #include breaks in downstreams.
++
+ #include "QtCore/qglobal.h"
+ 
+ #ifndef QTYPETRAITS_H
+@@ -38,53 +44,6 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-namespace QtPrivate {
+-
+-//
+-// Define QIsUnsignedEnum, QIsSignedEnum -
+-// std::is_signed, std::is_unsigned does not work for enum's
+-//
+-
+-// a metafunction to invert an integral_constant:
+-template <typename T>
+-struct not_
+-    : std::integral_constant<bool, !T::value> {};
+-
+-// Checks whether a type is unsigned (T must be convertible to unsigned int):
+-template <typename T>
+-struct QIsUnsignedEnum
+-    : std::integral_constant<bool, (T(0) < T(-1))> {};
+-
+-// Checks whether a type is signed (T must be convertible to int):
+-template <typename T>
+-struct QIsSignedEnum
+-    : not_< QIsUnsignedEnum<T> > {};
+-
+-Q_STATIC_ASSERT(( QIsUnsignedEnum<quint8>::value));
+-Q_STATIC_ASSERT((!QIsUnsignedEnum<qint8>::value));
+-
+-Q_STATIC_ASSERT((!QIsSignedEnum<quint8>::value));
+-Q_STATIC_ASSERT(( QIsSignedEnum<qint8>::value));
+-
+-Q_STATIC_ASSERT(( QIsUnsignedEnum<quint16>::value));
+-Q_STATIC_ASSERT((!QIsUnsignedEnum<qint16>::value));
+-
+-Q_STATIC_ASSERT((!QIsSignedEnum<quint16>::value));
+-Q_STATIC_ASSERT(( QIsSignedEnum<qint16>::value));
+-
+-Q_STATIC_ASSERT(( QIsUnsignedEnum<quint32>::value));
+-Q_STATIC_ASSERT((!QIsUnsignedEnum<qint32>::value));
+-
+-Q_STATIC_ASSERT((!QIsSignedEnum<quint32>::value));
+-Q_STATIC_ASSERT(( QIsSignedEnum<qint32>::value));
+-
+-Q_STATIC_ASSERT(( QIsUnsignedEnum<quint64>::value));
+-Q_STATIC_ASSERT((!QIsUnsignedEnum<qint64>::value));
+-
+-Q_STATIC_ASSERT((!QIsSignedEnum<quint64>::value));
+-Q_STATIC_ASSERT(( QIsSignedEnum<qint64>::value));
+-
+-} // namespace QtPrivate
+-
+ QT_END_NAMESPACE
++
+ #endif  // QTYPETRAITS_H
+diff --git a/src/corelib/io/qurl.h b/src/corelib/io/qurl.h
+index e6c570d1db..84be6f0d60 100644
+--- a/src/corelib/io/qurl.h
++++ b/src/corelib/io/qurl.h
+@@ -65,8 +65,8 @@ public:
+     Q_DECL_CONSTEXPR inline QUrlTwoFlags(E1 f) : i(f) {}
+     Q_DECL_CONSTEXPR inline QUrlTwoFlags(E2 f) : i(f) {}
+     Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlag f) : i(f) {}
+-    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E1> f) : i(f.operator int()) {}
+-    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E2> f) : i(f.operator int()) {}
++    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E1> f) : i(f.operator typename QFlags<E1>::Int()) {}
++    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E2> f) : i(f.operator typename QFlags<E2>::Int()) {}
+     Q_DECL_CONSTEXPR inline QUrlTwoFlags(Zero = 0) : i(0) {}
+ 
+     inline QUrlTwoFlags &operator&=(int mask) { i &= mask; return *this; }
+diff --git a/src/corelib/itemmodels/qabstractitemmodel.cpp b/src/corelib/itemmodels/qabstractitemmodel.cpp
+index e35454346b..f794fb4bf2 100644
+--- a/src/corelib/itemmodels/qabstractitemmodel.cpp
++++ b/src/corelib/itemmodels/qabstractitemmodel.cpp
+@@ -1959,7 +1959,7 @@ Qt::DropActions QAbstractItemModel::supportedDropActions() const
+ Qt::DropActions QAbstractItemModel::supportedDragActions() const
+ {
+     Q_D(const QAbstractItemModel);
+-    if (d->supportedDragActions != -1)
++    if (d->supportedDragActions != Qt::IgnoreAction)
+         return d->supportedDragActions;
+     return supportedDropActions();
+ }
+diff --git a/src/corelib/kernel/qmetatype.cpp b/src/corelib/kernel/qmetatype.cpp
+index 59d75c182f..b51850cad0 100644
+--- a/src/corelib/kernel/qmetatype.cpp
++++ b/src/corelib/kernel/qmetatype.cpp
+@@ -1012,7 +1012,7 @@ int QMetaType::registerNormalizedType(const NS(QByteArray) &normalizedTypeName,
+                                   normalizedTypeName.size());
+ 
+     int previousSize = 0;
+-    int previousFlags = 0;
++    QMetaType::TypeFlags::Int previousFlags = 0;
+     if (idx == UnknownType) {
+         QWriteLocker locker(customTypesLock());
+         int posInVector = -1;
+diff --git a/src/corelib/kernel/qmetatype_p.h b/src/corelib/kernel/qmetatype_p.h
+index 7c0c984c9c..61be08ff24 100644
+--- a/src/corelib/kernel/qmetatype_p.h
++++ b/src/corelib/kernel/qmetatype_p.h
+@@ -119,7 +119,7 @@ public:
+     QMetaType::Constructor constructor;
+     QMetaType::Destructor destructor;
+     int size;
+-    quint32 flags; // same as QMetaType::TypeFlags
++    QMetaType::TypeFlags::Int flags;
+     const QMetaObject *metaObject;
+ };
+ 
+diff --git a/src/gui/opengl/qopengltexturecache.cpp b/src/gui/opengl/qopengltexturecache.cpp
+index 72df636f5f..fbbca35b97 100644
+--- a/src/gui/opengl/qopengltexturecache.cpp
++++ b/src/gui/opengl/qopengltexturecache.cpp
+@@ -365,7 +365,7 @@ static void freeTexture(QOpenGLFunctions *funcs, GLuint id)
+     funcs->glDeleteTextures(1, &id);
+ }
+ 
+-QOpenGLCachedTexture::QOpenGLCachedTexture(GLuint id, int options, QOpenGLContext *context) : m_options(options)
++QOpenGLCachedTexture::QOpenGLCachedTexture(GLuint id, QOpenGLTextureCache::BindOptions options, QOpenGLContext *context) : m_options(options)
+ {
+     m_resource = new QOpenGLSharedResourceGuard(context, id, freeTexture);
+ }
+diff --git a/src/gui/opengl/qopengltexturecache_p.h b/src/gui/opengl/qopengltexturecache_p.h
+index 40f033df43..849f3229b7 100644
+--- a/src/gui/opengl/qopengltexturecache_p.h
++++ b/src/gui/opengl/qopengltexturecache_p.h
+@@ -53,19 +53,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-class QOpenGLCachedTexture
+-{
+-public:
+-    QOpenGLCachedTexture(GLuint id, int options, QOpenGLContext *context);
+-    ~QOpenGLCachedTexture() { m_resource->free(); }
+-
+-    GLuint id() const { return m_resource->id(); }
+-    int options() const { return m_options; }
+-
+-private:
+-    QOpenGLSharedResourceGuard *m_resource;
+-    int m_options;
+-};
++class QOpenGLCachedTexture;
+ 
+ class Q_GUI_EXPORT QOpenGLTextureCache : public QOpenGLSharedResource
+ {
+@@ -99,6 +87,20 @@ private:
+ 
+ Q_DECLARE_OPERATORS_FOR_FLAGS(QOpenGLTextureCache::BindOptions)
+ 
++class QOpenGLCachedTexture
++{
++public:
++    QOpenGLCachedTexture(GLuint id, QOpenGLTextureCache::BindOptions options, QOpenGLContext *context);
++    ~QOpenGLCachedTexture() { m_resource->free(); }
++
++    GLuint id() const { return m_resource->id(); }
++    QOpenGLTextureCache::BindOptions options() const { return m_options; }
++
++private:
++    QOpenGLSharedResourceGuard *m_resource;
++    QOpenGLTextureCache::BindOptions m_options;
++};
++
+ QT_END_NAMESPACE
+ 
+ #endif
+diff --git a/src/widgets/kernel/qwidgetwindow.cpp b/src/widgets/kernel/qwidgetwindow.cpp
+index 40c488857e..c0a3a670eb 100644
+--- a/src/widgets/kernel/qwidgetwindow.cpp
++++ b/src/widgets/kernel/qwidgetwindow.cpp
+@@ -947,8 +947,8 @@ void QWidgetWindow::handleWindowStateChangedEvent(QWindowStateChangeEvent *event
+ 
+     // Sent event if the state changed (that is, it is not triggered by
+     // QWidget::setWindowState(), which also sends an event to the widget).
+-    if (widgetState != int(m_widget->data->window_state)) {
+-        m_widget->data->window_state = widgetState;
++    if (widgetState != Qt::WindowStates::Int(m_widget->data->window_state)) {
++        m_widget->data->window_state = uint(widgetState);
+         QWindowStateChangeEvent widgetEvent(eventState);
+         QGuiApplication::sendSpontaneousEvent(m_widget, &widgetEvent);
+     }
+diff --git a/src/widgets/styles/qfusionstyle.cpp b/src/widgets/styles/qfusionstyle.cpp
+index dcc99496e3..2d8561219c 100644
+--- a/src/widgets/styles/qfusionstyle.cpp
++++ b/src/widgets/styles/qfusionstyle.cpp
+@@ -2413,7 +2413,7 @@ void QFusionStyle::drawComplexControl(ComplexControl control, const QStyleOption
+                 int oldMin = styleObject->property("_q_stylemin").toInt();
+                 int oldMax = styleObject->property("_q_stylemax").toInt();
+                 QRect oldRect = styleObject->property("_q_stylerect").toRect();
+-                int oldState = styleObject->property("_q_stylestate").toInt();
++                QStyle::State oldState = static_cast<QStyle::State>(styleObject->property("_q_stylestate").value<QStyle::State::Int>());
+                 uint oldActiveControls = styleObject->property("_q_stylecontrols").toUInt();
+ 
+                 // a scrollbar is transient when the the scrollbar itself and
+@@ -2436,7 +2436,7 @@ void QFusionStyle::drawComplexControl(ComplexControl control, const QStyleOption
+                     styleObject->setProperty("_q_stylemin", scrollBar->minimum);
+                     styleObject->setProperty("_q_stylemax", scrollBar->maximum);
+                     styleObject->setProperty("_q_stylerect", scrollBar->rect);
+-                    styleObject->setProperty("_q_stylestate", static_cast<int>(scrollBar->state));
++                    styleObject->setProperty("_q_stylestate", static_cast<QStyle::State::Int>(scrollBar->state));
+                     styleObject->setProperty("_q_stylecontrols", static_cast<uint>(scrollBar->activeSubControls));
+ 
+ #ifndef QT_NO_ANIMATION
+diff --git a/src/widgets/styles/qmacstyle_mac.mm b/src/widgets/styles/qmacstyle_mac.mm
+index 84445bfce4..fa4ea7f35a 100644
+--- a/src/widgets/styles/qmacstyle_mac.mm
++++ b/src/widgets/styles/qmacstyle_mac.mm
+@@ -5437,7 +5437,7 @@ void QMacStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex
+                     int oldMin = styleObject->property("_q_stylemin").toInt();
+                     int oldMax = styleObject->property("_q_stylemax").toInt();
+                     QRect oldRect = styleObject->property("_q_stylerect").toRect();
+-                    int oldState = styleObject->property("_q_stylestate").toInt();
++                    QStyle::State oldState = static_cast<QStyle::State>(styleObject->property("_q_stylestate").value<QStyle::State::Int>());
+                     uint oldActiveControls = styleObject->property("_q_stylecontrols").toUInt();
+ 
+                     // a scrollbar is transient when the scrollbar itself and
+@@ -5460,7 +5460,7 @@ void QMacStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex
+                         styleObject->setProperty("_q_stylemin", slider->minimum);
+                         styleObject->setProperty("_q_stylemax", slider->maximum);
+                         styleObject->setProperty("_q_stylerect", slider->rect);
+-                        styleObject->setProperty("_q_stylestate", static_cast<int>(slider->state));
++                        styleObject->setProperty("_q_stylestate", static_cast<QStyle::State::Int>(slider->state));
+                         styleObject->setProperty("_q_stylecontrols", static_cast<uint>(slider->activeSubControls));
+ 
+                         QScrollbarStyleAnimation *anim  = qobject_cast<QScrollbarStyleAnimation *>(d->animation(styleObject));
+diff --git a/tests/auto/corelib/global/qflags/tst_qflags.cpp b/tests/auto/corelib/global/qflags/tst_qflags.cpp
+index f16b5c4cf7..562a7a28d0 100644
+--- a/tests/auto/corelib/global/qflags/tst_qflags.cpp
++++ b/tests/auto/corelib/global/qflags/tst_qflags.cpp
+@@ -138,11 +138,11 @@ void tst_QFlags::signedness()
+     // underlying type is implementation-defined, we need to allow for
+     // a different signedness, so we only check that the relative
+     // signedness of the types matches:
+-    Q_STATIC_ASSERT((QtPrivate::QIsUnsignedEnum<Qt::MouseButton>::value ==
+-                     QtPrivate::QIsUnsignedEnum<Qt::MouseButtons::Int>::value));
++    Q_STATIC_ASSERT((std::is_unsigned<typename std::underlying_type<Qt::MouseButton>::type>::value ==
++                     std::is_unsigned<Qt::MouseButtons::Int>::value));
+ 
+-    Q_STATIC_ASSERT((QtPrivate::QIsSignedEnum<Qt::AlignmentFlag>::value ==
+-                     QtPrivate::QIsSignedEnum<Qt::Alignment::Int>::value));
++    Q_STATIC_ASSERT((std::is_signed<typename std::underlying_type<Qt::AlignmentFlag>::type>::value ==
++                     std::is_signed<Qt::Alignment::Int>::value));
+ }
+ 
+ #if defined(Q_COMPILER_CLASS_ENUM)
+diff --git a/tests/auto/other/modeltest/modeltest.cpp b/tests/auto/other/modeltest/modeltest.cpp
+index c119fdaa4e..55290a8402 100644
+--- a/tests/auto/other/modeltest/modeltest.cpp
++++ b/tests/auto/other/modeltest/modeltest.cpp
+@@ -443,7 +443,7 @@ void ModelTest::data()
+     // Check that the alignment is one we know about
+     QVariant textAlignmentVariant = model->data ( model->index ( 0, 0 ), Qt::TextAlignmentRole );
+     if ( textAlignmentVariant.isValid() ) {
+-        int alignment = textAlignmentVariant.toInt();
++        Qt::Alignment alignment = textAlignmentVariant.value<Qt::Alignment>();
+         QCOMPARE( alignment, ( alignment & ( Qt::AlignHorizontal_Mask | Qt::AlignVertical_Mask ) ) );
+     }
+ 
+-- 
+2.25.1
+

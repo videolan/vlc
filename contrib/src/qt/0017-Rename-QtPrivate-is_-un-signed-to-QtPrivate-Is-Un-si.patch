@@ -1,0 +1,125 @@
+From 4e57e3d915557dc00b4931727cf162a1742e73a2 Mon Sep 17 00:00:00 2001
+From: Kai Koehne <kai.koehne@qt.io>
+Date: Mon, 8 Aug 2016 09:41:57 +0200
+Subject: [PATCH 17/18] Rename QtPrivate::is_[un]signed to
+ QtPrivate::Is[Un]signedEnum
+
+Any other use than for enums should use std::is_[un]signed. Make this
+explicit by renaming the type traits.
+
+Change-Id: I494158563c95c710e710d0d337f4e547006df171
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Backport-Of: 615270a3008cfc1314a3c983b7e69006dc4184b4 (v5.8.0)
+---
+ src/corelib/global/qflags.h                   |  2 +-
+ src/corelib/global/qtypetraits.h              | 41 ++++++++++---------
+ .../auto/corelib/global/qflags/tst_qflags.cpp |  8 ++--
+ 3 files changed, 26 insertions(+), 25 deletions(-)
+
+diff --git a/src/corelib/global/qflags.h b/src/corelib/global/qflags.h
+index d2a6b51d90..dc0873aaad 100644
+--- a/src/corelib/global/qflags.h
++++ b/src/corelib/global/qflags.h
+@@ -97,7 +97,7 @@ public:
+     typedef int Int;
+ #else
+     typedef typename std::conditional<
+-            QtPrivate::is_unsigned<Enum>::value,
++            QtPrivate::QIsUnsignedEnum<Enum>::value,
+             unsigned int,
+             signed int
+         >::type Int;
+diff --git a/src/corelib/global/qtypetraits.h b/src/corelib/global/qtypetraits.h
+index 86593f7b11..c5d7cacd8d 100644
+--- a/src/corelib/global/qtypetraits.h
++++ b/src/corelib/global/qtypetraits.h
+@@ -41,7 +41,8 @@ QT_BEGIN_NAMESPACE
+ namespace QtPrivate {
+ 
+ //
+-// define custom is_signed, is_unsigned that also works with enum's
++// Define QIsUnsignedEnum, QIsSignedEnum -
++// std::is_signed, std::is_unsigned does not work for enum's
+ //
+ 
+ // a metafunction to invert an integral_constant:
+@@ -51,37 +52,37 @@ struct not_
+ 
+ // Checks whether a type is unsigned (T must be convertible to unsigned int):
+ template <typename T>
+-struct is_unsigned
++struct QIsUnsignedEnum
+     : std::integral_constant<bool, (T(0) < T(-1))> {};
+ 
+ // Checks whether a type is signed (T must be convertible to int):
+ template <typename T>
+-struct is_signed
+-    : not_< is_unsigned<T> > {};
++struct QIsSignedEnum
++    : not_< QIsUnsignedEnum<T> > {};
+ 
+-Q_STATIC_ASSERT(( is_unsigned<quint8>::value));
+-Q_STATIC_ASSERT((!is_unsigned<qint8>::value));
++Q_STATIC_ASSERT(( QIsUnsignedEnum<quint8>::value));
++Q_STATIC_ASSERT((!QIsUnsignedEnum<qint8>::value));
+ 
+-Q_STATIC_ASSERT((!is_signed<quint8>::value));
+-Q_STATIC_ASSERT(( is_signed<qint8>::value));
++Q_STATIC_ASSERT((!QIsSignedEnum<quint8>::value));
++Q_STATIC_ASSERT(( QIsSignedEnum<qint8>::value));
+ 
+-Q_STATIC_ASSERT(( is_unsigned<quint16>::value));
+-Q_STATIC_ASSERT((!is_unsigned<qint16>::value));
++Q_STATIC_ASSERT(( QIsUnsignedEnum<quint16>::value));
++Q_STATIC_ASSERT((!QIsUnsignedEnum<qint16>::value));
+ 
+-Q_STATIC_ASSERT((!is_signed<quint16>::value));
+-Q_STATIC_ASSERT(( is_signed<qint16>::value));
++Q_STATIC_ASSERT((!QIsSignedEnum<quint16>::value));
++Q_STATIC_ASSERT(( QIsSignedEnum<qint16>::value));
+ 
+-Q_STATIC_ASSERT(( is_unsigned<quint32>::value));
+-Q_STATIC_ASSERT((!is_unsigned<qint32>::value));
++Q_STATIC_ASSERT(( QIsUnsignedEnum<quint32>::value));
++Q_STATIC_ASSERT((!QIsUnsignedEnum<qint32>::value));
+ 
+-Q_STATIC_ASSERT((!is_signed<quint32>::value));
+-Q_STATIC_ASSERT(( is_signed<qint32>::value));
++Q_STATIC_ASSERT((!QIsSignedEnum<quint32>::value));
++Q_STATIC_ASSERT(( QIsSignedEnum<qint32>::value));
+ 
+-Q_STATIC_ASSERT(( is_unsigned<quint64>::value));
+-Q_STATIC_ASSERT((!is_unsigned<qint64>::value));
++Q_STATIC_ASSERT(( QIsUnsignedEnum<quint64>::value));
++Q_STATIC_ASSERT((!QIsUnsignedEnum<qint64>::value));
+ 
+-Q_STATIC_ASSERT((!is_signed<quint64>::value));
+-Q_STATIC_ASSERT(( is_signed<qint64>::value));
++Q_STATIC_ASSERT((!QIsSignedEnum<quint64>::value));
++Q_STATIC_ASSERT(( QIsSignedEnum<qint64>::value));
+ 
+ } // namespace QtPrivate
+ 
+diff --git a/tests/auto/corelib/global/qflags/tst_qflags.cpp b/tests/auto/corelib/global/qflags/tst_qflags.cpp
+index 1f2e7ca0cd..f16b5c4cf7 100644
+--- a/tests/auto/corelib/global/qflags/tst_qflags.cpp
++++ b/tests/auto/corelib/global/qflags/tst_qflags.cpp
+@@ -138,11 +138,11 @@ void tst_QFlags::signedness()
+     // underlying type is implementation-defined, we need to allow for
+     // a different signedness, so we only check that the relative
+     // signedness of the types matches:
+-    Q_STATIC_ASSERT((QtPrivate::is_unsigned<Qt::MouseButton>::value ==
+-                     QtPrivate::is_unsigned<Qt::MouseButtons::Int>::value));
++    Q_STATIC_ASSERT((QtPrivate::QIsUnsignedEnum<Qt::MouseButton>::value ==
++                     QtPrivate::QIsUnsignedEnum<Qt::MouseButtons::Int>::value));
+ 
+-    Q_STATIC_ASSERT((QtPrivate::is_signed<Qt::AlignmentFlag>::value ==
+-                     QtPrivate::is_signed<Qt::Alignment::Int>::value));
++    Q_STATIC_ASSERT((QtPrivate::QIsSignedEnum<Qt::AlignmentFlag>::value ==
++                     QtPrivate::QIsSignedEnum<Qt::Alignment::Int>::value));
+ }
+ 
+ #if defined(Q_COMPILER_CLASS_ENUM)
+-- 
+2.25.1
+

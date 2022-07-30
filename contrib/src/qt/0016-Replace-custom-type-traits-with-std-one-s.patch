@@ -1,0 +1,1148 @@
+From 2c12688e30f2e38c9d7ff9ab8718d6580b2eeb34 Mon Sep 17 00:00:00 2001
+From: Kai Koehne <kai.koehne@qt.io>
+Date: Fri, 5 Aug 2016 10:12:12 +0200
+Subject: [PATCH 16/18] Replace custom type traits with std one's
+
+Remove most type traits from qtypetraits.h, but keep the custom
+implementation of is_signed/is_unsigned. This gets rid of
+BSD-3 licensed code from Google in a public header (hugh!).
+
+The custom implementations for is_signed/is_unsigned are kept
+because the implementations in gcc's standard headers do not
+work as we expect for enums - both is_signed and is_unsigned
+always returns false there - see also
+  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59027
+
+[ChangeLog][QtCore][General] Qt now relies on type traits from
+the C++ standard library.
+
+Change-Id: I3f2188b46949f04ca4482a6ac9afd3482103f0e1
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Backport-Of: ed7f77071dcca996a8c8147fd66344090666e60c (v5.8.0)
+---
+ src/corelib/global/qflags.h                   |   2 +-
+ src/corelib/global/qglobal.h                  |   3 +-
+ src/corelib/global/qisenum.h                  |   3 +-
+ src/corelib/global/qnumeric_p.h               |   4 +-
+ src/corelib/global/qtypeinfo.h                |   7 +-
+ src/corelib/global/qtypetraits.h              | 450 +-----------------
+ src/corelib/kernel/qmetatype.h                |   9 +-
+ src/corelib/kernel/qobject.h                  |  12 +-
+ src/corelib/kernel/qpointer.h                 |   2 +-
+ src/corelib/kernel/qtimer.h                   |   8 +-
+ src/corelib/kernel/qvariant_p.h               |  10 +-
+ src/corelib/thread/qmutex.cpp                 |   3 +-
+ src/corelib/tools/qbytearray_p.h              |   3 +-
+ src/corelib/tools/qhash.h                     |   2 +-
+ src/corelib/tools/qlist.h                     |   4 +-
+ src/corelib/tools/qmap.h                      |   7 +-
+ src/corelib/tools/qsharedpointer_impl.h       |   2 +-
+ src/corelib/tools/qstringalgorithms_p.h       |   4 +-
+ src/testlib/qtestcase.h                       |   3 +-
+ src/widgets/graphicsview/qgraphicsitem.h      |   4 +-
+ src/widgets/styles/qstyleoption.h             |   8 +-
+ src/widgets/widgets/qmenu.h                   |   4 +-
+ src/widgets/widgets/qtoolbar.h                |   4 +-
+ .../corelib/global/qglobal/tst_qglobal.cpp    |   5 +-
+ .../qhashfunctions/tst_qhashfunctions.cpp     |   3 +-
+ 25 files changed, 58 insertions(+), 508 deletions(-)
+
+diff --git a/src/corelib/global/qflags.h b/src/corelib/global/qflags.h
+index f434e87c85..d2a6b51d90 100644
+--- a/src/corelib/global/qflags.h
++++ b/src/corelib/global/qflags.h
+@@ -96,7 +96,7 @@ public:
+     // the definition below is too complex for qdoc
+     typedef int Int;
+ #else
+-    typedef typename QtPrivate::if_<
++    typedef typename std::conditional<
+             QtPrivate::is_unsigned<Enum>::value,
+             unsigned int,
+             signed int
+diff --git a/src/corelib/global/qglobal.h b/src/corelib/global/qglobal.h
+index baa9053876..d35963dff3 100644
+--- a/src/corelib/global/qglobal.h
++++ b/src/corelib/global/qglobal.h
+@@ -36,6 +36,7 @@
+ #define QGLOBAL_H
+ 
+ #ifdef __cplusplus
++#  include <type_traits>
+ #  include <cstddef>
+ #endif
+ 
+@@ -944,7 +945,7 @@ public:
+ //  - if there was a break inside the inner loop, it will exit with control still
+ //    set to 1; in that case, the outer loop will invert it to 0 and will exit too
+ #define Q_FOREACH(variable, container)                                \
+-for (QForeachContainer<typename QtPrivate::remove_reference<decltype(container)>::type> _container_((container)); \
++for (QForeachContainer<typename std::remove_reference<decltype(container)>::type> _container_((container)); \
+      _container_.control && _container_.i != _container_.e;         \
+      ++_container_.i, _container_.control ^= 1)                     \
+     for (variable = *_container_.i; _container_.control; _container_.control = 0)
+diff --git a/src/corelib/global/qisenum.h b/src/corelib/global/qisenum.h
+index 3a05297bd6..e5f3f9c00c 100644
+--- a/src/corelib/global/qisenum.h
++++ b/src/corelib/global/qisenum.h
+@@ -49,8 +49,7 @@
+ #endif
+ 
+ #ifndef Q_IS_ENUM
+-#  include <QtCore/qtypetraits.h>
+-#  define Q_IS_ENUM(x) QtPrivate::is_enum<x>::value
++#  define Q_IS_ENUM(x) std::is_enum<x>::value
+ #endif
+ 
+ // shut up syncqt
+diff --git a/src/corelib/global/qnumeric_p.h b/src/corelib/global/qnumeric_p.h
+index c29ec0ea7b..24a51fd911 100644
+--- a/src/corelib/global/qnumeric_p.h
++++ b/src/corelib/global/qnumeric_p.h
+@@ -201,7 +201,7 @@ static inline bool qt_is_finite(float d)
+ // Overflow math
+ //
+ namespace {
+-template <typename T> inline typename QtPrivate::QEnableIf<QtPrivate::is_unsigned<T>::value, bool>::Type
++template <typename T> inline typename QtPrivate::QEnableIf<std::is_unsigned<T>::value, bool>::Type
+ add_overflow(T v1, T v2, T *r)
+ {
+     // unsigned additions are well-defined
+@@ -209,7 +209,7 @@ add_overflow(T v1, T v2, T *r)
+     return v1 > T(v1 + v2);
+ }
+ 
+-template <typename T> inline typename QtPrivate::QEnableIf<QtPrivate::is_unsigned<T>::value, bool>::Type
++template <typename T> inline typename QtPrivate::QEnableIf<std::is_unsigned<T>::value, bool>::Type
+ mul_overflow(T v1, T v2, T *r)
+ {
+     // use the next biggest type
+diff --git a/src/corelib/global/qtypeinfo.h b/src/corelib/global/qtypeinfo.h
+index f5fc311a22..5d60f1f83b 100644
+--- a/src/corelib/global/qtypeinfo.h
++++ b/src/corelib/global/qtypeinfo.h
+@@ -31,12 +31,13 @@
+ **
+ ****************************************************************************/
+ 
+-#include <QtCore/qtypetraits.h>
+ #include <QtCore/qisenum.h>
+ 
+ #ifndef QTYPEINFO_H
+ #define QTYPEINFO_H
+ 
++#include <QtCore/qglobal.h>
++
+ QT_BEGIN_NAMESPACE
+ 
+ /*
+@@ -53,7 +54,7 @@ class QTypeInfo
+ public:
+     enum {
+         isPointer = false,
+-        isIntegral = QtPrivate::is_integral<T>::value,
++        isIntegral = std::is_integral<T>::value,
+         isComplex = true,
+         isStatic = true,
+         isRelocatable = Q_IS_ENUM(T),
+@@ -214,7 +215,7 @@ public: \
+         isRelocatable = !isStatic || ((FLAGS) & Q_RELOCATABLE_TYPE), \
+         isLarge = (sizeof(TYPE)>sizeof(void*)), \
+         isPointer = false, \
+-        isIntegral = QtPrivate::is_integral< TYPE >::value, \
++        isIntegral = std::is_integral< TYPE >::value, \
+         isDummy = (((FLAGS) & Q_DUMMY_TYPE) != 0), \
+         sizeOf = sizeof(TYPE) \
+     }; \
+diff --git a/src/corelib/global/qtypetraits.h b/src/corelib/global/qtypetraits.h
+index 488e257e0f..86593f7b11 100644
+--- a/src/corelib/global/qtypetraits.h
++++ b/src/corelib/global/qtypetraits.h
+@@ -31,451 +31,28 @@
+ **
+ ****************************************************************************/
+ 
+-// BEGIN Google Code
+-
+-// Copyright (c) 2006, Google Inc.
+-// All rights reserved.
+-//
+-// Redistribution and use in source and binary forms, with or without
+-// modification, are permitted provided that the following conditions are
+-// met:
+-//
+-//     * Redistributions of source code must retain the above copyright
+-// notice, this list of conditions and the following disclaimer.
+-//     * Redistributions in binary form must reproduce the above
+-// copyright notice, this list of conditions and the following disclaimer
+-// in the documentation and/or other materials provided with the
+-// distribution.
+-//     * Neither the name of Google Inc. nor the names of its
+-// contributors may be used to endorse or promote products derived from
+-// this software without specific prior written permission.
+-//
+-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-
+-// ----
+-//
+-// This code is compiled directly on many platforms, including client
+-// platforms like Windows, Mac, and embedded systems.  Before making
+-// any changes here, make sure that you're not breaking any platforms.
+-//
+-// Define a small subset of tr1 type traits. The traits we define are:
+-//   is_integral
+-//   is_floating_point
+-//   is_pointer
+-//   is_enum
+-//   is_reference
+-//   is_const
+-//   is_volatile
+-//   is_pod
+-//   has_trivial_constructor
+-//   has_trivial_copy
+-//   has_trivial_assign
+-//   has_trivial_destructor
+-//   is_signed
+-//   is_unsigned
+-//   remove_const
+-//   remove_volatile
+-//   remove_cv
+-//   remove_reference
+-//   add_reference
+-//   remove_pointer
+-//   is_same
+-//   is_convertible
+-// We can add more type traits as required.
+-
+-// Changes from the original implementation:
+-//  - Move base types from template_util.h directly into this header.
+-//  - Use Qt macros for long long type differences on Windows.
+-//  - Enclose in QtPrivate namespace.
+-
+ #include "QtCore/qglobal.h"
+ 
+ #ifndef QTYPETRAITS_H
+ #define QTYPETRAITS_H
+ 
+-#include <utility>                  // For pair
+-
+ QT_BEGIN_NAMESPACE
+ 
+ namespace QtPrivate {
+ 
+-// Types small_ and big_ are guaranteed such that sizeof(small_) <
+-// sizeof(big_)
+-typedef char small_;
+-
+-struct big_ {
+-  char dummy[2];
+-};
+-
+-// Identity metafunction.
+-template <class T>
+-struct identity_ {
+-  typedef T type;
+-};
+-
+-// integral_constant, defined in tr1, is a wrapper for an integer
+-// value. We don't really need this generality; we could get away
+-// with hardcoding the integer type to bool. We use the fully
+-// general integer_constant for compatibility with tr1.
+-
+-template<class T, T v>
+-struct integral_constant {
+-  static const T value = v;
+-  typedef T value_type;
+-  typedef integral_constant<T, v> type;
+-};
+-
+-template <class T, T v> const T integral_constant<T, v>::value;
+-
+-
+-// Abbreviations: true_type and false_type are structs that represent boolean
+-// true and false values. Also define the boost::mpl versions of those names,
+-// true_ and false_.
+-typedef integral_constant<bool, true>  true_type;
+-typedef integral_constant<bool, false> false_type;
+-typedef true_type  true_;
+-typedef false_type false_;
+-
+-// if_ is a templatized conditional statement.
+-// if_<cond, A, B> is a compile time evaluation of cond.
+-// if_<>::type contains A if cond is true, B otherwise.
+-template<bool cond, typename A, typename B>
+-struct if_{
+-  typedef A type;
+-};
+-
+-template<typename A, typename B>
+-struct if_<false, A, B> {
+-  typedef B type;
+-};
+-
+-
+-// type_equals_ is a template type comparator, similar to Loki IsSameType.
+-// type_equals_<A, B>::value is true iff "A" is the same type as "B".
+ //
+-// New code should prefer base::is_same, defined in base/type_traits.h.
+-// It is functionally identical, but is_same is the standard spelling.
+-template<typename A, typename B>
+-struct type_equals_ : public false_ {
+-};
+-
+-template<typename A>
+-struct type_equals_<A, A> : public true_ {
+-};
+-
+-// and_ is a template && operator.
+-// and_<A, B>::value evaluates "A::value && B::value".
+-template<typename A, typename B>
+-struct and_ : public integral_constant<bool, (A::value && B::value)> {
+-};
+-
+-// or_ is a template || operator.
+-// or_<A, B>::value evaluates "A::value || B::value".
+-template<typename A, typename B>
+-struct or_ : public integral_constant<bool, (A::value || B::value)> {
+-};
+-
+-template <class T> struct is_integral;
+-template <class T> struct is_floating_point;
+-template <class T> struct is_pointer;
+-// MSVC can't compile this correctly, and neither can gcc 3.3.5 (at least)
+-#if !defined(_MSC_VER) && !(defined(__GNUC__) && __GNUC__ <= 3)
+-// is_enum uses is_convertible, which is not available on MSVC.
+-template <class T> struct is_enum;
+-#endif
+-template <class T> struct is_reference;
+-template <class T> struct is_pod;
+-template <class T> struct has_trivial_constructor;
+-template <class T> struct has_trivial_copy;
+-template <class T> struct has_trivial_assign;
+-template <class T> struct has_trivial_destructor;
+-template <class T> struct remove_const;
+-template <class T> struct remove_volatile;
+-template <class T> struct remove_cv;
+-template <class T> struct remove_reference;
+-template <class T> struct add_reference;
+-template <class T> struct remove_pointer;
+-template <class T, class U> struct is_same;
+-#if !defined(_MSC_VER) && !(defined(__GNUC__) && __GNUC__ <= 3)
+-template <class From, class To> struct is_convertible;
+-#endif
+-
+-// is_integral is false except for the built-in integer types. A
+-// cv-qualified type is integral if and only if the underlying type is.
+-template <class T> struct is_integral : false_type { };
+-template<> struct is_integral<bool> : true_type { };
+-template<> struct is_integral<char> : true_type { };
+-template<> struct is_integral<unsigned char> : true_type { };
+-template<> struct is_integral<signed char> : true_type { };
+-#if defined(_MSC_VER)
+-// wchar_t is not by default a distinct type from unsigned short in
+-// Microsoft C.
+-// See http://msdn2.microsoft.com/en-us/library/dh8che7s(VS.80).aspx
+-template<> struct is_integral<__wchar_t> : true_type { };
+-#else
+-template<> struct is_integral<wchar_t> : true_type { };
+-#endif
+-template<> struct is_integral<short> : true_type { };
+-template<> struct is_integral<unsigned short> : true_type { };
+-template<> struct is_integral<int> : true_type { };
+-template<> struct is_integral<unsigned int> : true_type { };
+-template<> struct is_integral<long> : true_type { };
+-template<> struct is_integral<unsigned long> : true_type { };
+-#if defined(Q_OS_WIN) && !defined(Q_CC_GNU)
+-template<> struct is_integral<__int64> : true_type { };
+-template<> struct is_integral<unsigned __int64> : true_type { };
+-#else
+-template<> struct is_integral<long long> : true_type { };
+-template<> struct is_integral<unsigned long long> : true_type { };
+-#endif
+-template <class T> struct is_integral<const T> : is_integral<T> { };
+-template <class T> struct is_integral<volatile T> : is_integral<T> { };
+-template <class T> struct is_integral<const volatile T> : is_integral<T> { };
+-#if defined (Q_COMPILER_UNICODE_STRINGS)
+-template<> struct is_integral<char16_t> : true_type { };
+-template<> struct is_integral<char32_t> : true_type { };
+-#endif
+-
+-// is_floating_point is false except for the built-in floating-point types.
+-// A cv-qualified type is integral if and only if the underlying type is.
+-template <class T> struct is_floating_point : false_type { };
+-template<> struct is_floating_point<float> : true_type { };
+-template<> struct is_floating_point<double> : true_type { };
+-template<> struct is_floating_point<long double> : true_type { };
+-template <class T> struct is_floating_point<const T>
+-    : is_floating_point<T> { };
+-template <class T> struct is_floating_point<volatile T>
+-    : is_floating_point<T> { };
+-template <class T> struct is_floating_point<const volatile T>
+-    : is_floating_point<T> { };
+-
+-// is_pointer is false except for pointer types. A cv-qualified type (e.g.
+-// "int* const", as opposed to "int const*") is cv-qualified if and only if
+-// the underlying type is.
+-template <class T> struct is_pointer : false_type { };
+-template <class T> struct is_pointer<T*> : true_type { };
+-template <class T> struct is_pointer<const T> : is_pointer<T> { };
+-template <class T> struct is_pointer<volatile T> : is_pointer<T> { };
+-template <class T> struct is_pointer<const volatile T> : is_pointer<T> { };
+-
+-#if !defined(_MSC_VER) && !(defined(__GNUC__) && __GNUC__ <= 3)
+-
+-namespace internal {
+-
+-template <class T> struct is_class_or_union {
+-  template <class U> static small_ tester(void (U::*)());
+-  template <class U> static big_ tester(...);
+-  static const bool value = sizeof(tester<T>(0)) == sizeof(small_);
+-};
+-
+-// is_convertible chokes if the first argument is an array. That's why
+-// we use add_reference here.
+-template <bool NotUnum, class T> struct is_enum_impl
+-    : is_convertible<typename add_reference<T>::type, int> { };
+-
+-template <class T> struct is_enum_impl<true, T> : false_type { };
+-
+-}  // namespace internal
+-
+-// Specified by TR1 [4.5.1] primary type categories.
+-
+-// Implementation note:
++// define custom is_signed, is_unsigned that also works with enum's
+ //
+-// Each type is either void, integral, floating point, array, pointer,
+-// reference, member object pointer, member function pointer, enum,
+-// union or class. Out of these, only integral, floating point, reference,
+-// class and enum types are potentially convertible to int. Therefore,
+-// if a type is not a reference, integral, floating point or class and
+-// is convertible to int, it's a enum. Adding cv-qualification to a type
+-// does not change whether it's an enum.
+-//
+-// Is-convertible-to-int check is done only if all other checks pass,
+-// because it can't be used with some types (e.g. void or classes with
+-// inaccessible conversion operators).
+-template <class T> struct is_enum
+-    : internal::is_enum_impl<
+-          is_same<T, void>::value ||
+-              is_integral<T>::value ||
+-              is_floating_point<T>::value ||
+-              is_reference<T>::value ||
+-              internal::is_class_or_union<T>::value,
+-          T> { };
+-
+-template <class T> struct is_enum<const T> : is_enum<T> { };
+-template <class T> struct is_enum<volatile T> : is_enum<T> { };
+-template <class T> struct is_enum<const volatile T> : is_enum<T> { };
+-
+-#endif
+-
+-// is_reference is false except for reference types.
+-template<typename T> struct is_reference : false_type {};
+-template<typename T> struct is_reference<T&> : true_type {};
+-
+-// Specified by TR1 [4.5.3] Type Properties
+-template <typename T> struct is_const : false_type {};
+-template <typename T> struct is_const<const T> : true_type {};
+-template <typename T> struct is_volatile : false_type {};
+-template <typename T> struct is_volatile<volatile T> : true_type {};
+-
+-// We can't get is_pod right without compiler help, so fail conservatively.
+-// We will assume it's false except for arithmetic types, enumerations,
+-// pointers and cv-qualified versions thereof. Note that std::pair<T,U>
+-// is not a POD even if T and U are PODs.
+-template <class T> struct is_pod
+- : integral_constant<bool, (is_integral<T>::value ||
+-                            is_floating_point<T>::value ||
+-#if !defined(_MSC_VER) && !(defined(__GNUC__) && __GNUC__ <= 3)
+-                            // is_enum is not available on MSVC.
+-                            is_enum<T>::value ||
+-#endif
+-                            is_pointer<T>::value)> { };
+-template <class T> struct is_pod<const T> : is_pod<T> { };
+-template <class T> struct is_pod<volatile T> : is_pod<T> { };
+-template <class T> struct is_pod<const volatile T> : is_pod<T> { };
+-
+-
+-// We can't get has_trivial_constructor right without compiler help, so
+-// fail conservatively. We will assume it's false except for: (1) types
+-// for which is_pod is true. (2) std::pair of types with trivial
+-// constructors. (3) array of a type with a trivial constructor.
+-// (4) const versions thereof.
+-template <class T> struct has_trivial_constructor : is_pod<T> { };
+-template <class T, class U> struct has_trivial_constructor<std::pair<T, U> >
+-  : integral_constant<bool,
+-                      (has_trivial_constructor<T>::value &&
+-                       has_trivial_constructor<U>::value)> { };
+-template <class A, int N> struct has_trivial_constructor<A[N]>
+-  : has_trivial_constructor<A> { };
+-template <class T> struct has_trivial_constructor<const T>
+-  : has_trivial_constructor<T> { };
+-
+-// We can't get has_trivial_copy right without compiler help, so fail
+-// conservatively. We will assume it's false except for: (1) types
+-// for which is_pod is true. (2) std::pair of types with trivial copy
+-// constructors. (3) array of a type with a trivial copy constructor.
+-// (4) const versions thereof.
+-template <class T> struct has_trivial_copy : is_pod<T> { };
+-template <class T, class U> struct has_trivial_copy<std::pair<T, U> >
+-  : integral_constant<bool,
+-                      (has_trivial_copy<T>::value &&
+-                       has_trivial_copy<U>::value)> { };
+-template <class A, int N> struct has_trivial_copy<A[N]>
+-  : has_trivial_copy<A> { };
+-template <class T> struct has_trivial_copy<const T> : has_trivial_copy<T> { };
+-
+-// We can't get has_trivial_assign right without compiler help, so fail
+-// conservatively. We will assume it's false except for: (1) types
+-// for which is_pod is true. (2) std::pair of types with trivial copy
+-// constructors. (3) array of a type with a trivial assign constructor.
+-template <class T> struct has_trivial_assign : is_pod<T> { };
+-template <class T, class U> struct has_trivial_assign<std::pair<T, U> >
+-  : integral_constant<bool,
+-                      (has_trivial_assign<T>::value &&
+-                       has_trivial_assign<U>::value)> { };
+-template <class A, int N> struct has_trivial_assign<A[N]>
+-  : has_trivial_assign<A> { };
+-
+-// We can't get has_trivial_destructor right without compiler help, so
+-// fail conservatively. We will assume it's false except for: (1) types
+-// for which is_pod is true. (2) std::pair of types with trivial
+-// destructors. (3) array of a type with a trivial destructor.
+-// (4) const versions thereof.
+-template <class T> struct has_trivial_destructor : is_pod<T> { };
+-template <class T, class U> struct has_trivial_destructor<std::pair<T, U> >
+-  : integral_constant<bool,
+-                      (has_trivial_destructor<T>::value &&
+-                       has_trivial_destructor<U>::value)> { };
+-template <class A, int N> struct has_trivial_destructor<A[N]>
+-  : has_trivial_destructor<A> { };
+-template <class T> struct has_trivial_destructor<const T>
+-  : has_trivial_destructor<T> { };
+-
+-// Specified by TR1 [4.7.1]
+-template<typename T> struct remove_const { typedef T type; };
+-template<typename T> struct remove_const<T const> { typedef T type; };
+-template<typename T> struct remove_volatile { typedef T type; };
+-template<typename T> struct remove_volatile<T volatile> { typedef T type; };
+-template<typename T> struct remove_cv {
+-  typedef typename remove_const<typename remove_volatile<T>::type>::type type;
+-};
+-
+-
+-// Specified by TR1 [4.7.2] Reference modifications.
+-template<typename T> struct remove_reference { typedef T type; };
+-template<typename T> struct remove_reference<T&> { typedef T type; };
+-
+-template <typename T> struct add_reference { typedef T& type; };
+-template <typename T> struct add_reference<T&> { typedef T& type; };
+-
+-// Specified by TR1 [4.7.4] Pointer modifications.
+-template<typename T> struct remove_pointer { typedef T type; };
+-template<typename T> struct remove_pointer<T*> { typedef T type; };
+-template<typename T> struct remove_pointer<T* const> { typedef T type; };
+-template<typename T> struct remove_pointer<T* volatile> { typedef T type; };
+-template<typename T> struct remove_pointer<T* const volatile> {
+-  typedef T type; };
+-
+-// Specified by TR1 [4.6] Relationships between types
+-template<typename T, typename U> struct is_same : public false_type { };
+-template<typename T> struct is_same<T, T> : public true_type { };
+-
+-// Specified by TR1 [4.6] Relationships between types
+-#if !defined(_MSC_VER) && !(defined(__GNUC__) && __GNUC__ <= 3)
+-namespace internal {
+-
+-// This class is an implementation detail for is_convertible, and you
+-// don't need to know how it works to use is_convertible. For those
+-// who care: we declare two different functions, one whose argument is
+-// of type To and one with a variadic argument list. We give them
+-// return types of different size, so we can use sizeof to trick the
+-// compiler into telling us which function it would have chosen if we
+-// had called it with an argument of type From.  See Alexandrescu's
+-// _Modern C++ Design_ for more details on this sort of trick.
+-
+-template <typename From, typename To>
+-struct ConvertHelper {
+-  static small_ Test(To);
+-  static big_ Test(...);
+-  static From Create();
+-};
+-}  // namespace internal
+-
+-// Inherits from true_type if From is convertible to To, false_type otherwise.
+-template <typename From, typename To>
+-struct is_convertible
+-    : integral_constant<bool,
+-                        sizeof(internal::ConvertHelper<From, To>::Test(
+-                                  internal::ConvertHelper<From, To>::Create()))
+-                        == sizeof(small_)> {
+-};
+-#endif
+-
+-// END Google Code
+ 
+ // a metafunction to invert an integral_constant:
+ template <typename T>
+ struct not_
+-    : integral_constant<bool, !T::value> {};
+-
+-// same, with a bool argument:
+-template <bool B>
+-struct not_c
+-    : integral_constant<bool, !B> {};
++    : std::integral_constant<bool, !T::value> {};
+ 
+ // Checks whether a type is unsigned (T must be convertible to unsigned int):
+ template <typename T>
+ struct is_unsigned
+-    : integral_constant<bool, (T(0) < T(-1))> {};
++    : std::integral_constant<bool, (T(0) < T(-1))> {};
+ 
+ // Checks whether a type is signed (T must be convertible to int):
+ template <typename T>
+@@ -506,27 +83,6 @@ Q_STATIC_ASSERT((!is_unsigned<qint64>::value));
+ Q_STATIC_ASSERT((!is_signed<quint64>::value));
+ Q_STATIC_ASSERT(( is_signed<qint64>::value));
+ 
+-template<class T = void> struct is_default_constructible;
+-
+-template<> struct is_default_constructible<void>
+-{
+-protected:
+-    template<bool> struct test { typedef char type; };
+-public:
+-    static bool const value = false;
+-};
+-template<> struct is_default_constructible<>::test<true> { typedef double type; };
+-
+-template<class T> struct is_default_constructible : is_default_constructible<>
+-{
+-private:
+-    template<class U> static typename test<!!sizeof(::new U())>::type sfinae(U*);
+-    template<class U> static char sfinae(...);
+-public:
+-    static bool const value = sizeof(sfinae<T>(0)) > 1;
+-};
+-
+-
+ } // namespace QtPrivate
+ 
+ QT_END_NAMESPACE
+diff --git a/src/corelib/kernel/qmetatype.h b/src/corelib/kernel/qmetatype.h
+index b6cfad56b5..27fd710ff7 100644
+--- a/src/corelib/kernel/qmetatype.h
++++ b/src/corelib/kernel/qmetatype.h
+@@ -40,7 +40,6 @@
+ #include <QtCore/qbytearray.h>
+ #include <QtCore/qvarlengtharray.h>
+ #include <QtCore/qisenum.h>
+-#include <QtCore/qtypetraits.h>
+ #ifndef QT_NO_QOBJECT
+ #include <QtCore/qobjectdefs.h>
+ #endif
+@@ -880,7 +879,7 @@ private:
+     // is void* to avoid overloads conflicts. We do it by injecting unaccessible Dummy
+     // type as part of the overload signature.
+     struct Dummy {};
+-    typedef typename QtPrivate::if_<QtPrivate::is_same<value_type, void*>::value, Dummy, value_type>::type value_type_OR_Dummy;
++    typedef typename std::conditional<std::is_same<value_type, void*>::value, Dummy, value_type>::type value_type_OR_Dummy;
+ public:
+     static void assign(void **ptr, const value_type_OR_Dummy *iterator )
+     {
+@@ -1085,7 +1084,7 @@ struct QSequentialIterableConvertFunctor
+ }
+ 
+ namespace QtMetaTypePrivate {
+-template<typename T, bool = QtPrivate::is_same<typename T::const_iterator::value_type, typename T::mapped_type>::value>
++template<typename T, bool = std::is_same<typename T::const_iterator::value_type, typename T::mapped_type>::value>
+ struct AssociativeContainerAccessor
+ {
+     static const typename T::key_type& getKey(const typename T::const_iterator &it)
+@@ -1099,7 +1098,7 @@ struct AssociativeContainerAccessor
+     }
+ };
+ 
+-template<typename T, bool = QtPrivate::is_same<typename T::const_iterator::value_type, std::pair<const typename T::key_type, typename T::mapped_type> >::value>
++template<typename T, bool = std::is_same<typename T::const_iterator::value_type, std::pair<const typename T::key_type, typename T::mapped_type> >::value>
+ struct StlStyleAssociativeContainerAccessor;
+ 
+ template<typename T>
+@@ -1787,7 +1786,7 @@ template <typename T>
+ struct QMetaTypeIdQObject<T, QMetaType::IsGadget>
+ {
+     enum {
+-        Defined = QtPrivate::is_default_constructible<T>::value
++        Defined = std::is_default_constructible<T>::value
+     };
+ 
+     static int qt_metatype_id()
+diff --git a/src/corelib/kernel/qobject.h b/src/corelib/kernel/qobject.h
+index b39eefa795..49a6996313 100644
+--- a/src/corelib/kernel/qobject.h
++++ b/src/corelib/kernel/qobject.h
+@@ -149,14 +149,14 @@ public:
+     template<typename T>
+     inline T findChild(const QString &aName = QString(), Qt::FindChildOptions options = Qt::FindChildrenRecursively) const
+     {
+-        typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type ObjType;
++        typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type ObjType;
+         return static_cast<T>(qt_qFindChild_helper(this, aName, ObjType::staticMetaObject, options));
+     }
+ 
+     template<typename T>
+     inline QList<T> findChildren(const QString &aName = QString(), Qt::FindChildOptions options = Qt::FindChildrenRecursively) const
+     {
+-        typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type ObjType;
++        typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type ObjType;
+         QList<T> list;
+         qt_qFindChildren_helper(this, aName, ObjType::staticMetaObject,
+                                 reinterpret_cast<QList<void *> *>(&list), options);
+@@ -167,7 +167,7 @@ public:
+     template<typename T>
+     inline QList<T> findChildren(const QRegExp &re, Qt::FindChildOptions options = Qt::FindChildrenRecursively) const
+     {
+-        typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type ObjType;
++        typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type ObjType;
+         QList<T> list;
+         qt_qFindChildren_helper(this, re, ObjType::staticMetaObject,
+                                 reinterpret_cast<QList<void *> *>(&list), options);
+@@ -179,7 +179,7 @@ public:
+     template<typename T>
+     inline QList<T> findChildren(const QRegularExpression &re, Qt::FindChildOptions options = Qt::FindChildrenRecursively) const
+     {
+-        typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type ObjType;
++        typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type ObjType;
+         QList<T> list;
+         qt_qFindChildren_helper(this, re, ObjType::staticMetaObject,
+                                 reinterpret_cast<QList<void *> *>(&list), options);
+@@ -514,7 +514,7 @@ inline QT_DEPRECATED QList<T> qFindChildren(const QObject *o, const QRegExp &re)
+ template <class T>
+ inline T qobject_cast(QObject *object)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type ObjType;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type ObjType;
+     Q_STATIC_ASSERT_X(QtPrivate::HasQ_OBJECT_Macro<ObjType>::Value,
+                     "qobject_cast requires the type to have a Q_OBJECT macro");
+     return static_cast<T>(ObjType::staticMetaObject.cast(object));
+@@ -523,7 +523,7 @@ inline T qobject_cast(QObject *object)
+ template <class T>
+ inline T qobject_cast(const QObject *object)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type ObjType;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type ObjType;
+     Q_STATIC_ASSERT_X(QtPrivate::HasQ_OBJECT_Macro<ObjType>::Value,
+                       "qobject_cast requires the type to have a Q_OBJECT macro");
+     return static_cast<T>(ObjType::staticMetaObject.cast(object));
+diff --git a/src/corelib/kernel/qpointer.h b/src/corelib/kernel/qpointer.h
+index 52bd368301..13af0bc015 100644
+--- a/src/corelib/kernel/qpointer.h
++++ b/src/corelib/kernel/qpointer.h
+@@ -46,7 +46,7 @@ class QVariant;
+ template <class T>
+ class QPointer
+ {
+-    Q_STATIC_ASSERT_X(!QtPrivate::is_pointer<T>::value, "QPointer's template type must not be a pointer type");
++    Q_STATIC_ASSERT_X(!std::is_pointer<T>::value, "QPointer's template type must not be a pointer type");
+ 
+     template<typename U>
+     struct TypeSelector
+diff --git a/src/corelib/kernel/qtimer.h b/src/corelib/kernel/qtimer.h
+index 889f5d7f70..2fc056a281 100644
+--- a/src/corelib/kernel/qtimer.h
++++ b/src/corelib/kernel/qtimer.h
+@@ -103,14 +103,14 @@ public:
+     // singleShot to a functor or function pointer (without context)
+     template <typename Func1>
+     static inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
+-                                                !QtPrivate::is_same<const char*, Func1>::value, void>::Type
++                                                !std::is_same<const char*, Func1>::value, void>::Type
+             singleShot(int msec, Func1 slot)
+     {
+         singleShot(msec, msec >= 2000 ? Qt::CoarseTimer : Qt::PreciseTimer, Q_NULLPTR, slot);
+     }
+     template <typename Func1>
+     static inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
+-                                                !QtPrivate::is_same<const char*, Func1>::value, void>::Type
++                                                !std::is_same<const char*, Func1>::value, void>::Type
+             singleShot(int msec, Qt::TimerType timerType, Func1 slot)
+     {
+         singleShot(msec, timerType, Q_NULLPTR, slot);
+@@ -118,14 +118,14 @@ public:
+     // singleShot to a functor or function pointer (with context)
+     template <typename Func1>
+     static inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
+-                                                !QtPrivate::is_same<const char*, Func1>::value, void>::Type
++                                                !std::is_same<const char*, Func1>::value, void>::Type
+             singleShot(int msec, QObject *context, Func1 slot)
+     {
+         singleShot(msec, msec >= 2000 ? Qt::CoarseTimer : Qt::PreciseTimer, context, slot);
+     }
+     template <typename Func1>
+     static inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
+-                                                !QtPrivate::is_same<const char*, Func1>::value, void>::Type
++                                                !std::is_same<const char*, Func1>::value, void>::Type
+             singleShot(int msec, Qt::TimerType timerType, QObject *context, Func1 slot)
+     {
+         //compilation error if the slot has arguments.
+diff --git a/src/corelib/kernel/qvariant_p.h b/src/corelib/kernel/qvariant_p.h
+index 337e1406ec..18fda7bae1 100644
+--- a/src/corelib/kernel/qvariant_p.h
++++ b/src/corelib/kernel/qvariant_p.h
+@@ -60,7 +60,7 @@ struct QVariantIntegrator
+ {
+     static const bool CanUseInternalSpace = sizeof(T) <= sizeof(QVariant::Private::Data)
+                                             && ((QTypeInfoQuery<T>::isRelocatable) || Q_IS_ENUM(T));
+-    typedef QtPrivate::integral_constant<bool, CanUseInternalSpace> CanUseInternalSpace_t;
++    typedef std::integral_constant<bool, CanUseInternalSpace> CanUseInternalSpace_t;
+ };
+ Q_STATIC_ASSERT(QVariantIntegrator<double>::CanUseInternalSpace);
+ Q_STATIC_ASSERT(QVariantIntegrator<long int>::CanUseInternalSpace);
+@@ -112,28 +112,28 @@ private:
+ };
+ 
+ template <class T>
+-inline void v_construct_helper(QVariant::Private *x, const T &t, QtPrivate::true_type)
++inline void v_construct_helper(QVariant::Private *x, const T &t, std::true_type)
+ {
+     new (&x->data) T(t);
+     x->is_shared = false;
+ }
+ 
+ template <class T>
+-inline void v_construct_helper(QVariant::Private *x, const T &t, QtPrivate::false_type)
++inline void v_construct_helper(QVariant::Private *x, const T &t, std::false_type)
+ {
+     x->data.shared = new QVariantPrivateSharedEx<T>(t);
+     x->is_shared = true;
+ }
+ 
+ template <class T>
+-inline void v_construct_helper(QVariant::Private *x, QtPrivate::true_type)
++inline void v_construct_helper(QVariant::Private *x, std::true_type)
+ {
+     new (&x->data) T();
+     x->is_shared = false;
+ }
+ 
+ template <class T>
+-inline void v_construct_helper(QVariant::Private *x, QtPrivate::false_type)
++inline void v_construct_helper(QVariant::Private *x, std::false_type)
+ {
+     x->data.shared = new QVariantPrivateSharedEx<T>;
+     x->is_shared = true;
+diff --git a/src/corelib/thread/qmutex.cpp b/src/corelib/thread/qmutex.cpp
+index e9709e34c5..5a6efad7fa 100644
+--- a/src/corelib/thread/qmutex.cpp
++++ b/src/corelib/thread/qmutex.cpp
+@@ -42,7 +42,6 @@
+ #include "qelapsedtimer.h"
+ #include "qthread.h"
+ #include "qmutex_p.h"
+-#include "qtypetraits.h"
+ 
+ #ifndef QT_LINUX_FUTEX
+ #include "private/qfreelist_p.h"
+@@ -71,7 +70,7 @@ public:
+ 
+     // written to by the thread that first owns 'mutex';
+     // read during attempts to acquire ownership of 'mutex' from any other thread:
+-    QAtomicPointer<QtPrivate::remove_pointer<Qt::HANDLE>::type> owner;
++    QAtomicPointer<std::remove_pointer<Qt::HANDLE>::type> owner;
+ 
+     // only ever accessed from the thread that owns 'mutex':
+     uint count;
+diff --git a/src/corelib/tools/qbytearray_p.h b/src/corelib/tools/qbytearray_p.h
+index 78c667aa90..584f8ff801 100644
+--- a/src/corelib/tools/qbytearray_p.h
++++ b/src/corelib/tools/qbytearray_p.h
+@@ -46,14 +46,13 @@
+ //
+ 
+ #include <QtCore/qbytearray.h>
+-#include <QtCore/qtypetraits.h>
+ #include "qtools_p.h"
+ 
+ QT_BEGIN_NAMESPACE
+ 
+ enum {
+     // Define as enum to force inlining. Don't expose MaxAllocSize in a public header.
+-    MaxByteArraySize = MaxAllocSize - sizeof(QtPrivate::remove_pointer<QByteArray::DataPtr>::type)
++    MaxByteArraySize = MaxAllocSize - sizeof(std::remove_pointer<QByteArray::DataPtr>::type)
+ };
+ 
+ QT_END_NAMESPACE
+diff --git a/src/corelib/tools/qhash.h b/src/corelib/tools/qhash.h
+index c181de94bb..28aeafe845 100644
+--- a/src/corelib/tools/qhash.h
++++ b/src/corelib/tools/qhash.h
+@@ -747,7 +747,7 @@ Q_INLINE_TEMPLATE typename QHash<Key, T>::iterator QHash<Key, T>::insert(const K
+         return iterator(createNode(h, akey, avalue, node));
+     }
+ 
+-    if (!QtPrivate::is_same<T, QHashDummyValue>::value)
++    if (!std::is_same<T, QHashDummyValue>::value)
+         (*node)->value = avalue;
+     return iterator(*node);
+ }
+diff --git a/src/corelib/tools/qlist.h b/src/corelib/tools/qlist.h
+index 381875e96f..df79ac0d98 100644
+--- a/src/corelib/tools/qlist.h
++++ b/src/corelib/tools/qlist.h
+@@ -116,10 +116,10 @@ class QList : public QListSpecialMethods<T>
+ {
+ public:
+     struct MemoryLayout
+-        : QtPrivate::if_<
++        : std::conditional<
+             QTypeInfo<T>::isStatic || QTypeInfo<T>::isLarge,
+             QListData::IndirectLayout,
+-            typename QtPrivate::if_<
++            typename std::conditional<
+                 sizeof(T) == sizeof(void*),
+                 QListData::ArrayCompatibleLayout,
+                 QListData::InlineWithPaddingLayout
+diff --git a/src/corelib/tools/qmap.h b/src/corelib/tools/qmap.h
+index 08565dfe9b..5b6382fa8f 100644
+--- a/src/corelib/tools/qmap.h
++++ b/src/corelib/tools/qmap.h
+@@ -38,7 +38,6 @@
+ #include <QtCore/qlist.h>
+ #include <QtCore/qrefcount.h>
+ #include <QtCore/qpair.h>
+-#include <QtCore/qtypetraits.h>
+ 
+ #ifdef Q_MAP_DEBUG
+ #include <QtCore/qdebug.h>
+@@ -124,15 +123,15 @@ struct QMapNode : public QMapNodeBase
+     {
+         callDestructorIfNecessary(key);
+         callDestructorIfNecessary(value);
+-        doDestroySubTree(QtPrivate::integral_constant<bool, QTypeInfo<T>::isComplex || QTypeInfo<Key>::isComplex>());
++        doDestroySubTree(std::integral_constant<bool, QTypeInfo<T>::isComplex || QTypeInfo<Key>::isComplex>());
+     }
+ 
+     QMapNode<Key, T> *lowerBound(const Key &key);
+     QMapNode<Key, T> *upperBound(const Key &key);
+ 
+ private:
+-    void doDestroySubTree(QtPrivate::false_type) {}
+-    void doDestroySubTree(QtPrivate::true_type)
++    void doDestroySubTree(std::false_type) {}
++    void doDestroySubTree(std::true_type)
+     {
+         if (left)
+             leftNode()->destroySubTree();
+diff --git a/src/corelib/tools/qsharedpointer_impl.h b/src/corelib/tools/qsharedpointer_impl.h
+index c408f54b04..6d3a1deb52 100644
+--- a/src/corelib/tools/qsharedpointer_impl.h
++++ b/src/corelib/tools/qsharedpointer_impl.h
+@@ -499,7 +499,7 @@ private:
+     template <class X>
+     inline void enableSharedFromThis(const QEnableSharedFromThis<X> *ptr)
+     {
+-        ptr->initializeFromSharedPointer(constCast<typename QtPrivate::remove_cv<T>::type>());
++        ptr->initializeFromSharedPointer(constCast<typename std::remove_cv<T>::type>());
+     }
+ 
+     inline void enableSharedFromThis(...) {}
+diff --git a/src/corelib/tools/qstringalgorithms_p.h b/src/corelib/tools/qstringalgorithms_p.h
+index a12874f567..d802995528 100644
+--- a/src/corelib/tools/qstringalgorithms_p.h
++++ b/src/corelib/tools/qstringalgorithms_p.h
+@@ -54,8 +54,8 @@ template <typename StringType> struct QStringAlgorithms
+ {
+     typedef typename StringType::value_type Char;
+     typedef typename StringType::size_type size_type;
+-    typedef typename QtPrivate::remove_cv<StringType>::type NakedStringType;
+-    static const bool isConst = QtPrivate::is_const<StringType>::value;
++    typedef typename std::remove_cv<StringType>::type NakedStringType;
++    static const bool isConst = std::is_const<StringType>::value;
+ 
+     static inline bool isSpace(char ch) { return ascii_isspace(ch); }
+     static inline bool isSpace(QChar ch) { return ch.isSpace(); }
+diff --git a/src/testlib/qtestcase.h b/src/testlib/qtestcase.h
+index a099aaa3d1..776647ae3d 100644
+--- a/src/testlib/qtestcase.h
++++ b/src/testlib/qtestcase.h
+@@ -40,7 +40,6 @@
+ #include <QtCore/qnamespace.h>
+ #include <QtCore/qmetatype.h>
+ #include <QtCore/qmetaobject.h>
+-#include <QtCore/qtypetraits.h>
+ #include <QtCore/qsharedpointer.h>
+ #include <QtCore/qtemporarydir.h>
+ 
+@@ -306,7 +305,7 @@ namespace QTest
+     template <typename T>
+     inline void addColumn(const char *name, T * = Q_NULLPTR)
+     {
+-        typedef QtPrivate::is_same<T, const char*> QIsSameTConstChar;
++        typedef std::is_same<T, const char*> QIsSameTConstChar;
+         Q_STATIC_ASSERT_X(!QIsSameTConstChar::value, "const char* is not allowed as a test data format.");
+         addColumnInternal(qMetaTypeId<T>(), name);
+     }
+diff --git a/src/widgets/graphicsview/qgraphicsitem.h b/src/widgets/graphicsview/qgraphicsitem.h
+index b2f8fcbe74..ad16fffa7e 100644
+--- a/src/widgets/graphicsview/qgraphicsitem.h
++++ b/src/widgets/graphicsview/qgraphicsitem.h
+@@ -1018,14 +1018,14 @@ private:
+ 
+ template <class T> inline T qgraphicsitem_cast(QGraphicsItem *item)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type Item;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type Item;
+     return int(Item::Type) == int(QGraphicsItem::Type)
+         || (item && int(Item::Type) == item->type()) ? static_cast<T>(item) : 0;
+ }
+ 
+ template <class T> inline T qgraphicsitem_cast(const QGraphicsItem *item)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type Item;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type Item;
+     return int(Item::Type) == int(QGraphicsItem::Type)
+         || (item && int(Item::Type) == item->type()) ? static_cast<T>(item) : 0;
+ }
+diff --git a/src/widgets/styles/qstyleoption.h b/src/widgets/styles/qstyleoption.h
+index 74dd35cc4a..e7151d0f23 100644
+--- a/src/widgets/styles/qstyleoption.h
++++ b/src/widgets/styles/qstyleoption.h
+@@ -658,7 +658,7 @@ protected:
+ template <typename T>
+ T qstyleoption_cast(const QStyleOption *opt)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type Opt;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type Opt;
+     if (opt && opt->version >= Opt::Version && (opt->type == Opt::Type
+         || int(Opt::Type) == QStyleOption::SO_Default
+         || (int(Opt::Type) == QStyleOption::SO_Complex
+@@ -670,7 +670,7 @@ T qstyleoption_cast(const QStyleOption *opt)
+ template <typename T>
+ T qstyleoption_cast(QStyleOption *opt)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type Opt;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type Opt;
+     if (opt && opt->version >= Opt::Version && (opt->type == Opt::Type
+         || int(Opt::Type) == QStyleOption::SO_Default
+         || (int(Opt::Type) == QStyleOption::SO_Complex
+@@ -721,7 +721,7 @@ public:
+ template <typename T>
+ T qstyleoption_cast(const QStyleHintReturn *hint)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type Opt;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type Opt;
+     if (hint && hint->version <= Opt::Version &&
+         (hint->type == Opt::Type || int(Opt::Type) == QStyleHintReturn::SH_Default))
+         return static_cast<T>(hint);
+@@ -731,7 +731,7 @@ T qstyleoption_cast(const QStyleHintReturn *hint)
+ template <typename T>
+ T qstyleoption_cast(QStyleHintReturn *hint)
+ {
+-    typedef typename QtPrivate::remove_cv<typename QtPrivate::remove_pointer<T>::type>::type Opt;
++    typedef typename std::remove_cv<typename std::remove_pointer<T>::type>::type Opt;
+     if (hint && hint->version <= Opt::Version &&
+         (hint->type == Opt::Type || int(Opt::Type) == QStyleHintReturn::SH_Default))
+         return static_cast<T>(hint);
+diff --git a/src/widgets/widgets/qmenu.h b/src/widgets/widgets/qmenu.h
+index 6bbe54186e..c33cb889b2 100644
+--- a/src/widgets/widgets/qmenu.h
++++ b/src/widgets/widgets/qmenu.h
+@@ -88,7 +88,7 @@ public:
+ #else
+     // addAction(QString): Connect to a QObject slot / functor or function pointer (with context)
+     template<class Obj, typename Func1>
+-    inline typename QtPrivate::QEnableIf<!QtPrivate::is_same<const char*, Func1>::value
++    inline typename QtPrivate::QEnableIf<!std::is_same<const char*, Func1>::value
+         && QtPrivate::IsPointerToTypeDerivedFromQObject<Obj*>::Value, QAction *>::Type
+         addAction(const QString &text, const Obj *object, Func1 slot, const QKeySequence &shortcut = 0)
+     {
+@@ -116,7 +116,7 @@ public:
+     }
+     // addAction(QIcon, QString): Connect to a QObject slot / functor or function pointer (with context)
+     template<class Obj, typename Func1>
+-    inline typename QtPrivate::QEnableIf<!QtPrivate::is_same<const char*, Func1>::value
++    inline typename QtPrivate::QEnableIf<!std::is_same<const char*, Func1>::value
+         && QtPrivate::IsPointerToTypeDerivedFromQObject<Obj*>::Value, QAction *>::Type
+         addAction(const QIcon &actionIcon, const QString &text, const Obj *object, Func1 slot, const QKeySequence &shortcut = 0)
+     {
+diff --git a/src/widgets/widgets/qtoolbar.h b/src/widgets/widgets/qtoolbar.h
+index 9eeb7ccd71..4bd3bc2b21 100644
+--- a/src/widgets/widgets/qtoolbar.h
++++ b/src/widgets/widgets/qtoolbar.h
+@@ -103,7 +103,7 @@ public:
+ #else
+     // addAction(QString): Connect to a QObject slot / functor or function pointer (with context)
+     template<class Obj, typename Func1>
+-    inline typename QtPrivate::QEnableIf<!QtPrivate::is_same<const char*, Func1>::value
++    inline typename QtPrivate::QEnableIf<!std::is_same<const char*, Func1>::value
+         && QtPrivate::IsPointerToTypeDerivedFromQObject<Obj*>::Value, QAction *>::Type
+         addAction(const QString &text, const Obj *object, Func1 slot)
+     {
+@@ -121,7 +121,7 @@ public:
+     }
+     // addAction(QString): Connect to a QObject slot / functor or function pointer (with context)
+     template<class Obj, typename Func1>
+-    inline typename QtPrivate::QEnableIf<!QtPrivate::is_same<const char*, Func1>::value
++    inline typename QtPrivate::QEnableIf<!std::is_same<const char*, Func1>::value
+         && QtPrivate::IsPointerToTypeDerivedFromQObject<Obj*>::Value, QAction *>::Type
+         addAction(const QIcon &actionIcon, const QString &text, const Obj *object, Func1 slot)
+     {
+diff --git a/tests/auto/corelib/global/qglobal/tst_qglobal.cpp b/tests/auto/corelib/global/qglobal/tst_qglobal.cpp
+index 00f70f5380..758c0ff6b4 100644
+--- a/tests/auto/corelib/global/qglobal/tst_qglobal.cpp
++++ b/tests/auto/corelib/global/qglobal/tst_qglobal.cpp
+@@ -33,7 +33,6 @@
+ 
+ 
+ #include <QtTest/QtTest>
+-#include <QtCore/qtypetraits.h>
+ 
+ #include <QPair>
+ #include <QTextCodec>
+@@ -380,8 +379,8 @@ void tst_QGlobal::isEnum()
+ #define IS_ENUM_TRUE(x)     (Q_IS_ENUM(x) == true)
+ #define IS_ENUM_FALSE(x)    (Q_IS_ENUM(x) == false)
+ #else
+-#define IS_ENUM_TRUE(x)     (Q_IS_ENUM(x) == true && QtPrivate::is_enum<x>::value == true)
+-#define IS_ENUM_FALSE(x)    (Q_IS_ENUM(x) == false && QtPrivate::is_enum<x>::value == false)
++#define IS_ENUM_TRUE(x)     (Q_IS_ENUM(x) == true && std::is_enum<x>::value == true)
++#define IS_ENUM_FALSE(x)    (Q_IS_ENUM(x) == false && std::is_enum<x>::value == false)
+ #endif
+ 
+     QVERIFY(IS_ENUM_TRUE(isEnum_B_Byte));
+diff --git a/tests/auto/corelib/tools/qhashfunctions/tst_qhashfunctions.cpp b/tests/auto/corelib/tools/qhashfunctions/tst_qhashfunctions.cpp
+index 4d61bc393d..e3d3a4b4e8 100644
+--- a/tests/auto/corelib/tools/qhashfunctions/tst_qhashfunctions.cpp
++++ b/tests/auto/corelib/tools/qhashfunctions/tst_qhashfunctions.cpp
+@@ -34,7 +34,6 @@
+ #include <QtTest/QtTest>
+ 
+ #include <qhash.h>
+-#include <qtypetraits.h>
+ 
+ #include <iterator>
+ #include <sstream>
+@@ -186,7 +185,7 @@ void tst_QHashFunctions::range()
+     {
+         // verify that the input iterator category suffices:
+         std::stringstream sstream;
+-        Q_STATIC_ASSERT((QtPrivate::is_same<std::input_iterator_tag, std::istream_iterator<int>::iterator_category>::value));
++        Q_STATIC_ASSERT((std::is_same<std::input_iterator_tag, std::istream_iterator<int>::iterator_category>::value));
+         std::copy(ints, ints + numInts, std::ostream_iterator<int>(sstream, " "));
+         sstream.seekg(0);
+         std::istream_iterator<int> it(sstream), end;
+-- 
+2.25.1
+
