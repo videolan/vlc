@@ -792,7 +792,10 @@ vout_CycleVariable(vout_thread_t *vout,
                    char const *varname, int vartype, bool next)
 {
     vlc_value_t val;
-    var_Get(vout, varname, &val);
+
+    if (var_Get(vout, varname, &val) != VLC_SUCCESS)
+        return;
+
     size_t num_choices;
     vlc_value_t *choices;
     var_Change(vout, varname, VLC_VAR_GETCHOICES,
