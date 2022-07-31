@@ -104,6 +104,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSImage *smallArtworkImage;
 @property (readonly) NSString *smallArtworkMRL;
 @property (readonly) NSString *displayString;
+@property (readonly) NSString *detailString;
 @property (readonly) NSString *durationString;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;
 

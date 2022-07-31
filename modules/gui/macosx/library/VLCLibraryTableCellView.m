@@ -51,13 +51,25 @@
     self.playInstantlyButton.hidden = YES;
 }
 
-- (void)setRepresentedMediaItem:(VLCMediaLibraryMediaItem *)representedMediaItem
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
 {
-    _representedMediaItem = representedMediaItem;
+    _representedItem = representedItem;
 
     self.trackingView.viewToHide = self.playInstantlyButton;
     self.playInstantlyButton.action = @selector(playMediaItemInstantly:);
     self.playInstantlyButton.target = self;
+
+    self.representedImageView.image = representedItem.smallArtworkImage;
+
+    if(representedItem.detailString.length > 0) {
+        self.primaryTitleTextField.hidden = NO;
+        self.primaryTitleTextField.stringValue = representedItem.displayString;
+        self.secondaryTitleTextField.hidden = NO;
+        self.secondaryTitleTextField.stringValue = representedItem.detailString;
+    } else {
+        self.singlePrimaryTitleTextField.hidden = NO;
+        self.singlePrimaryTitleTextField.stringValue = representedItem.displayString;
+    }
 }
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
@@ -95,7 +107,7 @@
 
 - (void)playMediaItemInstantly:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:_representedMediaItem playImmediately:YES];
+    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:_representedItem playImmediately:YES];
 }
 
 - (void)playInputItemInstantly:(id)sender

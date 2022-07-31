@@ -303,6 +303,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return _name;
 }
 
+- (NSString *)detailString
+{
+    return nil;
+}
+
 - (NSString *)durationString
 {
     NSString *countMetadataString;
@@ -377,10 +382,14 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return image;
 }
 
-
 - (NSString *)displayString
 {
     return _title;
+}
+
+- (NSString *)detailString
+{
+    return _artistName;
 }
 
 - (NSString *)durationString
@@ -438,6 +447,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 - (NSString *)displayString
 {
     return _name;
+}
+
+- (NSString *)detailString
+{
+    return [NSString stringWithFormat:_NS("%lli items"), _numberOfTracks];
 }
 
 - (NSString *)durationString
@@ -721,6 +735,16 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 - (NSString *)displayString
 {
     return _title;
+}
+
+- (NSString *)detailString
+{
+    VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:_artistID];
+    if (artist) {
+        return artist.name;
+    }
+
+    return nil;
 }
 
 - (NSString *)durationString

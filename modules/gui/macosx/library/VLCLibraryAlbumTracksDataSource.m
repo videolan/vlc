@@ -77,21 +77,7 @@
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    VLCMediaLibraryMediaItem *mediaItem = _tracks[row];
-
-    NSImage *image = mediaItem.smallArtworkImage;
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    cellView.representedImageView.image = image;
-    cellView.representedMediaItem = mediaItem;
-
-    NSString *title = mediaItem.title;
-    cellView.primaryTitleTextField.hidden = NO;
-    cellView.secondaryTitleTextField.hidden = NO;
-    cellView.primaryTitleTextField.stringValue = title;
-    cellView.secondaryTitleTextField.stringValue = [NSString stringWithTime:mediaItem.duration / 1000];
-
+    [cellView setRepresentedItem:_tracks[row]];
     return cellView;
 }
 

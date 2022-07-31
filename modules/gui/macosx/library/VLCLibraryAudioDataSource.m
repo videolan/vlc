@@ -255,69 +255,7 @@
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    switch (_currentParentType) {
-        case VLC_ML_PARENT_ARTIST:
-        {
-            VLCMediaLibraryArtist *artist = _displayedCollection[row];
-
-            cellView.singlePrimaryTitleTextField.hidden = NO;
-            cellView.singlePrimaryTitleTextField.stringValue = artist.name;
-            cellView.representedImageView.image = artist.smallArtworkImage;
-            break;
-        }
-        case VLC_ML_PARENT_ALBUM:
-        {
-            VLCMediaLibraryAlbum *album = _displayedCollection[row];
-
-            cellView.primaryTitleTextField.hidden = NO;
-            cellView.secondaryTitleTextField.hidden = NO;
-            cellView.primaryTitleTextField.stringValue = album.title;
-            cellView.secondaryTitleTextField.stringValue = album.artistName;
-            cellView.representedImageView.image = album.smallArtworkImage;
-            break;
-        }
-        case VLC_ML_PARENT_UNKNOWN:
-        {
-            VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[row];
-
-            cellView.representedImageView.image = mediaItem.smallArtworkImage;
-            cellView.representedMediaItem = mediaItem;
-
-            NSString *title = mediaItem.title;
-            NSString *nameOfArtist;
-
-            VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:mediaItem.artistID];
-            if (artist) {
-                nameOfArtist = artist.name;
-            }
-
-            if (title && nameOfArtist) {
-                cellView.primaryTitleTextField.hidden = NO;
-                cellView.secondaryTitleTextField.hidden = NO;
-                cellView.primaryTitleTextField.stringValue = title;
-                cellView.secondaryTitleTextField.stringValue = nameOfArtist;
-            } else {
-                cellView.singlePrimaryTitleTextField.hidden = NO;
-                cellView.singlePrimaryTitleTextField.stringValue = title;
-            }
-            break;
-        }
-        case VLC_ML_PARENT_GENRE:
-        {
-            VLCMediaLibraryGenre *genre = _displayedCollection[row];
-
-            cellView.primaryTitleTextField.hidden = NO;
-            cellView.secondaryTitleTextField.hidden = NO;
-            cellView.primaryTitleTextField.stringValue = genre.name;
-            cellView.secondaryTitleTextField.stringValue = [NSString stringWithFormat:_NS("%lli items"), genre.numberOfTracks];
-            cellView.representedImageView.image = genre.smallArtworkImage;
-            break;
-        }
-        default:
-            NSAssert(1, @"reached the unreachable");
-            break;
-    }
-
+    [cellView setRepresentedItem:_displayedCollection[row]];
     return cellView;
 }
 
