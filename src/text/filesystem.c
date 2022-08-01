@@ -130,7 +130,7 @@ int vlc_loaddir( DIR *dir, char ***namelist,
     char **tab = NULL;
     unsigned num = 0;
 
-    rewinddir (dir);
+    vlc_rewinddir (dir);
 
     for (unsigned size = 0;;)
     {
