@@ -229,6 +229,39 @@ VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
  * @{
  */
 
+#if defined( _WIN32 )
+typedef struct vlc_DIR
+{
+    _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
+    char *entry;
+    union
+    {
+        DWORD drives;
+        bool insert_dot_dot;
+    } u;
+} vlc_DIR;
+
+static inline int vlc_closedir( DIR *dir )
+{
+    vlc_DIR *vdir = (vlc_DIR *)dir;
+    _WDIR *wdir = vdir->wdir;
+
+    free( vdir->entry );
+    free( vdir );
+    return (wdir != NULL) ? _wclosedir( wdir ) : 0;
+}
+
+static inline void vlc_rewinddir( DIR *dir )
+{
+    _WDIR *wdir = *(_WDIR **)dir;
+
+    _wrewinddir( wdir );
+}
+#else // !_WIN32
+#define vlc_closedir(d)   closedir(d)
+#define vlc_rewinddir(d)  rewinddir(d)
+#endif
+
 /**
  * Opens a DIR pointer.
  *
@@ -273,39 +306,6 @@ VLC_API int vlc_mkdir(const char *dirname, mode_t mode);
 VLC_API char *vlc_getcwd(void) VLC_USED;
 
 /** @} */
-
-#if defined( _WIN32 )
-typedef struct vlc_DIR
-{
-    _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
-    char *entry;
-    union
-    {
-        DWORD drives;
-        bool insert_dot_dot;
-    } u;
-} vlc_DIR;
-
-static inline int vlc_closedir( DIR *dir )
-{
-    vlc_DIR *vdir = (vlc_DIR *)dir;
-    _WDIR *wdir = vdir->wdir;
-
-    free( vdir->entry );
-    free( vdir );
-    return (wdir != NULL) ? _wclosedir( wdir ) : 0;
-}
-
-static inline void vlc_rewinddir( DIR *dir )
-{
-    _WDIR *wdir = *(_WDIR **)dir;
-
-    _wrewinddir( wdir );
-}
-#else // !_WIN32
-#define vlc_closedir(d)   closedir(d)
-#define vlc_rewinddir(d)  rewinddir(d)
-#endif
 
 #ifdef __ANDROID__
 # define lseek lseek64
