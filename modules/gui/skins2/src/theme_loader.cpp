@@ -376,7 +376,7 @@ bool ThemeLoader::findFile( const std::string &rootDir, const std::string &rFile
                 // Can we find the file in this subdirectory?
                 if( findFile( newURI, rFileName, themeFilePath ) )
                 {
-                    closedir( pCurrDir );
+                    vlc_closedir( pCurrDir );
                     return true;
                 }
             }
@@ -386,14 +386,14 @@ bool ThemeLoader::findFile( const std::string &rootDir, const std::string &rFile
                 if( rFileName == std::string( pszDirContent ) )
                 {
                     themeFilePath = newURI;
-                    closedir( pCurrDir );
+                    vlc_closedir( pCurrDir );
                     return true;
                 }
             }
         }
     }
 
-    closedir( pCurrDir );
+    vlc_closedir( pCurrDir );
     return false;
 }
 

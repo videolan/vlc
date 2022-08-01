@@ -977,7 +977,7 @@ static std::string assetmapPath( demux_t * p_demux )
                 break;
             }
         }
-        closedir( dir );
+        vlc_closedir( dir );
     }
     else
         msg_Err( p_demux, "Could not open the directory: %s", p_dcp->path.c_str() );

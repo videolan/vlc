@@ -169,7 +169,7 @@ void ThemeRepository::parseDirectory( const std::string &rDir )
         }
     }
 
-    closedir( pDir );
+    vlc_closedir( pDir );
 }
 
 

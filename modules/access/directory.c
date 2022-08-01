@@ -98,7 +98,7 @@ int DirInit (stream_t *access, DIR *dir)
     return VLC_SUCCESS;
 
 error:
-    closedir(dir);
+    vlc_closedir(dir);
     return VLC_ENOMEM;
 }
 
@@ -128,7 +128,7 @@ void DirClose(vlc_object_t *obj)
     access_sys_t *sys = access->p_sys;
 
     free(sys->base_uri);
-    closedir(sys->dir);
+    vlc_closedir(sys->dir);
 }
 
 static int DirRead (stream_t *access, input_item_node_t *node)

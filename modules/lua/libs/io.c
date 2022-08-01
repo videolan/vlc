@@ -226,7 +226,7 @@ static int vlclua_io_readdir( lua_State *L )
         lua_rawseti( L, -2, idx );
         idx++;
     }
-    closedir( p_dir );
+    vlc_closedir( p_dir );
     return 1;
 }
 

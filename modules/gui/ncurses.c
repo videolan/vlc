@@ -301,7 +301,7 @@ static void ReadDir(intf_thread_t *intf)
         continue;
     }
 
-    closedir(current_dir);
+    vlc_closedir(current_dir);
 
     if (sys->n_dir_entries > 0)
         qsort(sys->dir_entries, sys->n_dir_entries,

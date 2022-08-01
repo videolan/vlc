@@ -457,7 +457,7 @@ void OS2Factory::rmDir( const std::string &rPath )
     }
 
     // Close the directory
-    closedir( dir );
+    vlc_closedir( dir );
 
     // And delete it
     rmdir( rPath.c_str() );
