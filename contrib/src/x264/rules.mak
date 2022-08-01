@@ -54,9 +54,6 @@ X264CONF += --cross-prefix="$(subst ar,,$(AR))"
 ifeq ($(ANDROID_ABI), x86)
 X264CONF += --disable-asm
 endif
-ifeq ($(ANDROID_ABI), x86_64)
-X264CONF += --disable-asm
-endif
 endif
 endif
 ifdef HAVE_DARWIN_OS
