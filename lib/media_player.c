@@ -717,6 +717,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
+    mp->timer.id = NULL;
+
     mp->p_md = NULL;
     mp->p_libvlc_instance = instance;
     /* use a reentrant lock to allow calling libvlc functions from callbacks */
@@ -2205,6 +2207,116 @@ int libvlc_media_player_get_role(libvlc_media_player_t *mp)
 
     free(str);
     return ret;
+}
+
+#define PLAYER_TIME_CORE_TO_LIB(point) { \
+    .position = point->position, \
+    .rate = point->rate, \
+    .ts = US_FROM_VLC_TICK(point->ts), \
+    .length = US_FROM_VLC_TICK(point->length), \
+    .system_date = US_FROM_VLC_TICK(point->system_date), \
+}
+
+#define PLAYER_TIME_LIB_TO_CORE(point) { \
+    .position = point->position, \
+    .rate = point->rate, \
+    .ts = VLC_TICK_FROM_US(point->ts), \
+    .length = VLC_TICK_FROM_US(point->length), \
+    .system_date = VLC_TICK_FROM_US(point->system_date), \
+}
+
+static void player_timer_on_update(const struct vlc_player_timer_point *point,
+                                   void *data)
+{
+    libvlc_media_player_t *p_mi = data;
+
+    const libvlc_media_player_time_point_t libpoint = PLAYER_TIME_CORE_TO_LIB(point);
+
+    p_mi->timer.on_update(&libpoint, p_mi->timer.cbs_data);
+}
+
+static void player_timer_on_discontinuity(vlc_tick_t system_date, void *data)
+{
+    libvlc_media_player_t *p_mi = data;
+
+    if (p_mi->timer.on_discontinuity == NULL)
+        return;
+
+    p_mi->timer.on_discontinuity(system_date, p_mi->timer.cbs_data);
+}
+
+int
+libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
+                               libvlc_time_t min_period,
+                               libvlc_media_player_watch_time_on_update on_update,
+                               libvlc_media_player_watch_time_on_discontinuity on_discontinuity,
+                               void *cbs_data)
+{
+    assert(on_update != NULL);
+
+    static const struct vlc_player_timer_cbs player_timer_cbs = {
+        .on_update = player_timer_on_update,
+        .on_discontinuity = player_timer_on_discontinuity,
+    };
+
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    if (p_mi->timer.id != NULL)
+    {
+        libvlc_printerr("libvlc_media_player_watch_time error:"
+                        "already watching for events");
+        vlc_player_Unlock(player);
+        return -1;
+    }
+
+    p_mi->timer.on_update = on_update;
+    p_mi->timer.on_discontinuity = on_discontinuity;
+    p_mi->timer.cbs_data = cbs_data;
+
+    p_mi->timer.id = vlc_player_AddTimer(player, min_period, &player_timer_cbs, p_mi);
+    vlc_player_Unlock(player);
+
+    if (unlikely(p_mi->timer.id == NULL))
+        return -1;
+
+    return 0;
+}
+
+void
+libvlc_media_player_unwatch_time(libvlc_media_player_t *p_mi)
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+
+    assert(p_mi->timer.id != NULL);
+    vlc_player_RemoveTimer(player, p_mi->timer.id);
+    p_mi->timer.id = NULL;
+
+    vlc_player_Unlock(player);
+}
+
+int
+libvlc_media_player_time_point_interpolate(const libvlc_media_player_time_point_t *libpoint,
+                                           libvlc_time_t system_now,
+                                           libvlc_time_t *out_ts, double *out_pos)
+{
+    const struct vlc_player_timer_point point = PLAYER_TIME_LIB_TO_CORE(libpoint);
+
+    return vlc_player_timer_point_Interpolate(&point, system_now, out_ts, out_pos);
+}
+
+libvlc_time_t
+libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_point_t *libpoint,
+                                             libvlc_time_t system_now,
+                                             libvlc_time_t interpolated_ts,
+                                             libvlc_time_t next_interval)
+{
+    const struct vlc_player_timer_point point = PLAYER_TIME_LIB_TO_CORE(libpoint);
+
+    return vlc_player_timer_point_GetNextIntervalDate(&point, system_now,
+                                                      interpolated_ts, next_interval);
 }
 
 #include <vlc_vout_display.h>

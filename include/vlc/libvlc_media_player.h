@@ -2652,6 +2652,158 @@ LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *p_mi,
 
 /** @} audio */
 
+/** \defgroup libvlc_media_player_watch_time LibVLC media player time watch API
+ * @{
+ */
+
+/**
+ * Media Player timer point
+ *
+ * \note ts and system_date values should not be used directly by the user.
+ * libvlc_media_player_time_point_interpolate() will read these values and
+ * return an interpolated ts.
+ *
+ * @see libvlc_media_player_watch_time_on_update
+ */
+typedef struct libvlc_media_player_time_point_t
+{
+    /** Position in the range [0.0f;1.0] */
+    double position;
+    /** Rate of the player */
+    double rate;
+    /** Valid time >= 0 or -1 */
+    libvlc_time_t ts;
+    /** Valid length >= 1 or 0 */
+    libvlc_time_t length;
+    /**
+     * System date of this record (always valid).
+     * Based on libvlc_clock(). This date can be in the future or in the past.
+     * The special value of INT64_MAX mean that the clock was paused when this
+     * point was updated. In that case,
+     * libvlc_media_player_time_point_interpolate() will return the current
+     * ts/pos of this point (there is nothing to interpolate).
+     * */
+    libvlc_time_t system_date;
+} libvlc_media_player_time_point_t;
+
+/**
+ * Callback prototype that notify when the player state or time changed.
+ *
+ * Get notified when the time is updated by the input or output source. The
+ * input source is the 'demux' or the 'access_demux'. The output source are
+ * audio and video outputs: an update is received each time a video frame is
+ * displayed or an audio sample is written. The delay between each updates may
+ * depend on the input and source type (it can be every 5ms, 30ms, 1s or
+ * 10s...). Users of this timer may need to update the position at a higher
+ * frequency from their own mainloop via
+ * libvlc_media_player_time_point_interpolate().
+ *
+ * \warning It is forbidden to call any Media Player functions from here.
+ *
+ * \param value always valid, the time corresponding to the state
+ * \param data opaque pointer set by libvlc_media_player_watch_time()
+ */
+typedef void (*libvlc_media_player_watch_time_on_update)(
+        const libvlc_media_player_time_point_t *value, void *data);
+
+/**
+ * Callback prototype that notify when the player is paused or a discontinuity
+ * occurred.
+ *
+ * Likely caused by seek from the user or because the playback is stopped. The
+ * player user should stop its "interpolate" timer.
+ *
+ * \warning It is forbidden to call any Media Player functions from here.
+ *
+ * \param system_date system date of this event, only valid (> 0) when paused. It
+ * can be used to interpolate the last updated point to this date in order
+ * to get the last paused ts/position.
+ * \param data opaque pointer set by libvlc_media_player_watch_time()
+ */
+typedef void (*libvlc_media_player_watch_time_on_discontinuity)(
+        libvlc_time_t system_date, void *data);
+
+/**
+ * Watch for times updates
+ *
+ * \warning Only one watcher can be registered at a time. Calling this function
+ * a second time (if libvlc_media_player_unwatch_time() was not called
+ * in-between) will fail.
+ *
+ * \param p_mi the media player
+ * \param min_period corresponds to the minimum period between each updates,
+ * use it to avoid flood from too many source updates, set it to 0 to receive
+ * all updates.
+ * \param on_update callback to listen to update events (must not be NULL)
+ * \param on_discontinuity callback to listen to discontinuity events (can be
+ * be NULL)
+ * \param cbs_data opaque pointer used by the callbacks
+ * \return 0 on success, -1 on error (allocation error, or if already watching)
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API int
+libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
+                               libvlc_time_t min_period,
+                               libvlc_media_player_watch_time_on_update on_update,
+                               libvlc_media_player_watch_time_on_discontinuity on_discontinuity,
+                               void *cbs_data);
+
+/**
+ * Unwatch time updates
+ *
+ * \param p_mi the media player
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API void
+libvlc_media_player_unwatch_time(libvlc_media_player_t *p_mi);
+
+/**
+ * Interpolate a timer value to now
+
+ * \param point time update obtained via the
+ * libvlc_media_player_watch_time_on_update() callback
+ * \param system_now current system date, returned by libvlc_clock()
+ * \param out_ts pointer where to set the interpolated ts, subtract this time
+ * with VLC_TICK_0 to get the original value.
+ * \param out_pos pointer where to set the interpolated position
+ * \return 0 in case of success, -1 if the interpolated ts is negative (could
+ * happen during the buffering step)
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API int
+libvlc_media_player_time_point_interpolate(const libvlc_media_player_time_point_t *point,
+                                           libvlc_time_t system_now,
+                                           libvlc_time_t *out_ts, double *out_pos);
+
+/**
+ * Get the date of the next interval
+ *
+ * Can be used to setup an UI timer in order to update some widgets at specific
+ * interval. A next_interval of VLC_TICK_FROM_SEC(1) can be used to update a
+ * time widget when the media reaches a new second.
+ *
+ * \note The media time doesn't necessarily correspond to the system time, that
+ * is why this function is needed and uses the rate of the current point.
+ *
+ * \param point time update obtained via the
+ * libvlc_media_player_watch_time_on_update()
+ * \param system_now same system date used by
+ * libvlc_media_player_time_point_interpolate()
+ * \param interpolated_ts ts returned by
+ * libvlc_media_player_time_point_interpolate()
+ * \param next_interval next interval
+ * \return the absolute system date of the next interval, use libvlc_delay() to
+ * get a relative delay.
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API libvlc_time_t
+libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_point_t *point,
+                                             libvlc_time_t system_now,
+                                             libvlc_time_t interpolated_ts,
+                                             libvlc_time_t next_interval);
+
+/** @} libvlc_media_player_watch_time */
+
 /** @} media_player */
 
 # ifdef __cplusplus
