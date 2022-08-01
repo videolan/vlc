@@ -24,7 +24,7 @@ variables:
     VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20220705072259
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20220713124227
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20210803114245
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20220505164734
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20220728132611
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20220505174948
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20220505175523
     VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20210915101305
@@ -447,11 +447,12 @@ tvos-arm64:
     image:
         name: $VLC_ANDROID_IMAGE
     script: |
-        wget https://code.videolan.org/videolan/vlc-android/raw/fd4d934ad31d37f3eeaa834214ca16eb0d4ecb6a/buildsystem/compile-libvlc.sh
+        git clone https://code.videolan.org/videolan/libvlcjni.git
+        (cd libvlcjni && git checkout 005bcdb4be46509fe9d8428d4ff5bcdc7d8a8d99)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-            /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --with-prebuilt-contribs
+            /bin/sh ./libvlcjni/buildsysten/compile-libvlc.sh -a $ANDROID_ARCH --with-prebuilt-contribs
         else
-            /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --package-contribs
+            /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh -a $ANDROID_ARCH --package-contribs
         fi
 
 android-arm:
