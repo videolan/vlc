@@ -136,11 +136,6 @@ endif
 endif
 endif
 
-ifneq ($(filter i386 x86_64,$(ARCH)),)
-# broken text relocations or invalid register for .seh_savexmm with gcc8
-VPX_CONF += --disable-mmx
-endif
-
 ifdef WITH_OPTIMIZATION
 VPX_CFLAGS += -DNDEBUG
 else
