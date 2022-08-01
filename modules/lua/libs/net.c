@@ -456,7 +456,7 @@ static int vlclua_opendir( lua_State *L )
         lua_pushstring( L, psz_filename );
         lua_rawseti( L, -2, i );
     }
-    closedir( p_dir );
+    vlc_closedir( p_dir );
     return 1;
 }
 

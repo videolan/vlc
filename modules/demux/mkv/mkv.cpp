@@ -245,7 +245,7 @@ static int OpenInternal( demux_t *p_demux, bool trust_cues )
                         }
                     }
                 }
-                closedir( p_src_dir );
+                vlc_closedir( p_src_dir );
             }
         }
 
