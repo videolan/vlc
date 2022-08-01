@@ -426,17 +426,17 @@ void OS2Factory::changeCursor( CursorType_t type ) const
 
 void OS2Factory::rmDir( const std::string &rPath )
 {
-    struct dirent *file;
+    const char *file;
     DIR *dir;
 
-    dir = opendir( rPath.c_str() );
+    dir = vlc_opendir( rPath.c_str() );
     if( !dir ) return;
 
     // Parse the directory and remove everything it contains
-    while( (file = readdir( dir )) )
+    while( (file = vlc_readdir( dir )) )
     {
         struct stat statbuf;
-        std::string filename = file->d_name;
+        std::string filename = file;
 
         // Skip "." and ".."
         if( filename == "." || filename == ".." )
