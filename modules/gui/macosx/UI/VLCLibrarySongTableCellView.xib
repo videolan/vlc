@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCPlaylistTableCellView"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="c22-O7-iKe" customClass="VLCLibrarySongTableCellView">
+            <rect key="frame" x="0.0" y="0.0" width="398" height="50"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="ffE-px-l0g" customClass="VLCTrackingView">
+                    <rect key="frame" x="0.0" y="0.0" width="398" height="50"/>
+                </customView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Wzl-zu-AHr">
+                    <rect key="frame" x="8" y="17" width="36" height="16"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="32" id="nu6-8s-Vhh"/>
+                    </constraints>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Track number" id="gjj-jC-J6y">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
+                    <rect key="frame" x="50" y="17" width="268" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Song name" id="ZPw-XO-XD1">
+                        <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NFZ-x0-t5c">
+                    <rect key="frame" x="10" y="7" width="12" height="36"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="32" id="bai-RH-huE"/>
+                    </constraints>
+                    <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="play.fill" catalog="system" imagePosition="only" alignment="left" imageScaling="proportionallyDown" inset="2" id="5MR-Gt-X4p">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <color key="contentTintColor" red="1" green="0.38123786450000002" blue="0.039215686270000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </button>
+                <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="XNL-fH-9bU">
+                    <rect key="frame" x="334" y="17" width="56" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Duration" id="5xs-R6-nqu">
+                        <font key="font" usesAppearanceFont="YES"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="trailing" secondItem="XNL-fH-9bU" secondAttribute="leading" constant="-20" id="8Vs-Dy-2RI"/>
+                <constraint firstItem="Wzl-zu-AHr" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="10" id="E8L-qx-YEb"/>
+                <constraint firstItem="ffE-px-l0g" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="EMs-It-nUH"/>
+                <constraint firstItem="XNL-fH-9bU" firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" constant="-10" id="Ea2-S4-L6B"/>
+                <constraint firstAttribute="bottom" secondItem="ffE-px-l0g" secondAttribute="bottom" id="I7D-8N-oA1"/>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="JWS-cd-lGO"/>
+                <constraint firstItem="ffE-px-l0g" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="M01-2i-CLZ"/>
+                <constraint firstItem="NFZ-x0-t5c" firstAttribute="leading" secondItem="Wzl-zu-AHr" secondAttribute="leading" id="Srq-fm-Owt"/>
+                <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="bhc-Wp-rhJ"/>
+                <constraint firstItem="XNL-fH-9bU" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="deD-eW-OHk"/>
+                <constraint firstItem="ohB-P0-nCv" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="52" id="fC0-Qy-VzP"/>
+                <constraint firstItem="NFZ-x0-t5c" firstAttribute="leading" secondItem="ffE-px-l0g" secondAttribute="leading" constant="10" id="laI-Bm-0fz"/>
+                <constraint firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" id="m4c-HB-V5e"/>
+                <constraint firstItem="Wzl-zu-AHr" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="rwm-3K-L1o"/>
+            </constraints>
+            <connections>
+                <outlet property="durationTextField" destination="XNL-fH-9bU" id="hm1-P0-Lec"/>
+                <outlet property="playInstantlyButton" destination="NFZ-x0-t5c" id="suD-1u-UrY"/>
+                <outlet property="songNameTextField" destination="ohB-P0-nCv" id="gBJ-WZ-6pB"/>
+                <outlet property="trackNumberTextField" destination="Wzl-zu-AHr" id="gjW-p3-Mg1"/>
+                <outlet property="trackingView" destination="ffE-px-l0g" id="Eme-n5-LGv"/>
+            </connections>
+            <point key="canvasLocation" x="98" y="39.5"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="play.fill" catalog="system" width="12" height="13"/>
+    </resources>
+</document>

@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCTrackingView.h: MacOS X interface module
+ * VLCLibrarySongTableCellView.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,11 +24,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCTrackingView : NSView
+@class VLCTrackingView;
+@class VLCMediaLibraryItem;
 
-@property (readwrite) BOOL animatesTransition;
-@property (readwrite, assign, nullable) NSView *viewToHide;
-@property (readwrite, assign, nullable) NSView *viewToShow;
+@interface VLCLibrarySongTableCellView : NSTableCellView
+
+extern NSString *VLCAudioLibrarySongCellIdentifier;
+
+@property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
+@property (readwrite, assign) IBOutlet NSTextField *songNameTextField;
+@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
+@property (readwrite, assign) IBOutlet NSTextField *trackNumberTextField;
+@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
+
+@property (readwrite, assign, nonatomic) VLCMediaLibraryItem *representedMediaItem;
+
+- (IBAction)playInstantly:(id)sender;
 
 @end
 

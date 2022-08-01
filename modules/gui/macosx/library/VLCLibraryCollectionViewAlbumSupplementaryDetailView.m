@@ -60,6 +60,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
     _albumTracksTableView.dataSource = _tracksDataSource;
     _albumTracksTableView.delegate = _tracksDataSource;
+    _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
+    
     _albumTitleTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];
     _albumDetailsTextField.font = [ NSFont VLCLibrarySupplementaryDetailViewSubtitleFont];
     _albumDetailsTextField.textColor = [NSColor VLCOrangeElementColor];

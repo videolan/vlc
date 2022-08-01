@@ -34,15 +34,22 @@
 {
     if (self.animatesTransition) {
         [self.viewToHide setAlphaValue:1.0];
+        [self.viewToShow setAlphaValue:.0];
+        [self.viewToShow setHidden:NO];
+
         __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
+        __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
+
         [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
             [[NSAnimationContext currentContext] setDuration:0.9];
             [[weakViewToHide animator] setAlphaValue:0.0];
+            [[weakViewToShow animator] setAlphaValue:1.0];
         } completionHandler:^{
             [weakViewToHide setHidden:YES];
         }];
     } else {
         self.viewToHide.hidden = YES;
+        self.viewToShow.hidden = NO;
     }
 }
 
@@ -51,13 +58,20 @@
     if (self.animatesTransition) {
         [self.viewToHide setAlphaValue:.0];
         [self.viewToHide setHidden:NO];
+
         __weak typeof(self.viewToHide) weakViewToHide = self.viewToHide;
+        __weak typeof(self.viewToShow) weakViewToShow = self.viewToShow;
+
         [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context){
             [[NSAnimationContext currentContext] setDuration:0.9];
             [[weakViewToHide animator] setAlphaValue:1.0];
-        } completionHandler:nil];
+            [[weakViewToShow animator] setAlphaValue:.0];
+        } completionHandler:^{
+            [weakViewToShow setHidden:YES];
+        }];
     } else {
         self.viewToHide.hidden = NO;
+        self.viewToShow.hidden = YES;
     }
 }
 

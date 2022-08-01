@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryAlbumTracksDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
+extern const CGFloat VLCLibraryTracksRowHeight;
+
 @property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
 
 @end

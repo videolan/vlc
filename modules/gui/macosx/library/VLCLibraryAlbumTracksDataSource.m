@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryAlbumTracksDataSource.h"
-#import "VLCLibraryAlbumTableCellView.h"
+#import "VLCLibrarySongTableCellView.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -31,6 +31,8 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryAlbumTracksDataSource.h"
+
+const CGFloat VLCLibraryTracksRowHeight = 40.;
 
 @interface VLCLibraryAlbumTracksDataSource ()
 {
@@ -57,11 +59,11 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
+    VLCLibrarySongTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibrarySongCellIdentifier owner:self];
 
     if (cellView == nil) {
         /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
+        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibrarySongTableCellView" bundle:nil];
         NSArray *topLevelObjects;
         if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
             NSAssert(1, @"Failed to load nib file to show audio library items");
@@ -69,15 +71,15 @@
         }
 
         for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCLibraryTableCellView class]]) {
+            if ([topLevelObject isKindOfClass:[VLCLibrarySongTableCellView class]]) {
                 cellView = topLevelObject;
                 break;
             }
         }
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
+        cellView.identifier = VLCAudioLibrarySongCellIdentifier;
     }
 
-    [cellView setRepresentedItem:_tracks[row]];
+    cellView.representedMediaItem = _tracks[row];
     return cellView;
 }
 

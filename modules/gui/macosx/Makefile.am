@@ -84,6 +84,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryNavigationStack.m \
 	gui/macosx/library/VLCLibraryNavigationState.h \
 	gui/macosx/library/VLCLibraryNavigationState.m \
+	gui/macosx/library/VLCLibrarySongTableCellView.h \
+	gui/macosx/library/VLCLibrarySongTableCellView.m \
 	gui/macosx/library/VLCLibrarySortingMenuController.h \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableCellView.h \
@@ -306,6 +308,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewAlbumSupplementaryDetailView.xib \
+	gui/macosx/UI/VLCLibrarySongTableCellView.xib \
 	gui/macosx/UI/VLCMediaSourceCollectionViewItem.xib \
 	gui/macosx/UI/VLCMediaSourceDeviceCollectionViewItem.xib \
 	gui/macosx/UI/VLCInformationWindow.xib \

@@ -32,7 +32,6 @@
 #import "library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
-const CGFloat VLCLibraryTracksRowHeight = 50.;
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 const CGFloat LayoutSpacer;
 
