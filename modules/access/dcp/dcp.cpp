@@ -50,6 +50,7 @@
 #include <vlc_xml.h>
 #include <vlc_url.h>
 #include <vlc_aout.h>
+#include <vlc_fs.h>
 
 #ifdef _WIN32
 # define KM_WIN32
@@ -958,21 +959,21 @@ int dcpInit ( demux_t *p_demux )
 static std::string assetmapPath( demux_t * p_demux )
 {
     DIR *dir = NULL;
-    struct dirent *ent = NULL;
+    const char *ent = NULL;
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     dcp_t *p_dcp = p_sys->p_dcp;
     std::string result;
 
-    if( ( dir = opendir (p_dcp->path.c_str() ) ) != NULL )
+    if( ( dir = vlc_opendir (p_dcp->path.c_str() ) ) != NULL )
     {
         /* print all the files and directories within directory */
-        while( ( ent = readdir ( dir ) ) != NULL )
+        while( ( ent = vlc_readdir ( dir ) ) != NULL )
         {
-            if( strcasecmp( "assetmap", ent->d_name ) == 0 || strcasecmp( "assetmap.xml", ent->d_name ) == 0 )
+            if( strcasecmp( "assetmap", ent ) == 0 || strcasecmp( "assetmap.xml", ent ) == 0 )
             {
                 /* copy of "path" in "res" */
                 result = p_dcp->path;
-                result.append( ent->d_name );
+                result.append( ent );
                 break;
             }
         }
