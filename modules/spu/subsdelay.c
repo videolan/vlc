@@ -1337,7 +1337,7 @@ static bool SubsdelayIsTextEmpty( const text_segment_t *p_segment )
 {
     while ( p_segment )
     {
-        if ( strlen( p_segment->psz_text ) > 0 )
+        if ( p_segment->psz_text && strlen( p_segment->psz_text ) > 0 )
         {
             size_t offset = strspn( p_segment->psz_text, " " );
             if ( p_segment->psz_text[offset] )
