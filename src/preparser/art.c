@@ -216,7 +216,7 @@ int input_FindArtInCache( input_item_t *p_item )
     }
 
     /* */
-    closedir( p_dir );
+    vlc_closedir( p_dir );
     free( psz_path );
     return b_found ? VLC_SUCCESS : VLC_EGENERIC;
 }

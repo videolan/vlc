@@ -194,7 +194,7 @@ int vlc_scandir( const char *dirname, char ***namelist,
     if (dir != NULL)
     {
         val = vlc_loaddir (dir, namelist, select, compar);
-        closedir (dir);
+        vlc_closedir (dir);
     }
     return val;
 }

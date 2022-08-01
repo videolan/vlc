@@ -502,7 +502,7 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
         free (relpath);
         free (abspath);
     }
-    closedir (dh);
+    vlc_closedir (dh);
 }
 
 /**
