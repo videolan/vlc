@@ -234,7 +234,7 @@ VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
  *
  * @param dirname UTF-8 representation of the directory name
  * @return a pointer to the DIR struct, or NULL in case of error.
- * Release with standard closedir().
+ * Release with vlc_closedir().
  */
 VLC_API DIR *vlc_opendir(const char *dirname) VLC_USED;
 
@@ -245,7 +245,7 @@ VLC_API DIR *vlc_opendir(const char *dirname) VLC_USED;
  *            (must not be used by another thread concurrently)
  *
  * @return a UTF-8 string of the directory entry. The string is valid until
- * the next call to vlc_readdir() or closedir() on the handle.
+ * the next call to vlc_readdir() or vlc_closedir() on the handle.
  * If there are no more entries in the directory, NULL is returned.
  * If an error occurs, errno is set and NULL is returned.
  */
@@ -295,8 +295,6 @@ static inline int vlc_closedir( DIR *dir )
     free( vdir );
     return (wdir != NULL) ? _wclosedir( wdir ) : 0;
 }
-# undef closedir
-# define closedir vlc_closedir
 
 static inline void vlc_rewinddir( DIR *dir )
 {
@@ -304,8 +302,9 @@ static inline void vlc_rewinddir( DIR *dir )
 
     _wrewinddir( wdir );
 }
-# undef rewinddir
-# define rewinddir vlc_rewinddir
+#else // !_WIN32
+#define vlc_closedir(d)   closedir(d)
+#define vlc_rewinddir(d)  rewinddir(d)
 #endif
 
 #ifdef __ANDROID__
