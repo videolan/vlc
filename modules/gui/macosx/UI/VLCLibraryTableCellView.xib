@@ -16,16 +16,16 @@
                     <rect key="frame" x="0.0" y="0.0" width="398" height="71"/>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ohB-P0-nCv">
-                    <rect key="frame" x="76" y="27" width="321" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="ZPw-XO-XD1">
+                    <rect key="frame" x="76" y="28" width="321" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="ZPw-XO-XD1">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xJW-ps-ycn">
-                    <rect key="frame" x="76" y="39" width="321" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="aCe-ia-0Ww">
+                    <rect key="frame" x="76" y="39" width="321" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="aCe-ia-0Ww">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -39,8 +39,8 @@
                     </constraints>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TPv-k2-6XS">
-                    <rect key="frame" x="76" y="16" width="321" height="17"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="jZ4-pa-K3T">
+                    <rect key="frame" x="76" y="17" width="321" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="jZ4-pa-K3T">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
