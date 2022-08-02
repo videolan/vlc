@@ -168,6 +168,7 @@ vlc_DIR *vlc_opendir (const char *dirname)
     vlc_DIR *p_dir = malloc (sizeof (*p_dir));
     if (unlikely(p_dir == NULL))
         return NULL;
+    p_dir->entry = NULL;
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Special mode to list drive letters */
@@ -175,7 +176,6 @@ vlc_DIR *vlc_opendir (const char *dirname)
     {
         p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
-        p_dir->entry = NULL;
         return p_dir;
     }
 #endif
@@ -197,7 +197,6 @@ vlc_DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
     p_dir->wdir = wdir;
-    p_dir->entry = NULL;
     return p_dir;
 }
 
