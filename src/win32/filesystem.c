@@ -49,6 +49,10 @@
 # include <io.h> /* _pipe */
 #endif
 
+#ifndef NTDDI_WIN10_RS3
+#define NTDDI_WIN10_RS3  0x0A000004
+#endif
+
 static wchar_t *widen_path (const char *path)
 {
     wchar_t *wpath;
@@ -172,7 +176,7 @@ vlc_DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Special mode to list drive letters */
     if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
     {
@@ -203,7 +207,7 @@ const char *vlc_readdir (vlc_DIR *p_dir)
 {
     free(p_dir->entry);
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Drive letters mode */
     if (p_dir->wdir == NULL)
     {
