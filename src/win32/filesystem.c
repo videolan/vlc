@@ -197,6 +197,12 @@ vlc_DIR *vlc_opendir (const char *dirname)
             free(p_dir);
             return NULL;
         }
+        p_dir->entry = strdup("C:\\");
+        if (unlikely(p_dir->entry == NULL))
+        {
+            free(p_dir);
+            return NULL;
+        }
         return p_dir;
     }
 #endif
@@ -242,8 +248,6 @@ void vlc_closedir( vlc_DIR *vdir )
 
 const char *vlc_readdir (vlc_DIR *p_dir)
 {
-    free(p_dir->entry);
-
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Drive letters mode */
     if (p_dir->fHandle ==  INVALID_HANDLE_VALUE)
@@ -251,7 +255,6 @@ const char *vlc_readdir (vlc_DIR *p_dir)
         DWORD drives = p_dir->u.drives;
         if (drives == 0)
         {
-            p_dir->entry = NULL;
             return NULL; /* end */
         }
 
@@ -261,11 +264,12 @@ const char *vlc_readdir (vlc_DIR *p_dir)
         p_dir->u.drives &= ~(1UL << i);
         assert (i < 26);
 
-        if (asprintf (&p_dir->entry, "%c:\\", 'A' + i) == -1)
-            p_dir->entry = NULL;
+        p_dir->entry[0] = 'A' + i;
+        return p_dir->entry;
     }
-    else
 #endif
+
+    free(p_dir->entry);
     if (p_dir->u.insert_dot_dot)
     {
         /* Adds "..", gruik! */
