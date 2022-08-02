@@ -211,7 +211,13 @@ vlc_DIR *vlc_opendir (const char *dirname)
     p_dir->u.insert_dot_dot = !strcmp (dirname + 1, ":\\");
 
     char *wildcard;
-    if (asprintf(&wildcard, "%s\\*", dirname) < 0)
+    int res;
+    if (p_dir->u.insert_dot_dot)
+        // Prepending the string "\\?\" does not allow access to the root directory.
+        res = asprintf(&wildcard, "%s\\*", dirname);
+    else
+        res = asprintf(&wildcard, "\\\\?\\%s\\*", dirname);
+    if (res < 0)
     {
         free (p_dir);
         return NULL;
