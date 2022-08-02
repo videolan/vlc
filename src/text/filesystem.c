@@ -118,7 +118,7 @@ static int compar_void(const void *a, const void *b, void *data)
  * Does the same as vlc_scandir(), but takes an open directory pointer
  * instead of a directory path.
  */
-int vlc_loaddir( DIR *dir, char ***namelist,
+int vlc_loaddir( vlc_DIR *dir, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
 {
@@ -188,7 +188,7 @@ int vlc_scandir( const char *dirname, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
 {
-    DIR *dir = vlc_opendir (dirname);
+    vlc_DIR *dir = vlc_opendir (dirname);
     int val = -1;
 
     if (dir != NULL)

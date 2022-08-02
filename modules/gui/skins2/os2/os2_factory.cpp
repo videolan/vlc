@@ -427,7 +427,7 @@ void OS2Factory::changeCursor( CursorType_t type ) const
 void OS2Factory::rmDir( const std::string &rPath )
 {
     const char *file;
-    DIR *dir;
+    vlc_DIR *dir;
 
     dir = vlc_opendir( rPath.c_str() );
     if( !dir ) return;

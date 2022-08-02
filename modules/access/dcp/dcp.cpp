@@ -957,7 +957,7 @@ int dcpInit ( demux_t *p_demux )
  */
 static std::string assetmapPath( demux_t * p_demux )
 {
-    DIR *dir = NULL;
+    vlc_DIR *dir = NULL;
     const char *ent = NULL;
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     dcp_t *p_dcp = p_sys->p_dcp;

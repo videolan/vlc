@@ -159,7 +159,7 @@ char *vlc_getcwd (void)
 
 /* Under Windows, these wrappers return the list of drive letters
  * when called with an empty argument or just '\'. */
-DIR *vlc_opendir (const char *dirname)
+vlc_DIR *vlc_opendir (const char *dirname)
 {
     wchar_t *wpath = widen_path (dirname);
     if (wpath == NULL)
@@ -180,7 +180,7 @@ DIR *vlc_opendir (const char *dirname)
         p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
         p_dir->entry = NULL;
-        return (void *)p_dir;
+        return p_dir;
     }
 #endif
 
@@ -196,13 +196,11 @@ DIR *vlc_opendir (const char *dirname)
     }
     p_dir->wdir = wdir;
     p_dir->entry = NULL;
-    return (void *)p_dir;
+    return p_dir;
 }
 
-const char *vlc_readdir (DIR *dir)
+const char *vlc_readdir (vlc_DIR *p_dir)
 {
-    vlc_DIR *p_dir = (vlc_DIR *)dir;
-
     free(p_dir->entry);
 
 #ifndef VLC_WINSTORE_APP

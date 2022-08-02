@@ -25,7 +25,6 @@
 
 #include <errno.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xinerama.h>
 
@@ -374,7 +373,7 @@ void X11Factory::getMousePos( int &rXPos, int &rYPos ) const
 void X11Factory::rmDir( const std::string &rPath )
 {
     const char *file;
-    DIR *dir;
+    vlc_DIR *dir;
 
     dir = vlc_opendir( rPath.c_str() );
     if( !dir ) return;

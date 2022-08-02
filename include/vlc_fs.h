@@ -232,7 +232,7 @@ VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
 #if defined( _WIN32 )
 typedef struct vlc_DIR
 {
-    _WDIR *wdir; /* MUST be first, see <vlc_fs.h> */
+    _WDIR *wdir;
     char *entry;
     union
     {
@@ -241,9 +241,8 @@ typedef struct vlc_DIR
     } u;
 } vlc_DIR;
 
-static inline int vlc_closedir( DIR *dir )
+static inline int vlc_closedir( vlc_DIR *vdir )
 {
-    vlc_DIR *vdir = (vlc_DIR *)dir;
     _WDIR *wdir = vdir->wdir;
 
     free( vdir->entry );
@@ -251,13 +250,12 @@ static inline int vlc_closedir( DIR *dir )
     return (wdir != NULL) ? _wclosedir( wdir ) : 0;
 }
 
-static inline void vlc_rewinddir( DIR *dir )
+static inline void vlc_rewinddir( vlc_DIR *wdir )
 {
-    _WDIR *wdir = *(_WDIR **)dir;
-
-    _wrewinddir( wdir );
+    _wrewinddir( wdir->wdir );
 }
 #else // !_WIN32
+typedef DIR vlc_DIR;
 #define vlc_closedir(d)   closedir(d)
 #define vlc_rewinddir(d)  rewinddir(d)
 #endif
@@ -269,7 +267,7 @@ static inline void vlc_rewinddir( DIR *dir )
  * @return a pointer to the DIR struct, or NULL in case of error.
  * Release with vlc_closedir().
  */
-VLC_API DIR *vlc_opendir(const char *dirname) VLC_USED;
+VLC_API vlc_DIR *vlc_opendir(const char *dirname) VLC_USED;
 
 /**
  * Reads the next file name from an open directory.
@@ -282,9 +280,9 @@ VLC_API DIR *vlc_opendir(const char *dirname) VLC_USED;
  * If there are no more entries in the directory, NULL is returned.
  * If an error occurs, errno is set and NULL is returned.
  */
-VLC_API const char *vlc_readdir(DIR *dir) VLC_USED;
+VLC_API const char *vlc_readdir(vlc_DIR *dir) VLC_USED;
 
-VLC_API int vlc_loaddir( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
+VLC_API int vlc_loaddir( vlc_DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 VLC_API int vlc_scandir( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 
 /**

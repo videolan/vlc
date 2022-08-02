@@ -213,7 +213,7 @@ static int vlclua_io_readdir( lua_State *L )
     if( lua_gettop( L ) < 1 )
         return luaL_error( L, "Usage: vlc.io.readdir(name)" );
     const char* psz_path = luaL_checkstring( L, 1 );
-    DIR* p_dir =  vlc_opendir( psz_path );
+    vlc_DIR* p_dir =  vlc_opendir( psz_path );
     if ( p_dir == NULL )
         return 0;
 

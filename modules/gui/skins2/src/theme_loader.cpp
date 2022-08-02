@@ -344,7 +344,7 @@ bool ThemeLoader::findFile( const std::string &rootDir, const std::string &rFile
     const char *pszDirContent;
 
     // Open the dir
-    DIR *pCurrDir = vlc_opendir( rootDir.c_str() );
+    vlc_DIR *pCurrDir = vlc_opendir( rootDir.c_str() );
 
     if( pCurrDir == NULL )
     {

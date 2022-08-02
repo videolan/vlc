@@ -185,7 +185,7 @@ static int OpenInternal( demux_t *p_demux, bool trust_cues )
                 }
             }
 
-            DIR *p_src_dir = vlc_opendir(s_path.c_str());
+            vlc_DIR *p_src_dir = vlc_opendir(s_path.c_str());
 
             if (p_src_dir != NULL)
             {

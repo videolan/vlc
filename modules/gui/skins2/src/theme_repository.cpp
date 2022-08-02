@@ -138,7 +138,7 @@ void ThemeRepository::parseDirectory( const std::string &rDir )
     const std::string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
     // Open the dir
-    DIR *pDir = vlc_opendir( rDir.c_str() );
+    vlc_DIR *pDir = vlc_opendir( rDir.c_str() );
     if( pDir == NULL )
     {
         // An error occurred

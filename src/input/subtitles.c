@@ -262,7 +262,7 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
             continue;
 
         /* parse psz_src dir */
-        DIR *dir = vlc_opendir( psz_dir );
+        vlc_DIR *dir = vlc_opendir( psz_dir );
         if( dir == NULL )
             continue;
 

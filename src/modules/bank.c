@@ -422,7 +422,7 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
         return;
     maxdepth--;
 
-    DIR *dh = vlc_opendir (absdir);
+    vlc_DIR *dh = vlc_opendir (absdir);
     if (dh == NULL)
         return;
 

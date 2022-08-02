@@ -272,7 +272,7 @@ static void ReadDir(intf_thread_t *intf)
         return;
     }
 
-    DIR *current_dir = vlc_opendir(sys->current_dir);
+    vlc_DIR *current_dir = vlc_opendir(sys->current_dir);
     if (!current_dir) {
         msg_Warn(intf, "cannot open directory `%s' (%s)", sys->current_dir,
                  vlc_strerror_c(errno));

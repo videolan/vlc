@@ -185,7 +185,7 @@ int input_FindArtInCache( input_item_t *p_item )
         return VLC_EGENERIC;
 
     /* Check if file exists */
-    DIR *p_dir = vlc_opendir( psz_path );
+    vlc_DIR *p_dir = vlc_opendir( psz_path );
     if( !p_dir )
     {
         free( psz_path );
