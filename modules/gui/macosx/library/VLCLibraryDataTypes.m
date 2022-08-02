@@ -39,6 +39,79 @@ const long long int VLCMediaLibraryMediaItemDurationDenominator = 1000;
 
 NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryID";
 
+typedef vlc_ml_media_list_t* (*library_mediaitem_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
+typedef vlc_ml_album_list_t* (*library_album_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
+typedef vlc_ml_artist_list_t* (*library_artist_list_fetch_f)(vlc_medialibrary_t*, const vlc_ml_query_params_t*, int64_t);
+
+static vlc_medialibrary_t *getMediaLibrary()
+{
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    return vlc_ml_instance_get(p_intf);
+}
+
+static NSArray<VLCMediaLibraryMediaItem *> *fetchMediaItemsForLibraryItem(library_mediaitem_list_fetch_f fetchFunction, int64_t itemId)
+{
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
+        return nil;
+    }
+    vlc_ml_media_list_t *p_mediaList = fetchFunction(p_mediaLibrary, NULL, itemId);
+    if(!p_mediaList) {
+        return nil;
+    }
+
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
+    for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
+        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
+        [mutableArray addObject:mediaItem];
+    }
+    vlc_ml_media_list_release(p_mediaList);
+    return [mutableArray copy];
+}
+
+static NSArray<VLCMediaLibraryAlbum *> *fetchAlbumsForLibraryItem(library_album_list_fetch_f fetchFunction, int64_t itemId)
+{
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
+        return nil;
+    }
+    vlc_ml_album_list_t *p_albumList = fetchFunction(p_mediaLibrary, NULL, itemId);
+    if(!p_albumList) {
+        return nil;
+    }
+
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
+    for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
+        VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
+        [mutableArray addObject:album];
+    }
+    vlc_ml_album_list_release(p_albumList);
+    return [mutableArray copy];
+}
+
+static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_artist_list_fetch_f fetchFunction, int64_t itemId)
+{
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
+        return nil;
+    }
+    vlc_ml_artist_list_t *p_artistList = fetchFunction(p_mediaLibrary, NULL, itemId);
+    if(!p_artistList) {
+        return nil;
+    }
+
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artistList->i_nb_items];
+    for (size_t x = 0; x < p_artistList->i_nb_items; x++) {
+        VLCMediaLibraryArtist *artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artistList->p_items[x]];
+        [mutableArray addObject:artist];
+    }
+    vlc_ml_artist_list_release(p_artistList);
+    return [mutableArray copy];
+}
+
 @implementation VLCMediaLibraryFile
 
 - (instancetype)initWithFile:(struct vlc_ml_file_t *)p_file
@@ -188,12 +261,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 + (nullable instancetype)artistWithID:(int64_t)artistID
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return nil;
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
         return nil;
     }
     vlc_ml_artist_t *p_artist = vlc_ml_get_artist(p_mediaLibrary, artistID);
@@ -253,42 +322,12 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return @[];
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
-        return @[];
-    }
-    vlc_ml_album_list_t *p_albumList = vlc_ml_list_artist_albums(p_mediaLibrary, NULL, _libraryID);
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
-    for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
-        VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
-        [mutableArray addObject:album];
-    }
-    vlc_ml_album_list_release(p_albumList);
-    return [mutableArray copy];
+    return fetchAlbumsForLibraryItem(vlc_ml_list_artist_albums, _libraryID);
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return @[];
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
-        return @[];
-    }
-    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_artist_tracks(p_mediaLibrary, NULL, _libraryID);
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
-    for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
-        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
-        [mutableArray addObject:mediaItem];
-    }
-    vlc_ml_media_list_release(p_mediaList);
-    return [mutableArray copy];
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_artist_tracks, _libraryID);
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -351,22 +390,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return @[];
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
-        return @[];
-    }
-    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_album_tracks(p_mediaLibrary, NULL, _libraryID);
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
-    for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
-        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
-        [mutableArray addObject:mediaItem];
-    }
-    vlc_ml_media_list_release(p_mediaList);
-    return [mutableArray copy];
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_album_tracks, _libraryID);
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -427,62 +451,18 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return @[];
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
-        return @[];
-    }
-    vlc_ml_album_list_t *p_albumList = vlc_ml_list_genre_albums(p_mediaLibrary, NULL, _libraryID);
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_albumList->i_nb_items];
-    for (size_t x = 0; x < p_albumList->i_nb_items; x++) {
-        VLCMediaLibraryAlbum *album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_albumList->p_items[x]];
-        [mutableArray addObject:album];
-    }
-    vlc_ml_album_list_release(p_albumList);
-    return [mutableArray copy];
+    return fetchAlbumsForLibraryItem(vlc_ml_list_genre_albums, _libraryID);
 }
 
-- (NSArray<VLCMediaLibraryAlbum *> *)artists
+- (NSArray<VLCMediaLibraryArtist *> *)artists
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return @[];
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
-        return @[];
-    }
-    vlc_ml_artist_list_t *p_artistList = vlc_ml_list_genre_artists(p_mediaLibrary, NULL, _libraryID);
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artistList->i_nb_items];
-    for (size_t x = 0; x < p_artistList->i_nb_items; x++) {
-        VLCMediaLibraryArtist *artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artistList->p_items[x]];
-        [mutableArray addObject:artist];
-    }
-    vlc_ml_artist_list_release(p_artistList);
-    return [mutableArray copy];
+
+    return fetchArtistsForLibraryItem(vlc_ml_list_genre_artists, _libraryID);
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return @[];
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
-        return @[];
-    }
-    vlc_ml_media_list_t *p_mediaList = vlc_ml_list_genre_tracks(p_mediaLibrary, NULL, _libraryID);
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
-    for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
-        VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_mediaList->p_items[x]];
-        [mutableArray addObject:mediaItem];
-    }
-    vlc_ml_media_list_release(p_mediaList);
-    return [mutableArray copy];
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_genre_tracks, _libraryID);
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -535,12 +515,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return nil;
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
         return nil;
     }
     vlc_ml_media_t *p_mediaItem = vlc_ml_get_media(p_mediaLibrary, libraryID);
@@ -553,12 +529,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 + (nullable instancetype)mediaItemForURL:(NSURL *)url
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return nil;
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
         return nil;
     }
     vlc_ml_media_t *p_mediaItem = vlc_ml_get_media_by_mrl(p_mediaLibrary,
@@ -572,12 +544,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (nullable instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_mediaItem
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return nil;
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
         return nil;
     }
     if (p_mediaItem != NULL && p_mediaLibrary != NULL) {
@@ -654,12 +622,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return self;
     }
 
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return nil;
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
         return nil;
     }
     vlc_ml_media_t *p_media = vlc_ml_new_external_media(p_mediaLibrary, urlString.UTF8String);
@@ -677,12 +641,8 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return self;
     }
 
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf) {
-        return nil;
-    }
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
-    if (!p_mediaLibrary) {
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
         return nil;
     }
     vlc_ml_media_t *p_media = vlc_ml_new_stream(p_mediaLibrary, urlString.UTF8String);
