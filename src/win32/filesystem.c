@@ -176,6 +176,11 @@ vlc_DIR *vlc_opendir (const char *dirname)
     {
         p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
+        if (unlikely(p_dir->u.drives == 0))
+        {
+            free(p_dir);
+            return NULL;
+        }
         return p_dir;
     }
 #endif
