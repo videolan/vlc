@@ -165,22 +165,14 @@ char *vlc_getcwd (void)
  * when called with an empty argument or just '\'. */
 vlc_DIR *vlc_opendir (const char *dirname)
 {
-    wchar_t *wpath = widen_path (dirname);
-    if (wpath == NULL)
-        return NULL;
-
     vlc_DIR *p_dir = malloc (sizeof (*p_dir));
     if (unlikely(p_dir == NULL))
-    {
-        free(wpath);
         return NULL;
-    }
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Special mode to list drive letters */
-    if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
+    if (dirname[0] == '\0' || (strcmp (dirname, "\\") == 0))
     {
-        free (wpath);
         p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
         p_dir->entry = NULL;
@@ -188,8 +180,14 @@ vlc_DIR *vlc_opendir (const char *dirname)
     }
 #endif
 
-    assert (wpath[0]); // wpath[1] is defined
-    p_dir->u.insert_dot_dot = !wcscmp (wpath + 1, L":\\");
+    assert (dirname[0]); // dirname[1] is defined
+    p_dir->u.insert_dot_dot = !strcmp (dirname + 1, ":\\");
+    wchar_t *wpath = widen_path (dirname);
+    if (unlikely(wpath == NULL))
+    {
+        free (p_dir);
+        return NULL;
+    }
 
     _WDIR *wdir = _wopendir (wpath);
     free (wpath);
