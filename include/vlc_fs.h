@@ -232,21 +232,7 @@ VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
  */
 
 #if defined( _WIN32 )
-typedef struct vlc_DIR
-{
-    wchar_t *wildcard;
-    HANDLE fHandle;
-    WIN32_FIND_DATAW wdir;
-    bool eol;
-
-    char *entry;
-    union
-    {
-        DWORD drives;
-        bool insert_dot_dot;
-    } u;
-} vlc_DIR;
-
+typedef struct vlc_DIR vlc_DIR;
 #else // !_WIN32
 typedef DIR vlc_DIR;
 #endif

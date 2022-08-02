@@ -160,6 +160,21 @@ char *vlc_getcwd (void)
 #endif
 }
 
+struct vlc_DIR
+{
+    wchar_t *wildcard;
+    HANDLE fHandle;
+    WIN32_FIND_DATAW wdir;
+    bool eol;
+
+    char *entry;
+    union
+    {
+        DWORD drives;
+        bool insert_dot_dot;
+    } u;
+};
+
 /* Under Windows, these wrappers return the list of drive letters
  * when called with an empty argument or just '\'. */
 vlc_DIR *vlc_opendir (const char *dirname)
