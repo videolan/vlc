@@ -2,6 +2,7 @@
  * es.c : Generic audio ES input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2008 VLC authors and VideoLAN
+ *               2022 VideoLabs
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -99,12 +100,6 @@ typedef struct
 
 typedef struct
 {
-    char  psz_version[10];
-    int   i_lowpass;
-} lame_extra_t;
-
-typedef struct
-{
     vlc_tick_t i_time;
     uint64_t i_pos;
     bs_t br;
@@ -128,6 +123,107 @@ typedef struct
     seekpoint_t *p_seekpoint;
 } chap_entry_t;
 
+/* Mpga specific */
+#define XING_FIELD_STREAMFRAMES    (1 << 0)
+#define XING_FIELD_STREAMBYTES     (1 << 1)
+#define XING_FIELD_TOC             (1 << 2)
+#define XING_FIELD_QUALITY         (1 << 3)
+#define XING_MIN_TAG_SIZE           42
+#define XING_TOC_COUNTBYTES         100
+#define XING_MAX_TAG_SIZE          (XING_MIN_TAG_SIZE + 4 + 4 + XING_TOC_COUNTBYTES + 4 + 2)
+#define XING_SUB_ETE_NOK_OTAE       XING_MIN_TAG_SIZE
+
+struct xing_info_s
+{
+    uint32_t i_frames;
+    uint32_t i_bytes;
+    uint32_t i_quality;
+    vlc_fourcc_t infotag;
+    vlc_fourcc_t encoder;
+    float f_peak_signal;
+    float f_radio_replay_gain;
+    float f_audiophile_replay_gain;
+    enum
+    {
+        XING_MODE_UNKNOWN   = 0,
+        XING_MODE_CBR       = 1,
+        XING_MODE_ABR       = 2,
+        XING_MODE_VBR1      = 3,
+        XING_MODE_VBR2      = 4,
+        XING_MODE_VBR3      = 5,
+        XING_MODE_VBR4      = 6,
+        XING_MODE_CBR_2PASS = 8,
+        XING_MODE_ABR_2PASS = 9,
+    } brmode;
+    uint8_t  bitrate_avg;
+    uint16_t i_delay_samples;
+    uint16_t i_padding_samples;
+    uint32_t i_music_length;
+};
+
+static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xing )
+{
+    if( i_buf < XING_MIN_TAG_SIZE )
+        return VLC_EGENERIC;
+
+    vlc_fourcc_t infotag = VLC_FOURCC(p_buf[0], p_buf[1], p_buf[2], p_buf[3]);
+
+    /* Xing VBR/CBR tags */
+    if( infotag != VLC_FOURCC('X','i','n','g') &&
+        infotag != VLC_FOURCC('I','n','f','o') )
+        return VLC_EGENERIC;
+
+    xing->infotag = infotag;
+
+    const uint32_t i_flags = GetDWBE( &p_buf[4] );
+    /* compute our variable struct size for early checks */
+    const unsigned varsz[4] = { ((i_flags & 0x01) ? 4 : 0),
+                                ((i_flags & 0x02) ? 4 : 0),
+                                ((i_flags & 0x04) ? XING_TOC_COUNTBYTES : 0),
+                                ((i_flags & 0x08) ? 4 : 0) };
+    const unsigned i_varallsz = varsz[0] + varsz[1] + varsz[2] + varsz[3];
+    const unsigned i_tag_total = XING_MIN_TAG_SIZE + i_varallsz;
+
+    if( i_buf < i_tag_total )
+        return VLC_EGENERIC;
+
+    if( i_flags & XING_FIELD_STREAMFRAMES )
+        xing->i_frames = GetDWBE( &p_buf[8] );
+    if( i_flags & XING_FIELD_STREAMBYTES )
+        xing->i_bytes = GetDWBE( &p_buf[8 + varsz[0]] );
+    if( i_flags & XING_FIELD_TOC )
+    { /* TODO Support XING TOC to improve seeking accuracy */ }
+    if( i_flags & XING_FIELD_QUALITY )
+        xing->i_quality = GetDWBE( &p_buf[8 + varsz[0] + varsz[1] + varsz[2]] );
+
+    /* pointer past optional members */
+    const uint8_t *p_fixed = &p_buf[8 + i_varallsz];
+
+    /* Original Xing encoder header stops here */
+
+    xing->encoder = VLC_FOURCC(p_fixed[0], p_fixed[1], p_fixed[2], p_fixed[3]); /* char version[9] start */
+
+    if( xing->encoder != VLC_FOURCC('L','A','M','E') )
+        return VLC_SUCCESS;
+
+    xing->brmode  = p_fixed[8] & 0x0f; /* version upper / mode lower */
+    uint32_t peak_signal  = GetDWBE( &p_fixed[11] );
+    xing->f_peak_signal = peak_signal / 8388608.0; /* pow(2, 23) */
+    uint16_t gain = GetWBE( &p_fixed[15] );
+    xing->f_radio_replay_gain = (gain & 0x1FF) / /* 9bits val stored x10 */
+                                ((gain & 0x200) ? -10.0 : 10.0); /* -sign bit on bit 6 */
+    gain = GetWBE( &p_fixed[17] );
+    xing->f_radio_replay_gain = (gain & 0x1FF) / /* 9bits val stored x10 */
+                                ((gain & 0x200) ? -10.0 : 10.0); /* -sign bit on bit 6 */
+    /* flags @19 */
+    xing->bitrate_avg = (p_fixed[20] != 0xFF) ? p_fixed[20] : 0; /* clipped to 255, so it's unknown from there */
+    xing->i_delay_samples = (p_fixed[21] << 4) | (p_fixed[22] >> 4); /* upper 12bits */
+    xing->i_padding_samples = ((p_fixed[22] & 0x0F) << 8) | p_fixed[23]; /* lower 12bits */
+    xing->i_music_length  = GetDWBE( &p_fixed[28] );
+
+    return VLC_SUCCESS;
+}
+
 typedef struct
 {
     codec_t codec;
@@ -145,7 +241,7 @@ typedef struct
 
     bool        b_big_endian;
     bool        b_estimate_bitrate;
-    int         i_bitrate_avg;  /* extracted from Xing header */
+    int         i_bitrate;  /* extracted from Xing header */
 
     bool b_initial_sync_failed;
 
@@ -158,14 +254,7 @@ typedef struct
 
     /* Mpga specific */
     struct mpga_frameheader_s mpgah;
-    struct
-    {
-        int i_frames;
-        int i_bytes;
-        int i_bitrate_avg;
-        lame_extra_t lame;
-        bool b_lame;
-    } xing;
+    struct xing_info_s xing;
 
     float rgf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
     float rgf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
@@ -234,7 +323,7 @@ static int OpenCommon( demux_t *p_demux,
     p_sys->b_start = true;
     p_sys->i_stream_offset = i_bs_offset;
     p_sys->b_estimate_bitrate = true;
-    p_sys->i_bitrate_avg = 0;
+    p_sys->i_bitrate = 0;
     p_sys->b_big_endian = false;
     p_sys->f_fps = var_InheritFloat( p_demux, "es-fps" );
     p_sys->p_packetized_data = NULL;
@@ -392,7 +481,7 @@ static int Demux( demux_t *p_demux )
         }
         /* Re-estimate bitrate */
         if( p_sys->b_estimate_bitrate && p_sys->i_pts > VLC_TICK_FROM_MS(500) )
-            p_sys->i_bitrate_avg = 8 * CLOCK_FREQ * p_sys->i_bytes
+            p_sys->i_bitrate = 8 * CLOCK_FREQ * p_sys->i_bytes
                                    / (p_sys->i_pts - 1);
         p_sys->i_bytes += p_block_out->i_buffer;
 
@@ -469,12 +558,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             va_copy ( ap, args );
             i_ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset,
-                                    -1, p_sys->i_bitrate_avg, 1, i_query, ap );
+                                    -1, p_sys->i_bitrate, 1, i_query, ap );
             va_end( ap );
 
             /* No bitrate, we can't have it precisely, but we can compute
              * a raw approximation with time/position */
-            if( i_ret && !p_sys->i_bitrate_avg )
+            if( i_ret && !p_sys->i_bitrate )
             {
                 float f_pos = (double)(uint64_t)( vlc_stream_Tell( p_demux->s ) ) /
                               (double)(uint64_t)( stream_Size( p_demux->s ) );
@@ -577,17 +666,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 
     int ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
-                                       p_sys->i_bitrate_avg, 1, i_query, args );
+                                       p_sys->i_bitrate, 1, i_query, args );
     if( ret != VLC_SUCCESS )
         return ret;
 
     if( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME )
     {
-        if( p_sys->i_bitrate_avg > 0 )
+        if( p_sys->i_bitrate > 0 )
         {
             vlc_tick_t i_time = vlc_tick_from_samples(
                 ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset ) * 8
-                , p_sys->i_bitrate_avg );
+                , p_sys->i_bitrate );
 
             /* Fix time_offset */
             if( i_time >= 0 )
@@ -669,16 +758,16 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
                 if( p_sys->xing.i_bytes && p_sys->xing.i_frames &&
                     p_sys->mpgah.i_samples_per_frame )
                 {
-                    p_sys->i_bitrate_avg = p_sys->xing.i_bytes * INT64_C(8) *
+                    p_sys->i_bitrate = p_sys->xing.i_bytes * INT64_C(8) *
                         p_sys->p_packetizer->fmt_out.audio.i_rate /
                         p_sys->xing.i_frames / p_sys->mpgah.i_samples_per_frame;
 
-                    if( p_sys->i_bitrate_avg > 0 )
+                    if( p_sys->i_bitrate > 0 )
                         p_sys->b_estimate_bitrate = false;
                 }
                 /* Use the bitrate as initual value */
                 if( p_sys->b_estimate_bitrate )
-                    p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
+                    p_sys->i_bitrate = p_sys->p_packetizer->fmt_out.i_bitrate;
             }
 
             block_t *p_next = p_block_out->p_next;
@@ -950,51 +1039,6 @@ static int MpgaProbe( demux_t *p_demux, uint64_t *pi_offset )
     return VLC_SUCCESS;
 }
 
-static void MpgaXingSkip( const uint8_t **pp_xing, int *pi_xing, int i_count )
-{
-    if(i_count > *pi_xing )
-        i_count = *pi_xing;
-
-    (*pp_xing) += i_count;
-    (*pi_xing) -= i_count;
-}
-
-static uint32_t MpgaXingGetDWBE( const uint8_t **pp_xing, int *pi_xing, uint32_t i_default )
-{
-    if( *pi_xing < 4 )
-        return i_default;
-
-    uint32_t v = GetDWBE( *pp_xing );
-
-    MpgaXingSkip( pp_xing, pi_xing, 4 );
-
-    return v;
-}
-
-static uint16_t MpgaXingGetWBE( const uint8_t **pp_xing, int *pi_xing, uint16_t i_default )
-{
-    if( *pi_xing < 2 )
-        return i_default;
-
-    uint16_t v = GetWBE( *pp_xing );
-
-    MpgaXingSkip( pp_xing, pi_xing, 2 );
-
-    return v;
-}
-
-static double MpgaXingLameConvertGain( uint16_t x )
-{
-    double gain = (x & 0x1FF) / 10.0;
-
-    return x & 0x200 ? -gain : gain;
-}
-
-static double MpgaXingLameConvertPeak( uint32_t x )
-{
-    return x / 8388608.0; /* pow(2, 23) */
-}
-
 static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1161,8 +1205,6 @@ static int MpgaInit( demux_t *p_demux )
         return VLC_SUCCESS;
 
     /* Xing header */
-    const uint8_t *p_xing = p_peek;
-    int i_xing = i_peek;
     int i_skip;
 
     if( MPGA_VERSION( header ) == 0 )
@@ -1170,59 +1212,21 @@ static int MpgaInit( demux_t *p_demux )
     else
         i_skip = MPGA_MODE( header ) != 3 ? 21 : 13;
 
-    if( i_skip + 8 >= i_xing || memcmp( &p_xing[i_skip], "Xing", 4 ) )
+    if( i_skip >= i_peek )
         return VLC_SUCCESS;
 
-    const uint32_t i_flags = GetDWBE( &p_xing[i_skip+4] );
-
-    MpgaXingSkip( &p_xing, &i_xing, i_skip + 8 );
-
-    if( i_flags&0x01 )
-        p_sys->xing.i_frames = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
-    if( i_flags&0x02 )
-        p_sys->xing.i_bytes = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
-    if( i_flags&0x04 ) /* TODO Support XING TOC to improve seeking accuracy */
-        MpgaXingSkip( &p_xing, &i_xing, 100 );
-    if( i_flags&0x08 )
+    struct xing_info_s *xing = &p_sys->xing;
+    if( ParseXing( &p_peek[i_skip], i_peek - i_skip, xing ) == VLC_SUCCESS )
     {
-        /* FIXME: doesn't return the right bitrage average, at least
-           with some MP3's */
-        p_sys->xing.i_bitrate_avg = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
-        msg_Dbg( p_demux, "xing vbr value present (%d)",
-                 p_sys->xing.i_bitrate_avg );
-    }
+        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = xing->f_peak_signal;
+        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = xing->f_radio_replay_gain;
+        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = xing->f_audiophile_replay_gain;
 
-    if( p_sys->xing.i_frames > 0 && p_sys->xing.i_bytes > 0 )
-    {
-        msg_Dbg( p_demux, "xing frames&bytes value present "
-                 "(%d bytes, %d frames, %u samples/frame)",
-                 p_sys->xing.i_bytes, p_sys->xing.i_frames,
-                 p_sys->mpgah.i_samples_per_frame );
-    }
-
-    if( i_xing >= 20 && memcmp( p_xing, "LAME", 4 ) == 0)
-    {
-        p_sys->xing.b_lame = true;
-        lame_extra_t *p_lame = &p_sys->xing.lame;
-
-        memcpy( p_lame->psz_version, p_xing, 9 );
-        p_lame->psz_version[9] = '\0';
-
-        MpgaXingSkip( &p_xing, &i_xing, 9 );
-        MpgaXingSkip( &p_xing, &i_xing, 1 ); /* rev_method */
-
-        p_lame->i_lowpass = (*p_xing) * 100;
-        MpgaXingSkip( &p_xing, &i_xing, 1 );
-
-        uint32_t peak  = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
-        uint16_t track = MpgaXingGetWBE( &p_xing, &i_xing, 0 );
-        uint16_t album = MpgaXingGetWBE( &p_xing, &i_xing, 0 );
-
-        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertPeak( peak );
-        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertGain( track );
-        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float) MpgaXingLameConvertGain( album );
-
-        MpgaXingSkip( &p_xing, &i_xing, 1 ); /* flags */
+        msg_Dbg( p_demux, "Using '%4.4s' infotag"
+                          "(%"PRIu32" bytes, %"PRIu32" frames, %u samples/frame)",
+                          (char *) &xing->infotag,
+                          xing->i_bytes, xing->i_frames,
+                          p_sys->mpgah.i_samples_per_frame );
     }
 
     return VLC_SUCCESS;
