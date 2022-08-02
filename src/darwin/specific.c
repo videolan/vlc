@@ -29,7 +29,6 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
-#include <dirent.h>                                                /* *dir() */
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <locale.h>
