@@ -51,7 +51,6 @@
 #else
 #   include <unistd.h>
 #endif
-#include <dirent.h>
 
 #include <vlc_common.h>
 #include "fs.h"
