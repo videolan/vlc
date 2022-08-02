@@ -126,10 +126,20 @@ DIR *vlc_opendir (const char *dirname)
     return opendir (dirname);
 }
 
+void vlc_closedir(DIR *dir)
+{
+    closedir(dir);
+}
+
 const char *vlc_readdir(DIR *dir)
 {
     struct dirent *ent = readdir (dir);
     return (ent != NULL) ? ent->d_name : NULL;
+}
+
+void vlc_rewinddir(DIR *dir)
+{
+    rewinddir(dir);
 }
 
 int vlc_stat (const char *filename, struct stat *buf)

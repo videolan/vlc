@@ -123,6 +123,11 @@ DIR *vlc_opendir (const char *dirname)
     return dir;
 }
 
+void vlc_closedir(DIR *dir)
+{
+    closedir(dir);
+}
+
 const char *vlc_readdir(DIR *dir)
 {
     /* Beware that readdir_r() assumes <buf> is large enough to hold the result
@@ -153,6 +158,11 @@ const char *vlc_readdir(DIR *dir)
         path = FromCharset ("", ent->d_name, strlen(ent->d_name));
     free (buf);
     return path;
+}
+
+void vlc_rewinddir(DIR *dir)
+{
+    rewinddir(dir);
 }
 
 static int vlc_statEx (const char *filename, struct stat *buf, bool deref)

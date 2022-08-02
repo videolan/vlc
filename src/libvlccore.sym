@@ -449,6 +449,8 @@ vlc_memfd
 vlc_opendir
 vlc_readdir
 vlc_scandir
+vlc_closedir
+vlc_rewinddir
 vlc_stat
 vlc_strcasestr
 vlc_unlink

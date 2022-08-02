@@ -247,34 +247,8 @@ typedef struct vlc_DIR
     } u;
 } vlc_DIR;
 
-static inline int vlc_closedir( vlc_DIR *vdir )
-{
-    HANDLE fHandle = vdir->fHandle;
-
-    free( vdir->entry );
-    free( vdir->wildcard );
-    free( vdir );
-    return (fHandle != INVALID_HANDLE_VALUE) ? (FindClose(fHandle) ? 0 : -1) : 0;
-}
-
-static inline void vlc_rewinddir( vlc_DIR *wdir )
-{
-    if (wdir->fHandle == INVALID_HANDLE_VALUE)
-    {
-        FindClose(wdir->fHandle);
-        wdir->fHandle = FindFirstFileExW(wdir->wildcard, FindExInfoBasic,
-                                         &wdir->wdir, (FINDEX_SEARCH_OPS)0,
-                                         NULL, FIND_FIRST_EX_LARGE_FETCH);
-    }
-    else
-    {
-        wdir->u.drives = GetLogicalDrives();
-    }
-}
 #else // !_WIN32
 typedef DIR vlc_DIR;
-#define vlc_closedir(d)   closedir(d)
-#define vlc_rewinddir(d)  rewinddir(d)
 #endif
 
 /**
@@ -301,6 +275,9 @@ VLC_API const char *vlc_readdir(vlc_DIR *dir) VLC_USED;
 
 VLC_API int vlc_loaddir( vlc_DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 VLC_API int vlc_scandir( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
+
+VLC_API void vlc_closedir( vlc_DIR *dir );
+VLC_API void vlc_rewinddir( vlc_DIR *dir );
 
 /**
  * Creates a directory.

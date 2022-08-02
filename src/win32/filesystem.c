@@ -215,6 +215,16 @@ vlc_DIR *vlc_opendir (const char *dirname)
     return p_dir;
 }
 
+void vlc_closedir( vlc_DIR *vdir )
+{
+    if (vdir->fHandle != INVALID_HANDLE_VALUE)
+        FindClose(vdir->fHandle);
+
+    free( vdir->entry );
+    free( vdir->wildcard );
+    free( vdir );
+}
+
 const char *vlc_readdir (vlc_DIR *p_dir)
 {
     free(p_dir->entry);
@@ -255,6 +265,21 @@ const char *vlc_readdir (vlc_DIR *p_dir)
         p_dir->eol = !FindNextFileW(p_dir->fHandle, &p_dir->wdir);
     }
     return p_dir->entry;
+}
+
+void vlc_rewinddir( vlc_DIR *wdir )
+{
+    if (wdir->fHandle == INVALID_HANDLE_VALUE)
+    {
+        FindClose(wdir->fHandle);
+        wdir->fHandle = FindFirstFileExW(wdir->wildcard, FindExInfoBasic,
+                                         &wdir->wdir, (FINDEX_SEARCH_OPS)0,
+                                         NULL, FIND_FIRST_EX_LARGE_FETCH);
+    }
+    else
+    {
+        wdir->u.drives = GetLogicalDrives();
+    }
 }
 
 int vlc_stat (const char *filename, struct stat *buf)
