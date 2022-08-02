@@ -216,6 +216,7 @@
             break;
     }
 
+    _groupDataSource.representedListOfAlbums = nil; // Clear whatever was being shown before
     [self reloadData];
 
     if(sender != [[[VLCMain sharedInstance] libraryWindow] navigationStack]) {
