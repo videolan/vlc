@@ -22,12 +22,12 @@
 #define VLC_FS_H 1
 
 #include <sys/types.h>
-#include <dirent.h>
 
 struct stat;
 struct iovec;
 
 #ifdef _WIN32
+# include <io.h>
 # include <sys/stat.h>
 # ifndef stat
 #  define stat _stati64
@@ -39,6 +39,8 @@ struct iovec;
 #  undef lseek
 #  define lseek _lseeki64
 # endif
+#else // !_WIN32
+#include <dirent.h>
 #endif
 
 #ifdef __ANDROID__
@@ -232,7 +234,11 @@ VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
 #if defined( _WIN32 )
 typedef struct vlc_DIR
 {
-    _WDIR *wdir;
+    wchar_t *wildcard;
+    HANDLE fHandle;
+    WIN32_FIND_DATAW wdir;
+    bool eol;
+
     char *entry;
     union
     {
@@ -243,16 +249,27 @@ typedef struct vlc_DIR
 
 static inline int vlc_closedir( vlc_DIR *vdir )
 {
-    _WDIR *wdir = vdir->wdir;
+    HANDLE fHandle = vdir->fHandle;
 
     free( vdir->entry );
+    free( vdir->wildcard );
     free( vdir );
-    return (wdir != NULL) ? _wclosedir( wdir ) : 0;
+    return (fHandle != INVALID_HANDLE_VALUE) ? (FindClose(fHandle) ? 0 : -1) : 0;
 }
 
 static inline void vlc_rewinddir( vlc_DIR *wdir )
 {
-    _wrewinddir( wdir->wdir );
+    if (wdir->fHandle == INVALID_HANDLE_VALUE)
+    {
+        FindClose(wdir->fHandle);
+        wdir->fHandle = FindFirstFileExW(wdir->wildcard, FindExInfoBasic,
+                                         &wdir->wdir, (FINDEX_SEARCH_OPS)0,
+                                         NULL, FIND_FIRST_EX_LARGE_FETCH);
+    }
+    else
+    {
+        wdir->u.drives = GetLogicalDrives();
+    }
 }
 #else // !_WIN32
 typedef DIR vlc_DIR;

@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <winsock2.h>
@@ -169,12 +168,14 @@ vlc_DIR *vlc_opendir (const char *dirname)
     if (unlikely(p_dir == NULL))
         return NULL;
     p_dir->entry = NULL;
+    p_dir->eol = false;
+    p_dir->fHandle = INVALID_HANDLE_VALUE;
+    p_dir->wildcard = NULL;
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Special mode to list drive letters */
     if (dirname[0] == '\0' || (strcmp (dirname, "\\") == 0))
     {
-        p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
         if (unlikely(p_dir->u.drives == 0))
         {
@@ -187,21 +188,30 @@ vlc_DIR *vlc_opendir (const char *dirname)
 
     assert (dirname[0]); // dirname[1] is defined
     p_dir->u.insert_dot_dot = !strcmp (dirname + 1, ":\\");
-    wchar_t *wpath = widen_path (dirname);
-    if (unlikely(wpath == NULL))
+
+    char *wildcard;
+    if (asprintf(&wildcard, "%s\\*", dirname) < 0)
+    {
+        free (p_dir);
+        return NULL;
+    }
+    p_dir->wildcard = ToWide(wildcard);
+    free(wildcard);
+    if (unlikely(p_dir->wildcard == NULL))
     {
         free (p_dir);
         return NULL;
     }
 
-    _WDIR *wdir = _wopendir (wpath);
-    free (wpath);
-    if (wdir == NULL)
+    p_dir->fHandle = FindFirstFileExW(p_dir->wildcard, FindExInfoBasic,
+                                      &p_dir->wdir, (FINDEX_SEARCH_OPS)0,
+                                      NULL, FIND_FIRST_EX_LARGE_FETCH);
+    if (p_dir->fHandle ==  INVALID_HANDLE_VALUE)
     {
-        free (p_dir);
+        free(p_dir->wildcard);
+        free(p_dir);
         return NULL;
     }
-    p_dir->wdir = wdir;
     return p_dir;
 }
 
@@ -211,7 +221,7 @@ const char *vlc_readdir (vlc_DIR *p_dir)
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Drive letters mode */
-    if (p_dir->wdir == NULL)
+    if (p_dir->fHandle ==  INVALID_HANDLE_VALUE)
     {
         DWORD drives = p_dir->u.drives;
         if (drives == 0)
@@ -237,10 +247,12 @@ const char *vlc_readdir (vlc_DIR *p_dir)
         p_dir->u.insert_dot_dot = false;
         p_dir->entry = strdup ("..");
     }
+    else if (p_dir->eol)
+        p_dir->entry = NULL;
     else
     {
-        struct _wdirent *ent = _wreaddir (p_dir->wdir);
-        p_dir->entry = (ent != NULL) ? FromWide (ent->d_name) : NULL;
+        p_dir->entry = FromWide(p_dir->wdir.cFileName);
+        p_dir->eol = !FindNextFileW(p_dir->fHandle, &p_dir->wdir);
     }
     return p_dir->entry;
 }
