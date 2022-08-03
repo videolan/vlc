@@ -165,7 +165,7 @@ QString MLPlaylistMedia::getMRLDisplay() const
 
 //-------------------------------------------------------------------------------------------------
 
-float MLPlaylistMedia::getProgress() const
+double MLPlaylistMedia::getProgress() const
 {
     return m_progress;
 }

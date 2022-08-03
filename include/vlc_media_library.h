@@ -202,7 +202,7 @@ typedef struct vlc_ml_media_t
     /* Duration in milliseconds */
     int64_t i_duration;
     uint32_t i_playcount;
-    float f_progress;
+    double f_progress;
     time_t i_last_played_date;
     char* psz_title;
     char* psz_filename;
@@ -1064,7 +1064,7 @@ static inline int vlc_ml_media_generate_thumbnail( vlc_medialibrary_t* p_ml, int
                                                    vlc_ml_thumbnail_size_t size_type,
                                                    uint32_t i_desired_width,
                                                    uint32_t i_desired_height,
-                                                   float position )
+                                                   double position )
 {
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_GENERATE_THUMBNAIL, i_media_id,
                            size_type, i_desired_width, i_desired_height, position );

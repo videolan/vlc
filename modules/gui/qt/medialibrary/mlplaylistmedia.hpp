@@ -57,7 +57,7 @@ public: // Interface
     QString getMRL       () const;
     QString getMRLDisplay() const;
 
-    float   getProgress    () const;
+    double   getProgress    () const;
     QString getProgressTime() const;
 
     unsigned int getPlayCount() const;
@@ -87,7 +87,7 @@ private: // Properties
 
     QUrl m_mrl;
 
-    float   m_progress;
+    double   m_progress;
     QString m_progressTime;
 
     unsigned int m_playCount;
