@@ -237,7 +237,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCConfigurationChangedNotification
                              object:nil];
 
-    if (@available(macOS 10_14, *)) {
+    if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self
                                             forKeyPath:@"effectiveAppearance"
                                                options:0
@@ -393,7 +393,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    if (@available(macOS 10_14, *)) {
+    if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
     }
 

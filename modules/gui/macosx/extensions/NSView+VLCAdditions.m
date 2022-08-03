@@ -29,7 +29,7 @@
 
 - (BOOL)shouldShowDarkAppearance
 {
-    if (@available(macOS 10_14, *)) {
+    if (@available(macOS 10.14, *)) {
         if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
         [self.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
             return YES;
