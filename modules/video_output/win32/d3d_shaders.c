@@ -346,41 +346,59 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
 #define COLOR_CONSTANTS_2020_KB 0.0593f
 #define COLOR_CONSTANTS_2020_KG (1.0f - COLOR_CONSTANTS_2020_KR - COLOR_CONSTANTS_2020_KB)
 
-// TODO these values should be adapted for 10 bits sources
-#define COLOR_SHIFT_STUDIO_MIN_Y   16
-#define COLOR_SHIFT_STUDIO_MAX_Y   235
-#define COLOR_SHIFT_STUDIO_MIN_UV  16
-#define COLOR_SHIFT_STUDIO_MAX_UV  240
-#define COLOR_SHIFT_STUDIO_UV     ((double)128)
-#define COLOR_COEFF_STUDIO_Y      ((double)(COLOR_SHIFT_STUDIO_MAX_Y - COLOR_SHIFT_STUDIO_MIN_Y))
-#define COLOR_COEFF_STUDIO_UV     ((double)((COLOR_SHIFT_STUDIO_MAX_UV - COLOR_SHIFT_STUDIO_MIN_UV) / 2))
+#define COLOR_SHIFT_STUDIO_8_MIN_Y   16
+#define COLOR_SHIFT_STUDIO_8_MAX_Y   235
+#define COLOR_SHIFT_STUDIO_8_MIN_UV  16
+#define COLOR_SHIFT_STUDIO_8_MAX_UV  240
+#define COLOR_SHIFT_STUDIO_8_UV     ((double)128)
+#define COLOR_COEFF_STUDIO_8_Y      ((double)(COLOR_SHIFT_STUDIO_8_MAX_Y - COLOR_SHIFT_STUDIO_8_MIN_Y))
+#define COLOR_COEFF_STUDIO_8_UV     ((double)((COLOR_SHIFT_STUDIO_8_MAX_UV - COLOR_SHIFT_STUDIO_8_MIN_UV) / 2))
 
-#define COLOR_SHIFT_FULL_MIN_Y   0
-#define COLOR_SHIFT_FULL_MAX_Y   255
-#define COLOR_COEFF_FULL_Y      ((double)(COLOR_SHIFT_FULL_MAX_Y - COLOR_SHIFT_FULL_MIN_Y))
-#define COLOR_COEFF_FULL_UV     ((double)255 / 2)
+#define COLOR_SHIFT_STUDIO_10_MIN_Y   64
+#define COLOR_SHIFT_STUDIO_10_MAX_Y   940
+#define COLOR_SHIFT_STUDIO_10_MIN_UV  64
+#define COLOR_SHIFT_STUDIO_10_MAX_UV  960
+#define COLOR_SHIFT_STUDIO_10_UV     ((double)512)
+#define COLOR_COEFF_STUDIO_10_Y      ((double)(COLOR_SHIFT_STUDIO_10_MAX_Y - COLOR_SHIFT_STUDIO_10_MIN_Y))
+#define COLOR_COEFF_STUDIO_10_UV     ((double)((COLOR_SHIFT_STUDIO_10_MAX_UV - COLOR_SHIFT_STUDIO_10_MIN_UV) / 2))
 
-#define COLOR_COEFF_FULL_RGB      ((double)255)
+#define COLOR_SHIFT_STUDIO_12_MIN_Y   256
+#define COLOR_SHIFT_STUDIO_12_MAX_Y   3760
+#define COLOR_SHIFT_STUDIO_12_MIN_UV  256
+#define COLOR_SHIFT_STUDIO_12_MAX_UV  3840
+#define COLOR_SHIFT_STUDIO_12_UV     ((double)2048)
+#define COLOR_COEFF_STUDIO_12_Y      ((double)(COLOR_SHIFT_STUDIO_12_MAX_Y - COLOR_SHIFT_STUDIO_12_MIN_Y))
+#define COLOR_COEFF_STUDIO_12_UV     ((double)((COLOR_SHIFT_STUDIO_12_MAX_UV - COLOR_SHIFT_STUDIO_12_MIN_UV) / 2))
 
-#define COLOR_SHIFT_STUDIO_MIN_RGB   16
-#define COLOR_SHIFT_STUDIO_MAX_RGB   235
-#define COLOR_COEFF_STUDIO_RGB      ((double)(COLOR_SHIFT_STUDIO_MAX_RGB - COLOR_SHIFT_STUDIO_MIN_RGB))
+#define COLOR_COEFF_FULL_8_RGB      ((double)255)
+#define COLOR_COEFF_FULL_10_RGB     ((double)1023)
+#define COLOR_COEFF_FULL_12_RGB     ((double)4095)
 
-    // based on http://avisynth.nl/index.php/Color_conversions and https://en.wikipedia.org/wiki/YCbCr
-#define COLOR_MATRIX_YUV2RGB(src, yuv_range, rgb_range) \
-    static const FLOAT COLORSPACE_BT##src##_##yuv_range##_TO_##rgb_range##_RGBA[4*3] = { \
-       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_Y, \
+#define COLOR_SHIFT_FULL_8_MIN_Y   0
+#define COLOR_SHIFT_FULL_8_MAX_Y   COLOR_COEFF_FULL_8_RGB
+#define COLOR_COEFF_FULL_8_Y      ((double)(COLOR_SHIFT_FULL_8_MAX_Y - COLOR_SHIFT_FULL_8_MIN_Y))
+#define COLOR_COEFF_FULL_8_UV     ((double)(COLOR_SHIFT_FULL_8_MAX_Y - COLOR_SHIFT_FULL_8_MIN_Y) / 2.0f)
+#define COLOR_SHIFT_FULL_8_UV     ((double)128)
+
+#define COLOR_SHIFT_STUDIO_8_MIN_RGB   16
+#define COLOR_SHIFT_STUDIO_8_MAX_RGB   235
+#define COLOR_COEFF_STUDIO_8_RGB      ((double)(COLOR_SHIFT_STUDIO_8_MAX_RGB - COLOR_SHIFT_STUDIO_8_MIN_RGB))
+
+
+#define COLOR_MATRIX_YUV2RGB(src, bits, yuv_range, rgb_range) \
+    static const FLOAT COLORSPACE_BT##src##_##yuv_range##_##bits##_TO_##rgb_range##_RGBA[4*3] = { \
+       COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_Y, \
        0.f, \
-       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KR), \
+       COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_UV * (1.f - COLOR_CONSTANTS_##src##_KR), \
        0.f, \
        \
-       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_Y, \
-       - COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KB) * COLOR_CONSTANTS_##src##_KB / COLOR_CONSTANTS_##src##_KG, \
-       - COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KR) * COLOR_CONSTANTS_##src##_KR / COLOR_CONSTANTS_##src##_KG, \
+       COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_Y, \
+       - COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_UV * (1.f - COLOR_CONSTANTS_##src##_KB) * COLOR_CONSTANTS_##src##_KB / COLOR_CONSTANTS_##src##_KG, \
+       - COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_UV * (1.f - COLOR_CONSTANTS_##src##_KR) * COLOR_CONSTANTS_##src##_KR / COLOR_CONSTANTS_##src##_KG, \
        0.f, \
        \
-       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_Y, \
-       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KB), \
+       COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_Y, \
+       COLOR_COEFF_##rgb_range##_##bits##_RGB / COLOR_COEFF_##yuv_range##_##bits##_UV * (1.f - COLOR_CONSTANTS_##src##_KB), \
        0.f, \
        0.f, \
     };
@@ -423,9 +441,16 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     };
 
 
-    COLOR_MATRIX_YUV2RGB(601,STUDIO,FULL);
-    COLOR_MATRIX_YUV2RGB(709,STUDIO,FULL);
-    COLOR_MATRIX_YUV2RGB(2020,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(601,8,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(709,8,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(2020,8,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(709,8,FULL,FULL);
+    COLOR_MATRIX_YUV2RGB(601,10,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(709,10,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(2020,10,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(601,12,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(709,12,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(2020,12,STUDIO,FULL);
 
     static const FLOAT COLORSPACE_FULL_RGBA_TO_BT601_YUV[4*3] = {
         0.299000f,  0.587000f,  0.114000f, 0.f,
@@ -452,23 +477,38 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     {
         switch (fmt->space){
             case COLOR_SPACE_BT709:
-                ppColorspace = COLORSPACE_BT709_STUDIO_TO_FULL_RGBA;
+                if (quad->textureFormat->bitsPerChannel == 12)
+                    ppColorspace = COLORSPACE_BT709_STUDIO_12_TO_FULL_RGBA;
+                else if (quad->textureFormat->bitsPerChannel == 10)
+                    ppColorspace = COLORSPACE_BT709_STUDIO_10_TO_FULL_RGBA;
+                else
+                    ppColorspace = COLORSPACE_BT709_STUDIO_8_TO_FULL_RGBA;
                 break;
             case COLOR_SPACE_BT2020:
-                ppColorspace = COLORSPACE_BT2020_STUDIO_TO_FULL_RGBA;
+                if (quad->textureFormat->bitsPerChannel == 12)
+                    ppColorspace = COLORSPACE_BT2020_STUDIO_12_TO_FULL_RGBA;
+                else if (quad->textureFormat->bitsPerChannel == 10)
+                    ppColorspace = COLORSPACE_BT2020_STUDIO_10_TO_FULL_RGBA;
+                else
+                    ppColorspace = COLORSPACE_BT2020_STUDIO_8_TO_FULL_RGBA;
                 break;
             case COLOR_SPACE_BT601:
-                ppColorspace = COLORSPACE_BT601_STUDIO_TO_FULL_RGBA;
+                if (quad->textureFormat->bitsPerChannel == 12)
+                    ppColorspace = COLORSPACE_BT601_STUDIO_12_TO_FULL_RGBA;
+                else if (quad->textureFormat->bitsPerChannel == 10)
+                    ppColorspace = COLORSPACE_BT601_STUDIO_10_TO_FULL_RGBA;
+                else
+                    ppColorspace = COLORSPACE_BT601_STUDIO_8_TO_FULL_RGBA;
                 break;
             default:
             case COLOR_SPACE_UNDEF:
                 if( fmt->i_height > 576 )
                 {
-                    ppColorspace = COLORSPACE_BT709_STUDIO_TO_FULL_RGBA;
+                    ppColorspace = COLORSPACE_BT709_STUDIO_8_TO_FULL_RGBA;
                 }
                 else
                 {
-                    ppColorspace = COLORSPACE_BT601_STUDIO_TO_FULL_RGBA;
+                    ppColorspace = COLORSPACE_BT601_STUDIO_8_TO_FULL_RGBA;
                 }
                 break;
         }
