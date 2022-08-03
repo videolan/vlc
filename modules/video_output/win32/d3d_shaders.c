@@ -564,7 +564,8 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
         }
 
         /* all matrices work in studio range and output in full range */
-        WhitePoint[0*4 + 3] = -itu_black_level;
+        if (fmt->color_range != COLOR_RANGE_FULL)
+            WhitePoint[0*4 + 3] = -itu_black_level;
         WhitePoint[1*4 + 3] = -itu_achromacy;
         WhitePoint[2*4 + 3] = -itu_achromacy;
     }

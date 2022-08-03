@@ -650,7 +650,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     FLOAT range_factor = 1.0f;
     FLOAT itu_black_level = 0.f;
     FLOAT itu_white_level = 1.f;
-    if (range_adjust != 0)
+    if (range_adjust != 0 && false)
     {
         FLOAT itu_range_factor;
         switch (dxgi_fmt->bitsPerChannel)
