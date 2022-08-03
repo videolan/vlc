@@ -245,7 +245,7 @@ void input_SetTime( input_thread_t *p_input, vlc_tick_t i_time, bool b_fast )
     input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &param );
 }
 
-void input_SetPosition( input_thread_t *p_input, float f_position, bool b_fast )
+void input_SetPosition( input_thread_t *p_input, double f_position, bool b_fast )
 {
     input_control_param_t param;
 
@@ -2014,7 +2014,7 @@ static bool Control( input_thread_t *p_input,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
-            if( demux_SetPosition( priv->master->p_demux, (double)param.pos.f_val,
+            if( demux_SetPosition( priv->master->p_demux, param.pos.f_val,
                                    !param.pos.b_fast_seek, absolute ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
