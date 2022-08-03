@@ -299,7 +299,7 @@ typedef struct libvlc_event_t
         } media_player_chapter_changed;
         struct
         {
-            float new_position;
+            double new_position;
         } media_player_position_changed;
         struct
         {
