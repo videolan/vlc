@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryAlbumTableCellView.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -32,14 +33,21 @@
 #import "library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
+NSString *VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
-const CGFloat LayoutSpacer;
+
+// Note that these values are not necessarily linked to the layout defined in the .xib files.
+// If the spacing in the layout is changed you will want to change these values too.
+const CGFloat VLCLibraryAlbumTableCellViewLargeSpacing = 20;
+const CGFloat VLCLibraryAlbumTableCellViewMediumSpacing = 10;
+const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
 
 @interface VLCLibraryAlbumTableCellView ()
 {
     VLCLibraryController *_libraryController;
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
     NSTableView *_tracksTableView;
+    NSTableColumn *_column;
 }
 @end
 
@@ -50,50 +58,128 @@ const CGFloat LayoutSpacer;
     return VLCLibraryAlbumTableCellViewDefaultHeight;
 }
 
-+ (CGFloat)heightForAlbum:(VLCMediaLibraryAlbum *)album
+- (CGFloat)height
 {
-    if (!album) {
-        return [VLCLibraryAlbumTableCellView defaultHeight];
+    if (_representedAlbum == nil) {
+        return -1;
     }
 
-    size_t numberOfTracks = album.numberOfTracks;
-    return [VLCLibraryAlbumTableCellView defaultHeight] + numberOfTracks * VLCLibraryTracksRowHeight + numberOfTracks * 0.5;
+    const CGFloat artworkAndSecondaryLabelsHeight = VLCLibraryAlbumTableCellViewLargeSpacing + 
+                                                    _representedImageView.frame.size.height + 
+                                                    VLCLibraryAlbumTableCellViewMediumSpacing + 
+                                                    _summaryTextField.frame.size.height + 
+                                                    VLCLibraryAlbumTableCellViewSmallSpacing +
+                                                    _yearTextField.frame.size.height + 
+                                                    VLCLibraryAlbumTableCellViewLargeSpacing;
+    
+    if(_tracksTableView == nil) {
+        return artworkAndSecondaryLabelsHeight;
+    }
+
+    const CGFloat titleAndTableViewHeight = VLCLibraryAlbumTableCellViewLargeSpacing +
+                                            _albumNameTextField.frame.size.height +
+                                            VLCLibraryAlbumTableCellViewSmallSpacing +
+                                            _artistNameTextField.frame.size.height + 
+                                            VLCLibraryAlbumTableCellViewSmallSpacing +
+                                            [self expectedTableViewHeight] +
+                                            VLCLibraryAlbumTableCellViewLargeSpacing;
+
+    return titleAndTableViewHeight > artworkAndSecondaryLabelsHeight ? titleAndTableViewHeight : artworkAndSecondaryLabelsHeight;
+}
+
+- (CGFloat)expectedTableViewWidth
+{
+    // We are positioning the table view to the right of the album art, which means we need
+    // to take into account the album's left spacing, right spacing, and the table view's
+    // right spacing. In this case we are using large spacing for all of these. We also
+    // throw in a little bit extra spacing to compensate for some mysterious internal spacing.
+    return self.frame.size.width - _representedImageView.frame.size.width - VLCLibraryAlbumTableCellViewLargeSpacing * 3.75;
+}
+
+- (CGFloat)expectedTableViewHeight
+{
+    const NSUInteger numberOfTracks = _representedAlbum.numberOfTracks;
+    const CGFloat intercellSpacing = numberOfTracks > 1 ? (numberOfTracks - 1) * _tracksTableView.intercellSpacing.height : 0;
+    return numberOfTracks * VLCLibraryTracksRowHeight + intercellSpacing + VLCLibraryAlbumTableCellViewMediumSpacing;
 }
 
 - (void)awakeFromNib
 {
-    CGRect frame = self.frame;
-    NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"theOnlyColumn"];
-    column.width = frame.size.width - LayoutSpacer * 2.;
-    _tracksTableView = [[NSTableView alloc] initWithFrame:CGRectMake(LayoutSpacer, 14., frame.size.width - LayoutSpacer * 2., 0.)];
+    [self setupTracksTableView];
+    self.albumNameTextField.font = [NSFont VLClibraryLargeCellTitleFont];
+    self.artistNameTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
+    self.artistNameTextField.textColor = [NSColor VLCOrangeElementColor];
+    self.yearTextField.font = [NSFont VLClibrarySmallCellTitleFont];
+    self.summaryTextField.font = [NSFont VLClibrarySmallCellTitleFont];
+    self.trackingView.viewToHide = self.playInstantlyButton;
+    [self prepareForReuse];
+}
+
+- (void)setupTracksTableView
+{
+    _tracksTableView = [[NSTableView alloc] initWithFrame:NSZeroRect];
+    _column = [[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier];
+    _column.width = [self expectedTableViewWidth];
+    _column.maxWidth = MAXFLOAT;
+    [_tracksTableView addTableColumn:_column];
+
+    if(@available(macOS 11.0, *)) {
+        _tracksTableView.style = NSTableViewStyleFullWidth;
+    }
+    _tracksTableView.gridStyleMask = NSTableViewSolidHorizontalGridLineMask;
     _tracksTableView.rowHeight = VLCLibraryTracksRowHeight;
-    [_tracksTableView addTableColumn:column];
-    _tracksTableView.translatesAutoresizingMaskIntoConstraints = NO;
+
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
     _tracksTableView.dataSource = _tracksDataSource;
     _tracksTableView.delegate = _tracksDataSource;
     _tracksTableView.doubleAction = @selector(tracksTableViewDoubleClickAction:);
     _tracksTableView.target = self;
-    [self addSubview:_tracksTableView];
-    NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-20-[_tracksTableView]-20-|" options:0 metrics:0 views:dict]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-20-[_representedImageView]-14-[_tracksTableView]-14-|" options:0 metrics:0 views:dict]];
 
-    self.albumNameTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-    self.yearTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-    self.summaryTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
-    self.trackingView.viewToHide = self.playInstantlyButton;
-    [self prepareForReuse];
+    _tracksTableView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_tracksTableView];
+    NSString *horizontalVisualConstraints = [NSString stringWithFormat:@"H:|-%f-[_representedImageView]-%f-[_tracksTableView]-%f-|",
+        VLCLibraryAlbumTableCellViewLargeSpacing,
+        VLCLibraryAlbumTableCellViewLargeSpacing,
+        VLCLibraryAlbumTableCellViewLargeSpacing];
+    NSString *verticalVisualContraints = [NSString stringWithFormat:@"V:|-%f-[_albumNameTextField]-%f-[_artistNameTextField]-%f-[_tracksTableView]->=%f-|",
+        VLCLibraryAlbumTableCellViewLargeSpacing,
+        VLCLibraryAlbumTableCellViewSmallSpacing,
+        VLCLibraryAlbumTableCellViewMediumSpacing,
+        VLCLibraryAlbumTableCellViewLargeSpacing];
+    NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView, _albumNameTextField, _artistNameTextField);
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];
 }
 
 - (void)prepareForReuse
 {
     [super prepareForReuse];
+
     self.representedImageView.image = nil;
     self.albumNameTextField.stringValue = @"";
+    self.artistNameTextField.stringValue = @"";
     self.yearTextField.stringValue = @"";
     self.summaryTextField.stringValue = @"";
+    self.yearTextField.hidden = NO;
     self.playInstantlyButton.hidden = YES;
+
+    _tracksDataSource.representedAlbum = nil;
+    [_tracksTableView reloadData];
+}
+
+- (void)setFrameSize:(NSSize)size
+{
+    [super setFrameSize:size];
+
+    // As it expects a scrollview as a parent, the table view will always resize itself and
+    // we cannot directly set its size. However, it resizes itself according to its columns
+    // and rows. We can therefore implicitly set its width by resizing the single column we
+    // are using.
+    //
+    // Since a column is just an NSObject and not an actual NSView object, however, we cannot
+    // use the normal autosizing/constraint systems and must instead calculate and set its
+    // size manually.
+    _column.width = [self expectedTableViewWidth];
 }
 
 - (IBAction)playInstantly:(id)sender
@@ -115,8 +201,12 @@ const CGFloat LayoutSpacer;
 {
     _representedAlbum = representedAlbum;
     self.albumNameTextField.stringValue = _representedAlbum.title;
+    self.artistNameTextField.stringValue = _representedAlbum.artistName;
+    
     if (_representedAlbum.year > 0) {
         self.yearTextField.intValue = _representedAlbum.year;
+    } else {
+        self.yearTextField.hidden = YES;
     }
 
     if (_representedAlbum.summary.length > 0) {

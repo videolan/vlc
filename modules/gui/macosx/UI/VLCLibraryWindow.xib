@@ -709,8 +709,8 @@
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
                 <outlet property="upNextSeparator" destination="qmL-Ar-cj1" id="GRX-ZE-2UG"/>
                 <outlet property="videoLibraryCollectionView" destination="B8x-e8-7zp" id="u1I-gn-IU1"/>
-                <outlet property="videoLibraryView" destination="vak-Gp-ljo" id="ulu-pc-ctF"/>
                 <outlet property="videoLibraryScrollView" destination="nXS-11-7iK" id="v1d-30-scr"/>
+                <outlet property="videoLibraryView" destination="vak-Gp-ljo" id="ulu-pc-ctF"/>
             </connections>
             <point key="canvasLocation" x="-609" y="325"/>
         </window>
@@ -971,14 +971,13 @@
                                 <rect key="frame" x="0.0" y="0.0" width="401" height="390"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="4ll-T2-J16">
+                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="4ll-T2-J16">
                                         <rect key="frame" x="0.0" y="0.0" width="401" height="390"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                        <size key="intercellSpacing" width="3" height="2"/>
                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                         <tableColumns>
-                                            <tableColumn width="369" minWidth="40" maxWidth="1000" id="WLd-Pi-bR4">
+                                            <tableColumn width="389" minWidth="40" maxWidth="1000000000" id="WLd-Pi-bR4">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>

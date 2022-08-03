@@ -305,6 +305,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _audioGroupSelectionTableView.dataSource = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.delegate = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
+
+    if(@available(macOS 11.0, *)) {
+        _audioGroupSelectionTableView.style = NSTableViewStyleFullWidth;
+    }
+
     _audioLibraryCollectionView.selectable = YES;
     _audioLibraryCollectionView.allowsMultipleSelection = NO;
     _audioLibraryCollectionView.allowsEmptySelection = YES;

@@ -402,11 +402,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
 {
-    VLCMediaLibraryAlbum *album = _representedListOfAlbums[row];
-    if (!album) {
-        return -1;
-    }
-    return [VLCLibraryAlbumTableCellView heightForAlbum:album];
+    VLCLibraryAlbumTableCellView *cellView = (VLCLibraryAlbumTableCellView *)[self tableView:tableView viewForTableColumn:[[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier] row:row];
+    return cellView == nil ? -1 : cellView.height;
 }
 
 @end
