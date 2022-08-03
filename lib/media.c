@@ -1032,7 +1032,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
 // Start an asynchronous thumbnail generation
 libvlc_media_thumbnail_request_t*
 libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
-                                       libvlc_media_t *md, float pos,
+                                       libvlc_media_t *md, double pos,
                                        libvlc_thumbnailer_seek_speed_t speed,
                                        unsigned int width, unsigned int height,
                                        bool crop, libvlc_picture_type_t picture_type,
