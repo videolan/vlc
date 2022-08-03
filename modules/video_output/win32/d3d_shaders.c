@@ -334,6 +334,57 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     else
         quad->shaderConstants->BoundaryY = (FLOAT) (fmt->i_visible_height - 1) / fmt->i_height;
 
+#define COLOR_CONSTANTS_601_KR 0.2990f
+#define COLOR_CONSTANTS_601_KB 0.1140f
+#define COLOR_CONSTANTS_601_KG (1.0f - COLOR_CONSTANTS_601_KR - COLOR_CONSTANTS_601_KB)
+
+#define COLOR_CONSTANTS_709_KR 0.2126f
+#define COLOR_CONSTANTS_709_KB 0.0722f
+#define COLOR_CONSTANTS_709_KG (1.0f - COLOR_CONSTANTS_709_KR - COLOR_CONSTANTS_709_KB)
+
+#define COLOR_CONSTANTS_2020_KR 0.2627f
+#define COLOR_CONSTANTS_2020_KB 0.0593f
+#define COLOR_CONSTANTS_2020_KG (1.0f - COLOR_CONSTANTS_2020_KR - COLOR_CONSTANTS_2020_KB)
+
+// TODO these values should be adapted for 10 bits sources
+#define COLOR_SHIFT_STUDIO_MIN_Y   16
+#define COLOR_SHIFT_STUDIO_MAX_Y   235
+#define COLOR_SHIFT_STUDIO_MIN_UV  16
+#define COLOR_SHIFT_STUDIO_MAX_UV  240
+#define COLOR_SHIFT_STUDIO_UV     ((double)128)
+#define COLOR_COEFF_STUDIO_Y      ((double)(COLOR_SHIFT_STUDIO_MAX_Y - COLOR_SHIFT_STUDIO_MIN_Y))
+#define COLOR_COEFF_STUDIO_UV     ((double)((COLOR_SHIFT_STUDIO_MAX_UV - COLOR_SHIFT_STUDIO_MIN_UV) / 2))
+
+#define COLOR_SHIFT_FULL_MIN_Y   0
+#define COLOR_SHIFT_FULL_MAX_Y   255
+#define COLOR_COEFF_FULL_Y      ((double)(COLOR_SHIFT_FULL_MAX_Y - COLOR_SHIFT_FULL_MIN_Y))
+#define COLOR_COEFF_FULL_UV     ((double)255 / 2)
+
+#define COLOR_COEFF_FULL_RGB      ((double)255)
+
+#define COLOR_SHIFT_STUDIO_MIN_RGB   16
+#define COLOR_SHIFT_STUDIO_MAX_RGB   235
+#define COLOR_COEFF_STUDIO_RGB      ((double)(COLOR_SHIFT_STUDIO_MAX_RGB - COLOR_SHIFT_STUDIO_MIN_RGB))
+
+    // based on http://avisynth.nl/index.php/Color_conversions and https://en.wikipedia.org/wiki/YCbCr
+#define COLOR_MATRIX_YUV2RGB(src, yuv_range, rgb_range) \
+    static const FLOAT COLORSPACE_BT##src##_##yuv_range##_TO_##rgb_range##_RGBA[4*3] = { \
+       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_Y, \
+       0.f, \
+       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KR), \
+       0.f, \
+       \
+       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_Y, \
+       - COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KB) * COLOR_CONSTANTS_##src##_KB / COLOR_CONSTANTS_##src##_KG, \
+       - COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KR) * COLOR_CONSTANTS_##src##_KR / COLOR_CONSTANTS_##src##_KG, \
+       0.f, \
+       \
+       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_Y, \
+       COLOR_COEFF_##rgb_range##_RGB / COLOR_COEFF_##yuv_range##_UV * (1.f - COLOR_CONSTANTS_##src##_KB), \
+       0.f, \
+       0.f, \
+    };
+
     const bool RGB_src_shader = DxgiIsRGBFormat(quad->textureFormat);
 
     FLOAT itu_black_level = 0.f;
@@ -371,31 +422,15 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
         0.f, 0.f, 1.f, 0.f,
     };
 
-    /* matrices for studio range */
-    /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT601_YUV_TO_FULL_RGBA[4*3] = {
-        1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
-        1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
-        1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
-    };
+
+    COLOR_MATRIX_YUV2RGB(601,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(709,STUDIO,FULL);
+    COLOR_MATRIX_YUV2RGB(2020,STUDIO,FULL);
 
     static const FLOAT COLORSPACE_FULL_RGBA_TO_BT601_YUV[4*3] = {
         0.299000f,  0.587000f,  0.114000f, 0.f,
        -0.168736f, -0.331264f,  0.500000f, 0.f,
         0.500000f, -0.418688f, -0.081312f, 0.f,
-    };
-
-    /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.709_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT709_YUV_TO_FULL_RGBA[4*3] = {
-        1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
-        1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
-        1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
-    };
-    /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.2020_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT2020_YUV_TO_FULL_RGBA[4*3] = {
-        1.164383561643836f,  0.000000000000f,  1.678674107143f, 0.f,
-        1.164383561643836f, -0.127007098661f, -0.440987687946f, 0.f,
-        1.164383561643836f,  2.141772321429f,  0.000000000000f, 0.f,
     };
 
     FLOAT WhitePoint[4*3];
@@ -417,23 +452,23 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     {
         switch (fmt->space){
             case COLOR_SPACE_BT709:
-                ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
+                ppColorspace = COLORSPACE_BT709_STUDIO_TO_FULL_RGBA;
                 break;
             case COLOR_SPACE_BT2020:
-                ppColorspace = COLORSPACE_BT2020_YUV_TO_FULL_RGBA;
+                ppColorspace = COLORSPACE_BT2020_STUDIO_TO_FULL_RGBA;
                 break;
             case COLOR_SPACE_BT601:
-                ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
+                ppColorspace = COLORSPACE_BT601_STUDIO_TO_FULL_RGBA;
                 break;
             default:
             case COLOR_SPACE_UNDEF:
                 if( fmt->i_height > 576 )
                 {
-                    ppColorspace = COLORSPACE_BT709_YUV_TO_FULL_RGBA;
+                    ppColorspace = COLORSPACE_BT709_STUDIO_TO_FULL_RGBA;
                 }
                 else
                 {
-                    ppColorspace = COLORSPACE_BT601_YUV_TO_FULL_RGBA;
+                    ppColorspace = COLORSPACE_BT601_STUDIO_TO_FULL_RGBA;
                 }
                 break;
         }
