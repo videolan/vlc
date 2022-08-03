@@ -1310,12 +1310,12 @@ int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
     return 0;
 }
 
-float libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
+double libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
 {
     vlc_player_t *player = p_mi->player;
     vlc_player_Lock(player);
 
-    float f_position = vlc_player_GetPosition(player);
+    double f_position = vlc_player_GetPosition(player);
 
     vlc_player_Unlock(player);
     return f_position;
