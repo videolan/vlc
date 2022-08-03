@@ -170,14 +170,6 @@ inline float3 toneMapping(float3 rgb) {\n\
     return rgb;\n\
 }\n\
 \n\
-inline float3 adjustRange(float3 rgb) {\n\
-#if (SRC_RANGE!=DST_RANGE)\n\
-    return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_WHITE_VALUE);\n\
-#else\n\
-    return rgb;\n\
-#endif\n\
-}\n\
-\n\
 inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     float4 sample;\n\
     /* sampling routine in sample */\n\
@@ -266,7 +258,6 @@ float4 main( PS_INPUT In ) : SV_TARGET\n\
     rgb = sourceToLinear(rgb);\n\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
-    rgb = adjustRange(rgb);\n\
     return float4(rgb, saturate(sample.a * Opacity));\n\
 }\n\
 ";
@@ -394,11 +385,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
                                    const char *psz_src_to_linear,
                                    const char *psz_linear_to_display,
                                    const char *psz_tone_mapping,
-                                   const char *psz_src_range, const char *psz_dst_range,
-                                   const char *psz_black_level,
-                                   const char *psz_range_factor,
-                                   const char *psz_min_black,
-                                   const char *psz_max_white,
                                    d3d_shader_blob *pPSBlob)
 {
     if (var_InheritInteger(o, "verbose") >= 4)
@@ -410,12 +396,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
          { "SRC_TO_LINEAR",     psz_src_to_linear },
          { "LINEAR_TO_DST",     psz_linear_to_display },
          { "SAMPLE_TEXTURES",   psz_sampler },
-         { "SRC_RANGE",         psz_src_range },
-         { "DST_RANGE",         psz_dst_range },
-         { "BLACK_LEVEL_SHIFT", psz_black_level },
-         { "RANGE_FACTOR",      psz_range_factor },
-         { "MIN_BLACK_VALUE",   psz_min_black },
-         { "MAX_WHITE_VALUE",   psz_max_white },
          { NULL, NULL },
     };
 #ifndef NDEBUG
@@ -446,7 +426,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     const char *psz_src_to_linear     = DEFAULT_NOOP;
     const char *psz_linear_to_display = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
-    const char *psz_src_range, *psz_dst_range;
     shader_views[1] = 0;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
@@ -625,83 +604,9 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     bool dst_full_range = display->b_full_range;
     if (!DxgiIsRGBFormat(dxgi_fmt) && DxgiIsRGBFormat(display->pixelFormat))
     {
-        /* the YUV->RGB conversion already output full range */
-        if (!src_full_range)
-            src_full_range = true; // account for this conversion
-        else
-        {
-            if (!dst_full_range)
-                msg_Warn(o, "unsupported display full range YUV on studio range RGB");
-            dst_full_range = false; // force a conversion down
-        }
+        if (src_full_range && !dst_full_range)
+            msg_Warn(o, "unsupported display full range YUV on studio range RGB");
     }
-
-    int range_adjust = 0;
-    psz_src_range = src_full_range ? "FULL_RANGE" : "STUDIO_RANGE";
-    psz_dst_range = display->b_full_range ? "FULL_RANGE" : "STUDIO_RANGE";
-    if (dst_full_range != src_full_range) {
-        if (!src_full_range)
-            range_adjust = 1; /* raise the source to full range */
-        else
-            range_adjust = -1; /* lower the source to studio range */
-    }
-
-    FLOAT black_level = 0;
-    FLOAT range_factor = 1.0f;
-    FLOAT itu_black_level = 0.f;
-    FLOAT itu_white_level = 1.f;
-    if (range_adjust != 0 && false)
-    {
-        FLOAT itu_range_factor;
-        switch (dxgi_fmt->bitsPerChannel)
-        {
-        case 8:
-            /* Rec. ITU-R BT.709-6 §4.6 */
-            itu_black_level  =              16.f / 255.f;
-            itu_white_level  =             235.f / 255.f;
-            itu_range_factor = (float)(235 - 16) / 255.f;
-            break;
-        case 10:
-            /* Rec. ITU-R BT.709-6 §4.6 */
-            itu_black_level  =              64.f / 1023.f;
-            itu_white_level  =             940.f / 1023.f;
-            itu_range_factor = (float)(940 - 64) / 1023.f;
-            break;
-        case 12:
-            /* Rec. ITU-R BT.2020-2 Table 5 */
-            itu_black_level  =               256.f / 4095.f;
-            itu_white_level  =              3760.f / 4095.f;
-            itu_range_factor = (float)(3760 - 256) / 4095.f;
-            break;
-        default:
-            /* unknown bitdepth, use approximation for infinite bit depth */
-            itu_black_level  =              16.f / 256.f;
-            itu_white_level  =             235.f / 256.f;
-            itu_range_factor = (float)(235 - 16) / 256.f;
-            break;
-        }
-
-        if (range_adjust > 0)
-        {
-            /* expand the range from studio to full range */
-            black_level -= itu_black_level;
-            range_factor /= itu_range_factor;
-        }
-        else
-        {
-            /* shrink the range to studio range */
-            black_level += itu_black_level;
-            range_factor *= itu_range_factor;
-        }
-    }
-    char psz_black_level[20];
-    char psz_range_factor[20];
-    char psz_min_black[20];
-    char psz_max_white[20];
-    snprintf(psz_black_level, ARRAY_SIZE(psz_black_level), "%f", black_level);
-    snprintf(psz_range_factor, ARRAY_SIZE(psz_range_factor), "%f", range_factor);
-    snprintf(psz_min_black, ARRAY_SIZE(psz_min_black), "%f", itu_black_level);
-    snprintf(psz_max_white, ARRAY_SIZE(psz_max_white), "%f", itu_white_level);
 
     HRESULT hr;
     hr = CompilePixelShaderBlob(o, compiler, feature_level,
@@ -709,8 +614,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 psz_src_to_linear,
                                 psz_linear_to_display,
                                 psz_tone_mapping,
-                                psz_src_range, psz_dst_range,
-                                psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
                                 &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
@@ -719,8 +622,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                     psz_src_to_linear,
                                     psz_linear_to_display,
                                     psz_tone_mapping,
-                                    psz_src_range, psz_dst_range,
-                                    psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
                                     &pPSBlob[1]);
         if (FAILED(hr))
             D3D_ShaderBlobRelease(&pPSBlob[0]);
