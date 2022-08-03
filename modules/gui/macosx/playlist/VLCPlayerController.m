@@ -192,7 +192,7 @@ static void cb_player_capabilities_changed(vlc_player_t *p_player, int oldCapabi
     });
 }
 
-static void cb_player_position_changed(vlc_player_t *p_player, vlc_tick_t time, float position, void *p_data)
+static void cb_player_position_changed(vlc_player_t *p_player, vlc_tick_t time, double position, void *p_data)
 {
     VLC_UNUSED(p_player);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -414,7 +414,7 @@ static void cb_player_program_selection_changed(vlc_player_t *p_player,
 
 static void cb_player_atobloop_changed(vlc_player_t *p_player,
                                        enum vlc_player_abloop new_state,
-                                       vlc_tick_t time, float pos,
+                                       vlc_tick_t time, double pos,
                                        void *p_data)
 {
     VLC_UNUSED(p_player);

@@ -175,7 +175,7 @@ on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps, void *
 }
 
 static void
-on_position_changed(vlc_player_t *player, vlc_tick_t new_time, float new_pos,
+on_position_changed(vlc_player_t *player, vlc_tick_t new_time, double new_pos,
                     void *data)
 {
     (void) player;

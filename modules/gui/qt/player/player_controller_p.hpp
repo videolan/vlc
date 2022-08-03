@@ -83,7 +83,7 @@ public:
 
     VLCTick      m_time = 0;
     VLCTick      m_remainingTime = 0;
-    float           m_position = 0.f;
+    double       m_position = 0.f;
     VLCTick      m_length= 0;
 
     QString m_highResolutionTime { "00:00:00:00" };

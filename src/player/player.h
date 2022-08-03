@@ -68,7 +68,7 @@ struct vlc_player_input
     int capabilities;
     vlc_tick_t length;
 
-    float position;
+    double position;
     vlc_tick_t time;
     vlc_tick_t normal_time;
 
@@ -104,7 +104,7 @@ struct vlc_player_input
     struct
     {
         vlc_tick_t time;
-        float pos;
+        double pos;
         bool set;
     } abloop_state[2];
 
@@ -439,7 +439,7 @@ vlc_player_input_GetSelectedTrackStringIds(struct vlc_player_input *input,
 vlc_tick_t
 vlc_player_input_GetTime(struct vlc_player_input *input);
 
-float
+double
 vlc_player_input_GetPos(struct vlc_player_input *input);
 
 int
@@ -482,7 +482,7 @@ vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source);
 
 int
 vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
-                         vlc_tick_t *out_ts, float *out_pos);
+                         vlc_tick_t *out_ts, double *out_pos);
 
 /*
  * player_vout.c
@@ -517,7 +517,7 @@ vlc_player_osd_Icon(vlc_player_t *player, short type);
 void
 vlc_player_osd_Position(vlc_player_t *player,
                         struct vlc_player_input *input, vlc_tick_t time,
-                        float position, enum vlc_player_whence whence);
+                        double position, enum vlc_player_whence whence);
 void
 vlc_player_osd_Volume(vlc_player_t *player, bool mute_action);
 

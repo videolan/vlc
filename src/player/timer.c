@@ -399,7 +399,7 @@ vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source)
 
 int
 vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
-                         vlc_tick_t *out_ts, float *out_pos)
+                         vlc_tick_t *out_ts, double *out_pos)
 {
     vlc_mutex_lock(&player->timer.lock);
     if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
@@ -474,7 +474,7 @@ vlc_player_RemoveTimer(vlc_player_t *player, vlc_player_timer_id *timer)
 int
 vlc_player_timer_point_Interpolate(const struct vlc_player_timer_point *point,
                                    vlc_tick_t system_now,
-                                   vlc_tick_t *out_ts, float *out_pos)
+                                   vlc_tick_t *out_ts, double *out_pos)
 {
     assert(point);
     assert(system_now > 0);
@@ -485,7 +485,7 @@ vlc_player_timer_point_Interpolate(const struct vlc_player_timer_point *point,
     const vlc_tick_t drift = point->system_date == VLC_TICK_MAX ? 0
                            : (system_now - point->system_date) * point->rate;
     vlc_tick_t ts = point->ts;
-    float pos = point->position;
+    double pos = point->position;
 
     if (ts != VLC_TICK_INVALID)
     {
@@ -495,7 +495,7 @@ vlc_player_timer_point_Interpolate(const struct vlc_player_timer_point *point,
     }
     if (point->length != VLC_TICK_INVALID)
     {
-        pos += drift / (float) point->length;
+        pos += drift / (double) point->length;
         if (unlikely(pos < 0.f))
             return VLC_EGENERIC;
         if (pos > 1.f)

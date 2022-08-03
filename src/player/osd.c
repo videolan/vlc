@@ -119,14 +119,14 @@ vlc_player_osd_Icon(vlc_player_t *player, short type)
 void
 vlc_player_osd_Position(vlc_player_t *player,
                         struct vlc_player_input *input, vlc_tick_t time,
-                        float position, enum vlc_player_whence whence)
+                        double position, enum vlc_player_whence whence)
 {
     if (input->length != VLC_TICK_INVALID)
     {
         if (time == VLC_TICK_INVALID)
             time = position * input->length;
         else
-            position = time / (float) input->length;
+            position = time / (double) input->length;
     }
 
     size_t count;
