@@ -1,20 +1,23 @@
-Changes between 3.0.17.4 and 3.0.18:
-------------------------------------
+Changes between 3.0.17.4 and 3.0.18-rc:
+--------------------------------------
 
 Demux:
  * Major adaptive streaming update, notably for multiple timelies and webvtt
  * Fix seeking with some fragmented MP4 files
  * Add support for DVBSub inside MKV
+ * Fix some Flac files that could not be played
+ * Improve seeking in Ogg files
 
 Decoders:
- * fix DxVA/D3D11 crashes on HEVC files with bogus references
- * fix libass storage size and crash
- * fix decoding errors on macOS hw decoding on some HEVC files
+ * Fix DxVA/D3D11 crashes on HEVC files with bogus references
+ * Fix libass storage size and crash
+ * Fix decoding errors on macOS hw decoding on some HEVC files
 
 Video Output:
  * Fix color regression with VAAPI/iOS and OpenGL output
  * Fix some resizing issues with OpenGL on GLX/EGL/X11/XV
  * Fix Direct3d9 texture stretching
+ * Fix 10-bit accelerated video filters on macOS
 
 Playlist:
  * Avoid playlist liveloop on failed/tiny items (temporize EOS bursts)
@@ -24,10 +27,13 @@ Misc:
  * Improve SMBv1 and SMBv2 behaviours
  * Improve FTP compatibility
  * Support RISC-V
+ * Fix AVI muxing for Windows Media Player compatibility
+ * Fix seeking speed on macOS
 
 Contribs:
  * update FFmpeg, bluray, upnp, pthread, x265, freetype, libsmb2, aom, dav1d,
-   libass, libxml2 (contains CVE), dvdread, harfbuzz, zlib, gme
+   libass, libxml2 (contains CVE), dvdread, harfbuzz, zlib, gme, nettle, GnuTLS,
+   mpg123, speex, bluray
 
 
 Changes between 3.0.17.3 and 3.0.17.4:
