@@ -502,14 +502,8 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
                 break;
             default:
             case COLOR_SPACE_UNDEF:
-                if( fmt->i_height > 576 )
-                {
-                    ppColorspace = COLORSPACE_BT709_STUDIO_8_TO_FULL_RGBA;
-                }
-                else
-                {
-                    ppColorspace = COLORSPACE_BT601_STUDIO_8_TO_FULL_RGBA;
-                }
+                msg_Warn(o, "unknown colorspace, using BT709");
+                ppColorspace = COLORSPACE_BT709_STUDIO_8_TO_FULL_RGBA;
                 break;
         }
 
