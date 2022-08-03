@@ -38,7 +38,7 @@ vlc_player_input_FindTrackById(struct vlc_player_input *input, vlc_es_id_t *id,
 
 static void
 vlc_player_input_HandleAtoBLoop(struct vlc_player_input *input, vlc_tick_t time,
-                                float pos)
+                                double pos)
 {
     vlc_player_t *player = input->player;
 
@@ -70,11 +70,11 @@ vlc_player_input_GetTime(struct vlc_player_input *input)
     return input->time;
 }
 
-float
+double
 vlc_player_input_GetPos(struct vlc_player_input *input)
 {
     vlc_player_t *player = input->player;
-    float pos;
+    double pos;
 
     if (input == player->input
      && vlc_player_GetTimerPoint(player, vlc_tick_now(), NULL, &pos) == 0)

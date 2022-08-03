@@ -79,7 +79,7 @@ public:
 
     VLCTick      m_time = 0;
     VLCTick      m_remainingTime = 0;
-    float           m_position = 0.f;
+    double       m_position = 0.f;
     VLCTick      m_length= 0;
 
     using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,

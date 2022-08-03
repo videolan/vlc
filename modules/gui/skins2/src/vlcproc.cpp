@@ -183,10 +183,10 @@ void on_player_capabilities_changed( vlc_player_t *player,
 }
 
 void on_player_position_changed( vlc_player_t *player, vlc_tick_t time,
-                                 float pos, void *data )
+                                 double pos, void *data )
 {
     (void)player;(void)time;
-    vlc_value_t val = { .f_float = pos};
+    vlc_value_t val = { .f_float = static_cast<float>(pos)};
     VlcProc::onGenericCallback( "position", val, data );
 }
 

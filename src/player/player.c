@@ -1380,7 +1380,7 @@ vlc_player_GetTime(vlc_player_t *player)
     return vlc_player_input_GetTime(input);
 }
 
-float
+double
 vlc_player_GetPosition(vlc_player_t *player)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
@@ -1406,13 +1406,13 @@ vlc_player_DisplayPosition(vlc_player_t *player)
     if (!input)
         return;
     vlc_player_osd_Position(player, input,
-                                vlc_player_input_GetTime(input),
-                                vlc_player_input_GetPos(input),
-                                VLC_PLAYER_WHENCE_ABSOLUTE);
+                            vlc_player_input_GetTime(input),
+                            vlc_player_input_GetPos(input),
+                            VLC_PLAYER_WHENCE_ABSOLUTE);
 }
 
 void
-vlc_player_SeekByPos(vlc_player_t *player, float position,
+vlc_player_SeekByPos(vlc_player_t *player, double position,
                      enum vlc_player_seek_speed speed,
                      enum vlc_player_whence whence)
 {

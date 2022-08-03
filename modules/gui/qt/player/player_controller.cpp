@@ -694,7 +694,7 @@ static void on_player_stats_changed(vlc_player_t *, const struct input_stats_t *
     });
 }
 
-static void on_player_atobloop_changed(vlc_player_t *, enum vlc_player_abloop state, vlc_tick_t time, float, void *data)
+static void on_player_atobloop_changed(vlc_player_t *, enum vlc_player_abloop state, vlc_tick_t time, double, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_atobloop_changed");

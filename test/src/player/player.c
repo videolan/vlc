@@ -45,7 +45,7 @@ struct report_capabilities
 struct report_position
 {
     vlc_tick_t time;
-    float pos;
+    double pos;
 };
 
 struct report_track_list
@@ -328,7 +328,7 @@ player_on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps,
 
 static void
 player_on_position_changed(vlc_player_t *player, vlc_tick_t time,
-                           float pos, void *data)
+                           double pos, void *data)
 {
     struct ctx *ctx = get_ctx(player, data);
     struct report_position report = {
