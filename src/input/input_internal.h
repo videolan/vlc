@@ -166,7 +166,7 @@ struct vlc_input_event_state
 
 struct vlc_input_event_times
 {
-    float position;
+    double position;
     vlc_tick_t time;
     vlc_tick_t normal_time;
     vlc_tick_t length;
@@ -331,7 +331,7 @@ void input_Close( input_thread_t * );
 
 void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );
 
-void input_SetPosition( input_thread_t *, float f_position, bool b_fast );
+void input_SetPosition( input_thread_t *, double f_position, bool b_fast );
 
 /**
  * Set the delay of an ES identifier
@@ -412,7 +412,7 @@ typedef union
     } time;
     struct {
         bool b_fast_seek;
-        float f_val;
+        double f_val;
     } pos;
     struct
     {
