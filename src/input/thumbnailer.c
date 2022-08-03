@@ -47,7 +47,7 @@ struct seek_target
     union
     {
         vlc_tick_t time;
-        float pos;
+        double pos;
     };
 };
 
@@ -274,7 +274,7 @@ vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
 
 task_t *
 vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
-                              float pos, enum vlc_thumbnailer_seek_speed speed,
+                              double pos, enum vlc_thumbnailer_seek_speed speed,
                               input_item_t *item, vlc_tick_t timeout,
                               vlc_thumbnailer_cb cb, void* userdata )
 {

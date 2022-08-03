@@ -107,7 +107,7 @@ vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
  */
 VLC_API vlc_thumbnailer_request_t*
 vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
-                              float pos,
+                              double pos,
                               enum vlc_thumbnailer_seek_speed speed,
                               input_item_t *input_item, vlc_tick_t timeout,
                               vlc_thumbnailer_cb cb, void* user_data );
