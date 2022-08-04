@@ -58,12 +58,15 @@ overlay_t *OverlayCreate( void )
                         0, 0, 1, 1 );
     p_ovl->p_fontstyle = text_style_Create( STYLE_NO_DEFAULTS );
     p_ovl->data.p_text = NULL;
+    p_ovl->data.p_pic = NULL;
 
     return p_ovl;
 }
 
 int OverlayDestroy( overlay_t *p_ovl )
 {
+    if( p_ovl->data.p_pic != NULL )
+        picture_Release( p_ovl->data.p_pic );
     free( p_ovl->data.p_text );
     text_style_Delete( p_ovl->p_fontstyle );
 
@@ -491,6 +494,9 @@ static int exec_DataSharedMem( filter_t *p_filter,
     {
         uint8_t *p_data, *p_in;
         size_t i_neededsize = 0;
+
+        if( p_ovl->data.p_pic != NULL )
+            picture_Release( p_ovl->data.p_pic );
 
         p_ovl->data.p_pic = picture_New( p_params->fourcc,
                                          p_params->i_width, p_params->i_height,
