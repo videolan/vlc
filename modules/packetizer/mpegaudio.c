@@ -62,9 +62,7 @@ typedef struct
     vlc_tick_t i_pts;
 
     int i_frame_size, i_free_frame_size;
-    unsigned int i_channels_conf, i_chan_mode, i_channels;
-    unsigned int i_rate, i_max_frame_size, i_frame_length;
-    unsigned int i_layer, i_bit_rate;
+    struct mpga_frameheader_s header;
 
     bool   b_discontinuity;
 } decoder_sys_t;
@@ -109,29 +107,30 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate ||
+    if( p_dec->fmt_out.audio.i_rate != p_sys->header.i_sample_rate ||
         date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
     {
-        msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
-                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
+        msg_Dbg( p_dec, "MPGA channels:%"PRIu8" samplerate:%u bitrate:%"PRIu16,
+                 p_sys->header.i_channels, p_sys->header.i_sample_rate,
+                 p_sys->header.i_bit_rate );
 
         if( p_sys->end_date.i_divider_num == 0 )
-            date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
+            date_Init( &p_sys->end_date, p_sys->header.i_sample_rate, 1 );
         else
-            date_Change( &p_sys->end_date, p_sys->i_rate, 1 );
+            date_Change( &p_sys->end_date, p_sys->header.i_sample_rate, 1 );
         date_Set( &p_sys->end_date, p_sys->i_pts );
     }
 
-    p_dec->fmt_out.i_profile        = p_sys->i_layer;
-    p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
-    p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
-    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_max_frame_size;
+    p_dec->fmt_out.i_profile        = p_sys->header.i_layer;
+    p_dec->fmt_out.audio.i_rate     = p_sys->header.i_sample_rate;
+    p_dec->fmt_out.audio.i_channels = p_sys->header.i_channels;
+    p_dec->fmt_out.audio.i_frame_length = p_sys->header.i_samples_per_frame;
+    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->header.i_max_frame_size;
 
-    p_dec->fmt_out.audio.i_physical_channels = p_sys->i_channels_conf;
-    p_dec->fmt_out.audio.i_chan_mode = p_sys->i_chan_mode;
+    p_dec->fmt_out.audio.i_physical_channels = p_sys->header.i_channels_conf;
+    p_dec->fmt_out.audio.i_chan_mode = p_sys->header.i_chan_mode;
 
-    p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate * 1000;
+    p_dec->fmt_out.i_bitrate = p_sys->header.i_bit_rate * 1000U;
 
     block_t *p_block = block_Alloc( p_sys->i_frame_size );
     if( p_block == NULL )
@@ -139,7 +138,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 
     p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
     p_block->i_length =
-        date_Increment( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
+        date_Increment( &p_sys->end_date, p_sys->header.i_samples_per_frame ) - p_block->i_pts;
 
     *pp_out_buffer = p_block;
     return p_block->p_buffer;
@@ -248,16 +247,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_header = GetDWBE(p_header);
 
             /* Check if frame is valid and get frame info */
-            p_sys->i_frame_size = SyncInfo( i_header,
-                                            &p_sys->i_channels,
-                                            &p_sys->i_channels_conf,
-                                            &p_sys->i_chan_mode,
-                                            &p_sys->i_rate,
-                                            &p_sys->i_bit_rate,
-                                            &p_sys->i_frame_length,
-                                            &p_sys->i_max_frame_size,
-                                            &p_sys->i_layer );
-
+            p_sys->i_frame_size = mpga_decode_frameheader( i_header, &p_sys->header );
             if( p_sys->i_frame_size == -1 )
             {
                 msg_Dbg( p_dec, "emulated startcode" );
@@ -266,7 +256,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_sys->i_bit_rate == 0 )
+            if( p_sys->header.i_bit_rate == 0 )
             {
                 /* Free bitrate, but 99% emulated startcode :( */
                 if( p_sys->i_free_frame_size == MPGA_HEADER_SIZE )
@@ -299,33 +289,22 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 /* Startcode is fine, let's try the header as an extra check */
                 int i_next_frame_size;
-                unsigned int i_next_channels, i_next_stereo_mode, i_next_channels_conf;
-                unsigned int i_next_rate, i_next_bit_rate;
-                unsigned int i_next_frame_length, i_next_max_frame_size;
-                unsigned int i_next_layer;
 
                 /* Build frame header */
                 i_header = GetDWBE(p_header);
 
-                i_next_frame_size = SyncInfo( i_header,
-                                              &i_next_channels,
-                                              &i_next_channels_conf,
-                                              &i_next_stereo_mode,
-                                              &i_next_rate,
-                                              &i_next_bit_rate,
-                                              &i_next_frame_length,
-                                              &i_next_max_frame_size,
-                                              &i_next_layer );
+                struct mpga_frameheader_s nextheader;
+                i_next_frame_size = mpga_decode_frameheader( i_header, &nextheader );
 
                 /* Free bitrate only */
-                if( p_sys->i_bit_rate == 0 && i_next_frame_size == -1 )
+                if( p_sys->header.i_bit_rate == 0 && i_next_frame_size == -1 )
                 {
                     if( (unsigned int)p_sys->i_frame_size >
-                        p_sys->i_max_frame_size )
+                        p_sys->header.i_max_frame_size )
                     {
-                        msg_Dbg( p_dec, "frame too big %d > %d "
+                        msg_Dbg( p_dec, "frame too big %d > %u "
                                  "(emulated startcode ?)", p_sys->i_frame_size,
-                                 p_sys->i_max_frame_size );
+                                 p_sys->header.i_max_frame_size );
                         block_SkipByte( &p_sys->bytestream );
                         p_sys->i_state = STATE_NOSYNC;
                         p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
@@ -345,14 +324,14 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 }
 
                 /* Check info is in sync with previous one */
-                if( i_next_channels_conf != p_sys->i_channels_conf ||
-                    i_next_stereo_mode != p_sys->i_chan_mode ||
-                    i_next_rate != p_sys->i_rate ||
-                    i_next_layer != p_sys->i_layer ||
-                    i_next_frame_length != p_sys->i_frame_length )
+                if( nextheader.i_channels_conf != p_sys->header.i_channels_conf ||
+                    nextheader.i_chan_mode != p_sys->header.i_chan_mode ||
+                    nextheader.i_sample_rate != p_sys->header.i_sample_rate ||
+                    nextheader.i_layer != p_sys->header.i_layer ||
+                    nextheader.i_samples_per_frame != p_sys->header.i_samples_per_frame )
                 {
                     /* Free bitrate only */
-                    if( p_sys->i_bit_rate == 0 )
+                    if( p_sys->header.i_bit_rate == 0 )
                     {
                         p_sys->i_frame_size++;
                         break;
@@ -366,9 +345,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 }
 
                 /* Free bitrate only */
-                if( p_sys->i_bit_rate == 0 )
+                if( p_sys->header.i_bit_rate == 0 )
                 {
-                    if( i_next_bit_rate != 0 )
+                    if( nextheader.i_bit_rate != 0 )
                     {
                         p_sys->i_frame_size++;
                         break;
@@ -379,14 +358,14 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             else
             {
                 /* Free bitrate only */
-                if( p_sys->i_bit_rate == 0 )
+                if( p_sys->header.i_bit_rate == 0 )
                 {
                     if( (unsigned int)p_sys->i_frame_size >
-                        p_sys->i_max_frame_size )
+                        p_sys->header.i_max_frame_size )
                     {
-                        msg_Dbg( p_dec, "frame too big %d > %d "
+                        msg_Dbg( p_dec, "frame too big %d > %u "
                                  "(emulated startcode ?)", p_sys->i_frame_size,
-                                 p_sys->i_max_frame_size );
+                                 p_sys->header.i_max_frame_size );
                         block_SkipByte( &p_sys->bytestream );
                         p_sys->i_state = STATE_NOSYNC;
                         p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
@@ -426,7 +405,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
 
             /* Free bitrate only */
-            if( p_sys->i_bit_rate == 0 )
+            if( p_sys->header.i_bit_rate == 0 )
             {
                 p_sys->i_free_frame_size = p_sys->i_frame_size;
             }
@@ -504,9 +483,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_discontinuity = false;
     p_sys->i_frame_size = 0;
 
-    p_sys->i_channels_conf = p_sys->i_chan_mode = p_sys->i_channels =
-    p_sys->i_rate = p_sys->i_max_frame_size = p_sys->i_frame_length =
-    p_sys->i_layer = p_sys->i_bit_rate = 0;
+    memset(&p_sys->header, 0, sizeof(p_sys->header));
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_MPGA;

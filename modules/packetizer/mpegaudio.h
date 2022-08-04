@@ -2,6 +2,7 @@
  * mpegaudio.h:
  *****************************************************************************
  * Copyright (C) 2001-2016 VLC authors and VideoLAN
+ *               2022 VideoLabs
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -26,19 +27,24 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/*****************************************************************************
- * SyncInfo: parse MPEG audio sync info
- *****************************************************************************/
-static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
-                    unsigned int *restrict pi_channels_conf,
-                    unsigned int *restrict pi_chan_mode,
-                    unsigned int *restrict pi_sample_rate,
-                    unsigned int *restrict pi_bit_rate,
-                    unsigned int *restrict pi_frame_length,
-                    unsigned int *restrict pi_max_frame_size,
-                    unsigned int *restrict pi_layer)
+struct mpga_frameheader_s
 {
-    static const unsigned short ppi_bitrate[2][3][16] =
+    uint8_t i_layer;
+    uint8_t i_channels;
+    uint16_t i_channels_conf;
+    uint16_t i_chan_mode;
+    uint16_t i_bit_rate;
+    uint16_t i_sample_rate;
+    uint16_t i_samples_per_frame;
+    unsigned int i_max_frame_size;
+};
+
+/*****************************************************************************
+ * mpgaDecodeFrameHeader: parse MPEG audio sync info
+ *****************************************************************************/
+static int mpga_decode_frameheader(uint32_t i_header, struct mpga_frameheader_s *h)
+{
+    static const uint16_t ppi_bitrate[2][3][16] =
     {
         {
             /* v1 l1 */
@@ -65,7 +71,7 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
         }
     };
 
-    static const unsigned short ppi_samplerate[2][4] = /* version 1 then 2 */
+    static const uint16_t ppi_samplerate[2][4] = /* version 1 then 2 */
     {
         { 44100, 48000, 32000, 0 },
         { 22050, 24000, 16000, 0 }
@@ -74,20 +80,20 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
     int i_frame_size;
 
     bool b_mpeg_2_5 = 1 - ((i_header & 0x100000) >> 20);
-    int i_version = 1 - ((i_header & 0x80000) >> 19);
-    *pi_layer   = 4 - ((i_header & 0x60000) >> 17);
+    unsigned i_version_index = 1 - ((i_header & 0x80000) >> 19);
+    h->i_layer   = 4 - ((i_header & 0x60000) >> 17);
     //bool b_crc = !((i_header >> 16) & 0x01);
-    int i_bitrate_index = (i_header & 0xf000) >> 12;
-    int i_samplerate_index = (i_header & 0xc00) >> 10;
+    unsigned i_bitrate_index = (i_header & 0xf000) >> 12;
+    unsigned i_samplerate_index = (i_header & 0xc00) >> 10;
     bool b_padding = (i_header & 0x200) >> 9;
     /* Extension */
-    int i_mode = (i_header & 0xc0) >> 6;
+    uint8_t i_mode = (i_header & 0xc0) >> 6;
     /* Modeext, copyright & original */
-    int i_emphasis = i_header & 0x3;
+    uint8_t i_emphasis = i_header & 0x3;
 
-    *pi_chan_mode = 0;
+    h->i_chan_mode = 0;
 
-    if (*pi_layer == 4
+    if (h->i_layer == 4
      || i_bitrate_index == 0x0f
      || i_samplerate_index == 0x03
      || i_emphasis == 0x02)
@@ -96,48 +102,48 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
     switch (i_mode)
     {
         case 2: /* dual-mono */
-            *pi_chan_mode = AOUT_CHANMODE_DUALMONO;
+            h->i_chan_mode = AOUT_CHANMODE_DUALMONO;
             /* fall through */
         case 0: /* stereo */
         case 1: /* joint stereo */
-            *pi_channels = 2;
-            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            h->i_channels = 2;
+            h->i_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
             break;
         case 3: /* mono */
-            *pi_channels = 1;
-            *pi_channels_conf = AOUT_CHAN_CENTER;
+            h->i_channels = 1;
+            h->i_channels_conf = AOUT_CHAN_CENTER;
             break;
     }
 
-    int i_max_bit_rate = ppi_bitrate[i_version][*pi_layer-1][14];
-    *pi_bit_rate = ppi_bitrate[i_version][*pi_layer-1][i_bitrate_index];
-    *pi_sample_rate = ppi_samplerate[i_version][i_samplerate_index];
+    uint16_t i_max_bit_rate = ppi_bitrate[i_version_index][h->i_layer-1][14];
+    h->i_bit_rate = ppi_bitrate[i_version_index][h->i_layer-1][i_bitrate_index];
+    h->i_sample_rate = ppi_samplerate[i_version_index][i_samplerate_index];
 
     if (b_mpeg_2_5)
-        *pi_sample_rate /= 2;
+        h->i_sample_rate /= 2;
 
-    switch (*pi_layer)
+    switch (h->i_layer)
     {
         case 1:
-            i_frame_size = (12000 * *pi_bit_rate / *pi_sample_rate +
+            i_frame_size = (12000 * h->i_bit_rate / h->i_sample_rate +
                             b_padding) * 4;
-            *pi_max_frame_size = (12000 * i_max_bit_rate /
-                                  *pi_sample_rate + 1) * 4;
-            *pi_frame_length = 384;
+            h->i_max_frame_size = (12000 * i_max_bit_rate /
+                                  h->i_sample_rate + 1) * 4;
+            h->i_samples_per_frame = 384;
             break;
 
         case 2:
-            i_frame_size = 144000 * *pi_bit_rate / *pi_sample_rate + b_padding;
-            *pi_max_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
-            *pi_frame_length = 1152;
+            i_frame_size = 144000 * h->i_bit_rate / h->i_sample_rate + b_padding;
+            h->i_max_frame_size = 144000 * i_max_bit_rate / h->i_sample_rate + 1;
+            h->i_samples_per_frame = 1152;
             break;
 
         case 3:
-            i_frame_size = (i_version ? 72000 : 144000) *
-                            *pi_bit_rate / *pi_sample_rate + b_padding;
-            *pi_max_frame_size = (i_version ? 72000 : 144000) *
-                                  i_max_bit_rate / *pi_sample_rate + 1;
-            *pi_frame_length = i_version ? 576 : 1152;
+            i_frame_size = (i_version_index ? 72000 : 144000) *
+                            h->i_bit_rate / h->i_sample_rate + b_padding;
+            h->i_max_frame_size = (i_version_index ? 72000 : 144000) *
+                                  i_max_bit_rate / h->i_sample_rate + 1;
+            h->i_samples_per_frame = i_version_index ? 576 : 1152;
             break;
 
         default:
@@ -145,8 +151,8 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
     }
 
     /* Free bitrate mode can support higher bitrates */
-    if (*pi_bit_rate == 0)
-        *pi_max_frame_size *= 2;
+    if (h->i_bit_rate == 0)
+        h->i_max_frame_size *= 2;
 
     return i_frame_size;
 }

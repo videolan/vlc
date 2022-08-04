@@ -141,9 +141,8 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
 
         /* This RTP payload format does atypically not flag end-of-frames, so
          * we have to parse the MPEG Audio frame header to find out. */
-        unsigned chans, conf, mode, srate, brate, samples, maxsize, layer;
-        int frame_size = SyncInfo(ntoh32(header), &chans, &conf, &mode, &srate,
-                                  &brate, &samples, &maxsize, &layer);
+        struct mpga_frameheader_s fh;
+        int frame_size = mpga_decode_frameheader(ntoh32(header), &fh);
         /* If the frame size is unknown due to free bit rate, then we can only
          * sense the completion of the frame when the next frame starts. */
         if (frame_size <= 0) {
