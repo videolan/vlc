@@ -406,4 +406,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return cellView == nil ? -1 : cellView.height;
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
+{
+    if(tableView == [[[VLCMain sharedInstance] libraryWindow] audioGroupSelectionTableView]) {
+        return NO;
+    }
+
+    return YES;
+}
+
 @end
