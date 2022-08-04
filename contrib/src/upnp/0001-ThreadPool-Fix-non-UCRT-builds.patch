@@ -1,0 +1,32 @@
+From 3560d8d3f1a5b7e88b9d6282c09b2caf37beedc8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Thu, 4 Aug 2022 15:55:55 +0200
+Subject: [PATCH] ThreadPool: Fix non UCRT builds
+
+---
+ upnp/src/threadutil/ThreadPool.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/upnp/src/threadutil/ThreadPool.c b/upnp/src/threadutil/ThreadPool.c
+index 49fa8486..e5883d31 100644
+--- a/upnp/src/threadutil/ThreadPool.c
++++ b/upnp/src/threadutil/ThreadPool.c
+@@ -1297,10 +1297,15 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
+ 			_tzset();
+ 			tzflag++;
+ 		}
++#ifdef _UCRT
+ 		long itz = 0;
+ 		_get_timezone(&itz);
+ 		tz->tz_minuteswest = (int)(itz / 60);
+ 		_get_daylight(&tz->tz_dsttime);
++#else
++		tz->tz_minuteswest = _timezone / 60;
++		tz->tz_dsttime = _daylight;
++#endif
+ 	}
+ 
+ 	return 0;
+-- 
+2.35.1
+

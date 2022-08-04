@@ -18,9 +18,9 @@ index f3e08a5..e6233b5 100644
  
 +#include "autoconfig.h"
 +
- #ifdef IPV6_
- #define INET_IPV6
- #endif
+	#ifdef IPV6_
+		#define INET_IPV6
+	#endif
 @@ -13,6 +15,8 @@
  #include <stdio.h>
  #include <string.h>

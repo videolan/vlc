@@ -1,5 +1,5 @@
 # UPNP
-UPNP_VERSION := 1.14.11
+UPNP_VERSION := 1.14.13
 UPNP_URL := $(GITHUB)/pupnp/pupnp/archive/refs/tags/release-$(UPNP_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -40,9 +40,8 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-pthread-force.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win32-exports.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
-	$(APPLY) $(SRC)/upnp/libupnp-win64.patch
 	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
-	$(APPLY) $(SRC)/upnp/win32-gettimeofday.patch
+	$(APPLY) $(SRC)/upnp/0001-ThreadPool-Fix-non-UCRT-builds.patch
 endif
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID
@@ -53,7 +52,6 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/upnp/revert-ifaddrs.patch
 endif
 	$(APPLY) $(SRC)/upnp/miniserver.patch
-	$(APPLY) $(SRC)/upnp/miniserver-pton-error.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
