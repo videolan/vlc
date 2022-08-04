@@ -1,11 +1,13 @@
---- libupnp/upnp/src/inc/upnputil.h	2010-12-23 21:24:06.000000000 +0100
-+++ libupnp.new/upnp/src/inc/upnputil.h	2011-02-13 08:24:24.000000000 +0100
-@@ -125,7 +125,7 @@
- 		#define strncasecmp		strnicmp
- 		#define sleep(a)		Sleep((a)*1000)
- 		#define usleep(a)		Sleep((a)/1000)
--		#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
-+		#define strerror_r(a,b,c)       strncpy( b, strerror(a), c)
+diff --git a/upnp/src/inc/upnputil.h b/upnp/src/inc/upnputil.h
+index 2f18422b..ffc79254 100644
+--- a/upnp/src/inc/upnputil.h
++++ b/upnp/src/inc/upnputil.h
+@@ -106,7 +106,7 @@ void linecopylen(
+ 		#endif
+ 		#define sleep(a) Sleep((a)*1000)
+ 		#define usleep(a) Sleep((a) / 1000)
+-		#define strerror_r(a, b, c) (strerror_s((b), (c), (a)))
++		#define strerror_r(a, b, c) strncpy(b, strerror(a), c)
  	#else
- 		#define max(a, b)   (((a)>(b))? (a):(b))
- 		#define min(a, b)   (((a)<(b))? (a):(b))
+ 		#define max(a, b) (((a) > (b)) ? (a) : (b))
+ 		#define min(a, b) (((a) < (b)) ? (a) : (b))
