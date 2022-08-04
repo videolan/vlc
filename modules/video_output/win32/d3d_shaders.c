@@ -425,23 +425,24 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
         {
         case 8:
             /* Rec. ITU-R BT.709-6 ¶4.6 */
-            itu_black_level  =              16.f / 255.f;
-            itu_achromacy    =             128.f / 255.f;
+            itu_black_level = COLOR_SHIFT_STUDIO_8_MIN_Y / COLOR_SHIFT_FULL_8_MAX_Y;
+            itu_achromacy   = COLOR_SHIFT_STUDIO_8_UV    / COLOR_SHIFT_FULL_8_MAX_Y;
             break;
         case 10:
             /* Rec. ITU-R BT.709-6 ¶4.6 */
-            itu_black_level  =              64.f / 1023.f;
-            itu_achromacy    =             512.f / 1023.f;
+            itu_black_level = COLOR_SHIFT_STUDIO_10_MIN_Y / COLOR_SHIFT_FULL_10_MAX_Y;
+            itu_achromacy   = COLOR_SHIFT_STUDIO_10_UV    / COLOR_SHIFT_FULL_10_MAX_Y;
             break;
         case 12:
             /* Rec. ITU-R BT.2020-2 Table 5 */
-            itu_black_level  =               256.f / 4095.f;
-            itu_achromacy    =              2048.f / 4095.f;
+            itu_black_level = COLOR_SHIFT_STUDIO_12_MIN_Y / COLOR_SHIFT_FULL_12_MAX_Y;
+            itu_achromacy   = COLOR_SHIFT_STUDIO_12_UV    / COLOR_SHIFT_FULL_12_MAX_Y;
             break;
         default:
             /* unknown bitdepth, use approximation for infinite bit depth */
-            itu_black_level  =              16.f / 256.f;
-            itu_achromacy    =             128.f / 256.f;
+            msg_Warn(o, "unsupported YUV bitdepth %u", (unsigned)quad->textureFormat->bitsPerChannel);
+            itu_black_level =  16.f / 256.f;
+            itu_achromacy   = 128.f / 256.f;
             break;
         }
     }
