@@ -291,7 +291,7 @@ static int Open(vlc_object_t *object)
 
 #if !VLC_WINSTORE_APP
     if (!external_device)
-    EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
+        EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
 #endif
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
 
@@ -1259,46 +1259,46 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     if (!external_device)
     {
 #if !VLC_WINSTORE_APP
-    HRESULT hr = S_OK;
+        HRESULT hr = S_OK;
 
-    DXGI_SWAP_CHAIN_DESC1 scd;
-    FillSwapChainDesc(vd, &scd);
+        DXGI_SWAP_CHAIN_DESC1 scd;
+        FillSwapChainDesc(vd, &scd);
 
-    hr = D3D11_CreateDevice(vd, &sys->hd3d,
-                            is_d3d11_opaque(vd->source.i_chroma),
-                            &sys->d3d_dev);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
+        hr = D3D11_CreateDevice(vd, &sys->hd3d,
+                                is_d3d11_opaque(vd->source.i_chroma),
+                                &sys->d3d_dev);
+        if (FAILED(hr)) {
+        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+        }
 
-    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (unlikely(dxgiadapter==NULL)) {
-       msg_Err(vd, "Could not get the DXGI Adapter");
-       return VLC_EGENERIC;
-    }
+        IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+        if (unlikely(dxgiadapter==NULL)) {
+        msg_Err(vd, "Could not get the DXGI Adapter");
+        return VLC_EGENERIC;
+        }
 
-    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
-    IDXGIAdapter_Release(dxgiadapter);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
+        hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
+        IDXGIAdapter_Release(dxgiadapter);
+        if (FAILED(hr)) {
+        msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+        }
 
-    hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                              sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
-    if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
-    {
-        msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
-        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
-    }
-    IDXGIFactory2_Release(dxgifactory);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
+                                                sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+        if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
+        {
+            msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
+            scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
+                                                    sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+        }
+        IDXGIFactory2_Release(dxgifactory);
+        if (FAILED(hr)) {
+        msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+        }
 #endif
     }
 

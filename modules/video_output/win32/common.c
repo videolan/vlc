@@ -177,7 +177,7 @@ void UpdateRects(vout_display_t *vd,
     point.x = point.y = 0;
 #if !VLC_WINSTORE_APP
     if (likely(sys->hwnd)) // internal rendering
-    ClientToScreen(sys->hwnd, &point);
+        ClientToScreen(sys->hwnd, &point);
 #endif
 
     /* If nothing changed, we can return */
@@ -185,17 +185,17 @@ void UpdateRects(vout_display_t *vd,
     bool is_resized;
     if (unlikely(!sys->event)) // external rendering
     {
-    has_moved = false;
-    is_resized = rect.right != (sys->rect_display.right - sys->rect_display.left) ||
-        rect.bottom != (sys->rect_display.bottom - sys->rect_display.top);
-    sys->rect_display = rect;
+        has_moved = false;
+        is_resized = rect.right != (sys->rect_display.right - sys->rect_display.left) ||
+            rect.bottom != (sys->rect_display.bottom - sys->rect_display.top);
+        sys->rect_display = rect;
     }
 #if !VLC_WINSTORE_APP
     else
     {
-    EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
-        point.x, point.y,
-        rect.right, rect.bottom);
+        EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
+            point.x, point.y,
+            rect.right, rect.bottom);
     }
 #endif
     if (is_resized)
@@ -222,12 +222,12 @@ void UpdateRects(vout_display_t *vd,
 #if !VLC_WINSTORE_APP
     if (likely(sys->event)) // internal rendering
     {
-    EventThreadUpdateSourceAndPlace(sys->event, source, &place);
+        EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 
-    if (sys->hvideownd)
-        SetWindowPos(sys->hvideownd, 0,
-            place.x, place.y, place.width, place.height,
-            SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
+        if (sys->hvideownd)
+            SetWindowPos(sys->hvideownd, 0,
+                place.x, place.y, place.width, place.height,
+                SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
     }
 #endif
 
@@ -242,10 +242,10 @@ void UpdateRects(vout_display_t *vd,
     }
     else
     {
-    rect_dest.left = 0;
-    rect_dest.right = place.width;
-    rect_dest.top = 0;
-    rect_dest.bottom = place.height;
+        rect_dest.left = 0;
+        rect_dest.right = place.width;
+        rect_dest.top = 0;
+        rect_dest.bottom = place.height;
     }
 #else
     rect_dest.left = point.x + place.x;
