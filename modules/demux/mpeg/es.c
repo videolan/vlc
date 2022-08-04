@@ -356,6 +356,12 @@ static int OpenCommon( demux_t *p_demux,
         return VLC_EGENERIC;
     }
 
+    if( vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     msg_Dbg( p_demux, "detected format %4.4s", (const char*)&p_sys->codec.i_codec );
 
     /* Load the audio packetizer */
@@ -1241,6 +1247,10 @@ static int MpgaInit( demux_t *p_demux )
                           (char *) &xing->infotag,
                           xing->i_bytes, xing->i_frames,
                           p_sys->mpgah.i_samples_per_frame );
+
+        /* We'll need to skip that part for playback
+         * and avoid using it as container frame could be different rate/size */
+        p_sys->i_stream_offset += p_sys->mpgah.i_frame_size;
     }
 
     return VLC_SUCCESS;
