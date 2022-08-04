@@ -176,21 +176,27 @@ void UpdateRects(vout_display_t *vd,
     /* Retrieve the window position */
     point.x = point.y = 0;
 #if !VLC_WINSTORE_APP
+    if (likely(sys->hwnd)) // internal rendering
     ClientToScreen(sys->hwnd, &point);
 #endif
 
     /* If nothing changed, we can return */
     bool has_moved;
     bool is_resized;
-#if VLC_WINSTORE_APP
+    if (unlikely(!sys->event)) // external rendering
+    {
     has_moved = false;
     is_resized = rect.right != (sys->rect_display.right - sys->rect_display.left) ||
         rect.bottom != (sys->rect_display.bottom - sys->rect_display.top);
     sys->rect_display = rect;
-#else
+    }
+#if !VLC_WINSTORE_APP
+    else
+    {
     EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
         point.x, point.y,
         rect.right, rect.bottom);
+    }
 #endif
     if (is_resized)
         vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
@@ -214,20 +220,33 @@ void UpdateRects(vout_display_t *vd,
     vout_display_PlacePicture(&place, source, &place_cfg, false);
 
 #if !VLC_WINSTORE_APP
+    if (likely(sys->event)) // internal rendering
+    {
     EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 
     if (sys->hvideownd)
         SetWindowPos(sys->hvideownd, 0,
             place.x, place.y, place.width, place.height,
             SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
+    }
 #endif
 
     /* Destination image position and dimensions */
-#if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)) && !VLC_WINSTORE_APP
+#if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11))
+    if (unlikely(!sys->event)) // external rendering
+    {
+        rect_dest.left = place.x;
+        rect_dest.right = rect_dest.left + place.width;
+        rect_dest.top = place.y;
+        rect_dest.bottom = rect_dest.top + place.height;
+    }
+    else
+    {
     rect_dest.left = 0;
     rect_dest.right = place.width;
     rect_dest.top = 0;
     rect_dest.bottom = place.height;
+    }
 #else
     rect_dest.left = point.x + place.x;
     rect_dest.right = rect_dest.left + place.width;
@@ -416,7 +435,7 @@ void CommonManage(vout_display_t *vd)
     }
 
     /* HasMoved means here resize or move */
-    if (EventThreadGetAndResetHasMoved(sys->event))
+    if (!sys->event || EventThreadGetAndResetHasMoved(sys->event))
         UpdateRects(vd, NULL, false);
 }
 
@@ -645,6 +664,8 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
 #if !VLC_WINSTORE_APP
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
     {   /* Update dimensions */
+        if (unlikely(!sys->event)) // external rendering
+            return VLC_EGENERIC;
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
         RECT rect_window = {
             .top    = 0,
@@ -663,6 +684,8 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
+        if (unlikely(!sys->event)) // external rendering
+            return VLC_EGENERIC;
         const unsigned state = va_arg(args, unsigned);
         const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
 #ifdef MODULE_NAME_IS_direct3d9
@@ -682,6 +705,8 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
+        if (unlikely(!sys->event)) // external rendering
+            return VLC_EGENERIC;
         bool fs = va_arg(args, int);
         if (CommonControlSetFullscreen(vd, fs))
             return VLC_EGENERIC;

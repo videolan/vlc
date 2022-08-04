@@ -139,7 +139,7 @@ static void Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 
 static void Direct3D11Destroy(vout_display_t *);
 
-static int  Direct3D11Open (vout_display_t *);
+static int  Direct3D11Open (vout_display_t *, bool external_device);
 static void Direct3D11Close(vout_display_t *);
 
 static int SetupOutputFormat(vout_display_t *, video_format_t *);
@@ -190,7 +190,6 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
     ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
-#if VLC_WINSTORE_APP
 static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 {
     const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
@@ -212,7 +211,6 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
     out->bottom = i_height;
     return true;
 }
-#endif
 
 static int OpenCoreW(vout_display_t *vd)
 {
@@ -235,6 +233,8 @@ static int OpenCoreW(vout_display_t *vd)
     IDXGISwapChain_AddRef     (sys->dxgiswapChain);
     ID3D11Device_AddRef       (sys->d3d_dev.d3ddevice);
     ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
+
+    sys->sys.pf_GetRect = GetRect;
 
     return VLC_SUCCESS;
 }
@@ -272,26 +272,25 @@ static int Open(vlc_object_t *object)
         goto error;
 
     ret = OpenCoreW(vd);
+    bool external_device = ret == VLC_SUCCESS;
 #if VLC_WINSTORE_APP
-    if (ret != VLC_SUCCESS)
+    if (!external_device)
         return ret;
 #endif
 
-    if (CommonInit(vd))
+    if (!external_device && CommonInit(vd) != VLC_SUCCESS)
         goto error;
 
-#if VLC_WINSTORE_APP
-    vd->sys->sys.pf_GetRect = GetRect;
-#endif
     vd->sys->sys.pf_GetPictureWidth  = GetPictureWidth;
     vd->sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
-    if (Direct3D11Open(vd)) {
+    if (Direct3D11Open(vd, external_device)) {
         msg_Err(vd, "Direct3D11 could not be opened");
         goto error;
     }
 
 #if !VLC_WINSTORE_APP
+    if (!external_device)
     EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
 #endif
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
@@ -540,9 +539,7 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
     RECT rect;
-#if VLC_WINSTORE_APP
-    if (!GetRect(&sys->sys, &rect))
-#endif
+    if (sys->sys.pf_GetRect != GetRect || !sys->sys.pf_GetRect(&sys->sys, &rect))
         rect = sys->sys.rect_dest_clipped;
     uint32_t i_width = RECTWidth(rect);
     uint32_t i_height = RECTHeight(rect);
@@ -1254,11 +1251,13 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, 0, 0, false, supportFlags );
 }
 
-static int Direct3D11Open(vout_display_t *vd)
+static int Direct3D11Open(vout_display_t *vd, bool external_device)
 {
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
 
+    if (!external_device)
+    {
 #if !VLC_WINSTORE_APP
     HRESULT hr = S_OK;
 
@@ -1301,6 +1300,7 @@ static int Direct3D11Open(vout_display_t *vd)
        return VLC_EGENERIC;
     }
 #endif
+    }
 
     IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
 
