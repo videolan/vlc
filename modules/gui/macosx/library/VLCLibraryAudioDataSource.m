@@ -264,36 +264,14 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    switch (_currentParentType) {
-        case VLC_ML_PARENT_ARTIST:
-        {
-            VLCMediaLibraryArtist *artist = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            NSArray *albumsForArtist = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.libraryID];
-            _groupDataSource.representedListOfAlbums = albumsForArtist;
-            break;
-        }
-        case VLC_ML_PARENT_ALBUM:
-        {
-            VLCMediaLibraryAlbum *album = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            _groupDataSource.representedListOfAlbums = @[album];
-            break;
-        }
-        case VLC_ML_PARENT_UNKNOWN:
-        {
-            // FIXME: we have nothing to show here
-            _groupDataSource.representedListOfAlbums = nil;
-            break;
-        }
-        case VLC_ML_PARENT_GENRE:
-        {
-            VLCMediaLibraryGenre *genre = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            NSArray *albumsForGenre = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.libraryID];
-            _groupDataSource.representedListOfAlbums = albumsForGenre;
-            break;
-        }
-        default:
-            NSAssert(1, @"reached the unreachable");
-            break;
+    id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[self.collectionSelectionTableView.selectedRow];
+
+    if (_currentParentType == VLC_ML_PARENT_ALBUM) {
+        _groupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
+    } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+        _groupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
+    } else { // FIXME: we have nothing to show here
+        _groupDataSource.representedListOfAlbums = nil;
     }
 
     [self.groupSelectionTableView reloadData];
@@ -305,64 +283,23 @@
 {
     NSArray *listOfAlbums = _groupDataSource.representedListOfAlbums;
     NSUInteger albumCount = listOfAlbums.count;
-    if (!listOfAlbums || albumCount == 0) {
-        return;
-    }
-
     NSInteger clickedRow = _groupSelectionTableView.clickedRow;
-    if (clickedRow > albumCount) {
+
+    if (!listOfAlbums || albumCount == 0 || clickedRow > albumCount) {
         return;
     }
-
-    VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
 
     NSArray *tracks = [listOfAlbums[clickedRow] tracksAsMediaItems];
-    [libraryController appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
+    [[[VLCMain sharedInstance] libraryController] appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
 }
 
 - (void)collectionSelectionDoubleClickAction:(id)sender
 {
-    NSArray <VLCMediaLibraryAlbum *> *listOfAlbums = nil;
-
-    switch (_currentParentType) {
-        case VLC_ML_PARENT_ARTIST:
-        {
-            VLCMediaLibraryArtist *artist = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_ARTIST forID:artist.libraryID];
-            break;
-        }
-        case VLC_ML_PARENT_ALBUM:
-        {
-            VLCMediaLibraryAlbum *album = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            listOfAlbums = @[album];
-            break;
-        }
-        case VLC_ML_PARENT_UNKNOWN:
-        {
-            // FIXME: we have nothing to show here
-            listOfAlbums = nil;
-            break;
-        }
-        case VLC_ML_PARENT_GENRE:
-        {
-            VLCMediaLibraryGenre *genre = _displayedCollection[self.collectionSelectionTableView.selectedRow];
-            listOfAlbums = [_libraryModel listAlbumsOfParentType:VLC_ML_PARENT_GENRE forID:genre.libraryID];
-            break;
-        }
-        default:
-            NSAssert(1, @"reached the unreachable");
-            break;
-    }
-
-    if (listOfAlbums.count == 0) {
-        return;
-    }
-
-    VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
-    for (VLCMediaLibraryAlbum *album in listOfAlbums) {
-        NSArray *tracks = [album tracksAsMediaItems];
-        [libraryController appendItemsToPlaylist:tracks playFirstItemImmediately:YES];
-    }
+    id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[self.collectionSelectionTableView.selectedRow];
+    
+    [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:YES];
+    }];
 }
 
 #pragma mark - collection view data source and delegation
@@ -382,36 +319,7 @@
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-
-    switch (_currentParentType) {
-        case VLC_ML_PARENT_ARTIST:
-        {
-            VLCMediaLibraryArtist *artist = _displayedCollection[indexPath.item];
-            viewItem.representedItem = artist;
-            break;
-        }
-        case VLC_ML_PARENT_ALBUM:
-        {
-            VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
-            viewItem.representedItem = album;
-            break;
-        }
-        case VLC_ML_PARENT_UNKNOWN:
-        {
-            VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[indexPath.item];
-            viewItem.representedItem = mediaItem;
-            break;
-        }
-        case VLC_ML_PARENT_GENRE:
-        {
-            VLCMediaLibraryGenre *genre = _displayedCollection[indexPath.item];
-            viewItem.representedItem = genre;
-            break;
-        }
-        default:
-            break;
-    }
-
+    viewItem.representedItem = _displayedCollection[indexPath.item];
     return viewItem;
 }
 
