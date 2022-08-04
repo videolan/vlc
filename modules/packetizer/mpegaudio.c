@@ -61,7 +61,7 @@ typedef struct
 
     vlc_tick_t i_pts;
 
-    int i_frame_size, i_free_frame_size;
+    unsigned int i_free_frame_size;
     struct mpga_frameheader_s header;
 
     bool   b_discontinuity;
@@ -132,7 +132,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 
     p_dec->fmt_out.i_bitrate = p_sys->header.i_bit_rate * 1000U;
 
-    block_t *p_block = block_Alloc( p_sys->i_frame_size );
+    block_t *p_block = block_Alloc( p_sys->header.i_frame_size );
     if( p_block == NULL )
         return NULL;
 
@@ -247,8 +247,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_header = GetDWBE(p_header);
 
             /* Check if frame is valid and get frame info */
-            p_sys->i_frame_size = mpga_decode_frameheader( i_header, &p_sys->header );
-            if( p_sys->i_frame_size == -1 )
+            if( mpga_decode_frameheader( i_header, &p_sys->header ) )
             {
                 msg_Dbg( p_dec, "emulated startcode" );
                 block_SkipByte( &p_sys->bytestream );
@@ -264,7 +263,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     msg_Dbg( p_dec, "free bitrate mode");
                 }
                 /* The -1 below is to account for the frame padding */
-                p_sys->i_frame_size = p_sys->i_free_frame_size - 1;
+                p_sys->header.i_frame_size = p_sys->i_free_frame_size - 1;
             }
 
             p_sys->i_state = STATE_NEXT_SYNC;
@@ -273,7 +272,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_NEXT_SYNC:
             /* Check if next expected frame contains the sync word */
             if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                       p_sys->i_frame_size, p_header,
+                                       p_sys->header.i_frame_size, p_header,
                                        MAD_BUFFER_GUARD ) != VLC_SUCCESS )
             {
                 if( p_block == NULL ) /* drain */
@@ -288,38 +287,37 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_header[0] == 0xff && (p_header[1] & 0xe0) == 0xe0 )
             {
                 /* Startcode is fine, let's try the header as an extra check */
-                int i_next_frame_size;
 
                 /* Build frame header */
                 i_header = GetDWBE(p_header);
 
                 struct mpga_frameheader_s nextheader;
-                i_next_frame_size = mpga_decode_frameheader( i_header, &nextheader );
-
-                /* Free bitrate only */
-                if( p_sys->header.i_bit_rate == 0 && i_next_frame_size == -1 )
+                if(mpga_decode_frameheader( i_header, &nextheader ))
                 {
-                    if( (unsigned int)p_sys->i_frame_size >
-                        p_sys->header.i_max_frame_size )
+                    /* Free bitrate only */
+                    if( p_sys->header.i_bit_rate == 0 )
                     {
-                        msg_Dbg( p_dec, "frame too big %d > %u "
-                                 "(emulated startcode ?)", p_sys->i_frame_size,
-                                 p_sys->header.i_max_frame_size );
+                        if( p_sys->header.i_frame_size > p_sys->header.i_max_frame_size )
+                        {
+                            msg_Dbg( p_dec, "frame too big %u > %u "
+                                     "(emulated startcode ?)",
+                                     p_sys->header.i_frame_size,
+                                     p_sys->header.i_max_frame_size );
+                            block_SkipByte( &p_sys->bytestream );
+                            p_sys->i_state = STATE_NOSYNC;
+                            p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
+                        }
+                        else
+                        {
+                            p_sys->header.i_frame_size++;
+                        }
+                    }
+                    else
+                    {
+                        msg_Dbg( p_dec, "emulated startcode on next frame" );
                         block_SkipByte( &p_sys->bytestream );
                         p_sys->i_state = STATE_NOSYNC;
-                        p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
-                        break;
                     }
-
-                    p_sys->i_frame_size++;
-                    break;
-                }
-
-                if( i_next_frame_size == -1 )
-                {
-                    msg_Dbg( p_dec, "emulated startcode on next frame" );
-                    block_SkipByte( &p_sys->bytestream );
-                    p_sys->i_state = STATE_NOSYNC;
                     break;
                 }
 
@@ -333,7 +331,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     /* Free bitrate only */
                     if( p_sys->header.i_bit_rate == 0 )
                     {
-                        p_sys->i_frame_size++;
+                        p_sys->header.i_frame_size++;
                         break;
                     }
 
@@ -349,7 +347,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 {
                     if( nextheader.i_bit_rate != 0 )
                     {
-                        p_sys->i_frame_size++;
+                        p_sys->header.i_frame_size++;
                         break;
                     }
                 }
@@ -360,11 +358,11 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Free bitrate only */
                 if( p_sys->header.i_bit_rate == 0 )
                 {
-                    if( (unsigned int)p_sys->i_frame_size >
-                        p_sys->header.i_max_frame_size )
+                    if( p_sys->header.i_frame_size > p_sys->header.i_max_frame_size )
                     {
-                        msg_Dbg( p_dec, "frame too big %d > %u "
-                                 "(emulated startcode ?)", p_sys->i_frame_size,
+                        msg_Dbg( p_dec, "frame too big %u > %u "
+                                 "(emulated startcode ?)",
+                                 p_sys->header.i_frame_size,
                                  p_sys->header.i_max_frame_size );
                         block_SkipByte( &p_sys->bytestream );
                         p_sys->i_state = STATE_NOSYNC;
@@ -372,7 +370,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                         break;
                     }
 
-                    p_sys->i_frame_size++;
+                    p_sys->header.i_frame_size++;
                     break;
                 }
 
@@ -390,7 +388,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Make sure we have enough data.
              * (Not useful if we went through NEXT_SYNC) */
             if( block_WaitBytes( &p_sys->bytestream,
-                                 p_sys->i_frame_size ) != VLC_SUCCESS )
+                                 p_sys->header.i_frame_size ) != VLC_SUCCESS )
             {
                 /* Need more data */
                 return NULL;
@@ -407,12 +405,14 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Free bitrate only */
             if( p_sys->header.i_bit_rate == 0 )
             {
-                p_sys->i_free_frame_size = p_sys->i_frame_size;
+                p_sys->i_free_frame_size = p_sys->header.i_frame_size;
             }
 
             /* Copy the whole frame into the buffer. */
-            if (block_GetBytes( &p_sys->bytestream,
-                            p_buf, __MIN( (unsigned)p_sys->i_frame_size, p_out_buffer->i_buffer ) )) {
+            if ( block_GetBytes( &p_sys->bytestream, p_buf,
+                                 __MIN( p_sys->header.i_frame_size,
+                                        p_out_buffer->i_buffer ) ) )
+            {
                 block_Release(p_out_buffer);
                 return NULL;
             }
@@ -481,7 +481,6 @@ static int Open( vlc_object_t *p_this )
     block_BytestreamInit( &p_sys->bytestream );
     p_sys->i_pts = VLC_TICK_INVALID;
     p_sys->b_discontinuity = false;
-    p_sys->i_frame_size = 0;
 
     memset(&p_sys->header, 0, sizeof(p_sys->header));
 

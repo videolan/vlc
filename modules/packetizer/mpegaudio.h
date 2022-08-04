@@ -36,11 +36,13 @@ struct mpga_frameheader_s
     uint16_t i_bit_rate;
     uint16_t i_sample_rate;
     uint16_t i_samples_per_frame;
+    unsigned int i_frame_size;
     unsigned int i_max_frame_size;
 };
 
 /*****************************************************************************
  * mpgaDecodeFrameHeader: parse MPEG audio sync info
+ * returns 0 on success, -1 on failure
  *****************************************************************************/
 static int mpga_decode_frameheader(uint32_t i_header, struct mpga_frameheader_s *h)
 {
@@ -76,8 +78,6 @@ static int mpga_decode_frameheader(uint32_t i_header, struct mpga_frameheader_s 
         { 44100, 48000, 32000, 0 },
         { 22050, 24000, 16000, 0 }
     };
-
-    int i_frame_size;
 
     bool b_mpeg_2_5 = 1 - ((i_header & 0x100000) >> 20);
     unsigned i_version_index = 1 - ((i_header & 0x80000) >> 19);
@@ -125,7 +125,7 @@ static int mpga_decode_frameheader(uint32_t i_header, struct mpga_frameheader_s 
     switch (h->i_layer)
     {
         case 1:
-            i_frame_size = (12000 * h->i_bit_rate / h->i_sample_rate +
+            h->i_frame_size = (12000 * h->i_bit_rate / h->i_sample_rate +
                             b_padding) * 4;
             h->i_max_frame_size = (12000 * i_max_bit_rate /
                                   h->i_sample_rate + 1) * 4;
@@ -133,13 +133,13 @@ static int mpga_decode_frameheader(uint32_t i_header, struct mpga_frameheader_s 
             break;
 
         case 2:
-            i_frame_size = 144000 * h->i_bit_rate / h->i_sample_rate + b_padding;
+            h->i_frame_size = 144000 * h->i_bit_rate / h->i_sample_rate + b_padding;
             h->i_max_frame_size = 144000 * i_max_bit_rate / h->i_sample_rate + 1;
             h->i_samples_per_frame = 1152;
             break;
 
         case 3:
-            i_frame_size = (i_version_index ? 72000 : 144000) *
+            h->i_frame_size = (i_version_index ? 72000 : 144000) *
                             h->i_bit_rate / h->i_sample_rate + b_padding;
             h->i_max_frame_size = (i_version_index ? 72000 : 144000) *
                                   i_max_bit_rate / h->i_sample_rate + 1;
@@ -154,5 +154,5 @@ static int mpga_decode_frameheader(uint32_t i_header, struct mpga_frameheader_s 
     if (h->i_bit_rate == 0)
         h->i_max_frame_size *= 2;
 
-    return i_frame_size;
+    return 0;
 }

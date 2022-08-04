@@ -142,10 +142,16 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
         /* This RTP payload format does atypically not flag end-of-frames, so
          * we have to parse the MPEG Audio frame header to find out. */
         struct mpga_frameheader_s fh;
-        int frame_size = mpga_decode_frameheader(ntoh32(header), &fh);
+        if(mpga_decode_frameheader(ntoh32(header), &fh))
+        {
+            vlc_warning(log, "malformatted header");
+            block->i_flags |= BLOCK_FLAG_CORRUPTED;
+            break;
+        }
+
         /* If the frame size is unknown due to free bit rate, then we can only
          * sense the completion of the frame when the next frame starts. */
-        if (frame_size <= 0) {
+        if (fh.i_frame_size == 0) {
             if (sys->offset >= MAX_PACKET_SIZE) {
                 vlc_warning(log, "oversized packet (%zu bytes)", sys->offset);
                 rtp_mpa_send(sys);
@@ -153,14 +159,14 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
             break;
         }
 
-        if ((size_t)frame_size == sys->offset) {
+        if (fh.i_frame_size == sys->offset) {
             rtp_mpa_send(sys);
             break;
         }
 
         /* If the frame size is larger than the current offset, then we need to
          * wait for the next fragment. */
-        if ((size_t)frame_size > sys->offset)
+        if (fh.i_frame_size > sys->offset)
             break;
 
         if (offset != 0) {
@@ -170,10 +176,10 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
         }
 
         /* The RTP packet contains multiple small frames. */
-        block_t *frame = block_Alloc(frame_size);
+        block_t *frame = block_Alloc(fh.i_frame_size);
         if (likely(frame != NULL)) {
             assert(block->p_next == NULL); /* Only one block to copy from */
-            memcpy(frame->p_buffer, block->p_buffer, frame_size);
+            memcpy(frame->p_buffer, block->p_buffer, frame->i_buffer);
             frame->i_flags = block->i_flags;
             frame->i_pts = block->i_pts;
             vlc_rtp_es_send(sys->es, frame);
@@ -182,8 +188,8 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
         } else
             block->i_flags = BLOCK_FLAG_DISCONTINUITY;
 
-        block->p_buffer += frame_size;
-        block->i_buffer -= frame_size;
+        block->p_buffer += fh.i_frame_size;
+        block->i_buffer -= fh.i_frame_size;
         block->i_pts = VLC_TICK_INVALID;
     }
     return;
