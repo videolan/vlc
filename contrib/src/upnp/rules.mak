@@ -49,7 +49,6 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/upnp/revert-ifaddrs.patch
 endif
 	$(APPLY) $(SRC)/upnp/miniserver.patch
-	$(APPLY) $(SRC)/upnp/upnp-no-debugfile.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
