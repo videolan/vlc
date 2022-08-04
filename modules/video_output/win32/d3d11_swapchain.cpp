@@ -84,28 +84,6 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
         display->swapchainTargetView[i].Reset();
 
     const d3d_format_t *newPixelFormat = NULL;
-#ifdef VLC_WINSTORE_APP
-    ComPtr<IDXGISwapChain1> dxgiswapChain = DXGI_GetSwapChain1(display->sys);
-    if (!dxgiswapChain.Get())
-        dxgiswapChain = static_cast<IDXGISwapChain1*>((void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain"));
-    if (dxgiswapChain.Get())
-    {
-        DXGI_SWAP_CHAIN_DESC1 scd;
-        if (SUCCEEDED(dxgiswapChain->GetDesc1(&scd)))
-        {
-            for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
-                 output_format->name != NULL; ++output_format)
-            {
-                if (output_format->formatTexture == scd.Format &&
-                    !is_d3d11_opaque(output_format->fourcc))
-                {
-                    newPixelFormat = output_format;
-                    break;
-                }
-            }
-        }
-    }
-#else /* !VLC_WINSTORE_APP */
     /* favor RGB formats first */
     newPixelFormat = FindD3D11Format( display->obj, display->d3d_dev, 0, DXGI_RGB_FORMAT,
                                       cfg->bitdepth > 8 ? 10 : 8,
@@ -116,7 +94,6 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
                                           cfg->bitdepth > 8 ? 10 : 8,
                                           0, 0,
                                           DXGI_CHROMA_CPU, D3D11_FORMAT_SUPPORT_DISPLAY );
-#endif /* !VLC_WINSTORE_APP */
     if (unlikely(newPixelFormat == NULL)) {
         msg_Err(display->obj, "Could not get the SwapChain format.");
         return false;
@@ -181,24 +158,6 @@ void D3D11_LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t
 {
     d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
     DXGI_LocalSwapchainSetMetadata( display->sys, type, metadata );
-}
-
-bool D3D11_LocalSwapchainWinstoreSize( void *opaque, uint32_t *width, uint32_t *height )
-{
-#ifdef VLC_WINSTORE_APP
-    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
-    /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
-    UINT dataSize = sizeof(*width);
-    HRESULT hr = DXGI_GetSwapChain1(display->sys)->GetPrivateData(GUID_SWAPCHAIN_WIDTH, &dataSize, width);
-    if (SUCCEEDED(hr)) {
-        dataSize = sizeof(*height);
-        hr = DXGI_GetSwapChain1(display->sys)->GetPrivateData(GUID_SWAPCHAIN_HEIGHT, &dataSize, height);
-        return SUCCEEDED(hr);
-    }
-#else
-    VLC_UNUSED(opaque); VLC_UNUSED(width); VLC_UNUSED(height);
-#endif
-    return false;
 }
 
 bool D3D11_LocalSwapchainStartEndRendering( void *opaque, bool enter )

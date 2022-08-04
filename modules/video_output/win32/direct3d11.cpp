@@ -70,10 +70,6 @@ vlc_module_begin ()
 
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT)
 
-#ifdef VLC_WINSTORE_APP
-    add_integer("winrt-swapchain",     0x0, NULL, NULL) /* IDXGISwapChain1*     */
-#endif
-
     add_shortcut("direct3d11")
     set_callback_display(Open, 300)
 vlc_module_end ()
@@ -659,19 +655,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
     d3d11_device_lock( sys->d3d_dev );
-#ifdef VLC_WINSTORE_APP
-    if ( sys->swapCb == D3D11_LocalSwapchainSwap )
-    {
-        /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
-        uint32_t i_width;
-        uint32_t i_height;
-        if (D3D11_LocalSwapchainWinstoreSize( sys->outside_opaque, &i_width, &i_height ))
-        {
-            if (i_width != vd->cfg->display.width || i_height != vd->cfg->display.height)
-                vout_display_SetSize(vd, i_width, i_height);
-        }
-    }
-#endif
     if ( sys->startEndRenderingCb( sys->outside_opaque, true ))
     {
         if ( sys->sendMetadataCb && picture->format.mastering.max_luminance )

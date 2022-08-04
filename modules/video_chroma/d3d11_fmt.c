@@ -539,21 +539,6 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
 
     sys->external.cleanupDeviceCb = NULL;
     HRESULT hr = E_FAIL;
-#ifdef VLC_WINSTORE_APP
-    /* LEGACY, the d3dcontext and swapchain were given by the host app */
-    ID3D11DeviceContext *d3dcontext = (ID3D11DeviceContext*)(uintptr_t) var_InheritInteger(obj, "winrt-d3dcontext");
-    if ( likely(d3dcontext != NULL) )
-    {
-        HANDLE context_lock;
-        UINT dataSize = sizeof(context_lock);
-        HRESULT hr = ID3D11DeviceContext_GetPrivateData(d3dcontext, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
-        if (FAILED(hr))
-            context_lock = NULL;
-
-        hr = D3D11_CreateDeviceExternal(obj, d3dcontext, context_lock, &sys->dec_device.d3d_dev);
-    }
-    else
-#endif
     {
         libvlc_video_engine_t engineType = var_InheritInteger( obj, "vout-cb-type" );
         libvlc_video_output_setup_cb setupDeviceCb = NULL;

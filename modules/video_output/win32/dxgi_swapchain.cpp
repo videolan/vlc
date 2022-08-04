@@ -96,9 +96,6 @@ struct dxgi_swapchain
     bool                   logged_capabilities = false;
 };
 
-DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
-DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd);
-
 #define DXGI_COLOR_RANGE_FULL   1 /* 0-255 */
 #define DXGI_COLOR_RANGE_STUDIO 0 /* 16-235 */
 
@@ -482,12 +479,7 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
                                      width, height);
 
     }
-#else /* VLC_WINSTORE_APP */
-    if ( !display->dxgiswapChain.Get() )
-    {
-        display->dxgiswapChain = static_cast<IDXGISwapChain1*>((void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain"));
-    }
-#endif /* VLC_WINSTORE_APP */
+#endif /* !VLC_WINSTORE_APP */
     if ( !display->dxgiswapChain.Get() )
         return false;
 
