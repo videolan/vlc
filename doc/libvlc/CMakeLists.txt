@@ -1,8 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 # configure with your own path
-#  -DLIBVLC_SDK_INC:STRING=S:/sources/build/win64/win64/vlc-4.0.0-dev/sdk/include
-#  -DLIBVLC_SDK_LIB:STRING=S:/sources/build/win64/win64/vlc-4.0.0-dev/sdk/lib
+#  -DLIBVLC_SDK_INC:STRING=S:/sources/build/win64/win64/vlc-3.0.0-dev/sdk/include
+#  -DLIBVLC_SDK_LIB:STRING=S:/sources/build/win64/win64/vlc-3.0.0-dev/sdk/lib
 #
 # or set them in your VSCode settings
 # {
@@ -27,6 +27,10 @@ else ()
 endif ()
 
 if(WIN32)
+
+    add_executable(d3d11_swapr WIN32 d3d11_swapr.cpp)
+    target_compile_definitions(d3d11_swapr PRIVATE _WIN32_WINNT=0x0601)
+    target_link_libraries(d3d11_swapr libvlc d3d11 d3dcompiler uuid)
 
     add_executable(win_player WIN32 win_player.c)
     target_link_libraries(win_player libvlc)
