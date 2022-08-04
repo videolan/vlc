@@ -78,10 +78,8 @@ vlc_module_begin ()
 
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
 
-#if VLC_WINSTORE_APP
     add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true) /* ID3D11DeviceContext* */
     add_integer("winrt-swapchain",     0x0, NULL, NULL, true) /* IDXGISwapChain1*     */
-#endif
 
     set_capability("vout display", 300)
     add_shortcut("direct3d11")
@@ -192,16 +190,6 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
     ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
-#if !VLC_WINSTORE_APP
-static int OpenHwnd(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
-    if (!sys)
-        return VLC_ENOMEM;
-
-    return D3D11_Create(vd, &sys->hd3d, true);
-}
-#else
 static int OpenCoreW(vout_display_t *vd)
 {
     IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
@@ -215,10 +203,7 @@ static int OpenCoreW(vout_display_t *vd)
     if (!d3ddevice)
         return VLC_EGENERIC;
 
-    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
-    if (!sys)
-        return VLC_ENOMEM;
-
+    vout_display_sys_t *sys = vd->sys;
     sys->dxgiswapChain = dxgiswapChain;
     sys->d3d_dev.d3ddevice     = d3ddevice;
     sys->d3d_dev.d3dcontext    = d3dcontext;
@@ -229,7 +214,6 @@ static int OpenCoreW(vout_display_t *vd)
 
     return VLC_SUCCESS;
 }
-#endif
 
 #if VLC_WINSTORE_APP
 static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
@@ -282,14 +266,16 @@ static int Open(vlc_object_t *object)
     }
 #endif
 
-#if !VLC_WINSTORE_APP
-    int ret = OpenHwnd(vd);
-#else
-    int ret = OpenCoreW(vd);
-#endif
+    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
+    int ret = D3D11_Create(vd, &sys->hd3d, true);
+    if (unlikely(ret != VLC_SUCCESS))
+        goto error;
 
+    ret = OpenCoreW(vd);
+#if VLC_WINSTORE_APP
     if (ret != VLC_SUCCESS)
         return ret;
+#endif
 
     if (CommonInit(vd))
         goto error;
