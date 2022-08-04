@@ -270,9 +270,7 @@ void UpdateRects(vout_display_t *vd,
     /* the 2 following lines are to fix a bug when clicking on the desktop */
     if ((rect_dest_clipped.right - rect_dest_clipped.left) == 0 ||
         (rect_dest_clipped.bottom - rect_dest_clipped.top) == 0) {
-#if !VLC_WINSTORE_APP
-        SetRectEmpty(&rect_src_clipped);
-#endif
+        rect_src_clipped = (RECT){0, 0, 0, 0};
         goto exit;
     }
 
