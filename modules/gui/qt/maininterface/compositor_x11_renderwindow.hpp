@@ -148,7 +148,7 @@ class CompositorX11RenderWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCDS, QWidget* parent = nullptr);
+    explicit CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWidget* parent = nullptr);
     ~CompositorX11RenderWindow();
 
     bool init();

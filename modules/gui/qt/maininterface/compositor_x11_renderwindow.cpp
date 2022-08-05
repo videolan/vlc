@@ -318,7 +318,7 @@ void X11DamageObserver::onEvent()
 
 //// CompositorX11RenderWindow
 
-CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCDS, QWidget* parent)
+CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWidget* parent)
     : QMainWindow(parent)
     , m_intf(p_intf)
     , m_conn(conn)
@@ -330,7 +330,7 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_MouseTracking);
 
-    if (useCDS)
+    if (useCSD)
         setWindowFlag(Qt::FramelessWindowHint);
 
     m_stable = new DummyNativeWidget(this);
