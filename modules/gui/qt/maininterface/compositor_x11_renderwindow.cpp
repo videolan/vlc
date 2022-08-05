@@ -323,6 +323,7 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
     , m_intf(p_intf)
     , m_conn(conn)
 {
+    setAcceptDrops(true);
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
