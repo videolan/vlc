@@ -190,6 +190,30 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
     ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
+#if VLC_WINSTORE_APP
+static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
+{
+    const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
+    out->left   = 0;
+    out->top    = 0;
+    uint32_t i_width;
+    uint32_t i_height;
+    UINT dataSize = sizeof(i_width);
+    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
+    if (FAILED(hr)) {
+        return false;
+    }
+    dataSize = sizeof(i_height);
+    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
+    if (FAILED(hr)) {
+        return false;
+    }
+    out->right  = i_width;
+    out->bottom = i_height;
+    return true;
+}
+#endif
+
 static int OpenCoreW(vout_display_t *vd)
 {
     IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
@@ -214,30 +238,6 @@ static int OpenCoreW(vout_display_t *vd)
 
     return VLC_SUCCESS;
 }
-
-#if VLC_WINSTORE_APP
-static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
-{
-    const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
-    out->left   = 0;
-    out->top    = 0;
-    uint32_t i_width;
-    uint32_t i_height;
-    UINT dataSize = sizeof(i_width);
-    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
-    if (FAILED(hr)) {
-        return false;
-    }
-    dataSize = sizeof(i_height);
-    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
-    if (FAILED(hr)) {
-        return false;
-    }
-    out->right  = i_width;
-    out->bottom = i_height;
-    return true;
-}
-#endif
 
 static unsigned int GetPictureWidth(const vout_display_t *vd)
 {
