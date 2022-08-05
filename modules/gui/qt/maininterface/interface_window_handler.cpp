@@ -217,29 +217,6 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         }
         break;
     }
-    case QEvent::DragEnter:
-    {
-        auto enterEvent = static_cast<QDragEnterEvent*>(event);
-        enterEvent->acceptProposedAction();
-        return true;
-    }
-    case QEvent::DragMove:
-    {
-        auto moveEvent = static_cast<QDragMoveEvent*>(event);
-        moveEvent->acceptProposedAction();
-        return true;
-    }
-    case QEvent::DragLeave:
-    {
-        event->accept();
-        return true;
-    }
-    case QEvent::Drop:
-    {
-        auto dropEvent = static_cast<QDropEvent*>(event);
-        m_mainCtx->dropEventPlay(dropEvent, true);
-        return true;
-    }
     case QEvent::Close:
     {
         bool ret = m_mainCtx->onWindowClose(m_window);

@@ -271,7 +271,6 @@ public:
                                                                         unsigned char patch)
                                                                        { return QT_VERSION_CHECK(major, minor, patch); };
 
-    void dropEventPlay( QDropEvent* event, bool b_play );
     /**
      * @brief ask for the application to terminate
      * @return true if the application can be close right away, false if it will be delayed
