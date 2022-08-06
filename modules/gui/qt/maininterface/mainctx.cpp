@@ -184,7 +184,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     if( config_GetInt("qt-privacy-ask") )
     {
         //postpone dialog call, as composition might not be ready yet
-        QMetaObject::invokeMethod(this, [this](){
+        QMetaObject::invokeMethod(this, [](){
             THEDP->firstRunDialog();
         }, Qt::QueuedConnection);
     }
