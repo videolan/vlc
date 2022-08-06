@@ -9,8 +9,8 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryCollectionViewAlbumSupplementaryDetailView"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <view misplaced="YES" id="HAc-or-XD8" customClass="VLCLibraryCollectionViewAlbumSupplementaryDetailView">
-            <rect key="frame" x="0.0" y="0.0" width="1071" height="304"/>
+        <view id="HAc-or-XD8" customClass="VLCLibraryCollectionViewAlbumSupplementaryDetailView">
+            <rect key="frame" x="0.0" y="0.0" width="1071" height="312"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
                 <box boxType="custom" borderType="none" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="TDx-ys-0hc">
@@ -22,24 +22,24 @@
                     <color key="borderColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <color key="fillColor" name="separatorColor" catalog="System" colorSpace="catalog"/>
                 </box>
-                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FWp-yd-2Pm">
-                    <rect key="frame" x="0.0" y="0.0" width="1071" height="282"/>
+                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FWp-yd-2Pm">
+                    <rect key="frame" x="10" y="0.0" width="1051" height="282"/>
                     <subviews>
-                        <stackView distribution="equalCentering" orientation="vertical" alignment="leading" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TOx-1e-6D9">
-                            <rect key="frame" x="0.0" y="10" width="252" height="272"/>
+                        <stackView distribution="equalCentering" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TOx-1e-6D9">
+                            <rect key="frame" x="0.0" y="10" width="237" height="272"/>
                             <subviews>
                                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="xZd-Hk-h2M" customClass="VLCImageView">
-                                    <rect key="frame" x="10" y="40" width="232" height="232"/>
+                                    <rect key="frame" x="0.0" y="35" width="237" height="237"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="xZd-Hk-h2M" secondAttribute="height" multiplier="1:1" id="TIK-Ez-QbE"/>
                                     </constraints>
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="no-art" id="6X6-Og-u8A"/>
                                 </imageView>
-                                <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Nc-Mb-wDa">
-                                    <rect key="frame" x="10" y="0.0" width="232" height="30"/>
+                                <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Nc-Mb-wDa">
+                                    <rect key="frame" x="0.0" y="0.0" width="237" height="28"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ntd-VT-2KS">
-                                            <rect key="frame" x="-6" y="-4" width="123" height="40"/>
+                                            <rect key="frame" x="-6" y="-6" width="128" height="40"/>
                                             <buttonCell key="cell" type="push" title=" Play" bezelStyle="rounded" image="play.fill" catalog="system" imagePosition="left" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Rgc-Uk-A3h">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -49,7 +49,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="idL-3a-QaA">
-                                            <rect key="frame" x="115" y="-4" width="123" height="40"/>
+                                            <rect key="frame" x="115" y="-6" width="128" height="40"/>
                                             <buttonCell key="cell" type="push" title=" Enqueue" bezelStyle="rounded" image="plus" catalog="system" imagePosition="left" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="igY-iu-P0N">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -70,15 +70,12 @@
                                 </stackView>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="xZd-Hk-h2M" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="TOx-1e-6D9" secondAttribute="leading" constant="10" id="5LU-fv-D53"/>
+                                <constraint firstAttribute="width" secondItem="xZd-Hk-h2M" secondAttribute="width" id="466-0J-pp1"/>
                                 <constraint firstAttribute="bottom" secondItem="6Nc-Mb-wDa" secondAttribute="bottom" id="9VU-I8-ob5"/>
-                                <constraint firstAttribute="trailing" secondItem="6Nc-Mb-wDa" secondAttribute="trailing" constant="10" id="DmE-xP-Wvn"/>
-                                <constraint firstItem="xZd-Hk-h2M" firstAttribute="height" secondItem="TOx-1e-6D9" secondAttribute="height" constant="-40" id="F6y-Zh-lrJ"/>
-                                <constraint firstItem="6Nc-Mb-wDa" firstAttribute="top" secondItem="xZd-Hk-h2M" secondAttribute="bottom" constant="10" id="MbQ-q1-COw"/>
-                                <constraint firstItem="6Nc-Mb-wDa" firstAttribute="leading" secondItem="TOx-1e-6D9" secondAttribute="leading" constant="10" id="Tce-Dm-Jve"/>
-                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xZd-Hk-h2M" secondAttribute="trailing" constant="10" id="a95-AT-EG5"/>
+                                <constraint firstItem="6Nc-Mb-wDa" firstAttribute="trailing" secondItem="xZd-Hk-h2M" secondAttribute="trailing" id="Jhf-x2-2Yy"/>
+                                <constraint firstItem="6Nc-Mb-wDa" firstAttribute="leading" secondItem="xZd-Hk-h2M" secondAttribute="leading" id="Sbf-QC-G2i"/>
+                                <constraint firstAttribute="height" secondItem="xZd-Hk-h2M" secondAttribute="height" constant="35" id="X7x-82-PMa"/>
                                 <constraint firstItem="xZd-Hk-h2M" firstAttribute="top" secondItem="TOx-1e-6D9" secondAttribute="top" id="b2u-ln-Wf4"/>
-                                <constraint firstItem="xZd-Hk-h2M" firstAttribute="centerX" secondItem="TOx-1e-6D9" secondAttribute="centerX" id="zLM-Ut-V4H"/>
                             </constraints>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -89,11 +86,11 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
-                            <rect key="frame" x="260" y="0.0" width="811" height="282"/>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
+                            <rect key="frame" x="257" y="0.0" width="794" height="282"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
-                                    <rect key="frame" x="-2" y="230" width="124" height="52"/>
+                                    <rect key="frame" x="-2" y="224" width="124" height="58"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album name" id="6RM-x8-Y4y">
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -101,7 +98,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="HnP-Fk-juB">
-                                    <rect key="frame" x="-2" y="206" width="87" height="16"/>
+                                    <rect key="frame" x="-2" y="203" width="87" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album details" id="Nwk-76-Wx9">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -116,14 +113,14 @@
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="50" viewBased="YES" id="eEJ-WA-0aM">
-                                                <rect key="frame" x="0.0" y="0.0" width="701" height="198"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="701" height="188"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <size key="intercellSpacing" width="3" height="2"/>
                                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <tableViewGridLines key="gridStyleMask" horizontal="YES"/>
                                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                 <tableColumns>
-                                                    <tableColumn editable="NO" width="689" minWidth="10" maxWidth="1000" id="tVn-dP-rPg">
+                                                    <tableColumn editable="NO" width="689" minWidth="10" maxWidth="1000000000000" id="tVn-dP-rPg">
                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -146,6 +143,7 @@
                                         </subviews>
                                         <nil key="backgroundColor"/>
                                     </clipView>
+                                    <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="10"/>
                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ZBY-pE-E7T">
                                         <rect key="frame" x="-100" y="-100" width="701" height="15"/>
                                         <autoresizingMask key="autoresizingMask"/>
@@ -187,13 +185,13 @@
                 </stackView>
             </subviews>
             <constraints>
-                <constraint firstItem="TDx-ys-0hc" firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" id="288-Qz-cb7"/>
-                <constraint firstItem="TDx-ys-0hc" firstAttribute="leading" secondItem="FWp-yd-2Pm" secondAttribute="leading" id="4AV-xO-cVg"/>
-                <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" id="D62-3E-aDO"/>
+                <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="10" id="D62-3E-aDO"/>
                 <constraint firstItem="TDx-ys-0hc" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="20" id="Wob-l9-MuU"/>
+                <constraint firstItem="TDx-ys-0hc" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" id="adT-vN-en1"/>
                 <constraint firstAttribute="bottom" secondItem="TDx-ys-0hc" secondAttribute="bottom" id="aub-cX-QrF"/>
-                <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" id="cPm-6m-umY"/>
+                <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="10" id="cPm-6m-umY"/>
                 <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="TDx-ys-0hc" secondAttribute="top" constant="10" id="cVs-ac-sSk"/>
+                <constraint firstAttribute="trailing" secondItem="TDx-ys-0hc" secondAttribute="trailing" id="g3s-Ri-jQ5"/>
                 <constraint firstItem="FWp-yd-2Pm" firstAttribute="bottom" secondItem="TDx-ys-0hc" secondAttribute="bottom" id="pZF-BE-cG1"/>
             </constraints>
             <connections>
