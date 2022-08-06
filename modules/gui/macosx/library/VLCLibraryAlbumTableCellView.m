@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
@@ -46,7 +47,7 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
 {
     VLCLibraryController *_libraryController;
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
-    NSTableView *_tracksTableView;
+    VLCLibraryTableView *_tracksTableView;
     NSTableColumn *_column;
 }
 @end
@@ -117,7 +118,7 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
 
 - (void)setupTracksTableView
 {
-    _tracksTableView = [[NSTableView alloc] initWithFrame:NSZeroRect];
+    _tracksTableView = [[VLCLibraryTableView alloc] initWithFrame:NSZeroRect];
     _column = [[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier];
     _column.width = [self expectedTableViewWidth];
     _column.maxWidth = MAXFLOAT;

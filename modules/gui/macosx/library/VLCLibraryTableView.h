@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAlbumTracksDataSource.h: MacOS X interface module
+ * VLCLibraryTableView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -22,17 +22,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "VLCLibraryTableView.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryAlbum;
+@protocol VLCMediaLibraryItemProtocol;
 
-@interface VLCLibraryAlbumTracksDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate>
+@protocol VLCLibraryTableViewDataSource <NSTableViewDataSource>
 
-extern const CGFloat VLCLibraryTracksRowHeight;
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row;
 
-@property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
+@end
+
+@interface VLCLibraryTableView : NSTableView<NSMenuDelegate>
 
 @end
 

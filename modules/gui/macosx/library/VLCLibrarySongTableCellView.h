@@ -25,7 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCTrackingView;
-@class VLCMediaLibraryItem;
+@class VLCMediaLibraryMediaItem;
 
 @interface VLCLibrarySongTableCellView : NSTableCellView
 
@@ -37,7 +37,7 @@ extern NSString *VLCAudioLibrarySongCellIdentifier;
 @property (readwrite, assign) IBOutlet NSTextField *trackNumberTextField;
 @property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
 
-@property (readwrite, assign, nonatomic) VLCMediaLibraryItem *representedMediaItem;
+@property (readwrite, assign, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
 
 - (IBAction)playInstantly:(id)sender;
 

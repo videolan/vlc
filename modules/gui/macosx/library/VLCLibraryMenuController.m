@@ -32,7 +32,6 @@
 
 @interface VLCLibraryMenuController ()
 {
-    NSMenu *_libraryMenu;
     VLCLibraryInformationPanel *_informationPanel;
     id<VLCMediaLibraryItemProtocol> _representedItem;
 }
@@ -66,19 +65,20 @@
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem]];
+
+    _minimalMenu = [[NSMenu alloc] initWithTitle:@""];
+    NSMenuItem *addItem2 = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
+    [_minimalMenu addItem:addItem2];
+}
+
+- (NSMenu *)menuToPresent
+{
+    return _representedItem == nil ? _minimalMenu : _libraryMenu;
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
 {
-    if (_representedItem != nil) {
-        [NSMenu popUpContextMenu:_libraryMenu withEvent:theEvent forView:theView];
-    } else {
-        NSMenu *minimalMenu = [[NSMenu alloc] initWithTitle:@""];
-        NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
-        addItem.target = self;
-        [minimalMenu addItem:addItem];
-        [NSMenu popUpContextMenu:minimalMenu withEvent:theEvent forView:theView];
-    }
+    [NSMenu popUpContextMenu:[self menuToPresent] withEvent:theEvent forView:theView];
 }
 
 #pragma mark - actions
@@ -88,8 +88,16 @@
         return;
     }
 
+    // We want to add all the tracks to the playlist but only play the first one immediately,
+    // otherwise we will skip straight to the last track of the last album from the artist
+    __block BOOL beginPlayImmediately = playImmediately;
+
     [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+        [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:beginPlayImmediately];
+
+        if(beginPlayImmediately) {
+            beginPlayImmediately = NO;
+        }
     }];
 }
 

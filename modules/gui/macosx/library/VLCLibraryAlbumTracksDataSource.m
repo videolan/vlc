@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryAlbumTracksDataSource.h"
 
 const CGFloat VLCLibraryTracksRowHeight = 40.;
@@ -79,8 +80,13 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
         cellView.identifier = VLCAudioLibrarySongCellIdentifier;
     }
 
-    cellView.representedMediaItem = _tracks[row];
+    cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)[self libraryItemAtRow:row];
     return cellView;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+{
+    return _tracks[row];
 }
 
 @end

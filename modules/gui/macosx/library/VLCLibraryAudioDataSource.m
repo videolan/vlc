@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
@@ -258,8 +259,13 @@
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    [cellView setRepresentedItem:_displayedCollection[row]];
+    [cellView setRepresentedItem:[self libraryItemAtRow:row]];
     return cellView;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+{
+    return _displayedCollection[row];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -394,10 +400,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    VLCMediaLibraryAlbum *album = _representedListOfAlbums[row];
-    cellView.representedAlbum = album;
-
+    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[self libraryItemAtRow:row];
     return cellView;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+{
+    return _representedListOfAlbums[row];
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
