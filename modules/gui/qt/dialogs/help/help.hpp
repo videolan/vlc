@@ -90,7 +90,7 @@ private:
 
     Ui::updateWidget ui;
     update_t *p_update;
-    void customEvent( QEvent * );
+    void customEvent( QEvent * ) override;
     bool b_checked;
 
 private slots:
