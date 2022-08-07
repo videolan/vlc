@@ -112,10 +112,10 @@ class FileOpenPanel: public OpenPanel
 public:
     FileOpenPanel( QWidget *, qt_intf_t * );
     virtual ~FileOpenPanel();
-    void clear() Q_DECL_OVERRIDE;
+    void clear() override;
     virtual void accept() ;
 protected:
-    bool eventFilter(QObject *, QEvent *event) Q_DECL_OVERRIDE
+    bool eventFilter(QObject *, QEvent *event) override
     {
         if( event->type() == QEvent::Hide ||
             event->type() == QEvent::HideToParent )
@@ -125,10 +125,10 @@ protected:
         }
         return false;
     }
-    void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
-    void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
-    void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
-    void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
+    void dropEvent( QDropEvent *) override;
+    void dragEnterEvent( QDragEnterEvent * ) override;
+    void dragMoveEvent( QDragMoveEvent * ) override;
+    void dragLeaveEvent( QDragLeaveEvent * ) override;
 private:
     Ui::OpenFile ui;
     QList<QUrl> urlList;
@@ -136,7 +136,7 @@ private:
     FileOpenBox *dialogBox;
     void BuildOldPanel();
 public slots:
-    void updateMRL() Q_DECL_OVERRIDE;
+    void updateMRL() override;
 private slots:
     void browseFileSub();
     void browseFile();
@@ -150,14 +150,14 @@ class NetOpenPanel: public OpenPanel
 public:
     NetOpenPanel( QWidget *, qt_intf_t * );
     virtual ~NetOpenPanel();
-    void clear()  Q_DECL_OVERRIDE;
-    void onFocus() Q_DECL_OVERRIDE;
-    void onAccept() Q_DECL_OVERRIDE;
+    void clear()  override;
+    void onFocus() override;
+    void onAccept() override;
 private:
     Ui::OpenNetwork ui;
     bool b_recentList;
 public slots:
-    void updateMRL() Q_DECL_OVERRIDE;
+    void updateMRL() override;
 };
 
 class DiscOpenPanel: public OpenPanel
@@ -174,18 +174,18 @@ class DiscOpenPanel: public OpenPanel
 public:
     DiscOpenPanel( QWidget *, qt_intf_t * );
     virtual ~DiscOpenPanel();
-    void clear() Q_DECL_OVERRIDE;
+    void clear() override;
     virtual void accept();
 #if defined( _WIN32 ) || defined( __OS2__ )
     virtual void onFocus() override;
 #endif
-    virtual void updateContext(int) Q_DECL_OVERRIDE;
+    virtual void updateContext(int) override;
 private:
     Ui::OpenDisk ui;
     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;
     DiscType m_discType;
 public slots:
-    void updateMRL() Q_DECL_OVERRIDE;
+    void updateMRL() override;
 private slots:
     void browseDevice();
     void updateButtons() ;
@@ -199,7 +199,7 @@ class CaptureOpenPanel: public OpenPanel
 public:
     CaptureOpenPanel( QWidget *, qt_intf_t * );
     virtual ~CaptureOpenPanel();
-    void clear() Q_DECL_OVERRIDE;
+    void clear() override;
 private:
     Ui::OpenCapture ui;
     bool isInitialized;
@@ -226,7 +226,7 @@ private:
     QDoubleSpinBox *screenFPS;
 
 public slots:
-    void updateMRL() Q_DECL_OVERRIDE;
+    void updateMRL() override;
     void initialize();
 private slots:
     void updateButtons();
