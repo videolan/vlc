@@ -104,7 +104,7 @@ CompositorDCompositionAcrylicSurface::~CompositorDCompositionAcrylicSurface()
         DestroyWindow(m_dummyWindow);
 }
 
-bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &, void *message, long *)
 {
     MSG* msg = static_cast<MSG*>( message );
 

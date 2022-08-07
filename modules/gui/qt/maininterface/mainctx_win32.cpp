@@ -614,7 +614,7 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
     return ret;
 }
 
-bool InterfaceWindowHandlerWin32::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool InterfaceWindowHandlerWin32::nativeEventFilter(const QByteArray &, void *message, long *result)
 {
     MSG* msg = static_cast<MSG*>( message );
 
