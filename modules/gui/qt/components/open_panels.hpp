@@ -177,7 +177,7 @@ public:
     void clear() Q_DECL_OVERRIDE;
     virtual void accept();
 #if defined( _WIN32 ) || defined( __OS2__ )
-    virtual void onFocus();
+    virtual void onFocus() override;
 #endif
     virtual void updateContext(int) Q_DECL_OVERRIDE;
 private:
