@@ -1698,7 +1698,7 @@
   <tabstop>posterizeEnable</tabstop>
   <tabstop>gradientEnable</tabstop>
   <tabstop>gradientModeCombo</tabstop>
-  <tabstop>gradientTypeCheck</tabstop>
+  <tabstop>gradientColorCheck</tabstop>
   <tabstop>gradientCartoonCheck</tabstop>
   <tabstop>sepiaEnable</tabstop>
   <tabstop>sepiaIntensitySpin</tabstop>
