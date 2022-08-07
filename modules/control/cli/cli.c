@@ -240,6 +240,7 @@ static int LogOut(struct cli_client *cl, const char *const *args, size_t count,
         net_Close(sys->i_socket);
         sys->i_socket = -1;
     }
+    (void) cl;
 #endif
     (void) args; (void) count;
     return 0;
