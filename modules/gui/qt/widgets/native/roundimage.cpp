@@ -123,7 +123,7 @@ namespace
 
         QString errorString() const { return errorStr; }
 
-        QImage execute()
+        QImage execute() override
         {
             QImageReader reader;
             reader.setDevice(device);
@@ -276,7 +276,7 @@ namespace
             {
             }
 
-            QImage execute()
+            QImage execute() override
             {
                 return prepareImage(sourceImg.size(), radius, sourceImg);
             }
