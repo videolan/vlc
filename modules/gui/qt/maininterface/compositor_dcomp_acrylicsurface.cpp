@@ -200,7 +200,7 @@ try
 }
 catch (std::exception &err)
 {
-    msg_Err(m_intf, err.what());
+    msg_Err(m_intf, "%s", err.what());
     return false;
 }
 
