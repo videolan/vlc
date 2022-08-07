@@ -82,11 +82,11 @@ point_t *puzzle_scale_curve_H(int32_t i_width, int32_t i_lines, uint8_t i_pts_nb
             f_bez_y = bezier_val(ps_new_pt,f_sub_t,i_main_t,y);
 
             if ( f_bez_x < ((float) i_width) / 2 ) {
-                if ( abs ( f_bez_y ) > ( f_bez_x * ( 0.9 * ((float)i_lines) / ((float)i_width) ) ) )
+                if ( fabsf ( f_bez_y ) > ( f_bez_x * ( 0.9 * ((float)i_lines) / ((float)i_width) ) ) )
                     b_fit = false;
             }
             else  {
-                if ( abs ( f_bez_y ) > ( ( ((float)i_width) - f_bez_x ) * ( 0.9 * ((float)i_lines) / ((float)i_width) ) ) )
+                if ( fabsf ( f_bez_y ) > ( ( ((float)i_width) - f_bez_x ) * ( 0.9 * ((float)i_lines) / ((float)i_width) ) ) )
                     b_fit = false;
             }
         }
