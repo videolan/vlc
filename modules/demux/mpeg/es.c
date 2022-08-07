@@ -38,6 +38,7 @@
 
 #include "../../packetizer/a52.h"
 #include "../../packetizer/dts_header.h"
+#include "../../packetizer/mpegaudio.h"
 #include "../../meta_engine/ID3Tag.h"
 #include "../../meta_engine/ID3Text.h"
 #include "../../meta_engine/ID3Meta.h"
@@ -156,12 +157,12 @@ typedef struct
     float   f_fps;
 
     /* Mpga specific */
+    struct mpga_frameheader_s mpgah;
     struct
     {
         int i_frames;
         int i_bytes;
         int i_bitrate_avg;
-        int i_frame_samples;
         lame_extra_t lame;
         bool b_lame;
     } xing;
@@ -666,11 +667,11 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
 
                 /* Try the xing header */
                 if( p_sys->xing.i_bytes && p_sys->xing.i_frames &&
-                    p_sys->xing.i_frame_samples )
+                    p_sys->mpgah.i_samples_per_frame )
                 {
                     p_sys->i_bitrate_avg = p_sys->xing.i_bytes * INT64_C(8) *
                         p_sys->p_packetizer->fmt_out.audio.i_rate /
-                        p_sys->xing.i_frames / p_sys->xing.i_frame_samples;
+                        p_sys->xing.i_frames / p_sys->mpgah.i_samples_per_frame;
 
                     if( p_sys->i_bitrate_avg > 0 )
                         p_sys->b_estimate_bitrate = false;
@@ -895,22 +896,6 @@ static int MpgaCheckSync( const uint8_t *p_peek )
 
 #define MPGA_VERSION( h )   ( 1 - (((h)>>19)&0x01) )
 #define MPGA_MODE(h)        (((h)>> 6)&0x03)
-
-static int MpgaGetFrameSamples( uint32_t h )
-{
-    const int i_layer = 3 - (((h)>>17)&0x03);
-    switch( i_layer )
-    {
-    case 0:
-        return 384;
-    case 1:
-        return 1152;
-    case 2:
-        return MPGA_VERSION(h) ? 576 : 1152;
-    default:
-        return 0;
-    }
-}
 
 static int MpgaProbe( demux_t *p_demux, uint64_t *pi_offset )
 {
@@ -1172,7 +1157,7 @@ static int MpgaInit( demux_t *p_demux )
         return VLC_SUCCESS;
 
     const uint32_t header = GetDWBE( p_peek );
-    if( !MpgaCheckSync( p_peek ) )
+    if( !MpgaCheckSync( p_peek ) || mpga_decode_frameheader( header, &p_sys->mpgah ) )
         return VLC_SUCCESS;
 
     /* Xing header */
@@ -1209,11 +1194,10 @@ static int MpgaInit( demux_t *p_demux )
 
     if( p_sys->xing.i_frames > 0 && p_sys->xing.i_bytes > 0 )
     {
-        p_sys->xing.i_frame_samples = MpgaGetFrameSamples( header );
         msg_Dbg( p_demux, "xing frames&bytes value present "
-                 "(%d bytes, %d frames, %d samples/frame)",
+                 "(%d bytes, %d frames, %u samples/frame)",
                  p_sys->xing.i_bytes, p_sys->xing.i_frames,
-                 p_sys->xing.i_frame_samples );
+                 p_sys->mpgah.i_samples_per_frame );
     }
 
     if( i_xing >= 20 && memcmp( p_xing, "LAME", 4 ) == 0)
