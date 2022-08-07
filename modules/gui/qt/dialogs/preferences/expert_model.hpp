@@ -101,7 +101,7 @@ public:
     void toggleBoolean( const QModelIndex & );
     void setItemToDefault( const QModelIndex & );
     void notifyUpdatedRow( int );
-    bool submit();
+    bool submit() override;
     /* Standard model interface */
     QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const override;
