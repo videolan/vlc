@@ -77,7 +77,7 @@ void ThumbnailCollector::onVlcMLEvent(void *data, const vlc_ml_event_t *event)
         if (event->media_thumbnail_generated.b_success && !url.isEmpty()) {
             self->m_thumbnails.insert(id, url);
         } else {
-            qDebug("thumbnail generation failed, id: %ld, url: '%s'", id, qUtf8Printable(url));
+            qDebug("thumbnail generation failed, id: %" PRId64 ", url: '%s'", id, qUtf8Printable(url));
         }
     }
 
