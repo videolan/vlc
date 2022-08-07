@@ -741,7 +741,6 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
             goto error;
     }
 
-    sout_stream_sys_t *sys = p_stream->p_sys;
     if( p_buffer != NULL )
     {
         assert( p_buffer->p_next == NULL );
