@@ -76,14 +76,14 @@
 {
     NSUInteger numNavigationStates = _navigationStates.count;
 
-    return _currentPosition && 
+    return _currentPosition != nil && 
         _currentPosition.navigationStackIndex < numNavigationStates - 1 && 
         numNavigationStates > 1;
 }
 
 - (BOOL)backwardsAvailable
 {
-    return _currentPosition && 
+    return _currentPosition != nil && 
         _currentPosition.navigationStackIndex > 0 && 
         _navigationStates.count > 1;
 }

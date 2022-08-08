@@ -333,7 +333,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _mainSplitView.delegate = self;
     _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
 
-    [self segmentedControlAction:nil];
+    [self setViewForSelectedSegment];
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
     
@@ -513,17 +513,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 #pragma mark - misc. user interactions
 
-- (IBAction)segmentedControlAction:(id)sender
+- (void)setViewForSelectedSegment
 {
-    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment && 
-        _gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
-        return;
-    }
-
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
-
-    [self invalidateRestorableState];
 
     switch (_segmentedTitleControl.selectedSegment) {
         case 0:
@@ -538,6 +531,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
             [self showMediaSourceAppearance];
             break;
     }
+}
+
+- (IBAction)segmentedControlAction:(id)sender
+{
+    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment && 
+        _gridVsListSegmentedControl.selectedSegment == _currentSelectedViewModeSegment) {
+        return;
+    }
+
+    [self setViewForSelectedSegment];
+    [self invalidateRestorableState];
 
     if(sender != _navigationStack) {
         [self.navigationStack appendCurrentLibraryState];
@@ -879,7 +883,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.librarySortButton setHidden:NO];
     [self.librarySearchField setEnabled:YES];
 
-    [self segmentedControlAction:nil];
+    [self setViewForSelectedSegment];
 
     if (self.nativeFullscreenMode) {
         [self showControlsBar];
