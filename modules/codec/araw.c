@@ -422,36 +422,45 @@ static void S20BDecode( void *outp, const uint8_t *in, unsigned samples )
 
 static void U24BDecode( void *outp, const uint8_t *in, unsigned samples )
 {
-    uint32_t *out = outp;
+    int32_t *out = outp;
+    union { int32_t s; uint32_t u; } u;
 
     for( size_t i = 0; i < samples; i++ )
     {
-        uint32_t s = ((in[0] << 24) | (in[1] << 16) | (in[2] << 8)) - 0x80000000;
-        *(out++) = s;
+        uint_fast32_t hi = in[0], mid = in[1], lo = in[2];
+
+        u.u = ((hi << 24) | (mid << 16) | (lo << 8)) - UINT32_C(0x80000000);
+        *(out++) = u.s;
         in += 3;
     }
 }
 
 static void U24LDecode( void *outp, const uint8_t *in, unsigned samples )
 {
-    uint32_t *out = outp;
+    int32_t *out = outp;
+    union { int32_t s; uint32_t u; } u;
 
     for( size_t i = 0; i < samples; i++ )
     {
-        uint32_t s = ((in[2] << 24) | (in[1] << 16) | (in[0] << 8)) - 0x80000000;
-        *(out++) = s;
+        uint_fast32_t hi = in[2], mid = in[1], lo = in[0];
+
+        u.u = ((hi << 24) | (mid << 16) | (lo << 8)) - UINT32_C(0x80000000);
+        *(out++) = u.s;
         in += 3;
     }
 }
 
 static void S24BDecode( void *outp, const uint8_t *in, unsigned samples )
 {
-    uint32_t *out = outp;
+    int32_t *out = outp;
+    union { int32_t s; uint32_t u; } u;
 
     for( size_t i = 0; i < samples; i++ )
     {
-        uint32_t s = ((in[0] << 24) | (in[1] << 16) | (in[2] << 8));
-        *(out++) = s;
+        uint_fast32_t hi = in[0], mid = in[1], lo = in[2];
+
+        u.u = (hi << 24) | (mid << 16) | (lo << 8);
+        *(out++) = u.s;
         in += 3;
     }
 }
@@ -459,11 +468,14 @@ static void S24BDecode( void *outp, const uint8_t *in, unsigned samples )
 static void S24LDecode( void *outp, const uint8_t *in, unsigned samples )
 {
     uint32_t *out = outp;
+    union { int32_t s; uint32_t u; } u;
 
     for( size_t i = 0; i < samples; i++ )
     {
-        uint32_t s = ((in[2] << 24) | (in[1] << 16) | (in[0] << 8));
-        *(out++) = s;
+        uint_fast32_t hi = in[2], mid = in[1], lo = in[0];
+
+        u.u = (hi << 24) | (mid << 16) | (lo << 8);
+        *(out++) = u.s;
         in += 3;
     }
 }
