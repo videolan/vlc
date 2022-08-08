@@ -229,11 +229,20 @@ vlc_DIR *vlc_opendir (const char *dirname)
         free (p_dir);
         return NULL;
     }
+    if (!p_dir->u.insert_dot_dot)
+    {
+        // remove forward slashes from long pathes to please FindFirstFileExW
+        for (size_t i=0; p_dir->wildcard[i]!=L'\0';i++)
+        {
+            if (unlikely(p_dir->wildcard[i] == L'/'))
+                p_dir->wildcard[i] = L'\\';
+        }
+    }
 
     p_dir->fHandle = FindFirstFileExW(p_dir->wildcard, FindExInfoBasic,
                                       &p_dir->wdir, (FINDEX_SEARCH_OPS)0,
                                       NULL, FIND_FIRST_EX_LARGE_FETCH);
-    if (p_dir->fHandle ==  INVALID_HANDLE_VALUE)
+    if (p_dir->fHandle == INVALID_HANDLE_VALUE)
     {
         free(p_dir->wildcard);
         free(p_dir);
