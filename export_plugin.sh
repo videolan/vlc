@@ -98,7 +98,7 @@ function should_copy_plugin()
     done
 }
 
-for plugin in $(fd -uu plugin.dylib ${INPUT_PATH}); do
+for plugin in $(find "${INPUT_PATH}" -name  '*plugin.dylib'); do
     name="$(basename "${plugin}")"
     name="${name#lib}"
     name="${name%_plugin.dylib}"
