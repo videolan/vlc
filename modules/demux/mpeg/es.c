@@ -140,6 +140,7 @@ struct xing_info_s
     uint32_t i_quality;
     vlc_fourcc_t infotag;
     vlc_fourcc_t encoder;
+    uint8_t  rgi_toc[XING_TOC_COUNTBYTES];
     float f_peak_signal;
     float f_radio_replay_gain;
     float f_audiophile_replay_gain;
@@ -204,7 +205,7 @@ static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xi
     if( i_flags & XING_FIELD_STREAMBYTES )
         xing->i_bytes = GetDWBE( &p_buf[8 + varsz[0]] );
     if( i_flags & XING_FIELD_TOC )
-    { /* TODO Support XING TOC to improve seeking accuracy */ }
+        memcpy( xing->rgi_toc, &p_buf[8 + varsz[0] + varsz[1]], XING_TOC_COUNTBYTES );
     if( i_flags & XING_FIELD_QUALITY )
         xing->i_quality = GetDWBE( &p_buf[8 + varsz[0] + varsz[1] + varsz[2]] );
 
@@ -264,6 +265,40 @@ static int MpgaGetCBRSeekpoint( const struct mpga_frameheader_s *mpgah,
     return 0;
 }
 
+static int SeekByPosUsingXingTOC( const struct mpga_frameheader_s *mpgah,
+                                  const struct xing_info_s *xing,double pos,
+                                  vlc_tick_t *pi_time, uint64_t *pi_offset )
+{
+    if( !xing->rgi_toc[XING_TOC_COUNTBYTES - 1] ||
+        !mpgah->i_sample_rate || !mpgah->i_samples_per_frame )
+        return -1;
+
+    unsigned syncentry = pos * XING_TOC_COUNTBYTES;
+    syncentry = VLC_CLIP(syncentry, 0, XING_TOC_COUNTBYTES - 1);
+    unsigned syncframe = syncentry * xing->i_frames / XING_TOC_COUNTBYTES;
+
+    *pi_time = vlc_tick_from_samples( syncframe * mpgah->i_samples_per_frame,
+                                      mpgah->i_sample_rate ) + VLC_TICK_0;
+    *pi_offset = xing->rgi_toc[syncentry] * xing->i_bytes / 256;
+
+    return 0;
+}
+
+static int SeekByTimeUsingXingTOC( const struct mpga_frameheader_s *mpgah,
+                                   const struct xing_info_s *xing,
+                                   vlc_tick_t *pi_time, uint64_t *pi_offset )
+{
+    if( !mpgah->i_sample_rate || !mpgah->i_samples_per_frame || !xing->i_frames ||
+        *pi_time < VLC_TICK_0 )
+        return -1;
+
+    uint32_t sample = samples_from_vlc_tick( *pi_time - VLC_TICK_0, mpgah->i_sample_rate );
+    uint64_t totalsamples = mpgah->i_samples_per_frame * (uint64_t) xing->i_frames;
+
+    return SeekByPosUsingXingTOC( mpgah, xing, (double)sample / totalsamples,
+                                  pi_time, pi_offset );
+}
+
 static int MpgaSeek( const struct mpga_frameheader_s *mpgah,
                      const struct xing_info_s *xing,
                      uint64_t i_seekablesize, double f_pos,
@@ -278,7 +313,11 @@ static int MpgaSeek( const struct mpga_frameheader_s *mpgah,
         }
     }
 
-    return -1;
+    if( *pi_time != VLC_TICK_INVALID &&
+        !SeekByTimeUsingXingTOC( mpgah, xing, pi_time, pi_offset ) )
+        return 0;
+
+    return SeekByPosUsingXingTOC( mpgah, xing, f_pos, pi_time, pi_offset );
 }
 
 typedef struct
