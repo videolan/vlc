@@ -267,6 +267,8 @@ static int Open(vlc_object_t *object)
 #endif
 
     vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
     int ret = D3D11_Create(vd, &sys->hd3d, true);
     if (unlikely(ret != VLC_SUCCESS))
         goto error;
