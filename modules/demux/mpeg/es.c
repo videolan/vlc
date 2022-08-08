@@ -256,6 +256,7 @@ typedef struct
     bool        b_big_endian;
     bool        b_estimate_bitrate;
     int         i_bitrate;  /* extracted from Xing header */
+    vlc_tick_t  i_duration;
 
     bool b_initial_sync_failed;
 
@@ -338,6 +339,7 @@ static int OpenCommon( demux_t *p_demux,
     p_sys->i_stream_offset = i_bs_offset;
     p_sys->b_estimate_bitrate = true;
     p_sys->i_bitrate = 0;
+    p_sys->i_duration = 0;
     p_sys->b_big_endian = false;
     p_sys->f_fps = var_InheritFloat( p_demux, "es-fps" );
     p_sys->p_packetized_data = NULL;
@@ -573,6 +575,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
         {
+            if( p_sys->i_duration > 0 )
+            {
+                *va_arg( args, vlc_tick_t * ) = p_sys->i_duration;
+                return VLC_SUCCESS;
+            }
+            /* compute length from bitrate */
             va_list ap;
             int i_ret;
 
@@ -1238,6 +1246,23 @@ static int MpgaInit( demux_t *p_demux )
     struct xing_info_s *xing = &p_sys->xing;
     if( ParseXing( &p_peek[i_skip], i_peek - i_skip, xing ) == VLC_SUCCESS )
     {
+        const uint64_t i_total_samples = xing->i_frames * (uint64_t) p_sys->mpgah.i_samples_per_frame;
+        const uint64_t i_dropped_samples = xing->i_delay_samples + xing->i_padding_samples;
+
+        if( p_sys->mpgah.i_sample_rate && i_dropped_samples < i_total_samples )
+        {
+            uint64_t i_stream_size;
+            /* We only set duration if we can't check (then compute it using bitrate/size)
+               or if we verified the file isn't truncated */
+            if( xing->i_bytes == 0 ||
+                vlc_stream_GetSize( p_demux->s, &i_stream_size ) ||
+                i_stream_size >= xing->i_bytes + p_sys->mpgah.i_frame_size )
+            {
+                p_sys->i_duration = vlc_tick_from_samples( i_total_samples - i_dropped_samples,
+                                                           p_sys->mpgah.i_sample_rate );
+            }
+        }
+
         p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = xing->f_peak_signal;
         p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = xing->f_radio_replay_gain;
         p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = xing->f_audiophile_replay_gain;
