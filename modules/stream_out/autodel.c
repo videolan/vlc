@@ -46,6 +46,7 @@ struct sout_stream_id_sys_t
 
 typedef struct
 {
+    vlc_tick_t last_pcr;
     struct vlc_list ids;
 } sout_stream_sys_t;
 
@@ -81,9 +82,9 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *p_es = (sout_stream_id_sys_t *)_p_es;
-    vlc_tick_t i_current = vlc_tick_now();
 
-    p_es->i_last = p_buffer->i_dts;
+    p_es->i_last = ( p_buffer->i_dts != VLC_TICK_INVALID ) ? p_buffer->i_dts
+                                                           : p_sys->last_pcr;
     if ( !p_es->id && !p_es->b_error )
     {
         p_es->id = sout_StreamIdAdd( p_stream->p_next, &p_es->fmt );
@@ -103,7 +104,7 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
     vlc_list_foreach (p_es, &p_sys->ids, node)
         if (p_es->id != NULL
          && (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES)
-         && p_es->i_last < i_current)
+         && p_es->i_last < p_sys->last_pcr )
         {
             sout_StreamIdDel(p_stream->p_next, p_es->id);
             p_es->id = NULL;
@@ -112,8 +113,16 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+    sys->last_pcr = pcr;
+
+    sout_StreamSetPCR( stream->p_next, pcr );
+}
+
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, NULL,
+    Add, Del, Send, NULL, NULL, SetPCR,
 };
 
 static int Open( vlc_object_t *p_this )
@@ -124,6 +133,7 @@ static int Open( vlc_object_t *p_this )
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
+    p_sys->last_pcr = VLC_TICK_INVALID;
     vlc_list_init(&p_sys->ids);
     p_stream->ops = &ops;
     p_stream->p_sys = p_sys;
