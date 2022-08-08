@@ -423,7 +423,7 @@ static int D3dCreateDevice(vlc_va_t *va)
         return VLC_SUCCESS;
     }
 
-    sys->d3d_dev.d3dcontext = var_InheritInteger(va, "winrt-d3dcontext");
+    sys->d3d_dev.d3dcontext = (void*)var_InheritInteger(va, "winrt-d3dcontext");
     if (unlikely(sys->d3d_dev.d3dcontext))
     {
         ID3D11DeviceContext_GetDevice(sys->d3d_dev.d3dcontext, &sys->d3d_dev.d3ddevice);

@@ -214,10 +214,10 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 
 static int OpenCoreW(vout_display_t *vd)
 {
-    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
+    IDXGISwapChain1* dxgiswapChain  = (void*)var_InheritInteger(vd, "winrt-swapchain");
     if (!dxgiswapChain)
         return VLC_EGENERIC;
-    ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
+    ID3D11DeviceContext* d3dcontext = (void*)var_InheritInteger(vd, "winrt-d3dcontext");
     if (!d3dcontext)
         return VLC_EGENERIC;
     ID3D11Device* d3ddevice = NULL;
