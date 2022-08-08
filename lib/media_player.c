@@ -1295,7 +1295,7 @@ int libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
 }
 
 int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
-                                       float position, bool b_fast )
+                                      double position, bool b_fast )
 {
     vlc_player_t *player = p_mi->player;
     vlc_player_Lock(player);

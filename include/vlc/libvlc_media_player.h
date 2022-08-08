@@ -1171,7 +1171,7 @@ LIBVLC_API double libvlc_media_player_get_position( libvlc_media_player_t *p_mi 
  * \return 0 on success, -1 on error
  */
 LIBVLC_API int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
-                                                 float f_pos, bool b_fast );
+                                                 double f_pos, bool b_fast );
 
 /**
  * Set movie chapter (if applicable).
