@@ -69,6 +69,10 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
     {
         return m_player->hasPrograms();
     }
+    else if (type == ControlListModel::TELETEXT_BUTTONS)
+    {
+        return m_player->isTeletextAvailable();
+    }
 
     return true;
 }
