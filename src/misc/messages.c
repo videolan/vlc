@@ -249,6 +249,7 @@ static void vlc_LogEarlyClose(void *d)
         vlc_LogCallback(sink, log->type, &log->meta, "%s",
                         (log->msg != NULL) ? log->msg : "message lost");
         free(log->msg);
+        free((char*)log->meta.psz_header); // local copy
         next = log->next;
         free(log);
     }
