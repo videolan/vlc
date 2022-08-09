@@ -29,7 +29,6 @@ T.Pane {
     id: root
 
     property VLCColors colors: VLCStyle.colors
-    property bool paintOnly: false
 
     enabled: Player.isTeletextAvailable
 
@@ -48,8 +47,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: teleActivateBtn
-
-            paintOnly: root.paintOnly
 
             checked: Player.teletextEnabled
 
@@ -71,8 +68,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: teleTransparencyBtn
-
-            paintOnly: root.paintOnly
 
             enabled: teleActivateBtn.checked
 
@@ -144,8 +139,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: indexKeyBtn
 
-            paintOnly: root.paintOnly
-
             enabled: teleActivateBtn.checked
 
             iconText: VLCIcons.record
@@ -166,8 +159,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: redKeyBtn
-
-            paintOnly: root.paintOnly
 
             enabled: teleActivateBtn.checked
 
@@ -190,8 +181,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: greenKeyBtn
 
-            paintOnly: root.paintOnly
-
             enabled: teleActivateBtn.checked
 
             iconText: VLCIcons.record
@@ -213,8 +202,6 @@ T.Pane {
         Widgets.IconControlButton{
             id: yellowKeyBtn
 
-            paintOnly: root.paintOnly
-
             enabled: teleActivateBtn.checked
 
             iconText: VLCIcons.record
@@ -235,8 +222,6 @@ T.Pane {
 
         Widgets.IconControlButton{
             id: blueKeyBtn
-
-            paintOnly: root.paintOnly
 
             enabled: teleActivateBtn.checked
 
