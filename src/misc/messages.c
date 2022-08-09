@@ -121,6 +121,10 @@ void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
                const char *format, va_list args)
 {
     struct vlc_logger *logger = *loggerp;
+    if (logger == NULL)
+        // nothing to do
+        return;
+
     /* Get basename from the module filename */
     char *p = strrchr(module, '/');
     if (p != NULL)
@@ -149,8 +153,7 @@ void vlc_vaLog(struct vlc_logger *const *loggerp, int type,
     msg.tid = vlc_thread_id();
 
     /* Pass message to the callback */
-    if (logger != NULL)
-        vlc_vaLogCallback(logger, type, &msg, format, args);
+    vlc_vaLogCallback(logger, type, &msg, format, args);
 }
 
 void vlc_Log(struct vlc_logger *const *logger, int type,
