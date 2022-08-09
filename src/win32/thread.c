@@ -591,10 +591,11 @@ vlc_tick_t vlc_tick_now (void)
 void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
     struct vlc_thread *th = current_thread_ctx;
-
-    if (th != NULL && th->killable)
+    if (likely(th != NULL))
+    {
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+    if (th->killable)
     {
         do
         {
@@ -608,6 +609,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 #else
     vlc_testcancel();
 #endif
+    }
 
     while ((delay = (deadline - vlc_tick_now())) > 0)
     {
