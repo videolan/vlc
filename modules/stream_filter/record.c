@@ -154,6 +154,18 @@ static int Control( stream_t *s, int i_query, va_list args )
         return Stop( s );
 }
 
+static void set_record_file_var(vlc_object_t *obj, const char *file)
+{
+    while ((obj = vlc_object_parent(obj)) != NULL)
+    {
+        if (var_Type(obj, "record-file") != 0)
+        {
+            var_SetString(obj, "record-file", file);
+            break;
+        }
+    }
+}
+
 /****************************************************************************
  * Helpers
  ****************************************************************************/
@@ -199,7 +211,7 @@ static int Start( stream_t *s, const char *dir_path, const char *psz_extension )
     }
 
     /* signal new record file */
-    var_SetString( vlc_object_instance(s), "record-file", psz_file );
+    set_record_file_var(VLC_OBJECT(s), psz_file);
 
     msg_Dbg( s, "Recording into %s", psz_file );
     free( psz_file );
