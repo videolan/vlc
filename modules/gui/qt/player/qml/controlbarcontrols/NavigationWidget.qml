@@ -41,6 +41,10 @@ Templates.Pane {
 
     readonly property string _controlPath : "qrc:///player/controlbarcontrols/"
 
+    // Signals
+
+    signal requestLockUnlockAutoHide(bool lock)
+
     // Settings
 
     implicitWidth: contentWidth + leftPadding + rightPadding
@@ -63,6 +67,16 @@ Templates.Pane {
         item.paintOnly = Qt.binding(function() { return paintOnly })
 
         item.Navigation.parentItem = Qt.binding(function() { return loader })
+    }
+
+    function _applyItemLock(loader, item) {
+        if (item === null) return
+
+        _applyItem(loader, item)
+
+        item.requestLockUnlockAutoHide.connect(function(lock) {
+            controlLayout.requestLockUnlockAutoHide(lock)
+        })
     }
 
     // Children
@@ -113,15 +127,7 @@ Templates.Pane {
             Navigation.leftItem: loaderA.item
             Navigation.rightItem: loaderC.item
 
-            onLoaded: {
-                if (item === null) return
-
-                _applyItem(loaderB, item)
-
-                item.requestLockUnlockAutoHide.connect(function(lock) {
-                    controlLayout.requestLockUnlockAutoHide(lock)
-                })
-            }
+            onLoaded: _applyItemLock(loaderB, item)
         }
 
         Loader {
@@ -133,14 +139,14 @@ Templates.Pane {
 
             source: (Player.isTeletextAvailable
                      &&
-                     root.paintOnly === false) ? root._controlPath + "TeletextWidget.qml" : ""
+                     root.paintOnly == false) ? _controlPath + "TeletextButton.qml" : ""
 
             Navigation.parentItem: root
 
             Navigation.leftItem: (loaderB.item) ? loaderB.item
                                                 : loaderA.item
 
-            onLoaded: if (item) _applyItem(loaderC, item)
+            onLoaded: _applyItemLock(loaderC, item)
         }
     }
 }
