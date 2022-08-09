@@ -592,11 +592,9 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
     struct vlc_thread *th = current_thread_ctx;
-    if (likely(th != NULL))
+    if (likely(th != NULL) && th->killable)
     {
 #if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-    if (th->killable)
-    {
         do
         {
             if (atomic_load_explicit(&th->killed, memory_order_acquire))
@@ -605,9 +603,9 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
         while (vlc_atomic_timedwait(&th->killed, false, deadline) == 0);
 
         return;
-    }
 #else
-    vlc_testcancel();
+        if (atomic_load_explicit(&th->killed, memory_order_relaxed))
+            vlc_docancel(th);
 #endif
     }
 
@@ -621,7 +619,12 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
         Sleep(delay);
 #else
         SleepEx(delay, TRUE);
-        vlc_testcancel();
+
+        if (likely(th != NULL) && th->killable)
+        {
+            if (atomic_load_explicit(&th->killed, memory_order_relaxed))
+                vlc_docancel(th);
+        }
 #endif
     }
 }
