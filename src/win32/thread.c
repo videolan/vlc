@@ -443,7 +443,7 @@ int vlc_savecancel (void)
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
-    int state = th->killable;
+    bool state = th->killable;
     th->killable = false;
     return state;
 }
@@ -457,7 +457,7 @@ void vlc_restorecancel (int state)
         return; /* Main thread - cannot be cancelled anyway */
 
     assert (!th->killable);
-    th->killable = state != 0;
+    th->killable = !!state;
 }
 
 noreturn static void vlc_docancel(struct vlc_thread *th)
