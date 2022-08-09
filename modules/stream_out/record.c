@@ -313,6 +313,18 @@ static const muxer_properties_t p_muxers[] = {
 };
 #undef M
 
+static void set_record_file_var(vlc_object_t *obj, const char *file)
+{
+    while ((obj = vlc_object_parent(obj)) != NULL)
+    {
+        if (var_Type(obj, "record-file") != 0)
+        {
+            var_SetString(obj, "record-file", file);
+            break;
+        }
+    }
+}
+
 static int OutputNew( sout_stream_t *p_stream,
                       const char *psz_muxer, const char *psz_prefix, const char *psz_extension  )
 {
@@ -364,7 +376,7 @@ static int OutputNew( sout_stream_t *p_stream,
     }
 
     if( psz_file && psz_extension )
-        var_SetString( vlc_object_instance(p_stream), "record-file", psz_file );
+        set_record_file_var(VLC_OBJECT(p_stream), psz_file);
 
     free( psz_file );
     free( psz_output );
