@@ -718,7 +718,7 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
         {
             HMODULE h;
-            h = GetModuleHandle(TEXT("kernel32.dll"));
+            h = GetModuleHandle(TEXT("kernelbase.dll"));
             if (h == NULL)
                 h = GetModuleHandle(TEXT("api-ms-win-core-processthreads-l1-1-3.dll"));
             if (h != NULL)
