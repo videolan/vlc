@@ -887,6 +887,7 @@ modules/gui/qt/player/qml/controlbarcontrols/SlowerButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SnapshotButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/SpacerWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/StopButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/TeletextButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml
 modules/gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml
 modules/gui/qt/playlist/qml/PlaylistDelegate.qml

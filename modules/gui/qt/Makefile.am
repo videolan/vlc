@@ -913,6 +913,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/controlbarcontrols/SnapshotButton.qml \
 	gui/qt/player/qml/controlbarcontrols/SpacerWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/StopButton.qml \
+	gui/qt/player/qml/controlbarcontrols/TeletextButton.qml \
 	gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/Fallback.qml \
