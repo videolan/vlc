@@ -43,6 +43,10 @@
 #include <time.h>
 #include <vlc_atomic.h>
 
+#ifndef NTDDI_WIN10_RS3
+#define NTDDI_WIN10_RS3  0x0A000004
+#endif
+
 /*** Static mutex and condition variable ***/
 static SRWLOCK super_lock = SRWLOCK_INIT;
 
@@ -707,7 +711,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
         abort();
     assert(mdate_selected != mdate_default);
 
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
