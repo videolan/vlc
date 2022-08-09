@@ -29,7 +29,7 @@ import "qrc:///util/Helpers.js" as Helpers
 Slider {
     id: control
 
-    readonly property real _hoveredScalingFactor: 2
+    readonly property real _hoveredScalingFactor: 1.8
     property int barHeight: VLCStyle.dp(5, VLCStyle.scale)
     readonly property real _scaledBarHeight: control.barHeight * _hoveredScalingFactor
     readonly property real _scaledY: (-control.barHeight / 2) * (control._hoveredScalingFactor - 1)
@@ -145,8 +145,8 @@ Slider {
         fsm.playerUpdatePosition(Player.position)
     }
 
-    height: control.barHeight
     implicitHeight: control.barHeight
+    height: implicitHeight
 
     padding: 0
 
@@ -230,6 +230,7 @@ Slider {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
+                        radius: parent.radius
 
                         width: sliderRect.width * control.visualPosition - parent.x - control._seekPointsDistance
                         visible: parent._currentChapter === 0
@@ -376,11 +377,13 @@ Slider {
     handle: Rectangle {
         id: sliderHandle
 
+        property int _size: control.barHeight * 3
+
         x: (control.visualPosition * control.availableWidth) - width / 2
         y: (control.barHeight - height) / 2
 
-        implicitWidth: VLCStyle.margin_small
-        implicitHeight: VLCStyle.margin_small
+        implicitWidth: sliderHandle._size
+        implicitHeight: sliderHandle._size
         radius: VLCStyle.margin_small
         color: control.colors.accent
 
@@ -402,7 +405,7 @@ Slider {
                     PropertyAction { target: sliderHandle; property: "visible"; value: true; }
                     NumberAnimation {
                         target: sliderHandle; properties: "implicitWidth,implicitHeight"
-                        to: VLCStyle.margin_small
+                        to: sliderHandle._size
                         duration: VLCStyle.duration_short; easing.type: Easing.InSine
                     }
                 }
@@ -413,7 +416,7 @@ Slider {
                     PropertyAction { target: sliderHandle; property: "visible"; value: true; }
                     NumberAnimation {
                         target: sliderHandle; properties: "implicitWidth,implicitHeight"
-                        to: VLCStyle.margin_small * (0.75 * control._hoveredScalingFactor)
+                        to: sliderHandle._size * (0.8 * control._hoveredScalingFactor)
                         duration: VLCStyle.duration_short; easing.type: Easing.InSine
                     }
                 }
