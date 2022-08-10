@@ -583,8 +583,7 @@ static vlc_tick_t mdate_wall (void)
 
 static vlc_tick_t mdate_default(void)
 {
-    vlc_threads_setup(NULL);
-    return mdate_perf();
+    return mdate_wall();
 }
 
 static vlc_tick_t (*mdate_selected) (void) = mdate_default;
