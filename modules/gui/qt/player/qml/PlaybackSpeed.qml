@@ -202,7 +202,7 @@ ColumnLayout {
 
             focus: true
 
-            Navigation.parentItem: rowB
+            Navigation.parentItem: rowA
             Navigation.downItem: slider
 
             onClicked: slider.value = 0
@@ -333,12 +333,10 @@ ColumnLayout {
             bgColor: root.colors.button
             borderColor: root.colors.buttonBorder
 
-            // NOTE: Applying the right theme to the ComboBox.
             Navigation.parentItem: rowB
 
-            // NOTE: This makes the navigation convenient since 'up' is changing the comboBox value.
+            // NOTE: This makes the navigation possible since 'up' is changing the comboBox value.
             Navigation.leftItem: slider
-            Navigation.rightItem: slider
 
             Component.onCompleted: {
                 for (var i = 0; i < _model.length; i++) {

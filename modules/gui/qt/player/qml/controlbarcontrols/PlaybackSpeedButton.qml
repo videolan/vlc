@@ -38,6 +38,20 @@ Widgets.IconControlButton {
 
     color: (popup.visible) ? colors.accent : colors.playerControlBarFg
 
+    // FIXME: We can't use upItem because a Popup is not an Item.
+    Navigation.upAction: function() {
+        if (popup.visible) {
+            popup.forceActiveFocus(Qt.TabFocusReason)
+
+            return
+        }
+
+        var parent = Navigation.parentItem;
+
+        if (parent)
+            parent.Navigation.defaultNavigationUp()
+    }
+
     onClicked: popup.open()
 
     Popup {
@@ -115,6 +129,9 @@ Widgets.IconControlButton {
             colors: root.colors
 
             Navigation.parentItem: root
+
+            // NOTE: Mapping the right direction because the down action triggers the ComboBox.
+            Navigation.rightItem: root
         }
     }
 
