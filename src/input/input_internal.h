@@ -437,6 +437,10 @@ typedef union
         vlc_es_id_t *id;
         bool enabled;
     } vbi_transparency;
+    struct {
+        bool enabled;
+        char *dir_path;
+    } record_state;
 } input_control_param_t;
 
 typedef struct

@@ -401,6 +401,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ts_read = 50;
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
+    p_sys->record_dir_path = NULL;
 
     vlc_dictionary_init( &p_sys->attachments, 0 );
 
@@ -590,6 +591,7 @@ static void Close( vlc_object_t *p_this )
     /* Clear up attachments */
     vlc_dictionary_clear( &p_sys->attachments, FreeDictAttachment, NULL );
 
+    free( p_sys->record_dir_path );
     free( p_sys );
 }
 
@@ -647,7 +649,7 @@ static int Demux( demux_t *p_demux )
         {
             /* Enable recording once synchronized */
             vlc_stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE, true,
-                                "ts" );
+                                p_sys->record_dir_path, "ts" );
             p_sys->b_start_record = false;
         }
 
@@ -1174,10 +1176,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_RECORD_STATE:
         b_bool = va_arg( args, int );
+        const char *dir_path = va_arg( args, const char * );
+
+        free( p_sys->record_dir_path );
+        p_sys->record_dir_path = NULL;
 
         if( !b_bool )
             vlc_stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE,
                                 false );
+        else if( dir_path != NULL )
+        {
+            p_sys->record_dir_path = strdup(dir_path);
+            if( p_sys->record_dir_path == NULL )
+                return VLC_ENOMEM;
+        }
         p_sys->b_start_record = b_bool;
         return VLC_SUCCESS;
 

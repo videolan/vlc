@@ -1637,6 +1637,9 @@ static void ControlRelease( int i_type, const input_control_param_t *p_param )
     case INPUT_CONTROL_SET_ES_CAT_IDS:
         free( p_param->cat_ids.str_ids );
         break;
+    case INPUT_CONTROL_SET_RECORD_STATE:
+        free( p_param->record_state.dir_path );
+        break;
 
     default:
         break;
@@ -1936,7 +1939,6 @@ static bool Control( input_thread_t *p_input,
     const vlc_tick_t i_control_date = vlc_tick_now();
     /* FIXME b_force_update is abused, it should be carefully checked */
     bool b_force_update = false;
-    vlc_value_t val;
 
     switch( i_type )
     {
@@ -2290,27 +2292,30 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_RECORD_STATE:
-            val = param.val;
-            if( !!priv->b_recording != !!val.b_bool )
+        {
+            bool enabled = param.record_state.enabled;
+            const char *dir_path = param.record_state.dir_path;
+            if( !!priv->b_recording != enabled )
             {
                 if( priv->master->b_can_stream_record )
                 {
                     if( demux_Control( priv->master->p_demux,
-                                       DEMUX_SET_RECORD_STATE, val.b_bool ) )
-                        val.b_bool = false;
+                                       DEMUX_SET_RECORD_STATE, enabled, dir_path ) )
+                        enabled = false;
                 }
                 else
                 {
-                    if( es_out_SetRecordState( priv->p_es_out_display, val.b_bool ) )
-                        val.b_bool = false;
+                    if( es_out_SetRecordState( priv->p_es_out_display, enabled, dir_path ) )
+                        enabled = false;
                 }
-                priv->b_recording = val.b_bool;
+                priv->b_recording = enabled;
 
-                input_SendEventRecord( p_input, val.b_bool );
+                input_SendEventRecord( p_input, enabled );
 
                 b_force_update = true;
             }
             break;
+        }
 
         case INPUT_CONTROL_SET_FRAME_NEXT:
             if( priv->i_state == PAUSE_S )

@@ -141,6 +141,7 @@ struct demux_sys_t
 
     /* */
     bool        b_start_record;
+    char        *record_dir_path;
 };
 
 void TsChangeStandard( demux_sys_t *, ts_standards_e );

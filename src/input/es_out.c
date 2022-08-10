@@ -243,7 +243,7 @@ static void         EsOutSelect( es_out_t *, es_out_id_t *es, bool b_force );
 static void         EsOutSelectList( es_out_t *, enum es_format_category_e cat,
                                      vlc_es_id_t *const* es_id_list );
 static void         EsOutUpdateInfo( es_out_t *, es_out_id_t *es, const vlc_meta_t * );
-static int          EsOutSetRecord(  es_out_t *, bool b_record );
+static int          EsOutSetRecord(  es_out_t *, bool b_record, const char *dir_path );
 
 static bool EsIsSelected( es_out_id_t *es );
 static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force );
@@ -678,7 +678,7 @@ static void EsOutTerminate( es_out_t *out )
     es_out_id_t *es;
 
     if( p_sys->p_sout_record )
-        EsOutSetRecord( out, false );
+        EsOutSetRecord( out, false, NULL );
 
     foreach_es_then_es_slaves(es)
     {
@@ -793,7 +793,7 @@ static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
                            p_sys->i_pts_jitter, p_sys->i_cr_average);
 }
 
-static int EsOutSetRecord(  es_out_t *out, bool b_record )
+static int EsOutSetRecord(  es_out_t *out, bool b_record, const char *dir_path )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
@@ -803,23 +803,29 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
 
     if( b_record )
     {
-        char *psz_path = var_CreateGetNonEmptyString( p_input, "input-record-path" );
-        if( !psz_path )
+        char *psz_path = NULL;
+        if( dir_path == NULL )
         {
-            if( var_CountChoices( p_input, "video-es" ) )
-                psz_path = config_GetUserDir( VLC_VIDEOS_DIR );
-            else if( var_CountChoices( p_input, "audio-es" ) )
-                psz_path = config_GetUserDir( VLC_MUSIC_DIR );
-            else
-                psz_path = config_GetUserDir( VLC_DOWNLOAD_DIR );
+            psz_path = var_CreateGetNonEmptyString( p_input, "input-record-path" );
+            if( psz_path == NULL )
+            {
+                if( var_CountChoices( p_input, "video-es" ) )
+                    psz_path = config_GetUserDir( VLC_VIDEOS_DIR );
+                else if( var_CountChoices( p_input, "audio-es" ) )
+                    psz_path = config_GetUserDir( VLC_MUSIC_DIR );
+                else
+                    psz_path = config_GetUserDir( VLC_DOWNLOAD_DIR );
+            }
+
+            dir_path = psz_path;
         }
 
         char *psz_sout = NULL;  // TODO conf
 
-        if( !psz_sout && psz_path )
+        if( !psz_sout && dir_path )
         {
             char *psz_file = input_item_CreateFilename( input_GetItem(p_input),
-                                                        psz_path,
+                                                        dir_path,
                                                         INPUT_RECORD_PREFIX, NULL );
             if( psz_file )
             {
@@ -3855,7 +3861,8 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
     case ES_OUT_PRIV_SET_RECORD_STATE:
     {
         bool b = va_arg( args, int );
-        return EsOutSetRecord( out, b );
+        const char *dir_path = va_arg( args, const char * );
+        return EsOutSetRecord( out, b, dir_path );
     }
     case ES_OUT_PRIV_SET_PAUSE_STATE:
     {

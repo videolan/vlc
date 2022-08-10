@@ -166,7 +166,8 @@ enum stream_query_e
     STREAM_SET_SEEKPOINT,   /**< arg1= int          res=can fail */
 
     /* XXX only data read through vlc_stream_Read/Block will be recorded */
-    STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */
+    STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *dir_path (if arg1 is true)
+                                      arg3=const char *psz_ext (if arg1 is true)  res=can fail */
 
     STREAM_SET_PRIVATE_ID_STATE = 0x1000, /* arg1= int i_private_data, bool b_selected    res=can fail */
     STREAM_SET_PRIVATE_ID_CA,             /* arg1= void * */

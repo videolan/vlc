@@ -187,9 +187,9 @@ static inline void es_out_SetDelay( es_out_t *p_out, int i_cat, vlc_tick_t i_del
     int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_DELAY, i_cat, i_delay );
     assert( !i_ret );
 }
-static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record )
+static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record, const char *dir_path )
 {
-    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_RECORD_STATE, b_record );
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_RECORD_STATE, b_record, dir_path );
 }
 static inline int es_out_SetPauseState( es_out_t *p_out, bool b_source_paused, bool b_paused, vlc_tick_t i_date )
 {

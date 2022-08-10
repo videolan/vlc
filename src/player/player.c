@@ -1622,9 +1622,9 @@ vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enable)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
-    int ret = input_ControlPushHelper(input->thread,
-                                      INPUT_CONTROL_SET_RECORD_STATE,
-                                      &(vlc_value_t) { .b_bool = enable });
+    const input_control_param_t param = { .record_state = { enable, NULL } };
+    int ret = input_ControlPush(input->thread,
+                                INPUT_CONTROL_SET_RECORD_STATE, &param);
 
     if (ret == VLC_SUCCESS)
         vlc_player_osd_Message(player, enable ?

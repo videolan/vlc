@@ -242,7 +242,7 @@ enum demux_query_e
      * The control is never used if DEMUX_CAN_RECORD fails or returns false.
      * Can fail.
      *
-     * arg1= bool */
+     * arg1= bool arg2= string */
     DEMUX_SET_RECORD_STATE,
 
     /* II. Specific access_demux queries */
