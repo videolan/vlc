@@ -526,7 +526,7 @@ static vlc_tick_t mdate_interrupt (void)
 
     /* hundreds of nanoseconds */
     static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
-    return ts / (10000000 / CLOCK_FREQ);
+    return VLC_TICK_FROM_MSFTIME(ts);
 }
 
 static vlc_tick_t mdate_tick (void)
