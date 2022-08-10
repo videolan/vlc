@@ -301,7 +301,7 @@ static int ThdProbe( demux_t *p_demux, uint64_t *pi_offset );
 static int MlpInit( demux_t *p_demux );
 
 static bool Parse( demux_t *p_demux, block_t **pp_output );
-static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time );
+static int SeekByMlltTable( sync_table_t *, vlc_tick_t *, uint64_t * );
 
 static const codec_t p_codecs[] = {
     { VLC_CODEC_MP4A, false, "mp4 audio",  AacProbe,  AacInit },
@@ -614,8 +614,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->mllt.p_bits )
             {
                 vlc_tick_t i_time = va_arg(args, vlc_tick_t);
-                uint64_t i_pos = SeekByMlltTable( p_demux, &i_time );
-                return MovetoTimePos( p_demux, i_time, i_pos );
+                uint64_t i_pos;
+                if( !SeekByMlltTable( &p_sys->mllt, &i_time, &i_pos ) )
+                    return MovetoTimePos( p_demux, i_time, i_pos );
+                else
+                    return VLC_EGENERIC;
             }
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
@@ -1067,33 +1070,37 @@ static int MpgaProbe( demux_t *p_demux, uint64_t *pi_offset )
     return VLC_SUCCESS;
 }
 
-static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time )
+static int SeekByMlltTable( sync_table_t *mllt, vlc_tick_t *pi_time, uint64_t *pi_offset )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    sync_table_ctx_t *p_cur = &p_sys->mllt.current;
+    if( !mllt->p_bits )
+        return -1;
+
+    sync_table_ctx_t *p_cur = &mllt->current;
 
     /* reset or init context */
     if( *pi_time < p_cur->i_time || !p_cur->br.p )
     {
         p_cur->i_time = 0;
         p_cur->i_pos = 0;
-        bs_init(&p_cur->br, p_sys->mllt.p_bits, p_sys->mllt.i_bits);
+        bs_init(&p_cur->br, mllt->p_bits, mllt->i_bits);
     }
 
     while(!bs_eof(&p_cur->br))
     {
-        const uint32_t i_bytesdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_bytes_dev);
-        const uint32_t i_msdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_ms_dev);
+        const uint32_t i_bytesdev = bs_read(&p_cur->br, mllt->i_bits_per_bytes_dev);
+        const uint32_t i_msdev = bs_read(&p_cur->br, mllt->i_bits_per_ms_dev);
         if(bs_error(&p_cur->br))
             break;
-        const vlc_tick_t i_deltatime = VLC_TICK_FROM_MS(p_sys->mllt.i_ms_btw_refs + i_msdev);
+        const vlc_tick_t i_deltatime = VLC_TICK_FROM_MS(mllt->i_ms_btw_refs + i_msdev);
         if( p_cur->i_time + i_deltatime > *pi_time )
             break;
         p_cur->i_time += i_deltatime;
-        p_cur->i_pos += p_sys->mllt.i_bytes_btw_refs + i_bytesdev;
+        p_cur->i_pos += mllt->i_bytes_btw_refs + i_bytesdev;
     }
     *pi_time = p_cur->i_time;
-    return p_cur->i_pos;
+    *pi_offset = p_cur->i_pos;
+
+    return 0;
 }
 
 static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_t i_payload, void *p_priv )
