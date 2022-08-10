@@ -581,12 +581,7 @@ static vlc_tick_t mdate_wall (void)
     return VLC_TICK_FROM_MSFTIME(s.QuadPart);
 }
 
-static vlc_tick_t mdate_default(void)
-{
-    return mdate_wall();
-}
-
-static vlc_tick_t (*mdate_selected) (void) = mdate_default;
+static vlc_tick_t (*mdate_selected) (void) = mdate_wall;
 
 vlc_tick_t vlc_tick_now (void)
 {
@@ -688,19 +683,10 @@ unsigned vlc_GetCPUCount (void)
 
 
 /*** Initialization ***/
-static SRWLOCK setup_lock = SRWLOCK_INIT; /* FIXME: use INIT_ONCE */
 
 void vlc_threads_setup(libvlc_int_t *vlc)
 {
-    AcquireSRWLockExclusive(&setup_lock);
-    if (mdate_selected != mdate_default)
-    {
-        ReleaseSRWLockExclusive(&setup_lock);
-        return;
-    }
-
     SelectClockSource(vlc);
-    assert(mdate_selected != mdate_default);
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
     /* Raise default priority of the current process */
@@ -716,7 +702,6 @@ void vlc_threads_setup(libvlc_int_t *vlc)
             msg_Dbg(vlc, "could not raise process priority");
     }
 #endif
-    ReleaseSRWLockExclusive(&setup_lock);
 }
 
 #define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
