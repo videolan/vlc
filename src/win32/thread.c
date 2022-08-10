@@ -634,16 +634,10 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
     vlc_tick_wait (vlc_tick_now () + delay);
 }
 
-static BOOL SelectClockSource(vlc_object_t *obj)
+static void SelectClockSource(libvlc_int_t *obj)
 {
-    const char *name = "perf";
-    char *str = NULL;
-    if (obj != NULL)
-    {
-        str = var_InheritString(obj, "clock-source");
-        if (str != NULL)
-            name = str;
-    }
+    char *str = var_InheritString(obj, "clock-source");
+    const char *name = str != NULL ? str : "perf";
     if (!strcmp (name, "interrupt"))
     {
         msg_Dbg (obj, "using interrupt time as clock source");
@@ -679,7 +673,6 @@ static BOOL SelectClockSource(vlc_object_t *obj)
         abort ();
     }
     free (str);
-    return TRUE;
 }
 
 
@@ -706,8 +699,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
         return;
     }
 
-    if (!SelectClockSource((vlc != NULL) ? VLC_OBJECT(vlc) : NULL))
-        abort();
+    SelectClockSource(vlc);
     assert(mdate_selected != mdate_default);
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
