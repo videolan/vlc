@@ -238,6 +238,49 @@ static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xi
     return VLC_SUCCESS;
 }
 
+static int MpgaGetCBRSeekpoint( const struct mpga_frameheader_s *mpgah,
+                                const struct xing_info_s *xing,
+                                uint64_t i_seekablesize,
+                                double f_pos, vlc_tick_t *pi_time, uint64_t *pi_offset )
+{
+    if( xing->infotag != 0 &&
+        xing->infotag != VLC_FOURCC('I','n','f','o') &&
+        xing->brmode != XING_MODE_CBR &&
+        xing->brmode != XING_MODE_CBR_2PASS )
+        return -1;
+
+    if( !mpgah->i_sample_rate || !mpgah->i_samples_per_frame || !mpgah->i_frame_size )
+        return -1;
+
+    uint32_t i_total_frames = xing->i_frames ? xing->i_frames
+                                             : i_seekablesize / mpgah->i_frame_size;
+
+    /* xing must be optional here */
+    uint32_t i_frame = i_total_frames * f_pos;
+    *pi_offset = i_frame * mpgah->i_frame_size;
+    *pi_time = vlc_tick_from_samples( i_frame * mpgah->i_samples_per_frame,
+                                      mpgah->i_sample_rate ) + VLC_TICK_0;
+
+    return 0;
+}
+
+static int MpgaSeek( const struct mpga_frameheader_s *mpgah,
+                     const struct xing_info_s *xing,
+                     uint64_t i_seekablesize, double f_pos,
+                     vlc_tick_t *pi_time, uint64_t *pi_offset )
+{
+    if( f_pos >= 0 ) /* Set Pos */
+    {
+        if( !MpgaGetCBRSeekpoint( mpgah, xing, i_seekablesize,
+                                  f_pos, pi_time, pi_offset ) )
+        {
+             return 0;
+        }
+    }
+
+    return -1;
+}
+
 typedef struct
 {
     codec_t codec;
@@ -538,19 +581,27 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Time seek:
  *****************************************************************************/
+static void PostSeekCleanup( demux_sys_t *p_sys, vlc_tick_t i_time )
+{
+    /* Fix time_offset */
+    if( i_time >= 0 )
+        p_sys->i_time_offset = i_time - p_sys->i_pts;
+    /* And reset buffered data */
+    if( p_sys->p_packetized_data )
+        block_ChainRelease( p_sys->p_packetized_data );
+    p_sys->p_packetized_data = NULL;
+    /* Reset chapter if any */
+    p_sys->chapters.i_current = 0;
+    p_sys->i_demux_flags |= INPUT_UPDATE_SEEKPOINT;
+}
+
 static int MovetoTimePos( demux_t *p_demux, vlc_tick_t i_time, uint64_t i_pos )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset + i_pos );
     if( i_ret != VLC_SUCCESS )
         return i_ret;
-    p_sys->i_time_offset = i_time - p_sys->i_pts;
-    /* And reset buffered data */
-    if( p_sys->p_packetized_data )
-        block_ChainRelease( p_sys->p_packetized_data );
-    p_sys->p_packetized_data = NULL;
-    p_sys->chapters.i_current = 0;
-    p_sys->i_demux_flags |= INPUT_UPDATE_SEEKPOINT;
+    PostSeekCleanup( p_sys, i_time );
     return VLC_SUCCESS;
 }
 
@@ -611,18 +662,71 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_SET_TIME:
-            if( p_sys->mllt.p_bits )
+        case DEMUX_SET_POSITION:
+        {
+            vlc_tick_t i_time;
+            double f_pos;
+            uint64_t i_offset;
+
+            va_list ap;
+            va_copy ( ap, args ); /* don't break args for helper fallback */
+            if( i_query == DEMUX_SET_TIME )
             {
-                vlc_tick_t i_time = va_arg(args, vlc_tick_t);
-                uint64_t i_pos;
-                if( !SeekByMlltTable( &p_sys->mllt, &i_time, &i_pos ) )
-                    return MovetoTimePos( p_demux, i_time, i_pos );
-                else
-                    return VLC_EGENERIC;
+                i_time = va_arg(ap, vlc_tick_t);
+                f_pos = p_sys->i_duration ? i_time / (double) p_sys->i_duration : -1.0;
+                if( f_pos > 1.0 )
+                    f_pos = 1.0;
             }
+            else
+            {
+                f_pos = va_arg(ap, double);
+                i_time = p_sys->i_duration ? p_sys->i_duration * f_pos : VLC_TICK_INVALID;
+            }
+            va_end( ap );
+
+            /* Try to use ID3 table */
+            if( !SeekByMlltTable( &p_sys->mllt, &i_time, &i_offset ) )
+                return MovetoTimePos( p_demux, i_time, i_offset );
+
+            if( p_sys->codec.i_codec == VLC_CODEC_MPGA )
+            {
+                uint64_t streamsize;
+                if( !vlc_stream_GetSize( p_demux->s, &streamsize ) &&
+                    streamsize > p_sys->i_stream_offset )
+                    streamsize -= p_sys->i_stream_offset;
+                else
+                    streamsize = 0;
+
+                if( !MpgaSeek( &p_sys->mpgah, &p_sys->xing,
+                           streamsize, f_pos, &i_time, &i_offset ) )
+                {
+                    return MovetoTimePos( p_demux, i_time, i_offset );
+                }
+            }
+
+            /* fallback on bitrate / file position seeking */
+            i_time = VLC_TICK_INVALID;
+            int ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
+                                             p_sys->i_bitrate, 1, i_query, args );
+            if( ret != VLC_SUCCESS )
+                return ret; /* not much we can do */
+
+            if( p_sys->i_bitrate > 0 )
+            {
+                i_offset = vlc_stream_Tell( p_demux->s ); /* new pos */
+                i_time = VLC_TICK_0;
+                if( likely(i_offset > p_sys->i_stream_offset) )
+                {
+                    i_offset -= p_sys->i_stream_offset;
+                    i_time += vlc_tick_from_samples( i_offset * 8, p_sys->i_bitrate );
+                }
+            }
+            PostSeekCleanup( p_sys, i_time );
+
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
-            break;
+            return VLC_SUCCESS;
+        }
 
         case DEMUX_GET_TITLE_INFO:
         {
@@ -696,34 +800,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
     }
 
-    int ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
-                                       p_sys->i_bitrate, 1, i_query, args );
-    if( ret != VLC_SUCCESS )
-        return ret;
-
-    if( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME )
-    {
-        if( p_sys->i_bitrate > 0 )
-        {
-            vlc_tick_t i_time = vlc_tick_from_samples(
-                ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset ) * 8
-                , p_sys->i_bitrate );
-
-            /* Fix time_offset */
-            if( i_time >= 0 )
-                p_sys->i_time_offset = i_time - p_sys->i_pts;
-            /* And reset buffered data */
-            if( p_sys->p_packetized_data )
-                block_ChainRelease( p_sys->p_packetized_data );
-            p_sys->p_packetized_data = NULL;
-        }
-
-        /* Reset chapter if any */
-        p_sys->chapters.i_current = 0;
-        p_sys->i_demux_flags |= INPUT_UPDATE_SEEKPOINT;
-    }
-
-    return VLC_SUCCESS;
+    return demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
+                                  p_sys->i_bitrate, 1, i_query, args );
 }
 
 /*****************************************************************************
