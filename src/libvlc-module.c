@@ -1140,17 +1140,11 @@ static const char* const ppsz_restore_playback_desc[] = {
 #ifdef _WIN32
 static const char *const clock_sources[] = {
     "", "interrupt", "tick",
-#ifndef VLC_WINSTORE_APP
-    "multimedia",
-#endif
     "perf", "wall",
 };
 
 static const char *const clock_sources_text[] = {
     N_("Auto"), "Interrupt time", "Windows time",
-#ifndef VLC_WINSTORE_APP
-    "Multimedia timers",
-#endif
     "Performance counters", "System time (DANGEROUS!)",
 };
 #endif
