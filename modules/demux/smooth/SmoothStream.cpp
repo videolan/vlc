@@ -40,11 +40,6 @@ AbstractDemuxer *SmoothStream::newDemux(vlc_object_t *p_obj, const StreamFormat 
     return AbstractStream::newDemux(p_obj, format, out, source);
 }
 
-block_t * SmoothStream::checkBlock(block_t *p_block, bool)
-{
-    return p_block;
-}
-
 AbstractStream * SmoothStreamFactory::create(demux_t *realdemux, const StreamFormat &format,
                                              SegmentTracker *tracker) const
 {

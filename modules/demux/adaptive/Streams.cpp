@@ -743,6 +743,11 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
     }
 }
 
+block_t *AbstractStream::checkBlock(block_t *p_block, bool)
+{
+    return p_block;
+}
+
 AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
 {
     AbstractDemuxer *ret = newDemux( VLC_OBJECT(p_realdemux), format,

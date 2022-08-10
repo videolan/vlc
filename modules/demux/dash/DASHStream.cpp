@@ -30,11 +30,6 @@ DASHStream::DASHStream(demux_t *demux)
 {
 }
 
-block_t * DASHStream::checkBlock(block_t *p_block, bool)
-{
-    return p_block;
-}
-
 AbstractDemuxer *DASHStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                       es_out_t *out, AbstractSourceStream *source) const
 {
