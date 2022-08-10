@@ -2085,7 +2085,7 @@ vlc_module_begin ()
 #endif
 
 #ifdef _WIN32
-    add_string( "clock-source", NULL, CLOCK_SOURCE_TEXT, NULL )
+    add_string( "clock-source", "perf", CLOCK_SOURCE_TEXT, NULL )
         change_string_list( clock_sources, clock_sources_text )
 #endif
 
