@@ -130,7 +130,8 @@ struct vlc_input_decoder_t
 
     /* If p_aout is valid, then p_astream is valid too */
     audio_output_t *p_aout;
-    vlc_aout_stream *p_astream; 
+    vlc_aout_stream *p_astream;
+    bool b_astream_update_latency;
 
     vout_thread_t   *p_vout;
     bool             vout_started;
@@ -258,6 +259,7 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
         // no need to lock, the decoder and ModuleThread are dead
         p_owner->p_aout = NULL;
         p_owner->p_astream = NULL;
+        p_owner->b_astream_update_latency = false;
         if( p_aout )
         {
             assert( p_astream );
@@ -332,7 +334,12 @@ static void aout_stream_NotifyLatency(void *data)
 {
     /* Wake the DecoderThread in order to update the audio latency via
      * vlc_aout_stream_UpdateLatency() */
-    vlc_fifo_Signal(data);
+    vlc_input_decoder_t *owner = data;
+
+    vlc_fifo_Lock(owner->p_fifo);
+    owner->b_astream_update_latency = true;
+    vlc_fifo_Signal(owner->p_fifo);
+    vlc_fifo_Unlock(owner->p_fifo);
 }
 
 static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
@@ -351,6 +358,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_astream = NULL;
         p_owner->p_aout = NULL; // the DecoderThread should not use the old aout anymore
+        p_owner->b_astream_update_latency = false;
         vlc_mutex_unlock( &p_owner->lock );
         vlc_aout_stream_Delete( p_astream );
 
@@ -399,7 +407,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
                 .str_id = p_owner->psz_id,
                 .replay_gain = &p_dec->fmt_out.audio_replay_gain,
                 .notify_latency_cb = aout_stream_NotifyLatency,
-                .notify_latency_data = p_owner->p_fifo,
+                .notify_latency_data = p_owner,
             };
             p_astream = vlc_aout_stream_New( p_aout, &cfg );
             if( p_astream == NULL )
@@ -1682,6 +1690,20 @@ static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
     vlc_mutex_unlock( &p_owner->lock );
 }
 
+static void DecoderThread_UpdateAudioLatency( vlc_input_decoder_t *p_owner )
+{
+    decoder_t *p_dec = &p_owner->dec;
+
+    /* Update the audio latency after a possible long wait in order to update
+     * the audio clock as soon as possible. */
+    assert( p_dec->fmt_in.i_cat == AUDIO_ES );
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->p_astream != NULL )
+        vlc_aout_stream_UpdateLatency( p_owner->p_astream );
+    vlc_mutex_unlock( &p_owner->lock );
+}
+
 static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t delay )
 {
     decoder_t *p_dec = &p_owner->dec;
@@ -1778,6 +1800,16 @@ static void *DecoderThread( void *p_data )
             continue;
         }
 
+        if( p_owner->b_astream_update_latency )
+        {
+            vlc_fifo_Unlock( p_owner->p_fifo );
+
+            DecoderThread_UpdateAudioLatency( p_owner );
+
+            vlc_fifo_Lock( p_owner->p_fifo );
+            p_owner->b_astream_update_latency = false;
+        }
+
         if( rate != p_owner->request_rate )
         {
             rate = p_owner->request_rate;
@@ -1819,13 +1851,6 @@ static void *DecoderThread( void *p_data )
                 p_owner->b_idle = true;
                 vlc_cond_signal( &p_owner->wait_acknowledge );
                 vlc_fifo_Wait( p_owner->p_fifo );
-
-                /* Update the audio latency after a possible long wait in order
-                 * to update the audio clock as soon as possible. */
-                if( p_owner->dec.fmt_in.i_cat == AUDIO_ES &&
-                    p_owner->p_astream != NULL )
-                    vlc_aout_stream_UpdateLatency( p_owner->p_astream );
-
                 p_owner->b_idle = false;
                 continue;
             }
@@ -1938,6 +1963,7 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
     p_owner->cbs_userdata = cbs_userdata;
     p_owner->p_aout = NULL;
     p_owner->p_astream = NULL;
+    p_owner->b_astream_update_latency = false;
     p_owner->p_vout = NULL;
     p_owner->vout_started = false;
     p_owner->i_spu_channel = VOUT_SPU_CHANNEL_INVALID;
