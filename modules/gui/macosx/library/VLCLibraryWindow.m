@@ -847,6 +847,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _windowFrameBeforePlayback = [self frame];
 }
 
+- (void)setHasActiveVideo:(BOOL)hasActiveVideo
+{
+    [super setHasActiveVideo:hasActiveVideo];
+    hasActiveVideo ? [self enableVideoPlaybackAppearance] : [self disableVideoPlaybackAppearance];
+}
+
 - (void)enableVideoPlaybackAppearance
 {
     [_mediaSourceView removeFromSuperviewWithoutNeedingDisplay];

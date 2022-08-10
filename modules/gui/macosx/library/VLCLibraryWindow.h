@@ -105,8 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCFSPanelController *fspanel;
 
 - (void)videoPlaybackWillBeStarted;
-- (void)enableVideoPlaybackAppearance;
-- (void)disableVideoPlaybackAppearance;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 - (IBAction)shuffleAction:(id)sender;
