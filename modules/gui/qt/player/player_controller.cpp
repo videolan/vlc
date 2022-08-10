@@ -1771,7 +1771,7 @@ void PlayerController::setRecording( bool recording )
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
-    vlc_player_SetRecordingEnabled( d->m_player, recording );
+    vlc_player_SetRecordingEnabled( d->m_player, recording, NULL );
 }
 
 void PlayerController::snapshot()

@@ -1558,14 +1558,14 @@ static int BossCallback(vlc_object_t *p_this,
 - (void)setEnableRecording:(BOOL)enableRecording
 {
     vlc_player_Lock(_p_player);
-    vlc_player_SetRecordingEnabled(_p_player, enableRecording);
+    vlc_player_SetRecordingEnabled(_p_player, enableRecording, NULL);
     vlc_player_Unlock(_p_player);
 }
 
 - (void)toggleRecord
 {
     vlc_player_Lock(_p_player);
-    vlc_player_SetRecordingEnabled(_p_player, !_enableRecording);
+    vlc_player_SetRecordingEnabled(_p_player, !_enableRecording, NULL);
     vlc_player_Unlock(_p_player);
 }
 

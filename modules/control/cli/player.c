@@ -497,7 +497,7 @@ static int PlayerRecord(struct cli_client *cl, const char *const *args,
     }
 
     if (cur_value != new_value)
-        vlc_player_SetRecordingEnabled(player, new_value);
+        vlc_player_SetRecordingEnabled(player, new_value, NULL);
     vlc_player_Unlock(player);
     (void) cl;
     return 0;

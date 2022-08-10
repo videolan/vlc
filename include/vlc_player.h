@@ -861,9 +861,12 @@ vlc_player_IsRecording(vlc_player_t *player);
  *
  * @param player locked player instance
  * @param enabled true to enable recording
+ * @param dir_path path of the recording directory or NULL (use default path),
+ * has only an effect when first enabling recording.
  */
 VLC_API void
-vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enabled);
+vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enabled,
+                               const char *dir_path);
 
 /**
  * Helper to toggle the recording state
@@ -871,7 +874,7 @@ vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enabled);
 static inline void
 vlc_player_ToggleRecording(vlc_player_t *player)
 {
-    vlc_player_SetRecordingEnabled(player, !vlc_player_IsRecording(player));
+    vlc_player_SetRecordingEnabled(player, !vlc_player_IsRecording(player), NULL);
 }
 
 /**

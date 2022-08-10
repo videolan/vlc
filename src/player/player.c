@@ -1617,12 +1617,23 @@ vlc_player_IsRecording(vlc_player_t *player)
 }
 
 void
-vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enable)
+vlc_player_SetRecordingEnabled(vlc_player_t *player, bool enable,
+                               const char *dir_path_)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
-    const input_control_param_t param = { .record_state = { enable, NULL } };
+    char *dir_path;
+    if (dir_path_ != NULL)
+    {
+        dir_path = strdup(dir_path_);
+        if (dir_path == NULL)
+            return;
+    }
+    else
+        dir_path = NULL;
+
+    const input_control_param_t param = { .record_state = { enable, dir_path } };
     int ret = input_ControlPush(input->thread,
                                 INPUT_CONTROL_SET_RECORD_STATE, &param);
 
