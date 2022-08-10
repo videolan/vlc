@@ -57,7 +57,7 @@ FocusScope {
         anchors.fill: parent
         visible: tracklistdisplay_id.model.count === 0
         focus: tracklistdisplay_id.model.count === 0
-        text: I18n.qtr("No tracks found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No tracks found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }

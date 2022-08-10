@@ -370,7 +370,7 @@ FocusScope {
 
         focus: visible
 
-        text: I18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No video found\nPlease try adding sources, by going to the Browse tab")
 
         cover: VLCStyle.noArtVideoCover
 
