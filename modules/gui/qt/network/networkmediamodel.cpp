@@ -617,7 +617,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
             //ML thread
             [mainMrl](vlc_medialibrary_t* ml, Ctx& ctx){
                 auto ret = vlc_ml_is_indexed( ml, qtu(mainMrl.toString( QUrl::FullyEncoded )), &ctx.isIndexed );
-                ctx.succeed = (ret != VLC_SUCCESS);
+                ctx.succeed = (ret == VLC_SUCCESS);
             },
             //UI thread
             [this, mainMrl](quint64, Ctx& ctx){
