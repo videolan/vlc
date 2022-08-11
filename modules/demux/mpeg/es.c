@@ -897,14 +897,19 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
         {
             if( !p_sys->p_es )
             {
-                p_packetizer->fmt_out.b_packetized = true;
-                p_packetizer->fmt_out.i_id = 0;
-                p_sys->p_es = es_out_Add( p_demux->out, &p_packetizer->fmt_out);
+                es_format_t fmt;
+                es_format_Init( &fmt, p_packetizer->fmt_out.i_cat, p_packetizer->fmt_out.i_codec );
+                es_format_Copy( &fmt, &p_packetizer->fmt_out );
 
+                fmt.b_packetized = true;
+                fmt.i_id = 0;
+                p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
                 /* Use the bitrate as initual value */
                 if( p_sys->b_estimate_bitrate )
-                    p_sys->i_bitrate = p_packetizer->fmt_out.i_bitrate;
+                    p_sys->i_bitrate = fmt.i_bitrate;
+
+                es_format_Clean( &fmt );
             }
 
             block_t *p_next = p_block_out->p_next;
