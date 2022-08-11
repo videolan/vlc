@@ -345,6 +345,7 @@ static int Open (filter_t *filter)
                 default:
                     return VLC_EGENERIC;
             }
+            break;
 
         case VLC_CODEC_UYVY:
             switch (filter->fmt_out.video.i_chroma)
@@ -355,6 +356,7 @@ static int Open (filter_t *filter)
                 default:
                     return VLC_EGENERIC;
             }
+            break;
 
         case VLC_CODEC_YVYU:
             switch (filter->fmt_out.video.i_chroma)
@@ -365,7 +367,7 @@ static int Open (filter_t *filter)
                 default:
                     return VLC_EGENERIC;
             }
-
+            break;
 
         case VLC_CODEC_VYUY:
             switch (filter->fmt_out.video.i_chroma)
@@ -376,6 +378,7 @@ static int Open (filter_t *filter)
                 default:
                     return VLC_EGENERIC;
             }
+            break;
 
         default:
             return VLC_EGENERIC;
