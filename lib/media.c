@@ -762,7 +762,7 @@ libvlc_media_event_manager( libvlc_media_t * p_md )
 }
 
 // Get duration of media object (in ms)
-int64_t
+libvlc_time_t
 libvlc_media_get_duration( libvlc_media_t * p_md )
 {
     assert( p_md );
