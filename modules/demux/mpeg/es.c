@@ -156,6 +156,13 @@ struct xing_info_s
         XING_MODE_CBR_2PASS = 8,
         XING_MODE_ABR_2PASS = 9,
     } brmode;
+    enum
+    {
+        XING_AUDIOMODE_UNKNOWN    = 0,
+        XING_AUDIOMODE_DPL        = 1,
+        XING_AUDIOMODE_DPL2       = 2,
+        XING_AUDIOMODE_AMBISONICS = 3,
+    } audiomode;
     uint8_t  bitrate_avg;
     uint16_t i_delay_samples;
     uint16_t i_padding_samples;
@@ -234,6 +241,7 @@ static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xi
     xing->bitrate_avg = (p_fixed[20] != 0xFF) ? p_fixed[20] : 0; /* clipped to 255, so it's unknown from there */
     xing->i_delay_samples = (p_fixed[21] << 4) | (p_fixed[22] >> 4); /* upper 12bits */
     xing->i_padding_samples = ((p_fixed[22] & 0x0F) << 8) | p_fixed[23]; /* lower 12bits */
+    xing->audiomode = (p_fixed[26] >> 3) & 0x07; /* over 16bits, 2b unused / 3b mode / 11b preset */
     xing->i_music_length  = GetDWBE( &p_fixed[28] );
 
     return VLC_SUCCESS;
@@ -900,6 +908,15 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
                 es_format_t fmt;
                 es_format_Init( &fmt, p_packetizer->fmt_out.i_cat, p_packetizer->fmt_out.i_codec );
                 es_format_Copy( &fmt, &p_packetizer->fmt_out );
+
+                switch( p_sys->xing.audiomode )
+                {
+                    case XING_AUDIOMODE_AMBISONICS:
+                        fmt.audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
+                        break;
+                    default:
+                        break;
+                }
 
                 fmt.b_packetized = true;
                 fmt.i_id = 0;
