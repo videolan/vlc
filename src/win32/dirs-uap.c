@@ -152,7 +152,7 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
         return dir;
 
     char *path;
-    if (unlikely(asprintf(&path, "%s/%s", dir, filename) == -1))
+    if (unlikely(asprintf(&path, "%s\\%s", dir, filename) == -1))
         path = NULL;
     free(dir);
     return path;
