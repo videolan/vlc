@@ -2671,19 +2671,19 @@ typedef struct libvlc_media_player_time_point_t
     double position;
     /** Rate of the player */
     double rate;
-    /** Valid time >= 0 or -1 */
-    libvlc_time_t ts;
-    /** Valid length >= 1 or 0 */
-    libvlc_time_t length;
+    /** Valid time, in us >= 0 or -1 */
+    int64_t ts_us;
+    /** Valid length, in us >= 1 or 0 */
+    int64_t length_us;
     /**
-     * System date of this record (always valid).
+     * System date, in us, of this record (always valid).
      * Based on libvlc_clock(). This date can be in the future or in the past.
      * The special value of INT64_MAX mean that the clock was paused when this
      * point was updated. In that case,
      * libvlc_media_player_time_point_interpolate() will return the current
      * ts/pos of this point (there is nothing to interpolate).
      * */
-    libvlc_time_t system_date;
+    int64_t system_date_us;
 } libvlc_media_player_time_point_t;
 
 /**
@@ -2715,13 +2715,13 @@ typedef void (*libvlc_media_player_watch_time_on_update)(
  *
  * \warning It is forbidden to call any Media Player functions from here.
  *
- * \param system_date system date of this event, only valid (> 0) when paused. It
- * can be used to interpolate the last updated point to this date in order
- * to get the last paused ts/position.
+ * \param system_date_us system date, in us, of this event, only valid (> 0)
+ * when paused. It can be used to interpolate the last updated point to this
+ * date in order to get the last paused ts/position.
  * \param data opaque pointer set by libvlc_media_player_watch_time()
  */
 typedef void (*libvlc_media_player_watch_time_on_discontinuity)(
-        libvlc_time_t system_date, void *data);
+        int64_t system_date_us, void *data);
 
 /**
  * Watch for times updates
@@ -2731,9 +2731,9 @@ typedef void (*libvlc_media_player_watch_time_on_discontinuity)(
  * in-between) will fail.
  *
  * \param p_mi the media player
- * \param min_period corresponds to the minimum period between each updates,
- * use it to avoid flood from too many source updates, set it to 0 to receive
- * all updates.
+ * \param min_period_us corresponds to the minimum period, in us, between each
+ * updates, use it to avoid flood from too many source updates, set it to 0 to
+ * receive all updates.
  * \param on_update callback to listen to update events (must not be NULL)
  * \param on_discontinuity callback to listen to discontinuity events (can be
  * be NULL)
@@ -2743,7 +2743,7 @@ typedef void (*libvlc_media_player_watch_time_on_discontinuity)(
  */
 LIBVLC_API int
 libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
-                               libvlc_time_t min_period,
+                               int64_t min_period_us,
                                libvlc_media_player_watch_time_on_update on_update,
                                libvlc_media_player_watch_time_on_discontinuity on_discontinuity,
                                void *cbs_data);
@@ -2762,9 +2762,8 @@ libvlc_media_player_unwatch_time(libvlc_media_player_t *p_mi);
 
  * \param point time update obtained via the
  * libvlc_media_player_watch_time_on_update() callback
- * \param system_now current system date, returned by libvlc_clock()
- * \param out_ts pointer where to set the interpolated ts, subtract this time
- * with VLC_TICK_0 to get the original value.
+ * \param system_now_us current system date, in us, returned by libvlc_clock()
+ * \param out_ts_us pointer where to set the interpolated ts, in us
  * \param out_pos pointer where to set the interpolated position
  * \return 0 in case of success, -1 if the interpolated ts is negative (could
  * happen during the buffering step)
@@ -2772,8 +2771,8 @@ libvlc_media_player_unwatch_time(libvlc_media_player_t *p_mi);
  */
 LIBVLC_API int
 libvlc_media_player_time_point_interpolate(const libvlc_media_player_time_point_t *point,
-                                           libvlc_time_t system_now,
-                                           libvlc_time_t *out_ts, double *out_pos);
+                                           int64_t system_now_us,
+                                           int64_t *out_ts_us, double *out_pos);
 
 /**
  * Get the date of the next interval
@@ -2787,20 +2786,20 @@ libvlc_media_player_time_point_interpolate(const libvlc_media_player_time_point_
  *
  * \param point time update obtained via the
  * libvlc_media_player_watch_time_on_update()
- * \param system_now same system date used by
+ * \param system_now_us same system date used by
  * libvlc_media_player_time_point_interpolate()
- * \param interpolated_ts ts returned by
+ * \param interpolated_ts_us ts returned by
  * libvlc_media_player_time_point_interpolate()
- * \param next_interval next interval
- * \return the absolute system date of the next interval, use libvlc_delay() to
- * get a relative delay.
+ * \param next_interval_us next interval, in us
+ * \return the absolute system date, in us,  of the next interval,
+ * use libvlc_delay() to get a relative delay.
  * \version LibVLC 4.0.0 or later
  */
-LIBVLC_API libvlc_time_t
+LIBVLC_API int64_t
 libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_point_t *point,
-                                             libvlc_time_t system_now,
-                                             libvlc_time_t interpolated_ts,
-                                             libvlc_time_t next_interval);
+                                             int64_t system_now_us,
+                                             int64_t interpolated_ts_us,
+                                             int64_t next_interval_us);
 
 /** @} libvlc_media_player_watch_time */
 

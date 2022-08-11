@@ -2212,17 +2212,17 @@ int libvlc_media_player_get_role(libvlc_media_player_t *mp)
 #define PLAYER_TIME_CORE_TO_LIB(point) { \
     .position = point->position, \
     .rate = point->rate, \
-    .ts = US_FROM_VLC_TICK(point->ts), \
-    .length = US_FROM_VLC_TICK(point->length), \
-    .system_date = US_FROM_VLC_TICK(point->system_date), \
+    .ts_us = US_FROM_VLC_TICK(point->ts), \
+    .length_us = US_FROM_VLC_TICK(point->length), \
+    .system_date_us = US_FROM_VLC_TICK(point->system_date), \
 }
 
 #define PLAYER_TIME_LIB_TO_CORE(point) { \
     .position = point->position, \
     .rate = point->rate, \
-    .ts = VLC_TICK_FROM_US(point->ts), \
-    .length = VLC_TICK_FROM_US(point->length), \
-    .system_date = VLC_TICK_FROM_US(point->system_date), \
+    .ts = VLC_TICK_FROM_US(point->ts_us), \
+    .length = VLC_TICK_FROM_US(point->length_us), \
+    .system_date = VLC_TICK_FROM_US(point->system_date_us), \
 }
 
 static void player_timer_on_update(const struct vlc_player_timer_point *point,
@@ -2242,12 +2242,13 @@ static void player_timer_on_discontinuity(vlc_tick_t system_date, void *data)
     if (p_mi->timer.on_discontinuity == NULL)
         return;
 
-    p_mi->timer.on_discontinuity(system_date, p_mi->timer.cbs_data);
+    p_mi->timer.on_discontinuity(US_FROM_VLC_TICK(system_date),
+                                 p_mi->timer.cbs_data);
 }
 
 int
 libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
-                               libvlc_time_t min_period,
+                               int64_t min_period_us,
                                libvlc_media_player_watch_time_on_update on_update,
                                libvlc_media_player_watch_time_on_discontinuity on_discontinuity,
                                void *cbs_data)
@@ -2274,7 +2275,8 @@ libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
     p_mi->timer.on_discontinuity = on_discontinuity;
     p_mi->timer.cbs_data = cbs_data;
 
-    p_mi->timer.id = vlc_player_AddTimer(player, min_period, &player_timer_cbs, p_mi);
+    p_mi->timer.id = vlc_player_AddTimer(player, VLC_TICK_FROM_US(min_period_us),
+                                         &player_timer_cbs, p_mi);
     vlc_player_Unlock(player);
 
     if (unlikely(p_mi->timer.id == NULL))
@@ -2299,24 +2301,33 @@ libvlc_media_player_unwatch_time(libvlc_media_player_t *p_mi)
 
 int
 libvlc_media_player_time_point_interpolate(const libvlc_media_player_time_point_t *libpoint,
-                                           libvlc_time_t system_now,
-                                           libvlc_time_t *out_ts, double *out_pos)
+                                           int64_t system_now_us,
+                                           int64_t *out_ts_us, double *out_pos)
 {
     const struct vlc_player_timer_point point = PLAYER_TIME_LIB_TO_CORE(libpoint);
 
-    return vlc_player_timer_point_Interpolate(&point, system_now, out_ts, out_pos);
+    vlc_tick_t out_ts;
+    int ret = vlc_player_timer_point_Interpolate(&point,
+                                                 VLC_TICK_FROM_US(system_now_us),
+                                                 &out_ts, out_pos);
+    *out_ts_us = US_FROM_VLC_TICK(out_ts);
+    return ret;
 }
 
-libvlc_time_t
+int64_t
 libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_point_t *libpoint,
-                                             libvlc_time_t system_now,
-                                             libvlc_time_t interpolated_ts,
-                                             libvlc_time_t next_interval)
+                                             int64_t system_now_us,
+                                             int64_t interpolated_ts_us,
+                                             int64_t next_interval_us)
 {
     const struct vlc_player_timer_point point = PLAYER_TIME_LIB_TO_CORE(libpoint);
 
-    return vlc_player_timer_point_GetNextIntervalDate(&point, system_now,
-                                                      interpolated_ts, next_interval);
+    vlc_tick_t date =
+        vlc_player_timer_point_GetNextIntervalDate(&point,
+                                                   VLC_TICK_FROM_US(system_now_us),
+                                                   VLC_TICK_FROM_US(interpolated_ts_us),
+                                                   VLC_TICK_FROM_US(next_interval_us));
+    return US_FROM_VLC_TICK(date);
 }
 
 #include <vlc_vout_display.h>
