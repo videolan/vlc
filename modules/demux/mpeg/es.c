@@ -901,17 +901,7 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
                 p_packetizer->fmt_out.i_id = 0;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_packetizer->fmt_out);
 
-                /* Try the xing header */
-                if( p_sys->xing.i_bytes && p_sys->xing.i_frames &&
-                    p_sys->mpgah.i_samples_per_frame )
-                {
-                    p_sys->i_bitrate = p_sys->xing.i_bytes * INT64_C(8) *
-                        p_packetizer->fmt_out.audio.i_rate /
-                        p_sys->xing.i_frames / p_sys->mpgah.i_samples_per_frame;
 
-                    if( p_sys->i_bitrate > 0 )
-                        p_sys->b_estimate_bitrate = false;
-                }
                 /* Use the bitrate as initual value */
                 if( p_sys->b_estimate_bitrate )
                     p_sys->i_bitrate = p_packetizer->fmt_out.i_bitrate;
@@ -1384,6 +1374,24 @@ static int MpgaInit( demux_t *p_demux )
                 p_sys->i_duration = vlc_tick_from_samples( i_total_samples - i_dropped_samples,
                                                            p_sys->mpgah.i_sample_rate );
             }
+        }
+
+        unsigned i_bitrate = 0;
+        if( xing->brmode == XING_MODE_ABR || xing->brmode == XING_MODE_ABR_2PASS )
+            i_bitrate = xing->bitrate_avg * 1000;
+
+        if( !i_bitrate && p_sys->mpgah.i_sample_rate &&
+            xing->i_bytes > p_sys->mpgah.i_frame_size )
+        {
+            unsigned d = vlc_tick_from_samples( i_total_samples, p_sys->mpgah.i_sample_rate );
+            if( d )
+                i_bitrate = (xing->i_bytes - p_sys->mpgah.i_frame_size) * 8 * CLOCK_FREQ / d;
+        }
+
+        if( i_bitrate )
+        {
+            p_sys->i_bitrate = i_bitrate;
+            p_sys->b_estimate_bitrate = false;
         }
 
         p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = xing->f_peak_signal;
