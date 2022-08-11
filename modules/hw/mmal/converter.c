@@ -141,7 +141,7 @@ static void pic_fifo_put(vlc_picture_chain_t * const pf, picture_t * pic)
 
 typedef struct conv_frame_stash_s
 {
-    mtime_t pts;
+    vlc_tick_t pts;
     MMAL_BUFFER_HEADER_T * sub_bufs[SUBS_MAX];
 } conv_frame_stash_t;
 
