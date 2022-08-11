@@ -105,7 +105,7 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     aout_sys_t *sys = aout->sys;
 
     vlc_mutex_lock(&sys->lock);
-    sys->play(sys->opaque, block->p_buffer, block->i_nb_samples, date);
+    sys->play(sys->opaque, block->p_buffer, block->i_nb_samples, US_FROM_VLC_TICK(date));
     vlc_mutex_unlock(&sys->lock);
     block_Release (block);
 }
