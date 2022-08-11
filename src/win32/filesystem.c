@@ -216,7 +216,12 @@ vlc_DIR *vlc_opendir (const char *dirname)
         // Prepending the string "\\?\" does not allow access to the root directory.
         res = asprintf(&wildcard, "%s\\*", dirname);
     else
-        res = asprintf(&wildcard, "\\\\?\\%s\\*", dirname);
+    {
+        if (dirname[strlen(dirname)-1] == '\\')
+            res = asprintf(&wildcard, "\\\\?\\%s*", dirname);
+        else
+            res = asprintf(&wildcard, "\\\\?\\%s\\*", dirname);
+    }
     if (res < 0)
     {
         free (p_dir);
