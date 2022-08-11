@@ -44,7 +44,6 @@ struct timespec;
  * arithmetic operators, and that no special functions are required.
  */
 typedef int64_t vlc_tick_t;
-typedef vlc_tick_t mtime_t; /* deprecated, use vlc_tick_t */
 
 #define VLC_TICK_MIN INT64_MIN
 #define VLC_TICK_MAX INT64_MAX
