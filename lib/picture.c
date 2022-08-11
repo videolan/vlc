@@ -26,6 +26,7 @@
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
+#include "libvlc_internal.h"
 
 #include <vlc_atomic.h>
 #include <vlc_picture.h>
@@ -62,7 +63,7 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
         return NULL;
     vlc_atomic_rc_init( &pic->rc );
     pic->type = type;
-    pic->time = MS_FROM_VLC_TICK( input->date );
+    pic->time = from_mtime( input->date );
     pic->attachment = NULL;
     vlc_fourcc_t format;
     switch ( type )
