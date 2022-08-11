@@ -681,13 +681,9 @@ void vout_ChangeIccProfile(vout_thread_t *vout,
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
-    vlc_mutex_lock(&sys->window_lock);
+    vlc_queuedmutex_lock(&sys->display_lock);
     free(sys->display_cfg.icc_profile);
     sys->display_cfg.icc_profile = profile;
-
-    vlc_queuedmutex_lock(&sys->display_lock);
-    vlc_mutex_unlock(&sys->window_lock);
-
     if (sys->display != NULL)
         vout_SetDisplayIccProfile(sys->display, profile);
     vlc_queuedmutex_unlock(&sys->display_lock);
