@@ -889,25 +889,24 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
     }
     p_sys->b_initial_sync_failed = p_sys->b_start; /* Only try to resync once */
 
-    while( ( p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, p_block_in ? &p_block_in : NULL ) ) )
+    decoder_t *p_packetizer = p_sys->p_packetizer;
+    while( ( p_block_out = p_packetizer->pf_packetize( p_packetizer, p_block_in ? &p_block_in : NULL ) ) )
     {
         p_sys->b_initial_sync_failed = false;
         while( p_block_out )
         {
             if( !p_sys->p_es )
             {
-                p_sys->p_packetizer->fmt_out.b_packetized = true;
-                p_sys->p_packetizer->fmt_out.i_id = 0;
-                p_sys->p_es = es_out_Add( p_demux->out,
-                                          &p_sys->p_packetizer->fmt_out);
-
+                p_packetizer->fmt_out.b_packetized = true;
+                p_packetizer->fmt_out.i_id = 0;
+                p_sys->p_es = es_out_Add( p_demux->out, &p_packetizer->fmt_out);
 
                 /* Try the xing header */
                 if( p_sys->xing.i_bytes && p_sys->xing.i_frames &&
                     p_sys->mpgah.i_samples_per_frame )
                 {
                     p_sys->i_bitrate = p_sys->xing.i_bytes * INT64_C(8) *
-                        p_sys->p_packetizer->fmt_out.audio.i_rate /
+                        p_packetizer->fmt_out.audio.i_rate /
                         p_sys->xing.i_frames / p_sys->mpgah.i_samples_per_frame;
 
                     if( p_sys->i_bitrate > 0 )
@@ -915,7 +914,7 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
                 }
                 /* Use the bitrate as initual value */
                 if( p_sys->b_estimate_bitrate )
-                    p_sys->i_bitrate = p_sys->p_packetizer->fmt_out.i_bitrate;
+                    p_sys->i_bitrate = p_packetizer->fmt_out.i_bitrate;
             }
 
             block_t *p_next = p_block_out->p_next;
