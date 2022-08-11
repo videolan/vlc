@@ -168,10 +168,22 @@ static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xi
 
     vlc_fourcc_t infotag = VLC_FOURCC(p_buf[0], p_buf[1], p_buf[2], p_buf[3]);
 
+    /* L3Enc VBR info */
+    if( infotag == VLC_FOURCC('V','B','R','I') )
+    {
+        if( GetWBE( &p_buf[4] ) != 0x0001 )
+            return VLC_EGENERIC;
+        xing->i_bytes = GetDWBE( &p_buf[10] );
+        xing->i_frames = GetDWBE( &p_buf[14] );
+        xing->infotag = infotag;
+        return VLC_SUCCESS;
+    }
     /* Xing VBR/CBR tags */
-    if( infotag != VLC_FOURCC('X','i','n','g') &&
-        infotag != VLC_FOURCC('I','n','f','o') )
+    else if( infotag != VLC_FOURCC('X','i','n','g') &&
+             infotag != VLC_FOURCC('I','n','f','o') )
+    {
         return VLC_EGENERIC;
+    }
 
     xing->infotag = infotag;
 
