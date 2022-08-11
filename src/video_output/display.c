@@ -634,6 +634,7 @@ void vout_SetDisplayIccProfile(vout_display_t *vd,
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
+    osys->cfg.icc_profile = (vlc_icc_profile_t *) profile;
     if (vd->ops->set_icc_profile)
         vd->ops->set_icc_profile(vd, profile);
 }

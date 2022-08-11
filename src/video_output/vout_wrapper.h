@@ -39,6 +39,9 @@ void vout_SetDisplayZoom(vout_display_t *, unsigned num, unsigned den);
 void vout_SetDisplayAspect(vout_display_t *, unsigned num, unsigned den);
 void vout_SetDisplayCrop(vout_display_t *, const struct vout_crop *);
 void vout_SetDisplayViewpoint(vout_display_t *, const vlc_viewpoint_t *);
+
+/* The owner/caller is responsible for managing the lifetime of this ICC
+ * profile and always updating the display state to a consistent value */
 void vout_SetDisplayIccProfile(vout_display_t *, const vlc_icc_profile_t *);
 
 #endif /* LIBVLC_VOUT_WRAPPER_H */
