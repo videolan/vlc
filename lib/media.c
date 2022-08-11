@@ -1013,11 +1013,11 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
     req->crop = crop;
     libvlc_media_retain( md );
     req->req = vlc_thumbnailer_RequestByTime( p_priv->p_thumbnailer,
-        VLC_TICK_FROM_MS( time ),
+        to_mtime( time ),
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
-        timeout > 0 ? VLC_TICK_FROM_MS( timeout ) : VLC_TICK_INVALID,
+        timeout > 0 ? to_mtime( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
     if ( req->req == NULL )
     {
@@ -1059,7 +1059,7 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
-        timeout > 0 ? VLC_TICK_FROM_MS( timeout ) : VLC_TICK_INVALID,
+        timeout > 0 ? to_mtime( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
     if ( req->req == NULL )
     {
