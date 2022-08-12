@@ -32,6 +32,7 @@ PLUGIN_LIST=(
     avcodec
     audiotoolboxmidi
     videotoolbox
+    subsdec
 
 # Demux
     avformat
