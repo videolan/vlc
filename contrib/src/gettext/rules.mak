@@ -18,6 +18,7 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
 	$(APPLY) $(SRC)/gettext/gettext-0.21-disable-libtextstyle.patch
+	$(APPLY) $(SRC)/gettext/obstack-func-ptr.patch
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv) libxml2 $(DEPS_libxml2)

@@ -1,0 +1,22 @@
+--- gettext/gettext-tools/libgettextpo/obstack.c.orig	2022-08-12 11:05:36.109187107 +0300
++++ gettext/gettext-tools/libgettextpo/obstack.c	2022-08-12 11:05:47.220954747 +0300
+@@ -326,7 +326,7 @@
+ #   include <libio/iolibio.h>
+ #  endif
+ 
+-static _Noreturn void
++static __attribute_noreturn__ void
+ print_and_abort (void)
+ {
+   /* Don't change any of these strings.  Yes, it would be possible to add
+--- gettext/gettext-tools/gnulib-lib/obstack.c.orig	2022-08-12 11:04:11.938947065 +0300
++++ gettext/gettext-tools/gnulib-lib/obstack.c	2022-08-12 11:04:19.682785156 +0300
+@@ -326,7 +326,7 @@
+ #   include <libio/iolibio.h>
+ #  endif
+ 
+-static _Noreturn void
++static __attribute_noreturn__ void
+ print_and_abort (void)
+ {
+   /* Don't change any of these strings.  Yes, it would be possible to add
