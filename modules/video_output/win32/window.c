@@ -56,6 +56,7 @@ typedef struct vout_window_sys_t
 
     HWND hwnd;
 
+    HMONITOR monitor; /* last monitor associated with window */
     WCHAR class_main[256];
     HICON vlc_icon;
 
@@ -242,6 +243,12 @@ static void MouseReleased( vlc_window_t *wnd, unsigned button )
     vlc_window_ReportMouseReleased(wnd, button);
 }
 
+static void MonitorChanged(vlc_window_t *wnd, HMONITOR monitor)
+{
+    (void) wnd;
+    (void) monitor;
+}
+
 
 static struct
 {
@@ -363,6 +370,23 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
         break;
     case WM_NCMOUSEMOVE:
         break;
+
+    case WM_DISPLAYCHANGE:
+    {
+        vout_window_sys_t *sys = wnd->sys;
+        sys->monitor = NULL;
+    }
+    /* fall through */
+    case WM_MOVE:
+    {
+        vout_window_sys_t *sys = wnd->sys;
+        HMONITOR hmon = MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST);
+        if (hmon != sys->monitor) {
+            sys->monitor = hmon;
+            MonitorChanged(wnd, hmon);
+        }
+        break;
+    }
 
     case WM_CAPTURECHANGED:
     {
@@ -642,6 +666,10 @@ static void *EventThread( void *p_this )
         vlc_restorecancel( canc );
         return NULL;
     }
+
+    /* Detect starting monitor */
+    sys->monitor = MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTOPRIMARY);
+    MonitorChanged(wnd, sys->monitor);
 
     /* Append a "Always On Top" entry in the system menu */
     HMENU hMenu = GetSystemMenu( sys->hwnd, FALSE );
