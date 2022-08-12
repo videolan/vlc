@@ -363,6 +363,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         /* fallthrough */
 
     case STATE_HEADER:
+    {
         /* Get FLAC frame header (MAX_FLAC_HEADER_SIZE bytes) */
         if (block_PeekBytes(&p_sys->bytestream, p_header, FLAC_HEADER_SIZE_MAX))
             return NULL; /* Need more data */
@@ -391,6 +392,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
          * The confusing part below is that sync code needs to be verified in case
          * it would appear in data, so we also need to check next frame header CRC
          */
+    }
         /* fallthrough */
 
     case STATE_NEXT_SYNC:
