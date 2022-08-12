@@ -156,8 +156,7 @@ void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostActio
 
 void NavigationHistory::update(QVariantMap item)
 {
-    int length = m_history.length();
-    assert(length >= 1);
+    assert(m_history.size() >= 1);
     m_history.back() = item;
     updateViewPath();
 }
