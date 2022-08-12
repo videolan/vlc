@@ -251,16 +251,16 @@ typedef struct
 
     vlc_tick_t  i_pts;
     vlc_tick_t  i_time_offset;
-    int64_t     i_bytes;
+    uint64_t    i_bytes;
 
     bool        b_big_endian;
     bool        b_estimate_bitrate;
-    int         i_bitrate;  /* extracted from Xing header */
+    unsigned    i_bitrate;  /* extracted from Xing header */
     vlc_tick_t  i_duration;
 
     bool b_initial_sync_failed;
 
-    int i_packet_size;
+    unsigned i_packet_size;
 
     uint64_t i_stream_offset;
     unsigned i_demux_flags;
