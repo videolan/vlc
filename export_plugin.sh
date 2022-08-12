@@ -85,6 +85,9 @@ PLUGIN_LIST=(
 # Video output plugins
     glconv_cvpx
     vout_ios
+
+# Text renderer
+    freetype
 )
 
 function should_copy_plugin()
