@@ -252,6 +252,7 @@ endif
 
 libwin32_window_plugin_la_SOURCES = video_output/win32/window.c \
 	video_output/wasync_resize_compressor.h
+libwin32_window_plugin_la_LIBADD = -lgdi32
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libwin32_window_plugin.la
 endif

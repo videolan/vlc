@@ -33,6 +33,8 @@
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
+#include <vlc_es.h>
+#include <vlc_frame.h>
 #include <vlc_plugin.h>
 #include <vlc_window.h>
 #include <vlc_mouse.h>
@@ -59,6 +61,9 @@ typedef struct vout_window_sys_t
     HMONITOR monitor; /* last monitor associated with window */
     WCHAR class_main[256];
     HICON vlc_icon;
+
+    /* icc profile */
+    char *icc_profile;
 
     /* mouse */
     unsigned button_pressed;
@@ -243,10 +248,76 @@ static void MouseReleased( vlc_window_t *wnd, unsigned button )
     vlc_window_ReportMouseReleased(wnd, button);
 }
 
+#define MAX_ICC_FILE_SIZE  (100*1024*1024)
+
+static void UpdateICCProfile(vlc_window_t *wnd, const wchar_t *pathw)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    vlc_icc_profile_t *icc = NULL;
+
+    if (!pathw) {
+        /* Profile cleared */
+        if (sys->icc_profile) {
+            free(sys->icc_profile);
+            sys->icc_profile = NULL;
+            vlc_window_ReportICCProfile(wnd, NULL);
+        }
+        return;
+    }
+
+    char *path = FromWide(pathw);
+    if (!path)
+        goto error;
+
+    if (sys->icc_profile && strcmp(path, sys->icc_profile) == 0) {
+        /* No change to profile */
+        free(path);
+        return;
+    }
+
+    free(sys->icc_profile);
+    sys->icc_profile = path;
+
+    /* Open ICC profile */
+    vlc_frame_t *frame = vlc_frame_FilePath(path, false);
+    if (!frame)
+        goto error;
+    vlc_frame_cleanup_push(frame);
+
+    icc = malloc(sizeof(*icc) + frame->i_buffer);
+    if (!icc)
+        goto error;
+
+    icc->size = frame->i_buffer;
+    memcpy(icc->data, frame->p_buffer, icc->size);
+    /* fall through */
+
+error:
+    if (!icc)
+        msg_Err(wnd, "Failed to open ICC profile: %s", path ? path : "(unknown)");
+
+    vlc_cleanup_pop();
+    vlc_window_ReportICCProfile(wnd, icc);
+}
+
 static void MonitorChanged(vlc_window_t *wnd, HMONITOR monitor)
 {
-    (void) wnd;
-    (void) monitor;
+    MONITORINFOEXW mi = { .cbSize = sizeof(mi) };
+    GetMonitorInfoW(monitor, (LPMONITORINFO) &mi);
+
+    /* Try updating ICC profile */
+    HDC ic = CreateICW(mi.szDevice, NULL, NULL, NULL);
+    if (!ic)
+        return;
+
+    wchar_t iccw[MAX_PATH];
+    if (GetICMProfileW(ic, &(DWORD){ sizeof(iccw) }, iccw)) {
+        UpdateICCProfile(wnd, iccw);
+    } else {
+        UpdateICCProfile(wnd, NULL);
+    }
+
+    DeleteDC(ic);
 }
 
 
