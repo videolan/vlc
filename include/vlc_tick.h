@@ -6,8 +6,6 @@
  * functions like gettimeofday() and ftime() are not always supported.
  * Most functions are declared as inline or as macros since they are only
  * interfaces to system calls and have to be called frequently.
- * 'm' stands for 'micro', since maximum resolution is the microsecond.
- * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VLC authors and VideoLAN
  *
