@@ -51,7 +51,7 @@ struct error_messages_s
     const char * const psz_error;
 };
 
-static const struct error_messages_s const b25_errors[] =
+static const struct error_messages_s b25_errors[] =
 {
     { ARIB_STD_B25_ERROR_INVALID_PARAM, "Invalid parameter" },
     { ARIB_STD_B25_ERROR_NO_ENOUGH_MEMORY , "Not enough memory" },
@@ -72,7 +72,7 @@ static const struct error_messages_s const b25_errors[] =
     { 0, NULL },
 };
 
-static const struct error_messages_s const bcas_errors[] =
+static const struct error_messages_s bcas_errors[] =
 {
     { B_CAS_CARD_ERROR_INVALID_PARAMETER, "Invalid parameter" },
     { B_CAS_CARD_ERROR_NOT_INITIALIZED, "Card not initialized" },
@@ -96,7 +96,7 @@ typedef struct
 } stream_sys_t;
 
 static const char * GetErrorMessage( const int i_error,
-                               const struct error_messages_s const *p_errors_messages )
+                               const struct error_messages_s *p_errors_messages )
 {
     int i = 0;
     while( p_errors_messages[i].psz_error )
