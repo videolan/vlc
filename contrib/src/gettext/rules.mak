@@ -17,6 +17,7 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(APPLY) $(SRC)/gettext/gettext-0.21-disable-libtextstyle.patch
+	$(APPLY) $(SRC)/gettext/obstack-func-ptr.patch
 	$(MOVE)
 
 DEPS_gettext = iconv $(DEPS_iconv) libxml2 $(DEPS_libxml2)
