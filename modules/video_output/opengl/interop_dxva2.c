@@ -220,18 +220,17 @@ GLConvClose(vlc_object_t *obj)
 static void SetupProcessorInput(struct vlc_gl_interop *interop, const video_format_t *fmt, D3DFORMAT src_format)
 {
     struct glpriv *sys = interop->priv;
-    HRESULT hr;
     DXVAHD_STREAM_STATE_D3DFORMAT_DATA d3dformat = { src_format };
-    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_D3DFORMAT, sizeof(d3dformat), &d3dformat );
+    IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_D3DFORMAT, sizeof(d3dformat), &d3dformat );
 
     DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA frame_format = { DXVAHD_FRAME_FORMAT_PROGRESSIVE };
-    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_FRAME_FORMAT, sizeof(frame_format), &frame_format );
+    IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_FRAME_FORMAT, sizeof(frame_format), &frame_format );
 
     DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA colorspace = { 0 };
     colorspace.RGB_Range = fmt->color_range == COLOR_RANGE_FULL ? 0 : 1;
     colorspace.YCbCr_xvYCC = fmt->color_range == COLOR_RANGE_FULL ? 1 : 0;
     colorspace.YCbCr_Matrix = fmt->space == COLOR_SPACE_BT601 ? 0 : 1;
-    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE, sizeof(colorspace), &colorspace );
+    IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE, sizeof(colorspace), &colorspace );
 
     DXVAHD_STREAM_STATE_SOURCE_RECT_DATA srcRect;
     srcRect.Enable = TRUE;
@@ -241,7 +240,7 @@ static void SetupProcessorInput(struct vlc_gl_interop *interop, const video_form
         .top    = interop->fmt_in.i_y_offset,
         .bottom = interop->fmt_in.i_y_offset + interop->fmt_in.i_visible_height,
     };;
-    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
+    IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
 
     DXVAHD_BLT_STATE_TARGET_RECT_DATA dstRect;
     dstRect.Enable = TRUE;
@@ -251,7 +250,7 @@ static void SetupProcessorInput(struct vlc_gl_interop *interop, const video_form
         .top    = 0,
         .bottom = interop->fmt_in.i_visible_height,
     };
-    hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_TARGET_RECT, sizeof(dstRect), &dstRect);
+    IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_TARGET_RECT, sizeof(dstRect), &dstRect);
 }
 
 static void GetFrameRate(DXVAHD_RATIONAL *r, const video_format_t *fmt)
