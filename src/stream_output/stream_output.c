@@ -755,8 +755,10 @@ int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args)
 static void sout_StreamDelete( sout_stream_t *p_stream )
 {
     struct sout_stream_private *priv = sout_stream_priv(p_stream);
+    char *psz_name = p_stream->psz_name;
 
-    msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
+    msg_Dbg( p_stream, "destroying chain... (name=%s)", psz_name ? psz_name
+                                                                 : "(null)" );
 
     if (priv->module != NULL)
         module_unneed(p_stream, priv->module);
