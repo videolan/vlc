@@ -136,13 +136,13 @@ class adaptive::http::LibVLCHTTPSource : public adaptive::AbstractSource
             {
                 if(range.getEndByte() > 0)
                 {
-                    if (vlc_http_msg_add_header(req, "Range", "bytes=%" PRIuMAX "-%" PRIuMAX,
+                    if (vlc_http_msg_add_header(req, "Range", "bytes=%zu-%zu",
                                                 range.getStartByte(), range.getEndByte()))
                         return -1;
                 }
                 else
                 {
-                    if (vlc_http_msg_add_header(req, "Range", "bytes=%" PRIuMAX "-",
+                    if (vlc_http_msg_add_header(req, "Range", "bytes=%zu-",
                                                 range.getStartByte()))
                         return -1;
                 }
