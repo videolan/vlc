@@ -1282,7 +1282,7 @@ libvlc_time_t libvlc_media_player_get_length(
     vlc_player_Lock(player);
 
     vlc_tick_t length = vlc_player_GetLength(player);
-    libvlc_time_t i_time = from_mtime(length);
+    libvlc_time_t i_time = libvlc_time_from_vlc_tick(length);
 
     vlc_player_Unlock(player);
     return i_time;
@@ -1294,7 +1294,7 @@ libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *p_mi )
     vlc_player_Lock(player);
 
     vlc_tick_t tick = vlc_player_GetTime(player);
-    libvlc_time_t i_time = from_mtime(tick);
+    libvlc_time_t i_time = libvlc_time_from_vlc_tick(tick);
 
     vlc_player_Unlock(player);
     return i_time;
@@ -1303,7 +1303,7 @@ libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *p_mi )
 int libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
                                    libvlc_time_t i_time, bool b_fast )
 {
-    vlc_tick_t tick = to_mtime(i_time);
+    vlc_tick_t tick = vlc_tick_from_libvlc_time(i_time);
 
     vlc_player_t *player = p_mi->player;
     vlc_player_Lock(player);
@@ -1898,7 +1898,7 @@ libvlc_media_player_select_track(libvlc_media_player_t *p_mi,
 
     const libvlc_media_trackpriv_t *trackpriv =
         libvlc_media_track_to_priv(track);
-    
+
     // It must be a player track
     assert(trackpriv->es_id);
 

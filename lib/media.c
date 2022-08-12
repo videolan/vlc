@@ -327,7 +327,7 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
     /* Construct the event */
     event.type = libvlc_MediaDurationChanged;
     event.u.media_duration_changed.new_duration =
-        from_mtime(p_event->u.input_item_duration_changed.new_duration);
+        libvlc_time_from_vlc_tick(p_event->u.input_item_duration_changed.new_duration);
 
     /* Send the event */
     libvlc_event_send( &p_md->event_manager, &event );
@@ -776,7 +776,7 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
     if (!input_item_IsPreparsed( p_md->p_input_item ))
         return -1;
 
-    return from_mtime(input_item_GetDuration( p_md->p_input_item ));
+    return libvlc_time_from_vlc_tick(input_item_GetDuration( p_md->p_input_item ));
 }
 
 int
@@ -1013,11 +1013,11 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
     req->crop = crop;
     libvlc_media_retain( md );
     req->req = vlc_thumbnailer_RequestByTime( p_priv->p_thumbnailer,
-        to_mtime( time ),
+        vlc_tick_from_libvlc_time( time ),
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
-        timeout > 0 ? to_mtime( timeout ) : VLC_TICK_INVALID,
+        timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
     if ( req->req == NULL )
     {
@@ -1059,7 +1059,7 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
-        timeout > 0 ? to_mtime( timeout ) : VLC_TICK_INVALID,
+        timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
     if ( req->req == NULL )
     {
