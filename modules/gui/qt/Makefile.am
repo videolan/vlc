@@ -963,7 +963,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/IconToolButton.qml \
 	gui/qt/widgets/qml/IconTrackButton.qml \
 	gui/qt/widgets/qml/ImageToolButton.qml \
-	gui/qt/widgets/qml/KeyNavigableGridView.qml \
 	gui/qt/widgets/qml/KeyNavigableListView.qml \
 	gui/qt/widgets/qml/KeyNavigableTableView.qml \
 	gui/qt/widgets/qml/TableViewDelegate.qml \

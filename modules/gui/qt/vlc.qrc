@@ -157,7 +157,6 @@
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
         <file alias="ListItem.qml">widgets/qml/ListItem.qml</file>
         <file alias="DrawerExt.qml">widgets/qml/DrawerExt.qml</file>
-        <file alias="KeyNavigableGridView.qml">widgets/qml/KeyNavigableGridView.qml</file>
         <file alias="KeyNavigableListView.qml">widgets/qml/KeyNavigableListView.qml</file>
         <file alias="ToolTipArea.qml">widgets/qml/ToolTipArea.qml</file>
         <file alias="KeyNavigableTableView.qml">widgets/qml/KeyNavigableTableView.qml</file>
