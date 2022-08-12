@@ -229,7 +229,6 @@ ssize_t BufferedChunksSourceStream::Read(uint8_t *buf, size_t i_toread)
         return i_read;
 
     i_bytestream_offset += i_read;
-    i_toread -= i_read;
 
     if(i_bytestream_offset > MAX_BACKEND)
     {

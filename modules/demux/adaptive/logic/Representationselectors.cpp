@@ -109,8 +109,8 @@ BaseRepresentation * RepresentationSelector::select(const std::vector<BaseRepres
         }
     }
 
-    if (!candidate)
-        return candidate = lowest;
+    if (candidate == nullptr)
+        return lowest;
 
     return candidate;
 }
