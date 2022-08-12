@@ -44,9 +44,24 @@ static VOID CALLBACK timer_callback(PTP_CALLBACK_INSTANCE instance,
     timer->func(timer->data);
 }
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+static vlc_once_t TIMER_INIT_FUNC = VLC_STATIC_ONCE;
+static void (WINAPI *SystemTimeAsFileTime_)(LPFILETIME);
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
+
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
     struct vlc_timer *timer = malloc (sizeof (*timer));
+
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+    if (unlikely(!vlc_once_begin(&TIMER_INIT_FUNC))) {
+        HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
+        SystemTimeAsFileTime_ = (void*)GetProcAddress(h, "GetSystemTimePreciseAsFileTime");
+        if (unlikely(SystemTimeAsFileTime_ == NULL)) // win7
+            SystemTimeAsFileTime_ = GetSystemTimeAsFileTime;
+        vlc_once_complete(&TIMER_INIT_FUNC);
+    }
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
 
     if (timer == NULL)
         return ENOMEM;
@@ -94,11 +109,11 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
 
     /* Get the system FILETIME */
     FILETIME time;
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && (!defined(VLC_WINSTORE_APP) || _WIN32_WINNT >= 0x0A00)
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+    SystemTimeAsFileTime_(&time);
+#else // _WIN32_WINNT >= _WIN32_WINNT_WIN8
     GetSystemTimePreciseAsFileTime(&time);
-#else
-    GetSystemTimeAsFileTime(&time);
-#endif
+#endif // _WIN32_WINNT >= _WIN32_WINNT_WIN8
 
     /* Convert it to ULARGE_INTEGER to allow calculation (addition here) */
     ULARGE_INTEGER time_ul = {

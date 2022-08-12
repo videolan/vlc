@@ -564,16 +564,20 @@ static vlc_tick_t mdate_perf_100ns(void)
     return VLC_TICK_FROM_MSFTIME(counter.QuadPart);
 }
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+static void (WINAPI *SystemTimeAsFileTime_)(LPFILETIME) = GetSystemTimeAsFileTime;
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
+
 static vlc_tick_t mdate_wall (void)
 {
     FILETIME ts;
     ULARGE_INTEGER s;
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && (!defined(VLC_WINSTORE_APP) || _WIN32_WINNT >= 0x0A00)
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
     GetSystemTimePreciseAsFileTime (&ts);
-#else
-    GetSystemTimeAsFileTime (&ts);
-#endif
+#else // _WIN32_WINNT < _WIN32_WINNT_WIN8
+    SystemTimeAsFileTime_ (&ts);
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
     s.LowPart = ts.dwLowDateTime;
     s.HighPart = ts.dwHighDateTime;
     /* hundreds of nanoseconds */
@@ -665,6 +669,12 @@ static void SelectClockSource(libvlc_int_t *obj)
     if (!strcmp (name, "wall"))
     {
         msg_Dbg (obj, "using system time as clock source");
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+        HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
+        SystemTimeAsFileTime_ = (void*)GetProcAddress(h, "GetSystemTimePreciseAsFileTime");
+        if (unlikely(SystemTimeAsFileTime_ == NULL)) // win7
+            SystemTimeAsFileTime_ = GetSystemTimeAsFileTime;
+#endif // _WIN32_WINNT < _WIN32_WINNT_WIN8
         mdate_selected = mdate_wall;
     }
     else
