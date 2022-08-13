@@ -35,6 +35,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -134,6 +135,10 @@
     [_collectionView registerNib:albumSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind 
                   withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier];
+    NSNib *audioGroupSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAudioGroupSupplementaryDetailView" bundle:nil];
+    [_collectionView registerNib:audioGroupSupplementaryDetailView
+      forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind 
+                  withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 
     _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionView.collectionViewLayout = _collectionViewFlowLayout;
@@ -332,7 +337,7 @@
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath || _currentParentType != VLC_ML_PARENT_ALBUM) {
+    if (!indexPath || _currentParentType == VLC_ML_PARENT_UNKNOWN) {
         return;
     }
 
@@ -342,7 +347,7 @@
 - (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath || _currentParentType != VLC_ML_PARENT_ALBUM) {
+    if (!indexPath || _currentParentType == VLC_ML_PARENT_UNKNOWN) {
         return;
     }
 
@@ -353,13 +358,23 @@
 viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                atIndexPath:(NSIndexPath *)indexPath
 {
-    if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] && _currentParentType == VLC_ML_PARENT_ALBUM) {
+    if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
+
         VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
 
         VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
         albumSupplementaryDetailView.representedAlbum = album;
 
         return albumSupplementaryDetailView;
+
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
+
+        VLCLibraryCollectionViewAudioGroupSupplementaryDetailView* audioGroupSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind forIndexPath:indexPath];
+
+        id<VLCMediaLibraryAudioGroupProtocol> audioGroup = _displayedCollection[indexPath.item];
+        audioGroupSupplementaryDetailView.representedAudioGroup = audioGroup;
+
+        return audioGroupSupplementaryDetailView;
     }
 
     return nil;
@@ -417,11 +432,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
 {
-    if(tableView == [[[VLCMain sharedInstance] libraryWindow] audioGroupSelectionTableView]) {
-        return NO;
-    }
-
-    return YES;
+    // We use this with nested table views, since the table view cell is the VLCLibraryAlbumTableCellView.
+    // We don't want to select the outer cell, only the inner cells in the album view's table.
+    return NO;
 }
 
 @end

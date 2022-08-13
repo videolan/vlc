@@ -258,6 +258,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize numberOfTracks = _numberOfTracks;
 
 + (nullable instancetype)artistWithID:(int64_t)artistID
 {
@@ -325,6 +326,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return countMetadataString;
 }
 
+- (NSArray<VLCMediaLibraryArtist *> *)artists
+{
+    return @[self];
+}
+
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
 {
     return fetchAlbumsForLibraryItem(vlc_ml_list_artist_albums, _libraryID);
@@ -354,6 +360,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize numberOfTracks = _numberOfTracks;
 
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album
 {
@@ -397,6 +404,16 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return [NSString stringWithTime:_duration / VLCMediaLibraryMediaItemDurationDenominator];
 }
 
+- (NSArray<VLCMediaLibraryArtist *> *)artists
+{
+    return @[[VLCMediaLibraryArtist artistWithID:_artistID]];
+}
+
+- (NSArray<VLCMediaLibraryAlbum *> *)albums
+{
+    return @[self];
+}
+
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
     return fetchMediaItemsForLibraryItem(vlc_ml_list_album_tracks, _libraryID);
@@ -421,6 +438,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize numberOfTracks = _numberOfTracks;
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre
 {

@@ -129,6 +129,7 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
     }
     _tracksTableView.gridStyleMask = NSTableViewSolidHorizontalGridLineMask;
     _tracksTableView.rowHeight = VLCLibraryTracksRowHeight;
+    _tracksTableView.backgroundColor = [NSColor clearColor];
 
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
     _tracksTableView.dataSource = _tracksDataSource;

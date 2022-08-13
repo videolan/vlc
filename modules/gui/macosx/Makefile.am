@@ -66,6 +66,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h \
 	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
+	gui/macosx/library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h \
+	gui/macosx/library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m \
 	gui/macosx/library/VLCLibraryController.h \
@@ -310,6 +312,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewAlbumSupplementaryDetailView.xib \
+	gui/macosx/UI/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibrarySongTableCellView.xib \
 	gui/macosx/UI/VLCMediaSourceCollectionViewItem.xib \
 	gui/macosx/UI/VLCMediaSourceDeviceCollectionViewItem.xib \
