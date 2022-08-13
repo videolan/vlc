@@ -29,6 +29,8 @@
 #define MODULE_STRING "test_vout_mock"
 #undef __PLUGIN__
 
+static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
+
 const char vlc_module_name[] = MODULE_STRING;
 
 #include "../../libvlc/test.h"
@@ -299,7 +301,7 @@ int main( int argc, char **argv )
 
     const char * const args[] = {
         "-vvv", "--vout=dummy", "--aout=dummy", "--text-renderer=dummy",
-        "--no-auto-preparse", "--dec-dev=" MODULE_STRING,
+        "--no-auto-preparse", dec_dev_arg,
         "--no-spu", "--no-osd",
     };
 
