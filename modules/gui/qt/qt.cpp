@@ -268,7 +268,7 @@ static const char *const compositor_vlc[] = {
     "auto",
 #ifdef _WIN32
 #ifdef HAVE_DCOMP_H
-    "dcomp"
+    "dcomp",
 #endif
     "win7",
 #endif
