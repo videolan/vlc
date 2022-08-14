@@ -31,11 +31,13 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
-static const int64_t MinimumDuration = 3 * 60 * 1000;
+static const int64_t SecInMillisecs = 1000;
+static const int64_t MinInMillisecs = SecInMillisecs * 60;
+static const int64_t MinimumDuration = 3 * MinInMillisecs;
 static const float MinimumStorePercent = 0.05;
 static const float MaximumStorePercent = 0.95;
-static const int64_t MinimumStoreTime = 60 * 1000;
-static const int64_t MinimumStoreRemainingTime = 60 * 1000;
+static const int64_t MinimumStoreTime = MinInMillisecs;
+static const int64_t MinimumStoreRemainingTime = MinInMillisecs;
 static NSString *VLCRecentlyPlayedMediaKey = @"recentlyPlayedMedia";
 static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 
@@ -187,10 +189,16 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
                                               ask:(BOOL)ask
                                            player:(VLCPlayerController *)playerController
 {
+    if(libraryMediaItem == nil) {
+        return;
+    }
+
     float lastPlaybackPosition = libraryMediaItem.progress;
     int64_t duration = libraryMediaItem.duration;
+    BOOL isAlbumTrack = libraryMediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
 
-    if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration) {
+    if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration || isAlbumTrack) {
+
         return;
     }
 
