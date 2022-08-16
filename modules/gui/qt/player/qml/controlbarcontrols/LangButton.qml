@@ -52,14 +52,14 @@ Widgets.IconControlButton {
             onOpened: {
                 langBtn.requestLockUnlockAutoHide(true)
                 if (!!rootPlayer)
-                    rootPlayer.menu = menu
+                    rootPlayer.applyMenu(menu)
             }
 
             onClosed: {
                 langBtn.requestLockUnlockAutoHide(false)
                 langBtn.forceActiveFocus()
                 if (!!rootPlayer)
-                    rootPlayer.menu = undefined
+                    rootPlayer.applyMenu(null)
             }
         }
     }
