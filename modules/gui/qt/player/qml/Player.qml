@@ -103,6 +103,19 @@ FocusScope {
             toolbarAutoHide.setVisibleControlBar(true)
     }
 
+    // Functions
+
+    function applyMenu(menu) {
+        if (rootPlayer.menu === menu)
+            return
+
+        // NOTE: When applying a new menu we hide the previous one.
+        if (menu)
+            dismiss()
+
+        rootPlayer.menu = menu
+    }
+
     function dismiss() {
         if ((typeof menu === undefined) || !menu)
             return
@@ -116,6 +129,8 @@ FocusScope {
         _lockAutoHide += lock ? 1 : -1;
         console.assert(_lockAutoHide >= 0)
     }
+
+    // Private
 
     function _onNavigationCancel() {
         if (rootPlayer.hasEmbededVideo && controlBarView.state === "visible") {
