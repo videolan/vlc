@@ -121,13 +121,15 @@ for plugin in $(find "${INPUT_PATH}" -name  '*plugin.dylib'); do
         -id "@rpath/${name}_plugin.framework/${name}_plugin" \
         -change "@rpath/libvlccore.dylib" "@rpath/vlccore.framework/vlccore"
 
+    normalized_name="$(echo ${name} | tr '_' '-')"
+
     EXECUTABLE_NAME=${name}_plugin \
-    BUNDLE_IDENTIFIER=${BASE_IDENTIFIER}.$(echo ${name} | tr '_' '-')-plugin \
+    BUNDLE_IDENTIFIER="${BASE_IDENTIFIER}.${normalized_name}-plugin" \
     bash template.info.plist.sh > "${OUTPUT_PATH}/${name}_plugin.framework/Info.plist"
     plutil -convert binary1 "${OUTPUT_PATH}/${name}_plugin.framework/Info.plist"
 
     codesign -f -v -s "${CODESIGN_IDENTITY}"\
-        -i ${BASE_IDENTIFIER}.${name}_plugin \
+        -i ${BASE_IDENTIFIER}.${normalized_name}-plugin \
         "${OUTPUT_PATH}/${name}_plugin.framework"
 done
 
