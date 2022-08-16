@@ -2,7 +2,7 @@
 
 INPUT_PATH="$1"
 OUTPUT_PATH="$2"
-BASE_IDENTIFIER="FOOBAR.com.audiblegenius"
+BASE_IDENTIFIER="com.audiblegenius"
 
 if [ -z "$INPUT_PATH" -o -z "${OUTPUT_PATH}" ]; then
     echo "Usage: ./export_plugin.sh [input folder for plugins] [output folder for frameworks]"
