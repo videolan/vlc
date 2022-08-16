@@ -1139,11 +1139,11 @@ static const char* const ppsz_restore_playback_desc[] = {
 #define CLOCK_SOURCE_TEXT N_("Clock source")
 #ifdef _WIN32
 static const char *const clock_sources[] = {
-    "", "interrupt", "tick", "perf",
+    "", "perf",
 };
 
 static const char *const clock_sources_text[] = {
-    N_("Auto"), "Interrupt time", "Windows time", "Performance counters",
+    N_("Auto"), "Performance counters",
 };
 #endif
 

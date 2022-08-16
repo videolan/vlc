@@ -520,29 +520,6 @@ static union
     } perf;
 } clk;
 
-static vlc_tick_t mdate_interrupt (void)
-{
-    ULONGLONG ts;
-    BOOL ret;
-
-    ret = QueryUnbiasedInterruptTime (&ts);
-    if (unlikely(!ret))
-        abort ();
-
-    /* hundreds of nanoseconds */
-    static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
-    return VLC_TICK_FROM_MSFTIME(ts);
-}
-
-static vlc_tick_t mdate_tick (void)
-{
-    ULONGLONG ts = GetTickCount64 ();
-
-    /* milliseconds */
-    static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
-    return VLC_TICK_FROM_MS( ts );
-}
-
 static vlc_tick_t mdate_perf (void)
 {
     /* We don't need the real date, just the value of a high precision timer */
@@ -644,25 +621,11 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 static void SelectClockSource(libvlc_int_t *obj)
 {
     // speed comparison / granularity / counts during sleep
-    // tick:       46000 /  ~16 ms / yes
-    // interrupt:  79937 /  ~10 ms / no
     // perf:      155612 / ~100 ns / yes
     // wall:      181593 /  100 ns / yes
 
     char *str = var_InheritString(obj, "clock-source");
     const char *name = str != NULL ? str : "perf";
-    if (!strcmp (name, "interrupt"))
-    {
-        msg_Dbg (obj, "using interrupt time as clock source");
-        mdate_selected = mdate_interrupt;
-    }
-    else
-    if (!strcmp (name, "tick"))
-    {
-        msg_Dbg (obj, "using Windows time as clock source");
-        mdate_selected = mdate_tick;
-    }
-    else
     if (!strcmp (name, "perf"))
     {
         msg_Dbg (obj, "using performance counters as clock source");
