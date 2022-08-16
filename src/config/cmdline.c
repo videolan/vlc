@@ -117,6 +117,14 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
     check_option_variant("--"   option_name, option_name, true)  \
     check_option_variant("--no-"option_name, option_name, false) \
     check_option_variant("--no" option_name, option_name, false)
+#define check_string(option_name) \
+    if( strncmp( arg, "--" option_name "=", strlen("--" option_name "=") ) == 0 ) \
+    { \
+        const char *value = arg + strlen("--" option_name "="); \
+        var_Create (p_this, option_name, VLC_VAR_STRING); \
+        var_SetString (p_this, option_name, value); \
+        continue; \
+    }
 
         check_option("plugins-cache")
         check_option("plugins-scan")
@@ -125,9 +133,13 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
 #if defined(_WIN32) || defined(__OS2__)
         check_option("high-priority")
 #endif
+#ifdef _WIN32
+        check_string("clock-source")
+#endif
 
 #undef check_option
 #undef check_option_variant
+#undef check_string
     }
 }
 #endif
