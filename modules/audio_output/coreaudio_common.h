@@ -63,9 +63,7 @@ struct aout_sys_common
     block_t             **pp_out_last;
     uint64_t            i_render_host_time;
     uint64_t            i_first_render_host_time;
-    vlc_tick_t          i_last_latency_ticks;
-    vlc_tick_t          i_total_frames;
-    vlc_tick_t          i_first_pts;
+    uint32_t            i_render_frames;
 
     vlc_sem_t           flush_sem;
 
