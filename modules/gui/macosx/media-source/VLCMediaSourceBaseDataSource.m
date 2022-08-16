@@ -127,7 +127,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
         for (NSUInteger x = 0; x < count; x++) {
             VLCMediaSource *mediaSource = mediaSources[x];
             VLCInputNode *rootNode = [mediaSource rootNode];
-            [mediaSource preparseInputItemWithinTree:rootNode.inputItem];
+            [mediaSource preparseInputNodeWithinTree:rootNode];
         }
     }
     _mediaSources = mediaSources;

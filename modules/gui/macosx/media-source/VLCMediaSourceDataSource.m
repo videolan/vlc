@@ -42,9 +42,7 @@
 - (void)setNodeToDisplay:(VLCInputNode *)nodeToDisplay
 {
     _nodeToDisplay = nodeToDisplay;
-
-    _childRootInput = _nodeToDisplay.inputItem;
-    [self.displayedMediaSource preparseInputItemWithinTree:_childRootInput];
+    [self.displayedMediaSource preparseInputNodeWithinTree:_nodeToDisplay];
 }
 
 - (void)setupViews
@@ -171,6 +169,10 @@
 
 - (void)performActionForNode:(VLCInputNode *)node allowPlayback:(BOOL)allowPlayback
 {
+    if(node == nil || node.inputItem == nil) {
+        return;
+    }
+
     VLCInputItem *childRootInput = node.inputItem;
 
     if (childRootInput.inputType == ITEM_TYPE_DIRECTORY || childRootInput.inputType == ITEM_TYPE_NODE) {
@@ -184,10 +186,12 @@
 
 - (void)reloadData
 {
-    if (_gridViewMode) {
-        [self.collectionView reloadData];
-    } else {
-        [self.tableView reloadData];
+    if (!_collectionView.hidden) {
+        [_collectionView reloadData];
+    }
+
+    if(!_tableView.hidden) {
+        [_tableView reloadData];
     }
 }
 

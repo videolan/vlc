@@ -573,11 +573,6 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 
 @end
 
-@interface VLCInputNode()
-{
-    struct input_item_node_t *_p_inputNode;
-}
-@end
 
 @implementation VLCInputNode
 
@@ -585,7 +580,7 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 {
     self = [super init];
     if (self && p_inputNode != NULL) {
-        _p_inputNode = p_inputNode;
+        _vlcInputItemNode = p_inputNode;
     }
     return self;
 }
@@ -593,31 +588,31 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 - (NSString *)description
 {
     NSString *inputItemName;
-    if (_p_inputNode->p_item)
-        inputItemName = toNSStr(_p_inputNode->p_item->psz_name);
+    if (_vlcInputItemNode->p_item)
+        inputItemName = toNSStr(_vlcInputItemNode->p_item->psz_name);
     else
         inputItemName = @"p_item == nil";
-    return [NSString stringWithFormat:@"%@: node: %p input name: %@, number of children: %i", NSStringFromClass([self class]), _p_inputNode, inputItemName, self.numberOfChildren];
+    return [NSString stringWithFormat:@"%@: node: %p input name: %@, number of children: %i", NSStringFromClass([self class]),_vlcInputItemNode, inputItemName, self.numberOfChildren];
 }
 
 - (VLCInputItem *)inputItem
 {
-    if (_p_inputNode->p_item) {
-        return [[VLCInputItem alloc] initWithInputItem:_p_inputNode->p_item];
+    if (_vlcInputItemNode->p_item) {
+        return [[VLCInputItem alloc] initWithInputItem:_vlcInputItemNode->p_item];
     }
     return nil;
 }
 
 - (int)numberOfChildren
 {
-    return _p_inputNode->i_children;
+    return _vlcInputItemNode->i_children;
 }
 
 - (NSArray<VLCInputNode *> *)children
 {
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:_p_inputNode->i_children];
-    for (int i = 0; i < _p_inputNode->i_children; i++) {
-        VLCInputNode *inputNode = [[VLCInputNode alloc] initWithInputNode:_p_inputNode->pp_children[i]];
+    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:_vlcInputItemNode->i_children];
+    for (int i = 0; i < _vlcInputItemNode->i_children; i++) {
+        VLCInputNode *inputNode = [[VLCInputNode alloc] initWithInputNode:_vlcInputItemNode->pp_children[i]];
         if (inputNode) {
             [mutableArray addObject:inputNode];
         }

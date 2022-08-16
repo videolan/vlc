@@ -178,16 +178,36 @@ static const char *const localDevicesDescription = "My Machine";
     }
 }
 
-- (void)preparseInputItemWithinTree:(VLCInputItem *)inputItem
+- (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode
 {
     if (_p_mediaSource->description == localDevicesDescription) {
         [self generateLocalDevicesTree];
+    }
+
+    if (inputNode == nil || inputNode.inputItem == nil) {
         return;
     }
-    if (inputItem == nil) {
-        return;
+
+    if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY) {
+	input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
+
+	[self clearChildNodesForNode:vlcInputNode];
+        NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
+	[self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
+
+	return;
     }
-    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputItem.vlcInputItem, NULL);
+
+    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputNode.inputItem.vlcInputItem, NULL);
+}
+
+- (void)clearChildNodesForNode:(input_item_node_t*)inputNode
+{
+    while(inputNode->i_children > 0) {
+	input_item_node_t *childNode = inputNode->pp_children[0];
+	input_item_node_RemoveNode(inputNode, childNode);
+	input_item_node_Delete(childNode);
+    }
 }
 
 - (void)generateLocalDevicesTree
@@ -201,7 +221,7 @@ static const char *const localDevicesDescription = "My Machine";
                                                 mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeIsEjectableKey, NSURLVolumeIsRemovableKey]
                                                                                         options:NSVolumeEnumerationSkipHiddenVolumes];
         
-        NSURL *homeDirectoryURL =  [NSURL fileURLWithPath:NSHomeDirectoryForUser(NSUserName())];
+        NSURL *homeDirectoryURL = [NSURL fileURLWithPath:NSHomeDirectoryForUser(NSUserName())];
         NSString *homeDirectoryDescription = [NSString stringWithFormat:@"%@'s home", NSUserName()];
         
         if (homeDirectoryURL) {
@@ -268,6 +288,50 @@ static const char *const localDevicesDescription = "My Machine";
             }
         });
     });
+}
+
+- (void)generateChildNodesForDirectoryNode:(input_item_node_t*)directoryNode withUrl:(NSURL*)directoryUrl
+{
+    if(directoryNode == NULL || directoryUrl == nil) {
+        return;
+    }
+
+    NSError *error;
+    NSArray<NSURL *> *subDirectories = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:directoryUrl
+                                                                     includingPropertiesForKeys:@[NSURLIsDirectoryKey]
+                                                                                        options:NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants
+                                                                                          error:&error];
+    if (subDirectories == nil || subDirectories.count == 0 || error) {
+        NSLog(@"Failed to get directories: %@.", error);
+        return;
+    }
+
+    for (NSURL *url in subDirectories) {
+        NSNumber *isDirectory;
+        NSNumber *isVolume;
+        NSNumber *isEjectable;
+        NSNumber *isInternal;
+        NSNumber *isLocal;
+
+	[url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+        [url getResourceValue:&isVolume forKey:NSURLIsVolumeKey error:nil];
+        [url getResourceValue:&isEjectable forKey:NSURLVolumeIsEjectableKey error:nil];
+        [url getResourceValue:&isInternal forKey:NSURLVolumeIsInternalKey error:nil];
+        [url getResourceValue:&isLocal forKey:NSURLVolumeIsLocalKey error:nil];
+        
+        const enum input_item_type_e inputType = isDirectory.boolValue ? isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+        const enum input_item_net_type netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
+        
+        input_item_t *urlInputItem = input_item_NewExt(url.absoluteString.UTF8String, url.lastPathComponent.UTF8String, 0, inputType, netType);
+        if (urlInputItem != NULL) {
+            input_item_node_t *urlNode = input_item_node_Create(urlInputItem);
+            if (urlNode) {
+                input_item_node_AppendNode(directoryNode, urlNode);
+            }
+            input_item_Release(urlInputItem);
+            urlInputItem = NULL;
+        }
+    }
 }
 
 - (NSString *)mediaSourceDescription
