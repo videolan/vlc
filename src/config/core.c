@@ -528,7 +528,7 @@ void config_ResetAll(void)
 }
 
 
-int config_AutoSaveConfigFile( vlc_object_t *p_this )
+int config_AutoSaveConfigFile( libvlc_int_t *p_this )
 {
     assert( p_this );
 

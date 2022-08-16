@@ -228,8 +228,8 @@ VLC_API ssize_t config_GetIntChoices(const char *, int64_t **values,
 VLC_API ssize_t config_GetPszChoices(const char *,
                                      char ***values, char ***texts) VLC_USED;
 
-VLC_API int config_SaveConfigFile( vlc_object_t * );
-#define config_SaveConfigFile(a) config_SaveConfigFile(VLC_OBJECT(a))
+VLC_API int config_SaveConfigFile( libvlc_int_t * );
+#define config_SaveConfigFile(a) config_SaveConfigFile(vlc_object_instance(a))
 
 /**
  * Resets the configuration.

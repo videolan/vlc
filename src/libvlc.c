@@ -195,7 +195,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Handle info requests such as for help or version text.
      */
-    if (config_PrintHelp (VLC_OBJECT(p_libvlc)))
+    if (config_PrintHelp (p_libvlc))
     {
         libvlc_InternalCleanup (p_libvlc);
         exit(0);
@@ -391,7 +391,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Save the configuration */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-        config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
+        config_AutoSaveConfigFile( p_libvlc );
 
     vlc_LogDestroy(p_libvlc->obj.logger);
     vlc_tracer_Destroy(p_libvlc);

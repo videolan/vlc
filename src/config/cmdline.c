@@ -40,7 +40,6 @@
 
 #include <assert.h>
 
-#undef config_CmdLineEarlyScan
 /**
  * Perform early scan of arguments for a small subset of simple options.
  *
@@ -95,7 +94,7 @@
  * @param argc number of command line arguments
  * @param argv command line arguments
  */
-void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[] )
+void config_CmdLineEarlyScan( libvlc_int_t *p_this, int argc, const char *argv[] )
 {
 #if !defined(HAVE_DYNAMIC_PLUGINS) && !defined(_WIN32)
     VLC_UNUSED(p_this); VLC_UNUSED(argc); VLC_UNUSED(argv);
@@ -148,7 +147,6 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
 #endif
 }
 
-#undef config_LoadCmdLine
 /**
  * Parse command line for configuration options.
  *
@@ -163,7 +161,7 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
  * @param pindex index of the first non-option argument [OUT]
  * @return 0 on success, -1 on error.
  */
-int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
+int config_LoadCmdLine( libvlc_int_t *p_this, int i_argc,
                         const char *ppsz_argv[], int *pindex )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;

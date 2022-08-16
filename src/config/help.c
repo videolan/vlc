@@ -54,10 +54,10 @@ static void PauseConsole (void);
 # define PauseConsole() (void)0
 #endif
 
-static void Help (vlc_object_t *, const char *);
-static void Usage (vlc_object_t *, const char *);
+static void Help (libvlc_int_t *, const char *);
+static void Usage (libvlc_int_t *, const char *);
 static void Version (void);
-static void ListModules (vlc_object_t *, bool);
+static void ListModules (libvlc_int_t *, bool);
 
 /**
  * Returns the console width or a best guess.
@@ -91,7 +91,7 @@ static unsigned ConsoleWidth(void)
  * \return true if a command line options caused some help message to be
  * printed, false otherwise.
  */
-bool config_PrintHelp (vlc_object_t *obj)
+bool config_PrintHelp (libvlc_int_t *obj)
 {
     char *str;
 
@@ -195,7 +195,7 @@ static const char vlc_usage[] = N_(
   "  vlc://quit                     Special item to quit VLC\n"
   "\n");
 
-static void Help (vlc_object_t *p_this, char const *psz_help_name)
+static void Help (libvlc_int_t *p_this, char const *psz_help_name)
 {
     ShowConsole();
 
@@ -573,7 +573,7 @@ static bool plugin_show(const vlc_plugin_t *plugin)
     return false;
 }
 
-static void Usage (vlc_object_t *p_this, char const *psz_search)
+static void Usage (libvlc_int_t *p_this, char const *psz_search)
 {
     bool found = false;
     bool strict = false;
@@ -641,7 +641,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
  * Print a list of all available modules (builtins and plugins) and a short
  * description for each one.
  *****************************************************************************/
-static void ListModules (vlc_object_t *p_this, bool b_verbose)
+static void ListModules (libvlc_int_t *p_this, bool b_verbose)
 {
     bool color = false;
 

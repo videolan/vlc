@@ -52,7 +52,7 @@
 /**
  * Get the user's configuration file
  */
-static char *config_GetConfigFile( vlc_object_t *obj )
+static char *config_GetConfigFile( libvlc_int_t *obj )
 {
     char *psz_file = var_InheritString( obj, "config" );
     if( psz_file == NULL )
@@ -66,7 +66,7 @@ static char *config_GetConfigFile( vlc_object_t *obj )
     return psz_file;
 }
 
-static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
+static FILE *config_OpenConfigFile( libvlc_int_t *p_obj )
 {
     char *psz_filename = config_GetConfigFile( p_obj );
     if( psz_filename == NULL )
@@ -153,14 +153,13 @@ static int64_t vlc_strtoi (const char *str)
     return l;
 }
 
-#undef config_LoadConfigFile
 /*****************************************************************************
  * config_LoadConfigFile: loads the configuration file.
  *****************************************************************************
  * This function is called to load the config options stored in the config
  * file.
  *****************************************************************************/
-int config_LoadConfigFile( vlc_object_t *p_this )
+int config_LoadConfigFile( libvlc_int_t *p_this )
 {
     FILE *file;
 
@@ -274,7 +273,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
 /*****************************************************************************
  * config_CreateDir: Create configuration directory if it doesn't exist.
  *****************************************************************************/
-static int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
+static int config_CreateDir( libvlc_int_t *p_this, char *psz_dirname )
 {
     if( !psz_dirname || !*psz_dirname ) return -1;
 
@@ -335,7 +334,7 @@ config_Write (FILE *file, const char *desc, const char *type,
 }
 
 
-static int config_PrepareDir (vlc_object_t *obj)
+static int config_PrepareDir (libvlc_int_t *obj)
 {
     char *psz_configdir = config_GetUserDir (VLC_CONFIG_DIR);
     if (psz_configdir == NULL)
@@ -346,12 +345,11 @@ static int config_PrepareDir (vlc_object_t *obj)
     return ret;
 }
 
-#undef config_SaveConfigFile
 /**
  * Saves the in-memory configuration into a file.
  * @return 0 on success, -1 on error.
  */
-int config_SaveConfigFile (vlc_object_t *p_this)
+int (config_SaveConfigFile) (libvlc_int_t *p_this)
 {
 
     if( config_PrepareDir( p_this ) )

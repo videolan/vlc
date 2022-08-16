@@ -50,18 +50,15 @@ struct vlc_param *vlc_param_Find(const char *name);
 
 int vlc_param_SetString(struct vlc_param *param, const char *value);
 
-int  config_AutoSaveConfigFile( vlc_object_t * );
+int  config_AutoSaveConfigFile( libvlc_int_t * );
 
 void config_Free(struct vlc_param *, size_t);
 
-void config_CmdLineEarlyScan( vlc_object_t *, int, const char *[] );
-#define config_CmdLineEarlyScan(a,b,c) config_CmdLineEarlyScan(VLC_OBJECT(a),b,c)
+void config_CmdLineEarlyScan( libvlc_int_t *, int, const char *[] );
 
-int config_LoadCmdLine   ( vlc_object_t *, int, const char *[], int * );
-int config_LoadConfigFile( vlc_object_t * );
-#define config_LoadCmdLine(a,b,c,d) config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
-#define config_LoadConfigFile(a) config_LoadConfigFile(VLC_OBJECT(a))
-bool config_PrintHelp (vlc_object_t *);
+int config_LoadCmdLine   ( libvlc_int_t *, int, const char *[], int * );
+int config_LoadConfigFile( libvlc_int_t * );
+bool config_PrintHelp (libvlc_int_t *);
 void config_Lock(void);
 void config_Unlock(void);
 
