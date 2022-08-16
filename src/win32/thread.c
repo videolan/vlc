@@ -647,6 +647,12 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 
 static void SelectClockSource(libvlc_int_t *obj)
 {
+    // speed comparison / granularity / counts during sleep
+    // tick:       46000 /  ~16 ms / yes
+    // interrupt:  79937 /  ~10 ms / no
+    // perf:      155612 / ~100 ns / yes
+    // wall:      181593 /  100 ns / yes
+
     char *str = var_InheritString(obj, "clock-source");
     const char *name = str != NULL ? str : "perf";
     if (!strcmp (name, "interrupt"))
