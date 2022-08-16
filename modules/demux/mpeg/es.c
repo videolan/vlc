@@ -203,7 +203,9 @@ static int ParseXing( const uint8_t *p_buf, size_t i_buf, struct xing_info_s *xi
 
     xing->encoder = VLC_FOURCC(p_fixed[0], p_fixed[1], p_fixed[2], p_fixed[3]); /* char version[9] start */
 
-    if( xing->encoder != VLC_FOURCC('L','A','M','E') )
+    if( xing->encoder != VLC_FOURCC('L','A','M','E') &&
+        xing->encoder != VLC_FOURCC('L','a','v','c') &&
+        xing->encoder != VLC_FOURCC('L','a','v','f') )
         return VLC_SUCCESS;
 
     xing->brmode  = p_fixed[8] & 0x0f; /* version upper / mode lower */
