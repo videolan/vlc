@@ -122,6 +122,10 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
         check_option("plugins-scan")
         check_option("reset-plugins-cache")
 
+#if defined(_WIN32) || defined(__OS2__)
+        check_option("high-priority")
+#endif
+
 #undef check_option
 #undef check_option_variant
     }
