@@ -71,8 +71,6 @@ typedef struct
     bool draining;
     pa_cvolume cvolume; /**< actual sink input volume */
     vlc_tick_t last_date; /**< Play system timestamp of last buffer */
-    vlc_tick_t first_pts;
-    pa_usec_t flush_rt;
 
     pa_volume_t volume_force; /**< Forced volume (stream must be NULL) */
     pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
@@ -308,35 +306,8 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
             TriggerDrain(aout);
         return; /* nothing to do if buffers are (still) empty */
     }
-
     if (pa_stream_is_corked(s) > 0)
         stream_start(s, aout, sys->last_date);
-
-    if (pa_stream_is_corked(s) == 0 && sys->first_pts != VLC_TICK_INVALID)
-    {
-        pa_usec_t rt;
-        if (pa_stream_get_time(s, &rt) == 0 && rt > 0)
-        {
-            if (likely(rt >= sys->flush_rt))
-            {
-                rt -= sys->flush_rt;
-                aout_TimingReport(aout, vlc_tick_now(), sys->first_pts + rt);
-            }
-#ifndef NDEBUG
-            else
-            {
-                /* The time returned by pa_stream_get_time() might be smaller
-                 * than flush_rt just after a flush (depending on
-                 * transport_usec, sink_usec), but the current read index
-                 * should always be superior or equal. */
-                const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
-                const pa_timing_info *ti = pa_stream_get_timing_info(s);
-                if (ti != NULL && !ti->read_index_corrupt)
-                    assert(pa_bytes_to_usec(ti->read_index, ss) >= sys->flush_rt);
-            }
-#endif
-        }
-    }
 }
 
 
@@ -514,6 +485,26 @@ static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
 
 /*** VLC audio output callbacks ***/
 
+static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_stream *s = sys->stream;
+    int ret = -1;
+
+    pa_threaded_mainloop_lock(sys->mainloop);
+    if (pa_stream_is_corked(s) <= 0)
+    {   /* latency is relevant only if not corked */
+        vlc_tick_t delta = vlc_pa_get_latency(aout, sys->context, s);
+        if (delta != VLC_TICK_INVALID)
+        {
+            *delay = delta;
+            ret = 0;
+        }
+    }
+    pa_threaded_mainloop_unlock(sys->mainloop);
+    return ret;
+}
+
 static void data_free(void *data)
 {
     block_Release(data);
@@ -534,8 +525,6 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
      * will take place, and sooner or later a deadlock. */
     pa_threaded_mainloop_lock(sys->mainloop);
 
-    if (sys->first_pts == VLC_TICK_INVALID)
-        sys->first_pts = block->i_pts;
     sys->last_date = date;
 
     if (pa_stream_is_corked(s) > 0)
@@ -601,14 +590,8 @@ static void Flush(audio_output_t *aout)
     pa_operation *op = pa_stream_flush(s, NULL, NULL);
     if (op != NULL)
         pa_operation_unref(op);
-    sys->first_pts = sys->last_date = VLC_TICK_INVALID;
-
+    sys->last_date = VLC_TICK_INVALID;
     stream_stop(s, aout);
-
-    const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
-    const pa_timing_info *ti = pa_stream_get_timing_info(s);
-    if (ti != NULL && !ti->read_index_corrupt)
-        sys->flush_rt = pa_bytes_to_usec(ti->read_index, ss);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
@@ -642,8 +625,7 @@ static void Drain(audio_output_t *aout)
         aout_DrainedReport(aout);
     else
     {
-        sys->first_pts = sys->last_date = VLC_TICK_INVALID;
-        sys->flush_rt = 0;
+        sys->last_date = VLC_TICK_INVALID;
 
         /* XXX: Loosy drain emulation.
          * See #18141: drain callback is never received */
@@ -880,8 +862,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->trigger = sys->drain_trigger = NULL;
     sys->draining = false;
     pa_cvolume_init(&sys->cvolume);
-    sys->first_pts = sys->last_date = VLC_TICK_INVALID;
-    sys->flush_rt = 0;
+    sys->last_date = VLC_TICK_INVALID;
 
     pa_format_info *formatv = pa_format_info_new();
     formatv->encoding = encoding;
@@ -1099,7 +1080,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->time_get = NULL;
+    aout->time_get = TimeGet;
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
