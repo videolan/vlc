@@ -1140,10 +1140,16 @@ static const char* const ppsz_restore_playback_desc[] = {
 #ifdef _WIN32
 static const char *const clock_sources[] = {
     "", "perf",
+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+    "multimedia",
+#endif
 };
 
 static const char *const clock_sources_text[] = {
     N_("Auto"), "Performance counters",
+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+    "Multimedia timers",
+#endif
 };
 #endif
 

@@ -43,6 +43,10 @@
 #include <time.h>
 #include <vlc_atomic.h>
 
+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+#include <mmsystem.h>
+#endif
+
 #ifndef NTDDI_WIN10_RS3
 #define NTDDI_WIN10_RS3  0x0A000004
 #endif
@@ -559,6 +563,17 @@ static vlc_tick_t mdate_wall (void)
     return VLC_TICK_FROM_MSFTIME(s.QuadPart);
 }
 
+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+static vlc_tick_t mdate_multimedia(void)
+{
+    DWORD ts = timeGetTime ();
+
+    /* milliseconds */
+    static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
+    return VLC_TICK_FROM_MS(ts);
+}
+#endif
+
 static vlc_tick_t (*mdate_selected) (void) = mdate_wall;
 
 vlc_tick_t vlc_tick_now (void)
@@ -621,11 +636,28 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 static void SelectClockSource(libvlc_int_t *obj)
 {
     // speed comparison / granularity / counts during sleep
+    // multimedia:102000 /    5 ms / no
     // perf:      155612 / ~100 ns / yes
     // wall:      181593 /  100 ns / yes
 
     char *str = var_InheritString(obj, "clock-source");
     const char *name = str != NULL ? str : "perf";
+#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+    if (!strcmp (name, "multimedia"))
+    {
+        TIMECAPS caps;
+
+        msg_Dbg (obj, "using multimedia timers as clock source");
+        if (timeGetDevCaps (&caps, sizeof (caps)) != MMSYSERR_NOERROR)
+            abort();
+        msg_Dbg (obj, " min period: %u ms, max period: %u ms",
+                 caps.wPeriodMin, caps.wPeriodMax);
+        mdate_selected = mdate_multimedia;
+
+        timeBeginPeriod(__MAX(5, caps.wPeriodMin));
+    }
+    else
+#endif
     if (!strcmp (name, "perf"))
     {
         msg_Dbg (obj, "using performance counters as clock source");
