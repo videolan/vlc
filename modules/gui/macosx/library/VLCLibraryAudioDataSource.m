@@ -112,9 +112,42 @@
             return;
         }
 
+        id<VLCMediaLibraryItemProtocol> selectedCollectionViewItem;
+        if(_collectionView.selectionIndexPaths.count > 0 && !_collectionView.hidden) {
+            selectedCollectionViewItem = [self selectedCollectionViewItem];
+        }
+
         _displayedCollection = collectionToDisplay;
         [self reloadData];
+
+        // Reopen supplementary view in the collection views
+        if(selectedCollectionViewItem) {
+            NSUInteger newIndexOfSelectedItem = [_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
+                id<VLCMediaLibraryItemProtocol> itemElement = (id<VLCMediaLibraryItemProtocol>)element;
+                return itemElement.libraryID == selectedCollectionViewItem.libraryID;
+            }];
+
+            if(newIndexOfSelectedItem == NSNotFound) {
+                return;
+            }
+
+            NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:newIndexOfSelectedItem inSection:0];
+            NSSet *indexPathSet = [NSSet setWithObject:newIndexPath];
+            [_collectionView selectItemsAtIndexPaths:indexPathSet scrollPosition:NSCollectionViewScrollPositionTop];
+            // selectItemsAtIndexPaths does not call any delegate methods so we do it manually
+            [self collectionView:_collectionView didSelectItemsAtIndexPaths:indexPathSet];
+        }
     });
+}
+
+- (id<VLCMediaLibraryItemProtocol>)selectedCollectionViewItem
+{
+    NSIndexPath *indexPath = _collectionView.selectionIndexPaths.anyObject;
+    if (!indexPath) {
+        return nil;
+    }
+
+    return _displayedCollection[indexPath.item];
 }
 
 - (void)setupAppearance
