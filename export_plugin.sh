@@ -122,7 +122,7 @@ for plugin in $(find "${INPUT_PATH}" -name  '*plugin.dylib'); do
         -change "@rpath/libvlccore.dylib" "@rpath/vlccore.framework/vlccore"
 
     EXECUTABLE_NAME=${name}_plugin \
-    BUNDLE_IDENTIFIER=${BASE_IDENTIFIER}.${name}_plugin \
+    BUNDLE_IDENTIFIER=${BASE_IDENTIFIER}.$(echo ${name} | tr '_' '-')-plugin \
     bash template.info.plist.sh > "${OUTPUT_PATH}/${name}_plugin.framework/Info.plist"
     plutil -convert binary1 "${OUTPUT_PATH}/${name}_plugin.framework/Info.plist"
 
