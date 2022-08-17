@@ -54,10 +54,8 @@ int  config_AutoSaveConfigFile( vlc_object_t * );
 
 void config_Free(struct vlc_param *, size_t);
 
-#ifdef HAVE_DYNAMIC_PLUGINS
 void config_CmdLineEarlyScan( vlc_object_t *, int, const char *[] );
 #define config_CmdLineEarlyScan(a,b,c) config_CmdLineEarlyScan(VLC_OBJECT(a),b,c)
-#endif
 
 int config_LoadCmdLine   ( vlc_object_t *, int, const char *[], int * );
 int config_LoadConfigFile( vlc_object_t * );

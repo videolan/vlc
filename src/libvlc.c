@@ -145,11 +145,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     module_InitBank ();
 
     /*
-     * Perform early check for commandline arguments that affect module loading.
+     * Perform early check for commandline arguments that affect module loading
+     * or vlc_threads_setup()
      */
-#ifdef HAVE_DYNAMIC_PLUGINS
     config_CmdLineEarlyScan( p_libvlc, i_argc, ppsz_argv );
-#endif
 
     vlc_threads_setup (p_libvlc);
 

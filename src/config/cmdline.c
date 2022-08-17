@@ -40,7 +40,6 @@
 
 #include <assert.h>
 
-#ifdef HAVE_DYNAMIC_PLUGINS
 #undef config_CmdLineEarlyScan
 /**
  * Perform early scan of arguments for a small subset of simple options.
@@ -98,6 +97,9 @@
  */
 void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[] )
 {
+#if !defined(HAVE_DYNAMIC_PLUGINS) && !defined(_WIN32)
+    VLC_UNUSED(p_this); VLC_UNUSED(argc); VLC_UNUSED(argv);
+#else
     for( int i = 0; i < argc; i++ )
     {
         const char *arg = argv[i];
@@ -126,9 +128,11 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
         continue; \
     }
 
+#ifdef HAVE_DYNAMIC_PLUGINS
         check_option("plugins-cache")
         check_option("plugins-scan")
         check_option("reset-plugins-cache")
+#endif
 
 #if defined(_WIN32) || defined(__OS2__)
         check_option("high-priority")
@@ -141,8 +145,8 @@ void config_CmdLineEarlyScan( vlc_object_t *p_this, int argc, const char *argv[]
 #undef check_option_variant
 #undef check_string
     }
-}
 #endif
+}
 
 #undef config_LoadCmdLine
 /**
