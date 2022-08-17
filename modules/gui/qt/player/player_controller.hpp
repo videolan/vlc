@@ -151,6 +151,8 @@ public:
 
     //programs
     Q_PROPERTY(ProgramListModel* programs READ getPrograms CONSTANT FINAL)
+
+    Q_PROPERTY(bool hasPrograms READ hasPrograms NOTIFY hasProgramsChanged FINAL)
     Q_PROPERTY(bool isEncrypted READ isEncrypted NOTIFY isEncryptedChanged FINAL)
 
     //teletext
@@ -324,6 +326,7 @@ public slots:
 
     //programs
     ProgramListModel* getPrograms();
+    bool hasPrograms() const;
     bool isEncrypted() const;
 
     //teletext
@@ -409,6 +412,7 @@ signals:
     void isInteractiveChanged( bool );
 
     //program
+    void hasProgramsChanged( bool );
     void isEncryptedChanged( bool );
 
     //teletext

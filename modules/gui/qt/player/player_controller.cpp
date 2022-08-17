@@ -154,6 +154,16 @@ void PlayerControllerPrivate::UpdateProgram(enum vlc_player_list_action action, 
 {
     Q_Q(PlayerController);
     m_programList.updatePrograms( action, prgm );
+
+    bool hasPrograms = (m_programList.getCount() > 1);
+
+    if (m_hasPrograms != hasPrograms)
+    {
+        m_hasPrograms = hasPrograms;
+
+        emit q->hasProgramsChanged(hasPrograms);
+    }
+
     emit q->isEncryptedChanged( prgm->scrambled );
 }
 
@@ -355,6 +365,9 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
             emit q->artChanged( "" );
             emit q->infoChanged( NULL );
             emit q->currentMetaChanged( (input_item_t *)NULL );
+
+            that->m_hasPrograms =false;
+            emit q->hasProgramsChanged( false );
 
             that->m_encrypted =false;
             emit q->isEncryptedChanged( false );
@@ -1947,6 +1960,7 @@ PRIMITIVETYPE_GETTER(bool, hasChapters, m_hasChapters)
 PRIMITIVETYPE_GETTER(bool, hasMenu, m_hasMenu)
 PRIMITIVETYPE_GETTER(bool, isMenu, m_isMenu)
 PRIMITIVETYPE_GETTER(bool, isInteractive, m_isInteractive)
+PRIMITIVETYPE_GETTER(bool, hasPrograms, m_hasPrograms)
 PRIMITIVETYPE_GETTER(bool, isEncrypted, m_encrypted)
 PRIMITIVETYPE_GETTER(bool, isRecording, m_recording)
 PRIMITIVETYPE_GETTER(PlayerController::ABLoopState, getABloopState, m_ABLoopState)

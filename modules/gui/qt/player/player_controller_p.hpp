@@ -128,6 +128,7 @@ public:
 
     //programs
     ProgramListModel m_programList;
+    bool m_hasPrograms = false;
     bool m_encrypted = false;
 
     //teletext
