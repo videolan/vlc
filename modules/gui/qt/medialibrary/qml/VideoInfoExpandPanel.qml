@@ -273,7 +273,12 @@ FocusScope {
         Repeater {
             model: expandRect.model.videoDesc
 
+            // TODO: use inline Component for Qt > 5.14
             delegate: Repeater {
+                id: videoDescRepeaterDelegate
+
+                readonly property bool isFirst: (index === 0)
+
                 model: [
                     {text: I18n.qtr("Codec:"), data: modelData.codec },
                     {text: I18n.qtr("Language:"), data: modelData.language },
@@ -281,10 +286,10 @@ FocusScope {
                 ]
 
                 delegate: Widgets.MenuCaption {
+                    topPadding: (!videoDescRepeaterDelegate.isFirst) && (index === 0) ? VLCStyle.margin_small : 0
                     text: modelData.text + " " + modelData.data
                     bottomPadding: VLCStyle.margin_xsmall
                 }
-
             }
         }
     }
@@ -292,10 +297,15 @@ FocusScope {
     ObjectModel {
         id: audioDescModel
 
+        // TODO: use inline Component for Qt > 5.14
         Repeater {
             model: expandRect.model.audioDesc
 
             delegate: Repeater {
+                id: audioDescRepeaterDelegate
+
+                readonly property bool isFirst: (index === 0)
+
                 model: [
                     {text: I18n.qtr("Codec:"), data: modelData.codec },
                     {text: I18n.qtr("Language:"), data: modelData.language },
@@ -303,6 +313,7 @@ FocusScope {
                 ]
 
                 delegate: Widgets.MenuCaption {
+                    topPadding: (!audioDescRepeaterDelegate.isFirst) && (index === 0) ? VLCStyle.margin_small : 0
                     text: modelData.text + " " + modelData.data
                     bottomPadding: VLCStyle.margin_xsmall
                 }
