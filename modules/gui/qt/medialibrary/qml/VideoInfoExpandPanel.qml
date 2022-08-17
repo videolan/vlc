@@ -174,50 +174,45 @@ FocusScope {
                     width: parent.width
                 }
 
-                Column {
-                    width: expand_infos_id.width
-
+                Widgets.MenuCaption {
                     topPadding: VLCStyle.margin_normal
+                    text: "<b>" + I18n.qtr("File Name:") + "</b> " + expandRect.model.fileName
+                    width: parent.width
+                    textFormat: Text.StyledText
+                }
 
-                    Widgets.MenuCaption {
-                        text: "<b>" + I18n.qtr("File Name:") + "</b> " + expandRect.model.fileName
-                        width: parent.width
-                        textFormat: Text.StyledText
-                    }
+                Widgets.MenuCaption {
+                    text: "<b>" + I18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
+                    topPadding: VLCStyle.margin_xsmall
+                    width: parent.width
+                    textFormat: Text.StyledText
+                }
 
-                    Widgets.MenuCaption {
-                        text: "<b>" + I18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
-                        topPadding: VLCStyle.margin_xsmall
-                        width: parent.width
-                        textFormat: Text.StyledText
-                    }
+                MouseArea {
+                    width: childrenRect.width
+                    height: childrenRect.height
 
-                    MouseArea {
-                        width: childrenRect.width
-                        height: childrenRect.height
+                    onClicked: _showMoreInfo = !_showMoreInfo
 
-                        onClicked: _showMoreInfo = !_showMoreInfo
+                    Row {
+                        topPadding: VLCStyle.margin_large
+                        spacing: VLCStyle.margin_xsmall
 
-                        Row {
-                            topPadding: VLCStyle.margin_large
-                            spacing: VLCStyle.margin_xsmall
+                        Widgets.IconLabel {
+                            text: VLCIcons.expand
+                            rotation: _showMoreInfo ? -180 : 0
+                            font.pixelSize: VLCStyle.icon_normal
 
-                            Widgets.IconLabel {
-                                text: VLCIcons.expand
-                                rotation: _showMoreInfo ? -180 : 0
-                                font.pixelSize: VLCStyle.icon_normal
-
-                                Behavior on rotation {
-                                    NumberAnimation {
-                                        duration: VLCStyle.duration_short
-                                    }
+                            Behavior on rotation {
+                                NumberAnimation {
+                                    duration: VLCStyle.duration_short
                                 }
                             }
+                        }
 
-                            Widgets.CaptionLabel {
-                                text: _showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
-                                color: VLCStyle.colors.text
-                            }
+                        Widgets.CaptionLabel {
+                            text: _showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
+                            color: VLCStyle.colors.text
                         }
                     }
                 }
