@@ -172,8 +172,10 @@
 # define APIENTRY
 #endif
 
+#if 0
 #ifndef NDEBUG
 # define HAVE_GL_ASSERT_NOERROR
+#endif
 #endif
 
 #ifdef HAVE_GL_ASSERT_NOERROR
