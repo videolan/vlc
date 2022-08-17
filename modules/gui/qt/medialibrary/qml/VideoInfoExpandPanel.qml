@@ -224,80 +224,87 @@ FocusScope {
 
                     spacing: VLCStyle.margin_xlarge
 
-                    Column {
-                        id: videoTrackInfo
+                    visible: _showMoreInfo
 
-                        visible: (_showMoreInfo && expandRect.model.videoDesc.length > 0)
-
-                        opacity: (visible) ? 1.0 : 0.0
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: VLCStyle.duration_short
+                    Repeater {
+                        model: [
+                            {
+                                "title": I18n.qtr("Video track"),
+                                "model": videoDescModel
+                            },
+                            {
+                                "title": I18n.qtr("Audio track"),
+                                "model": audioDescModel
                             }
-                        }
+                        ]
 
-                        Widgets.MenuCaption {
-                            text: I18n.qtr("Video track")
-                            font.bold: true
-                            bottomPadding: VLCStyle.margin_small
-                        }
+                        delegate: Column {
+                            visible: delgateRepeater.count > 0
 
-                        Repeater {
-                            model: expandRect.model.videoDesc
+                            opacity: (visible) ? 1.0 : 0.0
 
-                            delegate: Repeater {
-                                model: [
-                                    {text: I18n.qtr("Codec:"), data: modelData.codec },
-                                    {text: I18n.qtr("Language:"), data: modelData.language },
-                                    {text: I18n.qtr("FPS:"), data: modelData.fps }
-                                ]
-
-                                delegate: Widgets.MenuCaption {
-                                    text: modelData.text + " " + modelData.data
-                                    bottomPadding: VLCStyle.margin_xsmall
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: VLCStyle.duration_short
                                 }
+                            }
 
+                            Widgets.MenuCaption {
+                                text: modelData.title
+                                font.bold: true
+                                bottomPadding: VLCStyle.margin_small
+                            }
+
+                            Repeater {
+                                id: delgateRepeater
+
+                                model: modelData.model
                             }
                         }
                     }
+                }
+            }
+        }
+    }
 
-                    Column {
-                        id: audioTrackInfo
+    ObjectModel {
+        id: videoDescModel
 
-                        visible: (_showMoreInfo && expandRect.model.audioDesc.length > 0)
+        Repeater {
+            model: expandRect.model.videoDesc
 
-                        opacity: (visible) ? 1.0 : 0.0
+            delegate: Repeater {
+                model: [
+                    {text: I18n.qtr("Codec:"), data: modelData.codec },
+                    {text: I18n.qtr("Language:"), data: modelData.language },
+                    {text: I18n.qtr("FPS:"), data: modelData.fps }
+                ]
 
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: VLCStyle.duration_short
-                            }
-                        }
+                delegate: Widgets.MenuCaption {
+                    text: modelData.text + " " + modelData.data
+                    bottomPadding: VLCStyle.margin_xsmall
+                }
 
-                        Widgets.MenuCaption {
-                            text: I18n.qtr("Audio track")
-                            font.bold: true
-                            bottomPadding: VLCStyle.margin_small
-                        }
+            }
+        }
+    }
 
-                        Repeater {
-                            model: expandRect.model.audioDesc
+    ObjectModel {
+        id: audioDescModel
 
-                            delegate: Repeater {
-                                model: [
-                                    {text: I18n.qtr("Codec:"), data: modelData.codec },
-                                    {text: I18n.qtr("Language:"), data: modelData.language },
-                                    {text: I18n.qtr("Channel:"), data: modelData.nbchannels }
-                                ]
+        Repeater {
+            model: expandRect.model.audioDesc
 
-                                delegate: Widgets.MenuCaption {
-                                    text: modelData.text + " " + modelData.data
-                                    bottomPadding: VLCStyle.margin_xsmall
-                                }
-                            }
-                        }
-                    }
+            delegate: Repeater {
+                model: [
+                    {text: I18n.qtr("Codec:"), data: modelData.codec },
+                    {text: I18n.qtr("Language:"), data: modelData.language },
+                    {text: I18n.qtr("Channel:"), data: modelData.nbchannels }
+                ]
+
+                delegate: Widgets.MenuCaption {
+                    text: modelData.text + " " + modelData.data
+                    bottomPadding: VLCStyle.margin_xsmall
                 }
             }
         }
