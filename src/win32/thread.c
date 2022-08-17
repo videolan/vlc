@@ -293,6 +293,8 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 
         if (WaitOnAddress(addr, &val, sizeof (val), ms))
             return 0;
+        if (GetLastError() == ERROR_TIMEOUT)
+            return ETIMEDOUT;
     }
 }
 
@@ -316,6 +318,8 @@ int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline)
 
         if (WaitOnAddress(addr, &val, sizeof (val), ms))
             return 0;
+        if (GetLastError() == ERROR_TIMEOUT)
+            return ETIMEDOUT;
     }
 }
 
@@ -631,6 +635,8 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
                 vlc_docancel(th);
         }
 #endif
+        if (delay_ms != ULONG_MAX)
+            break;
     }
 }
 
