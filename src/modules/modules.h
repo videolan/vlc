@@ -112,8 +112,7 @@ vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb);
 int vlc_plugin_resolve(vlc_plugin_t *, vlc_plugin_cb);
 
 void module_InitBank (void);
-void module_LoadPlugins(vlc_object_t *);
-#define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
+void module_LoadPlugins(libvlc_int_t *);
 void module_EndBank (bool);
 int vlc_plugin_Map(struct vlc_logger *, vlc_plugin_t *);
 void *vlc_plugin_Symbol(struct vlc_logger *, vlc_plugin_t *, const char *name);
@@ -181,9 +180,9 @@ void *vlc_dlsym(void *handle, const char *) VLC_USED;
 char *vlc_dlerror(void) VLC_USED;
 
 /* Plugins cache */
-vlc_plugin_t *vlc_cache_load(vlc_object_t *, const char *, block_t **);
+vlc_plugin_t *vlc_cache_load(libvlc_int_t *, const char *, block_t **);
 vlc_plugin_t *vlc_cache_lookup(vlc_plugin_t **, const char *relpath);
 
-void CacheSave(vlc_object_t *, const char *, vlc_plugin_t *const *, size_t);
+void CacheSave(libvlc_int_t *, const char *, vlc_plugin_t *const *, size_t);
 
 #endif /* !LIBVLC_MODULES_H */
