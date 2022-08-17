@@ -76,6 +76,7 @@ public:
         BOOKMARK_BUTTON,
         RENDERER_BUTTON,
         NAVIGATION_BUTTONS,
+        PROGRAM_BUTTON,
         SPECIAL_MAX,
 
         WIDGET_SPACER = 0x40,
