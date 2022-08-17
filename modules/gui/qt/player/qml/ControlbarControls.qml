@@ -59,6 +59,7 @@ QtObject {
         { id: ControlListModel.NAVIGATION_BUTTONS, file: "NavigationWidget.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("Navigation") },
         { id: ControlListModel.DVD_MENUS_BUTTON, file: "DvdMenuButton.qml", label: VLCIcons.dvd_menu, text: I18n.qtr("DVD menus") },
         { id: ControlListModel.TELETEXT_BUTTONS, file: "TeletextWidget.qml", label: VLCIcons.tvtelx, text: I18n.qtr("Teletext") },
+        { id: ControlListModel.PROGRAM_BUTTON, file: "ProgramButton.qml", label: VLCIcons.bookmark, text: I18n.qtr("Program Button") },
         { id: ControlListModel.RENDERER_BUTTON, file: "RendererButton.qml", label: VLCIcons.renderer, text: I18n.qtr("Renderer Button") },
         { id: ControlListModel.ASPECT_RATIO_COMBOBOX, file: "AspectRatioWidget.qml", label: VLCIcons.aspect_ratio, text: I18n.qtr("Aspect Ratio") },
         { id: ControlListModel.WIDGET_SPACER, file: "SpacerWidget.qml", label: VLCIcons.space, text: I18n.qtr("Spacer") },
