@@ -37,6 +37,18 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistSortingMenuController;
 @class VLCFSPanelController;
 
+typedef NS_ENUM(NSUInteger, VLCLibrarySegment) {
+    VLCLibraryVideoSegment = 0,
+    VLCLibraryMusicSegment,
+    VLCLibraryBrowseSegment,
+    VLCLibraryStreamsSegment
+};
+
+typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
+    VLCGridViewModeSegment = 0,
+    VLCListViewModeSegment
+};
+
 @interface VLCLibraryWindowController : NSWindowController<NSWindowRestoration>
 
 - (instancetype)initWithLibraryWindow;

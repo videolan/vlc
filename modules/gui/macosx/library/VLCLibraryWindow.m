@@ -252,10 +252,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _currentSelectedSegment = -1; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 4;
     [_segmentedTitleControl setTarget:self];
-    [_segmentedTitleControl setLabel:_NS("Video") forSegment:0];
-    [_segmentedTitleControl setLabel:_NS("Music") forSegment:1];
-    [_segmentedTitleControl setLabel:_NS("Browse") forSegment:2];
-    [_segmentedTitleControl setLabel:_NS("Streams") forSegment:3];
+    [_segmentedTitleControl setLabel:_NS("Video") forSegment:VLCLibraryVideoSegment];
+    [_segmentedTitleControl setLabel:_NS("Music") forSegment:VLCLibraryMusicSegment];
+    [_segmentedTitleControl setLabel:_NS("Browse") forSegment:VLCLibraryBrowseSegment];
+    [_segmentedTitleControl setLabel:_NS("Streams") forSegment:VLCLibraryStreamsSegment];
     [_segmentedTitleControl sizeToFit];
 
     _playlistDragDropView.dropTarget = self;
@@ -533,16 +533,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
 
     switch (_segmentedTitleControl.selectedSegment) {
-        case 0:
+        case VLCLibraryVideoSegment:
             [self showVideoLibrary];
             break;
-
-        case 1:
+        case VLCLibraryMusicSegment:
             [self showAudioLibrary];
             break;
-
-        default:
+        case VLCLibraryBrowseSegment:
+        case VLCLibraryStreamsSegment:
             [self showMediaSourceAppearance];
+            break;
+        default:
             break;
     }
 }
@@ -635,7 +636,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
         
         
-         if (self.gridVsListSegmentedControl.selectedSegment == 0) {
+         if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
             _audioLibrarySplitView.hidden = YES;
             _audioCollectionViewScrollView.hidden = NO;
             [_libraryAudioDataSource reloadAppearance];

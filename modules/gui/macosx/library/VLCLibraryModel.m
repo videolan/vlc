@@ -166,11 +166,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [_defaultNotificationCenter removeObserver:self];
 }
 
-+ (NSArray *)availableAudioCollections
-{
-    return @[_NS("Artists"), _NS("Albums"), _NS("Songs"), _NS("Genres")];
-}
-
 - (void)mediaItemWasUpdated:(VLCMediaLibraryMediaItem *)mediaItem
 {
     [_defaultNotificationCenter postNotificationName:VLCLibraryModelMediaItemUpdated object:mediaItem];

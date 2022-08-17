@@ -42,8 +42,6 @@ extern NSString *VLCLibraryModelMediaItemUpdated;
 
 @interface VLCLibraryModel : NSObject
 
-+ (NSArray *)availableAudioCollections;
-
 - (instancetype)initWithLibrary:(vlc_medialibrary_t *)library;
 
 @property (readonly) size_t numberOfAudioMedia;

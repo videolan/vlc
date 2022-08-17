@@ -30,6 +30,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryGroupDataSource;
 @class VLCMediaLibraryAlbum;
 
+typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
+    VLCAudioLibraryArtistsSegment = 0,
+    VLCAudioLibraryAlbumsSegment,
+    VLCAudioLibrarySongsSegment,
+    VLCAudioLibraryGenresSegment
+};
+
 @interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;

@@ -119,12 +119,11 @@
 
 - (void)setupAppearance
 {
-    NSArray *availableCollections = [VLCLibraryModel availableAudioCollections];
-    NSUInteger availableCollectionsCount = availableCollections.count;
-    self.segmentedControl.segmentCount = availableCollectionsCount;
-    for (NSUInteger x = 0; x < availableCollectionsCount; x++) {
-        [self.segmentedControl setLabel:availableCollections[x] forSegment:x];
-    }
+    self.segmentedControl.segmentCount = 4;
+    [self.segmentedControl setLabel:_NS("Artists") forSegment:VLCAudioLibraryArtistsSegment];
+    [self.segmentedControl setLabel:_NS("Albums") forSegment:VLCAudioLibraryAlbumsSegment];
+    [self.segmentedControl setLabel:_NS("Songs") forSegment:VLCAudioLibrarySongsSegment];
+    [self.segmentedControl setLabel:_NS("Genres") forSegment:VLCAudioLibraryGenresSegment];
 
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
@@ -200,19 +199,19 @@
 
     _currentSelectedSegment = _segmentedControl.selectedSegment;
     switch (_currentSelectedSegment) {
-        case 0:
+        case VLCAudioLibraryArtistsSegment:
             _displayedCollection = [self.libraryModel listOfArtists];
             _currentParentType = VLC_ML_PARENT_ARTIST;
             break;
-        case 1:
+        case VLCAudioLibraryAlbumsSegment:
             _displayedCollection = [self.libraryModel listOfAlbums];
             _currentParentType = VLC_ML_PARENT_ALBUM;
             break;
-        case 2:
+        case VLCAudioLibrarySongsSegment:
             _displayedCollection = [self.libraryModel listOfAudioMedia];
             _currentParentType = VLC_ML_PARENT_UNKNOWN;
             break;
-        case 3:
+        case VLCAudioLibraryGenresSegment:
             _displayedCollection = [self.libraryModel listOfGenres];
             _currentParentType = VLC_ML_PARENT_GENRE;
             break;
