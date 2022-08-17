@@ -282,10 +282,14 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 
         if (delay < 0)
             return ETIMEDOUT; // deadline passed
-        if (delay >= VLC_TICK_FROM_MS(LONG_MAX))
-            ms = LONG_MAX;
+
+        DWORD ms;
+        int64_t idelay = MS_FROM_VLC_TICK(delay);
+        static_assert(sizeof(unsigned long) <= sizeof(DWORD), "unknown max DWORD");
+        if (unlikely(idelay > ULONG_MAX))
+            ms = ULONG_MAX;
         else
-            ms = MS_FROM_VLC_TICK(delay);
+            ms = idelay;
 
         if (WaitOnAddress(addr, &val, sizeof (val), ms))
             return 0;
