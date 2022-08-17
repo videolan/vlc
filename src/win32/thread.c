@@ -298,18 +298,19 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 
 int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline)
 {
-    long delay;
+    time_t delay;
 
     for(;;)
     {
-        long ms;
-
         delay = deadline - time(NULL);
 
         if (delay < 0)
             return ETIMEDOUT; // deadline passed
-        if (delay >= (LONG_MAX / 1000))
-            ms = LONG_MAX;
+
+        DWORD ms;
+        static_assert(sizeof(unsigned long) <= sizeof(DWORD), "unknown max DWORD");
+        if (unlikely(delay > (ULONG_MAX / 1000)))
+            ms = ULONG_MAX;
         else
             ms = delay * 1000;
 
