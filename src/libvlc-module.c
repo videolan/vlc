@@ -2200,7 +2200,6 @@ vlc_module_begin ()
 #endif
 
     add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT )
-        change_volatile ()
     add_obsolete_bool( "advanced" ) /* since 4.0.0 */
     add_bool( "interact", true, INTERACTION_TEXT,
               INTERACTION_LONGTEXT )
