@@ -181,8 +181,10 @@ typedef struct vlc_gl_t vlc_gl_t;
 # define APIENTRY
 #endif
 
+#if 0
 #ifndef NDEBUG
 # define HAVE_GL_ASSERT_NOERROR
+#endif
 #endif
 
 #ifdef HAVE_GL_ASSERT_NOERROR
