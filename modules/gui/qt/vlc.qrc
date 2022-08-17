@@ -334,6 +334,7 @@
         <file alias="PlayerSwitchButton.qml">player/qml/controlbarcontrols/PlayerSwitchButton.qml</file>
         <file alias="PlaylistButton.qml">player/qml/controlbarcontrols/PlaylistButton.qml</file>
         <file alias="PreviousButton.qml">player/qml/controlbarcontrols/PreviousButton.qml</file>
+        <file alias="ProgramButton.qml">player/qml/controlbarcontrols/ProgramButton.qml</file>
         <file alias="QuitButton.qml">player/qml/controlbarcontrols/QuitButton.qml</file>
         <file alias="RandomButton.qml">player/qml/controlbarcontrols/RandomButton.qml</file>
         <file alias="RendererButton.qml">player/qml/controlbarcontrols/RendererButton.qml</file>

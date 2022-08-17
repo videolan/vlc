@@ -875,6 +875,7 @@ modules/gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/PlayerSwitchButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/PlaylistButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/PreviousButton.qml
+modules/gui/qt/player/qml/controlbarcontrols/ProgramButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/QuitButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/RandomButton.qml
 modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml
