@@ -612,14 +612,18 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 
     while ((delay = (deadline - vlc_tick_now())) > 0)
     {
-        delay = (delay + (1000-1)) / 1000;
-        if (unlikely(delay > 0x7fffffff))
-            delay = 0x7fffffff;
+        int64_t idelay = MS_FROM_VLC_TICK(delay + VLC_TICK_FROM_MS(1)-1);
+        DWORD delay_ms;
+        static_assert(sizeof(unsigned long) <= sizeof(DWORD), "unknown max DWORD");
+        if (unlikely(idelay > ULONG_MAX))
+            delay_ms = ULONG_MAX;
+        else
+            delay_ms = idelay;
 
 #if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-        Sleep(delay);
+        Sleep(delay_ms);
 #else
-        SleepEx(delay, TRUE);
+        SleepEx(delay_ms, TRUE);
 
         if (likely(th != NULL) && th->killable)
         {
