@@ -1,0 +1,206 @@
+From c5c04a5b323e6390a8de91ca8dfd0e3aeacf1528 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 18 Aug 2022 14:44:33 +0200
+Subject: [PATCH] ifo_types: avoid forcing a higher length in bitfield
+ structures
+
+LLVM ends up using the size of an unsigned int if it's used in the bitfield.
+In other places the bitfields are using unsigned char which always uses the
+proper size in the packed structures.
+
+* multichannel_ext_t would end up having a size of 27 instead of 24
+* cell_playback_t would end up having a size of 26 instead of 24
+* pgci_srp_t would end up having a size of 11 instead of 8
+* playback_type_t would end up having a size of 4 instead of 1
+---
+ src/dvdread/ifo_types.h | 146 ++++++++++++++++++++--------------------
+ 1 file changed, 73 insertions(+), 73 deletions(-)
+
+diff --git a/src/dvdread/ifo_types.h b/src/dvdread/ifo_types.h
+index fca1b8b..9293ce7 100644
+--- a/src/dvdread/ifo_types.h
++++ b/src/dvdread/ifo_types.h
+@@ -132,29 +132,29 @@ typedef struct {
+  * MultiChannel Extension
+  */
+ typedef struct {
+-  unsigned int zero1      : 7;
+-  unsigned int ach0_gme   : 1;
+-
+-  unsigned int zero2      : 7;
+-  unsigned int ach1_gme   : 1;
+-
+-  unsigned int zero3      : 4;
+-  unsigned int ach2_gv1e  : 1;
+-  unsigned int ach2_gv2e  : 1;
+-  unsigned int ach2_gm1e  : 1;
+-  unsigned int ach2_gm2e  : 1;
+-
+-  unsigned int zero4      : 4;
+-  unsigned int ach3_gv1e  : 1;
+-  unsigned int ach3_gv2e  : 1;
+-  unsigned int ach3_gmAe  : 1;
+-  unsigned int ach3_se2e  : 1;
+-
+-  unsigned int zero5      : 4;
+-  unsigned int ach4_gv1e  : 1;
+-  unsigned int ach4_gv2e  : 1;
+-  unsigned int ach4_gmBe  : 1;
+-  unsigned int ach4_seBe  : 1;
++  unsigned char zero1      : 7;
++  unsigned char ach0_gme   : 1;
++
++  unsigned char zero2      : 7;
++  unsigned char ach1_gme   : 1;
++
++  unsigned char zero3      : 4;
++  unsigned char ach2_gv1e  : 1;
++  unsigned char ach2_gv2e  : 1;
++  unsigned char ach2_gm1e  : 1;
++  unsigned char ach2_gm2e  : 1;
++
++  unsigned char zero4      : 4;
++  unsigned char ach3_gv1e  : 1;
++  unsigned char ach3_gv2e  : 1;
++  unsigned char ach3_gmAe  : 1;
++  unsigned char ach3_se2e  : 1;
++
++  unsigned char zero5      : 4;
++  unsigned char ach4_gv1e  : 1;
++  unsigned char ach4_gv2e  : 1;
++  unsigned char ach4_gmBe  : 1;
++  unsigned char ach4_seBe  : 1;
+   uint8_t zero6[19];
+ } ATTRIBUTE_PACKED multichannel_ext_t;
+ 
+@@ -207,16 +207,16 @@ typedef uint8_t pgc_program_map_t;
+  * Cell Playback Information.
+  */
+ typedef struct {
+-  unsigned int block_mode       : 2;
+-  unsigned int block_type       : 2;
+-  unsigned int seamless_play    : 1;
+-  unsigned int interleaved      : 1;
+-  unsigned int stc_discontinuity: 1;
+-  unsigned int seamless_angle   : 1;
+-  unsigned int zero_1           : 1;
+-  unsigned int playback_mode    : 1;  /**< When set, enter StillMode after each VOBU */
+-  unsigned int restricted       : 1;  /**< ?? drop out of fastforward? */
+-  unsigned int cell_type        : 5;  /** for karaoke, reserved otherwise */
++  unsigned char block_mode       : 2;
++  unsigned char block_type       : 2;
++  unsigned char seamless_play    : 1;
++  unsigned char interleaved      : 1;
++  unsigned char stc_discontinuity: 1;
++  unsigned char seamless_angle   : 1;
++  unsigned char zero_1           : 1;
++  unsigned char playback_mode    : 1;  /**< When set, enter StillMode after each VOBU */
++  unsigned char restricted       : 1;  /**< ?? drop out of fastforward? */
++  unsigned char cell_type        : 5;  /** for karaoke, reserved otherwise */
+   uint8_t still_time;
+   uint8_t cell_cmd_nr;
+   dvd_time_t playback_time;
+@@ -247,35 +247,35 @@ typedef struct {
+  * User Operations.
+  */
+ typedef struct {
+-  unsigned int zero                           : 7; /* 25-31 */
+-  unsigned int video_pres_mode_change         : 1; /* 24 */
+-
+-  unsigned int karaoke_audio_pres_mode_change : 1; /* 23 */
+-  unsigned int angle_change                   : 1;
+-  unsigned int subpic_stream_change           : 1;
+-  unsigned int audio_stream_change            : 1;
+-  unsigned int pause_on                       : 1;
+-  unsigned int still_off                      : 1;
+-  unsigned int button_select_or_activate      : 1;
+-  unsigned int resume                         : 1; /* 16 */
+-
+-  unsigned int chapter_menu_call              : 1; /* 15 */
+-  unsigned int angle_menu_call                : 1;
+-  unsigned int audio_menu_call                : 1;
+-  unsigned int subpic_menu_call               : 1;
+-  unsigned int root_menu_call                 : 1;
+-  unsigned int title_menu_call                : 1;
+-  unsigned int backward_scan                  : 1;
+-  unsigned int forward_scan                   : 1; /* 8 */
+-
+-  unsigned int next_pg_search                 : 1; /* 7 */
+-  unsigned int prev_or_top_pg_search          : 1;
+-  unsigned int time_or_chapter_search         : 1;
+-  unsigned int go_up                          : 1;
+-  unsigned int stop                           : 1;
+-  unsigned int title_play                     : 1;
+-  unsigned int chapter_search_or_play         : 1;
+-  unsigned int title_or_time_play             : 1; /* 0 */
++  unsigned char zero                           : 7; /* 25-31 */
++  unsigned char video_pres_mode_change         : 1; /* 24 */
++
++  unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
++  unsigned char angle_change                   : 1;
++  unsigned char subpic_stream_change           : 1;
++  unsigned char audio_stream_change            : 1;
++  unsigned char pause_on                       : 1;
++  unsigned char still_off                      : 1;
++  unsigned char button_select_or_activate      : 1;
++  unsigned char resume                         : 1; /* 16 */
++
++  unsigned char chapter_menu_call              : 1; /* 15 */
++  unsigned char angle_menu_call                : 1;
++  unsigned char audio_menu_call                : 1;
++  unsigned char subpic_menu_call               : 1;
++  unsigned char root_menu_call                 : 1;
++  unsigned char title_menu_call                : 1;
++  unsigned char backward_scan                  : 1;
++  unsigned char forward_scan                   : 1; /* 8 */
++
++  unsigned char next_pg_search                 : 1; /* 7 */
++  unsigned char prev_or_top_pg_search          : 1;
++  unsigned char time_or_chapter_search         : 1;
++  unsigned char go_up                          : 1;
++  unsigned char stop                           : 1;
++  unsigned char title_play                     : 1;
++  unsigned char chapter_search_or_play         : 1;
++  unsigned char title_or_time_play             : 1; /* 0 */
+ } ATTRIBUTE_PACKED user_ops_t;
+ 
+ /**
+@@ -312,9 +312,9 @@ typedef struct {
+  */
+ typedef struct {
+   uint8_t  entry_id;
+-  unsigned int block_mode : 2;
+-  unsigned int block_type : 2;
+-  unsigned int zero_1   : 4;
++  unsigned char block_mode : 2;
++  unsigned char block_type : 2;
++  unsigned char zero_1   : 4;
+   uint16_t ptl_id_mask;
+   uint32_t pgc_start_byte;
+   pgc_t *pgc;
+@@ -440,14 +440,14 @@ typedef struct {
+ } ATTRIBUTE_PACKED vmgi_mat_t;
+ 
+ typedef struct {
+-  unsigned int zero_1                    : 1;
+-  unsigned int multi_or_random_pgc_title : 1; /* 0: one sequential pgc title */
+-  unsigned int jlc_exists_in_cell_cmd    : 1;
+-  unsigned int jlc_exists_in_prepost_cmd : 1;
+-  unsigned int jlc_exists_in_button_cmd  : 1;
+-  unsigned int jlc_exists_in_tt_dom      : 1;
+-  unsigned int chapter_search_or_play    : 1; /* UOP 1 */
+-  unsigned int title_or_time_play        : 1; /* UOP 0 */
++  unsigned char zero_1                    : 1;
++  unsigned char multi_or_random_pgc_title : 1; /* 0: one sequential pgc title */
++  unsigned char jlc_exists_in_cell_cmd    : 1;
++  unsigned char jlc_exists_in_prepost_cmd : 1;
++  unsigned char jlc_exists_in_button_cmd  : 1;
++  unsigned char jlc_exists_in_tt_dom      : 1;
++  unsigned char chapter_search_or_play    : 1; /* UOP 1 */
++  unsigned char title_or_time_play        : 1; /* UOP 0 */
+ } ATTRIBUTE_PACKED playback_type_t;
+ 
+ /**
+-- 
+2.27.0.windows.1
+
