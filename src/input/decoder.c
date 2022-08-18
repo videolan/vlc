@@ -2114,7 +2114,7 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
         vlc_video_context_Release( p_owner->vctx );
 
     /* Free all packets still in the decoder fifo. */
-    block_FifoRelease( p_owner->p_fifo );
+    block_FifoEmpty( p_owner->p_fifo );
 
     /* Cleanup */
 #ifdef ENABLE_SOUT
@@ -2174,6 +2174,7 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
         default:
             vlc_assert_unreachable();
     }
+    block_FifoRelease( p_owner->p_fifo );
 
     es_format_Clean( &p_owner->fmt );
 
