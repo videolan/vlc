@@ -1,0 +1,30 @@
+From ac7973075f808ffbf3bfeb601de940796485d6d1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 18 Aug 2022 11:14:57 +0200
+Subject: [PATCH] configure: don't use ms style packing
+
+It is not used in libdvdread and we should use the same structure packing as
+libdvdread.
+---
+ configure.ac | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 595378b..eb4cfa5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -99,11 +99,6 @@ AC_SUBST(THREAD_CFLAGS)
+ 
+ PKG_CHECK_MODULES([DVDREAD], [dvdread >= ${DVDREAD_MIN_VERSION}])
+ 
+-dnl ---------------------------------------------
+-dnl Check for bitfield compiler flag
+-dnl ---------------------------------------------
+-CC_CHECK_CFLAG_APPEND([-mno-ms-bitfields])
+-
+ dnl check for -Wall -Wextra support
+ CC_CHECK_CFLAG_APPEND([-Wall -Wsign-compare -Wextra])
+ 
+-- 
+2.27.0.windows.1
+

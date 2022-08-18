@@ -22,6 +22,7 @@ $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
 	$(call update_autoconfig,.)
+	$(APPLY) $(SRC)/dvdnav/0001-configure-don-t-use-ms-style-packing.patch
 	$(call pkg_static,"misc/dvdnav.pc.in")
 	$(MOVE)
 
