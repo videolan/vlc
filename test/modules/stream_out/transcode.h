@@ -40,6 +40,7 @@ struct transcode_scenario {
     void (*filter_setup)(filter_t *);
     void (*converter_setup)(filter_t *);
     void (*report_error)(sout_stream_t *);
+    void (*report_output)(const vlc_frame_t *);
 };
 
 

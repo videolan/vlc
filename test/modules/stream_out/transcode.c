@@ -240,6 +240,41 @@ static int OpenErrorChecker(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
+static int OutputCheckerSend(sout_stream_t *stream, void *id, vlc_frame_t *f)
+{
+    (void)stream; (void)id;
+    struct transcode_scenario *scenario = &transcode_scenarios[current_scenario];
+
+    assert(scenario->report_output != NULL);
+    scenario->report_output(f);
+
+    vlc_frame_ChainRelease(f);
+
+    return VLC_SUCCESS;
+}
+
+static void *OutputCheckerAdd(sout_stream_t *stream, const es_format_t *fmt)
+{
+    (void)stream; (void)fmt;
+    return (void*)0x42;
+}
+
+static void OutputCheckerDel(sout_stream_t *stream, void *id)
+    { (void)stream; (void)id; }
+
+static int OpenOutputChecker(vlc_object_t *obj)
+{
+    sout_stream_t *stream = (sout_stream_t *)obj;
+
+    static const struct sout_stream_operations ops = {
+        .add = OutputCheckerAdd,
+        .del = OutputCheckerDel,
+        .send = OutputCheckerSend,
+    };
+    stream->ops = &ops;
+    return VLC_SUCCESS;
+}
+
 static void on_state_changed(vlc_player_t *player, enum vlc_player_state state, void *opaque)
 {
     (void)player; (void)state; (void) opaque;
@@ -330,6 +365,11 @@ vlc_module_begin()
         set_callback(OpenErrorChecker)
         set_capability("sout filter", 0)
         add_shortcut("error_checker")
+
+    add_submodule()
+        set_callback(OpenOutputChecker)
+        set_capability("sout output", 0)
+        add_shortcut("output_checker")
 
     add_submodule()
         set_callback(OpenDecoderDevice)
