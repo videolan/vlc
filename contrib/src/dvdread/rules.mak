@@ -18,6 +18,7 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
+	$(APPLY) $(SRC)/dvdread/0001-ifo_types-avoid-forcing-a-higher-length-in-bitfield-.patch
 	$(call pkg_static,"misc/dvdread.pc.in")
 	$(MOVE)
 
