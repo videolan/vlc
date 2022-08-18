@@ -43,6 +43,7 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_filter.h>
 #include <vlc_threads.h>
 #include <vlc_sout.h>
+#include <vlc_frame.h>
 
 #include <limits.h>
 
@@ -71,9 +72,9 @@ static int OpenDecoderDevice(
     return VLC_SUCCESS;
 }
 
-static int DecoderDecode(decoder_t *dec, block_t *block)
+static int DecoderDecode(decoder_t *dec, vlc_frame_t *frame)
 {
-    if (block == NULL)
+    if (frame == NULL)
         return VLC_SUCCESS;
 
     const picture_resource_t resource = {
@@ -81,8 +82,8 @@ static int DecoderDecode(decoder_t *dec, block_t *block)
     };
     picture_t *pic = picture_NewFromResource(&dec->fmt_out.video, &resource);
     assert(pic);
-    pic->date = block->i_pts;
-    block_Release(block);
+    pic->date = frame->i_pts;
+    vlc_frame_Release(frame);
 
     struct transcode_scenario *scenario = &transcode_scenarios[current_scenario];
     assert(scenario->decoder_decode != NULL);
@@ -165,18 +166,18 @@ static int OpenConverter(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static block_t *EncodeVideo(encoder_t *enc, picture_t *pic)
+static vlc_frame_t *EncodeVideo(encoder_t *enc, picture_t *pic)
 {
     if (pic == NULL)
         return NULL;
 
     assert(pic->format.i_chroma == enc->fmt_in.video.i_chroma);
-    block_t *block = block_Alloc(4);
+    vlc_frame_t *frame = vlc_frame_Alloc(4);
 
     struct transcode_scenario *scenario = &transcode_scenarios[current_scenario];
     if (scenario->encoder_encode != NULL)
         scenario->encoder_encode(enc, pic);
-    return block;
+    return frame;
 }
 
 static void CloseEncoder(encoder_t *enc)
@@ -211,11 +212,11 @@ static int OpenEncoder(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static int ErrorCheckerSend(sout_stream_t *stream, void *id, block_t *b)
+static int ErrorCheckerSend(sout_stream_t *stream, void *id, vlc_frame_t *f)
 {
     struct transcode_scenario *scenario = &transcode_scenarios[current_scenario];
 
-    int ret = sout_StreamIdSend(stream->p_next, id, b);
+    int ret = sout_StreamIdSend(stream->p_next, id, f);
     if (ret != VLC_SUCCESS)
         scenario->report_error(stream);
     return VLC_SUCCESS;
