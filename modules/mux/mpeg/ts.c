@@ -255,7 +255,7 @@ typedef struct pmt_map_t   /* Holds the mapping between the pmt-pid/pmt table */
 
 typedef struct
 {
-    int     i_depth;
+    size_t   i_depth;
     block_t *p_first;
     block_t **pp_last;
 } sout_buffer_chain_t;
@@ -269,51 +269,33 @@ static inline void BufferChainInit  ( sout_buffer_chain_t *c )
 
 static inline void BufferChainAppend( sout_buffer_chain_t *c, block_t *b )
 {
-    *c->pp_last = b;
-    c->i_depth++;
-
-    while( b->p_next )
-    {
-        b = b->p_next;
+    for( block_t *bb = b; bb; bb = bb->p_next )
         c->i_depth++;
-    }
-    c->pp_last = &b->p_next;
+    block_ChainLastAppend( &c->pp_last, b );
 }
 
 static inline block_t *BufferChainGet( sout_buffer_chain_t *c )
 {
     block_t *b = c->p_first;
-
     if( b )
     {
         c->i_depth--;
         c->p_first = b->p_next;
-
-        if( c->p_first == NULL )
-        {
-            c->pp_last = &c->p_first;
-        }
-
         b->p_next = NULL;
+        if( c->p_first == NULL )
+            c->pp_last = &c->p_first;
     }
     return b;
 }
 
 static inline block_t *BufferChainPeek( sout_buffer_chain_t *c )
 {
-    block_t *b = c->p_first;
-
-    return b;
+    return c->p_first;
 }
 
 static inline void BufferChainClean( sout_buffer_chain_t *c )
 {
-    block_t *b;
-
-    while( ( b = BufferChainGet( c ) ) )
-    {
-        block_Release( b );
-    }
+    block_ChainRelease(c->p_first);
     BufferChainInit( c );
 }
 
