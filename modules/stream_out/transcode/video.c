@@ -559,13 +559,14 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     if( ret != VLCDEC_SUCCESS )
         return VLC_EGENERIC;
 
-    /* Only drain if we drained the decoder too. */
-    if (in != NULL)
+    /*
+     * Encoder creation depends on decoder's update_format which is only
+     * created once a few frames have been passed to the decoder.
+     */
+    if( id->encoder == NULL )
         return VLC_SUCCESS;
 
-    /* Drain encoder */
     vlc_fifo_Lock( id->output_fifo );
-    assert(id->encoder);
     if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
         msg_Dbg( p_stream, "Flushing thread and waiting that");
