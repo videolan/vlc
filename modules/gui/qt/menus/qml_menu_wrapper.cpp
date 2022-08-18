@@ -493,6 +493,38 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     m_positioner.popup(m_menu.get(), position, above);
 }
 
+// QmlProgramMenu
+
+/* explicit */ QmlProgramMenu::QmlProgramMenu(QObject * parent)
+    : QObject(parent)
+{}
+
+// Interface
+
+/* Q_INVOKABLE */ void QmlProgramMenu::popup(const QPoint & position, bool above)
+{
+    if (m_player == nullptr)
+        return;
+
+    m_menu = std::make_unique<QMenu>();
+
+    connect(m_menu.get(), &QMenu::aboutToHide, this, &QmlProgramMenu::aboutToHide);
+    connect(m_menu.get(), &QMenu::aboutToShow, this, &QmlProgramMenu::aboutToShow);
+
+    m_menu->addSection(qtr("Programs"));
+
+    ProgramListModel * programs = m_player->getPrograms();
+
+    ListMenuHelper * helper = new ListMenuHelper(m_menu.get(), programs, nullptr, m_menu.get());
+
+    connect(helper, &ListMenuHelper::select, [programs](int index)
+    {
+        programs->setData(programs->index(index), true, Qt::CheckStateRole);
+    });
+
+    m_positioner.popup(m_menu.get(), position, above);
+}
+
 // QmlRendererMenu
 
 /* explicit */ QmlRendererMenu::QmlRendererMenu(QObject * parent)

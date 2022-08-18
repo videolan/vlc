@@ -207,6 +207,28 @@ private:
     std::unique_ptr<QMenu> m_menu;
 };
 
+class QmlProgramMenu : public QObject
+{
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(PlayerController *, player, nullptr)
+
+public:
+    explicit QmlProgramMenu(QObject * parent = nullptr);
+
+public: // Interface
+    Q_INVOKABLE void popup(const QPoint & position, bool above = false);
+
+signals:
+    void aboutToHide();
+    void aboutToShow();
+
+private:
+    QmlMenuPositioner m_positioner;
+
+    std::unique_ptr<QMenu> m_menu;
+};
+
 class QmlRendererMenu : public QObject
 {
     Q_OBJECT
