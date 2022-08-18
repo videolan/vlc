@@ -59,7 +59,7 @@ bool ControlListFilter::filterAcceptsRow(int source_row, const QModelIndex &) co
     // NOTE: These controls are completely hidden when the current media does not support them.
     if (type == ControlListModel::NAVIGATION_BUTTONS)
     {
-        return (m_player->hasMenu() || m_player->isTeletextAvailable());
+        return (m_player->hasMenu() || m_player->hasPrograms() || m_player->isTeletextAvailable());
     }
     else if (type == ControlListModel::BOOKMARK_BUTTON)
     {

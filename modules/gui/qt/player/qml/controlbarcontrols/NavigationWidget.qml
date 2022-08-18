@@ -83,7 +83,9 @@ Templates.Pane {
             source: (Player.hasMenu || root.paintOnly) ? _controlPath + "DvdMenuButton.qml" : ""
 
             Navigation.parentItem: root
-            Navigation.rightItem: loaderB.item
+
+            Navigation.rightItem: (loaderB.item) ? loaderB.item
+                                                 : loaderC.item
 
             onLoaded: {
                 if (item === null) return
@@ -101,14 +103,35 @@ Templates.Pane {
 
             focus: (item && item.enabled && loaderA.focus === false)
 
+            source: (Player.hasPrograms
+                     &&
+                     root.paintOnly == false) ? _controlPath + "ProgramButton.qml" : ""
+
+            Navigation.parentItem: root
+
+            Navigation.leftItem: loaderA.item
+            Navigation.rightItem: loaderC.item
+
+            onLoaded: if (item) _applyItem(loaderB, item)
+        }
+
+        Loader {
+            id: loaderC
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            focus: (item && item.enabled && (loaderA.focus === false && loaderB.focus === false))
+
             source: (Player.isTeletextAvailable
                      &&
                      root.paintOnly == false) ? _controlPath + "TeletextWidget.qml" : ""
 
             Navigation.parentItem: root
-            Navigation.leftItem: loaderA.item
 
-            onLoaded: if (item) _applyItem(loaderB, item)
+            Navigation.leftItem: (loaderB.item) ? loaderB.item
+                                                : loaderA.item
+
+            onLoaded: if (item) _applyItem(loaderC, item)
         }
     }
 }
