@@ -156,15 +156,29 @@ T.Control {
                 }
             }
 
-            Widgets.ListLabel {
-                text: (model.name) ? model.name
-                                   : I18n.qtr("Unknown artist")
+            Widgets.ScrollingText {
+                label: artistName
 
-                color: background.foregroundColor
+                forceScroll: root.isCurrent || root._isHover
+                clip: scrolling
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                Widgets.ListLabel {
+                    id: artistName
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    text: (model.name) ? model.name
+                                       : I18n.qtr("Unknown artist")
+
+                    color: background.foregroundColor
+                }
             }
+
         }
     }
 }
