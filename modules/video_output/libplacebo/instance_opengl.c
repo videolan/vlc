@@ -87,6 +87,14 @@ static const struct vlc_placebo_operations instance_opts =
     .release_current = ReleaseCurrent,
 };
 
+#if PL_API_VER >= 215
+static pl_voidfunc_t get_proc_addr_wrapper(void *ctx, const char *procname)
+{
+    vlc_gl_t *gl = ctx;
+    return gl->ops->get_proc_address(gl, procname);
+}
+#endif
+
 static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
 {
     vlc_placebo_system_t *sys = pl->sys =
@@ -108,6 +116,10 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
     sys->opengl = pl_opengl_create(pl->log, &(struct pl_opengl_params) {
         .allow_software = var_InheritBool(pl, "gl-allow-sw"),
         .debug = true, // this only sets up the debug report callback
+#if PL_API_VER >= 215
+        .get_proc_addr_ex = get_proc_addr_wrapper,
+        .proc_ctx = sys->gl,
+#endif
     });
     vlc_gl_ReleaseCurrent (sys->gl);
     if (!sys->opengl)
