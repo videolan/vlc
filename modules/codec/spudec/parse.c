@@ -71,7 +71,7 @@ typedef struct
 } subpicture_data_t;
 
 static int  ParseControlSeq( decoder_t *, mtime_t i_pts,
-                             void(*pf_queue)(decoder_t *, subpicture_t *) );
+                             int(*pf_queue)(decoder_t *, subpicture_t *) );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
                              const spu_properties_t *, uint16_t * );
 static int  Render         ( decoder_t *, subpicture_t *, const uint16_t *,
@@ -196,7 +196,7 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
 static void OutputPicture( decoder_t *p_dec,
                            const subpicture_data_t *p_spu_data,
                            const spu_properties_t *p_spu_properties,
-                           void(*pf_queue)(decoder_t *, subpicture_t *) )
+                           int(*pf_queue)(decoder_t *, subpicture_t *) )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu;
@@ -318,7 +318,7 @@ static int Validate( decoder_t *p_dec, unsigned i_index,
  * This function parses the SPU packet and, if valid, sends it to the
  * video output.
  *****************************************************************************/
-void ParsePacket( decoder_t *p_dec, void(*pf_queue)(decoder_t *, subpicture_t *) )
+void ParsePacket( decoder_t *p_dec, int(*pf_queue)(decoder_t *, subpicture_t *) )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -335,7 +335,7 @@ void ParsePacket( decoder_t *p_dec, void(*pf_queue)(decoder_t *, subpicture_t *)
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
 static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
-                            void(*pf_queue)(decoder_t *, subpicture_t *) )
+                            int(*pf_queue)(decoder_t *, subpicture_t *) )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
