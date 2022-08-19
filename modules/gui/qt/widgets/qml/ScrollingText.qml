@@ -25,6 +25,7 @@ Item {
 
     readonly property alias scrolling: scrollAnimation.running
 
+    // `label`: label to scroll, don't add horizontal anchors on it
     property Text label: undefined
     property bool forceScroll: false
     property alias hoverScroll: hoverArea.enabled
