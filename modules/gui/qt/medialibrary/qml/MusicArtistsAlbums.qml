@@ -170,13 +170,6 @@ FocusScope {
                 }
             }
 
-            Behavior on width {
-                SmoothedAnimation {
-                    easing.type: Easing.InSine
-                    duration: VLCStyle.duration_veryShort
-                }
-            }
-
             Rectangle {
                 // id: musicArtistLeftBorder
 
