@@ -589,14 +589,6 @@ ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
     return vlc_sendmsg_i11e(fd, &msg, flags);
 }
 
-int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
-                  bool nonblock)
-{
-    if (vlc_poll_sock(fd, POLLIN) < 0)
-        return -1;
-    return vlc_accept(fd, addr, addrlen, nonblock);
-}
-
 #else /* _WIN32 */
 
 ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
@@ -623,16 +615,13 @@ ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
     return ret;
 }
 
+#endif
+
 int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
                   bool nonblock)
 {
     if (vlc_poll_sock(fd, POLLIN) < 0)
         return -1;
-
-    int cfd = vlc_accept(fd, addr, addrlen, nonblock);
-    if (cfd < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
-        errno = EAGAIN;
-    return cfd;
+    return vlc_accept(fd, addr, addrlen, nonblock);
 }
 
-#endif
