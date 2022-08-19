@@ -44,10 +44,30 @@ Item {
 
     readonly property bool _showCustomCover: (!artworkSource) || (artwork.status != Image.Ready)
 
+    readonly property var _shadowRects: [
+        {
+            "x": background.x,
+            "y": background.y,
+            "width": background.width,
+            "height": background.height
+        },
+        {
+            "x": artwork.x,
+            "y": artwork.y,
+            "width": artwork.paintedWidth,
+            "height": artwork.paintedHeight
+        }
+    ]
+
+    readonly property var _shadowRect: _shadowRects[_showCustomCover ? 0 : 1]
+
     signal playClicked(int index)
 
     Widgets.ListCoverShadow {
-        anchors.fill: !item._showCustomCover ? artwork : background
+        x: _shadowRect.x
+        y: _shadowRect.y
+        width: _shadowRect.width
+        height: _shadowRect.height
     }
 
     Rectangle {
