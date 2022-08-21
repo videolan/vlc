@@ -134,8 +134,8 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
 @interface VLCMediaLibraryFolderManagementController : NSObject <NSTableViewDelegate, NSTableViewDataSource>
 {
-    NSArray *_cachedFolderList;
     VLCLibraryController *_libraryController;
+    VLCLibraryModel *_libraryModel;
 }
 
 @property (readwrite, weak) NSTableView *libraryFolderTableView;
@@ -235,6 +235,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
     _mediaLibraryFolderTableView.delegate = _mediaLibraryManagementController;
     _mediaLibraryFolderTableView.dataSource = _mediaLibraryManagementController;
+    _mediaLibraryManagementController.libraryFolderTableView = _mediaLibraryFolderTableView;
 
     _mediaLibraryManagementController.nameTableColumn = _mediaLibraryNameTableColumn;
     _mediaLibraryManagementController.presentTableColumn = _mediaLibraryPresentTableColumn;
@@ -1537,8 +1538,27 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     self = [super init];
     if (self) {
         _libraryController = [[VLCMain sharedInstance] libraryController];
+        _libraryModel = _libraryController.libraryModel;
+
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(listOfMonitoredFoldersUpdated:)
+                                   name:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                 object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)listOfMonitoredFoldersUpdated:(NSNotification *)aNotification
+{
+    NSLog(@"WEEEE");
+    [self.libraryFolderTableView reloadData];
+    NSLog(@"%@", _libraryModel.listOfMonitoredFolders);
 }
 
 - (IBAction)addFolder:(id)sender
@@ -1558,49 +1578,34 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
             NSURL *url = URLs[i];
             [_libraryController addFolderWithFileURL:url];
         }
-
-        _cachedFolderList = nil;
-        [self.libraryFolderTableView reloadData];
     }
 }
 
 - (IBAction)banFolder:(id)sender
 {
-    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[self.libraryFolderTableView.selectedRow];
+    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
     if (entryPoint.isBanned) {
         [_libraryController unbanFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
     } else {
         [_libraryController banFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
     }
-
-    _cachedFolderList = nil;
-    [self.libraryFolderTableView reloadData];
 }
 
 - (IBAction)removeFolder:(id)sender
 {
-    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[self.libraryFolderTableView.selectedRow];
+    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
     [_libraryController removeFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
-
-    _cachedFolderList = nil;
-    [self.libraryFolderTableView reloadData];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    VLCLibraryModel *libraryModel = [_libraryController libraryModel];
-    if (!libraryModel) {
-        return 0;
-    }
-    if (!_cachedFolderList) {
-        _cachedFolderList = [libraryModel listOfMonitoredFolders];
-    }
-    return _cachedFolderList.count;
+    NSLog(@"%@", _libraryModel.listOfMonitoredFolders);
+    return _libraryModel.listOfMonitoredFolders.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[row];
+    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[row];
     if (tableColumn == self.nameTableColumn) {
         return [entryPoint.decodedMRL lastPathComponent];
     } else if (tableColumn == self.presentTableColumn) {
@@ -1620,7 +1625,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         return;
     }
     self.banFolderButton.enabled = self.removeFolderButton.enabled = YES;
-    VLCMediaLibraryEntryPoint *entryPoint = _cachedFolderList[selectedRow];
+    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[selectedRow];
     [self.banFolderButton setTitle:entryPoint.isBanned ? _NS("Unban Folder") : _NS("Ban Folder")];
 }
 

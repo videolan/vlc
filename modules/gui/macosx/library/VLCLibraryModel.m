@@ -32,6 +32,7 @@ NSString *VLCLibraryModelAlbumListUpdated = @"VLCLibraryModelAlbumListUpdated";
 NSString *VLCLibraryModelGenreListUpdated = @"VLCLibraryModelGenreListUpdated";
 NSString *VLCLibraryModelVideoMediaListUpdated = @"VLCLibraryModelVideoMediaListUpdated";
 NSString *VLCLibraryModelRecentMediaListUpdated = @"VLCLibraryModelRecentMediaListUpdated";
+NSString *VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
 NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 
 @interface VLCLibraryModel ()
@@ -45,6 +46,7 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
     NSArray *_cachedGenres;
     NSArray *_cachedVideoMedia;
     NSArray *_cachedRecentMedia;
+    NSArray *_cachedListOfMonitoredFolders;
     NSNotificationCenter *_defaultNotificationCenter;
 
     enum vlc_ml_sorting_criteria_t _sortCriteria;
@@ -61,6 +63,7 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 - (void)updateCachedListOfArtists;
 - (void)updateCachedListOfAlbums;
 - (void)updateCachedListOfGenres;
+- (void)updateCachedListOfMonitoredFolders;
 - (void)mediaItemWasUpdated:(VLCMediaLibraryMediaItem *)mediaItem;
 
 @end
@@ -120,6 +123,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 [libraryModel updateCachedListOfGenres];
             });
             break;
+        }
+        case VLC_ML_EVENT_FOLDER_ADDED:
+        case VLC_ML_EVENT_FOLDER_UPDATED:
+        case VLC_ML_EVENT_FOLDER_DELETED:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
+                [libraryModel updateCachedListOfMonitoredFolders];
+            });
         }
         default:
             break;
@@ -419,24 +431,41 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedRecentMedia;
 }
 
+- (void)updateCachedListOfMonitoredFolders
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        vlc_ml_folder_list_t *pp_entrypoints = vlc_ml_list_entry_points(self->_p_mediaLibrary, NULL);
+        if (pp_entrypoints == NULL) {
+            msg_Err(getIntf(), "failed to retrieve list of monitored library folders");
+            return;
+        }
+
+        NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:pp_entrypoints->i_nb_items];
+        for (size_t x = 0; x < pp_entrypoints->i_nb_items; x++) {
+            VLCMediaLibraryEntryPoint *entryPoint = [[VLCMediaLibraryEntryPoint alloc] initWithEntryPoint:&pp_entrypoints->p_items[x]];
+            if (entryPoint) {
+                [mutableArray addObject:entryPoint];
+            }
+        }
+
+        vlc_ml_folder_list_release(pp_entrypoints);
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self->_cachedListOfMonitoredFolders = [mutableArray copy];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelListOfMonitoredFoldersUpdated object:self];
+        });
+    });
+}
+
 - (NSArray<VLCMediaLibraryEntryPoint *> *)listOfMonitoredFolders
 {
-    vlc_ml_folder_list_t *pp_entrypoints = vlc_ml_list_entry_points(_p_mediaLibrary, NULL);
-    if (pp_entrypoints == NULL) {
-        msg_Err(getIntf(), "failed to retrieve list of monitored library folders");
-        return @[];
+    if(!_cachedListOfMonitoredFolders) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateCachedListOfMonitoredFolders];
+        });
     }
 
-    NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:pp_entrypoints->i_nb_items];
-    for (size_t x = 0; x < pp_entrypoints->i_nb_items; x++) {
-        VLCMediaLibraryEntryPoint *entryPoint = [[VLCMediaLibraryEntryPoint alloc] initWithEntryPoint:&pp_entrypoints->p_items[x]];
-        if (entryPoint) {
-            [mutableArray addObject:entryPoint];
-        }
-    }
-
-    vlc_ml_folder_list_release(pp_entrypoints);
-    return [mutableArray copy];
+    return _cachedListOfMonitoredFolders;
 }
 
 - (nullable NSArray <VLCMediaLibraryAlbum *>*)listAlbumsOfParentType:(enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
