@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewSupplementaryDetailView.m: MacOS X interface module
+ * VLCLibraryCollectionViewAlbumSupplementaryDetailView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2021 VLC authors and VideoLAN
  *

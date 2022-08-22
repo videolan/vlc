@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
-        <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,15 +12,6 @@
             <rect key="frame" x="0.0" y="0.0" width="1071" height="312"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
-                <box boxType="custom" borderType="none" cornerRadius="4" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="TDx-ys-0hc">
-                    <rect key="frame" x="0.0" y="0.0" width="1071" height="292"/>
-                    <view key="contentView" id="l4M-qd-E0u">
-                        <rect key="frame" x="0.0" y="0.0" width="1071" height="292"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    </view>
-                    <color key="borderColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    <color key="fillColor" name="separatorColor" catalog="System" colorSpace="catalog"/>
-                </box>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FWp-yd-2Pm">
                     <rect key="frame" x="10" y="0.0" width="1051" height="282"/>
                     <subviews>
@@ -113,7 +103,7 @@
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="50" viewBased="YES" id="eEJ-WA-0aM" customClass="VLCLibraryTableView">
-                                                <rect key="frame" x="0.0" y="0.0" width="701" height="198"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="701" height="188"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <size key="intercellSpacing" width="3" height="2"/>
                                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
@@ -186,13 +176,9 @@
             </subviews>
             <constraints>
                 <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="10" id="D62-3E-aDO"/>
-                <constraint firstItem="TDx-ys-0hc" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="20" id="Wob-l9-MuU"/>
-                <constraint firstItem="TDx-ys-0hc" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" id="adT-vN-en1"/>
-                <constraint firstAttribute="bottom" secondItem="TDx-ys-0hc" secondAttribute="bottom" id="aub-cX-QrF"/>
+                <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="30" id="Mr1-w0-CQK"/>
+                <constraint firstAttribute="bottom" secondItem="FWp-yd-2Pm" secondAttribute="bottom" id="bUH-jE-TQQ"/>
                 <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="10" id="cPm-6m-umY"/>
-                <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="TDx-ys-0hc" secondAttribute="top" constant="10" id="cVs-ac-sSk"/>
-                <constraint firstAttribute="trailing" secondItem="TDx-ys-0hc" secondAttribute="trailing" id="g3s-Ri-jQ5"/>
-                <constraint firstItem="FWp-yd-2Pm" firstAttribute="bottom" secondItem="TDx-ys-0hc" secondAttribute="bottom" id="pZF-BE-cG1"/>
             </constraints>
             <connections>
                 <outlet property="albumArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
@@ -207,6 +193,6 @@
     <resources>
         <image name="no-art" width="128" height="128"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
-        <image name="plus" catalog="system" width="15" height="13"/>
+        <image name="plus" catalog="system" width="14" height="13"/>
     </resources>
 </document>

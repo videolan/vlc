@@ -68,6 +68,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h \
 	gui/macosx/library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
+	gui/macosx/library/VLCLibraryCollectionViewSupplementaryDetailView.h \
+	gui/macosx/library/VLCLibraryCollectionViewSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.m \
 	gui/macosx/library/VLCLibraryController.h \

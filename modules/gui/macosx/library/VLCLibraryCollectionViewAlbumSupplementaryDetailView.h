@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewSupplementaryDetailView.h: MacOS X interface module
+ * VLCLibraryCollectionViewAlbumSupplementaryDetailView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -19,7 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #import <Cocoa/Cocoa.h>
+#import "VLCLibraryCollectionViewSupplementaryDetailView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier;
 extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
 
-@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView : NSView <NSCollectionViewElement>
+@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
 
 @property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
 @property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
