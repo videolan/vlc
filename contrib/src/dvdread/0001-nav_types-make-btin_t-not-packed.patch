@@ -1,0 +1,32 @@
+From 76a4ad6d6bd2ceea14328004048bb07fbc8e65c5 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 22 Aug 2022 09:21:05 +0200
+Subject: [PATCH 1/2] nav_types: make btin_t not packed
+
+The use of bitfields of 10 bits makes the use of `unsigned char` impossible.
+That means the compiler might use more bits than expected for the 4*12 bits.
+This is the case with MS-compatible compilers. We cannot guarantee that the
+btin_t will use the same 10 octets as used in the binary blob.
+
+In the end btin_t is not read as a packed structure but bit by bit in
+navRead_PCI().
+---
+ src/dvdread/nav_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/dvdread/nav_types.h b/src/dvdread/nav_types.h
+index f6a500f..e9d0efd 100644
+--- a/src/dvdread/nav_types.h
++++ b/src/dvdread/nav_types.h
+@@ -133,7 +133,7 @@ typedef struct {
+   unsigned int zero6            : 2;  /**< reserved */
+   unsigned int right            : 6;  /**< button index when pressing right */
+   vm_cmd_t cmd;
+-} ATTRIBUTE_PACKED btni_t;
++} btni_t;
+ 
+ /**
+  * Highlight Information
+-- 
+2.27.0.windows.1
+
