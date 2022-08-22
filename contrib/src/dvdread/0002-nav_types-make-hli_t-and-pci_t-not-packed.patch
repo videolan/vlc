@@ -1,0 +1,38 @@
+From a5702da22dc74a272251e647f9f87434a81d09c4 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 22 Aug 2022 09:22:49 +0200
+Subject: [PATCH 2/2] nav_types: make hli_t and pci_t not packed
+
+They depends on the packing of btni_t. Since btni_t is no longer packed, they
+cannot be packed anymore.
+
+This is not a problem as they are read bit by bit in navRead_PCI().
+---
+ src/dvdread/nav_types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/dvdread/nav_types.h b/src/dvdread/nav_types.h
+index e9d0efd..6139e5e 100644
+--- a/src/dvdread/nav_types.h
++++ b/src/dvdread/nav_types.h
+@@ -142,7 +142,7 @@ typedef struct {
+   hl_gi_t     hl_gi;
+   btn_colit_t btn_colit;
+   btni_t      btnit[36];
+-} ATTRIBUTE_PACKED hli_t;
++} hli_t;
+ 
+ /**
+  * PCI packet
+@@ -152,7 +152,7 @@ typedef struct {
+   nsml_agli_t nsml_agli;
+   hli_t       hli;
+   uint8_t     zero1[189];
+-} ATTRIBUTE_PACKED pci_t;
++} pci_t;
+ 
+ 
+ 
+-- 
+2.27.0.windows.1
+

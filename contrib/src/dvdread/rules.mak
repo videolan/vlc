@@ -21,6 +21,8 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdread/0001-ifo_types-avoid-forcing-a-higher-length-in-bitfield-.patch
+	$(APPLY) $(SRC)/dvdread/0001-nav_types-make-btin_t-not-packed.patch
+	$(APPLY) $(SRC)/dvdread/0002-nav_types-make-hli_t-and-pci_t-not-packed.patch
 	$(call pkg_static,"misc/dvdread.pc.in")
 	$(MOVE)
 
