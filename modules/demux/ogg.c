@@ -178,6 +178,7 @@ static void Ogg_ApplySkeleton( logical_stream_t * );
 /* Special decoding */
 static void Ogg_CleanSpecificData( logical_stream_t * );
 #ifdef HAVE_LIBVORBIS
+static bool Ogg_VorbisValidBlocksize( long );
 static void Ogg_DecodeVorbisHeader( logical_stream_t *, ogg_packet *, int );
 #endif
 
@@ -967,20 +968,23 @@ static void Ogg_SetNextFrame( demux_t *p_demux, logical_stream_t *p_stream,
                                 p_stream->special.speex.i_framesperpacket;
                     break;
 #ifdef HAVE_LIBVORBIS
+# define Vbs p_stream->special.vorbis
                 case VLC_CODEC_VORBIS:
-                    if( p_stream->special.vorbis.p_info &&
-                        VORBIS_HEADERS_VALID(p_stream) )
+                    if( Vbs.p_info && VORBIS_HEADERS_VALID(p_stream) )
                     {
-                        long i_blocksize = vorbis_packet_blocksize(
-                                    p_stream->special.vorbis.p_info, p_oggpacket );
+                        long i_blocksize = vorbis_packet_blocksize( Vbs.p_info, p_oggpacket );
                         /* duration in samples per channel */
-                        if ( p_stream->special.vorbis.i_prev_blocksize )
-                            i_samples = ( i_blocksize + p_stream->special.vorbis.i_prev_blocksize ) / 4;
-                        else
-                            i_samples = i_blocksize / 2;
-                        p_stream->special.vorbis.i_prev_blocksize = i_blocksize;
+                        if( Ogg_VorbisValidBlocksize( i_blocksize ) )
+                        {
+                            if ( Ogg_VorbisValidBlocksize( Vbs.i_prev_blocksize ) )
+                                i_samples = ( i_blocksize + Vbs.i_prev_blocksize ) / 4;
+                            else
+                                i_samples = i_blocksize / 2;
+                        }
+                        Vbs.i_prev_blocksize = i_blocksize;
                     }
                     break;
+# undef Vbs
 #endif
                 default:
                     if( p_stream->fmt.i_bitrate )
@@ -1056,7 +1060,8 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
                                                                 &dumb_packet );
                 /* The spec has 3 specific cases depending on long/short prev/next blocksizes
                    ranging weights from 1/4 to 3/4... but everyone does A/4 + B/4 */
-                p_block->i_nb_samples = (i_blocksize + i_nextblocksize) / 4;
+                if( Ogg_VorbisValidBlocksize( i_blocksize ) && Ogg_VorbisValidBlocksize( i_nextblocksize ) )
+                    p_block->i_nb_samples = (i_blocksize + i_nextblocksize) / 4;
                 break;
             }
 #endif
@@ -2793,6 +2798,12 @@ static bool Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
     return true;
 }
 #ifdef HAVE_LIBVORBIS
+static bool Ogg_VorbisValidBlocksize( long i_blocksize )
+{
+    /* non audio or broken return negative errors */
+    return i_blocksize > 0 && i_blocksize <= 8192;
+}
+
 static void Ogg_DecodeVorbisHeader( logical_stream_t *p_stream,
                                     ogg_packet *p_oggpacket, int i_number )
 {
