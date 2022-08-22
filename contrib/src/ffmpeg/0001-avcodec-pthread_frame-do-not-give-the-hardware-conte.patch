@@ -1,0 +1,43 @@
+From 2a2937b72e2ef17170a7cd617be3cfa578115b7a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 17 Dec 2019 11:21:17 +0100
+Subject: [PATCH] avcodec/pthread_frame: do not give the hardware context
+ internals to the user
+
+The internal data should not leak to the user. It can potentially be destroyed
+twice since the hwaccel uninit was also copied back to the user.
+
+This behaviour may only be found in VLC which uses frame threading with hardware
+decoding.
+---
+ libavcodec/pthread_frame.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/libavcodec/pthread_frame.c b/libavcodec/pthread_frame.c
+index 9176027f15..26439c1058 100644
+--- a/libavcodec/pthread_frame.c
++++ b/libavcodec/pthread_frame.c
+@@ -293,14 +293,17 @@ static int update_context_from_thread(AVCodecContext *dst, AVCodecContext *src,
+         dst->color_range = src->color_range;
+         dst->chroma_sample_location = src->chroma_sample_location;
+ 
+-        dst->hwaccel = src->hwaccel;
+-        dst->hwaccel_context = src->hwaccel_context;
++        if (!for_user) {
++            dst->hwaccel = src->hwaccel;
++            dst->hwaccel_context = src->hwaccel_context;
++        }
+ 
+         dst->channels       = src->channels;
+         dst->sample_rate    = src->sample_rate;
+         dst->sample_fmt     = src->sample_fmt;
+         dst->channel_layout = src->channel_layout;
+-        dst->internal->hwaccel_priv_data = src->internal->hwaccel_priv_data;
++        if (!for_user)
++            dst->internal->hwaccel_priv_data = src->internal->hwaccel_priv_data;
+ 
+         if (!!dst->hw_frames_ctx != !!src->hw_frames_ctx ||
+             (dst->hw_frames_ctx && dst->hw_frames_ctx->data != src->hw_frames_ctx->data)) {
+-- 
+2.27.0.windows.1
+

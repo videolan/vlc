@@ -246,6 +246,9 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-dxva2_hevc-don-t-use-frames-as-reference-if-they-are.patch
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-pthread_frame-do-not-give-the-hardware-conte.patch
+endif
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
