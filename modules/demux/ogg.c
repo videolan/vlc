@@ -1074,6 +1074,14 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
         date_t d = p_stream->dts;
         date_Set( &d, i_enddts );
         date_Decrement( &d, i_total_samples );
+        vlc_tick_t difftopos = ( date_Get( &d ) < VLC_TICK_0 )
+                             ? VLC_TICK_0 - date_Get( &d )
+                             : 0;
+        /* enforce positive values in date_t so we don't run
+         * into impossible increment on INVALID */
+        date_Set( &d, date_Get( &d ) + difftopos );
+
+        assert(date_Get( &d ) != VLC_TICK_INVALID);
 
         /* truncate end */
         if( b_eos && date_Get( &d ) < VLC_TICK_0 )
@@ -1083,7 +1091,7 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
         {
             if( p_block->i_flags & BLOCK_FLAG_HEADER )
                 continue;
-            p_block->i_dts = date_Get( &d );
+            p_block->i_dts = date_Get( &d ) - difftopos;
 
             /* truncate start */
             if( !b_eos && p_block->i_dts < VLC_TICK_0 )
