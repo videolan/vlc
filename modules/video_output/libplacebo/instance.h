@@ -45,7 +45,6 @@ typedef struct vlc_placebo_t
 {
     // fields internal to instance.c, should not be touched
     struct vlc_object_t obj;
-    module_t *module;
     vlc_placebo_system_t *sys;
 
     pl_log log;
