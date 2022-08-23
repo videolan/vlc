@@ -377,7 +377,7 @@ void ListMenuHelper::onRowsRemoved(const QModelIndex &, int first, int last)
 
     QList<QAction *>::iterator begin = m_actions.begin();
 
-    m_actions.erase(begin + first, begin + last);
+    m_actions.erase(begin + first, begin + last + 1);
 
     emit countChanged(m_actions.count());
 }
