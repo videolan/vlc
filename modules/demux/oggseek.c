@@ -407,12 +407,11 @@ static int64_t find_first_page_granule( demux_t *p_demux,
         if ( i_packets_checked )
         {
             *i_granulepos = ogg_page_granulepos( &p_sys->current_page );
-            return i_pos1;
+            return p_sys->i_input_position;
         }
 
         /*  -> start of next page */
         p_sys->i_input_position += i_result;
-        i_pos1 = p_sys->i_input_position;
     }
 }
 
