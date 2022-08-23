@@ -479,7 +479,7 @@ void RecentMenu::onRowsRemoved(const QModelIndex&, int first, int last)
 
     QList<QAction *>::iterator begin = m_actions.begin();
 
-    m_actions.erase(begin + first, begin + last);
+    m_actions.erase(begin + first, begin + last + 1);
 
     if (m_actions.isEmpty())
         setEnabled(false);
