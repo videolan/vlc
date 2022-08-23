@@ -113,7 +113,15 @@ Templates.Pane {
             Navigation.leftItem: loaderA.item
             Navigation.rightItem: loaderC.item
 
-            onLoaded: if (item) _applyItem(loaderB, item)
+            onLoaded: {
+                if (item === null) return
+
+                _applyItem(loaderB, item)
+
+                item.requestLockUnlockAutoHide.connect(function(lock) {
+                    controlLayout.requestLockUnlockAutoHide(lock)
+                })
+            }
         }
 
         Loader {
