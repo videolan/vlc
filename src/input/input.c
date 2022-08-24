@@ -869,14 +869,14 @@ static void StartTitle( input_thread_t * p_input )
         input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
-    priv->i_start = llroundf((float)CLOCK_FREQ
-                                     * var_GetFloat( p_input, "start-time" ));
-    priv->i_stop  = llroundf((float)CLOCK_FREQ
-                                     * var_GetFloat( p_input, "stop-time" ));
+    priv->i_start = llroundl(CLOCK_FREQ *
+                             (double) var_GetFloat( p_input, "start-time" ));
+    priv->i_stop  = llroundl(CLOCK_FREQ *
+                             (double) var_GetFloat( p_input, "stop-time" ));
     if( priv->i_stop <= 0 )
     {
-        priv->i_stop = llroundf((float)CLOCK_FREQ
-                                     * var_GetFloat( p_input, "run-time" ));
+        priv->i_stop = llroundl(CLOCK_FREQ *
+                                (double) var_GetFloat( p_input, "run-time" ));
         if( priv->i_stop < 0 )
         {
             msg_Warn( p_input, "invalid run-time ignored" );
