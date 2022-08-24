@@ -105,7 +105,7 @@ void GotoTimeDialog::close()
     if ( THEMIM->hasInput() )
     {
         int i_time = QTime( 0, 0, 0 ).msecsTo( timeEdit->time() );
-        THEMIM->jumpToTime( VLC_TICK_FROM_MS(i_time) );
+        THEMIM->setTime( VLC_TICK_FROM_MS(i_time) );
     }
     toggleVisible();
 }
