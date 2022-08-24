@@ -63,7 +63,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
     
     _albumTitleTextField.font = [NSFont VLCLibrarySupplementaryDetailViewTitleFont];
-    _albumDetailsTextField.font = [ NSFont VLCLibrarySupplementaryDetailViewSubtitleFont];
+    _albumDetailsTextField.font = [NSFont VLCLibrarySupplementaryDetailViewSubtitleFont];
     _albumDetailsTextField.textColor = [NSColor VLCOrangeElementColor];
 
     if(@available(macOS 10.12.2, *)) {
@@ -86,6 +86,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 
     _albumTitleTextField.stringValue = _representedAlbum.displayString;
     _albumDetailsTextField.stringValue = _representedAlbum.artistName;
+    _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedAlbum.year, _representedAlbum.durationString];
     _albumArtworkImageView.image = _representedAlbum.smallArtworkImage;
     _tracksDataSource.representedAlbum = _representedAlbum;
 

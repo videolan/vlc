@@ -87,14 +87,37 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="HnP-Fk-juB">
-                                    <rect key="frame" x="-2" y="203" width="87" height="16"/>
-                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album details" id="Nwk-76-Wx9">
-                                        <font key="font" metaFont="system"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
+                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="SvO-zd-2zo">
+                                    <rect key="frame" x="0.0" y="203" width="794" height="16"/>
+                                    <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="HnP-Fk-juB">
+                                            <rect key="frame" x="-2" y="0.0" width="87" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Album details" id="Nwk-76-Wx9">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
+                                            <rect key="frame" x="687" y="0.0" width="94" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="top" relation="greaterThanOrEqual" secondItem="SvO-zd-2zo" secondAttribute="top" id="Fdn-jn-Iaj"/>
+                                        <constraint firstAttribute="bottom" secondItem="HnP-Fk-juB" secondAttribute="bottom" id="ImH-Vf-Khl"/>
+                                        <constraint firstItem="HnP-Fk-juB" firstAttribute="top" secondItem="SvO-zd-2zo" secondAttribute="top" id="OUS-PH-e6K"/>
+                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="centerY" secondItem="HnP-Fk-juB" secondAttribute="centerY" id="Som-Jr-qAy"/>
+                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="QuO-3G-BMT" secondAttribute="bottom" id="UDs-9f-Og5"/>
+                                        <constraint firstItem="HnP-Fk-juB" firstAttribute="leading" secondItem="SvO-zd-2zo" secondAttribute="leading" id="Uuo-gf-FxL"/>
+                                        <constraint firstAttribute="trailing" secondItem="QuO-3G-BMT" secondAttribute="trailing" constant="15" id="Wfo-47-OGd"/>
+                                        <constraint firstItem="QuO-3G-BMT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="HnP-Fk-juB" secondAttribute="trailing" constant="5" id="aD2-Ry-CuA"/>
+                                    </constraints>
+                                </customView>
                                 <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="52" horizontalPageScroll="10" verticalLineScroll="52" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="9ZS-oy-iP9">
                                     <rect key="frame" x="0.0" y="0.0" width="701" height="198"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
@@ -144,6 +167,10 @@
                                     </scroller>
                                 </scrollView>
                             </subviews>
+                            <constraints>
+                                <constraint firstItem="SvO-zd-2zo" firstAttribute="leading" secondItem="nCe-dY-YMM" secondAttribute="leading" id="gSC-OW-Sld"/>
+                                <constraint firstAttribute="trailing" secondItem="SvO-zd-2zo" secondAttribute="trailing" id="hZf-vs-RlK"/>
+                            </constraints>
                             <visibilityPriorities>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
@@ -185,6 +212,7 @@
                 <outlet property="albumDetailsTextField" destination="HnP-Fk-juB" id="Hm3-l8-a9s"/>
                 <outlet property="albumTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="albumTracksTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
+                <outlet property="albumYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
                 <outlet property="playAlbumButton" destination="ntd-VT-2KS" id="ah5-as-eqw"/>
             </connections>
             <point key="canvasLocation" x="-237.5" y="-284"/>
