@@ -453,7 +453,6 @@ static bool OggSeekToPacket( demux_t *p_demux, logical_stream_t *p_stream,
                 msg_Dbg(p_demux, "** KEYFRAME PACKET START pageno %"PRId64" OFFSET %"PRId64" skip %"PRId64" **", p_lastpacketcoords->i_pageno, p_lastpacketcoords->i_pos, p_lastpacketcoords->i_skip );
                 msg_Dbg(p_demux, "KEYFRAME PACKET IS at pageno %"PRId64" OFFSET %"PRId64" with skip %d packet (%d / %d) ",
                     ogg_page_pageno( &p_sys->current_page ), p_sys->i_input_position, i, i+1, ogg_page_packets( &p_sys->current_page ) );
-                DemuxDebug( p_sys->b_seeked = true; )
             );
 
             if ( i != 0 ) /* Not continued packet */
