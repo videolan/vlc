@@ -2049,7 +2049,7 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
         vlc_video_context_Release( p_owner->vctx );
 
     /* Free all packets still in the decoder fifo. */
-    block_FifoRelease( p_owner->p_fifo );
+    block_FifoEmpty( p_owner->p_fifo );
 
     /* Cleanup */
 #ifdef ENABLE_SOUT
@@ -2115,6 +2115,7 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
     if( p_owner->p_description )
         vlc_meta_Delete( p_owner->p_description );
 
+    block_FifoRelease( p_owner->p_fifo );
     decoder_Destroy( p_owner->p_packetizer );
     decoder_Destroy( &p_owner->dec );
 }
