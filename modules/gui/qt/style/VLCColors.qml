@@ -145,6 +145,7 @@ Item {
     property color playerFgInactive: textInactive
     property color playerControlBarFg: playerFg
     property color playerBg: bg
+    property color playerSeekBar: Qt.lighter(playerBg, 1.6180)
     property color playerBorder: buttonText
 
     property color separator: blendColors(bg, text, .95)
