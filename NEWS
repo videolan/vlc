@@ -33,7 +33,7 @@ Misc:
 Contribs:
  * update FFmpeg, bluray, upnp, pthread, x265, freetype, libsmb2, aom, dav1d,
    libass, libxml2 (contains CVE), dvdread, harfbuzz, zlib, gme, nettle, GnuTLS,
-   mpg123, speex, bluray
+   mpg123, speex, bluray, libvpx
 
 
 Changes between 3.0.17.3 and 3.0.17.4:
