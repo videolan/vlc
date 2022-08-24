@@ -36,13 +36,15 @@ T.Pane {
     implicitHeight: Math.max(background ? background.implicitHeight : 0,
                              contentHeight + topPadding + bottomPadding)
 
-    contentWidth: teleWidget.implicitWidth
-    contentHeight: teleWidget.y + teleWidget.implicitHeight
+    contentWidth: column.implicitWidth
+    contentHeight: column.implicitHeight
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
     Column {
+        id: column
+
         spacing: VLCStyle.margin_small
 
         Widgets.SubtitleLabel {
@@ -52,8 +54,6 @@ T.Pane {
         }
 
         Row {
-            id: teleWidget
-
             Widgets.IconControlButton{
                 id: teleActivateBtn
 
