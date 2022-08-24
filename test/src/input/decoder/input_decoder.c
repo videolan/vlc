@@ -43,6 +43,7 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_filter.h>
 #include <vlc_threads.h>
 #include <vlc_vout_display.h>
+#include <vlc_sout.h>
 
 #include <limits.h>
 
@@ -169,6 +170,49 @@ static int OpenWindow(vlc_window_t *wnd)
     return VLC_SUCCESS;
 }
 
+static void *SoutFilterAdd(sout_stream_t *stream, const es_format_t *fmt)
+{
+    (void)stream; (void)fmt;
+    void *id = malloc(1);
+    assert(id != NULL);
+    return id;
+}
+
+static void SoutFilterDel(sout_stream_t *stream, void *id)
+{
+    (void)stream;
+    free(id);
+}
+
+static int SoutFilterSend(sout_stream_t *stream, void *id, block_t *block)
+{
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    if (scenario->sout_filter_send != NULL)
+        return scenario->sout_filter_send(stream, id, block);
+    block_Release(block);
+    return VLC_SUCCESS;
+}
+
+static void SoutFilterFlush(sout_stream_t *stream, void *id)
+{
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
+    if (scenario->sout_filter_flush != NULL)
+        scenario->sout_filter_flush(stream, id);
+}
+
+static int OpenSoutFilter(vlc_object_t *obj)
+{
+    sout_stream_t *stream = (sout_stream_t *)obj;
+    static const struct sout_stream_operations ops = {
+        .add = SoutFilterAdd,
+        .del = SoutFilterDel,
+        .send = SoutFilterSend,
+        .flush = SoutFilterFlush,
+    };
+    stream->ops = &ops;
+    return VLC_SUCCESS;
+};
+
 static void on_state_changed(vlc_player_t *player, enum vlc_player_state state, void *opaque)
 {
     (void)player; (void)state; (void) opaque;
@@ -183,6 +227,14 @@ static void play_scenario(intf_thread_t *intf, struct input_decoder_scenario *sc
 
     var_Create(intf, "codec", VLC_VAR_STRING);
     var_SetString(intf, "codec", MODULE_STRING);
+
+    if (scenario->sout != NULL)
+    {
+        char *sout;
+        assert(asprintf(&sout, ":sout=%s", scenario->sout) != -1);
+        input_item_AddOption(media, sout, VLC_INPUT_OPTION_TRUSTED);
+        free(sout);
+    }
 
     vlc_player_t *player = vlc_player_New(&intf->obj,
         VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
@@ -259,6 +311,10 @@ vlc_module_begin()
 
     add_submodule()
         set_callback_display(OpenDisplay, 0)
+
+    add_submodule()
+        set_callback(OpenSoutFilter)
+        set_capability("sout output", 0)
 
 vlc_module_end()
 

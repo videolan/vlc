@@ -43,6 +43,7 @@ static struct scenario_data
     vlc_sem_t wait_ready_to_flush;
     struct vlc_video_context *decoder_vctx;
     bool skip_decoder;
+    bool stream_out_sent;
 } scenario_data;
 
 static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
@@ -240,6 +241,22 @@ static void interface_setup_check_flush(intf_thread_t *intf)
     vlc_player_Unlock(player);
 }
 
+static int sout_filter_send(sout_stream_t *stream, void *id, block_t *block)
+{
+    (void)stream; (void)id;
+    block_Release(block);
+    scenario_data.stream_out_sent = true;
+    vlc_sem_post(&scenario_data.wait_ready_to_flush);
+    return VLC_SUCCESS;
+}
+
+static void sout_filter_flush(sout_stream_t *stream, void *id)
+{
+    (void)stream; (void)id;
+    assert(scenario_data.stream_out_sent);
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
 const char source_800_600[] = "mock://video_track_count=1;length=100000000000;video_width=800;video_height=600";
 struct input_decoder_scenario input_decoder_scenarios[] =
 {{
@@ -256,6 +273,19 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .decoder_flush = decoder_flush_signal,
     .display_prepare = display_prepare_signal,
     .interface_setup = interface_setup_check_flush,
+},
+{
+    /* Check that stream output is also flushed:
+      - the test cannot work if the stream_out filter is not added
+      - sout_filter_send(), signal the interface that it can flush
+      - the interface change player position to trigger a flush
+      - the flush is signaled to the stream_out filter
+      - the stream_out filter signal the end of the test */
+    .source = source_800_600,
+    .sout = "#" MODULE_STRING,
+    .sout_filter_send = sout_filter_send,
+    .sout_filter_flush = sout_filter_flush,
+    .interface_setup = interface_setup_check_flush,
 }};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 
@@ -263,6 +293,7 @@ void input_decoder_scenario_init(void)
 {
     scenario_data.decoder_vctx = NULL;
     scenario_data.skip_decoder = false;
+    scenario_data.stream_out_sent = false;
     vlc_sem_init(&scenario_data.wait_stop, 0);
     vlc_sem_init(&scenario_data.display_prepare_signal, 0);
     vlc_sem_init(&scenario_data.wait_ready_to_flush, 0);
