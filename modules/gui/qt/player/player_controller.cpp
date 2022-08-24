@@ -1259,7 +1259,7 @@ void PlayerController::jumpToTime(VLCTick i_time)
     vlc_player_locker lock{ d->m_player };
     if( !isCurrentItemSynced() )
         return;
-    vlc_player_JumpTime( d->m_player, vlc_tick_from_sec( i_time ) );
+    vlc_player_JumpTime( d->m_player, i_time );
 }
 
 void PlayerController::jumpToPos( float new_pos )
