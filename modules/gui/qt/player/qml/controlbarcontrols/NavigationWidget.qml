@@ -91,6 +91,9 @@ Templates.Pane {
 
             anchors.verticalCenter: parent.verticalCenter
 
+            // NOTE: This is required for the implicitWidth.
+            visible: (source != "")
+
             focus: (item && item.enabled)
 
             // NOTE: We display the 'menu button' as a placeholder for the customize dialog.
@@ -116,6 +119,9 @@ Templates.Pane {
 
             anchors.verticalCenter: parent.verticalCenter
 
+            // NOTE: This is required for the implicitWidth.
+            visible: (source != "")
+
             focus: (item && item.enabled && loaderA.focus === false)
 
             source: (Player.hasPrograms
@@ -134,6 +140,9 @@ Templates.Pane {
             id: loaderC
 
             anchors.verticalCenter: parent.verticalCenter
+
+            // NOTE: This is required for the implicitWidth.
+            visible: (source != "")
 
             focus: (item && item.enabled && (loaderA.focus === false && loaderB.focus === false))
 
