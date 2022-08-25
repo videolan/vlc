@@ -131,12 +131,30 @@ Item {
     DropArea {
         anchors.fill: parent
         onDropped: {
+            var urls = []
             if (drop.hasUrls) {
-                var list = []
-                for (var i = 0; i < drop.urls.length; i++){
-                    list.push(drop.urls[i])
+
+                for (var i = 0; i < drop.urls.length; i++)
+                    urls.push(drop.urls[i])
+
+            } else if (drop.hasText) {
+                /* Browsers give content as text if you dnd the addressbar,
+                   so check if mimedata has valid url in text and use it
+                   if we didn't get any normal Urls()*/
+
+                urls.push(drop.text)
+            }
+
+            if (urls.length > 0) {
+                /* D&D of a subtitles file, add it on the fly */
+                if (Player.isPlaying && urls.length == 1) {
+                    if (Player.associateSubtitleFile(urls[0])) {
+                        drop.accept()
+                        return
+                    }
                 }
-                mainPlaylistController.append(list, true)
+
+                mainPlaylistController.append(urls, true)
                 drop.accept()
             }
         }
