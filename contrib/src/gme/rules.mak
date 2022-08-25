@@ -8,6 +8,8 @@ PKGS += gme
 $(TARBALLS)/game-music-emu-$(GME_VERSION).tar.xz:
 	$(call download_pkg,$(GME_URL),gme)
 
+DEPS_gme = zlib $(DEPS_zlib)
+
 .sum-gme: game-music-emu-$(GME_VERSION).tar.xz
 
 game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
