@@ -52,6 +52,31 @@ static QVector<RAW> toRaw(const QVector<WRAPPER> &items)
     return vec;
 }
 
+QVector<Media> toMediaList(const QVariantList &sources)
+{
+    QVector<Media> mediaList;
+    std::transform(sources.begin(), sources.end(),
+                   std::back_inserter(mediaList), [](const QVariant& value) {
+        if (value.canConvert<QUrl>())
+        {
+            auto mrl = value.value<QUrl>();
+            return Media(mrl.toString(QUrl::None), mrl.fileName());
+        }
+        else if (value.canConvert<QString>())
+        {
+            auto mrl = value.value<QString>();
+            return Media(mrl, mrl);
+        } else if (value.canConvert<QmlInputItem>())
+        {
+            const QmlInputItem & item = value.value<QmlInputItem>();
+            return Media(item.item.get());
+        }
+        return Media{};
+    });
+
+    return mediaList;
+}
+
 
 extern "C" { // for C callbacks
 
@@ -330,44 +355,13 @@ PlaylistItem PlaylistControllerModel::getCurrentItem() const
 
 void PlaylistControllerModel::append(const QVariantList& sourceList, bool startPlaying)
 {
-    QVector<Media> mediaList;
-    std::transform(sourceList.begin(), sourceList.end(),
-                   std::back_inserter(mediaList), [](const QVariant& value) {
-        if (value.canConvert<QUrl>())
-        {
-            auto mrl = value.value<QUrl>();
-            return Media(mrl.toString(QUrl::None), mrl.fileName());
-        }
-        else if (value.canConvert<QString>())
-        {
-            auto mrl = value.value<QString>();
-            return Media(mrl, mrl);
-        }
-        return Media{};
-    });
-    append(mediaList, startPlaying);
+    append(toMediaList(sourceList), startPlaying);
 }
 
 void PlaylistControllerModel::insert(unsigned index, const QVariantList& sourceList, bool startPlaying)
 {
-    QVector<Media> mediaList;
-    std::transform(sourceList.begin(), sourceList.end(),
-                   std::back_inserter(mediaList), [](const QVariant& value) {
-        if (value.canConvert<QUrl>())
-        {
-            auto mrl = value.value<QUrl>();
-            return Media(mrl.toString(QUrl::None), mrl.fileName());
-        }
-        else if (value.canConvert<QString>())
-        {
-            auto mrl = value.value<QString>();
-            return Media(mrl, mrl);
-        }
-        return Media{};
-    });
-    insert(index, mediaList, startPlaying);
+    insert(index, toMediaList(sourceList), startPlaying);
 }
-
 
 void
 PlaylistControllerModel::append(const QVector<Media> &media, bool startPlaying)
@@ -441,24 +435,6 @@ PlaylistControllerModel::remove(const QVector<PlaylistItem> &items, ssize_t inde
                                          rawItems.size(), indexHint);
     if (ret != VLC_SUCCESS)
         throw std::bad_alloc();
-}
-
-void
-PlaylistControllerModel::insert(int index, const QVariantList & items)
-{
-    QVector<vlc::playlist::Media> medias;
-
-    for (const QVariant & variant : items)
-    {
-        if (variant.canConvert<QmlInputItem>() == false)
-            continue;
-
-        const QmlInputItem & item = variant.value<QmlInputItem>();
-
-        medias.push_back(vlc::playlist::Media(item.item.get()));
-    }
-
-    insert(index, medias, false);
 }
 
 void

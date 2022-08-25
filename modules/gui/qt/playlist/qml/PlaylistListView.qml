@@ -98,7 +98,7 @@ Control {
                     console.warn("can't convert items to input items");
                     return
                 }
-                mainPlaylistController.insert(index, inputItems)
+                mainPlaylistController.insert(index, inputItems, false)
             })
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
