@@ -16,6 +16,9 @@ game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
 	$(UNPACK)
 	$(APPLY) $(SRC)/gme/skip-underrun.patch
 	$(APPLY) $(SRC)/gme/add-libm.patch
+ifdef HAVE_MACOSX
+	$(APPLY) $(SRC)/gme/mac-use-c-stdlib.patch
+endif
 	$(call pkg_static,"gme/libgme.pc.in")
 	$(MOVE)
 
