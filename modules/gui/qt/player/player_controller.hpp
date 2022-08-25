@@ -374,6 +374,11 @@ public slots:
 
     // High resolution time fed by SMPTE timer
     QString highResolutionTime() const;
+
+    // associates subtitle file to currently playing media
+    // returns true on success
+    bool associateSubtitleFile(const QString &uri);
+
 signals:
     //playback
     void playingStateChanged( PlayingState state );

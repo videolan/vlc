@@ -1890,6 +1890,11 @@ void PlayerController::setArt( input_item_t *p_item, QString fileUrl )
     }
 }
 
+bool PlayerController::associateSubtitleFile(const QString &uri)
+{
+    return AddAssociatedMedia(SPU_ES, uri, true, true, true) == VLC_SUCCESS;
+}
+
 int PlayerController::AddAssociatedMedia(es_format_category_e cat, const QString &uri, bool select, bool notify, bool check_ext)
 {
     Q_D(PlayerController);
