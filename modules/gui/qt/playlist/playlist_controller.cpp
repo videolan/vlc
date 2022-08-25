@@ -52,20 +52,34 @@ static QVector<RAW> toRaw(const QVector<WRAPPER> &items)
     return vec;
 }
 
+static QUrl resolveWinSymlinks(const QUrl &mrl)
+{
+#ifdef _WIN32
+    QFileInfo info (mrl.toLocalFile());
+    if ( info.isSymLink() )
+    {
+        QString target = info.symLinkTarget();
+        return QFile::exists(target) ? QUrl::fromLocalFile(target) : mrl;
+    }
+#endif
+    return mrl;
+}
+
 QVector<Media> toMediaList(const QVariantList &sources)
 {
     QVector<Media> mediaList;
     std::transform(sources.begin(), sources.end(),
                    std::back_inserter(mediaList), [](const QVariant& value) {
-        if (value.canConvert<QUrl>())
+        if (value.canConvert<QUrl>() || value.canConvert<QString>())
         {
-            auto mrl = value.value<QUrl>();
+            QUrl mrl = value.canConvert<QString>()
+                    ? QUrl::fromUserInput(value.value<QString>())
+                    : value.value<QUrl>();
+
+            if (mrl.isLocalFile())
+                mrl = resolveWinSymlinks(mrl);
+
             return Media(mrl.toString(QUrl::None), mrl.fileName());
-        }
-        else if (value.canConvert<QString>())
-        {
-            auto mrl = value.value<QString>();
-            return Media(mrl, mrl);
         } else if (value.canConvert<QmlInputItem>())
         {
             const QmlInputItem & item = value.value<QmlInputItem>();
