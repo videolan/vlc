@@ -2116,26 +2116,7 @@ AM_CONDITIONAL(HAVE_DVBPSI, [test "${have_dvbpsi}" = "yes"])
 dnl
 dnl  GME demux plugin
 dnl
-AC_ARG_ENABLE(gme,
-  [AS_HELP_STRING([--enable-gme],
-    [use Game Music Emu (default auto)])])
-AS_IF([test "${enable_gme}" != "no"], [
-  AC_CHECK_HEADER([gme/gme.h], [
-    AC_CHECK_LIB([gme], [gme_identify_header], [
-      VLC_ADD_PLUGIN([gme])
-    ], [
-      AC_CHECK_LIB([gme], [gme_identify_extension], [
-         VLC_ADD_LIBS([gme], [-lstdc++ $LIBM])
-         VLC_ADD_PLUGIN([gme])
-      ],, [-lstdc++ $LIBM])
-    ])
-    VLC_ADD_LIBS([gme], [-lgme])
-  ], [
-    AS_IF([test "x${enable_gme}" != "x"], [
-      AC_MSG_ERROR([GME cannot be found. Please install the development files.])
-    ])
-  ])
-])
+PKG_ENABLE_MODULES_VLC([GME], [], [libgme], [Game Music Emu support (default auto)], [auto])
 
 
 dnl
