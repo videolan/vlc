@@ -1078,7 +1078,9 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
     {
         date_t d = p_stream->dts;
         date_Set( &d, i_enddts );
-        date_Decrement( &d, i_total_samples );
+        i_enddts = date_Decrement( &d, i_total_samples );
+        if( i_enddts < VLC_TICK_0 )
+            i_enddts = VLC_TICK_0;
         vlc_tick_t difftopos = ( date_Get( &d ) < VLC_TICK_0 )
                              ? VLC_TICK_0 - date_Get( &d )
                              : 0;
@@ -1135,7 +1137,7 @@ static void Ogg_QueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
 
     /* If we can have or compute block start from granule, it is set.
      * Otherwise the end dts will be used for reverse calculation */
-    if( p_stream->i_pcr == VLC_TICK_INVALID && i_enddts != VLC_TICK_INVALID )
+    if( p_stream->i_pcr == VLC_TICK_INVALID && i_enddts != VLC_TICK_INVALID && p_block->i_dts != VLC_TICK_INVALID )
     {
         /* fixup queue */
         p_stream->i_pcr = Ogg_FixupOutputQueue( p_demux, p_stream, i_enddts, b_eos );
@@ -1397,8 +1399,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     vlc_tick_t i_dts = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, true, false );
-    vlc_tick_t i_enddts = (i_dts == VLC_TICK_INVALID) ? Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, false, false )
-                                                      : VLC_TICK_INVALID;
+    vlc_tick_t i_enddts = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, false, false );
     vlc_tick_t i_expected_dts = p_stream->b_interpolation_failed ? VLC_TICK_INVALID :
                                 date_Get( &p_stream->dts ); /* Interpolated or previous end time */
     if( i_dts == VLC_TICK_INVALID )
