@@ -39,8 +39,8 @@ class EPGItem : public QGraphicsItem
 public:
     EPGItem( const vlc_epg_event_t *data, EPGView *view, EPGProgram * );
 
-    QRectF boundingRect() const Q_DECL_OVERRIDE;
-    void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) Q_DECL_OVERRIDE;
+    QRectF boundingRect() const override;
+    void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) override;
 
     const QDateTime& start() const;
     QDateTime end() const;
@@ -59,10 +59,10 @@ public:
     const QList<QPair<QString, QString>> &descriptionItems() const;
 
 protected:
-    void focusInEvent( QFocusEvent * event ) Q_DECL_OVERRIDE;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * ) Q_DECL_OVERRIDE;
-    void hoverEnterEvent ( QGraphicsSceneHoverEvent * ) Q_DECL_OVERRIDE;
-    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * ) Q_DECL_OVERRIDE;
+    void focusInEvent( QFocusEvent * event ) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * ) override;
+    void hoverEnterEvent ( QGraphicsSceneHoverEvent * ) override;
+    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * ) override;
 
 private:
     EPGProgram *program;

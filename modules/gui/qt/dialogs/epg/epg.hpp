@@ -37,7 +37,7 @@ class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
 {
     Q_OBJECT
 protected:
-    virtual void showEvent(QShowEvent * event) Q_DECL_OVERRIDE;
+    virtual void showEvent(QShowEvent * event) override;
 
 private:
     EpgDialog( qt_intf_t * );
