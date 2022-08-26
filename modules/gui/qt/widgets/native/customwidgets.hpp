@@ -40,9 +40,9 @@ class QFramelessButton : public QPushButton
     Q_OBJECT
 public:
     QFramelessButton( QWidget *parent = NULL );
-    QSize sizeHint() const Q_DECL_OVERRIDE { return iconSize(); }
+    QSize sizeHint() const override { return iconSize(); }
 protected:
-    void paintEvent( QPaintEvent * event ) Q_DECL_OVERRIDE;
+    void paintEvent( QPaintEvent * event ) override;
 };
 
 class VLCQDial : public QDial
@@ -51,7 +51,7 @@ class VLCQDial : public QDial
 public:
     VLCQDial( QWidget *parent = NULL );
 protected:
-    void paintEvent( QPaintEvent * event ) Q_DECL_OVERRIDE;
+    void paintEvent( QPaintEvent * event ) override;
 };
 
 class QToolButtonExt : public QToolButton
@@ -76,9 +76,9 @@ class QVLCDebugLevelSpinBox : public QSpinBox
 public:
     QVLCDebugLevelSpinBox( QWidget *parent ) : QSpinBox( parent ) { };
 protected:
-    QString textFromValue( int ) const Q_DECL_OVERRIDE;
+    QString textFromValue( int ) const override;
     /* QVLCDebugLevelSpinBox is read-only */
-    int valueFromText( const QString& ) const Q_DECL_OVERRIDE { return -1; }
+    int valueFromText( const QString& ) const override { return -1; }
 };
 
 /** This spinning icon, to the colors of the VLC cone, will show

@@ -104,7 +104,7 @@ protected:
     {
         hide();
     }
-    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *keyEvent ) override;
 };
 
 class QVLCDialog : public QDialog
@@ -131,7 +131,7 @@ protected:
     {
         hide();
     }
-    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *keyEvent ) override;
 };
 
 class QVLCMW : public QMainWindow

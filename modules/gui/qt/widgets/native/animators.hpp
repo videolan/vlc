@@ -40,13 +40,13 @@ class BasicAnimator : public QAbstractAnimation
 public:
     BasicAnimator( QObject *parent = 0 );
     void setFps( int _fps ) { fps = _fps; interval = 1000.0 / fps; }
-    int duration() const Q_DECL_OVERRIDE { return 1000; }
+    int duration() const override { return 1000; }
 
 signals:
     void frameChanged();
 
 protected:
-    void updateCurrentTime ( int msecs ) Q_DECL_OVERRIDE;
+    void updateCurrentTime ( int msecs ) override;
     int fps;
     int interval;
     int current_frame;
@@ -64,11 +64,11 @@ class PixmapAnimator : public BasicAnimator
 
 public:
     PixmapAnimator(QWidget *parent, QList<QString> _frames , int width, int height);
-    int duration() const Q_DECL_OVERRIDE { return interval * pixmaps.count(); }
+    int duration() const override { return interval * pixmaps.count(); }
     virtual ~PixmapAnimator();
     const QPixmap& getPixmap() { return currentPixmap; }
 protected:
-    void updateCurrentTime ( int msecs ) Q_DECL_OVERRIDE;
+    void updateCurrentTime ( int msecs ) override;
     QList<QPixmap> pixmaps;
     QPixmap currentPixmap;
 signals:
