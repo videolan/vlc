@@ -56,8 +56,8 @@ private:
     QStringList mrls;
 
 private slots:
-    void close() Q_DECL_OVERRIDE;
-    void cancel() Q_DECL_OVERRIDE;
+    void close() override;
+    void cancel() override;
     void fileBrowse();
     void setDestinationFileExtension();
     void validate();

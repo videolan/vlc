@@ -85,7 +85,7 @@ private:
     void loadCapabilities();
     void reset();
 protected slots:
-    void close() Q_DECL_OVERRIDE;
+    void close() override;
 private slots:
     void muxSelected();
     void codecSelected();

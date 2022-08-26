@@ -65,7 +65,7 @@ class FileDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         FileDestBox( QWidget *_parent = NULL, qt_intf_t * = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *fileEdit;
         qt_intf_t *p_intf;
@@ -78,7 +78,7 @@ class HTTPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         HTTPDestBox( QWidget *_parent = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *HTTPEdit;
         QSpinBox *HTTPPort;
@@ -89,7 +89,7 @@ class MMSHDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         MMSHDestBox( QWidget *_parent = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *MMSHEdit;
         QSpinBox *MMSHPort;
@@ -100,7 +100,7 @@ class RTSPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         RTSPDestBox( QWidget *_parent = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *RTSPEdit;
         QSpinBox *RTSPPort;
@@ -111,7 +111,7 @@ class UDPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         UDPDestBox( QWidget *_parent = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *UDPEdit;
         QSpinBox *UDPPort;
@@ -122,7 +122,7 @@ class SRTDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         SRTDestBox( QWidget *_parent = NULL, const char *mux = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *SRTEdit;
         QSpinBox *SRTPort;
@@ -135,7 +135,7 @@ class RISTDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         RISTDestBox( QWidget *_parent = NULL, const char *mux = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *RISTAddress;
         QSpinBox *RISTPort;
@@ -148,7 +148,7 @@ class RTPDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         RTPDestBox( QWidget *_parent = NULL, const char *mux = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *RTPEdit;
         QSpinBox *RTPPort;
@@ -161,7 +161,7 @@ class ICEDestBox: public VirtualDestBox
     Q_OBJECT
     public:
         ICEDestBox( QWidget *_parent = NULL );
-        QString getMRL( const QString& ) Q_DECL_OVERRIDE;
+        QString getMRL( const QString& ) override;
     private:
         QLineEdit *ICEEdit;
         QLineEdit *ICEMountEdit;
