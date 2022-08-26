@@ -43,7 +43,7 @@ public slots:
     void setOffset( int offset );
 
 protected:
-    void paintEvent( QPaintEvent *event ) Q_DECL_OVERRIDE;
+    void paintEvent( QPaintEvent *event ) override;
 
 private:
     qreal m_scale;
