@@ -36,8 +36,8 @@ private:
     virtual ~GotoTimeDialog();
     QTimeEdit *timeEdit;
 private slots:
-    void close() Q_DECL_OVERRIDE;
-    void cancel() Q_DECL_OVERRIDE;
+    void close() override;
+    void cancel() override;
     void reset();
 
     friend class    Singleton<GotoTimeDialog>;

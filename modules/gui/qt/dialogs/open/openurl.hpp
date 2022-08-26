@@ -52,10 +52,10 @@ public:
 
     QString url() const;
     bool shouldEnqueue() const;
-    virtual void showEvent( QShowEvent *ev ) Q_DECL_OVERRIDE;
+    virtual void showEvent( QShowEvent *ev ) override;
 
 public slots:
-    void close() Q_DECL_OVERRIDE { play(); }
+    void close() override { play(); }
 
 };
 

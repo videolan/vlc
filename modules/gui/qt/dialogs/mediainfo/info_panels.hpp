@@ -112,7 +112,7 @@ class InputStatsPanel: public QWidget
 public:
     InputStatsPanel( QWidget * );
 protected:
-    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
+    void hideEvent( QHideEvent * ) override;
 private:
     QTreeWidget *StatsTree;
     QTreeWidgetItem *input;
