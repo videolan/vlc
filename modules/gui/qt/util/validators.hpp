@@ -30,8 +30,8 @@ class UrlValidator : public QValidator
    Q_OBJECT
 public:
    UrlValidator( QObject *parent ) : QValidator( parent ) { }
-   QValidator::State validate( QString&, int& ) const Q_DECL_OVERRIDE;
-   void fixup ( QString & input ) const Q_DECL_OVERRIDE;
+   QValidator::State validate( QString&, int& ) const override;
+   void fixup ( QString & input ) const override;
 };
 
 #endif // VALIDATORS_HPP

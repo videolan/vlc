@@ -74,7 +74,7 @@ class ExtV4l2 : public QWidget
 public:
     ExtV4l2( intf_thread_t *, QWidget * );
 
-    void showEvent( QShowEvent *event ) Q_DECL_OVERRIDE;
+    void showEvent( QShowEvent *event ) override;
 
 private:
     intf_thread_t *p_intf;
@@ -162,13 +162,13 @@ public:
                          const slider_data_t *p_data, int index );
 
 protected:
-    float initialValue() Q_DECL_OVERRIDE;
+    float initialValue() override;
     int index;
     QStringList getBandsFromAout() const;
     void writeToConfig() override;
 
 public slots:
-    void onValueChanged( int i ) Q_DECL_OVERRIDE;
+    void onValueChanged( int i ) override;
 };
 
 class Equalizer: public AudioFilterControlWidget
@@ -179,7 +179,7 @@ public:
     Equalizer( intf_thread_t *, QWidget * );
 
 protected:
-    void build() Q_DECL_OVERRIDE;
+    void build() override;
 
 private:
     FilterSliderData *preamp;
