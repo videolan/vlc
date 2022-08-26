@@ -35,7 +35,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NFZ-x0-t5c">
-                    <rect key="frame" x="10" y="7" width="12" height="36"/>
+                    <rect key="frame" x="10" y="7" width="12.5" height="36"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="32" id="bai-RH-huE"/>
                     </constraints>

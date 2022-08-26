@@ -83,6 +83,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.unplayedIndicatorTextField.stringValue = _NS("NEW");
     self.unplayedIndicatorTextField.font = [NSFont VLClibraryHighlightCellHighlightLabelFont];
     self.unplayedIndicatorTextField.textColor = [NSColor VLClibraryHighlightColor];
+    self.highlightBox.borderColor = [NSColor VLCOrangeElementColor];
 
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self
@@ -134,6 +135,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     _annotationTextField.hidden = YES;
     _progressIndicator.hidden = YES;
     _unplayedIndicatorTextField.hidden = YES;
+    _highlightBox.hidden = YES;
 }
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
@@ -144,6 +146,12 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
     _representedItem = representedItem;
     [self updateRepresentation];
+}
+
+- (void)setSelected:(BOOL)selected
+{
+    super.selected = selected;
+    _highlightBox.hidden = !selected;
 }
 
 - (void)mediaItemUpdated:(NSNotification *)aNotification

@@ -10,6 +10,7 @@
                 <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
                 <outlet property="annotationTextField" destination="tm2-NW-WsZ" id="Miy-RS-Rol"/>
                 <outlet property="durationTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
+                <outlet property="highlightBox" destination="Vwd-1n-Sbd" id="h1g-hL-1gh"/>
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
                 <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="JlC-bE-i5Y"/>
@@ -61,6 +62,14 @@
                         <constraint firstAttribute="trailing" secondItem="dFt-oZ-h9P" secondAttribute="trailing" id="kBI-UU-vnc"/>
                     </constraints>
                 </customView>
+                <box boxType="custom" borderType="line" borderWidth="5" cornerRadius="4" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="Vwd-1n-Sbd">
+                    <rect key="frame" x="0.0" y="51" width="212" height="212"/>
+                    <view key="contentView" id="HJG-tt-Xh8">
+                        <rect key="frame" x="5" y="5" width="202" height="202"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </view>
+                    <color key="borderColor" red="1" green="0.38123786450000002" blue="0.039215686270000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </box>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
                     <rect key="frame" x="-2" y="23" width="52" height="24"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" usesSingleLineMode="YES" id="7Hy-o3-LvX">
@@ -110,10 +119,14 @@
                 <constraint firstItem="u2r-zy-XEW" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="VAn-gF-QiZ" secondAttribute="trailing" constant="4" id="IXL-bv-5zP"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="VAn-gF-QiZ" secondAttribute="bottom" id="Kp0-Hx-3Ek"/>
                 <constraint firstItem="VAn-gF-QiZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="QUW-dn-Fbc"/>
+                <constraint firstItem="Vwd-1n-Sbd" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="top" id="Qpt-yS-z2k"/>
+                <constraint firstItem="Vwd-1n-Sbd" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="Yqz-VL-Ul7"/>
                 <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="14" id="ZVz-SL-rxZ"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="cvk-A5-enS"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="fH0-Om-7gV"/>
+                <constraint firstItem="Vwd-1n-Sbd" firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="fag-50-6qS"/>
                 <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
+                <constraint firstItem="Vwd-1n-Sbd" firstAttribute="bottom" secondItem="2aB-sB-hfY" secondAttribute="bottom" id="sIE-go-0nP"/>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="bottom" constant="4" id="vJy-Kf-4Jh"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="yvp-xr-geN"/>
