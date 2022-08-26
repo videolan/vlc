@@ -1,0 +1,8 @@
+--- game-music-emu-0.6.3/gme/libgme.pc.in.old	2022-08-26 08:35:03.000000000 +0200
++++ game-music-emu-0.6.3/gme/libgme.pc.in	2022-08-26 08:35:18.000000000 +0200
+@@ -13,4 +13,4 @@
+ Version: @GME_VERSION@
+ Cflags: -I${includedir}
+ Libs: -L${libdir} -lgme
+-Libs.private: -lstdc++ @PKG_CONFIG_ZLIB@
++Libs.private: -lstdc++ -lm @PKG_CONFIG_ZLIB@
