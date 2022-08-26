@@ -15,6 +15,8 @@ DEPS_gme = zlib $(DEPS_zlib)
 game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
 	$(UNPACK)
 	$(APPLY) $(SRC)/gme/skip-underrun.patch
+	$(APPLY) $(SRC)/gme/add-libm.patch
+	$(call pkg_static,"gme/libgme.pc.in")
 	$(MOVE)
 
 .gme: game-music-emu toolchain.cmake
