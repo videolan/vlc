@@ -363,6 +363,9 @@ static const struct xdg_toplevel_listener xdg_toplevel_cbs =
 #ifdef XDG_TOPLEVEL_CONFIGURE_BOUNDS_SINCE_VERSION
     xdg_toplevel_configure_bounds_cb,
 #endif
+#ifdef XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION
+    NULL, /* We don't support wm_capabilities for now */
+#endif
 };
 
 static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
