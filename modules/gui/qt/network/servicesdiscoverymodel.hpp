@@ -67,7 +67,7 @@ public:
     Q_ENUM(Role);
 
     explicit ServicesDiscoveryModel(QObject* parent = nullptr);
-    virtual ~ServicesDiscoveryModel() override;
+    ~ServicesDiscoveryModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;

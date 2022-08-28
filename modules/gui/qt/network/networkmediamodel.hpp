@@ -147,7 +147,7 @@ public:
     Q_PROPERTY(int count READ getCount NOTIFY countChanged)
 
     explicit NetworkMediaModel(QObject* parent = nullptr);
-    virtual ~NetworkMediaModel() override;
+    ~NetworkMediaModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
