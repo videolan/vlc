@@ -21,9 +21,6 @@ endif
 
 libfilesystem_plugin_la_SOURCES = access/fs.h access/file.c access/directory.c access/fs.c
 libfilesystem_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-if HAVE_WIN32
-libfilesystem_plugin_la_LIBADD = -lshlwapi
-endif
 access_LTLIBRARIES += libfilesystem_plugin.la
 
 if HAVE_EMSCRIPTEN

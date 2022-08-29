@@ -47,9 +47,6 @@
 #if defined( _WIN32 )
 #   include <io.h>
 #   include <ctype.h>
-#if !defined(VLC_WINSTORE_APP)
-#   include <shlwapi.h> // for PathIsNetworkPathW
-#endif
 #else
 #   include <unistd.h>
 #endif
@@ -120,17 +117,25 @@ static bool IsRemote (int fd)
 }
 # define IsRemote(fd,path) IsRemote(fd)
 
-#else /* _WIN32 || __OS2__ */
+#elif defined(_WIN32)
+
+static bool IsRemote(int fd, const char *path)
+{
+    VLC_UNUSED(fd);
+
+    size_t len = strlen(path);
+    if (len < 2)
+        return false;
+    if (path[0] == '\\' && path[1] == '\\')
+        return true;
+    return false;
+}
+
+#else /* __OS2__ */
+
 static bool IsRemote (const char *path)
 {
-# if !defined(__OS2__) && !defined(VLC_WINSTORE_APP)
-    wchar_t *wpath = ToWide (path);
-    bool is_remote = (wpath != NULL && PathIsNetworkPathW (wpath));
-    free (wpath);
-    return is_remote;
-# else
     return (! strncmp(path, "\\\\", 2));
-# endif
 }
 # define IsRemote(fd,path) IsRemote(path)
 #endif
