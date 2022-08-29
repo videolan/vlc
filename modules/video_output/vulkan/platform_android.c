@@ -60,6 +60,8 @@ static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
     ANativeWindow *anw =
         AWindowHandler_getANativeWindow(vk->window->handle.anativewindow,
                                         AWindow_Video);
+    PFN_vkCreateAndroidSurfaceKHR CreateAndroidSurfaceKHR = (PFN_vkCreateAndroidSurfaceKHR)
+        inst->get_proc_address(inst->instance, "vkCreateAndroidSurfaceKHR");
 
     VkAndroidSurfaceCreateInfoKHR ainfo = {
          .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
@@ -68,7 +70,7 @@ static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
          .window = anw,
     };
 
-    VkResult res = vkCreateAndroidSurfaceKHR(inst->instance, &ainfo, NULL, surface_out);
+    VkResult res = CreateAndroidSurfaceKHR(inst->instance, &ainfo, NULL, surface_out);
     if (res != VK_SUCCESS) {
         msg_Err(vk, "Failed creating Android surface");
         return VLC_EGENERIC;
