@@ -2,6 +2,7 @@
 ### Vulkan ###
 
 VULKAN_COMMONSOURCES = video_output/vulkan/platform.c \
+	video_output/vulkan/instance.h \
 	video_output/vulkan/platform.h
 
 VULKAN_COMMONCFLAGS = $(VULKAN_CFLAGS) $(LIBPLACEBO_CFLAGS)
