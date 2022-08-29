@@ -1116,7 +1116,7 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
 
     } /* else can't do anything, no timestamped blocks in stream */
 
-    return i_enddts;
+    return ( i_enddts != VLC_TICK_INVALID )? p_sys->i_nzpcr_offset + i_enddts : i_enddts;
 }
 
 static void Ogg_QueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
