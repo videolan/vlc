@@ -31,7 +31,7 @@
 #include "../android/utils.h"
 
 static void ClosePlatform(vlc_vk_platform_t *vk);
-static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out);
+static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *, VkSurfaceKHR *);
 static const struct vlc_vk_platform_operations platform_ops =
 {
     .close = ClosePlatform,
@@ -54,7 +54,8 @@ static void ClosePlatform(vlc_vk_platform_t *vk)
                                         AWindow_Video);
 }
 
-static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out)
+static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
+                         VkSurfaceKHR *surface_out)
 {
     ANativeWindow *anw =
         AWindowHandler_getANativeWindow(vk->window->handle.anativewindow,
@@ -67,7 +68,7 @@ static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR 
          .window = anw,
     };
 
-    VkResult res = vkCreateAndroidSurfaceKHR(vkinst, &ainfo, NULL, surface_out);
+    VkResult res = vkCreateAndroidSurfaceKHR(inst->instance, &ainfo, NULL, surface_out);
     if (res != VK_SUCCESS) {
         msg_Err(vk, "Failed creating Android surface");
         return VLC_EGENERIC;

@@ -69,9 +69,14 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
     if (!sys->instance)
         goto error;
 
+    vlc_vk_instance_t inst = {
+        .instance = sys->instance->instance,
+        .get_proc_address = sys->instance->get_proc_addr,
+    };
+
     // Create the platform-specific surface object
     VkSurfaceKHR surface;
-    if (vlc_vk_CreateSurface(sys->platform, sys->instance->instance, &surface) != VLC_SUCCESS)
+    if (vlc_vk_CreateSurface(sys->platform, &inst, &surface) != VLC_SUCCESS)
         goto error;
 
     // Create vulkan device

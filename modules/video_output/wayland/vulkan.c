@@ -32,7 +32,8 @@
 static void ClosePlatform(vlc_vk_platform_t *vk)
     { (void)vk; }
 
-static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out)
+static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
+                         VkSurfaceKHR *surface_out)
 {
     VkWaylandSurfaceCreateInfoKHR surface_info = {
         .sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
@@ -40,7 +41,7 @@ static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR 
         .surface = vk->window->handle.wl,
     };
 
-    VkResult res = vkCreateWaylandSurfaceKHR(vkinst, &surface_info, NULL, surface_out);
+    VkResult res = vkCreateWaylandSurfaceKHR(inst->instance, &surface_info, NULL, surface_out);
     if (res != VK_SUCCESS) {
         msg_Err(vk, "Failed creating Wayland surface");
         return VLC_EGENERIC;
