@@ -395,7 +395,7 @@ bool CompositorX11RenderWindow::startRendering()
     m_renderTask->moveToThread(m_renderThread);
     connect(m_renderThread, &QThread::finished, m_renderTask, &QObject::deleteLater);
 
-    connect(m_interfaceWindow, &CompositorX11UISurface::afterRendering, m_renderTask, &RenderTask::requestRefresh);
+    connect(m_interfaceWindow, &CompositorX11UISurface::updated, m_renderTask, &RenderTask::requestRefresh);
     connect(m_interfaceWindow, &CompositorX11UISurface::sizeChanged, m_renderTask, &RenderTask::onInterfaceSizeChanged);
 
     connect(this, &CompositorX11RenderWindow::windowSizeChanged, m_renderTask, &RenderTask::onWindowSizeChanged);
