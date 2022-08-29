@@ -140,6 +140,8 @@ void CompositorX11UISurface::render()
 
     m_context->functions()->glFlush();
     m_context->swapBuffers(this);
+
+    emit updated();
 }
 
 void CompositorX11UISurface::updateSizes()

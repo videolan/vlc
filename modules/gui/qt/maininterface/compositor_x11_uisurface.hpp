@@ -64,6 +64,7 @@ signals:
     void beforeRendering();
     void afterRendering();
     void sizeChanged(const QSize& size);
+    void updated();
 
 protected:
     bool event(QEvent *event) override;
