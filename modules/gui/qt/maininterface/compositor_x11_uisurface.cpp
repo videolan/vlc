@@ -133,7 +133,7 @@ void CompositorX11UISurface::render()
     m_uiRenderControl->polishItems();
     m_uiRenderControl->sync();
 
-    // FIXME: Render function should be executed in rendering thread
+    // TODO: investigate multithreaded renderer
     m_uiRenderControl->render();
 
     m_uiWindow->resetOpenGLState();
