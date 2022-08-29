@@ -38,6 +38,8 @@ static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
 {
     // Get current win32 HINSTANCE
     HINSTANCE hInst = GetModuleHandle(NULL);
+    PFN_vkCreateWin32SurfaceKHR CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)
+        inst->get_proc_address(inst->instance, "vkCreateWin32SurfaceKHR");
 
     VkWin32SurfaceCreateInfoKHR winfo = {
          .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
@@ -45,7 +47,7 @@ static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
          .hwnd = (HWND) vk->window->handle.hwnd,
     };
 
-    VkResult res = vkCreateWin32SurfaceKHR(inst->instance, &winfo, NULL, surface_out);
+    VkResult res = CreateWin32SurfaceKHR(inst->instance, &winfo, NULL, surface_out);
     if (res != VK_SUCCESS) {
         msg_Err(vk, "Failed creating Win32 surface");
         return VLC_EGENERIC;
