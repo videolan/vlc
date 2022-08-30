@@ -627,6 +627,73 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     return VLC_SUCCESS;
 }
 
+static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
+                         enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt,
+                         const AVPixFmtDescriptor *src_desc,
+                         vlc_sem_t *open_lock)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( hwfmt == AV_PIX_FMT_NONE )
+        return VLC_EGENERIC;
+
+    p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
+    if (p_dec->fmt_out.video.i_chroma == 0)
+        return VLC_EGENERIC; /* Unknown brand of hardware acceleration */
+    if (p_context->width == 0 || p_context->height == 0)
+    {   /* should never happen */
+        msg_Err(p_dec, "unspecified video dimensions");
+        return VLC_EGENERIC;
+    }
+    const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
+    msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
+    if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
+        return VLC_EGENERIC; /* Unsupported brand of hardware acceleration */
+
+    if (open_lock)
+        vlc_sem_post(open_lock);
+
+    picture_t *test_pic = decoder_NewPicture(p_dec);
+    assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
+    vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
+                                &p_dec->fmt_in,
+                                test_pic ? test_pic->p_sys : NULL);
+
+    if (open_lock)
+        vlc_sem_wait(open_lock);
+
+    if (test_pic)
+        picture_Release(test_pic);
+    if (va == NULL)
+    {
+        return VLC_EGENERIC; /* Unsupported codec profile or such */
+    }
+
+    if (va->description != NULL)
+        msg_Info(p_dec, "Using %s for hardware decoding", va->description);
+
+    p_sys->p_va = va;
+    p_sys->pix_fmt = hwfmt;
+    p_context->draw_horiz_band = NULL;
+    return VLC_SUCCESS;
+}
+
+static const enum PixelFormat hwfmts[] =
+{
+#ifdef _WIN32
+#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
+    AV_PIX_FMT_D3D11VA_VLD,
+#endif
+    AV_PIX_FMT_DXVA2_VLD,
+#endif
+    AV_PIX_FMT_VAAPI,
+#if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
+    AV_PIX_FMT_VDPAU,
+#endif
+    AV_PIX_FMT_NONE,
+};
+
+
 /*****************************************************************************
  * InitVideo: initialize the video decoder
  *****************************************************************************
@@ -1625,21 +1692,6 @@ no_reuse:
 
     wait_mt(p_sys);
 
-    static const enum PixelFormat hwfmts[] =
-    {
-#ifdef _WIN32
-#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
-        AV_PIX_FMT_D3D11VA_VLD,
-#endif
-        AV_PIX_FMT_DXVA2_VLD,
-#endif
-        AV_PIX_FMT_VAAPI,
-#if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
-        AV_PIX_FMT_VDPAU,
-#endif
-        AV_PIX_FMT_NONE,
-    };
-
     const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(swfmt);
 
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
@@ -1649,42 +1701,10 @@ no_reuse:
             if( hwfmts[i] == pi_fmt[j] )
                 hwfmt = hwfmts[i];
 
-        if( hwfmt == AV_PIX_FMT_NONE )
+        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, swfmt, src_desc, &p_sys->sem_mt) != VLC_SUCCESS)
             continue;
 
-        p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
-        if (p_dec->fmt_out.video.i_chroma == 0)
-            continue; /* Unknown brand of hardware acceleration */
-        if (p_context->width == 0 || p_context->height == 0)
-        {   /* should never happen */
-            msg_Err(p_dec, "unspecified video dimensions");
-            continue;
-        }
-        const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
-        msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
-        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
-            continue; /* Unsupported brand of hardware acceleration */
         post_mt(p_sys);
-
-        picture_t *test_pic = decoder_NewPicture(p_dec);
-        assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
-        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, src_desc, hwfmt,
-                                  &p_dec->fmt_in,
-                                  test_pic ? test_pic->p_sys : NULL);
-        if (test_pic)
-            picture_Release(test_pic);
-        if (va == NULL)
-        {
-            wait_mt(p_sys);
-            continue; /* Unsupported codec profile or such */
-        }
-
-        if (va->description != NULL)
-            msg_Info(p_dec, "Using %s for hardware decoding", va->description);
-
-        p_sys->p_va = va;
-        p_sys->pix_fmt = hwfmt;
-        p_context->draw_horiz_band = NULL;
         return hwfmt;
     }
 
