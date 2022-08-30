@@ -3897,6 +3897,13 @@ AS_IF([test "${enable_qt}" != "no"], [
           qmlshapesplugin qmlplugin modelsplugin qsvg qsvgicon
           qtgraphicaleffectsprivate qjpeg ])
 
+        PKG_CHECK_MODULES([QT5_XCB_PLUGINS], [
+          qxcb-glx-integration qxcb
+        ], [VLC_ADD_LIBS([qt],[${QT5_XCB_PLUGINS_LIBS}])], [:])
+
+        dnl Platform plugins are mandatory on those platforms, as opposed to
+        dnl the previous integration for linux which are optional
+
         AS_IF([test "${SYS}" = "mingw32"], [
           PKG_CHECK_MODULES([QT5_PLATFORM_PLUGINS], [qwindows qwindowsvistastyle])
         ])
