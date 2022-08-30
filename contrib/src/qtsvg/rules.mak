@@ -31,6 +31,4 @@ qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	cd $< && $(MAKE) -C src sub-plugins-install_subtargets \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
 		sub-svg-install_subtargets
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Svg plugins/iconengines qsvgicon
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Svg plugins/imageformats qsvg
 	touch $@

@@ -25,11 +25,5 @@ qtgraphicaleffects: qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz .su
 
 .qtgraphicaleffects: qtgraphicaleffects
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
-	# Make && Install libraries
-	cd $< && $(MAKE)
-	cd $< && $(MAKE) -C src \
-	INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
-	sub-effects-install_subtargets
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickWidgets qml/QtGraphicalEffects qtgraphicaleffectsplugin
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickWidgets qml/QtGraphicalEffects/private qtgraphicaleffectsprivate
+	cd $< && $(MAKE) install INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)"
 	touch $@

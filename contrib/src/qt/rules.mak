@@ -138,17 +138,13 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 		sub-imageformats-install_subtargets \
 		sub-platforms-install_subtargets \
 		sub-styles-install_subtargets
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/imageformats qjpeg
+
 ifdef HAVE_WIN32
 	# Add the private include to our project (similar to using "gui-private" in a qmake project) as well as ANGLE headers
 	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtGui/$(QT_VERSION)/QtGui -I$${includedir}/QtANGLE#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/platforms qwindows
-	# Vista styling
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Widgets plugins/styles qwindowsvistastyle
 endif
 
 ifdef HAVE_MACOSX
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/platforms qcocoa
 	# Qt Cocoa plugins depend on printer support...
 	cd $< && cp ./lib/libQt5PrintSupport.a "$(PREFIX)/lib/"
 endif

@@ -59,11 +59,4 @@ QT_DECLARATIVE_CONFIG := \
 	cd $< && $(MAKE) -C tools \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
 		sub-qmlcachegen-install_subtargets
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick.2 qtquick2plugin
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Layouts qquicklayoutsplugin
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Window.2 windowplugin
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Shapes qmlshapesplugin
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Qml qml/QtQml qmlplugin
-	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Qml qml/QtQml/Models.2 modelsplugin
-
 	touch $@
