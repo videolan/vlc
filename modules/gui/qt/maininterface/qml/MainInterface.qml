@@ -51,6 +51,15 @@ Item {
         value: root.height
     }
 
+    BindingCompat {
+        target: root.Window.window
+        property: "color"
+        value: VLCStyle.colors.bg
+        when: root.Window.window &&
+              !Qt.colorEqual(root.Window.window.color,
+                             "transparent")
+    }
+
     Widgets.ToolTipExt {
         id: attachedToolTip
 
