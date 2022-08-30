@@ -310,6 +310,10 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     if (pa_stream_is_corked(s) > 0)
         stream_start(s, aout, sys->last_date);
 
+    const pa_timing_info *ti = pa_stream_get_timing_info(s);
+    if (unlikely(ti == NULL))
+        return;
+
     if (pa_stream_is_corked(s) == 0)
     {
         pa_usec_t rt;
@@ -319,7 +323,6 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
             {
                 /* Subtract the timestamp of the timing_info from the monotonic
                  * time */
-                const pa_timing_info *ti = pa_stream_get_timing_info(s);
                 pa_usec_t ti_age_us = pa_timeval_age(&ti->timestamp);
                 vlc_tick_t system_ts = vlc_tick_now()
                                      - VLC_TICK_FROM_US(ti_age_us);
@@ -336,9 +339,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
                  * transport_usec, sink_usec), but the current read index
                  * should always be superior or equal. */
                 const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
-                const pa_timing_info *ti = pa_stream_get_timing_info(s);
-                if (ti != NULL && !ti->read_index_corrupt)
-                    assert(pa_bytes_to_usec(ti->read_index, ss) >= sys->flush_rt);
+                assert(pa_bytes_to_usec(ti->read_index, ss) >= sys->flush_rt);
             }
 #endif
         }
