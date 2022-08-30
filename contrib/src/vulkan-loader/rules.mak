@@ -29,6 +29,11 @@ VULKAN_LOADER_CONF := \
 	-DENABLE_WERROR=OFF \
 	-DBUILD_TESTS=OFF
 
+ifndef HAVE_VISUALSTUDIO
+# can only use masm or jwasm on Windows
+VULKAN_LOADER_CONF += -DUSE_MASM=OFF
+endif
+
 $(TARBALLS)/Vulkan-Loader-$(VULKAN_LOADER_VERSION).tar.gz:
 	$(call download_pkg,$(VULKAN_LOADER_URL),vulkan-loader)
 
