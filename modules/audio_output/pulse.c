@@ -311,7 +311,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         stream_start(s, aout, sys->last_date);
 
     const pa_timing_info *ti = pa_stream_get_timing_info(s);
-    if (unlikely(ti == NULL))
+    if (unlikely(ti == NULL) || !ti->playing)
         return;
 
     if (ti->write_index_corrupt)
