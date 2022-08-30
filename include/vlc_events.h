@@ -105,6 +105,8 @@ typedef enum vlc_event_type_t {
     vlc_InputItemAttachmentsFound,
 } vlc_event_type_t;
 
+#define VLC_EVENT_TYPE_COUNT (vlc_InputItemAttachmentsFound + 1)
+
 typedef struct vlc_event_listeners_group_t
 {
     DECL_ARRAY(struct vlc_event_listener_t *) listeners;
@@ -115,7 +117,7 @@ typedef struct vlc_event_manager_t
 {
     void * p_obj;
     vlc_mutex_t lock;
-    vlc_event_listeners_group_t events[vlc_InputItemAttachmentsFound + 1];
+    vlc_event_listeners_group_t events[VLC_EVENT_TYPE_COUNT];
 } vlc_event_manager_t;
 
 /* Event definition */
