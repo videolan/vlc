@@ -3882,6 +3882,29 @@ AS_IF([test "${enable_qt}" != "no"], [
       AS_IF([test "${QMLCACHE}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
+
+      VLC_SAVE_FLAGS
+      CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
+      AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <qconfig.h>]],[[QT_STATIC]])],
+        [have_qt_static=yes],[have_qt_static=no])
+      VLC_RESTORE_FLAGS
+
+      AS_IF([test "${have_qt_static}" = "yes"],[
+        PKG_CHECK_MODULES([QT5_PLUGINS], [
+          qtgraphicaleffectsplugin qtquick2plugin qtquickcontrols2plugin
+          qtquicktemplates2plugin qquicklayoutsplugin windowplugin
+          qmlshapesplugin qmlplugin modelsplugin qsvg qsvgicon
+          qtgraphicaleffectsprivate qjpeg ])
+
+        AS_IF([test "${SYS}" = "mingw32"], [
+          PKG_CHECK_MODULES([QT5_PLATFORM_PLUGINS], [qwindows qwindowsvistastyle])
+        ])
+
+        AS_IF([test "${SYS}" = "darwin" -a "${HAVE_OSX}" = 1], [
+          PKG_CHECK_MODULES([QT5_PLATFORM_PLUGINS], [qcocoa])
+        ])
+      ])
     ], [
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
