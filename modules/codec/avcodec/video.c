@@ -417,8 +417,6 @@ static int OpenVideoCodec( decoder_t *p_dec )
 
     ctx->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
-    p_sys->profile = -1;
-    p_sys->level = -1;
     cc_Init( &p_sys->cc );
 
     set_video_color_settings( &p_dec->fmt_in.video, ctx );
@@ -458,33 +456,13 @@ static int OpenVideoCodec( decoder_t *p_dec )
     return 0;
 }
 
-/*****************************************************************************
- * InitVideo: initialize the video decoder
- *****************************************************************************
- * the ffmpeg codec will be opened, some memory allocated. The vout is not yet
- * opened (done after the first decoded frame).
- *****************************************************************************/
-int InitVideoDec( vlc_object_t *obj )
+static int InitVideoDecCommon( decoder_t *p_dec )
 {
-    decoder_t *p_dec = (decoder_t *)obj;
-    const AVCodec *p_codec;
-    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
-    if( p_context == NULL )
-        return VLC_EGENERIC;
-
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    AVCodecContext *p_context = p_sys->p_context;
+    const AVCodec *p_codec = p_sys->p_codec;
     int i_val;
 
-    /* Allocate the memory needed to store the decoder's structure */
-    decoder_sys_t *p_sys = calloc( 1, sizeof(*p_sys) );
-    if( unlikely(p_sys == NULL) )
-    {
-        avcodec_free_context( &p_context );
-        return VLC_ENOMEM;
-    }
-
-    p_dec->p_sys = p_sys;
-    p_sys->p_context = p_context;
-    p_sys->p_codec = p_codec;
     p_sys->p_va = NULL;
     vlc_sem_init( &p_sys->sem_mt, 0 );
 
@@ -647,6 +625,37 @@ int InitVideoDec( vlc_object_t *obj )
     if( p_context->level != FF_LEVEL_UNKNOWN )
         p_dec->fmt_in.i_level = p_context->level;
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * InitVideo: initialize the video decoder
+ *****************************************************************************
+ * the ffmpeg codec will be opened, some memory allocated. The vout is not yet
+ * opened (done after the first decoded frame).
+ *****************************************************************************/
+int InitVideoDec( vlc_object_t *obj )
+{
+    decoder_t *p_dec = (decoder_t *)obj;
+    const AVCodec *p_codec;
+    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
+    if( p_context == NULL )
+        return VLC_EGENERIC;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    decoder_sys_t *p_sys = calloc( 1, sizeof(*p_sys) );
+    if( unlikely(p_sys == NULL) )
+    {
+        avcodec_free_context( &p_context );
+        return VLC_ENOMEM;
+    }
+
+    p_dec->p_sys = p_sys;
+    p_sys->p_context = p_context;
+    p_sys->p_codec = p_codec;
+    p_sys->profile = -1;
+    p_sys->level = -1;
+
+    return InitVideoDecCommon( p_dec );
 }
 
 /*****************************************************************************
