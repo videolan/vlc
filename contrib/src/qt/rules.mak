@@ -115,11 +115,25 @@ QT_ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
 	# Make && Install libraries
 	cd $< && $(QT_ENV_VARS) $(MAKE)
-	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets
+	cd $< && $(MAKE) -C src \
+		sub-corelib-install_subtargets \
+		sub-gui-install_subtargets \
+		sub-widgets-install_subtargets \
+		sub-platformsupport-install_subtargets \
+		sub-zlib-install_subtargets \
+		sub-bootstrap-install_subtargets \
+		sub-network-install_subtargets
 	# Install tools
-	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets sub-qlalr-install_subtargets
+	cd $< && $(MAKE) -C src \
+		sub-moc-install_subtargets \
+		sub-rcc-install_subtargets \
+		sub-uic-install_subtargets \
+		sub-qlalr-install_subtargets
 	# Install plugins
-	cd $< && $(MAKE) -C src -C plugins sub-imageformats-install_subtargets sub-platforms-install_subtargets sub-styles-install_subtargets
+	cd $< && $(MAKE) -C src -C plugins \
+		sub-imageformats-install_subtargets \
+		sub-platforms-install_subtargets \
+		sub-styles-install_subtargets
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Gui plugins/imageformats qjpeg
 ifdef HAVE_WIN32
 	# Add the private include to our project (similar to using "gui-private" in a qmake project) as well as ANGLE headers

@@ -35,14 +35,17 @@ QT_DECLARATIVE_CONFIG := \
 	cd $</src && $(PREFIX)/lib/qt5/bin/qmake -o Makefile src.pro
 	# Build & install only what we require
 	# Invoke the build rules one at a time as some rule dependencies seem to be broken
-	cd $< && $(MAKE) -C src sub-quick-make_first-ordered \
+	cd $< && $(MAKE) -C src \
+		sub-quick-make_first-ordered \
 		sub-qmlmodels-make_first-ordered \
 		sub-qmldevtools-make_first-ordered \
 		sub-qmlworkerscript-make_first-ordered
 	# We don't use particles, but the import target (which generates the qtquick2plugin.a) require
 	# the particle module to be built
-	cd $< && $(MAKE) -C src sub-particles-make_first-ordered
-	cd $< && $(MAKE) -C src sub-quick-install_subtargets \
+	cd $< && $(MAKE) -C src \
+		sub-particles-make_first-ordered
+	cd $< && $(MAKE) -C src \
+		sub-quick-install_subtargets \
 		sub-qml-install_subtargets \
 		sub-quickwidgets-install_subtargets \
 		sub-imports-install_subtargets \
@@ -50,7 +53,8 @@ QT_DECLARATIVE_CONFIG := \
 		sub-qmlworkerscript-install_subtargets \
 		sub-quickshapes-install_subtargets
 	cd $</tools && $(PREFIX)/lib/qt5/bin/qmake -o Makefile tools.pro
-	cd $< && $(MAKE) -C tools sub-qmlcachegen-install_subtargets
+	cd $< && $(MAKE) -C tools \
+		sub-qmlcachegen-install_subtargets
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick.2 qtquick2plugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Layouts qquicklayoutsplugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Window.2 windowplugin
