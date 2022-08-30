@@ -28,7 +28,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
-libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
+libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_DARWIN
 libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
