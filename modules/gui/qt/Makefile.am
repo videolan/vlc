@@ -27,7 +27,8 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(builddir)/gui/qt/dialogs/vlm
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
-libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
+libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM) \
+                         $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_DARWIN
 libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
@@ -1060,7 +1061,8 @@ endif
 
 vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp gui/qt/plugins.hpp
 vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
-vlc_qt_check_LDADD = $(QT_LIBS)
+vlc_qt_check_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS)
+
 
 if ENABLE_QT
 gui_LTLIBRARIES += libqt_plugin.la
