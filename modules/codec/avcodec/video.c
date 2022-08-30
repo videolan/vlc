@@ -66,6 +66,7 @@ struct decoder_sys_t
     bool b_hurry_up;
     bool b_show_corrupted;
     bool b_from_preroll;
+    bool b_hardware_only;
     enum AVDiscard i_skip_frame;
 
     /* how many decoded frames are late */
@@ -534,7 +535,7 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     p_context->get_buffer2 = lavc_GetFrame;
     p_context->opaque = p_dec;
 
-    int i_thread_count = var_InheritInteger( p_dec, "avcodec-threads" );
+    int i_thread_count = p_sys->b_hardware_only ? 1 : var_InheritInteger( p_dec, "avcodec-threads" );
     if( i_thread_count <= 0 )
     {
         i_thread_count = vlc_GetCPUCount();
@@ -721,6 +722,7 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->p_codec = p_codec;
     p_sys->profile = -1;
     p_sys->level = -1;
+    p_sys->b_hardware_only = false;
 
     return InitVideoDecCommon( p_dec );
 }
@@ -1630,6 +1632,11 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             can_hwaccel = true;
     }
 
+    /* Use the default fmt in priority of any sw fmt if the default fmt is a hw
+     * one */
+    if (p_sys->pix_fmt != AV_PIX_FMT_NONE && !p_sys->b_hardware_only)
+        swfmt = p_sys->pix_fmt;
+
     if (p_sys->pix_fmt == AV_PIX_FMT_NONE)
         goto no_reuse;
 
@@ -1670,6 +1677,10 @@ no_reuse:
     if (p_sys->p_va != NULL)
     {
         msg_Err(p_dec, "existing hardware acceleration cannot be reused");
+        // the decoder changes have to be handled outside of lavc so that
+        // switching to a software decoder will not silently decode nothing
+        // (get_format will fail to use AV_PIX_FMT_NONE)
+        assert(!p_sys->b_hardware_only);
         vlc_va_Delete(p_sys->p_va, &p_context->hwaccel_context);
         p_sys->p_va = NULL;
     }
