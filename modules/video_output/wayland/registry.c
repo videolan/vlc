@@ -253,7 +253,7 @@ struct vlc_wl_registry *vlc_wl_registry_get(struct wl_display *display,
     return vr;
 error:
     free(vr);
-    return vr;
+    return NULL;
 }
 
 static void name_destroy(void *d)
