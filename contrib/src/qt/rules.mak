@@ -56,6 +56,7 @@ endif
 endif
 	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
 	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
+	$(APPLY) $(SRC)/qt/set-mkspecs-properties.patch
 	$(MOVE)
 
 
