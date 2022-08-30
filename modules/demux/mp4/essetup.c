@@ -807,11 +807,6 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 p_track->fmt.i_codec = p_sample->i_type;
                 break;
             }
-
-        }
-        else if( p_soun->i_qt_version == 1 && p_soun->i_sample_per_packet <= 0 )
-        {
-            p_soun->i_qt_version = 0;
         }
     }
     else if( p_sample->data.p_sample_soun->i_qt_version == 1 )
@@ -838,12 +833,22 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         {
             /* redefined sample tables for vbr audio */
         }
-        else if ( p_track->i_sample_size != 0 && p_soun->i_sample_per_packet == 0 )
+        else if ( p_track->i_sample_size != 0 &&
+                  ( p_soun->i_sample_per_packet == 0 || p_soun->i_bytes_per_frame == 0 ) )
         {
             msg_Err( p_demux, "Invalid sample per packet value for qt_version 1. Broken muxer! %u %u",
                      p_track->i_sample_size, p_soun->i_sample_per_packet );
             p_soun->i_qt_version = 0;
         }
+    }
+
+    if( p_sample->data.p_sample_soun->i_qt_version == 1 &&
+        ( p_soun->i_sample_per_packet == 0 || /* >0,  1 for uncompressed formats */
+          p_soun->i_bytes_per_frame == 0 /* bytes_per_packet * channels */ ) )
+    {
+        msg_Warn( p_demux, "Invalid sample values for qtff v1. Broken muxer! sz %u spp %u bpf %u",
+                  p_track->i_sample_size, p_soun->i_sample_per_packet, p_soun->i_bytes_per_frame );
+        p_soun->i_qt_version = 0;
     }
 
     /* Endianness atom */
