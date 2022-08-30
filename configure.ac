@@ -3872,6 +3872,13 @@ AS_IF([test "${enable_qt}" != "no"], [
       ],[
           AC_MSG_WARN([Not building Qt Interface with X11 helpers.])
       ])
+      dnl TODO
+      PKG_CHECK_MODULES([QT5_WAYLAND], [Qt5WaylandClient], [
+          have_qt5_wayland="yes"
+      ],[
+          AC_MSG_WARN([Not building Qt Interface with wayland support.])
+      ])
+
       QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix Qt5Core)"
       QT_HOST_PATH="$(eval $PKG_CONFIG --variable=host_bins Qt5Core)"
       QT_VERSION="$(eval $PKG_CONFIG --modversion Qt5Gui)"
@@ -3900,6 +3907,10 @@ AS_IF([test "${enable_qt}" != "no"], [
         PKG_CHECK_MODULES([QT5_XCB_PLUGINS], [
           qxcb-glx-integration qxcb
         ], [VLC_ADD_LIBS([qt],[${QT5_XCB_PLUGINS_LIBS}])], [:])
+
+        PKG_CHECK_MODULES([QT5_WAYLAND_PLUGINS], [
+          qwayland-generic qwayland-egl xdg-shell
+        ], [VLC_ADD_LIBS([qt],[${QT5_WAYLAND_PLUGINS_LIBS}])], [:])
 
         dnl Platform plugins are mandatory on those platforms, as opposed to
         dnl the previous integration for linux which are optional
@@ -3937,6 +3948,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 AC_SUBST([QT_VERSION])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
+AM_CONDITIONAL([HAVE_QT5_WAYLAND], [test "${have_qt5_wayland}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
