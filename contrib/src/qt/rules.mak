@@ -108,6 +108,7 @@ QT_CONFIG += -no-direct2d
 endif
 
 QT_ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
+QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 
 .qt: qt
 	# Prevent all Qt contribs from generating and installing libtool .la files
@@ -116,6 +117,7 @@ QT_ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 	# Make && Install libraries
 	cd $< && $(QT_ENV_VARS) $(MAKE)
 	cd $< && $(MAKE) -C src \
+		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-corelib-install_subtargets \
 		sub-gui-install_subtargets \
 		sub-widgets-install_subtargets \
@@ -125,12 +127,14 @@ QT_ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 		sub-network-install_subtargets
 	# Install tools
 	cd $< && $(MAKE) -C src \
+		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-moc-install_subtargets \
 		sub-rcc-install_subtargets \
 		sub-uic-install_subtargets \
 		sub-qlalr-install_subtargets
 	# Install plugins
 	cd $< && $(MAKE) -C src -C plugins \
+		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-imageformats-install_subtargets \
 		sub-platforms-install_subtargets \
 		sub-styles-install_subtargets

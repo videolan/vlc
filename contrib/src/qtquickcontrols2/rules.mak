@@ -38,7 +38,8 @@ ifndef HAVE_CROSS_COMPILE
 	cd $<; for i in QtQuickControls2 QtQuickTemplates2; do \
 		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QTQC2_VERSION)/$$i/private/*.h; done
 endif
-	cd $< && $(MAKE) install_subtargets
+	cd $< && $(MAKE) install_subtargets \
+		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)"
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickControls2 qml/QtQuick/Controls.2 qtquickcontrols2plugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickControls2 qml/QtQuick/Templates.2 qtquicktemplates2plugin
 	touch $@
