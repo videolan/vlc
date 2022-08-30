@@ -582,6 +582,69 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     return VLC_SUCCESS;
 }
 
+static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
+                         enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt,
+                         const AVPixFmtDescriptor *src_desc,
+                         vlc_mutex_t *open_lock)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( hwfmt == AV_PIX_FMT_NONE )
+        return VLC_EGENERIC;
+
+    if (!vlc_va_MightDecode(hwfmt, swfmt))
+        return VLC_EGENERIC; /* Unknown brand of hardware acceleration */
+    if (p_context->width == 0 || p_context->height == 0)
+    {   /* should never happen */
+        msg_Err(p_dec, "unspecified video dimensions");
+        return VLC_EGENERIC;
+    }
+    const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
+    vlc_decoder_device *init_device = NULL;
+    msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
+    if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device))
+        return VLC_EGENERIC; /* Unsupported brand of hardware acceleration */
+    if (open_lock)
+        vlc_mutex_unlock(open_lock);
+
+    p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
+    vlc_video_context *vctx_out;
+    vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt, src_desc,
+                                p_dec->fmt_in, init_device,
+                                &p_dec->fmt_out.video, &vctx_out);
+    if (init_device)
+        vlc_decoder_device_Release(init_device);
+    if (open_lock)
+        vlc_mutex_lock(open_lock);
+    if (va == NULL)
+        return VLC_EGENERIC; /* Unsupported codec profile or such */
+    assert(p_dec->fmt_out.video.i_chroma != 0);
+    assert(vctx_out != NULL);
+    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
+
+    if (decoder_UpdateVideoOutput(p_dec, vctx_out))
+    {
+        vlc_va_Delete(va, p_context);
+        return VLC_EGENERIC; /* Unsupported codec profile or such */
+    }
+
+    p_sys->p_va = va;
+    p_sys->vctx_out = vlc_video_context_Hold( vctx_out );
+    p_sys->pix_fmt = hwfmt;
+    return VLC_SUCCESS;
+}
+
+static const enum AVPixelFormat hwfmts[] =
+{
+#ifdef _WIN32
+    AV_PIX_FMT_D3D11VA_VLD,
+    AV_PIX_FMT_DXVA2_VLD,
+#endif
+    AV_PIX_FMT_VAAPI,
+    AV_PIX_FMT_VDPAU,
+    AV_PIX_FMT_NONE,
+};
+
 /*****************************************************************************
  * InitVideo: initialize the video decoder
  *****************************************************************************
@@ -1737,17 +1800,6 @@ no_reuse:
 
     vlc_mutex_lock(&p_sys->lock);
 
-    static const enum AVPixelFormat hwfmts[] =
-    {
-#ifdef _WIN32
-        AV_PIX_FMT_D3D11VA_VLD,
-        AV_PIX_FMT_DXVA2_VLD,
-#endif
-        AV_PIX_FMT_VAAPI,
-        AV_PIX_FMT_VDPAU,
-        AV_PIX_FMT_NONE,
-    };
-
     const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(swfmt);
 
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
@@ -1757,46 +1809,9 @@ no_reuse:
             if( hwfmts[i] == pi_fmt[j] )
                 hwfmt = hwfmts[i];
 
-        if( hwfmt == AV_PIX_FMT_NONE )
+        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, swfmt, src_desc, &p_sys->lock) != VLC_SUCCESS)
             continue;
 
-        if (!vlc_va_MightDecode(hwfmt, swfmt))
-            continue; /* Unknown brand of hardware acceleration */
-        if (p_context->width == 0 || p_context->height == 0)
-        {   /* should never happen */
-            msg_Err(p_dec, "unspecified video dimensions");
-            continue;
-        }
-        const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
-        vlc_decoder_device *init_device = NULL;
-        msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
-        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device))
-            continue; /* Unsupported brand of hardware acceleration */
-        vlc_mutex_unlock(&p_sys->lock);
-
-        p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
-        vlc_video_context *vctx_out;
-        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt, src_desc,
-                                  p_dec->fmt_in, init_device,
-                                  &p_dec->fmt_out.video, &vctx_out);
-        if (init_device)
-            vlc_decoder_device_Release(init_device);
-        vlc_mutex_lock(&p_sys->lock);
-        if (va == NULL)
-            continue; /* Unsupported codec profile or such */
-        assert(p_dec->fmt_out.video.i_chroma != 0);
-        assert(vctx_out != NULL);
-        p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
-
-        if (decoder_UpdateVideoOutput(p_dec, vctx_out))
-        {
-            vlc_va_Delete(va, p_context);
-            continue; /* Unsupported codec profile or such */
-        }
-
-        p_sys->p_va = va;
-        p_sys->vctx_out = vlc_video_context_Hold( vctx_out );
-        p_sys->pix_fmt = hwfmt;
         vlc_mutex_unlock(&p_sys->lock);
         return hwfmt;
     }
