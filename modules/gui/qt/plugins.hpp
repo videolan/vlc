@@ -55,4 +55,9 @@
     #elif defined(Q_OS_MACOS)
      Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin)
     #endif
+
+    #if defined(QT5_HAS_X11)
+     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
+     Q_IMPORT_PLUGIN(QXcbGlxIntegrationPlugin)
+    #endif
 #endif
