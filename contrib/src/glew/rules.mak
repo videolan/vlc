@@ -17,6 +17,6 @@ glew: glew-$(GLEW_VERSION).tgz .sum-glew
 	$(MOVE)
 
 .glew: glew toolchain.cmake
-	cd $</build/cmake && $(HOSTVARS_PIC) $(CMAKE) -DBUILD_SHARED_LIBS:BOOL=OFF -DGLEW_USE_STATIC_LIBS:BOOL=ON
+	cd $</build/cmake && $(HOSTVARS_PIC) $(CMAKE) -DGLEW_USE_STATIC_LIBS:BOOL=ON
 	+$(CMAKEBUILD) $</build/cmake --target install
 	touch $@
