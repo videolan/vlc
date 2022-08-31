@@ -40,25 +40,24 @@ static const CGFloat kBackgroundCornerRadius = 10.;
         _arrowSize = NSMakeSize(kArrowWidth, kArrowHeight);
     }
 
-    NSPoint itemCenterPoint = NSMakePoint(NSMinX(_selectedItemFrame) + NSWidth(_selectedItemFrame) / 2,
-                                          NSMinY(_selectedItemFrame) + NSHeight(_selectedItemFrame) / 2);
-    NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds),
-                                       NSMinY(self.bounds), NSWidth(self.bounds) + 2,
-                                       NSHeight(self.bounds) - _arrowSize.height);
-    CGFloat backgroundTop = NSMaxY(backgroundRect);
-    CGFloat backgroundLeft = NSMinX(backgroundRect);
+    const NSRect selectedItemFrame = _selectedItem.view.frame;
 
-    NSPoint arrowLeftPoint = NSMakePoint(itemCenterPoint.x - _arrowSize.width / 2, backgroundTop);
-    NSPoint arrowTopPoint = NSMakePoint(itemCenterPoint.x, backgroundTop - 1);
-    NSPoint arrowRightPoint = NSMakePoint(itemCenterPoint.x + _arrowSize.width / 2, backgroundTop);
+    const NSPoint itemCenterPoint = NSMakePoint(NSMinX(selectedItemFrame) + NSWidth(selectedItemFrame) / 2,
+                                                NSMinY(selectedItemFrame) + NSHeight(selectedItemFrame) / 2);
+    const NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds),
+                                             NSMinY(self.bounds), NSWidth(self.bounds) + 2,
+                                             NSHeight(self.bounds) - _arrowSize.height);
+    const CGFloat backgroundTop = NSMaxY(backgroundRect);
+    const CGFloat backgroundLeft = NSMinX(backgroundRect);
 
-    NSPoint topLeftCorner = NSMakePoint(backgroundLeft, backgroundTop);
-    NSPoint topLeftCornerAfterCurve = NSMakePoint(backgroundLeft + kBackgroundCornerRadius, backgroundTop);
+    const NSPoint arrowLeftPoint = NSMakePoint(itemCenterPoint.x - _arrowSize.width / 2, backgroundTop);
+    const NSPoint arrowTopPoint = NSMakePoint(itemCenterPoint.x, backgroundTop + kArrowHeight - 1);
+    const NSPoint arrowRightPoint = NSMakePoint(itemCenterPoint.x + _arrowSize.width / 2, backgroundTop);
 
-    NSBezierPath *backgroundPath = [NSBezierPath bezierPathWithRoundedRect:backgroundRect xRadius:kBackgroundCornerRadius yRadius:kBackgroundCornerRadius];
-    backgroundPath.flatness = 1.0;
-    backgroundPath.lineJoinStyle = NSLineJoinStyleRound;
-    backgroundPath.lineWidth = 0.5;
+    const NSPoint topLeftCorner = NSMakePoint(backgroundLeft, backgroundTop);
+    const NSPoint topLeftCornerAfterCurve = NSMakePoint(backgroundLeft + kBackgroundCornerRadius, backgroundTop);
+
+    const NSBezierPath *backgroundPath = [NSBezierPath bezierPathWithRoundedRect:backgroundRect xRadius:kBackgroundCornerRadius yRadius:kBackgroundCornerRadius];
 
     [backgroundPath moveToPoint:topLeftCornerAfterCurve];
     [backgroundPath lineToPoint:arrowLeftPoint];

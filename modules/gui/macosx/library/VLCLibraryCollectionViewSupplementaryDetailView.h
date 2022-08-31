@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryCollectionViewSupplementaryDetailView : NSView <NSCollectionViewElement>
 
-@property (readwrite, assign) NSRect selectedItemFrame;
+@property (readwrite, assign) NSCollectionViewItem *selectedItem;
 
 @end
 

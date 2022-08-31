@@ -396,7 +396,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
         albumSupplementaryDetailView.representedAlbum = album;
-        albumSupplementaryDetailView.selectedItemFrame = [collectionView frameForItemAtIndex:indexPath.item];
+        albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
 
         return albumSupplementaryDetailView;
 
@@ -406,7 +406,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         id<VLCMediaLibraryAudioGroupProtocol> audioGroup = _displayedCollection[indexPath.item];
         audioGroupSupplementaryDetailView.representedAudioGroup = audioGroup;
-        audioGroupSupplementaryDetailView.selectedItemFrame = [collectionView frameForItemAtIndex:indexPath.item];
+        audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
 
         return audioGroupSupplementaryDetailView;
     }
