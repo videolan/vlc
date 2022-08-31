@@ -67,7 +67,7 @@ libqt_plugin_la_CPPFLAGS += -DQT_QML_DEBUG
 endif
 
 libqt_plugin_la_SOURCES = \
-	gui/qt/qt.cpp gui/qt/qt.hpp \
+	gui/qt/qt.cpp gui/qt/qt.hpp gui/qt/plugins.hpp \
 	gui/qt/dialogs/bookmarks/bookmarks.cpp gui/qt/dialogs/bookmarks/bookmarks.hpp \
 	gui/qt/dialogs/dialogs/dialogmodel.cpp \
 	gui/qt/dialogs/dialogs/dialogmodel.hpp \
@@ -1058,7 +1058,7 @@ gui/qt/resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plu
 
 endif
 
-vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp
+vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp gui/qt/plugins.hpp
 vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
 vlc_qt_check_LDADD = $(QT_LIBS)
 

@@ -32,6 +32,12 @@ static void messageOutput(QtMsgType type, const QMessageLogContext &,
         exit(1);
 }
 
+#include <qconfig.h>
+#include <QtPlugin>
+QT_BEGIN_NAMESPACE
+#include "plugins.hpp"
+QT_END_NAMESPACE
+
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(messageOutput);
