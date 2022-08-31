@@ -461,6 +461,10 @@ function n_descramble( nparam, js )
     -- as a second argument. We parse and emulate those calls to follow
     -- the descrambling script.
     -- c[40](c[14],c[2]),c[25](c[48]),c[14](c[1],c[24],c[42]()), [...]
+    if not string.match( script, "c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)" ) then
+        vlc.msg.dbg( "Couldn't parse and execute YouTube video throttling parameter descrambling rules" )
+        return nil
+    end
     for ifunc, itab, args in string.gmatch( script, "c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)" ) do
         local iarg1 = string.match( args, "^,c%[(%d+)%]" )
         local iarg2 = string.match( args, "^,[^,]-,c%[(%d+)%]" )
