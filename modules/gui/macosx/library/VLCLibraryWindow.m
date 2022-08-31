@@ -69,6 +69,7 @@ const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 
 static NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
+static NSUserInterfaceItemIdentifier const kVLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
@@ -130,6 +131,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)awakeFromNib
 {
+    self.identifier = kVLCLibraryWindowIdentifier;
+    
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
 
@@ -974,24 +977,26 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                               state:(NSCoder *)state 
                   completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
+    if([identifier isEqualToString:kVLCLibraryWindowIdentifier] == NO) {
+        return;
+    }
+    
     if([VLCMain sharedInstance].libraryWindowController == nil) {
         [VLCMain sharedInstance].libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
     }
 
     VLCLibraryWindow *libraryWindow = [VLCMain sharedInstance].libraryWindow;
 
-    if([identifier isEqualToString:[libraryWindow identifier]]) {
-        NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
-        NSInteger rememberedSelectedLibraryViewModeSegment = [state decodeIntegerForKey:@"macosx-library-view-mode-selected-segment"];
-        NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
+    NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
+    NSInteger rememberedSelectedLibraryViewModeSegment = [state decodeIntegerForKey:@"macosx-library-view-mode-selected-segment"];
+    NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
 
-        [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
-        [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
-        [libraryWindow.libraryAudioDataSource.segmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
+    [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
+    [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
+    [libraryWindow.libraryAudioDataSource.segmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
-        [libraryWindow segmentedControlAction:libraryWindow.navigationStack]; // Prevent actions being added to the nav stack
-        [libraryWindow.libraryAudioDataSource segmentedControlAction:libraryWindow.navigationStack];
-    }
+    [libraryWindow segmentedControlAction:libraryWindow.navigationStack]; // Prevent actions being added to the nav stack
+    [libraryWindow.libraryAudioDataSource segmentedControlAction:libraryWindow.navigationStack];
 
     completionHandler(libraryWindow, nil);
 }
