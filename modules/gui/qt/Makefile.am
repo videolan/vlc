@@ -13,6 +13,11 @@
 
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 
+vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp gui/qt/plugins.hpp
+vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
+vlc_qt_check_CPPFLAGS = $(AM_CPPFLAGS)
+vlc_qt_check_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS)
+
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ \
 	-I$(builddir)/gui/qt/dialogs/extended \
@@ -36,6 +41,7 @@ endif
 if HAVE_QT5_X11
 libqt_plugin_la_CXXFLAGS += $(QT5_X11_CFLAGS) -DQT5_HAS_X11
 libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(X_LIBS) $(X_PRE_LIB) -lX11
+vlc_qt_check_CPPFLAGS += $(QT5_WAYLAND_CFLAGS) -DQT5_HAS_X11
 endif
 
 if HAVE_XCB
@@ -59,6 +65,8 @@ endif
 if HAVE_QT5_WAYLAND
 libqt_plugin_la_CPPFLAGS += $(QT5_WAYLAND_CFLAGS)
 libqt_plugin_la_LIBADD += $(QT5_WAYLAND_LIBS)
+vlc_qt_check_CPPFLAGS += $(QT5_WAYLAND_CFLAGS) -DQT5_HAS_WAYLAND
+vlc_qt_check_LDADD += $(QT5_WAYLAND_LIBS)
 endif
 if HAVE_WIN32
 libqt_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
@@ -1062,11 +1070,6 @@ gui/qt/resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plu
 	$(AM_V_GEN)$(RCC) --name vlc -o $@ $(filter %.qrc, $^)
 
 endif
-
-vlc_qt_check_SOURCES = gui/qt/vlc-qt-check.cpp gui/qt/plugins.hpp
-vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
-vlc_qt_check_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT5_PLUGINS_LIBS) $(QT5_PLATFORM_PLUGINS_LIBS)
-
 
 if ENABLE_QT
 gui_LTLIBRARIES += libqt_plugin.la
