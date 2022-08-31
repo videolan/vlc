@@ -22,5 +22,5 @@ import "qrc:///widgets/" as Widgets
 Widgets.ExpandGridView {
     id: root
 
-    displayMarginEnd: miniPlayer.height
+    displayMarginEnd: g_mainDisplay.displayMargin
 }

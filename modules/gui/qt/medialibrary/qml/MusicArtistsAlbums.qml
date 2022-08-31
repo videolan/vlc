@@ -124,7 +124,10 @@ FocusScope {
 
             visible: artistModel.count > 0
             focus: artistModel.count > 0
-            displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
+
+            // To get blur effect while scrolling in mainview
+            displayMarginEnd: g_mainDisplay.displayMargin
+
             Navigation.parentItem: root
 
             Navigation.rightAction: function() {

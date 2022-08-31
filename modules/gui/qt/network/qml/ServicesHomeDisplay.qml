@@ -172,7 +172,9 @@ Widgets.PageLoader {
             leftMargin: VLCStyle.margin_large
             rightMargin: VLCStyle.margin_large
             spacing: VLCStyle.margin_xsmall
-            displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
+
+            // To get blur effect while scrolling in mainview
+            displayMarginEnd: g_mainDisplay.displayMargin
 
             delegate: Rectangle {
                 width: servicesView.width - VLCStyle.margin_large * 2

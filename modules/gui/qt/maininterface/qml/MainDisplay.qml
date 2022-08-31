@@ -42,6 +42,11 @@ FocusScope {
     })
 
     property alias g_mainDisplay: root
+
+    // NOTE: The main view must be above the indexing bar and the mini player.
+    property int displayMargin: (loaderProgress.active) ? miniPlayer.height + loaderProgress.height
+                                                        : miniPlayer.height
+
     property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
@@ -259,11 +264,7 @@ FocusScope {
                             left: parent.left
                             bottom: parent.bottom
 
-                            // NOTE: The StackView must be above the indexing bar and the mini
-                            //       player.
-                            bottomMargin: (loaderProgress.active) ? miniPlayer.height
-                                                                    + loaderProgress.height
-                                                                  : miniPlayer.height
+                            bottomMargin: root.displayMargin
 
                             right: playlistColumn.visible ? playlistColumn.left : parent.right
                             rightMargin: (MainCtx.playlistDocked && MainCtx.playlistVisible)
@@ -306,7 +307,7 @@ FocusScope {
                                                      playlist.minimumWidth,
                                                      root.width / 2)
                         width: 0
-                        height: parent.height - miniPlayer.height
+                        height: parent.height - root.displayMargin
 
                         visible: false
 
@@ -360,7 +361,9 @@ FocusScope {
                             focus: true
 
                             rightPadding: VLCStyle.applicationHorizontalMargin
-                            bottomPadding: topPadding + Math.max(VLCStyle.applicationVerticalMargin - miniPlayer.height, 0)
+
+                            bottomPadding: topPadding + Math.max(VLCStyle.applicationVerticalMargin
+                                                                 - root.displayMargin, 0)
 
                             Navigation.parentItem: medialibId
                             Navigation.upItem: sourcesBanner

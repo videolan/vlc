@@ -23,5 +23,5 @@ import "qrc:///widgets/" as Widgets
 Widgets.KeyNavigableTableView {
     id: root
 
-    displayMarginEnd: miniPlayer.height
+    displayMarginEnd: g_mainDisplay.displayMargin
 }

@@ -50,7 +50,9 @@ FocusScope {
             else
                 tracklistdisplay_id.currentIndex = 0;
         }
-        displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
+
+        // To get blur effect while scrolling in mainview
+        displayMarginEnd: g_mainDisplay.displayMargin
     }
 
     EmptyLabelButton {
