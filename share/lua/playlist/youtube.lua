@@ -370,7 +370,7 @@ function n_descramble( nparam, js )
     -- as such into a table.
     local data = {}
     datac = datac..","
-    while datac ~= "" do
+    while datac and datac ~= "" do
         local el = nil
         -- Transformation functions
         if string.match( datac, "^function%(" ) then
@@ -396,6 +396,7 @@ function n_descramble( nparam, js )
                el == trans.compound1.func or
                el == trans.compound2.func then
                 datac = string.match( datac, '^.-},e%.split%(""%)%)},(.*)$' )
+                        or string.match( datac, "^.-},(.*)$" )
             else
                 datac = string.match( datac, "^.-},(.*)$" )
             end
