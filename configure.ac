@@ -2589,10 +2589,34 @@ dnl
 AC_CHECK_HEADERS([dxgidebug.h dxgi1_6.h d3d11_4.h])
 
 dnl
-dnl IApplicationData2
+dnl IStorageFolder
 dnl
-have_iapplication_data2="no"
-AC_CHECK_TYPES([IApplicationData2],[],[],[#include <windows.storage.h>])
+AS_IF([test "$vlc_winstore_app" = "1"],
+[
+    AC_MSG_CHECKING([for proper __x_ABI_CWindows_CStorage_CIStorageFolder definition])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <windows.storage.h>
+__x_ABI_CWindows_CStorage_CIStorageFolder *toto;
+    ]])], [
+        AC_MSG_RESULT([yes])
+    ], [
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([IStorageFolder not properly defined, use mingw-w64 8.0.1 or higher])
+    ])
+
+    AC_MSG_CHECKING([for proper __x_ABI_CWindows_CStorage_CIApplicationData2 definition])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <windows.storage.h>
+__x_ABI_CWindows_CStorage_CIApplicationData2 *toto;
+    ]])], [
+        AC_MSG_RESULT([yes])
+        have_iapplication_data2="yes"
+    ], [
+        AC_MSG_RESULT([no])
+    ])
+])
+
+AM_CONDITIONAL([HAVE_WINDOWS_STORAGE], [test "${have_iapplication_data2}" = "yes"])
 
 dnl
 dnl DirectComposition
