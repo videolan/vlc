@@ -60,4 +60,10 @@
      Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
      Q_IMPORT_PLUGIN(QXcbGlxIntegrationPlugin)
     #endif
+
+    #if defined(QT5_HAS_WAYLAND)
+     Q_IMPORT_PLUGIN(QWaylandEglPlatformIntegrationPlugin)
+     Q_IMPORT_PLUGIN(QWaylandIntegrationPlugin)
+     Q_IMPORT_PLUGIN(QWaylandXdgShellIntegrationPlugin)
+    #endif
 #endif
