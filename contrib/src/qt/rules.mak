@@ -53,9 +53,8 @@ else
 	cd $(UNPACK_DIR); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
 		sed -i.orig -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
 endif
-	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
-
 endif
+	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
 	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
 	$(MOVE)
 
