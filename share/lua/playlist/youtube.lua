@@ -708,8 +708,8 @@ function pick_stream( stream_map, js_url )
         if dn then
             url = string.gsub( url, "([?&])n=[^&]+", "%1n="..vlc.strings.encode_uri_component( dn ), 1 )
         else
-            vlc.msg.dbg( "Couldn't descramble YouTube throttling URL parameter: data transfer will get throttled" )
-            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+            vlc.msg.err( "Couldn't descramble YouTube throttling URL parameter: data transfer will get throttled" )
+            --vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
         end
     end
 
