@@ -1880,7 +1880,7 @@ void PlayerController::setArt( input_item_t *p_item, QString fileUrl )
         QString old_url = decodeArtURL( p_item );
         old_url = QDir( old_url ).canonicalPath();
 
-        if( old_url.startsWith( QString::fromUtf8( psz_cachedir ) ) )
+        if( psz_cachedir != nullptr && old_url.startsWith( QString::fromUtf8( psz_cachedir ) ) )
             QFile( old_url ).remove(); /* Purge cached artwork */
 
         free( psz_cachedir );
