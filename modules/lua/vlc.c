@@ -199,15 +199,17 @@ int vlclua_dir_list(const char *luadirname, char ***restrict listp)
     *listp = list;
 
     /* Lua scripts in user-specific data directory */
-    list = vlclua_dir_list_append(list, config_GetUserDir(VLC_USERDATA_DIR),
-                                  luadirname);
+    char *userdir = config_GetUserDir(VLC_USERDATA_DIR);
+    if (likely(userdir != NULL))
+        list = vlclua_dir_list_append(list, userdir, luadirname);
 
     char *libdir = config_GetSysPath(VLC_PKG_LIBEXEC_DIR, NULL);
     char *datadir = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
     bool both = libdir != NULL && datadir != NULL && strcmp(libdir, datadir);
 
     /* Tokenized Lua scripts in architecture-specific data directory */
-    list = vlclua_dir_list_append(list, libdir, luadirname);
+    if (libdir != NULL)
+        list = vlclua_dir_list_append(list, libdir, luadirname);
 
     /* Source Lua Scripts in architecture-independent data directory */
     if (both || libdir == NULL)
