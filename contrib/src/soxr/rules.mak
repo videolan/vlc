@@ -37,7 +37,6 @@ endif
 	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
 		$(SOXR_EXTRA_CONF) \
-		-DBUILD_EXAMPLES=OFF \
 		-DBUILD_TESTS=OFF \
 		-DWITH_LSR_BINDINGS=OFF \
 		-DWITH_OPENMP=OFF \
