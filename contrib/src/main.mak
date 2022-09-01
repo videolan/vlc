@@ -197,7 +197,7 @@ gcc_major_is = $(shell [ $(GCC_VERSION) -eq $(1) ] && echo true)
 endif
 endif
 
-cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - | grep -E $(1))
+cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - 2>/dev/null | grep -E $(1))
 
 EXTRA_CFLAGS += -I$(PREFIX)/include
 CPPFLAGS := $(CPPFLAGS) $(EXTRA_CFLAGS)
