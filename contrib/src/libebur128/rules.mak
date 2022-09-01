@@ -1,6 +1,6 @@
 # EBU R128 standard for loudness normalisation
 
-LIBEBUR128_VERSION := 1.2.4
+LIBEBUR128_VERSION := 1.2.6
 LIBEBUR128_URL := https://github.com/jiixyj/libebur128/archive/v$(LIBEBUR128_VERSION).tar.gz
 
 PKGS += libebur128
@@ -16,7 +16,6 @@ $(TARBALLS)/libebur128-$(LIBEBUR128_VERSION).tar.gz:
 libebur128: libebur128-$(LIBEBUR128_VERSION).tar.gz .sum-libebur128
 	$(UNPACK)
 	$(call pkg_static,"./ebur128/libebur128.pc.cmake")
-	$(APPLY) $(SRC)/libebur128/0001-CMake-Respect-the-BUILD_SHARED_LIBS-option-instead-o.patch
 	$(MOVE)
 
 .libebur128: libebur128 toolchain.cmake
