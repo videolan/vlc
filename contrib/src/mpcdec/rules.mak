@@ -42,8 +42,10 @@ endif
 	mv $@_src_r$(MUSE_REV) $@
 	touch $@
 
+MUSE_CONF := -DSHARED=OFF
+
 .mpcdec: musepack toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DSHARED=OFF .
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(MUSE_CONF)
 	+$(CMAKEBUILD) $< --target install
 	mkdir -p -- "$(PREFIX)/lib"
 	# Use globbing to work around cmake's change of destination file
