@@ -395,7 +395,10 @@ void MediaLibrary::onRescanStarted()
 
 MediaLibrary* MediaLibrary::create( vlc_medialibrary_module_t* vlc_ml )
 {
-    auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
+    char *userdir = config_GetUserDir( VLC_USERDATA_DIR );
+    if (unlikely(userdir == nullptr))
+        return nullptr;
+    auto userDir = vlc::wrap_cptr( userdir );
     auto mlDir = std::string{ userDir.get() } + "/ml/";
     auto dbPath = mlDir + "ml.db";
     auto mlFolderPath = mlDir + "mlstorage/";
