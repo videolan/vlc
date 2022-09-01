@@ -1,0 +1,11 @@
+--- soxr/CMakeLists.txt.31	2022-09-01 14:44:39.096702600 +0200
++++ soxr/CMakeLists.txt	2022-09-01 14:44:30.250234300 +0200
+@@ -1,7 +1,7 @@
+ # SoX Resampler Library       Copyright (c) 2007-18 robs@users.sourceforge.net
+ # Licence for this file: LGPL v2.1                  See LICENCE for details.
+ 
+-cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
++cmake_minimum_required (VERSION 3.12 FATAL_ERROR)
+ 
+ project (soxr C)
+ set (DESCRIPTION_SUMMARY
