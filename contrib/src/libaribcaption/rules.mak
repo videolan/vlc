@@ -23,6 +23,8 @@ endif
 endif
 endif
 
+DEPS_libaribcaption = freetype2 $(DEPS_freetype2)
+
 $(TARBALLS)/libaribcaption-$(LIBARIBCC_VERSION).tar.xz:
 	$(call download_git,$(LIBARIBCC_GITURL),,$(LIBARIBCC_HASH))
 
@@ -44,7 +46,6 @@ LIBARIBCC_CONF += -DARIBCC_IS_ANDROID:BOOL=ON
 endif
 
 ifeq ($(LIBARIBCC_WITH_FREETYPE), 1)
-DEPS_libaribcaption += freetype2 $(DEPS_freetype2)
 LIBARIBCC_CONF += -DARIBCC_USE_FREETYPE:BOOL=ON
 else
 LIBARIBCC_CONF += -DARIBCC_USE_FREETYPE:BOOL=OFF
