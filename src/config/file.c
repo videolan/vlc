@@ -58,6 +58,8 @@ static char *config_GetConfigFile( libvlc_int_t *obj )
     if( psz_file == NULL )
     {
         char *psz_dir = config_GetUserDir( VLC_CONFIG_DIR );
+        if (psz_dir == NULL)
+            return NULL;
 
         if( asprintf( &psz_file, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
             psz_file = NULL;
