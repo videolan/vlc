@@ -109,7 +109,6 @@ static char *config_GetShellDir(vlc_userdir_t csidl)
     }
 
 end_other:
-    WindowsDeleteString(hClassName);
     if (knownFoldersStatics)
         IKnownFoldersStatics_Release(knownFoldersStatics);
 
@@ -210,7 +209,6 @@ static char *config_GetAppDir (void)
     }
 
 end_appdata:
-    WindowsDeleteString(hClassName);
     if (appDataStatics)
         IApplicationDataStatics_Release(appDataStatics);
     if (appData)
@@ -268,7 +266,6 @@ static char *config_GetCacheDir (void)
     hr = IApplicationData2_get_LocalCacheFolder(appData2, &folder);
 
 end_appdata:
-    WindowsDeleteString(hClassName);
     if (appDataStatics)
         IApplicationDataStatics_Release(appDataStatics);
     if (appData2)
