@@ -41,7 +41,7 @@ PROJECTM_CONF := \
 		-DBUILD_PROJECTM_STATIC:BOOL=ON
 
 .projectM: projectM toolchain.cmake
-	cd $< && rm -f CMakeCache.txt
+	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) . $(PROJECTM_CONF)
 	+$(CMAKEBUILD) $< --target install
 	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
