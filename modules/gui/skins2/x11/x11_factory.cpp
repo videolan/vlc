@@ -85,12 +85,18 @@ bool X11Factory::init()
 
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_USERDATA_DIR );
-    m_resourcePath.push_back( (std::string)datadir + "/skins2" );
-    free( datadir );
+    if (likely(datadir != nullptr))
+    {
+        m_resourcePath.push_back( (std::string)datadir + "/skins2" );
+        free( datadir );
+    }
     m_resourcePath.push_back( (std::string)"share/skins2" );
     datadir = config_GetSysPath(VLC_PKG_DATA_DIR, "skins2");
-    m_resourcePath.push_back( (std::string)datadir );
-    free( datadir );
+    if (likely(datadir != nullptr))
+    {
+        m_resourcePath.push_back( (std::string)datadir );
+        free( datadir );
+    }
 
     // Determine the monitor geometry
     getDefaultGeometry( &m_screenWidth, &m_screenHeight );

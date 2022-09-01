@@ -218,16 +218,22 @@ bool OS2Factory::init()
 
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_USERDATA_DIR );
-    m_resourcePath.push_back( (std::string)datadir + "\\skins" );
-    free( datadir );
+    if (likely(datadir != nullptr))
+    {
+        m_resourcePath.push_back( (std::string)datadir + "\\skins" );
+        free( datadir );
+    }
     datadir = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
-    m_resourcePath.push_back( (std::string)datadir + "\\skins" );
-    m_resourcePath.push_back( (std::string)datadir + "\\skins2" );
-    m_resourcePath.push_back( (std::string)datadir + "\\share\\skins" );
-    m_resourcePath.push_back( (std::string)datadir + "\\share\\skins2" );
-    m_resourcePath.push_back( (std::string)datadir + "\\vlc\\skins" );
-    m_resourcePath.push_back( (std::string)datadir + "\\vlc\\skins2" );
-    free( datadir );
+    if (likely(datadir != nullptr))
+    {
+        m_resourcePath.push_back( (std::string)datadir + "\\skins" );
+        m_resourcePath.push_back( (std::string)datadir + "\\skins2" );
+        m_resourcePath.push_back( (std::string)datadir + "\\share\\skins" );
+        m_resourcePath.push_back( (std::string)datadir + "\\share\\skins2" );
+        m_resourcePath.push_back( (std::string)datadir + "\\vlc\\skins" );
+        m_resourcePath.push_back( (std::string)datadir + "\\vlc\\skins2" );
+        free( datadir );
+    }
 
     // All went well
     return true;
