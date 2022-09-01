@@ -29,9 +29,24 @@ import "qrc:///style/"
 FrostedGlassEffect {
     // Settings
 
-    height: column.implicitHeight + VLCStyle.margin_small * 2
+    height: _getHeight()
 
     tint: VLCStyle.colors.lowerBanner
+
+    // Functions
+
+    // Private
+
+    function _getHeight() {
+        var height = column.implicitHeight + VLCStyle.margin_small * 2
+
+        // NOTE: We don't need to take the vertical safe area into consideration when the
+        //       miniPlayer is visible.
+        if (g_mainDisplay.hasMiniPlayer)
+            return height
+        else
+            return height + VLCStyle.applicationVerticalMargin
+    }
 
     // Children
 
@@ -40,10 +55,14 @@ FrostedGlassEffect {
 
         anchors.fill: parent
 
-        anchors.leftMargin: VLCStyle.margin_large
-        anchors.rightMargin: VLCStyle.margin_large
+        anchors.leftMargin: VLCStyle.margin_large + VLCStyle.applicationHorizontalMargin
+        anchors.rightMargin: anchors.leftMargin
+
         anchors.topMargin: VLCStyle.margin_small
-        anchors.bottomMargin: VLCStyle.margin_small
+
+        anchors.bottomMargin: (g_mainDisplay.hasMiniPlayer) ? VLCStyle.margin_small
+                                                            : VLCStyle.margin_small
+                                                              + VLCStyle.applicationVerticalMargin
 
         spacing: VLCStyle.margin_small
 
