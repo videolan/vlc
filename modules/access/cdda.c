@@ -551,13 +551,15 @@ static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
 
     char *psz_cachedir;
     char *psz_temp = config_GetUserDir( VLC_CACHE_DIR );
-
-    if( asprintf( &psz_cachedir, "%s" DIR_SEP "cddb", psz_temp ) > 0 ) {
-        cddb_cache_enable( p_cddb );
-        cddb_cache_set_dir( p_cddb, psz_cachedir );
-        free( psz_cachedir );
+    if (likely(psz_temp != NULL))
+    {
+        if( asprintf( &psz_cachedir, "%s" DIR_SEP "cddb", psz_temp ) > 0 ) {
+            cddb_cache_enable( p_cddb );
+            cddb_cache_set_dir( p_cddb, psz_cachedir );
+            free( psz_cachedir );
+        }
+        free( psz_temp );
     }
-    free( psz_temp );
 
     cddb_set_timeout( p_cddb, 10 );
 
