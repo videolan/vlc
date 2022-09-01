@@ -41,7 +41,9 @@ FocusScope {
         "properties": {}
     })
 
-    property alias g_mainDisplay: root
+    // Properties
+
+    property bool hasMiniPlayer: miniPlayer.visible
 
     // NOTE: The main view must be above the indexing bar and the mini player.
     property int displayMargin: (loaderProgress.active) ? miniPlayer.height + loaderProgress.height
@@ -50,6 +52,10 @@ FocusScope {
     property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
+
+    // Aliases
+
+    property alias g_mainDisplay: root
 
     onViewChanged: {
         _oldViewProperties[view.name] = view.properties
