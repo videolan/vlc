@@ -23,6 +23,10 @@ endif
 
 DEPS_libaribcaption = freetype2 $(DEPS_freetype2)
 
+ifeq ($(LIBARIBCC_WITH_FONTCONFIG), 1)
+DEPS_libaribcaption += fontconfig $(DEPS_fontconfig)
+endif
+
 $(TARBALLS)/libaribcaption-$(LIBARIBCC_VERSION).tar.xz:
 	$(call download_git,$(LIBARIBCC_GITURL),,$(LIBARIBCC_HASH))
 
@@ -46,7 +50,6 @@ endif
 LIBARIBCC_CONF += -DARIBCC_USE_FREETYPE:BOOL=ON
 
 ifeq ($(LIBARIBCC_WITH_FONTCONFIG), 1)
-DEPS_libaribcaption += fontconfig $(DEPS_fontconfig)
 LIBARIBCC_CONF += -DARIBCC_USE_FONTCONFIG:BOOL=ON
 else
 LIBARIBCC_CONF += -DARIBCC_USE_FONTCONFIG:BOOL=OFF
