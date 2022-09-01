@@ -233,6 +233,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCSlider.m \
 	gui/macosx/views/VLCSliderCell.h \
 	gui/macosx/views/VLCSliderCell.m \
+	gui/macosx/views/VLCSubScrollView.h \
+	gui/macosx/views/VLCSubScrollView.m \
 	gui/macosx/views/VLCTimeField.h \
 	gui/macosx/views/VLCTimeField.m \
 	gui/macosx/views/VLCTrackingView.h \
