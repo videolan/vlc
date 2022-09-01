@@ -1,0 +1,41 @@
+From e76d61dae5af710317a919f867b9b7a58adf6a39 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 2 Sep 2022 09:46:56 +0200
+Subject: [PATCH] [build] always use GNUInstallDirs
+
+It's possible to use GNUInstallDirs and allow the user to force some specific
+target folder. The values set by the user are not overriden in that case [1]:
+
+> If the includer does not define a value the above-shown default will be used
+> and the value will appear in the cache for editing by the user.
+
+With MSVC builds this doesn't change the default values used to install targets.
+
+[1] https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html
+---
+ CMakeLists.txt | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ce3d0b8..05764e2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -45,14 +45,7 @@ set_if(POSIX       LINUX OR DARWIN OR BSD OR SUNOS OR ANDROID OR (CYGWIN AND CYG
+ set_if(SYMLINKABLE LINUX OR DARWIN OR BSD OR SUNOS OR CYGWIN OR GNU)
+ set_if(NEED_DESTINATION  ${CMAKE_VERSION} VERSION_LESS "3.14.0")
+ 
+-# Not sure what to do in case of compiling by MSVC.
+-# This will make installdir in C:\Program Files\SRT then
+-# inside "bin" and "lib64" directories. At least this maintains
+-# the current status. Shall this be not desired, override values
+-# of CMAKE_INSTALL_BINDIR, CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR.
+-if (NOT DEFINED CMAKE_INSTALL_LIBDIR)
+-	include(GNUInstallDirs)
+-endif()
++include(GNUInstallDirs)
+ 
+ # The CMAKE_BUILD_TYPE seems not to be always set, weird.
+ if (NOT DEFINED ENABLE_DEBUG)
+-- 
+2.37.3.windows.1
+

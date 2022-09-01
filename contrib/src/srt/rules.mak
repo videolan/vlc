@@ -25,11 +25,12 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
 	$(APPLY) $(SRC)/srt/0001-core-remove-MSG_TRUNC-logging.patch
+	$(APPLY) $(SRC)/srt/0001-build-always-use-GNUInstallDirs.patch
 	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
 .srt: srt toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
-		-DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_BINDIR=bin -DCMAKE_INSTALL_INCLUDEDIR=include
+		-DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
 	+$(CMAKEBUILD) $< --target install
 	touch $@
