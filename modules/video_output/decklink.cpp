@@ -439,8 +439,8 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
         size_t len = strlen(mode);
         if (len > 4)
         {
-            free(mode);
             msg_Err(vd, "Invalid mode %s", mode);
+            free(mode);
             goto error;
         }
         strncpy(wanted_mode.str, mode, 4);
