@@ -56,7 +56,7 @@ VULKAN_LOADER_ENV_CONF = \
 	cd $< && rm -rf ./build && mkdir -p build
 	cd $</build && $(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) \
 		$(CMAKE) $(VULKAN_LOADER_CONF) ..
-	$(CMAKEBUILD) $</build
+	+$(CMAKEBUILD) $</build
 
 ifdef HAVE_WIN32
 # CMake will generate a .pc file with -lvulkan even if the static library
