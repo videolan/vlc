@@ -39,7 +39,6 @@ libaribcaption: libaribcaption-$(LIBARIBCC_VERSION).tar.xz .sum-libaribcaption
 	$(MOVE)
 
 LIBARIBCC_CONF := \
-	-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON \
 	-DARIBCC_NO_EXCEPTIONS:BOOL=ON \
 	-DARIBCC_NO_RTTI:BOOL=ON
 
