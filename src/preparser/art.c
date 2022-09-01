@@ -61,6 +61,9 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
     char *psz_dir;
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
 
+    if (unlikely(psz_cachedir == NULL))
+        return NULL;
+
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
         char *psz_album_sanitized = strdup( psz_album );
@@ -225,6 +228,8 @@ static char * GetDirByItemUIDs( char *psz_uid )
 {
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
     char *psz_dir;
+    if (unlikely(psz_cachedir == NULL))
+        return NULL;
     if( asprintf( &psz_dir, "%s" DIR_SEP
                   "by-iiuid" DIR_SEP
                   "%s",
