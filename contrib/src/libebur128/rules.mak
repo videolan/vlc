@@ -18,7 +18,9 @@ libebur128: libebur128-$(LIBEBUR128_VERSION).tar.gz .sum-libebur128
 	$(call pkg_static,"./ebur128/libebur128.pc.cmake")
 	$(MOVE)
 
+LIBEBUR128_CONF := -DENABLE_INTERNAL_QUEUE_H=TRUE
+
 .libebur128: libebur128 toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DENABLE_INTERNAL_QUEUE_H=TRUE
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(LIBEBUR128_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

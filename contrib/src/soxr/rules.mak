@@ -33,13 +33,15 @@ SOXR_EXTRA_CONF=-DCMAKE_SYSTEM_NAME=Generic
 endif
 endif
 
-.soxr: soxr toolchain.cmake
-	rm -f $</CMakeCache.txt
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
+SOXR_CONF := \
 		$(SOXR_EXTRA_CONF) \
 		-DBUILD_TESTS=OFF \
 		-DWITH_LSR_BINDINGS=OFF \
 		-DWITH_OPENMP=OFF \
 		-DWITH_AVFFT=ON
+
+.soxr: soxr toolchain.cmake
+	rm -f $</CMakeCache.txt
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(SOXR_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

@@ -29,8 +29,9 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
+SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
+
 .srt: srt toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
-		-DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(SRT_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

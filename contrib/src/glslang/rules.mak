@@ -27,8 +27,9 @@ glslang: glslang-$(GLSLANG_VERSION).tar.gz .sum-glslang
 	$(APPLY) $(SRC)/glslang/glslang-win32.patch
 	$(MOVE)
 
+GLSLANG_CONF := -DENABLE_GLSLANG_BINARIES=OFF
+
 .glslang: glslang toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) CXXFLAGS="-DYYDEBUG=0" $(CMAKE) \
-	    -DENABLE_GLSLANG_BINARIES=OFF
+	cd $< && $(HOSTVARS_PIC) CXXFLAGS="-DYYDEBUG=0" $(CMAKE) $(GLSLANG_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

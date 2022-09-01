@@ -21,7 +21,9 @@ game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
 	$(call pkg_static,"gme/libgme.pc.in")
 	$(MOVE)
 
+GME_CONF := -DENABLE_UBSAN=OFF
+
 .gme: game-music-emu toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) . -DENABLE_UBSAN=OFF
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) . $(GME_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

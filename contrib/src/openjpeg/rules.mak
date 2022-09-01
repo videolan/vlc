@@ -26,10 +26,9 @@ endif
 	$(call pkg_static,"./src/lib/openjp2/libopenjp2.pc.cmake.in")
 	$(MOVE)
 
+OPENJPEG_CONF := -DBUILD_PKGCONFIG_FILES=ON -DBUILD_CODEC:bool=OFF
+
 .openjpeg: openjpeg toolchain.cmake
-	cd $< && $(HOSTVARS) $(CMAKE) \
-		-DBUILD_PKGCONFIG_FILES=ON \
-			-DBUILD_CODEC:bool=OFF \
-		.
+	cd $< && $(HOSTVARS) $(CMAKE) . $(OPENJPEG_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

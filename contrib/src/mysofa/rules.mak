@@ -23,9 +23,11 @@ mysofa: libmysofa-$(MYSOFA_VERSION).tar.gz .sum-mysofa
 	$(UNPACK)
 	$(MOVE)
 
+MYSOFA_CONF := -DBUILD_TESTS=OFF
+
 .mysofa: mysofa toolchain.cmake
 	cd $< && rm -f CMakeCache.txt
-	cd $< && $(HOSTVARS) $(CMAKE) -DBUILD_TESTS=OFF
+	cd $< && $(HOSTVARS) $(CMAKE) $(MYSOFA_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@
 

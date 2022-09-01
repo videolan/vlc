@@ -15,6 +15,8 @@ ifeq ($(call need_pkg,"libprojectM"),)
 PKGS_FOUND += projectM
 endif
 
+DEPS_projectM = glew $(DEPS_glew)
+
 $(TARBALLS)/projectM-$(PROJECTM_VERSION)-Source.tar.gz:
 	$(call download_pkg,$(PROJECTM_URL),projectM)
 
@@ -33,14 +35,14 @@ endif
 	$(APPLY) $(SRC)/projectM/missing-includes.patch
 	$(MOVE)
 
-DEPS_projectM = glew $(DEPS_glew)
+PROJECTM_CONF := \
+		-DDISABLE_NATIVE_PRESETS:BOOL=ON \
+		-DUSE_FTGL:BOOL=OFF \
+		-DBUILD_PROJECTM_STATIC:BOOL=ON
 
 .projectM: projectM toolchain.cmake
 	cd $< && rm -f CMakeCache.txt
-	cd $< && $(HOSTVARS) $(CMAKE) \
-		-DDISABLE_NATIVE_PRESETS:BOOL=ON \
-		-DUSE_FTGL:BOOL=OFF \
-		-DBUILD_PROJECTM_STATIC:BOOL=ON .
+	cd $< && $(HOSTVARS) $(CMAKE) . $(PROJECTM_CONF)
 	+$(CMAKEBUILD) $< --target install
 	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
 	touch $@
