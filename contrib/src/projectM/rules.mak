@@ -38,11 +38,8 @@ DEPS_projectM = glew $(DEPS_glew)
 .projectM: projectM toolchain.cmake
 	cd $< && rm -f CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) \
-		-DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF \
 		-DDISABLE_NATIVE_PRESETS:BOOL=ON \
 		-DUSE_FTGL:BOOL=OFF \
-		-DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF \
-		-DINCLUDE-PROJECTM-QT:BOOL=OFF \
 		-DBUILD_PROJECTM_STATIC:BOOL=ON .
 	+$(CMAKEBUILD) $< --target install
 	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
