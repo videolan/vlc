@@ -144,11 +144,6 @@ ifdef HAVE_WIN32
 	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtGui/$(QT_VERSION)/QtGui -I$${includedir}/QtANGLE#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
 endif
 
-ifdef HAVE_MACOSX
-	# Qt Cocoa plugins depend on printer support...
-	cd $< && cp ./lib/libQt5PrintSupport.a "$(PREFIX)/lib/"
-endif
-
 	#fix host tools headers to avoid collusion with target headers
 	mkdir -p $(PREFIX)/lib/qt5/include
 	cp -R $(PREFIX)/include/QtCore $(PREFIX)/lib/qt5/include
