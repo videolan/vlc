@@ -23,7 +23,7 @@ spatialaudio: spatialaudio-$(SPATIALAUDIO_VERSION).tar.bz2 .sum-spatialaudio
 SPATIALAUDIO_CONF := -DMYSOFA_ROOT_DIR=$(PREFIX) -DHAVE_MIT_HRTF=OFF
 
 .spatialaudio: spatialaudio toolchain.cmake
-	cd $< && rm -f CMakeCache.txt
+	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) $(SPATIALAUDIO_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@
