@@ -1,3 +1,13 @@
+Changes between 3.0.18-rc and 3.0.18:
+-------------------------------------
+
+Demux:
+ * Fix build of gme plugin
+
+Video Output:
+ * Fix video placement with caopengllayer
+
+
 Changes between 3.0.17.4 and 3.0.18-rc:
 --------------------------------------
 
