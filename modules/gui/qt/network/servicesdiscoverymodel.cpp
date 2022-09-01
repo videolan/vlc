@@ -235,25 +235,30 @@ ServicesDiscoveryModel::Item &ServicesDiscoveryModel::Item::operator=( ServicesD
     entry = addon;
 
     if ( addon->psz_image_data ) {
-        QDir dir( config_GetUserDir( VLC_CACHE_DIR ) );
-        dir.mkdir("art");
-        dir.cd("art");
-        dir.mkdir("qt-addon-covers");
-        dir.cd("qt-addon-covers");
+        char *cDir = config_GetUserDir( VLC_CACHE_DIR );
+        if (likely(cDir != nullptr))
+        {
+            QDir dir( cDir );
+            free(cDir);
+            dir.mkdir("art");
+            dir.cd("art");
+            dir.mkdir("qt-addon-covers");
+            dir.cd("qt-addon-covers");
 
-        QString id = addons_uuid_to_psz( &addon->uuid );
-        QString filename = QString("addon_thumbnail_%1.png").arg(id);
-        QString absoluteFilePath =  dir.absoluteFilePath(filename);
+            QString id = addons_uuid_to_psz( &addon->uuid );
+            QString filename = QString("addon_thumbnail_%1.png").arg(id);
+            QString absoluteFilePath =  dir.absoluteFilePath(filename);
 
-        if ( !QFileInfo::exists( absoluteFilePath )) {
-            QPixmap pixmap;
-            pixmap.loadFromData( QByteArray::fromBase64( QByteArray( addon->psz_image_data ) ),
-                0,
-                Qt::AutoColor
-            );
-            pixmap.save(absoluteFilePath);
+            if ( !QFileInfo::exists( absoluteFilePath )) {
+                QPixmap pixmap;
+                pixmap.loadFromData( QByteArray::fromBase64( QByteArray( addon->psz_image_data ) ),
+                    0,
+                    Qt::AutoColor
+                );
+                pixmap.save(absoluteFilePath);
+            }
+            artworkUrl = QUrl::fromLocalFile( absoluteFilePath );
         }
-        artworkUrl = QUrl::fromLocalFile( absoluteFilePath );
     }
     else if ( addon->e_flags & ADDON_BROKEN )
         artworkUrl = QUrl( ":/addons/addon_broken.svg" );
