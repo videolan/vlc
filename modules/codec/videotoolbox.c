@@ -1666,12 +1666,6 @@ static CFDictionaryRef ExtradataInfoCreate(CFStringRef name,
     if (p_data == NULL)
         return NULL;
 
-
-    char buffer[1024];
-    vlc_hex_encode_binary(p_data, i_data, buffer);
-    fprintf(stderr, "DEBUGVT: ExtradataInfoCreate size %zu content: %s\n",
-            i_data, buffer);
-
     CFDataRef extradata = CFDataCreate(kCFAllocatorDefault, p_data, i_data);
     if (extradata == NULL)
         return NULL;
