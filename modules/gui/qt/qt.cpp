@@ -498,6 +498,7 @@ static int OpenInternal( qt_intf_t *p_intf )
     /* Get the playlist before the lock to avoid a lock-order-inversion */
     vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf->intf);
 
+#ifndef Q_OS_MAC
     vlc::threads::mutex_locker locker (lock);
     if (busy || open_state == OPEN_STATE_ERROR)
     {
@@ -505,6 +506,7 @@ static int OpenInternal( qt_intf_t *p_intf )
             msg_Err (p_intf, "cannot start Qt multiple times");
         return VLC_EGENERIC;
     }
+#endif
 
     p_intf->p_mi = NULL;
 
@@ -834,7 +836,6 @@ static void *Thread( void *obj )
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
-#ifndef Q_OS_MAC
     /* Tell the main LibVLC thread we are ready */
     {
         vlc::threads::mutex_locker locker (lock);
@@ -843,7 +844,7 @@ static void *Thread( void *obj )
         open_state = OPEN_STATE_OPENED;
         wait_ready.signal();
     }
-#else
+#ifdef Q_OS_MAC
     /* We took over main thread, register and start here */
     if( !p_intf->b_isDialogProvider )
     {
