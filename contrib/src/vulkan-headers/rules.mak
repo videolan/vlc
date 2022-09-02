@@ -13,6 +13,7 @@ vulkan-headers: Vulkan-Headers-$(VULKAN_HEADERS_VERSION).tar.gz .sum-vulkan-head
 	$(MOVE)
 
 .vulkan-headers: vulkan-headers toolchain.cmake
+	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD) $< --target install
 	touch $@

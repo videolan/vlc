@@ -20,6 +20,7 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
+	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) .
 	+$(CMAKEBUILD) $< --target install
 	touch $@

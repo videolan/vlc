@@ -44,6 +44,7 @@ endif
 MUSE_CONF := -DSHARED=OFF
 
 .mpcdec: musepack toolchain.cmake
+	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(MUSE_CONF)
 	+$(CMAKEBUILD) $< --target install
 	mkdir -p -- "$(PREFIX)/lib"
