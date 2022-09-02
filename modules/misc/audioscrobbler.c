@@ -590,7 +590,7 @@ static int Handshake(intf_thread_t *p_this)
         goto proto;
 
     p_buffer_pos = strstr(p_buffer_pos, "\n");
-    if (!p_buffer_pos || strlen(p_buffer_pos) < 33)
+    if (!p_buffer_pos || strnlen(p_buffer_pos, 33) < 33)
         goto proto;
     p_buffer_pos++; /* we skip the '\n' */
 
