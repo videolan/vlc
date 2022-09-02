@@ -99,7 +99,7 @@
             }
 
             /* Remove trailing : : */
-            if (strlen(psz_string) > 0 && *(psz_string + strlen(psz_string) -1) == ':')
+            if (*psz_string != '\0' && *(psz_string + strlen(psz_string) -1) == ':')
                 *(psz_string + strlen(psz_string) -1) = '\0';
         } else {
             free(psz_string);

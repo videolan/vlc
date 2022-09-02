@@ -734,7 +734,7 @@ static bool webvtt_domnode_Match_Attribute( const webvtt_dom_node_t *p_node,
                 psz_start = p_tagnode->psz_attrs;
 
             if( !p_matchsel ) /* attribute check only */
-                return strlen( psz_start ) > 0;
+                return *psz_start != '\0';
 
             return MatchAttribute( psz_start, p_matchsel->psz_name, p_matchsel->match );
         }

@@ -196,7 +196,7 @@ static void RtspTrackClose( rtsp_strack_t *tr );
 
 char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base )
 {
-    const char *sep = strlen( base ) > 0 && base[strlen( base ) - 1] == '/' ?
+    const char *sep = *base != '\0' && base[strlen( base ) - 1] == '/' ?
                       "" : "/";
     char *url;
 
