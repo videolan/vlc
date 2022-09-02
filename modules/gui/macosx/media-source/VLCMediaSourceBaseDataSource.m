@@ -138,7 +138,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 {
     _mediaSourceMode = mediaSourceMode;
     [self loadMediaSources];
-    [self homeButtonAction:nil];
+    [self homeButtonAction:self];
 }
 
 #pragma mark - collection view data source
