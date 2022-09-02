@@ -24,7 +24,7 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
-	$(APPLY) $(SRC)/srt/0001-core-ifdef-MSG_TRUNC-nixes-fix.patch
+	$(APPLY) $(SRC)/srt/0001-core-remove-MSG_TRUNC-logging.patch
 	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
