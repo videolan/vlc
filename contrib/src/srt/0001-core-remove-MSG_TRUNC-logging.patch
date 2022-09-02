@@ -1,0 +1,27 @@
+From 82a65778b2445d3b310c7fa870cfb6410307d31b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 2 Sep 2022 09:12:03 +0200
+Subject: [PATCH] [core] remove MSG_TRUNC logging
+
+The code does not compile on platforms/SDKs where MSG_TRUNC doesn't exist
+(mingw-w64/windows).
+---
+ srtcore/channel.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/srtcore/channel.cpp b/srtcore/channel.cpp
+index 6d51487..30fd987 100644
+--- a/srtcore/channel.cpp
++++ b/srtcore/channel.cpp
+@@ -878,7 +878,7 @@ srt::EReadStatus srt::CChannel::recvfrom(sockaddr_any& w_addr, CPacket& w_packet
+     {
+         HLOGC(krlog.Debug,
+               log << CONID() << "NET ERROR: packet size=" << recv_size << " msg_flags=0x" << hex << msg_flags
+-                  << ", possibly MSG_TRUNC (0x" << hex << int(MSG_TRUNC) << ")");
++                  << ", possibly MSG_TRUNC)");
+         status = RST_AGAIN;
+         goto Return_error;
+     }
+-- 
+2.27.0.windows.1
+
