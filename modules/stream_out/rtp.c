@@ -766,7 +766,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
         inclport = false;
 
         /* Check against URL format rtsp://[<ipv6>]:<port>/<path> */
-        bool ipv6 = rtsp_url != NULL && strlen( rtsp_url ) > 7
+        bool ipv6 = rtsp_url != NULL && strnlen( rtsp_url, 7+1 ) > 7
                     && rtsp_url[7] == '[';
 
         /* Dummy destination address for RTSP */

@@ -180,7 +180,7 @@ static int Create( vlc_object_t *p_this )
         if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
             found = true;
         /* Then extension */
-        else if( !found && strlen( p_attach->psz_name ) > 4 )
+        else if( !found && strnlen( p_attach->psz_name, 4+1 ) > 4 )
         {
             char *ext = p_attach->psz_name + strlen( p_attach->psz_name ) - 4;
 

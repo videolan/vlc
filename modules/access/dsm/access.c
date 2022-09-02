@@ -645,7 +645,7 @@ static bool get_path( stream_t *p_access )
     backslash_path( p_sys->psz_fullpath );
 
     /* Is path longer than just "/" ? */
-    if( strlen( p_sys->psz_fullpath ) > 1 )
+    if( strnlen( p_sys->psz_fullpath, 1+1 ) > 1 )
     {
         iter = p_sys->psz_fullpath;
         while( *iter == '\\' ) iter++; /* Handle smb://Host/////Share/ */
