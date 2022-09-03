@@ -226,13 +226,26 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 # pragma mark - Calculation of displaced frame attributes
 
 - (NSRect)frameForDisplacedAttributes:(NSCollectionViewLayoutAttributes *)inAttributes {
+    if(inAttributes == nil || _animationSteps == NULL) {
+        return NSZeroRect;
+    }
+
     NSRect attributesFrame = inAttributes.frame;
+
     if (self.selectedIndexPath) {
-        NSRect selectedItemFrame = [[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame];
+        NSCollectionViewLayoutAttributes *selectedItemLayoutAttributes = [self layoutAttributesForItemAtIndexPath:_selectedIndexPath];
+
+        if(selectedItemLayoutAttributes == nil) {
+            return attributesFrame;
+        }
+
+        NSRect selectedItemFrame = selectedItemLayoutAttributes.frame;
+
         if (NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
             attributesFrame.origin.y += [_animationSteps[_animationIndex] floatValue] + kDetailViewMargin;
         }
     }
+
     return attributesFrame;
 }
 
