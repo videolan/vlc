@@ -84,7 +84,9 @@ int vlc_spawnp(pid_t *pid, const char *path, const int *fdv,
  *
  * \param pid process identifier as returned by vlc_spawn() or vlc_spawnp()
  *
- * \return This function returns the process exit code.
+ * \return If the process terminates cleanly, this function returns the exit
+ * code of the process. Otherwise, it returns an implementation-defined value
+ * that is not a valid exit code.
  */
 VLC_API
 int vlc_waitpid(pid_t pid);
