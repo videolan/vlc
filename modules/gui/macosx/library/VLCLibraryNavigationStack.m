@@ -72,6 +72,12 @@
     return self;
 }
 
+- (void)setDelegate:(VLCLibraryWindow *)delegate
+{
+    _delegate = delegate;
+    [self updateDelegateNavigationButtons];
+}
+
 - (BOOL)forwardsAvailable
 {
     NSUInteger numNavigationStates = _navigationStates.count;
