@@ -23,7 +23,7 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="9ZS-oy-iP9">
+                        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="9ZS-oy-iP9" customClass="VLCSubScrollView">
                             <rect key="frame" x="0.0" y="0.0" width="701" height="198"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" drawsBackground="NO" id="3V4-tX-owM">
@@ -84,6 +84,7 @@
             <connections>
                 <outlet property="audioGroupAlbumsTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
                 <outlet property="audioGroupNameTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
+                <outlet property="internalScrollView" destination="9ZS-oy-iP9" id="afa-6P-b12"/>
                 <outlet property="tableClipView" destination="3V4-tX-owM" id="t4b-1e-Cl1"/>
                 <outlet property="tableScrollView" destination="9ZS-oy-iP9" id="tab-L3-Scr"/>
             </connections>

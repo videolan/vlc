@@ -19,9 +19,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class VLCSubScrollView;
 
 // This class can be subclassed to create new supplementary detail views for library views.
 // It provides a consistent background and properties. It is not meant to be used directly.
@@ -29,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryCollectionViewSupplementaryDetailView : NSView <NSCollectionViewElement>
 
 @property (readwrite, assign) NSCollectionViewItem *selectedItem;
+@property (readwrite, assign) NSScrollView *parentScrollView;
+@property (readwrite, assign) VLCSubScrollView *internalScrollView;
 
 @end
 

@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryCollectionViewSupplementaryDetailView.h"
+#import "views/VLCSubScrollView.h"
 
 static const CGFloat kArrowHeight = 20.;
 static const CGFloat kArrowWidth = 50.;
@@ -77,6 +78,25 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     //[[NSColor.gridColor colorWithAlphaComponent:self.container.alphaValue] setStroke];
     [NSColor.gridColor setStroke];
     [backgroundPath stroke];
+}
+
+- (NSScrollView *)parentScrollView
+{
+    if(_internalScrollView == nil) {
+        return nil;
+    }
+
+    return _internalScrollView.parentScrollView;
+}
+
+- (void)setParentScrollView:(NSScrollView *)parentScrollView
+{
+    if(_internalScrollView == nil) {
+        NSLog(@"Library collection view supplementary view has no internal scroll view -- cannot set parent scrollview.");
+        return;
+    }
+
+    _internalScrollView.parentScrollView = parentScrollView;
 }
 
 @end

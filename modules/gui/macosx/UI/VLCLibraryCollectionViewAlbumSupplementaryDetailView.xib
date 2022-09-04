@@ -118,7 +118,7 @@
                                         <constraint firstItem="QuO-3G-BMT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="HnP-Fk-juB" secondAttribute="trailing" constant="5" id="aD2-Ry-CuA"/>
                                     </constraints>
                                 </customView>
-                                <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="52" horizontalPageScroll="10" verticalLineScroll="52" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="9ZS-oy-iP9">
+                                <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="52" horizontalPageScroll="10" verticalLineScroll="52" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="9ZS-oy-iP9" customClass="VLCSubScrollView">
                                     <rect key="frame" x="0.0" y="0.0" width="701" height="198"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                                     <clipView key="contentView" drawsBackground="NO" id="3V4-tX-owM">
@@ -213,6 +213,7 @@
                 <outlet property="albumTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="albumTracksTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
                 <outlet property="albumYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
+                <outlet property="internalScrollView" destination="9ZS-oy-iP9" id="afa-6P-b12"/>
                 <outlet property="playAlbumButton" destination="ntd-VT-2KS" id="ah5-as-eqw"/>
             </connections>
             <point key="canvasLocation" x="-237.5" y="-284"/>
@@ -221,6 +222,6 @@
     <resources>
         <image name="no-art" width="128" height="128"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
-        <image name="plus" catalog="system" width="14" height="13"/>
+        <image name="plus" catalog="system" width="15" height="13"/>
     </resources>
 </document>

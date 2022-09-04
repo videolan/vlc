@@ -39,6 +39,7 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
+#import "views/VLCSubScrollView.h"
 
 @interface VLCLibraryAudioDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
 {
@@ -397,6 +398,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCMediaLibraryAlbum *album = _displayedCollection[indexPath.item];
         albumSupplementaryDetailView.representedAlbum = album;
         albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
+        albumSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
+        albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         return albumSupplementaryDetailView;
 
@@ -407,6 +410,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         id<VLCMediaLibraryAudioGroupProtocol> audioGroup = _displayedCollection[indexPath.item];
         audioGroupSupplementaryDetailView.representedAudioGroup = audioGroup;
         audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
+        audioGroupSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
+        audioGroupSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         return audioGroupSupplementaryDetailView;
     }
