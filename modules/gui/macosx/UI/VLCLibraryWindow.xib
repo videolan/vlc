@@ -335,8 +335,24 @@
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5o7-Z0-dqS" userLabel="Artwork image view" customClass="VLCImageView">
                                                 <rect key="frame" x="16" y="8" width="60" height="60"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="15t-2s-22l">
+                                                        <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="jRw-La-BEz">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="artworkButtonAction:" target="Uzf-Tf-H8x" id="am9-q0-AXg"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
                                                 <constraints>
+                                                    <constraint firstItem="15t-2s-22l" firstAttribute="top" secondItem="5o7-Z0-dqS" secondAttribute="top" id="AS7-P7-l0D"/>
+                                                    <constraint firstItem="15t-2s-22l" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" id="Aq6-SV-NCD"/>
                                                     <constraint firstAttribute="height" constant="60" id="CtN-ax-WYl"/>
+                                                    <constraint firstAttribute="bottom" secondItem="15t-2s-22l" secondAttribute="bottom" id="VGx-AQ-FZ1"/>
+                                                    <constraint firstAttribute="trailing" secondItem="15t-2s-22l" secondAttribute="trailing" id="l3U-tz-a1t"/>
                                                     <constraint firstAttribute="width" constant="60" id="oVs-dj-viy"/>
                                                 </constraints>
                                             </customView>
@@ -717,6 +733,7 @@
         <customObject id="Uzf-Tf-H8x" userLabel="Detached Window Controls Bar" customClass="VLCMainWindowControlsBar">
             <connections>
                 <outlet property="artistNameTextField" destination="0jI-HH-uWa" id="ftC-MD-ymJ"/>
+                <outlet property="artworkButton" destination="15t-2s-22l" id="aR1-bU-1to"/>
                 <outlet property="artworkImageView" destination="5o7-Z0-dqS" id="Pns-yT-lKx"/>
                 <outlet property="backwardButton" destination="jGc-Xw-GYI" id="0AG-44-SN3"/>
                 <outlet property="bottomBarView" destination="vUy-jt-gjY" id="WqX-SW-mpv"/>

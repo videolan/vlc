@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryWindow.h"
+#include "VLCLibraryDataTypes.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
@@ -238,6 +239,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [notificationCenter addObserver:self
                            selector:@selector(updateViewCellDimensionsBasedOnSetting:)
                                name:VLCConfigurationChangedNotification
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playerStateChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playerStateChanged:)
+                               name:VLCPlayerStateChanged
                              object:nil];
 
     if (@available(macOS 10.14, *)) {
@@ -835,7 +844,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)backwardsNavigationAction:(id)sender
 {
-    [_navigationStack backwards];
+    self.videoView.hidden ? [_navigationStack backwards] : [self disableVideoPlaybackAppearance];
 }
 
 - (IBAction)forwardsNavigationAction:(id)sender
@@ -857,6 +866,31 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     hasActiveVideo ? [self enableVideoPlaybackAppearance] : [self disableVideoPlaybackAppearance];
 }
 
+- (void)playerStateChanged:(NSNotification *)notification
+{
+    if(_playlistController.playerController.playerState != VLC_PLAYER_STATE_PLAYING) {
+        return;
+    }
+
+    [self reopenVideoView];
+}
+
+// This handles reopening the video view when the user has closed it.
+- (void)reopenVideoView
+{
+    if(!self.hasActiveVideo || !self.videoView.hidden) {
+        return;
+    }
+
+    VLCMediaLibraryMediaItem *mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playlistController.playerController.URLOfCurrentMediaItem];
+
+    if(mediaItem == nil || mediaItem.mediaType != VLC_ML_MEDIA_TYPE_VIDEO) {
+        return;
+    }
+
+    [self enableVideoPlaybackAppearance];
+}
+
 - (void)enableVideoPlaybackAppearance
 {
     [_mediaSourceView removeFromSuperviewWithoutNeedingDisplay];
@@ -864,10 +898,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [_audioLibraryView removeFromSuperviewWithoutNeedingDisplay];
 
     [self.videoView setHidden:NO];
+
+    [self.segmentedTitleControl setHidden:YES];
+    [self.forwardsNavigationButton setHidden:YES];
     [self.gridVsListSegmentedControl setHidden:YES];
     [self.librarySortButton setHidden:YES];
     [self.librarySearchField setEnabled:NO];
     [self clearLibraryFilterString];
+
+    // Repurpose the back button
+    [self.backwardsNavigationButton setEnabled:YES];
 
     if (self.nativeFullscreenMode) {
         if ([self hasActiveVideo] && [self fullscreen]) {
@@ -903,9 +943,15 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];
     [self.videoView setHidden:YES];
+
+    [self.segmentedTitleControl setHidden:NO];
+    [self.forwardsNavigationButton setHidden:NO];
     [self.gridVsListSegmentedControl setHidden:NO];
     [self.librarySortButton setHidden:NO];
     [self.librarySearchField setEnabled:YES];
+
+    // Reset the back button to navigation state
+    [self.backwardsNavigationButton setEnabled:_navigationStack.backwardsAvailable];
 
     [self setViewForSelectedSegment];
 

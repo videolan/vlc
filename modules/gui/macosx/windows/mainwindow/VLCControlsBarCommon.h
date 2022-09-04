@@ -50,6 +50,7 @@
 @property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
 
 @property (readwrite, strong) IBOutlet VLCImageView *artworkImageView;
+@property (readwrite, strong) IBOutlet NSButton *artworkButton;
 @property (readwrite, strong) IBOutlet VLCWrappableTextField *songNameTextField;
 @property (readwrite, strong) IBOutlet VLCWrappableTextField *artistNameTextField;
 @property (readwrite, strong) IBOutlet VLCTimeField *timeField;

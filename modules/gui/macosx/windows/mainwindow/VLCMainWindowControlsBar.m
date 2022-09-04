@@ -25,6 +25,7 @@
 #import "VLCControlsBarCommon.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryWindow.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
@@ -119,6 +120,11 @@
         [_playerController toggleMute];
     else
         [_playerController setVolume:VLCVolumeMaximum];
+}
+
+- (IBAction)artworkButtonAction:(id)sender
+{
+    [[VLCMain sharedInstance].libraryWindow reopenVideoView];
 }
 
 #pragma mark -

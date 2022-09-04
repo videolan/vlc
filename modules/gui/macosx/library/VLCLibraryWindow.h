@@ -102,6 +102,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, weak) IBOutlet NSButton *playQueueToggle;
 @property (readwrite, weak) IBOutlet NSButton *backwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
+@property (readwrite, weak) IBOutlet NSButton *artworkButton;
 
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
@@ -117,6 +118,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readonly) VLCFSPanelController *fspanel;
 
 - (void)videoPlaybackWillBeStarted;
+- (void)reopenVideoView;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 - (IBAction)shuffleAction:(id)sender;

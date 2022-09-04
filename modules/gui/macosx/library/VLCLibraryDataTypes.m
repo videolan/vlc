@@ -561,6 +561,10 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 + (nullable instancetype)mediaItemForURL:(NSURL *)url
 {
+    if(url == nil) {
+        return nil;
+    }
+
     vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
     if(!p_mediaLibrary) {
         return nil;
