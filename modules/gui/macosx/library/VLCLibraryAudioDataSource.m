@@ -200,7 +200,7 @@
 {
     [self.segmentedControl setTarget:self];
     [self.segmentedControl setAction:@selector(segmentedControlAction:)];
-    [self segmentedControlAction:self];
+    [self segmentedControlAction:[[[VLCMain sharedInstance] libraryWindow] navigationStack]];
 }
 
 - (void)reloadEmptyViewAppearance

@@ -995,8 +995,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
     [libraryWindow.libraryAudioDataSource.segmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
-    [libraryWindow segmentedControlAction:libraryWindow.navigationStack]; // Prevent actions being added to the nav stack
+    // We don't want to add these to the navigation stack...
     [libraryWindow.libraryAudioDataSource segmentedControlAction:libraryWindow.navigationStack];
+    [libraryWindow segmentedControlAction:libraryWindow.navigationStack];
+
+    // But we do want the "final" initial position to be added. So we manually invoke the navigation stack
+    [libraryWindow.navigationStack appendCurrentLibraryState];
 
     completionHandler(libraryWindow, nil);
 }
