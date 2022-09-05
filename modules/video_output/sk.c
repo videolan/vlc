@@ -303,14 +303,20 @@ static void *OpenGLGetProcAddress(vlc_gl_t *gl, const char *name)
 static void OpenGLDestroy(vlc_gl_t *gl)
 {
     struct vout_window_sys_t *sys = gl->sys;
+    if (sys->embed_gl == NULL)
+        return;
+
+    vlc_gl_MakeCurrent(sys->embed_gl);
+    void (*glFinish)(void) =
+        vlc_gl_GetProcAddress(sys->embed_gl, "glFinish");
+    glFinish();
+    vlc_gl_ReleaseCurrent(sys->embed_gl);
+
     if (var_InheritBool(gl, "sk-keep-last-frame"))
         return;
 
-    if (sys->embed_gl != NULL)
-    {
-        vlc_gl_Release(sys->embed_gl);
-        sys->embed_gl = NULL;
-    }
+    vlc_gl_Release(sys->embed_gl);
+    sys->embed_gl = NULL;
 }
 
 static int OpenGLOpen(vlc_gl_t *gl, unsigned width, unsigned height)
