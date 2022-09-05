@@ -7,7 +7,7 @@ ifdef BUILD_NETWORK
 PKGS += srt
 endif
 
-ifeq ($(call need_pkg,"srt >= 1.3.1"),)
+ifeq ($(call need_pkg,"srt >= 1.3.2"),)
 PKGS_FOUND += srt
 endif
 
