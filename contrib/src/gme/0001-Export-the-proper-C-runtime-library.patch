@@ -1,0 +1,53 @@
+From a025cafddfa3c9a41625c08c384e90db88507bb5 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 5 Sep 2022 13:34:41 +0200
+Subject: [PATCH 1/3] Export the proper C++ runtime library
+
+With gcc it's libstdc++, with clang it's libc++. So let CMake give it to use
+and use all the libraries it needs, except some noise from clang toolchains.
+---
+ gme/CMakeLists.txt | 17 +++++++++++++++++
+ gme/libgme.pc.in   |  2 +-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/gme/CMakeLists.txt b/gme/CMakeLists.txt
+index b1b2bf0..51adade 100644
+--- a/gme/CMakeLists.txt
++++ b/gme/CMakeLists.txt
+@@ -193,6 +193,23 @@ set_target_properties(gme
+     PROPERTIES VERSION ${GME_VERSION}
+                SOVERSION 0)
+ 
++foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
++    if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
++        list(APPEND IMPLICITS_LIST "${LIB}")
++    else()
++        list(APPEND IMPLICITS_LIST "-l${LIB}")
++    endif()
++endforeach()
++if(IMPLICITS_LIST)
++    # blacklist of libraries that should not be in Libs.private
++    list(REMOVE_ITEM IMPLICITS_LIST "-lmingwex"
++         "-lmingw32" "-lmoldname" "-lmsvcrt" "-ladvapi32" "-lshell32"
++         "-luser32" "-lkernel32")
++    string(REPLACE ";" " " PKG_CONFIG_CXXRT "${IMPLICITS_LIST}")
++else()
++    set(PKG_CONFIG_CXXRT "")
++endif(IMPLICITS_LIST)
++
+ # macOS framework build
+ if(BUILD_FRAMEWORK)
+     set_target_properties(gme
+diff --git a/gme/libgme.pc.in b/gme/libgme.pc.in
+index f057ce1..a0e8986 100644
+--- a/gme/libgme.pc.in
++++ b/gme/libgme.pc.in
+@@ -13,4 +13,4 @@ URL: https://bitbucket.org/mpyne/game-music-emu/wiki/Home
+ Version: @GME_VERSION@
+ Cflags: -I${includedir}
+ Libs: -L${libdir} -lgme
+-Libs.private: -lstdc++ @PKG_CONFIG_ZLIB@
++Libs.private: @PKG_CONFIG_CXXRT@ @PKG_CONFIG_ZLIB@
+-- 
+2.27.0.windows.1
+
