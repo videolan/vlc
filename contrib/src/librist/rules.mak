@@ -7,11 +7,19 @@ ifdef BUILD_NETWORK
 PKGS += librist
 endif
 
+DEPS_librist =
+ifdef HAVE_WIN32
+DEPS_librist += pthreads $(DEPS_pthreads)
+endif
+
 ifeq ($(call need_pkg,"librist >= 0.2"),)
 PKGS_FOUND += librist
 endif
 
 LIBRIST_CONF = -Dbuilt_tools=false -Dtest=false
+ifdef HAVE_WIN32
+LIBRIST_CONF += -Dhave_mingw_pthreads=true
+endif
 
 $(TARBALLS)/librist-$(LIBRIST_VERSION).tar.gz:
 	$(call download_pkg,$(LIBRIST_URL),librist)
