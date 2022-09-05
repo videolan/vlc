@@ -562,7 +562,7 @@ vlc-contrib-$(HOST)-latest.tar.bz2:
 
 prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	$(RM) -r $(PREFIX)
-	-$(UNPACK)
+	$(UNPACK)
 	mv $(HOST) $(PREFIX)
 	cd $(PREFIX) && $(abspath $(SRC))/change_prefix.sh
 ifdef HAVE_WIN32
