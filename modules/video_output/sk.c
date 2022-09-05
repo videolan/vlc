@@ -29,7 +29,7 @@ struct vout_window_sys_t {
 
 struct embed_ack_data {
     void *opaque;
-    void (*ack)(struct vout_window_t *wnd, unsigned width, unsigned height, void *)
+    void (*ack)(struct vout_window_t *wnd, unsigned width, unsigned height, void *);
 };
 
 static void EmbedAckResize(struct vout_window_t *parent, unsigned width, unsigned height, void *opaque)
