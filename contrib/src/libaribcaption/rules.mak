@@ -7,8 +7,6 @@ ifeq ($(call need_pkg,"libaribcaption"),)
 PKGS_FOUND += libaribcaption
 endif
 
-LIBARIBCC_WITH_FREETYPE = 1
-
 ifdef HAVE_ANDROID
 LIBARIBCC_WITH_FONTCONFIG = 0
 else
@@ -45,11 +43,7 @@ ifdef HAVE_ANDROID
 LIBARIBCC_CONF += -DARIBCC_IS_ANDROID:BOOL=ON
 endif
 
-ifeq ($(LIBARIBCC_WITH_FREETYPE), 1)
 LIBARIBCC_CONF += -DARIBCC_USE_FREETYPE:BOOL=ON
-else
-LIBARIBCC_CONF += -DARIBCC_USE_FREETYPE:BOOL=OFF
-endif
 
 ifeq ($(LIBARIBCC_WITH_FONTCONFIG), 1)
 DEPS_libaribcaption += fontconfig $(DEPS_fontconfig)
