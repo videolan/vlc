@@ -37,6 +37,10 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     format.setStencilBufferSize(8);
     format.setAlphaBufferSize(8);
     format.setSwapInterval(0);
+
+    // UI is renderred on offscreen, no need for double bufferring
+    format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
+
     setFormat(format);
 
     m_context = new QOpenGLContext();
