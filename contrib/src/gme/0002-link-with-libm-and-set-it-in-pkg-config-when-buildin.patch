@@ -1,0 +1,41 @@
+From 327bda2f8517f9c35b5a734556a579c1781338fc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 5 Sep 2022 13:48:27 +0200
+Subject: [PATCH 2/3] link with libm and set it in pkg-config when building on
+ UNIX
+
+It's exported with PKG_CONFIG_CXXRT
+---
+ gme/CMakeLists.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/gme/CMakeLists.txt b/gme/CMakeLists.txt
+index 51adade..da23ea8 100644
+--- a/gme/CMakeLists.txt
++++ b/gme/CMakeLists.txt
+@@ -210,6 +210,22 @@ else()
+     set(PKG_CONFIG_CXXRT "")
+ endif(IMPLICITS_LIST)
+ 
++set(TEST_MATH_LINK "#include <math.h>\n
++int main(int argc, char** argv) { return (int)pow(argc, 2.5); }")
++
++check_cxx_source_compiles("${TEST_MATH_LINK}" HAVE_MATH_LIBRARY)
++if(NOT HAVE_MATH_LIBRARY)
++    set(CMAKE_REQUIRED_LIBRARIES "-lm")
++    check_cxx_source_compiles("${TEST_MATH_LINK}" NEEDS_MATH_LIBRARY)
++    unset(CMAKE_REQUIRED_LIBRARIES)
++    if(NEEDS_MATH_LIBRARY)
++        message(STATUS "Adding -lm flag.")
++        target_link_libraries(gme PRIVATE m)
++        set(PKG_CONFIG_CXXRT "${PKG_CONFIG_CXXRT} -lm")
++    endif(NEEDS_MATH_LIBRARY)
++endif()
++
++
+ # macOS framework build
+ if(BUILD_FRAMEWORK)
+     set_target_properties(gme
+-- 
+2.27.0.windows.1
+

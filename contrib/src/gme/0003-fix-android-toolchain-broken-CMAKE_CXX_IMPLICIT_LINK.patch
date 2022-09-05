@@ -1,0 +1,31 @@
+From 5fb77ca7127ab4343281920d79a87a899c6bc6bb Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 6 Sep 2022 11:56:30 +0200
+Subject: [PATCH 3/3] fix android toolchain broken
+ CMAKE_CXX_IMPLICIT_LINK_LIBRARIES
+
+CMake 3.17.0 and Android NDK 25 the CMAKE_CXX_IMPLICIT_LINK_LIBRARIES is
+c++;m;-l:libunwind.a;dl;c;-l:libunwind.a;dl
+
+When it should be
+c++;m;unwind;dl;c;unwind;dl
+---
+ gme/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gme/CMakeLists.txt b/gme/CMakeLists.txt
+index da23ea8..77738c4 100644
+--- a/gme/CMakeLists.txt
++++ b/gme/CMakeLists.txt
+@@ -196,6 +196,8 @@ set_target_properties(gme
+ foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
+     if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
+         list(APPEND IMPLICITS_LIST "${LIB}")
++    elseif(${LIB} MATCHES "-l:libunwind.a") # android toolchain
++        list(APPEND IMPLICITS_LIST "-lunwind")
+     else()
+         list(APPEND IMPLICITS_LIST "-l${LIB}")
+     endif()
+-- 
+2.27.0.windows.1
+
