@@ -46,7 +46,7 @@ Widgets.IconControlButton {
 
     enabled: Player.isTeletextAvailable
 
-    iconText: VLCIcons.tv
+    iconText: VLCIcons.tvtelx
 
     text: I18n.qtr("Teletext")
 
