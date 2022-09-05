@@ -30,8 +30,7 @@ Widgets.IconControlButton {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    // FIXME: Placeholder icon.
-    iconText: VLCIcons.bookmark
+    iconText: VLCIcons.tv
 
     text: I18n.qtr("Programs")
 
