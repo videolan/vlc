@@ -987,6 +987,8 @@ static int Ogg_ReadPage( demux_t *p_demux, ogg_page *p_oggpage )
     while( ogg_sync_pageout( &p_ogg->oy, p_oggpage ) != 1 )
     {
         p_buffer = ogg_sync_buffer( &p_ogg->oy, OGGSEEK_BYTES_TO_READ );
+        if( !p_buffer )
+            return VLC_EGENERIC;
 
         i_read = vlc_stream_Read( p_demux->s, p_buffer, OGGSEEK_BYTES_TO_READ );
         if( i_read <= 0 )

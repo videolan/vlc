@@ -204,6 +204,8 @@ static int64_t get_data( demux_t *p_demux, int64_t i_bytes_to_read )
     seek_byte ( p_demux, p_sys->i_input_position );
 
     buf = ogg_sync_buffer( &p_sys->oy, i_bytes_to_read );
+    if( !buf )
+        return 0;
 
     i_result = vlc_stream_Read( p_demux->s, buf, i_bytes_to_read );
 
@@ -1093,6 +1095,8 @@ int64_t oggseek_read_page( demux_t *p_demux )
     ogg_sync_reset( &p_ogg->oy );
 
     buf = ogg_sync_buffer( &p_ogg->oy, i_page_size );
+    if( !buf )
+        return 0;
 
     memcpy( buf, header, PAGE_HEADER_BYTES + i_nsegs );
 
