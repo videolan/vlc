@@ -45,7 +45,7 @@ static void EmbedAckResize(struct vout_window_t *parent, unsigned width, unsigne
 }
 
 static void EmbedResized(struct vout_window_t *wnd, unsigned width, unsigned height,
-                         vout_window_ack_cb *ack_cb, void *opaque)
+                         vout_window_ack_cb ack_cb, void *opaque)
 {
     vout_window_t *parent = wnd->owner.sys;
     struct embed_ack_data data = { .opaque = opaque, .ack = ack_cb };
