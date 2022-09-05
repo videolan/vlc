@@ -25,6 +25,6 @@ GME_CONF := -DENABLE_UBSAN=OFF
 
 .gme: game-music-emu toolchain.cmake
 	rm -f $</CMakeCache.txt
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) . $(GME_CONF)
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(GME_CONF)
 	+$(CMAKEBUILD) $< --target install
 	touch $@
