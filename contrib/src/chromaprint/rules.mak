@@ -16,6 +16,7 @@ $(TARBALLS)/chromaprint-$(CHROMAPRINT_VERSION).tar.gz:
 chromaprint: chromaprint-$(CHROMAPRINT_VERSION).tar.gz .sum-chromaprint
 	$(UNPACK)
 	$(APPLY) $(SRC)/chromaprint/linklibs.patch
+	$(APPLY) $(SRC)/chromaprint/0002-add-the-C-runtime-to-the-packages-to-link-to.patch
 	$(MOVE)
 
 DEPS_chromaprint = ffmpeg $(DEPS_ffmpeg)

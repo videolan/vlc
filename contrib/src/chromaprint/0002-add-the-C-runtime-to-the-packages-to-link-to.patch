@@ -1,0 +1,39 @@
+From 6726ebef3eec9dcc9d08b2ad6ae352bacb215e5e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 5 Sep 2022 16:13:05 +0200
+Subject: [PATCH 2/2] add the C++ runtime to the packages to link to
+
+gcc needs libstdc++ and clang needs libc++.
+---
+ CMakeLists.txt | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0dbd9bd..67fa620 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -197,6 +197,21 @@ else()
+ endif()
+ 
+ if(NOT BUILD_FRAMEWORK)
++	foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
++		if (LIB MATCHES "-l.*")
++			list(APPEND PKG_CXX_LIBS "${LIB}")
++		else()
++			list(APPEND PKG_CXX_LIBS "-l${LIB}")
++		endif()
++	endforeach()
++	if(PKG_CXX_LIBS)
++		# Blacklist for MinGW-w64
++		list(REMOVE_ITEM PKG_CXX_LIBS
++			"-lmingw32" "-lgcc_s" "-lgcc" "-lmoldname" "-lmingwex" "-lmingwthrd"
++			"-lmsvcrt" "-lpthread" "-ladvapi32" "-lshell32" "-luser32" "-lkernel32")
++		string(REPLACE ";" " " PKG_LIBS "${PKG_CXX_LIBS}")
++		set(CHROMAPRINT_ADDITIONAL_LIBS "${CHROMAPRINT_ADDITIONAL_LIBS} ${PKG_LIBS}")
++	endif()
+ 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libchromaprint.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc)
+ 	install(
+         FILES ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc
+-- 
+2.27.0.windows.1
+
