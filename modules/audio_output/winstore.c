@@ -104,7 +104,7 @@ static STDMETHODIMP MMDeviceLocator_QueryInterface(IActivateAudioInterfaceComple
 }
 
 /* MMDeviceLocator IActivateAudioInterfaceCompletionHandler methods */
-static HRESULT MMDeviceLocator_ActivateCompleted(IActivateAudioInterfaceCompletionHandler *This,
+static STDMETHODIMP MMDeviceLocator_ActivateCompleted(IActivateAudioInterfaceCompletionHandler *This,
                                                  IActivateAudioInterfaceAsyncOperation *operation)
 {
     (void)operation;
