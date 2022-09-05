@@ -34,7 +34,7 @@ endif
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
-X265_CONF := -DENABLE_SHARED=OFF -DCMAKE_SYSTEM_PROCESSOR=$(ARCH) -DENABLE_CLI=OFF
+X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
 
 .x265: x265 toolchain.cmake
 	$(REQUIRE_GPL)
