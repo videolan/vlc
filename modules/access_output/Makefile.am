@@ -29,7 +29,7 @@ libaccess_http_put_plugin_la_LIBADD = libvlc_http.la
 access_out_LTLIBRARIES += libaccess_http_put_plugin.la
 
 ### SRT ###
-libaccess_output_srt_plugin_la_SOURCES = access_output/srt.c access/srt_common.c access/srt_common.h dummy.cpp
+libaccess_output_srt_plugin_la_SOURCES = access_output/srt.c access/srt_common.c access/srt_common.h
 libaccess_output_srt_plugin_la_CFLAGS = $(AM_CFLAGS) $(SRT_CFLAGS)
 libaccess_output_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
 libaccess_output_srt_plugin_la_LIBADD = $(SRT_LIBS)

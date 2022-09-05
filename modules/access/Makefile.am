@@ -462,7 +462,7 @@ EXTRA_LTLIBRARIES += libaccess_mtp_plugin.la
 
 ### SRT ###
 
-libaccess_srt_plugin_la_SOURCES = access/srt.c access/srt_common.c access/srt_common.h dummy.cpp
+libaccess_srt_plugin_la_SOURCES = access/srt.c access/srt_common.c access/srt_common.h
 libaccess_srt_plugin_la_CFLAGS = $(AM_CFLAGS) $(SRT_CFLAGS)
 libaccess_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
 libaccess_srt_plugin_la_LIBADD = $(SRT_LIBS)
