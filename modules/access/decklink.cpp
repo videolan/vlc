@@ -648,8 +648,9 @@ static int Open(vlc_object_t *p_this)
         /* Enable a random format, we will reconfigure on format detection */
         u.id = bmdModeHD1080p2997;
     } else {
-        if (!mode || strlen(mode) < 3 || strlen(mode) > 4) {
-            msg_Err(demux, "Invalid mode: \'%s\'", mode ? mode : "");
+        size_t min_size = strnlen(mode, 4+1);
+        if (min_size < 3 || min_size > 4) {
+            msg_Err(demux, "Invalid mode: \'%s\'", mode);
             free(mode);
             goto finish;
         }
