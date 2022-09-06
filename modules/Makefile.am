@@ -57,11 +57,6 @@ include mux/Makefile.am
 include stream_out/Makefile.am
 endif
 
-BUILT_SOURCES += dummy.cpp
-
-dummy.cpp:
-	touch dummy.cpp
-
 if HAVE_WIN32
 BUILT_SOURCES += module.rc.lo
 CLEANFILES += module.rc
