@@ -548,7 +548,7 @@ void MainCtx::createSystray()
     sysTray = new QSystemTrayIcon( iconVLC, this );
     sysTray->setToolTip( qtr( "VLC media player" ));
 
-    systrayMenu.reset(new QMenu( qtr( "VLC media player") ));
+    systrayMenu = std::make_unique<QMenu>( qtr( "VLC media player") );
     systrayMenu->setIcon( iconVLC );
 
     VLCMenuBar::updateSystrayMenu( this, p_intf, true );
