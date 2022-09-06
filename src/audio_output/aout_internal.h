@@ -139,8 +139,6 @@ struct vlc_aout_stream_cfg
     struct vlc_clock_t *clock;
     const char *str_id;
     const audio_replay_gain_t *replay_gain;
-    void (*notify_latency_cb)(void *data);
-    void *notify_latency_data;
 };
 
 vlc_aout_stream *vlc_aout_stream_New(audio_output_t *p_aout,
@@ -153,7 +151,6 @@ void vlc_aout_stream_ChangeRate(vlc_aout_stream *stream, float rate);
 void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay);
 void vlc_aout_stream_Flush(vlc_aout_stream *stream);
 void vlc_aout_stream_Drain(vlc_aout_stream *stream);
-void vlc_aout_stream_UpdateLatency(vlc_aout_stream *stream);
 /* Contrary to other vlc_aout_stream_*() functions, this function can be called from
  * any threads */
 bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream);
