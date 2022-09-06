@@ -1,6 +1,6 @@
 # FFmpeg
 
-FFMPEG_HASH=dc91b913b6260e85e1304c74ff7bb3c22a8c9fb1
+FFMPEG_HASH=d4b7b3c03ee2baf0166ce49dff17ec9beff684db
 FFMPEG_BRANCH=release/4.4
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
