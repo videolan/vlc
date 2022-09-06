@@ -630,12 +630,7 @@ static int Open(vlc_object_t *p_this)
         goto finish;
     }
 
-    union {
-        BMDDisplayMode id;
-        char str[4];
-    } u;
-
-    u.id = bmdModeUnknown;
+    BMDDisplayMode u_id;
 
     char *mode;
     mode = var_CreateGetNonEmptyString(demux, "decklink-mode");
@@ -646,7 +641,7 @@ static int Open(vlc_object_t *p_this)
         msg_Dbg(demux, "Card supports input format detection");
         flags |= bmdVideoInputEnableFormatDetection;
         /* Enable a random format, we will reconfigure on format detection */
-        u.id = bmdModeHD1080p2997;
+        u_id = bmdModeHD1080p2997;
     } else {
         size_t min_size = strnlen(mode, 4+1);
         if (min_size < 3 || min_size > 4) {
@@ -656,10 +651,11 @@ static int Open(vlc_object_t *p_this)
         }
 
         msg_Dbg(demux, "Looking for mode \'%s\'", mode);
-        memcpy(u.str, mode, 4);
-        if (u.str[3] == '\0')
-            u.str[3] = ' '; /* 'pal'\0 -> 'pal ' */
+        if (mode[3] == '\0')
+            mode[3] = ' '; /* 'pal'\0 -> 'pal ' */
+        u_id = BMDDisplayMode(GetDWBE(mode));
         free(mode);
+
     }
 
     sys->video_fmt.video.i_width = 0;
@@ -694,7 +690,7 @@ static int Open(vlc_object_t *p_this)
                  (int)m->GetWidth(), (int)m->GetHeight(),
                  double(time_scale) / frame_duration, field);
 
-        if (u.id == mode.id) {
+        if (u_id == mode.id) {
             sys->video_fmt = GetModeSettings(demux, m, bmdDetectedVideoInputYCbCr422);
             msg_Dbg(demux, "Using that mode");
         }
@@ -703,11 +699,11 @@ static int Open(vlc_object_t *p_this)
     mode_it->Release();
 
     if (sys->video_fmt.video.i_width == 0) {
-        msg_Err(demux, "Unknown video mode `%4.4s\' specified.", u.str);
+        msg_Err(demux, "Unknown video mode `%4.4s\' specified.", (char*)&u_id);
         goto finish;
     }
 
-    if (sys->input->EnableVideoInput(u.id, fmt, flags) != S_OK) {
+    if (sys->input->EnableVideoInput(u_id, fmt, flags) != S_OK) {
         msg_Err(demux, "Failed to enable video input");
         goto finish;
     }
