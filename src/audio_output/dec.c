@@ -845,13 +845,13 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
                          original_pts, stream->sync.rate);
     }
 
-    /* Output */
-    stream->sync.discontinuity = false;
-    aout->play(aout, block, play_date);
-
     if (stream->timing_points.first_pts == VLC_TICK_INVALID)
         stream->timing_points.first_pts = original_pts;
     stream->timing_points.last_pts = original_pts;
+
+    /* Output */
+    stream->sync.discontinuity = false;
+    aout->play(aout, block, play_date);
 
     atomic_fetch_add_explicit(&stream->buffers_played, 1, memory_order_relaxed);
     return ret;
