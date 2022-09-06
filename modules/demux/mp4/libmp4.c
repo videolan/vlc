@@ -4467,7 +4467,6 @@ static int MP4_ReadBox_iref( stream_t *p_stream, MP4_Box_t *p_box )
 
     assert( i_read == 0 );
 
-    uint32_t i = 0;
     uint64_t i_remain = p_box->i_size - 12;
     while ( i_remain > 8 )
     {
@@ -4481,7 +4480,6 @@ static int MP4_ReadBox_iref( stream_t *p_stream, MP4_Box_t *p_box )
 
         MP4_BoxAddChild( p_box, p_childbox );
         i_remain -= p_childbox->i_size;
-        i++;
     }
 
     if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) )
