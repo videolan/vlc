@@ -83,8 +83,11 @@ private:
     void setRoundImage(QImage image);
     void setStatus(const Status status);
     void regenerateRoundImage();
-    Q_SLOT void adjustQSGCustomGeometry(const QQuickWindow* const window);
 
+private slots:
+    void adjustQSGCustomGeometry(const QQuickWindow* const window);
+
+private:
     QUrl m_source;
     qreal m_radius = 0.0;
     qreal m_dpr = 1.0; // device pixel ratio
