@@ -41,6 +41,7 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/libplacebo/fix-android-build.patch
 endif
 	$(APPLY) $(SRC)/libplacebo/0001-Fix-incompatible-pointer-integer-conversion-errors-o.patch
+	$(APPLY) $(SRC)/libplacebo/0001-meson-add-the-CLANG-gcc-C-runtime-when-linking-with-.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson

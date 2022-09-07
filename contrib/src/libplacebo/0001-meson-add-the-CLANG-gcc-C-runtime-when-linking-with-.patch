@@ -1,0 +1,42 @@
+From 45b4b27748dd8aa9e2bd63dc5060f92d45fc71a2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 7 Sep 2022 14:30:55 +0200
+Subject: [PATCH] meson: add the CLANG/gcc C++ runtime when linking with vulkan
+ loader
+
+The Vulkan loader present on some Linux distro or Android don't export which
+C++ they are using. When using libplacebo from C code it's missing in the link
+parameters from libplacebo. So we do it on behalf of Vulkan loader.
+
+We suppose we're building with a compatible C++ compiler that was used to
+generate the vulkan loader.
+
+We can't detect the link flags exposed by vulkan with Meson so we assume it's
+never set.
+---
+ src/meson.build | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/meson.build b/src/meson.build
+index dd2f1fe..0f238bd 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -48,6 +48,15 @@ if not vulkan_headers.found() and not get_option('vulkan').disabled()
+   endif
+ endif
+ 
++# add the C++ runtime that vulkan needs but may not expose in its pkg-config
++if vulkan_headers.found()
++  if cxx.get_id() == 'clang'
++    build_deps += cxx.find_library('c++', required: true)
++  elif cxx.get_id() == 'gcc'
++    build_deps += cxx.find_library('stdc++', required: true)
++  endif
++endif
++
+ d3d11 = disabler()
+ d3d11_inc = ['d3d11_4.h', 'dxgi1_6.h']
+ d3d11_deps = [
+-- 
+2.37.3.windows.1
+
