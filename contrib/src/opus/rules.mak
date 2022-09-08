@@ -16,17 +16,20 @@ $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
 
 opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
+	$(APPLY) $(SRC)/opus/0001-CMake-set-the-pkg-config-version-to-the-library-vers.patch
+	$(APPLY) $(SRC)/opus/0002-CMake-set-the-pkg-config-string-as-with-autoconf-mes.patch
+	# fix missing included file in packaged source
+	cd $(UNPACK_DIR) && sed -e 's,include(opus_buildtype,#include(opus_buildtype,' -i.orig CMakeLists.txt
 	$(MOVE)
 
-OPUS_CONF= --disable-extra-programs --disable-doc
+OPUS_CONF=
 ifndef HAVE_FPU
-OPUS_CONF += --enable-fixed-point
+OPUS_CONF += -DOPUS_FIXED_POINT=ON
 endif
 
-.opus: opus
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(OPUS_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.opus: opus toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS_PIC) $(CMAKE) $(OPUS_CONF)
+	+$(CMAKEBUILD)
+	+$(CMAKEBUILD) --target install
 	touch $@
