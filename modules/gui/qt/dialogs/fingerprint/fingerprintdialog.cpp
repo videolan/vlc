@@ -31,7 +31,7 @@
 FingerprintDialog::FingerprintDialog(QWidget *parent, qt_intf_t *p_intf,
                                      input_item_t *p_item ) :
     QDialog(parent),
-    ui(new Ui::FingerprintDialog), p_r( NULL )
+    ui(new Ui::FingerprintDialog), p_r( nullptr )
 {
     ui->setupUi(this);
 
@@ -80,7 +80,7 @@ void FingerprintDialog::handleResults()
     if ( vlc_array_count( & p_r->results.metas_array ) == 0 )
     {
         fingerprint_request_Delete( p_r );
-        p_r = NULL;
+        p_r = nullptr;
         ui->stackedWidget->setCurrentWidget( ui->error );
         return;
     }
@@ -111,7 +111,7 @@ void FingerprintDialog::handleResults()
 
 FingerprintDialog::~FingerprintDialog()
 {
-    if ( t ) delete t;
-    if ( p_r ) fingerprint_request_Delete( p_r );
     delete ui;
+    delete t;
+    if ( p_r ) fingerprint_request_Delete( p_r );
 }
