@@ -18,25 +18,6 @@
 
 .pragma library
 
-function msToString(time, short) {
-    if (time < 0) return "--:--"
-
-    var t_sec = Math.floor(time / 1000)
-    var sec = t_sec % 60
-    var min = Math.floor(t_sec / 60) % 60
-    var hour = Math.floor(t_sec / 3600)
-
-    function prefixZero(number) {
-        return number < 10 ? "0" + number : number;
-    }
-
-    if (hour === 0)
-        return "%1:%2".arg(prefixZero(min)).arg(prefixZero(sec))
-    if (!!short)
-        return "%1h%2".arg(hour.toFixed()).arg(prefixZero(min))
-    return "%1:%2:%3".arg(prefixZero(hour)).arg(prefixZero(min)).arg(prefixZero(sec))
-}
-
 function clamp(num, min, max) {
   return num <= min ? min : num >= max ? max : num;
 }
