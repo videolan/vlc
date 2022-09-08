@@ -314,6 +314,12 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     if (unlikely(ti == NULL))
         return;
 
+    if (ti->write_index_corrupt)
+    {
+        msg_Dbg(aout, "write index corrupt");
+        return;
+    }
+
     if (pa_stream_is_corked(s) == 0)
     {
         pa_usec_t rt;
