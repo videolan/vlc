@@ -1,0 +1,27 @@
+From e3932184ed8148b35e5a3bb58765aa12d01cb15c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 9 Sep 2022 07:57:02 +0200
+Subject: [PATCH 1/2] CMake: set the pkg-config version to the library version
+
+Not the .so version.
+---
+ CMakeLists.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 17ee3fc2..902cb835 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -316,8 +316,7 @@ if(OPUS_INSTALL_PKG_CONFIG_MODULE)
+   set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+   set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+   set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+-  set(VERSION ${OPUS_LIBRARY_VERSION})
+-  set(VERSION ${OPUS_LIBRARY_VERSION})
++  set(VERSION ${PROJECT_VERSION})
+   if(HAVE_LIBM)
+     set(LIBM "-lm")
+   endif()
+-- 
+2.37.3.windows.1
+

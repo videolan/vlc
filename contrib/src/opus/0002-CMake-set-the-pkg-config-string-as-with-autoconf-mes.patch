@@ -1,0 +1,31 @@
+From 77b5a3a4c024892a33c5ead0d38c707c02cef790 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 9 Sep 2022 07:58:02 +0200
+Subject: [PATCH 2/2] CMake: set the pkg-config string as with autoconf/meson
+
+---
+ CMakeLists.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 902cb835..0abb677c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -317,6 +317,14 @@ if(OPUS_INSTALL_PKG_CONFIG_MODULE)
+   set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+   set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+   set(VERSION ${PROJECT_VERSION})
++  if(OPUS_FIXED_POINT)
++    set(PC_BUILD "fixed-point")
++  else()
++    set(PC_BUILD "floating-point")
++  endif()
++  if(OPUS_CUSTOM_MODES)
++    set(PC_BUILD "${PC_BUILD}, custom modes")
++  endif()
+   if(HAVE_LIBM)
+     set(LIBM "-lm")
+   endif()
+-- 
+2.37.3.windows.1
+
