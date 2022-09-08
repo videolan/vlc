@@ -791,44 +791,55 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
+    bool report_volume = true;
+    bool report_mute = true;
+
     while (sys->requested_device == NULL)
     {
         if (volume != NULL)
         {
-            float level;
-
-            level = sys->requested_volume;
-            if (level >= 0.f)
+            if (sys->requested_volume >= 0.f)
             {
-                hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
+                hr = ISimpleAudioVolume_SetMasterVolume(volume, sys->requested_volume, NULL);
                 if (FAILED(hr))
                     msg_Err(aout, "cannot set master volume (error 0x%lX)",
                             hr);
+                report_volume = true;
+                sys->requested_volume = -1.f;
             }
-            sys->requested_volume = -1.f;
 
-            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
-            if (SUCCEEDED(hr))
-                aout_VolumeReport(aout, cbrtf(level * sys->gain));
-            else
-                msg_Err(aout, "cannot get master volume (error 0x%lX)", hr);
+            if (report_volume)
+            {
+                float level;
+                hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
+                if (SUCCEEDED(hr))
+                    aout_VolumeReport(aout, cbrtf(level * sys->gain));
+                else
+                    msg_Err(aout, "cannot get master volume (error 0x%lX)", hr);
+                report_volume = false;
+            }
 
-            BOOL mute;
             if (sys->requested_mute >= 0)
             {
-                mute = sys->requested_mute ? TRUE : FALSE;
+                BOOL mute = sys->requested_mute ? TRUE : FALSE;
 
                 hr = ISimpleAudioVolume_SetMute(volume, mute, NULL);
                 if (FAILED(hr))
                     msg_Err(aout, "cannot set mute (error 0x%lX)", hr);
+                report_mute = true;
+                sys->requested_mute = -1;
             }
-            sys->requested_mute = -1;
 
-            hr = ISimpleAudioVolume_GetMute(volume, &mute);
-            if (SUCCEEDED(hr))
-                aout_MuteReport(aout, mute != FALSE);
-            else
-                msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
+            if (report_mute)
+            {
+                BOOL mute;
+                hr = ISimpleAudioVolume_GetMute(volume, &mute);
+                if (SUCCEEDED(hr))
+                    aout_MuteReport(aout, mute != FALSE);
+                else
+                    msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
+                report_mute = false;
+            }
         }
 
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
