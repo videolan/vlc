@@ -62,3 +62,11 @@ args.file.write("endian = 'little'\n")
 # Get first part of triplet
 cpu = os.environ.get('HOST', '').split('-')[0]
 args.file.write("cpu = '{}'\n".format(cpu))
+
+# CMake section
+args.file.write("\n[cmake]\n")
+_add_environ_val('CMAKE_C_COMPILER', 'CC')
+_add_environ_val('CMAKE_CXX_COMPILER', 'CXX')
+_add_environ_val('CMAKE_SYSTEM_NAME', 'CMAKE_SYSTEM_NAME')
+_add_environ_val('CMAKE_SYSTEM_PROCESSOR', 'ARCH')
+
