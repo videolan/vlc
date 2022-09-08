@@ -10,10 +10,6 @@ ifeq ($(call need_pkg,"libssh2"),)
 PKGS_FOUND += ssh2
 endif
 
-ifeq ($(shell echo `${CC} -dumpversion | cut -f1-2 -d.`),4.9)
-	BROKEN_GCC_CFLAGS:="CFLAGS=-O1"
-endif
-
 $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
 	$(call download_pkg,$(LIBSSH2_URL),ssh2)
 
@@ -33,6 +29,6 @@ DEPS_ssh2 = gcrypt $(DEPS_gcrypt)
 
 .ssh2: ssh2
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(BROKEN_GCC_CFLAGS) $(HOSTCONF) --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls
 	cd $< && $(MAKE) install
 	touch $@
