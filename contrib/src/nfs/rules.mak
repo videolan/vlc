@@ -1,5 +1,5 @@
 # NFS
-NFS_VERSION := 5.0.1
+NFS_VERSION := 5.0.2
 NFS_URL := $(GITHUB)/sahlberg/libnfs/archive/libnfs-$(NFS_VERSION).tar.gz
 
 PKGS += nfs
