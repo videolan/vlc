@@ -17,16 +17,12 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
-	$(APPLY) $(SRC)/ogg/libogg-configure.patch
-	$(APPLY) $(SRC)/ogg/libogg-disable-check.patch
 	$(APPLY) $(SRC)/ogg/libogg-uint-macos.patch
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-.ogg: libogg
-	$(RECONF)
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.ogg: libogg toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE)
+	+$(CMAKEBUILD)
+	+$(CMAKEBUILD) --target install
 	touch $@
