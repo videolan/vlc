@@ -153,6 +153,7 @@
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
         <file alias="AcrylicBackground.qml">widgets/qml/AcrylicBackground.qml</file>
         <file alias="AnimatedBackground.qml">widgets/qml/AnimatedBackground.qml</file>
+        <file alias="CheckButton.qml">widgets/qml/CheckButton.qml</file>
         <file alias="CSDWindowButton.qml">widgets/qml/CSDWindowButton.qml</file>
         <file alias="CSDWindowButtonSet.qml">widgets/qml/CSDWindowButtonSet.qml</file>
         <file alias="CSDTitlebarTapNDrapHandler.qml">widgets/qml/CSDTitlebarTapNDrapHandler.qml</file>

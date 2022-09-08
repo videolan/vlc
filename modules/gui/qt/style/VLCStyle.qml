@@ -161,6 +161,12 @@ QtObject {
     readonly property int button_width_normal: dp(96, scale)
     readonly property int button_width_large: dp(128, scale)
 
+    readonly property int checkButton_width: dp(56, scale)
+    readonly property int checkButton_height: dp(32, scale)
+
+    readonly property int checkButton_margins: dp(4, scale)
+    readonly property int checkButton_handle_margins: dp(2, scale)
+
     readonly property int table_section_width: dp(32, scale)
     readonly property int table_section_text_margin: dp(10, scale)
 

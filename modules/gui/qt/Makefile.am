@@ -951,6 +951,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/BannerTabButton.qml \
 	gui/qt/widgets/qml/BusyIndicatorExt.qml \
 	gui/qt/widgets/qml/CaptionLabel.qml \
+	gui/qt/widgets/qml/CheckButton.qml \
 	gui/qt/widgets/qml/CheckedDelegate.qml \
 	gui/qt/widgets/qml/ComboBoxExt.qml \
 	gui/qt/widgets/qml/AcrylicBackground.qml \
