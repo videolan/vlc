@@ -82,8 +82,8 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
     self.unplayedIndicatorTextField.stringValue = _NS("NEW");
     self.unplayedIndicatorTextField.font = [NSFont VLClibraryHighlightCellHighlightLabelFont];
-    self.unplayedIndicatorTextField.textColor = [NSColor VLClibraryHighlightColor];
-    self.highlightBox.borderColor = [NSColor VLCOrangeElementColor];
+    self.highlightBox.borderColor = [NSColor VLCAccentColor];
+    self.unplayedIndicatorTextField.textColor = [NSColor VLCAccentColor];
 
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self

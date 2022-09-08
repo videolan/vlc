@@ -109,10 +109,11 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
     [self setupTracksTableView];
     self.albumNameTextField.font = [NSFont VLClibraryLargeCellTitleFont];
     self.artistNameTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
-    self.artistNameTextField.textColor = [NSColor VLCOrangeElementColor];
     self.yearTextField.font = [NSFont VLClibrarySmallCellTitleFont];
     self.summaryTextField.font = [NSFont VLClibrarySmallCellTitleFont];
     self.trackingView.viewToHide = self.playInstantlyButton;
+    self.artistNameTextField.textColor = [NSColor VLCAccentColor];
+
     [self prepareForReuse];
 }
 

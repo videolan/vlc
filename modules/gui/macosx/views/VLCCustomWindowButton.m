@@ -268,7 +268,7 @@
 -(void)awakeFromNib
 {
     self.wantsLayer = YES;
-    self.layer.backgroundColor = [NSColor VLClibraryHighlightColor].CGColor;
+    self.layer.backgroundColor = [NSColor VLCAccentColor].CGColor;
     self.layer.cornerRadius = 6.0f;
     
     self.bezelStyle = NSBezelStyleRecessed;

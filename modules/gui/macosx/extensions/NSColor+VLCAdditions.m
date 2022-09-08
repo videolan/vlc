@@ -24,14 +24,14 @@
 
 @implementation NSColor (VLCAdditions)
 
++ (instancetype)VLCAccentColor
+{
+     return [NSColor VLCOrangeElementColor];
+}
+
 + (instancetype)VLCOrangeElementColor
 {
     return [NSColor colorWithRed:1. green:.38 blue:.04 alpha:1.];
-}
-
-+ (instancetype)VLClibraryHighlightColor
-{
-    return [NSColor colorWithRed:1. green:136./255. blue:.0 alpha:1.];
 }
 
 + (instancetype)VLClibraryLightTitleColor

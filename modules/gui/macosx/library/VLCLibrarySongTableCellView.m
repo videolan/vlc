@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibrarySongTableCellView.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -43,6 +44,10 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 
 - (void)awakeFromNib
 {
+    if(@available(macOS 10.14, *)) {
+        self.playInstantlyButton.contentTintColor = [NSColor VLCAccentColor];
+    }
+
     self.playInstantlyButton.target = self;
     self.playInstantlyButton.action = @selector(playInstantly:);
 

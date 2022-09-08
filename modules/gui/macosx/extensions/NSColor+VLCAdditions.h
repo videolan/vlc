@@ -26,8 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSColor (VLCAdditions)
 
++ (instancetype)VLCAccentColor;
 + (instancetype)VLCOrangeElementColor;
-+ (instancetype)VLClibraryHighlightColor;
 + (instancetype)VLClibraryLightTitleColor;
 + (instancetype)VLClibraryDarkTitleColor;
 + (instancetype)VLClibrarySubtitleColor;
