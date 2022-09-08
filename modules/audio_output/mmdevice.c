@@ -781,6 +781,62 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
     return ret;
 }
 
+/**
+ * Main loop
+ *
+ * Adjust volume as long as device is unchanged
+ * */
+static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
+{
+    aout_sys_t *sys = aout->sys;
+    HRESULT hr;
+
+    while (sys->requested_device == NULL)
+    {
+        if (volume != NULL)
+        {
+            float level;
+
+            level = sys->requested_volume;
+            if (level >= 0.f)
+            {
+                hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
+                if (FAILED(hr))
+                    msg_Err(aout, "cannot set master volume (error 0x%lX)",
+                            hr);
+            }
+            sys->requested_volume = -1.f;
+
+            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
+            if (SUCCEEDED(hr))
+                aout_VolumeReport(aout, cbrtf(level * sys->gain));
+            else
+                msg_Err(aout, "cannot get master volume (error 0x%lX)", hr);
+
+            BOOL mute;
+
+            hr = ISimpleAudioVolume_GetMute(volume, &mute);
+            if (FAILED(hr))
+                msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
+
+            if (sys->requested_mute >= 0)
+            {
+                mute = sys->requested_mute ? TRUE : FALSE;
+
+                hr = ISimpleAudioVolume_SetMute(volume, mute, NULL);
+                if (FAILED(hr))
+                    msg_Err(aout, "cannot set mute (error 0x%lX)", hr);
+            }
+            sys->requested_mute = -1;
+
+            if (SUCCEEDED(hr))
+                aout_MuteReport(aout, mute != FALSE);
+        }
+
+        SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
+    }
+}
+
 /*** Initialization / deinitialization **/
 /** MMDevice audio output thread.
  * This thread takes cares of the audio session control. Inconveniently enough,
@@ -961,51 +1017,8 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
     else
         msg_Err(aout, "cannot activate endpoint volume (error 0x%lX)", hr);
 
-    /* Main loop (adjust volume as long as device is unchanged) */
-    while (sys->requested_device == NULL)
-    {
-        if (volume != NULL)
-        {
-            float level;
+    MMSessionMainloop(aout, volume);
 
-            level = sys->requested_volume;
-            if (level >= 0.f)
-            {
-                hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
-                if (FAILED(hr))
-                    msg_Err(aout, "cannot set master volume (error 0x%lX)",
-                            hr);
-            }
-            sys->requested_volume = -1.f;
-
-            hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
-            if (SUCCEEDED(hr))
-                aout_VolumeReport(aout, cbrtf(level * sys->gain));
-            else
-                msg_Err(aout, "cannot get master volume (error 0x%lX)", hr);
-
-            BOOL mute;
-
-            hr = ISimpleAudioVolume_GetMute(volume, &mute);
-            if (FAILED(hr))
-                msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
-
-            if (sys->requested_mute >= 0)
-            {
-                mute = sys->requested_mute ? TRUE : FALSE;
-
-                hr = ISimpleAudioVolume_SetMute(volume, mute, NULL);
-                if (FAILED(hr))
-                    msg_Err(aout, "cannot set mute (error 0x%lX)", hr);
-            }
-            sys->requested_mute = -1;
-
-            if (SUCCEEDED(hr))
-                aout_MuteReport(aout, mute != FALSE);
-        }
-
-        SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
-    }
     LeaveCriticalSection(&sys->lock);
 
     if (endpoint != NULL)
