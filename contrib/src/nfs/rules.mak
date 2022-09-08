@@ -15,15 +15,11 @@ $(TARBALLS)/libnfs-$(NFS_VERSION).tar.gz:
 nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(UNPACK)
 	mv libnfs-libnfs-$(NFS_VERSION) libnfs-$(NFS_VERSION)
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-NFS_CONF := --disable-examples --disable-utils --disable-werror
-
-.nfs: nfs
-	cd $< && ./bootstrap
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(NFS_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+.nfs: nfs toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS_PIC) $(CMAKE)
+	+$(CMAKEBUILD)
+	+$(CMAKEBUILD) --target install
 	touch $@
