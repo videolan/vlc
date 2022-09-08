@@ -36,6 +36,7 @@ DEPS_projectM = glew $(DEPS_glew)
 .projectM: projectM toolchain.cmake
 	cd $< && rm -f CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) \
+		-DCMAKE_CXX_STANDARD=98 \
 		-DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF \
 		-DDISABLE_NATIVE_PRESETS:BOOL=ON \
 		-DUSE_FTGL:BOOL=OFF \
