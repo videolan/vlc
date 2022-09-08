@@ -24,7 +24,6 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-
 T.Pane {
     id: root
 
@@ -47,52 +46,63 @@ T.Pane {
 
         spacing: VLCStyle.margin_small
 
-        Widgets.SubtitleLabel {
-            text: I18n.qtr("Teletext")
+        Item {
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-            color: root.colors.text
-        }
+            height: teleActivateBtn.height
 
-        Row {
-            Widgets.IconControlButton{
+            Widgets.SubtitleLabel {
+                text: I18n.qtr("Teletext")
+
+                color: root.colors.text
+            }
+
+            ControlCheckButton {
                 id: teleActivateBtn
 
-                checked: Player.teletextEnabled
+                anchors.right: parent.right
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 focus: true
 
-                iconText: VLCIcons.tv
-                text: I18n.qtr("Teletext activate")
+                checked: Player.teletextEnabled
 
                 colors: root.colors
-                color: colors.text
-
-                T.ToolTip.visible: hovered || visualFocus
 
                 Navigation.parentItem: root
                 Navigation.rightItem: teleTransparencyBtn
+                Navigation.downItem: teleTransparencyBtn
 
-                onClicked: Player.teletextEnabled = !Player.teletextEnabled
+                onCheckedChanged: Player.teletextEnabled = checked
             }
+        }
+
+        Row {
+            spacing: VLCStyle.margin_small
 
             Widgets.IconControlButton{
                 id: teleTransparencyBtn
 
+                anchors.verticalCenter: parent.verticalCenter
+
                 enabled: teleActivateBtn.checked
 
-                opacity: 0.5
+                checked: Player.teletextTransparency
 
-                iconText: VLCIcons.tvtelx
+                iconText: VLCIcons.transparency
                 text: I18n.qtr("Teletext transparency")
 
                 colors: root.colors
-                color: colors.text
 
-                T.ToolTip.visible: hovered || visualFocus
+                T.ToolTip.visible: (hovered || visualFocus)
 
                 Navigation.parentItem: root
                 Navigation.leftItem: teleActivateBtn
                 Navigation.rightItem: telePageNumber
+                Navigation.upItem: teleActivateBtn
+                Navigation.downItem: indexKeyBtn
 
                 onClicked: Player.teletextTransparency = !Player.teletextTransparency
             }
@@ -100,8 +110,10 @@ T.Pane {
             Widgets.SpinBoxExt{
                 id: telePageNumber
 
+                anchors.verticalCenter: parent.verticalCenter
+
                 // NOTE: We want a fixed size for the TextInput.
-                width: VLCStyle.dp(64, VLCStyle.scale)
+                width: VLCStyle.dp(136, VLCStyle.scale)
 
                 enabled: teleActivateBtn.checked
 
@@ -120,6 +132,8 @@ T.Pane {
                 Navigation.parentItem: root
                 Navigation.leftItem: teleTransparencyBtn
                 Navigation.rightItem: indexKeyBtn
+                Navigation.upItem: teleActivateBtn
+                Navigation.downItem: indexKeyBtn
 
                 //only update the player teletext page when the user change the value manually
                 property bool inhibitPageUpdate: true
@@ -144,107 +158,112 @@ T.Pane {
                     }
                 }
             }
+        }
+
+        Row {
+            spacing: VLCStyle.margin_small
 
             Widgets.IconControlButton{
                 id: indexKeyBtn
 
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: redKeyBtn.width
+
+                size: VLCStyle.dp(32, VLCStyle.scale)
+
                 enabled: teleActivateBtn.checked
 
-                iconText: VLCIcons.record
+                iconText: VLCIcons.home
                 text: I18n.qtr("Index key")
 
                 colors: root.colors
-                color: "grey"
-                colorDisabled: "grey"
 
-                T.ToolTip.visible: hovered || visualFocus
+                T.ToolTip.visible: (hovered || visualFocus)
 
                 Navigation.parentItem: root
                 Navigation.leftItem: telePageNumber
                 Navigation.rightItem: redKeyBtn
+                Navigation.upItem: teleTransparencyBtn
 
                 onClicked: Player.teletextPage = Player.TELE_INDEX
             }
 
-            Widgets.IconControlButton{
+            TeletextColorButton {
                 id: redKeyBtn
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 enabled: teleActivateBtn.checked
 
-                iconText: VLCIcons.record
                 text: I18n.qtr("Red key")
 
                 colors: root.colors
                 color: "red"
-                colorDisabled: "grey"
-
-                T.ToolTip.visible: hovered || visualFocus
 
                 Navigation.parentItem: root
                 Navigation.leftItem: indexKeyBtn
                 Navigation.rightItem: greenKeyBtn
+                Navigation.upItem: teleTransparencyBtn
 
                 onClicked: Player.teletextPage = Player.TELE_RED
             }
 
-            Widgets.IconControlButton{
+            TeletextColorButton {
                 id: greenKeyBtn
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 enabled: teleActivateBtn.checked
 
-                iconText: VLCIcons.record
                 text: I18n.qtr("Green key")
 
                 colors: root.colors
                 color: "green"
-                colorDisabled: "grey"
-
-                T.ToolTip.visible: hovered || visualFocus
 
                 Navigation.parentItem: root
                 Navigation.leftItem: redKeyBtn
                 Navigation.rightItem: yellowKeyBtn
+                Navigation.upItem: teleTransparencyBtn
 
                 onClicked: Player.teletextPage = Player.TELE_GREEN
             }
 
-            Widgets.IconControlButton{
+            TeletextColorButton {
                 id: yellowKeyBtn
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 enabled: teleActivateBtn.checked
 
-                iconText: VLCIcons.record
                 text: I18n.qtr("Yellow key")
 
                 colors: root.colors
                 color: "yellow"
-                colorDisabled: "grey"
-
-                T.ToolTip.visible: hovered || visualFocus
 
                 Navigation.parentItem: root
                 Navigation.leftItem: greenKeyBtn
                 Navigation.rightItem: blueKeyBtn
+                Navigation.upItem: teleTransparencyBtn
 
                 onClicked: Player.teletextPage = Player.TELE_YELLOW
             }
 
-            Widgets.IconControlButton{
+            TeletextColorButton {
                 id: blueKeyBtn
+
+                anchors.verticalCenter: parent.verticalCenter
 
                 enabled: teleActivateBtn.checked
 
-                iconText: VLCIcons.record
                 text: I18n.qtr("Blue key")
 
                 colors: root.colors
                 color: "blue"
-                colorDisabled: "grey"
-
-                T.ToolTip.visible: hovered || visualFocus
 
                 Navigation.parentItem: root
                 Navigation.leftItem: yellowKeyBtn
+                Navigation.upItem: teleTransparencyBtn
 
                 onClicked: Player.teletextPage = Player.TELE_BLUE
             }
