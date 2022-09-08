@@ -408,7 +408,7 @@ bool NetworkMediaModel::initializeMediaSources()
             //ML thread
             [uri](vlc_medialibrary_t* ml, Ctx& ctx){
                 auto ret = vlc_ml_is_indexed( ml, uri.constData(), &ctx.isIndexed );
-                ctx.succeed = (ret != VLC_SUCCESS);
+                ctx.succeed = (ret == VLC_SUCCESS);
             },
             //ML thread
             [this](quint64,Ctx& ctx){
