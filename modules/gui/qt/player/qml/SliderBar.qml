@@ -65,7 +65,7 @@ Slider {
 
         visible: control.hovered
 
-        text: Player.length.scale(pos.x / control.width).toString() +
+        text: Player.length.scale(pos.x / control.width).formatHMS() +
               (Player.hasChapters ?
                    " - " + Player.chapters.getNameAtPosition(control._tooltipPosition) : "")
 

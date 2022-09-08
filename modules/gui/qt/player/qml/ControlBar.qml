@@ -152,7 +152,7 @@ Control {
         id: mediaTime
 
         visible: false
-        text: Player.time.toString()
+        text: Player.time.formatHMS()
         color: root.colors.playerFg
         font.pixelSize: VLCStyle.fontSize_normal
     }
@@ -163,8 +163,8 @@ Control {
 
         visible: false
         text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
-              ? "-" + Player.remainingTime.toString()
-              : Player.length.toString()
+              ? "-" + Player.remainingTime.formatHMS()
+              : Player.length.formatHMS()
         color: root.colors.playerFg
         font.pixelSize: VLCStyle.fontSize_normal
 

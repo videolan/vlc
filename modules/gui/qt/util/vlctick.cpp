@@ -38,7 +38,7 @@ bool VLCTick::valid() const
     return m_ticks != VLC_TICK_INVALID;
 }
 
-QString VLCTick::toString() const
+QString VLCTick::formatHMS() const
 {
     if (m_ticks == VLC_TICK_INVALID)
         return "--:--";

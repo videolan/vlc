@@ -172,7 +172,7 @@ AbstractButton {
                     if (paintOnly)
                         " -- / -- "
                     else
-                        Player.time.toString() + " / " + Player.length.toString()
+                        Player.time.formatHMS() + " / " + Player.length.formatHMS()
                 }
                 color: colors.menuCaption
             }

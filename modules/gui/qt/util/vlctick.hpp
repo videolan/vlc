@@ -38,10 +38,11 @@ public:
     Q_INVOKABLE bool valid() const;
 
     /**
-     * @brief toString
+     * @brief formatHMS
      * @return time as HH:MM:SS
      */
-    Q_INVOKABLE QString toString() const;
+    Q_INVOKABLE QString formatHMS() const;
+
     Q_INVOKABLE VLCTick scale(float) const;
 
     Q_INVOKABLE int toMinutes() const;
