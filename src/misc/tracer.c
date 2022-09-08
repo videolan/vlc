@@ -103,14 +103,14 @@ void vlc_tracer_Destroy(libvlc_int_t *vlc)
 {
     libvlc_priv_t *vlc_priv = libvlc_priv(vlc);
 
-    if (vlc_priv->tracer != NULL)
-    {
-        struct vlc_tracer_module *module =
-            container_of(vlc_priv->tracer, struct vlc_tracer_module, tracer);
+    if (vlc_priv->tracer == NULL)
+        return;
 
-        if (module->tracer.ops->destroy != NULL)
-            module->tracer.ops->destroy(module->opaque);
+    struct vlc_tracer_module *module =
+        container_of(vlc_priv->tracer, struct vlc_tracer_module, tracer);
 
-        vlc_object_delete(VLC_OBJECT(module));
-    }
+    if (module->tracer.ops->destroy != NULL)
+        module->tracer.ops->destroy(module->opaque);
+
+    vlc_object_delete(VLC_OBJECT(module));
 }
