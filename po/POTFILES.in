@@ -909,6 +909,7 @@ modules/gui/qt/util/registry.hpp
 modules/gui/qt/util/singleton.hpp
 modules/gui/qt/util/validators.cpp
 modules/gui/qt/util/validators.hpp
+modules/gui/qt/util/vlctick.cpp
 modules/gui/qt/widgets/native/animators.cpp
 modules/gui/qt/widgets/native/animators.hpp
 modules/gui/qt/widgets/native/customwidgets.cpp

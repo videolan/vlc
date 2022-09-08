@@ -43,12 +43,34 @@ public:
      */
     Q_INVOKABLE QString formatHMS() const;
 
+    /**
+     * @brief formatLong
+     * @return time in literal form
+     * 1h 2min
+     * 5 min
+     * 10 sec
+     * 43 ms
+     */
+    Q_INVOKABLE QString formatLong() const;
+
+    /**
+     * @brief formatShort
+     * @return time in literal form
+     * 1h02
+     * 02:42
+     * 43 ms
+     */
+    Q_INVOKABLE QString formatShort() const;
+
+
     Q_INVOKABLE VLCTick scale(float) const;
 
     Q_INVOKABLE int toMinutes() const;
     Q_INVOKABLE int toSeconds() const;
     Q_INVOKABLE int toHours()   const;
 
+
+    static VLCTick fromMS(int64_t ms);
 private:
     vlc_tick_t m_ticks;
 };
