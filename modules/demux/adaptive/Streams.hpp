@@ -27,7 +27,6 @@
 
 #include "plumbing/CommandsQueue.hpp"
 #include "plumbing/Demuxer.hpp"
-#include "plumbing/SourceStream.hpp"
 #include "plumbing/FakeESOut.hpp"
 
 #include "Time.hpp"
