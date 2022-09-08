@@ -81,21 +81,15 @@ CompositorX11UISurface::~CompositorX11UISurface()
     // another surface that is valid for sure.
     m_context->makeCurrent(surface);
 
-    if (m_rootItem)
-        delete m_rootItem;
-    if (m_uiRenderControl)
-        delete m_uiRenderControl;
-    if (m_uiWindow)
-        delete m_uiWindow;
-    if (m_qmlEngine)
-        delete m_qmlEngine;
+    delete m_rootItem;
+    delete m_uiRenderControl;
+    delete m_uiWindow;
+    delete m_qmlEngine;
 
     m_context->doneCurrent();
 
     delete surface;
-    if (m_context)
-        delete m_context;
-
+    delete m_context;
 }
 
 
