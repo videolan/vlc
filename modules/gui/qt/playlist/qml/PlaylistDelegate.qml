@@ -185,7 +185,7 @@ T.Control {
         Widgets.ListLabel {
             id: textDuration
 
-            text: model.duration
+            text: model.duration.toString()
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             color: colors.text

@@ -501,19 +501,9 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
         return row == d->m_current;
     case DurationRole:
     {
-        int64_t t_sec = SEC_FROM_VLC_TICK(d->m_items[row].getDuration());
-        int sec = t_sec % 60;
-        int min = (t_sec / 60) % 60;
-        int hour = t_sec / 3600;
-        if (hour == 0)
-            return QString("%1:%2")
-                    .arg(min, 2, 10, QChar('0'))
-                    .arg(sec, 2, 10, QChar('0'));
-        else
-            return QString("%1:%2:%3")
-                    .arg(hour, 2, 10, QChar('0'))
-                    .arg(min, 2, 10, QChar('0'))
-                    .arg(sec, 2, 10, QChar('0'));
+        QVariant var;
+        var.setValue(VLCTick(d->m_items[row].getDuration()));
+        return var;
     }
     case ArtistRole:
         return d->m_items[row].getArtist();
