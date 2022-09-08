@@ -814,11 +814,6 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
                 msg_Err(aout, "cannot get master volume (error 0x%lX)", hr);
 
             BOOL mute;
-
-            hr = ISimpleAudioVolume_GetMute(volume, &mute);
-            if (FAILED(hr))
-                msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
-
             if (sys->requested_mute >= 0)
             {
                 mute = sys->requested_mute ? TRUE : FALSE;
@@ -829,8 +824,11 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             }
             sys->requested_mute = -1;
 
+            hr = ISimpleAudioVolume_GetMute(volume, &mute);
             if (SUCCEEDED(hr))
                 aout_MuteReport(aout, mute != FALSE);
+            else
+                msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
         }
 
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
