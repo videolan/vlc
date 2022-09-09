@@ -30,6 +30,7 @@
 #include "libvlc_internal.h"
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_tracer.h>
 
 /*** Logging core dispatcher ***/
 
@@ -109,4 +110,27 @@ static void libvlc_log_file (void *data, int level, const libvlc_log_t *log,
 void libvlc_log_set_file (libvlc_instance_t *inst, FILE *stream)
 {
     libvlc_log_set (inst, libvlc_log_file, stream);
+}
+
+static void vlibvlc_trace (void *data, vlc_tick_t ts, va_list ap)
+{
+    libvlc_instance_t *inst = data;
+    inst->trace.cb (inst->trace.data, ts, ap);
+}
+
+void libvlc_trace_set ( libvlc_instance_t *inst, libvlc_trace_cb cb, void *data)
+{
+    libvlc_trace_unset (inst);
+    inst->trace.cb = cb;
+    inst->trace.data = data;
+
+    static const struct vlc_tracer_operations libvlc_trace_ops = {
+        vlibvlc_trace, NULL
+    };
+    vlc_TraceSet(inst->p_libvlc_int, &libvlc_trace_ops, inst);
+}
+
+void libvlc_trace_unset (libvlc_instance_t *inst )
+{
+    vlc_TraceSet(inst->p_libvlc_int, NULL, NULL);
 }
