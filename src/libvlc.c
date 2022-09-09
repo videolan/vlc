@@ -180,7 +180,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     vlc_LogInit(p_libvlc);
-    vlc_tracer_Init(p_libvlc);
+
+    if (vlc_tracer_Init(p_libvlc) != VLC_SUCCESS)
+        goto error;
 
     /*
      * Support for gettext

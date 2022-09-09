@@ -92,11 +92,12 @@ static struct vlc_tracer *vlc_TraceModuleCreate(vlc_object_t *parent)
 
 /**
  * Initializes the messages tracing system */
-void vlc_tracer_Init(libvlc_int_t *vlc)
+int vlc_tracer_Init(libvlc_int_t *vlc)
 {
     struct vlc_tracer *tracer = vlc_TraceModuleCreate(VLC_OBJECT(vlc));
     libvlc_priv_t *vlc_priv = libvlc_priv(vlc);
     vlc_priv->tracer = tracer;
+    return VLC_SUCCESS;
 }
 
 void vlc_tracer_Destroy(libvlc_int_t *vlc)
