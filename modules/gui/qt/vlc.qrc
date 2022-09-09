@@ -353,6 +353,7 @@
         <file alias="SpacerWidget.qml">player/qml/controlbarcontrols/SpacerWidget.qml</file>
         <file alias="StopButton.qml">player/qml/controlbarcontrols/StopButton.qml</file>
         <file alias="TeletextButton.qml">player/qml/controlbarcontrols/TeletextButton.qml</file>
+        <file alias="TeletextColorButton.qml">player/qml/controlbarcontrols/TeletextColorButton.qml</file>
         <file alias="TeletextWidget.qml">player/qml/controlbarcontrols/TeletextWidget.qml</file>
         <file alias="VolumeWidget.qml">player/qml/controlbarcontrols/VolumeWidget.qml</file>
         <file alias="Fallback.qml">player/qml/controlbarcontrols/Fallback.qml</file>
