@@ -107,7 +107,6 @@ static BOOL CALLBACK InitFreq(INIT_ONCE *once, void *param, void **context)
 typedef struct aout_stream_sys
 {
     IAudioClient *client;
-    vlc_timer_t timer;
 
 #define STARTED_STATE_INIT 0
 #define STARTED_STATE_OK 1
@@ -181,37 +180,27 @@ static HRESULT StartNow(aout_stream_t *s)
     return hr;
 }
 
-static void StartDeferredCallback(void *val)
+static void StartDeferredCallback(aout_stream_t *s)
 {
-    aout_stream_t *s = val;
-
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    if (unlikely(FAILED(hr)))
-    {
-        msg_Err(s, "cannot initialize COM (error 0x%lX)", hr);
-        return;
-    }
-
     StartNow(s);
-
-    CoUninitialize();
 }
 
 static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
 {
     aout_stream_sys_t *sys = s->sys;
     vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
-    vlc_tick_t start_delay = date - vlc_tick_now() - written;
+    vlc_tick_t start_date = date - written;
+    vlc_tick_t start_delay = start_date - vlc_tick_now();
 
     /* Create or update the current timer */
     if (start_delay > 0)
     {
-        vlc_timer_schedule( sys->timer, false, start_delay, 0);
+        aout_stream_TriggerTimer(s, StartDeferredCallback, start_date);
         msg_Dbg(s, "deferring start (%"PRId64" us)", start_delay);
     }
     else
     {
-        vlc_timer_disarm(sys->timer);
+        aout_stream_DisarmTimer(s);
 
         /* Check started_state again, since the timer callback could have been
          * called before or while disarming the timer */
@@ -332,7 +321,7 @@ static HRESULT Pause(aout_stream_t *s, bool paused)
 
     if (paused)
     {
-        vlc_timer_disarm(sys->timer);
+        aout_stream_DisarmTimer(s);
         if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
         {
             hr = IAudioClient_Stop(sys->client);
@@ -353,7 +342,7 @@ static HRESULT Flush(aout_stream_t *s)
     aout_stream_sys_t *sys = s->sys;
     HRESULT hr;
 
-    vlc_timer_disarm(sys->timer);
+    aout_stream_DisarmTimer(s);
     /* Reset the timer state, the next start need to be deferred. */
     if (atomic_exchange(&sys->started_state, STARTED_STATE_INIT) == STARTED_STATE_OK)
     {
@@ -611,14 +600,13 @@ static void Stop(aout_stream_t *s)
 {
     aout_stream_sys_t *sys = s->sys;
 
-    vlc_timer_disarm(sys->timer);
+    aout_stream_DisarmTimer(s);
 
     if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
         IAudioClient_Stop(sys->client);
 
     IAudioClient_Release(sys->client);
 
-    vlc_timer_destroy(sys->timer);
     free(sys);
 }
 
@@ -782,12 +770,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         return E_OUTOFMEMORY;
     sys->client = NULL;
     atomic_init(&sys->started_state, STARTED_STATE_INIT);
-    if (unlikely(vlc_timer_create( &sys->timer, StartDeferredCallback, s ) != 0))
-    {
-        msg_Err(s, "failed to create the delayed start timer");
-        free(sys);
-        return E_UNEXPECTED;
-    }
 
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE_IEC61937 wf_iec61937;
@@ -953,7 +935,6 @@ error:
     CoTaskMemFree(pwf_mix);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
-    vlc_timer_destroy(sys->timer);
     free(sys);
     return hr;
 }
