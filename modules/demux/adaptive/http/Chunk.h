@@ -25,12 +25,12 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+#include <cstdint>
+#include <string>
+
 #include "BytesRange.hpp"
 #include "ConnectionParams.hpp"
 #include "../ID.hpp"
-#include <vector>
-#include <string>
-#include <stdint.h>
 #include <vlc_cxx_helpers.hpp>
 
 typedef struct vlc_frame_t block_t;
