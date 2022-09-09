@@ -1,0 +1,30 @@
+From 7ee28d63afbfd9d87bf8976cfe8f84ca8bbe49a2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 9 Sep 2022 10:19:56 +0200
+Subject: [PATCH] Fix mingw static library name on mingw
+
+mingw builds code in a UNIX like environment but CMake doesn't set UNIX for it.
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e6fbb37..3fa3046 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -199,10 +199,10 @@ if(NOT CYGWIN)
+     set_target_properties(zlib PROPERTIES VERSION ${ZLIB_FULL_VERSION})
+ endif()
+
+-if(UNIX)
++if(UNIX OR MINGW)
+     # On unix-like platforms the library is almost always called libz
+    set_target_properties(zlib zlibstatic PROPERTIES OUTPUT_NAME z)
+-   if(NOT APPLE)
++   if(NOT APPLE AND NOT MINGW)
+      set_target_properties(zlib PROPERTIES LINK_FLAGS "-Wl,--version-script,\"${CMAKE_CURRENT_SOURCE_DIR}/zlib.map\"")
+    endif()
+ elseif(BUILD_SHARED_LIBS AND WIN32)
+--
+2.37.3.windows.1
+
