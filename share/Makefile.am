@@ -16,7 +16,7 @@ EXTRA_DIST += vlc-openbd.desktop.in vlc-opendvd.desktop.in vlc-openvcd.desktop.i
 CLEANFILES += $(desktop_DATA) $(appdata_DATA)
 
 %.desktop: %.desktop.in $(top_builddir)/config.status
-	$(AM_V_GEN)mimetypes="$$(sed 's/\s*#.*$$//g' $(srcdir)/vlc.desktop.mimetypes | egrep -v '^$$' | tr "\n" ';')"; \
+	$(AM_V_GEN)mimetypes="$$(sed 's/\s*#.*$$//g' $(srcdir)/vlc.desktop.mimetypes | $(EGREP) -v '^$$' | tr "\n" ';')"; \
 	sed \
 		-e 's,\@bindir\@,$(bindir),g' \
 		 -e "s,\@MIMETYPES\@,$$mimetypes,g" < "$<" > tmp-$@
