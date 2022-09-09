@@ -30,7 +30,7 @@ endif
 
 	$(MOVE)
 
-DEPS_gcrypt = gpg-error
+DEPS_gcrypt = gpg-error $(DEPS_gpg-error)
 
 GCRYPT_CONF = \
 	--enable-ciphers=aes,des,rfc2268,arcfour,chacha20 \

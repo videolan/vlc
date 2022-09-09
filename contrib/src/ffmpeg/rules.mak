@@ -59,7 +59,7 @@ FFMPEGCONF += \
 endif
 endif
 
-DEPS_ffmpeg = zlib gsm
+DEPS_ffmpeg = zlib $(DEPS_zlib) gsm $(DEPS_gsm)
 
 ifndef USE_LIBAV
 FFMPEGCONF += \
