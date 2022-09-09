@@ -1,6 +1,6 @@
 # GSM
 GSM_MAJVERSION := 1.0
-GSM_MINVERSION := 13
+GSM_MINVERSION := 22
 GSM_URL := http://www.quut.com/gsm/gsm-$(GSM_MAJVERSION).$(GSM_MINVERSION).tar.gz
 
 $(TARBALLS)/gsm-$(GSM_MAJVERSION)-pl$(GSM_MINVERSION).tar.gz:
@@ -23,7 +23,6 @@ gsm: gsm-$(GSM_MAJVERSION)-pl$(GSM_MINVERSION).tar.gz .sum-gsm
 	sed -i.orig 's,^.c.o:,#.c.o:,' "$(UNPACK_DIR)/Makefile"
 	sed -i.orig 's,^		$$(CC),#		$$(CC),' "$(UNPACK_DIR)/Makefile"
 	sed -i.orig 's,^		@-mv,#		@-mv,' "$(UNPACK_DIR)/Makefile"
-	$(APPLY) $(SRC)/gsm/gsm-missing-include.patch
 	$(MOVE)
 
 GSM_ENV := GSM_INSTALL_ROOT="$(PREFIX)" \
