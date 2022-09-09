@@ -23,7 +23,6 @@
 #include "Segment.h"
 #include "Inheritables.hpp"
 #include "Templates.hpp"
-#include "../tools/Properties.hpp"
 
 namespace adaptive
 {
