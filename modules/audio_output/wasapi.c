@@ -39,6 +39,8 @@
 #include <audioclient.h>
 #include "audio_output/mmdevice.h"
 
+#define TIMING_REPORT_DELAY VLC_TICK_FROM_MS(1000)
+
 /* 00000092-0000-0010-8000-00aa00389b71 */
 DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL,
             WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00,
@@ -125,21 +127,20 @@ typedef struct aout_stream_sys
 } aout_stream_sys_t;
 
 /*** VLC audio output callbacks ***/
-static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
+static void TimingReport(aout_stream_t *s)
 {
     aout_stream_sys_t *sys = s->sys;
     void *pv;
     UINT64 pos, qpcpos, clock_freq;
     HRESULT hr;
 
-    if (sys->started_state != STARTED_STATE_OK)
-        return E_FAIL;
+    assert(sys->started_state == STARTED_STATE_OK);
 
     hr = IAudioClient_GetService(sys->client, &IID_IAudioClock, &pv);
     if (FAILED(hr))
     {
         msg_Err(s, "cannot get clock (error 0x%lX)", hr);
-        return hr;
+        return;
     }
 
     IAudioClock *clock = pv;
@@ -151,18 +152,16 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     if (FAILED(hr))
     {
         msg_Err(s, "cannot get position (error 0x%lX)", hr);
-        return hr;
+        return;
     }
 
-    vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
-    vlc_tick_t tick_pos = vlc_tick_from_frac(pos, clock_freq);
+    aout_stream_TimingReport(s, VLC_TICK_FROM_MSFTIME(qpcpos),
+                             vlc_tick_from_frac(pos, clock_freq));
+
+    aout_stream_TriggerTimer(s, TimingReport,
+                             vlc_tick_now() + TIMING_REPORT_DELAY);
 
     static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
-
-    *delay = written - tick_pos
-           - VLC_TICK_FROM_MSFTIME(get_qpc() - qpcpos);
-
-    return hr;
 }
 
 static HRESULT StartNow(aout_stream_t *s)
@@ -173,7 +172,9 @@ static HRESULT StartNow(aout_stream_t *s)
 
     sys->started_state = SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR;
 
-    if (FAILED(hr))
+    if (SUCCEEDED(hr))
+        TimingReport(s);
+    else
         msg_Err(s, "stream failed to start: 0x%lX", hr);
 
     return hr;
@@ -925,7 +926,6 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     *pfmt = fmt;
     sys->written = 0;
     s->sys = sys;
-    s->time_get = TimeGet;
     s->play = Play;
     s->pause = Pause;
     s->flush = Flush;
