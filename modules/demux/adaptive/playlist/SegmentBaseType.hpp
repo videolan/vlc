@@ -30,7 +30,6 @@ namespace adaptive
     namespace playlist
     {
         class SegmentInformation;
-        class SegmentTimeline;
 
         class AbstractSegmentBaseType : public Initializable<InitSegment>,
                                         public Indexable<IndexSegment>,
