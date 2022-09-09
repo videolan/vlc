@@ -260,7 +260,6 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
 
-        qmlRegisterUncreatableType<DialogErrorModel>( uri, versionMajor, versionMinor, "DialogErrorModel", "");
         qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
         qRegisterMetaType<DialogId>();
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
