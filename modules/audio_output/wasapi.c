@@ -111,7 +111,7 @@ typedef struct aout_stream_sys
 #define STARTED_STATE_INIT 0
 #define STARTED_STATE_OK 1
 #define STARTED_STATE_ERROR 2
-    atomic_char started_state;
+    uint8_t started_state;
 
     uint8_t chans_table[AOUT_CHAN_MAX];
     uint8_t chans_to_reorder;
@@ -132,7 +132,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     UINT64 pos, qpcpos, clock_freq;
     HRESULT hr;
 
-    if (atomic_load(&sys->started_state) != STARTED_STATE_OK)
+    if (sys->started_state != STARTED_STATE_OK)
         return E_FAIL;
 
     hr = IAudioClient_GetService(sys->client, &IID_IAudioClock, &pv);
@@ -171,8 +171,7 @@ static HRESULT StartNow(aout_stream_t *s)
 
     HRESULT hr = IAudioClient_Start(sys->client);
 
-    atomic_store(&sys->started_state,
-                 SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
+    sys->started_state = SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR;
 
     if (FAILED(hr))
         msg_Err(s, "stream failed to start: 0x%lX", hr);
@@ -204,7 +203,7 @@ static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
 
         /* Check started_state again, since the timer callback could have been
          * called before or while disarming the timer */
-        if (atomic_load(&sys->started_state) == STARTED_STATE_INIT)
+        if (sys->started_state == STARTED_STATE_INIT)
             return StartNow(s);
     }
 
@@ -218,13 +217,12 @@ static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
     void *pv;
     HRESULT hr;
 
-    char started_state = atomic_load(&sys->started_state);
-    if (unlikely(started_state == STARTED_STATE_ERROR))
+    if (unlikely(sys->started_state == STARTED_STATE_ERROR))
     {
         hr = E_FAIL;
         goto out;
     }
-    else if (started_state == STARTED_STATE_INIT)
+    else if (sys->started_state == STARTED_STATE_INIT)
     {
         hr = StartDeferred(s, date);
         if (FAILED(hr))
@@ -322,7 +320,8 @@ static HRESULT Pause(aout_stream_t *s, bool paused)
     if (paused)
     {
         aout_stream_DisarmTimer(s);
-        if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
+
+        if (sys->started_state == STARTED_STATE_OK)
         {
             hr = IAudioClient_Stop(sys->client);
             if (FAILED(hr))
@@ -344,8 +343,9 @@ static HRESULT Flush(aout_stream_t *s)
 
     aout_stream_DisarmTimer(s);
     /* Reset the timer state, the next start need to be deferred. */
-    if (atomic_exchange(&sys->started_state, STARTED_STATE_INIT) == STARTED_STATE_OK)
+    if (sys->started_state == STARTED_STATE_OK)
     {
+        sys->started_state = STARTED_STATE_INIT;
         IAudioClient_Stop(sys->client);
         hr = IAudioClient_Reset(sys->client);
     }
@@ -602,7 +602,7 @@ static void Stop(aout_stream_t *s)
 
     aout_stream_DisarmTimer(s);
 
-    if (atomic_load(&sys->started_state) == STARTED_STATE_OK)
+    if (sys->started_state == STARTED_STATE_OK)
         IAudioClient_Stop(sys->client);
 
     IAudioClient_Release(sys->client);
@@ -769,7 +769,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     if (unlikely(sys == NULL))
         return E_OUTOFMEMORY;
     sys->client = NULL;
-    atomic_init(&sys->started_state, STARTED_STATE_INIT);
+    sys->started_state = STARTED_STATE_INIT;
 
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE_IEC61937 wf_iec61937;
