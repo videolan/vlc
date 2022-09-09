@@ -29,7 +29,6 @@
 #include "Representationselectors.hpp"
 
 #include "../playlist/BaseRepresentation.h"
-#include "../playlist/BasePeriod.h"
 #include "../http/Chunk.h"
 #include "../tools/Debug.hpp"
 

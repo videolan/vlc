@@ -33,7 +33,6 @@
 #include <vlc_demux.h>
 
 #include "SharedResources.hpp"
-#include "playlist/BasePeriod.h"
 #include "logic/BufferingLogic.hpp"
 #include "xml/DOMParser.h"
 

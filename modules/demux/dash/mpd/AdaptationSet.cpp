@@ -27,7 +27,6 @@
 
 #include "AdaptationSet.h"
 #include "Representation.h"
-#include "../../adaptive/playlist/BasePeriod.h"
 #include "MPD.h"
 
 using namespace dash::mpd;

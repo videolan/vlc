@@ -23,7 +23,6 @@
 
 #include "BufferingLogic.hpp"
 #include "../playlist/BaseRepresentation.h"
-#include "../playlist/BasePeriod.h"
 #include "../playlist/BasePlaylist.hpp"
 #include "../playlist/SegmentTemplate.h"
 #include "../playlist/SegmentTimeline.h"

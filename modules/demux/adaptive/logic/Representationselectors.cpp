@@ -24,9 +24,9 @@
 #include "Representationselectors.hpp"
 #include "../playlist/BaseRepresentation.h"
 #include "../playlist/BaseAdaptationSet.h"
-#include "../playlist/BasePeriod.h"
-#include <limits>
+
 #include <algorithm>
+#include <limits>
 
 using namespace adaptive::logic;
 

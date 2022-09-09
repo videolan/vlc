@@ -33,7 +33,6 @@ namespace adaptive
     {
         class SegmentInformation;
         class SegmentTemplate;
-        class BasePeriod;
         class BaseAdaptationSet;
     }
     namespace xml

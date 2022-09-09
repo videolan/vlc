@@ -24,7 +24,6 @@
 #include "../../playlist/Segment.h"
 #include "../../playlist/SegmentList.h"
 #include "../../playlist/SegmentTimeline.h"
-#include "../../playlist/BasePeriod.h"
 #include "../../playlist/BaseAdaptationSet.h"
 #include "../../playlist/BaseRepresentation.h"
 
