@@ -177,7 +177,7 @@ int input_Start( input_thread_t *p_input )
     priv->is_running = !vlc_clone( &priv->thread, func, priv,
                                    VLC_THREAD_PRIORITY_INPUT );
 
-
+#ifdef __APPLE__
     char name[128];
     vlc_thread_t *vlc_th =(vlc_thread_t*)&priv->thread;
     mach_port_t tid = pthread_mach_thread_np(vlc_th->handle);
@@ -186,6 +186,7 @@ int input_Start( input_thread_t *p_input )
 
     //sprintf(name,"vlc-player-end, %x-%x-%qx",tid,tid_np,priv->thread);
     //pthread_setname_np(name);
+#endif
 
     if( !priv->is_running )
     {
@@ -310,10 +311,15 @@ static input_thread_t *Create( vlc_object_t *p_parent,
             option_str = "";
             break;
     }
-    
+
+#ifdef __APPLE__
     mach_port_t tid = pthread_mach_thread_np(p_input);
-    
+
     msg_Dbg( p_input, "Creating an input for %s'%s' tid=%x thread=%qx", option_str, psz_name, tid, p_input);
+#else
+    msg_Dbg( p_input, "Creating an input for %s'%s'", option_str, psz_name);
+#endif
+
     free( psz_name );
 
     var_Create(p_input, "avstat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
@@ -484,12 +490,14 @@ static void *Run( void *data )
     input_thread_private_t *priv = data;
     input_thread_t *p_input = &priv->input;
 
+#ifdef __APPLE
     char name[128];
     uint64_t tid_np;
     
     pthread_threadid_np(NULL,&tid_np);
     sprintf(name,"vlc-input tid_np=%qx",tid_np);
     vlc_thread_set_name(name);
+#endif
 
     vlc_interrupt_set(&priv->interrupt);
 
