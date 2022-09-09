@@ -20,7 +20,6 @@
 #ifndef SEGMENTCHUNK_HPP
 #define SEGMENTCHUNK_HPP
 
-#include <string>
 #include "../http/Chunk.h"
 #include "../StreamFormat.hpp"
 
