@@ -22,34 +22,47 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
+Widgets.ImageToolButton {
+    id: control
 
-Widgets.IconControlButton {
-    id: abBtn
+    property VLCColors colors: VLCStyle.colors
+
+    text: I18n.qtr("A to B")
+
+    sourceSize.width: VLCStyle.icon_toolbar
+    sourceSize.height: VLCStyle.icon_toolbar
 
     checked: Player.ABloopState !== Player.ABLOOP_STATE_NONE
     onClicked: Player.toggleABloopState()
-    text: I18n.qtr("A to B")
 
-    iconText: {
+    //imageSource: "qrc:///icons/atob.svg"
+    imageSource: {
         switch(Player.ABloopState) {
-          case Player.ABLOOP_STATE_A: return VLCIcons.atob_bg_b
-          case Player.ABLOOP_STATE_B: return VLCIcons.atob_bg_none
-          case Player.ABLOOP_STATE_NONE: return VLCIcons.atob_bg_ab
+        case Player.ABLOOP_STATE_A:
+            return control._colorize(
+                control.colors.accent,
+                control.colors.text
+            )
+        case Player.ABLOOP_STATE_B:
+            return control._colorize(
+                control.colors.accent,
+                control.colors.accent
+            )
+        case Player.ABLOOP_STATE_NONE:
+        default:
+            return control._colorize(
+                control.colors.text,
+                control.colors.text
+            )
         }
     }
 
-    Widgets.IconLabel {
-        anchors.centerIn: abBtn.contentItem
-
-        font.pixelSize: abBtn.size
-        color: abBtn.colors.accent
-
-        text: {
-            switch(Player.ABloopState) {
-              case Player.ABLOOP_STATE_A: return VLCIcons.atob_fg_a
-              case Player.ABLOOP_STATE_B: return VLCIcons.atob_fg_ab
-              case Player.ABLOOP_STATE_NONE: return ""
-            }
-        }
+    function _colorize(a, b) {
+        return SVGColorImage.colorize("qrc:///icons/atob.svg")
+            .color1(control.colors.text)
+            .any({
+                "#AAAAAA": a,
+                "#BBBBBB": b,
+            }).uri()
     }
 }

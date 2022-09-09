@@ -8,6 +8,9 @@
         <file alias="vlc48-xmas.png">../../../share/icons/48x48/vlc-xmas.png</file>
         <file alias="vlc128-kb.png">../../../share/icons/128x128/vlc-kb.png</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file alias="atob.svg">pixmaps/icons/atob.svg</file>
+    </qresource>
     <qresource prefix="/menu">
         <file alias="add.svg">pixmaps/menu/add.svg</file>
         <file alias="capture-card.svg">pixmaps/menu/capture-card.svg</file>
