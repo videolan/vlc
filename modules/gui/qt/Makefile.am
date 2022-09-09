@@ -603,15 +603,6 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/icons/add.svg \
 	gui/qt/pixmaps/icons/album_cover.svg \
 	gui/qt/pixmaps/icons/aspect_ratio.svg \
-	gui/qt/pixmaps/icons/atob_bg_ab.svg \
-	gui/qt/pixmaps/icons/atob_bg_a.svg \
-	gui/qt/pixmaps/icons/atob_bg_b.svg \
-	gui/qt/pixmaps/icons/atob_bg_none.svg \
-	gui/qt/pixmaps/icons/atob_fg_ab.svg \
-	gui/qt/pixmaps/icons/atob_fg_a.svg \
-	gui/qt/pixmaps/icons/atob_fg_b.svg \
-	gui/qt/pixmaps/icons/atob_noa.svg \
-	gui/qt/pixmaps/icons/atob_nob.svg \
 	gui/qt/pixmaps/icons/atob.svg \
 	gui/qt/pixmaps/icons/audiosub.svg \
 	gui/qt/pixmaps/icons/back.svg \
