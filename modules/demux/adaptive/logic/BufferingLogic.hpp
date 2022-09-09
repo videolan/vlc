@@ -20,8 +20,8 @@
 #ifndef BUFFERINGLOGIC_HPP
 #define BUFFERINGLOGIC_HPP
 
-#include <vector>
 #include <vlc_common.h>
+
 #include "../tools/Properties.hpp"
 
 namespace adaptive
