@@ -170,8 +170,7 @@ win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
-        LIBVLC_EXTRA_BUILD_FLAGS: -z
-        UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000006
+        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 uwp64-libvlc-llvm:
     extends: .win-common
