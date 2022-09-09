@@ -49,6 +49,10 @@ struct aout_stream_owner
     void *device;
     HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **);
     HANDLE buffer_ready_event;
+    struct {
+        vlc_tick_t deadline;
+        void (*callback)(aout_stream_t *);
+    } timer;
 
     block_t *chain;
     block_t **last;
@@ -163,6 +167,34 @@ HRESULT aout_stream_owner_PlayAll(struct aout_stream_owner *owner)
 }
 
 static inline
+DWORD aout_stream_owner_ProcessTimer(struct aout_stream_owner *owner)
+{
+    if (owner->timer.deadline != VLC_TICK_INVALID)
+    {
+        vlc_tick_t now = vlc_tick_now();
+        /* Subtract 1 ms since WaitForMultipleObjects will likely sleep
+         * a little less than requested */
+        if (now >= owner->timer.deadline - VLC_TICK_FROM_MS(1))
+        {
+            assert(owner->timer.callback != NULL);
+            owner->timer.deadline = VLC_TICK_INVALID;
+            owner->timer.callback(&owner->s);
+
+            /* timer.deadline might be updated from timer.callback */
+            if (owner->timer.deadline != VLC_TICK_INVALID)
+            {
+                now = vlc_tick_now();
+                return MS_FROM_VLC_TICK(owner->timer.deadline - now);
+            }
+        }
+        else
+            return MS_FROM_VLC_TICK(owner->timer.deadline - now);
+    }
+
+    return INFINITE;
+}
+
+static inline
 void *aout_stream_owner_New(audio_output_t *aout, size_t size,
                             HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **))
 {
@@ -176,6 +208,8 @@ void *aout_stream_owner_New(audio_output_t *aout, size_t size,
     owner->chain = NULL;
     owner->last = &owner->chain;
     owner->activate = activate;
+    owner->timer.deadline = VLC_TICK_INVALID;
+    owner->timer.callback = NULL;
 
     owner->buffer_ready_event = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (unlikely(owner->buffer_ready_event == NULL))
@@ -212,4 +246,23 @@ HANDLE aout_stream_GetBufferReadyEvent(aout_stream_t *s)
     struct aout_stream_owner *owner = aout_stream_owner(s);
     return owner->buffer_ready_event;
 }
+
+static inline
+void aout_stream_TriggerTimer(aout_stream_t *s,
+                              void (*callback)(aout_stream_t *),
+                              vlc_tick_t deadline)
+{
+    struct aout_stream_owner *owner = aout_stream_owner(s);
+    owner->timer.deadline = deadline;
+    owner->timer.callback = callback;
+}
+
+static inline
+void aout_stream_DisarmTimer(aout_stream_t *s)
+{
+    struct aout_stream_owner *owner = aout_stream_owner(s);
+    owner->timer.deadline = VLC_TICK_INVALID;
+    owner->timer.callback = NULL;
+}
+
 #endif
