@@ -192,6 +192,7 @@ typedef struct libvlc_priv_t
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance
     struct vlc_thumbnailer_t *p_thumbnailer; ///< Lazily instantiated media thumbnailer
     struct vlc_tracer *tracer; ///< Tracer callbacks
+    atomic_bool tracer_enabled;
 
     /* Exit callback */
     vlc_exit_t       exit;
