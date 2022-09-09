@@ -73,6 +73,11 @@ struct libvlc_instance_t
         libvlc_dialog_cbs cbs;
         void *data;
     } dialog;
+    struct
+    {
+        libvlc_trace_cb cb;
+        void *data;
+    } trace;
 };
 
 struct libvlc_event_manager_t

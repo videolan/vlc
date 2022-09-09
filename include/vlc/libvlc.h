@@ -480,6 +480,59 @@ LIBVLC_API void libvlc_log_set_file( libvlc_instance_t *p_instance, FILE *stream
 
 /** @} */
 
+/** \defgroup libvlc_trace LibVLC tracing
+ * libvlc_trace_* functions provide access to the LibVLC tracing metrics.
+ * This is used for tracing and debugging.
+ * @{
+ */
+
+/**
+ * Callback prototype for LibVLC trace handler.
+ *
+ * \param data data pointer as given to libvlc_trace_set()
+ * \param ts timestamp representing the sampling time
+ * \param args variable argument list for the traces, NULL represent the end of the trace list
+ * \note Trace handlers <b>must</b> be thread-safe.
+ * \warning The variable arguments are only valid until the callback returns.
+ */
+typedef void (*libvlc_trace_cb)(void *data, libvlc_time_t time,
+                                va_list args);
+
+/**
+ * Unsets the tracing callback.
+ *
+ * This function deregisters the tracing callback for a LibVLC instance.
+ * This is rarely needed as the callback is implicitly unset when the instance
+ * is destroyed.
+ *
+ * \note This function will wait for any pending callbacks invocation to
+ * complete (causing a deadlock if called from within the callback).
+ *
+ * \param p_instance libvlc instance
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API void libvlc_trace_unset( libvlc_instance_t *p_instance );
+
+
+/**
+ * Sets the tracing callback for a LibVLC instance.
+ *
+ * This function is thread-safe: it will wait for any pending callbacks
+ * invocation to complete.
+ *
+ * \param cb callback function pointer
+ * \param data opaque data pointer for the callback function
+ *
+ * \warning A deadlock may occur if this function is called from the callback.
+ *
+ * \param p_instance libvlc instance
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API void libvlc_trace_set( libvlc_instance_t *p_instance,
+                                  libvlc_trace_cb cb, void *data );
+
+/** @} */
+
 /**
  * Description of a module.
  */

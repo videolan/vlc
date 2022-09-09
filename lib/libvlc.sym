@@ -239,6 +239,8 @@ libvlc_set_app_id
 libvlc_title_descriptions_release
 libvlc_toggle_fullscreen
 libvlc_track_description_list_release
+libvlc_trace_set
+libvlc_trace_unset
 libvlc_video_get_adjust_float
 libvlc_video_get_adjust_int
 libvlc_video_get_aspect_ratio
