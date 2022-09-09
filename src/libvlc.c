@@ -82,6 +82,7 @@ static void GetFilenames  ( libvlc_int_t *, unsigned, const char *const [] );
 libvlc_int_t * libvlc_InternalCreate( void )
 {
     libvlc_int_t *p_libvlc;
+
     libvlc_priv_t *priv;
 
     /* Allocate a libvlc instance object */
@@ -90,11 +91,16 @@ libvlc_int_t * libvlc_InternalCreate( void )
         return NULL;
 
     priv = libvlc_priv (p_libvlc);
+
     vlc_mutex_init(&priv->lock);
     priv->interfaces = NULL;
     priv->main_playlist = NULL;
     priv->p_vlm = NULL;
     priv->media_source_provider = NULL;
+
+    atomic_init(&priv->tracer_enabled, false);
+    priv->libvlc_tracer = NULL;
+    priv->tracer = NULL;
 
     vlc_ExitInit( &priv->exit );
 
@@ -179,7 +185,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         goto error;
 
     vlc_LogInit(p_libvlc);
-    vlc_tracer_Init(p_libvlc);
+
+    // TODO log?
+    if (vlc_tracer_Init(p_libvlc) != VLC_SUCCESS)
+        goto error;
 
     /*
      * Support for gettext

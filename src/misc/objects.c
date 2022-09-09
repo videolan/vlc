@@ -54,6 +54,9 @@
 
 #include <limits.h>
 #include <assert.h>
+#include <stdatomic.h>
+
+#include "rcu.h"
 
 #define vlc_children_foreach(pos, priv) \
     while (((void)(pos), (void)(priv), 0))
@@ -120,6 +123,15 @@ struct vlc_tracer *vlc_object_get_tracer(vlc_object_t *obj)
 {
     libvlc_int_t *vlc = vlc_object_instance(obj);
     libvlc_priv_t *vlc_priv = libvlc_priv(vlc);
+
+    vlc_rcu_read_lock();
+    bool tracer_enabled =
+        atomic_load_explicit(&vlc_priv->tracer_enabled, memory_order_acquire);
+    vlc_rcu_read_unlock();
+
+    if (!tracer_enabled)
+        return NULL;
+
     return vlc_priv->tracer;
 }
 
