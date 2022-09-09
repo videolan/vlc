@@ -61,9 +61,12 @@ void vlc_LogInit(libvlc_int_t *);
  * Tracing
  */
 typedef struct vlc_tracer vlc_tracer_t;
+struct vlc_tracer_operations;
 
 int vlc_tracer_Init(libvlc_int_t *);
 void vlc_tracer_Destroy(libvlc_int_t *);
+void vlc_TraceSet(libvlc_int_t *vlc, const struct vlc_tracer_operations *ops,
+                  void *opaque);
 
 /*
  * LibVLC exit event handling
@@ -191,6 +194,7 @@ typedef struct libvlc_priv_t
     vlc_actions_t *actions; ///< Hotkeys handler
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance
     struct vlc_thumbnailer_t *p_thumbnailer; ///< Lazily instantiated media thumbnailer
+    struct vlc_tracer *libvlc_tracer;
     struct vlc_tracer *tracer; ///< Tracer callbacks
     atomic_bool tracer_enabled;
 

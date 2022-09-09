@@ -286,6 +286,7 @@ vlc_Log
 vlc_LogSet
 vlc_vaLog
 vlc_tracer_TraceWithTs
+vlc_TraceSet
 vlc_LogHeaderCreate
 vlc_LogDestroy
 vlc_strerror

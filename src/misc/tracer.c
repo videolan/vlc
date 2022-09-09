@@ -221,6 +221,11 @@ int vlc_tracer_Init(libvlc_int_t *vlc)
         return VLC_EGENERIC;
     vlc_priv->tracer = tracerswitch;
 
+    /* Pre-allocate the libvlc tracer to avoid allocating it when enabling. */
+    vlc_priv->libvlc_tracer = malloc(sizeof *vlc_priv->libvlc_tracer);
+    if (vlc_priv->libvlc_tracer == NULL)
+        return VLC_EGENERIC;
+
     struct vlc_tracer *tracer = vlc_TraceModuleCreate(VLC_OBJECT(vlc));
     vlc_TraceSwitch(tracerswitch, tracer);
     return VLC_SUCCESS;
@@ -234,6 +239,18 @@ void vlc_tracer_Destroy(libvlc_int_t *vlc)
     if (tracer != NULL && tracer->ops->destroy != NULL)
         tracer->ops->destroy(tracer->opaque);
 
+    free(vlc_priv->libvlc_tracer);
+}
 
+void vlc_TraceSet(libvlc_int_t *vlc, const struct vlc_tracer_operations *ops,
+                  void *opaque)
+{
+    libvlc_priv_t *vlc_priv = libvlc_priv(vlc);
+    struct vlc_tracer *tracer = vlc_priv->tracer;
 
+    vlc_priv->libvlc_tracer->ops = ops;
+    vlc_priv->libvlc_tracer->opaque = opaque;
+    vlc_TraceSwitch(tracer, vlc_priv->libvlc_tracer);
+    atomic_store_explicit(&vlc_priv->tracer_enabled, ops != NULL,
+                          memory_order_release);
 }

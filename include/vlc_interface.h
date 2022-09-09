@@ -109,6 +109,24 @@ VLC_API void vlc_LogSet(libvlc_int_t *, const struct vlc_logger_operations *,
 
 /** @} */
 
+/**
+ * #ingroup tracer
+ * @{
+ */
+
+/**
+ * Atomically set the current tracer to use for tracing from this instance.
+ *
+ * @param inst the instance to modify the tracer for
+ * @param ops the operations to use the tracer with
+ * @param data the private data used by the tracer operations
+ */
+struct vlc_tracer_operations;
+VLC_API void vlc_TraceSet(libvlc_int_t *inst, const struct vlc_tracer_operations *ops,
+                          void *data);
+
+/* @} */
+
 /* Interface dialog ids for dialog providers */
 typedef enum vlc_intf_dialog {
     INTF_DIALOG_FILE_SIMPLE = 1,

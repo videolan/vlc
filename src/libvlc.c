@@ -97,6 +97,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv->media_source_provider = NULL;
 
     atomic_init(&priv->tracer_enabled, false);
+    priv->libvlc_tracer = NULL;
     priv->tracer = NULL;
 
     vlc_ExitInit( &priv->exit );
