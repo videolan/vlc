@@ -36,7 +36,7 @@ FFMPEGCONF += \
 	--disable-securetransport
 endif
 
-DEPS_ffmpeg = zlib gsm
+DEPS_ffmpeg = zlib $(DEPS_zlib) gsm $(DEPS_gsm)
 
 FFMPEGCONF += \
 	--enable-libopenjpeg

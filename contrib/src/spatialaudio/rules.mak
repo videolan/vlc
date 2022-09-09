@@ -3,7 +3,7 @@
 SPATIALAUDIO_VERSION := 0.3.0
 SPATIALAUDIO_URL = https://github.com/videolabs/libspatialaudio/releases/download/$(SPATIALAUDIO_VERSION)/spatialaudio-$(SPATIALAUDIO_VERSION).tar.bz2
 
-DEPS_spatialaudio = zlib mysofa
+DEPS_spatialaudio = zlib $(DEPS_zlib) mysofa $(DEPS_mysofa)
 
 PKGS += spatialaudio
 

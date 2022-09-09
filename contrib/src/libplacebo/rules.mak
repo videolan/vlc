@@ -9,7 +9,7 @@ PLACEBOCONF := -Dglslang=enabled \
 	-Ddemos=false \
 	-Dtests=false
 
-DEPS_libplacebo = glslang
+DEPS_libplacebo = glslang $(DEPS_glslang)
 
 ifndef HAVE_WINSTORE
 PKGS += libplacebo

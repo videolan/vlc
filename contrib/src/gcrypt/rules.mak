@@ -33,7 +33,7 @@ endif
 	$(APPLY) $(SRC)/gcrypt/0001-cipher-Makefile.am-force-tag-CC-for-.S-files.patch
 	$(MOVE)
 
-DEPS_gcrypt = gpg-error
+DEPS_gcrypt = gpg-error $(DEPS_gpg-error)
 
 GCRYPT_CONF = \
 	--enable-ciphers=aes,des,rfc2268,arcfour \

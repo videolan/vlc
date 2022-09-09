@@ -7,7 +7,7 @@ ifeq ($(call need_pkg,"libarchive >= 3.2.0"),)
 PKGS_FOUND += libarchive
 endif
 
-DEPS_libarchive = zlib
+DEPS_libarchive = zlib $(DEPS_zlib)
 
 LIBARCHIVE_CONF := $(HOSTCONF) \
 		--disable-bsdcpio --disable-bsdtar --disable-bsdcat \
