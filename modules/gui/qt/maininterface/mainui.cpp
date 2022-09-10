@@ -177,7 +177,7 @@ bool MainUI::setup(QQmlEngine* engine)
     {
         for(auto& error: m_component->errors())
             msg_Err(m_intf, "qml loading %s %s:%u", qtu(error.description()), qtu(error.url().toString()), error.line());
-#ifdef QT_STATICPLUGIN
+#ifdef QT_STATIC
             assert( !"Missing qml modules from qt contribs." );
 #else
             msg_Err( m_intf, "Install missing modules using your packaging tool" );

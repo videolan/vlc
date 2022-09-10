@@ -33,10 +33,6 @@
 
 #include <qconfig.h>
 
-#ifdef QT_STATIC
-#define QT_STATICPLUGIN
-#endif
-
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
 
