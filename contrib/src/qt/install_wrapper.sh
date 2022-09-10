@@ -24,7 +24,7 @@ fi
 pkgconfigdir="$(cd "$(dirname "${DEST}")" && pwd -P)"
 
 # Filter packages installed in a pkgconfig/ folder
-if [ "$(basename "${pkgconfigdir}")" -eq "pkgconfig" ]; then
+if [ "$(basename "${pkgconfigdir}")" = "pkgconfig" ]; then
     exit 0
 fi
 
