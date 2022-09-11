@@ -18,7 +18,6 @@ openjpeg: openjpeg-v$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
 ifdef HAVE_VISUALSTUDIO
 #	$(APPLY) $(SRC)/openjpeg/msvc.patch
 endif
-#	$(APPLY) $(SRC)/openjpeg/restrict.patch
 	$(APPLY) $(SRC)/openjpeg/install.patch
 	$(APPLY) $(SRC)/openjpeg/pic.patch
 	$(APPLY) $(SRC)/openjpeg/openjp2_pthread.patch
