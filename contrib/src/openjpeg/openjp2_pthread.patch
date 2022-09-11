@@ -1,5 +1,5 @@
---- openjpeg/src/lib/openjp2/libopenjp2.pc.cmake.in.ORIG	2017-10-04 18:23:14.000000000 -0400
-+++ openjpeg/src/lib/openjp2/libopenjp2.pc.cmake.in	2017-12-05 19:05:07.578239280 -0500
+--- openjpeg/src/lib/openjp2/libopenjp2.pc.cmake.in.ORIG        2022-09-11 18:37:05.422118714 +0200
++++ openjpeg/src/lib/openjp2/libopenjp2.pc.cmake.in     2022-09-11 18:37:24.669787836 +0200
 @@ -10,5 +10,5 @@
  URL: http://www.openjpeg.org/
  Version: @OPENJPEG_VERSION@
@@ -7,9 +7,9 @@
 -Libs.private: -lm
 +Libs.private: -lm @PTHREAD_LIBS@
  Cflags: -I${includedir}
---- openjpeg/src/lib/openjp2/CMakeLists.txt.ORIG	2017-12-05 19:24:42.152312033 -0500
-+++ openjpeg/src/lib/openjp2/CMakeLists.txt	2017-12-05 19:25:35.097306981 -0500
-@@ -188,6 +188,7 @@
+--- openjpeg/src/lib/openjp2/CMakeLists.txt.ORIG        2022-09-11 18:54:26.244430934 +0200
++++ openjpeg/src/lib/openjp2/CMakeLists.txt     2022-09-11 19:01:15.953517284 +0200
+@@ -191,6 +191,7 @@
  endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_WIN32_THREADS_INIT )
  
  if(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT )
@@ -17,18 +17,18 @@
     add_definitions( -DMUTEX_pthread)
  endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT )
  
-@@ -216,3 +216,8 @@
+@@ -219,3 +220,8 @@
          target_link_libraries(test_sparse_array ${CMAKE_THREAD_LIBS_INIT})
      endif(OPJ_USE_THREAD AND Threads_FOUND AND CMAKE_USE_PTHREADS_INIT)
- endif(BUILD_UNIT_TESTS)
+ endif(BUILD_UNIT_TESTS AND UNIX)
 +
 +if(BUILD_PKGCONFIG_FILES)
 +    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libopenjp2.pc.cmake.in
 +                   ${PROJECT_BINARY_DIR}/libopenjp2.pc @ONLY)
 +endif(BUILD_PKGCONFIG_FILES)
---- openjpeg/CMakeLists.txt.ORIG	2017-10-04 18:23:14.000000000 -0400
-+++ openjpeg/CMakeLists.txt	2017-12-05 19:43:35.573788173 -0500
-@@ -359,8 +359,6 @@
+--- openjpeg/CMakeLists.txt.ORIG        2022-09-11 18:55:05.655765381 +0200
++++ openjpeg/CMakeLists.txt     2022-09-11 18:55:30.279349621 +0200
+@@ -367,8 +367,6 @@
  endif()
  if(BUILD_PKGCONFIG_FILES)
    # install in lib and not share (see multi-arch note above)
