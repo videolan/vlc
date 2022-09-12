@@ -56,7 +56,7 @@ VULKAN_LOADER_ENV_CONF = \
 	rm -f $</build/CMakeCache.txt
 	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) \
 		$(CMAKE) -S $< $(VULKAN_LOADER_CONF)
-	+$(CMAKEBUILD) $</build
+	+$(CMAKEBUILD)
 
 ifdef HAVE_WIN32
 # CMake will generate a .pc file with -lvulkan even if the static library
@@ -65,5 +65,5 @@ ifdef HAVE_WIN32
 endif
 
 	$(call pkg_static,"build/loader/vulkan.pc")
-	+$(CMAKEBUILD) $</build --target install
+	+$(CMAKEBUILD) --target install
 	touch $@

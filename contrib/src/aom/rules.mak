@@ -79,7 +79,7 @@ endif
 	rm -rf $(PREFIX)/include/aom
 	rm -f $</build/CMakeCache.txt
 	$(HOSTVARS) $(CMAKE) -S $< $(AOM_CONF)
-	+$(CMAKEBUILD) $</build
+	+$(CMAKEBUILD)
 	$(call pkg_static,"build/aom.pc")
-	+$(CMAKEBUILD) $</build --target install
+	+$(CMAKEBUILD) --target install
 	touch $@

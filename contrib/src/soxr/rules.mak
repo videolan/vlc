@@ -43,5 +43,5 @@ SOXR_CONF := \
 .soxr: soxr toolchain.cmake
 	rm -f $</build/CMakeCache.txt
 	$(HOSTVARS_PIC) $(CMAKE) -S $< $(SOXR_CONF)
-	+$(CMAKEBUILD) $</build --target install
+	+$(CMAKEBUILD) --target install
 	touch $@

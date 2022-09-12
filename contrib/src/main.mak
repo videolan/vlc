@@ -445,7 +445,7 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 # When using a single command, make might take a shortcut and fork/exec
 # itself instead of relying on a shell, but a bug in gnulib ends up
 # trying to execute a cmake folder when one is found in the PATH
-CMAKEBUILD := env cmake --build
+CMAKEBUILD = env cmake --build $</build
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-B $</build \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
