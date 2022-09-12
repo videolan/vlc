@@ -44,6 +44,6 @@ PROJECTM_CONF := \
 
 .projectM: projectM toolchain.cmake
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS) $(CMAKE) -S $< $(PROJECTM_CONF)
+	$(HOSTVARS) $(CMAKE) $(PROJECTM_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@

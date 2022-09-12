@@ -54,8 +54,7 @@ VULKAN_LOADER_ENV_CONF = \
 
 .vulkan-loader: vulkan-loader toolchain.cmake
 	rm -f $</build/CMakeCache.txt
-	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) \
-		$(CMAKE) -S $< $(VULKAN_LOADER_CONF)
+	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) $(CMAKE) $(VULKAN_LOADER_CONF)
 	+$(CMAKEBUILD)
 
 ifdef HAVE_WIN32

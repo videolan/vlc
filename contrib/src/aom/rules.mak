@@ -78,7 +78,7 @@ endif
 .aom: aom toolchain.cmake
 	rm -rf $(PREFIX)/include/aom
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS) $(CMAKE) -S $< $(AOM_CONF)
+	$(HOSTVARS) $(CMAKE) $(AOM_CONF)
 	+$(CMAKEBUILD)
 	$(call pkg_static,"build/aom.pc")
 	+$(CMAKEBUILD) --target install

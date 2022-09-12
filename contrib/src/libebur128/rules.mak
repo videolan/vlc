@@ -22,6 +22,6 @@ LIBEBUR128_CONF := -DENABLE_INTERNAL_QUEUE_H=TRUE
 
 .libebur128: libebur128 toolchain.cmake
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS_PIC) $(CMAKE) -S $< $(LIBEBUR128_CONF)
+	$(HOSTVARS_PIC) $(CMAKE) $(LIBEBUR128_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@

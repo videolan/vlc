@@ -23,6 +23,6 @@ matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 
 .matroska: matroska toolchain.cmake
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS_PIC) $(CMAKE) -S $<
+	$(HOSTVARS_PIC) $(CMAKE)
 	+$(CMAKEBUILD) --target install
 	touch $@
