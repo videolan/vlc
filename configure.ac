@@ -2334,9 +2334,10 @@ AC_ARG_ENABLE([mpc],
   AS_HELP_STRING([--disable-mpc], [do not use libmpcdec (default auto)]))
 if test "${enable_mpc}" != "no"
 then
-    AC_CHECK_HEADERS([mpcdec/mpcdec.h], [
-    VLC_ADD_PLUGIN([mpc])
-    VLC_ADD_LIBS([mpc],[-lmpcdec])])
+    AC_CHECK_HEADERS([mpc/mpcdec.h], [
+        VLC_ADD_PLUGIN([mpc])
+        VLC_ADD_LIBS([mpc],[-lmpcdec])
+    ])
 fi
 
 dnl
