@@ -1,0 +1,53 @@
+From 617c72c7df93da5bcca2febbad066e31a411d976 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Sun, 14 Feb 2016 22:07:10 +0000
+Subject: [PATCH 6/6] adapted patch 0001-shared.patch from buildroot:
+ https://git.busybox.net/buildroot/tree/package/musepack/0001-shared.patch
+ original changelog :
+
+Fixup installation of shared mpcdec library.
+Based on gentoo patch.
+
+Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@491 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ libmpcdec/CMakeLists.txt | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/libmpcdec/CMakeLists.txt b/libmpcdec/CMakeLists.txt
+index fb18968..fa9c800 100644
+--- a/libmpcdec/CMakeLists.txt
++++ b/libmpcdec/CMakeLists.txt
+@@ -4,7 +4,6 @@ SET(mpcdec_VERSION_PATCH 1)
+ 
+ set(mpcdec_VERSION ${mpcdec_VERSION_MAJOR}.${mpcdec_VERSION_MINOR}.${mpcdec_VERSION_PATCH})
+ 
+-include_directories(${libmpc_SOURCE_DIR}/include)
+ install(FILES
+ 	${libmpc_SOURCE_DIR}/include/mpc/mpcdec.h
+ 	${libmpc_SOURCE_DIR}/include/mpc/reader.h
+@@ -12,12 +11,16 @@ install(FILES
+ 	${libmpc_SOURCE_DIR}/include/mpc/mpc_types.h
+ 	DESTINATION include/mpcdec COMPONENT headers)
+ 
++include_directories(${libmpc_SOURCE_DIR}/include)
+ if(SHARED)
+-  add_library(mpcdec SHARED huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
+-  set_target_properties(mpcdec PROPERTIES VERSION ${mpcdec_VERSION} SOVERSION ${mpcdec_VERSION_MAJOR})
+-  install(TARGETS mpcdec LIBRARY DESTINATION "lib" COMPONENT libraries)
++  add_library(mpcdec_shared SHARED huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
++  set_target_properties(mpcdec_shared PROPERTIES OUTPUT_NAME mpcdec CLEAN_DIRECT_OUTPUT 1 VERSION ${mpcdec_VERSION} SOVERSION ${mpcdec_VERSION_MAJOR})
++  install(TARGETS mpcdec_shared LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}" COMPONENT libraries)
++  target_link_libraries(mpcdec_shared m)
+ else(SHARED)
+   add_library(mpcdec_static STATIC huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
+-  install(TARGETS mpcdec_static ARCHIVE DESTINATION "lib/static" COMPONENT libraries)
++  set_target_properties(mpcdec_static PROPERTIES OUTPUT_NAME mpcdec CLEAN_DIRECT_OUTPUT 1)
++  install(TARGETS mpcdec_static LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}" COMPONENT libraries)
++  target_link_libraries(mpcdec_static m)
+ endif(SHARED)
+ 
+-- 
+2.37.3.windows.1
+

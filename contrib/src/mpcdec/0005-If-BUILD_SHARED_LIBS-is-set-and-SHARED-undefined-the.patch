@@ -1,0 +1,41 @@
+From bab8308ca1ae6b96f4e1c2929608e02971d24009 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Sun, 5 Oct 2014 18:31:05 +0000
+Subject: [PATCH 5/6] If BUILD_SHARED_LIBS is set and SHARED undefined, then
+ drive SHARED with the BUILD_SHARED_LIBS value. patch by Samuel Martin
+ <s.martin49@gmail.com>
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@485 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ CMakeLists.txt | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e958296..50666fe 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -7,11 +7,16 @@ project(libmpc C)
+ set(CMAKE_VERBOSE_MAKEFILE false)
+ TEST_BIG_ENDIAN(MPC_ENDIANNESS)
+ 
+-if(WIN32)
+-  option(SHARED "Use shared libmpcdec" OFF)
+-else(WIN32)
+-  option(SHARED "Use shared libmpcdec" ON)
+-endif(WIN32)
++# Use the standard CMake flag to drive the shared object build.
++if(DEFINED BUILD_SHARED_LIBS AND NOT DEFINED SHARED)
++  set(SHARED ${BUILD_SHARED_LIBS})
++else()
++  if(WIN32)
++    option(SHARED "Use shared libmpcdec" OFF)
++  else(WIN32)
++    option(SHARED "Use shared libmpcdec" ON)
++  endif(WIN32)
++endif()
+ 
+ add_definitions(-DFAST_MATH -DCVD_FASTLOG)
+ 
+-- 
+2.37.3.windows.1
+

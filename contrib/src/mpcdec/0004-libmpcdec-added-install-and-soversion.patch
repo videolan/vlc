@@ -1,0 +1,72 @@
+From 1db3ae6dd941c1f68e0d447bb70a18679fccea2f Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Mon, 21 Oct 2013 20:34:18 +0000
+Subject: [PATCH 4/6] libmpcdec : added install and soversion
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@482 c51c8d5e-032a-db11-a0f2-0002b3467eef
+
+---
+ CMakeLists.txt           |  1 -
+ include/CMakeLists.txt   |  1 -
+ libmpcdec/CMakeLists.txt | 16 ++++++++++++++++
+ libmpcdec/Makefile.am    |  1 +
+ 4 files changed, 17 insertions(+), 2 deletions(-)
+ delete mode 100644 include/CMakeLists.txt
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 06d4363..e958296 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -23,4 +23,3 @@ add_subdirectory(libmpcdec)
+ add_subdirectory(libmpcpsy)
+ add_subdirectory(libmpcenc)
+ add_subdirectory(libwavformat)
+-add_subdirectory(include)
+diff --git a/include/CMakeLists.txt b/include/CMakeLists.txt
+deleted file mode 100644
+index 074461d..0000000
+--- a/include/CMakeLists.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-INSTALL(DIRECTORY mpc DESTINATION include)
+diff --git a/libmpcdec/CMakeLists.txt b/libmpcdec/CMakeLists.txt
+index 0bc5b62..fb18968 100644
+--- a/libmpcdec/CMakeLists.txt
++++ b/libmpcdec/CMakeLists.txt
+@@ -1,7 +1,23 @@
++SET(mpcdec_VERSION_MAJOR 7)
++SET(mpcdec_VERSION_MINOR 0)
++SET(mpcdec_VERSION_PATCH 1)
++
++set(mpcdec_VERSION ${mpcdec_VERSION_MAJOR}.${mpcdec_VERSION_MINOR}.${mpcdec_VERSION_PATCH})
++
+ include_directories(${libmpc_SOURCE_DIR}/include)
++install(FILES
++	${libmpc_SOURCE_DIR}/include/mpc/mpcdec.h
++	${libmpc_SOURCE_DIR}/include/mpc/reader.h
++	${libmpc_SOURCE_DIR}/include/mpc/streaminfo.h
++	${libmpc_SOURCE_DIR}/include/mpc/mpc_types.h
++	DESTINATION include/mpc COMPONENT headers)
++
+ if(SHARED)
+   add_library(mpcdec SHARED huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
++  set_target_properties(mpcdec PROPERTIES VERSION ${mpcdec_VERSION} SOVERSION ${mpcdec_VERSION_MAJOR})
++  install(TARGETS mpcdec LIBRARY DESTINATION "lib" COMPONENT libraries)
+ else(SHARED)
+   add_library(mpcdec_static STATIC huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
++  install(TARGETS mpcdec_static ARCHIVE DESTINATION "lib/static" COMPONENT libraries)
+ endif(SHARED)
+ 
+diff --git a/libmpcdec/Makefile.am b/libmpcdec/Makefile.am
+index 48f3835..048217a 100644
+--- a/libmpcdec/Makefile.am
++++ b/libmpcdec/Makefile.am
+@@ -16,4 +16,5 @@ libmpcdec_la_SOURCES = huffman.c mpc_decoder.c mpc_reader.c \
+ 	mpc_bits_reader.h huffman.h decoder.h internal.h requant.h mpcdec_math.h \
+ 	$(common_sources)
+ 
++# version info shoud match the one in CMakeLists.txt
+ libmpcdec_la_LDFLAGS = -no-undefined -version-info 7:0:1
+-- 
+2.37.3.windows.1
+
