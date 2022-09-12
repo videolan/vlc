@@ -40,7 +40,7 @@ X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
 .x265: x265 toolchain.cmake
 	$(REQUIRE_GPL)
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS_PIC) $(CMAKE) -B $</build -S $</source $(X265_CONF)
+	$(HOSTVARS_PIC) $(CMAKE) -S $</source $(X265_CONF)
 	+$(CMAKEBUILD) $</build --target install
 	sed -e s/'[^ ]*clang_rt[^ ]*'//g -i.orig "$(PREFIX)/lib/pkgconfig/x265.pc"
 	touch $@

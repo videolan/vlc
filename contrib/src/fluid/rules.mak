@@ -43,6 +43,6 @@ FLUIDCONF := \
 
 .fluid: fluidsynth toolchain.cmake
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS) $(CMAKE) -B $</build -S $< $(FLUIDCONF)
+	$(HOSTVARS) $(CMAKE) -S $< $(FLUIDCONF)
 	+$(CMAKEBUILD) $</build --target install
 	touch $@

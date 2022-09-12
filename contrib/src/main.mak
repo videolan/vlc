@@ -447,6 +447,7 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 # trying to execute a cmake folder when one is found in the PATH
 CMAKEBUILD := env cmake --build
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
+		-B $</build \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF \
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib
