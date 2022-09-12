@@ -43,7 +43,7 @@ PROJECTM_CONF := \
 		-DBUILD_PROJECTM_STATIC:BOOL=ON
 
 .projectM: projectM toolchain.cmake
-	rm -f $</CMakeCache.txt
-	cd $< && $(HOSTVARS) $(CMAKE) $(PROJECTM_CONF)
-	+$(CMAKEBUILD) $< --target install
+	rm -f $</build/CMakeCache.txt
+	$(HOSTVARS) $(CMAKE) -B $</build -S $< $(PROJECTM_CONF)
+	+$(CMAKEBUILD) $</build --target install
 	touch $@

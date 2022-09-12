@@ -53,9 +53,9 @@ VULKAN_LOADER_ENV_CONF = \
 	VULKAN_HEADERS_INSTALL_DIR="$(PREFIX)"
 
 .vulkan-loader: vulkan-loader toolchain.cmake
-	cd $< && rm -rf ./build && mkdir -p build
-	cd $</build && $(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) \
-		$(CMAKE) $(VULKAN_LOADER_CONF) ..
+	rm -f $</build/CMakeCache.txt
+	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) \
+		$(CMAKE) -B $</build -S $< $(VULKAN_LOADER_CONF)
 	+$(CMAKEBUILD) $</build
 
 ifdef HAVE_WIN32

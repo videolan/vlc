@@ -32,7 +32,7 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
 
 .srt: srt toolchain.cmake
-	rm -f $</CMakeCache.txt
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) $(SRT_CONF)
-	+$(CMAKEBUILD) $< --target install
+	rm -f $</build/CMakeCache.txt
+	$(HOSTVARS_PIC) $(CMAKE) -B $</build -S $< $(SRT_CONF)
+	+$(CMAKEBUILD) $</build --target install
 	touch $@
