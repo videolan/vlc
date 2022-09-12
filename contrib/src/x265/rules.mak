@@ -39,6 +39,6 @@ X265_CONF := -DENABLE_SHARED=OFF -DCMAKE_SYSTEM_PROCESSOR=$(ARCH) -DENABLE_CLI=O
 	$(REQUIRE_GPL)
 	rm -f $</build/CMakeCache.txt
 	$(HOSTVARS_PIC) $(CMAKE) -S $</source $(X265_CONF)
-	+$(CMAKEBUILD) $</build --target install
+	+$(CMAKEBUILD) --target install
 	sed -e s/'[^ ]*clang_rt[^ ]*'//g -i.orig "$(PREFIX)/lib/pkgconfig/x265.pc"
 	touch $@

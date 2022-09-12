@@ -19,5 +19,5 @@ glew: glew-$(GLEW_VERSION).tgz .sum-glew
 .glew: glew toolchain.cmake
 	rm -f $</build/CMakeCache.txt
 	$(HOSTVARS_PIC) $(CMAKE) -S $</build/cmake
-	+$(CMAKEBUILD) $</build --target install
+	+$(CMAKEBUILD) --target install
 	touch $@
