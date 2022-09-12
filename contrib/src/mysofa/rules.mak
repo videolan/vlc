@@ -27,7 +27,7 @@ MYSOFA_CONF := -DBUILD_TESTS=OFF
 
 .mysofa: mysofa toolchain.cmake
 	rm -f $</build/CMakeCache.txt
-	$(HOSTVARS) $(CMAKE) -S $< $(MYSOFA_CONF)
+	$(HOSTVARS) $(CMAKE) $(MYSOFA_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@
 
