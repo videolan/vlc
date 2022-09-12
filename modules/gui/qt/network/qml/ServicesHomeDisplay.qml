@@ -353,8 +353,9 @@ Widgets.PageLoader {
                             width: VLCStyle.icon_large
                             height: VLCStyle.icon_large
                             fillMode: Image.PreserveAspectFit
-                            source:  model.artwork || "qrc:///sd/directory.svg"
-                            visible: !is_dummy
+                            source:  model.artwork ? model.artwork
+                                : SVGColorImage.colorize("qrc:///sd/directory.svg")
+                                               .color1(VLCStyle.colors.text).uri()
                         }
 
 

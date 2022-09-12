@@ -32,30 +32,12 @@ Widgets.ListItem {
 
     focus: true
 
-    cover: Image {
+    cover: NetworkCustomCover {
         id: cover_obj
+        networkModel: model
         fillMode: Image.PreserveAspectFit
-        source: {
-            if (model.artwork && model.artwork.toString() !== "") {
-                return model.artwork
-            }
-
-            switch (model.type) {
-            case NetworkMediaModel.TYPE_DISC:
-                return  "qrc:///sd/disc.svg"
-            case NetworkMediaModel.TYPE_CARD:
-                return  "qrc:///sd/capture-card.svg"
-            case NetworkMediaModel.TYPE_STREAM:
-                return  "qrc:///sd/stream.svg"
-            case NetworkMediaModel.TYPE_PLAYLIST:
-                return  "qrc:///sd/playlist.svg"
-            case NetworkMediaModel.TYPE_FILE:
-                return  "qrc:///sd/file.svg"
-            default:
-                return "qrc:///sd/directory.svg"
-            }
-        }
     }
+
     line1: model.name || I18n.qtr("Unknown share")
     line2: model.mrl
     imageText: (model.type !== NetworkMediaModel.TYPE_DIRECTORY && model.type !== NetworkMediaModel.TYPE_NODE) ? model.protocol : ""

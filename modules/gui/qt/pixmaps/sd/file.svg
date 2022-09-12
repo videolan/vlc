@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
- <g>
-  <path transform="translate(-384 -1004.4)" d="m402.58 1039.9 11.967-7.364-11.967-7.364z" fill="none" stroke="#000" stroke-width="2.4546"/>
-  <path transform="translate(-384 -1004.4)" d="M396 1008.362c-2.2 0-3.98 1.8-3.98 4l-.02 32c0 2.2 1.78 4 3.98 4H420c2.2 0 4-1.8 4-4v-24l-12-12zm-1 3h17v9h9v25h-26z" stroke-width="2"/>
- </g>
+<svg version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+ <path d="m12 3.962c-2.2 0-3.98 1.8-3.98 4l-0.02 32c0 2.2 1.78 4 3.98 4h24.02c2.2 0 4-1.8 4-4v-24l-12-12zm-1 3h17v9h9v25h-26zm6.3535 11.614v19.119l1.8691-1.1504 13.666-8.4082zm2.4531 4.3906 8.3984 5.1699-8.3984 5.168z" fill="#FF00FF"/>
 </svg>

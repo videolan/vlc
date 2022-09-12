@@ -107,7 +107,6 @@ FocusScope {
 
             NetworkCustomCover {
                 networkModel: model
-                iconSize: networkDragItem.coverSize / 2
                 width: networkDragItem.coverSize / 2
                 height: networkDragItem.coverSize / 2
             }

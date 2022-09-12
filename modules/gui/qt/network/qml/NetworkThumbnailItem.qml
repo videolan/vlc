@@ -44,75 +44,29 @@ Item {
 
     readonly property bool _showCustomCover: (!artworkSource) || (artwork.status != Image.Ready)
 
-    readonly property var _shadowRects: [
-        {
-            "x": background.x,
-            "y": background.y,
-            "width": background.width,
-            "height": background.height
-        },
-        {
-            "x": artwork.x,
-            "y": artwork.y,
-            "width": artwork.paintedWidth,
-            "height": artwork.paintedHeight
-        }
-    ]
-
-    readonly property var _shadowRect: _shadowRects[_showCustomCover ? 0 : 1]
-
     signal playClicked(int index)
 
     Widgets.ListCoverShadow {
-        x: _shadowRect.x
-        y: _shadowRect.y
-        width: _shadowRect.width
-        height: _shadowRect.height
+        x: artwork.x
+        y: artwork.y
+        width: artwork.width
+        height: artwork.height
     }
 
-    Rectangle {
-        id: background
-
-        anchors.verticalCenter: parent.verticalCenter
-        color: VLCStyle.colors.bg
-        width: VLCStyle.listAlbumCover_width
-        height: VLCStyle.listAlbumCover_height
-        radius: VLCStyle.listAlbumCover_radius
-        visible: item._showCustomCover
-
-        NetworkCustomCover {
-            networkModel: rowModel
-            anchors.fill: parent
-            iconSize: VLCStyle.icon_small
-        }
-
-        Widgets.PlayCover {
-            anchors.centerIn: parent
-
-            width: VLCStyle.play_cover_small
-
-            visible: item._showPlayCover
-
-            onClicked: playClicked(item.index)
-        }
-    }
-
-    Widgets.ScaledImage {
+    NetworkCustomCover {
         id: artwork
 
-        x: Math.round((width - paintedWidth) / 2)
-        y: Math.round((parent.height - paintedHeight) / 2)
+        anchors.verticalCenter: parent.verticalCenter
+        bgColor: VLCStyle.colors.bg
         width: VLCStyle.listAlbumCover_width
         height: VLCStyle.listAlbumCover_height
-        fillMode: Image.PreserveAspectFit
-        horizontalAlignment: Image.AlignLeft
-        verticalAlignment: Image.AlignTop
-        source: item.artworkSource
-        visible: !item._showCustomCover
+
+        networkModel: rowModel
+        //radius: VLCStyle.listAlbumCover_radius
 
         Widgets.PlayCover {
-            x: Math.round((artwork.paintedWidth - width) / 2)
-            y: Math.round((artwork.paintedHeight - height) / 2)
+            x: Math.round((artwork.width - width) / 2)
+            y: Math.round((artwork.height - height) / 2)
 
             width: VLCStyle.play_cover_small
 

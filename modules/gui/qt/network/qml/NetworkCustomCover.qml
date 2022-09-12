@@ -24,45 +24,41 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Item {
+Widgets.ScaledImage {
+    id: custom_cover
+
     property var networkModel
-    property alias iconSize: custom_cover.width
+    property var bgColor: undefined
 
-    Widgets.ScaledImage {
-        id: custom_cover
+    sourceSize: Qt.size(width, height)
+    source: {
+        if (!!networkModel.artwork && networkModel.artwork.length > 0)
+            return networkModel.artwork
 
-        anchors.centerIn: parent
-        height: iconSize
-        sourceSize: Qt.size(width, height)
-        source: {
-            if (!networkModel)
-                return ""
+        var img = SVGColorImage.colorize(_baseUri(networkModel.type))
+            .color1(VLCStyle.colors.text)
+            .accent(VLCStyle.colors.accent)
 
-            switch (networkModel.type) {
-            case NetworkMediaModel.TYPE_DISC:
-                return "qrc:///sd/disc.svg"
-            case NetworkMediaModel.TYPE_CARD:
-                return "qrc:///sd/capture-card.svg"
-            case NetworkMediaModel.TYPE_STREAM:
-                return "qrc:///sd/stream.svg"
-            case NetworkMediaModel.TYPE_PLAYLIST:
-                return "qrc:///sd/playlist.svg"
-            case NetworkMediaModel.TYPE_FILE:
-                return "qrc:///sd/file.svg"
-            default:
-                return "qrc:///sd/directory.svg"
-            }
-        }
+        if (bgColor !== undefined)
+            img.background(bgColor)
+
+        return img.uri()
     }
 
-    ColorOverlay {
-        anchors.fill: custom_cover
-        source: custom_cover
-        color: VLCStyle.colors.text
-        visible: custom_cover.visible
-                 && !!networkModel
-                 && networkModel.type !== NetworkMediaModel.TYPE_DISC
-                 && networkModel.type !== NetworkMediaModel.TYPE_CARD
-                 && networkModel.type !== NetworkMediaModel.TYPE_STREAM
+    function _baseUri(type) {
+        switch (type) {
+        case NetworkMediaModel.TYPE_DISC:
+            return "qrc:///sd/disc.svg"
+        case NetworkMediaModel.TYPE_CARD:
+            return "qrc:///sd/capture-card.svg"
+        case NetworkMediaModel.TYPE_STREAM:
+            return "qrc:///sd/stream.svg"
+        case NetworkMediaModel.TYPE_PLAYLIST:
+            return "qrc:///sd/playlist.svg"
+        case NetworkMediaModel.TYPE_FILE:
+            return "qrc:///sd/file.svg"
+        default:
+            return "qrc:///sd/directory.svg"
+        }
     }
 }
