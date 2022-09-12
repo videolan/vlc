@@ -19,7 +19,6 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
 import QtQuick.Layouts 1.11
-import QtQuick.Shapes 1.0
 
 import org.videolan.vlc 0.1
 
@@ -325,7 +324,28 @@ Widgets.PageLoader {
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
                 playCoverBorderWidth: VLCStyle.gridCover_network_border
                 playCoverShowPlay: false
-                pictureOverlay: overlay
+                image: {
+                    if (is_dummy) {
+                        return SVGColorImage.colorize("qrc:///placeholder/add_service.svg")
+                            .color1(VLCStyle.colors.text)
+                            .accent(VLCStyle.colors.accent)
+                            .uri()
+                    } else if (model.artwork && model.artwork.toString() !== "") {
+                        //if the source is a qrc artwork, we should colorize it
+                        if (model.artwork.toString().match(/qrc:\/\/.*svg/))
+                        {
+                            return SVGColorImage.colorize(model.artwork)
+                                .color1(VLCStyle.colors.text)
+                                .accent(VLCStyle.colors.accent)
+                                .uri()
+                        }
+                        return model.artwork
+                    } else {
+                        return SVGColorImage.colorize("qrc:///sd/directory.svg")
+                                   .color1(VLCStyle.colors.text)
+                                   .uri()
+                    }
+                }
 
                 onItemDoubleClicked: {
                     if (is_dummy)
@@ -342,62 +362,6 @@ Widgets.PageLoader {
                     gridView.currentIndex = index
                     gridView.forceActiveFocus()
                 }
-
-                Component {
-                    id: overlay
-
-                    Item {
-                        Image {
-                            x: (pictureWidth - paintedWidth) / 2
-                            y: (pictureHeight - paintedWidth) / 2
-                            width: VLCStyle.icon_large
-                            height: VLCStyle.icon_large
-                            fillMode: Image.PreserveAspectFit
-                            source:  model.artwork ? model.artwork
-                                : SVGColorImage.colorize("qrc:///sd/directory.svg")
-                                               .color1(VLCStyle.colors.text).uri()
-                        }
-
-
-                        Loader {
-                            anchors.fill: parent
-                            active: is_dummy
-                            visible: is_dummy
-                            sourceComponent: Item {
-                                Shape {
-                                    id: shape
-
-                                    x: 1
-                                    y: 1
-                                    width: parent.width - 2
-                                    height: parent.height - 2
-
-                                    ShapePath {
-                                        strokeColor: VLCStyle.colors.setColorAlpha(VLCStyle.colors.text, .62)
-                                        strokeWidth: VLCStyle.dp(1, VLCStyle.scale)
-                                        dashPattern: [VLCStyle.dp(2, VLCStyle.scale), VLCStyle.dp(4, VLCStyle.scale)]
-                                        strokeStyle: ShapePath.DashLine
-                                        fillColor: VLCStyle.colors.setColorAlpha(VLCStyle.colors.bg, .62)
-                                        startX: 1
-                                        startY: 1
-                                        PathLine { x: shape.width ; y: 1 }
-                                        PathLine { x: shape.width ; y: shape.height }
-                                        PathLine { x: 1; y: shape.height }
-                                        PathLine { x: 1; y: 1 }
-                                    }
-                                }
-
-                                Widgets.IconLabel {
-                                    text: VLCIcons.add
-                                    font.pixelSize: VLCStyle.icon_large
-                                    anchors.centerIn: parent
-                                    color: VLCStyle.colors.accent
-                                }
-                            }
-                        }
-                    }
-                }
-
             }
 
             onActionAtIndex: {

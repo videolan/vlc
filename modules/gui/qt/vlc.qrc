@@ -96,6 +96,7 @@
         <file alias="katsomo.svg">pixmaps/sd/katsomo.svg</file>
     </qresource>
     <qresource prefix="/placeholder">
+        <file alias="add_service.svg">pixmaps/placeholder/add_service.svg</file>
         <file alias="noart.png">pixmaps/placeholder/noart.png</file>
         <file alias="noart_album.svg">pixmaps/placeholder/noart_album.svg</file>
         <file alias="noart_albumCover.svg">pixmaps/placeholder/noart_albumCover.svg</file>

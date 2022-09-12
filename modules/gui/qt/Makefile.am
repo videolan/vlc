@@ -731,6 +731,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/misc/wait2.svg \
 	gui/qt/pixmaps/misc/wait3.svg \
 	gui/qt/pixmaps/misc/wait4.svg \
+	gui/qt/pixmaps/placeholder/add_service.svg \
 	gui/qt/pixmaps/placeholder/noart.png \
 	gui/qt/pixmaps/placeholder/noart_album.svg \
 	gui/qt/pixmaps/placeholder/noart_albumCover.svg \
