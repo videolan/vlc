@@ -11,12 +11,16 @@
      qtConfig(debug_and_release): CONFIG += debug_and_release
 --- a/mkspecs/features/qt_plugin.prf	2020-09-02 12:15:07.000000000 +0200
 +++ b/mkspecs/features/qt_plugin.prf	2022-08-31 10:59:48.380662936 +0200
-@@ -14,8 +14,8 @@
+@@ -14,8 +14,12 @@
  isEmpty(PLUGIN_TYPE): error("PLUGIN_TYPE (plugins/ subdirectory) needs to be defined.")
 
  TEMPLATE = lib
 -CONFIG += plugin
 +CONFIG += plugin create_pc
++pluginpclib_replace.match = $$MODULE_BASE_OUTDIR/lib
++pluginpclib_replace.replace = $$[QT_INSTALL_LIBS]
++pluginpclib_replace.CONFIG = path
++QMAKE_PKGCONFIG_INSTALL_REPLACE += pluginpclib_replace
  DESTDIR = $$MODULE_BASE_OUTDIR/plugins/$$PLUGIN_TYPE
 
  win32:CONFIG(shared, static|shared) {
@@ -47,3 +51,28 @@
      CONFIG += skip_target_version_ext
  }
  
+--- a/qmake/generators/makefile.cpp	2020-09-02 12:15:07.000000000 +0200
++++ b/qmake/generators/makefile.cpp	2022-09-12 11:42:01.170411450 +0200
+@@ -3431,11 +3431,18 @@
+                                                + "," + windowsifyPath(replace.toQString()) + ",gi");
+             }
+         }
+-        if (sedargs.isEmpty()) {
+-            ret += "$(INSTALL_FILE) " + escapeFilePath(src) + ' ' + escapeFilePath(dst);
+-        } else {
+-            ret += "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > " + escapeFilePath(dst);
++
++        QString escaped_src = escapeFilePath(src);
++        if (!sedargs.isEmpty()) {
++            int pos = src.lastIndexOf('.');
++            QString filename = src.left(pos - 1);
++            QString ext = src.mid(pos + 1);
++            escaped_src = escapeFilePath(filename + ".qmakereplace." + ext);
++            ret += "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > "
++                   + escaped_src + " && ";
+         }
++
++        ret += "$(INSTALL_FILE) " + escaped_src + ' ' + escapeFilePath(dst);
+     }
+     return ret;
+ }
