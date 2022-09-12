@@ -235,7 +235,9 @@ FocusScope{
 
                 sourceSize.width: VLCStyle.icon_normal
                 sourceSize.height: VLCStyle.icon_normal
-                source: "qrc:///misc/cone.svg"
+                source: SVGColorImage.colorize("qrc:///misc/cone.svg")
+                            .accent(root.colors.accent)
+                            .uri()
                 enabled: false
             }
         }
