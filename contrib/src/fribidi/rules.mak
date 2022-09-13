@@ -20,5 +20,5 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.xz .sum-fribidi
 .fribidi: fribidi crossfile.meson
 	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) -Ddocs=false -Dbin=false -Dtests=false $</build $<
-	cd $< && cd build && ninja install
+	meson install -C $</build
 	touch $@

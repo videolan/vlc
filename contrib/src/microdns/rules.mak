@@ -24,5 +24,5 @@ microdns: microdns-$(LIBMICRODNS_VERSION).tar.xz .sum-microdns
 .microdns: microdns crossfile.meson
 	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled $</build $<
-	cd $< && cd build && ninja install
+	meson install -C $</build
 	touch $@
