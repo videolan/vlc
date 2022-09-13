@@ -1422,7 +1422,7 @@ static void ModuleThread_QueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
         p_spu->i_start < p_owner->i_preroll_end &&
         ( p_spu->i_stop == VLC_TICK_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
     {
-        vlc_fifo_Lock(p_owner->p_fifo);
+        vlc_fifo_Unlock(p_owner->p_fifo);
         subpicture_Delete( p_spu );
     }
     else
