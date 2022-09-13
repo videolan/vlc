@@ -20,12 +20,13 @@ freetype: freetype-$(FREETYPE2_VERSION).tar.xz .sum-freetype2
 
 DEPS_freetype2 = zlib $(DEPS_zlib)
 
-.freetype2: freetype
+FREETYPE_CONF = -DFT_DISABLE_ZLIB=OFF -DFT_DISABLE_PNG=ON -DFT_DISABLE_BZIP2=NO -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=ON
+
+.freetype2: freetype toolchain.cmake
 ifndef AD_CLAUSES
 	$(REQUIRE_GPL)
 endif
-	cd $< && cp builds/unix/install-sh .
-	sed -i.orig s/-ansi// $</builds/unix/configure
-	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure --with-harfbuzz=no --with-zlib=yes --without-png --with-bzip2=no $(HOSTCONF)
-	cd $< && $(MAKE) && $(MAKE) install
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) $(FREETYPE_CONF)
+	+$(CMAKEBUILD) --target install
 	touch $@
