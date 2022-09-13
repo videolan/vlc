@@ -464,8 +464,8 @@ ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
 
-MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
-	-Dlibdir=lib
+MESONFLAGS = $</build $< --default-library static --prefix "$(PREFIX)" \
+	--backend ninja -Dlibdir=lib
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else

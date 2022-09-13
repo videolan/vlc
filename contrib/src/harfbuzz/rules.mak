@@ -31,6 +31,6 @@ endif
 
 .harfbuzz: harfbuzz crossfile.meson
 	rm -rf $</build
-	$(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF) $</build $<
+	$(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF)
 	$(MESONBUILD)
 	touch $@
