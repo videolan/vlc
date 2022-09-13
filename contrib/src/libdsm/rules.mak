@@ -29,5 +29,5 @@ endif
 .libdsm: libdsm crossfile.meson
 	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false $</build $<
-	cd $< && cd build && ninja install
+	meson install -C $</build
 	touch $@

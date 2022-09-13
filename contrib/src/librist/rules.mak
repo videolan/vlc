@@ -35,5 +35,5 @@ librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 .librist: librist crossfile.meson
 	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) $(LIBRIST_CONF) $</build $<
-	cd $< && cd build && ninja install
+	meson install -C $</build
 	touch $@
