@@ -33,6 +33,7 @@ Core:
 Audio output:
  * ALSA: HDMI passthrough support.
    Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
+ * Remove the DirectSound plugin (API obsolete after Windows 7)
 
 Demuxer:
  * Support for HEIF image and grid image formats
