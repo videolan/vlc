@@ -159,10 +159,9 @@ values2key( const char* const* ppsz_values, bool b_search )
         vlc_memstream_printf( &ms, "*" );
 
     /* Realm and authtype section */
-    if ( ppsz_values[KEY_REALM] || ppsz_values[KEY_AUTHTYPE] || b_search )
+    if ( ppsz_values[KEY_REALM] || ppsz_values[KEY_AUTHTYPE] )
     {
-        vlc_memstream_printf( &ms, "?" );
-
+        vlc_memstream_printf( &ms, "\?" );
         /* Realm section */
         if ( ppsz_values[KEY_REALM] || b_search )
         {
@@ -198,6 +197,8 @@ values2key( const char* const* ppsz_values, bool b_search )
         }
 
     }
+    else if ( b_search )
+        vlc_memstream_printf( &ms, "*" );
 
     b_state = true;
 
