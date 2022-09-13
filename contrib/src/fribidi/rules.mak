@@ -19,6 +19,6 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.xz .sum-fribidi
 # FIXME: DEPS_fribidi = iconv $(DEPS_iconv)
 .fribidi: fribidi crossfile.meson
 	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS_MESON) $(MESON) -Ddocs=false -Dbin=false -Dtests=false build
+	$(HOSTVARS_MESON) $(MESON) -Ddocs=false -Dbin=false -Dtests=false $</build $<
 	cd $< && cd build && ninja install
 	touch $@
