@@ -30,4 +30,4 @@ fi
 
 sed -i.orig "s,libdir=.*,libdir=${pkgconfigdir}," "${DEST}"
 mkdir -p "${VLC_PREFIX}/lib/pkgconfig"
-ln -sf "${DEST}" "${VLC_PREFIX}/lib/pkgconfig/"
+cp "${DEST}" "${VLC_PREFIX}/lib/pkgconfig/"
