@@ -172,10 +172,6 @@ static int getDefaultAudioVolume(const char *aout)
         return (config_GetFloat("auhal-volume") * 100.f + .5f)
                  / AOUT_VOLUME_DEFAULT;
 #endif
-#ifdef _WIN32
-    if (!strcmp(aout, "directsound") && module_exists("directsound"))
-        return config_GetFloat("directx-volume") * 100.f + .5f;
-#endif
 
     if (!strcmp(aout, "jack"))
         return cbrtf(config_GetFloat("jack-gain")) * 100.f + 0.5f;
@@ -1100,8 +1096,6 @@ void SPrefsPanel::updateAudioOptions( int number )
     optionWidgets["mmdeviceW"]->setVisible( mmDeviceEnabled );
     optionWidgets["mmdeviceL"]->setVisible( mmDeviceEnabled );
 
-    optionWidgets["directxW"]->setVisible( ( value == "directsound" ) );
-    optionWidgets["directxL"]->setVisible( ( value == "directsound" ) );
     optionWidgets["waveoutW"]->setVisible( ( value == "waveout" ) );
     optionWidgets["waveoutL"]->setVisible( ( value == "waveout" ) );
 #elif defined( __OS2__ )
@@ -1122,7 +1116,7 @@ void SPrefsPanel::updateAudioOptions( int number )
 #endif
     optionWidgets["fileW"]->setVisible( ( value == "afile" ) );
     optionWidgets["spdifChB"]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
-                                           value == "directsound" || value == "waveout" ) );
+                                             value == "waveout" ) );
 
     int volume = getDefaultAudioVolume(qtu(value));
     bool save = true;
@@ -1252,8 +1246,6 @@ void SPrefsPanel::apply()
         VLC_UNUSED( f_gain );
         if( save_vol_aout( "mmdevice" ) )
             config_PutFloat( "mmdevice-volume", i_volume / 100.f );
-        if( save_vol_aout( "directsound" ) )
-            config_PutFloat( "directx-volume", i_volume / 100.f );
         if( save_vol_aout( "waveout" ) )
             config_PutFloat( "waveout-volume", i_volume / 100.f );
 #elif defined( Q_OS_MAC )
