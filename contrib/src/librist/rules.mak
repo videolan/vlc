@@ -33,7 +33,7 @@ librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 	$(MOVE)
 
 .librist: librist crossfile.meson
-	cd $< && rm -rf ./build
+	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) $(LIBRIST_CONF) $</build $<
 	cd $< && cd build && ninja install
 	touch $@

@@ -24,7 +24,7 @@ basu: basu-$(BASU_VERSION).tar.gz .sum-basu
 	$(MOVE)
 
 .basu: basu crossfile.meson
-	cd $< && rm -rf ./build
+	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) $</build $<
 	cd $< && cd build && ninja install
 	touch $@

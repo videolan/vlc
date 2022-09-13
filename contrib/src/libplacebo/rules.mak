@@ -45,7 +45,7 @@ endif
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson
-	cd $< && rm -rf ./build
+	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) $(PLACEBOCONF) $</build $<
 	cd $< && cd build && ninja install
 # Work-around for full paths to static libraries, which libtool does not like

@@ -27,7 +27,7 @@ DEPS_libdsm += pthreads $(DEPS_pthreads)
 endif
 
 .libdsm: libdsm crossfile.meson
-	cd $< && rm -rf ./build
+	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false $</build $<
 	cd $< && cd build && ninja install
 	touch $@

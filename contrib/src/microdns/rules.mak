@@ -22,7 +22,7 @@ microdns: microdns-$(LIBMICRODNS_VERSION).tar.xz .sum-microdns
 	$(MOVE)
 
 .microdns: microdns crossfile.meson
-	cd $< && rm -rf ./build
+	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled $</build $<
 	cd $< && cd build && ninja install
 	touch $@

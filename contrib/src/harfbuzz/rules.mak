@@ -30,7 +30,7 @@ HARFBUZZ_CONF += -Dcoretext=enabled
 endif
 
 .harfbuzz: harfbuzz crossfile.meson
-	cd $< && rm -rf ./build
+	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF) $</build $<
 	cd $< && cd build && ninja install
 	touch $@
