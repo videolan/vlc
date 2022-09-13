@@ -33,6 +33,7 @@ endif
 	$(APPLY) $(SRC)/projectM/gcc6.patch
 	$(APPLY) $(SRC)/projectM/clang6.patch
 	$(APPLY) $(SRC)/projectM/missing-includes.patch
+	$(APPLY) $(SRC)/projectM/projectm-cmake-install.patch
 	$(MOVE)
 
 PROJECTM_CONF := \
@@ -45,5 +46,4 @@ PROJECTM_CONF := \
 	rm -f $</CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) . $(PROJECTM_CONF)
 	+$(CMAKEBUILD) $< --target install
-	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
 	touch $@
