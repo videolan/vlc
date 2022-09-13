@@ -43,11 +43,11 @@ check_PROGRAMS = \
 	test_modules_keystore \
 	test_modules_demux_timestamps_filter \
 	test_modules_demux_ts_pes \
-	test_modules_stream_output_transcode \
 	$(NULL)
 
 if ENABLE_SOUT
-check_PROGRAMS += test_modules_tls
+check_PROGRAMS += test_modules_tls \
+	test_modules_stream_output_transcode
 endif
 if UPDATE_CHECK
 check_PROGRAMS += test_src_crypto_update
