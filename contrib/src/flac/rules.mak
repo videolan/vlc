@@ -20,41 +20,28 @@ ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/flac/remove_blocking_code_useless_flaclib.patch
 	$(APPLY) $(SRC)/flac/no-createfilew.patch
 endif
-ifdef HAVE_DARWIN_OS
-	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
-endif
-	$(APPLY) $(SRC)/flac/dont-force-msvcrt-version.patch
+	# disable building a tool we don't use
+	cd $(UNPACK_DIR) && sed -e 's,add_subdirectory("microbench"),#add_subdirectory("microbench"),' -i.orig CMakeLists.txt
 	$(call pkg_static,"src/libFLAC/flac.pc.in")
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-FLACCONF := \
-	--disable-examples \
-	--disable-thorough-tests \
-	--disable-doxygen-docs \
-	--disable-xmms-plugin \
-	--disable-cpplibs \
-	--disable-oggtest
-# TODO? --enable-sse
-ifdef HAVE_DARWIN_OS
-ifneq ($(findstring $(ARCH),i386 x86_64),)
-FLACCONF += --disable-asm-optimizations
-endif
-endif
+FLAC_CONF = \
+	-DBUILD_TESTING=OFF \
+	-DINSTALL_MANPAGES=OFF \
+	-DBUILD_CXXLIBS=OFF \
+	-DBUILD_EXAMPLES=OFF \
+	-DBUILD_PROGRAMS=OFF
 
-FLAC_CFLAGS := $(CFLAGS)
-ifdef HAVE_WIN32
-FLAC_CFLAGS += -mstackrealign
-FLAC_CFLAGS +="-DFLAC__NO_DLL"
+ifeq ($(ARCH),i386)
+# nasm doesn't like the -fstack-protector-strong that's added to its flags
+# let's prioritize the use of nasm over stack protection
+FLAC_CONF += -DWITH_STACK_PROTECTOR=OFF
 endif
 
 DEPS_flac = ogg $(DEPS_ogg)
 
-.flac: flac
-	cd $< && $(AUTORECONF)
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) CFLAGS="$(FLAC_CFLAGS)" $(FLACCONF)
-	$(MAKEBUILD) -C include install
-	$(MAKEBUILD) -C src/libFLAC install
-	$(MAKEBUILD) -C src/share install
+.flac: flac toolchain.cmake
+	$(CMAKECLEAN)
+	$(HOSTVARS_PIC) $(CMAKE) $(FLAC_CONF)
+	+$(CMAKEBUILD) --target install
 	touch $@
