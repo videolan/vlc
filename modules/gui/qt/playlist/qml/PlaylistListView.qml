@@ -212,26 +212,8 @@ Control {
                         return I18n.qtr("Moving tracks: %1").arg(model.selectedCount)
                     case PlaylistListView.Mode.Normal:
                     default:
-                        return I18n.qtr("%1 elements, %2").arg(model.count).arg(getHoursMinutesText(model.duration))
+                        return I18n.qtr("%1 elements, %2").arg(model.count).arg(model.duration.formatLong())
                     }
-                }
-
-                function getHoursMinutesText(duration) {
-                    var hours = duration.toHours()
-                    var minutes = duration.toMinutes()
-                    var text
-                    if (hours >= 1) {
-                        minutes = minutes % 60
-                        text = I18n.qtr("%1h %2 min").arg(hours).arg(minutes)
-                    }
-                    else if (minutes > 0) {
-                        text = I18n.qtr("%1 min").arg(minutes)
-                    }
-                    else {
-                        text = I18n.qtr("%1 sec").arg(duration.toSeconds())
-                    }
-
-                    return text
                 }
             }
         }

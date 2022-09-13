@@ -27,7 +27,6 @@
 #include <vlc_media_library.h>
 
 #include "mlbasemodel.hpp"
-#include "mlvideo.hpp"
 
 #include <QDateTime>
 

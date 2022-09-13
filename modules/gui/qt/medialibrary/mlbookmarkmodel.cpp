@@ -27,6 +27,7 @@
 
 #include "medialib.hpp"
 #include "mlhelper.hpp"
+#include "util/vlctick.hpp"
 
 MLBookmarkModel::MLBookmarkModel( MediaLib* medialib, vlc_player_t *player,
                                   QObject *parent )
@@ -115,7 +116,7 @@ QVariant MLBookmarkModel::data( const QModelIndex &index, int role ) const
     case 0:
         return QVariant::fromValue( QString::fromUtf8( bookmark.psz_name ) );
     case 1:
-        return QVariant::fromValue( MsToString( bookmark.i_time ) );
+        return QVariant::fromValue( VLCTick::fromMS( bookmark.i_time ).formatHMS() );
     case 2:
         return QVariant::fromValue( QString::fromUtf8( bookmark.psz_description ) );
     default:

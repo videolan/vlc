@@ -56,9 +56,9 @@ QString MLFolder::getMRL() const
     return m_mrl;
 }
 
-int64_t MLFolder::getDuration() const
+VLCTick MLFolder::getDuration() const
 {
-    return m_duration;
+    return VLCTick::fromMS(m_duration);
 }
 
 unsigned int MLFolder::getCount() const

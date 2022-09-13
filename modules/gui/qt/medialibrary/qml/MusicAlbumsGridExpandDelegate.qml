@@ -247,7 +247,7 @@ FocusScope {
                         .arg(Helpers.get(model, "main_artist", I18n.qtr("Unknown artist")))
                         .arg(Helpers.get(model, "release_year", ""))
                         .arg(_getStringTrack())
-                        .arg(Helpers.msToString(Helpers.get(model, "duration", 0)))
+                        .arg((model && model.duration) ? model.duration.formatHMS() : 0)
                 }
             }
 

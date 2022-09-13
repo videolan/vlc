@@ -91,9 +91,9 @@ unsigned int MLAlbumTrack::getDiscNumber() const
     return m_discNumber;
 }
 
-int64_t MLAlbumTrack::getDuration() const
+VLCTick MLAlbumTrack::getDuration() const
 {
-    return m_duration;
+    return VLCTick::fromMS(m_duration);
 }
 
 QString MLAlbumTrack::getMRL() const

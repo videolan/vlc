@@ -18,6 +18,8 @@
 
 #include "mlrecentsmodel.hpp"
 #include <QDateTime>
+#include "mlhelper.hpp"
+
 
 MLRecentMedia::MLRecentMedia( const vlc_ml_media_t *media )
     : MLItem( MLItemId( media->i_id, VLC_ML_PARENT_UNKNOWN ) )

@@ -30,6 +30,7 @@
 #include "vlc_media_library.h"
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
+#include "util/vlctick.hpp"
 
 class MLAlbum : public QObject, public MLItem
 {
@@ -44,7 +45,7 @@ public:
     QString getCover() const;
     QString getArtist() const;
     unsigned int getNbTracks() const;
-    int64_t getDuration() const;
+    VLCTick getDuration() const;
 
     Q_INVOKABLE QString getPresName() const;
     Q_INVOKABLE QString getPresImage() const;

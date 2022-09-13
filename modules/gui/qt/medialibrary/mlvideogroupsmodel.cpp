@@ -34,6 +34,7 @@
 #include "mlcustomcover.hpp"
 #include "mlgroup.hpp"
 #include "mlvideo.hpp"
+#include "mlhelper.hpp"
 
 //-------------------------------------------------------------------------------------------------
 // Static variables

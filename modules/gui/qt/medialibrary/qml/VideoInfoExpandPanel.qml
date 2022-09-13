@@ -169,7 +169,7 @@ FocusScope {
                 }
 
                 Widgets.CaptionLabel {
-                    text: Helpers.msToString(model.duration)
+                    text: model.duration.formatHMS()
                     color: VLCStyle.colors.text
                     width: parent.width
                 }

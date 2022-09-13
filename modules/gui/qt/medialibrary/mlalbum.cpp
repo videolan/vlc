@@ -63,9 +63,9 @@ unsigned int MLAlbum::getNbTracks() const
     return m_nbTracks;
 }
 
-int64_t MLAlbum::getDuration() const
+VLCTick MLAlbum::getDuration() const
 {
-    return m_duration;
+    return VLCTick::fromMS(m_duration);
 }
 
 QString MLAlbum::getPresName() const

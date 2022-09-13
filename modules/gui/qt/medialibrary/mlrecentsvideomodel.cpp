@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "mlrecentsvideomodel.hpp"
+#include "mlhelper.hpp"
 
 // Ctor / dtor
 

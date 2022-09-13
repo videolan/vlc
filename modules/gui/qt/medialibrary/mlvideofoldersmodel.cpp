@@ -33,6 +33,7 @@
 // MediaLibrary includes
 #include "mlcustomcover.hpp"
 #include "mlfolder.hpp"
+#include "mlhelper.hpp"
 
 // Static variables
 

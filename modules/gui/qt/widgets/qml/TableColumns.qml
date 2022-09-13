@@ -164,7 +164,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             text: (!timeDel.rowModel || !timeDel.rowModel[timeDel.model.criteria])
                 ? ""
-                : Helpers.msToString(timeDel.rowModel[timeDel.model.criteria], true)
+                : timeDel.rowModel[timeDel.model.criteria].formatShort()
             color: timeDel.foregroundColor
         }
     }
@@ -173,7 +173,7 @@ Item {
         id: timeTextMetric
 
         font.pixelSize: VLCStyle.fontSize_normal
-        text: "00h00"
+        text: "000h00"
     }
 
 }

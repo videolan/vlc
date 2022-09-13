@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "mlplaylistmedia.hpp"
+#include "mlhelper.hpp"
 
 // VLC includes
 #include <qt.hpp>
@@ -131,9 +132,9 @@ void MLPlaylistMedia::setThumbnail(const QString& thumbnail, vlc_ml_thumbnail_st
 
 //-------------------------------------------------------------------------------------------------
 
-int64_t MLPlaylistMedia::getDuration() const
+VLCTick MLPlaylistMedia::getDuration() const
 {
-    return m_duration;
+    return VLCTick::fromMS(m_duration);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -170,9 +171,9 @@ double MLPlaylistMedia::getProgress() const
     return m_progress;
 }
 
-QString MLPlaylistMedia::getProgressTime() const
+VLCTick MLPlaylistMedia::getProgressTime() const
 {
-    return MsToString(m_duration * m_progress);
+    return VLCTick::fromMS(m_duration * m_progress);
 }
 
 //-------------------------------------------------------------------------------------------------

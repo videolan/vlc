@@ -25,6 +25,7 @@
 
 // MediaLibrary includes
 #include "mlqmltypes.hpp"
+#include "util/vlctick.hpp"
 
 class MLPlaylist : public MLItem
 {
@@ -34,7 +35,7 @@ public:
 public: // Interface
     QString getName() const;
 
-    int64_t getDuration() const;
+    VLCTick getDuration() const;
 
     unsigned int getCount() const;
 

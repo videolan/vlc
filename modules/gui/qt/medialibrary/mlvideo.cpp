@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include <vlc_thumbnailer.h>
+#include "mlhelper.hpp"
 
 VideoDescription::VideoDescription(const QString &codec, const QString &language, const unsigned int fps)
     : m_codec(codec)
@@ -168,9 +169,9 @@ void MLVideo::setThumbnail(vlc_ml_thumbnail_status_t status, QString mrl)
     m_thumbnail = mrl;
 }
 
-int64_t MLVideo::getDuration() const
+VLCTick MLVideo::getDuration() const
 {
-    return m_duration;
+    return VLCTick::fromMS(m_duration);
 }
 
 QString MLVideo::getMRL() const
@@ -202,9 +203,9 @@ unsigned int MLVideo::getPlayCount() const
     return m_playCount;
 }
 
-QString MLVideo::getProgressTime() const
+VLCTick MLVideo::getProgressTime() const
 {
-    return MsToString(m_duration * m_progress);
+    return VLCTick::fromMS(m_duration * m_progress);
 }
 
 QList<VideoDescription> MLVideo::getVideoDesc() const

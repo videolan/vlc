@@ -28,8 +28,8 @@
 #include <QUrl>
 
 #include <vlc_media_library.h>
-#include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
+#include "util/vlctick.hpp"
 
 #include <functional>
 
@@ -97,14 +97,14 @@ public:
     QString getTitle() const;
     QString getThumbnail(vlc_ml_thumbnail_status_t* status);
     void setThumbnail(vlc_ml_thumbnail_status_t status, QString mrl);
-    int64_t getDuration() const;
+    VLCTick getDuration() const;
     QString getResolutionName() const;
     QString getChannel() const;
     QString getMRL() const;
     QString getDisplayMRL() const;
     float getProgress() const;
     unsigned int getPlayCount() const;
-    QString getProgressTime() const;
+    VLCTick getProgressTime() const;
     QList<AudioDescription> getAudioDesc() const;
     QList<VideoDescription> getVideoDesc() const;
 
