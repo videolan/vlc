@@ -29,6 +29,7 @@ endif
 	$(APPLY) $(SRC)/projectM/gcc6.patch
 	$(APPLY) $(SRC)/projectM/clang6.patch
 	$(APPLY) $(SRC)/projectM/missing-includes.patch
+	$(APPLY) $(SRC)/projectM/projectm-cmake-install.patch
 	$(MOVE)
 
 DEPS_projectM = glew $(DEPS_glew)
@@ -44,5 +45,4 @@ DEPS_projectM = glew $(DEPS_glew)
 		-DINCLUDE-PROJECTM-QT:BOOL=OFF \
 		-DBUILD_PROJECTM_STATIC:BOOL=ON .
 	+$(CMAKEBUILD) $< --target install
-	-cd $<; cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib
 	touch $@

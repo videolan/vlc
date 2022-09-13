@@ -1,0 +1,14 @@
+--- projectM/MilkdropPresetFactory/CMakeLists.txt.orig	2022-09-13 09:39:32.537914700 +0200
++++ projectM/MilkdropPresetFactory/CMakeLists.txt	2022-09-13 09:39:11.108002400 +0200
+@@ -17,3 +17,4 @@ LINK_DIRECTORIES(${projectM_BINARY_DIR}
+ ADD_LIBRARY(MilkdropPresetFactory STATIC ${MilkdropPresetFactory_SOURCES})
+ SET_TARGET_PROPERTIES(MilkdropPresetFactory PROPERTIES VERSION 2.00 SOVERSION 2)
+ TARGET_LINK_LIBRARIES(MilkdropPresetFactory Renderer)
++INSTALL(TARGETS MilkdropPresetFactory LIBRARY)
+--- projectM/Renderer/CMakeLists.txt.orig	2022-09-13 09:39:40.281885500 +0200
++++ projectM/Renderer/CMakeLists.txt	2022-09-13 09:39:07.123633100 +0200
+@@ -11,3 +11,4 @@ INCLUDE_DIRECTORIES(${projectM_SOURCE_DI
+ ADD_LIBRARY(Renderer STATIC ${Renderer_SOURCES})
+ SET_TARGET_PROPERTIES(Renderer PROPERTIES VERSION 2.00 SOVERSION 2)
+ TARGET_LINK_LIBRARIES(Renderer m)
++INSTALL(TARGETS Renderer LIBRARY)
