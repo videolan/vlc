@@ -1,11 +1,15 @@
 --- a/mkspecs/features/qml_plugin.prf	2020-09-02 12:15:07.000000000 +0200
 +++ b/mkspecs/features/qml_plugin.prf	2022-08-31 10:58:10.110600024 +0200
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,11 @@
  load(qt_build_config)
 
  TEMPLATE = lib
 -CONFIG += plugin
 +CONFIG += plugin create_pc
++qmlprefixpclib_replace.match = $$dirname(_QMAKE_CONF_)
++qmlprefixpclib_replace.replace = $$[QT_INSTALL_PREFIX]
++qmlprefixpclib_replace.CONFIG = path
++QMAKE_PKGCONFIG_INSTALL_REPLACE += qmlprefixpclib_replace
 
  if(win32|mac):!macx-xcode {
      qtConfig(debug_and_release): CONFIG += debug_and_release
