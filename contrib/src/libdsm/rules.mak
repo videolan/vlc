@@ -28,6 +28,6 @@ endif
 
 .libdsm: libdsm crossfile.meson
 	rm -rf $</build
-	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false $</build $<
+	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false
 	$(MESONBUILD)
 	touch $@

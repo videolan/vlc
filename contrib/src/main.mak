@@ -425,8 +425,8 @@ ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
 endif
 
-MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
-	-Dlibdir=lib
+MESONFLAGS = $</build $< --default-library static --prefix "$(PREFIX)" \
+	--backend ninja -Dlibdir=lib
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else
