@@ -55,6 +55,8 @@ struct vlc_clock_context
 
 typedef struct VLC_VECTOR(struct vlc_clock_context) vlc_clock_context_vector;
 
+#define COEFF_THRESHOLD 0.2 /* between 0.8 and 1.2 */
+
 struct vlc_clock_main_t
 {
     struct vlc_logger *logger;
@@ -318,11 +320,36 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
             if (rate == context->rate)
             {
                 /* We have a reference so we can update coeff */
-                double instant_coeff = (system_now - context->last.system)
-                                     / (double)(ts - context->last.stream)
-                                     * rate;
-                AvgUpdate(&context->coeff_avg, instant_coeff);
-                context->coeff = AvgGet(&context->coeff_avg);
+                vlc_tick_t system_diff = system_now - context->last.system;
+                vlc_tick_t stream_diff = ts - context->last.stream;
+
+                double instant_coeff = system_diff / (double) stream_diff * rate;
+
+                /* System and stream ts should be incrementing */
+                if (system_diff < 0 || stream_diff < 0)
+                {
+                    vlc_warning(main_clock->logger, "resetting master clock: "
+                                "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
+                                system_diff, stream_diff);
+                    /* Reset and continue (calculate the offset from the
+                     * current point) */
+                    vlc_clock_context_reset(context);
+                }
+                /* The instant coeff should always be around 1.0 */
+                else if (instant_coeff > 1.0 + COEFF_THRESHOLD
+                      || instant_coeff < 1.0 - COEFF_THRESHOLD)
+                {
+                    vlc_warning(main_clock->logger, "resetting master clock: "
+                                "coefficient too unstable: %f", instant_coeff);
+                    /* Reset and continue (calculate the offset from the
+                     * current point) */
+                    vlc_clock_context_reset(context);
+                }
+                else
+                {
+                    AvgUpdate(&context->coeff_avg, instant_coeff);
+                    context->coeff = AvgGet(&context->coeff_avg);
+                }
             }
         }
         else
