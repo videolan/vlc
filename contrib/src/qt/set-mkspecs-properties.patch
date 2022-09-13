@@ -69,7 +69,7 @@
 +        QString escaped_src = escapeFilePath(src);
 +        if (!sedargs.isEmpty()) {
 +            int pos = src.lastIndexOf('.');
-+            QString filename = src.left(pos - 1);
++            QString filename = src.left(pos);
 +            QString ext = src.mid(pos + 1);
 +            escaped_src = escapeFilePath(filename + ".qmakereplace." + ext);
 +            ret += "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > "
