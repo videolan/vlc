@@ -20,6 +20,6 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 .medialibrary: medialibrary crossfile.meson
 	rm -rf $</build
 	$(HOSTVARS_MESON) $(MESON) -Dlibvlc=disabled -Dlibtool_workaround=true $</build $<
-	meson install -C $</build
+	$(MESONBUILD)
 	touch $@
 
