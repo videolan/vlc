@@ -27,6 +27,6 @@ dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 
 .dav1d: dav1d crossfile.meson
 	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS_MESON) $(MESON) $(DAV1D_CONF) build
+	$(HOSTVARS_MESON) $(MESON) $(DAV1D_CONF) $</build $<
 	cd $< && cd build && ninja install
 	touch $@

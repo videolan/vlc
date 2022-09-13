@@ -31,6 +31,6 @@ endif
 
 .harfbuzz: harfbuzz crossfile.meson
 	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF) build
+	$(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF) $</build $<
 	cd $< && cd build && ninja install
 	touch $@

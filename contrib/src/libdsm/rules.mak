@@ -28,6 +28,6 @@ endif
 
 .libdsm: libdsm crossfile.meson
 	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false build
+	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false $</build $<
 	cd $< && cd build && ninja install
 	touch $@

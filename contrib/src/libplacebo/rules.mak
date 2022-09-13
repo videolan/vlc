@@ -46,7 +46,7 @@ endif
 
 .libplacebo: libplacebo crossfile.meson
 	cd $< && rm -rf ./build
-	cd $< && $(HOSTVARS_MESON) $(MESON) $(PLACEBOCONF) build
+	$(HOSTVARS_MESON) $(MESON) $(PLACEBOCONF) $</build $<
 	cd $< && cd build && ninja install
 # Work-around for full paths to static libraries, which libtool does not like
 # See https://github.com/mesonbuild/meson/issues/5479
