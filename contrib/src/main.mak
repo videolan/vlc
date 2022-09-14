@@ -498,7 +498,7 @@ else
 MESON = meson $(MESONFLAGS)
 endif
 MESONCLEAN = rm -rf $</build/meson-private
-MESONBUILD = meson install -C $</build
+MESONBUILD = meson compile -C $</build $(MESON_BUILD) && meson install -C $</build
 
 ifdef GPL
 REQUIRE_GPL =
