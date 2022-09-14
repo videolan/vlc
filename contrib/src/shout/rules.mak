@@ -35,17 +35,17 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)
 DEPS_shout += vorbis $(DEPS_vorbis)
 
-SHOUT_CONF := --disable-examples --disable-tools
+SHOUT_CONF := --disable-examples --disable-tools --without-openssl
 
 ifdef HAVE_WIN32
-SHOUT_CONF += "--disable-thread"
+SHOUT_CONF += --disable-thread
 endif
 ifdef HAVE_ANDROID
-SHOUT_CONF += "--disable-thread"
+SHOUT_CONF += --disable-thread
 endif
 
 .shout: libshout
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure --without-openssl $(SHOUT_CONF) $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SHOUT_CONF)
 	cd $< && $(MAKE) install
 	touch $@

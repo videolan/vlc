@@ -31,7 +31,7 @@ ifndef HAVE_WIN32
 endif
 	$(MOVE)
 
-GPGERROR_CONF := $(HOSTCONF) \
+GPGERROR_CONF := \
 	--disable-nls \
 	--disable-languages \
 	--disable-tests \
@@ -39,7 +39,7 @@ GPGERROR_CONF := $(HOSTCONF) \
 
 .gpg-error: libgpg-error
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(GPGERROR_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GPGERROR_CONF)
 	# pre_mkheader_cmds would delete our lock-obj-pub-native.h
 	cd $< && $(MAKE) pre_mkheader_cmds=true install
 	touch $@

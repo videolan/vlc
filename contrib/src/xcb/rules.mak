@@ -47,12 +47,11 @@ XCBCONF := \
 	--disable-xtest \
 	--enable-xv \
 	--disable-xvmc \
-	--without-doxygen \
-	$(HOSTCONF)
+	--without-doxygen
 
 DEPS_xcb = pthread-stubs xau $(DEPS_xau) xcb-proto $(DEPS_xcb-proto)
 
 .xcb: libxcb
-	cd $< && $(HOSTVARS) ./configure $(XCBCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(XCBCONF)
 	cd $< && $(MAKE) install
 	touch $@

@@ -58,6 +58,6 @@ endif
 
 .upnp: upnp
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(UPNP_CFLAGS)" CXXFLAGS="$(UPNP_CXXFLAGS)" ./configure $(UPNP_CONF) $(HOSTCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(UPNP_CFLAGS)" CXXFLAGS="$(UPNP_CXXFLAGS)" ./configure $(HOSTCONF) $(UPNP_CONF)
 	cd $< && $(MAKE) install
 	touch $@
