@@ -55,7 +55,7 @@ typedef struct plane_t
 
     /* Variables used for pictures with margins */
     int i_visible_lines;            /**< How many visible lines are there? */
-    int i_visible_pitch;            /**< How many visible pixels are there? */
+    int i_visible_pitch;            /**< How many bytes for visible pixels are there? */
 
 } plane_t;
 
