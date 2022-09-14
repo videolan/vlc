@@ -35,7 +35,7 @@ musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 	$(MOVE)
 
 .mpcdec: musepack toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(MUSE_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@
