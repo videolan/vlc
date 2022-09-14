@@ -134,17 +134,18 @@ static int SubpictureValidate(subpicture_t *p_subpic,
 
 static void CopyImageToRegion(subpicture_region_t *p_region, const aribcc_image_t *image)
 {
-    const plane_t *p = &p_region->p_picture->p[0];
-    const int i_height = p_region->fmt.i_height;
-    const uint32_t copy_line_size = __MIN(image->stride, p->i_pitch);
+    if(image->pixel_format != ARIBCC_PIXELFORMAT_RGBA8888)
+        return;
 
-    memset(p->p_pixels, 0, p->i_pitch * p->i_visible_lines);
-
-    for (int y = 0; y < i_height; y++) {
-        const uint8_t *src_line_begin = image->bitmap + y * image->stride;
-        uint8_t *dst_line_begin = p->p_pixels + y * p->i_pitch;
-        memcpy(dst_line_begin, src_line_begin, copy_line_size);
-    }
+    plane_t *p_dstplane = &p_region->p_picture->p[0];
+    plane_t srcplane;
+    srcplane.i_lines = image->height;
+    srcplane.i_pitch = image->stride;
+    srcplane.i_pixel_pitch = p_dstplane->i_pixel_pitch;
+    srcplane.i_visible_lines = image->height;
+    srcplane.i_visible_pitch = image->width /* in pixels */ * p_dstplane->i_pixel_pitch;
+    srcplane.p_pixels = image->bitmap;
+    plane_CopyPixels( p_dstplane, &srcplane );
 }
 
 static void SubpictureUpdate(subpicture_t *p_subpic,
