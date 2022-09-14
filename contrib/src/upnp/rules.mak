@@ -42,6 +42,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
 	$(APPLY) $(SRC)/upnp/0001-ThreadPool-Fix-non-UCRT-builds.patch
+	$(APPLY) $(SRC)/upnp/win32-remove-wrong-safe-wrappers.patch
 endif
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID
