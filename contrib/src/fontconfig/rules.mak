@@ -28,7 +28,6 @@ endif
 FONTCONFIG_CONF := $(HOSTCONF) \
 	--enable-libxml2 \
 	--disable-docs
-FONTCONFIG_ENV := $(HOSTVARS)
 
 # FreeType flags
 ifneq ($(findstring freetype2,$(PKGS)),)
@@ -44,9 +43,6 @@ FONTCONFIG_CONF += \
 	--with-cache-dir=~/Library/Caches/fontconfig \
 	--with-default-fonts=/System/Library/Fonts \
 	--with-add-fonts=/Library/Fonts,~/Library/Fonts
-# libxml2 without pkg-config...
-FONTCONFIG_ENV += LIBXML2_CFLAGS=`xml2-config --cflags`
-FONTCONFIG_ENV += LIBXML2_LIBS=`xml2-config --libs`
 endif
 
 DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
@@ -55,7 +51,7 @@ DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
 ifdef HAVE_WIN32
 	$(RECONF)
 endif
-	cd $< && $(FONTCONFIG_ENV) ./configure $(FONTCONFIG_CONF)
+	cd $< && $(HOSTVARS) ./configure $(FONTCONFIG_CONF)
 	cd $< && $(MAKE)
 ifndef HAVE_MACOSX
 	cd $< && $(MAKE) install
