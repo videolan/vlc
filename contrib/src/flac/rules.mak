@@ -1,6 +1,6 @@
 # FLAC
 
-FLAC_VERSION := 1.3.4
+FLAC_VERSION := 1.4.0
 FLAC_URL := http://downloads.xiph.org/releases/flac/flac-$(FLAC_VERSION).tar.xz
 
 PKGS += flac
@@ -18,7 +18,7 @@ flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/flac/console_write.patch
 	$(APPLY) $(SRC)/flac/remove_blocking_code_useless_flaclib.patch
-	$(APPLY) $(SRC)/flac/no-createfilea.patch
+	$(APPLY) $(SRC)/flac/no-createfilew.patch
 endif
 ifdef HAVE_DARWIN_OS
 	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
