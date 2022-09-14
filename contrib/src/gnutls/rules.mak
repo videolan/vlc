@@ -66,8 +66,7 @@ GNUTLS_CONF := \
 	--disable-tools \
 	--disable-tests \
 	--with-included-libtasn1 \
-	--with-included-unistring \
-	$(HOSTCONF)
+	--with-included-unistring
 
 GNUTLS_ENV := $(HOSTVARS)
 
@@ -90,7 +89,7 @@ endif
 endif
 
 .gnutls: gnutls
-	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
+	cd $< && $(GNUTLS_ENV) ./configure $(HOSTCONF) $(GNUTLS_CONF)
 	cd $< && $(MAKE) -C gl install
 	cd $< && $(MAKE) -C lib install
 	touch $@

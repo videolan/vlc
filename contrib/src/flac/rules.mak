@@ -35,7 +35,7 @@ endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-FLACCONF := $(HOSTCONF) \
+FLACCONF := \
 	--disable-thorough-tests \
 	--disable-doxygen-docs \
 	--disable-xmms-plugin \
@@ -58,7 +58,7 @@ DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac
 	cd $< && $(AUTORECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(FLAC_CFLAGS)" ./configure $(FLACCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(FLAC_CFLAGS)" ./configure $(HOSTCONF) $(FLACCONF)
 	cd $< && $(MAKE) -C include install
 	cd $< && $(MAKE) -C src/libFLAC install
 	cd $< && $(MAKE) -C src/share install

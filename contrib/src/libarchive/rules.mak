@@ -9,7 +9,7 @@ endif
 
 DEPS_libarchive = zlib
 
-LIBARCHIVE_CONF := $(HOSTCONF) \
+LIBARCHIVE_CONF := \
 		--disable-bsdcpio --disable-bsdtar --disable-bsdcat \
 		--without-nettle --without-cng \
 		--without-xml2 --without-lzma --without-iconv --without-expat
@@ -32,6 +32,6 @@ endif
 
 .libarchive: libarchive
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(LIBARCHIVE_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBARCHIVE_CONF)
 	cd $< && $(MAKE) install
 	touch $@

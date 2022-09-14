@@ -23,7 +23,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-THEORACONF := $(HOSTCONF) \
+THEORACONF := \
 	--disable-spec \
 	--disable-sdltest \
 	--disable-oggtest \
@@ -51,6 +51,6 @@ endif
 DEPS_theora = ogg $(DEPS_ogg)
 
 .theora: libtheora
-	cd $< && $(HOSTVARS) ./configure $(THEORACONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(THEORACONF)
 	cd $< && $(MAKE) install
 	touch $@

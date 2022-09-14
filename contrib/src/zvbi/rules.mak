@@ -33,8 +33,7 @@ DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)
 ZVBICONF := \
 	--disable-dvb --disable-bktr \
 	--disable-nls --disable-proxy \
-	--without-doxygen \
-	$(HOSTCONF)
+	--without-doxygen
 
 ifdef HAVE_WIN32
 DEPS_zvbi += pthreads $(DEPS_pthreads)
@@ -43,7 +42,7 @@ endif
 .zvbi: zvbi
 	$(UPDATE_AUTOCONFIG)
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(ZVBICONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ZVBICONF)
 	cd $< && $(MAKE) -C src install
 	cd $< && $(MAKE) SUBDIRS=. install
 	sed -i.orig -e "s/\/[^ ]*libiconv.a/-liconv/" $(PREFIX)/lib/pkgconfig/zvbi-0.2.pc
