@@ -3229,6 +3229,8 @@ static void input_ChangeState( input_thread_t *p_input, int i_state,
     input_priv(p_input)->i_state = i_state;
     if( i_state == ERROR_S )
         input_item_SetErrorWhenReading( input_priv(p_input)->p_item, true );
+    if (i_state == END_S || i_state == ERROR_S)
+        input_SendEventCapabilities( p_input, 0 );
     input_SendEventState( p_input, i_state, state_date );
 }
 

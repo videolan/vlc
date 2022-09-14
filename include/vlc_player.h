@@ -2817,7 +2817,8 @@ struct vlc_player_cbs
     /**
      * Called when the media capabilities has changed
      *
-     * Always called when the media is opening. Can be called during playback.
+     * Always called when the media is opening or stopping.
+     * Can be called during playback.
      *
      * @param player locked player instance
      * @param old_caps old player capabilities
