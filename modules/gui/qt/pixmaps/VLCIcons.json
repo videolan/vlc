@@ -68,6 +68,7 @@
         {"key":"topbar_video", "path": "./icons/topbar_video.svg"},
         {"key":"tv", "path": "./icons/tv.svg"},
         {"key":"tvtelx", "path": "./icons/tvtelx.svg"},
+        {"key":"transparency", "path": "./icons/transparency.svg"},
         {"key":"visualization", "path": "./icons/visualization.svg"},
         {"key":"volume_high", "path": "./icons/volume_high.svg"},
         {"key":"volume_low", "path": "./icons/volume_low.svg"},
