@@ -56,7 +56,7 @@ endif
 
 
 .libaribcaption: libaribcaption toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(LIBARIBCC_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@

@@ -42,7 +42,7 @@ FLUIDCONF := \
 	-Denable-readline=0
 
 .fluid: fluidsynth toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(FLUIDCONF)
 	+$(CMAKEBUILD) --target install
 	touch $@

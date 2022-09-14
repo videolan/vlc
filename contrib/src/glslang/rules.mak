@@ -30,7 +30,7 @@ glslang: glslang-$(GLSLANG_VERSION).tar.gz .sum-glslang
 GLSLANG_CONF := -DENABLE_GLSLANG_BINARIES=OFF
 
 .glslang: glslang toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) CXXFLAGS="-DYYDEBUG=0" $(CMAKE) $(GLSLANG_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@

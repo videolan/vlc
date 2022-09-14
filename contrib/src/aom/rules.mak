@@ -77,7 +77,7 @@ endif
 # libaom doesn't allow in-tree builds
 .aom: aom toolchain.cmake
 	rm -rf $(PREFIX)/include/aom
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(AOM_CONF)
 	+$(CMAKEBUILD)
 	$(call pkg_static,"build/aom.pc")

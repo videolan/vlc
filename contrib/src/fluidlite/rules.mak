@@ -26,7 +26,7 @@ fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(MOVE)
 
 .fluidlite: fluidlite toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD) --target install
 	touch $@

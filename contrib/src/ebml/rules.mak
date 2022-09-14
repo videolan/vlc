@@ -18,7 +18,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE)
 	+$(CMAKEBUILD) --target install
 	touch $@

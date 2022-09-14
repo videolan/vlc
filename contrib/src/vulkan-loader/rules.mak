@@ -53,7 +53,7 @@ VULKAN_LOADER_ENV_CONF = \
 	VULKAN_HEADERS_INSTALL_DIR="$(PREFIX)"
 
 .vulkan-loader: vulkan-loader toolchain.cmake
-	rm -f $</build/CMakeCache.txt
+	$(CMAKECLEAN)
 	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS) $(CMAKE) $(VULKAN_LOADER_CONF)
 	+$(CMAKEBUILD)
 

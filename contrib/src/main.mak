@@ -446,6 +446,7 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 # itself instead of relying on a shell, but a bug in gnulib ends up
 # trying to execute a cmake folder when one is found in the PATH
 CMAKEBUILD = env cmake --build $</build
+CMAKECLEAN = rm -f $</build/CMakeCache.txt
 CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-B $</build \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
