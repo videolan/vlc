@@ -497,6 +497,7 @@ MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" \
 else
 MESON = meson $(MESONFLAGS)
 endif
+MESONCLEAN = rm -rf $</build
 MESONBUILD = meson install -C $</build
 
 ifdef GPL

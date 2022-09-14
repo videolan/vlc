@@ -24,7 +24,7 @@ basu: basu-$(BASU_VERSION).tar.gz .sum-basu
 	$(MOVE)
 
 .basu: basu crossfile.meson
-	rm -rf $</build
+	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON)
 	$(MESONBUILD)
 	touch $@

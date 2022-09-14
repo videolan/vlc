@@ -33,7 +33,7 @@ librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 	$(MOVE)
 
 .librist: librist crossfile.meson
-	rm -rf $</build
+	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) $(LIBRIST_CONF)
 	$(MESONBUILD)
 	touch $@

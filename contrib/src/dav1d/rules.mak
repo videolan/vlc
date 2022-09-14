@@ -26,7 +26,7 @@ dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 	$(MOVE)
 
 .dav1d: dav1d crossfile.meson
-	rm -rf $</build
+	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) $(DAV1D_CONF)
 	$(MESONBUILD)
 	touch $@

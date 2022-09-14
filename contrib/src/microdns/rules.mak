@@ -22,7 +22,7 @@ microdns: microdns-$(LIBMICRODNS_VERSION).tar.xz .sum-microdns
 	$(MOVE)
 
 .microdns: microdns crossfile.meson
-	rm -rf $</build
+	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled
 	$(MESONBUILD)
 	touch $@

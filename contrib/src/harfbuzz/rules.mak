@@ -30,7 +30,7 @@ HARFBUZZ_CONF += -Dcoretext=enabled
 endif
 
 .harfbuzz: harfbuzz crossfile.meson
-	rm -rf $</build
+	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) $(HARFBUZZ_CONF)
 	$(MESONBUILD)
 	touch $@
