@@ -450,7 +450,7 @@ MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBD
 else
 MESON = meson $(MESONFLAGS)
 endif
-MESONBUILD = meson install -C $</build
+MESONBUILD = meson compile -C $</build $(MESON_BUILD) && meson install -C $</build
 
 ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
