@@ -27,7 +27,7 @@ DEPS_libdsm += pthreads $(DEPS_pthreads)
 endif
 
 .libdsm: libdsm crossfile.meson
-	rm -rf $</build
+	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled -Dbinaries=false
 	$(MESONBUILD)
 	touch $@
