@@ -30,7 +30,9 @@ Item {
     property bool forceScroll: false
     property alias hoverScroll: hoverArea.enabled
 
-    readonly property bool _needsToScroll: (label.width < label.contentWidth)
+
+    readonly property real requiredTextWidth: label.implicitWidth
+    readonly property bool _needsToScroll: (label.width < requiredTextWidth)
 
     ToolTip.delay: VLCStyle.delayToolTipAppear
     ToolTip.visible: scrolling && hoverArea.containsMouse
@@ -71,7 +73,7 @@ Item {
             target: label
             property: "x"
             from: 0
-            to: label.width - label.contentWidth
+            to: label.width - control.requiredTextWidth
 
             maximumEasingTime: 0
             velocity: 20
