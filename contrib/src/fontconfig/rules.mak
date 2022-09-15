@@ -42,7 +42,6 @@ endif
 ifdef HAVE_MACOSX
 FONTCONFIG_CONF += \
 	--with-cache-dir=~/Library/Caches/fontconfig \
-	--with-confdir=/usr/X11/lib/X11/fonts \
 	--with-default-fonts=/System/Library/Fonts \
 	--with-add-fonts=/Library/Fonts,~/Library/Fonts
 # libxml2 without pkg-config...
