@@ -28,6 +28,6 @@ endif
 
 .modplug: libmodplug
 	$(RECONF)
-	cd $< && $(HOSTVARS) CXXFLAGS="$(MODPLUG_CXXFLAGS)" ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CXXFLAGS="$(MODPLUG_CXXFLAGS)"
 	cd $< && $(MAKE) install
 	touch $@

@@ -43,6 +43,6 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 
 .mpg123: mpg123
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(MPG123_CFLAGS)" ./configure $(HOSTCONF) $(MPG123CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(MPG123_CFLAGS)" $(MPG123CONF)
 	cd $< && $(MAKE) install
 	touch $@

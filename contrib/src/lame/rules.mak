@@ -31,6 +31,6 @@ LAME_CONF := --disable-analyzer-hooks --disable-decoder --disable-gtktest --disa
 
 .lame: lame
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(LAME_CFLAGS)" ./configure $(HOSTCONF) $(LAME_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(LAME_CFLAGS)" $(LAME_CONF)
 	cd $< && $(MAKE) install
 	touch $@
