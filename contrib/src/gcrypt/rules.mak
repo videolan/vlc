@@ -79,6 +79,6 @@ endif
 	cd $< && git init && git config --local user.email "cone@example.com" && git config --local user.name "Cony Cone" && \
 		git commit --allow-empty -m "dummy commit"
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" ./configure $(HOSTCONF) $(GCRYPT_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" $(GCRYPT_CONF)
 	cd $< && $(MAKE) install
 	touch $@

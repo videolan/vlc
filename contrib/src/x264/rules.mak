@@ -80,7 +80,7 @@ x264 x26410b: %: $(X264_BASENAME) .sum-%
 
 .x264: x264
 	$(REQUIRE_GPL)
-	cd $< && $(HOSTVARS) $(X264_AS) ./configure $(HOSTCONF) $(X264CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(X264_AS) $(X264CONF)
 	cd $< && $(MAKE) install
 	touch $@
 

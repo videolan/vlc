@@ -66,12 +66,10 @@ GNUTLS_CONF := \
 	--with-included-libtasn1 \
 	--with-included-unistring
 
-GNUTLS_ENV := $(HOSTVARS)
-
 DEPS_gnutls = nettle $(DEPS_nettle)
 
 ifdef HAVE_ANDROID
-GNUTLS_ENV += gl_cv_header_working_stdint_h=yes
+GNUTLS_ENV := gl_cv_header_working_stdint_h=yes
 endif
 ifdef HAVE_WINSTORE
 ifeq ($(ARCH),x86_64)
@@ -87,7 +85,7 @@ endif
 endif
 
 .gnutls: gnutls
-	cd $< && $(GNUTLS_ENV) ./configure $(HOSTCONF) $(GNUTLS_CONF)
+	$(GNUTLS_ENV) cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GNUTLS_CONF)
 	$(call pkg_static,"lib/gnutls.pc")
 	cd $< && $(MAKE) -C gl install
 	cd $< && $(MAKE) -C lib install
