@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 114 114" transform="translate(33,33)" xmlns="http://www.w3.org/2000/svg">
  <g fill-rule="evenodd">
-  <path transform="translate(-384 -1004.4)" d="m390 1010.4h10v10h-10zm26 0h10v10h-10z" fill="#ff950d"/>
-  <path transform="matrix(1 0 0 -1 -384 -1004.4)" d="m403-1046.4h10v10h-10z" fill="#ff950d"/>
+  <path transform="translate(-384 -1004.4)" d="m390 1010.4h10v10h-10zm26 0h10v10h-10z" fill="#FF8800"/>
+  <path transform="matrix(1 0 0 -1 -384 -1004.4)" d="m403-1046.4h10v10h-10z" fill="#FF8800"/>
   <path transform="translate(-384 -1004.4)" d="M388 1008.362v14h5.5v3H388v6h18.5v3H401v14h14v-14h-5.5v-3H428v-6h-5.5v-3h5.5v-14h-14v14h5.5v3h-23v-3h5.5v-14zm2 2h10v10h-10zm26 0h10v10h-10zm-13 26h10v10h-10z" fill="#747474"/>
  </g>
 </svg>

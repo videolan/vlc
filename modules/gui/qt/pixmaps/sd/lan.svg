@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
- <path transform="translate(-96.46 -120.56)" d="m128.46 126.56h10v10h-10z" fill="#ff950d" fill-rule="evenodd"/>
- <path transform="matrix(1 0 0 -1 -96.46 -120.56)" d="m115.46-162.56h10v10h-10z" fill="#ff950d" fill-rule="evenodd"/>
- <path transform="translate(-96.46 -120.56)" d="m102.46 126.56h10v10h-10z" fill="#ff950d" fill-rule="evenodd"/>
+<svg viewBox="0 0 114 114" transform="translate(33,33)" xmlns="http://www.w3.org/2000/svg">
+ <path transform="translate(-96.46 -120.56)" d="m128.46 126.56h10v10h-10z" fill="#FF8800" fill-rule="evenodd"/>
+ <path transform="matrix(1 0 0 -1 -96.46 -120.56)" d="m115.46-162.56h10v10h-10z" fill="#FF8800" fill-rule="evenodd"/>
+ <path transform="translate(-96.46 -120.56)" d="m102.46 126.56h10v10h-10z" fill="#FF8800" fill-rule="evenodd"/>
  <path transform="translate(-96.46 -120.56)" d="m100.46 124.56v14h5.5v3h-5.5v6h18.5v3h-5.5v14h14v-14h-5.5v-3h18.5v-6h-5.5v-3h5.5v-14h-14v14h5.5v3h-23v-3h5.5v-14zm2 2h10v10h-10zm26 0h10v10h-10zm-13 26h10v10h-10z" fill="#747474" fill-rule="evenodd"/>
 </svg>

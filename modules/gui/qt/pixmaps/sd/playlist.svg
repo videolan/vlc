@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 114 114" transform="translate(33,33)" xmlns="http://www.w3.org/2000/svg">
  <g>
-  <path transform="translate(-384 -1004.4)" d="m400 1023.4v3.5h20v-3.5z" fill="#ff950d"/>
-  <path transform="translate(-384 -1004.4)" d="m400 1029.4v3.5h20v-3.5z" fill="#ff950d"/>
-  <path transform="translate(-384 -1004.4)" d="m400 1035.4v3.5h10v-3.5z" fill="#ff950d"/>
-  <path transform="matrix(0 .5 -.48714 0 355.59 50)" d="m-32 654.51 8 13.856h-16z" fill="#ff950d" fill-rule="evenodd"/>
+  <path transform="translate(-384 -1004.4)" d="m400 1023.4v3.5h20v-3.5z" fill="#FF8800"/>
+  <path transform="translate(-384 -1004.4)" d="m400 1029.4v3.5h20v-3.5z" fill="#FF8800"/>
+  <path transform="translate(-384 -1004.4)" d="m400 1035.4v3.5h10v-3.5z" fill="#FF8800"/>
+  <path transform="matrix(0 .5 -.48714 0 355.59 50)" d="m-32 654.51 8 13.856h-16z" fill="#FF8800" fill-rule="evenodd"/>
   <path transform="translate(-384 -1004.4)" d="M396 1008.362c-2.2 0-3.98 1.8-3.98 4l-.02 32c0 2.2 1.78 4 3.98 4H424c2.2 0 3.983-1.8 4-4v-24l-12-12zm-1 3h21v9h9v25h-30z" fill="#747474" stroke-width="2"/>
  </g>
 </svg>

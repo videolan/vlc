@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 114 114" transform="translate(33,33)" xmlns="http://www.w3.org/2000/svg">
  <g transform="translate(-96.46 -120.56)" fill-rule="evenodd">
-  <rect x="106.46" y="140.56" width="24" height="18" rx="4" ry="4" fill="#ff950d"/>
-  <circle cx="134.46" cy="145.56" r="2" fill="#ff950d"/>
-  <circle cx="134.46" cy="153.56" r="2" fill="#ff950d"/>
+  <rect x="106.46" y="140.56" width="24" height="18" rx="4" ry="4" fill="#FF8800"/>
+  <circle cx="134.46" cy="145.56" r="2" fill="#FF8800"/>
+  <circle cx="134.46" cy="153.56" r="2" fill="#FF8800"/>
   <path d="m106.46 136.56c-2.216 0-4 1.785-4 4v18c0 2.217 1.784 4 4 4h4a2 2 0 0 0 4 0h12a2 2 0 1 0 4 0h4c2.216 0 4-1.783 4-4v-18c0-2.215-1.784-4-4-4zm4 4h16c2.216 0 4 1.785 4 4v10c0 2.217-1.784 4-4 4h-16c-2.216 0-4-1.783-4-4v-10c0-2.215 1.784-4 4-4zm24 3a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2zm0 8a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2z" fill="#747474"/>
   <path d="m116.46 136.56-8-8 10 8zm4 0 4-12-6 12z" fill="#747474"/>
   <rect x="136.46" y="124.56" width="4" height="8" rx="0" ry="0" fill="red"/>
