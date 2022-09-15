@@ -53,7 +53,6 @@ endif
 
 GPGERROR_CONF := \
 	--disable-nls \
-	--disable-shared \
 	--disable-languages \
 	--disable-tests \
 	--disable-doc
