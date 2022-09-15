@@ -37,5 +37,5 @@ CDDB_CONF := --without-iconv
 .cddb: cddb
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int -DWIN32_LEAN_AND_MEAN" $(CDDB_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

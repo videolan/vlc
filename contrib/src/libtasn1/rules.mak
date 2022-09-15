@@ -23,5 +23,5 @@ LIBTASN1_CONF := --disable-doc
 .libtasn1: libtasn1
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBTASN1_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

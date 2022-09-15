@@ -29,5 +29,5 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 .protobuf: protobuf
 	$(RECONF)
 	cd $< && $(HOSTVARS) $(PROTOBUFVARS) ./configure $(HOSTCONF) --with-protoc="$(PROTOC)"
-	cd $< && $(MAKE) && $(MAKE) install
+	$(MAKE) -C $< && $(MAKE) -C $< install
 	touch $@

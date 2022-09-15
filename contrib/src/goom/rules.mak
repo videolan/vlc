@@ -33,5 +33,5 @@ endif
 .goom: goom
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-glibtest --disable-gtktest
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

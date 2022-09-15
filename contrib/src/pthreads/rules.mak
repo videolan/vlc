@@ -54,7 +54,7 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 
 .pthreads: pthreads
 	cd $</mingw-w64-libraries/winpthreads && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) -C mingw-w64-libraries -C winpthreads install
+	$(MAKE) -C $< -C mingw-w64-libraries -C winpthreads install
 	touch $@
 
 .sum-dxvahd: .sum-pthreads

@@ -53,6 +53,6 @@ endif
 	$(UPDATE_AUTOCONFIG)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ZVBICONF)
-	cd $< && $(MAKE) -C src install
-	cd $< && $(MAKE) SUBDIRS=. install
+	$(MAKE) -C $< -C src install
+	$(MAKE) -C $< SUBDIRS=. install
 	touch $@

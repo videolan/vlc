@@ -41,5 +41,5 @@ ASDCPLIB_CONF := --enable-freedist --enable-dev-headers --with-nettle=$(PREFIX)
 .asdcplib: asdcplib
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CXXFLAGS="$(ASDCPLIB_CXXFLAGS)" $(ASDCPLIB_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

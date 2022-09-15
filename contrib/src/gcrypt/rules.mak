@@ -85,5 +85,5 @@ endif
 .gcrypt: gcrypt
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" $(GCRYPT_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

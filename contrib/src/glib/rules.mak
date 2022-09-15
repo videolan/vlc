@@ -21,5 +21,5 @@ glib: glib-$(GLIB_MINOR_VERSION).tar.xz .sum-glib
 .glib: glib
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

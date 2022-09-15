@@ -39,7 +39,7 @@ VORBIS_CONF := --disable-docs --disable-examples --disable-oggtest
 .vorbis: libvorbis
 	$(RECONF) -Im4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(VORBIS_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@
 
 .sum-vorbisenc: .sum-vorbis

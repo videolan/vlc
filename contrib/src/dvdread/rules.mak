@@ -32,5 +32,5 @@ DVDREAD_CONF := --with-libdvdcss
 	$(REQUIRE_GPL)
 	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(DVDREAD_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

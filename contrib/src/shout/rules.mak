@@ -49,5 +49,5 @@ endif
 .shout: libshout
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SHOUT_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

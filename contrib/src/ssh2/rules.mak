@@ -37,5 +37,5 @@ SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --witho
 .ssh2: ssh2
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(BROKEN_GCC_CFLAGS) $(HOSTCONF) $(SSH2_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

@@ -22,5 +22,5 @@ DVDCSS_CONF := --disable-doc
 	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(DVDCSS_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

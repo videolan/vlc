@@ -22,5 +22,5 @@ XPROTO_CONF := --enable-xthreads
 .xproto: xproto
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(XPROTO_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

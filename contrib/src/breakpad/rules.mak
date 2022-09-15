@@ -37,6 +37,6 @@ ifdef HAVE_MACOSX
 else
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(BREAKPAD_CONF)
-	cd $< && Configuration=Release $(MAKE) install
+	Configuration=Release $(MAKE) -C $< install
 endif
 	touch $@

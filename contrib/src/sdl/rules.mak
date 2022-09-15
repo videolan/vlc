@@ -42,5 +42,5 @@ SDLCONF := $(HOSTCONF) \
 
 .sdl: sdl
 	cd $< && $(HOSTVARS) ./configure $(SDLCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

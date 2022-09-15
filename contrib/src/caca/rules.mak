@@ -62,5 +62,5 @@ CACA_CONF += \
 
 .caca: caca
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CACA_CONF)
-	cd $< && $(MAKE) -C $< install
+	$(MAKE) -C $< -C $< install
 	touch $@

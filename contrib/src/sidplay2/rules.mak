@@ -42,6 +42,6 @@ sidplay-libs: sidplay-libs-$(SID_VERSION).tar.gz .sum-sidplay2
 		(cd $</$$d && $(AUTORECONF) -fiv -I unix $(ACLOCAL_AMFLAGS)) || exit $$? ; \
 	done
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	cp -- $(PREFIX)/lib/sidplay/builders/* "$(PREFIX)/lib/"
 	touch $@

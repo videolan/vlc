@@ -73,11 +73,11 @@ endif
 	$(MOVE)
 
 .lua: lua
-	cd $< && $(HOSTVARS_PIC) $(MAKE) $(LUA_TARGET)
+	$(HOSTVARS_PIC) $(MAKE) -C $< $(LUA_TARGET)
 ifdef HAVE_WIN32
-	cd $< && $(HOSTVARS) $(MAKE) -C src liblua.a
+	$(HOSTVARS) $(MAKE) -C $< -C src liblua.a
 endif
-	cd $< && $(HOSTVARS) $(MAKE) install INSTALL_TOP="$(PREFIX)"
+	$(HOSTVARS) $(MAKE) -C $< install INSTALL_TOP="$(PREFIX)"
 ifdef HAVE_WIN32
 	cd $< && $(RANLIB) "$(PREFIX)/lib/liblua.a"
 endif
@@ -103,7 +103,7 @@ luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	$(MOVE)
 
 .luac: luac
-	cd $< && $(LUACVARS) $(MAKE) generic
+	$(LUACVARS) $(MAKE) -C $< generic
 	mkdir -p -- $(BUILDBINDIR)
 	install -m 0755 -s -- $</src/luac $(BUILDBINDIR)/$(HOST)-luac
 	touch $@

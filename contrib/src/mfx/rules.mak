@@ -38,5 +38,5 @@ mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 
 .mfx: mfx
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(MFX_CFLAGS)" CXXFLAGS="$(MFX_CXXFLAGS)"
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@
