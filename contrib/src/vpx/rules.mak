@@ -151,9 +151,7 @@ endif
 VPX_LDFLAGS += -arch $(PLATFORM_SHORT_ARCH)
 endif
 
-ifdef WITH_OPTIMIZATION
-VPX_CFLAGS += -DNDEBUG
-else
+ifndef WITH_OPTIMIZATION
 VPX_CONF += --disable-optimizations
 endif
 
