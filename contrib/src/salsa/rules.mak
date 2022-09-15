@@ -27,7 +27,7 @@ salsa-lib: salsa-lib-$(SALSA_TAG).tar.xz .sum-salsa
 
 .salsa: salsa-lib
 	$(RECONF)
-	cd $< && ./configure $(HOSTVARS) $(HOSTCONF) $(SALSACONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SALSACONF)
 	cd $< && $(MAKE) install
 	touch $@
 
