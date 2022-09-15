@@ -29,7 +29,7 @@ x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 	$(REQUIRE_GPL)
 	cd $< && sed -i -e 's/x264/x262/g' configure
 	cd $< && sed -i -e 's/x264_config/x262_config/g' *.h Makefile *.c
-	cd $< && $(HOSTVARS) ./configure $(X264CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(X264CONF)
 	cd $< && sed -i -e 's/x264.pc/x262.pc/g' Makefile
 	cd $< && sed -i -e 's/x264.h/x262.h/g' Makefile
 	cd $< && $(MAKE)
