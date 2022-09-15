@@ -60,5 +60,6 @@ DEPS_flac = ogg $(DEPS_ogg)
 	cd $< && $(AUTORECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(FLAC_CFLAGS)" ./configure $(FLACCONF)
 	cd $< && $(MAKE) -C include install
-	cd $< && $(MAKE) -C src/libFLAC install && $(MAKE) -C src/share install
+	cd $< && $(MAKE) -C src/libFLAC install
+	cd $< && $(MAKE) -C src/share install
 	touch $@

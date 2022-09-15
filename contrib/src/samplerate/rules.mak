@@ -22,5 +22,6 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 .samplerate: samplerate
 	$(REQUIRE_GPL)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) -C src install && $(MAKE) install-data
+	cd $< && $(MAKE) -C src install
+	cd $< && $(MAKE) install-data
 	touch $@

@@ -21,6 +21,7 @@ tiff: tiff-$(TIFF_VERSION).tar.gz .sum-tiff
 		--disable-zlib \
 		--disable-cxx \
 		--without-x
-	cd $< && $(MAKE) -C port && $(MAKE) -C libtiff
+	cd $< && $(MAKE) -C port
+	cd $< && $(MAKE) -C libtiff
 	cd $< && $(MAKE) -C libtiff install
 	touch $@
