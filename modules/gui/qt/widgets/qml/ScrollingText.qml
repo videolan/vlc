@@ -21,7 +21,7 @@ import QtQuick.Controls 2.4
 import "qrc:///style/"
 
 Item {
-    id: control
+    id: root
 
     readonly property alias scrolling: scrollAnimation.running
 
@@ -39,10 +39,10 @@ Item {
     ToolTip.text: label.text
 
     onLabelChanged: {
-        label.width = Qt.binding(function () { return Math.min(label.implicitWidth, control.width) })
+        label.width = Qt.binding(function () { return Math.min(label.implicitWidth, root.width) })
 
         label.elide = Qt.binding(function () {
-            return control.scrolling ? Text.ElideNone : Text.ElideRight
+            return root.scrolling ? Text.ElideNone : Text.ElideRight
         })
     }
 
@@ -58,7 +58,7 @@ Item {
     SequentialAnimation {
         id: scrollAnimation
 
-        running: (control.forceScroll || hoverArea.containsMouse) && control._needsToScroll
+        running: (root.forceScroll || hoverArea.containsMouse) && root._needsToScroll
         loops: Animation.Infinite
 
         onStopped: {
@@ -73,7 +73,7 @@ Item {
             target: label
             property: "x"
             from: 0
-            to: label.width - control.requiredTextWidth
+            to: label.width - root.requiredTextWidth
 
             maximumEasingTime: 0
             velocity: 20
