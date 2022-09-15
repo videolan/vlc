@@ -103,13 +103,13 @@ private:
 private:
     vlc_object_t *const m_parent;
     const std::string m_scheme;
-    std::shared_ptr<IDeviceLister> m_deviceLister;
     IFileSystemFactoryCb *m_callbacks;
     bool m_isNetwork;
 
     mutable vlc::threads::mutex m_mutex;
     mutable vlc::threads::condition_variable m_cond;
     std::vector<std::shared_ptr<IDevice>> m_devices;
+    std::shared_ptr<IDeviceLister> m_deviceLister;
 };
 
   } /* namespace medialibrary */
