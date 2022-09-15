@@ -25,8 +25,10 @@ fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(APPLY) $(SRC)/fluidlite/add-pic.diff
 	$(MOVE)
 
+FLUIDLITE_CONF := -DFLUIDLITE_BUILD_SHARED=OFF
+
 .fluidlite: fluidlite toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
+	$(HOSTVARS) $(CMAKE) $(FLUIDLITE_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@
