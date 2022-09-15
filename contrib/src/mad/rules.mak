@@ -19,7 +19,7 @@ endif
 $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
 	$(call download,$(MAD_URL))
 
-LIBMAD_VARS := CFLAGS="$(CFLAGS) -O3"
+LIBMAD_VARS :=
 ifdef HAVE_IOS
 LIBMAD_VARS += CCAS="$(AS)"
 endif
