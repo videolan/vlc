@@ -60,14 +60,8 @@ ifeq ($(WITH_ASS_ASM), 0)
 ASS_CONF += --disable-asm
 endif
 
-ifdef WITH_OPTIMIZATION
-ASS_CFLAGS += -O3
-else
-ASS_CFLAGS += -g
-endif
-
 .ass: libass
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(ASS_CFLAGS)" ./configure $(HOSTCONF) $(ASS_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ASS_CONF)
 	cd $< && $(MAKE)
 	$(call pkg_static,"libass.pc")
 	cd $< && $(MAKE) install
