@@ -30,7 +30,7 @@ MODPLUG_CONF := CXXFLAGS="$(MODPLUG_CXXFLAGS)"
 
 .modplug: libmodplug
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(MODPLUG_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(MODPLUG_CONF)
+	$(MAKEBUILD) install
 	touch $@

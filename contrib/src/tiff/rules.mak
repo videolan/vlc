@@ -15,13 +15,13 @@ tiff: tiff-$(TIFF_VERSION).tar.gz .sum-tiff
 	mv tiff/config.sub tiff/config.guess tiff/config
 
 .tiff: tiff
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) \
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) \
 		--disable-jpeg \
 		--disable-zlib \
 		--disable-cxx \
 		--without-x
-	$(MAKE) -C $</_build -C port
-	$(MAKE) -C $</_build -C libtiff
-	$(MAKE) -C $</_build -C libtiff install
+	$(MAKEBUILD) -C port
+	$(MAKEBUILD) -C libtiff
+	$(MAKEBUILD) -C libtiff install
 	touch $@

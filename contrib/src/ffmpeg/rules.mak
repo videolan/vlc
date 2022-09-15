@@ -269,9 +269,9 @@ endif
 	$(MOVE)
 
 .ffmpeg: ffmpeg
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure \
+	$(MAKEBUILDDIR)
+	$(MAKECONFDIR)/configure \
 		--extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) \
 		--prefix="$(PREFIX)" --enable-static --disable-shared
-	$(MAKE) -C $</_build install-libs install-headers
+	$(MAKEBUILD) install-libs install-headers
 	touch $@

@@ -47,7 +47,7 @@ endif
 
 .shout: libshout
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(SHOUT_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(SHOUT_CONF)
+	$(MAKEBUILD) install
 	touch $@

@@ -20,7 +20,7 @@ glib: glib-$(GLIB_MINOR_VERSION).tar.xz .sum-glib
 
 .glib: glib
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE)
+	$(MAKEBUILD) install
 	touch $@

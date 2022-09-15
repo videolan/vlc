@@ -18,7 +18,7 @@ xcb-proto: xcb-proto-$(XCB_PROTO_VERSION).tar.bz2 .sum-xcb-proto
 
 .xcb-proto: xcb-proto
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE)
+	$(MAKEBUILD) install
 	touch $@
