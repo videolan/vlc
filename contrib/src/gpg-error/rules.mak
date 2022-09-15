@@ -33,7 +33,6 @@ endif
 
 GPGERROR_CONF := $(HOSTCONF) \
 	--disable-nls \
-	--disable-shared \
 	--disable-languages \
 	--disable-tests
 
