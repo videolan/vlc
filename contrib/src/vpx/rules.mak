@@ -136,9 +136,7 @@ endif
 endif
 endif
 
-ifdef WITH_OPTIMIZATION
-VPX_CFLAGS += -DNDEBUG
-else
+ifndef WITH_OPTIMIZATION
 VPX_CONF += --disable-optimizations
 endif
 
