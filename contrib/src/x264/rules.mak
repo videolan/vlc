@@ -20,8 +20,7 @@ endif
 
 PKGS_ALL += x26410b
 
-X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \
-	--enable-static \
+X264CONF = \
 	--disable-avs \
 	--disable-lavf \
 	--disable-cli \
