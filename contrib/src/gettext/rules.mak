@@ -22,7 +22,6 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 
 DEPS_gettext = iconv $(DEPS_iconv) libxml2 $(DEPS_libxml2)
 
-GETTEXT_CFLAGS := $(CFLAGS)
 GETTEXT_CONF = \
 	--disable-relocatable \
 	--disable-java \
@@ -37,7 +36,7 @@ endif
 .gettext: gettext
 	cd $< && cd gettext-runtime && $(AUTORECONF)
 	cd $< && cd gettext-tools && $(AUTORECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(GETTEXT_CFLAGS)" $(GETTEXT_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GETTEXT_CONF)
 ifndef HAVE_ANDROID
 	$(MAKE) -C $< install
 else
