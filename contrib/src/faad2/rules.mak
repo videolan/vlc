@@ -34,5 +34,5 @@ FAAD2_CONF := --without-drm
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(FAAD2_CONF)
 	cd $< && sed -i.orig "s/shrext_cmds/shrext/g" libtool
-	cd $< && $(MAKE) -C libfaad install
+	$(MAKE) -C $< -C libfaad install
 	touch $@

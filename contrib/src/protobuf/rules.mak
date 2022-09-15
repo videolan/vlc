@@ -52,7 +52,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 .protoc: protoc
 	$(RECONF)
 	cd $< && $(BUILDVARS) $(PROTOCVARS) ./configure $(BUILDTOOLCONF) $(PROTOCCONF)
-	cd $< && $(MAKE) && $(MAKE) install
+	$(MAKE) -C $< && $(MAKE) -C $< install
 	touch $@
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
@@ -68,5 +68,5 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 .protobuf: protobuf
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(PROTOBUFVARS)
-	cd $< && $(MAKE) && $(MAKE) install
+	$(MAKE) -C $< && $(MAKE) -C $< install
 	touch $@

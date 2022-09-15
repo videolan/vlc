@@ -27,7 +27,7 @@ RNNOISE_CONF := --disable-examples --disable-doc
 .rnnoise: rnnoise
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(RNNOISE_CONF)
-	cd $< && $(MAKE)
+	$(MAKE) -C $<
 	$(call pkg_static,"rnnoise.pc")
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

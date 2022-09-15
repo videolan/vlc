@@ -32,7 +32,7 @@ x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(X264CONF)
 	cd $< && sed -i -e 's/x264.pc/x262.pc/g' Makefile
 	cd $< && sed -i -e 's/x264.h/x262.h/g' Makefile
-	cd $< && $(MAKE)
+	$(MAKE) -C $<
 	cd $< && cp x264.h x262.h
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

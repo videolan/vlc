@@ -26,5 +26,5 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 .ogg: libogg
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

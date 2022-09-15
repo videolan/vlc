@@ -51,5 +51,5 @@ endif
 .libxml2: libxml2
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(XMLCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

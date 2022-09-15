@@ -25,5 +25,5 @@ DEPS_png = zlib $(DEPS_zlib)
 .png: png
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

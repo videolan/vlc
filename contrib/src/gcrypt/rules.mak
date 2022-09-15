@@ -78,5 +78,5 @@ endif
 		git commit --allow-empty -m "dummy commit"
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

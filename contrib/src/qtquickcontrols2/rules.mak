@@ -33,11 +33,11 @@ QUICK_CONTROL_CONFIG := \
 .qtquickcontrols2: qtquickcontrols2
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake -- $(QUICK_CONTROL_CONFIG)
 	# Make && Install libraries
-	cd $< && $(MAKE) sub-src-qmake_all
+	$(MAKE) -C $< sub-src-qmake_all
 ifndef HAVE_CROSS_COMPILE
 	cd $<; for i in QtQuickControls2 QtQuickTemplates2; do \
 		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QTQC2_VERSION)/$$i/private/*.h; done
 endif
-	cd $< && $(MAKE) install_subtargets \
+	$(MAKE) -C $< install_subtargets \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)"
 	touch $@

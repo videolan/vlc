@@ -35,7 +35,7 @@ QT_DECLARATIVE_CONFIG := \
 	cd $</src && $(PREFIX)/lib/qt5/bin/qmake -o Makefile src.pro
 	# Build & install only what we require
 	# Invoke the build rules one at a time as some rule dependencies seem to be broken
-	cd $< && $(MAKE) -C src \
+	$(MAKE) -C $< -C src \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
 		sub-quick-make_first-ordered \
 		sub-qmlmodels-make_first-ordered \
@@ -43,10 +43,10 @@ QT_DECLARATIVE_CONFIG := \
 		sub-qmlworkerscript-make_first-ordered
 	# We don't use particles, but the import target (which generates the qtquick2plugin.a) require
 	# the particle module to be built
-	cd $< && $(MAKE) -C src \
+	$(MAKE) -C $< -C src \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
 		sub-particles-make_first-ordered
-	cd $< && $(MAKE) -C src \
+	$(MAKE) -C $< -C src \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
 		sub-quick-install_subtargets \
 		sub-qml-install_subtargets \
@@ -56,7 +56,7 @@ QT_DECLARATIVE_CONFIG := \
 		sub-qmlworkerscript-install_subtargets \
 		sub-quickshapes-install_subtargets
 	cd $</tools && $(PREFIX)/lib/qt5/bin/qmake -o Makefile tools.pro
-	cd $< && $(MAKE) -C tools \
+	$(MAKE) -C $< -C tools \
 		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
 		sub-qmlcachegen-install_subtargets
 	touch $@

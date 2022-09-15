@@ -37,5 +37,5 @@ endif
 .libarchive: libarchive
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBARCHIVE_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

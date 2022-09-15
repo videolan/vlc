@@ -41,5 +41,5 @@ ASDCPLIB_CONF += CXXFLAGS="$(ASDCPLIB_CXXFLAGS)"
 .asdcplib: asdcplib
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ASDCPLIB_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

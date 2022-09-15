@@ -26,6 +26,6 @@ endif
 	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) -C liba52 install
-	cd $< && $(MAKE) -C include install
+	$(MAKE) -C $< -C liba52 install
+	$(MAKE) -C $< -C include install
 	touch $@

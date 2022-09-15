@@ -17,5 +17,5 @@ nvcodec: nvcodec-$(NVCODEC_HASH).tar.xz .sum-nvcodec
 	$(MOVE)
 
 .nvcodec: nvcodec-$(NVCODEC_HASH).tar.xz nvcodec
-	cd nvcodec && $(MAKE) install PREFIX="$(PREFIX)"
+	$(MAKE) -C nvcodec install PREFIX="$(PREFIX)"
 	touch $@

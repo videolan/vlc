@@ -31,5 +31,5 @@ MODPLUG_CONF := CXXFLAGS="$(MODPLUG_CXXFLAGS)"
 .modplug: libmodplug
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(MODPLUG_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

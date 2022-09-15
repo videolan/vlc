@@ -25,5 +25,5 @@ KATE_CONF := --disable-valgrind --disable-doc
 
 .kate: libkate
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(KATE_CONF)
-	cd $< && $(MAKE) SUBDIRS=. install
+	$(MAKE) -C $< SUBDIRS=. install
 	touch $@

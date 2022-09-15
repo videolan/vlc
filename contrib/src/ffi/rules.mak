@@ -18,5 +18,5 @@ ffi: libffi-$(FFI_VERSION).tar.gz .sum-ffi
 .ffi: ffi
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

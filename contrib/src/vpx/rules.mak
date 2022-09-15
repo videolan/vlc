@@ -166,7 +166,7 @@ endif
 	rm -rf $(PREFIX)/include/vpx
 	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
-	cd $< && CONFIG_DEBUG=1 $(MAKE)
+	CONFIG_DEBUG=1 $(MAKE) -C $<
 	$(call pkg_static,"vpx.pc")
-	cd $< && CONFIG_DEBUG=1 $(MAKE) install
+	CONFIG_DEBUG=1 $(MAKE) -C $< install
 	touch $@

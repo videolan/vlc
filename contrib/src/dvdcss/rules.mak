@@ -21,5 +21,5 @@ DVDCSS_CONF := --disable-doc
 .dvdcss: dvdcss
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(DVDCSS_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

@@ -18,6 +18,6 @@ jpeg: jpegsrc.v$(JPEG_VERSION).tar.gz .sum-jpeg
 .jpeg: jpeg
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	if test -e $(PREFIX)/lib/libjpeg.a; then $(RANLIB) $(PREFIX)/lib/libjpeg.a; fi
 	touch $@

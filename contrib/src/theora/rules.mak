@@ -52,5 +52,5 @@ DEPS_theora = ogg $(DEPS_ogg)
 
 .theora: libtheora
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(THEORACONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

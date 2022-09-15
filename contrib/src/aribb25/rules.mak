@@ -32,5 +32,5 @@ ARIBB25_CONF := --disable-b25
 .aribb25: aribb25
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ARIBB25_CONF)
-	cd $< && $(MAKE) && $(MAKE) install
+	$(MAKE) -C $< && $(MAKE) -C $< install
 	touch $@

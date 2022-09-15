@@ -42,7 +42,7 @@ endif
 	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(VNCCLIENT_CONF)
-	cd $< && $(MAKE) -C libvncclient install
-	cd $< && $(MAKE) install-data
+	$(MAKE) -C $< -C libvncclient install
+	$(MAKE) -C $< install-data
 	rm $(PREFIX)/lib/pkgconfig/libvncserver.pc
 	touch $@

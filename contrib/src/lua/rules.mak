@@ -30,7 +30,7 @@ PKGS += lua luac
 PKGS_TOOLS += luac
 PKGS_ALL += luac
 
-LUAC_IF_NOT_CROSS = 
+LUAC_IF_NOT_CROSS =
 ifndef HAVE_CROSS_COMPILE
 LUAC_IF_NOT_CROSS += luac
 endif
@@ -96,12 +96,12 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(MOVE)
 
 .lua: lua
-	cd $< && $(HOSTVARS_PIC) $(MAKE) $(LUA_TARGET) $(LUA_MAKEFLAGS)
+	$(HOSTVARS_PIC) $(MAKE) -C $< $(LUA_TARGET) $(LUA_MAKEFLAGS)
 ifdef HAVE_WIN32
-	cd $< && $(HOSTVARS) $(MAKE) -C src liblua$(LUA_SHORTVERSION).a $(LUA_MAKEFLAGS)
+	$(HOSTVARS) $(MAKE) -C $< -C src liblua$(LUA_SHORTVERSION).a $(LUA_MAKEFLAGS)
 endif
 
-	cd $< && $(HOSTVARS) $(MAKE) install \
+	$(HOSTVARS) $(MAKE) -C $< install \
 		INSTALL_INC="$(PREFIX)/include/lua$(LUA_SHORTVERSION)" \
 		INSTALL_TOP="$(PREFIX)" \
 		$(LUA_MAKEFLAGS)
@@ -130,7 +130,7 @@ luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	$(MOVE)
 
 .luac: luac
-	cd $< && $(MAKE) $(LUA_BUILD_MAKEFLAGS) generic
+	$(MAKE) -C $< $(LUA_BUILD_MAKEFLAGS) generic
 	mkdir -p -- $(BUILDBINDIR)
 	install -m 0755 -s -- $</src/luac $(BUILDBINDIR)/$(HOST)-luac
 	touch $@

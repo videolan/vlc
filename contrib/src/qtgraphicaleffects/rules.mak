@@ -25,5 +25,5 @@ qtgraphicaleffects: qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz .su
 
 .qtgraphicaleffects: qtgraphicaleffects
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
-	cd $< && $(MAKE) install INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)"
+	$(MAKE) -C $< install INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)"
 	touch $@

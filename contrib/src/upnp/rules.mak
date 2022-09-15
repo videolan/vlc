@@ -59,5 +59,5 @@ endif
 .upnp: upnp
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(UPNP_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

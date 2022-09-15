@@ -26,5 +26,5 @@ endif
 
 .opus: opus
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(OPUS_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

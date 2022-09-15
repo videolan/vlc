@@ -25,5 +25,5 @@ SMB2_CONF := --disable-examples --disable-werror --without-libkrb5
 .smb2: smb2
 	cd $< && ./bootstrap
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SMB2_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

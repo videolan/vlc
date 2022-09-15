@@ -31,5 +31,5 @@ endif
 .lame: lame
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LAME_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

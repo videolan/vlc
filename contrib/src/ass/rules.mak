@@ -63,7 +63,7 @@ endif
 
 .ass: libass
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ASS_CONF)
-	cd $< && $(MAKE)
+	$(MAKE) -C $<
 	$(call pkg_static,"libass.pc")
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

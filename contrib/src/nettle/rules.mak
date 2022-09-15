@@ -33,5 +33,5 @@ ifndef GPL
 endif
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(NETTLE_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

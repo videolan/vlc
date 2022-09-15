@@ -41,5 +41,5 @@ GPGERROR_CONF := \
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GPGERROR_CONF)
 	# pre_mkheader_cmds would delete our lock-obj-pub-native.h
-	cd $< && $(MAKE) pre_mkheader_cmds=true install
+	$(MAKE) -C $< pre_mkheader_cmds=true install
 	touch $@

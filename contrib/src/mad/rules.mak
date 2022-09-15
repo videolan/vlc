@@ -49,5 +49,5 @@ endif
 	$(REQUIRE_GPL)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBMAD_VARS) $(MAD_CONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

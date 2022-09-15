@@ -30,5 +30,5 @@ DEPS_aribb24 = png $(DEPS_png)
 	$(REQUIRE_GNUV3)
 	cd $< && $(SHELL) ./bootstrap
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) && $(MAKE) install
+	$(MAKE) -C $< && $(MAKE) -C $< install
 	touch $@

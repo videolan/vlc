@@ -116,7 +116,7 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
 	# Make && Install libraries
 	cd $< && $(QT_ENV_VARS) $(MAKE)
-	cd $< && $(MAKE) -C src \
+	$(MAKE) -C $< -C src \
 		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-corelib-install_subtargets \
 		sub-gui-install_subtargets \
@@ -126,14 +126,14 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 		sub-bootstrap-install_subtargets \
 		sub-network-install_subtargets
 	# Install tools
-	cd $< && $(MAKE) -C src \
+	$(MAKE) -C $< -C src \
 		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-moc-install_subtargets \
 		sub-rcc-install_subtargets \
 		sub-uic-install_subtargets \
 		sub-qlalr-install_subtargets
 	# Install plugins
-	cd $< && $(MAKE) -C src/plugins \
+	$(MAKE) -C $< -C src/plugins \
 		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-imageformats-install_subtargets \
 		sub-platforms-install_subtargets \
@@ -149,7 +149,7 @@ endif
 	cp -R $(PREFIX)/include/QtCore $(PREFIX)/lib/qt5/include
 	sed -i.orig -e "s#\$\$QT_MODULE_INCLUDE_BASE#$(PREFIX)/lib/qt5/include#g" $(PREFIX)/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
 	# Install a qmake with correct paths set
-	cd $< && $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
+	$(MAKE) -C $< sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
 ifdef HAVE_WIN32
 	# Install libqtmain for potentially other targets, eg. docs/ samples
 	$(MAKE) -C "$</src/winmain" all

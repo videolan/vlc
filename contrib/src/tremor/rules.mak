@@ -27,5 +27,5 @@ DEPS_tremor = ogg $(DEPS_ogg)
 	$(RECONF)
 	cd $< && \
 	$(HOSTVARS) CFLAGS="$(CFLAGS) $(NOTHUMB)" ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@

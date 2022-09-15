@@ -50,12 +50,12 @@ ifdef HAVE_WIN32
 	$(RECONF)
 endif
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(FONTCONFIG_CONF)
-	cd $< && $(MAKE)
+	$(MAKE) -C $<
 ifndef HAVE_MACOSX
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 else
-	cd $< && $(MAKE) install-exec
-	cd $< && $(MAKE) -C fontconfig install-data
+	$(MAKE) -C $< install-exec
+	$(MAKE) -C $< -C fontconfig install-data
 	sed -e 's%/usr/lib/libiconv.la%%' -i.orig $(PREFIX)/lib/libfontconfig.la
 	cp $</fontconfig.pc $(PREFIX)/lib/pkgconfig/
 endif

@@ -39,13 +39,13 @@ endif
 	cd $< && cd gettext-tools && $(AUTORECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GETTEXT_CONF)
 ifndef HAVE_ANDROID
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 else
 	# Android 32bits does not have localeconv
-	cd $< && $(MAKE) -C gettext-runtime install
-	cd $< && $(MAKE) -C gettext-tools/intl
-	cd $< && $(MAKE) -C gettext-tools/misc install
-	cd $< && $(MAKE) -C gettext-tools/m4 install
+	$(MAKE) -C $< -C gettext-runtime install
+	$(MAKE) -C $< -C gettext-tools/intl
+	$(MAKE) -C $< -C gettext-tools/misc install
+	$(MAKE) -C $< -C gettext-tools/m4 install
 endif
 ifdef HAVE_MACOSX
 	# detect libintl correctly in configure for static library

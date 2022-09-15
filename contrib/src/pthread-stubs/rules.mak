@@ -13,5 +13,5 @@ libpthread-stubs: libpthread-stubs-$(PTHREAD_STUBS_VERSION).tar.bz2 .sum-pthread
 
 .pthread-stubs: libpthread-stubs
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	$(MAKE) -C $< install
 	touch $@
