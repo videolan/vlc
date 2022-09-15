@@ -24,7 +24,7 @@ SMB2_CONF := --disable-examples --disable-werror --without-libkrb5
 
 .smb2: smb2
 	cd $< && ./bootstrap
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(SMB2_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(SMB2_CONF)
+	$(MAKEBUILD) install
 	touch $@

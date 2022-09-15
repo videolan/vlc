@@ -17,8 +17,8 @@ jpeg: jpegsrc.v$(JPEG_VERSION).tar.gz .sum-jpeg
 
 .jpeg: jpeg
 	$(RECONF)
-	mkdir -p $</build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE)
+	$(MAKEBUILD) install
 	if test -e $(PREFIX)/lib/libjpeg.a; then $(RANLIB) $(PREFIX)/lib/libjpeg.a; fi
 	touch $@

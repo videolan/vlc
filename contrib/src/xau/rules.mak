@@ -21,7 +21,7 @@ XAU_CONF := --enable-xthreads
 
 .xau: libxau
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(XAU_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(XAU_CONF)
+	$(MAKEBUILD) install
 	touch $@

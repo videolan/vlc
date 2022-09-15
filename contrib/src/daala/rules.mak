@@ -29,7 +29,7 @@ DAALACONF := \
 .daala: daala
 	mkdir -p daala/m4
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(DAALACONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(DAALACONF)
+	$(MAKEBUILD) install
 	touch $@

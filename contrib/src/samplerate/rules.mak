@@ -22,8 +22,8 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 
 .samplerate: samplerate
 	$(REQUIRE_GPL)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
-	$(MAKE) -C $</_build -C src install
-	$(MAKE) -C $</_build install-data
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE)
+	$(MAKEBUILD) -C src install
+	$(MAKEBUILD) install-data
 	touch $@

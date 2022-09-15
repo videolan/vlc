@@ -22,7 +22,7 @@ NFS_CONF := --disable-examples --disable-utils --disable-werror
 
 .nfs: nfs
 	cd $< && ./bootstrap
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(NFS_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(NFS_CONF)
+	$(MAKEBUILD) install
 	touch $@

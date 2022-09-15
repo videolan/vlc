@@ -34,9 +34,9 @@ endif
 
 .speexdsp: speexdsp
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(SPEEXDSP_CONF)
-	$(MAKE) -C $</_build
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(SPEEXDSP_CONF)
+	$(MAKEBUILD)
 	$(call pkg_static,"_build/speexdsp.pc")
-	$(MAKE) -C $</_build install
+	$(MAKEBUILD) install
 	touch $@

@@ -30,7 +30,7 @@ endif
 
 .lame: lame
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(LAME_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(LAME_CONF)
+	$(MAKEBUILD) install
 	touch $@

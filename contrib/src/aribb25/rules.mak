@@ -31,7 +31,7 @@ ARIBB25_CONF := --disable-b25
 
 .aribb25: aribb25
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(ARIBB25_CONF)
-	$(MAKE) -C $</_build && $(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(ARIBB25_CONF)
+	$(MAKEBUILD) && $(MAKEBUILD) install
 	touch $@

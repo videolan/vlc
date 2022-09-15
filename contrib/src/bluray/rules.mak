@@ -55,7 +55,7 @@ bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 .bluray: bluray
 	rm -rf $(PREFIX)/share/java/libbluray*.jar
 	cd $< && ./bootstrap
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(BLURAY_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(BLURAY_CONF)
+	$(MAKEBUILD) install
 	touch $@

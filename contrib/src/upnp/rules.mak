@@ -58,7 +58,7 @@ endif
 
 .upnp: upnp
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(UPNP_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(UPNP_CONF)
+	$(MAKEBUILD) install
 	touch $@

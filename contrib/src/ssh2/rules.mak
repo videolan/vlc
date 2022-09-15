@@ -31,7 +31,7 @@ SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --witho
 
 .ssh2: ssh2
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(SSH2_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(SSH2_CONF)
+	$(MAKEBUILD) install
 	touch $@

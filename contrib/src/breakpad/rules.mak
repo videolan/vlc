@@ -35,8 +35,8 @@ ifdef HAVE_MACOSX
 		install build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(BREAKPAD_CONF)
-	Configuration=Release $(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(BREAKPAD_CONF)
+	Configuration=Release $(MAKEBUILD) install
 endif
 	touch $@

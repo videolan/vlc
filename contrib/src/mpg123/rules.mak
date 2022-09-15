@@ -42,7 +42,7 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 
 .mpg123: mpg123
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(MPG123CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(MPG123CONF)
+	$(MAKEBUILD) install
 	touch $@

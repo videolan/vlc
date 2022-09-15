@@ -59,9 +59,9 @@ DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac
 	cd $< && $(AUTORECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) CFLAGS="$(FLAC_CFLAGS)" $(FLACCONF)
-	$(MAKE) -C $</_build -C include install
-	$(MAKE) -C $</_build -C src/libFLAC install
-	$(MAKE) -C $</_build -C src/share install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) CFLAGS="$(FLAC_CFLAGS)" $(FLACCONF)
+	$(MAKEBUILD) -C include install
+	$(MAKEBUILD) -C src/libFLAC install
+	$(MAKEBUILD) -C src/share install
 	touch $@

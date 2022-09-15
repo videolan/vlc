@@ -25,9 +25,9 @@ TWOLAME_CONF := CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
 
 .twolame: twolame
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(TWOLAME_CONF)
-	$(MAKE) -C $</_build
-	$(MAKE) -C $</_build -C libtwolame install
-	$(MAKE) -C $</_build install-data
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(TWOLAME_CONF)
+	$(MAKEBUILD)
+	$(MAKEBUILD) -C libtwolame install
+	$(MAKEBUILD) install-data
 	touch $@

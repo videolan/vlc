@@ -65,7 +65,7 @@ CACA_CONF += \
 	CPPFLAGS="$(CPPFLAGS) -DCACA_STATIC"
 
 .caca: caca
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(CACA_CONF)
-	$(MAKE) -C $</_build -C $< install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(CACA_CONF)
+	$(MAKEBUILD) -C $< install
 	touch $@

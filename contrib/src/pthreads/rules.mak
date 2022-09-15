@@ -48,9 +48,9 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 	$(MOVE)
 
 .pthreads: pthreads
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../mingw-w64-libraries/winpthreads/configure $(HOSTCONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFDIR)/mingw-w64-libraries/winpthreads/configure $(HOSTCONF)
+	$(MAKEBUILD) install
 	touch $@
 
 .sum-winrt_headers: .sum-pthreads

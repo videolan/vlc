@@ -51,7 +51,7 @@ endif
 DEPS_theora = ogg $(DEPS_ogg)
 
 .theora: libtheora
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(THEORACONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(THEORACONF)
+	$(MAKEBUILD) install
 	touch $@

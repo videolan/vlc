@@ -50,7 +50,7 @@ endif
 
 .libxml2: libxml2
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(XMLCONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(XMLCONF)
+	$(MAKEBUILD) install
 	touch $@

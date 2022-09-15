@@ -25,7 +25,7 @@ OPUS_CONF += --enable-fixed-point
 endif
 
 .opus: opus
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(OPUS_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(OPUS_CONF)
+	$(MAKEBUILD) install
 	touch $@

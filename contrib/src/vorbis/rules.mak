@@ -41,7 +41,7 @@ VORBIS_CONF := --disable-docs --disable-examples --disable-oggtest
 
 .vorbis: libvorbis
 	$(RECONF) -Im4
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(VORBIS_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(VORBIS_CONF)
+	$(MAKEBUILD) install
 	touch $@

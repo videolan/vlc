@@ -40,7 +40,7 @@ CDDB_CONF += CFLAGS="$(CDDB_CFLAGS)"
 
 .cddb: cddb
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(CDDB_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(CDDB_CONF)
+	$(MAKEBUILD) install
 	touch $@

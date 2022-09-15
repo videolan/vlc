@@ -24,7 +24,7 @@ DEPS_png = zlib $(DEPS_zlib)
 
 .png: png
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE)
+	$(MAKEBUILD) install
 	touch $@

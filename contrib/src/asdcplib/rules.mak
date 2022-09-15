@@ -40,7 +40,7 @@ ASDCPLIB_CONF += CXXFLAGS="$(ASDCPLIB_CXXFLAGS)"
 
 .asdcplib: asdcplib
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(ASDCPLIB_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(ASDCPLIB_CONF)
+	$(MAKEBUILD) install
 	touch $@

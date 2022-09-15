@@ -25,7 +25,7 @@ SCHRODINGER_CONF := --with-thread=none --disable-gtk-doc
 
 .schroedinger: schroedinger
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(SCHRODINGER_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(SCHRODINGER_CONF)
+	$(MAKEBUILD) install
 	touch $@

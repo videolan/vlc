@@ -32,8 +32,8 @@ FAAD2_CONF := --without-drm
 .faad2: faad2
 	$(REQUIRE_GPL)
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(FAAD2_CONF)
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(FAAD2_CONF)
 	cd $</_build && sed -i.orig "s/shrext_cmds/shrext/g" libtool
-	$(MAKE) -C $</_build -C libfaad install
+	$(MAKEBUILD) -C libfaad install
 	touch $@

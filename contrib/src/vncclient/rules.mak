@@ -41,9 +41,9 @@ endif
 .vncclient: vncclient
 	$(REQUIRE_GPL)
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(VNCCLIENT_CONF)
-	$(MAKE) -C $</_build -C libvncclient install
-	$(MAKE) -C $</_build install-data
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(VNCCLIENT_CONF)
+	$(MAKEBUILD) -C libvncclient install
+	$(MAKEBUILD) install-data
 	rm $(PREFIX)/lib/pkgconfig/libvncserver.pc
 	touch $@

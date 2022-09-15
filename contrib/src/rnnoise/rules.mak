@@ -26,9 +26,9 @@ RNNOISE_CONF := --disable-examples --disable-doc
 
 .rnnoise: rnnoise
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(RNNOISE_CONF)
-	$(MAKE) -C $</_build
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(RNNOISE_CONF)
+	$(MAKEBUILD)
 	$(call pkg_static,"_build/rnnoise.pc")
-	$(MAKE) -C $</_build install
+	$(MAKEBUILD) install
 	touch $@

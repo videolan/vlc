@@ -29,8 +29,8 @@ LIBMPEG2_CONF := --without-x --disable-sdl
 .libmpeg2: libmpeg2
 	$(REQUIRE_GPL)
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(LIBMPEG2_CONF)
-	$(MAKE) -C $</_build -C libmpeg2 && $(MAKE) -C $</_build -C libmpeg2 install
-	$(MAKE) -C $</_build -C include && $(MAKE) -C $</_build -C include install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(LIBMPEG2_CONF)
+	$(MAKEBUILD) -C libmpeg2 && $(MAKEBUILD) -C libmpeg2 install
+	$(MAKEBUILD) -C include && $(MAKEBUILD) -C include install
 	touch $@

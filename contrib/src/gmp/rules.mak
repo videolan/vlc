@@ -38,7 +38,7 @@ ifndef GPL
 	$(REQUIRE_GNUV3)
 endif
 	$(RECONF)
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(GMP_CONF)
-	$(MAKE) -C $</_build install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(GMP_CONF)
+	$(MAKEBUILD) install
 	touch $@

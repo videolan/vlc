@@ -24,7 +24,7 @@ DEPS_kate = ogg $(DEPS_ogg)
 KATE_CONF := --disable-valgrind --disable-doc
 
 .kate: libkate
-	mkdir -p $</_build
-	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(KATE_CONF)
-	$(MAKE) -C $</_build SUBDIRS=. install
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(KATE_CONF)
+	$(MAKEBUILD) SUBDIRS=. install
 	touch $@
