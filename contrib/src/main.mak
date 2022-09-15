@@ -441,6 +441,12 @@ AUTORECONF = GTKDOCIZE=true autoreconf
 endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
+
+MAKEBUILDDIR = mkdir -p $</_build && rm -f $</_build/config.status
+MAKEBUILD = $(MAKE) -C $</_build
+MAKECONFDIR = cd $</_build && $(HOSTVARS) ..
+MAKECONFIGURE = $(MAKECONFDIR)/configure $(HOSTCONF)
+
 # Work around for https://lists.nongnu.org/archive/html/bug-gnulib/2020-05/msg00237.html
 # When using a single command, make might take a shortcut and fork/exec
 # itself instead of relying on a shell, but a bug in gnulib ends up
