@@ -284,6 +284,9 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize );
 static unsigned char* parseVorbisConfigStr( char const* configStr,
                                             unsigned int& configSize );
+static unsigned char* parseOpusConfigStr( char const* configStr,
+                                          unsigned int& configSize,
+                                          audio_format_t& fmt );
 
 static char *passwordLessURL( const vlc_url_t *url );
 
@@ -1046,19 +1049,16 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "OPUS" ) )
                 {
-                    int i_extra;
-                    unsigned char *p_extra;
+                    unsigned int i_extra;
+                    void *p_extra = parseOpusConfigStr( sub->fmtp_config(), i_extra, tk->fmt.audio );
                     tk->fmt.i_codec = VLC_CODEC_OPUS;
-                    OpusHeader header;
-                    opus_header_init(&header);
-                    // "The RTP clock rate in "a=rtpmap" MUST be 48000 and the number of channels MUST be 2."
-                    // See: https://datatracker.ietf.org/doc/html/draft-ietf-payload-rtp-opus-11#section-7
-                    opus_prepare_header( 2, 48000, &header );
-                    if( opus_write_header( &p_extra, &i_extra, &header, NULL ) )
-                        return VLC_ENOMEM;
-                    opus_header_clean(&header);
-                    tk->fmt.i_extra = i_extra;
-                    tk->fmt.p_extra = p_extra;
+                    if( p_extra )
+                    {
+                        tk->fmt.i_extra = i_extra;
+                        tk->fmt.p_extra = p_extra;
+                    }
+                    else
+                        msg_Warn( p_demux,"Missing or unsupported opus header." );
                 }
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
@@ -2415,6 +2415,57 @@ static uint8_t *parseVorbisConfigStr( char const* configStr,
         else configSize = 0;
     }
     delete[] p_cfg;
+    return p_extra;
+}
+
+static unsigned char* parseOpusConfigStr( char const* configStr,
+                                          unsigned int& configSize,
+                                          audio_format_t& fmt )
+{
+    OpusHeader header;
+    opus_header_init( &header );
+    header.input_sample_rate = 48000;
+    header.channels = 2;
+
+    if( configStr )
+    {
+        char *psz_end;
+        /* Get source input rate, from negotiated reply */
+        const char *psz_token = strcasestr( configStr, "maxcodedaudiobandwidth=" );
+        if( psz_token )
+        {
+            const uint8_t rgi_rateskhz[] = { 8, 12, 16, 24 };
+            header.input_sample_rate = strtoul( psz_token + 23, &psz_end, 10 );
+            bool b_found = false;
+            for( size_t i=0; i<ARRAY_SIZE(rgi_rateskhz) && !b_found; i++ )
+                b_found = ( header.input_sample_rate == rgi_rateskhz[i] * 1000 );
+            if(!b_found)
+                header.input_sample_rate = 48000; /* last allowed or bogus value */
+        }
+
+        /* Get channel mode, from negotiated reply */
+        psz_token = strcasestr( configStr, "stereo=" );
+        if( psz_token )
+        {
+            header.channels = strtoul( psz_token + 7, &psz_end, 10 );
+            if( psz_end == psz_token + 7 || (header.channels & ~1U) )
+                header.channels = 2;
+        }
+    }
+
+    fmt.i_channels = header.channels;
+    fmt.i_rate = header.input_sample_rate;
+    /* Build extradata with the proper params */
+    opus_prepare_header( header.channels, header.input_sample_rate, &header );
+    int i_extra;
+    uint8_t *p_extra;
+    if( opus_write_header( &p_extra, &i_extra, &header, NULL ) )
+    {
+        p_extra = NULL;
+        i_extra = 0;
+    }
+    opus_header_clean(&header);
+    configSize = i_extra;
     return p_extra;
 }
 
