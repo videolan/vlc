@@ -26,7 +26,7 @@ libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 .dca: libdca
 	$(REQUIRE_GPL)
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -std=gnu89" ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C include install
 	cd $< && $(MAKE) -C libdca install
 	rm -f $(PREFIX)/lib/libdts.a
