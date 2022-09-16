@@ -48,6 +48,10 @@ struct aout_stream_owner
     aout_stream_t s;
     void *device;
     HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **);
+    HANDLE buffer_ready_event;
+
+    block_t *chain;
+    block_t **last;
 };
 
 /*
@@ -82,7 +86,16 @@ static inline
 HRESULT aout_stream_owner_TimeGet(struct aout_stream_owner *owner,
                                   vlc_tick_t *delay)
 {
-    return owner->s.time_get(&owner->s, delay);
+    HRESULT hr = owner->s.time_get(&owner->s, delay);
+
+    if (SUCCEEDED(hr))
+    {
+        /* Add the block chain delay */
+        vlc_tick_t length;
+        block_ChainProperties(owner->chain, NULL, NULL, &length);
+        *delay += length;
+    }
+    return hr;
 }
 
 static inline
@@ -101,7 +114,52 @@ HRESULT aout_stream_owner_Pause(struct aout_stream_owner *owner, bool paused)
 static inline
 HRESULT aout_stream_owner_Flush(struct aout_stream_owner *owner)
 {
+    block_ChainRelease(owner->chain);
+    owner->chain = NULL;
+    owner->last = &owner->chain;
+
     return owner->s.flush(&owner->s);
+}
+
+static inline
+void aout_stream_owner_AppendBlock(struct aout_stream_owner *owner,
+                                   block_t *block, vlc_tick_t date)
+{
+    block->i_dts = date;
+    block_ChainLastAppend(&owner->last, block);
+}
+
+static inline
+HRESULT aout_stream_owner_PlayAll(struct aout_stream_owner *owner)
+{
+    HRESULT hr;
+
+    block_t *block = owner->chain, *next;
+    while (block != NULL)
+    {
+        next = block->p_next;
+
+        vlc_tick_t date = block->i_dts;
+        block->i_dts = VLC_TICK_INVALID;
+
+        hr = aout_stream_owner_Play(owner, block, date);
+
+        if (hr == S_FALSE)
+            return hr;
+        else
+        {
+            block = owner->chain = next;
+            if (FAILED(hr))
+            {
+                if (block == NULL)
+                    owner->last = &owner->chain;
+                return hr;
+            }
+        }
+    }
+    owner->last = &owner->chain;
+
+    return S_OK;
 }
 
 /*
@@ -114,5 +172,12 @@ HRESULT aout_stream_Activate(aout_stream_t *s, REFIID iid,
 {
     struct aout_stream_owner *owner = aout_stream_owner(s);
     return owner->activate(owner->device, iid, actparms, pv);
+}
+
+static inline
+HANDLE aout_stream_GetBufferReadyEvent(aout_stream_t *s)
+{
+    struct aout_stream_owner *owner = aout_stream_owner(s);
+    return owner->buffer_ready_event;
 }
 #endif
