@@ -31,8 +31,8 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	# differentiate for winstore, only _WIN32_WINNT
 	$(APPLY) $(SRC)/iconv/0001-do-not-call-GetHandleInformation-in-Winstore-apps.patch
 
-	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
-	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub libcharset/build-aux
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && cp config.guess config.sub build-aux \
+	                                         && mv config.guess config.sub libcharset/build-aux
 	$(MOVE)
 
 ICONV_CONF := --disable-nls
