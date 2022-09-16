@@ -94,8 +94,8 @@ typedef struct
     signed char requested_mute; /**< Requested mute, negative if none */
     wchar_t *acquired_device; /**< Acquired device identifier, NULL if none */
     bool request_device_restart;
+    HANDLE work_event;
     vlc_mutex_t lock;
-    vlc_cond_t work;
     vlc_cond_t ready;
     vlc_thread_t thread; /**< Thread for audio session control */
 } aout_sys_t;
@@ -197,8 +197,8 @@ static int VolumeSet(audio_output_t *aout, float vol)
     vlc_mutex_lock(&sys->lock);
     int ret = VolumeSetLocked(aout, vol);
     aout_GainRequest(aout, sys->gain);
-    vlc_cond_signal(&sys->work);
     vlc_mutex_unlock(&sys->lock);
+    SetEvent(sys->work_event);
     return ret;
 }
 
@@ -208,8 +208,8 @@ static int MuteSet(audio_output_t *aout, bool mute)
 
     vlc_mutex_lock(&sys->lock);
     sys->requested_mute = mute;
-    vlc_cond_signal(&sys->work);
     vlc_mutex_unlock(&sys->lock);
+    SetEvent(sys->work_event);
     return 0;
 }
 
@@ -280,9 +280,7 @@ vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this,
 
     msg_Dbg(aout, "simple volume changed: %f, muting %sabled", vol,
             mute ? "en" : "dis");
-    vlc_mutex_lock(&sys->lock);
-    vlc_cond_signal(&sys->work); /* implicit state: vol & mute */
-    vlc_mutex_unlock(&sys->lock);
+    SetEvent(sys->work_event); /* implicit state: vol & mute */
     (void) ctx;
     return S_OK;
 }
@@ -736,7 +734,7 @@ static int DeviceRequestLocked(audio_output_t *aout)
 
     sys->request_device_restart = false;
 
-    vlc_cond_signal(&sys->work);
+    SetEvent(sys->work_event);
     while (sys->requested_device != NULL)
         vlc_cond_wait(&sys->ready, &sys->lock);
 
@@ -842,7 +840,9 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             }
         }
 
-        vlc_cond_wait(&sys->work, &sys->lock);
+        vlc_mutex_unlock(&sys->lock);
+        WaitForSingleObject(sys->work_event, INFINITE);
+        vlc_mutex_lock(&sys->lock);
     }
 }
 
@@ -1090,7 +1090,11 @@ static void *MMThread(void *data)
 
     do
         if (sys->requested_device == NULL || FAILED(MMSession(aout, it)))
-            vlc_cond_wait(&sys->work, &sys->lock);
+        {
+            vlc_mutex_unlock(&sys->lock);
+            WaitForSingleObject(sys->work_event, INFINITE);
+            vlc_mutex_lock(&sys->lock);
+        }
     while (sys->it != NULL);
 
     vlc_mutex_unlock(&sys->lock);
@@ -1289,8 +1293,11 @@ static int Open(vlc_object_t *obj)
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
 
     vlc_mutex_init(&sys->lock);
-    vlc_cond_init(&sys->work);
     vlc_cond_init(&sys->ready);
+
+    sys->work_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (unlikely(sys->work_event == NULL))
+        goto error;
 
     aout_HotplugReport(aout, default_device_b, _("Default"));
 
@@ -1350,6 +1357,8 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+    if (sys->work_event != NULL)
+        CloseHandle(sys->work_event);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -1362,10 +1371,12 @@ static void Close(vlc_object_t *obj)
     vlc_mutex_lock(&sys->lock);
     sys->requested_device = default_device; /* break out of MMSession() loop */
     sys->it = NULL; /* break out of MMThread() loop */
-    vlc_cond_signal(&sys->work);
     vlc_mutex_unlock(&sys->lock);
 
+    SetEvent(sys->work_event);
+
     vlc_join(sys->thread, NULL);
+    CloseHandle(sys->work_event);
 
     free(sys);
 }
