@@ -34,7 +34,8 @@ endif
 GPGERROR_CONF := $(HOSTCONF) \
 	--disable-nls \
 	--disable-languages \
-	--disable-tests
+	--disable-tests \
+	--disable-doc
 
 .gpg-error: libgpg-error
 	$(RECONF)
