@@ -29,6 +29,6 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(MOVE)
 
 .iconv: iconv
-	cd $< && $(HOSTVARS) ./configure CFLAGS="$(CFLAGS) -fgnu89-inline" $(HOSTCONF) --disable-nls
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls
 	cd $< && $(MAKE) install
 	touch $@
