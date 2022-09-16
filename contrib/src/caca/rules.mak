@@ -46,6 +46,9 @@ CACA_CONF := \
 ifdef HAVE_MACOSX
 CACA_CONF += --disable-x11
 endif
+ifndef WITH_OPTIMIZATION
+CACA_CONF += --enable-debug
+endif
 ifdef HAVE_WIN32
 CACA_CONF += --disable-ncurses \
     ac_cv_func_vsnprintf_s=yes \
