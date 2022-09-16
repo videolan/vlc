@@ -38,8 +38,9 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(MOVE)
 
-DEPS_ass = freetype2 $(DEPS_freetype2) fribidi iconv $(DEPS_iconv)
+DEPS_ass = freetype2 $(DEPS_freetype2) fribidi $(DEPS_fribidi) iconv $(DEPS_iconv)
 
+ASS_CONF = --disable-test
 ifneq ($(WITH_FONTCONFIG), 0)
 DEPS_ass += fontconfig $(DEPS_fontconfig)
 else
