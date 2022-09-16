@@ -8,6 +8,7 @@ PKGS_FOUND += nettle
 endif
 
 ifdef HAVE_WIN32
+NETTLE_CONF += --disable-pic
 ifeq ($(ARCH),arm)
 NETTLE_CONF += --disable-assembler
 endif
