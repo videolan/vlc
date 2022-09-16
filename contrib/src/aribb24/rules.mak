@@ -1,7 +1,7 @@
 # aribb24
 
 ARIBB24_VERSION := 1.0.3
-ARIBB24_URL := https://github.com/nkoriyama/aribb24/archive/v$(ARIBB24_VERSION).tar.gz
+ARIBB24_URL := $(GITHUB)/nkoriyama/aribb24/archive/v$(ARIBB24_VERSION).tar.gz
 
 ifdef GPL
 ifdef GNUV3

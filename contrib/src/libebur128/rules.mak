@@ -1,7 +1,7 @@
 # EBU R128 standard for loudness normalisation
 
 LIBEBUR128_VERSION := 1.2.6
-LIBEBUR128_URL := https://github.com/jiixyj/libebur128/archive/v$(LIBEBUR128_VERSION).tar.gz
+LIBEBUR128_URL := $(GITHUB)/jiixyj/libebur128/archive/v$(LIBEBUR128_VERSION).tar.gz
 
 PKGS += libebur128
 ifeq ($(call need_pkg,"libebur128"),)

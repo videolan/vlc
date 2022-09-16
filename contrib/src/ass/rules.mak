@@ -1,6 +1,6 @@
 # ASS
 ASS_VERSION := 0.16.0
-ASS_URL := https://github.com/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
+ASS_URL := $(GITHUB)/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
 
 PKGS += ass
 ifeq ($(call need_pkg,"libass"),)

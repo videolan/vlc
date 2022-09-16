@@ -1,6 +1,6 @@
 # NFS
 NFS_VERSION := 5.0.1
-NFS_URL := https://github.com/sahlberg/libnfs/archive/libnfs-$(NFS_VERSION).tar.gz
+NFS_URL := $(GITHUB)/sahlberg/libnfs/archive/libnfs-$(NFS_VERSION).tar.gz
 
 PKGS += nfs
 ifeq ($(call need_pkg,"libnfs >= 1.10"),)

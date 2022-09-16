@@ -1,6 +1,6 @@
 FXC2_HASH := 63ad74b7faa7033f2c1be9cc1cd0225241a1a9a5
 FXC2_VERSION := git-$(FXC2_HASH)
-FXC2_GITURL := https://github.com/mozilla/fxc2.git
+FXC2_GITURL := $(GITHUB)/mozilla/fxc2.git
 
 ifeq ($(call need_pkg,"fxc2"),)
 PKGS_FOUND += fxc2

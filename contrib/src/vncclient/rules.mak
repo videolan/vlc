@@ -1,7 +1,7 @@
 # vncclient
 
 VNCCLIENT_VERSION := 0.9.10
-VNCCLIENT_URL := https://github.com/LibVNC/libvncserver/archive/LibVNCServer-$(VNCCLIENT_VERSION).tar.gz
+VNCCLIENT_URL := $(GITHUB)/LibVNC/libvncserver/archive/LibVNCServer-$(VNCCLIENT_VERSION).tar.gz
 
 ifdef GPL
 ifdef BUILD_NETWORK

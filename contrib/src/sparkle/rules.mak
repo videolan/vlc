@@ -1,7 +1,7 @@
 # Sparkle
 
 SPARKLE_VERSION := 1.16.0
-SPARKLE_URL := https://github.com/sparkle-project/Sparkle/archive/$(SPARKLE_VERSION).zip
+SPARKLE_URL := $(GITHUB)/sparkle-project/Sparkle/archive/$(SPARKLE_VERSION).zip
 
 ifdef HAVE_MACOSX
 PKGS += sparkle

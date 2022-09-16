@@ -1,7 +1,7 @@
 # jpeg
 
 OPENJPEG_VERSION := 2.5.0
-OPENJPEG_URL := https://github.com/uclouvain/openjpeg/archive/v$(OPENJPEG_VERSION).tar.gz
+OPENJPEG_URL := $(GITHUB)/uclouvain/openjpeg/archive/v$(OPENJPEG_VERSION).tar.gz
 
 ifdef HAVE_WIN32
 DEPS_openjpeg += pthreads $(DEPS_pthreads)

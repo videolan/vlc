@@ -1,6 +1,6 @@
 LIBARIBCC_HASH := fab6e2a857dbda2eabca5c9b53d7a67e5c00c626
 LIBARIBCC_VERSION := git-$(LIBARIBCC_HASH)
-LIBARIBCC_GITURL := https://github.com/xqq/libaribcaption.git
+LIBARIBCC_GITURL := $(GITHUB)/xqq/libaribcaption.git
 
 PKGS += libaribcaption
 ifeq ($(call need_pkg,"libaribcaption"),)

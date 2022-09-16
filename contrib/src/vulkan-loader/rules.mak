@@ -1,5 +1,5 @@
 VULKAN_LOADER_VERSION := 1.3.211
-VULKAN_LOADER_URL := https://github.com/KhronosGroup/Vulkan-Loader/archive/v$(VULKAN_LOADER_VERSION).tar.gz
+VULKAN_LOADER_URL := $(GITHUB)/KhronosGroup/Vulkan-Loader/archive/v$(VULKAN_LOADER_VERSION).tar.gz
 
 DEPS_vulkan-loader = vulkan-headers $(DEPS_vulkan-headers)
 

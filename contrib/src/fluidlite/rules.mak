@@ -1,6 +1,6 @@
 # fluidlite
 
-FLUID_GITURL := https://github.com/divideconcept/FluidLite.git
+FLUID_GITURL := $(GITHUB)/divideconcept/FluidLite.git
 FLUID_HASH := 238997654efb20e736512847f3f5f6d618de9423
 
 ifdef HAVE_WIN32

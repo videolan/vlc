@@ -1,6 +1,6 @@
 # protobuf
 PROTOBUF_VERSION := 3.1.0
-PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
+PROTOBUF_URL := $(GITHUB)/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
 
 ifndef HAVE_TVOS
 PKGS += protobuf protoc

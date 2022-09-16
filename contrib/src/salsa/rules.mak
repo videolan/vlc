@@ -1,6 +1,6 @@
 # SALSA-lib
 
-SALSA_URL = https://github.com/tiwai/salsa-lib.git
+SALSA_URL = $(GITHUB)/tiwai/salsa-lib.git
 SALSA_TAG = v0.2.0
 SALSA_HASH = a3e5accc0b34ddc59fea2342f1ab1f8be179cf9d
 
