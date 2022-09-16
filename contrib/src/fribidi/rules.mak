@@ -1,6 +1,6 @@
 # FRIBIDI
 FRIBIDI_VERSION := 1.0.12
-FRIBIDI_URL := https://github.com/fribidi/fribidi/releases/download/v$(FRIBIDI_VERSION)/fribidi-$(FRIBIDI_VERSION).tar.xz
+FRIBIDI_URL := $(GITHUB)/fribidi/fribidi/releases/download/v$(FRIBIDI_VERSION)/fribidi-$(FRIBIDI_VERSION).tar.xz
 
 PKGS += fribidi
 ifeq ($(call need_pkg,"fribidi"),)

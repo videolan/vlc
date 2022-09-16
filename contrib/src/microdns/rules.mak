@@ -1,7 +1,7 @@
 # libmicrodns
 
 LIBMICRODNS_VERSION := 0.1.2
-LIBMICRODNS_URL := https://github.com/videolabs/libmicrodns/releases/download/$(LIBMICRODNS_VERSION)/microdns-$(LIBMICRODNS_VERSION).tar.xz
+LIBMICRODNS_URL := $(GITHUB)/videolabs/libmicrodns/releases/download/$(LIBMICRODNS_VERSION)/microdns-$(LIBMICRODNS_VERSION).tar.xz
 
 ifndef HAVE_DARWIN_OS
 ifdef BUILD_NETWORK

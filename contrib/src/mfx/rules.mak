@@ -1,6 +1,6 @@
 # mfx (Media SDK)
 
-mfx_GITURL := https://github.com/lu-zero/mfx_dispatch.git
+mfx_GITURL := $(GITHUB)/lu-zero/mfx_dispatch.git
 MFX_GITHASH := 7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca
 
 ifeq ($(call need_pkg,"mfx"),)

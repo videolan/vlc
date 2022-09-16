@@ -1,7 +1,7 @@
 # Mysofa
 
 MYSOFA_VERSION := 0.5
-MYSOFA_URL = https://github.com/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.gz
+MYSOFA_URL = $(GITHUB)/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.gz
 
 PKGS += mysofa
 

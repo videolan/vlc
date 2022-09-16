@@ -1,6 +1,6 @@
 # CACA
 CACA_VERSION := 0.99.beta20
-CACA_URL := https://github.com/cacalabs/libcaca/releases/download/v$(CACA_VERSION)/libcaca-$(CACA_VERSION).tar.gz
+CACA_URL := $(GITHUB)/cacalabs/libcaca/releases/download/v$(CACA_VERSION)/libcaca-$(CACA_VERSION).tar.gz
 
 ifndef HAVE_DARWIN_OS
 ifndef HAVE_LINUX # see VLC Trac 17251

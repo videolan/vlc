@@ -1,6 +1,6 @@
 # SMB2
 SMB2_VERSION := 4.0.0
-SMB2_URL := https://github.com/sahlberg/libsmb2/archive/v$(SMB2_VERSION).tar.gz
+SMB2_URL := $(GITHUB)/sahlberg/libsmb2/archive/v$(SMB2_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"smb2"),)
 PKGS_FOUND += smb2
