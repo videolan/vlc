@@ -48,7 +48,8 @@ GPGERROR_CONF := \
 	--disable-nls \
 	--disable-shared \
 	--disable-languages \
-	--disable-tests
+	--disable-tests \
+	--disable-doc
 
 .gpg-error: libgpg-error
 	$(RECONF)
