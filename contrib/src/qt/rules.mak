@@ -133,7 +133,7 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 		sub-uic-install_subtargets \
 		sub-qlalr-install_subtargets
 	# Install plugins
-	cd $< && $(MAKE) -C src -C plugins \
+	cd $< && $(MAKE) -C src/plugins \
 		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-imageformats-install_subtargets \
 		sub-platforms-install_subtargets \
