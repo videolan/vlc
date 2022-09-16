@@ -31,8 +31,10 @@ endif
 
 DEPS_ssh2 = gcrypt $(DEPS_gcrypt)
 
+SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls
+
 .ssh2: ssh2
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(BROKEN_GCC_CFLAGS) $(HOSTCONF) --disable-examples-build --with-libgcrypt --without-openssl --without-mbedtls
+	cd $< && $(HOSTVARS) ./configure $(BROKEN_GCC_CFLAGS) $(HOSTCONF) $(SSH2_CONF)
 	cd $< && $(MAKE) install
 	touch $@

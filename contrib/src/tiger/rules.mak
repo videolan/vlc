@@ -24,8 +24,10 @@ libtiger: libtiger-$(TIGER_VERSION).tar.gz .sum-tiger
 
 DEPS_tiger = kate $(DEPS_kate)
 
+TIGER_CONF := --disable-doc
+
 .tiger: libtiger
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(TIGER_CONF)
 	cd $< && $(MAKE) install
 	touch $@

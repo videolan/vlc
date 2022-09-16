@@ -21,9 +21,9 @@ libkate: libkate-$(KATE_VERSION).tar.gz .sum-kate
 
 DEPS_kate = ogg $(DEPS_ogg)
 
+KATE_CONF := --disable-valgrind --disable-doc
+
 .kate: libkate
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
-		--disable-valgrind \
-		--disable-doc
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(KATE_CONF)
 	cd $< && $(MAKE) SUBDIRS=. install
 	touch $@

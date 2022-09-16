@@ -18,8 +18,10 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
+NFS_CONF := --disable-examples --disable-utils --disable-werror
+
 .nfs: nfs
 	cd $< && ./bootstrap
-	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-utils --disable-werror $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(NFS_CONF)
 	cd $< && $(MAKE) install
 	touch $@

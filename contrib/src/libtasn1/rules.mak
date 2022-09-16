@@ -17,8 +17,10 @@ libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(APPLY) $(SRC)/libtasn1/no-executables.patch
 	$(MOVE)
 
+LIBTASN1_CONF := --disable-doc
+
 .libtasn1: libtasn1
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBTASN1_CONF)
 	cd $< && $(MAKE) install
 	touch $@

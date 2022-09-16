@@ -19,6 +19,8 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 	sed -i.orig -e "s/GCC_TREAT_WARNINGS_AS_ERRORS = YES/GCC_TREAT_WARNINGS_AS_ERRORS = NO/" "$(UNPACK_DIR)/src/common/mac/Breakpad.xcconfig"
 	$(MOVE)
 
+BREAKPAD_CONF := --disable-processor
+
 .breakpad: breakpad
 	# Framework
 ifdef HAVE_MACOSX
@@ -34,7 +36,7 @@ ifdef HAVE_MACOSX
 		install build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-processor
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(BREAKPAD_CONF)
 	cd $< && Configuration=Release $(MAKE) install
 endif
 	touch $@
