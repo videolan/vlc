@@ -20,8 +20,10 @@ libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	cd $(UNPACK_DIR) && sed -i.orig -e 's, -DASN1_BUILDING, -DASN1_BUILDING -D_GNU_SOURCE,' lib/Makefile.am
 	$(MOVE)
 
+LIBTASN1_CONF := --disable-doc
+
 .libtasn1: libtasn1
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBTASN1_CONF)
 	cd $< && $(MAKE) install
 	touch $@

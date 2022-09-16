@@ -21,8 +21,10 @@ schroedinger: schroedinger-$(SCHROEDINGER_VERSION).tar.gz .sum-schroedinger
 
 DEPS_schroedinger = orc $(DEPS_orc)
 
+SCHRODINGER_CONF := --with-thread=none --disable-gtk-doc
+
 .schroedinger: schroedinger
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure --with-thread=none --disable-gtk-doc $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SCHRODINGER_CONF)
 	cd $< && $(MAKE) install
 	touch $@

@@ -22,9 +22,11 @@ rnnoise: rnnoise-$(RNNOISE_GITHASH).tar.xz .sum-rnnoise
 	$(UNPACK)
 	$(MOVE)
 
+RNNOISE_CONF := --disable-examples --disable-doc
+
 .rnnoise: rnnoise
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-doc $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(RNNOISE_CONF)
 	cd $< && $(MAKE)
 	$(call pkg_static,"rnnoise.pc")
 	cd $< && $(MAKE) install

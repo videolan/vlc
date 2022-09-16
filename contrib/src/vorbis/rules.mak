@@ -37,8 +37,10 @@ endif
 
 DEPS_vorbis = ogg $(DEPS_ogg)
 
+VORBIS_CONF := --disable-docs --disable-examples --disable-oggtest
+
 .vorbis: libvorbis
 	$(RECONF) -Im4
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-docs --disable-examples --disable-oggtest
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(VORBIS_CONF)
 	cd $< && $(MAKE) install
 	touch $@

@@ -27,8 +27,10 @@ aribb25: aribb25-$(ARIBB25_VERSION).tar.gz .sum-aribb25
 	$(APPLY) $(SRC)/aribb25/0001-add-an-option-not-to-build-the-b25-sample-code.patch
 	$(MOVE)
 
+ARIBB25_CONF := --disable-b25
+
 .aribb25: aribb25
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-b25
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ARIBB25_CONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@

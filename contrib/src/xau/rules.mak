@@ -17,8 +17,10 @@ libxau: libXau-$(XAU_VERSION).tar.bz2 .sum-xau
 
 DEPS_xau = xorg-macros $(DEPS_xorg-macros) xproto $(DEPS_xproto)
 
+XAU_CONF := --enable-xthreads
+
 .xau: libxau
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-xthreads
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(XAU_CONF)
 	cd $< && $(MAKE) install
 	touch $@

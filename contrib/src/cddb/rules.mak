@@ -30,8 +30,10 @@ endif
 
 DEPS_cddb = regex $(DEPS_regex) gettext $(DEPS_gettext)
 
+CDDB_CONF := --without-iconv
+
 .cddb: cddb
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int -DWIN32_LEAN_AND_MEAN"
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int -DWIN32_LEAN_AND_MEAN" $(CDDB_CONF)
 	cd $< && $(MAKE) install
 	touch $@

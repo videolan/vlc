@@ -18,6 +18,8 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 	$(APPLY) $(SRC)/breakpad/0001-mac-client-Upgrade-Breakpad.xib-to-new-format.patch
 	$(MOVE)
 
+BREAKPAD_CONF := --disable-processor
+
 .breakpad: breakpad
 	# Framework
 ifdef HAVE_MACOSX
@@ -33,7 +35,7 @@ ifdef HAVE_MACOSX
 		install build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-processor
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(BREAKPAD_CONF)
 	cd $< && Configuration=Release $(MAKE) install
 endif
 	touch $@

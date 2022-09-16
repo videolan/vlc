@@ -27,8 +27,10 @@ endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
+LAME_CONF := --disable-analyzer-hooks --disable-decoder --disable-gtktest --disable-frontend
+
 .lame: lame
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(LAME_CFLAGS)" ./configure $(HOSTCONF) --disable-analyzer-hooks --disable-decoder --disable-gtktest --disable-frontend
+	cd $< && $(HOSTVARS) CFLAGS="$(LAME_CFLAGS)" ./configure $(HOSTCONF) $(LAME_CONF)
 	cd $< && $(MAKE) install
 	touch $@
