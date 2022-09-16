@@ -36,6 +36,7 @@ endif
 	$(MOVE)
 
 FLACCONF := \
+	--disable-examples \
 	--disable-thorough-tests \
 	--disable-doxygen-docs \
 	--disable-xmms-plugin \
