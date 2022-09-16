@@ -34,6 +34,6 @@ DEPS_dvdnav = dvdread $(DEPS_dvdread)
 .dvdnav: dvdnav
 	$(REQUIRE_GPL)
 	$(RECONF) -I m4
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-examples
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	$(MAKE) -C $< install
 	touch $@
