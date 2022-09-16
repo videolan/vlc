@@ -50,7 +50,6 @@ VLC.FlickableScrollHandler {
 
         model: ListModel {
             ListElement {property: "boundsBehavior"; value: 0 /* Flickable.StopAtBounds */}
-            ListElement {property: "boundsMovement"; value: 0 /* Flickable.StopAtBounds */}
         }
     }
 }
