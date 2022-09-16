@@ -78,10 +78,7 @@ static int write_uint32(Packet *p, uint32_t val)
 {
     if (p->pos>p->maxlen-4)
         return 0;
-    p->data[p->pos  ] = (val    ) & 0xFF;
-    p->data[p->pos+1] = (val>> 8) & 0xFF;
-    p->data[p->pos+2] = (val>>16) & 0xFF;
-    p->data[p->pos+3] = (val>>24) & 0xFF;
+    SetDWBE(&p->data[p->pos], val);
     p->pos += 4;
     return 1;
 }
@@ -90,8 +87,7 @@ static int write_uint16(Packet *p, uint16_t val)
 {
     if (p->pos>p->maxlen-2)
         return 0;
-    p->data[p->pos  ] = (val    ) & 0xFF;
-    p->data[p->pos+1] = (val>> 8) & 0xFF;
+    SetWBE(&p->data[p->pos], val);
     p->pos += 2;
     return 1;
 }
@@ -100,8 +96,8 @@ static int write_chars(Packet *p, const unsigned char *str, int nb_chars)
 {
     if (p->pos>p->maxlen-nb_chars)
         return 0;
-    for (int i=0;i<nb_chars;i++)
-        p->data[p->pos++] = str[i];
+    memcpy(&p->data[p->pos], str, nb_chars);
+    p->pos += nb_chars;
     return 1;
 }
 
@@ -109,10 +105,7 @@ static int read_uint32(ROPacket *p, uint32_t *val)
 {
     if (p->pos>p->maxlen-4)
         return 0;
-    *val =  (uint32_t)p->data[p->pos  ];
-    *val |= (uint32_t)p->data[p->pos+1]<< 8;
-    *val |= (uint32_t)p->data[p->pos+2]<<16;
-    *val |= (uint32_t)p->data[p->pos+3]<<24;
+    *val = GetDWBE(&p->data[p->pos]);
     p->pos += 4;
     return 1;
 }
@@ -121,8 +114,7 @@ static int read_uint16(ROPacket *p, uint16_t *val)
 {
     if (p->pos>p->maxlen-2)
         return 0;
-    *val =  (uint16_t)p->data[p->pos  ];
-    *val |= (uint16_t)p->data[p->pos+1]<<8;
+    *val = GetWBE(&p->data[p->pos]);
     p->pos += 2;
     return 1;
 }
@@ -131,8 +123,8 @@ static int read_chars(ROPacket *p, unsigned char *str, int nb_chars)
 {
     if (p->pos>p->maxlen-nb_chars)
         return 0;
-    for (int i=0;i<nb_chars;i++)
-        str[i] = p->data[p->pos++];
+    memcpy(str, &p->data[p->pos], nb_chars);
+    p->pos += nb_chars;
     return 1;
 }
 
