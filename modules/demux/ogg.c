@@ -2887,10 +2887,8 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
 
     /* All OggOpus streams are timestamped at 48kHz and
      * can be played at 48kHz. */
-    p_stream->fmt.audio.i_rate = 48000;
-    date_Init( &p_stream->dts, p_stream->fmt.audio.i_rate, 1 );
+    date_Init( &p_stream->dts, 48000, 1 );
     p_stream->fmt.i_bitrate = 0;
-
     /* Cheat and get additional info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
     oggpack_adv( &opb, 64 );
@@ -2898,7 +2896,8 @@ static void Ogg_ReadOpusHeader( logical_stream_t *p_stream,
     {
         p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
         p_stream->i_pre_skip = oggpack_read( &opb, 16 );
-        oggpack_adv( &opb, 48 );
+        p_stream->fmt.audio.i_rate = oggpack_read( &opb, 32 );
+        oggpack_adv( &opb, 16 );
         switch( oggpack_read( &opb, 8 ) ) /* mapping family */
         {
             case 0: /* RFC7587 */
