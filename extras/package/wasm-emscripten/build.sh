@@ -123,7 +123,7 @@ diagnostic "vlc contribs: bootstrap"
             --disable-lua --disable-luac --disable-sqlite \
             --disable-medialibrary --disable-mpcdec --disable-schroedinger \
             --disable-orc --disable-protobuf --disable-sidplay2 \
-            --disable-soxr --disable-spatialaudio --disable-speex \
+            --disable-spatialaudio --disable-speex \
             --disable-speexdsp --disable-taglib --disable-zvbi \
             --disable-rnnoise --disable-libaribcaption \
             --host=wasm32-unknown-emscripten
