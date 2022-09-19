@@ -23,13 +23,6 @@ endif
 ifdef HAVE_DARWIN_OS
 	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
 endif
-ifdef HAVE_ANDROID
-ifeq ($(ANDROID_ABI), x86)
-	# cpu.c:130:29: error: sys/ucontext.h: No such file or directory
-	# defining USE_OBSOLETE_SIGCONTEXT_FLAVOR allows us to bypass that
-	cd $(UNPACK_DIR) && sed -i.orig -e s/"#  undef USE_OBSOLETE_SIGCONTEXT_FLAVOR"/"#define USE_OBSOLETE_SIGCONTEXT_FLAVOR"/g src/libFLAC/cpu.c
-endif
-endif
 	$(APPLY) $(SRC)/flac/dont-force-msvcrt-version.patch
 	$(call pkg_static,"src/libFLAC/flac.pc.in")
 	$(UPDATE_AUTOCONFIG)
