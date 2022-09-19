@@ -43,6 +43,7 @@ private:
     QTreeView *bookmarksList;
     QPushButton *clearButton;
     QPushButton *delButton;
+    QPushButton *addButton;
     MLBookmarkModel* m_model;
 
 private slots:
