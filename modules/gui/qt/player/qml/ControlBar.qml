@@ -67,45 +67,45 @@ Control {
 
     function _layout() {
         switch (textPosition) {
-        case ControlBar.TimeTextPosition.Hide:
-            row1.children = []
-            row2.children = [trackPositionSlider]
-            mediaTime.visible = false
-            mediaRemainingTime.visible = false
-            spacer.visible = false
-            row2.Layout.leftMargin = 0
-            row2.Layout.rightMargin = 0
-            mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-            mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-            break;
+            case ControlBar.TimeTextPosition.Hide:
+                row1.children = []
+                row2.children = [trackPositionSlider]
+                mediaTime.visible = false
+                mediaRemainingTime.visible = false
+                spacer.visible = false
+                row2.Layout.leftMargin = 0
+                row2.Layout.rightMargin = 0
+                mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+                mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+                break;
 
-        case ControlBar.TimeTextPosition.AboveSlider:
-            row1.children = [mediaTime, spacer, mediaRemainingTime]
-            row2.children = [trackPositionSlider]
-            mediaTime.visible = true
-            mediaRemainingTime.visible = Qt.binding(function() { return !playlistVisibility.isPlaylistVisible })
-            spacer.visible = true
-            row2.Layout.leftMargin = 0
-            row2.Layout.rightMargin = 0
-            mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-            mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-            break;
+            case ControlBar.TimeTextPosition.AboveSlider:
+                row1.children = [mediaTime, spacer, mediaRemainingTime]
+                row2.children = [trackPositionSlider]
+                mediaTime.visible = true
+                mediaRemainingTime.visible = Qt.binding(function() { return !playlistVisibility.isPlaylistVisible })
+                spacer.visible = true
+                row2.Layout.leftMargin = 0
+                row2.Layout.rightMargin = 0
+                mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+                mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+                break;
 
-        case ControlBar.TimeTextPosition.LeftRightSlider:
-            row1.children = []
-            row2.children = [mediaTime, trackPositionSlider, mediaRemainingTime]
-            mediaTime.visible = true
-            mediaRemainingTime.visible = true
-            spacer.visible = false
-            row2.Layout.leftMargin = VLCStyle.margin_xsmall
-            row2.Layout.rightMargin = VLCStyle.margin_xsmall
-            mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
-            mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
-            trackPositionSlider.Layout.alignment = Qt.AlignVCenter
-            break;
+            case ControlBar.TimeTextPosition.LeftRightSlider:
+                row1.children = []
+                row2.children = [mediaTime, trackPositionSlider, mediaRemainingTime]
+                mediaTime.visible = true
+                mediaRemainingTime.visible = true
+                spacer.visible = false
+                row2.Layout.leftMargin = VLCStyle.margin_xsmall
+                row2.Layout.rightMargin = VLCStyle.margin_xsmall
+                mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
+                mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
+                trackPositionSlider.Layout.alignment = Qt.AlignVCenter
+                break;
 
-        default:
-            console.assert(false, "invalid text position")
+            default:
+                console.assert(false, "invalid text position")
         }
 
         row1.visible = row1.children.length > 0

@@ -52,9 +52,7 @@ QVariant MLBookmarkModel::data( const QModelIndex &index, int role ) const
 {
     if ( !index.isValid() || index.row() < 0 || m_player == nullptr ||
          !m_bookmarks || (uint32_t)index.row() >= m_bookmarks->i_nb_items )
-    {
         return QVariant{};
-    }
 
     const auto& bookmark = m_bookmarks->p_items[index.row()];
 
@@ -217,7 +215,6 @@ void MLBookmarkModel::sort( int column, Qt::SortOrder order )
 
 void MLBookmarkModel::add()
 {
-
     vlc_tick_t currentTime;
     {
         vlc_player_locker lock{ m_player };
@@ -248,7 +245,6 @@ void MLBookmarkModel::add()
     [this](){
         refresh( MLBOOKMARKMODEL_REFRESH );
     });
-
 }
 
 void MLBookmarkModel::remove( const QModelIndexList &indexes )
@@ -401,8 +397,6 @@ void MLBookmarkModel::updateMediaId(uint64_t revision, const QString mediaUri)
         }
     });
 }
-
-
 
 void MLBookmarkModel::refresh(MLBookmarkModel::RefreshOperation forceClear )
 {
