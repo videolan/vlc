@@ -16,7 +16,8 @@ $(TARBALLS)/libsamplerate-$(SAMPLERATE_VERSION).tar.gz:
 
 samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub Cfg
+	$(UPDATE_AUTOCONFIG)
+	cd $(UNPACK_DIR) && mv config.guess config.sub Cfg
 	$(MOVE)
 
 .samplerate: samplerate
