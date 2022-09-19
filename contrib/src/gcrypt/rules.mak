@@ -48,9 +48,7 @@ GCRYPT_CONF += --disable-asm --disable-padlock-support
 endif
 endif
 ifdef HAVE_IOS
-GCRYPT_EXTRA_CFLAGS = -fheinous-gnu-extensions
-else
-GCRYPT_EXTRA_CFLAGS =
+GCRYPT_CONF += CFLAGS="$(CFLAGS) -fheinous-gnu-extensions"
 endif
 ifdef HAVE_MACOSX
 GCRYPT_CONF += --disable-aesni-support
@@ -84,6 +82,6 @@ endif
 
 .gcrypt: gcrypt
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" $(GCRYPT_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
 	$(MAKE) -C $< install
 	touch $@
