@@ -489,7 +489,7 @@ ifdef HAVE_CROSS_COMPILE
 MESONFLAGS += --cross-file $(abspath crossfile.meson)
 MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" \
 	PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
-	CMAKE="$(command -v cmake)" \
+	CMAKE="$(shell command -v cmake)" \
 	CMAKE_PREFIX_PATH="$(PREFIX)" \
 	meson -Dpkg_config_path="$(PKG_CONFIG_PATH)" \
 	$(MESONFLAGS)
