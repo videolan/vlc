@@ -9,8 +9,8 @@ YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.
 NASM_VERSION=2.14
 NASM_URL=https://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
 
-CMAKE_VERSION=3.17.0
-CMAKE_URL=https://www.cmake.org/files/v3.17/cmake-$(CMAKE_VERSION).tar.gz
+CMAKE_VERSION=3.24.2
+CMAKE_URL=https://www.cmake.org/files/v3.24/cmake-$(CMAKE_VERSION).tar.gz
 
 LIBTOOL_VERSION=2.4.7
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
