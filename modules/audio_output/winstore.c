@@ -68,7 +68,7 @@ typedef struct
     IActivateAudioInterfaceCompletionHandler client_locator;
     vlc_sem_t async_completed;
     LONG refs;
-    CRITICAL_SECTION lock;
+    vlc_mutex_t lock;
 } aout_sys_t;
 
 
@@ -257,9 +257,9 @@ static int DeviceSelectLocked(audio_output_t *aout, const char* id)
 static int DeviceSelect(audio_output_t *aout, const char* id)
 {
     aout_sys_t *sys = aout->sys;
-    EnterCriticalSection(&sys->lock);
+    vlc_mutex_lock(&sys->lock);
     int ret = DeviceSelectLocked(aout, id);
-    LeaveCriticalSection(&sys->lock);
+    vlc_mutex_unlock(&sys->lock);
     return ret;
 }
 
@@ -450,7 +450,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     // Load the "out stream" for the requested device
     EnterMTA();
-    EnterCriticalSection(&sys->lock);
+    vlc_mutex_lock(&sys->lock);
 
     if (sys->requested_device != NULL)
     {
@@ -460,7 +460,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             DeviceRestartLocked(aout);
             if (sys->client == NULL)
             {
-                LeaveCriticalSection(&sys->lock);
+                vlc_mutex_unlock(&sys->lock);
                 LeaveMTA();
                 vlc_object_delete(&s->obj);
                 return -1;
@@ -539,7 +539,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             ISimpleAudioVolume_Release(pc_AudioVolume);
     }
 
-    LeaveCriticalSection(&sys->lock);
+    vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
 
     if (sys->module == NULL)
@@ -596,7 +596,7 @@ static int Open(vlc_object_t *obj)
         free(psz_default);
     }
 
-    InitializeCriticalSection(&sys->lock);
+    vlc_mutex_init(&sys->lock);
 
     vlc_sem_init(&sys->async_completed, 0);
     sys->refs = 0;
@@ -634,7 +634,6 @@ static void Close(vlc_object_t *obj)
     if (sys->requested_device != sys->default_device)
         free(sys->requested_device);
     CoTaskMemFree(sys->default_device);
-    DeleteCriticalSection(&sys->lock);
 
     free(sys);
 }
