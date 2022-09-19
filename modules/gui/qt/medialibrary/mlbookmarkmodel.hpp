@@ -36,12 +36,27 @@
 #include "mlevent.hpp"
 
 
+class PlayerController;
 class MediaLib;
 class MLBookmarkModel : public QAbstractListModel
 {
+    Q_OBJECT
+
+    Q_PROPERTY(PlayerController * player READ playerController WRITE setPlayer FINAL)
+
+    Q_PROPERTY(MediaLib * ml READ ml WRITE setMl FINAL)
+
 public:
     explicit MLBookmarkModel( QObject* parent = nullptr );
     virtual ~MLBookmarkModel();
+
+    enum BookmarkRoles {
+        NameRole = Qt::UserRole,
+        TimeRole = Qt::UserRole + 1,
+        PositionRole = Qt::UserRole + 2,
+        DescriptionRole = Qt::UserRole + 3
+    };
+    virtual QHash<int, QByteArray> roleNames() const override;
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole ) const override;
     bool setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole ) override;
@@ -56,13 +71,15 @@ public:
 
     vlc_player_t* player() const;
     void setPlayer(vlc_player_t* player);
+    PlayerController * playerController() const;
+    void setPlayer(PlayerController* playerController);
     MediaLib* ml() const;
     void setMl(MediaLib* ml);
 
     void add();
     void remove( const QModelIndexList& indexes );
     void clear();
-    void select( const QModelIndex& index );
+    Q_INVOKABLE void select( const QModelIndex& index );
 
 private:
     static void onCurrentMediaChanged( vlc_player_t* player, input_item_t* media,
@@ -74,6 +91,7 @@ private:
     void updateMediaId(uint64_t revision, const QString mediaUri);
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
 
+    int columnToRole(int column) const;
     void initModel();
 
     enum RefreshOperation {
@@ -88,6 +106,7 @@ private:
     MediaLib* m_mediaLib = nullptr;
     vlc_player_t* m_player = nullptr;
     vlc_player_listener_id* m_listener = nullptr;
+    PlayerController* m_player_controller = nullptr;
 
     // Assume to be only used from the GUI thread
     BookmarkListPtr m_bookmarks;

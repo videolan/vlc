@@ -861,6 +861,7 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/NetworkThumbnailItem.qml \
 	gui/qt/network/qml/ServicesHomeDisplay.qml \
 	gui/qt/player/qml/qmldir \
+        gui/qt/player/qml/Bookmarks.qml \
 	gui/qt/player/qml/ControlBar.qml \
 	gui/qt/player/qml/ControlbarControls.qml \
 	gui/qt/player/qml/PlaybackSpeed.qml \

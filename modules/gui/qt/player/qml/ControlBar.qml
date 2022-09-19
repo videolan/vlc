@@ -44,6 +44,7 @@ Control {
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
+    property real bookmarksHeight: VLCStyle.icon_xsmall * 0.9
 
     signal requestLockUnlockAutoHide(bool lock)
 
@@ -116,6 +117,7 @@ Control {
         id: columnLayout
 
         spacing: VLCStyle.margin_xsmall
+        z: 1
 
         RowLayout {
             id: row1
@@ -190,6 +192,24 @@ Control {
 
         Keys.onPressed: {
             Navigation.defaultKeyAction(event)
+        }
+    }
+
+    Loader {
+        id: bookmarksLoader
+
+        active: MainCtx.mediaLibraryAvailable
+        source: "qrc:/player/Bookmarks.qml"
+
+        x: root.leftPadding + trackPositionSlider.x + row2.Layout.leftMargin
+        y: row2.y + row2.height + VLCStyle.margin_xxsmall
+        width: trackPositionSlider.width
+
+        onLoaded: {
+           item.colors = Qt.binding(function() { return root.colors })
+           item.barHeight = Qt.binding(function() { return bookmarksHeight })
+           item.controlBarHovered = Qt.binding(function() { return root.hovered })
+           item.yShift = Qt.binding(function() { return row2.height + VLCStyle.margin_xxsmall })
         }
     }
 }

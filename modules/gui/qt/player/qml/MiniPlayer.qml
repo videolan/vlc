@@ -89,6 +89,7 @@ FocusScope {
         textPosition: ControlBar.TimeTextPosition.Hide
         sliderHeight: VLCStyle.dp(3, VLCStyle.scale)
         sliderBackgroundColor: colors.sliderBarMiniplayerBgColor
+        bookmarksHeight: VLCStyle.icon_xsmall * 0.7
         identifier: PlayerControlbarModel.Miniplayer
         Navigation.parentItem: root
 

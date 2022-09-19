@@ -311,6 +311,7 @@
         <file alias="PlayerPlaylistVisibilityFSM.qml">player/qml/PlayerPlaylistVisibilityFSM.qml</file>
         <file alias="PlayerBlurredBackground.qml">player/qml/PlayerBlurredBackground.qml</file>
         <file alias="PlayerBlurredBackground.frag">player/qml/PlayerBlurredBackground.frag</file>
+        <file alias="Bookmarks.qml">player/qml/Bookmarks.qml</file>
     </qresource>
     <qresource prefix="/player/controlbarcontrols">
         <file alias="HighResolutionTimeWidget.qml">player/qml/controlbarcontrols/HighResolutionTimeWidget.qml</file>
