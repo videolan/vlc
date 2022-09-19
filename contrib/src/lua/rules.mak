@@ -106,7 +106,7 @@ endif
 		INSTALL_TOP="$(PREFIX)" \
 		$(LUA_MAKEFLAGS)
 ifdef HAVE_WIN32
-	cd $< && $(RANLIB) "$(PREFIX)/lib/liblua$(LUA_SHORTVERSION).a"
+	$(RANLIB) "$(PREFIX)/lib/liblua$(LUA_SHORTVERSION).a"
 endif
 
 	# Configure scripts might search for lua >= 5.4 or lua5.4 so expose both
