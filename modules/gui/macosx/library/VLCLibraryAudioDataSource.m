@@ -36,6 +36,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -168,10 +169,16 @@
     [_collectionView registerNib:albumSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind 
                   withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier];
+
     NSNib *audioGroupSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAudioGroupSupplementaryDetailView" bundle:nil];
     [_collectionView registerNib:audioGroupSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind 
                   withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
+
+    NSNib *mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
+    [_collectionView registerNib:mediaItemSupplementaryDetailView
+      forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 
     _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionView.collectionViewLayout = _collectionViewFlowLayout;
@@ -370,7 +377,7 @@
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath || _currentParentType == VLC_ML_PARENT_UNKNOWN) {
+    if (!indexPath) {
         return;
     }
 
@@ -380,7 +387,7 @@
 - (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath || _currentParentType == VLC_ML_PARENT_UNKNOWN) {
+    if (!indexPath) {
         return;
     }
 
@@ -414,6 +421,16 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         audioGroupSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
         return audioGroupSupplementaryDetailView;
+
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView* mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
+
+        VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[indexPath.item];
+        mediaItemSupplementaryDetailView.representedMediaItem = mediaItem;
+        mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
+
+        return mediaItemSupplementaryDetailView;
     }
 
     return nil;

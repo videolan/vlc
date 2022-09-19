@@ -22,9 +22,10 @@
 
 #import "VLCLibraryCollectionViewFlowLayout.h"
 
+#import "VLCLibraryAudioDataSource.h"
 #import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
-#import "VLCLibraryAudioDataSource.h"
+#import "VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
@@ -172,6 +173,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 break;
             case 2:
             default:
+                [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
         }
     }
@@ -185,9 +187,13 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     BOOL isLibrarySupplementaryView = NO;
 
     if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
+
         isLibrarySupplementaryView = YES;
         _animationSteps = _largeHeightAnimationSteps;
-    } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
+
+    } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
+               [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+
         isLibrarySupplementaryView = YES;
         _animationSteps = _defaultHeightAnimationSteps;
     }
@@ -217,7 +223,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 - (NSSet<NSIndexPath *> *)indexPathsToDeleteForSupplementaryViewOfKind:(NSString *)elementKind 
 {
-    if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
+    if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind] ||
+        [elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
+        [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+
         return [self.collectionView indexPathsForVisibleSupplementaryElementsOfKind:elementKind];
     }
     return [NSSet set];
