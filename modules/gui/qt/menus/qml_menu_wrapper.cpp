@@ -479,8 +479,9 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
         m_menu->addSeparator();
 
-        MLBookmarkModel * bookmarks = new MLBookmarkModel(m_ctx->getMediaLibrary(),
-                                                          m_player->getPlayer(), m_menu.get());
+        MLBookmarkModel * bookmarks = new MLBookmarkModel(m_menu.get());
+        bookmarks->setPlayer(m_player->getPlayer());
+        bookmarks->setMl(m_ctx->getMediaLibrary());
 
         helper = new ListMenuHelper(m_menu.get(), bookmarks, nullptr, m_menu.get());
 

@@ -63,9 +63,9 @@ BookmarksDialog::BookmarksDialog( qt_intf_t *_p_intf ):QVLCFrame( _p_intf )
                           QDialogButtonBox::RejectRole);
 
     bookmarksList = new QTreeView( this );
-    m_model = new MLBookmarkModel( _p_intf->p_mi->getMediaLibrary(),
-                                   _p_intf->p_player,
-                                   bookmarksList );
+    m_model = new MLBookmarkModel( bookmarksList );
+    m_model->setPlayer(_p_intf->p_player);
+    m_model->setMl(_p_intf->p_mi->getMediaLibrary());
     bookmarksList->setModel( m_model );
     bookmarksList->setRootIsDecorated( false );
     bookmarksList->setAlternatingRowColors( true );

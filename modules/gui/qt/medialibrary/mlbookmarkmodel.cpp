@@ -29,78 +29,29 @@
 #include "mlhelper.hpp"
 #include "util/vlctick.hpp"
 
-MLBookmarkModel::MLBookmarkModel( MediaLib* medialib, vlc_player_t *player,
-                                  QObject *parent )
+MLBookmarkModel::MLBookmarkModel( QObject *parent )
     : QAbstractListModel( parent )
-    , m_mediaLib( medialib )
-    , m_player( player )
     , m_currentItem( nullptr, &input_item_Release )
-{
-    static const vlc_player_cbs cbs {
-        &onCurrentMediaChanged,
-        &onPlaybackStateChanged,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-    };
-    QString uri;
-    {
-        vlc_player_locker lock{ m_player };
-        vlc::threads::mutex_locker selflock{ m_mutex };
-        m_listener = vlc_player_AddListener( m_player, &cbs, this );
-        if ( m_listener == nullptr )
-            throw std::bad_alloc{};
-        auto currentItem = vlc_player_GetCurrentMedia( m_player );
-        m_currentItem = vlc::wrap_cptr( currentItem ? input_item_Hold( currentItem ) : nullptr,
-                                        &input_item_Release );
-        if (m_currentItem)
-        {
-            uri = m_currentItem->psz_uri;
-        }
-    }
-    updateMediaId(0, uri);
-}
+    , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
+        if (!cb)
+            return;
+        if ( m_mediaLib )
+            m_mediaLib->unregisterEventListener(cb);
+    })
+{}
 
 MLBookmarkModel::~MLBookmarkModel()
 {
-    vlc_player_locker lock{ m_player };
-    vlc_player_RemoveListener( m_player, m_listener );
+    if(m_player && m_listener){
+        vlc_player_locker lock{ m_player };
+        vlc_player_RemoveListener( m_player, m_listener );
+    }
 }
 
 QVariant MLBookmarkModel::data( const QModelIndex &index, int role ) const
 {
-    if ( !index.isValid() || index.row() < 0 ||
-         !m_bookmarks ||
-         (uint32_t)index.row() >= m_bookmarks->i_nb_items )
+    if ( !index.isValid() || index.row() < 0 || m_player == nullptr ||
+         !m_bookmarks || (uint32_t)index.row() >= m_bookmarks->i_nb_items )
     {
         return QVariant{};
     }
@@ -445,6 +396,7 @@ void MLBookmarkModel::updateMediaId(uint64_t revision, const QString mediaUri)
             beginResetModel();
             m_bookmarks = std::move(ctx.newBookmarks);
             m_currentMediaId = ctx.newMLid;
+            refresh(MLBOOKMARKMODEL_REFRESH);
             endResetModel();
         }
     });
@@ -486,5 +438,129 @@ void MLBookmarkModel::refresh(MLBookmarkModel::RefreshOperation forceClear )
                 m_bookmarks.reset();
             endResetModel();
         });
+    }
+}
+
+vlc_player_t * MLBookmarkModel::player() const
+{
+    return m_player;
+}
+
+void MLBookmarkModel::setPlayer(vlc_player_t * player)
+{
+    if (m_player == player) return;
+
+    if(m_player && m_listener){
+        vlc_player_locker lock{ m_player };
+        vlc_player_RemoveListener( m_player, m_listener );
+    }
+
+    m_player = player;
+
+    if (m_player && m_mediaLib)
+        initModel();
+}
+
+MediaLib* MLBookmarkModel::ml() const
+{
+    return m_mediaLib;
+}
+
+void MLBookmarkModel::playerLengthChanged()
+{
+    refresh(MLBOOKMARKMODEL_REFRESH);
+}
+
+void MLBookmarkModel::setMl(MediaLib* medialib)
+{
+    if(m_mediaLib == medialib) return;
+
+    if(m_mediaLib)
+        m_ml_event_handle.reset(nullptr);
+
+    m_mediaLib = medialib;
+
+    if (m_player && m_mediaLib)
+        initModel();
+}
+
+void MLBookmarkModel::initModel()
+{
+    static const vlc_player_cbs cbs {
+        &onCurrentMediaChanged,
+        &onPlaybackStateChanged,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+    };
+    QString uri;
+    {
+        vlc_player_locker lock{ m_player };
+        vlc::threads::mutex_locker selflock{ m_mutex };
+        m_listener = vlc_player_AddListener( m_player, &cbs, this );
+        if ( m_listener == nullptr )
+            throw std::bad_alloc{};
+        auto currentItem = vlc_player_GetCurrentMedia( m_player );
+        m_currentItem = vlc::wrap_cptr( currentItem ? input_item_Hold( currentItem ) : nullptr,
+                                        &input_item_Release );
+        if (m_currentItem)
+        {
+            uri = m_currentItem->psz_uri;
+        }
+    }
+    updateMediaId(0, uri);
+
+    if (m_ml_event_handle == nullptr)
+        m_ml_event_handle.reset(m_mediaLib->registerEventListener(onVlcMlEvent, this));
+}
+
+void MLBookmarkModel::onVlcMlEvent(void* data, const vlc_ml_event_t* event)
+{
+    auto self = static_cast<MLBookmarkModel*>(data);
+    auto  mlEvent = std::make_shared<MLEvent>(event);
+    QMetaObject::invokeMethod(self, [self, mlEvent] () mutable {
+        self->onVlcMlEvent(*mlEvent);
+    });
+}
+
+void MLBookmarkModel::onVlcMlEvent(const MLEvent &event){
+    switch (event.i_type)
+    {
+        case VLC_ML_EVENT_BOOKMARKS_ADDED:
+        case VLC_ML_EVENT_BOOKMARKS_DELETED:
+        case VLC_ML_EVENT_BOOKMARKS_UPDATED:
+            refresh(MLBOOKMARKMODEL_REFRESH);
+        break;
+        default:
+            break;
     }
 }

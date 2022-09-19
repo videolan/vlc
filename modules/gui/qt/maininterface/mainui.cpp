@@ -19,6 +19,7 @@
 #include "medialibrary/mlplaylistlistmodel.hpp"
 #include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlplaylist.hpp"
+#include "medialibrary/mlbookmarkmodel.hpp"
 
 #include "player/player_controller.hpp"
 #include "player/player_controlbar_model.hpp"
@@ -254,7 +255,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterUncreatableType<TrackListModel>(uri, versionMajor, versionMinor, "TrackListModel", "available tracks of a media (audio/video/sub)" );
         qmlRegisterUncreatableType<TitleListModel>(uri, versionMajor, versionMinor, "TitleListModel", "available titles of a media" );
-        qmlRegisterUncreatableType<ChapterListModel>(uri, versionMajor, versionMinor, "ChapterListModel", "available titles of a media" );
+        qmlRegisterUncreatableType<ChapterListModel>(uri, versionMajor, versionMinor, "ChapterListModel", "available chapters of a media" );
         qmlRegisterUncreatableType<ProgramListModel>(uri, versionMajor, versionMinor, "ProgramListModel", "available programs of a media" );
         qmlRegisterUncreatableType<VLCVarChoiceModel>(uri, versionMajor, versionMinor, "VLCVarChoiceModel", "generic variable with choice model" );
 
@@ -356,6 +357,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLVideoFoldersModel>( uri, versionMajor, versionMinor, "MLVideoFoldersModel" );
         qmlRegisterType<MLPlaylistListModel>( uri, versionMajor, versionMinor, "MLPlaylistListModel" );
         qmlRegisterType<MLPlaylistModel>( uri, versionMajor, versionMinor, "MLPlaylistModel" );
+        qmlRegisterType<MLBookmarkModel>( uri, versionMajor, versionMinor, "MLBookmarkModel" );
 
         qRegisterMetaType<NetworkTreeItem>();
         qmlRegisterType<NetworkMediaModel>( uri, versionMajor, versionMinor, "NetworkMediaModel");

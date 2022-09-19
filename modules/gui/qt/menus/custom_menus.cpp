@@ -554,7 +554,9 @@ BookmarkMenu::BookmarkMenu(MediaLib * mediaLib, vlc_player_t * player, QWidget *
 
     addSeparator();
 
-    MLBookmarkModel * model = new MLBookmarkModel(mediaLib, player, this);
+    MLBookmarkModel * model = new MLBookmarkModel(this);
+    model->setPlayer(player);
+    model->setMl(mediaLib);
 
     ListMenuHelper * helper = new ListMenuHelper(this, model, nullptr, this);
 

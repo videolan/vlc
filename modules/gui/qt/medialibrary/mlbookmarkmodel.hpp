@@ -22,6 +22,10 @@
 #include <QAbstractListModel>
 #include <memory>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <vlc_common.h>
 #include <vlc_media_library.h>
 #include <vlc_player.h>
@@ -29,13 +33,14 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include "mlhelper.hpp"
+#include "mlevent.hpp"
 
 
 class MediaLib;
 class MLBookmarkModel : public QAbstractListModel
 {
 public:
-    MLBookmarkModel( MediaLib* medialib, vlc_player_t* player, QObject* parent );
+    explicit MLBookmarkModel( QObject* parent = nullptr );
     virtual ~MLBookmarkModel();
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole ) const override;
@@ -49,6 +54,11 @@ public:
     QVariant headerData( int section, Qt::Orientation orientation, int role ) const override;
     void sort( int column, Qt::SortOrder order ) override;
 
+    vlc_player_t* player() const;
+    void setPlayer(vlc_player_t* player);
+    MediaLib* ml() const;
+    void setMl(MediaLib* ml);
+
     void add();
     void remove( const QModelIndexList& indexes );
     void clear();
@@ -59,8 +69,12 @@ private:
                                        void* data );
     static void onPlaybackStateChanged( vlc_player_t* player, vlc_player_state state,
                                         void* data );
+    void playerLengthChanged();
 
     void updateMediaId(uint64_t revision, const QString mediaUri);
+    static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
+
+    void initModel();
 
     enum RefreshOperation {
         MLBOOKMARKMODEL_REFRESH,
@@ -87,6 +101,11 @@ private:
 
     vlc_ml_sorting_criteria_t m_sort = VLC_ML_SORTING_INSERTIONDATE;
     bool m_desc = false;
+
+protected:
+    std::unique_ptr<vlc_ml_event_callback_t,
+                    std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
+    virtual void onVlcMlEvent( const MLEvent &event );
 };
 
 #endif // MLBOOKMARKMODEL_HPP

@@ -422,6 +422,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlalbumtrackmodel.moc.cpp \
 	gui/qt/medialibrary/mlartist.moc.cpp \
 	gui/qt/medialibrary/mlartistmodel.moc.cpp \
+        gui/qt/medialibrary/mlbookmarkmodel.moc.cpp \
 	gui/qt/medialibrary/mlbasemodel.moc.cpp \
 	gui/qt/medialibrary/mlfoldersmodel.moc.cpp \
 	gui/qt/medialibrary/mlgenremodel.moc.cpp \
