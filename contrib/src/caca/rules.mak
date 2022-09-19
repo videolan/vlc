@@ -65,6 +65,7 @@ CACA_CONF += \
 	CPPFLAGS="$(CPPFLAGS) -DCACA_STATIC"
 
 .caca: caca
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CACA_CONF)
-	$(MAKE) -C $< -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(CACA_CONF)
+	$(MAKE) -C $</_build -C $< install
 	touch $@

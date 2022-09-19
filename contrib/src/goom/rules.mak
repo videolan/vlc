@@ -35,6 +35,7 @@ endif
 
 .goom: goom
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build install
 	touch $@

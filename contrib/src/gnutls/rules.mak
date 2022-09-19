@@ -85,8 +85,9 @@ endif
 endif
 
 .gnutls: gnutls
-	$(GNUTLS_ENV) cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GNUTLS_CONF)
-	$(call pkg_static,"lib/gnutls.pc")
-	$(MAKE) -C $< -C gl install
-	$(MAKE) -C $< -C lib install
+	mkdir -p $</_build
+	$(GNUTLS_ENV) cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(GNUTLS_CONF)
+	$(call pkg_static,"_build/lib/gnutls.pc")
+	$(MAKE) -C $</_build -C gl install
+	$(MAKE) -C $</_build -C lib install
 	touch $@

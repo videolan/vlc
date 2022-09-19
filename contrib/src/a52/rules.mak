@@ -25,7 +25,8 @@ endif
 .a52: a52dec
 	$(REQUIRE_GPL)
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< -C liba52 install
-	$(MAKE) -C $< -C include install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build -C liba52 install
+	$(MAKE) -C $</_build -C include install
 	touch $@

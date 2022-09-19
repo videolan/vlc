@@ -226,8 +226,9 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	$(MOVE)
 
 .ffmpeg: ffmpeg
-	cd $< && $(HOSTVARS) ./configure \
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure \
 		--extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) \
 		--prefix="$(PREFIX)" --enable-static --disable-shared
-	$(MAKE) -C $< install-libs install-headers
+	$(MAKE) -C $</_build install-libs install-headers
 	touch $@

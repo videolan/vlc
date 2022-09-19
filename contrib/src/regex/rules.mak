@@ -19,9 +19,10 @@ regex: regex-$(REGEX_VERSION).tar.gz .sum-regex
 	$(MOVE)
 
 .regex: regex
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< subirs=
-	cd $< && $(AR) rcvu libregex.a regex.o && $(RANLIB) libregex.a
-	mkdir -p $(PREFIX)/include/ && cp $</regex.h $(PREFIX)/include/
-	mkdir -p $(PREFIX)/lib/ && cp $</libregex.a $(PREFIX)/lib/
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build subirs=
+	cd $</_build && $(AR) rcvu libregex.a regex.o && $(RANLIB) libregex.a
+	mkdir -p $(PREFIX)/include/ && cp $</regex.h $(PREFIX)/include
+	mkdir -p $(PREFIX)/lib/ && cp $</_build/libregex.a $(PREFIX)/lib
 	touch $@

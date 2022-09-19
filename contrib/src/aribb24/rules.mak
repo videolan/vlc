@@ -29,6 +29,7 @@ DEPS_aribb24 = png $(DEPS_png)
 	$(REQUIRE_GPL)
 	$(REQUIRE_GNUV3)
 	cd $< && $(SHELL) ./bootstrap
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< && $(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build && $(MAKE) -C $</_build install
 	touch $@

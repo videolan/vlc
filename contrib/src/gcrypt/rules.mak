@@ -77,6 +77,7 @@ endif
 	cd $< && git init && git config --local user.email "cone@example.com" && git config --local user.name "Cony Cone" && \
 		git commit --allow-empty -m "dummy commit"
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(GCRYPT_CONF)
+	$(MAKE) -C $</_build install
 	touch $@

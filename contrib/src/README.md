@@ -41,8 +41,9 @@ source code is fully ready. Otherwise Makefile dependencies will break
 		$(MOVE)
 
 	.foo: libfoo
-		cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-		cd $< && $(MAKE) install
+		mkdir -p $</build
+		cd $</build && $(HOSTVARS) ../configure $(HOSTCONF)
+		$(MAKE) -C $</build install
 		touch $@
 
 ### Conditional builds

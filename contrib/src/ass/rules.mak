@@ -62,8 +62,9 @@ ASS_CONF += --disable-asm
 endif
 
 .ass: libass
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ASS_CONF)
-	$(MAKE) -C $<
-	$(call pkg_static,"libass.pc")
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(ASS_CONF)
+	$(MAKE) -C $</_build
+	$(call pkg_static,"_build/libass.pc")
+	$(MAKE) -C $</_build install
 	touch $@

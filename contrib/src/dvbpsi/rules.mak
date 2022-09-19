@@ -24,6 +24,7 @@ libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 	$(MOVE)
 
 .dvbpsi: libdvbpsi
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build install
 	touch $@

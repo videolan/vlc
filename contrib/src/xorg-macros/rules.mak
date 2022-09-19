@@ -17,6 +17,7 @@ xorg-macros: util-macros-$(UTILS_MACROS_VERSION).tar.bz2 .sum-xorg-macros
 
 .xorg-macros: xorg-macros
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build install
 	touch $@

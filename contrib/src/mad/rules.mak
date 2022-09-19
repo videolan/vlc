@@ -48,6 +48,7 @@ endif
 .mad: libmad
 	$(REQUIRE_GPL)
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(LIBMAD_VARS) $(MAD_CONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(LIBMAD_VARS) $(MAD_CONF)
+	$(MAKE) -C $</_build install
 	touch $@

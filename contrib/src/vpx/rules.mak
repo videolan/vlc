@@ -164,9 +164,10 @@ endif
 
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
-	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
+	mkdir -p $</_build
+	cd $</_build && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ../configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
-	CONFIG_DEBUG=1 $(MAKE) -C $<
-	$(call pkg_static,"vpx.pc")
-	CONFIG_DEBUG=1 $(MAKE) -C $< install
+	CONFIG_DEBUG=1 $(MAKE) -C $</_build
+	$(call pkg_static,"_build/vpx.pc")
+	CONFIG_DEBUG=1 $(MAKE) -C $</_build install
 	touch $@

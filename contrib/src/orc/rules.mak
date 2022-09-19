@@ -19,6 +19,7 @@ orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 	$(MOVE)
 
 .orc: orc
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
+	$(MAKE) -C $</_build install
 	touch $@

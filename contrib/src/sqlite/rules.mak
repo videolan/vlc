@@ -28,6 +28,7 @@ sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 
 .sqlite: sqlite
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SQLITE_CONF)
-	$(MAKE) -C $< && $(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(SQLITE_CONF)
+	$(MAKE) -C $</_build && $(MAKE) -C $</_build install
 	touch $@

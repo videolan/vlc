@@ -42,8 +42,9 @@ endif
 .zvbi: zvbi
 	$(UPDATE_AUTOCONFIG)
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ZVBICONF)
-	$(MAKE) -C $< -C src install
-	$(MAKE) -C $< SUBDIRS=. install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(ZVBICONF)
+	$(MAKE) -C $</_build -C src install
+	$(MAKE) -C $</_build SUBDIRS=. install
 	sed -i.orig -e "s/\/[^ ]*libiconv.a/-liconv/" $(PREFIX)/lib/pkgconfig/zvbi-0.2.pc
 	touch $@
