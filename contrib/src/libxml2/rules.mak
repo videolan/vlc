@@ -35,6 +35,8 @@ ifdef WITH_OPTIMIZATION
 XMLCONF+= --without-debug
 endif
 
+XMLCONF += CFLAGS="$(CFLAGS) -DLIBXML_STATIC"
+
 libxml2: libxml2-$(LIBXML2_VERSION).tar.xz .sum-libxml2
 	$(UNPACK)
 	$(APPLY) $(SRC)/libxml2/win32.patch
@@ -48,6 +50,6 @@ endif
 
 .libxml2: libxml2
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) -DLIBXML_STATIC" $(XMLCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(XMLCONF)
 	cd $< && $(MAKE) install
 	touch $@

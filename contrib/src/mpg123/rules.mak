@@ -7,9 +7,8 @@ ifeq ($(call need_pkg,"libmpg123"),)
 PKGS_FOUND += mpg123
 endif
 
-MPG123_CFLAGS := $(CFLAGS)
 # Same forced value as in VLC
-MPG123_CFLAGS += -D_FILE_OFFSET_BITS=64
+MPG123CONF := CFLAGS="$(CFLAGS) -D_FILE_OFFSET_BITS=64"
 
 MPG123CONF =
 MPG123CONF += --with-default-audio=dummy --enable-buffer=no --enable-modules=no --disable-network
@@ -43,6 +42,6 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 
 .mpg123: mpg123
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(MPG123_CFLAGS)" $(MPG123CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(MPG123CONF)
 	cd $< && $(MAKE) install
 	touch $@

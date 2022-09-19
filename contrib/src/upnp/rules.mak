@@ -14,9 +14,9 @@ $(TARBALLS)/pupnp-release-$(UPNP_VERSION).tar.gz:
 
 .sum-upnp: pupnp-release-$(UPNP_VERSION).tar.gz
 
-UPNP_CFLAGS := $(CFLAGS) -DUPNP_STATIC_LIB
-UPNP_CXXFLAGS := $(CXXFLAGS) -DUPNP_STATIC_LIB
 UPNP_CONF := --disable-samples
+UPNP_CONF += CFLAGS="$(CFLAGS) -DUPNP_STATIC_LIB"
+UPNP_CONF += CXXFLAGS="$(CXXFLAGS) -DUPNP_STATIC_LIB"
 
 ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
@@ -58,6 +58,6 @@ endif
 
 .upnp: upnp
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(UPNP_CFLAGS)" CXXFLAGS="$(UPNP_CXXFLAGS)" $(UPNP_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(UPNP_CONF)
 	cd $< && $(MAKE) install
 	touch $@

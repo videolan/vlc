@@ -36,8 +36,10 @@ DEPS_asdcplib = nettle $(DEPS_nettle)
 
 ASDCPLIB_CONF := --enable-freedist --enable-dev-headers --with-nettle=$(PREFIX)
 
+ASDCPLIB_CONF += CXXFLAGS="$(ASDCPLIB_CXXFLAGS)"
+
 .asdcplib: asdcplib
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CXXFLAGS="$(ASDCPLIB_CXXFLAGS)" $(ASDCPLIB_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(ASDCPLIB_CONF)
 	cd $< && $(MAKE) install
 	touch $@

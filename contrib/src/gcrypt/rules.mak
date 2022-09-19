@@ -47,9 +47,7 @@ GCRYPT_CONF += --disable-asm --disable-padlock-support
 endif
 endif
 ifdef HAVE_IOS
-GCRYPT_EXTRA_CFLAGS = -fheinous-gnu-extensions
-else
-GCRYPT_EXTRA_CFLAGS =
+GCRYPT_CONF += CFLAGS="$(CFLAGS) -fheinous-gnu-extensions"
 endif
 ifdef HAVE_MACOSX
 GCRYPT_CONF += --disable-aesni-support
@@ -79,6 +77,6 @@ endif
 	cd $< && git init && git config --local user.email "cone@example.com" && git config --local user.name "Cony Cone" && \
 		git commit --allow-empty -m "dummy commit"
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) $(GCRYPT_EXTRA_CFLAGS)" $(GCRYPT_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
 	cd $< && $(MAKE) install
 	touch $@

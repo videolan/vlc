@@ -32,8 +32,14 @@ DEPS_cddb = regex $(DEPS_regex) gettext $(DEPS_gettext)
 
 CDDB_CONF := --without-iconv
 
+CDDB_CFLAGS := $(CFLAGS) -D_BSD_SOCKLEN_T_=int
+ifdef HAVE_WIN32
+CDDB_CFLAGS += -DWIN32_LEAN_AND_MEAN
+endif
+CDDB_CONF += CFLAGS="$(CDDB_CFLAGS)"
+
 .cddb: cddb
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int -DWIN32_LEAN_AND_MEAN" $(CDDB_CONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CDDB_CONF)
 	cd $< && $(MAKE) install
 	touch $@

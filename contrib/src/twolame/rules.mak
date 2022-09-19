@@ -21,9 +21,11 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz .sum-twolame
 	cd $(UNPACK_DIR) && cp config.guess config.sub build-scripts
 	$(MOVE)
 
+TWOLAME_CONF := CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
+
 .twolame: twolame
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(TWOLAME_CONF)
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C libtwolame install
 	cd $< && $(MAKE) install-data
