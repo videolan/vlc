@@ -179,6 +179,14 @@ EM_ASYNC_JS(int, init_js_file, (stream_t *p_access, long id), {
     return return_value;
 });
 
+static void EmFileClose (vlc_object_t * p_this) {
+    stream_t *p_access = (stream_t*)p_this;
+    EM_ASM({
+            Module.vlcAccess[$0].worker_js_file = undefined;
+            Module.vlcAccess[$0].reader = undefined;            
+        }, p_access);
+}
+
 static int EmFileOpen( vlc_object_t *p_this ) {
     stream_t *p_access = (stream_t*)p_this;
 
@@ -240,6 +248,11 @@ static int EmFileOpen( vlc_object_t *p_this ) {
         w.addEventListener('message', handleFileRequest);
     }, pthread_self());
 
+    access_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
+    if (unlikely(p_sys == NULL)) {      
+        return VLC_ENOMEM;
+    }
+
     char *endPtr;
     long id = strtol(p_access->psz_location, &endPtr, 10);
     if ((endPtr == p_access->psz_location) || (*endPtr != '\0')) {
@@ -260,10 +273,6 @@ static int EmFileOpen( vlc_object_t *p_this ) {
         return VLC_EGENERIC;
     }
 
-    access_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
-    if (unlikely(p_sys == NULL))
-        return VLC_ENOMEM;
-
     p_access->pf_read = Read;
     p_access->pf_block = NULL;
     p_access->pf_control = Control;
@@ -273,18 +282,11 @@ static int EmFileOpen( vlc_object_t *p_this ) {
     p_sys->offset = 0;
     if (get_js_file_size(p_access, &p_sys->js_file_size)) {
         msg_Err(p_access, "EMJsFile error: could not get file size!");
+        EmFileClose(p_this);
         return VLC_EGENERIC;
     } 
 
     return VLC_SUCCESS;
-}
-
-static void EmFileClose (vlc_object_t * p_this) {
-    stream_t *p_access = (stream_t*)p_this;
-    EM_ASM({
-            Module.vlcAccess[$0].worker_js_file = undefined;
-            Module.vlcAccess[$0].reader = undefined;            
-        }, p_access);
 }
 
 vlc_module_begin ()
