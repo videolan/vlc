@@ -608,7 +608,6 @@ FocusScope {
 
                 colors: rootPlayer.colors
                 textPosition: rootPlayer.pinVideoControls ? ControlBar.TimeTextPosition.LeftRightSlider : ControlBar.TimeTextPosition.AboveSlider
-                showRightTimeText: (textPosition !== ControlBar.TimeTextPosition.AboveSlider) || !playlistVisibility.isPlaylistVisible
 
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)

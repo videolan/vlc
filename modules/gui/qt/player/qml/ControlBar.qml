@@ -44,7 +44,6 @@ Control {
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
-    property bool showRightTimeText: true
 
     signal requestLockUnlockAutoHide(bool lock)
 
@@ -67,35 +66,39 @@ Control {
     onTextPositionChanged: _layout()
 
     function _layout() {
-        trackPositionSlider.visible = true
-        mediaTime.visible = true
-
-        mediaRemainingTime.visible = Qt.binding(function() { return root.showRightTimeText && textPosition !== ControlBar.TimeTextPosition.Hide; })
-        mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-        mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
-
-        row2.Layout.leftMargin = 0
-        row2.Layout.rightMargin = 0
-
         switch (textPosition) {
         case ControlBar.TimeTextPosition.Hide:
             row1.children = []
             row2.children = [trackPositionSlider]
             mediaTime.visible = false
+            mediaRemainingTime.visible = false
+            spacer.visible = false
+            row2.Layout.leftMargin = 0
+            row2.Layout.rightMargin = 0
+            mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+            mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
             break;
 
         case ControlBar.TimeTextPosition.AboveSlider:
-            var spacer = Qt.createQmlObject("import QtQuick 2.11; Item {}", row1, "ControlBar")
             row1.children = [mediaTime, spacer, mediaRemainingTime]
-            spacer.Layout.fillWidth = true
             row2.children = [trackPositionSlider]
+            mediaTime.visible = true
+            mediaRemainingTime.visible = Qt.binding(function() { return !playlistVisibility.isPlaylistVisible })
+            spacer.visible = true
+            row2.Layout.leftMargin = 0
+            row2.Layout.rightMargin = 0
+            mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+            mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
             break;
 
         case ControlBar.TimeTextPosition.LeftRightSlider:
             row1.children = []
             row2.children = [mediaTime, trackPositionSlider, mediaRemainingTime]
-            row2.Layout.leftMargin = Qt.binding(function() { return VLCStyle.margin_xsmall })
-            row2.Layout.rightMargin = Qt.binding(function() { return VLCStyle.margin_xsmall })
+            mediaTime.visible = true
+            mediaRemainingTime.visible = true
+            spacer.visible = false
+            row2.Layout.leftMargin = VLCStyle.margin_xsmall
+            row2.Layout.rightMargin = VLCStyle.margin_xsmall
             mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
             mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
             trackPositionSlider.Layout.alignment = Qt.AlignVCenter
@@ -105,7 +108,6 @@ Control {
             console.assert(false, "invalid text position")
         }
 
-        trackPositionSlider.Layout.fillWidth = true
         row1.visible = row1.children.length > 0
         row2.visible = row2.children.length > 0
     }
@@ -147,26 +149,20 @@ Control {
         }
     }
 
-    //FIXME use the right xxxLabel class
     T.Label {
         id: mediaTime
 
-        visible: false
         text: Player.time.formatHMS()
         color: root.colors.playerFg
-        font.pixelSize: VLCStyle.fontSize_normal
     }
 
-    //FIXME use the right xxxLabel class
     T.Label {
         id: mediaRemainingTime
 
-        visible: false
         text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
               ? "-" + Player.remainingTime.formatHMS()
               : Player.length.formatHMS()
         color: root.colors.playerFg
-        font.pixelSize: VLCStyle.fontSize_normal
 
         MouseArea {
             anchors.fill: parent
@@ -174,12 +170,18 @@ Control {
         }
     }
 
+    Item {
+        id: spacer
+
+        Layout.fillWidth: true
+    }
+
     SliderBar {
         id: trackPositionSlider
 
-        visible: false
         backgroundColor: colors.playerSeekBar
         barHeight: VLCStyle.heightBar_xxsmall
+        Layout.fillWidth: true
         enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
         colors: root.colors
 
