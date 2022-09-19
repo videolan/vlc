@@ -637,6 +637,8 @@ CMAKE_SYSTEM_NAME = Darwin
 endif
 ifdef HAVE_EMSCRIPTEN
 CMAKE_SYSTEM_NAME = Emscripten
+EMCMAKE_PATH := $(shell command -v emcmake)
+EMSDK_PATH := $(dir $(EMCMAKE_PATH))
 endif
 
 ifdef HAVE_ANDROID
@@ -694,8 +696,7 @@ ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 endif
 ifdef HAVE_EMSCRIPTEN
-	# https://github.com/emscripten-core/emscripten/blob/main/cmake/Modules/Platform/Emscripten.cmake#L268
-	echo "set(EMSCRIPTEN 1)" >> $@
+	echo "include($(EMSDK_PATH)cmake/Modules/Platform/Emscripten.cmake)" >> $@
 endif
 
 MESON_SYSTEM_NAME =
