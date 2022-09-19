@@ -53,6 +53,7 @@
 #include "network/networkdevicemodel.hpp"
 #include "network/networksourcesmodel.hpp"
 #include "network/servicesdiscoverymodel.hpp"
+#include "network/standardpathmodel.hpp"
 
 #include "menus/qml_menu_wrapper.hpp"
 
@@ -254,6 +255,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<NetworkDeviceModel>( uri, versionMajor, versionMinor, "NetworkDeviceModel");
         qmlRegisterType<NetworkSourcesModel>( uri, versionMajor, versionMinor, "NetworkSourcesModel");
         qmlRegisterType<ServicesDiscoveryModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
+        qmlRegisterType<StandardPathModel>( uri, versionMajor, versionMinor, "StandardPathModel");
         qmlRegisterType<MLFoldersModel>( uri, versionMajor, versionMinor, "MLFolderModel");
         qmlRegisterType<ImageLuminanceExtractor>( uri, versionMajor, versionMinor, "ImageLuminanceExtractor");
 
