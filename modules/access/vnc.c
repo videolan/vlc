@@ -33,6 +33,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -115,7 +116,7 @@ struct demux_sys_t
     int i_cancel_state;
 
     rfbClient* p_client;
-    int i_framebuffersize;
+    size_t i_framebuffersize;
     block_t *p_block;
 
     float f_fps;
@@ -143,11 +144,16 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
         p_sys->es = NULL;
     }
 
-    int i_width = p_client->width;
-    int i_height = p_client->height;
-    int i_depth = p_client->format.bitsPerPixel;
+    assert(!(p_client->width & ~0xffff)); // fits in 16 bits
+    uint16_t i_width = p_client->width;
 
-    switch( i_depth )
+    assert(!(p_client->height & ~0xffff)); // fits in 16 bits
+    uint16_t i_height = p_client->height;
+
+    uint8_t i_bits_per_pixel = p_client->format.bitsPerPixel;
+    assert((i_bits_per_pixel & 0x7) == 0); // multiple of 8
+
+    switch( i_bits_per_pixel )
     {
         case 8:
             i_chroma = VLC_CODEC_RGB8;
@@ -180,7 +186,10 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     }
 
     /* Set up framebuffer */
-    p_sys->i_framebuffersize = i_width * i_height * i_depth / 8;
+    if (mul_overflow(i_width, i_height * (i_bits_per_pixel / 8), &p_sys->i_framebuffersize)) {
+        msg_Err(p_demux, "VNC framebuffersize overflow");
+        return FALSE;
+    }
 
     /* Reuse unsent block */
     if ( p_sys->p_block )
@@ -211,7 +220,7 @@ static rfbBool mallocFrameBufferHandler( rfbClient* p_client )
     fmt.video.i_frame_rate_base = 1000;
     fmt.video.i_frame_rate = 1000 * p_sys->f_fps;
 
-    fmt.video.i_bits_per_pixel = i_depth;
+    fmt.video.i_bits_per_pixel = i_bits_per_pixel;
     fmt.video.i_rmask = p_client->format.redMax << p_client->format.redShift;
     fmt.video.i_gmask = p_client->format.greenMax << p_client->format.greenShift;
     fmt.video.i_bmask = p_client->format.blueMax << p_client->format.blueShift;
