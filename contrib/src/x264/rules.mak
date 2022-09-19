@@ -81,8 +81,9 @@ x264 x26410b: %: x264-$(X264_VERSION).tar.xz .sum-%
 
 .x264: x264
 	$(REQUIRE_GPL)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(X264CONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(X264CONF)
+	$(MAKE) -C $</_build install
 	touch $@
 
 .x26410b: .x264

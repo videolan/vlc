@@ -36,7 +36,8 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(MOVE)
 
 .iconv: iconv
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF)
 	$(MAKE) -C $<
-	$(MAKE) -C $< install
+	$(MAKE) -C $</_build install
 	touch $@

@@ -82,6 +82,7 @@ endif
 
 .gcrypt: gcrypt
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GCRYPT_CONF)
-	$(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(GCRYPT_CONF)
+	$(MAKE) -C $</_build install
 	touch $@

@@ -48,7 +48,8 @@ ifdef HAVE_MACOSX
 		install build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(BREAKPAD_CONF)
-	Configuration=Release $(MAKE) -C $< install
+	mkdir -p $</_build
+	cd $</_build && $(HOSTVARS) ../configure $(HOSTCONF) $(BREAKPAD_CONF)
+	Configuration=Release $(MAKE) -C $</_build install
 endif
 	touch $@
