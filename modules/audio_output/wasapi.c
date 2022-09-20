@@ -313,8 +313,10 @@ static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
         if (block->i_nb_samples == 0)
             break; /* done */
 
-        /* Out of buffer space, sleep */
-        vlc_tick_sleep(sys->frames * VLC_TICK_FROM_MS(500) / sys->rate);
+        block->i_length -= vlc_tick_from_samples(frames, sys->rate);
+        /* Out of buffer space, keep the block and notify the owner */
+        IAudioRenderClient_Release(render);
+        return S_FALSE;
     }
     IAudioRenderClient_Release(render);
 out:
@@ -902,12 +904,21 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     if (sys->s24s32)
         msg_Dbg(s, "audio device configured as s24");
 
-    hr = IAudioClient_Initialize(sys->client, shared_mode, 0, buffer_duration,
-                                 0, pwf, sid);
+    hr = IAudioClient_Initialize(sys->client, shared_mode,
+                                 AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+                                 buffer_duration, 0, pwf, sid);
     CoTaskMemFree(pwf_closest);
     if (FAILED(hr))
     {
         msg_Err(s, "cannot initialize audio client (error 0x%lX)", hr);
+        goto error;
+    }
+
+    hr = IAudioClient_SetEventHandle(sys->client,
+                                     aout_stream_GetBufferReadyEvent(s));
+    if (FAILED(hr))
+    {
+        msg_Err(s, "cannot set audio client EventHandle (error 0x%lX)", hr);
         goto error;
     }
 
