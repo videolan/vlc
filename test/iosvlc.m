@@ -157,9 +157,38 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
+#include <vlc_stream.h>
+#include <vlc_access.h>
+
+static int OpenAssetDemux(vlc_object_t *obj)
+{
+    stream_t *access = (stream_t *)obj;
+
+    if (access->psz_location == NULL)
+        return VLC_EGENERIC;
+
+    /* Store startup arguments to forward them to libvlc */
+    NSString *bundle_path = [[NSBundle mainBundle] resourcePath];
+    const char *resource_path = [bundle_path UTF8String];
+    size_t resource_path_length = strlen(resource_path);
+
+    char *url;
+    if (asprintf(&url, "file://%s/%s", resource_path, access->psz_location) < 0)
+        return VLC_ENOMEM;
+
+    access->psz_url = url;
+
+    return VLC_ACCESS_REDIRECT;
+}
+
 vlc_module_begin()
     set_capability("interface", 0)
     set_callback(Open)
+
+    add_submodule()
+    set_capability("access", 1)
+    set_callback(OpenAssetDemux)
+    add_shortcut("asset")
 vlc_module_end()
 
 VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
