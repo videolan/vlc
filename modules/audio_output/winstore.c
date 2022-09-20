@@ -366,7 +366,10 @@ static void Play(audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
     if( unlikely( sys->client == NULL ) )
+    {
+        block_Release(block);
         return;
+    }
 
     EnterMTA();
     HRESULT hr = aout_stream_Play(sys->stream, block);
