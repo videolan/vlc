@@ -18,10 +18,17 @@ $(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz .sum-fontconfig
 	$(UNPACK)
 	$(RM) $(UNPACK_DIR)/src/fcobjshash.gperf
+	# include the generated fcobjshash.h, not the one from src/
+	sed -i.orig -e 's,"fcobjshash.h",<fcobjshash.h>,' $(UNPACK_DIR)/src/fcobjs.c
 	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
 
 FONTCONFIG_CONF := --enable-libxml2 --disable-docs
+FONTCONFIG_INSTALL :=
+ifdef HAVE_MACOSX
+# fc-cache crashes on macOS
+FONTCONFIG_INSTALL += RUN_FC_CACHE_TEST=false
+endif
 
 # FreeType flags
 ifneq ($(findstring freetype2,$(PKGS)),)
@@ -42,14 +49,8 @@ endif
 DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
 
 .fontconfig: fontconfig
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(FONTCONFIG_CONF)
-	$(MAKE) -C $<
-ifndef HAVE_MACOSX
-	$(MAKE) -C $< install
-else
-	$(MAKE) -C $< install-exec
-	$(MAKE) -C $< -C fontconfig
-	$(MAKE) -C $< -C fontconfig install-data
-	cp $</fontconfig.pc $(PREFIX)/lib/pkgconfig/
-endif
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(FONTCONFIG_CONF)
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) $(FONTCONFIG_INSTALL) install
 	touch $@
