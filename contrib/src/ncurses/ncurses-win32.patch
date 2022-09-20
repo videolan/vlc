@@ -1,0 +1,11 @@
+--- ncurses/ncurses/tinfo/lib_napms.c.orig.c	2022-09-20 09:42:37.463160900 +0200
++++ ncurses/ncurses/tinfo/lib_napms.c	2022-09-20 09:42:45.210335100 +0200
+@@ -50,6 +50,8 @@
+ #if HAVE_SYS_TIME_H
+ #include <sys/time.h>		/* needed for MacOS X DP3 */
+ #endif
++#elif defined(_NC_WINDOWS)
++#include <windows.h>
+ #endif
+ 
+ MODULE_ID("$Id: lib_napms.c,v 1.27 2020/08/15 19:45:23 tom Exp $")

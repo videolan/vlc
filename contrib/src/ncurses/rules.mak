@@ -18,6 +18,7 @@ $(TARBALLS)/ncurses-$(NCURSES_VERSION).tar.gz:
 
 ncurses: ncurses-$(NCURSES_VERSION).tar.gz .sum-ncurses
 	$(UNPACK)
+	$(APPLY) $(SRC)/ncurses/ncurses-win32.patch
 	$(MOVE)
 
 NCURSES_CONF := --enable-widec --with-terminfo-dirs=/usr/share/terminfo \
@@ -25,6 +26,9 @@ NCURSES_CONF := --enable-widec --with-terminfo-dirs=/usr/share/terminfo \
     --without-ada --without-progs
 ifdef WITH_OPTIMIZATION
 NCURSES_CONF+= --without-debug
+endif
+ifdef HAVE_WIN32
+NCURSES_CONF+= --disable-sigwinch
 endif
 
 .ncurses: ncurses
