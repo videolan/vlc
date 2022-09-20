@@ -20,8 +20,11 @@ ncurses: ncurses-$(NCURSES_VERSION).tar.gz .sum-ncurses
 	$(UNPACK)
 	$(MOVE)
 
+NCURSES_CONF := --without-debug --enable-widec --without-develop --without-shared --with-terminfo-dirs=/usr/share/terminfo \
+    --with-pkg-config=yes --enable-pc-files
+
 .ncurses: ncurses
-	cd $< && mkdir -p "$(PREFIX)/lib/pkgconfig" && $(HOSTVARS) PKG_CONFIG_LIBDIR="$(PREFIX)/lib/pkgconfig" ./configure $(patsubst --datarootdir=%,,$(HOSTCONF)) --without-debug --enable-widec --without-develop --without-shared --with-terminfo-dirs=/usr/share/terminfo --with-pkg-config=yes --enable-pc-files
+	cd $< && mkdir -p "$(PREFIX)/lib/pkgconfig" && $(HOSTVARS) PKG_CONFIG_LIBDIR="$(PREFIX)/lib/pkgconfig" ./configure $(patsubst --datarootdir=%,,$(HOSTCONF)) $(NCURSES_CONF)
 	cd $< && $(MAKE) -C ncurses -j1 && $(MAKE) -C ncurses install
 	cd $< && $(MAKE) -C include -j1 && $(MAKE) -C include install
 	cd $< && $(MAKE) -C misc pc-files && cp misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
