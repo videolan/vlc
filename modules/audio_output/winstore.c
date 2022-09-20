@@ -55,7 +55,7 @@ static void LeaveMTA(void)
 
 typedef struct
 {
-    aout_stream_t *stream; /**< Underlying audio output stream */
+    struct aout_stream_owner *stream; /**< Underlying audio output stream */
     module_t *module;
     IAudioClient *client;
     wchar_t* acquired_device;
@@ -360,7 +360,7 @@ static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_TimeGet(sys->stream, delay);
+    hr = aout_stream_owner_TimeGet(sys->stream, delay);
     LeaveMTA();
 
     return SUCCEEDED(hr) ? 0 : -1;
@@ -376,7 +376,7 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     }
 
     EnterMTA();
-    HRESULT hr = aout_stream_Play(sys->stream, block, date);
+    HRESULT hr = aout_stream_owner_Play(sys->stream, block, date);
     LeaveMTA();
 
     ResetInvalidatedClient(aout, hr);
@@ -390,7 +390,7 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
         return;
 
     EnterMTA();
-    HRESULT hr = aout_stream_Pause(sys->stream, paused);
+    HRESULT hr = aout_stream_owner_Pause(sys->stream, paused);
     LeaveMTA();
 
     (void) date;
@@ -404,7 +404,7 @@ static void Flush(audio_output_t *aout)
         return;
 
     EnterMTA();
-    HRESULT hr = aout_stream_Flush(sys->stream);
+    HRESULT hr = aout_stream_owner_Flush(sys->stream);
     LeaveMTA();
 
     ResetInvalidatedClient(aout, hr);
@@ -556,7 +556,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     assert (sys->stream == NULL);
-    sys->stream = s;
+    sys->stream = owner;
     return 0;
 }
 
@@ -567,10 +567,10 @@ static void Stop(audio_output_t *aout)
     assert (sys->stream != NULL);
 
     EnterMTA();
-    aout_stream_Stop(sys->stream);
+    aout_stream_owner_Stop(sys->stream);
     LeaveMTA();
 
-    vlc_object_delete(sys->stream);
+    vlc_object_delete(&sys->stream->s);
     sys->stream = NULL;
 }
 

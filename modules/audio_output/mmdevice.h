@@ -50,6 +50,10 @@ struct aout_stream_owner
     HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **);
 };
 
+/*
+ * "aout output" helpers
+ */
+
 static inline
 struct aout_stream_owner *aout_stream_owner(aout_stream_t *s)
 {
@@ -68,31 +72,41 @@ typedef HRESULT (*aout_stream_start_t)(aout_stream_t *s,
 /**
  * Destroys an audio output stream.
  */
-static inline void aout_stream_Stop(aout_stream_t *s)
+static inline
+void aout_stream_owner_Stop(struct aout_stream_owner *owner)
 {
-    (s->stop)(s);
+    owner->s.stop(&owner->s);
 }
 
-static inline HRESULT aout_stream_TimeGet(aout_stream_t *s, vlc_tick_t *delay)
+static inline
+HRESULT aout_stream_owner_TimeGet(struct aout_stream_owner *owner,
+                                  vlc_tick_t *delay)
 {
-    return (s->time_get)(s, delay);
+    return owner->s.time_get(&owner->s, delay);
 }
 
-static inline HRESULT aout_stream_Play(aout_stream_t *s, block_t *block,
-                                       vlc_tick_t date)
+static inline
+HRESULT aout_stream_owner_Play(struct aout_stream_owner *owner,
+                               block_t *block, vlc_tick_t date)
 {
-    return (s->play)(s, block, date);
+    return owner->s.play(&owner->s, block, date);
 }
 
-static inline HRESULT aout_stream_Pause(aout_stream_t *s, bool paused)
+static inline
+HRESULT aout_stream_owner_Pause(struct aout_stream_owner *owner, bool paused)
 {
-    return (s->pause)(s, paused);
+    return owner->s.pause(&owner->s, paused);
 }
 
-static inline HRESULT aout_stream_Flush(aout_stream_t *s)
+static inline
+HRESULT aout_stream_owner_Flush(struct aout_stream_owner *owner)
 {
-    return (s->flush)(s);
+    return owner->s.flush(&owner->s);
 }
+
+/*
+ * "aout stream" helpers
+ */
 
 static inline
 HRESULT aout_stream_Activate(aout_stream_t *s, REFIID iid,

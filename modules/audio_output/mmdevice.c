@@ -76,7 +76,7 @@ static char default_device_b[1] = "";
 
 typedef struct
 {
-    aout_stream_t *stream; /**< Underlying audio output stream */
+    struct aout_stream_owner *stream; /**< Underlying audio output stream */
     audio_output_t *aout;
     IMMDeviceEnumerator *it; /**< Device enumerator, NULL when exiting */
     IMMDevice *dev; /**< Selected output device, NULL if none */
@@ -129,7 +129,7 @@ static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_TimeGet(sys->stream, delay);
+    hr = aout_stream_owner_TimeGet(sys->stream, delay);
     LeaveMTA();
 
     return SUCCEEDED(hr) ? 0 : -1;
@@ -141,7 +141,7 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_Play(sys->stream, block, date);
+    hr = aout_stream_owner_Play(sys->stream, block, date);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
@@ -153,7 +153,7 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_Pause(sys->stream, paused);
+    hr = aout_stream_owner_Pause(sys->stream, paused);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
@@ -166,7 +166,7 @@ static void Flush(audio_output_t *aout)
     HRESULT hr;
 
     EnterMTA();
-    hr = aout_stream_Flush(sys->stream);
+    hr = aout_stream_owner_Flush(sys->stream);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
@@ -1219,7 +1219,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
 
     assert (sys->stream == NULL);
-    sys->stream = s;
+    sys->stream = owner;
     aout_GainRequest(aout, sys->gain);
     return 0;
 }
@@ -1231,10 +1231,10 @@ static void Stop(audio_output_t *aout)
     assert(sys->stream != NULL);
 
     EnterMTA();
-    aout_stream_Stop(sys->stream);
+    aout_stream_owner_Stop(sys->stream);
     LeaveMTA();
 
-    vlc_object_delete(sys->stream);
+    vlc_object_delete(&sys->stream->s);
     sys->stream = NULL;
 }
 
