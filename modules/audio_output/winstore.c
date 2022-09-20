@@ -133,7 +133,6 @@ static void WaitForAudioClient(audio_output_t *aout)
     assert(sys->refs == 0);
     sys->refs = 0;
     assert(sys->client == NULL);
-    sys->client = NULL;
     free(sys->acquired_device);
     sys->acquired_device = NULL;
     ActivateAudioInterfaceAsync(devId, &IID_IAudioClient, NULL, &sys->client_locator, &asyncOp);
