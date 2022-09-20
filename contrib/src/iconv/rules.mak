@@ -29,8 +29,10 @@ iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	                 && mv config.guess config.sub libcharset/build-aux
 	$(MOVE)
 
+ICONV_CONF := --disable-nls
+
 .iconv: iconv
 	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE)
+	$(MAKECONFIGURE) $(ICONV_CONF)
 	$(MAKEBUILD) install
 	touch $@
