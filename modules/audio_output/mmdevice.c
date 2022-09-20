@@ -129,7 +129,9 @@ static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
     HRESULT hr;
 
     EnterMTA();
+    vlc_mutex_lock(&sys->lock);
     hr = aout_stream_owner_TimeGet(sys->stream, delay);
+    vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
 
     return SUCCEEDED(hr) ? 0 : -1;
@@ -138,13 +140,11 @@ static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
 static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
-    HRESULT hr;
 
-    EnterMTA();
-    hr = aout_stream_owner_Play(sys->stream, block, date);
-    LeaveMTA();
-
-    vlc_FromHR(aout, hr);
+    vlc_mutex_lock(&sys->lock);
+    aout_stream_owner_AppendBlock(sys->stream, block, date);
+    vlc_mutex_unlock(&sys->lock);
+    SetEvent(sys->work_event);
 }
 
 static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
@@ -153,7 +153,9 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
     HRESULT hr;
 
     EnterMTA();
+    vlc_mutex_lock(&sys->lock);
     hr = aout_stream_owner_Pause(sys->stream, paused);
+    vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
@@ -166,7 +168,9 @@ static void Flush(audio_output_t *aout)
     HRESULT hr;
 
     EnterMTA();
+    vlc_mutex_lock(&sys->lock);
     hr = aout_stream_owner_Flush(sys->stream);
+    vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
@@ -840,9 +844,31 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             }
         }
 
+        DWORD ev_count = 1;
+        HANDLE events[2] = {
+            sys->work_event,
+            NULL
+        };
+        /* Don't listen to the stream event if the block fifo is empty */
+        if (sys->stream != NULL && sys->stream->chain != NULL)
+            events[ev_count++] = sys->stream->buffer_ready_event;
+
         vlc_mutex_unlock(&sys->lock);
-        WaitForSingleObject(sys->work_event, INFINITE);
+        WaitForMultipleObjects(ev_count, events, FALSE, INFINITE);
         vlc_mutex_lock(&sys->lock);
+
+        if (sys->stream != NULL)
+        {
+            hr = aout_stream_owner_PlayAll(sys->stream);
+            /* Don't call vlc_FromHR here since this function waits for the
+             * current thread */
+            if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
+                         hr == AUDCLNT_E_RESOURCES_INVALIDATED))
+            {
+                sys->requested_device = default_device;
+                /* The restart of the stream will be requested asynchronously */
+            }
+        }
     }
 }
 
@@ -1157,6 +1183,15 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (unlikely(owner == NULL))
         return -1;
     aout_stream_t *s = &owner->s;
+    owner->chain = NULL;
+    owner->last = &owner->chain;
+
+    owner->buffer_ready_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (unlikely(owner->buffer_ready_event == NULL))
+    {
+        vlc_object_delete(s);
+        return -1;
+    }
 
     owner->activate = ActivateDevice;
 
@@ -1170,6 +1205,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
          * failed. */
         vlc_mutex_unlock(&sys->lock);
         LeaveMTA();
+        CloseHandle(owner->buffer_ready_event);
         vlc_object_delete(s);
         return -1;
     }
@@ -1235,17 +1271,21 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
     }
 
-    vlc_mutex_unlock(&sys->lock);
-    LeaveMTA();
-
     if (module == NULL)
     {
+        CloseHandle(owner->buffer_ready_event);
         vlc_object_delete(s);
+        vlc_mutex_unlock(&sys->lock);
+        LeaveMTA();
         return -1;
     }
 
     assert (sys->stream == NULL);
     sys->stream = owner;
+
+    vlc_mutex_unlock(&sys->lock);
+    LeaveMTA();
+
     aout_GainRequest(aout, sys->gain);
     return 0;
 }
@@ -1260,6 +1300,7 @@ static void Stop(audio_output_t *aout)
     aout_stream_owner_Stop(sys->stream);
     LeaveMTA();
 
+    CloseHandle(sys->stream->buffer_ready_event);
     vlc_object_delete(&sys->stream->s);
     sys->stream = NULL;
 }
