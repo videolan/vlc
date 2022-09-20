@@ -43,7 +43,7 @@ libvk_x11_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) \
 libvk_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 	-DVK_USE_PLATFORM_XCB_KHR -DPLATFORM_NAME=X11
-libvk_x11_plugin_la_LIBADD = $(VULKAN_COMMONLIBS) $(XCB_LIBS)
+libvk_x11_plugin_la_LIBADD = $(XCB_LIBS)
 
 libegl_x11_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_x11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_X11=1
