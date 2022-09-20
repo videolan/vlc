@@ -1127,11 +1127,12 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
     }
 
-    aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
-    if (unlikely(s == NULL))
+    struct aout_stream_owner *owner = vlc_object_create(aout, sizeof (*owner));
+    if (unlikely(owner == NULL))
         return -1;
+    aout_stream_t *s = &owner->s;
 
-    s->owner.activate = ActivateDevice;
+    owner->activate = ActivateDevice;
 
     EnterMTA();
     EnterCriticalSection(&sys->lock);
@@ -1153,7 +1154,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     {
         char *modlist = var_InheritString(aout, "mmdevice-backend");
         HRESULT hr;
-        s->owner.device = sys->dev;
+        owner->device = sys->dev;
 
         module = vlc_module_load(s, "aout stream", modlist,
                                  false, aout_stream_Start, s, fmt, &hr);

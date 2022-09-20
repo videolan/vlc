@@ -41,13 +41,20 @@ struct aout_stream
     HRESULT (*play)(aout_stream_t *, block_t *, vlc_tick_t);
     HRESULT (*pause)(aout_stream_t *, bool);
     HRESULT (*flush)(aout_stream_t *);
-
-    struct
-    {
-        void *device;
-        HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **);
-    } owner;
 };
+
+struct aout_stream_owner
+{
+    aout_stream_t s;
+    void *device;
+    HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **);
+};
+
+static inline
+struct aout_stream_owner *aout_stream_owner(aout_stream_t *s)
+{
+    return container_of(s, struct aout_stream_owner, s);
+}
 
 /**
  * Creates an audio output stream on a given Windows multimedia device.
@@ -91,6 +98,7 @@ static inline
 HRESULT aout_stream_Activate(aout_stream_t *s, REFIID iid,
                              PROPVARIANT *actparms, void **pv)
 {
-    return s->owner.activate(s->owner.device, iid, actparms, pv);
+    struct aout_stream_owner *owner = aout_stream_owner(s);
+    return owner->activate(owner->device, iid, actparms, pv);
 }
 #endif
