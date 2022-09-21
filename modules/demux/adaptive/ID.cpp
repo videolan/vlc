@@ -39,6 +39,11 @@ ID::ID(uint64_t id_)
     id = ss.str();
 }
 
+bool ID::isValid() const
+{
+    return !id.empty();
+}
+
 bool ID::operator==(const ID &other) const
 {
     return (!id.empty() && id == other.id);

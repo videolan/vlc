@@ -64,6 +64,10 @@ namespace hls
                 HLSRepresentation * createRepresentation(BaseAdaptationSet *, const AttributesTag *);
                 void createAndFillRepresentation(vlc_object_t *, BaseAdaptationSet *,
                                                  const AttributesTag *, const std::list<Tag *>&);
+                void fillRepresentationFromMediainfo(const AttributesTag *, const std::string &,
+                                                     HLSRepresentation *);
+                void fillAdaptsetFromMediainfo(const AttributesTag *, const std::string &,
+                                               const std::string &, BaseAdaptationSet *);
                 void parseSegments(vlc_object_t *, HLSRepresentation *, const std::list<Tag *>&);
                 std::list<Tag *> parseEntries(stream_t *);
                 adaptive::SharedResources *resources;
