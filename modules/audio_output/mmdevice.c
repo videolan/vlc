@@ -844,17 +844,24 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
             }
         }
 
+        DWORD wait_ms = INFINITE;
         DWORD ev_count = 1;
         HANDLE events[2] = {
             sys->work_event,
             NULL
         };
-        /* Don't listen to the stream event if the block fifo is empty */
-        if (sys->stream != NULL && sys->stream->chain != NULL)
-            events[ev_count++] = sys->stream->buffer_ready_event;
+
+        if (sys->stream != NULL)
+        {
+            wait_ms = aout_stream_owner_ProcessTimer(sys->stream);
+
+            /* Don't listen to the stream event if the block fifo is empty */
+            if (sys->stream->chain != NULL)
+                events[ev_count++] = sys->stream->buffer_ready_event;
+        }
 
         vlc_mutex_unlock(&sys->lock);
-        WaitForMultipleObjects(ev_count, events, FALSE, INFINITE);
+        WaitForMultipleObjects(ev_count, events, FALSE, wait_ms);
         vlc_mutex_lock(&sys->lock);
 
         if (sys->stream != NULL)
