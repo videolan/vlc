@@ -522,12 +522,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 }
 
                 const Attribute *typeattr = pair.second->getAttributeByName("TYPE");
-
-                if(pair.second->getAttributeByName("CODECS"))
-                {
-                    rep->addCodecs(pair.second->getAttributeByName("CODECS")->quotedString());
-                }
-                else if(typeattr)
+                if(typeattr)
                 {
                     if(typeattr->value == "AUDIO")
                         rep->addCodecs("mp4a");
