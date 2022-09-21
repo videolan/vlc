@@ -27,6 +27,7 @@
 #include "../../playlist/BaseAdaptationSet.h"
 #include "../../playlist/BaseRepresentation.h"
 #include "../../logic/BufferingLogic.hpp"
+#include "../../tools/FormatNamespace.hpp"
 #include "../../SegmentTracker.hpp"
 #include "../../../hls/playlist/Parser.hpp"
 #include "../../../hls/playlist/M3U8.hpp"
@@ -125,10 +126,10 @@ int M3U8MasterPlaylist_test()
     {
         Expect(m3u);
         Expect(m3u->getPeriods().size() == 1);
-        Expect(m3u->getFirstPeriod()->getAdaptationSets().size() == 4);
+        Expect(m3u->getFirstPeriod()->getAdaptationSets().size() == 3);
         BaseAdaptationSet *set = m3u->getFirstPeriod()->getAdaptationSetByID(ID("aac English"));
         Expect(set);
-        Expect(set->getRepresentations().size() == 1);
+        Expect(set->getRepresentations().size() == 2);
         Expect(set->getLang() == "en");
         Expect(set->getRole().autoSelectable());
         Expect(set->getRole().isDefault());
@@ -140,6 +141,129 @@ int M3U8MasterPlaylist_test()
         return 1;
     }
 
+    /* Empty MEDIA URI property group propagation test */
+    {
+        const char srcmanifest[] =
+        "#EXTM3U\n"
+        "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"aach-64\",NAME=\"audio 64\",AUTOSELECT=YES,DEFAULT=YES,CHANNELS=\"2\"\n"
+        "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"aacl-128\",NAME=\"audio 128\",AUTOSELECT=YES,DEFAULT=YES,CHANNELS=\"2\"\n"
+        "#EXT-X-STREAM-INF:BANDWIDTH=75000,AVERAGE-BANDWIDTH=70000,CODECS=\"mp4a.40.5\",AUDIO=\"aach-64\"\n"
+        "streaminf0.m3u8\n"
+        "#EXT-X-STREAM-INF:BANDWIDTH=150000,AVERAGE-BANDWIDTH=125000,CODECS=\"mp4a.40.2\",AUDIO=\"aacl-128\"\n"
+        "streaminf1.m3u8\n"
+        ;
+
+        m3u = ParseM3U8(obj, srcmanifest, sizeof(srcmanifest));
+        try
+        {
+            Expect(m3u);
+            Expect(m3u->getFirstPeriod());
+            Expect(m3u->getFirstPeriod()->getAdaptationSets().size() == 1);
+            BaseAdaptationSet *set = m3u->getFirstPeriod()->getAdaptationSets().front();
+            Expect(set->getRole().autoSelectable());
+            Expect(set->getRole().isDefault());
+            auto reps = set->getRepresentations();
+            Expect(reps.size() == 2);
+            Expect(reps[0]->getBandwidth() == 70000);
+            Expect(reps[1]->getBandwidth() == 125000);
+
+            FormatNamespace fns("mp4a.40.5");
+            CodecDescriptionList codecsdesclist;
+            reps[0]->getCodecsDesc(&codecsdesclist);
+            Expect(codecsdesclist.size() == 1);
+            const es_format_t *fmt = codecsdesclist.front()->getFmt();
+            Expect(fmt != nullptr);
+            Expect(fmt->i_codec == fns.getFmt()->i_codec);
+            Expect(fmt->i_profile == fns.getFmt()->i_profile);
+            Expect(fmt->i_cat == AUDIO_ES);
+
+            delete m3u;
+        }
+        catch (...)
+        {
+            delete m3u;
+            return 1;
+        }
+    }
+
+    /* check codec assignment per group */
+    {
+        const char srcmanifest[] =
+        "#EXTM3U\n"
+        "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"Audio\",NAME=\"en_aud\",DEFAULT=YES,AUTOSELECT=YES,"
+        " LANGUAGE=\"en\",CHANNELS=\"2\",URI=\"a0.m3u8\"\n"
+        "#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=\"Subtitles\",NAME=\"sub_fr\",DEFAULT=YES,FORCED=NO,LANGUAGE=\"fr\","
+        " URI=\"cc0.m3u8\"\n"
+        "#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID=\"Closed Captions\",NAME=\"cc_en\",DEFAULT=YES,AUTOSELECT=YES,"
+        " LANGUAGE=\"en\",INSTREAM-ID=\"CC1\"\n"
+        "#EXT-X-STREAM-INF:BANDWIDTH=629758,AVERAGE-BANDWIDTH=572508,RESOLUTION=426x240,CODECS=\"avc1.42E015,mp4a.40.2,wvtt\","
+        " FRAME-RATE=25,AUDIO=\"Audio\",SUBTITLES=\"Subtitles\",CLOSED-CAPTIONS=\"Closed Captions\"\n"
+        "v0.m3u8\n"
+        "#EXT-X-STREAM-INF:BANDWIDTH=1069758,AVERAGE-BANDWIDTH=972508,RESOLUTION=640x360,CODECS=\"avc1.4D401E,mp4a.40.2,wvtt\","
+        " FRAME-RATE=29.970,AUDIO=\"Audio\",SUBTITLES=\"Subtitles\",CLOSED-CAPTIONS=\"Closed Captions\"\n"
+        "v1.m3u8\n"
+        ;
+
+        m3u = ParseM3U8(obj, srcmanifest, sizeof(srcmanifest));
+        try
+        {
+            Expect(m3u);
+            Expect(m3u->getFirstPeriod());
+            Expect(m3u->getFirstPeriod()->getAdaptationSets().size() == 3);
+
+            {
+                auto set = m3u->getFirstPeriod()->getAdaptationSetByID(ID("Audio en_aud"));
+                Expect(set != nullptr);
+                auto reps = set->getRepresentations();
+                Expect(reps.size() == 1);
+                FormatNamespace fns("mp4a.40.2");
+                CodecDescriptionList codecsdesclist;
+                reps[0]->getCodecsDesc(&codecsdesclist);
+                Expect(codecsdesclist.size() == 1);
+                const es_format_t *fmt = codecsdesclist.front()->getFmt();
+                Expect(fmt != nullptr);
+                Expect(fmt->i_codec == fns.getFmt()->i_codec);
+                Expect(fmt->i_cat == AUDIO_ES);
+            }
+
+            {
+                auto set = m3u->getFirstPeriod()->getAdaptationSetByID(ID("Subtitles sub_fr"));
+                Expect(set != nullptr);
+                auto reps = set->getRepresentations();
+                Expect(reps.size() == 1);
+                FormatNamespace fns("wvtt");
+                CodecDescriptionList codecsdesclist;
+                reps[0]->getCodecsDesc(&codecsdesclist);
+                Expect(codecsdesclist.size() == 1);
+                const es_format_t *fmt = codecsdesclist.front()->getFmt();
+                Expect(fmt != nullptr);
+                Expect(fmt->i_codec == fns.getFmt()->i_codec);
+                Expect(fmt->i_cat == SPU_ES);
+            }
+
+            {
+                auto set = m3u->getFirstPeriod()->getAdaptationSetByID(ID("default_id#0"));
+                Expect(set != nullptr);
+                auto reps = set->getRepresentations();
+                Expect(reps.size() == 2);
+                FormatNamespace fns("avc1.42E015");
+                CodecDescriptionList codecsdesclist;
+                reps[0]->getCodecsDesc(&codecsdesclist);
+                Expect(codecsdesclist.size() == 1);
+                const es_format_t *fmt = codecsdesclist.front()->getFmt();
+                Expect(fmt != nullptr);
+                Expect(fmt->i_codec == fns.getFmt()->i_codec);
+                Expect(fmt->i_cat == VIDEO_ES);
+            }
+
+            delete m3u;
+        }
+        catch (...)
+        {
+            delete m3u;
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -419,7 +543,6 @@ int M3U8Playlist_test()
         delete m3u;
         return 1;
     }
-
 
     return 0;
 }
