@@ -102,6 +102,7 @@ noreturn void sout_AnnounceUnRegister(vlc_object_t *obj,
 #undef sout_EncoderCreate
 encoder_t *sout_EncoderCreate( vlc_object_t *p_this, size_t owner_size )
 {
+    (void)owner_size;
     msg_Err (p_this, "Encoding support not compiled-in!");
     return NULL;
 }
