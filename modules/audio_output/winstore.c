@@ -663,6 +663,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         // we keep the corresponding sys->client until a new request is started
         SetRequestedDevice(aout, NULL);
     }
+    aout->time_get = s->time_get == NULL ? NULL : TimeGet;
 
     return 0;
 
@@ -731,7 +732,6 @@ static int Open(vlc_object_t *obj)
     sys->client = NULL;
     aout->start = Start;
     aout->stop = Stop;
-    aout->time_get = TimeGet;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
     aout->play = Play;
