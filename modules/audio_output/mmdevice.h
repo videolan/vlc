@@ -56,6 +56,8 @@ struct aout_stream_owner
 
     block_t *chain;
     block_t **last;
+
+    audio_output_t *aout;
 };
 
 /*
@@ -205,6 +207,7 @@ void *aout_stream_owner_New(audio_output_t *aout, size_t size,
         return NULL;
     struct aout_stream_owner *owner = obj;
 
+    owner->aout = aout;
     owner->chain = NULL;
     owner->last = &owner->chain;
     owner->activate = activate;
@@ -231,6 +234,14 @@ void aout_stream_owner_Delete(struct aout_stream_owner *owner)
 /*
  * "aout stream" helpers
  */
+
+static inline
+void aout_stream_TimingReport(aout_stream_t *s, vlc_tick_t system_ts,
+                              vlc_tick_t audio_ts)
+{
+    struct aout_stream_owner *owner = aout_stream_owner(s);
+    aout_TimingReport(owner->aout, system_ts, audio_ts);
+}
 
 static inline
 HRESULT aout_stream_Activate(aout_stream_t *s, REFIID iid,
