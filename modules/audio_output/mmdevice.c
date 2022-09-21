@@ -123,20 +123,6 @@ static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 }
 
 /*** VLC audio output callbacks ***/
-static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
-{
-    aout_sys_t *sys = aout->sys;
-    HRESULT hr;
-
-    EnterMTA();
-    vlc_mutex_lock(&sys->lock);
-    hr = aout_stream_owner_TimeGet(sys->stream, delay);
-    vlc_mutex_unlock(&sys->lock);
-    LeaveMTA();
-
-    return SUCCEEDED(hr) ? 0 : -1;
-}
-
 static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
@@ -1280,7 +1266,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
-    aout->time_get = s->time_get == NULL ? NULL : TimeGet;
 
     aout_GainRequest(aout, sys->gain);
     return 0;

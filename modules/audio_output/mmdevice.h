@@ -37,7 +37,6 @@ struct aout_stream
     void *sys;
 
     void (*stop)(aout_stream_t *);
-    HRESULT (*time_get)(aout_stream_t *, vlc_tick_t *);
     HRESULT (*play)(aout_stream_t *, block_t *, vlc_tick_t);
     HRESULT (*pause)(aout_stream_t *, bool);
     HRESULT (*flush)(aout_stream_t *);
@@ -86,22 +85,6 @@ static inline
 void aout_stream_owner_Stop(struct aout_stream_owner *owner)
 {
     owner->s.stop(&owner->s);
-}
-
-static inline
-HRESULT aout_stream_owner_TimeGet(struct aout_stream_owner *owner,
-                                  vlc_tick_t *delay)
-{
-    HRESULT hr = owner->s.time_get(&owner->s, delay);
-
-    if (SUCCEEDED(hr))
-    {
-        /* Add the block chain delay */
-        vlc_tick_t length;
-        block_ChainProperties(owner->chain, NULL, NULL, &length);
-        *delay += length;
-    }
-    return hr;
 }
 
 static inline
