@@ -1149,7 +1149,6 @@ modules/hw/vdpau/adjust.c
 modules/hw/vdpau/avcodec.c
 modules/hw/vdpau/chroma.c
 modules/hw/vdpau/deinterlace.c
-modules/hw/vdpau/display.c
 modules/hw/vdpau/sharpen.c
 modules/isa/arm/neon/chroma_yuv.c
 modules/isa/arm/neon/volume.c

@@ -83,6 +83,7 @@ Video output:
  * Fix washed out black on NVIDIA cards with Direct3D9
  * On-Screen-Display is off by default in libvlc
  * Remove deprecated Linux framebuffer plugin
+ * Removed VDPAU video output plugin (hardware decoder still present)
 
 Audio filter:
  * Add RNNoise recurrent neural network denoiser
