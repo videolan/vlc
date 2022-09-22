@@ -40,13 +40,13 @@ endif
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GETTEXT_CONF)
 ifndef HAVE_ANDROID
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 else
 	# Android 32bits does not have localeconv
-	$(MAKEBUILD) -C gettext-runtime install
-	$(MAKEBUILD) -C gettext-tools/intl
-	$(MAKEBUILD) -C gettext-tools/misc install
-	$(MAKEBUILD) -C gettext-tools/m4 install
+	+$(MAKEBUILD) -C gettext-runtime install
+	+$(MAKEBUILD) -C gettext-tools/intl
+	+$(MAKEBUILD) -C gettext-tools/misc install
+	+$(MAKEBUILD) -C gettext-tools/m4 install
 endif
 ifdef HAVE_MACOSX
 	# detect libintl correctly in configure for static library

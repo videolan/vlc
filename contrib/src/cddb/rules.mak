@@ -42,5 +42,5 @@ CDDB_CONF += CFLAGS="$(CDDB_CFLAGS)"
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(CDDB_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

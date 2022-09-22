@@ -82,7 +82,7 @@ x264 x26410b: %: $(X264_BASENAME) .sum-%
 	$(REQUIRE_GPL)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(X264_AS) $(X264CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@
 
 .x26410b: .x264

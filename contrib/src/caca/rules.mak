@@ -67,5 +67,5 @@ CACA_CONF += \
 .caca: caca
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(CACA_CONF)
-	$(MAKEBUILD) -C $< install
+	+$(MAKEBUILD) -C $< install
 	touch $@

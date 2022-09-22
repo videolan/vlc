@@ -28,7 +28,7 @@ RNNOISE_CONF := --disable-examples --disable-doc
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(RNNOISE_CONF)
-	$(MAKEBUILD)
+	+$(MAKEBUILD)
 	$(call pkg_static,"_build/rnnoise.pc")
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

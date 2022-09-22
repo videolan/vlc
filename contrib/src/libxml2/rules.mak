@@ -52,5 +52,5 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XMLCONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

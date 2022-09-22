@@ -57,5 +57,5 @@ bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	cd $< && ./bootstrap
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(BLURAY_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

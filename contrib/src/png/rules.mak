@@ -26,5 +26,5 @@ DEPS_png = zlib $(DEPS_zlib)
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

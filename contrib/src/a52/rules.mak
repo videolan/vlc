@@ -27,6 +27,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	$(MAKEBUILD) -C liba52 install
-	$(MAKEBUILD) -C include install
+	+$(MAKEBUILD) -C liba52 install
+	+$(MAKEBUILD) -C include install
 	touch $@

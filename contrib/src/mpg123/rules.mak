@@ -44,5 +44,5 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(MPG123CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

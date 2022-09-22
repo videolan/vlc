@@ -43,5 +43,5 @@ VORBIS_CONF := --disable-docs --disable-examples --disable-oggtest
 	$(RECONF) -Im4
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(VORBIS_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

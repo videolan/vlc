@@ -53,7 +53,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	cd $</_build && $(BUILDVARS) ../configure $(BUILDTOOLCONF) $(PROTOCVARS) $(PROTOCCONF)
-	$(MAKEBUILD) && $(MAKEBUILD) install
+	+$(MAKEBUILD) && $(MAKEBUILD) install
 	touch $@
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
@@ -70,5 +70,5 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(PROTOBUFVARS)
-	$(MAKEBUILD) && $(MAKEBUILD) install
+	+$(MAKEBUILD) && $(MAKEBUILD) install
 	touch $@

@@ -21,7 +21,7 @@ regex: regex-$(REGEX_VERSION).tar.gz .sum-regex
 .regex: regex
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	$(MAKEBUILD) subirs=
+	+$(MAKEBUILD) subirs=
 	cd $</_build && $(AR) rcvu libregex.a regex.o && $(RANLIB) libregex.a
 	mkdir -p $(PREFIX)/include/ && cp $</regex.h $(PREFIX)/include
 	mkdir -p $(PREFIX)/lib/ && cp $</_build/libregex.a $(PREFIX)/lib

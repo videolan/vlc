@@ -64,7 +64,7 @@ endif
 .ass: libass
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ASS_CONF)
-	$(MAKEBUILD)
+	+$(MAKEBUILD)
 	$(call pkg_static,"_build/libass.pc")
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

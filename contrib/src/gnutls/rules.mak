@@ -88,6 +88,6 @@ endif
 	$(MAKEBUILDDIR)
 	$(GNUTLS_ENV) $(MAKECONFIGURE) $(GNUTLS_CONF)
 	$(call pkg_static,"_build/lib/gnutls.pc")
-	$(MAKEBUILD) -C gl install
-	$(MAKEBUILD) -C lib install
+	+$(MAKEBUILD) -C gl install
+	+$(MAKEBUILD) -C lib install
 	touch $@

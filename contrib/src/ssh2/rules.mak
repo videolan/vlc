@@ -33,5 +33,5 @@ SSH2_CONF := --disable-examples-build --with-libgcrypt --without-openssl --witho
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SSH2_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

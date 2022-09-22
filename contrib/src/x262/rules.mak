@@ -33,7 +33,7 @@ x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 	$(MAKECONFIGURE) $(X264CONF)
 	cd $</_build && sed -i -e 's/x264.pc/x262.pc/g' Makefile
 	cd $</_build && sed -i -e 's/x264.h/x262.h/g' Makefile
-	$(MAKEBUILD)
+	+$(MAKEBUILD)
 	cd $</_build && cp x264.h x262.h
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

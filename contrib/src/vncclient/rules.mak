@@ -43,7 +43,7 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(VNCCLIENT_CONF)
-	$(MAKEBUILD) -C libvncclient install
-	$(MAKEBUILD) install-data
+	+$(MAKEBUILD) -C libvncclient install
+	+$(MAKEBUILD) install-data
 	rm $(PREFIX)/lib/pkgconfig/libvncserver.pc
 	touch $@

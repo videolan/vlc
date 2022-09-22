@@ -27,5 +27,5 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

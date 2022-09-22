@@ -44,7 +44,7 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ZVBICONF)
-	$(MAKEBUILD) -C src install
-	$(MAKEBUILD) SUBDIRS=. install
+	+$(MAKEBUILD) -C src install
+	+$(MAKEBUILD) SUBDIRS=. install
 	sed -i.orig -e "s/\/[^ ]*libiconv.a/-liconv/" $(PREFIX)/lib/pkgconfig/zvbi-0.2.pc
 	touch $@

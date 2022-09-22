@@ -31,7 +31,7 @@ endif
 .speex: speex
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SPEEX_CONF)
-	$(MAKEBUILD)
+	+$(MAKEBUILD)
 	$(call pkg_static,"_build/speex.pc")
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@
