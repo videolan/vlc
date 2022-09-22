@@ -385,14 +385,20 @@ AUTORECONF = GTKDOCIZE=true autoreconf
 endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
+
+BUILD_DIR = $</_build
+BUILD_SRC := ..
+# build directory relative to UNPACK_DIR
+BUILD_DIRUNPACK = _build
+
 # Work around for https://lists.nongnu.org/archive/html/bug-gnulib/2020-05/msg00237.html
 # When using a single command, make might take a shortcut and fork/exec
 # itself instead of relying on a shell, but a bug in gnulib ends up
 # trying to execute a cmake folder when one is found in the PATH
-CMAKEBUILD = env cmake --build $</build
-CMAKECLEAN = rm -f $</build/CMakeCache.txt
+CMAKEBUILD = env cmake --build $(BUILD_DIR)
+CMAKECLEAN = rm -f $(BUILD_DIR)/CMakeCache.txt
 CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
-		-B $</build \
+		-B $(BUILD_DIR) \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF \
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib
