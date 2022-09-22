@@ -31,5 +31,6 @@ ARIBB25_CONF := --disable-b25
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ARIBB25_CONF)
-	+$(MAKEBUILD) && $(MAKEBUILD) install
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) install
 	touch $@

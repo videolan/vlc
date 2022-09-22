@@ -19,5 +19,6 @@ ffi: libffi-$(FFI_VERSION).tar.gz .sum-ffi
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

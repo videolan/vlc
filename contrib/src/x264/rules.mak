@@ -83,6 +83,7 @@ x264 x26410b: %: x264-$(X264_VERSION).tar.xz .sum-%
 	$(REQUIRE_GPL)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(X264CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
 

@@ -49,5 +49,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SHOUT_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

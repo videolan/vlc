@@ -53,5 +53,6 @@ DEPS_theora = ogg $(DEPS_ogg)
 .theora: libtheora
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(THEORACONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

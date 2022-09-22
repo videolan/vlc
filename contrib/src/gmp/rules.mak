@@ -45,6 +45,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GMP_CONF)
-	$(MAKE) -C $<
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

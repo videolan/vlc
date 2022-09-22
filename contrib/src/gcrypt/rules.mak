@@ -84,5 +84,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(GCRYPT_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

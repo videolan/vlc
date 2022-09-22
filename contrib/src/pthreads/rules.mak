@@ -55,6 +55,7 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 .pthreads: pthreads
 	$(MAKEBUILDDIR)
 	$(MAKECONFDIR)/mingw-w64-libraries/winpthreads/configure $(HOSTCONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
 

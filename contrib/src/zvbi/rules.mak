@@ -54,6 +54,8 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ZVBICONF)
+	+$(MAKEBUILD) -C src
+	+$(MAKEBUILD) SUBDIRS=.
 	+$(MAKEBUILD) -C src install
 	+$(MAKEBUILD) SUBDIRS=. install
 	touch $@

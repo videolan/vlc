@@ -33,5 +33,6 @@ DVDREAD_CONF := --with-libdvdcss
 	$(RECONF) -I m4
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(DVDREAD_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

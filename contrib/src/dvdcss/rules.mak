@@ -23,5 +23,6 @@ DVDCSS_CONF := --disable-doc
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(DVDCSS_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

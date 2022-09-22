@@ -27,5 +27,6 @@ LIBTASN1_CONF := --disable-doc
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(LIBTASN1_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

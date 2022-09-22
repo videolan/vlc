@@ -29,5 +29,6 @@ libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 .dvbpsi: libdvbpsi
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

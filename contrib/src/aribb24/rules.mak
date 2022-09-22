@@ -31,5 +31,6 @@ DEPS_aribb24 = png $(DEPS_png)
 	cd $< && $(SHELL) ./bootstrap
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	+$(MAKEBUILD) && $(MAKEBUILD) install
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) install
 	touch $@

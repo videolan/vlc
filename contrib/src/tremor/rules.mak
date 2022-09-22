@@ -28,5 +28,6 @@ DEPS_tremor = ogg $(DEPS_ogg)
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	+$(MAKEBUILD) && $(MAKEBUILD) install
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) install
 	touch $@
