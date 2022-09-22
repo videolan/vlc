@@ -25,6 +25,7 @@ index 2fdf662a1d..22aebf3c5b 100644
  #define CURL_BUILD_MAC_10_11 MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
  #define CURL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300
 +#define CURL_BUILD_MAC_10_14 MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+ #define CURL_BUILD_MAC_10_15 MAC_OS_X_VERSION_MAX_ALLOWED >= 101500
  /* These macros mean "the following code is present to allow runtime backward
     compatibility with at least this cat or earlier":
     (You set this at build-time using the compiler command line option
