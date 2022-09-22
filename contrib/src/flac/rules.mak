@@ -16,7 +16,7 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
 flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 	$(UNPACK)
 	# disable building a tool we don't use
-	cd $(UNPACK_DIR) && sed -e 's,add_subdirectory("microbench"),#add_subdirectory("microbench"),' -i.orig CMakeLists.txt
+	sed -e 's,add_subdirectory("microbench"),#add_subdirectory("microbench"),' -i.orig $(UNPACK_DIR)/CMakeLists.txt
 	$(call pkg_static,"src/libFLAC/flac.pc.in")
 	$(MOVE)
 

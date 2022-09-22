@@ -28,7 +28,7 @@ x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 .x262: x262
 	$(REQUIRE_GPL)
 	sed -i -e 's/x264/x262/g' $</configure
-	sed -i -e 's/x264_config/x262_config/g' *.h Makefile $</*.c
+	sed -i -e 's/x264_config/x262_config/g' *.h Makefile $(UNPACK_DIR)/*.c
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(X264CONF)
 	cd $</_build && sed -i -e 's/x264.pc/x262.pc/g' Makefile
