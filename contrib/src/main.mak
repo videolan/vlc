@@ -443,10 +443,10 @@ endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
 
-BUILD_DIR = $</_build
+BUILD_DIR = $</vlc_build
 BUILD_SRC := ..
 # build directory relative to UNPACK_DIR
-BUILD_DIRUNPACK = _build
+BUILD_DIRUNPACK = vlc_build
 
 MAKEBUILDDIR = mkdir -p $(BUILD_DIR) && rm -f $(BUILD_DIR)/config.status
 MAKEBUILD = $(MAKE) -C $(BUILD_DIR)
