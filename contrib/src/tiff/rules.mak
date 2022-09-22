@@ -24,4 +24,5 @@ tiff: tiff-$(TIFF_VERSION).tar.gz .sum-tiff
 		--without-x
 	+$(MAKEBUILD) -C port
 	+$(MAKEBUILD) -C libtiff
-	+$(MAKEBUILD) -C libtiff install	touch $@
+	+$(MAKEBUILD) -C libtiff install
+	touch $@
