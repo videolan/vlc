@@ -185,7 +185,7 @@ VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 	$(MAKEBUILDDIR)
 	cd $</_build && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ../configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
-	CONFIG_DEBUG=1 $(MAKEBUILD)
+	+CONFIG_DEBUG=1 $(MAKEBUILD)
 	$(call pkg_static,"_build/vpx.pc")
-	CONFIG_DEBUG=1 $(MAKEBUILD) install
+	+CONFIG_DEBUG=1 $(MAKEBUILD) install
 	touch $@

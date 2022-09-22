@@ -55,5 +55,5 @@ DEPS_xcb = xau $(DEPS_xau) xcb-proto $(DEPS_xcb-proto)
 .xcb: libxcb
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XCBCONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

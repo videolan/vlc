@@ -273,5 +273,5 @@ endif
 	$(MAKECONFDIR)/configure \
 		--extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) \
 		--prefix="$(PREFIX)" --enable-static --disable-shared
-	$(MAKEBUILD) install-libs install-headers
+	+$(MAKEBUILD) install-libs install-headers
 	touch $@

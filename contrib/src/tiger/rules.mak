@@ -31,5 +31,5 @@ TIGER_CONF := --disable-doc
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(TIGER_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

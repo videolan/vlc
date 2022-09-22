@@ -40,5 +40,5 @@ ICONV_CONF := --disable-nls
 .iconv: iconv
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ICONV_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

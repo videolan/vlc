@@ -36,7 +36,7 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SPEEXDSP_CONF)
-	$(MAKEBUILD)
+	+$(MAKEBUILD)
 	$(call pkg_static,"_build/speexdsp.pc")
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

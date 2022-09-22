@@ -21,7 +21,7 @@ tiff: tiff-$(TIFF_VERSION).tar.gz .sum-tiff
 		--disable-zlib \
 		--disable-cxx \
 		--without-x
-	$(MAKEBUILD) -C port
-	$(MAKEBUILD) -C libtiff
-	$(MAKEBUILD) -C libtiff install
+	+$(MAKEBUILD) -C port
+	+$(MAKEBUILD) -C libtiff
+	+$(MAKEBUILD) -C libtiff install
 	touch $@

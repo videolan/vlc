@@ -22,5 +22,5 @@ glib: glib-$(GLIB_MINOR_VERSION).tar.xz .sum-glib
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@

@@ -28,7 +28,7 @@ libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	$(MAKEBUILD) -C include install
-	$(MAKEBUILD) -C libdca install
+	+$(MAKEBUILD) -C include install
+	+$(MAKEBUILD) -C libdca install
 	rm -f $(PREFIX)/lib/libdts.a
 	touch $@

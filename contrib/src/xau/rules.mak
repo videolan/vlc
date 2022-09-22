@@ -23,5 +23,5 @@ XAU_CONF := --enable-xthreads
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XAU_CONF)
-	$(MAKEBUILD) install
+	+$(MAKEBUILD) install
 	touch $@
