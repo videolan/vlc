@@ -28,8 +28,11 @@ NCURSES_CONF+= --without-debug
 endif
 
 .ncurses: ncurses
-	cd $< && mkdir -p "$(PREFIX)/lib/pkgconfig" && $(HOSTVARS) PKG_CONFIG_LIBDIR="$(PREFIX)/lib/pkgconfig" ./configure $(patsubst --datarootdir=%,,$(HOSTCONF)) $(NCURSES_CONF)
-	cd $< && $(MAKE) -C ncurses -j1 && $(MAKE) -C ncurses install
-	cd $< && $(MAKE) -C include -j1 && $(MAKE) -C include install
-	cd $< && $(MAKE) -C misc pc-files && cp misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(NCURSES_CONF)
+	$(MAKE) -C $< -C ncurses -j1
+	$(MAKE) -C $< -C ncurses install
+	$(MAKE) -C $< -C include -j1
+	$(MAKE) -C $< -C include install
+	$(MAKE) -C $< -C misc pc-files
+	install $</misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
 	touch $@
