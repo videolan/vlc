@@ -28,11 +28,12 @@ NCURSES_CONF+= --without-debug
 endif
 
 .ncurses: ncurses
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(NCURSES_CONF)
-	$(MAKE) -C $< -C ncurses -j1
-	$(MAKE) -C $< -C ncurses install
-	$(MAKE) -C $< -C include -j1
-	$(MAKE) -C $< -C include install
-	$(MAKE) -C $< -C misc pc-files
-	install $</misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(NCURSES_CONF)
+	+$(MAKEBUILD) -C ncurses -j1
+	+$(MAKEBUILD) -C ncurses install
+	+$(MAKEBUILD) -C include -j1
+	+$(MAKEBUILD) -C include install
+	+$(MAKEBUILD) -C misc pc-files
+	install $</_build/misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
 	touch $@
