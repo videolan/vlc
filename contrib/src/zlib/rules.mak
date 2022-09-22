@@ -16,7 +16,7 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
 	$(APPLY) $(SRC)/zlib/0001-Fix-mingw-static-library-name-on-mingw.patch
 	# disable the installation of the dynamic library since there's no option
-	cd $(UNPACK_DIR) && sed -e 's,install(TARGETS zlib zlibstatic,install(TARGETS zlibstatic,' -i.orig CMakeLists.txt
+	sed -e 's,install(TARGETS zlib zlibstatic,install(TARGETS zlibstatic,' -i.orig $(UNPACK_DIR)/CMakeLists.txt
 	$(MOVE)
 
 ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig

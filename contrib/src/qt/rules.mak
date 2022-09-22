@@ -112,7 +112,7 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 
 .qt: qt
 	# Prevent all Qt contribs from generating and installing libtool .la files
-	cd $< && sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" mkspecs/features/qt_module.prf
+	sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" $(UNPACK_DIR)/mkspecs/features/qt_module.prf
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
 	# Make && Install libraries
 	cd $< && $(QT_ENV_VARS) $(MAKE)

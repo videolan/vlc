@@ -29,7 +29,7 @@ gmp: gmp-$(GMP_VERSION).tar.xz .sum-gmp
 	$(UNPACK)
 	$(APPLY) $(SRC)/gmp/gmp-fix-asm-detection.patch
 	# do not try the cross compiler to detect the build compiler
-	cd $(UNPACK_DIR) && sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' acinclude.m4
+	sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' $(UNPACK_DIR)/acinclude.m4
 	$(MOVE)
 
 # GMP requires either GPLv2 or LGPLv3
