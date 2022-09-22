@@ -20,8 +20,9 @@ ncurses: ncurses-$(NCURSES_VERSION).tar.gz .sum-ncurses
 	$(UNPACK)
 	$(MOVE)
 
-NCURSES_CONF := --enable-widec --without-shared --with-terminfo-dirs=/usr/share/terminfo \
-    --with-pkg-config=yes --enable-pc-files
+NCURSES_CONF := --enable-widec --with-terminfo-dirs=/usr/share/terminfo \
+    --with-pkg-config=yes --enable-pc-files --without-manpages --without-tests \
+    --without-ada --without-progs
 ifdef WITH_OPTIMIZATION
 NCURSES_CONF+= --without-debug
 endif
