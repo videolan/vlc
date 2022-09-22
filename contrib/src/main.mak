@@ -392,9 +392,9 @@ BUILD_SRC := ..
 BUILD_DIRUNPACK = _build
 
 
-MAKEBUILDDIR = mkdir -p $</_build && rm -f $</_build/config.status
-MAKEBUILD = $(MAKE) -C $</_build
-MAKECONFDIR = cd $</_build && $(HOSTVARS) ..
+MAKEBUILDDIR = mkdir -p $(BUILD_DIR) && rm -f $(BUILD_DIR)/config.status
+MAKEBUILD = $(MAKE) -C $(BUILD_DIR)
+MAKECONFDIR = cd $(BUILD_DIR) && $(HOSTVARS) $(BUILD_SRC)
 MAKECONFIGURE = $(MAKECONFDIR)/configure $(HOSTCONF)
 
 # Work around for https://lists.nongnu.org/archive/html/bug-gnulib/2020-05/msg00237.html
