@@ -443,19 +443,24 @@ endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
 
-MAKEBUILDDIR = mkdir -p $</_build && rm -f $</_build/config.status
-MAKEBUILD = $(MAKE) -C $</_build
-MAKECONFDIR = cd $</_build && $(HOSTVARS) ..
+BUILD_DIR = $</_build
+BUILD_SRC := ..
+# build directory relative to UNPACK_DIR
+BUILD_DIRUNPACK = _build
+
+MAKEBUILDDIR = mkdir -p $(BUILD_DIR) && rm -f $(BUILD_DIR)/config.status
+MAKEBUILD = $(MAKE) -C $(BUILD_DIR)
+MAKECONFDIR = cd $(BUILD_DIR) && $(HOSTVARS) $(BUILD_SRC)
 MAKECONFIGURE = $(MAKECONFDIR)/configure $(HOSTCONF)
 
 # Work around for https://lists.nongnu.org/archive/html/bug-gnulib/2020-05/msg00237.html
 # When using a single command, make might take a shortcut and fork/exec
 # itself instead of relying on a shell, but a bug in gnulib ends up
 # trying to execute a cmake folder when one is found in the PATH
-CMAKEBUILD = env cmake --build $</build
-CMAKECLEAN = rm -f $</build/CMakeCache.txt
+CMAKEBUILD = env cmake --build $(BUILD_DIR)
+CMAKECLEAN = rm -f $(BUILD_DIR)/CMakeCache.txt
 CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
-		-B $</build \
+		-B $(BUILD_DIR) \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF \
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib
@@ -471,7 +476,7 @@ ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
 
-MESONFLAGS = $</build $< --default-library static --prefix "$(PREFIX)" \
+MESONFLAGS = $(BUILD_DIR) $< --default-library static --prefix "$(PREFIX)" \
 	--backend ninja -Dlibdir=lib
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
@@ -504,8 +509,8 @@ MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" \
 else
 MESON = meson $(MESONFLAGS)
 endif
-MESONCLEAN = rm -rf $</build/meson-private
-MESONBUILD = meson compile -C $</build $(MESON_BUILD) && meson install -C $</build
+MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
+MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(BUILD_DIR)
 
 ifdef GPL
 REQUIRE_GPL =
