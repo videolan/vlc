@@ -29,10 +29,9 @@ endif
 libmad: libmad-$(MAD_VERSION).tar.gz .sum-mad
 	$(UNPACK)
 ifdef HAVE_DARWIN_OS
-	cd $@-$(MAD_VERSION) && sed \
-		-e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
+	sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
 		-e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' \
-		-i.orig configure
+		-i.orig $(UNPACK_DIR)/configure
 endif
 ifdef HAVE_IOS
 	$(APPLY) $(SRC)/mad/mad-ios-asm.patch

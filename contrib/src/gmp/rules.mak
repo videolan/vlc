@@ -34,7 +34,7 @@ ifdef HAVE_DARWIN_OS
 	$(APPLY) $(SRC)/gmp/arm64-Change-adrp-add-relocations-to-darwin-style.patch
 endif
 	# do not try the cross compiler to detect the build compiler
-	cd $(UNPACK_DIR) && sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' acinclude.m4
+	sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' $(UNPACK_DIR)/acinclude.m4
 	$(MOVE)
 
 # GMP requires either GPLv2 or LGPLv3
