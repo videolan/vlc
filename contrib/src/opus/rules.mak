@@ -27,5 +27,6 @@ endif
 .opus: opus
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(OPUS_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

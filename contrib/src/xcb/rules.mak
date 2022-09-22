@@ -54,5 +54,6 @@ DEPS_xcb = pthread-stubs xau $(DEPS_xau) xcb-proto $(DEPS_xcb-proto)
 .xcb: libxcb
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XCBCONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

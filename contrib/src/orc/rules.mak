@@ -21,5 +21,6 @@ orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 .orc: orc
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

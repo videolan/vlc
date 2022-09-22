@@ -27,5 +27,6 @@ SCHRODINGER_CONF := --with-thread=none --disable-gtk-doc
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SCHRODINGER_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

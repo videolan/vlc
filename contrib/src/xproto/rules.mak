@@ -23,5 +23,6 @@ XPROTO_CONF := --enable-xthreads
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XPROTO_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

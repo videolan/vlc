@@ -28,6 +28,7 @@ TWOLAME_CONF := CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(TWOLAME_CONF)
 	+$(MAKEBUILD)
+	+$(MAKEBUILD) -C libtwolame
 	+$(MAKEBUILD) -C libtwolame install
 	+$(MAKEBUILD) install-data
 	touch $@

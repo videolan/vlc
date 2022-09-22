@@ -31,6 +31,8 @@ LIBMPEG2_CONF := --without-x --disable-sdl
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(LIBMPEG2_CONF)
-	+$(MAKEBUILD) -C libmpeg2 && $(MAKEBUILD) -C libmpeg2 install
-	+$(MAKEBUILD) -C include && $(MAKEBUILD) -C include install
+	+$(MAKEBUILD) -C libmpeg2
+	+$(MAKEBUILD) -C include
+	+$(MAKEBUILD) -C libmpeg2 install
+	+$(MAKEBUILD) -C include install
 	touch $@

@@ -20,5 +20,6 @@ xcb-proto: xcb-proto-$(XCB_PROTO_VERSION).tar.gz .sum-xcb-proto
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

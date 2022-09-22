@@ -43,6 +43,7 @@ source code is fully ready. Otherwise Makefile dependencies will break
 	.foo: libfoo
 		$(MAKEBUILDDIR)
 		$(MAKECONFIGURE)
+		+$(MAKEBUILD)
 		+$(MAKEBUILD) install
 		touch $@
 

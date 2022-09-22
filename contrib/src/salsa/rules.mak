@@ -29,6 +29,7 @@ salsa-lib: salsa-lib-$(SALSA_TAG).tar.xz .sum-salsa
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SALSACONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
 

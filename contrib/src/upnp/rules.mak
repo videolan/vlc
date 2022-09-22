@@ -60,5 +60,6 @@ endif
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(UPNP_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

@@ -26,5 +26,6 @@ KATE_CONF := --disable-valgrind --disable-doc
 .kate: libkate
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(KATE_CONF)
+	+$(MAKEBUILD) SUBDIRS=.
 	+$(MAKEBUILD) SUBDIRS=. install
 	touch $@

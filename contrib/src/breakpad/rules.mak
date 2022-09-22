@@ -37,6 +37,7 @@ else
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(BREAKPAD_CONF)
+	+Configuration=Release $(MAKEBUILD)
 	+Configuration=Release $(MAKEBUILD) install
 endif
 	touch $@

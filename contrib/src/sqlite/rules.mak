@@ -30,5 +30,6 @@ sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SQLITE_CONF)
-	+$(MAKEBUILD) && $(MAKEBUILD) install
+	+$(MAKEBUILD)
+	+$(MAKEBUILD) install
 	touch $@

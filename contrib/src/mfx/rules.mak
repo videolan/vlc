@@ -35,5 +35,6 @@ mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 .mfx: mfx
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(MFX_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

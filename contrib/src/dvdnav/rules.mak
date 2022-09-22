@@ -31,5 +31,6 @@ DEPS_dvdnav = dvdread $(DEPS_dvdread)
 	$(RECONF) -I m4
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

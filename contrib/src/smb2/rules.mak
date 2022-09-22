@@ -26,5 +26,6 @@ SMB2_CONF := --disable-examples --disable-werror --without-libkrb5
 	cd $< && ./bootstrap
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SMB2_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

@@ -24,5 +24,6 @@ NFS_CONF := --disable-examples --disable-utils --disable-werror
 	cd $< && ./bootstrap
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(NFS_CONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

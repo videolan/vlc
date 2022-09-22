@@ -31,5 +31,6 @@ DAALACONF := \
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(DAALACONF)
+	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
