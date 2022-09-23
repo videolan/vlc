@@ -519,6 +519,7 @@ AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
 ], [
   AS_IF([test "${with_contrib}" != "no"], [
     CONTRIB_DIR="${with_contrib}"
+    AC_MSG_RESULT([${CONTRIB_DIR}])
   ], [
     CONTRIB_DIR=""
     AC_MSG_RESULT([disabled])
@@ -526,7 +527,9 @@ AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
 ])
 AS_IF([test -n "${CONTRIB_DIR}"], [
   AS_IF([test -d "${CONTRIB_DIR}/lib"],[
-    CONTRIB_DIR=`cd "${CONTRIB_DIR}" && pwd`
+    SRC_CONTRIB_DIR=$(CONTRIB_DIR)
+    CONTRIB_DIR=`cd "${CONTRIB_DIR}" && pwd -P`
+    AC_MSG_RESULT([${CONTRIB_DIR} from ${SRC_CONTRIB_DIR}])
   ], [
     echo "${CONTRIB_DIR}/lib not found" >&AS_MESSAGE_LOG_FD
     CONTRIB_DIR=""
@@ -535,7 +538,6 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
 
 ])
 AS_IF([test -n "${CONTRIB_DIR}"], [
-  AC_MSG_RESULT([${CONTRIB_DIR}])
   CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
   CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
   CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
