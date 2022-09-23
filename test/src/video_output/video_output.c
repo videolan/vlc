@@ -238,7 +238,7 @@ static int OpenIntf(vlc_object_t *obj)
     msg_Info(intf, "Starting tests");
     while (current_scenario < vout_scenarios_count)
     {
-        msg_Info(intf, " - Running transcode scenario %zu", current_scenario);
+        msg_Info(intf, " - Running vout scenario %zu", current_scenario);
         play_scenario(intf, &vout_scenarios[current_scenario]);
         current_scenario++;
     }
