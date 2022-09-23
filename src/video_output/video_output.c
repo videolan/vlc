@@ -973,7 +973,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                         continue;
                     }
                 }
-                vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
+
                 if (!VideoFormatIsCropArEqual(&decoded->format, &sys->filter.src_fmt))
                 {
                     // we received an aspect ratio change
@@ -982,6 +982,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                     video_format_Copy(&sys->filter.src_fmt, &decoded->format);
                     if (sys->filter.src_vctx)
                         vlc_video_context_Release(sys->filter.src_vctx);
+                    vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
                     sys->filter.src_vctx = pic_vctx ? vlc_video_context_Hold(pic_vctx) : NULL;
 
                     ChangeFilters(vout);
