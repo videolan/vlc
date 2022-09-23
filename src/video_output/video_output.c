@@ -748,6 +748,15 @@ void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
                 NS_FROM_VLC_TICK(last_date),
                 NS_FROM_VLC_TICK(last_system_pts));
 
+    struct vlc_tracer *tracer = GetTracer(sys);
+    if (tracer != NULL && last_date != VLC_TICK_INVALID)
+        vlc_tracer_Trace(tracer,
+            VLC_TRACE("type", "RENDER"),
+            VLC_TRACE("id", sys->str_id),
+            VLC_TRACE("stream", "VSYNC"),
+            VLC_TRACE("pts_per_vsync", last_date),
+            VLC_TRACE("system_pts", last_system_pts),
+            VLC_TRACE_END);
 
     /**
      * TODO: we want to synchronize frame sampling on vsync:
@@ -1192,6 +1201,16 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                         NS_FROM_VLC_TICK(decoded->date),
                         NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
 
+                struct vlc_tracer *tracer = GetTracer(sys);
+                if (tracer != NULL)
+                    vlc_tracer_Trace(tracer,
+                        VLC_TRACE("type", "RENDER"),
+                        VLC_TRACE("id", sys->str_id),
+                        VLC_TRACE("stream", "DECODED"),
+                        VLC_TRACE("pts", decoded->date),
+                        VLC_TRACE("system_pts", system_pts == INT64_MAX ? system_now : system_pts),
+                        VLC_TRACE_END);
+
                 if (is_late_dropped && !decoded->b_force)
                 {
 
@@ -1237,28 +1256,54 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
 
         vout_chrono_Start(&sys->static_filter);
 
+        vlc_tick_t now_ts = vlc_tick_now();
+        vlc_tick_t system_pts = vlc_clock_ConvertToSystem(sys->clock, now_ts, sys->displayed.decoded->date, sys->rate);
+
         if (atomic_load(&sys->b_display_avstat))
         {
-            vlc_tick_t now_ts = vlc_tick_now();
             // TODO rate is not protected here
-            vlc_tick_t system_pts = vlc_clock_ConvertToSystem(sys->clock, now_ts, sys->displayed.decoded->date, sys->rate);
             msg_Info(&sys->obj, "avstats: [RENDER][BEGINSTATIC] ts=%" PRId64 " pts=%" PRId64 " system_pts=%" PRId64,
                     NS_FROM_VLC_TICK(now_ts),
                     NS_FROM_VLC_TICK(sys->displayed.decoded->date),
                     NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
+
         }
+        struct vlc_tracer *tracer = GetTracer(sys);
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "BEGINSTATIC"),
+                VLC_TRACE("pts", sys->displayed.decoded->date),
+                VLC_TRACE("system_pts", system_pts == INT64_MAX ? vlc_tick_now() : system_pts),
+                VLC_TRACE_END);
 
         picture = filter_chain_VideoFilter(sys->filter.chain_static, sys->displayed.decoded);
+
+        if (picture == NULL)
+            goto after_tracing;
+
+        now_ts = vlc_tick_now();
+        system_pts = vlc_clock_ConvertToSystem(sys->clock, now_ts, picture->date, sys->rate);
+
         if (atomic_load(&sys->b_display_avstat) && picture)
         {
-            vlc_tick_t now_ts = vlc_tick_now();
             // TODO rate is not protected here
-            vlc_tick_t system_pts = vlc_clock_ConvertToSystem(sys->clock, now_ts, picture->date, sys->rate);
             msg_Info(&sys->obj, "avstats: [RENDER][ENDSTATIC] ts=%" PRId64 " pts=%" PRId64 " system_pts=%" PRId64,
                     NS_FROM_VLC_TICK(now_ts),
                     NS_FROM_VLC_TICK(picture->date),
                     NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
         }
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "ENDSTATIC"),
+                VLC_TRACE("pts", picture->date),
+                VLC_TRACE("system_pts", system_pts == INT64_MAX ? vlc_tick_now() : system_pts),
+                VLC_TRACE_END);
+
+after_tracing:
         vout_chrono_Stop(&sys->static_filter);
     }
 
@@ -1536,8 +1581,16 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     bool rendering_enabled = sys->rendering_enabled &&
         sys->window_width != 0 && sys->window_height != 0;
 
+    struct vlc_tracer *tracer = GetTracer(sys);
+
     if (rendering_enabled)
     {
+        vlc_tick_t trace_pts = system_pts == INT64_MAX ?
+            system_now : system_pts;
+
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "render.prepare", sys->str_id, "late");
+
         vlc_tick_t now_ts = vlc_tick_now();
         if (atomic_load(&sys->b_display_avstat))
         {
@@ -1546,6 +1599,14 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                       NS_FROM_VLC_TICK(todisplay->date),
                       NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
         }
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "PREPARE"),
+                VLC_TRACE("pts_per_vsync", todisplay->date),
+                VLC_TRACE("pts", trace_pts),
+                VLC_TRACE_END);
 
         if (vd->ops->prepare != NULL)
             vd->ops->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
@@ -1558,6 +1619,14 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                       NS_FROM_VLC_TICK(todisplay->date),
                       NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
         }
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "PREPARED"),
+                VLC_TRACE("pts_per_vsync", todisplay->date),
+                VLC_TRACE("pts", trace_pts),
+                VLC_TRACE_END);
 
         vout_chrono_Stop(&sys->render);
     }
@@ -1595,7 +1664,6 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
 
         if (unlikely(late > __MAX(latency,-latency) + VLC_TICK_FROM_MS(2)))
         {
-            struct vlc_tracer *tracer = GetTracer(sys);
             if (tracer != NULL)
                 vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "late");
             msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
@@ -1655,14 +1723,25 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     /* Display the direct buffer returned by vout_RenderPicture */
     if (rendering_enabled)
     {
+        vlc_tick_t trace_pts = system_pts == INT64_MAX ?
+            system_now : system_pts;
+
         if (atomic_load(&sys->b_display_avstat))
         {
             vlc_tick_t now_ts = vlc_tick_now();
             msg_Info( vd, "avstats: [RENDER][DISPLAY] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64,
                     NS_FROM_VLC_TICK(now_ts),
                     NS_FROM_VLC_TICK(todisplay->date),
-                    NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
+                    NS_FROM_VLC_TICK(trace_pts));
         }
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "DISPLAY"),
+                VLC_TRACE("pts_per_vsync", todisplay->date),
+                VLC_TRACE("pts", trace_pts),
+                VLC_TRACE_END);
 
         vout_display_Display(vd, todisplay);
         vlc_tick_t display_ts = vlc_tick_now();
@@ -1680,6 +1759,9 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         if (vsync_missed && atomic_load(&sys->b_display_avstat))
             msg_Warn(vout, "avstats: [VSYNC MISSED] ts=%" PRId64, NS_FROM_VLC_TICK(vlc_tick_now()));
 
+        if (vsync_missed)
+            vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "vsync_missed");
+
         if (atomic_load(&sys->b_display_avstat))
         {
             vlc_tick_t now_ts = vlc_tick_now();
@@ -1688,6 +1770,16 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                     NS_FROM_VLC_TICK(todisplay->date),
                     NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
         }
+
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "DISPLAYED"),
+                VLC_TRACE("pts_per_vsync", todisplay->date),
+                VLC_TRACE("pts", trace_pts),
+                VLC_TRACE_END);
+
     }
     else
         picture_Release(todisplay);
@@ -1696,6 +1788,8 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     {
         vlc_tick_t now_ts = vlc_tick_now();
         vlc_tick_t clock_offset = vlc_clock_GetOffset(sys->clock, system_now, pts, sys->rate);
+        vlc_tick_t trace_pts = system_pts == INT64_MAX ?
+            system_now : system_pts;
 
         msg_Info( vd, "avstats: [RENDER][VIDEO] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts_late=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
                   NS_FROM_VLC_TICK(now_ts),
@@ -1703,6 +1797,17 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                   NS_FROM_VLC_TICK(pts + late),
                   NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts),
                   NS_FROM_VLC_TICK(system_now - clock_offset));
+
+        if (tracer != NULL)
+            vlc_tracer_Trace(tracer,
+                VLC_TRACE("type", "RENDER"),
+                VLC_TRACE("id", sys->str_id),
+                VLC_TRACE("stream", "VIDEO"),
+                VLC_TRACE("pts_per_vsync", pts),
+                VLC_TRACE("pts_late", pts + late),
+                VLC_TRACE("pts", trace_pts),
+                VLC_TRACE("pcr", system_now - clock_offset),
+                VLC_TRACE_END);
     }
 
     vlc_mutex_unlock(&sys->display_lock);
@@ -2029,6 +2134,10 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
+    struct vlc_tracer *tracer = GetTracer(sys);
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "flush");
+
     vlc_mutex_lock(&sys->vsync.lock);
     atomic_store(&sys->vsync_halted, true);
     vlc_mutex_unlock(&sys->vsync.lock);
@@ -2039,7 +2148,6 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     vout_control_Release(&sys->control);
     atomic_store(&sys->vsync_halted, false);
 
-    struct vlc_tracer *tracer = GetTracer(sys);
     if (tracer != NULL)
         vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "flushed");
 }
