@@ -652,6 +652,7 @@ if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
         $MAKE prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" \
             || abort_err "Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed"
     fi
+    $MAKE tools
 else
     # Download source packages
     $MAKE fetch
