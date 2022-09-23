@@ -641,6 +641,9 @@ fi
     "${VLC_CONTRIB_OPTIONS[@]}" \
 || abort_err "Bootstrapping contribs failed"
 
+# Print list of contribs that will be built
+$MAKE list
+
 if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
     # Fetch prebuilt contribs
     if [ -z "$VLC_PREBUILT_CONTRIBS_URL" ]; then
@@ -650,9 +653,6 @@ if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
             || abort_err "Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed"
     fi
 else
-    # Print list of contribs that will be built
-    $MAKE list
-
     # Download source packages
     $MAKE fetch
 
