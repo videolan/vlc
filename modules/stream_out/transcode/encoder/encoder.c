@@ -51,9 +51,8 @@ void transcode_encoder_delete( transcode_encoder_t *p_enc )
             block_ChainRelease( p_enc->p_buffers );
             picture_fifo_Delete( p_enc->pp_pics );
         }
-        es_format_Clean( &p_enc->p_encoder->fmt_in );
-        es_format_Clean( &p_enc->p_encoder->fmt_out );
-        vlc_object_delete(p_enc->p_encoder);
+
+        vlc_encoder_Destroy( p_enc->p_encoder );
     }
     free( p_enc );
 }
