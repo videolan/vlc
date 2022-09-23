@@ -35,12 +35,14 @@ else
 X264CONF += --disable-win32thread
 endif
 ifeq ($(ARCH), arm)
-X264_AS = AS="./tools/gas-preprocessor.pl -arch arm -as-type clang -force-thumb -- $(CC) -mimplicit-it=always"
+# This isn't required in newer x264 snapshots, see
+# 3d90057e15abf257320c89bb7146fb0c92687fa6 in x264.
+X264_AS = export AS="../tools/gas-preprocessor.pl -arch arm -as-type clang -force-thumb -- $(CC) -mimplicit-it=always";
 endif
 ifeq ($(ARCH),aarch64)
 # Configure defaults to gas-preprocessor + armasm64 for this target,
-# unless overridden.
-X264_AS = AS="$(CC)"
+# unless overridden. This isn't required in newer x264 snapshots.
+X264_AS = export AS="$(CC)";
 endif
 endif
 ifdef HAVE_CROSS_COMPILE
@@ -81,7 +83,7 @@ x264 x26410b: %: $(X264_BASENAME) .sum-%
 .x264: x264
 	$(REQUIRE_GPL)
 	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(X264_AS) $(X264CONF)
+	$(X264_AS) $(MAKECONFIGURE) $(X264CONF)
 	+$(MAKEBUILD) install
 	touch $@
 
