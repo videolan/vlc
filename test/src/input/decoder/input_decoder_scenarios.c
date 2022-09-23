@@ -33,6 +33,7 @@
 #include <vlc_player.h>
 #include <vlc_interface.h>
 #include <vlc_codec.h>
+#include <vlc_vout_display.h>
 
 #include "input_decoder.h"
 
@@ -44,6 +45,7 @@ static struct scenario_data
     struct vlc_video_context *decoder_vctx;
     bool skip_decoder;
     bool stream_out_sent;
+    size_t decoder_image_sent;
 } scenario_data;
 
 static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
@@ -116,8 +118,27 @@ static int decoder_decode_check_flush_video(decoder_t *dec, picture_t *pic)
         return VLC_SUCCESS;
     }
 
-    int ret = decoder_UpdateVideoOutput(dec, NULL);
-    assert(ret == VLC_SUCCESS);
+    /* Only update the output format the first time. */
+    if (scenario_data.decoder_image_sent == 0)
+    {
+        int ret = decoder_UpdateVideoOutput(dec, NULL);
+        assert(ret == VLC_SUCCESS);
+    }
+
+    /* Workaround: the input decoder needs multiple frame (at least 2
+     * currently) to start correctly. We're not testing this, but we're
+     * testing the flush here, so provide additional picture at the
+     * beginning of the test to avoid issues with this.
+     * They must not be linked to any picture context. */
+    if (scenario_data.decoder_image_sent < 3)
+    {
+        msg_Info(dec, "Queueing workaround picture number %zu", scenario_data.decoder_image_sent);
+        decoder_QueueVideo(dec, pic);
+        scenario_data.decoder_image_sent++;
+        return VLC_SUCCESS;
+    }
+
+    /* Now the input decoder should be completely started. */
 
     struct picture_watcher_context context1 = {
         .context.destroy = context_destroy,
@@ -187,6 +208,10 @@ static void display_prepare_signal(vout_display_t *vd, picture_t *pic)
 {
     (void)vd;
 
+    if (pic->context == NULL)
+        return;
+
+    msg_Info(vd, "Signal that the frame has been prepared from display");
     struct picture_watcher_context *watcher =
         container_of(pic->context, struct picture_watcher_context, context);
     vlc_sem_post(&watcher->wait_prepare);
@@ -294,6 +319,7 @@ void input_decoder_scenario_init(void)
     scenario_data.decoder_vctx = NULL;
     scenario_data.skip_decoder = false;
     scenario_data.stream_out_sent = false;
+    scenario_data.decoder_image_sent = 0;
     vlc_sem_init(&scenario_data.wait_stop, 0);
     vlc_sem_init(&scenario_data.display_prepare_signal, 0);
     vlc_sem_init(&scenario_data.wait_ready_to_flush, 0);
