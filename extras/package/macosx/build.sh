@@ -254,8 +254,8 @@ mkdir -p contrib-$HOST_TRIPLET && cd contrib-$HOST_TRIPLET
 if [ "$REBUILD" = "yes" ]; then
     make clean
 fi
+make list
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
-    make list
     make fetch
     make -j$JOBS -k || make -j1
 
