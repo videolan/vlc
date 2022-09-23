@@ -368,6 +368,7 @@ HOSTVARS_PIC := $(HOSTTOOLS) \
 
 BUILDCOMMONCONF := --disable-dependency-tracking
 BUILDCOMMONCONF += --prefix="$(BUILDPREFIX)"
+BUILDCOMMONCONF += --bindir="$(BUILDBINDIR)"
 BUILDCOMMONCONF += --datarootdir="$(BUILDPREFIX)/share"
 BUILDCOMMONCONF += --includedir="$(BUILDPREFIX)/include"
 BUILDCOMMONCONF += --libdir="$(BUILDPREFIX)"
