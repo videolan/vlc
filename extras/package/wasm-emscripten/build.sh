@@ -138,6 +138,7 @@ if [ "$VLC_USE_PREBUILT_CONTRIBS" -eq "0" ]; then
 else
     diagnostic "vlc contribs: using prebuilt contribs"
     emmake make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+    emmake make tools
 fi
 
 diagnostic "starting libvlc build"
