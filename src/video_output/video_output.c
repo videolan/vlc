@@ -1443,8 +1443,12 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
     picture_t *next = PreparePicture(sys, false, false);
     if (next == NULL)
         return false;
+    /* We might have reset the current picture when preparing the next one,
+     * because filters had to be changed. In this case, avoid releasing the
+     * picture since it will lead to null pointer dereference errors. */
+    if (sys->displayed.current != NULL)
+        picture_Release(sys->displayed.current);
 
-    picture_Release(sys->displayed.current);
     sys->displayed.current = next;
 
     return true;
