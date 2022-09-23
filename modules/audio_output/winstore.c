@@ -528,12 +528,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
 
-    struct aout_stream_owner *owner = vlc_object_create(aout, sizeof (*owner));
+    struct aout_stream_owner *owner =
+        aout_stream_owner_New(aout, sizeof (*owner), ActivateDevice);
     if (unlikely(owner == NULL))
         return -1;
     aout_stream_t *s = &owner->s;
-    owner->chain = NULL;
-    owner->last = &owner->chain;
 
     // Load the "out stream" for the requested device
     EnterMTA();
@@ -549,25 +548,21 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             {
                 vlc_mutex_unlock(&sys->lock);
                 LeaveMTA();
-                vlc_object_delete(&s->obj);
+                aout_stream_owner_Delete(owner);
                 return -1;
             }
         }
     }
 
     sys->work_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    owner->buffer_ready_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (unlikely(sys->work_event == NULL || owner->buffer_ready_event == NULL))
+    if (unlikely(sys->work_event == NULL))
     {
-        if (sys->work_event != NULL)
-            CloseHandle(sys->work_event);
         vlc_mutex_unlock(&sys->lock);
         LeaveMTA();
-        vlc_object_delete(&s->obj);
+        aout_stream_owner_Delete(owner);
         return -1;
     }
 
-    owner->activate = ActivateDevice;
     for (;;)
     {
         owner->device = sys->client;
@@ -666,8 +661,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
 error:
     CloseHandle(sys->work_event);
-    CloseHandle(owner->buffer_ready_event);
-    vlc_object_delete(s);
+    aout_stream_owner_Delete(owner);
     vlc_mutex_unlock(&sys->lock);
     LeaveMTA();
     return -1;
@@ -690,9 +684,7 @@ static void Stop(audio_output_t *aout)
     LeaveMTA();
 
     CloseHandle(sys->work_event);
-    CloseHandle(sys->stream->buffer_ready_event);
-
-    vlc_object_delete(&sys->stream->s);
+    aout_stream_owner_Delete(sys->stream);
     sys->stream = NULL;
 }
 

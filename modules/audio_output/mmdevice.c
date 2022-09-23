@@ -1179,21 +1179,11 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
     }
 
-    struct aout_stream_owner *owner = vlc_object_create(aout, sizeof (*owner));
+    struct aout_stream_owner *owner =
+        aout_stream_owner_New(aout, sizeof (*owner), ActivateDevice);
     if (unlikely(owner == NULL))
         return -1;
     aout_stream_t *s = &owner->s;
-    owner->chain = NULL;
-    owner->last = &owner->chain;
-
-    owner->buffer_ready_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (unlikely(owner->buffer_ready_event == NULL))
-    {
-        vlc_object_delete(s);
-        return -1;
-    }
-
-    owner->activate = ActivateDevice;
 
     EnterMTA();
     vlc_mutex_lock(&sys->lock);
@@ -1205,8 +1195,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
          * failed. */
         vlc_mutex_unlock(&sys->lock);
         LeaveMTA();
-        CloseHandle(owner->buffer_ready_event);
-        vlc_object_delete(s);
+        aout_stream_owner_Delete(owner);
         return -1;
     }
 
@@ -1273,8 +1262,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     if (module == NULL)
     {
-        CloseHandle(owner->buffer_ready_event);
-        vlc_object_delete(s);
+        aout_stream_owner_Delete(owner);
         vlc_mutex_unlock(&sys->lock);
         LeaveMTA();
         return -1;
@@ -1300,8 +1288,7 @@ static void Stop(audio_output_t *aout)
     aout_stream_owner_Stop(sys->stream);
     LeaveMTA();
 
-    CloseHandle(sys->stream->buffer_ready_event);
-    vlc_object_delete(&sys->stream->s);
+    aout_stream_owner_Delete(sys->stream);
     sys->stream = NULL;
 }
 

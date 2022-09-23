@@ -162,6 +162,38 @@ HRESULT aout_stream_owner_PlayAll(struct aout_stream_owner *owner)
     return S_OK;
 }
 
+static inline
+void *aout_stream_owner_New(audio_output_t *aout, size_t size,
+                            HRESULT (*activate)(void *device, REFIID, PROPVARIANT *, void **))
+{
+    assert(size >= sizeof(struct aout_stream_owner));
+
+    void *obj = vlc_object_create(aout, size);
+    if (unlikely(obj == NULL))
+        return NULL;
+    struct aout_stream_owner *owner = obj;
+
+    owner->chain = NULL;
+    owner->last = &owner->chain;
+    owner->activate = activate;
+
+    owner->buffer_ready_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (unlikely(owner->buffer_ready_event == NULL))
+    {
+        vlc_object_delete(&owner->s);
+        return NULL;
+    }
+
+    return obj;
+}
+
+static inline
+void aout_stream_owner_Delete(struct aout_stream_owner *owner)
+{
+    CloseHandle(owner->buffer_ready_event);
+    vlc_object_delete(&owner->s);
+}
+
 /*
  * "aout stream" helpers
  */
