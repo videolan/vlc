@@ -19,10 +19,10 @@ VPATH := $(TARBALLS)
 
 # Common download locations
 GNU ?= http://ftp.gnu.org/gnu
-SF := https://netcologne.dl.sourceforge.net/
+SF := https://netcologne.dl.sourceforge.net
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
-GITHUB := https://github.com/
+GITHUB := https://github.com
 GOOGLE_CODE := https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com
 
 #
