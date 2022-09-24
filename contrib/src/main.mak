@@ -19,10 +19,10 @@ VPATH := $(TARBALLS)
 
 # Common download locations
 GNU ?= http://ftpmirror.gnu.org/gnu
-SF := https://netcologne.dl.sourceforge.net/
+SF := https://netcologne.dl.sourceforge.net
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
-GITHUB := https://github.com/
+GITHUB := https://github.com
 GNUGPG := https://www.gnupg.org/ftp/gcrypt
 XIPH := https://ftp.osuosl.org/pub/xiph/releases
 
