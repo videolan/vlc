@@ -31,7 +31,7 @@ GOOGLE_CODE := https://storage.googleapis.com/google-code-archive-downloads/v2/c
 
 PREFIX ?= $(TOPDST)/$(HOST)
 PREFIX := $(abspath $(PREFIX))
-BUILDPREFIX ?= $(TOPDST)
+BUILDPREFIX ?= $(PREFIX)/..
 BUILDPREFIX := $(abspath $(BUILDPREFIX))
 BUILDBINDIR ?= $(BUILDPREFIX)/bin
 ifneq ($(HOST),$(BUILD))
