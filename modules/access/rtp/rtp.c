@@ -31,7 +31,7 @@
 #include <vlc_demux.h>
 #include <vlc_network.h>
 #include <vlc_plugin.h>
-#include <vlc_dtls.h>
+#include "vlc_dtls.h"
 #include <vlc_modules.h> /* module_exists() */
 
 #include "rtp.h"

@@ -35,7 +35,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "substext.h"
+#include "../substext.h"
 #include "ttml.h"
 #include "imageupdater.h"
 #include "ttmlpes.h"

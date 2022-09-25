@@ -47,8 +47,8 @@
 #import <vlc_opengl.h>
 #import <vlc_picture_pool.h>
 
-#import "../codec/vt_utils.h"
-#import "../video_output/opengl/vout_helper.h"
+#import "codec/vt_utils.h"
+#import "video_output/opengl/vout_helper.h"
 
 #define BUFFER_COUNT 3
 

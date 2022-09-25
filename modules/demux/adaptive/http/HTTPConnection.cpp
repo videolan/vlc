@@ -32,10 +32,10 @@
 
 extern "C"
 {
-    #include "../access/http/resource.h"
-    #include "../access/http/connmgr.h"
-    #include "../access/http/conn.h"
-    #include "../access/http/message.h"
+    #include "access/http/resource.h"
+    #include "access/http/connmgr.h"
+    #include "access/http/conn.h"
+    #include "access/http/message.h"
 }
 
 using namespace adaptive::http;

@@ -29,7 +29,7 @@
 #include "HTTPConnection.hpp"
 #include "ConnectionParams.hpp"
 #include "Downloader.hpp"
-#include "tools/Debug.hpp"
+#include "../tools/Debug.hpp"
 #include <vlc_url.h>
 #include <vlc_http.h>
 

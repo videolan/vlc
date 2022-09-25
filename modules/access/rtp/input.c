@@ -39,7 +39,7 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_block.h>
-#include <vlc_dtls.h>
+#include "vlc_dtls.h"
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
