@@ -44,6 +44,7 @@ namespace adaptive
                 void setAspectRatio(const AspectRatio &);
                 void setFrameRate(const Rate &);
                 void setSampleRate(const Rate &);
+                void setChannelsCount(unsigned);
 
             protected:
                 es_format_t fmt;

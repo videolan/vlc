@@ -54,6 +54,9 @@ namespace hls
                 virtual bool canNoLongerUpdate() const override;
 
                 virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const override;
+                virtual CodecDescription * makeCodecDescription(const std::string &) const override;
+
+                void setChannelsCount(unsigned);
 
             protected:
                 time_t targetDuration;
@@ -66,6 +69,7 @@ namespace hls
                 bool b_loaded;
                 unsigned updateFailureCount;
                 mtime_t lastUpdateTime;
+                unsigned channels;
         };
     }
 }
