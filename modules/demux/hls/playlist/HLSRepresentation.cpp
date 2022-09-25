@@ -45,6 +45,7 @@ HLSRepresentation::HLSRepresentation  ( BaseAdaptationSet *set ) :
     lastUpdateTime = 0;
     targetDuration = 0;
     streamFormat = StreamFormat::Type::Unknown;
+    channels = 0;
 }
 
 HLSRepresentation::~HLSRepresentation ()
@@ -173,6 +174,21 @@ bool HLSRepresentation::runLocalUpdates(SharedResources *res)
 bool HLSRepresentation::canNoLongerUpdate() const
 {
     return updateFailureCount > MAX_UPDATE_FAILED_UPDATE_COUNT;
+}
+
+void HLSRepresentation::setChannelsCount(unsigned c)
+{
+    channels = c;
+}
+
+CodecDescription * HLSRepresentation::makeCodecDescription(const std::string &s) const
+{
+    CodecDescription *desc = BaseRepresentation::makeCodecDescription(s);
+    if(desc)
+    {
+        desc->setChannelsCount(channels);
+    }
+    return desc;
 }
 
 uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const

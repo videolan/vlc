@@ -160,10 +160,17 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
     }
 }
 
-void M3U8Parser::fillRepresentationFromMediainfo(const AttributesTag *,
+void M3U8Parser::fillRepresentationFromMediainfo(const AttributesTag *mediatag,
                                                  const std::string &type,
                                                  HLSRepresentation *rep)
 {
+    if(type == "AUDIO")
+    {
+        const Attribute *channelsAttr = mediatag->getAttributeByName("CHANNELS");
+        if(channelsAttr)
+            rep->setChannelsCount(std::atoi(channelsAttr->quotedString().c_str()));
+    }
+
     if(type != "AUDIO" && type != "VIDEO")
     {
         rep->streamFormat = StreamFormat(StreamFormat::Type::Unsupported);

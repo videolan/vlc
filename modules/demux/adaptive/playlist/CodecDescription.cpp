@@ -93,6 +93,11 @@ void CodecDescription::setSampleRate(const Rate &r)
     fmt.audio.i_rate = r.num();
 }
 
+void CodecDescription::setChannelsCount(unsigned c)
+{
+    fmt.audio.i_channels = c;
+}
+
 CodecDescriptionList::CodecDescriptionList()
 {
 

@@ -173,6 +173,7 @@ int M3U8MasterPlaylist_test()
             Expect(fmt->i_codec == fns.getFmt()->i_codec);
             Expect(fmt->i_profile == fns.getFmt()->i_profile);
             Expect(fmt->i_cat == AUDIO_ES);
+            Expect(fmt->audio.i_channels == 2);
 
             delete m3u;
         }
@@ -221,6 +222,7 @@ int M3U8MasterPlaylist_test()
                 Expect(fmt != nullptr);
                 Expect(fmt->i_codec == fns.getFmt()->i_codec);
                 Expect(fmt->i_cat == AUDIO_ES);
+                Expect(fmt->audio.i_channels == 2);
             }
 
             {
