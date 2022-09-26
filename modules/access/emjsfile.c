@@ -27,7 +27,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_threads.h>
-
+#include <stdalign.h>
 #include <emscripten.h>
 
 typedef struct
@@ -67,14 +67,12 @@ static int Seek (stream_t *p_access, uint64_t offset) {
 
 static int get_js_file_size(stream_t *p_access, uint64_t *value) {
     /*
+      Note :
       to avoid RangeError on BigUint64 view creation,
-      the start offset must be a multiple of 8.
+      the start offset (value) must be a multiple of 8.
     */
-    if ((uintptr_t)value % 8 != 0) {
-        msg_Err(p_access, "error: value is not aligned in get_js_file_size!");
-        return VLC_EGENERIC;
-    }        
-    return (EM_ASM_INT({
+    alignas(8) uint64_t file_size = 0;
+    int ret = (EM_ASM_INT({
         try {
             var v = new BigUint64Array(wasmMemory.buffer, $0, 1);
             v[0] = BigInt(Module.vlcAccess[$1].worker_js_file.size);
@@ -84,7 +82,9 @@ static int get_js_file_size(stream_t *p_access, uint64_t *value) {
             console.error("get_js_file_size error: " + error);
             return 1;
         }
-    }, value, p_access) == 0) ? VLC_SUCCESS: VLC_EGENERIC;
+    }, &file_size, p_access) == 0) ? VLC_SUCCESS: VLC_EGENERIC;
+    *value = file_size;
+    return ret;
 }
 
 static int Control( stream_t *p_access, int i_query, va_list args )
