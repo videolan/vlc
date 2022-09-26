@@ -25,5 +25,6 @@ OPENJPEG_CONF := -DBUILD_PKGCONFIG_FILES=ON -DBUILD_CODEC:bool=OFF
 .openjpeg: openjpeg toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(OPENJPEG_CONF)
+	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@

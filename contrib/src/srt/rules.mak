@@ -34,5 +34,6 @@ SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
 .srt: srt toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(SRT_CONF)
+	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@

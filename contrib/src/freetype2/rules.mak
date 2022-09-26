@@ -28,5 +28,6 @@ ifndef AD_CLAUSES
 endif
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(FREETYPE_CONF)
+	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@
