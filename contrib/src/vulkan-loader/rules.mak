@@ -46,6 +46,7 @@ vulkan-loader: Vulkan-Loader-$(VULKAN_LOADER_VERSION).tar.gz .sum-vulkan-loader
 ifeq ($(HOST),i686-w64-mingw32)
 	cp -v $(SRC)/vulkan-loader/libvulkan-32.def $(UNPACK_DIR)/loader/vulkan-1.def
 endif
+	$(call pkg_static,"loader/vulkan.pc.in")
 	$(MOVE)
 
 # Needed for the loader's cmake script to find the registry files
@@ -63,7 +64,6 @@ ifdef HAVE_WIN32
 	cd $< && sed -i.orig -e "s,-lvulkan,-lvulkan.dll -lcfgmgr32," build/loader/vulkan.pc
 endif
 
-	$(call pkg_static,"build/loader/vulkan.pc")
 	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@

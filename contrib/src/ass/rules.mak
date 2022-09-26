@@ -36,6 +36,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
+	$(call pkg_static,"libass.pc.in")
 	$(MOVE)
 
 DEPS_ass = freetype2 $(DEPS_freetype2) fribidi $(DEPS_fribidi) iconv $(DEPS_iconv)
@@ -65,6 +66,5 @@ endif
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ASS_CONF)
 	+$(MAKEBUILD)
-	$(call pkg_static,"_build/libass.pc")
 	+$(MAKEBUILD) install
 	touch $@
