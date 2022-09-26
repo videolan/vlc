@@ -22,11 +22,13 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
+#include <vlc_threads.h>
 #include <pthread.h>
 #include <assert.h>
 
 unsigned long vlc_thread_id(void)
 {
     static_assert(sizeof(pthread_t) <= sizeof(unsigned long),"invalid pthread_t size");
-    return pthread_self();
+    return (uintptr_t)(void *)pthread_self();
 }
