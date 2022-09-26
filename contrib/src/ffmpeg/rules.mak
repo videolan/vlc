@@ -5,7 +5,7 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=d4b7b3c03ee2baf0166ce49dff17ec9beff684db
+FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
 FFMPEG_BRANCH=release/4.4
 FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
