@@ -27,7 +27,7 @@ glslang: glslang-$(GLSLANG_VERSION).tar.gz .sum-glslang
 	$(APPLY) $(SRC)/glslang/glslang-win32.patch
 	$(MOVE)
 
-GLSLANG_CONF := -DENABLE_GLSLANG_BINARIES=OFF
+GLSLANG_CONF := -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_CTEST=OFF
 
 .glslang: glslang toolchain.cmake
 	$(CMAKECLEAN)
