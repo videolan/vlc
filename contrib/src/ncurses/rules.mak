@@ -39,5 +39,5 @@ endif
 	+$(MAKEBUILD) -C include -j1
 	+$(MAKEBUILD) -C include install
 	+$(MAKEBUILD) -C misc pc-files
-	install $</_build/misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
+	install $(BUILD_DIR)/misc/ncursesw.pc "$(PREFIX)/lib/pkgconfig"
 	touch $@

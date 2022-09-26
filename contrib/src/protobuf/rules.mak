@@ -52,7 +52,7 @@ protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 .protoc: protoc
 	$(RECONF)
 	$(MAKEBUILDDIR)
-	cd $</_build && $(BUILDVARS) ../configure $(BUILDTOOLCONF) $(PROTOCVARS) $(PROTOCCONF)
+	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILD_SRC)/configure $(BUILDTOOLCONF) $(PROTOCVARS) $(PROTOCCONF)
 	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@

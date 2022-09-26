@@ -61,7 +61,7 @@ VULKAN_LOADER_ENV_CONF = \
 ifdef HAVE_WIN32
 # CMake will generate a .pc file with -lvulkan even if the static library
 # generated is libvulkan.dll.a. It also forget to link with libcfgmgr32.
-	cd $< && sed -i.orig -e "s,-lvulkan,-lvulkan.dll -lcfgmgr32," build/loader/vulkan.pc
+	sed -i.orig -e "s,-lvulkan,-lvulkan.dll -lcfgmgr32," $(BUILD_DIR)/loader/vulkan.pc
 endif
 
 	+$(CMAKEBUILD)

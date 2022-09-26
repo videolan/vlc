@@ -87,7 +87,7 @@ endif
 .gnutls: gnutls
 	$(MAKEBUILDDIR)
 	$(GNUTLS_ENV) $(MAKECONFIGURE) $(GNUTLS_CONF)
-	$(call pkg_static,"_build/lib/gnutls.pc")
+	$(call pkg_static,"$(BUILD_DIRUNPACK)/lib/gnutls.pc")
 	+$(MAKEBUILD) -C gl
 	+$(MAKEBUILD) -C lib
 	+$(MAKEBUILD) -C gl install
