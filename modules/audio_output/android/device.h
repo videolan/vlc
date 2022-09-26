@@ -83,6 +83,13 @@ aout_stream_GainRequest(aout_stream_t *s, float gain)
 }
 
 static inline
+void aout_stream_TimingReport(aout_stream_t *s, vlc_tick_t system_ts,
+                              vlc_tick_t audio_ts)
+{
+    aout_TimingReport(s->aout, system_ts, audio_ts);
+}
+
+static inline
 void aout_stream_DrainedReport(aout_stream_t *s)
 {
     aout_DrainedReport(s->aout);
