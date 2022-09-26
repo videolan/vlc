@@ -40,7 +40,7 @@ static ssize_t Read (stream_t *p_access, void *buffer, size_t size) {
     access_sys_t *p_sys = p_access->p_sys;
 
     size_t offset = p_sys->offset;
-    size_t js_file_size = p_sys->js_file_size; 
+    size_t js_file_size = p_sys->js_file_size;
 
     if (offset >= js_file_size)
         return 0;
@@ -183,7 +183,7 @@ static void EmFileClose (vlc_object_t * p_this) {
     stream_t *p_access = (stream_t*)p_this;
     EM_ASM({
             Module.vlcAccess[$0].worker_js_file = undefined;
-            Module.vlcAccess[$0].reader = undefined;            
+            Module.vlcAccess[$0].reader = undefined;
         }, p_access);
 }
 
@@ -195,7 +195,7 @@ static int EmFileOpen( vlc_object_t *p_this ) {
             if (Module.vlcAccess === undefined) {
                 Module.vlcAccess = {};
             }
-            (Module.vlcAccess[$0] = {worker_js_file: undefined, reader: undefined});            
+            (Module.vlcAccess[$0] = {worker_js_file: undefined, reader: undefined});
     }, p_access);
 
     /*
@@ -249,7 +249,7 @@ static int EmFileOpen( vlc_object_t *p_this ) {
     }, pthread_self());
 
     access_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
-    if (unlikely(p_sys == NULL)) {      
+    if (unlikely(p_sys == NULL)) {
         return VLC_ENOMEM;
     }
 
@@ -266,7 +266,6 @@ static int EmFileOpen( vlc_object_t *p_this ) {
 
       To open a file, we need to call libvlc_media_new_location with
       the following uri : emjsfile://<id>
-      To avoid confusion with atoi() return error, id starts at 1.
     */
     if (init_js_file(p_access, id)) {
         msg_Err(p_access, "EMJsFile error: failed init!");
@@ -284,7 +283,7 @@ static int EmFileOpen( vlc_object_t *p_this ) {
         msg_Err(p_access, "EMJsFile error: could not get file size!");
         EmFileClose(p_this);
         return VLC_EGENERIC;
-    } 
+    }
 
     return VLC_SUCCESS;
 }
