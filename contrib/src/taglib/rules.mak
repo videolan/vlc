@@ -23,5 +23,6 @@ TAGLIB_CONF := -DBUILD_BINDINGS=OFF
 .taglib: taglib toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(TAGLIB_CONF)
+	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@

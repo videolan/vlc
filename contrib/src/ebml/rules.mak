@@ -19,5 +19,6 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 .ebml: ebml toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE)
+	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@
