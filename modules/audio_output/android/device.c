@@ -81,6 +81,15 @@ Drain(audio_output_t *aout)
 }
 
 static int
+TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
+{
+    struct sys *sys = aout->sys;
+    assert(sys->stream != NULL);
+
+    return sys->stream->time_get(sys->stream, delay);
+}
+
+static int
 Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     struct sys *sys = aout->sys;
@@ -106,10 +115,11 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         {
             sys->stream = s;
 
-            assert(s->stop != NULL && s->time_get != NULL && s->play != NULL &&
+            assert(s->stop != NULL && s->play != NULL &&
                    s->pause != NULL && s->flush != NULL);
 
             aout->drain = s->drain != NULL ? Drain : NULL;
+            aout->time_get = s->time_get != NULL ? TimeGet : NULL;
 
             if (s->volume_set != NULL)
                 s->volume_set(s, sys->volume);
@@ -134,15 +144,6 @@ Stop(audio_output_t *aout)
 
     vlc_object_delete(sys->stream);
     sys->stream = NULL;
-}
-
-static int
-TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
-{
-    struct sys *sys = aout->sys;
-    assert(sys->stream != NULL);
-
-    return sys->stream->time_get(sys->stream, delay);
 }
 
 static void
@@ -273,7 +274,6 @@ Open(vlc_object_t *obj)
     aout->pause = Pause;
     aout->flush = Flush;
     aout->drain = NULL;
-    aout->time_get = TimeGet;
     aout->device_select = DeviceSelect;
     aout->volume_set = VolumeSet;
     aout->mute_set = MuteSet;
