@@ -39,6 +39,7 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/ass/0001-aarch64-Set-the-right-intended-alignment-for-constan.patch
+	$(call pkg_static,"libass.pc.in")
 	$(MOVE)
 
 DEPS_ass = freetype2 $(DEPS_freetype2) fribidi $(DEPS_fribidi) iconv $(DEPS_iconv) harfbuzz $(DEPS_harfbuzz)
@@ -62,6 +63,5 @@ endif
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(ASS_CONF)
 	+$(MAKEBUILD)
-	$(call pkg_static,"_build/libass.pc")
 	+$(MAKEBUILD) install
 	touch $@
