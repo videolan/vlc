@@ -554,10 +554,11 @@ void RoundImage::resetImageResponse(bool cancel)
     if (!m_activeImageResponse)
         return;
 
+    m_activeImageResponse->disconnect(this);
+
     if (cancel)
         m_activeImageResponse->cancel();
 
-    m_activeImageResponse->disconnect(this);
     m_activeImageResponse = nullptr;
 }
 
