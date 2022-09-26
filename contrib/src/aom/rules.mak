@@ -86,6 +86,6 @@ endif
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(AOM_CONF)
 	+$(CMAKEBUILD)
-	$(call pkg_static,"build/aom.pc")
+	$(call pkg_static,"$(BUILD_DIRUNPACK)/aom.pc")
 	+$(CMAKEBUILD) --target install
 	touch $@
