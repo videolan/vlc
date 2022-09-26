@@ -38,7 +38,7 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(call pkg_static,"scripts/srt.pc.in")
 	$(MOVE)
 
-SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
+SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF -DENABLE_APPS=OFF
 
 .srt: srt toolchain.cmake
 	$(CMAKECLEAN)
