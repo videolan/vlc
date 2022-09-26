@@ -30,7 +30,8 @@ FLAC_CONF = \
 	-DINSTALL_MANPAGES=OFF \
 	-DBUILD_CXXLIBS=OFF \
 	-DBUILD_EXAMPLES=OFF \
-	-DBUILD_PROGRAMS=OFF
+	-DBUILD_PROGRAMS=OFF \
+	-DBUILD_DOCS=OFF
 
 ifeq ($(ARCH),i386)
 # nasm doesn't like the -fstack-protector-strong that's added to its flags
