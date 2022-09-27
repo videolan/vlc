@@ -129,15 +129,19 @@ diagnostic "vlc contribs: bootstrap"
             --host=wasm32-unknown-emscripten
 
 diagnostic "vlc contribs: make"
-if [ "$VLC_USE_PREBUILT_CONTRIBS" -eq "0" ]; then
+if [ "$VLC_USE_PREBUILT_CONTRIBS" -ne "0" ]; then
+    diagnostic "vlc contribs: using prebuilt contribs"
+    emmake make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
+else
+    PREBUILT_FAILED=yes
+fi
+if [ -n "$PREBUILT_FAILED" ]; then
     emmake make
     if [ "$GENERATE_ARCHIVE" -eq "1" ]; then
         diagnostic "vlc contribs: generating package"
         emmake make package
     fi
 else
-    diagnostic "vlc contribs: using prebuilt contribs"
-    emmake make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
     emmake make tools
 fi
 
