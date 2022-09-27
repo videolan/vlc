@@ -420,7 +420,7 @@ nightly-macos-arm64:
         export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-            ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH \
+            ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs \
                 --with-prebuilt-contribs
         else
             ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs
