@@ -17,10 +17,6 @@ $(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz .sum-fontconfig
 	$(UNPACK)
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/fontconfig/fontconfig-win32.patch
-	$(APPLY) $(SRC)/fontconfig/fontconfig-noxml2.patch
-endif
 	$(RM) $(UNPACK_DIR)/src/fcobjshash.gperf
 	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
@@ -46,9 +42,6 @@ endif
 DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
 
 .fontconfig: fontconfig
-ifdef HAVE_WIN32
-	$(RECONF)
-endif
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(FONTCONFIG_CONF)
 	$(MAKE) -C $<
 ifndef HAVE_MACOSX
