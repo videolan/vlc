@@ -487,7 +487,7 @@ wasm32-emscripten-build :
         - source $EMSCRIPTEN_SDK/emsdk_env.sh
         - |
             if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-                ./extras/package/wasm-emscripten/build.sh --with-prebuilt-contribs
+                ./extras/package/wasm-emscripten/build.sh --gen-contrib-archive --with-prebuilt-contribs
             else
                 ./extras/package/wasm-emscripten/build.sh --gen-contrib-archive
             fi
