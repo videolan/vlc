@@ -241,13 +241,15 @@ debian:
         ../bootstrap
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}"
-            make -j$NCPU --output-sync=recurse tools
-        else
+            make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}" || PREBUILT_FAILED=yes
+        fi
+        if [ -n "$PREBUILT_FAILED" ]; then
             make list
             make -j$NCPU --output-sync=recurse fetch
             make -j$NCPU --output-sync=recurse
             make package
+        else
+            make -j$NCPU --output-sync=recurse tools
         fi
         cd ../../
 
