@@ -342,17 +342,23 @@ ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $
 
 # Rebuild the contribs or use the prebuilt ones
 make list
-if [ "$PREBUILT" != "yes" ]; then
+if [ "$PREBUILT" = "yes" ]; then
+    if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
+    else
+        make prebuilt || PREBUILT_FAILED=yes
+    fi
+    make .luac
+else
+    PREBUILT_FAILED=yes
+fi
+if [ -n "$PREBUILT_FAILED" ]; then
     make -j$JOBS fetch
     make -j$JOBS -k || make -j1
     if [ "$PACKAGE" = "yes" ]; then
         make package
     fi
-elif [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-    make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-    make .luac
 else
-    make prebuilt
     make .luac
 fi
 cd ../..
