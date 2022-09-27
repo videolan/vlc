@@ -600,12 +600,6 @@ echo ""
 ##########################################################
 #                     Contribs build                     #
 ##########################################################
-if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
-    echo "Fetching prebuilt contribs"
-else
-    echo "Building contribs for $VLC_HOST_ARCH"
-fi
-
 # Combine settings from config file
 VLC_CONTRIB_OPTIONS=( "${VLC_CONTRIB_OPTIONS_BASE[@]}" )
 
@@ -645,15 +639,19 @@ fi
 $MAKE list
 
 if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
+    echo "Fetching prebuilt contribs"
     # Fetch prebuilt contribs
     if [ -z "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-        $MAKE prebuilt || abort_err "Fetching prebuilt contribs failed"
+        $MAKE prebuilt || PREBUILT_FAILED=yes && echo "ERROR: Fetching prebuilt contribs failed" >&2
     else
         $MAKE prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" \
-            || abort_err "Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed"
+             || PREBUILT_FAILED=yes && echo "ERROR: Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed" >&2
     fi
-    $MAKE tools
 else
+    PREBUILT_FAILED=yes
+fi
+if [ -n "$PREBUILT_FAILED" ]; then
+    echo "Building contribs for $VLC_HOST_ARCH"
     # Download source packages
     $MAKE fetch
 
@@ -664,6 +662,8 @@ else
     if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ]; then
         $MAKE package || abort_err "Creating prebuilt contribs package failed"
     fi
+else
+    $MAKE tools
 fi
 
 echo ""
