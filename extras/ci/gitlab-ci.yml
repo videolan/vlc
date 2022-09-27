@@ -372,6 +372,7 @@ raspbian-arm:
         fi
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         else
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c -p"
         fi
