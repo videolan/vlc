@@ -43,15 +43,6 @@ _add_environ_val('windres', 'WINDRES')
 args.file.write("\n[properties]\n")
 args.file.write("needs_exe_wrapper = true\n")
 _add_environ_val('pkg_config_libdir', 'PKG_CONFIG_LIBDIR')
-_add_environ_arr('c_args', 'CFLAGS')
-_add_environ_arr('c_link_args', 'LDFLAGS')
-_add_environ_arr('cpp_args', 'CXXFLAGS')
-_add_environ_arr('cpp_link_args', 'LDFLAGS')
-if os.environ.get('HOST_SYSTEM') == 'darwin':
-    _add_environ_val('objc_args', 'CFLAGS')
-    _add_environ_val('objcpp_args', 'CXXFLAGS')
-    _add_environ_val('objc_link_args', 'LDFLAGS')
-    _add_environ_arr('objcpp_link_args', 'LDFLAGS')
 
 # Host machine section
 args.file.write("\n[host_machine]\n")

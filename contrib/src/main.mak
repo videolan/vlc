@@ -332,11 +332,7 @@ HOSTTOOLS := \
 	PATH="$(PREFIX)/bin:$(PATH)" \
 	PKG_CONFIG="$(PKG_CONFIG)"
 
-HOSTVARS_MESON := $(HOSTTOOLS) \
-	CPPFLAGS="$(CPPFLAGS)" \
-	CFLAGS="$(CFLAGS)" \
-	CXXFLAGS="$(CXXFLAGS)" \
-	LDFLAGS="$(LDFLAGS)"
+HOSTVARS_MESON := $(HOSTTOOLS)
 
 # Add these flags after Meson consumed the CFLAGS/CXXFLAGS
 # as when setting those for Meson, it would apply to tests
@@ -485,6 +481,10 @@ MESONFLAGS += --buildtype debugoptimized
 endif
 ifdef HAVE_BITCODE_ENABLED
 MESONFLAGS += -Db_bitcode=true
+endif
+MESONFLAGS += -Dc_args="$(CFLAGS)" -Dc_link_args="$(LDFLAGS)" -Dcpp_args="$(CXXFLAGS)" -Dcpp_link_args="$(LDFLAGS)"
+ifdef HAVE_DARWIN_OS
+MESONFLAGS += -Dobjc_args="$(CFLAGS)" -Dobjc_link_args="$(LDFLAGS)" -Dobjcpp_args="$(CXXFLAGS)" -Dobjcpp_link_args="$(LDFLAGS)"
 endif
 
 ifdef HAVE_CROSS_COMPILE
