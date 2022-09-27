@@ -170,7 +170,18 @@ mkdir -p contrib-$HOST_TRIPLET && cd contrib-$HOST_TRIPLET
 ../bootstrap --build=$BUILD_TRIPLET --host=$HOST_TRIPLET > $out
 
 make list
-if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
+if [ "$CONTRIBFROMSOURCE" != "yes" ]; then
+    if [ ! -e "../$HOST_TRIPLET" ]; then
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
+        else
+            make prebuilt || PREBUILT_FAILED=yes
+        fi
+    fi
+else
+    PREBUILT_FAILED=yes
+fi
+if [ -n "$PREBUILT_FAILED" ]; then
     make fetch
     make -j$JOBS .gettext
     make -j$JOBS -k || make -j1
@@ -178,16 +189,8 @@ if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     if [ "$PACKAGE" = "yes" ]; then
         make package
     fi
-
 else
-if [ ! -e "../$HOST_TRIPLET" ]; then
-    if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-    else
-        make prebuilt
-    fi
     make -j$JOBS tools
-fi
 fi
 spopd
 
