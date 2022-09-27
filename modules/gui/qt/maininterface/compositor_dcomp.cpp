@@ -45,7 +45,7 @@ namespace vlc {
 using namespace Microsoft::WRL;
 
 //Signature for DCompositionCreateDevice
-typedef HRESULT (*DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID iid, void** dcompositionDevice);
+typedef HRESULT (WINAPI* DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID iid, void** dcompositionDevice);
 
 int CompositorDirectComposition::windowEnable(const vlc_window_cfg_t *)
 {

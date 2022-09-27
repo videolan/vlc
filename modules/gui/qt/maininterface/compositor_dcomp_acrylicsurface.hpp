@@ -151,7 +151,7 @@ typedef BOOL(WINAPI* GetWindowCompositionAttribute)(
 );
 
 //Signature for DCompositionCreateDevice
-typedef HRESULT (*DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID iid, void** dcompositionDevice);
+typedef HRESULT (WINAPI* DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID iid, void** dcompositionDevice);
 
 namespace vlc
 {
