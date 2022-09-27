@@ -86,6 +86,7 @@ Widgets.KeyNavigableListView {
 
                         Widgets.CaptionLabel {
                             color: VLCStyle.colors.text
+                            textFormat: Text.StyledText
                             text: model.author ? I18n.qtr("by <b>%1</b>").arg(model.author) : I18n.qtr("by <b>Unknown</b>")
                             topPadding: VLCStyle.margin_xxxsmall
                             width: parent.width
