@@ -31,7 +31,7 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include "networksourcelistener.hpp"
+#include "mediatreelistener.hpp"
 
 #include <memory>
 
@@ -122,6 +122,10 @@ private:
     using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
                                     vlc_media_source_Hold, vlc_media_source_Release);
 
+    using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
+                                                  vlc_media_tree_Hold,
+                                                  vlc_media_tree_Release);
+
     using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
                                                   input_item_Hold,
                                                   input_item_Release);
@@ -143,15 +147,19 @@ private:
     void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
 
 private:
-    struct ListenerCb : public NetworkSourceListener::SourceListenerCb {
-        ListenerCb(NetworkDeviceModel *model) : model(model) {}
+    struct ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
+        ListenerCb(NetworkDeviceModel *model, MediaSourcePtr mediaSource)
+            : model(model)
+            , mediaSource(std::move(mediaSource))
+        {}
 
-        void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
-        void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
-        void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
-        inline void onItemPreparseEnded( MediaSourcePtr, input_item_node_t *, enum input_item_preparse_status ) override {}
+        void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) override;
+        void onItemAdded( MediaTreePtr tree, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
+        void onItemRemoved( MediaTreePtr tree, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
+        inline void onItemPreparseEnded( MediaTreePtr, input_item_node_t *, enum input_item_preparse_status ) override {}
 
         NetworkDeviceModel *model;
+        MediaSourcePtr mediaSource;
     };
 
     std::vector<Item> m_items;
@@ -160,7 +168,7 @@ private:
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name
 
-    std::vector<std::unique_ptr<NetworkSourceListener>> m_listeners;
+    std::vector<std::unique_ptr<MediaTreeListener>> m_listeners;
 };
 
 #endif // MLNETWORKDEVICEMODEL_HPP

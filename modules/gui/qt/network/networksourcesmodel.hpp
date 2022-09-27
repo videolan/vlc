@@ -82,7 +82,7 @@ private:
         QUrl artworkUrl;
     };
 
-    bool initializeMediaSources();
+    bool initializeMediaTree();
 
 private:
     std::vector<Item> m_items;

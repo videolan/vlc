@@ -30,7 +30,7 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include "networksourcelistener.hpp"
+#include "mediatreelistener.hpp"
 #include <maininterface/mainctx.hpp>
 
 #include <QSemaphore>
@@ -41,6 +41,10 @@
 using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
                                 vlc_media_source_Hold, vlc_media_source_Release);
 
+using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
+                                              vlc_media_tree_Hold,
+                                              vlc_media_tree_Release);
+
 using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
                                               input_item_Hold,
                                               input_item_Release);
@@ -49,9 +53,9 @@ class NetworkTreeItem
 {
     Q_GADGET
 public:
-    NetworkTreeItem() : source(nullptr), media(nullptr) {}
-    NetworkTreeItem( MediaSourcePtr s, input_item_t* m )
-        : source( std::move( s ) )
+    NetworkTreeItem() : tree(nullptr), media(nullptr) {}
+    NetworkTreeItem( MediaTreePtr tree, input_item_t* m )
+        : tree( std::move( tree ) )
         , media( m )
     {
     }
@@ -63,18 +67,18 @@ public:
 
     operator bool() const
     {
-        return source.get() != nullptr;
+        return tree.get() != nullptr;
     }
 
     bool isValid() {
-        vlc_media_tree_Lock(source->tree);
+        vlc_media_tree_Lock(tree.get());
         input_item_node_t* node;
-        bool ret = vlc_media_tree_Find( source->tree, media.get(), &node, nullptr);
-        vlc_media_tree_Unlock(source->tree);
+        bool ret = vlc_media_tree_Find( tree.get(), media.get(), &node, nullptr);
+        vlc_media_tree_Unlock(tree.get());
         return ret;
     }
 
-    MediaSourcePtr source;
+    MediaTreePtr tree;
     InputItemPtr media;
 };
 
@@ -216,18 +220,18 @@ private:
 
     bool initializeMediaSources();
 
-    void refreshMediaList(MediaSourcePtr s, std::vector<InputItemPtr> children , bool clear);
+    void refreshMediaList(MediaTreePtr tree, std::vector<InputItemPtr> children , bool clear);
 
     bool canBeIndexed(const QUrl& url , ItemType itemType );
 
 private:
-    struct ListenerCb : public NetworkSourceListener::SourceListenerCb {
+    struct ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
         ListenerCb(NetworkMediaModel *model) : model(model) {}
 
-        void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
-        void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
-        void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
-        void onItemPreparseEnded( MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status ) override;
+        void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) override;
+        void onItemAdded( MediaTreePtr tree, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
+        void onItemRemoved( MediaTreePtr tree, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
+        void onItemPreparseEnded( MediaTreePtr tree, input_item_node_t* node, enum input_item_preparse_status status ) override;
 
         NetworkMediaModel *model;
     };
@@ -246,7 +250,7 @@ private:
     MediaLib* m_mediaLib;
     bool m_hasTree = false;
     NetworkTreeItem m_treeItem;
-    std::unique_ptr<NetworkSourceListener> m_listener;
+    std::unique_ptr<MediaTreeListener> m_listener;
     QVariantList m_path;
 };
 

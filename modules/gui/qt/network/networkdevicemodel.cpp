@@ -49,7 +49,7 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
         case NETWORK_SOURCE:
             return item.mediaSource->description;
         case NETWORK_TREE:
-            return QVariant::fromValue( NetworkTreeItem(item.mediaSource, item.inputItem.get()) );
+            return QVariant::fromValue( NetworkTreeItem(MediaTreePtr{ item.mediaSource->tree }, item.inputItem.get()) );
         case NETWORK_ARTWORK:
             return item.artworkUrl;
         default:
@@ -288,8 +288,9 @@ bool NetworkDeviceModel::initializeMediaSources()
                                                                      meta->name );
         if ( mediaSource == nullptr )
             continue;
-        std::unique_ptr<NetworkSourceListener> l{ new NetworkSourceListener(
-                        MediaSourcePtr{ mediaSource, false }, std::make_unique<ListenerCb>(this) ) };
+        std::unique_ptr<MediaTreeListener> l{ new MediaTreeListener(
+                        MediaTreePtr{ mediaSource->tree },
+                        std::make_unique<ListenerCb>(this, MediaSourcePtr{ mediaSource }) ) };
         if ( l->listener == nullptr )
             return false;
         m_listeners.push_back( std::move( l ) );
@@ -298,27 +299,27 @@ bool NetworkDeviceModel::initializeMediaSources()
 }
 
 
-void NetworkDeviceModel::ListenerCb::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
+void NetworkDeviceModel::ListenerCb::onItemCleared( MediaTreePtr tree, input_item_node_t* node )
 {
-    if (node != &mediaSource->tree->root)
+    if (node != &tree->root)
         return;
-    model->refreshDeviceList( std::move( mediaSource ), node->pp_children, node->i_children, true );
+    model->refreshDeviceList( mediaSource, node->pp_children, node->i_children, true );
 }
 
-void NetworkDeviceModel::ListenerCb::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
+void NetworkDeviceModel::ListenerCb::onItemAdded( MediaTreePtr tree, input_item_node_t* parent,
                                                   input_item_node_t *const children[],
                                                   size_t count )
 {
-    if (parent != &mediaSource->tree->root)
+    if (parent != &tree->root)
         return;
-    model->refreshDeviceList( std::move( mediaSource ), children, count, false );
+    model->refreshDeviceList( mediaSource, children, count, false );
 }
 
-void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t* node,
+void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaTreePtr tree, input_item_node_t* node,
                                                     input_item_node_t *const children[],
                                                     size_t count )
 {
-    if (node != &mediaSource->tree->root)
+    if (node != &tree->root)
         return;
 
     std::vector<InputItemPtr> itemList;

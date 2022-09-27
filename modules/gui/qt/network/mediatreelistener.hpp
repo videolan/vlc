@@ -31,36 +31,37 @@
 #include <memory>
 #include <functional>
 
-class NetworkSourceListener
+class MediaTreeListener
 {
 public:
-    using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
-                                    vlc_media_source_Hold, vlc_media_source_Release);
+    using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
+                                                  vlc_media_tree_Hold,
+                                                  vlc_media_tree_Release);
 
     using ListenerPtr = std::unique_ptr<vlc_media_tree_listener_id,
                                         std::function<void(vlc_media_tree_listener_id*)>>;
 
-    class SourceListenerCb
+    class MediaTreeListenerCb
     {
     public:
-        virtual ~SourceListenerCb() = default;
-        virtual void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) = 0;
-        virtual void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) = 0;
-        virtual void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t* node, input_item_node_t *const children[], size_t count ) = 0;
-        virtual void onItemPreparseEnded( MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status ) = 0;
+        virtual ~MediaTreeListenerCb() = default;
+        virtual void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) = 0;
+        virtual void onItemAdded( MediaTreePtr tree, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) = 0;
+        virtual void onItemRemoved( MediaTreePtr tree, input_item_node_t* node, input_item_node_t *const children[], size_t count ) = 0;
+        virtual void onItemPreparseEnded( MediaTreePtr tree, input_item_node_t* node, enum input_item_preparse_status status ) = 0;
     };
 
 public:
-    NetworkSourceListener( MediaSourcePtr s, std::unique_ptr<SourceListenerCb> &&cb );
+    MediaTreeListener( MediaTreePtr tree, std::unique_ptr<MediaTreeListenerCb> &&cb );
 
-    NetworkSourceListener( NetworkSourceListener&& ) = default;
-    NetworkSourceListener& operator=( NetworkSourceListener&& ) = default;
+    MediaTreeListener( MediaTreeListener&& ) = default;
+    MediaTreeListener& operator=( MediaTreeListener&& ) = default;
 
-    NetworkSourceListener( const NetworkSourceListener& ) = delete;
-    NetworkSourceListener& operator=( const NetworkSourceListener& ) = delete;
+    MediaTreeListener( const MediaTreeListener& ) = delete;
+    MediaTreeListener& operator=( const MediaTreeListener& ) = delete;
 
-    MediaSourcePtr source;
+    MediaTreePtr tree;
     ListenerPtr listener = nullptr;
-    std::unique_ptr<SourceListenerCb> cb;
+    std::unique_ptr<MediaTreeListenerCb> cb;
 };
 #endif // MLNETWORKSOURCELISTENER_HPP

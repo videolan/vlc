@@ -230,14 +230,14 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/menus/qml_menu_wrapper.cpp \
 	gui/qt/menus/qml_menu_wrapper.hpp \
 	gui/qt/menus/menus.cpp gui/qt/menus/menus.hpp \
+	gui/qt/network/mediatreelistener.cpp \
+	gui/qt/network/mediatreelistener.hpp \
 	gui/qt/network/networkdevicemodel.cpp \
 	gui/qt/network/networkdevicemodel.hpp \
 	gui/qt/network/networksourcesmodel.cpp \
 	gui/qt/network/networksourcesmodel.hpp \
 	gui/qt/network/networkmediamodel.cpp \
 	gui/qt/network/networkmediamodel.hpp \
-	gui/qt/network/networksourcelistener.cpp \
-	gui/qt/network/networksourcelistener.hpp \
 	gui/qt/network/servicesdiscoverymodel.cpp \
 	gui/qt/network/servicesdiscoverymodel.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \

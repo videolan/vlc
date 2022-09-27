@@ -76,7 +76,7 @@ void NetworkSourcesModel::setCtx(MainCtx* ctx)
         m_ctx = ctx;
     }
     if (m_ctx) {
-        initializeMediaSources();
+        initializeMediaTree();
     }
     emit ctxChanged();
 }
@@ -97,7 +97,7 @@ QMap<QString, QVariant> NetworkSourcesModel::getDataAt(int idx)
     return dataDict;
 }
 
-bool NetworkSourcesModel::initializeMediaSources()
+bool NetworkSourcesModel::initializeMediaTree()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());
 

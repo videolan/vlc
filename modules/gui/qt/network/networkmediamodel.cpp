@@ -379,8 +379,9 @@ bool NetworkMediaModel::initializeMediaSources()
     if (!m_treeItem)
         return false;
 
-    auto tree = m_treeItem.source->tree;
-    auto l = std::make_unique<NetworkSourceListener>( m_treeItem.source, std::make_unique<ListenerCb>(this) );
+    auto tree = m_treeItem.tree.get();
+    auto l = std::make_unique<MediaTreeListener>( m_treeItem.tree,
+                                                  std::make_unique<ListenerCb>(this) );
     if ( l->listener == nullptr )
         return false;
 
@@ -431,7 +432,9 @@ bool NetworkMediaModel::initializeMediaSources()
                 itemList.emplace_back(mediaNode->pp_children[i]->p_item);
 
             while (parent && parent->p_item) {
-                m_path.push_front(QVariant::fromValue(PathNode(NetworkTreeItem(m_treeItem.source, parent->p_item), parent->p_item->psz_name)));
+                m_path.push_front(QVariant::fromValue(PathNode(
+                        NetworkTreeItem(m_treeItem.tree, parent->p_item),
+                        parent->p_item->psz_name)));
                 input_item_node_t *node = nullptr;
                 input_item_node_t *grandParent = nullptr;
                 if (!vlc_media_tree_Find( tree, parent->p_item, &node, &grandParent)) {
@@ -442,7 +445,7 @@ bool NetworkMediaModel::initializeMediaSources()
         }
         vlc_media_tree_Unlock(tree);
         if (!itemList.empty())
-            refreshMediaList( m_treeItem.source, std::move( itemList ), true );
+            refreshMediaList( m_treeItem.tree, std::move( itemList ), true );
         emit pathChanged();
     }
 
@@ -456,18 +459,19 @@ bool NetworkMediaModel::initializeMediaSources()
     return true;
 }
 
-void NetworkMediaModel::ListenerCb::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node)
+void NetworkMediaModel::ListenerCb::onItemCleared( MediaTreePtr tree, input_item_node_t* node)
 {
     InputItemPtr p_node { node->p_item };
-    QMetaObject::invokeMethod(model, [model=model, p_node = std::move(p_node), mediaSource = std::move(mediaSource)]() {
+    QMetaObject::invokeMethod(model, [model=model, p_node = std::move(p_node), tree = std::move(tree)]() {
         if (p_node != model->m_treeItem.media)
             return;
         input_item_node_t *res;
         input_item_node_t *parent;
-        vlc_media_tree_Lock( model->m_treeItem.source->tree );
-        bool found = vlc_media_tree_Find( model->m_treeItem.source->tree, model->m_treeItem.media.get(),
+        // XXX is tree == m_treeItem.tree?
+        vlc_media_tree_Lock( model->m_treeItem.tree.get() );
+        bool found = vlc_media_tree_Find( model->m_treeItem.tree.get(), model->m_treeItem.media.get(),
                                           &res, &parent );
-        vlc_media_tree_Unlock( model->m_treeItem.source->tree );
+        vlc_media_tree_Unlock( model->m_treeItem.tree.get() );
         if (!found)
             return;
 
@@ -476,11 +480,11 @@ void NetworkMediaModel::ListenerCb::onItemCleared( MediaSourcePtr mediaSource, i
         for (int i = 0; i < res->i_children; i++)
             itemList.emplace_back(res->pp_children[i]->p_item);
 
-        model->refreshMediaList( std::move( mediaSource ), std::move( itemList ), true );
+        model->refreshMediaList( std::move( tree ), std::move( itemList ), true );
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
+void NetworkMediaModel::ListenerCb::onItemAdded( MediaTreePtr tree, input_item_node_t* parent,
                                                  input_item_node_t *const children[],
                                                  size_t count )
 {
@@ -490,13 +494,13 @@ void NetworkMediaModel::ListenerCb::onItemAdded( MediaSourcePtr mediaSource, inp
     for (size_t i = 0; i < count; i++)
         itemList.emplace_back(children[i]->p_item);
 
-    QMetaObject::invokeMethod(model, [model=model, p_parent = std::move(p_parent), mediaSource = std::move(mediaSource), itemList=std::move(itemList)]() {
+    QMetaObject::invokeMethod(model, [model=model, p_parent = std::move(p_parent), tree = std::move(tree), itemList=std::move(itemList)]() {
         if ( p_parent == model->m_treeItem.media )
-            model->refreshMediaList( std::move( mediaSource ), std::move( itemList ), false );
+            model->refreshMediaList( std::move( tree ), std::move( itemList ), false );
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemRemoved( MediaSourcePtr, input_item_node_t * node,
+void NetworkMediaModel::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node_t * node,
                                                    input_item_node_t *const children[],
                                                    size_t count )
 {
@@ -538,7 +542,7 @@ void NetworkMediaModel::ListenerCb::onItemRemoved( MediaSourcePtr, input_item_no
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaSourcePtr, input_item_node_t* node, enum input_item_preparse_status )
+void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item_node_t* node, enum input_item_preparse_status )
 {
     model->m_preparseSem.release();
     InputItemPtr p_node { node->p_item };
@@ -551,9 +555,9 @@ void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaSourcePtr, input_it
     });
 }
 
-void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
-                                       std::vector<InputItemPtr> children,
-                                       bool clear )
+void NetworkMediaModel::refreshMediaList( MediaTreePtr tree,
+                                          std::vector<InputItemPtr> children,
+                                          bool clear )
 {
     std::vector<Item> items;
     for ( auto it: children)
@@ -631,7 +635,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
                 }
             });
         }
-        item.tree = NetworkTreeItem( mediaSource, it.get() );
+        item.tree = NetworkTreeItem( tree, it.get() );
         items.push_back( std::move( item ) );
     }
     if ( clear == true )
