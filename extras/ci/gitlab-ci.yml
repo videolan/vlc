@@ -136,7 +136,7 @@ variables:
         fi
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            extras/package/win32/build.sh -p -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
+            extras/package/win32/build.sh -p -c -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
         else
             extras/package/win32/build.sh -c -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
         fi
