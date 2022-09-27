@@ -53,7 +53,6 @@ public:
 
 public:
     NetworkSourceListener( MediaSourcePtr s, SourceListenerCb* m );
-    NetworkSourceListener();
 
     NetworkSourceListener( NetworkSourceListener&& ) = default;
     NetworkSourceListener& operator=( NetworkSourceListener&& ) = default;

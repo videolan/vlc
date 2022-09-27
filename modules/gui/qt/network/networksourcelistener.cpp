@@ -23,10 +23,6 @@ NetworkSourceListener::NetworkSourceListener(MediaSourcePtr s, SourceListenerCb*
     listener.reset( l );
 }
 
-NetworkSourceListener::NetworkSourceListener()
-{
-}
-
 void NetworkSourceListener::onItemCleared( vlc_media_tree_t*, input_item_node_t* node,
                                                     void* userdata)
 {
