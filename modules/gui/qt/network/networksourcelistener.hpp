@@ -58,19 +58,6 @@ public:
     NetworkSourceListener( const NetworkSourceListener& ) = delete;
     NetworkSourceListener& operator=( const NetworkSourceListener& ) = delete;
 
-    static void onItemCleared( vlc_media_tree_t* tree, input_item_node_t* node,
-                               void* userdata );
-    static void onItemAdded( vlc_media_tree_t *tree, input_item_node_t *node,
-                             input_item_node_t *const children[], size_t count,
-                             void *userdata );
-    static void onItemRemoved( vlc_media_tree_t *tree, input_item_node_t *node,
-                               input_item_node_t *const children[], size_t count,
-                               void *userdata );
-
-    static void onItemPreparseEnded( vlc_media_tree_t *tree, input_item_node_t *node,
-                                     enum input_item_preparse_status status,
-                                     void *userdata );
-
     MediaSourcePtr source;
     ListenerPtr listener = nullptr;
     SourceListenerCb *cb = nullptr;
