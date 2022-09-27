@@ -496,15 +496,6 @@ if [ "${VLC_REQUESTED_CORE_COUNT}" != "0" ]; then
     export MAKEFLAGS="${MAKEFLAGS} -j${VLC_REQUESTED_CORE_COUNT}"
 fi
 
-# Validate arguments
-if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ] &&
-   [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
-    echo >&2 "ERROR: The --package-contribs and --with-prebuilt-contribs options"
-    echo >&2 "       can not be used together."
-    usage
-    exit 1
-fi
-
 # Check for some required tools before proceeding
 check_tool xcrun
 
