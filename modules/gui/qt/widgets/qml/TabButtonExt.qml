@@ -103,7 +103,7 @@ T.TabButton {
                 implicitWidth: VLCStyle.fontHeight_normal
                 implicitHeight: VLCStyle.fontHeight_normal
 
-                visible: (control.iconTxt !== "")
+                visible: (control.iconTxt !== "") || control.busy
 
                 Widgets.IconLabel {
                     id: icon
@@ -122,8 +122,11 @@ T.TabButton {
                     font.pixelSize: control.iconSize
                 }
 
+                // FIXME: use Control.Templates
                 BusyIndicator {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
+
+                    padding: 0
 
                     running: control.busy
                 }
