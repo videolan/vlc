@@ -1,9 +1,5 @@
 #include "networksourcelistener.hpp"
 
-NetworkSourceListener::SourceListenerCb::~SourceListenerCb()
-{
-}
-
 NetworkSourceListener::NetworkSourceListener(MediaSourcePtr s, SourceListenerCb* m)
     : source( s )
     , listener( nullptr, [s]( vlc_media_tree_listener_id* l ) {
