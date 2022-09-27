@@ -321,7 +321,7 @@ raspbian-arm:
     script: |
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            extras/package/raspberry/build.sh -p -x -a $HOST_ARCH
+            extras/package/raspberry/build.sh -p -c -x -a $HOST_ARCH
         else
             extras/package/raspberry/build.sh -c -x -a $HOST_ARCH
         fi
