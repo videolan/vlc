@@ -121,18 +121,23 @@ export CPPFLAGS="$CPPFLAGS -g -mfpu=neon -isystem=/usr/lib/$TRIPLET -isystem=/op
 export LDFLAGS="$LDFLAGS -L/usr/$TRIPLET/lib -L/opt/vc/lib"
 
 # Rebuild the contribs or use the prebuilt ones
-if [ "$PREBUILT" != "yes" ]; then
+if [ "$PREBUILT" = "yes" ]; then
+    if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
+    else
+        make prebuilt || PREBUILT_FAILED=yes
+    fi
+else
+    PREBUILT_FAILED=yes
+fi
+if [ -n "$PREBUILT_FAILED" ]; then
     make list
     make -j$JOBS --output-sync=recurse fetch
     make -j$JOBS --output-sync=recurse -k || make -j1
     if [ "$PACKAGE" = "yes" ]; then
         make package
     fi
-elif [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-    make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
-    make -j$JOBS --output-sync=recurse tools
 else
-    make prebuilt
     make -j$JOBS --output-sync=recurse tools
 fi
 cd ../..
