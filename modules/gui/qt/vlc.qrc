@@ -231,6 +231,7 @@
         <file alias="NetworkThumbnailItem.qml">network/qml/NetworkThumbnailItem.qml</file>
         <file alias="NetworkAddressbar.qml">network/qml/NetworkAddressbar.qml</file>
         <file alias="ServicesHomeDisplay.qml">network/qml/ServicesHomeDisplay.qml</file>
+        <file alias="ServicesManage.qml">network/qml/ServicesManage.qml</file>
     </qresource>
     <qresource prefix="/medialibrary">
         <file alias="EmptyLabel.qml">medialibrary/qml/EmptyLabel.qml</file>
