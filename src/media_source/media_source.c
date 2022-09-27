@@ -30,7 +30,6 @@
 #include <vlc_services_discovery.h>
 #include <vlc_vector.h>
 #include "libvlc.h"
-#include "media_tree.h"
 
 #ifdef TEST_MEDIA_SOURCE
 #define vlc_module_name "test"

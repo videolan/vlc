@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include "media_tree.h"
+#include <vlc_media_source.h>
 
 #include <assert.h>
 #include <vlc_common.h>

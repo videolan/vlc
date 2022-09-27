@@ -995,8 +995,11 @@ vlc_media_source_provider_List
 vlc_media_source_meta_list_Count
 vlc_media_source_meta_list_Get
 vlc_media_source_meta_list_Delete
+vlc_media_tree_New
 vlc_media_tree_AddListener
 vlc_media_tree_RemoveListener
+vlc_media_tree_Hold
+vlc_media_tree_Release
 vlc_media_tree_Lock
 vlc_media_tree_Unlock
 vlc_media_tree_Find

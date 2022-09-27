@@ -127,6 +127,12 @@ struct vlc_media_tree_callbacks
 };
 
 /**
+ * Create an empty media tree.
+ */
+VLC_API vlc_media_tree_t *
+vlc_media_tree_New(void);
+
+/**
  * Listener for media tree events.
  */
 typedef struct vlc_media_tree_listener_id vlc_media_tree_listener_id;
@@ -158,6 +164,24 @@ vlc_media_tree_RemoveListener(vlc_media_tree_t *tree,
                               vlc_media_tree_listener_id *listener);
 
 /**
+ * Increase the media tree reference count.
+ *
+ * \param tree the media tree, unlocked
+ */
+VLC_API void
+vlc_media_tree_Hold(vlc_media_tree_t *tree);
+
+/**
+ * Decrease the media tree reference count.
+ *
+ * Destroy the media tree if it reaches 0.
+ *
+ * \param tree the media tree, unlocked
+ */
+VLC_API void
+vlc_media_tree_Release(vlc_media_tree_t *tree);
+
+/**
  * Lock the media tree (non-recursive).
  */
 VLC_API void
@@ -168,6 +192,26 @@ vlc_media_tree_Lock(vlc_media_tree_t *);
  */
 VLC_API void
 vlc_media_tree_Unlock(vlc_media_tree_t *);
+
+/**
+ * Add an item to the media tree.
+ *
+ * \param tree the media tree, locked
+ * \param parent the parent node, belonging to the media tree
+ * \param media the media to add as a child of `parent`
+ */
+VLC_API input_item_node_t *
+vlc_media_tree_Add(vlc_media_tree_t *tree, input_item_node_t *parent,
+                   input_item_t *media);
+
+/**
+ * Remove an item from the media tree.
+ *
+ * \param tree the media tree, locked
+ * \param media the media to remove
+ */
+VLC_API bool
+vlc_media_tree_Remove(vlc_media_tree_t *tree, input_item_t *media);
 
 /**
  * Find the node containing the requested input item (and its parent).

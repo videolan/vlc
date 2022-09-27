@@ -26,7 +26,6 @@
 #include <vlc_common.h>
 #include <vlc_vector.h>
 #include "media_source.h"
-#include "media_tree.h"
 
 static void
 test_media_tree(void)
