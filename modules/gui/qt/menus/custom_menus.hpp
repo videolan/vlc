@@ -75,7 +75,8 @@ class CheckableListMenu : public QMenu
     Q_OBJECT
 public:
     enum GroupingMode {
-        GROUPED,
+        GROUPED_EXLUSIVE,
+        GROUPED_OPTIONAL,
         UNGROUPED
     };
 
