@@ -1565,6 +1565,7 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
     stream->volume_set = VolumeSet;
     stream->mute_set = MuteSet;
 
+    msg_Dbg(stream, "using AudioTrack API");
     return VLC_SUCCESS;
 
 error:
