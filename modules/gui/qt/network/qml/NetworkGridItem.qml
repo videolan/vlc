@@ -28,6 +28,9 @@ import "qrc:///style/"
 Widgets.GridItem {
     id: root
 
+    property var model: ({})
+    property int index: -1
+
     width: VLCStyle.gridItem_network_width
     height: VLCStyle.gridItem_network_height
 

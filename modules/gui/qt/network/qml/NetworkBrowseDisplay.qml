@@ -198,9 +198,6 @@ FocusScope {
             delegate: NetworkGridItem {
                 id: delegateGrid
 
-                property var model: ({})
-                property int index: -1
-
                 subtitle: ""
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
                 dragItem: networkDragItem
