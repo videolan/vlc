@@ -29,10 +29,20 @@ import "qrc:///util/" as Util
 import "qrc:///style/"
 
 FocusScope {
-    id: topFocusScope
+    id: root
+
+    property int maximumRows: (MainCtx.gridView) ? 2 : 5
+
+    property var sortModel: [
+        { text: I18n.qtr("Alphabetic"), criteria: "name"},
+        { text: I18n.qtr("Url"),        criteria: "mrl" }
+    ]
+
+    property alias model: deviceSection.model
+
     focus: true
 
-    readonly property bool isViewMultiView: false
+    signal seeAll(var title, var sd_source, int reason)
 
     signal browse(var tree, int reason)
 
@@ -43,7 +53,27 @@ FocusScope {
         deviceSection.setCurrentItemFocus(reason);
     }
 
-    function _centerFlickableOnItem(minY, maxY) {
+    function _centerFlickableOnItem(item) {
+        if (item.activeFocus === false)
+            return
+
+        var minY
+        var maxY
+
+        var index = item.currentIndex
+
+        // NOTE: We want to include the header when we're on the first row.
+        if ((MainCtx.gridView && index < item.nbItemPerRow) || index < 1) {
+            minY = item.y
+
+            maxY = minY + item.getItemY(index) + item.rowHeight
+        } else {
+            minY = item.y + item.getItemY(index)
+
+            maxY = minY + item.rowHeight
+        }
+
+        // TODO: We could implement a scrolling animation like in ExpandGridView.
         if (maxY > flickable.contentItem.contentY + flickable.height) {
             flickable.contentItem.contentY = maxY - flickable.height
         } else if (minY < flickable.contentItem.contentY) {
@@ -56,7 +86,7 @@ FocusScope {
         anchors.centerIn: parent
         visible: (deviceSection.model.count === 0 && lanSection.model.count === 0 )
         font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: topFocusScope.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
         text: I18n.qtr("No network shares found")
     }
 
@@ -69,79 +99,86 @@ FocusScope {
             width: parent.width
             height: implicitHeight
 
-            topPadding: VLCStyle.margin_large
             spacing: VLCStyle.margin_small
 
-            Widgets.SubtitleLabel {
-                id: deviceLabel
-                text: I18n.qtr("My Machine")
-                width: flickable.width
-                visible: deviceSection.model.count !== 0
-                leftPadding: VLCStyle.margin_xlarge
-            }
-
-            NetworkHomeDeviceListView {
+            BrowseDeviceView {
                 id: deviceSection
-                ctx: MainCtx
-                sd_source: NetworkDeviceModel.CAT_DEVICES
 
                 width: flickable.width
-                visible: deviceSection.model.count !== 0
-                onVisibleChanged: topFocusScope.resetFocus()
+                height: contentHeight
 
-                onBrowse: topFocusScope.browse(tree, reason)
+                maximumRows: root.maximumRows
 
-                Navigation.parentItem: topFocusScope
+                visible: (model.count !== 0)
+
+                model: NetworkDeviceModel {
+                    ctx: MainCtx
+
+                    sd_source: NetworkDeviceModel.CAT_DEVICES
+                    source_name: "*"
+
+                    maximumCount: deviceSection.maximumCount
+                }
+
+                title: I18n.qtr("My Machine")
+
+                Navigation.parentItem: root
 
                 Navigation.downAction: function() {
-                    if (lanSection.visible == false)
-                        return;
-
-                    lanSection.setCurrentItemFocus(Qt.TabFocusReason);
+                    if (lanSection.visible)
+                        lanSection.setCurrentItemFocus(Qt.TabFocusReason)
+                    else
+                        root.Navigation.defaultNavigationDown()
                 }
 
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                        _centerFlickableOnItem(deviceLabel.y, deviceSection.y + deviceSection.height)
-                }
+                onBrowse: root.browse(tree, reason)
+
+                onSeeAll: root.seeAll(title, model.sd_source, reason)
+
+                onActiveFocusChanged: _centerFlickableOnItem(deviceSection)
+                onCurrentIndexChanged: _centerFlickableOnItem(deviceSection)
             }
 
-            Widgets.SubtitleLabel {
-                id: lanLabel
-                text: I18n.qtr("My LAN")
-                width: flickable.width
-                visible: lanSection.model.count !== 0
-                leftPadding: VLCStyle.margin_xlarge
-                topPadding: deviceLabel.visible ? VLCStyle.margin_small : 0
-            }
-
-            NetworkHomeDeviceListView {
+            BrowseDeviceView {
                 id: lanSection
-                ctx: MainCtx
-                sd_source: NetworkDeviceModel.CAT_LAN
 
                 width: flickable.width
-                visible: lanSection.model.count !== 0
-                onVisibleChanged: topFocusScope.resetFocus()
+                height: contentHeight
 
-                onBrowse: topFocusScope.browse(tree, reason)
+                maximumRows: root.maximumRows
 
-                Navigation.parentItem: topFocusScope
+                visible: (model.count !== 0)
+
+                model: NetworkDeviceModel {
+                    ctx: MainCtx
+
+                    sd_source: NetworkDeviceModel.CAT_LAN
+                    source_name: "*"
+
+                    maximumCount: lanSection.maximumCount
+                }
+
+                title: I18n.qtr("My LAN")
+
+                parentFilter: deviceSection.modelFilter
+
+                Navigation.parentItem: root
 
                 Navigation.upAction: function() {
-                    if (deviceSection.visible == false)
-                        return;
-
-                    deviceSection.setCurrentItemFocus(Qt.TabFocusReason);
+                    if (deviceSection.visible)
+                        deviceSection.setCurrentItemFocus(Qt.TabFocusReason)
+                    else
+                        root.Navigation.defaultNavigationUp()
                 }
 
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                        _centerFlickableOnItem(lanLabel.y, lanSection.y + lanSection.height)
-                }
+                onBrowse: root.browse(tree, reason)
+
+                onSeeAll: root.seeAll(title, model.sd_source, reason)
+
+                onActiveFocusChanged: _centerFlickableOnItem(lanSection)
+                onCurrentIndexChanged: _centerFlickableOnItem(lanSection)
             }
         }
-
     }
 
     function resetFocus() {
