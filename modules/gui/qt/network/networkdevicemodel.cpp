@@ -289,7 +289,7 @@ bool NetworkDeviceModel::initializeMediaSources()
         if ( mediaSource == nullptr )
             continue;
         std::unique_ptr<NetworkSourceListener> l{ new NetworkSourceListener(
-                        MediaSourcePtr{ mediaSource, false }, this ) };
+                        MediaSourcePtr{ mediaSource, false }, std::make_unique<ListenerCb>(this) ) };
         if ( l->listener == nullptr )
             return false;
         m_listeners.push_back( std::move( l ) );
@@ -298,25 +298,25 @@ bool NetworkDeviceModel::initializeMediaSources()
 }
 
 
-void NetworkDeviceModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
+void NetworkDeviceModel::ListenerCb::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
 {
     if (node != &mediaSource->tree->root)
         return;
-    refreshDeviceList( std::move( mediaSource), node->pp_children, node->i_children, true );
+    model->refreshDeviceList( std::move( mediaSource ), node->pp_children, node->i_children, true );
 }
 
-void NetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
-                                  input_item_node_t *const children[],
-                                  size_t count )
+void NetworkDeviceModel::ListenerCb::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
+                                                  input_item_node_t *const children[],
+                                                  size_t count )
 {
     if (parent != &mediaSource->tree->root)
         return;
-    refreshDeviceList( std::move( mediaSource ), children, count, false );
+    model->refreshDeviceList( std::move( mediaSource ), children, count, false );
 }
 
-void NetworkDeviceModel::onItemRemoved(MediaSourcePtr mediaSource, input_item_node_t* node,
-                                    input_item_node_t *const children[],
-                                    size_t count )
+void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t* node,
+                                                    input_item_node_t *const children[],
+                                                    size_t count )
 {
     if (node != &mediaSource->tree->root)
         return;
@@ -326,15 +326,15 @@ void NetworkDeviceModel::onItemRemoved(MediaSourcePtr mediaSource, input_item_no
     for ( auto i = 0u; i < count; ++i )
         itemList.emplace_back( children[i]->p_item );
 
-    QMetaObject::invokeMethod(this, [this, itemList=std::move(itemList)]() {
+    QMetaObject::invokeMethod(model, [model=model, itemList=std::move(itemList)]() {
         for (auto p_item : itemList)
         {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
-            auto it = std::find_if( begin( m_items ), end( m_items ), [p_item, itemUri](const Item& i) {
+            auto it = std::find_if( begin( model->m_items ), end( model->m_items ), [p_item, itemUri](const Item& i) {
                 return QString::compare( qfu(p_item->psz_name), i.name, Qt::CaseInsensitive ) == 0 &&
                     itemUri.scheme() == i.mainMrl.scheme();
             });
-            if ( it == end( m_items ) )
+            if ( it == end( model->m_items ) )
                 continue;
 
             auto mrlIt = std::find_if( begin( (*it).mrls ), end( (*it).mrls),
@@ -347,11 +347,11 @@ void NetworkDeviceModel::onItemRemoved(MediaSourcePtr mediaSource, input_item_no
             (*it).mrls.erase( mrlIt );
             if ( (*it).mrls.empty() == false )
                 continue;
-            auto idx = std::distance( begin( m_items ), it );
-            beginRemoveRows({}, idx, idx );
-            m_items.erase( it );
-            endRemoveRows();
-            emit countChanged();
+            auto idx = std::distance( begin( model->m_items ), it );
+            model->beginRemoveRows({}, idx, idx );
+            model->m_items.erase( it );
+            model->endRemoveRows();
+            model->emit countChanged();
         }
     }, Qt::QueuedConnection);
 }

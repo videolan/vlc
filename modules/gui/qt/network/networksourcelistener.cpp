@@ -32,12 +32,12 @@ static void onItemPreparseEnded(vlc_media_tree_t *, input_item_node_t * node,
     self->cb->onItemPreparseEnded( self->source, node, status );
 }
 
-NetworkSourceListener::NetworkSourceListener(MediaSourcePtr s, SourceListenerCb* m)
+NetworkSourceListener::NetworkSourceListener(MediaSourcePtr s, std::unique_ptr<SourceListenerCb> &&cb)
     : source( s )
     , listener( nullptr, [s]( vlc_media_tree_listener_id* l ) {
             vlc_media_tree_RemoveListener( s->tree, l );
         } )
-    , cb( m )
+    , cb( std::move( cb ) )
 {
     static const vlc_media_tree_callbacks cbs {
         &onItemCleared,

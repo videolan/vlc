@@ -43,6 +43,7 @@ public:
     class SourceListenerCb
     {
     public:
+        virtual ~SourceListenerCb() = default;
         virtual void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) = 0;
         virtual void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) = 0;
         virtual void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t* node, input_item_node_t *const children[], size_t count ) = 0;
@@ -50,7 +51,7 @@ public:
     };
 
 public:
-    NetworkSourceListener( MediaSourcePtr s, SourceListenerCb* m );
+    NetworkSourceListener( MediaSourcePtr s, std::unique_ptr<SourceListenerCb> &&cb );
 
     NetworkSourceListener( NetworkSourceListener&& ) = default;
     NetworkSourceListener& operator=( NetworkSourceListener&& ) = default;
@@ -60,6 +61,6 @@ public:
 
     MediaSourcePtr source;
     ListenerPtr listener = nullptr;
-    SourceListenerCb *cb = nullptr;
+    std::unique_ptr<SourceListenerCb> cb;
 };
 #endif // MLNETWORKSOURCELISTENER_HPP

@@ -102,7 +102,7 @@ private:
 
 Q_DECLARE_METATYPE(PathNode)
 
-class NetworkMediaModel : public QAbstractListModel, public NetworkSourceListener::SourceListenerCb
+class NetworkMediaModel : public QAbstractListModel
 {
     Q_OBJECT
 
@@ -217,16 +217,23 @@ private:
     };
 
     bool initializeMediaSources();
-    void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
-    void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
-    void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
-    void onItemPreparseEnded( MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status ) override;
 
     void refreshMediaList(MediaSourcePtr s, std::vector<InputItemPtr> children , bool clear);
 
     bool canBeIndexed(const QUrl& url , ItemType itemType );
 
 private:
+    struct ListenerCb : public NetworkSourceListener::SourceListenerCb {
+        ListenerCb(NetworkMediaModel *model) : model(model) {}
+
+        void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
+        void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
+        void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
+        void onItemPreparseEnded( MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status ) override;
+
+        NetworkMediaModel *model;
+    };
+
     //properties of the current node
     QString m_name;
     QUrl m_url;
