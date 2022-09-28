@@ -1,11 +1,26 @@
-Changes between 3.0.18-rc and 3.0.18:
+Changes between 3.0.18-rc and 3.0.18-rc2:
 -------------------------------------
 
-Demux:
+Codec/Demux:
+ * Add support for Y16 chroma
  * Fix build of gme plugin
+
+Lua:
+ * Fix script for vocaroo
+ * Fix script for youtube to allow throttled playback
+   (Note: Restrictions on youtube still prevent unthrottled playback)
+
+Service Discovery:
+ * Fix UPnP regression on Windows
 
 Video Output:
  * Fix video placement with caopengllayer
+
+Misc:
+ * Fix password search in kwallet module
+
+Contribs:
+ * Update FFmpeg
 
 
 Changes between 3.0.17.4 and 3.0.18-rc:
