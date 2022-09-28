@@ -849,6 +849,7 @@ libqt_plugin_la_QML = \
 	gui/qt/menus/qml/ShortcutExt.qml \
 	gui/qt/network/qml/AddressbarButton.qml \
 	gui/qt/network/qml/BrowseDeviceHeader.qml \
+	gui/qt/network/qml/BrowseDeviceView.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/DiscoverUrlDisplay.qml \
 	gui/qt/network/qml/NetworkAddressbar.qml \

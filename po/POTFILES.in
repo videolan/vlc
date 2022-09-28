@@ -831,6 +831,7 @@ modules/gui/qt/menus/qml/Menubar.qml
 modules/gui/qt/menus/qml_menu_wrapper.cpp
 modules/gui/qt/menus/qml_menu_wrapper.hpp
 modules/gui/qt/network/qml/BrowseDeviceHeader.qml
+modules/gui/qt/network/qml/BrowseDeviceView.qml
 modules/gui/qt/network/qml/DiscoverDisplay.qml
 modules/gui/qt/network/qml/DiscoverUrlDisplay.qml
 modules/gui/qt/network/qml/NetworkBrowseDisplay.qml
