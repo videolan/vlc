@@ -171,6 +171,11 @@ public:
             HOLD(ptr);
     }
 
+    vlc_shared_data_ptr(std::nullptr_t)
+        : ptr(nullptr)
+    {
+    }
+
     vlc_shared_data_ptr(const vlc_shared_data_ptr &other)
         : vlc_shared_data_ptr(other.ptr) {}
 
