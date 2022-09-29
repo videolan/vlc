@@ -335,6 +335,7 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
 
     m_stable = new DummyNativeWidget(this);
     m_stable->winId();
+    setTransparentForMouseEvent(QX11Info::connection(), m_stable->winId());
 
     setCentralWidget(m_stable);
 
