@@ -659,58 +659,47 @@ CFLAGS += -DANDROID_NATIVE_API_LEVEL=$(ANDROID_API)
 endif
 
 # CMake toolchain
-toolchain.cmake:
-	$(RM) $@
+CMAKE_TOOLCHAIN_ENV := $(HOSTTOOLS) HOST_ARCH="$(ARCH)" SYSTEM_NAME="$(CMAKE_SYSTEM_NAME)"
 ifndef WITH_OPTIMIZATION
-	echo "set(CMAKE_BUILD_TYPE Debug)" >> $@
+	CMAKE_TOOLCHAIN_ENV += BUILD_TYPE=Debug
 else
-	echo "set(CMAKE_BUILD_TYPE RelWithDebInfo)" >> $@
+	CMAKE_TOOLCHAIN_ENV += BUILD_TYPE=RelWithDebInfo
 endif
-	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
-	if test -n "$(CMAKE_SYSTEM_NAME)"; then \
-		echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" >> $@; \
-	fi;
 ifdef HAVE_WIN32
 ifdef HAVE_CROSS_COMPILE
-	echo "set(CMAKE_RC_COMPILER $(WINDRES))" >> $@
+	CMAKE_TOOLCHAIN_ENV += RC_COMPILER="$(WINDRES)"
 endif
 endif
 ifdef HAVE_DARWIN_OS
-	echo "set(CMAKE_C_FLAGS \"$(CFLAGS)\")" >> $@
-	echo "set(CMAKE_CXX_FLAGS \"$(CXXFLAGS)\")" >> $@
-	echo "set(CMAKE_LD_FLAGS \"$(LDFLAGS)\")" >> $@
 ifdef HAVE_IOS
-	echo "set(CMAKE_OSX_SYSROOT $(IOS_SDK))" >> $@
+	CMAKE_TOOLCHAIN_ENV += OSX_SYSROOT="$(IOS_SDK)"
 else
-	echo "set(CMAKE_OSX_SYSROOT $(MACOSX_SDK))" >> $@
+	CMAKE_TOOLCHAIN_ENV += OSX_SYSROOT="$(MACOSX_SDK)"
 endif
 endif
-	echo "set(CMAKE_AR $(AR) CACHE FILEPATH \"Archiver\")" >> $@
-	echo "set(CMAKE_RANLIB $(RANLIB) CACHE FILEPATH \"Add index to Archive\")" >> $@
 ifdef HAVE_CROSS_COMPILE
-	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
+	CMAKE_TOOLCHAIN_ENV += TOOLCHAIN_PREFIX="$(HOST)-"
+	CMAKE_TOOLCHAIN_ENV += PATH_MODE_LIBRARY="ONLY"
+	CMAKE_TOOLCHAIN_ENV += PATH_MODE_INCLUDE="ONLY"
+endif
 ifdef HAVE_ANDROID
 # cmake will overwrite our --sysroot with a native (host) one on Darwin
 # Set it to "" right away to short-circuit this behaviour
-	echo "set(CMAKE_CXX_SYSROOT_FLAG \"\")" >> $@
-	echo "set(CMAKE_C_SYSROOT_FLAG \"\")" >> $@
+	CMAKE_TOOLCHAIN_ENV += CXX_SYSROOT_FLAG=
+	CMAKE_TOOLCHAIN_ENV += C_SYSROOT_FLAG=
 endif
-endif
-	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
-	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
 ifdef MSYS_BUILD
-	echo "set(CMAKE_FIND_ROOT_PATH `cygpath -m $(PREFIX)`)" >> $@
+	CMAKE_TOOLCHAIN_ENV += FIND_ROOT_PATH="$(shell cygpath -m $(PREFIX))"
 else
-	echo "set(CMAKE_FIND_ROOT_PATH $(PREFIX))" >> $@
-endif
-	echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> $@
-ifdef HAVE_CROSS_COMPILE
-	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
-	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
+	CMAKE_TOOLCHAIN_ENV += FIND_ROOT_PATH="$(PREFIX)"
 endif
 ifdef HAVE_EMSCRIPTEN
-	echo "include($(EMSDK_PATH)cmake/Modules/Platform/Emscripten.cmake)" >> $@
+	CMAKE_TOOLCHAIN_ENV += EXTRA_INCLUDE="$(EMSDK_PATH)cmake/Modules/Platform/Emscripten.cmake"
 endif
+
+toolchain.cmake: $(SRC)/gen-cmake-toolchain.py
+	$(CMAKE_TOOLCHAIN_ENV) $(SRC)/gen-cmake-toolchain.py $@
+	cat $@
 
 MESON_SYSTEM_NAME =
 ifdef HAVE_WIN32
