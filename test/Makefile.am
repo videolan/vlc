@@ -189,7 +189,9 @@ test_modules_stream_out_transcode_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_modules_stream_out_pcr_sync_SOURCES = modules/stream_out/pcr_sync.c \
 	../modules/stream_out/transcode/pcr_sync.c \
-	../modules/stream_out/transcode/pcr_sync.h
+	../modules/stream_out/transcode/pcr_sync.h \
+	../modules/stream_out/transcode/pcr_helper.h \
+	../modules/stream_out/transcode/pcr_helper.c
 test_modules_stream_out_pcr_sync_LDADD = $(LIBVLCCORE)
 
 test_src_input_decoder_SOURCES = \
