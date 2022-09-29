@@ -95,7 +95,9 @@ static void test_Sync(vlc_pcr_sync_t *sync, const test_context context)
     {
         const test_element *elem = &context.input[i];
         if (elem->type == TEST_ELEM_TYPE_PCR)
-            vlc_pcr_sync_SignalPCR(sync, elem->pcr);
+        {
+            assert(vlc_pcr_sync_SignalPCR(sync, elem->pcr) == VLC_SUCCESS);
+        }
         else
         {
             const vlc_frame_t mock = {.i_dts = elem->dts,
