@@ -69,8 +69,6 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
             return item.protocol;
         case NETWORK_TREE:
             return QVariant::fromValue( item.tree );
-        case NETWORK_SOURCE:
-            return item.mediaSource->description;
         case NETWORK_ARTWORK:
             return item.artworkUrl;
         case NETWORK_FILE_SIZE:
@@ -92,7 +90,6 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
         { NETWORK_TYPE, "type" },
         { NETWORK_PROTOCOL, "protocol" },
         { NETWORK_TREE, "tree" },
-        { NETWORK_SOURCE, "source" },
         { NETWORK_ARTWORK, "artwork" },
         { NETWORK_FILE_SIZE, "fileSizeRaw64" },
         { NETWORK_FILE_MODIFIED, "fileModified" }
@@ -571,7 +568,6 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
                     QUrl::fromEncoded(it->psz_uri);
 
         item.canBeIndexed = canBeIndexed( item.mainMrl , item.type );
-        item.mediaSource = mediaSource;
 
         input_item_t * inputItem = it.get();
 

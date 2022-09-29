@@ -115,7 +115,6 @@ public:
         NETWORK_TYPE,
         NETWORK_PROTOCOL,
         NETWORK_TREE,
-        NETWORK_SOURCE,
         NETWORK_ARTWORK,
         NETWORK_FILE_SIZE,
         NETWORK_FILE_MODIFIED,
@@ -210,7 +209,6 @@ private:
         ItemType type;
         bool canBeIndexed;
         NetworkTreeItem tree;
-        MediaSourcePtr mediaSource;
         QUrl artworkUrl;
         qint64 fileSize;
         QDateTime fileModified;
