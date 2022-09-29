@@ -60,14 +60,14 @@ static inline void pcr_event_Delete(pcr_event_t *ev)
 struct es_data
 {
     bool is_deleted;
-    vlc_tick_t last_frame_dts;
+    vlc_tick_t last_input_dts;
     vlc_tick_t discontinuity;
 };
 
 static inline struct es_data es_data_Init()
 {
     return (struct es_data){
-        .is_deleted = false, .last_frame_dts = VLC_TICK_INVALID, .discontinuity = VLC_TICK_INVALID};
+        .is_deleted = false, .last_input_dts = VLC_TICK_INVALID, .discontinuity = VLC_TICK_INVALID};
 }
 
 struct es_data_vec VLC_VECTOR(struct es_data);
@@ -106,7 +106,7 @@ static bool pcr_sync_ShouldFastForwardPCR(vlc_pcr_sync_t *pcr_sync)
     struct es_data it;
     vlc_vector_foreach(it, &pcr_sync->es_data)
     {
-        if (!it.is_deleted && it.last_frame_dts != VLC_TICK_INVALID)
+        if (!it.is_deleted && it.last_input_dts != VLC_TICK_INVALID)
             return false;
     }
     return vlc_list_is_empty(&pcr_sync->pcr_events);
@@ -123,11 +123,11 @@ static bool pcr_sync_HadFrameInputSinceLastPCR(vlc_pcr_sync_t *pcr_sync)
     for (unsigned int i = 0; i < pcr_sync->es_data.size; ++i)
     {
         const struct es_data *curr = &pcr_sync->es_data.data[i];
-        if (curr->is_deleted || curr->last_frame_dts == VLC_TICK_INVALID)
+        if (curr->is_deleted || curr->last_input_dts == VLC_TICK_INVALID)
             continue;
 
         const bool is_oob = i >= pcr_event->es_last_dts_entries.size;
-        if (!is_oob && curr->last_frame_dts != pcr_event->es_last_dts_entries.data[i].dts)
+        if (!is_oob && curr->last_input_dts != pcr_event->es_last_dts_entries.data[i].dts)
             return true;
         else if (is_oob)
             return true;
@@ -160,9 +160,9 @@ static int pcr_sync_SignalPCRLocked(vlc_pcr_sync_t *pcr_sync, vlc_tick_t pcr)
         if (!data.is_deleted)
         {
             vlc_vector_push(&event->es_last_dts_entries,
-                            ((struct es_dts_entry){.dts = data.last_frame_dts,
+                            ((struct es_dts_entry){.dts = data.last_input_dts,
                                                    .discontinuity = data.discontinuity}));
-            if (data.last_frame_dts != VLC_TICK_INVALID)
+            if (data.last_input_dts != VLC_TICK_INVALID)
                 ++entries_left;
             data.discontinuity = VLC_TICK_INVALID;
         }
@@ -193,7 +193,7 @@ void vlc_pcr_sync_SignalFrame(vlc_pcr_sync_t *pcr_sync, unsigned int id, const v
     struct es_data *data = &pcr_sync->es_data.data[id];
     assert(!data->is_deleted);
     if (frame->i_dts != VLC_TICK_INVALID)
-        data->last_frame_dts = frame->i_dts;
+        data->last_input_dts = frame->i_dts;
     if (frame->i_flags & VLC_FRAME_FLAG_DISCONTINUITY)
     {
         assert(frame->i_dts != VLC_TICK_INVALID);
@@ -245,7 +245,7 @@ static inline void pcr_sync_ResetLastReceivedFrames(vlc_pcr_sync_t *pcr_sync)
 {
     for (size_t i = 0; i < pcr_sync->es_data.size; ++i)
     {
-        pcr_sync->es_data.data[i].last_frame_dts = VLC_TICK_INVALID;
+        pcr_sync->es_data.data[i].last_input_dts = VLC_TICK_INVALID;
     }
 }
 
