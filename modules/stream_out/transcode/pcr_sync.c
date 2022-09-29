@@ -109,7 +109,7 @@ static bool pcr_sync_ShouldFastForwardPCR(vlc_pcr_sync_t *pcr_sync)
     struct es_data it;
     vlc_vector_foreach(it, &pcr_sync->es_data)
     {
-        if (!it.is_deleted && it.last_input_dts != VLC_TICK_INVALID)
+        if (!it.is_deleted && it.last_output_dts != it.last_input_dts)
             return false;
     }
     return vlc_list_is_empty(&pcr_sync->pcr_events);
@@ -244,14 +244,6 @@ void vlc_pcr_sync_DelESID(vlc_pcr_sync_t *pcr_sync, unsigned int id)
     vlc_mutex_unlock(&pcr_sync->lock);
 }
 
-static inline void pcr_sync_ResetLastReceivedFrames(vlc_pcr_sync_t *pcr_sync)
-{
-    for (size_t i = 0; i < pcr_sync->es_data.size; ++i)
-    {
-        pcr_sync->es_data.data[i].last_input_dts = VLC_TICK_INVALID;
-    }
-}
-
 vlc_tick_t
 vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const vlc_frame_t *frame)
 {
@@ -316,7 +308,6 @@ return_pcr:
     vlc_list_remove(&pcr_event->node);
     pcr_event_Delete(pcr_event);
 
-    pcr_sync_ResetLastReceivedFrames(pcr_sync);
     vlc_mutex_unlock(&pcr_sync->lock);
     return pcr;
 
