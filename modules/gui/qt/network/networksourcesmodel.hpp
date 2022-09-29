@@ -31,7 +31,6 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include <maininterface/mainctx.hpp>
-#include "networksourcelistener.hpp"
 
 #include <memory>
 
