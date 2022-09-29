@@ -362,7 +362,7 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
     {
         QMetaObject::invokeMethod(this, [this, mediaSource]() {
             beginResetModel();
-            m_items.erase(std::remove_if(m_items.begin(), m_items.end(), [mediaSource](const Item& value) {
+            m_items.erase(std::remove_if(m_items.begin(), m_items.end(), [&mediaSource](const Item& value) {
                 return value.mediaSource == mediaSource;
             }), m_items.end());
             endResetModel();
@@ -384,7 +384,7 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
             item.mrls.push_back( item.mainMrl );
             item.type = static_cast<ItemType>( p_item->i_type );
             item.protocol = item.mainMrl.scheme();
-            item.mediaSource = mediaSource;
+            item.mediaSource = std::move(mediaSource);
             item.inputItem = InputItemPtr(p_item);
 
             char* artwork = input_item_GetArtworkURL( p_item.get() );
