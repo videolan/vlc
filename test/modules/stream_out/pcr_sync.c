@@ -226,6 +226,56 @@ static void test_TwoDiscontinuities(vlc_pcr_sync_t *sync)
                                    .track_count = MAX_TRACKS});
 }
 
+static void test_FastForwardAtBeginning(vlc_pcr_sync_t *sync)
+{
+    assert(vlc_pcr_sync_SignalPCR(sync, 1u) == VLC_PCR_SYNC_FORWARD_PCR);
+}
+
+static void test_FastForwardMiddleOfStream(vlc_pcr_sync_t *sync)
+{
+    // Launch a basic test scenario to mimic an usual stream flow.
+    test_MultipleTracks(sync);
+
+    // Ensure PCRs sent in the middle of the stream without any data in between
+    // can be immediately forwarded.
+    assert(vlc_pcr_sync_SignalPCR(sync, 30u) == VLC_PCR_SYNC_FORWARD_PCR);
+    assert(vlc_pcr_sync_SignalPCR(sync, 40u) == VLC_PCR_SYNC_FORWARD_PCR);
+    assert(vlc_pcr_sync_SignalPCR(sync, 50u) == VLC_PCR_SYNC_FORWARD_PCR);
+}
+
+static void test_OneTrackWithDelay(vlc_pcr_sync_t *sync)
+{
+    unsigned id;
+    assert(vlc_pcr_sync_NewESID(sync, &id) == VLC_SUCCESS);
+
+    const vlc_frame_t frame1 = {.i_dts = 1u};
+    vlc_pcr_sync_SignalFrame(sync, id, &frame1);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10u) == VLC_SUCCESS);
+
+    const vlc_frame_t frame2 = {.i_dts = 11u};
+    vlc_pcr_sync_SignalFrame(sync, id, &frame2);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, id, &frame1) == 10u);
+    assert(vlc_pcr_sync_SignalPCR(sync, 20u) == VLC_SUCCESS);
+}
+
+static void test_SubsequentPCR(vlc_pcr_sync_t *sync)
+{
+    unsigned id;
+    assert(vlc_pcr_sync_NewESID(sync, &id) == VLC_SUCCESS);
+
+    const vlc_frame_t frame = {.i_dts = 1u};
+    vlc_pcr_sync_SignalFrame(sync, id, &frame);
+    assert(vlc_pcr_sync_SignalPCR(sync, 10u) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalPCR(sync, 20u) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_SignalPCR(sync, 30u) == VLC_SUCCESS);
+
+    // Output the same frame until no PCR is returned.
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, id, &frame) == 10u);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, id, &frame) == 20u);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, id, &frame) == 30u);
+    assert(vlc_pcr_sync_SignalFrameOutput(sync, id, &frame) == VLC_TICK_INVALID);
+}
+
 static void test_PCRHelper(void (*test)(vlc_pcr_sync_t *,
                                         transcode_track_pcr_helper_t *))
 {
@@ -369,6 +419,10 @@ int main()
     test_Run(test_LowDiscontinuity);
     test_Run(test_HighDiscontinuity);
     test_Run(test_TwoDiscontinuities);
+    test_Run(test_FastForwardAtBeginning);
+    test_Run(test_FastForwardMiddleOfStream);
+    test_Run(test_OneTrackWithDelay);
+    test_Run(test_SubsequentPCR);
     test_PCRHelper(test_PCRHelperSimple);
     test_PCRHelper(test_PCRHelperMultipleTracks);
     test_PCRHelper(test_PCRHelperSplitFrameOutput);
