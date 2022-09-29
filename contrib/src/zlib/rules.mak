@@ -14,12 +14,13 @@ $(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(UNPACK)
-	$(APPLY) $(SRC)/zlib/0001-Fix-mingw-static-library-name-on-mingw.patch
+	$(APPLY) $(SRC)/zlib/0001-Fix-mingw-static-library-name-on-mingw-and-Emscripte.patch
+	$(APPLY) $(SRC)/zlib/0002-Add-an-option-to-enable-disable-building-examples.patch
 	# disable the installation of the dynamic library since there's no option
 	sed -e 's,install(TARGETS zlib zlibstatic,install(TARGETS zlibstatic,' -i.orig $(UNPACK_DIR)/CMakeLists.txt
 	$(MOVE)
 
-ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig
+ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig -DBUILD_EXAMPLES=OFF
 
 # ASM is disabled as the necessary source files are not in the tarball nor the git
 # ifeq ($(ARCH),i386)
