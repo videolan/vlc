@@ -61,13 +61,16 @@ struct es_data
 {
     bool is_deleted;
     vlc_tick_t last_input_dts;
+    vlc_tick_t last_output_dts;
     vlc_tick_t discontinuity;
 };
 
 static inline struct es_data es_data_Init()
 {
-    return (struct es_data){
-        .is_deleted = false, .last_input_dts = VLC_TICK_INVALID, .discontinuity = VLC_TICK_INVALID};
+    return (struct es_data){.is_deleted = false,
+                            .last_input_dts = VLC_TICK_INVALID,
+                            .last_output_dts = VLC_TICK_INVALID,
+                            .discontinuity = VLC_TICK_INVALID};
 }
 
 struct es_data_vec VLC_VECTOR(struct es_data);
@@ -253,6 +256,10 @@ vlc_tick_t
 vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const vlc_frame_t *frame)
 {
     vlc_mutex_lock(&pcr_sync->lock);
+
+    struct es_data *es = &pcr_sync->es_data.data[id];
+    assert(!es->is_deleted);
+    es->last_output_dts = frame->i_dts;
 
     pcr_event_t *pcr_event = vlc_list_first_entry_or_null(&pcr_sync->pcr_events, pcr_event_t, node);
 
