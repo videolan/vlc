@@ -2,7 +2,7 @@ dnl Autoconf settings for vlc
 
 AC_COPYRIGHT([Copyright 1999-2022 VLC authors and VideoLAN])
 
-AC_INIT(vlc, 3.0.18)
+AC_INIT(vlc, 3.0.18-rc2)
 VERSION_MAJOR=3
 VERSION_MINOR=0
 VERSION_REVISION=18
