@@ -63,16 +63,16 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 	touch $@
 
 .dxvahd: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
 
 .sum-dxva: .sum-pthreads
 	touch $@
 
 .dxva: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
 
 
