@@ -18,7 +18,7 @@ libdsm: libdsm-$(LIBDSM_VERSION).tar.xz .sum-libdsm
 
 DEPS_libdsm = libtasn1 $(DEPS_libtasn1) iconv $(DEPS_iconv)
 ifdef HAVE_WIN32
-DEPS_libdsm += pthreads $(DEPS_pthreads)
+DEPS_libdsm += winpthreads $(DEPS_winpthreads)
 endif
 
 .libdsm: libdsm crossfile.meson

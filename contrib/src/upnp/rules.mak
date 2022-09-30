@@ -19,7 +19,7 @@ UPNP_CONF += CFLAGS="$(CFLAGS) -DUPNP_STATIC_LIB"
 UPNP_CONF += CXXFLAGS="$(CXXFLAGS) -DUPNP_STATIC_LIB"
 
 ifdef HAVE_WIN32
-DEPS_upnp += pthreads $(DEPS_pthreads)
+DEPS_upnp += winpthreads $(DEPS_winpthreads)
 endif
 ifdef HAVE_WINSTORE
 UPNP_CONF += --disable-ipv6 --enable-unspecified_server

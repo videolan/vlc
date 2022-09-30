@@ -13,7 +13,7 @@ endif
 
 DEPS_srt = gnutls $(DEPS_gnutls)
 ifdef HAVE_WIN32
-DEPS_srt += pthreads $(DEPS_pthreads)
+DEPS_srt += winpthreads $(DEPS_winpthreads)
 endif
 
 

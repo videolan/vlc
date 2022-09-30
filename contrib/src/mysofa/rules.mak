@@ -11,7 +11,7 @@ endif
 
 DEPS_mysofa += zlib $(DEPS_zlib)
 ifdef HAVE_WIN32
-DEPS_mysofa += pthreads $(DEPS_pthreads)
+DEPS_mysofa += winpthreads $(DEPS_winpthreads)
 endif
 
 $(TARBALLS)/libmysofa-$(MYSOFA_VERSION).tar.gz:

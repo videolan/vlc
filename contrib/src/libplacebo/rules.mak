@@ -19,7 +19,7 @@ PKGS_FOUND += libplacebo
 endif
 
 ifdef HAVE_WIN32
-DEPS_libplacebo += pthreads $(DEPS_pthreads)
+DEPS_libplacebo += winpthreads $(DEPS_winpthreads)
 endif
 
 # We don't want vulkan on darwin for now

@@ -36,7 +36,7 @@ ZVBICONF := \
 	--without-doxygen
 
 ifdef HAVE_WIN32
-DEPS_zvbi += pthreads $(DEPS_pthreads)
+DEPS_zvbi += winpthreads $(DEPS_winpthreads)
 endif
 
 .zvbi: zvbi

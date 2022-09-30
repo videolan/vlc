@@ -9,7 +9,7 @@ endif
 
 DEPS_librist =
 ifdef HAVE_WIN32
-DEPS_librist += pthreads $(DEPS_pthreads)
+DEPS_librist += winpthreads $(DEPS_winpthreads)
 endif
 
 ifeq ($(call need_pkg,"librist >= 0.2"),)
