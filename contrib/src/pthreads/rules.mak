@@ -13,7 +13,6 @@ ifdef HAVE_WINSTORE
 PKGS += alloweduwp
 endif
 PKGS += dxva dxvahd
-PKGS_ALL += dxva dxvahd alloweduwp
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva
 endif # MINGW 10
@@ -25,6 +24,8 @@ PKGS_FOUND += pthreads
 endif
 endif # !HAVE_VISUALSTUDIO
 endif # HAVE_WIN32
+
+PKGS_ALL += dxva dxvahd alloweduwp
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
