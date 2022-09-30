@@ -11,10 +11,8 @@ PKGS += pthreads
 ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
 PKGS += winrt_headers
-PKGS_ALL += winrt_headers
 endif # HAVE_WINSTORE
 PKGS += d3d9 dxva dxvahd dcomp
-PKGS_ALL += d3d9 dxva dxvahd dcomp
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9 dxvahd
 endif # MINGW 8
@@ -34,6 +32,8 @@ PKGS_FOUND += dcomp
 endif
 endif # !HAVE_VISUALSTUDIO
 endif # HAVE_WIN32
+
+PKGS_ALL += winrt_headers d3d9 dxva dxvahd dcomp
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
