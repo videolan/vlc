@@ -11,8 +11,11 @@ PKGS += pthreads
 ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
 PKGS += winrt_headers
-endif # HAVE_WINSTORE
-PKGS += d3d9 dxva dxvahd dcomp
+else  # !HAVE_WINSTORE
+PKGS += d3d9 dcomp
+endif # !HAVE_WINSTORE
+PKGS += dxva dxvahd
+
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9 dxvahd
 endif # MINGW 8
