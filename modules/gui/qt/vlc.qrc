@@ -219,6 +219,7 @@
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
+        <file alias="BrowseDeviceHeader.qml">network/qml/BrowseDeviceHeader.qml</file>
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
         <file alias="DiscoverUrlDisplay.qml">network/qml/DiscoverUrlDisplay.qml</file>
         <file alias="NetworkCustomCover.qml">network/qml/NetworkCustomCover.qml</file>
