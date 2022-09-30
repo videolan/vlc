@@ -281,6 +281,11 @@ end_appdata:
 
     return GetFolderName(folder);
 }
+#else
+static inline char *config_GetCacheDir(void)
+{
+    return config_GetAppDir();
+}
 #endif // HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
 
 char *config_GetUserDir (vlc_userdir_t type)
@@ -298,11 +303,7 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_USERDATA_DIR:
             return config_GetAppDir ();
         case VLC_CACHE_DIR:
-#ifdef HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
             return config_GetCacheDir ();
-#else // !HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
-            return config_GetAppDir();
-#endif // !HAVE___X_ABI_CWINDOWS_CSTORAGE_CIAPPLICATIONDATA2
         case VLC_MUSIC_DIR:
             return config_GetShellDir (VLC_MUSIC_DIR);
         case VLC_PICTURES_DIR:
