@@ -59,48 +59,52 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 .sum-winrt_headers: .sum-pthreads
 	touch $@
 
+MINGW_HEADERS_WINRT := \
+    windows.foundation.h \
+    windows.storage.h \
+    windows.storage.streams.h \
+    windows.system.threading.h \
+    windows.foundation.collections.h \
+    eventtoken.h \
+    asyncinfo.h \
+    windowscontracts.h
+
 .winrt_headers: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/windows.foundation.h             "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/windows.storage.h                "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/windows.storage.streams.h        "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/windows.system.threading.h       "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/windows.foundation.collections.h "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/eventtoken.h                     "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/asyncinfo.h                      "$(PREFIX)/include"
-	cp -f $</mingw-w64-headers/include/windowscontracts.h               "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_WINRT)) "$(PREFIX)/include"
 	touch $@
 
 .sum-dxvahd: .sum-pthreads
 	touch $@
 
 .dxvahd: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
 
 .sum-dcomp: .sum-pthreads
 	touch $@
 
 .dcomp: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/dcomp.h "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/dcomp.h "$(PREFIX)/include"
 	touch $@
 
 .sum-d3d9: .sum-pthreads
 	touch $@
 
+MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
+
 .d3d9: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/d3d9.h "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/d3d9caps.h "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_D3D9)) "$(PREFIX)/include"
 	touch $@
 
 .sum-dxva: .sum-pthreads
 	touch $@
 
 .dxva: pthreads
-	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
 
