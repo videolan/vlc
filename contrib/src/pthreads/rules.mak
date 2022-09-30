@@ -17,10 +17,12 @@ PKGS += d3d9 dxva dxvahd dcomp
 PKGS_ALL += d3d9 dxva dxvahd dcomp
 ifeq ($(call mingw_at_least, 8), true)
 PKGS_FOUND += d3d9 dxvahd
+endif # MINGW 8
+ifeq ($(call mingw_at_least, 9), true)
 ifdef HAVE_WINSTORE
 PKGS_FOUND += winrt_headers
 endif # HAVE_WINSTORE
-endif # MINGW 8
+endif # MINGW 9
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva
 endif # MINGW 10
@@ -59,8 +61,14 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 
 .winrt_headers: pthreads
 	mkdir -p -- "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/windows.storage.h "$(PREFIX)/include"
-	cd $< && cp mingw-w64-headers/include/eventtoken.h "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/windows.foundation.h             "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/windows.storage.h                "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/windows.storage.streams.h        "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/windows.system.threading.h       "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/windows.foundation.collections.h "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/eventtoken.h                     "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/asyncinfo.h                      "$(PREFIX)/include"
+	cp -f $</mingw-w64-headers/include/windowscontracts.h               "$(PREFIX)/include"
 	touch $@
 
 .sum-dxvahd: .sum-pthreads
