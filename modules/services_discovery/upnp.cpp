@@ -1562,7 +1562,7 @@ done:
 #include <SystemConfiguration/SystemConfiguration.h>
 #include "vlc_charset.h"
 
-inline char *FromCFString(const CFStringRef cfString,
+inline char *UPNPFromCFString(const CFStringRef cfString,
                           const CFStringEncoding cfStringEncoding)
 {
     // Try the quick way to obtain the buffer
@@ -1608,7 +1608,7 @@ inline char *getPreferedAdapter()
     if (q != NULL) {
         const void *val;
         if (CFDictionaryGetValueIfPresent(q, CFSTR("PrimaryInterface"), &val)) {
-            returnValue = FromCFString((CFStringRef)val, kCFStringEncodingUTF8);
+            returnValue = UPNPFromCFString((CFStringRef)val, kCFStringEncodingUTF8);
         }
         CFRelease(q);
     }
