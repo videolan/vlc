@@ -35,6 +35,7 @@
 #include <QFile>
 #include <QDir>
 #include <QSignalMapper>
+#include <QThreadPool>
 
 #include <assert.h>
 
@@ -1791,7 +1792,22 @@ void PlayerController::snapshot()
 {
     VoutPtr vout = getVout();
     if (vout)
-        var_TriggerCallback(vout.get(), "video-snapshot");
+    {
+        /* Passing a lambda directly would require Qt 5.15:
+         * <https://doc.qt.io/qt-5/qthreadpool.html#start-1>
+         */
+        struct SnapshotTask : public QRunnable
+        {
+            VoutPtr vout;
+            SnapshotTask(VoutPtr vout) : vout(std::move(vout)) {}
+            void run() override
+            {
+                var_TriggerCallback(vout.get(), "video-snapshot");
+            }
+        };
+
+        QThreadPool::globalInstance()->start(new SnapshotTask(std::move(vout)));
+    }
 }
 
 
