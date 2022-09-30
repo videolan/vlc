@@ -220,7 +220,6 @@ inline char* getPreferedAdapter()
 
 #if defined(TARGET_OS_OSX) && TARGET_OS_OSX
 #include <SystemConfiguration/SystemConfiguration.h>
-#include "vlc_charset.h"
 
 inline char *getPreferedAdapter()
 {
