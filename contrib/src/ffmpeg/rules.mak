@@ -192,7 +192,7 @@ DEPS_ffmpeg += d3d11
 endif
 FFMPEGCONF += --target-os=mingw32
 FFMPEGCONF += --disable-w32threads --enable-pthreads --extra-libs="-lpthread"
-DEPS_ffmpeg += pthreads $(DEPS_pthreads)
+DEPS_ffmpeg += winpthreads $(DEPS_winpthreads)
 # disable modules not compatible with XP
 FFMPEGCONF += --disable-mediafoundation --disable-amf --disable-schannel
 ifndef HAVE_WINSTORE

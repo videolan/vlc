@@ -6,7 +6,7 @@ MINGW64_HASH=2c35e8ff0d33916bd490e8932cba2049cd1af3d0
 MINGW64_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
 
 ifdef HAVE_WIN32
-PKGS += pthreads
+PKGS += winpthreads
 
 ifndef HAVE_VISUALSTUDIO
 ifdef HAVE_WINSTORE
@@ -20,12 +20,12 @@ ifeq ($(call mingw_at_least, 11), true)
 PKGS_FOUND += dxvahd
 endif # MINGW 11
 ifeq ($(HAVE_WINPTHREAD),)
-PKGS_FOUND += pthreads
+PKGS_FOUND += winpthreads
 endif
 endif # !HAVE_VISUALSTUDIO
 endif # HAVE_WIN32
 
-PKGS_ALL += dxva dxvahd alloweduwp
+PKGS_ALL += winpthreads dxva dxvahd alloweduwp
 
 $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -54,6 +54,12 @@ pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 	$(MOVE)
 
 .pthreads: pthreads
+	touch $@
+
+.sum-winpthreads: .sum-pthreads
+	touch $@
+
+.winpthreads: pthreads
 	$(MAKEBUILDDIR)
 	$(MAKECONFDIR)/mingw-w64-libraries/winpthreads/configure $(HOSTCONF)
 	+$(MAKEBUILD)

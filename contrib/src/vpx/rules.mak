@@ -39,7 +39,7 @@ endif
 DEPS_vpx =
 
 ifdef HAVE_WIN32
-DEPS_vpx += pthreads $(DEPS_pthreads)
+DEPS_vpx += winpthreads $(DEPS_winpthreads)
 endif
 
 ifdef HAVE_CROSS_COMPILE

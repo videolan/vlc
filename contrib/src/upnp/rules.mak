@@ -15,7 +15,7 @@ $(TARBALLS)/pupnp-release-$(UPNP_VERSION).tar.gz:
 .sum-upnp: pupnp-release-$(UPNP_VERSION).tar.gz
 
 ifdef HAVE_WIN32
-DEPS_upnp += pthreads $(DEPS_pthreads)
+DEPS_upnp += winpthreads $(DEPS_winpthreads)
 endif
 
 UPNP_CONF := -DUPNP_BUILD_SHARED=OFF \
