@@ -33,51 +33,51 @@ $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 	$(call download_pkg,$(MINGW64_URL),winpthreads)
 
-.sum-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2
-# .sum-pthreads: mingw-w64-$(MINGW64_HASH).tar.xz
+.sum-mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2
+# .sum-mingw64: mingw-w64-$(MINGW64_HASH).tar.xz
 # 	$(call check_githash,$(MINGW64_HASH))
 # 	touch $@
 
-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
-# pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
+mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
+# mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
-	$(APPLY) $(SRC)/pthreads/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
-	$(APPLY) $(SRC)/pthreads/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-CreateHardLinkW-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-more-module-API-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
-	$(APPLY) $(SRC)/pthreads/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
-	$(APPLY) $(SRC)/pthreads/0001-add-api-ms-core-registry-def-files.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-Update-to-Wine-master-and-regenerate-H-from-.patch
+	$(APPLY) $(SRC)/mingw64/0002-headers-dxvahd-Regenerate-H-from-IDL.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-CreateHardLinkW-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-more-module-API-in-Win10-UWP-builds.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
+	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch
 	$(MOVE)
 
-.pthreads: pthreads
+.mingw64: mingw64
 	touch $@
 
-.sum-winpthreads: .sum-pthreads
+.sum-winpthreads: .sum-mingw64
 	touch $@
 
-.winpthreads: pthreads
+.winpthreads: mingw64
 	$(MAKEBUILDDIR)
 	$(MAKECONFDIR)/mingw-w64-libraries/winpthreads/configure $(HOSTCONF)
 	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
 
-.sum-dxvahd: .sum-pthreads
+.sum-dxvahd: .sum-mingw64
 	touch $@
 
-.dxvahd: pthreads
+.dxvahd: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
 
-.sum-dxva: .sum-pthreads
+.sum-dxva: .sum-mingw64
 	touch $@
 
-.dxva: pthreads
+.dxva: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
@@ -98,10 +98,10 @@ MINGW64_UWP_CONF +=--disable-lib32 --disable-lib64 --enable-libarm32
 MINGW64_BUILDDIR := libarm32
 endif
 
-.sum-alloweduwp: .sum-pthreads
+.sum-alloweduwp: .sum-mingw64
 	touch $@
 
-.alloweduwp: pthreads
+.alloweduwp: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/memoryapi.h "$(PREFIX)/include"
