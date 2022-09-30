@@ -44,28 +44,28 @@ $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 	$(call download_pkg,$(MINGW64_URL),winpthreads)
 
-.sum-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2
-# .sum-pthreads: mingw-w64-$(MINGW64_HASH).tar.xz
+.sum-mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2
+# .sum-mingw64: mingw-w64-$(MINGW64_HASH).tar.xz
 
-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
-# pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
+mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
+# mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
 	$(MOVE)
 
-.pthreads: pthreads
+.mingw64: mingw64
 	touch $@
 
-.sum-winpthreads: .sum-pthreads
+.sum-winpthreads: .sum-mingw64
 	touch $@
 
-.winpthreads: pthreads
+.winpthreads: mingw64
 	$(MAKEBUILDDIR)
 	$(MAKECONFDIR)/mingw-w64-libraries/winpthreads/configure $(HOSTCONF)
 	+$(MAKEBUILD)
 	+$(MAKEBUILD) install
 	touch $@
 
-.sum-winrt_headers: .sum-pthreads
+.sum-winrt_headers: .sum-mingw64
 	touch $@
 
 MINGW_HEADERS_WINRT := \
@@ -78,41 +78,41 @@ MINGW_HEADERS_WINRT := \
     asyncinfo.h \
     windowscontracts.h
 
-.winrt_headers: pthreads
+.winrt_headers: mingw64
 	install -d "$(PREFIX)/include"
 	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_WINRT)) "$(PREFIX)/include"
 	touch $@
 
-.sum-dxvahd: .sum-pthreads
+.sum-dxvahd: .sum-mingw64
 	touch $@
 
-.dxvahd: pthreads
+.dxvahd: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
 
-.sum-dcomp: .sum-pthreads
+.sum-dcomp: .sum-mingw64
 	touch $@
 
-.dcomp: pthreads
+.dcomp: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dcomp.h "$(PREFIX)/include"
 	touch $@
 
-.sum-d3d9: .sum-pthreads
+.sum-d3d9: .sum-mingw64
 	touch $@
 
 MINGW_HEADERS_D3D9 := d3d9.h d3d9caps.h
 
-.d3d9: pthreads
+.d3d9: mingw64
 	install -d "$(PREFIX)/include"
 	install $(addprefix $</mingw-w64-headers/include/,$(MINGW_HEADERS_D3D9)) "$(PREFIX)/include"
 	touch $@
 
-.sum-dxva: .sum-pthreads
+.sum-dxva: .sum-mingw64
 	touch $@
 
-.dxva: pthreads
+.dxva: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/dxva.h "$(PREFIX)/include"
 	touch $@
