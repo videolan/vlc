@@ -858,7 +858,6 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/NetworkDisplay.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
 	gui/qt/network/qml/NetworkHomeDisplay.qml \
-	gui/qt/network/qml/NetworkHomeDeviceListView.qml \
 	gui/qt/network/qml/NetworkListItem.qml \
 	gui/qt/network/qml/NetworkThumbnailItem.qml \
 	gui/qt/network/qml/ServicesHomeDisplay.qml \
