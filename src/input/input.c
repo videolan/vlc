@@ -490,7 +490,7 @@ static void *Run( void *data )
     input_thread_private_t *priv = data;
     input_thread_t *p_input = &priv->input;
 
-#ifdef __APPLE
+#if TARGET_OS_TV && !(TARGET_OS_SIMULATOR)
     char name[128];
     uint64_t tid_np;
     
