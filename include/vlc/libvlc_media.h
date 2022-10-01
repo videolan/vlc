@@ -123,6 +123,18 @@ typedef struct libvlc_media_stats_t
     /* Audio output */
     int         i_played_abuffers;
     int         i_lost_abuffers;
+
+    /* SK related */
+    uint64_t video_deinterlacer_drop_cnt;
+    uint64_t video_demux_out_cnt;
+    uint64_t video_decoder_in_cnt;
+    uint64_t video_decoder_out_cnt;
+    uint64_t audio_demux_out_cnt;
+    uint64_t audio_decoder_in_cnt;
+    uint64_t audio_decoder_out_cnt;
+    uint64_t video_renderer_out_cnt;
+    uint64_t audio_renderer_out_cnt;
+    libvlc_time_t audio_latency;
 } libvlc_media_stats_t;
 
 /**

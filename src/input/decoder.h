@@ -41,8 +41,16 @@ struct vlc_input_decoder_callbacks {
     void (*on_new_video_stats)(vlc_input_decoder_t *decoder, unsigned decoded,
                                unsigned lost, unsigned displayed, unsigned late,
                                void *userdata);
+    void (*on_new_video_sk_stats)(vlc_input_decoder_t *decoder,
+                               unsigned video_deinterlacer_drop_cnt,
+                               unsigned video_renderer_out_cnt,
+                               void *userdata);
     void (*on_new_audio_stats)(vlc_input_decoder_t *decoder, unsigned decoded,
-                               unsigned lost, unsigned played, void *userdata);
+                               unsigned lost, unsigned played, vlc_tick_t latency, void *userdata);
+    void (*on_new_decoder_stats)(vlc_input_decoder_t *decoder,
+                                 enum es_format_category_e cat,
+                                 uintmax_t cnt_in, uintmax_t cnt_out,
+                                 void *userdata);
     void (*on_captions_to_display)(vlc_input_decoder_t *decoder,
                                    vout_thread_t *vout, const void *p_cc, size_t i_cc,
                                    void *userdata);

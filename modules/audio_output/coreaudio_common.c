@@ -396,6 +396,8 @@ void ca_ResetDeviceLatency(audio_output_t *p_aout)
     /* Trigger aout_TimingReport() to be called from the next render callback */
     p_sys->timing_report_last_written_bytes = p_sys->timing_report_delay_bytes;
     lock_unlock(p_sys);
+
+    aout_LatencyReport(p_aout, i_dev_latency_ticks);
 }
 
 AudioUnit

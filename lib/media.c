@@ -752,6 +752,17 @@ bool libvlc_media_get_stats(libvlc_media_t *p_md,
     p_stats->i_played_abuffers = p_itm_stats->i_played_abuffers;
     p_stats->i_lost_abuffers = p_itm_stats->i_lost_abuffers;
 
+    p_stats->video_deinterlacer_drop_cnt = p_itm_stats->video_deinterlacer_drop_cnt;
+    p_stats->video_demux_out_cnt = p_itm_stats->video_demux_out_cnt;
+    p_stats->video_decoder_in_cnt = p_itm_stats->video_decoder_in_cnt;
+    p_stats->video_decoder_out_cnt = p_itm_stats->video_decoder_out_cnt;
+    p_stats->audio_demux_out_cnt = p_itm_stats->audio_demux_out_cnt;
+    p_stats->audio_decoder_in_cnt = p_itm_stats->audio_decoder_in_cnt;
+    p_stats->audio_decoder_out_cnt = p_itm_stats->audio_decoder_out_cnt;
+    p_stats->video_renderer_out_cnt = p_itm_stats->video_renderer_out_cnt;
+    p_stats->audio_renderer_out_cnt = p_itm_stats->audio_renderer_out_cnt;
+    p_stats->audio_latency = p_itm_stats->audio_latency;
+
     vlc_mutex_unlock( &item->lock );
     return true;
 }

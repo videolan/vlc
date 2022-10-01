@@ -1226,6 +1226,26 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     return VLC_SUCCESS;
 }
 
+static void ModuleThread_UpdateStatVideo( vlc_input_decoder_t *p_owner,
+                                          bool lost )
+{
+    unsigned displayed = 0;
+    unsigned vout_lost = 0;
+    unsigned vout_late = 0;
+    if( p_owner->p_vout != NULL )
+    {
+        vout_GetResetStatistic( p_owner->p_vout, &displayed, &vout_lost, &vout_late );
+    }
+    if (lost) vout_lost++;
+
+    decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed, vout_late);
+
+    unsigned video_deinterlacer_drop_cnt, video_renderer_out_cnt;
+    vout_GetSKResetStatistic(p_owner->p_vout, &video_deinterlacer_drop_cnt,
+                             &video_renderer_out_cnt);
+    decoder_Notify(p_owner, on_new_video_sk_stats, video_deinterlacer_drop_cnt, video_renderer_out_cnt);
+}
+
 static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
@@ -1242,6 +1262,8 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
         vlc_tracer_TraceStreamPTS( tracer, "DEC", p_owner->psz_id,
                             "OUT", p_pic->date );
     }
+
+    decoder_Notify(p_owner, on_new_decoder_stats, VIDEO_ES, 0, 1);
 
     if( atomic_load(&p_owner->b_display_avstat))
     {
@@ -1382,6 +1404,8 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
                             p_aout_buf->i_pts, p_aout_buf->i_dts );
     }
 
+    decoder_Notify(p_owner, on_new_decoder_stats, AUDIO_ES, 0, 1);
+
     if(p_aout_buf && atomic_load(&p_owner->b_display_avstat))
     {
         msg_Info( p_dec, "avstats: [DEC][OUT][AUDIO] ts=%" PRId64 " pts=%" PRId64,
@@ -1394,16 +1418,17 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
 
     unsigned played = 0;
     unsigned aout_lost = 0;
+    vlc_tick_t latency;
     if( p_owner->p_astream != NULL )
     {
-        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played );
+        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played, &latency );
     }
     if (success != VLC_SUCCESS)
         aout_lost++;
 
     vlc_fifo_Unlock(p_owner->p_fifo);
 
-    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
+    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played, latency);
 }
 
 static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_subpic )
@@ -1480,6 +1505,8 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
         vlc_tracer_TraceStreamDTS( tracer, "DEC", p_owner->psz_id, "IN",
                             frame->i_pts, frame->i_dts );
     }
+
+    decoder_Notify(p_owner, on_new_decoder_stats, p_dec->fmt_in->i_cat, 1, 0);
 
     if( type != NULL && frame != NULL && atomic_load(&p_owner->b_display_avstat))
     {

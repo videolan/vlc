@@ -748,6 +748,18 @@ struct input_stats {
     atomic_uintmax_t displayed_pictures;
     atomic_uintmax_t late_pictures;
     atomic_uintmax_t lost_pictures;
+
+    /* SK related */
+    atomic_uintmax_t video_deinterlacer_drop_cnt;
+    atomic_uintmax_t video_demux_out_cnt;
+    atomic_uintmax_t video_decoder_in_cnt;
+    atomic_uintmax_t video_decoder_out_cnt;
+    atomic_uintmax_t audio_demux_out_cnt;
+    atomic_uintmax_t audio_decoder_in_cnt;
+    atomic_uintmax_t audio_decoder_out_cnt;
+    atomic_uintmax_t video_renderer_out_cnt;
+    atomic_uintmax_t audio_renderer_out_cnt;
+    _Atomic vlc_tick_t audio_latency;
 };
 
 struct input_stats *input_stats_Create(void);

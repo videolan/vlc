@@ -230,6 +230,13 @@ void vout_ChangeSpuDelay( vout_thread_t *, size_t channel_id, vlc_tick_t delay )
  */
 void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
                              unsigned *pi_lost, unsigned *pi_late );
+/**
+ * This function will return and reset internal statistics.
+ */
+void vout_GetSKResetStatistic( vout_thread_t *p_vout,
+                               unsigned *video_deinterlacer_drop_cnt,
+                               unsigned *video_renderer_out_cnt);
+
 
 /**
  * This function will force to display the next picture while paused

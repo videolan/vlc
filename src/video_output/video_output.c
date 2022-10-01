@@ -297,6 +297,18 @@ void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
     vout_statistic_GetReset( &sys->statistic, displayed, lost, late );
 }
 
+void vout_GetSKResetStatistic(vout_thread_t *vout,
+        unsigned *restrict video_deinterlacer_drop_cnt,
+        unsigned *restrict video_renderer_out_cnt)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+    vout_statistic_GetSKReset( &sys->statistic,
+            video_deinterlacer_drop_cnt,
+            video_renderer_out_cnt);
+}
+
+
 bool vout_IsEmpty(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
@@ -1051,6 +1063,8 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
                         /* A picture dropped means discontinuity for the
                          * filters and we need to notify eg. deinterlacer. */
                         filter_chain_VideoFlush(sys->filter.chain_static);
+
+                        vout_statistic_AddDeinterlacerDrop(&sys->statistic, 1);
                         continue;
                     }
                 }
