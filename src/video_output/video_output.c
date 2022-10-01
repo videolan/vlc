@@ -392,6 +392,18 @@ void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
     vout_statistic_GetReset( &sys->statistic, displayed, lost, late );
 }
 
+void vout_GetSKResetStatistic(vout_thread_t *vout,
+        unsigned *restrict video_deinterlacer_drop_cnt,
+        unsigned *restrict video_renderer_out_cnt)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+    vout_statistic_GetSKReset( &sys->statistic,
+            video_deinterlacer_drop_cnt,
+            video_renderer_out_cnt);
+}
+
+
 bool vout_IsEmpty(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
@@ -1220,6 +1232,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                         filter_chain_VideoFlush(sys->filter.chain_static);
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
+                        vout_statistic_AddDeinterlacerDrop(&sys->statistic, 1);
                         continue;
                     }
                 }

@@ -63,6 +63,13 @@ static int var_CopyDevice (vlc_object_t *src, const char *name,
     return var_Set (dst, "audio-device", value);
 }
 
+static void aout_LatencyNotify(audio_output_t *aout, vlc_tick_t latency)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    assert(owner->main_stream);
+    vlc_aout_stream_NotifyLatency(owner->main_stream, latency);
+}
+
 static void aout_TimingNotify(audio_output_t *aout, vlc_tick_t system_ts,
                               vlc_tick_t audio_ts)
 {
@@ -185,6 +192,7 @@ static const struct vlc_audio_output_events aout_events = {
     aout_HotplugNotify,
     aout_RestartNotify,
     aout_GainNotify,
+    .latency_report = aout_LatencyNotify,
 };
 
 static int FilterCallback (vlc_object_t *obj, const char *var,

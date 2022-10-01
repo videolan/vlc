@@ -515,6 +515,8 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
 void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_ticks)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    aout_LatencyReport(p_aout, i_dev_latency_ticks);
 }
 
 AudioUnit

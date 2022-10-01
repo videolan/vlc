@@ -134,6 +134,7 @@ struct vlc_audio_output_events {
     void (*hotplug_report)(audio_output_t *, const char *, const char *);
     void (*restart_request)(audio_output_t *, unsigned);
     int (*gain_request)(audio_output_t *, float);
+    void (*latency_report)(audio_output_t *, vlc_tick_t);
 };
 
 /** Audio output object
@@ -315,6 +316,11 @@ static inline void aout_TimingReport(audio_output_t *aout, vlc_tick_t system_ts,
                                      vlc_tick_t audio_ts)
 {
     aout->events->timing_report(aout, system_ts, audio_ts);
+}
+
+static inline void aout_LatencyReport(audio_output_t *aout, vlc_tick_t latency)
+{
+    aout->events->latency_report(aout, latency);
 }
 
 /**

@@ -477,8 +477,36 @@ decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
 }
 
 static void
+decoder_on_new_video_sk_stats(vlc_input_decoder_t *decoder,
+        unsigned video_deinterlacer_drop_cnt,
+        unsigned video_renderer_out_cnt,
+        void *userdata)
+{
+    (void) decoder;
+
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
+
+    struct input_stats *stats = input_priv(p_sys->p_input)->stats;
+    if (!stats)
+        return;
+
+    atomic_fetch_add_explicit(&stats->video_deinterlacer_drop_cnt,
+                              video_deinterlacer_drop_cnt,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->video_renderer_out_cnt,
+                              video_renderer_out_cnt,
+                              memory_order_relaxed);
+}
+
+
+static void
 decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsigned lost,
-                           unsigned played, void *userdata)
+                           unsigned played, vlc_tick_t latency, void *userdata)
 {
     (void) decoder;
 
@@ -499,6 +527,7 @@ decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
                               memory_order_relaxed);
     atomic_fetch_add_explicit(&stats->played_abuffers, played,
                               memory_order_relaxed);
+    atomic_store_explicit(&stats->audio_latency, latency, memory_order_relaxed);
 }
 
 static int
@@ -518,6 +547,45 @@ decoder_get_attachments(vlc_input_decoder_t *decoder,
     return input_GetAttachments(p_sys->p_input, ppp_attachment);
 }
 
+static void
+decoder_on_new_decoder_stats(vlc_input_decoder_t *decoder,
+                             enum es_format_category_e cat,
+                             uintmax_t cnt_in, uintmax_t cnt_out,
+                             void *userdata)
+{
+    // TODO
+    //vlc_assert_unreachable();
+
+    (void) decoder;
+
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
+
+    struct input_stats *stats = input_priv(p_sys->p_input)->stats;
+    if (!stats)
+        return;
+
+    atomic_uintmax_t *stat_cnt_in, *stat_cnt_out;
+    switch(cat)
+    {
+        case VIDEO_ES:
+            stat_cnt_in = &stats->video_decoder_in_cnt;
+            stat_cnt_out = &stats->video_decoder_out_cnt;
+            break;
+        case AUDIO_ES:
+            stat_cnt_in = &stats->audio_decoder_in_cnt;
+            stat_cnt_out = &stats->audio_decoder_out_cnt;
+            break;
+        default: return;
+    }
+    atomic_fetch_add_explicit(stat_cnt_in, cnt_in, memory_order_relaxed);
+    atomic_fetch_add_explicit(stat_cnt_out, cnt_out, memory_order_relaxed);
+}
+
 static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_vout_started = decoder_on_vout_started,
     .on_vout_stopped = decoder_on_vout_stopped,
@@ -525,8 +593,10 @@ static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_vout_frame_displayed = decoder_on_vout_frame_displayed,
     .on_thumbnail_ready = decoder_on_thumbnail_ready,
     .on_new_video_stats = decoder_on_new_video_stats,
+    .on_new_video_sk_stats = decoder_on_new_video_sk_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,
     .get_attachments = decoder_get_attachments,
+    .on_new_decoder_stats = decoder_on_new_decoder_stats,
 };
 
 /*****************************************************************************
@@ -3027,11 +3097,19 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
             atomic_fetch_add_explicit(&stats->demux_corrupted, 1,
                                       memory_order_relaxed);
+        else {
+            if (es->fmt.i_cat == VIDEO_ES)
+                atomic_fetch_add_explicit(&stats->video_demux_out_cnt, 1, memory_order_relaxed);
+            else if (es->fmt.i_cat == AUDIO_ES)
+                atomic_fetch_add_explicit(&stats->audio_demux_out_cnt, 1, memory_order_relaxed);
+        }
+
 
         /* Update number of discontinuities */
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
             atomic_fetch_add_explicit(&stats->demux_discontinuity, 1,
                                       memory_order_relaxed);
+
     }
 
     vlc_mutex_lock( &p_sys->lock );

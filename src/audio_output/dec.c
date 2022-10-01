@@ -99,6 +99,7 @@ struct vlc_aout_stream
 
     atomic_uint buffers_lost;
     atomic_uint buffers_played;
+    _Atomic vlc_tick_t latency;
 };
 
 static inline aout_owner_t *aout_stream_owner(vlc_aout_stream *stream)
@@ -251,6 +252,7 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
 
     atomic_init (&stream->buffers_lost, 0);
     atomic_init (&stream->buffers_played, 0);
+    atomic_init (&stream->latency, 0);
     atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
 
     atomic_init(&stream->drained, false);
@@ -604,6 +606,12 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
     stream_HandleDrift(stream, drift, dec_pts);
 }
 
+
+void vlc_aout_stream_NotifyLatency(vlc_aout_stream *stream, vlc_tick_t latency)
+{
+    atomic_store_explicit(&stream->latency, latency, memory_order_relaxed);
+}
+
 void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
                                   vlc_tick_t audio_ts)
 {
@@ -775,12 +783,13 @@ drop:
 }
 
 void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *restrict lost,
-                           unsigned *restrict played)
+                           unsigned *restrict played, vlc_tick_t *restrict latency)
 {
     *lost = atomic_exchange_explicit(&stream->buffers_lost, 0,
                                      memory_order_relaxed);
     *played = atomic_exchange_explicit(&stream->buffers_played, 0,
                                        memory_order_relaxed);
+    *latency = atomic_load_explicit(&stream->latency, memory_order_relaxed);
 }
 
 void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool paused, vlc_tick_t date)

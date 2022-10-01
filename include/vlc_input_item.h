@@ -529,6 +529,19 @@ struct input_stats_t
     /* Aout */
     int64_t i_played_abuffers;
     int64_t i_lost_abuffers;
+
+    /* SK related */
+    uintmax_t video_deinterlacer_drop_cnt;
+    uintmax_t video_demux_out_cnt;
+    uintmax_t video_decoder_in_cnt;
+    uintmax_t video_decoder_out_cnt;
+    uintmax_t audio_demux_out_cnt;
+    uintmax_t audio_decoder_in_cnt;
+    uintmax_t audio_decoder_out_cnt;
+    uintmax_t video_renderer_out_cnt;
+    uintmax_t audio_renderer_out_cnt;
+    vlc_tick_t audio_latency;
+
 };
 
 /**

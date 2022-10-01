@@ -1181,6 +1181,11 @@ static void ModuleThread_UpdateStatVideo( vlc_input_decoder_t *p_owner,
     if (lost) vout_lost++;
 
     decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed, vout_late);
+
+    unsigned video_deinterlacer_drop_cnt, video_renderer_out_cnt;
+    vout_GetSKResetStatistic(p_owner->p_vout, &video_deinterlacer_drop_cnt,
+                             &video_renderer_out_cnt);
+    decoder_Notify(p_owner, on_new_video_sk_stats, video_deinterlacer_drop_cnt, video_renderer_out_cnt);
 }
 
 static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
@@ -1188,6 +1193,8 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     assert( p_pic );
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
+
+    decoder_Notify(p_owner, on_new_decoder_stats, VIDEO_ES, 0, 1);
 
     if( atomic_load(&p_owner->b_display_avstat))
     {
@@ -1322,19 +1329,22 @@ static void ModuleThread_UpdateStatAudio( vlc_input_decoder_t *p_owner,
 {
     unsigned played = 0;
     unsigned aout_lost = 0;
+    vlc_tick_t latency;
     if( p_owner->p_astream != NULL )
     {
-        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played );
+        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played, &latency);
     }
     if (lost) aout_lost++;
 
-    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
+    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played, latency);
 }
 
 static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
+
+    decoder_Notify(p_owner, on_new_decoder_stats, AUDIO_ES, 0, 1);
 
     if(p_aout_buf && atomic_load(&p_owner->b_display_avstat))
     {
@@ -1433,6 +1443,8 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
         p_dec->fmt_in.i_cat == VIDEO_ES ? "VIDEO" :
         p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
+
+    decoder_Notify(p_owner, on_new_decoder_stats, p_dec->fmt_in.i_cat, 1, 0);
 
     if( type != NULL && frame && atomic_load(&p_owner->b_display_avstat))
     {

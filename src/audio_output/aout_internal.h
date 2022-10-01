@@ -148,7 +148,7 @@ vlc_aout_stream *vlc_aout_stream_New(audio_output_t *p_aout,
                                      const struct vlc_aout_stream_cfg *cfg);
 void vlc_aout_stream_Delete(vlc_aout_stream *);
 int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block);
-void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *, unsigned *);
+void vlc_aout_stream_GetResetStats(vlc_aout_stream *stream, unsigned *, unsigned *, vlc_tick_t *);
 void vlc_aout_stream_ChangePause(vlc_aout_stream *stream, bool b_paused, vlc_tick_t i_date);
 void vlc_aout_stream_ChangeRate(vlc_aout_stream *stream, float rate);
 void vlc_aout_stream_ChangeDelay(vlc_aout_stream *stream, vlc_tick_t delay);
@@ -159,6 +159,7 @@ void vlc_aout_stream_UpdateLatency(vlc_aout_stream *stream);
  * any threads */
 bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream);
 /* Called from output.c */
+void vlc_aout_stream_NotifyLatency(vlc_aout_stream *stream, vlc_tick_t latency);
 void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
                                   vlc_tick_t audio_ts);
 void vlc_aout_stream_NotifyDrained(vlc_aout_stream *stream);

@@ -68,6 +68,19 @@ struct input_stats *input_stats_Create(void)
     atomic_init(&stats->displayed_pictures, 0);
     atomic_init(&stats->late_pictures, 0);
     atomic_init(&stats->lost_pictures, 0);
+
+    atomic_init(&stats->video_deinterlacer_drop_cnt, 0);
+    atomic_init(&stats->video_demux_out_cnt, 0);
+    atomic_init(&stats->video_decoder_in_cnt, 0);
+    atomic_init(&stats->video_decoder_out_cnt, 0);
+    atomic_init(&stats->audio_demux_out_cnt, 0);
+    atomic_init(&stats->audio_decoder_in_cnt, 0);
+    atomic_init(&stats->audio_decoder_out_cnt, 0);
+    atomic_init(&stats->video_renderer_out_cnt, 0);
+    atomic_init(&stats->audio_renderer_out_cnt, 0);
+
+    atomic_init(&stats->audio_latency, 0);
+
     return stats;
 }
 
@@ -111,6 +124,19 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
                                                     memory_order_relaxed);
     st->i_lost_pictures = atomic_load_explicit(&stats->lost_pictures,
                                                memory_order_relaxed);
+
+    /* SK */
+    st->video_deinterlacer_drop_cnt = atomic_load_explicit(&stats->video_deinterlacer_drop_cnt, memory_order_relaxed);
+    st->video_demux_out_cnt = atomic_load_explicit(&stats->video_demux_out_cnt, memory_order_relaxed);
+    st->video_decoder_in_cnt = atomic_load_explicit(&stats->video_decoder_in_cnt, memory_order_relaxed);
+    st->video_decoder_out_cnt = atomic_load_explicit(&stats->video_decoder_out_cnt, memory_order_relaxed);
+    st->video_renderer_out_cnt = atomic_load_explicit(&stats->video_renderer_out_cnt, memory_order_relaxed);
+    st->audio_demux_out_cnt = atomic_load_explicit(&stats->audio_demux_out_cnt, memory_order_relaxed);
+    st->audio_decoder_in_cnt = atomic_load_explicit(&stats->audio_decoder_in_cnt, memory_order_relaxed);
+    st->audio_decoder_out_cnt = atomic_load_explicit(&stats->audio_decoder_out_cnt, memory_order_relaxed);
+    st->audio_renderer_out_cnt = atomic_load_explicit(&stats->audio_renderer_out_cnt, memory_order_relaxed);
+
+    st->audio_latency = atomic_load_explicit(&stats->audio_latency, memory_order_relaxed);
 }
 
 /** Update a counter element with new values
