@@ -730,6 +730,29 @@ static int DrawStats(intf_thread_t *intf)
         MainBoxWrite(sys, l++, _("| buffers lost     :    %5"PRIi64),
                 p_stats->i_lost_abuffers);
     }
+
+    if (sys->color) color_set(C_CATEGORY, NULL);
+    MainBoxWrite(sys, l++, _("+-[SK stats]"));
+    if (sys->color) color_set(C_DEFAULT, NULL);
+    MainBoxWrite(sys, l++, _("| video_deinterlacer_drop_cnt :    %5"PRIi64),
+            p_stats->video_deinterlacer_drop_cnt);
+    MainBoxWrite(sys, l++, _("| video_demux_out_cnt         :    %5"PRIi64),
+            p_stats->video_demux_out_cnt);
+    MainBoxWrite(sys, l++, _("| video_decoder_in_cnt        :    %5"PRIi64),
+            p_stats->video_decoder_in_cnt);
+    MainBoxWrite(sys, l++, _("| video_decoder_out_cnt       :    %5"PRIi64),
+            p_stats->video_decoder_out_cnt);
+    MainBoxWrite(sys, l++, _("| audio_demux_out_cnt         :    %5"PRIi64),
+            p_stats->audio_demux_out_cnt);
+    MainBoxWrite(sys, l++, _("| audio_decoder_in_cnt        :    %5"PRIi64),
+            p_stats->audio_decoder_in_cnt);
+    MainBoxWrite(sys, l++, _("| audio_decoder_out_cnt       :    %5"PRIi64),
+            p_stats->audio_decoder_out_cnt);
+    MainBoxWrite(sys, l++, _("| video_renderer_out_cnt      :    %5"PRIi64),
+            p_stats->video_renderer_out_cnt);
+    MainBoxWrite(sys, l++, _("| audio latency               :    %5"PRIi64),
+            US_FROM_VLC_TICK(p_stats->audio_latency));
+
     if (sys->color) color_set(C_DEFAULT, NULL);
 
     vlc_mutex_unlock(&item->lock);
