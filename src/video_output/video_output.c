@@ -1759,7 +1759,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         if (vsync_missed && atomic_load(&sys->b_display_avstat))
             msg_Warn(vout, "avstats: [VSYNC MISSED] ts=%" PRId64, NS_FROM_VLC_TICK(vlc_tick_now()));
 
-        if (vsync_missed)
+        if (tracer != NULL & vsync_missed)
             vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "vsync_missed");
 
         if (atomic_load(&sys->b_display_avstat))
