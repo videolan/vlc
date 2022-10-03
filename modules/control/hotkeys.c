@@ -37,6 +37,7 @@
 #include <vlc_playlist.h>
 #include <vlc_actions.h>
 #include <vlc_spu.h>
+#include <vlc_executor.h>
 #include "math.h"
 
 struct intf_sys_t
@@ -56,6 +57,8 @@ struct intf_sys_t
         vlc_tick_t subtitle_time;
     } subsync;
     enum vlc_vout_order spu_channel_order;
+
+    vlc_executor_t *executor;
 };
 
 static void handle_action(intf_thread_t *, vlc_action_id_t);
@@ -758,6 +761,42 @@ PLAYER_ACTION_HANDLER(Aout)
     }
 }
 
+struct snapshot_task
+{
+    struct vlc_runnable runnable;
+    vout_thread_t *vout;
+};
+
+static void RunSnapshot(void *userdata)
+{
+    struct snapshot_task *task = userdata;
+
+    var_TriggerCallback(task->vout, "video-snapshot");
+
+    vout_Release(task->vout);
+    free(task);
+}
+
+static void TakeSnapshotAsync(struct intf_sys_t *sys, vlc_player_t *player)
+{
+    if (!sys->executor)
+    {
+        /* Create the executor only on the first request */
+        sys->executor = vlc_executor_New(1);
+        if (!sys->executor)
+            return;
+    }
+
+    struct snapshot_task *task = malloc(sizeof(*task));
+    if (!task)
+        return;
+
+    task->vout = vlc_player_vout_Hold(player);
+    task->runnable.run = RunSnapshot;
+    task->runnable.userdata = task;
+    vlc_executor_Submit(sys->executor, &task->runnable);
+}
+
 PLAYER_ACTION_HANDLER(Vouts)
 {
     VLC_UNUSED(intf);
@@ -770,7 +809,7 @@ PLAYER_ACTION_HANDLER(Vouts)
             vlc_player_vout_SetFullscreen(player, false);
             break;
         case ACTIONID_SNAPSHOT:
-            vlc_player_vout_Snapshot(player);
+            TakeSnapshotAsync(intf->p_sys, player);
             break;
         case ACTIONID_WALLPAPER:
             vlc_player_vout_ToggleWallpaperMode(player);
@@ -1283,6 +1322,9 @@ Open(vlc_object_t *this)
         return VLC_EGENERIC;
     }
     var_AddCallback(vlc_object_instance(intf), "key-action", ActionCallback, intf);
+
+    sys->executor = NULL;
+
     intf->p_sys = sys;
     return VLC_SUCCESS;
 }
@@ -1302,6 +1344,13 @@ Close(vlc_object_t *this)
     vlc_player_Unlock(player);
 
     var_DelCallback(vlc_object_instance(intf), "key-action", ActionCallback, intf);
+
+    if (sys->executor)
+    {
+        vlc_executor_WaitIdle(sys->executor);
+        vlc_executor_Delete(sys->executor);
+    }
+
     free(sys);
 }
 
