@@ -19,10 +19,13 @@ endif # MINGW 10
 ifeq ($(call mingw_at_least, 11), true)
 PKGS_FOUND += dxvahd
 endif # MINGW 11
+endif # !HAVE_VISUALSTUDIO
+
+HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
 ifeq ($(HAVE_WINPTHREAD),)
 PKGS_FOUND += winpthreads
 endif
-endif # !HAVE_VISUALSTUDIO
+
 endif # HAVE_WIN32
 
 PKGS_ALL += winpthreads dxva dxvahd alloweduwp
