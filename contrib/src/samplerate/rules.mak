@@ -25,7 +25,6 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD) -C src
-	+$(MAKEBUILD)
 	+$(MAKEBUILD) -C src install
 	+$(MAKEBUILD) install-data
 	touch $@
