@@ -27,13 +27,16 @@ endif # MINGW 9
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva
 endif # MINGW 10
-ifeq ($(HAVE_WINPTHREAD),)
-PKGS_FOUND += winpthreads
-endif
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dcomp
 endif
 endif # !HAVE_VISUALSTUDIO
+
+HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
+ifeq ($(HAVE_WINPTHREAD),)
+PKGS_FOUND += winpthreads
+endif
+
 endif # HAVE_WIN32
 
 PKGS_ALL += winpthreads winrt_headers d3d9 dxva dxvahd dcomp
