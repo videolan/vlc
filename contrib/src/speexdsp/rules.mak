@@ -23,8 +23,10 @@ ifeq ($(ARCH),aarch64)
 # old neon, not compatible with aarch64
 SPEEXDSP_CONF += --disable-neon
 endif
+ifeq ($(ARCH),arm)
 ifndef HAVE_NEON
 SPEEXDSP_CONF += --disable-neon
+endif
 endif
 ifndef HAVE_FPU
 SPEEXDSP_CONF += --enable-fixed-point
