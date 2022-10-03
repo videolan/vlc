@@ -116,7 +116,7 @@ diagnostic "vlc contribs: bootstrap"
             --disable-a52 --disable-aom --disable-faad2 --disable-chromaprint \
             --disable-mad --disable-libmpeg2 --disable-nvcodec \
             --disable-tremor --disable-vpx --disable-theora \
-            --disable-postproc --disable-gmp --disable-gcrypt --disable-ass \
+            --disable-postproc --disable-gmp --disable-gcrypt \
             --disable-gpgerror --disable-harfbuzz --disable-fontconfig \
             --disable-asdcplib --disable-caca --disable-gettext \
             --disable-goom --disable-libplacebo \
