@@ -1,5 +1,5 @@
 # PNG
-PNG_VERSION := 1.6.37
+PNG_VERSION := 1.6.38
 PNG_URL := $(SF)/libpng/libpng16/$(PNG_VERSION)/libpng-$(PNG_VERSION).tar.xz
 
 PKGS += png
@@ -14,7 +14,6 @@ $(TARBALLS)/libpng-$(PNG_VERSION).tar.xz:
 
 png: libpng-$(PNG_VERSION).tar.xz .sum-png
 	$(UNPACK)
-	$(APPLY) $(SRC)/png/winrt.patch
 	sed -i.orig 's,set(CMAKE_DEBUG_POSTFIX ,#set(CMAKE_DEBUG_POSTFIX ,' "$(UNPACK_DIR)/CMakeLists.txt"
 	$(call pkg_static,"libpng.pc.in")
 	$(MOVE)
