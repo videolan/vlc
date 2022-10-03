@@ -34,7 +34,7 @@ endif
 	$(MOVE)
 
 .goom: goom
-	$(RECONF)
+	$(RECONF) -I m4
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD)
