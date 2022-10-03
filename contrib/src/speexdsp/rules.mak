@@ -24,10 +24,10 @@ ifeq ($(ARCH),aarch64)
 # old neon, not compatible with aarch64
 SPEEXDSP_CONF += --disable-neon
 endif
-ifeq ($(ARCH),arm)
-ifndef HAVE_NEON
+ifeq ($(filter arm aarch64, $(ARCH)),)
+# The configure script checks for NEON C intrinsics only.
+# This leads to false positives on Android-x86.
 SPEEXDSP_CONF += --disable-neon
-endif
 endif
 ifndef HAVE_FPU
 SPEEXDSP_CONF += --enable-fixed-point
