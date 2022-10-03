@@ -383,7 +383,7 @@ static inline void VolumeEntries( qt_intf_t *p_intf, QMenu *current )
     current->addSeparator();
 
     current->addAction( QIcon( ":/menu/volume-high.svg" ), qtr( "&Increase Volume" ), THEMIM, &PlayerController::setVolumeUp );
-    current->addAction( QIcon( ":/menu/volume-low.svg" ), qtr( "D&ecrease Volume" ), THEMIM, &PlayerController::setVolumeDown );
+    current->addAction( QIcon( ":/menu/volume-low.svg" ), qtr( "&Decrease Volume" ), THEMIM, &PlayerController::setVolumeDown );
     current->addAction( QIcon( ":/menu/volume-muted.svg" ), qtr( "&Mute" ), THEMIM, &PlayerController::toggleMuted );
 }
 
@@ -396,7 +396,7 @@ void VLCMenuBar::AudioMenu( qt_intf_t *p_intf, QMenu * current )
     {
         current->addMenu(new CheckableListMenu(qtr( "Audio &Track" ), THEMIM->getAudioTracks(), CheckableListMenu::GROUPED_OPTIONAL, current));
 
-        QAction *audioDeviceAction = new QAction( qtr( "Audio &Device" ), current );
+        QAction *audioDeviceAction = new QAction( qtr( "&Audio Device" ), current );
         QMenu *audioDeviceSubmenu = new QMenu( current );
         audioDeviceAction->setMenu( audioDeviceSubmenu );
         current->addAction( audioDeviceAction );
