@@ -102,8 +102,16 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
     s->aout = aout;
 
+    /* There is only one "aout" module for android, that take care of choosing
+     * the best API by default (AAudio, AudioTrack, OpenSLES). This is needed
+     * because AAudio, that is the best API to use, doesn't handle pass-through
+     * while AudioTrack can. Therefore, this intermediate "aout" module allow
+     * choosing AAudio for PCM and AudioTrack for pass-through. The user is
+     * still able to force an API via LibVLC because the "aout" choice is
+     * forwarded to the "aout android stream" module probe. */
+    char *modlist = var_InheritString(aout, "aout");
     module_t **mods;
-    ssize_t total = vlc_module_match("aout android stream", NULL, false, &mods, NULL);
+    ssize_t total = vlc_module_match("aout android stream", modlist, false, &mods, NULL);
     int ret = VLC_EGENERIC;
     for (ssize_t i = 0; i < total; i++)
     {
@@ -129,6 +137,7 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
         }
     }
 
+    free(modlist);
     free(mods);
 
     return ret;
@@ -372,15 +381,25 @@ DynamicsProcessing_Delete( aout_stream_t *stream, jobject dp )
     (*env)->DeleteGlobalRef( env, dp );
 }
 
+#define add_aout(shortcut, name, desc) \
+    add_submodule() \
+        add_shortcut(name) \
+        set_shortname(name) \
+        set_description(desc) \
+        set_capability("audio output", 0) \
+        set_callback(Open)
+
 #define AUDIOTRACK_SESSION_ID_TEXT " Id of audio session the AudioTrack must be attached to"
 
 vlc_module_begin ()
     set_shortname("Android Audio")
-    set_description("Android audio output")
+    set_description("Android automatic audio output")
     set_capability("audio output", 200)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     add_integer("audiotrack-session-id", 0,
             AUDIOTRACK_SESSION_ID_TEXT, NULL )
         change_private()
     set_callback(Open)
+    add_aout("audiotrack", "AudioTrack", "Android AudioTrack audio output")
+    add_aout("aaudio", "AAudio", "Android AAudio output")
 vlc_module_end ()
