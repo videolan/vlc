@@ -788,9 +788,9 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
      * request any mode */
     if (aout->current_sink_info.headphones
      && owner->requested_mix_mode == AOUT_VAR_CHAN_UNSET
+     && fmt->i_physical_channels == AOUT_CHANS_STEREO
      && aout_HasMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL))
     {
-        assert(fmt->i_physical_channels == AOUT_CHANS_STEREO);
         assert(stereo_mode == AOUT_VAR_CHAN_UNSET);
         aout_UpdateMixMode(aout, AOUT_MIX_MODE_BINAURAL, fmt);
     }
