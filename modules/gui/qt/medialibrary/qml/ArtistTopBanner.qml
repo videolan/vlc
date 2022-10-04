@@ -51,6 +51,7 @@ FocusScope {
                                  : undefined
         mipmap: !!artist.cover
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
+        visible: false
 
         Rectangle {
             anchors.fill: background
