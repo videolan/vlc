@@ -49,6 +49,7 @@ FocusScope {
         source: artist.cover || VLCStyle.noArtArtist
         sourceSize: artist.cover ? Qt.size(MainCtx.screen ? Helpers.alignUp(MainCtx.screen.availableGeometry.width, 32) : 1024, 0)
                                  : undefined
+        mipmap: !!artist.cover
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
 
         Rectangle {
