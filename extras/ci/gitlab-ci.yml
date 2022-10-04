@@ -224,6 +224,18 @@ nightly-win64-ucrt-llvm:
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
+nightly-win64-arm-llvm:
+    extends: .nightly-win-common
+    image:
+        name: $VLC_WIN_LLVM_UCRT_IMAGE
+    variables:
+        <<: *variables-win64-arm
+        TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
+        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
+        # Clang <= 15 produces incorrect unwind info for code with
+        # branch protection enabled on Windows.
+        CONFIGFLAGS: --disable-branch-protection
+
 #
 # Debian
 #
