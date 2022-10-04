@@ -2468,10 +2468,6 @@ dnl
 AC_ARG_ENABLE([libva],
   AS_HELP_STRING([--enable-libva], [VAAPI GPU decoding support (libVA) (default auto)]))
 
-AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
-  AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
-])
-
 have_vaapi="no"
 have_vaapi_drm="no"
 have_vaapi_x11="no"
