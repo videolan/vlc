@@ -42,6 +42,9 @@ Widgets.PageLoader {
         name: "home",
         url: "qrc:///network/NetworkHomeDisplay.qml"
     }, {
+        name: "device",
+        component: browseDevice,
+    }, {
         name: "browse",
         component: browseComponent,
         guard: function (prop) { return !!prop.tree }
@@ -61,24 +64,61 @@ Widgets.PageLoader {
                            ||
                            currentItem.isViewMultiView);
 
-        if (view.name === "browse")
-            localMenuDelegate = componentBar
-        else
+        if (view.name === "home")
             localMenuDelegate = null
+        else
+            localMenuDelegate = componentBar
     }
 
     // Connections
+    Connections {
+        target: (stackView.currentItem instanceof BrowseHomeDisplay) ? stackView.currentItem
+                                                                     : null
+
+        onSeeAll: {
+            History.push(["mc", "network", "device", { title: title, sd_source: sd_source }])
+
+            stackView.currentItem.setCurrentItemFocus(reason)
+        }
+    }
 
     Connections {
         target: stackView.currentItem
 
         onBrowse: {
-            History.push(["mc", "network", "browse", { tree: tree }]);
-            stackView.currentItem.setCurrentItemFocus(reason);
+            History.push(["mc", "network", "browse", { tree: tree }])
+
+            stackView.currentItem.setCurrentItemFocus(reason)
         }
     }
 
     // Children
+
+    Component {
+        id: browseDevice
+
+        BrowseDeviceView {
+            id: viewDevice
+
+            property var sd_source
+
+            property var sortModel: [
+                { text: I18n.qtr("Alphabetic"), criteria: "name" },
+                { text: I18n.qtr("Url"),        criteria: "mrl"  }
+            ]
+
+            displayMarginEnd: g_mainDisplay.displayMargin
+
+            model: modelFilter
+
+            sourceModel: NetworkDeviceModel {
+                ctx: MainCtx
+
+                sd_source: viewDevice.sd_source
+                source_name: "*"
+            }
+        }
+    }
 
     Component {
         id: browseComponent

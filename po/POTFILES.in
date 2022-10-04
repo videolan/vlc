@@ -835,6 +835,7 @@ modules/gui/qt/network/qml/BrowseDeviceView.qml
 modules/gui/qt/network/qml/DiscoverDisplay.qml
 modules/gui/qt/network/qml/DiscoverUrlDisplay.qml
 modules/gui/qt/network/qml/NetworkBrowseDisplay.qml
+modules/gui/qt/network/qml/NetworkDisplay.qml
 modules/gui/qt/network/qml/NetworkGridItem.qml
 modules/gui/qt/network/qml/NetworkHomeDisplay.qml
 modules/gui/qt/network/qml/NetworkListItem.qml
