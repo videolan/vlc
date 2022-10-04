@@ -138,9 +138,6 @@ FFMPEGCONF += --cpu=core2
 endif
 ifdef HAVE_IOS
 FFMPEGCONF += --enable-pic --extra-ldflags="$(EXTRA_CFLAGS) -isysroot $(IOS_SDK)"
-ifeq ($(ARCH),arm) # gas-preprocessor.pl
-FFMPEGCONF += --as="$(AS)"
-endif
 endif
 endif
 

@@ -120,13 +120,6 @@ endif
 
 CCAS=$(CC) -c
 
-ifdef HAVE_IOS
-ifeq ($(ARCH),arm)
-AS=perl $(abspath $(VLC_TOOLS)/bin/gas-preprocessor.pl) $(CC)
-CCAS=gas-preprocessor.pl $(CC) -c
-endif
-endif
-
 LN_S = ln -s
 ifdef HAVE_WIN32
 MINGW_W64_VERSION := $(shell echo "__MINGW64_VERSION_MAJOR" | $(CC) $(CFLAGS) -E -include _mingw.h - | tail -n 1)
