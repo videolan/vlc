@@ -20,10 +20,6 @@ speexdsp: speexdsp-$(SPEEXDSP_VERSION).tar.gz .sum-speexdsp
 	$(MOVE)
 
 SPEEXDSP_CONF := --enable-resample-full-sinc-table --disable-examples
-ifeq ($(ARCH),aarch64)
-# old neon, not compatible with aarch64
-SPEEXDSP_CONF += --disable-neon
-endif
 ifeq ($(filter arm aarch64, $(ARCH)),)
 # The configure script checks for NEON C intrinsics only.
 # This leads to false positives on Android-x86.
