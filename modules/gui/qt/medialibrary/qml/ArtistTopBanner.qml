@@ -76,7 +76,6 @@ FocusScope {
         anchors.leftMargin: VLCStyle.margin_xlarge
 
         spacing: VLCStyle.margin_normal
-        clip: true
 
         Item {
             implicitHeight: VLCStyle.cover_normal
