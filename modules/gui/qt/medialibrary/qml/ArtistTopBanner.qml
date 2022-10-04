@@ -34,7 +34,7 @@ FocusScope {
 
     property var artist: ({})
 
-    height: VLCStyle.artistBanner_height
+    implicitHeight: VLCStyle.artistBanner_height
 
     function setCurrentItemFocus(reason) {
         playActionBtn.forceActiveFocus(reason);
@@ -42,10 +42,9 @@ FocusScope {
 
     Image {
         id: background
-        asynchronous: true
+        anchors.fill: parent
 
-        width: parent.width
-        height: VLCStyle.artistBanner_height
+        asynchronous: true
         source: artist.cover || VLCStyle.noArtArtist
         sourceSize: artist.cover ? Qt.size(MainCtx.screen ? Helpers.alignUp(MainCtx.screen.availableGeometry.width, 32) : 1024, 0)
                                  : undefined
@@ -75,24 +74,22 @@ FocusScope {
         anchors.topMargin: VLCStyle.margin_xxlarge
         anchors.bottomMargin: VLCStyle.margin_xxlarge
         anchors.leftMargin: VLCStyle.margin_xlarge
+
         spacing: VLCStyle.margin_normal
         clip: true
 
         Item {
-            Layout.alignment: Qt.AlignVCenter
-            Layout.preferredHeight: VLCStyle.cover_normal
-            Layout.preferredWidth: VLCStyle.cover_normal
+            implicitHeight: VLCStyle.cover_normal
+            implicitWidth: VLCStyle.cover_normal
 
             RoundImage {
                 source: artist.cover || VLCStyle.noArtArtist
-                height: VLCStyle.cover_normal
-                width: VLCStyle.cover_normal
+                anchors.fill: parent
                 radius: VLCStyle.cover_normal
             }
 
             Rectangle {
-                height: VLCStyle.cover_normal
-                width: VLCStyle.cover_normal
+                anchors.fill: parent
                 radius: VLCStyle.cover_normal
                 color: "transparent"
                 border.width: VLCStyle.dp(1, VLCStyle.scale)
@@ -103,12 +100,13 @@ FocusScope {
         ColumnLayout {
             spacing: 0
 
-            Layout.alignment: Qt.AlignVCenter
             Layout.fillWidth: true
 
             Widgets.SubtitleLabel {
                 text: artist.name || I18n.qtr("No artist")
                 color: "white"
+
+                Layout.maximumWidth: parent.width
             }
 
             Widgets.MenuCaption {
@@ -117,6 +115,7 @@ FocusScope {
                 opacity: .6
 
                 Layout.topMargin: VLCStyle.margin_xxxsmall
+                Layout.maximumWidth: parent.width
             }
 
             Widgets.NavigableRow {
