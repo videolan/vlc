@@ -27,6 +27,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
     id: root
@@ -46,6 +47,8 @@ FocusScope {
         width: parent.width
         height: VLCStyle.artistBanner_height
         source: artist.cover || VLCStyle.noArtArtist
+        sourceSize: artist.cover ? Qt.size(MainCtx.screen ? Helpers.alignUp(MainCtx.screen.availableGeometry.width, 32) : 1024, 0)
+                                 : undefined
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
 
         Rectangle {
