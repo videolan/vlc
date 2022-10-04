@@ -16,6 +16,7 @@ $(TARBALLS)/speexdsp-$(SPEEXDSP_VERSION).tar.gz:
 speexdsp: speexdsp-$(SPEEXDSP_VERSION).tar.gz .sum-speexdsp
 	$(UNPACK)
 	$(call pkg_static,"speexdsp.pc.in")
+	$(APPLY) $(SRC)/speexdsp/missing-stdint-for-aarch.patch
 	$(MOVE)
 
 SPEEXDSP_CONF := --enable-resample-full-sinc-table --disable-examples

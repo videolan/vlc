@@ -1,0 +1,29 @@
+From 1d99e79f604aa23fd3c9db2a727f24287519999b Mon Sep 17 00:00:00 2001
+From: Christoph Reiter <reiter.christoph@gmail.com>
+Date: Wed, 22 Jun 2022 09:19:45 +0200
+Subject: [PATCH 1/1] resample_neon.h: add missing stdint include for aarch64
+
+aarch64 code is referencing stdint types but the file is missing
+the include.
+
+Signed-off-by: Tristan Matthews <tmatth@videolan.org>
+---
+ libspeexdsp/resample_neon.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libspeexdsp/resample_neon.h b/libspeexdsp/resample_neon.h
+index e14ffe1..85a51fe 100644
+--- a/libspeexdsp/resample_neon.h
++++ b/libspeexdsp/resample_neon.h
+@@ -36,6 +36,8 @@
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
++#include <stdint.h>
++
+ #ifdef FIXED_POINT
+ #if defined(__aarch64__)
+ static inline int32_t saturate_32bit_to_16bit(int32_t a) {
+-- 
+2.34.1
+
