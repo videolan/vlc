@@ -62,11 +62,10 @@ FocusScope {
         }
     }
 
-    GaussianBlur {
+    FastBlur {
         source: background
         anchors.fill: background
         radius: VLCStyle.dp(4, VLCStyle.scale)
-        samples: (radius * 2) + 1
     }
 
     RowLayout {
