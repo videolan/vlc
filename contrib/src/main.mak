@@ -119,7 +119,7 @@ endif
 CCAS=$(CC) -c
 
 ifdef HAVE_IOS
-ifdef HAVE_NEON
+ifeq ($(ARCH),arm)
 AS=perl $(abspath $(VLC_TOOLS)/bin/gas-preprocessor.pl) $(CC)
 CCAS=gas-preprocessor.pl $(CC) -c
 endif
