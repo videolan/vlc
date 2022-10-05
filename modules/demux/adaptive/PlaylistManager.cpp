@@ -158,6 +158,8 @@ bool PlaylistManager::init(bool b_preparsing)
     playlist->playbackStart.Set(time(nullptr));
     nextPlaylistupdate = playlist->playbackStart.Get();
 
+    if(b_preparsing)
+        preparsePlaylist();
     updateControlsPosition();
 
     return true;
@@ -411,6 +413,11 @@ bool PlaylistManager::updatePlaylist()
 
     updateControlsPosition();
     return true;
+}
+
+void PlaylistManager::preparsePlaylist()
+{
+
 }
 
 Times PlaylistManager::getTimes(bool b_first) const

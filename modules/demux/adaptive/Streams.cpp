@@ -724,7 +724,7 @@ bool AbstractStream::getMediaAdvanceAmount(vlc_tick_t *duration) const
     return true;
 }
 
-bool AbstractStream::runUpdates()
+bool AbstractStream::runUpdates(bool b_preparsing)
 {
     if(!valid)
         return false;
