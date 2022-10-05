@@ -161,7 +161,7 @@ FocusScope {
             displayText: I18n.qtr("Browse"),
             icon: VLCIcons.topbar_network,
             name: "network",
-            url: "qrc:///network/NetworkDisplay.qml"
+            url: "qrc:///network/BrowseDisplay.qml"
         }, {
             listed: true,
             displayText: I18n.qtr("Discover"),
