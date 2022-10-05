@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 
 T.ToolButton {
@@ -29,6 +31,12 @@ T.ToolButton {
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
 
     padding: VLCStyle.margin_xxsmall
+
+    // Keys
+
+    Keys.priority: Keys.AfterItem
+
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
     contentItem: T.Label {
         text: control.text
