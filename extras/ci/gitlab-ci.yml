@@ -171,6 +171,9 @@ win64-arm-llvm:
     variables:
         <<: *variables-win64-arm
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
+        # Clang <= 15 produces incorrect unwind info for code with
+        # branch protection enabled on Windows.
+        CONFIGFLAGS: --disable-branch-protection
 
 uwp64-libvlc-llvm:
     extends: .win-common
