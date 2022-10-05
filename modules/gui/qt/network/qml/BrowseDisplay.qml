@@ -40,7 +40,7 @@ Widgets.PageLoader {
 
     pageModel: [{
         name: "home",
-        url: "qrc:///network/NetworkHomeDisplay.qml"
+        url: "qrc:///network/BrowseHomeDisplay.qml"
     }, {
         name: "device",
         component: browseDevice,

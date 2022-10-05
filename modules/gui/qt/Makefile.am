@@ -851,13 +851,13 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/BrowseDeviceHeader.qml \
 	gui/qt/network/qml/BrowseDeviceView.qml \
 	gui/qt/network/qml/BrowseDisplay.qml \
+	gui/qt/network/qml/BrowseHomeDisplay.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/DiscoverUrlDisplay.qml \
 	gui/qt/network/qml/NetworkAddressbar.qml \
 	gui/qt/network/qml/NetworkBrowseDisplay.qml \
 	gui/qt/network/qml/NetworkCustomCover.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
-	gui/qt/network/qml/NetworkHomeDisplay.qml \
 	gui/qt/network/qml/NetworkListItem.qml \
 	gui/qt/network/qml/NetworkThumbnailItem.qml \
 	gui/qt/network/qml/ServicesHomeDisplay.qml \

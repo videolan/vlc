@@ -833,11 +833,11 @@ modules/gui/qt/menus/qml_menu_wrapper.hpp
 modules/gui/qt/network/qml/BrowseDeviceHeader.qml
 modules/gui/qt/network/qml/BrowseDeviceView.qml
 modules/gui/qt/network/qml/BrowseDisplay.qml
+modules/gui/qt/network/qml/BrowseHomeDisplay.qml
 modules/gui/qt/network/qml/DiscoverDisplay.qml
 modules/gui/qt/network/qml/DiscoverUrlDisplay.qml
 modules/gui/qt/network/qml/NetworkBrowseDisplay.qml
 modules/gui/qt/network/qml/NetworkGridItem.qml
-modules/gui/qt/network/qml/NetworkHomeDisplay.qml
 modules/gui/qt/network/qml/NetworkListItem.qml
 modules/gui/qt/network/qml/ServicesHomeDisplay.qml
 modules/gui/qt/player/control_list_filter.cpp
