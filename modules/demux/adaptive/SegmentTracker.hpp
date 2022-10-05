@@ -235,7 +235,7 @@ namespace adaptive
             void notifyBufferingState(bool) const;
             void notifyBufferingLevel(vlc_tick_t, vlc_tick_t, vlc_tick_t, vlc_tick_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
-            void updateSelected();
+            bool updateSelected();
             bool bufferingAvailable() const;
 
         private:
