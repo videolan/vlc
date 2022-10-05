@@ -24,8 +24,10 @@ endif
 
 # We don't want vulkan on darwin for now
 ifndef HAVE_DARWIN_OS
+ifndef HAVE_EMSCRIPTEN
 DEPS_libplacebo += vulkan-loader $(DEPS_vulkan-loader) vulkan-headers $(DEPS_vulkan-headers)
 PLACEBOCONF += -Dvulkan-registry=${PREFIX}/share/vulkan/registry/vk.xml
+endif
 endif
 
 $(TARBALLS)/$(PLACEBO_ARCHIVE):
