@@ -102,7 +102,7 @@ namespace adaptive
         virtual bool setPosition(const StreamPosition &, bool);
         bool getMediaPlaybackTimes(mtime_t *, mtime_t *, mtime_t *) const;
         bool getMediaAdvanceAmount(mtime_t *) const;
-        bool runUpdates();
+        bool runUpdates(bool = false);
 
         /* Used by demuxers fake streams */
         virtual block_t *readNextBlock() override;

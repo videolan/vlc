@@ -727,7 +727,7 @@ bool AbstractStream::getMediaAdvanceAmount(mtime_t *duration) const
     return true;
 }
 
-bool AbstractStream::runUpdates()
+bool AbstractStream::runUpdates(bool)
 {
     if(!valid)
         return false;

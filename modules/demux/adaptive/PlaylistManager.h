@@ -66,6 +66,7 @@ namespace adaptive
             virtual bool needsUpdate() const;
             virtual bool updatePlaylist();
             virtual void scheduleNextUpdate();
+            virtual void preparsePlaylist();
 
             /* static callbacks */
             static int control_callback(demux_t *, int, va_list);
@@ -105,6 +106,7 @@ namespace adaptive
             demux_t                             *p_demux;
             std::vector<AbstractStream *>        streams;
             BasePeriod                          *currentPeriod;
+            bool                                 b_preparsing;
 
             enum class TimestampSynchronizationPoint
             {
@@ -151,7 +153,6 @@ namespace adaptive
             bool         b_buffering;
             bool         b_canceled;
             mtime_t      pause_start;
-            bool         b_preparsing;
     };
 
 }
