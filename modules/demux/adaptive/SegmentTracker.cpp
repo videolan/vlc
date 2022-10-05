@@ -596,18 +596,22 @@ bool SegmentTracker::bufferingAvailable() const
     return true;
 }
 
-void SegmentTracker::updateSelected()
+bool SegmentTracker::updateSelected()
 {
+    bool b_updated;
     if(current.rep && current.rep->needsUpdate(next.number))
     {
-        bool b_updated = current.rep->runLocalUpdates(resources);
+        b_updated = current.rep->runLocalUpdates(resources);
         current.rep->scheduleNextUpdate(current.number, b_updated);
         if(b_updated)
             notify(RepresentationUpdatedEvent(current.rep));
     }
+    else b_updated = false;
 
     if(current.rep && current.rep->canNoLongerUpdate())
         notify(RepresentationUpdateFailedEvent(current.rep));
+
+    return b_updated;
 }
 
 void SegmentTracker::notify(const TrackerEvent &event) const

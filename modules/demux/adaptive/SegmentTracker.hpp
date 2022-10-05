@@ -235,7 +235,7 @@ namespace adaptive
             void notifyBufferingState(bool) const;
             void notifyBufferingLevel(mtime_t, mtime_t, mtime_t, mtime_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
-            void updateSelected();
+            bool updateSelected();
             bool bufferingAvailable() const;
 
         private:
