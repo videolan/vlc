@@ -141,6 +141,7 @@ diagnostic "vlc contribs: bootstrap"
             --disable-spatialaudio --disable-speex \
             --disable-speexdsp --disable-taglib --disable-zvbi \
             --disable-rnnoise --disable-libaribcaption \
+            --disable-ogg --disable-vorbis --disable-kate --disable-flac \
             --host=wasm32-unknown-emscripten --enable-rav1e
 
 diagnostic "vlc contribs: make"
