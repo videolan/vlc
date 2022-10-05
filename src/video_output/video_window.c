@@ -198,7 +198,7 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
         var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
     if (vlc_mouse_HasButton(&state->mouse.video, &video_mouse))
         var_SetInteger(vout, "mouse-button-down", m->i_pressed);
-    if (m->b_double_click)
+    if (m->b_double_click && ev->button_mask == MOUSE_BUTTON_LEFT)
         var_ToggleBool(vout, "fullscreen");
 
     state->mouse.video = video_mouse;
