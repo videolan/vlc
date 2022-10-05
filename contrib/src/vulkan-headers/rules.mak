@@ -14,7 +14,7 @@ vulkan-headers: Vulkan-Headers-$(VULKAN_HEADERS_VERSION).tar.gz .sum-vulkan-head
 
 .vulkan-headers: vulkan-headers toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
+	$(HOSTVARS_PIC) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
