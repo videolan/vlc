@@ -131,6 +131,7 @@ Widgets.OverlayMenu {
         id: deleteAction
         text: I18n.qtr("Remove Selected")
         onTriggered: listView.onDelete()
+        enabled: (root.mode !== PlaylistListView.Mode.Move)
     }
 
     readonly property var rootMenu: ({
