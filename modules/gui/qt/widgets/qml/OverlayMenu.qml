@@ -242,8 +242,8 @@ FocusScope {
                     Loader {
                         id: icon
 
-                        Layout.preferredWidth: VLCStyle.icon_small
-                        Layout.preferredHeight: VLCStyle.icon_small
+                        Layout.preferredWidth: VLCStyle.icon_normal
+                        Layout.preferredHeight: VLCStyle.icon_normal
                         Layout.alignment: Qt.AlignHCenter
 
                         active: (!!modelData.icon.source || !!modelData.fontIcon || modelData.tickMark === true)
