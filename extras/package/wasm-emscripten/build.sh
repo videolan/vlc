@@ -31,6 +31,8 @@ get_entryname()
     echo "$entryname"
 }
 
+VLC_USE_SANITIZER=
+
 while test -n "$1"
 do
     case "$1" in
@@ -43,6 +45,9 @@ do
             ;;
         --with-prebuilt-contribs)
             VLC_USE_PREBUILT_CONTRIBS=1
+            ;;
+        --with-sanitizer=*)
+            VLC_USE_SANITIZER="${1#--with-sanitizer=}"
             ;;
         --gen-contrib-archive|-c)
             GENERATE_ARCHIVE=1
@@ -164,12 +169,17 @@ if [ $BUILD_MODE -eq 1 ]; then
     # in tools/deps_info.py
 
     # shm.h is a blacklisted module
+    SANITIZER_OPTIONS=
+    if [ ! -z "${VLC_USE_SANITIZER}" ]; then
+        SANITIZER_OPTIONS="--with-sanitizer=${VLC_USE_SANITIZER}"
+    fi
     emconfigure "$VLC_SRCPATH"/configure --host=wasm32-unknown-emscripten --enable-debug \
                         --disable-shared --disable-vlc \
                         --disable-sout --disable-vlm --disable-a52 --disable-xcb --disable-lua \
                         --disable-addonmanagermodules --disable-ssp --disable-nls \
                         --enable-gles2 \
-                        --with-contrib="$VLC_SRCPATH"/contrib/wasm32-unknown-emscripten
+                        --with-contrib="$VLC_SRCPATH"/contrib/wasm32-unknown-emscripten \
+                        "${SANITIZER_OPTIONS}"
 fi
 
 diagnostic "libvlc build: make"
@@ -201,6 +211,11 @@ const void *vlc_static_modules[] = {
 
 diagnostic "vlc static modules: compiling static modules entry points"
 # compile vlc-modules.c
-emcc -pthread -c "$BUILD_PATH"/vlc-modules.c -o "$BUILD_PATH"/vlc-modules.bc
+SANITIZERS=
+if echo "${VLC_USE_SANITIZER}" | grep address > /dev/null; then
+SANITIZERS="$SANITIZERS -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer"
+fi
+
+emcc $SANITIZERS -pthread -c "$BUILD_PATH"/vlc-modules.c -o "$BUILD_PATH"/vlc-modules.bc
 
 echo "VLC for wasm32-unknown-emscripten built!"
