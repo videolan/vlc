@@ -724,10 +724,15 @@ bool AbstractStream::getMediaAdvanceAmount(vlc_tick_t *duration) const
     return true;
 }
 
-void AbstractStream::runUpdates()
+bool AbstractStream::runUpdates()
 {
-    if(valid && !disabled)
-        segmentTracker->updateSelected();
+    if(!valid)
+        return false;
+
+    if(!disabled)
+        return segmentTracker->updateSelected();
+    else
+        return false;
 }
 
 void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
