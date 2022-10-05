@@ -69,7 +69,7 @@ Widgets.PageLoader {
     Component {
         id: sourceRootComponent
 
-        NetworkBrowseDisplay {
+        BrowseTreeDisplay {
             property alias source_name: deviceModel.source_name
 
             property Component addressBar: NetworkAddressbar {
@@ -111,7 +111,7 @@ Widgets.PageLoader {
     Component {
         id: sourceBrowseComponent
 
-        NetworkBrowseDisplay {
+        BrowseTreeDisplay {
             property string root_name
             property string source_name
 

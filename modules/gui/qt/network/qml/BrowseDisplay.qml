@@ -123,7 +123,7 @@ Widgets.PageLoader {
     Component {
         id: browseComponent
 
-        NetworkBrowseDisplay {
+        BrowseTreeDisplay {
             providerModel: NetworkMediaModel {
                 ctx: MainCtx
             }

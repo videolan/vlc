@@ -223,10 +223,10 @@
         <file alias="BrowseDeviceView.qml">network/qml/BrowseDeviceView.qml</file>
         <file alias="BrowseDisplay.qml">network/qml/BrowseDisplay.qml</file>
         <file alias="BrowseHomeDisplay.qml">network/qml/BrowseHomeDisplay.qml</file>
+        <file alias="BrowseTreeDisplay.qml">network/qml/BrowseTreeDisplay.qml</file>
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
         <file alias="DiscoverUrlDisplay.qml">network/qml/DiscoverUrlDisplay.qml</file>
         <file alias="NetworkCustomCover.qml">network/qml/NetworkCustomCover.qml</file>
-        <file alias="NetworkBrowseDisplay.qml">network/qml/NetworkBrowseDisplay.qml</file>
         <file alias="NetworkGridItem.qml">network/qml/NetworkGridItem.qml</file>
         <file alias="NetworkListItem.qml">network/qml/NetworkListItem.qml</file>
         <file alias="NetworkThumbnailItem.qml">network/qml/NetworkThumbnailItem.qml</file>
