@@ -20,6 +20,8 @@ DEPS_qt += wine-headers
 endif
 endif
 
+DEPS_qt += zlib $(DEPS_zlib)
+
 ifeq ($(call need_pkg,"Qt5Core >= 5.11 Qt5Gui Qt5Widgets"),)
 PKGS_FOUND += qt
 endif
@@ -95,7 +97,8 @@ QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
 QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-vulkan -no-sql-odbc -no-pch -no-feature-testlib \
-	-no-compile-examples -nomake examples -nomake tests  -qt-zlib
+	-no-compile-examples -nomake examples -nomake tests \
+	-system-zlib
 
 QT_CONFIG += -skip qtsql
 QT_CONFIG += -release
@@ -123,7 +126,6 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 		sub-gui-install_subtargets \
 		sub-widgets-install_subtargets \
 		sub-platformsupport-install_subtargets \
-		sub-zlib-install_subtargets \
 		sub-bootstrap-install_subtargets \
 		sub-network-install_subtargets
 	# Install tools
