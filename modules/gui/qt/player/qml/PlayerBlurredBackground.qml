@@ -80,6 +80,7 @@ Item {
         anchors.fill: parent
         visible: true
         blending: false
+        cullMode: ShaderEffect.BackFaceCulling
 
         fragmentShader: "qrc:///player/PlayerBlurredBackground.frag"
     }

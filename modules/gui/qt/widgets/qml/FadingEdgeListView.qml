@@ -191,6 +191,8 @@ ListView {
             // can not be placed in the atlas.
             supportsAtlasTextures: false
 
+            // cullMode: ShaderEffect.BackFaceCulling // Does not work sometimes. Qt bug?
+
             vertexShader: " uniform highp mat4 qt_Matrix;
 
                             attribute highp vec4 qt_Vertex;

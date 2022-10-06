@@ -78,6 +78,8 @@ Item {
                     readonly property real noiseStrength: effect.noiseStrength
                     readonly property real exclusionStrength: effect.exclusionStrength
 
+                    cullMode: ShaderEffect.BackFaceCulling
+
                     fragmentShader: "
                         uniform lowp sampler2D source; // this item
                         varying highp vec2 qt_TexCoord0;
