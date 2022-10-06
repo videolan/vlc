@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 
+int WindowsThemeProviderOpen(vlc_object_t* p_this);
 int SystemPaletteThemeProviderOpen(vlc_object_t* p_this);
 
 #endif // WINDOWSTHEMEPROVIDER_HPP

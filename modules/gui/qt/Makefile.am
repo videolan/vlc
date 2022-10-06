@@ -321,7 +321,8 @@ libqt_plugin_la_SOURCES += \
 	gui/qt/maininterface/mainctx_win32.cpp \
 	gui/qt/maininterface/mainctx_win32.hpp \
 	gui/qt/maininterface/compositor_win7.cpp \
-	gui/qt/maininterface/compositor_win7.hpp
+	gui/qt/maininterface/compositor_win7.hpp \
+	gui/qt/style/windowsthemeprovider.cpp
 
 if HAVE_DCOMP
 libqt_plugin_la_SOURCES += \

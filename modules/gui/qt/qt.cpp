@@ -405,6 +405,13 @@ vlc_module_begin ()
         set_capability( "vout window", 0 )
         set_callback( WindowOpen )
 
+#ifdef _WIN32
+    add_submodule ()
+        set_capability( "qt theme provider", 10 )
+        set_callback( WindowsThemeProviderOpen )
+        set_description( "Qt Windows theme" )
+        add_shortcut("qt-themeprovider-windows")
+#endif
     add_submodule()
         set_capability("qt theme provider", 1)
         set_description( "Qt basic system theme" )
