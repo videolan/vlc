@@ -36,7 +36,7 @@
 #include "util/imageluminanceextractor.hpp"
 #include "util/i18n.hpp"
 #include "util/keyhelper.hpp"
-#include "util/systempalette.hpp"
+#include "style/systempalette.hpp"
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
 #include "util/qmlinputitem.hpp"
@@ -227,7 +227,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);
         qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::callback);
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
-        qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::callback);
         qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
@@ -242,6 +241,7 @@ void MainUI::registerQMLTypes()
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
         qmlRegisterUncreatableType<ColorSchemeModel>(uri, versionMajor, versionMinor, "ColorSchemeModel", "");
+        qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
 
         qRegisterMetaType<QmlInputItem>();
 

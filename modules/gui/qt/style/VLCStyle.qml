@@ -35,11 +35,23 @@ QtObject {
 
     property alias self: vlc_style
 
-    readonly property VLCColors colors: VLCColors {}
+    readonly property SystemPalette theme:  SystemPalette {
+        source: MainCtx.colorScheme.scheme
+        ctx: MainCtx
+    }
+
+    readonly property VLCColors colors: VLCColors {
+        palette: vlc_style.theme
+    }
 
     // When trying to force night/dark theme colors for items,
     // this can be used:
-    readonly property VLCColors nightColors: VLCColors { state: "night" }
+    readonly property VLCColors nightColors: VLCColors {
+        palette: SystemPalette {
+            source: ColorSchemeModel.Night
+            ctx: MainCtx
+        }
+    }
 
     // Sizes
     readonly property double margin_xxxsmall: dp(2, scale);

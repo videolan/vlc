@@ -240,6 +240,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/network/networkmediamodel.hpp \
 	gui/qt/network/servicesdiscoverymodel.cpp \
 	gui/qt/network/servicesdiscoverymodel.hpp \
+	gui/qt/style/systempalette.cpp \
+	gui/qt/style/systempalette.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/player_controlbar_model.cpp gui/qt/player/player_controlbar_model.hpp \
@@ -285,7 +287,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/sortfilterproxymodel.cpp \
 	gui/qt/util/sortfilterproxymodel.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
-	gui/qt/util/systempalette.cpp gui/qt/util/systempalette.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
 	gui/qt/util/varcommon_p.hpp \
 	gui/qt/util/varchoicemodel.cpp  gui/qt/util/varchoicemodel.hpp \
@@ -446,6 +447,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/network/networksourcesmodel.moc.cpp \
 	gui/qt/network/networkmediamodel.moc.cpp \
 	gui/qt/network/servicesdiscoverymodel.moc.cpp \
+	gui/qt/style/systempalette.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/player_controlbar_model.moc.cpp \
@@ -471,7 +473,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
 	gui/qt/util/sortfilterproxymodel.moc.cpp \
-	gui/qt/util/systempalette.moc.cpp \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/util/variables.moc.cpp \

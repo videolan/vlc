@@ -17,16 +17,18 @@
  *****************************************************************************/
 import QtQuick 2.11
 
-import org.videolan.vlc 0.1 as VLC
+import org.videolan.vlc 0.1
 
 Item {
     id: colors_id
 
+    /* required*/ property var palette
+
     function blendColors( a, b, blend ) {
-        return Qt.rgba( a.r * blend + b.r * (1. - blend),
-                       a.g * blend + b.g * (1. - blend),
-                       a.b * blend + b.b * (1. - blend),
-                       a.a * blend + b.a * (1. - blend))
+        return Qt.rgba(b.r + (a.r - b.r) * blend,
+                       b.g + (a.g - b.g) * blend,
+                       b.b + (a.b - b.b) * blend,
+                       b.a + (a.a - b.a) * blend)
     }
 
     function setColorAlpha( c, alpha )
@@ -46,276 +48,135 @@ Item {
             return "transparent"
     }
 
-    property bool  isThemeDark: false
+    readonly property bool isThemeDark: palette.isDark
 
-    property color text: VLC.SystemPalette.text;
-    property color textInactive: VLC.SystemPalette.textInactive;
-    property color textDisabled: VLC.SystemPalette.textDisabled;
+    readonly property color text: palette.text;
+    readonly property color textInactive: palette.textInactive;
+    readonly property color textDisabled: palette.textDisabled;
 
-    property color caption: setColorAlpha(text, .4)
-    property color menuCaption: setColorAlpha(text, .6)
+    readonly property color caption: setColorAlpha(text, .4)
+    readonly property color menuCaption: setColorAlpha(text, .6)
 
-    property color bg: VLC.SystemPalette.base;
-    property color bgInactive: VLC.SystemPalette.baseInactive;
+    readonly property color bg: palette.bg;
+    readonly property color bgInactive: palette.bgInactive;
 
     //for alternate rows
-    property color bgAlt: VLC.SystemPalette.alternateBase;
-    property color bgAltInactive: VLC.SystemPalette.alternateBaseInactive;
+    readonly property color bgAlt: palette.bgAlt;
+    readonly property color bgAltInactive: palette.bgAltInactive;
 
-    property color bgHover: VLC.SystemPalette.highlight;
-    property color bgHoverText: VLC.SystemPalette.highlightText;
-    property color bgHoverInactive: VLC.SystemPalette.highlightInactive;
-    property color bgHoverTextInactive: VLC.SystemPalette.highlightTextInactive;
+    readonly property color bgHover: palette.bgHover;
+    readonly property color bgHoverText: palette.bgHoverText;
+    readonly property color bgHoverInactive: palette.bgHoverInactive;
+    readonly property color bgHoverTextInactive: palette.bgHoverTextInactive;
 
-    property color bgFocus: (isThemeDark) ? white : black
+    readonly property color bgFocus: palette.bgFocus
 
     // Banner
 
-    property color border: (isThemeDark) ? "#303030" : "#e0e0e0"
+    readonly property color border: palette.border
 
     // Button
 
-    property color button: VLC.SystemPalette.button
+    readonly property color button: palette.button
 
-    property color buttonHover: (isThemeDark) ? "#303030" : "#f2f2f2"
+    readonly property color buttonHover: palette.buttonHover
 
-    property color buttonText: VLC.SystemPalette.buttonText
-    property color buttonTextHover: bgFocus
+    readonly property color buttonText: palette.buttonText
+    readonly property color buttonTextHover: bgFocus
 
-    property color buttonBorder: blendColors(VLC.SystemPalette.button, VLC.SystemPalette.buttonText, 0.8)
+    readonly property color buttonBorder: blendColors(palette.button, palette.buttonText, 0.8)
 
     // ButtonBanner (BannerTabButton)
 
-    property color buttonBannerDark: "#a6a6a6"
+    readonly property color buttonBannerDark: "#a6a6a6"
 
-    property color buttonBanner: (isThemeDark) ? buttonBannerDark : "#666666"
+    readonly property color buttonBanner: palette.buttonBanner
 
     // ButtonPrimary (ActionButtonPrimary)
 
-    property color buttonPrimaryHover: (isThemeDark) ? "#e67A00" : "#e65609"
+    readonly property color buttonPrimaryHover: palette.buttonPrimaryHover
 
     // ButtonPlayer (IconControlButton)
 
-    property color buttonPlayer: (isThemeDark) ? "#e5e5e5" : "#484848"
+    readonly property color buttonPlayer: palette.buttonPlayer
 
     // ButtonPlay (ControlButtons)
 
-    property color buttonPlayA: "#f89a06"
-    property color buttonPlayB: "#e25b01"
+    readonly property color buttonPlayA: "#f89a06"
+    readonly property color buttonPlayB: "#e25b01"
 
-    property color buttonPlayIcon: "#333333"
+    readonly property color buttonPlayIcon: "#333333"
 
     // GridItem
 
     // NOTE: This needs to contrast with the background because we have no border.
-    property color grid: (isThemeDark) ? "#272727" : "#ededed"
+    readonly property color grid: palette.grid
 
-    property color gridSelect: (isThemeDark) ? "#303030" : "#e5e5e5"
+    readonly property color gridSelect: palette.gridSelect
 
     // ListItem
 
-    property color listHover: (isThemeDark) ? "#272727" : "#e9e9e9"
+    readonly property color listHover: palette.listHover
 
     // TrackItem (CheckedDelegate)
 
-    property color trackItem: "#303030"
-    property color trackItemHover: "#2a2a2a"
+    readonly property color trackItem: palette.darkGrey800
+    readonly property color trackItemHover: palette.darkGrey600
 
     // TextField
 
-    property color textField: (isThemeDark) ? "#6f6f6f" : "#999999"
-    property color textFieldHover: (isThemeDark) ? "#b7b7b7" : "#4c4c4c"
+    readonly property color textField: palette.textField
+    readonly property color textFieldHover: palette.textFieldHover
 
-    property color icon: isThemeDark ? white : "#616161"
+    readonly property color icon: palette.icon
 
-    property color textActiveSource: "red";
+    readonly property color textActiveSource: "red";
 
-    property color topBanner: VLC.SystemPalette.window
-    property color topBannerHover: VLC.SystemPalette.highlight
+    readonly property color topBanner: palette.topBanner
 
-    property color lowerBanner: bg
+    readonly property color lowerBanner: palette.lowerBanner
 
-    property color volsliderbg: "#bdbebf"
-    property color volbelowmid: "#99d299"
-    property color volabovemid: "#14d214"
-    property color volhigh: "#ffc70f"
-    property color volmax: "#f5271d"
+    readonly property color volsliderbg: "#bdbebf"
+    readonly property color volbelowmid: "#99d299"
+    readonly property color volabovemid: "#14d214"
+    readonly property color volhigh: "#ffc70f"
+    readonly property color volmax: "#f5271d"
 
-    property color playerFg: text
-    property color playerFgInactive: textInactive
-    property color playerControlBarFg: playerFg
-    property color playerBg: bg
-    property color playerSeekBar: Qt.lighter(playerBg, 1.6180)
-    property color playerBorder: buttonText
+    readonly property color playerFg: text
+    readonly property color playerFgInactive: textInactive
+    readonly property color playerControlBarFg: playerFg
+    readonly property color playerBg: bg
+    readonly property color playerSeekBar: Qt.lighter(playerBg, 1.6180)
+    readonly property color playerBorder: buttonText
 
-    property color separator: blendColors(bg, text, .95)
-    
-    property color roundPlayCoverBorder: "#979797"
+    readonly property color separator: blendColors(bg, text, .95)
 
-    // playlist
-    property color plItemHovered:  topBannerHover
-    property color plItemSelected: blendColors(plItemHovered, plItemFocused, 0.5)
-    property color plItemFocused: isThemeDark ? "#1E1E1E" : "#EDEDED"
+    readonly property color roundPlayCoverBorder: "#979797"
 
     // basic color definitions for color blending:
-    property color black: "black"
-    property color white: "white"
+    readonly property color black: "black"
+    readonly property color white: "white"
 
     // glow colors:
-    property color glowColor: setColorAlpha(blendColors(bg, black, 0.8), 0.35)
-    property color glowColorBanner: setColorAlpha(blendColors(topBanner, black, isThemeDark ? 0.25 : 0.35), 0.25)
+    readonly property color glowColor: setColorAlpha(blendColors(bg, black, 0.8), 0.35)
+    readonly property color glowColorBanner: setColorAlpha(blendColors(topBanner, black, isThemeDark ? 0.25 : 0.35), 0.25)
 
-    property color sliderBarMiniplayerBgColor: isThemeDark ? "#FF929292" : "#FFEEEEEE"
+    readonly property color sliderBarMiniplayerBgColor: palette.sliderBarMiniplayerBgColor
 
-    property color tooltipTextColor: isThemeDark ? white : black
-    property color tooltipColor: isThemeDark ? black : white
+    readonly property color tooltipTextColor: palette.tooltipTextColor
+    readonly property color tooltipColor: palette.tooltipColor
 
     //vlc orange
-    property color accent: (isThemeDark) ? "#ff8800" : "#ff610a"
+    readonly property color accent: palette.accent
 
-    property color accentText: "#ffffff";
+    readonly property color alert: palette.alert;
 
-    property color alert: "#d70022";
+    readonly property color buffer: "#696969";
 
-    property color buffer: "#696969";
+    readonly property color seekpoint: "red";
+    readonly property color record: "red";
 
-    property color seekpoint: "red";
-    property color record: "red";
+    readonly property color windowCSDButtonBg: palette.windowCSDButtonBg
 
-    property color windowCSDButtonDarkBg:  "#80484848"
-    property color windowCSDButtonLightBg: "#80DADADA"
-    property color windowCSDButtonBg: isThemeDark ? windowCSDButtonDarkBg : windowCSDButtonLightBg
-
-    property color expandDelegate
-
-    state: {
-        switch (VLC.MainCtx.colorScheme.scheme) {
-        case VLC.ColorSchemeModel.System:
-            return "system"
-        case VLC.ColorSchemeModel.Day:
-            return "day"
-        case VLC.ColorSchemeModel.Night:
-            return "night"
-        default:
-            console.assert(false, "Unknown color scheme")
-        }
-    }
-
-    states: [
-        //other styles are provided for testing purpose
-        State {
-            name: "day"
-            PropertyChanges {
-                target: colors_id
-
-                text: "#232627"
-                textInactive: "#7f8c8d"
-
-                bg: "#fafafa"
-                bgInactive: "#fcfdfc"
-
-                bgAlt: "#ededed"
-                bgAltInactive: "#ededed"
-
-                bgHover: "#ededed"
-                bgHoverText: text
-                bgHoverInactive: "#3daee9"
-                bgHoverTextInactive: text
-                bgFocus: "black"
-
-                button: "#eff0f1";
-                buttonText: "#232627";
-                buttonBorder: blendColors(button, buttonText, 0.8);
-
-                textActiveSource: "#ff950d";
-
-                topBanner: "#ededed"
-                topBannerHover: "#f2f2f2"
-                lowerBanner: "#ffffff"
-
-                accent: "#ff610a";
-                separator: "#ededed";
-
-                playerControlBarFg: "#333333"
-
-                expandDelegate: "#ffffff"
-
-                isThemeDark: false;
-            }
-        },
-        State {
-            name: "night"
-            PropertyChanges {
-                target: colors_id
-
-                text: "#eff0f1"
-                textInactive: "#bdc3c7"
-                bg: "#1e1e1e"
-                bgInactive: "#232629"
-                bgAlt: "#242424"
-                bgAltInactive: "#212121"
-                bgHover: "#303030"
-                bgHoverText: text
-                bgHoverInactive: "#3daee9"
-                bgHoverTextInactive: text
-                bgFocus: "white"
-                button: "#31363b"
-                buttonText: "#eff0f1"
-                buttonBorder: "#575b5f"
-                textActiveSource: "#ff950d"
-                topBanner: "#242424"
-                topBannerHover: "#272727"
-                lowerBanner: "#000000"
-                accent: "#ff8800"
-                separator: "#2d2d2d"
-                playerControlBarFg: "#ffffff"
-
-                expandDelegate: "#000000"
-
-                isThemeDark: true
-            }
-        },
-        State {
-            name: "system"
-            PropertyChanges {
-                target: colors_id
-
-                bg: VLC.SystemPalette.base
-                bgInactive: VLC.SystemPalette.baseInactive
-
-                bgAlt: VLC.SystemPalette.alternateBase
-                bgAltInactive: VLC.SystemPalette.alternateBaseInactive
-
-                bgHover: VLC.SystemPalette.highlight
-                bgHoverText: VLC.SystemPalette.highlightText
-                bgHoverInactive: VLC.SystemPalette.highlightInactive
-                bgHoverTextInactive: VLC.SystemPalette.highlightTextInactive
-
-                text: VLC.SystemPalette.text
-                textDisabled: VLC.SystemPalette.textDisabled
-                textInactive: VLC.SystemPalette.textInactive
-
-                button: VLC.SystemPalette.button
-                buttonText: VLC.SystemPalette.buttonText
-                buttonBorder: blendColors(button, buttonText, 0.8)
-
-                textActiveSource: accent
-
-                topBanner: VLC.SystemPalette.window
-                topBannerHover: VLC.SystemPalette.highlight
-                lowerBanner: VLC.SystemPalette.base
-
-                separator: blendColors(bg, text, .95)
-
-                playerControlBarFg: VLC.SystemPalette.text
-
-                expandDelegate: bg
-
-                isThemeDark: VLC.SystemPalette.isDark
-
-                tooltipColor: VLC.SystemPalette.tooltip
-                tooltipTextColor: VLC.SystemPalette.tooltipText
-            }
-        }
-    ]
+    readonly property color expandDelegate: palette.expandDelegate
 }
