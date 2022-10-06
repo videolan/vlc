@@ -89,7 +89,8 @@ endif
 endif
 
 QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
-	-device-option VLC_EXTRA_CXXFLAGS="-isystem $(PREFIX)/include"
+	-device-option VLC_EXTRA_CXXFLAGS="-isystem $(PREFIX)/include" \
+	-device-option VLC_EXTRA_LDFLAGS="-L$(PREFIX)/lib"
 
 QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \

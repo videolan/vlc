@@ -19,7 +19,7 @@ index 85955f7..8602b78 100644
  
 +QMAKE_CFLAGS           += $${VLC_EXTRA_CFLAGS}
 +QMAKE_CXXFLAGS         += $${VLC_EXTRA_CXXFLAGS}
-+QMAKE_LDFLAGS          += $${VLC_EXTRA_LDFLAGS}
++QMAKE_LFLAGS           += $${VLC_EXTRA_LDFLAGS}
 +
  load(qt_config)
 diff --git a/mkspecs/win32-clang-g++/qmake.conf b/mkspecs/win32-clang-g++/qmake.conf
@@ -32,7 +32,7 @@ index 4630ec4..149f779 100644
  
 +QMAKE_CFLAGS           += $${VLC_EXTRA_CFLAGS}
 +QMAKE_CXXFLAGS         += $${VLC_EXTRA_CXXFLAGS}
-+QMAKE_LDFLAGS          += $${VLC_EXTRA_LDFLAGS}
++QMAKE_LFLAGS           += $${VLC_EXTRA_LDFLAGS}
 +
  load(qt_config)
 diff --git a/mkspecs/win32-g++/qmake.conf b/mkspecs/win32-g++/qmake.conf
@@ -45,7 +45,7 @@ index 5e99233..b22cbce 100644
  
 +QMAKE_CFLAGS           += $${VLC_EXTRA_CFLAGS}
 +QMAKE_CXXFLAGS         += $${VLC_EXTRA_CXXFLAGS}
-+QMAKE_LDFLAGS          += $${VLC_EXTRA_LDFLAGS}
++QMAKE_LFLAGS           += $${VLC_EXTRA_LDFLAGS}
 +
  load(qt_config)
 -- 
