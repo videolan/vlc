@@ -34,6 +34,69 @@ QColor blendColors(QColor c1, QColor c2, float blend = 0.5)
 }
 
 
+#ifndef _WIN32
+/**
+ * function taken from QtBase gui/platform/unix/qgenericunixservices.cpp
+ */
+static inline QByteArray detectLinuxDesktopEnvironment()
+{
+    const QByteArray xdgCurrentDesktop = qgetenv("XDG_CURRENT_DESKTOP");
+    if (!xdgCurrentDesktop.isEmpty())
+        return xdgCurrentDesktop.toUpper(); // KDE, GNOME, UNITY, LXDE, MATE, XFCE...
+
+    // Classic fallbacks
+    if (!qEnvironmentVariableIsEmpty("KDE_FULL_SESSION"))
+        return QByteArrayLiteral("KDE");
+    if (!qEnvironmentVariableIsEmpty("GNOME_DESKTOP_SESSION_ID"))
+        return QByteArrayLiteral("GNOME");
+
+    // Fallback to checking $DESKTOP_SESSION (unreliable)
+    QByteArray desktopSession = qgetenv("DESKTOP_SESSION");
+
+    // This can be a path in /usr/share/xsessions
+    int slash = desktopSession.lastIndexOf('/');
+    if (slash != -1) {
+        QSettings desktopFile(QFile::decodeName(desktopSession + ".desktop"), QSettings::IniFormat);
+        desktopFile.beginGroup(QStringLiteral("Desktop Entry"));
+        QByteArray desktopName = desktopFile.value(QStringLiteral("DesktopNames")).toByteArray();
+        if (!desktopName.isEmpty())
+            return desktopName;
+
+        // try decoding just the basename
+        desktopSession = desktopSession.mid(slash + 1);
+    }
+
+    if (desktopSession == "gnome")
+        return QByteArrayLiteral("GNOME");
+    else if (desktopSession == "xfce")
+        return QByteArrayLiteral("XFCE");
+    else if (desktopSession == "kde")
+        return QByteArrayLiteral("KDE");
+
+    return QByteArrayLiteral("UNKNOWN");
+}
+
+bool isGTKBasedEnvironment()
+{
+    QList<QByteArray> gtkBasedEnvironments{
+        "GNOME",
+        "X-CINNAMON",
+        "UNITY",
+        "MATE",
+        "XFCE",
+        "LXDE"
+    };
+    const QList<QByteArray> desktopNames = detectLinuxDesktopEnvironment().split(':');
+    for (const QByteArray& desktopName: desktopNames)
+    {
+        if (gtkBasedEnvironments.contains(desktopName))
+            return true;
+    }
+    return false;
+}
+#endif
+
+
 static void PaletteChangedCallback(vlc_qt_theme_provider_t*, void* data)
 {
     auto priv = static_cast<ExternalPaletteImpl*>(data);
@@ -75,6 +138,12 @@ ExternalPaletteImpl::~ExternalPaletteImpl()
 
 bool ExternalPaletteImpl::init()
 {
+    QString preferedProvider;
+#ifndef _WIN32
+    if (isGTKBasedEnvironment())
+        preferedProvider = "qt-themeprovider-gtk";
+#endif
+
     m_provider = static_cast<vlc_qt_theme_provider_t*>(vlc_object_create(m_ctx->getIntf(), sizeof(vlc_qt_theme_provider_t)));
     if (!m_provider)
         return false;
@@ -83,7 +152,9 @@ bool ExternalPaletteImpl::init()
     m_provider->setColorF = setQColorRBGAFloat;
     m_provider->setColorInt = setQColorRBGAInt;
 
-    m_module = module_need(m_provider, "qt theme provider", nullptr, true);
+    m_module = module_need(m_provider, "qt theme provider",
+                           preferedProvider.isNull() ? nullptr : qtu(preferedProvider),
+                           true);
     if (!m_module)
         return false;
     return true;
