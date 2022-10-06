@@ -103,6 +103,14 @@ static void PaletteChangedCallback(vlc_qt_theme_provider_t*, void* data)
     emit priv->paletteChanged();
 }
 
+static void ReleaseVLCPictureCb(void* data)
+{
+    auto pic = static_cast<picture_t*>(data);
+    if (pic)
+        picture_Release(pic);
+}
+
+
 static void setQColorRBGAInt(void* data, int r, int g, int b, int a)
 {
     auto color = static_cast<QColor*>(data);
@@ -167,6 +175,52 @@ bool ExternalPaletteImpl::isThemeDark() const
     return m_provider->isThemeDark(m_provider);
 }
 
+bool ExternalPaletteImpl::hasCSDImages() const
+{
+    if (!m_provider->supportThemeImage)
+        return false;
+    return m_provider->supportThemeImage(m_provider, VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON);
+}
+
+
+QImage ExternalPaletteImpl::getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_theme_csd_button_state state, bool maximized, bool active, int bannerHeight)
+{
+    if (!m_provider->getThemeImage)
+        return {};
+    vlc_qt_theme_image_setting imageSettings;
+    imageSettings.windowScaleFactor = m_ctx->intfMainWindow()->devicePixelRatio();
+    imageSettings.userScaleFacor = m_ctx->getIntfUserScaleFactor();
+    imageSettings.u.csdButton.buttonType = type;
+    imageSettings.u.csdButton.state = state;
+    imageSettings.u.csdButton.maximized = maximized;
+    imageSettings.u.csdButton.active = active;
+    imageSettings.u.csdButton.bannerHeight = bannerHeight;
+    picture_t* pic = m_provider->getThemeImage(m_provider, VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON, &imageSettings);
+    if (!pic)
+        return {};
+
+    QImage::Format format = QImage::Format_Invalid;
+    switch (pic->format.i_chroma)
+    {
+    case VLC_CODEC_ARGB:
+        format = QImage::Format_ARGB32_Premultiplied;
+        break;
+    case VLC_CODEC_RGBA:
+        format = QImage::Format_RGBA8888_Premultiplied;
+    case VLC_CODEC_RGB24:
+        format = QImage::Format_RGB888;
+    default:
+        msg_Err(m_ctx->getIntf(), "unexpected image format from theme provider");
+        break;
+    }
+
+    return QImage(pic->p[0].p_pixels,
+            pic->format.i_visible_width, pic->format.i_visible_height, pic->p[0].i_pitch,
+            format,
+            ReleaseVLCPictureCb, pic
+            );
+}
+
 void ExternalPaletteImpl::update(vlc_qt_palette_t& p)
 {
     if (m_provider->updatePalette)
@@ -185,6 +239,22 @@ SystemPalette::SystemPalette(QObject* parent)
 ColorSchemeModel::ColorScheme SystemPalette::source() const
 {
     return m_source;
+}
+
+QImage SystemPalette::getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_theme_csd_button_state state, bool maximized, bool active, int bannerHeight)
+{
+    if (!hasCSDImage())
+        return QImage();
+    assert(m_palettePriv);
+    return m_palettePriv->getCSDImage(type, state, maximized, active, bannerHeight);
+
+}
+
+bool SystemPalette::hasCSDImage() const
+{
+    if (!m_palettePriv)
+        return false;
+    return m_palettePriv->hasCSDImages();
 }
 
 void SystemPalette::setSource(ColorSchemeModel::ColorScheme source)
@@ -232,6 +302,13 @@ void SystemPalette::updatePalette()
             this, &SystemPalette::updatePalette);
     }
     emit paletteChanged();
+
+    bool hasCSDImage = m_palettePriv && m_palettePriv->hasCSDImages();
+    if (m_hasCSDImage != hasCSDImage)
+    {
+        m_hasCSDImage = hasCSDImage;
+        emit hasCSDImageChanged();
+    }
 }
 
 void SystemPalette::makeLightPalette()

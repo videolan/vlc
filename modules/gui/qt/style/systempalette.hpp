@@ -41,6 +41,10 @@ public:
 
     bool isThemeDark() const;
 
+    QImage getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_theme_csd_button_state state, bool maximized, bool active, int bannerHeight);
+
+    bool hasCSDImages() const;
+
     void update(vlc_qt_palette_t& p);
 
 signals:
@@ -78,6 +82,7 @@ public:
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(ColorSchemeModel::ColorScheme  source READ source WRITE setSource NOTIFY sourceChanged FINAL)
     Q_PROPERTY(bool isDark MEMBER m_isDark NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(bool hasCSDImage READ hasCSDImage NOTIFY hasCSDImageChanged FINAL)
 
 
     VLC_QT_INTF_PUBLIC_COLORS(COLOR_PROPERTY)
@@ -106,7 +111,10 @@ public:
     SystemPalette(QObject* parent = nullptr);
 
     ColorSchemeModel::ColorScheme source() const;
+    QImage getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_theme_csd_button_state state, bool maximized, bool active, int bannerHeight);
+
     inline MainCtx* getCtx() const { return m_ctx; }
+    bool hasCSDImage() const;
 
 public slots:
     void setSource(ColorSchemeModel::ColorScheme source);
@@ -116,6 +124,7 @@ public slots:
 signals:
     void sourceChanged();
     void paletteChanged();
+    void hasCSDImageChanged();
     void ctxChanged();
 
 private:
@@ -130,6 +139,7 @@ private:
 
     ColorSchemeModel::ColorScheme m_source = ColorSchemeModel::ColorScheme::Day;
     bool m_isDark = false;
+    bool m_hasCSDImage = false;
 
     std::unique_ptr<ExternalPaletteImpl> m_palettePriv;
 };

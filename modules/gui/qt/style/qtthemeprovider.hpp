@@ -77,6 +77,41 @@ struct vlc_qt_palette_t
 
 #undef DEFINE_QCOLOR_STRUCT
 
+enum vlc_qt_theme_image_type
+{
+    VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON
+};
+
+enum vlc_qt_theme_csd_button_type {
+    VLC_QT_THEME_BUTTON_MAXIMIZE = 0,
+    VLC_QT_THEME_BUTTON_MINIMIZE,
+    VLC_QT_THEME_BUTTON_RESTORE,
+    VLC_QT_THEME_BUTTON_CLOSE,
+    VLC_QT_THEME_BUTTON_TYPE_COUNT
+};
+
+enum vlc_qt_theme_csd_button_state {
+    VLC_QT_THEME_BUTTON_STATE_DISABLED = 0,
+    VLC_QT_THEME_BUTTON_STATE_HOVERED,
+    VLC_QT_THEME_BUTTON_STATE_NORMAL,
+    VLC_QT_THEME_BUTTON_STATE_PRESSED,
+    VLC_QT_THEME_BUTTON_STATE_COUNT
+};
+
+struct vlc_qt_theme_image_setting {
+    float windowScaleFactor;
+    float userScaleFacor;
+    union {
+        struct {
+            vlc_qt_theme_csd_button_type buttonType;
+            vlc_qt_theme_csd_button_state state;
+            bool maximized;
+            bool active;
+            int bannerHeight;
+        } csdButton;
+    } u;
+};
+
 
 struct vlc_qt_theme_provider_t
 {
@@ -94,6 +129,8 @@ struct vlc_qt_theme_provider_t
     void (*close)(vlc_qt_theme_provider_t* obj);
     bool (*isThemeDark)(vlc_qt_theme_provider_t* obj);
     void (*updatePalette)(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*);
+    picture_t* (*getThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, const vlc_qt_theme_image_setting* setting);
+    bool (*supportThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type);
 };
 
 #endif // QTTHEMEPROVIDER_HPP
