@@ -19,6 +19,13 @@
 #ifndef QTTHEMEPROVIDER_HPP
 #define QTTHEMEPROVIDER_HPP
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+
 #define VLC_QT_INTF_PUBLIC_COLORS(X) \
     X(text) \
     X(textInactive) \
@@ -58,5 +65,35 @@
     X(icon) \
     X(sliderBarMiniplayerBgColor) \
     X(windowCSDButtonBg)
+
+#define DEFINE_QCOLOR_STRUCT(x) void* x;
+
+
+
+struct vlc_qt_palette_t
+{
+    VLC_QT_INTF_PUBLIC_COLORS(DEFINE_QCOLOR_STRUCT)
+};
+
+#undef DEFINE_QCOLOR_STRUCT
+
+
+struct vlc_qt_theme_provider_t
+{
+    struct vlc_object_t obj;
+    void* p_sys;
+
+    //set by user while opening
+    void (*paletteUpdated)(vlc_qt_theme_provider_t* obj, void* data);
+    void* paletteUpdatedData;
+
+    void (*setColorInt)(void* color, int r, int g, int b, int a);
+    void (*setColorF)(void* color, double r, double g, double b, double a);
+
+    //set by module
+    void (*close)(vlc_qt_theme_provider_t* obj);
+    bool (*isThemeDark)(vlc_qt_theme_provider_t* obj);
+    void (*updatePalette)(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*);
+};
 
 #endif // QTTHEMEPROVIDER_HPP

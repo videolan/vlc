@@ -33,7 +33,77 @@ QColor blendColors(QColor c1, QColor c2, float blend = 0.5)
                   c2.alphaF() + (c1.alphaF() - c2.alphaF()) * blend);
 }
 
+
+static void PaletteChangedCallback(vlc_qt_theme_provider_t*, void* data)
+{
+    auto priv = static_cast<ExternalPaletteImpl*>(data);
+    emit priv->paletteChanged();
 }
+
+static void setQColorRBGAInt(void* data, int r, int g, int b, int a)
+{
+    auto color = static_cast<QColor*>(data);
+    color->setRgb(r,g,b,a);
+}
+
+static void setQColorRBGAFloat(void* data, double r, double g, double b, double a)
+{
+    auto color = static_cast<QColor*>(data);
+    color->setRgbF(r,g,b,a);
+}
+
+
+}
+
+ExternalPaletteImpl::ExternalPaletteImpl(MainCtx* ctx, QObject* parent)
+    : QObject(parent)
+    , m_ctx(ctx)
+{
+}
+
+ExternalPaletteImpl::~ExternalPaletteImpl()
+{
+    if (m_provider)
+    {
+        if (m_provider->close)
+            m_provider->close(m_provider);
+        if (m_module)
+            module_unneed(m_provider, m_module);
+        vlc_object_delete(m_provider);
+    }
+}
+
+bool ExternalPaletteImpl::init()
+{
+    m_provider = static_cast<vlc_qt_theme_provider_t*>(vlc_object_create(m_ctx->getIntf(), sizeof(vlc_qt_theme_provider_t)));
+    if (!m_provider)
+        return false;
+    m_provider->paletteUpdated = PaletteChangedCallback;
+    m_provider->paletteUpdatedData = this;
+    m_provider->setColorF = setQColorRBGAFloat;
+    m_provider->setColorInt = setQColorRBGAInt;
+
+    m_module = module_need(m_provider, "qt theme provider", nullptr, true);
+    if (!m_module)
+        return false;
+    return true;
+}
+
+bool ExternalPaletteImpl::isThemeDark() const
+{
+    if (!m_provider->isThemeDark)
+        return false;
+    return m_provider->isThemeDark(m_provider);
+}
+
+void ExternalPaletteImpl::update(vlc_qt_palette_t& p)
+{
+    if (m_provider->updatePalette)
+        m_provider->updatePalette(m_provider, &p);
+}
+
+
+
 
 SystemPalette::SystemPalette(QObject* parent)
     : QObject(parent)
@@ -68,8 +138,12 @@ void SystemPalette::setCtx(MainCtx* ctx)
 
 void SystemPalette::updatePalette()
 {
+    m_palettePriv.reset();
     switch(m_source)
     {
+    case ColorSchemeModel::System:
+        makeSystemPalette();
+        break;
     case ColorSchemeModel::Day:
         makeLightPalette();
         break;
@@ -77,10 +151,15 @@ void SystemPalette::updatePalette()
         makeDarkPalette();
         break;
     default:
-        makeLightPalette();
         break;
     }
 
+    if (m_palettePriv)
+    {
+        connect(
+            m_palettePriv.get(), &ExternalPaletteImpl::paletteChanged,
+            this, &SystemPalette::updatePalette);
+    }
     emit paletteChanged();
 }
 
@@ -203,4 +282,36 @@ void SystemPalette::makeDarkPalette()
     m_icon = Qt::white;
     m_sliderBarMiniplayerBgColor = QColor{"#FF929292"};
     m_windowCSDButtonBg =  QColor{"#80484848"};
+}
+
+void SystemPalette::makeSystemPalette()
+{
+    if (!m_ctx)
+    {
+        //can't initialise system palette, fallback to default
+        makeLightPalette();
+        return;
+    }
+
+    auto palette = std::make_unique<ExternalPaletteImpl>(m_ctx);
+    if (!palette->init())
+    {
+        //can't initialise system palette, fallback to default
+        makeLightPalette();
+        return;
+    }
+
+    if (palette->isThemeDark())
+        makeDarkPalette();
+    else
+        makeLightPalette();
+
+    vlc_qt_palette_t p;
+#define BIND_COLOR(name)  p. name = &m_##name;
+    VLC_QT_INTF_PUBLIC_COLORS(BIND_COLOR)
+#undef BIND_COLOR
+
+    palette->update(p);
+
+    m_palettePriv = std::move(palette);
 }

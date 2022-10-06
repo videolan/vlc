@@ -28,6 +28,31 @@
 
 #include "qtthemeprovider.hpp"
 
+
+class ExternalPaletteImpl : public QObject
+{
+    Q_OBJECT
+public:
+    ExternalPaletteImpl(MainCtx* ctx, QObject* parent = nullptr);
+
+    ~ExternalPaletteImpl();
+
+    bool init();
+
+    bool isThemeDark() const;
+
+    void update(vlc_qt_palette_t& p);
+
+signals:
+    void paletteChanged();
+
+public:
+    MainCtx* m_ctx = nullptr;
+    module_t* m_module = nullptr;
+    vlc_qt_theme_provider_t* m_provider = nullptr;
+};
+
+
 #define COLOR_PROPERTY(name) \
     Q_PROPERTY(QColor name READ get_##name NOTIFY paletteChanged FINAL) \
 public: \
@@ -98,12 +123,15 @@ private:
 
     void makeLightPalette();
     void makeDarkPalette();
+    void makeSystemPalette();
 
 private:
     MainCtx* m_ctx = nullptr;
 
     ColorSchemeModel::ColorScheme m_source = ColorSchemeModel::ColorScheme::Day;
     bool m_isDark = false;
+
+    std::unique_ptr<ExternalPaletteImpl> m_palettePriv;
 };
 
 #undef COLOR_PROPERTY
