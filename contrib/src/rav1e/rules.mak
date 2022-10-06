@@ -23,7 +23,9 @@ $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz:
 
 RAV1E_FEATURES=--features=asm
 
-rav1e: rav1e-$(RAV1E_VERSION).tar.gz .sum-rav1e .rav1e-vendor
+DEPS_rav1e = rav1e-vendor $(DEPS_rav1e-vendor) cargo $(DEPS_cargo)
+
+rav1e: rav1e-$(RAV1E_VERSION).tar.gz .sum-rav1e
 	$(UNPACK)
 ifdef HAVE_WIN32
 ifndef HAVE_WIN64
@@ -33,7 +35,7 @@ endif
 	$(CARGO_VENDOR_SETUP)
 	$(MOVE)
 
-.rav1e: rav1e .cargo
+.rav1e: rav1e
 	+cd $< && $(CARGOC_INSTALL) --no-default-features $(RAV1E_FEATURES)
 # No gcc in Android NDK25
 ifdef HAVE_ANDROID
