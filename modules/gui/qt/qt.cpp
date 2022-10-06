@@ -63,6 +63,7 @@ extern "C" char **environ;
 #else
 # include "maininterface/mainctx.hpp"   /* MainCtx creation */
 #endif
+#include "style/defaultthemeproviders.hpp"
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help/help.hpp"     /* Launch Update */
@@ -404,6 +405,11 @@ vlc_module_begin ()
         set_capability( "vout window", 0 )
         set_callback( WindowOpen )
 
+    add_submodule()
+        set_capability("qt theme provider", 1)
+        set_description( "Qt basic system theme" )
+        set_callback( SystemPaletteThemeProviderOpen )
+        add_shortcut("qt-themeprovider-systempalette")
 vlc_module_end ()
 
 /*****************************************/

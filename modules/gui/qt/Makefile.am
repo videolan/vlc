@@ -242,6 +242,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/network/servicesdiscoverymodel.hpp \
 	gui/qt/style/systempalette.cpp \
 	gui/qt/style/systempalette.hpp \
+	gui/qt/style/defaultthemeproviders.hpp \
+	gui/qt/style/systempalettethemeprovider.cpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/player_controlbar_model.cpp gui/qt/player/player_controlbar_model.hpp \
