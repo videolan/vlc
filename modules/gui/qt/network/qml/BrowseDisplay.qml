@@ -131,6 +131,12 @@ Widgets.PageLoader {
             contextMenu: NetworkMediaContextMenu {
                 model: providerModel
             }
+
+            Navigation.cancelAction: function() {
+                History.previous()
+
+                stackView.currentItem.setCurrentItemFocus(Qt.BacktabFocusReason)
+            }
         }
     }
 
