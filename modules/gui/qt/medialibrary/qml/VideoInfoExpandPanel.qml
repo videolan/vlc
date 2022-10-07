@@ -226,6 +226,14 @@ FocusScope {
 
                     visible: root._showMoreInfo
 
+                    opacity: visible ? 1.0 : 0.0
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: VLCStyle.duration_long
+                        }
+                    }
+
                     Repeater {
                         model: [
                             {
@@ -240,14 +248,6 @@ FocusScope {
 
                         delegate: Column {
                             visible: delgateRepeater.count > 0
-
-                            opacity: (visible) ? 1.0 : 0.0
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: VLCStyle.duration_short
-                                }
-                            }
 
                             Widgets.MenuCaption {
                                 text: modelData.title
