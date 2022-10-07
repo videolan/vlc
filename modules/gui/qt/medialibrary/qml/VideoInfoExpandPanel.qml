@@ -30,7 +30,7 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 FocusScope {
-    id: expandRect
+    id: root
 
     property int currentId: -1
     property var model : ({})
@@ -142,7 +142,7 @@ FocusScope {
                             }
                         }
 
-                        Navigation.parentItem: expandRect
+                        Navigation.parentItem: root
                         Navigation.rightItem: showMoreButton
                     }
                 }
@@ -170,9 +170,9 @@ FocusScope {
 
                         iconText: VLCIcons.close
 
-                        onClicked: expandRect.retract()
+                        onClicked: root.retract()
 
-                        Navigation.parentItem: expandRect
+                        Navigation.parentItem: root
                         Navigation.leftItem: showMoreButton
                     }
                 }
@@ -185,13 +185,13 @@ FocusScope {
 
                 Widgets.MenuCaption {
                     topPadding: VLCStyle.margin_normal
-                    text: "<b>" + I18n.qtr("File Name:") + "</b> " + expandRect.model.fileName
+                    text: "<b>" + I18n.qtr("File Name:") + "</b> " + root.model.fileName
                     width: parent.width
                     textFormat: Text.StyledText
                 }
 
                 Widgets.MenuCaption {
-                    text: "<b>" + I18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
+                    text: "<b>" + I18n.qtr("Path:") + "</b> " + root.model.display_mrl
                     topPadding: VLCStyle.margin_xsmall
                     bottomPadding: VLCStyle.margin_large
                     width: parent.width
@@ -213,7 +213,7 @@ FocusScope {
 
                     onClicked: _showMoreInfo = !_showMoreInfo
 
-                    Navigation.parentItem: expandRect
+                    Navigation.parentItem: root
                     Navigation.leftItem: enqueueActionBtn
                     Navigation.rightItem: closeButton
                 }
@@ -272,7 +272,7 @@ FocusScope {
         id: videoDescModel
 
         Repeater {
-            model: expandRect.model.videoDesc
+            model: root.model.videoDesc
 
             // TODO: use inline Component for Qt > 5.14
             delegate: Repeater {
@@ -300,7 +300,7 @@ FocusScope {
 
         // TODO: use inline Component for Qt > 5.14
         Repeater {
-            model: expandRect.model.audioDesc
+            model: root.model.audioDesc
 
             delegate: Repeater {
                 id: audioDescRepeaterDelegate
