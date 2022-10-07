@@ -143,6 +143,7 @@ FocusScope {
                         }
 
                         Navigation.parentItem: expandRect
+                        Navigation.rightItem: showMoreButton
                     }
                 }
             }
@@ -209,6 +210,9 @@ FocusScope {
                     }
 
                     onClicked: _showMoreInfo = !_showMoreInfo
+
+                    Navigation.parentItem: expandRect
+                    Navigation.leftItem: enqueueActionBtn
                 }
 
                 Row {
