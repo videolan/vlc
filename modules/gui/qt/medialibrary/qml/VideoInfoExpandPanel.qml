@@ -165,13 +165,10 @@ FocusScope {
                         Layout.fillWidth: true
                     }
 
-                    Widgets.IconLabel {
-                        text: VLCIcons.close
+                    Widgets.IconToolButton {
+                        iconText: VLCIcons.close
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: expandRect.retract()
-                        }
+                        onClicked: expandRect.retract()
                     }
                 }
 
