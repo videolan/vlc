@@ -51,6 +51,10 @@ FocusScope {
 
     signal browse(var tree, int reason)
 
+    Navigation.cancelAction: function() {
+        History.previous()
+    }
+
     onTreeChanged: providerModel.tree = tree
 
     function playSelected() {
@@ -222,9 +226,6 @@ FocusScope {
 
             Navigation.parentItem: root
             Navigation.upItem: gridView.headerItem
-            Navigation.cancelAction: function() {
-                History.previous()
-            }
         }
     }
 
@@ -259,9 +260,6 @@ FocusScope {
             headerColor: VLCStyle.colors.bg
             Navigation.parentItem: root
             Navigation.upItem: tableView.headerItem
-            Navigation.cancelAction: function() {
-                History.previous()
-            }
 
             rowHeight: VLCStyle.tableCoverRow_height
 
