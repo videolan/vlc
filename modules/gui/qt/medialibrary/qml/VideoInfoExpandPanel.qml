@@ -200,9 +200,9 @@ FocusScope {
                 Widgets.TabButtonExt {
                     id: showMoreButton
 
-                    text: _showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
+                    text: root._showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
                     iconTxt: VLCIcons.expand
-                    iconRotation: _showMoreInfo ? -180 : 0
+                    iconRotation: root._showMoreInfo ? -180 : 0
 
                     Behavior on iconRotation {
                         NumberAnimation {
@@ -210,7 +210,7 @@ FocusScope {
                         }
                     }
 
-                    onClicked: _showMoreInfo = !_showMoreInfo
+                    onClicked: root._showMoreInfo = !root._showMoreInfo
 
                     Navigation.parentItem: root
                     Navigation.leftItem: enqueueActionBtn
@@ -224,7 +224,7 @@ FocusScope {
 
                     spacing: VLCStyle.margin_xlarge
 
-                    visible: _showMoreInfo
+                    visible: root._showMoreInfo
 
                     Repeater {
                         model: [
