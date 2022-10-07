@@ -166,9 +166,14 @@ FocusScope {
                     }
 
                     Widgets.IconToolButton {
+                        id: closeButton
+
                         iconText: VLCIcons.close
 
                         onClicked: expandRect.retract()
+
+                        Navigation.parentItem: expandRect
+                        Navigation.leftItem: showMoreButton
                     }
                 }
 
@@ -210,6 +215,7 @@ FocusScope {
 
                     Navigation.parentItem: expandRect
                     Navigation.leftItem: enqueueActionBtn
+                    Navigation.rightItem: closeButton
                 }
 
                 Row {
