@@ -108,12 +108,10 @@ download_vendor = \
 		  mv $(patsubst %.tar.bz2,%,$(notdir $(f))) $(patsubst .%,%,$@))
 	touch $@
 
-CARGO_VENDOR_SETUP = \
-	if test -d $@-vendor; then \
-		mkdir -p $(UNPACK_DIR)/.cargo; \
-		echo "[source.crates-io]" > $(UNPACK_DIR)/.cargo/config.toml; \
-		echo "replace-with = \"vendored-sources\"" >> $(UNPACK_DIR)/.cargo/config.toml; \
-		echo "[source.vendored-sources]" >> $(UNPACK_DIR)/.cargo/config.toml; \
-		echo "directory = \"../$@-vendor\"" >> $(UNPACK_DIR)/.cargo/config.toml; \
-		echo "Using cargo vendor archive for $(UNPACK_DIR)"; \
-	fi;
+cargo_vendor_setup = \
+	mkdir -p $1/.cargo; \
+	echo "[source.crates-io]" > $1/.cargo/config.toml; \
+	echo "replace-with = \"vendored-sources\"" >> $1/.cargo/config.toml; \
+	echo "[source.vendored-sources]" >> $1/.cargo/config.toml; \
+	echo "directory = \"../$2-vendor\"" >> $1/.cargo/config.toml; \
+	echo "Using cargo vendor archive for $2";

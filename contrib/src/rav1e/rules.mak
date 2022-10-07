@@ -32,7 +32,7 @@ ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/rav1e/unwind-resume-stub.patch
 endif
 endif
-	$(CARGO_VENDOR_SETUP)
+	$(call cargo_vendor_setup,$(UNPACK_DIR),$@)
 	$(MOVE)
 
 .rav1e: rav1e
