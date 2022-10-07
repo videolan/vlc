@@ -244,7 +244,6 @@ check_android_sdk()
 	add_make "ANDROID_ABI := ${ANDROID_ABI}"
 	[ -z "${ANDROID_API}" ] && echo "You should set ANDROID_API environment variable (using default android-9)" && ANDROID_API := android-9
 	add_make "ANDROID_API := ${ANDROID_API}"
-	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_NEON"
 	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_ARMV7A"
 	[ ${ANDROID_ABI} = "arm64-v8a" ] && add_make_enabled "HAVE_ARMV8A"
 	[ ${ANDROID_ABI} = "armeabi" -a -z "${NO_ARMV6}" ] && add_make_enabled "HAVE_ARMV6"
@@ -296,7 +295,7 @@ case "${OS}" in
 					;;
 				*arm*)
 					add_make "PLATFORM_SHORT_ARCH := armv7"
-					add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
+					add_make_enabled "HAVE_ARMV7A"
 					;;
 				*x86_64*)
 					add_make "PLATFORM_SHORT_ARCH := x86_64"
