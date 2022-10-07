@@ -175,7 +175,7 @@ FocusScope {
                 }
 
                 Widgets.CaptionLabel {
-                    text: model.duration.formatHMS()
+                    text: (model && model.duration) ? model.duration.formatHMS() : ""
                     color: VLCStyle.colors.text
                     width: parent.width
                 }
