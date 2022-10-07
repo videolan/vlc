@@ -48,6 +48,8 @@ T.TabButton {
 
     property alias colorFocus: background.activeBorderColor
 
+    property alias iconRotation: icon.rotation
+
     // Settings
 
     width: implicitWidth
