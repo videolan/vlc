@@ -299,9 +299,7 @@ FocusScope {
         positionViewAtIndex(currentIndex, ItemView.Contain);
 
         if (expandIndex !== -1) {
-            // NOTE: We clear expandIndex so we can apply the proper focus in _setupChild.
-            expandIndex = -1;
-
+            // We clear expandIndex so we can apply the proper focus in _setupChild.
             retract();
         }
     }
