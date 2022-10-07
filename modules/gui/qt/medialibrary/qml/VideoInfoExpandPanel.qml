@@ -42,6 +42,12 @@ FocusScope {
     // otherwise produces artefacts on retract animation
     clip: true
 
+    focus: true
+
+    function setCurrentItemFocus(reason) {
+        playActionBtn.forceActiveFocus(reason);
+    }
+
     Rectangle{
         id: contentRect
 

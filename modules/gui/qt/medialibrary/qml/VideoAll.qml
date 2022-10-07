@@ -246,7 +246,12 @@ FocusScope {
             Connections {
                 target: root.contextMenu
 
-                onShowMediaInformation: gridView.switchExpandItem(index)
+                onShowMediaInformation: {
+                    gridView.switchExpandItem(index)
+
+                    if (gridView.focus)
+                        expandItem.setCurrentItemFocus(Qt.TabFocusReason)
+                }
             }
 
             // Children
@@ -302,11 +307,15 @@ FocusScope {
 
                 Navigation.parentItem: gridView
 
-                Navigation.cancelAction: function() { gridView.retract() }
-                Navigation.upAction    : function() { gridView.retract() }
-                Navigation.downAction  : function() { gridView.retract() }
+                Navigation.cancelAction: gridView.forceFocus
+                Navigation.upAction: gridView.forceFocus
+                Navigation.downAction: gridView.forceFocus
 
                 onRetract: gridView.retract()
+            }
+
+            function forceFocus() {
+                setCurrentItemFocus(Qt.TabFocus)
             }
         }
     }
