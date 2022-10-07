@@ -32,7 +32,6 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property int currentId: -1
     property var model : ({})
     property bool _showMoreInfo: false
     signal retract()
