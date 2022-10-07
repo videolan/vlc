@@ -190,37 +190,25 @@ FocusScope {
                 Widgets.MenuCaption {
                     text: "<b>" + I18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
                     topPadding: VLCStyle.margin_xsmall
+                    bottomPadding: VLCStyle.margin_large
                     width: parent.width
                     textFormat: Text.StyledText
                 }
 
-                MouseArea {
-                    width: childrenRect.width
-                    height: childrenRect.height
+                Widgets.TabButtonExt {
+                    id: showMoreButton
 
-                    onClicked: _showMoreInfo = !_showMoreInfo
+                    text: _showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
+                    iconTxt: VLCIcons.expand
+                    iconRotation: _showMoreInfo ? -180 : 0
 
-                    Row {
-                        topPadding: VLCStyle.margin_large
-                        spacing: VLCStyle.margin_xsmall
-
-                        Widgets.IconLabel {
-                            text: VLCIcons.expand
-                            rotation: _showMoreInfo ? -180 : 0
-                            font.pixelSize: VLCStyle.icon_normal
-
-                            Behavior on rotation {
-                                NumberAnimation {
-                                    duration: VLCStyle.duration_short
-                                }
-                            }
-                        }
-
-                        Widgets.CaptionLabel {
-                            text: _showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
-                            color: VLCStyle.colors.text
+                    Behavior on iconRotation {
+                        NumberAnimation {
+                            duration: VLCStyle.duration_short
                         }
                     }
+
+                    onClicked: _showMoreInfo = !_showMoreInfo
                 }
 
                 Row {
