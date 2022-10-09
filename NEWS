@@ -1,5 +1,13 @@
+Changes between 3.0.18-rc2 and 3.0.18:
+--------------------------------------
+
+macOS:
+* Fix audio device listing with non-latin names
+* Update some translations
+
+
 Changes between 3.0.18-rc and 3.0.18-rc2:
--------------------------------------
+-----------------------------------------
 
 Codec/Demux:
  * Add support for Y16 chroma
@@ -24,7 +32,7 @@ Contribs:
 
 
 Changes between 3.0.17.4 and 3.0.18-rc:
---------------------------------------
+---------------------------------------
 
 Demux:
  * Major adaptive streaming update, notably for multiple timelies and webvtt
@@ -62,7 +70,7 @@ Contribs:
 
 
 Changes between 3.0.17.3 and 3.0.17.4:
----------------------------------------
+--------------------------------------
 
 Service Discovery:
  * Fix UPnP regression on Windows
