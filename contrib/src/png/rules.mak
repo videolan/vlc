@@ -29,9 +29,12 @@ PNG_CONF += -DCMAKE_ASM_FLAGS="$(CFLAGS)"
 endif
 endif
 
-ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
+ifdef HAVE_IOS
 # otherwise detection fails
+PNG_CONF += -DPNG_ARM_NEON=on
+else ifdef HAVE_WIN32
+# No runtime detection needed
 PNG_CONF += -DPNG_ARM_NEON=on
 endif
 endif
