@@ -326,10 +326,8 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
         struct pl_shader_var sv = res->variables[i];
         struct pl_var var = sv.var;
         // libplacebo doesn't need anything else anyway
-        if (var.type != PL_VAR_FLOAT)
-            continue;
-        if (var.dim_m > 1 && var.dim_m != var.dim_v)
-            continue;
+        assert(var.type == PL_VAR_FLOAT);
+        assert(var.dim_m == 1 || var.dim_m == var.dim_v);
 
         const float *f = sv.data;
         switch (var.dim_m) {
