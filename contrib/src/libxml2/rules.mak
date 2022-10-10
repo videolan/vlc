@@ -54,5 +54,5 @@ endif
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(LIBXML2_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

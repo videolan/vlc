@@ -52,5 +52,5 @@ endif
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(PNG_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

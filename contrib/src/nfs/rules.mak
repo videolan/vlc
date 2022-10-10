@@ -29,5 +29,5 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

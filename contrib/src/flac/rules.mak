@@ -39,5 +39,5 @@ DEPS_flac = ogg $(DEPS_ogg)
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(FLAC_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@
