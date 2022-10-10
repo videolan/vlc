@@ -449,6 +449,7 @@ MAKECONFIGURE = $(MAKECONFDIR)/configure $(HOSTCONF)
 # itself instead of relying on a shell, but a bug in gnulib ends up
 # trying to execute a cmake folder when one is found in the PATH
 CMAKEBUILD = env cmake --build $(BUILD_DIR)
+CMAKEINSTALL = env cmake --build $(BUILD_DIR) --target install
 CMAKECLEAN = rm -f $(BUILD_DIR)/CMakeCache.txt
 CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-B $(BUILD_DIR) \
