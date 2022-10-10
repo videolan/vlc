@@ -2187,6 +2187,22 @@ enum libvlc_video_adjust_option_t {
     libvlc_adjust_Gamma
 };
 
+enum libvlc_video_sharpen_option_t {
+    libvlc_sharpen_Enable = 0,
+    libvlc_sharpen_Sigma
+};
+
+LIBVLC_API int libvlc_video_get_sharpen_int( libvlc_media_player_t *p_mi,
+                                                unsigned option );
+LIBVLC_API void libvlc_video_set_sharpen_int( libvlc_media_player_t *p_mi,
+                                  unsigned option, int value );
+
+
+LIBVLC_API float libvlc_video_get_sharpen_float( libvlc_media_player_t *p_mi,
+                                                    unsigned option );
+LIBVLC_API void libvlc_video_set_sharpen_float( libvlc_media_player_t *p_mi,
+                                    unsigned option, float value );
+
 /**
  * Get integer adjust option.
  *

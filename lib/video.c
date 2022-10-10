@@ -930,6 +930,44 @@ adjust_option_bynumber( unsigned option )
     return r;
 }
 
+static const opt_t *
+sharpen_option_bynumber( unsigned option )
+{
+    static const opt_t optlist[] =
+    {
+        { "sharpen",     0 },
+        { "sharpen-sigma",   VLC_VAR_FLOAT },
+    };
+    enum { num_opts = sizeof(optlist) / sizeof(*optlist) };
+
+    const opt_t *r = option < num_opts ? optlist+option : NULL;
+    if( !r )
+        libvlc_printerr( "Unknown sharpness option" );
+    return r;
+}
+
+int libvlc_video_get_sharpen_int( libvlc_media_player_t *p_mi,
+                                 unsigned option )
+{
+    return get_int( p_mi, "sharpen", sharpen_option_bynumber(option) );
+}
+void libvlc_video_set_sharpen_int( libvlc_media_player_t *p_mi,
+                                  unsigned option, int value )
+{
+    set_value( p_mi, "sharpen", sharpen_option_bynumber(option), VLC_VAR_INTEGER,
+               &(vlc_value_t) { .i_int = value }, false );
+}
+float libvlc_video_get_sharpen_float( libvlc_media_player_t *p_mi,
+                                     unsigned option )
+{
+    return get_float( p_mi, "sharpen", sharpen_option_bynumber(option) );
+}
+void libvlc_video_set_sharpen_float( libvlc_media_player_t *p_mi,
+                                    unsigned option, float value )
+{
+    set_value( p_mi, "sharpen", sharpen_option_bynumber(option), VLC_VAR_FLOAT,
+               &(vlc_value_t) { .f_float = value }, false );
+}
 
 void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
                                   unsigned option, int value )
