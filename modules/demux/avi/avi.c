@@ -832,25 +832,32 @@ error:
  *****************************************************************************/
 
 static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
-                     const unsigned int i_header, const int i_size )
+                            uint32_t i_header, uint32_t i_size )
 {
-    block_t *p_frame = vlc_stream_Block( p_demux->s, __EVEN( i_size ) );
-    if ( !p_frame ) return p_frame;
-
-    if( i_size % 2 )    /* read was padded on word boundary */
+    /* skip header */
+    if( i_header )
     {
-        p_frame->i_buffer--;
+        assert(i_header % 8 == 0);
+        ssize_t i_skip = vlc_stream_Read( p_demux->s, NULL, i_header );
+        if( i_skip < 0 || (size_t) i_skip < i_header )
+            return NULL;
     }
 
-    if( i_header >= p_frame->i_buffer || tk->bihprops.i_stride > INT32_MAX - 3 )
+    /* read size padded on word boundary */
+    i_size = __EVEN(i_size);
+
+    if( i_size == 0 )
+        return block_Alloc(0); /* vlc_stream_Block can't read/alloc 0 sized */
+
+    block_t *p_frame = vlc_stream_Block( p_demux->s, i_size );
+    if ( !p_frame )
+        return p_frame;
+
+    if( tk->bihprops.i_stride > INT32_MAX - 3 )
     {
         p_frame->i_buffer = 0;
         return p_frame;
     }
-
-    /* skip header */
-    p_frame->p_buffer += i_header;
-    p_frame->i_buffer -= i_header;
 
     const unsigned int i_stride_bytes = (tk->bihprops.i_stride + 3) & ~3;
 
@@ -1224,13 +1231,10 @@ static int Demux_Seekable( demux_t *p_demux )
             i_size = tk->idx.p_entry[tk->i_idxposc].i_length;
         }
 
-        if( tk->i_idxposb == 0 )
-        {
-            i_size += 8; /* need to read and skip header */
-        }
+        /* need to read and skip tag/header */
+        const uint8_t i_header = ( tk->i_idxposb == 0 ) ? 8 : 0;
 
-        if( ( p_frame = ReadFrame( p_demux, tk,
-                        ( tk->i_idxposb == 0 ) ? 8 : 0, i_size ) )==NULL )
+        if( ( p_frame = ReadFrame( p_demux, tk, i_header, i_size ) )==NULL )
         {
             msg_Warn( p_demux, "failed reading data" );
             tk->b_eof = false;
@@ -1251,10 +1255,6 @@ static int Demux_Seekable( demux_t *p_demux )
         /* read data */
         if( tk->i_samplesize )
         {
-            if( tk->i_idxposb == 0 )
-            {
-                i_size -= 8;
-            }
             toread[i_track].i_toread -= i_size;
             tk->i_idxposb += i_size;
             if( tk->i_idxposb >=
@@ -1402,7 +1402,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                         AVI_GetPTS( p_stream_master ) )< VLC_TICK_FROM_SEC(2) )
             {
                 /* load it and send to decoder */
-                block_t *p_frame = ReadFrame( p_demux, p_stream, 8, avi_pk.i_size + 8 ) ;
+                block_t *p_frame = ReadFrame( p_demux, p_stream, 8, avi_pk.i_size ) ;
                 if( p_frame == NULL )
                 {
                     return VLC_DEMUXER_EGENERIC;
