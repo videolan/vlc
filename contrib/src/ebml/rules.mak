@@ -20,5 +20,5 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

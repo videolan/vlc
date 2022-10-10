@@ -25,5 +25,5 @@ matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

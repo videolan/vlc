@@ -41,5 +41,5 @@ SOXR_CONF := \
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(SOXR_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

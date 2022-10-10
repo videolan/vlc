@@ -44,5 +44,5 @@ PROJECTM_CONF := \
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(PROJECTM_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

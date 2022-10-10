@@ -87,5 +87,5 @@ endif
 	$(HOSTVARS) $(CMAKE) $(AOM_CONF)
 	+$(CMAKEBUILD)
 	$(call pkg_static,"$(BUILD_DIRUNPACK)/aom.pc")
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

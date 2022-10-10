@@ -38,5 +38,5 @@ musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(MUSE_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@
