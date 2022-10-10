@@ -252,6 +252,9 @@ typedef void (APIENTRY *PFNGLREADPIXELSPROC) (GLint, GLint, GLsizei, GLsizei, GL
 #   define PFNGLUNIFORMMATRIX3FVPROC         typeof(glUniformMatrix3fv)*
 #   define PFNGLUNIFORMMATRIX2FVPROC         typeof(glUniformMatrix2fv)*
 #   define PFNGLUNIFORM4FVPROC               typeof(glUniform4fv)*
+#   define PFNGLUNIFORM3FVPROC               typeof(glUniform3fv)*
+#   define PFNGLUNIFORM2FVPROC               typeof(glUniform2fv)*
+#   define PFNGLUNIFORM1FVPROC               typeof(glUniform1fv)*
 #   define PFNGLUNIFORM4FPROC                typeof(glUniform4f)*
 #   define PFNGLUNIFORM3FPROC                typeof(glUniform3f)*
 #   define PFNGLUNIFORM2FPROC                typeof(glUniform2f)*
@@ -356,6 +359,9 @@ typedef struct {
     PFNGLUNIFORMMATRIX3FVPROC        UniformMatrix3fv;
     PFNGLUNIFORMMATRIX2FVPROC        UniformMatrix2fv;
     PFNGLUNIFORM4FVPROC              Uniform4fv;
+    PFNGLUNIFORM3FVPROC              Uniform3fv;
+    PFNGLUNIFORM2FVPROC              Uniform2fv;
+    PFNGLUNIFORM1FVPROC              Uniform1fv;
     PFNGLUNIFORM4FPROC               Uniform4f;
     PFNGLUNIFORM3FPROC               Uniform3f;
     PFNGLUNIFORM2FPROC               Uniform2f;

@@ -108,6 +108,9 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR(UniformMatrix3fv);
     GET_PROC_ADDR(UniformMatrix2fv);
     GET_PROC_ADDR(Uniform4fv);
+    GET_PROC_ADDR(Uniform3fv);
+    GET_PROC_ADDR(Uniform2fv);
+    GET_PROC_ADDR(Uniform1fv);
     GET_PROC_ADDR(Uniform4f);
     GET_PROC_ADDR(Uniform3f);
     GET_PROC_ADDR(Uniform2f);
