@@ -332,16 +332,16 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
 
         const float *f = sv.data;
         switch (var.dim_m) {
-        case 4: vt->UniformMatrix4fv(loc, 1, GL_FALSE, f); break;
-        case 3: vt->UniformMatrix3fv(loc, 1, GL_FALSE, f); break;
-        case 2: vt->UniformMatrix2fv(loc, 1, GL_FALSE, f); break;
+        case 4: vt->UniformMatrix4fv(loc, var.dim_a, GL_FALSE, f); break;
+        case 3: vt->UniformMatrix3fv(loc, var.dim_a, GL_FALSE, f); break;
+        case 2: vt->UniformMatrix2fv(loc, var.dim_a, GL_FALSE, f); break;
 
         case 1:
             switch (var.dim_v) {
-            case 1: vt->Uniform1f(loc, f[0]); break;
-            case 2: vt->Uniform2f(loc, f[0], f[1]); break;
-            case 3: vt->Uniform3f(loc, f[0], f[1], f[2]); break;
-            case 4: vt->Uniform4f(loc, f[0], f[1], f[2], f[3]); break;
+            case 1: vt->Uniform1fv(loc, var.dim_a, f); break;
+            case 2: vt->Uniform2fv(loc, var.dim_a, f); break;
+            case 3: vt->Uniform3fv(loc, var.dim_a, f); break;
+            case 4: vt->Uniform4fv(loc, var.dim_a, f); break;
             }
             break;
         }
@@ -715,7 +715,12 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         for (int i = 0; i < res->num_variables; i++) {
             struct pl_shader_var sv = res->variables[i];
             const char *glsl_type_name = pl_var_glsl_type_name(sv.var);
-            ADDF("uniform %s %s;\n", glsl_type_name, sv.var.name);
+            ADDF("uniform %s %s", glsl_type_name, sv.var.name);
+            if (sv.var.dim_a > 1) {
+                ADDF("[%d];\n", sv.var.dim_a);
+            } else {
+                ADDF(";\n");
+            }
         }
 
         // We can't handle these yet, but nothing we use requires them, either
