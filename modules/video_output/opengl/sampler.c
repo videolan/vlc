@@ -28,7 +28,7 @@
 #include <vlc_memstream.h>
 #include <vlc_opengl.h>
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
 #include <libplacebo/shaders.h>
 #include <libplacebo/shaders/colorspace.h>
 #include "../libplacebo/utils.h"
@@ -57,7 +57,7 @@ struct vlc_gl_sampler_priv {
     bool yuv_color;
     GLfloat conv_matrix[4*4];
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     /* libplacebo context */
     pl_log pl_log;
     pl_shader pl_sh;
@@ -276,7 +276,7 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         }
     }
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     const struct pl_shader_res *res = priv->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
         struct pl_shader_var sv = res->variables[i];
@@ -315,7 +315,7 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
                           glfmt->tex_heights[i]);
     }
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     const struct pl_shader_res *res = priv->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
         GLint loc = priv->uloc.pl_vars[i];
@@ -661,7 +661,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
     ADDF("uniform %s Textures[%u];\n", glsl_sampler, tex_count);
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     if (priv->pl_sh) {
         pl_shader sh = priv->pl_sh;
         struct pl_color_map_params color_params;
@@ -775,7 +775,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     }
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     if (priv->pl_sh_res) {
         const struct pl_shader_res *res = priv->pl_sh_res;
         if (res->input != PL_SHADER_SIG_NONE) {
@@ -842,7 +842,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     priv->uloc.pl_vars = NULL;
     priv->pl_sh_res = NULL;
     priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(gl));
@@ -873,7 +873,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-#ifdef HAVE_LIBPLACEBO
+#ifdef HAVE_LIBPLACEBO_GL
     FREENULL(priv->uloc.pl_vars);
     pl_shader_free(&priv->pl_sh);
     pl_log_destroy(&priv->pl_log);

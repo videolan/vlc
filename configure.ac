@@ -3143,6 +3143,7 @@ AS_IF([test "$enable_libplacebo" != "no"], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
     AC_CHECK_HEADER([libplacebo/vulkan.h], [VLC_ADD_PLUGIN([placebo_vk])])
     AC_CHECK_HEADER([libplacebo/opengl.h], [
+        AC_DEFINE([HAVE_LIBPLACEBO_GL], [1], [Define to 1 if <libplacebo/opengl.h> is available.])
         VLC_ADD_PLUGIN([placebo_gl])
         VLC_ADD_PLUGIN([placebo_gles2])
         dnl Minimum version that the OpenGL filter pl_scale is compatible with
