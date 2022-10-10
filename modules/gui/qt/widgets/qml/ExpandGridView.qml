@@ -158,9 +158,12 @@ FocusScope {
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (KeyHelper.matchDown(event)) {
+            var lastIndex = _count - 1
             // we are not on the last line
-            if (Math.floor(currentIndex / _nbItemPerRow) !== Math.floor(_count / _nbItemPerRow)) {
-                newIndex = Math.min(_count - 1, currentIndex + _nbItemPerRow)
+            if (Math.floor(currentIndex / _nbItemPerRow)
+                !==
+                Math.floor(lastIndex / _nbItemPerRow)) {
+                newIndex = Math.min(lastIndex, currentIndex + _nbItemPerRow)
             }
         } else if (KeyHelper.matchPageDown(event)) {
             newIndex = Math.min(_count - 1, currentIndex + _nbItemPerRow * 5)
@@ -590,7 +593,7 @@ FocusScope {
                 }
             }
         }
-        
+
         Util.FlickableScrollHandler { }
 
         Loader {
