@@ -31,5 +31,5 @@ endif
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) $(OPUS_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

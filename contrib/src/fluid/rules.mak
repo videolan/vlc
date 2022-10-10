@@ -45,5 +45,5 @@ FLUIDCONF := \
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(FLUIDCONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

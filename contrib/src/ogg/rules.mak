@@ -24,5 +24,5 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

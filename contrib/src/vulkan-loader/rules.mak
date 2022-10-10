@@ -65,5 +65,5 @@ ifdef HAVE_WIN32
 endif
 
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

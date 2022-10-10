@@ -31,5 +31,5 @@ endif
 	$(CMAKECLEAN)
 	$(HOSTVARS) $(CMAKE) $(FREETYPE_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@

@@ -42,6 +42,6 @@ X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) -S $</source $(X265_CONF)
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	sed -e s/'[^ ]*clang_rt[^ ]*'//g -i.orig "$(PREFIX)/lib/pkgconfig/x265.pc"
 	touch $@

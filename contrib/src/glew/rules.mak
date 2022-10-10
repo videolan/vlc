@@ -20,5 +20,5 @@ glew: glew-$(GLEW_VERSION).tgz .sum-glew
 	$(CMAKECLEAN)
 	$(HOSTVARS_PIC) $(CMAKE) -S $</build/cmake
 	+$(CMAKEBUILD)
-	+$(CMAKEBUILD) --target install
+	$(CMAKEINSTALL)
 	touch $@
