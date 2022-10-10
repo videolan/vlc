@@ -29,6 +29,7 @@
 #include <vlc_opengl.h>
 
 #ifdef HAVE_LIBPLACEBO_GL
+#include <libplacebo/opengl.h>
 #include <libplacebo/shaders.h>
 #include <libplacebo/shaders/colorspace.h>
 #include "../libplacebo/utils.h"
@@ -60,6 +61,7 @@ struct vlc_gl_sampler_priv {
 #ifdef HAVE_LIBPLACEBO_GL
     /* libplacebo context */
     pl_log pl_log;
+    pl_opengl pl_opengl;
     pl_shader pl_sh;
     pl_shader_obj dither_state, tone_map_state;
     const struct pl_shader_res *pl_sh_res;
@@ -846,6 +848,13 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     priv->uloc.pl_vars = NULL;
     priv->pl_sh_res = NULL;
     priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(gl));
+    priv->pl_opengl = pl_opengl_create(priv->pl_log, NULL);
+    if (!priv->pl_opengl)
+    {
+        vlc_gl_sampler_Delete(sampler);
+        return NULL;
+    }
+
     priv->pl_sh = pl_shader_alloc(priv->pl_log, &(struct pl_shader_params) {
         .glsl = {
 #   ifdef USE_OPENGL_ES2
@@ -878,6 +887,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
     pl_shader_free(&priv->pl_sh);
     pl_shader_obj_destroy(&priv->tone_map_state);
     pl_shader_obj_destroy(&priv->dither_state);
+    pl_opengl_destroy(&priv->pl_opengl);
     pl_log_destroy(&priv->pl_log);
 #endif
 
