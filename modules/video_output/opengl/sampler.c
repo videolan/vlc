@@ -61,6 +61,7 @@ struct vlc_gl_sampler_priv {
     /* libplacebo context */
     pl_log pl_log;
     pl_shader pl_sh;
+    pl_shader_obj dither_state, tone_map_state;
     const struct pl_shader_res *pl_sh_res;
 #endif
 
@@ -671,12 +672,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         dst_space.primaries = var_InheritInteger(priv->gl, "target-prim");
         dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
-        pl_shader_obj tone_map_state = NULL;
         pl_shader_color_map(sh, &color_params,
                 vlc_placebo_ColorSpace(fmt),
-                dst_space, &tone_map_state, false);
+                dst_space, &priv->tone_map_state, false);
 
-        pl_shader_obj dither_state = NULL;
         int method = var_InheritInteger(priv->gl, "dither-algo");
         if (method >= 0) {
 
@@ -700,15 +699,13 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
                 out_bits = fb_depth;
             }
 
-            pl_shader_dither(sh, out_bits, &dither_state, &(struct pl_dither_params) {
+            pl_shader_dither(sh, out_bits, &priv->dither_state, &(struct pl_dither_params) {
                 .method   = method,
                 .lut_size = 4, // avoid too large values, since this gets embedded
             });
         }
 
         const struct pl_shader_res *res = priv->pl_sh_res = pl_shader_finalize(sh);
-        pl_shader_obj_destroy(&tone_map_state);
-        pl_shader_obj_destroy(&dither_state);
 
         FREENULL(priv->uloc.pl_vars);
         priv->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
@@ -881,6 +878,8 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 #ifdef HAVE_LIBPLACEBO_GL
     FREENULL(priv->uloc.pl_vars);
     pl_shader_free(&priv->pl_sh);
+    pl_shader_obj_destroy(&priv->tone_map_state);
+    pl_shader_obj_destroy(&priv->dither_state);
     pl_log_destroy(&priv->pl_log);
 #endif
 
