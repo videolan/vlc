@@ -288,7 +288,7 @@ const QString& MLBaseModel::searchPattern() const
 
 void MLBaseModel::setSearchPattern( const QString& pattern )
 {
-    QString patternToApply = pattern.length() < 3 ? nullptr : pattern;
+    QString patternToApply = pattern.length() == 0 ? QString{} : pattern;
     if (patternToApply == m_search_pattern)
         /* No changes */
         return;
