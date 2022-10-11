@@ -1241,7 +1241,6 @@ static int Demux_Seekable( demux_t *p_demux )
         block_t         *p_frame;
         int64_t i_pos;
         unsigned int i;
-        size_t i_size;
 
         /* search for first chunk to be read */
         for( i = 0, b_done = true, i_pos = -1; i < p_sys->i_track; i++ )
@@ -1371,6 +1370,10 @@ static int Demux_Seekable( demux_t *p_demux )
         /* Set the track to use */
         tk = p_sys->track[i_track];
 
+        size_t i_size;
+        unsigned i_ck_remaining_bytes = tk->idx.p_entry[tk->i_idxposc].i_length -
+                                        tk->i_idxposb;
+
         /* read those data */
         if( tk->i_samplesize )
         {
@@ -1388,13 +1391,12 @@ static int Demux_Seekable( demux_t *p_demux )
                     i_toread = __MAX( i_toread, 100 );
                 }
             }
-            i_size = __MIN( tk->idx.p_entry[tk->i_idxposc].i_length -
-                                tk->i_idxposb,
-                            (size_t) i_toread );
+            i_size = __MIN( i_ck_remaining_bytes, (size_t) i_toread );
         }
         else
         {
-            i_size = tk->idx.p_entry[tk->i_idxposc].i_length;
+            assert(tk->i_idxposb == 0);
+            i_size = i_ck_remaining_bytes;
         }
 
         /* need to read and skip tag/header */
