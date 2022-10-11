@@ -1992,18 +1992,15 @@ static int AVI_TrackSeek( demux_t *p_demux,
 
         if( p_stream->fmt.i_cat == AUDIO_ES )
         {
-            unsigned int i;
-            tk->i_blockno = 0;
-            for( i = 0; i < tk->i_idxposc; i++ )
+            if( tk->i_blocksize > 0 )
             {
-                if( tk->i_blocksize > 0 )
-                {
+                tk->i_blockno = tk->i_idxposc;
+            }
+            else
+            {
+                tk->i_blockno = 0;
+                for( unsigned int i = 0; i < tk->i_idxposc; i++ )
                     tk->i_blockno += ( tk->idx.p_entry[i].i_length + tk->i_blocksize - 1 ) / tk->i_blocksize;
-                }
-                else
-                {
-                    tk->i_blockno++;
-                }
             }
         }
 
