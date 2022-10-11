@@ -81,6 +81,11 @@ public:
     Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged FINAL)
     Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
+    Q_PROPERTY(int maximumCount READ maximumCount WRITE setMaximumCount NOTIFY maximumCountChanged
+               FINAL)
+
+    Q_PROPERTY(bool hasMoreItems READ hasMoreItems NOTIFY countChanged FINAL)
+
 public:
     NetworkDeviceModel( QObject* parent = nullptr );
 
@@ -98,6 +103,11 @@ public:
     inline QString getSourceName() { return m_sourceName; }
 
     int getCount() const;
+
+    int maximumCount() const;
+    void setMaximumCount(int count);
+
+    bool hasMoreItems() const;
 
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
     Q_INVOKABLE bool addToPlaylist( int index );
@@ -117,6 +127,8 @@ signals:
     void sourceNameChanged();
     void nameChanged();
     void countChanged();
+
+    void maximumCountChanged();
 
 private:
     using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
@@ -146,6 +158,15 @@ private:
 
     void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
 
+    void addItems(const std::vector<InputItemPtr> & inputList, const MediaSourcePtr & mediaSource);
+
+    void removeItem(std::vector<Item>::iterator & it, int index, int count);
+
+    void expandItems();
+    void shrinkItems();
+
+    int implicitCount() const;
+
 private:
     struct ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
         ListenerCb(NetworkDeviceModel *model, MediaSourcePtr mediaSource)
@@ -167,6 +188,10 @@ private:
     SDCatType m_sdSource = CAT_UNDEFINED;
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name
+
+    int m_count = 0;
+
+    int m_maximumCount = -1;
 
     std::vector<std::unique_ptr<MediaTreeListener>> m_listeners;
 };

@@ -110,8 +110,41 @@ void NetworkDeviceModel::setSourceName(const QString& sourceName)
 
 int NetworkDeviceModel::getCount() const
 {
-    assert( m_items.size() < INT32_MAX );
-    return static_cast<int>( m_items.size() );
+    return m_count;
+}
+
+int NetworkDeviceModel::maximumCount() const
+{
+    return m_maximumCount;
+}
+
+void NetworkDeviceModel::setMaximumCount(int count)
+{
+    if (m_maximumCount == count)
+        return;
+
+    if (count == -1 || m_maximumCount < count)
+    {
+        m_maximumCount = count;
+
+        expandItems();
+    }
+    else
+    {
+        m_maximumCount = count;
+
+        shrinkItems();
+    }
+
+    emit maximumCountChanged();
+}
+
+bool NetworkDeviceModel::hasMoreItems() const
+{
+    if (m_maximumCount == -1)
+        return false;
+    else
+        return ((size_t) m_count < m_items.size());
 }
 
 bool NetworkDeviceModel::insertIntoPlaylist(const QModelIndexList &itemIdList, ssize_t playlistIndex)
@@ -256,8 +289,13 @@ bool NetworkDeviceModel::initializeMediaSources()
     m_listeners.clear();
     if (!m_items.empty()) {
         beginResetModel();
+
         m_items.clear();
+
+        m_count = 0;
+
         endResetModel();
+
         emit countChanged();
     }
     m_name = QString {};
@@ -323,11 +361,14 @@ void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaTreePtr tree, input_ite
         return;
 
     std::vector<InputItemPtr> itemList;
+
     itemList.reserve( count );
     for ( auto i = 0u; i < count; ++i )
         itemList.emplace_back( children[i]->p_item );
 
     QMetaObject::invokeMethod(model, [model=model, itemList=std::move(itemList)]() {
+        int implicitCount = model->implicitCount();
+
         for (auto p_item : itemList)
         {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
@@ -349,69 +390,204 @@ void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaTreePtr tree, input_ite
             if ( (*it).mrls.empty() == false )
                 continue;
             auto idx = std::distance( begin( model->m_items ), it );
-            model->beginRemoveRows({}, idx, idx );
-            model->m_items.erase( it );
-            model->endRemoveRows();
-            model->emit countChanged();
+
+            model->removeItem(it, idx, implicitCount);
         }
+
+        if (model->m_maximumCount != -1)
+            model->expandItems();
     }, Qt::QueuedConnection);
 }
 
-void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count, bool clear )
+void NetworkDeviceModel::refreshDeviceList(MediaSourcePtr mediaSource,
+                                           input_item_node_t * const children[], size_t count,
+                                           bool clear)
 {
-    if ( clear == true )
+    if (clear)
     {
-        QMetaObject::invokeMethod(this, [this, mediaSource]() {
-            beginResetModel();
-            m_items.erase(std::remove_if(m_items.begin(), m_items.end(), [&mediaSource](const Item& value) {
-                return value.mediaSource == mediaSource;
-            }), m_items.end());
-            endResetModel();
-            emit countChanged();
+        QMetaObject::invokeMethod(this, [this, mediaSource]()
+        {
+            int implicitCount = this->implicitCount();
+
+            int index = 0;
+
+            std::vector<Item>::iterator it = m_items.begin();
+
+            while (it != m_items.end())
+            {
+                if (it->mediaSource != mediaSource)
+                    continue;
+
+                removeItem(it, index, implicitCount);
+
+                index++;
+            }
         });
     }
 
     std::vector<InputItemPtr> itemList;
-    itemList.reserve( count );
-    for ( auto i = 0u; i < count; ++i )
-        itemList.emplace_back( children[i]->p_item );
 
-    QMetaObject::invokeMethod(this, [this, itemList=std::move(itemList), mediaSource=std::move(mediaSource) ]() mutable {
-        for ( auto p_item : itemList )
+    itemList.reserve(count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        input_item_t * item = children[i]->p_item;
+
+        itemList.emplace_back(item);
+    }
+
+    QMetaObject::invokeMethod(this, [this, itemList = std::move(itemList), mediaSource]() mutable
+    {
+        addItems(itemList, mediaSource);
+    }, Qt::QueuedConnection);
+}
+
+void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
+                                  const MediaSourcePtr & mediaSource)
+{
+    for (auto inputItem : inputList)
+    {
+        Item item;
+
+        item.name = qfu(inputItem->psz_name);
+
+        item.mainMrl = QUrl::fromEncoded(inputItem->psz_uri);
+
+        auto it = std::upper_bound(begin(m_items),
+                                   end(m_items), item, [](const Item & a, const Item & b)
         {
-            Item item;
-            item.mainMrl = QUrl::fromEncoded( p_item->psz_uri );
-            item.name = qfu(p_item->psz_name);
-            item.mrls.push_back( item.mainMrl );
-            item.type = static_cast<ItemType>( p_item->i_type );
-            item.protocol = item.mainMrl.scheme();
-            item.mediaSource = std::move(mediaSource);
-            item.inputItem = InputItemPtr(p_item);
+            int comp = QString::compare(a.name, b.name, Qt::CaseInsensitive);
 
-            char* artwork = input_item_GetArtworkURL( p_item.get() );
-            if (artwork)
+            if (comp == 0)
+                comp = QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme());
+
+            return (comp <= 0);
+        });
+
+        if (it != end(m_items)
+            &&
+            QString::compare(it->name, item.name, Qt::CaseInsensitive) == 0
+            &&
+            it->mainMrl.scheme() == item.mainMrl.scheme())
+            continue;
+
+        item.mrls.push_back(item.mainMrl);
+
+        item.protocol = item.mainMrl.scheme();
+
+        item.type = static_cast<ItemType>(inputItem->i_type);
+
+        item.mediaSource = mediaSource;
+
+        item.inputItem = InputItemPtr(inputItem);
+
+        char * artwork = input_item_GetArtworkURL(inputItem.get());
+
+        if (artwork)
+        {
+            item.artworkUrl = QUrl::fromEncoded(artwork);
+
+            free(artwork);
+        }
+
+        int pos = std::distance(begin(m_items), it);
+
+        if (m_maximumCount != -1 && m_count >= m_maximumCount)
+        {
+            // NOTE: When the position is beyond the maximum count we don't notify the view.
+            if (pos >= m_maximumCount)
             {
-                item.artworkUrl = QUrl::fromEncoded(artwork);
-                free(artwork);
+                m_items.insert(it, std::move(item));
+
+                continue;
             }
 
-            auto it = std::upper_bound(begin( m_items ), end( m_items ), item, [](const Item& a, const Item& b) {
-                int comp =  QString::compare(a.name , b.name, Qt::CaseInsensitive );
-                if (comp == 0)
-                    comp = QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme());
-                return comp <= 0;
-            });
+            // NOTE: Removing the last item to make room for the new one.
 
-            if (it != end( m_items )
-                && QString::compare(it->name , item.name, Qt::CaseInsensitive ) == 0
-                && it->mainMrl.scheme() == item.mainMrl.scheme())
-                continue;
+            int index = m_count - 1;
 
-            int pos = std::distance(begin(m_items), it);
-            beginInsertRows( {}, pos, pos );
-            m_items.insert( it, std::move( item ) );
-            endInsertRows();
+            beginRemoveRows({}, index, index);
+
+            m_count--;
+
+            endRemoveRows();
+
             emit countChanged();
         }
-    }, Qt::QueuedConnection);
+
+        beginInsertRows({}, pos, pos);
+
+        m_items.insert(it, std::move(item));
+
+        m_count++;
+
+        endInsertRows();
+
+        emit countChanged();
+    }
+
+    if (m_maximumCount != -1)
+        expandItems();
+}
+
+void NetworkDeviceModel::removeItem(std::vector<Item>::iterator & it, int index, int count)
+{
+    if (index < count)
+    {
+        beginRemoveRows({}, index, index);
+
+        it = m_items.erase(it);
+
+        m_count--;
+
+        endRemoveRows();
+
+        emit countChanged();
+    }
+    // NOTE: We don't want to notify the view if the item's position is beyond the
+    //       maximumCount.
+    else
+        it = m_items.erase(it);
+}
+
+void NetworkDeviceModel::expandItems()
+{
+    int count = implicitCount();
+
+    if (m_count >= count)
+        return;
+
+    beginInsertRows({}, m_count, count - 1);
+
+    m_count = count;
+
+    endInsertRows();
+
+    emit countChanged();
+}
+
+void NetworkDeviceModel::shrinkItems()
+{
+    int count = implicitCount();
+
+    if (m_count <= count)
+        return;
+
+    beginRemoveRows({}, count, m_count - 1);
+
+    m_count = count;
+
+    endRemoveRows();
+
+    emit countChanged();
+}
+
+int NetworkDeviceModel::implicitCount() const
+{
+    assert(m_items.size() < INT32_MAX);
+
+    if (m_maximumCount == -1)
+        return (int) m_items.size();
+    else
+        return qMin((int) m_items.size(), m_maximumCount);
 }
