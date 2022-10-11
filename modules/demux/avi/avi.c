@@ -1379,6 +1379,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             int64_t i_toread;
 
+            /* remaining bytes to read inside the current read increment */
             if( ( i_toread = toread[i_track].i_toread ) <= 0 )
             {
                 if( tk->i_samplesize > 1 )
@@ -1387,6 +1388,7 @@ static int Demux_Seekable( demux_t *p_demux )
                 }
                 else
                 {
+                    /* refill current read increment */
                     i_toread = AVI_PTSToByte( tk, 20 * 1000 );
                     i_toread = __MAX( i_toread, 100 );
                 }
@@ -1420,7 +1422,7 @@ static int Demux_Seekable( demux_t *p_demux )
             p_frame->i_flags = BLOCK_FLAG_TYPE_PB;
         }
 
-        /* read data */
+        /* advance chunk/byte pointers */
         if( tk->i_samplesize )
         {
             toread[i_track].i_toread -= i_size;
@@ -1432,8 +1434,9 @@ static int Demux_Seekable( demux_t *p_demux )
                 tk->i_idxposc++;
             }
         }
-        else
+        else /* full chunk */
         {
+            /* Goto to next chunk */
             tk->i_idxposc++;
             if( tk->fmt.i_cat == AUDIO_ES )
             {
@@ -1442,6 +1445,7 @@ static int Demux_Seekable( demux_t *p_demux )
             toread[i_track].i_toread--;
         }
 
+        /* check new chunk and set new read pos */
         if( tk->i_idxposc < tk->idx.i_size)
         {
             toread[i_track].i_posf =
@@ -1452,7 +1456,7 @@ static int Demux_Seekable( demux_t *p_demux )
             }
 
         }
-        else
+        else /* all chunks read for this track */
         {
             toread[i_track].i_posf = -1;
         }
