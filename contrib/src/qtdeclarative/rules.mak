@@ -31,6 +31,7 @@ QT_DECLARATIVE_CONFIG := \
 
 .qtdeclarative: qtdeclarative
 	# Generate Makefile & src/Makefile
+	$(call qmake_toolchain, $<)
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake -- $(QT_DECLARATIVE_CONFIG)
 	cd $</src && $(PREFIX)/lib/qt5/bin/qmake -o Makefile src.pro
 	# Build & install only what we require

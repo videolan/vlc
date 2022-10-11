@@ -24,6 +24,7 @@ qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(MOVE)
 
 .qtsvg: qtsvg
+	$(call qmake_toolchain, $<)
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
 	$(MAKE) -C $<

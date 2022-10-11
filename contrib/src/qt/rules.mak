@@ -114,7 +114,24 @@ endif
 QT_ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 
+qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
+	echo "  QMAKE_C        = $(CC)"      >> $(1)/.qmake.cache && \
+	echo "  QMAKE_CXX      = $(CXX)"     >> $(1)/.qmake.cache && \
+	echo "  QMAKE_CFLAGS   += -isystem $(PREFIX)/include $(CFLAGS)" >> $(1)/.qmake.cache && \
+	echo "  QMAKE_CXXFLAGS += -isystem $(PREFIX)/include $(CXXFLAGS)" >> $(1)/.qmake.cache && \
+	echo "  QMAKE_LFLAGS   += $(LDFLAGS)"  >> $(1)/.qmake.cache && \
+	echo "} else {"                        >> $(1)/.qmake.cache && \
+	echo "  QMAKE_C        = $(BUILDCC)"   >> $(1)/.qmake.cache && \
+	echo "  QMAKE_CXX      = $(BUILDCXX)"  >> $(1)/.qmake.cache && \
+	echo "  QMAKE_CFLAGS   += $(BUILDCFLAGS)"   >> $(1)/.qmake.cache && \
+	echo "  QMAKE_CXXFLAGS += $(BUILDCXXFLAGS)" >> $(1)/.qmake.cache && \
+	echo "  QMAKE_LFLAGS   += $(BUILDLDFLAGS)"  >> $(1)/.qmake.cache && \
+	echo "}"                                           >> $(1)/.qmake.cache && \
+	echo "CONFIG += static -shared -create_libtool nostrip object_parallel_to_source create_pc" >> $(1)/.qmake.cache
+
+
 .qt: qt
+	$(call qmake_toolchain, $<)
 	# Prevent all Qt contribs from generating and installing libtool .la files
 	sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" $(UNPACK_DIR)/mkspecs/features/qt_module.prf
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5

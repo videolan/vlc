@@ -21,6 +21,7 @@ qtwayland: qtwayland-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
 	$(MOVE)
 
 .qtwayland: qtwayland
+	$(call qmake_toolchain, $<)
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
 	$(MAKE) -C $<
