@@ -1251,7 +1251,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             p_frame->i_flags = BLOCK_FLAG_TYPE_I;
         }
-        else
+        else if( tk->fmt.i_cat == VIDEO_ES )
         {
             p_frame->i_flags = BLOCK_FLAG_TYPE_PB;
         }
