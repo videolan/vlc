@@ -2,8 +2,7 @@
 
 QTWAYLAND_VERSION_MAJOR := 5.15
 QTWAYLAND_VERSION := $(QTWAYLAND_VERSION_MAJOR).1
-QTWAYLAND_URL := http://download.qt.io/development_releases/qt/5.12/5.12.0-beta1/submodules/qtwayland-everywhere-src-5.12.0-beta1.tar.xz
-QTWAYLAND_URL := http://download.qt.io/official_releases/qt/$(QTWAYLAND_VERSION_MAJOR)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
+QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION_MAJOR)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
 DEPS_qtwayland = qtdeclarative $(DEPS_qtdeclarative)
 

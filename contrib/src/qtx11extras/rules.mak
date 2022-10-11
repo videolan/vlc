@@ -2,7 +2,7 @@
 
 QTX11_VERSION_MAJOR := 5.15
 QTX11_VERSION:= $(QTX11_VERSION_MAJOR).1
-QTX11_URL := http://download.qt.io/official_releases/qt/$(QTX11_VERSION_MAJOR)/$(QTX11_VERSION)/submodules/qtx11extras-everywhere-src-$(QTX11_VERSION).tar.xz
+QTX11_URL := $(QT)/$(QTX11_VERSION_MAJOR)/$(QTX11_VERSION)/submodules/qtx11extras-everywhere-src-$(QTX11_VERSION).tar.xz
 
 DEPS_qtx11extras += qt $(DEPS_qt)
 

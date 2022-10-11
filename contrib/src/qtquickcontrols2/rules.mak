@@ -2,7 +2,7 @@
 
 QTQC2_VERSION_MAJOR := 5.15
 QTQC2_VERSION := $(QTQC2_VERSION_MAJOR).1
-QTQC2_URL := http://download.qt.io/official_releases/qt/$(QTQC2_VERSION_MAJOR)/$(QTQC2_VERSION)/submodules/qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz
+QTQC2_URL := $(QT)/$(QTQC2_VERSION_MAJOR)/$(QTQC2_VERSION)/submodules/qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz
 
 ifdef HAVE_WIN32
 PKGS += qtquickcontrols2
