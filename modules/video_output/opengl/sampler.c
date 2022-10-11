@@ -742,7 +742,6 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
             pl_shader_dither(sh, out_bits, &priv->dither_state, &(struct pl_dither_params) {
                 .method   = method,
-                .lut_size = 4, // avoid too large values, since this gets embedded
             });
         }
 
