@@ -25,9 +25,19 @@
 #include "../qtthemeprovider.hpp"
 #include <mutex>
 
+#include "nav_button_provider_gtk.h"
 #include "gtk_util.h"
 
 using namespace gtk;
+
+
+class GtkPrivateThemeProvider {
+public:
+    bool windowMaximized = false;
+    bool windowActive = false;
+    int bannerHeight = -1;
+    NavButtonProviderGtk navButtons;
+};
 
 static bool isThemeDark( vlc_qt_theme_provider_t*)
 {
@@ -50,6 +60,49 @@ static void setGtkColorSet(vlc_qt_theme_provider_t* obj, void* base, void* disab
         setGtkColor(obj, disabled, getter(selector + ":disabled"));
     if (inactive)
         setGtkColor(obj, inactive, getter(selector + ":backdrop"));
+}
+
+picture_t* getThemeImage(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, const vlc_qt_theme_image_setting* settings)
+{
+    auto sys = static_cast<GtkPrivateThemeProvider*>(obj->p_sys);
+    if (type == VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON)
+    {
+        SetDeviceScaleFactor(settings->windowScaleFactor);
+
+        bool windowMaximized = settings->u.csdButton.maximized;
+        bool windowActive = settings->u.csdButton.active;
+        int bannerHeight = settings->u.csdButton.bannerHeight;
+        vlc_qt_theme_csd_button_state state = settings->u.csdButton.state;
+        vlc_qt_theme_csd_button_type buttonType = settings->u.csdButton.buttonType;
+
+        if (buttonType == VLC_QT_THEME_BUTTON_MAXIMIZE && windowMaximized)
+            buttonType = VLC_QT_THEME_BUTTON_RESTORE;
+        else if (buttonType == VLC_QT_THEME_BUTTON_RESTORE && !windowMaximized)
+             buttonType = VLC_QT_THEME_BUTTON_MAXIMIZE;
+
+        if (windowActive != sys->windowActive
+            || windowMaximized != sys->windowMaximized
+            || bannerHeight != sys->bannerHeight)
+        {
+            sys->navButtons.RedrawImages(bannerHeight, windowMaximized, windowActive);
+            sys->bannerHeight = bannerHeight;
+            sys->windowMaximized = windowMaximized;
+            sys->windowActive = windowActive;
+        }
+
+        picture_t* pic = sys->navButtons.GetImage(buttonType, state).get();
+        if (pic)
+            picture_Hold(pic);
+        return pic;
+    }
+    return nullptr;
+}
+
+bool supportThemeImage(vlc_qt_theme_provider_t*, vlc_qt_theme_image_type type)
+{
+    if (type == VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON)
+        return true;
+    return false;
 }
 
 static void updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
@@ -81,8 +134,10 @@ static void updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*
     setGtkColor(obj, p->tooltipTextColor, GtkStyleContextGetColor(AppendCssNodeToStyleContext(tooltip_context, "GtkLabel#label")));
 }
 
-static void Close(vlc_qt_theme_provider_t*)
+static void Close(vlc_qt_theme_provider_t* obj)
 {
+    auto sys = static_cast<GtkPrivateThemeProvider*>(obj->p_sys);
+    delete sys;
 }
 
 static int Open(vlc_object_t* p_this)
@@ -122,9 +177,16 @@ static int Open(vlc_object_t* p_this)
         g_type_class_unref(g_type_class_ref(gtk_scale_get_type()));
     });
 
+    auto sys = new (std::nothrow) GtkPrivateThemeProvider();
+    if (!sys)
+        return VLC_EGENERIC;
+
+    obj->p_sys = sys;
     obj->close = Close;
     obj->isThemeDark = isThemeDark;
     obj->updatePalette = updatePalette;
+    obj->supportThemeImage  = supportThemeImage;
+    obj->getThemeImage = getThemeImage;
     return VLC_SUCCESS;
 }
 

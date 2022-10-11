@@ -1091,6 +1091,8 @@ libqt_gtktheme_plugin_la_SOURCES = \
 	gui/qt/style/gtkthemeprovider/gtkthemeprovider.cpp \
 	gui/qt/style/gtkthemeprovider/gtk_util.cpp \
 	gui/qt/style/gtkthemeprovider/gtk_util.h \
+	gui/qt/style/gtkthemeprovider/nav_button_provider_gtk.cpp \
+	gui/qt/style/gtkthemeprovider/nav_button_provider_gtk.h \
 	gui/qt/style/gtkthemeprovider/scoped_gobject.h
 if ENABLE_QT
 gui_LTLIBRARIES += libqt_gtktheme_plugin.la
