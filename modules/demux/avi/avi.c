@@ -2251,6 +2251,8 @@ static void avi_index_Clean( avi_index_t *p_index )
 {
     free( p_index->p_entry );
 }
+#define MAX_INDEX_ENTRIES __MIN(SIZE_MAX/sizeof(avi_entry_t), UINT32_MAX)
+#define INDEX_EXTENT 16384
 static void avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
                               avi_entry_t *p_entry )
 {
@@ -2258,14 +2260,23 @@ static void avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
     if( *pi_last_pos < p_entry->i_pos )
          *pi_last_pos = p_entry->i_pos;
 
+    if( p_index->i_size == MAX_INDEX_ENTRIES )
+        return;
+
     /* add the entry */
     if( p_index->i_size >= p_index->i_max )
     {
-        p_index->i_max += 16384;
+        if( MAX_INDEX_ENTRIES - INDEX_EXTENT > p_index->i_max )
+            p_index->i_max += INDEX_EXTENT;
+        else
+            p_index->i_max = MAX_INDEX_ENTRIES;
         p_index->p_entry = realloc_or_free( p_index->p_entry,
-                                            p_index->i_max * sizeof( *p_index->p_entry ) );
+                                            p_index->i_max * sizeof(avi_entry_t) );
         if( !p_index->p_entry )
+        {
+            avi_index_Init( p_index );
             return;
+        }
     }
     /* calculate cumulate length */
     if( p_index->i_size > 0 )
