@@ -52,7 +52,7 @@ struct vlc_gl_sampler_priv {
         GLint Textures[PICTURE_PLANE_MAX];
         GLint TexSizes[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
         GLint ConvMatrix;
-        GLint *pl_vars; /* for pl_sh_res */
+        GLint *pl_vars, *pl_descs; /* for pl_sh_res */
     } uloc;
 
     bool yuv_color;
@@ -285,6 +285,11 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         struct pl_shader_var sv = res->variables[i];
         priv->uloc.pl_vars[i] = vt->GetUniformLocation(program, sv.var.name);
     }
+
+    for (int i = 0; res && i < res->num_descriptors; i++) {
+        struct pl_shader_desc sd = res->descriptors[i];
+        priv->uloc.pl_descs[i] = vt->GetUniformLocation(program, sd.desc.name);
+    }
 #endif
 }
 
@@ -345,6 +350,42 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
             case 4: vt->Uniform4fv(loc, var.dim_a, f); break;
             }
             break;
+        }
+    }
+
+    for (int i = 0; res && i < res->num_descriptors; i++) {
+        GLint loc = priv->uloc.pl_descs[i];
+        if (loc == -1)
+            continue;
+        struct pl_shader_desc sd = res->descriptors[i];
+        assert(sd.desc.type == PL_DESC_SAMPLED_TEX);
+        pl_tex tex = sd.binding.object;
+        int texid = glfmt->tex_count + i; // first free texture unit
+        unsigned gltex, target;
+        gltex = pl_opengl_unwrap(priv->pl_opengl->gpu, tex, &target, NULL, NULL);
+        vt->Uniform1i(loc, texid);
+        vt->ActiveTexture(GL_TEXTURE0 + texid);
+        vt->BindTexture(target, gltex);
+
+        static const GLint wraps[PL_TEX_ADDRESS_MODE_COUNT] = {
+            [PL_TEX_ADDRESS_CLAMP]  = GL_CLAMP_TO_EDGE,
+            [PL_TEX_ADDRESS_REPEAT] = GL_REPEAT,
+            [PL_TEX_ADDRESS_MIRROR] = GL_MIRRORED_REPEAT,
+        };
+
+        static const GLint filters[PL_TEX_SAMPLE_MODE_COUNT] = {
+            [PL_TEX_SAMPLE_NEAREST] = GL_NEAREST,
+            [PL_TEX_SAMPLE_LINEAR]  = GL_LINEAR,
+        };
+
+        GLint filter = filters[sd.binding.sample_mode];
+        GLint wrap = wraps[sd.binding.address_mode];
+        vt->TexParameteri(target, GL_TEXTURE_MIN_FILTER, filter);
+        vt->TexParameteri(target, GL_TEXTURE_MAG_FILTER, filter);
+        switch (pl_tex_params_dimension(tex->params)) {
+        case 3: vt->TexParameteri(target, GL_TEXTURE_WRAP_R, wrap); // fall through
+        case 2: vt->TexParameteri(target, GL_TEXTURE_WRAP_T, wrap); // fall through
+        case 1: vt->TexParameteri(target, GL_TEXTURE_WRAP_S, wrap); break;
         }
     }
 #endif
@@ -720,9 +761,19 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
             }
         }
 
+        FREENULL(priv->uloc.pl_descs);
+        priv->uloc.pl_descs = calloc(res->num_descriptors, sizeof(GLint));
+        for (int i = 0; i < res->num_descriptors; i++) {
+            struct pl_shader_desc sd = res->descriptors[i];
+            assert(sd.desc.type == PL_DESC_SAMPLED_TEX);
+            pl_tex tex = sd.binding.object;
+            assert(tex->sampler_type == PL_SAMPLER_NORMAL);
+            int dims = pl_tex_params_dimension(tex->params);
+            ADDF("uniform sampler%dD %s;\n", dims, sd.desc.name);
+        }
+
         // We can't handle these yet, but nothing we use requires them, either
         assert(res->num_vertex_attribs == 0);
-        assert(res->num_descriptors == 0);
 
         ADD(res->glsl);
     }
@@ -846,6 +897,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
 #ifdef HAVE_LIBPLACEBO_GL
     priv->uloc.pl_vars = NULL;
+    priv->uloc.pl_descs = NULL;
     priv->pl_sh_res = NULL;
     priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(gl));
     priv->pl_opengl = pl_opengl_create(priv->pl_log, NULL);
@@ -884,6 +936,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 
 #ifdef HAVE_LIBPLACEBO_GL
     FREENULL(priv->uloc.pl_vars);
+    FREENULL(priv->uloc.pl_descs);
     pl_shader_free(&priv->pl_sh);
     pl_shader_obj_destroy(&priv->tone_map_state);
     pl_shader_obj_destroy(&priv->dither_state);
