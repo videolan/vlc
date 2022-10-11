@@ -78,6 +78,9 @@ endif
 if QT_QML_DEBUG
 libqt_plugin_la_CPPFLAGS += -DQT_QML_DEBUG
 endif
+if HAVE_QT5_GTK
+libqt_plugin_la_CPPFLAGS += -DQT5_HAS_GTK
+endif
 
 libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp gui/qt/plugins.hpp \
@@ -1075,6 +1078,23 @@ EXTRA_DIST += $(libqt_plugin_la_QML)
 gui/qt/resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_QML)
 	$(AM_V_GEN)$(RCC) --name vlc -o $@ $(filter %.qrc, $^)
 
+endif
+
+if HAVE_QT5_GTK
+libqt_gtktheme_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(GTK3_CFLAGS)
+libqt_gtktheme_CPPFLAGS = $(AM_CPPFLAGS)
+libqt_gtktheme_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+libqt_gtktheme_plugin_la_LIBADD = $(GTK3_LIBS)
+libqt_gtktheme_plugin_la_SOURCES = \
+	gui/qt/style/gtkthemeprovider/gtk_compat.cpp \
+	gui/qt/style/gtkthemeprovider/gtk_compat.h \
+	gui/qt/style/gtkthemeprovider/gtkthemeprovider.cpp \
+	gui/qt/style/gtkthemeprovider/gtk_util.cpp \
+	gui/qt/style/gtkthemeprovider/gtk_util.h \
+	gui/qt/style/gtkthemeprovider/scoped_gobject.h
+if ENABLE_QT
+gui_LTLIBRARIES += libqt_gtktheme_plugin.la
+endif
 endif
 
 if ENABLE_QT

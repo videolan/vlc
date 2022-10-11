@@ -3924,6 +3924,7 @@ AC_ARG_ENABLE([qt],
   ])
 ])
 have_qt5_x11="no"
+have_qt5_gtk="no"
 AS_IF([test "${enable_qt}" != "no"], [
   PKG_CHECK_MODULES([QT], [Qt5Core >= 5.11.0 Qt5Widgets Qt5Gui Qt5Quick Qt5QuickWidgets Qt5QuickControls2 Qt5Svg], [
       PKG_CHECK_MODULES([QT5_X11], [Qt5X11Extras], [
@@ -3981,6 +3982,14 @@ AS_IF([test "${enable_qt}" != "no"], [
         AS_IF([test "${SYS}" = "darwin" -a "${HAVE_OSX}" = 1], [
           PKG_CHECK_MODULES([QT5_PLATFORM_PLUGINS], [qcocoa])
         ])
+
+      ])
+
+      AS_IF([test  "${SYS}" != "mingw32" -a "${SYS}" != "darwin"], [
+          dnl gtk theme provider
+          PKG_CHECK_MODULES([GTK3], [gtk+-3.0 >= 3.20], [
+            have_qt5_gtk=yes
+          ], [:])
       ])
     ], [
       AS_IF([test -n "${enable_qt}"],[
@@ -4008,6 +4017,7 @@ AC_SUBST([QT_VERSION])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_QT5_WAYLAND], [test "${have_qt5_wayland}" = "yes"])
+AM_CONDITIONAL([HAVE_QT5_GTK], [test "${have_qt5_gtk}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
