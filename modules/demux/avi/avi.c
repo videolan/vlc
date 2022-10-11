@@ -1268,12 +1268,10 @@ static int Demux_Seekable( demux_t *p_demux )
         }
         else
         {
-            int i_length = tk->idx.p_entry[tk->i_idxposc].i_length;
-
             tk->i_idxposc++;
             if( tk->fmt.i_cat == AUDIO_ES )
             {
-                tk->i_blockno += tk->i_blocksize > 0 ? ( i_length + tk->i_blocksize - 1 ) / tk->i_blocksize : 1;
+                tk->i_blockno += tk->i_blocksize > 0 ? ( i_size + tk->i_blocksize - 1 ) / tk->i_blocksize : 1;
             }
             toread[i_track].i_toread--;
         }
