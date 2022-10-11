@@ -908,6 +908,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     }
 
     priv->pl_sh = pl_shader_alloc(priv->pl_log, &(struct pl_shader_params) {
+        .gpu = priv->pl_opengl->gpu,
         .glsl = {
 #   ifdef USE_OPENGL_ES2
             .version = 100,
