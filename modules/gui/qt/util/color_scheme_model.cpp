@@ -80,9 +80,11 @@ void ColorSchemeModel::setCurrentIndex(const int newIndex)
     if (m_currentIndex == newIndex)
         return;
 
-    assert(newIndex >= 0 && newIndex < m_list.size());
     const auto oldIndex = this->index(m_currentIndex);
     m_currentIndex = newIndex;
+    if (m_currentIndex < 0 || m_currentIndex >= m_list.size())
+        m_currentIndex = 0;
+
     emit dataChanged(index(m_currentIndex), index(m_currentIndex), {Qt::CheckStateRole});
     emit dataChanged(oldIndex, oldIndex, {Qt::CheckStateRole});
     emit currentChanged();
