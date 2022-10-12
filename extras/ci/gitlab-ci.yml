@@ -27,7 +27,7 @@ variables:
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20220728132611
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20220810081944
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20220505175523
-    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20210915101305
+    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20221011224907
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
