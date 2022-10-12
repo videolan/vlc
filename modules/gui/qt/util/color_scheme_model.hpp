@@ -34,9 +34,7 @@ public:
     {
         System,
         Day,
-        Night,
-
-        Auto
+        Night
     };
 
     struct Item
@@ -76,14 +74,13 @@ private:
     };
 
     class DefaultSchemeList;
-    class WinColorSchemeList;
 
     static std::unique_ptr<SchemeList> createList(ColorSchemeModel *parent);
 
     // \internal used by SchemeList to notify scheme changed
     void indexChanged(int i);
 
-    const std::unique_ptr<SchemeList> m_list;
+    const QVector<ColorSchemeModel::Item> m_list;
     int m_currentIndex;
 };
 
