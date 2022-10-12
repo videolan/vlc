@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
+#include <vlc_aout.h>
 
 #include <vlc_dialog.h>
 
@@ -501,14 +502,27 @@ static int Open( vlc_object_t * p_this )
                     tk->fmt.i_codec = AVI_FourccGetCodec( AUDIO_ES, p_auds->p_wf->wFormatTag );
 
                 tk->i_blocksize = p_auds->p_wf->nBlockAlign;
-                if( tk->i_blocksize == 0 )
+
+                /* Fix blocksize == 0 and force interleaving PCM chunks samplesize == 0 */
+                if( tk->i_samplesize == 0 || tk->i_blocksize == 0 )
                 {
-                    if( p_auds->p_wf->wFormatTag == 1 )
-                        tk->i_blocksize = p_auds->p_wf->nChannels * (p_auds->p_wf->wBitsPerSample/8);
-                    else
+                    vlc_fourcc_t i_codec = vlc_fourcc_GetCodecAudio( tk->fmt.i_codec,
+                                                                     p_auds->p_wf->wBitsPerSample );
+                    unsigned bps = aout_BitsPerSample( i_codec );
+                    if( bps > 0 ) /* PCM audio */
+                    {
+                        if( tk->i_blocksize == 0 )
+                            tk->i_blocksize = bps * p_auds->p_wf->nChannels / 8;
+                        if( tk->i_samplesize == 0 )
+                            tk->i_samplesize = tk->i_blocksize;
+                        tk->fmt.b_packetized = true;
+                    }
+                    else if( tk->i_blocksize == 0 )
+                    {
                         tk->i_blocksize = 1;
+                    }
                 }
-                else if( tk->i_samplesize != 0 && tk->i_samplesize != tk->i_blocksize )
+                else if( tk->i_samplesize != tk->i_blocksize )
                 {
                     msg_Warn( p_demux, "track[%u] samplesize=%u and blocksize=%u are not equal."
                                        "Using blocksize as a workaround.",
