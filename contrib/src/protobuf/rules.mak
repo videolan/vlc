@@ -1,5 +1,7 @@
 # protobuf
-PROTOBUF_VERSION := 3.4.1
+PROTOBUF_MAJVERSION := 3.4
+PROTOBUF_REVISION := 1
+PROTOBUF_VERSION := $(PROTOBUF_MAJVERSION).$(PROTOBUF_REVISION)
 PROTOBUF_URL := $(GITHUB)/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
 
 ifndef HAVE_TVOS
@@ -14,10 +16,10 @@ PKGS_FOUND += protoc
 endif
 endif
 
-ifeq ($(shell $(HOST)-protoc --version 2>/dev/null | head -1 | sed s/'.* '//),$(PROTOBUF_VERSION))
+ifeq ($(shell $(HOST)-protoc --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),$(PROTOBUF_MAJVERSION))
 PKGS_FOUND += protoc
 endif
-ifeq ($(shell protoc --version 2>/dev/null | head -1 | sed s/'.* '//),$(PROTOBUF_VERSION))
+ifeq ($(shell protoc --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),$(PROTOBUF_MAJVERSION))
 PKGS_FOUND += protoc
 endif
 
