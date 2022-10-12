@@ -27,7 +27,7 @@ index 45d1e7e7..8b0a38fa 100644
  
  
  /* When we query the performance counters, we allocate an initial buffer and
-@@ -259,6 +262,7 @@ init_system_rng (void)
+@@ -260,6 +263,7 @@ init_system_rng (void)
    system_rng_available = 0;
    hRNGProv = NULL;
  
@@ -35,7 +35,7 @@ index 45d1e7e7..8b0a38fa 100644
    hAdvAPI32 = GetModuleHandle ("AdvAPI32.dll");
    if (!hAdvAPI32)
      return;
-@@ -274,6 +278,19 @@ init_system_rng (void)
+@@ -275,6 +279,19 @@ init_system_rng (void)
       This isn't exported by name, so we have to get it by ordinal.  */
    pRtlGenRandom = (RTLGENRANDOM)
      GetProcAddress (hAdvAPI32, "SystemFunction036");
@@ -59,14 +59,14 @@ diff --git a/src/Makefile.am b/src/Makefile.am
 index 3cc4a552..a22acd41 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -123,7 +123,9 @@ libgcrypt_la_LIBADD = $(gcrypt_res) \
- 	../random/librandom.la \
+@@ -127,6 +127,10 @@ libgcrypt_la_LIBADD = $(gcrypt_res) \
  	../mpi/libmpi.la \
- 	../compat/libcompat.la  $(GPG_ERROR_LIBS)
--
+ 	../compat/libcompat.la $(DL_LIBS) $(GPG_ERROR_LIBS)
+ 
 +if HAVE_W32_SYSTEM
 +libgcrypt_la_LIBADD += -lbcrypt
 +endif
++
  
  dumpsexp_SOURCES = dumpsexp.c
  dumpsexp_CFLAGS = $(arch_gpg_error_cflags)
