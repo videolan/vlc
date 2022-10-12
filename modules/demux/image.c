@@ -325,9 +325,8 @@ static bool IsBmp(stream_t *s)
         return false;
     if (data_offset < header_size + 14)
         return false;
-    if (header_size != 12 && header_size < 40)
-        return false;
-    return true;
+    static const uint8_t header_sizes[] = { 12, 40, 56, 64, 108, 124 };
+    return memchr(header_sizes, header_size, ARRAY_SIZE(header_sizes)) != NULL;
 }
 
 static bool IsPcx(stream_t *s)
