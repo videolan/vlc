@@ -212,23 +212,21 @@ vlc_DIR *vlc_opendir (const char *dirname)
 
     char *wildcard;
     const size_t len = strlen(dirname);
-    if (p_dir->u.insert_dot_dot)
+    if (p_dir->u.insert_dot_dot || strncmp(dirname + 1, ":\\", 2) != 0)
     {
         // Prepending the string "\\?\" does not allow access to the root directory.
+        // Don't use long path with relative pathes.
         wildcard = malloc(len + 3);
         if (unlikely(wildcard == NULL))
         {
             free (p_dir);
             return NULL;
         }
-        else
-        {
-            memcpy(wildcard, dirname, len);
-            size_t j = len;
-            wildcard[j++] = '\\';
-            wildcard[j++] = '*';
-            wildcard[j++] = '\0';
-        }
+        memcpy(wildcard, dirname, len);
+        size_t j = len;
+        wildcard[j++] = '\\';
+        wildcard[j++] = '*';
+        wildcard[j++] = '\0';
     }
     else
     {
@@ -238,28 +236,26 @@ vlc_DIR *vlc_opendir (const char *dirname)
             free (p_dir);
             return NULL;
         }
-        else
+
+        // prepend "\\?\"
+        wildcard[0] = '\\';
+        wildcard[1] = '\\';
+        wildcard[2] = '?';
+        wildcard[3] = '\\';
+        size_t j = 4;
+        for (size_t i=0; i<len;i++)
         {
-            // prepend "\\?\"
-            wildcard[0] = '\\';
-            wildcard[1] = '\\';
-            wildcard[2] = '?';
-            wildcard[3] = '\\';
-            size_t j = 4;
-            for (size_t i=0; i<len;i++)
-            {
-                // remove forward slashes from long pathes to please FindFirstFileExW
-                if (unlikely(dirname[i] == '/'))
-                    wildcard[j++] = '\\';
-                else
-                    wildcard[j++] = dirname[i];
-            }
-            // append "\*" or "*"
-            if (wildcard[j-1] != '\\')
+            // remove forward slashes from long pathes to please FindFirstFileExW
+            if (unlikely(dirname[i] == '/'))
                 wildcard[j++] = '\\';
-            wildcard[j++] = '*';
-            wildcard[j++] = '\0';
+            else
+                wildcard[j++] = dirname[i];
         }
+        // append "\*" or "*"
+        if (wildcard[j-1] != '\\')
+            wildcard[j++] = '\\';
+        wildcard[j++] = '*';
+        wildcard[j++] = '\0';
     }
     p_dir->wildcard = ToWide(wildcard);
     free(wildcard);
