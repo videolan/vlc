@@ -20,7 +20,7 @@ DEPS_qt += wine-headers
 endif
 endif
 
-DEPS_qt += freetype2 $(DEPS_freetype2) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib)
+DEPS_qt += freetype2 $(DEPS_freetype2) harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib)
 
 ifeq ($(call need_pkg,"Qt5Core >= 5.11 Qt5Gui Qt5Widgets"),)
 PKGS_FOUND += qt
@@ -100,7 +100,7 @@ QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-vulkan -no-sql-odbc -no-pch -no-feature-testlib \
 	-no-compile-examples -nomake examples -nomake tests \
-	-system-freetype -system-libjpeg -system-libpng -system-zlib
+	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib
 
 QT_CONFIG += -skip qtsql
 QT_CONFIG += -release
