@@ -35,7 +35,7 @@ FadingEdgeListView {
 
     readonly property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
-    property bool keyNavigationWraps : false
+    property bool keyNavigationWraps: false
 
     // Private
 
@@ -69,12 +69,37 @@ FadingEdgeListView {
 
     property int _currentFocusReason: Qt.OtherFocusReason
 
-
     // Settings
+
+    focus: true
+
+    //key navigation is reimplemented for item selection
+    keyNavigationEnabled: false
+
+    ScrollBar.vertical: ScrollBar { id: scroll_id; visible: root.contentHeight > root.height }
+    ScrollBar.horizontal: ScrollBar { visible: root.contentWidth > root.width }
+
+    highlightMoveDuration: 300 //ms
+    highlightMoveVelocity: 1000 //px/s
+
+    section.property: ""
+    section.criteria: ViewSection.FullString
+    section.delegate: sectionHeading
+
+    disableBeginningFade: (dragAutoScrollHandler.scrollingDirection
+                           ===
+                           Util.ViewDragAutoScrollHandler.Backward)
+
+    disableEndFade: (dragAutoScrollHandler.scrollingDirection
+                     ===
+                     Util.ViewDragAutoScrollHandler.Forward)
 
     Accessible.role: Accessible.List
 
     // Events
+
+    // NOTE: We always want a valid 'currentIndex' by default.
+    onCountChanged: if (count && currentIndex === -1) currentIndex = 0
 
     onCurrentItemChanged: {
         if (_currentFocusReason === Qt.OtherFocusReason)
@@ -115,27 +140,6 @@ FadingEdgeListView {
     function prevPage() {
         root.contentX -= Math.min(root.width,root.contentX - root.originX)
     }
-
-    focus: true
-
-    //key navigation is reimplemented for item selection
-    keyNavigationEnabled: false
-
-    ScrollBar.vertical: ScrollBar { id: scroll_id; visible: root.contentHeight > root.height }
-    ScrollBar.horizontal: ScrollBar { visible: root.contentWidth > root.width }
-
-    highlightMoveDuration: 300 //ms
-    highlightMoveVelocity: 1000 //px/s
-
-    section.property: ""
-    section.criteria: ViewSection.FullString
-    section.delegate: sectionHeading
-
-    // NOTE: We always want a valid 'currentIndex' by default.
-    onCountChanged: if (count && currentIndex === -1) currentIndex = 0
-
-    disableBeginningFade: (dragAutoScrollHandler.scrollingDirection === Util.ViewDragAutoScrollHandler.Backward)
-    disableEndFade: (dragAutoScrollHandler.scrollingDirection === Util.ViewDragAutoScrollHandler.Forward)
 
     Keys.onPressed: {
         var newIndex = -1
