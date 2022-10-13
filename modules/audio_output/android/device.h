@@ -82,6 +82,12 @@ aout_stream_GainRequest(aout_stream_t *s, float gain)
     aout_GainRequest(s->aout, gain);
 }
 
+static inline void
+aout_stream_RestartRequest(aout_stream_t *s, unsigned mode)
+{
+    aout_RestartRequest(s->aout, mode);
+}
+
 static inline
 void aout_stream_TimingReport(aout_stream_t *s, vlc_tick_t system_ts,
                               vlc_tick_t audio_ts)
