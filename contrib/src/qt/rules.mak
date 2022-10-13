@@ -96,7 +96,7 @@ QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
 	-device-option VLC_EXTRA_CXXFLAGS="-isystem $(PREFIX)/include" \
 	-device-option VLC_EXTRA_LDFLAGS="-L$(PREFIX)/lib"
 
-QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
+QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-vulkan -no-sql-odbc -no-pch -no-feature-testlib \
 	-no-compile-examples -nomake examples -nomake tests \
