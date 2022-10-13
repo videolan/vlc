@@ -102,7 +102,6 @@ QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-compile-examples -nomake examples -nomake tests \
 	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib
 
-QT_CONFIG += -skip qtsql
 QT_CONFIG += -release
 
 ifeq ($(V),1)
