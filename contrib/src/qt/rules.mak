@@ -59,6 +59,8 @@ endif
 	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
 	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
 	$(APPLY) $(SRC)/qt/set-mkspecs-properties.patch
+	# Let us decide the WINVER/_WIN32_WINNT
+	sed -i.orig 's,mingw: DEFINES += WINVER=0x0601,# mingw: DEFINES += WINVER=0x0601,' "$(UNPACK_DIR)/mkspecs/features/qt_build_config.prf"
 	$(MOVE)
 
 
