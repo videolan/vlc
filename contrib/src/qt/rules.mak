@@ -33,7 +33,6 @@ $(TARBALLS)/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz:
 
 qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
-	$(APPLY) $(SRC)/qt/0001-allow-to-pass-user-defined-compilation-flags-to-qt.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
 ifndef HAVE_WIN64
@@ -100,10 +99,6 @@ ifneq ($(QT_SPEC),)
 QT_PLATFORM := -platform $(QT_SPEC)
 endif
 endif
-
-QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
-	-device-option VLC_EXTRA_CXXFLAGS="-isystem $(PREFIX)/include" \
-	-device-option VLC_EXTRA_LDFLAGS="-L$(PREFIX)/lib"
 
 QT_CONFIG := -static -opensource -confirm-license $(QT_OPENGL) -no-pkg-config \
 	-no-sql-sqlite -no-gif -no-openssl -no-dbus -no-vulkan -no-sql-odbc -no-pch \
