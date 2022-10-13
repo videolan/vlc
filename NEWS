@@ -5,6 +5,12 @@ macOS:
 * Fix audio device listing with non-latin names
 * Update some translations
 
+Misc:
+* Fix rendering and performance issue with older GPUs
+
+Contribs:
+* Update aom
+
 
 Changes between 3.0.18-rc and 3.0.18-rc2:
 -----------------------------------------
