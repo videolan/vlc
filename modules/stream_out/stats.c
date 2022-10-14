@@ -152,6 +152,15 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
+{
+    /*
+     * XXX: Don't trace the PCR for now as it wouldn't match the tracing scheme
+     * already decided in `Send()`.
+     */
+    sout_StreamSetPCR( stream->p_next, pcr );
+}
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -251,7 +260,7 @@ static int FilterSend(sout_stream_t *stream, void *opaque, block_t *block)
 }
 
 static const struct sout_stream_operations filter_ops = {
-    FilterAdd, FilterDel, FilterSend, NULL, NULL, NULL,
+    FilterAdd, FilterDel, FilterSend, NULL, NULL, SetPCR,
 };
 
 static int FilterOpen(vlc_object_t *obj)
