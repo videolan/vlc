@@ -308,6 +308,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/animators.cpp \
 	gui/qt/widgets/native/animators.hpp \
 	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
+	gui/qt/widgets/native/csdthemeimage.cpp \
+	gui/qt/widgets/native/csdthemeimage.hpp \
 	gui/qt/widgets/native/interface_widgets.cpp \
 	gui/qt/widgets/native/interface_widgets.hpp \
 	gui/qt/widgets/native/navigation_attached.cpp \
@@ -486,6 +488,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/qmlinputitem.moc.cpp \
 	gui/qt/util/qsgroundedrectangularimagenode.moc.cpp \
 	gui/qt/widgets/native/animators.moc.cpp \
+	gui/qt/widgets/native/csdthemeimage.moc.cpp \
 	gui/qt/widgets/native/customwidgets.moc.cpp \
 	gui/qt/widgets/native/interface_widgets.moc.cpp \
 	gui/qt/widgets/native/navigation_attached.moc.cpp \

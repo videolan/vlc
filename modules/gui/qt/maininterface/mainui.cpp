@@ -56,6 +56,7 @@
 
 #include "menus/qml_menu_wrapper.hpp"
 
+#include "widgets/native/csdthemeimage.hpp"
 #include "widgets/native/roundimage.hpp"
 #include "widgets/native/navigation_attached.hpp"
 #include "widgets/native/viewblockingrectangle.hpp"
@@ -242,6 +243,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
         qmlRegisterUncreatableType<ColorSchemeModel>(uri, versionMajor, versionMinor, "ColorSchemeModel", "");
         qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
+        qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
 
         qRegisterMetaType<QmlInputItem>();
 
