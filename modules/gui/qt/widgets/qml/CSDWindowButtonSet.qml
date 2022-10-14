@@ -28,6 +28,8 @@ Row {
     spacing: 0
     padding: 0
 
+    width: implicitWidth
+
     property color color: VLCStyle.colors.text
     property color hoverColor: VLCStyle.colors.windowCSDButtonBg
 

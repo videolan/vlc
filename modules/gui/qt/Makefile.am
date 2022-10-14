@@ -974,6 +974,8 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/AcrylicBackground.qml \
 	gui/qt/widgets/qml/AnimatedBackground.qml \
 	gui/qt/widgets/qml/CoverShadow.qml \
+	gui/qt/widgets/qml/CSDThemeButton.qml \
+	gui/qt/widgets/qml/CSDThemeButtonSet.qml \
 	gui/qt/widgets/qml/CSDWindowButton.qml \
 	gui/qt/widgets/qml/CSDWindowButtonSet.qml \
 	gui/qt/widgets/qml/CSDTitlebarTapNDrapHandler.qml \
