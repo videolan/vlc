@@ -58,6 +58,7 @@ vlc_module_end ()
 static void *Add( sout_stream_t *, const es_format_t * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
+static void  SetPCR( sout_stream_t *, vlc_tick_t );
 
 typedef struct
 {
@@ -105,7 +106,7 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, NULL, NULL,
+    Add, Del, Send, Control, NULL, SetPCR,
 };
 
 /*****************************************************************************
@@ -324,6 +325,16 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
         p_buffer = p_next;
     }
     return VLC_SUCCESS;
+}
+
+static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    for ( int i = 0; i < sys->i_nb_streams; ++i )
+    {
+        sout_StreamSetPCR( sys->pp_streams[i], pcr );
+    }
 }
 
 /*****************************************************************************
