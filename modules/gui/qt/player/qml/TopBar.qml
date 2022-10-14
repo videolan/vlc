@@ -339,10 +339,19 @@ FocusScope{
         active: root.showCSD
         enabled: root.showCSD
         visible: root.showCSD
-        source: "qrc:///widgets/CSDWindowButtonSet.qml"
+        source:  VLCStyle.theme.hasCSDImage
+            ? "qrc:///widgets/CSDThemeButtonSet.qml"
+            : "qrc:///widgets/CSDWindowButtonSet.qml"
         onLoaded: {
-            item.color = Qt.binding(function() { return root.colors.playerFg })
-            item.hoverColor = Qt.binding(function() { return root.colors.windowCSDButtonDarkBg })
+            if (VLCStyle.theme.hasCSDImage) {
+                if (item.hasOwnProperty("color"))
+                    item.color = Qt.binding(function() { return VLCStyle.colors.topBanner })
+            } else {
+                if (item.hasOwnProperty("color"))
+                    item.color = Qt.binding(function() { return root.colors.playerFg })
+                if (item.hasOwnProperty("hoverColor"))
+                    item.hoverColor = Qt.binding(function() { return root.colors.windowCSDButtonDarkBg })
+            }
         }
 
         Connections {
