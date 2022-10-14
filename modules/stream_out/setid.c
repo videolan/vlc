@@ -96,6 +96,7 @@ static void *AddId  ( sout_stream_t *, const es_format_t * );
 static void *AddLang( sout_stream_t *, const es_format_t * );
 static void  Del    ( sout_stream_t *, void * );
 static int   Send   ( sout_stream_t *, void *, block_t * );
+static void  SetPCR ( sout_stream_t *, vlc_tick_t );
 
 typedef struct
 {
@@ -122,7 +123,7 @@ static int OpenCommon( vlc_object_t *p_this )
 }
 
 static const struct sout_stream_operations id_ops = {
-    AddId, Del, Send, NULL, NULL, NULL,
+    AddId, Del, Send, NULL, NULL, SetPCR,
 };
 
 static int OpenId( vlc_object_t *p_this )
@@ -147,7 +148,7 @@ static int OpenId( vlc_object_t *p_this )
 }
 
 static const struct sout_stream_operations lang_ops = {
-    AddLang, Del, Send, NULL, NULL, NULL,
+    AddLang, Del, Send, NULL, NULL, SetPCR,
 };
 
 static int OpenLang( vlc_object_t *p_this )
@@ -228,4 +229,9 @@ static void Del( sout_stream_t *p_stream, void *id )
 static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
+}
+
+static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
+{
+    sout_StreamSetPCR( stream->p_next, pcr );
 }
