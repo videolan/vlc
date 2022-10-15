@@ -175,7 +175,7 @@ Item {
 
     property color accentText: "#ffffff";
 
-    property color alert: "red";
+    property color alert: "#d70022";
 
     property color buffer: "#696969";
 
@@ -234,7 +234,6 @@ Item {
                 lowerBanner: "#ffffff"
 
                 accent: "#ff610a";
-                alert: "#ff0000";
                 separator: "#ededed";
 
                 playerControlBarFg: "#333333"
@@ -268,7 +267,6 @@ Item {
                 topBannerHover: "#272727"
                 lowerBanner: "#000000"
                 accent: "#ff8800"
-                alert: "#ff0000"
                 separator: "#2d2d2d"
                 playerControlBarFg: "#ffffff"
 

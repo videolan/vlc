@@ -109,6 +109,13 @@ void DialogErrorModel::pushError(const DialogError & error)
 
     endInsertRows();
 
+    if (lastNotificationText == error.title)
+        repeatedNotificationCount += 1;
+    else{
+        lastNotificationText = error.title;
+        repeatedNotificationCount = 1;
+    }
+
     emit countChanged();
 }
 
@@ -119,6 +126,21 @@ void DialogErrorModel::pushError(const DialogError & error)
 int DialogErrorModel::count() const
 {
     return m_data.count();
+}
+
+QString DialogErrorModel::notificationText() const
+{
+    return lastNotificationText;
+}
+
+int DialogErrorModel::repeatedMessageCount() const
+{
+    return repeatedNotificationCount;
+}
+
+void DialogErrorModel::resetRepeatedMessageCount()
+{
+   repeatedNotificationCount = 0;
 }
 
 //=================================================================================================

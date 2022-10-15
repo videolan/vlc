@@ -61,6 +61,8 @@ class DialogErrorModel : public QAbstractListModel
     Q_ENUMS(DialogRoles)
 
     Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
+    Q_PROPERTY(QString notificationText READ notificationText NOTIFY countChanged FINAL)
+    Q_PROPERTY(int repeatedMessageCount READ repeatedMessageCount NOTIFY countChanged FINAL)
 
 public: // Enums
     enum DialogRoles
@@ -75,6 +77,8 @@ private:
         QString title;
         QString text;
     };
+    QString lastNotificationText;
+    int repeatedNotificationCount = 0;
 
 public:
     explicit DialogErrorModel(qt_intf_t* intf, QObject * parent = nullptr);
@@ -100,6 +104,9 @@ signals:
 
 public: // Properties
     int count() const;
+    QString notificationText() const;
+    int repeatedMessageCount() const;
+    Q_INVOKABLE void resetRepeatedMessageCount();
 
 private: // Variables
     QList<DialogError> m_data;
