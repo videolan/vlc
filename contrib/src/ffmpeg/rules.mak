@@ -1,7 +1,11 @@
 # FFmpeg
 
 FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
-FFMPEG_BRANCH=release/4.4
+FFMPEG_MAJVERSION := 4.4
+FFMPEG_REVISION := 3
+FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
+FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
+FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 
@@ -201,11 +205,16 @@ FFMPEGCONF += --nm="$(NM)" --ar="$(AR)" --ranlib="$(RANLIB)"
 $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 	$(call download_git,$(FFMPEG_GITURL),$(FFMPEG_BRANCH),$(FFMPEG_HASH))
 
-.sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
-	$(call check_githash,$(FFMPEG_HASH))
-	touch $@
+# .sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
+# 	$(call check_githash,$(FFMPEG_HASH))
+# 	touch $@
 
-ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
+$(TARBALLS)/ffmpeg-$(FFMPEG_VERSION).tar.xz:
+	$(call download_pkg,$(FFMPEG_URL),ffmpeg)
+
+.sum-ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz
+
+ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(UNPACK)
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
