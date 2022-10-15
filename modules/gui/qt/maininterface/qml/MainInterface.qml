@@ -27,7 +27,6 @@ import org.videolan.compat 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-import "qrc:///dialogs/" as DG
 import "qrc:///playlist/" as PL
 
 Item {
@@ -37,7 +36,6 @@ Item {
     property bool _playlistReady: false
 
     property alias g_root: root
-    property QtObject g_dialogs: dialogsLoader.item
 
     BindingCompat {
         target: VLCStyle.self
@@ -196,25 +194,6 @@ Item {
     Loader {
         asynchronous: true
         source: "qrc:///menus/GlobalShortcuts.qml"
-    }
-
-    Loader {
-        id: dialogsLoader
-
-        anchors.fill: parent
-        asynchronous: true
-        source: "qrc:///dialogs/Dialogs.qml"
-
-        onLoaded:  {
-            item.bgContent = root
-        }
-    }
-
-    Connections {
-        target: dialogsLoader.item
-        onRestoreFocus: {
-            stackView.focus = true
-        }
     }
 
     MouseArea {

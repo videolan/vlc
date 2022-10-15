@@ -31,6 +31,7 @@ import "qrc:///player/" as P
 
 import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///dialogs/" as DG
 
 FocusScope {
     id: root
@@ -486,6 +487,16 @@ FocusScope {
                 }
             }
 
+            DG.Dialogs {
+                z: 10
+                bgContent: root
+
+                anchors {
+                    bottom: miniPlayer.visible ? miniPlayer.top : parent.bottom
+                    left: parent.left
+                    right: parent.right
+                }
+            }
 
             P.MiniPlayer {
                 id: miniPlayer

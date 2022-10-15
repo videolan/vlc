@@ -28,6 +28,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
 import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///dialogs/" as DG
 
 FocusScope {
     id: rootPlayer
@@ -560,6 +561,18 @@ FocusScope {
         onStateChanged: {
             if (state === "hidden")
                 toolbarAutoHide.restart()
+        }
+    }
+
+    DG.Dialogs {
+        z: 10
+        bgContent: rootPlayer
+
+        anchors {
+            bottom: controlBarView.contentItem.visible ? controlBarView.top : rootPlayer.bottom
+            left: parent.left
+            right: parent.right
+            bottomMargin: rootPlayer.pinVideoControls || !controlBarView.contentItem.visible ? 0 : - VLCStyle.margin_large
         }
     }
 
