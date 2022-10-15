@@ -1,25 +1,26 @@
-From f12a2840ccb937d695d8a0db26c76d2f642525cf Mon Sep 17 00:00:00 2001
+From dc5305dbdd39d5f90c0413704d6945c5f8ac6617 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 29 Sep 2022 06:32:21 +0200
 Subject: [PATCH 2/2] Add an option to enable/disable building examples
 
 ---
- CMakeLists.txt | 3 +++
- 1 file changed, 3 insertions(+)
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index bb9a76d..c08ac3f 100644
+index 3f42869..3f6de05 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -7,6 +7,7 @@ set(VERSION "1.2.12")
+@@ -5,6 +5,8 @@ project(zlib C)
  
- option(ASM686 "Enable building i686 assembly implementation")
- option(AMD64 "Enable building amd64 assembly implementation")
+ set(VERSION "1.2.13")
+ 
 +option(BUILD_EXAMPLES "Build examples" ON)
- 
++
  set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for executables")
  set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
-@@ -230,6 +231,7 @@ endif()
+ set(INSTALL_INC_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "Installation directory for headers")
+@@ -194,6 +196,7 @@ endif()
  # Example binaries
  #============================================================================
  
@@ -27,7 +28,7 @@ index bb9a76d..c08ac3f 100644
  add_executable(example test/example.c)
  target_link_libraries(example zlib)
  add_test(example example)
-@@ -247,3 +249,4 @@ if(HAVE_OFF64_T)
+@@ -211,3 +214,4 @@ if(HAVE_OFF64_T)
      target_link_libraries(minigzip64 zlib)
      set_target_properties(minigzip64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
  endif()

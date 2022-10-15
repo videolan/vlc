@@ -1,18 +1,18 @@
 # ZLIB
-ZLIB_VERSION := 1.2.12
-ZLIB_URL := $(GITHUB)/madler/zlib/archive/refs/tags/v$(ZLIB_VERSION).tar.gz
+ZLIB_VERSION := 1.2.13
+ZLIB_URL := $(GITHUB)/madler/zlib/releases/download/v$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION).tar.xz
 
 PKGS += zlib
 ifeq ($(call need_pkg,"zlib"),)
 PKGS_FOUND += zlib
 endif
 
-$(TARBALLS)/zlib-$(ZLIB_VERSION).tar.gz:
+$(TARBALLS)/zlib-$(ZLIB_VERSION).tar.xz:
 	$(call download_pkg,$(ZLIB_URL),zlib)
 
-.sum-zlib: zlib-$(ZLIB_VERSION).tar.gz
+.sum-zlib: zlib-$(ZLIB_VERSION).tar.xz
 
-zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
+zlib: zlib-$(ZLIB_VERSION).tar.xz .sum-zlib
 	$(UNPACK)
 	$(APPLY) $(SRC)/zlib/0001-Fix-mingw-static-library-name-on-mingw-and-Emscripte.patch
 	$(APPLY) $(SRC)/zlib/0002-Add-an-option-to-enable-disable-building-examples.patch
@@ -23,14 +23,6 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz .sum-zlib
 	$(MOVE)
 
 ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig -DBUILD_EXAMPLES=OFF
-
-# ASM is disabled as the necessary source files are not in the tarball nor the git
-# ifeq ($(ARCH),i386)
-# ZLIB_CONF += -DASM686=ON
-# endif
-# ifeq ($(ARCH),x86_64)
-# ZLIB_CONF += -DAMD64=ON
-# endif
 
 .zlib: zlib toolchain.cmake
 	$(CMAKECLEAN)
