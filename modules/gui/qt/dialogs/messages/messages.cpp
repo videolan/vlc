@@ -43,6 +43,7 @@
 
 
 #include "dialogs/messages/messages.hpp"
+#include "dialogs/dialogs/dialogmodel.hpp"
 
 enum {
     MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
@@ -81,6 +82,13 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
     ui.setupUi( this );
     ui.bottomButtonsBox->addButton( new QPushButton( qtr("&Close"), this ),
                                          QDialogButtonBox::RejectRole );
+
+    /* Error messages */
+    QPlainTextEdit * errorsList = ui.errors;
+    DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
+    connect( errors, &DialogErrorModel::countChanged, this, &MessagesDialog::errorsCountChanged );
+    for(int i=0; i<errors->count(); i++)
+        addError(i);
 
     /* Modules tree */
     ui.modulesTree->setHeaderHidden( true );
@@ -160,6 +168,46 @@ void MessagesDialog::updateConfig()
     getSettings()->beginGroup( "Messages" );
     getSettings()->setValue( "messages-filter", ui.filterEdit->text() );
     getSettings()->endGroup();
+}
+
+void MessagesDialog::addError(int row){
+    DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
+
+    QPlainTextEdit * errorsList = ui.errors;
+
+    bool b_autoscroll = ( errorsList->verticalScrollBar()->value()
+                          + errorsList->verticalScrollBar()->pageStep()
+                          >= errorsList->verticalScrollBar()->maximum() );
+
+    /* Copy selected text to the clipboard */
+    if( errorsList->textCursor().hasSelection() )
+        errorsList->copy();
+
+    /* Fix selected text bug */
+    if( !errorsList->textCursor().atEnd() ||
+         errorsList->textCursor().anchor() != errorsList->textCursor().position() )
+         errorsList->moveCursor( QTextCursor::End );
+
+    /* Start a new logic block */
+    if( !errorsList->document()->isEmpty() )
+        errorsList->textCursor().insertBlock();
+
+    QTextCharFormat format;
+
+    format.setProperty( QTextFormat::FontItalic, true );
+    format.setForeground( Qt::darkRed );
+    errorsList->textCursor().insertText( errors->data(errors->index(row, 0), DialogErrorModel::DIALOG_TITLE).toString()+": ", format );
+
+    format.setProperty( QTextFormat::FontItalic, false );
+    format.setForeground( errorsList->palette().windowText() );
+    errorsList->textCursor().insertText( errors->data(errors->index(row, 0), DialogErrorModel::DIALOG_TEXT).toString(), format );
+
+    if ( b_autoscroll ) errorsList->ensureCursorVisible();
+}
+
+void MessagesDialog::errorsCountChanged(){
+    DialogErrorModel *errors = DialogErrorModel::getInstance(p_intf);
+    addError(errors->count() - 1);
 }
 
 void MessagesDialog::filterMessages()
@@ -342,13 +390,15 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
 
 void MessagesDialog::updateOrClear()
 {
-    if( ui.mainTab->currentIndex() == 1)
+    if( ui.mainTab->currentIndex() == 2)
     {
         ui.modulesTree->clear();
         buildTree( NULL, VLC_OBJECT( vlc_object_instance(p_intf) ) );
     }
     else if( ui.mainTab->currentIndex() == 0 )
         ui.messages->clear();
+    else if( ui.mainTab->currentIndex() == 1 )
+        ui.errors->clear();
 #ifndef NDEBUG
     else
         updatePLTree();
@@ -357,9 +407,17 @@ void MessagesDialog::updateOrClear()
 
 void MessagesDialog::tabChanged( int i )
 {
-    updateButton->setIcon( i != 0 ? QIcon(":/menu/update.svg") : QIcon(":/menu/clear.svg") );
-    updateButton->setToolTip( i != 0 ? qtr("Update the tree")
-                                     : qtr("Clear the messages") );
+    updateButton->setIcon( i > 1 ? QIcon(":/menu/update.svg") : QIcon(":/menu/clear.svg") );
+    updateButton->setToolTip( i > 1 ? qtr("Update the tree")
+                                     : i == 0 ? qtr("Clear the messages")
+                                              : qtr("Clear the errors"));
+}
+
+void MessagesDialog::showTab( int i )
+{
+    ui.mainTab->setCurrentIndex(i);
+    show();
+    raise();
 }
 
 void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,

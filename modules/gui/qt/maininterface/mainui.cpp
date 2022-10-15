@@ -130,10 +130,12 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(DialogsProvider::getInstance());
     SingletonRegisterHelper<DialogsProvider>::setInstance(DialogsProvider::getInstance());
 
+    assert(DialogErrorModel::getInstance<false>());
+    SingletonRegisterHelper<DialogErrorModel>::setInstance( DialogErrorModel::getInstance<false>() );
+
     SingletonRegisterHelper<NavigationHistory>::setInstance( new NavigationHistory(this) );
     SingletonRegisterHelper<I18n>::setInstance( new I18n(this) );
     SingletonRegisterHelper<SystemPalette>::setInstance( new SystemPalette(this) );
-    SingletonRegisterHelper<DialogErrorModel>::setInstance( new DialogErrorModel(m_intf, this));
     SingletonRegisterHelper<QmlKeyHelper>::setInstance( new QmlKeyHelper(this) );
     SingletonRegisterHelper<SVGColorImage>::setInstance( new SVGColorImage(this) );
 

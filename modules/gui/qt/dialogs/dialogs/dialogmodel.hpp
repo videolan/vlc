@@ -33,6 +33,7 @@
 #include <QAbstractListModel>
 
 #include "qt.hpp"
+#include "util/singleton.hpp"
 
 class DialogId
 {
@@ -54,7 +55,7 @@ public: // Variables
 Q_DECLARE_METATYPE(DialogId)
 
 
-class DialogErrorModel : public QAbstractListModel
+class DialogErrorModel : public QAbstractListModel, public Singleton<DialogErrorModel>
 {
     Q_OBJECT
 
@@ -82,7 +83,7 @@ private:
 
 public:
     explicit DialogErrorModel(qt_intf_t* intf, QObject * parent = nullptr);
-    ~DialogErrorModel();
+    virtual ~DialogErrorModel();
 
 public: // QAbstractItemModel implementation
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
@@ -111,6 +112,8 @@ public: // Properties
 private: // Variables
     QList<DialogError> m_data;
     qt_intf_t* m_intf = nullptr;
+
+    friend class Singleton<DialogErrorModel>;
 };
 
 class DialogModel : public QObject

@@ -197,6 +197,7 @@ Item {
                         hideErrorPopupTimer.stop()
                         errorPopup.state = "hidden"
                         DialogErrorModel.resetRepeatedMessageCount()
+                        DialogsProvider.messagesDialog(1)
                     }
 
                     background: Widgets.AnimatedBackground {

@@ -59,6 +59,8 @@ private slots:
     void updateOrClear();
     void tabChanged( int );
     void filterMessages();
+    void addError( int );
+    void errorsCountChanged();
 
 private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
@@ -70,6 +72,9 @@ private:
     QTreeWidget *pldebugTree;
     void updatePLTree();
 #endif
+
+public:
+    void showTab( int i );
 };
 
 #endif

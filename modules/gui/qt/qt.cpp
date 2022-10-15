@@ -57,6 +57,7 @@ extern "C" char **environ;
 #include "player/player_controller.hpp"    /* THEMIM destruction */
 #include "playlist/playlist_controller.hpp" /* THEMPL creation */
 #include "dialogs/dialogs_provider.hpp" /* THEDP creation */
+#include "dialogs/dialogs/dialogmodel.hpp"
 #ifdef _WIN32
 # include "maininterface/mainctx_win32.hpp"
 #else
@@ -733,6 +734,8 @@ static void *Thread( void *obj )
 
     app.setDesktopFileName( PACKAGE );
 
+    DialogErrorModel::getInstance( p_intf );
+
     /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
     p_intf->p_mainPlayerController = new PlayerController(p_intf);
@@ -898,6 +901,8 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
        Settings must be destroyed after that.
      */
     DialogsProvider::killInstance();
+
+    DialogErrorModel::killInstance();
 
     /* Destroy the main playlist controller */
     if (p_intf->p_mainPlaylistController)

@@ -292,9 +292,14 @@ void DialogsProvider::synchroDialog()
         extDialog->hide();
 }
 
-void DialogsProvider::messagesDialog()
+void DialogsProvider::messagesDialog(int page)
 {
-    MessagesDialog::getInstance( p_intf )->toggleVisible();
+    MessagesDialog *msgDialog = MessagesDialog::getInstance( p_intf );
+
+    if(!msgDialog->isVisible() || page)
+        msgDialog->showTab(page);
+    else
+        msgDialog->toggleVisible();
 }
 
 void DialogsProvider::gotoTimeDialog()
