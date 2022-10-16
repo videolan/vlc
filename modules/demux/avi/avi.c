@@ -1187,11 +1187,14 @@ static int Demux_Seekable( demux_t *p_demux )
                     index.i_pos    = avi_pk.i_pos;
                     index.i_length = avi_pk.i_size;
                     index.i_lengthtotal = index.i_length;
-                    avi_index_Append( &tk->idx, &p_sys->i_movi_lastchunk_pos, &index );
+                    int64_t i_indexid = avi_index_Append( &tk->idx, &p_sys->i_movi_lastchunk_pos, &index );
 
                     /* do we will read this data ? */
-                    if( AVI_GetDPTS( tk, toread[i_track].i_toread ) > -p_sys->i_read_increment )
+                    if( i_indexid >= 0 &&
+                        AVI_GetDPTS( tk, toread[i_track].i_toread ) > -p_sys->i_read_increment )
                     {
+                        tk->i_idxposc = (unsigned int) i_indexid;
+                        tk->i_idxposb = 0;
                         break;
                     }
                     else
