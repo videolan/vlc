@@ -251,9 +251,9 @@ static int        AVI_TrackStopFinishedStreams( demux_t *);
 
 #define QNAP_VIDEO_HEADER_SIZE 56
 /* https://github.com/qnap-dev/qnap-qiot-sdks/blob/master/doc/QVRPro/live_stream_parser.cpp#L90 */
-static bool IsQNAPCodec(vlc_fourcc_t i_codec)
+static bool IsQNAPCodec(uint32_t biCompression)
 {
-    switch (i_codec)
+    switch (biCompression)
     {
         case QNAP_FCC_w264:
         case QNAP_FCC_q264:
@@ -654,8 +654,7 @@ static int Open( vlc_object_t * p_this )
                    break;
                 }
 
-                es_format_Init( &tk->fmt, VIDEO_ES,
-                        AVI_FourccGetCodec( VIDEO_ES, p_bih->biCompression ) );
+                es_format_Init( &tk->fmt, VIDEO_ES, 0 );
 
                 if( p_bih->biCompression == BI_RGB )
                 {
@@ -726,7 +725,7 @@ static int Open( vlc_object_t * p_this )
                     Set_BMP_RGB_Masks( &tk->fmt );
                 }
 
-                if( IsQNAPCodec( tk->fmt.i_codec ) )
+                if( IsQNAPCodec( p_bih->biCompression ) )
                 {
                     tk->is_qnap = true;
                     tk->fmt.b_packetized = false;
