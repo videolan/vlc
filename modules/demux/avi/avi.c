@@ -136,7 +136,7 @@ typedef struct
 } avi_index_t;
 static void avi_index_Init( avi_index_t * );
 static void avi_index_Clean( avi_index_t * );
-static void avi_index_Append( avi_index_t *, uint64_t *, avi_entry_t * );
+static int64_t avi_index_Append( avi_index_t *, uint64_t *, avi_entry_t * );
 
 typedef struct
 {
@@ -2267,15 +2267,15 @@ static void avi_index_Clean( avi_index_t *p_index )
 }
 #define MAX_INDEX_ENTRIES __MIN(SIZE_MAX/sizeof(avi_entry_t), UINT32_MAX)
 #define INDEX_EXTENT 16384
-static void avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
-                              avi_entry_t *p_entry )
+static int64_t avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
+                                 avi_entry_t *p_entry )
 {
     /* Update last chunk position */
     if( *pi_last_pos < p_entry->i_pos )
          *pi_last_pos = p_entry->i_pos;
 
     if( p_index->i_size == MAX_INDEX_ENTRIES )
-        return;
+        return -1;
 
     /* add the entry */
     if( p_index->i_size >= p_index->i_max )
@@ -2289,7 +2289,7 @@ static void avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
         if( !p_index->p_entry )
         {
             avi_index_Init( p_index );
-            return;
+            return -1;
         }
     }
     /* calculate cumulate length */
@@ -2305,6 +2305,7 @@ static void avi_index_Append( avi_index_t *p_index, uint64_t *pi_last_pos,
     }
 
     p_index->p_entry[p_index->i_size++] = *p_entry;
+    return p_index->i_size - 1;
 }
 
 static int AVI_IndexFind_idx1( demux_t *p_demux,
