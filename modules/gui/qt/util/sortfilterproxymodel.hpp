@@ -71,7 +71,6 @@ private slots:
 private:
     QByteArray m_searchRole;
     QString m_sortCriteria;
-    Qt::SortOrder m_sortOrder;
 };
 
 #endif // SORT_FILTER_PROXY_MODEL
