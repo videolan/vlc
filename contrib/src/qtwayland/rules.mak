@@ -1,19 +1,18 @@
 # qtwayland
 
 QTWAYLAND_VERSION_MAJOR := 5.15
-QTWAYLAND_VERSION := $(QTWAYLAND_VERSION_MAJOR).1
-QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION_MAJOR)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
+QTWAYLAND_VERSION := $(QTWAYLAND_VERSION_MAJOR).8
+QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION_MAJOR)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-opensource-src-$(QTWAYLAND_VERSION).tar.xz
 
 DEPS_qtwayland = qtdeclarative $(DEPS_qtdeclarative)
 
-$(TARBALLS)/qtwayland-$(QTWAYLAND_VERSION).tar.xz:
+$(TARBALLS)/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz:
 	$(call download,$(QTWAYLAND_URL))
 
-.sum-qtwayland: qtwayland-$(QTWAYLAND_VERSION).tar.xz
+.sum-qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
-qtwayland: qtwayland-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
+qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
 	$(UNPACK)
-	mv qtwayland-everywhere-src-$(QTWAYLAND_VERSION) qtwayland-$(QTWAYLAND_VERSION)
 	sed -i.orig '/SUBDIRS/d' "$(UNPACK_DIR)/tests/tests.pro"
 	sed -i.orig 's/"egl drm"/"egl"/g' \
 		$(UNPACK_DIR)/src/compositor/configure.json \
