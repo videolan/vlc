@@ -147,6 +147,40 @@ bool NetworkDeviceModel::hasMoreItems() const
         return ((size_t) m_count < m_items.size());
 }
 
+QString NetworkDeviceModel::sortCriteria() const
+{
+    return m_sortCriteria;
+}
+
+void NetworkDeviceModel::setSortCriteria(const QString & criteria)
+{
+    if (m_sortCriteria == criteria)
+        return;
+
+    m_sortCriteria = criteria;
+
+    updateSort();
+
+    emit sortCriteriaChanged();
+}
+
+Qt::SortOrder NetworkDeviceModel::sortOrder() const
+{
+    return m_sortOrder;
+}
+
+void NetworkDeviceModel::setSortOrder(Qt::SortOrder order)
+{
+    if (m_sortOrder == order)
+        return;
+
+    m_sortOrder = order;
+
+    updateSort();
+
+    emit sortOrderChanged();
+}
+
 bool NetworkDeviceModel::insertIntoPlaylist(const QModelIndexList &itemIdList, ssize_t playlistIndex)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
@@ -453,16 +487,8 @@ void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
 
         item.mainMrl = QUrl::fromEncoded(inputItem->psz_uri);
 
-        auto it = std::upper_bound(begin(m_items),
-                                   end(m_items), item, [](const Item & a, const Item & b)
-        {
-            int comp = QString::compare(a.name, b.name, Qt::CaseInsensitive);
-
-            if (comp == 0)
-                comp = QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme());
-
-            return (comp <= 0);
-        });
+        std::vector<Item>::iterator it = std::upper_bound(begin(m_items), end(m_items), item,
+                                                          m_comparator);
 
         if (it != end(m_items)
             &&
@@ -582,6 +608,30 @@ void NetworkDeviceModel::shrinkItems()
     emit countChanged();
 }
 
+void NetworkDeviceModel::updateSort()
+{
+    if (m_sortCriteria == "mrl")
+    {
+        if (m_sortOrder == Qt::AscendingOrder)
+            m_comparator = ascendingMrl;
+        else
+            m_comparator = descendingMrl;
+    }
+    else
+    {
+        if (m_sortOrder == Qt::AscendingOrder)
+            m_comparator = ascendingName;
+        else
+            m_comparator = descendingName;
+    }
+
+    beginResetModel();
+
+    std::sort(m_items.begin(), m_items.end(), m_comparator);
+
+    endResetModel();
+}
+
 int NetworkDeviceModel::implicitCount() const
 {
     assert(m_items.size() < INT32_MAX);
@@ -590,4 +640,28 @@ int NetworkDeviceModel::implicitCount() const
         return (int) m_items.size();
     else
         return qMin((int) m_items.size(), m_maximumCount);
+}
+
+// Private static function
+
+/* static */ bool NetworkDeviceModel::ascendingName(const Item & a, const Item & b)
+{
+    return (QString::compare(a.name, b.name, Qt::CaseInsensitive) <= 0);
+}
+
+/* static */ bool NetworkDeviceModel::ascendingMrl(const Item & a, const Item & b)
+{
+    return (QString::compare(a.mainMrl.toString(),
+                             b.mainMrl.toString(), Qt::CaseInsensitive) <= 0);
+}
+
+/* static */ bool NetworkDeviceModel::descendingName(const Item & a, const Item & b)
+{
+    return (QString::compare(a.name, b.name, Qt::CaseInsensitive) >= 0);
+}
+
+/* static */ bool NetworkDeviceModel::descendingMrl(const Item & a, const Item & b)
+{
+    return (QString::compare(a.mainMrl.toString(),
+                             b.mainMrl.toString(), Qt::CaseInsensitive) >= 0);
 }

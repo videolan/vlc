@@ -86,6 +86,12 @@ public:
 
     Q_PROPERTY(bool hasMoreItems READ hasMoreItems NOTIFY countChanged FINAL)
 
+    Q_PROPERTY(QString sortCriteria READ sortCriteria WRITE setSortCriteria
+               NOTIFY sortCriteriaChanged FINAL)
+
+    Q_PROPERTY(Qt::SortOrder sortOrder READ sortOrder WRITE setSortOrder
+               NOTIFY sortOrderChanged FINAL)
+
 public:
     NetworkDeviceModel( QObject* parent = nullptr );
 
@@ -109,6 +115,12 @@ public:
 
     bool hasMoreItems() const;
 
+    QString sortCriteria() const;
+    void setSortCriteria(const QString & criteria);
+
+    Qt::SortOrder sortOrder() const;
+    void setSortOrder(Qt::SortOrder order);
+
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
     Q_INVOKABLE bool addToPlaylist( int index );
     Q_INVOKABLE bool addToPlaylist(const QVariantList& itemIdList);
@@ -129,6 +141,9 @@ signals:
     void countChanged();
 
     void maximumCountChanged();
+
+    void sortCriteriaChanged();
+    void sortOrderChanged();
 
 private:
     using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
@@ -165,7 +180,16 @@ private:
     void expandItems();
     void shrinkItems();
 
+    void updateSort();
+
     int implicitCount() const;
+
+private: // Static functions
+    static bool ascendingName(const Item & a, const Item & b);
+    static bool ascendingMrl (const Item & a, const Item & b);
+
+    static bool descendingName(const Item & a, const Item & b);
+    static bool descendingMrl (const Item & a, const Item & b);
 
 private:
     struct ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
@@ -192,6 +216,12 @@ private:
     int m_count = 0;
 
     int m_maximumCount = -1;
+
+    QString m_sortCriteria = "name";
+
+    std::function<bool(const Item &, const Item &)> m_comparator = ascendingName;
+
+    Qt::SortOrder m_sortOrder = Qt::AscendingOrder;
 
     std::vector<std::unique_ptr<MediaTreeListener>> m_listeners;
 };
