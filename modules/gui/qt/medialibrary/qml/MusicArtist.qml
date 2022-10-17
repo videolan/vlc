@@ -170,7 +170,7 @@ FocusScope {
                         }
 
                         onSelectAll: albumSelectionModel.selectAll()
-
+                        onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
                         onActionAtIndex: MediaLib.addAndPlay( albumModel.getIdForIndex( index ) )
                     }
 
