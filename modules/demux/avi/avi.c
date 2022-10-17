@@ -1655,7 +1655,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, int i_percent, bool b_accu
             if ( !p_sys->i_movi_lastchunk_pos && /* set when index is successfully loaded */
                  ! ( p_sys->i_avih_flags & AVIF_ISINTERLEAVED ) )
             {
-                msg_Err( p_demux, "seeking without index at %d%%"
+                msg_Warn( p_demux, "seeking without index at %d%%"
                          " only works for interleaved files", i_percent );
                 goto failandresetpos;
             }
@@ -2739,7 +2739,7 @@ static void AVI_IndexLoad( demux_t *p_demux )
             b_key = p_index->p_entry[j].i_flags & AVIIF_KEYFRAME;
         if( !b_key )
         {
-            msg_Err( p_demux, "no key frame set for track %u", i );
+            msg_Warn( p_demux, "no key frame set for track %u", i );
             for( unsigned j = 0; j < p_index->i_size; j++ )
                 p_index->p_entry[j].i_flags |= AVIIF_KEYFRAME;
         }
