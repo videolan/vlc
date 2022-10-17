@@ -35,6 +35,8 @@
 #include "rtp.h"
 #include "../demux/xiph.h"
 #include "../packetizer/hxxx_nal.h"
+#include "../packetizer/h264_nal.h"
+#include "../packetizer/hevc_nal.h"
 
 #include <assert.h>
 
@@ -320,17 +322,17 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                         continue;
                     }
 
-                    const int i_nal_type = p_nal[0]&0x1f;
+                    const enum h264_nal_unit_type_e i_nal_type = h264_getNALType(p_nal);
 
                     msg_Dbg( obj, "we found a startcode for NAL with TYPE:%d", i_nal_type );
 
-                    if( i_nal_type == 7 && i_nal >= 4 )
+                    if( i_nal_type == H264_NAL_SPS && i_nal >= 4 )
                     {
                         free( p_64_sps );
                         p_64_sps = vlc_b64_encode_binary( p_nal, i_nal );
                         sprintf_hexa( hexa, &p_nal[1], 3 );
                     }
-                    else if( i_nal_type == 8 )
+                    else if( i_nal_type == H264_NAL_PPS )
                     {
                         free( p_64_pps );
                         p_64_pps = vlc_b64_encode_binary( p_nal, i_nal );
@@ -369,10 +371,10 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                 const char *psz_name;
                 char *psz_64;
             } nalsets[4] = {
-                { 32, 0, "vps", NULL },
-                { 33, 0, "sps", NULL },
-                { 34, 0, "pps", NULL },
-                { 39, 1, "sei", NULL },
+                { HEVC_NAL_VPS, 0, "vps", NULL },
+                { HEVC_NAL_SPS, 0, "sps", NULL },
+                { HEVC_NAL_PPS, 0, "pps", NULL },
+                { HEVC_NAL_PREF_SEI, 1, "sei", NULL },
             };
 
             if( p_fmt->i_extra > 0 )
@@ -387,7 +389,7 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                     size_t i_nal;
                     while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) )
                     {
-                        const uint8_t i_nal_type = (p_nal[0] & 0x7E) >> 1;
+                        const uint8_t i_nal_type = hevc_getNALType( p_nal );
                         if( i_nal_type < set->i_nal ||
                             i_nal_type > set->i_nal + set->i_extend )
                             continue;
@@ -412,7 +414,7 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                             }
                         }
 
-                        if( i_nal_type == 33 && i_nal > 12 )
+                        if( i_nal_type == HEVC_NAL_SPS && i_nal > 12 )
                         {
                             if( i_profile < 0 )
                                 i_profile = p_nal[1] & 0x1F;
