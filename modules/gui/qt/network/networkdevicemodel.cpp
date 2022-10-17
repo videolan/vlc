@@ -147,6 +147,36 @@ bool NetworkDeviceModel::hasMoreItems() const
         return ((size_t) m_count < m_items.size());
 }
 
+QString NetworkDeviceModel::searchPattern() const
+{
+    return m_searchPattern;
+}
+
+void NetworkDeviceModel::setSearchPattern(const QString & pattern)
+{
+    if (m_searchPattern == pattern)
+        return;
+
+    m_searchPattern = pattern;
+
+    emit searchPatternChanged();
+}
+
+QByteArray NetworkDeviceModel::searchRole() const
+{
+    return m_searchRole;
+}
+
+void NetworkDeviceModel::setSearchRole(const QByteArray & role)
+{
+    if (m_searchRole == role)
+        return;
+
+    m_searchRole = role;
+
+    emit searchRoleChanged();
+}
+
 QString NetworkDeviceModel::sortCriteria() const
 {
     return m_sortCriteria;

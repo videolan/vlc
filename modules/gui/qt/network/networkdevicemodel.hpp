@@ -86,6 +86,12 @@ public:
 
     Q_PROPERTY(bool hasMoreItems READ hasMoreItems NOTIFY countChanged FINAL)
 
+    Q_PROPERTY(QByteArray searchRole READ searchRole WRITE setSearchRole
+               NOTIFY searchRoleChanged FINAL)
+
+    Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern
+               NOTIFY searchPatternChanged FINAL)
+
     Q_PROPERTY(QString sortCriteria READ sortCriteria WRITE setSortCriteria
                NOTIFY sortCriteriaChanged FINAL)
 
@@ -115,6 +121,12 @@ public:
 
     bool hasMoreItems() const;
 
+    QString searchPattern() const;
+    void setSearchPattern(const QString & pattern);
+
+    QByteArray searchRole() const;
+    void setSearchRole(const QByteArray & role);
+
     QString sortCriteria() const;
     void setSortCriteria(const QString & criteria);
 
@@ -141,6 +153,9 @@ signals:
     void countChanged();
 
     void maximumCountChanged();
+
+    void searchPatternChanged();
+    void searchRoleChanged();
 
     void sortCriteriaChanged();
     void sortOrderChanged();
@@ -216,6 +231,9 @@ private:
     int m_count = 0;
 
     int m_maximumCount = -1;
+
+    QString m_searchPattern;
+    QByteArray m_searchRole;
 
     QString m_sortCriteria = "name";
 
