@@ -165,8 +165,8 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 		sub-styles-install_subtargets
 
 ifdef HAVE_WIN32
-	# Add the private include to our project (similar to using "gui-private" in a qmake project) as well as ANGLE headers
-	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtGui/$(QT_VERSION)/QtGui -I$${includedir}/QtANGLE#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
+	# Add the ANGLE headers to our project
+	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtANGLE#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
 endif
 
 	#fix host tools headers to avoid collusion with target headers
