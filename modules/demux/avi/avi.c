@@ -46,6 +46,8 @@
 #include "libavi.h"
 #include "../rawdv.h"
 #include "bitmapinfoheader.h"
+#include "../packetizer/h264_nal.h"
+#include "../packetizer/hevc_nal.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -2126,6 +2128,33 @@ static int AVI_GetKeyFlag( const avi_track_t *tk, const uint8_t *p_byte )
                 return AVIIF_KEYFRAME;
             }
             return p_byte[4] & 0xC0 ? 0 : AVIIF_KEYFRAME;
+
+        case VLC_CODEC_H264:
+        {
+            uint32_t bytes = GetDWBE( p_byte );
+            enum h264_nal_unit_type_e i_nal_type;
+            if( bytes == 0x00000001 )
+                i_nal_type = h264_getNALType( &p_byte[4] );
+            else if( (bytes & 0xFFFFFF00) == 0x00000100 )
+                i_nal_type = h264_getNALType( &p_byte[3] );
+            else
+                return i_nal_type = 0;
+            return (i_nal_type == H264_NAL_SLICE_IDR) ? AVIIF_KEYFRAME : 0;
+        }
+
+        case VLC_CODEC_HEVC:
+        {
+            uint32_t bytes = GetDWBE( p_byte );
+            uint8_t i_nal_type;
+            if( bytes == 0x00000001 )
+                i_nal_type = hevc_getNALType( &p_byte[4] );
+            else if( (bytes & 0xFFFFFF00) == 0x00000100 )
+                i_nal_type = hevc_getNALType( &p_byte[3] );
+            else
+                i_nal_type = 0;
+            return (i_nal_type >= HEVC_NAL_IDR_W_RADL &&
+                    i_nal_type <= HEVC_NAL_CRA) ? AVIIF_KEYFRAME : 0;
+        }
 
         default:
             /* I can't do it, so say yes */
