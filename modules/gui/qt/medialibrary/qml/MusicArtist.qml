@@ -134,6 +134,8 @@ FocusScope {
                         }
 
                         delegate: Widgets.GridItem {
+                            id: gridItem
+
                             image: model.cover || VLCStyle.noArtAlbumCover
                             title: model.title || I18n.qtr("Unknown title")
                             subtitle: model.release_year || ""
@@ -157,7 +159,7 @@ FocusScope {
                             Connections {
                                 target: albumSelectionModel
 
-                                onSelectionChanged: selected = albumSelectionModel.isSelected(albumModel.index(index, 0))
+                                onSelectionChanged: gridItem.selected = albumSelectionModel.isSelected(albumModel.index(index, 0))
                             }
 
                             function play() {
