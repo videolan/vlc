@@ -132,14 +132,16 @@ variables:
     extends: .base-template
     script: |
         if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
-            NIGHTLY_EXTRA_BUILD_FLAGS="-i n -l"
+            EXTRA_BUILD_FLAGS="-i n -l"
         fi
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            extras/package/win32/build.sh -p -c -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
-        else
-            extras/package/win32/build.sh -c -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
+        fi
+        extras/package/win32/build.sh -a $HOST_ARCH $EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
         if [ "${CI_JOB_NAME}" = "win64" ]; then
           cmake -DLIBVLC_SDK_INC:STRING=${CI_PROJECT_DIR}/include -DLIBVLC_SDK_LIB:STRING=${CI_PROJECT_DIR}/${SHORTARCH}/lib/.libs -H${CI_PROJECT_DIR}/doc/libvlc -B${CI_PROJECT_DIR}/doc/libvlc/build \
                 -G Ninja -DCMAKE_C_COMPILER=${TRIPLET}-gcc -DCMAKE_CXX_COMPILER=${TRIPLET}-g++ -DCMAKE_SYSTEM_NAME=Windows
@@ -262,7 +264,9 @@ debian:
             make list
             make -j$NCPU --output-sync=recurse fetch
             make -j$NCPU --output-sync=recurse
-            make package
+            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+                make package
+            fi
         else
             make -j$NCPU --output-sync=recurse tools
         fi
@@ -336,10 +340,12 @@ raspbian-arm:
     script: |
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            extras/package/raspberry/build.sh -p -c -x -a $HOST_ARCH
-        else
-            extras/package/raspberry/build.sh -c -x -a $HOST_ARCH
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
+        fi
+        extras/package/raspberry/build.sh $EXTRA_BUILD_FLAGS -x -a $HOST_ARCH
     variables: *variables-raspbian-arm
 
 #
@@ -387,9 +393,11 @@ raspbian-arm:
         fi
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         else
-            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c -p"
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
+        fi
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+            EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
         export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
@@ -502,10 +510,13 @@ wasm32-emscripten-build :
         - source $EMSCRIPTEN_SDK/emsdk_env.sh
         - |
             if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-                ./extras/package/wasm-emscripten/build.sh --gen-contrib-archive --with-prebuilt-contribs
-            else
-                ./extras/package/wasm-emscripten/build.sh --gen-contrib-archive
+                echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+                EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
             fi
+            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+                EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --gen-contrib-archive"
+            fi
+            ./extras/package/wasm-emscripten/build.sh $EXTRA_BUILD_FLAGS
 
 #
 # VLC Documentation
