@@ -83,7 +83,9 @@ T.Control {
     
     ListView.delayRemove: dragActive
 
-
+    Component.onCompleted: {
+        Keys.menuPressed.connect(contextButton.clicked)
+    }
 
     // Childs
 
@@ -111,8 +113,6 @@ T.Control {
             anchors.fill: parent
 
             hoverEnabled: false
-
-            Keys.onMenuPressed: delegate.contextMenuButtonClicked(contextButton, delegate.rowModel)
 
             acceptedButtons: Qt.RightButton | Qt.LeftButton
 
