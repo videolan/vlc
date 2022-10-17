@@ -20,5 +20,6 @@ qtx11extras: qtx11extras-$(QTX11_VERSION).tar.xz .sum-qtx11extras
 	$(call qmake_toolchain, $<)
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
+	$(MAKE) -C $<
 	$(MAKE) -C $< install INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)"
 	touch $@
