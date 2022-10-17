@@ -27,7 +27,7 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 
-#include <qpa/qplatformnativeinterface.h>
+#include QPNI_HEADER
 
 #include <d3d11_1.h>
 #include <d3dcompiler.h>

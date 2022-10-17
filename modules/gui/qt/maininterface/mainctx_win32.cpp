@@ -38,7 +38,7 @@
 #include <assert.h>
 
 #include <QWindow>
-#include <qpa/qplatformnativeinterface.h>
+#include QPNI_HEADER
 
 #include <dwmapi.h>
 

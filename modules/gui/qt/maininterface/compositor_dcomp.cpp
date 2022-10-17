@@ -36,7 +36,7 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLExtraFunctions>
 
-#include <qpa/qplatformnativeinterface.h>
+#include QPNI_HEADER
 #include "compositor_dcomp_error.hpp"
 #include "maininterface/interface_window_handler.hpp"
 
