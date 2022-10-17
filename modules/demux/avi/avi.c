@@ -148,6 +148,7 @@ typedef struct
     unsigned int    i_samplesize;
 
     struct bitmapinfoheader_properties bihprops;
+    bool            is_qnap;
 
     es_format_t     fmt;
     es_out_id_t     *p_es;
@@ -210,7 +211,7 @@ static int AVI_StreamChunkSet ( demux_t *, avi_track_t *, unsigned int i_ck );
 static int AVI_StreamBytesSet ( demux_t *, avi_track_t *, uint64_t i_byte );
 
 vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t );
-static int   AVI_GetKeyFlag    ( vlc_fourcc_t , uint8_t * );
+static int   AVI_GetKeyFlag    ( const avi_track_t *, const uint8_t * );
 
 static int AVI_PacketGetHeader( demux_t *, avi_packet_t *p_pk );
 static int AVI_PacketNext     ( demux_t * );
@@ -242,10 +243,11 @@ static int        AVI_TrackStopFinishedStreams( demux_t *);
  - to complete....
  */
 
-#define QNAP_HEADER_SIZE 56
-static bool IsQNAPCodec(vlc_fourcc_t codec)
+#define QNAP_VIDEO_HEADER_SIZE 56
+/* https://github.com/qnap-dev/qnap-qiot-sdks/blob/master/doc/QVRPro/live_stream_parser.cpp#L90 */
+static bool IsQNAPCodec(vlc_fourcc_t i_codec)
 {
-    switch (codec)
+    switch (i_codec)
     {
         case QNAP_FCC_w264:
         case QNAP_FCC_q264:
@@ -630,7 +632,10 @@ static int Open( vlc_object_t * p_this )
                 }
 
                 if( IsQNAPCodec( tk->fmt.i_codec ) )
+                {
+                    tk->is_qnap = true;
                     tk->fmt.b_packetized = false;
+                }
 
                 tk->i_samplesize = 0;
                 tk->fmt.video.i_frame_rate = tk->i_rate;
@@ -944,17 +949,18 @@ static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
     if( tk->i_dv_audio_rate )
         AVI_DvHandleAudio( p_demux, tk, p_frame );
 
-    /* Strip QNAP header */
-    if( IsQNAPCodec( tk->fmt.i_codec ) )
+    /* Strip 3rd party header */
+    if( tk->is_qnap )
     {
-        if( p_frame->i_buffer <= QNAP_HEADER_SIZE )
+        if( p_frame->i_buffer < QNAP_VIDEO_HEADER_SIZE )
         {
-            block_Release( p_frame );
-            return;
+            p_frame->i_buffer = 0;
         }
-
-        p_frame->i_buffer -= QNAP_HEADER_SIZE;
-        p_frame->p_buffer += QNAP_HEADER_SIZE;
+        else
+        {
+            p_frame->i_buffer -= QNAP_VIDEO_HEADER_SIZE;
+            p_frame->p_buffer += QNAP_VIDEO_HEADER_SIZE;
+        }
     }
 
     if( tk->i_next_block_flags )
@@ -1183,7 +1189,7 @@ static int Demux_Seekable( demux_t *p_demux )
                     /* add this chunk to the index */
                     avi_entry_t index;
                     index.i_id     = avi_pk.i_fourcc;
-                    index.i_flags  = AVI_GetKeyFlag(tk->fmt.i_codec, avi_pk.i_peek);
+                    index.i_flags  = AVI_GetKeyFlag(tk, avi_pk.i_peek);
                     index.i_pos    = avi_pk.i_pos;
                     index.i_length = avi_pk.i_size;
                     index.i_lengthtotal = index.i_length;
@@ -1872,7 +1878,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, avi_track_t *tk )
             /* add this chunk to the index */
             avi_entry_t index;
             index.i_id     = avi_pk.i_fourcc;
-            index.i_flags  = AVI_GetKeyFlag(tk_pk->fmt.i_codec, avi_pk.i_peek);
+            index.i_flags  = AVI_GetKeyFlag(tk_pk, avi_pk.i_peek);
             index.i_pos    = avi_pk.i_pos;
             index.i_length = avi_pk.i_size;
             index.i_lengthtotal = index.i_length;
@@ -2055,9 +2061,16 @@ static int AVI_TrackSeek( demux_t *p_demux,
 /****************************************************************************
  * Return true if it's a key frame
  ****************************************************************************/
-static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
+static int AVI_GetKeyFlag( const avi_track_t *tk, const uint8_t *p_byte )
 {
-    switch( i_fourcc )
+    if( tk->is_qnap )
+    {
+        const uint8_t *p = p_byte;
+        if( IsQNAPCodec(VLC_FOURCC(p[0],p[1],p[2],p[3])) )
+            return p[4] & 0x01 ? AVIIF_KEYFRAME : 0;
+    }
+
+    switch( tk->fmt.i_codec )
     {
         case VLC_CODEC_DIV1:
             /* we have:
@@ -2662,7 +2675,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
             avi_entry_t index;
             index.i_id      = pk.i_fourcc;
-            index.i_flags   = AVI_GetKeyFlag(tk->fmt.i_codec, pk.i_peek);
+            index.i_flags   = AVI_GetKeyFlag(tk, pk.i_peek);
             index.i_pos     = pk.i_pos;
             index.i_length  = pk.i_size;
             index.i_lengthtotal = pk.i_size;
