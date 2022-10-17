@@ -193,6 +193,7 @@ typedef struct
 
     /* meta */
     vlc_meta_t  *meta;
+    unsigned int updates;
 
     unsigned int       i_attachment;
     input_attachment_t **attachment;
@@ -938,6 +939,8 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
  *****************************************************************************/
 static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     if( tk->fmt.i_cat != VIDEO_ES )
         p_frame->i_dts = p_frame->i_pts;
     else
@@ -952,12 +955,26 @@ static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
     /* Strip 3rd party header */
     if( tk->is_qnap )
     {
-        if( p_frame->i_buffer < QNAP_VIDEO_HEADER_SIZE )
+        if( p_frame->i_buffer >= QNAP_VIDEO_HEADER_SIZE )
         {
-            p_frame->i_buffer = 0;
-        }
-        else
-        {
+            const uint8_t *p = p_frame->p_buffer;
+            /* Check header is really there */
+            vlc_fourcc_t fcc = VLC_FOURCC(p[0],p[1],p[2],p[3]);
+            /* Parse QNAP header */
+            if( IsQNAPCodec(fcc) && p_sys->meta )
+            {
+                const char *psz_title = vlc_meta_Get( p_sys->meta, vlc_meta_Title );
+                char *psz_osd = (char *) &p_frame->p_buffer[24];
+                if( *psz_osd != 0 )
+                {
+                    psz_osd[23] = 0;
+                    if( !psz_title || strncmp( psz_osd, psz_title, 24 ) )
+                    {
+                        vlc_meta_Set( p_sys->meta, vlc_meta_Title, psz_osd );
+                        p_sys->updates |= INPUT_UPDATE_META;
+                    }
+                }
+            }
             p_frame->i_buffer -= QNAP_VIDEO_HEADER_SIZE;
             p_frame->p_buffer += QNAP_VIDEO_HEADER_SIZE;
         }
@@ -1731,6 +1748,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
+        }
+
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+        {
+            unsigned *restrict flags = va_arg( args, unsigned * );
+            *flags &= p_sys->updates;
+            p_sys->updates &= ~*flags;
+            return VLC_SUCCESS;
         }
 
         case DEMUX_CAN_PAUSE:
