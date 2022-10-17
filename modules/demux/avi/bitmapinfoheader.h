@@ -188,7 +188,7 @@ static inline int ParseBitmapInfoHeader( VLC_BITMAPINFOHEADER *p_bih, size_t i_b
     }
     else /* Compressed codecs */
     {
-        fmt->i_codec = p_bih->biCompression;
+        fmt->i_codec = vlc_fourcc_GetCodec( VIDEO_ES, p_bih->biCompression );
 
         /* Copy extradata if any */
         if( i_bihextra > 0 )
