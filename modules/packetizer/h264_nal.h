@@ -76,6 +76,11 @@ enum h264_nal_unit_type_e
     H264_NAL_RESERVED_23 = 23,
 };
 
+static inline enum h264_nal_unit_type_e h264_getNALType(const uint8_t *p)
+{
+    return (enum h264_nal_unit_type_e) (*p & 0x1f);
+}
+
 typedef struct h264_sequence_parameter_set_t h264_sequence_parameter_set_t;
 typedef struct h264_picture_parameter_set_t h264_picture_parameter_set_t;
 typedef struct h264_sequence_parameter_set_extension_t h264_sequence_parameter_set_extension_t;

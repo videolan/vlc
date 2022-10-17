@@ -624,7 +624,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
-    const int i_nal_type = p_frag->p_buffer[4]&0x1f;
+    const enum h264_nal_unit_type_e i_nal_type = h264_getNALType( &p_frag->p_buffer[4] );
     const vlc_tick_t i_frag_dts = p_frag->i_dts;
     const vlc_tick_t i_frag_pts = p_frag->i_pts;
     bool b_au_end = p_frag->i_flags & BLOCK_FLAG_AU_END;
