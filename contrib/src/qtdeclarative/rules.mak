@@ -1,8 +1,8 @@
 # QtDeclarative
 
 QTDECLARATIVE_VERSION_MAJOR := 5.15
-QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).1
-QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
+QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).8
+QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-opensource-src-$(QTDECLARATIVE_VERSION).tar.xz
 
 DEPS_qtdeclarative += qt $(DEPS_qt)
 
@@ -21,7 +21,6 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
-	$(APPLY) $(SRC)/qtdeclarative/fix-gcc11-build.patch
 	# do not build qml.exe and other useless tools
 	sed -i.orig 's,!wasm:!rtems ,!wasm:!rtems:!static ,' "$(UNPACK_DIR)/tools/tools.pro"
 	$(MOVE)
