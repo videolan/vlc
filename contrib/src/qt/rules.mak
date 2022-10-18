@@ -50,7 +50,6 @@ ifndef HAVE_CLANG
 	$(APPLY) $(SRC)/qt/0010-Windows-QPA-Fix-build-with-mingw64-Win32-threading.patch
 endif
 else
-	$(APPLY) $(SRC)/qt/qt-fix-msys-long-pathes.patch
 	$(APPLY) $(SRC)/qt/0003-fix-angle-compilation.patch
 	cd $(UNPACK_DIR); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
 		sed -i.orig -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
