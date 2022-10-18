@@ -248,7 +248,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     };
 
 #if PL_API_VER >= 185
-    vlc_placebo_DoviMetadata(&img, pic, &sys->dovi_metadata);
+    vlc_placebo_frame_DoviMetadata(&img, pic, &sys->dovi_metadata);
 #endif
 
     struct vlc_ancillary *iccp = picture_GetAncillary(pic, VLC_ANCILLARY_ID_ICC);

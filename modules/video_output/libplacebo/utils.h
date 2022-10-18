@@ -39,9 +39,13 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *);
 enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
 
 #if PL_API_VER >= 185
-// Map dolby vision metadata, using `data` as storage.
-void vlc_placebo_DoviMetadata(struct pl_frame *out, const picture_t *pic,
-                              struct pl_dovi_metadata *data);
+// Map raw dolby vision metadata struct
+void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,
+                              struct pl_dovi_metadata *dst);
+
+// Map metadata from frame if present, using `data` as storage
+void vlc_placebo_frame_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
+                                    struct pl_dovi_metadata *data);
 #endif
 
 int vlc_placebo_PlaneComponents(const video_format_t *, struct pl_plane[4]);

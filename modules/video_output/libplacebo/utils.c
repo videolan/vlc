@@ -453,14 +453,9 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *fmt)
 }
 
 #if PL_API_VER >= 185
-void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
+void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,
                               struct pl_dovi_metadata *dst)
 {
-    struct vlc_ancillary *ancillary = picture_GetAncillary(pic, VLC_ANCILLARY_ID_DOVI);
-    if (!ancillary)
-        return;
-
-    const vlc_video_dovi_metadata_t *src = vlc_ancillary_GetData(ancillary);
     static_assert(sizeof(dst->nonlinear_offset) == sizeof(src->nonlinear_offset), "array mismatch");
     static_assert(sizeof(dst->nonlinear) == sizeof(src->nonlinear_matrix), "matrix mismatch");
     static_assert(sizeof(dst->linear) == sizeof(src->linear_matrix), "matrix mismatch");
@@ -500,6 +495,17 @@ void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
             }
         }
     }
+}
+
+void vlc_placebo_frame_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
+                                    struct pl_dovi_metadata *dst)
+{
+    struct vlc_ancillary *ancillary = picture_GetAncillary(pic, VLC_ANCILLARY_ID_DOVI);
+    if (!ancillary)
+        return;
+
+    const vlc_video_dovi_metadata_t *src = vlc_ancillary_GetData(ancillary);
+    vlc_placebo_DoviMetadata(src, dst);
 
     // The output of the Dolby Vision reshaping process is always BT.2020/PQ,
     // no matter the color space of the base layer, so override these fields
