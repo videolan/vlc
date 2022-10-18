@@ -452,7 +452,7 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *fmt)
     };
 }
 
-#if PL_API_VER >= 187
+#if PL_API_VER >= 185
 void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
                               struct pl_dovi_metadata *dst)
 {
