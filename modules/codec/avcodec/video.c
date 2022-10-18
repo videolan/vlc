@@ -275,6 +275,8 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     dec->fmt_out.video.pose = dec->fmt_in.video.pose;
     if ( dec->fmt_in.video.mastering.max_luminance )
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
+    if ( dec->fmt_in.video.dovi.version_major )
+        dec->fmt_out.video.dovi = dec->fmt_in.video.dovi;
     dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
     p_sys->decoder_width  = dec->fmt_out.video.i_width;
     p_sys->decoder_height = dec->fmt_out.video.i_height;
