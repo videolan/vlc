@@ -151,8 +151,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     int upscaler = var_InheritInteger(gl, "gl-upscaler");
     int downscaler = var_InheritInteger(gl, "gl-downscaler");
+    int has_dovi = fmt->dovi.rpu_present && !fmt->dovi.el_present; /* can't handle EL yet */
 
-    if (upscaler || downscaler)
+    if (upscaler || downscaler || has_dovi)
     {
         char upscaler_value[12];
         char downscaler_value[12];

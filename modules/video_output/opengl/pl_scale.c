@@ -69,6 +69,10 @@ struct sys
     struct pl_frame frame_out;
     struct pl_render_params render_params;
 
+#if PL_API_VER >= 185
+    struct pl_dovi_metadata dovi_metadata;
+#endif
+
     unsigned out_width;
     unsigned out_height;
 };
@@ -172,6 +176,18 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
         r->x1 = coords[2] * w;
         r->y1 = coords[3] * h;
     }
+
+#if PL_API_VER >= 185
+    if (frame_in->repr.dovi && meta->dovi_rpu) {
+        vlc_placebo_DoviMetadata(meta->dovi_rpu, &sys->dovi_metadata);
+        struct pl_hdr_metadata *hdr = &frame_in->color.hdr;
+        const float scale = 1.0f / ((1 << 12) - 1);
+        hdr->min_luma = pl_hdr_rescale(PL_HDR_PQ, PL_HDR_NITS,
+                                       scale * meta->dovi_rpu->source_min_pq);
+        hdr->max_luma = pl_hdr_rescale(PL_HDR_PQ, PL_HDR_NITS,
+                                       scale * meta->dovi_rpu->source_max_pq);
+    }
+#endif
 
     GLint value;
     vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &value);
@@ -292,6 +308,15 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         .repr = vlc_placebo_ColorRepr(&glfmt->fmt),
         .color = vlc_placebo_ColorSpace(&glfmt->fmt),
     };
+
+#if PL_API_VER >= 185
+    if (glfmt->fmt.dovi.rpu_present && !glfmt->fmt.dovi.el_present) {
+        sys->frame_in.color.primaries = PL_COLOR_PRIM_BT_2020;
+        sys->frame_in.color.transfer = PL_COLOR_TRC_PQ;
+        sys->frame_in.repr.sys = PL_COLOR_SYSTEM_DOLBYVISION;
+        sys->frame_in.repr.dovi = &sys->dovi_metadata; /* to be filled later */
+    }
+#endif
 
     /* Initialize frame_in.planes */
     int plane_count =
