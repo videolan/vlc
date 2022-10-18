@@ -32,6 +32,9 @@ Widgets.ScaledImage {
 
     sourceSize: Qt.size(width, height)
     source: {
+        if (networkModel === null)
+            return ""
+
         if (!!networkModel.artwork && networkModel.artwork.length > 0)
             return networkModel.artwork
 
