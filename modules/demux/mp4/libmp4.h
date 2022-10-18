@@ -416,6 +416,9 @@ typedef int64_t stime_t;
 #define ATOM_mdcv VLC_FOURCC( 'm', 'd', 'c', 'v' )
 #define ATOM_clli VLC_FOURCC( 'c', 'l', 'l', 'i' )
 #define ATOM_purl VLC_FOURCC( 'p', 'u', 'r', 'l' )
+#define ATOM_dvcC VLC_FOURCC( 'd', 'v', 'c', 'C' )
+#define ATOM_dvvC VLC_FOURCC( 'd', 'v', 'v', 'C' )
+#define ATOM_dvwC VLC_FOURCC( 'd', 'v', 'w', 'C' )
 
 #define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
 #define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )
@@ -716,6 +719,17 @@ typedef struct
 {
     uint16_t i_ccw_degrees;
 } MP4_Box_data_irot_t;
+
+typedef struct
+{
+    uint8_t i_version_major;
+    uint8_t i_version_minor;
+    uint8_t i_profile;
+    uint8_t i_level;
+    uint8_t i_rpu_present;
+    uint8_t i_el_present;
+    uint8_t i_bl_present;
+} MP4_Box_data_dvcC_t;
 
 #define SAMPLE_DESC_COMMON_HEADER \
     uint8_t  i_reserved1[6];\
@@ -1760,6 +1774,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_vpcC_t *p_vpcC;
     MP4_Box_data_SmDm_t *p_SmDm;
     MP4_Box_data_CoLL_t *p_CoLL;
+    MP4_Box_data_dvcC_t *p_dvcC;
 
     MP4_Box_data_tfra_t *p_tfra;
     MP4_Box_data_mfro_t *p_mfro;

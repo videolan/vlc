@@ -4037,6 +4037,24 @@ static int MP4_ReadBox_irot( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_dvcC( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_data_dvcC_t *p_dvcC;
+    uint16_t flags;
+    MP4_READBOX_ENTER( MP4_Box_data_dvcC_t, NULL );
+    p_dvcC = p_box->data.p_dvcC;
+    MP4_GET1BYTE( p_dvcC->i_version_major );
+    MP4_GET1BYTE( p_dvcC->i_version_minor );
+    MP4_GET2BYTES( flags );
+    p_dvcC->i_profile       = (flags >> 9) & 0x7f;  // 7 bits
+    p_dvcC->i_level         = (flags >> 3) & 0x3f;  // 6 bits
+    p_dvcC->i_rpu_present   = (flags >> 2) & 0x01;  // 1 bit
+    p_dvcC->i_el_present    = (flags >> 1) & 0x01;  // 1 bit
+    p_dvcC->i_bl_present    =  flags       & 0x01;  // 1 bit
+    /* TODO: remainder of box, if needed */
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     const uint8_t *p_peek;
@@ -4994,6 +5012,9 @@ static const struct
     { ATOM_keys,    MP4_ReadBox_keys,         ATOM_meta },
     { ATOM_colr,    MP4_ReadBox_colr,         0 },
     { ATOM_irot,    MP4_ReadBox_irot,         0 }, /* heif */
+    { ATOM_dvcC,    MP4_ReadBox_dvcC,         0 }, /* dolby vision config record */
+    { ATOM_dvvC,    MP4_ReadBox_dvcC,         0 },
+    { ATOM_dvwC,    MP4_ReadBox_dvcC,         0 },
 
     /* XiphQT */
     { ATOM_vCtH,    MP4_ReadBox_Binary,       ATOM_wave },

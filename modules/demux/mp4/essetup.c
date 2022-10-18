@@ -507,6 +507,23 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
         }
     }
 
+    const MP4_Box_t *p_dvcC = MP4_BoxGet( p_sample, "dvcC" );
+    if( !p_dvcC )
+        p_dvcC = MP4_BoxGet( p_sample, "dvvC" );
+    if( !p_dvcC )
+        p_dvcC = MP4_BoxGet( p_sample, "dvwC" );
+    if( p_dvcC && BOXDATA(p_dvcC) )
+    {
+        const MP4_Box_data_dvcC_t *p_data = BOXDATA( p_dvcC );
+        p_fmt->video.dovi.version_major = p_data->i_version_major;
+        p_fmt->video.dovi.version_minor = p_data->i_version_minor;
+        p_fmt->video.dovi.profile = p_data->i_profile;
+        p_fmt->video.dovi.level = p_data->i_level;
+        p_fmt->video.dovi.rpu_present = p_data->i_rpu_present;
+        p_fmt->video.dovi.bl_present = p_data->i_bl_present;
+        p_fmt->video.dovi.el_present = p_data->i_el_present;
+    }
+
     SetupGlobalExtensions( p_sample, p_fmt );
 
     /* now see if esds is present and if so create a data packet
