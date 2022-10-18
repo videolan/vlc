@@ -132,7 +132,7 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	echo "  QMAKE_CXXFLAGS += $(BUILDCXXFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_LFLAGS   += $(BUILDLDFLAGS)"  >> $(1)/.qmake.cache && \
 	echo "}"                                           >> $(1)/.qmake.cache && \
-	echo "CONFIG -= create_libtool" >> $(1)/.qmake.cache && \
+	echo "CONFIG -= create_libtool debug_and_release" >> $(1)/.qmake.cache && \
 	echo "CONFIG += nostrip object_parallel_to_source create_pc" >> $(1)/.qmake.cache
 
 
