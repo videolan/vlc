@@ -26,6 +26,7 @@
 #include "filters.h"
 
 #include <vlc_common.h>
+#include <vlc_ancillary.h>
 #include <vlc_list.h>
 
 #include "filter_priv.h"
@@ -133,6 +134,10 @@ struct vlc_gl_filters {
     struct {
         /** Last updated picture PTS */
         vlc_tick_t pts;
+
+        /** Dolby Vision RPU metadata for the last picture, if any */
+        vlc_video_dovi_metadata_t dovi_rpu;
+        int has_dovi;
     } pic;
 };
 
@@ -158,6 +163,7 @@ vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     memset(&filters->viewport, 0, sizeof(filters->viewport));
     filters->pic.pts = VLC_TICK_INVALID;
+    filters->pic.has_dovi = 0;
 
     return filters;
 }
@@ -370,6 +376,13 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
 
     filters->pic.pts = picture->date;
 
+    struct vlc_ancillary *dovi = picture_GetAncillary(picture, VLC_ANCILLARY_ID_DOVI);
+    filters->pic.has_dovi = !!dovi;
+    if (dovi) {
+        memcpy(&filters->pic.dovi_rpu, vlc_ancillary_GetData(dovi),
+               sizeof(filters->pic.dovi_rpu));
+    }
+
     struct vlc_gl_filter_priv *first_filter =
         vlc_list_first_entry_or_null(&filters->list, struct vlc_gl_filter_priv,
                                      node);
@@ -393,6 +406,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
     struct vlc_gl_input_meta meta = {
         .pts = filters->pic.pts,
         .plane = 0,
+        .dovi_rpu = filters->pic.has_dovi ? &filters->pic.dovi_rpu : NULL,
     };
 
     struct vlc_gl_picture direct_pic;

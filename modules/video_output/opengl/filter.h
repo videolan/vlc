@@ -41,6 +41,7 @@ struct vlc_gl_tex_size {
 struct vlc_gl_input_meta {
     vlc_tick_t pts;
     unsigned plane;
+    const vlc_video_dovi_metadata_t *dovi_rpu;
 };
 
 typedef int
