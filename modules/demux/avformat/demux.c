@@ -47,6 +47,10 @@
 #include <libavformat/avformat.h>
 #include <libavutil/display.h>
 
+#if LIBAVUTIL_VERSION_CHECK( 57, 16, 100 )
+# include <libavutil/dovi_meta.h>
+#endif
+
 //#define AVFORMAT_DEBUG 1
 
 # define HAVE_AVUTIL_CODEC_ATTACHMENT 1
@@ -179,6 +183,24 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
         else
             fmt->video.orientation = ORIENT_NORMAL;
     }
+}
+
+static void get_dovi_config(es_format_t *fmt, AVStream *s)
+{
+#if LIBAVUTIL_VERSION_CHECK( 57, 16, 100 )
+    AVDOVIDecoderConfigurationRecord *cfg;
+    cfg = av_stream_get_side_data(s, AV_PKT_DATA_DOVI_CONF, NULL);
+    if (!cfg)
+        return;
+
+    fmt->video.dovi.version_major = cfg->dv_version_major;
+    fmt->video.dovi.version_minor = cfg->dv_version_minor;
+    fmt->video.dovi.profile = cfg->dv_profile;
+    fmt->video.dovi.level = cfg->dv_level;
+    fmt->video.dovi.rpu_present = cfg->rpu_present_flag;
+    fmt->video.dovi.el_present = cfg->el_present_flag;
+    fmt->video.dovi.bl_present = cfg->bl_present_flag;
+#endif
 }
 
 static AVDictionary * BuildAVOptions( demux_t *p_demux )
@@ -494,6 +516,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             es_fmt.video.i_visible_height = es_fmt.video.i_height;
 
             get_rotation(&es_fmt, s);
+            get_dovi_config(&es_fmt, s);
 
 # warning FIXME: implement palette transmission
             psz_type = "video";
