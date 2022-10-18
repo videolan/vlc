@@ -392,6 +392,15 @@ struct video_format_t
         uint16_t MaxCLL;  /* max content light level */
         uint16_t MaxFALL; /* max frame average light level */
     } lighting;
+    struct {
+        uint8_t version_major;
+        uint8_t version_minor;
+        unsigned profile : 7;
+        unsigned level : 6;
+        unsigned rpu_present : 1;
+        unsigned el_present : 1;
+        unsigned bl_present : 1;
+    } dovi;
     uint32_t i_cubemap_padding; /**< padding in pixels of the cube map faces */
 };
 
