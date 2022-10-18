@@ -18,9 +18,74 @@
 
 #include "viewblockingrectangle.hpp"
 
-#include <QSGRectangleNode>
 #include <QQuickWindow>
+#include <QPainter>
+#include <QPointer>
+#include <QSGRectangleNode>
 #include <QSGMaterial>
+#include <QSGRenderNode>
+
+class SoftwareRenderNode : public QSGRenderNode
+{
+public:
+    void render(const RenderState *renderState) override
+    {
+        assert(m_window);
+        const auto painter = static_cast<QPainter *>(m_window->rendererInterface()->getResource(m_window, QSGRendererInterface::PainterResource));
+        assert(painter);
+
+        const auto clipRegion = renderState->clipRegion();
+        if (clipRegion && !clipRegion->isEmpty())
+            painter->setClipRegion(*clipRegion, Qt::ReplaceClip);
+
+        painter->setTransform(matrix()->toTransform());
+        painter->setOpacity(inheritedOpacity());
+
+        painter->fillRect(rect().toRect(), m_color);
+    }
+
+    RenderingFlags flags() const override
+    {
+        return BoundedRectRendering | DepthAwareRendering | OpaqueRendering;
+    }
+
+    QRectF rect() const override
+    {
+        return m_rect;
+    }
+
+    void setRect(const QRectF& rect)
+    {
+        if (m_rect != rect)
+        {
+            m_rect = rect;
+            markDirty(DirtyGeometry);
+        }
+    }
+
+    void setWindow(QQuickWindow* const window)
+    {
+        if (Q_LIKELY(m_window != window))
+        {
+            m_window = window;
+            markDirty(DirtyForceUpdate);
+        }
+    }
+
+    void setColor(const QColor& color)
+    {
+        if (m_color != color)
+        {
+            m_color = color;
+            markDirty(DirtyMaterial);
+        }
+    }
+
+private:
+    QPointer<QQuickWindow> m_window = nullptr;
+    QRectF m_rect;
+    QColor m_color {Qt::transparent};
+};
 
 ViewBlockingRectangle::ViewBlockingRectangle(QQuickItem *parent)
     : QQuickItem(parent)
@@ -28,40 +93,67 @@ ViewBlockingRectangle::ViewBlockingRectangle(QQuickItem *parent)
 {
     setFlag(QQuickItem::ItemHasContents);
     connect(this, &ViewBlockingRectangle::colorChanged, this, &QQuickItem::update);
+    connect(this, &ViewBlockingRectangle::windowChanged, this, [this] { m_windowChanged = true; });
 }
 
 QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    auto node = static_cast<QSGRectangleNode*>(oldNode);
+    auto rectangleNode = dynamic_cast<QSGRectangleNode*>(oldNode);
+    auto softwareRenderNode = dynamic_cast<SoftwareRenderNode*>(oldNode);
+
+    assert(window());
+    const bool softwareMode = (window()->rendererInterface()->graphicsApi() == QSGRendererInterface::GraphicsApi::Software);
+
+    if (Q_UNLIKELY(oldNode && ((softwareMode && !softwareRenderNode)
+                               || (!softwareMode && !rectangleNode))))
+    {
+        delete oldNode;
+        oldNode = nullptr;
+    }
+
+    if (!oldNode)
+    {
+        if (softwareMode)
+        {
+            softwareRenderNode = new SoftwareRenderNode;
+            softwareRenderNode->setWindow(window());
+        }
+        else
+        {
+            rectangleNode = window()->createRectangleNode();
+            assert(rectangleNode);
+            assert(rectangleNode->material());
+            rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
+        }
+    }
 
     const auto rect = boundingRect();
 
-    const auto disableBlending = [&node]() {
-        assert(node->material());
-        // Software backend check: (Qt bug)
-        if (node->material() != reinterpret_cast<QSGMaterial*>(1))
-            node->material()->setFlag(QSGMaterial::Blending, false);
-    };
-
-    if (!node)
+    if (softwareMode)
     {
-        assert(window());
-        node = window()->createRectangleNode();
-        assert(node);
+        softwareRenderNode->setRect(rect);
+        softwareRenderNode->setColor(m_color);
 
-        disableBlending();
+        if (Q_UNLIKELY(m_windowChanged))
+        {
+            softwareRenderNode->setWindow(window());
+            m_windowChanged = false;
+        }
+
+        return softwareRenderNode;
     }
-
-    // Geometry:
-    if (node->rect() != rect)
-        node->setRect(rect);
-
-    // Material:
-    if (node->color() != m_color)
+    else
     {
-        node->setColor(m_color);
-        disableBlending();
-    }
+        if (rectangleNode->rect() != rect)
+            rectangleNode->setRect(rect);
 
-    return node;
+        if (rectangleNode->color() != m_color)
+        {
+            rectangleNode->setColor(m_color);
+            assert(rectangleNode->material());
+            rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
+        }
+
+        return rectangleNode;
+    }
 }

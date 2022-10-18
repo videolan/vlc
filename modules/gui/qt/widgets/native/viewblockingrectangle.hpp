@@ -36,6 +36,7 @@ protected:
 
 private:
     QColor m_color;
+    bool m_windowChanged = false;
 
 signals:
     void colorChanged();
