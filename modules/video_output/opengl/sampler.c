@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_memstream.h>
 #include <vlc_opengl.h>
+#include <vlc_fs.h>
 
 #ifdef HAVE_LIBPLACEBO_GL
 #include <libplacebo/opengl.h>
@@ -63,7 +64,7 @@ struct vlc_gl_sampler_priv {
     pl_log pl_log;
     pl_opengl pl_opengl;
     pl_shader pl_sh;
-    pl_shader_obj dither_state, tone_map_state;
+    pl_shader_obj dither_state, tone_map_state, lut_state;
     const struct pl_shader_res *pl_sh_res;
 #endif
 
@@ -650,6 +651,45 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     return VLC_SUCCESS;
 }
 
+#ifdef HAVE_LIBPLACEBO_GL
+static struct pl_custom_lut *LoadCustomLUT(struct vlc_gl_sampler *sampler,
+                                           const char *filepath)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    if (!filepath || !filepath[0])
+        return NULL;
+
+    FILE *fs = vlc_fopen(filepath, "rb");
+    struct pl_custom_lut *lut = NULL;
+    char *lut_file = NULL;
+    if (!fs)
+        goto error;
+    int ret = fseek(fs, 0, SEEK_END);
+    if (ret == -1)
+        goto error;
+    long length = ftell(fs);
+    if (length < 0)
+        goto error;
+    rewind(fs);
+
+    lut_file = vlc_alloc(length, sizeof(*lut_file));
+    if (!lut_file)
+        goto error;
+    ret = fread(lut_file, length, 1, fs);
+    if (ret != 1)
+        goto error;
+
+    lut = pl_lut_parse_cube(priv->pl_log, lut_file, length);
+    // fall through
+
+error:
+    if (fs)
+        fclose(fs);
+    free(lut_file);
+    return lut;
+}
+#endif
+
 static int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 {
@@ -709,13 +749,27 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         struct pl_color_map_params color_params;
         vlc_placebo_ColorMapParams(VLC_OBJECT(priv->gl), "gl", &color_params);
 
+        struct pl_color_space src_space = vlc_placebo_ColorSpace(fmt);
         struct pl_color_space dst_space = pl_color_space_unknown;
         dst_space.primaries = var_InheritInteger(priv->gl, "target-prim");
         dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
-        pl_shader_color_map(sh, &color_params,
-                vlc_placebo_ColorSpace(fmt),
-                dst_space, &priv->tone_map_state, false);
+        char *lut_file = var_InheritString(priv->gl, "gl-lut-file");
+        struct pl_custom_lut *lut = LoadCustomLUT(sampler, lut_file);
+        if (lut) {
+            // Transform from the video input to the LUT input color space,
+            // defaulting to a no-op if LUT input color space info is unknown
+            dst_space = lut->color_in;
+            pl_color_space_merge(&dst_space, &src_space);
+        }
+
+        pl_shader_color_map(sh, &color_params, src_space, dst_space,
+                            &priv->tone_map_state, false);
+
+        if (lut) {
+            pl_shader_custom_lut(sh, lut, &priv->lut_state);
+            pl_lut_free(&lut);
+        }
 
         int method = var_InheritInteger(priv->gl, "dither-algo");
         if (method >= 0) {
@@ -938,6 +992,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
     FREENULL(priv->uloc.pl_vars);
     FREENULL(priv->uloc.pl_descs);
     pl_shader_free(&priv->pl_sh);
+    pl_shader_obj_destroy(&priv->lut_state);
     pl_shader_obj_destroy(&priv->tone_map_state);
     pl_shader_obj_destroy(&priv->dither_state);
     pl_opengl_destroy(&priv->pl_opengl);
