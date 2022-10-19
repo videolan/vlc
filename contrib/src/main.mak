@@ -253,9 +253,6 @@ endif # HAVE_CROSS_COMPILE
 PKG_CONFIG ?= pkg-config
 
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
-ifdef MSYS_BUILD
-PKG_CONFIG_PATH := $(shell cygpath -pm ${PKG_CONFIG_PATH})
-endif
 export PKG_CONFIG_PATH
 
 ifndef GIT
