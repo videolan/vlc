@@ -37,6 +37,14 @@ public:
     bool windowActive = false;
     int bannerHeight = -1;
     NavButtonProviderGtk navButtons;
+
+    //Metrics
+    int interNavButtonSpacing = 0;
+
+    int csdFrameMarginLeft = 0;
+    int csdFrameMarginRight = 0;
+    int csdFrameMarginTop = 0;
+    int csdFrameMarginBottom = 0;
 };
 
 static bool isThemeDark( vlc_qt_theme_provider_t*)
@@ -88,6 +96,16 @@ picture_t* getThemeImage(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type t
             sys->bannerHeight = bannerHeight;
             sys->windowMaximized = windowMaximized;
             sys->windowActive = windowActive;
+
+            sys->interNavButtonSpacing = sys->navButtons.GetInterNavButtonSpacing();
+
+            MyInset frameMargin = sys->navButtons.GetTopAreaSpacing();
+            sys->csdFrameMarginLeft = frameMargin.left();
+            sys->csdFrameMarginRight = frameMargin.right();
+            sys->csdFrameMarginTop = frameMargin.top();
+            sys->csdFrameMarginBottom = frameMargin.bottom();
+            if (obj->metricsUpdated)
+                obj->metricsUpdated(obj, VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON, obj->metricsUpdatedData);
         }
 
         picture_t* pic = sys->navButtons.GetImage(buttonType, state).get();
@@ -96,6 +114,20 @@ picture_t* getThemeImage(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type t
         return pic;
     }
     return nullptr;
+}
+
+static bool getThemeMetrics(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, struct vlc_qt_theme_metrics* metrics)
+{
+    auto sys = static_cast<GtkPrivateThemeProvider*>(obj->p_sys);
+    if (type != VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON)
+        return false;
+    metrics->u.csd.interNavButtonSpacing = sys->interNavButtonSpacing;
+
+    metrics->u.csd.csdFrameMarginLeft = sys->csdFrameMarginLeft;
+    metrics->u.csd.csdFrameMarginRight = sys->csdFrameMarginRight;
+    metrics->u.csd.csdFrameMarginTop = sys->csdFrameMarginTop;
+    metrics->u.csd.csdFrameMarginBottom = sys->csdFrameMarginBottom;
+    return true;
 }
 
 bool supportThemeImage(vlc_qt_theme_provider_t*, vlc_qt_theme_image_type type)
@@ -187,6 +219,7 @@ static int Open(vlc_object_t* p_this)
     obj->updatePalette = updatePalette;
     obj->supportThemeImage  = supportThemeImage;
     obj->getThemeImage = getThemeImage;
+    obj->getThemeMetrics = getThemeMetrics;
     return VLC_SUCCESS;
 }
 
