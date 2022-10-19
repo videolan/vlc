@@ -60,6 +60,8 @@ FocusScope {
 
     property bool _keyPressed: false
 
+    layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
+
     // Events
 
     Component.onCompleted: MainCtx.preferHotkeys = true

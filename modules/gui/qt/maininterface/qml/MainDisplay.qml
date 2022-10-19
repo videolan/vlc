@@ -135,6 +135,8 @@ FocusScope {
             MainCtx.sendHotkey(event.key, event.modifiers);
     }
 
+    layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
+
     readonly property var pageModel: [
         {
             listed: MainCtx.mediaLibraryAvailable,
