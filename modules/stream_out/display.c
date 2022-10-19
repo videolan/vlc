@@ -92,9 +92,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         return NULL;
     }
 
-    vlc_input_decoder_t *p_dec =
-        vlc_input_decoder_Create( VLC_OBJECT(p_stream), p_fmt,
-                                  p_sys->p_resource );
+    vlc_input_decoder_t *p_dec = vlc_input_decoder_Create(
+        VLC_OBJECT(p_stream), p_fmt, NULL, p_sys->p_resource );
     if( p_dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
