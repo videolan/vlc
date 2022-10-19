@@ -253,7 +253,7 @@ endif # HAVE_CROSS_COMPILE
 PKG_CONFIG ?= pkg-config
 
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
-ifeq ($(findstring mingw32,$(BUILD)),mingw32)
+ifdef MSYS_BUILD
 PKG_CONFIG_PATH := $(shell cygpath -pm ${PKG_CONFIG_PATH})
 endif
 export PKG_CONFIG_PATH
