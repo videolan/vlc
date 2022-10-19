@@ -7,14 +7,13 @@ ifdef HAVE_WIN32
 DEPS_openjpeg += winpthreads $(DEPS_winpthreads)
 endif
 
-$(TARBALLS)/openjpeg-v$(OPENJPEG_VERSION).tar.gz:
+$(TARBALLS)/openjpeg-$(OPENJPEG_VERSION).tar.gz:
 	$(call download_pkg,$(OPENJPEG_URL),openjpeg)
 
-.sum-openjpeg: openjpeg-v$(OPENJPEG_VERSION).tar.gz
+.sum-openjpeg: openjpeg-$(OPENJPEG_VERSION).tar.gz
 
-openjpeg: openjpeg-v$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
+openjpeg: openjpeg-$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
 	$(UNPACK)
-	mv openjpeg-$(OPENJPEG_VERSION) openjpeg-v$(OPENJPEG_VERSION)
 	$(APPLY) $(SRC)/openjpeg/openjp2_pthread.patch
 	$(call pkg_static,"./src/lib/openjp2/libopenjp2.pc.cmake.in")
 	$(MOVE)
