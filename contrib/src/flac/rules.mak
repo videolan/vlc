@@ -37,6 +37,6 @@ DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(FLAC_CONF)
+	$(HOSTVARS) $(CMAKE) $(FLAC_CONF)
 	+$(CMAKEBUILD) --target install
 	touch $@

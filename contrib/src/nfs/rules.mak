@@ -27,7 +27,7 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 
 .nfs: nfs toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE)
+	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@

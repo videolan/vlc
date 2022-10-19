@@ -50,7 +50,7 @@ endif
 
 .png: png toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(PNG_CONF)
+	$(HOSTVARS) $(CMAKE) $(PNG_CONF)
 	+$(CMAKEBUILD)
 	+$(CMAKEBUILD) --target install
 	touch $@
