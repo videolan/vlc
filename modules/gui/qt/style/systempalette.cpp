@@ -103,6 +103,14 @@ static void PaletteChangedCallback(vlc_qt_theme_provider_t*, void* data)
     emit priv->paletteChanged();
 }
 
+static void MetricsChangedCallback(vlc_qt_theme_provider_t*, vlc_qt_theme_image_type type, void* data)
+{
+    auto priv = static_cast<ExternalPaletteImpl*>(data);
+    assert(priv);
+    priv->updateMetrics(type);
+}
+
+
 static void ReleaseVLCPictureCb(void* data)
 {
     auto pic = static_cast<picture_t*>(data);
@@ -157,6 +165,10 @@ bool ExternalPaletteImpl::init()
         return false;
     m_provider->paletteUpdated = PaletteChangedCallback;
     m_provider->paletteUpdatedData = this;
+
+    m_provider->metricsUpdated = MetricsChangedCallback;
+    m_provider->metricsUpdatedData = this;
+
     m_provider->setColorF = setQColorRBGAFloat;
     m_provider->setColorInt = setQColorRBGAInt;
 
@@ -221,14 +233,44 @@ QImage ExternalPaletteImpl::getCSDImage(vlc_qt_theme_csd_button_type type, vlc_q
             );
 }
 
+CSDMetrics* ExternalPaletteImpl::getCSDMetrics() const
+{
+    return m_csdMetrics.get();
+}
+
 void ExternalPaletteImpl::update(vlc_qt_palette_t& p)
 {
     if (m_provider->updatePalette)
         m_provider->updatePalette(m_provider, &p);
 }
 
+void ExternalPaletteImpl::updateMetrics(vlc_qt_theme_image_type type)
+{
+    if (m_provider->getThemeMetrics)
+    {
+        if (type == VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON)
+        {
+            m_csdMetrics.reset();
+            [&](){
+                if (!m_provider->getThemeMetrics)
+                    return;
+                vlc_qt_theme_metrics metrics;
+                memset(&metrics, 0, sizeof(metrics));
+                bool ret = m_provider->getThemeMetrics(m_provider, VLC_QT_THEME_IMAGE_TYPE_CSD_BUTTON, &metrics);
+                if (!ret)
+                    return;
+                m_csdMetrics = std::make_unique<CSDMetrics>();
+                m_csdMetrics->interNavButtonSpacing = metrics.u.csd.interNavButtonSpacing;
 
-
+                m_csdMetrics->csdFrameMarginLeft = metrics.u.csd.csdFrameMarginLeft;
+                m_csdMetrics->csdFrameMarginRight = metrics.u.csd.csdFrameMarginRight;
+                m_csdMetrics->csdFrameMarginTop = metrics.u.csd.csdFrameMarginTop;
+                m_csdMetrics->csdFrameMarginBottom = metrics.u.csd.csdFrameMarginBottom;
+            }();
+            emit CSDMetricsChanged();
+        }
+    }
+}
 
 SystemPalette::SystemPalette(QObject* parent)
     : QObject(parent)
@@ -248,6 +290,13 @@ QImage SystemPalette::getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_them
     assert(m_palettePriv);
     return m_palettePriv->getCSDImage(type, state, maximized, active, bannerHeight);
 
+}
+
+CSDMetrics* SystemPalette::getCSDMetrics() const
+{
+    if (!m_palettePriv)
+        return nullptr;
+    return m_palettePriv->getCSDMetrics();
 }
 
 bool SystemPalette::hasCSDImage() const
@@ -300,6 +349,9 @@ void SystemPalette::updatePalette()
         connect(
             m_palettePriv.get(), &ExternalPaletteImpl::paletteChanged,
             this, &SystemPalette::updatePalette);
+        connect(
+            m_palettePriv.get(), &ExternalPaletteImpl::CSDMetricsChanged,
+            this, &SystemPalette::CSDMetricsChanged);
     }
     emit paletteChanged();
 

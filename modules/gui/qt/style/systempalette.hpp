@@ -28,6 +28,24 @@
 
 #include "qtthemeprovider.hpp"
 
+class CSDMetrics : public QObject {
+    Q_OBJECT
+
+    Q_PROPERTY(int interNavButtonSpacing MEMBER interNavButtonSpacing CONSTANT FINAL)
+
+    Q_PROPERTY(int csdFrameMarginLeft MEMBER csdFrameMarginLeft CONSTANT FINAL)
+    Q_PROPERTY(int csdFrameMarginRight MEMBER csdFrameMarginRight CONSTANT FINAL)
+    Q_PROPERTY(int csdFrameMarginTop MEMBER csdFrameMarginTop CONSTANT FINAL)
+    Q_PROPERTY(int csdFrameMarginBottom MEMBER csdFrameMarginBottom CONSTANT FINAL)
+
+public:
+    int interNavButtonSpacing = 0;
+
+    int csdFrameMarginLeft = 0;
+    int csdFrameMarginRight = 0;
+    int csdFrameMarginTop = 0;
+    int csdFrameMarginBottom = 0;
+};
 
 class ExternalPaletteImpl : public QObject
 {
@@ -42,18 +60,22 @@ public:
     bool isThemeDark() const;
 
     QImage getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_theme_csd_button_state state, bool maximized, bool active, int bannerHeight);
+    CSDMetrics* getCSDMetrics() const;
 
     bool hasCSDImages() const;
 
     void update(vlc_qt_palette_t& p);
+    void updateMetrics(vlc_qt_theme_image_type type);
 
 signals:
     void paletteChanged();
+    void CSDMetricsChanged();
 
 public:
     MainCtx* m_ctx = nullptr;
     module_t* m_module = nullptr;
     vlc_qt_theme_provider_t* m_provider = nullptr;
+    std::unique_ptr<CSDMetrics> m_csdMetrics;
 };
 
 
@@ -83,6 +105,7 @@ public:
     Q_PROPERTY(ColorSchemeModel::ColorScheme  source READ source WRITE setSource NOTIFY sourceChanged FINAL)
     Q_PROPERTY(bool isDark MEMBER m_isDark NOTIFY paletteChanged FINAL)
     Q_PROPERTY(bool hasCSDImage READ hasCSDImage NOTIFY hasCSDImageChanged FINAL)
+    Q_PROPERTY(CSDMetrics* csdMetrics READ getCSDMetrics NOTIFY CSDMetricsChanged FINAL)
 
 
     VLC_QT_INTF_PUBLIC_COLORS(COLOR_PROPERTY)
@@ -112,6 +135,7 @@ public:
 
     ColorSchemeModel::ColorScheme source() const;
     QImage getCSDImage(vlc_qt_theme_csd_button_type type, vlc_qt_theme_csd_button_state state, bool maximized, bool active, int bannerHeight);
+    CSDMetrics* getCSDMetrics() const;
 
     inline MainCtx* getCtx() const { return m_ctx; }
     bool hasCSDImage() const;
@@ -126,6 +150,7 @@ signals:
     void paletteChanged();
     void hasCSDImageChanged();
     void ctxChanged();
+    void CSDMetricsChanged();
 
 private:
     void updatePalette();

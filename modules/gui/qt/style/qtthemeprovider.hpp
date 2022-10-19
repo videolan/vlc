@@ -112,6 +112,19 @@ struct vlc_qt_theme_image_setting {
     } u;
 };
 
+struct vlc_qt_theme_metrics {
+    union {
+        struct {
+            int interNavButtonSpacing;
+
+            int csdFrameMarginLeft;
+            int csdFrameMarginRight;
+            int csdFrameMarginTop;
+            int csdFrameMarginBottom;
+        } csd;
+    } u;
+};
+
 
 struct vlc_qt_theme_provider_t
 {
@@ -122,6 +135,9 @@ struct vlc_qt_theme_provider_t
     void (*paletteUpdated)(vlc_qt_theme_provider_t* obj, void* data);
     void* paletteUpdatedData;
 
+    void (*metricsUpdated)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, void* data);
+    void* metricsUpdatedData;
+
     void (*setColorInt)(void* color, int r, int g, int b, int a);
     void (*setColorF)(void* color, double r, double g, double b, double a);
 
@@ -130,6 +146,7 @@ struct vlc_qt_theme_provider_t
     bool (*isThemeDark)(vlc_qt_theme_provider_t* obj);
     void (*updatePalette)(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*);
     picture_t* (*getThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, const vlc_qt_theme_image_setting* setting);
+    bool (*getThemeMetrics)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, vlc_qt_theme_metrics* setting);
     bool (*supportThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type);
 };
 
