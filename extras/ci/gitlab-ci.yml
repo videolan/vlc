@@ -233,6 +233,7 @@ debian:
         name: $VLC_DEBIAN_IMAGE
     script: |
         export NCPU=$(getconf _NPROCESSORS_ONLN)
+        echo "Building branch '${CI_COMMIT_BRANCH}' (default: '${CI_DEFAULT_BRANCH}')"
 
         # Build tools
         ( cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse )
