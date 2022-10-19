@@ -15,7 +15,6 @@ $(TARBALLS)/openjpeg-v$(OPENJPEG_VERSION).tar.gz:
 openjpeg: openjpeg-v$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
 	$(UNPACK)
 	mv openjpeg-$(OPENJPEG_VERSION) openjpeg-v$(OPENJPEG_VERSION)
-	$(APPLY) $(SRC)/openjpeg/pic.patch
 	$(APPLY) $(SRC)/openjpeg/openjp2_pthread.patch
 	$(call pkg_static,"./src/lib/openjp2/libopenjp2.pc.cmake.in")
 	$(MOVE)
@@ -24,7 +23,7 @@ OPENJPEG_CONF := -DBUILD_PKGCONFIG_FILES=ON -DBUILD_CODEC:bool=OFF
 
 .openjpeg: openjpeg toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(OPENJPEG_CONF)
+	$(HOSTVARS) $(CMAKE_PIC) $(OPENJPEG_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

@@ -410,6 +410,8 @@ ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
 endif
 
+CMAKE_PIC = $(CMAKE) -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
 MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
 	-Dlibdir=lib
 ifndef WITH_OPTIMIZATION
