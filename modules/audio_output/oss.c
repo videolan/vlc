@@ -33,11 +33,8 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#ifdef HAVE_SOUNDCARD_H
-# include <soundcard.h>
-#else
-# include <sys/soundcard.h>
-#endif
+
+#include <sys/soundcard.h>
 
 #ifndef SNDCTL_DSP_HALT
 # define SNDCTL_DSP_HALT SNDCTL_DSP_RESET

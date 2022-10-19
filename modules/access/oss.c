@@ -43,12 +43,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#ifdef HAVE_SYS_SOUNDCARD_H
-#  include <sys/soundcard.h>
-#endif
-#ifdef HAVE_SOUNDCARD_H
-#  include <soundcard.h>
-#endif
+#include <sys/soundcard.h>
 
 #include <poll.h>
 

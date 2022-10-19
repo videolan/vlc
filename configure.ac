@@ -3760,14 +3760,14 @@ dnl
 AC_ARG_ENABLE([oss],
   AS_HELP_STRING([--enable-oss],
     [support the Open Sound System OSS (default enabled on FreeBSD/NetBSD/DragonFlyBSD)]),, [
-  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "linux" -o "$SYS" = "openbsd"], [
+  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "linux"], [
     enable_oss="no"
   ])
 ])
 have_oss="no"
 OSS_LIBS=""
 AS_IF([test "$enable_oss" != "no"], [
-  AC_CHECK_HEADERS([soundcard.h sys/soundcard.h], [
+  AC_CHECK_HEADERS([sys/soundcard.h], [
     have_oss="yes"
     AC_CHECK_LIB([ossaudio], [main], [
       OSS_LIBS="-lossaudio"
