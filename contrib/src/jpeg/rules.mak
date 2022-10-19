@@ -13,14 +13,10 @@ jpeg: libjpeg-turbo-$(JPEG_VERSION).tar.gz .sum-jpeg
 	$(MOVE)
 
 JPEG_CONF:= -DENABLE_SHARED=OFF -DWITH_TURBOJPEG=OFF
-ifndef HAVE_WIN32
-# this should probably be a global setting for CMake targets
-JPEG_CONF += -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=TRUE
-endif
 
 .jpeg: jpeg toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(JPEG_CONF)
+	$(HOSTVARS) $(CMAKE_PIC) $(JPEG_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

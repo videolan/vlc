@@ -470,6 +470,8 @@ ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
 
+CMAKE_PIC = $(CMAKE) -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
 MESONFLAGS = $(BUILD_DIR) $< --default-library static --prefix "$(PREFIX)" \
 	--backend ninja -Dlibdir=lib
 ifndef WITH_OPTIMIZATION

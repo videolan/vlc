@@ -41,7 +41,7 @@ endif
 
 .png: png toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(PNG_CONF)
+	$(HOSTVARS) $(CMAKE_PIC) $(PNG_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

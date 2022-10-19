@@ -27,7 +27,7 @@ MYSOFA_CONF := -DBUILD_TESTS=OFF
 
 .mysofa: mysofa toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(MYSOFA_CONF)
+	$(HOSTVARS) $(CMAKE_PIC) $(MYSOFA_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

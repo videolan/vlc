@@ -57,7 +57,7 @@ endif
 
 .libaribcaption: libaribcaption toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(LIBARIBCC_CONF)
+	$(HOSTVARS) $(CMAKE_PIC) $(LIBARIBCC_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

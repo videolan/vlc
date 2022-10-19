@@ -22,14 +22,13 @@ DEPS_fluidlite = ogg $(DEPS_ogg)
 
 fluidlite: fluidlite-$(FLUID_HASH).tar.xz .sum-fluidlite
 	$(UNPACK)
-	$(APPLY) $(SRC)/fluidlite/add-pic.diff
 	$(MOVE)
 
 FLUIDLITE_CONF := -DFLUIDLITE_BUILD_SHARED=OFF
 
 .fluidlite: fluidlite toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_PIC) $(CMAKE) $(FLUIDLITE_CONF)
+	$(HOSTVARS) $(CMAKE_PIC) $(FLUIDLITE_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
