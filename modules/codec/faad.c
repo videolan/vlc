@@ -129,6 +129,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    char * vinfo[2];
+    if( NeAACDecGetVersion( &vinfo[0], &vinfo[1] ) == 0 )
+        msg_Dbg( p_dec, "using version " FAAD2_VERSION " - %s", vinfo[0] );
+
     /* Misc init */
     p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
 
