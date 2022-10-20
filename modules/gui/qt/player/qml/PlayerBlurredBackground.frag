@@ -116,5 +116,5 @@ void main() {
     result = multiply(result, screenColorP);
     result = normal(result, overlayColorP);
 
-    gl_FragColor = toPremult(result) * qt_Opacity;
+    gl_FragColor = vec4(result.rgb, 1.0) * qt_Opacity;
 }
