@@ -64,14 +64,14 @@ uniform lowp sampler2D backgroundSource;
 uniform lowp vec4 screenColor;
 uniform lowp vec4 overlayColor;
 
-lowp vec4 toPremult(lowp vec4 color) {
+lowp vec4 fromPremult(lowp vec4 color) {
     lowp vec4 result = vec4(0.0);
     result.rgb = color.rgb / max(1.0/256.0, color.a);
     result.a = color.a;
     return result;
 }
 
-lowp vec4 fromPremult(lowp vec4 color) {
+lowp vec4 toPremult(lowp vec4 color) {
     lowp vec4 result = vec4(0.0);
     result.rbg = color.rbg * color.a;
     result.a = color.a;
@@ -108,13 +108,13 @@ lowp vec4 normal(lowp vec4 color1, lowp vec4 color2) {
 
 void main() {
     lowp vec4 result = vec4(0.0);
-    lowp vec4 colorP = toPremult(texture2D(backgroundSource, qt_TexCoord0));
-    lowp vec4 screenColorP = toPremult(screenColor);
-    lowp vec4 overlayColorP = toPremult(overlayColor);
+    lowp vec4 colorP = fromPremult(texture2D(backgroundSource, qt_TexCoord0));
+    lowp vec4 screenColorP = fromPremult(screenColor);
+    lowp vec4 overlayColorP = fromPremult(overlayColor);
 
     result = screen(colorP, screenColorP);
     result = multiply(result, screenColorP);
     result = normal(result, overlayColorP);
 
-    gl_FragColor = fromPremult(result) * qt_Opacity;
+    gl_FragColor = toPremult(result) * qt_Opacity;
 }
