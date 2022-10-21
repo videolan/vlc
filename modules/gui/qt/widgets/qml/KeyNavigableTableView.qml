@@ -146,6 +146,17 @@ FocusScope {
         view.positionViewAtBeginning()
     }
 
+    function getItemY(index) {
+        var size = index * rowHeight + topMargin
+
+        if (tableHeaderItem)
+            size += tableHeaderItem.height
+
+        return size
+    }
+
+    // Private
+
     function _qtAvoidSectionUpdate() {
         // Qt SEG. FAULT WORKAROUND
 
