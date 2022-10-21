@@ -47,6 +47,7 @@ struct sout_stream_id_sys_t
 typedef struct
 {
     vlc_tick_t last_pcr;
+    vlc_tick_t drop_delay;
     struct vlc_list ids;
 } sout_stream_sys_t;
 
@@ -104,7 +105,7 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
     vlc_list_foreach (p_es, &p_sys->ids, node)
         if (p_es->id != NULL
          && (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES)
-         && p_es->i_last < p_sys->last_pcr )
+         && p_es->i_last + p_sys->drop_delay < p_sys->last_pcr )
         {
             sout_StreamIdDel(p_stream->p_next, p_es->id);
             p_es->id = NULL;
@@ -121,6 +122,8 @@ static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
     sout_StreamSetPCR( stream->p_next, pcr );
 }
 
+#define SOUT_CFG_PREFIX "sout-autodel-"
+
 static const struct sout_stream_operations ops = {
     Add, Del, Send, NULL, NULL, SetPCR,
 };
@@ -130,10 +133,15 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
 
+    static const char *sout_options[] = {"drop-delay", NULL};
+    config_ChainParse(p_stream, SOUT_CFG_PREFIX, sout_options, p_stream->p_cfg);
+
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
     p_sys->last_pcr = VLC_TICK_INVALID;
+    p_sys->drop_delay = VLC_TICK_FROM_MS(
+        var_GetInteger(p_stream, SOUT_CFG_PREFIX "drop-delay"));
     vlc_list_init(&p_sys->ids);
     p_stream->ops = &ops;
     p_stream->p_sys = p_sys;
@@ -141,7 +149,12 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-#define SOUT_CFG_PREFIX "sout-autodel-"
+#define DROP_DELAY_TEXT N_("Delay (ms) before track deletion")
+#define DROP_DELAY_LONGTEXT                                                    \
+    N_("Specify a delay (ms) applied to incoming frame timestamps when we "    \
+       "choose whether they should be dropped or not. Tweak this parameter "   \
+       "if you believe your tracks are deleted too early.")
+
 
 vlc_module_begin()
     set_shortname(N_("Autodel"))
@@ -149,4 +162,6 @@ vlc_module_begin()
     set_capability("sout filter", 50)
     add_shortcut("autodel")
     set_callback(Open)
+
+    add_integer(SOUT_CFG_PREFIX "drop-delay", 0, DROP_DELAY_TEXT, DROP_DELAY_LONGTEXT)
 vlc_module_end()
