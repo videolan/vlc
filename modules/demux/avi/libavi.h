@@ -368,3 +368,14 @@ int     AVI_ChunkFetchIndexes( stream_t *, avi_chunk_t *p_riff );
 #define FOURCC_dvsl         VLC_FOURCC('d','v','s','l')
 #define FOURCC_dv25         VLC_FOURCC('d','v','2','5')
 #define FOURCC_dv50         VLC_FOURCC('d','v','5','0')
+
+/* QNap */
+#define QNAP_FCC_w264       VLC_FOURCC('w','2','6','4')
+#define QNAP_FCC_q264       VLC_FOURCC('q','2','6','4')
+#define QNAP_FCC_Q264       VLC_FOURCC('Q','2','6','4')
+#define QNAP_FCC_wMP4       VLC_FOURCC('w','M','P','4')
+#define QNAP_FCC_qMP4       VLC_FOURCC('q','M','P','4')
+#define QNAP_FCC_QMP4       VLC_FOURCC('Q','M','P','4')
+#define QNAP_FCC_wIVG       VLC_FOURCC('w','I','V','G')
+#define QNAP_FCC_qIVG       VLC_FOURCC('q','I','V','G')
+#define QNAP_FCC_QIVG       VLC_FOURCC('Q','I','V','G')

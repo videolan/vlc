@@ -247,15 +247,15 @@ static bool IsQNAPCodec(vlc_fourcc_t codec)
 {
     switch (codec)
     {
-        case VLC_FOURCC('w', '2', '6', '4'):
-        case VLC_FOURCC('q', '2', '6', '4'):
-        case VLC_FOURCC('Q', '2', '6', '4'):
-        case VLC_FOURCC('w', 'M', 'P', '4'):
-        case VLC_FOURCC('q', 'M', 'P', '4'):
-        case VLC_FOURCC('Q', 'M', 'P', '4'):
-        case VLC_FOURCC('w', 'I', 'V', 'G'):
-        case VLC_FOURCC('q', 'I', 'V', 'G'):
-        case VLC_FOURCC('Q', 'I', 'V', 'G'):
+        case QNAP_FCC_w264:
+        case QNAP_FCC_q264:
+        case QNAP_FCC_Q264:
+        case QNAP_FCC_wMP4:
+        case QNAP_FCC_qMP4:
+        case QNAP_FCC_QMP4:
+        case QNAP_FCC_wIVG:
+        case QNAP_FCC_qIVG:
+        case QNAP_FCC_QIVG:
             return true;
         default:
             return false;
