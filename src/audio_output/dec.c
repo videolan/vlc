@@ -69,7 +69,7 @@ struct vlc_aout_stream
         vlc_tick_t last_drift;
 
         vlc_tick_t first_pts;
-        vlc_tick_t last_pts; /* Used for stream_TimeGet() emulation */
+        vlc_tick_t last_pts; /* Used for stream_GetDelay() emulation */
 
         vlc_tick_t rate_system_ts;
         vlc_tick_t rate_audio_ts;
@@ -114,7 +114,7 @@ static inline struct vlc_tracer *aout_stream_tracer(vlc_aout_stream *stream)
         vlc_object_get_tracer(VLC_OBJECT(aout_stream_aout(stream)));
 }
 
-static int stream_TimeGet(vlc_aout_stream *stream, vlc_tick_t *delay)
+static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
 {
     audio_output_t *aout = aout_stream_aout(stream);
 
@@ -586,7 +586,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
      */
     vlc_tick_t delay;
 
-    if (stream_TimeGet(stream, &delay) != 0)
+    if (stream_GetDelay(stream, &delay) != 0)
         return; /* nothing can be done if timing is unknown */
 
     if (stream->sync.discontinuity)
@@ -607,7 +607,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         if (jitter > 0)
         {
             stream_Silence(stream, jitter, dec_pts - delay);
-            if (stream_TimeGet(stream, &delay) != 0)
+            if (stream_GetDelay(stream, &delay) != 0)
                 return;
         }
     }
@@ -893,7 +893,7 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
         vlc_tick_t drain_deadline = vlc_tick_now();
 
         vlc_tick_t delay;
-        if (stream_TimeGet(stream, &delay) == 0)
+        if (stream_GetDelay(stream, &delay) == 0)
             drain_deadline += delay;
         /* else the deadline is now, and vlc_aout_stream_IsDrained() will
          * return true on the first call. */
