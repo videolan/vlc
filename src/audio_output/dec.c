@@ -69,7 +69,7 @@ struct vlc_aout_stream
         vlc_tick_t last_drift;
 
         vlc_tick_t first_pts;
-        vlc_tick_t last_pts; /* Used for stream_GetDelay() emulation */
+        int64_t played_samples; /* Used for stream_GetDelay() emulation */
 
         vlc_tick_t rate_system_ts;
         vlc_tick_t rate_audio_ts;
@@ -121,15 +121,18 @@ static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
     if (aout->time_get != NULL)
         return aout->time_get(aout, delay);
 
-    if (stream->timing.last_pts == VLC_TICK_INVALID)
+    if (stream->timing.first_pts == VLC_TICK_INVALID)
         return -1;
 
     /* Interpolate the last updated point. */
     vlc_tick_t system_now = vlc_tick_now();
+    vlc_tick_t played_length =
+        vlc_tick_from_samples(stream->timing.played_samples,
+                              stream->mixer_format.i_rate);
+    vlc_tick_t last_pts = stream->timing.first_pts + played_length;
 
     vlc_tick_t play_date =
-        vlc_clock_ConvertToSystem(stream->sync.clock, system_now,
-                                  stream->timing.last_pts,
+        vlc_clock_ConvertToSystem(stream->sync.clock, system_now, last_pts,
                                   stream->sync.rate);
     *delay = play_date - system_now;
     return 0;
@@ -144,7 +147,7 @@ static void stream_Discontinuity(vlc_aout_stream *stream)
     stream->timing.first_pts = VLC_TICK_INVALID;
     stream->timing.last_drift = VLC_TICK_INVALID;
     vlc_mutex_unlock(&stream->timing.lock);
-    stream->timing.last_pts = VLC_TICK_INVALID;
+    stream->timing.played_samples = 0;
 }
 
 static void stream_Reset(vlc_aout_stream *stream)
@@ -434,6 +437,7 @@ static void stream_Silence (vlc_aout_stream *stream, vlc_tick_t length, vlc_tick
     const vlc_tick_t system_pts =
        vlc_clock_ConvertToSystem(stream->sync.clock, system_now, pts,
                                  stream->sync.rate);
+    stream->timing.played_samples += block->i_nb_samples;
     aout->play(aout, block, system_pts);
 }
 
@@ -757,10 +761,10 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
         stream->timing.first_pts = original_pts;
         vlc_mutex_unlock(&stream->timing.lock);
     }
-    stream->timing.last_pts = original_pts;
 
     /* Output */
     stream->sync.discontinuity = false;
+    stream->timing.played_samples += block->i_nb_samples;
     aout->play(aout, block, play_date);
 
     atomic_fetch_add_explicit(&stream->buffers_played, 1, memory_order_relaxed);
