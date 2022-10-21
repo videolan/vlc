@@ -411,7 +411,7 @@ info "Compiling"
 make -j$JOBS
 
 if [ "$INSTALLER" = "n" ]; then
-make package-win32-debug package-win32 package-msi
+make package-win32-debug-7zip package-win32 package-msi
 elif [ "$INSTALLER" = "r" ]; then
 make package-win32
 elif [ "$INSTALLER" = "u" ]; then
