@@ -606,7 +606,33 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
      *    pts = vlc_tick_now() + delay
      */
     vlc_tick_t delay;
+    vlc_tick_t drift;
+    audio_output_t *aout = aout_stream_aout(stream);
 
+    if (aout->time_get == NULL)
+    {
+        vlc_mutex_lock(&stream->timing.lock);
+        bool is_drifting = stream->timing.last_drift != VLC_TICK_INVALID;
+        vlc_mutex_unlock(&stream->timing.lock);
+
+        if (!is_drifting)
+        {
+            /* module is using aout_TimingReport() and stream is master:
+             * nothing to do */
+            return;
+        }
+        if (stream_GetDelay(stream, &delay) != 0)
+            return; /* nothing can be done if timing is unknown */
+
+        /* Equivalent to vlc_clock_Update() but we don't want to update points
+         * (since there are already updated via aout_TimingReport()). */
+        vlc_tick_t play_date =
+            vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay, dec_pts,
+                                      stream->sync.rate);
+        drift = play_date - system_now - delay;
+    }
+    else
+    {
     if (stream_GetDelay(stream, &delay) != 0)
         return; /* nothing can be done if timing is unknown */
 
@@ -633,8 +659,9 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         }
     }
 
-    vlc_tick_t drift = vlc_clock_Update(stream->sync.clock, system_now + delay,
-                                        dec_pts, stream->sync.rate);
+    drift = vlc_clock_Update(stream->sync.clock, system_now + delay,
+                             dec_pts, stream->sync.rate);
+    }
 
     stream_HandleDrift(stream, drift, dec_pts);
 }
@@ -734,16 +761,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
 
     /* Drift correction */
     vlc_tick_t system_now = vlc_tick_now();
-    if (aout->time_get != NULL)
-        stream_Synchronize(stream, system_now, original_pts);
-    else
-    {
-        vlc_mutex_lock(&stream->timing.lock);
-        vlc_tick_t drift = stream->timing.last_drift;
-        stream->timing.last_drift = VLC_TICK_INVALID;
-        vlc_mutex_unlock(&stream->timing.lock);
-        stream_HandleDrift(stream, drift, original_pts);
-    }
+    stream_Synchronize(stream, system_now, original_pts);
 
     vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(stream->sync.clock, system_now, original_pts,
