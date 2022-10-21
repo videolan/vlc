@@ -20,6 +20,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/**
+ * The autodel module remove inactive or late tracks relative to the PCR and
+ * only adds ESs that contains at least one frame. It is mainly here to cope the
+ * fact that PCR isn't forwarded to Muxers right now, which make them unable to
+ * close inactive ES.
+ */
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
