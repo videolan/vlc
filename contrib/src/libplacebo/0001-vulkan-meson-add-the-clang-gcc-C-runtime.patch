@@ -1,0 +1,42 @@
+From f338dcf654a615839925de33939e538cc92880a9 Mon Sep 17 00:00:00 2001
+From: Niklas Haas <git@haasn.dev>
+Date: Sat, 22 Oct 2022 11:36:51 +0200
+Subject: [PATCH] vulkan/meson: add the clang/gcc C++ runtime
+
+The Vulkan loader present on some Linux distro or Android don't export which
+C++ they are using. When using libplacebo from C code it's missing in the link
+parameters from libplacebo. So we do it on behalf of Vulkan loader.
+
+We suppose we're building with a compatible C++ compiler that was used to
+generate the vulkan loader.
+
+We can't detect the link flags exposed by vulkan with Meson so we assume it's
+never set.
+
+Authored-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ src/vulkan/meson.build | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/vulkan/meson.build b/src/vulkan/meson.build
+index fe77f699..915df90b 100644
+--- a/src/vulkan/meson.build
++++ b/src/vulkan/meson.build
+@@ -6,6 +6,14 @@ registry_xml = get_option('vulkan-registry')
+ 
+ if vulkan_loader.found()
+   vulkan_headers = vulkan_loader.partial_dependency(includes: true, compile_args: true)
++
++# add the C++ runtime that vulkan needs but may not expose in its pkg-config
++  if cxx.get_id() == 'clang'
++    build_deps += cxx.find_library('c++', required: true)
++  elif cxx.get_id() == 'gcc'
++    build_deps += cxx.find_library('stdc++', required: true)
++  endif
++
+ # Probe for <vulkan/vulkan.h> as a fallback for the vulkan headers
+ elif cc.has_header_symbol('vulkan/vulkan_core.h', 'VK_VERSION_1_2')
+   vulkan_headers = declare_dependency()
+-- 
+2.38.0
+

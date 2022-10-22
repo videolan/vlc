@@ -1,0 +1,37 @@
+From 62dc67bd043a9982dafd7e1a4c708ce427489712 Mon Sep 17 00:00:00 2001
+From: Niklas Haas <git@haasn.dev>
+Date: Sat, 22 Oct 2022 13:59:37 +0200
+Subject: [PATCH] meson: allow overriding python3 path
+
+We need this to support building inside a virtualenv.
+---
+ meson.build       | 2 +-
+ meson_options.txt | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 2ea819b2..c1404ee9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -320,7 +320,7 @@ add_project_link_arguments(link_args, language: 'c')
+ fs = import('fs')
+ libm = cc.find_library('m', required: false)
+ thirdparty = meson.project_source_root()/'3rdparty'
+-python = import('python').find_installation()
++python = import('python').find_installation(get_option('python-path'))
+ python_env = environment()
+ python_env.append('PYTHONPATH', thirdparty/'jinja'/'src')
+ python_env.append('PYTHONPATH', thirdparty/'markupsafe'/'src')
+diff --git a/meson_options.txt b/meson_options.txt
+index ce88b3bf..853d1347 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -44,3 +44,5 @@ option('unwind', type: 'feature', value: 'auto',
+ 
+ option('debug-abort', type: 'boolean', value: false,
+        description: 'abort() on most runtime errors (only for debugging purposes)')
++
++option('python-path', type: 'string', description: 'Path to python3 executable')
+-- 
+2.38.0
+
