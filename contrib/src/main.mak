@@ -523,6 +523,14 @@ REQUIRE_GNUV3 = \
 	exit 1
 endif
 
+PYTHON_VENV = $(BUILDPREFIX)/python-venv
+PYTHON_ACTIVATE = . $(PYTHON_VENV)/bin/activate
+PYTHON_INSTALL = $(HOSTVARS) $(PYTHON_VENV)/bin/pip3 install ./$<
+
+.python-venv:
+	python3 -m venv $(PYTHON_VENV)
+	touch $@
+
 #
 # Rust specific rules
 #
@@ -558,6 +566,8 @@ tools: $(PKGS_TOOLS:%=.dep-%)
 
 mostlyclean:
 	-$(RM) $(foreach p,$(PKGS_ALL),.$(p) .sum-$(p) .dep-$(p))
+	-$(RM) -R "$(PYTHON_VENV)"
+	-$(RM) .python-venv
 	-$(RM) toolchain.cmake
 	-$(RM) crossfile.meson
 	-$(RM) -R "$(PREFIX)"
