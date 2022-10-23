@@ -299,6 +299,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
     [(NSCollectionViewFlowLayout *)_videoLibraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
+    [_libraryVideoDataSource reloadData];
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
@@ -605,7 +606,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
         
-        [_videoLibraryCollectionView reloadData];
+        [_libraryVideoDataSource reloadData];
     }
     
     _librarySortButton.hidden = NO;
@@ -965,7 +966,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)updateLibraryRepresentation:(NSNotification *)aNotification
 {
     if (_videoLibraryView.superview != nil) {
-        [_videoLibraryCollectionView reloadData];
+        [_libraryVideoDataSource reloadData];
     } else if (_audioLibraryView.superview != nil) {
         [_libraryAudioDataSource reloadAppearance];
     }

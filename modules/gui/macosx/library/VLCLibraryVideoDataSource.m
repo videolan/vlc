@@ -30,7 +30,50 @@
 #import "main/CompatibilityFixes.h"
 #import "extensions/NSString+Helpers.h"
 
+@interface VLCLibraryVideoDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
+{
+    NSArray *_recentsArray;
+    NSArray *_libraryArray;
+}
+
+@end
+
 @implementation VLCLibraryVideoDataSource
+
+- (instancetype)init
+{
+    self = [super init];
+    if(self) {
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelVideoMediaListUpdated
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelRecentMediaListUpdated
+                                 object:nil];
+    }
+    return self;
+}
+
+- (void)libraryModelUpdated:(NSNotification *)aNotification
+{
+    [self reloadData];
+}
+
+- (void)reloadData
+{
+    if(!_libraryModel) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        _recentsArray = [_libraryModel listOfRecentMedia];
+        _libraryArray = [_libraryModel listOfVideoMedia];
+        [_libraryMediaCollectionView reloadData];
+    });
+}
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
@@ -58,18 +101,15 @@
 {
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
 
-    NSArray *mediaArray;
     switch(indexPath.section) {
         case VLCVideoLibraryRecentsSection:
-            mediaArray = [_libraryModel listOfRecentMedia];
+            viewItem.representedItem = _recentsArray[indexPath.item];
             break;
         case VLCVideoLibraryLibrarySection:
         default:
-            mediaArray = [_libraryModel listOfVideoMedia];
+            viewItem.representedItem = _libraryArray[indexPath.item];
             break;
     }
-
-    viewItem.representedItem = mediaArray[indexPath.item];
 
     return viewItem;
 }
@@ -108,13 +148,11 @@ canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
           toPasteboard:(NSPasteboard *)pasteboard
 {
-    NSArray *mediaArray = [_libraryModel listOfVideoMedia];
-
     NSUInteger numberOfIndexPaths = indexPaths.count;
     NSMutableArray *encodedLibraryItemsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
     NSMutableArray *filePathsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
     for (NSIndexPath *indexPath in indexPaths) {
-        VLCMediaLibraryMediaItem *mediaItem = mediaArray[indexPath.item];
+        VLCMediaLibraryMediaItem *mediaItem = _libraryArray[indexPath.item];
         [encodedLibraryItemsArray addObject:mediaItem];
 
         VLCMediaLibraryFile *file = mediaItem.files.firstObject;
