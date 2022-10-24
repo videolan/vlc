@@ -412,14 +412,21 @@ make -j$JOBS
 
 if [ "$INSTALLER" = "n" ]; then
 make package-win32-debug-7zip
-make -j$JOBS package-win32 package-msi
+make -j$JOBS package-win32
+if [ "$ARCH" != "aarch64" ]; then
+# WIX 3.5 doesn't support aarch64
+make package-msi
+fi
 elif [ "$INSTALLER" = "r" ]; then
 make package-win32
 elif [ "$INSTALLER" = "u" ]; then
 make package-win32-release
 sha512sum vlc-*-release.7z
 elif [ "$INSTALLER" = "m" ]; then
+if [ "$ARCH" != "aarch64" ]; then
+# WIX 3.5 doesn't support aarch64
 make package-msi
+fi
 elif [ ! -z "$INSTALL_PATH" ]; then
 make package-win-install
 fi
