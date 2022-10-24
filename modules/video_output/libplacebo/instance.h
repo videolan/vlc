@@ -24,8 +24,8 @@
 #include <vlc_common.h>
 #include <vlc_vout_display.h>
 
-#include <libplacebo/context.h>
 #include <libplacebo/swapchain.h>
+#include <libplacebo/log.h>
 #include <libplacebo/gpu.h>
 
 struct vlc_placebo_t;

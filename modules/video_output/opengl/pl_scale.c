@@ -31,7 +31,7 @@
 #include <vlc_opengl.h>
 #include <vlc_filter.h>
 
-#include <libplacebo/context.h>
+#include <libplacebo/log.h>
 #include <libplacebo/gpu.h>
 #include <libplacebo/opengl.h>
 #include <libplacebo/renderer.h>
