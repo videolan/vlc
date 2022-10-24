@@ -118,22 +118,21 @@ static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
 {
     audio_output_t *aout = aout_stream_aout(stream);
 
-    if (aout->time_get == NULL)
-    {
-        if (stream->timing.last_pts == VLC_TICK_INVALID)
-            return -1;
+    if (aout->time_get != NULL)
+        return aout->time_get(aout, delay);
 
-        /* Interpolate the last updated point. */
-        vlc_tick_t system_now = vlc_tick_now();
+    if (stream->timing.last_pts == VLC_TICK_INVALID)
+        return -1;
 
-        vlc_tick_t play_date =
-            vlc_clock_ConvertToSystem(stream->sync.clock, system_now,
-                                      stream->timing.last_pts,
-                                      stream->sync.rate);
-        *delay = play_date - system_now;
-        return 0;
-    }
-    return aout->time_get(aout, delay);
+    /* Interpolate the last updated point. */
+    vlc_tick_t system_now = vlc_tick_now();
+
+    vlc_tick_t play_date =
+        vlc_clock_ConvertToSystem(stream->sync.clock, system_now,
+                                  stream->timing.last_pts,
+                                  stream->sync.rate);
+    *delay = play_date - system_now;
+    return 0;
 }
 
 static void stream_Discontinuity(vlc_aout_stream *stream)
