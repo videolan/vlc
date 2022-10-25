@@ -81,10 +81,15 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
-    if ( id == p_sys->id )
-    {
+    /**
+     * Positive delay is added to the selected ES timestamps while negative
+     * delay is added to every other ES except the selected one. This avoids
+     * any negative timestamps.
+     */
+    if ( p_sys->i_delay < 0 && id != p_sys->id )
+        block_ChainApplyDelay( p_buffer, -p_sys->i_delay );
+    else if ( p_sys->i_delay > 0 && id == p_sys->id )
         block_ChainApplyDelay( p_buffer, p_sys->i_delay );
-    }
 
     return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }
