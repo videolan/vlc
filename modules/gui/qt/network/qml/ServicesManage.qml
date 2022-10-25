@@ -93,7 +93,7 @@ Widgets.KeyNavigableListView {
                         }
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ButtonExt {
                         id: action_btn
 
                         focus: true

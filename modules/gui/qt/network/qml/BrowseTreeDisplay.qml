@@ -180,7 +180,7 @@ FocusScope {
                         Layout.fillWidth: true
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ButtonExt {
                         id: btn
 
                         focus: true
@@ -287,7 +287,7 @@ FocusScope {
                         Layout.fillWidth: true
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ButtonExt {
                         id: btn
 
                         focus: true

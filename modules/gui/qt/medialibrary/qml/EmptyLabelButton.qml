@@ -63,7 +63,7 @@ EmptyLabel {
 
     // Children
 
-    Widgets.TabButtonExt {
+    Widgets.ButtonExt {
         id: button
 
         anchors.horizontalCenter: parent.horizontalCenter

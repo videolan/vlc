@@ -152,7 +152,7 @@ FocusScope {
                             onClicked: MediaLib.addAndPlay( model.id )
                         }
 
-                        Widgets.TabButtonExt {
+                        Widgets.ButtonExt {
                             id: enqueueActionBtn
 
                             iconTxt: VLCIcons.enqueue

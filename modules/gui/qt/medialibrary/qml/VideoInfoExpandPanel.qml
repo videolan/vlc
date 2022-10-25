@@ -132,7 +132,7 @@ FocusScope {
                                 onClicked: MediaLib.addAndPlay( model.id )
                             }
 
-                            Widgets.TabButtonExt {
+                            Widgets.ButtonExt {
                                 id: enqueueActionBtn
 
                                 iconTxt: VLCIcons.enqueue
@@ -197,7 +197,7 @@ FocusScope {
                     textFormat: Text.StyledText
                 }
 
-                Widgets.TabButtonExt {
+                Widgets.ButtonExt {
                     id: showMoreButton
 
                     text: root._showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")

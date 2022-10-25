@@ -104,7 +104,7 @@ FocusScope {
             text: I18n.qtr("Do you want to restart the playback where you left off?")
         }
 
-        Widgets.TabButtonExt {
+        Widgets.ButtonExt {
             id: continueBtn
             Layout.preferredHeight: implicitHeight
             Layout.preferredWidth: implicitWidth
@@ -123,7 +123,7 @@ FocusScope {
             Keys.onPressed:  continueBtn.Navigation.defaultKeyAction(event)
         }
 
-        Widgets.TabButtonExt {
+        Widgets.ButtonExt {
             id: closeBtn
             Layout.preferredHeight: implicitHeight
             Layout.preferredWidth: implicitWidth

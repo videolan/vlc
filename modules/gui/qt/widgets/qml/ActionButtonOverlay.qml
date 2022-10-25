@@ -22,7 +22,7 @@ import QtQuick 2.11
 
 import "qrc:///style/"
 
-TabButtonExt {
+ButtonExt {
     // Style
     iconSize: VLCStyle.icon_actionButton
 
