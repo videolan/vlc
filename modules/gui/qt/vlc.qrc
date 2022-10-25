@@ -190,7 +190,6 @@
         <file alias="VideoProgressBar.qml">widgets/qml/VideoProgressBar.qml</file>
         <file alias="NavigableCol.qml">widgets/qml/NavigableCol.qml</file>
         <file alias="NavigableRow.qml">widgets/qml/NavigableRow.qml</file>
-        <file alias="TabButtonExt.qml">widgets/qml/TabButtonExt.qml</file>
         <file alias="ButtonExt.qml">widgets/qml/ButtonExt.qml</file>
         <file alias="ScrollingText.qml">widgets/qml/ScrollingText.qml</file>
         <file alias="CaptionLabel.qml">widgets/qml/CaptionLabel.qml</file>
