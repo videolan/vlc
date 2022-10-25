@@ -97,8 +97,8 @@ QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
 
 QT_CONFIG := -static -opensource -confirm-license $(QT_OPENGL) -no-pkg-config \
 	-no-sql-sqlite -no-gif -no-openssl -no-dbus -no-vulkan -no-sql-odbc -no-pch \
-	-no-feature-testlib -no-feature-itemmodeltester -no-feature-sqlmodel \
-	-no-compile-examples -nomake examples -nomake tests \
+	-no-feature-testlib -no-feature-itemmodeltester -no-feature-sqlmodel -no-feature-sql \
+	-no-feature-xml -no-compile-examples -nomake examples -nomake tests \
 	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib
 
 ifdef WITH_OPTIMIZATION
