@@ -509,7 +509,11 @@ void NetworkDeviceModel::refreshDeviceList(MediaSourcePtr mediaSource,
 void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
                                   const MediaSourcePtr & mediaSource)
 {
-    for (auto inputItem : inputList)
+    // NOTE: We need to check duplicates when we're not sorting by name. Otherwise it's handled via
+    //       the 'name' sorting functions.
+    bool checkDuplicate = (m_sortCriteria != "name");
+
+    for (const InputItemPtr & inputItem : inputList)
     {
         Item item;
 
@@ -517,15 +521,31 @@ void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
 
         item.mainMrl = QUrl::fromEncoded(inputItem->psz_uri);
 
-        std::vector<Item>::iterator it = std::upper_bound(begin(m_items), end(m_items), item,
-                                                          m_comparator);
+        std::vector<Item>::iterator it;
 
-        if (it != end(m_items)
-            &&
-            QString::compare(it->name, item.name, Qt::CaseInsensitive) == 0
-            &&
-            it->mainMrl.scheme() == item.mainMrl.scheme())
-            continue;
+        if (checkDuplicate)
+        {
+            it = std::find_if(begin(m_items), end(m_items), [item](const Item & i)
+            {
+                return matchItem(item, i);
+            });
+
+            // NOTE: We don't want the same name and scheme to appear twice in the list.
+            if (it != end(m_items))
+                continue;
+
+            it = std::upper_bound(begin(m_items), end(m_items), item, m_comparator);
+
+            if (it != end(m_items))
+                continue;
+        }
+        else
+        {
+            it = std::upper_bound(begin(m_items), end(m_items), item, m_comparator);
+
+            if (it != end(m_items) && matchItem(item, *it))
+                continue;
+        }
 
         item.mrls.push_back(item.mainMrl);
 
@@ -674,9 +694,21 @@ int NetworkDeviceModel::implicitCount() const
 
 // Private static function
 
+/* static */ bool NetworkDeviceModel::matchItem(const Item & a, const Item & b)
+{
+    return (QString::compare(a.name, b.name, Qt::CaseInsensitive) == 0
+            &&
+            QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme(), Qt::CaseInsensitive) == 0);
+}
+
 /* static */ bool NetworkDeviceModel::ascendingName(const Item & a, const Item & b)
 {
-    return (QString::compare(a.name, b.name, Qt::CaseInsensitive) <= 0);
+    int result = QString::compare(a.name, b.name, Qt::CaseInsensitive);
+
+    if (result != 0)
+        return (result <= 0);
+
+    return (QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme(), Qt::CaseInsensitive) <= 0);
 }
 
 /* static */ bool NetworkDeviceModel::ascendingMrl(const Item & a, const Item & b)
@@ -687,7 +719,12 @@ int NetworkDeviceModel::implicitCount() const
 
 /* static */ bool NetworkDeviceModel::descendingName(const Item & a, const Item & b)
 {
-    return (QString::compare(a.name, b.name, Qt::CaseInsensitive) >= 0);
+    int result = QString::compare(a.name, b.name, Qt::CaseInsensitive);
+
+    if (result != 0)
+        return (result >= 0);
+
+    return (QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme(), Qt::CaseInsensitive) >= 0);
 }
 
 /* static */ bool NetworkDeviceModel::descendingMrl(const Item & a, const Item & b)

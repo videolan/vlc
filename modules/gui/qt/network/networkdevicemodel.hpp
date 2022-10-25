@@ -200,6 +200,8 @@ private:
     int implicitCount() const;
 
 private: // Static functions
+    static bool matchItem(const Item & a, const Item & b);
+
     static bool ascendingName(const Item & a, const Item & b);
     static bool ascendingMrl (const Item & a, const Item & b);
 
