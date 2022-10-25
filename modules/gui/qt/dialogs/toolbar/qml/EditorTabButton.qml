@@ -23,53 +23,18 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-TabButton {
-    id: mainPlayerControl
-
-    readonly property bool active: index === bar.currentIndex
+Widgets.BannerTabButton {
+    id: root
 
     implicitWidth: VLCStyle.button_width_large
 
-    contentItem: Widgets.ListLabel {
-        text: {
-            var text = mainPlayerControl.text
-
-            if (!!MainCtx.controlbarProfileModel.currentModel &&
-                    MainCtx.controlbarProfileModel.currentModel.getModel(mainPlayerControl.identifier).dirty)
-                return _markDirty(text)
-            else
-                return text
-        }
-
-        horizontalAlignment: Text.AlignHCenter
-    }
-
-    background: Rectangle {
-        color: active ? VLCStyle.colors.bgAlt : hovered ? VLCStyle.colors.bgHover : VLCStyle.colors.bg
-
-        border.color: VLCStyle.colors.accent
-        border.width: active ? VLCStyle.dp(1, VLCStyle.scale) : 0
-
-        Rectangle {
-            width: parent.width - parent.border.width * 2
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.bottom
-
-            anchors.topMargin: -(height / 2)
-
-            color: parent.color
-
-            visible: active
-
-            height: parent.border.width * 2
-        }
-    }
+    signal dropEnterred()
 
     DropArea {
         anchors.fill: parent
 
         onEntered: {
-            bar.currentIndex = index
+            root.dropEnterred()
         }
     }
 }

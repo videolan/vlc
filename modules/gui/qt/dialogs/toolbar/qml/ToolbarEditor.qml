@@ -55,8 +55,25 @@ Rectangle{
                 model: PlayerListModel.model
 
                 delegate: EditorTabButton {
-                    text: modelData.name
                     readonly property int identifier: modelData.identifier
+
+                    selected: index === bar.currentIndex
+
+                    implicitWidth: VLCStyle.button_width_large
+
+                    text: {
+                        var text = modelData.name
+
+                        if (!!MainCtx.controlbarProfileModel.currentModel &&
+                                MainCtx.controlbarProfileModel.currentModel.getModel(identifier).dirty)
+                            return _markDirty(text)
+                        else
+                            return text
+                    }
+
+                    onDropEnterred: {
+                        bar.currentIndex = index
+                    }
                 }
             }
         }
