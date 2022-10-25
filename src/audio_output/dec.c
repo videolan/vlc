@@ -633,34 +633,34 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
     }
     else
     {
-    if (stream_GetDelay(stream, &delay) != 0)
-        return; /* nothing can be done if timing is unknown */
+        if (stream_GetDelay(stream, &delay) != 0)
+            return; /* nothing can be done if timing is unknown */
 
-    if (stream->sync.discontinuity)
-    {
-        /* Chicken-egg situation for most aout modules that can't be started
-         * deferred (all except PulseAudio). These modules will start to play
-         * data immediately and ignore the given play_date (that take the clock
-         * jitter into account). We don't want to let stream_HandleDrift()
-         * handle the first silence (from the "Early audio output" case) since
-         * this function will first update the clock without taking the jitter
-         * into account. Therefore, we manually insert silence that correspond
-         * to the clock jitter value before updating the clock.
-         */
-        vlc_tick_t play_date =
-            vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay,
-                                      dec_pts, stream->sync.rate);
-        vlc_tick_t jitter = play_date - system_now;
-        if (jitter > 0)
+        if (stream->sync.discontinuity)
         {
-            stream_Silence(stream, jitter, dec_pts - delay);
-            if (stream_GetDelay(stream, &delay) != 0)
-                return;
+            /* Chicken-egg situation for most aout modules that can't be
+             * started deferred (all except PulseAudio). These modules will
+             * start to play data immediately and ignore the given play_date
+             * (that take the clock jitter into account). We don't want to let
+             * stream_HandleDrift() handle the first silence (from the "Early
+             * audio output" case) since this function will first update the
+             * clock without taking the jitter into account. Therefore, we
+             * manually insert silence that correspond to the clock jitter
+             * value before updating the clock. */
+            vlc_tick_t play_date =
+                vlc_clock_ConvertToSystem(stream->sync.clock, system_now + delay,
+                                          dec_pts, stream->sync.rate);
+            vlc_tick_t jitter = play_date - system_now;
+            if (jitter > 0)
+            {
+                stream_Silence(stream, jitter, dec_pts - delay);
+                if (stream_GetDelay(stream, &delay) != 0)
+                    return;
+            }
         }
-    }
 
-    drift = vlc_clock_Update(stream->sync.clock, system_now + delay,
-                             dec_pts, stream->sync.rate);
+        drift = vlc_clock_Update(stream->sync.clock, system_now + delay,
+                                 dec_pts, stream->sync.rate);
     }
 
     stream_HandleDrift(stream, drift, dec_pts);
