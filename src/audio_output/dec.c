@@ -638,10 +638,10 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
 
         if (stream->sync.discontinuity)
         {
-            /* Chicken-egg situation for most aout modules that can't be
-             * started deferred (all except PulseAudio). These modules will
-             * start to play data immediately and ignore the given play_date
-             * (that take the clock jitter into account). We don't want to let
+            /* Chicken-egg situation for some aout modules that can't be
+             * started deferred (like alsa). These modules will start to play
+             * data immediately and ignore the given play_date (that take the
+             * clock jitter into account). We don't want to let
              * stream_HandleDrift() handle the first silence (from the "Early
              * audio output" case) since this function will first update the
              * clock without taking the jitter into account. Therefore, we
