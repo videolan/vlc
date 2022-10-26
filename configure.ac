@@ -1838,6 +1838,34 @@ AS_IF([test "${enable_sout}" != "no"], [
 ])
 AM_CONDITIONAL([ENABLE_SOUT], [test "${enable_sout}" != "no"])
 
+dnl
+dnl Rust Modules
+dnl
+AC_ARG_ENABLE([rust],
+  AS_HELP_STRING([--enable-rust],
+    [enable building Rust modules (default disabled)]))
+AS_IF([test "${enable_rust}" = "yes"],[
+  AC_CHECK_PROGS(RUSTC, [rustc], [no])
+  AS_IF([test "$RUSTC" = "no"],[
+    AC_MSG_ERROR([rustc not found but required to build Rust modules])
+  ])
+  AS_IF([test "${host}" = "${build}"],[
+    AC_CACHE_CHECK([rustc host target], [ac_cv_rustc_host_target],
+                     [ac_cv_rustc_host_target=$($RUSTC --verbose --version | grep "host:" | cut -d" " -f2-)])
+    AS_IF([test -n "${ac_cv_rustc_host_target}"],
+           [AC_SUBST([RUST_TARGET], ["$ac_cv_rustc_host_target"])],
+           [AC_MSG_ERROR(failed to extract rustc host target)])
+  ],[
+    AC_MSG_ERROR([cross compilation is not yet supported for Rust modules (${host} != ${build})])
+  ])
+  AC_CHECK_PROGS(CARGO, [cargo], [no])
+  AS_IF([test "$CARGO" = "no"],[
+    AC_MSG_ERROR([cargo not found. cargo is required to build Rust modules])
+  ])
+  AC_DEFINE(ENABLE_RUST, 1, [Define to 1 for building rust modules.])
+])
+AM_CONDITIONAL([HAVE_RUST], [test "${enable_rust}" = "yes"])
+
 dnl Lua modules
 AC_ARG_ENABLE([lua],
   AS_HELP_STRING([--disable-lua],
