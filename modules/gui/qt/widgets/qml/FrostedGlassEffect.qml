@@ -63,6 +63,7 @@ Item {
 
                 source: ShaderEffectSource {
                     id: effectSource
+                    smooth: false
                     sourceItem: effect.source
                     sourceRect: effect.sourceRect
                     visible: false
