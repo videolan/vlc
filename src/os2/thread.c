@@ -184,7 +184,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    if (var->destr != NULL)
+    if (var->destroy != NULL)
     {
         vlc_mutex_lock(&super_mutex);
         if (var->prev != NULL)
