@@ -136,7 +136,11 @@ ListView {
         readonly property bool effectCompatible: !(((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
                                                   ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString)))
 
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+
+        implicitWidth: Math.ceil(parent.width)
+        implicitHeight: Math.ceil(parent.height)
 
         z: root.contentItem.z
 
@@ -144,8 +148,8 @@ ListView {
 
         sourceRect: Qt.rect(root.contentX,
                             root.contentY,
-                            root.width,
-                            root.height)
+                            width,
+                            height)
 
         // Make sure contentItem is not rendered twice:
         hideSource: visible
