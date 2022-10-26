@@ -151,8 +151,8 @@ uwp64-libvlc-llvm:
     except:
     after_script:
         - mkdir nightlies
-        - for ext in 7z zip; do mv ${SHORTARCH}/vlc-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
-        - for ext in exe msi 7z zip; do mv ${SHORTARCH}/vlc-*.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - for ext in 7z;             do mv ${SHORTARCH}/vlc-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - for ext in exe msi 7z zip; do mv ${SHORTARCH}/vlc-*.${ext}       nightlies/$(basename ${SHORTARCH}/vlc-*.${ext}       | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
