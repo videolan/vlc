@@ -1303,13 +1303,13 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 
     vout_chrono_Stop(&sys->chrono.render);
 
+    struct vlc_tracer *tracer = GetTracer(sys);
     system_now = vlc_tick_now();
     if (!render_now)
     {
         const vlc_tick_t late = system_now - system_pts;
         if (unlikely(late > 0))
         {
-            struct vlc_tracer *tracer = GetTracer(sys);
             if (tracer != NULL)
                 vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "late");
             msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
@@ -1363,8 +1363,8 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         /* Tell the clock that the pts was forced */
         system_pts = VLC_TICK_MAX;
     }
-    vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
-                          frame_rate, frame_rate_base);
+    vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
+                                             frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
@@ -1376,6 +1376,11 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         subpicture_Delete(subpic);
 
     vout_statistic_AddDisplayed(&sys->statistic, 1);
+
+    if (tracer != NULL && system_pts != VLC_TICK_MAX)
+        vlc_tracer_TraceWithTs(tracer, system_pts, VLC_TRACE("type", "RENDER"),
+                               VLC_TRACE("id", sys->str_id),
+                               VLC_TRACE("drift", drift), VLC_TRACE_END);
 
     return VLC_SUCCESS;
 }
