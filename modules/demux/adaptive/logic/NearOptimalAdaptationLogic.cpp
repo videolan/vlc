@@ -70,7 +70,7 @@ NearOptimalAdaptationLogic::getNextQualityIndex( BaseAdaptationSet *adaptSet, Re
 {
     BaseRepresentation *ret = nullptr;
     BaseRepresentation *prev = nullptr;
-    float argmax;
+    float argmax = 0;
     for(BaseRepresentation *rep = selector.lowest(adaptSet);
                             rep && rep != prev; rep = selector.higher(adaptSet, rep))
     {
