@@ -39,6 +39,7 @@
 #include "modules/modules.h"
 
 #include <assert.h>
+#include <unistd.h>             /* STDERR_FILENO */
 
 /**
  * Perform early scan of arguments for a small subset of simple options.
