@@ -450,6 +450,10 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
         return; /* cf. VLC_TICK_MAX comment in vlc_aout_stream_Play() */
 
     struct vlc_tracer *tracer = aout_stream_tracer(stream);
+    if (tracer != NULL)
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", "RENDER"),
+                         VLC_TRACE("id", stream->str_id),
+                         VLC_TRACE("drift", drift), VLC_TRACE_END);
 
     /* Following calculations expect an opposite drift. Indeed,
      * vlc_clock_Update() returns a positive relative time, corresponding to
