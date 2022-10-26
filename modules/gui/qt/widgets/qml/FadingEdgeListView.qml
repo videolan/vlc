@@ -154,6 +154,8 @@ ListView {
         // Make sure contentItem is not rendered twice:
         hideSource: visible
 
+        smooth: false
+
         layer.enabled: true
         layer.effect: ShaderEffect {
             // It makes sense to use the effect for only in the fading part.
