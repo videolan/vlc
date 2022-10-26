@@ -192,8 +192,8 @@ uwp64-libvlc-llvm:
         - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
-        - for ext in 7z;             do mv ${SHORTARCH}/vlc-*-dev-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
-        - for ext in exe msi 7z zip; do mv ${SHORTARCH}/vlc-*-dev-*.${ext}       nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*.${ext}       | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - for ext in 7z;             do test ! -f ${SHORTARCH}/vlc-*-dev-*-debug.${ext} || mv ${SHORTARCH}/vlc-*-dev-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - for ext in exe msi 7z zip; do test ! -f ${SHORTARCH}/vlc-*-dev-*.${ext}       || mv ${SHORTARCH}/vlc-*-dev-*.${ext}       nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*.${ext}       | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
