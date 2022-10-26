@@ -94,8 +94,13 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }
 
+static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
+{
+    sout_StreamSetPCR( stream->p_next, pcr );
+}
+
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL, NULL,
+    Add, Del, Send, NULL, NULL, SetPCR,
 };
 
 static const char *ppsz_sout_options[] = {
