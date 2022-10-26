@@ -193,14 +193,14 @@ uwp64-libvlc-llvm:
     after_script:
         - mkdir nightlies
         - for ext in 7z; \
-          do test ! -f           ${SHORTARCH}/vlc-*-dev-*-debug.${ext} || \
-                              mv ${SHORTARCH}/vlc-*-dev-*-debug.${ext} \
-            nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); \
+          do mv                  ${SHORTARCH}/vlc-*-dev-*-debug.${ext} \
+            nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || \
+            echo "vlc-*debug.${ext} not found!"; \
           done
         - for ext in exe msi 7z zip; \
-           do test ! -f           ${SHORTARCH}/vlc-*-dev-*.${ext} || \
-                               mv ${SHORTARCH}/vlc-*-dev-*.${ext} \
-             nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*.${ext}      | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); \
+           do mv                  ${SHORTARCH}/vlc-*-dev-*.${ext} \
+             nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*.${ext}      | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || \
+            echo "vlc-*.${ext} not found!"; \
            done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
