@@ -33,6 +33,12 @@ QColor blendColors(QColor c1, QColor c2, float blend = 0.5)
                   c2.alphaF() + (c1.alphaF() - c2.alphaF()) * blend);
 }
 
+QColor setColorAlpha(const QColor& c1, float alpha)
+{
+    QColor c(c1);
+    c.setAlphaF(alpha);
+    return c;
+}
 
 #ifndef _WIN32
 /**
@@ -306,6 +312,15 @@ bool SystemPalette::hasCSDImage() const
     return m_palettePriv->hasCSDImages();
 }
 
+QColor SystemPalette::blendColors(const QColor& c1, const QColor& c2, float blend)
+{
+    return ::blendColors(c1, c2, blend);
+}
+QColor SystemPalette::setColorAlpha(const QColor& c1, float alpha)
+{
+    return ::setColorAlpha(c1, alpha);
+}
+
 void SystemPalette::setSource(ColorSchemeModel::ColorScheme source)
 {
     if (m_source == source)
@@ -389,7 +404,7 @@ void SystemPalette::makeLightPalette()
 
     m_button =  QColor{"#eff0f1"};
     m_buttonText =  m_text;
-    m_buttonBorder =  blendColors(m_button, m_buttonText, 0.8);
+    m_buttonBorder =  ::blendColors(m_button, m_buttonText, 0.8);
 
     m_textActiveSource =  QColor{"#ff950d"};
 

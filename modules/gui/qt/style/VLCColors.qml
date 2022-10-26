@@ -24,17 +24,9 @@ Item {
 
     /* required*/ property var palette
 
-    function blendColors( a, b, blend ) {
-        return Qt.rgba(b.r + (a.r - b.r) * blend,
-                       b.g + (a.g - b.g) * blend,
-                       b.b + (a.b - b.b) * blend,
-                       b.a + (a.a - b.a) * blend)
-    }
-
-    function setColorAlpha( c, alpha )
-    {
-        return Qt.rgba(c.r, c.g, c.b, alpha)
-    }
+    //"alias" ColorHelper functions
+    property var blendColors: palette.blendColors
+    property var setColorAlpha: palette.setColorAlpha
 
     function getBgColor(selected, hovered, focus)
     {
