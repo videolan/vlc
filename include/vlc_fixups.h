@@ -637,6 +637,8 @@ struct sockaddr_in6
 
 # define IN6_IS_ADDR_MULTICAST(a)   (((__const uint8_t *) (a))[0] == 0xff)
 
+# define INET6_ADDRSTRLEN   46
+
 static const struct in6_addr in6addr_any =
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
