@@ -128,6 +128,16 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     type = Type::Unknown;
     const char moov[] = "ftypmoovmoofemsg";
 
+    /* Skipped ID3 if any */
+    while(sz > 10 && ID3TAG_IsTag(data, false))
+    {
+        size_t tagsize = ID3TAG_Parse(data, sz, ID3Callback, this);
+        if(tagsize >= sz || tagsize == 0)
+            return; /* not enough peek */
+        data += tagsize;
+        sz -= tagsize;
+    }
+
     if(sz > 188 && data[0] == 0x47 && data[188] == 0x47)
         type = StreamFormat::Type::MPEG2TS;
     else if(sz > 8 && (!memcmp(&moov,    &data[4], 4) ||
@@ -144,15 +154,6 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     else /* Check Packet Audio formats */
     {
         /* It MUST have ID3 header, but HLS spec is an oxymoron */
-        while(sz > 10 && ID3TAG_IsTag(data, false))
-        {
-            size_t tagsize = ID3TAG_Parse(data, sz, ID3Callback, this);
-            if(tagsize >= sz || tagsize == 0)
-                return; /* not enough peek */
-            data += tagsize;
-            sz -= tagsize;
-        }
-        /* Skipped ID3 if any */
         if(sz > 3 && (!memcmp("\xFF\xF1", data, 2) ||
                       !memcmp("\xFF\xF9", data, 2)))
         {
