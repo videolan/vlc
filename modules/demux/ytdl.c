@@ -27,6 +27,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>         /* STDERR_FILENO */
 
 #include "json/json.h"
 #include <vlc_common.h>
