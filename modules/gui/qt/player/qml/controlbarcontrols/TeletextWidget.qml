@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 import QtQuick 2.11
+import QtQuick.Layouts 1.11
 import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
@@ -47,12 +48,15 @@ T.Pane {
         spacing: VLCStyle.margin_small
 
         Item {
-            anchors.left: parent.left
-            anchors.right: parent.right
+            // NOTE: This makes sure that we can deal with long translations for our itemText.
+            width: Math.max(itemText.implicitWidth + teleActivateBtn.width + VLCStyle.margin_small,
+                            parent.width)
 
             height: teleActivateBtn.height
 
             Widgets.SubtitleLabel {
+                id: itemText
+
                 text: I18n.qtr("Teletext")
 
                 color: root.colors.text
@@ -79,13 +83,14 @@ T.Pane {
             }
         }
 
-        Row {
+        RowLayout {
+            anchors.left: parent.left
+            anchors.right: parent.right
+
             spacing: VLCStyle.margin_small
 
             Widgets.IconControlButton{
                 id: teleTransparencyBtn
-
-                anchors.verticalCenter: parent.verticalCenter
 
                 enabled: teleActivateBtn.checked
 
@@ -110,10 +115,7 @@ T.Pane {
             Widgets.SpinBoxExt{
                 id: telePageNumber
 
-                anchors.verticalCenter: parent.verticalCenter
-
-                // NOTE: We want a fixed size for the TextInput.
-                width: VLCStyle.dp(136, VLCStyle.scale)
+                Layout.fillWidth: true
 
                 enabled: teleActivateBtn.checked
 
