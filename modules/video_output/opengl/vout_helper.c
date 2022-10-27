@@ -39,10 +39,10 @@
 #include <vlc_modules.h>
 #include <vlc_vout.h>
 #include <vlc_viewpoint.h>
+#include <vlc_opengl_filter.h>
+#include <vlc_opengl_platform.h>
 
 #include "filters.h"
-#include "gl_api.h"
-#include "gl_util.h"
 #include "vout_helper.h"
 #include "renderer.h"
 #include "sub_renderer.h"

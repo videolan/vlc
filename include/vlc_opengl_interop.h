@@ -102,7 +102,7 @@ struct vlc_gl_interop {
     vlc_object_t obj;
     module_t *module;
 
-    vlc_gl_t *gl;
+    struct vlc_gl_t *gl;
     uint32_t tex_target;
 
     /* Input format
@@ -165,4 +165,22 @@ vlc_gl_interop_GetTexFormatSize(struct vlc_gl_interop *interop, uint32_t target,
                                         type);
 }
 
+VLC_API struct vlc_gl_interop *
+vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
+                  const video_format_t *fmt);
+
+VLC_API struct vlc_gl_interop *
+vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl);
+
+VLC_API void
+vlc_gl_interop_Delete(struct vlc_gl_interop *interop);
+
+VLC_API int
+vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
+                                const size_t *tex_width,
+                                const size_t *tex_height, unsigned *textures);
+
+VLC_API void
+vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
+                              unsigned *textures);
 #endif

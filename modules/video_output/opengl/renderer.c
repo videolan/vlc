@@ -37,10 +37,9 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 
-#include "filter.h"
-#include "gl_util.h"
+#include <vlc_opengl_platform.h>
+#include <vlc_opengl_filter.h>
 #include "vout_helper.h"
-#include "sampler.h"
 
 #define SPHERE_RADIUS 1.f
 

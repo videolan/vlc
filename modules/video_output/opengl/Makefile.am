@@ -1,23 +1,8 @@
 OPENGL_COMMONSOURCES = \
-       video_output/opengl/filter.c \
-       video_output/opengl/filter.h \
-       video_output/opengl/filter_priv.h \
-       video_output/opengl/filters.c \
        video_output/opengl/filters.h \
-       video_output/opengl/gl_api.c \
-       video_output/opengl/gl_api.h \
-       video_output/opengl/gl_common.h \
-       video_output/opengl/gl_util.c \
-       video_output/opengl/gl_util.h \
-       video_output/opengl/importer.c \
-       video_output/opengl/importer.h \
-       video_output/opengl/importer_priv.h \
-       video_output/opengl/interop.h \
-       video_output/opengl/interop.c \
-       video_output/opengl/picture.c \
-       video_output/opengl/picture.h \
-       video_output/opengl/sampler.c \
-       video_output/opengl/sampler.h
+       video_output/opengl/filters.c \
+       video_output/opengl/filter.h \
+       video_output/opengl/filter.c
 
 OPENGL_COMMONCFLAGS = $(LIBPLACEBO_CFLAGS)
 OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
@@ -60,16 +45,16 @@ endif
 libglinterop_sw_plugin_la_SOURCES = video_output/opengl/interop_sw.c
 libglinterop_sw_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_GL
-vout_LTLIBRARIES += libglinterop_sw_plugin.la
+vout_PLUGINS += libglinterop_sw_plugin.la
 else
 if HAVE_GLES2
-vout_LTLIBRARIES += libglinterop_sw_plugin.la
+vout_PLUGINS += libglinterop_sw_plugin.la
 libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 endif
 endif
 
 if HAVE_DARWIN
-vout_LTLIBRARIES += libglinterop_sw_plugin.la
+vout_PLUGINS += libglinterop_sw_plugin.la
 if HAVE_OSX
 libglinterop_sw_plugin_la_LIBADD = libvlc_opengl.la
 else
@@ -81,7 +66,7 @@ endif
 if HAVE_ANDROID
 libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
 libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
-vout_LTLIBRARIES += libglinterop_sw_plugin.la
+vout_PLUGINS += libglinterop_sw_plugin.la
 endif
 
 ### OpenGL ###

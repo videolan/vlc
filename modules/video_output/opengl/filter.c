@@ -29,6 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
+#include <vlc_opengl.h>
 
 #include "gl_api.h"
 

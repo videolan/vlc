@@ -45,6 +45,7 @@
 #import <vlc_picture.h>
 #import <vlc_plugin.h>
 #import <vlc_opengl.h>
+#import <vlc_opengl_platform.h>
 #import <vlc_picture_pool.h>
 
 #import "codec/vt_utils.h"

@@ -23,9 +23,9 @@
 
 #include "importer.h"
 
-#include "gl_api.h"
-#include "gl_common.h"
-#include "gl_util.h"
+#include <vlc_opengl_platform.h>
+#include <vlc_opengl_filter.h>
+
 #include "interop.h"
 #include "picture.h"
 

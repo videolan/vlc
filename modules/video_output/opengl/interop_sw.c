@@ -30,9 +30,10 @@
 #include <vlc_plugin.h>
 #include <vlc_opengl.h>
 #include <vlc_opengl_interop.h>
+#include <vlc_opengl_platform.h>
+#include "gl_common.h"
 
 #include "gl_util.h"
-#include "interop.h"
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 typedef struct

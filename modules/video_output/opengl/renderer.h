@@ -28,7 +28,6 @@
 
 #include "filter.h"
 #include "gl_api.h"
-#include "gl_common.h"
 #include "interop.h"
 #include "sampler.h"
 

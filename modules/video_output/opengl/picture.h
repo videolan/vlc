@@ -27,19 +27,21 @@
 
 #include <vlc_es.h>
 #include <vlc_picture.h>
-#include "gl_common.h"
+#include <vlc_opengl_platform.h>
+#include <vlc_opengl_filter.h>
 
+#if 0
 /**
  * Format of an OpenGL picture
  */
 struct vlc_gl_format {
     video_format_t fmt;
 
-    GLenum tex_target;
+    uint32_t tex_target;
 
     unsigned tex_count;
-    GLsizei tex_widths[PICTURE_PLANE_MAX];
-    GLsizei tex_heights[PICTURE_PLANE_MAX];
+    int32_t tex_widths[PICTURE_PLANE_MAX];
+    int32_t tex_heights[PICTURE_PLANE_MAX];
 
     uint32_t formats[PICTURE_PLANE_MAX];
 };
@@ -51,7 +53,7 @@ struct vlc_gl_format {
  * known.
  */
 struct vlc_gl_picture {
-    GLuint textures[PICTURE_PLANE_MAX];
+    unsigned textures[PICTURE_PLANE_MAX];
 
     /**
      * Matrix to convert from 2D pictures coordinates to texture coordinates
@@ -142,4 +144,5 @@ void
 vlc_gl_picture_ComputeDirectionMatrix(const struct vlc_gl_picture *pic,
                                       float direction[2*2]);
 
+#endif
 #endif

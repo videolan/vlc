@@ -1,8 +1,7 @@
 /*****************************************************************************
- * gl_api.h
+ * internal.h: OpenGL internal header
  *****************************************************************************
- * Copyright (C) 2020 VLC authors and VideoLAN
- * Copyright (C) 2020 Videolabs
+ * Copyright (C) 2017 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -19,10 +18,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_GL_API_H
-#define VLC_GL_API_H
+#ifndef VLC_OPENGL_INTERNAL_H
+#define VLC_OPENGL_INTERNAL_H
 
-#include <vlc_opengl_filter.h>
-#include <vlc_opengl_platform.h>
+//#include "interop.h"
+//#include "renderer.h"
 
-#endif
+
+#endif /* include-guard */

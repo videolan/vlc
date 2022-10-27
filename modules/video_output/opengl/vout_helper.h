@@ -29,7 +29,6 @@
 #ifndef VLC_OPENGL_VOUT_HELPER_H
 #define VLC_OPENGL_VOUT_HELPER_H
 
-#include "gl_common.h"
 #include "gl_scale.h"
 
 #ifdef HAVE_LIBPLACEBO

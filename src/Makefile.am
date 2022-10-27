@@ -83,6 +83,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_objects.h \
 	../include/vlc_opengl.h \
 	../include/vlc_opengl_interop.h \
+	../include/vlc_opengl_filter.h \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
@@ -191,7 +192,8 @@ AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	-DPKGLIBDIR=\"$(pkglibdir)\" \
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\" \
-	$(CPPFLAGS_libvlccore)
+	$(CPPFLAGS_libvlccore) \
+    -DUSE_OPENGL_ES2
 AM_CFLAGS = $(CFLAGS_libvlccore)
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -DHAVE_DYNAMIC_PLUGINS
@@ -345,6 +347,7 @@ libvlccore_la_SOURCES = \
 	video_output/video_window.h \
 	video_output/window.c \
 	video_output/opengl.c \
+	video_output/opengl_filter.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
 	video_output/vout_private.h \

@@ -69,10 +69,9 @@
 #include <math.h>
 
 #include "filter.h"
-#include "gl_api.h"
-#include "gl_common.h"
-#include "gl_util.h"
-#include "sampler.h"
+
+#include <vlc_opengl_platform.h>
+#include <vlc_opengl_filter.h>
 
 #define MOCK_CFG_PREFIX "mock-"
 

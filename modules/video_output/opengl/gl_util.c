@@ -28,6 +28,7 @@
 #include <vlc_filter.h>
 #include <vlc_modules.h>
 
+#if 0
 static void
 LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
 {
@@ -106,7 +107,6 @@ CreateShader(vlc_object_t *obj, const opengl_vtable_t *vt, GLenum type,
     return shader;
 }
 
-
 GLuint
 vlc_gl_BuildProgram(vlc_object_t *obj, const opengl_vtable_t *vt,
                     GLsizei vstring_count, const GLchar **vstrings,
@@ -167,3 +167,4 @@ vlc_gl_WrapOpenGLFilter(filter_t *filter, const char *opengl_filter_name)
 
     return module;
 }
+#endif

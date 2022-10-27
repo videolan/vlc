@@ -24,9 +24,12 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include "gl_util.h"
-#include "interop.h"
+#include <vlc_opengl_platform.h>
+#include <vlc_opengl_interop.h>
+#include <vlc_opengl.h>
+#include <vlc_opengl_filter.h>
 #include "../../codec/vt_utils.h"
+#include "gl_common.h"
 
 #if TARGET_OS_IPHONE
 #include <OpenGLES/ES2/gl.h>
@@ -387,7 +390,7 @@ error:
 
 vlc_module_begin ()
     set_description("Apple OpenGL CVPX converter")
-    set_capability("glinterop", 1)
+    set_capability("glinterop", 100)
     set_callback(Open)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 vlc_module_end ()

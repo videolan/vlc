@@ -27,12 +27,10 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
+#include <vlc_opengl_filter.h>
+#include <vlc_opengl_platform.h>
 
 #include "filter.h"
-#include "gl_api.h"
-#include "gl_common.h"
-#include "gl_util.h"
-#include "sampler.h"
 
 #define DRAW_VFLIP_SHORTTEXT "VFlip the video"
 #define DRAW_VFLIP_LONGTEXT \
@@ -59,7 +57,7 @@ struct sys {
 
 static int
 Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
-     const struct vlc_gl_input_meta *meta)
+     struct vlc_gl_input_meta *meta)
 {
     (void) meta;
 
