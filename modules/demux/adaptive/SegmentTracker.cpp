@@ -399,7 +399,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed)
         chunkformat = StreamFormat(p_peek, i_peek);
         /* fallback on Mime type */
         if(chunkformat == StreamFormat(StreamFormat::Type::Unknown))
-            format = StreamFormat(chunk.chunk->getContentType());
+            chunkformat = StreamFormat(chunk.chunk->getContentType());
         chunk.chunk->setStreamFormat(chunkformat);
         returnedChunk = wrappedck;
     }
