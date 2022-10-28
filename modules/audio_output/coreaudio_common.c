@@ -703,7 +703,7 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                  AudioChannelLayoutTag *inlayout_tag)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-    uint32_t chans_out[AOUT_CHAN_MAX];
+    uint32_t chans_out[AOUT_CHAN_MAX] = { 0, };
 
     /* Some channel abbreviations used below:
      * L - left
@@ -767,13 +767,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                 chans_out[3] = AOUT_CHAN_REARRIGHT;
                 chans_out[4] = AOUT_CHAN_CENTER;
                 chans_out[5] = AOUT_CHAN_LFE;
-
-                p_sys->chans_to_reorder =
-                    aout_CheckChannelReorder(NULL, chans_out,
-                                             fmt->i_physical_channels,
-                                             p_sys->chan_table);
-                if (p_sys->chans_to_reorder)
-                    msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
             }
             else
             {
@@ -786,13 +779,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                 chans_out[3] = AOUT_CHAN_REARRIGHT;
                 chans_out[4] = AOUT_CHAN_CENTER;
                 chans_out[5] = AOUT_CHAN_REARCENTER;
-
-                p_sys->chans_to_reorder =
-                    aout_CheckChannelReorder(NULL, chans_out,
-                                             fmt->i_physical_channels,
-                                             p_sys->chan_table);
-                if (p_sys->chans_to_reorder)
-                    msg_Dbg(p_aout, "channel reordering needed for 6.0 output");
             }
             break;
         case 7:
@@ -806,14 +792,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
             chans_out[4] = AOUT_CHAN_REARLEFT;
             chans_out[5] = AOUT_CHAN_REARRIGHT;
             chans_out[6] = AOUT_CHAN_REARCENTER;
-
-            p_sys->chans_to_reorder =
-                aout_CheckChannelReorder(NULL, chans_out,
-                                         fmt->i_physical_channels,
-                                         p_sys->chan_table);
-            if (p_sys->chans_to_reorder)
-                msg_Dbg(p_aout, "channel reordering needed for 6.1 output");
-
             break;
         case 8:
             if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
@@ -844,12 +822,6 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                 chans_out[6] = AOUT_CHAN_REARCENTER;
                 chans_out[7] = AOUT_CHAN_REARRIGHT;
             }
-            p_sys->chans_to_reorder =
-                aout_CheckChannelReorder(NULL, chans_out,
-                                         fmt->i_physical_channels,
-                                         p_sys->chan_table);
-            if (p_sys->chans_to_reorder)
-                msg_Dbg(p_aout, "channel reordering needed for 7.1 / 8.0 output");
             break;
         case 9:
             /* Lc C Rc L R Ls Cs Rs LFE */
@@ -863,14 +835,17 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
             chans_out[6] = AOUT_CHAN_REARCENTER;
             chans_out[7] = AOUT_CHAN_REARRIGHT;
             chans_out[8] = AOUT_CHAN_LFE;
-
-            p_sys->chans_to_reorder =
-                aout_CheckChannelReorder(NULL, chans_out,
-                                         fmt->i_physical_channels,
-                                         p_sys->chan_table);
-            if (p_sys->chans_to_reorder)
-                msg_Dbg(p_aout, "channel reordering needed for 8.1 output");
             break;
+    }
+
+    if (chans_out[0] != 0)
+    {
+        p_sys->chans_to_reorder =
+            aout_CheckChannelReorder(NULL, chans_out,
+                                     fmt->i_physical_channels,
+                                     p_sys->chan_table);
+        if (p_sys->chans_to_reorder)
+            msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
     }
 
     return VLC_SUCCESS;
