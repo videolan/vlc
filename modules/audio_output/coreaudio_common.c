@@ -749,7 +749,7 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
             else if (fmt->i_physical_channels & AOUT_CHANS_REAR) /* L R Ls Rs */
                 *inlayout_tag = kAudioChannelLayoutTag_DVD_3;
             else if (fmt->i_physical_channels & AOUT_CHANS_CENTER) /* L R C Cs */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_3;
+                *inlayout_tag = kAudioChannelLayoutTag_MPEG_4_0_A;
             break;
         case 5:
             if (fmt->i_physical_channels & (AOUT_CHAN_CENTER)) /* L R Ls Rs C */
