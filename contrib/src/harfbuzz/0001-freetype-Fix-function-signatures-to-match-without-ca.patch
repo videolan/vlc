@@ -1,0 +1,67 @@
+From 1a4fd470808067717e6b9b228ec1cb0eab26039e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 28 Oct 2022 22:17:15 +0300
+Subject: [PATCH 1/2] freetype: Fix function signatures to match without casts
+
+Clang 16 has got a new stricter warning for casts of function types
+(see https://github.com/llvm/llvm-project/commit/1aad641c793090b4d036c03e737df2ebe2c32c57).
+
+This new warning gets included as part of the existing error
+diagnostic setting of -Wcast-function-type.
+
+This fixes errors like these:
+
+../src/hb-ft.cc:1011:34: error: cast from 'void (*)(FT_Face)' (aka 'void (*)(FT_FaceRec_ *)') to 'FT_Generic_Finalizer' (aka 'void (*)(void *)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
+    ft_face->generic.finalizer = (FT_Generic_Finalizer) hb_ft_face_finalize;
+                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+ src/hb-ft.cc | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/hb-ft.cc b/src/hb-ft.cc
+index 67691e3ff..37f9f7f84 100644
+--- a/src/hb-ft.cc
++++ b/src/hb-ft.cc
+@@ -732,8 +732,9 @@ hb_ft_face_create_referenced (FT_Face ft_face)
+ }
+ 
+ static void
+-hb_ft_face_finalize (FT_Face ft_face)
++hb_ft_face_finalize (void *arg)
+ {
++  FT_Face ft_face = (FT_Face) arg;
+   hb_face_destroy ((hb_face_t *) ft_face->generic.data);
+ }
+ 
+@@ -765,7 +766,7 @@ hb_ft_face_create_cached (FT_Face ft_face)
+       ft_face->generic.finalizer (ft_face);
+ 
+     ft_face->generic.data = hb_ft_face_create (ft_face, nullptr);
+-    ft_face->generic.finalizer = (FT_Generic_Finalizer) hb_ft_face_finalize;
++    ft_face->generic.finalizer = hb_ft_face_finalize;
+   }
+ 
+   return hb_face_reference ((hb_face_t *) ft_face->generic.data);
+@@ -946,8 +947,9 @@ get_ft_library ()
+ }
+ 
+ static void
+-_release_blob (FT_Face ft_face)
++_release_blob (void *arg)
+ {
++  FT_Face ft_face = (FT_Face) arg;
+   hb_blob_destroy ((hb_blob_t *) ft_face->generic.data);
+ }
+ 
+@@ -1029,7 +1031,7 @@ hb_ft_font_set_funcs (hb_font_t *font)
+ #endif
+ 
+   ft_face->generic.data = blob;
+-  ft_face->generic.finalizer = (FT_Generic_Finalizer) _release_blob;
++  ft_face->generic.finalizer = _release_blob;
+ 
+   _hb_ft_font_set_funcs (font, ft_face, true);
+   hb_ft_font_set_load_flags (font, FT_LOAD_DEFAULT | FT_LOAD_NO_HINTING);
+-- 
+2.25.1
+
