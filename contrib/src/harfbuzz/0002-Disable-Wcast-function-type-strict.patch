@@ -1,0 +1,25 @@
+From b1f1c6e3951f7e28ce1c57248f8141cde40d2002 Mon Sep 17 00:00:00 2001
+From: Behdad Esfahbod <behdad@behdad.org>
+Date: Fri, 28 Oct 2022 14:19:39 -0600
+Subject: [PATCH 2/2] Disable -Wcast-function-type-strict
+
+https://github.com/harfbuzz/harfbuzz/pull/3859#issuecomment-1295409126
+---
+ src/hb.hh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/hb.hh b/src/hb.hh
+index b9f5f7141..32838ff9b 100644
+--- a/src/hb.hh
++++ b/src/hb.hh
+@@ -126,6 +126,7 @@
+ /* Ignored intentionally. */
+ #ifndef HB_NO_PRAGMA_GCC_DIAGNOSTIC_IGNORED
+ #pragma GCC diagnostic ignored "-Wclass-memaccess"
++#pragma GCC diagnostic ignored "-Wcast-function-type-strict" // https://github.com/harfbuzz/harfbuzz/pull/3859#issuecomment-1295409126
+ #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ #pragma GCC diagnostic ignored "-Wformat-zero-length"
+ #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+-- 
+2.25.1
+
