@@ -3905,7 +3905,7 @@ AS_IF([test -n "$PKG_CONFIG"],[
         ])
     ])
 ])
-AM_CONDITIONAL([BUILD_CHROMECAST], [test "${build_chromecast}" = "yes" -a "${protoc_matching}" = yes])
+AM_CONDITIONAL([BUILD_CHROMECAST], [test "${build_chromecast}" != "no" -a "${protoc_matching}" = yes])
 
 dnl
 dnl  Interface plugins
