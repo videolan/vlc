@@ -606,8 +606,8 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 const AudioChannelLayout *outlayout, bool *warn_configuration)
 {
     /* Fill VLC physical_channels from output layout */
-    fmt->i_physical_channels = 0;
     uint32_t i_original = fmt->i_physical_channels;
+    fmt->i_physical_channels = 0;
     AudioChannelLayout *reslayout = NULL;
 
     if (outlayout == NULL)
