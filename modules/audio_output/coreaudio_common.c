@@ -640,6 +640,39 @@ AudioChannelLabelToVlcChan(AudioChannelLabel chan, bool swap_rear_surround)
     }
 }
 
+static AudioChannelLabel
+VlcChanToAudioChannelLabel(unsigned chan, bool swap_rear_surround)
+{
+    /* maps auhal channels to vlc ones */
+    switch (chan)
+    {
+        case AOUT_CHAN_LEFT:
+            return kAudioChannelLabel_Left;
+        case AOUT_CHAN_RIGHT:
+            return kAudioChannelLabel_Right;
+        case AOUT_CHAN_CENTER:
+            return kAudioChannelLabel_Center;
+        case AOUT_CHAN_LFE:
+            return kAudioChannelLabel_LFEScreen;
+        case AOUT_CHAN_REARLEFT:
+            return swap_rear_surround ? kAudioChannelLabel_RearSurroundLeft
+                                      : kAudioChannelLabel_LeftSurround;
+        case AOUT_CHAN_REARRIGHT:
+            return swap_rear_surround ? kAudioChannelLabel_RearSurroundRight
+                                      : kAudioChannelLabel_RightSurround;
+        case AOUT_CHAN_MIDDLELEFT:
+            return swap_rear_surround ? kAudioChannelLabel_LeftSurround
+                                      : kAudioChannelLabel_RearSurroundLeft;
+        case AOUT_CHAN_MIDDLERIGHT:
+            return swap_rear_surround ? kAudioChannelLabel_RightSurround
+                                      : kAudioChannelLabel_RearSurroundRight;
+        case AOUT_CHAN_REARCENTER:
+            return kAudioChannelLabel_CenterSurround;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 static int
 MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 const AudioChannelLayout *outlayout, bool *warn_configuration)
@@ -755,154 +788,41 @@ MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     uint32_t chans_out[AOUT_CHAN_MAX] = { 0, };
 
-    *inlayoutp = malloc(sizeof(AudioChannelLayout));
-    if (*inlayoutp == NULL)
+    unsigned channels = aout_FormatNbChannels(fmt);
+
+    size_t size;
+    if (mul_overflow(channels, sizeof(AudioChannelDescription), &size))
         return VLC_ENOMEM;
-    *inlayout_size = sizeof(AudioChannelLayout);
-    AudioChannelLayoutTag *inlayout_tag = &((*inlayoutp)->mChannelLayoutTag);
+    if (add_overflow(size, sizeof(AudioChannelLayout), &size))
+        return VLC_ENOMEM;
+    AudioChannelLayout *inlayout = malloc(size);
+    if (inlayout == NULL)
+        return VLC_ENOMEM;
 
-    /* Some channel abbreviations used below:
-     * L - left
-     * R - right
-     * C - center
-     * Ls - left surround
-     * Rs - right surround
-     * Cs - center surround
-     * Rls - rear left surround
-     * Rrs - rear right surround
-     * Lw - left wide
-     * Rw - right wide
-     * Lsd - left surround direct
-     * Rsd - right surround direct
-     * Lc - left center
-     * Rc - right center
-     * Ts - top surround
-     * Vhl - vertical height left
-     * Vhc - vertical height center
-     * Vhr - vertical height right
-     * Lt - left matrix total. for matrix encoded stereo.
-     * Rt - right matrix total. for matrix encoded stereo. */
+    *inlayoutp = inlayout;
+    *inlayout_size = size;
+    inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelDescriptions;
+    inlayout->mNumberChannelDescriptions = aout_FormatNbChannels(fmt);
 
-    switch (aout_FormatNbChannels(fmt))
+    bool swap_rear_surround = fmt->i_physical_channels & AOUT_CHANS_7_0;
+    if (swap_rear_surround)
+        msg_Dbg(p_aout, "swapping Surround and RearSurround channels "
+                "for 7.1 Rear Surround");
+    unsigned chan_idx = 0;
+    for (unsigned i = 0; i < AOUT_CHAN_MAX; ++i)
     {
-        case 1:
-            *inlayout_tag = kAudioChannelLayoutTag_Mono;
-            break;
-        case 2:
-            *inlayout_tag = kAudioChannelLayoutTag_Stereo;
-            break;
-        case 3:
-            if (fmt->i_physical_channels & AOUT_CHAN_CENTER) /* L R C */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_7;
-            else if (fmt->i_physical_channels & AOUT_CHAN_LFE) /* L R LFE */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_4;
-            break;
-        case 4:
-            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER | AOUT_CHAN_LFE)) /* L R C LFE */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_10;
-            else if (fmt->i_physical_channels & AOUT_CHANS_REAR) /* L R Ls Rs */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_3;
-            else if (fmt->i_physical_channels & AOUT_CHANS_CENTER) /* L R C Cs */
-                *inlayout_tag = kAudioChannelLayoutTag_MPEG_4_0_A;
-            break;
-        case 5:
-            if (fmt->i_physical_channels & (AOUT_CHAN_CENTER)) /* L R Ls Rs C */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_19;
-            else if (fmt->i_physical_channels & (AOUT_CHAN_LFE)) /* L R Ls Rs LFE */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_18;
-            break;
-        case 6:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
-            {
-                /* L R Ls Rs C LFE */
-                *inlayout_tag = kAudioChannelLayoutTag_DVD_20;
+        unsigned vlcchan = pi_vlc_chan_order_wg4[i];
+        if ((vlcchan & fmt->i_physical_channels) == 0)
+            continue;
 
-                chans_out[0] = AOUT_CHAN_LEFT;
-                chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_REARLEFT;
-                chans_out[3] = AOUT_CHAN_REARRIGHT;
-                chans_out[4] = AOUT_CHAN_CENTER;
-                chans_out[5] = AOUT_CHAN_LFE;
-            }
-            else
-            {
-                /* L R Ls Rs C Cs */
-                *inlayout_tag = kAudioChannelLayoutTag_AudioUnit_6_0;
-
-                chans_out[0] = AOUT_CHAN_LEFT;
-                chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_REARLEFT;
-                chans_out[3] = AOUT_CHAN_REARRIGHT;
-                chans_out[4] = AOUT_CHAN_CENTER;
-                chans_out[5] = AOUT_CHAN_REARCENTER;
-            }
-            break;
-        case 7:
-            /* L R C LFE Ls Rs Cs */
-            *inlayout_tag = kAudioChannelLayoutTag_MPEG_6_1_A;
-
-            chans_out[0] = AOUT_CHAN_LEFT;
-            chans_out[1] = AOUT_CHAN_RIGHT;
-            chans_out[2] = AOUT_CHAN_CENTER;
-            chans_out[3] = AOUT_CHAN_LFE;
-            chans_out[4] = AOUT_CHAN_REARLEFT;
-            chans_out[5] = AOUT_CHAN_REARRIGHT;
-            chans_out[6] = AOUT_CHAN_REARCENTER;
-            break;
-        case 8:
-            if (fmt->i_physical_channels & (AOUT_CHAN_LFE))
-            {
-                /* L R C LFE Ls Rs Rls Rrs */
-                *inlayout_tag = kAudioChannelLayoutTag_MPEG_7_1_C;
-
-                chans_out[0] = AOUT_CHAN_LEFT;
-                chans_out[1] = AOUT_CHAN_RIGHT;
-                chans_out[2] = AOUT_CHAN_CENTER;
-                chans_out[3] = AOUT_CHAN_LFE;
-                chans_out[4] = AOUT_CHAN_MIDDLELEFT;
-                chans_out[5] = AOUT_CHAN_MIDDLERIGHT;
-                chans_out[6] = AOUT_CHAN_REARLEFT;
-                chans_out[7] = AOUT_CHAN_REARRIGHT;
-            }
-            else
-            {
-                /* Lc C Rc L R Ls Cs Rs */
-                *inlayout_tag = kAudioChannelLayoutTag_DTS_8_0_B;
-
-                chans_out[0] = AOUT_CHAN_MIDDLELEFT;
-                chans_out[1] = AOUT_CHAN_CENTER;
-                chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
-                chans_out[3] = AOUT_CHAN_LEFT;
-                chans_out[4] = AOUT_CHAN_RIGHT;
-                chans_out[5] = AOUT_CHAN_REARLEFT;
-                chans_out[6] = AOUT_CHAN_REARCENTER;
-                chans_out[7] = AOUT_CHAN_REARRIGHT;
-            }
-            break;
-        case 9:
-            /* Lc C Rc L R Ls Cs Rs LFE */
-            *inlayout_tag = kAudioChannelLayoutTag_DTS_8_1_B;
-            chans_out[0] = AOUT_CHAN_MIDDLELEFT;
-            chans_out[1] = AOUT_CHAN_CENTER;
-            chans_out[2] = AOUT_CHAN_MIDDLERIGHT;
-            chans_out[3] = AOUT_CHAN_LEFT;
-            chans_out[4] = AOUT_CHAN_RIGHT;
-            chans_out[5] = AOUT_CHAN_REARLEFT;
-            chans_out[6] = AOUT_CHAN_REARCENTER;
-            chans_out[7] = AOUT_CHAN_REARRIGHT;
-            chans_out[8] = AOUT_CHAN_LFE;
-            break;
+        inlayout->mChannelDescriptions[chan_idx].mChannelLabel =
+            VlcChanToAudioChannelLabel(vlcchan, swap_rear_surround);
+        inlayout->mChannelDescriptions[chan_idx].mChannelFlags =
+            kAudioChannelFlags_AllOff;
+        chan_idx++;
     }
 
-    if (chans_out[0] != 0)
-    {
-        p_sys->chans_to_reorder =
-            aout_CheckChannelReorder(NULL, chans_out,
-                                     fmt->i_physical_channels,
-                                     p_sys->chan_table);
-        if (p_sys->chans_to_reorder)
-            msg_Dbg(p_aout, "channel reordering needed for 5.1 output");
-    }
+    msg_Dbg(p_aout, "VLC keeping the same input layout");
 
     return VLC_SUCCESS;
 }
