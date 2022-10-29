@@ -38,7 +38,7 @@ FocusScope {
         { text: I18n.qtr("Url"),        criteria: "mrl" }
     ]
 
-    property alias model: deviceSection.model
+    property alias model: foldersSection.model
 
     focus: true
 
@@ -50,7 +50,12 @@ FocusScope {
     onActiveFocusChanged: resetFocus()
 
     function setCurrentItemFocus(reason) {
-        deviceSection.setCurrentItemFocus(reason);
+        if (foldersSection.visible)
+            foldersSection.setCurrentItemFocus(reason);
+        else if (deviceSection.visible)
+            deviceSection.setCurrentItemFocus(reason);
+        else if (lanSection.visible)
+            lanSection.setCurrentItemFocus(reason);
     }
 
     function _centerFlickableOnItem(item) {
@@ -84,7 +89,11 @@ FocusScope {
     //FIXME use the right xxxLabel class
     T.Label {
         anchors.centerIn: parent
-        visible: (deviceSection.model.count === 0 && lanSection.model.count === 0 )
+
+        visible: (foldersSection.model.count === 0 && deviceSection.model.count === 0
+                  &&
+                  lanSection.model.count === 0)
+
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
         text: I18n.qtr("No network shares found")
@@ -100,6 +109,42 @@ FocusScope {
             height: implicitHeight
 
             spacing: VLCStyle.margin_small
+
+            BrowseDeviceView {
+                id: foldersSection
+
+                width: flickable.width
+                height: contentHeight
+
+                maximumRows: root.maximumRows
+
+                visible: (model.count !== 0)
+
+                model: StandardPathModel
+                {
+                    maximumCount: foldersSection.maximumCount
+                }
+
+                title: I18n.qtr("My Folders")
+
+                Navigation.parentItem: root
+
+                Navigation.downAction: function() {
+                    if (deviceSection.visible)
+                        deviceSection.setCurrentItemFocus(Qt.TabFocusReason)
+                    else if (lanSection.visible)
+                        lanSection.setCurrentItemFocus(Qt.TabFocusReason)
+                    else
+                        root.Navigation.defaultNavigationDown()
+                }
+
+                onBrowse: root.browse(tree, reason)
+
+                onSeeAll: root.seeAll(title, -1, reason)
+
+                onActiveFocusChanged: _centerFlickableOnItem(foldersSection)
+                onCurrentIndexChanged: _centerFlickableOnItem(foldersSection)
+            }
 
             BrowseDeviceView {
                 id: deviceSection
@@ -122,7 +167,16 @@ FocusScope {
 
                 title: I18n.qtr("My Machine")
 
+                parentFilter: foldersSection.model
+
                 Navigation.parentItem: root
+
+                Navigation.upAction: function() {
+                    if (foldersSection.visible)
+                        foldersSection.setCurrentItemFocus(Qt.TabFocusReason)
+                    else
+                        root.Navigation.defaultNavigationUp()
+                }
 
                 Navigation.downAction: function() {
                     if (lanSection.visible)
@@ -160,13 +214,15 @@ FocusScope {
 
                 title: I18n.qtr("My LAN")
 
-                parentFilter: deviceSection.modelFilter
+                parentFilter: foldersSection.model
 
                 Navigation.parentItem: root
 
                 Navigation.upAction: function() {
                     if (deviceSection.visible)
                         deviceSection.setCurrentItemFocus(Qt.TabFocusReason)
+                    else if (foldersSection.visible)
+                        foldersSection.setCurrentItemFocus(Qt.TabFocusReason)
                     else
                         root.Navigation.defaultNavigationUp()
                 }
@@ -182,7 +238,7 @@ FocusScope {
     }
 
     function resetFocus() {
-        var widgetlist = [deviceSection, lanSection]
+        var widgetlist = [foldersSection, deviceSection, lanSection]
         var i;
         for (i in widgetlist) {
             if (widgetlist[i].activeFocus && widgetlist[i].visible)
