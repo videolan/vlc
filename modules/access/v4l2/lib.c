@@ -31,6 +31,12 @@
 
 #include "v4l2.h"
 
+#ifdef __OpenBSD__
+#define V4L2_LIB "libv4l2.so"
+#else
+#define V4L2_LIB "libv4l2.so.0"
+#endif
+
 static int fd_open (int fd, int flags)
 {
     (void) flags;
@@ -56,7 +62,7 @@ static void v4l2_lib_load (void)
 
     h = dlopen ("libmediaclient.so", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD);
     if (h == NULL)
-        h = dlopen ("libv4l2.so.0", RTLD_LAZY | RTLD_LOCAL);
+        h = dlopen (V4L2_LIB, RTLD_LAZY | RTLD_LOCAL);
     if (h == NULL)
         return;
 
