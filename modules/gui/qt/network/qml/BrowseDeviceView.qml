@@ -226,6 +226,8 @@ FocusScope {
                                                 ? -1
                                                 : root.maximumRows * nbItemPerRow
 
+            anchors.fill: parent
+
             cellWidth: VLCStyle.gridItem_network_width
             cellHeight: VLCStyle.gridItem_network_height
 
@@ -268,6 +270,8 @@ FocusScope {
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(listView.availableRowWidth)
 
             readonly property int _nameColSpan: Math.max((_nbCols - 1) / 2, 1)
+
+            anchors.fill: parent
 
             rowHeight: VLCStyle.tableCoverRow_height
 
