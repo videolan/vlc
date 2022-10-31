@@ -1,7 +1,7 @@
 # speexdsp
 
 SPEEXDSP_VERSION := 1.2.1
-SPEEXDSP_URL := http://downloads.xiph.org/releases/speex/speexdsp-$(SPEEXDSP_VERSION).tar.gz
+SPEEXDSP_URL := $(XIPH)/speex/speexdsp-$(SPEEXDSP_VERSION).tar.gz
 
 PKGS += speexdsp
 ifeq ($(call need_pkg,"speexdsp"),)

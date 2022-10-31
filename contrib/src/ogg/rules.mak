@@ -2,7 +2,7 @@
 
 OGG_VERSION := 1.3.4
 
-OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
+OGG_URL := $(XIPH)/ogg/libogg-$(OGG_VERSION).tar.xz
 #OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
 
 PKGS += ogg
