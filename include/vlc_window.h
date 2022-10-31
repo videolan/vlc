@@ -572,7 +572,6 @@ static inline void vlc_window_SetTitle(vlc_window_t *window, const char *title)
  * while the window is enabled.
  *
  * \param window window to enable
- * \param cfg initial configuration for the window
  */
 VLC_API
 int vlc_window_Enable(vlc_window_t *window);
@@ -645,7 +644,9 @@ static inline void vlc_window_ReportClose(vlc_window_t *window)
  * the window that the state of the window changed.
  *
  * \param window the window reporting the state change
- * \param state \see vlc_window_state
+ * \param state the new state from the window implementation
+ *
+ * \see vlc_window_state
  */
 static inline void vlc_window_ReportState(vlc_window_t *window,
                                            unsigned state)

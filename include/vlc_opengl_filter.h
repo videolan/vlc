@@ -153,7 +153,7 @@ struct vlc_gl_picture {
  *                       floats
  */
 VLC_API void
-vlc_gl_picture_ToTexCoords(const struct vlc_gl_picture *pic,
+vlc_gl_picture_ToTexCoords(const struct vlc_gl_picture *picture,
                            unsigned coords_count, const float *pic_coords,
                            float *tex_coords_out);
 
