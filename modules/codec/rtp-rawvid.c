@@ -616,7 +616,7 @@ corrupt:    msg_Err(dec, "corrupt packet, %zu bytes remaining", inlen);
 
         if (inlen < length /* input buffer underflow */
          || d.rem != 0 /* length must be a multiple of pgroup size */
-         || offset + d.quot >= width /* output scanline overflow */
+         || offset + (unsigned)d.quot >= width /* output scanline overflow */
          || lineno >= height /* output picture overflow */)
             goto corrupt;
 
