@@ -17,7 +17,7 @@ libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -I$
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,Cocoa -Wl,-framework,CoreServices \
 	-Wl,-framework,AVFoundation -Wl,-framework,CoreMedia -Wl,-framework,IOKit \
-	-Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio \
+	-Wl,-framework,WebKit -Wl,-framework,CoreAudio \
 	-Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge \
 	-Wl,-framework,QuartzCore -Wl,-weak_framework,MediaPlayer
 
