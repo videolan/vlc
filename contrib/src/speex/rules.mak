@@ -1,7 +1,7 @@
 # speex
 
 SPEEX_VERSION := 1.2.1
-SPEEX_URL := http://downloads.us.xiph.org/releases/speex/speex-$(SPEEX_VERSION).tar.gz
+SPEEX_URL := http://downloads.xiph.org/releases/speex/speex-$(SPEEX_VERSION).tar.gz
 
 PKGS += speex
 ifeq ($(call need_pkg,"speex >= 1.0.5"),)
