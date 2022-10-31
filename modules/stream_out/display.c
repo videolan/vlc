@@ -83,6 +83,11 @@ typedef struct
     input_resource_t *p_resource;
 } sout_stream_sys_t;
 
+typedef struct
+{
+    vlc_input_decoder_t *dec;
+} sout_stream_id_sys_t;
+
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -93,26 +98,35 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         return NULL;
     }
 
-    vlc_input_decoder_t *p_dec = vlc_input_decoder_Create(
+    sout_stream_id_sys_t *id = malloc( sizeof(*id) );
+    if( unlikely(id == NULL) )
+        return NULL;
+
+    id->dec = vlc_input_decoder_Create(
         VLC_OBJECT(p_stream), p_fmt, NULL, p_sys->p_resource );
-    if( p_dec == NULL )
+    if( id->dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
                  (char*)&p_fmt->i_codec );
+        free( id );
         return NULL;
     }
-    return p_dec;
+    return id;
 }
 
 static void Del( sout_stream_t *p_stream, void *id )
 {
     (void) p_stream;
-    vlc_input_decoder_Delete( id );
+
+    sout_stream_id_sys_t *id_sys = id;
+    vlc_input_decoder_Delete( id_sys->dec );
+    free( id_sys );
 }
 
 static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    sout_stream_id_sys_t *id_sys = id;
 
     while( p_buffer )
     {
@@ -132,7 +146,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
             else
                 p_buffer->i_pts += p_sys->i_delay;
 
-            vlc_input_decoder_Decode( id, p_buffer, false );
+            vlc_input_decoder_Decode( id_sys->dec, p_buffer, false );
         }
 
         p_buffer = p_next;
