@@ -128,7 +128,7 @@ check flex
 check_nasm 2.14
 check gettext
 check help2man
-check meson 0.56.0
+check meson 0.59.0
 check ninja
 
 DEPS_ONLY="help2man"
