@@ -1,7 +1,7 @@
 # Theora
 
 THEORA_VERSION := 1.1.1
-THEORA_URL := http://downloads.xiph.org/releases/theora/libtheora-$(THEORA_VERSION).tar.xz
+THEORA_URL := $(XIPH)/theora/libtheora-$(THEORA_VERSION).tar.xz
 
 PKGS += theora
 ifeq ($(call need_pkg,"theora >= 1.0"),)

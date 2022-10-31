@@ -2,7 +2,7 @@
 
 OGG_VERSION := 1.3.6
 
-OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
+OGG_URL := $(XIPH)/ogg/libogg-$(OGG_VERSION).tar.xz
 
 PKGS += ogg
 ifeq ($(call need_pkg,"ogg >= 1.0"),)

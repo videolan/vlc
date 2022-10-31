@@ -24,6 +24,7 @@ VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
 GITHUB := https://github.com/
 GNUGPG := https://www.gnupg.org/ftp/gcrypt
+XIPH := https://downloads.xiph.org/releases
 
 #
 # Machine-dependent variables
