@@ -379,27 +379,6 @@ void vout_SetSpuHighlight( vout_thread_t *vout,
 }
 
 /**
- * Allocates a video output picture buffer.
- *
- * Either vout_PutPicture() or picture_Release() must be used to return the
- * buffer to the video output free buffer pool.
- *
- * You may use picture_Hold() (paired with picture_Release()) to keep a
- * read-only reference.
- */
-picture_t *vout_GetPicture(vout_thread_t *vout)
-{
-    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    assert(!sys->dummy);
-    picture_t *picture = picture_pool_Wait(sys->private.display_pool);
-    if (likely(picture != NULL)) {
-        picture_Reset(picture);
-        video_format_CopyCropAr(&picture->format, &sys->original);
-    }
-    return picture;
-}
-
-/**
  * It gives to the vout a picture to be displayed.
  *
  * Becareful, after vout_PutPicture is called, picture_t::p_next cannot be
