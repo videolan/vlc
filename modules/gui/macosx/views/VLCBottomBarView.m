@@ -151,8 +151,10 @@
 
     BOOL setDark = NO;
 
-    if (@available(macOS 10.14, *) && [self.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
-        setDark = YES;
+    if (@available(macOS 10.14, *)) {
+        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
+            setDark = YES;
+        }
     }
     
     _isDark = setDark;
