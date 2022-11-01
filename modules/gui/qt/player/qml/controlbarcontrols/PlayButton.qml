@@ -91,11 +91,6 @@ T.Control {
             if (!containsMouse)
                 return false
 
-            if (width !== height) {
-                console.warn("PlayButton should be round!")
-                return true
-            }
-
             var center = (width / 2)
             if (Helpers.pointInRadius( center - mouseX,
                                        center - mouseY,
@@ -216,10 +211,10 @@ T.Control {
 
             color: Qt.rgba(255 / 255, 97 / 255, 10 / 255, 0.29)
 
-            xRadius: sourceSize.width
+            xRadius: parent.width
             yRadius: xRadius
 
-            sourceSize: Qt.size(parent.width, parent.height)
+            sourceSize: Qt.size(xRadius, yRadius)
         }
 
         Widgets.DropShadowImage {
@@ -235,10 +230,10 @@ T.Control {
 
             color: Qt.rgba(255 / 255, 97 / 255, 10 / 255, 1.0)
 
-            xRadius: sourceSize.width
+            xRadius: parent.width
             yRadius: xRadius
 
-            sourceSize: Qt.size(parent.width, parent.height)
+            sourceSize: Qt.size(xRadius, yRadius)
         }
 
         Widgets.ScaledImage {
