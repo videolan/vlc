@@ -36,6 +36,7 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 #include <vlc_queue.h>
+#include <vlc_picture_pool.h>
 
 #include "visual.h"
 
@@ -177,6 +178,7 @@ typedef struct
 {
     vlc_queue_t     queue;
     vout_thread_t   *p_vout;
+    picture_pool_t  *pool;
     visual_effect_t **effect;
     int             i_effect;
     bool            dead;
@@ -202,6 +204,7 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( unlikely (p_sys == NULL ) )
         return VLC_EGENERIC;
+    p_sys->pool = NULL;
 
     int width = var_InheritInteger( p_filter , "effect-width");
     int height = var_InheritInteger( p_filter , "effect-height");
@@ -305,6 +308,12 @@ static int Open( vlc_object_t *p_this )
         .primaries = COLOR_PRIMARIES_SRGB,
         .space = COLOR_SPACE_SRGB,
     };
+
+    /* TODO: the number of picture is arbitrary for now. */
+    p_sys->pool = picture_pool_NewFromFormat(&fmt, 3);
+    if (p_sys->pool == NULL)
+        goto error;
+
     p_sys->p_vout = aout_filter_GetVout( p_filter, &fmt );
     if( p_sys->p_vout == NULL )
     {
@@ -327,6 +336,9 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
+    if (p_sys->pool)
+        picture_pool_Release(p_sys->pool);
+
     for( int i = 0; i < p_sys->i_effect; i++ )
         free( p_sys->effect[i] );
     free( p_sys->effect );
@@ -339,7 +351,7 @@ static block_t *DoRealWork( filter_t *p_filter, block_t *p_in_buf )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* First, get a new picture */
-    picture_t *p_outpic = vout_GetPicture( p_sys->p_vout );
+    picture_t *p_outpic = picture_pool_Wait(p_sys->pool);
     if( unlikely(p_outpic == NULL) )
         return p_in_buf;
     p_outpic->b_progressive = true;
@@ -416,6 +428,7 @@ static void Close( filter_t * p_filter )
 #undef p_effect
     }
 
+    picture_pool_Release(p_sys->pool);
     free( p_sys->effect );
     free( p_sys );
 }
