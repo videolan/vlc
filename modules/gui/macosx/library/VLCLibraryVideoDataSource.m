@@ -22,7 +22,9 @@
 
 #import "VLCLibraryVideoDataSource.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
@@ -34,6 +36,7 @@
 {
     NSArray *_recentsArray;
     NSArray *_libraryArray;
+    VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
 }
 
 @end
@@ -84,9 +87,10 @@
     [_libraryMediaCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
                     forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                                 withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-    
-    [(NSCollectionViewFlowLayout *)_libraryMediaCollectionView.collectionViewLayout
-     setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
+
+    _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _collectionViewFlowLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+    _libraryMediaCollectionView.collectionViewLayout = _collectionViewFlowLayout;
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
