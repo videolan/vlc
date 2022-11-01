@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) NSCollectionView *libraryMediaCollectionView;
 
+- (void)setupAppearance;
 - (void)reloadData;
 
 @end

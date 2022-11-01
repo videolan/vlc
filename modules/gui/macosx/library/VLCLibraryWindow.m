@@ -292,14 +292,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = mainInstance.libraryController.libraryModel;
     _libraryVideoDataSource.libraryMediaCollectionView = _videoLibraryCollectionView;
-    _videoLibraryCollectionView.dataSource = _libraryVideoDataSource;
-    _videoLibraryCollectionView.delegate = _libraryVideoDataSource;
-    [_videoLibraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
-    [_videoLibraryCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
-               forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
-                           withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-    [(NSCollectionViewFlowLayout *)_videoLibraryCollectionView.collectionViewLayout setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
-    [_libraryVideoDataSource reloadData];
+    [_libraryVideoDataSource setupAppearance];
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;

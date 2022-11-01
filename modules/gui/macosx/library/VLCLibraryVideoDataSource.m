@@ -75,6 +75,20 @@
     });
 }
 
+- (void)setupAppearance
+{
+    _libraryMediaCollectionView.dataSource = self;
+    _libraryMediaCollectionView.delegate = self;
+    
+    [_libraryMediaCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [_libraryMediaCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
+                    forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                                withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+    
+    [(NSCollectionViewFlowLayout *)_libraryMediaCollectionView.collectionViewLayout
+     setHeaderReferenceSize:[VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize]];
+}
+
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
