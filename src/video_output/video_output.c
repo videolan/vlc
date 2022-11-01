@@ -402,8 +402,6 @@ picture_t *vout_GetPicture(vout_thread_t *vout)
 /**
  * It gives to the vout a picture to be displayed.
  *
- * The given picture MUST comes from vout_GetPicture.
- *
  * Becareful, after vout_PutPicture is called, picture_t::p_next cannot be
  * read/used.
  */
