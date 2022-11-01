@@ -71,6 +71,8 @@
         return;
     }
     
+    [_collectionViewFlowLayout resetLayout];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         _recentsArray = [_libraryModel listOfRecentMedia];
         _libraryArray = [_libraryModel listOfVideoMedia];
@@ -87,6 +89,11 @@
     [_libraryMediaCollectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
                     forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
                                 withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+    
+    NSNib *mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
+    [_libraryMediaCollectionView registerNib:mediaItemSupplementaryDetailView
+                  forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                              withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 
     _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionViewFlowLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
@@ -132,25 +139,65 @@
     return viewItem;
 }
 
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        return;
+    }
+
+    [_collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        return;
+    }
+
+    [_collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
+}
+
 - (NSView *)collectionView:(NSCollectionView *)collectionView
 viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                atIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewSupplementaryElementView *view = [collectionView makeSupplementaryViewOfKind:kind
-                                                                                          withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
-                                                                                            forIndexPath:indexPath];
-
-    switch(indexPath.section) {
-        case VLCVideoLibraryRecentsSection:
-            view.stringValue = _NS("Recent");
-            break;
-        case VLCVideoLibraryLibrarySection:
-        default:
-            view.stringValue = _NS("Library");
-            break;
+    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        VLCLibraryCollectionViewSupplementaryElementView *sectionHeadingView = [collectionView makeSupplementaryViewOfKind:kind
+                                                                                                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
+                                                                                                              forIndexPath:indexPath];
+        
+        switch(indexPath.section) {
+            case VLCVideoLibraryRecentsSection:
+                sectionHeadingView.stringValue = _NS("Recent");
+                break;
+            case VLCVideoLibraryLibrarySection:
+            default:
+                sectionHeadingView.stringValue = _NS("Library");
+                break;
+        }
+                
+        return sectionHeadingView;
+        
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView* mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
+        
+        switch(indexPath.section) {
+            case VLCVideoLibraryRecentsSection:
+                mediaItemSupplementaryDetailView.representedMediaItem = _recentsArray[indexPath.item];
+                break;
+            case VLCVideoLibraryLibrarySection:
+            default:
+                mediaItemSupplementaryDetailView.representedMediaItem = _libraryArray[indexPath.item];
+                break;
+        }
+        
+        mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return mediaItemSupplementaryDetailView;
     }
 
-    return view;
+    return nil;
 }
 
 #pragma mark - drag and drop support
