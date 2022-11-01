@@ -23,6 +23,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.11
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -430,7 +431,11 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_xxlarge
 
-                visible: centerContent.height > (albumLabel.y + albumLabel.height)
+                BindingCompat on visible {
+                    delayed: true
+                    value: centerContent.height > (albumLabel.y + albumLabel.height)
+                }
+
                 text: mainPlaylistController.currentItem.album
                 font.pixelSize: VLCStyle.fontSize_xxlarge
                 horizontalAlignment: Text.AlignHCenter
@@ -444,7 +449,11 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_small
 
-                visible: centerContent.height > (artistLabel.y + artistLabel.height)
+                BindingCompat on visible {
+                    delayed: true
+                    value: centerContent.height > (artistLabel.y + artistLabel.height)
+                }
+
                 text: mainPlaylistController.currentItem.artist
                 font.weight: Font.Light
                 horizontalAlignment: Text.AlignHCenter
@@ -458,7 +467,11 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_large
 
-                visible: Player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
+                BindingCompat on visible {
+                    delayed: true
+                    value: Player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
+                }
+
                 focus: visible
                 spacing: VLCStyle.margin_xxsmall
                 Navigation.parentItem: rootPlayer
