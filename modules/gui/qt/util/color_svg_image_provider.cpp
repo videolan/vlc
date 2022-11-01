@@ -168,7 +168,7 @@ public:
     }
 
     void cancel() override {
-        m_reader->abandon();
+        m_reader.reset();
         emit finished();
     }
 
