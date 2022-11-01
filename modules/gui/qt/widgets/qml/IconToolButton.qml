@@ -52,7 +52,7 @@ T.ToolButton {
 
 
     // active border color
-    property alias colorFocus: background.activeBorderColor
+    property color colorFocus: VLCStyle.colors.bgFocus
 
     // Settings
 
@@ -78,8 +78,6 @@ T.ToolButton {
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
     background: AnimatedBackground {
-        id: background
-
         implicitWidth: size
         implicitHeight: size
 
@@ -106,7 +104,7 @@ T.ToolButton {
                 return control.color;
         }
 
-        activeBorderColor: VLCStyle.colors.bgFocus
+        activeBorderColor: control.colorFocus
     }
 
     contentItem: T.Label {
