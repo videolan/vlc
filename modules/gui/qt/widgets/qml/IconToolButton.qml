@@ -60,10 +60,10 @@ T.ToolButton {
 
     enabled: !paintOnly
 
-    implicitWidth: Math.max(background.implicitWidth,
+    implicitWidth: Math.max(background ? background.implicitWidth : 0,
                             contentItem.implicitWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(background.implicitHeight,
-                            contentItem.implicitHeight + topPadding + bottomPadding)
+    implicitHeight: Math.max(background ? background.implicitHeight : 0,
+                             contentItem.implicitHeight + topPadding + bottomPadding)
     baselineOffset: contentItem.y + contentItem.baselineOffset
 
     // Keys
@@ -117,7 +117,7 @@ T.ToolButton {
 
         text: iconText
 
-        color: background.foregroundColor
+        color: background ? background.foregroundColor : control.color
 
         font.pixelSize: control.size
         font.family: VLCIcons.fontFamily
@@ -135,7 +135,7 @@ T.ToolButton {
 
             text: VLCIcons.active_indicator
 
-            color: background.foregroundColor
+            color: background ? background.foregroundColor : control.color
 
             font.pixelSize: control.size
             font.family: VLCIcons.fontFamily
