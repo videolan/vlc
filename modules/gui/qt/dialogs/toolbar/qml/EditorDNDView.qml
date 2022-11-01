@@ -115,7 +115,11 @@ ListView {
         anchors.verticalCenter: parent.verticalCenter
 
         implicitHeight: VLCStyle.icon_medium
-        implicitWidth: Math.max(implicitHeight, playerBtnDND.width - x)
+
+        BindingCompat on implicitWidth {
+            delayed: true
+            value: Math.max(implicitHeight, playerBtnDND.width - x)
+        }
 
         property alias dropVisible: footerDropArea.containsDrag
 
