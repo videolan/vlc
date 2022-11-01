@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.11
 import QtQml.Models 2.2
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
@@ -309,8 +310,12 @@ Control {
             }
 
             footer: Item {
-                width: parent.width
-                height: Math.max(VLCStyle.icon_normal, listView.height - y)
+                implicitWidth: parent.width
+
+                BindingCompat on implicitHeight {
+                    delayed: true
+                    value: Math.max(VLCStyle.icon_normal, listView.height - y)
+                }
 
                 property alias firstItemIndicatorVisible: firstItemIndicator.visible
 
