@@ -34,6 +34,7 @@
 #include <vlc_aout.h>            /* aout_FormatNbChannels, AOUT_FMTS_SIMILAR */
 #include <vlc_vout.h>              /* vout_*Picture, aout_filter_..tVout */
 #include <vlc_filter.h>
+#include <vlc_picture_pool.h>
 
 #include <goom/goom.h>
 
@@ -81,6 +82,7 @@ typedef struct
     video_format_t fmt;
 
     vout_thread_t *p_vout;
+    picture_pool_t *pool;
     int           i_speed;
 
     vlc_mutex_t   lock;
@@ -128,10 +130,19 @@ static int Open( vlc_object_t *p_this )
     p_thread->fmt.i_chroma = VLC_CODEC_RGB32;
     p_thread->fmt.i_sar_num = p_thread->fmt.i_sar_den = 1;
 
+    /* TODO: the number of picture is arbitrary for now. */
+    p_thread->pool = picture_pool_NewFromFormat(&p_thread->fmt, 3);
+    if (p_thread->pool == NULL)
+    {
+        free(p_thread);
+        return VLC_ENOMEM;
+    }
+
     p_thread->p_vout = aout_filter_GetVout( p_filter, &p_thread->fmt );
     if( p_thread->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
+        picture_pool_Release(p_thread->pool);
         free( p_thread );
         return VLC_EGENERIC;
     }
@@ -152,6 +163,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "cannot launch goom thread" );
         vout_Close( p_thread->p_vout );
+        picture_pool_Release(p_thread->pool);
         free( p_thread );
         return VLC_EGENERIC;
     }
@@ -322,7 +334,7 @@ static void *Thread( void *p_thread_data )
         plane = goom_update( p_plugin_info, p_data, 0, 0.0,
                              NULL, NULL );
 
-        p_pic = vout_GetPicture( p_thread->p_vout );
+        p_pic = picture_pool_Wait( p_thread->pool );
         if( unlikely(p_pic == NULL) )
             continue;
 
@@ -360,6 +372,7 @@ static void Close( filter_t *p_filter )
         block_Release( p_thread->pp_blocks[p_thread->i_blocks] );
     }
 
+    picture_pool_Release(p_thread->pool);
     free( p_thread );
 }
 
