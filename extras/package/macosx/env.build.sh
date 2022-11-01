@@ -1,7 +1,6 @@
 #!/bin/bash
 
-HOST_ARCH="x86_64"
-BUILD_ARCH=`uname -m | cut -d. -f1`
+
 MINIMAL_OSX_VERSION="10.11"
 
 get_actual_arch() {
@@ -19,6 +18,11 @@ get_buildsystem_arch() {
         echo "$1"
     fi
 }
+
+HOST_ARCH=`uname -m | cut -d. -f1`
+HOST_ARCH=`get_buildsystem_arch $HOST_ARCH`
+BUILD_ARCH=`uname -m | cut -d. -f1`
+BUILD_ARCH=`get_buildsystem_arch $BUILD_ARCH`
 
 vlcGetOSXKernelVersion() {
     local OSX_KERNELVERSION=$(uname -r | cut -d. -f1)

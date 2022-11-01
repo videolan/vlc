@@ -118,9 +118,8 @@ if [ "$QUIET" = "yes" ]; then
 fi
 
 ACTUAL_HOST_ARCH=`get_actual_arch $HOST_ARCH`
-BUILD_ARCH=`get_buildsystem_arch $BUILD_ARCH`
 
-info "Building VLC for macOS, architecture ${ACTUAL_HOST_ARCH} on a ${BUILD_ARCH} device"
+info "Building VLC for macOS, architecture ${HOST_ARCH} (aka: ${ACTUAL_HOST_ARCH}) on a ${BUILD_ARCH} device"
 
 BUILD_TRIPLET=$(vlcGetBuildTriplet)
 HOST_TRIPLET=$(vlcGetHostTriplet)
