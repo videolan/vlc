@@ -21,6 +21,9 @@
  *****************************************************************************/
 
 #import "VLCImageView.h"
+
+#import <QuartzCore/QuartzCore.h>
+
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 

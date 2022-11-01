@@ -20,6 +20,7 @@
  */
 
 #import <AudioToolbox/AudioToolbox.h>
+#import <CoreAudio/CoreAudio.h>
 
 #import "VLCSystemVolume.h"
 #import "main/VLCMain.h"

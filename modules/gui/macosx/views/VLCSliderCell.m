@@ -22,6 +22,8 @@
 
 #import "VLCSliderCell.h"
 
+#import <CoreVideo/CoreVideo.h>
+
 #import "extensions/NSGradient+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"
