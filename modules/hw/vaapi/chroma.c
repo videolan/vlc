@@ -66,11 +66,13 @@ static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
     int i;
     for (i = 0; i < count; i++)
         if (fmts[i].fourcc == VA_FOURCC_NV12
+         || fmts[i].fourcc == VA_FOURCC_I420
          || fmts[i].fourcc == VA_FOURCC_P010)
             break;
 
     int ret;
-    if ((fmts[i].fourcc == VA_FOURCC_NV12 || fmts[i].fourcc == VA_FOURCC_P010)
+    if ((fmts[i].fourcc == VA_FOURCC_NV12 || fmts[i].fourcc == VA_FOURCC_I420
+      || fmts[i].fourcc == VA_FOURCC_P010)
      && !vlc_vaapi_CreateImage(VLC_OBJECT(filter), va_dpy, &fmts[i],
                                src_pic->format.i_width, src_pic->format.i_height,
                                image_fallback))
@@ -87,10 +89,12 @@ static inline void
 FillPictureFromVAImage(picture_t *dest,
                        VAImage *src_img, uint8_t *src_buf, copy_cache_t *cache)
 {
-    const uint8_t * src_planes[2] = { src_buf + src_img->offsets[0],
-                                      src_buf + src_img->offsets[1] };
-    const size_t    src_pitches[2] = { src_img->pitches[0],
-                                       src_img->pitches[1] };
+    const uint8_t * src_planes[3] = { src_buf + src_img->offsets[0],
+                                      src_buf + src_img->offsets[1],
+                                      src_buf + src_img->offsets[2] };
+    const size_t    src_pitches[3] = { src_img->pitches[0],
+                                       src_img->pitches[1],
+                                       src_img->pitches[2] };
 
     switch (src_img->format.fourcc)
     {
@@ -98,6 +102,12 @@ FillPictureFromVAImage(picture_t *dest,
     {
         assert(dest->format.i_chroma == VLC_CODEC_I420);
         Copy420_SP_to_P(dest, src_planes, src_pitches, src_img->height, cache);
+        break;
+    }
+    case VA_FOURCC_I420:
+    {
+        assert(dest->format.i_chroma == VLC_CODEC_I420);
+        Copy420_P_to_P(dest, src_planes, src_pitches, src_img->height, cache);
         break;
     }
     case VA_FOURCC_P010:
