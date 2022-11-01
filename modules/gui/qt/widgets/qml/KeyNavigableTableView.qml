@@ -48,7 +48,7 @@ FocusScope {
     }
 
     property Component header: Item{}
-    property Item headerItem: view.headerItem.loadedHeader
+    property Item headerItem: view.headerItem ? view.headerItem.loadedHeader : null
     property color headerColor
     property int headerTopPadding: 0
 
@@ -333,7 +333,7 @@ FocusScope {
         }
 
         section.delegate: Widgets.ListLabel {
-            x: view.headerItem.contentX - VLCStyle.table_section_width
+            x: (view.headerItem ? view.headerItem.contentX : 0) - VLCStyle.table_section_width
             topPadding: VLCStyle.margin_xsmall
             bottomPadding: VLCStyle.margin_xxsmall
             leftPadding: VLCStyle.table_section_text_margin
