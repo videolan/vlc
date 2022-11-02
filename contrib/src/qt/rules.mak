@@ -1,10 +1,10 @@
 # Qt
 
 QT_VERSION_MAJOR := 5.15
-QT_VERSION := $(QT_VERSION_MAJOR).1
+QT_VERSION := $(QT_VERSION_MAJOR).8
 # Insert potential -betaX suffix here:
 QT_VERSION_FULL := $(QT_VERSION)
-QT_URL := $(QT)/$(QT_VERSION_MAJOR)/$(QT_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz
+QT_URL := $(QT)/$(QT_VERSION_MAJOR)/$(QT_VERSION_FULL)/submodules/qtbase-everywhere-opensource-src-$(QT_VERSION_FULL).tar.xz
 
 ifdef HAVE_MACOSX
 #PKGS += qt
@@ -33,27 +33,12 @@ $(TARBALLS)/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz:
 
 qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
-ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
-ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
-endif
-	$(APPLY) $(SRC)/qt/0006-ANGLE-don-t-use-msvc-intrinsics-when-crosscompiling-.patch
 	$(APPLY) $(SRC)/qt/0007-ANGLE-remove-static-assert-that-can-t-be-evaluated-b.patch
 	$(APPLY) $(SRC)/qt/0008-ANGLE-disable-ANGLE_STD_ASYNC_WORKERS-when-compiling.patch
 	$(APPLY) $(SRC)/qt/0009-Add-KHRONOS_STATIC-to-allow-static-linking-on-Windows.patch
-
-ifdef HAVE_CROSS_COMPILE
 	$(APPLY) $(SRC)/qt/0003-allow-cross-compilation-of-angle-with-wine.patch
-ifndef HAVE_CLANG
-	$(APPLY) $(SRC)/qt/0010-Windows-QPA-Fix-build-with-mingw64-Win32-threading.patch
-endif
-else
-	$(APPLY) $(SRC)/qt/0003-fix-angle-compilation.patch
-	cd $(UNPACK_DIR); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
-		sed -i.orig -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
-endif
-endif
 	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
 	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
 	# force path replacement in pkg-config output files

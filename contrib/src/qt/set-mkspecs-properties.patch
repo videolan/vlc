@@ -1,25 +1,22 @@
---- a/qmake/generators/makefile.cpp	2020-09-02 12:15:07.000000000 +0200
-+++ b/qmake/generators/makefile.cpp	2022-09-12 11:42:01.170411450 +0200
-@@ -3431,11 +3431,18 @@
-                                                + "," + windowsifyPath(replace.toQString()) + ",gi");
-             }
-         }
--        if (sedargs.isEmpty()) {
--            ret += "$(INSTALL_FILE) " + escapeFilePath(src) + ' ' + escapeFilePath(dst);
--        } else {
--            ret += "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > " + escapeFilePath(dst);
-+
-+        QString escaped_src = escapeFilePath(src);
-+        if (!sedargs.isEmpty()) {
-+            int pos = src.lastIndexOf('.');
-+            QString filename = src.left(pos);
-+            QString ext = src.mid(pos + 1);
-+            escaped_src = escapeFilePath(filename + ".qmakereplace." + ext);
-+            ret += "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > "
-+                   + escaped_src + " && ";
-         }
-+
-+        ret += "$(INSTALL_FILE) " + escaped_src + ' ' + escapeFilePath(dst);
+--- qt/qmake/generators/makefile.cpp.orig       2022-12-09 12:33:15.756774500 +0100
++++ qt/qmake/generators/makefile.cpp    2022-12-09 12:41:41.744418400 +0100
+@@ -3471,11 +3471,16 @@ QString MakefileGenerator::installMetaFi
+ {
+     QString ret;
+     QString sedargs = createSedArgs(replace_rule);
+-    if (sedargs.isEmpty()) {
+-        ret = "$(INSTALL_FILE) " + escapeFilePath(src) + ' ' + escapeFilePath(dst);
+-    } else {
+-        ret = "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > " + escapeFilePath(dst);
++    QString escaped_src = escapeFilePath(src);
++    if (!sedargs.isEmpty()) {
++        int pos = src.lastIndexOf('.');
++        QString filename = src.left(pos);
++        QString ext = src.mid(pos + 1);
++        escaped_src = escapeFilePath(filename + ".qmakereplace." + ext);
++        ret += "$(SED) " + sedargs + ' ' + escapeFilePath(src) + " > "
++                + escaped_src + " && ";
      }
++    ret += "$(INSTALL_FILE) " + escaped_src + ' ' + escapeFilePath(dst);
      return ret;
  }
