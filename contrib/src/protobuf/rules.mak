@@ -44,7 +44,7 @@ PROTOCCONF += --enable-static --disable-shared
 
 protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
 	$(RM) -Rf $@ $(UNPACK_DIR) && mkdir -p $(UNPACK_DIR)
-	tar xvzfo "$<" -C $(UNPACK_DIR) --strip-components=1
+	tar $(TAR_VERBOSE)xzfo "$<" -C $(UNPACK_DIR) --strip-components=1
 	# don't build benchmarks and conformance
 	sed -i.orig 's, conformance benchmarks,,' "$(UNPACK_DIR)/Makefile.am"
 	sed -i.orig 's, benchmarks/Makefile conformance/Makefile,,' "$(UNPACK_DIR)/configure.ac"

@@ -82,7 +82,7 @@ download_vendor = \
 .%-vendor: $(SRC)/%-vendor/SHA512SUMS
 	$(RM) -R $(patsubst .%,%,$@)
 	-$(call checksum,$(SHA512SUM),SHA512,.) \
-		$(foreach f,$(filter %.tar.bz2,$^), && tar xvjfo $(f) && \
+		$(foreach f,$(filter %.tar.bz2,$^), && tar $(TAR_VERBOSE)xjfo $(f) && \
 		  mv $(patsubst %.tar.bz2,%,$(notdir $(f))) $(patsubst .%,%,$@))
 	touch $@
 
