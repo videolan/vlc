@@ -147,7 +147,6 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 		sub-network-install_subtargets
 	# Install tools
 	$(MAKE) -C $< -C src \
-		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
 		sub-moc-install_subtargets \
 		sub-rcc-install_subtargets \
 		sub-uic-install_subtargets \
