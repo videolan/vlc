@@ -353,6 +353,10 @@ check_githash = \
 		< "$(<:.tar.xz=.githash)"` && \
 	test "$$h" = "$1"
 
+ifeq ($(V),1)
+TAR_VERBOSE := v
+endif
+
 checksum = \
 	$(foreach f,$(filter $(TARBALLS)/%,$^), \
 		grep -- " $(f:$(TARBALLS)/%=%)$$" \
@@ -361,9 +365,9 @@ checksum = \
 		"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS"
 CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512)
 UNPACK = $(RM) -R $@ \
-	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzfo $(f)) \
-	$(foreach f,$(filter %.tar.bz2,$^), && tar xvjfo $(f)) \
-	$(foreach f,$(filter %.tar.xz,$^), && tar xvJfo $(f)) \
+	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar $(TAR_VERBOSE)xzfo $(f)) \
+	$(foreach f,$(filter %.tar.bz2,$^), && tar $(TAR_VERBOSE)xjfo $(f)) \
+	$(foreach f,$(filter %.tar.xz,$^), && tar $(TAR_VERBOSE)xJfo $(f)) \
 	$(foreach f,$(filter %.zip,$^), && unzip $(f))
 UNPACK_DIR = $(patsubst %.tar,%,$(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -fp1) <

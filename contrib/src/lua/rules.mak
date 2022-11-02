@@ -98,7 +98,7 @@ endif
 luac: UNPACK_DIR=luac-$(LUA_VERSION)
 luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	$(RM) -Rf $@ $(UNPACK_DIR) && mkdir -p $(UNPACK_DIR)
-	tar xvzfo $< -C $(UNPACK_DIR) --strip-components=1
+	tar $(TAR_VERBOSE)xzfo $< -C $(UNPACK_DIR) --strip-components=1
 	$(APPLY) $(SRC)/lua/luac-32bits.patch
 	$(MOVE)
 
