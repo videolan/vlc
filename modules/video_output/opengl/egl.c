@@ -702,7 +702,7 @@ error:
 static int OpenGLES2(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     static const struct gl_api api = {
-        "OpenGL_ES", EGL_OPENGL_ES_API, 3, EGL_OPENGL_ES2_BIT,
+        "OpenGL_ES", EGL_OPENGL_ES_API, 4, EGL_OPENGL_ES2_BIT,
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE },
     };
     return Open(gl, &api, width, height);
