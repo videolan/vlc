@@ -188,13 +188,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.librarySortButton setHidden:NO];
     [self.librarySearchField setEnabled:YES];
 
-    self.videoView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.contentView addSubview:self.videoView];
-    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeWidth multiplier:1. constant:1.]];
-    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeHeight multiplier:1. constant:1.]];
-    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeCenterX multiplier:1. constant:1.]];
-    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeCenterY multiplier:1. constant:1.]];
-
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowFullscreenController:)
@@ -872,7 +865,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 // This handles reopening the video view when the user has closed it.
 - (void)reopenVideoView
 {
-    if(!self.hasActiveVideo || !self.videoView.hidden) {
+    if(!self.hasActiveVideo) {
         return;
     }
 
@@ -885,13 +878,33 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self enableVideoPlaybackAppearance];
 }
 
+- (void)presentVideoView
+{
+    for (NSView *subview in _libraryTargetView.subviews) {
+        [subview removeFromSuperview];
+    }
+    
+    NSLog(@"Presenting video view in main library window.");
+    
+    VLCVoutView *videoView = self.videoView;
+    videoView.translatesAutoresizingMaskIntoConstraints = NO;
+    videoView.hidden = NO;
+    
+    [_libraryTargetView addSubview:videoView];
+    NSDictionary *dict = NSDictionaryOfVariableBindings(videoView);
+    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[videoView(>=572.)]|"
+                                                                               options:0
+                                                                               metrics:0
+                                                                                 views:dict]];
+    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[videoView(>=444.)]|"
+                                                                               options:0
+                                                                               metrics:0
+                                                                                 views:dict]];
+}
+
 - (void)enableVideoPlaybackAppearance
 {
-    [_mediaSourceView removeFromSuperviewWithoutNeedingDisplay];
-    [_videoLibraryView removeFromSuperviewWithoutNeedingDisplay];
-    [_audioLibraryView removeFromSuperviewWithoutNeedingDisplay];
-
-    [self.videoView setHidden:NO];
+    [self presentVideoView];
 
     [self.segmentedTitleControl setHidden:YES];
     [self.forwardsNavigationButton setHidden:YES];
@@ -936,7 +949,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];
-    [self.videoView setHidden:YES];
 
     [self.segmentedTitleControl setHidden:NO];
     [self.forwardsNavigationButton setHidden:NO];
