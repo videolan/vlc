@@ -343,6 +343,8 @@ libvlccore_la_SOURCES = \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
 	video_output/vout_private.h \
+	video_output/vout_scheduler.c \
+	video_output/vout_scheduler.h \
 	video_output/vout_wrapper.c \
 	network/getaddrinfo.c \
 	network/http_auth.c \
