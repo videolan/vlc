@@ -3853,7 +3853,7 @@ PKG_WITH_MODULES([CHROMECAST],[protobuf-lite], [],[
     ],[
         AC_MSG_WARN(Library protobuf-lite needed for [chromecast] was not found)
     ])
-    build_chromecast=no
+    enable_chromecast=no
 ], [(Chromecast streaming support)], [auto])
 
 AC_ARG_VAR(PROTOC, [protobuf compiler])
@@ -3905,7 +3905,7 @@ AS_IF([test -n "$PKG_CONFIG"],[
         ])
     ])
 ])
-AM_CONDITIONAL([BUILD_CHROMECAST], [test "${build_chromecast}" != "no" -a "${protoc_matching}" = yes])
+AM_CONDITIONAL([BUILD_CHROMECAST], [test "${enable_chromecast}" != "no" -a "${protoc_matching}" = yes])
 
 dnl
 dnl  Interface plugins
