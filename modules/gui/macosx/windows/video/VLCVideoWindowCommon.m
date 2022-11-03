@@ -358,8 +358,9 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 {
     // VLC_WINDOW_SET_SIZE is triggered when exiting fullscreen. This event is ignored here
     // to avoid interference with the animation.
-    if ([self fullscreen] || _inFullscreenTransition)
+    if ([self isInNativeFullscreen] || [self fullscreen] || _inFullscreenTransition) {
         return;
+    }
 
     NSRect window_rect = [self getWindowRectForProposedVideoViewSize:self.nativeVideoSize];
     [[self animator] setFrame:window_rect display:YES];
@@ -369,8 +370,9 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 {
     _nativeVideoSize = size;
 
-    if (var_InheritBool(getIntf(), "macosx-video-autoresize") && !var_InheritBool(getIntf(), "video-wallpaper"))
+    if (var_InheritBool(getIntf(), "macosx-video-autoresize") && !var_InheritBool(getIntf(), "video-wallpaper")) {
         [self resizeWindow];
+    }
 }
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize

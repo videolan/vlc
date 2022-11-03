@@ -158,4 +158,9 @@
     return nil;
 }
 
+- (BOOL)isInNativeFullscreen
+{
+    return ([self styleMask] & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen;
+}
+
 @end
