@@ -330,6 +330,7 @@ static void *Thread( void *p_thread_data )
                 p_thread->fmt.i_width * p_thread->fmt.i_height * 4 );
 
         p_pic->date = date_Get( &i_pts ) + GOOM_DELAY;
+        p_pic->b_progressive = true;
         vout_PutPicture( p_thread->p_vout, p_pic );
     }
 
