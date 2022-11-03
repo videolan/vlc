@@ -311,6 +311,54 @@ int WindowOpen(vlc_window_t *p_wnd)
     return [self setupDetachedVideoWindow];
 }
 
+- (void)setupWindowOriginForVideoWindow:(VLCVideoWindowCommon *)videoWindow
+                             atPosition:(NSRect)videoViewPosition
+{
+    NSRect window_rect = [videoWindow frame];
+    if (videoViewPosition.origin.x > 0.)
+        window_rect.origin.x = videoViewPosition.origin.x;
+    if (videoViewPosition.origin.y > 0.)
+        window_rect.origin.y = videoViewPosition.origin.y;
+
+    [videoWindow setFrame:window_rect display:YES];
+}
+
+- (void)cascadeVoutWindowsForVideoWindow:(VLCVideoWindowCommon *)videoWindow
+{
+    if (_voutWindows.count == 1) {
+        NSWindow * firstWindow = [_voutWindows objectForKey:_voutWindows.allKeys.firstObject];
+
+        NSRect topleftBaseRect = NSMakeRect(0, firstWindow.frame.size.height, 0, 0);
+        _topLeftPoint = [firstWindow convertRectToScreen:topleftBaseRect].origin;
+    }
+
+    _topLeftPoint = [videoWindow cascadeTopLeftFromPoint:_topLeftPoint];
+    [videoWindow setFrameTopLeftPoint:_topLeftPoint];
+}
+
+- (void)setupPositionAndSizeForVideoWindow:(VLCVideoWindowCommon *)videoWindow
+                                atPosition:(NSRect)videoViewPosition
+{
+    BOOL isEmbedded = [videoWindow isKindOfClass:[VLCLibraryWindow class]];
+    BOOL multipleVoutWindows = _voutWindows.count > 0;
+    NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
+    
+    // set (only!) window origin if specified
+    if (!isEmbedded) {
+        [self setupWindowOriginForVideoWindow:videoWindow
+                                   atPosition:videoViewPosition];
+    }
+
+    // cascade windows if we have more than one vout
+    if (multipleVoutWindows) {
+        [self cascadeVoutWindowsForVideoWindow:videoWindow];
+    }
+
+    // resize window
+    [videoWindow setNativeVideoSize:videoViewSize];
+    [videoWindow makeKeyAndOrderFront: self];
+}
+
 - (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
@@ -322,39 +370,12 @@ int WindowOpen(vlc_window_t *p_wnd)
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
 
     VLCVoutView *voutView = newVideoWindow.videoView;
-    NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
 
     // Avoid flashes if video will directly start in fullscreen
     [NSAnimationContext beginGrouping];
 
     if (!videoWallpaper) {
-        // set (only!) window origin if specified
-        if (!isEmbedded) {
-            NSRect window_rect = [newVideoWindow frame];
-            if (videoViewPosition.origin.x > 0.)
-                window_rect.origin.x = videoViewPosition.origin.x;
-            if (videoViewPosition.origin.y > 0.)
-                window_rect.origin.y = videoViewPosition.origin.y;
-
-            [newVideoWindow setFrame:window_rect display:YES];
-        }
-
-        // cascade windows if we have more than one vout
-        if (multipleVoutWindows) {
-            if (_voutWindows.count == 1) {
-                NSWindow * firstWindow = [_voutWindows objectForKey:_voutWindows.allKeys.firstObject];
-
-                NSRect topleftBaseRect = NSMakeRect(0, firstWindow.frame.size.height, 0, 0);
-                _topLeftPoint = [firstWindow convertRectToScreen:topleftBaseRect].origin;
-            }
-
-            _topLeftPoint = [newVideoWindow cascadeTopLeftFromPoint:_topLeftPoint];
-            [newVideoWindow setFrameTopLeftPoint:_topLeftPoint];
-        }
-
-        // resize window
-        [newVideoWindow setNativeVideoSize:videoViewSize];
-        [newVideoWindow makeKeyAndOrderFront: self];
+        [self setupPositionAndSizeForVideoWindow:newVideoWindow atPosition:videoViewPosition];
     }
 
     [newVideoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
