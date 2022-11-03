@@ -359,17 +359,27 @@ int WindowOpen(vlc_window_t *p_wnd)
     [videoWindow makeKeyAndOrderFront: self];
 }
 
+- (void)setupVideoOutputForVideoWindow:(VLCVideoWindowCommon *)videoWindow withVlcWindow:(vlc_window_t *)p_wnd
+{
+    VLCVoutView *voutView = videoWindow.videoView;
+    
+    [videoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
+    [_voutWindows setObject:videoWindow forKey:[NSValue valueWithPointer:p_wnd]];
+    [voutView setVoutThread:(vout_thread_t *)vlc_object_parent(p_wnd)];
+    videoWindow.hasActiveVideo = YES;
+    _playerController.activeVideoPlayback = YES;
+    [VLCMain sharedInstance].libraryWindow.nonembedded = !b_mainWindowHasVideo;
+}
+
 - (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
-    VLCMain *mainInstance = [VLCMain sharedInstance];
-    _playerController = mainInstance.playlistController.playerController;
+    _playerController = [VLCMain sharedInstance].playlistController.playerController;
     VLCVideoWindowCommon *newVideoWindow = [self setupVideoWindow];
+    VLCVoutView *voutView = newVideoWindow.videoView;
 
     BOOL isEmbedded = [newVideoWindow isKindOfClass:[VLCLibraryWindow class]];
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
-
-    VLCVoutView *voutView = newVideoWindow.videoView;
 
     // Avoid flashes if video will directly start in fullscreen
     [NSAnimationContext beginGrouping];
@@ -378,13 +388,8 @@ int WindowOpen(vlc_window_t *p_wnd)
         [self setupPositionAndSizeForVideoWindow:newVideoWindow atPosition:videoViewPosition];
     }
 
-    [newVideoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
-    [_voutWindows setObject:newVideoWindow forKey:[NSValue valueWithPointer:p_wnd]];
-    [voutView setVoutThread:(vout_thread_t *)vlc_object_parent(p_wnd)];
-    newVideoWindow.hasActiveVideo = YES;
-    _playerController.activeVideoPlayback = YES;
-    mainInstance.libraryWindow.nonembedded = !b_mainWindowHasVideo;
-
+    [self setupVideoOutputForVideoWindow:newVideoWindow withVlcWindow:p_wnd];
+    
     // TODO: find a cleaner way for "start in fullscreen"
     // Start in fs, because either prefs settings, or fullscreen button was pressed before
     /* detect the video-splitter and prevent starts in fullscreen if it is enabled */
