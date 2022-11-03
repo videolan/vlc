@@ -37,7 +37,13 @@ ListView {
         id: contentItemCoverRect
 
         parent: root.contentItem
-        anchors.fill: parent
+
+        x: contentX
+        y: contentY
+
+        implicitWidth: proxyContentItem.width
+        implicitHeight: proxyContentItem.height
+
         z: -99
         visible: proxyContentItem.visible && color.a > 0.0
     }
@@ -172,6 +178,12 @@ ListView {
         hideSource: visible
 
         smooth: false
+
+        // If background rectangle is fully opaque,
+        // the texture does not need an alpha
+        // channel: (optimization)
+        format: (contentItemCoverRect.visible && Helpers.compareFloat(1.0, contentItemCoverRect.color.a)) ? ShaderEffectSource.RGB
+                                                                                                          : ShaderEffectSource.RGBA
 
         layer.enabled: true
         layer.effect: ShaderEffect {
