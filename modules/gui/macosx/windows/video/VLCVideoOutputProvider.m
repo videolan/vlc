@@ -359,7 +359,8 @@ int WindowOpen(vlc_window_t *p_wnd)
     [videoWindow makeKeyAndOrderFront: self];
 }
 
-- (void)setupVideoOutputForVideoWindow:(VLCVideoWindowCommon *)videoWindow withVlcWindow:(vlc_window_t *)p_wnd
+- (void)setupVideoOutputForVideoWindow:(VLCVideoWindowCommon *)videoWindow
+                         withVlcWindow:(vlc_window_t *)p_wnd
 {
     VLCVoutView *voutView = videoWindow.videoView;
     
@@ -371,13 +372,34 @@ int WindowOpen(vlc_window_t *p_wnd)
     [VLCMain sharedInstance].libraryWindow.nonembedded = !b_mainWindowHasVideo;
 }
 
-- (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
+- (void)setupFullscreenStartIfNeededForVout:(VLCVoutView *)voutView
+                              withVlcWindow:(vlc_window_t *)p_wnd
+{
+    // TODO: find a cleaner way for "start in fullscreen"
+    // Start in fs, because either prefs settings, or fullscreen button was pressed before
+    /* detect the video-splitter and prevent starts in fullscreen if it is enabled */
+    char *psz_splitter = var_GetString(voutView.voutThread, "video-splitter");
+    BOOL b_have_splitter = psz_splitter != NULL && strcmp(psz_splitter, "none");
+    free(psz_splitter);
+    
+    BOOL multipleVoutWindows = _voutWindows.count > 0;
+    BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
+
+    if (!videoWallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || _playerController.fullscreen)) {
+        // this is not set when we start in fullscreen because of
+        // fullscreen settings in video prefs the second time
+        var_SetBool(vlc_object_parent(p_wnd), "fullscreen", 1);
+        [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
+    }
+}
+
+- (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd
+      withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
     _playerController = [VLCMain sharedInstance].playlistController.playerController;
     VLCVideoWindowCommon *newVideoWindow = [self setupVideoWindow];
     VLCVoutView *voutView = newVideoWindow.videoView;
 
-    BOOL isEmbedded = [newVideoWindow isKindOfClass:[VLCLibraryWindow class]];
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
 
@@ -389,20 +411,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     }
 
     [self setupVideoOutputForVideoWindow:newVideoWindow withVlcWindow:p_wnd];
-    
-    // TODO: find a cleaner way for "start in fullscreen"
-    // Start in fs, because either prefs settings, or fullscreen button was pressed before
-    /* detect the video-splitter and prevent starts in fullscreen if it is enabled */
-    char *psz_splitter = var_GetString(voutView.voutThread, "video-splitter");
-    BOOL b_have_splitter = psz_splitter != NULL && strcmp(psz_splitter, "none");
-    free(psz_splitter);
-
-    if (!videoWallpaper && !b_have_splitter && (var_InheritBool(getIntf(), "fullscreen") || _playerController.fullscreen)) {
-        // this is not set when we start in fullscreen because of
-        // fullscreen settings in video prefs the second time
-        var_SetBool(vlc_object_parent(p_wnd), "fullscreen", 1);
-        [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
-    }
+    [self setupFullscreenStartIfNeededForVout:voutView withVlcWindow:p_wnd];
 
     [NSAnimationContext endGrouping];
     return voutView;
