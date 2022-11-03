@@ -171,7 +171,7 @@ void M3U8Parser::fillRepresentationFromMediainfo(const AttributesTag *mediatag,
             rep->setChannelsCount(std::atoi(channelsAttr->quotedString().c_str()));
     }
 
-    if(type != "AUDIO" && type != "VIDEO")
+    if(type != "AUDIO" && type != "VIDEO" && type != "SUBTITLES")
     {
         rep->streamFormat = StreamFormat(StreamFormat::Type::Unsupported);
     }
