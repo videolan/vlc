@@ -631,6 +631,10 @@ AudioChannelLabelToVlcChan(AudioChannelLabel chan, bool swap_rear_surround)
                                       : AOUT_CHAN_MIDDLERIGHT;
         case kAudioChannelLabel_CenterSurround:
             return AOUT_CHAN_REARCENTER;
+        case kAudioChannelLabel_LeftSurroundDirect:
+            return AOUT_CHAN_MIDDLELEFT;
+        case kAudioChannelLabel_RightSurroundDirect:
+            return AOUT_CHAN_MIDDLERIGHT;
         default:
             return 0;
     }
