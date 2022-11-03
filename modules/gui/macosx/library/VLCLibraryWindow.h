@@ -104,7 +104,6 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
 
-@property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
 @property (readonly) VLCLibraryAudioDataSource *libraryAudioDataSource;

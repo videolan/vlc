@@ -61,7 +61,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
     BOOL b_video_view_was_hidden;
 
-    NSRect frameBeforeLionFullscreen;
+    NSRect _frameBeforeLionFullscreen;
     VLCPlayerController *_playerController;
 }
 
@@ -381,7 +381,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         return proposedFrameSize;
 
     // needed when entering lion fullscreen mode
-    if (_inFullscreenTransition || [self fullscreen])
+    if (_inFullscreenTransition || [self fullscreen] || [self isInNativeFullscreen])
         return proposedFrameSize;
 
     if ([_videoView isHidden])
@@ -481,11 +481,11 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 - (void)window:window startCustomAnimationToExitFullScreenWithDuration:(NSTimeInterval)duration
 {
     [window setStyleMask:([window styleMask] & ~NSFullScreenWindowMask)];
-    [[window animator] setFrame:frameBeforeLionFullscreen display:YES animate:YES];
+    [[window animator] setFrame:_frameBeforeLionFullscreen display:YES animate:YES];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         [context setDuration:0.5 * duration];
-        [[window animator] setFrame:self->frameBeforeLionFullscreen display:YES animate:YES];
+        [[window animator] setFrame:self->_frameBeforeLionFullscreen display:YES animate:YES];
     } completionHandler:nil];
 }
 
@@ -503,7 +503,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
     _playerController.fullscreen = YES;
 
-    frameBeforeLionFullscreen = [self frame];
+    _frameBeforeLionFullscreen = [self frame];
 
     if ([self hasActiveVideo]) {
         vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];

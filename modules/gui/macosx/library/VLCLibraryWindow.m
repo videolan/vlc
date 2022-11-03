@@ -843,7 +843,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)videoPlaybackWillBeStarted
 {
-    if (!self.fullscreen)
+    if (!self.fullscreen && !self.isInNativeFullscreen)
         _windowFrameBeforePlayback = [self frame];
 }
 
@@ -916,20 +916,19 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // Repurpose the back button
     [self.backwardsNavigationButton setEnabled:YES];
 
-    if (self.nativeFullscreenMode) {
-        if ([self hasActiveVideo] && [self fullscreen]) {
-            [self hideControlsBar];
-            [_fspanel shouldBecomeActive:nil];
-        }
+    if (self.isInNativeFullscreen && [self hasActiveVideo] && [self fullscreen]) {
+        [self hideControlsBar];
+        [_fspanel shouldBecomeActive:nil];
     }
 }
 
 - (void)disableVideoPlaybackAppearance
 {
-    if (!self.nonembedded
-        && (!self.nativeFullscreenMode || (self.nativeFullscreenMode && !self.fullscreen))
-        && _windowFrameBeforePlayback.size.width > 0
-        && _windowFrameBeforePlayback.size.height > 0) {
+    if (!self.nonembedded &&
+        !self.isInNativeFullscreen &&
+        !self.fullscreen &&
+        _windowFrameBeforePlayback.size.width > 0 &&
+        _windowFrameBeforePlayback.size.height > 0) {
 
         // only resize back to minimum view of this is still desired final state
         CGFloat f_threshold_height = VLCVideoWindowCommonMinimalHeight + [self.controlsBar height];
@@ -961,7 +960,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self setViewForSelectedSegment];
 
-    if (self.nativeFullscreenMode) {
+    if (self.isInNativeFullscreen) {
         [self showControlsBar];
         [_fspanel shouldBecomeInactive:nil];
     }
