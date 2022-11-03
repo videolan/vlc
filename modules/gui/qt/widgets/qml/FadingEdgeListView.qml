@@ -25,6 +25,23 @@ import "qrc:///util/Helpers.js" as Helpers
 ListView {
     id: root
 
+    // backgroundColor is only needed for sub-pixel
+    // font rendering. Or, if the background color
+    // needs to be known during rendering in general.
+    // Ideally it should be fully opaque, but it is
+    // still better than not providing any color
+    // information.
+    property alias backgroundColor: contentItemCoverRect.color
+
+    Rectangle {
+        id: contentItemCoverRect
+
+        parent: root.contentItem
+        anchors.fill: parent
+        z: -99
+        visible: proxyContentItem.visible && color.a > 0.0
+    }
+
     property bool disableBeginningFade: false
     property bool disableEndFade: false
 

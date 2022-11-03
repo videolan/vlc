@@ -283,6 +283,9 @@ Control {
 
             dragAutoScrollDragItem: dragItem
 
+            backgroundColor: background.usingAcrylic ? "transparent"
+                                                     : background.alternativeColor
+
             property int shiftIndex: -1
 
             property Item itemContainsDrag: null

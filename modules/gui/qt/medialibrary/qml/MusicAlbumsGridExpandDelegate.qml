@@ -172,6 +172,8 @@ FocusScope {
         MusicTrackListDisplay {
             id: tracks
 
+            backgroundColor: VLCStyle.colors.expandDelegate
+
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
 
             property Component titleDelegate: RowLayout {

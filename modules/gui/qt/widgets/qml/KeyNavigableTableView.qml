@@ -97,6 +97,7 @@ FocusScope {
     property alias footerItem: view.footerItem
     property alias footer: view.footer
 
+    property alias backgroundColor: view.backgroundColor
     property alias fadeSize: view.fadeSize
 
     property alias add:       view.add

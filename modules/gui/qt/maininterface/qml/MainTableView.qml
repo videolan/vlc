@@ -19,9 +19,12 @@
 import QtQuick 2.11
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///style/"
 
 Widgets.KeyNavigableTableView {
     id: root
 
     displayMarginEnd: g_mainDisplay.displayMargin
+
+    backgroundColor: VLCStyle.colors.bg
 }
