@@ -1000,6 +1000,8 @@ vlc_media_tree_Hold
 vlc_media_tree_Release
 vlc_media_tree_Lock
 vlc_media_tree_Unlock
+vlc_media_tree_Add
+vlc_media_tree_Remove
 vlc_media_tree_Find
 vlc_media_tree_Preparse
 vlc_media_tree_PreparseCancel
