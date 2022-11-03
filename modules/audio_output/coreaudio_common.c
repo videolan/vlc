@@ -752,10 +752,16 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
 
 static int
 MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-               AudioChannelLayoutTag *inlayout_tag)
+               AudioChannelLayout **inlayoutp, size_t *inlayout_size)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     uint32_t chans_out[AOUT_CHAN_MAX] = { 0, };
+
+    *inlayoutp = malloc(sizeof(AudioChannelLayout));
+    if (*inlayoutp == NULL)
+        return VLC_ENOMEM;
+    *inlayout_size = sizeof(AudioChannelLayout);
+    AudioChannelLayoutTag *inlayout_tag = &((*inlayoutp)->mChannelLayoutTag);
 
     /* Some channel abbreviations used below:
      * L - left
@@ -909,8 +915,9 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
               bool *warn_configuration)
 {
     int ret;
-    bool use_input_layout = false;
-    AudioChannelLayoutTag inlayout_tag;
+    AudioChannelLayout *inlayout_buf = NULL;
+    const AudioChannelLayout *inlayout = NULL;
+    size_t inlayout_size = 0;
 
     if (warn_configuration)
         *warn_configuration = false;
@@ -929,10 +936,10 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         }
         else
         {
-            ret = MapInputLayout(p_aout, fmt, &inlayout_tag);
+            ret = MapInputLayout(p_aout, fmt, &inlayout_buf, &inlayout_size);
             if (ret != VLC_SUCCESS)
                 return ret;
-            use_input_layout = true;
+            inlayout = inlayout_buf;
         }
 
         desc.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
@@ -946,8 +953,11 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         fmt->i_bytes_per_frame = 4;
         fmt->i_frame_length = 1;
 
-        inlayout_tag = kAudioChannelLayoutTag_Stereo;
-        use_input_layout = true;
+        static const AudioChannelLayout inlayout_spdif = {
+            .mChannelLayoutTag = kAudioChannelLayoutTag_Stereo,
+        };
+        inlayout = &inlayout_spdif;
+        inlayout_size = sizeof(inlayout_spdif);
 
         desc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger |
                             kLinearPCMFormatFlagIsPacked; /* S16LE */
@@ -969,6 +979,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
     if (err != noErr)
     {
         ca_LogErr("failed to set stream format");
+        free(inlayout_buf);
         return VLC_EGENERIC;
     }
     msg_Dbg(p_aout, STREAM_FORMAT_MSG("Current AU format: " , desc));
@@ -980,6 +991,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
     if (err != noErr)
     {
         ca_LogErr("failed to set stream format");
+        free(inlayout_buf);
         return VLC_EGENERIC;
     }
 
@@ -995,19 +1007,18 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
     if (err != noErr)
     {
         ca_LogErr("failed to setup render callback");
+        free(inlayout_buf);
         return VLC_EGENERIC;
     }
 
-    if (use_input_layout)
+    if (inlayout != NULL)
     {
         /* Set the input_layout as the layout VLC will use to feed the AU unit.
          * Yes, it must be the INPUT scope */
-        AudioChannelLayout inlayout = {
-            .mChannelLayoutTag = inlayout_tag,
-        };
         err = AudioUnitSetProperty(au, kAudioUnitProperty_AudioChannelLayout,
-                                   kAudioUnitScope_Input, 0, &inlayout,
-                                   sizeof(inlayout));
+                                   kAudioUnitScope_Input, 0, inlayout,
+                                   inlayout_size);
+        free(inlayout_buf);
         if (err != noErr)
         {
             ca_LogErr("failed to setup input layout");
