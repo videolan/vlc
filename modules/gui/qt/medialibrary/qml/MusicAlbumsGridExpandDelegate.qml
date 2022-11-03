@@ -229,15 +229,12 @@ FocusScope {
                         Layout.fillWidth: true
                     }
 
-                    Widgets.IconLabel {
-                        text: VLCIcons.close
+                    Widgets.IconControlButton {
+                        iconText: VLCIcons.close
 
                         Layout.rightMargin: VLCStyle.margin_small
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: root.retract()
-                        }
+                        onClicked: root.retract()
                     }
                 }
 
