@@ -749,8 +749,8 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
 }
 
 static int
-SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-                 AudioChannelLayoutTag *inlayout_tag)
+MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
+               AudioChannelLayoutTag *inlayout_tag)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     uint32_t chans_out[AOUT_CHAN_MAX] = { 0, };
@@ -927,7 +927,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         }
         else
         {
-            ret = SetupInputLayout(p_aout, fmt, &inlayout_tag);
+            ret = MapInputLayout(p_aout, fmt, &inlayout_tag);
             if (ret != VLC_SUCCESS)
                 return ret;
             use_input_layout = true;
