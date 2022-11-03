@@ -91,14 +91,14 @@ else
 QT_SPEC := win32-g++
 endif
 
+endif
+
 ifdef HAVE_CROSS_COMPILE
 QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 else
 ifneq ($(QT_SPEC),)
 QT_PLATFORM := -platform $(QT_SPEC)
 endif
-endif
-
 endif
 
 QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
