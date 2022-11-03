@@ -162,10 +162,10 @@ FocusScope {
 
         var data = modelFilter.getDataAt(index)
 
-        if (data.type === NetworkMediaModel.TYPE_DIRECTORY
-            ||
-            data.type === NetworkMediaModel.TYPE_NODE)
-            browse(data.tree, Qt.TabFocusReason);
+        var type = data.type
+
+        if (type === NetworkMediaModel.TYPE_DIRECTORY || type === NetworkMediaModel.TYPE_NODE)
+            browse(data.tree, Qt.TabFocusReason)
         else
             playAt(index);
     }
@@ -179,10 +179,10 @@ FocusScope {
     }
 
     function onDoubleClicked(model, index) {
-        if (model.type === NetworkMediaModel.TYPE_NODE
-            ||
-            model.type === NetworkMediaModel.TYPE_DIRECTORY)
-            browse(model.tree, Qt.MouseFocusReason);
+        var type = model.type
+
+        if (type === NetworkMediaModel.TYPE_NODE || type === NetworkMediaModel.TYPE_DIRECTORY)
+            browse(model.tree, Qt.MouseFocusReason)
         else
             playAt(index);
     }
