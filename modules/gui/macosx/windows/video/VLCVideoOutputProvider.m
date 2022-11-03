@@ -263,50 +263,63 @@ int WindowOpen(vlc_window_t *p_wnd)
     return newVideoWindow;
 }
 
-- (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
+- (VLCVideoWindowCommon *)setupMainLibraryVideoWindow
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
-    _playerController = mainInstance.playlistController.playerController;
-    VLCVideoWindowCommon *newVideoWindow;
+    
+    // should be called before any window resizing occurs
+    [mainInstance.libraryWindow videoPlaybackWillBeStarted];
+    b_mainWindowHasVideo = YES;
+    
+    return mainInstance.libraryWindow;
+}
 
+- (VLCVideoWindowCommon *)setupDetachedVideoWindow
+{
+    BOOL multipleVoutWindows = _voutWindows.count > 0;
+    // setup detached window with controls
+    NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
+    [o_controller loadWindow];
+    VLCVideoWindowCommon *newVideoWindow = (VLCDetachedVideoWindow *)o_controller.window;
+
+    // no frame autosave for additional vout windows
+    if (multipleVoutWindows) {
+        newVideoWindow.frameAutosaveName = @"";
+    }
+
+    newVideoWindow.delegate = newVideoWindow;
+    newVideoWindow.level = NSNormalWindowLevel;
+    return newVideoWindow;
+}
+
+- (VLCVideoWindowCommon *)setupVideoWindow
+{
     BOOL isNativeFullscreen = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
     BOOL windowDecorations = var_InheritBool(getIntf(), "video-deco");
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper");
 
-    BOOL isEmbedded = NO;
-    BOOL multipleVoutWindows = _voutWindows.count > 0;
-
-    // should be called before any window resizing occurs
-    if (!multipleVoutWindows) {
-        [mainInstance.libraryWindow videoPlaybackWillBeStarted];
-    } else if (videoWallpaper) {
-        videoWallpaper = false;
-    }
-
     // TODO: make lion fullscreen compatible with video-wallpaper
     if ((videoWallpaper || !windowDecorations) && !isNativeFullscreen) {
-        newVideoWindow = [self borderlessVideoWindowAsVideoWallpaper:videoWallpaper withWindowDecorations:windowDecorations];
-    } else {
-        isEmbedded = var_InheritBool(getIntf(), "embedded-video") && !b_mainWindowHasVideo;
-        if (isEmbedded) {
-            // setup embedded video
-            newVideoWindow = mainInstance.libraryWindow;
-            b_mainWindowHasVideo = YES;
-        } else {
-            // setup detached window with controls
-            NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
-            [o_controller loadWindow];
-            newVideoWindow = (VLCDetachedVideoWindow *)o_controller.window;
-
-            // no frame autosave for additional vout windows
-            if (multipleVoutWindows) {
-                newVideoWindow.frameAutosaveName = @"";
-            }
-
-            newVideoWindow.delegate = newVideoWindow;
-            newVideoWindow.level = NSNormalWindowLevel;
-        }
+        return [self borderlessVideoWindowAsVideoWallpaper:videoWallpaper withWindowDecorations:windowDecorations];
     }
+    
+    BOOL isEmbedded = var_InheritBool(getIntf(), "embedded-video") && !b_mainWindowHasVideo;
+    if (isEmbedded) {
+        return [self setupMainLibraryVideoWindow];
+    }
+    
+    return [self setupDetachedVideoWindow];
+}
+
+- (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition
+{
+    VLCMain *mainInstance = [VLCMain sharedInstance];
+    _playerController = mainInstance.playlistController.playerController;
+    VLCVideoWindowCommon *newVideoWindow = [self setupVideoWindow];
+
+    BOOL isEmbedded = [newVideoWindow isKindOfClass:[VLCLibraryWindow class]];
+    BOOL multipleVoutWindows = _voutWindows.count > 0;
+    BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
 
     VLCVoutView *voutView = newVideoWindow.videoView;
     NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
