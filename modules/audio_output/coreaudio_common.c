@@ -604,7 +604,7 @@ GetLayoutDescription(audio_output_t *p_aout,
 }
 
 static unsigned
-AudioChannelLabelToVlcChan(AudioChannelLabel chan)
+AudioChannelLabelToVlcChan(AudioChannelLabel chan, bool swap_rear_surround)
 {
     /* maps auhal channels to vlc ones */
     switch (chan)
@@ -618,13 +618,17 @@ AudioChannelLabelToVlcChan(AudioChannelLabel chan)
         case kAudioChannelLabel_LFEScreen:
             return AOUT_CHAN_LFE;
         case kAudioChannelLabel_LeftSurround:
-            return AOUT_CHAN_REARLEFT;
+            return swap_rear_surround ? AOUT_CHAN_MIDDLELEFT
+                                      : AOUT_CHAN_REARLEFT;
         case kAudioChannelLabel_RightSurround:
-            return AOUT_CHAN_REARRIGHT;
+            return swap_rear_surround ? AOUT_CHAN_MIDDLERIGHT
+                                      : AOUT_CHAN_REARRIGHT;
         case kAudioChannelLabel_RearSurroundLeft:
-            return AOUT_CHAN_MIDDLELEFT;
+            return swap_rear_surround ? AOUT_CHAN_REARLEFT
+                                      : AOUT_CHAN_MIDDLELEFT;
         case kAudioChannelLabel_RearSurroundRight:
-            return AOUT_CHAN_MIDDLERIGHT;
+            return swap_rear_surround ? AOUT_CHAN_REARRIGHT
+                                      : AOUT_CHAN_MIDDLERIGHT;
         case kAudioChannelLabel_CenterSurround:
             return AOUT_CHAN_REARCENTER;
         default:
@@ -674,7 +678,26 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 outlayout->mNumberChannelDescriptions);
         uint32_t chans_out[AOUT_CHAN_MAX];
 
-        /* We want more than stereo and we can do that */
+        /* For 7.1, AOUT_CHAN_MIDDLELEFT/RIGHT needs to be swapped with
+         * AOUT_CHAN_REARLEFT/RIGHT. Auhal
+         * kAudioChannelLabel_Left/RightSurround are used as surround for 5.1,
+         * but as middle speakers for rear 7.1. */
+        unsigned swap_rear_surround = 0;
+        if (outlayout->mNumberChannelDescriptions == 8)
+        {
+            for (unsigned i = 0; i < outlayout->mNumberChannelDescriptions; i++)
+            {
+                AudioChannelLabel chan =
+                    outlayout->mChannelDescriptions[i].mChannelLabel;
+                if (chan == kAudioChannelLabel_RearSurroundLeft
+                 || chan == kAudioChannelLabel_RearSurroundRight)
+                    swap_rear_surround++;
+            }
+            if (swap_rear_surround == 2)
+                msg_Dbg(p_aout, "swapping Surround and RearSurround channels "
+                        "for 7.1 Rear Surround");
+        }
+
         for (unsigned i = 0; i < outlayout->mNumberChannelDescriptions; i++)
         {
             AudioChannelLabel chan =
@@ -682,7 +705,8 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
 #ifndef NDEBUG
             msg_Dbg(p_aout, "this is channel: %d", (int) chan);
 #endif
-            unsigned mapped_chan = AudioChannelLabelToVlcChan(chan);
+            unsigned mapped_chan =
+                AudioChannelLabelToVlcChan(chan, swap_rear_surround == 2);
             if (mapped_chan != 0)
             {
                 chans_out[i] = mapped_chan;
