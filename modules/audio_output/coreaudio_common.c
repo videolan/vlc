@@ -603,6 +603,35 @@ GetLayoutDescription(audio_output_t *p_aout,
     return reslayout;
 }
 
+static unsigned
+AudioChannelLabelToVlcChan(AudioChannelLabel chan)
+{
+    /* maps auhal channels to vlc ones */
+    switch (chan)
+    {
+        case kAudioChannelLabel_Left:
+            return AOUT_CHAN_LEFT;
+        case kAudioChannelLabel_Right:
+            return AOUT_CHAN_RIGHT;
+        case kAudioChannelLabel_Center:
+            return AOUT_CHAN_CENTER;
+        case kAudioChannelLabel_LFEScreen:
+            return AOUT_CHAN_LFE;
+        case kAudioChannelLabel_LeftSurround:
+            return AOUT_CHAN_REARLEFT;
+        case kAudioChannelLabel_RightSurround:
+            return AOUT_CHAN_REARRIGHT;
+        case kAudioChannelLabel_RearSurroundLeft:
+            return AOUT_CHAN_MIDDLELEFT;
+        case kAudioChannelLabel_RearSurroundRight:
+            return AOUT_CHAN_MIDDLERIGHT;
+        case kAudioChannelLabel_CenterSurround:
+            return AOUT_CHAN_REARCENTER;
+        default:
+            return 0;
+    }
+}
+
 static int
 MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 const AudioChannelLayout *outlayout, bool *warn_configuration)
@@ -645,23 +674,6 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
                 outlayout->mNumberChannelDescriptions);
         uint32_t chans_out[AOUT_CHAN_MAX];
 
-        /* maps auhal channels to vlc ones */
-        static const unsigned i_auhal_channel_mapping[] = {
-            [kAudioChannelLabel_Left]           = AOUT_CHAN_LEFT,
-            [kAudioChannelLabel_Right]          = AOUT_CHAN_RIGHT,
-            [kAudioChannelLabel_Center]         = AOUT_CHAN_CENTER,
-            [kAudioChannelLabel_LFEScreen]      = AOUT_CHAN_LFE,
-            [kAudioChannelLabel_LeftSurround]   = AOUT_CHAN_REARLEFT,
-            [kAudioChannelLabel_RightSurround]  = AOUT_CHAN_REARRIGHT,
-            /* needs to be swapped with rear */
-            [kAudioChannelLabel_RearSurroundLeft]  = AOUT_CHAN_MIDDLELEFT,
-            /* needs to be swapped with rear */
-            [kAudioChannelLabel_RearSurroundRight] = AOUT_CHAN_MIDDLERIGHT,
-            [kAudioChannelLabel_CenterSurround] = AOUT_CHAN_REARCENTER
-        };
-        static const size_t i_auhal_size = sizeof(i_auhal_channel_mapping)
-                                         / sizeof(i_auhal_channel_mapping[0]);
-
         /* We want more than stereo and we can do that */
         for (unsigned i = 0; i < outlayout->mNumberChannelDescriptions; i++)
         {
@@ -670,9 +682,9 @@ MapOutputLayout(audio_output_t *p_aout, audio_sample_format_t *fmt,
 #ifndef NDEBUG
             msg_Dbg(p_aout, "this is channel: %d", (int) chan);
 #endif
-            if (chan < i_auhal_size && i_auhal_channel_mapping[chan] > 0)
+            unsigned mapped_chan = AudioChannelLabelToVlcChan(chan);
+            if (mapped_chan != 0)
             {
-                unsigned mapped_chan = i_auhal_channel_mapping[chan];
                 chans_out[i] = mapped_chan;
                 fmt->i_physical_channels |= mapped_chan;
             }
