@@ -43,16 +43,19 @@ variables:
 
 .variables-win32: &variables-win32
         SHORTARCH: win32
+        VLCARCH: win32
         HOST_ARCH: i686
         TRIPLET: $HOST_ARCH-w64-mingw32
 
 .variables-win64: &variables-win64
         SHORTARCH: win64
+        VLCARCH: win64
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
 .variables-win64-arm: &variables-win64-arm
         SHORTARCH: arm64
+        VLCARCH: winarm64
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
@@ -143,7 +146,7 @@ variables:
         fi
         extras/package/win32/build.sh -a $HOST_ARCH $EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
         if [ "${CI_JOB_NAME}" = "win64" ]; then
-          cmake -DLIBVLC_SDK_INC:STRING=${CI_PROJECT_DIR}/include -DLIBVLC_SDK_LIB:STRING=${CI_PROJECT_DIR}/${SHORTARCH}/lib/.libs -H${CI_PROJECT_DIR}/doc/libvlc -B${CI_PROJECT_DIR}/doc/libvlc/build \
+          cmake -DLIBVLC_SDK_INC:STRING=${CI_PROJECT_DIR}/include -DLIBVLC_SDK_LIB:STRING=${CI_PROJECT_DIR}/${VLCARCH}/lib/.libs -H${CI_PROJECT_DIR}/doc/libvlc -B${CI_PROJECT_DIR}/doc/libvlc/build \
                 -G Ninja -DCMAKE_C_COMPILER=${TRIPLET}-gcc -DCMAKE_CXX_COMPILER=${TRIPLET}-g++ -DCMAKE_SYSTEM_NAME=Windows
           cmake --build ${CI_PROJECT_DIR}/doc/libvlc/build
         fi
@@ -172,6 +175,7 @@ win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
+        VLCARCH: winarm64-ucrt
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
         # Clang <= 15 produces incorrect unwind info for code with
         # branch protection enabled on Windows.
@@ -183,6 +187,7 @@ uwp64-libvlc-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64
+        VLCARCH: win64-uwp
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000006
 
@@ -192,8 +197,8 @@ uwp64-libvlc-llvm:
         - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
         - mkdir nightlies
-        - for ext in 7z;  do mv ${SHORTARCH}/vlc-*-dev-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || echo "vlc-*debug.${ext} not found!"; done
-        - for ext in exe msi 7z zip; do mv ${SHORTARCH}/vlc-*-dev-*.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-dev-*.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || echo "vlc-*.${ext} not found!"; done
+        - for ext in 7z;  do mv ${VLCARCH}/vlc-*-dev-*-debug.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-dev-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || echo "vlc-*debug.${ext} not found!"; done
+        - for ext in exe msi 7z zip; do mv ${VLCARCH}/vlc-*-dev-*.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-dev-*.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/") || echo "vlc-*.${ext} not found!"; done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
@@ -223,6 +228,7 @@ nightly-win64-ucrt-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64
+        VLCARCH: win64-ucrt
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
@@ -232,6 +238,7 @@ nightly-win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
+        VLCARCH: winarm64-ucrt
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
         # Clang <= 15 produces incorrect unwind info for code with
