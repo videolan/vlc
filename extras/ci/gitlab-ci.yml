@@ -31,16 +31,19 @@ variables:
 
 .variables-win32: &variables-win32
         SHORTARCH: win32
+        VLCARCH: win32
         HOST_ARCH: i686
         TRIPLET: $HOST_ARCH-w64-mingw32
 
 .variables-win64: &variables-win64
         SHORTARCH: win64
+        VLCARCH: win64
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
 .variables-win64-arm: &variables-win64-arm
         SHORTARCH: arm64
+        VLCARCH: winarm64
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
@@ -130,6 +133,7 @@ win64-arm-llvm:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
         <<: *variables-win64-arm
+        VLCARCH: winarm64-ucrt
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
         # Clang <= 15 produces incorrect unwind info for code with
         # branch protection enabled on Windows.
@@ -141,6 +145,7 @@ uwp64-libvlc-llvm:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
         <<: *variables-win64
+        VLCARCH: win64-uwp
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w
 
@@ -151,8 +156,8 @@ uwp64-libvlc-llvm:
     except:
     after_script:
         - mkdir nightlies
-        - for ext in 7z;             do mv ${SHORTARCH}/vlc-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
-        - for ext in exe msi 7z zip; do mv ${SHORTARCH}/vlc-*.${ext}       nightlies/$(basename ${SHORTARCH}/vlc-*.${ext}       | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - for ext in 7z;             do mv ${VLCARCH}/vlc-*-debug.${ext} nightlies/$(basename ${VLCARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - for ext in exe msi 7z zip; do mv ${VLCARCH}/vlc-*.${ext}       nightlies/$(basename ${VLCARCH}/vlc-*.${ext}       | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
