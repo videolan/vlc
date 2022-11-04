@@ -41,7 +41,7 @@ Item {
         color: VLCStyle.colors.buttonText
         visible: paintOnly
 
-        font.pixelSize: VLCIcons.icon_toolbar
+        font.pixelSize: VLCStyle.icon_toolbar
         font.family: VLCIcons.fontFamily
 
         verticalAlignment: Text.AlignVCenter
