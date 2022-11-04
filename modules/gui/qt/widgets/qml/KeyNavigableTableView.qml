@@ -108,6 +108,8 @@ FocusScope {
 
     property alias displayMarginEnd: view.displayMarginEnd
 
+    property alias count: view.count
+
     // Signals
 
     //forwarded from subview
