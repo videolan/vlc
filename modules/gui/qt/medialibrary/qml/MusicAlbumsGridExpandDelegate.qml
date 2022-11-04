@@ -212,41 +212,65 @@ FocusScope {
                 }
             }
 
-            header: Column {
+            header: FocusScope {
+                id: headerFocusScope
+
                 width: tracks.width
                 height: implicitHeight
-                bottomPadding: VLCStyle.margin_large
+                implicitHeight: col.implicitHeight
 
-                RowLayout {
-                    width: parent.width
+                focus: true
 
-                    /* The title of the albums */
-                    Widgets.SubtitleLabel {
-                        id: expand_infos_title_id
-
-                        text: Helpers.get(model, "title", I18n.qtr("Unknown title"))
-
-                        Layout.fillWidth: true
-                    }
-
-                    Widgets.IconControlButton {
-                        iconText: VLCIcons.close
-
-                        Layout.rightMargin: VLCStyle.margin_small
-
-                        onClicked: root.retract()
+                Navigation.parentItem: root
+                Navigation.leftItem: enqueueActionBtn
+                Navigation.downAction: function () {
+                    if (tracks.count > 0) {
+                        tracks.setCurrentItemFocus(Qt.TabFocus)
+                    } else {
+                        root.Navigation.downAction()
                     }
                 }
 
-                Widgets.CaptionLabel {
-                    id: expand_infos_subtitle_id
 
-                    width: parent.width
-                    text: I18n.qtr("%1 - %2 - %3 - %4")
-                        .arg(Helpers.get(model, "main_artist", I18n.qtr("Unknown artist")))
-                        .arg(Helpers.get(model, "release_year", ""))
-                        .arg(_getStringTrack())
-                        .arg((model && model.duration) ? model.duration.formatHMS() : 0)
+                Column {
+                    id: col
+
+                    anchors.fill: parent
+                    bottomPadding: VLCStyle.margin_large
+
+                    RowLayout {
+                        width: parent.width
+
+                        /* The title of the albums */
+                        Widgets.SubtitleLabel {
+                            id: expand_infos_title_id
+
+                            text: Helpers.get(model, "title", I18n.qtr("Unknown title"))
+
+                            Layout.fillWidth: true
+                        }
+
+                        Widgets.IconControlButton {
+                            iconText: VLCIcons.close
+                            focus: true
+
+                            Navigation.parentItem: headerFocusScope
+                            Layout.rightMargin: VLCStyle.margin_small
+
+                            onClicked: root.retract()
+                        }
+                    }
+
+                    Widgets.CaptionLabel {
+                        id: expand_infos_subtitle_id
+
+                        width: parent.width
+                        text: I18n.qtr("%1 - %2 - %3 - %4")
+                            .arg(Helpers.get(model, "main_artist", I18n.qtr("Unknown artist")))
+                            .arg(Helpers.get(model, "release_year", ""))
+                            .arg(_getStringTrack())
+                            .arg((model && model.duration) ? model.duration.formatHMS() : 0)
+                    }
                 }
             }
 
@@ -272,6 +296,7 @@ FocusScope {
 
             Navigation.parentItem: root
             Navigation.leftItem: actionButtons
+            Navigation.upItem: headerItem
 
             Widgets.TableColumns {
                 id: tableColumns
