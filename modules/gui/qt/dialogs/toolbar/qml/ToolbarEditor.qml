@@ -272,6 +272,11 @@ Rectangle{
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.margins: VLCStyle.margin_xxsmall
+
+                    Component.onCompleted: {
+                        dragStarted.connect(root.dragStarted)
+                        dragStopped.connect(root.dragStopped)
+                    }
                 }
             }
         }

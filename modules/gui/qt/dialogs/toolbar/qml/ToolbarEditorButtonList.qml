@@ -43,6 +43,9 @@ GridView {
 
     property alias removeInfoRectVisible: removeInfoRect.visible
 
+    signal dragStarted(int id)
+    signal dragStopped(int id)
+
     MouseEventFilter {
         target: root
     }
