@@ -59,4 +59,13 @@ static inline int vlc_vk_CreateSurface(vlc_vk_platform_t * vk,
     return vk->ops->create_surface(vk, instance, surface_out);
 }
 
+static inline void vlc_vk_DestroySurface(const vlc_vk_instance_t *inst,
+                                         VkSurfaceKHR surface)
+{
+    PFN_vkDestroySurfaceKHR DestroySurfaceKHR = (PFN_vkDestroySurfaceKHR)
+        inst->get_proc_address(inst->instance, "vkDestroySurfaceKHR");
+
+    DestroySurfaceKHR(inst->instance, surface, NULL);
+}
+
 #endif // VLC_VULKAN_PLATFORM_H
