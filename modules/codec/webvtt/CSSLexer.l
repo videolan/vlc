@@ -39,10 +39,10 @@
 char *d;
 %}
 
-h		[0-9a-f]
-nonascii	[\200-\377]
+h		[0-9a-fA-F]
+nonascii	(?-i:[\200-\377])
 unicode		\\{h}{1,6}[ \t\r\n\f]?
-escape		{unicode}|\\[ -~\200-\377]
+escape		(?-i:{unicode}|\\[ -~\200-\377])
 nmstart		[a-z]|{nonascii}|{escape}
 nmchar		[a-z0-9-]|{nonascii}|{escape}
 string1		\"([\t !#$%&(-~]|\\{nl}|\'|{nonascii}|{escape})*\"
