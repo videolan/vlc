@@ -3862,11 +3862,11 @@ AS_IF([test -n "$PKG_CONFIG"],[
     AC_CHECK_TOOL(PROTOC, protoc, no)
     AS_IF([test "${PROTOC}" != "no"], [
         dnl silently checks the protoc version matches the protobuf library
-        protoc_ver="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
-        protoc_ver_next="${protoc_ver%.*}.$((${protoc_ver##*.}+1))"
-        AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${protoc_ver}])
+        PROTOBUF_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
+        protoc_ver_next="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
+        AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${PROTOBUF_VERSION}])
         AS_IF([test -n "$PKG_CONFIG"],[
-            ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${protoc_ver} protobuf-lite < ${protoc_ver_next}") 2>&5
+            ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${protoc_ver_next}") 2>&5
             ac_status=$?
             AS_IF([test $ac_status = 0],[
                 protoc_matching=yes
@@ -3888,10 +3888,10 @@ AS_IF([test -n "$PKG_CONFIG"],[
 
         AS_IF([test "${PROTOC}" != "no"], [
             dnl silently checks the protoc version matches the protobuf library
-            protoc_ver="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
-            protoc_ver_next="${protoc_ver%.*}.$((${protoc_ver##*.}+1))"
-            AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${protoc_ver}])
-            ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${protoc_ver} protobuf-lite < ${protoc_ver_next}") 2>&5
+            PROTOBUF_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
+            protoc_ver_next="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
+            AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${PROTOBUF_VERSION}])
+            ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${protoc_ver_next}") 2>&5
             ac_status=$?
             AS_IF([test $ac_status = 0],[
                 protoc_matching=yes
@@ -3905,6 +3905,7 @@ AS_IF([test -n "$PKG_CONFIG"],[
         ])
     ])
 ])
+AC_SUBST([PROTOBUF_VERSION])
 AM_CONDITIONAL([BUILD_CHROMECAST], [test "${enable_chromecast}" != "no" -a "${protoc_matching}" = yes])
 
 dnl
