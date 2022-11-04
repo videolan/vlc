@@ -283,12 +283,10 @@ avas_resetPreferredNumberOfChannels(audio_output_t *p_aout)
 }
 
 static int
-avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
-                             AudioChannelLayout **playout)
+avas_GetPortType(audio_output_t *p_aout, enum port_type *pport_type)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
-    AudioChannelLayout *layout = NULL;
     *pport_type = PORT_TYPE_DEFAULT;
 
     long last_channel_count = 0;
@@ -311,58 +309,11 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
             p_sys->b_spatial_audio_supported = out.spatialAudioEnabled;
         }
 
-        NSArray<AVAudioSessionChannelDescription *> *chans = [out channels];
-
-        if (chans.count > last_channel_count || port_type == PORT_TYPE_HDMI)
-        {
-            /* We don't need a layout specification for stereo */
-            if (chans.count > 2)
-            {
-                bool labels_valid = false;
-                for (AVAudioSessionChannelDescription *chan in chans)
-                {
-                    if ([chan channelLabel] != kAudioChannelLabel_Unknown)
-                    {
-                        labels_valid = true;
-                        break;
-                    }
-                }
-                if (!labels_valid)
-                {
-                    /* TODO: Guess labels ? */
-                    msg_Warn(p_aout, "no valid channel labels");
-                    continue;
-                }
-
-                if (layout == NULL
-                 || layout->mNumberChannelDescriptions < chans.count)
-                {
-                    const size_t layout_size = sizeof(AudioChannelLayout)
-                        + chans.count * sizeof(AudioChannelDescription);
-                    layout = realloc_or_free(layout, layout_size);
-                    if (layout == NULL)
-                        return VLC_ENOMEM;
-                }
-
-                layout->mChannelLayoutTag =
-                    kAudioChannelLayoutTag_UseChannelDescriptions;
-                layout->mNumberChannelDescriptions = chans.count;
-
-                unsigned i = 0;
-                for (AVAudioSessionChannelDescription *chan in chans)
-                    layout->mChannelDescriptions[i++].mChannelLabel
-                        = [chan channelLabel];
-
-                last_channel_count = chans.count;
-            }
-            *pport_type = port_type;
-        }
-
+        *pport_type = port_type;
         if (port_type == PORT_TYPE_HDMI) /* Prefer HDMI */
             break;
     }
 
-    *playout = layout;
     return VLC_SUCCESS;
 }
 
@@ -643,7 +594,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
 
     enum port_type port_type;
-    int ret = avas_GetOptimalChannelLayout(p_aout, &port_type, &layout);
+    int ret = avas_GetPortType(p_aout, &port_type);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -677,7 +628,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     const mtime_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
     msg_Dbg(p_aout, "Current device has a latency of %lld us", latency_us);
 
-    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, latency_us, NULL);
+    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL, latency_us, NULL);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -706,7 +657,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 
 error:
-    free(layout);
     if (p_sys->au_unit != NULL)
         AudioComponentInstanceDispose(p_sys->au_unit);
     avas_resetPreferredNumberOfChannels(p_aout);
