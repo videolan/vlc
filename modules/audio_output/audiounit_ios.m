@@ -362,12 +362,6 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
             break;
     }
 
-    msg_Dbg(p_aout, "Output on %s, channel count: %u, spatialAudioEnabled %i",
-            *pport_type == PORT_TYPE_HDMI ? "HDMI" :
-            *pport_type == PORT_TYPE_USB ? "USB" :
-            *pport_type == PORT_TYPE_HEADPHONES ? "Headphones" : "Default",
-            layout ? (unsigned) layout->mNumberChannelDescriptions : 2, p_sys->b_spatial_audio_supported);
-
     *playout = layout;
     return VLC_SUCCESS;
 }
@@ -659,6 +653,13 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
          || (port_type != PORT_TYPE_USB && port_type != PORT_TYPE_HDMI))
             goto error;
     }
+
+    msg_Dbg(p_aout, "Output on %s, channel count: %ld, spatialAudioEnabled %i",
+            port_type == PORT_TYPE_HDMI ? "HDMI" :
+            port_type == PORT_TYPE_USB ? "USB" :
+            port_type == PORT_TYPE_HEADPHONES ? "Headphones" : "Default",
+            (long) [p_sys->avInstance outputNumberOfChannels],
+            p_sys->b_spatial_audio_supported);
 
     p_aout->current_sink_info.headphones = port_type == PORT_TYPE_HEADPHONES;
 
