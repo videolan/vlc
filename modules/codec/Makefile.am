@@ -240,6 +240,7 @@ if ENABLE_CSS
 # dependency: we need grammar build first
 BUILT_SOURCES += codec/webvtt/CSSGrammar.h
 libwebvtt_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/codec/webvtt/ -I$(builddir)/codec/webvtt/
+libwebvtt_plugin_la_LFLAGS = $(AM_LFLAGS) --outfile=lex.yy.c
 libwebvtt_plugin_la_SOURCES += codec/webvtt/CSSGrammar.y \
                                codec/webvtt/CSSLexer.l \
                                codec/webvtt/css_parser.c \
@@ -248,6 +249,7 @@ libwebvtt_plugin_la_SOURCES += codec/webvtt/CSSGrammar.y \
                                codec/webvtt/css_style.h \
                                codec/webvtt/css_bridge.h
 css_parser_test_CFLAGS = $(libwebvtt_plugin_la_CFLAGS)
+css_parser_test_LFLAGS = $(AM_LFLAGS) --outfile=lex.yy.c
 css_parser_test_SOURCES = codec/webvtt/css_test.c \
                           codec/webvtt/css_parser.c \
                           codec/webvtt/CSSGrammar.y \

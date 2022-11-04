@@ -25,7 +25,7 @@
 %option noinput
 %option never-interactive
 %option nostdinit
-%option prefix="css" outfile="lex.yy.c"
+%option prefix="css"
 
 %{
 #ifdef HAVE_CONFIG_H
