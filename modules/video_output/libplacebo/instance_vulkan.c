@@ -35,6 +35,7 @@
 
 struct vlc_placebo_system_t {
     vlc_vk_platform_t *platform;
+    VkSurfaceKHR surface;
     pl_vk_inst instance;
     pl_vulkan vulkan;
 };
@@ -75,15 +76,14 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
     };
 
     // Create the platform-specific surface object
-    VkSurfaceKHR surface;
-    if (vlc_vk_CreateSurface(sys->platform, &inst, &surface) != VLC_SUCCESS)
+    if (vlc_vk_CreateSurface(sys->platform, &inst, &sys->surface) != VLC_SUCCESS)
         goto error;
 
     // Create vulkan device
     char *device_name = var_InheritString(pl, "vk-device");
     sys->vulkan = pl_vulkan_create(pl->log, &(struct pl_vulkan_params) {
         .instance = sys->instance->instance,
-        .surface = surface,
+        .surface = sys->surface,
         .device_name = device_name,
         .allow_software = var_InheritBool(pl, "vk-allow-sw"),
         .async_transfer = var_InheritBool(pl, "vk-async-xfer"),
@@ -96,7 +96,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
 
     // Create swapchain for this surface
     struct pl_vulkan_swapchain_params swap_params = {
-        .surface = surface,
+        .surface = sys->surface,
         .present_mode = var_InheritInteger(pl, "vk-present-mode"),
         .swapchain_depth = var_InheritInteger(pl, "vk-queue-depth"),
     };
@@ -119,6 +119,15 @@ static void CloseInstance(vlc_placebo_t *pl)
     vlc_placebo_system_t *sys = pl->sys;
 
     pl_swapchain_destroy(&pl->swapchain);
+
+    if (sys->surface) {
+        vlc_vk_instance_t inst = {
+            .instance = sys->instance->instance,
+            .get_proc_address = sys->instance->get_proc_addr,
+        };
+        vlc_vk_DestroySurface(&inst, sys->surface);
+    }
+
     pl_vulkan_destroy(&sys->vulkan);
     pl_vk_inst_destroy(&sys->instance);
 
