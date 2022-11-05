@@ -26,7 +26,9 @@ RAV1E_FEATURES=--features=asm
 rav1e: rav1e-$(RAV1E_VERSION).tar.gz .sum-rav1e .rav1e-vendor
 	$(UNPACK)
 ifdef HAVE_WIN32
+ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/rav1e/unwind-resume-stub.patch
+endif
 endif
 	$(CARGO_VENDOR_SETUP)
 	$(MOVE)
