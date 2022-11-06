@@ -65,6 +65,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     NSArray *_largeHeightAnimationSteps;
     
     VLCExpandAnimationType _animationType;
+    CGFloat _prevProvidedAnimationStep;
 }
 
 @property (nonatomic, readwrite) BOOL detailViewIsAnimating;
@@ -79,14 +80,15 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 - (instancetype)init
 {
     self = [super init];
-    if (self == nil) {
-        return nil;
+    if (self) {
+        _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewDefaultExpandedHeight]];
+        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewLargeExpandedHeight]];
+        
+        _animationType = VLCExpandAnimationTypeDefault;
+        _prevProvidedAnimationStep = 0;
+        
+        [self resetLayout];
     }
-
-    _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewDefaultExpandedHeight]];
-    _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewLargeExpandedHeight]];
-    
-    [self resetLayout];
     
     return self;
 }
@@ -108,17 +110,20 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 - (CGFloat)currentAnimationStep
 {
     if (_animationIndex < 0 || _animationIndex >= kAnimationSteps) {
-        return -1;
+        return _prevProvidedAnimationStep; // Try to disguise problem
     }
-        
+    
     switch(_animationType) {
         case VLCExpandAnimationTypeLarge:
-            return [_largeHeightAnimationSteps[_animationIndex] floatValue];
+            _prevProvidedAnimationStep = [_largeHeightAnimationSteps[_animationIndex] floatValue];
+            break;
         case VLCExpandAnimationTypeDefault:
         default:
-            return [_defaultHeightAnimationSteps[_animationIndex] floatValue];
+            _prevProvidedAnimationStep = [_defaultHeightAnimationSteps[_animationIndex] floatValue];
             break;
     }
+    
+    return _prevProvidedAnimationStep;
 }
 
 #pragma mark - Public methods
