@@ -243,6 +243,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/network/networkmediamodel.hpp \
 	gui/qt/network/servicesdiscoverymodel.cpp \
 	gui/qt/network/servicesdiscoverymodel.hpp \
+	gui/qt/style/qtthemeprovider.hpp \
 	gui/qt/style/systempalette.cpp \
 	gui/qt/style/systempalette.hpp \
 	gui/qt/style/defaultthemeproviders.hpp \
