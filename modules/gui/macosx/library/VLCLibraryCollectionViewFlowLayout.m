@@ -43,6 +43,11 @@ typedef NS_ENUM(NSUInteger, VLCDetailViewAnimationType)
     VLCDetailViewAnimationTypeCollapse,
 };
 
+typedef NS_ENUM(NSUInteger, VLCExpandAnimationType) {
+    VLCExpandAnimationTypeDefault = 0,
+    VLCExpandAnimationTypeLarge,
+};
+
 static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                                             const CVTimeStamp *inNow,
                                             const CVTimeStamp *inOutputTime,
@@ -58,7 +63,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
     NSArray *_defaultHeightAnimationSteps;
     NSArray *_largeHeightAnimationSteps;
-    NSArray *_animationSteps;
+    
+    VLCExpandAnimationType _animationType;
 }
 
 @property (nonatomic, readwrite) BOOL detailViewIsAnimating;
@@ -79,7 +85,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
     _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewDefaultExpandedHeight]];
     _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewLargeExpandedHeight]];
-    _animationSteps = _defaultHeightAnimationSteps;
+    
     [self resetLayout];
     
     return self;
@@ -97,6 +103,22 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     }
 
     return [generatedAnimationSteps copy];
+}
+
+- (CGFloat)currentAnimationStep
+{
+    if (_animationIndex < 0 || _animationIndex >= kAnimationSteps) {
+        return -1;
+    }
+        
+    switch(_animationType) {
+        case VLCExpandAnimationTypeLarge:
+            return [_largeHeightAnimationSteps[_animationIndex] floatValue];
+        case VLCExpandAnimationTypeDefault:
+        default:
+            return [_defaultHeightAnimationSteps[_animationIndex] floatValue];
+            break;
+    }
 }
 
 #pragma mark - Public methods
@@ -193,13 +215,13 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
-        _animationSteps = _largeHeightAnimationSteps;
+        _animationType = VLCExpandAnimationTypeLarge;
 
     } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
                [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
-        _animationSteps = _defaultHeightAnimationSteps;
+        _animationType = VLCExpandAnimationTypeDefault;
     }
     
     if(isLibrarySupplementaryView) {
@@ -213,7 +235,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame),
                                                 selectedItemFrameMaxY + kDetailViewMargin,
                                                 self.collectionViewContentSize.width - 20.0,
-                                                [_animationSteps[_animationIndex] floatValue]);
+                                                [self currentAnimationStep]);
 
         return detailViewAttributes;
     }
@@ -239,12 +261,12 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 # pragma mark - Calculation of displaced frame attributes
 
 - (NSRect)frameForDisplacedAttributes:(NSCollectionViewLayoutAttributes *)inAttributes {
-    if(inAttributes == nil || _animationSteps == NULL) {
+    if(inAttributes == nil) {
         return NSZeroRect;
     }
 
     NSRect attributesFrame = inAttributes.frame;
-
+    
     if (self.selectedIndexPath) {
         NSCollectionViewLayoutAttributes *selectedItemLayoutAttributes = [self layoutAttributesForItemAtIndexPath:_selectedIndexPath];
 
@@ -253,9 +275,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         }
 
         NSRect selectedItemFrame = selectedItemLayoutAttributes.frame;
-
+        
         if (NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
-            attributesFrame.origin.y += [_animationSteps[_animationIndex] floatValue] + kDetailViewMargin;
+            attributesFrame.origin.y += [self currentAnimationStep] + kDetailViewMargin;
         }
     }
 
