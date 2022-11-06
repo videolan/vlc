@@ -101,11 +101,7 @@ QT_CONFIG := -static -opensource -confirm-license $(QT_OPENGL) -no-pkg-config \
 	-no-feature-xml -no-compile-examples -nomake examples -nomake tests \
 	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib
 
-ifdef WITH_OPTIMIZATION
 QT_CONFIG += -release
-else
-QT_CONFIG += -debug
-endif
 
 ifeq ($(V),1)
 QT_CONFIG += -verbose
