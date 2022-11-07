@@ -61,6 +61,24 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     [self updateRepresentation];
 }
 
+- (NSString*)formattedYearAndDurationString
+{
+    if (_representedMediaItem.year > 0) {
+        return [NSString stringWithFormat:@"%u · %@", _representedMediaItem.year, _representedMediaItem.durationString];
+    } else if (_representedMediaItem.files.count > 0) {
+        VLCMediaLibraryFile *firstFile = _representedMediaItem.files.firstObject;
+        time_t fileLastModTime = firstFile.lastModificationDate;
+        
+        if (fileLastModTime > 0) {
+            NSDate *lastModDate = [NSDate dateWithTimeIntervalSince1970:fileLastModTime];
+            NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:lastModDate];
+            return [NSString stringWithFormat:@"%ld · %@", components.year, _representedMediaItem.durationString];
+        }
+    }
+    
+    return _representedMediaItem.durationString;
+}
+
 - (void)updateRepresentation
 {
     if (_representedMediaItem == nil) {
@@ -69,7 +87,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 
     _mediaItemTitleTextField.stringValue = _representedMediaItem.displayString;
-    _mediaItemYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", _representedMediaItem.year, _representedMediaItem.durationString];
+    _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
     _mediaItemFileNameTextField.stringValue = _representedMediaItem.inputItem.name;
     _mediaItemPathTextField.stringValue = _representedMediaItem.inputItem.decodedMRL;
     _mediaItemArtworkImageView.image = _representedMediaItem.smallArtworkImage;

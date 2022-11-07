@@ -123,6 +123,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _external = p_file->b_external;
         _removable = p_file->b_removable;
         _present = p_file->b_present;
+        _lastModificationDate = p_file->i_last_modification_date;
     }
     return self;
 }

@@ -49,6 +49,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) BOOL external;
 @property (readonly) BOOL removable;
 @property (readonly) BOOL present;
+@property (readonly) time_t lastModificationDate;
 
 @end
 
