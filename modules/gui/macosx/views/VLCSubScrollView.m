@@ -47,9 +47,9 @@
 
     // Sometimes scroll views initialise with the Y value being almost 0, but not quite (e.g. 0.000824)
     const BOOL isViewAtYStartAndScrollUp = self.verticalScroller.floatValue <= 0.01 && event.deltaY > 0;
-    const BOOL isViewAtYEndAndScrollDown = self.verticalScroller.floatValue >= 1. && event.deltaY < 0;
+    const BOOL isViewAtYEndAndScrollDown = self.verticalScroller.floatValue >= 0.99 && event.deltaY < 0;
     const BOOL isViewAtXStartAndScrollLeft = self.horizontalScroller.floatValue <= 0.01 && event.deltaX > 0;
-    const BOOL isViewAtXEndAndScrollRight = self.horizontalScroller.floatValue >= 1 && event.deltaX < 0;
+    const BOOL isViewAtXEndAndScrollRight = self.horizontalScroller.floatValue >= 0.99 && event.deltaX < 0;
 
     const BOOL isSubScrollViewScrollableY = self.documentView.frame.size.height > self.documentVisibleRect.size.height;
     const BOOL isSubScrollViewScrollableX = self.documentView.frame.size.width > self.documentVisibleRect.size.width;
