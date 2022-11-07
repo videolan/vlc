@@ -155,6 +155,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_cover_score = 0;
 
     es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_FLAC );
+    fmt.i_id = 0;
 
     /* We need to read and store the STREAMINFO metadata into fmt extra */
     if( ParseHeaders( p_demux, &fmt ) )
@@ -175,8 +176,7 @@ static int Open( vlc_object_t * p_this )
         vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
 
-    p_sys->p_packetizer->fmt_in.i_id = 0;
-    p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_in );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     if( !p_sys->p_es )
         goto error;
 
