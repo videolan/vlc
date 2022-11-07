@@ -1556,9 +1556,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (void)listOfMonitoredFoldersUpdated:(NSNotification *)aNotification
 {
-    NSLog(@"WEEEE");
     [self.libraryFolderTableView reloadData];
-    NSLog(@"%@", _libraryModel.listOfMonitoredFolders);
 }
 
 - (IBAction)addFolder:(id)sender
@@ -1599,7 +1597,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    NSLog(@"%@", _libraryModel.listOfMonitoredFolders);
     return _libraryModel.listOfMonitoredFolders.count;
 }
 
