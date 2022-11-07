@@ -72,7 +72,7 @@ QT_OPENGL := -opengl desktop
 endif
 
 ifdef HAVE_MACOSX
-QT_SPEC := darwin-g++
+QT_SPEC := macx-clang
 endif
 
 ifdef HAVE_WIN32
