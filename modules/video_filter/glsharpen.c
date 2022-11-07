@@ -228,8 +228,8 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "               + vlc_texture(tex_coords                + one_pixel_right).rgb\n"
         "               + vlc_texture(tex_coords + one_pixel_up + one_pixel_right).rgb\n"
         "               + vlc_texture(tex_coords + one_pixel_up                  ).rgb)\n"
-        "             + 8.f * color;\n"
-        "  gl_FragColor = vec4(clamp(color + sigma * pix, 0.f, 1.f), 1.f);\n"
+        "             + 8.0 * color;\n"
+        "  gl_FragColor = vec4(clamp(color + sigma * pix, 0.0, 1.0), 1.0);\n"
         "}\n";
 
     const char *shader_version;
