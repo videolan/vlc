@@ -75,6 +75,14 @@ ifdef HAVE_MACOSX
 QT_SPEC := macx-clang
 endif
 
+ifdef HAVE_LINUX
+ifdef HAVE_CLANG
+QT_SPEC := linux-clang
+else
+QT_SPEC := linux-g++
+endif
+endif
+
 ifdef HAVE_WIN32
 
 ifdef HAVE_CLANG
