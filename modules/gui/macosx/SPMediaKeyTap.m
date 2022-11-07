@@ -157,8 +157,13 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     static NSArray *bundleIdentifiers;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        NSString *ourIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+        if (ourIdentifier == nil) {
+            NSLog(@"SPMediaKeyTap: Bundle identifier unexpectedly nil, falling back to org.videolan.vlc");
+            ourIdentifier = @"org.videolan.vlc";
+        }
         bundleIdentifiers = @[
-            [[NSBundle mainBundle] bundleIdentifier], // your app
+            ourIdentifier, // your app
             @"com.spotify.client",
             @"com.apple.iTunes",
             @"com.apple.Music",
