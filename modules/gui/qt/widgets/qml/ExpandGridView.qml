@@ -121,6 +121,8 @@ FocusScope {
 
     Accessible.role: Accessible.Table
 
+    activeFocusOnTab: true
+
     // Events
 
     Component.onCompleted: flickable.layout(true)

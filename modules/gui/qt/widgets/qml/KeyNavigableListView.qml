@@ -73,6 +73,8 @@ FadingEdgeListView {
 
     focus: true
 
+    activeFocusOnTab: true
+
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
 
@@ -300,6 +302,8 @@ FadingEdgeListView {
         visible: (root.orientation === ListView.Horizontal && !(root.atXBeginning))
 
         onClicked: root.prevPage()
+
+        activeFocusOnTab: false
     }
 
     RoundButton {
@@ -313,5 +317,7 @@ FadingEdgeListView {
         visible: (root.orientation === ListView.Horizontal && !(root.atXEnd))
 
         onClicked: root.nextPage()
+
+        activeFocusOnTab: false
     }
 }

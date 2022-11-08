@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.11
 
@@ -157,6 +158,9 @@ FocusScope {
                     // navigation parent of control is always controlLayout
                     // so it can be set here unlike leftItem and rightItem:
                     item.Navigation.parentItem = controlLayout
+
+                    if (item instanceof Control || item instanceof T.Control)
+                        item.activeFocusOnTab = true
 
                     // FIXME: Do we really need to enforce a defaultSize ?
                     if (item.size !== undefined)

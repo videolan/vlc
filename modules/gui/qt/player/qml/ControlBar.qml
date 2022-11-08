@@ -188,6 +188,8 @@ Control {
         Navigation.parentItem: root
         Navigation.downItem: playerControlLayout
 
+        activeFocusOnTab: true
+
         Keys.onPressed: {
             Navigation.defaultKeyAction(event)
         }
