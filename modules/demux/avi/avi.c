@@ -46,8 +46,8 @@
 #include "libavi.h"
 #include "../rawdv.h"
 #include "bitmapinfoheader.h"
-#include "../packetizer/h264_nal.h"
-#include "../packetizer/hevc_nal.h"
+#include "../../packetizer/h264_nal.h"
+#include "../../packetizer/hevc_nal.h"
 
 /*****************************************************************************
  * Module descriptor
