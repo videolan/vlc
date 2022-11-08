@@ -119,6 +119,15 @@ static inline bool ps_is_H264( const uint8_t *p_data, size_t i_data )
     return false;
 }
 
+static inline bool ps_is_EAC3( const uint8_t *p_data, size_t i_data )
+{
+    /* AC-3 marking, see vlc_a52_header_Parse */
+    if( i_data < 8 || p_data[0] != 0x0b || p_data[1] != 0x77 )
+        return false;
+    int bsid = p_data[5] >> 3;
+    return bsid > 10 && bsid <= 16;
+}
+
 /* From id fill i_skip and es_format_t */
 static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
                                  int i_id,
@@ -147,16 +156,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
 
                 unsigned i_start = 9 + p_pkt[8];
                 if( i_start + 9 < i_pkt )
-                {
-                    /* AC-3 marking, see vlc_a52_header_Parse */
-                    if( p_pkt[i_start + 4] == 0x0b ||
-                        p_pkt[i_start + 5] == 0x77 )
-                    {
-                        int bsid = p_pkt[i_start + 9] >> 3;
-                        if( bsid > 10 )
-                            b_eac3 = true;
-                    }
-                }
+                    b_eac3 = ps_is_EAC3( &p_pkt[i_start + 4], i_pkt - i_start - 4 );
             }
 
             es_format_Change( &tk->fmt, AUDIO_ES, b_eac3 ? VLC_CODEC_EAC3 : VLC_CODEC_A52 );
@@ -165,6 +165,11 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
         else if( ( i_id&0xfc ) == 0x00 ) /* 0x00 -> 0x03 */
         {
             es_format_Change( &tk->fmt, SPU_ES, VLC_CODEC_CVD );
+        }
+        else if( ( i_id&0xff ) == 0x0b ) /* 0x0b */
+        {
+            bool b_eac3 = i_pkt > 8 && ps_is_EAC3( &p_pkt[9], i_pkt - 9 );
+            es_format_Change( &tk->fmt, AUDIO_ES, b_eac3 ? VLC_CODEC_EAC3 : VLC_CODEC_A52 );
         }
         else if( ( i_id&0xff ) == 0x10 ) /* 0x10 */
         {
