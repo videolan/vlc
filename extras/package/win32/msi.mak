@@ -4,10 +4,10 @@ BUILT_SOURCES_distclean += \
 endif
 
 WIXPATH=`wine winepath -u 'C:\\Program Files (x86)\\Windows Installer XML v3.5\\bin'`
-HEAT=wine "$(WIXPATH)/heat.exe"
+HEAT=$(MSIDIR)/msi-heat.py
 CANDLE=wine "$(WIXPATH)/candle.exe"
 LIGHT=wine "$(WIXPATH)/light.exe"
-VLCDIR=`wine winepath -s \`wine winepath -w '$(abs_top_builddir)/vlc-$(VERSION)'\``
+VLCDIR=$(abs_top_builddir)/vlc-$(VERSION)
 MSIDIR=$(abs_srcdir)/extras/package/win32/msi
 W_MSIDIR=`wine winepath -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
@@ -21,13 +21,13 @@ W_WINE_C=c:/v
 WINE_C=`wine winepath $(W_WINE_C)`
 
 heat: package-win-strip
-	$(HEAT) dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Plugins.fragment.wxs
-	$(HEAT) dir $(VLCDIR)/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Locale.fragment.wxs
+	$(HEAT) --dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Plugins.fragment.wxs
+	$(HEAT) --dir $(VLCDIR)/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Locale.fragment.wxs
 if BUILD_LUA
-	$(HEAT) dir $(VLCDIR)/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Lua.fragment.wxs
+	$(HEAT) --dir $(VLCDIR)/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Lua.fragment.wxs
 endif
 if BUILD_SKINS
-	$(HEAT) dir $(VLCDIR)/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Skins.fragment.wxs
+	$(HEAT) --dir $(VLCDIR)/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(MSIBUILDDIR)/Skins.fragment.wxs
 endif
 
 candle: heat
