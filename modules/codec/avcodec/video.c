@@ -601,11 +601,6 @@ int InitVideoDec( vlc_object_t *obj )
     p_dec->pf_decode = DecodeVideo;
     p_dec->pf_flush  = Flush;
 
-    /* XXX: Writing input format makes little sense. */
-    if( p_context->profile != FF_PROFILE_UNKNOWN )
-        p_dec->fmt_in.i_profile = p_context->profile;
-    if( p_context->level != FF_LEVEL_UNKNOWN )
-        p_dec->fmt_in.i_level = p_context->level;
     return VLC_SUCCESS;
 }
 

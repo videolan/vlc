@@ -264,12 +264,6 @@ int InitAudioDec( vlc_object_t *obj )
     p_dec->pf_decode = DecodeAudio;
     p_dec->pf_flush  = Flush;
 
-    /* XXX: Writing input format makes little sense. */
-    if( avctx->profile != FF_PROFILE_UNKNOWN )
-        p_dec->fmt_in.i_profile = avctx->profile;
-    if( avctx->level != FF_LEVEL_UNKNOWN )
-        p_dec->fmt_in.i_level = avctx->level;
-
     return VLC_SUCCESS;
 }
 
