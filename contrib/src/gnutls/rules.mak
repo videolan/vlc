@@ -87,6 +87,10 @@ endif
 .gnutls: gnutls
 	$(MAKEBUILDDIR)
 	$(GNUTLS_ENV) $(MAKECONFIGURE) $(GNUTLS_CONF)
+ifdef HAVE_DARWIN_OS
+	# Add missing frameworks to Libs.private for Darwin
+	cd $< && sed -i.orig -e s/"Libs.private:"/"Libs.private: -framework Security -framework CoreFoundation"/g $(BUILD_DIRUNPACK)/lib/gnutls.pc
+endif
 	$(call pkg_static,"$(BUILD_DIRUNPACK)/lib/gnutls.pc")
 	+$(MAKEBUILD) -C gl
 	+$(MAKEBUILD) -C lib
