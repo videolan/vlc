@@ -39,8 +39,8 @@
             Compressed='yes'
             Platform="$(var.Platform)" />
 
-        <Condition Message="This application is only supported on Windows XP or higher.">
-            <![CDATA[Installed OR (VersionNT >= 501)]]>
+        <Condition Message="This application is only supported on Windows 7 or higher.">
+            <![CDATA[Installed OR (VersionNT >= 601)]]>
         </Condition>
 
         <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
