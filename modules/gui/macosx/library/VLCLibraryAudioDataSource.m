@@ -42,7 +42,7 @@
 #import "views/VLCImageView.h"
 #import "views/VLCSubScrollView.h"
 
-@interface VLCLibraryAudioDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
+@interface VLCLibraryAudioDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSInteger _currentSelectedSegment;
