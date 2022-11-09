@@ -918,6 +918,14 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     return VLC_SUCCESS;
 }
 
+#if defined(HAVE_LIBPLACEBO_GL) && PL_API_VER >= 215
+static pl_voidfunc_t PlaceboGetProcAddr(void *opaque, const char *name)
+{
+    vlc_gl_t *gl = opaque;
+    return (pl_voidfunc_t)vlc_gl_GetProcAddress(gl, name);
+}
+#endif
+
 struct vlc_gl_sampler *
 vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
                    const struct vlc_gl_format *glfmt, bool expose_planes)
@@ -953,7 +961,21 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     priv->uloc.pl_descs = NULL;
     priv->pl_sh_res = NULL;
     priv->pl_log = vlc_placebo_CreateLog(VLC_OBJECT(gl));
-    priv->pl_opengl = pl_opengl_create(priv->pl_log, NULL);
+
+    const struct pl_opengl_params gl_params =
+    {
+        /* Libplacebo won't control whether the context is current or not.
+         * This is the default but we also want to ensure that the struct is
+         * properly initialized even if PL_API_VER < 215. */
+        .make_current = NULL,
+        .release_current = NULL,
+
+#if PL_API_VER >= 215
+        .get_proc_addr_ex = PlaceboGetProcAddr,
+        .proc_ctx = gl,
+#endif
+    };
+    priv->pl_opengl = pl_opengl_create(priv->pl_log, &gl_params);
     if (!priv->pl_opengl)
     {
         vlc_gl_sampler_Delete(sampler);
