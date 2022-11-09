@@ -189,6 +189,7 @@ static const char *const ts_standards_list_text[] =
 static_assert (MAX_SDT_DESC >= MAX_PMT, "MAX_SDT_DESC < MAX_PMT");
 
 #define BLOCK_FLAG_NO_KEYFRAME (1 << BLOCK_FLAG_PRIVATE_SHIFT) /* This is not a key frame for bitrate shaping */
+#define BLOCK_FLAG_FOR_PCR     (1 << (BLOCK_FLAG_PRIVATE_SHIFT+1))
 
 vlc_module_begin ()
     set_description( N_("TS muxer (libdvbpsi)") )
@@ -1719,7 +1720,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         p_ts->i_dts    = i_new_dts;
         p_ts->i_length = i_pcr_length / i_packet_count;
 
-        if( p_ts->i_flags & BLOCK_FLAG_CLOCK )
+        if( p_ts->i_flags & BLOCK_FLAG_FOR_PCR )
         {
             /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
             TSSetPCR( p_ts, p_ts->i_dts - p_sys->first_dts );
@@ -1787,7 +1788,7 @@ static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream,
         int i_stuffing = i_payload_max - i_payload;
         if( b_pcr )
         {
-            p_ts->i_flags |= BLOCK_FLAG_CLOCK;
+            p_ts->i_flags |= BLOCK_FLAG_FOR_PCR;
 
             p_ts->p_buffer[4] = 7 + i_stuffing;
             p_ts->p_buffer[5] = 1 << 4; /* PCR_flag */
