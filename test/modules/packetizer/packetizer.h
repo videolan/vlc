@@ -49,6 +49,11 @@ struct params_s
 #define EXPECT(foo) if(!(foo)) BAILOUT(run)
 
 
+struct packetizer_owner
+{
+    decoder_t   packetizer;
+};
+
 static void delete_packetizer(decoder_t *p_pack)
 {
     if(p_pack->p_module)
@@ -64,10 +69,11 @@ static decoder_t *create_packetizer(libvlc_instance_t *vlc,
                                     unsigned num, unsigned den,
                                     vlc_fourcc_t codec)
 {
-    decoder_t *p_pack = vlc_object_create(vlc->p_libvlc_int,
-                                          sizeof(*p_pack));
-    if(!p_pack)
+    struct packetizer_owner *owner;
+    owner = vlc_object_create(vlc->p_libvlc_int, sizeof(*owner));
+    if(!owner)
         return NULL;
+    decoder_t *p_pack = &owner->packetizer;
     p_pack->pf_decode = NULL;
     p_pack->pf_packetize = NULL;
 
