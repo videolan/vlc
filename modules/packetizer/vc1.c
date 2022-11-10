@@ -484,7 +484,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
          * TODO find a test case and valid it */
         if( p_frag->i_buffer > 8 && (p_frag->p_buffer[4]&0x80) == 0 ) /* for advanced profile, the first bit is 1 */
         {
-            video_format_t *p_v = &p_dec->fmt_in.video;
+            const video_format_t *p_v = &p_dec->fmt_in->video;
             const size_t i_potential_width  = GetWBE( &p_frag->p_buffer[4] );
             const size_t i_potential_height = GetWBE( &p_frag->p_buffer[6] );
 
