@@ -640,29 +640,25 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         
         _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
         [_libraryTargetView addSubview:_emptyLibraryView];
-        
         NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-    }
-    else {
+    } else {
         _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
         [_libraryTargetView addSubview:_audioLibraryView];
         NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
         
-        
-         if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+        if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
             _audioLibrarySplitView.hidden = YES;
             _audioCollectionViewScrollView.hidden = NO;
-            [_libraryAudioDataSource reloadAppearance];
         } else {
             _audioLibrarySplitView.hidden = NO;
             _audioCollectionViewScrollView.hidden = YES;
-            [_libraryAudioDataSource reloadAppearance];
-            [_audioCollectionSelectionTableView reloadData];
         }
+        
+        [_libraryAudioDataSource reloadAppearance];
     }
     
     _librarySortButton.hidden = NO;
