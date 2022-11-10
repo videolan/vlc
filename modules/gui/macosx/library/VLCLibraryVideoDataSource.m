@@ -28,11 +28,12 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryTableCellView.h"
 
 #import "main/CompatibilityFixes.h"
 #import "extensions/NSString+Helpers.h"
 
-@interface VLCLibraryVideoDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
+@interface VLCLibraryVideoDataSource ()
 {
     NSArray *_recentsArray;
     NSArray *_libraryArray;
@@ -77,10 +78,18 @@
         _recentsArray = [_libraryModel listOfRecentMedia];
         _libraryArray = [_libraryModel listOfVideoMedia];
         [_libraryMediaCollectionView reloadData];
+        [_groupsTableView reloadData];
+        [_groupSelectionTableView reloadData];
     });
 }
 
-- (void)setupAppearance
+- (void)setup
+{
+    [self setupCollectionView];
+    [self setupTableViews];
+}
+
+- (void)setupCollectionView
 {
     _libraryMediaCollectionView.dataSource = self;
     _libraryMediaCollectionView.delegate = self;
@@ -100,6 +109,19 @@
     _libraryMediaCollectionView.collectionViewLayout = _collectionViewFlowLayout;
 }
 
+- (void)setupTableViews
+{
+    _groupsTableView.dataSource = self;
+    _groupsTableView.delegate = self;
+    _groupsTableView.target = self;
+    
+    _groupSelectionTableView.dataSource = self;
+    _groupSelectionTableView.delegate = self;
+    _groupSelectionTableView.target = self;
+}
+
+#pragma mark - collection view data source and delegation
+
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
@@ -111,8 +133,10 @@
         case VLCVideoLibraryRecentsSection:
             return [_libraryModel numberOfRecentMedia];
         case VLCVideoLibraryLibrarySection:
-        default:
             return [_libraryModel numberOfVideoMedia];
+        default:
+            NSAssert(1, @"Reached unreachable case for video library section");
+            break;
     }
 }
 
@@ -131,8 +155,10 @@
             viewItem.representedItem = _recentsArray[indexPath.item];
             break;
         case VLCVideoLibraryLibrarySection:
-        default:
             viewItem.representedItem = _libraryArray[indexPath.item];
+            break;
+        default:
+            NSAssert(1, @"Reached unreachable case for video library section");
             break;
     }
 
@@ -173,8 +199,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                 sectionHeadingView.stringValue = _NS("Recent");
                 break;
             case VLCVideoLibraryLibrarySection:
-            default:
                 sectionHeadingView.stringValue = _NS("Library");
+                break;
+            default:
+                NSAssert(1, @"Reached unreachable case for video library section");
                 break;
         }
                 
@@ -188,8 +216,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                 mediaItemSupplementaryDetailView.representedMediaItem = _recentsArray[indexPath.item];
                 break;
             case VLCVideoLibraryLibrarySection:
-            default:
                 mediaItemSupplementaryDetailView.representedMediaItem = _libraryArray[indexPath.item];
+                break;
+            default:
+                NSAssert(1, @"Reached unreachable case for video library section");
                 break;
         }
         
@@ -233,6 +263,75 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
 
     return YES;
+}
+
+#pragma mark - table view data source and delegation
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (tableView == _groupsTableView) {
+        return 2;
+    } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
+        switch(_groupsTableView.selectedRow) {
+            case VLCVideoLibraryRecentsSection:
+                return _recentsArray.count;
+            case VLCVideoLibraryLibrarySection:
+                return _libraryArray.count;
+            default:
+                NSAssert(1, @"Reached unreachable case for video library section");
+                break;
+        }
+    }
+    
+    return 0;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:@"VLCVideoLibraryTableViewCellIdentifier" owner:self];
+    
+    if (!cellView) {
+        /* the following code saves us an instance of NSViewController which we don't need */
+        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
+        NSArray *topLevelObjects;
+        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
+            NSAssert(1, @"Failed to load nib file to show audio library items");
+            return nil;
+        }
+
+        for (id topLevelObject in topLevelObjects) {
+            if ([topLevelObject isKindOfClass:[VLCLibraryTableCellView class]]) {
+                cellView = topLevelObject;
+                break;
+            }
+        }
+        cellView.identifier = @"VLCVideoLibraryTableViewCellIdentifier";
+    }
+    
+    if (tableView == _groupsTableView) {
+        cellView.representedVideoLibrarySection = row;
+    } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
+        switch(_groupsTableView.selectedRow) {
+            case VLCVideoLibraryRecentsSection:
+                cellView.representedItem = _recentsArray[row];
+                break;
+            case VLCVideoLibraryLibrarySection:
+                cellView.representedItem = _libraryArray[row];
+                break;
+            default:
+                NSAssert(1, @"Reached unreachable case for video library section");
+                break;
+        }
+    }
+    
+    return cellView;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    if(notification.object == _groupsTableView) {
+        [_groupSelectionTableView reloadData];
+    }
 }
 
 @end

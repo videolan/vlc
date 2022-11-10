@@ -21,13 +21,16 @@
  *****************************************************************************/
 
 #import "VLCLibraryTableCellView.h"
+
 #import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryVideoDataSource.h"
 #import "playlist/VLCPlaylistController.h"
 
 @implementation VLCLibraryTableCellView
@@ -90,6 +93,26 @@
     self.trackingView.viewToHide = self.playInstantlyButton;
     self.playInstantlyButton.action = @selector(playInputItemInstantly:);
     self.playInstantlyButton.target = self;
+}
+
+- (void)setRepresentedVideoLibrarySection:(NSUInteger)section
+{
+    NSString *sectionString = @"";
+    switch(section) {
+        case VLCVideoLibraryRecentsSection:
+            sectionString = _NS("Recents");
+            break;
+        case VLCVideoLibraryLibrarySection:
+            sectionString = _NS("Library");
+            break;
+        default:
+            NSAssert(1, @"Reached unreachable case for video library section");
+            break;
+    }
+    
+    self.singlePrimaryTitleTextField.hidden = NO;
+    self.singlePrimaryTitleTextField.stringValue = sectionString;
+    self.representedImageView.image = [NSImage imageNamed: @"noart.png"];
 }
 
 - (NSImage *)imageForInputItem

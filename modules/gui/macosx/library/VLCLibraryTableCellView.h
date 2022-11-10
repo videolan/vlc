@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, strong, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
+@property (readwrite, nonatomic) NSUInteger representedVideoLibrarySection;
 
 @end
 

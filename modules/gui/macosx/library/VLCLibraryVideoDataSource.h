@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "VLCLibraryTableView.h"
+
 typedef NS_ENUM(NSUInteger, VLCVideoLibrarySection) {
     VLCVideoLibraryRecentsSection = 0,
     VLCVideoLibraryLibrarySection,
@@ -31,12 +33,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryVideoDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+@interface VLCLibraryVideoDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) NSCollectionView *libraryMediaCollectionView;
+@property (readwrite, assign) NSTableView *groupsTableView;
+@property (readwrite, assign) NSTableView *groupSelectionTableView;
 
-- (void)setupAppearance;
+- (void)setup;
 - (void)reloadData;
 
 @end

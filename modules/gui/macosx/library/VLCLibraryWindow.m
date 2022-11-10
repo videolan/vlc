@@ -285,7 +285,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = mainInstance.libraryController.libraryModel;
     _libraryVideoDataSource.libraryMediaCollectionView = _videoLibraryCollectionView;
-    [_libraryVideoDataSource setupAppearance];
+    _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
+    _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+    _videoLibraryGroupsTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
+    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
+    [_libraryVideoDataSource setup];
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
@@ -370,9 +374,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _audioGroupSelectionTableViewScrollView.contentInsets = audioScrollViewInsets;
     _audioGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
     
-    _videoLibraryScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryScrollView.contentInsets = defaultInsets;
-    _videoLibraryScrollView.scrollerInsets = scrollerInsets;
+    _videoLibraryCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryCollectionViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryCollectionViewScrollView.scrollerInsets = scrollerInsets;
 
     _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _mediaSourceCollectionViewScrollView.contentInsets = defaultInsets;
@@ -584,13 +588,20 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         
         _placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
         _placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
-    }
-    else {
+    } else {
         _videoLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
         [_libraryTargetView addSubview:_videoLibraryView];
         NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryView);
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+        
+        if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+            _videoLibrarySplitView.hidden = YES;
+            _videoLibraryCollectionViewScrollView.hidden = NO;
+        } else {
+            _videoLibrarySplitView.hidden = NO;
+            _videoLibraryCollectionViewScrollView.hidden = YES;
+        }
         
         [_libraryVideoDataSource reloadData];
     }

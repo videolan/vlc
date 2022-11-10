@@ -61,10 +61,15 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
-@property (readwrite, weak) IBOutlet NSView *videoLibraryView;
-@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryScrollView;
 @property (readwrite, strong) IBOutlet NSView *playlistView;
+@property (readwrite, weak) IBOutlet NSView *videoLibraryView;
+@property (readwrite, weak) IBOutlet NSSplitView *videoLibrarySplitView;
+@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet NSCollectionView *videoLibraryCollectionView;
+@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
+@property (readwrite, weak) IBOutlet NSTableView *videoLibraryGroupSelectionTableView;
+@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryGroupsTableViewScrollView;
+@property (readwrite, weak) IBOutlet NSTableView *videoLibraryGroupsTableView;
 @property (readwrite, weak) IBOutlet NSCollectionView *mediaSourceCollectionView;
 @property (readwrite, weak) IBOutlet NSView *audioLibraryView;
 @property (readwrite, weak) IBOutlet NSSplitView *audioLibrarySplitView;
