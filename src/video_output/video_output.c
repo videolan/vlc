@@ -2084,7 +2084,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     };
 
     // TODO: display?
-    sys->scheduler = vlc_vout_scheduler_New(&sys->obj, cfg->clock, sys->display, &cbs, vout);
+    sys->scheduler = vlc_vout_scheduler_NewVSYNC(&sys->obj, cfg->clock, sys->display, &cbs, vout);
 
     if (sys->scheduler == NULL)
     {

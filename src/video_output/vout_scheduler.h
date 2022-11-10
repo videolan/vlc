@@ -60,6 +60,12 @@ vlc_vout_scheduler_New(vout_thread_t *vout, vlc_clock_t *clock,
                        const struct vlc_vout_scheduler_callbacks *cbs,
                        void *owner);
 
+VLC_MALLOC VLC_USED struct vlc_vout_scheduler *
+vlc_vout_scheduler_NewVSYNC(vout_thread_t *vout, vlc_clock_t *clock,
+                       vout_display_t *display,
+                       const struct vlc_vout_scheduler_callbacks *cbs,
+                       void *owner);
+
 static inline void
 vlc_vout_scheduler_Destroy(struct vlc_vout_scheduler *scheduler)
 {
