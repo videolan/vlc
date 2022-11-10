@@ -351,11 +351,12 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
     }
 
     /* Image format */
+    es_format_t fmt_in = p_dec->fmt_in;
     if ( !memcmp(&p_block->p_buffer[4], "PNG", 3) ) {
-        p_dec->fmt_in.video.i_chroma = VLC_CODEC_PNG;
+        fmt_in.video.i_chroma = VLC_CODEC_PNG;
     }
     else if ( !memcmp(&p_block->p_buffer[4], "JPEG", 4) ) {
-        p_dec->fmt_in.video.i_chroma = VLC_CODEC_JPEG;
+        fmt_in.video.i_chroma = VLC_CODEC_JPEG;
     }
     else {
         char psz_image_type[8+1];
@@ -373,7 +374,7 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
     p_block->p_buffer += i_img_offset;
 
     p_pic = image_Read(p_sys->p_image, p_block,
-                       &p_dec->fmt_in,
+                       &fmt_in,
                        &p_dec->fmt_out.video);
     if (p_pic == NULL) {
         return NULL;
