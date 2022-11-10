@@ -474,7 +474,6 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     {
         es_format_t *p_es = &p_dec->fmt_out;
         bs_t s;
-        int i_profile;
 
         /* */
         if( p_sys->sh.p_sh )
@@ -513,10 +512,10 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         bs_init_custom( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4,
                         &hxxx_bsfw_ep3b_callbacks, &bsctx );
 
-        i_profile = bs_read( &s, 2 );
-        if( i_profile == 3 )
+        p_dec->fmt_out.i_profile = bs_read( &s, 2 );
+        if( p_dec->fmt_out.i_profile == 3 )
         {
-            const int i_level = bs_read( &s, 3 );
+            p_dec->fmt_out.i_level = bs_read( &s, 3 );
 
             /* Advanced profile */
             p_sys->sh.b_advanced_profile = true;
@@ -530,7 +529,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 
             if( !p_sys->b_sequence_header )
                 msg_Dbg( p_dec, "found sequence header for advanced profile level L%d resolution %dx%d",
-                         i_level, p_es->video.i_width, p_es->video.i_height);
+                         p_dec->fmt_out.i_level, p_es->video.i_width, p_es->video.i_height);
 
             bs_skip( &s, 1 );// pulldown
             p_sys->sh.b_interlaced = bs_read( &s, 1 );
@@ -632,7 +631,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
             p_sys->sh.b_interlaced = false;
 
             if( !p_sys->b_sequence_header )
-                msg_Dbg( p_dec, "found sequence header for %s profile", i_profile == 0 ? "simple" : "main" );
+                msg_Dbg( p_dec, "found sequence header for %s profile", p_dec->fmt_out.i_profile == 0 ? "simple" : "main" );
 
             bs_skip( &s, 2+3+5+1+1+     // reserved + frame rate Q + bit rate Q + loop filter + reserved
                          1+1+1+1+2+     // multiresolution + reserved + fast uv mc + extended mv + dquant
