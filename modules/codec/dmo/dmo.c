@@ -64,7 +64,7 @@ static block_t *EncodeBlock( encoder_t *, void * );
 static int  EncOpen  ( vlc_object_t * );
 
 static int LoadDMO( vlc_object_t *, HINSTANCE *, IMediaObject **,
-                    es_format_t *, bool );
+                    const es_format_t *, bool );
 static void CopyPicture( picture_t *, uint8_t * );
 
 vlc_module_begin ()
@@ -621,7 +621,7 @@ static int DecOpen( decoder_t *p_dec )
  * LoadDMO: Load the DMO object
  *****************************************************************************/
 static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
-                    IMediaObject **pp_dmo, es_format_t *p_fmt,
+                    IMediaObject **pp_dmo, const es_format_t *p_fmt,
                     bool b_out )
 {
     DMO_PARTIAL_MEDIATYPE dmo_partial_type;
