@@ -51,7 +51,7 @@
 #import "codec/vt_utils.h"
 #import "video_output/opengl/vout_helper.h"
 
-#define BUFFER_COUNT 3
+#define BUFFER_COUNT 5
 
 struct vlc_cvbuffer {
     CVPixelBufferRef cvpx;
