@@ -245,12 +245,12 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
     }
     p_sys->dec_dev = dec_dev;
 
-    if( !p_dec->fmt_in.video.i_visible_width )
-        p_dec->fmt_in.video.i_visible_width = p_dec->fmt_in.video.i_width;
-    if( !p_dec->fmt_in.video.i_visible_height )
-        p_dec->fmt_in.video.i_visible_height = p_dec->fmt_in.video.i_height;
-
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+
+    if( !p_dec->fmt_out.video.i_visible_width )
+        p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+    if( !p_dec->fmt_out.video.i_visible_height )
+        p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
     if( p_dec->fmt_out.video.i_frame_rate == 0 ||
         p_dec->fmt_out.video.i_frame_rate_base == 0)
