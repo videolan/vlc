@@ -92,12 +92,12 @@ static int OpenCommon( decoder_t *p_dec )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    if( !p_dec->fmt_in.video.i_visible_width )
-        p_dec->fmt_in.video.i_visible_width = p_dec->fmt_in.video.i_width;
-    if( !p_dec->fmt_in.video.i_visible_height )
-        p_dec->fmt_in.video.i_visible_height = p_dec->fmt_in.video.i_height;
-
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+
+    if( !p_dec->fmt_out.video.i_visible_width )
+        p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+    if( !p_dec->fmt_out.video.i_visible_height )
+        p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
     if( p_dec->fmt_in.i_codec == VLC_CODEC_YUV2 )
     {
