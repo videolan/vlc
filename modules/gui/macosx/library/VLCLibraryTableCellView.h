@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryTableCellView : NSTableCellView
 
++ (instancetype)fromNibWithOwner:(id)owner;
+
 @property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
 @property (readwrite, assign) IBOutlet NSTextField *singlePrimaryTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *secondaryTitleTextField;

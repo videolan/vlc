@@ -63,20 +63,7 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
     VLCLibrarySongTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibrarySongCellIdentifier owner:self];
 
     if (cellView == nil) {
-        /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibrarySongTableCellView" bundle:nil];
-        NSArray *topLevelObjects;
-        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
-            NSAssert(1, @"Failed to load nib file to show audio library items");
-            return nil;
-        }
-
-        for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCLibrarySongTableCellView class]]) {
-                cellView = topLevelObject;
-                break;
-            }
-        }
+        cellView = [VLCLibrarySongTableCellView fromNibWithOwner:self];
         cellView.identifier = VLCAudioLibrarySongCellIdentifier;
     }
 

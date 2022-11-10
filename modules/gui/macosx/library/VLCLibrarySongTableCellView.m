@@ -21,9 +21,11 @@
  *****************************************************************************/
 
 #import "VLCLibrarySongTableCellView.h"
+
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 #import "main/VLCMain.h"
@@ -41,6 +43,13 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 @end
 
 @implementation VLCLibrarySongTableCellView
+
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCLibrarySongTableCellView*)[NSView fromNibNamed:@"VLCLibrarySongTableCellView"
+                                                     withClass:[VLCLibrarySongTableCellView class]
+                                                     withOwner:owner];
+}
 
 - (void)awakeFromNib
 {

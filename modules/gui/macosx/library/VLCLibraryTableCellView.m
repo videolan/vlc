@@ -24,6 +24,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 #import "main/VLCMain.h"
@@ -34,6 +35,13 @@
 #import "playlist/VLCPlaylistController.h"
 
 @implementation VLCLibraryTableCellView
+
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCLibraryTableCellView*)[NSView fromNibNamed:@"VLCLibraryTableCellView"
+                                                withClass:[VLCLibraryTableCellView class]
+                                                withOwner:owner];
+}
 
 - (void)awakeFromNib
 {

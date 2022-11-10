@@ -21,9 +21,11 @@
  *****************************************************************************/
 
 #import "VLCLibraryAlbumTableCellView.h"
+
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 #import "main/VLCMain.h"
@@ -53,6 +55,13 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
 @end
 
 @implementation VLCLibraryAlbumTableCellView
+
++ (instancetype)fromNibWithOwner:(id)owner
+{
+    return (VLCLibraryAlbumTableCellView*)[NSView fromNibNamed:@"VLCLibraryAlbumTableCellView"
+                                                     withClass:[VLCLibraryAlbumTableCellView class]
+                                                     withOwner:owner];
+}
 
 + (CGFloat)defaultHeight
 {

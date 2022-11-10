@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSView (VLCAdditions)
 
++ (instancetype)fromNibNamed:(NSString *)nibName withClass:(Class)viewClass withOwner:(id)owner;
+
 @property (readonly) BOOL shouldShowDarkAppearance;
 
 - (void)enableSubviews:(BOOL)enabled;

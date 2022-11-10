@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *VLCAudioLibrarySongCellIdentifier;
 
++ (instancetype)fromNibWithOwner:(id)owner;
+
 @property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
 @property (readwrite, assign) IBOutlet NSTextField *songNameTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;

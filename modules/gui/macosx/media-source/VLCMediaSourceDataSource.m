@@ -112,20 +112,7 @@
     VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:@"VLCMediaSourceTableViewCellIdentifier" owner:self];
 
     if (cellView == nil) {
-        /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryTableCellView" bundle:nil];
-        NSArray *topLevelObjects;
-        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
-            NSAssert(1, @"Failed to load nib file to show audio library items");
-            return nil;
-        }
-
-        for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCLibraryTableCellView class]]) {
-                cellView = topLevelObject;
-                break;
-            }
-        }
+        cellView = [VLCLibraryTableCellView fromNibWithOwner:self];
         cellView.identifier = @"VLCMediaSourceTableViewCellIdentifier";
     }
 

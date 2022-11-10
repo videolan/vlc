@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *VLCAudioLibraryCellIdentifier;
 extern NSString *VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 
++ (instancetype)fromNibWithOwner:(id)owner;
 + (CGFloat)defaultHeight;
 
 @property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;

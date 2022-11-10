@@ -27,6 +27,26 @@
 
 @implementation NSView (VLCAdditions)
 
++ (instancetype)fromNibNamed:(NSString *)nibName withClass:(Class)viewClass withOwner:(id)owner
+{
+    /* the following code saves us an instance of NSViewController which we don't need */
+    NSNib *nib = [[NSNib alloc] initWithNibNamed:nibName bundle:nil];
+    NSArray *topLevelObjects;
+    if (![nib instantiateWithOwner:owner topLevelObjects:&topLevelObjects]) {
+        NSAssert(1, @"Failed to load nib file to show view");
+        return nil;
+    }
+
+    for (id topLevelObject in topLevelObjects) {
+        if ([topLevelObject isKindOfClass:viewClass]) {
+            return topLevelObject;
+            break;
+        }
+    }
+
+    return nil;
+}
+
 - (BOOL)shouldShowDarkAppearance
 {
     if (@available(macOS 10.14, *)) {
