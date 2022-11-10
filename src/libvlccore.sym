@@ -1044,3 +1044,4 @@ vlc_gl_WrapOpenGLFilter
 vlc_gl_importer_New
 vlc_gl_importer_Delete
 vlc_gl_importer_Update
+vlc_sampler_yuv2rgb_matrix

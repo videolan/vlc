@@ -735,10 +735,10 @@ static const float MATRIX_BT601[3*3] = MATRIX_YUV_TO_RGB(0.299, 0.114);
 static const float MATRIX_BT709[3*3] = MATRIX_YUV_TO_RGB(0.2126, 0.0722);
 static const float MATRIX_BT2020[3*3] = MATRIX_YUV_TO_RGB(0.2627, 0.0593);
 
-static void
-init_conv_matrix(float conv_matrix_out[],
-                 video_color_space_t color_space,
-                 video_color_range_t color_range)
+void
+vlc_sampler_yuv2rgb_matrix(float conv_matrix_out[],
+                           video_color_space_t color_space,
+                           video_color_range_t color_range)
 {
     const float *space_matrix;
     switch (color_space) {
@@ -793,7 +793,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
     float *matrix = priv->conv_matrix;
-    init_conv_matrix(matrix, yuv_space, range);
+    vlc_sampler_yuv2rgb_matrix(matrix, yuv_space, range);
 
     if (desc->pixel_size == 2)
     {

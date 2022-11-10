@@ -366,12 +366,14 @@ static const char * const  ppsz_deinterlace_text[] = {
 static const char * const ppsz_deinterlace_mode[] = {
     "auto", "discard", "blend", "mean", "bob",
     "linear", "x", "yadif", "yadif2x", "phosphor",
-    "ivtc"
+    "ivtc",
+    "gl_bwdif", "gl_bwdif2x",
 };
 static const char * const ppsz_deinterlace_mode_text[] = {
     N_("Auto"), N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
     N_("Linear"), "X", "Yadif", "Yadif (2x)", N_("Phosphor"),
-    N_("Film NTSC (IVTC)")
+    N_("Film NTSC (IVTC)"),
+    N_("OpenGL Bwdif"), N_("OpenGL Bwdif (2x)"),
 };
 
 #define DEINTERLACE_FILTER_TEXT N_("Deinterlace filter")
