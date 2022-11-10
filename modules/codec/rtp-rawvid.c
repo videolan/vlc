@@ -763,15 +763,15 @@ static const struct vlc_rtp_video_raw_samplings samplings = {
 static int Open(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t *)obj;
-    const char *sname = dec->fmt_in.p_extra;
+    const char *sname = dec->p_fmt_in->p_extra;
 
-    if (dec->fmt_in.i_codec != VLC_CODEC_RTP_VIDEO_RAW)
+    if (dec->p_fmt_in->i_codec != VLC_CODEC_RTP_VIDEO_RAW)
         return VLC_ENOTSUP;
-    if (dec->fmt_in.i_extra <= 0 || sname[dec->fmt_in.i_extra - 1] != '\0')
+    if (dec->p_fmt_in->i_extra <= 0 || sname[dec->p_fmt_in->i_extra - 1] != '\0')
         return VLC_EINVAL;
 
     /* Sampling is supplied as extra data, bit depth as level */
-    unsigned int depth = dec->fmt_in.i_level;
+    unsigned int depth = dec->p_fmt_in->i_level;
     const struct vlc_rtp_video_raw_sampling *sampling;
     unsigned int spmp; /* samples per macropixel */
     bool half_height_uv = false;
@@ -836,7 +836,7 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    es_format_Copy(&dec->fmt_out, &dec->fmt_in);
+    es_format_Copy(&dec->fmt_out, dec->p_fmt_in);
     dec->fmt_out.i_codec = format->fourcc;
     dec->fmt_out.video.i_chroma = format->fourcc;
 

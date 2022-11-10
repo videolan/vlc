@@ -234,7 +234,7 @@ static int Open(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t *)obj;
 
-    if (dec->fmt_in.i_codec != VLC_CODEC_CAVS2)
+    if (dec->p_fmt_in->i_codec != VLC_CODEC_CAVS2)
         return VLC_EGENERIC;
 
     davs2_param_t params = {

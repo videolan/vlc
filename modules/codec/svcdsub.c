@@ -109,7 +109,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_OGT )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_OGT )
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = calloc( 1, sizeof( decoder_sys_t ) );

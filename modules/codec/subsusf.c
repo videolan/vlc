@@ -117,7 +117,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_USF )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_USF )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -139,7 +139,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( var_CreateGetBool( p_dec, "subsdec-formatted" ) )
     {
-        if( p_dec->fmt_in.i_extra > 0 )
+        if( p_dec->p_fmt_in->i_extra > 0 )
             ParseUSFHeader( p_dec );
     }
 
@@ -961,8 +961,8 @@ static void ParseUSFHeader( decoder_t *p_dec )
     xml_reader_t  *p_xml_reader = NULL;
 
     p_sub = vlc_stream_MemoryNew( VLC_OBJECT(p_dec),
-                              p_dec->fmt_in.p_extra,
-                              p_dec->fmt_in.i_extra,
+                              p_dec->p_fmt_in->p_extra,
+                              p_dec->p_fmt_in->i_extra,
                               true );
     if( !p_sub )
         return;

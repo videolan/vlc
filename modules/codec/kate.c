@@ -321,7 +321,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_KATE )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_KATE )
     {
         return VLC_EGENERIC;
     }
@@ -529,7 +529,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
-                           p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra) )
+                           p_dec->p_fmt_in->i_extra, p_dec->p_fmt_in->p_extra) )
         return VLC_EGENERIC;
 
     if( i_count < 1 )
@@ -587,15 +587,15 @@ static int ProcessHeaders( decoder_t *p_dec )
     else
     {
         void* p_extra = realloc( p_dec->fmt_out.p_extra,
-                                 p_dec->fmt_in.i_extra );
+                                 p_dec->p_fmt_in->i_extra );
         if( unlikely( p_extra == NULL ) )
         {
             return VLC_ENOMEM;
         }
         p_dec->fmt_out.p_extra = p_extra;
-        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
+        p_dec->fmt_out.i_extra = p_dec->p_fmt_in->i_extra;
         memcpy( p_dec->fmt_out.p_extra,
-                p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
+                p_dec->p_fmt_in->p_extra, p_dec->fmt_out.i_extra );
     }
 #endif
 

@@ -238,7 +238,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if (p_dec->fmt_in.i_codec != VLC_CODEC_MP4A)
+    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_MP4A)
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -269,7 +269,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
      *          The demuxer needs to set original_codec for hardwiring
      */
 
-    switch (p_dec->fmt_in.i_original_fourcc)
+    switch (p_dec->p_fmt_in->i_original_fourcc)
     {
         case VLC_FOURCC('L','A','T','M'):
             p_sys->i_type = TYPE_LOAS;
@@ -294,13 +294,13 @@ static int OpenPacketizer(vlc_object_t *p_this)
        and LATM can be sent with out-of-band audioconfig,
        (avformat sets m4a extradata in both cases)
        so we can't rely on extradata to guess multiplexing */
-    p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
+    p_dec->fmt_out.audio.i_rate = p_dec->p_fmt_in->audio.i_rate;
 
-    if(p_dec->fmt_in.i_extra)
+    if(p_dec->p_fmt_in->i_extra)
     {
         mpeg4_asc_t asc;
         bs_t s;
-        bs_init(&s, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+        bs_init(&s, p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra);
         if(Mpeg4ReadAudioSpecificConfig(&s, &asc, true) == VLC_SUCCESS)
         {
             p_dec->fmt_out.audio.i_rate = asc.i_samplerate;
@@ -318,12 +318,12 @@ static int OpenPacketizer(vlc_object_t *p_this)
                     p_dec->fmt_out.audio.i_frame_length);
         }
 
-        p_dec->fmt_out.p_extra = malloc(p_dec->fmt_in.i_extra);
+        p_dec->fmt_out.p_extra = malloc(p_dec->p_fmt_in->i_extra);
         if (!p_dec->fmt_out.p_extra)
             return VLC_ENOMEM;
-        p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        memcpy(p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
-                p_dec->fmt_in.i_extra);
+        p_dec->fmt_out.i_extra = p_dec->p_fmt_in->i_extra;
+        memcpy(p_dec->fmt_out.p_extra, p_dec->p_fmt_in->p_extra,
+                p_dec->p_fmt_in->i_extra);
     }
     /* else() We will try to create a AAC Config from adts/loas */
 
@@ -979,7 +979,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
     if (!p_sys->b_latm_cfg)
     {
         /* WAVE_FORMAT_MPEG_LOAS, configuration provided as AAC header :/ */
-        if( p_dec->fmt_in.i_extra > 0 &&
+        if( p_dec->p_fmt_in->i_extra > 0 &&
             p_sys->i_channels && p_sys->i_rate && p_sys->i_frame_length )
         {
             p_sys->b_latm_cfg = true;

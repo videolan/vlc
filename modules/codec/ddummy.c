@@ -109,7 +109,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     /* Set callbacks */
     p_dec->pf_decode = DecodeBlock;
 
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
 
     return VLC_SUCCESS;
 }

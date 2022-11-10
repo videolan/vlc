@@ -93,8 +93,8 @@ static int Decode (decoder_t *dec, block_t *block)
     video_format_Setup(&dec->fmt_out.video, chroma,
                        ntohl(hdr->pixmap_width), ntohl(hdr->pixmap_height),
                        ntohl(hdr->pixmap_width), ntohl(hdr->pixmap_height),
-                       dec->fmt_in.video.i_sar_num,
-                       dec->fmt_in.video.i_sar_den);
+                       dec->p_fmt_in->video.i_sar_num,
+                       dec->p_fmt_in->video.i_sar_den);
 
     const size_t copy = dec->fmt_out.video.i_width
                         * (dec->fmt_out.video.i_bits_per_pixel / 8);
@@ -132,11 +132,11 @@ static int Open(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t *)obj;
 
-    if (dec->fmt_in.i_codec != VLC_CODEC_XWD)
+    if (dec->p_fmt_in->i_codec != VLC_CODEC_XWD)
         return VLC_EGENERIC;
 
     dec->pf_decode = Decode;
-    es_format_Copy(&dec->fmt_out, &dec->fmt_in);
+    es_format_Copy(&dec->fmt_out, dec->p_fmt_in);
     dec->fmt_out.i_codec = VLC_CODEC_RGB32;
     return VLC_SUCCESS;
 }

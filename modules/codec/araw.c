@@ -99,9 +99,9 @@ static void DAT12Decode( void *, const uint8_t *, unsigned );
 static int DecoderOpen( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
-    vlc_fourcc_t format = p_dec->fmt_in.i_codec;
+    vlc_fourcc_t format = p_dec->p_fmt_in->i_codec;
 
-    switch( p_dec->fmt_in.i_codec )
+    switch( p_dec->p_fmt_in->i_codec )
     {
     case VLC_FOURCC('a','r','a','w'):
     case VLC_FOURCC('a','f','l','t'):
@@ -110,8 +110,8 @@ static int DecoderOpen( vlc_object_t *p_this )
     /* _signed_ little endian samples (mov) */
     case VLC_FOURCC('s','o','w','t'):
         format =
-            vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
-                                      p_dec->fmt_in.audio.i_bitspersample );
+            vlc_fourcc_GetCodecAudio( p_dec->p_fmt_in->i_codec,
+                                      p_dec->p_fmt_in->audio.i_bitspersample );
         if( !format )
         {
             msg_Err( p_dec, "bad parameters(bits/sample)" );
@@ -236,23 +236,23 @@ static int DecoderOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.audio.i_channels == 0 ||
-        p_dec->fmt_in.audio.i_channels > INPUT_CHAN_MAX )
+    if( p_dec->p_fmt_in->audio.i_channels == 0 ||
+        p_dec->p_fmt_in->audio.i_channels > INPUT_CHAN_MAX )
     {
         msg_Err( p_dec, "bad channels count (1-%i): %i",
-                 AOUT_CHAN_MAX, p_dec->fmt_in.audio.i_channels );
+                 AOUT_CHAN_MAX, p_dec->p_fmt_in->audio.i_channels );
         return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.audio.i_rate == 0 || p_dec->fmt_in.audio.i_rate > 384000 )
+    if( p_dec->p_fmt_in->audio.i_rate == 0 || p_dec->p_fmt_in->audio.i_rate > 384000 )
     {
-        msg_Err( p_dec, "bad samplerate: %d Hz", p_dec->fmt_in.audio.i_rate );
+        msg_Err( p_dec, "bad samplerate: %d Hz", p_dec->p_fmt_in->audio.i_rate );
         return VLC_EGENERIC;
     }
 
     msg_Dbg( p_dec, "samplerate:%dHz channels:%d bits/sample:%d",
-             p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
-             p_dec->fmt_in.audio.i_bitspersample );
+             p_dec->p_fmt_in->audio.i_rate, p_dec->p_fmt_in->audio.i_channels,
+             p_dec->p_fmt_in->audio.i_bitspersample );
 
     /* Allocate the memory needed to store the decoder's structure */
     decoder_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof(*p_sys));
@@ -261,22 +261,22 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = format;
-    p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
+    p_dec->fmt_out.audio.channel_type = p_dec->p_fmt_in->audio.channel_type;
     p_dec->fmt_out.audio.i_format = format;
-    p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
-    if( p_dec->fmt_in.audio.i_channels < ARRAY_SIZE(vlc_chan_maps) )
+    p_dec->fmt_out.audio.i_rate = p_dec->p_fmt_in->audio.i_rate;
+    if( p_dec->p_fmt_in->audio.i_channels < ARRAY_SIZE(vlc_chan_maps) )
     {
-        if( p_dec->fmt_in.audio.i_physical_channels )
+        if( p_dec->p_fmt_in->audio.i_physical_channels )
             p_dec->fmt_out.audio.i_physical_channels =
-                                           p_dec->fmt_in.audio.i_physical_channels;
+                                           p_dec->p_fmt_in->audio.i_physical_channels;
         else
             p_dec->fmt_out.audio.i_physical_channels =
-                vlc_chan_maps[p_dec->fmt_in.audio.i_channels];
+                vlc_chan_maps[p_dec->p_fmt_in->audio.i_channels];
     }
     else
     {
         /* Unknown channel map, let the aout/filters decide what to do */
-        p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
+        p_dec->fmt_out.audio.i_channels = p_dec->p_fmt_in->audio.i_channels;
         p_dec->fmt_out.audio.i_physical_channels = 0;
     }
     aout_FormatPrepare( &p_dec->fmt_out.audio );
@@ -344,7 +344,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             goto skip;
 
         p_sys->decode( p_out->p_buffer, p_block->p_buffer,
-                       samples * p_dec->fmt_in.audio.i_channels );
+                       samples * p_dec->p_fmt_in->audio.i_channels );
         block_Release( p_block );
         p_block = p_out;
     }

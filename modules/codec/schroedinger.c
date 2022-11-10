@@ -556,7 +556,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     SchroDecoder *p_schro;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_DIRAC )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_DIRAC )
     {
         return VLC_EGENERIC;
     }

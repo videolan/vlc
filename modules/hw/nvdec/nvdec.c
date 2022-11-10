@@ -284,7 +284,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
     }
 
     int i_nb_surface;
-    switch (p_dec->fmt_in.i_codec) {
+    switch (p_dec->p_fmt_in->i_codec) {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
         case VLC_CODEC_VC1:
@@ -650,8 +650,8 @@ static block_t * ProcessVC1Block(decoder_t *p_dec, block_t *p_block)
     nvdec_ctx_t *p_sys = p_dec->p_sys;
     if (!p_sys->b_xps_pushed)
     {
-        uint8_t *p_extra = p_dec->fmt_in.p_extra;
-        CuvidPushRawBlock(p_dec, &p_extra[p_sys->vc1_header_offset], p_dec->fmt_in.i_extra - p_sys->vc1_header_offset);
+        uint8_t *p_extra = p_dec->p_fmt_in->p_extra;
+        CuvidPushRawBlock(p_dec, &p_extra[p_sys->vc1_header_offset], p_dec->p_fmt_in->i_extra - p_sys->vc1_header_offset);
         p_sys->b_xps_pushed = true;
     }
 
@@ -741,7 +741,7 @@ static int ProbeDecoder(decoder_t *p_dec, uint8_t bitDepth, cudaVideoChromaForma
     if (unlikely(result != VLC_SUCCESS))
         return result;
 
-    p_sys->selectedDecoder.eCodecType         = MapCodecID(p_dec->fmt_in.i_codec);
+    p_sys->selectedDecoder.eCodecType         = MapCodecID(p_dec->p_fmt_in->i_codec);
     p_sys->selectedDecoder.eChromaFormat      = chroma;
     p_sys->selectedDecoder.nBitDepthMinus8    = bitDepth - 8;
 
@@ -774,14 +774,14 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     p_dec->p_sys = p_sys;
 
-    switch (p_dec->fmt_in.i_codec) {
+    switch (p_dec->p_fmt_in->i_codec) {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
             p_sys->b_is_hxxx = true;
             hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
-                             p_dec->fmt_in.i_codec, 0, 0);
-            result = hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
-                                           p_dec->fmt_in.i_extra);
+                             p_dec->p_fmt_in->i_codec, 0, 0);
+            result = hxxx_helper_set_extra(&p_sys->hh, p_dec->p_fmt_in->p_extra,
+                                           p_dec->p_fmt_in->i_extra);
             if (result != VLC_SUCCESS) {
                 hxxx_helper_clean(&p_sys->hh);
                 goto early_exit;
@@ -790,18 +790,18 @@ static int OpenDecoder(vlc_object_t *p_this)
             break;
         case VLC_CODEC_VC1:
         case VLC_CODEC_WMV3:
-            if (p_dec->fmt_in.i_extra >= 4)
+            if (p_dec->p_fmt_in->i_extra >= 4)
             {
-                uint8_t *p_extra = p_dec->fmt_in.p_extra;
+                uint8_t *p_extra = p_dec->p_fmt_in->p_extra;
                 /* Initialisation data starts with : 0x00 0x00 0x01 0x0f */
                 /* Skipping unnecessary data */
                 static const uint8_t vc1_start_code[4] = {0x00, 0x00, 0x01, 0x0f};
-                for (; p_sys->vc1_header_offset < p_dec->fmt_in.i_extra - 4 ; ++p_sys->vc1_header_offset)
+                for (; p_sys->vc1_header_offset < p_dec->p_fmt_in->i_extra - 4 ; ++p_sys->vc1_header_offset)
                 {
                     if (!memcmp(&p_extra[p_sys->vc1_header_offset], vc1_start_code, 4))
                         break;
                 }
-                if (p_sys->vc1_header_offset < p_dec->fmt_in.i_extra - 4)
+                if (p_sys->vc1_header_offset < p_dec->p_fmt_in->i_extra - 4)
                 {
                     p_sys->process_block = ProcessVC1Block;
                     break;
@@ -815,9 +815,9 @@ static int OpenDecoder(vlc_object_t *p_this)
         case VLC_CODEC_VP8:
             break;
         case VLC_CODEC_VP9:
-            if (p_dec->fmt_in.i_profile != 0 && p_dec->fmt_in.i_profile != 2)
+            if (p_dec->p_fmt_in->i_profile != 0 && p_dec->p_fmt_in->i_profile != 2)
             {
-                msg_Warn(p_dec, "Unsupported VP9 profile %d", p_dec->fmt_in.i_profile);
+                msg_Warn(p_dec, "Unsupported VP9 profile %d", p_dec->p_fmt_in->i_profile);
                 goto early_exit;
             }
             break;
@@ -854,7 +854,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         goto error;
 
     CUVIDPARSERPARAMS pparams = {
-        .CodecType               = MapCodecID(p_dec->fmt_in.i_codec),
+        .CodecType               = MapCodecID(p_dec->p_fmt_in->i_codec),
         .ulClockRate             = CLOCK_FREQ,
         .ulMaxDisplayDelay       = NVDEC_DISPLAY_SURFACES,
         .ulMaxNumDecodeSurfaces  = 1,
@@ -889,7 +889,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         if (result != VLC_SUCCESS)
             goto error;
 
-        if(p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
+        if(p_dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
         {
             video_color_primaries_t primaries;
             video_transfer_func_t transfer;
@@ -911,7 +911,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         p_dec->fmt_out.video.i_width = vlc_align(i_w, OUTPUT_WIDTH_ALIGN);
         p_dec->fmt_out.video.i_height = i_h;
 
-        if (!p_dec->fmt_in.video.i_visible_width || !p_dec->fmt_in.video.i_visible_height)
+        if (!p_dec->p_fmt_in->video.i_visible_width || !p_dec->p_fmt_in->video.i_visible_height)
         {
             p_dec->fmt_out.video.i_visible_width = i_vw;
             p_dec->fmt_out.video.i_visible_height = i_vh;
@@ -925,13 +925,13 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
     else
     {
-        p_dec->fmt_out.video.i_width = vlc_align(p_dec->fmt_in.video.i_width, OUTPUT_WIDTH_ALIGN);
-        p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
+        p_dec->fmt_out.video.i_width = vlc_align(p_dec->p_fmt_in->video.i_width, OUTPUT_WIDTH_ALIGN);
+        p_dec->fmt_out.video.i_height = p_dec->p_fmt_in->video.i_height;
         cudaChroma = cudaVideoChromaFormat_420;
         i_depth_luma = 8;
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_VP9)
+        if (p_dec->p_fmt_in->i_codec == VLC_CODEC_VP9)
         {
-            switch (p_dec->fmt_in.i_profile)
+            switch (p_dec->p_fmt_in->i_profile)
             {
                 case 0: // 8 bits 4:2:0
                     i_depth_luma = 8;
@@ -949,10 +949,10 @@ static int OpenDecoder(vlc_object_t *p_this)
             }
         }
     }
-    if (p_dec->fmt_in.video.i_sar_den != 0)
+    if (p_dec->p_fmt_in->video.i_sar_den != 0)
     {
-        i_sar_num = p_dec->fmt_in.video.i_sar_num;
-        i_sar_den = p_dec->fmt_in.video.i_sar_den;
+        i_sar_num = p_dec->p_fmt_in->video.i_sar_num;
+        i_sar_den = p_dec->p_fmt_in->video.i_sar_den;
     }
     if (i_sar_den == 0)
     {
@@ -964,8 +964,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.video.i_sar_den = i_sar_den;
 #undef ALIGN
     p_dec->fmt_out.video.i_bits_per_pixel = i_depth_luma;
-    p_dec->fmt_out.video.i_frame_rate = p_dec->fmt_in.video.i_frame_rate;
-    p_dec->fmt_out.video.i_frame_rate_base = p_dec->fmt_in.video.i_frame_rate_base;
+    p_dec->fmt_out.video.i_frame_rate = p_dec->p_fmt_in->video.i_frame_rate;
+    p_dec->fmt_out.video.i_frame_rate_base = p_dec->p_fmt_in->video.i_frame_rate_base;
 
     result = ProbeDecoder(p_dec, i_depth_luma, cudaChroma);
     if (result != VLC_SUCCESS)

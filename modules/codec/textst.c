@@ -261,7 +261,7 @@ static int Open(vlc_object_t *object)
 {
     decoder_t *p_dec = (decoder_t*)object;
 
-    if (p_dec->fmt_in.i_codec != VLC_CODEC_BD_TEXT)
+    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_BD_TEXT)
         return VLC_EGENERIC;
 
     decoder_sys_t *p_sys = vlc_obj_malloc(object, sizeof(decoder_sys_t));

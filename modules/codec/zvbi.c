@@ -202,7 +202,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys = NULL;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_TELETEXT )
         return VLC_EGENERIC;
 
     int i_page = var_CreateGetInteger( p_dec, "vbi-page" );
@@ -234,7 +234,7 @@ static int Open( vlc_object_t *p_this )
      * is known. It would be better if people started sending G0 */
     for( int i = 0; ppsz_default_triplet[i] != NULL; i++ )
     {
-        if( p_dec->fmt_in.psz_language && !strcasecmp( p_dec->fmt_in.psz_language, ppsz_default_triplet[i] ) )
+        if( p_dec->p_fmt_in->psz_language && !strcasecmp( p_dec->p_fmt_in->psz_language, ppsz_default_triplet[i] ) )
         {
             vbi_teletext_set_default_region( p_sys->p_vbi_dec, pi_default_triplet[i]);
             msg_Dbg( p_dec, "overwriting default zvbi region: %d", pi_default_triplet[i] );
@@ -253,10 +253,10 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_dec, "vbi-page", RequestPage, p_sys );
 
     /* Check if the Teletext track has a known "initial page". */
-    if( p_sys->i_wanted_page == 100 && p_dec->fmt_in.subs.teletext.i_magazine < 9 )
+    if( p_sys->i_wanted_page == 100 && p_dec->p_fmt_in->subs.teletext.i_magazine < 9 )
     {
-        p_sys->i_wanted_page = 100 * p_dec->fmt_in.subs.teletext.i_magazine +
-                               vbi_bcd2dec( p_dec->fmt_in.subs.teletext.i_page );
+        p_sys->i_wanted_page = 100 * p_dec->p_fmt_in->subs.teletext.i_magazine +
+                               vbi_bcd2dec( p_dec->p_fmt_in->subs.teletext.i_page );
         var_SetInteger( p_dec, "vbi-page", p_sys->i_wanted_page );
     }
     p_sys->i_wanted_subpage = VBI_ANY_SUBNO;

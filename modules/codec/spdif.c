@@ -50,7 +50,7 @@ OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    switch (p_dec->fmt_in.i_codec)
+    switch (p_dec->p_fmt_in->i_codec)
     {
     case VLC_CODEC_MPGA:
     case VLC_CODEC_MP3:
@@ -72,9 +72,9 @@ OpenDecoder(vlc_object_t *p_this)
     }
 
     /* Set output properties */
-    p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
-    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-    p_dec->fmt_out.i_profile = p_dec->fmt_in.i_profile;
+    p_dec->fmt_out.i_codec = p_dec->p_fmt_in->i_codec;
+    p_dec->fmt_out.audio = p_dec->p_fmt_in->audio;
+    p_dec->fmt_out.i_profile = p_dec->p_fmt_in->i_profile;
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
 
     if (decoder_UpdateAudioFormat(p_dec))

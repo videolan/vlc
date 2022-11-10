@@ -221,7 +221,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->i_pts != VLC_TICK_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
-                if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'D','V','R',' ') )
+                if( p_dec->p_fmt_in->i_original_fourcc == VLC_FOURCC( 'D','V','R',' ') )
                 {
                     if( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
                         date_Set( &p_sys->end_date, p_sys->i_pts );
@@ -464,8 +464,8 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if(( p_dec->fmt_in.i_codec != VLC_CODEC_MPGA ) &&
-       ( p_dec->fmt_in.i_codec != VLC_CODEC_MP3 ) )
+    if(( p_dec->p_fmt_in->i_codec != VLC_CODEC_MPGA ) &&
+       ( p_dec->p_fmt_in->i_codec != VLC_CODEC_MP3 ) )
     {
         return VLC_EGENERIC;
     }

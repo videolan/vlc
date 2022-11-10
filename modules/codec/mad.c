@@ -259,13 +259,13 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
 
-    if( ( p_dec->fmt_in.i_codec != VLC_CODEC_MPGA
-     && p_dec->fmt_in.i_codec != VLC_CODEC_MP3
-     && p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','3') )
-     || p_dec->fmt_in.audio.i_rate == 0
-     || p_dec->fmt_in.audio.i_physical_channels == 0
-     || p_dec->fmt_in.audio.i_bytes_per_frame == 0
-     || p_dec->fmt_in.audio.i_frame_length == 0 )
+    if( ( p_dec->p_fmt_in->i_codec != VLC_CODEC_MPGA
+     && p_dec->p_fmt_in->i_codec != VLC_CODEC_MP3
+     && p_dec->p_fmt_in->i_codec != VLC_FOURCC('m','p','g','3') )
+     || p_dec->p_fmt_in->audio.i_rate == 0
+     || p_dec->p_fmt_in->audio.i_physical_channels == 0
+     || p_dec->p_fmt_in->audio.i_bytes_per_frame == 0
+     || p_dec->p_fmt_in->audio.i_frame_length == 0 )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the module's structure */
@@ -281,7 +281,7 @@ static int Open( vlc_object_t *p_this )
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
 
-    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
+    p_dec->fmt_out.audio = p_dec->p_fmt_in->audio;
     p_dec->fmt_out.audio.i_format = VLC_CODEC_FL32;
     p_dec->fmt_out.i_codec = p_dec->fmt_out.audio.i_format;
 

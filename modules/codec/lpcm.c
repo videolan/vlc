@@ -217,7 +217,7 @@ static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
     int i_type;
     int i_header_size;
 
-    switch( p_dec->fmt_in.i_codec )
+    switch( p_dec->p_fmt_in->i_codec )
     {
     /* DVD LPCM */
     case VLC_CODEC_DVD_LPCM:

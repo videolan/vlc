@@ -132,7 +132,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_MP4V )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_MP4V )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -151,7 +151,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_last = &p_sys->p_frame;
 
     /* Setup properties */
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_MP4V;
 
     if( p_dec->fmt_out.i_extra )
@@ -476,7 +476,7 @@ static int ParseVO( decoder_t *p_dec, block_t *p_vo )
             }
         }
 
-        if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
+        if( p_dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF )
         {
             p_dec->fmt_out.video.primaries = iso_23001_8_cp_to_vlc_primaries( colour_primaries );
             p_dec->fmt_out.video.transfer = iso_23001_8_tc_to_vlc_xfer( colour_xfer );
@@ -547,12 +547,12 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     }
 
     if( p_sys->i_fps_num < 5 && /* Work-around buggy streams */
-        p_dec->fmt_in.video.i_frame_rate > 0 &&
-        p_dec->fmt_in.video.i_frame_rate_base > 0 )
+        p_dec->p_fmt_in->video.i_frame_rate > 0 &&
+        p_dec->p_fmt_in->video.i_frame_rate_base > 0 )
     {
         p_sys->i_interpolated_pts += vlc_tick_from_samples(
-        p_dec->fmt_in.video.i_frame_rate_base,
-        p_dec->fmt_in.video.i_frame_rate);
+        p_dec->p_fmt_in->video.i_frame_rate_base,
+        p_dec->p_fmt_in->video.i_frame_rate);
     }
     else if( p_sys->i_fps_num )
     {

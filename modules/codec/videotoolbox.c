@@ -302,8 +302,8 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
 
                 /* Set frame rate for timings in case of missing rate */
-                if ( (!p_dec->fmt_in.video.i_frame_rate_base ||
-                      !p_dec->fmt_in.video.i_frame_rate) &&
+                if ( (!p_dec->p_fmt_in->video.i_frame_rate_base ||
+                      !p_dec->p_fmt_in->video.i_frame_rate) &&
                      p_sps->vui.i_time_scale && p_sps->vui.i_num_units_in_tick )
                 {
                     date_Change( &p_sys->pts, p_sps->vui.i_time_scale,
@@ -355,9 +355,9 @@ static bool InitH264(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     h264_poc_context_init(&p_sys->h264_pocctx);
     hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
-                     p_dec->fmt_in.i_codec, 0, 4);
-    return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
-                                             p_dec->fmt_in.i_extra) == VLC_SUCCESS;
+                     p_dec->p_fmt_in->i_codec, 0, 4);
+    return hxxx_helper_set_extra(&p_sys->hh, p_dec->p_fmt_in->p_extra,
+                                             p_dec->p_fmt_in->i_extra) == VLC_SUCCESS;
 }
 
 static void CleanH264(decoder_t *p_dec)
@@ -371,12 +371,12 @@ static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in.i_extra && p_sys->hh.i_input_nal_length_size)
+    if (p_dec->p_fmt_in->i_extra && p_sys->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("avcC"),
-                                        p_dec->fmt_in.p_extra,
-                                        p_dec->fmt_in.i_extra);
+                                        p_dec->p_fmt_in->p_extra,
+                                        p_dec->p_fmt_in->i_extra);
     }
     else if (hxxx_helper_has_config(&p_sys->hh))
     {
@@ -443,14 +443,14 @@ static bool CodecSupportedH264(decoder_t *p_dec)
 static bool LateStartH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return (p_dec->fmt_in.i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
+    return (p_dec->p_fmt_in->i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
 }
 
 static bool ConfigureVoutH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
+    if (p_dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
     {
         video_color_primaries_t primaries;
         video_transfer_func_t transfer;
@@ -469,7 +469,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
         }
     }
 
-    if (!p_dec->fmt_in.video.i_visible_width || !p_dec->fmt_in.video.i_visible_height)
+    if (!p_dec->p_fmt_in->video.i_visible_width || !p_dec->p_fmt_in->video.i_visible_height)
     {
         unsigned i_width, i_height, i_vis_width, i_vis_height;
         if (VLC_SUCCESS ==
@@ -485,7 +485,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
         else return false;
     }
 
-    if (!p_dec->fmt_in.video.i_sar_num || !p_dec->fmt_in.video.i_sar_den)
+    if (!p_dec->p_fmt_in->video.i_sar_num || !p_dec->p_fmt_in->video.i_sar_den)
     {
         int i_sar_num, i_sar_den;
         if (VLC_SUCCESS ==
@@ -544,9 +544,9 @@ static bool InitHEVC(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     hevc_poc_cxt_init(&p_sys->hevc_pocctx);
     hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
-                     p_dec->fmt_in.i_codec, 0, 4);
-    return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
-                                             p_dec->fmt_in.i_extra) == VLC_SUCCESS;
+                     p_dec->p_fmt_in->i_codec, 0, 4);
+    return hxxx_helper_set_extra(&p_sys->hh, p_dec->p_fmt_in->p_extra,
+                                             p_dec->p_fmt_in->i_extra) == VLC_SUCCESS;
 }
 
 #define CleanHEVC CleanH264
@@ -678,8 +678,8 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->b_progressive = hevc_frame_is_progressive(p_sps, sei.p_timing);
 
                 /* Set frame rate for timings in case of missing rate */
-                if ( (!p_dec->fmt_in.video.i_frame_rate_base ||
-                     !p_dec->fmt_in.video.i_frame_rate) )
+                if ( (!p_dec->p_fmt_in->video.i_frame_rate_base ||
+                     !p_dec->p_fmt_in->video.i_frame_rate) )
                 {
                     unsigned num, den;
                     if (hevc_get_frame_rate(p_sps, p_vps, &num, &den))
@@ -722,12 +722,12 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in.i_extra && p_sys->hh.i_input_nal_length_size)
+    if (p_dec->p_fmt_in->i_extra && p_sys->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("hvcC"),
-                                        p_dec->fmt_in.p_extra,
-                                        p_dec->fmt_in.i_extra);
+                                        p_dec->p_fmt_in->p_extra,
+                                        p_dec->p_fmt_in->i_extra);
     }
     else if (hxxx_helper_has_config(&p_sys->hh))
     {
@@ -747,7 +747,7 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
 static bool LateStartHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return (p_dec->fmt_in.i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
+    return (p_dec->p_fmt_in->i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
 }
 
 static bool CodecSupportedHEVC(decoder_t *p_dec)
@@ -763,9 +763,9 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
 
 static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 {
-    if (p_dec->fmt_in.i_extra)
-        return ESDSExtradataInfoCreate(p_dec, p_dec->fmt_in.p_extra,
-                                              p_dec->fmt_in.i_extra);
+    if (p_dec->p_fmt_in->i_extra)
+        return ESDSExtradataInfoCreate(p_dec, p_dec->p_fmt_in->p_extra,
+                                              p_dec->p_fmt_in->i_extra);
     else
         return NULL; /* MPEG4 without esds ? */
 }
@@ -960,7 +960,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 {
     /* check for the codec we can and want to decode */
-    switch (p_dec->fmt_in.i_codec) {
+    switch (p_dec->p_fmt_in->i_codec) {
         case VLC_CODEC_H264:
             return kCMVideoCodecType_H264;
 
@@ -974,12 +974,12 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
         case VLC_CODEC_MP4V:
         {
-            if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'X','V','I','D' )) {
+            if (p_dec->p_fmt_in->i_original_fourcc == VLC_FOURCC( 'X','V','I','D' )) {
                 msg_Warn(p_dec, "XVID decoding not implemented, fallback on software");
                 return 0;
             }
 
-            msg_Dbg(p_dec, "Will decode MP4V with original FourCC '%4.4s'", (char *)&p_dec->fmt_in.i_original_fourcc);
+            msg_Dbg(p_dec, "Will decode MP4V with original FourCC '%4.4s'", (char *)&p_dec->p_fmt_in->i_original_fourcc);
             return kCMVideoCodecType_MPEG4Video;
         }
 #if !TARGET_OS_IPHONE
@@ -989,7 +989,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             /* there are no DV or ProRes decoders on iOS, so bailout early */
         case VLC_CODEC_PRORES:
             /* the VT decoder can't differentiate between the ProRes flavors, so we do it */
-            switch (p_dec->fmt_in.i_original_fourcc) {
+            switch (p_dec->p_fmt_in->i_original_fourcc) {
                 case VLC_FOURCC( 'a','p','4','c' ):
                 case VLC_FOURCC( 'a','p','4','h' ):
                 case VLC_FOURCC( 'a','p','4','x' ):
@@ -1010,7 +1010,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
         case VLC_CODEC_DV:
             /* the VT decoder can't differentiate between PAL and NTSC, so we need to do it */
-            switch (p_dec->fmt_in.i_original_fourcc) {
+            switch (p_dec->p_fmt_in->i_original_fourcc) {
                 case VLC_FOURCC( 'd', 'v', 'c', ' '):
                 case VLC_FOURCC( 'd', 'v', ' ', ' '):
                     msg_Dbg(p_dec, "Decoding DV NTSC");
@@ -1035,7 +1035,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
         default:
 #ifndef NDEBUG
-            msg_Err(p_dec, "'%4.4s' is not supported", (char *)&p_dec->fmt_in.i_codec);
+            msg_Err(p_dec, "'%4.4s' is not supported", (char *)&p_dec->p_fmt_in->i_codec);
 #endif
             return -1;
     }
@@ -1136,10 +1136,10 @@ static void PtsInit(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_dec->fmt_in.video.i_frame_rate_base && p_dec->fmt_in.video.i_frame_rate)
+    if (p_dec->p_fmt_in->video.i_frame_rate_base && p_dec->p_fmt_in->video.i_frame_rate)
     {
-        date_Init(&p_sys->pts, p_dec->fmt_in.video.i_frame_rate * 2,
-                  p_dec->fmt_in.video.i_frame_rate_base);
+        date_Init(&p_sys->pts, p_dec->p_fmt_in->video.i_frame_rate * 2,
+                  p_dec->p_fmt_in->video.i_frame_rate_base);
     }
     else
     {
@@ -1406,7 +1406,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         free(cvpx_chroma);
     }
 
-    p_dec->fmt_out.video = p_dec->fmt_in.video;
+    p_dec->fmt_out.video = p_dec->p_fmt_in->video;
     p_dec->fmt_out.video.p_palette = NULL;
 
     if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
@@ -1483,7 +1483,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (i_ret == VLC_SUCCESS) {
         PtsInit(p_dec);
         msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'",
-                        (char *)&p_dec->fmt_in.i_codec);
+                        (char *)&p_dec->p_fmt_in->i_codec);
     } else {
         CloseDecoder(p_this);
     }

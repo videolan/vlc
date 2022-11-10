@@ -76,14 +76,14 @@ static void Flush( decoder_t * );
 
 static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 {
-    if( p_dec->fmt_in.i_extra > 0 )
+    if( p_dec->p_fmt_in->i_extra > 0 )
     {
-        const uint8_t * const p_src = p_dec->fmt_in.p_extra;
+        const uint8_t * const p_src = p_dec->p_fmt_in->p_extra;
 
         int i_offset = 0;
-        int i_size = p_dec->fmt_in.i_extra;
+        int i_size = p_dec->p_fmt_in->i_extra;
 
-        if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAC )
+        if( p_dec->p_fmt_in->i_codec == VLC_CODEC_ALAC )
         {
             static const uint8_t p_pattern[] = { 0, 0, 0, 36, 'a', 'l', 'a', 'c' };
             /* Find alac atom XXX it is a bit ugly */
@@ -92,7 +92,7 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
                 if( !memcmp( &p_src[i_offset], p_pattern, sizeof(p_pattern) ) )
                     break;
             }
-            i_size = __MIN( p_dec->fmt_in.i_extra - i_offset, 36 );
+            i_size = __MIN( p_dec->p_fmt_in->i_extra - i_offset, 36 );
             if( i_size < 36 )
                 i_size = 0;
         }
@@ -129,7 +129,7 @@ static int OpenAudioCodec( decoder_t *p_dec )
     {
         if( codec->id == AV_CODEC_ID_VORBIS ||
             ( codec->id == AV_CODEC_ID_AAC &&
-              !p_dec->fmt_in.b_packetized ) )
+              !p_dec->p_fmt_in->b_packetized ) )
         {
             msg_Warn( p_dec, "waiting for extra data for codec %s",
                       codec->name );
@@ -137,11 +137,11 @@ static int OpenAudioCodec( decoder_t *p_dec )
         }
     }
 
-    ctx->sample_rate = p_dec->fmt_in.audio.i_rate;
-    ctx->channels = p_dec->fmt_in.audio.i_channels;
-    ctx->block_align = p_dec->fmt_in.audio.i_blockalign;
-    ctx->bit_rate = p_dec->fmt_in.i_bitrate;
-    ctx->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
+    ctx->sample_rate = p_dec->p_fmt_in->audio.i_rate;
+    ctx->channels = p_dec->p_fmt_in->audio.i_channels;
+    ctx->block_align = p_dec->p_fmt_in->audio.i_blockalign;
+    ctx->bit_rate = p_dec->p_fmt_in->i_bitrate;
+    ctx->bits_per_coded_sample = p_dec->p_fmt_in->audio.i_bitspersample;
 
     if( codec->id == AV_CODEC_ID_ADPCM_G726 &&
         ctx->bit_rate > 0 &&
@@ -256,10 +256,10 @@ int InitAudioDec( vlc_object_t *obj )
     SetupOutputFormat( p_dec, false );
 
     if( !p_dec->fmt_out.audio.i_rate )
-        p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
+        p_dec->fmt_out.audio.i_rate = p_dec->p_fmt_in->audio.i_rate;
     if( p_dec->fmt_out.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-    p_dec->fmt_out.audio.i_chan_mode = p_dec->fmt_in.audio.i_chan_mode;
+    p_dec->fmt_out.audio.i_chan_mode = p_dec->p_fmt_in->audio.i_chan_mode;
 
     p_dec->pf_decode = DecodeAudio;
     p_dec->pf_flush  = Flush;
@@ -295,7 +295,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block = NULL;
     bool b_error = false;
 
-    if( !ctx->extradata_size && p_dec->fmt_in.i_extra
+    if( !ctx->extradata_size && p_dec->p_fmt_in->i_extra
      && !avcodec_is_open( ctx ) )
     {
         InitDecoderConfig( p_dec, ctx );
@@ -583,7 +583,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_dec->fmt_out.i_codec = GetVlcAudioFormat( p_sys->p_context->sample_fmt );
-    p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
+    p_dec->fmt_out.audio.channel_type = p_dec->p_fmt_in->audio.channel_type;
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     p_dec->fmt_out.audio.i_rate = p_sys->p_context->sample_rate;
 
@@ -636,7 +636,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
         /* No reordering for Ambisonic order 1 channels encoded in AAC... */
         if (p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS
-            && p_dec->fmt_in.i_codec == VLC_CODEC_MP4A
+            && p_dec->p_fmt_in->i_codec == VLC_CODEC_MP4A
             && i_channels_src == 4)
             p_sys->b_extract = false;
 

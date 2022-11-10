@@ -98,9 +98,9 @@ static int MPG123Open( decoder_t *p_dec )
     mpg123_format_none( p_sys->p_handle );
 
     int i_ret = MPG123_OK;
-    if( p_dec->fmt_in.audio.i_rate != 0 )
+    if( p_dec->p_fmt_in->audio.i_rate != 0 )
     {
-        i_ret =  mpg123_format( p_sys->p_handle, p_dec->fmt_in.audio.i_rate,
+        i_ret =  mpg123_format( p_sys->p_handle, p_dec->p_fmt_in->audio.i_rate,
                                 MPG123_MONO | MPG123_STEREO,
                                 MPG123_ENC_FLOAT_32 );
     }
@@ -381,8 +381,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGA &&
-        p_dec->fmt_in.i_codec != VLC_CODEC_MP3 )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_MPGA &&
+        p_dec->p_fmt_in->i_codec != VLC_CODEC_MP3 )
         return VLC_EGENERIC;
 
     /* Initialize libmpg123 */
@@ -407,7 +407,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_flush  = Flush;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
-             (char *)&p_dec->fmt_in.i_codec,
+             (char *)&p_dec->p_fmt_in->i_codec,
              (char *)&p_dec->fmt_out.i_codec,
              aout_BitsPerSample( p_dec->fmt_out.i_codec ) );
 

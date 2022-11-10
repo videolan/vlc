@@ -254,7 +254,7 @@ static int Decode(decoder_t *dec, block_t *block)
         dec->fmt_out.video.i_sar_den = 1;
     }
 
-    if(dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF &&
+    if(dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF &&
        img->cs >= 0 && img->cs < ARRAY_SIZE(vpx_color_mapping_table))
     {
         v->primaries = vpx_color_mapping_table[img->cs].primaries;
@@ -263,9 +263,9 @@ static int Decode(decoder_t *dec, block_t *block)
         v->color_range = img->range == VPX_CR_FULL_RANGE ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
-    dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
-    dec->fmt_out.video.multiview_mode = dec->fmt_in.video.multiview_mode;
-    dec->fmt_out.video.pose = dec->fmt_in.video.pose;
+    dec->fmt_out.video.projection_mode = dec->p_fmt_in->video.projection_mode;
+    dec->fmt_out.video.multiview_mode = dec->p_fmt_in->video.multiview_mode;
+    dec->fmt_out.video.pose = dec->p_fmt_in->video.pose;
 
     if (decoder_UpdateVideoFormat(dec))
         return VLCDEC_SUCCESS;
@@ -303,7 +303,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     const struct vpx_codec_iface *iface;
     int vp_version;
 
-    switch (dec->fmt_in.i_codec)
+    switch (dec->p_fmt_in->i_codec)
     {
 #ifdef ENABLE_VP8_DECODER
     case VLC_CODEC_WEBP:
@@ -342,12 +342,12 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     dec->pf_decode = Decode;
 
-    dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
-    dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
+    dec->fmt_out.video.i_width = dec->p_fmt_in->video.i_width;
+    dec->fmt_out.video.i_height = dec->p_fmt_in->video.i_height;
 
-    if (dec->fmt_in.video.i_sar_num > 0 && dec->fmt_in.video.i_sar_den > 0) {
-        dec->fmt_out.video.i_sar_num = dec->fmt_in.video.i_sar_num;
-        dec->fmt_out.video.i_sar_den = dec->fmt_in.video.i_sar_den;
+    if (dec->p_fmt_in->video.i_sar_num > 0 && dec->p_fmt_in->video.i_sar_den > 0) {
+        dec->fmt_out.video.i_sar_num = dec->p_fmt_in->video.i_sar_num;
+        dec->fmt_out.video.i_sar_den = dec->p_fmt_in->video.i_sar_den;
     }
 
     return VLC_SUCCESS;

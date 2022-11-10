@@ -278,7 +278,7 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
             [AUDIO_ES] = "audio decoder",
             [SPU_ES] = "spu decoder",
         };
-        p_dec->p_module = module_need_var( p_dec, caps[p_dec->fmt_in.i_cat],
+        p_dec->p_module = module_need_var( p_dec, caps[p_dec->p_fmt_in->i_cat],
                                            "codec" );
     }
     else
@@ -344,7 +344,7 @@ static void DecoderUpdateFormatLocked( vlc_input_decoder_t *p_owner )
     es_format_Clean( &p_owner->fmt );
     es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
 
-    assert( p_owner->fmt.i_cat == p_dec->fmt_in.i_cat );
+    assert( p_owner->fmt.i_cat == p_dec->p_fmt_in->i_cat );
 
     /* Move p_description */
     if( p_dec->p_description != NULL )
@@ -409,13 +409,13 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
     }
 
     /* Check if only replay gain has changed */
-    if( aout_replaygain_changed( &p_dec->fmt_in.audio_replay_gain,
+    if( aout_replaygain_changed( &p_dec->p_fmt_in->audio_replay_gain,
                                  &p_owner->fmt.audio_replay_gain ) )
     {
-        p_dec->fmt_out.audio_replay_gain = p_dec->fmt_in.audio_replay_gain;
+        p_dec->fmt_out.audio_replay_gain = p_dec->p_fmt_in->audio_replay_gain;
         if( p_owner->p_aout )
         {
-            p_owner->fmt.audio_replay_gain = p_dec->fmt_in.audio_replay_gain;
+            p_owner->fmt.audio_replay_gain = p_dec->p_fmt_in->audio_replay_gain;
             var_TriggerCallback( p_owner->p_aout, "audio-replay-gain-mode" );
         }
     }
@@ -513,7 +513,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     if ( p_owner->out_pool == NULL )
     {
         unsigned dpb_size;
-        switch( p_dec->fmt_in.i_codec )
+        switch( p_dec->p_fmt_in->i_codec )
         {
         case VLC_CODEC_HEVC:
         case VLC_CODEC_H264:
@@ -994,13 +994,13 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, vlc_frame_t
             vlc_fifo_Lock(p_owner->p_fifo);
             DecoderUpdateFormatLocked( p_owner );
 
-            p_owner->fmt.i_group = p_dec->fmt_in.i_group;
-            p_owner->fmt.i_id = p_dec->fmt_in.i_id;
-            if( p_dec->fmt_in.psz_language )
+            p_owner->fmt.i_group = p_dec->p_fmt_in->i_group;
+            p_owner->fmt.i_id = p_dec->p_fmt_in->i_id;
+            if( p_dec->p_fmt_in->psz_language )
             {
                 free( p_owner->fmt.psz_language );
                 p_owner->fmt.psz_language =
-                    strdup( p_dec->fmt_in.psz_language );
+                    strdup( p_dec->p_fmt_in->psz_language );
             }
             vlc_fifo_Unlock(p_owner->p_fifo);
 
@@ -1494,7 +1494,7 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
         msg_Warn( p_dec, "Reloading the decoder module%s",
                   reload == RELOAD_DECODER_AOUT ? " and the audio output" : "" );
 
-        if( DecoderThread_Reload( p_owner, &p_dec->fmt_in, reload ) != VLC_SUCCESS )
+        if( DecoderThread_Reload( p_owner, p_dec->p_fmt_in, reload ) != VLC_SUCCESS )
             goto error;
     }
 
@@ -1530,7 +1530,7 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
         while( (packetized_frame =
                 p_packetizer->pf_packetize( p_packetizer, ppframe ) ) )
         {
-            if( !es_format_IsSimilar( &p_dec->fmt_in, &p_packetizer->fmt_out ) )
+            if( !es_format_IsSimilar( p_dec->p_fmt_in, &p_packetizer->fmt_out ) )
             {
                 msg_Dbg( p_dec, "restarting module due to input format change");
 
@@ -1613,7 +1613,7 @@ static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused
     decoder_t *p_dec = &p_owner->dec;
 
     msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
-    switch( p_dec->fmt_in.i_cat )
+    switch( p_dec->p_fmt_in->i_cat )
     {
         case VIDEO_ES:
             if( p_owner->p_vout != NULL && p_owner->vout_started )
@@ -1637,7 +1637,7 @@ static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
     decoder_t *p_dec = &p_owner->dec;
 
     msg_Dbg( p_dec, "changing rate: %f", rate );
-    switch( p_dec->fmt_in.i_cat )
+    switch( p_dec->p_fmt_in->i_cat )
     {
         case VIDEO_ES:
             if( p_owner->p_vout != NULL && p_owner->vout_started )
@@ -1668,7 +1668,7 @@ static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t 
     decoder_t *p_dec = &p_owner->dec;
 
     msg_Dbg( p_dec, "changing delay: %"PRId64, delay );
-    switch( p_dec->fmt_in.i_cat )
+    switch( p_dec->p_fmt_in->i_cat )
     {
         case VIDEO_ES:
             if( p_owner->p_vout != NULL && p_owner->vout_started )
@@ -1704,7 +1704,7 @@ static void *DecoderThread( void *p_data )
     bool paused = false;
 
     const char *thread_name;
-    switch (p_owner->dec.fmt_in.i_cat)
+    switch (p_owner->dec.p_fmt_in->i_cat)
     {
         case VIDEO_ES: thread_name = "vlc-dec-video"; break;
         case AUDIO_ES: thread_name = "vlc-dec-audio"; break;
@@ -1802,7 +1802,7 @@ static void *DecoderThread( void *p_data )
 
         DecoderThread_ProcessInput( p_owner, frame );
 
-        if( frame == NULL && p_owner->dec.fmt_in.i_cat == AUDIO_ES )
+        if( frame == NULL && p_owner->dec.p_fmt_in->i_cat == AUDIO_ES )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
             if( p_owner->p_astream != NULL )
@@ -1982,7 +1982,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     if( LoadDecoder( p_dec, cfg->sout != NULL, fmt ) )
         return p_owner;
 
-    assert( p_dec->fmt_in.i_cat == p_dec->fmt_out.i_cat && fmt->i_cat == p_dec->fmt_in.i_cat);
+    assert( p_dec->p_fmt_in->i_cat == p_dec->fmt_out.i_cat && fmt->i_cat == p_dec->p_fmt_in->i_cat);
 
     /* Copy ourself the input replay gain */
     if( fmt->i_cat == AUDIO_ES )
@@ -2025,7 +2025,7 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
 {
     decoder_t *p_dec = &p_owner->dec;
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
-             (char*)&p_dec->fmt_in.i_codec );
+             (char*)&p_dec->p_fmt_in->i_codec );
 
     decoder_Clean( p_dec );
     if ( p_owner->out_pool )
@@ -2148,12 +2148,12 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     {
         DecoderUnsupportedCodec( p_dec, cfg->fmt, !cfg->sout );
 
-        /* Don't use dec->fmt_in.i_cat since it may not be initialized here. */
+        /* Don't use dec->p_fmt_in->i_cat since it may not be initialized here. */
         DeleteDecoder( p_owner, cfg->fmt->i_cat );
         return NULL;
     }
 
-    assert( p_dec->fmt_in.i_cat != UNKNOWN_ES );
+    assert( p_dec->p_fmt_in->i_cat != UNKNOWN_ES );
 
 #ifdef ENABLE_SOUT
     /* Do not delay sout creation for SPU or DATA. */
@@ -2176,7 +2176,7 @@ decoder_New( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
         if( vlc_clone( &p_owner->thread, DecoderThread, p_owner ) )
         {
             msg_Err( p_dec, "cannot spawn decoder thread" );
-            DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );
+            DeleteDecoder( p_owner, p_dec->p_fmt_in->i_cat );
             return NULL;
         }
     }
@@ -2245,7 +2245,7 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
      *
      * This unblocks the thread, allowing the decoder module to join all its
      * worker threads (if any) and the decoder thread to terminate. */
-    if( p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout != NULL
+    if( p_dec->p_fmt_in->i_cat == VIDEO_ES && p_owner->p_vout != NULL
      && p_owner->vout_started )
     {
         if( p_owner->paused )
@@ -2277,7 +2277,7 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     }
 
     /* Delete decoder */
-    DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );
+    DeleteDecoder( p_owner, p_dec->p_fmt_in->i_cat );
 }
 
 /**
@@ -2383,7 +2383,7 @@ void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
  */
 void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 {
-    enum es_format_category_e cat = p_owner->dec.fmt_in.i_cat;
+    enum es_format_category_e cat = p_owner->dec.p_fmt_in->i_cat;
 
     vlc_fifo_Lock( p_owner->p_fifo );
 
@@ -2638,7 +2638,7 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner,
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     vlc_fifo_Lock(p_owner->p_fifo);
-    if( p_owner->dec.fmt_in.i_cat == VIDEO_ES )
+    if( p_owner->dec.p_fmt_in->i_cat == VIDEO_ES )
     {
         if( p_owner->p_vout )
             vout_NextPicture( p_owner->p_vout, pi_duration );
@@ -2684,7 +2684,7 @@ size_t vlc_input_decoder_GetFifoSize( vlc_input_decoder_t *p_owner )
 
 static bool DecoderHasVbi( decoder_t *dec )
 {
-    return dec->fmt_in.i_cat == SPU_ES && dec->fmt_in.i_codec == VLC_CODEC_TELETEXT
+    return dec->p_fmt_in->i_cat == SPU_ES && dec->p_fmt_in->i_codec == VLC_CODEC_TELETEXT
         && var_Type( dec, "vbi-page" ) == VLC_VAR_INTEGER;
 }
 
@@ -2717,7 +2717,7 @@ void vlc_input_decoder_SetVoutMouseEvent( vlc_input_decoder_t *owner,
                                           vlc_mouse_event mouse_event,
                                           void *user_data )
 {
-    assert( owner->dec.fmt_in.i_cat == VIDEO_ES );
+    assert( owner->dec.p_fmt_in->i_cat == VIDEO_ES );
 
     vlc_mutex_lock( &owner->mouse_lock );
 
@@ -2730,7 +2730,7 @@ void vlc_input_decoder_SetVoutMouseEvent( vlc_input_decoder_t *owner,
 int vlc_input_decoder_AddVoutOverlay( vlc_input_decoder_t *owner, subpicture_t *sub,
                                       size_t *channel )
 {
-    assert( owner->dec.fmt_in.i_cat == VIDEO_ES );
+    assert( owner->dec.p_fmt_in->i_cat == VIDEO_ES );
     assert( sub && channel );
 
     vlc_fifo_Lock(owner->p_fifo);
@@ -2759,7 +2759,7 @@ int vlc_input_decoder_AddVoutOverlay( vlc_input_decoder_t *owner, subpicture_t *
 
 int vlc_input_decoder_DelVoutOverlay( vlc_input_decoder_t *owner, size_t channel )
 {
-    assert( owner->dec.fmt_in.i_cat == VIDEO_ES );
+    assert( owner->dec.p_fmt_in->i_cat == VIDEO_ES );
 
     vlc_fifo_Lock(owner->p_fifo);
 
@@ -2777,7 +2777,7 @@ int vlc_input_decoder_DelVoutOverlay( vlc_input_decoder_t *owner, size_t channel
 int vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *p_owner,
                                        const vlc_spu_highlight_t *spu_hl )
 {
-    assert( p_owner->dec.fmt_in.i_cat == SPU_ES );
+    assert( p_owner->dec.p_fmt_in->i_cat == SPU_ES );
 
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )

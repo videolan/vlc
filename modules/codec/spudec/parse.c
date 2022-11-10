@@ -119,7 +119,7 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
         if(p_palette->i_entries +4 >= VIDEO_PALETTE_COLORS_MAX)
             break;
 
-        if( p_dec->fmt_in.subs.spu.palette[0] == SPU_PALETTE_DEFINED )
+        if( p_dec->p_fmt_in->subs.spu.palette[0] == SPU_PALETTE_DEFINED )
         {
             /* Lookup the CLUT palette for the YUV values */
             uint8_t idx[4];
@@ -129,7 +129,7 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
             idx[1] = (i_color >>  8)&0x0f;
             idx[2] = (i_color >>  4)&0x0f;
             idx[3] = i_color&0x0f;
-            CLUTIdxToYUV( &p_dec->fmt_in.subs, idx, yuv );
+            CLUTIdxToYUV( &p_dec->p_fmt_in->subs, idx, yuv );
 
             /* Process the contrast */
             alpha[3] = (i_contrast >> 12)&0x0f;
@@ -205,9 +205,9 @@ static void OutputPicture( decoder_t *p_dec,
     if( !p_spu ) return;
 
     p_spu->i_original_picture_width =
-        p_dec->fmt_in.subs.spu.i_original_frame_width;
+        p_dec->p_fmt_in->subs.spu.i_original_frame_width;
     p_spu->i_original_picture_height =
-        p_dec->fmt_in.subs.spu.i_original_frame_height;
+        p_dec->p_fmt_in->subs.spu.i_original_frame_height;
     p_spu->i_start = p_spu_properties->i_start;
     p_spu->i_stop = p_spu_properties->i_stop;
     p_spu->b_ephemer = p_spu_properties->b_ephemer;
@@ -437,7 +437,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
                 return VLC_EGENERIC;
             }
 
-            if( p_dec->fmt_in.subs.spu.palette[0] == SPU_PALETTE_DEFINED )
+            if( p_dec->p_fmt_in->subs.spu.palette[0] == SPU_PALETTE_DEFINED )
             {
                 uint8_t idx[4];
 
@@ -448,7 +448,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
                 idx[2] = (p_sys->buffer[i_index+2]>>4)&0x0f;
                 idx[3] = (p_sys->buffer[i_index+2])&0x0f;
 
-                CLUTIdxToYUV( &p_dec->fmt_in.subs, idx, spu_data_cmd.pi_yuv );
+                CLUTIdxToYUV( &p_dec->p_fmt_in->subs, idx, spu_data_cmd.pi_yuv );
             }
 
             i_index += 3;

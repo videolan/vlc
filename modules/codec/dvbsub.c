@@ -327,7 +327,7 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int i_posx, i_posy;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_DVBS )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_DVBS )
     {
         return VLC_EGENERIC;
     }
@@ -339,8 +339,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->i_pts          = VLC_TICK_INVALID;
-    p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
-    p_sys->i_ancillary_id = p_dec->fmt_in.subs.dvb.i_id >> 16;
+    p_sys->i_id           = p_dec->p_fmt_in->subs.dvb.i_id & 0xFFFF;
+    p_sys->i_ancillary_id = p_dec->p_fmt_in->subs.dvb.i_id >> 16;
 
     p_sys->p_regions      = NULL;
     p_sys->p_cluts        = NULL;

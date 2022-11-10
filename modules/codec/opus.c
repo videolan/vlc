@@ -272,7 +272,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_OPUS )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_OPUS )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -353,8 +353,8 @@ static int ProcessHeaders( decoder_t *p_dec )
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
 
-    int i_extra = p_dec->fmt_in.i_extra;
-    const uint8_t *p_extra = p_dec->fmt_in.p_extra;
+    int i_extra = p_dec->p_fmt_in->i_extra;
+    const uint8_t *p_extra = p_dec->p_fmt_in->p_extra;
     uint8_t *p_alloc = NULL;
 
     /* Xiph headers as extradata */
@@ -376,8 +376,8 @@ static int ProcessHeaders( decoder_t *p_dec )
     {
         OpusHeader header;
         opus_header_init(&header);
-        opus_prepare_header( p_dec->fmt_in.audio.i_channels ? p_dec->fmt_in.audio.i_channels : 2,
-                             p_dec->fmt_in.audio.i_rate ? p_dec->fmt_in.audio.i_rate : 48000,
+        opus_prepare_header( p_dec->p_fmt_in->audio.i_channels ? p_dec->p_fmt_in->audio.i_channels : 2,
+                             p_dec->p_fmt_in->audio.i_rate ? p_dec->p_fmt_in->audio.i_rate : 48000,
                              &header );
         int ret = opus_write_header( &p_alloc, &i_extra, &header,
                                      opus_get_version_string() );

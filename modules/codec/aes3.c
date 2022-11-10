@@ -256,7 +256,7 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
 {
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_302M )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_302M )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */

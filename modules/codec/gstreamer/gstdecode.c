@@ -477,7 +477,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_str = vlc_to_gst_fmt( &p_dec->fmt_in );
+    p_str = vlc_to_gst_fmt( p_dec->p_fmt_in );
     if( !p_str )
         return VLC_EGENERIC;
 
@@ -710,11 +710,11 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             GST_BUFFER_DURATION( p_buf ) = gst_util_uint64_scale(
                     p_block->i_length, GST_SECOND, GST_MSECOND );
 
-        if( p_dec->fmt_in.video.i_frame_rate  &&
-                p_dec->fmt_in.video.i_frame_rate_base )
+        if( p_dec->p_fmt_in->video.i_frame_rate  &&
+                p_dec->p_fmt_in->video.i_frame_rate_base )
             GST_BUFFER_DURATION( p_buf ) = gst_util_uint64_scale( GST_SECOND,
-                    p_dec->fmt_in.video.i_frame_rate_base,
-                    p_dec->fmt_in.video.i_frame_rate );
+                    p_dec->p_fmt_in->video.i_frame_rate_base,
+                    p_dec->p_fmt_in->video.i_frame_rate );
 
         /* Give the input buffer to GStreamer Bin.
          *

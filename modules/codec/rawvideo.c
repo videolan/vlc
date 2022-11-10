@@ -76,14 +76,14 @@ vlc_module_end ()
 static int OpenCommon( decoder_t *p_dec )
 {
     const vlc_chroma_description_t *dsc =
-        vlc_fourcc_GetChromaDescription( p_dec->fmt_in.i_codec );
+        vlc_fourcc_GetChromaDescription( p_dec->p_fmt_in->i_codec );
     if( dsc == NULL || dsc->plane_count == 0 )
         return VLC_EGENERIC;
 
-    if( p_dec->fmt_in.video.i_width <= 0 || p_dec->fmt_in.video.i_height == 0 )
+    if( p_dec->p_fmt_in->video.i_width <= 0 || p_dec->p_fmt_in->video.i_height == 0 )
     {
         msg_Err( p_dec, "invalid display size %dx%d",
-                 p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
+                 p_dec->p_fmt_in->video.i_width, p_dec->p_fmt_in->video.i_height );
         return VLC_EGENERIC;
     }
 
@@ -92,14 +92,14 @@ static int OpenCommon( decoder_t *p_dec )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
 
     if( !p_dec->fmt_out.video.i_visible_width )
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
     if( !p_dec->fmt_out.video.i_visible_height )
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
-    if( p_dec->fmt_in.i_codec == VLC_CODEC_YUV2 )
+    if( p_dec->p_fmt_in->i_codec == VLC_CODEC_YUV2 )
     {
         p_dec->fmt_out.video.i_chroma =
         p_dec->fmt_out.i_codec = VLC_CODEC_YUYV;
@@ -119,9 +119,9 @@ static int OpenCommon( decoder_t *p_dec )
 
     for( unsigned i = 0; i < dsc->plane_count; i++ )
     {
-        unsigned pitch = ((p_dec->fmt_in.video.i_width + (dsc->p[i].w.den - 1)) / dsc->p[i].w.den)
+        unsigned pitch = ((p_dec->p_fmt_in->video.i_width + (dsc->p[i].w.den - 1)) / dsc->p[i].w.den)
                          * dsc->p[i].w.num * dsc->pixel_size;
-        unsigned lines = ((p_dec->fmt_in.video.i_height + (dsc->p[i].h.den - 1)) / dsc->p[i].h.den)
+        unsigned lines = ((p_dec->p_fmt_in->video.i_height + (dsc->p[i].h.den - 1)) / dsc->p[i].h.den)
                          * dsc->p[i].h.num;
 
         p_sys->pitches[i] = pitch;
@@ -218,7 +218,7 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
         {
             memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
             /*Fix chroma sign.*/
-            if( p_dec->fmt_in.i_codec == VLC_CODEC_YUV2 ) {
+            if( p_dec->p_fmt_in->i_codec == VLC_CODEC_YUV2 ) {
                 for( int y = 0; y < p_pic->p[i].i_visible_pitch; y++ ) {
                     p_dst[2*y + 1] ^= 0x80;
                 }

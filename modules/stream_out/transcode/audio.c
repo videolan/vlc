@@ -148,11 +148,11 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
                                                  id->p_decoder->fmt_out.i_codec,
                                                  VLC_CODEC_FL32 );
     id->decoder_out.audio.i_rate = FIRSTVALID( id->decoder_out.audio.i_rate,
-                                               id->p_decoder->fmt_in.audio.i_rate,
+                                               id->p_decoder->p_fmt_in->audio.i_rate,
                                                48000 );
     id->decoder_out.audio.i_physical_channels =
             FIRSTVALID( id->decoder_out.audio.i_physical_channels,
-                        id->p_decoder->fmt_in.audio.i_physical_channels,
+                        id->p_decoder->p_fmt_in->audio.i_physical_channels,
                         AOUT_CHANS_STEREO );
     aout_FormatPrepare( &id->decoder_out.audio );
 
@@ -292,7 +292,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if( !id->downstream_id )
                 id->downstream_id =
                     id->pf_transcode_downstream_add( p_stream,
-                                                     &id->p_decoder->fmt_in,
+                                                     id->p_decoder->p_fmt_in,
                                                      transcode_encoder_format_out( id->encoder ) );
             if( !id->downstream_id )
             {

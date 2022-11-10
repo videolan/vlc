@@ -101,7 +101,7 @@ static int Open (vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
 
-    if (p_dec->fmt_in.i_codec != VLC_CODEC_MIDI)
+    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_MIDI)
         return VLC_EGENERIC;
 
     decoder_sys_t *p_sys = malloc (sizeof (*p_sys));

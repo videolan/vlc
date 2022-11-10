@@ -239,7 +239,7 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
             p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
         }
 
-        if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF &&
+        if( p_dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF &&
             p_sps->vui.b_valid )
         {
             h264_get_colorimetry( p_sps, &p_dec->fmt_out.video.primaries,
@@ -327,11 +327,11 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int i;
 
-    const bool b_avc = (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1' ));
+    const bool b_avc = (p_dec->p_fmt_in->i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1' ));
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_H264 )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_H264 )
         return VLC_EGENERIC;
-    if( b_avc && p_dec->fmt_in.i_extra < 7 )
+    if( b_avc && p_dec->p_fmt_in->i_extra < 7 )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -393,16 +393,16 @@ static int Open( vlc_object_t *p_this )
     date_Init( &p_sys->dts, 30000 * 2, 1001 );
 
     /* Setup properties */
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_H264;
     p_dec->fmt_out.b_packetized = true;
 
-    if( p_dec->fmt_in.video.i_frame_rate_base &&
-        p_dec->fmt_in.video.i_frame_rate &&
-        p_dec->fmt_in.video.i_frame_rate <= UINT_MAX / 2 )
+    if( p_dec->p_fmt_in->video.i_frame_rate_base &&
+        p_dec->p_fmt_in->video.i_frame_rate &&
+        p_dec->p_fmt_in->video.i_frame_rate <= UINT_MAX / 2 )
     {
-        date_Change( &p_sys->dts, p_dec->fmt_in.video.i_frame_rate * 2,
-                                  p_dec->fmt_in.video.i_frame_rate_base );
+        date_Change( &p_sys->dts, p_dec->p_fmt_in->video.i_frame_rate * 2,
+                                  p_dec->p_fmt_in->video.i_frame_rate_base );
     }
 
     if( b_avc )
@@ -411,12 +411,12 @@ static int Open( vlc_object_t *p_this )
          * when we want to store it in another streamformat, you need to convert
          * The fmt_in.p_extra should ALWAYS contain the avcC
          * The fmt_out.p_extra should contain all the SPS and PPS with 4 byte startcodes */
-        if( h264_isavcC( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra ) )
+        if( h264_isavcC( p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra ) )
         {
             free( p_dec->fmt_out.p_extra );
             size_t i_size;
-            p_dec->fmt_out.p_extra = h264_avcC_to_AnnexB_NAL( p_dec->fmt_in.p_extra,
-                                                              p_dec->fmt_in.i_extra,
+            p_dec->fmt_out.p_extra = h264_avcC_to_AnnexB_NAL( p_dec->p_fmt_in->p_extra,
+                                                              p_dec->p_fmt_in->i_extra,
                                                              &i_size,
                                                              &p_sys->i_avcC_length_size );
             p_dec->fmt_out.i_extra = i_size;
@@ -1256,7 +1256,7 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
 
         case HXXX_SEI_FRAME_PACKING_ARRANGEMENT:
         {
-            if( p_dec->fmt_in.video.multiview_mode == MULTIVIEW_2D )
+            if( p_dec->p_fmt_in->video.multiview_mode == MULTIVIEW_2D )
             {
                 video_multiview_mode_t mode;
                 switch( p_sei_data->frame_packing.type )

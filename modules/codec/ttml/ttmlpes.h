@@ -44,7 +44,7 @@ static void ttml_in_pes_Init(struct ttml_in_pes_ctx *p)
 
 static inline bool TTML_in_PES(decoder_t *p_dec)
 {
-    return p_dec->fmt_in.i_codec == VLC_CODEC_TTML_TS;
+    return p_dec->p_fmt_in->i_codec == VLC_CODEC_TTML_TS;
 }
 
 static block_t * DecompressTTML( decoder_t *p_dec, const uint8_t *p_data, size_t i_data )

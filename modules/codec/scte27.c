@@ -491,7 +491,7 @@ static int Open(vlc_object_t *object)
 {
     decoder_t *dec = (decoder_t *)object;
 
-    if (dec->fmt_in.i_codec != VLC_CODEC_SCTE_27)
+    if (dec->p_fmt_in->i_codec != VLC_CODEC_SCTE_27)
         return VLC_EGENERIC;
 
     decoder_sys_t *sys = dec->p_sys = malloc(sizeof(*sys));

@@ -103,7 +103,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
     if(!p_sys->p_sequence_header)
         return;
 
-    if(p_dec->fmt_in.i_profile < AV1_PROFILE_MAIN)
+    if(p_dec->p_fmt_in->i_profile < AV1_PROFILE_MAIN)
     {
         int val[3];
         AV1_get_profile_level(p_sys->p_sequence_header, &val[0], &val[1], &val[2]);
@@ -116,8 +116,8 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
 
     unsigned wnum, hden;
     AV1_get_frame_max_dimensions(p_sys->p_sequence_header, &wnum, &hden);
-    if((!p_dec->fmt_in.video.i_visible_height ||
-        !p_dec->fmt_in.video.i_visible_width ||
+    if((!p_dec->p_fmt_in->video.i_visible_height ||
+        !p_dec->p_fmt_in->video.i_visible_width ||
         p_sys->b_sequence_header_changed) &&
        (p_dec->fmt_out.video.i_visible_width != wnum ||
         p_dec->fmt_out.video.i_visible_width != hden))
@@ -128,8 +128,8 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
         p_dec->fmt_out.video.i_visible_height = hden;
     }
 
-    if((!p_dec->fmt_in.video.i_frame_rate ||
-        !p_dec->fmt_in.video.i_frame_rate_base) &&
+    if((!p_dec->p_fmt_in->video.i_frame_rate ||
+        !p_dec->p_fmt_in->video.i_frame_rate_base) &&
         AV1_get_frame_rate(p_sys->p_sequence_header, &wnum, &hden) &&
         (p_dec->fmt_out.video.i_frame_rate != wnum ||
          p_dec->fmt_out.video.i_frame_rate_base != hden))
@@ -142,7 +142,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
     video_color_space_t space;
     video_transfer_func_t xfer;
     video_color_range_t full;
-    if(p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF &&
+    if(p_dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF &&
        AV1_get_colorimetry(p_sys->p_sequence_header, &prim, &xfer, &space, &full) &&
        prim != COLOR_PRIMARIES_UNDEF &&
        (p_dec->fmt_out.video.primaries != prim ||
@@ -161,7 +161,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
         p_dec->fmt_out.i_extra = 0;
     }
 
-    if(!p_dec->fmt_in.i_extra && !p_dec->fmt_out.i_extra)
+    if(!p_dec->p_fmt_in->i_extra && !p_dec->fmt_out.i_extra)
     {
         p_dec->fmt_out.i_extra =
                 AV1_create_DecoderConfigurationRecord((uint8_t **)&p_dec->fmt_out.p_extra,
@@ -543,7 +543,7 @@ static int Open(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t*)p_this;
     av1_sys_t *p_sys;
 
-    if (p_dec->fmt_in.i_codec != VLC_CODEC_AV1)
+    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_AV1)
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = calloc(1, sizeof(av1_sys_t));
@@ -564,7 +564,7 @@ static int Open(vlc_object_t *p_this)
     INITQ(tu.post);
 
     /* Copy properties */
-    es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
+    es_format_Copy(&p_dec->fmt_out, p_dec->p_fmt_in);
     p_dec->fmt_out.b_packetized = true;
 
     p_dec->pf_packetize = PacketizeOBU;

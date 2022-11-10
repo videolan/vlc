@@ -2069,8 +2069,8 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
 static void LoadExtradata( decoder_t *p_dec )
 {
     stream_t *p_stream = vlc_stream_MemoryNew( p_dec,
-                                               p_dec->fmt_in.p_extra,
-                                               p_dec->fmt_in.i_extra,
+                                               p_dec->p_fmt_in->p_extra,
+                                               p_dec->p_fmt_in->i_extra,
                                                true );
     if( !p_stream )
         return;
@@ -2157,7 +2157,7 @@ int webvtt_OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_WEBVTT )
+    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_WEBVTT )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -2176,7 +2176,7 @@ int webvtt_OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode = DecodeBlock;
     p_dec->pf_flush  = Flush;
 
-    if( p_dec->fmt_in.i_extra )
+    if( p_dec->p_fmt_in->i_extra )
         LoadExtradata( p_dec );
 
     return VLC_SUCCESS;

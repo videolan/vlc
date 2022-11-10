@@ -340,8 +340,8 @@ static int Open(vlc_object_t *p_this)
     decoder_t     *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
 
-    if (p_dec->fmt_in.i_codec != VLC_CODEC_ARIB_A &&
-        p_dec->fmt_in.i_codec != VLC_CODEC_ARIB_C) {
+    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_ARIB_A &&
+        p_dec->p_fmt_in->i_codec != VLC_CODEC_ARIB_C) {
         return VLC_ENOTSUP;
     }
 
@@ -383,7 +383,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     aribcc_profile_t i_profile = ARIBCC_PROFILE_A;
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_ARIB_C) {
+    if (p_dec->p_fmt_in->i_codec == VLC_CODEC_ARIB_C) {
         i_profile = ARIBCC_PROFILE_C;
     }
 
