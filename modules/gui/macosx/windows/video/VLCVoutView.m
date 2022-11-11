@@ -95,33 +95,6 @@
     NSRectFill(rect);
 }
 
-- (void)addVoutLayer:(CALayer *)aLayer
-{
-    if (self.layer == nil) {
-        [self setLayer:[CALayer layer]];
-        [self setWantsLayer:YES];
-    }
-
-    [CATransaction begin];
-    aLayer.opaque = 1.;
-    aLayer.hidden = NO;
-    aLayer.bounds = self.layer.bounds;
-    [self.layer addSublayer:aLayer];
-    [self setNeedsDisplay:YES];
-    [aLayer setNeedsDisplay];
-    CGRect frame = aLayer.bounds;
-    frame.origin.x = frame.origin.y = 0.;
-    aLayer.frame = frame;
-    [CATransaction commit];
-}
-
-- (void)removeVoutLayer:(CALayer *)aLayer
-{
-    [CATransaction begin];
-    [aLayer removeFromSuperlayer];
-    [CATransaction commit];
-}
-
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
     if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric)
