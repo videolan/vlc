@@ -921,6 +921,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self presentVideoView];
 
     [self.segmentedTitleControl setHidden:YES];
+    [self.optionBarView setHidden:YES];
     [self.forwardsNavigationButton setHidden:YES];
     [self.gridVsListSegmentedControl setHidden:YES];
     [self.librarySortButton setHidden:YES];
