@@ -186,6 +186,21 @@ void PlayerControllerPrivate::UpdateTrackSelection(vlc_es_id_t *trackid, bool se
 void PlayerControllerPrivate::UpdateMeta( input_item_t *p_item )
 {
     Q_Q(PlayerController);
+
+    {
+        vlc_mutex_lock(&p_item->lock);
+
+        if (p_item->p_meta)
+        {
+            m_title   = vlc_meta_Get(p_item->p_meta, vlc_meta_Title);
+            m_artist  = vlc_meta_Get(p_item->p_meta, vlc_meta_Artist);
+            m_album   = vlc_meta_Get(p_item->p_meta, vlc_meta_Album);
+            m_artwork = vlc_meta_Get(p_item->p_meta, vlc_meta_ArtworkURL);
+        }
+
+        vlc_mutex_unlock(&p_item->lock);
+    }
+
     emit q->currentMetaChanged( p_item  );
 }
 
@@ -1991,6 +2006,10 @@ PRIMITIVETYPE_GETTER(bool, isTeletextEnabled, m_teletextEnabled)
 PRIMITIVETYPE_GETTER(bool, isTeletextAvailable, m_teletextAvailable)
 PRIMITIVETYPE_GETTER(int, getTeletextPage, m_teletextPage)
 PRIMITIVETYPE_GETTER(bool, getTeletextTransparency, m_teletextTransparent)
+PRIMITIVETYPE_GETTER(QString, getTitle, m_title)
+PRIMITIVETYPE_GETTER(QString, getArtist, m_artist)
+PRIMITIVETYPE_GETTER(QString, getAlbum, m_album)
+PRIMITIVETYPE_GETTER(QUrl, getArtwork, m_artwork)
 
 // High resolution time fed by SMPTE timer
 PRIMITIVETYPE_GETTER(QString, highResolutionTime, m_highResolutionTime)

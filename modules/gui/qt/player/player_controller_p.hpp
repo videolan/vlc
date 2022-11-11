@@ -25,6 +25,7 @@
 #include "util/varchoicemodel.hpp"
 
 #include <QTimer>
+#include <QUrl>
 
 class PlayerControllerPrivate {
     Q_DISABLE_COPY(PlayerControllerPrivate)
@@ -166,6 +167,11 @@ public:
     QString         m_artUrl;
     struct input_stats_t m_stats;
 
+    // meta
+    QString m_title;
+    QString m_artist;
+    QString m_album;
+    QUrl m_artwork;
 };
 
 #endif /* QVLC_INPUT_MANAGER_P_H_ */

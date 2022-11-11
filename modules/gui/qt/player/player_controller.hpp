@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QEvent>
 #include <QScopedPointer>
+#include <QUrl>
 #include <vlc_cxx_helpers.hpp>
 #include "player/input_models.hpp"
 #include "util/audio_device_model.hpp"
@@ -125,6 +126,12 @@ public:
     Q_PROPERTY(bool ratechangable READ isRateChangable NOTIFY rateChangableChanged FINAL)
 
     Q_PROPERTY(bool canRestorePlayback READ canRestorePlayback NOTIFY playbackRestoreQueried FINAL)
+
+    // meta
+    Q_PROPERTY(QString title READ getTitle NOTIFY currentMetaChanged FINAL)
+    Q_PROPERTY(QString artist READ getArtist NOTIFY currentMetaChanged FINAL)
+    Q_PROPERTY(QString album READ getAlbum NOTIFY currentMetaChanged FINAL)
+    Q_PROPERTY(QUrl artwork READ getArtwork NOTIFY currentMetaChanged FINAL)
 
     //tracks
     Q_PROPERTY(TrackListModel* videoTracks READ getVideoTracks CONSTANT FINAL)
@@ -378,6 +385,12 @@ public slots:
     // associates subtitle file to currently playing media
     // returns true on success
     bool associateSubtitleFile(const QString &uri);
+
+    // meta
+    QString getTitle() const;
+    QString getArtist() const;
+    QString getAlbum() const;
+    QUrl getArtwork() const;
 
 signals:
     //playback
