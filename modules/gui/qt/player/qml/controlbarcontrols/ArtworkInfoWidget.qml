@@ -103,9 +103,9 @@ AbstractButton {
 
                 source: {
                     if (!paintOnly
-                        && mainPlaylistController.currentItem.artwork
-                        && mainPlaylistController.currentItem.artwork.toString())
-                        mainPlaylistController.currentItem.artwork
+                        && Player.artwork
+                        && Player.artwork.toString())
+                        Player.artwork
                     else
                         VLCStyle.noArtAlbumCover
                 }
@@ -142,7 +142,7 @@ AbstractButton {
                     if (paintOnly)
                         I18n.qtr("Title")
                     else
-                        mainPlaylistController.currentItem.title
+                        Player.title
                 }
                 color: colors.text
             }
@@ -157,7 +157,7 @@ AbstractButton {
                     if (paintOnly)
                         I18n.qtr("Artist")
                     else
-                        mainPlaylistController.currentItem.artist
+                        Player.artist
                 }
                 color: colors.menuCaption
             }
