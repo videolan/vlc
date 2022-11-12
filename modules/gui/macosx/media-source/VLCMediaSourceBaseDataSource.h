@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSButton *homeButton;
 @property (readwrite) NSPathControl *pathControl;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
-@property (readwrite) VLCMediaSourceDataSource *childDataSource;
+@property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
 
 - (void)setupViews;
 - (void)reloadViews;

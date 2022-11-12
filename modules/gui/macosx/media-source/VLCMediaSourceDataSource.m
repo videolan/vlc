@@ -23,6 +23,8 @@
 #import "VLCMediaSourceDataSource.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "media-source/VLCMediaSourceCollectionViewItem.h"
 #import "media-source/VLCMediaSource.h"
@@ -41,6 +43,11 @@
 
 - (void)setNodeToDisplay:(VLCInputNode *)nodeToDisplay
 {
+    if (!nodeToDisplay) {
+        NSLog(@"Nil node to display, will not set");
+        return;
+    }
+    
     _nodeToDisplay = nodeToDisplay;
     [self.displayedMediaSource preparseInputNodeWithinTree:_nodeToDisplay];
 }
@@ -166,6 +173,7 @@
         self.pathControl.URL = [NSURL URLWithString:[self.pathControl.URL.path stringByAppendingPathComponent:[childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         self.nodeToDisplay = node;
         [self reloadData];
+        [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
     } else if (childRootInput.inputType == ITEM_TYPE_FILE && allowPlayback) {
         [[[VLCMain sharedInstance] playlistController] addInputItem:childRootInput.vlcInputItem atPosition:-1 startPlayback:YES];
     }

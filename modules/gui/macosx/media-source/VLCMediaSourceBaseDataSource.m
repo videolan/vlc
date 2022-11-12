@@ -241,9 +241,9 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     }
 
     [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
-
     [self reloadData];
 }
+
 - (NSView *)collectionView:(NSCollectionView *)collectionView
 viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                atIndexPath:(NSIndexPath *)indexPath
@@ -357,17 +357,40 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)configureChildDataSourceWithNode:(VLCInputNode *)node andMediaSource:(VLCMediaSource *)mediaSource
 {
-    _childDataSource = [[VLCMediaSourceDataSource alloc] init];
+    if (!node || !mediaSource) {
+        NSLog(@"Received bad node or media source, could not configure child data media source");
+        return;
+    }
+    
+    VLCMediaSourceDataSource *newChildDataSource = [[VLCMediaSourceDataSource alloc] init];
+    
+    newChildDataSource.displayedMediaSource = mediaSource;
+    newChildDataSource.nodeToDisplay = node;
+    newChildDataSource.collectionView = self.collectionView;
+    newChildDataSource.pathControl = self.pathControl;
+    newChildDataSource.tableView = self.tableView;
+    
+    [self setChildDataSource:newChildDataSource];
+    [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
+}
 
-    VLCInputItem *nodeInput = node.inputItem;
+- (void)setChildDataSource:(VLCMediaSourceDataSource *)childDataSource
+{
+    if (!childDataSource) {
+        NSLog(@"Received bad childDataSource, returning home");
+        [self returnHome];
+        return;
+    } else if (childDataSource == _childDataSource) {
+        NSLog(@"Received same childDataSource");
+        return;
+    }
+    
+    _childDataSource = childDataSource;
+    
+    VLCInputItem *nodeInput = childDataSource.nodeToDisplay.inputItem;
     self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [nodeInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
     self.pathControl.hidden = NO;
     
-    _childDataSource.displayedMediaSource = mediaSource;
-    _childDataSource.nodeToDisplay = node;
-    _childDataSource.collectionView = self.collectionView;
-    _childDataSource.pathControl = self.pathControl;
-    _childDataSource.tableView = self.tableView;
     [_childDataSource setupViews];
 
     self.collectionView.dataSource = _childDataSource;
@@ -379,7 +402,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 #pragma mark - user interaction with generic buttons
 
-- (void)homeButtonAction:(id)sender
+- (void)returnHome
 {
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
@@ -389,6 +412,12 @@ referenceSizeForHeaderInSection:(NSInteger)section
     _childDataSource = nil;
 
     [self reloadData];
+}
+
+- (void)homeButtonAction:(id)sender
+{
+    [self returnHome];
+    [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
 }
 
 - (void)setCurrentViewMode
