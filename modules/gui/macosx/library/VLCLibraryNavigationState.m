@@ -23,6 +23,8 @@
 #import "VLCLibraryNavigationState.h"
 
 #import "VLCLibraryWindow.h"
+#import "media-source/VLCMediaSourceBaseDataSource.h"
+#import "media-source/VLCMediaSourceDataSource.h"
 
 @implementation VLCLibraryNavigationState
 
@@ -34,6 +36,8 @@
         _libraryWindowSelectedSegment = libraryWindow.segmentedTitleControl.selectedSegment;
         _viewModeSelectedSegment = libraryWindow.gridVsListSegmentedControl.selectedSegment;
         _audioLibraryViewSelectedSegment = libraryWindow.audioSegmentedControl.selectedSegment;
+        _currentMediaSource = libraryWindow.mediaSourceDataSource.childDataSource;
+        _currentNodeDisplayed = libraryWindow.mediaSourceDataSource.childDataSource.nodeToDisplay;
     }
 
     return navState;

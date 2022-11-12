@@ -26,6 +26,7 @@
 #import "VLCLibraryAudioDataSource.h"
 #import "VLCLibraryNavigationState.h"
 #import "media-source/VLCMediaSourceBaseDataSource.h"
+#import "media-source/VLCMediaSourceDataSource.h"
 
 @interface VLCLibraryNavigationCurrentStackPosition : NSObject
 
@@ -155,6 +156,8 @@
     [_delegate.segmentedTitleControl setSelectedSegment:state.libraryWindowSelectedSegment];
     [_delegate.audioSegmentedControl setSelectedSegment:state.audioLibraryViewSelectedSegment];
     [_delegate.gridVsListSegmentedControl setSelectedSegment:state.viewModeSelectedSegment];
+    [_delegate.mediaSourceDataSource setChildDataSource:state.currentMediaSource];
+    [_delegate.mediaSourceDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 
     [_delegate segmentedControlAction:self];
     [_delegate.libraryAudioDataSource segmentedControlAction:self];
