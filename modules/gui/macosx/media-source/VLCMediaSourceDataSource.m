@@ -41,12 +41,9 @@
 
 @implementation VLCMediaSourceDataSource
 
-- (void)setNodeToDisplay:(VLCInputNode *)nodeToDisplay
+- (void)setNodeToDisplay:(nonnull VLCInputNode*)nodeToDisplay
 {
-    if (!nodeToDisplay) {
-        NSLog(@"Nil node to display, will not set");
-        return;
-    }
+    NSAssert(nodeToDisplay, @"Nil node to display, will not set");
     
     _nodeToDisplay = nodeToDisplay;
     [self.displayedMediaSource preparseInputNodeWithinTree:_nodeToDisplay];

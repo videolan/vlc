@@ -42,6 +42,7 @@ extern NSString *VLCMediaSourcePreparsingEnded;
                         forCategory:(enum services_discovery_category_e)category;
 
 - (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
+- (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
 
 @property (nonatomic, readonly) NSString *mediaSourceDescription;
 @property (nonatomic, readonly) VLCInputNode *rootNode;

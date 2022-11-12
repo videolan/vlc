@@ -581,6 +581,10 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
     self = [super init];
     if (self && p_inputNode != NULL) {
         _vlcInputItemNode = p_inputNode;
+        
+        if (_vlcInputItemNode->p_item) {
+            _inputItem = [[VLCInputItem alloc] initWithInputItem:_vlcInputItemNode->p_item];
+        }
     }
     return self;
 }
@@ -593,14 +597,6 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
     else
         inputItemName = @"p_item == nil";
     return [NSString stringWithFormat:@"%@: node: %p input name: %@, number of children: %i", NSStringFromClass([self class]),_vlcInputItemNode, inputItemName, self.numberOfChildren];
-}
-
-- (VLCInputItem *)inputItem
-{
-    if (_vlcInputItemNode->p_item) {
-        return [[VLCInputItem alloc] initWithInputItem:_vlcInputItemNode->p_item];
-    }
-    return nil;
 }
 
 - (int)numberOfChildren

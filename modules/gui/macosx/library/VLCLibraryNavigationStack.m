@@ -25,8 +25,10 @@
 #import "VLCLibraryWindow.h"
 #import "VLCLibraryAudioDataSource.h"
 #import "VLCLibraryNavigationState.h"
+#import "VLCInputItem.h"
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCMediaSourceDataSource.h"
+#import "media-source/VLCMediaSource.h"
 
 @interface VLCLibraryNavigationCurrentStackPosition : NSObject
 
@@ -127,6 +129,7 @@
         NSUInteger firstIndexToRemove = _currentPosition.navigationStackIndex + 1;
         // -1 to account for the array count
         NSRange rangeToRemove = NSMakeRange(firstIndexToRemove, (_navigationStates.count - 1) - _currentPosition.navigationStackIndex);
+        [self removeAndCleanUpStatesInRange:rangeToRemove];
         [_navigationStates removeObjectsInRange:rangeToRemove];
     }
 
@@ -135,6 +138,22 @@
     [_navigationStates addObject:navigationState];
 
     [self updateDelegateNavigationButtons];
+}
+
+- (void)removeAndCleanUpStatesInRange:(NSRange)range
+{
+    NSAssert(range.location + range.length - 1 < _navigationStates.count, @"Invalid range for state removal and cleanup, out of bounds.");
+    
+    for (NSUInteger i = range.location; i < range.length; ++i) {
+        VLCLibraryNavigationState *state = [_navigationStates objectAtIndex:i];
+        VLCInputNode *stateNode = state.currentNodeDisplayed;
+        
+        if (stateNode) {
+            [state.currentMediaSource.displayedMediaSource clearChildNodesForNode:stateNode.vlcInputItemNode];
+        }
+        
+        [_navigationStates removeObjectAtIndex:i];
+    }
 }
 
 - (void)updateDelegateNavigationButtons

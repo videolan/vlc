@@ -180,6 +180,11 @@ static const char *const localDevicesDescription = "My Machine";
 
 - (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode
 {
+    if(!inputNode) {
+        NSLog(@"Could not preparese input node, is null.");
+        return;
+    }
+
     if (_p_mediaSource->description == localDevicesDescription) {
         [self generateLocalDevicesTree];
     }
@@ -189,24 +194,24 @@ static const char *const localDevicesDescription = "My Machine";
     }
 
     if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY) {
-	input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
-
-	[self clearChildNodesForNode:vlcInputNode];
+        input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
-	[self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
 
-	return;
+        [self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
+        return;
     }
 
     vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputNode.inputItem.vlcInputItem, NULL);
 }
 
-- (void)clearChildNodesForNode:(input_item_node_t*)inputNode
+- (void)clearChildNodesForNode:(nonnull input_item_node_t*)inputNode
 {
+    NSAssert(inputNode != NULL, @"Could not clear child nodes for input node as node is null");
+
     while(inputNode->i_children > 0) {
-	input_item_node_t *childNode = inputNode->pp_children[0];
-	input_item_node_RemoveNode(inputNode, childNode);
-	input_item_node_Delete(childNode);
+        input_item_node_t *childNode = inputNode->pp_children[0];
+        input_item_node_RemoveNode(inputNode, childNode);
+        input_item_node_Delete(childNode);
     }
 }
 
