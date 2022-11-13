@@ -114,8 +114,8 @@ sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
 SUFFIXES += .proto .pb.cc
 
 stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc: stream_out/chromecast/cast_channel.proto
-	mkdir -p stream_out/chromecast/@PROTOBUF_VERSION@
-	$(PROTOC) --cpp_out=stream_out/chromecast/@PROTOBUF_VERSION@ -I$(srcdir)/stream_out/chromecast $<
+	$(AM_V_at)mkdir -p stream_out/chromecast/@PROTOBUF_VERSION@
+	$(AM_V_GEN)$(PROTOC) --cpp_out=stream_out/chromecast/@PROTOBUF_VERSION@ -I$(srcdir)/stream_out/chromecast $<
 
 stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.h: stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc
 
