@@ -174,6 +174,7 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
         case VLC_WINDOW_MOUSE_DOUBLE_CLICK:
             assert(window->info.has_double_click);
             m->b_double_click = true;
+            vlc_mouse_SetPressed(m, ev->button_mask);
             break;
 
         default:
