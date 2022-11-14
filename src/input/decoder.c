@@ -1293,6 +1293,15 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     }
 
     vlc_fifo_Lock(p_owner->p_fifo);
+    vlc_aout_stream *p_astream = p_owner->p_astream;
+    if( p_astream == NULL )
+    {
+        vlc_fifo_Unlock(p_owner->p_fifo);
+        msg_Dbg( p_dec, "discarded audio buffer" );
+        block_Release( p_audio );
+        return VLC_EGENERIC;
+    }
+
     if (p_owner->flushing)
     {
         vlc_fifo_Unlock(p_owner->p_fifo);
@@ -1315,8 +1324,7 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     {
         msg_Dbg( p_dec, "end of audio preroll" );
 
-        if( p_owner->p_astream )
-            vlc_aout_stream_Flush( p_owner->p_astream );
+        vlc_aout_stream_Flush( p_astream );
     }
 
     /* */
@@ -1326,15 +1334,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     /* */
     DecoderWaitUnblock( p_owner );
     vlc_fifo_Unlock(p_owner->p_fifo);
-
-    vlc_aout_stream *p_astream = p_owner->p_astream;
-
-    if( p_astream == NULL )
-    {
-        msg_Dbg( p_dec, "discarded audio buffer" );
-        block_Release( p_audio );
-        return VLC_EGENERIC;
-    }
 
     int status = vlc_aout_stream_Play( p_astream, p_audio );
     if( status == AOUT_DEC_CHANGED )
