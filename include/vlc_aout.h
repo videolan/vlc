@@ -29,6 +29,7 @@
 #include "vlc_block.h"
 #include "vlc_es.h"
 #include "vlc_list.h"
+#include "vlc_es.h"
 
 /**
  * \defgroup audio_output Audio output
