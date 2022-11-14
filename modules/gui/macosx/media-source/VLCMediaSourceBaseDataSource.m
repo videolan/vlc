@@ -417,7 +417,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)homeButtonAction:(id)sender
 {
     [self returnHome];
-    [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
+    VLCLibraryNavigationStack *mainNavStack = [VLCMain sharedInstance].libraryWindow.navigationStack;
+    if(sender != mainNavStack && sender != self) {
+        [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
+    }
 }
 
 - (void)setCurrentViewMode
