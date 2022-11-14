@@ -115,6 +115,7 @@ typedef struct vout_thread_sys_t
         bool        is_interlaced;
         picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
+        picture_captions_t captions;
     } displayed;
 
     struct {
@@ -993,6 +994,7 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
 
         sys->displayed.decoded       = picture_Hold(decoded);
         sys->displayed.timestamp     = decoded->date;
+        sys->displayed.captions      = decoded->captions;
         sys->displayed.is_interlaced = !decoded->b_progressive;
 
         vout_chrono_Start(&sys->chrono.static_filter);
@@ -1378,6 +1380,10 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
                                VLC_TRACE("id", sys->str_id),
                                VLC_TRACE("drift", drift), VLC_TRACE_END);
 
+    if(sys->displayed.captions.size)
+        vout_CaptionsToDisplay(&vout->obj,
+                sys->displayed.captions.bytes,
+                sys->displayed.captions.size);
     return VLC_SUCCESS;
 }
 
@@ -1460,6 +1466,9 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
             sys->displayed.decoded   = NULL;
             sys->displayed.date      = VLC_TICK_INVALID;
             sys->displayed.timestamp = VLC_TICK_INVALID;
+            /* Is caption still relevant here? */
+            sys->displayed.captions.size = 0;
+            sys->displayed.caption_reference = NULL;
         }
     }
 
@@ -1644,6 +1653,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     sys->displayed.decoded       = NULL;
     sys->displayed.date          = VLC_TICK_INVALID;
     sys->displayed.timestamp     = VLC_TICK_INVALID;
+    sys->displayed.captions.size = 0;
     sys->displayed.is_interlaced = false;
 
     sys->step.last               = VLC_TICK_INVALID;

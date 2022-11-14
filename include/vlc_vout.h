@@ -104,6 +104,14 @@ vout_ReportFirstFrame(vout_thread_t *vout)
         vout->cbs->first_frame_reported(vout, vout->owner);
 }
 
+static inline void
+vout_CaptionsToDisplay(vout_thread_t *vout, const void *p_cc, size_t i_cc)
+{
+    assert(vout);
+    if (vout->cbs && vout->cbs->captions_to_display)
+        vout->cbs->captions_to_display(p_cc, i_cc, vout->owner);
+}
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
