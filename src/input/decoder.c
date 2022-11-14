@@ -1313,7 +1313,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     }
 
     p_owner->i_preroll_end = PREROLL_NONE;
-    vlc_fifo_Unlock(p_owner->p_fifo);
 
     if( unlikely(prerolled) )
     {
@@ -1322,13 +1321,7 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
         vlc_aout_stream_Flush( p_astream );
     }
 
-    /* */
-    /* */
-    vlc_fifo_Lock(p_owner->p_fifo);
-
-    /* */
     DecoderWaitUnblock( p_owner );
-    vlc_fifo_Unlock(p_owner->p_fifo);
 
     int status = vlc_aout_stream_Play( p_astream, p_audio );
     if( status == AOUT_DEC_CHANGED )
@@ -1343,6 +1336,8 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
             * previous (failing) aout but will try to create a new one. */
         atomic_store( &p_owner->reload, RELOAD_DECODER_AOUT );
     }
+
+    vlc_fifo_Unlock(p_owner->p_fifo);
     return VLC_SUCCESS;
 }
 
