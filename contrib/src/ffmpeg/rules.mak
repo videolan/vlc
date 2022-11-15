@@ -54,6 +54,10 @@ else
 FFMPEGCONF += --disable-encoders --disable-muxers
 endif
 
+ifneq ($(findstring amf,$(PKGS)),)
+DEPS_ffmpeg += amf $(DEPS_amf)
+endif
+
 # Postproc
 MAYBE_POSTPROC =
 ifdef GPL
