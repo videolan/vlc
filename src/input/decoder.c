@@ -115,6 +115,7 @@ enum reload
 struct vlc_input_decoder_t
 {
     decoder_t        dec;
+    es_format_t      dec_fmt_in;
     input_resource_t*p_resource;
     vlc_clock_t     *p_clock;
     const char *psz_id;
@@ -132,6 +133,7 @@ struct vlc_input_decoder_t
 
     /* Some decoders require already packetized data (ie. not truncated) */
     decoder_t *p_packetizer;
+    es_format_t pktz_fmt_in;
     bool b_packetizer;
 
     /* Current format in use by the output */
@@ -263,10 +265,11 @@ static inline bool vlc_input_decoder_IsSynchronous( const vlc_input_decoder_t *d
 /**
  * Load a decoder module
  */
-static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
+static int LoadDecoder( decoder_t *p_dec, bool b_packetizer, es_format_t *fmt_in,
                         const es_format_t *restrict p_fmt )
 {
-    decoder_Init( p_dec, p_fmt );
+    vlc_input_decoder_t *owner = dec_get_owner( p_dec );
+    decoder_Init( p_dec, fmt_in, p_fmt );
 
     p_dec->b_frame_drop_allowed = true;
 
@@ -286,6 +289,7 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
 
     if( !p_dec->p_module )
     {
+        es_format_Clean(fmt_in);
         decoder_Clean( p_dec );
         return -1;
     }
@@ -306,6 +310,7 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
     }
 
     /* Restart the decoder module */
+    es_format_Clean( &p_owner->dec_fmt_in );
     decoder_Clean( p_dec );
     p_owner->error = false;
 
@@ -325,7 +330,7 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
         }
     }
 
-    if( LoadDecoder( p_dec, false, &fmt_in ) )
+    if( LoadDecoder( p_dec, false, &p_owner->dec_fmt_in, &fmt_in ) )
     {
         p_owner->error = true;
         es_format_Clean( &fmt_in );
@@ -1946,7 +1951,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
             vlc_custom_create( p_parent, sizeof( decoder_t ), "packetizer" );
         if( p_owner->p_packetizer )
         {
-            if( LoadDecoder( p_owner->p_packetizer, true, fmt ) )
+            if( LoadDecoder( p_owner->p_packetizer, true, &p_owner->pktz_fmt_in, fmt ) )
             {
                 vlc_object_delete(p_owner->p_packetizer);
                 p_owner->p_packetizer = NULL;
@@ -1979,7 +1984,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     }
 
     /* Find a suitable decoder/packetizer module */
-    if( LoadDecoder( p_dec, cfg->sout != NULL, fmt ) )
+    if( LoadDecoder( p_dec, cfg->sout != NULL, &p_owner->dec_fmt_in, fmt ) )
         return p_owner;
 
     assert( p_dec->p_fmt_in->i_cat == p_dec->fmt_out.i_cat && fmt->i_cat == p_dec->p_fmt_in->i_cat);
@@ -2027,6 +2032,8 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
              (char*)&p_dec->p_fmt_in->i_codec );
 
+    es_format_Clean( &p_owner->dec_fmt_in );
+    es_format_Clean( &p_owner->pktz_fmt_in );
     decoder_Clean( p_dec );
     if ( p_owner->out_pool )
     {

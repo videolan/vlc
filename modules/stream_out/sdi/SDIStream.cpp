@@ -205,6 +205,7 @@ const StreamID & AbstractStream::getID() const
 struct decoder_owner
 {
     decoder_t dec;
+    es_format_t fmt_in;
     AbstractDecodedStream *id;
     bool b_error;
     es_format_t last_fmt_update;
@@ -268,7 +269,7 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
     p_owner->id = this;
 
     p_decoder = &p_owner->dec;
-    decoder_Init( p_decoder, p_fmt );
+    decoder_Init( p_decoder, &p_owner->fmt_in, p_fmt );
 
     setCallbacks();
 
@@ -284,6 +285,7 @@ bool AbstractDecodedStream::init(const es_format_t *p_fmt)
     {
         es_format_Clean(&p_owner->decoder_out);
         es_format_Clean(&p_owner->last_fmt_update);
+        es_format_Clean(&p_owner->fmt_in);
         decoder_Destroy( p_decoder );
         p_decoder = NULL;
         return false;
@@ -418,6 +420,7 @@ void AbstractDecodedStream::ReleaseDecoder()
     p_owner = container_of(p_decoder, struct decoder_owner, dec);
     es_format_Clean(&p_owner->decoder_out);
     es_format_Clean(&p_owner->last_fmt_update);
+    es_format_Clean(&p_owner->fmt_in);
     decoder_Destroy( p_decoder );
     p_decoder = NULL;
 }

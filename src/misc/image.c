@@ -51,6 +51,7 @@
 struct decoder_owner
 {
     decoder_t dec;
+    es_format_t fmt_in;
     image_handler_t *p_image;
 };
 
@@ -116,6 +117,8 @@ void image_HandlerDelete( image_handler_t *p_image )
 {
     if( !p_image ) return;
 
+    struct decoder_owner *p_owner = dec_get_owner( p_image->p_dec );
+    es_format_Clean( &p_owner->fmt_in );
     decoder_Destroy( p_image->p_dec );
     if( p_image->p_enc )
         vlc_encoder_Destroy( p_image->p_enc );
@@ -154,6 +157,8 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
     if( p_image->p_dec &&
         p_image->p_dec->p_fmt_in->i_codec != p_es_in->video.i_chroma )
     {
+        struct decoder_owner *p_owner = dec_get_owner( p_image->p_dec );
+        es_format_Clean( &p_owner->fmt_in );
         decoder_Destroy( p_image->p_dec );
         p_image->p_dec = NULL;
     }
@@ -169,6 +174,8 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
         if( p_image->p_dec->fmt_out.i_cat != VIDEO_ES )
         {
+            struct decoder_owner *p_owner = dec_get_owner( p_image->p_dec );
+            es_format_Clean( &p_owner->fmt_in );
             decoder_Destroy( p_image->p_dec );
             p_image->p_dec = NULL;
             block_Release(p_block);
@@ -678,7 +685,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     p_dec = &p_owner->dec;
     p_owner->p_image = p_image;
 
-    decoder_Init( p_dec, fmt );
+    decoder_Init( p_dec, &p_owner->fmt_in, fmt );
 
     static const struct decoder_owner_callbacks dec_cbs =
     {
@@ -697,6 +704,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
                  "VLC probably does not support this image format.",
                  (char*)&p_dec->p_fmt_in->i_codec );
 
+        es_format_Clean( &p_owner->fmt_in );
         decoder_Destroy( p_dec );
         p_dec = NULL;
     }

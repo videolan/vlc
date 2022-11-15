@@ -42,6 +42,7 @@
 struct decoder_owner
 {
     decoder_t dec;
+    es_format_t fmt_in;
     decoder_t *packetizer;
 };
 
@@ -89,7 +90,9 @@ static void queue_sub(decoder_t *dec, subpicture_t *p_subpic)
 static int decoder_load(decoder_t *decoder, bool is_packetizer,
                          const es_format_t *restrict fmt)
 {
-    decoder_Init( decoder, fmt );
+    struct decoder_owner *owner = dec_get_owner(decoder);
+
+    decoder_Init( decoder, &owner->fmt_in, fmt );
 
     decoder->b_frame_drop_allowed = true;
 
@@ -108,6 +111,7 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
 
     if (!decoder->p_module)
     {
+        es_format_Clean( &owner->fmt_in );
         decoder_Clean( decoder );
         return VLC_EGENERIC;
     }
@@ -118,6 +122,7 @@ void test_decoder_destroy(decoder_t *decoder)
 {
     struct decoder_owner *owner = dec_get_owner(decoder);
 
+    es_format_Clean(&owner->fmt_in);
     decoder_Destroy(owner->packetizer);
     decoder_Destroy(decoder);
 }
@@ -223,6 +228,7 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
             decoder->pf_decode(decoder, NULL);
 
             /* Reload decoder */
+            es_format_Clean( &owner->fmt_in );
             decoder_Clean(decoder);
             if (decoder_load(decoder, false, &packetizer->fmt_out) != VLC_SUCCESS)
             {

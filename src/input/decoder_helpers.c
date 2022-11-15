@@ -34,7 +34,7 @@
 #include <vlc_picture.h>
 #include "libvlc.h"
 
-void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
+void decoder_Init( decoder_t *p_dec, es_format_t *restrict fmt_in, const es_format_t *restrict p_fmt )
 {
     p_dec->i_extra_picture_buffers = 0;
     p_dec->b_frame_drop_allowed = false;
@@ -45,8 +45,9 @@ void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
     p_dec->pf_flush = NULL;
     p_dec->p_module = NULL;
 
-    es_format_Copy( &p_dec->fmt_in, p_fmt );
-    p_dec->p_fmt_in = &p_dec->fmt_in;
+    assert(fmt_in != NULL);
+    es_format_Copy( fmt_in, p_fmt );
+    p_dec->p_fmt_in = fmt_in;
     es_format_Init( &p_dec->fmt_out, p_fmt->i_cat, 0 );
 }
 
@@ -58,7 +59,6 @@ void decoder_Clean( decoder_t *p_dec )
         p_dec->p_module = NULL;
     }
 
-    es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );
 
     if ( p_dec->p_description )

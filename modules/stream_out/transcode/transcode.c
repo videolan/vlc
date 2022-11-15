@@ -592,7 +592,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     p_owner->p_stream = p_stream;
 
     id->p_decoder = &p_owner->dec;
-    decoder_Init( id->p_decoder, p_fmt );
+    decoder_Init( id->p_decoder, &p_owner->fmt_in, p_fmt );
 
     es_format_SetMeta( &id->p_decoder->fmt_out, id->p_decoder->p_fmt_in );
 
@@ -673,6 +673,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     return id;
 
 error:
+    es_format_Clean( &p_owner->fmt_in );
     decoder_Destroy( id->p_decoder );
     DeleteSoutStreamID( id );
     return NULL;
@@ -683,6 +684,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
+    struct decoder_owner *p_owner = id->p_decoder ? dec_get_owner(id->p_decoder) : NULL;
     if( id->b_transcode )
     {
         int i_cat = id->p_decoder ? id->p_decoder->p_fmt_in->i_cat : UNKNOWN_ES;
@@ -690,6 +692,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
         {
         case AUDIO_ES:
             Send( p_stream, id, NULL );
+            es_format_Clean( &p_owner->fmt_in );
             decoder_Destroy( id->p_decoder );
             vlc_mutex_lock( &p_sys->lock );
             if( id == p_sys->id_master_sync )
@@ -702,6 +705,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
              * decoder/encoder might not even exist. */
             if(!id->b_error)
                 Send( p_stream, id, NULL );
+            es_format_Clean( &p_owner->fmt_in );
             decoder_Destroy( id->p_decoder );
             vlc_mutex_lock( &p_sys->lock );
             if( id == p_sys->id_video )
@@ -710,6 +714,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
             transcode_video_clean( id );
             break;
         case SPU_ES:
+            es_format_Clean( &p_owner->fmt_in );
             decoder_Destroy( id->p_decoder );
             transcode_spu_clean( p_stream, id );
             break;
@@ -718,7 +723,12 @@ static void Del( sout_stream_t *p_stream, void *_id )
         }
         transcode_track_pcr_helper_Delete( id->pcr_helper );
     }
-    else decoder_Destroy( id->p_decoder );
+    else
+    {
+        if (p_owner)
+            es_format_Clean( &p_owner->fmt_in );
+        decoder_Destroy( id->p_decoder );
+    }
 
     if( id->downstream_id ) sout_StreamIdDel( p_stream->p_next, id->downstream_id );
 

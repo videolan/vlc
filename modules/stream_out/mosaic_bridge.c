@@ -64,6 +64,7 @@ typedef struct
 struct decoder_owner
 {
     decoder_t dec;
+    es_format_t fmt_in;
     vlc_decoder_device *dec_dev;
     sout_stream_t *p_stream;
 };
@@ -315,6 +316,7 @@ static void ReleaseDecoder( decoder_t *p_dec )
         vlc_decoder_device_Release( p_owner->dec_dev );
         p_owner->dec_dev = NULL;
     }
+    es_format_Clean( &p_owner->fmt_in );
     decoder_Destroy( p_dec );
 }
 
@@ -341,7 +343,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( !p_owner )
         return NULL;
     p_sys->p_decoder = &p_owner->dec;
-    decoder_Init( p_sys->p_decoder, p_fmt );
+    decoder_Init( p_sys->p_decoder, &p_owner->fmt_in, p_fmt );
 
     p_sys->p_decoder->b_frame_drop_allowed = true;
     p_sys->p_decoder->fmt_out = *p_sys->p_decoder->p_fmt_in;

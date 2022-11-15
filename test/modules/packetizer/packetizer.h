@@ -52,13 +52,15 @@ struct params_s
 struct packetizer_owner
 {
     decoder_t   packetizer;
+    es_format_t fmt_in;
 };
 
 static void delete_packetizer(decoder_t *p_pack)
 {
+    struct packetizer_owner *owner = container_of(p_pack, struct packetizer_owner, packetizer);
     if(p_pack->p_module)
         module_unneed(p_pack, p_pack->p_module);
-    es_format_Clean(&p_pack->fmt_in);
+    es_format_Clean(&owner->fmt_in);
     es_format_Clean(&p_pack->fmt_out);
     if(p_pack->p_description)
         vlc_meta_Delete(p_pack->p_description);
@@ -77,12 +79,12 @@ static decoder_t *create_packetizer(libvlc_instance_t *vlc,
     p_pack->pf_decode = NULL;
     p_pack->pf_packetize = NULL;
 
-    es_format_Init(&p_pack->fmt_in, VIDEO_ES, codec);
+    es_format_Init(&owner->fmt_in, VIDEO_ES, codec);
     es_format_Init(&p_pack->fmt_out, VIDEO_ES, 0);
-    p_pack->fmt_in.video.i_frame_rate = num;
-    p_pack->fmt_in.video.i_frame_rate_base = den;
-    p_pack->fmt_in.b_packetized = false;
-    p_pack->p_fmt_in = &p_pack->fmt_in;
+    owner->fmt_in.video.i_frame_rate = num;
+    owner->fmt_in.video.i_frame_rate_base = den;
+    owner->fmt_in.b_packetized = false;
+    p_pack->fmt_in = &owner->fmt_in;
 
     p_pack->p_module = module_need( p_pack, "packetizer", NULL, false );
     if(!p_pack->p_module)

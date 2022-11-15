@@ -377,6 +377,7 @@ int demux_vaControlHelper( stream_t *s,
 struct packetizer_owner
 {
     decoder_t   packetizer;
+    es_format_t fmt_in;
 };
 
 /****************************************************************************
@@ -397,8 +398,8 @@ decoder_t *demux_PacketizerNew( vlc_object_t *p_demux, es_format_t *p_fmt, const
     p_packetizer->pf_decode = NULL;
     p_packetizer->pf_packetize = NULL;
 
-    p_packetizer->fmt_in = *p_fmt;
-    p_packetizer->p_fmt_in = &p_packetizer->fmt_in;
+    owner->fmt_in = *p_fmt;
+    p_packetizer->p_fmt_in = &owner->fmt_in;
     es_format_Init( &p_packetizer->fmt_out, p_fmt->i_cat, 0 );
 
     p_packetizer->p_module = module_need( p_packetizer, "packetizer", NULL, false );
@@ -415,9 +416,10 @@ decoder_t *demux_PacketizerNew( vlc_object_t *p_demux, es_format_t *p_fmt, const
 
 void demux_PacketizerDestroy( decoder_t *p_packetizer )
 {
+    struct packetizer_owner *owner = container_of(p_packetizer, struct packetizer_owner, packetizer);
     if( p_packetizer->p_module )
         module_unneed( p_packetizer, p_packetizer->p_module );
-    es_format_Clean( &p_packetizer->fmt_in );
+    es_format_Clean( &owner->fmt_in );
     es_format_Clean( &p_packetizer->fmt_out );
     if( p_packetizer->p_description )
         vlc_meta_Delete( p_packetizer->p_description );

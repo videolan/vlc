@@ -105,8 +105,6 @@ struct decoder_t
     module_t *          p_module;
     void               *p_sys;
 
-    /* Input format ie from demuxer (XXX: a lot of fields could be invalid) */
-    es_format_t         fmt_in;
     /* Input format ie from demuxer (XXX: a lot of fields could be invalid),
        cannot be NULL */
     const es_format_t   *p_fmt_in;
@@ -396,8 +394,12 @@ VLC_API picture_t *decoder_NewPicture( decoder_t *dec );
  *
  * To be used by decoder owners.
  * By default frame drop is not allowed.
+ *
+ * @param dec the decoder to be initialized
+ * @param fmt_in the es_format_t where the decoder owner stores the input ES format
+ * @param fmt the input es_format_t used to initialize the decoder
  */
-VLC_API void decoder_Init( decoder_t *dec, const es_format_t * );
+VLC_API void decoder_Init( decoder_t *dec, es_format_t *fmt_in, const es_format_t *fmt );
 
 /**
  * Destroy a decoder and reset the structure.
