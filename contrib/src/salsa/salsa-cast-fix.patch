@@ -1,0 +1,29 @@
+From 0c83bfa7ddc13efa2160a8d6f2d081818ed5d6af Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 25 Feb 2022 09:37:13 +0100
+Subject: [PATCH] fix invalid cast
+
+I get this error when compiling
+
+```
+error: assignment to 'snd_config_t **' {aka 'struct _snd_config **'} from incompatible pointer type 'snd_config_t *' {aka 'struct _snd_config *'} [-Werror=incompatible-pointer-types]
+|         top = (snd_config_t*)1;
+|             ^
+```
+---
+ src/conf.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/conf.h b/src/conf.h
+index 56858e7..2603d93 100644
+--- a/src/conf.h
++++ b/src/conf.h
+@@ -69,7 +69,7 @@ __SALSA_EXPORT_FUNC
+ int snd_config_update_ref(snd_config_t **top)
+ {
+ 	/* an invalid address, but just mark to be non-NULL */
+-	top = (snd_config_t*)1;
++	*top = (snd_config_t*)1;
+ 	snd_config_update();
+ 	return 0;
+ }

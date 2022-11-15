@@ -23,6 +23,7 @@ $(TARBALLS)/salsa-lib-$(SALSA_TAG).tar.xz:
 
 salsa-lib: salsa-lib-$(SALSA_TAG).tar.xz .sum-salsa
 	$(UNPACK)
+	$(APPLY) $(SRC)/salsa/salsa-cast-fix.patch
 	$(MOVE)
 
 .salsa: salsa-lib
