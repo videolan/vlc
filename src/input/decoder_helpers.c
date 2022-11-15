@@ -46,6 +46,7 @@ void decoder_Init( decoder_t *p_dec, const es_format_t *restrict p_fmt )
     p_dec->p_module = NULL;
 
     es_format_Copy( &p_dec->fmt_in, p_fmt );
+    p_dec->p_fmt_in = &p_dec->fmt_in;
     es_format_Init( &p_dec->fmt_out, p_fmt->i_cat, 0 );
 }
 

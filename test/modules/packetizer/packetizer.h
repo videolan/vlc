@@ -82,6 +82,7 @@ static decoder_t *create_packetizer(libvlc_instance_t *vlc,
     p_pack->fmt_in.video.i_frame_rate = num;
     p_pack->fmt_in.video.i_frame_rate_base = den;
     p_pack->fmt_in.b_packetized = false;
+    p_pack->p_fmt_in = &p_pack->fmt_in;
 
     p_pack->p_module = module_need( p_pack, "packetizer", NULL, false );
     if(!p_pack->p_module)

@@ -398,6 +398,7 @@ decoder_t *demux_PacketizerNew( vlc_object_t *p_demux, es_format_t *p_fmt, const
     p_packetizer->pf_packetize = NULL;
 
     p_packetizer->fmt_in = *p_fmt;
+    p_packetizer->p_fmt_in = &p_packetizer->fmt_in;
     es_format_Init( &p_packetizer->fmt_out, p_fmt->i_cat, 0 );
 
     p_packetizer->p_module = module_need( p_packetizer, "packetizer", NULL, false );

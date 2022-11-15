@@ -105,8 +105,11 @@ struct decoder_t
     module_t *          p_module;
     void               *p_sys;
 
-    /* Input format ie from demuxer (XXX: a lot of field could be invalid) */
+    /* Input format ie from demuxer (XXX: a lot of fields could be invalid) */
     es_format_t         fmt_in;
+    /* Input format ie from demuxer (XXX: a lot of fields could be invalid),
+       cannot be NULL */
+    const es_format_t   *p_fmt_in;
 
     /* Output format of decoder/packetizer */
     es_format_t         fmt_out;
