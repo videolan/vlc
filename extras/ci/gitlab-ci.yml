@@ -284,21 +284,16 @@ debian:
         fi
         cd ../../
 
-        # Build VLC
+        # Configure VLC
         ./bootstrap
         ./configure
-        make -j$NCPU
 
-        # Run tests
-        VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
-        if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
-            export XZ_OPT="-T 0"
-            make -j$NCPU distcheck
-        else
-          # Don't run distcheck but dist as it is already tested via
-          # make_check_wrapper.sh
-          make -j$NCPU dist
-        fi
+        # Allow core dumps for tracing test failures
+        ulimit -c unlimited
+
+        # Build, check and distcheck VLC
+        export XZ_OPT="-T 0"
+        VLC_TEST_TIMEOUT=60 make -j$NCPU distcheck || ./test/dump_stacktraces.sh
     variables: *variables-debian
 
 nightly-debian:

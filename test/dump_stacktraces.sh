@@ -2,12 +2,14 @@
 
 # Helper used to print more information (log + core dump) about a failing test
 
-ulimit -c unlimited
+if [ $# -gt 0 ];then
+    # exit code passed in from stdin
+    ret=$1
+else
+    ret=1
+fi
 
-make check $*
-ret=$?
-
-if [ $ret -eq 0 ] || ! (which gdb >/dev/null);then
+if [ $ret -eq 0 ] || ! (command -v gdb >/dev/null);then
     exit $ret
 fi
 
