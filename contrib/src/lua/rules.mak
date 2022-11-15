@@ -58,9 +58,9 @@ endif
 LUA_MAKEFLAGS := \
 	$(HOSTTOOLS) \
 	AR="$(AR) rcu" \
-	MYCFLAGS="$(CFLAGS)" \
-	MYLDFLAGS="$(LDFLAGS)" \
-	CPPFLAGS="$(CPPFLAGS)"
+	MYCFLAGS="$(CFLAGS) $(PIC)" \
+	MYLDFLAGS="$(LDFLAGS) $(PIC)" \
+	CPPFLAGS="$(CPPFLAGS) $(PIC)"
 
 # Make sure we do not use the cross-compiler when building
 # the native luac for the host.
@@ -96,12 +96,12 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(MOVE)
 
 .lua: lua
-	$(HOSTVARS_PIC) $(MAKE) -C $< $(LUA_TARGET) $(LUA_MAKEFLAGS)
+	$(MAKE) -C $< $(LUA_TARGET) $(LUA_MAKEFLAGS)
 ifdef HAVE_WIN32
-	$(HOSTVARS) $(MAKE) -C $< -C src liblua$(LUA_SHORTVERSION).a $(LUA_MAKEFLAGS)
+	$(MAKE) -C $< -C src liblua$(LUA_SHORTVERSION).a $(LUA_MAKEFLAGS)
 endif
 
-	$(HOSTVARS) $(MAKE) -C $< install \
+	$(MAKE) -C $< install \
 		INSTALL_INC="$(PREFIX)/include/lua$(LUA_SHORTVERSION)" \
 		INSTALL_TOP="$(PREFIX)" \
 		$(LUA_MAKEFLAGS)
