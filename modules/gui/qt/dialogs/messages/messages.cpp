@@ -84,7 +84,6 @@ MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
                                          QDialogButtonBox::RejectRole );
 
     /* Error messages */
-    QPlainTextEdit * errorsList = ui.errors;
     DialogErrorModel *errors = DialogErrorModel::getInstance<false>();
     connect( errors, &DialogErrorModel::countChanged, this, &MessagesDialog::errorsCountChanged );
     for(int i=0; i<errors->count(); i++)
