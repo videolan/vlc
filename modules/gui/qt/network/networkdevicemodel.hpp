@@ -32,15 +32,24 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include "mediatreelistener.hpp"
+#include "util/cliplistmodel.hpp"
 
 #include <memory>
 
 class MainCtx;
-class NetworkDeviceModel : public QAbstractListModel
+
+struct NetworkDeviceItem;
+
+class NetworkDeviceModel : public ClipListModel<NetworkDeviceItem>
 {
     Q_OBJECT
-public:
 
+    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged FINAL)
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
+    Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged FINAL)
+
+public: // Enums
     enum Role {
         NETWORK_NAME = Qt::UserRole + 1,
         NETWORK_MRL,
@@ -74,36 +83,23 @@ public:
     };
     Q_ENUM( SDCatType )
 
+public: // Declarations
+    using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
+                                    vlc_media_source_Hold, vlc_media_source_Release);
 
-    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
-    Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged FINAL)
-    Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
-    Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged FINAL)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
+    using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
+                                                  vlc_media_tree_Hold,
+                                                  vlc_media_tree_Release);
 
-    Q_PROPERTY(int maximumCount READ maximumCount WRITE setMaximumCount NOTIFY maximumCountChanged
-               FINAL)
-
-    Q_PROPERTY(bool hasMoreItems READ hasMoreItems NOTIFY countChanged FINAL)
-
-    Q_PROPERTY(QByteArray searchRole READ searchRole WRITE setSearchRole
-               NOTIFY searchRoleChanged FINAL)
-
-    Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern
-               NOTIFY searchPatternChanged FINAL)
-
-    Q_PROPERTY(QString sortCriteria READ sortCriteria WRITE setSortCriteria
-               NOTIFY sortCriteriaChanged FINAL)
-
-    Q_PROPERTY(Qt::SortOrder sortOrder READ sortOrder WRITE setSortOrder
-               NOTIFY sortOrderChanged FINAL)
+    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
+                                                  input_item_Hold,
+                                                  input_item_Release);
 
 public:
     NetworkDeviceModel( QObject* parent = nullptr );
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex& parent = {}) const override;
 
     void setCtx(MainCtx* ctx);
     void setSdSource(SDCatType s);
@@ -113,25 +109,6 @@ public:
     inline SDCatType getSdSource() { return m_sdSource; }
     inline QString getName() { return m_name; }
     inline QString getSourceName() { return m_sourceName; }
-
-    int getCount() const;
-
-    int maximumCount() const;
-    void setMaximumCount(int count);
-
-    bool hasMoreItems() const;
-
-    QString searchPattern() const;
-    void setSearchPattern(const QString & pattern);
-
-    QByteArray searchRole() const;
-    void setSearchRole(const QByteArray & role);
-
-    QString sortCriteria() const;
-    void setSortCriteria(const QString & criteria);
-
-    Qt::SortOrder sortOrder() const;
-    void setSortOrder(Qt::SortOrder order);
 
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
     Q_INVOKABLE bool addToPlaylist( int index );
@@ -145,68 +122,32 @@ public:
 
     Q_INVOKABLE QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
 
+protected: // ClipListModel implementation
+    void onUpdateSort(const QString & criteria, Qt::SortOrder order) override;
+
 signals:
     void ctxChanged();
     void sdSourceChanged();
     void sourceNameChanged();
     void nameChanged();
-    void countChanged();
-
-    void maximumCountChanged();
-
-    void searchPatternChanged();
-    void searchRoleChanged();
-
-    void sortCriteriaChanged();
-    void sortOrderChanged();
 
 private:
-    using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
-                                    vlc_media_source_Hold, vlc_media_source_Release);
-
-    using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
-                                                  vlc_media_tree_Hold,
-                                                  vlc_media_tree_Release);
-
-    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
-                                                  input_item_Hold,
-                                                  input_item_Release);
-
-    struct Item
-    {
-        QString name;
-        QUrl mainMrl;
-        std::vector<QUrl> mrls;
-        QString protocol;
-        ItemType type;
-        MediaSourcePtr mediaSource;
-        InputItemPtr inputItem;
-        QUrl artworkUrl;
-    };
-
     bool initializeMediaSources();
 
     void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
 
     void addItems(const std::vector<InputItemPtr> & inputList, const MediaSourcePtr & mediaSource);
 
-    void removeItem(std::vector<Item>::iterator & it, int index, int count);
-
-    void expandItems();
-    void shrinkItems();
-
-    void updateSort();
-
-    int implicitCount() const;
+    void eraseItem(std::vector<NetworkDeviceItem>::iterator & it, int index, int count);
 
 private: // Static functions
-    static bool matchItem(const Item & a, const Item & b);
+    static bool matchItem(const NetworkDeviceItem & a, const NetworkDeviceItem & b);
 
-    static bool ascendingName(const Item & a, const Item & b);
-    static bool ascendingMrl (const Item & a, const Item & b);
+    static bool ascendingName(const NetworkDeviceItem & a, const NetworkDeviceItem & b);
+    static bool ascendingMrl (const NetworkDeviceItem & a, const NetworkDeviceItem & b);
 
-    static bool descendingName(const Item & a, const Item & b);
-    static bool descendingMrl (const Item & a, const Item & b);
+    static bool descendingName(const NetworkDeviceItem & a, const NetworkDeviceItem & b);
+    static bool descendingMrl (const NetworkDeviceItem & a, const NetworkDeviceItem & b);
 
 private:
     struct ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
@@ -224,26 +165,24 @@ private:
         MediaSourcePtr mediaSource;
     };
 
-    std::vector<Item> m_items;
     MainCtx* m_ctx = nullptr;
     SDCatType m_sdSource = CAT_UNDEFINED;
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name
 
-    int m_count = 0;
-
-    int m_maximumCount = -1;
-
-    QString m_searchPattern;
-    QByteArray m_searchRole;
-
-    QString m_sortCriteria = "name";
-
-    std::function<bool(const Item &, const Item &)> m_comparator = ascendingName;
-
-    Qt::SortOrder m_sortOrder = Qt::AscendingOrder;
-
     std::vector<std::unique_ptr<MediaTreeListener>> m_listeners;
+};
+
+struct NetworkDeviceItem
+{
+    QString name;
+    QUrl mainMrl;
+    std::vector<QUrl> mrls;
+    QString protocol;
+    NetworkDeviceModel::ItemType type;
+    NetworkDeviceModel::MediaSourcePtr mediaSource;
+    NetworkDeviceModel::InputItemPtr inputItem;
+    QUrl artworkUrl;
 };
 
 #endif // MLNETWORKDEVICEMODEL_HPP

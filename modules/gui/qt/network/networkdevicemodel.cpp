@@ -24,8 +24,9 @@
 #include <maininterface/mainctx.hpp>
 
 NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
-    : QAbstractListModel( parent )
+    : ClipListModel(parent)
 {
+    m_comparator = ascendingName;
 }
 
 QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
@@ -33,7 +34,7 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
     if (!m_ctx)
         return {};
     auto idx = index.row();
-    if ( idx < 0 || (size_t)idx >= m_items.size() )
+    if ( idx < 0 || idx >= count() )
         return {};
     const auto& item = m_items[idx];
     switch ( role )
@@ -70,15 +71,6 @@ QHash<int, QByteArray> NetworkDeviceModel::roleNames() const
     };
 }
 
-
-int NetworkDeviceModel::rowCount(const QModelIndex& parent) const
-{
-    if ( parent.isValid() )
-        return 0;
-    return getCount();
-}
-
-
 void NetworkDeviceModel::setCtx(MainCtx* ctx)
 {
     if (ctx) {
@@ -108,109 +100,6 @@ void NetworkDeviceModel::setSourceName(const QString& sourceName)
     emit sourceNameChanged();
 }
 
-int NetworkDeviceModel::getCount() const
-{
-    return m_count;
-}
-
-int NetworkDeviceModel::maximumCount() const
-{
-    return m_maximumCount;
-}
-
-void NetworkDeviceModel::setMaximumCount(int count)
-{
-    if (m_maximumCount == count)
-        return;
-
-    if (count == -1 || m_maximumCount < count)
-    {
-        m_maximumCount = count;
-
-        expandItems();
-    }
-    else
-    {
-        m_maximumCount = count;
-
-        shrinkItems();
-    }
-
-    emit maximumCountChanged();
-}
-
-bool NetworkDeviceModel::hasMoreItems() const
-{
-    if (m_maximumCount == -1)
-        return false;
-    else
-        return ((size_t) m_count < m_items.size());
-}
-
-QString NetworkDeviceModel::searchPattern() const
-{
-    return m_searchPattern;
-}
-
-void NetworkDeviceModel::setSearchPattern(const QString & pattern)
-{
-    if (m_searchPattern == pattern)
-        return;
-
-    m_searchPattern = pattern;
-
-    emit searchPatternChanged();
-}
-
-QByteArray NetworkDeviceModel::searchRole() const
-{
-    return m_searchRole;
-}
-
-void NetworkDeviceModel::setSearchRole(const QByteArray & role)
-{
-    if (m_searchRole == role)
-        return;
-
-    m_searchRole = role;
-
-    emit searchRoleChanged();
-}
-
-QString NetworkDeviceModel::sortCriteria() const
-{
-    return m_sortCriteria;
-}
-
-void NetworkDeviceModel::setSortCriteria(const QString & criteria)
-{
-    if (m_sortCriteria == criteria)
-        return;
-
-    m_sortCriteria = criteria;
-
-    updateSort();
-
-    emit sortCriteriaChanged();
-}
-
-Qt::SortOrder NetworkDeviceModel::sortOrder() const
-{
-    return m_sortOrder;
-}
-
-void NetworkDeviceModel::setSortOrder(Qt::SortOrder order)
-{
-    if (m_sortOrder == order)
-        return;
-
-    m_sortOrder = order;
-
-    updateSort();
-
-    emit sortOrderChanged();
-}
-
 bool NetworkDeviceModel::insertIntoPlaylist(const QModelIndexList &itemIdList, ssize_t playlistIndex)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
@@ -222,7 +111,7 @@ bool NetworkDeviceModel::insertIntoPlaylist(const QModelIndexList &itemIdList, s
         if ( !id.isValid() )
             continue;
         const int index = id.row();
-        if ( index < 0 || (size_t)index >= m_items.size() )
+        if ( index < 0 || index >= count() )
             continue;
 
         medias.append( vlc::playlist::Media {m_items[index].inputItem.get()} );
@@ -237,7 +126,7 @@ bool NetworkDeviceModel::addToPlaylist(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
         return false;
-    if (index < 0 || (size_t)index >= m_items.size() )
+    if (index < 0 || index >= count() )
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
@@ -271,12 +160,11 @@ bool NetworkDeviceModel::addToPlaylist(const QModelIndexList &itemIdList)
     return ret;
 }
 
-
 bool NetworkDeviceModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
         return false;
-    if (index < 0 || (size_t)index >= m_items.size() )
+    if (index < 0 || index >= count() )
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
@@ -335,7 +223,7 @@ QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & inde
     {
         int index = modelIndex.row();
 
-        if (index < 0 || (size_t) index >= m_items.size())
+        if (index < 0 || index >= count())
             continue;
 
         QmlInputItem input(m_items[index].inputItem.get(), true);
@@ -346,22 +234,34 @@ QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & inde
     return items;
 }
 
+// Protected ClipListModel implementation
+
+void NetworkDeviceModel::onUpdateSort(const QString & criteria, Qt::SortOrder order) /* override */
+{
+    if (criteria == "mrl")
+    {
+        if (order == Qt::AscendingOrder)
+            m_comparator = ascendingMrl;
+        else
+            m_comparator = descendingMrl;
+    }
+    else
+    {
+        if (order == Qt::AscendingOrder)
+            m_comparator = ascendingName;
+        else
+            m_comparator = descendingName;
+    }
+}
+
 bool NetworkDeviceModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());
 
     m_listeners.clear();
-    if (!m_items.empty()) {
-        beginResetModel();
 
-        m_items.clear();
+    clearItems();
 
-        m_count = 0;
-
-        endResetModel();
-
-        emit countChanged();
-    }
     m_name = QString {};
 
     auto provider = vlc_media_source_provider_Get( libvlc );
@@ -436,7 +336,8 @@ void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaTreePtr tree, input_ite
         for (auto p_item : itemList)
         {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
-            auto it = std::find_if( begin( model->m_items ), end( model->m_items ), [p_item, itemUri](const Item& i) {
+            auto it = std::find_if( begin( model->m_items ), end( model->m_items ),
+                                   [p_item, itemUri](const NetworkDeviceItem & i) {
                 return QString::compare( qfu(p_item->psz_name), i.name, Qt::CaseInsensitive ) == 0 &&
                     itemUri.scheme() == i.mainMrl.scheme();
             });
@@ -455,11 +356,10 @@ void NetworkDeviceModel::ListenerCb::onItemRemoved( MediaTreePtr tree, input_ite
                 continue;
             auto idx = std::distance( begin( model->m_items ), it );
 
-            model->removeItem(it, idx, implicitCount);
+            model->eraseItem(it, idx, implicitCount);
         }
 
-        if (model->m_maximumCount != -1)
-            model->expandItems();
+       model->updateItems();
     }, Qt::QueuedConnection);
 }
 
@@ -475,14 +375,14 @@ void NetworkDeviceModel::refreshDeviceList(MediaSourcePtr mediaSource,
 
             int index = 0;
 
-            std::vector<Item>::iterator it = m_items.begin();
+            std::vector<NetworkDeviceItem>::iterator it = m_items.begin();
 
             while (it != m_items.end())
             {
                 if (it->mediaSource != mediaSource)
                     continue;
 
-                removeItem(it, index, implicitCount);
+                eraseItem(it, index, implicitCount);
 
                 index++;
             }
@@ -515,17 +415,17 @@ void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
 
     for (const InputItemPtr & inputItem : inputList)
     {
-        Item item;
+        NetworkDeviceItem item;
 
         item.name = qfu(inputItem->psz_name);
 
         item.mainMrl = QUrl::fromEncoded(inputItem->psz_uri);
 
-        std::vector<Item>::iterator it;
+        std::vector<NetworkDeviceItem>::iterator it;
 
         if (checkDuplicate)
         {
-            it = std::find_if(begin(m_items), end(m_items), [item](const Item & i)
+            it = std::find_if(begin(m_items), end(m_items), [item](const NetworkDeviceItem & i)
             {
                 return matchItem(item, i);
             });
@@ -566,59 +466,18 @@ void NetworkDeviceModel::addItems(const std::vector<InputItemPtr> & inputList,
             free(artwork);
         }
 
-        int pos = std::distance(begin(m_items), it);
-
-        if (m_maximumCount != -1 && m_count >= m_maximumCount)
-        {
-            // NOTE: When the position is beyond the maximum count we don't notify the view.
-            if (pos >= m_maximumCount)
-            {
-                m_items.insert(it, std::move(item));
-
-                continue;
-            }
-
-            // NOTE: Removing the last item to make room for the new one.
-
-            int index = m_count - 1;
-
-            beginRemoveRows({}, index, index);
-
-            m_count--;
-
-            endRemoveRows();
-
-            emit countChanged();
-        }
-
-        beginInsertRows({}, pos, pos);
-
-        m_items.insert(it, std::move(item));
-
-        m_count++;
-
-        endInsertRows();
-
-        emit countChanged();
+        insertItem(it, std::move(item));
     }
 
-    if (m_maximumCount != -1)
-        expandItems();
+    updateItems();
 }
 
-void NetworkDeviceModel::removeItem(std::vector<Item>::iterator & it, int index, int count)
+void NetworkDeviceModel::eraseItem(std::vector<NetworkDeviceItem>::iterator & it,
+                                   int index, int count)
 {
     if (index < count)
     {
-        beginRemoveRows({}, index, index);
-
-        it = m_items.erase(it);
-
-        m_count--;
-
-        endRemoveRows();
-
-        emit countChanged();
+        removeItem(it, index);
     }
     // NOTE: We don't want to notify the view if the item's position is beyond the
     //       maximumCount.
@@ -626,82 +485,18 @@ void NetworkDeviceModel::removeItem(std::vector<Item>::iterator & it, int index,
         it = m_items.erase(it);
 }
 
-void NetworkDeviceModel::expandItems()
-{
-    int count = implicitCount();
-
-    if (m_count >= count)
-        return;
-
-    beginInsertRows({}, m_count, count - 1);
-
-    m_count = count;
-
-    endInsertRows();
-
-    emit countChanged();
-}
-
-void NetworkDeviceModel::shrinkItems()
-{
-    int count = implicitCount();
-
-    if (m_count <= count)
-        return;
-
-    beginRemoveRows({}, count, m_count - 1);
-
-    m_count = count;
-
-    endRemoveRows();
-
-    emit countChanged();
-}
-
-void NetworkDeviceModel::updateSort()
-{
-    if (m_sortCriteria == "mrl")
-    {
-        if (m_sortOrder == Qt::AscendingOrder)
-            m_comparator = ascendingMrl;
-        else
-            m_comparator = descendingMrl;
-    }
-    else
-    {
-        if (m_sortOrder == Qt::AscendingOrder)
-            m_comparator = ascendingName;
-        else
-            m_comparator = descendingName;
-    }
-
-    beginResetModel();
-
-    std::sort(m_items.begin(), m_items.end(), m_comparator);
-
-    endResetModel();
-}
-
-int NetworkDeviceModel::implicitCount() const
-{
-    assert(m_items.size() < INT32_MAX);
-
-    if (m_maximumCount == -1)
-        return (int) m_items.size();
-    else
-        return qMin((int) m_items.size(), m_maximumCount);
-}
-
 // Private static function
 
-/* static */ bool NetworkDeviceModel::matchItem(const Item & a, const Item & b)
+/* static */ bool NetworkDeviceModel::matchItem(const NetworkDeviceItem & a,
+                                                const NetworkDeviceItem & b)
 {
     return (QString::compare(a.name, b.name, Qt::CaseInsensitive) == 0
             &&
             QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme(), Qt::CaseInsensitive) == 0);
 }
 
-/* static */ bool NetworkDeviceModel::ascendingName(const Item & a, const Item & b)
+/* static */ bool NetworkDeviceModel::ascendingName(const NetworkDeviceItem & a,
+                                                    const NetworkDeviceItem & b)
 {
     int result = QString::compare(a.name, b.name, Qt::CaseInsensitive);
 
@@ -711,13 +506,15 @@ int NetworkDeviceModel::implicitCount() const
     return (QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme(), Qt::CaseInsensitive) <= 0);
 }
 
-/* static */ bool NetworkDeviceModel::ascendingMrl(const Item & a, const Item & b)
+/* static */ bool NetworkDeviceModel::ascendingMrl(const NetworkDeviceItem & a,
+                                                   const NetworkDeviceItem & b)
 {
     return (QString::compare(a.mainMrl.toString(),
                              b.mainMrl.toString(), Qt::CaseInsensitive) <= 0);
 }
 
-/* static */ bool NetworkDeviceModel::descendingName(const Item & a, const Item & b)
+/* static */ bool NetworkDeviceModel::descendingName(const NetworkDeviceItem & a,
+                                                     const NetworkDeviceItem & b)
 {
     int result = QString::compare(a.name, b.name, Qt::CaseInsensitive);
 
@@ -727,7 +524,8 @@ int NetworkDeviceModel::implicitCount() const
     return (QString::compare(a.mainMrl.scheme(), b.mainMrl.scheme(), Qt::CaseInsensitive) >= 0);
 }
 
-/* static */ bool NetworkDeviceModel::descendingMrl(const Item & a, const Item & b)
+/* static */ bool NetworkDeviceModel::descendingMrl(const NetworkDeviceItem & a,
+                                                    const NetworkDeviceItem & b)
 {
     return (QString::compare(a.mainMrl.toString(),
                              b.mainMrl.toString(), Qt::CaseInsensitive) >= 0);
