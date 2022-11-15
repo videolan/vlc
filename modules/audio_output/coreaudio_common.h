@@ -56,7 +56,6 @@ struct aout_sys_common
     bool                b_muted;
     bool                b_do_flush;
 
-    size_t              i_out_max_size;
     size_t              i_out_size;
     bool                b_played;
     block_t             *p_out_chain;

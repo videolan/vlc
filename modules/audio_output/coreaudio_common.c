@@ -356,57 +356,8 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
             = mach_absolute_time() + TickToHostTime(p_sys, first_render_delay);
     }
 
-    do
-    {
-        const size_t i_avalaible_bytes =
-            __MIN(p_block->i_buffer, p_sys->i_out_max_size - p_sys->i_out_size);
-
-        if (unlikely(i_avalaible_bytes != p_block->i_buffer))
-        {
-            /* Not optimal but unlikely code path. */
-
-            lock_unlock(p_sys);
-
-            block_t *p_new = block_Alloc(i_avalaible_bytes);
-            if (!p_new)
-            {
-                block_Release(p_block);
-                return;
-            }
-
-            memcpy(p_new->p_buffer, p_block->p_buffer, i_avalaible_bytes);
-
-            p_block->p_buffer += i_avalaible_bytes;
-            p_block->i_buffer -= i_avalaible_bytes;
-
-            lock_lock(p_sys);
-
-            block_ChainLastAppend(&p_sys->pp_out_last, p_new);
-            p_sys->i_out_size += i_avalaible_bytes;
-
-            if (p_sys->b_paused)
-            {
-                lock_unlock(p_sys);
-                block_Release(p_block);
-                return;
-            }
-
-            /* The render buffer is full, Wait for the renderer to play half
-             * the data. */
-            const vlc_tick_t i_sleep_ticks =
-                FramesToTicks(p_sys, BytesToFrames(p_sys, p_sys->i_out_max_size)) / 2;
-
-            lock_unlock(p_sys);
-            vlc_tick_sleep(i_sleep_ticks);
-            lock_lock(p_sys);
-        }
-        else
-        {
-            block_ChainLastAppend(&p_sys->pp_out_last, p_block);
-            p_sys->i_out_size += i_avalaible_bytes;
-            p_block = NULL;
-        }
-    } while (p_block != NULL);
+    p_sys->i_out_size += p_block->i_buffer;
+    block_ChainLastAppend(&p_sys->pp_out_last, p_block);
 
     size_t i_underrun_size = p_sys->i_underrun_size;
     p_sys->i_underrun_size = 0;
@@ -440,21 +391,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
 
-    /* setup circular buffer */
-    size_t i_audiobuffer_size = fmt->i_rate * fmt->i_bytes_per_frame
-                              / p_sys->i_frame_length;
-    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
-    {
-        /* lower latency: 200 ms of buffering. XXX: Decrease when VLC's core
-         * can handle lower audio latency */
-        p_sys->i_out_max_size = i_audiobuffer_size / 5;
-    }
-    else
-    {
-        /* 2 seconds of buffering */
-        p_sys->i_out_max_size = i_audiobuffer_size * 2;
-    }
-
     ca_ClearOutBuffers(p_aout);
     p_sys->b_played = false;
 
@@ -466,7 +402,6 @@ ca_Uninitialize(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     ca_ClearOutBuffers(p_aout);
-    p_sys->i_out_max_size = 0;
     p_sys->chans_to_reorder = 0;
 }
 
