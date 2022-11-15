@@ -230,7 +230,7 @@ ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
         p_sys->pp_out_last = &p_sys->p_out_chain;
     p_sys->i_out_size -= i_copied;
 
-    p_sys->i_total_frames += i_copied;
+    p_sys->i_total_bytes += i_copied;
 
     /* Pad with 0 */
     if (i_requested > 0)
@@ -252,7 +252,7 @@ ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
      || i_host_ticks - p_sys->i_last_latency_ticks >= VLC_TICK_FROM_SEC(1))
     {
         vlc_tick_t frames_tick = FramesToTicks(p_sys,
-                                    BytesToFrames(p_sys, p_sys->i_total_frames))
+                                    BytesToFrames(p_sys, p_sys->i_total_bytes))
                                + p_sys->i_dev_latency_ticks;
 
         aout_TimingReport(p_aout, i_host_ticks, frames_tick);
@@ -300,7 +300,7 @@ ca_Flush(audio_output_t *p_aout)
 
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
-    p_sys->i_total_frames = 0;
+    p_sys->i_total_bytes = 0;
     lock_unlock(p_sys);
 
     p_sys->b_played = false;
@@ -432,7 +432,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->b_muted = false;
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
-    p_sys->i_total_frames = 0;
+    p_sys->i_total_bytes = 0;
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
