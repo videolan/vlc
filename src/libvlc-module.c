@@ -2820,6 +2820,10 @@ vlc_module_begin ()
     add_string( "config", NULL, CONFIG_TEXT, "" )
         change_volatile ()
 
+    /* SK options */
+    add_bool( "vsync", true, "", "" )
+        change_volatile ()
+
 vlc_module_end ()
 
 /*****************************************************************************
