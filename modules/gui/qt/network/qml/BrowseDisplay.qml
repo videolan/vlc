@@ -42,6 +42,9 @@ Widgets.PageLoader {
         name: "home",
         url: "qrc:///network/BrowseHomeDisplay.qml"
     }, {
+        name: "folders",
+        component: browseFolders,
+    }, {
         name: "device",
         component: browseDevice,
     }, {
@@ -76,7 +79,10 @@ Widgets.PageLoader {
                                                                      : null
 
         onSeeAll: {
-            History.push(["mc", "network", "device", { title: title, sd_source: sd_source }])
+            if (sd_source === -1)
+                History.push(["mc", "network", "folders", { title: title }])
+            else
+                History.push(["mc", "network", "device", { title: title, sd_source: sd_source }])
 
             stackView.currentItem.setCurrentItemFocus(reason)
         }
@@ -93,6 +99,23 @@ Widgets.PageLoader {
     }
 
     // Children
+
+    Component {
+        id: browseFolders
+
+        BrowseDeviceView {
+            property var sortModel: [
+                { text: I18n.qtr("Alphabetic"), criteria: "name" },
+                { text: I18n.qtr("Url"),        criteria: "mrl"  }
+            ]
+
+            displayMarginEnd: g_mainDisplay.displayMargin
+
+            model: modelFilter
+
+            sourceModel: StandardPathModel {}
+        }
+    }
 
     Component {
         id: browseDevice
