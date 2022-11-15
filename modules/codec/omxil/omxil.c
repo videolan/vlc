@@ -115,7 +115,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
     /* Try to find out the profile of the video */
     if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirInput &&
             p_fmt->i_codec == VLC_CODEC_H264)
-        h264_get_profile_level(p_dec->p_fmt_in, &i_profile, &i_level, &p_sys->i_nal_size_length);
+        h264_get_profile_level(p_dec->fmt_in, &i_profile, &i_level, &p_sys->i_nal_size_length);
 
     if(!strcmp(p_sys->psz_component, "OMX.TI.Video.Decoder"))
     {
@@ -504,8 +504,8 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         p_fmt->video.i_visible_width = def->format.video.nFrameWidth;
         p_fmt->video.i_height = def->format.video.nFrameHeight;
         p_fmt->video.i_visible_height = def->format.video.nFrameHeight;
-        p_fmt->video.i_frame_rate = p_dec->p_fmt_in->video.i_frame_rate;
-        p_fmt->video.i_frame_rate_base = p_dec->p_fmt_in->video.i_frame_rate_base;
+        p_fmt->video.i_frame_rate = p_dec->fmt_in->video.i_frame_rate;
+        p_fmt->video.i_frame_rate_base = p_dec->fmt_in->video.i_frame_rate_base;
 
         OMX_INIT_STRUCTURE(crop_rect);
         crop_rect.nPortIndex = def->nPortIndex;
@@ -710,12 +710,12 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         return omx_error;
     }
     strncpy(p_sys->psz_component, psz_component, OMX_MAX_STRINGNAME_SIZE-1);
-    i_quirks = OMXCodec_GetQuirks(p_dec->p_fmt_in->i_cat,
-                                  p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->p_fmt_in->i_codec,
+    i_quirks = OMXCodec_GetQuirks(p_dec->fmt_in->i_cat,
+                                  p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->fmt_in->i_codec,
                                   p_sys->psz_component,
                                   strlen(p_sys->psz_component));
     if ((i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
-      && !p_dec->p_fmt_in->i_extra)
+      && !p_dec->fmt_in->i_extra)
     {
         /* TODO handle late configuration */
         msg_Warn( p_dec, "codec need CSD" );
@@ -732,8 +732,8 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     /* Set component role */
     OMX_INIT_STRUCTURE(role);
     strcpy((char*)role.cRole,
-           GetOmxRole(p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->p_fmt_in->i_codec,
-                      p_dec->p_fmt_in->i_cat, p_sys->b_enc));
+           GetOmxRole(p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->fmt_in->i_codec,
+                      p_dec->fmt_in->i_cat, p_sys->b_enc));
 
     omx_error = OMX_SetParameter(omx_handle, OMX_IndexParamStandardComponentRole,
                                  &role);
@@ -745,7 +745,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     /* Find the input / output ports */
     OMX_INIT_STRUCTURE(param);
     OMX_INIT_STRUCTURE(definition);
-    omx_error = OMX_GetParameter(omx_handle, p_dec->p_fmt_in->i_cat == VIDEO_ES ?
+    omx_error = OMX_GetParameter(omx_handle, p_dec->fmt_in->i_cat == VIDEO_ES ?
                                  OMX_IndexParamVideoInit : OMX_IndexParamAudioInit, &param);
     if(omx_error != OMX_ErrorNone) {
 #ifdef __ANDROID__
@@ -781,7 +781,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         CHECK_ERROR(omx_error, "couldn't find an input and output port");
     }
 
-    if( !strncmp(p_sys->psz_component, "OMX.SEC.", 8) && p_dec->p_fmt_in->i_cat == VIDEO_ES )
+    if( !strncmp(p_sys->psz_component, "OMX.SEC.", 8) && p_dec->fmt_in->i_cat == VIDEO_ES )
     {
         OMX_INDEXTYPE index;
         omx_error = OMX_GetExtensionIndex(omx_handle, (OMX_STRING) "OMX.SEC.index.ThumbnailMode", &index);
@@ -878,13 +878,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     int status;
 
-    if( 0 || !GetOmxRole(p_dec->p_fmt_in->i_codec, p_dec->p_fmt_in->i_cat, false) )
+    if( 0 || !GetOmxRole(p_dec->fmt_in->i_codec, p_dec->fmt_in->i_cat, false) )
         return VLC_EGENERIC;
 
     status = OpenGeneric( p_this, false );
     if(status != VLC_SUCCESS) return status;
 
-    switch( p_dec->p_fmt_in->i_cat )
+    switch( p_dec->fmt_in->i_cat )
     {
         case AUDIO_ES: p_dec->pf_decode = DecodeAudio; break;
         case VIDEO_ES: p_dec->pf_decode = DecodeVideo; break;
@@ -949,8 +949,8 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     /* Initialise the thread properties */
     if(!b_encode)
     {
-        p_dec->fmt_out.video = p_dec->p_fmt_in->video;
-        p_dec->fmt_out.audio = p_dec->p_fmt_in->audio;
+        p_dec->fmt_out.video = p_dec->fmt_in->video;
+        p_dec->fmt_out.audio = p_dec->fmt_in->audio;
         p_dec->fmt_out.i_codec = 0;
 
         /* set default aspect of 1, if parser did not set it */
@@ -973,19 +973,19 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     p_sys->p_ports = &p_sys->in;
     p_sys->b_use_pts = 1;
 
-    msg_Dbg(p_dec, "fmt in:%4.4s, out: %4.4s", (char *)&p_dec->p_fmt_in->i_codec,
+    msg_Dbg(p_dec, "fmt in:%4.4s, out: %4.4s", (char *)&p_dec->fmt_in->i_codec,
             (char *)&p_dec->fmt_out.i_codec);
 
     /* Enumerate components and build a list of the one we want to try */
     p_sys->components =
         CreateComponentsList(p_this,
              GetOmxRole(p_sys->b_enc ? p_dec->fmt_out.i_codec :
-                        p_dec->p_fmt_in->i_codec, p_dec->p_fmt_in->i_cat,
+                        p_dec->fmt_in->i_codec, p_dec->fmt_in->i_cat,
                         p_sys->b_enc), p_sys->ppsz_components);
     if( !p_sys->components )
     {
         msg_Warn( p_this, "couldn't find an omx component for codec %4.4s",
-                  (char *)&p_dec->p_fmt_in->i_codec );
+                  (char *)&p_dec->fmt_in->i_codec );
         CloseGeneric(p_this);
         return VLC_EGENERIC;
     }
@@ -1027,18 +1027,18 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     CHECK_ERROR(omx_error, "Wait for Executing failed (%x)", omx_error );
 
     /* Send codec configuration data */
-    if( p_dec->p_fmt_in->i_extra )
+    if( p_dec->fmt_in->i_extra )
     {
         OMX_FIFO_GET(&p_sys->in.fifo, p_header);
-        p_header->nFilledLen = p_dec->p_fmt_in->i_extra;
+        p_header->nFilledLen = p_dec->fmt_in->i_extra;
 
         /* Convert H.264 NAL format to annex b */
         if( p_sys->i_nal_size_length && !p_sys->in.b_direct &&
-            h264_isavcC(p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra) )
+            h264_isavcC(p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra) )
         {
             size_t i_filled_len = 0;
             uint8_t *p_buf = h264_avcC_to_AnnexB_NAL(
-                        p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra,
+                        p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra,
                         &i_filled_len, NULL );
 
             if( p_buf == NULL )
@@ -1059,11 +1059,11 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             p_header->nFilledLen = i_filled_len;
             free(p_buf);
         }
-        else if( p_dec->p_fmt_in->i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
+        else if( p_dec->fmt_in->i_codec == VLC_CODEC_HEVC && !p_sys->in.b_direct )
         {
             size_t i_filled_len = 0;
             uint8_t *p_buf = hevc_hvcC_to_AnnexB_NAL(
-                        p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra,
+                        p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra,
                         &i_filled_len, &p_sys->i_nal_size_length );
 
             if( p_buf == NULL )
@@ -1087,10 +1087,10 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         else if(p_sys->in.b_direct)
         {
             p_header->pOutputPortPrivate = p_header->pBuffer;
-            p_header->pBuffer = p_dec->p_fmt_in->p_extra;
+            p_header->pBuffer = p_dec->fmt_in->p_extra;
         }
-        else if (p_dec->p_fmt_in->i_codec == VLC_CODEC_WMV3 &&
-                 p_dec->p_fmt_in->i_extra >= 4 &&
+        else if (p_dec->fmt_in->i_codec == VLC_CODEC_WMV3 &&
+                 p_dec->fmt_in->i_extra >= 4 &&
                  p_header->nAllocLen >= 36)
         {
             int profile;
@@ -1112,13 +1112,13 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             p_header->nFilledLen = sizeof(wmv3seq);
             memcpy(p_header->pBuffer, wmv3seq, p_header->nFilledLen);
             // Struct C - almost equal to the extradata
-            memcpy(&p_header->pBuffer[8], p_dec->p_fmt_in->p_extra, 4);
+            memcpy(&p_header->pBuffer[8], p_dec->fmt_in->p_extra, 4);
             // Expand profile from the highest 2 bits to the highest 4 bits
             profile = p_header->pBuffer[8] >> 6;
             p_header->pBuffer[8] = (p_header->pBuffer[8] & 0x0f) | (profile << 4);
             // Fill in the height/width for struct A
-            SetDWLE(&p_header->pBuffer[12], p_dec->p_fmt_in->video.i_height);
-            SetDWLE(&p_header->pBuffer[16], p_dec->p_fmt_in->video.i_width);
+            SetDWLE(&p_header->pBuffer[12], p_dec->fmt_in->video.i_height);
+            SetDWLE(&p_header->pBuffer[16], p_dec->fmt_in->video.i_width);
         }
         else
         {
@@ -1128,7 +1128,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
                         (int)p_header->nAllocLen);
                 p_header->nFilledLen = p_header->nAllocLen;
             }
-            memcpy(p_header->pBuffer, p_dec->p_fmt_in->p_extra, p_header->nFilledLen);
+            memcpy(p_header->pBuffer, p_dec->fmt_in->p_extra, p_header->nFilledLen);
         }
 
         p_header->nOffset = 0;
@@ -1174,7 +1174,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     definition.nPortIndex = p_port->i_port_index;
     omx_error = OMX_GetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition,
                                  &definition);
-    if(omx_error != OMX_ErrorNone || (p_dec->p_fmt_in->i_cat == VIDEO_ES &&
+    if(omx_error != OMX_ErrorNone || (p_dec->fmt_in->i_cat == VIDEO_ES &&
        (!definition.format.video.nFrameWidth ||
        !definition.format.video.nFrameHeight)) )
         return OMX_ErrorUndefined;
@@ -1195,7 +1195,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     omx_error = GetPortDefinition(p_dec, &p_sys->out, p_sys->out.p_fmt);
     if(omx_error != OMX_ErrorNone) goto error;
 
-    if( p_dec->p_fmt_in->i_cat != AUDIO_ES )
+    if( p_dec->fmt_in->i_cat != AUDIO_ES )
     {
         /* Don't explicitly set the new parameters that we got with
          * OMX_GetParameter above when using audio codecs.
@@ -1430,12 +1430,12 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
      * broadcom OMX implementation on RPi), don't let the packetizer values
      * override what the decoder says, if anything - otherwise always update
      * even if it already is set (since it can change within a stream). */
-    if((p_dec->p_fmt_in->video.i_sar_num != 0 && p_dec->p_fmt_in->video.i_sar_den != 0) &&
+    if((p_dec->fmt_in->video.i_sar_num != 0 && p_dec->fmt_in->video.i_sar_den != 0) &&
        (p_dec->fmt_out.video.i_sar_num == 0 || p_dec->fmt_out.video.i_sar_den == 0 ||
              !p_sys->b_aspect_ratio_handled))
     {
-        p_dec->fmt_out.video.i_sar_num = p_dec->p_fmt_in->video.i_sar_num;
-        p_dec->fmt_out.video.i_sar_den = p_dec->p_fmt_in->video.i_sar_den;
+        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in->video.i_sar_num;
+        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in->video.i_sar_den;
     }
 
     /* Loop as long as we haven't either got an input buffer (and cleared

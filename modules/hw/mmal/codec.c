@@ -388,8 +388,8 @@ set_extradata_and_commit(decoder_t * const dec, decoder_sys_t * const sys)
 
 static MMAL_STATUS_T decoder_send_extradata(decoder_t * const dec, decoder_sys_t *const sys)
 {
-    if (dec->p_fmt_in->i_codec == VLC_CODEC_H264 &&
-        dec->p_fmt_in->i_extra > 0)
+    if (dec->fmt_in->i_codec == VLC_CODEC_H264 &&
+        dec->fmt_in->i_extra > 0)
     {
         MMAL_BUFFER_HEADER_T * const buf = mmal_queue_wait(sys->input_pool->queue);
         MMAL_STATUS_T status;
@@ -398,8 +398,8 @@ static MMAL_STATUS_T decoder_send_extradata(decoder_t * const dec, decoder_sys_t
         buf->cmd = 0;
         buf->user_data = NULL;
         buf->alloc_size = sys->input->buffer_size;
-        buf->length = dec->p_fmt_in->i_extra;
-        buf->data = dec->p_fmt_in->p_extra;
+        buf->length = dec->fmt_in->i_extra;
+        buf->data = dec->fmt_in->p_extra;
         buf->flags = MMAL_BUFFER_HEADER_FLAG_CONFIG;
 
         status = mmal_port_send_buffer(sys->input, buf);
@@ -594,15 +594,15 @@ static int OpenDecoder(vlc_object_t *p_this)
     int ret = VLC_EGENERIC;
     decoder_sys_t *sys;
     MMAL_STATUS_T status;
-    const MMAL_FOURCC_T in_fcc = vlc_to_mmal_es_fourcc(dec->p_fmt_in->i_codec);
+    const MMAL_FOURCC_T in_fcc = vlc_to_mmal_es_fourcc(dec->fmt_in->i_codec);
     if (in_fcc == 0) {
-        msg_Dbg(p_this, "codec %4.4s not supported", (const char*)&dec->p_fmt_in->i_codec);
+        msg_Dbg(p_this, "codec %4.4s not supported", (const char*)&dec->fmt_in->i_codec);
         return VLC_EGENERIC;
     }
 
     if (!is_enc_supported(&supported_decode_in_enc, in_fcc)) {
         msg_Dbg(p_this, "codec %4.4s (MMAL %4.4s) not supported",
-                (const char*)&dec->p_fmt_in->i_codec, (const char*)&in_fcc);
+                (const char*)&dec->fmt_in->i_codec, (const char*)&in_fcc);
         return VLC_EGENERIC;
     }
 
@@ -639,7 +639,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     sys->input->format->encoding = in_fcc;
 
     if (!set_and_test_enc_supported(p_this, &supported_decode_in_enc, sys->input, in_fcc)) {
-        msg_Warn(p_this, "codec %4.4s not supported", (const char*)&dec->p_fmt_in->i_codec);
+        msg_Warn(p_this, "codec %4.4s not supported", (const char*)&dec->fmt_in->i_codec);
         goto fail;
     }
 

@@ -145,7 +145,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     const int16_t *table;
 
-    switch( p_dec->p_fmt_in->i_codec )
+    switch( p_dec->fmt_in->i_codec )
     {
         case VLC_CODEC_ALAW:
             table = alawtos16;
@@ -157,22 +157,22 @@ static int DecoderOpen( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
-    if( p_dec->p_fmt_in->audio.i_channels == 0 ||
-        p_dec->p_fmt_in->audio.i_channels > AOUT_CHAN_MAX )
+    if( p_dec->fmt_in->audio.i_channels == 0 ||
+        p_dec->fmt_in->audio.i_channels > AOUT_CHAN_MAX )
     {
         msg_Err( p_dec, "bad channels count (1-%i): %i",
-                 AOUT_CHAN_MAX, p_dec->p_fmt_in->audio.i_channels );
+                 AOUT_CHAN_MAX, p_dec->fmt_in->audio.i_channels );
         return VLC_EGENERIC;
     }
 
-    if( p_dec->p_fmt_in->audio.i_rate == 0 )
+    if( p_dec->fmt_in->audio.i_rate == 0 )
     {
-        msg_Err( p_dec, "bad samplerate: %d Hz", p_dec->p_fmt_in->audio.i_rate );
+        msg_Err( p_dec, "bad samplerate: %d Hz", p_dec->fmt_in->audio.i_rate );
         return VLC_EGENERIC;
     }
 
     msg_Dbg( p_dec, "samplerate:%dHz channels:%d",
-             p_dec->p_fmt_in->audio.i_rate, p_dec->p_fmt_in->audio.i_channels );
+             p_dec->fmt_in->audio.i_rate, p_dec->fmt_in->audio.i_channels );
 
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -187,13 +187,13 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
     p_dec->fmt_out.audio.i_format = VLC_CODEC_S16N;
-    p_dec->fmt_out.audio.i_rate = p_dec->p_fmt_in->audio.i_rate;
-    if( p_dec->p_fmt_in->audio.i_physical_channels )
+    p_dec->fmt_out.audio.i_rate = p_dec->fmt_in->audio.i_rate;
+    if( p_dec->fmt_in->audio.i_physical_channels )
         p_dec->fmt_out.audio.i_physical_channels =
-                                       p_dec->p_fmt_in->audio.i_physical_channels;
+                                       p_dec->fmt_in->audio.i_physical_channels;
     else
         p_dec->fmt_out.audio.i_physical_channels =
-                              pi_channels_maps[p_dec->p_fmt_in->audio.i_channels];
+                              pi_channels_maps[p_dec->fmt_in->audio.i_channels];
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 
     p_sys->table = table;
@@ -242,7 +242,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     /* Don't re-use the same pts twice */
     p_block->i_pts = VLC_TICK_INVALID;
 
-    unsigned samples = p_block->i_buffer / p_dec->p_fmt_in->audio.i_channels;
+    unsigned samples = p_block->i_buffer / p_dec->fmt_in->audio.i_channels;
     if( samples == 0 )
     {
         block_Release( p_block );
@@ -262,7 +262,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
 
     assert( p_out->i_nb_samples == samples );
-    assert( p_out->i_buffer == samples * 2 * p_dec->p_fmt_in->audio.i_channels );
+    assert( p_out->i_buffer == samples * 2 * p_dec->fmt_in->audio.i_channels );
 
     p_out->i_pts = date_Get( &p_sys->end_date );
     p_out->i_length = date_Increment( &p_sys->end_date, samples )
@@ -271,7 +271,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     const uint8_t *src = p_block->p_buffer;
     int16_t *dst = (int16_t *)p_out->p_buffer;
 
-    samples *= p_dec->p_fmt_in->audio.i_channels;
+    samples *= p_dec->fmt_in->audio.i_channels;
 
     for( unsigned i = 0; i < samples; i++ )
        *(dst++) = p_sys->table[*(src++)];

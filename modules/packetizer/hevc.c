@@ -194,7 +194,7 @@ static int Open(vlc_object_t *p_this)
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_HEVC)
+    if (p_dec->fmt_in->i_codec != VLC_CODEC_HEVC)
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = calloc(1, sizeof(decoder_sys_t));
@@ -219,15 +219,15 @@ static int Open(vlc_object_t *p_this)
                     p_dec);
 
     /* Copy properties */
-    es_format_Copy(&p_dec->fmt_out, p_dec->p_fmt_in);
+    es_format_Copy(&p_dec->fmt_out, p_dec->fmt_in);
     p_dec->fmt_out.b_packetized = true;
 
     /* Init timings */
-    if( p_dec->p_fmt_in->video.i_frame_rate_base &&
-        p_dec->p_fmt_in->video.i_frame_rate &&
-        p_dec->p_fmt_in->video.i_frame_rate <= UINT_MAX / 2 )
-        date_Init( &p_sys->dts, p_dec->p_fmt_in->video.i_frame_rate * 2,
-                                p_dec->p_fmt_in->video.i_frame_rate_base );
+    if( p_dec->fmt_in->video.i_frame_rate_base &&
+        p_dec->fmt_in->video.i_frame_rate &&
+        p_dec->fmt_in->video.i_frame_rate <= UINT_MAX / 2 )
+        date_Init( &p_sys->dts, p_dec->fmt_in->video.i_frame_rate * 2,
+                                p_dec->fmt_in->video.i_frame_rate_base );
     else
         date_Init( &p_sys->dts, 2 * 30000, 1001 );
     p_sys->pts = VLC_TICK_INVALID;
@@ -235,8 +235,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->sets = MISSING;
 
     /* Set callbacks */
-    const uint8_t *p_extra = p_dec->p_fmt_in->p_extra;
-    const size_t i_extra = p_dec->p_fmt_in->i_extra;
+    const uint8_t *p_extra = p_dec->fmt_in->p_extra;
+    const size_t i_extra = p_dec->fmt_in->i_extra;
     /* Check if we have hvcC as extradata */
     if(hevc_ishvcC(p_extra, i_extra))
     {
@@ -607,7 +607,7 @@ static void ActivateSets(decoder_t *p_dec,
             p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
         }
 
-        if(p_dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
+        if(p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
         {
             (void) hevc_get_colorimetry( p_sps,
                                          &p_dec->fmt_out.video.primaries,
@@ -622,14 +622,14 @@ static void ActivateSets(decoder_t *p_dec,
         {
             p_dec->fmt_out.video.i_width = sizes[0];
             p_dec->fmt_out.video.i_height = sizes[1];
-            if(p_dec->p_fmt_in->video.i_visible_width == 0)
+            if(p_dec->fmt_in->video.i_visible_width == 0)
             {
                 p_dec->fmt_out.video.i_visible_width = sizes[2];
                 p_dec->fmt_out.video.i_visible_height = sizes[3];
             }
         }
 
-        if ( p_dec->p_fmt_in->video.i_sar_num == 0 || p_dec->p_fmt_in->video.i_sar_den == 0)
+        if ( p_dec->fmt_in->video.i_sar_num == 0 || p_dec->fmt_in->video.i_sar_den == 0)
         {
             unsigned num, den;
             if ( hevc_get_aspect_ratio( p_sps, &num, &den ) )
@@ -639,7 +639,7 @@ static void ActivateSets(decoder_t *p_dec,
             }
         }
 
-        if(p_dec->p_fmt_in->i_profile == -1)
+        if(p_dec->fmt_in->i_profile == -1)
         {
             uint8_t i_profile, i_level;
             if( hevc_get_sps_profile_tier_level( p_sps, &i_profile, &i_level ) )
@@ -1072,7 +1072,7 @@ static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
         } break;
         case HXXX_SEI_FRAME_PACKING_ARRANGEMENT:
         {
-            if( p_dec->p_fmt_in->video.multiview_mode == MULTIVIEW_2D )
+            if( p_dec->fmt_in->video.multiview_mode == MULTIVIEW_2D )
             {
                 video_multiview_mode_t mode;
                 switch( p_sei_data->frame_packing.type )

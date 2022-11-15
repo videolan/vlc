@@ -366,7 +366,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     mp4_box_iterator_Init( &it, p_buf,
                            p_block->i_buffer - (p_buf - p_block->p_buffer) );
     /* Parse our styles */
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_QTXT )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_QTXT )
     while( mp4_box_iterator_Next( &it ) )
     {
         switch( it.i_type )
@@ -453,9 +453,9 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 static void ParseExtradataTx3g( decoder_t *p_dec )
 {
     text_style_t *p_style = (text_style_t *) p_dec->p_sys;
-    const uint8_t *p_extra = p_dec->p_fmt_in->p_extra;
+    const uint8_t *p_extra = p_dec->fmt_in->p_extra;
 
-    if( p_dec->p_fmt_in->i_extra < 32 )
+    if( p_dec->fmt_in->i_extra < 32 )
         return;
 
     /* DF @0 */
@@ -483,9 +483,9 @@ static void ParseExtradataTx3g( decoder_t *p_dec )
 static void ParseExtradataTextMedia( decoder_t *p_dec )
 {
     text_style_t *p_style = (text_style_t *) p_dec->p_sys;
-    const uint8_t *p_extra = p_dec->p_fmt_in->p_extra;
+    const uint8_t *p_extra = p_dec->fmt_in->p_extra;
 
-    if( p_dec->p_fmt_in->i_extra < 44 )
+    if( p_dec->fmt_in->i_extra < 44 )
         return;
 
     /* DF @0 */
@@ -544,8 +544,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_TX3G &&
-        p_dec->p_fmt_in->i_codec != VLC_CODEC_QTXT )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_TX3G &&
+        p_dec->fmt_in->i_codec != VLC_CODEC_QTXT )
         return VLC_EGENERIC;
 
     p_dec->pf_decode = Decode;
@@ -558,7 +558,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_default_style->i_style_flags |= STYLE_BACKGROUND;
     p_default_style->i_features |= STYLE_HAS_FLAGS;
 
-    if( p_dec->p_fmt_in->i_codec == VLC_CODEC_TX3G )
+    if( p_dec->fmt_in->i_codec == VLC_CODEC_TX3G )
         ParseExtradataTx3g( p_dec );
     else
         ParseExtradataTextMedia( p_dec );

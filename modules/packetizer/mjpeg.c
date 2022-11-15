@@ -132,8 +132,8 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
     {
         date_Set( &p_sys->date, p_block->i_dts );
     }
-    else if( p_dec->p_fmt_in->video.i_frame_rate &&
-             p_dec->p_fmt_in->video.i_frame_rate_base )
+    else if( p_dec->fmt_in->video.i_frame_rate &&
+             p_dec->fmt_in->video.i_frame_rate_base )
     {
         date_Increment( &p_sys->date, 1 );
         p_block->i_dts = p_block->i_pts = date_Get( &p_sys->date );
@@ -178,7 +178,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_MJPG )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_MJPG )
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
@@ -187,16 +187,16 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_next_block_flags = 0;
 
-    if( p_dec->p_fmt_in->video.i_frame_rate &&
-        p_dec->p_fmt_in->video.i_frame_rate_base )
+    if( p_dec->fmt_in->video.i_frame_rate &&
+        p_dec->fmt_in->video.i_frame_rate_base )
     {
-        date_Init( &p_sys->date, p_dec->p_fmt_in->video.i_frame_rate,
-                   p_dec->p_fmt_in->video.i_frame_rate_base );
+        date_Init( &p_sys->date, p_dec->fmt_in->video.i_frame_rate,
+                   p_dec->fmt_in->video.i_frame_rate_base );
     }
     else
         date_Init( &p_sys->date, 30000, 1001 );
 
-    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->fmt_in );
 
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,

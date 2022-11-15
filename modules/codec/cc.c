@@ -242,7 +242,7 @@ static void DTVCC_ServiceData_Handler( void *priv, uint8_t i_sid, vlc_tick_t i_t
     decoder_t *p_dec = priv;
     decoder_sys_t *p_sys = p_dec->p_sys;
     //msg_Err( p_dec, "DTVCC_ServiceData_Handler sid %d bytes %ld", i_sid, i_data );
-    if( i_sid == 1 + p_dec->p_fmt_in->subs.cc.i_channel )
+    if( i_sid == 1 + p_dec->fmt_in->subs.cc.i_channel )
         CEA708_Decoder_Push( p_sys->p_cea708, i_time, p_data, i_data );
 }
 
@@ -257,10 +257,10 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( ( p_dec->p_fmt_in->i_codec != VLC_CODEC_CEA608 ||
-          p_dec->p_fmt_in->subs.cc.i_channel > 3 ) &&
-        ( p_dec->p_fmt_in->i_codec != VLC_CODEC_CEA708 ||
-          p_dec->p_fmt_in->subs.cc.i_channel > 63 ) )
+    if( ( p_dec->fmt_in->i_codec != VLC_CODEC_CEA608 ||
+          p_dec->fmt_in->subs.cc.i_channel > 3 ) &&
+        ( p_dec->fmt_in->i_codec != VLC_CODEC_CEA708 ||
+          p_dec->fmt_in->subs.cc.i_channel > 63 ) )
         return VLC_EGENERIC;
 
     p_dec->pf_decode = Decode;
@@ -271,14 +271,14 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    if( p_dec->p_fmt_in->i_codec == VLC_CODEC_CEA608 )
+    if( p_dec->fmt_in->i_codec == VLC_CODEC_CEA608 )
     {
         /*  0 -> i_field = 0; i_channel = 1;
             1 -> i_field = 0; i_channel = 2;
             2 -> i_field = 1; i_channel = 1;
             3 -> i_field = 1; i_channel = 2; */
-        p_sys->i_field = p_dec->p_fmt_in->subs.cc.i_channel >> 1;
-        p_sys->i_channel = 1 + (p_dec->p_fmt_in->subs.cc.i_channel & 1);
+        p_sys->i_field = p_dec->fmt_in->subs.cc.i_channel >> 1;
+        p_sys->i_channel = 1 + (p_dec->fmt_in->subs.cc.i_channel & 1);
 
         p_sys->p_eia608 = malloc(sizeof(*p_sys->p_eia608));
         if( !p_sys->p_eia608 )
@@ -305,11 +305,11 @@ static int Open( vlc_object_t *p_this )
             return VLC_ENOMEM;
         }
 
-         p_sys->i_channel = p_dec->p_fmt_in->subs.cc.i_channel;
+         p_sys->i_channel = p_dec->fmt_in->subs.cc.i_channel;
     }
 
     p_sys->b_opaque = var_InheritBool( p_dec, "cc-opaque" );
-    p_sys->i_reorder_depth = p_dec->p_fmt_in->subs.cc.i_reorder_depth;
+    p_sys->i_reorder_depth = p_dec->fmt_in->subs.cc.i_reorder_depth;
 
     p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 
@@ -403,7 +403,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         Push( p_dec, p_block );
     }
 
-    const bool b_no_reorder = (p_dec->p_fmt_in->subs.cc.i_reorder_depth < 0);
+    const bool b_no_reorder = (p_dec->fmt_in->subs.cc.i_reorder_depth < 0);
     for( ; DoDecode( p_dec, (p_block == NULL) || b_no_reorder ); );
 
     return VLCDEC_SUCCESS;

@@ -155,7 +155,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
 
     /* Check if we can reuse the current decoder */
     if( p_image->p_dec &&
-        p_image->p_dec->p_fmt_in->i_codec != p_es_in->video.i_chroma )
+        p_image->p_dec->fmt_in->i_codec != p_es_in->video.i_chroma )
     {
         struct decoder_owner *p_owner = dec_get_owner( p_image->p_dec );
         es_format_Clean( &p_owner->fmt_in );
@@ -702,7 +702,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     {
         msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'. "
                  "VLC probably does not support this image format.",
-                 (char*)&p_dec->p_fmt_in->i_codec );
+                 (char*)&p_dec->fmt_in->i_codec );
 
         es_format_Clean( &p_owner->fmt_in );
         decoder_Destroy( p_dec );

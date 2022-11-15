@@ -346,7 +346,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     decoder_Init( p_sys->p_decoder, &p_owner->fmt_in, p_fmt );
 
     p_sys->p_decoder->b_frame_drop_allowed = true;
-    p_sys->p_decoder->fmt_out = *p_sys->p_decoder->p_fmt_in;
+    p_sys->p_decoder->fmt_out = *p_sys->p_decoder->fmt_in;
     p_sys->p_decoder->fmt_out.i_extra = 0;
     p_sys->p_decoder->fmt_out.p_extra = 0;
     p_sys->p_decoder->pf_decode = NULL;

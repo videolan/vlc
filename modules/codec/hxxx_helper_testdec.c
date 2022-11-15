@@ -113,7 +113,7 @@ OpenDecoder(vlc_object_t *this)
 {
     decoder_t *dec = (void *)this;
 
-    switch (dec->p_fmt_in->i_codec)
+    switch (dec->fmt_in->i_codec)
     {
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
@@ -126,11 +126,11 @@ OpenDecoder(vlc_object_t *this)
     if (sys == NULL)
         return VLC_EGENERIC;
 
-    hxxx_helper_init(&sys->hh, this, dec->p_fmt_in->i_codec, 0,
+    hxxx_helper_init(&sys->hh, this, dec->fmt_in->i_codec, 0,
                      var_InheritBool(this, "hxxx-helper-testdec-xvcC") ? 4 : 0);
 
-    int ret = hxxx_helper_set_extra(&sys->hh, dec->p_fmt_in->p_extra,
-                                    dec->p_fmt_in->i_extra);
+    int ret = hxxx_helper_set_extra(&sys->hh, dec->fmt_in->p_extra,
+                                    dec->fmt_in->i_extra);
     if (ret != VLC_SUCCESS)
     {
         hxxx_helper_clean(&sys->hh);
@@ -142,7 +142,7 @@ OpenDecoder(vlc_object_t *this)
     dec->pf_decode = DecodeBlock;
     dec->pf_flush  = Flush;
 
-    dec->fmt_out.video = dec->p_fmt_in->video;
+    dec->fmt_out.video = dec->fmt_in->video;
     dec->fmt_out.video.p_palette = NULL;
 
     return VLC_SUCCESS;

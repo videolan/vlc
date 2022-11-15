@@ -112,15 +112,15 @@ static void ProcessHeader(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    int i_extra = p_dec->p_fmt_in->i_extra;
-    char *p_extra = p_dec->p_fmt_in->p_extra;
+    int i_extra = p_dec->fmt_in->i_extra;
+    char *p_extra = p_dec->fmt_in->p_extra;
 
     if (i_extra > 8 && !memcmp(p_extra, "fLaC", 4)) {
         i_extra -= 8;
         p_extra += 8;
     }
 
-    if (p_dec->p_fmt_in->i_extra < FLAC_STREAMINFO_SIZE)
+    if (p_dec->fmt_in->i_extra < FLAC_STREAMINFO_SIZE)
         return;
 
     FLAC_ParseStreamInfo( (uint8_t *) p_extra, &p_sys->stream_info );
@@ -579,7 +579,7 @@ static int Open(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_FLAC)
+    if (p_dec->fmt_in->i_codec != VLC_CODEC_FLAC)
         return VLC_EGENERIC;
 
 
@@ -601,7 +601,7 @@ static int Open(vlc_object_t *p_this)
     date_Init( &p_sys->pts, 1, 1 );
 
     /* */
-    es_format_Copy(&p_dec->fmt_out, p_dec->p_fmt_in);
+    es_format_Copy(&p_dec->fmt_out, p_dec->fmt_in);
     p_dec->fmt_out.i_codec = VLC_CODEC_FLAC;
     p_dec->fmt_out.b_packetized = true;
 

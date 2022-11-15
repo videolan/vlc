@@ -594,7 +594,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id->p_decoder = &p_owner->dec;
     decoder_Init( id->p_decoder, &p_owner->fmt_in, p_fmt );
 
-    es_format_SetMeta( &id->p_decoder->fmt_out, id->p_decoder->p_fmt_in );
+    es_format_SetMeta( &id->p_decoder->fmt_out, id->p_decoder->fmt_in );
 
     switch( p_fmt->i_cat )
     {
@@ -687,7 +687,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
     struct decoder_owner *p_owner = id->p_decoder ? dec_get_owner(id->p_decoder) : NULL;
     if( id->b_transcode )
     {
-        int i_cat = id->p_decoder ? id->p_decoder->p_fmt_in->i_cat : UNKNOWN_ES;
+        int i_cat = id->p_decoder ? id->p_decoder->fmt_in->i_cat : UNKNOWN_ES;
         switch( i_cat )
         {
         case AUDIO_ES:
@@ -764,7 +764,7 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     }
 
     int i_ret;
-    switch( id->p_decoder->p_fmt_in->i_cat )
+    switch( id->p_decoder->fmt_in->i_cat )
     {
     case AUDIO_ES:
         i_ret = transcode_audio_process( p_stream, id, p_buffer, &p_out );

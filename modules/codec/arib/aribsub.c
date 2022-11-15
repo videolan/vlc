@@ -94,8 +94,8 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_ARIB_A &&
-        p_dec->p_fmt_in->i_codec != VLC_CODEC_ARIB_C )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_ARIB_A &&
+        p_dec->fmt_in->i_codec != VLC_CODEC_ARIB_C )
     {
         return VLC_EGENERIC;
     }
@@ -117,7 +117,7 @@ static int Open( vlc_object_t *p_this )
     p_dec->pf_decode = Decode;
     p_dec->fmt_out.i_codec = 0;
 
-    p_sys->b_a_profile = ( p_dec->p_fmt_in->i_codec == VLC_CODEC_ARIB_A );
+    p_sys->b_a_profile = ( p_dec->fmt_in->i_codec == VLC_CODEC_ARIB_A );
 
     p_sys->b_ignore_ruby =
         var_InheritBool( p_this, ARIBSUB_CFG_PREFIX "ignore-ruby" );

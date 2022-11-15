@@ -117,14 +117,14 @@ static int OpenDecoder(vlc_object_t *obj)
     dec->pf_decode = DecoderDecode;
     dec->pf_flush = DecoderFlush;
     es_format_Clean(&dec->fmt_out);
-    es_format_Copy(&dec->fmt_out, dec->p_fmt_in);
+    es_format_Copy(&dec->fmt_out, dec->fmt_in);
 
     struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
     assert(scenario->decoder_setup != NULL);
     scenario->decoder_setup(dec);
 
     msg_Dbg(obj, "Decoder chroma %4.4s -> %4.4s size %ux%u",
-            (const char *)&dec->p_fmt_in->i_codec,
+            (const char *)&dec->fmt_in->i_codec,
             (const char *)&dec->fmt_out.i_codec,
             dec->fmt_out.video.i_width, dec->fmt_out.video.i_height);
 

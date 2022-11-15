@@ -425,7 +425,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_FLAC )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_FLAC )
     {
         return VLC_EGENERIC;
     }
@@ -516,16 +516,16 @@ static void ProcessHeader( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !p_dec->p_fmt_in->i_extra )
+    if( !p_dec->fmt_in->i_extra )
         return;
 
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
-    int i_extra = p_dec->p_fmt_in->i_extra;
+    int i_extra = p_dec->fmt_in->i_extra;
 
     static const char header[4] = { 'f', 'L', 'a', 'C' };
 
-    if( memcmp( p_dec->p_fmt_in->p_extra, header, 4 ) )
+    if( memcmp( p_dec->fmt_in->p_extra, header, 4 ) )
         i_extra += 8;
 
     p_sys->p_block = block_Alloc( i_extra );
@@ -533,7 +533,7 @@ static void ProcessHeader( decoder_t *p_dec )
         return;
 
     uint8_t *p_data = p_sys->p_block->p_buffer;
-    if( i_extra != p_dec->p_fmt_in->i_extra )
+    if( i_extra != p_dec->fmt_in->i_extra )
     {
         memcpy( p_data, header, 4);
         p_data[4] = 0x80 | 0; /* STREAMINFO faked as last block */
@@ -542,7 +542,7 @@ static void ProcessHeader( decoder_t *p_dec )
         p_data[7] = 34; /* block size */
         p_data += 8;
     }
-    memcpy( p_data, p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra );
+    memcpy( p_data, p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra );
 
     FLAC__stream_decoder_process_until_end_of_metadata( p_sys->p_flac );
     msg_Dbg( p_dec, "STREAMINFO decoded" );

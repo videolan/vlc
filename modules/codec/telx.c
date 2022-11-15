@@ -183,7 +183,7 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys = NULL;
     int            i_val;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_TELETEXT)
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_TELETEXT)
     {
         return VLC_EGENERIC;
     }
@@ -199,13 +199,13 @@ static int Open( vlc_object_t *p_this )
         p_sys->pi_active_national_set[i] = ppi_national_subsets[1];
 
     i_val = var_CreateGetInteger( p_dec, "telx-override-page" );
-    if( i_val == -1 && p_dec->p_fmt_in->subs.teletext.i_magazine < 9 &&
-        ( p_dec->p_fmt_in->subs.teletext.i_magazine != 1 ||
-          p_dec->p_fmt_in->subs.teletext.i_page != 0 ) ) /* ignore if TS demux wants page 100 (unlikely to be sub) */
+    if( i_val == -1 && p_dec->fmt_in->subs.teletext.i_magazine < 9 &&
+        ( p_dec->fmt_in->subs.teletext.i_magazine != 1 ||
+          p_dec->fmt_in->subs.teletext.i_page != 0 ) ) /* ignore if TS demux wants page 100 (unlikely to be sub) */
     {
         bool b_val;
-        p_sys->i_wanted_magazine = p_dec->p_fmt_in->subs.teletext.i_magazine;
-        p_sys->i_wanted_page = p_dec->p_fmt_in->subs.teletext.i_page;
+        p_sys->i_wanted_magazine = p_dec->fmt_in->subs.teletext.i_magazine;
+        p_sys->i_wanted_page = p_dec->fmt_in->subs.teletext.i_page;
 
         b_val = var_CreateGetBool( p_dec, "telx-french-workaround" );
         if( p_sys->i_wanted_page < 100 &&

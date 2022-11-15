@@ -203,8 +203,8 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_MPGV &&
-        p_dec->p_fmt_in->i_codec != VLC_CODEC_MP2V )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_MPGV &&
+        p_dec->fmt_in->i_codec != VLC_CODEC_MP2V )
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
@@ -213,7 +213,7 @@ static int Open( vlc_object_t *p_this )
     memset( p_dec->p_sys, 0, sizeof( decoder_sys_t ) );
 
     p_dec->fmt_out.i_codec = VLC_CODEC_MPGV;
-    p_dec->fmt_out.i_original_fourcc = p_dec->p_fmt_in->i_original_fourcc;
+    p_dec->fmt_out.i_original_fourcc = p_dec->fmt_in->i_original_fourcc;
 
     /* Misc init */
     packetizer_Init( &p_sys->packetizer,
@@ -232,10 +232,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts = VLC_TICK_INVALID;
 
     unsigned num, den;
-    if( p_dec->p_fmt_in->video.i_frame_rate && p_dec->p_fmt_in->video.i_frame_rate_base )
+    if( p_dec->fmt_in->video.i_frame_rate && p_dec->fmt_in->video.i_frame_rate_base )
     {
-        num = p_dec->p_fmt_in->video.i_frame_rate;
-        den = p_dec->p_fmt_in->video.i_frame_rate_base;
+        num = p_dec->fmt_in->video.i_frame_rate;
+        den = p_dec->fmt_in->video.i_frame_rate_base;
     }
     else
     {
@@ -388,8 +388,8 @@ static void ProcessSequenceParameters( decoder_t *p_dec )
     /* Frame Rate */
 
     /* Only of not specified by container */
-    if ( !p_dec->p_fmt_in->video.i_frame_rate ||
-         !p_dec->p_fmt_in->video.i_frame_rate_base )
+    if ( !p_dec->fmt_in->video.i_frame_rate ||
+         !p_dec->fmt_in->video.i_frame_rate_base )
     {
         static const int code_to_frame_rate[16][2] =
         {
@@ -519,7 +519,7 @@ static block_t *OutputFrame( decoder_t *p_dec )
      * and only use first dts as it does not monotonically increase
      * This will NOT work with frame repeats and such, as we would need to fully
      * fill the DPB to get accurate pts timings. */
-    if( unlikely( p_dec->p_fmt_in->i_original_fourcc == VLC_FOURCC( 'D','V','R',' ') ) )
+    if( unlikely( p_dec->fmt_in->i_original_fourcc == VLC_FOURCC( 'D','V','R',' ') ) )
     {
         const bool b_first_xmited = (p_sys->i_prev_temporal_ref != p_sys->i_temporal_ref );
 
@@ -965,7 +965,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         /* Frame Packing extension identifier as H262 2012 Amd4 Annex L */
         if( !memcmp( &p_frag->p_buffer[4], "JP3D", 4 ) &&
             p_frag->i_buffer > 11 && p_frag->p_buffer[8] == 0x03 &&
-            p_dec->p_fmt_in->video.multiview_mode == MULTIVIEW_2D )
+            p_dec->fmt_in->video.multiview_mode == MULTIVIEW_2D )
         {
             video_multiview_mode_t mode;
             switch( p_frag->p_buffer[9] & 0x7F )

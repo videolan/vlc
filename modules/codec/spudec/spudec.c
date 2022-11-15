@@ -72,7 +72,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_SPU )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_SPU )
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
@@ -88,7 +88,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     if( b_packetizer )
     {
         p_dec->pf_packetize  = Packetize;
-        es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
+        es_format_Copy( &p_dec->fmt_out, p_dec->fmt_in );
         p_dec->fmt_out.i_codec = VLC_CODEC_SPU;
     }
     else

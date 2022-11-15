@@ -194,7 +194,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_SPEEX )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_SPEEX )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -202,7 +202,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
         return VLC_ENOMEM;
     p_sys->bits.buf_size = 0;
     p_sys->b_packetizer = b_packetizer;
-    p_sys->rtp_rate = p_dec->p_fmt_in->audio.i_rate;
+    p_sys->rtp_rate = p_dec->fmt_in->audio.i_rate;
     p_sys->b_has_headers = false;
 
     date_Set( &p_sys->end_date, VLC_TICK_INVALID );
@@ -223,10 +223,10 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
           being invoked on a Speex stream arriving via RTP.
           A special decoder callback is used.
         */
-        if (p_dec->p_fmt_in->i_original_fourcc == VLC_FOURCC('s', 'p', 'x', 'r'))
+        if (p_dec->fmt_in->i_original_fourcc == VLC_FOURCC('s', 'p', 'x', 'r'))
         {
             msg_Dbg( p_dec, "Using RTP version of Speex decoder @ rate %d.",
-            p_dec->p_fmt_in->audio.i_rate );
+            p_dec->fmt_in->audio.i_rate );
             p_dec->pf_decode = DecodeRtpSpeexPacket;
         }
         else
@@ -263,7 +263,7 @@ static int CreateDefaultHeader( decoder_t *p_dec )
     if( !p_header )
         return VLC_ENOMEM;
 
-    const int rate = p_dec->p_fmt_in->audio.i_rate;
+    const int rate = p_dec->fmt_in->audio.i_rate;
     const unsigned i_mode = (rate / 8000) >> 1;
 
     const SpeexMode *mode;
@@ -283,7 +283,7 @@ static int CreateDefaultHeader( decoder_t *p_dec )
             goto cleanup;
     }
 
-    speex_init_header( p_header, rate, p_dec->p_fmt_in->audio.i_channels, mode );
+    speex_init_header( p_header, rate, p_dec->fmt_in->audio.i_channels, mode );
     p_header->frames_per_packet = 160 << i_mode;
 
     oggpacket.packet = (unsigned char *) speex_header_to_packet( p_header,
@@ -359,7 +359,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     /* Check for headers */
     if( !p_sys->b_has_headers )
     {
-        if( !p_dec->p_fmt_in->p_extra )
+        if( !p_dec->fmt_in->p_extra )
         {
             msg_Warn( p_dec, "Header missing, using default settings" );
 
@@ -412,7 +412,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     const void *pp_data[XIPH_MAX_HEADER_COUNT];
     unsigned i_count;
     if( xiph_SplitHeaders( pi_size, pp_data, &i_count,
-                           p_dec->p_fmt_in->i_extra, p_dec->p_fmt_in->p_extra) )
+                           p_dec->fmt_in->i_extra, p_dec->fmt_in->p_extra) )
         return VLC_EGENERIC;
     if( i_count < 2 )
         return VLC_EGENERIC;;
@@ -440,15 +440,15 @@ static int ProcessHeaders( decoder_t *p_dec )
     if( p_sys->b_packetizer )
     {
         void* p_extra = realloc( p_dec->fmt_out.p_extra,
-                                 p_dec->p_fmt_in->i_extra );
+                                 p_dec->fmt_in->i_extra );
         if( unlikely( p_extra == NULL ) )
         {
             return VLC_ENOMEM;
         }
         p_dec->fmt_out.p_extra = p_extra;
-        p_dec->fmt_out.i_extra = p_dec->p_fmt_in->i_extra;
+        p_dec->fmt_out.i_extra = p_dec->fmt_in->i_extra;
         memcpy( p_dec->fmt_out.p_extra,
-                p_dec->p_fmt_in->p_extra, p_dec->fmt_out.i_extra );
+                p_dec->fmt_in->p_extra, p_dec->fmt_out.i_extra );
     }
 
     return VLC_SUCCESS;

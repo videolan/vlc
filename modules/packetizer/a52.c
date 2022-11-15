@@ -332,7 +332,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    switch( p_dec->p_fmt_in->i_codec )
+    switch( p_dec->fmt_in->i_codec )
     {
     case VLC_CODEC_EAC3:
     case VLC_CODEC_A52:
@@ -356,8 +356,8 @@ static int Open( vlc_object_t *p_this )
     block_BytestreamInit( &p_sys->bytestream );
 
     /* Set output properties (Passthrough ONLY) */
-    p_dec->fmt_out.i_codec = p_dec->p_fmt_in->i_codec;
-    p_dec->fmt_out.audio = p_dec->p_fmt_in->audio;
+    p_dec->fmt_out.i_codec = p_dec->fmt_in->i_codec;
+    p_dec->fmt_out.audio = p_dec->fmt_in->audio;
     p_dec->fmt_out.audio.i_rate = 0;
 
     /* Set callback */

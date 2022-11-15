@@ -140,7 +140,7 @@ static void UpdateDecoderOutput(decoder_t *dec, const Dav1dSequenceHeader *seq_h
         v->i_sar_den = 1;
     }
 
-    if(dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF && seq_hdr)
+    if(dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF && seq_hdr)
     {
         v->primaries = iso_23001_8_cp_to_vlc_primaries(seq_hdr->pri);
         v->transfer = iso_23001_8_tc_to_vlc_xfer(seq_hdr->trc);
@@ -161,7 +161,7 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     UpdateDecoderOutput(dec, img->seq_hdr);
 
     const Dav1dMasteringDisplay *md = img->mastering_display;
-    if( dec->p_fmt_in->video.mastering.max_luminance == 0 && md )
+    if( dec->fmt_in->video.mastering.max_luminance == 0 && md )
     {
         const uint8_t RGB2GBR[3] = {2,0,1};
         for( size_t i=0;i<6; i++ )
@@ -181,15 +181,15 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     }
 
     const Dav1dContentLightLevel *cll = img->content_light;
-    if( dec->p_fmt_in->video.lighting.MaxCLL == 0 && cll )
+    if( dec->fmt_in->video.lighting.MaxCLL == 0 && cll )
     {
         v->lighting.MaxCLL = cll->max_content_light_level;
         v->lighting.MaxFALL = cll->max_frame_average_light_level;
     }
 
-    v->projection_mode = dec->p_fmt_in->video.projection_mode;
-    v->multiview_mode = dec->p_fmt_in->video.multiview_mode;
-    v->pose = dec->p_fmt_in->video.pose;
+    v->projection_mode = dec->fmt_in->video.projection_mode;
+    v->multiview_mode = dec->fmt_in->video.multiview_mode;
+    v->pose = dec->fmt_in->video.pose;
     dec->fmt_out.i_codec = FindVlcChroma(img);
     v->i_width  = (img->p.w + 0x7F) & ~0x7F;
     v->i_height = (img->p.h + 0x7F) & ~0x7F;
@@ -399,7 +399,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *dec = (decoder_t *)p_this;
 
-    if (dec->p_fmt_in->i_codec != VLC_CODEC_AV1)
+    if (dec->fmt_in->i_codec != VLC_CODEC_AV1)
         return VLC_EGENERIC;
 
     decoder_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof(*p_sys));
@@ -445,24 +445,24 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->s.allocator.release_picture_callback = FreePicture;
 
     av1_OBU_sequence_header_t *sequence_hdr = NULL;
-    if (dec->p_fmt_in->i_extra > 4)
+    if (dec->fmt_in->i_extra > 4)
     {
         // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
         // and then one or more OBU
-        const uint8_t *obu_start = ((const uint8_t*) dec->p_fmt_in->p_extra) + 4;
-        int obu_size = dec->p_fmt_in->i_extra - 4;
+        const uint8_t *obu_start = ((const uint8_t*) dec->fmt_in->p_extra) + 4;
+        int obu_size = dec->fmt_in->i_extra - 4;
         if (AV1_OBUIsValid(obu_start, obu_size) && AV1_OBUGetType(obu_start) == AV1_OBU_SEQUENCE_HEADER)
             sequence_hdr = AV1_OBU_parse_sequence_header(obu_start, obu_size);
     }
 
-    dec->fmt_out.video.i_frame_rate = dec->p_fmt_in->video.i_frame_rate;
-    dec->fmt_out.video.i_frame_rate_base = dec->p_fmt_in->video.i_frame_rate_base;
+    dec->fmt_out.video.i_frame_rate = dec->fmt_in->video.i_frame_rate;
+    dec->fmt_out.video.i_frame_rate_base = dec->fmt_in->video.i_frame_rate_base;
 
     if (!sequence_hdr)
     {
         dec->fmt_out.i_codec = VLC_CODEC_I420;
-        dec->fmt_out.video.i_width = dec->p_fmt_in->video.i_width;
-        dec->fmt_out.video.i_height = dec->p_fmt_in->video.i_height;
+        dec->fmt_out.video.i_width = dec->fmt_in->video.i_width;
+        dec->fmt_out.video.i_height = dec->fmt_in->video.i_height;
     }
     else
     {
@@ -500,16 +500,16 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     dec->p_sys = p_sys;
 
-    if (dec->p_fmt_in->video.i_sar_num > 0 && dec->p_fmt_in->video.i_sar_den > 0) {
-        dec->fmt_out.video.i_sar_num = dec->p_fmt_in->video.i_sar_num;
-        dec->fmt_out.video.i_sar_den = dec->p_fmt_in->video.i_sar_den;
+    if (dec->fmt_in->video.i_sar_num > 0 && dec->fmt_in->video.i_sar_den > 0) {
+        dec->fmt_out.video.i_sar_num = dec->fmt_in->video.i_sar_num;
+        dec->fmt_out.video.i_sar_den = dec->fmt_in->video.i_sar_den;
     }
-    dec->fmt_out.video.primaries   = dec->p_fmt_in->video.primaries;
-    dec->fmt_out.video.transfer    = dec->p_fmt_in->video.transfer;
-    dec->fmt_out.video.space       = dec->p_fmt_in->video.space;
-    dec->fmt_out.video.color_range = dec->p_fmt_in->video.color_range;
-    dec->fmt_out.video.mastering   = dec->p_fmt_in->video.mastering;
-    dec->fmt_out.video.lighting    = dec->p_fmt_in->video.lighting;
+    dec->fmt_out.video.primaries   = dec->fmt_in->video.primaries;
+    dec->fmt_out.video.transfer    = dec->fmt_in->video.transfer;
+    dec->fmt_out.video.space       = dec->fmt_in->video.space;
+    dec->fmt_out.video.color_range = dec->fmt_in->video.color_range;
+    dec->fmt_out.video.mastering   = dec->fmt_in->video.mastering;
+    dec->fmt_out.video.lighting    = dec->fmt_in->video.lighting;
 
     if (sequence_hdr != NULL)
     {

@@ -104,7 +104,7 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
             [SPU_ES] = "spu decoder",
         };
         decoder->p_module =
-            module_need(decoder, caps[decoder->p_fmt_in->i_cat], NULL, false);
+            module_need(decoder, caps[decoder->fmt_in->i_cat], NULL, false);
     }
     else
         decoder->p_module = module_need(decoder, "packetizer", NULL, false);
@@ -220,7 +220,7 @@ int test_decoder_process(decoder_t *decoder, block_t *p_block)
                 packetizer->pf_packetize(packetizer, pp_block)))
     {
 
-        if (!es_format_IsSimilar(decoder->p_fmt_in, &packetizer->fmt_out))
+        if (!es_format_IsSimilar(decoder->fmt_in, &packetizer->fmt_out))
         {
             debug("restarting module due to input format change\n");
 

@@ -267,7 +267,7 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         dec->fmt_out.video.i_sar_den = 1;
     }
 
-    if(dec->p_fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
+    if(dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
     {
         v->primaries = iso_23001_8_cp_to_vlc_primaries(img->cp);
         v->transfer = iso_23001_8_tc_to_vlc_xfer(img->tc);
@@ -275,9 +275,9 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         v->color_range = img->range == AOM_CR_FULL_RANGE ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
-    dec->fmt_out.video.projection_mode = dec->p_fmt_in->video.projection_mode;
-    dec->fmt_out.video.multiview_mode = dec->p_fmt_in->video.multiview_mode;
-    dec->fmt_out.video.pose = dec->p_fmt_in->video.pose;
+    dec->fmt_out.video.projection_mode = dec->fmt_in->video.projection_mode;
+    dec->fmt_out.video.multiview_mode = dec->fmt_in->video.multiview_mode;
+    dec->fmt_out.video.pose = dec->fmt_in->video.pose;
 
     if (decoder_UpdateVideoFormat(dec) == 0)
     {
@@ -369,7 +369,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     const aom_codec_iface_t *iface;
     int av_version;
 
-    if (dec->p_fmt_in->i_codec != VLC_CODEC_AV1)
+    if (dec->fmt_in->i_codec != VLC_CODEC_AV1)
         return VLC_EGENERIC;
 
     iface = &aom_codec_av1_dx_algo;
@@ -399,18 +399,18 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->pf_decode = Decode;
     dec->pf_flush = FlushDecoder;
 
-    dec->fmt_out.video.i_width = dec->p_fmt_in->video.i_width;
-    dec->fmt_out.video.i_height = dec->p_fmt_in->video.i_height;
+    dec->fmt_out.video.i_width = dec->fmt_in->video.i_width;
+    dec->fmt_out.video.i_height = dec->fmt_in->video.i_height;
     dec->fmt_out.i_codec = VLC_CODEC_I420;
 
-    if (dec->p_fmt_in->video.i_sar_num > 0 && dec->p_fmt_in->video.i_sar_den > 0) {
-        dec->fmt_out.video.i_sar_num = dec->p_fmt_in->video.i_sar_num;
-        dec->fmt_out.video.i_sar_den = dec->p_fmt_in->video.i_sar_den;
+    if (dec->fmt_in->video.i_sar_num > 0 && dec->fmt_in->video.i_sar_den > 0) {
+        dec->fmt_out.video.i_sar_num = dec->fmt_in->video.i_sar_num;
+        dec->fmt_out.video.i_sar_den = dec->fmt_in->video.i_sar_den;
     }
-    dec->fmt_out.video.primaries   = dec->p_fmt_in->video.primaries;
-    dec->fmt_out.video.transfer    = dec->p_fmt_in->video.transfer;
-    dec->fmt_out.video.space       = dec->p_fmt_in->video.space;
-    dec->fmt_out.video.color_range = dec->p_fmt_in->video.color_range;
+    dec->fmt_out.video.primaries   = dec->fmt_in->video.primaries;
+    dec->fmt_out.video.transfer    = dec->fmt_in->video.transfer;
+    dec->fmt_out.video.space       = dec->fmt_in->video.space;
+    dec->fmt_out.video.color_range = dec->fmt_in->video.color_range;
 
     return VLC_SUCCESS;
 }

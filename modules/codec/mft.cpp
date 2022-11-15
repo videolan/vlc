@@ -379,18 +379,18 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
     if (FAILED(hr))
         goto error;
 
-    if (p_dec->p_fmt_in->i_cat == VIDEO_ES)
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
-        UINT64 width = p_dec->p_fmt_in->video.i_width;
-        UINT64 height = p_dec->p_fmt_in->video.i_height;
+        UINT64 width = p_dec->fmt_in->video.i_width;
+        UINT64 height = p_dec->fmt_in->video.i_height;
         UINT64 frame_size = (width << 32) | height;
         hr = input_media_type->SetUINT64(MF_MT_FRAME_SIZE, frame_size);
         if (FAILED(hr))
             goto error;
 
         /* Some transforms like to know the frame rate and may reject the input type otherwise. */
-        UINT64 frame_ratio_num = p_dec->p_fmt_in->video.i_frame_rate;
-        UINT64 frame_ratio_dem = p_dec->p_fmt_in->video.i_frame_rate_base;
+        UINT64 frame_ratio_num = p_dec->fmt_in->video.i_frame_rate;
+        UINT64 frame_ratio_dem = p_dec->fmt_in->video.i_frame_rate_base;
         if(frame_ratio_num && frame_ratio_dem) {
             UINT64 frame_rate = (frame_ratio_num << 32) | frame_ratio_dem;
             hr = input_media_type->SetUINT64(MF_MT_FRAME_RATE, frame_rate);
@@ -403,39 +403,39 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
         hr = input_media_type->SetUINT32(MF_MT_ORIGINAL_WAVE_FORMAT_TAG, p_sys->subtype->Data1);
         if (FAILED(hr))
             goto error;
-        if (p_dec->p_fmt_in->audio.i_rate)
+        if (p_dec->fmt_in->audio.i_rate)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, p_dec->p_fmt_in->audio.i_rate);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, p_dec->fmt_in->audio.i_rate);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->p_fmt_in->audio.i_channels)
+        if (p_dec->fmt_in->audio.i_channels)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_NUM_CHANNELS, p_dec->p_fmt_in->audio.i_channels);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_NUM_CHANNELS, p_dec->fmt_in->audio.i_channels);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->p_fmt_in->audio.i_bitspersample)
+        if (p_dec->fmt_in->audio.i_bitspersample)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, p_dec->p_fmt_in->audio.i_bitspersample);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, p_dec->fmt_in->audio.i_bitspersample);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->p_fmt_in->audio.i_blockalign)
+        if (p_dec->fmt_in->audio.i_blockalign)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BLOCK_ALIGNMENT, p_dec->p_fmt_in->audio.i_blockalign);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_BLOCK_ALIGNMENT, p_dec->fmt_in->audio.i_blockalign);
             if (FAILED(hr))
                 goto error;
         }
-        if (p_dec->p_fmt_in->i_bitrate)
+        if (p_dec->fmt_in->i_bitrate)
         {
-            hr = input_media_type->SetUINT32(MF_MT_AUDIO_AVG_BYTES_PER_SECOND, p_dec->p_fmt_in->i_bitrate / 8);
+            hr = input_media_type->SetUINT32(MF_MT_AUDIO_AVG_BYTES_PER_SECOND, p_dec->fmt_in->i_bitrate / 8);
             if (FAILED(hr))
                 goto error;
         }
     }
 
-    if (p_dec->p_fmt_in->i_extra > 0)
+    if (p_dec->fmt_in->i_extra > 0)
     {
         UINT32 blob_size = 0;
         hr = input_media_type->GetBlobSize(MF_MT_USER_DATA, &blob_size);
@@ -446,7 +446,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFMediaType> 
         if (hr == MF_E_ATTRIBUTENOTFOUND)
         {
             hr = input_media_type->SetBlob(MF_MT_USER_DATA,
-                                      static_cast<const UINT8*>(p_dec->p_fmt_in->p_extra), p_dec->p_fmt_in->i_extra);
+                                      static_cast<const UINT8*>(p_dec->fmt_in->p_extra), p_dec->fmt_in->i_extra);
             if (FAILED(hr))
                 goto error;
         }
@@ -497,7 +497,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
         if (FAILED(hr))
             goto error;
 
-        if (p_dec->p_fmt_in->i_cat == VIDEO_ES)
+        if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
             if (IsEqualGUID(subtype, MFVideoFormat_NV12) || IsEqualGUID(subtype, MFVideoFormat_YV12) || IsEqualGUID(subtype, MFVideoFormat_I420))
                 found = true;
@@ -543,9 +543,9 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
     if (FAILED(hr))
         goto error;
 
-    if (p_dec->p_fmt_in->i_cat == VIDEO_ES)
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
-        video_format_Copy( &p_dec->fmt_out.video, &p_dec->p_fmt_in->video );
+        video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in->video );
 
         /* Transform might offer output in a D3DFMT proprietary FCC */
         vlc_fourcc_t fcc = GUIDToFormat(d3d_format_table, subtype);
@@ -553,14 +553,14 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id)
             /* D3D formats are upside down */
             p_dec->fmt_out.video.orientation = ORIENT_BOTTOM_LEFT;
         } else {
-            fcc = vlc_fourcc_GetCodec(p_dec->p_fmt_in->i_cat, subtype.Data1);
+            fcc = vlc_fourcc_GetCodec(p_dec->fmt_in->i_cat, subtype.Data1);
         }
 
         p_dec->fmt_out.i_codec = fcc;
     }
     else
     {
-        p_dec->fmt_out.audio = p_dec->p_fmt_in->audio;
+        p_dec->fmt_out.audio = p_dec->fmt_in->audio;
 
         UINT32 bitspersample = 0;
         hr = output_media_type->GetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, &bitspersample);
@@ -653,7 +653,7 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, ComPtr<IMFSam
         return VLC_SUCCESS;
     }
 
-    if (p_dec->p_fmt_in->i_cat == VIDEO_ES)
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         const DWORD expected_flags =
                           MFT_OUTPUT_STREAM_WHOLE_SAMPLES
@@ -700,7 +700,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     vlc_tick_t ts;
     ComPtr<IMFMediaBuffer> input_media_buffer;
 
-    if (p_dec->p_fmt_in->i_codec == VLC_CODEC_H264)
+    if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
     {
         /* in-place NAL to annex B conversion. */
         p_block = hxxx_helper_process_block(&p_sys->hh, p_block);
@@ -909,7 +909,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
         if (FAILED(hr))
             goto error;
 
-        if (p_dec->p_fmt_in->i_cat == VIDEO_ES)
+        if (p_dec->fmt_in->i_cat == VIDEO_ES)
         {
             mf_d3d11_pic_ctx *pic_ctx = nullptr;
             UINT sliceIndex = 0;
@@ -1284,7 +1284,7 @@ static int EnableHardwareAcceleration(decoder_t *p_dec, ComPtr<IMFAttributes> & 
 {
     HRESULT hr = S_OK;
 #if defined(STATIC_CODECAPI_AVDecVideoAcceleration_H264)
-    switch (p_dec->p_fmt_in->i_codec)
+    switch (p_dec->fmt_in->i_codec)
     {
         case VLC_CODEC_H264:
             hr = attributes->SetUINT32(CODECAPI_AVDecVideoAcceleration_H264, TRUE);
@@ -1392,7 +1392,7 @@ static int InitializeMFT(decoder_t *p_dec)
     if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type))
         goto error;
 
-    if (attributes.Get() && p_dec->p_fmt_in->i_cat == VIDEO_ES)
+    if (attributes.Get() && p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         EnableHardwareAcceleration(p_dec, attributes);
         if (p_sys->fptr_MFCreateDXGIDeviceManager)
@@ -1438,7 +1438,7 @@ static int InitializeMFT(decoder_t *p_dec)
     if (FAILED(hr))
         goto error;
 
-    if (attributes.Get() && p_dec->p_fmt_in->i_codec == VLC_CODEC_H264)
+    if (attributes.Get() && p_dec->fmt_in->i_codec == VLC_CODEC_H264)
     {
         /* It's not an error if the following call fails. */
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
@@ -1447,8 +1447,8 @@ static int InitializeMFT(decoder_t *p_dec)
         attributes->SetUINT32(MF_LOW_LATENCY, TRUE);
 #endif
 
-        hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec), p_dec->p_fmt_in->i_codec, 0, 0);
-        hxxx_helper_set_extra(&p_sys->hh, p_dec->p_fmt_in->p_extra, p_dec->p_fmt_in->i_extra);
+        hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec), p_dec->fmt_in->i_codec, 0, 0);
+        hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra);
     }
     return VLC_SUCCESS;
 
@@ -1500,7 +1500,7 @@ static void DestroyMFT(decoder_t *p_dec)
         p_sys->flushStream();
     }
 
-    if (p_dec->p_fmt_in->i_codec == VLC_CODEC_H264)
+    if (p_dec->fmt_in->i_codec == VLC_CODEC_H264)
         hxxx_helper_clean(&p_sys->hh);
 }
 
@@ -1511,15 +1511,15 @@ static int FindMFT(decoder_t *p_dec)
 
     /* Try to create a MFT using MFTEnumEx. */
     GUID category;
-    if (p_dec->p_fmt_in->i_cat == VIDEO_ES)
+    if (p_dec->fmt_in->i_cat == VIDEO_ES)
     {
         category = MFT_CATEGORY_VIDEO_DECODER;
         p_sys->major_type = &MFMediaType_Video;
-        p_sys->subtype = FormatToGUID(video_format_table, p_dec->p_fmt_in->i_codec);
+        p_sys->subtype = FormatToGUID(video_format_table, p_dec->fmt_in->i_codec);
         if(!p_sys->subtype) {
             /* Codec is not well known. Construct a MF transform subtype from the fourcc */
             p_sys->custom_subtype = MFVideoFormat_Base;
-            p_sys->custom_subtype.Data1 = p_dec->p_fmt_in->i_codec;
+            p_sys->custom_subtype.Data1 = p_dec->fmt_in->i_codec;
             p_sys->subtype = &p_sys->custom_subtype;
         }
     }
@@ -1527,7 +1527,7 @@ static int FindMFT(decoder_t *p_dec)
     {
         category = MFT_CATEGORY_AUDIO_DECODER;
         p_sys->major_type = &MFMediaType_Audio;
-        p_sys->subtype = FormatToGUID(audio_format_table, p_dec->p_fmt_in->i_codec);
+        p_sys->subtype = FormatToGUID(audio_format_table, p_dec->fmt_in->i_codec);
     }
     if (!p_sys->subtype)
         return VLC_EGENERIC;
@@ -1542,7 +1542,7 @@ static int FindMFT(decoder_t *p_dec)
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    msg_Dbg(p_dec, "Found %d available MFT module(s) for %4.4s", activate_objects_count, (const char*)&p_dec->p_fmt_in->i_codec);
+    msg_Dbg(p_dec, "Found %d available MFT module(s) for %4.4s", activate_objects_count, (const char*)&p_dec->fmt_in->i_codec);
     if (activate_objects_count == 0)
         return VLC_EGENERIC;
 
@@ -1576,10 +1576,10 @@ static int LoadMFTLibrary(decoder_t *p_dec)
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    if (p_dec->p_fmt_in->i_cat != VIDEO_ES) // nothing left to do
+    if (p_dec->fmt_in->i_cat != VIDEO_ES) // nothing left to do
         return VLC_SUCCESS;
 
-    if (p_dec->p_fmt_in->video.i_width == 0) // don't consume D3D resource for a fake decoder
+    if (p_dec->fmt_in->video.i_width == 0) // don't consume D3D resource for a fake decoder
     {
         msg_Dbg(p_dec, "skip D3D handling for dummy decoder");
         return VLC_SUCCESS;

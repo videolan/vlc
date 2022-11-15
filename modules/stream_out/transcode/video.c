@@ -154,7 +154,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     es_format_Clean( &id->decoder_out );
     es_format_Copy( &id->decoder_out, &p_dec->fmt_out );
     /* crap, decoders resetting the whole fmtout... */
-    es_format_SetMeta( &id->decoder_out, p_dec->p_fmt_in );
+    es_format_SetMeta( &id->decoder_out, p_dec->fmt_in );
 
     if( transcode_video_filters_init( p_owner->p_stream,
                   id->p_filterscfg,
@@ -222,7 +222,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     if( !id->downstream_id )
         id->downstream_id =
             id->pf_transcode_downstream_add( p_owner->p_stream,
-                                             id->p_decoder->p_fmt_in,
+                                             id->p_decoder->fmt_in,
                                              transcode_encoder_format_out( id->encoder ) );
     msg_Info( p_dec, "video format update succeed" );
 

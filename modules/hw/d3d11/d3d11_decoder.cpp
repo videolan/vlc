@@ -218,12 +218,12 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
 {
     decoder_t *p_dec = (decoder_t *)obj;
 
-    if ( !is_d3d11_opaque(p_dec->p_fmt_in->video.i_chroma) )
+    if ( !is_d3d11_opaque(p_dec->fmt_in->video.i_chroma) )
         return VLC_EGENERIC;
-    if( p_dec->p_fmt_in->video.i_width <= 0 || p_dec->p_fmt_in->video.i_height == 0 )
+    if( p_dec->fmt_in->video.i_width <= 0 || p_dec->fmt_in->video.i_height == 0 )
     {
         msg_Err( p_dec, "invalid display size %dx%d",
-                 p_dec->p_fmt_in->video.i_width, p_dec->p_fmt_in->video.i_height );
+                 p_dec->fmt_in->video.i_width, p_dec->fmt_in->video.i_height );
         return VLC_EGENERIC;
     }
 
@@ -245,7 +245,7 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
     }
     p_sys->dec_dev = dec_dev;
 
-    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->fmt_in );
 
     if( !p_dec->fmt_out.video.i_visible_width )
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
@@ -264,14 +264,14 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
         date_Init( &p_sys->pts, p_dec->fmt_out.video.i_frame_rate,
                     p_dec->fmt_out.video.i_frame_rate_base );
 
-    if (p_dec->p_fmt_in->video.i_chroma == VLC_CODEC_D3D11_OPAQUE_BGRA)
+    if (p_dec->fmt_in->video.i_chroma == VLC_CODEC_D3D11_OPAQUE_BGRA)
     {
         // there's only one possible value so we don't have to wait for the
         // DXGI_FORMAT
         for (p_sys->output_format = DxgiGetRenderFormatList();
             p_sys->output_format->name != nullptr; ++p_sys->output_format)
         {
-            if (p_sys->output_format->fourcc == p_dec->p_fmt_in->video.i_chroma &&
+            if (p_sys->output_format->fourcc == p_dec->fmt_in->video.i_chroma &&
                 is_d3d11_opaque(p_sys->output_format->fourcc))
                 break;
         }

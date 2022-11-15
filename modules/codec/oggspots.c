@@ -98,7 +98,7 @@ static int OpenCommon(vlc_object_t* p_this, bool b_packetizer)
     decoder_t* p_dec = (decoder_t*)p_this;
     decoder_sys_t* p_sys;
 
-    if (p_dec->p_fmt_in->i_codec != VLC_CODEC_OGGSPOTS) {
+    if (p_dec->fmt_in->i_codec != VLC_CODEC_OGGSPOTS) {
         return VLC_EGENERIC;
     }
 
@@ -203,10 +203,10 @@ static int ProcessHeader(decoder_t* p_dec)
     uint64_t i_granulerate_denominator;
 
     /* The OggSpots header is always 52 bytes */
-    if (p_dec->p_fmt_in->i_extra != 52) {
+    if (p_dec->fmt_in->i_extra != 52) {
         return VLC_EGENERIC;
     }
-    p_extra = p_dec->p_fmt_in->p_extra;
+    p_extra = p_dec->fmt_in->p_extra;
 
     /* Identification string */
     if ( memcmp(p_extra, "SPOTS\0\0", 8) ) {
@@ -267,14 +267,14 @@ static int ProcessHeader(decoder_t* p_dec)
 
     if (p_sys->b_packetizer) {
         void* p_new_extra = realloc(p_dec->fmt_out.p_extra,
-                                p_dec->p_fmt_in->i_extra);
+                                p_dec->fmt_in->i_extra);
         if (unlikely(p_new_extra == NULL)) {
             return VLC_ENOMEM;
         }
         p_dec->fmt_out.p_extra = p_new_extra;
-        p_dec->fmt_out.i_extra = p_dec->p_fmt_in->i_extra;
+        p_dec->fmt_out.i_extra = p_dec->fmt_in->i_extra;
         memcpy(p_dec->fmt_out.p_extra,
-               p_dec->p_fmt_in->p_extra, p_dec->fmt_out.i_extra);
+               p_dec->fmt_in->p_extra, p_dec->fmt_out.i_extra);
     }
 
     return VLC_SUCCESS;
@@ -351,7 +351,7 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
     }
 
     /* Image format */
-    es_format_t fmt_in = *p_dec->p_fmt_in;
+    es_format_t fmt_in = *p_dec->fmt_in;
     if ( !memcmp(&p_block->p_buffer[4], "PNG", 3) ) {
         fmt_in.video.i_chroma = VLC_CODEC_PNG;
     }

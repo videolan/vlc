@@ -148,11 +148,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_MPGV )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_MPGV )
         return VLC_EGENERIC;
 
     /* Select only recognized original format (standard mpeg video) */
-    switch( p_dec->p_fmt_in->i_original_fourcc )
+    switch( p_dec->fmt_in->i_original_fourcc )
     {
     case VLC_FOURCC('m','p','g','1'):
     case VLC_FOURCC('m','p','g','2'):
@@ -161,7 +161,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     case VLC_FOURCC('h','d','v','2'):
         break;
     default:
-        if( p_dec->p_fmt_in->i_original_fourcc )
+        if( p_dec->fmt_in->i_original_fourcc )
             return VLC_EGENERIC;
         break;
     }
@@ -712,11 +712,11 @@ static void GetAR( decoder_t *p_dec )
     int i_old_sar_den = p_sys->i_sar_den;
 
     /* Check whether the input gave a particular aspect ratio */
-    if( p_dec->p_fmt_in->video.i_sar_num > 0 &&
-        p_dec->p_fmt_in->video.i_sar_den > 0 )
+    if( p_dec->fmt_in->video.i_sar_num > 0 &&
+        p_dec->fmt_in->video.i_sar_den > 0 )
     {
-        p_sys->i_sar_num = p_dec->p_fmt_in->video.i_sar_num;
-        p_sys->i_sar_den = p_dec->p_fmt_in->video.i_sar_den;
+        p_sys->i_sar_num = p_dec->fmt_in->video.i_sar_num;
+        p_sys->i_sar_den = p_dec->fmt_in->video.i_sar_den;
     }
     /* Use the value provided in the MPEG sequence header */
     else if( p_sys->p_info->sequence->pixel_height > 0 )

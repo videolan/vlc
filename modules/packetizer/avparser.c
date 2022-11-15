@@ -86,12 +86,12 @@ int avparser_OpenPacketizer( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     /* Restrict to VP9 for now */
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_VP9 )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_VP9 )
         return VLC_EGENERIC;
 
     enum AVCodecID i_avcodec_id;
 
-    if( !GetFfmpegCodec( p_dec->p_fmt_in->i_cat, p_dec->p_fmt_in->i_codec,
+    if( !GetFfmpegCodec( p_dec->fmt_in->i_cat, p_dec->fmt_in->i_codec,
                          &i_avcodec_id, NULL ) )
         return VLC_EGENERIC;
 
@@ -131,7 +131,7 @@ int avparser_OpenPacketizer( vlc_object_t *p_this )
     p_sys->p_parser_ctx = p_ctx;
     p_sys->p_codec_ctx = p_codec_ctx;
     p_sys->i_offset = 0;
-    es_format_Copy( &p_dec->fmt_out, p_dec->p_fmt_in );
+    es_format_Copy( &p_dec->fmt_out, p_dec->fmt_in );
 
     return VLC_SUCCESS;
 }
@@ -213,7 +213,7 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
         *pp_block = NULL;
     }
 
-    if( p_dec->p_fmt_in->i_cat == VIDEO_ES )
+    if( p_dec->fmt_in->i_cat == VIDEO_ES )
     {
         switch ( p_sys->p_parser_ctx->pict_type )
         {

@@ -92,13 +92,13 @@ int InitSubtitleDec(vlc_object_t *obj)
 
     if( codec->id == AV_CODEC_ID_DVB_SUBTITLE )
     {
-        if( dec->p_fmt_in->i_extra > 3 )
+        if( dec->fmt_in->i_extra > 3 )
         {
-            context->extradata = malloc( dec->p_fmt_in->i_extra );
+            context->extradata = malloc( dec->fmt_in->i_extra );
             if( context->extradata )
             {
-                context->extradata_size = dec->p_fmt_in->i_extra;
-                memcpy( context->extradata, dec->p_fmt_in->p_extra, dec->p_fmt_in->i_extra );
+                context->extradata_size = dec->fmt_in->i_extra;
+                memcpy( context->extradata, dec->fmt_in->p_extra, dec->fmt_in->i_extra );
             }
         }
         else
@@ -107,8 +107,8 @@ int InitSubtitleDec(vlc_object_t *obj)
             if( context->extradata )
             {
                 context->extradata_size = 4;
-                SetWBE( &context->extradata[0], dec->p_fmt_in->subs.dvb.i_id & 0xFFFF );
-                SetWBE( &context->extradata[2], dec->p_fmt_in->subs.dvb.i_id >> 16 );
+                SetWBE( &context->extradata[0], dec->fmt_in->subs.dvb.i_id & 0xFFFF );
+                SetWBE( &context->extradata[2], dec->fmt_in->subs.dvb.i_id >> 16 );
             }
         }
     }
@@ -335,9 +335,9 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, vlc_tick
         spu->i_original_picture_height = avctx->coded_height;
     } else {
         spu->i_original_picture_width =
-            dec->p_fmt_in->subs.spu.i_original_frame_width;
+            dec->fmt_in->subs.spu.i_original_frame_width;
         spu->i_original_picture_height =
-            dec->p_fmt_in->subs.spu.i_original_frame_height;
+            dec->fmt_in->subs.spu.i_original_frame_height;
     }
 
     subpicture_region_t **region_next = &spu->p_region;

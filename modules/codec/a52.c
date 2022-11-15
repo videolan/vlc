@@ -274,11 +274,11 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->p_fmt_in->i_codec != VLC_CODEC_A52
-     || p_dec->p_fmt_in->audio.i_rate == 0
-     || p_dec->p_fmt_in->audio.i_physical_channels == 0
-     || p_dec->p_fmt_in->audio.i_bytes_per_frame == 0
-     || p_dec->p_fmt_in->audio.i_frame_length == 0 )
+    if( p_dec->fmt_in->i_codec != VLC_CODEC_A52
+     || p_dec->fmt_in->audio.i_rate == 0
+     || p_dec->fmt_in->audio.i_physical_channels == 0
+     || p_dec->fmt_in->audio.i_bytes_per_frame == 0
+     || p_dec->fmt_in->audio.i_frame_length == 0 )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the module's structure */
@@ -289,8 +289,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_dynrng = var_InheritBool( p_this, "a52-dynrng" );
     p_sys->b_dontwarn = 0;
 
-    p_sys->i_nb_channels = aout_FormatNbChannels( &p_dec->p_fmt_in->audio );
-    if( channels_vlc2a52( &p_dec->p_fmt_in->audio, &p_sys->i_flags )
+    p_sys->i_nb_channels = aout_FormatNbChannels( &p_dec->fmt_in->audio );
+    if( channels_vlc2a52( &p_dec->fmt_in->audio, &p_sys->i_flags )
         != VLC_SUCCESS )
     {
         msg_Warn( p_this, "unknown sample format!" );
@@ -314,10 +314,10 @@ static int Open( vlc_object_t *p_this )
     };
 
     aout_CheckChannelReorder( pi_channels_in, NULL,
-                              p_dec->p_fmt_in->audio.i_physical_channels,
+                              p_dec->fmt_in->audio.i_physical_channels,
                               p_sys->pi_chan_table );
 
-    p_dec->fmt_out.audio = p_dec->p_fmt_in->audio;
+    p_dec->fmt_out.audio = p_dec->fmt_in->audio;
 #ifdef LIBA52_FIXED
     p_dec->fmt_out.audio.i_format = VLC_CODEC_S32N;
 #else
