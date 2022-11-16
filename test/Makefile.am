@@ -333,6 +333,7 @@ vlccoreios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
 vlccoreios_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/Frameworks/"
 vlccoreios_OBJCFLAGS = -fobjc-arc
 vlccoreios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
+
 if HAVE_IOS
 noinst_PROGRAMS += vlccoreios
 endif
@@ -350,4 +351,18 @@ vlc_window_LDADD = ../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
 # cannot link static plugins currently anyway.
 if HAVE_DYNAMIC_PLUGINS
 noinst_PROGRAMS += vlc-window
+endif
+
+if HAVE_MERGE_PLUGINS
+if !HAVE_DYNAMIC_PLUGINS
+vlccoreios_LDADD += ../modules/libvlc_static.la
+vlccoreios_LDFLAGS += \
+	-Wl,-framework,CoreFoundation,-framework,Foundation \
+	-Wl,-framework,CoreAudio,-framework,AudioToolbox \
+	-Wl,-framework,CoreVideo,-framework,QuartzCore \
+	-Wl,-framework,OpenGLES,-framework,UIKit \
+	-Wl,-framework,Security,-framework,AVFoundation \
+	-Wl,-framework,CoreImage
+vlccoreios_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
+endif
 endif

@@ -163,5 +163,21 @@ vlc_module_end()
 /* Inject the glue interface as a static module */
 typedef int (*vlc_plugin_cb)(vlc_set_cb, void*);
 
+#define VLC_PLUGIN_ENTRY_NAME(name) vlc_entry__ ## name
+#define VLC_DECLARE_PLUGIN_ENTRY(name) \
+    VLC_EXPORT extern int VLC_PLUGIN_ENTRY_NAME(name) (vlc_set_cb, void *);
+
+#ifdef HAVE_MERGE_PLUGINS
+#include "vlc_modules_manifest.h"
+VLC_MODULE_LIST(VLC_DECLARE_PLUGIN_ENTRY)
+#endif
+
+#define VLC_PLUGIN_ENTRY_LIST(name) VLC_PLUGIN_ENTRY_NAME(name),
+
 __attribute__((visibility("default")))
-vlc_plugin_cb vlc_static_modules[] = { vlc_entry__ios_interface, NULL };
+vlc_plugin_cb vlc_static_modules[] = { vlc_entry__ios_interface,
+#ifdef HAVE_MERGE_PLUGINS
+    VLC_MODULE_LIST(VLC_PLUGIN_ENTRY_LIST)
+#endif
+    NULL
+};

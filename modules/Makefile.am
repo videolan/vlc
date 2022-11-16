@@ -90,7 +90,8 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 ALL_TARGETS_1 := $(LTLIBRARIES)
 # Remove the special targets
 ALL_TARGETS_2 := $(ALL_TARGETS_1:libvlc_static.la=)
-ALL_TARGETS := $(ALL_TARGETS_2:libvlc_plugin.la=)
+ALL_TARGETS_3 := $(ALL_TARGETS_2:libvlc_static_bundled.la=)
+ALL_TARGETS := $(ALL_TARGETS_3:libvlc_plugin.la=)
 
 # Remove the non-plugins, it needs intermediate steps because
 # we can only replace and not match inverse. Instead we;
@@ -102,12 +103,13 @@ PLUGINS_NAMES := $(ALL_TARGETS_PLUGIN_RENAMED:%.la=)
 PLUGINS_1 := $(PLUGINS_NAMES:%=%_plugin.la)
 PLUGINS := $(PLUGINS_1:libytdl_plugin.la=)
 
-plugin.c: $(PLUGINS)
-	echo "Compile VLC static modules list object"
+if HAVE_MERGE_PLUGINS
+vlc_modules_manifest.h: $(PLUGINS)
+	$(AM_V_at)echo "Compile VLC static modules list object"
 	## Collect paths of all static libraries needed (plugins and contribs)
-	echo "#define VLC_MODULE_LIST(F) \\" > $@.tmp
+	$(AM_V_at)echo "#define VLC_MODULE_LIST(F) \\" > $@.tmp
 	## Note: $(NULL) here is to fix syntax interpretation of \\ in the string
-	for ltlib in $^; do \
+	$(AM_V_GEN)for ltlib in $^; do \
 		if ! echo $${ltlib} | grep ytdl ; then \
 		if ! echo $${ltlib} | grep wl_shell ; then \
 		if ! echo $${ltlib} | grep addon ; then \
@@ -121,20 +123,23 @@ plugin.c: $(PLUGINS)
 		fi \
 		fi \
 	done
-	echo "" >> $@.tmp
-	echo "#include \"plugin_static.c\"" >> $@.tmp
-	mv $@.tmp $@
+	$(AM_V_at)echo "" >> $@.tmp
+	$(AM_V_at)mv $@.tmp $@
+endif
 
-BUILT_SOURCES += plugin.c
-CLEANFILES += plugin.c
+if HAVE_MERGE_PLUGINS
+BUILT_SOURCES += vlc_modules_manifest.h
+CLEANFILES += vlc_modules_manifest.h
+endif
 
-libvlc_static_la_SOURCES = plugin.c
+# We need to compile something to make a target
+libvlc_static_la_SOURCES = plugin_static.c
 libvlc_static_la_CFLAGS =
 libvlc_static_la_LDFLAGS =
 libvlc_static_la_LIBADD = $(PLUGINS) $(LTLIBVLCCORE)
-EXTRA_libvlc_static_la_DEPENDENCIES = plugin_static.c
+EXTRA_libvlc_static_la_DEPENDENCIES = vlc_modules_manifest.h
 
-libvlc_plugin_la_SOURCES = plugin.c
+libvlc_plugin_la_SOURCES = plugin_static.c
 libvlc_plugin_la_CFLAGS =
 libvlc_plugin_la_LDFLAGS = \
 	-avoid-version -module \
@@ -155,6 +160,10 @@ libvlc_plugin_la_LDFLAGS += \
 	-Wl,-framework,CoreImage
 endif
 
-EXTRA_libvlc_plugin_la_DEPENDENCIES = plugin_static.c
-
-pkglib_LTLIBRARIES += libvlc_plugin.la #libvlc_static.la
+if HAVE_MERGE_PLUGINS
+if HAVE_DYNAMIC_PLUGINS
+pkglib_LTLIBRARIES += libvlc_plugin.la
+else
+pkglib_LTLIBRARIES += libvlc_static.la
+endif
+endif

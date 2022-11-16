@@ -1,3 +1,5 @@
+#include "vlc_modules_manifest.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #define __LIBVLC__
