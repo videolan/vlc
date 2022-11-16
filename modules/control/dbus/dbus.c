@@ -557,6 +557,20 @@ static void ProcessEvents( intf_thread_t *p_intf,
                     vlc_dictionary_insert( &player_properties, "CanPause", NULL );
                 if ( var_GetBool( p_input, "can-seek" ) )
                     vlc_dictionary_insert( &player_properties, "CanSeek", NULL );
+
+                // If VLC is started from a file (double-clicking or specifying on CLI)
+                // there is a chance that we miss the initial SIGNAL_PLAYLIST_ITEM_APPEND
+                // event, resulting in CanPlay never being signalled.
+                // However it is not enough to check once this module is loaded, as
+                // when items from the non-main playlist (like Lua discoveries) are
+                // played, CanPlay would incorrectly be false too, even though we
+                // have a current item that can be resumed.
+                if ( !p_intf->p_sys->b_can_play )
+                {
+                    p_intf->p_sys->b_can_play = 1;
+                    vlc_dictionary_insert( &player_properties, "CanPlay", NULL );
+                }
+
                 vlc_object_release( p_input );
             }
 
