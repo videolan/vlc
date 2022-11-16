@@ -1036,7 +1036,8 @@ WarnConfiguration(audio_output_t *p_aout)
  * StartAnalog: open and setup a HAL AudioUnit to do PCM audio output
  */
 static int
-StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
+StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
+            vlc_tick_t latency_us)
 {
     aout_sys_t                  *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -1090,7 +1091,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     /* Do the last VLC aout setups */
     bool warn_configuration;
-    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, 0,
+    int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, latency_us,
                             &warn_configuration);
     if (ret != VLC_SUCCESS)
         goto error;
@@ -1595,7 +1596,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
     else
     {
-        if (StartAnalog(p_aout, fmt) == VLC_SUCCESS)
+        if (StartAnalog(p_aout, fmt, i_latency_us) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
             fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
