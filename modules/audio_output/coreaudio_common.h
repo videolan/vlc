@@ -52,18 +52,24 @@ struct aout_sys_common
     mach_timebase_info_data_t tinfo;
 
     size_t              i_underrun_size;
+    bool                started;
     bool                b_paused;
     bool                b_muted;
     bool                b_do_flush;
 
-    size_t              i_out_size;
     bool                b_played;
     block_t             *p_out_chain;
     block_t             **pp_out_last;
-    uint64_t            i_render_host_time;
-    uint64_t            i_first_render_host_time;
-    vlc_tick_t          i_last_latency_ticks;
+    /* Size of the frame FIFO */
+    size_t              i_out_size;
+    /* Size written via the render callback */
     uint64_t            i_total_bytes;
+    /* Date when the data callback should start to process audio */
+    vlc_tick_t first_play_date;
+    /* Bytes written since the last timing report */
+    size_t timing_report_last_written_bytes;
+    /* Number of bytes to write before sending a timing report */
+    size_t timing_report_delay_bytes;
 
     vlc_sem_t           flush_sem;
 

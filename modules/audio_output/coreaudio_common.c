@@ -25,6 +25,8 @@
 #include "coreaudio_common.h"
 #include <CoreAudio/CoreAudioTypes.h>
 
+#define TIMING_REPORT_DELAY_TICKS VLC_TICK_FROM_MS(1000)
+
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
 {
@@ -37,6 +39,12 @@ FramesToTicks(struct aout_sys_common *p_sys, int64_t i_nb_frames)
     return vlc_tick_from_samples(i_nb_frames, p_sys->i_rate);
 }
 
+static inline vlc_tick_t
+BytesToTicks(struct aout_sys_common *p_sys, size_t i_bytes)
+{
+    return FramesToTicks(p_sys, BytesToFrames(p_sys, i_bytes));
+}
+
 static inline size_t
 FramesToBytes(struct aout_sys_common *p_sys, uint64_t i_frames)
 {
@@ -47,6 +55,12 @@ static inline int64_t
 TicksToFrames(struct aout_sys_common *p_sys, vlc_tick_t i_ticks)
 {
     return samples_from_vlc_tick(i_ticks, p_sys->i_rate);
+}
+
+static inline size_t
+TicksToBytes(struct aout_sys_common *p_sys, vlc_tick_t i_ticks)
+{
+    return FramesToBytes(p_sys, TicksToFrames(p_sys, i_ticks));
 }
 
 /**
@@ -62,19 +76,6 @@ HostTimeToTick(struct aout_sys_common *p_sys, int64_t i_host_time)
     return VLC_TICK_FROM_NS(i_host_time * p_sys->tinfo.numer / p_sys->tinfo.denom);
 }
 
-/**
- * Convert relative vlc_ticks to an audio host time
- *
- * \warning  This function may only be used to convert relative
- *           vlc_ticks, as vlc_ticks do not have the same origin
- *           as the audio host clock!
- */
-static inline int64_t
-TickToHostTime(struct aout_sys_common *p_sys, vlc_tick_t i_ticks)
-{
-    return NS_FROM_VLC_TICK(i_ticks * p_sys->tinfo.denom / p_sys->tinfo.numer);
-}
-
 static void
 ca_ClearOutBuffers(audio_output_t *p_aout)
 {
@@ -83,8 +84,6 @@ ca_ClearOutBuffers(audio_output_t *p_aout)
     block_ChainRelease(p_sys->p_out_chain);
     p_sys->p_out_chain = NULL;
     p_sys->pp_out_last = &p_sys->p_out_chain;
-
-    p_sys->i_out_size = 0;
 }
 
 static inline void
@@ -140,12 +139,19 @@ ca_Open(audio_output_t *p_aout)
 
 /* Called from render callbacks. No lock, wait, and IO here */
 void
-ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
-          uint8_t *p_output, size_t i_requested, bool *is_silence)
+ca_Render(audio_output_t *p_aout, uint64_t host_time,
+          uint8_t *data, size_t bytes, bool *is_silence)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    vlc_tick_t i_now_ticks = vlc_tick_now();
+    const vlc_tick_t host_delay_ticks = host_time == 0 ? 0
+                                      : HostTimeToTick(p_sys, host_time - mach_absolute_time());
+    const vlc_tick_t bytes_ticks = BytesToTicks(p_sys, bytes);
+
+    const vlc_tick_t now_ticks = vlc_tick_now();
+    const vlc_tick_t end_ticks = now_ticks + bytes_ticks
+                               + host_delay_ticks
+                               + p_sys->i_dev_latency_ticks;
 
     lock_lock(p_sys);
 
@@ -157,107 +163,81 @@ ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
         vlc_sem_post(&p_sys->flush_sem);
     }
 
-    if (unlikely(p_sys->i_first_render_host_time == 0))
-        goto drop;
-
     if (p_sys->b_paused)
-    {
-        p_sys->i_render_host_time = i_host_time;
         goto drop;
+
+    if (!p_sys->started)
+    {
+        size_t tocopy;
+
+        if (p_sys->first_play_date == VLC_TICK_INVALID)
+            tocopy = bytes;
+        else
+        {
+            /* Write silence to reach the first play date */
+            vlc_tick_t silence_ticks = p_sys->first_play_date - end_ticks
+                                     + bytes_ticks;
+            if (silence_ticks > 0)
+            {
+                tocopy = TicksToBytes(p_sys, silence_ticks);
+                if (tocopy > bytes)
+                    tocopy = bytes;
+            }
+            else
+                tocopy = 0;
+        }
+
+        if (tocopy > 0)
+        {
+            memset(data, 0, tocopy);
+
+            data += tocopy;
+            bytes -= tocopy;
+
+            if (bytes == 0 && is_silence != NULL)
+                *is_silence = true;
+        }
     }
 
-    /* Start deferred: write silence (zeros) until we reach the first render
-     * host time. */
-    if (unlikely(p_sys->i_first_render_host_time > i_host_time ))
+    while (bytes > 0)
     {
-        /* Convert the requested bytes into host time and check that it does
-         * not overlap between the first_render host time and the current one.
-         * */
-        const vlc_tick_t i_requested_ticks =
-            FramesToTicks(p_sys, BytesToFrames(p_sys, i_requested));
-        const int64_t i_requested_host_time =
-            TickToHostTime(p_sys, i_requested_ticks);
-        if (p_sys->i_first_render_host_time >= i_host_time + i_requested_host_time)
-        {
-            /* Fill the buffer with silence */
+        vlc_frame_t *f = p_sys->p_out_chain;
+        if (f == NULL)
             goto drop;
-        }
 
-        /* Write silence to reach the first_render host time */
-        const vlc_tick_t i_silence_ticks =
-            HostTimeToTick(p_sys, p_sys->i_first_render_host_time - i_host_time);
+        size_t tocopy = f->i_buffer > bytes ? bytes : f->i_buffer;
 
-        const size_t i_silence_bytes =
-            FramesToBytes(p_sys, TicksToFrames(p_sys, i_silence_ticks));
-        assert(i_silence_bytes <= i_requested);
-        memset(p_output, 0, i_silence_bytes);
+        p_sys->i_out_size -= tocopy;
+        p_sys->i_total_bytes += tocopy;
 
-        i_requested -= i_silence_bytes;
-        p_output += i_silence_bytes;
-
-        /* Start the first rendering */
-    }
-    p_sys->i_render_host_time = i_host_time;
-
-    size_t i_copied = 0;
-    block_t *p_block = p_sys->p_out_chain;
-    while (p_block != NULL && i_requested != 0)
-    {
-        size_t i_tocopy = __MIN(i_requested, p_block->i_buffer);
-        if (unlikely(p_sys->b_muted))
-            memset(p_output, 0, i_tocopy);
-        else
-            memcpy(p_output, p_block->p_buffer, i_tocopy);
-        i_requested -= i_tocopy;
-        i_copied += i_tocopy;
-        p_output += i_tocopy;
-
-        if (i_tocopy == p_block->i_buffer)
+        if (!p_sys->started
+          || (p_sys->timing_report_last_written_bytes >=
+             p_sys->timing_report_delay_bytes))
         {
-            block_t *p_release = p_block;
-            p_block = p_block->p_next;
-            block_Release(p_release);
+            p_sys->timing_report_last_written_bytes = 0;
+            vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes);
+            aout_TimingReport(p_aout, end_ticks, pos_ticks);
         }
         else
+            p_sys->timing_report_last_written_bytes += tocopy;
+
+        p_sys->started = true;
+
+        memcpy(data, f->p_buffer, tocopy);
+
+        data += tocopy;
+        bytes -= tocopy;
+        f->i_buffer -= tocopy;
+        f->p_buffer += tocopy;
+
+        if (f->i_buffer == 0)
         {
-            assert(i_requested == 0);
+            p_sys->p_out_chain = f->p_next;
+            if (p_sys->p_out_chain == NULL)
+                p_sys->pp_out_last = &p_sys->p_out_chain;
 
-            p_block->p_buffer += i_tocopy;
-            p_block->i_buffer -= i_tocopy;
+            block_Release(f);
         }
-    }
-    p_sys->p_out_chain = p_block;
-    if (!p_sys->p_out_chain)
-        p_sys->pp_out_last = &p_sys->p_out_chain;
-    p_sys->i_out_size -= i_copied;
-
-    p_sys->i_total_bytes += i_copied;
-
-    /* Pad with 0 */
-    if (i_requested > 0)
-    {
-        assert(p_sys->i_out_size == 0);
-        p_sys->i_underrun_size += i_requested;
-        memset(p_output, 0, i_requested);
-    }
-
-    if (is_silence != NULL)
-        *is_silence = p_sys->b_muted;
-
-    /* Convert host time to ticks */
-    vlc_tick_t i_host_ticks = HostTimeToTick(p_sys, i_host_time - mach_absolute_time())
-                            + i_now_ticks;
-
-    /* Report a timing every seconds */
-    if (p_sys->i_last_latency_ticks == VLC_TICK_INVALID
-     || i_host_ticks - p_sys->i_last_latency_ticks >= VLC_TICK_FROM_SEC(1))
-    {
-        vlc_tick_t frames_tick = FramesToTicks(p_sys,
-                                    BytesToFrames(p_sys, p_sys->i_total_bytes))
-                               + p_sys->i_dev_latency_ticks;
-
-        aout_TimingReport(p_aout, i_host_ticks, frames_tick);
-        p_sys->i_last_latency_ticks = i_host_ticks;
     }
 
     lock_unlock(p_sys);
@@ -265,20 +245,10 @@ ca_Render(audio_output_t *p_aout, uint64_t i_host_time,
     return;
 
 drop:
-    memset(p_output, 0, i_requested);
+    memset(data, 0, bytes);
     if (is_silence != NULL)
         *is_silence = true;
     lock_unlock(p_sys);
-}
-
-static vlc_tick_t
-ca_GetLatencyLocked(audio_output_t *p_aout)
-{
-    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
-    const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
-    return FramesToTicks(p_sys, i_out_frames)
-           + p_sys->i_dev_latency_ticks;
 }
 
 void
@@ -299,9 +269,11 @@ ca_Flush(audio_output_t *p_aout)
         lock_lock(p_sys);
     }
 
-    p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
-    p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
+    p_sys->started = false;
+    p_sys->i_out_size = 0;
     p_sys->i_total_bytes = 0;
+    p_sys->first_play_date = VLC_TICK_INVALID;
+    p_sys->timing_report_last_written_bytes = 0;
     lock_unlock(p_sys);
 
     p_sys->b_played = false;
@@ -315,6 +287,7 @@ ca_Pause(audio_output_t * p_aout, bool pause, vlc_tick_t date)
 
     lock_lock(p_sys);
     p_sys->b_paused = pause;
+    p_sys->started = false;
     lock_unlock(p_sys);
 }
 
@@ -341,20 +314,17 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 
     lock_lock(p_sys);
 
-    if (p_sys->i_render_host_time == 0)
+    if (!p_sys->started)
     {
-        /* Setup the first render time, this date must be updated until the
-         * first (non-silence/zero) frame is rendered by the render callback.
-         * Once the rendering is truly started, the date can be ignored. */
+        vlc_tick_t now = vlc_tick_now();
+        p_sys->first_play_date = date - BytesToTicks(p_sys, p_sys->i_out_size);
 
-        /* We can't convert date to host time directly since the clock source
-         * may be different (MONOTONIC vs continue during sleep). The solution
-         * is to convert it to a relative time and then add it to
-         * mach_absolute_time() */
-        const vlc_tick_t first_render_delay = date - vlc_tick_now()
-                                            - ca_GetLatencyLocked(p_aout);
-        p_sys->i_first_render_host_time
-            = mach_absolute_time() + TickToHostTime(p_sys, first_render_delay);
+        if (p_sys->first_play_date > now)
+            msg_Dbg(p_aout, "deferring start (%"PRId64" us)",
+                    p_sys->first_play_date - now);
+        else
+            msg_Dbg(p_aout, "starting late (%"PRId64" us)",
+                    p_sys->first_play_date - now);
     }
 
     p_sys->i_out_size += p_block->i_buffer;
@@ -381,16 +351,19 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     p_sys->i_underrun_size = 0;
     p_sys->b_paused = false;
+    p_sys->started = false;
     p_sys->b_muted = false;
-    p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
-    p_sys->i_last_latency_ticks = VLC_TICK_INVALID;
+    p_sys->i_out_size = 0;
     p_sys->i_total_bytes = 0;
+    p_sys->first_play_date = VLC_TICK_INVALID;
+    p_sys->timing_report_last_written_bytes = 0;
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
 
     p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
+    p_sys->timing_report_delay_bytes = TicksToBytes(p_sys, TIMING_REPORT_DELAY_TICKS);
 
     ca_ClearOutBuffers(p_aout);
     p_sys->b_played = false;
