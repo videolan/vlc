@@ -100,7 +100,7 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) c
         const Element *el = *it;
         if(scaled >= el->t)
         {
-            if((uint64_t)scaled < el->t + (el->d * el->r))
+            if((uint64_t)scaled < el->t + (el->d * (el->r + 1)))
                 return el->number + (scaled - el->t) / el->d;
         }
         /* might have been discontinuity */
