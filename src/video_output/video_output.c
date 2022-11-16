@@ -429,6 +429,8 @@ void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
     assert( !picture_HasChainedPics( picture ) );
     picture_fifo_Push(sys->decoder_fifo, picture);
     vout_control_Wake(&sys->control);
+    if (sys->scheduler->ops->put_picture != NULL)
+        sys->scheduler->ops->put_picture(sys->scheduler, picture);
 }
 
 /* */
