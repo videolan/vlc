@@ -30,12 +30,12 @@ if BUILD_SKINS
 endif
 
 candle: heat
-	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)\\product.wxs $(W_MSIDIR)\\axvlc.wxs $(W_MSIDIR)\\extensions.wxs $(W_MSIBUILDDIR)\\*.fragment.wxs
+	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)/product.wxs $(W_MSIDIR)/axvlc.wxs $(W_MSIDIR)/extensions.wxs $(W_MSIBUILDDIR)/*.fragment.wxs
 
 light: candle
 	test ! -d "$(WINE_C)/v" -o ! -f "$(WINE_C)/v"
 	ln -Tsf "$(abs_top_builddir)/vlc-$(VERSION)" "$(WINE_C)"/v
-	$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b C:/v/plugins -b C:/v/locale -b C:/v/lua -b C:/v/skins $(W_MSIBUILDDIR)\\product.wixobj $(W_MSIBUILDDIR)\\axvlc.wixobj $(W_MSIBUILDDIR)\\extensions.wixobj $(W_MSIBUILDDIR)\\*.fragment.wixobj -o $(MSIOUTFILE)
+	$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b C:/v/plugins -b C:/v/locale -b C:/v/lua -b C:/v/skins $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/axvlc.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o $(MSIOUTFILE)
 	chmod 644 $(MSIOUTFILE)
 
 package-msi: light
