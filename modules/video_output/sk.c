@@ -8,12 +8,18 @@
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
 #include <vlc_mouse.h>
+#include <vlc_threads.h>
 
 struct vlc_window_sys_t {
     struct vlc_window *embed_window;
     vlc_gl_t *embed_gl;
     struct vlc_window_owner window_owner;
     bool enabled;
+
+    vlc_cond_t cond;
+    vlc_mutex_t lock;
+    float vsync_interval;
+    vlc_thread_t vsync_generator;
 };
 
 /**
@@ -191,6 +197,41 @@ static void WindowClose(struct vlc_window *wnd)
         vlc_window_Disable(sys->embed_window);
 
     vlc_window_Delete(sys->embed_window);
+
+    if (sys->vsync_interval > 0.f)
+    {
+        vlc_cancel(sys->vsync_generator);
+        vlc_join(sys->vsync_generator, NULL);
+    }
+}
+
+static void cleanupMutex(void *opaque)
+{
+    vlc_mutex_unlock(opaque);
+}
+
+static void *GenerateVSYNC(void *opaque)
+{
+    struct vlc_window *wnd = opaque;
+    struct vlc_window_sys_t *sys = wnd->sys;
+
+    vlc_mutex_lock(&sys->lock);
+    vlc_cleanup_push(cleanupMutex, &sys->lock);
+    vlc_tick_t last_vsync = vlc_tick_now();
+    for (;;)
+    {
+        vlc_tick_t vsync_interval = VLC_TICK_FROM_MS(sys->vsync_interval);
+        vlc_tick_t next_vsync = last_vsync + vsync_interval;
+        while (vlc_cond_timedwait(&sys->cond, &sys->lock, next_vsync) == 0) {}
+        int canc = vlc_savecancel();
+        vlc_window_ReportVsyncReached(wnd, next_vsync + vsync_interval);
+        msg_Info(wnd, "Generate VSYNC %d", (int)MS_FROM_VLC_TICK(next_vsync));
+        vlc_restorecancel(canc);
+        last_vsync = next_vsync;
+        vlc_testcancel();
+    }
+    vlc_cleanup_pop();
+    return NULL;
 }
 
 static int WindowOpen(struct vlc_window *wnd)
@@ -205,11 +246,21 @@ static int WindowOpen(struct vlc_window *wnd)
     struct vlc_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof *sys);
     sys->embed_gl = NULL;
     sys->enabled = false;
+    vlc_cond_init(&sys->cond);
+    vlc_mutex_init(&sys->lock);
+    vlc_mutex_lock(&sys->lock);
     wnd->sys = sys;
 
     var_Create(wnd, "skwrapper-output", VLC_VAR_BOOL);
     var_SetBool(wnd, "skwrapper-output", true);
 
+    sys->vsync_interval = var_InheritFloat(wnd, "sk-generate-vsync");
+    if (sys->vsync_interval > 0.f && vlc_clone(&sys->vsync_generator,
+                GenerateVSYNC, wnd) != VLC_SUCCESS)
+    {
+        vlc_assert_unreachable();
+        goto error;
+    }
     sys->embed_window = NULL;
 
     static const struct vlc_window_operations vlc_window_ops =
@@ -222,9 +273,12 @@ static int WindowOpen(struct vlc_window *wnd)
     wnd->type = VOUT_WINDOW_TYPE_SK;
     wnd->handle.sk = sys;
 
+    vlc_mutex_unlock(&sys->lock);
     return VLC_SUCCESS;
 
 error:
+    // TODO Clone error
+    vlc_mutex_unlock(&sys->lock);
     var_Destroy(wnd, "skwrapper-output");
     wnd->sys = NULL;
     return VLC_EGENERIC;
@@ -319,6 +373,9 @@ vlc_module_begin()
 
     add_bool( "sk-keep-last-frame", false, "Keep last frame",
               "Keep the OpenGL surface and the window between media")
+
+    add_float( "sk-generate-vsync", -1.f, "Generate new VSYNC",
+              "Generate new VSYNC")
 
     add_submodule()
         set_capability ("opengl es2", 1000)
