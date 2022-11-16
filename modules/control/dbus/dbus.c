@@ -541,7 +541,24 @@ static void ProcessEvents( intf_thread_t *p_intf,
         switch( p_events[i]->signal )
         {
         case SIGNAL_ITEM_CURRENT:
+        {
             TrackChange( p_intf );
+
+            // Update status when new item starts playing
+            // Just relying on the variables change callbacks is not enough
+            // as by the time the callbacks are attached, we might already
+            // have missed a change, so we need to query and set the initial
+            // values reliably here.
+            vlc_dictionary_insert( &player_properties, "PlaybackStatus", NULL );
+            input_thread_t *p_input = pl_CurrentInput( p_intf );
+            if( p_input )
+            {
+                if ( var_GetBool( p_input, "can-pause" ) )
+                    vlc_dictionary_insert( &player_properties, "CanPause", NULL );
+                if ( var_GetBool( p_input, "can-seek" ) )
+                    vlc_dictionary_insert( &player_properties, "CanSeek", NULL );
+                vlc_object_release( p_input );
+            }
 
             // rate depends on current item
             if( !vlc_dictionary_has_key( &player_properties, "Rate" ) )
@@ -549,6 +566,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
 
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
             break;
+        }
         case SIGNAL_PLAYLIST_ITEM_APPEND:
         case SIGNAL_PLAYLIST_ITEM_DELETED:
         {
