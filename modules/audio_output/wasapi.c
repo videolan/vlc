@@ -37,7 +37,7 @@
 #include <vlc_plugin.h>
 
 #include <audioclient.h>
-#include "audio_output/mmdevice.h"
+#include "mmdevice.h"
 
 #define TIMING_REPORT_DELAY VLC_TICK_FROM_MS(1000)
 
