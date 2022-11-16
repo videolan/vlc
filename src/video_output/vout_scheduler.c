@@ -318,7 +318,8 @@ static void *Thread(void *opaque)
 
         // TODO
         // UpdateDeinterlaceFilter(sys);
-        if (current_changed || priv->wait_interrupted)
+        if (priv->displayed.current != NULL &&
+             (current_changed || priv->wait_interrupted))
             DisplayPicture(scheduler, current_changed);
 
         if (atomic_load(&priv->is_terminated))
