@@ -41,7 +41,7 @@
 #include <vlc_plugin.h>
 
 #include <audioclient.h>
-#include "audio_output/mmdevice.h"
+#include "mmdevice.h"
 
 /* 00000092-0000-0010-8000-00aa00389b71 */
 DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL,

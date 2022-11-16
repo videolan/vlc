@@ -33,7 +33,7 @@
 #include <vlc_aout.h>
 #include <vlc_charset.h> // ToWide
 #include <vlc_modules.h>
-#include "audio_output/mmdevice.h"
+#include "mmdevice.h"
 
 #include <audioclient.h>
 #include <mmdeviceapi.h>
