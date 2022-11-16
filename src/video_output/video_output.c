@@ -183,7 +183,7 @@ typedef struct vout_thread_sys_t
     atomic_bool b_display_avstat;
     vlc_atomic_rc_t rc;
 
-
+    vlc_mutex_t scheduler_lock;
     struct {
         vlc_mutex_t lock;
         vlc_tick_t last_displayed_date;
@@ -2021,7 +2021,11 @@ void vout_StopDisplay(vout_thread_t *vout)
     atomic_store(&sys->control_is_terminated, true);
     // wake up so it goes back to the loop that will detect the terminated state
     vout_control_Wake(&sys->control);
+
+    vlc_mutex_lock(&sys->scheduler_lock);
     vlc_vout_scheduler_Destroy(sys->scheduler);
+    sys->scheduler = NULL;
+    vlc_mutex_unlock(&sys->scheduler_lock);
 
     vout_ReleaseDisplay(sys);
 }
@@ -2234,6 +2238,7 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     sys->display_cfg.icc_profile = NULL;
     vlc_queuedmutex_init(&sys->display_lock);
     vlc_mutex_init(&sys->render_lock);
+    vlc_mutex_init(&sys->scheduler_lock);
 
     /* Window */
     sys->window_width = sys->window_height = 0;
@@ -2401,10 +2406,12 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
 
     sys->delay = 0;
 
+    vlc_mutex_lock(&sys->scheduler_lock);
     if (vout_Start(vout, vctx, cfg))
     {
         msg_Err(cfg->vout, "video output display creation failed");
         vout_DisableWindow(vout);
+        vlc_mutex_unlock(&sys->scheduler_lock);
         return -1;
     }
     atomic_store(&sys->control_is_terminated, false);
@@ -2416,7 +2423,6 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         .render_picture = RenderPicture,
     };
 
-    vlc_mutex_lock(&sys->render_lock);
     // TODO: display?
     if (var_InheritBool(&sys->obj, "vsync"))
     sys->scheduler = vlc_vout_scheduler_NewVSYNC(&sys->obj, cfg->clock, sys->display, &cbs, vout);
@@ -2425,11 +2431,12 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
 
     if (sys->scheduler == NULL)
     {
-        vlc_mutex_unlock(&sys->render_lock);
+        vlc_mutex_unlock(&sys->scheduler_lock);
         vout_ReleaseDisplay(vout);
         vout_DisableWindow(vout);
         return -1;
     }
+    vlc_mutex_unlock(&sys->scheduler_lock);
 
     if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
@@ -2438,7 +2445,6 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
 end:
     cfg->vout->owner = cfg->video.opaque;
     cfg->vout->cbs = cfg->video.cbs;
-    vlc_mutex_unlock(&sys->render_lock);
     return 0;
 }
 
