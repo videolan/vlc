@@ -26,7 +26,7 @@ typedef struct
 {
     vlc_object_t *p_obj;
     void *priv;
-    void(*pf_parse)(vlc_object_t *, void *, block_t *, stime_t);
+    void(*pf_parse)(vlc_object_t *, void *, block_t *, uint32_t, stime_t );
 } ts_pes_parse_callback;
 
 bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes );

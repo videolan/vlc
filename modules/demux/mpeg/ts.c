@@ -1547,7 +1547,7 @@ static void SendDataChain( demux_t *p_demux, ts_es_t *p_es, block_t *p_chain )
  * gathering stuff
  ****************************************************************************/
 static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
-                               stime_t i_append_pcr )
+                               uint32_t i_flags, stime_t i_append_pcr )
 {
     uint8_t header[34];
     unsigned i_pes_size = 0;
@@ -1685,6 +1685,12 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
             p_chain = p_chain->p_next;
             p_block->p_next = NULL;
 
+            if( i_flags )
+            {
+                p_block->i_flags |= i_flags;
+                i_flags = 0;
+            }
+
             if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
                 PCRFixHandle( p_demux, p_pmt, p_block );
 
@@ -1786,9 +1792,10 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
     }
 }
 
-static void PESDataChainHandle( vlc_object_t *p_obj, void *priv, block_t *p_data, stime_t i_appendpcr )
+static void PESDataChainHandle( vlc_object_t *p_obj, void *priv, block_t *p_data,
+                                uint32_t i_flags, stime_t i_appendpcr )
 {
-    ParsePESDataChain( (demux_t *)p_obj, (ts_pid_t *) priv, p_data, i_appendpcr );
+    ParsePESDataChain( (demux_t *)p_obj, (ts_pid_t *) priv, p_data, i_flags, i_appendpcr );
 }
 
 static block_t* ReadTSPacket( demux_t *p_demux )
@@ -1932,6 +1939,7 @@ static inline void FlushESBuffer( ts_stream_t *p_pes )
         p_pes->gather.p_data = NULL;
         p_pes->gather.pp_last = &p_pes->gather.p_data;
         p_pes->gather.i_saved = 0;
+        p_pes->gather.i_block_flags = 0;
     }
     if( p_pes->p_proc )
         ts_stream_processor_Reset( p_pes->p_proc );

@@ -31,13 +31,15 @@
 
 #include "../../libvlc/test.h"
 
-static void Parse(vlc_object_t *obj, void *priv, block_t *data, stime_t t)
+static void Parse(vlc_object_t *obj, void *priv, block_t *data,
+                  uint32_t i_flags, stime_t t)
 {
     VLC_UNUSED(obj);
     VLC_UNUSED(t);
     block_t **pp_append = (block_t **) priv;
     fprintf(stderr, "recv: ");
     data = block_ChainGather(data);
+    data->i_flags = i_flags;
     for(size_t i=0; i<data->i_buffer; i++)
         fprintf(stderr, "%2.2x ", data->p_buffer[i]);
     fprintf(stderr, "\n");
@@ -266,6 +268,34 @@ int main()
 
         RESET;
     }
+
+    /* PKT FLAGS */
+    PKT_FROM(aligned1);
+    pkt->i_buffer -= 1;
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
+    PKT_FROM(aligned1);
+    pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
+    ASSERT(output);
+    block_ChainProperties(output, &outputcount, &outputsize, NULL);
+    ASSERT(outputcount == 2);
+    ASSERT(outputsize == sizeof(aligned1) * 2 - 1);
+    ASSERT((output->i_flags & BLOCK_FLAG_DISCONTINUITY) == 0);
+    ASSERT(output->p_next->i_flags & BLOCK_FLAG_DISCONTINUITY); /* Next block resumes as discont */
+    RESET;
+
+    PKT_FROM(aligned1);
+    SetWBE(&pkt->p_buffer[4], 0); /* Set 0 sized to prevent immediate output */
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
+    PKT_FROM(aligned1);
+    SetWBE(&pkt->p_buffer[4], 0);
+    pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0)); /* should output on sync||discont */
+    ASSERT(output);
+    block_ChainProperties(output, &outputcount, &outputsize, NULL);
+    ASSERT(outputcount == 1);
+    ASSERT(outputsize == sizeof(aligned1));
+    RESET;
 
     return 0;
 }

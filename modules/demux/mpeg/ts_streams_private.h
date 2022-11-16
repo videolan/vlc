@@ -128,6 +128,7 @@ struct ts_stream_t
         uint8_t     saved[5];
         size_t      i_saved;
         stime_t     i_append_pcr;
+        uint32_t    i_block_flags;
     } gather;
 
     bool        b_always_receive;
