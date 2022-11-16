@@ -17,7 +17,8 @@ MSIOUTFILE=vlc-$(VERSION)-win64.msi
 else
 MSIOUTFILE=vlc-$(VERSION)-win32.msi
 endif
-WINE_C=`wine winepath c:`
+W_WINE_C=c:/v
+WINE_C=`wine winepath $(W_WINE_C)`
 
 heat: package-win-strip
 	$(HEAT) dir $(VLCDIR)/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER -out $(W_MSIBUILDDIR)/Plugins.fragment.wxs
@@ -33,9 +34,9 @@ candle: heat
 	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)/product.wxs $(W_MSIDIR)/axvlc.wxs $(W_MSIDIR)/extensions.wxs $(W_MSIBUILDDIR)/*.fragment.wxs
 
 light: candle
-	test ! -d "$(WINE_C)/v" -o ! -f "$(WINE_C)/v"
-	ln -Tsf "$(abs_top_builddir)/vlc-$(VERSION)" "$(WINE_C)"/v
-	$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b C:/v/plugins -b C:/v/locale -b C:/v/lua -b C:/v/skins $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/axvlc.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o $(MSIOUTFILE)
+	test ! -d "$(WINE_C)" -o ! -f "$(WINE_C)"
+	ln -Tsf "$(abs_top_builddir)/vlc-$(VERSION)" "$(WINE_C)"
+	$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b $(W_WINE_C)/plugins -b $(W_WINE_C)/locale -b $(W_WINE_C)/lua -b $(W_WINE_C)/skins $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/axvlc.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o $(MSIOUTFILE)
 	chmod 644 $(MSIOUTFILE)
 
 package-msi: light
