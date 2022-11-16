@@ -113,12 +113,11 @@ sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
 # Chromecast plugin
 SUFFIXES += .proto .pb.cc
 
-.chromecast_proto: stream_out/chromecast/cast_channel.proto
+stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc: stream_out/chromecast/cast_channel.proto
 	mkdir -p stream_out/chromecast/@PROTOBUF_VERSION@
 	$(PROTOC) --cpp_out=stream_out/chromecast/@PROTOBUF_VERSION@ -I$(srcdir)/stream_out/chromecast $<
-	touch $@
 
-stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.h stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc: .chromecast_proto
+stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.h: stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc
 
 libdemux_chromecast_plugin_la_SOURCES = stream_out/chromecast/chromecast_demux.cpp stream_out/chromecast/chromecast.h \
                                         stream_out/chromecast/chromecast_common.h
