@@ -166,6 +166,16 @@ static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
     return container_of( p_dec, struct decoder_owner, dec );
 }
 
+static inline void dec_Delete( decoder_t *p_dec )
+{
+    if( p_dec == NULL )
+        return;
+
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    es_format_Clean( &p_owner->fmt_in );
+    decoder_Destroy( p_dec );
+}
+
 static inline void es_format_SetMeta( es_format_t *p_dst, const es_format_t *p_src )
 {
     p_dst->i_group = p_src->i_group;
