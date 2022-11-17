@@ -22,7 +22,7 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 
 .ogg: libogg toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC)
+	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

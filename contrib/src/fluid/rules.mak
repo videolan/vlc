@@ -48,7 +48,7 @@ endif
 
 .fluid: fluidsynth toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC) $(FLUIDCONF)
+	$(HOSTVARS) $(CMAKE) $(FLUIDCONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

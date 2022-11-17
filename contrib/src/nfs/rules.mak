@@ -19,7 +19,7 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 
 .nfs: nfs toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC)
+	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

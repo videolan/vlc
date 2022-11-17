@@ -18,7 +18,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 
 .ebml: ebml toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC)
+	$(HOSTVARS) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

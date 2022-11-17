@@ -44,7 +44,7 @@ PROJECTM_CONF := \
 
 .projectM: projectM toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC) $(PROJECTM_CONF)
+	$(HOSTVARS) $(CMAKE) $(PROJECTM_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

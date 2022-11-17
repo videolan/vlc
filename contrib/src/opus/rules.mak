@@ -29,7 +29,7 @@ endif
 
 .opus: opus toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC) $(OPUS_CONF)
+	$(HOSTVARS) $(CMAKE) $(OPUS_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
