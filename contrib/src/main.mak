@@ -442,7 +442,7 @@ BUILD_SRC := ..
 # build directory relative to UNPACK_DIR
 BUILD_DIRUNPACK = vlc_build
 
-MAKEBUILDDIR = mkdir -p $(BUILD_DIR) && rm -f $(BUILD_DIR)/config.status
+MAKEBUILDDIR = mkdir -p $(BUILD_DIR) && rm -f $(BUILD_DIR)/config.status && test ! -f $</config.status || $(MAKE) -C $< distclean
 MAKEBUILD = $(MAKE) -C $(BUILD_DIR)
 MAKECONFDIR = cd $(BUILD_DIR) && $(HOSTVARS) $(BUILD_SRC)
 MAKECONFIGURE = $(MAKECONFDIR)/configure $(HOSTCONF)
