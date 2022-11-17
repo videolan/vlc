@@ -18,7 +18,7 @@ glew: glew-$(GLEW_VERSION).tgz .sum-glew
 
 .glew: glew toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC) -S $</build/cmake
+	$(HOSTVARS) $(CMAKE) -S $</build/cmake
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

@@ -22,7 +22,7 @@ TAGLIB_CONF := -DBUILD_BINDINGS=OFF
 
 .taglib: taglib toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE_PIC) $(TAGLIB_CONF)
+	$(HOSTVARS) $(CMAKE) $(TAGLIB_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
