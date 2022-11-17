@@ -117,9 +117,12 @@ void image_HandlerDelete( image_handler_t *p_image )
 {
     if( !p_image ) return;
 
-    struct decoder_owner *p_owner = dec_get_owner( p_image->p_dec );
-    es_format_Clean( &p_owner->fmt_in );
-    decoder_Destroy( p_image->p_dec );
+    if( p_image->p_dec != NULL )
+    {
+        struct decoder_owner *p_owner = dec_get_owner( p_image->p_dec );
+        es_format_Clean( &p_owner->fmt_in );
+        decoder_Destroy( p_image->p_dec );
+    }
     if( p_image->p_enc )
         vlc_encoder_Destroy( p_image->p_enc );
     if( p_image->p_converter ) DeleteConverter( p_image->p_converter );
