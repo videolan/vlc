@@ -400,6 +400,7 @@ CMAKEINSTALL = env cmake --install $(BUILD_DIR) --prefix $(PREFIX)
 CMAKECLEAN = rm -f $(BUILD_DIR)/CMakeCache.txt
 CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-B $(BUILD_DIR) \
+		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF \
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib
@@ -410,7 +411,7 @@ ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
 endif
 
-CMAKE_PIC = $(CMAKE) -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+CMAKE_PIC = $(CMAKE)
 
 MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
 	-Dlibdir=lib
