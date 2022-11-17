@@ -54,11 +54,10 @@ VideoAll {
     header: Widgets.SubtitleLabel {
         width: root.width
 
-        topPadding: VLCStyle.margin_normal
-        bottomPadding: VLCStyle.margin_normal
-
         // NOTE: We want this to be properly aligned with the grid items.
-        leftPadding: root.contentMargin + VLCStyle.margin_normal
+        leftPadding: root.contentMargin
+
+        bottomPadding: VLCStyle.margin_normal
 
         text: root.title
     }
