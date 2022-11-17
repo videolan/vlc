@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryNavigationStack;
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryVideoDataSource;
+@class VLCLibraryVideoCollectionViewsDataSource;
 @class VLCLibraryGroupDataSource;
 @class VLCLibrarySortingMenuController;
 @class VLCMediaSourceBaseDataSource;
@@ -64,8 +65,8 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, strong) IBOutlet NSView *playlistView;
 @property (readwrite, weak) IBOutlet NSView *videoLibraryView;
 @property (readwrite, weak) IBOutlet NSSplitView *videoLibrarySplitView;
-@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryCollectionViewScrollView;
-@property (readwrite, weak) IBOutlet NSCollectionView *videoLibraryCollectionView;
+@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryCollectionsTableViewScrollView;
+@property (readwrite, weak) IBOutlet NSTableView *videoLibraryCollectionsTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *videoLibraryGroupSelectionTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *videoLibraryGroupsTableViewScrollView;
@@ -113,6 +114,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
 @property (readonly) VLCLibraryAudioDataSource *libraryAudioDataSource;
 @property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
+@property (readonly) VLCLibraryVideoCollectionViewsDataSource *libraryVideoCollectionViewsDataSource;
 @property (readonly) VLCLibraryGroupDataSource *libraryAudioGroupDataSource;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCMediaSourceBaseDataSource *mediaSourceDataSource;
