@@ -1,6 +1,6 @@
 # fluid
 
-FLUID_VERSION := 2.1.8
+FLUID_VERSION := 2.3.0
 FLUID_URL := $(GITHUB)/FluidSynth/fluidsynth/archive/refs/tags/v$(FLUID_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"glib-2.0 gthread-2.0"),)
@@ -19,10 +19,9 @@ $(TARBALLS)/fluidsynth-$(FLUID_VERSION).tar.gz:
 
 fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz .sum-fluid
 	$(UNPACK)
-	$(APPLY) $(SRC)/fluid/fluid-pkg-static.patch
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/fluid/fluid-static-win32.patch
-endif
+	$(call pkg_static,"fluidsynth.pc.in")
+	# don't use their internal windows-version variable to set the Windows version
+	sed -i.orig 's,.*$${windows-version}.*,# use our Windows version,' "$(UNPACK_DIR)/CMakeLists.txt"
 	$(MOVE)
 
 FLUIDCONF := \
@@ -40,6 +39,12 @@ FLUIDCONF := \
 	-Denable-portaudio=0 \
 	-Denable-pulseaudio=0 \
 	-Denable-readline=0
+
+ifdef HAVE_LINUX
+# don't use openmp as the linking fails
+# https://github.com/FluidSynth/fluidsynth/issues/904 is not properly fixed
+FLUIDCONF += -Denable-openmp=0
+endif
 
 .fluid: fluidsynth toolchain.cmake
 	$(CMAKECLEAN)
