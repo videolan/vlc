@@ -22,9 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef NS_ENUM(NSUInteger, VLCVideoLibraryCollection) {
-    VLCVideoLibraryRecentsCollection = 0,
-    VLCVideoLibraryLibraryCollection,
+typedef NS_ENUM(NSUInteger, VLCLibraryVideoGroup) {
+    VLCLibraryVideoRecentsGroup = 1, // We also use this for our row count
+    VLCLibraryVideoLibraryGroup, // Keep last!
+};
+
+typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
+    VLCLibraryVideoCollectionViewTableViewCellNormalType = 0,
+    VLCLibraryVideoCollectionViewTableViewCellHorizontalScrollType
 };
 
 @class VLCLibraryModel;
