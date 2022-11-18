@@ -159,10 +159,19 @@ GetLatency(audio_output_t *p_aout)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    vlc_tick_t latency_us =
-        vlc_tick_from_sec([p_sys->avInstance outputLatency]);
+    Float64 unit_s;
+    vlc_tick_t latency_us = 0, us;
 
-    msg_Dbg(p_aout, "Current device has a latency of %lld us", latency_us);
+    us = vlc_tick_from_sec([p_sys->avInstance outputLatency]);
+    msg_Dbg(p_aout, "Current device has a outputLatency of %" PRId64 "us", us);
+    latency_us += us;
+
+    us = vlc_tick_from_sec([p_sys->avInstance IOBufferDuration]);
+    msg_Dbg(p_aout, "Current device has a IOBufferDuration of %" PRId64 "us", us);
+    latency_us += us;
+
+    msg_Dbg(p_aout, "Current device has a total latency of %" PRId64 "us",
+            latency_us);
     return latency_us;
 }
 
