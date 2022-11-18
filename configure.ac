@@ -1430,6 +1430,19 @@ AS_IF([test "${SYS}" = "mingw32"], [
 
 AC_SUBST([WIN32_PATH_CMD])
 
+AC_ARG_WITH([wix],
+    AS_HELP_STRING([--with-wix=DIR], [location of WIX binary (default: contribs)])
+)
+AS_IF([test -z "${with_wix}"], [
+    AS_IF([test -n "${CONTRIB_DIR}"], [
+        with_wix="${CONTRIB_DIR}/bin"
+    ])
+])
+AS_IF([test "${with_wix}" != "no"], [
+    WIXPATH="${with_wix}"
+])
+AC_SUBST([WIXPATH])
+
 dnl
 dnl  Check the CPU
 dnl
