@@ -280,8 +280,9 @@ int main()
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 2);
     ASSERT(outputsize == sizeof(aligned1) * 2 - 1);
+    ASSERT(output->i_flags & BLOCK_FLAG_CORRUPTED); /* First block is corrupted 15/16 bytes */
     ASSERT((output->i_flags & BLOCK_FLAG_DISCONTINUITY) == 0);
-    ASSERT(output->p_next->i_flags & BLOCK_FLAG_DISCONTINUITY); /* Next block resumes as discont */
+    ASSERT(output->p_next->i_flags == BLOCK_FLAG_DISCONTINUITY); /* Next block resumes as discont */
     RESET;
 
     PKT_FROM(aligned1);
@@ -295,6 +296,7 @@ int main()
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
     ASSERT(outputsize == sizeof(aligned1));
+    //ASSERT(output->i_flags == BLOCK_FLAG_CORRUPTED); /* First might be corrupted but we don't really know */
     RESET;
 
     return 0;
