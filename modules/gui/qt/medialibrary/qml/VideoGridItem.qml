@@ -72,12 +72,12 @@ Widgets.GridItem {
                 bottom: parent.bottom
                 left: parent.left
                 right: parent.right
-                rightMargin: root.pictureRadius
             }
 
-            visible: (value > 0)
+            visible: (model.progress > 0)
 
-            value: (model.progress > 0) ? model.progress : 0
+            radius: root.pictureRadius
+            value: Helpers.clamp(model.progress, 0, 1)
         }
     }
 
