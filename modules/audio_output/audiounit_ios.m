@@ -154,6 +154,18 @@ enum port_type
     PORT_TYPE_HEADPHONES
 };
 
+static vlc_tick_t
+GetLatency(audio_output_t *p_aout)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    vlc_tick_t latency_us =
+        vlc_tick_from_sec([p_sys->avInstance outputLatency]);
+
+    msg_Dbg(p_aout, "Current device has a latency of %lld us", latency_us);
+    return latency_us;
+}
+
 #pragma mark -
 #pragma mark AVAudioSession route and output handling
 
@@ -182,10 +194,8 @@ enum port_type
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
     else
     {
-        const vlc_tick_t latency_us =
-            vlc_tick_from_sec([p_sys->avInstance outputLatency]);
+        const vlc_tick_t latency_us = GetLatency(p_aout);
         ca_SetDeviceLatency(p_aout, latency_us);
-        msg_Dbg(p_aout, "Current device has a new latency of %lld us", latency_us);
     }
 }
 
@@ -580,10 +590,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (err != noErr)
         ca_LogWarn("failed to set IO mode");
 
-    const vlc_tick_t latency_us =
-        vlc_tick_from_sec([p_sys->avInstance outputLatency]);
-    msg_Dbg(p_aout, "Current device has a latency of %lld us", latency_us);
-
+    const vlc_tick_t latency_us = GetLatency(p_aout);
     ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL, latency_us, NULL);
     if (ret != VLC_SUCCESS)
         goto error;
