@@ -65,11 +65,11 @@ def outputDir(top, parent: str, dir: str, with_pdb: bool):
             if not file.is_dir():
                 # args.out.write('          file   <{}>\r\n'.format(file))
                 if not file.name.endswith('.pdb'):
-                    outname = os.path.join(dirName, file.name)
+                    outname = os.path.join(top.name, file.relative_to(top))
                     fileId = generate_id('cmp', outname)
                     args.out.write('                    <Component Id="{}" Guid="*">\r\n'.format(fileId))
                     fileIdList.append(fileId)
-                    args.out.write('                        <File Id="{}" Name="{}" KeyPath="yes" Source="SourceDir/{}"/>\r\n'.format(generate_id('fil', outname), file.name, outname))
+                    args.out.write('                        <File Id="{}" Name="{}" KeyPath="yes" Source="{}"/>\r\n'.format(generate_id('fil', outname), file.name, outname))
                     args.out.write('                    </Component>\r\n')
         # then sub directories
         for file in cwd.iterdir():
