@@ -3,10 +3,9 @@ BUILT_SOURCES_distclean += \
 	extras/package/win32/msi/config.wxi
 endif
 
-WIXPATH=`$(WIN32_PATH_CMD) -u 'C:\Program Files (x86)\Windows Installer XML v3.5\bin'`
 HEAT=$(MSIDIR)/msi-heat.py
-CANDLE=wine "$(WIXPATH)/candle.exe"
-LIGHT=wine "$(WIXPATH)/light.exe"
+CANDLE=wine "@WIXPATH@/candle.exe"
+LIGHT=wine "@WIXPATH@/light.exe"
 VLCDIR=@PACKAGE_DIR@
 MSIDIR=$(abs_srcdir)/extras/package/win32/msi
 W_MSIDIR=`$(WIN32_PATH_CMD) -w '$(MSIDIR)'`
