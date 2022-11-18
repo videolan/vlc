@@ -14,10 +14,7 @@
     <?define Version = "$(var.VerMajor).$(var.VerMinor).$(var.VerPatch)" ?>
     <?define VersionLong = "$(var.Version).$(var.VerExtra)" ?>
 
-    <?define SourceDir = "vlc-@VERSION@" ?>
-    <!--<?define PluginsPath = "$(var.BinPath)\plugins" ?>
-    <?define LocalePath = "$(var.BinPath)\locale" ?>
-    <?define SdkPath = "$(var.BinPath)\sdk" ?>-->
+    <?define SourceDir = "." ?>
 
     <?define Platform= "@WINDOWS_ARCH@" ?>
 
