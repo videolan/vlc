@@ -45,6 +45,8 @@ targets:
       path: "vlc_plugin/Info.plist"
     postBuildScripts:
       - name: Copy vlc_plugin library
+        shell: /bin/bash
+        buildRules:
         script: |
             INPUT_FILES=()
             BUILD_SUFFIX=""
@@ -77,6 +79,7 @@ targets:
       - target: VLCAutomake
     postBuildScripts:
       - name: Copy libvlc library
+        shell: /bin/bash
         script: |
             INPUT_FILES=()
             BUILD_SUFFIX=""
@@ -109,6 +112,8 @@ targets:
         headerVisibility: public
     postBuildScripts:
       - name: Copy vlccore library
+        shell: /bin/bash
+        buildRules:
         script: |
             INPUT_FILES=()
             BUILD_SUFFIX=""
