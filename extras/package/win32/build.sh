@@ -25,6 +25,7 @@ OPTIONS:
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
    -i <n|r|u|m>  Create an Installer (n: nightly, r: release, u: unsigned release archive, m: msi only)
+   -W <wix_path> Set the path to the WIX binaries
    -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Create PDB files during the build
@@ -40,7 +41,7 @@ EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dD:xS:uwzo:" OPTION
+while getopts "hra:pcli:W:sb:dD:xS:uwzo:" OPTION
 do
      case $OPTION in
          h)
@@ -65,6 +66,9 @@ do
          ;;
          i)
              INSTALLER=$OPTARG
+         ;;
+         W)
+             WIXPATH=--with-wix="$OPTARG"
          ;;
          s)
              INTERACTIVE="yes"
@@ -405,7 +409,7 @@ if [ ! -z "$INSTALL_PATH" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --with-packagedir=$INSTALL_PATH"
 fi
 
-${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX $CONFIGFLAGS
+${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
 
 info "Compiling"
 make -j$JOBS
