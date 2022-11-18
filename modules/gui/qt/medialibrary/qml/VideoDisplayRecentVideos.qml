@@ -30,10 +30,12 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property alias leftPadding: recentVideosColumn.leftPadding
-    property alias rightPadding: recentVideosColumn.rightPadding
-    property alias topPadding: recentVideosColumn.topPadding
+    // Aliases
+
     property alias bottomPadding: recentVideosColumn.bottomPadding
+
+    property alias displayMarginBeginning: listView.displayMarginBeginning
+    property alias displayMarginEnd: listView.displayMarginEnd
 
     property alias subtitleText : subtitleLabel.text
 
@@ -70,23 +72,21 @@ FocusScope {
         Widgets.SubtitleLabel {
             text: I18n.qtr("Continue Watching")
 
+            // NOTE: Setting this to listView.visible seems to causes unnecessary implicitHeight
+            //       calculations in the Column parent.
             visible: listView.count > 0
         }
 
         Widgets.KeyNavigableListView {
             id: listView
 
-            width: root.width - root.leftPadding - root.rightPadding
+            width: parent.width
 
             implicitHeight: VLCStyle.gridItem_video_height + VLCStyle.gridItemSelectedBorder
                             +
                             VLCStyle.margin_xlarge
 
             spacing: VLCStyle.column_margin_width
-
-            // NOTE: Sometimes, we want items to be visible on the sides.
-            displayMarginBeginning: root.leftPadding
-            displayMarginEnd: root.rightPadding
 
             // NOTE: We want navigation buttons to be centered on the item cover.
             buttonMargin: VLCStyle.margin_xsmall + VLCStyle.gridCover_video_height / 2 - buttonLeft.height / 2
