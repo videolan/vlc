@@ -855,8 +855,10 @@ function parse()
             end
 
             -- JSON parameters, also formerly known as "swfConfig",
-            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
-            if string.match( line, "ytplayer%.config" ) then
+            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig",
+            -- "ytplayer.config" ...
+            if string.match( line, "ytInitialPlayerResponse ?= ?{" )
+                or string.match( line, "ytplayer%.config" ) then
 
                 -- Classic parameters - out of use since early 2020
                 if not fmt then
