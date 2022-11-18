@@ -33,13 +33,13 @@ endif
 candle: heat
 	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)/product.wxs $(W_MSIDIR)/axvlc.wxs $(W_MSIDIR)/extensions.wxs $(W_MSIBUILDDIR)/*.fragment.wxs
 
-light: candle
+$(MSIOUTFILE): candle
 	test ! -d "$(WINE_C)" -o ! -f "$(WINE_C)"
 	ln -Tsf "$(abs_top_builddir)/vlc-$(VERSION)" "$(WINE_C)"
-	$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b $(W_WINE_C)/plugins -b $(W_WINE_C)/locale -b $(W_WINE_C)/lua -b $(W_WINE_C)/skins $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/axvlc.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o $(MSIOUTFILE)
-	chmod 644 $(MSIOUTFILE)
+	$(AM_V_GEN)$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) -b $(W_WINE_C)/plugins -b $(W_WINE_C)/locale -b $(W_WINE_C)/lua -b $(W_WINE_C)/skins $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/axvlc.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o $@
+	chmod 644 $@
 
-package-msi: light
+package-msi: $(MSIOUTFILE)
 
 cleanmsi:
 	-rm -f $(MSIBUILDDIR)/*.wixobj
@@ -49,4 +49,4 @@ cleanmsi:
 distcleanmsi: cleanmsi
 	-rm -f $(MSIOUTFILE)
 
-.PHONY: heat candle light cleanmsi distcleanmsi package-msi
+.PHONY: heat candle cleanmsi distcleanmsi package-msi
