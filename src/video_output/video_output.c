@@ -1028,6 +1028,7 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
 
     picture_t *picture = filter_chain_VideoFilter(sys->filter.chain_static, NULL);
     assert(!reuse_decoded || !picture);
+    vlc_mutex_unlock(&sys->filter.lock);
 
     while (!picture) {
         picture_t *decoded;
@@ -1037,6 +1038,9 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
             decoded = picture_fifo_Pop(sys->decoder_fifo);
 
             if (decoded) {
+                vout_SetInterlacingState(&vout->obj, &sys->private, !decoded->b_progressive);
+                UpdateDeinterlaceFilter(sys);
+
                 const vlc_tick_t system_now = vlc_tick_now();
                 const vlc_tick_t system_pts =
                     vlc_clock_ConvertToSystem(sys->clock, system_now,
@@ -1058,7 +1062,6 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
                     if (system_pts != VLC_TICK_MAX &&
                         IsPictureLate(vout, decoded, system_now, system_pts))
                     {
-                        filter_chain_VideoFlush(sys->filter.chain_static);
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
 
@@ -1100,7 +1103,6 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
         sys->displayed.is_interlaced = !decoded->b_progressive;
         sys->displayed.caption_reference = decoded;
 
-        vout_chrono_Start(&sys->chrono.static_filter);
         if (atomic_load(&sys->b_display_avstat))
         {
             vlc_tick_t now_ts = vlc_tick_now();
@@ -1112,7 +1114,10 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
                     NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
         }
 
+        vlc_mutex_lock(&sys->filter.lock);
+        vout_chrono_Start(&sys->chrono.static_filter);
         picture = filter_chain_VideoFilter(sys->filter.chain_static, sys->displayed.decoded);
+        vlc_mutex_unlock(&sys->filter.lock);
         if (atomic_load(&sys->b_display_avstat) && picture)
         {
             vlc_tick_t now_ts = vlc_tick_now();
@@ -1125,8 +1130,6 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
         }
         vout_chrono_Stop(&sys->chrono.static_filter);
     }
-
-    vlc_mutex_unlock(&sys->filter.lock);
 
     return picture;
 }
