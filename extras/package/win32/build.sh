@@ -209,6 +209,11 @@ if [ ! -z "$BUILD_UCRT" ]; then
     fi
 fi
 
+if [ ! -z "$WIXPATH" ]; then
+    # the CI didn't provide its own WIX, make sure we use our own
+    CONTRIBFLAGS="$CONTRIBFLAGS --enable-wix"
+fi
+
 export PATH="$PWD/contrib/$CONTRIB_PREFIX/bin":"$PATH"
 
 if [ "$INTERACTIVE" = "yes" ]; then
