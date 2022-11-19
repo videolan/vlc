@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSEdgeInsets collectionViewSectionInset;
 
 @property (readwrite, assign, nonatomic) NSTableView *collectionsTableView;
+@property (readwrite, assign) NSScrollView *collectionsTableViewScrollView;
 
 @end
 

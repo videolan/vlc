@@ -36,6 +36,8 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCSubScrollView.h"
+
 @interface VLCLibraryVideoCollectionViewGroupDescriptor : NSObject
 
 @property (readonly) VLCLibraryVideoGroup group;
@@ -222,7 +224,7 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 @interface VLCLibraryVideoCollectionViewTableViewCell : NSTableCellView
 
 @property (readonly) NSCollectionView *collectionView;
-@property (readonly) NSScrollView *scrollView;
+@property (readonly) VLCSubScrollView *scrollView;
 @property (readonly) VLCLibraryVideoCollectionViewTableViewCellDataSource *dataSource;
 @property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoGroup videoGroup;
@@ -253,7 +255,8 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
     _collectionView.collectionViewLayout = collectionViewLayout;
 
-    _scrollView = [[NSScrollView alloc] init];
+    _scrollView = [[VLCSubScrollView alloc] init];
+    _scrollView.scrollParentY = YES;
     _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
     _scrollView.documentView = _collectionView;
 
@@ -340,6 +343,7 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     VLCLibraryVideoCollectionViewTableViewCell *cell = [[VLCLibraryVideoCollectionViewTableViewCell alloc] init];
     cell.identifier = @"VLCLibraryVideoCollectionViewTableViewCellIdentifier";
+    cell.scrollView.parentScrollView = _collectionsTableViewScrollView;
     cell.videoGroup = row + 1; // The VLCVideoLibraryVideoGroup enum starts at 1, and represents our row count
 
     return cell;
