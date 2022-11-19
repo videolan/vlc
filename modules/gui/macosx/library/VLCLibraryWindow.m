@@ -295,7 +295,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoCollectionViewsDataSource.collectionsTableViewScrollView = _videoLibraryCollectionsTableViewScrollView;
     _libraryVideoCollectionViewsDataSource.collectionsTableView = _videoLibraryCollectionsTableView;
     _videoLibraryCollectionsTableView.rowHeight = VLCLibraryWindowLargeRowHeight * 10;
-    [_videoLibraryCollectionsTableView reloadData];
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
@@ -610,7 +609,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
             _videoLibrarySplitView.hidden = YES;
             _videoLibraryCollectionsTableViewScrollView.hidden = NO;
-            [_libraryVideoCollectionViewsDataSource.collectionsTableView reloadData];
+            [_libraryVideoCollectionViewsDataSource reloadData];
         } else {
             _videoLibrarySplitView.hidden = NO;
             _videoLibraryCollectionsTableViewScrollView.hidden = YES;

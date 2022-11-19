@@ -23,8 +23,9 @@
 #import <Cocoa/Cocoa.h>
 
 typedef NS_ENUM(NSUInteger, VLCLibraryVideoGroup) {
-    VLCLibraryVideoRecentsGroup = 1, // We also use this for our row count
-    VLCLibraryVideoLibraryGroup, // Keep last!
+    VLCLibraryVideoInvalidGroup = 0,
+    VLCLibraryVideoRecentsGroup,
+    VLCLibraryVideoLibraryGroup,
 };
 
 typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
@@ -46,6 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, assign, nonatomic) NSTableView *collectionsTableView;
 @property (readwrite, assign) NSScrollView *collectionsTableViewScrollView;
+
+- (void)reloadData;
 
 @end
 

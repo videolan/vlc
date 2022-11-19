@@ -73,6 +73,10 @@
                 _isHorizontalBarCollectionView = NO;
                 _name = _NS("Library");
                 break;
+            default:
+                NSAssert(1, @"Cannot construct group descriptor from invalid VLCLibraryVideoGroup value");
+                _group = VLCLibraryVideoInvalidGroup;
+                break;
         }
 
         _libraryModelDataMethodSignature = [VLCLibraryModel instanceMethodSignatureForSelector:_libraryModelDataSelector];
@@ -133,6 +137,8 @@
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSAssert(self->_groupDescriptor.libraryModelDataMethodSignature, @"Group descriptor's library model data method signature cannot be nil");
+
         NSInvocation *modelDataInvocation = [NSInvocation invocationWithMethodSignature:self->_groupDescriptor.libraryModelDataMethodSignature];
         modelDataInvocation.selector = self->_groupDescriptor.libraryModelDataSelector;
         [modelDataInvocation invokeWithTarget:self->_libraryModel];
@@ -250,7 +256,7 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 - (void)setupCollectionView
 {
     NSCollectionViewFlowLayout *collectionViewLayout = [[NSCollectionViewFlowLayout alloc] init];
-    collectionViewLayout.itemSize = CGSizeMake(214., 246.);
+    collectionViewLayout.itemSize = CGSizeMake(214., 260.);
 
     _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
     _collectionView.collectionViewLayout = collectionViewLayout;
@@ -317,14 +323,60 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 
 - (void)setVideoGroup:(VLCLibraryVideoGroup)group
 {
+    if (_groupDescriptor.group == group) {
+        return;
+    }
+
     VLCLibraryVideoCollectionViewGroupDescriptor *descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
     [self setGroupDescriptor:descriptor];
 }
 
+@end
 
+@interface VLCLibraryVideoCollectionViewsDataSource()
+{
+    NSArray *_collectionViewCells;
+}
 @end
 
 @implementation VLCLibraryVideoCollectionViewsDataSource
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self generateCollectionViewCells];
+    }
+    return self;
+}
+
+- (void)generateCollectionViewCells
+{
+    NSMutableArray *collectionViewCells = [[NSMutableArray alloc] init];
+    NSUInteger firstRow = VLCLibraryVideoRecentsGroup;
+    NSUInteger lastRow = VLCLibraryVideoLibraryGroup;
+
+    for (NSUInteger i = firstRow; i <= lastRow; ++i) {
+        VLCLibraryVideoCollectionViewTableViewCell *cellView = [[VLCLibraryVideoCollectionViewTableViewCell alloc] init];
+        cellView.identifier = @"VLCLibraryVideoCollectionViewTableViewCellIdentifier";
+        cellView.scrollView.parentScrollView = _collectionsTableViewScrollView;
+
+        [collectionViewCells addObject:cellView];
+    }
+
+    _collectionViewCells = collectionViewCells;
+}
+
+- (void)reloadData
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self generateCollectionViewCells];
+
+        if (self->_collectionsTableView) {
+            [self->_collectionsTableView reloadData];
+        }
+    });
+}
 
 - (void)setCollectionsTableView:(NSTableView *)collectionsTableView
 {
@@ -335,19 +387,16 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    NSInteger lastGroupEnumElement = VLCLibraryVideoLibraryGroup;
-    return lastGroupEnumElement;
+    return _collectionViewCells.count;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSView *)tableView:(NSTableView *)tableView
+   viewForTableColumn:(NSTableColumn *)tableColumn
+                  row:(NSInteger)row
 {
-    VLCLibraryVideoCollectionViewTableViewCell *cell = [[VLCLibraryVideoCollectionViewTableViewCell alloc] init];
-    cell.identifier = @"VLCLibraryVideoCollectionViewTableViewCellIdentifier";
-    cell.scrollView.parentScrollView = _collectionsTableViewScrollView;
-    cell.videoGroup = row + 1; // The VLCVideoLibraryVideoGroup enum starts at 1, and represents our row count
-
-    return cell;
+    VLCLibraryVideoCollectionViewTableViewCell* cellView = _collectionViewCells[row];
+    cellView.videoGroup = row + 1;
+    return cellView;
 }
-
 
 @end
