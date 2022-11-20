@@ -294,7 +294,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoCollectionViewsDataSource = [[VLCLibraryVideoCollectionViewsDataSource alloc] init];
     _libraryVideoCollectionViewsDataSource.collectionsTableViewScrollView = _videoLibraryCollectionsTableViewScrollView;
     _libraryVideoCollectionViewsDataSource.collectionsTableView = _videoLibraryCollectionsTableView;
-    _videoLibraryCollectionsTableView.rowHeight = VLCLibraryWindowLargeRowHeight * 10;
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;

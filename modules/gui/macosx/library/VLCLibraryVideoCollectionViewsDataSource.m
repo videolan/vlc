@@ -87,11 +87,14 @@
 
 @end
 
+@class VLCLibraryVideoCollectionViewTableViewCell;
+
 @interface VLCLibraryVideoCollectionViewTableViewCellDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
+@property (readwrite, assign) VLCLibraryVideoCollectionViewTableViewCell *parentCell;
 
 - (void)setup;
 - (void)reloadData;
@@ -259,6 +262,7 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     collectionViewLayout.itemSize = CGSizeMake(214., 260.);
 
     _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
+    _collectionView.postsFrameChangedNotifications = YES;
     _collectionView.collectionViewLayout = collectionViewLayout;
 
     _scrollView = [[VLCSubScrollView alloc] init];
@@ -345,9 +349,19 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     self = [super init];
     if (self) {
-        [self generateCollectionViewCells];
+        [self setup];
     }
     return self;
+}
+
+- (void)setup
+{
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(cellRowHeightChanged:)
+                               name:NSViewFrameDidChangeNotification
+                             object:nil];
+    [self generateCollectionViewCells];
 }
 
 - (void)generateCollectionViewCells
@@ -374,7 +388,50 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 
         if (self->_collectionsTableView) {
             [self->_collectionsTableView reloadData];
+
+            // HACK: On app init the vertical collection views will not get their heights updated properly.
+            // So let's schedule a check when the table view is set to correct this issue...
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
+                NSMutableIndexSet *indexSet = [[NSMutableIndexSet alloc] init];
+
+                for (NSUInteger i = 0; i < self->_collectionViewCells.count; ++i) {
+                    [indexSet addIndex:i];
+                }
+
+                [self->_collectionsTableView noteHeightOfRowsWithIndexesChanged:indexSet];
+            });
         }
+    });
+}
+
+- (void)cellRowHeightChanged:(NSNotification *)notification
+{
+    if (!_collectionsTableView || [notification.object class] != [VLCLibraryVideoCollectionViewTableViewCell class]) {
+        return;
+    }
+
+    VLCLibraryVideoCollectionViewTableViewCell *cellView = (VLCLibraryVideoCollectionViewTableViewCell *)notification.object;
+    if (!cellView) {
+        return;
+    }
+
+    NSUInteger cellIndex = [_collectionViewCells indexOfObjectPassingTest:^BOOL(VLCLibraryVideoCollectionViewTableViewCell* existingCell, NSUInteger idx, BOOL *stop) {
+        return existingCell.groupDescriptor.group == cellView.groupDescriptor.group;
+    }];
+    if (cellIndex == NSNotFound) {
+        // Let's try a backup
+        cellIndex = cellView.groupDescriptor.group - 1;
+    }
+
+    [self scheduleRowHeightNoteChangeForRow:cellView.groupDescriptor.group - 1];
+}
+
+- (void)scheduleRowHeightNoteChangeForRow:(NSUInteger)row
+{
+    NSAssert(row >= 0 && row < _collectionViewCells.count, @"Invalid row index passed to scheduleRowHeightNoteChangeForRow");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSIndexSet *indexSetToNote = [NSIndexSet indexSetWithIndex:row];
+        [self->_collectionsTableView noteHeightOfRowsWithIndexesChanged:indexSetToNote];
     });
 }
 
@@ -397,6 +454,26 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     VLCLibraryVideoCollectionViewTableViewCell* cellView = _collectionViewCells[row];
     cellView.videoGroup = row + 1;
     return cellView;
+}
+
+- (CGFloat)tableView:(NSTableView *)tableView
+         heightOfRow:(NSInteger)row
+{
+    CGFloat fallback = _collectionViewItemSize.height +
+                       _collectionViewSectionInset.top +
+                       _collectionViewSectionInset.bottom;
+    
+    VLCLibraryVideoCollectionViewTableViewCell* cellView = _collectionViewCells[row];
+    if (cellView && cellView.collectionView.collectionViewLayout.collectionViewContentSize.height > fallback) {
+        return cellView.collectionView.collectionViewLayout.collectionViewContentSize.height;
+    }
+
+    if (fallback <= 0) {
+        NSLog(@"Unable to provide reasonable fallback or accurate rowheight -- providing rough rowheight");
+        return 300;
+    }
+
+    return fallback;
 }
 
 @end
