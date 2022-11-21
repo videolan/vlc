@@ -100,7 +100,11 @@ static void DecoderFlush(decoder_t *dec)
 
 static void CloseDecoder(vlc_object_t *obj)
 {
+    struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
     decoder_t *dec = (decoder_t*)obj;
+
+    if (scenario->decoder_destroy != NULL)
+        scenario->decoder_destroy(dec);
     struct vlc_video_context *vctx = dec->p_sys;
     if (vctx)
         vlc_video_context_Release(vctx);

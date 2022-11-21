@@ -32,6 +32,7 @@ struct input_decoder_scenario {
     const char *source;
     const char *sout;
     void (*decoder_setup)(decoder_t *);
+    void (*decoder_destroy)(decoder_t *);
     int (*decoder_decode)(decoder_t *, picture_t *);
     void (*decoder_flush)(decoder_t *);
     void (*display_prepare)(vout_display_t *vd, picture_t *pic);

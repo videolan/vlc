@@ -65,6 +65,12 @@ static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
 static void decoder_i420_800_600(decoder_t *dec)
     { decoder_fixed_size(dec, VLC_CODEC_I420, 800, 600); }
 
+static void decoder_i420_800_600_stop(decoder_t *dec)
+{
+    decoder_i420_800_600(dec);
+    vlc_sem_post(&scenario_data.wait_stop);
+}
+
 static int decoder_decode_check_cc(decoder_t *dec, picture_t *pic)
 {
     vlc_tick_t date = pic->date;
@@ -204,6 +210,23 @@ static void decoder_flush_signal(decoder_t *dec)
     vlc_sem_post(&scenario_data.wait_stop);
 }
 
+static void* SendUpdateOutput(void *opaque)
+{
+    decoder_t *dec = opaque;
+    decoder_UpdateVideoOutput(dec, NULL);
+    return NULL;
+}
+
+static void decoder_destroy_trigger_update(decoder_t *dec)
+{
+    /* Use another thread to ensure we don't double-lock, but
+     * at most deadlock instead. */
+    vlc_thread_t thread;
+    int ret = vlc_clone(&thread, SendUpdateOutput, dec);
+    assert(ret == VLC_SUCCESS);
+    vlc_join(thread, NULL);
+}
+
 static void display_prepare_signal(vout_display_t *vd, picture_t *pic)
 {
     (void)vd;
@@ -311,6 +334,14 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .sout_filter_send = sout_filter_send,
     .sout_filter_flush = sout_filter_flush,
     .interface_setup = interface_setup_check_flush,
+},
+{
+    /* Check that releasing a decoder while it is triggering an update
+     * of the video output format doesn't lead to a crash. Non-regression
+     * test from issue #27532. */
+    .source = source_800_600,
+    .decoder_setup = decoder_i420_800_600_stop,
+    .decoder_destroy = decoder_destroy_trigger_update,
 }};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 
