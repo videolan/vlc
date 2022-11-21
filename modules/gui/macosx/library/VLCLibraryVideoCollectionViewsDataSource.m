@@ -480,4 +480,9 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     return fallback;
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
+{
+    return NO;
+}
+
 @end
