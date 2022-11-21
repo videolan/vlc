@@ -2015,9 +2015,8 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
              (char*)&p_dec->fmt_in->i_codec );
 
-    es_format_Clean( &p_owner->dec_fmt_in );
-    es_format_Clean( &p_owner->pktz_fmt_in );
     decoder_Clean( p_dec );
+
     if ( p_owner->out_pool )
     {
         picture_pool_Release( p_owner->out_pool );
@@ -2089,6 +2088,8 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
             vlc_assert_unreachable();
     }
 
+    es_format_Clean( &p_owner->dec_fmt_in );
+    es_format_Clean( &p_owner->pktz_fmt_in );
     es_format_Clean( &p_owner->fmt );
 
     if( p_owner->p_description )
