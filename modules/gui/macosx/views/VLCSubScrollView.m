@@ -62,4 +62,22 @@
     }
 }
 
+- (BOOL)hasVerticalScroller
+{
+    if (_forceHideVerticalScroller) {
+        return NO;
+    }
+
+    return [super hasVerticalScroller];
+}
+
+- (BOOL)hasHorizontalScroller
+{
+    if (_forceHideHorizontalScroller) {
+        return NO;
+    }
+
+    return [super hasHorizontalScroller];
+}
+
 @end

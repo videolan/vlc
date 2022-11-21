@@ -267,6 +267,8 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 
     _scrollView = [[VLCSubScrollView alloc] init];
     _scrollView.scrollParentY = YES;
+    _scrollView.forceHideVerticalScroller = YES;
+
     _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
     _scrollView.documentView = _collectionView;
 
