@@ -154,10 +154,10 @@ static void Close(vlc_gl_t *gl)
 static void FreeCVBuffer(picture_t *picture)
 {
     struct vlc_cvbuffer *buffer = picture->p_sys;
-    if (buffer->cvpx)
-        CFRelease(buffer->cvpx);
     if (buffer->texture)
         CFRelease(buffer->texture);
+    if (buffer->cvpx)
+        CFRelease(buffer->cvpx);
     free(buffer);
 }
 
