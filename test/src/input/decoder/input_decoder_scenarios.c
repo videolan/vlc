@@ -44,6 +44,7 @@ static struct scenario_data
     vlc_sem_t wait_ready_to_flush;
     struct vlc_video_context *decoder_vctx;
     bool skip_decoder;
+    bool has_reload;
     bool stream_out_sent;
     size_t decoder_image_sent;
 } scenario_data;
@@ -227,6 +228,19 @@ static void decoder_destroy_trigger_update(decoder_t *dec)
     vlc_join(thread, NULL);
 }
 
+static int decoder_decode_trigger_reload(decoder_t *dec, picture_t *pic)
+{
+    (void)dec;
+    picture_Release(pic);
+
+    if (!scenario_data.has_reload)
+    {
+        vlc_sem_post(&scenario_data.wait_stop);
+        return VLCDEC_RELOAD;
+    }
+    return VLCDEC_SUCCESS;
+}
+
 static void display_prepare_signal(vout_display_t *vd, picture_t *pic)
 {
     (void)vd;
@@ -342,6 +356,15 @@ struct input_decoder_scenario input_decoder_scenarios[] =
     .source = source_800_600,
     .decoder_setup = decoder_i420_800_600_stop,
     .decoder_destroy = decoder_destroy_trigger_update,
+},
+{
+    /* Check that reloading a decoder while it is triggering an update
+     * of the video output format doesn't lead to a crash. Non-regression
+     * test from issue #27532. */
+    .source = source_800_600,
+    .decoder_setup = decoder_i420_800_600,
+    .decoder_decode = decoder_decode_trigger_reload,
+    .decoder_destroy = decoder_destroy_trigger_update,
 }};
 size_t input_decoder_scenarios_count = ARRAY_SIZE(input_decoder_scenarios);
 
@@ -349,6 +372,7 @@ void input_decoder_scenario_init(void)
 {
     scenario_data.decoder_vctx = NULL;
     scenario_data.skip_decoder = false;
+    scenario_data.has_reload = false;
     scenario_data.stream_out_sent = false;
     scenario_data.decoder_image_sent = 0;
     vlc_sem_init(&scenario_data.wait_stop, 0);
