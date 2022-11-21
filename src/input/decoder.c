@@ -1208,21 +1208,6 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     return VLC_SUCCESS;
 }
 
-static void ModuleThread_UpdateStatVideo( vlc_input_decoder_t *p_owner,
-                                          bool lost )
-{
-    unsigned displayed = 0;
-    unsigned vout_lost = 0;
-    unsigned vout_late = 0;
-    if( p_owner->p_vout != NULL )
-    {
-        vout_GetResetStatistic( p_owner->p_vout, &displayed, &vout_lost, &vout_late );
-    }
-    if (lost) vout_lost++;
-
-    decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed, vout_late);
-}
-
 static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
@@ -1236,7 +1221,17 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     }
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
-    ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
+    unsigned displayed = 0;
+    unsigned vout_lost = 0;
+    unsigned vout_late = 0;
+    if( p_owner->p_vout != NULL )
+    {
+        vout_GetResetStatistic( p_owner->p_vout, &displayed, &vout_lost, &vout_late );
+    }
+    if (success != VLC_SUCCESS)
+        vout_lost++;
+
+    decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed, vout_late);
 }
 
 static vlc_decoder_device * thumbnailer_get_device( decoder_t *p_dec )
