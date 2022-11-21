@@ -309,8 +309,8 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
     }
 
     /* Restart the decoder module */
-    es_format_Clean( &p_owner->dec_fmt_in );
     decoder_Clean( p_dec );
+    es_format_Clean( &p_owner->dec_fmt_in );
     p_owner->error = false;
 
     if( reload == RELOAD_DECODER_AOUT )
