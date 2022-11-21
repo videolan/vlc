@@ -1145,10 +1145,8 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
         return VLC_EGENERIC;
     }
 
-    vlc_fifo_Lock( p_owner->p_fifo );
     if (p_owner->flushing)
     {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         picture_Release(p_picture);
         return VLC_SUCCESS;
     }
@@ -1160,7 +1158,6 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     bool prerolled = p_owner->i_preroll_end != PREROLL_NONE;
     if( prerolled && p_owner->i_preroll_end > p_picture->date )
     {
-        vlc_fifo_Unlock( p_owner->p_fifo );
         picture_Release( p_picture );
         return VLC_SUCCESS;
     }
@@ -1193,7 +1190,6 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     if( p_vout == NULL )
     {
         picture_Release( p_picture );
-        vlc_fifo_Unlock(p_owner->p_fifo);
         return VLC_EGENERIC;
     }
 
@@ -1203,7 +1199,6 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
         vout_Flush( p_vout, p_picture->date );
     }
     vout_PutPicture( p_vout, p_picture );
-    vlc_fifo_Unlock(p_owner->p_fifo);
 
     return VLC_SUCCESS;
 }
@@ -1219,6 +1214,9 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
         vlc_tracer_TraceStreamPTS( tracer, "DEC", p_owner->psz_id,
                             "OUT", p_pic->date );
     }
+
+    vlc_fifo_Lock( p_owner->p_fifo );
+
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
     unsigned displayed = 0;
@@ -1230,6 +1228,8 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     }
     if (success != VLC_SUCCESS)
         vout_lost++;
+
+    vlc_fifo_Unlock(p_owner->p_fifo);
 
     decoder_Notify(p_owner, on_new_video_stats, 1, vout_lost, displayed, vout_late);
 }
