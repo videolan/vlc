@@ -1351,20 +1351,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     return VLC_SUCCESS;
 }
 
-static void ModuleThread_UpdateStatAudio( vlc_input_decoder_t *p_owner,
-                                          bool lost )
-{
-    unsigned played = 0;
-    unsigned aout_lost = 0;
-    if( p_owner->p_astream != NULL )
-    {
-        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played );
-    }
-    if (lost) aout_lost++;
-
-    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
-}
-
 static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
@@ -1377,7 +1363,16 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
     }
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
-    ModuleThread_UpdateStatAudio( p_owner, success != VLC_SUCCESS );
+    unsigned played = 0;
+    unsigned aout_lost = 0;
+    if( p_owner->p_astream != NULL )
+    {
+        vlc_aout_stream_GetResetStats( p_owner->p_astream, &aout_lost, &played );
+    }
+    if (success != VLC_SUCCESS)
+        aout_lost++;
+
+    decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
 }
 
 static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_subpic )
