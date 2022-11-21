@@ -442,6 +442,8 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     _collectionsTableView = collectionsTableView;
     _collectionsTableView.dataSource = self;
     _collectionsTableView.delegate = self;
+
+    _collectionsTableView.intercellSpacing = NSMakeSize(20., 20.);
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
