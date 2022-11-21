@@ -1287,11 +1287,9 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
         return VLC_EGENERIC;
     }
 
-    vlc_fifo_Lock(p_owner->p_fifo);
     vlc_aout_stream *p_astream = p_owner->p_astream;
     if( p_astream == NULL )
     {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         msg_Dbg( p_dec, "discarded audio buffer" );
         block_Release( p_audio );
         return VLC_EGENERIC;
@@ -1299,7 +1297,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
 
     if (p_owner->flushing)
     {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         block_Release(p_audio);
         return VLC_SUCCESS;
     }
@@ -1307,7 +1304,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
     bool prerolled = p_owner->i_preroll_end != PREROLL_NONE;
     if( prerolled && p_owner->i_preroll_end > p_audio->i_pts )
     {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         block_Release( p_audio );
         return VLC_SUCCESS;
     }
@@ -1337,7 +1333,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
         atomic_store( &p_owner->reload, RELOAD_DECODER_AOUT );
     }
 
-    vlc_fifo_Unlock(p_owner->p_fifo);
     return VLC_SUCCESS;
 }
 
@@ -1351,6 +1346,9 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
         vlc_tracer_TraceStreamDTS( tracer, "DEC", p_owner->psz_id, "OUT",
                             p_aout_buf->i_pts, p_aout_buf->i_dts );
     }
+
+    vlc_fifo_Lock(p_owner->p_fifo);
+
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
     unsigned played = 0;
@@ -1361,6 +1359,8 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
     }
     if (success != VLC_SUCCESS)
         aout_lost++;
+
+    vlc_fifo_Unlock(p_owner->p_fifo);
 
     decoder_Notify(p_owner, on_new_audio_stats, 1, aout_lost, played);
 }
