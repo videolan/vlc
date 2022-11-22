@@ -266,6 +266,7 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
     const uint8_t *p_peek;
     *pi_header_size = 0;
     int i_packet_size = -1;
+    int i_offset = 0;
 
     if( vlc_stream_Peek( p_demux->s,
                      &p_peek, TS_PACKET_SIZE_MAX ) < TS_PACKET_SIZE_MAX )
@@ -349,8 +350,13 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
             //return TS_PACKET_SIZE_188;
         }
     }
+    else if( !memcmp( p_peek, "\x47\xff\xffPRIV", 7 ) ) /* Denver */
+    {
+        /* Bogus TS packets with private payload interleaved in stream */
+        i_offset = TS_PACKET_SIZE_188 * 11;
+    }
 
-    return DetectPacketSize( p_demux, pi_header_size, 0 );
+    return DetectPacketSize( p_demux, pi_header_size, i_offset );
 }
 
 /*****************************************************************************
