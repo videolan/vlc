@@ -23,7 +23,7 @@
 #import "VLCLibraryCollectionViewFlowLayout.h"
 
 #import "VLCLibraryAudioDataSource.h"
-#import "VLCLibraryVideoDataSource.h"
+#import "VLCLibraryVideoCollectionViewsDataSource.h"
 #import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
@@ -216,8 +216,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
         }
-    } else if([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
-        VLCLibraryVideoDataSource *videoDataSource = (VLCLibraryVideoDataSource *)self.collectionView.dataSource;
+    } else if([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoCollectionViewTableViewCellDataSource class]]) {
+        VLCLibraryVideoCollectionViewTableViewCellDataSource *videoDataSource = (VLCLibraryVideoCollectionViewTableViewCellDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
     

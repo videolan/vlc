@@ -87,23 +87,10 @@
 
 @end
 
-@class VLCLibraryVideoCollectionViewTableViewCell;
-
-@interface VLCLibraryVideoCollectionViewTableViewCellDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
-
-@property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite, assign) VLCLibraryModel *libraryModel;
-@property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
-@property (readwrite, assign) VLCLibraryVideoCollectionViewTableViewCell *parentCell;
-
-- (void)setup;
-- (void)reloadData;
-
-@end
-
 @interface VLCLibraryVideoCollectionViewTableViewCellDataSource ()
 {
     NSArray *_collectionArray;
+    VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
 }
 @end
 
@@ -164,11 +151,24 @@
 
 - (void)setup
 {
+    VLCLibraryCollectionViewFlowLayout *collectionViewLayout = (VLCLibraryCollectionViewFlowLayout*)_collectionView.collectionViewLayout;
+    NSAssert(collectionViewLayout, @"Collection view must have a VLCLibraryCollectionViewFlowLayout!");
+
+    _collectionViewFlowLayout = collectionViewLayout;
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
 
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class]
              forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    [_collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
+        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                    withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+
+    NSNib *mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
+    [_collectionView registerNib:mediaItemSupplementaryDetailView
+      forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
@@ -192,6 +192,51 @@
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     viewItem.representedItem = _collectionArray[indexPath.item];
     return viewItem;
+}
+
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        VLCLibraryCollectionViewSupplementaryElementView *sectionHeadingView = [collectionView makeSupplementaryViewOfKind:kind
+                                                                                                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
+                                                                                                              forIndexPath:indexPath];
+
+        sectionHeadingView.stringValue = _groupDescriptor.name;
+        return sectionHeadingView;
+
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView* mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
+
+        mediaItemSupplementaryDetailView.representedMediaItem = _collectionArray[indexPath.item];
+        mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return mediaItemSupplementaryDetailView;
+    }
+
+    return nil;
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        NSLog(@"Bad index path on item selection");
+        return;
+    }
+
+    [_collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        NSLog(@"Bad index path on item deselection");
+        return;
+    }
+
+    [_collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
 }
 
 
@@ -249,28 +294,17 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     self = [super init];
 
     if(self) {
-        [self setupCollectionView];
+        [self setupView];
         [self setupDataSource];
     }
 
     return self;
 }
 
-- (void)setupCollectionView
+- (void)setupView
 {
-    NSCollectionViewFlowLayout *collectionViewLayout = [[NSCollectionViewFlowLayout alloc] init];
-    collectionViewLayout.itemSize = CGSizeMake(214., 260.);
-
-    _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
-    _collectionView.postsFrameChangedNotifications = YES;
-    _collectionView.collectionViewLayout = collectionViewLayout;
-
-    _scrollView = [[VLCSubScrollView alloc] init];
-    _scrollView.scrollParentY = YES;
-    _scrollView.forceHideVerticalScroller = YES;
-
-    _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    _scrollView.documentView = _collectionView;
+    [self setupCollectionView];
+    [self setupScrollView];
 
     [self addSubview:_scrollView];
     [self addConstraints:@[
@@ -307,6 +341,30 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
                                       constant:0
         ],
     ]];
+}
+
+- (void)setupCollectionView
+{
+    VLCLibraryCollectionViewFlowLayout *collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    collectionViewLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+    collectionViewLayout.itemSize = CGSizeMake(214., 260.);
+
+    _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
+    _collectionView.postsFrameChangedNotifications = YES;
+    _collectionView.collectionViewLayout = collectionViewLayout;
+    _collectionView.selectable = YES;
+    _collectionView.allowsEmptySelection = YES;
+    _collectionView.allowsMultipleSelection = NO;
+}
+
+- (void)setupScrollView
+{
+    _scrollView = [[VLCSubScrollView alloc] init];
+    _scrollView.scrollParentY = YES;
+    _scrollView.forceHideVerticalScroller = YES;
+
+    _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    _scrollView.documentView = _collectionView;
 }
 
 - (void)setupDataSource

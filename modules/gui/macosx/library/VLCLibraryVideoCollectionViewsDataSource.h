@@ -34,8 +34,22 @@ typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
 };
 
 @class VLCLibraryModel;
+@class VLCLibraryVideoCollectionViewTableViewCell;
+@class VLCLibraryVideoCollectionViewGroupDescriptor;
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface VLCLibraryVideoCollectionViewTableViewCellDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+
+@property (readwrite, assign) NSCollectionView *collectionView;
+@property (readwrite, assign) VLCLibraryModel *libraryModel;
+@property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
+@property (readwrite, assign) VLCLibraryVideoCollectionViewTableViewCell *parentCell;
+
+- (void)setup;
+- (void)reloadData;
+
+@end
 
 /** Serves collection views for each of the video library sections **/
 @interface VLCLibraryVideoCollectionViewsDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
