@@ -31,7 +31,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCInputItem.h"
-#import "library/video-library/VLCLibraryVideoDataSource.h"
+#import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 #import "playlist/VLCPlaylistController.h"
 
 @implementation VLCLibraryTableCellView

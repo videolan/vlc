@@ -24,6 +24,12 @@
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
 
+typedef NS_ENUM(NSUInteger, VLCLibraryVideoGroup) {
+    VLCLibraryVideoInvalidGroup = 0,
+    VLCLibraryVideoRecentsGroup,
+    VLCLibraryVideoLibraryGroup,
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoCollectionViewGroupDescriptor : NSObject

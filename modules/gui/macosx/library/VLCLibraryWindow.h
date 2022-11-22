@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCRoundedCornerTextField;
 @class VLCLibraryNavigationStack;
 @class VLCLibraryAudioDataSource;
-@class VLCLibraryVideoDataSource;
 @class VLCLibraryVideoCollectionViewsDataSource;
+@class VLCLibraryVideoTableViewDataSource;
 @class VLCLibraryGroupDataSource;
 @class VLCLibrarySortingMenuController;
 @class VLCMediaSourceBaseDataSource;
@@ -113,7 +113,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite) BOOL nonembedded;
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
 @property (readonly) VLCLibraryAudioDataSource *libraryAudioDataSource;
-@property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
+@property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoTableViewDataSource;
 @property (readonly) VLCLibraryVideoCollectionViewsDataSource *libraryVideoCollectionViewsDataSource;
 @property (readonly) VLCLibraryGroupDataSource *libraryAudioGroupDataSource;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;

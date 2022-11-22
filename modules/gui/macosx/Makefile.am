@@ -112,8 +112,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCell.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.h \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.m \
-	gui/macosx/library/video-library/VLCLibraryVideoDataSource.h \
-	gui/macosx/library/video-library/VLCLibraryVideoDataSource.m \
+	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h \
+	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.m \
 	gui/macosx/main/CompatibilityFixes.h \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \

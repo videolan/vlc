@@ -41,8 +41,9 @@
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryNavigationStack.h"
-#import "library/video-library/VLCLibraryVideoDataSource.h"
+
 #import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
+#import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 
@@ -283,13 +284,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self updateViewCellDimensionsBasedOnSetting:nil];
     [_playlistTableView reloadData];
 
-    _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
-    _libraryVideoDataSource.libraryModel = mainInstance.libraryController.libraryModel;
-    _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
-    _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+    _libraryVideoTableViewDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
+    _libraryVideoTableViewDataSource.libraryModel = mainInstance.libraryController.libraryModel;
+    _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
+    _libraryVideoTableViewDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
     _videoLibraryGroupsTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
     _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
-    [_libraryVideoDataSource setup];
+    [_libraryVideoTableViewDataSource setup];
 
     _libraryVideoCollectionViewsDataSource = [[VLCLibraryVideoCollectionViewsDataSource alloc] init];
     _libraryVideoCollectionViewsDataSource.collectionsTableViewScrollView = _videoLibraryCollectionsTableViewScrollView;
@@ -582,7 +583,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [subview removeFromSuperview];
     }
     
-    if (_libraryVideoDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
+    if (_libraryVideoTableViewDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
         for (NSLayoutConstraint *constraint in audioPlaceholderImageViewSizeConstraints) {
             constraint.active = NO;
         }
@@ -612,7 +613,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         } else {
             _videoLibrarySplitView.hidden = NO;
             _videoLibraryCollectionsTableViewScrollView.hidden = YES;
-            [_libraryVideoDataSource reloadData];
+            [_libraryVideoTableViewDataSource reloadData];
         }
     }
     
@@ -988,7 +989,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)updateLibraryRepresentation:(NSNotification *)aNotification
 {
     if (_videoLibraryView.superview != nil) {
-        [_libraryVideoDataSource reloadData];
+        if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+            [_libraryVideoCollectionViewsDataSource reloadData];
+        } else {
+            [_libraryVideoTableViewDataSource reloadData];
+        }
     } else if (_audioLibraryView.superview != nil) {
         [_libraryAudioDataSource reloadAppearance];
     }
