@@ -84,11 +84,13 @@ static int DecoderDecode(decoder_t *dec, block_t *block)
     assert(pic);
     pic->date = block->i_pts;
     pic->b_progressive = true;
-    block_Release(block);
 
     struct input_decoder_scenario *scenario = &input_decoder_scenarios[current_scenario];
     assert(scenario->decoder_decode != NULL);
-    return scenario->decoder_decode(dec, pic);
+    int ret = scenario->decoder_decode(dec, pic);
+    if (ret != VLCDEC_RELOAD)
+        block_Release(block);
+    return ret;
 }
 
 static void DecoderFlush(decoder_t *dec)
