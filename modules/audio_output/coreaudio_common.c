@@ -425,13 +425,18 @@ RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     VLC_UNUSED(ioActionFlags);
     VLC_UNUSED(inTimeStamp);
     VLC_UNUSED(inBusNumber);
+
+    audio_output_t * p_aout = p_data;
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    assert(inNumberFrames == BytesToFrames(p_sys, ioData->mBuffers[0].mDataByteSize));
     VLC_UNUSED(inNumberFrames);
 
     uint64_t i_host_time = (inTimeStamp->mFlags & kAudioTimeStampHostTimeValid)
                          ? inTimeStamp->mHostTime : 0;
 
     bool is_silence;
-    ca_Render(p_data, i_host_time, ioData->mBuffers[0].mData,
+    ca_Render(p_aout, i_host_time, ioData->mBuffers[0].mData,
               ioData->mBuffers[0].mDataByteSize, &is_silence);
     if (is_silence)
         *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
