@@ -1215,7 +1215,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             for( vlc_dictionary_entry_t *p_entry = p_sys->attachments.p_entries[i];
                                          p_entry; p_entry = p_entry->p_next )
             {
-                msg_Err(p_demux, "GET ATTACHMENT %s", p_entry->psz_key);
+                msg_Dbg(p_demux, "GET ATTACHMENT %s", p_entry->psz_key);
                 (*ppp_attach)[*pi_int] = vlc_input_attachment_Hold(
                                                 (input_attachment_t *) p_entry->p_value );
                 if( (*ppp_attach)[*pi_int] )
