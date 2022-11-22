@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryVideoDataSource.h: MacOS X interface module
+ * VLCLibraryVideoCollectionViewTableViewCell.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Claudio Cambra <developer@claudiocambra.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,26 +22,23 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "VLCLibraryTableView.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
 
-typedef NS_ENUM(NSUInteger, VLCVideoLibrarySection) {
-    VLCVideoLibraryRecentsSection = 0,
-    VLCVideoLibraryLibrarySection,
-};
+@class VLCSubScrollView;
+@class VLCLibraryVideoCollectionViewGroupDescriptor;
+@class VLCLibraryVideoCollectionViewTableViewCellDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryModel;
+@interface VLCLibraryVideoCollectionViewTableViewCell : NSTableCellView
 
-@interface VLCLibraryVideoDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegate>
+@property (readonly) NSCollectionView *collectionView;
+@property (readonly) VLCSubScrollView *scrollView;
+@property (readonly) VLCLibraryVideoCollectionViewTableViewCellDataSource *dataSource;
+@property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
+@property (readwrite, assign, nonatomic) VLCLibraryVideoGroup videoGroup;
 
-@property (readwrite, assign) VLCLibraryModel *libraryModel;
-@property (readwrite, assign) NSCollectionView *libraryMediaCollectionView;
-@property (readwrite, assign) NSTableView *groupsTableView;
-@property (readwrite, assign) NSTableView *groupSelectionTableView;
-
-- (void)setup;
-- (void)reloadData;
+- (void)setVideoGroup:(VLCLibraryVideoGroup)group;
 
 @end
 

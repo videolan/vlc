@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoDataSource.h: MacOS X interface module
+ * VLCLibraryVideoCollectionViewTableViewCellDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -22,18 +22,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef NS_ENUM(NSUInteger, VLCLibraryVideoGroup) {
-    VLCLibraryVideoInvalidGroup = 0,
-    VLCLibraryVideoRecentsGroup,
-    VLCLibraryVideoLibraryGroup,
-};
-
-typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
-    VLCLibraryVideoCollectionViewTableViewCellNormalType = 0,
-    VLCLibraryVideoCollectionViewTableViewCellHorizontalScrollType
-};
-
-@class VLCLibraryModel;
 @class VLCLibraryVideoCollectionViewTableViewCell;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
 
@@ -42,26 +30,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryVideoCollectionViewTableViewCellDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign) VLCLibraryVideoCollectionViewTableViewCell *parentCell;
 
 - (void)setup;
-- (void)reloadData;
-
-@end
-
-/** Serves collection views for each of the video library sections **/
-@interface VLCLibraryVideoCollectionViewsDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
-
-@property (readwrite, assign) NSSize collectionViewItemSize;
-@property (readwrite, assign) CGFloat collectionViewMinimumLineSpacing;
-@property (readwrite, assign) CGFloat collectionViewMinimumInteritemSpacing;
-@property (readwrite, assign) NSEdgeInsets collectionViewSectionInset;
-
-@property (readwrite, assign, nonatomic) NSTableView *collectionsTableView;
-@property (readwrite, assign) NSScrollView *collectionsTableViewScrollView;
-
 - (void)reloadData;
 
 @end

@@ -35,14 +35,14 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryAudioDataSource.h"
-#import "library/VLCLibraryVideoDataSource.h"
-#import "library/VLCLibraryVideoCollectionViewsDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryNavigationStack.h"
+#import "library/video-library/VLCLibraryVideoDataSource.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 

@@ -23,10 +23,11 @@
 #import "VLCLibraryCollectionViewFlowLayout.h"
 
 #import "VLCLibraryAudioDataSource.h"
-#import "VLCLibraryVideoCollectionViewsDataSource.h"
 #import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+
+#import "library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.h"
 
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
