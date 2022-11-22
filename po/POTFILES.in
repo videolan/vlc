@@ -482,8 +482,10 @@ modules/gui/macosx/library/VLCLibrarySortingMenuController.h
 modules/gui/macosx/library/VLCLibrarySortingMenuController.m
 modules/gui/macosx/library/VLCLibraryTableCellView.h
 modules/gui/macosx/library/VLCLibraryTableCellView.m
-modules/gui/macosx/library/VLCLibraryVideoDataSource.h
-modules/gui/macosx/library/VLCLibraryVideoDataSource.m
+modules/gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h
+modules/gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m
+modules/gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h
+modules/gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.m
 modules/gui/macosx/library/VLCLibraryWindow.h
 modules/gui/macosx/library/VLCLibraryWindow.m
 modules/gui/macosx/main/CompatibilityFixes.h
