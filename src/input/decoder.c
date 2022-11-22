@@ -268,7 +268,6 @@ static inline bool vlc_input_decoder_IsSynchronous( const vlc_input_decoder_t *d
 static int LoadDecoder( decoder_t *p_dec, bool b_packetizer, es_format_t *fmt_in,
                         const es_format_t *restrict p_fmt )
 {
-    vlc_input_decoder_t *owner = dec_get_owner( p_dec );
     decoder_Init( p_dec, fmt_in, p_fmt );
 
     p_dec->b_frame_drop_allowed = true;
