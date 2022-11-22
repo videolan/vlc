@@ -227,8 +227,6 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         size_t size = glfmt->tex_count * sizeof(GLsizei);
         memcpy(glfmt->tex_widths, prev_filter->plane_widths, size);
         memcpy(glfmt->tex_heights, prev_filter->plane_heights, size);
-        memcpy(glfmt->visible_widths, prev_filter->plane_widths, size);
-        memcpy(glfmt->visible_heights, prev_filter->plane_heights, size);
     }
 
     /* By default, the output size is the same as the input size. The filter
