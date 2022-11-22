@@ -298,6 +298,21 @@ int foo() { return my_array[0]; }
     AC_DEFINE([_BSD_SOURCE], [1], [ISO C, POSIX, and 4.3BSD things.])
     AC_DEFINE([_SVID_SOURCE], [1], [ISO C, POSIX, and SVID things.])
 
+    AC_ARG_WITH(packagedir,
+      AS_HELP_STRING([--with-packagedir=DIR],
+        [output the packaged VLC files in DIR (default vlc-$PACKAGE_VERSION)]))
+    AS_IF([test "${with_packagedir}" != ""], [
+        AS_IF([test -d "${with_packagedir}"], [
+            PACKAGE_DIR=`cd "${with_packagedir}" && pwd -P`
+        ],[
+            dnl this should be an absolute path
+            PACKAGE_DIR="${with_packagedir}"
+        ])
+    ], [
+        PACKAGE_DIR=`pwd -P`"/vlc-${PACKAGE_VERSION}"
+    ])
+    AC_SUBST([PACKAGE_DIR])
+
     case "${host_os}" in
       *mingw32*)
         SYS=mingw32
