@@ -30,7 +30,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewGroupDescriptor.h"
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "main/VLCMain.h"
 

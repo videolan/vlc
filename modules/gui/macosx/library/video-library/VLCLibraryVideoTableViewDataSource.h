@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoDataSource.h: MacOS X interface module
+ * VVLCLibraryVideoTableViewDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -21,11 +21,6 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-
-typedef NS_ENUM(NSUInteger, VLCVideoLibrarySection) {
-    VLCVideoLibraryRecentsSection = 0,
-    VLCVideoLibraryLibrarySection,
-};
 
 NS_ASSUME_NONNULL_BEGIN
 

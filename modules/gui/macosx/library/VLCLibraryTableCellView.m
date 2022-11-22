@@ -31,7 +31,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCInputItem.h"
-#import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 #import "playlist/VLCPlaylistController.h"
 
 @implementation VLCLibraryTableCellView
@@ -106,11 +106,11 @@
 - (void)setRepresentedVideoLibrarySection:(NSUInteger)section
 {
     NSString *sectionString = @"";
-    switch(section) {
-        case VLCVideoLibraryRecentsSection:
+    switch(section + 1) { // Group 0 is Invalid, so add one
+        case VLCLibraryVideoRecentsGroup:
             sectionString = _NS("Recents");
             break;
-        case VLCVideoLibraryLibrarySection:
+        case VLCLibraryVideoLibraryGroup:
             sectionString = _NS("Library");
             break;
         default:

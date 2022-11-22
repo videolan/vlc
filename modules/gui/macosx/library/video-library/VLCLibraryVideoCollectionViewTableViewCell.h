@@ -22,11 +22,16 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 @class VLCSubScrollView;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
 @class VLCLibraryVideoCollectionViewTableViewCellDataSource;
+
+typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
+    VLCLibraryVideoCollectionViewTableViewCellNormalType = 0,
+    VLCLibraryVideoCollectionViewTableViewCellHorizontalScrollType
+};
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -26,9 +26,9 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewGroupDescriptor.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewTableViewCell.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.h"
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "views/VLCSubScrollView.h"
 

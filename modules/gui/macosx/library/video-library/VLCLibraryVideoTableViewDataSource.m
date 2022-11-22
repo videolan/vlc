@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoDataSource.m: MacOS X interface module
+ * VLCLibraryVideoTableViewDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -29,6 +29,8 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
+
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "main/CompatibilityFixes.h"
 #import "extensions/NSString+Helpers.h"
@@ -105,10 +107,10 @@
     if (tableView == _groupsTableView) {
         return 2;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch(_groupsTableView.selectedRow) {
-            case VLCVideoLibraryRecentsSection:
+        switch(_groupsTableView.selectedRow + 1) { // Group 0 is invalid so add one
+            case VLCLibraryVideoRecentsGroup:
                 return _recentsArray.count;
-            case VLCVideoLibraryLibrarySection:
+            case VLCLibraryVideoLibraryGroup:
                 return _libraryArray.count;
             default:
                 NSAssert(1, @"Reached unreachable case for video library section");
@@ -131,11 +133,11 @@
     if (tableView == _groupsTableView) {
         cellView.representedVideoLibrarySection = row;
     } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch(_groupsTableView.selectedRow) {
-            case VLCVideoLibraryRecentsSection:
+        switch(_groupsTableView.selectedRow + 1) { // Group 0 is invalid so add one
+            case VLCLibraryVideoRecentsGroup:
                 cellView.representedItem = _recentsArray[row];
                 break;
-            case VLCVideoLibraryLibrarySection:
+            case VLCLibraryVideoLibraryGroup:
                 cellView.representedItem = _libraryArray[row];
                 break;
             default:

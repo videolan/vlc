@@ -22,18 +22,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef NS_ENUM(NSUInteger, VLCLibraryVideoGroup) {
-    VLCLibraryVideoInvalidGroup = 0,
-    VLCLibraryVideoRecentsGroup,
-    VLCLibraryVideoLibraryGroup,
-};
-
-typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
-    VLCLibraryVideoCollectionViewTableViewCellNormalType = 0,
-    VLCLibraryVideoCollectionViewTableViewCellHorizontalScrollType
-};
-
-
 NS_ASSUME_NONNULL_BEGIN
 
 /** Serves collection views for each of the video library sections **/

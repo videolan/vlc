@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewGroupDescriptor.m: MacOS X interface module
+ * VLCLibraryVideoGroupDescriptor.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoCollectionViewGroupDescriptor.h"
+#import "VLCLibraryVideoGroupDescriptor.h"
 
 #import "extensions/NSString+Helpers.h"
 
