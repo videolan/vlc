@@ -67,7 +67,7 @@ FocusScope {
 
         width: root.width
 
-        spacing: VLCStyle.margin_xsmall
+        spacing: VLCStyle.margin_normal
 
         Widgets.SubtitleLabel {
             text: I18n.qtr("Continue Watching")
@@ -105,15 +105,8 @@ FocusScope {
                 ml: MediaLib
             }
 
-            header: Item {
-                width: VLCStyle.margin_normal
-            }
-
             delegate: VideoGridItem {
                 id: gridItem
-
-                x: selectedBorderWidth
-                y: selectedBorderWidth
 
                 pictureWidth: VLCStyle.gridCover_video_width
                 pictureHeight: VLCStyle.gridCover_video_height
@@ -162,10 +155,6 @@ FocusScope {
                         MediaLib.addAndPlay( model.id, [":restore-playback-pos=2"] )
                     }
                 }
-            }
-
-            footer: Item {
-                width: VLCStyle.margin_normal
             }
 
             onActionAtIndex: root._actionAtIndex(index)
