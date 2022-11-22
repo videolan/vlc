@@ -402,7 +402,7 @@ else
     CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
 fi
 if [ ! -z "$INSTALL_PATH" ]; then
-    CONFIGFLAGS="$CONFIGFLAGS --prefix=$INSTALL_PATH"
+    CONFIGFLAGS="$CONFIGFLAGS --with-packagedir=$INSTALL_PATH"
 fi
 
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX $CONFIGFLAGS
@@ -428,5 +428,5 @@ if [ "$ARCH" != "aarch64" ]; then
 make package-msi
 fi
 elif [ ! -z "$INSTALL_PATH" ]; then
-make package-win-install
+make package-win-common
 fi
