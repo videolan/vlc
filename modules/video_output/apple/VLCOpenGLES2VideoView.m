@@ -290,6 +290,11 @@ static void Close(vlc_gl_t *gl)
     _eaglEnabled = NO;
     vlc_mutex_unlock(&_mutex);
 
+    /* We can drop the context as fast as possible since we don't use it
+     * anymore. It avoids crashes with the context modifying destroyed
+     * resources when it is being deallocated in the main thread. */
+    _eaglContext = nil;
+
     /* This cannot be a synchronous dispatch because player is usually running
      * in the main thread and block the main thread unless we accept our fate
      * and exit here. */
