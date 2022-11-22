@@ -277,12 +277,6 @@ static void Close(vlc_gl_t *gl)
 
 - (void)detachFromWindow
 {
-    EAGLContext *previous_context = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_eaglContext];
-    glDeleteFramebuffers(1, &_frameBuffer);
-    glDeleteRenderbuffers(1, &_renderBuffer);
-    [EAGLContext setCurrentContext:previous_context];
-
     /* Flush the OpenGL pipeline before leaving. */
     vlc_mutex_lock(&_mutex);
     if (_eaglEnabled)
