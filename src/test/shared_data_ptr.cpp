@@ -78,7 +78,8 @@ static void test_assignment()
     /* ptr2 had been moved, no decrement */
     assert(mock.count == 1);
 
-    ptr = ptr; /* self-assignement should have no effect */
+    auto &ptr2 = ptr;
+    ptr = ptr2; /* self-assignement should have no effect */
     assert(mock.count == 1);
 }
 
