@@ -3245,6 +3245,14 @@ PKG_CHECK_MODULES([GL], [gl], [
       have_gl="yes"
       GL_LIBS="-lopengl32"
     ])
+    AC_CHECK_HEADERS([GL/glew.h], [
+      AC_CHECK_HEADERS([GL/wglew.h], [
+        VLC_ADD_PLUGIN([glwin32 wgl])
+      ], [], [
+        #include <windows.h>
+        #include <GL/glew.h>
+      ])
+    ], [], [#include <windows.h>])
   ])
   AC_MSG_CHECKING([for OpenGL])
   AC_MSG_RESULT([${have_gl}])
@@ -3597,17 +3605,6 @@ AC_ARG_ENABLE([directx],
   ])
 ])
 AS_IF([test "${enable_directx}" != "no"], [
-  dnl OpenGL
-  AC_CHECK_HEADERS([GL/glew.h], [
-    AC_CHECK_HEADERS([GL/wglew.h], [
-        VLC_ADD_PLUGIN([glwin32 wgl])
-      ],, [
-        #include <windows.h>
-        #include <GL/glew.h>
-      ])],, [
-      #include <windows.h>
-   ])
-
   dnl Direct3D11
   AC_CHECK_HEADERS([d3d11.h], [
     VLC_ADD_PLUGIN([direct3d11 direct3d11_filters])
