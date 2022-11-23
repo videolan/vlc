@@ -159,6 +159,18 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 #pragma mark - Flow Layout methods
 
+- (NSSize)collectionViewContentSize
+{
+    NSSize contentSize = [super collectionViewContentSize];
+
+    if (!_selectedIndexPath) {
+        return contentSize;
+    }
+
+    contentSize.height += [self currentAnimationStep];
+    return contentSize;
+}
+
 - (NSCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSCollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
