@@ -185,6 +185,23 @@ LIBVLC_API void libvlc_release( libvlc_instance_t *p_instance );
 LIBVLC_API void libvlc_retain( libvlc_instance_t *p_instance );
 
 /**
+ * Get the ABI version of the libvlc library.
+ *
+ * This is different than the VLC version, which is the version of the whole
+ * VLC package. The value is the same as LIBVLC_ABI_VERSION_INT used when
+ * compiling.
+ *
+ * \return a value with the following mask in hexadecimal
+ *  0xFF000000: major VLC version, similar to VLC major version,
+ *  0x00FF0000: major ABI version, incremented incompatible changes are added,
+ *  0x0000FF00: minor ABI version, incremented when new functions are added
+ *  0x000000FF: micro ABI version, incremented with new release/builds
+ *
+ * \note This the same value as the .so version but cross platform.
+ */
+LIBVLC_API int libvlc_abi_version(void);
+
+/**
  * Try to start a user interface for the libvlc instance.
  *
  * \param p_instance the instance

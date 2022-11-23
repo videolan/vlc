@@ -34,6 +34,10 @@
 #include <limits.h>
 #include <assert.h>
 
+int libvlc_abi_version(void)
+{
+    return LIBVLC_ABI_VERSION_INT;
+}
 
 libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
