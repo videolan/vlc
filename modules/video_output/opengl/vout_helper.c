@@ -185,7 +185,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         }
     }
 
-    /* The renderer is the only filter, for now */
     struct vlc_gl_filter *renderer_filter =
         vlc_gl_filters_Append(vgl->filters, "renderer", NULL);
     if (!renderer_filter)
