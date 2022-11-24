@@ -61,7 +61,7 @@ libvlc_la_LIBADD = ../src/libvlccore.la ../compat/libcompat.la $(LIBM)
 libvlc_la_LDFLAGS = \
 	$(LDFLAGS_libvlc) \
 	-no-undefined \
-	-version-info 12:0:0 \
+	-version-info @LIBVLC_ABI_LT_CURRENT@:@LIBVLC_ABI_LT_REVISION@:@LIBVLC_ABI_LT_AGE@ \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym
 if HAVE_WIN32
