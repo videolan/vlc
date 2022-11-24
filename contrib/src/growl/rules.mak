@@ -24,6 +24,12 @@ growl: GrowlSDK-$(GROWL_VERSION)-src.tar.gz .sum-growl
 
 .growl: growl
 	cd $< && xcodebuild $(XCODE_FLAGS) MACOSX_DEPLOYMENT_TARGET=10.7 CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" GCC_TREAT_WARNINGS_AS_ERRORS=NO -target Growl.framework -configuration Release
+
+	# Support for macOS 10.7 on intel builds
+ifeq ($(ARCH),x86_64)
+	cd $< && install_name_tool -change /System/Library/Frameworks/CFNetwork.framework/Versions/A/CFNetwork /System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices build/Release/Growl.framework/Growl
+endif
+
 	install -d $(PREFIX)
 	cd $< && mkdir -p "$(PREFIX)/Frameworks" && rm -Rf $(PREFIX)/Frameworks/Growl.framework && \
 	         cp -Rf build/Release/Growl.framework "$(PREFIX)/Frameworks"
