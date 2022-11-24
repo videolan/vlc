@@ -19,7 +19,7 @@ project("libvlc samples")
 
 # define the libvlc external build
 add_library(libvlc SHARED IMPORTED GLOBAL)
-target_include_directories(libvlc INTERFACE "${LIBVLC_SDK_INC}")
+target_include_directories(libvlc INTERFACE ${LIBVLC_SDK_INC})
 if (MSVC)
     set_target_properties(libvlc PROPERTIES IMPORTED_IMPLIB "${LIBVLC_SDK_LIB}/libvlc.lib")
 else ()
