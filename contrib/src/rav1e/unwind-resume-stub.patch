@@ -1,27 +1,55 @@
-From 30b9e63817bf60c3cab0bc6cebb073ee2344ac34 Mon Sep 17 00:00:00 2001
+From d186b5350e425a82dbd4513b5d629dc892c3c4a5 Mon Sep 17 00:00:00 2001
 From: Tristan Matthews <tmatth@videolan.org>
 Date: Fri, 25 Feb 2022 12:30:01 -0500
-Subject: [PATCH 1/1] lib: workaround for
+Subject: [PATCH] lib: workaround for
  https://github.com/rust-lang/rust/issues/79609
 
 This avoids to broken linking on some mingw32 versions. The function
 will never be called since we set `-C panic=abort`.
 ---
- src/lib.rs | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/lib.rs | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/src/lib.rs b/src/lib.rs
-index 63afa2d5..412bb0e0 100644
+index 3425588d..1b645340 100644
 --- a/src/lib.rs
 +++ b/src/lib.rs
-@@ -389,3 +389,7 @@ pub mod bench {
+@@ -486,3 +486,35 @@ pub mod bench {
  
  #[cfg(fuzzing)]
  pub mod fuzzing;
 +
 +#[no_mangle]
 +#[allow(non_snake_case)]
++fn _Unwind_GetDataRelBase() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_GetIPInfo() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_GetLanguageSpecificData() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_GetRegionStart() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_GetTextRelBase() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
 +fn _Unwind_Resume() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_SetGR() {}
++
++#[no_mangle]
++#[allow(non_snake_case)]
++fn _Unwind_SetIP() {}
 -- 
-2.32.0
+2.37.1 (Apple Git-137.1)
 
