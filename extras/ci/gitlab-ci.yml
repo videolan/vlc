@@ -46,21 +46,18 @@ variables:
         VLCARCH: win32
         HOST_ARCH: i686
         TRIPLET: $HOST_ARCH-w64-mingw32
-        WIX_PATH: '-W/home/videolan/.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin'
 
 .variables-win64: &variables-win64
         SHORTARCH: win64
         VLCARCH: win64
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
-        WIX_PATH: '-W/home/videolan/.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin'
 
 .variables-win64-arm: &variables-win64-arm
         SHORTARCH: arm64
         VLCARCH: winarm64
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
-        WIX_PATH: '-W/home/videolan/.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin'
 
 .variables-macos-x86_64: &variables-macos-x86_64
         VLC_PATH: /Users/videolanci/sandbox/bin
@@ -147,7 +144,7 @@ variables:
         if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
         fi
-        extras/package/win32/build.sh -a $HOST_ARCH $EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS "${WIX_PATH}"
+        extras/package/win32/build.sh -a $HOST_ARCH $EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
         if [ "${CI_JOB_NAME}" = "win64" ]; then
           cmake -DLIBVLC_SDK_INC:STRING=${CI_PROJECT_DIR}/include -DLIBVLC_SDK_LIB:STRING=${CI_PROJECT_DIR}/${VLCARCH}/lib/.libs -H${CI_PROJECT_DIR}/doc/libvlc -B${CI_PROJECT_DIR}/doc/libvlc/build \
                 -G Ninja -DCMAKE_C_COMPILER=${TRIPLET}-gcc -DCMAKE_CXX_COMPILER=${TRIPLET}-g++ -DCMAKE_SYSTEM_NAME=Windows
