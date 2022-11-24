@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistController;
 @class VLCPlaylistSortingMenuController;
 @class VLCFSPanelController;
+@class VLCCustomEmptyLibraryBrowseButton;
 
 typedef NS_ENUM(NSUInteger, VLCLibrarySegment) {
     VLCLibraryVideoSegment = 0,
@@ -109,6 +110,11 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, weak) IBOutlet NSButton *backwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
+
+@property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
+@property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
+@property (nonatomic, readwrite, strong) IBOutlet NSTextField *placeholderLabel;
+@property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
 
 @property (readwrite) BOOL nonembedded;
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;

@@ -84,11 +84,6 @@ static NSUserInterfaceItemIdentifier const kVLCLibraryWindowIdentifier = @"VLCLi
     NSInteger _currentSelectedViewModeSegment;
 }
 
-@property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
-@property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
-@property (nonatomic, readwrite, strong) IBOutlet NSTextField *placeholderLabel;
-@property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
-
 - (IBAction)goToBrowseSection:(id)sender;
 
 @end
