@@ -23,6 +23,7 @@ check_PROGRAMS = \
 	test_libvlc_renderer_discoverer \
 	test_libvlc_slaves \
 	test_libvlc_tracer \
+	test_libvlc_captions_to_display \
 	test_src_config_chain \
 	test_src_misc_ancillary \
 	test_src_misc_variables \
@@ -103,6 +104,8 @@ test_libvlc_media_list_SOURCES = libvlc/media_list.c
 test_libvlc_media_list_LDADD = $(LIBVLC)
 test_libvlc_media_player_SOURCES = libvlc/media_player.c
 test_libvlc_media_player_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_captions_to_display_SOURCES = libvlc/captions_to_display.c
+test_libvlc_captions_to_display_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_libvlc_media_discoverer_SOURCES = libvlc/media_discoverer.c
 test_libvlc_media_discoverer_LDADD = $(LIBVLC)
 test_libvlc_renderer_discoverer_SOURCES = libvlc/renderer_discoverer.c
