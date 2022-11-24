@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewAlbumSupplementaryDetailView.h: MacOS X interface module
+ * VLCLibraryAlbumTracksDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -21,28 +21,18 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "VLCLibraryCollectionViewSupplementaryDetailView.h"
+
+#import "library/VLCLibraryTableView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaLibraryAlbum;
-@class VLCImageView;
 
-extern NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier;
-extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
+@interface VLCLibraryAlbumTracksDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate>
 
-@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
+extern const CGFloat VLCLibraryTracksRowHeight;
 
-@property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
-@property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
-@property (readwrite, weak) IBOutlet NSTextField *albumDetailsTextField;
-@property (readwrite, weak) IBOutlet NSTextField *albumYearAndDurationTextField;
-@property (readwrite, weak) IBOutlet VLCImageView *albumArtworkImageView;
-@property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;
-@property (readwrite, weak) IBOutlet NSButton *playAlbumButton;
-
-- (IBAction)playAction:(id)sender;
-- (IBAction)enqueueAction:(id)sender;
+@property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
 
 @end
 

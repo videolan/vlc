@@ -33,7 +33,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
-#import "library/VLCLibraryAlbumTracksDataSource.h"
+#import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
 NSString *VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";

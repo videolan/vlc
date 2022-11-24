@@ -1098,18 +1098,9 @@
 			isa = PBXGroup;
 			children = (
 				5325C567292D556800B2B63A /* video-library */,
+				5325C5742930026600B2B63A /* audio-library */,
 				7DFBDCBF226DC16200B700A5 /* VLCInputItem.h */,
 				7DFBDCC0226DC16200B700A5 /* VLCInputItem.m */,
-				7DE82E7722843781002D341A /* VLCLibraryAlbumTableCellView.h */,
-				7DE82E7822843781002D341A /* VLCLibraryAlbumTableCellView.m */,
-				536283DC291146BC00640C15 /* VLCLibraryAlbumTracksDataSource.h */,
-				536283DF291146BC00640C15 /* VLCLibraryAlbumTracksDataSource.m */,
-				7DE2F0422282C84A0040DD0A /* VLCLibraryAudioDataSource.h */,
-				7DE2F0432282C84A0040DD0A /* VLCLibraryAudioDataSource.m */,
-				536283E8291146BC00640C15 /* VLCLibraryCollectionViewAlbumSupplementaryDetailView.h */,
-				536283E1291146BC00640C15 /* VLCLibraryCollectionViewAlbumSupplementaryDetailView.m */,
-				536283E7291146BC00640C15 /* VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h */,
-				536283E9291146BC00640C15 /* VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m */,
 				536283ED291146BC00640C15 /* VLCLibraryCollectionViewFlowLayout.h */,
 				536283EE291146BC00640C15 /* VLCLibraryCollectionViewFlowLayout.m */,
 				7D0F64032202047900FDB91F /* VLCLibraryCollectionViewItem.h */,
@@ -1136,8 +1127,6 @@
 				536283E2291146BC00640C15 /* VLCLibraryNavigationStack.m */,
 				536283E4291146BC00640C15 /* VLCLibraryNavigationState.h */,
 				536283EB291146BC00640C15 /* VLCLibraryNavigationState.m */,
-				536283DD291146BC00640C15 /* VLCLibrarySongTableCellView.h */,
-				536283EC291146BC00640C15 /* VLCLibrarySongTableCellView.m */,
 				7D22A8F222BC14F80063ECD2 /* VLCLibrarySortingMenuController.h */,
 				7D22A8F322BC14F80063ECD2 /* VLCLibrarySortingMenuController.m */,
 				7DE2F0452282D5D10040DD0A /* VLCLibraryTableCellView.h */,
@@ -1288,6 +1277,24 @@
 				7DFBDCAD2269ED0C00B700A5 /* VLCLibraryVideoTableViewDataSource.m */,
 			);
 			path = "video-library";
+		};
+		5325C5742930026600B2B63A /* audio-library */ = {
+			isa = PBXGroup;
+			children = (
+				7DE82E7722843781002D341A /* VLCLibraryAlbumTableCellView.h */,
+				7DE82E7822843781002D341A /* VLCLibraryAlbumTableCellView.m */,
+				536283DC291146BC00640C15 /* VLCLibraryAlbumTracksDataSource.h */,
+				536283DF291146BC00640C15 /* VLCLibraryAlbumTracksDataSource.m */,
+				7DE2F0422282C84A0040DD0A /* VLCLibraryAudioDataSource.h */,
+				7DE2F0432282C84A0040DD0A /* VLCLibraryAudioDataSource.m */,
+				536283E8291146BC00640C15 /* VLCLibraryCollectionViewAlbumSupplementaryDetailView.h */,
+				536283E1291146BC00640C15 /* VLCLibraryCollectionViewAlbumSupplementaryDetailView.m */,
+				536283E7291146BC00640C15 /* VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h */,
+				536283E9291146BC00640C15 /* VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m */,
+				536283DD291146BC00640C15 /* VLCLibrarySongTableCellView.h */,
+				536283EC291146BC00640C15 /* VLCLibrarySongTableCellView.m */,
+			);
+			path = "audio-library";
 			sourceTree = "<group>";
 		};
 		6B8224481E4D2B0500833BE1 /* Template Images */ = {

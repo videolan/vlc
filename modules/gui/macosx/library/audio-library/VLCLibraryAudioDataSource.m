@@ -31,12 +31,13 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
-#import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
-#import "library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+
+#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"

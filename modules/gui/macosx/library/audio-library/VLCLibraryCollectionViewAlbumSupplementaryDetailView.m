@@ -33,8 +33,9 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
-#import "library/VLCLibraryAlbumTracksDataSource.h"
-#import "library/VLCLibraryAlbumTableCellView.h"
+
+#import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
+#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 
 NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";

@@ -24,7 +24,8 @@
 
 #import "library/VLCLibraryDataTypes.h"
 #import "extensions/NSFont+VLCAdditions.h"
-#import "library/VLCLibraryAudioDataSource.h"
+
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
 
 NSString *const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";

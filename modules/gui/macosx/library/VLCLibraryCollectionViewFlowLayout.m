@@ -22,10 +22,11 @@
 
 #import "VLCLibraryCollectionViewFlowLayout.h"
 
-#import "VLCLibraryAudioDataSource.h"
-#import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
-#import "VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
-#import "VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
+#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 

@@ -58,20 +58,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.m \
 	gui/macosx/library/VLCInputItem.h \
 	gui/macosx/library/VLCInputItem.m \
-	gui/macosx/library/VLCLibraryAlbumTableCellView.h \
-	gui/macosx/library/VLCLibraryAlbumTableCellView.m \
-	gui/macosx/library/VLCLibraryAlbumTracksDataSource.h \
-	gui/macosx/library/VLCLibraryAlbumTracksDataSource.m \
-	gui/macosx/library/VLCLibraryAudioDataSource.h \
-	gui/macosx/library/VLCLibraryAudioDataSource.m \
 	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.h \
 	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.m \
 	gui/macosx/library/VLCLibraryCollectionViewItem.h \
 	gui/macosx/library/VLCLibraryCollectionViewItem.m \
-	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h \
-	gui/macosx/library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
-	gui/macosx/library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h \
-	gui/macosx/library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h \
 	gui/macosx/library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.m \
 	gui/macosx/library/VLCLibraryCollectionViewSupplementaryDetailView.h \
@@ -94,8 +84,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryNavigationStack.m \
 	gui/macosx/library/VLCLibraryNavigationState.h \
 	gui/macosx/library/VLCLibraryNavigationState.m \
-	gui/macosx/library/VLCLibrarySongTableCellView.h \
-	gui/macosx/library/VLCLibrarySongTableCellView.m \
 	gui/macosx/library/VLCLibrarySortingMenuController.h \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableView.h \
@@ -104,6 +92,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
+<<<<<<< HEAD
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.h \
@@ -114,6 +103,20 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.m \
+=======
+	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h \
+	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m \
+	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.h \
+	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.m \
+	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h \
+	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m \
+	gui/macosx/library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h \
+	gui/macosx/library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
+	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h \
+	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
+	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.h \
+	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.m \
+>>>>>>> 9cb892a24d (macosx: Move all audio library related classes into audio-library folder)
 	gui/macosx/main/CompatibilityFixes.h \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \

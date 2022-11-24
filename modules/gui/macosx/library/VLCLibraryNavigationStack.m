@@ -23,9 +23,11 @@
 #import "VLCLibraryNavigationStack.h"
 
 #import "VLCLibraryWindow.h"
-#import "VLCLibraryAudioDataSource.h"
 #import "VLCLibraryNavigationState.h"
 #import "VLCInputItem.h"
+
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
+
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 #import "media-source/VLCMediaSource.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h: MacOS X interface module
+ * VLCLibraryCollectionViewAlbumSupplementaryDetailView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -21,23 +21,29 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "VLCLibraryCollectionViewSupplementaryDetailView.h"
+
+#import "library/VLCLibraryCollectionViewSupplementaryDetailView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol VLCMediaLibraryAudioGroupProtocol;
+@class VLCMediaLibraryAlbum;
 @class VLCImageView;
 
-extern NSString *const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier;
-extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
+extern NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier;
+extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
 
-@interface VLCLibraryCollectionViewAudioGroupSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
+@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
 
-@property (readwrite, retain, nonatomic) id<VLCMediaLibraryAudioGroupProtocol> representedAudioGroup;
-@property (readwrite, weak) IBOutlet NSTextField *audioGroupNameTextField;
-@property (readwrite, weak) IBOutlet NSTableView *audioGroupAlbumsTableView;
-@property (readwrite, weak) IBOutlet NSClipView *tableClipView;
-@property (readwrite, weak) IBOutlet NSScrollView *tableScrollView;
+@property (readwrite, retain, nonatomic) VLCMediaLibraryAlbum *representedAlbum;
+@property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *albumDetailsTextField;
+@property (readwrite, weak) IBOutlet NSTextField *albumYearAndDurationTextField;
+@property (readwrite, weak) IBOutlet VLCImageView *albumArtworkImageView;
+@property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;
+@property (readwrite, weak) IBOutlet NSButton *playAlbumButton;
+
+- (IBAction)playAction:(id)sender;
+- (IBAction)enqueueAction:(id)sender;
 
 @end
 

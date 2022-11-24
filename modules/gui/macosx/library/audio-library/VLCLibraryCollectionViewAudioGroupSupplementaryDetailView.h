@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAlbumTracksDataSource.h: MacOS X interface module
+ * VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -22,17 +22,23 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "VLCLibraryTableView.h"
+#import "library/VLCLibraryCollectionViewSupplementaryDetailView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryAlbum;
+@protocol VLCMediaLibraryAudioGroupProtocol;
+@class VLCImageView;
 
-@interface VLCLibraryAlbumTracksDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate>
+extern NSString *const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier;
+extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
 
-extern const CGFloat VLCLibraryTracksRowHeight;
+@interface VLCLibraryCollectionViewAudioGroupSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
 
-@property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
+@property (readwrite, retain, nonatomic) id<VLCMediaLibraryAudioGroupProtocol> representedAudioGroup;
+@property (readwrite, weak) IBOutlet NSTextField *audioGroupNameTextField;
+@property (readwrite, weak) IBOutlet NSTableView *audioGroupAlbumsTableView;
+@property (readwrite, weak) IBOutlet NSClipView *tableClipView;
+@property (readwrite, weak) IBOutlet NSScrollView *tableScrollView;
 
 @end
 

@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryAlbumTracksDataSource.h"
-#import "VLCLibrarySongTableCellView.h"
+
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -31,7 +31,8 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
-#import "library/VLCLibraryAlbumTracksDataSource.h"
+#import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
+#import "library/audio-library/VLCLibrarySongTableCellView.h"
 
 const CGFloat VLCLibraryTracksRowHeight = 40.;
 

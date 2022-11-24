@@ -34,16 +34,17 @@
 #import "playlist/VLCPlaylistSortingMenuController.h"
 
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryAudioDataSource.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibrarySortingMenuController.h"
-#import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryNavigationStack.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
+
+#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/audio-library/VLCLibraryAudioDataSource.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 

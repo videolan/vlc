@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "VLCLibraryTableView.h"
+#import "library/VLCLibraryTableView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
