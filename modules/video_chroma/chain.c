@@ -53,6 +53,7 @@ vlc_module_end ()
  *****************************************************************************/
 static picture_t *Chain         ( filter_t *, picture_t * );
 static void Flush               ( filter_t * );
+static int ChainMouse           ( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p_old );
 
 static int BuildTransformChain( filter_t *p_filter );
 static int BuildChromaResize( filter_t * );
@@ -111,7 +112,6 @@ typedef struct
 {
     filter_chain_t *p_chain;
     filter_t *p_video_filter;
-    struct vlc_filter_operations custom_ops;
 } filter_sys_t;
 
 /* Restart filter callback */
@@ -151,7 +151,7 @@ static const struct filter_video_callbacks filter_video_chain_cbs =
 };
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Chain, .flush = Flush, .close = Destroy,
+    .filter_video = Chain, .flush = Flush, .video_mouse=ChainMouse, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -412,12 +412,7 @@ static int BuildFilterChain( filter_t *p_filter )
                 filter_AddProxyCallbacks( p_filter,
                                           p_sys->p_video_filter,
                                           RestartFilterCallback );
-                if (p_sys->p_video_filter->ops->video_mouse != NULL)
-                {
-                    p_sys->custom_ops = *p_sys->p_video_filter->ops;
-                    p_sys->p_video_filter->ops = &p_sys->custom_ops;
-                    p_sys->custom_ops.video_mouse = ChainMouse;
-                }
+
                 es_format_Clean( &fmt_mid );
                 i_ret = VLC_SUCCESS;
                 p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
