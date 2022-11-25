@@ -414,23 +414,21 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
         sys->frames_total_bytes -= tocopy;
         sys->timing_report_last_written_bytes += tocopy;
 
-        if (sys->timing_report_last_written_bytes >= sys->timing_report_delay_bytes)
+        int64_t pos_frames;
+        vlc_tick_t system_ts;
+        if (sys->timing_report_last_written_bytes >= sys->timing_report_delay_bytes
+         && GetFrameTimestampLocked(stream, &pos_frames, &system_ts) == VLC_SUCCESS)
         {
             sys->timing_report_last_written_bytes = 0;
 
-            int64_t pos_frames;
-            vlc_tick_t system_ts;
-            if (GetFrameTimestampLocked(stream, &pos_frames, &system_ts) == VLC_SUCCESS)
-            {
-                pos_frames -= sys->frames_flush_pos;
-                assert(pos_frames > 0);
-                vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
+            pos_frames -= sys->frames_flush_pos;
+            assert(pos_frames > 0);
+            vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
 
-                /* Add the start silence to the system time and don't subtract
-                 * it from pos_ticks to avoid (unlikely) negatives ts */
-                system_ts += BytesToTicks(sys, sys->start_silence_bytes);
-                aout_stream_TimingReport(stream, system_ts, pos_ticks);
-            }
+            /* Add the start silence to the system time and don't subtract
+             * it from pos_ticks to avoid (unlikely) negatives ts */
+            system_ts += BytesToTicks(sys, sys->start_silence_bytes);
+            aout_stream_TimingReport(stream, system_ts, pos_ticks);
         }
 
         memcpy(data, f->p_buffer, tocopy);
