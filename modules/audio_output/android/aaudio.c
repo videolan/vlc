@@ -329,10 +329,8 @@ GetFrameTimestampLocked(aout_stream_t *stream, int64_t *pos_frames,
     aaudio_result_t result =
             vt.AAudioStream_getTimestamp(sys->as, CLOCK_MONOTONIC,
                                          pos_frames, &time_ns);
-    if (result != AAUDIO_OK)
+    if (result != AAUDIO_OK || *pos_frames <= 0)
         return VLC_EGENERIC;
-
-    assert(*pos_frames > 0);
 
     *frame_time_us = VLC_TICK_FROM_NS(time_ns);
     return VLC_SUCCESS;
