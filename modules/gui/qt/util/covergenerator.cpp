@@ -26,6 +26,8 @@
 // MediaLibrary includes
 #include "medialibrary/mlhelper.hpp"
 
+#include <cmath>
+
 // Qt includes
 #include <QDir>
 #include <QImageReader>

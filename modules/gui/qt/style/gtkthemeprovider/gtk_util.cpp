@@ -30,6 +30,7 @@
 #include <stddef.h>
 
 #include <memory>
+#include <cmath>
 
 namespace gtk {
 
