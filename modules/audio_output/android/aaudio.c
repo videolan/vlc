@@ -419,6 +419,10 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
         {
             sys->timing_report_last_written_bytes = 0;
 
+            /* From now on, fetch the timestamp every 1 seconds */
+            sys->timing_report_delay_bytes =
+                TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
+
             pos_frames -= sys->frames_flush_pos;
             assert(pos_frames > 0);
             vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
@@ -578,6 +582,7 @@ Flush(aout_stream_t *stream)
     sys->first_play_date = VLC_TICK_INVALID;
     sys->start_silence_bytes = 0;
     sys->timing_report_last_written_bytes = 0;
+    sys->timing_report_delay_bytes = 0;
     sys->underrun_bytes = 0;
 
     vlc_tick_t unused;
@@ -723,8 +728,6 @@ static int OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
     sys->as = as;
     sys->fmt = *fmt;
 
-    sys->timing_report_delay_bytes = TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
-
     return VLC_SUCCESS;
 }
 
@@ -779,6 +782,7 @@ Start(aout_stream_t *stream, audio_sample_format_t *fmt,
     sys->draining = false;
     sys->first_play_date = VLC_TICK_INVALID;
     sys->timing_report_last_written_bytes = 0;
+    sys->timing_report_delay_bytes = 0;
 
     int ret = OpenAAudioStream(stream, fmt);
     if (ret != VLC_SUCCESS)
