@@ -465,6 +465,8 @@ picture_t *picture_InternalClone(picture_t *picture,
 picture_t *picture_Clone(picture_t *picture)
 {
     picture_t *clone = picture_InternalClone(picture, picture_DestroyClone, picture);
+    if (clone == NULL)
+        return NULL;
 
     const picture_priv_t *priv = container_of(picture, picture_priv_t, picture);
     picture_priv_t *clone_priv = container_of(clone, picture_priv_t, picture);
