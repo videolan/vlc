@@ -38,19 +38,25 @@ FocusScope {
         text: model.text || ""
     }
 
-    readonly property int extraMargin: Math.max(0, view.width - usedRowSpace) / 2 + sectionWidth
+    // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own
+    //       margins implementation like in ExpandGridView. The default values should be the same
+    //       than ExpandGridView to respect the grid parti pris.
+    property int leftMargin: VLCStyle.margin_normal
+    property int rightMargin: VLCStyle.margin_normal
+
+    readonly property int extraMargin: Math.max(0, (width - usedRowSpace) / 2)
 
     // NOTE: The list margins for the item(s) horizontal positioning.
-    readonly property int contentLeftMargin: extraMargin + view.leftMargin
-    readonly property int contentRightMargin: extraMargin + view.rightMargin
-
-    readonly property real sectionWidth: !!section.property ? VLCStyle.table_section_width : 0
+    readonly property int contentLeftMargin: extraMargin + leftMargin
+    readonly property int contentRightMargin: extraMargin + rightMargin
 
     readonly property real usedRowSpace: {
-        var s = 0
+        var size = leftMargin + rightMargin
+
         for (var i in sortModel)
-            s += sortModel[i].width + root.horizontalSpacing
-        return s + root._contextButtonHorizontalSpace + (VLCStyle.margin_xxxsmall * 2)
+            size += sortModel[i].width
+
+        return size + Math.max(VLCStyle.column_margin_width * (sortModel.length - 1), 0)
     }
 
     property Component header: Item{}
@@ -60,15 +66,12 @@ FocusScope {
 
     property Util.SelectableDelegateModel selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
-    readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal
     property int horizontalSpacing: VLCStyle.column_margin_width
 
     property real availableRowWidth: 0
     property real _availabeRowWidthLastUpdateTime: Date.now()
-    readonly property real _currentAvailableRowWidth: root.width
-                                                      - root.sectionWidth * 2
-                                                      - (root.horizontalSpacing + _contextButtonHorizontalSpace)
-                                                      - (VLCStyle.margin_xxxsmall * 2)
+
+    readonly property real _currentAvailableRowWidth: width - leftMargin - rightMargin
 
     property Item dragItem
     property bool acceptDrop: false
@@ -77,8 +80,6 @@ FocusScope {
 
     property alias topMargin: view.topMargin
     property alias bottomMargin: view.bottomMargin
-    property alias leftMargin: view.leftMargin
-    property alias rightMargin: view.rightMargin
 
     property alias spacing: view.spacing
 
@@ -227,9 +228,19 @@ FocusScope {
 
         anchors.fill: parent
 
+        contentWidth: root.width - root.contentLeftMargin - root.contentRightMargin
+
         focus: true
 
         headerPositioning: ListView.OverlayHeader
+
+        flickableDirection: Flickable.AutoFlickDirection
+
+        Navigation.parentItem: root
+
+        onSelectAll: selectionDelegateModel.selectAll()
+        onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+        onActionAtIndex: root.actionForSelection( selectionDelegateModel.selectedIndexes )
 
         onDeselectAll: {
             if (selectionDelegateModel) {
@@ -243,12 +254,9 @@ FocusScope {
         }
 
         header: Rectangle {
-
-            readonly property alias contentX: row.x
-            readonly property alias contentWidth: row.width
             property alias loadedHeader: headerLoader.item
 
-            width: Math.max(view.width, root.usedRowSpace + root.sectionWidth)
+            width: view.width
             height: col.height
             color: headerColor
             visible: view.count > 0
@@ -261,11 +269,14 @@ FocusScope {
             onHeightChanged: if (root.contentY < 0) root.positionViewAtBeginning()
 
             Widgets.ListLabel {
-                x: contentX - VLCStyle.table_section_width
-                y: row.y
                 height: row.height
+
+                // NOTE: We want the section label to be slightly shifted to the left.
+                x: row.x - VLCStyle.margin_small
+                y: row.y
+
                 topPadding: root.headerTopPadding
-                leftPadding: VLCStyle.table_section_text_margin
+
                 text: view.currentSection
                 color: VLCStyle.colors.accent
                 verticalAlignment: Text.AlignTop
@@ -289,9 +300,12 @@ FocusScope {
                 Row {
                     id: row
 
-                    x: root.extraMargin
-                    leftPadding: VLCStyle.margin_xxxsmall
-                    rightPadding: VLCStyle.margin_xxxsmall
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    anchors.leftMargin: root.contentLeftMargin
+                    anchors.rightMargin: root.contentRightMargin
+
                     topPadding: root.headerTopPadding
                     bottomPadding: VLCStyle.margin_xsmall
 
@@ -342,11 +356,13 @@ FocusScope {
         }
 
         section.delegate: Widgets.ListLabel {
-            x: (view.headerItem ? view.headerItem.contentX : 0) - VLCStyle.table_section_width
+            // NOTE: We want the section label to be slightly shifted to the left.
+            leftPadding: root.contentLeftMargin - VLCStyle.margin_small
+
             topPadding: VLCStyle.margin_xsmall
-            bottomPadding: VLCStyle.margin_xxsmall
-            leftPadding: VLCStyle.table_section_text_margin
+
             text: section
+
             color: VLCStyle.colors.accent
         }
 
@@ -357,7 +373,9 @@ FocusScope {
             height: root.rowHeight
 
             horizontalSpacing: root.horizontalSpacing
-            leftPadding: root.extraMargin
+
+            leftPadding: root.contentLeftMargin
+            rightPadding: root.contentRightMargin
 
             dragItem: root.dragItem
 
@@ -396,14 +414,5 @@ FocusScope {
                 }
             }
         }
-
-        flickableDirection: Flickable.AutoFlickDirection
-        contentWidth: root.usedRowSpace + root.sectionWidth
-
-        onSelectAll: selectionDelegateModel.selectAll()
-        onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: root.actionForSelection( selectionDelegateModel.selectedIndexes )
-
-        Navigation.parentItem: root
     }
 }
