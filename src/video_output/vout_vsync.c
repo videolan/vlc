@@ -164,8 +164,6 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
             NextPicture(scheduler);
             priv->state.current = VOUT_STATE_CONTROL;
 
-            msg_Warn(obj, " -- DROPPING FIRST CONDITION");
-
             return;
         }
 
@@ -184,7 +182,6 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
              * In particular, the state machine will always run into the
              * VOUT_STATE_IDLE state as long as no VSYNC has happened. */
             priv->state.current = VOUT_STATE_IDLE;
-            msg_Warn(obj, " -- DROPPING SECOND CONDITION: %s", error);
             return;
         }
 
@@ -198,16 +195,15 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
         // TODO: why the condition on vsync_date and system_now here ?
         if (new_next_pts < vsync_date)// || system_now + render_delay > vsync_date)
         {
-            if (!priv->displayed.current_rendered)
-            msg_Dbg((vlc_object_t*)vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms",
+            //if (!priv->displayed.current_rendered)
+            /*msg_Dbg((vlc_object_t*)vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms",
                 (int)MS_FROM_VLC_TICK(vsync_date - new_next_pts),
                 (int)MS_FROM_VLC_TICK(render_delay),
                 (int)MS_FROM_VLC_TICK(new_next_pts),
-                (int)MS_FROM_VLC_TICK(vsync_date));
+                (int)MS_FROM_VLC_TICK(vsync_date));*/
             picture_Release(priv->displayed.current);
             NextPicture(scheduler);
             priv->state.current = VOUT_STATE_CONTROL;
-            msg_Warn(obj, " -- DROPPING THIRD CONDITION");
 
             return;
         }
@@ -252,14 +248,12 @@ static void *StateMachine(void *object)
         {
             /* For now, just suspend the runloop to set the state machine paused. */
             case VOUT_STATE_IDLE:
-                msg_Info(obj, "STATE: IDLE");
                 while (priv->state.current == VOUT_STATE_IDLE &&
                        !priv->state.terminated)
                     vlc_cond_wait(&priv->state.cond_update, &priv->state.lock);
                 break;
 
             case VOUT_STATE_CONTROL: {
-                msg_Info(obj, "STATE: CONTROL");
                 // TODO: submit a control task? remove and replace by cond wait?
                 //vlc_executor_Submit(scheduler->executor, &task->runnable);
 
@@ -290,7 +284,6 @@ static void *StateMachine(void *object)
             }
 
             case VOUT_STATE_PREPARE: {
-                msg_Info(obj, "STATE: PREPARE (next=%p)", priv->displayed.next);
                 // TODO: submit a prepare task?
                 //vlc_executor_Submit(scheduler->executor, &task->runnable);
 
@@ -338,7 +331,6 @@ static void *StateMachine(void *object)
             }
 
             case VOUT_STATE_SAMPLE: {
-                msg_Info(obj, "STATE: SAMPLE");
                 // TODO: submit a task to call vlc_vout_scheduler_RenderPicture or DisplayPicture
                 //vlc_executor_Submit(scheduler->executor, &task->runnable);
 
@@ -359,7 +351,6 @@ static void *StateMachine(void *object)
 
 
             case VOUT_STATE_DISPLAY: {
-                msg_Info(obj, "STATE: DISPLAY");
                 // TODO: task, but the frames must be ready?
                 //vlc_executor_Submit(scheduler->executor, &task->runnable);
                 assert(priv->displayed.current);
@@ -410,7 +401,6 @@ PutPicture(struct vlc_vout_scheduler *scheduler, picture_t *picture)
         container_of(scheduler, struct vlc_vout_vsync_priv, impl);
     vlc_object_t *obj = (vlc_object_t*)priv->vout;
 
-    msg_Err(obj, " -- PUT PICTURE");
     vlc_mutex_lock(&priv->state.lock);
     if (priv->state.current == VOUT_STATE_IDLE)
         priv->state.current = VOUT_STATE_CONTROL;
@@ -424,7 +414,6 @@ SignalVSYNC(struct vlc_vout_scheduler *scheduler, vlc_tick_t next_ts)
     struct vlc_vout_vsync_priv *priv =
         container_of(scheduler, struct vlc_vout_vsync_priv, impl);
     vlc_object_t *obj = (vlc_object_t*)priv->vout;
-    msg_Err(obj, " -- VSYNC SIGNAL");
 
     vlc_mutex_lock(&priv->state.lock);
     if (priv->state.current == VOUT_STATE_IDLE)
@@ -438,10 +427,13 @@ SignalVSYNC(struct vlc_vout_scheduler *scheduler, vlc_tick_t next_ts)
     vlc_cond_signal(&priv->state.cond_update);
     vlc_mutex_unlock(&priv->state.lock);
 
+#if 0
     msg_Info(obj, "New vsync date, period=%dms offset=%dms",
              (int)MS_FROM_VLC_TICK(next_ts - now),
              (int)MS_FROM_VLC_TICK(offset));
+#endif
 
+#if 1
     static vlc_tick_t last_offset = -1;
 
     if (  last_offset != -1
@@ -452,6 +444,7 @@ SignalVSYNC(struct vlc_vout_scheduler *scheduler, vlc_tick_t next_ts)
     }
 
     last_offset = offset;
+#endif
 }
 
 struct vlc_vout_scheduler *
@@ -462,8 +455,6 @@ vlc_vout_scheduler_NewVSYNC(vout_thread_t *vout, vlc_clock_t *clock,
 {
     struct vlc_vout_vsync_priv *priv = malloc(sizeof *priv);
     struct vlc_vout_scheduler *scheduler = &priv->impl;
-
-    msg_Info((vlc_object_t*)vout, "USING VSYNC");
 
     static const struct vlc_vout_scheduler_operations ops =
     {
