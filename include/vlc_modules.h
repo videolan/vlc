@@ -200,6 +200,16 @@ VLC_API bool module_provides(const module_t *m, const char *cap);
  */
 VLC_API const char * module_get_object(const module_t *m) VLC_USED;
 
+
+/**
+ * Gets the shortcut names of a module.
+ *
+ * \param m the module
+ * \param n [OUT] pointer to the number of shortcuts
+ * \return the module name
+ */
+VLC_API const char **module_get_shortcuts(const module_t *m, size_t *n) VLC_USED;
+
 /**
  * Gets the human-friendly name of a module.
  *

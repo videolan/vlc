@@ -611,28 +611,50 @@ static int get_filter_str( vlc_object_t *p_parent, const char *psz_name,
 {
     char *psz_parser;
     char *psz_string;
-    const char *psz_filter_type;
+    const char *psz_filter_type = NULL;
 
-    module_t *p_obj = module_find( psz_name );
-    if( !p_obj )
+    size_t sz_modules, sz_shortcuts;
+    module_t **list = module_list_get (&sz_modules);
+    module_t *p_obj = NULL;
+    for (size_t i = 0; i < sz_modules; i++)
     {
-        msg_Err( p_parent, "Unable to find filter module \"%s\".", psz_name );
-        return VLC_EGENERIC;
+        module_t *module = list[i];
+        const char **shortcuts_list = module_get_shortcuts(module, &sz_shortcuts);
+        if ( shortcuts_list == NULL )
+            continue;
+        
+        for (size_t i = 0; i < sz_shortcuts; i++) 
+        {
+            const char *shortcut = shortcuts_list[i];
+            if ( !strcmp( shortcut, psz_name ) )
+            {
+                if( module_provides( module, "video filter" ) )
+                {
+                    psz_filter_type = "video-filter";
+                }
+                else if( module_provides( module, "sub source" ) )
+                {
+                    psz_filter_type = "sub-source";
+                }
+                else if( module_provides( module, "sub filter" ) )
+                {
+                    psz_filter_type = "sub-filter";
+                }
+            }
+
+            if ( psz_filter_type )
+                break;
+        }
+
+        if ( psz_filter_type ) {
+            p_obj = module;
+            break;
+        }
     }
 
-    if( module_provides( p_obj, "video filter" ) )
-    {
-        psz_filter_type = "video-filter";
-    }
-    else if( module_provides( p_obj, "sub source" ) )
-    {
-        psz_filter_type = "sub-source";
-    }
-    else if( module_provides( p_obj, "sub filter" ) )
-    {
-        psz_filter_type = "sub-filter";
-    }
-    else
+    module_list_free (list);
+    
+    if ( p_obj == NULL )
     {
         msg_Err( p_parent, "Unknown video filter type." );
         return VLC_EGENERIC;

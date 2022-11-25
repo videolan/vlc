@@ -54,6 +54,18 @@ const char *module_get_object( const module_t *m )
     return m->pp_shortcuts[0];
 }
 
+const char **module_get_shortcuts(const module_t *m, size_t *n)
+{
+    assert (m != NULL);
+    assert (n != NULL);
+    *n = m->i_shortcuts;
+
+    if (unlikely(m->i_shortcuts == 0))
+        return NULL;
+
+    return m->pp_shortcuts;
+}
+
 const char *module_get_name( const module_t *m, bool long_name )
 {
     if( long_name && ( m->psz_longname != NULL) )
