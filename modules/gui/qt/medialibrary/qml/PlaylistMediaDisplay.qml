@@ -123,13 +123,15 @@ FocusScope {
     Widgets.SubtitleLabel {
         id: label
 
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.top: parent.top
+
+        anchors.leftMargin: view.contentLeftMargin
+        anchors.rightMargin: view.contentRightMargin
 
         anchors.topMargin: VLCStyle.margin_normal
 
-        width: root.width
-
-        leftPadding  : VLCStyle.margin_xlarge
         bottomPadding: VLCStyle.margin_xsmall
 
         text: initialName
