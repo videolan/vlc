@@ -123,19 +123,14 @@ typedef struct
     bool b_error; /* generic error */
 
     struct {
-        uint64_t i_read;    /* Number of bytes read */
-        uint64_t i_write;   /* Number of bytes written */
-        size_t i_size;      /* Size of the circular buffer in bytes */
-        union {
-            jbyteArray p_bytearray;
-            jfloatArray p_floatarray;
-            jshortArray p_shortarray;
-            struct {
-                uint8_t *p_data;
-                jobject p_obj;
-            } bytebuffer;
-        } u;
-    } circular;
+        size_t offset;
+        size_t size;
+        size_t maxsize;
+        jobject array;
+    } jbuffer;
+
+    vlc_frame_t *frame_chain;
+    vlc_frame_t **frame_last;
 } aout_sys_t;
 
 
@@ -820,9 +815,12 @@ TimeGet( aout_stream_t *stream, vlc_tick_t *restrict p_delay )
                         - i_audiotrack_us;
         if( i_delay >= 0 )
         {
-            /* Circular buffer delay */
-            i_delay += BYTES_TO_US( p_sys->circular.i_write
-                                    - p_sys->circular.i_read );
+            /* Frame FIFO + jarray delay */
+            size_t total_size;
+            vlc_frame_ChainProperties(p_sys->frame_chain, NULL, &total_size, NULL);
+            i_delay += BYTES_TO_US(total_size + p_sys->jbuffer.size
+                                   - p_sys->jbuffer.offset);
+
             *p_delay = i_delay;
             vlc_mutex_unlock( &p_sys->lock );
             return 0;
@@ -1384,7 +1382,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
 
     aout_FormatPrint( stream, "VLC is looking for:", &p_sys->fmt );
 
-    bool low_latency = false;
     if (p_sys->fmt.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
     {
         p_sys->fmt.channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
@@ -1392,7 +1389,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
         /* TODO: detect sink channel layout */
         p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
         aout_FormatPrepare(&p_sys->fmt);
-        low_latency = true;
     }
 
     if( AOUT_FMT_LINEAR( &p_sys->fmt ) )
@@ -1429,6 +1425,11 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
     }
 #endif
 
+    p_sys->jbuffer.array = NULL;
+    p_sys->jbuffer.size = p_sys->jbuffer.offset = 0;
+    p_sys->jbuffer.maxsize = 0;
+    p_sys->frame_chain = NULL;
+    p_sys->frame_last = &p_sys->frame_chain;
     AudioTrack_Reset( env, stream );
 
     if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
@@ -1456,89 +1457,6 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
     {
         msg_Dbg( stream, "using WRITE_BYTEARRAY");
         p_sys->i_write_type = WRITE_BYTEARRAY;
-    }
-
-    p_sys->circular.i_read = p_sys->circular.i_write = 0;
-    p_sys->circular.i_size = (int)p_sys->fmt.i_rate
-                           * p_sys->fmt.i_bytes_per_frame
-                           / p_sys->fmt.i_frame_length;
-    if (low_latency)
-    {
-        /* 40 ms of buffering */
-        p_sys->circular.i_size = p_sys->circular.i_size / 25;
-    }
-    else
-    {
-        /* 2 seconds of buffering */
-        p_sys->circular.i_size = samples_from_vlc_tick(AOUT_MAX_PREPARE_TIME, p_sys->circular.i_size);
-    }
-
-    /* Allocate circular buffer */
-    switch( p_sys->i_write_type )
-    {
-        case WRITE_BYTEARRAY:
-        case WRITE_BYTEARRAYV23:
-        {
-            jbyteArray p_bytearray;
-
-            p_bytearray = (*env)->NewByteArray( env, p_sys->circular.i_size );
-            if( p_bytearray )
-            {
-                p_sys->circular.u.p_bytearray = (*env)->NewGlobalRef( env, p_bytearray );
-                (*env)->DeleteLocalRef( env, p_bytearray );
-            }
-
-            if( !p_sys->circular.u.p_bytearray )
-            {
-                msg_Err(stream, "byte array allocation failed");
-                goto error;
-            }
-            break;
-        }
-        case WRITE_SHORTARRAYV23:
-        {
-            jshortArray p_shortarray;
-
-            p_shortarray = (*env)->NewShortArray( env,
-                                                  p_sys->circular.i_size / 2 );
-            if( p_shortarray )
-            {
-                p_sys->circular.u.p_shortarray = (*env)->NewGlobalRef( env, p_shortarray );
-                (*env)->DeleteLocalRef( env, p_shortarray );
-            }
-            if( !p_sys->circular.u.p_shortarray )
-            {
-                msg_Err(stream, "short array allocation failed");
-                goto error;
-            }
-            break;
-        }
-        case WRITE_FLOATARRAY:
-        {
-            jfloatArray p_floatarray;
-
-            p_floatarray = (*env)->NewFloatArray( env,
-                                                  p_sys->circular.i_size / 4 );
-            if( p_floatarray )
-            {
-                p_sys->circular.u.p_floatarray = (*env)->NewGlobalRef( env, p_floatarray );
-                (*env)->DeleteLocalRef( env, p_floatarray );
-            }
-            if( !p_sys->circular.u.p_floatarray )
-            {
-                msg_Err(stream, "float array allocation failed");
-                goto error;
-            }
-            break;
-        }
-        case WRITE_BYTEBUFFER:
-            p_sys->circular.u.bytebuffer.p_data = malloc( p_sys->circular.i_size );
-            if( !p_sys->circular.u.bytebuffer.p_data )
-            {
-                msg_Err(stream, "bytebuffer allocation failed");
-                goto error;
-            }
-            break;
     }
 
     /* Run AudioTrack_Thread */
@@ -1613,28 +1531,48 @@ Stop( aout_stream_t *stream )
     if( p_sys->timestamp.p_obj )
         (*env)->DeleteGlobalRef( env, p_sys->timestamp.p_obj );
 
-    /* Release the Circular buffer data */
-    switch( p_sys->i_write_type )
+    free( p_sys );
+}
+
+static void
+AudioTrack_ConsumeFrame(aout_stream_t *stream, vlc_frame_t *f)
+{
+    aout_sys_t *p_sys = stream->sys;
+    assert(f != NULL && f == p_sys->frame_chain);
+
+    p_sys->frame_chain = f->p_next;
+    if (p_sys->frame_chain == NULL)
+        p_sys->frame_last = &p_sys->frame_chain;
+
+    vlc_frame_Release(f);
+}
+
+static int
+AudioTrack_AllocJArray(JNIEnv *env, aout_stream_t *stream, size_t size,
+                       jarray (*new)(JNIEnv *env, jsize size))
+{
+    aout_sys_t *p_sys = stream->sys;
+
+    if (size > p_sys->jbuffer.maxsize)
     {
-    case WRITE_BYTEARRAY:
-    case WRITE_BYTEARRAYV23:
-        if( p_sys->circular.u.p_bytearray )
-            (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_bytearray );
-        break;
-    case WRITE_SHORTARRAYV23:
-        if( p_sys->circular.u.p_shortarray )
-            (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_shortarray );
-        break;
-    case WRITE_FLOATARRAY:
-        if( p_sys->circular.u.p_floatarray )
-            (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_floatarray );
-        break;
-    case WRITE_BYTEBUFFER:
-        free( p_sys->circular.u.bytebuffer.p_data );
-        break;
+        p_sys->jbuffer.maxsize = 0;
+        if (p_sys->jbuffer.array != NULL)
+            (*env)->DeleteLocalRef(env, p_sys->jbuffer.array);
+
+        p_sys->jbuffer.array = new(env, size);
+        if (p_sys->jbuffer.array != NULL)
+            p_sys->jbuffer.maxsize = size;
+        else
+            msg_Err(stream, "jarray allocation failed");
     }
 
-    free( p_sys );
+    if (p_sys->jbuffer.array == NULL)
+        return jfields.AudioTrack.ERROR;
+
+    p_sys->jbuffer.size = size;
+    p_sys->jbuffer.offset = 0;
+
+    return 0;
 }
 
 /**
@@ -1643,14 +1581,27 @@ Stop( aout_stream_t *stream )
  * that we won't wait in AudioTrack.write() method.
  */
 static int
-AudioTrack_WriteByteArray( JNIEnv *env, aout_stream_t *stream,
-                           size_t i_data_size, size_t i_data_offset,
-                           bool b_force )
+AudioTrack_WriteByteArray( JNIEnv *env, aout_stream_t *stream, bool b_force )
 {
     aout_sys_t *p_sys = stream->sys;
     uint64_t i_samples;
     uint64_t i_audiotrack_pos;
     uint64_t i_samples_pending;
+
+    int ret;
+    if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
+    {
+        vlc_frame_t *f = p_sys->frame_chain;
+        assert(f != NULL);
+        ret = AudioTrack_AllocJArray(env, stream, f->i_buffer,
+                                     (*env)->NewByteArray);
+        if (ret != 0)
+            return ret;
+
+        (*env)->SetByteArrayRegion(env, p_sys->jbuffer.array,
+                                   0, f->i_buffer, (jbyte *)f->p_buffer);
+        AudioTrack_ConsumeFrame(stream, f);
+    }
 
     i_audiotrack_pos = AudioTrack_getPlaybackHeadPosition( env, stream );
 
@@ -1673,12 +1624,14 @@ AudioTrack_WriteByteArray( JNIEnv *env, aout_stream_t *stream,
         return 0;
 
     i_samples = __MIN( p_sys->i_max_audiotrack_samples - i_samples_pending,
-                       BYTES_TO_FRAMES( i_data_size ) );
+                       BYTES_TO_FRAMES(p_sys->jbuffer.size - p_sys->jbuffer.offset));
 
-    i_data_size = FRAMES_TO_BYTES( i_samples );
+    ret = JNI_AT_CALL_INT( write, p_sys->jbuffer.array, p_sys->jbuffer.offset,
+                           FRAMES_TO_BYTES( i_samples ) );
+    if (ret > 0)
+        p_sys->jbuffer.offset += ret;
 
-    return JNI_AT_CALL_INT( write, p_sys->circular.u.p_bytearray,
-                            i_data_offset, i_data_size );
+    return ret;
 }
 
 /**
@@ -1687,14 +1640,33 @@ AudioTrack_WriteByteArray( JNIEnv *env, aout_stream_t *stream,
  * flags.
  */
 static int
-AudioTrack_WriteByteArrayV23( JNIEnv *env, aout_stream_t *stream,
-                              size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteByteArrayV23(JNIEnv *env, aout_stream_t *stream)
 {
     aout_sys_t *p_sys = stream->sys;
 
-    return JNI_AT_CALL_INT( writeV23, p_sys->circular.u.p_bytearray,
-                            i_data_offset, i_data_size,
-                            jfields.AudioTrack.WRITE_NON_BLOCKING );
+    int ret;
+    if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
+    {
+        vlc_frame_t *f = p_sys->frame_chain;
+        assert(f != NULL);
+        ret = AudioTrack_AllocJArray(env, stream, f->i_buffer,
+                                     (*env)->NewByteArray);
+        if (ret != 0)
+            return ret;
+
+        (*env)->SetByteArrayRegion(env, p_sys->jbuffer.array,
+                                   0, f->i_buffer, (jbyte *)f->p_buffer);
+        AudioTrack_ConsumeFrame(stream, f);
+    }
+
+    ret = JNI_AT_CALL_INT( writeV23, p_sys->jbuffer.array,
+                           p_sys->jbuffer.offset,
+                           p_sys->jbuffer.size - p_sys->jbuffer.offset,
+                           jfields.AudioTrack.WRITE_NON_BLOCKING );
+    if (ret > 0)
+        p_sys->jbuffer.offset += ret;
+
+    return ret;
 }
 
 /**
@@ -1703,35 +1675,44 @@ AudioTrack_WriteByteArrayV23( JNIEnv *env, aout_stream_t *stream,
  * flags.
  */
 static int
-AudioTrack_WriteByteBuffer( JNIEnv *env, aout_stream_t *stream,
-                            size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteByteBuffer(JNIEnv *env, aout_stream_t *stream)
 {
     aout_sys_t *p_sys = stream->sys;
 
-    /* The same DirectByteBuffer will be used until the data_offset reaches 0.
-     * The internal position of this buffer is moved by the writeBufferV21
-     * wall. */
-    if( i_data_offset == 0 )
+    if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
     {
-        /* No need to get a global ref, this object will be only used from the
-         * same Thread */
-        if( p_sys->circular.u.bytebuffer.p_obj )
-            (*env)->DeleteLocalRef( env, p_sys->circular.u.bytebuffer.p_obj );
-
-        p_sys->circular.u.bytebuffer.p_obj = (*env)->NewDirectByteBuffer( env,
-                                            p_sys->circular.u.bytebuffer.p_data,
-                                            p_sys->circular.i_size );
-        if( !p_sys->circular.u.bytebuffer.p_obj )
+        vlc_frame_t *f = p_sys->frame_chain;
+        assert(f != NULL);
+        if (p_sys->jbuffer.array != NULL)
+            (*env)->DeleteLocalRef(env, p_sys->jbuffer.array);
+        p_sys->jbuffer.array = (*env)->NewDirectByteBuffer(env,
+                                                           f->p_buffer,
+                                                           f->i_buffer);
+        if (p_sys->jbuffer.array == NULL)
         {
-            if( (*env)->ExceptionCheck( env ) )
-                (*env)->ExceptionClear( env );
+            if ((*env)->ExceptionCheck(env))
+                (*env)->ExceptionClear(env);
             return jfields.AudioTrack.ERROR;
         }
+        p_sys->jbuffer.offset = 0;
+        p_sys->jbuffer.size = f->i_buffer;
+        /* Don't take account of the current frame for the delay */
+        f->i_buffer = 0;
     }
 
-    return JNI_AT_CALL_INT( writeBufferV21, p_sys->circular.u.bytebuffer.p_obj,
-                            i_data_size,
-                            jfields.AudioTrack.WRITE_NON_BLOCKING );
+    int ret = JNI_AT_CALL_INT(writeBufferV21, p_sys->jbuffer.array,
+                              p_sys->jbuffer.size - p_sys->jbuffer.offset,
+                              jfields.AudioTrack.WRITE_NON_BLOCKING);
+    if (ret > 0)
+    {
+        p_sys->jbuffer.offset += ret;
+        /* The ByteBuffer reference directly the data from the frame, so it
+         * should stay allocated until all the data is written */
+        if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
+            AudioTrack_ConsumeFrame(stream, p_sys->frame_chain);
+    }
+
+    return ret;
 }
 
 /**
@@ -1740,19 +1721,36 @@ AudioTrack_WriteByteBuffer( JNIEnv *env, aout_stream_t *stream,
  * flags.
  */
 static int
-AudioTrack_WriteShortArrayV23( JNIEnv *env, aout_stream_t *stream,
-                               size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteShortArrayV23(JNIEnv *env, aout_stream_t *stream)
 {
     aout_sys_t *p_sys = stream->sys;
-    int i_ret;
 
-    i_ret = JNI_AT_CALL_INT( writeShortV23, p_sys->circular.u.p_shortarray,
-                             i_data_offset / 2, i_data_size / 2,
-                             jfields.AudioTrack.WRITE_NON_BLOCKING );
-    if( i_ret < 0 )
-        return i_ret;
-    else
-        return i_ret * 2;
+    int ret;
+    if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
+    {
+        vlc_frame_t *f = p_sys->frame_chain;
+        assert(f != NULL);
+        ret = AudioTrack_AllocJArray(env, stream, f->i_buffer / 2,
+                                     (*env)->NewShortArray);
+        if (ret != 0)
+            return ret;
+
+        (*env)->SetShortArrayRegion(env, p_sys->jbuffer.array,
+                                    0, f->i_buffer / 2, (jshort *)f->p_buffer);
+        AudioTrack_ConsumeFrame(stream, f);
+    }
+
+    ret = JNI_AT_CALL_INT( writeShortV23, p_sys->jbuffer.array,
+                           p_sys->jbuffer.offset,
+                           p_sys->jbuffer.size - p_sys->jbuffer.offset,
+                           jfields.AudioTrack.WRITE_NON_BLOCKING );
+    if (ret > 0)
+    {
+        p_sys->jbuffer.offset += ret;
+        ret *= 2;
+    }
+
+    return ret;
 }
 
 /**
@@ -1761,24 +1759,41 @@ AudioTrack_WriteShortArrayV23( JNIEnv *env, aout_stream_t *stream,
  * flags.
  */
 static int
-AudioTrack_WriteFloatArray( JNIEnv *env, aout_stream_t *stream,
-                            size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteFloatArray(JNIEnv *env, aout_stream_t *stream)
 {
     aout_sys_t *p_sys = stream->sys;
-    int i_ret;
+    int ret;
 
-    i_ret = JNI_AT_CALL_INT( writeFloat, p_sys->circular.u.p_floatarray,
-                             i_data_offset / 4, i_data_size / 4,
-                             jfields.AudioTrack.WRITE_NON_BLOCKING );
-    if( i_ret < 0 )
-        return i_ret;
-    else
-        return i_ret * 4;
+    if (p_sys->jbuffer.offset == p_sys->jbuffer.size)
+    {
+        vlc_frame_t *f = p_sys->frame_chain;
+        assert(f != NULL);
+        ret = AudioTrack_AllocJArray(env, stream, f->i_buffer / 4,
+                                     (*env)->NewFloatArray);
+        if (ret != 0)
+            return ret;
+
+        (*env)->SetFloatArrayRegion(env, p_sys->jbuffer.array,
+                                   0, f->i_buffer / 4, (jfloat *)f->p_buffer);
+        AudioTrack_ConsumeFrame(stream, f);
+    }
+
+    ret = JNI_AT_CALL_INT(writeFloat, p_sys->jbuffer.array,
+                          p_sys->jbuffer.offset,
+                          p_sys->jbuffer.size - p_sys->jbuffer.offset,
+                          jfields.AudioTrack.WRITE_NON_BLOCKING);
+
+    if (ret > 0)
+    {
+        p_sys->jbuffer.offset += ret;
+        ret *= 4;
+    }
+
+    return ret;
 }
 
 static int
-AudioTrack_Write( JNIEnv *env, aout_stream_t *stream, size_t i_data_size,
-                  size_t i_data_offset, bool b_force )
+AudioTrack_Write( JNIEnv *env, aout_stream_t *stream, bool b_force )
 {
     aout_sys_t *p_sys = stream->sys;
     int i_ret;
@@ -1786,24 +1801,19 @@ AudioTrack_Write( JNIEnv *env, aout_stream_t *stream, size_t i_data_size,
     switch( p_sys->i_write_type )
     {
     case WRITE_BYTEARRAYV23:
-        i_ret = AudioTrack_WriteByteArrayV23( env, stream, i_data_size,
-                                              i_data_offset );
+        i_ret = AudioTrack_WriteByteArrayV23(env, stream);
         break;
     case WRITE_BYTEBUFFER:
-        i_ret = AudioTrack_WriteByteBuffer( env, stream, i_data_size,
-                                            i_data_offset );
+        i_ret = AudioTrack_WriteByteBuffer(env, stream);
         break;
     case WRITE_SHORTARRAYV23:
-        i_ret = AudioTrack_WriteShortArrayV23( env, stream, i_data_size,
-                                               i_data_offset );
+        i_ret = AudioTrack_WriteShortArrayV23(env, stream);
         break;
     case WRITE_BYTEARRAY:
-        i_ret = AudioTrack_WriteByteArray( env, stream, i_data_size,
-                                           i_data_offset, b_force );
+        i_ret = AudioTrack_WriteByteArray(env, stream, b_force);
         break;
     case WRITE_FLOATARRAY:
-        i_ret = AudioTrack_WriteFloatArray( env, stream, i_data_size,
-                                            i_data_offset );
+        i_ret = AudioTrack_WriteFloatArray(env, stream);
         break;
     default:
         vlc_assert_unreachable();
@@ -1839,7 +1849,7 @@ AudioTrack_Write( JNIEnv *env, aout_stream_t *stream, size_t i_data_size,
 }
 
 /**
- * This thread will play the data coming from the circular buffer.
+ * This thread will play the data coming from the jbuffer buffer.
  */
 static void *
 AudioTrack_Thread( void *p_data )
@@ -1858,8 +1868,6 @@ AudioTrack_Thread( void *p_data )
     {
         int i_ret = 0;
         bool b_forced;
-        size_t i_data_offset;
-        size_t i_data_size;
 
         vlc_mutex_lock( &p_sys->lock );
 
@@ -1870,9 +1878,10 @@ AudioTrack_Thread( void *p_data )
             vlc_cond_wait( &p_sys->thread_cond, &p_sys->lock );
         }
 
-        /* Wait for more data in the circular buffer */
-        while( p_sys->b_thread_running
-            && p_sys->circular.i_read >= p_sys->circular.i_write )
+        /* Wait for more data in the jbuffer buffer */
+        while (p_sys->b_thread_running
+            && p_sys->jbuffer.offset == p_sys->jbuffer.size
+            && p_sys->frame_chain == NULL)
             vlc_cond_wait( &p_sys->thread_cond, &p_sys->lock );
 
         if( !p_sys->b_thread_running || p_sys->b_error )
@@ -1893,12 +1902,7 @@ AudioTrack_Thread( void *p_data )
         else
             b_forced = false;
 
-        i_data_offset = p_sys->circular.i_read % p_sys->circular.i_size;
-        i_data_size = __MIN( p_sys->circular.i_size - i_data_offset,
-                             p_sys->circular.i_write - p_sys->circular.i_read );
-
-        i_ret = AudioTrack_Write( env, stream, i_data_size, i_data_offset,
-                                  b_forced );
+        i_ret = AudioTrack_Write( env, stream, b_forced );
         if( i_ret >= 0 )
         {
             if( i_ret == 0 )
@@ -1921,7 +1925,6 @@ AudioTrack_Thread( void *p_data )
             else
             {
                 i_last_time_blocked = 0;
-                p_sys->circular.i_read += i_ret;
                 vlc_cond_signal( &p_sys->aout_cond );
             }
         }
@@ -1929,10 +1932,10 @@ AudioTrack_Thread( void *p_data )
         vlc_mutex_unlock( &p_sys->lock );
     }
 
-    if( p_sys->circular.u.bytebuffer.p_obj )
+    if (p_sys->jbuffer.array != NULL)
     {
-        (*env)->DeleteLocalRef( env, p_sys->circular.u.bytebuffer.p_obj );
-        p_sys->circular.u.bytebuffer.p_obj = NULL;
+        (*env)->DeleteLocalRef(env, p_sys->jbuffer.array);
+        p_sys->jbuffer.array = NULL;
     }
 
     return NULL;
@@ -1992,7 +1995,6 @@ static void
 Play( aout_stream_t *stream, block_t *p_buffer, vlc_tick_t i_date )
 {
     JNIEnv *env = NULL;
-    size_t i_buffer_offset = 0;
     aout_sys_t *p_sys = stream->sys;
 
     if( p_sys->b_passthrough && p_sys->fmt.i_format == VLC_CODEC_SPDIFB
@@ -2005,72 +2007,21 @@ Play( aout_stream_t *stream, block_t *p_buffer, vlc_tick_t i_date )
     vlc_mutex_lock( &p_sys->lock );
 
     if( p_sys->b_error || !( env = GET_ENV() ) )
+    {
+        block_Release( p_buffer );
         goto bailout;
+    }
 
     if( p_sys->i_chans_to_reorder )
        aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
                             p_sys->i_chans_to_reorder, p_sys->p_chan_table,
                             p_sys->fmt.i_format );
 
-    while( i_buffer_offset < p_buffer->i_buffer && !p_sys->b_error )
-    {
-        size_t i_circular_free;
-        size_t i_data_offset;
-        size_t i_data_size;
-
-        /* Wait for enough room in circular buffer */
-        while( !p_sys->b_error && ( i_circular_free = p_sys->circular.i_size -
-               ( p_sys->circular.i_write - p_sys->circular.i_read ) ) == 0 )
-            vlc_cond_wait( &p_sys->aout_cond, &p_sys->lock );
-        if( p_sys->b_error )
-            goto bailout;
-
-        i_data_offset = p_sys->circular.i_write % p_sys->circular.i_size;
-        i_data_size = __MIN( p_buffer->i_buffer - i_buffer_offset,
-                             p_sys->circular.i_size - i_data_offset );
-        i_data_size = __MIN( i_data_size, i_circular_free );
-
-        switch( p_sys->i_write_type )
-        {
-        case WRITE_BYTEARRAY:
-        case WRITE_BYTEARRAYV23:
-            (*env)->SetByteArrayRegion( env, p_sys->circular.u.p_bytearray,
-                                        i_data_offset, i_data_size,
-                                        (jbyte *)p_buffer->p_buffer
-                                        + i_buffer_offset);
-            break;
-        case WRITE_SHORTARRAYV23:
-            i_data_offset &= ~1;
-            i_data_size &= ~1;
-            (*env)->SetShortArrayRegion( env, p_sys->circular.u.p_shortarray,
-                                         i_data_offset / 2, i_data_size / 2,
-                                         (jshort *)p_buffer->p_buffer
-                                         + i_buffer_offset / 2);
-            break;
-        case WRITE_FLOATARRAY:
-            i_data_offset &= ~3;
-            i_data_size &= ~3;
-            (*env)->SetFloatArrayRegion( env, p_sys->circular.u.p_floatarray,
-                                         i_data_offset / 4, i_data_size / 4,
-                                         (jfloat *)p_buffer->p_buffer
-                                         + i_buffer_offset / 4);
-
-            break;
-        case WRITE_BYTEBUFFER:
-            memcpy( p_sys->circular.u.bytebuffer.p_data + i_data_offset,
-                    p_buffer->p_buffer + i_buffer_offset, i_data_size );
-            break;
-        }
-
-        i_buffer_offset += i_data_size;
-        p_sys->circular.i_write += i_data_size;
-
-        vlc_cond_signal( &p_sys->thread_cond );
-    }
+    vlc_frame_ChainLastAppend(&p_sys->frame_last, p_buffer);
+    vlc_cond_signal(&p_sys->thread_cond);
 
 bailout:
     vlc_mutex_unlock( &p_sys->lock );
-    block_Release( p_buffer );
     (void) i_date;
 }
 
@@ -2111,6 +2062,11 @@ Flush( aout_stream_t *stream )
 
     vlc_mutex_lock( &p_sys->lock );
 
+    p_sys->jbuffer.size = p_sys->jbuffer.offset = 0;
+    vlc_frame_ChainRelease(p_sys->frame_chain);
+    p_sys->frame_chain = NULL;
+    p_sys->frame_last = &p_sys->frame_chain;
+
     if( p_sys->b_error || !( env = GET_ENV() ) )
         goto bailout;
 
@@ -2129,7 +2085,6 @@ Flush( aout_stream_t *stream )
     if( CHECK_AT_EXCEPTION( "pause" ) )
         goto bailout;
     JNI_AT_CALL_VOID( flush );
-    p_sys->circular.i_read = p_sys->circular.i_write = 0;
 
     /* HACK: Before Android 4.4, the head position is not reset to zero and is
      * still moving after a flush or a stop. This prevents to get a precise
