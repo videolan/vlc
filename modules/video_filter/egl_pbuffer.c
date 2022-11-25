@@ -221,11 +221,31 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
         = sys->context
         = eglCreateContext(sys->display, cfgv[0], EGL_NO_CONTEXT, ctx_attr);
 
+#ifdef USE_OPENGL_ES2
     if (ctx == EGL_NO_CONTEXT)
     {
         msg_Err (gl, "cannot create EGL context");
         goto error;
     }
+#else
+    if (ctx == EGL_NO_CONTEXT)
+    {
+        const GLint ctx_attr_fallback[] = {
+            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_NONE
+        };
+
+        ctx
+            = sys->context
+            = eglCreateContext(sys->display, cfgv[0], EGL_NO_CONTEXT, ctx_attr_fallback);
+
+        if (ctx == EGL_NO_CONTEXT)
+        {
+            msg_Err (gl, "cannot create EGL context");
+            goto error;
+        }
+    }
+#endif
 
     return VLC_SUCCESS;
 error:
