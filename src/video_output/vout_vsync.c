@@ -121,6 +121,13 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
         return;
     }
 
+    if (priv->displayed.next->b_force)
+    {
+        NextPicture(scheduler);
+        priv->state.current = VOUT_STATE_DISPLAY;
+        return;
+    }
+
     /* If video format have changed, drop the intermediate pictures since the
      * vout has already changed the format at this point. */
     if (!video_format_IsSimilar(&priv->last_format, &priv->displayed.next->format))
@@ -130,22 +137,6 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
         priv->state.current = VOUT_STATE_CONTROL;
         return;
     }
-
-#if 0
-    // TODO
-    if (priv->pause.is_on)
-    {
-        // TODO VSYNC -> DISPLAY transition?
-        priv->state.current = VOUT_STATE_IDLE;
-        return;
-    }
-
-    if (priv->wait_interrupted)
-    {
-        priv->state.current = VOUT_STATE_CONTROL;
-        return;
-    }
-#endif
 
     vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = /*vout_chrono_GetHigh(&sys->render) + */ VOUT_MWAIT_TOLERANCE;
