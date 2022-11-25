@@ -387,8 +387,6 @@ void transcode_encoder_video_close( transcode_encoder_t *p_enc )
     }
 
     /* Close encoder */
-    if (p_enc->p_encoder->ops->close)
-        p_enc->p_encoder->ops->close(p_enc->p_encoder);
     module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
     p_enc->p_encoder->p_module = NULL;
 }
