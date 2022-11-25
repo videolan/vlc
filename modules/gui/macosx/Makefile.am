@@ -92,7 +92,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
-<<<<<<< HEAD
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.h \
@@ -103,20 +102,20 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.m \
-=======
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.h \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.m \
 	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h \
 	gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m \
+	gui/macosx/library/audio-library/VLCLibraryAudioViewController.h \
+	gui/macosx/library/audio-library/VLCLibraryAudioViewController.m \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.m \
->>>>>>> 9cb892a24d (macosx: Move all audio library related classes into audio-library folder)
 	gui/macosx/main/CompatibilityFixes.h \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \

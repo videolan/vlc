@@ -205,7 +205,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         VLCLibraryAudioDataSource *audioDataSource = (VLCLibraryAudioDataSource *)self.collectionView.dataSource;
 
         // Add detail view to the attributes set -- detail view about to be shown
-        switch(audioDataSource.segmentedControl.selectedSegment) {
+        switch(audioDataSource.audioLibrarySegment) {
             case VLCAudioLibraryArtistsSegment:
             case VLCAudioLibraryGenresSegment:
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];

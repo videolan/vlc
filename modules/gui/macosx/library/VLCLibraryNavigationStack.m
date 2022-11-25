@@ -26,7 +26,7 @@
 #import "VLCLibraryNavigationState.h"
 #import "VLCInputItem.h"
 
-#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCMediaSourceDataSource.h"
@@ -181,7 +181,7 @@
     [_delegate.mediaSourceDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 
     [_delegate segmentedControlAction:self];
-    [_delegate.libraryAudioDataSource segmentedControlAction:self];
+    [_delegate.libraryAudioViewController segmentedControlAction:self];
     [_delegate.mediaSourceDataSource setGridOrListMode:self];
 
     [self updateDelegateNavigationButtons];

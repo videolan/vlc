@@ -27,10 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
 @class VLCLibraryNavigationStack;
-@class VLCLibraryAudioDataSource;
+@class VLCLibraryAudioViewController;
 @class VLCLibraryVideoCollectionViewsStackViewController;
 @class VLCLibraryVideoTableViewDataSource;
-@class VLCLibraryGroupDataSource;
 @class VLCLibrarySortingMenuController;
 @class VLCMediaSourceBaseDataSource;
 @class VLCPlaylistDataSource;
@@ -118,16 +117,17 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 
 @property (readwrite) BOOL nonembedded;
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
-@property (readonly) VLCLibraryAudioDataSource *libraryAudioDataSource;
+@property (readonly) VLCLibraryAudioViewController *libraryAudioViewController;
 @property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoTableViewDataSource;
 @property (readonly) VLCLibraryVideoCollectionViewsStackViewController *libraryVideoCollectionViewsStackViewController;
-@property (readonly) VLCLibraryGroupDataSource *libraryAudioGroupDataSource;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCMediaSourceBaseDataSource *mediaSourceDataSource;
 @property (readonly) VLCPlaylistDataSource *playlistDataSource;
 @property (readonly) VLCPlaylistSortingMenuController *playlistSortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCFSPanelController *fspanel;
+
+@property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 
 - (void)videoPlaybackWillBeStarted;
 - (void)reopenVideoView;

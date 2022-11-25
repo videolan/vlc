@@ -46,9 +46,6 @@
 @interface VLCLibraryAudioDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
-    NSInteger _currentSelectedSegment;
-    NSArray<NSString *> *_placeholderImageNames;
-    NSArray<NSString *> *_placeholderLabelStrings;
     NSArray *_displayedCollection;
     enum vlc_ml_parent_type _currentParentType;
 }
@@ -153,14 +150,8 @@
     return _displayedCollection[indexPath.item];
 }
 
-- (void)setupAppearance
+- (void)setup
 {
-    self.segmentedControl.segmentCount = 4;
-    [self.segmentedControl setLabel:_NS("Artists") forSegment:VLCAudioLibraryArtistsSegment];
-    [self.segmentedControl setLabel:_NS("Albums") forSegment:VLCAudioLibraryAlbumsSegment];
-    [self.segmentedControl setLabel:_NS("Songs") forSegment:VLCAudioLibrarySongsSegment];
-    [self.segmentedControl setLabel:_NS("Genres") forSegment:VLCAudioLibraryGenresSegment];
-
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
 
@@ -188,38 +179,8 @@
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
-    
-    _currentSelectedSegment = -1; // Force segmentedControlAction to do what it must
-    _segmentedControl.selectedSegment = 0;
 
-    _placeholderImageNames = @[@"placeholder-group2", @"placeholder-music", @"placeholder-music", @"placeholder-music"];
-    _placeholderLabelStrings = @[
-        _NS("Your favorite artists will appear here.\nGo to the Browse section to add artists you love."),
-        _NS("Your favorite albums will appear here.\nGo to the Browse section to add albums you love."),
-        _NS("Your favorite tracks will appear here.\nGo to the Browse section to add tracks you love."),
-        _NS("Your favorite genres will appear here.\nGo to the Browse section to add genres you love."),
-    ];
-
-    [self reloadAppearance];
-    [self reloadEmptyViewAppearance];
-}
-
-- (void)reloadAppearance
-{
-    [self.segmentedControl setTarget:self];
-    [self.segmentedControl setAction:@selector(segmentedControlAction:)];
-    [self segmentedControlAction:[[[VLCMain sharedInstance] libraryWindow] navigationStack]];
-}
-
-- (void)reloadEmptyViewAppearance
-{
-    if(_currentSelectedSegment < _placeholderImageNames.count && _currentSelectedSegment >= 0) {
-        _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[_currentSelectedSegment]];
-    }
-
-    if(_currentSelectedSegment < _placeholderLabelStrings.count && _currentSelectedSegment >= 0) {
-        _placeholderLabel.stringValue = _placeholderLabelStrings[_currentSelectedSegment];
-    }
+    _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
 }
 
 - (void)reloadData
@@ -230,17 +191,14 @@
     [self.groupSelectionTableView reloadData];
 }
 
-- (IBAction)segmentedControlAction:(id)sender
+- (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
 {
-    if (_libraryModel.listOfAudioMedia.count == 0) {
-        [self reloadEmptyViewAppearance];
-        return;
-    } else if (_segmentedControl.selectedSegment == _currentSelectedSegment) {
+    if (audioLibrarySegment == _audioLibrarySegment) {
         return;
     }
 
-    _currentSelectedSegment = _segmentedControl.selectedSegment;
-    switch (_currentSelectedSegment) {
+    _audioLibrarySegment = audioLibrarySegment;
+    switch (_audioLibrarySegment) {
         case VLCAudioLibraryArtistsSegment:
             _displayedCollection = [self.libraryModel listOfArtists];
             _currentParentType = VLC_ML_PARENT_ARTIST;
@@ -265,15 +223,6 @@
 
     _groupDataSource.representedListOfAlbums = nil; // Clear whatever was being shown before
     [self reloadData];
-
-    if(sender != [[[VLCMain sharedInstance] libraryWindow] navigationStack]) {
-        [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
-    }
-}
-
-- (NSString *)imageNameForCurrentSegment
-{
-    return _placeholderImageNames[_currentSelectedSegment];
 }
 
 #pragma mark - table view data source and delegation

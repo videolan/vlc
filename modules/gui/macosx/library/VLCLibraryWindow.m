@@ -44,7 +44,7 @@
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
-#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 
@@ -71,8 +71,6 @@ const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 
-static NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
-static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
 static NSUserInterfaceItemIdentifier const kVLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
@@ -145,7 +143,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
     
-    videoPlaceholderImageViewSizeConstraints = @[
+    _videoPlaceholderImageViewSizeConstraints = @[
         [NSLayoutConstraint constraintWithItem:_placeholderImageView
                                      attribute:NSLayoutAttributeWidth
                                      relatedBy:NSLayoutRelationEqual
@@ -160,22 +158,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                      attribute:NSLayoutAttributeNotAnAttribute
                                     multiplier:0.f
                                       constant:114.f],
-    ];
-    audioPlaceholderImageViewSizeConstraints = @[
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
-                                     attribute:NSLayoutAttributeWidth
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:nil
-                                     attribute:NSLayoutAttributeNotAnAttribute
-                                    multiplier:0.f
-                                      constant:149.f],
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
-                                     attribute:NSLayoutAttributeHeight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:nil
-                                     attribute:NSLayoutAttributeNotAnAttribute
-                                    multiplier:0.f
-                                      constant:149.f],
     ];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
@@ -268,31 +250,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoCollectionViewsStackViewController.collectionsStackViewScrollView = _videoLibraryCollectionViewsStackViewScrollView;
     _libraryVideoCollectionViewsStackViewController.collectionsStackView = _videoLibraryCollectionViewsStackView;
 
-    _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
-    _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
-    _libraryAudioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
-    _libraryAudioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
-    _libraryAudioDataSource.segmentedControl = self.audioSegmentedControl;
-    _libraryAudioDataSource.collectionView = self.audioLibraryCollectionView;
-    _libraryAudioDataSource.placeholderImageView = _placeholderImageView;
-    _libraryAudioDataSource.placeholderLabel = _placeholderLabel;
-    [_libraryAudioDataSource setupAppearance];
-    _audioCollectionSelectionTableView.dataSource = _libraryAudioDataSource;
-    _audioCollectionSelectionTableView.delegate = _libraryAudioDataSource;
+    _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _audioCollectionSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
-    _libraryAudioGroupDataSource = [[VLCLibraryGroupDataSource alloc] init];
-    _libraryAudioDataSource.groupDataSource = _libraryAudioGroupDataSource;
-    _audioGroupSelectionTableView.dataSource = _libraryAudioGroupDataSource;
-    _audioGroupSelectionTableView.delegate = _libraryAudioGroupDataSource;
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
-
-    if(@available(macOS 11.0, *)) {
-        _audioGroupSelectionTableView.style = NSTableViewStyleFullWidth;
-    }
-
-    _audioLibraryCollectionView.selectable = YES;
-    _audioLibraryCollectionView.allowsMultipleSelection = NO;
-    _audioLibraryCollectionView.allowsEmptySelection = YES;
 
     _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
     _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
@@ -421,7 +381,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [super encodeRestorableStateWithCoder:coder];
     [coder encodeInteger:_segmentedTitleControl.selectedSegment forKey:@"macosx-library-selected-segment"];
     [coder encodeInteger:_gridVsListSegmentedControl.selectedSegment forKey:@"macosx-library-view-mode-selected-segment"];
-    [coder encodeInteger:_libraryAudioDataSource.segmentedControl.selectedSegment forKey:@"macosx-library-audio-view-selected-segment"];
+    [coder encodeInteger:_audioSegmentedControl.selectedSegment forKey:@"macosx-library-audio-view-selected-segment"];
 }
 
 #pragma mark - appearance setters
@@ -556,10 +516,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
     
     if (_libraryVideoTableViewDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
-        for (NSLayoutConstraint *constraint in audioPlaceholderImageViewSizeConstraints) {
+        for (NSLayoutConstraint *constraint in _libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
             constraint.active = NO;
         }
-        for (NSLayoutConstraint *constraint in videoPlaceholderImageViewSizeConstraints) {
+        for (NSLayoutConstraint *constraint in _videoPlaceholderImageViewSizeConstraints) {
             constraint.active = YES;
         }
         
@@ -600,48 +560,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showAudioLibrary
 {
-    for (NSView *subview in _libraryTargetView.subviews) {
-        [subview removeFromSuperview];
-    }
-    
-    if (_libraryAudioDataSource.libraryModel.numberOfAudioMedia == 0) { // empty library
-        for (NSLayoutConstraint *constraint in videoPlaceholderImageViewSizeConstraints) {
-            constraint.active = NO;
-        }
-        for (NSLayoutConstraint *constraint in audioPlaceholderImageViewSizeConstraints) {
-            constraint.active = YES;
-        }
-        
-        [_libraryAudioDataSource reloadEmptyViewAppearance];
-        
-        _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_emptyLibraryView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-    } else {
-        _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_audioLibraryView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-        
-        if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
-            _audioLibrarySplitView.hidden = YES;
-            _audioCollectionViewScrollView.hidden = NO;
-        } else {
-            _audioLibrarySplitView.hidden = NO;
-            _audioCollectionViewScrollView.hidden = YES;
-        }
-        
-        [_libraryAudioDataSource reloadAppearance];
-    }
-    
-    _librarySortButton.hidden = NO;
-    _librarySearchField.enabled = YES;
-    _optionBarView.hidden = NO;
-    _audioSegmentedControl.hidden = NO;
-    
+    [_libraryAudioViewController presentAudioView];
+
     self.gridVsListSegmentedControl.target = self;
     self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 }
@@ -1025,10 +945,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
     [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
-    [libraryWindow.libraryAudioDataSource.segmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
+    [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
     // We don't want to add these to the navigation stack...
-    [libraryWindow.libraryAudioDataSource segmentedControlAction:libraryWindow.navigationStack];
+    [libraryWindow.libraryAudioViewController segmentedControlAction:libraryWindow.navigationStack];
     [libraryWindow segmentedControlAction:libraryWindow.navigationStack];
 
     // But we do want the "final" initial position to be added. So we manually invoke the navigation stack
