@@ -38,6 +38,12 @@ FocusScope {
         text: model.text || ""
     }
 
+    readonly property int extraMargin: Math.max(0, view.width - usedRowSpace) / 2 + sectionWidth
+
+    // NOTE: The list margins for the item(s) horizontal positioning.
+    readonly property int contentLeftMargin: extraMargin + view.leftMargin
+    readonly property int contentRightMargin: extraMargin + view.rightMargin
+
     readonly property real sectionWidth: !!section.property ? VLCStyle.table_section_width : 0
 
     readonly property real usedRowSpace: {
@@ -283,7 +289,7 @@ FocusScope {
                 Row {
                     id: row
 
-                    x: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
+                    x: root.extraMargin
                     leftPadding: VLCStyle.margin_xxxsmall
                     rightPadding: VLCStyle.margin_xxxsmall
                     topPadding: root.headerTopPadding
@@ -351,7 +357,7 @@ FocusScope {
             height: root.rowHeight
 
             horizontalSpacing: root.horizontalSpacing
-            leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2 + root.sectionWidth
+            leftPadding: root.extraMargin
 
             dragItem: root.dragItem
 

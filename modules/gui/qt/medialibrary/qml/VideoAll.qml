@@ -325,8 +325,6 @@ FocusScope {
         VideoListDisplay {
             id: listView
 
-            readonly property real contentLeftMargin: VLCStyle.margin_normal
-
             // Settings
 
             model: root.model

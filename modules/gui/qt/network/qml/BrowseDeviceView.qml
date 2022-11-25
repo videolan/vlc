@@ -261,8 +261,6 @@ FocusScope {
         Widgets.KeyNavigableTableView {
             id: listView
 
-            readonly property real contentLeftMargin: VLCStyle.margin_normal
-
             readonly property int maximumCount: root.maximumRows
 
             readonly property int nbItemPerRow: 1
