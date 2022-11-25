@@ -583,10 +583,10 @@ $(libvlccore_la_OBJECTS): libvlccore_objc.la libvlc_darwin.la
 libvlccore_objc_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvlccore_objc_la_LDFLAGS = -static
 libvlccore_la_LIBADD += libvlccore_objc.la libvlc_darwin.la
-if HAVE_TVOS
-libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/vlccore.framework/vlccore
-else
+if HAVE_OSX
 libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib
+else
+libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/vlccore.framework/vlccore
 endif
 endif
 

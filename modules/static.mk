@@ -115,14 +115,16 @@ libvlc_plugin_la_LDFLAGS = \
 if HAVE_TVOS
 libvlc_plugin_la_LDFLAGS += $(libvlc_plugin_frameworks)
 endif
+if HAVE_IOS
+libvlc_plugin_la_LDFLAGS += $(libvlc_plugin_frameworks)
+endif
 libvlc_plugin_la_LIBADD = $(PARTIAL_PLUGINS)
 EXTRA_libvlc_plugin_la_DEPENDENCIES = vlc_modules_manifest.h ../src/vlccore.framework/vlccore
 
-if HAVE_IOS
-libvlc_plugin_la_LDFLAGS += -avoid-version
-endif
-if HAVE_TVOS
+if HAVE_DARWIN
+if !HAVE_OSX
 libvlc_plugin_la_LDFLAGS += -avoid-version -Xlinker -install_name -Xlinker @rpath/vlc_plugin.framework/vlc_plugin
+endif
 endif
 
 if HAVE_OSX
