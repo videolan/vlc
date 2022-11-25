@@ -47,7 +47,6 @@ struct audio_buffer_t
     int         length;
     int         size;
     vlc_mutex_t mutex;
-    vlc_cond_t  cond;
 };
 
 typedef struct audio_buffer_t audio_buffer_t;
@@ -356,7 +355,6 @@ static int CreateBuffer( audio_output_t *aout, int size )
     buffer->size = size;
 
     vlc_mutex_init( &buffer->mutex );
-    vlc_cond_init( &buffer->cond );
 
     aout_sys_t *sys = aout->sys;
     sys->buffer = buffer;
@@ -401,8 +399,6 @@ static int ReadBuffer( audio_output_t *aout, uint8_t *data, int size )
 
     buffer->length -= len;
 
-    vlc_cond_signal( &buffer->cond );
-
     vlc_mutex_unlock( &buffer->mutex );
 
     return len;
@@ -417,11 +413,31 @@ static int WriteBuffer( audio_output_t *aout, uint8_t *data, int size )
 
     vlc_mutex_lock( &buffer->mutex );
 
-    /* FIXME :
-     * If size is larger than buffer->size, this is locked indefinitely.
-     */
-    while( buffer->length + size > buffer->size )
-        vlc_cond_wait( &buffer->cond, &buffer->mutex );
+    if( buffer->length + size > buffer->size )
+    {
+        int delta = AUDIO_BUFFER_SIZE_IN_SECONDS *
+                    sys-> format.i_rate * sys->format.i_bytes_per_frame;
+        int new_size = (( buffer->length + size + delta - 1 ) / delta ) *
+                       delta;
+
+        uint8_t *p;
+
+        msg_Dbg( aout, "Trying to enlarge audio buffer: "
+                 "buffer length = %d, buffer size = %d, "
+                 "block size = %d, new buffer size = %d",
+                 buffer->length, buffer->size, size, new_size );
+
+        p = realloc( buffer->data, new_size );
+        if( unlikely( p == NULL ))
+        {
+            msg_Err( aout, "Enlarging audio buffer failed! Drop a block!");
+
+            return 0;
+        }
+
+        buffer->data = p;
+        buffer->size = new_size;
+    }
 
     len = size;
     if( buffer->write_pos + len > buffer->size )
