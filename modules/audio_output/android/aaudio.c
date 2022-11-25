@@ -359,11 +359,9 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
         else
         {
             vlc_tick_t now = vlc_tick_now();
-            vlc_tick_t data_ticks = FramesToTicks(sys, num_frames);
-            vlc_tick_t silence_ticks = now + data_ticks - sys->first_play_date;
 
             /* Write silence to reach the first play date */
-            silence_ticks = data_ticks - silence_ticks;
+            vlc_tick_t silence_ticks = sys->first_play_date - now;
             if (silence_ticks > 0)
             {
                 tocopy = TicksToBytes(sys, silence_ticks);
