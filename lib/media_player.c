@@ -788,6 +788,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_SetFloat(mp, "saturation", 1.f);
     var_Create(mp, "gamma", VLC_VAR_FLOAT);
     var_SetFloat(mp, "gamma", 1.f);
+    var_Create(mp, "sharpen-sigma", VLC_VAR_FLOAT);
+    var_SetFloat(mp, "sharpen-sigma", 0.05f);
 
      /* Audio */
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);

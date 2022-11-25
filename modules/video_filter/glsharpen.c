@@ -38,7 +38,7 @@
 
 #define FILTER_PREFIX "sharpen-"
 
-struct sys {
+typedef struct {
     struct vlc_gl_sampler *sampler;
 
     GLuint program_id;
@@ -57,18 +57,28 @@ struct sys {
     /* Texture coordinates unit vectors */
     float u[2];
     float v[2];
-};
+} gl_filter_sys_t;
 
 static const char *const ppsz_filter_options[] = {
     "sigma", NULL
 };
 
-static int varFloatCallback(vlc_object_t *p_this, char const *psz_variable,
-                            vlc_value_t oldvalue, vlc_value_t newvalue,
-                            void *p_data)
+static int OpenGLFilterSharpenSigmaVarCallback(vlc_object_t *p_this, char const *psz_variable,
+                                               vlc_value_t oldvalue, vlc_value_t newvalue,
+                                               void *p_data)
 {
     _Atomic float *atom = p_data;
     atomic_store_explicit(atom, newvalue.f_float, memory_order_relaxed);
+    (void) p_this; (void) psz_variable; (void) oldvalue;
+    return VLC_SUCCESS;
+}
+
+static int VideoFilterSharpenSigmaVarCallback(vlc_object_t *p_this, char const *psz_variable,
+                                              vlc_value_t oldvalue, vlc_value_t newvalue,
+                                              void *p_data)
+{
+    struct vlc_gl_filter *filter = p_data;
+    var_Set(filter, psz_variable, newvalue);
     (void) p_this; (void) psz_variable; (void) oldvalue;
     return VLC_SUCCESS;
 }
@@ -79,7 +89,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 {
     (void) meta;
 
-    struct sys *sys = filter->sys;
+    gl_filter_sys_t *sys = filter->sys;
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
@@ -152,15 +162,24 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
 static void
 Close(struct vlc_gl_filter *filter) {
-    struct sys *sys = filter->sys;
+    gl_filter_sys_t *sys = filter->sys;
 
     vlc_gl_sampler_Delete(sys->sampler);
 
     const opengl_vtable_t *vt = &filter->api->vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
-    var_DelCallback(filter, FILTER_PREFIX "sigma", varFloatCallback,
+    var_DelCallback(filter, FILTER_PREFIX "sigma", 
+                    OpenGLFilterSharpenSigmaVarCallback,
                     &sys->sigma);
+
+    vlc_gl_t *gl = (vlc_gl_t *)vlc_object_parent(filter);
+    filter_t *video_filter = (filter_t *)vlc_object_parent(gl);
+    if (var_Type(video_filter, FILTER_PREFIX "sigma"))
+    {
+        var_DelCallback( video_filter, FILTER_PREFIX "sigma",
+                        VideoFilterSharpenSigmaVarCallback, filter );
+    }
     free(sys);
 }
 
@@ -175,7 +194,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     filter->config.blend = false;
     filter->config.msaa_level = 0;
 
-    struct sys *sys = malloc(sizeof(*sys));
+    gl_filter_sys_t *sys = malloc(sizeof(*sys));
     if (!sys)
         return VLC_EGENERIC;
 
@@ -195,9 +214,17 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     atomic_init(&sys->sigma,
                 var_CreateGetFloatCommand(filter, FILTER_PREFIX "sigma"));
 
-    var_AddCallback(filter, FILTER_PREFIX "sigma", varFloatCallback,
+    var_AddCallback(filter, FILTER_PREFIX "sigma", OpenGLFilterSharpenSigmaVarCallback,
                     &sys->sigma );
 
+    vlc_gl_t *gl = (vlc_gl_t *)vlc_object_parent(filter);
+    filter_t *video_filter = (filter_t *)vlc_object_parent(gl);
+    if (var_Type(video_filter, FILTER_PREFIX "sigma"))
+    {
+        var_AddCallback( video_filter, FILTER_PREFIX "sigma",
+                        VideoFilterSharpenSigmaVarCallback, filter );
+    }
+    
     static const char *const VERTEX_SHADER =
         "attribute vec2 vertex_pos;\n"
         "attribute vec2 tex_coords_in;\n"
@@ -305,11 +332,14 @@ error:
 #define SIG_TEXT N_("Sharpen strength (0-2)")
 #define SIG_LONGTEXT N_("Set the Sharpen strength, between 0 and 2. Defaults to 0.05.")
 
-static int OpenVideoFilter(vlc_object_t *obj)
+static int OpenVideoFilter(filter_t *filter)
 {
-    filter_t *filter = (filter_t*)obj;
+    config_ChainParse( filter, FILTER_PREFIX, ppsz_filter_options,
+                   filter->p_cfg );
 
-    module_t *module = vlc_gl_WrapOpenGLFilter(filter, "glsharpen");
+    var_CreateGetFloatCommand(filter, FILTER_PREFIX "sigma");
+
+    module_t *module = vlc_gl_WrapOpenGLFilter(filter, "gl-sharpen");
     return module ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
