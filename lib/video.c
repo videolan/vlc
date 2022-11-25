@@ -957,7 +957,7 @@ sharpen_option_bynumber( unsigned option )
 {
     static const opt_t optlist[] =
     {
-        { "sharpen",     0 },
+        { "glsharpen",     0 },
         { "sharpen-sigma",   VLC_VAR_FLOAT },
     };
     enum { num_opts = sizeof(optlist) / sizeof(*optlist) };
@@ -971,23 +971,23 @@ sharpen_option_bynumber( unsigned option )
 int libvlc_video_get_sharpen_int( libvlc_media_player_t *p_mi,
                                  unsigned option )
 {
-    return get_int( p_mi, "sharpen", sharpen_option_bynumber(option) );
+    return get_int( p_mi, "glsharpen", sharpen_option_bynumber(option) );
 }
 void libvlc_video_set_sharpen_int( libvlc_media_player_t *p_mi,
                                   unsigned option, int value )
 {
-    set_value( p_mi, "sharpen", sharpen_option_bynumber(option), VLC_VAR_INTEGER,
+    set_value( p_mi, "glsharpen", sharpen_option_bynumber(option), VLC_VAR_INTEGER,
                &(vlc_value_t) { .i_int = value }, false );
 }
 float libvlc_video_get_sharpen_float( libvlc_media_player_t *p_mi,
                                      unsigned option )
 {
-    return get_float( p_mi, "sharpen", sharpen_option_bynumber(option) );
+    return get_float( p_mi, "glsharpen", sharpen_option_bynumber(option) );
 }
 void libvlc_video_set_sharpen_float( libvlc_media_player_t *p_mi,
                                     unsigned option, float value )
 {
-    set_value( p_mi, "sharpen", sharpen_option_bynumber(option), VLC_VAR_FLOAT,
+    set_value( p_mi, "glsharpen", sharpen_option_bynumber(option), VLC_VAR_FLOAT,
                &(vlc_value_t) { .f_float = value }, false );
 }
 
