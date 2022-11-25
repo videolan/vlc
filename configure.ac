@@ -3437,10 +3437,12 @@ AS_IF([test "${enable_wayland}" != "no"], [
   PKG_CHECK_MODULES([WAYLAND_EGL], [wayland-egl],, [
     wl_err="$wl_err ${WAYLAND_EGL_PKG_ERRORS}."
   ])
-  PKG_CHECK_MODULES([WAYLAND_SCANNER], [wayland-scanner >= 1.15], [
-    WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
-  ], [
-    wl_err="$wl_err ${WAYLAND_SCANNER_PKG_ERRORS}."
+  AS_VAR_SET_IF(WAYLAND_SCANNER, [],[
+    PKG_CHECK_MODULES([WAYLAND_SCANNER], [wayland-scanner >= 1.15], [
+      WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
+    ], [
+      wl_err="$wl_err ${WAYLAND_SCANNER_PKG_ERRORS}."
+    ])
   ])
 
   dnl wayland-protocols
