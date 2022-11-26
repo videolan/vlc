@@ -214,12 +214,17 @@
         _audioLibrarySplitView.hidden = YES;
         _audioCollectionViewScrollView.hidden = NO;
     } else {
-        _audioLibrarySplitView.hidden = NO;
+        [self presentAudioTableView];
         _audioCollectionViewScrollView.hidden = YES;
     }
 
     [self configureAudioSegmentedControl];
     [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
+}
+
+- (void)presentAudioTableView
+{
+    _audioLibrarySplitView.hidden = NO;
 }
 
 - (IBAction)segmentedControlAction:(id)sender
