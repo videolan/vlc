@@ -26,10 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoCollectionViewsStackViewController : NSObject
 
-@property (readwrite, assign) NSSize collectionViewItemSize;
-@property (readwrite, assign) CGFloat collectionViewMinimumLineSpacing;
-@property (readwrite, assign) CGFloat collectionViewMinimumInteritemSpacing;
-@property (readwrite, assign) NSEdgeInsets collectionViewSectionInset;
+@property (readwrite, assign, nonatomic) NSSize collectionViewItemSize;
+@property (readwrite, assign, nonatomic) CGFloat collectionViewMinimumLineSpacing;
+@property (readwrite, assign, nonatomic) CGFloat collectionViewMinimumInteritemSpacing;
+@property (readwrite, assign, nonatomic) NSEdgeInsets collectionViewSectionInset;
 
 @property (readwrite, assign, nonatomic) NSStackView *collectionsStackView;
 @property (readwrite, assign, nonatomic) NSScrollView *collectionsStackViewScrollView;

@@ -30,12 +30,6 @@
 
 #import "views/VLCSubScrollView.h"
 
-@interface VLCLibraryVideoCollectionViewContainerView()
-{
-    VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
-}
-@end
-
 @implementation VLCLibraryVideoCollectionViewContainerView
 
 - (instancetype)init
@@ -185,9 +179,9 @@
                            scrollViewInsets.bottom +
                            collectionViewLayoutInset.top +
                            collectionViewLayoutInset.bottom +
-                           15;
+                           15; // Account for the scrollbar size
 
-    if (collectionViewContentSize.height == 0) {
+    if (collectionViewContentSize.height == 0 || _groupDescriptor.isHorizontalBarCollectionView) {
         CGFloat fallback = _collectionViewLayout.itemSize.height + insetsHeight;
 
         if (fallback <= 0) {

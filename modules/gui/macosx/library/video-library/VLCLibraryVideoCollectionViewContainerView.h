@@ -25,6 +25,7 @@
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 @class VLCSubScrollView;
+@class VLCLibraryCollectionViewFlowLayout;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
 @class VLCLibraryVideoCollectionViewContainerViewDataSource;
 
@@ -33,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryVideoCollectionViewContainerView : NSView
 
 @property (readonly) NSCollectionView *collectionView;
+@property (readonly) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readonly) VLCSubScrollView *scrollView;
 @property (readonly) VLCLibraryVideoCollectionViewContainerViewDataSource *dataSource;
 @property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;

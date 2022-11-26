@@ -134,4 +134,40 @@
     }
 }
 
+- (void)setCollectionViewItemSize:(NSSize)collectionViewItemSize
+{
+    _collectionViewItemSize = collectionViewItemSize;
+
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+        containerView.collectionViewLayout.itemSize = collectionViewItemSize;
+    }
+}
+
+- (void)setCollectionViewSectionInset:(NSEdgeInsets)collectionViewSectionInset
+{
+    _collectionViewSectionInset = collectionViewSectionInset;
+
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+        containerView.collectionViewLayout.sectionInset = collectionViewSectionInset;
+    }
+}
+
+- (void)setCollectionViewMinimumLineSpacing:(CGFloat)collectionViewMinimumLineSpacing
+{
+    _collectionViewMinimumLineSpacing = collectionViewMinimumLineSpacing;
+
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+        containerView.collectionViewLayout.minimumLineSpacing = collectionViewMinimumLineSpacing;
+    }
+}
+
+- (void) setCollectionViewMinimumInteritemSpacing:(CGFloat)collectionViewMinimumInteritemSpacing
+{
+    _collectionViewMinimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
+
+    for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
+        containerView.collectionViewLayout.minimumInteritemSpacing = collectionViewMinimumInteritemSpacing;
+    }
+}
+
 @end
