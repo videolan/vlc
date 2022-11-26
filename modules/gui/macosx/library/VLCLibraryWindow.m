@@ -42,7 +42,7 @@
 #import "library/VLCLibraryAlbumTableCellView.h"
 #import "library/VLCLibraryNavigationStack.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
@@ -292,9 +292,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
     [_libraryVideoTableViewDataSource setup];
 
-    _libraryVideoCollectionViewsDataSource = [[VLCLibraryVideoCollectionViewsDataSource alloc] init];
-    _libraryVideoCollectionViewsDataSource.collectionsTableViewScrollView = _videoLibraryCollectionsTableViewScrollView;
-    _libraryVideoCollectionViewsDataSource.collectionsTableView = _videoLibraryCollectionsTableView;
+    _libraryVideoCollectionViewsStackViewController = [[VLCLibraryVideoCollectionViewsStackViewController alloc] init];
+    _libraryVideoCollectionViewsStackViewController.collectionsStackViewScrollView = _videoLibraryCollectionViewsStackViewScrollView;
+    _libraryVideoCollectionViewsStackViewController.collectionsStackView = _videoLibraryCollectionViewsStackView;
 
     _libraryAudioDataSource = [[VLCLibraryAudioDataSource alloc] init];
     _libraryAudioDataSource.libraryModel = mainInstance.libraryController.libraryModel;
@@ -379,9 +379,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _audioGroupSelectionTableViewScrollView.contentInsets = audioScrollViewInsets;
     _audioGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
     
-    _videoLibraryCollectionsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryCollectionsTableViewScrollView.contentInsets = defaultInsets;
-    _videoLibraryCollectionsTableViewScrollView.scrollerInsets = scrollerInsets;
+    _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryCollectionViewsStackViewScrollView.scrollerInsets = scrollerInsets;
     
     _videoLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
@@ -407,10 +407,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
 
-    _libraryVideoCollectionViewsDataSource.collectionViewItemSize = CGSizeMake(214., 260.);
-    _libraryVideoCollectionViewsDataSource.collectionViewMinimumLineSpacing = collectionItemSpacing;
-    _libraryVideoCollectionViewsDataSource.collectionViewMinimumInteritemSpacing = collectionItemSpacing;
-    _libraryVideoCollectionViewsDataSource.collectionViewSectionInset = collectionViewSectionInset;
+    _libraryVideoCollectionViewsStackViewController.collectionViewItemSize = CGSizeMake(214., 260.);
+    _libraryVideoCollectionViewsStackViewController.collectionViewMinimumLineSpacing = collectionItemSpacing;
+    _libraryVideoCollectionViewsStackViewController.collectionViewMinimumInteritemSpacing = collectionItemSpacing;
+    _libraryVideoCollectionViewsStackViewController.collectionViewSectionInset = collectionViewSectionInset;
 
     NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = _mediaSourceCollectionView.collectionViewLayout;
     mediaSourceCollectionViewLayout.itemSize = CGSizeMake(214., 246.);
@@ -608,11 +608,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         
         if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
             _videoLibrarySplitView.hidden = YES;
-            _videoLibraryCollectionsTableViewScrollView.hidden = NO;
-            [_libraryVideoCollectionViewsDataSource reloadData];
+            _videoLibraryCollectionViewsStackViewScrollView.hidden = NO;
+            [_libraryVideoCollectionViewsStackViewController reloadData];
         } else {
             _videoLibrarySplitView.hidden = NO;
-            _videoLibraryCollectionsTableViewScrollView.hidden = YES;
+            _videoLibraryCollectionViewsStackViewScrollView.hidden = YES;
             [_libraryVideoTableViewDataSource reloadData];
         }
     }
@@ -990,7 +990,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     if (_videoLibraryView.superview != nil) {
         if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
-            [_libraryVideoCollectionViewsDataSource reloadData];
+            [_libraryVideoCollectionViewsStackViewController reloadData];
         } else {
             [_libraryVideoTableViewDataSource reloadData];
         }

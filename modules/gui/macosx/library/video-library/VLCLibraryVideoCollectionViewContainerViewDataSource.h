@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewTableViewCell.h: MacOS X interface module
+ * VLCLibraryVideoCollectionViewTableViewCellDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -22,28 +22,19 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
-
-@class VLCSubScrollView;
+@class VLCLibraryVideoCollectionViewContainerView;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
-@class VLCLibraryVideoCollectionViewTableViewCellDataSource;
-
-typedef NS_ENUM(NSUInteger, VLCLibraryVideoCollectionViewTableViewCellType) {
-    VLCLibraryVideoCollectionViewTableViewCellNormalType = 0,
-    VLCLibraryVideoCollectionViewTableViewCellHorizontalScrollType
-};
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCollectionViewTableViewCell : NSTableCellView
+@interface VLCLibraryVideoCollectionViewContainerViewDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
-@property (readonly) NSCollectionView *collectionView;
-@property (readonly) VLCSubScrollView *scrollView;
-@property (readonly) VLCLibraryVideoCollectionViewTableViewCellDataSource *dataSource;
-@property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
-@property (readwrite, assign, nonatomic) VLCLibraryVideoGroup videoGroup;
+@property (readwrite, assign) NSCollectionView *collectionView;
+@property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
+@property (readwrite, assign) VLCLibraryVideoCollectionViewContainerView *parentCell;
 
-- (void)setVideoGroup:(VLCLibraryVideoGroup)group;
+- (void)setup;
+- (void)reloadData;
 
 @end
 

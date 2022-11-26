@@ -27,7 +27,7 @@
 #import "VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 
 #pragma mark - Private data
 static const NSUInteger kAnimationSteps = 32;
@@ -217,8 +217,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
         }
-    } else if([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoCollectionViewTableViewCellDataSource class]]) {
-        VLCLibraryVideoCollectionViewTableViewCellDataSource *videoDataSource = (VLCLibraryVideoCollectionViewTableViewCellDataSource *)self.collectionView.dataSource;
+    } else if([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoCollectionViewContainerViewDataSource class]]) {
+        VLCLibraryVideoCollectionViewContainerViewDataSource *videoDataSource = (VLCLibraryVideoCollectionViewContainerViewDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
     

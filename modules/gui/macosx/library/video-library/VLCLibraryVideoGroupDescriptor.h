@@ -22,12 +22,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/video-library/VLCLibraryVideoCollectionViewsDataSource.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 
 typedef NS_ENUM(NSUInteger, VLCLibraryVideoGroup) {
     VLCLibraryVideoInvalidGroup = 0,
     VLCLibraryVideoRecentsGroup,
     VLCLibraryVideoLibraryGroup,
+    VLCLibraryVideoSentinel,
 };
 
 NS_ASSUME_NONNULL_BEGIN

@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCRoundedCornerTextField;
 @class VLCLibraryNavigationStack;
 @class VLCLibraryAudioDataSource;
-@class VLCLibraryVideoCollectionViewsDataSource;
+@class VLCLibraryVideoCollectionViewsStackViewController;
 @class VLCLibraryVideoTableViewDataSource;
 @class VLCLibraryGroupDataSource;
 @class VLCLibrarySortingMenuController;
@@ -65,8 +65,8 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, strong) IBOutlet NSView *playlistView;
 @property (readwrite, weak) IBOutlet NSView *videoLibraryView;
 @property (readwrite, weak) IBOutlet NSSplitView *videoLibrarySplitView;
-@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryCollectionsTableViewScrollView;
-@property (readwrite, weak) IBOutlet NSTableView *videoLibraryCollectionsTableView;
+@property (readwrite, weak) IBOutlet NSScrollView *videoLibraryCollectionViewsStackViewScrollView;
+@property (readwrite, weak) IBOutlet NSStackView *videoLibraryCollectionViewsStackView;
 @property (readwrite, weak) IBOutlet NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *videoLibraryGroupSelectionTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *videoLibraryGroupsTableViewScrollView;
@@ -114,7 +114,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
 @property (readonly) VLCLibraryAudioDataSource *libraryAudioDataSource;
 @property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoTableViewDataSource;
-@property (readonly) VLCLibraryVideoCollectionViewsDataSource *libraryVideoCollectionViewsDataSource;
+@property (readonly) VLCLibraryVideoCollectionViewsStackViewController *libraryVideoCollectionViewsStackViewController;
 @property (readonly) VLCLibraryGroupDataSource *libraryAudioGroupDataSource;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCMediaSourceBaseDataSource *mediaSourceDataSource;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewTableViewCellDataSource.h: MacOS X interface module
+ * VLCLibraryVideoCollectionViewContainerView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -22,19 +22,24 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class VLCLibraryVideoCollectionViewTableViewCell;
+#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+
+@class VLCSubScrollView;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
+@class VLCLibraryVideoCollectionViewContainerViewDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCollectionViewTableViewCellDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+@interface VLCLibraryVideoCollectionViewContainerView : NSView
 
-@property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
-@property (readwrite, assign) VLCLibraryVideoCollectionViewTableViewCell *parentCell;
+@property (readonly) NSCollectionView *collectionView;
+@property (readonly) VLCSubScrollView *scrollView;
+@property (readonly) VLCLibraryVideoCollectionViewContainerViewDataSource *dataSource;
+@property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
+@property (readwrite, assign, nonatomic) VLCLibraryVideoGroup videoGroup;
+@property (readwrite, assign) NSArray<NSLayoutConstraint *> *constraintsWithSuperview;
 
-- (void)setup;
-- (void)reloadData;
+- (void)setVideoGroup:(VLCLibraryVideoGroup)group;
 
 @end
 

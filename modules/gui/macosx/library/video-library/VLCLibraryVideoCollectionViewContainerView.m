@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewTableViewCell.m: MacOS X interface module
+ * VLCLibraryVideoCollectionViewContainerView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,17 +20,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoCollectionViewTableViewCell.h"
+#import "VLCLibraryVideoCollectionViewContainerView.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 
-#import "library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.h"
+#import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "views/VLCSubScrollView.h"
 
-@implementation VLCLibraryVideoCollectionViewTableViewCell
+@interface VLCLibraryVideoCollectionViewContainerView()
+{
+    VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
+}
+@end
+
+@implementation VLCLibraryVideoCollectionViewContainerView
 
 - (instancetype)init
 {
@@ -39,6 +45,7 @@
     if(self) {
         [self setupView];
         [self setupDataSource];
+        [self setupCollectionViewSizeChangeListener];
     }
 
     return self;
@@ -84,17 +91,27 @@
                                       constant:0
         ],
     ]];
+
+    [self setContentHuggingPriority:NSLayoutPriorityDefaultLow
+                     forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [self setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
+                                   forOrientation:NSLayoutConstraintOrientationHorizontal];
+
+    [self setContentHuggingPriority:NSLayoutPriorityDefaultHigh
+                     forOrientation:NSLayoutConstraintOrientationVertical];
+    [self setContentCompressionResistancePriority:NSLayoutPriorityDefaultHigh
+                     forOrientation:NSLayoutConstraintOrientationVertical];
 }
 
 - (void)setupCollectionView
 {
-    VLCLibraryCollectionViewFlowLayout *collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
-    collectionViewLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
-    collectionViewLayout.itemSize = CGSizeMake(214., 260.);
+    _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _collectionViewLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+    _collectionViewLayout.itemSize = CGSizeMake(214., 260.);
 
     _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
     _collectionView.postsFrameChangedNotifications = YES;
-    _collectionView.collectionViewLayout = collectionViewLayout;
+    _collectionView.collectionViewLayout = _collectionViewLayout;
     _collectionView.selectable = YES;
     _collectionView.allowsEmptySelection = YES;
     _collectionView.allowsMultipleSelection = NO;
@@ -112,9 +129,18 @@
 
 - (void)setupDataSource
 {
-    _dataSource = [[VLCLibraryVideoCollectionViewTableViewCellDataSource alloc] init];
+    _dataSource = [[VLCLibraryVideoCollectionViewContainerViewDataSource alloc] init];
     _dataSource.collectionView = _collectionView;
     [_dataSource setup];
+}
+
+- (void)setupCollectionViewSizeChangeListener
+{
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(collectionViewFrameChanged:)
+                               name:NSViewFrameDidChangeNotification
+                             object:nil];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
@@ -122,10 +148,9 @@
     _groupDescriptor = groupDescriptor;
     _dataSource.groupDescriptor = groupDescriptor;
 
-    NSCollectionViewFlowLayout *collectionViewLayout = _collectionView.collectionViewLayout;
-    collectionViewLayout.scrollDirection = _groupDescriptor.isHorizontalBarCollectionView ?
-                                           NSCollectionViewScrollDirectionHorizontal :
-                                           NSCollectionViewScrollDirectionVertical;
+    _collectionViewLayout.scrollDirection = _groupDescriptor.isHorizontalBarCollectionView ?
+                                            NSCollectionViewScrollDirectionHorizontal :
+                                            NSCollectionViewScrollDirectionVertical;
 }
 
 - (void)setVideoGroup:(VLCLibraryVideoGroup)group
@@ -136,6 +161,45 @@
 
     VLCLibraryVideoCollectionViewGroupDescriptor *descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
     [self setGroupDescriptor:descriptor];
+}
+
+- (void)collectionViewFrameChanged:(NSNotification *)notification
+{
+    if (notification.object != self) {
+        return;
+    }
+
+    // HACK: On app init the vertical collection views will not get their heights updated properly.
+    // So let's schedule a check a bit later to correct this issue...
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
+        [self invalidateIntrinsicContentSize];
+    });
+}
+
+- (NSSize)intrinsicContentSize
+{
+    NSSize collectionViewContentSize = _collectionViewLayout.collectionViewContentSize;
+    NSEdgeInsets scrollViewInsets = _collectionView.enclosingScrollView.contentInsets;
+    NSEdgeInsets collectionViewLayoutInset = _collectionViewLayout.sectionInset;
+    CGFloat insetsHeight = scrollViewInsets.top +
+                           scrollViewInsets.bottom +
+                           collectionViewLayoutInset.top +
+                           collectionViewLayoutInset.bottom +
+                           15;
+
+    if (collectionViewContentSize.height == 0) {
+        CGFloat fallback = _collectionViewLayout.itemSize.height + insetsHeight;
+
+        if (fallback <= 0) {
+            NSLog(@"Unable to provide reasonable fallback or accurate rowheight -- providing rough rowheight");
+            fallback = 400;
+        }
+
+        return NSMakeSize(fallback, fallback);
+    }
+
+    collectionViewContentSize.height += insetsHeight;
+    return collectionViewContentSize;
 }
 
 @end

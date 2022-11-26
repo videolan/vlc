@@ -104,12 +104,12 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsDataSource.h \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsDataSource.m \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCell.h \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCell.m \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.h \
-	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewTableViewCellDataSource.m \
+	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h \
+	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.m \
+	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.h \
+	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.m \
+	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h \
+	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h \

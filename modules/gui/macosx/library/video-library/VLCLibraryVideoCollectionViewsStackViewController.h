@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewsDataSource.h: MacOS X interface module
+ * VLCLibraryVideoCollectionViewsStackViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -24,16 +24,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Serves collection views for each of the video library sections **/
-@interface VLCLibraryVideoCollectionViewsDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
+@interface VLCLibraryVideoCollectionViewsStackViewController : NSObject
 
 @property (readwrite, assign) NSSize collectionViewItemSize;
 @property (readwrite, assign) CGFloat collectionViewMinimumLineSpacing;
 @property (readwrite, assign) CGFloat collectionViewMinimumInteritemSpacing;
 @property (readwrite, assign) NSEdgeInsets collectionViewSectionInset;
 
-@property (readwrite, assign, nonatomic) NSTableView *collectionsTableView;
-@property (readwrite, assign) NSScrollView *collectionsTableViewScrollView;
+@property (readwrite, assign, nonatomic) NSStackView *collectionsStackView;
+@property (readwrite, assign, nonatomic) NSScrollView *collectionsStackViewScrollView;
 
 - (void)reloadData;
 

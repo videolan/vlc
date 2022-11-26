@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoCollectionViewTableViewCellDataSource.m: MacOS X interface module
+ * VLCLibraryVideoCollectionViewContainerViewDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoCollectionViewTableViewCellDataSource.h"
+#import "VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -34,7 +34,7 @@
 
 #import "main/VLCMain.h"
 
-@interface VLCLibraryVideoCollectionViewTableViewCellDataSource ()
+@interface VLCLibraryVideoCollectionViewContainerViewDataSource ()
 {
     NSArray *_collectionArray;
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
@@ -42,7 +42,7 @@
 }
 @end
 
-@implementation VLCLibraryVideoCollectionViewTableViewCellDataSource
+@implementation VLCLibraryVideoCollectionViewContainerViewDataSource
 
 - (instancetype)init
 {
