@@ -106,7 +106,7 @@ VLC_API void vlc_tracer_TraceWithTs(struct vlc_tracer *tracer, vlc_tick_t ts, ..
 static inline struct vlc_tracer_entry vlc_tracer_entry_FromTick(const char *key, vlc_tick_t value)
 {
     vlc_tracer_value_t tracer_value;
-    tracer_value.integer = value;
+    tracer_value.tick = value;
     struct vlc_tracer_entry trace = { key, tracer_value, VLC_TRACER_TICK };
     return trace;
 }
