@@ -201,8 +201,7 @@ tc_pbo_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         priv->gl.ActiveTexture(GL_TEXTURE0 + i);
         priv->gl.BindTexture(interop->tex_target, textures[i]);
 
-        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
-            * tex_width[i] / (pic->p[i].i_visible_pitch ? pic->p[i].i_visible_pitch : 1));
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch / pic->p[i].i_pixel_pitch);
 
         priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                                    interop->texs[i].format, interop->texs[i].type, NULL);
@@ -214,8 +213,7 @@ tc_pbo_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         /* For YUV 4:2:2 formats, a single plane is uploaded into 2 textures */
         priv->gl.ActiveTexture(GL_TEXTURE1);
         priv->gl.BindTexture(interop->tex_target, textures[1]);
-        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[0].i_pitch
-            * tex_width[1] / (pic->p[0].i_visible_pitch ? pic->p[0].i_visible_pitch : 1));
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[1].i_pitch / pic->p[1].i_pixel_pitch);
         priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, tex_width[1], tex_height[1],
                                interop->texs[1].format, interop->texs[1].type, NULL);
         priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -244,8 +242,8 @@ tc_common_allocate_textures(const struct vlc_gl_interop *interop, uint32_t textu
 
 static int
 upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
-             int32_t width, int32_t height,
-             unsigned pitch, unsigned visible_pitch, const void *pixels)
+             int32_t width, int32_t height, size_t pitch, size_t pixel_size,
+             const void *pixels)
 {
     struct priv *priv = interop->priv;
     GLenum tex_format = interop->texs[tex_idx].format;
@@ -254,12 +252,20 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
     /* This unpack alignment is the default, but setting it just in case. */
     priv->gl.PixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
+    assert(height > 0);
+    assert(width > 0);
+    assert(pixel_size);
+    assert(pitch % pixel_size == 0);
+    assert((size_t) width * pixel_size <= pitch);
+
+    size_t width_bytes = width * pixel_size;
+
     if (!priv->has_unpack_subimage)
     {
-        if (pitch != visible_pitch)
+        if (pitch != width_bytes)
         {
-            visible_pitch = vlc_align(visible_pitch, 4);
-            size_t buf_size = visible_pitch * height;
+            size_t aligned_row_len = vlc_align(width_bytes, 4);
+            size_t buf_size = aligned_row_len * height;
             const uint8_t *source = pixels;
             uint8_t *destination;
             if (priv->texture_temp_buf_size < buf_size)
@@ -277,9 +283,9 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
 
             for (GLsizei h = 0; h < height ; h++)
             {
-                memcpy(destination, source, visible_pitch);
+                memcpy(destination, source, width_bytes);
                 source += pitch;
-                destination += visible_pitch;
+                destination += aligned_row_len;
             }
             priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
                                    tex_format, tex_type, priv->texture_temp_buf);
@@ -292,7 +298,7 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
     }
     else
     {
-        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ? visible_pitch : 1));
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pitch / pixel_size);
         priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
                                tex_format, tex_type, pixels);
         priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -317,7 +323,7 @@ tc_common_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                              pic->p[i].p_pixels;
 
         ret = upload_plane(interop, i, tex_width[i], tex_height[i],
-                           pic->p[i].i_pitch, pic->p[i].i_visible_pitch, pixels);
+                           pic->p[i].i_pitch, pic->p[i].i_pixel_pitch, pixels);
     }
 
     if (pic->i_planes == 1 && interop->tex_count == 2)
@@ -331,7 +337,7 @@ tc_common_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                              pic->p[0].p_pixels;
 
         ret = upload_plane(interop, 1, tex_width[1], tex_height[1],
-                           pic->p[0].i_pitch, pic->p[0].i_visible_pitch, pixels);
+                           pic->p[0].i_pitch, pic->p[0].i_pixel_pitch, pixels);
     }
 
     return ret;
