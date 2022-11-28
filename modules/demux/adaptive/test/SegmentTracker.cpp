@@ -679,7 +679,7 @@ static int SegmentTracker_check_HLSseeks(BaseAdaptationSet *adaptSet,
         }
         rep0->addAttribute(segmentList);
 
-        DummyHLSRepresentation *rep1 = new DummyHLSRepresentation(adaptSet, 2.5);
+        DummyHLSRepresentation *rep1 = new DummyHLSRepresentation(adaptSet, 3);
         adaptSet->addRepresentation(rep1);
         rep1->setID(ID("1"));
 
