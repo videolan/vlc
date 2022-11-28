@@ -2940,6 +2940,19 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
                             p_block->i_pts, p_block->i_dts);
     }
 
+    const char *type =
+        es->fmt.i_cat == VIDEO_ES ? "VIDEO" :
+        es->fmt.i_cat == AUDIO_ES ? "AUDIO" :
+        NULL;
+
+    if( type != NULL )
+    {
+        msg_Info( p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][%s], dts=%" PRId64 ", pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()), type,
+                  NS_FROM_VLC_TICK(p_block->i_dts),
+                  NS_FROM_VLC_TICK(p_block->i_pts) );
+    }
+
     struct input_stats *stats = input_priv(p_input)->stats;
     if( stats != NULL )
     {
@@ -3398,6 +3411,10 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         {
             vlc_tracer_TracePCR(tracer, "DEMUX", "PCR", i_pcr);
         }
+
+        msg_Info( p_sys->p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][PCR], pcr=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()), NS_FROM_VLC_TICK(i_pcr) );
+
         input_thread_private_t *priv = input_priv(p_sys->p_input);
 
         if ( priv->p_sout != NULL )

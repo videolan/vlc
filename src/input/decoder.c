@@ -1208,10 +1208,27 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
 
-    if ( tracer != NULL )
+    const char *type =
+        p_dec->fmt_in.i_cat == VIDEO_ES ? "VIDEO" :
+        p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
+        "UNKNOWN";
+
+    if ( tracer != NULL && type != NULL)
     {
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", type),
+                VLC_TRACE("id", "[DEC][OUT]"),
+                VLC_TRACE("stream", p_owner->psz_id),
+                VLC_TRACE("pts", NS_FROM_VLC_TICK(p_pic->date)),
+                         VLC_TRACE_END);
         vlc_tracer_TraceStreamPTS( tracer, "DEC", p_owner->psz_id,
                             "OUT", p_pic->date );
+    }
+
+    if( type != NULL )
+    {
+        msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][OUT][%s], pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()), type,
+                  NS_FROM_VLC_TICK(p_pic->date) );
     }
 
     vlc_fifo_Lock( p_owner->p_fifo );
@@ -1428,13 +1445,28 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
     decoder_t *p_dec = &p_owner->dec;
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
 
-    if ( tracer != NULL && frame != NULL )
+    const char *type =
+        p_dec->fmt_in->i_cat == VIDEO_ES ? "VIDEO" :
+        p_dec->fmt_in->i_cat == AUDIO_ES ? "AUDIO" :
+        NULL;
+
+    if ( tracer != NULL && type != NULL && frame != NULL )
     {
         vlc_tracer_TraceStreamDTS( tracer, "DEC", p_owner->psz_id, "IN",
                             frame->i_pts, frame->i_dts );
     }
 
+    if( type != NULL && frame != NULL )
+    {
+        msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][IN][%s], dts=%" PRId64
+                          ", pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()), type,
+                  NS_FROM_VLC_TICK(frame->i_dts),
+                  NS_FROM_VLC_TICK(frame->i_pts) );
+    }
+
     int ret = p_dec->pf_decode( p_dec, frame );
+
     switch( ret )
     {
         case VLCDEC_SUCCESS:
