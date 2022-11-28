@@ -1,5 +1,5 @@
 # UPNP
-UPNP_VERSION := 1.14.13
+UPNP_VERSION := 1.14.15
 UPNP_URL := $(GITHUB)/pupnp/pupnp/archive/refs/tags/release-$(UPNP_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -37,8 +37,6 @@ upnp: pupnp-release-$(UPNP_VERSION).tar.gz .sum-upnp
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
-	$(APPLY) $(SRC)/upnp/0001-ThreadPool-Fix-non-UCRT-builds.patch
-	$(APPLY) $(SRC)/upnp/win32-remove-wrong-safe-wrappers.patch
 endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/upnp/revert-ifaddrs.patch
