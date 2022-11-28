@@ -14,18 +14,14 @@ $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 
 libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
-	$(APPLY) $(SRC)/libtasn1/no-executables.patch
 	$(APPLY) $(SRC)/libtasn1/0001-fcntl-do-not-call-GetHandleInformation-in-Winstore-a.patch
-	# on iOS for some reason _GNU_SOURCE is found in config.h but strverscmp() is not found
-	sed -i.orig -e 's, -DASN1_BUILDING, -DASN1_BUILDING -D_GNU_SOURCE,' $(UNPACK_DIR)/lib/Makefile.am
 	$(MOVE)
 
 LIBTASN1_CONF := --disable-doc
 
 .libtasn1: libtasn1
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(LIBTASN1_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) bin_PROGRAMS=
+	+$(MAKEBUILD) bin_PROGRAMS= install
 	touch $@
