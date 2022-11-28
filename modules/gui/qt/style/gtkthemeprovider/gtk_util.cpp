@@ -217,12 +217,12 @@ GdkRGBA CairoSurface::GetAveragePixelValue(bool frame) {
     int stride = cairo_image_surface_get_stride(surface_);
     assert(cairo_image_surface_get_format(surface_) == CAIRO_FORMAT_ARGB32);
     long a = 0, r = 0, g = 0, b = 0;
-    uint64_t max_alpha = 0;
+    uint32_t max_alpha = 0;
     for (int line = 0; line < height; line++)
     {
-        uint64_t* rgbaLine = (uint64_t*)(&data[line*stride]);
+        uint32_t* rgbaLine = (uint32_t*)(&data[line*stride]);
         for (int i = 0; i < width; i++) {
-            uint64_t color =  rgbaLine[i];
+            uint32_t color =  rgbaLine[i];
             max_alpha = std::max((color >> 24) & 0xFF, max_alpha);
             a += (color >> 24) & 0xFF;
             r += (color >> 16) & 0xFF;
