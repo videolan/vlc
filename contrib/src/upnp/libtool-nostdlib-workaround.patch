@@ -1,0 +1,50 @@
+From 10278966327553b32d6799fb228be7506757778e Mon Sep 17 00:00:00 2001
+From: Alaric Senat <dev.asenat@posteo.net>
+Date: Tue, 29 Nov 2022 14:00:02 +0100
+Subject: [PATCH] libtool-nostdlib-workaround
+
+Works around a libtool linking with `-no-stdlib` which discards
+`-lpthread`.
+Also forces win32 networking libs which are probably missing for the
+same reasons.
+---
+ CMakeLists.txt | 9 +++++++++
+ libupnp.pc.in  | 2 +-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index de7f4525..6fd04bf4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -301,6 +301,15 @@ if (UPNP_ENABLE_OPEN_SSL)
+ 	set (OPENSSL_LIBS "-lssl")
+ endif()
+ 
++if (WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    set (VLC_FORCED_LIBS "-pthread -lpthread")
++
++    # Force network libs.
++    if (WIN32)
++        set (VLC_FORCED_LIBS "${VLC_FORCED_LIBS} -liphlpapi -lws2_32")
++    endif()
++endif()
++
+ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/libupnp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc @ONLY)
+ 
+ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libupnp.pc
+diff --git a/libupnp.pc.in b/libupnp.pc.in
+index 8c6fc22f..4c8b9f79 100644
+--- a/libupnp.pc.in
++++ b/libupnp.pc.in
+@@ -6,7 +6,7 @@ includedir=@includedir@
+ Name: libupnp
+ Description: Linux SDK for UPnP Devices
+ Version: @VERSION@
+-Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp -lixml
++Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp -lixml @VLC_FORCED_LIBS@
+ Libs.private: @OPENSSL_LIBS@
+ Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
+ 
+-- 
+2.38.1
+
