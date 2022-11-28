@@ -282,19 +282,19 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
                 destination += visible_pitch;
             }
             priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
-                                       tex_format, tex_type, priv->texture_temp_buf);
+                                   tex_format, tex_type, priv->texture_temp_buf);
         }
         else
         {
             priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
-                                       tex_format, tex_type, pixels);
+                                   tex_format, tex_type, pixels);
         }
     }
     else
     {
         priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ? visible_pitch : 1));
         priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, width, height,
-                                   tex_format, tex_type, pixels);
+                               tex_format, tex_type, pixels);
         priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
     return VLC_SUCCESS;
