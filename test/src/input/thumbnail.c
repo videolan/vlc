@@ -150,11 +150,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         }
 
         while ( ctx.b_done == false )
-        {
-            vlc_tick_t timeout = vlc_tick_now() + VLC_TICK_FROM_SEC( 2 );
-            res = vlc_cond_timedwait( &ctx.cond, &ctx.lock, timeout );
-            assert( res != ETIMEDOUT );
-        }
+            vlc_cond_wait( &ctx.cond, &ctx.lock );
         vlc_mutex_unlock( &ctx.lock );
 
         input_item_Release( p_item );
