@@ -29,6 +29,7 @@
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibrarySongsTableView.h"
 
 @interface VLCLibraryAudioViewController()
 {
@@ -110,6 +111,55 @@
     if(@available(macOS 11.0, *)) {
         _audioGroupSelectionTableView.style = NSTableViewStyleFullWidth;
     }
+
+    [self setupSongsTableView];
+}
+
+- (void)setupSongsTableView
+{
+    _audioSongTableView = [[VLCLibrarySongsTableView alloc] init];
+    _audioSongTableViewScrollView = [[NSScrollView alloc] init];
+    _audioSongTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    _audioSongTableViewScrollView.documentView = _audioSongTableView;
+
+    [_audioLibraryView addSubview:_audioSongTableViewScrollView];
+    [_audioLibraryView addConstraints:@[
+        [NSLayoutConstraint constraintWithItem:_audioSongTableViewScrollView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_audioLibraryView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1.
+                                      constant:_optionBarView.frame.size.height
+        ],
+        [NSLayoutConstraint constraintWithItem:_audioSongTableViewScrollView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_audioLibraryView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:_audioSongTableViewScrollView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_audioLibraryView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:_audioSongTableViewScrollView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_audioLibraryView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1.
+                                      constant:0.
+        ],
+    ]];
+
+    _audioSongTableView.dataSource = _audioDataSource;
+    _audioSongTableView.delegate = _audioDataSource;
 }
 
 - (void)setupAudioPlaceholderView
@@ -212,6 +262,7 @@
 
     if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
         _audioLibrarySplitView.hidden = YES;
+        _audioSongTableViewScrollView.hidden = YES;
         _audioCollectionViewScrollView.hidden = NO;
     } else {
         [self presentAudioTableView];
@@ -224,6 +275,12 @@
 
 - (void)presentAudioTableView
 {
+    if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment) {
+        _audioLibrarySplitView.hidden = YES;
+        _audioSongTableViewScrollView.hidden = NO;
+        return;
+    }
+    _audioSongTableViewScrollView.hidden = YES;
     _audioLibrarySplitView.hidden = NO;
 }
 
@@ -234,6 +291,10 @@
     }
 
     _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
+
+    if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
+        [self presentAudioTableView];
+    }
 
     VLCLibraryNavigationStack *globalNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
     if(sender != globalNavStack) {

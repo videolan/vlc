@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTableView *audioCollectionSelectionTableView;
 @property (readonly) NSScrollView *audioGroupSelectionTableViewScrollView;
 @property (readonly) NSTableView *audioGroupSelectionTableView;
+@property (readonly) NSScrollView *audioSongTableViewScrollView;
+@property (readonly) NSTableView *audioSongTableView;
 @property (readonly) NSScrollView *audioCollectionViewScrollView;
 @property (readonly) NSCollectionView *audioLibraryCollectionView;
 @property (readonly) NSSegmentedControl *audioSegmentedControl;
