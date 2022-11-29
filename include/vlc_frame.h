@@ -485,7 +485,7 @@ static size_t vlc_frame_ChainExtract( vlc_frame_t *p_list, void *p_data, size_t 
  * @param[out]  pi_size     Pointer to number of bytes in the chain (may be NULL)
  * @param[out]  pi_length   Pointer to length (duration) of the chain (may be NULL)
  */
-static inline void vlc_frame_ChainProperties( vlc_frame_t *p_list, int *pi_count, size_t *pi_size, vlc_tick_t *pi_length )
+static inline void vlc_frame_ChainProperties( const vlc_frame_t *p_list, int *pi_count, size_t *pi_size, vlc_tick_t *pi_length )
 {
     size_t i_size = 0;
     vlc_tick_t i_length = 0;
@@ -513,7 +513,7 @@ static inline void vlc_frame_ChainProperties( vlc_frame_t *p_list, int *pi_count
  *
  * All frames in the chain are gathered into a single vlc_frame_t and the
  * original chain is released.
- * 
+ *
  * @param   p_list  Pointer to the first vlc_frame_t of the chain to gather
  * @return  Returns a pointer to a new vlc_frame_t or NULL if the frame can not
  *          be allocated, in which case the original chain is not released.
