@@ -41,10 +41,13 @@ FocusScope {
     property int leftMargin: VLCStyle.margin_normal
     property int rightMargin: VLCStyle.margin_normal
 
-    // NOTE: The grid margin for the item(s) horizontal positioning.
-    readonly property int contentMargin: (_contentWidth - nbItemPerRow * _effectiveCellWidth
-                                          +
-                                          horizontalSpacing) / 2
+    readonly property int extraMargin: (_contentWidth - nbItemPerRow * _effectiveCellWidth
+                                        +
+                                        horizontalSpacing) / 2
+
+    // NOTE: The grid margins for the item(s) horizontal positioning.
+    readonly property int contentLeftMargin: extraMargin + leftMargin
+    readonly property int contentRightMargin: extraMargin + rightMargin
 
     readonly property int rowHeight: cellHeight + verticalSpacing
 
@@ -124,9 +127,8 @@ FocusScope {
 
     onHeightChanged: flickable.layout(false)
 
-    // NOTE: Update on contentMargin change rather than width since the margin defines the x
-    //       position and depends on the width.
-    onContentMarginChanged: flickable.layout(true)
+    // NOTE: Update on contentLeftMargin since we depend on this for item placements.
+    onContentLeftMarginChanged: flickable.layout(true)
 
     onDisplayMarginEndChanged: flickable.layout(false)
 
@@ -341,7 +343,7 @@ FocusScope {
     function getItemPos(id) {
         var rowCol = getItemRowCol(id);
 
-        var x = rowCol[0] * _effectiveCellWidth + contentMargin + leftMargin;
+        var x = rowCol[0] * _effectiveCellWidth + contentLeftMargin;
 
         var y = rowCol[1] * rowHeight + headerHeight + topMargin;
 

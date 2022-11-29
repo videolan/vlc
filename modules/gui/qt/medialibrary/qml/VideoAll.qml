@@ -35,8 +35,7 @@ FocusScope {
 
     // Properties
 
-    readonly property int contentMargin: (_currentView.contentMargin) ? _currentView.contentMargin
-                                                                      : 0
+    readonly property int contentMargin: (_currentView) ? _currentView.contentLeftMargin : 0
 
     // NOTE: Specify an optional header for the view.
     property Component header: null
@@ -326,7 +325,7 @@ FocusScope {
         VideoListDisplay {
             id: listView
 
-            readonly property real contentMargin: VLCStyle.margin_normal
+            readonly property real contentLeftMargin: VLCStyle.margin_normal
 
             // Settings
 

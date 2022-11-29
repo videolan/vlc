@@ -40,7 +40,7 @@ FocusScope {
 
     readonly property int contentHeight: (_currentView) ? _currentView.contentHeight : 0
 
-    readonly property int contentMargin: (_currentView) ? _currentView.contentMargin : 0
+    readonly property int contentMargin: (_currentView) ? _currentView.contentLeftMargin : 0
 
     property int displayMarginEnd: 0
 
@@ -261,7 +261,7 @@ FocusScope {
         Widgets.KeyNavigableTableView {
             id: listView
 
-            readonly property real contentMargin: VLCStyle.margin_normal
+            readonly property real contentLeftMargin: VLCStyle.margin_normal
 
             readonly property int maximumCount: root.maximumRows
 
