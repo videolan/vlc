@@ -36,7 +36,6 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
-	$(APPLY) $(SRC)/mpg123/no-programs.patch
 	$(call pkg_static,"libmpg123.pc.in")
 	$(MOVE)
 
@@ -44,6 +43,6 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(MPG123CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) bin_PROGRAMS=
+	+$(MAKEBUILD) bin_PROGRAMS= install
 	touch $@
