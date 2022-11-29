@@ -20,7 +20,6 @@ ifdef HAVE_WINSTORE
 endif
 endif
 	$(APPLY) $(SRC)/gpg-error/missing-unistd-include.patch
-	$(APPLY) $(SRC)/gpg-error/no-executable.patch
 	$(APPLY) $(SRC)/gpg-error/win32-unicode.patch
 	$(APPLY) $(SRC)/gpg-error/version-bump-gawk-5.patch
 	$(APPLY) $(SRC)/gpg-error/win32-extern-struct.patch
@@ -41,6 +40,6 @@ GPGERROR_CONF := \
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(GPGERROR_CONF)
 	# pre_mkheader_cmds would delete our lock-obj-pub-native.h
-	$(MAKE) -C $< pre_mkheader_cmds=true
-	$(MAKE) -C $< pre_mkheader_cmds=true install
+	$(MAKE) -C $< pre_mkheader_cmds=true bin_PROGRAMS=
+	$(MAKE) -C $< pre_mkheader_cmds=true bin_PROGRAMS= install
 	touch $@
