@@ -1485,8 +1485,6 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         {
             if (tracer != NULL)
                 vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "late");
-            msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
-            vout_statistic_AddLate(&sys->statistic, 1);
 
             /* vd->prepare took too much time. Tell the clock that the pts was
              * rendered late. */
