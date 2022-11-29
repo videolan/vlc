@@ -9,7 +9,7 @@ ifeq ($(call need_pkg,"sqlite3 >= 3.33.0"),)
 PKGS_FOUND += sqlite
 endif
 
-SQLITE_CONF = --disable-readline --disable-shell
+SQLITE_CONF = --disable-readline
 
 ifdef HAVE_WINSTORE
 SQLITE_CONF += CFLAGS="$(CFLAGS) -DSQLITE_OS_WINRT=1"
@@ -22,14 +22,12 @@ $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 
 sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(UNPACK)
-	$(APPLY) $(SRC)/sqlite/sqlite-no-shell.patch
 	$(call pkg_static, "sqlite3.pc.in")
 	$(MOVE)
 
 .sqlite: sqlite
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SQLITE_CONF)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) bin_PROGRAMS=
+	+$(MAKEBUILD) bin_PROGRAMS= install
 	touch $@
