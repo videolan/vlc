@@ -2721,18 +2721,12 @@ if test "${enable_swscale}" != "no"
 then
   PKG_CHECK_MODULES(SWSCALE,[libswscale >= 0.5.0],
     [
-      VLC_SAVE_FLAGS
-      CPPFLAGS="${CPPFLAGS} ${SWSCALE_CFLAGS}"
-      CFLAGS="${CFLAGS} ${SWSCALE_CFLAGS}"
-      AC_CHECK_HEADERS([libswscale/swscale.h])
-      AC_CHECK_HEADERS([libavutil/avutil.h])
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
       AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
         VLC_ADD_LIBS([swscale],[${ac_cv_ld_bsymbolic}])
       ])
-      VLC_RESTORE_FLAGS
     ],[
       AC_MSG_ERROR([${SWSCALE_PKG_ERRORS}. Pass --disable-swscale to ignore this error. Proper software scaling and some video chroma conversion will be missing.])
   ])
