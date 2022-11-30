@@ -65,7 +65,7 @@ static const char *const ppsz_filter_options[] = {
     NULL
 };
 
-static int OpenGLFilterSharpenSigmaVarCallback(vlc_object_t *p_this, char const *psz_variable,
+static int OpenGLFilterFloatVarCallback(vlc_object_t *p_this, char const *psz_variable,
                                                vlc_value_t oldvalue, vlc_value_t newvalue,
                                                void *p_data)
 {
@@ -75,7 +75,7 @@ static int OpenGLFilterSharpenSigmaVarCallback(vlc_object_t *p_this, char const 
     return VLC_SUCCESS;
 }
 
-static int VideoFilterSharpenSigmaVarCallback(vlc_object_t *p_this, char const *psz_variable,
+static int VideoFilterForwardVarCallback(vlc_object_t *p_this, char const *psz_variable,
                                               vlc_value_t oldvalue, vlc_value_t newvalue,
                                               void *p_data)
 {
@@ -172,7 +172,7 @@ Close(struct vlc_gl_filter *filter) {
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
     var_DelCallback(filter, FILTER_PREFIX "sigma", 
-                    OpenGLFilterSharpenSigmaVarCallback,
+                    OpenGLFilterFloatVarCallback,
                     &sys->sigma);
 
     vlc_gl_t *gl = (vlc_gl_t *)vlc_object_parent(filter);
@@ -180,7 +180,7 @@ Close(struct vlc_gl_filter *filter) {
     if (var_Type(video_filter, FILTER_PREFIX "sigma"))
     {
         var_DelCallback( video_filter, FILTER_PREFIX "sigma",
-                        VideoFilterSharpenSigmaVarCallback, filter );
+                        VideoFilterForwardVarCallback, filter );
     }
     free(sys);
 }
@@ -216,7 +216,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     atomic_init(&sys->sigma,
                 var_CreateGetFloatCommand(filter, FILTER_PREFIX "sigma"));
 
-    var_AddCallback(filter, FILTER_PREFIX "sigma", OpenGLFilterSharpenSigmaVarCallback,
+    var_AddCallback(filter, FILTER_PREFIX "sigma", OpenGLFilterFloatVarCallback,
                     &sys->sigma );
 
     vlc_gl_t *gl = (vlc_gl_t *)vlc_object_parent(filter);
@@ -224,7 +224,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     if (var_Type(video_filter, FILTER_PREFIX "sigma"))
     {
         var_AddCallback( video_filter, FILTER_PREFIX "sigma",
-                        VideoFilterSharpenSigmaVarCallback, filter );
+                        VideoFilterForwardVarCallback, filter );
     }
     
     static const char *const VERTEX_SHADER =
