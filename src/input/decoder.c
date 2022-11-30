@@ -1791,16 +1791,17 @@ static void *DecoderThread( void *p_data )
         DecoderThread_ProcessInput( p_owner, frame );
 
         vlc_fifo_Lock(p_owner->p_fifo);
-        if( frame == NULL && p_owner->dec.fmt_in->i_cat == AUDIO_ES )
-        {   /* Draining: the decoder is drained and all decoded buffers are
-             * queued to the output at this point. Now drain the output. */
-            if( p_owner->p_astream != NULL )
+        if( p_owner->b_draining && frame == NULL )
+        {
+            p_owner->b_draining = false;
+
+            if( p_owner->dec.fmt_in->i_cat == AUDIO_ES && p_owner->p_astream != NULL )
+            {   /* Draining: the decoder is drained and all decoded buffers are
+                 * queued to the output at this point. Now drain the output. */
                 vlc_aout_stream_Drain( p_owner->p_astream );
+            }
         }
 
-        /* TODO? Wait for draining instead of polling. */
-        if( p_owner->b_draining && (frame == NULL) )
-            p_owner->b_draining = false;
         vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
@@ -2386,6 +2387,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
      * dequeued by DecoderThread and there is no need to flush a second time in
      * a row. */
     p_owner->flushing = true;
+    p_owner->b_draining = false;
 
     /* Flush video/spu decoder when paused: increment frames_countdown in order
      * to display one frame/subtitle */
