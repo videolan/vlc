@@ -339,7 +339,7 @@ static int OpenVideoFilter(filter_t *filter)
 
     var_CreateGetFloatCommand(filter, FILTER_PREFIX "sigma");
 
-    module_t *module = vlc_gl_WrapOpenGLFilter(filter, "gl-sharpen");
+    module_t *module = vlc_gl_WrapOpenGLFilter(filter, "glsharpen");
     return module ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
