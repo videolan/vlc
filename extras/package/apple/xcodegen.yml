@@ -2,7 +2,7 @@ name: VLC
 options:
   bundleIdPrefix: org.videolan.vlc
   deploymentTarget:
-    iOS: 9.0
+    iOS: 10.0
 configs:
   Debug: debug
   Release: release
