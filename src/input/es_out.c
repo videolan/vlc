@@ -535,6 +535,25 @@ decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
     atomic_store_explicit(&stats->audio_latency, latency, memory_order_relaxed);
 }
 
+static void
+decoder_on_new_audio_latency(vlc_input_decoder_t *decoder, vlc_tick_t latency,
+                             void *userdata)
+{
+    (void) decoder;
+
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (p_sys->p_input == NULL)
+        return;
+
+    input_SendEvent(p_sys->p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_AOUT_LATENCY,
+        .latency = latency,
+    });
+}
+
 static int
 decoder_get_attachments(vlc_input_decoder_t *decoder,
                         input_attachment_t ***ppp_attachment,
@@ -601,6 +620,7 @@ static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_new_video_sk_stats = decoder_on_new_video_sk_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,
     .on_new_decoder_stats = decoder_on_new_decoder_stats,
+    .on_new_audio_latency = decoder_on_new_audio_latency,
     .get_attachments = decoder_get_attachments,
 };
 
