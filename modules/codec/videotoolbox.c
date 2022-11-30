@@ -1249,7 +1249,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void StopVideoToolbox(decoder_t *p_dec, bool closing)
+static void StopVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -1260,26 +1260,6 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
         VTDecompressionSessionInvalidate(p_sys->session);
         CFRelease(p_sys->session);
         p_sys->session = NULL;
-
-#if TARGET_OS_IPHONE
-        /* In case of 4K 10bits (BGRA), we can easily reach the device max
-         * memory when flushing. Indeed, we'll create a new VT session that
-         * will reallocate frames while previous frames are still used by the
-         * vout (and not released). To work-around this issue, we force a vout
-         * change. */
-        if (!closing && p_dec->fmt_out.i_codec == VLC_CODEC_CVPX_BGRA
-            && p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height >= 8000000)
-        {
-            const video_format_t orig = p_dec->fmt_out.video;
-            p_dec->fmt_out.video.i_width = p_dec->fmt_out.video.i_height =
-            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_visible_height = 64;
-            (void) decoder_UpdateVideoFormat(p_dec);
-            p_dec->fmt_out.video = orig;
-        }
-#else
-        VLC_UNUSED(closing);
-#endif
-
         p_sys->b_format_propagated = false;
         p_dec->fmt_out.i_codec = 0;
     }
@@ -1350,7 +1330,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    StopVideoToolbox(p_dec, true);
+    StopVideoToolbox(p_dec);
 
     if (p_sys->pf_codec_clean)
         p_sys->pf_codec_clean(p_dec);
@@ -1857,7 +1837,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
                 /* Drain before stopping */
                 Drain(p_dec, false);
-                StopVideoToolbox(p_dec, false);
+                StopVideoToolbox(p_dec);
 
                 vlc_mutex_lock(&p_sys->lock);
             }
@@ -1894,7 +1874,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             vlc_mutex_unlock(&p_sys->lock);
 
             /* Session will be started by Late Start code block */
-            StopVideoToolbox(p_dec, false);
+            StopVideoToolbox(p_dec);
 
             vlc_mutex_lock(&p_sys->lock);
             p_sys->vtsession_status = VTSESSION_STATUS_OK;
@@ -1956,7 +1936,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             msg_Dbg(p_dec, "parameters sets changed: draining decoder");
             Drain(p_dec, false);
             msg_Dbg(p_dec, "parameters sets changed: restarting decoder");
-            StopVideoToolbox(p_dec, false);
+            StopVideoToolbox(p_dec);
         }
 
         if (!p_sys->session)
