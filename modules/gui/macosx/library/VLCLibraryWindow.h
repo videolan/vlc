@@ -78,6 +78,8 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 @property (readwrite, weak) IBOutlet NSTableView *audioCollectionSelectionTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *audioGroupSelectionTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *audioGroupSelectionTableView;
+@property (readwrite, weak) IBOutlet NSScrollView *audioLibrarySongsTableViewScrollView;
+@property (readwrite, weak) IBOutlet NSTableView *audioLibrarySongsTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *audioCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet NSCollectionView *audioLibraryCollectionView;
 @property (readwrite, weak) IBOutlet NSVisualEffectView *optionBarView;
