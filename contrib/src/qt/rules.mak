@@ -140,6 +140,8 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 
 .qt: qt
 	$(call qmake_toolchain, $<)
+	# Prevent all Qt contribs from generating and installing libtool .la files
+	sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" $(UNPACK_DIR)/mkspecs/features/qt_module.prf
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5 \
 	    $(shell $(SRC)/qt/configure-env.py $(CPPFLAGS) $(LDFLAGS))
 	# Make && Install libraries
