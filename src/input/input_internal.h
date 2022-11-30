@@ -271,14 +271,14 @@ struct vlc_input_event_vout
 struct vlc_input_event_vout_frame_displayed
 {
     vout_thread_t *vout;
-    struct vlc_es_out_id_t *id;
+    vlc_es_id_t *id;
     vlc_tick_t pts;
 };
 
 struct vlc_input_event_captions
 {
     vout_thread_t *vout;
-    void *p_cc;
+    const void *p_cc;
     size_t i_cc;
 };
 

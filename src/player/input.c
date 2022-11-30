@@ -870,7 +870,7 @@ input_thread_Events(input_thread_t *input_thread,
             assert(track);
 
             vlc_player_vout_SendEvent(player, on_frame_displayed,
-                event->vout_frame.vout, track,
+                event->vout_frame.vout, &track->t,
                 event->vout_frame.pts);
             break;
         }

@@ -388,7 +388,7 @@ decoder_on_vout_stopped(vlc_input_decoder_t *decoder, vout_thread_t *vout, void 
 
 static void
 decoder_on_captions_to_display(vlc_input_decoder_t *decoder, vout_thread_t *vout,
-                               void *p_cc, size_t i_cc, void *userdata)
+                               const void *p_cc, size_t i_cc, void *userdata)
 {
     (void)decoder;
     es_out_id_t *id = userdata;
@@ -426,7 +426,7 @@ decoder_on_vout_frame_displayed(vlc_input_decoder_t *decoder, vout_thread_t *vou
         .type = INPUT_EVENT_VOUT_FRAME_DISPLAYED,
         .vout_frame = {
             .vout = vout,
-            .id = id,
+            .id = &id->id,
             .pts = pts,
         },
     };
@@ -600,8 +600,8 @@ static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_new_video_stats = decoder_on_new_video_stats,
     .on_new_video_sk_stats = decoder_on_new_video_sk_stats,
     .on_new_audio_stats = decoder_on_new_audio_stats,
-    .get_attachments = decoder_get_attachments,
     .on_new_decoder_stats = decoder_on_new_decoder_stats,
+    .get_attachments = decoder_get_attachments,
 };
 
 /*****************************************************************************
