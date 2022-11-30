@@ -183,6 +183,10 @@ ATTR_PACKED
 #   pragma pack(pop)
 #endif
 
+/* disable Windws ones, keep consistency throughout our source code */
+#undef WAVE_FORMAT_PCM
+#undef WAVE_FORMAT_IMA_ADPCM
+
 /* WAVE format wFormatTag IDs */
 /* See http://msdn.microsoft.com/en-us/library/aa904731%28v=vs.80%29.aspx */
 #define WAVE_FORMAT_UNKNOWN             0x0000 /* Microsoft Corporation */
