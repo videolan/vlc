@@ -62,10 +62,10 @@ libfluidsynth_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,Core
 endif
 
 libaudiotoolboxmidi_plugin_la_SOURCES = codec/audiotoolbox_midi.c
-libaudiotoolboxmidi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libaudiotoolboxmidi_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,AudioToolbox
-EXTRA_LTLIBRARIES += libaudiotoolboxmidi_plugin.la
-codec_LTLIBRARIES += $(LTLIBaudiotoolboxmidi)
+libaudiotoolboxmidi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation,-framework,AudioToolbox
+if HAVE_DARWIN
+codec_LTLIBRARIES += libaudiotoolboxmidi_plugin.la
+endif
 
 liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
@@ -359,9 +359,10 @@ if HAVE_TVOS
 libvideotoolbox_plugin_la_CFLAGS += -mtvos-version-min=10.2
 endif
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
-libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
-EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
-codec_LTLIBRARIES += $(LTLIBvideotoolbox)
+libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+if HAVE_DARWIN
+codec_LTLIBRARIES += libvideotoolbox_plugin.la
+endif
 
 ### FFmpeg/libav ###
 libavcodec_common_la_SOURCES = codec/avcodec/fourcc.c codec/avcodec/avcommon.h \

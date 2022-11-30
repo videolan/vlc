@@ -4239,19 +4239,6 @@ fi
 AM_CONDITIONAL([HAVE_DMGBUILD], [test "$DMGBUILD" != "no" -a "${HAVE_OSX}" = "1"])
 
 dnl
-dnl  VideoToolbox plugins
-AC_CHECK_HEADERS([VideoToolbox/VideoToolbox.h], [
-    VLC_ADD_PLUGIN([videotoolbox])
-    VLC_ADD_PLUGIN([cvpx])
-  ])
-
-dnl
-dnl  AudioToolbox MIDI plugin
-AC_CHECK_HEADERS([AudioToolbox/AudioToolbox.h], [
-  VLC_ADD_PLUGIN([audiotoolboxmidi])
-])
-
-dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE([ncurses],
