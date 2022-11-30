@@ -60,7 +60,9 @@ typedef struct {
 } gl_filter_sys_t;
 
 static const char *const ppsz_filter_options[] = {
-    "sigma", NULL
+    "sigma",
+    "fast",
+    NULL
 };
 
 static int OpenGLFilterSharpenSigmaVarCallback(vlc_object_t *p_this, char const *psz_variable,
@@ -234,7 +236,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "  tex_coords = tex_coords_in;\n"
         "}\n";
 
-    static const char *const FRAGMENT_SHADER =
+    static const char *const FRAGMENT_SHADER_FULL =
         "varying vec2 tex_coords;\n"
         "uniform float sigma;\n"
         "uniform vec2 one_pixel_up;\n"
@@ -256,6 +258,27 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "               + vlc_texture(tex_coords + one_pixel_up + one_pixel_right).rgb\n"
         "               + vlc_texture(tex_coords + one_pixel_up                  ).rgb)\n"
         "             + 8.0 * color;\n"
+        "  gl_FragColor = vec4(clamp(color + sigma * pix, 0.0, 1.0), 1.0);\n"
+        "}\n";
+    
+    static const char *const FRAGMENT_SHADER_HALF =
+        "varying vec2 tex_coords;\n"
+        "uniform float sigma;\n"
+        "uniform vec2 one_pixel_up;\n"
+        "uniform vec2 one_pixel_right;\n"
+        "void main() {\n"
+        /*
+         * Kernel:
+         *    -1
+         * -1  4 -1
+         *    -1
+         */
+        "  vec3 color = vlc_texture(tex_coords).rgb;\n"
+        "  vec3 pix = -(  vlc_texture(tex_coords                - one_pixel_right).rgb\n"
+        "               + vlc_texture(tex_coords - one_pixel_up                  ).rgb\n"
+        "               + vlc_texture(tex_coords                + one_pixel_right).rgb\n"
+        "               + vlc_texture(tex_coords + one_pixel_up                  ).rgb)\n"
+        "             + 4.0 * color;\n"
         "  gl_FragColor = vec4(clamp(color + sigma * pix, 0.0, 1.0), 1.0);\n"
         "}\n";
 
@@ -283,7 +306,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         extensions,
         shader_precision,
         sampler->shader.body,
-        FRAGMENT_SHADER,
+        var_GetBool(filter, FILTER_PREFIX "fast") ? FRAGMENT_SHADER_HALF : FRAGMENT_SHADER_FULL,
     };
 
     GLuint program_id =
@@ -331,6 +354,8 @@ error:
 
 #define SIG_TEXT N_("Sharpen strength (0-2)")
 #define SIG_LONGTEXT N_("Set the Sharpen strength, between 0 and 2. Defaults to 0.05.")
+#define SIG_TEXT N_("Faster sharpen kernel algorithm")
+#define SIG_LONGTEXT N_("Enable a faster but less precise sharpen kernel. Defaults to false.")
 
 static int OpenVideoFilter(filter_t *filter)
 {
@@ -350,6 +375,8 @@ vlc_module_begin()
     set_capability("video filter", 0)
     add_float_with_range( FILTER_PREFIX "sigma", 0.05, 0.0, 2.0,
         SIG_TEXT, SIG_LONGTEXT )
+    add_bool( FILTER_PREFIX "fast", false,
+             SIG_TEXT, SIG_LONGTEXT )
     change_safe()
     add_shortcut("glsharpen")
     set_callback(OpenVideoFilter)
