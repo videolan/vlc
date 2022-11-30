@@ -392,6 +392,13 @@ static bool aout_replaygain_changed( const audio_replay_gain_t *a,
     return false;
 }
 
+static void
+OnNewAudioLatency(vlc_tick_t latency, void *data)
+{
+    vlc_input_decoder_t *p_owner = data;
+    decoder_Notify(p_owner, on_new_audio_latency, latency);
+}
+
 static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
@@ -455,6 +462,8 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
                 .clock = p_owner->p_clock,
                 .str_id = p_owner->psz_id,
                 .replay_gain = &p_dec->fmt_out.audio_replay_gain,
+                .on_new_latency_cb = OnNewAudioLatency,
+                .cb_data = p_owner,
             };
             p_astream = vlc_aout_stream_New( p_aout, &cfg );
             if( p_astream == NULL )
