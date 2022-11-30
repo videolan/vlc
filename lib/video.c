@@ -937,7 +937,7 @@ adjust_option_bynumber( unsigned option )
 {
     static const opt_t optlist[] =
     {
-        { "adjust",     0 },
+        { "gladjust",     0 },
         { "contrast",   VLC_VAR_FLOAT },
         { "brightness", VLC_VAR_FLOAT },
         { "hue",        VLC_VAR_FLOAT },
@@ -994,7 +994,7 @@ void libvlc_video_set_sharpen_float( libvlc_media_player_t *p_mi,
 void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
                                   unsigned option, int value )
 {
-    set_value( p_mi, "adjust", adjust_option_bynumber(option), VLC_VAR_INTEGER,
+    set_value( p_mi, "gladjust", adjust_option_bynumber(option), VLC_VAR_INTEGER,
                &(vlc_value_t) { .i_int = value }, false );
 }
 
@@ -1002,14 +1002,14 @@ void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
 int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
                                  unsigned option )
 {
-    return get_int( p_mi, "adjust", adjust_option_bynumber(option) );
+    return get_int( p_mi, "gladjust", adjust_option_bynumber(option) );
 }
 
 
 void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
                                     unsigned option, float value )
 {
-    set_value( p_mi, "adjust", adjust_option_bynumber(option), VLC_VAR_FLOAT,
+    set_value( p_mi, "gladjust", adjust_option_bynumber(option), VLC_VAR_FLOAT,
                &(vlc_value_t) { .f_float = value }, false );
 }
 
@@ -1017,7 +1017,7 @@ void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
 float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
                                      unsigned option )
 {
-    return get_float( p_mi, "adjust", adjust_option_bynumber(option) );
+    return get_float( p_mi, "gladjust", adjust_option_bynumber(option) );
 }
 
 void libvlc_video_set_keep_last_frame( libvlc_media_player_t *p_mi,
