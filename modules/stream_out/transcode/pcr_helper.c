@@ -33,7 +33,9 @@
 struct transcode_track_pcr_helper
 {
     vlc_tick_t max_delay;
-    vlc_tick_t current_media_time;
+
+    /// Represents the media time held by the frame processing unit.
+    vlc_tick_t held_media_time;
     vlc_tick_t last_dts_output;
 
     struct vlc_list delayed_frames_data;
@@ -63,7 +65,7 @@ transcode_track_pcr_helper_t *transcode_track_pcr_helper_New(vlc_pcr_sync_t *syn
     }
 
     ret->max_delay = max_delay;
-    ret->current_media_time = 0;
+    ret->held_media_time = 0;
     ret->last_dts_output = VLC_TICK_INVALID;
     vlc_list_init(&ret->delayed_frames_data);
     ret->sync_ref = sync_ref;
@@ -115,7 +117,7 @@ int transcode_track_pcr_helper_SignalEnteringFrame(transcode_track_pcr_helper_t 
     bdata->length = frame->i_length;
     bdata->dts = frame->i_dts;
 
-    pcr_helper->current_media_time += bdata->length;
+    pcr_helper->held_media_time += bdata->length;
 
     vlc_pcr_sync_SignalFrame(pcr_helper->sync_ref, pcr_helper->pcr_sync_es_id, frame);
 
@@ -125,7 +127,7 @@ int transcode_track_pcr_helper_SignalEnteringFrame(transcode_track_pcr_helper_t 
     // Exceeding this limit usually means the frame was dropped. So in our case, act like it went
     // through.
     // TODO needs to be properly unit-tested.
-    if (pcr_helper->current_media_time > pcr_helper->max_delay)
+    if (pcr_helper->held_media_time > pcr_helper->max_delay)
     {
         delayed_frame_data_t *first_bdata = vlc_list_first_entry_or_null(
             &pcr_helper->delayed_frames_data, delayed_frame_data_t, node);
@@ -136,7 +138,7 @@ int transcode_track_pcr_helper_SignalEnteringFrame(transcode_track_pcr_helper_t 
                                 ? pcr
                                 : __MIN(pcr_helper->last_dts_output, first_bdata->dts);
 
-        pcr_helper->current_media_time -= first_bdata->length;
+        pcr_helper->held_media_time -= first_bdata->length;
 
         vlc_list_remove(&first_bdata->node);
         free(first_bdata);
@@ -156,7 +158,7 @@ vlc_tick_t transcode_track_pcr_helper_SignalLeavingFrame(transcode_track_pcr_hel
 
     assert(frame_data != NULL);
     pcr_helper->last_dts_output = frame->i_dts;
-    pcr_helper->current_media_time -= frame_data->length;
+    pcr_helper->held_media_time -= frame_data->length;
 
     const vlc_tick_t pcr = transcode_track_pcr_helper_GetFramePCR(pcr_helper, frame_data->dts);
 
