@@ -30,7 +30,7 @@
 /**
  * The transcode PCR helper is a wrapper of the pcr_sync helper specific for processing
  * units that have a high risk of altering the frames timestamps or simply dropping them. The usual
- * case is an encoder and/or a filter chain which is excactly what transcode does.
+ * case is an encoder and/or a filter chain which is exactly what transcode does.
  *
  * This helper uses an approximation of the max frame `delay` taken by the processing unit. When
  * this delay is bypassed, it is assumed that a frame was dropped and eventually a new PCR can be
