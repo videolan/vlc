@@ -351,13 +351,6 @@ EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_LTLIBRARIES += $(LTLIBoggspots)
 
 libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox.c
-libvideotoolbox_plugin_la_CFLAGS = $(AM_CFLAGS)
-if HAVE_IOS
-libvideotoolbox_plugin_la_CFLAGS += -miphoneos-version-min=9.0
-endif
-if HAVE_TVOS
-libvideotoolbox_plugin_la_CFLAGS += -mtvos-version-min=10.2
-endif
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 if HAVE_DARWIN
