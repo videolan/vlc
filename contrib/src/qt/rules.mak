@@ -61,6 +61,8 @@ endif
 	sed -i.orig 's#"-lharfbuzz"#{ "libs": "-framework CoreText -framework CoreGraphics -framework CoreFoundation -lharfbuzz", "condition": "config.darwin" }, "-lharfbuzz"#' "$(UNPACK_DIR)/src/gui/configure.json"
 	# Let us decide the WINVER/_WIN32_WINNT
 	sed -i.orig 's,mingw: DEFINES += WINVER=0x0601,# mingw: DEFINES += WINVER=0x0601,' "$(UNPACK_DIR)/mkspecs/features/qt_build_config.prf"
+	# Prevent all Qt contribs from generating and installing libtool .la files
+	sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" $(UNPACK_DIR)/mkspecs/features/qt_module.prf
 	$(MOVE)
 
 
@@ -140,8 +142,6 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 
 .qt: qt
 	$(call qmake_toolchain, $<)
-	# Prevent all Qt contribs from generating and installing libtool .la files
-	sed -i.orig "/CONFIG/ s/ create_libtool/ -create_libtool/g" $(UNPACK_DIR)/mkspecs/features/qt_module.prf
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5 \
 	    $(shell $(SRC)/qt/configure-env.py $(CPPFLAGS) $(LDFLAGS))
 	# Make && Install libraries
