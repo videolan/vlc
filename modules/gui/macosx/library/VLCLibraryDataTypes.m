@@ -363,6 +363,20 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @synthesize smallArtworkMRL = _smallArtworkMRL;
 @synthesize numberOfTracks = _numberOfTracks;
 
++ (nullable instancetype)albumWithID:(int64_t)albumID
+{
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
+        return nil;
+    }
+    vlc_ml_album_t *p_album = vlc_ml_get_album(p_mediaLibrary, albumID);
+    VLCMediaLibraryAlbum *album = nil;
+    if (p_album) {
+        album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:p_album];
+    }
+    return album;
+}
+
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album
 {
     self = [super init];
@@ -452,6 +466,20 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
     }
     return self;
+}
+
++ (nullable instancetype)genreWithID:(int64_t)genreID
+{
+    vlc_medialibrary_t *p_mediaLibrary = getMediaLibrary();
+    if(!p_mediaLibrary) {
+        return nil;
+    }
+    vlc_ml_genre_t *p_genre = vlc_ml_get_genre(p_mediaLibrary, genreID);
+    VLCMediaLibraryGenre *genre = nil;
+    if (p_genre) {
+        genre = [[VLCMediaLibraryGenre alloc] initWithGenre:p_genre];
+    }
+    return genre;
 }
 
 - (NSImage *)smallArtworkImage

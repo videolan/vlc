@@ -137,6 +137,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @interface VLCMediaLibraryAlbum : NSObject<VLCMediaLibraryAudioGroupProtocol>
 
++ (nullable instancetype)albumWithID:(int64_t)albumID;
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album;
 
 @property (readonly) NSString *title;
@@ -150,6 +151,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @interface VLCMediaLibraryGenre : NSObject<VLCMediaLibraryAudioGroupProtocol>
 
++ (nullable instancetype)genreWithID:(int64_t)genreID;
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre;
 
 @property (readonly) NSString *name;
