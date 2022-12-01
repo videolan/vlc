@@ -661,7 +661,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( id->b_transcode )
     {
         // TODO properly estimate the delay
-        id->pcr_helper = transcode_track_pcr_helper_New( p_sys->pcr_sync, VLC_TICK_FROM_SEC( 2 ) );
+        id->pcr_helper = transcode_track_pcr_helper_New( p_sys->pcr_sync, VLC_TICK_FROM_SEC( 4 ) );
         if( unlikely( id->pcr_helper == NULL ) )
             goto error;
     }
