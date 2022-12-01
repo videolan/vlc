@@ -117,6 +117,13 @@ static picture_context_t * context_copy(picture_context_t *context)
     return context;
 }
 
+static int decoder_decode_drop(decoder_t *dec, picture_t *pic)
+{
+    (void)dec;
+    picture_Release(pic);
+    return VLC_SUCCESS;
+}
+
 static int decoder_decode_check_flush_video(decoder_t *dec, picture_t *pic)
 {
     if (scenario_data.skip_decoder)
@@ -355,6 +362,7 @@ struct input_decoder_scenario input_decoder_scenarios[] =
      * test from issue #27532. */
     .source = source_800_600,
     .decoder_setup = decoder_i420_800_600_stop,
+    .decoder_decode = decoder_decode_drop,
     .decoder_destroy = decoder_destroy_trigger_update,
 },
 {
