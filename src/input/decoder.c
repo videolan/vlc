@@ -405,7 +405,9 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
     }
 
     /* Restart the decoder module */
+    vlc_fifo_Unlock(p_owner->p_fifo);
     decoder_Clean( p_dec );
+    vlc_fifo_Lock(p_owner->p_fifo);
     es_format_Clean( &p_owner->dec_fmt_in );
     p_owner->error = false;
 
@@ -426,12 +428,15 @@ static int DecoderThread_Reload( vlc_input_decoder_t *p_owner,
     }
 
     decoder_Init(p_dec, &p_owner->dec_fmt_in, &fmt_in);
+    vlc_fifo_Unlock(p_owner->p_fifo);
     if (LoadDecoder(p_dec, false, &p_owner->dec_fmt_in))
     {
+        vlc_fifo_Lock(p_owner->p_fifo);
         p_owner->error = true;
         es_format_Clean( &fmt_in );
         return VLC_EGENERIC;
     }
+    vlc_fifo_Lock(p_owner->p_fifo);
     es_format_Clean( &fmt_in );
     return VLC_SUCCESS;
 }
@@ -1536,6 +1541,8 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
     decoder_t *p_dec = &p_owner->dec;
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
 
+    vlc_fifo_Unlock(p_owner->p_fifo);
+
     if ( tracer != NULL && frame != NULL )
     {
         vlc_tracer_TraceStreamDTS( tracer, "DEC", p_owner->psz_id, "IN",
@@ -1543,6 +1550,8 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
     }
 
     int ret = p_dec->pf_decode( p_dec, frame );
+
+    vlc_fifo_Lock(p_owner->p_fifo);
     switch( ret )
     {
         case VLCDEC_SUCCESS:
@@ -1600,9 +1609,7 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
         if( frame->i_buffer <= 0 )
             goto error;
 
-        vlc_fifo_Lock(p_owner->p_fifo);
         DecoderUpdatePreroll( &p_owner->i_preroll_end, frame );
-        vlc_fifo_Unlock(p_owner->p_fifo);
         if( unlikely( frame->i_flags & BLOCK_FLAG_CORE_PRIVATE_RELOADED ) )
         {
             /* This frame has already been packetized */
@@ -1612,7 +1619,9 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
 
     if( p_owner->p_sout != NULL )
     {
+        vlc_fifo_Unlock(p_owner->p_fifo);
         DecoderThread_ProcessSout( p_owner, frame );
+        vlc_fifo_Lock(p_owner->p_fifo);
         return;
     }
     if( packetize )
@@ -1648,6 +1657,7 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_
                 packetized_frame->p_next = NULL;
 
                 DecoderThread_DecodeBlock( p_owner, packetized_frame );
+
                 if( p_owner->error )
                 {
                     block_ChainRelease( p_next );
@@ -1788,11 +1798,11 @@ static void *DecoderThread( void *p_data )
              * drain. Pass frame = NULL to decoder just once. */
         }
 
-        vlc_fifo_Unlock( p_owner->p_fifo );
-
+        /* DecoderThread_ProcessInput will unlock when playing to the decoders
+         * but will ensure it re-locks in the end. This is necessary to handle
+         * reloading, CC and packetizing. */
         DecoderThread_ProcessInput( p_owner, frame );
 
-        vlc_fifo_Lock(p_owner->p_fifo);
         if( p_owner->b_draining && frame == NULL )
         {
             p_owner->b_draining = false;
@@ -2239,7 +2249,9 @@ void vlc_input_decoder_Decode( vlc_input_decoder_t *p_owner, vlc_frame_t *frame,
     {
         /* DecoderThread's fifo should be empty as no decoder thread is running. */
         assert( vlc_fifo_IsEmpty( p_owner->p_fifo ) );
+        vlc_fifo_Lock(p_owner->p_fifo);
         DecoderThread_ProcessInput( p_owner, frame );
+        vlc_fifo_Unlock(p_owner->p_fifo);
         return;
     }
 
@@ -2301,7 +2313,9 @@ void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
     if ( vlc_input_decoder_IsSynchronous( p_owner ) )
     {
         /* Process a NULL frame synchronously to signal draining to packetizer/decoder. */
+        vlc_fifo_Lock(p_owner->p_fifo);
         DecoderThread_ProcessInput( p_owner, NULL );
+        vlc_fifo_Unlock(p_owner->p_fifo);
         return;
     }
 
