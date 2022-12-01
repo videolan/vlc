@@ -109,6 +109,18 @@ static void *GetSymbol(vlc_gl_t *gl, const char *procname)
     return (void *)eglGetProcAddress (procname);
 }
 
+static EGLContext CreateContext(vlc_gl_t *gl, EGLConfig cfg, EGLint client_version)
+{
+    struct vlc_gl_pbuffer *sys = gl->sys;
+
+    const EGLint ctx_attr[] = {
+        EGL_CONTEXT_CLIENT_VERSION, client_version,
+        EGL_NONE
+    };
+
+    return eglCreateContext(sys->display, cfg, EGL_NO_CONTEXT, ctx_attr);
+}
+
 static int InitEGL(vlc_gl_t *gl, int opengl_api, unsigned width, unsigned height)
 {
     struct vlc_gl_pbuffer *sys = gl->sys;
@@ -186,18 +198,11 @@ static int InitEGL(vlc_gl_t *gl, int opengl_api, unsigned width, unsigned height
     else
         sys->surface = EGL_NO_SURFACE;
 
-    EGLint client_version;
     EGLint egl_api;
     if (opengl_api == VLC_OPENGL_ES2)
-    {
         egl_api = EGL_OPENGL_ES_API;
-        client_version = 2;
-    }
     else
-    {
         egl_api = EGL_OPENGL_API;
-        client_version = 3;
-    }
 
     if (eglBindAPI(egl_api) != EGL_TRUE)
     {
@@ -205,41 +210,19 @@ static int InitEGL(vlc_gl_t *gl, int opengl_api, unsigned width, unsigned height
         goto error;
     }
 
+    EGLContext ctx = CreateContext(gl, cfgv[0], 3);
+    if (ctx != EGL_NO_CONTEXT)
+        goto context_created;
 
-    const EGLint ctx_attr[] = {
-        EGL_CONTEXT_CLIENT_VERSION, client_version,
-        EGL_NONE
-    };
+    ctx = CreateContext(gl, cfgv[0], 2);
+    if (ctx != EGL_NO_CONTEXT)
+        goto context_created;
 
-    EGLContext ctx
-        = sys->context
-        = eglCreateContext(sys->display, cfgv[0], EGL_NO_CONTEXT, ctx_attr);
+    msg_Err (gl, "cannot create EGL context");
+    goto error;
 
-#ifdef USE_OPENGL_ES2
-    if (ctx == EGL_NO_CONTEXT)
-    {
-        msg_Err (gl, "cannot create EGL context");
-        goto error;
-    }
-#else
-    if (ctx == EGL_NO_CONTEXT)
-    {
-        const GLint ctx_attr_fallback[] = {
-            EGL_CONTEXT_CLIENT_VERSION, 2,
-            EGL_NONE
-        };
-
-        ctx
-            = sys->context
-            = eglCreateContext(sys->display, cfgv[0], EGL_NO_CONTEXT, ctx_attr_fallback);
-
-        if (ctx == EGL_NO_CONTEXT)
-        {
-            msg_Err (gl, "cannot create EGL context");
-            goto error;
-        }
-    }
-#endif
+context_created:
+    sys->context = ctx;
 
     return VLC_SUCCESS;
 error:
