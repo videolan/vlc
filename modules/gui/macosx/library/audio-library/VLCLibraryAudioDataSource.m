@@ -179,6 +179,8 @@
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
+    _songsTableView.target = self;
+    _songsTableView.doubleAction = @selector(songDoubleClickAction:);
 
     _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
 }
@@ -332,6 +334,13 @@
     [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
         [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:YES];
     }];
+}
+
+- (void)songDoubleClickAction:(id)sender
+{
+    NSAssert(_audioLibrarySegment == VLCAudioLibrarySongsSegment, @"Should not be possible to trigger this action from a non-song library view");
+    VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[_songsTableView.selectedRow];
+    [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
 }
 
 #pragma mark - collection view data source and delegation
