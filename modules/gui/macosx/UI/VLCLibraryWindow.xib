@@ -927,33 +927,6 @@
                         <real value="250"/>
                     </holdingPriorities>
                 </splitView>
-                <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nXS-11-7iK">
-                    <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
-                    <clipView key="contentView" copiesOnScroll="NO" id="OKa-dt-1yY">
-                        <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <collectionView selectable="YES" id="B8x-e8-7zp">
-                                <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" id="Rag-cM-k1g">
-                                    <size key="itemSize" width="256" height="214"/>
-                                    <edgeInsets key="sectionInset" left="20" right="20" top="20" bottom="20"/>
-                                </collectionViewFlowLayout>
-                                <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                <color key="secondaryBackgroundColor" name="controlAlternatingRowColor" catalog="System" colorSpace="catalog"/>
-                            </collectionView>
-                        </subviews>
-                    </clipView>
-                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="7ik-B8-JYg">
-                        <rect key="frame" x="-100" y="-100" width="233" height="15"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </scroller>
-                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="rUh-Qg-gUL">
-                        <rect key="frame" x="226" y="0.0" width="16" height="291"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </scroller>
-                </scrollView>
             </subviews>
             <constraints>
                 <constraint firstItem="GUe-Sd-j2l" firstAttribute="leading" secondItem="vak-Gp-ljo" secondAttribute="leading" id="6FZ-mu-ICw"/>
@@ -1251,13 +1224,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView identifier="VLCLibrarySongsTableViewIdentifier" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" rowSizeStyle="automatic" headerView="LR0-xA-UlZ" viewBased="YES" id="Xck-iv-pH4">
-                                <rect key="frame" x="0.0" y="0.0" width="947" height="313"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1088" height="313"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="17" height="0.0"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewTitleColumnIdentifier" width="116" minWidth="40" maxWidth="1000" id="mYC-ua-QDN">
+                                    <tableColumn identifier="VLCLibrarySongsTableViewTitleColumnIdentifier" width="300" minWidth="40" maxWidth="1000" id="mYC-ua-QDN">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Title">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -1270,11 +1243,11 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="VLCLibrarySongsTableViewTitleTableCellViewIdentifier" id="SZw-Fr-2EA">
-                                                <rect key="frame" x="18" y="0.0" width="114" height="24"/>
+                                                <rect key="frame" x="8" y="0.0" width="298" height="24"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zai-EE-AIZ">
-                                                        <rect key="frame" x="0.0" y="4" width="114" height="16"/>
+                                                        <rect key="frame" x="0.0" y="4" width="298" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="y7s-2M-iio">
                                                             <font key="font" usesAppearanceFont="YES"/>
@@ -1289,7 +1262,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewDurationColumnIdentifier" width="127" minWidth="40" maxWidth="1000" id="3Df-VW-eAd">
+                                    <tableColumn identifier="VLCLibrarySongsTableViewDurationColumnIdentifier" width="60" minWidth="40" maxWidth="1000" id="3Df-VW-eAd">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Duration">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -1302,11 +1275,11 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="VLCLibrarySongsTableViewDurationTableCellViewIdentifier" id="w9x-WQ-1Zs">
-                                                <rect key="frame" x="149" y="0.0" width="127" height="24"/>
+                                                <rect key="frame" x="323" y="0.0" width="60" height="24"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wYt-1l-VHr">
-                                                        <rect key="frame" x="0.0" y="4" width="127" height="16"/>
+                                                        <rect key="frame" x="0.0" y="4" width="60" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="0z5-xP-p2I">
                                                             <font key="font" usesAppearanceFont="YES"/>
@@ -1321,7 +1294,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewArtistColumnIdentifier" width="71" minWidth="10" maxWidth="3.4028234663852886e+38" id="M2r-SG-Neg">
+                                    <tableColumn identifier="VLCLibrarySongsTableViewArtistColumnIdentifier" width="150" minWidth="10" maxWidth="3.4028234663852886e+38" id="M2r-SG-Neg">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Artist">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1334,11 +1307,11 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="VLCLibrarySongsTableViewArtistTableCellViewIdentifier" id="ecm-4Q-BHD">
-                                                <rect key="frame" x="293" y="0.0" width="71" height="17"/>
+                                                <rect key="frame" x="400" y="0.0" width="150" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LpX-Ty-dhy">
-                                                        <rect key="frame" x="0.0" y="0.0" width="71" height="16"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="150" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="Sox-k5-8GV">
                                                             <font key="font" usesAppearanceFont="YES"/>
@@ -1353,7 +1326,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewAlbumColumnIdentifier" width="64" minWidth="10" maxWidth="3.4028234663852886e+38" id="SL3-ox-dgc">
+                                    <tableColumn identifier="VLCLibrarySongsTableViewAlbumColumnIdentifier" width="200" minWidth="10" maxWidth="3.4028234663852886e+38" id="SL3-ox-dgc">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Album">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1366,11 +1339,11 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="VLCLibrarySongsTableViewAlbumTableCellViewIdentifier" id="aMg-rT-0RL">
-                                                <rect key="frame" x="381" y="0.0" width="64" height="17"/>
+                                                <rect key="frame" x="567" y="0.0" width="200" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PbF-Bm-f34">
-                                                        <rect key="frame" x="0.0" y="0.0" width="64" height="16"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="200" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="as7-Ec-3tU">
                                                             <font key="font" usesAppearanceFont="YES"/>
@@ -1385,7 +1358,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewGenreColumnIdentifier" width="64" minWidth="10" maxWidth="3.4028234663852886e+38" id="pdV-26-8ca">
+                                    <tableColumn identifier="VLCLibrarySongsTableViewGenreColumnIdentifier" width="150" minWidth="10" maxWidth="3.4028234663852886e+38" id="pdV-26-8ca">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Genre">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1398,11 +1371,11 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="VLCLibrarySongsTableViewGenreTableCellViewIdentifier" id="RpF-ZZ-VVR">
-                                                <rect key="frame" x="462" y="0.0" width="64" height="17"/>
+                                                <rect key="frame" x="784" y="0.0" width="150" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="faR-Tr-m5n">
-                                                        <rect key="frame" x="0.0" y="0.0" width="64" height="16"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="150" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="mYg-CM-jff">
                                                             <font key="font" usesAppearanceFont="YES"/>
@@ -1430,7 +1403,7 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView identifier="VLCLibrarySongPlayCountTableCellViewIdentifier" id="yc4-Vp-4hr">
-                                                <rect key="frame" x="543" y="0.0" width="64" height="17"/>
+                                                <rect key="frame" x="951" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4VQ-fV-w9a">
@@ -1449,8 +1422,8 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewInsertionDateColumnIdentifier" width="64" minWidth="10" maxWidth="3.4028234663852886e+38" id="Sca-gD-Cur">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Insertion date">
+                                    <tableColumn identifier="VLCLibrarySongsTableViewYearColumnIdentifier" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="Sca-gD-Cur">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Year">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </tableHeaderCell>
@@ -1461,12 +1434,12 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewInsertionDateTableCellViewIdentifier" id="I8Z-L8-hBM">
-                                                <rect key="frame" x="624" y="0.0" width="64" height="17"/>
+                                            <tableCellView identifier="VLCLibrarySongsTableViewYearTableCellViewIdentifier" id="I8Z-L8-hBM">
+                                                <rect key="frame" x="1032" y="0.0" width="47" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Er-xE-Jz7">
-                                                        <rect key="frame" x="0.0" y="0.0" width="64" height="16"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="47" height="16"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="5bJ-rm-CUk">
                                                             <font key="font" usesAppearanceFont="YES"/>
@@ -1477,102 +1450,6 @@
                                                 </subviews>
                                                 <connections>
                                                     <outlet property="textField" destination="9Er-xE-Jz7" id="JwZ-SQ-BoS"/>
-                                                </connections>
-                                            </tableCellView>
-                                        </prototypeCellViews>
-                                    </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewLastModificationDateColumnIdentifier" width="64" minWidth="10" maxWidth="3.4028234663852886e+38" id="qSo-NV-P6O">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Last modification date">
-                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </tableHeaderCell>
-                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="9vW-rr-DUP">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                        <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewLastModificationDateTableCellViewIdentifier" id="8zU-ew-l0x">
-                                                <rect key="frame" x="705" y="0.0" width="64" height="17"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aez-x0-5Pp">
-                                                        <rect key="frame" x="0.0" y="0.0" width="64" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="oze-Xj-5qq">
-                                                            <font key="font" usesAppearanceFont="YES"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                </subviews>
-                                                <connections>
-                                                    <outlet property="textField" destination="aez-x0-5Pp" id="kyL-sF-AxJ"/>
-                                                </connections>
-                                            </tableCellView>
-                                        </prototypeCellViews>
-                                    </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewFileNameColumnIdentifier" width="64" minWidth="10" maxWidth="3.4028234663852886e+38" id="tC4-70-MNy">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="File name">
-                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </tableHeaderCell>
-                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="V42-Jh-CFp">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                        <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewFileNameTableCellViewIdentifier" id="86P-8m-zOQ">
-                                                <rect key="frame" x="786" y="0.0" width="64" height="17"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lra-Kj-zmI">
-                                                        <rect key="frame" x="0.0" y="0.0" width="64" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="nhF-Gr-lNd">
-                                                            <font key="font" usesAppearanceFont="YES"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                </subviews>
-                                                <connections>
-                                                    <outlet property="textField" destination="lra-Kj-zmI" id="vNe-Ph-kQy"/>
-                                                </connections>
-                                            </tableCellView>
-                                        </prototypeCellViews>
-                                    </tableColumn>
-                                    <tableColumn identifier="VLCLibrarySongsTableViewFileSizeColumnIdentifier" width="64" minWidth="10" maxWidth="3.4028234663852886e+38" id="aYq-fx-G69">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="File size">
-                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </tableHeaderCell>
-                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="xKf-sV-yOz">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                        <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewFileSizeTableCellViewIdentifier" id="njv-fJ-OKK">
-                                                <rect key="frame" x="867" y="0.0" width="61" height="17"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KvA-Ia-Ftx">
-                                                        <rect key="frame" x="0.0" y="0.0" width="61" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="YXU-dr-qvr">
-                                                            <font key="font" usesAppearanceFont="YES"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                </subviews>
-                                                <connections>
-                                                    <outlet property="textField" destination="KvA-Ia-Ftx" id="BQE-1e-OAh"/>
                                                 </connections>
                                             </tableCellView>
                                         </prototypeCellViews>
@@ -1590,7 +1467,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <tableHeaderView key="headerView" wantsLayer="YES" id="LR0-xA-UlZ">
-                        <rect key="frame" x="0.0" y="0.0" width="947" height="28"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1088" height="28"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
                 </scrollView>

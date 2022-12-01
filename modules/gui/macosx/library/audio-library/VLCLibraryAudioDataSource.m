@@ -242,8 +242,11 @@
     if ([tableView.identifier isEqualToString:@"VLCLibrarySongsTableViewIdentifier"]) {
         const NSString * const columnIdentifier = tableColumn.identifier;
         const VLCMediaLibraryMediaItem * const mediaItem = [self libraryItemAtRow:row];
-        NSString *cellText;
-        NSString *cellIdentifier;
+        const VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:mediaItem.albumID];
+        const VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:mediaItem.genreID];
+
+        NSString *cellText = @"";
+        NSString *cellIdentifier = @"";
 
         if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewTitleColumnIdentifier"]) {
             cellIdentifier = @"VLCLibrarySongsTableViewTitleTableCellViewIdentifier";
@@ -253,28 +256,19 @@
             cellText = mediaItem.durationString;
         } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewArtistColumnIdentifier"]) {
             cellIdentifier = @"VLCLibrarySongsTableViewArtistTableCellViewIdentifier";
-            cellText = @"Placeholder artist";
+            cellText = album.artistName.length == 0 ? @"" : album.artistName;
         } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewAlbumColumnIdentifier"]) {
             cellIdentifier = @"VLCLibrarySongsTableViewAlbumTableCellViewIdentifier";
-            cellText = @"Placeholder album";
+            cellText = album.title.length == 0 ? @"" : album.title;
         } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewGenreColumnIdentifier"]) {
             cellIdentifier = @"VLCLibrarySongsTableViewGenreTableCellViewIdentifier";
-            cellText = @"Placeholder genre";
+            cellText = genre.name.length == 0 ? @"" : genre.name;
         } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewPlayCountColumnIdentifier"]) {
             cellIdentifier = @"VLCLibrarySongsTableViewPlayCountTableCellViewIdentifier";
             cellText = [@(mediaItem.playCount) stringValue];
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewInsertionDateColumnIdentifier"]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewInsertionDateTableCellViewIdentifier";
-            cellText = @"Placeholder insertion date";
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewLastModificationDateColumnIdentifier"]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewLastModificationDateTableCellViewIdentifier";
-            cellText = @"Placeholder modification date";
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewFileNameColumnIdentifier"]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewFileNameTableCellViewIdentifier";
-            cellText = @"Placeholder file name";
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewFileSizeColumnIdentifier"]) {
-            cellIdentifier = @"VLCLibrarySongsTableViewFileSizeTableCellViewIdentifier";
-            cellText = @"Placeholder file size";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewYearColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewYearTableCellViewIdentifier";
+            cellText = [@(mediaItem.year) stringValue];
         } else {
             NSAssert(true, @"Received unknown column identifier %@", columnIdentifier);
         }
