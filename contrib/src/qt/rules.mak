@@ -134,7 +134,7 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	echo "  QMAKE_CXXFLAGS += $(BUILDCXXFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_LFLAGS   += $(BUILDLDFLAGS)"  >> $(1)/.qmake.cache && \
 	echo "}"                                           >> $(1)/.qmake.cache && \
-	echo "CONFIG -= create_libtool debug_and_release" >> $(1)/.qmake.cache && \
+	echo "CONFIG -= debug_and_release" >> $(1)/.qmake.cache && \
 	echo "CONFIG += object_parallel_to_source create_pc force_bootstrap" >> $(1)/.qmake.cache
 
 
