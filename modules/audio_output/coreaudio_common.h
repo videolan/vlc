@@ -55,7 +55,6 @@ struct aout_sys_common
     bool                started;
     bool                b_paused;
     bool                b_muted;
-    bool                b_do_flush;
 
     bool                b_played;
     block_t             *p_out_chain;
@@ -70,8 +69,6 @@ struct aout_sys_common
     size_t timing_report_last_written_bytes;
     /* Number of bytes to write before sending a timing report */
     size_t timing_report_delay_bytes;
-
-    vlc_sem_t           flush_sem;
 
     union lock
     {
