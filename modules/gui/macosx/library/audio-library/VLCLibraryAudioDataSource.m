@@ -189,6 +189,7 @@
     [self.collectionView reloadData];
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
+    [self.songsTableView reloadData];
 }
 
 - (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
@@ -232,8 +233,57 @@
     return _displayedCollection.count;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSView *)tableView:(NSTableView *)tableView
+   viewForTableColumn:(NSTableColumn *)tableColumn
+                  row:(NSInteger)row
 {
+    // The table view for songs in the list view mode of the audio library is different from the other audio groupings
+    // and we use a vanilla NSTableView created in the VLCLibraryWindow XIB for it
+    if ([tableView.identifier isEqualToString:@"VLCLibrarySongsTableViewIdentifier"]) {
+        const NSString * const columnIdentifier = tableColumn.identifier;
+        const VLCMediaLibraryMediaItem * const mediaItem = [self libraryItemAtRow:row];
+        NSString *cellText;
+        NSString *cellIdentifier;
+
+        if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewTitleColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewTitleTableCellViewIdentifier";
+            cellText = mediaItem.title;
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewDurationColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewDurationTableCellViewIdentifier";
+            cellText = mediaItem.durationString;
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewArtistColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewArtistTableCellViewIdentifier";
+            cellText = @"Placeholder artist";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewAlbumColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewAlbumTableCellViewIdentifier";
+            cellText = @"Placeholder album";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewGenreColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewGenreTableCellViewIdentifier";
+            cellText = @"Placeholder genre";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewPlayCountColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewPlayCountTableCellViewIdentifier";
+            cellText = [@(mediaItem.playCount) stringValue];
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewInsertionDateColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewInsertionDateTableCellViewIdentifier";
+            cellText = @"Placeholder insertion date";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewLastModificationDateColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewLastModificationDateTableCellViewIdentifier";
+            cellText = @"Placeholder modification date";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewFileNameColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewFileNameTableCellViewIdentifier";
+            cellText = @"Placeholder file name";
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewFileSizeColumnIdentifier"]) {
+            cellIdentifier = @"VLCLibrarySongsTableViewFileSizeTableCellViewIdentifier";
+            cellText = @"Placeholder file size";
+        } else {
+            NSAssert(true, @"Received unknown column identifier %@", columnIdentifier);
+        }
+
+        NSTableCellView *cellView = [tableView makeViewWithIdentifier:cellIdentifier owner:self];
+        cellView.textField.stringValue = cellText;
+        return cellView;
+    }
+
     VLCLibraryTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
 
     if (cellView == nil) {

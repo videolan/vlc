@@ -87,6 +87,7 @@
     _audioDataSource.libraryModel = [VLCMain sharedInstance].libraryController.libraryModel;
     _audioDataSource.collectionSelectionTableView = _audioCollectionSelectionTableView;
     _audioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
+    _audioDataSource.songsTableView = _audioSongTableView;
     _audioDataSource.collectionView = _audioLibraryCollectionView;
     [_audioDataSource setup];
 
@@ -245,11 +246,11 @@
         return;
     }
 
-    _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
-
     if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
         [self presentAudioTableView];
     }
+
+    _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
 
     VLCLibraryNavigationStack *globalNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
     if(sender != globalNavStack) {

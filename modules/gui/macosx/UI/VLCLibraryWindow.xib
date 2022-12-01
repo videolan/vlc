@@ -809,7 +809,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="OqR-YY-weT">
                                 <rect key="frame" x="0.0" y="0.0" width="230" height="808"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" viewBased="YES" id="ceR-Vd-9ss" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="230" height="808"/>
@@ -868,7 +868,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="0td-vX-CFl">
                                 <rect key="frame" x="0.0" y="0.0" width="638" height="808"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="8M4-Y1-r6Z" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="638" height="808"/>
@@ -927,6 +927,33 @@
                         <real value="250"/>
                     </holdingPriorities>
                 </splitView>
+                <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nXS-11-7iK">
+                    <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
+                    <clipView key="contentView" copiesOnScroll="NO" id="OKa-dt-1yY">
+                        <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <collectionView selectable="YES" id="B8x-e8-7zp">
+                                <rect key="frame" x="0.0" y="0.0" width="869" height="808"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="20" minimumLineSpacing="20" id="Rag-cM-k1g">
+                                    <size key="itemSize" width="256" height="214"/>
+                                    <edgeInsets key="sectionInset" left="20" right="20" top="20" bottom="20"/>
+                                </collectionViewFlowLayout>
+                                <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <color key="secondaryBackgroundColor" name="controlAlternatingRowColor" catalog="System" colorSpace="catalog"/>
+                            </collectionView>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="7ik-B8-JYg">
+                        <rect key="frame" x="-100" y="-100" width="233" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="rUh-Qg-gUL">
+                        <rect key="frame" x="226" y="0.0" width="16" height="291"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
             </subviews>
             <constraints>
                 <constraint firstItem="GUe-Sd-j2l" firstAttribute="leading" secondItem="vak-Gp-ljo" secondAttribute="leading" id="6FZ-mu-ICw"/>
@@ -948,7 +975,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
                     <clipView key="contentView" id="5co-vI-cEn">
                         <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" viewBased="YES" id="vpJ-Oz-Ebz">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
@@ -1006,7 +1033,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
                     <clipView key="contentView" id="tI4-x3-55j">
                         <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView selectable="YES" id="r7v-GI-W1U">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="371"/>
@@ -1217,14 +1244,14 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QqV-hX-sZw">
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QqV-hX-sZw">
                     <rect key="frame" x="0.0" y="0.0" width="714" height="358"/>
                     <clipView key="contentView" id="D1c-vg-zeA">
-                        <rect key="frame" x="0.0" y="0.0" width="714" height="343"/>
+                        <rect key="frame" x="1" y="1" width="712" height="341"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView identifier="VLCLibrarySongsTableViewIdentifier" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" rowSizeStyle="automatic" headerView="LR0-xA-UlZ" viewBased="YES" id="Xck-iv-pH4">
-                                <rect key="frame" x="0.0" y="0.0" width="947" height="315"/>
+                                <rect key="frame" x="0.0" y="0.0" width="947" height="313"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="17" height="0.0"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1242,7 +1269,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewTitleTableViewCellIdentifier" id="SZw-Fr-2EA">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewTitleTableCellViewIdentifier" id="SZw-Fr-2EA">
                                                 <rect key="frame" x="18" y="0.0" width="114" height="24"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1274,7 +1301,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewDurationTableViewCellIdentifier" id="w9x-WQ-1Zs">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewDurationTableCellViewIdentifier" id="w9x-WQ-1Zs">
                                                 <rect key="frame" x="149" y="0.0" width="127" height="24"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1306,7 +1333,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongArtistTableViewCellIdentifier" id="ecm-4Q-BHD">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewArtistTableCellViewIdentifier" id="ecm-4Q-BHD">
                                                 <rect key="frame" x="293" y="0.0" width="71" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1338,7 +1365,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewAlbumTableViewCellIdentifier" id="aMg-rT-0RL">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewAlbumTableCellViewIdentifier" id="aMg-rT-0RL">
                                                 <rect key="frame" x="381" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1370,7 +1397,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewGenreTableViewCellIdentifier" id="RpF-ZZ-VVR">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewGenreTableCellViewIdentifier" id="RpF-ZZ-VVR">
                                                 <rect key="frame" x="462" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1402,7 +1429,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongPlayCountTableViewCellIdentifier" id="yc4-Vp-4hr">
+                                            <tableCellView identifier="VLCLibrarySongPlayCountTableCellViewIdentifier" id="yc4-Vp-4hr">
                                                 <rect key="frame" x="543" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1434,7 +1461,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewInsertionDateTableViewCellIdentifier" id="I8Z-L8-hBM">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewInsertionDateTableCellViewIdentifier" id="I8Z-L8-hBM">
                                                 <rect key="frame" x="624" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1466,7 +1493,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewLastModificationDateTableViewCellIdentifier" id="8zU-ew-l0x">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewLastModificationDateTableCellViewIdentifier" id="8zU-ew-l0x">
                                                 <rect key="frame" x="705" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1498,7 +1525,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewFileNameTableViewCellIdentifier" id="86P-8m-zOQ">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewFileNameTableCellViewIdentifier" id="86P-8m-zOQ">
                                                 <rect key="frame" x="786" y="0.0" width="64" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1530,7 +1557,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibrarySongsTableViewFileSizeTableViewCellIdentifier" id="njv-fJ-OKK">
+                                            <tableCellView identifier="VLCLibrarySongsTableViewFileSizeTableCellViewIdentifier" id="njv-fJ-OKK">
                                                 <rect key="frame" x="867" y="0.0" width="61" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1555,7 +1582,7 @@
                         </subviews>
                     </clipView>
                     <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="2VX-c2-fRL">
-                        <rect key="frame" x="0.0" y="343" width="714" height="15"/>
+                        <rect key="frame" x="1" y="342" width="712" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="NFb-XZ-MAv">
