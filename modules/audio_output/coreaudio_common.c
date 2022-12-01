@@ -120,6 +120,7 @@ ca_Open(audio_output_t *p_aout)
     vlc_sem_init(&p_sys->flush_sem, 0);
     lock_init(p_sys);
     p_sys->p_out_chain = NULL;
+    p_sys->pp_out_last = &p_sys->p_out_chain;
     p_sys->chans_to_reorder = 0;
 
     p_aout->play = ca_Play;
