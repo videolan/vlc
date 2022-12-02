@@ -1481,16 +1481,21 @@ GetLatency(audio_output_t *p_aout, const audio_sample_format_t *fmt)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    /* get device latency */
     UInt32 i_latency_samples;
-    vlc_tick_t i_latency_us = 0;
+    vlc_tick_t i_latency_us, i_device_latency_us = 0;
+    /* Get device latency */
     int ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
                           kAudioDevicePropertyLatency,
                           kAudioObjectPropertyScopeOutput);
     if (ret == VLC_SUCCESS)
-        i_latency_us += vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
+        i_device_latency_us = vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
+    else
+        msg_Warn(p_aout, "failed to get kAudioDevicePropertyLatency");
 
-    msg_Dbg(p_aout, "Current device has a latency of %lld us", i_latency_us);
+    i_latency_us = i_device_latency_us;
+
+    msg_Dbg(p_aout, "Current device has a latency of " PRId64 " us",
+            i_latency_us);
 
     return i_latency_us;
 }
