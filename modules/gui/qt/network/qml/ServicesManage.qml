@@ -41,7 +41,7 @@ Widgets.KeyNavigableListView {
     delegate: Rectangle {
         width: servicesView.width - VLCStyle.margin_large * 2
         height: row.implicitHeight + VLCStyle.margin_small * 2
-        color: VLCStyle.colors.bgAlt
+        color: servicesView.colorContext.bg.secondary
 
         onActiveFocusChanged: if (activeFocus) action_btn.forceActiveFocus()
 
@@ -82,10 +82,11 @@ Widgets.KeyNavigableListView {
                         Widgets.SubtitleLabel {
                             text: model.name
                             width: parent.width
+                            color: servicesView.colorContext.fg.primary
                         }
 
                         Widgets.CaptionLabel {
-                            color: VLCStyle.colors.text
+                            color: servicesView.colorContext.fg.primary
                             textFormat: Text.StyledText
                             text: model.author ? I18n.qtr("by <b>%1</b>").arg(model.author) : I18n.qtr("by <b>Unknown</b>")
                             topPadding: VLCStyle.margin_xxxsmall
@@ -124,6 +125,7 @@ Widgets.KeyNavigableListView {
                 Widgets.CaptionLabel {
                     elide: Text.ElideRight
                     text:  model.description || model.summary || I18n.qtr("No information available")
+                    color: servicesView.colorContext.fg.secondary
                     topPadding: VLCStyle.margin_xsmall
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
@@ -133,6 +135,7 @@ Widgets.KeyNavigableListView {
                 Widgets.CaptionLabel {
                     text: I18n.qtr("Score: %1/5  Downloads: %2").arg(model.score).arg(model.downloads)
                     topPadding: VLCStyle.margin_xsmall
+                    color: servicesView.colorContext.fg.secondary
                     Layout.fillWidth: true
                 }
             }
@@ -142,6 +145,7 @@ Widgets.KeyNavigableListView {
     Widgets.BusyIndicatorExt {
         runningDelayed: discoveryModel.parsingPending
         anchors.centerIn: parent
+        color: servicesView.colorContext.fg.primary
         z: 1
     }
 

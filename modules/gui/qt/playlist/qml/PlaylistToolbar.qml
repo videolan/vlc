@@ -28,8 +28,13 @@ import "qrc:///style/"
 RowLayout {
     id: rowLayout
 
+    readonly property ColorContext colorContext:  ColorContext {
+        colorSet: ColorContext.Window
+    }
+
     height: VLCStyle.heightBar_normal
     spacing: VLCStyle.margin_normal
+
 
     Item {
         Layout.fillWidth: true
@@ -103,8 +108,6 @@ RowLayout {
 
                 mainPlaylistController.sort()
             }
-
-            colors: root.colors
 
             sortOrder: {
                 if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC) {

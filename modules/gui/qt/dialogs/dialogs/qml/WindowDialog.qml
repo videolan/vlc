@@ -21,6 +21,7 @@ import QtQuick.Window 2.11
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.4
 
+import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -35,7 +36,7 @@ Window {
     width: VLCStyle.appWidth * 0.75
     height: VLCStyle.appHeight * 0.85
 
-    color: VLCStyle.colors.bg
+    color: theme.bg.primary
 
     property alias contentComponent: loader.sourceComponent
     property alias standardButtons: buttonBox.standardButtons
@@ -63,6 +64,12 @@ Window {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: VLCStyle.margin_small
+
+
+        readonly property ColorContext colorContext: ColorContext {
+            palette: VLCStyle.palette
+            colorSet: ColorContext.Window
+        }
 
         Loader {
             id: loader
@@ -92,18 +99,20 @@ Window {
             onDiscarded: root.discarded()
             onReset: root.reset()
 
+
             delegate: Widgets.TextToolButton {
                 id: button
 
+                colorContext.palette: VLCStyle.palette
+
                 // NOTE: We specify a dedicated background with borders to improve clarity.
                 background: Widgets.AnimatedBackground {
-                    backgroundColor: (button.hovered) ? VLCStyle.colors.buttonHover
-                                                      : VLCStyle.colors.bgAlt
-
+                    animate: button.colorContext.initialized
+                    backgroundColor: button.colorContext.bg.primary
+                    activeBorderColor: button.colorContext.visualFocus
                     border.width: VLCStyle.border
 
-                    border.color: (button.visualFocus) ? activeBorderColor
-                                                       : VLCStyle.colors.buttonBorder
+                    border.color: button.colorContext.border
                 }
             }
         }

@@ -45,7 +45,14 @@ Control {
 
     onActiveFocusChanged: if (activeFocus) listView.forceActiveFocus(focusReason)
 
-    property VLCColors colors: VLCStyle.colors
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+
+        focused: root.activeFocus
+        hovered: root.hovered
+        enabled: root.enabled
+    }
 
     property int mode: PlaylistListView.Mode.Normal
 
@@ -139,8 +146,6 @@ Control {
         }
 
         sourceComponent: PlaylistOverlayMenu {
-            colors: root.colors
-
             isRight: true
             rightPadding: VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
             bottomPadding: VLCStyle.margin_large + root.bottomPadding
@@ -153,8 +158,6 @@ Control {
         parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
 
         property var selection: null // make this indexes alias?
-
-        colors: root.colors
 
         indexes: selection
 
@@ -183,7 +186,7 @@ Control {
 
     background: Widgets.AcrylicBackground {
         enabled: root.useAcrylic
-        alternativeColor: colors.bgAlt
+        tintColor: theme.bg.primary
     }
 
     contentItem: ColumnLayout {
@@ -199,14 +202,14 @@ Control {
 
             Widgets.SubtitleLabel {
                 text: I18n.qtr("Playqueue")
-                color: colors.text
+                color: theme.fg.primary
                 font.weight: Font.Bold
                 font.pixelSize: VLCStyle.dp(24, VLCStyle.scale)
             }
 
             Widgets.CaptionLabel {
                 color: (root.mode === PlaylistListView.Mode.Select || root.mode === PlaylistListView.Mode.Move)
-                       ? colors.accent : colors.caption
+                       ? theme.accent : theme.fg.secondary
                 visible: model.count !== 0
                 text: {
                     switch (root.mode) {
@@ -240,7 +243,7 @@ Control {
                 text: VLCIcons.album_cover
                 font.pixelSize: VLCStyle.icon_playlistHeader
 
-                color: colors.caption
+                color: theme.fg.secondary
             }
 
             Widgets.CaptionLabel {
@@ -248,14 +251,14 @@ Control {
 
                 verticalAlignment: Text.AlignVCenter
                 text: I18n.qtr("Title")
-                color: colors.caption
+                color: theme.fg.secondary
             }
 
             Widgets.IconLabel {
                 Layout.preferredWidth: durationMetric.width
 
                 text: VLCIcons.time
-                color: colors.caption
+                color: theme.fg.secondary
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: VLCStyle.icon_playlistHeader
@@ -289,11 +292,10 @@ Control {
             // NOTE: We want a gentle fade at the beginning / end of the playqueue.
             enableFade: true
 
-            backgroundColor: background.usingAcrylic ? "transparent"
-                                                     : background.alternativeColor
+            backgroundColor: root.background.usingAcrylic ? "transparent"
+                                                          : listView.colorContext.bg.primary
 
             property int shiftIndex: -1
-
             property Item itemContainsDrag: null
 
             onDeselectAll: {
@@ -347,7 +349,7 @@ Control {
                     anchors.margins: VLCStyle.margin_small
 
                     border.width: VLCStyle.dp(2)
-                    border.color: colors.accent
+                    border.color: theme.accent
 
                     color: "transparent"
 
@@ -363,7 +365,7 @@ Control {
                         font.pointSize: VLCStyle.fontHeight_xxxlarge
 
                         font.family: VLCIcons.fontFamily
-                        color: colors.accent
+                        color: theme.accent
                     }
                 }
 
@@ -402,7 +404,7 @@ Control {
                 implicitHeight: VLCStyle.dp(1)
 
                 visible: !!parent
-                color: colors.accent
+                color: theme.accent
             }
 
             function updateItemContainsDrag(item, set) {
@@ -591,8 +593,7 @@ Control {
 
                     text: VLCIcons.playlist
 
-                    color: (listView.activeFocus) ? colors.bgFocus
-                                                  : colors.text
+                    color: theme.fg.primary
 
                     font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
                 }

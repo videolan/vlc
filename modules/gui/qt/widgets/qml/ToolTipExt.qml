@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
 
+import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 T.ToolTip {
@@ -39,17 +40,20 @@ T.ToolTip {
 
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutsideParent | T.Popup.CloseOnReleaseOutsideParent
 
-    property VLCColors colors: VLCStyle.colors
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Tooltip
+    }
 
     contentItem: Text {
         text: control.text
         font: control.font
 
-        color: colors.tooltipTextColor
+        color: theme.fg.primary
     }
 
     background: Rectangle {
-        border.color: colors.border
-        color: colors.tooltipColor
+        border.color: theme.border
+        color: theme.bg.primary
     }
 }

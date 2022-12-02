@@ -62,6 +62,11 @@ FocusScope {
         showPlayAsAudioAction: true
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     Column {
         id: recentVideosColumn
 
@@ -75,6 +80,7 @@ FocusScope {
             // NOTE: Setting this to listView.visible seems to causes unnecessary implicitHeight
             //       calculations in the Column parent.
             visible: listView.count > 0
+            color: theme.fg.primary
         }
 
         Widgets.KeyNavigableListView {
@@ -97,8 +103,6 @@ FocusScope {
 
             // NOTE: We want a gentle fade at the beginning / end of the history.
             enableFade: true
-
-            backgroundColor: VLCStyle.colors.bg
 
             Navigation.parentItem: root
 
@@ -167,6 +171,7 @@ FocusScope {
             id: subtitleLabel
 
             visible: text !== ""
+            color: theme.fg.primary
         }
     }
 }

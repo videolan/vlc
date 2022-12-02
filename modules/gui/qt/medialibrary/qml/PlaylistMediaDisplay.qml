@@ -165,6 +165,7 @@ FocusScope {
             bottomPadding: VLCStyle.margin_xsmall
 
             text: root.name
+            color: view.colorContext.fg.primary
         }
 
 

@@ -19,8 +19,6 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.11
 
-import QtGraphicalEffects 1.0
-
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -31,8 +29,6 @@ AbstractButton {
     id: artworkInfoItem
 
     property bool paintOnly: false
-
-    property VLCColors colors: VLCStyle.colors
 
     readonly property real minimumWidth: coverRect.implicitWidth +
                                          + (leftPadding + rightPadding)
@@ -68,9 +64,17 @@ AbstractButton {
         g_mainDisplay.showPlayer()
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+        focused: artworkInfoItem.visualFocus
+        hovered: artworkInfoItem.hovered
+    }
+
     background: Widgets.AnimatedBackground {
         active: visualFocus
-        activeBorderColor: colors.bgFocus
+        animate: theme.initialized
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: RowLayout {
@@ -82,7 +86,7 @@ AbstractButton {
             implicitHeight: VLCStyle.dp(60, VLCStyle.scale)
             implicitWidth: implicitHeight
 
-            color: colors.bg
+            color: theme.bg.primary
 
             Widgets.DoubleShadow {
                 anchors.fill: parent
@@ -118,8 +122,6 @@ AbstractButton {
                 ToolTip.text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text)
                                                     .arg(artistLabel.text)
                                                     .arg(progressIndicator.text)
-
-                property alias colors: artworkInfoItem.colors
             }
         }
 
@@ -142,7 +144,7 @@ AbstractButton {
                     else
                         Player.title
                 }
-                color: colors.text
+                color: theme.fg.primary
             }
 
             Widgets.MenuCaption {
@@ -157,7 +159,7 @@ AbstractButton {
                     else
                         Player.artist
                 }
-                color: colors.menuCaption
+                color: theme.fg.secondary
             }
 
             Widgets.MenuCaption {
@@ -172,7 +174,7 @@ AbstractButton {
                     else
                         Player.time.formatHMS() + " / " + Player.length.formatHMS()
                 }
-                color: colors.menuCaption
+                color: theme.fg.secondary
             }
         }
     }

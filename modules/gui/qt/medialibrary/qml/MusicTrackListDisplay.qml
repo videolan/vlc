@@ -175,8 +175,6 @@ Widgets.KeyNavigableTableView {
 
     section.property: "title_first_symbol"
 
-    headerColor: VLCStyle.colors.bg
-
     model: rootmodel
     selectionDelegateModel: selectionModel
     rowHeight: VLCStyle.tableCoverRow_height

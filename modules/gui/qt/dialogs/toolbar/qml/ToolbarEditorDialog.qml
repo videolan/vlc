@@ -72,7 +72,7 @@ WindowDialog {
             RowLayout {
                 Widgets.MenuLabel {
                     Layout.fillWidth: true
-
+                    color: root.colorContext.fg.primary
                     text: I18n.qtr("Select profile:")
                 }
 

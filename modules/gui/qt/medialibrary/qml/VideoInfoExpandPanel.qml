@@ -47,12 +47,18 @@ FocusScope {
         playActionBtn.forceActiveFocus(reason);
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
+
     Rectangle{
         id: contentRect
 
         anchors.fill: parent
         implicitHeight: contentLayout.implicitHeight + ( VLCStyle.margin_normal * 2 )
-        color: VLCStyle.colors.expandDelegate
+        color: theme.bg.secondary
 
         Rectangle {
             anchors {
@@ -60,7 +66,7 @@ FocusScope {
                 left: parent.left
                 right: parent.right
             }
-            color: VLCStyle.colors.border
+            color: theme.border
             height: VLCStyle.expandDelegate_border
         }
 
@@ -70,7 +76,7 @@ FocusScope {
                 left: parent.left
                 right: parent.right
             }
-            color: VLCStyle.colors.border
+            color: theme.border
             height: VLCStyle.expandDelegate_border
         }
 
@@ -160,6 +166,7 @@ FocusScope {
 
                     Widgets.SubtitleLabel {
                         text: model.title || I18n.qtr("Unknown title")
+                        color: theme.fg.primary
 
                         Layout.fillWidth: true
                     }
@@ -178,7 +185,7 @@ FocusScope {
 
                 Widgets.CaptionLabel {
                     text: (model && model.duration) ? model.duration.formatHMS() : ""
-                    color: VLCStyle.colors.text
+                    color: theme.fg.primary
                     width: parent.width
                 }
 
@@ -186,11 +193,13 @@ FocusScope {
                     topPadding: VLCStyle.margin_normal
                     text: "<b>" + I18n.qtr("File Name:") + "</b> " + root.model.fileName
                     width: parent.width
+                    color: theme.fg.secondary
                     textFormat: Text.StyledText
                 }
 
                 Widgets.MenuCaption {
                     text: "<b>" + I18n.qtr("Path:") + "</b> " + root.model.display_mrl
+                    color: theme.fg.secondary
                     topPadding: VLCStyle.margin_xsmall
                     bottomPadding: VLCStyle.margin_large
                     width: parent.width
@@ -251,6 +260,7 @@ FocusScope {
 
                             Widgets.MenuCaption {
                                 text: modelData.title
+                                color: theme.fg.secondary
                                 font.bold: true
                                 bottomPadding: VLCStyle.margin_small
                             }
@@ -288,6 +298,7 @@ FocusScope {
                 delegate: Widgets.MenuCaption {
                     topPadding: (!videoDescRepeaterDelegate.isFirst) && (index === 0) ? VLCStyle.margin_small : 0
                     text: modelData.text + " " + modelData.data
+                    color: theme.fg.secondary
                     bottomPadding: VLCStyle.margin_xsmall
                 }
             }
@@ -316,6 +327,7 @@ FocusScope {
                     topPadding: (!audioDescRepeaterDelegate.isFirst) && (index === 0) ? VLCStyle.margin_small : 0
                     text: modelData.text + " " + modelData.data
                     bottomPadding: VLCStyle.margin_xsmall
+                    color: theme.fg.secondary
                 }
             }
         }

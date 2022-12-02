@@ -31,18 +31,6 @@ T.ToolButton {
 
     property size sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
 
-    // background colors
-    // NOTE: We want the background to be transparent for IconToolButton(s).
-    property color backgroundColor: "transparent"
-    property color backgroundColorHover: "transparent"
-
-    property color color: VLCStyle.colors.icon
-    property color colorHover: VLCStyle.colors.buttonTextHover
-    property color colorHighlighted: VLCStyle.colors.accent
-    property color colorDisabled: paintOnly ? color : VLCStyle.colors.textInactive
-    property color colorFocus: VLCStyle.colors.bgFocus
-
-
     padding: 0
 
     enabled: !paintOnly
@@ -55,34 +43,26 @@ T.ToolButton {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+
+        enabled: control.enabled || control.paintOnly
+        focused: control.visualFocus
+        hovered: control.hovered
+        pressed: control.down
+    }
+
     background: AnimatedBackground {
         width: control.sourceSize.width
         height: control.sourceSize.height
 
         active: control.visualFocus
+        animate: theme.initialized
 
-        backgroundColor: {
-            if (control.hovered)
-                return control.backgroundColorHover;
-            // if base color is transparent, animation starts with black color
-            else if (control.backgroundColor.a === 0)
-                return VLCStyle.colors.setColorAlpha(control.backgroundColorHover, 0);
-            else
-                return control.backgroundColor;
-        }
-
-        foregroundColor: {
-            if (control.highlighted)
-                return control.colorHighlighted;
-            else if (control.hovered)
-                return control.colorHover;
-            else if (!control.enabled)
-                return control.colorDisabled;
-            else
-                return control.color;
-        }
-
-        activeBorderColor: control.colorFocus
+        backgroundColor: theme.bg.primary
+        foregroundColor: theme.fg.primary
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: Image {

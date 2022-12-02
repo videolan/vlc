@@ -46,6 +46,12 @@ GridView {
     signal dragStarted(int id)
     signal dragStopped(int id)
 
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     MouseEventFilter {
         target: root
     }
@@ -81,9 +87,9 @@ GridView {
         visible: false
 
         opacity: 0.8
-        color: VLCStyle.colors.bg
+        color: theme.bg.primary
 
-        border.color: VLCStyle.colors.menuCaption
+        border.color: theme.border
         border.width: VLCStyle.dp(2, VLCStyle.scale)
 
         Text {
@@ -96,7 +102,7 @@ GridView {
             font.pointSize: VLCStyle.fontHeight_xxxlarge
 
             font.family: VLCIcons.fontFamily
-            color: VLCStyle.colors.menuCaption
+            color: theme.fg.secondary
         }
 
         MouseArea {
@@ -167,7 +173,7 @@ GridView {
             color: "transparent"
 
             border.width: VLCStyle.dp(1, VLCStyle.scale)
-            border.color: containsMouse && !buttonDragItem.Drag.active ? VLCStyle.colors.buttonBorder
+            border.color: containsMouse && !buttonDragItem.Drag.active ? theme.border
                                                                        : "transparent"
 
             ColumnLayout {
@@ -179,6 +185,7 @@ GridView {
                     Layout.preferredHeight: VLCStyle.icon_medium
                     Layout.alignment: Qt.AlignHCenter
 
+                    color: theme.fg.primary
                     text: PlayerControlbarControls.controlList[model.index].label
                 }
 
@@ -186,6 +193,7 @@ GridView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+                    color: theme.fg.secondary
                     elide: Text.ElideNone
                     text: PlayerControlbarControls.controlList[model.index].text
                     wrapMode: Text.WordWrap

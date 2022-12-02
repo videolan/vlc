@@ -30,8 +30,8 @@ Row {
 
     width: implicitWidth
 
-    property color color: VLCStyle.colors.text
-    property color hoverColor: VLCStyle.colors.windowCSDButtonBg
+    property color color: theme.fg.primary
+    property color hoverColor: VLCStyle.colors.setColorAlpha(theme.bg.primary, 0.5)
 
     readonly property bool hovered: {
         var h = false
@@ -41,6 +41,11 @@ Row {
         }
 
         return h
+    }
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
     }
 
     Repeater {
@@ -58,6 +63,8 @@ Row {
                    : windowButtonGroup.color
 
             hoverColor: (modelData.type === CSDButton.Close) ? "red" : windowButtonGroup.hoverColor
+
+            isThemeDark: theme.palette.isDark
 
             iconTxt: {
                 switch (modelData.type) {

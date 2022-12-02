@@ -21,6 +21,7 @@ import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.3
 
 import org.videolan.compat 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -60,7 +61,8 @@ T.Control {
         id: defaultDelId
         property var rowModel: parent.rowModel
         property var colModel: parent.colModel
-        property color foregroundColor: parent.foregroundColor
+        readonly property ColorContext colorContext: parent.colorContext
+        readonly property bool selected: parent.selected
 
         label: text
         forceScroll: parent.currentlyFocused
@@ -74,13 +76,16 @@ T.Control {
             text: defaultDelId.rowModel
                     ? (defaultDelId.rowModel[defaultDelId.colModel.criteria] || "")
                     : ""
-            color: defaultDelId.foregroundColor
+
+            color: defaultDelId.selected
+                ? defaultDelId.colorContext.fg.highlight
+                : defaultDelId.colorContext.fg.primary
         }
     }
     // Settings
 
     hoverEnabled: true
-    
+
     ListView.delayRemove: dragActive
 
     Component.onCompleted: {
@@ -89,19 +94,21 @@ T.Control {
 
     // Childs
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Item
+
+        focused: delegate.visualFocus
+        hovered: delegate.hovered
+    }
+
     background: AnimatedBackground {
         active: visualFocus
 
         animationDuration: VLCStyle.duration_short
-
-        backgroundColor: {
-            if (delegate.selected)
-                return VLCStyle.colors.gridSelect;
-            else if (delegate.hovered)
-                return VLCStyle.colors.listHover;
-            else
-                return VLCStyle.colors.setColorAlpha(VLCStyle.colors.listHover, 0);
-        }
+        animate: theme.initialized
+        backgroundColor: delegate.selected ? theme.bg.highlight : theme.bg.primary
+        activeBorderColor: theme.visualFocus
 
         MouseArea {
             id: hoverArea
@@ -189,9 +196,11 @@ T.Control {
 
                 readonly property bool currentlyFocused: delegate.activeFocus
 
+                readonly property bool selected: delegate.selected
+
                 readonly property bool containsMouse: hoverArea.containsMouse
 
-                readonly property color foregroundColor: delegate.background.foregroundColor
+                readonly property ColorContext colorContext: theme
 
                 width: (modelData.size) ? VLCStyle.colWidth(modelData.size) : 0
 

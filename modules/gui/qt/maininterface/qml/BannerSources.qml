@@ -65,6 +65,11 @@ FocusScope {
         searchBox.state = "expanded"
     }
 
+    ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     BindingCompat {
         property: "searchPattern"
         value: searchBox.searchPattern
@@ -80,7 +85,8 @@ FocusScope {
     }
 
     Widgets.AcrylicBackground {
-        alternativeColor: VLCStyle.colors.topBanner
+        tintColor: theme.bg.primary
+        alternativeColor: theme.bg.secondary
         anchors.fill: parent
     }
 
@@ -153,7 +159,6 @@ FocusScope {
                                  text: I18n.qtr("Previous")
                                  height: VLCStyle.bannerButton_height
                                  width: VLCStyle.bannerButton_width
-                                 colorDisabled: VLCStyle.colors.textDisabled
                                  onClicked: History.previous()
                                  enabled: !History.previousEmpty
 
@@ -163,7 +168,7 @@ FocusScope {
                             }
 
                             Widgets.BannerCone {
-
+                                color: theme.accent
                             }
                         }
 
@@ -187,7 +192,6 @@ FocusScope {
 
                             delegate: Widgets.BannerTabButton {
                                 iconTxt: model.icon
-                                color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
                                 showText: globalToolbar.colapseTabButtons
                                 selected: model.index === root.selectedIndex
                                 onClicked: root.itemClicked(model.index)
@@ -235,7 +239,7 @@ FocusScope {
                 background: Rectangle {
                     id: localToolbarBg
 
-                    color: VLCStyle.colors.lowerBanner
+                    color: theme.bg.secondary
                     Rectangle {
                         anchors.left : parent.left
                         anchors.right: parent.right
@@ -243,7 +247,7 @@ FocusScope {
 
                         height: VLCStyle.border
 
-                        color: VLCStyle.colors.border
+                        color: theme.border
                     }
                 }
 

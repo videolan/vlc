@@ -35,24 +35,9 @@ T.ToolButton {
 
     property string iconText: ""
 
-    // Style
+    property color color: (control.checked) ? theme.accent : theme.fg.primary
 
-    // background colors
-    // NOTE: We want the background to be transparent for IconToolButton(s).
-    property color backgroundColor: "transparent"
-    property color backgroundColorHover: "transparent"
-
-    // foreground colors based on state
-    property color color: VLCStyle.colors.icon
-    property color colorHover: VLCStyle.colors.buttonTextHover
-    property color colorHighlighted: VLCStyle.colors.accent
-    property color colorDisabled: paintOnly ? color : VLCStyle.colors.textInactive
-
-    // Aliases
-
-
-    // active border color
-    property color colorFocus: VLCStyle.colors.bgFocus
+    property color backgroundColor: theme.bg.primary
 
     // Settings
 
@@ -77,34 +62,28 @@ T.ToolButton {
     T.ToolTip.text: control.text
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
+    readonly property ColorContext colorContext : ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+
+        enabled: control.paintOnly || control.enabled
+        focused: control.visualFocus
+        hovered: control.hovered
+        pressed: control.down
+    }
+
     background: AnimatedBackground {
         implicitWidth: size
         implicitHeight: size
 
+        animate: theme.initialized
+
         active: control.visualFocus
 
-        backgroundColor: {
-            if (control.hovered)
-                return control.backgroundColorHover;
-            // if base color is transparent, animation starts with black color
-            else if (control.backgroundColor.a === 0)
-                return VLCStyle.colors.setColorAlpha(control.backgroundColorHover, 0);
-            else
-                return control.backgroundColor;
-        }
+        backgroundColor: control.backgroundColor
+        foregroundColor: control.color
 
-        foregroundColor: {
-            if (control.highlighted)
-                return control.colorHighlighted;
-            else if (control.hovered)
-                return control.colorHover;
-            else if (!control.enabled)
-                return control.colorDisabled;
-            else
-                return control.color;
-        }
-
-        activeBorderColor: control.colorFocus
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: T.Label {
@@ -115,7 +94,7 @@ T.ToolButton {
 
         text: iconText
 
-        color: background ? background.foregroundColor : control.color
+        color: control.background.foregroundColor
 
         font.pixelSize: control.size
         font.family: VLCIcons.fontFamily

@@ -30,10 +30,6 @@ import "qrc:///util/Helpers.js" as Helpers
 ColumnLayout {
     id: root
 
-    // Properties
-
-    property VLCColors colors: VLCStyle.nightColors
-
     // Private
 
     property var _model: [{ "value": 0.25 },
@@ -61,8 +57,8 @@ ColumnLayout {
 
     property real _threshold: 0.03
 
-    property color _color: (slider.visualFocus || slider.pressed) ? colors.accent
-                                                                  : colors.text
+    property color _color: (slider.visualFocus || slider.pressed) ? theme.accent
+                                                                  : theme.fg.primary
 
     // Settings
 
@@ -159,6 +155,11 @@ ColumnLayout {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     Widgets.SubtitleLabel {
         id: label
 
@@ -168,7 +169,7 @@ ColumnLayout {
 
         text: I18n.qtr("Playback Speed")
 
-        color: root.colors.text
+        color: theme.fg.primary
     }
 
     Item {
@@ -189,7 +190,7 @@ ColumnLayout {
 
             text: I18n.qtr("0.25")
 
-            color: label.color
+            color: theme.fg.primary
 
             font.pixelSize: VLCStyle.fontSize_normal
         }
@@ -201,8 +202,6 @@ ColumnLayout {
             width: VLCStyle.dp(64, VLCStyle.scale)
 
             anchors.centerIn: parent
-
-            colors: root.colors
 
             focus: true
 
@@ -216,7 +215,7 @@ ColumnLayout {
 
                 text: I18n.qtr("1.00x")
 
-                color: buttonReset.background.foregroundColor
+                color: theme.fg.primary
 
                 font.pixelSize: VLCStyle.fontSize_xlarge
             }
@@ -229,7 +228,7 @@ ColumnLayout {
 
             text: I18n.qtr("4.00")
 
-            color: label.color
+            color: theme.fg.primary
 
             font.pixelSize: VLCStyle.fontSize_normal
         }
@@ -271,7 +270,7 @@ ColumnLayout {
 
             radius: VLCStyle.dp(2, VLCStyle.scale)
 
-            color: root.colors.bgAlt
+            color: theme.bg.secondary
 
             Rectangle {
                 width: slider.visualPosition * parent.width
@@ -376,10 +375,6 @@ ColumnLayout {
             // NOTE: We display the 'Normal' string when the Slider is centered.
             displayText: (currentIndex === 3) ? currentText
                                               : root._value
-
-            color: root.colors.buttonText
-            bgColor: root.colors.button
-            borderColor: root.colors.buttonBorder
 
             Navigation.parentItem: rowB
 

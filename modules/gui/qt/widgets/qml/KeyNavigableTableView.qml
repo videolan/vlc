@@ -39,6 +39,7 @@ FocusScope {
         verticalAlignment: Text.AlignVCenter
 
         text: model.text || ""
+        color: parent.colorContext.fg.secondary
     }
 
     // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own
@@ -67,7 +68,7 @@ FocusScope {
 
     property Component header: Item{}
     property Item headerItem: view.headerItem ? view.headerItem.loadedHeader : null
-    property color headerColor
+    property color headerColor: colorContext.bg.primary
     property int headerTopPadding: 0
 
     property Util.SelectableDelegateModel selectionDelegateModel
@@ -128,6 +129,8 @@ FocusScope {
     property alias displayMarginEnd: view.displayMarginEnd
 
     property alias count: view.count
+
+    property alias colorContext: view.colorContext
 
     // Signals
 
@@ -274,8 +277,8 @@ FocusScope {
 
             width: view.width
             height: col.height
-            color: headerColor
             z: 3
+            color: root.headerColor
 
             // with inline header positioning and for `root.header` which changes it's height after loading,
             // in such cases after `root.header` completes, the ListView will try to maintain the relative contentY,
@@ -293,7 +296,7 @@ FocusScope {
                 topPadding: root.headerTopPadding
 
                 text: view.currentSection
-                color: VLCStyle.colors.accent
+                color: view.colorContext.accent
                 verticalAlignment: Text.AlignTop
                 visible: view.headerPositioning === ListView.OverlayHeader
                          && text !== ""
@@ -333,13 +336,12 @@ FocusScope {
                             height: VLCStyle.dp(20, VLCStyle.scale)
                             width: VLCStyle.colWidth(modelData.size) || 1
 
-                            //Layout.alignment: Qt.AlignVCenter
-
                             Loader {
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
 
                                 property var model: modelData.model
+                                readonly property ColorContext colorContext: view.colorContext
 
                                 sourceComponent: model.headerDelegate || root.tableHeaderDelegate
                             }
@@ -348,7 +350,8 @@ FocusScope {
                                 text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
                                 visible: root.model.sortCriteria === modelData.criteria
                                 font.pixelSize: VLCStyle.fontSize_normal
-                                color: VLCStyle.colors.accent
+                                color: root.colorContext.accent
+
                                 anchors {
                                     top: parent.top
                                     bottom: parent.bottom
@@ -384,8 +387,7 @@ FocusScope {
             topPadding: VLCStyle.margin_xsmall
 
             text: section
-
-            color: VLCStyle.colors.accent
+            color: root.colorContext.accent
         }
 
         delegate: TableViewDelegate {

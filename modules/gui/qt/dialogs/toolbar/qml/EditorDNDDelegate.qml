@@ -43,6 +43,11 @@ Control {
 
     ListView.delayRemove: dragActive
     
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+    }
+
     MouseArea {
         id: mouseArea
 
@@ -126,7 +131,7 @@ Control {
         implicitHeight: VLCStyle.icon_medium
 
         visible: dropArea.containsDrag
-        color: VLCStyle.colors.accent
+        color: theme.accent
     }
 
     background: Rectangle {
@@ -135,7 +140,7 @@ Control {
         color: "transparent"
 
         border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: containsMouse && !pressed ? VLCStyle.colors.buttonBorder
+        border.color: containsMouse && !pressed ? theme.border
                                                 : "transparent"
     }
 

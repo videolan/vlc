@@ -30,7 +30,6 @@ import "qrc:///menus/" as Menus
 FocusScope {
     id: resumePanel
 
-    property VLCColors colors: VLCStyle.colors
     property int maxWidth
 
     implicitHeight: continueBtn.y + continueBtn.implicitHeight
@@ -74,6 +73,12 @@ FocusScope {
         }
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
+
     Component.onCompleted: {
         if (Player.canRestorePlayback) {
             showResumePanel()
@@ -99,7 +104,7 @@ FocusScope {
         anchors.top: parent.top
         anchors.left: parent.left
 
-        color: resumePanel.colors.playerFg
+        color: theme.fg.primary
         font.pixelSize: VLCStyle.fontSize_normal
         font.bold: true
         wrapMode: Text.Wrap
@@ -116,7 +121,7 @@ FocusScope {
 
         text: I18n.qtr("Continue")
         font.bold: true
-        color: resumePanel.colors.playerFg
+        color: theme.fg.primary
         focus: true
         onClicked: {
             Player.restorePlaybackPos()
@@ -137,7 +142,7 @@ FocusScope {
 
         text: I18n.qtr("Dismiss")
         font.bold: true
-        color: resumePanel.colors.playerFg
+        color: theme.fg.primary
         onClicked: hideResumePanel()
 
         Navigation.parentItem: resumePanel

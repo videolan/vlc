@@ -42,6 +42,13 @@ FocusScope {
         playActionBtn.forceActiveFocus(reason);
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        ////force the dark theme in the header
+        palette: VLCStyle.darkPalette
+        colorSet: ColorContext.View
+    }
+
     Image {
         id: background
 
@@ -109,7 +116,7 @@ FocusScope {
                 radius: VLCStyle.cover_normal
                 color: "transparent"
                 border.width: VLCStyle.dp(1, VLCStyle.scale)
-                border.color: VLCStyle.colors.roundPlayCoverBorder
+                border.color: theme.border
             }
         }
 
@@ -127,7 +134,9 @@ FocusScope {
                 Layout.fillWidth: true
 
                 text: artist.name || I18n.qtr("No artist")
-                color: "white"
+                color: theme.fg.primary
+
+                Layout.maximumWidth: parent.width
             }
 
             Widgets.MenuCaption {
@@ -136,8 +145,7 @@ FocusScope {
                 Layout.topMargin: VLCStyle.margin_xxxsmall
 
                 text: I18n.qtr("%1 Songs").arg(artist.nb_tracks)
-                color: "white"
-                opacity: .6
+                color: theme.fg.secondary
             }
 
             Widgets.NavigableRow {
@@ -156,8 +164,10 @@ FocusScope {
                         iconTxt: VLCIcons.play_outline
                         text: I18n.qtr("Play all")
                         focus: true
-                        // NOTE: In overlay, the focus rectangle is always white.
-                        colorFocus: VLCStyle.colors.white
+
+                        //we probably want to keep this button like the other action buttons
+                        colorContext.palette: VLCStyle.palette
+
                         onClicked: MediaLib.addAndPlay( artist.id )
                     }
 

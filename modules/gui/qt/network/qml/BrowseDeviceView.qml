@@ -330,8 +330,6 @@ FocusScope {
 
             header: root.header
 
-            headerColor: VLCStyle.colors.bg
-
             selectionDelegateModel: modelSelect
 
             Navigation.parentItem: root
@@ -351,6 +349,8 @@ FocusScope {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: VLCStyle.icon_tableHeader
+
+                    color: parent.colorContext.fg.secondary
                 }
             }
 
@@ -369,7 +369,8 @@ FocusScope {
                     property var rowModel: parent.rowModel
                     property var colModel: parent.colModel
 
-                    property color foregroundColor: parent.foregroundColor
+                    readonly property ColorContext colorContext: parent.colorContext
+                    readonly property bool selected: parent.selected
 
                     width: parent.width
 
@@ -396,7 +397,9 @@ FocusScope {
                                 return text
                         }
 
-                        color: itemText.foregroundColor
+                        color: itemText.selected
+                            ? itemText.colorContext.fg.highlight
+                            : itemText.colorContext.fg.primary
                     }
                 }
             }

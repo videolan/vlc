@@ -38,7 +38,7 @@ Widgets.KeyNavigableTableView {
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: VLCStyle.icon_tableHeader
         text: VLCIcons.history
-        color: VLCStyle.colors.caption
+        color: listView_id.colorContext.fg.secondary
     }
 
     visible: urlModel.count > 0
@@ -71,7 +71,6 @@ Widgets.KeyNavigableTableView {
     }]
 
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
-    headerColor: VLCStyle.colors.bg
 
     onActionForSelection: MediaLib.addAndPlay(model.getIdsForIndexes(
                                                   selection))

@@ -20,14 +20,11 @@
 
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 ButtonExt {
-    // Style
+    id: control
+
     iconSize: VLCStyle.icon_actionButton
-
-    foregroundColor: (hovered) ? VLCStyle.colors.white
-                               : VLCStyle.colors.buttonBannerDark
-
-    colorFocus: VLCStyle.colors.white
 }

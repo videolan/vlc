@@ -33,8 +33,6 @@ Templates.Pane {
 
     property int size: VLCStyle.icon_toolbar
 
-    property VLCColors colors: VLCStyle.colors
-
     property bool paintOnly: false
 
     // Private
@@ -63,7 +61,6 @@ Templates.Pane {
     function _applyItem(loader, item) {
         item.focus = true
 
-        item.colors    = Qt.binding(function() { return colors })
         item.paintOnly = Qt.binding(function() { return paintOnly })
 
         item.Navigation.parentItem = Qt.binding(function() { return loader })
@@ -80,6 +77,11 @@ Templates.Pane {
     }
 
     // Children
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
 
     Row {
         id: row

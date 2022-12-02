@@ -41,7 +41,9 @@ Row {
 
     readonly property string artworkSource: !!rowModel ? rowModel.artwork : ""
 
-    readonly property color foregroundColor: parent.foregroundColor
+    readonly property ColorContext colorContext: parent.colorContext
+
+    readonly property bool selected: parent.selected
 
     // Private
 
@@ -111,7 +113,9 @@ Row {
 
             networkModel: rowModel
 
-            bgColor: VLCStyle.colors.bg
+            bgColor: root.colorContext.bg.secondary
+            color1: root.colorContext.fg.primary
+            accent: root.colorContext.accent
 
             Widgets.PlayCover {
                 x: Math.round((artwork.width - width) / 2)
@@ -159,7 +163,9 @@ Row {
 
                 text: (root.rowModel && model.title) ? root.rowModel[model.title] : ""
 
-                color: root.foregroundColor
+                color: root.selected
+                    ? root.colorContext.fg.highlight
+                    : root.colorContext.fg.primary
             }
         }
 
@@ -172,6 +178,10 @@ Row {
             height: itemText.height
 
             visible: (text)
+
+            color: root.selected
+                ? root.colorContext.fg.highlight
+                : root.colorContext.fg.secondary
 
             text: root.getCriterias(root.model, root.rowModel)
         }

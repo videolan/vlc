@@ -213,6 +213,12 @@ FocusScope {
         onContentModelChanged: modelSortSettingHandler.set(sourcesBanner.contentModel, History.viewPath)
     }
 
+    ColorContext {
+        id: theme
+        palette: VLCStyle.palette
+        colorSet: ColorContext.View
+    }
+
     FocusScope {
         focus: true
         id: medialibId
@@ -224,14 +230,20 @@ FocusScope {
             id: parentRectangle
             anchors.fill: parent
 
-            color: VLCStyle.colors.bg
+            color: theme.bg.primary
 
             layer.enabled: (((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
                            ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString))) &&
                            (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
 
             layer.effect: Widgets.FrostedGlassEffect {
-                tint: VLCStyle.colors.lowerBanner
+                ColorContext {
+                    id: frostedTheme
+                    palette: VLCStyle.palette
+                    colorSet: ColorContext.Window
+                }
+
+                tint: frostedTheme.bg.secondary
 
                 effectRect: {
                     var _height = 0
@@ -379,7 +391,7 @@ FocusScope {
                             anchors.left: parent.left
 
                             width: VLCStyle.border
-                            color: VLCStyle.colors.border
+                            color: theme.separator
                         }
 
                         PL.PlaylistListView {

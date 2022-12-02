@@ -91,7 +91,8 @@ Item {
 
         readonly property bool containsMouse: parent.containsMouse
         readonly property bool currentlyFocused: parent.currentlyFocused
-        readonly property color foregroundColor: parent.foregroundColor
+        readonly property ColorContext colorContext: parent.colorContext
+        readonly property bool selected: parent.selected
 
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
@@ -120,6 +121,7 @@ Item {
                 playIconSize: VLCStyle.play_cover_small
                 onPlayIconClicked: g_mainDisplay.play(MediaLib, titleDel.rowModel.id)
                 radius: root.titleCover_radius
+                color: titleDel.colorContext.bg.secondary
 
                 imageOverlay: Item {
                     width: cover.width
@@ -171,7 +173,11 @@ Item {
                     text: (titleDel.rowModel && root.showTitleText)
                           ? (titleDel.rowModel[titleDel.model.criteria] || I18n.qtr("Unknown Title"))
                           : ""
-                    color: titleDel.foregroundColor
+
+                    color: titleDel.selected
+                        ? titleDel.colorContext.fg.highlight
+                        : titleDel.colorContext.fg.primary
+
                 }
             }
 
@@ -184,6 +190,10 @@ Item {
                 visible: root.showCriterias
 
                 text: (visible) ? root.getCriterias(titleDel.model, titleDel.rowModel) : ""
+
+                color: titleDel.selected
+                    ? titleDel.colorContext.fg.highlight
+                    : titleDel.colorContext.fg.secondary
             }
         }
     }
@@ -191,6 +201,7 @@ Item {
     property Component titleHeaderDelegate: Row {
         id: titleHeadDel
         property var model: parent.colModel
+        readonly property ColorContext colorContext: parent.colorContext
 
         spacing: VLCStyle.margin_normal
 
@@ -200,15 +211,17 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: VLCStyle.icon_tableHeader
-            color: VLCStyle.colors.caption
 
             text: VLCIcons.album_cover
+            color: titleHeadDel.colorContext.fg.secondary
         }
 
         Widgets.CaptionLabel {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             height: parent.height
+
+            color: titleHeadDel.colorContext.fg.secondary
 
             text: titleHeadDel.model
                     ? titleHeadDel.model.text || ""
@@ -223,7 +236,7 @@ Item {
         verticalAlignment: Text.AlignVCenter
         text: VLCIcons.time
         font.pixelSize: VLCStyle.icon_tableHeader
-        color: VLCStyle.colors.caption
+        color: parent.colorContext.fg.secondary
     }
 
     property Component timeColDelegate: Item {
@@ -231,7 +244,8 @@ Item {
 
         property var rowModel: parent.rowModel
         property var model: parent.colModel
-        property color foregroundColor: parent.foregroundColor
+        readonly property bool selected: parent.selected
+        readonly property ColorContext colorContext: parent.colorContext
 
         Widgets.ListLabel {
             width: timeTextMetric.width
@@ -240,7 +254,9 @@ Item {
             text: (!timeDel.rowModel || !timeDel.rowModel[timeDel.model.criteria])
                 ? ""
                 : timeDel.rowModel[timeDel.model.criteria].formatShort()
-            color: timeDel.foregroundColor
+            color: timeDel.selected
+                ? timeDel.colorContext.fg.highlight
+                : timeDel.colorContext.fg.primary
         }
     }
 

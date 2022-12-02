@@ -79,6 +79,8 @@ FadingEdgeListView {
 
     activeFocusOnTab: true
 
+    backgroundColor: theme.bg.primary
+
     //key navigation is reimplemented for item selection
     keyNavigationEnabled: false
 
@@ -231,6 +233,12 @@ FadingEdgeListView {
         }
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
+
     Component {
         id: sectionHeading
 
@@ -240,13 +248,13 @@ FadingEdgeListView {
             Text {
                 text: section
                 font.pixelSize: VLCStyle.fontSize_xlarge
-                color: VLCStyle.colors.accent
+                color: theme.accent
             }
 
             Rectangle {
                 width: parent.width
                 height: 1
-                color: VLCStyle.colors.textDisabled
+                color: theme.border
             }
         }
     }

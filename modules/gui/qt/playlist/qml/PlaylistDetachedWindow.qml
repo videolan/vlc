@@ -34,7 +34,7 @@ Window {
     minimumWidth: playlistView.minimumWidth
 
     title: I18n.qtr("Playlist")
-    color: VLCStyle.colors.bg
+    color: theme.bg.primary
 
     Loader {
         asynchronous: true
@@ -60,6 +60,8 @@ Window {
         useAcrylic: false
         focus: true
         anchors.fill: parent
+
+        colorContext.palette: VLCStyle.palette
 
         readonly property PlaylistListView g_root: playlistView
     }

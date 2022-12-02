@@ -28,6 +28,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
 
 Widgets.IconControlButton {
+    id: control
     // Properties
 
     // Private
@@ -46,7 +47,7 @@ Widgets.IconControlButton {
 
     // Settings
 
-    color: (popup.visible) ? colors.accent : colors.playerControlBarFg
+    color: (popup.visible) ? control.colorContext.accent : control.colorContext.fg.primary
 
     // FIXME: We can't use upItem because a Popup is not an Item.
     Navigation.upAction: function() {
@@ -140,11 +141,17 @@ Widgets.IconControlButton {
         onHeightChanged: if (visible) root._updatePosition()
 
         background: Rectangle {
+            ColorContext {
+                id: popupTheme
+                palette: control.colorContext.palette
+                colorSet: ColorContext.Window
+            }
+
             radius: VLCStyle.dp(8, VLCStyle.scale)
 
             opacity: 0.85
 
-            color: colors.bg
+            color: popupTheme.bg.primary
         }
     }
 }

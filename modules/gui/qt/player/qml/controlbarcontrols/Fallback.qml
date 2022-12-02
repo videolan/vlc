@@ -35,16 +35,21 @@ Control {
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
     property bool paintOnly: false
-    property VLCColors colors: VLCStyle.colors
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
 
     background: Widgets.AnimatedBackground {
         active: visualFocus
-        activeBorderColor: colors.bgFocus
+        animate: theme.initialized
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: Widgets.MenuLabel {
         text: I18n.qtr("WIDGET\nNOT\nFOUND")
         horizontalAlignment: Text.AlignHCenter
-        color: colors.text
+        color: theme.fg.primary
     }
 }

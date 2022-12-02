@@ -29,7 +29,7 @@ Widgets.IconToolButton {
 
     enabled: !paintOnly && Player.isPlaying
 
-    color: VLCStyle.colors.record
+    color: "red" //red means recording
     text: I18n.qtr("record")
 
     onClicked: Player.toggleRecord()

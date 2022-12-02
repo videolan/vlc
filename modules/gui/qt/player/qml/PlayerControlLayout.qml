@@ -29,8 +29,6 @@ FocusScope {
     implicitWidth: layoutLoader_left.implicitWidth + layoutLoader_center.implicitWidth + layoutLoader_right.implicitWidth + 2 * layoutSpacing
     implicitHeight: VLCStyle.maxControlbarControlHeight
 
-    property VLCColors colors: null
-
     property real defaultSize: VLCStyle.icon_normal // default size for IconToolButton based controls
 
     property real spacing: VLCStyle.margin_normal // spacing between controls
@@ -48,6 +46,11 @@ FocusScope {
 
     Component.onCompleted: {
         console.assert(identifier >= 0)
+    }
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
     }
 
     Loader {

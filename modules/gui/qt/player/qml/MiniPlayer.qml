@@ -60,6 +60,11 @@ T.Pane {
         }
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     // this MouseArea prevents mouse events to be sent below miniplayer
     MouseArea {
         anchors.fill: parent
@@ -68,15 +73,13 @@ T.Pane {
     }
 
     background: Rectangle {
-        color: VLCStyle.colors.bg
+        color: theme.bg.primary
     }
 
     contentItem: ControlBar {
         focus: true
-        colors: VLCStyle.colors
         textPosition: ControlBar.TimeTextPosition.Hide
         sliderHeight: VLCStyle.dp(3, VLCStyle.scale)
-        sliderBackgroundColor: colors.sliderBarMiniplayerBgColor
         bookmarksHeight: VLCStyle.icon_xsmall * 0.7
         identifier: PlayerControlbarModel.Miniplayer
         Navigation.parentItem: root

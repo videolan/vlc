@@ -109,8 +109,6 @@ MainInterface.MainTableView {
 
     rowHeight: VLCStyle.tableCoverRow_height
 
-    headerColor: VLCStyle.colors.bg
-
     //---------------------------------------------------------------------------------------------
     // Connections
     //---------------------------------------------------------------------------------------------

@@ -33,12 +33,17 @@ Item {
 
     readonly property real minimumWidth: 0
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Button
+    }
+
     T.Label {
         id: spacetext
         anchors.centerIn: parent
 
         text: VLCIcons.space
-        color: VLCStyle.colors.buttonText
+        color: theme.fg.secondary
         visible: paintOnly
 
         font.pixelSize: VLCStyle.icon_toolbar

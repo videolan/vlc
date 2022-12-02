@@ -43,6 +43,11 @@ FocusScope {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     Column {
         id: column
 
@@ -95,7 +100,7 @@ FocusScope {
 
                 wrapMode: Text.WordWrap
 
-                color: VLCStyle.colors.text
+                color: theme.fg.primary
 
                 font.pixelSize: VLCStyle.fontSize_xxlarge
                 font.weight: Font.DemiBold

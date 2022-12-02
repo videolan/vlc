@@ -81,6 +81,11 @@ FocusScope {
         activeFocusChanged.connect(_handleFocus)
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     RowLayout {
         id: rowLayout
 
@@ -165,11 +170,6 @@ FocusScope {
                     // FIXME: Do we really need to enforce a defaultSize ?
                     if (item.size !== undefined)
                         item.size = Qt.binding(function() { return defaultSize; })
-
-                    // force colors:
-                    if (!!colors && !!item.colors) {
-                        item.colors = Qt.binding(function() { return colors; })
-                    }
 
                     item.width = Qt.binding(function() { return loader.width } )
 

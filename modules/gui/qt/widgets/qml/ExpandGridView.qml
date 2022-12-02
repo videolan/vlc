@@ -575,6 +575,11 @@ FocusScope {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     //Gridview visible above the expanded item
     Flickable {
         id: flickable

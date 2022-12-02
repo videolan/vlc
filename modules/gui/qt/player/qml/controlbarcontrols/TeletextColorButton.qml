@@ -29,7 +29,5 @@ Widgets.IconControlButton {
 
     iconText: VLCIcons.circle
 
-    colorDisabled: "grey"
-
     T.ToolTip.visible: (hovered || visualFocus)
 }

@@ -60,7 +60,7 @@ TracksPage {
 
             text: I18n.qtr("Subtitle synchronization")
 
-            color: "white"
+            color: root.colorContext.fg.primary
         }
 
         RowLayout {
@@ -75,7 +75,7 @@ TracksPage {
 
                 text: I18n.qtr("Primary subtitle delay")
 
-                color: "white"
+                color: root.colorContext.fg.primary
             }
 
             Widgets.SpinBoxExt {
@@ -147,7 +147,7 @@ TracksPage {
 
                 text: I18n.qtr("Secondary subtitle delay")
 
-                color: "white"
+                color: root.colorContext.fg.primary
             }
 
             Widgets.SpinBoxExt {
@@ -218,7 +218,7 @@ TracksPage {
 
                 text: I18n.qtr("Subtitle Speed")
 
-                color: "white"
+                color: root.colorContext.fg.primary
             }
 
             Widgets.SpinBoxExt {

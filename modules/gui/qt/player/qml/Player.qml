@@ -54,11 +54,6 @@ FocusScope {
             VLCStyle.noArtAlbumCover
 
     }
-
-    // NOTE: We force the night theme when playing a video.
-    readonly property VLCColors colors: (MainCtx.hasEmbededVideo && !MainCtx.pinVideoControls) ? VLCStyle.nightColors
-                                                                  : VLCStyle.colors
-
     property bool _keyPressed: false
 
     layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
@@ -147,6 +142,15 @@ FocusScope {
         }
     }
 
+    //we draw both the view and the window here
+    ColorContext {
+        id: windowTheme
+        // NOTE: We force the night theme when playing a video.
+        palette: (MainCtx.hasEmbededVideo && !rootPlayer.pinVideoControls) ? VLCStyle.darkPalette
+                                                                           : VLCStyle.palette
+        colorSet: ColorContext.Window
+    }
+
     PlayerPlaylistVisibilityFSM {
         id: playlistVisibility
 
@@ -190,8 +194,13 @@ FocusScope {
     Rectangle {
         visible: !rootPlayer.hasEmbededVideo
         focus: false
-        color: rootPlayer.colors.bg
+        color: bgtheme.bg.primary
         anchors.fill: parent
+
+        readonly property ColorContext colorContext: ColorContext {
+            id: bgtheme
+            colorSet: ColorContext.View
+        }
 
         PlayerBlurredBackground {
             id: backgroundImage
@@ -205,8 +214,8 @@ FocusScope {
 
             source: cover
 
-            screenColor: rootPlayer.colors.setColorAlpha(rootPlayer.colors.playerBg, .55)
-            overlayColor: rootPlayer.colors.setColorAlpha(Qt.tint(rootPlayer.colors.playerFg, rootPlayer.colors.playerBg), 0.4)
+            screenColor: VLCStyle.colors.setColorAlpha(bgtheme.bg.primary, .55)
+            overlayColor: VLCStyle.colors.setColorAlpha(Qt.tint(bgtheme.fg.primary, bgtheme.bg.primary), 0.4)
         }
     }
 
@@ -216,7 +225,7 @@ FocusScope {
 
         Rectangle {
             width: rootPlayer.width
-            color: rootPlayer.colors.playerBg
+            color: windowTheme.bg.primary
         }
     }
 
@@ -225,7 +234,7 @@ FocusScope {
 
         Widgets.AcrylicBackground {
             width: rootPlayer.width
-            alternativeColor: rootPlayer.colors.playerBg
+            tintColor: windowTheme.bg.primary
         }
     }
 
@@ -299,9 +308,7 @@ FocusScope {
             Rectangle {
                 width: controlBarView.width
                 height: controlBarView.height - (rootPlayer.positionSliderY - controlBarView.y)
-                color: rootPlayer.colors.isThemeDark
-                       ? Qt.darker(rootPlayer.colors.playerBg, 1.2)
-                       : Qt.lighter(rootPlayer.colors.playerBg, 1.2)
+                color: windowTheme.bg.primary
                 opacity: 0.7
             }
         }
@@ -334,7 +341,6 @@ FocusScope {
 
             focus: true
             title: mainPlaylistController.currentItem.title
-            colors: rootPlayer.colors
 
             pinControls: rootPlayer.pinVideoControls
             showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
@@ -360,6 +366,11 @@ FocusScope {
 
     Item {
         id: centerContent
+
+        readonly property ColorContext colorContext: ColorContext {
+            id: centerTheme
+            colorSet: ColorContext.View
+        }
 
         anchors {
             left: parent.left
@@ -441,7 +452,7 @@ FocusScope {
                 text: mainPlaylistController.currentItem.album
                 font.pixelSize: VLCStyle.fontSize_xxlarge
                 horizontalAlignment: Text.AlignHCenter
-                color: rootPlayer.colors.playerFg
+                color: centerTheme.fg.primary
                 Accessible.description: I18n.qtr("album")
             }
 
@@ -459,7 +470,7 @@ FocusScope {
                 text: mainPlaylistController.currentItem.artist
                 font.weight: Font.Light
                 horizontalAlignment: Text.AlignHCenter
-                color: rootPlayer.colors.playerFg
+                color: centerTheme.fg.primary
                 Accessible.description: I18n.qtr("artist")
             }
 
@@ -486,9 +497,6 @@ FocusScope {
                         size: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpBwd()
                         text: I18n.qtr("Step back")
-                        color: rootPlayer.colors.playerFg
-                        colorHover: rootPlayer.colors.buttonTextHover
-                        colorFocus: rootPlayer.colors.bgFocus
                     }
 
                     Widgets.IconToolButton {
@@ -496,9 +504,6 @@ FocusScope {
                         size: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.toggleVisualization()
                         text: I18n.qtr("Visualization")
-                        color: rootPlayer.colors.playerFg
-                        colorHover: rootPlayer.colors.buttonTextHover
-                        colorFocus: rootPlayer.colors.bgFocus
                     }
 
                     Widgets.IconToolButton{
@@ -506,9 +511,6 @@ FocusScope {
                         size: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpFwd()
                         text: I18n.qtr("Step forward")
-                        color: rootPlayer.colors.playerFg
-                        colorHover: rootPlayer.colors.buttonTextHover
-                        colorFocus: rootPlayer.colors.bgFocus
                     }
                 }
             }
@@ -540,7 +542,7 @@ FocusScope {
 
             height: playlistpopup.height
 
-            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
+            color: VLCStyle.colors.setColorAlpha(windowTheme.bg.primary, 0.8)
 
 
             PL.PlaylistListView {
@@ -548,11 +550,9 @@ FocusScope {
 
                 useAcrylic: false
                 focus: true
+
                 anchors.fill: parent
-
-                colors: rootPlayer.colors
                 rightPadding: VLCStyle.applicationHorizontalMargin
-
                 topPadding:  {
                     if (rootPlayer.pinVideoControls)
                         return VLCStyle.margin_normal
@@ -652,7 +652,6 @@ FocusScope {
                 anchors.rightMargin: VLCStyle.applicationHorizontalMargin
                 anchors.bottomMargin: VLCStyle.applicationVerticalMargin
 
-                colors: rootPlayer.colors
                 textPosition: rootPlayer.pinVideoControls ? ControlBar.TimeTextPosition.LeftRightSlider : ControlBar.TimeTextPosition.AboveSlider
 
                 Navigation.parentItem: rootPlayer

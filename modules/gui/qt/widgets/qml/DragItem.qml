@@ -39,8 +39,6 @@ Item {
 
     readonly property int coverSize: VLCStyle.icon_normal
 
-    property VLCColors colors: VLCStyle.colors
-
     property var indexes: []
 
     // data from last setData
@@ -178,11 +176,16 @@ Item {
         }
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     Rectangle {
         /* background */
         anchors.fill: parent
-        color: colors.button
-        border.color: colors.buttonBorder
+        color: theme.bg.primary
+        border.color: theme.border
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         radius: VLCStyle.dp(6, VLCStyle.scale)
     }
@@ -190,7 +193,7 @@ Item {
     RectangularGlow {
         anchors.fill: parent
         glowRadius: VLCStyle.dp(8, VLCStyle.scale)
-        color: colors.glowColor
+        color: theme.shadow
         spread: 0.2
         z: -1
     }
@@ -211,7 +214,7 @@ Item {
 
                 radius: coverRepeater.count > 1 ? dragItem.coverSize : VLCStyle.dp(2, VLCStyle.scale)
                 anchors.fill: parent
-                color: colors.bg
+                color: theme.bg.primary
 
                 DoubleShadow {
                     anchors.fill: parent
@@ -258,7 +261,7 @@ Item {
                 // for cover border
                 color: "transparent"
                 border.width: VLCStyle.dp(1, VLCStyle.scale)
-                border.color: colors.buttonBorder
+                border.color: theme.border
                 anchors.fill: parent
                 radius: bg.radius
             }
@@ -274,13 +277,13 @@ Item {
         height: dragItem.coverSize
         radius: dragItem.coverSize
         visible: dragItem._indexesSize > dragItem._maxCovers
-        color: colors.bgAlt
+        color: theme.bg.secondary
         border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: colors.buttonBorder
+        border.color: theme.border
 
         MenuLabel {
             anchors.centerIn: parent
-            color: colors.accent
+            color: theme.accent
             text: "+" + (dragItem._indexesSize - dragItem._maxCovers)
         }
 
@@ -324,7 +327,7 @@ Item {
                 width: parent.width
                 elide: Text.ElideNone
                 font.pixelSize: VLCStyle.fontSize_large
-                color: colors.buttonText
+                color: theme.fg.primary
             }
         }
 
@@ -334,7 +337,7 @@ Item {
             visible: text && text !== ""
             width: parent.width
             text: I18n.qtr("%1 selected").arg(dragItem._indexesSize)
-            color: colors.menuCaption
+            color: theme.fg.secondary
         }
     }
 

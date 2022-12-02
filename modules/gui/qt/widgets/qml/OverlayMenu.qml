@@ -50,8 +50,6 @@ FocusScope {
     // Example usage can be found in 'Playlist/PlaylistOverlayMenu.qml' file
     property var model: undefined
 
-    property VLCColors colors: VLCStyle.colors
-
     onModelChanged: {
         listView.currentModel = model
         listView.resetStack()
@@ -79,6 +77,11 @@ FocusScope {
         }
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     Rectangle {
         color: "black"
         anchors {
@@ -104,7 +107,7 @@ FocusScope {
     Rectangle {
         id: parentItem
 
-        color: root.colors.bg
+        color: theme.bg.primary
 
         anchors {
             top: parent.top
@@ -182,7 +185,7 @@ FocusScope {
                 font.pixelSize: VLCStyle.fontSize_xlarge
                 text: listView.currentModel.title
 
-                color: colors.text
+                color: theme.fg.primary
 
                 leftPadding: root.leftPadding
                 rightPadding: root.rightPadding
@@ -261,7 +264,7 @@ FocusScope {
                             IconLabel {
                                 horizontalAlignment: Text.AlignHCenter
                                 text: modelData.fontIcon
-                                color: colors.text
+                                color: theme.fg.primary
                             }
                         }
 
@@ -270,7 +273,7 @@ FocusScope {
                             ListLabel {
                                 horizontalAlignment: Text.AlignHCenter
                                 text: "✓"
-                                color: colors.text
+                                color: theme.fg.primary
                             }
                         }
 
@@ -292,7 +295,7 @@ FocusScope {
 
                         font.weight: Font.Normal
                         text: modelData.text
-                        color: colors.text
+                        color: theme.fg.primary
                     }
 
                     ListLabel {
@@ -306,13 +309,13 @@ FocusScope {
                                                                       : button.yieldsAnotherModel ? "➜"
                                                                                                   : ""
 
-                        color: colors.text
+                        color: theme.fg.primary
                     }
                 }
             }
 
             highlight: Rectangle {
-                color: colors.accent
+                color: theme.accent
                 opacity: 0.8
             }
 

@@ -28,7 +28,9 @@ Widgets.ScaledImage {
     id: custom_cover
 
     property var networkModel
-    property var bgColor: undefined
+    property color bgColor
+    property color color1
+    property color accent
 
     sourceSize: Qt.size(width, height)
     source: {
@@ -39,11 +41,11 @@ Widgets.ScaledImage {
             return networkModel.artwork
 
         var img = SVGColorImage.colorize(_baseUri(networkModel.type))
-            .color1(VLCStyle.colors.text)
-            .accent(VLCStyle.colors.accent)
+            .color1(custom_cover.color1)
+            .accent(custom_cover.accent)
 
         if (bgColor !== undefined)
-            img.background(bgColor)
+            img.background(custom_cover.bgColor)
 
         return img.uri()
     }

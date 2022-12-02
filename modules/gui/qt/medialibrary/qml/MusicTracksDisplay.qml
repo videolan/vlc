@@ -70,8 +70,6 @@ FocusScope {
 
         // To get blur effect while scrolling in mainview
         displayMarginEnd: g_mainDisplay.displayMargin
-
-        backgroundColor: VLCStyle.colors.bg
     }
 
     EmptyLabelButton {

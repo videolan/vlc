@@ -21,6 +21,8 @@ import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -42,6 +44,12 @@ Dialog {
                     + (footer && footer.visible ? footer.implicitHeight + spacing : 0)
                     + (contentHeight > 0 ? contentHeight + topPadding + bottomPadding : 0)
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        palette: VLCStyle.palette
+        colorSet: ColorContext.Window
+    }
+
     Overlay.modal: GaussianBlur {
         source: ShaderEffectSource {
             sourceItem: control.rootWindow
@@ -52,7 +60,7 @@ Dialog {
     }
 
     background: Rectangle {
-        color: VLCStyle.colors.topBanner
+        color: theme.bg.primary
     }
 
     //FIXME use the right xxxLabel class
@@ -61,13 +69,13 @@ Dialog {
         visible: control.title
         elide: Label.ElideRight
         font.bold: true
-        color: VLCStyle.colors.text
+        color: theme.fg.primary
         padding: 6
         background: Rectangle {
             x: 1; y: 1
             width: parent.width - 2
             height: parent.height - 1
-            color: VLCStyle.colors.topBanner
+            color: theme.bg.primary
         }
     }
 

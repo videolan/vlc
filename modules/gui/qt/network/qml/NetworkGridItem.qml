@@ -64,8 +64,8 @@ Widgets.GridItem {
                 }
             }
             return SVGColorImage.colorize(f(model.type))
-                                .color1(VLCStyle.colors.text)
-                                .accent(VLCStyle.colors.accent)
+                                .color1(root.colorContext.fg.primary)
+                                .accent(root.colorContext.accent)
                                 .uri()
         }
     }

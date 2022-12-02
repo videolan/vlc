@@ -28,10 +28,14 @@ import "qrc:///style/"
 T.Pane {
     id: root
 
-    property VLCColors colors: VLCStyle.colors
-    property color color: colors.accent
     property bool paintOnly: false
+
+    readonly property color sliderColor: (volControl.position > _fullvolpos) ? theme.fg.negative : theme.fg.primary
+
     readonly property var _player: paintOnly ? ({ muted: false, volume: .5 }) : Player
+    readonly property int _maxvol: MainCtx.maxVolume
+    readonly property real _fullvolpos: 100 / _maxvol
+    readonly property real _maxvolpos: _maxvol / 100
 
     implicitWidth: Math.max(background ? background.implicitWidth : 0, contentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(background ? background.implicitHeight : 0, contentHeight + topPadding + bottomPadding)
@@ -41,6 +45,15 @@ T.Pane {
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Slider
+
+        enabled: volControl.enabled || root.paintOnly
+        focused: volControl.visualFocus
+        hovered: volControl.hovered
+    }
 
     RowLayout {
         id: volumeWidget
@@ -65,9 +78,6 @@ T.Pane {
                 else
                     VLCIcons.volume_high
             text: I18n.qtr("Mute")
-            color: colors.buttonText
-            colorHover: colors.buttonTextHover
-            colorFocus: colors.bgFocus
             onClicked: Player.muted = !Player.muted
 
             Navigation.parentItem: root
@@ -95,7 +105,7 @@ T.Pane {
             property bool _keyPressed: false
 
             from: 0
-            to: maxvolpos
+            to: root._maxvolpos
             opacity: _player.muted ? 0.5 : 1
 
             Accessible.name: I18n.qtr("Volume")
@@ -172,11 +182,6 @@ T.Pane {
 
             Keys.priority: Keys.BeforeItem
 
-            readonly property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : root.color
-            readonly property int maxvol: MainCtx.maxVolume
-            readonly property real fullvolpos: 100 / maxvol
-            readonly property real maxvolpos: maxvol / 100
-
             onValueChanged: {
                 if (paintOnly)
                     return
@@ -197,7 +202,8 @@ T.Pane {
 
                     pos: Qt.point(handle.x + handle.width / 2, handle.y)
 
-                    colors: root.colors
+                    //tooltip is a Popup, palette should be passed explicitly
+                    colorContext.palette: theme.palette
                 }
             }
 
@@ -210,26 +216,26 @@ T.Pane {
                 height: implicitHeight
                 width: volControl.availableWidth
                 radius: VLCStyle.dp(4, VLCStyle.scale)
-                color: colors.volsliderbg
+                color: theme.bg.primary
 
                 Rectangle {
                     id: filled
                     width: volControl.visualPosition * sliderBg.width
                     height: parent.height
                     radius: VLCStyle.dp(4, VLCStyle.scale)
-                    color: root.color
+                    color: root.sliderColor
                 }
                 Rectangle{
                     id: tickmark
-                    x : parent.width * volControl.fullvolpos
+                    x : parent.width * root._fullvolpos
                     width: VLCStyle.dp(1, VLCStyle.scale)
                     height: parent.height
                     radius: VLCStyle.dp(2, VLCStyle.scale)
 
                     // NOTE: This shouldn't be visible when the volume stops before a 100.
-                    visible: (volControl.maxvol > 100)
+                    visible: (root._maxvol > 100)
 
-                    color: root.color
+                    color: root.sliderColor
 
                     // NOTE: This is a helper to select the default volume when clicking on the
                     //       tickmark. We apply a higher clamp value to achieve that behavior on
@@ -260,7 +266,7 @@ T.Pane {
                 implicitHeight: implicitWidth
                 radius: width * 0.5
                 visible: (paintOnly || volControl.hovered || volControl.activeFocus)
-                color: volControl.sliderColor
+                color: root.sliderColor
             }
 
             MouseArea {
@@ -326,7 +332,7 @@ T.Pane {
                 function adjustVolume(mouse) {
                     mouse.accepted = true
 
-                    var pos = mouse.x * volControl.maxvolpos / width
+                    var pos = mouse.x * root._maxvolpos / width
 
                     if (pos < 0.25)
                         volControl.value = 0

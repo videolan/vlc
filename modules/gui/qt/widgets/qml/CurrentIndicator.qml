@@ -18,6 +18,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+
+import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 Rectangle {
@@ -25,7 +27,11 @@ Rectangle {
     property int orientation: Qt.Vertical
     property int margin: VLCStyle.margin_xxxsmall
 
-    color: VLCStyle.colors.accent
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+    }
+
+    color: theme.accent
     width: orientation === Qt.Vertical ? VLCStyle.heightBar_xxxsmall : parent.width
     height: orientation === Qt.Horizontal ? VLCStyle.heightBar_xxxsmall : parent.height
 

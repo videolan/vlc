@@ -37,8 +37,6 @@ T.TabButton {
     property bool showText: true
     property bool showCurrentIndicator: true
 
-    property color color: VLCStyle.colors.topBanner
-
     // Settings
 
     width: control.showText ? VLCStyle.bannerTabButton_width_large
@@ -59,34 +57,30 @@ T.TabButton {
 
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
-    // Private functions
-
-    function _getBackground() {
-        if (activeFocus || hovered)
-            return VLCStyle.colors.buttonHover;
-        else
-            return color;
-    }
-
-    function _getForeground() {
-        if (activeFocus || hovered || selected)
-            return VLCStyle.colors.buttonTextHover;
-        else
-            return VLCStyle.colors.buttonBanner;
-    }
-
     // Childs
+
+    ColorContext {
+        id: theme
+        colorSet: ColorContext.TabButton
+
+        focused: control.activeFocus
+        hovered: control.hovered
+        pressed: control.down
+        enabled: control.enabled
+    }
 
     background: Widgets.AnimatedBackground {
         height: control.height
         width: control.width
 
         active: visualFocus
+        animate: theme.initialized
 
         animationDuration: VLCStyle.duration_short
 
-        backgroundColor: _getBackground()
-        foregroundColor: _getForeground()
+        backgroundColor: theme.bg.primary
+        foregroundColor: control.selected ? theme.fg.secondary : theme.fg.primary
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: Item {
@@ -105,10 +99,9 @@ T.TabButton {
             Widgets.IconLabel {
                 text: control.iconTxt
 
-                color: (control.activeFocus ||
-                        control.hovered     ||
-                        control.selected) ? VLCStyle.colors.accent
-                                          : VLCStyle.colors.text
+                color: (control.selected || control.activeFocus || control.hovered)
+                        ? theme.accent
+                        : theme.fg.primary
 
                 font.pixelSize: VLCStyle.icon_banner
             }

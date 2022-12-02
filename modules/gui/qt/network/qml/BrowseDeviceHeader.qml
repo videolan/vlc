@@ -53,6 +53,11 @@ FocusScope {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     RowLayout {
         id: row
 
@@ -65,6 +70,7 @@ FocusScope {
             id: label
 
             Layout.fillWidth: true
+            color: theme.fg.primary
 
             topPadding: VLCStyle.margin_large
             bottomPadding: VLCStyle.margin_normal

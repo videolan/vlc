@@ -387,8 +387,6 @@ FocusScope {
 
             dragItem: dragItemPlaylist
 
-            headerColor: VLCStyle.colors.bg
-
             Navigation.parentItem: root
             Navigation.cancelAction: root._onNavigationCancel
 

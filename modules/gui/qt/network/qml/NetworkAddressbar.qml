@@ -67,10 +67,19 @@ T.Control {
         control._menuModel = menuModel
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+
+        focused: control.visualFocus
+        hovered: control.hovered
+        enabled: control.enabled
+    }
+
     background: Rectangle {
         border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.text, .4)
-        color: VLCStyle.colors.bg
+        border.color: theme.border
+        color: theme.bg.primary
     }
 
     contentItem: RowLayout {
@@ -169,8 +178,7 @@ T.Control {
                     visible: index !== contentRepeater.count - 1
                     text: VLCIcons.breadcrumb_sep
                     font.pixelSize: VLCStyle.icon_addressBar
-                    color: VLCStyle.colors.text
-                    opacity: .6
+                    color: theme.fg.secondary
                     verticalAlignment: Text.AlignVCenter
                 }
             }

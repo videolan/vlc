@@ -43,17 +43,6 @@ FocusScope {
         searchField.forceActiveFocus(reason);
     }
 
-    // Private
-
-    function _getColor() {
-        if (searchField.activeFocus) {
-            return VLCStyle.colors.accent;
-        } else if (searchField.hovered) {
-            return VLCStyle.colors.textFieldHover;
-        } else
-            return VLCStyle.colors.textField;
-    }
-
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------

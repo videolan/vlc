@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+import org.videolan.vlc 0.1
 import "qrc:///style/"
 
 //we want the progress bar to match the radius of the of the video thumbnail
@@ -31,6 +32,11 @@ Item {
     property real value: 0
     property int radius: implicitHeight
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Slider
+    }
+
     Rectangle {
 
         anchors.left: parent.left
@@ -40,6 +46,7 @@ Item {
         height: Math.max(progressBar.radius * 2, //to have at least the proper radius applied
                          parent.height + radius) //the top radius section should be always clipped
 
+        //FIXME do we want it always white or do we want it to change with the theme
         color: "white"
         radius: progressBar.radius
 
@@ -59,7 +66,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
 
-                color: VLCStyle.colors.accent
+                color: theme.fg.primary
                 radius: progressBar.radius
             }
         }

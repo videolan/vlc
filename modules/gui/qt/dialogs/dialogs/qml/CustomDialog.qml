@@ -67,7 +67,7 @@ ModalDialog {
     contentItem: Text {
         focus: false
         font.pixelSize: VLCStyle.fontSize_normal
-        color: VLCStyle.colors.text
+        color: root.colorContext.fg.primary
         wrapMode: Text.WordWrap
         text: root.text
     }
@@ -77,8 +77,14 @@ ModalDialog {
         id: questionButtons
         implicitHeight: VLCStyle.icon_normal
 
+        readonly property ColorContext colorContext: ColorContext {
+            id: footerTheme
+            palette: root.colorContext.palette
+            colorSet: ColorContext.Window
+        }
+
         Rectangle {
-            color: VLCStyle.colors.topBanner
+            color: footerTheme.bg.primary
             anchors.fill: parent
             anchors.leftMargin: VLCStyle.margin_xxsmall
             anchors.rightMargin: VLCStyle.margin_xxsmall

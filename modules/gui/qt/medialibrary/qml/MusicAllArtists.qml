@@ -218,7 +218,6 @@ FocusScope {
             selectionDelegateModel: selectionModel
             model: artistModel
             focus: true
-            headerColor: VLCStyle.colors.bg
             dragItem: artistsDragItem
             rowHeight: VLCStyle.tableCoverRow_height
             headerTopPadding: VLCStyle.margin_normal

@@ -26,17 +26,26 @@ import "qrc:///style/"
 TextField {
     id: control
 
-    selectedTextColor : VLCStyle.colors.bgHoverText
-    selectionColor : VLCStyle.colors.bgHover
-    color : VLCStyle.colors.text
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.TextField
+
+        focused: control.activeFocus
+        hovered: control.hovered
+        enabled: control.enabled
+    }
+
+    selectedTextColor : theme.fg.highlight
+    selectionColor : theme.bg.highlight
+    color : theme.fg.primary
     font.pixelSize: VLCStyle.fontSize_normal
 
     background: Rectangle {
         implicitWidth: 200
         implicitHeight: 40
         border.width: control.enabled ? VLCStyle.dp(2, VLCStyle.scale) : 0
-        color: VLCStyle.colors.bgAlt
-        border.color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.buttonBorder
+        color: theme.bg.primary
+        border.color: theme.border
     }
 
 }

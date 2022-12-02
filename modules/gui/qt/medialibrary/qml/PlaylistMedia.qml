@@ -99,8 +99,6 @@ MainInterface.MainTableView {
 
     rowHeight: VLCStyle.tableCoverRow_height
 
-    headerColor: VLCStyle.colors.bg
-
     acceptDrop: true
 
     sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
@@ -242,6 +240,6 @@ MainInterface.MainTableView {
 
         visible: root._item !== null
 
-        color: VLCStyle.colors.accent
+        color: root.colorContext.accent
     }
 }

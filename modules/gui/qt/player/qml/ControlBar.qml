@@ -40,10 +40,8 @@ Control {
 
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
-    property VLCColors colors: VLCStyle.nightColors
     property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
-    property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
     property real bookmarksHeight: VLCStyle.icon_xsmall * 0.9
 
     signal requestLockUnlockAutoHide(bool lock)
@@ -113,6 +111,11 @@ Control {
         row2.visible = row2.children.length > 0
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     contentItem: ColumnLayout {
         spacing: VLCStyle.margin_xsmall
         z: 1
@@ -143,8 +146,6 @@ Control {
 
             Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
-            colors: root.colors
-
             onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock)
         }
     }
@@ -153,7 +154,7 @@ Control {
         id: mediaTime
 
         text: Player.time.formatHMS()
-        color: root.colors.playerFg
+        color: theme.fg.primary
     }
 
     T.Label {
@@ -162,7 +163,7 @@ Control {
         text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
               ? "-" + Player.remainingTime.formatHMS()
               : Player.length.formatHMS()
-        color: root.colors.playerFg
+        color: theme.fg.primary
 
         MouseArea {
             anchors.fill: parent
@@ -179,11 +180,9 @@ Control {
     SliderBar {
         id: trackPositionSlider
 
-        backgroundColor: colors.playerSeekBar
         barHeight: VLCStyle.heightBar_xxsmall
         Layout.fillWidth: true
         enabled: Player.playingState === Player.PLAYING_STATE_PLAYING || Player.playingState === Player.PLAYING_STATE_PAUSED
-        colors: root.colors
 
         Navigation.parentItem: root
         Navigation.downItem: playerControlLayout
@@ -206,7 +205,6 @@ Control {
         width: trackPositionSlider.width
 
         onLoaded: {
-           item.colors = Qt.binding(function() { return root.colors })
            item.barHeight = Qt.binding(function() { return bookmarksHeight })
            item.controlBarHovered = Qt.binding(function() { return root.hovered })
            item.yShift = Qt.binding(function() { return row2.height + VLCStyle.margin_xxsmall })

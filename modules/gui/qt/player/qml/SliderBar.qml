@@ -42,8 +42,7 @@ Slider {
     property bool _currentChapterHovered: false
     property real _tooltipPosition: timeTooltip.pos.x / sliderRectMouseArea.width
 
-    property alias backgroundColor: sliderRect.color
-    property VLCColors colors: VLCStyle.colors
+    property color backgroundColor: theme.bg.primary
 
     Keys.onRightPressed: Player.jumpFwd()
     Keys.onLeftPressed: Player.jumpBwd()
@@ -51,6 +50,15 @@ Slider {
     function showChapterMarks() {
         _isSeekPointsShown = true
         seekpointTimer.restart()
+    }
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Slider
+
+        enabled: control.enabled
+        focused: control.visualFocus
+        hovered: control.hovered
     }
 
     Timer {
@@ -63,6 +71,9 @@ Slider {
     Widgets.PointingTooltip {
         id: timeTooltip
 
+        //tooltip is a Popup, palette should be passed explicitly
+        colorContext.palette: theme.palette
+
         visible: control.hovered
 
         text: Player.length.scale(pos.x / control.width).formatHMS() +
@@ -70,8 +81,6 @@ Slider {
                    " - " + Player.chapters.getNameAtPosition(control._tooltipPosition) : "")
 
         pos: Qt.point(sliderRectMouseArea.mouseX, 0)
-
-        colors: control.colors
     }
 
     Item {
@@ -160,7 +169,7 @@ Slider {
         Rectangle {
             id: sliderRect
             visible: !Player.hasChapters
-            color: backgroundColor
+            color: control.backgroundColor
             anchors.fill: parent
             radius: implicitHeight
         }
@@ -220,7 +229,7 @@ Slider {
                     readonly property bool _hovered: control.hovered &&
                                             (sliderRectMouseArea.mouseX > x && sliderRectMouseArea.mouseX < x+width)
 
-                    color: _currentChapter < 0 ? control.colors.accent : control.backgroundColor
+                    color: _currentChapter < 0 ? theme.fg.primary : control.backgroundColor
                     width: sliderRect.width * seekpointsRect.endPosition - x - control._seekPointsDistance
                     x: sliderRect.width * seekpointsRect.startPosition
 
@@ -233,7 +242,7 @@ Slider {
 
                         width: sliderRect.width * control.visualPosition - parent.x - control._seekPointsDistance
                         visible: parent._currentChapter === 0
-                        color: control.colors.accent
+                        color: theme.fg.primary
                     }
                 }
 
@@ -283,7 +292,7 @@ Slider {
             id: progressRect
             width: control.visualPosition * parent.width
             visible: !Player.hasChapters
-            color: control.colors.accent
+            color: theme.fg.primary
             height: control.barHeight
             radius: control._seekPointsRadius
         }
@@ -297,7 +306,7 @@ Slider {
 
             height: control.barHeight
             opacity: 0.4
-            color: control.colors.buffer
+            color: theme.fg.neutral //FIXME buffer color ?
             radius: control.barHeight
 
             states: [
@@ -384,7 +393,7 @@ Slider {
         implicitWidth: sliderHandle._size
         implicitHeight: sliderHandle._size
         radius: VLCStyle.margin_small
-        color: control.colors.accent
+        color: theme.fg.primary
 
         transitions: [
             Transition {

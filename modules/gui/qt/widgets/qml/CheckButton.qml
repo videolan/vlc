@@ -32,12 +32,15 @@ T.Switch {
 
     property int animationDuration: VLCStyle.duration_long
 
-    property color color: (checked) ? VLCStyle.colors.accent
-                                    : VLCStyle.colors.black
+    property color color: (checked) ? theme.bg.secondary
+                                    : theme.bg.primary
 
-    property color colorHandle: VLCStyle.colors.white
+    property color colorHandle: (checked) ? theme.fg.secondary
+                                          : theme.fg.primary
 
-    property color colorActive: VLCStyle.colors.bgFocus
+
+    property color colorBorder:  (checked) ? "transparent"
+                                           : theme.border
 
     // Private
 
@@ -137,21 +140,20 @@ T.Switch {
 
     // Children
 
-    background: Rectangle {
-        visible: root.visualFocus
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Switch
 
-        color: "transparent"
+        enabled: root.enabled
+        focused: root.visualFocus
+        hovered: root.hovered
+        pressed: root.down
+    }
 
-        border.width: VLCStyle.focus_border
-
-        border.color: (visible) ? root.colorActive
-                                : VLCStyle.colors.setColorAlpha(root.colorActive, 0)
-
-        Behavior on border.color {
-            ColorAnimation {
-                duration: root.animationDuration
-            }
-        }
+    background: AnimatedBackground {
+        active: root.visualFocus
+        animate: theme.initialized
+        activeBorderColor: theme.visualFocus
     }
 
     indicator: Rectangle {
@@ -162,6 +164,9 @@ T.Switch {
         radius: height
 
         color: root.color
+
+        border.color: root.colorBorder
+        border.width: VLCStyle.border
 
         MouseArea {
             id: handle

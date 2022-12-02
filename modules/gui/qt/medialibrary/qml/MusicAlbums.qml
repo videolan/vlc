@@ -271,7 +271,6 @@ FocusScope {
 
             model: albumModelId
             selectionDelegateModel: selectionModel
-            headerColor: VLCStyle.colors.bg
             onActionForSelection: _actionAtIndex(selection[0]);
             Navigation.parentItem: root
             section.property: "title_first_symbol"

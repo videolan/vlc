@@ -43,13 +43,19 @@ T.ProgressBar {
 
     value: MediaLib.parsingProgress
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     indeterminate: MediaLib.discoveryPending
 
     background: Rectangle {
-        color: VLCStyle.colors.bg
+        color: theme.bg.primary
     }
 
     contentItem: Column {
+
         spacing: VLCStyle.margin_small
 
         Item {
@@ -59,6 +65,11 @@ T.ProgressBar {
             implicitHeight: VLCStyle.heightBar_xxsmall
             implicitWidth: 200
 
+            ColorContext {
+                id: progressBarTheme
+                colorSet: ColorContext.Slider
+            }
+
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -66,7 +77,7 @@ T.ProgressBar {
 
                 implicitHeight: VLCStyle.heightBar_xxxsmall
 
-                color: VLCStyle.colors.sliderBarMiniplayerBgColor
+                color: progressBarTheme.bg.primary
             }
 
             Rectangle {
@@ -80,7 +91,8 @@ T.ProgressBar {
 
                 visible: !control.indeterminate
 
-                color: VLCStyle.colors.accent
+
+                color: progressBarTheme.accent
             }
 
             Rectangle {
@@ -96,10 +108,9 @@ T.ProgressBar {
 
                 // NOTE: We want round corners.
                 radius: height
-
                 visible: control.indeterminate
 
-                color: VLCStyle.colors.accent
+                color: progressBarTheme.accent
 
                 SequentialAnimation on position {
                     loops: Animation.Infinite
@@ -138,6 +149,7 @@ T.ProgressBar {
 
             font.pixelSize: VLCStyle.fontSize_large
             font.weight: Font.Normal
+            color: theme.fg.primary
         }
     }
 }

@@ -126,7 +126,9 @@ FocusScope {
       visible: artistModel.count > 0
       width: artistList.width
       height: artistList.height
-      alternativeColor: VLCStyle.colors.bgAlt
+
+      tintColor: artistList.colorContext.bg.secondary
+
       focus: false
     }
 
@@ -176,6 +178,7 @@ FocusScope {
             header: Widgets.SubtitleLabel {
                 text: I18n.qtr("Artists")
                 font.pixelSize: VLCStyle.fontSize_large
+                color: artistList.colorContext.fg.primary
                 leftPadding: VLCStyle.margin_normal
                 bottomPadding: VLCStyle.margin_small
                 topPadding: VLCStyle.margin_xlarge
@@ -213,7 +216,7 @@ FocusScope {
                 anchors.right: parent.right
 
                 width: VLCStyle.border
-                color: VLCStyle.colors.border
+                color: artistList.colorContext.separator
             }
 
 

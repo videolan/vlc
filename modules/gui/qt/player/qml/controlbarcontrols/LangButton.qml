@@ -49,6 +49,8 @@ Widgets.IconControlButton {
             y: (rootPlayer.positionSliderY - height)
             z: 1
 
+            colorContext.palette: langBtn.colorContext.palette
+
             onOpened: {
                 langBtn.requestLockUnlockAutoHide(true)
                 if (!!rootPlayer)

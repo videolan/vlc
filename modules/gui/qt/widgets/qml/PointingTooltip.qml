@@ -33,8 +33,8 @@ ToolTipExt {
     property point pos
 
     background: Rectangle {
-        border.color: colors.border
-        color: colors.tooltipColor
+        border.color: pointingTooltip.colorContext.border
+        color: pointingTooltip.colorContext.bg.primary
         radius: VLCStyle.dp(6, VLCStyle.scale)
 
         Item {
@@ -62,8 +62,8 @@ ToolTipExt {
 
                 rotation: 45
 
-                color: background.color
-                border.color: background.border.color
+                color: pointingTooltip.colorContext.bg.primary
+                border.color: pointingTooltip.colorContext.border
             }
         }
     }

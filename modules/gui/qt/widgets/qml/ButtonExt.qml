@@ -39,15 +39,11 @@ T.Button {
 
     property int iconSize: VLCStyle.icon_normal
 
-    property color color: VLCStyle.colors.text
+    property color color: theme.fg.primary
+    property color colorFocus: theme.visualFocus
+
 
     // Aliases
-
-    property alias backgroundColor: background.backgroundColor
-    property alias foregroundColor: background.foregroundColor
-
-    property alias colorFocus: background.activeBorderColor
-
     property alias iconRotation: icon.rotation
 
     // Settings
@@ -72,18 +68,29 @@ T.Button {
 
     // Childs
 
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ButtonStandard
+
+        focused: control.activeFocus
+        hovered: control.hovered
+        enabled: control.enabled
+        pressed: control.down
+    }
+
     background: Widgets.AnimatedBackground {
         id: background
 
         height: control.height
         width: control.width
 
-        active: visualFocus
+        active: control.visualFocus
+        animate: theme.initialized
 
-        foregroundColor: (hovered) ? VLCStyle.colors.buttonTextHover
-                                   : VLCStyle.colors.buttonBanner
-
-        activeBorderColor: VLCStyle.colors.bgFocus
+        backgroundColor: theme.bg.primary
+        foregroundColor: control.color
+        activeBorderColor: control.colorFocus
     }
 
     contentItem: Item {
@@ -119,7 +126,7 @@ T.Button {
 
                     text: control.iconTxt
 
-                    color: background.foregroundColor
+                    color: control.color
 
                     font.pixelSize: control.iconSize
                 }
@@ -131,13 +138,15 @@ T.Button {
                     padding: 0
 
                     running: control.busy
+
+                    palette.text: theme.fg.primary
                 }
             }
 
             Widgets.ListLabel {
                 text: control.text
 
-                color: background.foregroundColor
+                color: theme.fg.primary
             }
         }
 
@@ -152,7 +161,7 @@ T.Button {
 
             color: "transparent"
 
-            border.color: VLCStyle.colors.accent
+            border.color: theme.accent
         }
     }
 }

@@ -152,8 +152,14 @@ Item {
         height: contentItem.height
         z: 10
 
+        ColorContext {
+            id: errorMsgTheme
+            palette: VLCStyle.palette
+            colorSet: ColorContext.Window
+        }
+
         component: Rectangle {
-            color: VLCStyle.colors.alert
+            color: errorMsgTheme.bg.negative
 
             height: messageText.implicitHeight + VLCStyle.margin_normal
             radius: VLCStyle.fontHeight_normal / 2
@@ -163,12 +169,13 @@ Item {
             RowLayout {
                 id: layout
 
-                spacing: VLCStyle.margin_xxsmall
+                spacing: VLCStyle.margin_xsmall
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
 
                 Widgets.IconLabel {
                     text: VLCIcons.info
+                    color: errorMsgTheme.fg.negative
                     Layout.leftMargin: VLCStyle.margin_xxsmall
                 }
 
@@ -185,7 +192,7 @@ Item {
                     wrapMode: Text.WrapAnywhere
                     font.pixelSize: VLCStyle.fontSize_normal
                     font.bold: true
-                    color: "white"
+                    color: errorMsgTheme.fg.negative
                 }
 
                 Widgets.TextToolButton {
@@ -193,19 +200,13 @@ Item {
 
                     text: I18n.qtr("Show Details")
 
+                    colorContext.colorSet: ColorContext.ButtonAccent
+
                     onClicked: {
                         hideErrorPopupTimer.stop()
                         errorPopup.state = "hidden"
                         DialogErrorModel.resetRepeatedMessageCount()
                         DialogsProvider.messagesDialog(1)
-                    }
-
-                    background: Widgets.AnimatedBackground {
-                        active: visualFocus
-
-                        radius: VLCStyle.dp(4, VLCStyle.scale)
-                        backgroundColor: detailsBtn.hovered ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0.5)
-                                                            : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0.3)
                     }
                 }
 
@@ -216,18 +217,13 @@ Item {
                     text: I18n.qtr("Dismiss")
                     Layout.rightMargin: VLCStyle.margin_xxsmall
 
+                    color: closeBtn.colorContext.fg.negative
+                    backgroundColor: closeBtn.colorContext.bg.negative
+
                     onClicked: {
                         hideErrorPopupTimer.stop()
                         errorPopup.state = "hidden"
                         DialogErrorModel.resetRepeatedMessageCount()
-                    }
-
-                    background: Widgets.AnimatedBackground {
-                        active: visualFocus
-
-                        radius: VLCStyle.dp(4, VLCStyle.scale)
-                        backgroundColor: closeBtn.hovered ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0.5)
-                                                          : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0.0)
                     }
                 }
             }
@@ -259,9 +255,15 @@ Item {
         contentItem: GridLayout {
             columns: 2
 
+            readonly property ColorContext colorContext: ColorContext {
+                id: loginContentTheme
+                palette: VLCStyle.palette
+                colorSet: ColorContext.Window
+            }
+
             Text {
                 text: I18n.qtr("User")
-                color: VLCStyle.colors.text
+                color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
 
@@ -280,7 +282,7 @@ Item {
 
             Text {
                 text: I18n.qtr("Password")
-                color: VLCStyle.colors.text
+                color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
 
@@ -299,7 +301,7 @@ Item {
 
             Text {
                 text: I18n.qtr("Save password")
-                color: VLCStyle.colors.text
+                color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
             CheckBox {
@@ -316,8 +318,14 @@ Item {
             id: loginButtons
             implicitHeight: VLCStyle.icon_normal
 
+            readonly property ColorContext colorContext: ColorContext {
+                id: loginFooterTheme
+                palette: VLCStyle.palette
+                colorSet: ColorContext.Window
+            }
+
             Rectangle {
-                color: VLCStyle.colors.topBanner
+                color: loginFooterTheme.bg.primary
                 anchors.fill: parent
 
                 RowLayout {
@@ -393,7 +401,7 @@ Item {
             id: content
             focus: false
             font.pixelSize: VLCStyle.fontSize_normal
-            color: VLCStyle.colors.text
+            color: questionDialog.colorContext.fg.primary
             wrapMode: Text.WordWrap
         }
 
@@ -402,8 +410,13 @@ Item {
             id: questionButtons
             implicitHeight: VLCStyle.icon_normal
 
+            readonly property ColorContext colorContext: ColorContext {
+                palette: VLCStyle.palette
+                colorSet: ColorContext.Window
+            }
+
             Rectangle {
-                color: VLCStyle.colors.topBanner
+                color: questionDialog.colorContext.bg.primary
                 anchors.fill: parent
                 anchors.leftMargin: VLCStyle.margin_xxsmall
                 anchors.rightMargin: VLCStyle.margin_xxsmall

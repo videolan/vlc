@@ -24,6 +24,11 @@ import "qrc:///widgets/" as Widgets
 
 FocusScope {
 
+    ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     Column {
         anchors.centerIn: parent
 
@@ -31,7 +36,7 @@ FocusScope {
 
         Widgets.IconLabel {
             text: VLCIcons.dropzone
-            color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.text, 0.2)
+            color: theme.fg.secondary
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: VLCStyle.dp(100, VLCStyle.scale)
         }
@@ -39,6 +44,7 @@ FocusScope {
         Widgets.MenuLabel {
             anchors .horizontalCenter: parent.horizontalCenter
             text: I18n.qtr("Drop some content here")
+            color: theme.fg.secondary
         }
 
         Widgets.ActionButtonPrimary {
@@ -49,5 +55,4 @@ FocusScope {
             onClicked: DialogsProvider.simpleOpenDialog()
         }
     }
-
 }

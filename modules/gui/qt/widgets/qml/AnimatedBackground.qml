@@ -36,14 +36,9 @@ Rectangle {
 
     // `foregroundColor` property is not used in this component but is
     // provided as a convenience as it gets animated with color property
-    property color foregroundColor: {
-        if (backgroundColor.a === 0)
-            return VLCStyle.colors.text
-        var brightness = backgroundColor.r*0.299 + backgroundColor.g*0.587 + backgroundColor.b*0.114
-        return brightness > .6 ? "black" : "white"
-    }
+    property color foregroundColor
 
-    property color activeBorderColor: VLCStyle.colors.bgFocus
+    property color activeBorderColor
 
     property int animationDuration: VLCStyle.duration_long
 

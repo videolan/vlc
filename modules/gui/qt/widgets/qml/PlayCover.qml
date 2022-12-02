@@ -21,6 +21,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -37,6 +38,11 @@ MouseArea {
     opacity: (visible) ? 1.0 : 0.0
 
     hoverEnabled: true
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+    }
 
     // Animations
 
@@ -78,7 +84,7 @@ MouseArea {
 
         radius: width
 
-        color: VLCStyle.colors.white
+        color: "white"
     }
 
     Widgets.IconLabel {
@@ -86,8 +92,8 @@ MouseArea {
 
         text: VLCIcons.play
 
-        color: (containsMouse) ? VLCStyle.colors.accent
-                               : VLCStyle.colors.black
+        color: (containsMouse) ? theme.accent
+                               : "black"
 
         font.pixelSize: Math.round(parent.width / 2)
     }

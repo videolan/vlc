@@ -56,8 +56,6 @@ Rectangle {
     height: VLCStyle.listAlbumCover_height
     width: VLCStyle.listAlbumCover_width
 
-    color: VLCStyle.colors.grid
-
     // Children
 
     RoundImage {

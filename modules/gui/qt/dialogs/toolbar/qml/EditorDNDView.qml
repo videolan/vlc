@@ -92,6 +92,11 @@ ListView {
             drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
         }
     }
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
     
     MouseEventFilter {
         target: playerBtnDND
@@ -133,7 +138,7 @@ ListView {
             implicitWidth: VLCStyle.dp(2, VLCStyle.scale)
 
             visible: dropVisible
-            color: VLCStyle.colors.accent
+            color: theme.accent
         }
 
         DropArea {

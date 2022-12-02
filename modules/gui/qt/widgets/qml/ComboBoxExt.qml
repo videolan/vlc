@@ -21,6 +21,7 @@ import QtQuick.Controls 2.4
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
 ComboBox {
     id: control
@@ -28,9 +29,19 @@ ComboBox {
     font.pixelSize: VLCStyle.fontSize_large
     leftPadding: 5
 
-    property color color: VLCStyle.colors.buttonText
-    property color bgColor: VLCStyle.colors.button
-    property color borderColor: VLCStyle.colors.buttonBorder
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ComboBox
+
+        focused: control.activeFocus
+        enabled: control.enabled
+        hovered: control.hovered
+        pressed: control.pressed
+    }
+
+    property color color: theme.fg.primary
+    property color bgColor: theme.bg.primary
+    property color borderColor: theme.border
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -71,7 +82,7 @@ ComboBox {
             context.lineTo(width, 0);
             context.lineTo(width / 2, height);
             context.closePath();
-            context.fillStyle = control.activeFocus ? VLCStyle.colors.accent : control.color;
+            context.fillStyle = control.activeFocus ? theme.accent : control.color;
             context.fill();
         }
     }
@@ -91,7 +102,7 @@ ComboBox {
         implicitWidth: control.width
         implicitHeight: control.height
         color: control.bgColor
-        border.color: control.activeFocus ? VLCStyle.colors.accent : control.borderColor
+        border.color: control.borderColor
         border.width: control.activeFocus ? 2 : 1
         radius: 2
     }
@@ -112,16 +123,11 @@ ComboBox {
             model: control.popup.visible ? control.delegateModel : null
             currentIndex: control.highlightedIndex
 
-            highlight: Rectangle {
-                color: VLCStyle.colors.accent
-            }
-
-            Rectangle {
-                z: 10
-                width: parent.width
-                height: parent.height
-                color: "transparent"
-                border.color: VLCStyle.colors.accent
+            highlight: Widgets.AnimatedBackground {
+                active: visualFocus
+                animate: theme.initialized
+                activeBorderColor: theme.visualFocus
+                backgroundColor: theme.bg.secondary
             }
 
             ScrollIndicator.vertical: ScrollIndicator { }

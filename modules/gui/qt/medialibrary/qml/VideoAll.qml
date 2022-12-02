@@ -170,6 +170,11 @@ FocusScope {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     Widgets.StackViewExt {
         id: view
 

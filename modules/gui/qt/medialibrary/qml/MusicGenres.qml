@@ -286,7 +286,6 @@ FocusScope {
                                                                   : _modelMedium
 
             selectionDelegateModel: selectionModel
-            headerColor: VLCStyle.colors.bg
             focus: true
             onActionForSelection: _actionAtIndex(selection)
             Navigation.parentItem: root

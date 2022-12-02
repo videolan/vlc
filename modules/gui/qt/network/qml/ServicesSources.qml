@@ -53,22 +53,22 @@ MainInterface.MainGridView {
         image: {
             if (is_dummy) {
                 return SVGColorImage.colorize("qrc:///placeholder/add_service.svg")
-                    .color1(VLCStyle.colors.text)
-                    .accent(VLCStyle.colors.accent)
+                    .color1(this.colorContext.fg.secondary)
+                    .accent(this.colorContext.accent)
                     .uri()
             } else if (model.artwork && model.artwork.toString() !== "") {
                 //if the source is a qrc artwork, we should colorize it
                 if (model.artwork.toString().match(/qrc:\/\/.*svg/))
                 {
                     return SVGColorImage.colorize(model.artwork)
-                        .color1(VLCStyle.colors.text)
-                        .accent(VLCStyle.colors.accent)
+                        .color1(this.colorContext.fg.secondary)
+                        .accent(this.colorContext.accent)
                         .uri()
                 }
                 return model.artwork
             } else {
                 return SVGColorImage.colorize("qrc:///sd/directory.svg")
-                           .color1(VLCStyle.colors.text)
+                           .color1(this.colorContext.fg.secondary)
                            .uri()
             }
         }

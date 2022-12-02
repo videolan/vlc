@@ -27,11 +27,12 @@ Image {
     id: root
 
     property var button: MainCtx.csdButtonModel.systemMenuButton
+    /* required */ property color color
 
     sourceSize.width: VLCStyle.icon_normal
     sourceSize.height: VLCStyle.icon_normal
     source: SVGColorImage.colorize("qrc:///misc/cone.svg")
-                    .accent(VLCStyle.colors.accent)
+                    .accent(root.color)
                     .uri()
 
     focus: false

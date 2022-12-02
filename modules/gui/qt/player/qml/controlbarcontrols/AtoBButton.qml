@@ -25,8 +25,6 @@ import "qrc:///style/"
 Widgets.ImageToolButton {
     id: control
 
-    property VLCColors colors: VLCStyle.colors
-
     text: I18n.qtr("A to B")
 
     sourceSize.width: VLCStyle.icon_toolbar
@@ -40,26 +38,26 @@ Widgets.ImageToolButton {
         switch(Player.ABloopState) {
         case Player.ABLOOP_STATE_A:
             return control._colorize(
-                control.colors.accent,
-                control.colors.text
+                control.colorContext.accent,
+                control.colorContext.fg.primary
             )
         case Player.ABLOOP_STATE_B:
             return control._colorize(
-                control.colors.accent,
-                control.colors.accent
+                control.colorContext.accent,
+                control.colorContext.accent
             )
         case Player.ABLOOP_STATE_NONE:
         default:
             return control._colorize(
-                control.colors.text,
-                control.colors.text
+                control.colorContext.fg.primary,
+                control.colorContext.fg.primary
             )
         }
     }
 
     function _colorize(a, b) {
         return SVGColorImage.colorize("qrc:///icons/atob.svg")
-            .color1(control.colors.text)
+            .color1(control.colorContext.fg.primary)
             .any({
                 "#AAAAAA": a,
                 "#BBBBBB": b,

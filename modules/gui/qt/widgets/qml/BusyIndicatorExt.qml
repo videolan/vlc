@@ -22,7 +22,8 @@ import "qrc:///style/"
 BusyIndicator {
     id: control
 
-    palette.text: VLCStyle.colors.text
+    property color color
+    palette.text: color
     running: false
 
     property int delay: VLCStyle.duration_humanMoment

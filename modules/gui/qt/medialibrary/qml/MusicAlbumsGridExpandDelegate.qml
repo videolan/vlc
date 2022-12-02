@@ -71,9 +71,14 @@ FocusScope {
             return I18n.qtr("%1 tracks").arg(count);
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     Rectangle {
         anchors.fill: parent
-        color: VLCStyle.colors.expandDelegate
+        color: theme.bg.secondary
 
         Rectangle {
             anchors {
@@ -81,7 +86,7 @@ FocusScope {
                 left: parent.left
                 right: parent.right
             }
-            color: VLCStyle.colors.border
+            color: theme.border
             height: VLCStyle.expandDelegate_border
         }
 
@@ -91,7 +96,7 @@ FocusScope {
                 left: parent.left
                 right: parent.right
             }
-            color: VLCStyle.colors.border
+            color: theme.border
             height: VLCStyle.expandDelegate_border
         }
     }
@@ -346,7 +351,7 @@ FocusScope {
         MusicTrackListDisplay {
             id: tracks
 
-            backgroundColor: VLCStyle.colors.expandDelegate
+            headerColor: theme.bg.secondary
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
 
@@ -357,7 +362,7 @@ FocusScope {
 
                 Widgets.ListLabel {
                     text: !!rowModel && !!rowModel.track_number ? rowModel.track_number : ""
-                    color: foregroundColor
+                    color: theme.fg.primary
                     font.weight: Font.Normal
 
                     Layout.fillHeight: true
@@ -367,7 +372,7 @@ FocusScope {
 
                 Widgets.ListLabel {
                     text: !!rowModel && !!rowModel.title ? rowModel.title : ""
-                    color: foregroundColor
+                    color: theme.fg.primary
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -379,10 +384,12 @@ FocusScope {
                 Widgets.CaptionLabel {
                     text: "#"
                     width: VLCStyle.margin_large
+                    color: theme.fg.secondary
                 }
 
                 Widgets.CaptionLabel {
                     text: I18n.qtr("Title")
+                    color: theme.fg.secondary
                 }
             }
 
@@ -403,7 +410,6 @@ FocusScope {
             Layout.fillHeight: true
 
             rowHeight: VLCStyle.tableRow_height
-            headerColor: VLCStyle.colors.expandDelegate
 
             parentId: Helpers.get(root.model, "id")
             onParentIdChanged: {

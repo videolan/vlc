@@ -30,8 +30,6 @@ Item {
     property real barHeight
     property int yShift
 
-    property VLCColors colors
-
     property bool controlBarHovered
 
     property bool bookmarkHovered
@@ -47,10 +45,12 @@ Item {
     Widgets.PointingTooltip {
         id: timeTooltip
 
+        //tooltip is a Popup, palette should be passed explicitly
+        colorContext.palette: theme.palette
+
         visible: control.bookmarkHovered
         text: control.bookmarkText
         pos: Qt.point(control.bookmarkPosition, - yShift)
-        colors: control.colors
     }
 
     transitions: [
@@ -82,6 +82,11 @@ Item {
 
     state: controlBarHovered && bookmarksRptr.count > 0 ? "visible" : "hidden"
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     Repeater {
         id: bookmarksRptr
         model: MLBookmarkModel {
@@ -112,7 +117,7 @@ Item {
 
             background: Rectangle {
                 radius: parent.width * 0.5
-                color: colors.playerFg
+                color: bookmarkButton.colorContext.fg.primary
             }
         }
     }

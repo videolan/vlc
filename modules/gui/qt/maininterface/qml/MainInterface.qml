@@ -51,8 +51,14 @@ Item {
 
     Window.onWindowChanged: {
         if (Window.window && !Qt.colorEqual(Window.window.color, "transparent")) {
-            Window.window.color = Qt.binding(function() { return VLCStyle.colors.bg })
+            Window.window.color = Qt.binding(function() { return theme.bg.primary })
         }
+    }
+
+    ColorContext {
+        id: theme
+        palette: VLCStyle.palette
+        colorSet: ColorContext.View
     }
 
     Widgets.ToolTipExt {
@@ -60,8 +66,8 @@ Item {
 
         parent: null
         z: 99
-        colors: parent && parent.colors ? parent.colors
-                                        : VLCStyle.colors
+        colorContext.palette: parent && parent.colorContext ? parent.colorContext.palette
+                                                            : VLCStyle.palette
 
         Component.onCompleted: {
             MainCtx.setAttachedToolTip(this)

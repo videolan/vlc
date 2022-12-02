@@ -70,6 +70,9 @@ FocusScope {
             PropertyAction { property: "focus" }
         }
     }
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+    }
 
     Row {
         id: content

@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
 
+import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -31,11 +32,8 @@ T.AbstractButton {
 
     property bool highlighted: false
 
-    // Aliases
-
-    property color foregroundColor: (hovered) ? VLCStyle.colors.buttonTextHover
-                                              : VLCStyle.colors.buttonBanner
-    property color backgroundColor: "transparent"
+    property color foregroundColor: theme.fg.primary
+    property color backgroundColor: theme.bg.primary
 
     // Settings
 
@@ -53,11 +51,25 @@ T.AbstractButton {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+
+        colorSet: ColorContext.ButtonStandard
+
+        enabled: button.enabled
+        focused: button.visualFocus
+        hovered: button.hovered
+        pressed: button.down
+    }
+
+
     background: Widgets.AnimatedBackground {
         active: visualFocus
 
+        animate: theme.initialized
         backgroundColor: button.backgroundColor
         foregroundColor: button.foregroundColor
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: contentLoader.item

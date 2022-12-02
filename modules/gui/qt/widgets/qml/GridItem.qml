@@ -150,6 +150,14 @@ T.Control {
 
     // Childs
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Item
+
+        focused: root.activeFocus
+        hovered: root.hovered
+    }
+
     background: AnimatedBackground {
         width: root.width + (selectedBorderWidth * 2)
         height: root.height + (selectedBorderWidth * 2)
@@ -158,12 +166,12 @@ T.Control {
         y: - selectedBorderWidth
 
         active: visualFocus
+        animate: theme.initialized
 
-        backgroundColor: root.selected
-                         ? VLCStyle.colors.gridSelect
-                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.gridSelect, 0)
-
-        visible: animationRunning || active || root.selected
+        //don't show the backgroud unless selected
+        backgroundColor: root.selected ?  theme.bg.highlight : theme.bg.primary
+        activeBorderColor: theme.visualFocus
+        visible: animationRunning || active || root.selected || root.hovered
     }
 
     contentItem: MouseArea {
@@ -238,6 +246,7 @@ T.Control {
                 playCoverVisible: false
                 playCoverOpacity: 0
                 radius: VLCStyle.gridCover_radius
+                color: theme.bg.secondary
 
                 Layout.preferredWidth: pictureWidth
                 Layout.preferredHeight: pictureHeight
@@ -307,7 +316,9 @@ T.Control {
                     id: titleLabel
 
                     height: implicitHeight
-                    color: root.background.foregroundColor
+                    color: root.selected
+                        ? theme.fg.highlight
+                        : theme.fg.primary
                     textFormat: Text.PlainText
                 }
             }
@@ -318,16 +329,14 @@ T.Control {
                 visible: text !== ""
                 text: root.subtitle
                 elide: Text.ElideRight
-                color: root.background.foregroundColor
+                color: root.selected
+                    ? theme.fg.highlight
+                    : theme.fg.secondary
                 textFormat: Text.PlainText
 
                 Layout.preferredWidth: Math.min(pictureWidth, implicitWidth)
                 Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
                 Layout.topMargin: VLCStyle.margin_xsmall
-
-                // this is based on that MenuCaption.color.a == .6, color of this component is animated (via binding with background.foregroundColor),
-                // to save operation during animation, directly set the opacity
-                opacity: .6
 
                 ToolTip.delay: VLCStyle.delayToolTipAppear
                 ToolTip.text: subtitleTxt.text

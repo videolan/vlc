@@ -31,10 +31,19 @@ SpinBox {
     leftPadding: padding + (control.mirrored ? up.indicator.width : 0)
     rightPadding: padding + (control.mirrored ? 0 : up.indicator.width)
 
-    property color textColor: VLCStyle.colors.buttonText
-    property color bgColor: VLCStyle.colors.bg
-    property color borderColor:  VLCStyle.colors.buttonBorder
-    property int borderWidth: 0
+    property color textColor: theme.fg.primary
+    property color bgColor: theme.bg.primary
+    property color borderColor:  theme.border
+    property int borderWidth: VLCStyle.border
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.SpinBox
+
+        enabled: control.enabled
+        focused: control.visualFocus
+        hovered: control.hovered
+    }
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -62,7 +71,7 @@ SpinBox {
         text: control.textFromValue(control.value, control.locale)
 
         font: control.font
-        color: enabled ? control.textColor : "grey"
+        color: upTheme.fg.primary
 
         padding: 0
         horizontalAlignment: Qt.AlignRight
@@ -88,13 +97,23 @@ SpinBox {
         implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
         implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
         anchors.top: parent.top
-        color: control.up.pressed ? VLCStyle.colors.bgHover : control.bgColor
-        border.color: control.borderColor
+
+        color: downTheme.bg.primary
+
+        ColorContext {
+            id: upTheme
+            colorSet: ColorContext.ButtonStandard
+
+            enabled: control.enabled
+            focused: control.up.visualFocus
+            hovered: control.up.hovered
+            pressed: control.up.pressed
+        }
 
         Text {
             text: "\u2227" // ^ logical AND
             font.pixelSize: control.font.pixelSize * 2
-            color: control.textColor
+            color: upTheme.fg.primary
             font.bold: true
             anchors.fill: parent
             fontSizeMode: Text.Fit
@@ -109,13 +128,23 @@ SpinBox {
         implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
         implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
         anchors.bottom: parent.bottom
-        color: control.down.pressed ? VLCStyle.colors.bgHover : control.bgColor
-        border.color: control.borderColor
+        color: downTheme.bg.primary
+
+        ColorContext {
+            id: downTheme
+            colorSet: ColorContext.ButtonStandard
+
+            enabled: control.enabled
+            focused: control.down.visualFocus
+            hovered: control.down.hovered
+            pressed: control.down.pressed
+        }
 
         Text {
             text: "\u2228" // ^ logical OR
             font.pixelSize: control.font.pixelSize * 2
-            color: control.textColor
+            color: downTheme.fg.primary
+            font.bold: true
             anchors.fill: parent
             fontSizeMode: Text.Fit
             horizontalAlignment: Text.AlignHCenter

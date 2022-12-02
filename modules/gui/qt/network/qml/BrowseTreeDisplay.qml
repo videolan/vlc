@@ -184,6 +184,7 @@ FocusScope {
                     Widgets.SubtitleLabel {
                         text: providerModel.name
                         leftPadding: gridView.rowX
+                        color: gridView.colorContext.fg.primary
 
                         Layout.fillWidth: true
                     }
@@ -252,7 +253,7 @@ FocusScope {
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: VLCStyle.icon_tableHeader
                 text: VLCIcons.album_cover
-                color: VLCStyle.colors.caption
+                color: tableView.colorContext.fg.secondary
             }
 
             property Component thumbnailColumn: NetworkThumbnailItem {
@@ -316,7 +317,7 @@ FocusScope {
 
             selectionDelegateModel: selectionModel
             focus: true
-            headerColor: VLCStyle.colors.bg
+
             Navigation.parentItem: root
             Navigation.upItem: tableView.headerItem
 
@@ -342,6 +343,7 @@ FocusScope {
                     Widgets.SubtitleLabel {
                         text: providerModel.name
                         leftPadding: VLCStyle.margin_large
+                        color: tableView.colorContext.fg.primary
 
                         Layout.fillWidth: true
                     }

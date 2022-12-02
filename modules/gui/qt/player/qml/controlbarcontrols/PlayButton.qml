@@ -34,8 +34,6 @@ T.Control {
     scale: (_keyOkPressed || (mouseArea.pressed && cursorInside)) ? 0.95
                                                                   : 1.00
 
-    property VLCColors colors: VLCStyle.colors
-
     property bool paintOnly: false
 
     property bool _keyOkPressed: false
@@ -68,6 +66,16 @@ T.Control {
     function _pressAndHoldAction() {
         _keyOkPressed = false
         mainPlaylistController.stop()
+    }
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+
+        enabled: playBtn.enabled || playBtn.paintOnly
+        focused: playBtn.activeFocus
+        hovered: playBtn.cursorInside
+        pressed: mouseArea.containsPress
     }
 
     Timer {
@@ -174,11 +182,8 @@ T.Control {
                 return VLCIcons.play
         }
 
-        color: cursorInside ? VLCStyle.colors.blendColors(VLCStyle.colors.buttonPlayA,
-                                                          VLCStyle.colors.buttonPlayB,
-                                                          0.5)
-                            : (paintOnly || enabled ? colors.buttonPlayIcon
-                                                    : colors.textInactive)
+        color: cursorInside ? theme.accent
+                            : "black"  //foreground is always black
 
         font.pixelSize: VLCStyle.icon_play
         font.family: VLCIcons.fontFamily
@@ -187,6 +192,7 @@ T.Control {
         horizontalAlignment: Text.AlignHCenter
 
         Behavior on color {
+            enabled: theme.initialized
             ColorAnimation {
                 duration: VLCStyle.duration_veryShort
                 easing.type: Easing.InOutSine
@@ -207,7 +213,7 @@ T.Control {
             blurRadius: VLCStyle.dp(9)
             yOffset: VLCStyle.dp(4)
 
-            color: Qt.rgba(255 / 255, 97 / 255, 10 / 255, 0.29)
+            color: VLCStyle.colors.setColorAlpha(theme.accent, 0.29)
 
             xRadius: parent.width
             yRadius: xRadius
@@ -226,7 +232,7 @@ T.Control {
             blurRadius: VLCStyle.dp(14)
             yOffset: VLCStyle.dp(1)
 
-            color: Qt.rgba(255 / 255, 97 / 255, 10 / 255, 1.0)
+            color: VLCStyle.colors.setColorAlpha(theme.accent, 1.0)
 
             xRadius: parent.width
             yRadius: xRadius

@@ -60,5 +60,6 @@ VideoAll {
         bottomPadding: VLCStyle.margin_normal
 
         text: root.title
+        color: root.colorContext.fg.primary
     }
 }

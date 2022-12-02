@@ -21,18 +21,6 @@ import QtQuick 2.11
 import "qrc:///style/"
 
 IconToolButton {
-    // Properties
-
-    property VLCColors colors: VLCStyle.colors
-
     // Style
-
     size: VLCStyle.icon_toolbar
-    color: colors.buttonPlayer
-    colorHover: colors.buttonTextHover
-    colorHighlighted: colors.accent
-    colorDisabled: paintOnly ? color
-                             : colors.blendColors(colors.playerBg, colors.playerControlBarFg, 0.75)
-
-    colorFocus: colors.bgFocus
 }

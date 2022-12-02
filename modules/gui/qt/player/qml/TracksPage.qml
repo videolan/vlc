@@ -49,6 +49,11 @@ RowLayout {
 
     // Children
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
     Item {
         Layout.preferredWidth: VLCStyle.dp(72, VLCStyle.scale)
         Layout.fillHeight: true
@@ -75,9 +80,7 @@ RowLayout {
         Layout.preferredWidth: VLCStyle.margin_xxxsmall
         Layout.fillHeight: true
 
-        opacity: 0.1
-
-        color: "white"
+        color: theme.border
     }
 
     FocusScope {

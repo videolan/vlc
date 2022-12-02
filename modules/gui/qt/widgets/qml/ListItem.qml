@@ -48,6 +48,11 @@ FocusScope {
     Accessible.role: Accessible.ListItem
     Accessible.name: line1
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Item
+    }
+
     Component {
         id: actionAdd
         IconToolButton {
@@ -87,9 +92,7 @@ FocusScope {
     Rectangle {
         id: linerect
         anchors.fill: parent
-        color: VLCStyle.colors.getBgColor(
-                   root.selected, root.hovered,
-                   root.activeFocus)
+        color: theme.border
 
         MouseArea {
             id: mouse
@@ -129,7 +132,7 @@ FocusScope {
                         Text {
                             id: cover_text
                             anchors.centerIn: parent
-                            color: VLCStyle.colors.textInactive
+                            color: theme.fg.secondary
                             font.pixelSize: VLCStyle.fontSize_xsmall
                         }
                     }
@@ -154,7 +157,7 @@ FocusScope {
                                 width: parent.width
 
                                 elide: Text.ElideRight
-                                color: VLCStyle.colors.text
+                                color: theme.fg.primary
                                 font.pixelSize: VLCStyle.fontSize_normal
                                 enabled: text !== ""
                             }
@@ -162,7 +165,7 @@ FocusScope {
                                 id: line2_text
                                 width: parent.width
                                 elide: Text.ElideRight
-                                color: VLCStyle.colors.textInactive
+                                color: theme.fg.secondary
                                 font.pixelSize: VLCStyle.fontSize_small
                                 visible: text !== ""
                                 enabled: text !== ""

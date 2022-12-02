@@ -26,10 +26,11 @@ import "qrc:///style/"
 T.Button {
     id: control
 
-    property color color: VLCStyle.colors.text
-    property color hoverColor: VLCStyle.colors.windowCSDButtonBg
+    property color color
+    property color hoverColor
     property string iconTxt: ""
     property bool showHovered: false
+    property bool isThemeDark: false
 
     readonly property bool _paintHovered: control.hovered || showHovered
 
@@ -43,12 +44,12 @@ T.Button {
         height: control.height
         width: control.width
         color: {
+            if (control.pressed)
+                return control.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
+                                           : Qt.darker(control.hoverColor, 1.2)
+
             if (control._paintHovered)
                 return control.hoverColor
-
-            if (control.pressed)
-                return VLCStyle.colors.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
-                                                   : Qt.darker(control.hoverColor, 1.2)
 
             return "transparent"
         }

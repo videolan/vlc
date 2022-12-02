@@ -95,6 +95,11 @@ FocusScope {
         }
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     //FIXME use the right xxxLabel class
     T.Label {
         anchors.centerIn: parent
@@ -104,7 +109,7 @@ FocusScope {
                   lanSection.model.count === 0)
 
         font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+        color: root.activeFocus ? theme.accent : theme.fg.primary
         text: I18n.qtr("No network shares found")
     }
 

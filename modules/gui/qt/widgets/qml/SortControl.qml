@@ -37,8 +37,6 @@ FocusScope {
 
     property real listWidth: VLCStyle.widthSortBox
 
-    property VLCColors colors: VLCStyle.colors
-
     // NOTE: This allows us provide a custom menu and override sortMenu.
     property SortMenu menu
 
@@ -54,6 +52,7 @@ FocusScope {
 
     // Aliases
 
+    property alias colorContext: button.colorContext
     property alias checked: button.checked
     property alias focusPolicy: button.focusPolicy
     property alias iconSize: button.size

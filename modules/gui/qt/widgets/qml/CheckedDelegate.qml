@@ -37,22 +37,22 @@ T.ItemDelegate {
 
     // Childs
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Item
+
+        focused: control.activeFocus
+        hovered: control.hovered
+        pressed: control.pressed
+        enabled: control.enabled
+    }
+
     background: AnimatedBackground {
         active: visualFocus
 
-        backgroundColor: {
-            if (control.hovered) {
-                if (control.checked)
-                    return VLCStyle.colors.trackItemHover;
-                else
-                    return VLCStyle.colors.trackItem;
-            } else if (control.checked)
-                return VLCStyle.colors.trackItem;
-            else
-                return "transparent"
-        }
-
-        activeBorderColor: VLCStyle.colors.white
+        animate: theme.initialized
+        backgroundColor: control.checked ? theme.bg.highlight : theme.bg.primary
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: Item { // don't use a row, it will move text when control is unchecked
@@ -67,7 +67,7 @@ T.ItemDelegate {
 
             text: VLCIcons.check
 
-            color: "white"
+            color: theme.fg.primary
 
             font.pixelSize: VLCStyle.icon_track
         }
@@ -87,7 +87,7 @@ T.ItemDelegate {
             text: control.text
             font: control.font
 
-            color: "white"
+            color: theme.fg.primary
         }
     }
 }

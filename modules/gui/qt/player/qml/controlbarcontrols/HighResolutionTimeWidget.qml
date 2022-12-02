@@ -30,7 +30,6 @@ Control {
     id: highResolutionTimeWidget
 
     property bool paintOnly: false
-    property VLCColors colors: VLCStyle.colors
 
     padding: VLCStyle.focus_border
 
@@ -55,9 +54,17 @@ Control {
         _adjustSMPTETimer(false)
     }
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.ToolButton
+
+        focused: highResolutionTimeWidget.visualFocus
+    }
+
     background: Widgets.AnimatedBackground {
         active: visualFocus
-        activeBorderColor: colors.bgFocus
+        animate: theme.initialized
+        activeBorderColor: theme.visualFocus
     }
 
     contentItem: Item {
@@ -69,7 +76,7 @@ Control {
             anchors.fill: parent
 
             text: paintOnly ? "00:00:00:00" : Player.highResolutionTime
-            color: colors.text
+            color: theme.fg.primary
 
             horizontalAlignment: Text.AlignHCenter
         }
