@@ -74,7 +74,7 @@ static bool isThemeDark(vlc_qt_theme_provider_t* obj)
     return sys->isThemeDark();
 }
 
-static int updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*)
+static int updatePalette(vlc_qt_theme_provider_t* obj)
 {
     //use VLC palette, choose the one maching the dark/light settings
     return VLC_EGENERIC;

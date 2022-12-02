@@ -68,7 +68,56 @@
 
 #define DEFINE_QCOLOR_STRUCT(x) void* x;
 
+enum vlc_qt_theme_color_state {
+    VQTC_STATE_NORMAL = 0,
+    VQTC_STATE_DISABLED,
+    VQTC_STATE_PRESSED,
+    VQTC_STATE_HOVERED,
+    VQTC_STATE_FOCUSED,
+    VQTC_STATE_COUNT
+};
 
+
+enum vlc_qt_theme_color_section {
+    VQTC_SECTION_FG,
+    VQTC_SECTION_BG,
+    VQTC_SECTION_DECORATION,
+    VQTC_SECTION_COUNT
+};
+enum vlc_qt_theme_color_set {
+    VQTC_SET_VIEW = 0,
+    VQTC_SET_WINDOW,
+    VQTC_SET_ITEM,
+    VQTC_SET_BADGE,
+    VQTC_SET_BUTTON_STANDARD,
+    VQTC_SET_BUTTON_ACCENT,
+    VQTC_SET_TAB_BUTTON,
+    VQTC_SET_TOOL_BUTTON,
+    VQTC_SET_SWITCH,
+    VQTC_SET_MENUBAR,
+    VQTC_SET_TOOLTIP,
+    VQTC_SET_SLIDER,
+    VQTC_SET_COMBOBOX,
+    VQTC_SET_SPINBOX,
+    VQTC_SET_TEXTFIELD,
+    VQTC_SET_COUNT
+};
+
+enum vlc_qt_theme_color_name {
+    VQTC_NAME_PRIMARY = 0,
+    VQTC_NAME_SECONDARY,
+    VQTC_NAME_HIGHLIGHT,
+    VQTC_NAME_LINK,
+    VQTC_NAME_POSITIVE,
+    VQTC_NAME_NEUTRAL,
+    VQTC_NAME_NEGATIVE,
+    VQTC_NAME_VISUAL_FOCUS,
+    VQTC_NAME_BORDER,
+    VQTC_NAME_ACCENT,
+    VQTC_NAME_SHADOW,
+    VQTC_NAME_SEPARATOR,
+    VQTC_NAME_COUNT
+};
 
 struct vlc_qt_palette_t
 {
@@ -138,8 +187,18 @@ struct vlc_qt_theme_provider_t
     void (*metricsUpdated)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, void* data);
     void* metricsUpdatedData;
 
-    void (*setColorInt)(void* color, int r, int g, int b, int a);
-    void (*setColorF)(void* color, double r, double g, double b, double a);
+
+    void (*setColorInt)(
+            vlc_qt_theme_provider_t* obj,
+            vlc_qt_theme_color_set set, vlc_qt_theme_color_section section,
+            vlc_qt_theme_color_name name, vlc_qt_theme_color_state state,
+            int r, int g, int b, int a);
+    void (*setColorF)(
+            vlc_qt_theme_provider_t* obj,
+            vlc_qt_theme_color_set set, vlc_qt_theme_color_section section,
+            vlc_qt_theme_color_name name, vlc_qt_theme_color_state state,
+            double r, double g, double b, double a);
+    void* setColorData;
 
     //set by module
     void (*close)(vlc_qt_theme_provider_t* obj);
@@ -147,7 +206,7 @@ struct vlc_qt_theme_provider_t
     /**
      * return VLC_SUCCESS if palette have been updated, VLC_EGENERIC otherwise
      */
-    int (*updatePalette)(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*);
+    int (*updatePalette)(vlc_qt_theme_provider_t* obj);
     picture_t* (*getThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, const vlc_qt_theme_image_setting* setting);
     bool (*getThemeMetrics)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, vlc_qt_theme_metrics* setting);
     bool (*supportThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type);

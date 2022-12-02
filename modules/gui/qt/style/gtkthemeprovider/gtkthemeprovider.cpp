@@ -56,7 +56,8 @@ static bool isThemeDark( vlc_qt_theme_provider_t*)
 
 static void setGtkColor(vlc_qt_theme_provider_t* obj, void* qColor, const GdkRGBA& gColor)
 {
-     obj->setColorF(qColor, gColor.red, gColor.green, gColor.blue, gColor.alpha);
+    //temporary disabled
+    //obj->setColorF(qColor, gColor.red, gColor.green, gColor.blue, gColor.alpha);
 }
 
 template<typename Getter>
@@ -137,35 +138,9 @@ bool supportThemeImage(vlc_qt_theme_provider_t*, vlc_qt_theme_image_type type)
     return false;
 }
 
-static int updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
+static int updatePalette(vlc_qt_theme_provider_t* obj)
 {
-    GdkRGBA bg = GetBgColor("GtkTreeView#treeview.view GtkTreeView#treeview.view.cell");
-    GdkRGBA text = GetFgColor("GtkLabel#label");
-
-    setGtkColorSet(obj, p->bg, nullptr, p->bgInactive, GetBgColor,  "GtkTreeView#treeview.view GtkTreeView#treeview.view.cell");
-    setGtkColorSet(obj, p->bgAlt, nullptr, p->bgAltInactive, GetBgColor, "");
-    setGtkColorSet(obj, p->text, p->textDisabled, p->textInactive, GetFgColor, "GtkLabel#label");
-
-    setGtkColorSet(obj, p->bgHover, nullptr, p->bgHoverInactive, GetSelectionBgColor, "GtkLabel#label #selection");
-    setGtkColorSet(obj, p->bgHoverText, nullptr, p->bgHoverTextInactive, GetFgColor, "GtkLabel#setGtkColorSet");
-
-    setGtkColorSet(obj, p->button, nullptr, nullptr, GetBgColor, "GtkButton#button");
-    setGtkColorSet(obj, p->buttonText, nullptr, nullptr, GetFgColor, "GtkButton#button GtkLabel#label");
-    setGtkColorSet(obj, p->buttonBorder, nullptr, nullptr, GetBorderColor, "GtkButton#button");
-
-    setGtkColor(obj, p->topBanner, GetBgColor("#headerbar.header-bar.titlebar"));
-    setGtkColor(obj, p->lowerBanner, GetBgColor(""));
-    setGtkColor(obj, p->expandDelegate, bg);
-
-    setGtkColor(obj, p->separator, GdkRBGABlend(bg, text, .95));
-    setGtkColor(obj, p->playerControlBarFg, text);
-
-    const auto tooltip_context = AppendCssNodeToStyleContext({}, "#tooltip.background");
-
-    setGtkColor(obj, p->tooltipColor, GetBgColorFromStyleContext(tooltip_context));
-    setGtkColor(obj, p->tooltipTextColor, GtkStyleContextGetColor(AppendCssNodeToStyleContext(tooltip_context, "GtkLabel#label")));
-
-    return VLC_SUCCESS;
+    return VLC_EGENERIC;
 }
 
 static void Close(vlc_qt_theme_provider_t* obj)

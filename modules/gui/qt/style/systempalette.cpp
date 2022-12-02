@@ -125,23 +125,42 @@ static void ReleaseVLCPictureCb(void* data)
 }
 
 
-static void setQColorRBGAInt(void* data, int r, int g, int b, int a)
+static void setColorRBGAInt(
+    vlc_qt_theme_provider_t* obj,
+    vlc_qt_theme_color_set set, vlc_qt_theme_color_section section,
+    vlc_qt_theme_color_name name, vlc_qt_theme_color_state state,
+    int r, int g, int b, int a)
 {
-    auto color = static_cast<QColor*>(data);
-    color->setRgb(r,g,b,a);
+    auto palette = static_cast<SystemPalette*>(obj->setColorData);
+    QColor color(r,g,b,a);
+    palette->setColor(
+        static_cast<ColorContext::ColorSet>(set), static_cast<ColorContext::ColorSection>(section),
+        static_cast<ColorContext::ColorName>(name), static_cast<ColorContext::ColorState>(state),
+        color);
 }
 
-static void setQColorRBGAFloat(void* data, double r, double g, double b, double a)
+static void setColorRBGAFloat(
+    vlc_qt_theme_provider_t* obj,
+    vlc_qt_theme_color_set set, vlc_qt_theme_color_section section,
+    vlc_qt_theme_color_name name, vlc_qt_theme_color_state state,
+    double r, double g, double b, double a)
 {
-    auto color = static_cast<QColor*>(data);
-    color->setRgbF(r,g,b,a);
+    auto palette = static_cast<SystemPalette*>(obj->setColorData);
+    QColor color;
+    color.setRgbF(r,g,b,a);
+    palette->setColor(
+        static_cast<ColorContext::ColorSet>(set), static_cast<ColorContext::ColorSection>(section),
+        static_cast<ColorContext::ColorName>(name), static_cast<ColorContext::ColorState>(state),
+        color);
 }
 
-
 }
 
-ExternalPaletteImpl::ExternalPaletteImpl(MainCtx* ctx, QObject* parent)
+//ExternalPaletteImpl
+
+ExternalPaletteImpl::ExternalPaletteImpl(MainCtx* ctx, SystemPalette& palette, QObject* parent)
     : QObject(parent)
+    , m_palette(palette)
     , m_ctx(ctx)
 {
 }
@@ -169,14 +188,17 @@ bool ExternalPaletteImpl::init()
     m_provider = static_cast<vlc_qt_theme_provider_t*>(vlc_object_create(m_ctx->getIntf(), sizeof(vlc_qt_theme_provider_t)));
     if (!m_provider)
         return false;
+
+
     m_provider->paletteUpdated = PaletteChangedCallback;
     m_provider->paletteUpdatedData = this;
 
     m_provider->metricsUpdated = MetricsChangedCallback;
     m_provider->metricsUpdatedData = this;
 
-    m_provider->setColorF = setQColorRBGAFloat;
-    m_provider->setColorInt = setQColorRBGAInt;
+    m_provider->setColorF = setColorRBGAFloat;
+    m_provider->setColorInt = setColorRBGAInt;
+    m_provider->setColorData = &m_palette;
 
     m_module = module_need(m_provider, "qt theme provider",
                            preferedProvider.isNull() ? nullptr : qtu(preferedProvider),
@@ -246,10 +268,10 @@ CSDMetrics* ExternalPaletteImpl::getCSDMetrics() const
     return m_csdMetrics.get();
 }
 
-int ExternalPaletteImpl::update(vlc_qt_palette_t& p)
+int ExternalPaletteImpl::update()
 {
     if (m_provider->updatePalette)
-        return m_provider->updatePalette(m_provider, &p);
+        return m_provider->updatePalette(m_provider);
     return VLC_EGENERIC;
 }
 
@@ -331,7 +353,6 @@ void SystemPalette::setSource(ColorSchemeModel::ColorScheme source)
     m_source = source;
 
     updatePalette();
-
     emit sourceChanged();
 }
 
@@ -380,6 +401,56 @@ void SystemPalette::updatePalette()
         emit hasCSDImageChanged();
     }
 }
+
+static quint64 makeKey(ColorContext::ColorSet colorSet, ColorContext::ColorSection section,
+                       ColorContext::ColorName name, ColorContext::ColorState state)
+{
+    static_assert(VQTC_STATE_COUNT < (1<<4), "");
+    static_assert(VQTC_SECTION_COUNT < (1<<4), "");
+    static_assert(VQTC_NAME_COUNT < (1<<8), "");
+    static_assert(VQTC_SET_COUNT < (1<<16), "");
+    return  (colorSet << 16)
+        + (name << 8)
+        + (section << 4)
+        + state;
+}
+
+void SystemPalette::setColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
+                             ColorContext::ColorName name, ColorContext::ColorState state, QColor color)
+{
+
+    quint64 key = makeKey(colorSet, section, name, state);
+    m_colorMap[key] = color;
+}
+
+
+QColor SystemPalette::getColor(ColorContext::ColorSet colorSet, ColorContext::ColorSection section,
+                               ColorContext::ColorName name, ColorContext::ColorState state) const
+{
+    typedef ColorContext C;
+
+    quint64 key = makeKey(colorSet, section, name, state);
+    auto it = m_colorMap.find(key);
+    if (it != m_colorMap.cend())
+        return *it;
+    //we don't have the role explicitly set, fallback to the normal state
+    key = makeKey(colorSet, section, name, C::Normal);
+    it = m_colorMap.find(key);
+    if (it != m_colorMap.cend())
+        return *it;
+    //we don't have the role explicitly set, fallback to the colorSet View
+    //TODO do we want finer hierarchy?
+    if (colorSet != C::View)
+    {
+        return getColor(C::View, section, name, state);
+    }
+    else
+    {
+        //nothing matches, that's probably an issue, return an ugly color
+        return Qt::magenta;
+    }
+}
+
 
 void SystemPalette::makeLightPalette()
 {
@@ -511,7 +582,7 @@ void SystemPalette::makeSystemPalette()
         return;
     }
 
-    auto palette = std::make_unique<ExternalPaletteImpl>(m_ctx);
+    auto palette = std::make_unique<ExternalPaletteImpl>(m_ctx, *this);
     if (!palette->init())
     {
         //can't initialise system palette, fallback to default
@@ -519,12 +590,8 @@ void SystemPalette::makeSystemPalette()
         return;
     }
 
-    vlc_qt_palette_t p;
-#define BIND_COLOR(name)  p. name = &m_##name;
-    VLC_QT_INTF_PUBLIC_COLORS(BIND_COLOR)
-#undef BIND_COLOR
-
-    int ret = palette->update(p);
+    m_colorMap.clear();
+    int ret = palette->update();
     if (ret != VLC_SUCCESS)
     {
         if (palette->isThemeDark())

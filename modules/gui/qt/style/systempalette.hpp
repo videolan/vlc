@@ -20,13 +20,23 @@
 
 #include <QObject>
 #include <QColor>
+#include <QPalette>
 #include <QQuickImageProvider>
 #include <QQuickItem>
+#include <QPointer>
+#include <QtQml/QQmlParserStatus>
 
 #include "qt.hpp"
 #include "util/color_scheme_model.hpp"
 
 #include "qtthemeprovider.hpp"
+
+#include "colorcontext.hpp"
+
+class SystemPalette;
+class ColorProperty;
+class ColorContextState;
+
 
 class CSDMetrics : public QObject {
     Q_OBJECT
@@ -51,7 +61,7 @@ class ExternalPaletteImpl : public QObject
 {
     Q_OBJECT
 public:
-    ExternalPaletteImpl(MainCtx* ctx, QObject* parent = nullptr);
+    ExternalPaletteImpl(MainCtx* ctx, SystemPalette& palette, QObject* parent = nullptr);
 
     ~ExternalPaletteImpl();
 
@@ -64,7 +74,7 @@ public:
 
     bool hasCSDImages() const;
 
-    int update(vlc_qt_palette_t& p);
+    int update();
     void updateMetrics(vlc_qt_theme_image_type type);
 
 signals:
@@ -72,6 +82,7 @@ signals:
     void CSDMetricsChanged();
 
 public:
+    SystemPalette& m_palette;
     MainCtx* m_ctx = nullptr;
     module_t* m_module = nullptr;
     vlc_qt_theme_provider_t* m_provider = nullptr;
@@ -144,6 +155,11 @@ public:
     Q_INVOKABLE QColor blendColors(const QColor& c1, const QColor& c2, float blend = 0.5);
     Q_INVOKABLE QColor setColorAlpha(const QColor& c1, float alpha);
 
+    void setColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
+                  ColorContext::ColorName name, ColorContext::ColorState state, QColor color);
+    QColor getColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
+                    ColorContext::ColorName name, ColorContext::ColorState state) const;
+
 public slots:
     void setSource(ColorSchemeModel::ColorScheme source);
     void setCtx(MainCtx* ctx);
@@ -171,6 +187,9 @@ private:
     bool m_hasCSDImage = false;
 
     std::unique_ptr<ExternalPaletteImpl> m_palettePriv;
+
+    QMap<quint64, QColor> m_colorMap;
+
 };
 
 #undef COLOR_PROPERTY

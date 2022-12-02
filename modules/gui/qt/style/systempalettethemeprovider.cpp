@@ -67,48 +67,13 @@ static bool isThemeDark(vlc_qt_theme_provider_t*)
 
 static void setColor(vlc_qt_theme_provider_t* obj, void* ptr, const QColor c)
 {
-    obj->setColorInt(ptr, c.red(), c.green(), c.blue(), c.alpha());
+    //temporary disabled
+    //obj->setColorInt(ptr, c.red(), c.green(), c.blue(), c.alpha());
 }
 
-static int updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
+static int updatePalette(vlc_qt_theme_provider_t* obj)
 {
-    QPalette palette = qApp->palette();
-
-    QColor bg = palette.color(QPalette::Normal, QPalette::Base);
-    QColor text = palette.color(QPalette::Normal, QPalette::Text);
-
-    //fix with colors provided by the system
-    setColor(obj, p->bg, bg);
-    setColor(obj, p->bgInactive, palette.color(QPalette::Inactive, QPalette::Base));
-    setColor(obj, p->bgAlt, palette.color(QPalette::Normal, QPalette::AlternateBase));
-    setColor(obj, p->bgAltInactive, palette.color(QPalette::Inactive, QPalette::AlternateBase));
-
-    setColor(obj, p->text, palette.color(QPalette::Normal, QPalette::Text));
-    setColor(obj, p->textDisabled, palette.color(QPalette::Disabled, QPalette::Text));
-    setColor(obj, p->textInactive, palette.color(QPalette::Inactive, QPalette::Text));
-
-    setColor(obj, p->bgHover, palette.color(QPalette::Normal, QPalette::Highlight));
-    setColor(obj, p->bgHoverInactive, palette.color(QPalette::Inactive, QPalette::Highlight));
-    setColor(obj, p->bgHoverText, palette.color(QPalette::Normal, QPalette::HighlightedText));
-    setColor(obj, p->bgHoverTextInactive, palette.color(QPalette::Inactive, QPalette::HighlightedText));
-
-    QColor button = palette.color(QPalette::Normal, QPalette::Button);
-    QColor buttonText = palette.color(QPalette::Normal, QPalette::ButtonText);
-    setColor(obj, p->button, button);
-    setColor(obj, p->buttonText, buttonText);
-    setColor(obj, p->buttonBorder, blendColors(button, buttonText, 0.8));
-
-    setColor(obj, p->topBanner, palette.color(QPalette::Normal, QPalette::Window));
-    setColor(obj, p->lowerBanner, palette.color(QPalette::Normal, QPalette::AlternateBase));
-
-    setColor(obj, p->separator, blendColors(bg, text, .95));
-    setColor(obj, p->playerControlBarFg, palette.color(QPalette::Normal, QPalette::Text));
-    setColor(obj, p->expandDelegate, bg);
-    setColor(obj, p->tooltipColor, palette.color(QPalette::Normal, QPalette::ToolTipBase));
-    setColor(obj, p->tooltipTextColor, palette.color(QPalette::Normal, QPalette::ToolTipText));
-
-    //use VLC palette, choose the one maching the dark/light settings
-    return VLC_SUCCESS;
+    return VLC_EGENERIC;
 }
 
 static void Close(vlc_qt_theme_provider_t* obj)
