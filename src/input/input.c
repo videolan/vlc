@@ -424,6 +424,14 @@ static void *Run( void *data )
 
     vlc_thread_set_name("vlc-input");
 
+    char name[128];
+    uint64_t tid_np;
+ 
+    pthread_threadid_np(NULL,&tid_np);
+    sprintf(name,"vlc-input tid_np=%qx",tid_np);
+    vlc_thread_set_name(name);
+    msg_Dbg(p_input,"debug_demux:vlc-input tid_np=%qx created",tid_np);
+    
     vlc_interrupt_set(&priv->interrupt);
 
     if( !Init( p_input ) )
@@ -435,6 +443,7 @@ static void *Run( void *data )
     }
 
     input_SendEventDead( p_input );
+    msg_Dbg(p_input,"debug_demux:vlc-input tid_np=%qx destroyed",tid_np);
     return NULL;
 }
 
