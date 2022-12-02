@@ -1,5 +1,7 @@
 #define VERSION_NUMBER @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,@VERSION_EXTRA@
 #define VERSION_NUMBER_STR "@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,@VERSION_EXTRA@"
+#define LIBVLC_VERSION_NUMBER @LIBVLC_ABI_MAJOR@,@LIBVLC_ABI_MINOR@,@LIBVLC_ABI_MICRO@
+#define LIBVLC_VERSION_NUMBER_STR "@LIBVLC_ABI_MAJOR@,@LIBVLC_ABI_MINOR@,@LIBVLC_ABI_MICRO@"
 
 #include <winuser.h>
 
@@ -7,7 +9,7 @@
 FILETYPE 2
 FILEOS 4
 PRODUCTVERSION VERSION_NUMBER
-FILEVERSION VERSION_NUMBER
+FILEVERSION LIBVLC_VERSION_NUMBER
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -16,7 +18,7 @@ BEGIN
       VALUE "CompanyName", "VideoLAN"
       VALUE "ProductName", "VLC media player"
       VALUE "ProductVersion", VERSION_NUMBER_STR
-      VALUE "FileVersion", "@VERSION@"
+      VALUE "FileVersion", LIBVLC_VERSION_NUMBER_STR
       VALUE "FileDescription", "VLC media player"
       VALUE "LegalCopyright", "Copyright \251 @COPYRIGHT_YEARS@ VideoLAN and VLC Authors"
       VALUE "LegalTrademarks", "VLC media player, VideoLAN and x264 are registered trademarks from VideoLAN"
