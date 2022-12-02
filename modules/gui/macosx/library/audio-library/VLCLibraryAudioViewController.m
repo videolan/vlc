@@ -242,6 +242,8 @@
 
 - (IBAction)segmentedControlAction:(id)sender
 {
+    _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
+
     if (_audioDataSource.libraryModel.listOfAudioMedia.count == 0) {
         return;
     }
@@ -249,8 +251,6 @@
     if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
         [self presentAudioTableView];
     }
-
-    _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
 
     VLCLibraryNavigationStack *globalNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
     if(sender != globalNavStack) {
