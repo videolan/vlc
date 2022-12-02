@@ -126,6 +126,9 @@ public:
     COLOR_DEFINITION(orange500, "#FF8800");
     COLOR_DEFINITION(orange800, "#FF610A");
 
+    COLOR_DEFINITION(orange400, "#f89a06"); //FIXME name have been chosen randomly by me
+    COLOR_DEFINITION(orange200, "#e29a06"); //FIXME name have been chosen randomly by me
+
     COLOR_DEFINITION(darkGrey200, "#1E1E1E");
     COLOR_DEFINITION(darkGrey300, "#212121");
     COLOR_DEFINITION(darkGrey400, "#242424");
@@ -140,6 +143,8 @@ public:
     COLOR_DEFINITION(lightGrey400, "#EDEDED");
     COLOR_DEFINITION(lightGrey500, "#E9E9E9");
     COLOR_DEFINITION(lightGrey600, "#E5E5E5");
+
+    COLOR_DEFINITION(red500, "#FF0000");
 
 public:
     SystemPalette(QObject* parent = nullptr);
