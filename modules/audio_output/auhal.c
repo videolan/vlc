@@ -1476,6 +1476,25 @@ Stop(audio_output_t *p_aout)
                       kAudioObjectPropertyScopeGlobal);
 }
 
+static vlc_tick_t
+GetLatency(audio_output_t *p_aout, const audio_sample_format_t *fmt)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    /* get device latency */
+    UInt32 i_latency_samples;
+    vlc_tick_t i_latency_us = 0;
+    int ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
+                          kAudioDevicePropertyLatency,
+                          kAudioObjectPropertyScopeOutput);
+    if (ret == VLC_SUCCESS)
+        i_latency_us += vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
+
+    msg_Dbg(p_aout, "Current device has a latency of %lld us", i_latency_us);
+
+    return i_latency_us;
+}
+
 static int
 Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
@@ -1574,16 +1593,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                       kAudioDevicePropertyDeviceIsAlive,
                       kAudioObjectPropertyScopeGlobal);
 
-    /* get device latency */
-    UInt32 i_latency_samples;
-    vlc_tick_t i_latency_us = 0;
-    int ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
-                          kAudioDevicePropertyLatency,
-                          kAudioObjectPropertyScopeOutput);
-    if (ret == VLC_SUCCESS)
-        i_latency_us += vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
-
-    msg_Dbg(p_aout, "Current device has a latency of %lld us", i_latency_us);
+    vlc_tick_t i_latency_us = GetLatency(p_aout, fmt);
 
     /* Check for Digital mode or Analog output mode */
     if (do_spdif)
