@@ -202,6 +202,12 @@ GdkRGBA GetBgColor(const std::string& css_selector);
 // returns the average color.
 GdkRGBA GetBorderColor(const std::string& css_selector);
 
+// Renders focus indicator from the style context created by
+// GetStyleContextFromCss(|css_selector|) into a 24x24 bitmap and
+// returns the average color.
+GdkRGBA GetFocusColor(const std::string& css_selector);
+GdkRGBA GetFocusColorFromContext(GtkCssContext context);
+
 // On Gtk3.20 or later, behaves like GetBgColor.  Otherwise, returns
 // the background-color property.
 GdkRGBA GetSelectionBgColor(const std::string& css_selector);

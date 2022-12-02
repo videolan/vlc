@@ -497,6 +497,15 @@ GdkRGBA GetBorderColor(const std::string& css_selector) {
     return surface.GetAveragePixelValue(true);
 }
 
+GdkRGBA GetFocusColor(const std::string& css_selector)
+{
+    auto context = GetStyleContextFromCss(css_selector);
+    MySize size(24, 24);
+    CairoSurface surface(size);
+    gtk_render_focus(context, surface.cairo(), 0, 0, size.width(), size.height());
+    return surface.GetAveragePixelValue(true);
+}
+
 GdkRGBA GetSelectionBgColor(const std::string& css_selector) {
     auto context = GetStyleContextFromCss(css_selector);
     return GetBgColorFromStyleContext(context);
