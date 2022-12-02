@@ -168,11 +168,11 @@ vlc-plugin.pc: vlc-plugin.pc.in $(top_builddir)/config.status
 ##############################################################################
 
 if HAVE_WIN32
-noinst_DATA = libvlc_win32_rc.rc
+noinst_DATA = libvlccore_win32_rc.rc
 endif
-EXTRA_DIST += libvlc_win32_rc.rc.in
+EXTRA_DIST += libvlccore_win32_rc.rc.in
 
-libvlc_win32_rc.rc: libvlc_win32_rc.rc.in $(top_builddir)/config.status
+libvlccore_win32_rc.rc: libvlccore_win32_rc.rc.in $(top_builddir)/config.status
 	$(AM_V_GEN)cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
 
@@ -558,8 +558,8 @@ libvlccore_la_LDFLAGS = \
 	-version-info 9:0:0
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
-libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
-libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
+libvlccore_la_DEPENDENCIES += libvlccore_win32_rc.$(OBJEXT)
+libvlccore_la_LDFLAGS += -Wl,libvlccore_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
 endif
 if HAVE_OS2
 libvlccore_la_LDFLAGS += -avoid-version
@@ -584,7 +584,7 @@ if HAVE_TVOS
 libvlccore_la_LDFLAGS += -avoid-version
 endif
 
-libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlc.dll.manifest
+libvlccore_win32_rc.$(OBJEXT): libvlccore_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlccore.dll.manifest
 	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
 
 # FourCC tables

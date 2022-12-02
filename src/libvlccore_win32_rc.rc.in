@@ -1,0 +1,31 @@
+#define VERSION_NUMBER @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,@VERSION_EXTRA@
+#define VERSION_NUMBER_STR "@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,@VERSION_EXTRA@"
+
+#include <winuser.h>
+
+1 VERSIONINFO
+FILETYPE 2
+FILEOS 4
+PRODUCTVERSION VERSION_NUMBER
+FILEVERSION VERSION_NUMBER
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "VideoLAN"
+      VALUE "ProductName", "VLC media player"
+      VALUE "ProductVersion", VERSION_NUMBER_STR
+      VALUE "FileVersion", "@VERSION@"
+      VALUE "FileDescription", "VLC media player"
+      VALUE "LegalCopyright", "Copyright \251 @COPYRIGHT_YEARS@ VideoLAN and VLC Authors"
+      VALUE "LegalTrademarks", "VLC media player, VideoLAN and x264 are registered trademarks from VideoLAN"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+
+ISOLATIONAWARE_MANIFEST_RESOURCE_ID RT_MANIFEST "libvlccore.dll.manifest"
