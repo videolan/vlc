@@ -51,6 +51,8 @@ struct aout_sys_common
 {
     /* The following is owned by common.c (initialized from ca_Open) */
 
+    AudioUnit au; /* Can be NULL (pass-through) */
+
     mach_timebase_info_data_t tinfo;
 
     size_t              i_underrun_size;
@@ -71,6 +73,8 @@ struct aout_sys_common
     size_t timing_report_last_written_bytes;
     /* Number of bytes to write before sending a timing report */
     size_t timing_report_delay_bytes;
+    /* Last AudioUnit Latency, for debug/log purpose */
+    vlc_tick_t au_latency_ticks;
 
     union lock
     {
