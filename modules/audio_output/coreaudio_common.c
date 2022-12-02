@@ -136,6 +136,14 @@ ca_Open(audio_output_t *p_aout)
     return VLC_SUCCESS;
 }
 
+static vlc_tick_t
+GetLatency(audio_output_t *p_aout)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+    return p_sys->get_latency != NULL ? p_sys->get_latency(p_aout)
+                                      : p_sys->i_dev_latency_ticks;
+}
+
 /* Called from render callbacks. No lock, wait, and IO here */
 void
 ca_Render(audio_output_t *p_aout, uint64_t host_time,
@@ -148,9 +156,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
     const vlc_tick_t bytes_ticks = BytesToTicks(p_sys, bytes);
 
     const vlc_tick_t now_ticks = vlc_tick_now();
-    const vlc_tick_t end_ticks = now_ticks + bytes_ticks
-                               + host_delay_ticks
-                               + p_sys->i_dev_latency_ticks;
+    const vlc_tick_t end_ticks = now_ticks + bytes_ticks + host_delay_ticks;
 
     lock_lock(p_sys);
 
@@ -168,7 +174,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         {
             /* Write silence to reach the first play date */
             vlc_tick_t silence_ticks = p_sys->first_play_date - end_ticks
-                                     + bytes_ticks;
+                                     - GetLatency(p_aout) + bytes_ticks;
             if (silence_ticks > 0)
             {
                 tocopy = TicksToBytes(p_sys, silence_ticks);
@@ -208,7 +214,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         {
             p_sys->timing_report_last_written_bytes = 0;
             vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes);
-            aout_TimingReport(p_aout, end_ticks, pos_ticks);
+            aout_TimingReport(p_aout, end_ticks + GetLatency(p_aout), pos_ticks);
         }
         else
             p_sys->timing_report_last_written_bytes += tocopy;
@@ -329,7 +335,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 
 int
 ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-              vlc_tick_t i_dev_latency_ticks)
+              vlc_tick_t i_dev_latency_ticks, get_latency_cb get_latency)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -346,7 +352,10 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
 
-    p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
+    if (get_latency != NULL)
+        p_sys->get_latency = get_latency;
+    else
+        p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
     p_sys->timing_report_delay_bytes = TicksToBytes(p_sys, TIMING_REPORT_DELAY_TICKS);
 
     ca_ClearOutBuffers(p_aout);
@@ -373,12 +382,13 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
     lock_unlock(p_sys);
 }
 
-void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_ticks)
+void ca_ResetDeviceLatency(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
-    p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
+    /* Trigger aout_TimingReport() to be called from the next render callback */
+    p_sys->timing_report_last_written_bytes = p_sys->timing_report_delay_bytes;
     lock_unlock(p_sys);
 }
 
@@ -713,7 +723,7 @@ MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
               const AudioChannelLayout *outlayout, vlc_tick_t i_dev_latency_ticks,
-              bool *warn_configuration)
+              get_latency_cb get_latency, bool *warn_configuration)
 {
     int ret;
     AudioChannelLayout *inlayout_buf = NULL;
@@ -836,7 +846,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, i_dev_latency_ticks);
+    ret = ca_Initialize(p_aout, fmt, i_dev_latency_ticks, get_latency);
     if (ret != VLC_SUCCESS)
     {
         AudioUnitUninitialize(au);

@@ -45,6 +45,8 @@
 #define ca_LogErr(fmt) msg_Err(p_aout, fmt ", OSStatus: %d", (int) err)
 #define ca_LogWarn(fmt) msg_Warn(p_aout, fmt ", OSStatus: %d", (int) err)
 
+typedef vlc_tick_t (*get_latency_cb)(audio_output_t *);
+
 struct aout_sys_common
 {
     /* The following is owned by common.c (initialized from ca_Open) */
@@ -86,6 +88,7 @@ struct aout_sys_common
     uint8_t             chan_table[AOUT_CHAN_MAX];
     /* ca_TimeGet extra latency, in vlc ticks */
     vlc_tick_t          i_dev_latency_ticks;
+    get_latency_cb      get_latency;
 };
 
 int ca_Open(audio_output_t *p_aout);
@@ -104,20 +107,20 @@ void ca_MuteSet(audio_output_t * p_aout, bool mute);
 void ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date);
 
 int  ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-                   vlc_tick_t i_dev_latency_ticks);
+                   vlc_tick_t i_dev_latency_ticks, get_latency_cb get_latency);
 
 void ca_Uninitialize(audio_output_t *p_aout);
 
 void ca_SetAliveState(audio_output_t *p_aout, bool alive);
 
-void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_ticks);
+void ca_ResetDeviceLatency(audio_output_t *p_aout);
 
 AudioUnit au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type);
 
 int  au_Initialize(audio_output_t *p_aout, AudioUnit au,
                    audio_sample_format_t *fmt,
                    const AudioChannelLayout *outlayout, vlc_tick_t i_dev_latency_ticks,
-                   bool *warn_configuration);
+                   get_latency_cb get_latency, bool *warn_configuration);
 
 void au_Uninitialize(audio_output_t *p_aout, AudioUnit au);
 

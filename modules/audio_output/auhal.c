@@ -1092,7 +1092,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
     /* Do the last VLC aout setups */
     bool warn_configuration;
     int ret = au_Initialize(p_aout, p_sys->au_unit, fmt, layout, latency_us,
-                            &warn_configuration);
+                            NULL, &warn_configuration);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -1365,7 +1365,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, 0);
+    ret = ca_Initialize(p_aout, fmt, 0, NULL);
     if (ret != VLC_SUCCESS)
     {
         AudioDeviceDestroyIOProcID(p_sys->i_selected_dev, p_sys->i_procID);

@@ -138,6 +138,10 @@ typedef struct
     bool      b_spatial_audio_supported;
     enum au_dev au_dev;
 
+    /* For debug purpose, to print when specific latency changed */
+    vlc_tick_t output_latency_ticks;
+    vlc_tick_t io_buffer_duration_ticks;
+
     /* sw gain */
     float               soft_gain;
     bool                soft_mute;
@@ -161,17 +165,29 @@ GetLatency(audio_output_t *p_aout)
 
     Float64 unit_s;
     vlc_tick_t latency_us = 0, us;
+    bool changed = false;
 
     us = vlc_tick_from_sec([p_sys->avInstance outputLatency]);
-    msg_Dbg(p_aout, "Current device has a outputLatency of %" PRId64 "us", us);
+    if (us != p_sys->output_latency_ticks)
+    {
+        msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us", us);
+        p_sys->output_latency_ticks = us;
+        changed = true;
+    }
     latency_us += us;
 
     us = vlc_tick_from_sec([p_sys->avInstance IOBufferDuration]);
-    msg_Dbg(p_aout, "Current device has a IOBufferDuration of %" PRId64 "us", us);
+    if (us != p_sys->io_buffer_duration_ticks)
+    {
+        msg_Dbg(p_aout, "Current device has a new IOBufferDuration of %" PRId64 "us", us);
+        p_sys->io_buffer_duration_ticks = us;
+        changed = true;
+    }
     latency_us += us;
 
-    msg_Dbg(p_aout, "Current device has a total latency of %" PRId64 "us",
-            latency_us);
+    if (changed)
+        msg_Dbg(p_aout, "Current device has a new total latency of %" PRId64 "us",
+                latency_us);
     return latency_us;
 }
 
@@ -202,10 +218,7 @@ GetLatency(audio_output_t *p_aout)
      || routeChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
     else
-    {
-        const vlc_tick_t latency_us = GetLatency(p_aout);
-        ca_SetDeviceLatency(p_aout, latency_us);
-    }
+        ca_ResetDeviceLatency(p_aout);
 }
 
 - (void)handleInterruption:(NSNotification *)notification
@@ -539,6 +552,8 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     aout_FormatPrint(p_aout, "VLC is looking for:", fmt);
 
     p_sys->au_unit = NULL;
+    p_sys->output_latency_ticks = 0;
+    p_sys->io_buffer_duration_ticks = 0;
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:p_sys->aoutWrapper
@@ -599,8 +614,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (err != noErr)
         ca_LogWarn("failed to set IO mode");
 
-    const vlc_tick_t latency_us = GetLatency(p_aout);
-    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL, latency_us, NULL);
+    ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL, 0, GetLatency, NULL);
     if (ret != VLC_SUCCESS)
         goto error;
 
