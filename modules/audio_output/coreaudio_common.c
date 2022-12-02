@@ -702,9 +702,6 @@ static int
 MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
                AudioChannelLayout **inlayoutp, size_t *inlayout_size)
 {
-    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-    uint32_t chans_out[AOUT_CHAN_MAX] = { 0, };
-
     unsigned channels = aout_FormatNbChannels(fmt);
 
     size_t size;
