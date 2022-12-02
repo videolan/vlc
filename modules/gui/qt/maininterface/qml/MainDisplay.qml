@@ -109,12 +109,12 @@ FocusScope {
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {
             return e.listed
         }).findIndex(function (e) {
-            return e.name === root.view
+            return e.name === root.view.name
         })
 
         if (item.pageModel !== undefined)
             sourcesBanner.subSelectedIndex = item.pageModel.findIndex(function (e) {
-                return e.name === item.view
+                return e.name === item.view.name
             })
 
         if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)

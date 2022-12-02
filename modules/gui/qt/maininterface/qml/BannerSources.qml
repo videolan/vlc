@@ -179,7 +179,7 @@ FocusScope {
 
                             focus: true
 
-                            indexFocus: selectedIndex
+                            indexFocus: root.selectedIndex
 
                             Navigation.parentItem: root
                             Navigation.leftItem: history_back.enabled ? history_back : null
@@ -189,7 +189,7 @@ FocusScope {
                                 iconTxt: model.icon
                                 color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
                                 showText: globalToolbar.colapseTabButtons
-                                selected: model.index === selectedIndex
+                                selected: model.index === root.selectedIndex
                                 onClicked: root.itemClicked(model.index)
                                 height: globalMenuGroup.height
                             }
