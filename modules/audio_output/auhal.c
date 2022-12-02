@@ -1482,7 +1482,8 @@ GetLatency(audio_output_t *p_aout, const audio_sample_format_t *fmt)
     aout_sys_t *p_sys = p_aout->sys;
 
     UInt32 i_latency_samples;
-    vlc_tick_t i_latency_us, i_device_latency_us = 0, i_stream_latency_us = 0;
+    vlc_tick_t i_latency_us, i_device_latency_us = 0, i_device_offset_us = 0,
+               i_stream_latency_us = 0;
     /* Get device latency */
     int ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
                           kAudioDevicePropertyLatency,
@@ -1491,6 +1492,15 @@ GetLatency(audio_output_t *p_aout, const audio_sample_format_t *fmt)
         i_device_latency_us = vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
     else
         msg_Warn(p_aout, "failed to get kAudioDevicePropertyLatency");
+
+    /* Get device safety offset */
+    ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
+                      kAudioDevicePropertySafetyOffset,
+                      kAudioObjectPropertyScopeOutput);
+    if (ret == VLC_SUCCESS)
+        i_device_offset_us = vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
+    else
+        msg_Warn(p_aout, "failed to get kAudioDevicePropertySafetyOffset");
 
     AudioStreamID sid;
     /* Get stream latency */
@@ -1509,11 +1519,11 @@ GetLatency(audio_output_t *p_aout, const audio_sample_format_t *fmt)
     else
         msg_Warn(p_aout, "failed to get kAudioDevicePropertyStreams");
 
-    i_latency_us = i_device_latency_us + i_stream_latency_us;
+    i_latency_us = i_device_latency_us + i_device_offset_us + i_stream_latency_us;
 
     msg_Dbg(p_aout, "Current device has a latency of %" PRId64 " us "
-            "(device: %" PRId64 " us, stream: %" PRId64 " us)", i_latency_us,
-            i_device_latency_us, i_stream_latency_us);
+            "(device: %" PRId64 " us, offset: %" PRId64 " us, stream: %" PRId64 " us)", i_latency_us,
+            i_device_latency_us, i_device_offset_us, i_stream_latency_us);
 
     return i_latency_us;
 }
