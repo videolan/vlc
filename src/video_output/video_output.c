@@ -1979,6 +1979,8 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     cs = sys->filter.chain_static;
     sys->filter.chain_interactive = NULL;
     sys->filter.chain_static = NULL;
+    free(sys->filter.configuration);
+    sys->filter.configuration = NULL;
     vlc_mutex_unlock(&sys->filter.lock);
     filter_chain_Delete(ci);
     filter_chain_Delete(cs);
@@ -1988,7 +1990,6 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
         vlc_video_context_Release(sys->filter.src_vctx);
         sys->filter.src_vctx = NULL;
     }
-    free(sys->filter.configuration);
 
     if (sys->decoder_fifo != NULL)
     {
