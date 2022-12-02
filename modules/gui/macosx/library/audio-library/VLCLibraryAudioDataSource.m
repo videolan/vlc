@@ -38,6 +38,7 @@
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
+#import "library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "views/VLCImageView.h"
@@ -250,7 +251,12 @@
         NSString *cellText = @"";
         NSString *cellIdentifier = @"";
 
-        if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewTitleColumnIdentifier"]) {
+        if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewSongPlayingColumnIdentifier"]) {
+            VLCLibrarySongsTableViewSongPlayingTableCellView *cellView = (VLCLibrarySongsTableViewSongPlayingTableCellView*)[tableView makeViewWithIdentifier:@"VLCLibrarySongsTableViewSongPlayingTableCellViewIdentifier" owner:self];
+            NSAssert(cellView, @"Unexpectedly received null cellview");
+            cellView.representedMediaItem = [self libraryItemAtRow:row];
+            return cellView;
+        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewTitleColumnIdentifier"]) {
             cellIdentifier = @"VLCLibrarySongsTableViewTitleTableCellViewIdentifier";
             cellText = mediaItem.title;
         } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewDurationColumnIdentifier"]) {

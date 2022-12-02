@@ -116,6 +116,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.m \
+	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h \
+	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.m \
 	gui/macosx/main/CompatibilityFixes.h \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \
