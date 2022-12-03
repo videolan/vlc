@@ -458,10 +458,6 @@ modules/gui/macosx/extensions/VLCPositionFormatter.h
 modules/gui/macosx/extensions/VLCPositionFormatter.m
 modules/gui/macosx/library/VLCInputItem.h
 modules/gui/macosx/library/VLCInputItem.m
-modules/gui/macosx/library/VLCLibraryAlbumTableCellView.h
-modules/gui/macosx/library/VLCLibraryAlbumTableCellView.m
-modules/gui/macosx/library/VLCLibraryAudioDataSource.h
-modules/gui/macosx/library/VLCLibraryAudioDataSource.m
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.h
 modules/gui/macosx/library/VLCLibraryCollectionViewItem.m
 modules/gui/macosx/library/VLCLibraryCollectionViewSupplementaryElementView.h
@@ -482,6 +478,10 @@ modules/gui/macosx/library/VLCLibrarySortingMenuController.h
 modules/gui/macosx/library/VLCLibrarySortingMenuController.m
 modules/gui/macosx/library/VLCLibraryTableCellView.h
 modules/gui/macosx/library/VLCLibraryTableCellView.m
+modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h
+modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m
+modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h
+modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m
 modules/gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h
 modules/gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m
 modules/gui/macosx/library/video-library/VLCLibraryVideoTableViewDataSource.h
