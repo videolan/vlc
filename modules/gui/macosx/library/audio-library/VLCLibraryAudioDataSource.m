@@ -49,6 +49,11 @@
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSArray *_displayedCollection;
     enum vlc_ml_parent_type _currentParentType;
+
+    id<VLCMediaLibraryItemProtocol> _selectedCollectionViewItem;
+    id<VLCMediaLibraryItemProtocol> _selectedCollectionSelectionTableViewItem;
+    id<VLCMediaLibraryItemProtocol> _selectedGroupSelectionTableViewItem;
+    id<VLCMediaLibraryItemProtocol> _selectedSongTableViewItem;
 }
 @end
 
@@ -106,39 +111,40 @@
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSSet* originalCollectionSet = [[NSSet alloc] initWithArray:_displayedCollection];
+        NSSet* originalCollectionSet = [[NSSet alloc] initWithArray:self->_displayedCollection];
         NSSet* newCollectionSet = [[NSSet alloc] initWithArray:collectionToDisplay];
 
         if([originalCollectionSet isEqual:newCollectionSet]) {
             return;
         }
 
-        id<VLCMediaLibraryItemProtocol> selectedCollectionViewItem;
-        if(_collectionView.selectionIndexPaths.count > 0 && !_collectionView.hidden) {
-            selectedCollectionViewItem = [self selectedCollectionViewItem];
-        }
-
-        _displayedCollection = collectionToDisplay;
+        [self retainSelectedMediaItem];
+        self->_displayedCollection = collectionToDisplay;
         [self reloadData];
-
-        // Reopen supplementary view in the collection views
-        if(selectedCollectionViewItem) {
-            NSUInteger newIndexOfSelectedItem = [_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
-                id<VLCMediaLibraryItemProtocol> itemElement = (id<VLCMediaLibraryItemProtocol>)element;
-                return itemElement.libraryID == selectedCollectionViewItem.libraryID;
-            }];
-
-            if(newIndexOfSelectedItem == NSNotFound) {
-                return;
-            }
-
-            NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:newIndexOfSelectedItem inSection:0];
-            NSSet *indexPathSet = [NSSet setWithObject:newIndexPath];
-            [_collectionView selectItemsAtIndexPaths:indexPathSet scrollPosition:NSCollectionViewScrollPositionTop];
-            // selectItemsAtIndexPaths does not call any delegate methods so we do it manually
-            [self collectionView:_collectionView didSelectItemsAtIndexPaths:indexPathSet];
-        }
+        [self restoreSelectionState];
     });
+}
+
+- (void)retainSelectedMediaItem
+{
+    if(_collectionView.selectionIndexPaths.count > 0 && !_collectionView.hidden) {
+        _selectedCollectionViewItem = [self selectedCollectionViewItem];
+    }
+
+    const NSInteger collectionSelectionTableViewRow = _collectionSelectionTableView.selectedRow;
+    if(collectionSelectionTableViewRow >= 0 && !_collectionSelectionTableView.hidden) {
+        _selectedCollectionSelectionTableViewItem = [self libraryItemAtRow:collectionSelectionTableViewRow];
+    }
+
+    const NSInteger groupSelectionTableViewRow = _groupSelectionTableView.selectedRow;
+    if(groupSelectionTableViewRow >= 0 && !_groupSelectionTableView.hidden) {
+        _selectedGroupSelectionTableViewItem = [self libraryItemAtRow:groupSelectionTableViewRow];
+    }
+
+    const NSInteger songsTableViewRow = _songsTableView.selectedRow;
+    if(songsTableViewRow >= 0 && !_songsTableView.hidden) {
+        _selectedSongTableViewItem = [self libraryItemAtRow:songsTableViewRow];
+    }
 }
 
 - (id<VLCMediaLibraryItemProtocol>)selectedCollectionViewItem
@@ -149,6 +155,74 @@
     }
 
     return _displayedCollection[indexPath.item];
+}
+
+- (void)restoreSelectionState
+{
+    [self restoreCollectionViewSelectionState];
+    [self restoreCollectionSelectionTableViewSelectionState];
+    [self restoreGroupSelectionTableViewSelectionState];
+    [self restoreSongTableViewSelectionState];
+}
+
+- (NSUInteger)findSelectedItemNewIndex:(id<VLCMediaLibraryItemProtocol>)item
+{
+    return [_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
+        id<VLCMediaLibraryItemProtocol> itemElement = (id<VLCMediaLibraryItemProtocol>)element;
+        return itemElement.libraryID == item.libraryID;
+    }];
+}
+
+- (void)restoreCollectionViewSelectionState
+{
+    if (!_selectedCollectionViewItem) {
+        return;
+    }
+
+    const NSUInteger newIndexOfSelectedItem = [self findSelectedItemNewIndex:_selectedCollectionViewItem];
+    if(newIndexOfSelectedItem == NSNotFound) {
+        return;
+    }
+
+    NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:newIndexOfSelectedItem inSection:0];
+    NSSet *indexPathSet = [NSSet setWithObject:newIndexPath];
+    [_collectionView selectItemsAtIndexPaths:indexPathSet scrollPosition:NSCollectionViewScrollPositionTop];
+    // selectItemsAtIndexPaths does not call any delegate methods so we do it manually
+    [self collectionView:_collectionView didSelectItemsAtIndexPaths:indexPathSet];
+    _selectedCollectionViewItem = nil;
+}
+
+- (void)restoreSelectionStateForTableView:(NSTableView*)tableView
+                         withSelectedItem:(id<VLCMediaLibraryItemProtocol>)item
+{
+    const NSUInteger newIndexOfSelectedItem = [self findSelectedItemNewIndex:item];
+    if(newIndexOfSelectedItem == NSNotFound || newIndexOfSelectedItem < 0) {
+        return;
+    }
+
+    NSIndexSet *newSelectedRowIndexSet = [NSIndexSet indexSetWithIndex:newIndexOfSelectedItem];
+    [tableView selectRowIndexes:newSelectedRowIndexSet byExtendingSelection:NO];
+}
+
+- (void)restoreCollectionSelectionTableViewSelectionState
+{
+    [self restoreSelectionStateForTableView:_collectionSelectionTableView
+                           withSelectedItem:_selectedCollectionSelectionTableViewItem];
+    _selectedCollectionSelectionTableViewItem = nil;
+}
+
+- (void)restoreGroupSelectionTableViewSelectionState
+{
+    [self restoreSelectionStateForTableView:_groupSelectionTableView
+                           withSelectedItem:_selectedGroupSelectionTableViewItem];
+    _selectedGroupSelectionTableViewItem = nil;
+}
+
+- (void)restoreSongTableViewSelectionState
+{
+    [self restoreSelectionStateForTableView:_songsTableView
+                           withSelectedItem:_selectedSongTableViewItem];
+    _selectedSongTableViewItem = nil;
 }
 
 - (void)setup
@@ -187,6 +261,13 @@
 }
 
 - (void)reloadData
+{
+    [self retainSelectedMediaItem];
+    [self reloadViews];
+    [self restoreSelectionState];
+}
+
+- (void)reloadViews
 {
     [_collectionViewFlowLayout resetLayout];
     [self.collectionView reloadData];
@@ -304,6 +385,10 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
+    if (notification.object != _collectionSelectionTableView) {
+        return;
+    }
+
     id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[self.collectionSelectionTableView.selectedRow];
 
     if (_currentParentType == VLC_ML_PARENT_ALBUM) {
