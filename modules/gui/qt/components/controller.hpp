@@ -283,6 +283,8 @@ protected:
 
     void customEvent( QEvent *event ) Q_DECL_OVERRIDE;
 
+    bool eventFilter( QObject *watched, QEvent *event ) Q_DECL_OVERRIDE;
+
 private slots:
     void showFSC();
     void planHideFSC();
