@@ -200,30 +200,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCWindowShouldShowController
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(updateLibraryRepresentation:)
-                               name:VLCLibraryModelAudioMediaListUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateLibraryRepresentation:)
-                               name:VLCLibraryModelArtistListUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateLibraryRepresentation:)
-                               name:VLCLibraryModelAlbumListUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateLibraryRepresentation:)
-                               name:VLCLibraryModelGenreListUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateLibraryRepresentation:)
-                               name:VLCLibraryModelVideoMediaListUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(updateLibraryRepresentation:)
-                               name:VLCLibraryModelRecentMediaListUpdated
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(shuffleStateUpdated:)
                                name:VLCPlaybackOrderChanged
                              object:nil];
@@ -982,20 +958,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (self.isInNativeFullscreen) {
         [self showControlsBar];
         [_fspanel shouldBecomeInactive:nil];
-    }
-}
-
-#pragma mark - library representation and interaction
-- (void)updateLibraryRepresentation:(NSNotification *)aNotification
-{
-    if (_videoLibraryView.superview != nil) {
-        if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
-            [_libraryVideoCollectionViewsStackViewController reloadData];
-        } else {
-            [_libraryVideoTableViewDataSource reloadData];
-        }
-    } else if (_audioLibraryView.superview != nil) {
-        [_libraryAudioDataSource reloadAppearance];
     }
 }
 
