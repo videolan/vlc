@@ -142,7 +142,8 @@ public: // BaseClipListModel implementation
     bool hasMoreItems() const override;
 
 protected: // Abstract functions
-    // NOTE: This function has to return a comparator for the current sorting parameters.
+    // NOTE: This function is called when we need to update 'm_comparator' based on the current
+    //       sorting parameters.
     virtual void onUpdateSort(const QString & criteria, Qt::SortOrder order) = 0;
 
 protected: // BaseClipListModel implementation
