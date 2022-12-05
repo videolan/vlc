@@ -119,6 +119,12 @@ vout_LTLIBRARIES += \
 	libcaeagl_ios_plugin.la
 endif
 
+libglinterop_gst_mem_plugin_la_SOURCES = video_output/opengl/interop_gst_mem.c \
+	video_output/opengl/interop.h codec/gstreamer/gst_mem.h
+libglinterop_gst_mem_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(GST_VIDEO_CFLAGS) \
+	$(GST_APP_CFLAGS)
+libglinterop_gst_mem_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
+
 libglinterop_vaapi_plugin_la_SOURCES = video_output/opengl/interop_vaapi.c \
 	video_output/opengl/interop.h \
 	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
@@ -134,6 +140,10 @@ if HAVE_GL
 if HAVE_EGL
 if HAVE_VAAPI
 vout_LTLIBRARIES += libglinterop_vaapi_plugin.la
+endif
+
+if HAVE_GST_DECODE
+vout_LTLIBRARIES += libglinterop_gst_mem_plugin.la
 endif
 endif # HAVE_EGL
 
