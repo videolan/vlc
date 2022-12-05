@@ -561,12 +561,15 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
 
     if (!p_dec->fmt_in->video.i_visible_width || !p_dec->fmt_in->video.i_visible_height)
     {
-        unsigned i_width, i_height, i_vis_width, i_vis_height;
+        unsigned i_offset_x, i_offset_y, i_width, i_height, i_vis_width, i_vis_height;
         if (VLC_SUCCESS ==
            hxxx_helper_get_current_picture_size(&h264ctx->hh,
+                                                &i_offset_x, &i_offset_y,
                                                 &i_width, &i_height,
                                                 &i_vis_width, &i_vis_height))
         {
+            p_dec->fmt_out.video.i_x_offset = i_offset_x;
+            p_dec->fmt_out.video.i_y_offset = i_offset_y;
             p_dec->fmt_out.video.i_visible_width = i_vis_width;
             p_dec->fmt_out.video.i_width = vlc_align(i_width, VT_ALIGNMENT);
             p_dec->fmt_out.video.i_visible_height = i_vis_height;
@@ -596,10 +599,10 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     struct vt_h264_context *h264ctx = p_sys->p_codec_context;
     const struct hxxx_helper *hh = &h264ctx->hh;
 
-    unsigned w, h, vw, vh;
+    unsigned ox, oy, w, h, vw, vh;
     int sarn, sard;
 
-    if (hxxx_helper_get_current_picture_size(hh, &w, &h, &vw, &vh) != VLC_SUCCESS)
+    if (hxxx_helper_get_current_picture_size(hh, &ox, &oy, &w, &h, &vw, &vh) != VLC_SUCCESS)
         return true;
 
     if (hxxx_helper_get_current_sar(hh, &sarn, &sard) != VLC_SUCCESS)

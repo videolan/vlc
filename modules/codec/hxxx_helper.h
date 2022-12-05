@@ -112,6 +112,7 @@ block_t * hxxx_helper_get_extradata_chain(const struct hxxx_helper *hh);
 block_t * hxxx_helper_get_extradata_block(const struct hxxx_helper *hh);
 
 int hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
+                                         unsigned *p_ox, unsigned *p_oy,
                                          unsigned *p_w, unsigned *p_h,
                                          unsigned *p_vw, unsigned *p_vh);
 

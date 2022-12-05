@@ -884,8 +884,8 @@ static int OpenDecoder(vlc_object_t *p_this)
             goto error;
         cudaChroma = MapChomaIDC(i_chroma_idc);
 
-        unsigned i_w, i_h, i_vw, i_vh;
-        result = hxxx_helper_get_current_picture_size(&p_sys->hh, &i_w, &i_h, &i_vw, &i_vh);
+        unsigned i_ox, i_oy, i_w, i_h, i_vw, i_vh;
+        result = hxxx_helper_get_current_picture_size(&p_sys->hh, &i_ox, &i_oy, &i_w, &i_h, &i_vw, &i_vh);
         if (result != VLC_SUCCESS)
             goto error;
 
@@ -910,6 +910,9 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         p_dec->fmt_out.video.i_width = vlc_align(i_w, OUTPUT_WIDTH_ALIGN);
         p_dec->fmt_out.video.i_height = i_h;
+
+        p_dec->fmt_out.video.i_x_offset = i_ox;
+        p_dec->fmt_out.video.i_y_offset = i_oy;
 
         if (!p_dec->fmt_in->video.i_visible_width || !p_dec->fmt_in->video.i_visible_height)
         {

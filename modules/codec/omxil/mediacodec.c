@@ -131,6 +131,7 @@ typedef struct decoder_sys_t
             struct android_picture_ctx apic_ctxs[MAX_PIC];
             void *p_surface, *p_jsurface;
             unsigned i_angle;
+            unsigned i_input_offset_x, i_input_offset_y;
             unsigned i_input_width, i_input_height;
             unsigned i_input_visible_width, i_input_visible_height;
             unsigned int i_stride, i_slice_height;
@@ -269,14 +270,16 @@ static void HXXXInitSize(decoder_t *p_dec, bool *p_size_changed)
     {
         decoder_sys_t *p_sys = p_dec->p_sys;
         struct hxxx_helper *hh = &p_sys->video.hh;
-        unsigned i_w, i_h, i_vw, i_vh;
-        if(hxxx_helper_get_current_picture_size(hh, &i_w, &i_h, &i_vw, &i_vh)
+        unsigned i_ox, i_oy, i_w, i_h, i_vw, i_vh;
+        if(hxxx_helper_get_current_picture_size(hh, &i_ox, &i_oy, &i_w, &i_h, &i_vw, &i_vh)
            == VLC_SUCCESS)
         {
             *p_size_changed = (i_w != p_sys->video.i_input_width
                             || i_h != p_sys->video.i_input_height
                             || i_vw != p_sys->video.i_input_visible_width
                             || i_vh != p_sys->video.i_input_visible_height);
+            p_sys->video.i_input_offset_x = i_ox;
+            p_sys->video.i_input_offset_y = i_oy;
             p_sys->video.i_input_width = i_w;
             p_sys->video.i_input_height = i_h;
             p_sys->video.i_input_visible_width = i_vw;

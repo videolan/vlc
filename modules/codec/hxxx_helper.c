@@ -810,17 +810,20 @@ h264_helper_get_current_sps(const struct hxxx_helper *hh)
 
 int
 hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
+                                     unsigned *p_ox, unsigned *p_oy,
                                      unsigned *p_w, unsigned *p_h,
                                      unsigned *p_vw, unsigned *p_vh)
 {
     if(hh->i_codec == VLC_CODEC_H264)
     {
+        *p_ox = *p_oy = 0;
         const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
         if (hsps && h264_get_picture_size(hsps->h264_sps, p_w, p_h, p_vw, p_vh))
                return VLC_SUCCESS;
     }
     else if(hh->i_codec == VLC_CODEC_HEVC)
     {
+        *p_ox = *p_oy = 0;
         const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
         if(hsps && hsps->hevc_sps && hevc_get_picture_size(hsps->hevc_sps, p_w, p_h, p_vw, p_vh))
             return VLC_SUCCESS;
