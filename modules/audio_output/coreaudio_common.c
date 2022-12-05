@@ -146,24 +146,7 @@ GetLatency(audio_output_t *p_aout)
                                    : p_sys->i_dev_latency_ticks;
 
     /* Add the AudioUnit latency to the auhal/audiounit_ios latency */
-    if (p_sys->au != NULL)
-    {
-        Float64 unit_s;
-        if (AudioUnitGetProperty(p_sys->au, kAudioUnitProperty_Latency,
-                                 kAudioUnitScope_Global, 0, &unit_s,
-                                 &(UInt32) { sizeof(unit_s) }) != noErr)
-            unit_s = 0;
-        vlc_tick_t us = vlc_tick_from_sec(unit_s);
-        if (us != p_sys->au_latency_ticks)
-        {
-            msg_Dbg(p_aout, "Adding AudioUnit latency: %" PRId64 "us", us);
-            p_sys->au_latency_ticks = us;
-        }
-
-        dev_latency_ticks += us;
-    }
-
-    return dev_latency_ticks;
+    return dev_latency_ticks + p_sys->au_latency_ticks;
 }
 
 /* Called from render callbacks. No lock, wait, and IO here */
@@ -361,7 +344,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    p_sys->au = NULL;
     p_sys->au_latency_ticks = 0;
     p_sys->i_underrun_size = 0;
     p_sys->b_paused = false;
@@ -874,7 +856,15 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         AudioUnitUninitialize(au);
         return VLC_EGENERIC;
     }
-    p_sys->au = au;
+
+    Float64 unit_s;
+    if (AudioUnitGetProperty(au, kAudioUnitProperty_Latency,
+                             kAudioUnitScope_Global, 0, &unit_s,
+                             &(UInt32) { sizeof(unit_s) }) == noErr)
+    {
+        p_sys->au_latency_ticks = vlc_tick_from_sec(unit_s);
+        msg_Dbg(p_aout, "AudioUnit latency: %" PRId64 "us", p_sys->au_latency_ticks);
+    }
 
     return VLC_SUCCESS;
 }
