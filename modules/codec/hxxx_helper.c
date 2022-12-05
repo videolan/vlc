@@ -822,9 +822,8 @@ hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
     }
     else if(hh->i_codec == VLC_CODEC_HEVC)
     {
-        *p_ox = *p_oy = 0;
         const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
-        if(hsps && hsps->hevc_sps && hevc_get_picture_size(hsps->hevc_sps, p_w, p_h, p_vw, p_vh))
+        if(hsps && hsps->hevc_sps && hevc_get_picture_size(hsps->hevc_sps, p_ox, p_oy, p_w, p_h, p_vw, p_vh))
             return VLC_SUCCESS;
     }
     return VLC_EGENERIC;

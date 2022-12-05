@@ -283,7 +283,9 @@ bool hevc_get_sps_profile_tier_level( const hevc_sequence_parameter_set_t *,
                                       uint8_t *pi_profile, uint8_t *pi_level );
 enum vlc_hevc_profile_e
      hevc_get_vlc_profile( const hevc_sequence_parameter_set_t * );
-bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *, unsigned *p_w, unsigned *p_h,
+bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *,
+                            unsigned *p_ox, unsigned *p_oy,
+                            unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh );
 bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *,
                           const hevc_video_parameter_set_t * /* can be NULL */,

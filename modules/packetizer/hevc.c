@@ -616,16 +616,19 @@ static void ActivateSets(decoder_t *p_dec,
                                          &p_dec->fmt_out.video.color_range);
         }
 
-        unsigned sizes[4];
+        unsigned sizes[6];
         if( hevc_get_picture_size( p_sps, &sizes[0], &sizes[1],
-                                          &sizes[2], &sizes[3] ) )
+                                          &sizes[2], &sizes[3],
+                                          &sizes[4], &sizes[5] ) )
         {
-            p_dec->fmt_out.video.i_width = sizes[0];
-            p_dec->fmt_out.video.i_height = sizes[1];
+            p_dec->fmt_out.video.i_x_offset = sizes[0];
+            p_dec->fmt_out.video.i_y_offset = sizes[1];
+            p_dec->fmt_out.video.i_width = sizes[2];
+            p_dec->fmt_out.video.i_height = sizes[3];
             if(p_dec->fmt_in->video.i_visible_width == 0)
             {
-                p_dec->fmt_out.video.i_visible_width = sizes[2];
-                p_dec->fmt_out.video.i_visible_height = sizes[3];
+                p_dec->fmt_out.video.i_visible_width = sizes[4];
+                p_dec->fmt_out.video.i_visible_height = sizes[5];
             }
         }
 
