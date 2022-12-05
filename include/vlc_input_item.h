@@ -483,6 +483,7 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_FETCH_NETWORK = 0x08,
     META_REQUEST_OPTION_FETCH_ANY     = 0x0C,
     META_REQUEST_OPTION_DO_INTERACT   = 0x10,
+    META_REQUEST_OPTION_NO_SKIP       = 0x20,
 } input_item_meta_request_option_t;
 
 /* status of the on_preparse_ended() callback */
