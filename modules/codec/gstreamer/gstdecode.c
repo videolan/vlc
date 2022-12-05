@@ -34,12 +34,14 @@
 #include <gst/gst.h>
 #include <gst/video/video.h>
 #include <gst/video/gstvideometa.h>
+#include <gst/allocators/gstdmabuf.h>
 
 #include <gst/app/gstappsrc.h>
 #include <gst/gstatomicqueue.h>
 
 #include "gstvlcpictureplaneallocator.h"
 #include "gstvlcvideosink.h"
+#include "gst_mem.h"
 
 typedef struct
 {
@@ -105,6 +107,31 @@ vlc_module_begin( )
     add_bool( "use-vlcpool", false, USEVLCPOOL_TEXT,
         USEVLCPOOL_LONGTEXT )
 vlc_module_end( )
+
+static void gst_mem_pic_context_Destroy( struct picture_context_t *ctx )
+{
+    struct gst_mem_pic_context *gst_mem_ctx = container_of( ctx,
+            struct gst_mem_pic_context, s );
+
+    gst_buffer_unref( gst_mem_ctx->p_buf );
+    free( gst_mem_ctx );
+}
+
+static picture_context_t *gst_mem_pic_context_Copy(
+        struct picture_context_t *ctx )
+{
+    struct gst_mem_pic_context *gst_mem_ctx = container_of( ctx,
+            struct gst_mem_pic_context, s );
+    struct gst_mem_pic_context *gst_mem_ctx_copy = calloc( 1,
+            sizeof( *gst_mem_ctx_copy ) );
+    if( unlikely( gst_mem_ctx_copy == NULL ) )
+        return NULL;
+
+    *gst_mem_ctx_copy = *gst_mem_ctx;
+    gst_buffer_ref( gst_mem_ctx_copy->p_buf );
+
+    return &gst_mem_ctx_copy->s;
+}
 
 void gst_vlc_dec_ensure_empty_queue( decoder_t *p_dec )
 {
@@ -806,13 +833,67 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         GstBuffer *p_buf = GST_BUFFER_CAST(
                 gst_atomic_queue_pop( p_sys->p_que ));
         GstMemory *p_mem;
+        p_mem = gst_buffer_peek_memory( p_buf, 0 );
 
-        if(( p_mem = gst_buffer_peek_memory( p_buf, 0 )) &&
+        bool b_copy_picture = true;
+
+        if( p_mem &&
             GST_IS_VLC_PICTURE_PLANE_ALLOCATOR( p_mem->allocator ))
         {
+            b_copy_picture = false;
             p_pic = picture_Hold(( (GstVlcPicturePlane*) p_mem )->p_pic );
         }
-        else
+        else if( p_mem && gst_is_dmabuf_memory(p_mem) )
+        {
+            b_copy_picture = false;
+
+            switch( p_dec->fmt_out.video.i_chroma ) {
+            case VLC_CODEC_NV12:
+                p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec =
+                    VLC_CODEC_GST_MEM_OPAQUE;
+                break;
+            case VLC_CODEC_GST_MEM_OPAQUE:
+                break;
+            /* fallback */
+            default:
+                b_copy_picture = true;
+            }
+
+            if( !b_copy_picture )
+            {
+                /* Get a new picture */
+                if( decoder_UpdateVideoFormat( p_dec ) )
+                {
+                    gst_buffer_unref( p_buf );
+                    goto done;
+                }
+                p_pic = decoder_NewPicture( p_dec );
+                if( !p_pic )
+                {
+                    gst_buffer_unref( p_buf );
+                    goto done;
+                }
+
+                struct gst_mem_pic_context *pctx = calloc( 1, sizeof( *pctx ) );
+                if( unlikely( pctx == NULL ) )
+                {
+                    gst_buffer_unref( p_buf );
+                    return VLCDEC_ECRITICAL;
+                }
+
+                pctx->s = ( picture_context_t ) {
+                    gst_mem_pic_context_Destroy, gst_mem_pic_context_Copy,
+                    NULL,
+                };
+
+                pctx->p_buf = p_buf;
+                gst_buffer_ref( p_buf );
+
+                p_pic->context = &pctx->s;
+            }
+        }
+
+        if( b_copy_picture )
         {
             GstVideoFrame frame;
 

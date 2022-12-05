@@ -2484,7 +2484,7 @@ AC_ARG_ENABLE([gst-decode],
 have_gst_decode="no"
 AS_IF([test "${enable_gst_decode}" != "no"], [
   PKG_CHECK_MODULES([GST_APP], [gstreamer-app-1.0], [
-    PKG_CHECK_MODULES([GST_VIDEO], [gstreamer-video-1.0], [
+    PKG_CHECK_MODULES([GST_VIDEO], [gstreamer-video-1.0 gstreamer-allocators-1.0], [
       have_gst_decode="yes"
     ], [
       AC_MSG_WARN([${GST_VIDEO_PKG_ERRORS}. GStreamer decoder module will not be built.])
