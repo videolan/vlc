@@ -166,6 +166,10 @@ typedef enum libvlc_media_parse_flag_t
      * when the input is asking for credentials.
      */
     libvlc_media_do_interact    = 0x08,
+    /**
+     * Force parsing the media even if it would be skipped.
+     */
+    libvlc_media_no_skip        = 0x10,
 } libvlc_media_parse_flag_t;
 
 /**
