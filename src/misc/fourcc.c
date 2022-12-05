@@ -835,6 +835,8 @@ static const struct
 
     { { VLC_CODEC_CVPX_P010, 0 },              FAKE_FMT() },
 
+    { { VLC_CODEC_GST_MEM_OPAQUE, 0 },         FAKE_FMT() },
+
     { { VLC_CODEC_VAAPI_420, VLC_CODEC_VAAPI_420_10BPP },
                                                FAKE_FMT() },
 

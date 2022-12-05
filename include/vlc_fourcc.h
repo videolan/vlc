@@ -439,6 +439,9 @@
 #define VLC_CODEC_CVPX_BGRA       VLC_FOURCC('C','V','P','B')
 #define VLC_CODEC_CVPX_P010       VLC_FOURCC('C','V','P','P')
 
+/* GStreamer Memory opaque buffer type */
+#define VLC_CODEC_GST_MEM_OPAQUE  VLC_FOURCC('G','S','T','M')
+
 /* Image codec (video) */
 #define VLC_CODEC_PNG             VLC_FOURCC('p','n','g',' ')
 #define VLC_CODEC_PPM             VLC_FOURCC('p','p','m',' ')
