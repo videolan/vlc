@@ -148,6 +148,35 @@ static gboolean seek_data_cb( GstAppSrc *p_src, guint64 l_offset,
     return TRUE;
 }
 
+/* Emitted by decodebin when an autoplugged element not yet
+ * downstream-linked does a query.
+ * Used here for format and allocator negotiation. */
+static gboolean autoplug_query_cb( GstElement *p_bin, GstPad *p_pad,
+                                   GstElement *p_element, GstQuery *p_query,
+                                   gpointer p_data )
+{
+    VLC_UNUSED( p_bin );
+    decoder_t *p_dec = p_data;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( ( p_pad->direction == GST_PAD_SRC ) &&
+        GST_IS_VIDEO_DECODER( p_element ) )
+    {
+        switch( GST_QUERY_TYPE ( p_query ) ){
+        case GST_QUERY_CAPS:
+            return gst_vlc_video_sink_query_caps( p_query );
+        case GST_QUERY_ALLOCATION:
+            GstBaseSink *p_bsink = GST_BASE_SINK_CAST( p_sys->p_decode_out );
+            GstBaseSinkClass *p_bclass = GST_BASE_SINK_GET_CLASS( p_bsink );
+            return p_bclass->propose_allocation( p_bsink, p_query );
+        default:
+            return FALSE;
+        }
+    }
+
+    return FALSE;
+}
+
 /* Emitted by decodebin and links decodebin to vlcvideosink.
  * Since only one elementary codec stream is fed to decodebin,
  * this signal cannot be emitted more than once. */
@@ -564,6 +593,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         g_signal_connect( G_OBJECT( p_sys->p_decode_in ), "pad-added",
                 G_CALLBACK( pad_added_cb ), p_dec );
 
+        g_signal_connect( G_OBJECT( p_sys->p_decode_in ), "autoplug-query",
+                G_CALLBACK( autoplug_query_cb ), p_dec );
     }
 
     /* videosink: will emit signal for every available buffer */
@@ -803,6 +834,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             gst_CopyPicture( p_pic, &frame );
             gst_video_frame_unmap( &frame );
         }
+
+        if( p_pic != NULL )
+            p_pic->b_progressive = ( p_sys->vinfo.interlace_mode ==
+                                     GST_VIDEO_INTERLACE_MODE_PROGRESSIVE );
 
         if( likely( GST_BUFFER_PTS_IS_VALID( p_buf ) ) )
             p_pic->date = gst_util_uint64_scale(

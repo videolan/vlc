@@ -81,4 +81,6 @@ struct _GstVlcVideoSinkClass
 
 GType gst_vlc_video_sink_get_type (void);
 
+gboolean gst_vlc_video_sink_query_caps( GstQuery *p_query );
+
 #endif /* __GST_VLC_VIDEO_SINK_H__ */

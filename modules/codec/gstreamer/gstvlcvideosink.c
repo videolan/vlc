@@ -25,6 +25,7 @@
  *****************************************************************************/
 #include "gstvlcvideopool.h"
 #include "gstvlcvideosink.h"
+#include "gstvlcpictureplaneallocator.h"
 
 #include <vlc_common.h>
 
@@ -57,7 +58,9 @@ static GstStaticPadTemplate sink_template =
 static gboolean gst_vlc_video_sink_setcaps( GstBaseSink *p_bsink,
         GstCaps *p_caps );
 static gboolean gst_vlc_video_sink_propose_allocation( GstBaseSink *p_bsink,
-        GstQuery *p_query);
+        GstQuery *p_query );
+static gboolean gst_vlc_video_sink_query( GstBaseSink *p_bsink,
+        GstQuery *p_query );
 static GstFlowReturn gst_vlc_video_sink_chain( GstBaseSink *p_vsink,
         GstBuffer *p_buffer );
 
@@ -126,6 +129,8 @@ static void gst_vlc_video_sink_class_init( GstVlcVideoSinkClass *p_klass )
     p_gstbasesink_class->set_caps = gst_vlc_video_sink_setcaps;
     p_gstbasesink_class->propose_allocation =
         gst_vlc_video_sink_propose_allocation;
+
+    p_gstbasesink_class->query = gst_vlc_video_sink_query;
 
     p_gstbasesink_class->render = gst_vlc_video_sink_chain;
 }
@@ -260,6 +265,52 @@ invalid_caps:
         msg_Err( p_vsink->p_dec, "invalid caps in allocation query" );
         return FALSE;
     }
+}
+
+gboolean gst_vlc_video_sink_query_caps( GstQuery *p_query )
+{
+    GstCaps *p_query_caps;
+    gst_query_parse_caps( p_query, &p_query_caps );
+
+    if( p_query_caps == NULL )
+        return FALSE;
+
+    /* gst_caps_normalize takes ownership of the cap  */
+    gst_caps_ref( p_query_caps );
+    GstCaps *p_normalized = gst_caps_normalize( p_query_caps );
+    p_normalized = gst_caps_make_writable( p_normalized );
+
+    guint i = 0;
+    while( i < gst_caps_get_size( p_normalized ) )
+    {
+        GstStructure *p_str = gst_caps_get_structure( p_normalized, i );
+        const char* psz_fourcc = gst_structure_get_string( p_str, "format" );
+
+        if( ( psz_fourcc != NULL ) && gst_vlc_to_map_format( psz_fourcc ) ==
+                                          VLC_CODEC_UNKNOWN )
+        {
+            gst_caps_remove_structure( p_normalized, i );
+        }
+        else
+        {
+            i++;
+        }
+    }
+
+    gst_query_set_caps_result( p_query, p_normalized );
+
+    return TRUE;
+}
+
+static gboolean gst_vlc_video_sink_query( GstBaseSink *p_bsink,
+        GstQuery *p_query )
+{
+    if( GST_QUERY_TYPE( p_query ) == GST_QUERY_CAPS )
+    {
+        return gst_vlc_video_sink_query_caps( p_query );
+    }
+
+    return GST_BASE_SINK_CLASS( parent_class )->query( p_bsink, p_query );
 }
 
 static GstFlowReturn gst_vlc_video_sink_chain( GstBaseSink *p_bsink,
