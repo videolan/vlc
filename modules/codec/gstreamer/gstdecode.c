@@ -818,10 +818,16 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
             /* Get a new picture */
             if( decoder_UpdateVideoFormat( p_dec ) )
+            {
+                gst_buffer_unref( p_buf );
                 goto done;
+            }
             p_pic = decoder_NewPicture( p_dec );
             if( !p_pic )
+            {
+                gst_buffer_unref( p_buf );
                 goto done;
+            }
 
             if( unlikely( !gst_video_frame_map( &frame,
                             &p_sys->vinfo, p_buf, GST_MAP_READ ) ) )
