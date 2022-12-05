@@ -228,7 +228,9 @@ private:
         }
 
         // add back shadows
-        const MARGINS m {0, 0, (m_useClientSideDecoration ? 1 : 0) /* top margin */ , 0};
+        // with positive margins, snap layouts menu (windows 11) won't appear
+        const int margin = (m_useClientSideDecoration ? - 1 : 0);
+        const MARGINS m {margin, margin, margin, margin};
         DwmExtendFrameIntoClientArea(winId, &m);
 
         SetWindowPos(winId, NULL, 0, 0, 0, 0,
