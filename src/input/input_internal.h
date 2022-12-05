@@ -153,7 +153,6 @@ typedef enum input_event_type_e
     INPUT_EVENT_BUFFER_CLEARED = 0x1000,
     INPUT_EVENT_VOUT_FRAME_DISPLAYED,
     INPUT_EVENT_VOUT_CAPTIONS_TO_DISPLAY,
-    INPUT_EVENT_AOUT_LATENCY,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -329,8 +328,6 @@ struct vlc_input_event
         float subs_fps;
         /* INPUT_EVENT_THUMBNAIL_READY */
         picture_t *thumbnail;
-        /* INPUT_EVENT_AOUT_LATENCY */
-        vlc_tick_t latency;
     };
 };
 

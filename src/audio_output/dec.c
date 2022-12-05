@@ -100,9 +100,6 @@ struct vlc_aout_stream
     atomic_uint buffers_lost;
     atomic_uint buffers_played;
     _Atomic vlc_tick_t latency;
-    vlc_tick_t last_latency;
-    void (*on_new_latency_cb)(vlc_tick_t tick, void *data);
-    void *cb_data;
 };
 
 static inline aout_owner_t *aout_stream_owner(vlc_aout_stream *stream)
@@ -170,7 +167,6 @@ static void stream_Discontinuity(vlc_aout_stream *stream)
     stream->timing.audio_ts = VLC_TICK_INVALID;
     vlc_mutex_unlock(&stream->timing.lock);
     stream->timing.played_samples = 0;
-    stream->last_latency = VLC_TICK_INVALID;
 }
 
 static void stream_Reset(vlc_aout_stream *stream)
@@ -257,9 +253,6 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     if (stream == NULL)
         return NULL;
     stream->instance = aout_instance(p_aout);
-
-    stream->on_new_latency_cb = cfg->on_new_latency_cb;
-    stream->cb_data = cfg->cb_data;
 
     stream->volume = NULL;
     if (!owner->bitexact)
@@ -678,13 +671,6 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
 
 void vlc_aout_stream_NotifyLatency(vlc_aout_stream *stream, vlc_tick_t latency)
 {
-    if (stream->last_latency == latency)
-        return;
-    stream->last_latency = latency;
-
-    if (stream->on_new_latency_cb != NULL)
-        stream->on_new_latency_cb(latency, stream->cb_data);
-
     atomic_store_explicit(&stream->latency, latency, memory_order_relaxed);
 }
 

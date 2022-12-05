@@ -179,7 +179,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         {
             /* Write silence to reach the first play date */
             vlc_tick_t silence_ticks = p_sys->first_play_date - end_ticks
-                                     + bytes_ticks;
+                                     - GetLatency(p_aout) + bytes_ticks;
             if (silence_ticks > 0)
             {
                 tocopy = TicksToBytes(p_sys, silence_ticks);
@@ -219,9 +219,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         {
             p_sys->timing_report_last_written_bytes = 0;
             vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes);
-            const vlc_tick_t latency_ticks = GetLatency(p_aout);
-            aout_LatencyReport(p_aout, latency_ticks);
-            aout_TimingReport(p_aout, end_ticks, pos_ticks);
+            aout_TimingReport(p_aout, end_ticks + GetLatency(p_aout), pos_ticks);
         }
         else
             p_sys->timing_report_last_written_bytes += tocopy;
