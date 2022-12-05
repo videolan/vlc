@@ -816,9 +816,8 @@ hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
 {
     if(hh->i_codec == VLC_CODEC_H264)
     {
-        *p_ox = *p_oy = 0;
         const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
-        if (hsps && h264_get_picture_size(hsps->h264_sps, p_w, p_h, p_vw, p_vh))
+        if (hsps && h264_get_picture_size(hsps->h264_sps, p_ox, p_oy, p_w, p_h, p_vw, p_vh))
                return VLC_SUCCESS;
     }
     else if(hh->i_codec == VLC_CODEC_HEVC)

@@ -205,7 +205,10 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
         p_dec->fmt_out.i_profile = p_sps->i_profile;
         p_dec->fmt_out.i_level = p_sps->i_level;
 
-        (void) h264_get_picture_size( p_sps, &p_dec->fmt_out.video.i_width,
+        (void) h264_get_picture_size( p_sps,
+                                      &p_dec->fmt_out.video.i_x_offset,
+                                      &p_dec->fmt_out.video.i_y_offset,
+                                      &p_dec->fmt_out.video.i_width,
                                       &p_dec->fmt_out.video.i_height,
                                       &p_dec->fmt_out.video.i_visible_width,
                                       &p_dec->fmt_out.video.i_visible_height );
