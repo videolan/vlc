@@ -98,6 +98,7 @@ enum vlc_video_context_type
     VLC_VIDEO_CONTEXT_NVDEC,     //!< empty
     VLC_VIDEO_CONTEXT_CVPX,      //!< private: cvpx_video_context*
     VLC_VIDEO_CONTEXT_MMAL,      //!< empty
+    VLC_VIDEO_CONTEXT_GSTDECODE, //!< empty
 };
 
 VLC_API vlc_video_context * vlc_video_context_Create(vlc_decoder_device *,

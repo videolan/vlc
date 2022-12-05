@@ -172,6 +172,12 @@ Open(vlc_object_t *obj)
     struct vlc_gl_interop *interop = (void *) obj;
     struct priv *priv = NULL;
 
+    if (interop->vctx == NULL)
+        return VLC_EGENERIC;
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
+    if (dec_device->type != VLC_DECODER_DEVICE_GSTDECODE)
+        goto error;
+
     priv = interop->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
         goto error;
@@ -251,9 +257,12 @@ Open(vlc_object_t *obj)
     };
     interop->ops = &ops;
 
+    vlc_decoder_device_Release(dec_device);
+
     return VLC_SUCCESS;
 
 error:
+    vlc_decoder_device_Release(dec_device);
     free(priv);
     return VLC_EGENERIC;
 }

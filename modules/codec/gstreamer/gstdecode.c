@@ -58,6 +58,8 @@ typedef struct
     GstAtomicQueue *p_que;
     bool b_prerolled;
     bool b_running;
+
+    vlc_video_context *vctx;
 } decoder_sys_t;
 
 typedef struct
@@ -73,6 +75,7 @@ static int  OpenDecoder( vlc_object_t* );
 static void CloseDecoder( vlc_object_t* );
 static int  DecodeBlock( decoder_t*, block_t* );
 static void Flush( decoder_t * );
+static int OpenDecoderDevice( vlc_decoder_device*, vlc_window_t* );
 
 #define MODULE_DESCRIPTION N_( "Uses GStreamer framework's plugins " \
         "to decode the media codecs" )
@@ -106,6 +109,9 @@ vlc_module_begin( )
         USEDECODEBIN_LONGTEXT )
     add_bool( "use-vlcpool", false, USEVLCPOOL_TEXT,
         USEVLCPOOL_LONGTEXT )
+    add_submodule( )
+        set_callback_dec_device( OpenDecoderDevice, 100 )
+        add_shortcut( "gstdecode" )
 vlc_module_end( )
 
 static void gst_mem_pic_context_Destroy( struct picture_context_t *ctx )
@@ -128,6 +134,7 @@ static picture_context_t *gst_mem_pic_context_Copy(
         return NULL;
 
     *gst_mem_ctx_copy = *gst_mem_ctx;
+    vlc_video_context_Hold( gst_mem_ctx_copy->s.vctx );
     gst_buffer_ref( gst_mem_ctx_copy->p_buf );
 
     return &gst_mem_ctx_copy->s;
@@ -681,6 +688,20 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode = DecodeBlock;
     p_dec->pf_flush  = Flush;
 
+    vlc_decoder_device *dec_device = decoder_GetDecoderDevice( p_dec );
+    if( dec_device == NULL )
+    {
+        msg_Err( p_dec, "failed to get a decoder device" );
+        goto fail;
+    }
+    p_sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_GSTDECODE, 0, NULL );
+    vlc_decoder_device_Release( dec_device );
+    if( unlikely( p_sys->vctx == NULL ) )
+    {
+        msg_Err( p_dec, "failed to create a video context" );
+        goto fail;
+    }
+
     return VLC_SUCCESS;
 
 fail:
@@ -862,7 +883,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             if( !b_copy_picture )
             {
                 /* Get a new picture */
-                if( decoder_UpdateVideoFormat( p_dec ) )
+                if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
                 {
                     gst_buffer_unref( p_buf );
                     goto done;
@@ -883,8 +904,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
                 pctx->s = ( picture_context_t ) {
                     gst_mem_pic_context_Destroy, gst_mem_pic_context_Copy,
-                    NULL,
+                    p_sys->vctx,
                 };
+                vlc_video_context_Hold( pctx->s.vctx );
 
                 pctx->p_buf = p_buf;
                 gst_buffer_ref( p_buf );
@@ -1014,5 +1036,22 @@ static void CloseDecoder( vlc_object_t *p_this )
     if( p_sys->p_decoder )
         gst_object_unref( p_sys->p_decoder );
 
+    if( p_sys->vctx )
+        vlc_video_context_Release( p_sys->vctx );
+
     free( p_sys );
+}
+
+static const struct vlc_decoder_device_operations gstdecode_device_ops = {
+    .close = NULL,
+};
+
+static int OpenDecoderDevice(vlc_decoder_device *device, vlc_window_t *window)
+{
+    VLC_UNUSED(window);
+
+    device->ops = &gstdecode_device_ops;
+    device->type = VLC_DECODER_DEVICE_GSTDECODE;
+
+    return VLC_SUCCESS;
 }
