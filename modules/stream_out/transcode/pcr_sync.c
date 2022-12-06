@@ -63,6 +63,7 @@ struct es_data
     vlc_tick_t last_input_dts;
     vlc_tick_t last_output_dts;
     vlc_tick_t discontinuity;
+    pcr_event_t *last_pcr_event;
 };
 
 static inline struct es_data es_data_Init()
@@ -246,6 +247,8 @@ void vlc_pcr_sync_DelESID(vlc_pcr_sync_t *pcr_sync, unsigned int id)
 
 #define pcr_event_FirstEntry(head)                                                                 \
     vlc_list_first_entry_or_null(head, pcr_event_t, node)
+#define pcr_event_NextEntry(head, entry)                                                           \
+    vlc_list_next_entry_or_null(head, entry, pcr_event_t, node)
 
 vlc_tick_t
 vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const vlc_frame_t *frame)
@@ -256,7 +259,9 @@ vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const 
     assert(!es->is_deleted);
     es->last_output_dts = frame->i_dts;
 
-    pcr_event_t *pcr_event = pcr_event_FirstEntry(&pcr_sync->pcr_events);
+    pcr_event_t *pcr_event = (es->last_pcr_event == NULL)
+                                 ? pcr_event_FirstEntry(&pcr_sync->pcr_events)
+                                 : es->last_pcr_event;
     if (pcr_event == NULL)
         goto no_pcr;
 
@@ -265,47 +270,26 @@ vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const 
     const vlc_tick_t pcr = pcr_event->pcr;
 
     if (pcr_event->no_frame_before)
+    {
+        es->last_pcr_event = pcr_event_NextEntry(&pcr_sync->pcr_events, pcr_event);
         goto return_pcr;
+    }
 
     assert(pcr_event->entries_left != 0);
+
     struct es_dts_entry *dts_entry = &pcr_event->es_last_dts_entries.data[id];
-    const vlc_tick_t last_dts = dts_entry->dts;
 
-    // Handle scenarios where the current track is ahead of the others in a big way.
-    // When it happen, the PCR threshold of the current track has already been reached and we need
-    // to keep checking the DTS with the next pcr_events entries.
-    if (last_dts == VLC_TICK_INVALID)
-    {
-        pcr_event_t *it;
-        vlc_list_foreach(it, &pcr_sync->pcr_events, node)
-        {
-            if (it == pcr_event)
-                continue;
-
-            struct es_dts_entry *entry = &it->es_last_dts_entries.data[id];
-            if (entry->dts == VLC_TICK_INVALID || entry->passed)
-                continue;
-            if (entry->discontinuity != VLC_TICK_INVALID && frame->i_dts > entry->discontinuity)
-                break;
-            if (frame->i_dts < entry->dts)
-                break;
-
-            entry->passed = true;
-            --it->entries_left;
-            assert(it->entries_left != 0);
-        }
-        goto no_pcr;
-    }
     if (dts_entry->discontinuity != VLC_TICK_INVALID && frame->i_dts > dts_entry->discontinuity)
         goto no_pcr;
 
-    if (frame->i_dts < last_dts)
+    if (frame->i_dts < dts_entry->dts)
         goto no_pcr;
 
     if (dts_entry->passed)
         goto no_pcr;
 
     dts_entry->passed = true;
+    es->last_pcr_event = pcr_event_NextEntry(&pcr_sync->pcr_events, pcr_event);
     if (--pcr_event->entries_left != 0)
         goto no_pcr;
 
