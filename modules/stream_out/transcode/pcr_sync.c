@@ -302,6 +302,9 @@ vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const 
     if (frame->i_dts < last_dts)
         goto no_pcr;
 
+    if (dts_entry->passed)
+        goto no_pcr;
+
     dts_entry->passed = true;
     if (--pcr_event->entries_left != 0)
         goto no_pcr;
