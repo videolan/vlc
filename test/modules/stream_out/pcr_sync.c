@@ -276,6 +276,52 @@ static void test_SubsequentPCR(vlc_pcr_sync_t *sync)
     assert(vlc_pcr_sync_SignalFrameOutput(sync, id, &frame) == VLC_TICK_INVALID);
 }
 
+static void test_LateTrack(vlc_pcr_sync_t *sync)
+{
+    unsigned audio, video;
+    assert(vlc_pcr_sync_NewESID(sync, &audio) == VLC_SUCCESS);
+    assert(vlc_pcr_sync_NewESID(sync, &video) == VLC_SUCCESS);
+
+    for (vlc_tick_t dts = 0; dts < 100; ++dts )
+    {
+        if (dts % 2 == 0)
+        {
+            const vlc_frame_t v_frame = {.i_dts = dts + 1};
+            vlc_pcr_sync_SignalFrame(sync, video, &v_frame);
+        }
+        const vlc_frame_t a_frame = {.i_dts = dts + 1};
+        vlc_pcr_sync_SignalFrame(sync, audio, &a_frame);
+        if (dts % 10 == 0)
+            assert(vlc_pcr_sync_SignalPCR(sync, dts + 1) == VLC_SUCCESS);
+    }
+
+    // Unqueue the audio frames first to mimic fast decoding
+    for (vlc_tick_t dts = 0; dts < 100; ++dts)
+    {
+        const vlc_frame_t a_frame = {.i_dts = dts + 1};
+        const vlc_tick_t pcr =
+            vlc_pcr_sync_SignalFrameOutput(sync, audio, &a_frame);
+        assert(pcr == VLC_TICK_INVALID);
+    }
+
+    for (vlc_tick_t dts = 0; dts < 100; ++dts )
+    {
+        if (dts % 2 != 0)
+            continue;
+
+        const vlc_frame_t v_frame = {.i_dts = dts + 1};
+        const vlc_tick_t pcr =
+            vlc_pcr_sync_SignalFrameOutput(sync, video, &v_frame);
+        if (dts % 10 == 0)
+            assert(pcr == dts + 1);
+        else
+            assert(pcr == VLC_TICK_INVALID);
+    }
+
+    vlc_pcr_sync_DelESID(sync, audio);
+    vlc_pcr_sync_DelESID(sync, video);
+}
+
 static void test_PCRHelper(void (*test)(vlc_pcr_sync_t *,
                                         transcode_track_pcr_helper_t *))
 {
@@ -423,6 +469,7 @@ int main()
     test_Run(test_FastForwardMiddleOfStream);
     test_Run(test_OneTrackWithDelay);
     test_Run(test_SubsequentPCR);
+    test_Run(test_LateTrack);
     test_PCRHelper(test_PCRHelperSimple);
     test_PCRHelper(test_PCRHelperMultipleTracks);
     test_PCRHelper(test_PCRHelperSplitFrameOutput);
