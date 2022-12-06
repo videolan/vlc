@@ -122,7 +122,7 @@ static int test_packetize(const char *run,
             if(out)
             {
                 fprintf(stderr, "block #%u dts %"PRId64
-                                " flags %x sz %"PRId64"\n",
+                                " flags %x sz %zu""\n",
                         i_count, out->i_dts,
                         out->i_flags, out->i_buffer );
                 block_ChainLastAppend(&outappend, out);
