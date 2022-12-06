@@ -42,6 +42,12 @@
 #include "darwin/runloop.h"
 #endif
 
+#include <poll.h>
+#include <vlc_network.h>
+#include <vlc_tracer.h>
+static void *
+SyncOne2Thread(void *data);
+
 static_assert(VLC_PLAYER_CAP_SEEK == VLC_INPUT_CAPABILITIES_SEEKABLE &&
               VLC_PLAYER_CAP_PAUSE == VLC_INPUT_CAPABILITIES_PAUSEABLE &&
               VLC_PLAYER_CAP_CHANGE_RATE == VLC_INPUT_CAPABILITIES_CHANGE_RATE &&
@@ -1968,6 +1974,13 @@ vlc_player_Delete(vlc_player_t *player)
 
     assert(!vlc_mutex_held(&player->lock));
 
+    if (player->syncone2_interrupt != NULL)
+    {
+        vlc_interrupt_kill(player->syncone2_interrupt);
+        vlc_join(player->syncone2_th, NULL);
+    }
+
+
     vlc_object_delete(player);
 }
 
@@ -2112,6 +2125,23 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
         goto error;
     }
 
+    struct vlc_tracer *tracer = vlc_object_get_tracer(VLC_OBJECT(player));
+    int64_t syncone_port = var_InheritInteger(player, "syncone2-listen-port");
+    player->syncone2_interrupt = NULL;
+    if (tracer != NULL && syncone_port > 0 && syncone_port <= 65535)
+    {
+        player->syncone2_interrupt = vlc_interrupt_create();
+        if (player->syncone2_interrupt != NULL)
+        {
+            int ret = vlc_clone(&player->syncone2_th, SyncOne2Thread, player);
+            if (ret != 0)
+            {
+                vlc_interrupt_destroy(player->syncone2_interrupt);
+                player->syncone2_interrupt = NULL;
+            }
+        }
+    }
+
     return player;
 
 error:
@@ -2139,4 +2169,75 @@ vlc_player_ClearBuffer(vlc_player_t *player)
         return;
 
     input_ClearBuffer(input->thread);
+}
+
+static void *
+SyncOne2Thread(void *data)
+{
+    vlc_player_t *player = data;
+    struct vlc_tracer *tracer = vlc_object_get_tracer(VLC_OBJECT(player));
+    assert(tracer != NULL);
+
+    vlc_thread_set_name("SyncOne2");
+    vlc_interrupt_set(player->syncone2_interrupt);
+
+    int64_t port = var_InheritInteger(player, "syncone2-listen-port");
+    if (port <= 0 || port > 65535)
+        return NULL;
+
+    int fd = net_ListenUDP1(VLC_OBJECT(player), NULL, port);
+    if (fd < 0)
+    {
+        msg_Err(player, "SyncOne2: Failing to open UDP socket on port %"PRId64, port);
+        return NULL;
+    }
+    msg_Info(player, "SyncOne2: Listening on port %"PRId64, port);
+
+    while (true)
+    {
+        char buffer[1024];
+        const size_t size = sizeof(buffer);
+
+        struct pollfd ufd = { .fd = fd, .events = POLLIN, };
+
+        if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        {
+            msg_Warn(player, "SyncOne2: stopping thread, reason: %s",
+                     vlc_strerror_c(errno));
+            break;
+        }
+
+        struct sockaddr_storage from;
+        socklen_t fromlen = sizeof (from);
+        ssize_t ret = recvfrom(fd, buffer, size, 0, (struct sockaddr *)&from,
+                               &fromlen);
+
+        if (ret <= 0)
+            break;
+
+        long result = LONG_MAX;
+        for (size_t i = 0; i < size; ++i)
+        {
+            if (buffer[i] == '\r')
+            {
+                buffer[i] = '\0';
+                result = strtol(buffer, NULL, 10);
+                break;
+            }
+        }
+
+        if (result == LONG_MAX || result == LONG_MIN)
+        {
+            msg_Warn(player, "SyncOne2: received bad data: '%s'", buffer);
+            continue;
+        }
+
+        vlc_tick_t delay_ticks = VLC_TICK_FROM_MS(result);
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", "SyncOne2"),
+                         VLC_TRACE("delay", delay_ticks), VLC_TRACE_END);
+    }
+
+    net_Close(fd);
+
+    return NULL;
 }

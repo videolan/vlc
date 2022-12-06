@@ -1978,6 +1978,9 @@ vlc_module_begin ()
                  CLOCK_MASTER_TEXT, CLOCK_MASTER_LONGTEXT )
         change_string_list( ppsz_clock_master_values, ppsz_clock_master_descriptions )
 
+    add_integer("syncone2-listen-port", 0, NULL, NULL);
+        change_integer_range( 1, 65535 )
+
     add_directory("input-record-path", NULL,
                   INPUT_RECORD_PATH_TEXT, INPUT_RECORD_PATH_LONGTEXT)
     add_bool( "input-record-native", true, INPUT_RECORD_NATIVE_TEXT,

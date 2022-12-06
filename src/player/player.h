@@ -288,6 +288,9 @@ struct vlc_player_t
     } destructor;
 
     struct vlc_player_timer timer;
+
+    vlc_thread_t syncone2_th;
+    vlc_interrupt_t *syncone2_interrupt;
 };
 
 #ifndef NDEBUG
