@@ -220,8 +220,6 @@ static const struct vlc_tracer_operations *Open(vlc_object_t *obj,
     if (unlikely(sys == NULL))
         return NULL;
 
-    const struct vlc_tracer_operations *ops = &json_ops;
-
     const char *filename = JSON_FILENAME;
 
     char *path = var_InheritString(obj, "json-tracer-file");
@@ -256,7 +254,7 @@ static const struct vlc_tracer_operations *Open(vlc_object_t *obj,
     setvbuf(sys->stream, NULL, _IOLBF, 0);
 
     *sysp = sys;
-    return ops;
+    return &json_ops;
 }
 
 #define LOGFILE_NAME_TEXT N_("Log filename")
