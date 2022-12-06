@@ -121,9 +121,9 @@ static int test_packetize(const char *run,
             out = p->pf_packetize(p, in ? &in : NULL);
             if(out)
             {
-                fprintf(stderr, "block #%u dts %"PRId64" sz %"PRId64
+                fprintf(stderr, "block #%u dts %"PRId64
                                 " flags %x sz %"PRId64"\n",
-                        i_count, out->i_dts, out->i_buffer,
+                        i_count, out->i_dts,
                         out->i_flags, out->i_buffer );
                 block_ChainLastAppend(&outappend, out);
                 ++i_count;
