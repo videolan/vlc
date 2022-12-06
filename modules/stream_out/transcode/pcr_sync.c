@@ -244,6 +244,9 @@ void vlc_pcr_sync_DelESID(vlc_pcr_sync_t *pcr_sync, unsigned int id)
     vlc_mutex_unlock(&pcr_sync->lock);
 }
 
+#define pcr_event_FirstEntry(head)                                                                 \
+    vlc_list_first_entry_or_null(head, pcr_event_t, node)
+
 vlc_tick_t
 vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const vlc_frame_t *frame)
 {
@@ -253,8 +256,7 @@ vlc_pcr_sync_SignalFrameOutput(vlc_pcr_sync_t *pcr_sync, unsigned int id, const 
     assert(!es->is_deleted);
     es->last_output_dts = frame->i_dts;
 
-    pcr_event_t *pcr_event = vlc_list_first_entry_or_null(&pcr_sync->pcr_events, pcr_event_t, node);
-
+    pcr_event_t *pcr_event = pcr_event_FirstEntry(&pcr_sync->pcr_events);
     if (pcr_event == NULL)
         goto no_pcr;
 
