@@ -42,6 +42,7 @@
 
 #include <atomic>
 
+class CSDButtonModel;
 class QSettings;
 class QCloseEvent;
 class QKeyEvent;
@@ -142,6 +143,7 @@ public:
 
 };
 
+
 class MainCtx : public QObject
 {
     Q_OBJECT
@@ -175,6 +177,8 @@ class MainCtx : public QObject
     Q_PROPERTY(QScreen* screen READ screen NOTIFY screenChanged)
     Q_PROPERTY(bool useGlobalShortcuts READ getUseGlobalShortcuts WRITE setUseGlobalShortcuts NOTIFY useGlobalShortcutsChanged FINAL)
     Q_PROPERTY(int maxVolume READ maxVolume NOTIFY maxVolumeChanged FINAL)
+
+    Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -290,6 +294,8 @@ public:
 
     Q_INVOKABLE static void setAttachedToolTip(QObject* toolTip);
 
+    CSDButtonModel *csdButtonModel() { return m_csdButtonModel.get(); }
+
 protected:
     /* Systray */
     void createSystray();
@@ -359,6 +365,8 @@ protected:
     bool m_preferHotkeys = false;
 
     int m_maxVolume = 125;
+
+    std::unique_ptr<CSDButtonModel> m_csdButtonModel;
 
 public slots:
     void toggleUpdateSystrayMenu();

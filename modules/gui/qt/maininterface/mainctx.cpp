@@ -31,6 +31,7 @@
 #include "maininterface/mainctx.hpp"
 #include "compositor.hpp"
 #include "util/renderer_manager.hpp"
+#include "util/csdbuttonmodel.hpp"
 
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
@@ -46,6 +47,7 @@
 #include "menus/menus.hpp"                            // Menu creation
 
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
+
 
 #include <QKeyEvent>
 
@@ -104,6 +106,7 @@ bool loadVLCOption<bool>(vlc_object_t *obj, const char *name)
 
 MainCtx::MainCtx(qt_intf_t *_p_intf)
     : p_intf(_p_intf)
+    , m_csdButtonModel {std::make_unique<CSDButtonModel>(this, this)}
 {
     /**
      *  Configuration and settings

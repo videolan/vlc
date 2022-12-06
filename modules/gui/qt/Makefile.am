@@ -277,6 +277,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/covergenerator.cpp \
 	gui/qt/util/covergenerator.hpp \
 	gui/qt/util/imageluminanceextractor.cpp gui/qt/util/imageluminanceextractor.hpp \
+	gui/qt/util/csdbuttonmodel.cpp gui/qt/util/csdbuttonmodel.hpp \
 	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp \
 	gui/qt/util/i18n.cpp gui/qt/util/i18n.hpp \
 	gui/qt/util/keyhelper.cpp gui/qt/util/keyhelper.hpp \
@@ -477,6 +478,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/color_scheme_model.moc.cpp \
 	gui/qt/util/color_svg_image_provider.moc.cpp \
 	gui/qt/util/imageluminanceextractor.moc.cpp \
+	gui/qt/util/csdbuttonmodel.moc.cpp \
 	gui/qt/util/i18n.moc.cpp \
 	gui/qt/util/keyhelper.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
