@@ -409,7 +409,12 @@ static void msg_vprint(intf_thread_t *p_intf, const char *fmt, va_list args)
 
     vlc_mutex_lock(&sys->clients_lock);
     vlc_list_foreach (cl, &sys->clients, node)
-        cli_vprintf(cl, fmt, args);
+    {
+        va_list ap;
+        va_copy(ap, args);
+        cli_vprintf(cl, fmt, ap);
+        va_end(ap);
+    }
     vlc_mutex_unlock(&sys->clients_lock);
 }
 
