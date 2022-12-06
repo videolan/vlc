@@ -44,6 +44,7 @@
 #include <vlc_variables.h>
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowController.h"
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain+OldPrefs.h"

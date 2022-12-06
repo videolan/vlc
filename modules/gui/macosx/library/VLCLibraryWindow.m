@@ -70,8 +70,10 @@ const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
 const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
+const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-static NSUserInterfaceItemIdentifier const kVLCLibraryWindowIdentifier = @"VLCLibraryWindow";
+static NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
+static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
 
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
@@ -128,7 +130,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)awakeFromNib
 {
-    self.identifier = kVLCLibraryWindowIdentifier;
+    self.identifier = VLCLibraryWindowIdentifier;
     
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
@@ -895,66 +897,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
             }
         }
     }
-}
-
-@end
-
-@implementation VLCLibraryWindowController
-
-- (instancetype)initWithLibraryWindow
-{
-    self = [super initWithWindowNibName:@"VLCLibraryWindow"];
-    return self;
-}
-
-- (void)windowDidLoad
-{
-    VLCLibraryWindow *window = (VLCLibraryWindow *)self.window;
-    [window setRestorationClass:[self class]];
-    [window setExcludedFromWindowsMenu:YES];
-    [window setAcceptsMouseMovedEvents:YES];
-    [window setContentMinSize:NSMakeSize(VLCLibraryWindowMinimalWidth, VLCLibraryWindowMinimalHeight)];
-
-    // HACK: On initialisation, the window refuses to accept any border resizing. It seems the split view
-    // holds a monopoly on the edges of the window (which can be seen as the right-side of the split view
-    // lets you resize the playlist, and after doing so the window becomes resizeable.
-    
-    // This can be worked around by maximizing the window, or toggling the playlist.
-    // Toggling the playlist is simplest.
-    [window togglePlaylist];
-    [window togglePlaylist];
-}
-
-+ (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier 
-                              state:(NSCoder *)state 
-                  completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
-{
-    if([identifier isEqualToString:kVLCLibraryWindowIdentifier] == NO) {
-        return;
-    }
-    
-    if([VLCMain sharedInstance].libraryWindowController == nil) {
-        [VLCMain sharedInstance].libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
-    }
-
-    VLCLibraryWindow *libraryWindow = [VLCMain sharedInstance].libraryWindow;
-
-    NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
-    NSInteger rememberedSelectedLibraryViewModeSegment = [state decodeIntegerForKey:@"macosx-library-view-mode-selected-segment"];
-    NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
-
-    [libraryWindow.segmentedTitleControl setSelectedSegment:rememberedSelectedLibrarySegment];
-    [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
-    [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
-
-    // We don't want to add these to the navigation stack...
-    [libraryWindow.libraryAudioViewController segmentedControlAction:libraryWindow.navigationStack];
-    [libraryWindow segmentedControlAction:libraryWindow.navigationStack];
-
-    // But we do want the "final" initial position to be added. So we manually invoke the navigation stack
-    [libraryWindow.navigationStack appendCurrentLibraryState];
-
-    completionHandler(libraryWindow, nil);
 }
 
 @end

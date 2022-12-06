@@ -92,6 +92,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
+	gui/macosx/library/VLCLibraryWindowController.h \
+	gui/macosx/library/VLCLibraryWindowController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewsStackViewController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoCollectionViewContainerView.h \

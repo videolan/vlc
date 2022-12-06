@@ -50,13 +50,11 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
     VLCListViewModeSegment
 };
 
-@interface VLCLibraryWindowController : NSWindowController<NSWindowRestoration>
-
-- (instancetype)initWithLibraryWindow;
-
-@end
-
 @interface VLCLibraryWindow : VLCVideoWindowCommon<NSUserInterfaceItemIdentification>
+
+extern const CGFloat VLCLibraryWindowMinimalWidth;
+extern const CGFloat VLCLibraryWindowMinimalHeight;
+extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
@@ -133,6 +131,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
 
 - (void)videoPlaybackWillBeStarted;
 - (void)reopenVideoView;
+- (void)togglePlaylist;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 - (IBAction)shuffleAction:(id)sender;

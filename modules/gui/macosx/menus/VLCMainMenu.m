@@ -29,6 +29,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowController.h"
 
 #import "menus/renderers/VLCRendererMenuController.h"
 
