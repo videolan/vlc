@@ -29,6 +29,9 @@ T.Button {
     property color color: VLCStyle.colors.text
     property color hoverColor: VLCStyle.colors.windowCSDButtonBg
     property string iconTxt: ""
+    property bool showHovered: false
+
+    readonly property bool _paintHovered: control.hovered || showHovered
 
     padding: 0
     width: VLCStyle.dp(40, VLCStyle.scale)
@@ -39,11 +42,16 @@ T.Button {
     background: Rectangle {
         height: control.height
         width: control.width
-        color: !control.hovered ? "transparent"
-               : control.pressed ? (VLCStyle.colors.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
-                                      : Qt.darker(control.hoverColor, 1.2)
-                                    )
-               : control.hoverColor
+        color: {
+            if (control._paintHovered)
+                return control.hoverColor
+
+            if (control.pressed)
+                return VLCStyle.colors.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
+                                                   : Qt.darker(control.hoverColor, 1.2)
+
+            return "transparent"
+        }
     }
 
     contentItem: Item {
