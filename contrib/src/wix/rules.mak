@@ -1,5 +1,5 @@
-WIX_VERSION=35
-WIX_FULL_VERSION=3.5.2519.0
+WIX_VERSION=314
+WIX_FULL_VERSION=3.14.0.6526
 WIX_URL := https://wixtoolset.org/downloads/v$(WIX_FULL_VERSION)/wix$(WIX_VERSION)-binaries.zip
 
 ifdef HAVE_WIN32
@@ -21,7 +21,7 @@ wix: wix$(WIX_FULL_VERSION).zip .sum-wix
 
 .wix: wix
 	install -d "$(PREFIX)/bin"
-	for f in $</*.exe $</*.exe.config $</*.dll $</*.targets $</*.cub $</*.wixlib ; do \
+	for f in $</*.exe $</*.dll ; do \
 	  install $$f "$(PREFIX)/bin" ; \
 	done
 	touch $@
