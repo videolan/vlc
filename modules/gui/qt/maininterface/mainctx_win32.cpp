@@ -32,6 +32,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "widgets/native/interface_widgets.hpp"
+#include "util/csdbuttonmodel.hpp"
 
 #include <QBitmap>
 
@@ -83,6 +84,13 @@
 #define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
 #define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
 
+
+// XXX: Cygwin (at least) doesn't define these macros. Too bad...
+#ifndef GET_X_LPARAM
+    #define GET_X_LPARAM(a) ((int16_t)(a))
+    #define GET_Y_LPARAM(a) ((int16_t)((a)>>16))
+#endif
+
 using namespace vlc::playlist;
 
 #ifndef WM_NCUAHDRAWCAPTION
@@ -109,10 +117,11 @@ HWND WinId( QWindow *windowHandle )
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
 {
 public:
-    CSDWin32EventHandler(const bool useClientSideDecoration, const bool isWin7Compositor, QWindow *window, QObject *parent)
+    CSDWin32EventHandler(const bool useClientSideDecoration, const bool isWin7Compositor, QWindow *window, CSDButtonModel *buttonmodel, QObject *parent)
         : QObject {parent}
         , m_useClientSideDecoration {useClientSideDecoration}
         , m_window {window}
+        , m_buttonmodel {buttonmodel}
         , m_isWin7Compositor {isWin7Compositor}
     {
         QApplication::instance()->installNativeEventFilter(this);
@@ -194,6 +203,90 @@ public:
              return true;
         }
 
+        // send to determine on what part of UI is mouse ON
+        // handle it to relay if mouse is on the CSD buttons
+        // required for snap layouts menu (WINDOWS 11)
+        if ( msg->message == WM_NCHITTEST )
+        {
+            setAllUnhovered();
+
+            // Get the point in screen coordinates.
+            POINT point = { GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam) };
+
+            // Map the point to client coordinates.
+            ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
+
+            const QPoint qtPoint {point.x, point.y};
+            auto button = overlappingButton(qtPoint);
+            if (!button)
+                return false;
+
+            switch (button->type())
+            {
+            case CSDButton::Close:
+                *result = HTCLOSE;
+                return true;
+            case CSDButton::Minimize:
+                *result = HTMINBUTTON;
+                return true;
+            case CSDButton::MaximizeRestore:
+                *result = HTMAXBUTTON;
+                return true;
+            default:
+                vlc_assert_unreachable();
+                return false;
+            }
+        }
+
+        if ( msg->message == WM_NCMOUSEMOVE )
+        {
+
+            // when we handle WM_NCHITTEST, that makes the OS to capture the mouse events
+            // and WM_NCMOUSEMOVE is sent in this case, manually handle them here and relay
+            // to UI to draw correct button state
+            switch ( msg->wParam )
+            {
+            case HTCLOSE:
+                setHovered(CSDButton::Close);
+                break;
+            case HTMINBUTTON:
+                setHovered(CSDButton::Minimize);
+                break;
+            case HTMAXBUTTON:
+                setHovered(CSDButton::MaximizeRestore);
+                break;
+            }
+
+            // If we haven't previously asked for mouse tracking, request mouse
+            // tracking. We need to do this so we can get the WM_NCMOUSELEAVE
+            // message when the mouse leave the titlebar. Otherwise, we won't always
+            // get that message (especially if the user moves the mouse _real
+            // fast_).
+            const bool onSystemButton = (msg->wParam == HTCLOSE || msg->wParam == HTMINBUTTON || msg->wParam == HTMAXBUTTON);
+            if (!m_trackingMouse && onSystemButton)
+            {
+                TRACKMOUSEEVENT ev{};
+                ev.cbSize = sizeof(TRACKMOUSEEVENT);
+                // TME_NONCLIENT is absolutely critical here. In my experimentation,
+                // we'd get WM_MOUSELEAVE messages after just a HOVER_DEFAULT
+                // timeout even though we're not requesting TME_HOVER, which kinda
+                // ruined the whole point of this.
+                ev.dwFlags = TME_LEAVE | TME_NONCLIENT;
+                ev.hwndTrack = msg->hwnd;
+                ev.dwHoverTime = HOVER_DEFAULT; // we don't _really_ care about this.
+                TrackMouseEvent(&ev); // TODO check return?
+                m_trackingMouse = true;
+            }
+        }
+
+        if ( msg->message == WM_NCMOUSELEAVE || msg->message == WM_MOUSELEAVE )
+        {
+            m_trackingMouse = false;
+
+            // release all buttons we may have captured
+            setAllUnhovered();
+        }
+
         return false;
     }
 
@@ -239,9 +332,41 @@ private:
             SWP_NOSENDCHANGING | SWP_NOSIZE | SWP_NOZORDER);
     }
 
+    CSDButton *overlappingButton(const QPoint point)
+    {
+        for (auto button : m_buttonmodel->windowCSDButtons())
+        {
+            if (button->rect().contains(point))
+                return button;
+        }
+        return nullptr;
+    }
+
+    void setHovered(CSDButton::ButtonType type)
+    {
+        for (auto button : m_buttonmodel->windowCSDButtons()) {
+            if (button->type() == type) {
+                button->setShowHovered(true);
+                return ;
+            }
+        }
+
+        vlc_assert_unreachable();
+    }
+
+    void setAllUnhovered()
+    {
+        for (auto button : m_buttonmodel->windowCSDButtons())
+        {
+            button->setShowHovered(false);
+        }
+    }
+
     DWORD m_nonCSDGwlStyle = 0;
     bool m_useClientSideDecoration;
     QWindow *m_window;
+    CSDButtonModel *m_buttonmodel;
+    bool m_trackingMouse = false;
     const bool m_isWin7Compositor;
 };
 
@@ -513,7 +638,7 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx->useClientSideDecoration(),
                                                        _p_intf->p_compositor->type() == vlc::Compositor::Win7Compositor,
-                                                       window, window))
+                                                       window, mainCtx->csdButtonModel(), window))
 #endif
 
 {
