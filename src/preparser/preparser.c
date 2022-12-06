@@ -324,19 +324,21 @@ int input_preparser_Push( input_preparser_t *preparser,
     vlc_mutex_unlock( &item->lock );
 
     if (!(i_options & META_REQUEST_OPTION_NO_SKIP))
-    switch( i_type )
     {
-        case ITEM_TYPE_NODE:
-        case ITEM_TYPE_FILE:
-        case ITEM_TYPE_DIRECTORY:
-        case ITEM_TYPE_PLAYLIST:
-            if( !b_net || i_options & META_REQUEST_OPTION_SCOPE_NETWORK )
-                break;
-            /* fallthrough */
-        default:
-            if (cbs && cbs->on_preparse_ended)
-                cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED, cbs_userdata);
-            return VLC_SUCCESS;
+        switch( i_type )
+        {
+            case ITEM_TYPE_NODE:
+            case ITEM_TYPE_FILE:
+            case ITEM_TYPE_DIRECTORY:
+            case ITEM_TYPE_PLAYLIST:
+                if( !b_net || i_options & META_REQUEST_OPTION_SCOPE_NETWORK )
+                    break;
+                /* fallthrough */
+            default:
+                if (cbs && cbs->on_preparse_ended)
+                    cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED, cbs_userdata);
+                return VLC_SUCCESS;
+        }
     }
 
     vlc_tick_t timeout = timeout_ms == -1 ? preparser->default_timeout
