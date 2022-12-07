@@ -276,22 +276,30 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                     break;
                 }
             }
+            /* We found at least a page with valid granule */
             if ( i_length > 0 ) break;
         }
 
-        /* We found at least a page with valid granule */
-        if ( i_length > 0 ) break;
+        if( i_startpos == i_lowerbound ||
+            p_sys->i_length != 0 )
+            goto clean;
+
+        int64_t i_next_upperbound = __MIN(i_startpos + MIN_PAGE_SIZE, i_upperbound);
 
         /* Otherwise increase read size, starting earlier */
-        if ( i_backoffset <= ( UINT_MAX >> 1 ) )
+        if ( i_backoffset <= MAX_PAGE_SIZE )
         {
             i_backoffset <<= 1;
             i_startpos = i_upperbound - i_backoffset;
         }
         else
         {
-            i_startpos -= i_backoffset;
+            i_startpos = i_upperbound - MAX_PAGE_SIZE;
         }
+
+        i_upperbound = i_next_upperbound;
+
+        i_startpos = __MAX( i_startpos, i_lowerbound );
         i_pos = i_startpos;
 
         if ( vlc_stream_Seek( p_demux->s, i_pos ) )
