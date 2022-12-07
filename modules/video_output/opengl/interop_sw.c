@@ -213,7 +213,7 @@ tc_pbo_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         /* For YUV 4:2:2 formats, a single plane is uploaded into 2 textures */
         priv->gl.ActiveTexture(GL_TEXTURE1);
         priv->gl.BindTexture(interop->tex_target, textures[1]);
-        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[1].i_pitch / pic->p[1].i_pixel_pitch);
+        priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, (pic->p[0].i_pitch / pic->p[0].i_pixel_pitch) >> 1); /* yuv[Y] */
         priv->gl.TexSubImage2D(interop->tex_target, 0, 0, 0, tex_width[1], tex_height[1],
                                interop->texs[1].format, interop->texs[1].type, NULL);
         priv->gl.PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
