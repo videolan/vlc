@@ -1,5 +1,5 @@
 /*****************************************************************************
- * gst_mem.h: GStreamer Memory picture context for VLC
+ * gstcopypicture.h: copy GStreamer frames into pictures
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,19 +20,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_GST_MEM_H
-#define VLC_GST_MEM_H
-
-#include <vlc_picture.h>
+#ifndef VLC_GSTCOPYPICTURE_H
+#define VLC_GSTCOPYPICTURE_H
 
 #include <gst/gst.h>
 #include <gst/video/video.h>
 
-struct gst_mem_pic_context
-{
-    picture_context_t s;
-    GstBuffer *p_buf;
-    GstVideoInfo *p_vinfo;
-};
+void gst_CopyPicture( picture_t *p_pic, GstVideoFrame *p_frame );
 
 #endif

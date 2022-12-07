@@ -41,6 +41,7 @@
 
 #include "gstvlcpictureplaneallocator.h"
 #include "gstvlcvideosink.h"
+#include "gstcopypicture.h"
 #include "gst_mem.h"
 
 typedef struct
@@ -276,39 +277,6 @@ static void frame_handoff_cb( GstElement *p_ele, GstBuffer *p_buf,
 
     /* Push the buffer to the queue */
     gst_atomic_queue_push( p_sys->p_que, gst_buffer_ref( p_buf ) );
-}
-
-/* Copy the frame data from the GstBuffer (from decoder)
- * to the picture obtained from downstream in VLC.
- * This function should be avoided as much
- * as possible, since it involves a complete frame copy. */
-static void gst_CopyPicture( picture_t *p_pic, GstVideoFrame *p_frame )
-{
-    int i_plane, i_planes, i_line, i_dst_stride, i_src_stride;
-    uint8_t *p_dst, *p_src;
-    int i_w, i_h;
-
-    i_planes = p_pic->i_planes;
-    for( i_plane = 0; i_plane < i_planes; i_plane++ )
-    {
-        p_dst = p_pic->p[i_plane].p_pixels;
-        p_src = GST_VIDEO_FRAME_PLANE_DATA( p_frame, i_plane );
-        i_dst_stride = p_pic->p[i_plane].i_pitch;
-        i_src_stride = GST_VIDEO_FRAME_PLANE_STRIDE( p_frame, i_plane );
-
-        i_w = GST_VIDEO_FRAME_COMP_WIDTH( p_frame,
-                i_plane ) * GST_VIDEO_FRAME_COMP_PSTRIDE( p_frame, i_plane );
-        i_h = GST_VIDEO_FRAME_COMP_HEIGHT( p_frame, i_plane );
-
-        for( i_line = 0;
-                i_line < __MIN( p_pic->p[i_plane].i_lines, i_h );
-                i_line++ )
-        {
-            memcpy( p_dst, p_src, i_w );
-            p_src += i_src_stride;
-            p_dst += i_dst_stride;
-        }
-    }
 }
 
 /* Check if the element can use this caps */
@@ -911,6 +879,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 pctx->p_buf = p_buf;
                 gst_buffer_ref( p_buf );
 
+                pctx->p_vinfo = &p_sys->vinfo;
                 p_pic->context = &pctx->s;
             }
         }

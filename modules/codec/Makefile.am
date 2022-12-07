@@ -614,8 +614,10 @@ libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c \
 								 codec/gstreamer/gstvlcvideopool.h \
 								 codec/gstreamer/gstvlcvideosink.c \
 								 codec/gstreamer/gstvlcvideosink.h \
-								 codec/gstreamer/fourcc.c \
-								 codec/gstreamer/gst_mem.h
+								 codec/gstreamer/gstcopypicture.c \
+								 codec/gstreamer/gstcopypicture.h \
+								 codec/gstreamer/gst_mem.h \
+								 codec/gstreamer/fourcc.c
 libgstdecode_plugin_la_CFLAGS = $(AM_CFLAGS) $(GST_VIDEO_CFLAGS) $(GST_APP_CFLAGS)
 libgstdecode_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
 if HAVE_GST_DECODE

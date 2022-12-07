@@ -89,6 +89,15 @@ if HAVE_DARWIN
 chroma_LTLIBRARIES += libcvpx_plugin.la
 endif
 
+libgst_mem_plugin_la_SOURCES = video_chroma/gst_mem.c \
+	codec/gstreamer/gstcopypicture.c codec/gstreamer/gstcopypicture.h codec/gstreamer/gst_mem.h
+libgst_mem_plugin_la_CFLAGS = $(AM_CFLAGS) $(GST_VIDEO_CFLAGS) $(GST_APP_CFLAGS)
+libgst_mem_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
+
+if HAVE_GST_DECODE
+chroma_LTLIBRARIES += libgst_mem_plugin.la
+endif
+
 # Tests
 chroma_copy_sse_test_SOURCES = $(libchroma_copy_la_SOURCES)
 chroma_copy_sse_test_CFLAGS = -DCOPY_TEST
