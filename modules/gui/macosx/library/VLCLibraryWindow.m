@@ -82,6 +82,8 @@ static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
     
     NSInteger _currentSelectedSegment;
     NSInteger _currentSelectedViewModeSegment;
+
+    NSTimer *_hideToolbarTimer;
 }
 
 - (IBAction)goToBrowseSection:(id)sender;
@@ -198,6 +200,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [notificationCenter addObserver:self
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(videoDisplayToolbar:)
+                               name:VLCVideoWindowShouldShowFullscreenController
                              object:nil];
 
     if (@available(macOS 10.14, *)) {
@@ -759,6 +765,47 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _windowFrameBeforePlayback = [self frame];
 }
 
+- (void)startAutohideTimer
+{
+    /* Do nothing if timer is already in place */
+    if (_hideToolbarTimer.valid) {
+        return;
+    }
+
+    /* Get timeout and make sure it is not lower than 1 second */
+    long long timeToKeepVisibleInSec = MAX(var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000, 1);
+
+    _hideToolbarTimer = [NSTimer scheduledTimerWithTimeInterval:timeToKeepVisibleInSec
+                                                         target:self
+                                                       selector:@selector(videoHideToolbar:)
+                                                       userInfo:nil
+                                                        repeats:NO];
+}
+
+- (void)stopAutohideTimer
+{
+    [_hideToolbarTimer invalidate];
+}
+
+- (void)videoHideToolbar:(id)sender
+{
+    if (self.hasActiveVideo && !self.videoView.hidden) {
+        [self stopAutohideTimer];
+        self.toolbar.visible = NO;
+    }
+}
+
+- (void)videoDisplayToolbar:(id)sender
+{
+    [self stopAutohideTimer];
+
+    if (self.hasActiveVideo && !self.videoView.hidden) {
+        [self startAutohideTimer];
+    }
+
+    self.toolbar.visible = YES;
+}
+
 - (void)setHasActiveVideo:(BOOL)hasActiveVideo
 {
     [super setHasActiveVideo:hasActiveVideo];
@@ -833,6 +880,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self hideControlsBar];
         [_fspanel shouldBecomeActive:nil];
     }
+
+    [self videoHideToolbar:self];
 }
 
 - (void)disableVideoPlaybackAppearance
@@ -861,6 +910,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];
+    self.videoView.hidden = YES;
 
     [self.segmentedTitleControl setHidden:NO];
     [self.forwardsNavigationButton setHidden:NO];
@@ -877,6 +927,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self showControlsBar];
         [_fspanel shouldBecomeInactive:nil];
     }
+
+    [self videoDisplayToolbar:self];
 }
 
 #pragma mark -
