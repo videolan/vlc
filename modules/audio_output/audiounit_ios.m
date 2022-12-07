@@ -25,6 +25,7 @@
 #import "coreaudio_common.h"
 
 #import <vlc_plugin.h>
+#import <vlc_tracer.h>
 
 #import <CoreAudio/CoreAudioTypes.h>
 #import <Foundation/Foundation.h>
@@ -184,6 +185,14 @@ GetLatency(audio_output_t *p_aout)
         changed = true;
     }
     latency_us += us;
+
+    struct vlc_tracer *tracer = vlc_object_get_tracer(VLC_OBJECT(p_aout));
+    if (tracer != NULL)
+        vlc_tracer_Trace(tracer, VLC_TRACE("type", "SyncOne2"),
+                         VLC_TRACE("outputLatency", p_sys->output_latency_ticks),
+                         VLC_TRACE("IOBufferDuration", p_sys->io_buffer_duration_ticks),
+                         VLC_TRACE("kAudioUnitProperty_Latency", p_sys->c.au_latency_ticks),
+                         VLC_TRACE_END);
 
     if (changed)
     {
