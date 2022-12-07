@@ -819,7 +819,6 @@ libqt_plugin_la_QML = \
 	gui/qt/dialogs/dialogs/qml/Dialogs.qml \
 	gui/qt/dialogs/dialogs/qml/ModalDialog.qml \
 	gui/qt/dialogs/dialogs/qml/WindowDialog.qml \
-	gui/qt/dialogs/help/qml/About.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDNDDelegate.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDNDView.qml\
 	gui/qt/dialogs/toolbar/qml/EditorDummyButton.qml \
@@ -881,7 +880,6 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/NetworkAddressbar.qml \
 	gui/qt/network/qml/NetworkCustomCover.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
-	gui/qt/network/qml/NetworkListItem.qml \
 	gui/qt/network/qml/NetworkThumbnailItem.qml \
 	gui/qt/network/qml/ServicesHomeDisplay.qml \
 	gui/qt/network/qml/ServicesManage.qml \
@@ -897,13 +895,10 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/PlayerBlurredBackground.qml \
 	gui/qt/player/qml/PlayerBlurredBackground.frag \
 	gui/qt/player/qml/PlayerControlLayout.qml \
-	gui/qt/player/qml/PlayerMenu.qml \
-	gui/qt/player/qml/PlayerMenuItem.qml \
 	gui/qt/player/qml/PlayerPlaylistVisibilityFSM.qml \
 	gui/qt/player/qml/ResumeDialog.qml \
 	gui/qt/player/qml/SliderBar.qml \
 	gui/qt/player/qml/TopBar.qml \
-	gui/qt/player/qml/TrackInfo.qml \
 	gui/qt/player/qml/TracksMenu.qml \
 	gui/qt/player/qml/TracksPage.qml \
 	gui/qt/player/qml/TracksPageAudio.qml \
@@ -1012,7 +1007,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/KeyNavigableListView.qml \
 	gui/qt/widgets/qml/KeyNavigableTableView.qml \
 	gui/qt/widgets/qml/TableViewDelegate.qml \
-	gui/qt/widgets/qml/LabelSeparator.qml \
 	gui/qt/widgets/qml/ListCoverShadow.qml \
 	gui/qt/widgets/qml/ListItem.qml \
 	gui/qt/widgets/qml/ListLabel.qml \
@@ -1020,8 +1014,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/MediaCover.qml \
 	gui/qt/widgets/qml/SubtitleLabel.qml \
 	gui/qt/widgets/qml/MenuCaption.qml \
-	gui/qt/widgets/qml/MenuExt.qml \
-	gui/qt/widgets/qml/MenuItemExt.qml \
 	gui/qt/widgets/qml/MenuLabel.qml \
 	gui/qt/widgets/qml/MLDragItem.qml \
 	gui/qt/widgets/qml/NavigableCol.qml \
@@ -1040,7 +1032,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/TableColumns.qml \
 	gui/qt/widgets/qml/TransparentSpinBox.qml \
 	gui/qt/widgets/qml/TextToolButton.qml \
-	gui/qt/widgets/qml/ToolTipArea.qml \
 	gui/qt/widgets/qml/VideoProgressBar.qml \
 	gui/qt/widgets/qml/VideoQualityLabels.qml \
 	gui/qt/widgets/qml/ListSubtitleLabel.qml \

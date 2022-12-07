@@ -716,7 +716,6 @@ modules/gui/qt/dialogs/gototime/gototime.cpp
 modules/gui/qt/dialogs/gototime/gototime.hpp
 modules/gui/qt/dialogs/help/help.cpp
 modules/gui/qt/dialogs/help/help.hpp
-modules/gui/qt/dialogs/help/qml/About.qml
 modules/gui/qt/dialogs/mediainfo/info_panels.cpp
 modules/gui/qt/dialogs/mediainfo/info_panels.hpp
 modules/gui/qt/dialogs/mediainfo/info_widgets.cpp
@@ -840,7 +839,6 @@ modules/gui/qt/network/qml/BrowseTreeDisplay.qml
 modules/gui/qt/network/qml/DiscoverDisplay.qml
 modules/gui/qt/network/qml/DiscoverUrlDisplay.qml
 modules/gui/qt/network/qml/NetworkGridItem.qml
-modules/gui/qt/network/qml/NetworkListItem.qml
 modules/gui/qt/network/qml/ServicesHomeDisplay.qml
 modules/gui/qt/player/control_list_filter.cpp
 modules/gui/qt/player/control_list_filter.hpp
