@@ -194,6 +194,20 @@ GetLatency(audio_output_t *p_aout)
 
     if (changed)
     {
+        NSString *ports = @"";
+        bool first = true;
+        for (AVAudioSessionPortDescription *out in [[p_sys->avInstance currentRoute] outputs])
+        {
+            if (!first)
+                ports = [ports stringByAppendingString: @" + "];
+            ports = [ports stringByAppendingString:out.portType];
+            first = false;
+        }
+        const char *ports_str = [ports UTF8String];
+        msg_Dbg(p_aout, "Current device changed: %s", ports_str);
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "SyncOne2", "device", ports_str);
+
         msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us",
                 p_sys->output_latency_ticks);
         msg_Dbg(p_aout, "Current device has a new IOBufferDuration of %" PRId64 "us",
