@@ -171,7 +171,6 @@ GetLatency(audio_output_t *p_aout)
     us = vlc_tick_from_sec([p_sys->avInstance outputLatency]);
     if (us != p_sys->output_latency_ticks)
     {
-        msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us", us);
         p_sys->output_latency_ticks = us;
         changed = true;
     }
@@ -180,7 +179,6 @@ GetLatency(audio_output_t *p_aout)
     us = vlc_tick_from_sec([p_sys->avInstance IOBufferDuration]);
     if (us != p_sys->io_buffer_duration_ticks)
     {
-        msg_Dbg(p_aout, "Current device has a new IOBufferDuration of %" PRId64 "us", us);
         p_sys->io_buffer_duration_ticks = us;
         changed = true;
     }
@@ -196,6 +194,10 @@ GetLatency(audio_output_t *p_aout)
 
     if (changed)
     {
+        msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us",
+                p_sys->output_latency_ticks);
+        msg_Dbg(p_aout, "Current device has a new IOBufferDuration of %" PRId64 "us",
+                p_sys->io_buffer_duration_ticks);
         msg_Dbg(p_aout, "Current device has a new total latency of %" PRId64 "us",
                 latency_us);
         aout_LatencyReport(p_aout, latency_us);
