@@ -20,13 +20,8 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_media_track.h \
 	../include/vlc/libvlc_renderer_discoverer.h \
 	../include/vlc/libvlc_picture.h \
+	../include/vlc/libvlc_version.h \
 	../include/vlc/vlc.h
-
-nodist_pkginclude_HEADERS = ../include/vlc/libvlc_version.h
-
-../include/vlc/libvlc_version.h: ../include/vlc/libvlc_version.h.in $(top_builddir)/config.status
-	$(AM_V_GEN)cd "$(top_builddir)" && \
-	$(SHELL) ./config.status --file="src/$@"
 
 lib_LTLIBRARIES = libvlc.la
 
@@ -55,7 +50,7 @@ libvlc_la_SOURCES = \
 	media_discoverer.c \
 	picture.c \
 	../src/revision.c
-EXTRA_DIST = libvlc.pc.in libvlc.sym ../include/vlc/libvlc_version.h.in
+EXTRA_DIST = libvlc.pc.in libvlc.sym
 
 if HAVE_WIN32
 noinst_DATA = libvlc_win32_rc.rc

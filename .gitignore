@@ -47,8 +47,6 @@ vlc_install_dir/*
 plugins.dat
 patches/*
 
-include/vlc/libvlc_version.h
-
 # Ignore build dirs
 build*/
 contrib-*

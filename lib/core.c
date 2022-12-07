@@ -34,6 +34,14 @@
 #include <limits.h>
 #include <assert.h>
 
+static_assert(LIBVLC_VERSION_MAJOR    == PACKAGE_VERSION_MAJOR, "Major VLC version mismatch");
+static_assert(LIBVLC_VERSION_MINOR    == PACKAGE_VERSION_MINOR, "Minor VLC version mismatch");
+static_assert(LIBVLC_VERSION_REVISION == PACKAGE_VERSION_REVISION, "VLC Revision version mismatch");
+static_assert(LIBVLC_VERSION_EXTRA    == PACKAGE_VERSION_EXTRA, "VLC Extra version mismatch");
+static_assert(LIBVLC_ABI_VERSION_MAJOR == LIBVLC_ABI_MAJOR, "Major LibVLC version mismatch");
+static_assert(LIBVLC_ABI_VERSION_MINOR == LIBVLC_ABI_MINOR, "Minor LibVLC version mismatch");
+static_assert(LIBVLC_ABI_VERSION_MICRO == LIBVLC_ABI_MICRO, "Micro LibVLC version mismatch");
+
 int libvlc_abi_version(void)
 {
     return LIBVLC_ABI_VERSION_INT;

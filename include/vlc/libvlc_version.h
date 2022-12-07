@@ -33,13 +33,13 @@
 # define LIBVLC_VERSION_H 1
 
 /** LibVLC major version number */
-# define LIBVLC_VERSION_MAJOR    (@VERSION_MAJOR@)
+# define LIBVLC_VERSION_MAJOR    (4)
 
 /** LibVLC minor version number */
-# define LIBVLC_VERSION_MINOR    (@VERSION_MINOR@)
+# define LIBVLC_VERSION_MINOR    (0)
 
 /** LibVLC revision */
-# define LIBVLC_VERSION_REVISION (@VERSION_REVISION@)
+# define LIBVLC_VERSION_REVISION (0)
 
 # define LIBVLC_VERSION_EXTRA    (0)
 
@@ -54,13 +54,13 @@
 
 
 /** LibVLC ABI major version number, updated when incompatible changes are added */
-# define LIBVLC_ABI_VERSION_MAJOR  (@LIBVLC_ABI_MAJOR@)
+# define LIBVLC_ABI_VERSION_MAJOR  (12)
 
 /** LibVLC ABI minor version number, updated when compatible changes are added */
-# define LIBVLC_ABI_VERSION_MINOR  (@LIBVLC_ABI_MINOR@)
+# define LIBVLC_ABI_VERSION_MINOR  (0)
 
 /** LibVLC ABI micro version number, updated with new releases */
-# define LIBVLC_ABI_VERSION_MICRO  (@LIBVLC_ABI_MICRO@)
+# define LIBVLC_ABI_VERSION_MICRO  (0)
 
 /** LibVLC full ABI version combining the major VLC version and the .so version:
  * - A 0xFF000000 mask gives the VLC major version,
