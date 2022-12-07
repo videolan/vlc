@@ -36,18 +36,18 @@
 extern "C" {
 # endif
 
-#include <vlc/libvlc.h>
-#include <vlc/libvlc_renderer_discoverer.h>
-#include <vlc/libvlc_picture.h>
-#include <vlc/libvlc_media.h>
-#include <vlc/libvlc_media_player.h>
-#include <vlc/libvlc_media_list.h>
-#include <vlc/libvlc_media_list_player.h>
-#include <vlc/libvlc_media_discoverer.h>
-#include <vlc/libvlc_events.h>
-#include <vlc/libvlc_dialog.h>
-#include <vlc/libvlc_version.h>
-#include <vlc/deprecated.h>
+#include "libvlc.h"
+#include "libvlc_renderer_discoverer.h"
+#include "libvlc_picture.h"
+#include "libvlc_media.h"
+#include "libvlc_media_player.h"
+#include "libvlc_media_list.h"
+#include "libvlc_media_list_player.h"
+#include "libvlc_media_discoverer.h"
+#include "libvlc_events.h"
+#include "libvlc_dialog.h"
+#include "libvlc_version.h"
+#include "deprecated.h"
 
 # ifdef __cplusplus
 }
