@@ -2264,7 +2264,7 @@ LIBVLC_API void libvlc_media_player_clear_buffer( libvlc_media_player_t *p_mi );
  * Audio stereo modes
  */
 typedef enum libvlc_audio_output_stereomode_t {
-    libvlc_AudioStereoMode_Error   = -1,
+    libvlc_AudioStereoMode_Unset   = 0,
     libvlc_AudioStereoMode_Stereo  = 1,
     libvlc_AudioStereoMode_RStereo = 2,
     libvlc_AudioStereoMode_Left    = 3,
