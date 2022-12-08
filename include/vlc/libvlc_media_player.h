@@ -2229,6 +2229,17 @@ typedef enum libvlc_audio_output_stereomode_t {
     libvlc_AudioStereoMode_Mono  = 7,
 } libvlc_audio_output_stereomode_t;
 
+/**
+ * Audio mix modes
+ */
+typedef enum libvlc_audio_output_mixmode_t {
+    libvlc_AudioMixMode_Unset       = 0,
+    libvlc_AudioMixMode_Stereo      = 1,
+    libvlc_AudioMixMode_Binaural    = 2,
+    libvlc_AudioMixMode_4_0         = 3,
+    libvlc_AudioMixMode_5_1         = 4,
+    libvlc_AudioMixMode_7_1         = 5,
+} libvlc_audio_output_mixmode_t;
 
 /**
  * Gets the list of available audio output modules.
@@ -2428,6 +2439,41 @@ LIBVLC_API libvlc_audio_output_stereomode_t libvlc_audio_get_stereomode( libvlc_
  */
 LIBVLC_API int libvlc_audio_set_stereomode( libvlc_media_player_t *p_mi,
                                             libvlc_audio_output_stereomode_t mode );
+
+/**
+ * Get current audio mix-mode.
+ *
+ * \param p_mi media player
+ * \return the audio mix-mode, \see libvlc_audio_output_mixmode_t
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API libvlc_audio_output_mixmode_t libvlc_audio_get_mixmode( libvlc_media_player_t *p_mi );
+
+/**
+ * Set current audio mix-mode.
+ *
+ * By default (libvlc_AudioMixMode_Unset), the audio output will keep its
+ * original channel configuration (play stereo as stereo, or 5.1 as 5.1). Yet,
+ * the OS and Audio API might refuse a channel configuration and asks VLC to
+ * adapt (Stereo played as 5.1 or vice-versa).
+ *
+ * This function allows to force a channel configuration, it will only work if
+ * the OS and Audio API accept this configuration (otherwise, it won't have any
+ * effects). Here are some examples:
+ *  - Play multi-channels (5.1, 7.1...) as stereo (libvlc_AudioMixMode_Stereo)
+ *  - Play Stereo or 5.1 as 7.1 (libvlc_AudioMixMode_7_1)
+ *  - Play multi-channels as stereo with a binaural effect
+ *  (libvlc_AudioMixMode_Binaural). It might be selected automatically if the
+ *  OS and Audio API can detect if a headphone is plugged.
+ *
+ * \param p_mi media player
+ * \param channel the audio mix-mode, \see libvlc_audio_output_mixmode_t
+ * \return 0 on success, -1 on error
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API int libvlc_audio_set_mixmode( libvlc_media_player_t *p_mi,
+                                         libvlc_audio_output_mixmode_t mode );
+
 
 /**
  * Get current audio delay.

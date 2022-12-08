@@ -391,6 +391,48 @@ int libvlc_audio_set_stereomode( libvlc_media_player_t *mp, libvlc_audio_output_
 }
 
 /*****************************************************************************
+ * libvlc_audio_get_mixmode : Get the current audio mix-mode
+ *****************************************************************************/
+libvlc_audio_output_mixmode_t libvlc_audio_get_mixmode( libvlc_media_player_t *mp )
+{
+    audio_output_t *p_aout = GetAOut( mp );
+    if( !p_aout )
+        return libvlc_AudioMixMode_Unset;
+
+    int val = var_GetInteger( p_aout, "mix-mode" );
+    aout_Release(p_aout);
+    return val;
+}
+
+/*****************************************************************************
+ * libvlc_audio_set_mixmode : Set the current audio mix-mode
+ *****************************************************************************/
+int libvlc_audio_set_mixmode( libvlc_media_player_t *mp, libvlc_audio_output_mixmode_t mode )
+{
+    static_assert(libvlc_AudioMixMode_Unset == AOUT_VAR_CHAN_UNSET &&
+                  libvlc_AudioMixMode_Stereo == AOUT_MIX_MODE_STEREO &&
+                  libvlc_AudioMixMode_Binaural == AOUT_MIX_MODE_BINAURAL &&
+                  libvlc_AudioMixMode_4_0 == AOUT_MIX_MODE_4_0 &&
+                  libvlc_AudioMixMode_5_1 == AOUT_MIX_MODE_5_1 &&
+                  libvlc_AudioMixMode_7_1 == AOUT_MIX_MODE_7_1,
+                  "Mismatch with mix-mode LibVLC/VLC enums");
+
+    audio_output_t *p_aout = GetAOut( mp );
+    int ret = 0;
+
+    if( !p_aout )
+        return -1;
+
+    if( var_SetInteger( p_aout, "mix-mode", mode ) < 0 )
+    {
+        libvlc_printerr( "Audio mix-mode out of range" );
+        ret = -1;
+    }
+    aout_Release(p_aout);
+    return ret;
+}
+
+/*****************************************************************************
  * libvlc_audio_get_delay : Get the current audio delay
  *****************************************************************************/
 int64_t libvlc_audio_get_delay( libvlc_media_player_t *p_mi )
