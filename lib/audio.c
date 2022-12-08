@@ -379,6 +379,14 @@ libvlc_audio_output_stereomode_t libvlc_audio_get_stereomode( libvlc_media_playe
  *****************************************************************************/
 int libvlc_audio_set_stereomode( libvlc_media_player_t *mp, libvlc_audio_output_stereomode_t mode )
 {
+    static_assert(libvlc_AudioStereoMode_Unset == AOUT_VAR_CHAN_UNSET &&
+                  libvlc_AudioStereoMode_Stereo == AOUT_VAR_CHAN_STEREO &&
+                  libvlc_AudioStereoMode_RStereo == AOUT_VAR_CHAN_RSTEREO &&
+                  libvlc_AudioStereoMode_Left == AOUT_VAR_CHAN_LEFT &&
+                  libvlc_AudioStereoMode_Right == AOUT_VAR_CHAN_RIGHT &&
+                  libvlc_AudioStereoMode_Dolbys == AOUT_VAR_CHAN_DOLBYS,
+                  "Mismatch with stereo-mode LibVLC/VLC enums");
+
     audio_output_t *p_aout = GetAOut( mp );
     int ret = 0;
 
