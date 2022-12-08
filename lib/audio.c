@@ -348,9 +348,9 @@ end:
 }
 
 /*****************************************************************************
- * libvlc_audio_get_channel : Get the current audio channel
+ * libvlc_audio_get_stereomode : Get the current audio stereo-mode
  *****************************************************************************/
-int libvlc_audio_get_channel( libvlc_media_player_t *mp )
+libvlc_audio_output_stereomode_t libvlc_audio_get_stereomode( libvlc_media_player_t *mp )
 {
     audio_output_t *p_aout = GetAOut( mp );
     if( !p_aout )
@@ -362,9 +362,9 @@ int libvlc_audio_get_channel( libvlc_media_player_t *mp )
 }
 
 /*****************************************************************************
- * libvlc_audio_set_channel : Set the current audio channel
+ * libvlc_audio_set_stereomode : Set the current audio stereo-mode
  *****************************************************************************/
-int libvlc_audio_set_channel( libvlc_media_player_t *mp, int channel )
+int libvlc_audio_set_stereomode( libvlc_media_player_t *mp, libvlc_audio_output_stereomode_t mode )
 {
     audio_output_t *p_aout = GetAOut( mp );
     int ret = 0;
@@ -372,9 +372,9 @@ int libvlc_audio_set_channel( libvlc_media_player_t *mp, int channel )
     if( !p_aout )
         return -1;
 
-    if( var_SetInteger( p_aout, "stereo-mode", channel ) < 0 )
+    if( var_SetInteger( p_aout, "stereo-mode", mode ) < 0 )
     {
-        libvlc_printerr( "Audio channel out of range" );
+        libvlc_printerr( "Audio stereo-mode out of range" );
         ret = -1;
     }
     aout_Release(p_aout);
