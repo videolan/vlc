@@ -39,8 +39,6 @@ T.Control {
 
     readonly property bool dragActive: hoverArea.drag.active
 
-    property int horizontalSpacing: 0
-
     property var dragItem
 
     property bool acceptDrop: false
@@ -165,7 +163,7 @@ T.Control {
     contentItem: Row {
         id: content
 
-        spacing: delegate.horizontalSpacing
+        spacing: VLCStyle.column_spacing
 
         Repeater {
             model: delegate.sortModel
@@ -203,7 +201,7 @@ T.Control {
                 anchors.left: parent.left
 
                 // NOTE: We want the contextButton to be contained inside the trailing
-                //       horizontalSpacing.
+                //       column_spacing.
                 anchors.leftMargin: -width
 
                 anchors.verticalCenter: parent.verticalCenter

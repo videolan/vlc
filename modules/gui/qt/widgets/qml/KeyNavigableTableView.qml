@@ -66,7 +66,6 @@ FocusScope {
 
     property Util.SelectableDelegateModel selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
-    property int horizontalSpacing: VLCStyle.column_spacing
 
     property real availableRowWidth: 0
     property real _availabeRowWidthLastUpdateTime: Date.now()
@@ -309,7 +308,7 @@ FocusScope {
                     topPadding: root.headerTopPadding
                     bottomPadding: VLCStyle.margin_xsmall
 
-                    spacing: root.horizontalSpacing
+                    spacing: VLCStyle.column_spacing
 
                     Repeater {
                         model: sortModel
@@ -371,8 +370,6 @@ FocusScope {
 
             width: view.width
             height: root.rowHeight
-
-            horizontalSpacing: root.horizontalSpacing
 
             leftPadding: root.contentLeftMargin
             rightPadding: root.contentRightMargin
