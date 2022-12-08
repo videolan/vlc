@@ -387,6 +387,16 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
                     fmt->video.i_visible_width = p_prop->data.p_ispe->i_width;
                     fmt->video.i_visible_height = p_prop->data.p_ispe->i_height;
                     break;
+                case ATOM_clap:
+                    if(p_prop->data.p_clap->i_width + p_prop->data.p_clap->i_x_offset <= fmt->video.i_width &&
+                       p_prop->data.p_clap->i_height + p_prop->data.p_clap->i_y_offset <= fmt->video.i_height)
+                    {
+                        fmt->video.i_visible_width = p_prop->data.p_clap->i_width;
+                        fmt->video.i_visible_height = p_prop->data.p_clap->i_height;
+                        fmt->video.i_x_offset = p_prop->data.p_clap->i_x_offset;
+                        fmt->video.i_y_offset = p_prop->data.p_clap->i_y_offset;
+                    }
+                    break;
                 case ATOM_pasp:
                     if( p_prop->data.p_pasp->i_horizontal_spacing &&
                         p_prop->data.p_pasp->i_vertical_spacing )
@@ -589,7 +599,9 @@ static int LoadGridImage( demux_t *p_demux,
         const unsigned offsetpxh = (tile / gridcols) * tileheight;
         if( offsetpxw > imagewidth )
             break;
-        const uint8_t *srcline = p_picture->p[0].p_pixels;
+        const uint8_t *srcline = p_picture->p[0].p_pixels +
+                                 p_picture->format.i_y_offset * p_picture->p[0].i_pitch +
+                                 p_picture->format.i_x_offset * 4;
         unsigned tocopylines = p_picture->p[0].i_visible_lines;
         if(offsetpxh + tocopylines >= imageheight)
             tocopylines = imageheight - offsetpxh;
