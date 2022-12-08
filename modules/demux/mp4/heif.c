@@ -590,7 +590,7 @@ static int LoadGridImage( demux_t *p_demux,
         if( offsetpxw > imagewidth )
             break;
         const uint8_t *srcline = p_picture->p[0].p_pixels;
-        unsigned tocopylines = p_picture->p[0].i_lines;
+        unsigned tocopylines = p_picture->p[0].i_visible_lines;
         if(offsetpxh + tocopylines >= imageheight)
             tocopylines = imageheight - offsetpxh;
         for(unsigned i=0; i<tocopylines; i++)
