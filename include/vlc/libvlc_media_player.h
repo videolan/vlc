@@ -2225,7 +2225,8 @@ typedef enum libvlc_audio_output_stereomode_t {
     libvlc_AudioStereoMode_RStereo = 2,
     libvlc_AudioStereoMode_Left    = 3,
     libvlc_AudioStereoMode_Right   = 4,
-    libvlc_AudioStereoMode_Dolbys  = 5
+    libvlc_AudioStereoMode_Dolbys  = 5,
+    libvlc_AudioStereoMode_Mono  = 7,
 } libvlc_audio_output_stereomode_t;
 
 
