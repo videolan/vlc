@@ -557,26 +557,6 @@ int WindowOpen(vlc_window_t *p_wnd)
 #pragma mark -
 #pragma mark Misc methods
 
-- (void)updateControlsBarsUsingBlock:(void (^)(VLCControlsBarCommon *controlsBar))block
-{
-    [_voutWindows enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-
-        if ([obj respondsToSelector:@selector(controlsBar)]) {
-            VLCControlsBarCommon *o_controlsBar = [obj controlsBar];
-            if (o_controlsBar && block)
-                block(o_controlsBar);
-        }
-    }];
-}
-
-- (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater
-{
-    [_voutWindows enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        if ([obj isKindOfClass: [NSWindow class]])
-            windowUpdater(obj);
-    }];
-}
-
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level
 {
     if (var_InheritBool(getIntf(), "video-wallpaper"))

@@ -42,9 +42,6 @@ extern NSString *VLCWindowLevelKey;
 - (void)setWindowLevel:(NSInteger)i_level forWindow:(vlc_window_t *)p_wnd;
 - (void)setFullscreen:(int)i_full forWindow:(vlc_window_t *)p_wnd withAnimation:(BOOL)b_animation;
 
-- (void)updateControlsBarsUsingBlock:(void (^)(VLCControlsBarCommon *controlsBar))block;
-- (void)updateWindowsUsingBlock:(void (^)(VLCVideoWindowCommon *o_window))windowUpdater;
-
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level;
 
 @end
