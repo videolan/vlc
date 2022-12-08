@@ -1024,6 +1024,7 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
 
     UpdateDeinterlaceFilter(sys);
 
+    bool late = false;
     vlc_mutex_lock(&sys->filter.lock);
 
     picture_t *picture = filter_chain_VideoFilter(sys->filter.chain_static, NULL);
@@ -1060,7 +1061,7 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
                                                   decoded->date, sys->rate);
 
                     if (system_pts != VLC_TICK_MAX &&
-                        IsPictureLate(vout, decoded, system_now, system_pts))
+                        (late = IsPictureLate(vout, decoded, system_now, system_pts)))
                     {
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
@@ -1088,6 +1089,15 @@ static picture_t *PreparePicture(void *opaque, bool reuse_decoded,
                     ChangeFilters(vout);
                 }
             }
+        }
+
+        /* If we could not catchup and find a non-late frame, reset the chrono
+         * to ensure we don't just get stuck. */
+        if (late)
+        {
+            vlc_mutex_lock(&sys->filter.lock);
+            vout_chrono_Init(&sys->chrono.static_filter, 4, VLC_TICK_FROM_MS(0));
+            vlc_mutex_unlock(&sys->filter.lock);
         }
 
         if (!decoded)
