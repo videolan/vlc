@@ -354,7 +354,7 @@ libvlc_audio_output_stereomode_t libvlc_audio_get_stereomode( libvlc_media_playe
 {
     audio_output_t *p_aout = GetAOut( mp );
     if( !p_aout )
-        return 0;
+        return libvlc_AudioStereoMode_Unset;
 
     int val = var_GetInteger( p_aout, "stereo-mode" );
     aout_Release(p_aout);
