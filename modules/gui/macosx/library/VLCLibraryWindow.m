@@ -825,6 +825,21 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self enableVideoPlaybackAppearance];
 }
 
+- (void)hideControlsBar
+{
+    [super hideControlsBar];
+    _splitViewBottomConstraintToBottomBar.priority = 1;
+    _splitViewBottomConstraintToSuperView.priority = 999;
+
+}
+
+- (void)showControlsBar
+{
+    [super showControlsBar];
+    _splitViewBottomConstraintToBottomBar.priority = 999;
+    _splitViewBottomConstraintToSuperView.priority = 1;
+}
+
 - (void)presentVideoView
 {
     for (NSView *subview in _libraryTargetView.subviews) {

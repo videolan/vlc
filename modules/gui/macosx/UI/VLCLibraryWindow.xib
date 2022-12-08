@@ -577,6 +577,7 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="top" id="33P-it-9HX"/>
+                    <constraint firstAttribute="bottom" secondItem="u8g-jy-S4e" secondAttribute="bottom" priority="250" id="DQQ-ji-YSy"/>
                     <constraint firstItem="6gW-0d-ymm" firstAttribute="trailing" secondItem="iSp-bV-w6B" secondAttribute="trailing" id="DZK-gL-4Jh"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="bottom" id="QH8-mU-6ZP"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="Sse-bx-ewr"/>
@@ -770,6 +771,8 @@
                 <outlet property="segmentedTitleControlToolbarItem" destination="KnW-Lr-R1d" id="Wg1-Y2-34a"/>
                 <outlet property="shufflePlaylistButton" destination="jg5-33-vH0" id="FV2-36-3lG"/>
                 <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="098-yp-97f"/>
+                <outlet property="splitViewBottomConstraintToBottomBar" destination="QH8-mU-6ZP" id="b0t-C0-N5t"/>
+                <outlet property="splitViewBottomConstraintToSuperView" destination="DQQ-ji-YSy" id="b0t-C0-5uP"/>
                 <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="gtf-cd-765"/>
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
                 <outlet property="upNextSeparator" destination="qmL-Ar-cj1" id="GRX-ZE-2UG"/>
