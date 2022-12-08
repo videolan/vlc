@@ -472,6 +472,17 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
 
     /* Read extensions */
 
+    const MP4_Box_t *p_clap = MP4_BoxGet( p_sample, "clap" );
+    if( p_clap && BOXDATA(p_clap) &&
+        BOXDATA(p_clap)->i_width + BOXDATA(p_clap)->i_x_offset <= p_fmt->video.i_width &&
+        BOXDATA(p_clap)->i_height + BOXDATA(p_clap)->i_y_offset <= p_fmt->video.i_height )
+    {
+        p_fmt->video.i_visible_width = BOXDATA(p_clap)->i_width;
+        p_fmt->video.i_visible_height = BOXDATA(p_clap)->i_height;
+        p_fmt->video.i_x_offset = BOXDATA(p_clap)->i_x_offset;
+        p_fmt->video.i_y_offset = BOXDATA(p_clap)->i_y_offset;
+    }
+
     /* Set up A/R from extension atom */
     const MP4_Box_t *p_pasp = MP4_BoxGet( p_sample, "pasp" );
     if( p_pasp && BOXDATA(p_pasp) && BOXDATA(p_pasp)->i_horizontal_spacing > 0 &&

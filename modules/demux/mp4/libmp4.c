@@ -4172,6 +4172,39 @@ static int MP4_ReadBox_pasp( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_clap( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_clap_t, NULL );
+
+    if ( i_read != 32 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_Box_data_clap_t *p_clap = p_box->data.p_clap;
+    uint32_t num, den;
+
+    MP4_GET4BYTES( num ); MP4_GET4BYTES( den );
+    p_clap->i_width = num / (den ? den : 1);
+    MP4_GET4BYTES( num ); MP4_GET4BYTES( den );
+    p_clap->i_height = num / (den ? den : 1);
+    MP4_GET4BYTES( num ); MP4_GET4BYTES( den );
+    p_clap->i_x_offset = num / (den ? den : 1);
+    MP4_GET4BYTES( num ); MP4_GET4BYTES( den );
+    p_clap->i_y_offset = num / (den ? den : 1);
+
+    if( UINT32_MAX - p_clap->i_width < p_clap->i_x_offset ||
+        UINT32_MAX - p_clap->i_height < p_clap->i_y_offset )
+        MP4_READBOX_EXIT( 0 );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+             "read box: \"clap\" %"PRIu32"x%"PRIu32"+%"PRIu32"+%"PRIu32,
+             p_box->data.p_clap->i_width, p_box->data.p_clap->i_height,
+             p_box->data.p_clap->i_x_offset, p_box->data.p_clap->i_y_offset );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_mehd( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_mehd_t, NULL );
@@ -5008,6 +5041,7 @@ static const struct
     { ATOM_pcmC,    MP4_ReadBox_pcmC,         0 }, /* ISO-IEC 23003-5 */
     { ATOM_iods,    MP4_ReadBox_iods,         0 },
     { ATOM_pasp,    MP4_ReadBox_pasp,         0 },
+    { ATOM_clap,    MP4_ReadBox_clap,         0 },
     { ATOM_btrt,    MP4_ReadBox_btrt,         0 }, /* codecs bitrate stsd/????/btrt */
     { ATOM_keys,    MP4_ReadBox_keys,         ATOM_meta },
     { ATOM_colr,    MP4_ReadBox_colr,         0 },
