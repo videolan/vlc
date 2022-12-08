@@ -182,14 +182,6 @@ ListView {
 
         smooth: false
 
-        // If background rectangle is fully opaque,
-        // the texture does not need an alpha
-        // channel: (optimization)
-        format: (contentItemCoverRect.visible
-                 && Helpers.compareFloat(1.0, contentItemCoverRect.color.a)
-                 && (displayMarginBeginning <= 0 && displayMarginEnd <= 0)) ? ShaderEffectSource.RGB
-                                                                            : ShaderEffectSource.RGBA
-
         layer.enabled: true
         layer.effect: ShaderEffect {
             // It makes sense to use the effect for only in the fading part.
