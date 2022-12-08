@@ -241,7 +241,24 @@ static void *StateMachine(void *object)
             case VOUT_STATE_IDLE:
                 while (priv->state.current == VOUT_STATE_IDLE &&
                        !priv->state.terminated)
-                    vlc_cond_wait(&priv->state.cond_update, &priv->state.lock);
+                {
+                    if (priv->displayed.next == NULL)
+                    {
+                        vlc_cond_wait(&priv->state.cond_update, &priv->state.lock);
+                        continue;
+                    }
+
+                    vlc_tick_t system_now = vlc_tick_now();
+                    vlc_tick_t deadline =
+                        vlc_clock_ConvertToSystem(priv->clock, system_now,
+                                                  priv->displayed.next->date, priv->rate);
+                    if (deadline < system_now)
+                    {
+                        priv->state.current = VOUT_STATE_CONTROL;
+                        break;
+                    }
+                    vlc_cond_timedwait(&priv->state.cond_update, &priv->state.lock, deadline);
+                }
                 break;
 
             case VOUT_STATE_CONTROL: {
