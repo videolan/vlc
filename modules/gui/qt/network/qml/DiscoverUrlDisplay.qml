@@ -71,7 +71,7 @@ FocusScope {
             Navigation.parentItem:  root
             Navigation.downItem: (!!urlListDisplay.item) ? urlListDisplay.item : null
 
-            TextField {
+            Widgets.TextFieldExt {
                 id: searchField
 
                 focus: true
@@ -79,17 +79,7 @@ FocusScope {
                 height: VLCStyle.dp(32, VLCStyle.scale)
                 width: VLCStyle.colWidth(Math.max(VLCStyle.gridColumnsForWidth(root.width * .6), 2))
                 placeholderText: I18n.qtr("Paste or write the URL here")
-                palette.text: VLCStyle.colors.text
-                palette.highlight: VLCStyle.colors.bgHover
-                palette.highlightedText: VLCStyle.colors.bgHoverText
-                font.pixelSize: VLCStyle.fontSize_large
                 selectByMouse: true
-
-                background: Rectangle {
-                    color: VLCStyle.colors.bg
-                    border.width: VLCStyle.dp(2, VLCStyle.scale)
-                    border.color: _getColor()
-                }
 
                 onAccepted: {
                     if (urlListDisplay.status == Loader.Ready)

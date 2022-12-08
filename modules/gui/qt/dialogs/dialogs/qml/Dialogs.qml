@@ -265,12 +265,11 @@ Item {
                 font.pixelSize: VLCStyle.fontSize_normal
             }
 
-            TextField {
+            Widgets.TextFieldExt {
                 id: username
 
                 focus: true
                 text: loginDialog.defaultUsername
-                font.pixelSize: VLCStyle.fontSize_normal
 
                 Layout.fillWidth:true
 
@@ -285,7 +284,7 @@ Item {
                 font.pixelSize: VLCStyle.fontSize_normal
             }
 
-            TextField {
+            Widgets.TextFieldExt {
                 id: password
 
                 echoMode: TextInput.Password

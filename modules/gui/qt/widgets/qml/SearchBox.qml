@@ -99,7 +99,7 @@ FocusScope {
             }
         }
 
-        TextField {
+        TextFieldExt {
             id: textField
 
             property bool _keyPressed: false
@@ -115,14 +115,6 @@ FocusScope {
             padding: VLCStyle.dp(6)
             leftPadding: padding + VLCStyle.dp(4)
             rightPadding: (textField.width - clearButton.x)
-
-            font.pixelSize: VLCStyle.fontSize_normal
-
-            palette.text: VLCStyle.colors.buttonText
-            palette.highlightedText: VLCStyle.colors.bgHoverText
-            palette.base: VLCStyle.colors.button
-            palette.highlight: VLCStyle.colors.accent
-            palette.mid: VLCStyle.colors.buttonBorder
 
             selectByMouse: true
 
@@ -164,12 +156,6 @@ FocusScope {
                     event.accepted = true
 
                 Navigation.defaultKeyReleaseAction(event)
-            }
-
-            Component.onCompleted: {
-                background.border.width = Qt.binding(function() { return root.activeFocus ? VLCStyle.dp(2)
-                                                                                          : VLCStyle.dp(1) })
-
             }
 
             Widgets.IconToolButton {
