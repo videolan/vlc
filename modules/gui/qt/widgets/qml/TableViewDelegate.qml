@@ -200,6 +200,12 @@ T.Control {
             Widgets.IconToolButton {
                 id: contextButton
 
+                anchors.left: parent.left
+
+                // NOTE: We want the contextButton to be contained inside the trailing
+                //       horizontalSpacing.
+                anchors.leftMargin: -width
+
                 anchors.verticalCenter: parent.verticalCenter
 
                 iconText: VLCIcons.ellipsis
