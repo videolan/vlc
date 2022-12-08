@@ -2261,16 +2261,16 @@ LIBVLC_API void libvlc_media_player_clear_buffer( libvlc_media_player_t *p_mi );
  */
 
 /**
- * Audio channels
+ * Audio stereo modes
  */
-typedef enum libvlc_audio_output_channel_t {
-    libvlc_AudioChannel_Error   = -1,
-    libvlc_AudioChannel_Stereo  =  1,
-    libvlc_AudioChannel_RStereo =  2,
-    libvlc_AudioChannel_Left    =  3,
-    libvlc_AudioChannel_Right   =  4,
-    libvlc_AudioChannel_Dolbys  =  5
-} libvlc_audio_output_channel_t;
+typedef enum libvlc_audio_output_stereomode_t {
+    libvlc_AudioStereoMode_Error   = -1,
+    libvlc_AudioStereoMode_Stereo  = 1,
+    libvlc_AudioStereoMode_RStereo = 2,
+    libvlc_AudioStereoMode_Left    = 3,
+    libvlc_AudioStereoMode_Right   = 4,
+    libvlc_AudioStereoMode_Dolbys  = 5
+} libvlc_audio_output_stereomode_t;
 
 
 /**
@@ -2454,21 +2454,24 @@ LIBVLC_API int libvlc_audio_get_volume( libvlc_media_player_t *p_mi );
 LIBVLC_API int libvlc_audio_set_volume( libvlc_media_player_t *p_mi, int i_volume );
 
 /**
- * Get current audio channel.
+ * Get current audio stereo-mode.
  *
  * \param p_mi media player
- * \return the audio channel \see libvlc_audio_output_channel_t
+ * \return the audio stereo-mode, \see libvlc_audio_output_stereomode_t
+ * \version LibVLC 4.0.0 or later
  */
-LIBVLC_API int libvlc_audio_get_channel( libvlc_media_player_t *p_mi );
+LIBVLC_API libvlc_audio_output_stereomode_t libvlc_audio_get_stereomode( libvlc_media_player_t *p_mi );
 
 /**
- * Set current audio channel.
+ * Set current audio stereo-mode.
  *
  * \param p_mi media player
- * \param channel the audio channel, \see libvlc_audio_output_channel_t
+ * \param channel the audio stereo-mode, \see libvlc_audio_output_stereomode_t
  * \return 0 on success, -1 on error
+ * \version LibVLC 4.0.0 or later
  */
-LIBVLC_API int libvlc_audio_set_channel( libvlc_media_player_t *p_mi, int channel );
+LIBVLC_API int libvlc_audio_set_stereomode( libvlc_media_player_t *p_mi,
+                                            libvlc_audio_output_stereomode_t mode );
 
 /**
  * Get current audio delay.
