@@ -97,7 +97,7 @@ FocusScope {
     }
 
     Widgets.AcrylicBackground {
-      /* id: artistListBackground */
+      id: artistListBackground
 
       visible: artistModel.count > 0
       width: artistList.width
@@ -124,6 +124,9 @@ FocusScope {
 
             visible: artistModel.count > 0
             focus: artistModel.count > 0
+
+            backgroundColor: artistListBackground.usingAcrylic ? "transparent"
+                                                               : artistListBackground.alternativeColor
 
             // To get blur effect while scrolling in mainview
             displayMarginEnd: g_mainDisplay.displayMargin
