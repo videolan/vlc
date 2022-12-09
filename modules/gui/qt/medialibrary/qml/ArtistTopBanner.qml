@@ -50,21 +50,33 @@ FocusScope {
                                  : undefined
         mipmap: !!artist.cover
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
-        visible: false
+        visible: !blurLoader.active
 
-        Rectangle {
-            anchors.fill: background
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, .5) }
-                GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, .7) }
-            }
+        // Single pass linear filtering, in case the effect is not available:
+        layer.enabled: visible
+        layer.smooth: true
+        layer.textureSize: Qt.size(width * .75, height * .75)
+    }
+
+    Loader {
+        id: blurLoader
+        anchors.fill: background
+
+        // Don't care Qt 6 Qt5Compat RHI compatible graphical effects for now
+        active: (GraphicsInfo.api === GraphicsInfo.OpenGL)
+
+        sourceComponent: FastBlur {
+            source: background
+            radius: VLCStyle.dp(4, VLCStyle.scale)
         }
     }
 
-    FastBlur {
-        source: background
+    Rectangle {
         anchors.fill: background
-        radius: VLCStyle.dp(4, VLCStyle.scale)
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, .5) }
+            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, .7) }
+        }
     }
 
     RowLayout {
