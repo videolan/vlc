@@ -144,45 +144,21 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 
 .qt: qt
 	$(call qmake_toolchain, $<)
+	# Configure and build qmake
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5 \
 	    $(shell $(SRC)/qt/configure-env.py $(CPPFLAGS) $(LDFLAGS))
-	# Make && Install libraries
-	cd $< && $(QT_ENV_VARS) $(MAKE)
-	$(MAKE) -C $< -C src \
-		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
-		sub-corelib-install_subtargets \
-		sub-gui-install_subtargets \
-		sub-widgets-install_subtargets \
-		sub-platformsupport-install_subtargets \
-		sub-bootstrap-install_subtargets \
-		sub-network-install_subtargets
-	# Install tools
-	$(MAKE) -C $< -C src \
-		sub-moc-install_subtargets \
-		sub-rcc-install_subtargets \
-		sub-uic-install_subtargets \
-		sub-qlalr-install_subtargets
-	# Install plugins
-	$(MAKE) -C $< -C src/plugins \
-		INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" \
-		sub-imageformats-install_subtargets \
-		sub-platforms-install_subtargets \
-		sub-styles-install_subtargets
+	# Build libraries, widgets, plugins, doc (empty)
+	$(QT_ENV_VARS) $(MAKE) -C $<
+	# Install libraries, widgets, plugins, tools, doc (empty)
+	$(MAKE) -C $< INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" install
 
 ifdef HAVE_WIN32
 	# Add the ANGLE headers to our project
 	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtANGLE#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
 endif
 
-	#fix host tools headers to avoid collusion with target headers
+	#fix host tools headers to avoid collision with target headers
 	mkdir -p $(PREFIX)/lib/qt5/include
 	cp -R $(PREFIX)/include/QtCore $(PREFIX)/lib/qt5/include
 	sed -i.orig -e "s#\$\$QT_MODULE_INCLUDE_BASE#$(PREFIX)/lib/qt5/include#g" $(PREFIX)/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
-	# Install a qmake with correct paths set
-	$(MAKE) -C $< sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
-ifdef HAVE_WIN32
-	# Install libqtmain for potentially other targets, eg. docs/ samples
-	$(MAKE) -C "$</src/winmain" all
-	$(MAKE) -C "$</src/winmain" install
-endif
 	touch $@
