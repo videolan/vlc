@@ -44,6 +44,16 @@
 #import "views/VLCImageView.h"
 #import "views/VLCSubScrollView.h"
 
+static NSString *VLCLibrarySongsTableViewSongPlayingColumnIdentifier = @"VLCLibrarySongsTableViewSongPlayingColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewTitleColumnIdentifier = @"VLCLibrarySongsTableViewTitleColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewDurationColumnIdentifier = @"VLCLibrarySongsTableViewDurationColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewArtistColumnIdentifier = @"VLCLibrarySongsTableViewArtistColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewAlbumColumnIdentifier = @"VLCLibrarySongsTableViewAlbumColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewGenreColumnIdentifier = @"VLCLibrarySongsTableViewGenreColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewPlayCountColumnIdentifier = @"VLCLibrarySongsTableViewPlayCountColumnIdentifier";
+static NSString *VLCLibrarySongsTableViewYearColumnIdentifier = @"VLCLibrarySongsTableViewYearColumnIdentifier";
+
+
 @interface VLCLibraryAudioDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
@@ -263,8 +273,10 @@
 {
     _groupSelectionTableView.target = self;
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
+
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
+
     _songsTableView.target = self;
     _songsTableView.doubleAction = @selector(songDoubleClickAction:);
 }
@@ -341,30 +353,30 @@
         NSString *cellText = @"";
         NSString *cellIdentifier = @"";
 
-        if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewSongPlayingColumnIdentifier"]) {
+        if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewSongPlayingColumnIdentifier]) {
             VLCLibrarySongsTableViewSongPlayingTableCellView *cellView = (VLCLibrarySongsTableViewSongPlayingTableCellView*)[tableView makeViewWithIdentifier:@"VLCLibrarySongsTableViewSongPlayingTableCellViewIdentifier" owner:self];
             NSAssert(cellView, @"Unexpectedly received null cellview");
             cellView.representedMediaItem = [self libraryItemAtRow:row];
             return cellView;
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewTitleColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewTitleColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewTitleTableCellViewIdentifier";
             cellText = mediaItem.title;
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewDurationColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewDurationColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewDurationTableCellViewIdentifier";
             cellText = mediaItem.durationString;
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewArtistColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewArtistColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewArtistTableCellViewIdentifier";
             cellText = album.artistName.length == 0 ? @"" : album.artistName;
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewAlbumColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewAlbumColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewAlbumTableCellViewIdentifier";
             cellText = album.title.length == 0 ? @"" : album.title;
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewGenreColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewGenreColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewGenreTableCellViewIdentifier";
             cellText = genre.name.length == 0 ? @"" : genre.name;
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewPlayCountColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewPlayCountColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewPlayCountTableCellViewIdentifier";
             cellText = [@(mediaItem.playCount) stringValue];
-        } else if ([columnIdentifier isEqualToString:@"VLCLibrarySongsTableViewYearColumnIdentifier"]) {
+        } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewYearColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewYearTableCellViewIdentifier";
             cellText = [@(mediaItem.year) stringValue];
         } else {
