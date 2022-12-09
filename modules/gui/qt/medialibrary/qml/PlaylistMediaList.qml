@@ -324,10 +324,7 @@ FocusScope {
             //-------------------------------------------------------------------------------------
             // Properties
 
-            property int _widthName:
-                Math.max(VLCStyle.gridColumnsForWidth(tableView.availableRowWidth
-                                                      - VLCStyle.listAlbumCover_width
-                                                      - VLCStyle.column_margin_width) - 1, 1)
+            property int _columns: Math.max(1, VLCStyle.gridColumnsForWidth(availableRowWidth) - 2)
 
             //-------------------------------------------------------------------------------------
             // Settings
@@ -348,14 +345,14 @@ FocusScope {
                 isPrimary: true,
                 criteria: "thumbnail",
 
-                width: VLCStyle.listAlbumCover_width,
+                width: VLCStyle.colWidth(1),
 
                 headerDelegate: columns.titleHeaderDelegate,
                 colDelegate   : columns.titleDelegate
             }, {
                 criteria: "name",
 
-                width: VLCStyle.colWidth(_widthName),
+                width: VLCStyle.colWidth(_columns),
 
                 text: I18n.qtr("Name")
             }, {
