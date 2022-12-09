@@ -325,6 +325,12 @@ void MainUI::registerQMLTypes()
         qmlRegisterType(QUrl("qrc:///util/BindingRev8.qml"), uri, versionMajor, versionMinor, "BindingCompat");
 #endif
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+        qmlRegisterType(QUrl("qrc:///util/TouchScreenTapHandlerRev12.qml"), uri, versionMajor, versionMinor, "TouchScreenTapHandlerCompat");
+#else
+        qmlRegisterType(QUrl("qrc:///util/TouchScreenTapHandlerRev11.qml"), uri, versionMajor, versionMinor, "TouchScreenTapHandlerCompat");
+#endif
+
         qmlProtectModule(uri, versionMajor);
     }
 
