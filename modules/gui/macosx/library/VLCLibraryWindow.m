@@ -765,7 +765,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _windowFrameBeforePlayback = [self frame];
 }
 
-- (void)startAutohideTimer
+- (void)startToolbarAutohideTimer
 {
     /* Do nothing if timer is already in place */
     if (_hideToolbarTimer.valid) {
@@ -800,7 +800,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self stopAutohideTimer];
 
     if (self.hasActiveVideo && !self.videoView.hidden) {
-        [self startAutohideTimer];
+        [self startToolbarAutohideTimer];
     }
 
     self.toolbar.visible = YES;
@@ -881,7 +881,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_fspanel shouldBecomeActive:nil];
     }
 
-    [self videoHideToolbar:self];
+    [self startToolbarAutohideTimer];
 }
 
 - (void)disableVideoPlaybackAppearance
