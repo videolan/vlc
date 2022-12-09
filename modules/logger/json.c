@@ -39,6 +39,10 @@
 
 #define JSON_FILENAME "vlc-log.json"
 
+#ifdef __APPLE__
+# include <TargetConditionals.h>
+#endif
+
 #define TIME_FROM_TICK(ts) NS_FROM_VLC_TICK(ts)
 
 typedef struct
@@ -212,6 +216,29 @@ static const struct vlc_tracer_operations json_ops =
     Close
 };
 
+#ifdef __APPLE__
+/* Find the correct path to the default location for tracing
+ * on Apple platforms (OSX / iOS / tvOS). */
+static char *GetAppleJsonFile(void)
+{
+#ifdef TARGET_OS_IPHONE
+#define LOGFILE_FORMAT "%s/"JSON_FILENAME
+#else
+#define LOGFILE_FORMAT "%s/Library/Logs/"JSON_FILENAME
+#endif
+
+    char *path = NULL;
+    char *home = config_GetUserDir(VLC_HOME_DIR);
+    if (home != NULL)
+    {
+        if (asprintf(&path, LOGFILE_FORMAT, home) == -1)
+            path = NULL;
+        free(home);
+    }
+    return path;
+}
+#endif
+
 static const struct vlc_tracer_operations *Open(vlc_object_t *obj,
                                                void **restrict sysp)
 {
@@ -226,16 +253,9 @@ static const struct vlc_tracer_operations *Open(vlc_object_t *obj,
     char *path = var_InheritString(obj, "json-tracer-file");
 #ifdef __APPLE__
     if (path == NULL)
-    {
-        char *home = config_GetUserDir(VLC_HOME_DIR);
-        if (home != NULL)
-        {
-            if (asprintf(&path, "%s/Library/Logs/"JSON_FILENAME, home) == -1)
-                path = NULL;
-            free(home);
-        }
-    }
+        path = GetAppleJsonFile();
 #endif
+
     if (path != NULL)
         filename = path;
 
