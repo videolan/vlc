@@ -132,6 +132,7 @@ typedef struct decoder_sys_t
             void *p_surface, *p_jsurface;
             unsigned i_angle;
             unsigned i_input_width, i_input_height;
+            unsigned i_input_visible_width, i_input_visible_height;
             unsigned int i_stride, i_slice_height;
             int i_pixel_format;
             struct hxxx_helper hh;
@@ -273,9 +274,13 @@ static void HXXXInitSize(decoder_t *p_dec, bool *p_size_changed)
            == VLC_SUCCESS)
         {
             *p_size_changed = (i_w != p_sys->video.i_input_width
-                            || i_h != p_sys->video.i_input_height);
+                            || i_h != p_sys->video.i_input_height
+                            || i_vw != p_sys->video.i_input_visible_width
+                            || i_vh != p_sys->video.i_input_visible_height);
             p_sys->video.i_input_width = i_w;
             p_sys->video.i_input_height = i_h;
+            p_sys->video.i_input_visible_width = i_vw;
+            p_sys->video.i_input_visible_height = i_vh;
             /* fmt_out video size will be updated by mediacodec output callback */
         }
         else *p_size_changed = false;
@@ -1202,9 +1207,9 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         }
         else
         {
-            p_dec->fmt_out.video.i_visible_width =
+            p_dec->fmt_out.video.i_visible_width = p_sys->video.i_input_visible_width;
             p_dec->fmt_out.video.i_width = p_sys->video.i_input_width;
-            p_dec->fmt_out.video.i_visible_height =
+            p_dec->fmt_out.video.i_visible_height = p_sys->video.i_input_visible_height;
             p_dec->fmt_out.video.i_height = p_sys->video.i_input_height;
             msg_Dbg(p_dec, "video size ignored from MediaCodec");
         }
