@@ -186,8 +186,12 @@ GetLatency(audio_output_t *p_aout)
     latency_us += us;
 
     if (changed)
+    {
         msg_Dbg(p_aout, "Current device has a new total latency of %" PRId64 "us",
                 latency_us);
+        aout_LatencyReport(p_aout, latency_us);
+    }
+
     return latency_us;
 }
 
