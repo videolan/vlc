@@ -761,6 +761,7 @@ static void FilterFlush(vout_thread_sys_t *sys, bool is_locked)
     {
         picture_Release( sys->displayed.current );
         sys->displayed.current = NULL;
+        sys->displayed.date = VLC_TICK_INVALID;
     }
 
     if (!is_locked)
