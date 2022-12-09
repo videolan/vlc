@@ -155,6 +155,12 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 
 static char *config_GetHomeDir (void)
 {
+#ifdef TARGET_OS_TV
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [paths objectAtIndex:0];
+    return strdup([cacheDirectory UTF8String]);
+#endif
+
     const char *home = getenv ("HOME");
 
     if (home == NULL)
