@@ -577,10 +577,13 @@ static void aout_SetupMixModeChoices (audio_output_t *aout,
 
     const bool has_spatialaudio = module_exists("spatialaudio");
 
-    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_UNSET, _("Original"), fmt);
-
-    if (fmt->channel_type != AUDIO_CHANNEL_TYPE_AMBISONICS && has_spatialaudio)
+    /* Don't propose the mix option if we don't have the spatialaudio module
+     * and if the content is ambisonics */
+    if (fmt->channel_type != AUDIO_CHANNEL_TYPE_AMBISONICS || has_spatialaudio)
+    {
+        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_UNSET, _("Original"), fmt);
         aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
+    }
 
     if (has_spatialaudio)
         aout_AddMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL, _("Binaural"), NULL);
