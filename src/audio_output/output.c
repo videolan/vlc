@@ -587,8 +587,7 @@ static void aout_SetupMixModeChoices (audio_output_t *aout,
 
     aout_AddMixModeChoice(aout, AOUT_MIX_MODE_UNSET, _("Original"), fmt);
 
-    if (fmt->channel_type != AUDIO_CHANNEL_TYPE_AMBISONICS && has_spatialaudio)
-        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
+    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
 
     if (has_spatialaudio)
         aout_AddMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL, _("Binaural"), NULL);
