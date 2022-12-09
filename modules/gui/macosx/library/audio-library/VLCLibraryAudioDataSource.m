@@ -227,6 +227,14 @@
 
 - (void)setup
 {
+    [self setupCollectionView];
+    [self setupTableViews];
+
+    _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
+}
+
+- (void)setupCollectionView
+{
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
 
@@ -234,12 +242,12 @@
 
     NSNib *albumSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAlbumSupplementaryDetailView" bundle:nil];
     [_collectionView registerNib:albumSupplementaryDetailView
-      forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind 
+      forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier];
 
     NSNib *audioGroupSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAudioGroupSupplementaryDetailView" bundle:nil];
     [_collectionView registerNib:audioGroupSupplementaryDetailView
-      forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind 
+      forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 
     NSNib *mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
@@ -249,15 +257,16 @@
 
     _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionView.collectionViewLayout = _collectionViewFlowLayout;
+}
 
+- (void)setupTableViews
+{
     _groupSelectionTableView.target = self;
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
     _songsTableView.target = self;
     _songsTableView.doubleAction = @selector(songDoubleClickAction:);
-
-    _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
 }
 
 - (void)reloadData
