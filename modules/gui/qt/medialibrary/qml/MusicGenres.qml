@@ -228,9 +228,7 @@ FocusScope {
         MainInterface.MainTableView {
             id: tableView_id
 
-            readonly property int _nameColSpan: Math.max(
-                                                    VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth - VLCStyle.listAlbumCover_width - VLCStyle.column_margin_width) - 1
-                                                    , 1)
+            property int _nameColSpan: Math.max(1, VLCStyle.gridColumnsForWidth(availableRowWidth) - 2)
 
             model: genreModel
             selectionDelegateModel: selectionModel
@@ -248,11 +246,27 @@ FocusScope {
             rowHeight: VLCStyle.tableCoverRow_height
             headerTopPadding: VLCStyle.margin_normal
 
-            sortModel:  [
-                { isPrimary: true, criteria: "cover", width: VLCStyle.listAlbumCover_width, headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
-                { criteria: "name", width: VLCStyle.colWidth(tableView_id._nameColSpan), text: I18n.qtr("Name") },
-                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: I18n.qtr("Tracks") }
-            ]
+            sortModel: [{
+                isPrimary: true,
+                criteria: "cover",
+
+                width: VLCStyle.colWidth(1),
+
+                headerDelegate: tableColumns.titleHeaderDelegate,
+                colDelegate: tableColumns.titleDelegate
+            }, {
+                criteria: "name",
+
+                width: VLCStyle.colWidth(_nameColSpan),
+
+                text: I18n.qtr("Name")
+            }, {
+                criteria: "nb_tracks",
+
+                width: VLCStyle.colWidth(1),
+
+                text: I18n.qtr("Tracks")
+            }]
 
             onItemDoubleClicked: {
                 root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
