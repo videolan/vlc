@@ -1204,6 +1204,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             p_dec->fmt_out.video.i_width = i_width;
             p_dec->fmt_out.video.i_visible_height =
             p_dec->fmt_out.video.i_height = i_height;
+            p_dec->fmt_out.video.i_x_offset = p_out->conf.video.crop_left;
+            p_dec->fmt_out.video.i_y_offset = p_out->conf.video.crop_top;
         }
         else
         {
