@@ -104,8 +104,9 @@ endif
 
 QT_CONFIG := -static -opensource -confirm-license $(QT_OPENGL) -no-pkg-config \
 	-no-sql-sqlite -no-gif -no-openssl -no-dbus -no-vulkan -no-sql-odbc -no-pch \
-	-no-feature-testlib -no-feature-itemmodeltester -no-feature-sqlmodel -no-feature-sql \
-	-no-feature-xml -no-feature-printer -no-feature-concurrent -no-compile-examples -nomake examples -nomake tests \
+	-no-feature-concurrent -no-feature-itemmodeltester -no-feature-printer \
+	-no-feature-sqlmodel -no-feature-sql -no-feature-testlib -no-feature-xml \
+	-no-compile-examples -nomake examples -nomake tests \
 	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib
 
 # For now, we only build Qt in release mode. In debug mode, startup is prevented by the internal ANGLE
