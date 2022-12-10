@@ -53,14 +53,13 @@ static NSString *VLCLibrarySongsTableViewGenreColumnIdentifier = @"VLCLibrarySon
 static NSString *VLCLibrarySongsTableViewPlayCountColumnIdentifier = @"VLCLibrarySongsTableViewPlayCountColumnIdentifier";
 static NSString *VLCLibrarySongsTableViewYearColumnIdentifier = @"VLCLibrarySongsTableViewYearColumnIdentifier";
 
-static NSString *VLCLibrarySongsTableViewSongPlayingSortDescriptorKey = @"VLCLibrarySongsTableViewSongPlayingSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewTitleSortDescriptorKey = @"VLCLibrarySongsTableViewTitleSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewDurationSortDescriptorKey = @"VLCLibrarySongsTableViewDurationSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewArtistSortDescriptorKey = @"VLCLibrarySongsTableViewArtistSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewAlbumSortDescriptorKey = @"VLCLibrarySongsTableViewAlbumSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewGenreSortDescriptorKey = @"VLCLibrarySongsTableViewGenreSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewPlayCountSortDescriptorKey = @"VLCLibrarySongsTableViewPlayCountSortDescriptorKey";
-static NSString *VLCLibrarySongsTableViewYearSortDescriptorKey = @"VLCLibrarySongsTableViewYearSortDescriptorKey";
+static NSString *VLCLibraryTitleSortDescriptorKey = @"VLCLibraryTitleSortDescriptorKey";
+static NSString *VLCLibraryDurationSortDescriptorKey = @"VLCLibraryDurationSortDescriptorKey";
+static NSString *VLCLibraryArtistSortDescriptorKey = @"VLCLibraryArtistSortDescriptorKey";
+static NSString *VLCLibraryAlbumSortDescriptorKey = @"VLCLibraryAlbumSortDescriptorKey";
+static NSString *VLCLibraryPlayCountSortDescriptorKey = @"VLCLibraryPlayCountSortDescriptorKey";
+static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescriptorKey";
+// TODO: Add sorting by genre
 
 @interface VLCLibraryAudioDataSource ()
 {
@@ -294,35 +293,33 @@ static NSString *VLCLibrarySongsTableViewYearSortDescriptorKey = @"VLCLibrarySon
     _songsTableView.doubleAction = @selector(songDoubleClickAction:);
 
     for(NSTableColumn *column in _songsTableView.tableColumns) {
-        column.sortDescriptorPrototype = [self sortDescriptorPrototypeForSongsTableViewColumnIdentifier:column.identifier];
+        NSSortDescriptor * const columnSortDescriptor = [self sortDescriptorPrototypeForSongsTableViewColumnIdentifier:column.identifier];
+
+        if(columnSortDescriptor) {
+            column.sortDescriptorPrototype = columnSortDescriptor;
+        }
     }
 }
 
 - (NSSortDescriptor *)sortDescriptorPrototypeForSongsTableViewColumnIdentifier:(NSString *)columnIdentifier
 {
-    if([columnIdentifier isEqualToString:VLCLibrarySongsTableViewSongPlayingColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewSongPlayingSortDescriptorKey ascending:true];
-
-    } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewTitleColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewTitleSortDescriptorKey ascending:true];
+    if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewTitleColumnIdentifier]) {
+        return [[NSSortDescriptor alloc] initWithKey:VLCLibraryTitleSortDescriptorKey ascending:true];
 
     } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewDurationColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewDurationSortDescriptorKey ascending:true];
+        return [[NSSortDescriptor alloc] initWithKey:VLCLibraryDurationSortDescriptorKey ascending:true];
 
     } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewArtistColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewArtistSortDescriptorKey ascending:true];
+        return [[NSSortDescriptor alloc] initWithKey:VLCLibraryArtistSortDescriptorKey ascending:true];
 
     } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewAlbumColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewAlbumSortDescriptorKey ascending:true];
-
-    } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewGenreColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewGenreSortDescriptorKey ascending:true];
+        return [[NSSortDescriptor alloc] initWithKey:VLCLibraryAlbumSortDescriptorKey ascending:true];
 
     } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewPlayCountColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewPlayCountSortDescriptorKey ascending:true];
+        return [[NSSortDescriptor alloc] initWithKey:VLCLibraryPlayCountSortDescriptorKey ascending:true];
 
     } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewYearColumnIdentifier]) {
-        return [[NSSortDescriptor alloc] initWithKey:VLCLibrarySongsTableViewYearSortDescriptorKey ascending:true];
+        return [[NSSortDescriptor alloc] initWithKey:VLCLibraryYearSortDescriptorKey ascending:true];
 
     }
 
@@ -469,6 +466,40 @@ static NSString *VLCLibrarySongsTableViewYearSortDescriptorKey = @"VLCLibrarySon
     }
 
     [self.groupSelectionTableView reloadData];
+}
+
+- (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
+{
+    const NSSortDescriptor * const sortDescriptor = tableView.sortDescriptors.firstObject;
+    const vlc_ml_sorting_criteria_t sortCriteria = [self sortDescriptorKeyToVlcMlSortingCriteria:sortDescriptor.key];
+
+    [VLCMain.sharedInstance.libraryController sortByCriteria:sortCriteria andDescending:!sortDescriptor.ascending];
+    [self reloadData];
+}
+
+- (vlc_ml_sorting_criteria_t)sortDescriptorKeyToVlcMlSortingCriteria:(NSString *)sortDescriptorKey
+{
+    if ([sortDescriptorKey isEqualToString:VLCLibraryTitleSortDescriptorKey]) {
+        return VLC_ML_SORTING_DEFAULT;
+
+    } else if ([sortDescriptorKey isEqualToString:VLCLibraryDurationSortDescriptorKey]) {
+        return VLC_ML_SORTING_DURATION;
+
+    } else if ([sortDescriptorKey isEqualToString:VLCLibraryArtistSortDescriptorKey]) {
+        return VLC_ML_SORTING_ARTIST;
+
+    } else if ([sortDescriptorKey isEqualToString:VLCLibraryAlbumSortDescriptorKey]) {
+        return VLC_ML_SORTING_ALBUM;
+
+    } else if ([sortDescriptorKey isEqualToString:VLCLibraryPlayCountSortDescriptorKey]) {
+        return VLC_ML_SORTING_PLAYCOUNT;
+
+    } else if ([sortDescriptorKey isEqualToString:VLCLibraryYearSortDescriptorKey]) {
+        return VLC_ML_SORTING_RELEASEDATE;
+
+    }
+
+    return VLC_ML_SORTING_DEFAULT;
 }
 
 #pragma mark - table view double click actions
