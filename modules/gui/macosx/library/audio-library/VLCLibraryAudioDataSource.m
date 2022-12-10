@@ -383,6 +383,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
     [self.songsTableView reloadData];
+    [self setupExistingSortForTableView:_songsTableView];
 }
 
 - (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
