@@ -292,7 +292,13 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     _songsTableView.target = self;
     _songsTableView.doubleAction = @selector(songDoubleClickAction:);
 
-    for(NSTableColumn *column in _songsTableView.tableColumns) {
+    [self setupPrototypeSortDescriptorsForTableView:_songsTableView];
+    [self setupExistingSortForTableView:_songsTableView];
+}
+
+- (void)setupPrototypeSortDescriptorsForTableView:(NSTableView *)tableView
+{
+    for(NSTableColumn *column in tableView.tableColumns) {
         NSSortDescriptor * const columnSortDescriptor = [self sortDescriptorPrototypeForSongsTableViewColumnIdentifier:column.identifier];
 
         if(columnSortDescriptor) {
@@ -324,6 +330,43 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     return nil;
+}
+
+- (void)setupExistingSortForTableView:(NSTableView *)tableView
+{
+    const VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    const vlc_ml_sorting_criteria_t existingSortCriteria = libraryController.lastSortingCriteria;
+
+    NSString *sortDescriptorKey = [self sortDescriptorKeyFromVlcMlSortingCriteria:existingSortCriteria];
+    const NSSortDescriptor * const sortDescriptor = [[NSSortDescriptor alloc] initWithKey:sortDescriptorKey
+                                                                                ascending:!libraryController.descendingLibrarySorting];
+
+    tableView.sortDescriptors = @[sortDescriptor];
+}
+
+- (NSString *)sortDescriptorKeyFromVlcMlSortingCriteria:(vlc_ml_sorting_criteria_t)existingSortCriteria
+{
+    if (existingSortCriteria == VLC_ML_SORTING_DEFAULT) {
+        return VLCLibraryTitleSortDescriptorKey;
+
+    } else if (existingSortCriteria == VLC_ML_SORTING_DURATION) {
+        return VLCLibraryDurationSortDescriptorKey;
+
+    } else if (existingSortCriteria == VLC_ML_SORTING_ARTIST) {
+        return VLCLibraryArtistSortDescriptorKey;
+
+    } else if (existingSortCriteria == VLC_ML_SORTING_ALBUM) {
+        return VLCLibraryAlbumSortDescriptorKey;
+
+    } else if (existingSortCriteria == VLC_ML_SORTING_PLAYCOUNT) {
+        return VLCLibraryPlayCountSortDescriptorKey;
+
+    } else if (existingSortCriteria == VLC_ML_SORTING_RELEASEDATE) {
+        return VLCLibraryYearSortDescriptorKey;
+
+    }
+
+    return VLCLibraryTitleSortDescriptorKey;
 }
 
 - (void)reloadData
