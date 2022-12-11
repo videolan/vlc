@@ -68,11 +68,13 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
         cellView.identifier = VLCAudioLibrarySongCellIdentifier;
     }
 
-    cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)[self libraryItemAtRow:row];
+    cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)[self libraryItemAtRow:row
+                                                                          forTableView:tableView];
     return cellView;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
 {
     return _tracks[row];
 }

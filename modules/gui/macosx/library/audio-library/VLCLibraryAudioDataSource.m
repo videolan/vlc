@@ -150,17 +150,20 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
     const NSInteger collectionSelectionTableViewRow = _collectionSelectionTableView.selectedRow;
     if(collectionSelectionTableViewRow >= 0 && !_collectionSelectionTableView.hidden) {
-        _selectedCollectionSelectionTableViewItem = [self libraryItemAtRow:collectionSelectionTableViewRow];
+        _selectedCollectionSelectionTableViewItem = [self libraryItemAtRow:collectionSelectionTableViewRow
+                                                              forTableView:_collectionSelectionTableView];
     }
 
     const NSInteger groupSelectionTableViewRow = _groupSelectionTableView.selectedRow;
     if(groupSelectionTableViewRow >= 0 && !_groupSelectionTableView.hidden) {
-        _selectedGroupSelectionTableViewItem = [self libraryItemAtRow:groupSelectionTableViewRow];
+        _selectedGroupSelectionTableViewItem = [self libraryItemAtRow:groupSelectionTableViewRow
+                                                         forTableView:_groupSelectionTableView];
     }
 
     const NSInteger songsTableViewRow = _songsTableView.selectedRow;
     if(songsTableViewRow >= 0 && !_songsTableView.hidden) {
-        _selectedSongTableViewItem = [self libraryItemAtRow:songsTableViewRow];
+        _selectedSongTableViewItem = [self libraryItemAtRow:songsTableViewRow
+                                               forTableView:_songsTableView];
     }
 }
 
@@ -435,7 +438,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     // and we use a vanilla NSTableView created in the VLCLibraryWindow XIB for it
     if ([tableView.identifier isEqualToString:@"VLCLibrarySongsTableViewIdentifier"]) {
         const NSString * const columnIdentifier = tableColumn.identifier;
-        const VLCMediaLibraryMediaItem * const mediaItem = [self libraryItemAtRow:row];
+        const VLCMediaLibraryMediaItem * const mediaItem = [self libraryItemAtRow:row forTableView:tableView];
         const VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:mediaItem.albumID];
         const VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:mediaItem.genreID];
 
@@ -445,7 +448,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewSongPlayingColumnIdentifier]) {
             VLCLibrarySongsTableViewSongPlayingTableCellView *cellView = (VLCLibrarySongsTableViewSongPlayingTableCellView*)[tableView makeViewWithIdentifier:@"VLCLibrarySongsTableViewSongPlayingTableCellViewIdentifier" owner:self];
             NSAssert(cellView, @"Unexpectedly received null cellview");
-            cellView.representedMediaItem = [self libraryItemAtRow:row];
+            cellView.representedMediaItem = (VLCMediaLibraryMediaItem *)mediaItem;
             return cellView;
         } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewTitleColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewTitleTableCellViewIdentifier";
@@ -484,11 +487,12 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    [cellView setRepresentedItem:[self libraryItemAtRow:row]];
+    [cellView setRepresentedItem:[self libraryItemAtRow:row forTableView:tableView]];
     return cellView;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
 {
     return _displayedCollection[row];
 }
@@ -683,11 +687,12 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         cellView.identifier = VLCAudioLibraryCellIdentifier;
     }
 
-    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[self libraryItemAtRow:row];
+    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[self libraryItemAtRow:row forTableView:tableView];
     return cellView;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
 {
     return _representedListOfAlbums[row];
 }

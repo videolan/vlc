@@ -65,7 +65,7 @@
         return;
     }
 
-    [_menuController setRepresentedItem:[(id<VLCLibraryTableViewDataSource>)self.dataSource libraryItemAtRow:self.clickedRow]];
+    [_menuController setRepresentedItem:[(id<VLCLibraryTableViewDataSource>)self.dataSource libraryItemAtRow:self.clickedRow forTableView:self]];
 }
 
 @end

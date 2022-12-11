@@ -28,7 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryTableViewDataSource <NSTableViewDataSource>
 
-- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row;
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView;
 
 @end
 
