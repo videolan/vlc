@@ -156,4 +156,22 @@
     }
 }
 
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
+        switch(_groupsTableView.selectedRow + 1) { // Group 0 is invalid so add one
+            case VLCLibraryVideoRecentsGroup:
+                return _recentsArray[row];
+            case VLCLibraryVideoLibraryGroup:
+                return _libraryArray[row];
+            default:
+                NSAssert(1, @"Reached unreachable case for video library section");
+                break;
+        }
+    }
+
+    return nil;
+}
+
 @end

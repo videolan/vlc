@@ -22,11 +22,13 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryTableView.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryVideoTableViewDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
+@interface VLCLibraryVideoTableViewDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) NSTableView *groupsTableView;
