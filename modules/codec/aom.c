@@ -517,8 +517,7 @@ static int OpenEncoder(vlc_object_t *p_this)
                     break;
                 default:
                     msg_Err( p_enc, "%d bit is unsupported for profile %d", i_bit_depth, i_profile );
-                    free( p_sys );
-                    return VLC_EGENERIC;
+                    goto error_nocontext;
             }
             enccfg.g_bit_depth = i_bit_depth;
             break;
@@ -531,8 +530,7 @@ static int OpenEncoder(vlc_object_t *p_this)
             /* fallthrough */
         default:
             msg_Err( p_enc, "Unsupported profile %d", i_profile );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error_nocontext;
     }
 
     msg_Dbg(p_this, "AV1: using libaom version %s (build options %s)",
@@ -542,26 +540,21 @@ static int OpenEncoder(vlc_object_t *p_this)
     if (aom_codec_enc_init(ctx, iface, &enccfg, enc_flags) != AOM_CODEC_OK)
     {
         AOM_ERR(p_this, ctx, "Failed to initialize encoder");
-        free(p_sys);
-        return VLC_EGENERIC;
+        goto error_nocontext;
     }
 
     if (i_tile_rows >= 0 &&
         aom_codec_control(ctx, AV1E_SET_TILE_ROWS, i_tile_rows))
     {
         AOM_ERR(p_this, ctx, "Failed to set tile rows");
-        destroy_context(p_this, ctx);
-        free(p_sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if (i_tile_columns >= 0 &&
         aom_codec_control(ctx, AV1E_SET_TILE_COLUMNS, i_tile_columns))
     {
         AOM_ERR(p_this, ctx, "Failed to set tile columns");
-        destroy_context(p_this, ctx);
-        free(p_sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
 #ifdef AOM_CTRL_AV1E_SET_ROW_MT
@@ -569,9 +562,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         aom_codec_control(ctx, AV1E_SET_ROW_MT, b_row_mt))
     {
         AOM_ERR(p_this, ctx, "Failed to set row-multithreading");
-        destroy_context(p_this, ctx);
-        free(p_sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 #endif
 
@@ -579,9 +570,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     if (aom_codec_control(ctx, AOME_SET_CPUUSED, i_cpu_used))
     {
         AOM_ERR(p_this, ctx, "Failed to set cpu-used");
-        destroy_context(p_this, ctx);
-        free(p_sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     static const struct vlc_encoder_operations ops =
@@ -592,6 +581,12 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_enc->ops = &ops;
 
     return VLC_SUCCESS;
+
+error:
+    destroy_context(p_this, ctx);
+error_nocontext:
+    free(p_sys);
+    return VLC_EGENERIC;
 }
 
 /****************************************************************************
