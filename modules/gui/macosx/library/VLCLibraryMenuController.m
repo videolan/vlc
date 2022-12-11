@@ -50,6 +50,12 @@
 
 - (void)createMenu
 {
+    [self createLibraryMediaItemMenu];
+    [self createMinimalMenu];
+}
+
+- (void)createLibraryMediaItemMenu
+{
     NSMenuItem *playItem = [[NSMenuItem alloc] initWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
     playItem.target = self;
     NSMenuItem *appendItem = [[NSMenuItem alloc] initWithTitle:_NS("Append to Playlist") action:@selector(appendToPlaylist:) keyEquivalent:@""];
@@ -65,7 +71,10 @@
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem]];
+}
 
+- (void)createMinimalMenu
+{
     _minimalMenu = [[NSMenu alloc] initWithTitle:@""];
     NSMenuItem *addItem2 = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
     [_minimalMenu addItem:addItem2];
