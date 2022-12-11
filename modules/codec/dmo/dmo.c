@@ -67,33 +67,6 @@ static int LoadDMO( vlc_object_t *, HINSTANCE *, IMediaObject **,
                     const es_format_t *, bool );
 static void CopyPicture( picture_t *, uint8_t * );
 
-vlc_module_begin ()
-    set_description( N_("DirectMedia Object decoder") )
-    add_shortcut( "dmo" )
-    set_capability( "video decoder", 1 )
-    set_callbacks( DecoderOpen, DecoderClose )
-    set_subcategory( SUBCAT_INPUT_VCODEC )
-
-    add_submodule()
-    add_shortcut("dmo")
-    set_capability( "audio decoder", 1 )
-    set_callbacks(DecoderOpen, DecoderClose)
-
-    add_submodule ()
-    set_description( N_("DirectMedia Object encoder") )
-    add_shortcut( "dmo" )
-    set_capability( "video encoder", 10 )
-    set_callback( EncoderOpen )
-
-    add_submodule ()
-    set_description( N_("DirectMedia Object encoder") )
-    add_shortcut( "dmo" )
-    set_capability( "audio encoder", 10 )
-    set_callback( EncoderOpen )
-
-
-vlc_module_end ()
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -1639,3 +1612,28 @@ void EncoderClose( encoder_t *p_enc )
 
     free( p_sys );
 }
+
+vlc_module_begin ()
+    set_description( N_("DirectMedia Object decoder") )
+    add_shortcut( "dmo" )
+    set_capability( "video decoder", 1 )
+    set_callbacks( DecoderOpen, DecoderClose )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+
+    add_submodule()
+    add_shortcut("dmo")
+    set_capability( "audio decoder", 1 )
+    set_callbacks(DecoderOpen, DecoderClose)
+
+    add_submodule ()
+    set_description( N_("DirectMedia Object encoder") )
+    add_shortcut( "dmo" )
+    set_capability( "video encoder", 10 )
+    set_callback( EncoderOpen )
+
+    add_submodule ()
+    set_description( N_("DirectMedia Object encoder") )
+    add_shortcut( "dmo" )
+    set_capability( "audio encoder", 10 )
+    set_callback( EncoderOpen )
+vlc_module_end ()
