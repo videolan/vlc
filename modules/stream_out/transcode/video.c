@@ -68,7 +68,7 @@ static vlc_decoder_device *video_get_encoder_device( encoder_t *enc )
 }
 
 static const struct encoder_owner_callbacks encoder_video_transcode_cbs = {
-    { video_get_encoder_device, }
+    .video.get_device = video_get_encoder_device
 };
 
 static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
