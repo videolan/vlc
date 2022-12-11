@@ -29,8 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryMenuController : NSObject
 
 @property (readonly) NSMenu *libraryMenu;
-@property (readonly) NSMenu *minimalMenu;
-@property (readonly) NSMenu *menuToPresent;
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView;
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item;

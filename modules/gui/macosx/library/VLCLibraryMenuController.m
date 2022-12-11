@@ -34,6 +34,8 @@
 {
     VLCLibraryInformationPanel *_informationPanel;
     id<VLCMediaLibraryItemProtocol> _representedItem;
+
+    NSArray<NSMenuItem*> *_mediaItemRequiringMenuItems;
 }
 @end
 
@@ -43,51 +45,56 @@
 {
     self = [super init];
     if (self) {
-        [self createMenu];
+        [self createLibraryMenu];
     }
     return self;
 }
 
-- (void)createMenu
-{
-    [self createLibraryMediaItemMenu];
-    [self createMinimalMenu];
-}
-
-- (void)createLibraryMediaItemMenu
+- (void)createLibraryMenu
 {
     NSMenuItem *playItem = [[NSMenuItem alloc] initWithTitle:_NS("Play") action:@selector(play:) keyEquivalent:@""];
     playItem.target = self;
+
     NSMenuItem *appendItem = [[NSMenuItem alloc] initWithTitle:_NS("Append to Playlist") action:@selector(appendToPlaylist:) keyEquivalent:@""];
     appendItem.target = self;
+
     NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
     addItem.target = self;
+
     NSMenuItem *revealItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
     revealItem.target = self;
+
     NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete from Library") action:@selector(moveToTrash:) keyEquivalent:@""];
     deleteItem.target = self;
+
     NSMenuItem *informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
     informationItem.target = self;
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem]];
+    
+    _mediaItemRequiringMenuItems = @[playItem, appendItem, revealItem, deleteItem, informationItem];
 }
 
-- (void)createMinimalMenu
+- (void)setMediaItemRequiringMenuItemsHidden:(BOOL)hidden
 {
-    _minimalMenu = [[NSMenu alloc] initWithTitle:@""];
-    NSMenuItem *addItem2 = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
-    [_minimalMenu addItem:addItem2];
+    for (NSMenuItem *menuItem in _mediaItemRequiringMenuItems) {
+        menuItem.hidden = hidden;
+    }
 }
 
-- (NSMenu *)menuToPresent
+- (void)updateLibraryMenuItems
 {
-    return _representedItem == nil ? _minimalMenu : _libraryMenu;
+    if (_representedItem) {
+        [self setMediaItemRequiringMenuItemsHidden:NO];
+    } else {
+        [self setMediaItemRequiringMenuItemsHidden:YES];
+    }
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
 {
-    [NSMenu popUpContextMenu:[self menuToPresent] withEvent:theEvent forView:theView];
+    [NSMenu popUpContextMenu:_libraryMenu withEvent:theEvent forView:theView];
 }
 
 #pragma mark - actions
@@ -178,6 +185,7 @@
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
 {
     _representedItem = item;
+    [self updateLibraryMenuItems];
 }
 
 @end
