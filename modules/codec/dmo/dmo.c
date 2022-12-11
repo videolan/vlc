@@ -1014,9 +1014,30 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *samples )
     { return EncodeBlock( p_enc, samples ); }
 
 /*****************************************************************************
- * EncoderOpen: open dmo codec
+ * EncoderOpenAudio: open audio dmo codec
  *****************************************************************************/
-static int EncoderOpen( vlc_object_t *p_this )
+static int EncoderOpenAudio(vlc_object_t *p_this)
+{
+    encoder_t *p_enc = (encoder_t*)p_this;
+
+    int i_ret = EncOpen( p_this );
+    if( i_ret != VLC_SUCCESS ) return i_ret;
+
+
+    static const struct vlc_encoder_operations audio_ops =
+    {
+        .close = EncoderClose,
+        .encode_audio = EncodeAudio,
+    };
+    p_enc->ops = &audio_ops;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * EncoderOpenVideo: open video dmo codec
+ *****************************************************************************/
+static int EncoderOpenVideo(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t*)p_this;
 
@@ -1028,26 +1049,7 @@ static int EncoderOpen( vlc_object_t *p_this )
         .close = EncoderClose,
         .encode_video = EncodeVideo,
     };
-
-    static const struct vlc_encoder_operations audio_ops =
-    {
-        .close = EncoderClose,
-        .encode_audio = EncodeAudio,
-    };
-
-    switch( p_enc->fmt_in.i_cat )
-    {
-        case VIDEO_ES:
-            p_enc->ops = &video_ops;
-            break;
-
-        case AUDIO_ES:
-            p_enc->ops = &audio_ops;
-            break;
-
-        default:
-            vlc_assert_unreachable();
-    }
+    p_enc->ops = &video_ops;
 
     return VLC_SUCCESS;
 }
@@ -1629,11 +1631,11 @@ vlc_module_begin ()
     set_description( N_("DirectMedia Object encoder") )
     add_shortcut( "dmo" )
     set_capability( "video encoder", 10 )
-    set_callback( EncoderOpen )
+    set_callback( EncoderOpenVideo )
 
     add_submodule ()
     set_description( N_("DirectMedia Object encoder") )
     add_shortcut( "dmo" )
     set_capability( "audio encoder", 10 )
-    set_callback( EncoderOpen )
+    set_callback( EncoderOpenAudio )
 vlc_module_end ()
