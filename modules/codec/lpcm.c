@@ -537,7 +537,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the encoder's structure */
-    if( ( p_enc->p_sys = p_sys =
+    if( ( p_sys =
           (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
@@ -570,6 +570,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     };
 
     p_enc->ops = &ops;
+    p_enc->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
