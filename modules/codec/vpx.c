@@ -433,8 +433,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     struct vpx_codec_ctx *ctx = &p_sys->ctx;
     if (vpx_codec_enc_init(ctx, iface, &enccfg, 0) != VPX_CODEC_OK) {
         VPX_ERR(p_this, ctx, "Failed to initialize encoder");
-        free(p_sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
@@ -463,6 +462,9 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_enc->p_sys = p_sys;
 
     return VLC_SUCCESS;
+error:
+    free(p_sys);
+    return VLC_EGENERIC;
 }
 
 /****************************************************************************
