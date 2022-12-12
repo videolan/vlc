@@ -613,10 +613,6 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_enc->fmt_in.i_codec = VLC_CODEC_TEXT;
 
-    p_enc->p_sys = NULL;
-
-    p_enc->fmt_out.i_cat = SPU_ES;
-
     if( !p_enc->fmt_out.i_extra )
         FillExtradataTx3g( &p_enc->fmt_out.p_extra, &p_enc->fmt_out.i_extra );
 
