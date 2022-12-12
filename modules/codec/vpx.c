@@ -394,11 +394,6 @@ static int OpenEncoder(vlc_object_t *p_this)
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
 
-    /* Allocate the memory needed to store the encoder's structure */
-    p_sys = malloc(sizeof(*p_sys));
-    if (p_sys == NULL)
-        return VLC_ENOMEM;
-
     const struct vpx_codec_iface *iface;
     int vp_version;
 
@@ -418,9 +413,13 @@ static int OpenEncoder(vlc_object_t *p_this)
         break;
 #endif
     default:
-        free(p_sys);
         return VLC_EGENERIC;
     }
+
+    /* Allocate the memory needed to store the encoder's structure */
+    p_sys = malloc(sizeof(*p_sys));
+    if (p_sys == NULL)
+        return VLC_ENOMEM;
 
     struct vpx_codec_enc_cfg enccfg = {0};
     vpx_codec_enc_config_default(iface, &enccfg, 0);
