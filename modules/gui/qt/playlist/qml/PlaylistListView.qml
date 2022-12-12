@@ -33,7 +33,7 @@ Control {
 
     property alias model: listView.model
 
-    property alias useAcrylic: acrylicBackground.enabled
+    property bool useAcrylic: true
 
     readonly property real minimumWidth: noContentInfoColumn.implicitWidth +
                                          leftPadding +
@@ -178,8 +178,7 @@ Control {
     }
 
     background: Widgets.AcrylicBackground {
-        id: acrylicBackground
-
+        enabled: root.useAcrylic
         alternativeColor: colors.bgAlt
     }
 

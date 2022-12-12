@@ -40,7 +40,7 @@ T.ToolButton {
     property color colorHover: VLCStyle.colors.buttonTextHover
     property color colorHighlighted: VLCStyle.colors.accent
     property color colorDisabled: paintOnly ? color : VLCStyle.colors.textInactive
-    property alias colorFocus: background.activeBorderColor
+    property color colorFocus: VLCStyle.colors.bgFocus
 
 
     padding: 0
@@ -56,8 +56,6 @@ T.ToolButton {
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
     background: AnimatedBackground {
-        id: background
-
         width: control.sourceSize.width
         height: control.sourceSize.height
 
@@ -84,7 +82,7 @@ T.ToolButton {
                 return control.color;
         }
 
-        activeBorderColor: VLCStyle.colors.bgFocus
+        activeBorderColor: control.colorFocus
     }
 
     contentItem: Image {

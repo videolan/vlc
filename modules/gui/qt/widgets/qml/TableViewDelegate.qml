@@ -88,8 +88,6 @@ T.Control {
     // Childs
 
     background: AnimatedBackground {
-        id: background
-
         active: visualFocus
 
         animationDuration: VLCStyle.duration_short
@@ -179,7 +177,7 @@ T.Control {
 
                 readonly property bool containsMouse: hoverArea.containsMouse
 
-                readonly property color foregroundColor: background.foregroundColor
+                readonly property color foregroundColor: delegate.background.foregroundColor
 
                 width: (modelData.width) ? modelData.width : 0
 

@@ -150,8 +150,6 @@ T.Control {
     // Childs
 
     background: AnimatedBackground {
-        id: background
-
         width: root.width + (selectedBorderWidth * 2)
         height: root.height + (selectedBorderWidth * 2)
 
@@ -164,7 +162,7 @@ T.Control {
                          ? VLCStyle.colors.gridSelect
                          : VLCStyle.colors.setColorAlpha(VLCStyle.colors.gridSelect, 0)
 
-        visible: animationRunning || background.active || root.selected
+        visible: animationRunning || active || root.selected
     }
 
     contentItem: MouseArea {
@@ -301,7 +299,7 @@ T.Control {
                     id: titleLabel
 
                     height: implicitHeight
-                    color: background.foregroundColor
+                    color: root.background.foregroundColor
                     textFormat: Text.PlainText
                 }
             }
@@ -312,7 +310,7 @@ T.Control {
                 visible: text !== ""
                 text: root.subtitle
                 elide: Text.ElideRight
-                color: background.foregroundColor
+                color: root.background.foregroundColor
                 textFormat: Text.PlainText
 
                 Layout.preferredWidth: Math.min(pictureWidth, implicitWidth)

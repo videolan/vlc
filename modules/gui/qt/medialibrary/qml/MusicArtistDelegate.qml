@@ -56,8 +56,6 @@ T.Control {
     // Childs
 
     background: Widgets.AnimatedBackground {
-        id: background
-
         active: visualFocus
 
         backgroundColor: {
@@ -175,7 +173,7 @@ T.Control {
                     text: (model.name) ? model.name
                                        : I18n.qtr("Unknown artist")
 
-                    color: background.foregroundColor
+                    color: root.background.foregroundColor
                 }
             }
 

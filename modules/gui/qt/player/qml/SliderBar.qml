@@ -153,7 +153,6 @@ Slider {
     stepSize: 0.01
 
     background: Item {
-        id: slider
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight

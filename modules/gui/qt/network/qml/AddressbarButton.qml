@@ -33,8 +33,9 @@ T.AbstractButton {
 
     // Aliases
 
-    property alias foregroundColor: background.foregroundColor
-    property alias backgroundColor: background.backgroundColor
+    property color foregroundColor: (hovered) ? VLCStyle.colors.buttonTextHover
+                                              : VLCStyle.colors.buttonBanner
+    property color backgroundColor: "transparent"
 
     // Settings
 
@@ -53,14 +54,10 @@ T.AbstractButton {
     // Children
 
     background: Widgets.AnimatedBackground {
-        id: background
-
         active: visualFocus
 
-        backgroundColor: "transparent"
-
-        foregroundColor: (hovered) ? VLCStyle.colors.buttonTextHover
-                                   : VLCStyle.colors.buttonBanner
+        backgroundColor: button.backgroundColor
+        foregroundColor: button.foregroundColor
     }
 
     contentItem: contentLoader.item
