@@ -47,6 +47,8 @@ qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/set-mkspecs-properties.patch
 	# fix missing QMAKE_PKGCONFIG_VERSION in Windows targets
 	$(APPLY) $(SRC)/qt/set-mkspecs-version.patch
+	# don't omit -I${includedir} from .pc files when forcing -I$CONTRIB/include
+	$(APPLY) $(SRC)/qt/add-includedir-to-pc-file.patch
 	# fix detection of our harfbuzz on macosx
 	sed -i.orig 's#"-lharfbuzz"#{ "libs": "-framework CoreText -framework CoreGraphics -framework CoreFoundation -lharfbuzz", "condition": "config.darwin" }, "-lharfbuzz"#' "$(UNPACK_DIR)/src/gui/configure.json"
 	# Let us decide the WINVER/_WIN32_WINNT

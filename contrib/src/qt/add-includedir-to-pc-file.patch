@@ -1,0 +1,41 @@
+From 3114853cdc19b35ca9a312321e4014319e5828fa Mon Sep 17 00:00:00 2001
+From: Johannes Kauffmann <johanneskauffmann@hotmail.com>
+Date: Mon, 12 Dec 2022 13:36:45 +0100
+Subject: [PATCH] qmake: always add includedir to the .pc files
+
+The generated .pc files do not contain -I${includedir}, only
+-I${includedir}/$QTMODULE. This is because QMake finds out that our
+standard contrib include path is already in the QMAKE_DEFAULT_INCDIRS
+list.
+
+When this includepath is not forced externally through some script and
+only the .pc file flags are used for the qt plugin, the build fails:
+
+In file included from /vlc/contrib/x86_64-linux-gnu/include/QtWidgets/QApplication:1,
+                 from ../modules/gui/qt/vlc-qt-check.cpp:26:
+/vlc/contrib/x86_64-linux-gnu/include/QtWidgets/qapplication.h:43:10: fatal error: QtWidgets/qtwidgetsglobal.h: No such file or directory
+   43 | #include <QtWidgets/qtwidgetsglobal.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Fixes #27588.
+---
+ qmake/generators/makefile.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/qmake/generators/makefile.cpp b/qmake/generators/makefile.cpp
+index 5c61a3c65c..ab9d696440 100644
+--- a/qmake/generators/makefile.cpp
++++ b/qmake/generators/makefile.cpp
+@@ -3388,8 +3388,7 @@ MakefileGenerator::writePkgConfigFile()
+       << varGlue("QMAKE_PKGCONFIG_CFLAGS", "", " ", " ")
+         //      << varGlue("DEFINES","-D"," -D"," ")
+          ;
+-    if (!project->values("QMAKE_DEFAULT_INCDIRS").contains(includeDir))
+-        t << "-I${includedir}";
++    t << "-I${includedir}";
+     if (target_mode == TARG_MAC_MODE && project->isActiveConfig("lib_bundle")
+         && libDir != QLatin1String("/Library/Frameworks")) {
+             t << " -F${libdir}";
+-- 
+2.34.1
+
