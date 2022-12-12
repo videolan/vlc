@@ -129,8 +129,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->s = shine_initialise(&cfg);
     p_sys->samples_per_frame = shine_samples_per_pass(p_sys->s);
 
-    p_enc->fmt_out.i_cat = AUDIO_ES;
-
     p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
 
     static const struct vlc_encoder_operations ops =
