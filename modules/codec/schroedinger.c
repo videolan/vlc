@@ -1605,4 +1605,6 @@ static void CloseEncoder( encoder_t *p_enc )
     block_ChainRelease( p_sys->p_chain );
 
     free( p_sys );
+    /* We need to reset p_sys since CloseEncoder is also called during error. */
+    p_enc->p_sys = NULL;
 }
