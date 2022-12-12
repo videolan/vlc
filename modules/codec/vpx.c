@@ -398,7 +398,6 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_sys = malloc(sizeof(*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
-    p_enc->p_sys = p_sys;
 
     const struct vpx_codec_iface *iface;
     int vp_version;
@@ -462,6 +461,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         .encode_video = Encode,
     };
     p_enc->ops = &ops;
+    p_enc->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
