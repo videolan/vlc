@@ -20,6 +20,8 @@ import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.3
 
+import org.videolan.compat 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -154,6 +156,13 @@ T.Control {
                 }
 
                 delegate.dragItem.Drag.active = drag.active
+            }
+
+            TouchScreenTapHandlerCompat {
+                onTapped: {
+                    delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
+                    delegate.itemDoubleClicked(delegate._index, delegate.rowModel)
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -74,6 +75,19 @@ T.Control {
     // Events
 
     // Functions
+
+    function moveSelected() {
+        var selectedIndexes = root.model.getSelection()
+        if (selectedIndexes.length === 0)
+            return
+        var preTarget = index
+        /* move to _above_ the clicked item if move up, but
+         * _below_ the clicked item if move down */
+        if (preTarget > selectedIndexes[0])
+            preTarget++
+        listView.currentIndex = selectedIndexes[0]
+        root.model.moveItemsPre(selectedIndexes, preTarget)
+    }
 
     // Childs
 
@@ -204,16 +218,7 @@ T.Control {
             /* to receive keys events */
             listView.forceActiveFocus()
             if (root.mode === PlaylistListView.Mode.Move) {
-                var selectedIndexes = root.model.getSelection()
-                if (selectedIndexes.length === 0)
-                    return
-                var preTarget = index
-                /* move to _above_ the clicked item if move up, but
-                 * _below_ the clicked item if move down */
-                if (preTarget > selectedIndexes[0])
-                    preTarget++
-                listView.currentIndex = selectedIndexes[0]
-                root.model.moveItemsPre(selectedIndexes, preTarget)
+                moveSelected()
                 return
             } else if (root.mode === PlaylistListView.Mode.Select) {
             } else if (!(root.model.isSelected(index) && mouse.button === Qt.RightButton)) {
@@ -259,6 +264,16 @@ T.Control {
                 var pos = mapToItem(dragItem.parent, mouseX, mouseY)
                 dragItem.x = pos.x + VLCStyle.dp(15)
                 dragItem.y = pos.y
+            }
+        }
+
+        TouchScreenTapHandlerCompat {
+            onTapped: {
+                if (root.mode === PlaylistListView.Mode.Normal) {
+                    mainPlaylistController.goTo(index, true)
+                } else if (root.mode === PlaylistListView.Mode.Move) {
+                    moveSelected()
+                }
             }
         }
     }

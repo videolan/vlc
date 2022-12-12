@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.11
 import QtQml.Models 2.2
 
 import org.videolan.vlc 0.1
+import org.videolan.compat 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
@@ -209,6 +210,13 @@ T.Control {
                 root.dragItem.Drag.drop()
             }
             root.dragItem.Drag.active = drag.active
+        }
+
+        TouchScreenTapHandlerCompat {
+            onTapped: {
+                root.itemClicked(picture, Qt.LeftButton, Qt.NoModifier)
+                root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
+            }
         }
 
         ColumnLayout {
