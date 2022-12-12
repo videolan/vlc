@@ -25,7 +25,5 @@ qtwayland: qtwayland-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
 	$(MAKE) -C $<
-	$(MAKE) -C $< -C src \
-		INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" \
-		sub-plugins-install_subtargets
+	$(MAKE) -C $< INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" install
 	touch $@
