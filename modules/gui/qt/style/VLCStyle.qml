@@ -218,7 +218,11 @@ QtObject {
     readonly property int gridItem_newIndicator: dp(8, scale)
 
     readonly property int column_width: dp(114, scale)
-    readonly property int column_spacing: dp(32, scale)
+
+    // NOTE: This property should be applied on ExpandGridView and TableView. We should provision
+    //       enough space to fit the TableView section labels and 'contextButton'.
+    readonly property int column_margin: dp(32, scale)
+    readonly property int column_spacing: column_margin
 
     readonly property int table_cover_border: dp(2, scale)
 

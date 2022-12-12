@@ -38,8 +38,8 @@ FocusScope {
     //margin to apply
     property int bottomMargin: 0
     property int topMargin: 0
-    property int leftMargin: VLCStyle.margin_normal
-    property int rightMargin: VLCStyle.margin_normal
+    property int leftMargin: VLCStyle.column_margin
+    property int rightMargin: VLCStyle.column_margin
 
     readonly property int extraMargin: (_contentWidth - nbItemPerRow * _effectiveCellWidth
                                         +
