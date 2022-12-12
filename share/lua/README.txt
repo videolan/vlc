@@ -90,7 +90,7 @@ errno
 List of potential errors. It contains the following values:
   .ENOENT: No such file or directory
   .EEXIST: File exists
-  .EACCESS: Permission denied
+  .EACCES: Permission denied
   .EINVAL: Invalid argument
 
 
