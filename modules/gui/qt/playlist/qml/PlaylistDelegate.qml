@@ -95,8 +95,6 @@ T.Control {
     }
 
     contentItem: RowLayout {
-        id: content
-
         spacing: 0
 
         Item {

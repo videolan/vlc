@@ -26,7 +26,7 @@ import "qrc:///widgets/" as Widgets
 ModalDialog {
     id: root
 
-    property alias text: content.text
+    property string text
 
     property alias cancelTxt: cancelBtn.text
     property alias okTxt: okBtn.text
@@ -65,11 +65,11 @@ ModalDialog {
     }
 
     contentItem: Text {
-        id: content
         focus: false
         font.pixelSize: VLCStyle.fontSize_normal
         color: VLCStyle.colors.text
         wrapMode: Text.WordWrap
+        text: root.text
     }
 
     footer: FocusScope {

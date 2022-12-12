@@ -163,8 +163,6 @@ T.Control {
     }
 
     contentItem: T.Label {
-        id: contentLabel
-
         text: {
             var state = Player.playingState
 

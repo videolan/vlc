@@ -41,7 +41,7 @@ T.Control {
     // Aliases
     // Private
 
-    property alias _isHover: mouseArea.containsMouse
+    readonly property bool _isHover: contentItem.containsMouse
 
     // Signals
 
@@ -69,8 +69,6 @@ T.Control {
     }
 
     contentItem: MouseArea {
-        id: mouseArea
-
         hoverEnabled: true
 
         drag.axis: Drag.XAndYAxis

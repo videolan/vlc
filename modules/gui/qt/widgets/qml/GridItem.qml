@@ -37,7 +37,7 @@ T.Control {
     property int titleMargin: VLCStyle.margin_xsmall
     property Item dragItem: null
 
-    readonly property bool highlighted: (mouseArea.containsMouse || visualFocus)
+    readonly property bool highlighted: (contentItem.containsMouse || visualFocus)
 
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
@@ -166,8 +166,6 @@ T.Control {
     }
 
     contentItem: MouseArea {
-        id: mouseArea
-
         implicitWidth: layout.implicitWidth
         implicitHeight: layout.implicitHeight
 

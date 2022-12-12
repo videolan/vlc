@@ -159,7 +159,8 @@ T.Control {
     }
 
     contentItem: Row {
-        id: content
+        leftPadding: VLCStyle.margin_xxxsmall
+        rightPadding: VLCStyle.margin_xxxsmall
 
         spacing: VLCStyle.column_spacing
 

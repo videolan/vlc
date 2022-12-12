@@ -37,7 +37,7 @@ T.MenuItem {
 
     //implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
     //                        implicitContentWidth + leftPadding + rightPadding)
-    implicitHeight: contentId.implicitHeight + topPadding + bottomPadding
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
 
     padding: VLCStyle.margin_xsmall
     spacing: VLCStyle.margin_xsmall
@@ -83,7 +83,6 @@ T.MenuItem {
     }
 
     contentItem:  IconLabel {
-        id: contentId
         implicitHeight: VLCStyle.fontHeight_normal
 
         readonly property real arrowPadding: control.subMenu && control.arrow ? control.arrow.width + control.spacing : 0

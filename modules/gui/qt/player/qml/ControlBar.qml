@@ -114,8 +114,6 @@ Control {
     }
 
     contentItem: ColumnLayout {
-        id: columnLayout
-
         spacing: VLCStyle.margin_xsmall
         z: 1
 

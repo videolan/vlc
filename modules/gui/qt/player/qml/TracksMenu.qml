@@ -60,8 +60,6 @@ T.Popup {
     }
 
     contentItem: StackView {
-        id: view
-
         focus: true
         clip: true
 

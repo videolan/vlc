@@ -35,8 +35,6 @@ Widgets.IconToolButton {
     onClicked: Player.toggleRecord()
 
     contentItem: T.Label {
-        id: content
-
         anchors.centerIn: parent
 
         verticalAlignment: Text.AlignVCenter
@@ -55,7 +53,7 @@ Widgets.IconToolButton {
             running: control.enabled && Player.recording
 
             onStopped: {
-                content.color = control.color
+                control.contentItem.color = control.color
             }
         }
 

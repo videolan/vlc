@@ -140,15 +140,13 @@ Control {
     }
 
     contentItem: Item {
-        id: wrapper
-
         implicitHeight: loader.implicitHeight
         implicitWidth: loader.implicitWidth
 
         Loader {
             id: loader
 
-            parent: Drag.active ? root : wrapper
+            parent: Drag.active ? root : control.contentItem
 
             anchors.horizontalCenter: Drag.active ? undefined : parent.horizontalCenter
             anchors.verticalCenter:  Drag.active ? undefined : parent.verticalCenter
