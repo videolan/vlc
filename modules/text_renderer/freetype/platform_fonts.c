@@ -794,7 +794,7 @@ SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style, uni_char_t c
 
 #ifndef HAVE_GET_FONT_BY_FAMILY_NAME
 static int StaticMap_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
-                                vlc_family_t **pp_result )
+                                const vlc_family_t **pp_result )
 {
     filter_t *p_filter = fs->p_filter;
     filter_sys_t *p_sys = p_filter->p_sys;
