@@ -782,7 +782,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     /* Create and store headers */
     while ( ( status = th_encode_flushheader( p_sys->tcx, &p_sys->tc, &header ) ) )
     {
-        if ( status < 0 ) return VLC_EGENERIC;
+        if ( status < 0 ) goto error;
         if( xiph_AppendHeaders( &p_enc->fmt_out.i_extra, &p_enc->fmt_out.p_extra,
                                 header.bytes, header.packet ) )
         {
@@ -800,6 +800,12 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     return VLC_SUCCESS;
+error:
+    th_info_clear(&p_sys->ti);
+    th_comment_clear(&p_sys->tc);
+    th_encode_free(p_sys->tcx);
+    free(p_sys);
+    return VLC_EGENERIC;
 }
 
 /****************************************************************************
