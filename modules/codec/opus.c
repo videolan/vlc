@@ -840,7 +840,12 @@ static int OpenEncoder(vlc_object_t *p_this)
     opus_header_clean(&header);
 
     if (status != VLC_SUCCESS)
+    {
+        free(sys->buffer);
+        opus_multistream_encoder_destroy(sys->enc);
+        free(sys);
         return status;
+    }
 
     static const struct vlc_encoder_operations ops =
     {
