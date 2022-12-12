@@ -121,7 +121,7 @@ FocusScope {
                         bottomMargin: VLCStyle.margin_xsmall
                         model: albumModel
                         orientation: ListView.Horizontal
-                        spacing: VLCStyle.column_margin_width
+                        spacing: VLCStyle.column_spacing
 
                         Navigation.parentItem: root
 

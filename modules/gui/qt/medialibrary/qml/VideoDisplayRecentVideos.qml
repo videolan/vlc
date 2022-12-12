@@ -86,7 +86,7 @@ FocusScope {
                             +
                             VLCStyle.margin_xlarge
 
-            spacing: VLCStyle.column_margin_width
+            spacing: VLCStyle.column_spacing
 
             // NOTE: We want navigation buttons to be centered on the item cover.
             buttonMargin: VLCStyle.margin_xsmall + VLCStyle.gridCover_video_height / 2 - buttonLeft.height / 2

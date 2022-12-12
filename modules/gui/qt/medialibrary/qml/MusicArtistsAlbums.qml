@@ -119,7 +119,7 @@ FocusScope {
             z: 1
             height: parent.height
             width: Helpers.clamp(root.width / resizeHandle.widthFactor,
-                                 VLCStyle.colWidth(1) + VLCStyle.column_margin_width,
+                                 VLCStyle.colWidth(1) + VLCStyle.column_spacing,
                                  root.width * .5)
 
             visible: artistModel.count > 0

@@ -218,7 +218,7 @@ QtObject {
     readonly property int gridItem_newIndicator: dp(8, scale)
 
     readonly property int column_width: dp(114, scale)
-    readonly property int column_margin_width: dp(32, scale)
+    readonly property int column_spacing: dp(32, scale)
 
     readonly property int table_cover_border: dp(2, scale)
 
@@ -310,12 +310,12 @@ QtObject {
     }
 
     function colWidth(nb) {
-      return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_margin_width;
+      return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_spacing;
     }
 
     //Returns the number columns fitting in given width
     function gridColumnsForWidth(width) {
-        return Math.floor((width + column_margin_width) / (column_width + column_margin_width))
+        return Math.floor((width + column_spacing) / (column_width + column_spacing))
     }
 
 }

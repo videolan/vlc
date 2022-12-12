@@ -56,7 +56,7 @@ FocusScope {
         for (var i in sortModel)
             size += sortModel[i].width
 
-        return size + Math.max(VLCStyle.column_margin_width * (sortModel.length - 1), 0)
+        return size + Math.max(VLCStyle.column_spacing * (sortModel.length - 1), 0)
     }
 
     property Component header: Item{}
@@ -66,7 +66,7 @@ FocusScope {
 
     property Util.SelectableDelegateModel selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
-    property int horizontalSpacing: VLCStyle.column_margin_width
+    property int horizontalSpacing: VLCStyle.column_spacing
 
     property real availableRowWidth: 0
     property real _availabeRowWidthLastUpdateTime: Date.now()

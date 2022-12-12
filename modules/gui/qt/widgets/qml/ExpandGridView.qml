@@ -52,8 +52,8 @@ FocusScope {
     readonly property int rowHeight: cellHeight + verticalSpacing
 
     property int rowX: 0
-    property int horizontalSpacing: VLCStyle.column_margin_width
-    property int verticalSpacing: VLCStyle.column_margin_width
+    property int horizontalSpacing: VLCStyle.column_spacing
+    property int verticalSpacing: VLCStyle.column_spacing
 
     property int displayMarginEnd: 0
 
