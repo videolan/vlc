@@ -38,9 +38,6 @@ int webvtt_OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec != VLC_CODEC_WEBVTT )
         return VLC_EGENERIC;
 
-    p_enc->p_sys = NULL;
-
-    p_enc->fmt_out.i_cat = SPU_ES;
 
     static const struct vlc_encoder_operations ops =
         { .encode_sub = Encode };
