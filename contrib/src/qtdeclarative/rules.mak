@@ -22,6 +22,8 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtdeclarative/fix-gcc11-build.patch
+	# do not build qml.exe and other useless tools
+	sed -i.orig 's,!wasm:!rtems ,!wasm:!rtems:!static ,' "$(UNPACK_DIR)/tools/tools.pro"
 	$(MOVE)
 
 QT_DECLARATIVE_CONFIG := \
