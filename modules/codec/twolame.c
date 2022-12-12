@@ -157,7 +157,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
-    p_enc->p_sys = p_sys;
 
     p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
     p_enc->fmt_out.i_codec = VLC_CODEC_MPGA;
@@ -239,6 +238,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         .encode_audio = Encode,
     };
     p_enc->ops = &ops;
+    p_enc->p_sys = p_sys;
 
     p_sys->i_nb_samples = 0;
 
