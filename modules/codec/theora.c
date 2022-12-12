@@ -687,7 +687,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the encoder's structure */
     if( ( p_sys = malloc(sizeof(encoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
-    p_enc->p_sys = p_sys;
 
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
     p_enc->fmt_out.i_codec = VLC_CODEC_THEORA;
@@ -798,6 +797,8 @@ static int OpenEncoder( vlc_object_t *p_this )
         .encode_video = Encode,
     };
     p_enc->ops = &ops;
+    p_enc->p_sys = p_sys;
+
     return VLC_SUCCESS;
 }
 
