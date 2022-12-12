@@ -107,7 +107,8 @@ QT_CONFIG := -static -opensource -confirm-license $(QT_OPENGL) -no-pkg-config \
 	-no-feature-concurrent -no-feature-itemmodeltester -no-feature-printer \
 	-no-feature-sqlmodel -no-feature-sql -no-feature-testlib -no-feature-xml \
 	-no-compile-examples -nomake examples -nomake tests \
-	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib
+	-system-freetype -system-harfbuzz -system-libjpeg -system-libpng -system-zlib \
+	-no-syncqt
 
 # For now, we only build Qt in release mode. In debug mode, startup is prevented by the internal ANGLE
 # throwing an assertion in debug mode, but only when built with clang. See issue 27476.
