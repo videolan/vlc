@@ -143,7 +143,7 @@ static int  Open (vlc_object_t *p_this)
 
     p_enc->fmt_out.i_cat = VIDEO_ES;
     p_enc->fmt_out.i_codec = VLC_CODEC_HEVC;
-    p_enc->p_sys = p_sys = malloc(sizeof(encoder_sys_t));
+    p_sys = malloc(sizeof(encoder_sys_t));
     if (!p_sys)
         return VLC_ENOMEM;
 
@@ -232,6 +232,7 @@ static int  Open (vlc_object_t *p_this)
         .encode_video = Encode,
     };
     p_enc->ops = &ops;
+    p_enc->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
