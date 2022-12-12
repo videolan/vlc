@@ -160,8 +160,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
-
-    p_enc->fmt_out.i_cat = AUDIO_ES;
     p_enc->fmt_out.i_codec = VLC_CODEC_MPGA;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
