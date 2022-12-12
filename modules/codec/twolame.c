@@ -229,7 +229,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     if ( twolame_init_params( p_sys->p_twolame ) )
     {
         msg_Err( p_enc, "twolame initialization failed" );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     static const struct vlc_encoder_operations ops =
@@ -243,6 +243,10 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_nb_samples = 0;
 
     return VLC_SUCCESS;
+error:
+    twolame_close( &p_sys->p_twolame );
+    free(p_sys);
+    return VLC_EGENERIC;
 }
 
 /****************************************************************************
