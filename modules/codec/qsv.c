@@ -432,8 +432,6 @@ static int Open(vlc_object_t *this)
         return VLC_EGENERIC;
     }
 
-    enc->p_sys = sys;
-
     vlc_list_init(&sys->packets);
 
     config_ChainParse(enc, SOUT_CFG_PREFIX, sout_options, enc->p_cfg);
@@ -625,16 +623,15 @@ static int Open(vlc_object_t *this)
         .encode_video = Encode,
     };
     enc->ops = &ops;
+    enc->p_sys = sys;
 
     return VLC_SUCCESS;
 
  error:
     Close(enc);
-    enc->p_sys = NULL;
     return VLC_EGENERIC;
  nomem:
     Close(enc);
-    enc->p_sys = NULL;
     return VLC_ENOMEM;
 }
 
