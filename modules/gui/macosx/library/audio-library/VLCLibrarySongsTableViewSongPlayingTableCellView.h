@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibrarySongsTableViewSongPlayingTableCellView : NSTableCellView
 
-@property (readwrite, assign, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
+@property (readwrite, weak, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
 
 @end
 

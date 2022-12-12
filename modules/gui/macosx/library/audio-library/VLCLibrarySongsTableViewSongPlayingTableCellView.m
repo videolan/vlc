@@ -62,7 +62,12 @@
 
 - (BOOL)isCurrentSong
 {
-    if (!_representedMediaItem) {
+    if (!_representedMediaItem ||
+        !_representedMediaItem.inputItem ||
+        !VLCMain.sharedInstance ||
+        !VLCMain.sharedInstance.playlistController ||
+        !VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem) {
+
         return false;
     }
 
