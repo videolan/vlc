@@ -214,44 +214,14 @@ static int OpenDecoder(vlc_object_t *p_this)
 typedef unsigned int uint;
 typedef unsigned short ushort;
 
-LOCAL( unsigned short )
+static uint16_t
 de_get16( const void * ptr, uint endian ) {
-    unsigned short val;
-
-    memcpy( &val, ptr, sizeof( val ) );
-    if ( endian == G_BIG_ENDIAN )
-    {
-        #ifndef WORDS_BIGENDIAN
-        val = vlc_bswap16( val );
-        #endif
-    }
-    else
-    {
-        #ifdef WORDS_BIGENDIAN
-        val = vlc_bswap16( val );
-        #endif
-    }
-    return val;
+    return (endian == G_BIG_ENDIAN) ? GetWBE(ptr) : GetWLE(ptr);
 }
 
-LOCAL( unsigned int )
+static uint32_t
 de_get32( const void * ptr, uint endian ) {
-    unsigned int val;
-
-    memcpy( &val, ptr, sizeof( val ) );
-    if ( endian == G_BIG_ENDIAN )
-    {
-        #ifndef WORDS_BIGENDIAN
-        val = vlc_bswap32( val );
-        #endif
-    }
-    else
-    {
-        #ifdef WORDS_BIGENDIAN
-        val = vlc_bswap32( val );
-        #endif
-    }
-    return val;
+    return (endian == G_BIG_ENDIAN) ? GetDWBE(ptr) : GetDWLE(ptr);
 }
 
 static bool getRDFFloat(const char *psz_rdf, float *out, const char *psz_var)
