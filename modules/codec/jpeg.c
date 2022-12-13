@@ -286,38 +286,26 @@ static bool getRDFFloat(const char *psz_rdf, float *out, const char *psz_var)
 
 /* read XMP metadata for projection according to
  * https://developers.google.com/streetview/spherical-metadata */
-static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
+static bool jpeg_ParseXMP(const uint8_t *p_buf, size_t i_buf,
+                          video_format_t *fmt)
 {
-    jpeg_saved_marker_ptr xmp_marker = NULL;
-    jpeg_saved_marker_ptr cmarker = cinfo->marker_list;
+    if(i_buf < 29)
+        return false;
 
-    while (cmarker)
-    {
-        if (cmarker->marker == EXIF_JPEG_MARKER)
-        {
-            if(cmarker->data_length >= 32 &&
-               !memcmp(cmarker->data, EXIF_XMP_STRING, 29))
-            {
-                xmp_marker = cmarker;
-                break;
-            }
-        }
-        cmarker = cmarker->next;
-    }
-
-    if (xmp_marker == NULL)
-        return;
-    char *psz_rdf = malloc(xmp_marker->data_length - 29 + 1);
+    /* Allocate temp, zero terminated buffer */
+    /* Fixme: custom memicmp */
+    /* or Fixme: Who's not compliant to XML attributes case ? */
+    char *psz_rdf = malloc(i_buf - 29 + 1);
     if (unlikely(psz_rdf == NULL))
-        return;
-    memcpy(psz_rdf, xmp_marker->data + 29, xmp_marker->data_length - 29);
-    psz_rdf[xmp_marker->data_length - 29] = '\0';
+        return false;
+    memcpy(psz_rdf, p_buf + 29, i_buf - 29);
+    psz_rdf[i_buf - 29] = '\0';
 
-    /* Try to find the string "GSpherical:Spherical" because the v1
-        spherical video spec says the tag must be there. */
-    if (strcasestr(psz_rdf, "ProjectionType=\"equirectangular\"") ||
-        strcasestr(psz_rdf, "ProjectionType>equirectangular"))
-        fmt->projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
+    if (!strcasestr(psz_rdf, "ProjectionType=\"equirectangular\"") &&
+        !strcasestr(psz_rdf, "ProjectionType>equirectangular"))
+    return false;
+
+    fmt->projection_mode = PROJECTION_MODE_EQUIRECTANGULAR;
 
     /* pose handling */
     float value;
@@ -344,6 +332,22 @@ static void jpeg_GetProjection(j_decompress_ptr cinfo, video_format_t *fmt)
         fmt->pose.fov = value;
 
     free(psz_rdf);
+
+    return true;
+}
+
+static void jpeg_FillProjection(j_decompress_ptr cinfo, video_format_t *fmt)
+{
+    for (jpeg_saved_marker_ptr cmarker = cinfo->marker_list;
+                               cmarker != NULL;
+                               cmarker = cmarker->next)
+    {
+        if(cmarker->marker == EXIF_JPEG_MARKER &&
+           cmarker->data_length >= 32 &&
+           !memcmp(cmarker->data, EXIF_XMP_STRING, 29) &&
+           jpeg_ParseXMP(cmarker->data, cmarker->data_length, fmt))
+           break; /* found projection marker */
+    }
 }
 
 /*
@@ -544,7 +548,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         msg_Dbg( p_dec, "Jpeg orientation is %d", i_otag );
         p_dec->fmt_out.video.orientation = ORIENT_FROM_EXIF( i_otag );
     }
-    jpeg_GetProjection(&p_sys->p_jpeg, &p_dec->fmt_out.video);
+    jpeg_FillProjection(&p_sys->p_jpeg, &p_dec->fmt_out.video);
 
     /* Get a new picture */
     if (decoder_UpdateVideoFormat(p_dec))
