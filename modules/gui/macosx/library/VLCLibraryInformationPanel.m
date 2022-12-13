@@ -99,11 +99,11 @@
     [textContent appendFormat:@"\nNumber of files: %lu\n", fileCount];
     [textContent appendString: fileDetails];
     
-    [self.textView.textStorage setAttributedString: [[NSAttributedString alloc] initWithString:textContent]];
-    self.textView.textStorage.font = [NSFont systemFontOfSize:13.];
-    self.textView.textStorage.foregroundColor = [NSColor whiteColor];
+    _textField.attributedStringValue = [[NSAttributedString alloc] initWithString:textContent];
+    _textField.font = [NSFont systemFontOfSize:13.];
+    _textField.textColor = [NSColor whiteColor];
+    _imageView.image = _representedItem.smallArtworkImage;
     self.window.title = _representedItem.displayString;
-    self.imageView.image = _representedItem.smallArtworkImage;
 }
 
 @end

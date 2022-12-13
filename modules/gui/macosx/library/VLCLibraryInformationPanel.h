@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryInformationPanel : NSWindowController
 
-@property (readwrite) IBOutlet NSTextView *textView;
+@property (readwrite, weak) IBOutlet NSTextField *textField;
 @property (readwrite, weak) IBOutlet NSImageView *imageView;
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem;
