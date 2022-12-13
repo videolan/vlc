@@ -50,37 +50,8 @@
     NSMutableString *textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
 
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
-        if (mediaItem.mediaSubType != VLC_ML_MEDIA_SUBTYPE_UNKNOWN) {
-            [textContent appendFormat:@"Type: %@ — %@\n", mediaItem.readableMediaType, mediaItem.readableMediaSubType];
-        } else {
-            [textContent appendFormat:@"Type: %@\n", mediaItem.readableMediaType];
-        }
-        [textContent appendFormat:@"Duration: %@\n", _representedItem.durationString];
-        [textContent appendFormat:@"Play count: %u, last played: %@\n", mediaItem.playCount, [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:mediaItem.lastPlayedDate] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
-        [textContent appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
-        [textContent appendFormat:@"Favorited? %@\n", mediaItem.favorited == YES ? _NS("Yes") : _NS("No")];
-        [textContent appendFormat:@"Playback progress: %2.f%%\n", mediaItem.progress * 100.]; // TODO: Calculate progress for other library item types
-
-        [textContent appendFormat:@"\nNumber of tracks: %lu\n", mediaItem.tracks.count];
-        for (VLCMediaLibraryTrack *track in mediaItem.tracks) {
-            [textContent appendFormat:@"Type: %@\n", track.readableTrackType];
-            [textContent appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
-            if (track.language.length > 0) {
-                [textContent appendFormat:@"Language: %@\n", track.language];
-            }
-            if (track.trackDescription.length > 0) {
-                [textContent appendFormat:@"Description: %@\n", track.trackDescription];
-            }
-
-            if (track.trackType == VLC_ML_TRACK_TYPE_AUDIO) {
-                [textContent appendFormat:@"Number of Channels: %u, Sample rate: %u\n", track.numberOfAudioChannels, track.audioSampleRate];
-            } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
-                [textContent appendFormat:@"Dimensions: %ux%u px, Aspect-Ratio: %2.f\n", track.videoWidth, track.videoHeight, (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
-                [textContent appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];
-            }
-            [textContent appendString:@"\n"];
-        }
+        NSString *mediaItemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
+        [textContent appendString:mediaItemDetailsString];
     } else {
         [textContent appendFormat:@"Duration: %@\n", _representedItem.durationString];
         [textContent appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
@@ -104,6 +75,50 @@
     _textField.textColor = [NSColor whiteColor];
     _imageView.image = _representedItem.smallArtworkImage;
     self.window.title = _representedItem.displayString;
+}
+
+- (NSString *)detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+{
+    NSMutableString *detailsString = [[NSMutableString alloc] init];
+
+    if (mediaItem.mediaSubType != VLC_ML_MEDIA_SUBTYPE_UNKNOWN) {
+        [detailsString appendFormat:@"Type: %@ — %@\n", mediaItem.readableMediaType, mediaItem.readableMediaSubType];
+    } else {
+        [detailsString appendFormat:@"Type: %@\n", mediaItem.readableMediaType];
+    }
+
+    [detailsString appendFormat:@"Duration: %@\n", _representedItem.durationString];
+
+    [detailsString appendFormat:@"Play count: %u, last played: %@\n", mediaItem.playCount, [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:mediaItem.lastPlayedDate] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
+
+    [detailsString appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
+
+    [detailsString appendFormat:@"Favorited? %@\n", mediaItem.favorited == YES ? _NS("Yes") : _NS("No")];
+
+    [detailsString appendFormat:@"Playback progress: %2.f%%\n", mediaItem.progress * 100.]; // TODO: Calculate progress for other library item types
+
+    [detailsString appendFormat:@"\nNumber of tracks: %lu\n", mediaItem.tracks.count];
+
+    for (VLCMediaLibraryTrack *track in mediaItem.tracks) {
+        [detailsString appendFormat:@"Type: %@\n", track.readableTrackType];
+        [detailsString appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
+        if (track.language.length > 0) {
+            [detailsString appendFormat:@"Language: %@\n", track.language];
+        }
+        if (track.trackDescription.length > 0) {
+            [detailsString appendFormat:@"Description: %@\n", track.trackDescription];
+        }
+
+        if (track.trackType == VLC_ML_TRACK_TYPE_AUDIO) {
+            [detailsString appendFormat:@"Number of Channels: %u, Sample rate: %u\n", track.numberOfAudioChannels, track.audioSampleRate];
+        } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
+            [detailsString appendFormat:@"Dimensions: %ux%u px, Aspect-Ratio: %2.f\n", track.videoWidth, track.videoHeight, (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
+            [detailsString appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];
+        }
+        [detailsString appendString:@"\n"];
+    }
+
+    return detailsString;
 }
 
 @end
