@@ -438,7 +438,9 @@ static bool IsSpiff(stream_t *s)
     return true;
 }
 
-static bool IsExif(stream_t *s)
+#define EXIF_STRING "Exif" /* includes \0 */
+#define EXIF_XMP_STRING "http://ns.adobe.com/xap/1.0/" /* includes \0 */
+static bool IsExifXMP(stream_t *s)
 {
     const uint8_t *header;
     ssize_t peek = vlc_stream_Peek(s, &header, 256);
@@ -452,11 +454,13 @@ static bool IsExif(stream_t *s)
     if (FindJpegMarker(&position, header, size) != 0xe1)
         return false;
     position += 2;  /* Skip size */
-    if (position + 5 > size)
-        return false;
-    if (memcmp(&header[position], "Exif\0", 5))
-        return false;
-    return true;
+    if (position + sizeof(EXIF_STRING) <= size &&
+        !memcmp(&header[position], EXIF_STRING, sizeof(EXIF_STRING)))
+        return true;
+    if (position + sizeof(EXIF_XMP_STRING) <= size &&
+        !memcmp(&header[position], EXIF_XMP_STRING, sizeof(EXIF_XMP_STRING)))
+        return true;
+    return false;
 }
 
 static bool FindSVGmarker(int *position, const uint8_t *data, const int size, const char *marker)
@@ -624,7 +628,7 @@ static const image_format_t formats[] = {
       .detect = IsSpiff,
     },
     { .codec = VLC_CODEC_JPEG,
-      .detect = IsExif,
+      .detect = IsExifXMP,
     },
     { .codec = VLC_CODEC_WEBP,
       .detect = IsWebP,
