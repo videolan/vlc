@@ -133,6 +133,7 @@ QT_QINSTALL="$(shell cd $(SRC)/qt/; pwd -P)/install_wrapper.sh"
 qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	echo "  QMAKE_C        = $(CC)"      >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CXX      = $(CXX)"     >> $(1)/.qmake.cache && \
+	echo "  QMAKE_STRIP    = $(STRIP)"  >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CFLAGS   += -isystem $(PREFIX)/include $(CFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CXXFLAGS += -isystem $(PREFIX)/include $(CXXFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_LFLAGS   += $(LDFLAGS)"  >> $(1)/.qmake.cache && \
@@ -140,6 +141,7 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	echo "} else {"                        >> $(1)/.qmake.cache && \
 	echo "  QMAKE_C        = $(BUILDCC)"   >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CXX      = $(BUILDCXX)"  >> $(1)/.qmake.cache && \
+	echo "  QMAKE_STRIP    = $(BUILDSTRIP)"  >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CFLAGS   += $(BUILDCFLAGS)"   >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CXXFLAGS += $(BUILDCXXFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_LFLAGS   += $(BUILDLDFLAGS)"  >> $(1)/.qmake.cache && \
