@@ -309,7 +309,8 @@ static bool jpeg_ParseXMP(const uint8_t *p_buf, size_t i_buf,
 
     /* pose handling */
     float value;
-    if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees"))
+    if (getRDFFloat(psz_rdf, &value, "PoseHeadingDegrees") &&
+        value >= 0.f && value <= 360.f)
         fmt->pose.yaw = value;
 
     if (getRDFFloat(psz_rdf, &value, "PosePitchDegrees"))
@@ -328,7 +329,8 @@ static bool jpeg_ParseXMP(const uint8_t *p_buf, size_t i_buf,
     if (getRDFFloat(psz_rdf, &value, "InitialViewRollDegrees"))
         fmt->pose.roll = value;
 
-    if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees"))
+    if (getRDFFloat(psz_rdf, &value, "InitialHorizontalFOVDegrees") &&
+        value >= FIELD_OF_VIEW_DEGREES_MIN && value <= FIELD_OF_VIEW_DEGREES_MAX)
         fmt->pose.fov = value;
 
     free(psz_rdf);
