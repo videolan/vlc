@@ -322,15 +322,15 @@ static void jpeg_FillProjection(j_decompress_ptr cinfo, video_format_t *fmt)
 
 /*
  * Look through the meta data in the libjpeg decompress structure to determine
- * if an EXIF Orientation tag is present. If so return its value (1-8),
- * otherwise return 0
+ * if an EXIF Orientation tag is present. If so return true and sets orientation
+ *  value (1-8), otherwise return false
  *
  * This function is based on the function get_orientation in io-jpeg.c, part of
  * the GdkPixbuf library, licensed under LGPLv2+.
  *   Copyright (C) 1999 Michael Zucchi, The Free Software Foundation
 */
-LOCAL( int )
-jpeg_GetOrientation( j_decompress_ptr cinfo )
+#define EXIF_IDENT_STRING   "Exif\0" /* Exif\000\000 */
+static bool jpeg_ParseExifApp1( const uint8_t *p_buf, size_t i_buf, int *orientation )
 {
 
     uint i;                    /* index into working buffer */
@@ -343,37 +343,13 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
     uint tiff = 0;             /* offset to active tiff header */
     uint endian = 0;           /* detected endian of data */
 
-    jpeg_saved_marker_ptr exif_marker;      /* Location of the Exif APP1 marker */
-    jpeg_saved_marker_ptr cmarker;          /* Location to check for Exif APP1 marker */
-
     const char leth[] = { 0x49, 0x49, 0x2a, 0x00 }; /* Little endian TIFF header */
     const char beth[] = { 0x4d, 0x4d, 0x00, 0x2a }; /* Big endian TIFF header */
 
-    #define EXIF_IDENT_STRING   "Exif\000\000"
     #define EXIF_ORIENT_TAGID   0x112
 
-    /* check for Exif marker (also called the APP1 marker) */
-    exif_marker = NULL;
-    cmarker = cinfo->marker_list;
-
-    while ( cmarker )
-    {
-        if ( cmarker->data_length >= 32 &&
-             cmarker->marker == EXIF_JPEG_MARKER )
-        {
-            /* The Exif APP1 marker should contain a unique
-               identification string ("Exif\0\0"). Check for it. */
-            if ( !memcmp( cmarker->data, EXIF_IDENT_STRING, 6 ) )
-            {
-                exif_marker = cmarker;
-            }
-        }
-        cmarker = cmarker->next;
-    }
-
-    /* Did we find the Exif APP1 marker? */
-    if ( exif_marker == NULL )
-        return 0;
+    if (i_buf < 32)
+        return false;
 
     /* Check for TIFF header and catch endianness */
     i = 0;
@@ -396,13 +372,13 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
     while ( i < 16 )
     {
         /* Little endian TIFF header */
-        if ( memcmp( &exif_marker->data[i], leth, 4 ) == 0 )
+        if ( memcmp( &p_buf[i], leth, 4 ) == 0 )
         {
             endian = G_LITTLE_ENDIAN;
         }
         /* Big endian TIFF header */
         else
-        if ( memcmp( &exif_marker->data[i], beth, 4 ) == 0 )
+        if ( memcmp( &p_buf[i], beth, 4 ) == 0 )
         {
             endian = G_BIG_ENDIAN;
         }
@@ -419,53 +395,70 @@ jpeg_GetOrientation( j_decompress_ptr cinfo )
 
     /* So did we find a TIFF header or did we just hit end of buffer? */
     if ( tiff == 0 )
-        return 0;
+        return false;
 
     /* Read out the offset pointer to IFD0 */
-    offset = de_get32( &exif_marker->data[i] + 4, endian );
+    offset = de_get32( &p_buf[i] + 4, endian );
     i = i + offset;
 
     /* Check that we still are within the buffer and can read the tag count */
 
-    if ( i > exif_marker->data_length - 2 )
-        return 0;
+    if ( i > i_buf - 2 )
+        return false;
 
     /* Find out how many tags we have in IFD0. As per the TIFF spec, the first
        two bytes of the IFD contain a count of the number of tags. */
-    tags = de_get16( &exif_marker->data[i], endian );
+    tags = de_get16( &p_buf[i], endian );
     i = i + 2;
 
     /* Check that we still have enough data for all tags to check. The tags
        are listed in consecutive 12-byte blocks. The tag ID, type, size, and
        a pointer to the actual value, are packed into these 12 byte entries. */
-    if ( tags * 12U > exif_marker->data_length - i )
-        return 0;
+    if ( tags * 12U > i_buf - i )
+        return false;
 
     /* Check through IFD0 for tags of interest */
     while ( tags-- )
     {
-        tag_type = de_get16( &exif_marker->data[i], endian );
+        tag_type = de_get16( &p_buf[i], endian );
         /* Is this the orientation tag? */
         if ( tag_type == EXIF_ORIENT_TAGID )
         {
-            type = de_get16( &exif_marker->data[i + 2], endian );
-            count = de_get32( &exif_marker->data[i + 4], endian );
+            type = de_get16( &p_buf[i + 2], endian );
+            count = de_get32( &p_buf[i + 4], endian );
 
             /* Check that type and count fields are OK. The orientation field
                will consist of a single (count=1) 2-byte integer (type=3). */
             if ( type != 3 || count != 1 )
-                return 0;
+                return false;
 
             /* Return the orientation value. Within the 12-byte block, the
                pointer to the actual data is at offset 8. */
-            ret = de_get16( &exif_marker->data[i + 8], endian );
-            return ( ret <= 8 ) ? ret : 0;
+            ret = de_get16( &p_buf[i + 8], endian );
+            *orientation = ( ret <= 8 ) ? ret : 0;
+            return true;
         }
         /* move the pointer to the next 12-byte tag field. */
         i = i + 12;
     }
 
-    return 0;     /* No EXIF Orientation tag found */
+    return false; /* No EXIF Orientation tag found */
+}
+
+static int jpeg_GetOrientation( j_decompress_ptr cinfo )
+{
+    int orientation = 0;
+    for (jpeg_saved_marker_ptr cmarker = cinfo->marker_list;
+                               cmarker != NULL;
+                               cmarker = cmarker->next)
+    {
+        if(cmarker->marker == EXIF_JPEG_MARKER &&
+           cmarker->data_length >= 32 &&
+           !memcmp(cmarker->data, EXIF_IDENT_STRING, sizeof(EXIF_IDENT_STRING)) &&
+           jpeg_ParseExifApp1(cmarker->data, cmarker->data_length, &orientation))
+           break; /* found orientation marker */
+    }
+    return orientation;
 }
 
 /*
