@@ -57,18 +57,8 @@
     }
     [textContent appendString:itemDetailsString];
     
-    __block NSUInteger fileCount = 0;
-    NSMutableString *fileDetails = [[NSMutableString alloc] init];
-
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        for (VLCMediaLibraryFile *file in mediaItem.files) {
-            ++fileCount;
-            [fileDetails appendFormat:@"URL: %@\n", file.fileURL];
-            [fileDetails appendFormat:@"Type: %@\n", file.readableFileType];
-        }
-    }];
-    [textContent appendFormat:@"\nNumber of files: %lu\n", fileCount];
-    [textContent appendString: fileDetails];
+    NSString *fileDetailsString = [self fileDetailsStringForLibraryItem:_representedItem];
+    [textContent appendString:fileDetailsString];
     
     _textField.attributedStringValue = [[NSAttributedString alloc] initWithString:textContent];
     _textField.font = [NSFont systemFontOfSize:13.];
@@ -139,6 +129,23 @@
     [detailsString appendFormat:@"Small artwork generated? %@\n", libraryItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
 
     return detailsString;
+}
+
+- (NSString *)fileDetailsStringForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    __block NSUInteger fileCount = 0;
+    NSMutableString *fileDetails = [[NSMutableString alloc] init];
+
+    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        for (VLCMediaLibraryFile *file in mediaItem.files) {
+            ++fileCount;
+            [fileDetails appendFormat:@"URL: %@\n", file.fileURL];
+            [fileDetails appendFormat:@"Type: %@\n", file.readableFileType];
+        }
+    }];
+    [fileDetails appendFormat:@"\nNumber of files: %lu\n", fileCount];
+
+    return fileDetails;
 }
 
 @end
