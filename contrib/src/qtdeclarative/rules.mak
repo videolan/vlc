@@ -36,5 +36,5 @@ QT_DECLARATIVE_CONFIG := \
 	$(call qmake_toolchain, $<)
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake -- $(QT_DECLARATIVE_CONFIG)
 	$(MAKE) -C $<
-	$(MAKE) -C $< INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" install
+	$(MAKE) -C $< install
 	touch $@

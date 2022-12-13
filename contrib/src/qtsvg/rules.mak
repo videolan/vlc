@@ -28,5 +28,5 @@ qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
 	$(MAKE) -C $<
-	$(MAKE) -C $< INSTALL_FILE="$(QT_QINSTALL)" VLC_PREFIX="$(PREFIX)" install
+	$(MAKE) -C $< install
 	touch $@

@@ -131,6 +131,7 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	echo "  QMAKE_CFLAGS   += -isystem $(PREFIX)/include $(CFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CXXFLAGS += -isystem $(PREFIX)/include $(CXXFLAGS)" >> $(1)/.qmake.cache && \
 	echo "  QMAKE_LFLAGS   += $(LDFLAGS)"  >> $(1)/.qmake.cache && \
+	echo "  QMAKE_INSTALL_FILE = VLC_PREFIX=$(PREFIX) $(QT_QINSTALL)"  >> $(1)/.qmake.cache && \
 	echo "} else {"                        >> $(1)/.qmake.cache && \
 	echo "  QMAKE_C        = $(BUILDCC)"   >> $(1)/.qmake.cache && \
 	echo "  QMAKE_CXX      = $(BUILDCXX)"  >> $(1)/.qmake.cache && \
@@ -150,7 +151,7 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	# Build libraries, widgets, plugins, doc (empty)
 	$(QT_ENV_VARS) $(MAKE) -C $<
 	# Install libraries, widgets, plugins, tools, doc (empty)
-	$(MAKE) -C $< INSTALL_FILE=$(QT_QINSTALL) VLC_PREFIX="$(PREFIX)" install
+	$(MAKE) -C $< install
 
 ifdef HAVE_WIN32
 	# Add the ANGLE headers to our project
