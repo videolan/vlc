@@ -81,9 +81,9 @@
 
     [detailsString appendFormat:@"Play count: %u, last played: %@\n", mediaItem.playCount, [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:mediaItem.lastPlayedDate] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
 
-    [detailsString appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
+    [detailsString appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated ? _NS("Yes") : _NS("No")];
 
-    [detailsString appendFormat:@"Favorited? %@\n", mediaItem.favorited == YES ? _NS("Yes") : _NS("No")];
+    [detailsString appendFormat:@"Favorited? %@\n", mediaItem.favorited ? _NS("Yes") : _NS("No")];
 
     [detailsString appendFormat:@"Playback progress: %2.f%%\n", mediaItem.progress * 100.]; // TODO: Calculate progress for other library item types
 
@@ -126,7 +126,7 @@
     NSMutableString *detailsString = [[NSMutableString alloc] init];
 
     [detailsString appendFormat:@"Duration: %@\n", libraryItem.durationString];
-    [detailsString appendFormat:@"Small artwork generated? %@\n", libraryItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
+    [detailsString appendFormat:@"Small artwork generated? %@\n", libraryItem.smallArtworkGenerated ? _NS("Yes") : _NS("No")];
 
     return detailsString;
 }
