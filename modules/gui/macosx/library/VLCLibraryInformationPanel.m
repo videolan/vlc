@@ -49,14 +49,14 @@
 {
     NSMutableString *textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedItem.displayString, _representedItem.libraryID];
 
+    NSString *itemDetailsString;
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
-        NSString *mediaItemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
-        [textContent appendString:mediaItemDetailsString];
+        itemDetailsString = [self detailsStringForMediaItem:(VLCMediaLibraryMediaItem *)_representedItem];
     } else {
-        [textContent appendFormat:@"Duration: %@\n", _representedItem.durationString];
-        [textContent appendFormat:@"Small artwork generated? %@\n", _representedItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
+        itemDetailsString = [self detailsStringForLibraryItem:_representedItem];
     }
-
+    [textContent appendString:itemDetailsString];
+    
     __block NSUInteger fileCount = 0;
     NSMutableString *fileDetails = [[NSMutableString alloc] init];
 
@@ -127,6 +127,16 @@
         [detailsString appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];
     }
     [detailsString appendString:@"\n"];
+
+    return detailsString;
+}
+
+- (NSString *)detailsStringForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    NSMutableString *detailsString = [[NSMutableString alloc] init];
+
+    [detailsString appendFormat:@"Duration: %@\n", libraryItem.durationString];
+    [detailsString appendFormat:@"Small artwork generated? %@\n", libraryItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
 
     return detailsString;
 }
