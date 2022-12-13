@@ -100,23 +100,33 @@
     [detailsString appendFormat:@"\nNumber of tracks: %lu\n", mediaItem.tracks.count];
 
     for (VLCMediaLibraryTrack *track in mediaItem.tracks) {
-        [detailsString appendFormat:@"Type: %@\n", track.readableTrackType];
-        [detailsString appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
-        if (track.language.length > 0) {
-            [detailsString appendFormat:@"Language: %@\n", track.language];
-        }
-        if (track.trackDescription.length > 0) {
-            [detailsString appendFormat:@"Description: %@\n", track.trackDescription];
-        }
-
-        if (track.trackType == VLC_ML_TRACK_TYPE_AUDIO) {
-            [detailsString appendFormat:@"Number of Channels: %u, Sample rate: %u\n", track.numberOfAudioChannels, track.audioSampleRate];
-        } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
-            [detailsString appendFormat:@"Dimensions: %ux%u px, Aspect-Ratio: %2.f\n", track.videoWidth, track.videoHeight, (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
-            [detailsString appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];
-        }
-        [detailsString appendString:@"\n"];
+        NSString *trackDetailsString = [self detailsStringForTrack:track];
+        [detailsString appendString:trackDetailsString];
     }
+
+    return detailsString;
+}
+
+- (NSString *)detailsStringForTrack:(VLCMediaLibraryTrack *)track
+{
+    NSMutableString *detailsString = [[NSMutableString alloc] init];
+
+    [detailsString appendFormat:@"Type: %@\n", track.readableTrackType];
+    [detailsString appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
+    if (track.language.length > 0) {
+        [detailsString appendFormat:@"Language: %@\n", track.language];
+    }
+    if (track.trackDescription.length > 0) {
+        [detailsString appendFormat:@"Description: %@\n", track.trackDescription];
+    }
+
+    if (track.trackType == VLC_ML_TRACK_TYPE_AUDIO) {
+        [detailsString appendFormat:@"Number of Channels: %u, Sample rate: %u\n", track.numberOfAudioChannels, track.audioSampleRate];
+    } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
+        [detailsString appendFormat:@"Dimensions: %ux%u px, Aspect-Ratio: %2.f\n", track.videoWidth, track.videoHeight, (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
+        [detailsString appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];
+    }
+    [detailsString appendString:@"\n"];
 
     return detailsString;
 }
