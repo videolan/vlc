@@ -153,11 +153,6 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 	# Install libraries, widgets, plugins, tools, doc (empty)
 	$(MAKE) -C $< install
 
-ifdef HAVE_WIN32
-	# Add the ANGLE headers to our project
-	sed -i.orig -e 's#-I$${includedir}/QtGui#-I$${includedir}/QtGui -I$${includedir}/QtANGLE#' $(PREFIX)/lib/pkgconfig/Qt5Gui.pc
-endif
-
 	#fix host tools headers to avoid collision with target headers
 	mkdir -p $(PREFIX)/lib/qt5/include
 	cp -R $(PREFIX)/include/QtCore $(PREFIX)/lib/qt5/include
