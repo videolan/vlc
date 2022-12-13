@@ -55,31 +55,37 @@ MainInterface.MainTableView {
     acceptDrop: true
 
     sortModel: [{
-        criteria: "thumbnail",
-
         width: VLCStyle.colWidth(1),
 
-        type: "image",
+        model: {
+            criteria: "thumbnail",
 
-        headerDelegate: table.titleHeaderDelegate,
-        colDelegate   : table.titleDelegate,
+            type: "image",
 
-        placeHolder: VLCStyle.noArtAlbumCover,
+            headerDelegate: table.titleHeaderDelegate,
+            colDelegate   : table.titleDelegate,
+
+            placeHolder: VLCStyle.noArtAlbumCover
+        }
     }, {
         isPrimary: true,
 
-        criteria: "title",
-
         width: VLCStyle.colWidth(Math.max(columns - 2, 1)),
 
-        text: I18n.qtr("Title")
-    }, {
-        criteria: "duration",
+        model: {
+            criteria: "title",
 
+            text: I18n.qtr("Title")
+        }
+    }, {
         width: VLCStyle.colWidth(1),
 
-        headerDelegate: table.timeHeaderDelegate,
-        colDelegate   : table.timeColDelegate
+        model: {
+            criteria: "duration",
+
+            headerDelegate: table.timeHeaderDelegate,
+            colDelegate   : table.timeColDelegate
+        }
     }]
 
     //---------------------------------------------------------------------------------------------

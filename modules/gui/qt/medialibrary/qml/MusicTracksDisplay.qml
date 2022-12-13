@@ -27,7 +27,15 @@ import "qrc:///main/" as MainInterface
 FocusScope {
     id: root
 
-    property alias sortModel: tracklistdisplay_id.sortModel
+    property var sortModel: [
+        { text: I18n.qtr("Title"),    criteria: "title"},
+        { text: I18n.qtr("Album"),    criteria: "album_title" },
+        { text: I18n.qtr("Artist"),   criteria: "main_artist" },
+        { text: I18n.qtr("Duration"), criteria: "duration" },
+        { text: I18n.qtr("Track"),    criteria: "track_number" },
+        { text: I18n.qtr("Disc"),     criteria: "disc_number" }
+    ]
+
     property alias model: tracklistdisplay_id.model
     property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
     readonly property bool isViewMultiView: false

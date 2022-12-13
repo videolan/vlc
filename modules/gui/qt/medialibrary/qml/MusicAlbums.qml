@@ -217,11 +217,41 @@ FocusScope {
             rowHeight: VLCStyle.tableCoverRow_height
             headerTopPadding: VLCStyle.margin_normal
 
-            sortModel:  [
-                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: I18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate, placeHolder: VLCStyle.noArtAlbumCover },
-                { criteria: "main_artist", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: I18n.qtr("Artist") },
-                { criteria: "duration", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
-            ]
+            sortModel: [{
+                isPrimary: true,
+
+                width: VLCStyle.colWidth(2),
+
+                model: {
+                    criteria: "title",
+
+                    text: I18n.qtr("Title"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate,
+
+                    placeHolder: VLCStyle.noArtAlbumCover
+                }
+            }, {
+                width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)),
+
+                model: {
+                    criteria: "main_artist",
+
+                    text: I18n.qtr("Artist")
+                }
+            }, {
+                width: VLCStyle.colWidth(1),
+
+                model: {
+                    criteria: "duration",
+
+                    showSection: "",
+
+                    headerDelegate: tableColumns.timeHeaderDelegate,
+                    colDelegate: tableColumns.timeColDelegate
+                }
+            }]
 
             Navigation.cancelAction: root._onNavigationCancel
 

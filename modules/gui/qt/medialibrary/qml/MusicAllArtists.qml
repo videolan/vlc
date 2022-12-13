@@ -187,10 +187,30 @@ FocusScope {
                 }
             }
 
-            sortModel:  [
-                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(artistTable._nbCols - 1, 1)), text: I18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate, placeHolder: VLCStyle.noArtArtistSmall },
-                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: I18n.qtr("Tracks") }
-            ]
+            sortModel: [{
+                isPrimary: true,
+
+                width: VLCStyle.colWidth(Math.max(artistTable._nbCols - 1, 1)),
+
+                model: {
+                    criteria: "name",
+
+                    text: I18n.qtr("Name"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate,
+
+                    placeHolder: VLCStyle.noArtArtistSmall
+                }
+            }, {
+                width: VLCStyle.colWidth(1),
+
+                model: {
+                    criteria: "nb_tracks",
+
+                    text: I18n.qtr("Tracks")
+                }
+            }]
 
             onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
 

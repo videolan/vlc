@@ -179,7 +179,7 @@ T.Control {
             Loader{
                 property var rowModel: delegate.rowModel
 
-                property var colModel: modelData
+                property var colModel: modelData.model
 
                 readonly property int index: delegate._index
 

@@ -43,20 +43,31 @@ Widgets.KeyNavigableTableView {
     selectionDelegateModel: selectionModel
 
     sortModel: [{
-            "isPrimary": true,
-            "criteria": "url",
-            "width": VLCStyle.colWidth(Math.max(listView_id._nbCols - 1,
-                                                1)),
-            "text": I18n.qtr("Url"),
-            "showSection": "url",
+        isPrimary: true,
+
+        width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 1, 1)),
+
+        model: {
+            criteria: url,
+
+            text: I18n.qtr("Url"),
+
+            showSection: url,
+
             headerDelegate: urlHeaderDelegate
-        }, {
-            "criteria": "last_played_date",
-            "width": VLCStyle.colWidth(1),
-            "showSection": "",
-            "headerDelegate": tableColumns.timeHeaderDelegate,
-            "showContextButton": true
-        }]
+        }
+    }, {
+        width: VLCStyle.colWidth(1),
+
+        model: {
+            criteria: last_played_date,
+
+            showSection: "",
+            showContextButton: true,
+
+            headerDelegate: tableColumns.timeHeaderDelegate
+        }
+    }]
 
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
     headerColor: VLCStyle.colors.bg

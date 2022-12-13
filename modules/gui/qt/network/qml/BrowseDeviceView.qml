@@ -278,27 +278,34 @@ FocusScope {
             model: modelFilter
 
             sortModel: [{
-                criteria: "artwork",
-
                 width: VLCStyle.colWidth(1),
 
-                headerDelegate: artworkHeader,
-                colDelegate   : artworkColumn
+                model: {
+                    criteria: "artwork",
+
+                    headerDelegate: artworkHeader,
+                    colDelegate   : artworkColumn
+                }
             }, {
                 isPrimary: true,
-                criteria: "name",
 
                 width: VLCStyle.colWidth(listView._nameColSpan),
 
-                text: I18n.qtr("Name")
-            }, {
-                criteria: "mrl",
+                model: {
+                    criteria: "name",
 
+                    text: I18n.qtr("Name")
+                }
+            }, {
                 width: VLCStyle.colWidth(Math.max(listView._nbCols - listView._nameColSpan - 1), 1),
 
-                text: I18n.qtr("Url"),
+                model: {
+                    criteria: "mrl",
 
-                colDelegate: mrlColumn
+                    text: I18n.qtr("Url"),
+
+                    colDelegate: mrlColumn
+                }
             }]
 
             header: root.header

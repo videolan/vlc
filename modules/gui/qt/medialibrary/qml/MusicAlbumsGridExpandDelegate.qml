@@ -289,10 +289,37 @@ FocusScope {
                 currentIndex = 0
             }
 
-            sortModel: [
-                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(Math.max(tracks._nbCols - 1, 1)), visible: true, text: I18n.qtr("Title"), showSection: "", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
-                { criteria: "duration",               width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
-            ]
+            sortModel: [{
+                isPrimary: true,
+
+                width: VLCStyle.colWidth(Math.max(tracks._nbCols - 1, 1)),
+
+                model: {
+                    criteria: "title",
+
+                    visible: true,
+
+                    text: I18n.qtr("Title"),
+
+                    showSection: "",
+
+                    colDelegate: titleDelegate,
+                    headerDelegate: titleHeaderDelegate
+                }
+            }, {
+                width: VLCStyle.colWidth(1),
+
+                model: {
+                    criteria: "duration",
+
+                    visible: true,
+
+                    showSection: "",
+
+                    colDelegate: tableColumns.timeColDelegate,
+                    headerDelegate: tableColumns.timeHeaderDelegate
+                }
+            }]
 
             Navigation.parentItem: root
             Navigation.leftItem: actionButtons

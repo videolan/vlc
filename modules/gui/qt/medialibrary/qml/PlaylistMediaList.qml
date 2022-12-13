@@ -343,24 +343,31 @@ FocusScope {
 
             sortModel: [{
                 isPrimary: true,
-                criteria: "thumbnail",
 
                 width: VLCStyle.colWidth(1),
 
-                headerDelegate: columns.titleHeaderDelegate,
-                colDelegate   : columns.titleDelegate
-            }, {
-                criteria: "name",
+                model: {
+                    criteria: "thumbnail",
 
+                    headerDelegate: columns.titleHeaderDelegate,
+                    colDelegate   : columns.titleDelegate
+                }
+            }, {
                 width: VLCStyle.colWidth(_columns),
 
-                text: I18n.qtr("Name")
-            }, {
-                criteria: "count",
+                model: {
+                    criteria: "name",
 
+                    text: I18n.qtr("Name")
+                }
+            }, {
                 width: VLCStyle.colWidth(1),
 
-                text: I18n.qtr("Tracks")
+                model: {
+                    criteria: "count",
+
+                    text: I18n.qtr("Tracks")
+                }
             }]
 
             Navigation.parentItem: root

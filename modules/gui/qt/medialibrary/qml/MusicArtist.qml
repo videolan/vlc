@@ -395,11 +395,39 @@ FocusScope {
             headerPositioning: ListView.InlineHeader
             rowHeight: VLCStyle.tableCoverRow_height
 
-            sortModel:  [
-                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: I18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
-                { criteria: "album_title", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: I18n.qtr("Album") },
-                { criteria: "duration", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
-            ]
+            sortModel: [{
+                isPrimary: true,
+
+                width: VLCStyle.colWidth(2),
+
+                model: {
+                    criteria: "title",
+
+                    text: I18n.qtr("Title"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate
+                }
+            }, {
+                width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)),
+
+                model: {
+                    criteria: "album_title",
+
+                    text: I18n.qtr("Album")
+                }
+            }, {
+                width: VLCStyle.colWidth(1),
+
+                model: {
+                    criteria: "duration",
+
+                    showSection: "",
+
+                    headerDelegate: tableColumns.timeHeaderDelegate,
+                    colDelegate: tableColumns.timeColDelegate
+                }
+            }]
 
             Navigation.parentItem: root
 

@@ -307,11 +307,36 @@ FocusScope {
                 }
             }
 
-            sortModel: [
-                { criteria: "thumbnail", width: VLCStyle.colWidth(1), headerDelegate: tableView.thumbnailHeader, colDelegate: tableView.thumbnailColumn },
-                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(tableView._nameColSpan), text: I18n.qtr("Name") },
-                { criteria: "mrl", width: VLCStyle.colWidth(Math.max(tableView._nbCols - tableView._nameColSpan - 1), 1), text: I18n.qtr("Url"), showContextButton: true },
-            ]
+            sortModel: [{
+                width: VLCStyle.colWidth(1),
+
+                model: {
+                    criteria: "thumbnail",
+
+                    headerDelegate: tableView.thumbnailHeader,
+                    colDelegate: tableView.thumbnailColumn
+                }
+            }, {
+                isPrimary: true,
+
+                width: VLCStyle.colWidth(tableView._nameColSpan),
+
+                model: {
+                    criteria: "name",
+
+                    text: I18n.qtr("Name")
+                }
+            }, {
+                width: VLCStyle.colWidth(Math.max(tableView._nbCols - tableView._nameColSpan - 1), 1),
+
+                model: {
+                    criteria: "mrl",
+
+                    text: I18n.qtr("Url"),
+
+                    showContextButton: true
+                }
+            }]
 
             onActionForSelection: _actionAtIndex(selection[0].row)
             onItemDoubleClicked: _actionAtIndex(index)

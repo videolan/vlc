@@ -47,36 +47,44 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
 
     sortModel: [{
-        type: "image",
-
-        criteria: "thumbnail",
-
         width: VLCStyle.colWidth(1),
 
-        showSection: "",
+        model: ({
+            type: "image",
 
-        placeHolder: VLCStyle.noArtVideoCover,
+            criteria: "thumbnail",
 
-        headerDelegate: tableColumns.titleHeaderDelegate,
-        colDelegate   : tableColumns.titleDelegate,
+            showSection: "",
+
+            placeHolder: VLCStyle.noArtVideoCover,
+
+            headerDelegate: tableColumns.titleHeaderDelegate,
+            colDelegate   : tableColumns.titleDelegate
+        })
     }, {
         isPrimary: true,
-        criteria: mainCriteria,
 
         width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 2, 1)),
 
-        showSection: "title",
+        model: ({
+            criteria: mainCriteria,
 
-        text: I18n.qtr("Title")
+            showSection: "title",
+
+            text: I18n.qtr("Title")
+        })
     }, {
-        criteria: "duration",
-
         width: VLCStyle.colWidth(1),
 
-        showSection: "",
+        model: ({
+            criteria: "duration",
 
-        headerDelegate: tableColumns.timeHeaderDelegate, showContextButton: true,
-        colDelegate   : tableColumns.timeColDelegate
+            showSection: "",
+            showContextButton: true,
+
+            headerDelegate: tableColumns.timeHeaderDelegate,
+            colDelegate   : tableColumns.timeColDelegate
+        })
     }]
 
     section.property: "title_first_symbol"

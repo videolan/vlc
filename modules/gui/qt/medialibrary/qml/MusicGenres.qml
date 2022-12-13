@@ -248,24 +248,31 @@ FocusScope {
 
             sortModel: [{
                 isPrimary: true,
-                criteria: "cover",
 
                 width: VLCStyle.colWidth(1),
 
-                headerDelegate: tableColumns.titleHeaderDelegate,
-                colDelegate: tableColumns.titleDelegate
-            }, {
-                criteria: "name",
+                model: {
+                    criteria: "cover",
 
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate
+                }
+            }, {
                 width: VLCStyle.colWidth(_nameColSpan),
 
-                text: I18n.qtr("Name")
-            }, {
-                criteria: "nb_tracks",
+                model: {
+                    criteria: "name",
 
+                    text: I18n.qtr("Name")
+                }
+            }, {
                 width: VLCStyle.colWidth(1),
 
-                text: I18n.qtr("Tracks")
+                model: {
+                    criteria: "nb_tracks",
+
+                    text: I18n.qtr("Tracks")
+                }
             }]
 
             onItemDoubleClicked: {

@@ -318,7 +318,7 @@ FocusScope {
                             //Layout.alignment: Qt.AlignVCenter
 
                             Loader {
-                                property var model: modelData
+                                property var model: modelData.model
 
                                 sourceComponent: model.headerDelegate || root.tableHeaderDelegate
                             }
