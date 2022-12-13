@@ -213,7 +213,7 @@ typedef unsigned int uint;
 typedef unsigned short ushort;
 
 LOCAL( unsigned short )
-de_get16( void * ptr, uint endian ) {
+de_get16( const void * ptr, uint endian ) {
     unsigned short val;
 
     memcpy( &val, ptr, sizeof( val ) );
@@ -233,7 +233,7 @@ de_get16( void * ptr, uint endian ) {
 }
 
 LOCAL( unsigned int )
-de_get32( void * ptr, uint endian ) {
+de_get32( const void * ptr, uint endian ) {
     unsigned int val;
 
     memcpy( &val, ptr, sizeof( val ) );
