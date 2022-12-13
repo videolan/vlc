@@ -29,7 +29,8 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 QT_DECLARATIVE_CONFIG := \
      -no-feature-d3d12 \
      -no-feature-qml-debug \
-     -no-feature-quick-designer
+     -no-feature-quick-designer \
+     -no-feature-quick-particles
 
 .qtdeclarative: qtdeclarative
 	# Generate Makefile & src/Makefile
