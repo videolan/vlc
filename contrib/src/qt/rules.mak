@@ -145,7 +145,7 @@ qmake_toolchain = echo "!host_build {"    > $(1)/.qmake.cache && \
 
 .qt: qt
 	$(call qmake_toolchain, $<)
-	# Configure and build qmake
+	# Configure qt, build and run qmake
 	+cd $< && $(QT_ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5 \
 	    $(shell $(SRC)/qt/configure-env.py $(CPPFLAGS) $(LDFLAGS))
 	# Build libraries, widgets, plugins, doc (empty)
