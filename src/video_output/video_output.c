@@ -222,6 +222,7 @@ static void VoutFixFormat(video_format_t *dst, const video_format_t *src)
     dst->i_chroma = vlc_fourcc_GetCodec(VIDEO_ES, src->i_chroma);
     VoutFixFormatAR( dst );
     video_format_FixRgb(dst);
+    vlc_viewpoint_clip( &dst->pose );
 }
 
 static void VoutRenderWakeUpUrgent(vout_thread_sys_t *sys)
