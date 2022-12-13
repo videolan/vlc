@@ -66,6 +66,7 @@ typedef struct
     sout_stream_id_sys_t *id_video;
 
     vlc_pcr_sync_t *pcr_sync;
+    unsigned int transcoded_stream_nb;
 } sout_stream_sys_t;
 
 struct aout_filters;

@@ -392,6 +392,7 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
+    p_sys->transcoded_stream_nb = 0u;
 
     /* Audio transcoding parameters */
     transcode_encoder_config_init( &p_sys->aenc_cfg );
@@ -664,6 +665,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         id->pcr_helper = transcode_track_pcr_helper_New( p_sys->pcr_sync, VLC_TICK_FROM_SEC( 4 ) );
         if( unlikely( id->pcr_helper == NULL ) )
             goto error;
+
+        ++p_sys->transcoded_stream_nb;
     }
     else
     {
@@ -717,6 +720,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
             break;
         }
         transcode_track_pcr_helper_Delete( id->pcr_helper );
+        --p_sys->transcoded_stream_nb;
     }
     else
         dec_Delete( id->p_decoder );
@@ -811,8 +815,14 @@ error:
 static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
 {
     sout_stream_sys_t *sys = stream->p_sys;
+    if( sys->transcoded_stream_nb == 0)
+    {
+        sout_StreamSetPCR( stream->p_next, pcr );
+        return;
+    }
+
     const int status = vlc_pcr_sync_SignalPCR( sys->pcr_sync, pcr );
-    if ( status == VLC_PCR_SYNC_FORWARD_PCR )
+    if( status == VLC_PCR_SYNC_FORWARD_PCR )
     {
         sout_StreamSetPCR( stream->p_next, pcr );
     }
