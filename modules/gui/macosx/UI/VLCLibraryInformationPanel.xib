@@ -20,7 +20,7 @@
             <rect key="contentRect" x="136" y="189" width="512" height="640"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <value key="minSize" type="size" width="386" height="227"/>
-            <view key="contentView" misplaced="YES" id="Nfs-rF-cUN">
+            <view key="contentView" id="Nfs-rF-cUN">
                 <rect key="frame" x="0.0" y="0.0" width="544" height="640"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
@@ -37,8 +37,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="480" height="429"/>
                                             <subviews>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="eeq-7b-IbI">
-                                                    <rect key="frame" x="0.0" y="408" width="480" height="21"/>
-                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Jc0-rT-PNg">
+                                                    <rect key="frame" x="0.0" y="408" width="495" height="21"/>
+                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" id="Jc0-rT-PNg">
                                                         <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -55,6 +55,7 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="eeq-7b-IbI" secondAttribute="trailing" id="hIV-HK-m3A"/>
+                                                <constraint firstItem="N4h-LP-IRY" firstAttribute="centerX" secondItem="Wv4-dn-5EA" secondAttribute="centerX" id="iwt-XU-iJg"/>
                                                 <constraint firstItem="eeq-7b-IbI" firstAttribute="leading" secondItem="Wv4-dn-5EA" secondAttribute="leading" id="k7h-rh-AJ1"/>
                                             </constraints>
                                             <visibilityPriorities>
@@ -78,7 +79,7 @@
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="bU3-vL-IQb" secondAttribute="trailing" id="Xcb-WE-2PK"/>
                                 <constraint firstItem="bU3-vL-IQb" firstAttribute="top" secondItem="Bl4-q7-swx" secondAttribute="top" id="eEV-Ix-okb"/>
-                                <constraint firstItem="bU3-vL-IQb" firstAttribute="leading" secondItem="Bl4-q7-swx" secondAttribute="leading" constant="15" id="oko-yV-hzs"/>
+                                <constraint firstItem="bU3-vL-IQb" firstAttribute="leading" secondItem="Bl4-q7-swx" secondAttribute="leading" id="oko-yV-hzs"/>
                             </constraints>
                         </clipView>
                         <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ePK-Cw-UmB">
