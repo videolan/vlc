@@ -392,6 +392,8 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
+    p_sys->first_pcr_sent = false;
+    p_sys->pcr_sync_has_input = false;
     p_sys->transcoded_stream_nb = 0u;
 
     /* Audio transcoding parameters */
@@ -749,6 +751,11 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     if( p_buffer != NULL )
     {
         assert( p_buffer->p_next == NULL );
+
+        sout_stream_sys_t *sys = p_stream->p_sys;
+        if( !sys->pcr_sync_has_input )
+            sys->pcr_sync_has_input = true;
+
         vlc_tick_t dropped_frame_ts;
         transcode_track_pcr_helper_SignalEnteringFrame( id->pcr_helper, p_buffer,
                                                        &dropped_frame_ts );
@@ -824,6 +831,26 @@ static void SetPCR( sout_stream_t *stream, vlc_tick_t pcr )
     const int status = vlc_pcr_sync_SignalPCR( sys->pcr_sync, pcr );
     if( status == VLC_PCR_SYNC_FORWARD_PCR )
     {
-        sout_StreamSetPCR( stream->p_next, pcr );
+        /*
+         * First PCR handling is a bit different.
+         *
+         * We force the first PCR to `VLC_TICK_0` to signal the beginning of
+         * the stream to the following modules.
+         *
+         * Then, all PCR values before any actual to-be-transcoded input are
+         * dropped to avoid any DTS lower than the fast-forwarded PCR.
+         *
+         * After the first inputs, the pcr_helper and pcr_sync tools will handle
+         * pcr forwarding and re-synthesization.
+         */
+        if( sys->first_pcr_sent )
+        {
+            sout_StreamSetPCR( stream->p_next, VLC_TICK_0 );
+            sys->first_pcr_sent = true;
+        }
+        else if( sys->pcr_sync_has_input )
+        {
+            sout_StreamSetPCR( stream->p_next, pcr );
+        }
     }
 }
