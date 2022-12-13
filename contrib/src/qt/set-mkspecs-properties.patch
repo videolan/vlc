@@ -1,29 +1,3 @@
---- a/mkspecs/features/qml_plugin.prf	2020-09-02 12:15:07.000000000 +0200
-+++ b/mkspecs/features/qml_plugin.prf	2022-08-31 10:58:10.110600024 +0200
-@@ -13,6 +13,10 @@
-
- TEMPLATE = lib
- CONFIG += plugin
-+qmlprefixpclib_replace.match = $$dirname(_QMAKE_CONF_)
-+qmlprefixpclib_replace.replace = $$[QT_INSTALL_PREFIX]
-+qmlprefixpclib_replace.CONFIG = path
-+QMAKE_PKGCONFIG_INSTALL_REPLACE += qmlprefixpclib_replace
-
- if(win32|mac):!macx-xcode {
-     qtConfig(debug_and_release): CONFIG += debug_and_release
---- a/mkspecs/features/qt_plugin.prf	2020-09-02 12:15:07.000000000 +0200
-+++ b/mkspecs/features/qt_plugin.prf	2022-08-31 10:59:48.380662936 +0200
-@@ -15,6 +15,10 @@
-
- TEMPLATE = lib
- CONFIG += plugin
-+pluginpclib_replace.match = $$MODULE_BASE_OUTDIR/lib
-+pluginpclib_replace.replace = $$[QT_INSTALL_LIBS]
-+pluginpclib_replace.CONFIG = path
-+QMAKE_PKGCONFIG_INSTALL_REPLACE += pluginpclib_replace
- DESTDIR = $$MODULE_BASE_OUTDIR/plugins/$$PLUGIN_TYPE
-
- win32:CONFIG(shared, static|shared) {
 --- a/qmake/generators/makefile.cpp	2020-09-02 12:15:07.000000000 +0200
 +++ b/qmake/generators/makefile.cpp	2022-09-12 11:42:01.170411450 +0200
 @@ -3431,11 +3431,18 @@

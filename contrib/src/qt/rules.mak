@@ -56,6 +56,9 @@ endif
 endif
 	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
 	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
+	# force path replacement in pkg-config output files
+	$(APPLY) $(SRC)/qt/force-pkgconfg-replace.patch
+	# pass all files installed through our installer
 	$(APPLY) $(SRC)/qt/set-mkspecs-properties.patch
 	# fix missing QMAKE_PKGCONFIG_VERSION in Windows targets
 	$(APPLY) $(SRC)/qt/set-mkspecs-version.patch
