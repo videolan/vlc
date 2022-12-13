@@ -77,12 +77,12 @@ ListView {
             if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
                 margin += headerItem.height
 
-            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + margin)
+            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + margin - displayMarginBeginning + spacing)
         } else {
             if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
                 margin += headerItem.width
 
-            return itemAt(contentX + margin, contentY + (delegateItem.y + delegateItem.height / 2))
+            return itemAt(contentX + margin - displayMarginBeginning + spacing, contentY + (delegateItem.y + delegateItem.height / 2))
         }
     }
 
@@ -95,12 +95,12 @@ ListView {
             if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
                 margin += footerItem.height
 
-            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + height - margin - 1)
+            return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + height - margin + displayMarginEnd - spacing - 1)
         } else {
             if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
                 margin += footerItem.width
 
-            return itemAt(contentX + width - margin - 1, contentY + (delegateItem.y + delegateItem.height / 2))
+            return itemAt(contentX + width - margin + displayMarginEnd - spacing - 1, contentY + (delegateItem.y + delegateItem.height / 2))
         }
     }
 
@@ -162,15 +162,18 @@ ListView {
         anchors.top: parent.top
         anchors.left: parent.left
 
-        implicitWidth: Math.ceil(parent.width)
-        implicitHeight: Math.ceil(parent.height)
+        anchors.leftMargin: (orientation === ListView.Horizontal ? -displayMarginBeginning : 0)
+        anchors.topMargin: (orientation === ListView.Vertical ? -displayMarginBeginning : 0)
+
+        implicitWidth: Math.ceil(parent.width + (orientation === ListView.Horizontal ? (displayMarginBeginning + displayMarginEnd) : 0))
+        implicitHeight: Math.ceil(parent.height + (orientation === ListView.Vertical ? (displayMarginBeginning + displayMarginEnd) : 0))
 
         z: root.contentItem.z
 
         sourceItem: root.contentItem
 
-        sourceRect: Qt.rect(root.contentX,
-                            root.contentY,
+        sourceRect: Qt.rect(root.contentX - (orientation === ListView.Horizontal ? displayMarginBeginning : 0),
+                            root.contentY - (orientation === ListView.Vertical ? displayMarginBeginning : 0),
                             width,
                             height)
 
@@ -182,8 +185,10 @@ ListView {
         // If background rectangle is fully opaque,
         // the texture does not need an alpha
         // channel: (optimization)
-        format: (contentItemCoverRect.visible && Helpers.compareFloat(1.0, contentItemCoverRect.color.a)) ? ShaderEffectSource.RGB
-                                                                                                          : ShaderEffectSource.RGBA
+        format: (contentItemCoverRect.visible
+                 && Helpers.compareFloat(1.0, contentItemCoverRect.color.a)
+                 && (displayMarginBeginning <= 0 && displayMarginEnd <= 0)) ? ShaderEffectSource.RGB
+                                                                            : ShaderEffectSource.RGBA
 
         layer.enabled: true
         layer.effect: ShaderEffect {
