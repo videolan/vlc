@@ -172,28 +172,30 @@
 
 - (NSSize)intrinsicContentSize
 {
-    NSSize collectionViewContentSize = _collectionViewLayout.collectionViewContentSize;
-    NSEdgeInsets scrollViewInsets = _collectionView.enclosingScrollView.contentInsets;
-    NSEdgeInsets collectionViewLayoutInset = _collectionViewLayout.sectionInset;
-    CGFloat insetsHeight = scrollViewInsets.top +
-                           scrollViewInsets.bottom +
-                           collectionViewLayoutInset.top +
-                           collectionViewLayoutInset.bottom +
-                           15; // Account for the scrollbar size
+    const NSSize collectionViewContentSize = _collectionViewLayout.collectionViewContentSize;
+    const NSEdgeInsets scrollViewInsets = _collectionView.enclosingScrollView.contentInsets;
+    const NSEdgeInsets collectionViewLayoutInset = _collectionViewLayout.sectionInset;
+    const CGFloat insetsHeight = scrollViewInsets.top +
+                                 scrollViewInsets.bottom +
+                                 collectionViewLayoutInset.top +
+                                 collectionViewLayoutInset.bottom;
 
-    if (collectionViewContentSize.height == 0 || _groupDescriptor.isHorizontalBarCollectionView) {
-        CGFloat fallback = _collectionViewLayout.itemSize.height + insetsHeight;
-
-        if (fallback <= 0) {
-            NSLog(@"Unable to provide reasonable fallback or accurate rowheight -- providing rough rowheight");
-            fallback = 400;
-        }
-
-        return NSMakeSize(fallback, fallback);
+    if (collectionViewContentSize.height == 0) {
+        // If we don't return a size larger than 0 then we run into issues with the collection
+        // view layout not trying to properly calculate its size. So let's return something
+        NSLog(@"Unable to provide accurate height for container -- providing rough size");
+        const CGFloat roughValue = _collectionViewLayout.itemSize.height + insetsHeight;
+        return NSMakeSize(roughValue, roughValue);
     }
 
-    collectionViewContentSize.height += insetsHeight;
-    return collectionViewContentSize;
+    if (_groupDescriptor.isHorizontalBarCollectionView) {
+        const CGFloat viewHeight = _collectionViewLayout.itemSize.height +
+                                   insetsHeight +
+                                   15; // Account for horizontal scrollbar
+        return NSMakeSize(viewHeight, viewHeight);
+    }
+
+    return _scrollView.documentView.frame.size;
 }
 
 @end
