@@ -248,7 +248,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (fmt->projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
-        goto delete_sub_renderer;
+        msg_Err(gl, "Could not set viewpoint");
 
     /* Forward to the core the changes to the input format requested by the
      * interop */
