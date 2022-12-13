@@ -295,11 +295,33 @@ FocusScope {
 
                             bottomMargin: root.displayMargin
 
-                            right: playlistColumn.visible ? playlistColumn.left : parent.right
+                            right: (playlistColumn.visible && !VLCStyle.isScreenSmall)
+                                   ? playlistColumn.left
+                                   : parent.right
                             rightMargin: (MainCtx.playlistDocked && MainCtx.playlistVisible)
                                          ? 0
                                          : VLCStyle.applicationHorizontalMargin
                             leftMargin: VLCStyle.applicationHorizontalMargin
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        visible: VLCStyle.isScreenSmall && MainCtx.playlistVisible
+                        color: "black"
+                        opacity: 0.4
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                MainCtx.playlistVisible = false
+                            }
+
+                            // Capture WheelEvents before they reach stackView
+                            onWheel: {
+                                wheel.accepted = true
+                            }
                         }
                     }
 
@@ -311,9 +333,11 @@ FocusScope {
                         }
                         focus: false
 
-                        implicitWidth: Helpers.clamp(root.width / resizeHandle.widthFactor,
-                                                     playlist.minimumWidth,
-                                                     root.width / 2)
+                        implicitWidth: VLCStyle.isScreenSmall
+                                       ? root.width * 0.8
+                                       : Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                                       playlist.minimumWidth,
+                                                       root.width / 2)
                         width: 0
                         height: parent.height - root.displayMargin
 
