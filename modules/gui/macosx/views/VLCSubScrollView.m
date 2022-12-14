@@ -32,6 +32,7 @@
     if(self) {
         _scrollParentX = NO;
         _scrollParentY = NO;
+        _scrollSelf = YES;
     }
 
     return self;
@@ -39,6 +40,11 @@
 
 - (void)scrollWheel:(NSEvent *)event
 {
+    if (!_scrollSelf) {
+        [_parentScrollView scrollWheel:event];
+        return;
+    }
+
     [super scrollWheel:event];
 
     if(_parentScrollView == nil || (!_scrollParentX && !_scrollParentY)) {

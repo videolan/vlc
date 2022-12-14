@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSScrollView *parentScrollView;
 @property (readwrite, assign) BOOL scrollParentY;
 @property (readwrite, assign) BOOL scrollParentX;
+@property (readwrite, assign) BOOL scrollSelf;
 
 // Scroll views containing collection views can disobey hasVerticalScroller -> NO.
 // This lets us forcefully override this behaviour
