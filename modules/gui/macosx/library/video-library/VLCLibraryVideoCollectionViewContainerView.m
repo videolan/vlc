@@ -160,8 +160,7 @@
 
 - (void)collectionViewFrameChanged:(NSNotification *)notification
 {
-    if ([notification.object class] != [NSCollectionView class] ||
-        (NSCollectionView *)notification.object != _collectionView) {
+    if ((NSCollectionView *)notification.object != _collectionView) {
         return;
     }
 
