@@ -622,7 +622,8 @@ static const struct vlc_window_operations window_ops =
 
 static int Open(vlc_window_t *wnd)
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    CFRunLoopRef runloop = CFRunLoopGetMain();
+    vlc_darwin_DispatchSync(runloop, ^{
         VLCVideoUIView *sys = [[VLCVideoUIView alloc] initWithWindow:wnd];
         wnd->sys = (__bridge_retained void*)sys;
     });
