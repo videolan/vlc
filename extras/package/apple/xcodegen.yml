@@ -17,7 +17,7 @@ settings:
       STRIP_BITCODE_FROM_COPIED_FILES: NO
     Release:
       STRIP_BITCODE_FROM_COPIED_FILES: NO
-      ENABLE_BITCODE: YES
+      ENABLE_BITCODE: NO
       BITCODE_GENERATION_MODE: full
 fileGroups:
   - "${VLC_SRC_DIR}/src"
