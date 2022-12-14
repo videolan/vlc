@@ -77,6 +77,25 @@ Row {
             }
 
             onClicked: modelData.click()
+
+            // handles VLCStyle.scale changes
+            onWidthChanged: Qt.callLater(updateRect)
+            onHeightChanged: Qt.callLater(updateRect)
+
+            Connections {
+                target: VLCStyle.self
+
+                // handle window resize
+                onAppWidthChanged: Qt.callLater(updateRect)
+                onAppHeightChanged: Qt.callLater(updateRect)
+            }
+
+            function updateRect() {
+                var point = mapToItem(null, 0, 0)
+                var rect = Qt.rect(point.x, point.y, width, height)
+
+                modelData.rect = rect
+            }
         }
     }
 }
