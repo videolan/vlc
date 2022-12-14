@@ -35,7 +35,7 @@
     VLCLibraryInformationPanel *_informationPanel;
     id<VLCMediaLibraryItemProtocol> _representedItem;
 
-    NSArray<NSMenuItem*> *_mediaItemRequiringMenuItems;
+    NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
 }
 @end
 
@@ -73,7 +73,12 @@
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
     [_libraryMenu addMenuItemsFromArray:@[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem]];
     
-    _mediaItemRequiringMenuItems = @[playItem, appendItem, revealItem, deleteItem, informationItem];
+    _mediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
+    [_mediaItemRequiringMenuItems addObject:playItem];
+    [_mediaItemRequiringMenuItems addObject:appendItem];
+    [_mediaItemRequiringMenuItems addObject:revealItem];
+    [_mediaItemRequiringMenuItems addObject:deleteItem];
+    [_mediaItemRequiringMenuItems addObject:informationItem];
 }
 
 - (void)setMediaItemRequiringMenuItemsHidden:(BOOL)hidden
