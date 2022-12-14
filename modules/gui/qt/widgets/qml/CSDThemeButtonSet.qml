@@ -46,47 +46,34 @@ Rectangle {
 
         spacing: root._interNavButtonSpacing
 
-        CSDThemeButton {
-            id: minimizeButton
+        Repeater {
+            model: MainCtx.csdButtonModel.windowCSDButtons
 
-            anchors.verticalCenter: parent.verticalCenter
+            CSDThemeButton {
 
-            bannerHeight: root.height
+                anchors.verticalCenter: parent.verticalCenter
 
-            buttonType: CSDThemeImage.MINIMIZE
+                bannerHeight: root.height
 
-            onClicked: MainCtx.requestInterfaceMinimized()
-        }
+                buttonType: {
+                    switch (modelData.type) {
+                    case CSDButton.Minimize:
+                        return CSDThemeImage.MINIMIZE
 
-        CSDThemeButton {
-            id: maximizeButton
+                    case CSDButton.MaximizeRestore:
+                        return (MainCtx.intfMainWindow.visibility === Window.Maximized)
+                                ? CSDThemeImage.RESTORE
+                                : CSDThemeImage.MAXIMIZE
 
-            anchors.verticalCenter: parent.verticalCenter
+                    case CSDButton.Close:
+                        return CSDThemeButton.CLOSE
+                    }
 
-            bannerHeight: root.height
-
-            buttonType: (MainCtx.intfMainWindow.visibility === Window.Maximized)  ? CSDThemeImage.RESTORE : CSDThemeImage.MAXIMIZE
-
-            onClicked: {
-                if (MainCtx.intfMainWindow.visibility === Window.Maximized) {
-                    MainCtx.requestInterfaceNormal()
-                } else {
-                    MainCtx.requestInterfaceMaximized()
+                    console.assert(false, "unreachable")
                 }
+
+                onClicked: modelData.click()
             }
         }
-
-        CSDThemeButton {
-            id: closeButton
-
-            anchors.verticalCenter: parent.verticalCenter
-
-            bannerHeight: root.height
-
-            buttonType: CSDThemeImage.CLOSE
-
-            onClicked: MainCtx.intfMainWindow.close()
-        }
     }
-
 }

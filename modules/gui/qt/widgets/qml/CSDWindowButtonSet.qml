@@ -33,38 +33,46 @@ Row {
     property color color: VLCStyle.colors.text
     property color hoverColor: VLCStyle.colors.windowCSDButtonBg
 
-    property bool hovered: minimizeButton.hovered || maximizeButton.hovered || closeButton.hovered
-
-    CSDWindowButton {
-        id: minimizeButton
-        iconTxt: VLCIcons.window_minimize
-        onClicked: MainCtx.requestInterfaceMinimized()
-        height: windowButtonGroup.height
-        color: windowButtonGroup.color
-        hoverColor: windowButtonGroup.hoverColor
-    }
-
-    CSDWindowButton {
-        id: maximizeButton
-        iconTxt: (MainCtx.intfMainWindow.visibility === Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
-        onClicked: {
-            if (MainCtx.intfMainWindow.visibility === Window.Maximized) {
-                MainCtx.requestInterfaceNormal()
-            } else {
-                MainCtx.requestInterfaceMaximized()
-            }
+    readonly property bool hovered: {
+        var h = false
+        for (var i = 0; i < repeater.count; ++i) {
+            var button = repeater.itemAt(i)
+            h = h || button.hovered
         }
-        height: windowButtonGroup.height
-        color: windowButtonGroup.color
-        hoverColor: windowButtonGroup.hoverColor
+
+        return h
     }
 
-    CSDWindowButton {
-        id: closeButton
-        iconTxt: VLCIcons.window_close
-        onClicked: MainCtx.intfMainWindow.close()
-        height: windowButtonGroup.height
-        color: closeButton.hovered ? "white" : windowButtonGroup.color
-        hoverColor: "red"
+    Repeater {
+        id: repeater
+
+        model: MainCtx.csdButtonModel.windowCSDButtons
+
+        CSDWindowButton {
+            height: windowButtonGroup.height
+
+            color: (modelData.type === CSDButton.Close && (hovered)) ? "white" : windowButtonGroup.color
+
+            hoverColor: (modelData.type === CSDButton.Close) ? "red" : windowButtonGroup.hoverColor
+
+            iconTxt: {
+                switch (modelData.type) {
+                case CSDButton.Minimize:
+                    return VLCIcons.window_minimize
+
+                case CSDButton.MaximizeRestore:
+                    return (MainCtx.intfMainWindow.visibility === Window.Maximized)
+                            ? VLCIcons.window_restore
+                            : VLCIcons.window_maximize
+
+                case CSDButton.Close:
+                    return VLCIcons.window_close
+                }
+
+                console.assert(false, "unreachable")
+            }
+
+            onClicked: modelData.click()
+        }
     }
 }
