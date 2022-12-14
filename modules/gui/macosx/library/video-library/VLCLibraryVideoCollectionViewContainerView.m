@@ -145,6 +145,7 @@
     _collectionViewLayout.scrollDirection = _groupDescriptor.isHorizontalBarCollectionView ?
                                             NSCollectionViewScrollDirectionHorizontal :
                                             NSCollectionViewScrollDirectionVertical;
+    _scrollView.scrollSelf = _groupDescriptor.isHorizontalBarCollectionView;
 }
 
 - (void)setVideoGroup:(VLCLibraryVideoGroup)group
@@ -201,7 +202,12 @@
         return NSMakeSize(width, viewHeight);
     }
 
-    return NSMakeSize(width, collectionViewContentSize.height - 1);
+    // HACK: At very specific widths of the container, the full height containers
+    // can have a bug where the top rows of the collection view are not displayed
+    // at all. By reducing the height of the container to below the height of the
+    // collection view contents we can eliminate this, so we reduce the height
+    // just enough to not be noticeable but enough for the bug to not manifest
+    return NSMakeSize(width, collectionViewContentSize.height - 15);
 }
 
 @end
