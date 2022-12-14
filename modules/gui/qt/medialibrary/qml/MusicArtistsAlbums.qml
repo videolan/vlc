@@ -65,7 +65,11 @@ FocusScope {
     }
 
     function setCurrentItemFocus(reason) {
-        artistList.setCurrentItemFocus(reason);
+        if (VLCStyle.isScreenSmall) {
+            albumSubView.setCurrentItemFocus(reason);
+        } else {
+            artistList.setCurrentItemFocus(reason);
+        }
     }
 
     function _actionAtIndex(index) {
@@ -118,12 +122,14 @@ FocusScope {
             currentIndex: -1
             z: 1
             height: parent.height
-            width: Helpers.clamp(root.width / resizeHandle.widthFactor,
-                                 VLCStyle.colWidth(1) + VLCStyle.column_spacing,
-                                 root.width * .5)
+            width: VLCStyle.isScreenSmall
+                   ? 0
+                   : Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                   VLCStyle.colWidth(1) + VLCStyle.column_spacing,
+                                   root.width * .5)
 
-            visible: artistModel.count > 0
-            focus: artistModel.count > 0
+            visible: !VLCStyle.isScreenSmall && (artistModel.count > 0)
+            focus: !VLCStyle.isScreenSmall && (artistModel.count > 0)
 
             backgroundColor: artistListBackground.usingAcrylic ? "transparent"
                                                                : artistListBackground.alternativeColor
@@ -209,7 +215,7 @@ FocusScope {
             focus: true
             initialIndex: root.initialAlbumIndex
             Navigation.parentItem: root
-            Navigation.leftItem: artistList
+            Navigation.leftItem: VLCStyle.isScreenSmall ? null : artistList
         }
     }
 
