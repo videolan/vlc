@@ -19,15 +19,15 @@ default:
         - amd64
 
 variables:
-    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20221023191128
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20221023193231
-    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20221023173315
-    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20221023181650
+    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20221214121630
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20221214115142
+    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20221214101739
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20221214110439
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20221023190059
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20221023172629
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20221214124003
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20221023195550
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20221023200157
-    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20221023190736
+    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20221213104631
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
