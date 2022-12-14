@@ -37,7 +37,7 @@ Row {
         var h = false
         for (var i = 0; i < repeater.count; ++i) {
             var button = repeater.itemAt(i)
-            h = h || button.hovered
+            h = h || button.hovered || button.showHovered
         }
 
         return h
@@ -51,7 +51,11 @@ Row {
         CSDWindowButton {
             height: windowButtonGroup.height
 
-            color: (modelData.type === CSDButton.Close && (hovered)) ? "white" : windowButtonGroup.color
+            showHovered: modelData.showHovered
+
+            color: (modelData.type === CSDButton.Close && (hovered || modelData.showHovered))
+                   ? "white"
+                   : windowButtonGroup.color
 
             hoverColor: (modelData.type === CSDButton.Close) ? "red" : windowButtonGroup.hoverColor
 
