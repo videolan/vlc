@@ -156,8 +156,13 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    const vlc_tick_t host_delay_ticks = host_time == 0 ? 0
-                                      : HostTimeToTick(p_sys, host_time - mach_absolute_time());
+    vlc_tick_t host_delay_ticks = 0;
+    if (host_time != 0)
+    {
+        uint64_t now_nsec = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+        host_delay_ticks = HostTimeToTick(p_sys, host_time)
+                         - VLC_TICK_FROM_NS(now_nsec);
+    }
     const vlc_tick_t bytes_ticks = BytesToTicks(p_sys, bytes);
 
     const vlc_tick_t now_ticks = vlc_tick_now();
