@@ -2189,15 +2189,18 @@ enum libvlc_video_adjust_option_t {
 
 enum libvlc_video_sharpen_option_t {
     libvlc_sharpen_Enable = 0,
+    libvlc_sharpen_Fast,
     libvlc_sharpen_Sigma
 };
 
 LIBVLC_API int libvlc_video_get_sharpen_int( libvlc_media_player_t *p_mi,
-                                                unsigned option );
+                                             unsigned option );
 LIBVLC_API void libvlc_video_set_sharpen_int( libvlc_media_player_t *p_mi,
-                                  unsigned option, int value );
-
-
+                                              unsigned option, int value );
+LIBVLC_API bool libvlc_video_get_sharpen_bool( libvlc_media_player_t *p_mi,
+                                               unsigned option );     
+LIBVLC_API void libvlc_video_set_sharpen_bool( libvlc_media_player_t *p_mi,
+                                               unsigned option, bool value );                                  
 LIBVLC_API float libvlc_video_get_sharpen_float( libvlc_media_player_t *p_mi,
                                                     unsigned option );
 LIBVLC_API void libvlc_video_set_sharpen_float( libvlc_media_player_t *p_mi,
@@ -2226,6 +2229,12 @@ LIBVLC_API int libvlc_video_get_adjust_int( libvlc_media_player_t *p_mi,
  */
 LIBVLC_API void libvlc_video_set_adjust_int( libvlc_media_player_t *p_mi,
                                                  unsigned option, int value );
+
+
+LIBVLC_API bool libvlc_video_get_adjust_bool( libvlc_media_player_t *p_mi,
+                                              unsigned option );
+LIBVLC_API void libvlc_video_set_adjust_bool( libvlc_media_player_t *p_mi,
+                                              unsigned option, bool value );
 
 /**
  * Get float adjust option.
