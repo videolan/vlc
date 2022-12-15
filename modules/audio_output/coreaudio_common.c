@@ -212,6 +212,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         vlc_frame_t *f = p_sys->p_out_chain;
         if (f == NULL)
         {
+            p_sys->i_underrun_size += bytes;
             memset(data, 0, bytes);
             lock_unlock(p_sys);
             return;
