@@ -308,7 +308,7 @@ FocusScope {
             }
 
             sortModel: [{
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "thumbnail",
@@ -319,7 +319,7 @@ FocusScope {
             }, {
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(tableView._nameColSpan),
+                size: tableView._nameColSpan,
 
                 model: {
                     criteria: "name",
@@ -327,7 +327,7 @@ FocusScope {
                     text: I18n.qtr("Name")
                 }
             }, {
-                width: VLCStyle.colWidth(Math.max(tableView._nbCols - tableView._nameColSpan - 1), 1),
+                size: Math.max(tableView._nbCols - tableView._nameColSpan - 1, 1),
 
                 model: {
                     criteria: "mrl",

@@ -278,7 +278,7 @@ FocusScope {
             model: modelFilter
 
             sortModel: [{
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "artwork",
@@ -289,7 +289,7 @@ FocusScope {
             }, {
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(listView._nameColSpan),
+                size: listView._nameColSpan,
 
                 model: {
                     criteria: "name",
@@ -297,7 +297,7 @@ FocusScope {
                     text: I18n.qtr("Name")
                 }
             }, {
-                width: VLCStyle.colWidth(Math.max(listView._nbCols - listView._nameColSpan - 1), 1),
+                size: Math.max(listView._nbCols - listView._nameColSpan - 1, 1),
 
                 model: {
                     criteria: "mrl",

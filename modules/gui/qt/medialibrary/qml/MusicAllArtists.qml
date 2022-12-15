@@ -190,7 +190,7 @@ FocusScope {
             sortModel: [{
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(Math.max(artistTable._nbCols - 1, 1)),
+                size: Math.max(artistTable._nbCols - 1, 1),
 
                 model: {
                     criteria: "name",
@@ -203,7 +203,7 @@ FocusScope {
                     placeHolder: VLCStyle.noArtArtistSmall
                 }
             }, {
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "nb_tracks",

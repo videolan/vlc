@@ -398,7 +398,7 @@ FocusScope {
             sortModel: [{
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(2),
+                size: 2,
 
                 model: {
                     criteria: "title",
@@ -409,7 +409,7 @@ FocusScope {
                     colDelegate: tableColumns.titleDelegate
                 }
             }, {
-                width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)),
+                size: Math.max(tableView_id._nbCols - 3, 1),
 
                 model: {
                     criteria: "album_title",
@@ -417,7 +417,7 @@ FocusScope {
                     text: I18n.qtr("Album")
                 }
             }, {
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "duration",

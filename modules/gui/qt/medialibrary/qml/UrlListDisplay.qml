@@ -45,7 +45,7 @@ Widgets.KeyNavigableTableView {
     sortModel: [{
         isPrimary: true,
 
-        width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 1, 1)),
+        size: Math.max(listView_id._nbCols - 1, 1),
 
         model: {
             criteria: url,
@@ -57,7 +57,7 @@ Widgets.KeyNavigableTableView {
             headerDelegate: urlHeaderDelegate
         }
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: {
             criteria: last_played_date,

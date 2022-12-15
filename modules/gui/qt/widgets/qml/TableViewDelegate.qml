@@ -189,7 +189,7 @@ T.Control {
 
                 readonly property color foregroundColor: delegate.background.foregroundColor
 
-                width: (modelData.width) ? modelData.width : 0
+                width: (modelData.size) ? VLCStyle.colWidth(modelData.size) : 0
 
                 height: parent.height
 

@@ -249,7 +249,7 @@ FocusScope {
             sortModel: [{
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "cover",
@@ -258,7 +258,7 @@ FocusScope {
                     colDelegate: tableColumns.titleDelegate
                 }
             }, {
-                width: VLCStyle.colWidth(_nameColSpan),
+                size: _nameColSpan,
 
                 model: {
                     criteria: "name",
@@ -266,7 +266,7 @@ FocusScope {
                     text: I18n.qtr("Name")
                 }
             }, {
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "nb_tracks",

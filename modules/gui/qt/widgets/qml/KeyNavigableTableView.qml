@@ -54,7 +54,7 @@ FocusScope {
         var size = leftMargin + rightMargin
 
         for (var i in sortModel)
-            size += sortModel[i].width
+            size += VLCStyle.colWidth(sortModel[i].size)
 
         return size + Math.max(VLCStyle.column_spacing * (sortModel.length - 1), 0)
     }
@@ -314,7 +314,9 @@ FocusScope {
                         model: sortModel
                         MouseArea {
                             height: childrenRect.height
-                            width: modelData.width || 1
+
+                            width: VLCStyle.colWidth(modelData.size) || 1
+
                             //Layout.alignment: Qt.AlignVCenter
 
                             Loader {

@@ -47,7 +47,7 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
 
     sortModel: [{
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: ({
             type: "image",
@@ -64,7 +64,7 @@ MainInterface.MainTableView {
     }, {
         isPrimary: true,
 
-        width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 2, 1)),
+        size: Math.max(listView_id._nbCols - 2, 1),
 
         model: ({
             criteria: mainCriteria,
@@ -74,7 +74,7 @@ MainInterface.MainTableView {
             text: I18n.qtr("Title")
         })
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: ({
             criteria: "duration",

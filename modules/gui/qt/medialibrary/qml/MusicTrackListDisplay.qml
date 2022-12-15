@@ -97,27 +97,27 @@ Widgets.KeyNavigableTableView {
     property var _modelLarge: [{
         isPrimary: true,
 
-        width: VLCStyle.colWidth(_expandingColsSpan),
+        size: _expandingColsSpan,
 
         model: _lineTitle
     }, {
-        width: VLCStyle.colWidth(_expandingColsSpan),
+        size: _expandingColsSpan,
 
         model: _lineAlbum
     }, {
-        width: VLCStyle.colWidth(_expandingColsSpan),
+        size: _expandingColsSpan,
 
         model: _lineArtist
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineDuration
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineTrack
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineDisc
     }]
@@ -125,19 +125,19 @@ Widgets.KeyNavigableTableView {
     property var _modelMedium: [{
         isPrimary: true,
 
-        width: VLCStyle.colWidth(2),
+        size: 2,
 
         model: _lineTitle
     }, {
-        width: VLCStyle.colWidth(2),
+        size: 2,
 
         model: _lineAlbum
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineArtist
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineDuration
     }]
@@ -145,19 +145,19 @@ Widgets.KeyNavigableTableView {
     property var _modelSmall: [{
         isPrimary: true,
 
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineTitle
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineAlbum
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineArtist
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: _lineDuration
     }]

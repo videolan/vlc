@@ -292,7 +292,7 @@ FocusScope {
             sortModel: [{
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(Math.max(tracks._nbCols - 1, 1)),
+                size: Math.max(tracks._nbCols - 1, 1),
 
                 model: {
                     criteria: "title",
@@ -307,7 +307,7 @@ FocusScope {
                     headerDelegate: titleHeaderDelegate
                 }
             }, {
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "duration",

@@ -344,7 +344,7 @@ FocusScope {
             sortModel: [{
                 isPrimary: true,
 
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "thumbnail",
@@ -353,7 +353,7 @@ FocusScope {
                     colDelegate   : columns.titleDelegate
                 }
             }, {
-                width: VLCStyle.colWidth(_columns),
+                size: _columns,
 
                 model: {
                     criteria: "name",
@@ -361,7 +361,7 @@ FocusScope {
                     text: I18n.qtr("Name")
                 }
             }, {
-                width: VLCStyle.colWidth(1),
+                size: 1,
 
                 model: {
                     criteria: "count",

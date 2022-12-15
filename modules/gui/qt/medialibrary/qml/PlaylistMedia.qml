@@ -55,7 +55,7 @@ MainInterface.MainTableView {
     acceptDrop: true
 
     sortModel: [{
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: {
             criteria: "thumbnail",
@@ -70,7 +70,7 @@ MainInterface.MainTableView {
     }, {
         isPrimary: true,
 
-        width: VLCStyle.colWidth(Math.max(columns - 2, 1)),
+        size: Math.max(columns - 2, 1),
 
         model: {
             criteria: "title",
@@ -78,7 +78,7 @@ MainInterface.MainTableView {
             text: I18n.qtr("Title")
         }
     }, {
-        width: VLCStyle.colWidth(1),
+        size: 1,
 
         model: {
             criteria: "duration",
