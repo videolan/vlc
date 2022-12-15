@@ -194,19 +194,19 @@ GetLatency(audio_output_t *p_aout)
 
     if (changed)
     {
-        NSString *ports = @"";
-        bool first = true;
+        msg_Dbg(p_aout, "Current route changed");
         for (AVAudioSessionPortDescription *out in [[p_sys->avInstance currentRoute] outputs])
         {
-            if (!first)
-                ports = [ports stringByAppendingString: @" + "];
-            ports = [ports stringByAppendingString:out.portType];
-            first = false;
+            NSString *port = out.portType;
+            NSString *uid = out.UID;
+            NSString *name = out.portName;
+
+            if (tracer != NULL)
+                vlc_tracer_TraceEvent(tracer, "SyncOne2", "device", [port UTF8String]);
+
+            msg_Dbg(p_aout, "Current device changed: port: '%s', name: '%s', uid: '%s'",
+                    [port UTF8String], [name UTF8String], [uid UTF8String]);
         }
-        const char *ports_str = [ports UTF8String];
-        msg_Dbg(p_aout, "Current device changed: %s", ports_str);
-        if (tracer != NULL)
-            vlc_tracer_TraceEvent(tracer, "SyncOne2", "device", ports_str);
 
         msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us",
                 p_sys->output_latency_ticks);
