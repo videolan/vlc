@@ -123,7 +123,6 @@ ca_Open(audio_output_t *p_aout)
 
     assert(p_sys->tinfo.denom != 0 && p_sys->tinfo.numer != 0);
 
-    vlc_sem_init(&p_sys->flush_sem, 0);
     lock_init(p_sys);
     p_sys->p_out_chain = NULL;
     p_sys->pp_out_last = &p_sys->p_out_chain;
@@ -166,13 +165,6 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
 
     lock_lock(p_sys);
 
-    if (p_sys->b_do_flush)
-    {
-        ca_ClearOutBuffers(p_aout);
-        /* Signal that the renderer is flushed */
-        p_sys->b_do_flush = false;
-        vlc_sem_post(&p_sys->flush_sem);
-    }
 
     if (p_sys->b_paused)
         goto drop;
@@ -269,24 +261,16 @@ ca_Flush(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    lock_lock(p_sys);
 
-    assert(!p_sys->b_do_flush);
-    if (p_sys->b_paused)
-        ca_ClearOutBuffers(p_aout);
-    else
-    {
-        p_sys->b_do_flush = true;
-        lock_unlock(p_sys);
-        vlc_sem_wait(&p_sys->flush_sem);
-        lock_lock(p_sys);
-    }
+    lock_lock(p_sys);
 
     p_sys->started = false;
     p_sys->i_out_size = 0;
     p_sys->i_total_bytes = 0;
     p_sys->first_play_date = VLC_TICK_INVALID;
     p_sys->timing_report_last_written_bytes = 0;
+
+    ca_ClearOutBuffers(p_aout);
     lock_unlock(p_sys);
 
     p_sys->b_played = false;
@@ -402,21 +386,8 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
-
-    bool b_sem_post = false;
     p_sys->b_paused = !alive;
-    if (!alive && p_sys->b_do_flush)
-    {
-        ca_ClearOutBuffers(p_aout);
-        p_sys->b_played = false;
-        p_sys->b_do_flush = false;
-        b_sem_post = true;
-    }
-
     lock_unlock(p_sys);
-
-    if (b_sem_post)
-        vlc_sem_post(&p_sys->flush_sem);
 }
 
 void ca_ResetDeviceLatency(audio_output_t *p_aout)
