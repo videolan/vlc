@@ -55,4 +55,5 @@ MESON_VERSION=0.63.0
 MESON_URL=https://github.com/mesonbuild/meson/releases/download/$(MESON_VERSION)/meson-$(MESON_VERSION).tar.gz
 
 NINJA_VERSION=1.8.2
-NINJA_URL=https://github.com/ninja-build/ninja/archive/v$(NINJA_VERSION).tar.gz
+NINJA_BUILD_NAME=$(NINJA_VERSION).g81279.kitware.dyndep-1.jobserver-1
+NINJA_URL=https://github.com/Kitware/ninja/archive/refs/tags/v$(NINJA_BUILD_NAME).tar.gz
