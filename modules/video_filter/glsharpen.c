@@ -354,8 +354,8 @@ error:
 
 #define SIG_TEXT N_("Sharpen strength (0-2)")
 #define SIG_LONGTEXT N_("Set the Sharpen strength, between 0 and 2. Defaults to 0.05.")
-#define SIG_TEXT N_("Faster sharpen kernel algorithm")
-#define SIG_LONGTEXT N_("Enable a faster but less precise sharpen kernel. Defaults to false.")
+#define FAST_TEXT N_("Faster sharpen kernel algorithm")
+#define FAST_LONGTEXT N_("Enable a faster but less precise sharpen kernel. Defaults to false.")
 
 static int OpenVideoFilter(filter_t *filter)
 {
@@ -376,7 +376,7 @@ vlc_module_begin()
     add_float_with_range( FILTER_PREFIX "sigma", 0.05, 0.0, 2.0,
         SIG_TEXT, SIG_LONGTEXT )
     add_bool( FILTER_PREFIX "fast", false,
-             SIG_TEXT, SIG_LONGTEXT )
+             FAST_TEXT, FAST_LONGTEXT )
     change_safe()
     add_shortcut("glsharpen")
     set_callback(OpenVideoFilter)
