@@ -165,9 +165,14 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
 
     lock_lock(p_sys);
 
-
     if (p_sys->b_paused)
-        goto drop;
+    {
+        if (is_silence != NULL)
+            *is_silence = true;
+        memset(data, 0, bytes);
+        lock_unlock(p_sys);
+        return;
+    }
 
     if (!p_sys->started)
     {
@@ -206,7 +211,11 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
     {
         vlc_frame_t *f = p_sys->p_out_chain;
         if (f == NULL)
-            goto drop;
+        {
+            memset(data, 0, bytes);
+            lock_unlock(p_sys);
+            return;
+        }
 
         size_t tocopy = f->i_buffer > bytes ? bytes : f->i_buffer;
 
@@ -243,14 +252,6 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         }
     }
 
-    lock_unlock(p_sys);
-
-    return;
-
-drop:
-    memset(data, 0, bytes);
-    if (is_silence != NULL)
-        *is_silence = true;
     lock_unlock(p_sys);
 }
 
