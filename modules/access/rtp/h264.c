@@ -368,6 +368,9 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 {
     VLC_UNUSED(obj);
 
+    if(!desc->parameters)
+        return VLC_ENOTSUP;
+
     const char *psz = strstr(desc->parameters, "packetization-mode=");
     if(!psz || psz[19] == '\0' || atoi(&psz[19]) > 1)
         return VLC_ENOTSUP;
