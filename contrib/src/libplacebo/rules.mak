@@ -44,7 +44,7 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 .libplacebo: libplacebo crossfile.meson .python-venv
 	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) $(PLACEBOCONF)
-	$(MESONBUILD)
+	+$(MESONBUILD)
 # Work-around for full paths to static libraries, which libtool does not like
 # See https://github.com/mesonbuild/meson/issues/5479
 	(cd $(UNPACK_DIR) && $(SRC_BUILT)/pkg-rewrite-absolute.py -i "$(PREFIX)/lib/pkgconfig/libplacebo.pc")
