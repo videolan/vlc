@@ -68,6 +68,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     
     VLCExpandAnimationType _animationType;
     CGFloat _prevProvidedAnimationStep;
+
+    BOOL _invalidateAll;
 }
 
 @property (nonatomic, readwrite) BOOL detailViewIsAnimating;
@@ -88,6 +90,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         
         _animationType = VLCExpandAnimationTypeDefault;
         _prevProvidedAnimationStep = 0;
+
+        _invalidateAll = NO;
         
         [self resetLayout];
     }
@@ -171,6 +175,25 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
     contentSize.height += [self currentAnimationStep];
     return contentSize;
+}
+
+- (BOOL)shouldInvalidateLayoutForBoundsChange:(NSRect)newBounds
+{
+    [super shouldInvalidateLayoutForBoundsChange:newBounds];
+    _invalidateAll = YES;
+    return YES;
+}
+
+- (void)invalidateLayoutWithContext:(NSCollectionViewLayoutInvalidationContext *)context
+{
+    NSCollectionViewFlowLayoutInvalidationContext *flowLayoutContext = (NSCollectionViewFlowLayoutInvalidationContext *)context;
+    if (flowLayoutContext && _invalidateAll) {
+        flowLayoutContext.invalidateFlowLayoutAttributes = YES;
+        flowLayoutContext.invalidateFlowLayoutDelegateMetrics = YES;
+        _invalidateAll = NO;
+    }
+
+    [super invalidateLayoutWithContext:context];
 }
 
 - (NSCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
