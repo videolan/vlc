@@ -24,5 +24,5 @@ microdns: microdns-$(LIBMICRODNS_VERSION).tar.xz .sum-microdns
 .microdns: microdns crossfile.meson
 	$(MESONCLEAN)
 	$(HOSTVARS_MESON) $(MESON) -Dauto_features=disabled
-	$(MESONBUILD)
+	+$(MESONBUILD)
 	touch $@
