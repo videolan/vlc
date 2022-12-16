@@ -320,7 +320,7 @@ FocusScope {
             }]
 
             Navigation.parentItem: root
-            Navigation.leftItem: actionButtons
+            Navigation.leftItem: enqueueActionBtn
             Navigation.upItem: headerItem
 
             Widgets.TableColumns {
