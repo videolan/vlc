@@ -1587,6 +1587,8 @@ vlc_module_begin ()
     add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT )
         change_safe ()
+    add_integer( "video-desync", 0, NULL, NULL )
+        change_safe ()
 
     /* FIXME TODO create a subcat replay gain ? */
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,

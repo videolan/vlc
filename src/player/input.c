@@ -1064,6 +1064,8 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     /* Initial sub/audio delay */
     const vlc_tick_t cat_delays[DATA_ES] = {
+        [VIDEO_ES] =
+            VLC_TICK_FROM_MS(var_InheritInteger(player, "video-desync")),
         [AUDIO_ES] =
             VLC_TICK_FROM_MS(var_InheritInteger(player, "audio-desync")),
         [SPU_ES] =
