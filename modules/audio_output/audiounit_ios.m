@@ -183,7 +183,8 @@ GetLatency(audio_output_t *p_aout)
         p_sys->io_buffer_duration_ticks = us;
         changed = true;
     }
-    latency_us += us;
+    /* Don't add 'us' to 'latency_us', IOBufferDuration is already handled by
+     * the render callback (end_ticks include the current buffer length). */
 
     if (changed)
         msg_Dbg(p_aout, "Current device has a new total latency of %" PRId64 "us",
