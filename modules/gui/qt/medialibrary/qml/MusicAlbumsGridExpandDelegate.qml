@@ -225,7 +225,7 @@ FocusScope {
                 Navigation.leftItem: enqueueActionBtn
                 Navigation.downAction: function () {
                     if (tracks.count > 0) {
-                        tracks.setCurrentItemFocus(Qt.TabFocus)
+                        tracks.setCurrentItemFocus(Qt.TabFocusReason)
                     } else {
                         root.Navigation.downAction()
                     }
