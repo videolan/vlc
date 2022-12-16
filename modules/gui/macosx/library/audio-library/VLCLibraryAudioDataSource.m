@@ -722,21 +722,29 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     if (collectionViewLayout == _collectionViewFlowLayout &&
         collectionView == _collectionView) {
 
-        const CGFloat numItemsInRow = 5;
-
-        const NSEdgeInsets sectionInsets = _collectionViewFlowLayout.sectionInset;
-        const CGFloat interItemSpacing = _collectionViewFlowLayout.minimumInteritemSpacing;
-
-        const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
-                                        (sectionInsets.left +
-                                         sectionInsets.right +
-                                         (interItemSpacing * (numItemsInRow - 1)));
-
-        const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
-        return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
+        const uint numItemsInRow = 5;
+        return [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
     }
 
     return NSZeroSize;
+}
+
+- (NSSize)collectionViewItemSizeForNumberOfItemsInRow:(uint)numItemsInRow
+{
+    NSParameterAssert(numItemsInRow > 0);
+    NSAssert(_collectionView, @"Collection view should be valid");
+    NSAssert(_collectionViewFlowLayout, @"Collection view flow layout should be valid");
+
+    const NSEdgeInsets sectionInsets = _collectionViewFlowLayout.sectionInset;
+    const CGFloat interItemSpacing = _collectionViewFlowLayout.minimumInteritemSpacing;
+
+    const CGFloat rowOfItemsWidth = _collectionView.bounds.size.width -
+                                    (sectionInsets.left +
+                                     sectionInsets.right +
+                                     (interItemSpacing * (numItemsInRow - 1)));
+
+    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
+    return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
 }
 
 @end
