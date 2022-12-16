@@ -212,6 +212,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         }
     }
 
+    size_t bytes_copied = 0;
     while (bytes > 0)
     {
         vlc_frame_t *f = p_sys->p_out_chain;
@@ -228,19 +229,6 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         p_sys->i_out_size -= tocopy;
         p_sys->i_total_bytes += tocopy;
 
-        if (!p_sys->started
-          || (p_sys->timing_report_last_written_bytes >=
-             p_sys->timing_report_delay_bytes))
-        {
-            p_sys->timing_report_last_written_bytes = 0;
-            vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes);
-            const vlc_tick_t latency_ticks = GetLatency(p_aout);
-            aout_LatencyReport(p_aout, latency_ticks);
-            aout_TimingReport(p_aout, end_ticks, pos_ticks);
-        }
-        else
-            p_sys->timing_report_last_written_bytes += tocopy;
-
         p_sys->started = true;
 
         memcpy(data, f->p_buffer, tocopy);
@@ -249,6 +237,7 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         bytes -= tocopy;
         f->i_buffer -= tocopy;
         f->p_buffer += tocopy;
+        bytes_copied += tocopy;
 
         if (f->i_buffer == 0)
         {
@@ -259,6 +248,18 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
             block_Release(f);
         }
     }
+
+    if (p_sys->timing_report_last_written_bytes >=
+        p_sys->timing_report_delay_bytes)
+    {
+        p_sys->timing_report_last_written_bytes = 0;
+        vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes);
+        const vlc_tick_t latency_ticks = GetLatency(p_aout);
+        aout_LatencyReport(p_aout, latency_ticks);
+        aout_TimingReport(p_aout, end_ticks, pos_ticks);
+    }
+    else
+        p_sys->timing_report_last_written_bytes += bytes_copied;
 
     lock_unlock(p_sys);
 }
