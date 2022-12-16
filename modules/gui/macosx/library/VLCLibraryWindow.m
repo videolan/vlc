@@ -342,7 +342,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     const NSEdgeInsets collectionViewSectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
 
     NSCollectionViewFlowLayout *audioLibraryCollectionViewLayout = _audioLibraryCollectionView.collectionViewLayout;
-    audioLibraryCollectionViewLayout.itemSize = CGSizeMake(214., 260.);
     audioLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;

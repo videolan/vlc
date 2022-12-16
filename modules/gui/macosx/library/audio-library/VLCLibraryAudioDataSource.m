@@ -715,6 +715,30 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return nil;
 }
 
+- (NSSize)collectionView:(NSCollectionView *)collectionView
+                  layout:(NSCollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (collectionViewLayout == _collectionViewFlowLayout &&
+        collectionView == _collectionView) {
+
+        const CGFloat numItemsInRow = 5;
+
+        const NSEdgeInsets sectionInsets = _collectionViewFlowLayout.sectionInset;
+        const CGFloat interItemSpacing = _collectionViewFlowLayout.minimumInteritemSpacing;
+
+        const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
+                                        (sectionInsets.left +
+                                         sectionInsets.right +
+                                         (interItemSpacing * (numItemsInRow - 1)));
+
+        const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
+        return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
+    }
+
+    return NSZeroSize;
+}
+
 @end
 
 @implementation VLCLibraryGroupDataSource
