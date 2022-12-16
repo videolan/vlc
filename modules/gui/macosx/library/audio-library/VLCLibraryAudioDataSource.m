@@ -722,8 +722,22 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     if (collectionViewLayout == _collectionViewFlowLayout &&
         collectionView == _collectionView) {
 
-        const uint numItemsInRow = 5;
-        return [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+        static const CGFloat maxItemWidth = 280;
+        static const CGFloat minItemWidth = 180;
+
+        static uint numItemsInRow = 5;
+
+        NSSize itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+        while (itemSize.width > maxItemWidth) {
+            ++numItemsInRow;
+            itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+        }
+        while (itemSize.width < minItemWidth) {
+            --numItemsInRow;
+            itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+        }
+
+        return itemSize;
     }
 
     return NSZeroSize;
