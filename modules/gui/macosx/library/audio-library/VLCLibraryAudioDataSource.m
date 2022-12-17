@@ -69,7 +69,6 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 @interface VLCLibraryAudioDataSource ()
 {
-    VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     NSArray *_displayedCollection;
     enum vlc_ml_parent_type _currentParentType;
 
@@ -306,7 +305,6 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (void)setupCollectionView
 {
     _collectionView.dataSource = self;
-    _collectionView.delegate = self;
 
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
@@ -324,9 +322,6 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     [_collectionView registerNib:mediaItemSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
-
-    _collectionViewFlowLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
-    _collectionView.collectionViewLayout = _collectionViewFlowLayout;
 }
 
 - (void)setupTableViews
@@ -431,7 +426,11 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)reloadViews
 {
-    [_collectionViewFlowLayout resetLayout];
+    VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)_collectionView.collectionViewLayout;
+    if (collectionViewFlowLayout) {
+        [collectionViewFlowLayout resetLayout];
+    }
+    
     [self.collectionView reloadData];
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];

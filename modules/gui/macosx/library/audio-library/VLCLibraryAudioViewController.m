@@ -24,6 +24,8 @@
 
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryCollectionViewDelegate.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
@@ -34,6 +36,8 @@
 {
     NSArray<NSString *> *_placeholderImageNames;
     NSArray<NSString *> *_placeholderLabelStrings;
+
+    VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
 }
 @end
 
@@ -100,6 +104,11 @@
     _audioLibraryCollectionView.selectable = YES;
     _audioLibraryCollectionView.allowsMultipleSelection = NO;
     _audioLibraryCollectionView.allowsEmptySelection = YES;
+
+    _audioLibraryCollectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    _audioLibraryCollectionView.delegate = _audioLibraryCollectionViewDelegate;
+
+    _audioLibraryCollectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 }
 
 - (void)setupAudioTableViews
