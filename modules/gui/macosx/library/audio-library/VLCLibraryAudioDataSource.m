@@ -755,7 +755,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     const CGFloat rowOfItemsWidth = _collectionView.bounds.size.width -
                                     (sectionInsets.left +
                                      sectionInsets.right +
-                                     (interItemSpacing * (numItemsInRow - 1)));
+                                     (interItemSpacing * (numItemsInRow - 1)) +
+                                     1);
 
     const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
     return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
