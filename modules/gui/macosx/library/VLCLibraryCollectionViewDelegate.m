@@ -22,6 +22,70 @@
 
 #import "VLCLibraryCollectionViewDelegate.h"
 
+#import "VLCLibraryCollectionViewFlowLayout.h"
+
 @implementation VLCLibraryCollectionViewDelegate
+
+- (NSSize)collectionView:(NSCollectionView *)collectionView
+                  layout:(NSCollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([collectionViewLayout class] == [VLCLibraryCollectionViewFlowLayout class]) {
+        VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
+        return [self adjustedItemSizeForCollectionView:collectionView
+                                            withLayout:collectionViewFlowLayout];
+    }
+
+    return NSZeroSize;
+}
+
+- (NSSize)adjustedItemSizeForCollectionView:(NSCollectionView *)collectionView
+                                 withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+{
+    static const CGFloat maxItemWidth = 280;
+    static const CGFloat minItemWidth = 180;
+
+    static uint numItemsInRow = 5;
+
+    NSSize itemSize = [self itemSizeForCollectionView:collectionView
+                                           withLayout:collectionViewLayout
+                               withNumberOfItemsInRow:numItemsInRow];
+
+    while (itemSize.width > maxItemWidth) {
+        ++numItemsInRow;
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewLayout
+                            withNumberOfItemsInRow:numItemsInRow];
+    }
+    while (itemSize.width < minItemWidth) {
+        --numItemsInRow;
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewLayout
+                            withNumberOfItemsInRow:numItemsInRow];
+    }
+
+    return itemSize;
+}
+
+- (NSSize)itemSizeForCollectionView:(NSCollectionView *)collectionView
+                        withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+            withNumberOfItemsInRow:(uint)numItemsInRow
+{
+    NSParameterAssert(numItemsInRow > 0);
+    NSParameterAssert(collectionView);
+    NSParameterAssert(collectionViewLayout);
+
+    const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
+    const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
+
+    const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
+                                    (sectionInsets.left +
+                                     sectionInsets.right +
+                                     (interItemSpacing * (numItemsInRow - 1)) +
+                                     1);
+
+    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
+    return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
+}
 
 @end

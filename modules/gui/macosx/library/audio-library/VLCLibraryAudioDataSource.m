@@ -715,57 +715,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return nil;
 }
 
-- (NSSize)collectionView:(NSCollectionView *)collectionView
-                  layout:(NSCollectionViewLayout *)collectionViewLayout
-  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (collectionViewLayout == _collectionViewFlowLayout &&
-        collectionView == _collectionView) {
-        return [self adjustedCollectionViewItemSize];
-    }
-
-    return NSZeroSize;
-}
-
-- (NSSize)adjustedCollectionViewItemSize
-{
-    static const CGFloat maxItemWidth = 280;
-    static const CGFloat minItemWidth = 180;
-
-    static uint numItemsInRow = 5;
-
-    NSSize itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
-    while (itemSize.width > maxItemWidth) {
-        ++numItemsInRow;
-        itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
-    }
-    while (itemSize.width < minItemWidth) {
-        --numItemsInRow;
-        itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
-    }
-
-    return itemSize;
-}
-
-- (NSSize)collectionViewItemSizeForNumberOfItemsInRow:(uint)numItemsInRow
-{
-    NSParameterAssert(numItemsInRow > 0);
-    NSAssert(_collectionView, @"Collection view should be valid");
-    NSAssert(_collectionViewFlowLayout, @"Collection view flow layout should be valid");
-
-    const NSEdgeInsets sectionInsets = _collectionViewFlowLayout.sectionInset;
-    const CGFloat interItemSpacing = _collectionViewFlowLayout.minimumInteritemSpacing;
-
-    const CGFloat rowOfItemsWidth = _collectionView.bounds.size.width -
-                                    (sectionInsets.left +
-                                     sectionInsets.right +
-                                     (interItemSpacing * (numItemsInRow - 1)) +
-                                     1);
-
-    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
-    return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
-}
-
 @end
 
 @implementation VLCLibraryGroupDataSource
