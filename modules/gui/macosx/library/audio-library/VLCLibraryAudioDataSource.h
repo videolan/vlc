@@ -37,7 +37,7 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
     VLCAudioLibraryGenresSegment
 };
 
-@interface VLCLibraryAudioDataSource : NSViewController <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegate, NSCollectionViewDelegateFlowLayout>
+@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) VLCLibraryGroupDataSource *groupDataSource;

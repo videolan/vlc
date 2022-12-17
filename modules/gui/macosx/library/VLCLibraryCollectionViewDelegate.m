@@ -26,11 +26,38 @@
 
 @implementation VLCLibraryCollectionViewDelegate
 
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        return;
+    }
+
+    VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
+    if(collectionViewFlowLayout) {
+        [collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
+    }
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSIndexPath *indexPath = indexPaths.anyObject;
+    if (!indexPath) {
+        return;
+    }
+
+    VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
+    if (collectionViewFlowLayout) {
+        [collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
+    }
+}
+
 - (NSSize)collectionView:(NSCollectionView *)collectionView
                   layout:(NSCollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([collectionViewLayout class] == [VLCLibraryCollectionViewFlowLayout class]) {
+    VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
+    if (collectionViewLayout) {
         VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
         return [self adjustedItemSizeForCollectionView:collectionView
                                             withLayout:collectionViewFlowLayout];

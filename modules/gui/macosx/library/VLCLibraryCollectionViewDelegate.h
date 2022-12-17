@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryCollectionViewDelegate : NSObject<NSCollectionViewDelegate>
+@interface VLCLibraryCollectionViewDelegate : NSObject <NSCollectionViewDelegate, NSCollectionViewDelegateFlowLayout>
 
 @end
 

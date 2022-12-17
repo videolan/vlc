@@ -258,7 +258,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     NSSet *indexPathSet = [NSSet setWithObject:newIndexPath];
     [_collectionView selectItemsAtIndexPaths:indexPathSet scrollPosition:NSCollectionViewScrollPositionTop];
     // selectItemsAtIndexPaths does not call any delegate methods so we do it manually
-    [self collectionView:_collectionView didSelectItemsAtIndexPaths:indexPathSet];
+    [_collectionView.delegate collectionView:_collectionView didSelectItemsAtIndexPaths:indexPathSet];
     _selectedCollectionViewItem = nil;
 }
 
@@ -632,7 +632,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     [VLCMain.sharedInstance.libraryController appendItemToPlaylist:mediaItem playImmediately:YES];
 }
 
-#pragma mark - collection view data source and delegation
+#pragma mark - collection view data source
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
@@ -651,26 +651,6 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     viewItem.representedItem = _displayedCollection[indexPath.item];
     return viewItem;
-}
-
-- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-{
-    NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath) {
-        return;
-    }
-
-    [_collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
-}
-
-- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-{
-    NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath) {
-        return;
-    }
-
-    [_collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
 }
 
 - (NSView *)collectionView:(NSCollectionView *)collectionView
