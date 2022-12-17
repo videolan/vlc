@@ -721,26 +721,30 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 {
     if (collectionViewLayout == _collectionViewFlowLayout &&
         collectionView == _collectionView) {
-
-        static const CGFloat maxItemWidth = 280;
-        static const CGFloat minItemWidth = 180;
-
-        static uint numItemsInRow = 5;
-
-        NSSize itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
-        while (itemSize.width > maxItemWidth) {
-            ++numItemsInRow;
-            itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
-        }
-        while (itemSize.width < minItemWidth) {
-            --numItemsInRow;
-            itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
-        }
-
-        return itemSize;
+        return [self adjustedCollectionViewItemSize];
     }
 
     return NSZeroSize;
+}
+
+- (NSSize)adjustedCollectionViewItemSize
+{
+    static const CGFloat maxItemWidth = 280;
+    static const CGFloat minItemWidth = 180;
+
+    static uint numItemsInRow = 5;
+
+    NSSize itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+    while (itemSize.width > maxItemWidth) {
+        ++numItemsInRow;
+        itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+    }
+    while (itemSize.width < minItemWidth) {
+        --numItemsInRow;
+        itemSize = [self collectionViewItemSizeForNumberOfItemsInRow:numItemsInRow];
+    }
+
+    return itemSize;
 }
 
 - (NSSize)collectionViewItemSizeForNumberOfItemsInRow:(uint)numItemsInRow
