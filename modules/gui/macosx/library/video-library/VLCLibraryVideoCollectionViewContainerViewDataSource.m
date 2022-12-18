@@ -104,7 +104,6 @@
 
     _collectionViewFlowLayout = collectionViewLayout;
     _collectionView.dataSource = self;
-    _collectionView.delegate = self;
 
     [_collectionView registerClass:[VLCLibraryCollectionViewItem class]
              forItemWithIdentifier:VLCLibraryCellIdentifier];
@@ -163,62 +162,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
 
     return nil;
-}
-
-- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-{
-    NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath) {
-        NSLog(@"Bad index path on item selection");
-        return;
-    }
-
-    [_collectionViewFlowLayout expandDetailSectionAtIndex:indexPath];
-}
-
-- (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-{
-    NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath) {
-        NSLog(@"Bad index path on item deselection");
-        return;
-    }
-
-    [_collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
-}
-
-- (BOOL)collectionView:(NSCollectionView *)collectionView
-canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-             withEvent:(NSEvent *)event
-{
-    return YES;
-}
-
-- (BOOL)collectionView:(NSCollectionView *)collectionView
-writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-          toPasteboard:(NSPasteboard *)pasteboard
-{
-    NSUInteger numberOfIndexPaths = indexPaths.count;
-    NSMutableArray *encodedLibraryItemsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
-    NSMutableArray *filePathsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
-
-    for (NSIndexPath *indexPath in indexPaths) {
-        VLCMediaLibraryMediaItem *mediaItem = _collectionArray[indexPath.item];
-        [encodedLibraryItemsArray addObject:mediaItem];
-
-        VLCMediaLibraryFile *file = mediaItem.files.firstObject;
-        if (file) {
-            NSURL *url = [NSURL URLWithString:file.MRL];
-            [filePathsArray addObject:url.path];
-        }
-    }
-
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
-    [pasteboard declareTypes:@[VLCMediaLibraryMediaItemPasteboardType, NSFilenamesPboardType] owner:self];
-    [pasteboard setPropertyList:filePathsArray forType:NSFilenamesPboardType];
-    [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
-
-    return YES;
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath

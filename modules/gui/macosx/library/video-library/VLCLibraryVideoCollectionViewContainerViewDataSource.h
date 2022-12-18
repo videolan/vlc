@@ -29,7 +29,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCollectionViewContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource, NSCollectionViewDelegate>
+@interface VLCLibraryVideoCollectionViewContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) NSCollectionView *collectionView;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;

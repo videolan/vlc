@@ -22,7 +22,9 @@
 
 #import "VLCLibraryCollectionViewDelegate.h"
 
+#import "VLCLibraryCollectionViewDataSource.h"
 #import "VLCLibraryCollectionViewFlowLayout.h"
+#import "VLCLibraryDataTypes.h"
 
 @implementation VLCLibraryCollectionViewDelegate
 
@@ -113,6 +115,50 @@
 
     const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
     return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
+}
+
+- (BOOL)collectionView:(NSCollectionView *)collectionView
+canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+             withEvent:(NSEvent *)event
+{
+    return YES;
+}
+
+- (BOOL)collectionView:(NSCollectionView *)collectionView
+writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+          toPasteboard:(NSPasteboard *)pasteboard
+{
+    if (![collectionView.dataSource conformsToProtocol:@protocol(VLCLibraryCollectionViewDataSource)]) {
+        return NO;
+    }
+
+    NSObject<VLCLibraryCollectionViewDataSource> *vlcDataSource = (NSObject<VLCLibraryCollectionViewDataSource>*)collectionView.dataSource;
+
+    NSUInteger numberOfIndexPaths = indexPaths.count;
+    NSMutableArray *encodedLibraryItemsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
+    NSMutableArray *filePathsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
+
+    for (NSIndexPath *indexPath in indexPaths) {
+
+        id<VLCMediaLibraryItemProtocol> libraryItem = [vlcDataSource libraryItemAtIndexPath:indexPath
+                                                                          forCollectionView:collectionView];
+
+        VLCMediaLibraryMediaItem *mediaItem = libraryItem.firstMediaItem;
+        [encodedLibraryItemsArray addObject:mediaItem];
+
+        VLCMediaLibraryFile *file = mediaItem.files.firstObject;
+        if (file) {
+            NSURL *url = [NSURL URLWithString:file.MRL];
+            [filePathsArray addObject:url.path];
+        }
+    }
+
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
+    [pasteboard declareTypes:@[VLCMediaLibraryMediaItemPasteboardType, NSFilenamesPboardType] owner:self];
+    [pasteboard setPropertyList:filePathsArray forType:NSFilenamesPboardType];
+    [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
+
+    return YES;
 }
 
 @end
