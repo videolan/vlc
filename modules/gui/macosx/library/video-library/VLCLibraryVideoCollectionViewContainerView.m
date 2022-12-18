@@ -31,12 +31,6 @@
 
 #import "views/VLCSubScrollView.h"
 
-@interface VLCLibraryVideoCollectionViewContainerView()
-{
-    VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
-}
-@end
-
 @implementation VLCLibraryVideoCollectionViewContainerView
 
 - (instancetype)init
