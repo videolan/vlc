@@ -33,6 +33,7 @@
     self = [super init];
     if (self) {
         _dynamicItemSizing = YES;
+        _staticItemSize = NSMakeSize(214, 260);
     }
     return self;
 }
@@ -68,7 +69,7 @@
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if (!_dynamicItemSizing) {
-        return CGSizeMake(214., 260.);
+        return _staticItemSize;
     }
     
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
