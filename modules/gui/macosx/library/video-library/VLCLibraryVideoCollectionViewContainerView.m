@@ -108,7 +108,6 @@
 {
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionViewLayout.headerReferenceSize = [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
-    _collectionViewLayout.itemSize = CGSizeMake(214., 260.);
 
     _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
     _collectionView.postsFrameChangedNotifications = YES;
@@ -156,6 +155,7 @@
                                             NSCollectionViewScrollDirectionHorizontal :
                                             NSCollectionViewScrollDirectionVertical;
     _scrollView.scrollSelf = _groupDescriptor.isHorizontalBarCollectionView;
+    _collectionViewDelegate.dynamicItemSizing = !_groupDescriptor.isHorizontalBarCollectionView;
 }
 
 - (void)setVideoGroup:(VLCLibraryVideoGroup)group
