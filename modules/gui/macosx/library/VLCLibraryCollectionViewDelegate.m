@@ -28,6 +28,15 @@
 
 @implementation VLCLibraryCollectionViewDelegate
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _dynamicItemSizing = YES;
+    }
+    return self;
+}
+
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
     NSIndexPath *indexPath = indexPaths.anyObject;
@@ -58,6 +67,10 @@
                   layout:(NSCollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (!_dynamicItemSizing) {
+        return CGSizeMake(214., 260.);
+    }
+    
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
     if (collectionViewLayout) {
         VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
