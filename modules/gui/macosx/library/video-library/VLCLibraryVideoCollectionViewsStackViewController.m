@@ -22,6 +22,7 @@
 
 #import "VLCLibraryVideoCollectionViewsStackViewController.h"
 
+#import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
@@ -139,7 +140,7 @@
     _collectionViewItemSize = collectionViewItemSize;
 
     for (VLCLibraryVideoCollectionViewContainerView *containerView in _collectionViewContainers) {
-        containerView.collectionViewLayout.itemSize = collectionViewItemSize;
+        containerView.collectionViewDelegate.staticItemSize = collectionViewItemSize;
     }
 }
 
