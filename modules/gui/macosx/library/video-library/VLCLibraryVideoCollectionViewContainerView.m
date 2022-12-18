@@ -22,6 +22,7 @@
 
 #import "VLCLibraryVideoCollectionViewContainerView.h"
 
+#import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 
@@ -29,6 +30,12 @@
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
 #import "views/VLCSubScrollView.h"
+
+@interface VLCLibraryVideoCollectionViewContainerView()
+{
+    VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
+}
+@end
 
 @implementation VLCLibraryVideoCollectionViewContainerView
 
@@ -109,6 +116,9 @@
     _collectionView.selectable = YES;
     _collectionView.allowsEmptySelection = YES;
     _collectionView.allowsMultipleSelection = NO;
+
+    _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    _collectionView.delegate = _collectionViewDelegate;
 }
 
 - (void)setupScrollView
