@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryCollectionViewDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,7 +38,7 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
     VLCAudioLibraryGenresSegment
 };
 
-@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource>
+@interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) VLCLibraryGroupDataSource *groupDataSource;

@@ -187,7 +187,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     [_collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
 }
 
-
 - (BOOL)collectionView:(NSCollectionView *)collectionView
 canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
              withEvent:(NSEvent *)event
@@ -202,6 +201,7 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     NSUInteger numberOfIndexPaths = indexPaths.count;
     NSMutableArray *encodedLibraryItemsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
     NSMutableArray *filePathsArray = [NSMutableArray arrayWithCapacity:numberOfIndexPaths];
+
     for (NSIndexPath *indexPath in indexPaths) {
         VLCMediaLibraryMediaItem *mediaItem = _collectionArray[indexPath.item];
         [encodedLibraryItemsArray addObject:mediaItem];
@@ -219,6 +219,12 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
     [pasteboard setData:data forType:VLCMediaLibraryMediaItemPasteboardType];
 
     return YES;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
+                                        forCollectionView:(NSCollectionView *)collectionView
+{
+    return _collectionArray[indexPath.item];
 }
 
 @end
