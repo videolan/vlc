@@ -393,6 +393,8 @@ static bool IsJfif(stream_t *s)
 {
     const uint8_t *header;
     int size = vlc_stream_Peek(s, &header, 256);
+    if(size < 256)
+        return false;
     int position = 0;
 
     if (FindJpegMarker(&position, header, size) != 0xd8)
@@ -439,7 +441,7 @@ static bool IsExif(stream_t *s)
 {
     const uint8_t *header;
     ssize_t size = vlc_stream_Peek(s, &header, 256);
-    if (size == -1)
+    if (size < 256)
         return false;
     int position = 0;
 
