@@ -188,8 +188,6 @@ FocusScope {
             }
 
             sortModel: [{
-                isPrimary: true,
-
                 size: Math.max(artistTable._nbCols - 1, 1),
 
                 model: {

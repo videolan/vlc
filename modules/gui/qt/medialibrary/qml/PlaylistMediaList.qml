@@ -342,8 +342,6 @@ FocusScope {
             headerColor: VLCStyle.colors.bg
 
             sortModel: [{
-                isPrimary: true,
-
                 size: 1,
 
                 model: {

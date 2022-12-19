@@ -68,8 +68,6 @@ MainInterface.MainTableView {
             placeHolder: VLCStyle.noArtAlbumCover
         }
     }, {
-        isPrimary: true,
-
         size: Math.max(columns - 2, 1),
 
         model: {

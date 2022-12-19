@@ -95,8 +95,6 @@ Widgets.KeyNavigableTableView {
     })
 
     property var _modelLarge: [{
-        isPrimary: true,
-
         size: _expandingColsSpan,
 
         model: _lineTitle
@@ -123,8 +121,6 @@ Widgets.KeyNavigableTableView {
     }]
 
     property var _modelMedium: [{
-        isPrimary: true,
-
         size: 2,
 
         model: _lineTitle
@@ -143,8 +139,6 @@ Widgets.KeyNavigableTableView {
     }]
 
     property var _modelSmall: [{
-        isPrimary: true,
-
         size: 1,
 
         model: _lineTitle

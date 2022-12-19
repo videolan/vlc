@@ -290,8 +290,6 @@ FocusScope {
             }
 
             sortModel: [{
-                isPrimary: true,
-
                 size: Math.max(tracks._nbCols - 1, 1),
 
                 model: {

@@ -287,8 +287,6 @@ FocusScope {
                     colDelegate   : artworkColumn
                 }
             }, {
-                isPrimary: true,
-
                 size: listView._nameColSpan,
 
                 model: {

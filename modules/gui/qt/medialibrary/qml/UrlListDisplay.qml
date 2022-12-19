@@ -43,8 +43,6 @@ Widgets.KeyNavigableTableView {
     selectionDelegateModel: selectionModel
 
     sortModel: [{
-        isPrimary: true,
-
         size: Math.max(listView_id._nbCols - 1, 1),
 
         model: {

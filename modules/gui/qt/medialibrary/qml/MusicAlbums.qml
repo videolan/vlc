@@ -218,8 +218,6 @@ FocusScope {
             headerTopPadding: VLCStyle.margin_normal
 
             sortModel: [{
-                isPrimary: true,
-
                 size: 2,
 
                 model: {

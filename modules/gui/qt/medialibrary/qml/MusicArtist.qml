@@ -396,8 +396,6 @@ FocusScope {
             rowHeight: VLCStyle.tableCoverRow_height
 
             sortModel: [{
-                isPrimary: true,
-
                 size: 2,
 
                 model: {

@@ -62,8 +62,6 @@ MainInterface.MainTableView {
             colDelegate   : tableColumns.titleDelegate
         })
     }, {
-        isPrimary: true,
-
         size: Math.max(listView_id._nbCols - 2, 1),
 
         model: ({

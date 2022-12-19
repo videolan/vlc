@@ -317,8 +317,6 @@ FocusScope {
                     colDelegate: tableView.thumbnailColumn
                 }
             }, {
-                isPrimary: true,
-
                 size: tableView._nameColSpan,
 
                 model: {
