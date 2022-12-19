@@ -95,13 +95,6 @@ bool config_PrintHelp (libvlc_int_t *obj)
 {
     char *str;
 
-    /* Check for short help option */
-    if (var_InheritBool (obj, "help"))
-    {
-        Help (obj, "help");
-        return true;
-    }
-
     /* Check for version option */
     if (var_InheritBool (obj, "version"))
     {
@@ -133,17 +126,23 @@ bool config_PrintHelp (libvlc_int_t *obj)
         Help (obj, "longhelp");
         return true;
     }
-
-    /* Check for module list option */
-    if (var_InheritBool (obj, "list"))
+    /* Check for short help option */
+    if (var_InheritBool (obj, "help"))
     {
-        ListModules (obj, false );
+        Help (obj, "help");
         return true;
     }
 
     if (var_InheritBool (obj, "list-verbose"))
     {
         ListModules (obj, true);
+        return true;
+    }
+
+    /* Check for module list option */
+    if (var_InheritBool (obj, "list"))
+    {
+        ListModules (obj, false );
         return true;
     }
 
