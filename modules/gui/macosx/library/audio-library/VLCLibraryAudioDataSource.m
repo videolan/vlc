@@ -24,6 +24,7 @@
 
 #import "main/VLCMain.h"
 
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryModel.h"
@@ -41,6 +42,9 @@
 #import "library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h"
 
 #import "extensions/NSString+Helpers.h"
+
+#import "playlist/VLCPlaylistController.h"
+
 #import "views/VLCImageView.h"
 #import "views/VLCSubScrollView.h"
 
@@ -97,9 +101,27 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelGenreListUpdated
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(playlistItemChanged:)
+                                   name:VLCPlaylistCurrentItemChanged
+                                 object:nil];
     }
 
     return self;
+}
+
+- (void)playlistItemChanged:(NSNotification *)aNotification
+{
+    if (_currentParentType == VLC_ML_PARENT_UNKNOWN) {
+        VLCInputItem *currentPlayingItem = VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem;
+
+        NSUInteger itemIndexInDisplayedCollection = [_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
+            VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)element;
+            return [mediaItem.inputItem.MRL isEqualToString:currentPlayingItem.MRL];
+        }];
+
+        [_songsTableView scrollRowToVisible:itemIndexInDisplayedCollection];
+    }
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
