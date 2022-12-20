@@ -378,8 +378,6 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             const video_format_t *p_fmt_in,
                             const video_format_t *p_fmt_out )
 {
-    block_t *p_block;
-
     /* Check if we can reuse the current encoder */
     if( p_image->p_enc &&
         ( p_image->p_enc->fmt_out.i_codec != p_fmt_out->i_chroma ||
@@ -404,7 +402,6 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_enc->fmt_in.video.i_height != p_fmt_in->i_height ||
        !BitMapFormatIsSimilar( &p_image->p_enc->fmt_in.video, p_fmt_in ) )
     {
-        picture_t *p_tmp_pic;
 
         if( p_image->p_converter &&
             ( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
@@ -442,24 +439,17 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
             es_format_Copy( &p_image->p_converter->fmt_out, &p_image->p_enc->fmt_in );
         }
 
-        picture_Hold( p_pic );
+        p_pic = p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
 
-        p_tmp_pic =
-            p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
-
-        if( likely(p_tmp_pic != NULL) )
+        if( likely(p_pic != NULL) )
         {
-            assert(!picture_HasChainedPics(p_tmp_pic)); // no chaining
-            p_block = vlc_encoder_EncodeVideo(p_image->p_enc, p_tmp_pic );
-            picture_Release( p_tmp_pic );
+            assert(!picture_HasChainedPics(p_pic)); // no chaining
         }
-        else
-            p_block = NULL;
     }
-    else
-    {
-        p_block = vlc_encoder_EncodeVideo( p_image->p_enc, p_pic );
-    }
+
+    block_t *p_block = NULL;
+    if (p_pic != NULL)
+        p_block = vlc_encoder_EncodeVideo(p_image->p_enc, p_pic);
 
     if( !p_block )
     {
