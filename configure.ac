@@ -547,7 +547,7 @@ AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
 ])
 AS_IF([test -n "${CONTRIB_DIR}"], [
   AS_IF([test -d "${CONTRIB_DIR}/lib"],[
-    SRC_CONTRIB_DIR=$(CONTRIB_DIR)
+    SRC_CONTRIB_DIR="${CONTRIB_DIR}"
     CONTRIB_DIR=`cd "${CONTRIB_DIR}" && pwd -P`
     AC_MSG_RESULT([${CONTRIB_DIR} from ${SRC_CONTRIB_DIR}])
   ], [
