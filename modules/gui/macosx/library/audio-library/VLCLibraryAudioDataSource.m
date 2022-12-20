@@ -112,16 +112,29 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)playlistItemChanged:(NSNotification *)aNotification
 {
-    if (_currentParentType == VLC_ML_PARENT_UNKNOWN) {
+    // HACK: If we ask for the currently playing item too quickly
+    // we will get the previous item from the playlist controller...
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
         VLCInputItem *currentPlayingItem = VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem;
 
-        NSUInteger itemIndexInDisplayedCollection = [_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
-            VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)element;
-            return [mediaItem.inputItem.MRL isEqualToString:currentPlayingItem.MRL];
-        }];
+        if (!currentPlayingItem) {
+            NSLog(@"Current playing type is invalid.");
+            return;
+        }
 
-        [_songsTableView scrollRowToVisible:itemIndexInDisplayedCollection];
-    }
+        if (self->_currentParentType == VLC_ML_PARENT_UNKNOWN) {
+            NSString *currentItemMrl = currentPlayingItem.MRL;
+
+            NSUInteger itemIndexInDisplayedCollection = [self->_displayedCollection indexOfObjectPassingTest:^BOOL(id element, NSUInteger idx, BOOL *stop) {
+                VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)element;
+                return [mediaItem.inputItem.MRL isEqualToString:currentItemMrl];
+            }];
+
+            if (itemIndexInDisplayedCollection != NSNotFound) {
+                [self->_songsTableView scrollRowToVisible:itemIndexInDisplayedCollection];
+            }
+        }
+    });
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
