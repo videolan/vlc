@@ -307,7 +307,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSString *)detailString
 {
-    return nil;
+    return [self durationString];
 }
 
 - (NSString *)durationString
@@ -810,37 +810,24 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSString *)detailString
 {
-    switch (_mediaSubType) {
-        case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
-        {
-            VLCInputItem *inputItem = [self inputItem];
-            if (inputItem) {
-                NSString *showName = inputItem.showName;
-                return showName.length > 0 ? showName : [self durationString];
-            }
-            break;
+   if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+        VLCInputItem *inputItem = [self inputItem];
+        if (inputItem) {
+            NSString *showName = inputItem.showName;
+            return showName.length > 0 ? showName : [self durationString];
         }
-        case VLC_ML_MEDIA_SUBTYPE_MOVIE:
-        {
-            VLCInputItem *inputItem = [self inputItem];
-            if (inputItem) {
-                NSString *directorString = inputItem.director;
-                return directorString.length > 0 ? directorString : [self durationString];
-            }
-            break;
+   } else if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
+        VLCInputItem *inputItem = [self inputItem];
+        if (inputItem) {
+            NSString *directorString = inputItem.director;
+            return directorString.length > 0 ? directorString : [self durationString];
         }
-        case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
-        {
-            VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:_artistID];
-            if (artist) {
-                NSString *artistName = artist.name;
-                return artistName.length > 0 ? artistName : [self durationString];
-            }
-            break;
+    } else if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
+        VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:_artistID];
+        if (artist) {
+            NSString *artistName = artist.name;
+            return artistName.length > 0 ? artistName : [self durationString];
         }
-        case VLC_ML_MEDIA_SUBTYPE_UNKNOWN:
-        default:
-            return [self durationString];
     }
 
     return [self durationString];
