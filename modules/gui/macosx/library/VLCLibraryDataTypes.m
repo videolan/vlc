@@ -815,7 +815,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         return artist.name;
     }
 
-    return nil;
+    return @"";
 }
 
 - (NSString *)durationString
