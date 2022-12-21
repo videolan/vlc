@@ -810,9 +810,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSString *)detailString
 {
-    VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:_artistID];
-    if (artist) {
-        return artist.name;
+    if (_mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
+        VLCMediaLibraryArtist *artist = [VLCMediaLibraryArtist artistWithID:_artistID];
+        if (artist) {
+            return artist.name;
+        }
     }
 
     return @"";
