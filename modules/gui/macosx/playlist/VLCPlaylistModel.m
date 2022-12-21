@@ -56,6 +56,10 @@
 
 - (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index
 {
+    if (index < 0 || index > _playlistArray.count) {
+        return nil;
+    }
+    
     return _playlistArray[index];
 }
 
