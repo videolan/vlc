@@ -175,7 +175,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     }
 
     _mediaTitleTextField.stringValue = _representedItem.displayString;
-    _secondaryInfoTextField.stringValue = _representedItem.durationString;
+    _secondaryInfoTextField.stringValue = _representedItem.detailString;
     _mediaImageView.image = _representedItem.smallArtworkImage;
 
     // TODO: Add handling for the other types
