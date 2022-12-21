@@ -32,6 +32,8 @@ import "qrc:///util/Helpers.js" as Helpers
 FocusScope {
     id: root
 
+    property int rightPadding: 0
+
     property var artist: ({})
 
     implicitHeight: VLCStyle.artistBanner_height
@@ -42,6 +44,8 @@ FocusScope {
 
     Image {
         id: background
+
+        // NOTE: We want the banner to ignore safe margins.
         anchors.fill: parent
 
         asynchronous: true
@@ -82,10 +86,11 @@ FocusScope {
     RowLayout {
         id: col
 
-        anchors.fill: background
+        anchors.fill: parent
         anchors.topMargin: VLCStyle.margin_xxlarge
         anchors.bottomMargin: VLCStyle.margin_xxlarge
         anchors.leftMargin: VLCStyle.margin_xlarge
+        anchors.rightMargin: root.rightPadding
 
         spacing: VLCStyle.margin_normal
 
@@ -109,24 +114,30 @@ FocusScope {
         }
 
         ColumnLayout {
-            spacing: 0
-
             Layout.fillWidth: true
 
+            // NOTE: The layout can be resized to zero to hide the text entirely.
+            Layout.minimumWidth: 0
+
+            Layout.rightMargin: VLCStyle.margin_small
+
+            spacing: 0
+
             Widgets.SubtitleLabel {
+                Layout.fillWidth: true
+
                 text: artist.name || I18n.qtr("No artist")
                 color: "white"
-
-                Layout.maximumWidth: parent.width
             }
 
             Widgets.MenuCaption {
+                Layout.fillWidth: true
+
+                Layout.topMargin: VLCStyle.margin_xxxsmall
+
                 text: I18n.qtr("%1 Songs").arg(artist.nb_tracks)
                 color: "white"
                 opacity: .6
-
-                Layout.topMargin: VLCStyle.margin_xxxsmall
-                Layout.maximumWidth: parent.width
             }
 
             Widgets.NavigableRow {
