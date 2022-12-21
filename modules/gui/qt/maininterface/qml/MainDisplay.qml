@@ -213,16 +213,36 @@ FocusScope {
         onContentModelChanged: modelSortSettingHandler.set(sourcesBanner.contentModel, History.viewPath)
     }
 
-    Rectangle {
-        color: VLCStyle.colors.bg
+    FocusScope {
+        focus: true
+        id: medialibId
         anchors.fill: parent
 
-        FocusScope {
-            focus: true
-            id: medialibId
+        Navigation.parentItem: root
+
+        Rectangle {
+            id: parentRectangle
             anchors.fill: parent
 
-            Navigation.parentItem: root
+            color: VLCStyle.colors.bg
+
+            layer.enabled: (((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
+                           ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString))) &&
+                           (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
+
+            layer.effect: Widgets.FrostedGlassEffect {
+                tint: VLCStyle.colors.lowerBanner
+
+                effectRect: {
+                    var _height = 0
+                    if (loaderProgress.active && loaderProgress.item.visible)
+                        _height += loaderProgress.item.height
+                    if (miniPlayer.visible)
+                        _height += miniPlayer.height
+
+                    return Qt.rect(0, height - _height, width, _height)
+                }
+            }
 
             ColumnLayout {
                 id: mainColumn
@@ -281,27 +301,6 @@ FocusScope {
                                          : VLCStyle.applicationHorizontalMargin
                             leftMargin: VLCStyle.applicationHorizontalMargin
                         }
-
-                        // This item is the root of a large hierarchy
-                        // which requires many batches to be rendered.
-                        // When the miniPlayer effect is active, this
-                        // item (source item) gets rendered in an offscreen
-                        // surface. If we don't enable layer here,
-                        // it (along with children) gets rendered again
-                        // in the assigned window.
-                        // If layer is enabled, instead of rendering one
-                        // more time with many batches, a dynamic texture
-                        // from the offscreen surface is used. This behavior
-                        // reduces the amount of batches from 2x to x+1.
-                        // A side effect is having to draw a large texture
-                        // with blending on, but this must be cheaper redrawing
-                        // all the batches.
-                        // TODO: Reconsider this behavior when batching is optimized.
-                        layer.enabled: miniPlayer.visible && miniPlayer.effectAvailable
-
-                        // Enable clipping so that the effect does not sit
-                        // on top of the source.
-                        clip: miniPlayer.visible && miniPlayer.effectAvailable
                     }
 
                     FocusScope {
@@ -430,114 +429,110 @@ FocusScope {
                     }
                 }
             }
+        }
 
-            Loader {
-                id: loaderProgress
+        Loader {
+            id: loaderProgress
 
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: miniPlayer.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: miniPlayer.top
 
-                active: (MainCtx.mediaLibraryAvailable && MainCtx.mediaLibrary.idle === false)
+            active: (MainCtx.mediaLibraryAvailable && MainCtx.mediaLibrary.idle === false)
 
-                source: "qrc:///widgets/ScanProgressBar.qml"
+            source: "qrc:///widgets/ScanProgressBar.qml"
 
-                onItemChanged: {
-                    if (item === null) return
+            onLoaded: {
+                item.background.visible = Qt.binding(function() { return !parentRectangle.layer.enabled })
 
-                    // NOTE: These are required for the FrostedGlassEffect.
+                item.leftPadding = Qt.binding(function() { return VLCStyle.margin_large + VLCStyle.applicationHorizontalMargin })
+                item.rightPadding = Qt.binding(function() { return VLCStyle.margin_large + VLCStyle.applicationHorizontalMargin })
+                item.bottomPadding = Qt.binding(function() { return VLCStyle.margin_small + (miniPlayer.visible ? 0 : VLCStyle.applicationVerticalMargin) })
+            }
+        }
 
-                    item.source = Qt.binding(function() { return stackView })
-
-                    item.sourceRect = Qt.binding(function() {
-                        return stackView.mapFromItem(parent, x, y, width, height)
-                    })
-                }
+        P.PIPPlayer {
+            id: playerPip
+            anchors {
+                bottom: miniPlayer.top
+                left: parent.left
+                bottomMargin: VLCStyle.margin_normal
+                leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
             }
 
-            P.PIPPlayer {
-                id: playerPip
-                anchors {
-                    bottom: miniPlayer.top
-                    left: parent.left
-                    bottomMargin: VLCStyle.margin_normal
-                    leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
-                }
+            width: VLCStyle.dp(320, VLCStyle.scale)
+            height: VLCStyle.dp(180, VLCStyle.scale)
+            z: 2
+            visible: !root._inhibitMiniPlayer && root._showMiniPlayer && MainCtx.hasEmbededVideo
+            enabled: !root._inhibitMiniPlayer && root._showMiniPlayer && MainCtx.hasEmbededVideo
 
-                width: VLCStyle.dp(320, VLCStyle.scale)
-                height: VLCStyle.dp(180, VLCStyle.scale)
-                z: 2
-                visible: !root._inhibitMiniPlayer && root._showMiniPlayer && MainCtx.hasEmbededVideo
-                enabled: !root._inhibitMiniPlayer && root._showMiniPlayer && MainCtx.hasEmbededVideo
+            dragXMin: 0
+            dragXMax: root.width - playerPip.width
+            dragYMin: sourcesBanner.y + sourcesBanner.height
+            dragYMax: miniPlayer.y - playerPip.height
 
-                dragXMin: 0
-                dragXMax: root.width - playerPip.width
-                dragYMin: sourcesBanner.y + sourcesBanner.height
-                dragYMax: miniPlayer.y - playerPip.height
-
-                //keep the player visible on resize
-                Connections {
-                    target: root
-                    onWidthChanged: {
-                        if (playerPip.x > playerPip.dragXMax)
-                            playerPip.x = playerPip.dragXMax
-                    }
-                    onHeightChanged: {
-                        if (playerPip.y > playerPip.dragYMax)
-                            playerPip.y = playerPip.dragYMax
-                    }
-                }
-            }
-
-            DG.Dialogs {
-                z: 10
-                bgContent: root
-
-                anchors {
-                    bottom: miniPlayer.visible ? miniPlayer.top : parent.bottom
-                    left: parent.left
-                    right: parent.right
-                }
-            }
-
-            P.MiniPlayer {
-                id: miniPlayer
-
-                BindingCompat on state {
-                    when: root._inhibitMiniPlayer && !miniPlayer.visible
-                    value: ""
-                }
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-
-                z: 3
-                Navigation.parentItem: medialibId
-                Navigation.upItem: stackView
-                Navigation.cancelItem:sourcesBanner
-                onVisibleChanged: {
-                    if (!visible && miniPlayer.activeFocus)
-                        stackView.forceActiveFocus()
-                }
-
-                effectSource: stackView
-                effectSourceRect: effectSource.mapFromItem(parent,
-                                                           x,
-                                                           y,
-                                                           width,
-                                                           height)
-            }
-
+            //keep the player visible on resize
             Connections {
-                target: Player
-                onHasVideoOutputChanged: {
-                    if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
-                        if (History.current.view !== "player")
-                            g_mainDisplay.showPlayer()
-                    } else {
-                        _showMiniPlayer = false;
-                    }
+                target: root
+                onWidthChanged: {
+                    if (playerPip.x > playerPip.dragXMax)
+                        playerPip.x = playerPip.dragXMax
+                }
+                onHeightChanged: {
+                    if (playerPip.y > playerPip.dragYMax)
+                        playerPip.y = playerPip.dragYMax
+                }
+            }
+        }
+
+        DG.Dialogs {
+            z: 10
+            bgContent: root
+
+            anchors {
+                bottom: miniPlayer.visible ? miniPlayer.top : parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+        }
+
+        P.MiniPlayer {
+            id: miniPlayer
+
+            BindingCompat on state {
+                when: root._inhibitMiniPlayer && !miniPlayer.visible
+                value: ""
+            }
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            z: 3
+
+            rightPadding: VLCStyle.applicationHorizontalMargin
+            leftPadding: VLCStyle.applicationHorizontalMargin
+            bottomPadding: VLCStyle.applicationVerticalMargin
+
+            background.visible: !parentRectangle.layer.enabled
+
+            Navigation.parentItem: medialibId
+            Navigation.upItem: stackView
+            Navigation.cancelItem:sourcesBanner
+            onVisibleChanged: {
+                if (!visible && miniPlayer.activeFocus)
+                    stackView.forceActiveFocus()
+            }
+        }
+
+        Connections {
+            target: Player
+            onHasVideoOutputChanged: {
+                if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
+                    if (History.current.view !== "player")
+                        g_mainDisplay.showPlayer()
+                } else {
+                    _showMiniPlayer = false;
                 }
             }
         }

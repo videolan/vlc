@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
 
@@ -25,17 +26,15 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-FocusScope {
+T.Pane {
     id: root
 
-    implicitHeight: controlBar.implicitHeight
     height: 0
 
-    visible: false
+    implicitWidth: Math.max(background ? background.implicitWidth : 0, contentItem.implicitWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(background ? background.implicitHeight : 0, contentItem.implicitHeight + topPadding + bottomPadding)
 
-    property alias effectSource: effect.source
-    property alias effectSourceRect: effect.sourceRect
-    property alias effectAvailable: effect.effectAvailable
+    visible: false
 
     state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? ""
                                                                   : "expanded"
@@ -68,22 +67,11 @@ FocusScope {
         acceptedButtons: Qt.AllButtons
     }
 
-    Widgets.FrostedGlassEffect {
-        id: effect
-        anchors.fill: parent
-
-        tint: VLCStyle.colors.lowerBanner
+    background: Rectangle {
+        color: VLCStyle.colors.bg
     }
 
-    ControlBar {
-        id: controlBar
-
-        anchors.fill: parent
-
-        rightPadding: VLCStyle.applicationHorizontalMargin
-        leftPadding: rightPadding
-        bottomPadding: VLCStyle.applicationVerticalMargin
-
+    contentItem: ControlBar {
         focus: true
         colors: VLCStyle.colors
         textPosition: ControlBar.TimeTextPosition.Hide
@@ -94,7 +82,7 @@ FocusScope {
         Navigation.parentItem: root
 
         Keys.onPressed: {
-            controlBar.Navigation.defaultKeyAction(event)
+            Navigation.defaultKeyAction(event)
 
             if (!event.accepted) {
                 MainCtx.sendHotkey(event.key, event.modifiers)

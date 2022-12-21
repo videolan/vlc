@@ -19,138 +19,115 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
-import QtQuick.Layouts 1.11
 
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///style/"
 
-FrostedGlassEffect {
-    // Settings
+T.ProgressBar {
+    id: control
 
-    height: _getHeight()
+    implicitWidth: Math.max(background ? background.implicitWidth : 0,
+                            contentItem.implicitWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(background ? background.implicitHeight : 0,
+                             contentItem.implicitHeight + topPadding + bottomPadding)
 
-    tint: VLCStyle.colors.lowerBanner
+    rightPadding: VLCStyle.margin_large
+    leftPadding: VLCStyle.margin_large
+    bottomPadding: VLCStyle.margin_small
+    topPadding: VLCStyle.margin_small
 
-    // Functions
+    from: 0
+    to: 100
 
-    // Private
+    value: MediaLib.parsingProgress
 
-    function _getHeight() {
-        var height = column.implicitHeight + VLCStyle.margin_small * 2
+    indeterminate: MediaLib.discoveryPending
 
-        // NOTE: We don't need to take the vertical safe area into consideration when the
-        //       miniPlayer is visible.
-        if (g_mainDisplay.hasMiniPlayer)
-            return height
-        else
-            return height + VLCStyle.applicationVerticalMargin
+    background: Rectangle {
+        color: VLCStyle.colors.bg
     }
 
-    // Children
-
-    ColumnLayout {
-        id: column
-
-        anchors.fill: parent
-
-        anchors.leftMargin: VLCStyle.margin_large + VLCStyle.applicationHorizontalMargin
-        anchors.rightMargin: anchors.leftMargin
-
-        anchors.topMargin: VLCStyle.margin_small
-
-        anchors.bottomMargin: (g_mainDisplay.hasMiniPlayer) ? VLCStyle.margin_small
-                                                            : VLCStyle.margin_small
-                                                              + VLCStyle.applicationVerticalMargin
-
+    contentItem: Column {
         spacing: VLCStyle.margin_small
 
-        T.ProgressBar {
-            id: control
+        Item {
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-            Layout.fillWidth: true
+            implicitHeight: VLCStyle.heightBar_xxsmall
+            implicitWidth: 200
 
-            height: VLCStyle.heightBar_xxsmall
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
 
-            from: 0
-            to: 100
+                implicitHeight: VLCStyle.heightBar_xxxsmall
 
-            value: MediaLib.parsingProgress
+                color: VLCStyle.colors.sliderBarMiniplayerBgColor
+            }
 
-            indeterminate: MediaLib.discoveryPending
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
 
-            contentItem: Item {
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                implicitWidth: parent.width * control.visualPosition
+                implicitHeight: VLCStyle.heightBar_xxsmall
 
-                    anchors.verticalCenter: parent.verticalCenter
+                // NOTE: We want round corners.
+                radius: height
 
-                    height: VLCStyle.heightBar_xxxsmall
+                visible: !control.indeterminate
 
-                    color: VLCStyle.colors.sliderBarMiniplayerBgColor
-                }
+                color: VLCStyle.colors.accent
+            }
 
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
+            Rectangle {
+                property real position: 0
 
-                    width: parent.width * control.visualPosition
-                    height: VLCStyle.heightBar_xxsmall
+                anchors.verticalCenter: parent.verticalCenter
 
-                    // NOTE: We want round corners.
-                    radius: height
+                // NOTE: Why 0.24 though ?
+                implicitWidth: parent.width * 0.24
+                implicitHeight: VLCStyle.heightBar_xxsmall
 
-                    visible: (control.indeterminate === false)
+                x: Math.round((parent.width - width) * position)
 
-                    color: VLCStyle.colors.accent
-                }
+                // NOTE: We want round corners.
+                radius: height
 
-                Rectangle {
-                    property real position: 0
+                visible: control.indeterminate
 
-                    anchors.verticalCenter: parent.verticalCenter
+                color: VLCStyle.colors.accent
 
-                    // NOTE: Why 0.24 though ?
-                    width: parent.width * 0.24
-                    height: VLCStyle.heightBar_xxsmall
+                SequentialAnimation on position {
+                    loops: Animation.Infinite
 
-                    x: Math.round((parent.width - width) * position)
+                    running: visible
 
-                    // NOTE: We want round corners.
-                    radius: height
+                    NumberAnimation {
+                        from: 0
+                        to: 1.0
 
-                    visible: control.indeterminate
+                        duration: VLCStyle.durationSliderBouncing
+                        easing.type: Easing.OutBounce
+                    }
 
-                    color: VLCStyle.colors.accent
+                    NumberAnimation {
+                        from: 1.0
+                        to: 0
 
-                    SequentialAnimation on position {
-                        loops: Animation.Infinite
-
-                        running: visible
-
-                        NumberAnimation {
-                            from: 0
-                            to: 1.0
-
-                            duration: VLCStyle.durationSliderBouncing
-                            easing.type: Easing.OutBounce
-                        }
-
-                        NumberAnimation {
-                            from: 1.0
-                            to: 0
-
-                            duration: VLCStyle.durationSliderBouncing
-                            easing.type: Easing.OutBounce
-                        }
+                        duration: VLCStyle.durationSliderBouncing
+                        easing.type: Easing.OutBounce
                     }
                 }
             }
         }
 
         SubtitleLabel {
-            Layout.fillWidth: true
+            anchors.left: parent.left
+            anchors.right: parent.right
 
             text: (MediaLib.discoveryPending) ? I18n.qtr("Scanning %1")
                                                 .arg(MediaLib.discoveryEntryPoint)
