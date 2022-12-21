@@ -223,6 +223,8 @@ FocusScope {
                                 font.underline: activeFocus
 
                                 onClicked: root.contextMenuButtonClicked(this)
+
+                                activeFocusOnTab: false
                             }
                         }
                     }

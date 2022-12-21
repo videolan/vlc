@@ -227,6 +227,8 @@ T.Control {
                     var pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
                     delegate.contextMenuButtonClicked(this, delegate.rowModel, pos)
                 }
+
+                activeFocusOnTab: false
             }
         }
     }
