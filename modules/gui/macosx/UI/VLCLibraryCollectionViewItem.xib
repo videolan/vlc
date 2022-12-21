@@ -9,7 +9,7 @@
             <connections>
                 <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
                 <outlet property="annotationTextField" destination="tm2-NW-WsZ" id="Miy-RS-Rol"/>
-                <outlet property="durationTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
+                <outlet property="secondaryInfoTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
                 <outlet property="highlightBox" destination="Vwd-1n-Sbd" id="h1g-hL-1gh"/>
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>

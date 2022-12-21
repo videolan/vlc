@@ -76,7 +76,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)awakeFromNib
 {
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
-    self.durationTextField.textColor = [NSColor VLClibrarySubtitleColor];
+    self.secondaryInfoTextField.textColor = [NSColor VLClibrarySubtitleColor];
     self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
     self.annotationTextField.textColor = [NSColor VLClibraryAnnotationColor];
     self.annotationTextField.backgroundColor = [NSColor VLClibraryAnnotationBackgroundColor];
@@ -116,10 +116,10 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 {
     if (config_GetInt("macosx-large-text")) {
         self.mediaTitleTextField.font = [NSFont VLClibraryLargeCellTitleFont];
-        self.durationTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
+        self.secondaryInfoTextField.font = [NSFont VLClibraryLargeCellSubtitleFont];
     } else {
         self.mediaTitleTextField.font = [NSFont VLClibrarySmallCellTitleFont];
-        self.durationTextField.font = [NSFont VLClibrarySmallCellSubtitleFont];
+        self.secondaryInfoTextField.font = [NSFont VLClibrarySmallCellSubtitleFont];
     }
 }
 
@@ -130,7 +130,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     [super prepareForReuse];
     _playInstantlyButton.hidden = YES;
     _mediaTitleTextField.stringValue = @"";
-    _durationTextField.stringValue = [NSString stringWithTime:0];
+    _secondaryInfoTextField.stringValue = [NSString stringWithTime:0];
     _mediaImageView.image = nil;
     _annotationTextField.hidden = YES;
     _progressIndicator.hidden = YES;
@@ -175,7 +175,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     }
 
     _mediaTitleTextField.stringValue = _representedItem.displayString;
-    _durationTextField.stringValue = _representedItem.durationString;
+    _secondaryInfoTextField.stringValue = _representedItem.durationString;
     _mediaImageView.image = _representedItem.smallArtworkImage;
 
     // TODO: Add handling for the other types
