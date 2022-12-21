@@ -498,7 +498,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSString *)detailString
 {
-    return [NSString stringWithFormat:_NS("%lli items"), _numberOfTracks];
+    return [self durationString];
 }
 
 - (NSString *)durationString
