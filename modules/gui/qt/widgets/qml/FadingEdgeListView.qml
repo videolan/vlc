@@ -74,13 +74,13 @@ ListView {
 
         var margin = 0 // -root.displayMarginBeginning
         if (orientation === Qt.Vertical) {
-            if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
-                margin += headerItem.height
+            // if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
+            //    margin += headerItem.height
 
             return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + margin - displayMarginBeginning + spacing)
         } else {
-            if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
-                margin += headerItem.width
+            // if (headerItem && headerItem.visible && headerPositioning === ListView.OverlayHeader)
+            //    margin += headerItem.width
 
             return itemAt(contentX + margin - displayMarginBeginning + spacing, contentY + (delegateItem.y + delegateItem.height / 2))
         }
@@ -92,13 +92,13 @@ ListView {
 
         var margin = 0 // -root.displayMarginEnd
         if (orientation === Qt.Vertical) {
-            if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
-                margin += footerItem.height
+            // if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
+            //    margin += footerItem.height
 
             return itemAt(contentX + (delegateItem.x + delegateItem.width / 2), contentY + height - margin + displayMarginEnd - spacing - 1)
         } else {
-            if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
-                margin += footerItem.width
+            // if (footerItem && footerItem.visible && footerPositioning === ListView.OverlayFooter)
+            //    margin += footerItem.width
 
             return itemAt(contentX + width - margin + displayMarginEnd - spacing - 1, contentY + (delegateItem.y + delegateItem.height / 2))
         }
@@ -132,6 +132,16 @@ ListView {
         if (!(clipBinding.restoreMode === 3 /* RestoreBindingOrValue */)) {
             clip = Qt.binding(function() { return true })
         }
+    }
+
+    BindingCompat on disableBeginningFade {
+        when: !!root.headerItem && (root.headerPositioning !== ListView.InlineHeader)
+        value: true
+    }
+
+    BindingCompat on disableEndFade {
+        when: !!root.footerItem && (root.footerPositioning !== ListView.InlineFooter)
+        value: true
     }
 
     // When the effect is active,
