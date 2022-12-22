@@ -152,11 +152,11 @@ ListView {
         BindingCompat on visible {
             // Let's see if the effect is compatible...
             value: false
-            when: proxyContentItem.effectCompatible
+            when: !proxyContentItem.effectCompatible
         }
 
-        readonly property bool effectCompatible: !(((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
-                                                  ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString)))
+        readonly property bool effectCompatible: (((GraphicsInfo.shaderType === GraphicsInfo.GLSL)) &&
+                                                 ((GraphicsInfo.shaderSourceType & GraphicsInfo.ShaderSourceString)))
 
         anchors.top: parent.top
         anchors.left: parent.left
