@@ -421,8 +421,8 @@ void SystemPalette::makeLightPalette()
     m_playerControlBarFg =  QColor{"#333333"};
     m_expandDelegate =  Qt::white;
 
-    m_tooltipTextColor = Qt::white;
-    m_tooltipColor = Qt::black;
+    m_tooltipTextColor = Qt::black;
+    m_tooltipColor = Qt::white;
 
     m_border = QColor{"#e0e0e0"};
     m_buttonHover = lightGrey300;
@@ -483,8 +483,8 @@ void SystemPalette::makeDarkPalette()
 
     m_expandDelegate = Qt::black;
 
-    m_tooltipTextColor = Qt::black;
-    m_tooltipColor = Qt::white;
+    m_tooltipTextColor = Qt::white;
+    m_tooltipColor = Qt::black;
 
     m_border = darkGrey800;
     m_buttonHover = darkGrey800;
