@@ -532,13 +532,14 @@ FocusScope {
         edge: Widgets.DrawerExt.Edges.Right
         state: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
         component: Rectangle {
-            // NOTE: Take the minimumWidth into account.
-            width: Math.max(playlistView.minimumWidth,
-                            (rootPlayer.width + playlistView.rightPadding) / 4)
+            width: Helpers.clamp(rootPlayer.width / resizeHandle.widthFactor
+                                 , playlistView.minimumWidth
+                                 , (rootPlayer.width + playlistView.rightPadding) / 2)
 
             height: playlistpopup.height
 
             color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
+
 
             PL.PlaylistListView {
                 id: playlistView
@@ -570,6 +571,21 @@ FocusScope {
                         audioControls.forceActiveFocus()
                     else
                         controlBarView.forceActiveFocus()
+                }
+
+                // TODO: remember width factor?
+                Widgets.HorizontalResizeHandle {
+                    id: resizeHandle
+
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        left: parent.left
+                    }
+
+                    atRight: false
+                    targetWidth: playlistpopup.width
+                    sourceWidth: rootPlayer.width
                 }
             }
         }
