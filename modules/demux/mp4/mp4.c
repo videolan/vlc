@@ -4170,11 +4170,12 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
             /* track offset */
             tk->i_elst_time += elst->i_segment_duration[tk->i_elst];
         }
-    }
-    if( i_elst_last != tk->i_elst )
-    {
-        msg_Warn( p_demux, "elst old=%d new=%"PRIu32, i_elst_last, tk->i_elst );
-        tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+
+        if( i_elst_last != tk->i_elst )
+        {
+            msg_Warn( p_demux, "elst old=%d new=%"PRIu32, i_elst_last, tk->i_elst );
+            tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+        }
     }
 }
 
