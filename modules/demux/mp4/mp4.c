@@ -4174,7 +4174,9 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         if( i_elst_last != tk->i_elst )
         {
             msg_Warn( p_demux, "elst old=%d new=%"PRIu32, i_elst_last, tk->i_elst );
-            tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+            if( i_elst_last < elst->i_entry_count &&
+                elst->i_media_time[i_elst_last] >= 0 )
+                tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
     }
 }
