@@ -44,6 +44,8 @@ ListView {
         implicitWidth: proxyContentItem.width
         implicitHeight: proxyContentItem.height
 
+        color: "transparent"
+
         z: -99
         visible: proxyContentItem.visible && color.a > 0.0
     }
