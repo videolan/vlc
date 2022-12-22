@@ -108,6 +108,8 @@ FocusScope {
 
     property alias backgroundColor: view.backgroundColor
     property alias fadeSize: view.fadeSize
+    property alias disableBeginningFade: view.disableBeginningFade
+    property alias disableEndFade: view.disableEndFade
 
     property alias add:       view.add
     property alias displaced: view.displaced

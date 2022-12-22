@@ -27,4 +27,6 @@ Widgets.KeyNavigableTableView {
     displayMarginEnd: g_mainDisplay.displayMargin
 
     backgroundColor: VLCStyle.colors.bg
+
+    disableEndFade: g_mainDisplay.hasMiniPlayer
 }
