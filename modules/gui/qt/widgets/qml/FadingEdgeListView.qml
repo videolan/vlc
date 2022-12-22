@@ -147,8 +147,7 @@ ListView {
     ShaderEffectSource {
         id: proxyContentItem
 
-        visible: (root._beginningFade || root._endFade) ||
-                 (layer.effect.beginningFadeSize > 0 || layer.effect.endFadeSize > 0)
+        visible: (root._beginningFade || root._endFade)
 
         BindingCompat on visible {
             // Let's see if the effect is compatible...
