@@ -125,6 +125,8 @@ FocusScope {
                         orientation: ListView.Horizontal
                         spacing: VLCStyle.column_spacing
 
+                        backgroundColor: VLCStyle.colors.bg
+
                         Navigation.parentItem: root
 
                         Navigation.upAction: function() {
