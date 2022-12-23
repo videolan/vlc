@@ -685,6 +685,10 @@
                 <outlet property="audioGroupSelectionTableView" destination="4ll-T2-J16" id="m18-cT-5BQ"/>
                 <outlet property="audioGroupSelectionTableViewScrollView" destination="Jmx-bp-HDp" id="m81-p1-e5Q"/>
                 <outlet property="audioLibraryCollectionView" destination="QAt-jP-zE7" id="Lda-FY-5gD"/>
+                <outlet property="audioLibraryGridModeSplitView" destination="YHF-re-hif" id="S71-li-TGr"/>
+                <outlet property="audioLibraryGridModeSplitViewListSelectionCollectionView" destination="ZGR-PZ-7h5" id="098-89-gh5"/>
+                <outlet property="audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView" destination="6NL-vK-li1" id="nO1-98-8th"/>
+                <outlet property="audioLibraryGridModeSplitViewListTableView" destination="hvV-yD-5Kd" id="AEf-7K-98h"/>
                 <outlet property="audioLibrarySongsTableView" destination="Xck-iv-pH4" id="Sp4-iv-pH4"/>
                 <outlet property="audioLibrarySongsTableViewScrollView" destination="QqV-hX-sZw" id="1t5-D3-CeM"/>
                 <outlet property="audioLibrarySplitView" destination="llh-BF-BEJ" id="gvt-K1-cGw"/>
@@ -1076,7 +1080,7 @@
                                 <rect key="frame" x="1" y="1" width="292" height="388"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="automatic" headerView="ReX-Vp-0he" viewBased="YES" id="hvV-yD-5Kd" customClass="VLCLibraryTableView">
+                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="automatic" viewBased="YES" id="hvV-yD-5Kd" customClass="VLCLibraryTableView">
                                         <rect key="frame" x="0.0" y="0.0" width="292" height="360"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <size key="intercellSpacing" width="17" height="0.0"/>
@@ -1127,10 +1131,6 @@
                                 <rect key="frame" x="224" y="17" width="15" height="102"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
-                            <tableHeaderView key="headerView" wantsLayer="YES" id="ReX-Vp-0he">
-                                <rect key="frame" x="0.0" y="0.0" width="292" height="28"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                            </tableHeaderView>
                         </scrollView>
                         <scrollView wantsLayer="YES" fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="6NL-vK-li1">
                             <rect key="frame" x="304" y="0.0" width="410" height="390"/>
