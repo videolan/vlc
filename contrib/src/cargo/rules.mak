@@ -1,7 +1,7 @@
 # cargo/cargo-c installation via rustup
 
 RUST_VERSION=1.66.0
-CARGOC_VERSION=0.9.13
+CARGOC_VERSION=0.9.15
 RUSTUP_VERSION=1.25.1
 RUSTUP_URL=$(GITHUB)/rust-lang/rustup/archive/$(RUSTUP_VERSION).tar.gz
 
