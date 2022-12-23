@@ -80,9 +80,9 @@ Widgets.PageLoader {
 
     function _updateHistoryPlaylist(playlist) {
         History.update(["mc", "video", "playlists", "list", {
-                            "initialIndex": playlist.currentIndex,
-                            "initialId"   : playlist.parentId,
-                            "initialName" : playlist.name
+                            "currentIndex": playlist.currentIndex,
+                            "parentId"   : playlist.parentId,
+                            "name" : playlist.name
                         }]);
     }
 

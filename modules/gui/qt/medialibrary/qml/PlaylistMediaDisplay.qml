@@ -40,15 +40,11 @@ FocusScope {
     property int rightPadding: 0
 
     readonly property int currentIndex: view.currentIndex
+    property string name: ""
 
-    // NOTE: We need 'var' for properties altered by StackView.replace().
-    property int    initialIndex: 0
-    property var    initialId
-    property string initialName
+    property int initialIndex: 0
 
-    // NOTE: Specify an optional header for the view.
-    property Component header: null
-
+    property alias header: view.header
     property Item headerItem: view.headerItem
 
     property bool isMusic: true
@@ -59,9 +55,6 @@ FocusScope {
 
     // NOTE: This is used to determine which media(s) shall be displayed.
     property alias parentId: model.parentId
-
-    // NOTE: The name of the playlist.
-    property alias name: label.text
 
     property alias model: model
 
@@ -109,8 +102,6 @@ FocusScope {
 
         ml: MediaLib
 
-        parentId: initialId
-
         onCountChanged: {
             // NOTE: We need to cancel the Drag item manually when resetting. Should this be called
             //       from 'onModelReset' only ?
@@ -121,23 +112,6 @@ FocusScope {
 
             resetFocus();
         }
-    }
-
-    Widgets.SubtitleLabel {
-        id: label
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-
-        anchors.leftMargin: view.contentLeftMargin
-        anchors.rightMargin: view.contentRightMargin
-
-        anchors.topMargin: VLCStyle.margin_normal
-
-        bottomPadding: VLCStyle.margin_xsmall
-
-        text: initialName
     }
 
     Widgets.MLDragItem {
@@ -170,10 +144,7 @@ FocusScope {
 
         // Settings
 
-        anchors.left  : parent.left
-        anchors.right : parent.right
-        anchors.top   : label.bottom
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
 
         clip: true
 
@@ -185,14 +156,21 @@ FocusScope {
 
         dragItem: root.dragItem
 
-        header: root.header
+        header: Widgets.SubtitleLabel {
+            id: label
+
+            leftPadding: view.contentLeftMargin
+            rightPadding: view.contentRightMargin
+            topPadding: VLCStyle.margin_normal
+            bottomPadding: VLCStyle.margin_xsmall
+
+            text: root.name
+        }
+
 
         headerTopPadding: VLCStyle.margin_normal
 
-        headerPositioning: ListView.InlineHeader
-
         Navigation.parentItem: root
-        Navigation.upItem: (headerItem) ? headerItem.focusItem : null
 
         Navigation.cancelAction: function () {
             if (view.currentIndex <= 0) {

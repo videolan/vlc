@@ -81,8 +81,8 @@ Widgets.PageLoader {
     function _updateHistoryPlaylist(playlist) {
         History.update(["mc", "music", "playlists", "list", {
                             "initialIndex": playlist.currentIndex,
-                            "initialId"   : playlist.parentId,
-                            "initialName" : playlist.name
+                            "parentId"   : playlist.parentId,
+                            "name" : playlist.name
                         }]);
     }
 
