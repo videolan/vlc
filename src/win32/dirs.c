@@ -158,7 +158,9 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_CACHE_DIR:
             return config_GetAppDir ();
         case VLC_DESKTOP_DIR:
+            return config_GetKnownFolder (FOLDERID_Desktop);
         case VLC_DOWNLOAD_DIR:
+            return config_GetKnownFolder (FOLDERID_Downloads);
         case VLC_TEMPLATES_DIR:
         case VLC_PUBLICSHARE_DIR:
         case VLC_DOCUMENTS_DIR:
