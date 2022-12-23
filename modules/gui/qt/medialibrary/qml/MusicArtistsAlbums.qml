@@ -33,15 +33,25 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property alias model: artistModel
+    // Properties
+
+    property int leftPadding: 0
+    property int rightPadding: 0
+
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"),  criteria: "title" }
     ]
 
-    property alias currentIndex: artistList.currentIndex
-    property alias currentAlbumIndex: albumSubView.currentIndex
     property int initialIndex: 0
     property int initialAlbumIndex: 0
+
+    // Aliases
+
+    property alias model: artistModel
+
+    property alias currentIndex: artistList.currentIndex
+    property alias currentAlbumIndex: albumSubView.currentIndex
+
     property alias currentArtist: albumSubView.artist
 
     onInitialAlbumIndexChanged: resetFocus()
@@ -112,6 +122,9 @@ FocusScope {
 
     Row {
         anchors.fill: parent
+
+        anchors.leftMargin: root.leftPadding
+
         visible: artistModel.count > 0
 
         Widgets.KeyNavigableListView {
@@ -211,7 +224,10 @@ FocusScope {
             id: albumSubView
 
             height: parent.height
-            width: root.width - artistList.width
+            width: root.width - root.leftPadding - artistList.width
+
+            rightPadding: root.rightPadding
+
             focus: true
             initialIndex: root.initialAlbumIndex
             Navigation.parentItem: root

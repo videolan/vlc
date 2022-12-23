@@ -29,14 +29,24 @@ import "qrc:///style/"
 
 FocusScope {
     id: root
-    property alias model: genreModel
+
+    // Properties
+
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "title" }
     ]
 
     readonly property var currentIndex: _currentView.currentIndex
+
     //the index to "go to" when the view is loaded
     property int initialIndex: 0
+
+    // Aliases
+
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
+
+    property alias model: genreModel
 
     property alias _currentView: view.currentItem
 
@@ -292,9 +302,10 @@ FocusScope {
     Widgets.StackViewExt {
         id: view
 
+        anchors.fill: parent
+
         initialItem: MainCtx.gridView ? gridComponent : tableComponent
 
-        anchors.fill: parent
         focus: genreModel.count !== 0
     }
 

@@ -27,6 +27,10 @@ import "qrc:///main/" as MainInterface
 FocusScope {
     id: root
 
+    // Properties
+
+    readonly property bool isViewMultiView: false
+
     property var sortModel: [
         { text: I18n.qtr("Title"),    criteria: "title"},
         { text: I18n.qtr("Album"),    criteria: "album_title" },
@@ -36,9 +40,13 @@ FocusScope {
         { text: I18n.qtr("Disc"),     criteria: "disc_number" }
     ]
 
+    // Aliases
+
+    property alias leftPadding: tracklistdisplay_id.leftPadding
+    property alias rightPadding: tracklistdisplay_id.rightPadding
+
     property alias model: tracklistdisplay_id.model
     property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
-    readonly property bool isViewMultiView: false
 
     function setCurrentItemFocus(reason) {
         tracklistdisplay_id.setCurrentItemFocus(reason);
@@ -48,6 +56,7 @@ FocusScope {
         id: tracklistdisplay_id
 
         anchors.fill: parent
+
         visible: model.count > 0
         focus: model.count > 0
         headerTopPadding: VLCStyle.margin_normal

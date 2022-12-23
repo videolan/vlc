@@ -30,6 +30,18 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
+    // Properties
+
+    //the index to "go to" when the view is loaded
+    property int initialIndex: 0
+    property int gridViewMarginTop: VLCStyle.margin_large
+    property var gridViewRowX: MainCtx.gridView ? _currentView.rowX : undefined
+
+    readonly property var currentIndex: _currentView.currentIndex
+
+    property Component header: Item{}
+    readonly property Item headerItem: _currentView ? _currentView.headerItem : null
+
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"),  criteria: "title"},
         { text: I18n.qtr("Duration"),    criteria: "duration" },
@@ -37,16 +49,13 @@ FocusScope {
         { text: I18n.qtr("Artist"),      criteria: "main_artist" },
     ]
 
+    // Aliases
+
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
+
     property alias model: albumModelId
     property alias parentId: albumModelId.parentId
-    readonly property var currentIndex: _currentView.currentIndex
-    //the index to "go to" when the view is loaded
-    property int initialIndex: 0
-    property int gridViewMarginTop: VLCStyle.margin_large
-    property var gridViewRowX: MainCtx.gridView ? _currentView.rowX : undefined
-
-    property Component header: Item{}
-    readonly property Item headerItem: _currentView ? _currentView.headerItem : null
 
     property alias _currentView: view.currentItem
 
@@ -281,6 +290,7 @@ FocusScope {
         id: view
 
         anchors.fill: parent
+
         focus: albumModelId.count !== 0
 
         initialItem: MainCtx.gridView ? gridComponent : tableComponent

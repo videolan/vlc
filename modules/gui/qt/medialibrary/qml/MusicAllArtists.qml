@@ -32,8 +32,16 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
+    // Properties
+
     readonly property int currentIndex: _currentView.currentIndex
     property int initialIndex: 0
+
+    // Aliases
+
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
+
     property alias model: artistModel
 
     property alias _currentView: view.currentItem
@@ -225,6 +233,7 @@ FocusScope {
         id: view
 
         anchors.fill: parent
+
         visible: artistModel.count > 0
         focus: artistModel.count > 0
         initialItem: MainCtx.gridView ? gridComponent : tableComponent
