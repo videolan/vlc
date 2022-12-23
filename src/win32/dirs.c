@@ -104,14 +104,19 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     return path;
 }
 
-static char *config_GetShellDir (int csidl)
+static char *config_GetKnownFolder (KNOWNFOLDERID id)
 {
-    wchar_t wdir[MAX_PATH];
+    PWSTR wdir = NULL;
 
-    if (SHGetFolderPathW (NULL, csidl | CSIDL_FLAG_CREATE,
-                          NULL, SHGFP_TYPE_CURRENT, wdir ) == S_OK)
-        return FromWide (wdir);
-    return NULL;
+    const HRESULT hr = SHGetKnownFolderPath (&id, 0, NULL, &wdir);
+
+    char *result = NULL;
+
+    if ( hr == S_OK )
+        result = FromWide(wdir);
+
+    CoTaskMemFree(wdir);
+    return result;
 }
 
 static char *config_GetAppDir (void)
@@ -132,7 +137,7 @@ static char *config_GetAppDir (void)
     }
 
     char *psz_dir;
-    char *psz_parent = config_GetShellDir (CSIDL_APPDATA);
+    char *psz_parent = config_GetKnownFolder (FOLDERID_RoamingAppData);
 
     if (psz_parent == NULL
      ||  asprintf (&psz_dir, "%s\\vlc", psz_parent) == -1)
@@ -141,13 +146,12 @@ static char *config_GetAppDir (void)
     return psz_dir;
 }
 
-#warning FIXME Use known folders on Vista and above
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {
         case VLC_HOME_DIR:
-            return config_GetShellDir (CSIDL_PERSONAL);
+            return config_GetKnownFolder (FOLDERID_Documents);
         case VLC_CONFIG_DIR:
         case VLC_USERDATA_DIR:
             return config_GetAppDir ();
@@ -160,11 +164,11 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_DOCUMENTS_DIR:
             return config_GetUserDir(VLC_HOME_DIR);
         case VLC_MUSIC_DIR:
-            return config_GetShellDir (CSIDL_MYMUSIC);
+            return config_GetKnownFolder (FOLDERID_Music);
         case VLC_PICTURES_DIR:
-            return config_GetShellDir (CSIDL_MYPICTURES);
+            return config_GetKnownFolder (FOLDERID_Pictures);
         case VLC_VIDEOS_DIR:
-            return config_GetShellDir (CSIDL_MYVIDEO);
+            return config_GetKnownFolder (FOLDERID_Videos);
     }
     vlc_assert_unreachable ();
 }

@@ -431,7 +431,7 @@ if HAVE_WINSTORE
 libvlccore_la_SOURCES += posix/timer.c win32/dirs-uap.c
 else
 libvlccore_la_SOURCES += win32/timer.c win32/dirs.c win32/spawn.c
-libvlccore_la_LIBADD += -lwinmm
+libvlccore_la_LIBADD += -lwinmm -lole32 -luuid
 endif
 libvlccore_la_LIBADD += -lbcrypt
 endif
