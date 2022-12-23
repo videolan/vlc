@@ -26,11 +26,40 @@ import "qrc:///style/"
 StackView {
     id: root
 
+    // Private
+
     property string _currentView: ""
+
+    // Settings
 
     replaceEnter: null
 
     replaceExit: null
+
+    // Events
+
+    onCurrentItemChanged: {
+        if (currentItem === null)
+            return
+
+        // NOTE: When the currentItem has a padding defined we propagate the StackView values.
+
+        if (currentItem.leftPadding !== undefined)
+        {
+            currentItem.leftPadding = Qt.binding(function() {
+                return leftPadding
+            })
+        }
+
+        if (currentItem.rightPadding !== undefined)
+        {
+            currentItem.rightPadding = Qt.binding(function() {
+                return rightPadding
+            })
+        }
+    }
+
+    // Functions
 
     /**
      * viewModel: model with the definition of the available view
