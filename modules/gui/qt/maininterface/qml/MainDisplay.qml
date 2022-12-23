@@ -298,11 +298,13 @@ FocusScope {
                             right: (playlistColumn.visible && !VLCStyle.isScreenSmall)
                                    ? playlistColumn.left
                                    : parent.right
-                            rightMargin: (MainCtx.playlistDocked && MainCtx.playlistVisible)
-                                         ? 0
-                                         : VLCStyle.applicationHorizontalMargin
-                            leftMargin: VLCStyle.applicationHorizontalMargin
                         }
+
+                        leftPadding: VLCStyle.applicationHorizontalMargin
+
+                        rightPadding: (MainCtx.playlistDocked && MainCtx.playlistVisible)
+                                      ? 0
+                                      : VLCStyle.applicationHorizontalMargin
                     }
 
                     Rectangle {
