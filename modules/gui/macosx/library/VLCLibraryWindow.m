@@ -230,6 +230,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _audioCollectionSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _audioLibraryGridModeSplitViewListTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
 
     _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
@@ -291,7 +292,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _audioGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
     _audioGroupSelectionTableViewScrollView.contentInsets = audioScrollViewInsets;
     _audioGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
-    
+
+    _audioLibraryGridModeSplitViewListTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioLibraryGridModeSplitViewListTableViewScrollView.contentInsets = audioScrollViewInsets;
+    _audioLibraryGridModeSplitViewListTableViewScrollView.scrollerInsets = scrollerInsets;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = audioScrollViewInsets;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = scrollerInsets;
+
     _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;
     _videoLibraryCollectionViewsStackViewScrollView.scrollerInsets = scrollerInsets;
@@ -321,6 +329,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     audioLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
+
+    NSCollectionViewFlowLayout *audioLibraryGridModeListSelectionCollectionViewLayout = _audioLibraryGridModeSplitViewListSelectionCollectionView.collectionViewLayout;
+    audioLibraryGridModeListSelectionCollectionViewLayout.itemSize = [VLCLibraryCollectionViewItem defaultSize];
+    audioLibraryGridModeListSelectionCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    audioLibraryGridModeListSelectionCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
 
     VLCLibraryVideoCollectionViewsStackViewController *videoLibraryStackViewController = _libraryVideoViewController.libraryVideoCollectionViewsStackViewController;
     videoLibraryStackViewController.collectionViewItemSize = [VLCLibraryCollectionViewItem defaultSize];

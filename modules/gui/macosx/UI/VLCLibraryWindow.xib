@@ -1071,24 +1071,24 @@
             <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <splitView arrangesAllSubviews="NO" dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YHF-re-hif">
+                <splitView arrangesAllSubviews="NO" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YHF-re-hif">
                     <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
                     <subviews>
-                        <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="KW4-fp-jy1">
-                            <rect key="frame" x="0.0" y="0.0" width="294" height="390"/>
+                        <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="KW4-fp-jy1">
+                            <rect key="frame" x="0.0" y="0.0" width="298" height="390"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="4uw-9H-2bN">
-                                <rect key="frame" x="1" y="1" width="292" height="388"/>
+                                <rect key="frame" x="0.0" y="0.0" width="298" height="390"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="automatic" viewBased="YES" id="hvV-yD-5Kd" customClass="VLCLibraryTableView">
-                                        <rect key="frame" x="0.0" y="0.0" width="292" height="360"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="298" height="390"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <size key="intercellSpacing" width="17" height="0.0"/>
                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                         <tableColumns>
-                                            <tableColumn width="147" minWidth="40" maxWidth="1000" id="5fQ-TS-Dqm">
+                                            <tableColumn editable="NO" width="266" minWidth="40" maxWidth="9.2233720368547758e+18" id="5fQ-TS-Dqm">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -1098,14 +1098,14 @@
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
-                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                 <prototypeCellViews>
                                                     <tableCellView id="FPm-wv-pPO">
-                                                        <rect key="frame" x="8" y="0.0" width="142" height="24"/>
+                                                        <rect key="frame" x="18" y="0.0" width="261" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jsn-kJ-CVZ">
-                                                                <rect key="frame" x="0.0" y="4" width="142" height="16"/>
+                                                                <rect key="frame" x="0.0" y="4" width="261" height="16"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="UD3-mZ-qPY">
                                                                     <font key="font" usesAppearanceFont="YES"/>
@@ -1133,15 +1133,15 @@
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
                         </scrollView>
-                        <scrollView wantsLayer="YES" fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="6NL-vK-li1">
-                            <rect key="frame" x="304" y="0.0" width="410" height="390"/>
+                        <scrollView wantsLayer="YES" fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="6NL-vK-li1">
+                            <rect key="frame" x="299" y="0.0" width="415" height="390"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <clipView key="contentView" id="Zmo-lc-CDL">
-                                <rect key="frame" x="1" y="1" width="408" height="388"/>
+                                <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <collectionView id="ZGR-PZ-7h5">
-                                        <rect key="frame" x="0.0" y="0.0" width="408" height="158"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="od3-Iu-ch8">
                                             <size key="itemSize" width="50" height="50"/>
@@ -1151,7 +1151,7 @@
                                 </subviews>
                             </clipView>
                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="CDD-UB-kQh">
-                                <rect key="frame" x="1" y="144" width="233" height="15"/>
+                                <rect key="frame" x="-100" y="-100" width="233" height="15"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
                             <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Qfe-rP-ogK">
