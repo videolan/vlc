@@ -107,6 +107,9 @@
 
 - (void)setupAudioCollectionView
 {
+    _audioLibraryCollectionView.dataSource = _audioDataSource;
+    _audioLibraryCollectionView.delegate = _audioDataSource;
+
     _audioLibraryCollectionView.selectable = YES;
     _audioLibraryCollectionView.allowsMultipleSelection = NO;
     _audioLibraryCollectionView.allowsEmptySelection = YES;

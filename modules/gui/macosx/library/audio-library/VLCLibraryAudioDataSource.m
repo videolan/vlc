@@ -296,30 +296,28 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)setup
 {
-    [self setupCollectionView];
+    [self setupCollectionView:_collectionView];
     [self setupTableViews];
 
     _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
 }
 
-- (void)setupCollectionView
+- (void)setupCollectionView:(NSCollectionView *)collectionView
 {
-    _collectionView.dataSource = self;
-
-    [_collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [collectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
 
     NSNib *albumSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAlbumSupplementaryDetailView" bundle:nil];
-    [_collectionView registerNib:albumSupplementaryDetailView
+    [collectionView registerNib:albumSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier];
 
     NSNib *audioGroupSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAudioGroupSupplementaryDetailView" bundle:nil];
-    [_collectionView registerNib:audioGroupSupplementaryDetailView
+    [collectionView registerNib:audioGroupSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 
     NSNib *mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
-    [_collectionView registerNib:mediaItemSupplementaryDetailView
+    [collectionView registerNib:mediaItemSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }

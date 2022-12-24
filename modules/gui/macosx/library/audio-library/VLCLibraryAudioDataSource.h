@@ -50,6 +50,7 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
 @property (nonatomic, readwrite, assign) VLCAudioLibrarySegment audioLibrarySegment;
 
 - (void)setup;
+- (void)setupCollectionView:(NSCollectionView *)collectionView;
 - (void)reloadData;
 
 @end
