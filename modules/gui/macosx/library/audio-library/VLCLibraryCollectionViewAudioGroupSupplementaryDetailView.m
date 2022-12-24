@@ -25,14 +25,14 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "extensions/NSFont+VLCAdditions.h"
 
-#import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 
 NSString *const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
 NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier";
 
 @interface VLCLibraryCollectionViewAudioGroupSupplementaryDetailView () 
 {
-    VLCLibraryGroupDataSource *_audioGroupAlbumsDataSource;
+    VLCLibraryAudioGroupDataSource *_audioGroupAlbumsDataSource;
 }
 
 @end
@@ -41,7 +41,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 
 - (void)awakeFromNib
 {
-    _audioGroupAlbumsDataSource = [[VLCLibraryGroupDataSource alloc] init];
+    _audioGroupAlbumsDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
     _audioGroupAlbumsTableView.dataSource = _audioGroupAlbumsDataSource;
     _audioGroupAlbumsTableView.delegate = _audioGroupAlbumsDataSource;
     

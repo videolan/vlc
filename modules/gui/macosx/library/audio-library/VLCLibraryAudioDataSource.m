@@ -37,6 +37,7 @@
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
+#import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h"
@@ -472,7 +473,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
             break;
     }
 
-    _groupDataSource.representedListOfAlbums = nil; // Clear whatever was being shown before
+    _audioGroupDataSource.representedListOfAlbums = nil; // Clear whatever was being shown before
     [self reloadData];
 }
 
@@ -586,16 +587,16 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
 
     if (libraryItemIndex < 0 && showingAllItemsEntry) {
-        _groupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
+        _audioGroupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
     } else {
         id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[libraryItemIndex];
 
         if (_currentParentType == VLC_ML_PARENT_ALBUM) {
-            _groupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
+            _audioGroupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
         } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
-            _groupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
+            _audioGroupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
         } else { // FIXME: we have nothing to show here
-            _groupDataSource.representedListOfAlbums = nil;
+            _audioGroupDataSource.representedListOfAlbums = nil;
         }
     }
 
@@ -641,7 +642,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 - (void)groubSelectionDoubleClickAction:(id)sender
 {
-    NSArray *listOfAlbums = _groupDataSource.representedListOfAlbums;
+    NSArray *listOfAlbums = _audioGroupDataSource.representedListOfAlbums;
     NSUInteger albumCount = listOfAlbums.count;
     NSInteger clickedRow = _groupSelectionTableView.clickedRow;
 
@@ -736,91 +737,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                                         forCollectionView:(NSCollectionView *)collectionView
 {
     return _displayedCollection[indexPath.item];
-}
-
-@end
-
-@implementation VLCLibraryGroupDataSource
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-    if (_representedListOfAlbums != nil) {
-        return _representedListOfAlbums.count;
-    }
-
-    return 0;
-}
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    VLCLibraryAlbumTableCellView *cellView = [tableView makeViewWithIdentifier:VLCAudioLibraryCellIdentifier owner:self];
-
-    if (cellView == nil) {
-        cellView = [VLCLibraryAlbumTableCellView fromNibWithOwner:self];
-        cellView.identifier = VLCAudioLibraryCellIdentifier;
-    }
-
-    cellView.representedAlbum = (VLCMediaLibraryAlbum *)[self libraryItemAtRow:row forTableView:tableView];
-    return cellView;
-}
-
-- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
-                                       forTableView:(NSTableView *)tableView
-{
-    return _representedListOfAlbums[row];
-}
-
-- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
-{
-    VLCLibraryAlbumTableCellView *cellView = (VLCLibraryAlbumTableCellView *)[self tableView:tableView viewForTableColumn:[[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier] row:row];
-    return cellView == nil ? -1 : cellView.height;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)rowIndex
-{
-    // We use this with nested table views, since the table view cell is the VLCLibraryAlbumTableCellView.
-    // We don't want to select the outer cell, only the inner cells in the album view's table.
-    return NO;
-}
-
-- (NSInteger)collectionView:(NSCollectionView *)collectionView
-     numberOfItemsInSection:(NSInteger)section
-{
-    return _representedListOfAlbums.count;
-}
-
-- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
-{
-    return 1;
-}
-
-- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
-     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
-{
-    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    viewItem.representedItem = _representedListOfAlbums[indexPath.item];
-    return viewItem;
-}
-
-- (NSView *)collectionView:(NSCollectionView *)collectionView
-viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
-               atIndexPath:(NSIndexPath *)indexPath
-{
-    if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
-
-        VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
-
-        VLCMediaLibraryAlbum *album = _representedListOfAlbums[indexPath.item];
-        albumSupplementaryDetailView.representedAlbum = album;
-        albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
-        albumSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
-        albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
-
-        return albumSupplementaryDetailView;
-
-    }
-
-    return nil;
 }
 
 @end

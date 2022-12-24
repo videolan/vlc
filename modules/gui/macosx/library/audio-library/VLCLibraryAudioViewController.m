@@ -32,6 +32,7 @@
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 
 #import "library/video-library/VLCLibraryVideoViewController.h"
 
@@ -113,8 +114,8 @@
     _audioDataSource.gridModeListSelectionCollectionView = _audioLibraryGridModeSplitViewListSelectionCollectionView;
     [_audioDataSource setup];
 
-    _audioGroupDataSource = [[VLCLibraryGroupDataSource alloc] init];
-    _audioDataSource.groupDataSource = _audioGroupDataSource;
+    _audioGroupDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
+    _audioDataSource.audioGroupDataSource = _audioGroupDataSource;
 }
 
 - (void)setupAudioCollectionView

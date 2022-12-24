@@ -23,7 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCLibraryAudioDataSource;
-@class VLCLibraryGroupDataSource;
+@class VLCLibraryAudioGroupDataSource;
 @class VLCLibraryWindow;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSView *emptyLibraryView;
 
 @property (readonly) VLCLibraryAudioDataSource *audioDataSource;
-@property (readonly) VLCLibraryGroupDataSource *audioGroupDataSource;
+@property (readonly) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
 
 @property (readonly) NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
 

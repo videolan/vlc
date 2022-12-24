@@ -26,6 +26,7 @@
 #import "library/VLCLibraryUIUnits.h"
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
+#import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
@@ -240,7 +241,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 break;
         }
 
-    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryGroupDataSource class]]) {
+    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryAudioGroupDataSource class]]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
         
     } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoCollectionViewContainerViewDataSource class]]) {

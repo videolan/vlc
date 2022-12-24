@@ -28,7 +28,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
-@class VLCLibraryGroupDataSource;
+@class VLCLibraryAudioGroupDataSource;
 @class VLCMediaLibraryAlbum;
 
 typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
@@ -41,7 +41,7 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
 @interface VLCLibraryAudioDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
-@property (readwrite, assign) VLCLibraryGroupDataSource *groupDataSource;
+@property (readwrite, assign) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
 @property (readwrite, assign) NSTableView *collectionSelectionTableView;
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 @property (readwrite, assign) NSTableView *songsTableView;
@@ -54,12 +54,6 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
 - (void)setup;
 - (void)setupCollectionView:(NSCollectionView *)collectionView;
 - (void)reloadData;
-
-@end
-
-@interface VLCLibraryGroupDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource>
-
-@property (readwrite, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
 @end
 
