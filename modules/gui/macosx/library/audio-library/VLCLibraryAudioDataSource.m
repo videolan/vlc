@@ -297,6 +297,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (void)setup
 {
     [self setupCollectionView:_collectionView];
+    [self setupCollectionView:_gridModeListSelectionCollectionView];
     [self setupTableViews];
 
     _audioLibrarySegment = -1; // Force setAudioLibrarySegment to do something always on first try
@@ -329,6 +330,9 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
+
+    _gridModeListTableView.target = self;
+    _gridModeListTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
 
     [self setupSongsTableView];
 }
@@ -428,8 +432,10 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     if (collectionViewFlowLayout) {
         [collectionViewFlowLayout resetLayout];
     }
-    
+
     [self.collectionView reloadData];
+    [self.gridModeListTableView reloadData];
+    [self.gridModeListSelectionCollectionView reloadData];
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
     [self.songsTableView reloadData];
@@ -490,9 +496,15 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 {
     // The table view for songs in the list view mode of the audio library is different from the other audio groupings
     // and we use a vanilla NSTableView created in the VLCLibraryWindow XIB for it
-    if ([tableView.identifier isEqualToString:@"VLCLibrarySongsTableViewIdentifier"]) {
+    if ([tableView.identifier isEqualToString:@"VLCLibrarySongsTableViewIdentifier"] &&
+        _currentParentType == VLC_ML_PARENT_UNKNOWN) {
         const NSString * const columnIdentifier = tableColumn.identifier;
         const VLCMediaLibraryMediaItem * const mediaItem = [self libraryItemAtRow:row forTableView:tableView];
+
+        if (!mediaItem) {
+            return nil;
+        }
+
         const VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:mediaItem.albumID];
         const VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:mediaItem.genreID];
 
@@ -588,6 +600,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     }
 
     [self.groupSelectionTableView reloadData];
+    [self.gridModeListSelectionCollectionView reloadData];
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors

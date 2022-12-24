@@ -58,6 +58,7 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupAudioDataSource];
         [self setupAudioCollectionView];
+        [self setupGridModeSplitView];
         [self setupAudioTableViews];
         [self setupAudioSegmentedControl];
     }
@@ -81,6 +82,12 @@
     _audioSongTableView = libraryWindow.audioLibrarySongsTableView;
     _audioCollectionViewScrollView = libraryWindow.audioCollectionViewScrollView;
     _audioLibraryCollectionView = libraryWindow.audioLibraryCollectionView;
+    _audioLibraryGridModeSplitView = libraryWindow.audioLibraryGridModeSplitView;
+    _audioLibraryGridModeSplitViewListTableViewScrollView = libraryWindow.audioLibraryGridModeSplitViewListTableViewScrollView;
+    _audioLibraryGridModeSplitViewListTableView = libraryWindow.audioLibraryGridModeSplitViewListTableView;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
+    _audioLibraryGridModeSplitViewListSelectionCollectionView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionView;
+
     _audioSegmentedControl = libraryWindow.audioSegmentedControl;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
     _optionBarView = libraryWindow.optionBarView;
@@ -99,6 +106,8 @@
     _audioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
     _audioDataSource.songsTableView = _audioSongTableView;
     _audioDataSource.collectionView = _audioLibraryCollectionView;
+    _audioDataSource.gridModeListTableView = _audioLibraryGridModeSplitViewListTableView;
+    _audioDataSource.gridModeListSelectionCollectionView = _audioLibraryGridModeSplitViewListSelectionCollectionView;
     [_audioDataSource setup];
 
     _audioGroupDataSource = [[VLCLibraryGroupDataSource alloc] init];
@@ -108,7 +117,7 @@
 - (void)setupAudioCollectionView
 {
     _audioLibraryCollectionView.dataSource = _audioDataSource;
-    _audioLibraryCollectionView.delegate = _audioDataSource;
+    _audioLibraryCollectionView.delegate = _audioLibraryCollectionViewDelegate;
 
     _audioLibraryCollectionView.selectable = YES;
     _audioLibraryCollectionView.allowsMultipleSelection = NO;
@@ -134,6 +143,15 @@
 
     _audioSongTableView.dataSource = _audioDataSource;
     _audioSongTableView.delegate = _audioDataSource;
+}
+
+- (void)setupGridModeSplitView
+{
+    _audioLibraryGridModeSplitViewListTableView.dataSource = _audioDataSource;
+    _audioLibraryGridModeSplitViewListTableView.delegate = _audioDataSource;
+
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.dataSource = _audioGroupDataSource;
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.delegate = _audioGroupDataSource;
 }
 
 - (void)setupAudioPlaceholderView
@@ -235,20 +253,37 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
     if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
-        _audioLibrarySplitView.hidden = YES;
-        _audioSongTableViewScrollView.hidden = YES;
-        _audioCollectionViewScrollView.hidden = NO;
+        [self presentAudioGridModeView];
     } else {
         [self presentAudioTableView];
-        _audioCollectionViewScrollView.hidden = YES;
     }
 
     [self configureAudioSegmentedControl];
     [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
 }
 
+- (void)presentAudioGridModeView
+{
+    _audioLibrarySplitView.hidden = YES;
+    _audioSongTableViewScrollView.hidden = YES;
+
+    if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment ||
+        _audioSegmentedControl.selectedSegment == VLCAudioLibraryAlbumsSegment) {
+
+        _audioCollectionViewScrollView.hidden = NO;
+        _audioLibraryGridModeSplitView.hidden = YES;
+        return;
+    }
+
+    _audioCollectionViewScrollView.hidden = YES;
+    _audioLibraryGridModeSplitView.hidden = NO;
+}
+
 - (void)presentAudioTableView
 {
+    _audioCollectionViewScrollView.hidden = YES;
+    _audioLibraryGridModeSplitView.hidden = YES;
+
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment) {
         _audioLibrarySplitView.hidden = YES;
         _audioSongTableViewScrollView.hidden = NO;
@@ -268,6 +303,8 @@
 
     if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
         [self presentAudioTableView];
+    } else if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+        [self presentAudioGridModeView];
     }
 
     VLCLibraryNavigationStack *globalNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;

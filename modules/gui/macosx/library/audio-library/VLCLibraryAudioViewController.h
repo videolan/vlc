@@ -42,6 +42,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTableView *audioSongTableView;
 @property (readonly) NSScrollView *audioCollectionViewScrollView;
 @property (readonly) NSCollectionView *audioLibraryCollectionView;
+@property (readonly) NSSplitView *audioLibraryGridModeSplitView;
+@property (readonly) NSScrollView *audioLibraryGridModeSplitViewListTableViewScrollView;
+@property (readonly) NSTableView *audioLibraryGridModeSplitViewListTableView;
+@property (readonly) NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
+@property (readonly) NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
 @property (readonly) NSSegmentedControl *audioSegmentedControl;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readonly) NSButton *librarySortButton;

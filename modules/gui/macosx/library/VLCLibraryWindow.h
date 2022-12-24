@@ -82,7 +82,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSSplitView *audioLibraryGridModeSplitView;
 @property (readwrite, weak) IBOutlet NSScrollView *audioLibraryGridModeSplitViewListTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *audioLibraryGridModeSplitViewListTableView;
-@property (readwrite, weak) IBOutlet NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
+@property (readwrite, weak) IBOutlet NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
 @property (readwrite, weak) IBOutlet NSVisualEffectView *optionBarView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *audioSegmentedControl;

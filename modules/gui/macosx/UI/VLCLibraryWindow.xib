@@ -689,6 +689,7 @@
                 <outlet property="audioLibraryGridModeSplitViewListSelectionCollectionView" destination="ZGR-PZ-7h5" id="098-89-gh5"/>
                 <outlet property="audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView" destination="6NL-vK-li1" id="nO1-98-8th"/>
                 <outlet property="audioLibraryGridModeSplitViewListTableView" destination="hvV-yD-5Kd" id="AEf-7K-98h"/>
+                <outlet property="audioLibraryGridModeSplitViewListTableViewScrollView" destination="KW4-fp-jy1" id="sug-6s-b9Y"/>
                 <outlet property="audioLibrarySongsTableView" destination="Xck-iv-pH4" id="Sp4-iv-pH4"/>
                 <outlet property="audioLibrarySongsTableViewScrollView" destination="QqV-hX-sZw" id="1t5-D3-CeM"/>
                 <outlet property="audioLibrarySplitView" destination="llh-BF-BEJ" id="gvt-K1-cGw"/>
