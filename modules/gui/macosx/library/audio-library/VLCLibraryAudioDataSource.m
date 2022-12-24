@@ -568,6 +568,7 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 {
     NSParameterAssert(notification);
     NSTableView *tableView = (NSTableView *)notification.object;
+    NSAssert(tableView, @"Must be a valid table view");
     NSInteger selectedRow = tableView.selectedRow;
     BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
     NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
