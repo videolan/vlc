@@ -802,4 +802,25 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return viewItem;
 }
 
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
+
+        VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
+
+        VLCMediaLibraryAlbum *album = _representedListOfAlbums[indexPath.item];
+        albumSupplementaryDetailView.representedAlbum = album;
+        albumSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
+        albumSupplementaryDetailView.parentScrollView = [VLCMain sharedInstance].libraryWindow.audioCollectionViewScrollView;
+        albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
+
+        return albumSupplementaryDetailView;
+
+    }
+
+    return nil;
+}
+
 @end

@@ -57,6 +57,9 @@
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupAudioDataSource];
+
+        _audioLibraryCollectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
@@ -123,9 +126,6 @@
     _audioLibraryCollectionView.allowsMultipleSelection = NO;
     _audioLibraryCollectionView.allowsEmptySelection = YES;
 
-    _audioLibraryCollectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
-    _audioLibraryCollectionView.delegate = _audioLibraryCollectionViewDelegate;
-
     _audioLibraryCollectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 }
 
@@ -151,7 +151,13 @@
     _audioLibraryGridModeSplitViewListTableView.delegate = _audioDataSource;
 
     _audioLibraryGridModeSplitViewListSelectionCollectionView.dataSource = _audioGroupDataSource;
-    _audioLibraryGridModeSplitViewListSelectionCollectionView.delegate = _audioGroupDataSource;
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.delegate = _audioLibraryCollectionViewDelegate;
+
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.selectable = YES;
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsMultipleSelection = NO;
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsEmptySelection = YES;
+
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 }
 
 - (void)setupAudioPlaceholderView

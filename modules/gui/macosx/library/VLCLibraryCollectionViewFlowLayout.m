@@ -222,7 +222,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         layoutAttributesArray[i] = attributes;
     }
 
-    if([self.collectionView.dataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
+    if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
         VLCLibraryAudioDataSource *audioDataSource = (VLCLibraryAudioDataSource *)self.collectionView.dataSource;
 
         // Add detail view to the attributes set -- detail view about to be shown
@@ -239,7 +239,11 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
         }
-    } else if([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoCollectionViewContainerViewDataSource class]]) {
+
+    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryGroupDataSource class]]) {
+        [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
+        
+    } else if ([self.collectionView.dataSource isKindOfClass:[VLCLibraryVideoCollectionViewContainerViewDataSource class]]) {
         VLCLibraryVideoCollectionViewContainerViewDataSource *videoDataSource = (VLCLibraryVideoCollectionViewContainerViewDataSource *)self.collectionView.dataSource;
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }

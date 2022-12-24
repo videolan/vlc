@@ -57,7 +57,7 @@ typedef NS_ENUM(NSUInteger, VLCAudioLibrarySegment) {
 
 @end
 
-@interface VLCLibraryGroupDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource, NSCollectionViewDelegate>
+@interface VLCLibraryGroupDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource>
 
 @property (readwrite, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
