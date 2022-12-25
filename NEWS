@@ -1,15 +1,40 @@
+Changes between 3.0.18 and 3.0.19:
+----------------------------------
+
+Demux:
+ * Fix some FLAC VBR files playback regression
+ * Fix black screen on poorly edited MP4 files on Android Mediacodec
+ * Fix AVI files with flipped RAW video planes
+ * Fix duration on short and small Ogg/Opus files
+ * Fix some HLS/TS streams with ID3 prefix
+ * Fix for GoPro MAX spatial metadata
+
+Contribs:
+ * Update of fluidlite, fixing some MIDI rendering on Windows
+ * Update of zlib to 1.2.13 (CVE-2022-37434)
+
+Misc:
+ * Fix some rendering issues on Linux with the fullscreen controller
+ * Fix some MPRIS inconsistencies that broke some OS widgets on Linux
+ * Fixes for Youtube playback
+ * Fix some crashes on macOS when switching application
+ * Fix password search using the Kwallet backend
+ * Fix 5.1/7.1 output on macOS and tvOS
+ * Multiple fixes on AAC handling
+
+
 Changes between 3.0.18-rc2 and 3.0.18:
 --------------------------------------
 
 macOS:
-* Fix audio device listing with non-latin names
-* Update some translations
+ * Fix audio device listing with non-latin names
+ * Update some translations
 
 Misc:
-* Fix rendering and performance issue with older GPUs
+ * Fix rendering and performance issue with older GPUs
 
 Contribs:
-* Update aom
+ * Update aom
 
 
 Changes between 3.0.18-rc and 3.0.18-rc2:
