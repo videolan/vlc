@@ -434,6 +434,11 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
         [collectionViewFlowLayout resetLayout];
     }
 
+    VLCLibraryCollectionViewFlowLayout *gridModeListSelectionCollectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)_gridModeListSelectionCollectionView.collectionViewLayout;
+    if (gridModeListSelectionCollectionViewFlowLayout) {
+        [gridModeListSelectionCollectionViewFlowLayout resetLayout];
+    }
+
     [self.collectionView reloadData];
     [self.gridModeListTableView reloadData];
     [self.gridModeListSelectionCollectionView reloadData];
