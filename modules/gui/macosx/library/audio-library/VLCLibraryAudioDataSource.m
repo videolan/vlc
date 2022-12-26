@@ -474,9 +474,16 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 
 #pragma mark - table view data source and delegation
 
+- (BOOL)displayAllArtistsGenresTableEntry
+{
+    return _currentParentType == VLC_ML_PARENT_GENRE ||
+           _currentParentType == VLC_ML_PARENT_ARTIST;
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return _displayedCollection.count;
+    NSInteger numItems = _displayedCollection.count;
+    return [self displayAllArtistsGenresTableEntry] ? numItems + 1 : numItems;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView
@@ -543,16 +550,24 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
+    if ([self displayAllArtistsGenresTableEntry]) {
+        if (row == 0) {
+            return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:_NS("All items")
+                                                          withDetailString:@""];
+        }
+        return _displayedCollection[row - 1];
+    }
+
     return _displayedCollection[row];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    if (notification.object != _collectionSelectionTableView) {
-        return;
-    }
-
-    id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[self.collectionSelectionTableView.selectedRow];
+    NSParameterAssert(notification);
+    NSTableView *tableView = (NSTableView *)notification.object;
+    NSInteger selectedRow = tableView.selectedRow;
+    NSInteger libraryItemIndex = [self displayAllArtistsGenresTableEntry] ? selectedRow - 1 : selectedRow;
+    id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[libraryItemIndex];
 
     if (_currentParentType == VLC_ML_PARENT_ALBUM) {
         _groupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
