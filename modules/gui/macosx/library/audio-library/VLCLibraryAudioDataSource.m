@@ -566,15 +566,21 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
     NSParameterAssert(notification);
     NSTableView *tableView = (NSTableView *)notification.object;
     NSInteger selectedRow = tableView.selectedRow;
-    NSInteger libraryItemIndex = [self displayAllArtistsGenresTableEntry] ? selectedRow - 1 : selectedRow;
-    id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[libraryItemIndex];
+    BOOL showingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
+    NSInteger libraryItemIndex = showingAllItemsEntry ? selectedRow - 1 : selectedRow;
 
-    if (_currentParentType == VLC_ML_PARENT_ALBUM) {
-        _groupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
-    } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
-        _groupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
-    } else { // FIXME: we have nothing to show here
-        _groupDataSource.representedListOfAlbums = nil;
+    if (libraryItemIndex < 0 && showingAllItemsEntry) {
+        _groupDataSource.representedListOfAlbums = _libraryModel.listOfAlbums;
+    } else {
+        id<VLCMediaLibraryItemProtocol> libraryItem = _displayedCollection[libraryItemIndex];
+
+        if (_currentParentType == VLC_ML_PARENT_ALBUM) {
+            _groupDataSource.representedListOfAlbums = @[(VLCMediaLibraryAlbum *)libraryItem];
+        } else if(_currentParentType != VLC_ML_PARENT_UNKNOWN) {
+            _groupDataSource.representedListOfAlbums = [_libraryModel listAlbumsOfParentType:_currentParentType forID:libraryItem.libraryID];
+        } else { // FIXME: we have nothing to show here
+            _groupDataSource.representedListOfAlbums = nil;
+        }
     }
 
     [self.groupSelectionTableView reloadData];
