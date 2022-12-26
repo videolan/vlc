@@ -550,11 +550,16 @@ static NSString *VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescripto
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if ([self displayAllArtistsGenresTableEntry]) {
-        if (row == 0) {
-            return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:_NS("All items")
-                                                          withDetailString:@""];
-        }
+    BOOL viewDisplayingAllItemsEntry = [self displayAllArtistsGenresTableEntry];
+    BOOL provideAllItemsEntry = viewDisplayingAllItemsEntry && row == 0;
+
+    if (provideAllItemsEntry && _currentParentType == VLC_ML_PARENT_GENRE) {
+        return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:_NS("All genres")
+                                                      withDetailString:@""];
+    } else if (provideAllItemsEntry && _currentParentType == VLC_ML_PARENT_ARTIST) {
+        return [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:_NS("All artists")
+                                                      withDetailString:@""];
+    } else if (viewDisplayingAllItemsEntry) {
         return _displayedCollection[row - 1];
     }
 
