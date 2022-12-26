@@ -287,7 +287,8 @@
                                 </customView>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="404" firstAttribute="leading" secondItem="35" secondAttribute="leading" id="7df-Bg-DO2"/>
+                                <constraint firstItem="404" firstAttribute="leading" secondItem="AhF-YR-JeB" secondAttribute="leading" constant="42" id="1rc-S7-tCZ"/>
+                                <constraint firstItem="35" firstAttribute="leading" secondItem="AhF-YR-JeB" secondAttribute="leading" constant="12" id="6Fi-nE-OLf"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="centerX" secondItem="AhF-YR-JeB" secondAttribute="centerX" id="8OH-Qk-eDc"/>
                                 <constraint firstItem="392" firstAttribute="leading" secondItem="QZC-Ij-ExL" secondAttribute="trailing" constant="-2" id="Dzi-vX-Pur"/>
                                 <constraint firstItem="404" firstAttribute="centerY" secondItem="389" secondAttribute="centerY" id="Elm-ny-3z0"/>
@@ -295,7 +296,6 @@
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="leading" secondItem="389" secondAttribute="trailing" constant="-3" id="WbW-cJ-1IX"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="centerY" secondItem="AhF-YR-JeB" secondAttribute="centerY" constant="10" id="ZSO-2c-zCe"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="height" secondItem="392" secondAttribute="height" id="cox-aD-z4G"/>
-                                <constraint firstItem="35" firstAttribute="leading" secondItem="AhF-YR-JeB" secondAttribute="leading" constant="17" id="cwo-xq-mtI"/>
                                 <constraint firstItem="389" firstAttribute="centerY" secondItem="392" secondAttribute="centerY" id="wML-B4-jxu"/>
                                 <constraint firstItem="QZC-Ij-ExL" firstAttribute="centerY" secondItem="392" secondAttribute="centerY" id="x9n-V7-R5B"/>
                             </constraints>
