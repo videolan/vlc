@@ -1102,3 +1102,36 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 }
 
 @end
+
+@implementation VLCMediaLibraryDummyItem
+
+@synthesize detailString = _detailString;
+@synthesize displayString = _displayString;
+@synthesize durationString = _durationString;
+@synthesize firstMediaItem = _firstMediaItem;
+@synthesize libraryID = _libraryId;
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
+@synthesize smallArtworkImage = _smallArtworkImage;
+@synthesize smallArtworkMRL = _smallArtworkMRL;
+
+
+- (instancetype)initWithDisplayString:(NSString*)displayString
+                     withDetailString:(NSString*)detailString
+{
+    self = [super init];
+    if (self) {
+        _displayString = displayString;
+        _detailString = detailString;
+        _durationString = @"";
+        _libraryId = -1;
+        _smallArtworkGenerated = NO;
+        _smallArtworkMRL = @"";
+    }
+    return self;
+}
+
+- (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock {
+    return;
+}
+
+@end

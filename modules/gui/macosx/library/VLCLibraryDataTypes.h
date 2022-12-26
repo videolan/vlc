@@ -228,4 +228,11 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
+@interface VLCMediaLibraryDummyItem : NSObject<VLCMediaLibraryItemProtocol>
+
+- (instancetype)initWithDisplayString:(NSString*)displayString
+                     withDetailString:(NSString*)detailString;
+
+@end
+
 NS_ASSUME_NONNULL_END
