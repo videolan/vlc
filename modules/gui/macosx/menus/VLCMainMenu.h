@@ -75,6 +75,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *record;
 @property (readwrite, weak) IBOutlet NSMenuItem *rate;
 @property (readwrite, weak) IBOutlet NSView *rate_view;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *rate_view_offset_constraint;
 @property (readwrite, weak) IBOutlet NSTextField *rateLabel;
 @property (readwrite, weak) IBOutlet NSTextField *rate_slowerLabel;
 @property (readwrite, weak) IBOutlet NSTextField *rate_normalLabel;
@@ -144,6 +145,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *openSubtitleFile;
 @property (readwrite, weak) IBOutlet NSMenuItem *subtitleSize;
 @property (readwrite, weak) IBOutlet NSView *subtitleSizeView;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *subtitleSizeViewOffsetConstraint;
 @property (readwrite, weak) IBOutlet NSTextField *subtitleSizeLabel;
 @property (readwrite, weak) IBOutlet NSTextField *subtitleSizeSmallerLabel;
 @property (readwrite, weak) IBOutlet NSTextField *subtitleSizeLargerLabel;
@@ -155,6 +157,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *subtitle_bgcolor;
 @property (readwrite, weak) IBOutlet NSMenuItem *subtitle_bgopacity;
 @property (readwrite, weak) IBOutlet NSView *subtitle_bgopacity_view;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *subtitle_bgopacity_view_offset_constraint;
 @property (readwrite, weak) IBOutlet NSTextField *subtitle_bgopacityLabel;
 @property (readwrite, weak) IBOutlet NSTextField *subtitle_bgopacityLabel_gray;
 @property (readwrite, weak) IBOutlet NSSlider *subtitle_bgopacity_sld;

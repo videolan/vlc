@@ -104,6 +104,7 @@
                 <outlet property="rate_sld" destination="4597" id="HsT-Rx-eia"/>
                 <outlet property="rate_slowerLabel" destination="4600" id="vRN-S8-MSb"/>
                 <outlet property="rate_view" destination="4596" id="MPC-hG-6bj"/>
+                <outlet property="rate_view_offset_constraint" destination="Zdw-tm-Z6L" id="EXY-EB-QXd"/>
                 <outlet property="record" destination="5137" id="Ka3-jl-auY"/>
                 <outlet property="rendererMenu" destination="ODg-VN-8Tv" id="3Ox-BO-HyW"/>
                 <outlet property="rendererMenuItem" destination="wYl-A2-q30" id="obH-UF-FmA"/>
@@ -126,6 +127,7 @@
                 <outlet property="subtitleSizeSmallerLabel" destination="DE3-cs-bVc" id="74W-Xn-pGS"/>
                 <outlet property="subtitleSizeTextField" destination="uVr-yv-xcp" id="45Z-1j-gDB"/>
                 <outlet property="subtitleSizeView" destination="GSo-om-Xt7" id="qOx-XX-QUJ"/>
+                <outlet property="subtitleSizeViewOffsetConstraint" destination="cYQ-Os-xxJ" id="wXc-df-LK6"/>
                 <outlet property="subtitle_bgcolor" destination="5581" id="moz-G5-DBl"/>
                 <outlet property="subtitle_bgcolorMenu" destination="5582" id="gPd-5S-3xK"/>
                 <outlet property="subtitle_bgopacity" destination="5568" id="aPB-o5-iU6"/>
@@ -133,6 +135,7 @@
                 <outlet property="subtitle_bgopacityLabel_gray" destination="5548" id="NBY-zL-Uln"/>
                 <outlet property="subtitle_bgopacity_sld" destination="5555" id="NKB-tp-uwe"/>
                 <outlet property="subtitle_bgopacity_view" destination="5547" id="KR2-v5-OeA"/>
+                <outlet property="subtitle_bgopacity_view_offset_constraint" destination="2NC-Yr-P6e" id="yLP-DA-eVo"/>
                 <outlet property="subtitle_outlinethickness" destination="5571" id="Zml-NY-nvy"/>
                 <outlet property="subtitle_outlinethicknessMenu" destination="5572" id="x2V-5T-aCd"/>
                 <outlet property="subtitle_textcolor" destination="5576" id="RjP-9r-hxv"/>

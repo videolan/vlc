@@ -153,6 +153,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     /* configure playback / controls menu */
     self.controlsMenu.delegate = self;
+    self.subtitlesMenu.delegate = self;
     [_rendererNoneItem setState:NSOnState];
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
@@ -1862,6 +1863,34 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     [_cancelRendererDiscoveryTimer invalidate];
     [_rendererMenuController startRendererDiscoveries];
+
+    if (@available(macOS 10.16, *)) {
+
+        const int menuItemOffset = 14;
+        const int menuItemOffsetWithActiveState = 24;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (menu == self->_controlsMenu) {
+                BOOL controlsMenuHasActiveState = NO;
+                for (NSMenuItem *viewMenuItem in menu.itemArray) {
+                    if (viewMenuItem.state == NSControlStateValueOn) {
+                        controlsMenuHasActiveState = YES;
+                    }
+                }
+
+                if (controlsMenuHasActiveState) {
+                    self->_rate_view_offset_constraint.constant = menuItemOffsetWithActiveState;
+                } else {
+                    self->_rate_view_offset_constraint.constant = menuItemOffset;
+                }
+            }
+
+            if (menu == self->_subtitlesMenu) {
+                self->_subtitle_bgopacity_view_offset_constraint.constant = menuItemOffset;
+                self->_subtitleSizeViewOffsetConstraint.constant = menuItemOffset;
+            }
+        });
+    }
 }
 
 - (void)menuDidClose:(NSMenu *)menu
