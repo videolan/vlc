@@ -267,7 +267,11 @@ void VideoSurface::mouseReleaseEvent(QMouseEvent* event)
 void VideoSurface::mouseMoveEvent(QMouseEvent* event)
 {
     QPointF current_pos = event->localPos();
-    emit mouseMoved(current_pos.x() , current_pos.y());
+    QQuickWindow* window = this->window();
+    if (!window)
+        return;
+    qreal dpr = window->effectiveDevicePixelRatio();
+    emit mouseMoved(current_pos.x() * dpr, current_pos.y() * dpr);
     event->accept();
 }
 
@@ -276,7 +280,11 @@ void VideoSurface::hoverMoveEvent(QHoverEvent* event)
     QPointF current_pos = event->posF();
     if (current_pos != m_oldHoverPos)
     {
-        emit mouseMoved(current_pos.x(), current_pos.y());
+        QQuickWindow* window = this->window();
+        if (!window)
+            return;
+        qreal dpr = window->effectiveDevicePixelRatio();
+        emit mouseMoved(current_pos.x() * dpr, current_pos.y()  * dpr);
         m_oldHoverPos = current_pos;
     }
     event->accept();
@@ -379,7 +387,7 @@ void VideoSurface::onSurfacePositionChanged()
     QQuickWindow* window = this->window();
     if (!window)
         return;
-    qreal dpr = this->window()->effectiveDevicePixelRatio();
+    qreal dpr = window->effectiveDevicePixelRatio();
     emit surfacePositionChanged(scenePosition * dpr);
 }
 
@@ -391,7 +399,7 @@ void VideoSurface::updatePositionAndSize()
     QQuickWindow* window = this->window();
     if (!window)
         return;
-    qreal dpr = this->window()->effectiveDevicePixelRatio();
+    qreal dpr = window->effectiveDevicePixelRatio();
     emit surfaceSizeChanged(size() * dpr);
     QPointF scenePosition = this->mapToScene(QPointF(0, 0));
     emit surfacePositionChanged(scenePosition * dpr);
