@@ -135,11 +135,9 @@ T.Control {
                     z: -1
 
                     primaryBlurRadius: VLCStyle.dp(3)
-                    primaryColor: Qt.rgba(0, 0, 0, 0.18)
                     primaryVerticalOffset: VLCStyle.dp(1)
 
                     secondaryBlurRadius: VLCStyle.dp(14)
-                    secondaryColor: Qt.rgba(0, 0, 0, 0.22)
                     secondaryVerticalOffset: VLCStyle.dp(6)
                 }
             }

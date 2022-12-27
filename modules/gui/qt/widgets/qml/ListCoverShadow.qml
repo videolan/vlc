@@ -26,11 +26,9 @@ DoubleShadow {
 
     primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
     primaryBlurRadius: VLCStyle.dp(14, VLCStyle.scale)
-    primaryColor: Qt.rgba(0, 0, 0, .22)
 
     secondaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
     secondaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
-    secondaryColor: Qt.rgba(0, 0, 0, .18)
 
     z: -1
 }

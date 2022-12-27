@@ -88,11 +88,9 @@ AbstractButton {
                 anchors.fill: parent
 
                 primaryBlurRadius: VLCStyle.dp(3, VLCStyle.scale)
-                primaryColor: Qt.rgba(0, 0, 0, 0.18)
                 primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
 
                 secondaryBlurRadius: VLCStyle.dp(14, VLCStyle.scale)
-                secondaryColor: Qt.rgba(0, 0, 0, 0.22)
                 secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
             }
 

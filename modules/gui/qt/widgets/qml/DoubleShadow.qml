@@ -51,7 +51,7 @@ Item {
 
         anchors.centerIn: parent
 
-        color: VLCStyle.colors.bg
+        color: Qt.rgba(0, 0, 0, .18)
         xOffset: 0
 
         xRadius: root.xRadius
@@ -65,7 +65,7 @@ Item {
 
         anchors.centerIn: parent
 
-        color: VLCStyle.colors.bg
+        color: Qt.rgba(0, 0, 0, .22)
         xOffset: 0
 
         xRadius: root.xRadius
