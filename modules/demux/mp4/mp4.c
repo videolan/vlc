@@ -382,7 +382,7 @@ static bool MP4_ChunkGetSampleCTSDelta( const mp4_chunk_t *p_chunk,
     return false;
 }
 
-static void MP4_TrackTimeApplyELST( const mp4_track_t *p_track,
+static void MP4_TrackTimeApplyELST( const mp4_track_t *p_track, uint64_t i_movie_timescale,
                                     stime_t *pi_dts )
 {
     if( !p_track->p_elst || !p_track->BOXDATA(p_elst)->i_entry_count )
@@ -399,7 +399,7 @@ static void MP4_TrackTimeApplyELST( const mp4_track_t *p_track,
     }
 
     /* add i_elst_time */
-    *pi_dts += p_track->i_elst_time;
+    *pi_dts += MP4_rescale( p_track->i_elst_time, i_movie_timescale, p_track->i_timescale );
 
     if( *pi_dts < 0 ) *pi_dts = 0;
 }
@@ -407,14 +407,14 @@ static void MP4_TrackTimeApplyELST( const mp4_track_t *p_track,
 /* Return time in microsecond of a track */
 static inline mtime_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
-    VLC_UNUSED(p_demux);
+    demux_sys_t *p_sys = p_demux->p_sys;
     const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
 
     stime_t sdts = MP4_ChunkGetSampleDTS( p_chunk,
                                           p_track->i_sample - p_chunk->i_sample_first );
 
     /* now handle elst */
-    MP4_TrackTimeApplyELST( p_track, &sdts );
+    MP4_TrackTimeApplyELST( p_track, p_sys->i_timescale, &sdts );
 
     return MP4_rescale( sdts, p_track->i_timescale, CLOCK_FREQ );
 }
