@@ -44,23 +44,6 @@ T.ToolButton {
         color: VLCStyle.colors.text
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-
-        anchors {
-            verticalCenter: parent.verticalCenter
-            rightMargin: VLCStyle.margin_xsmall
-            leftMargin: VLCStyle.margin_small
-        }
-
-        Rectangle {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: 2
-            visible: control.checked
-            color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
-        }
     }
 
     background: AnimatedBackground {
