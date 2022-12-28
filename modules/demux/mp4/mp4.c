@@ -346,44 +346,23 @@ static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
     return p_es;
 }
 
-static int MP4_ChunkAllocDtsEntries( mp4_chunk_t *ck )
+static int MP4_ChunkAllocEntries( size_t entries, uint32_t *smallbuf,
+                                  uint32_t **dst0, uint32_t **dst1 )
 {
-    size_t entries = ck->i_entries_dts;
+    uint32_t *buf;
 
-    if( entries <= ARRAY_SIZE(ck->small_dts_buf) / 2 )
+    if( entries > MP4_CHUNK_SMALLBUF_ENTRIES )
     {
-        ck->p_sample_count_dts = ck->small_dts_buf;
-        ck->p_sample_delta_dts = ck->small_dts_buf + entries;
-        return 0;
+        buf = calloc( entries, sizeof( buf[0] ) * 2 );
+        if( unlikely(buf == NULL) )
+            return VLC_ENOMEM;
     }
+    else buf = smallbuf;
 
-    uint32_t *buf = calloc( entries, sizeof( buf[0] ) * 2 );
-    if( unlikely(buf == NULL) )
-        return VLC_ENOMEM;
+    *dst0 = buf;
+    *dst1 = &buf[entries];
 
-    ck->p_sample_count_dts = buf;
-    ck->p_sample_delta_dts = buf + entries;
-    return 0;
-}
-
-static int MP4_ChunkAllocPtsEntries( mp4_chunk_t *ck )
-{
-    size_t entries = ck->i_entries_pts;
-
-    if( entries <= ARRAY_SIZE(ck->small_pts_buf) / 2 )
-    {
-        ck->p_sample_count_pts = ck->small_pts_buf;
-        ck->p_sample_offset_pts = ck->small_pts_buf + entries;
-        return 0;
-    }
-
-    uint32_t *buf = calloc( entries, sizeof( buf[0] ) * 2 );
-    if( unlikely(buf == NULL) )
-        return VLC_ENOMEM;
-
-    ck->p_sample_count_pts = buf;
-    ck->p_sample_offset_pts = buf + entries;
-    return 0;
+    return VLC_SUCCESS;
 }
 
 static void MP4_ChunkDestroy( mp4_chunk_t *ck )
@@ -2681,7 +2660,10 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 return i_ret;
 
             /* allocate them */
-            i_ret = MP4_ChunkAllocDtsEntries( ck );
+            i_ret = MP4_ChunkAllocEntries( ck->i_entries_dts,
+                                           ck->small_dts_buf,
+                                           &ck->p_sample_count_dts,
+                                           &ck->p_sample_delta_dts );
             if( i_ret )
             {
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_dts );
@@ -2793,7 +2775,10 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 return i_ret;
 
             /* allocate them */
-            i_ret = MP4_ChunkAllocPtsEntries( ck );
+            i_ret = MP4_ChunkAllocEntries( ck->i_entries_pts,
+                                           ck->small_pts_buf,
+                                           &ck->p_sample_count_pts,
+                                           &ck->p_sample_offset_pts );
             if( i_ret )
             {
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_pts );
