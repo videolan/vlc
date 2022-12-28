@@ -346,13 +346,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
 
-    _libraryVideoCollectionViewsStackViewController.collectionViewItemSize = CGSizeMake(214., 260.);
+    _libraryVideoCollectionViewsStackViewController.collectionViewItemSize = [VLCLibraryCollectionViewItem defaultSize];
     _libraryVideoCollectionViewsStackViewController.collectionViewMinimumLineSpacing = collectionItemSpacing;
     _libraryVideoCollectionViewsStackViewController.collectionViewMinimumInteritemSpacing = collectionItemSpacing;
     _libraryVideoCollectionViewsStackViewController.collectionViewSectionInset = collectionViewSectionInset;
 
     NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = _mediaSourceCollectionView.collectionViewLayout;
-    mediaSourceCollectionViewLayout.itemSize = CGSizeMake(214., 246.);
+    mediaSourceCollectionViewLayout.itemSize = [VLCLibraryCollectionViewItem defaultSize];
     mediaSourceCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
     mediaSourceCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     mediaSourceCollectionViewLayout.sectionInset = collectionViewSectionInset;

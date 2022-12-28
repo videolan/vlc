@@ -24,6 +24,7 @@
 
 #import "VLCLibraryCollectionViewDataSource.h"
 #import "VLCLibraryCollectionViewFlowLayout.h"
+#import "VLCLibraryCollectionViewItem.h"
 #import "VLCLibraryDataTypes.h"
 
 @implementation VLCLibraryCollectionViewDelegate
@@ -33,7 +34,7 @@
     self = [super init];
     if (self) {
         _dynamicItemSizing = YES;
-        _staticItemSize = NSMakeSize(214, 260);
+        _staticItemSize = [VLCLibraryCollectionViewItem defaultSize];
     }
     return self;
 }

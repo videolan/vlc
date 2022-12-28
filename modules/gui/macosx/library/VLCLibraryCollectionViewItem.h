@@ -32,6 +32,8 @@ extern NSString *VLCLibraryCellIdentifier;
 
 @interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
++ (NSSize)defaultSize;
+
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
 @property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;

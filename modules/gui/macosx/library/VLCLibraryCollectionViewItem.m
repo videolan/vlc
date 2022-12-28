@@ -48,6 +48,11 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 @implementation VLCLibraryCollectionViewItem
 
++ (NSSize)defaultSize
+{
+    return CGSizeMake(214., 246.);
+}
+
 - (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
