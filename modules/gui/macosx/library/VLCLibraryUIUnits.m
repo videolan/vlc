@@ -39,4 +39,9 @@
     return 5;
 }
 
++ (CGFloat)scrollBarSmallSideSize
+{
+    return 16;
+}
+
 @end
