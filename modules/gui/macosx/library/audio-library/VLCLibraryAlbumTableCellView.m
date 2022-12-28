@@ -26,24 +26,23 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
+
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
+
 #import "main/VLCMain.h"
+
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryUIUnits.h"
+
 #import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
 NSString *VLCLibraryAlbumTableCellTableViewColumnIdentifier = @"VLCLibraryAlbumTableCellTableViewColumnIdentifier";
 const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
-
-// Note that these values are not necessarily linked to the layout defined in the .xib files.
-// If the spacing in the layout is changed you will want to change these values too.
-const CGFloat VLCLibraryAlbumTableCellViewLargeSpacing = 20;
-const CGFloat VLCLibraryAlbumTableCellViewMediumSpacing = 10;
-const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
 
 @interface VLCLibraryAlbumTableCellView ()
 {
@@ -74,25 +73,25 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
         return -1;
     }
 
-    const CGFloat artworkAndSecondaryLabelsHeight = VLCLibraryAlbumTableCellViewLargeSpacing + 
+    const CGFloat artworkAndSecondaryLabelsHeight = [VLCLibraryUIUnits largeSpacing] +
                                                     _representedImageView.frame.size.height + 
-                                                    VLCLibraryAlbumTableCellViewMediumSpacing + 
+                                                    [VLCLibraryUIUnits mediumSpacing] +
                                                     _summaryTextField.frame.size.height + 
-                                                    VLCLibraryAlbumTableCellViewSmallSpacing +
+                                                    [VLCLibraryUIUnits smallSpacing] +
                                                     _yearTextField.frame.size.height + 
-                                                    VLCLibraryAlbumTableCellViewLargeSpacing;
+                                                    [VLCLibraryUIUnits largeSpacing];
     
     if(_tracksTableView == nil) {
         return artworkAndSecondaryLabelsHeight;
     }
 
-    const CGFloat titleAndTableViewHeight = VLCLibraryAlbumTableCellViewLargeSpacing +
+    const CGFloat titleAndTableViewHeight = [VLCLibraryUIUnits largeSpacing] +
                                             _albumNameTextField.frame.size.height +
-                                            VLCLibraryAlbumTableCellViewSmallSpacing +
+                                            [VLCLibraryUIUnits smallSpacing] +
                                             _artistNameTextField.frame.size.height + 
-                                            VLCLibraryAlbumTableCellViewSmallSpacing +
+                                            [VLCLibraryUIUnits smallSpacing] +
                                             [self expectedTableViewHeight] +
-                                            VLCLibraryAlbumTableCellViewLargeSpacing;
+                                            [VLCLibraryUIUnits largeSpacing];
 
     return titleAndTableViewHeight > artworkAndSecondaryLabelsHeight ? titleAndTableViewHeight : artworkAndSecondaryLabelsHeight;
 }
@@ -103,14 +102,14 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
     // to take into account the album's left spacing, right spacing, and the table view's
     // right spacing. In this case we are using large spacing for all of these. We also
     // throw in a little bit extra spacing to compensate for some mysterious internal spacing.
-    return self.frame.size.width - _representedImageView.frame.size.width - VLCLibraryAlbumTableCellViewLargeSpacing * 3.75;
+    return self.frame.size.width - _representedImageView.frame.size.width - [VLCLibraryUIUnits largeSpacing] * 3.75;
 }
 
 - (CGFloat)expectedTableViewHeight
 {
     const NSUInteger numberOfTracks = _representedAlbum.numberOfTracks;
     const CGFloat intercellSpacing = numberOfTracks > 1 ? (numberOfTracks - 1) * _tracksTableView.intercellSpacing.height : 0;
-    return numberOfTracks * VLCLibraryTracksRowHeight + intercellSpacing + VLCLibraryAlbumTableCellViewMediumSpacing;
+    return numberOfTracks * VLCLibraryTracksRowHeight + intercellSpacing + [VLCLibraryUIUnits mediumSpacing];
 }
 
 - (void)awakeFromNib
@@ -150,14 +149,14 @@ const CGFloat VLCLibraryAlbumTableCellViewSmallSpacing = 5;
     _tracksTableView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_tracksTableView];
     NSString *horizontalVisualConstraints = [NSString stringWithFormat:@"H:|-%f-[_representedImageView]-%f-[_tracksTableView]-%f-|",
-        VLCLibraryAlbumTableCellViewLargeSpacing,
-        VLCLibraryAlbumTableCellViewLargeSpacing,
-        VLCLibraryAlbumTableCellViewLargeSpacing];
+                                             [VLCLibraryUIUnits largeSpacing],
+                                             [VLCLibraryUIUnits largeSpacing],
+                                             [VLCLibraryUIUnits largeSpacing]];
     NSString *verticalVisualContraints = [NSString stringWithFormat:@"V:|-%f-[_albumNameTextField]-%f-[_artistNameTextField]-%f-[_tracksTableView]->=%f-|",
-        VLCLibraryAlbumTableCellViewLargeSpacing,
-        VLCLibraryAlbumTableCellViewSmallSpacing,
-        VLCLibraryAlbumTableCellViewMediumSpacing,
-        VLCLibraryAlbumTableCellViewLargeSpacing];
+                                          [VLCLibraryUIUnits largeSpacing],
+                                          [VLCLibraryUIUnits smallSpacing],
+                                          [VLCLibraryUIUnits mediumSpacing],
+                                          [VLCLibraryUIUnits largeSpacing]];
     NSDictionary *dict = NSDictionaryOfVariableBindings(_tracksTableView, _representedImageView, _albumNameTextField, _artistNameTextField);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalVisualConstraints options:0 metrics:0 views:dict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalVisualContraints options:0 metrics:0 views:dict]];

@@ -29,7 +29,7 @@
     return 20;
 }
 
-+ (CGFloat)standardSpacing
++ (CGFloat)mediumSpacing
 {
     return 10;
 }

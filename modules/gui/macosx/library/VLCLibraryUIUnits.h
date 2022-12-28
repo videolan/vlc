@@ -26,8 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryUIUnits : NSObject
 
+// Note that these values are not necessarily linked to the layout defined in the .xib files.
+// If the spacing in the layout is changed you will want to change these values too.
 + (CGFloat)largeSpacing;
-+ (CGFloat)standardSpacing;
++ (CGFloat)mediumSpacing;
 + (CGFloat)smallSpacing;
 
 + (CGFloat)scrollBarSmallSideSize;
