@@ -192,6 +192,7 @@ Item {
         glowRadius: VLCStyle.dp(8, VLCStyle.scale)
         color: colors.glowColor
         spread: 0.2
+        z: -1
     }
 
     Repeater {
@@ -211,27 +212,25 @@ Item {
                 radius: coverRepeater.count > 1 ? dragItem.coverSize : VLCStyle.dp(2, VLCStyle.scale)
                 anchors.fill: parent
                 color: colors.bg
+
+                DoubleShadow {
+                    anchors.fill: parent
+
+                    z: -1
+
+                    xRadius: bg.radius
+                    yRadius: bg.radius
+
+                    primaryBlurRadius: VLCStyle.dp(3)
+                    primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                    primaryHorizontalOffset: 0
+
+                    secondaryBlurRadius: VLCStyle.dp(14)
+                    secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                    secondaryHorizontalOffset: 0
+                }
             }
 
-            DropShadow {
-                horizontalOffset: 0
-                verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-                radius: VLCStyle.dp(3, VLCStyle.scale)
-                samples: 2 * radius + 1
-                color: Qt.rgba(0, 0, 0, .18)
-                anchors.fill: bg
-                source: bg
-            }
-
-            DropShadow {
-                horizontalOffset: 0
-                verticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                radius: VLCStyle.dp(14, VLCStyle.scale)
-                samples: 2 * radius + 1
-                color: Qt.rgba(0, 0, 0, .18)
-                anchors.fill: bg
-                source: bg
-            }
 
             Loader {
                 // parent may provide extra data with covers
@@ -284,29 +283,23 @@ Item {
             color: colors.accent
             text: "+" + (dragItem._indexesSize - dragItem._maxCovers)
         }
+
+        DoubleShadow {
+            z: -1
+            anchors.fill: parent
+            xRadius: extraCovers.radius
+            yRadius: extraCovers.radius
+
+            primaryBlurRadius: VLCStyle.dp(3)
+            primaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+            primaryHorizontalOffset: 0
+
+            secondaryBlurRadius: VLCStyle.dp(14)
+            secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+            secondaryHorizontalOffset: 0
+        }
     }
 
-    DropShadow {
-        horizontalOffset: 0
-        verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-        radius: VLCStyle.dp(3, VLCStyle.scale)
-        samples: 2 * radius + 1
-        color: Qt.rgba(0, 0, 0, .18)
-        anchors.fill: extraCovers
-        source: extraCovers
-        visible: extraCovers.visible
-    }
-
-    DropShadow {
-        horizontalOffset: 0
-        verticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-        radius: VLCStyle.dp(14, VLCStyle.scale)
-        samples: 2 * radius + 1
-        color: Qt.rgba(0, 0, 0, .18)
-        anchors.fill: extraCovers
-        source: extraCovers
-        visible: extraCovers.visible
-    }
 
     Column {
         id: labelColumn
