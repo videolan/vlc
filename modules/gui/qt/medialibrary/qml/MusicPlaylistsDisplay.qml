@@ -94,8 +94,6 @@ Widgets.PageLoader {
         id: componentAll
 
         PlaylistMediaList {
-            anchors.fill: parent
-
             isMusic: true
 
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
@@ -114,8 +112,6 @@ Widgets.PageLoader {
 
         PlaylistMediaDisplay {
             id: playlist
-
-            anchors.fill: parent
 
             isMusic: true
 

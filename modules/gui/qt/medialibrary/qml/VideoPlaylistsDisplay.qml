@@ -94,7 +94,6 @@ Widgets.PageLoader {
         id: componentAll
 
         PlaylistMediaList {
-            anchors.fill: parent
 
             isMusic: false
 
@@ -114,8 +113,6 @@ Widgets.PageLoader {
 
         PlaylistMediaDisplay {
             id: playlist
-
-            anchors.fill: parent
 
             isMusic: false
 
