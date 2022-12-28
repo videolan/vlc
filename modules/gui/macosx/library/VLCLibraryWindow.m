@@ -39,6 +39,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryNavigationStack.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
@@ -338,8 +339,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _mediaSourceTableViewScrollView.contentInsets = defaultInsets;
     _mediaSourceTableViewScrollView.scrollerInsets = scrollerInsets;
 
-    const CGFloat collectionItemSpacing = 20.;
-    const NSEdgeInsets collectionViewSectionInset = NSEdgeInsetsMake(20., 20., 20., 20.);
+    const CGFloat collectionItemSpacing = [VLCLibraryUIUnits largeSpacing];
+    const NSEdgeInsets collectionViewSectionInset = NSEdgeInsetsMake(collectionItemSpacing,
+                                                                     collectionItemSpacing,
+                                                                     collectionItemSpacing,
+                                                                     collectionItemSpacing);
 
     NSCollectionViewFlowLayout *audioLibraryCollectionViewLayout = _audioLibraryCollectionView.collectionViewLayout;
     audioLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;

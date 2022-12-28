@@ -24,4 +24,19 @@
 
 @implementation VLCLibraryUIUnits
 
++ (CGFloat)largeSpacing
+{
+    return 20;
+}
+
++ (CGFloat)standardSpacing
+{
+    return 10;
+}
+
++ (CGFloat)smallSpacing
+{
+    return 5;
+}
+
 @end

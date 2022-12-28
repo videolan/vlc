@@ -26,6 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryUIUnits : NSObject
 
++ (CGFloat)largeSpacing;
++ (CGFloat)standardSpacing;
++ (CGFloat)smallSpacing;
+
 @end
 
 NS_ASSUME_NONNULL_END
