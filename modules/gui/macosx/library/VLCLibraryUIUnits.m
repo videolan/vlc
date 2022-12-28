@@ -59,4 +59,15 @@
     return 25;
 }
 
++ (CGFloat)mediumDetailSupplementaryViewCollectionViewHeight
+{
+    return 300;
+}
+
++ (CGFloat)largeDetailSupplementaryViewCollectionViewHeight
+{
+    return 500;
+}
+
+
 @end

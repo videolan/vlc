@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (CGFloat)mediumTableViewRowHeight;
 + (CGFloat)smallTableViewRowHeight;
 
++ (CGFloat)mediumDetailSupplementaryViewCollectionViewHeight;
++ (CGFloat)largeDetailSupplementaryViewCollectionViewHeight;
+
 @end
 
 NS_ASSUME_NONNULL_END

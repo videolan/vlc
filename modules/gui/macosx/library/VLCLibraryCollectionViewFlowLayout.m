@@ -23,6 +23,7 @@
 #import "VLCLibraryCollectionViewFlowLayout.h"
 
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
@@ -34,10 +35,7 @@
 static const NSUInteger kAnimationSteps = 32;
 static const NSUInteger kWrapAroundValue = (NSUInteger)-1;
 
-static const CGFloat kDetailViewMargin = 8.;
 static const CGFloat kDetailViewCollapsedHeight = 0.;
-static const CGFloat kDetailViewDefaultExpandedHeight = 300.;
-static const CGFloat kDetailViewLargeExpandedHeight = 500.;
 
 typedef NS_ENUM(NSUInteger, VLCDetailViewAnimationType)
 {
@@ -85,8 +83,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     self = [super init];
     if (self) {
-        _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewDefaultExpandedHeight]];
-        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:kDetailViewLargeExpandedHeight]];
+        _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:[VLCLibraryUIUnits mediumDetailSupplementaryViewCollectionViewHeight]]];
+        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:[VLCLibraryUIUnits largeDetailSupplementaryViewCollectionViewHeight]]];
         
         _animationType = VLCExpandAnimationTypeDefault;
         _prevProvidedAnimationStep = 0;
@@ -275,8 +273,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         
         float selectedItemFrameMaxY = _selectedIndexPath == nil ? 0 : NSMaxY([[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame]);
         detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame),
-                                                selectedItemFrameMaxY + kDetailViewMargin,
-                                                self.collectionViewContentSize.width - 20.0,
+                                                selectedItemFrameMaxY + [VLCLibraryUIUnits mediumSpacing],
+                                                self.collectionViewContentSize.width - [VLCLibraryUIUnits largeSpacing],
                                                 [self currentAnimationStep]);
 
         return detailViewAttributes;
@@ -319,7 +317,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         NSRect selectedItemFrame = selectedItemLayoutAttributes.frame;
         
         if (NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
-            attributesFrame.origin.y += [self currentAnimationStep] + kDetailViewMargin;
+            attributesFrame.origin.y += [self currentAnimationStep] + [VLCLibraryUIUnits mediumSpacing];
         }
     }
 
