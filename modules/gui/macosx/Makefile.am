@@ -93,6 +93,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryTableView.m \
 	gui/macosx/library/VLCLibraryTableCellView.h \
 	gui/macosx/library/VLCLibraryTableCellView.m \
+	gui/macosx/library/VLCLibraryUIUnits.h \
+	gui/macosx/library/VLCLibraryUIUnits.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
