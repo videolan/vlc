@@ -26,6 +26,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerView.h"
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
@@ -90,7 +91,7 @@
     }
 
     _collectionsStackView = collectionsStackView;
-    _collectionsStackView.spacing = 20.;
+    _collectionsStackView.spacing = [VLCLibraryUIUnits largeSpacing];
     _collectionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
     _collectionsStackView.alignment = NSLayoutAttributeLeading;
     _collectionsStackView.distribution = NSStackViewDistributionFill;
