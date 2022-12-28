@@ -28,21 +28,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Note that these values are not necessarily linked to the layout defined in the .xib files.
 // If the spacing in the layout is changed you will want to change these values too.
-+ (CGFloat)largeSpacing;
-+ (CGFloat)mediumSpacing;
-+ (CGFloat)smallSpacing;
++ (const CGFloat)largeSpacing;
++ (const CGFloat)mediumSpacing;
++ (const CGFloat)smallSpacing;
 
-+ (CGFloat)scrollBarSmallSideSize;
++ (const CGFloat)scrollBarSmallSideSize;
 
-+ (CGFloat)largeTableViewRowHeight;
-+ (CGFloat)mediumTableViewRowHeight;
-+ (CGFloat)smallTableViewRowHeight;
++ (const CGFloat)largeTableViewRowHeight;
++ (const CGFloat)mediumTableViewRowHeight;
++ (const CGFloat)smallTableViewRowHeight;
 
-+ (CGFloat)mediumDetailSupplementaryViewCollectionViewHeight;
-+ (CGFloat)largeDetailSupplementaryViewCollectionViewHeight;
++ (const CGFloat)mediumDetailSupplementaryViewCollectionViewHeight;
++ (const CGFloat)largeDetailSupplementaryViewCollectionViewHeight;
 
-+ (CGFloat)dynamicCollectionViewItemMinimumSize;
-+ (CGFloat)dynamicCollectionViewItemMaximumSize;
++ (const CGFloat)dynamicCollectionViewItemMinimumSize;
++ (const CGFloat)dynamicCollectionViewItemMaximumSize;
 
 @end
 

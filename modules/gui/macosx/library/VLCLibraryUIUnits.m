@@ -24,57 +24,57 @@
 
 @implementation VLCLibraryUIUnits
 
-+ (CGFloat)largeSpacing
++ (const CGFloat)largeSpacing
 {
     return 20;
 }
 
-+ (CGFloat)mediumSpacing
++ (const CGFloat)mediumSpacing
 {
     return 10;
 }
 
-+ (CGFloat)smallSpacing
++ (const CGFloat)smallSpacing
 {
     return 5;
 }
 
-+ (CGFloat)scrollBarSmallSideSize
++ (const CGFloat)scrollBarSmallSideSize
 {
     return 16;
 }
 
-+ (CGFloat)largeTableViewRowHeight
++ (const CGFloat)largeTableViewRowHeight
 {
     return 100;
 }
 
-+ (CGFloat)mediumTableViewRowHeight
++ (const CGFloat)mediumTableViewRowHeight
 {
     return 50;
 }
 
-+ (CGFloat)smallTableViewRowHeight
++ (const CGFloat)smallTableViewRowHeight
 {
     return 25;
 }
 
-+ (CGFloat)mediumDetailSupplementaryViewCollectionViewHeight
++ (const CGFloat)mediumDetailSupplementaryViewCollectionViewHeight
 {
     return 300;
 }
 
-+ (CGFloat)largeDetailSupplementaryViewCollectionViewHeight
++ (const CGFloat)largeDetailSupplementaryViewCollectionViewHeight
 {
     return 500;
 }
 
-+ (CGFloat)dynamicCollectionViewItemMinimumSize
++ (const CGFloat)dynamicCollectionViewItemMinimumSize
 {
     return 180;
 }
 
-+ (CGFloat)dynamicCollectionViewItemMaximumSize
++ (const CGFloat)dynamicCollectionViewItemMaximumSize
 {
     return 280;
 }
