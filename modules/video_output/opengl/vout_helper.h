@@ -34,6 +34,11 @@
 #ifdef HAVE_LIBPLACEBO
 #include <libplacebo/shaders/colorspace.h>
 
+# if PL_MAJOR_VER >= 5
+# define pl_context_create pl_log_create
+# define pl_context_destroy pl_log_destroy
+# endif
+
 #define RENDER_INTENT_TEXT "Rendering intent for color conversion"
 #define RENDER_INTENT_LONGTEXT "The algorithm used to convert between color spaces"
 
