@@ -44,4 +44,19 @@
     return 16;
 }
 
++ (CGFloat)largeTableViewRowHeight
+{
+    return 100;
+}
+
++ (CGFloat)mediumTableViewRowHeight
+{
+    return 50;
+}
+
++ (CGFloat)smallTableViewRowHeight
+{
+    return 25;
+}
+
 @end

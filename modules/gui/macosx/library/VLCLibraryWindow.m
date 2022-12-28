@@ -65,10 +65,6 @@
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
-const CGFloat VLCLibraryWindowLargePlaylistRowHeight = 60.;
-const CGFloat VLCLibraryWindowSmallPlaylistRowHeight = 45.;
-const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
-const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
@@ -251,8 +247,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoTableViewDataSource.libraryModel = mainInstance.libraryController.libraryModel;
     _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
     _libraryVideoTableViewDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
-    _videoLibraryGroupsTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
-    _videoLibraryGroupSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
+    _videoLibraryGroupsTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _videoLibraryGroupSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     [_libraryVideoTableViewDataSource setup];
 
     _libraryVideoCollectionViewsStackViewController = [[VLCLibraryVideoCollectionViewsStackViewController alloc] init];
@@ -260,7 +256,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoCollectionViewsStackViewController.collectionsStackView = _videoLibraryCollectionViewsStackView;
 
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
-    _audioCollectionSelectionTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
+    _audioCollectionSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
 
     _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
@@ -269,7 +265,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _mediaSourceDataSource.homeButton = _mediaSourceHomeButton;
     _mediaSourceDataSource.pathControl = _mediaSourcePathControl;
     _mediaSourceDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
-    _mediaSourceTableView.rowHeight = VLCLibraryWindowLargeRowHeight;
+    _mediaSourceTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _mediaSourceDataSource.tableView = _mediaSourceTableView;
     [_mediaSourceDataSource setupViews];
 
@@ -428,7 +424,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)updateViewCellDimensionsBasedOnSetting:(NSNotification *)aNotification
 {
-    _playlistTableView.rowHeight = config_GetInt("macosx-large-text") ? VLCLibraryWindowLargePlaylistRowHeight : VLCLibraryWindowSmallPlaylistRowHeight;
+    _playlistTableView.rowHeight = config_GetInt("macosx-large-text") ?
+        [VLCLibraryUIUnits largeTableViewRowHeight] :
+        [VLCLibraryUIUnits mediumTableViewRowHeight];
 }
 
 #pragma mark - playmode state display and interaction

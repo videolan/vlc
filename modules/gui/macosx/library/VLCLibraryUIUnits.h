@@ -32,6 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (CGFloat)scrollBarSmallSideSize;
 
++ (CGFloat)largeTableViewRowHeight;
++ (CGFloat)mediumTableViewRowHeight;
++ (CGFloat)smallTableViewRowHeight;
+
 @end
 
 NS_ASSUME_NONNULL_END
