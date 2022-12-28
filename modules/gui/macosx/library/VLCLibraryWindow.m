@@ -291,7 +291,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     const CGFloat scrollViewLeftInset = 16.;
 
     // Need to account for the audio collection switcher at the top
-    const CGFloat audioScrollViewTopInset = scrollViewTopInset + 32.;
+    const CGFloat audioScrollViewTopInset = scrollViewTopInset + _optionBarView.frame.size.height;
 
     const NSEdgeInsets defaultInsets = NSEdgeInsetsMake(scrollViewTopInset,
                                                         scrollViewLeftInset,
