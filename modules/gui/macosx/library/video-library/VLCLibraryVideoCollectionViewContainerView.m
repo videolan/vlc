@@ -25,6 +25,7 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
@@ -200,7 +201,7 @@
     }
 
     if (_groupDescriptor.isHorizontalBarCollectionView) {
-        const CGFloat viewHeight = itemHeight + insetsHeight + 15; // Account for horizontal scrollbar
+        const CGFloat viewHeight = itemHeight + insetsHeight + [VLCLibraryUIUnits scrollBarSmallSideSize];
         return NSMakeSize(width, viewHeight);
     }
 
