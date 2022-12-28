@@ -272,9 +272,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                   elementKind);
         
         float selectedItemFrameMaxY = _selectedIndexPath == nil ? 0 : NSMaxY([[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame]);
-        detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame),
+        detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame) + self.minimumInteritemSpacing,
                                                 selectedItemFrameMaxY + [VLCLibraryUIUnits mediumSpacing],
-                                                self.collectionViewContentSize.width - [VLCLibraryUIUnits largeSpacing],
+                                                self.collectionViewContentSize.width - (self.minimumInteritemSpacing * 2),
                                                 [self currentAnimationStep]);
 
         return detailViewAttributes;
