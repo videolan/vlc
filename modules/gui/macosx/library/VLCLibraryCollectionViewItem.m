@@ -23,13 +23,17 @@
 #import "VLCLibraryCollectionViewItem.h"
 
 #import "main/VLCMain.h"
+
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryUIUnits.h"
+
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
 #import "views/VLCTrackingView.h"
+
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
@@ -50,7 +54,17 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 + (NSSize)defaultSize
 {
-    return CGSizeMake(214., 246.);
+    CGFloat width = 214;
+    return CGSizeMake(width, width + [self bottomTextViewsHeight]);
+}
+
++ (CGFloat)bottomTextViewsHeight
+{
+    return [VLCLibraryUIUnits smallSpacing] +
+           16 +
+           [VLCLibraryUIUnits smallSpacing] +
+           16 +
+           [VLCLibraryUIUnits smallSpacing];
 }
 
 - (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil

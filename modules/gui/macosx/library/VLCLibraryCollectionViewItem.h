@@ -32,7 +32,9 @@ extern NSString *VLCLibraryCellIdentifier;
 
 @interface VLCLibraryCollectionViewItem : NSCollectionViewItem
 
+// NOTE: These will need to be changed after changed to XIB
 + (NSSize)defaultSize;
++ (CGFloat)bottomTextViewsHeight;
 
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *annotationTextField;

@@ -41,6 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (CGFloat)mediumDetailSupplementaryViewCollectionViewHeight;
 + (CGFloat)largeDetailSupplementaryViewCollectionViewHeight;
 
++ (CGFloat)dynamicCollectionViewItemMinimumSize;
++ (CGFloat)dynamicCollectionViewItemMaximumSize;
+
 @end
 
 NS_ASSUME_NONNULL_END

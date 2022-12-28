@@ -69,5 +69,14 @@
     return 500;
 }
 
++ (CGFloat)dynamicCollectionViewItemMinimumSize
+{
+    return 180;
+}
+
++ (CGFloat)dynamicCollectionViewItemMaximumSize
+{
+    return 280;
+}
 
 @end

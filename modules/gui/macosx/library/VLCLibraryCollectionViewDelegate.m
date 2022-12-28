@@ -26,6 +26,7 @@
 #import "VLCLibraryCollectionViewFlowLayout.h"
 #import "VLCLibraryCollectionViewItem.h"
 #import "VLCLibraryDataTypes.h"
+#import "VLCLibraryUIUnits.h"
 
 @implementation VLCLibraryCollectionViewDelegate
 
@@ -86,22 +87,19 @@
 - (NSSize)adjustedItemSizeForCollectionView:(NSCollectionView *)collectionView
                                  withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
 {
-    static const CGFloat maxItemWidth = 280;
-    static const CGFloat minItemWidth = 180;
-
     static uint numItemsInRow = 5;
 
     NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                            withLayout:collectionViewLayout
                                withNumberOfItemsInRow:numItemsInRow];
 
-    while (itemSize.width > maxItemWidth) {
+    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumSize]) {
         ++numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
                             withNumberOfItemsInRow:numItemsInRow];
     }
-    while (itemSize.width < minItemWidth) {
+    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumSize]) {
         --numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
@@ -129,7 +127,7 @@
                                      1);
 
     const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
-    return NSMakeSize(itemWidth, itemWidth + 46); // Text fields height needed
+    return NSMakeSize(itemWidth, itemWidth + [VLCLibraryCollectionViewItem bottomTextViewsHeight]);
 }
 
 - (BOOL)collectionView:(NSCollectionView *)collectionView
