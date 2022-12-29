@@ -41,7 +41,7 @@ T.Control {
     // Aliases
     // Private
 
-    readonly property bool _isHover: contentItem.containsMouse
+    readonly property bool _isHover: contentItem.containsMouse || root.activeFocus
 
     // Signals
 
