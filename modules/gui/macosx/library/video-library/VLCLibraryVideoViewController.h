@@ -23,6 +23,8 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCLibraryWindow;
+@class VLCLibraryVideoTableViewDataSource;
+@class VLCLibraryVideoCollectionViewsStackViewController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,6 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
+
+@property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoTableViewDataSource;
+@property (readonly) VLCLibraryVideoCollectionViewsStackViewController *libraryVideoCollectionViewsStackViewController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

@@ -22,7 +22,14 @@
 
 #import "VLCLibraryVideoViewController.h"
 
+#import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryWindow.h"
+
+#import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
+#import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
+
+#import "main/VLCMain.h"
 
 @implementation VLCLibraryVideoViewController
 
@@ -32,6 +39,8 @@
 
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupTableViewDataSource];
+        [self setupGridViewController];
     }
 
     return self;
@@ -57,7 +66,23 @@
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
+}
 
+- (void)setupTableViewDataSource
+{
+    _libraryVideoTableViewDataSource = [[VLCLibraryVideoTableViewDataSource alloc] init];
+    _libraryVideoTableViewDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    _libraryVideoTableViewDataSource.groupsTableView = _videoLibraryGroupsTableView;
+    _libraryVideoTableViewDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+
+    [_libraryVideoTableViewDataSource setup];
+}
+
+- (void)setupGridViewController
+{
+    _libraryVideoCollectionViewsStackViewController = [[VLCLibraryVideoCollectionViewsStackViewController alloc] init];
+    _libraryVideoCollectionViewsStackViewController.collectionsStackViewScrollView = _videoLibraryCollectionViewsStackViewScrollView;
+    _libraryVideoCollectionViewsStackViewController.collectionsStackView = _videoLibraryCollectionViewsStackView;
 }
 
 @end
