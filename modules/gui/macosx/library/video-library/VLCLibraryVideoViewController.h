@@ -22,9 +22,31 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCLibraryWindow;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoViewController : NSObject
+
+@property (readonly) NSView *libraryTargetView;
+@property (readonly) NSView *videoLibraryView;
+@property (readonly) NSSplitView *videoLibrarySplitView;
+@property (readonly) NSScrollView *videoLibraryCollectionViewsStackViewScrollView;
+@property (readonly) NSStackView *videoLibraryCollectionViewsStackView;
+@property (readonly) NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
+@property (readonly) NSTableView *videoLibraryGroupSelectionTableView;
+@property (readonly) NSScrollView *videoLibraryGroupsTableViewScrollView;
+@property (readonly) NSTableView *videoLibraryGroupsTableView;
+@property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
+@property (readonly) NSButton *librarySortButton;
+@property (readonly) NSSearchField *librarySearchField;
+@property (readonly) NSVisualEffectView *optionBarView;
+@property (readonly) NSImageView *placeholderImageView;
+@property (readonly) NSTextField *placeholderLabel;
+@property (readonly) NSView *emptyLibraryView;
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+
 
 @end
 

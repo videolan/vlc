@@ -22,6 +22,42 @@
 
 #import "VLCLibraryVideoViewController.h"
 
+#import "library/VLCLibraryWindow.h"
+
 @implementation VLCLibraryVideoViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super init];
+
+    if(self) {
+        [self setupPropertiesFromLibraryWindow:libraryWindow];
+    }
+
+    return self;
+}
+
+- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    NSParameterAssert(libraryWindow);
+    _libraryTargetView = libraryWindow.libraryTargetView;
+    _videoLibraryView = libraryWindow.videoLibraryView;
+    _videoLibrarySplitView = libraryWindow.videoLibrarySplitView;
+    _videoLibraryCollectionViewsStackViewScrollView = libraryWindow.videoLibraryCollectionViewsStackViewScrollView;
+    _videoLibraryCollectionViewsStackView = libraryWindow.videoLibraryCollectionViewsStackView;
+    _videoLibraryGroupSelectionTableViewScrollView = libraryWindow.videoLibraryGroupSelectionTableViewScrollView;
+    _videoLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
+    _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
+    _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
+
+    _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
+    _optionBarView = libraryWindow.optionBarView;
+    _librarySortButton = libraryWindow.librarySortButton;
+    _librarySearchField = libraryWindow.librarySearchField;
+    _placeholderImageView = libraryWindow.placeholderImageView;
+    _placeholderLabel = libraryWindow.placeholderLabel;
+    _emptyLibraryView = libraryWindow.emptyLibraryView;
+
+}
 
 @end
