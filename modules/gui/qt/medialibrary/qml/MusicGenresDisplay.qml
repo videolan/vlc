@@ -89,7 +89,8 @@ Widgets.PageLoader {
 
             header: Widgets.SubtitleLabel {
                 text: I18n.qtr("Genres - %1").arg(genreName)
-                leftPadding: (albumsView.gridViewRowX || VLCStyle.margin_large)
+                leftPadding: albumsView.contentLeftMargin
+                rightPadding: albumsView.contentRightMargin
                 topPadding: VLCStyle.margin_large
                 bottomPadding: VLCStyle.margin_normal
                 width: root.width

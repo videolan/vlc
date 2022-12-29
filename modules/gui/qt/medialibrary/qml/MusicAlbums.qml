@@ -57,6 +57,9 @@ FocusScope {
     property alias model: albumModelId
     property alias parentId: albumModelId.parentId
 
+    readonly property int contentLeftMargin: _currentView ? _currentView.contentLeftMargin : 0
+    readonly property int contentRightMargin: _currentView ? _currentView.contentRightMargin : 0
+
     property alias _currentView: view.currentItem
 
     onInitialIndexChanged:  resetFocus()
