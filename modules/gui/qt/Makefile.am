@@ -917,7 +917,6 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ControlButtonPopup.qml \
-	gui/qt/player/qml/controlbarcontrols/ControlCheckButton.qml \
 	gui/qt/player/qml/controlbarcontrols/DvdMenuButton.qml \
 	gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml \

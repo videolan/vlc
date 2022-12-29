@@ -75,11 +75,10 @@ T.Pane {
                 color: theme.fg.primary
             }
 
-            ControlCheckButton {
+            Widgets.CheckButton {
                 id: teleActivateBtn
 
                 anchors.right: parent.right
-
                 anchors.verticalCenter: parent.verticalCenter
 
                 focus: true
