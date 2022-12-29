@@ -122,23 +122,5 @@ T.ToolButton {
         font.underline: control.font.underline
 
         Accessible.ignored: true
-
-        T.Label {
-            anchors.centerIn: parent
-
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-
-            visible: !paintOnly && control.checked
-
-            text: VLCIcons.active_indicator
-
-            color: background ? background.foregroundColor : control.color
-
-            font.pixelSize: control.size
-            font.family: VLCIcons.fontFamily
-
-            Accessible.ignored: true
-        }
     }
 }
