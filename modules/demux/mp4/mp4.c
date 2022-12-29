@@ -3213,6 +3213,60 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
     return i_ret;
 }
 
+static int STTSToSampleChunk(const mp4_track_t *p_track, uint64_t i_dts,
+                             uint32_t *pi_chunk, uint32_t *pi_sample)
+{
+    const mp4_chunk_t *ck;
+    for( unsigned int i_chunk = 0; ; i_chunk++ )
+    {
+        if( i_chunk + 1 >= p_track->i_chunk_count )
+        {
+            /* at the end and can't check if i_start in this chunk,
+               it will be check while searching i_sample */
+            ck = &p_track->chunk[p_track->i_chunk_count - 1];
+            break;
+        }
+
+        if( (uint64_t)i_dts >= p_track->chunk[i_chunk].i_first_dts &&
+            (uint64_t)i_dts <  p_track->chunk[i_chunk + 1].i_first_dts )
+        {
+            ck = &p_track->chunk[i_chunk];
+            break;
+        }
+    }
+
+    /* *** find sample in the chunk *** */
+    uint32_t i_sample = ck->i_sample_first;
+    uint64_t i_entrydts = ck->i_first_dts;
+
+    for( uint_fast32_t i = 0;
+         i < ck->i_entries_dts && i_sample < ck->i_sample_count;
+         i++ )
+    {
+        uint64_t i_entry_duration = ck->p_sample_count_dts[i] * (uint64_t)
+                                    ck->p_sample_delta_dts[i];
+        if( i_entrydts + i_entry_duration < i_dts )
+        {
+            i_entrydts += i_entry_duration;
+            i_sample += ck->p_sample_count_dts[i];
+        }
+        else
+        {
+            if( ck->p_sample_delta_dts[i] > 0 )
+                i_sample += ( i_dts - i_entrydts ) / ck->p_sample_delta_dts[i];
+            break;
+        }
+    }
+
+    *pi_chunk = ck - p_track->chunk;
+    *pi_sample = i_sample;
+
+    if( i_sample >= p_track->i_sample_count )
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
 /* given a time it return sample/chunk
  * it also update elst field of the track
  */
@@ -3221,9 +3275,6 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
                                    uint32_t *pi_sample )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint64_t     i_dts;
-    unsigned int i_sample;
-    unsigned int i_chunk;
     stime_t      i_start;
 
     /* FIXME see if it's needed to check p_track->i_chunk_count */
@@ -3267,60 +3318,12 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
         i_start = MP4_rescale_qtime( start, p_track->i_timescale );
     }
 
-    /* we start from sample 0/chunk 0, hope it won't take too much time */
     /* *** find good chunk *** */
-    for( i_chunk = 0; ; i_chunk++ )
-    {
-        if( i_chunk + 1 >= p_track->i_chunk_count )
-        {
-            /* at the end and can't check if i_start in this chunk,
-               it will be check while searching i_sample */
-            i_chunk = p_track->i_chunk_count - 1;
-            break;
-        }
-
-        if( (uint64_t)i_start >= p_track->chunk[i_chunk].i_first_dts &&
-            (uint64_t)i_start <  p_track->chunk[i_chunk + 1].i_first_dts )
-        {
-            break;
-        }
-    }
-
-    /* *** find sample in the chunk *** */
-    i_sample = p_track->chunk[i_chunk].i_sample_first;
-    i_dts    = p_track->chunk[i_chunk].i_first_dts;
-
-    for( uint_fast32_t i_index = 0;
-         i_index < p_track->chunk[i_chunk].i_entries_dts &&
-         i_sample < p_track->chunk[i_chunk].i_sample_count;
-         i_index++ )
-    {
-        if( i_dts +
-            (uint64_t)p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
-            p_track->chunk[i_chunk].p_sample_delta_dts[i_index] < (uint64_t)i_start )
-        {
-            i_dts    +=
-                (uint64_t)p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
-                p_track->chunk[i_chunk].p_sample_delta_dts[i_index];
-
-            i_sample += p_track->chunk[i_chunk].p_sample_count_dts[i_index];
-        }
-        else
-        {
-            if( p_track->chunk[i_chunk].p_sample_delta_dts[i_index] <= 0 )
-            {
-                break;
-            }
-            i_sample += ( i_start - i_dts ) /
-                p_track->chunk[i_chunk].p_sample_delta_dts[i_index];
-            break;
-        }
-    }
-
-    if( i_sample >= p_track->i_sample_count )
+    uint32_t i_sample, i_chunk;
+    if( STTSToSampleChunk( p_track, i_start, &i_chunk, &i_sample ) != VLC_SUCCESS )
     {
         msg_Warn( p_demux, "track[Id 0x%x] will be disabled "
-                  "(seeking too far) chunk=%d sample=%d",
+                  "(seeking too far) chunk=%"PRIu32" sample=%"PRIu32,
                   p_track->i_track_ID, i_chunk, i_sample );
         return( VLC_EGENERIC );
     }
