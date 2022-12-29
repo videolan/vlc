@@ -245,14 +245,14 @@ FocusScope {
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView.availableRowWidth)
             readonly property int _nameColSpan: Math.max((_nbCols - 1) / 2, 1)
-            property Component thumbnailHeader: Item {
-                Widgets.IconLabel {
-                    height: VLCStyle.listAlbumCover_height
-                    width: VLCStyle.listAlbumCover_width
-                    horizontalAlignment: Text.AlignHCenter
-                    text: VLCIcons.album_cover
-                    color: VLCStyle.colors.caption
-                }
+            property Component thumbnailHeader: Widgets.IconLabel {
+                height: VLCStyle.listAlbumCover_height
+                width: VLCStyle.listAlbumCover_width
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: VLCStyle.icon_tableHeader
+                text: VLCIcons.album_cover
+                color: VLCStyle.colors.caption
             }
 
             property Component thumbnailColumn: NetworkThumbnailItem {

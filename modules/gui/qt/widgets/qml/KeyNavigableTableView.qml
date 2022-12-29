@@ -35,6 +35,9 @@ FocusScope {
     property var sortModel: []
 
     property Component tableHeaderDelegate: Widgets.CaptionLabel {
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+
         text: model.text || ""
     }
 
@@ -291,8 +294,8 @@ FocusScope {
             Column {
                 id: col
 
-                width: parent.width
-                height: implicitHeight
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 Loader {
                     id: headerLoader
@@ -317,13 +320,16 @@ FocusScope {
                     Repeater {
                         model: sortModel
                         MouseArea {
-                            height: childrenRect.height
 
+                            height: VLCStyle.dp(20, VLCStyle.scale)
                             width: VLCStyle.colWidth(modelData.size) || 1
 
                             //Layout.alignment: Qt.AlignVCenter
 
                             Loader {
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+
                                 property var model: modelData.model
 
                                 sourceComponent: model.headerDelegate || root.tableHeaderDelegate
@@ -335,6 +341,8 @@ FocusScope {
                                 font.pixelSize: VLCStyle.fontSize_normal
                                 color: VLCStyle.colors.accent
                                 anchors {
+                                    top: parent.top
+                                    bottom: parent.bottom
                                     right: parent.right
                                     leftMargin: VLCStyle.margin_xsmall
                                     rightMargin: VLCStyle.margin_xsmall

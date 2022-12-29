@@ -34,6 +34,9 @@ Widgets.KeyNavigableTableView {
     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(
                                        listView_id.availableRowWidth)
     property Component urlHeaderDelegate: Widgets.IconLabel {
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: VLCStyle.icon_tableHeader
         text: VLCIcons.history
         color: VLCStyle.colors.caption
     }

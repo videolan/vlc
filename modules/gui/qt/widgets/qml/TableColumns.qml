@@ -187,13 +187,20 @@ Item {
 
         Widgets.IconLabel {
             width: root.titleCover_width
+            height: parent.height
             horizontalAlignment: Text.AlignHCenter
-            text: VLCIcons.album_cover
+            verticalAlignment: Text.AlignVCenter
             font.pixelSize: VLCStyle.icon_tableHeader
             color: VLCStyle.colors.caption
+
+            text: VLCIcons.album_cover
         }
 
         Widgets.CaptionLabel {
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            height: parent.height
+
             text: titleHeadDel.model
                     ? titleHeadDel.model.text || ""
                     : ""
@@ -204,6 +211,7 @@ Item {
     property Component timeHeaderDelegate: Widgets.IconLabel {
         width: timeTextMetric.width
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         text: VLCIcons.time
         font.pixelSize: VLCStyle.icon_tableHeader
         color: VLCStyle.colors.caption

@@ -321,15 +321,14 @@ FocusScope {
             Component {
                 id: artworkHeader
 
-                Item {
-                    Widgets.IconLabel {
-                        width: VLCStyle.listAlbumCover_width
-                        height: VLCStyle.listAlbumCover_height
+                Widgets.IconLabel {
+                    text: VLCIcons.album_cover
 
-                        horizontalAlignment: Text.AlignHCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: VLCStyle.icon_tableHeader
 
-                        color: VLCStyle.colors.caption
-                    }
+                    color: parent.foregroundColor
                 }
             }
 
