@@ -28,25 +28,9 @@ StackView {
 
     property string _currentView: ""
 
-    replaceEnter: Transition {
-        PropertyAnimation {
-            property: "opacity"
-            from: 0.0
-            to: 1.0
-            duration: VLCStyle.duration_long
-            easing.type: Easing.InSine
-        }
-    }
+    replaceEnter: null
 
-    replaceExit: Transition {
-        PropertyAnimation {
-            property: "opacity"
-            from: 1.0
-            to: 0.0
-            duration: VLCStyle.duration_long
-            easing.type: Easing.OutSine
-        }
-    }
+    replaceExit: null
 
     /**
      * viewModel: model with the definition of the available view
