@@ -36,9 +36,9 @@ FocusScope {
     // Properties
     //---------------------------------------------------------------------------------------------
 
-    readonly property int currentIndex: _currentView.currentIndex
-
     property bool isMusic: false
+
+    readonly property int currentIndex: _currentView.currentIndex
 
     property int initialIndex: 0
 
@@ -65,6 +65,9 @@ FocusScope {
     //---------------------------------------------------------------------------------------------
     // Alias
     //---------------------------------------------------------------------------------------------
+
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
 
     property alias model: model
 

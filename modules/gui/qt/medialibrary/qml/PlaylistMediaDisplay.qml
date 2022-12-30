@@ -36,6 +36,9 @@ FocusScope {
 
     readonly property bool isViewMultiView: false
 
+    property int leftPadding: 0
+    property int rightPadding: 0
+
     readonly property int currentIndex: view.currentIndex
 
     // NOTE: We need 'var' for properties altered by StackView.replace().
