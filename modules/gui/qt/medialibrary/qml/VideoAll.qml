@@ -58,6 +58,9 @@ FocusScope {
 
     // Aliases
 
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
+
     property alias dragItem: dragItem
 
     // Private
