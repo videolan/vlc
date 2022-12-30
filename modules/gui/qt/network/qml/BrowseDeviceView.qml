@@ -72,6 +72,9 @@ FocusScope {
 
     // Aliases
 
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
+
     property alias modelFilter: modelFilter
 
     property alias sourceModel: modelFilter.sourceModel

@@ -31,6 +31,11 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
+    // Properties
+
+    property int leftPadding: 0
+    property int rightPadding: 0
+
     property int maximumRows: (MainCtx.gridView) ? 2 : 5
 
     property var sortModel: [
@@ -38,13 +43,17 @@ FocusScope {
         { text: I18n.qtr("Url"),        criteria: "mrl" }
     ]
 
+    // Aliases
+
     property alias model: foldersSection.model
 
-    focus: true
+    // Signals
 
     signal seeAll(var title, var sd_source, int reason)
 
     signal browse(var tree, int reason)
+
+    focus: true
 
     Component.onCompleted: resetFocus()
     onActiveFocusChanged: resetFocus()
@@ -101,7 +110,12 @@ FocusScope {
 
     ScrollView {
         id: flickable
+
         anchors.fill: parent
+
+        anchors.leftMargin: root.leftPadding
+        anchors.rightMargin: root.rightPadding
+
         focus: true
 
         Column {

@@ -29,7 +29,8 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property alias model: filterModel
+    // Properties
+
     property var providerModel
     property var contextMenu
     property var tree
@@ -46,6 +47,13 @@ FocusScope {
         { text: I18n.qtr("File size"), criteria: "fileSizeRaw64" },
         { text: I18n.qtr("File modified"), criteria: "fileModified" }
     ]
+
+    // Aliases
+
+    property alias leftPadding: view.leftPadding
+    property alias rightPadding: view.rightPadding
+
+    property alias model: filterModel
 
     property alias _currentView: view.currentItem
 
@@ -346,7 +354,8 @@ FocusScope {
     Widgets.StackViewExt {
         id: view
 
-        anchors.fill:parent
+        anchors.fill: parent
+
         focus: true
         initialItem: MainCtx.gridView ? gridComponent : tableComponent
 
