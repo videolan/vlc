@@ -44,8 +44,6 @@ FocusScope {
 
     onInitialIndexChanged:  resetFocus()
 
-    Component.onCompleted: loadView()
-
     function loadView() {
         if (MainCtx.gridView) {
             view.replace(gridComponent)
