@@ -325,7 +325,7 @@ FocusScope {
                             name: "expanded"
                             PropertyChanges {
                                 target: playlistColumn
-                                width: playlistColumn.implicitWidth
+                                width: Math.round(playlistColumn.implicitWidth)
                                 visible: true
                             }
                         }
