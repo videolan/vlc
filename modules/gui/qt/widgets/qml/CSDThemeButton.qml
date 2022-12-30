@@ -45,7 +45,7 @@ T.AbstractButton {
 
         bannerHeight: control.bannerHeight
 
-        theme: VLCStyle.theme
+        theme: VLCStyle.palette
 
         windowMaximized: MainCtx.intfMainWindow.visibility === Window.Maximized
         windowActive: MainCtx.intfMainWindow.active

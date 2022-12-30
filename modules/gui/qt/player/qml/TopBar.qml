@@ -356,11 +356,11 @@ FocusScope{
         active: root.showCSD
         enabled: root.showCSD
         visible: root.showCSD
-        source:  VLCStyle.theme.hasCSDImage
+        source:  VLCStyle.palette.hasCSDImage
             ? "qrc:///widgets/CSDThemeButtonSet.qml"
             : "qrc:///widgets/CSDWindowButtonSet.qml"
         onLoaded: {
-            if (VLCStyle.theme.hasCSDImage) {
+            if (VLCStyle.palette.hasCSDImage) {
                 if (item.hasOwnProperty("color"))
                     item.color = Qt.binding(function() { return VLCStyle.colors.topBanner })
             } else {

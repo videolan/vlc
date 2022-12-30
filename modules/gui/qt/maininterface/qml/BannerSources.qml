@@ -206,7 +206,7 @@ FocusScope {
                     }
                     height: VLCStyle.globalToolbar_height
                     active: root._showCSD
-                    source: VLCStyle.theme.hasCSDImage
+                    source: VLCStyle.palette.hasCSDImage
                               ? "qrc:///widgets/CSDThemeButtonSet.qml"
                               : "qrc:///widgets/CSDWindowButtonSet.qml"
                 }
