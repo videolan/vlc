@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryAudioViewController : NSObject
 
+@property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *audioLibraryView;
 @property (readonly) NSSplitView *audioLibrarySplitView;

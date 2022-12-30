@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoViewController : NSObject
 
+@property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *videoLibraryView;
 @property (readonly) NSSplitView *videoLibrarySplitView;
@@ -49,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCLibraryVideoTableViewDataSource *libraryVideoTableViewDataSource;
 @property (readonly) VLCLibraryVideoCollectionViewsStackViewController *libraryVideoCollectionViewsStackViewController;
+
+@property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

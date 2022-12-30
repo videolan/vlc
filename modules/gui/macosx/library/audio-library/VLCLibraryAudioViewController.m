@@ -22,15 +22,20 @@
 
 #import "VLCLibraryAudioViewController.h"
 
-#import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryWindow.h"
+
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
+
+#import "library/video-library/VLCLibraryVideoViewController.h"
+
+#import "main/VLCMain.h"
 
 @interface VLCLibraryAudioViewController()
 {
@@ -62,8 +67,9 @@
 
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow*)libraryWindow
 {
-    NSAssert(libraryWindow, @"Cannot setup audio view controller with invalid library window");
+    NSParameterAssert(libraryWindow);
 
+    _libraryWindow = libraryWindow;
     _libraryTargetView = libraryWindow.libraryTargetView;
     _audioLibraryView = libraryWindow.audioLibraryView;
     _audioLibrarySplitView = libraryWindow.audioLibrarySplitView;
@@ -193,7 +199,7 @@
 
 - (void)presentPlaceholderAudioView
 {
-    for (NSLayoutConstraint *constraint in [VLCMain sharedInstance].libraryWindow.videoPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint *constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
     for (NSLayoutConstraint *constraint in _audioPlaceholderImageViewSizeConstraints) {

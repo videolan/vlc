@@ -125,8 +125,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCFSPanelController *fspanel;
 
-@property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
-
 - (void)videoPlaybackWillBeStarted;
 - (void)reopenVideoView;
 - (void)togglePlaylist;

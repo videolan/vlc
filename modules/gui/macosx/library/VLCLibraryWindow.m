@@ -70,9 +70,6 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-static NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
-static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
-
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
     NSRect _windowFrameBeforePlayback;
@@ -144,23 +141,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
-    
-    _videoPlaceholderImageViewSizeConstraints = @[
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
-                                     attribute:NSLayoutAttributeWidth
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:nil
-                                     attribute:NSLayoutAttributeNotAnAttribute
-                                    multiplier:0.f
-                                      constant:182.f],
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
-                                     attribute:NSLayoutAttributeHeight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:nil
-                                     attribute:NSLayoutAttributeNotAnAttribute
-                                    multiplier:0.f
-                                      constant:114.f],
-    ];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
     [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
@@ -525,7 +505,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         for (NSLayoutConstraint *constraint in _libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
             constraint.active = NO;
         }
-        for (NSLayoutConstraint *constraint in _videoPlaceholderImageViewSizeConstraints) {
+        for (NSLayoutConstraint *constraint in _libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
             constraint.active = YES;
         }
         

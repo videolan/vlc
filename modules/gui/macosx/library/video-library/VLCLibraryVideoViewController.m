@@ -26,6 +26,8 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryWindow.h"
 
+#import "library/audio-library/VLCLibraryAudioViewController.h"
+
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
 
@@ -41,6 +43,7 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupTableViewDataSource];
         [self setupGridViewController];
+        [self setupVideoPlaceholderView];
     }
 
     return self;
@@ -49,6 +52,7 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);
+    _libraryWindow = libraryWindow;
     _libraryTargetView = libraryWindow.libraryTargetView;
     _videoLibraryView = libraryWindow.videoLibraryView;
     _videoLibrarySplitView = libraryWindow.videoLibrarySplitView;
@@ -83,6 +87,26 @@
     _libraryVideoCollectionViewsStackViewController = [[VLCLibraryVideoCollectionViewsStackViewController alloc] init];
     _libraryVideoCollectionViewsStackViewController.collectionsStackViewScrollView = _videoLibraryCollectionViewsStackViewScrollView;
     _libraryVideoCollectionViewsStackViewController.collectionsStackView = _videoLibraryCollectionViewsStackView;
+}
+
+- (void)setupVideoPlaceholderView
+{
+    _videoPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:182.f],
+        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:114.f],
+    ];
 }
 
 @end
