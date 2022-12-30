@@ -31,6 +31,9 @@ FocusScope {
     // one may use `loadPage(string pageName)` to load the page from 'pageModel'
     property var loadDefaultView: null
 
+    property alias leftPadding: stackView.leftPadding
+    property alias rightPadding: stackView.rightPadding
+
     property alias stackView: stackView
 
     signal pageChanged(string page)
