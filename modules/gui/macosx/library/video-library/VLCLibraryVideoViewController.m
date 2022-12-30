@@ -22,6 +22,8 @@
 
 #import "VLCLibraryVideoViewController.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryWindow.h"
@@ -107,6 +109,54 @@
                                     multiplier:0.f
                                       constant:114.f],
     ];
+}
+
+
+#pragma mark - Show the video library view
+
+- (void)presentVideoLibraryView
+{
+    for (NSView *subview in _libraryTargetView.subviews) {
+        [subview removeFromSuperview];
+    }
+
+    if (_libraryVideoTableViewDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
+        for (NSLayoutConstraint *constraint in _libraryWindow.libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
+            constraint.active = NO;
+        }
+        for (NSLayoutConstraint *constraint in _videoPlaceholderImageViewSizeConstraints) {
+            constraint.active = YES;
+        }
+
+        _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_emptyLibraryView];
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+
+        _placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
+        _placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
+    } else {
+        _videoLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_videoLibraryView];
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+
+        if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+            _videoLibrarySplitView.hidden = YES;
+            _videoLibraryCollectionViewsStackViewScrollView.hidden = NO;
+            [_libraryVideoCollectionViewsStackViewController reloadData];
+        } else {
+            _videoLibrarySplitView.hidden = NO;
+            _videoLibraryCollectionViewsStackViewScrollView.hidden = YES;
+            [_libraryVideoTableViewDataSource reloadData];
+        }
+    }
+
+    _librarySortButton.hidden = NO;
+    _librarySearchField.enabled = YES;
+    _optionBarView.hidden = YES;
 }
 
 @end

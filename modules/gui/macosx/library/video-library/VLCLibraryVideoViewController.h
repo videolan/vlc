@@ -54,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+- (void)presentVideoLibraryView;
 
 
 @end
