@@ -28,6 +28,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Controller for the video library views
+
 @interface VLCLibraryVideoViewController : NSObject
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
@@ -54,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
-- (void)presentVideoLibraryView;
+- (void)presentVideoView;
 
 
 @end

@@ -497,7 +497,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showVideoLibrary
 {
-    [_libraryVideoViewController presentVideoLibraryView];
+    [_libraryVideoViewController presentVideoView];
 
     self.gridVsListSegmentedControl.target = self;
     self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
