@@ -149,11 +149,6 @@ typedef struct
     uint32_t         *p_sample_size; /* XXX perhaps add file offset if take
 //                                    too much time to do sumations each time*/
 
-    uint32_t     i_sample_first; /* i_sample_first value
-                                                   of the next chunk */
-    uint64_t     i_first_dts;    /* i_first_dts value
-                                                   of the next chunk */
-
     const MP4_Box_t *p_track;
     const MP4_Box_t *p_stbl;  /* will contain all timing information */
     const MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
