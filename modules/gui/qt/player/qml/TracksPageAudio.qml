@@ -70,7 +70,7 @@ TracksPage {
                 color: "white"
             }
 
-            Widgets.TransparentSpinBox {
+            Widgets.SpinBoxExt {
                 id: spinBox
 
                 property bool update: false
@@ -79,6 +79,7 @@ TracksPage {
 
                 stepSize: 50
                 from: -10000
+                to: 10000
 
                 textFromValue: root.textFromValue
                 valueFromText: root.valueFromText

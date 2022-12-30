@@ -78,7 +78,7 @@ TracksPage {
                 color: "white"
             }
 
-            Widgets.TransparentSpinBox {
+            Widgets.SpinBoxExt {
                 id: spinBoxA
 
                 property bool update: false
@@ -87,6 +87,7 @@ TracksPage {
 
                 stepSize: 50
                 from: -10000
+                to: 10000
 
                 textFromValue: root.textFromValueA
                 valueFromText: root.valueFromTextA
@@ -149,7 +150,7 @@ TracksPage {
                 color: "white"
             }
 
-            Widgets.TransparentSpinBox {
+            Widgets.SpinBoxExt {
                 id: spinBoxB
 
                 property bool update: false
@@ -158,6 +159,7 @@ TracksPage {
 
                 stepSize: 50
                 from: -10000
+                to: 10000
 
                 textFromValue: root.textFromValueA
                 valueFromText: root.valueFromTextA
@@ -219,7 +221,7 @@ TracksPage {
                 color: "white"
             }
 
-            Widgets.TransparentSpinBox {
+            Widgets.SpinBoxExt {
                 id: spinBoxC
 
                 property bool update: false
@@ -227,6 +229,8 @@ TracksPage {
                 Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
 
                 stepSize: 1
+                from: 0
+                to: 100
 
                 textFromValue: root.textFromValueB
                 valueFromText: root.valueFromTextB

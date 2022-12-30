@@ -23,13 +23,18 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 
-SpinBox{
+SpinBox {
     id: control
     font.pixelSize: VLCStyle.fontSize_large
+
+    padding: 0
+    leftPadding: padding + (control.mirrored ? up.indicator.width : 0)
+    rightPadding: padding + (control.mirrored ? 0 : up.indicator.width)
 
     property color textColor: VLCStyle.colors.buttonText
     property color bgColor: VLCStyle.colors.bg
     property color borderColor:  VLCStyle.colors.buttonBorder
+    property int borderWidth: 0
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -44,9 +49,9 @@ SpinBox{
     }
 
     background: Rectangle {
-        implicitWidth: VLCStyle.dp(4, VLCStyle.scale)
-        implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
+        radius: VLCStyle.margin_xxxsmall
         border.color: control.borderColor
+        border.width: control.borderWidth
         color: control.bgColor
     }
 
@@ -59,12 +64,15 @@ SpinBox{
         font: control.font
         color: enabled ? control.textColor : "grey"
 
+        padding: 0
         horizontalAlignment: Qt.AlignRight
         verticalAlignment: Qt.AlignVCenter
+
         selectByMouse: true
         autoScroll: false
         readOnly: !control.editable
         validator: control.validator
+        inputMethodHints: Qt.ImhFormattedNumbersOnly
 
         Keys.priority: Keys.AfterItem
 
@@ -72,9 +80,10 @@ SpinBox{
         Keys.onReleased: Navigation.defaultKeyReleaseAction(event)
 
         Navigation.parentItem: control
+
     }
     up.indicator: Rectangle {
-        x: parent.width - width
+        x: control.mirrored ? 0: parent.width - width
         height: parent.height / 2
         implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
         implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
@@ -83,9 +92,10 @@ SpinBox{
         border.color: control.borderColor
 
         Text {
-            text: "+"
+            text: "\u2227" // ^ logical AND
             font.pixelSize: control.font.pixelSize * 2
             color: control.textColor
+            font.bold: true
             anchors.fill: parent
             fontSizeMode: Text.Fit
             horizontalAlignment: Text.AlignHCenter
@@ -94,7 +104,7 @@ SpinBox{
     }
 
     down.indicator: Rectangle {
-        x: parent.width - width
+        x: control.mirrored ? 0 : parent.width - width
         height: parent.height / 2
         implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
         implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
@@ -103,7 +113,7 @@ SpinBox{
         border.color: control.borderColor
 
         Text {
-            text: "-"
+            text: "\u2228" // ^ logical OR
             font.pixelSize: control.font.pixelSize * 2
             color: control.textColor
             anchors.fill: parent

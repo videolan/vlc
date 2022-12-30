@@ -1030,7 +1030,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/PageLoader.qml \
 	gui/qt/widgets/qml/ButtonExt.qml \
 	gui/qt/widgets/qml/TableColumns.qml \
-	gui/qt/widgets/qml/TransparentSpinBox.qml \
 	gui/qt/widgets/qml/TextToolButton.qml \
 	gui/qt/widgets/qml/VideoProgressBar.qml \
 	gui/qt/widgets/qml/VideoQualityLabels.qml \
