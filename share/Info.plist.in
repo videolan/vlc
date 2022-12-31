@@ -55,6 +55,8 @@
 	<string>VLCApplication</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
+	<key>NSAccentColorName</key>
+	<string>VLCAccentColor</string>
 	<key>SUFeedURL</key>
 	<string>https://update.videolan.org/vlc/sparkle/vlc-intel64.xml</string>
 	<key>SUPublicDSAKeyFile</key>
