@@ -9,6 +9,7 @@ endif
 pseudo-bundle:
 	$(MKDIR_P) $(top_builddir)/bin/Contents/Resources/
 	$(LN_S) -nf $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/Base.lproj
+	$(LN_S) -nf $(abs_top_builddir)/modules/gui/macosx/Resources/Assets.car $(top_builddir)/bin/Contents/Resources/Assets.car
 	$(LN_S) -nf $(abs_top_builddir)/share/macosx/Info.plist $(top_builddir)/bin/Contents/Info.plist
 	$(LN_S) -nf $(CONTRIB_DIR)/Frameworks
 	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -not -path "*.lproj/*" -exec $(LN_S) -f {} \;
@@ -28,6 +29,8 @@ VLC.app: macos-install
 	## Copy .strings file and .nib files
 	cp -R "$(srcdir)/modules/gui/macosx/Resources/"*.lproj $@/Contents/Resources/
 	cp -R "$(top_builddir)/modules/gui/macosx/UI/." $@/Contents/Resources/Base.lproj/
+	## Copy Asset catalog
+	cp "$(top_builddir)/modules/gui/macosx/Resources/Assets.car" $@/Contents/Resources/Assets.car
 	## Copy Info.plist and convert to binary
 	cp -R "$(top_builddir)/share/macosx/Info.plist" $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist

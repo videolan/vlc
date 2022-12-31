@@ -1,3 +1,27 @@
+actool_verbose = $(actool_verbose_$(V))
+actool_verbose_ = $(actool_verbose__$(AM_DEFAULT_VERBOSITY))
+actool_verbose_0 = @echo "  ACTOOL  " $@;
+actool_verbose__0 = $(actool_verbose_0)
+
+# All content of the asset catalog should be listed below
+# so that it is properly rebuilt when its content changes.
+ASSET_CATALOG_DEPS = \
+	gui/macosx/Resources/Assets.xcassets/Contents.json \
+	gui/macosx/Resources/Assets.xcassets/VLCAccentColor.colorset/Contents.json
+
+gui/macosx/Resources/Assets.car: gui/macosx/Resources/Assets.xcassets $(ASSET_CATALOG_DEPS)
+	$(AM_V_at)$(MKDIR_P) "gui/macosx/Resources"
+	$(actool_verbose)$(ACTOOL) --errors --warnings --notices \
+	  --platform macosx --target-device mac --skip-app-store-deployment \
+	  --minimum-deployment-target 10.11 --output-format human-readable-text \
+	  --compile $(@D) $<
+
+if ENABLE_MACOSX_UI
+BUILT_SOURCES += gui/macosx/Resources/Assets.car
+endif
+
+EXTRA_DIST += $(ASSET_CATALOG_DEPS)
+
 SUFFIXES += .xib .nib
 
 xib_verbose = $(xib_verbose_$(V))
