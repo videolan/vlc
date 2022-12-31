@@ -291,6 +291,7 @@
 		53903D3929576ED500D0B308 /* VLCLibraryAudioGroupDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioGroupDataSource.m; sourceTree = "<group>"; };
 		539BA79D298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCAspectRatioRetainingVideoWindow.h; sourceTree = "<group>"; };
 		539BA79E298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCAspectRatioRetainingVideoWindow.m; sourceTree = "<group>"; };
+		536EFC3A295F828000F4CB13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		53B447C82939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySongsTableViewSongPlayingTableCellView.h; sourceTree = "<group>"; };
 		53B447C92939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySongsTableViewSongPlayingTableCellView.m; sourceTree = "<group>"; };
 		53B447EC293BB47A00857588 /* VLCLibraryVideoCollectionViewContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoCollectionViewContainerView.m; sourceTree = "<group>"; };
@@ -830,6 +831,7 @@
 				6B8229FF1E4D2DD100833BE1 /* vlc.scriptSuite */,
 				6B822A001E4D2DD100833BE1 /* vlc.scriptTerminology */,
 				7DB5D7E820CD851F00326DFE /* Info.plist */,
+				536EFC3A295F828000F4CB13 /* Assets.xcassets */,
 			);
 			name = Resources;
 			path = ../../../modules/gui/macosx/Resources;
