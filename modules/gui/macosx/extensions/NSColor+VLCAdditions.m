@@ -26,7 +26,11 @@
 
 + (instancetype)VLCAccentColor
 {
-     return [NSColor VLCOrangeElementColor];
+    if (@available(macOS 10.14, *)) {
+        return [NSColor controlAccentColor];
+    }
+
+    return [NSColor VLCOrangeElementColor];
 }
 
 + (instancetype)VLCOrangeElementColor
