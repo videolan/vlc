@@ -62,7 +62,6 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 #pragma mark - VLCLibraryCollectionViewFlowLayout
 @interface VLCLibraryCollectionViewFlowLayout ()
 {
-    NSUInteger _lastHeightIndex;
     CVDisplayLinkRef _displayLinkRef;
 
     NSArray *_defaultHeightAnimationSteps;
@@ -360,11 +359,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if (type == VLCDetailViewAnimationTypeExpand) {
         _animationIsCollapse = NO;
         _animationIndex = kWrapAroundValue;
-        _lastHeightIndex = kAnimationSteps - 1;
     } else {
         _animationIsCollapse = YES;
         _animationIndex = kAnimationSteps;
-        _lastHeightIndex = 0;
     }
 
     _detailViewIsAnimating = YES;
