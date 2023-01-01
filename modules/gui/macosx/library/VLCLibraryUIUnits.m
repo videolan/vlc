@@ -81,6 +81,11 @@
     return 300;
 }
 
++ (const CGFloat)largeDetailSupplementaryViewCollectionViewWidth
+{
+    return 800;
+}
+
 + (const CGFloat)largeDetailSupplementaryViewCollectionViewHeight
 {
     return 500;

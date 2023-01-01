@@ -50,6 +50,7 @@ typedef NS_ENUM(NSUInteger, VLCExpandAnimationType) {
     VLCExpandAnimationTypeVerticalMedium = 0,
     VLCExpandAnimationTypeVerticalLarge,
     VLCExpandAnimationTypeHorizontalMedium,
+    VLCExpandAnimationTypeHorizontalLarge,
 };
 
 static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
@@ -67,6 +68,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     NSArray *_mediumHeightAnimationSteps;
     NSArray *_largeHeightAnimationSteps;
     NSArray *_mediumWidthAnimationSteps;
+    NSArray *_largeWidthAnimationSteps;
     
     VLCExpandAnimationType _animationType;
     CGFloat _prevProvidedAnimationStep;
@@ -87,10 +89,11 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     self = [super init];
     if (self) {
-        _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight]];
-        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight]];
+        _mediumHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight]];
+        _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight]];
         _mediumWidthAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth]];
-
+        _largeWidthAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewWidth]];
+        
         _animationType = VLCExpandAnimationTypeVerticalMedium;
         _prevProvidedAnimationStep = 0;
 
@@ -125,6 +128,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     switch(_animationType) {
         case VLCExpandAnimationTypeHorizontalMedium:
             _prevProvidedAnimationStep = [_mediumWidthAnimationSteps[_animationIndex] floatValue];
+            break;
+        case VLCExpandAnimationTypeHorizontalLarge:
+            _prevProvidedAnimationStep = [_largeWidthAnimationSteps[_animationIndex] floatValue];
+            break;
         case VLCExpandAnimationTypeVerticalLarge:
             _prevProvidedAnimationStep = [_largeHeightAnimationSteps[_animationIndex] floatValue];
             break;
@@ -291,7 +298,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
-        _animationType = VLCExpandAnimationTypeVerticalLarge;
+        _animationType = self.scrollDirection == NSCollectionViewScrollDirectionVertical ? VLCExpandAnimationTypeVerticalLarge : VLCExpandAnimationTypeHorizontalLarge;
 
     } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
                [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
@@ -365,8 +372,12 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         }
 
         NSRect selectedItemFrame = selectedItemLayoutAttributes.frame;
+
         if (self.scrollDirection == NSCollectionViewScrollDirectionVertical &&
             NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
+
+            attributesFrame.origin.y += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
+
         } else if (self.scrollDirection == NSCollectionViewScrollDirectionHorizontal &&
                    NSMinX(attributesFrame) > (NSMaxX(selectedItemFrame))) {
 

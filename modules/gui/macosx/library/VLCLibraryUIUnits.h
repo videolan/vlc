@@ -47,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, readonly) const CGFloat mediumDetailSupplementaryViewCollectionViewWidth;
 @property (class, readonly) const CGFloat mediumDetailSupplementaryViewCollectionViewHeight;
+@property (class, readonly) const CGFloat largeDetailSupplementaryViewCollectionViewWidth;
 @property (class, readonly) const CGFloat largeDetailSupplementaryViewCollectionViewHeight;
 
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMinimumWidth;
