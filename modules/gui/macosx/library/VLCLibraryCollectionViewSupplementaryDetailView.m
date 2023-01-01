@@ -21,6 +21,8 @@
  *****************************************************************************/
 
 #import "VLCLibraryCollectionViewSupplementaryDetailView.h"
+
+#import "library/VLCLibraryUIUnits.h"
 #import "views/VLCSubScrollView.h"
 
 static const CGFloat kArrowHeight = 20.;
@@ -93,7 +95,7 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     const NSRect selectedItemFrame = _selectedItem.view.frame;
     const NSPoint itemCenterPoint = NSMakePoint(NSMinX(selectedItemFrame) + NSWidth(selectedItemFrame) / 2,
                                                 NSMinY(selectedItemFrame) + NSHeight(selectedItemFrame) / 2);
-    const NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds),
+    const NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds) + _arrowSize.height,
                                              NSMinY(self.bounds),
                                              NSWidth(self.bounds) - _arrowSize.height,
                                              NSHeight(self.bounds));
@@ -152,16 +154,35 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     _internalScrollView.parentScrollView = parentScrollView;
 }
 
-- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+- (void)setLayoutScrollDirection:(NSCollectionViewScrollDirection)layoutScrollDirection
 {
-    _representedItem = representedItem;
-    [self updateRepresentation];
+    _layoutScrollDirection = layoutScrollDirection;
+
+    if (_layoutScrollDirection == NSCollectionViewScrollDirectionVertical) {
+        _contentViewTopConstraint.constant = kArrowHeight + [VLCLibraryUIUnits mediumSpacing];
+        _contentViewBottomConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+        _contentViewLeftConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+        _contentViewRightConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+    } else if (_layoutScrollDirection == NSCollectionViewScrollDirectionHorizontal) {
+        _contentViewTopConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+        _contentViewBottomConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+        _contentViewLeftConstraint.constant = kArrowHeight + [VLCLibraryUIUnits mediumSpacing];
+        _contentViewRightConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
+    }
+
+    self.needsDisplay = YES;
 }
 
 - (void)updateRepresentation
 {
     [self doesNotRecognizeSelector:_cmd];
     return;
+}
+
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+{
+    _representedItem = representedItem;
+    [self updateRepresentation];
 }
 
 @end
