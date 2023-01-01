@@ -154,16 +154,24 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     _internalScrollView.parentScrollView = parentScrollView;
 }
 
+- (BOOL)validConstraintProps
+{
+    return _contentViewTopConstraint != nil &&
+           _contentViewLeftConstraint != nil &&
+           _contentViewRightConstraint != nil &&
+           _contentViewBottomConstraint != nil;
+}
+
 - (void)setLayoutScrollDirection:(NSCollectionViewScrollDirection)layoutScrollDirection
 {
     _layoutScrollDirection = layoutScrollDirection;
 
-    if (_layoutScrollDirection == NSCollectionViewScrollDirectionVertical) {
+    if (_layoutScrollDirection == NSCollectionViewScrollDirectionVertical && [self validConstraintProps]) {
         _contentViewTopConstraint.constant = kArrowHeight + [VLCLibraryUIUnits mediumSpacing];
         _contentViewBottomConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
         _contentViewLeftConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
         _contentViewRightConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
-    } else if (_layoutScrollDirection == NSCollectionViewScrollDirectionHorizontal) {
+    } else if (_layoutScrollDirection == NSCollectionViewScrollDirectionHorizontal  && [self validConstraintProps]) {
         _contentViewTopConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
         _contentViewBottomConstraint.constant = [VLCLibraryUIUnits mediumSpacing];
         _contentViewLeftConstraint.constant = kArrowHeight + [VLCLibraryUIUnits mediumSpacing];
