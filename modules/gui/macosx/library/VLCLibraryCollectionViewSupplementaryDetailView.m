@@ -47,8 +47,12 @@ static const CGFloat kBackgroundCornerRadius = 10.;
         _arrowSize = NSMakeSize(kArrowWidth, kArrowHeight);
     }
 
-    const NSRect selectedItemFrame = _selectedItem.view.frame;
+    [self drawBackgroundWithTopArrow];
+}
 
+- (void)drawBackgroundWithTopArrow
+{
+    const NSRect selectedItemFrame = _selectedItem.view.frame;
     const NSPoint itemCenterPoint = NSMakePoint(NSMinX(selectedItemFrame) + NSWidth(selectedItemFrame) / 2,
                                                 NSMinY(selectedItemFrame) + NSHeight(selectedItemFrame) / 2);
     const NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds),
@@ -76,6 +80,11 @@ static const CGFloat kBackgroundCornerRadius = 10.;
                    controlPoint2:NSMakePoint(itemCenterPoint.x + _arrowSize.width / 6, backgroundTop)];
 
     [backgroundPath closePath];
+    [self colorBackground:backgroundPath];
+}
+
+- (void)colorBackground:(const NSBezierPath*)backgroundPath
+{
 
     //[[NSColor.gridColor colorWithAlphaComponent:self.container.alphaValue] setFill];
     [NSColor.gridColor setFill];
