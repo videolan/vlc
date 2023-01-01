@@ -47,8 +47,9 @@ typedef NS_ENUM(NSUInteger, VLCDetailViewAnimationType)
 };
 
 typedef NS_ENUM(NSUInteger, VLCExpandAnimationType) {
-    VLCExpandAnimationTypeDefault = 0,
-    VLCExpandAnimationTypeLarge,
+    VLCExpandAnimationTypeVerticalMedium = 0,
+    VLCExpandAnimationTypeVerticalLarge,
+    VLCExpandAnimationTypeHorizontalMedium,
 };
 
 static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
@@ -88,8 +89,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if (self) {
         _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight]];
         _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight]];
-
-        _animationType = VLCExpandAnimationTypeDefault;
+        
+        _animationType = VLCExpandAnimationTypeVerticalMedium;
         _prevProvidedAnimationStep = 0;
 
         _invalidateAll = NO;
@@ -121,10 +122,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     }
 
     switch(_animationType) {
-        case VLCExpandAnimationTypeLarge:
+        case VLCExpandAnimationTypeVerticalLarge:
             _prevProvidedAnimationStep = [_largeHeightAnimationSteps[_animationIndex] floatValue];
             break;
-        case VLCExpandAnimationTypeDefault:
+        case VLCExpandAnimationTypeVerticalMedium:
         default:
             _prevProvidedAnimationStep = [_defaultHeightAnimationSteps[_animationIndex] floatValue];
             break;
@@ -283,13 +284,13 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
-        _animationType = VLCExpandAnimationTypeLarge;
+        _animationType = VLCExpandAnimationTypeVerticalLarge;
 
     } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
                [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
-        _animationType = VLCExpandAnimationTypeDefault;
+        _animationType = VLCExpandAnimationTypeVerticalMedium;
     }
 
     if(isLibrarySupplementaryView) {
