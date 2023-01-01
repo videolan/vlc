@@ -326,6 +326,12 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+
+        VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
+        if (flowLayout != nil) {
+            mediaItemSupplementaryDetailView.layoutScrollDirection = flowLayout.scrollDirection;
+        }
+        
         return mediaItemSupplementaryDetailView;
     }
 

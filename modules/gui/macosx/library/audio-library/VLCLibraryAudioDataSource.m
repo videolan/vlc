@@ -811,6 +811,11 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         albumSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         albumSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
+        VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
+        if (flowLayout != nil) {
+            albumSupplementaryDetailView.layoutScrollDirection = flowLayout.scrollDirection;
+        }
+
         return albumSupplementaryDetailView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
@@ -825,6 +830,11 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         audioGroupSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
         audioGroupSupplementaryDetailView.internalScrollView.scrollParentY = YES;
 
+        VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
+        if (flowLayout != nil) {
+            audioGroupSupplementaryDetailView.layoutScrollDirection = flowLayout.scrollDirection;
+        }
+
         return audioGroupSupplementaryDetailView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
@@ -835,6 +845,11 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:actualItem parentType:_currentParentType];
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
+
+        VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
+        if (flowLayout != nil) {
+            mediaItemSupplementaryDetailView.layoutScrollDirection = flowLayout.scrollDirection;
+        }
 
         return mediaItemSupplementaryDetailView;
     }
