@@ -84,6 +84,10 @@
             <connections>
                 <outlet property="audioGroupAlbumsTableView" destination="eEJ-WA-0aM" id="l8k-M9-a8e"/>
                 <outlet property="audioGroupNameTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
+                <outlet property="contentViewBottomConstraint" destination="eS3-iK-oGV" id="T0p-C1-8jm"/>
+                <outlet property="contentViewLeftConstraint" destination="L0r-A5-7Xq" id="T0p-C1-a8j"/>
+                <outlet property="contentViewRightConstraint" destination="8QK-wS-vnX" id="T0p-C1-a7l"/>
+                <outlet property="contentViewTopConstraint" destination="oWk-8b-f1e" id="T0p-C1-1nv"/>
                 <outlet property="internalScrollView" destination="9ZS-oy-iP9" id="afa-6P-b12"/>
                 <outlet property="tableClipView" destination="3V4-tX-owM" id="t4b-1e-Cl1"/>
                 <outlet property="tableScrollView" destination="9ZS-oy-iP9" id="tab-L3-Scr"/>
