@@ -47,7 +47,11 @@ static const CGFloat kBackgroundCornerRadius = 10.;
         _arrowSize = NSMakeSize(kArrowWidth, kArrowHeight);
     }
 
-    [self drawBackgroundWithTopArrow];
+    if (_layoutScrollDirection == NSCollectionViewScrollDirectionVertical) {
+        [self drawBackgroundWithTopArrow];
+    } else if (_layoutScrollDirection == NSCollectionViewScrollDirectionHorizontal) {
+        [self drawBackgroundWithLeftArrow];
+    }
 }
 
 - (void)drawBackgroundWithTopArrow
@@ -56,7 +60,8 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     const NSPoint itemCenterPoint = NSMakePoint(NSMinX(selectedItemFrame) + NSWidth(selectedItemFrame) / 2,
                                                 NSMinY(selectedItemFrame) + NSHeight(selectedItemFrame) / 2);
     const NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds),
-                                             NSMinY(self.bounds), NSWidth(self.bounds) + 2,
+                                             NSMinY(self.bounds),
+                                             NSWidth(self.bounds) + 2,
                                              NSHeight(self.bounds) - _arrowSize.height);
     const CGFloat backgroundTop = NSMaxY(backgroundRect);
     const CGFloat backgroundLeft = NSMinX(backgroundRect);
@@ -83,9 +88,42 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     [self colorBackground:backgroundPath];
 }
 
+- (void)drawBackgroundWithLeftArrow
+{
+    const NSRect selectedItemFrame = _selectedItem.view.frame;
+    const NSPoint itemCenterPoint = NSMakePoint(NSMinX(selectedItemFrame) + NSWidth(selectedItemFrame) / 2,
+                                                NSMinY(selectedItemFrame) + NSHeight(selectedItemFrame) / 2);
+    const NSRect backgroundRect = NSMakeRect(NSMinX(self.bounds),
+                                             NSMinY(self.bounds),
+                                             NSWidth(self.bounds) - _arrowSize.height,
+                                             NSHeight(self.bounds));
+    const CGFloat backgroundBottom = NSMinY(backgroundRect);
+    const CGFloat backgroundLeft = NSMinX(backgroundRect);
+
+    const NSPoint arrowBottomPoint = NSMakePoint(backgroundLeft, itemCenterPoint.y + _arrowSize.width / 2);
+    const NSPoint arrowLeftMostPoint = NSMakePoint(backgroundLeft - kArrowHeight + 1, itemCenterPoint.y);
+    const NSPoint arrowTopPoint = NSMakePoint(backgroundLeft, itemCenterPoint.y - _arrowSize.width / 2);
+
+    const NSPoint bottomLeftCorner = NSMakePoint(backgroundLeft, backgroundBottom);
+    const NSPoint bottomLeftCornerAfterCurve = NSMakePoint(backgroundLeft, backgroundBottom - kBackgroundCornerRadius);
+
+    const NSBezierPath *backgroundPath = [NSBezierPath bezierPathWithRoundedRect:backgroundRect xRadius:kBackgroundCornerRadius yRadius:kBackgroundCornerRadius];
+
+    [backgroundPath moveToPoint:bottomLeftCornerAfterCurve];
+    [backgroundPath lineToPoint:arrowBottomPoint];
+    [backgroundPath curveToPoint:arrowLeftMostPoint
+                   controlPoint1:NSMakePoint(backgroundLeft, itemCenterPoint.y + _arrowSize.width / 6)
+                   controlPoint2:NSMakePoint(backgroundLeft - _arrowSize.height, itemCenterPoint.y + kArrowTipRadius)];
+    [backgroundPath curveToPoint:arrowTopPoint
+                   controlPoint1:NSMakePoint(backgroundLeft - _arrowSize.height, itemCenterPoint.y - kArrowTipRadius)
+                   controlPoint2:NSMakePoint(backgroundLeft, itemCenterPoint.y - _arrowSize.width / 6)];
+
+    [backgroundPath closePath];
+    [self colorBackground:backgroundPath];
+}
+
 - (void)colorBackground:(const NSBezierPath*)backgroundPath
 {
-
     //[[NSColor.gridColor colorWithAlphaComponent:self.container.alphaValue] setFill];
     [NSColor.gridColor setFill];
     [backgroundPath fill];
