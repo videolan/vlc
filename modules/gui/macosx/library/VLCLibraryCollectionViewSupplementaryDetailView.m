@@ -107,7 +107,7 @@ static const CGFloat kBackgroundCornerRadius = 10.;
     const NSPoint arrowTopPoint = NSMakePoint(backgroundLeft, itemCenterPoint.y - _arrowSize.width / 2);
 
     const NSPoint bottomLeftCorner = NSMakePoint(backgroundLeft, backgroundBottom);
-    const NSPoint bottomLeftCornerAfterCurve = NSMakePoint(backgroundLeft, backgroundBottom - kBackgroundCornerRadius);
+    const NSPoint bottomLeftCornerAfterCurve = NSMakePoint(backgroundLeft, backgroundBottom + kBackgroundCornerRadius);
 
     const NSBezierPath *backgroundPath = [NSBezierPath bezierPathWithRoundedRect:backgroundRect xRadius:kBackgroundCornerRadius yRadius:kBackgroundCornerRadius];
 
