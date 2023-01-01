@@ -71,6 +71,11 @@
     return 25;
 }
 
++ (const CGFloat)mediumDetailSupplementaryViewCollectionViewWidth
+{
+    return 600;
+}
+
 + (const CGFloat)mediumDetailSupplementaryViewCollectionViewHeight
 {
     return 300;

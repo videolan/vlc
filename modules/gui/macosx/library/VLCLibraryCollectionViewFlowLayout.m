@@ -64,9 +64,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     CVDisplayLinkRef _displayLinkRef;
 
-    NSArray *_defaultHeightAnimationSteps;
+    NSArray *_mediumHeightAnimationSteps;
     NSArray *_largeHeightAnimationSteps;
-
+    NSArray *_mediumWidthAnimationSteps;
+    
     VLCExpandAnimationType _animationType;
     CGFloat _prevProvidedAnimationStep;
 
@@ -88,7 +89,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if (self) {
         _defaultHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight]];
         _largeHeightAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewHeight:VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight]];
-        
+        _mediumWidthAnimationSteps = [NSArray arrayWithArray:[self generateAnimationStepsForExpandedViewDimension:VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth]];
+
         _animationType = VLCExpandAnimationTypeVerticalMedium;
         _prevProvidedAnimationStep = 0;
 
@@ -100,7 +102,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     return self;
 }
 
-- (NSArray *)generateAnimationStepsForExpandedViewHeight:(NSInteger)height
+- (NSArray *)generateAnimationStepsForExpandedViewDimension:(NSInteger)dimension
 {
     NSMutableArray *generatedAnimationSteps = [NSMutableArray arrayWithCapacity:kAnimationSteps];
 
@@ -108,7 +110,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     for(int i = 0; i < kAnimationSteps; ++i) {
         CGFloat progress = (CGFloat)i  / (CGFloat)kAnimationSteps;
         progress -= 1;
-        generatedAnimationSteps[i] = @(height * (progress * progress * progress + 1) + kDetailViewCollapsedHeight);
+        generatedAnimationSteps[i] = @(dimension * (progress * progress * progress + 1) + kDetailViewCollapsedHeight);
     }
 
     return [generatedAnimationSteps copy];
@@ -121,12 +123,14 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     }
 
     switch(_animationType) {
+        case VLCExpandAnimationTypeHorizontalMedium:
+            _prevProvidedAnimationStep = [_mediumWidthAnimationSteps[_animationIndex] floatValue];
         case VLCExpandAnimationTypeVerticalLarge:
             _prevProvidedAnimationStep = [_largeHeightAnimationSteps[_animationIndex] floatValue];
             break;
         case VLCExpandAnimationTypeVerticalMedium:
         default:
-            _prevProvidedAnimationStep = [_defaultHeightAnimationSteps[_animationIndex] floatValue];
+            _prevProvidedAnimationStep = [_mediumHeightAnimationSteps[_animationIndex] floatValue];
             break;
     }
 
@@ -187,7 +191,11 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         return contentSize;
     }
 
-    contentSize.height += [self currentAnimationStep];
+    if (self.scrollDirection == NSCollectionViewScrollDirectionVertical) {
+        contentSize.height += [self currentAnimationStep];
+    } else if (self.scrollDirection == NSCollectionViewScrollDirectionHorizontal) {
+        contentSize.width += [self currentAnimationStep];
+    }
     return contentSize;
 }
 
@@ -289,7 +297,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
-        _animationType = VLCExpandAnimationTypeVerticalMedium;
+        _animationType = self.scrollDirection == NSCollectionViewScrollDirectionVertical ? VLCExpandAnimationTypeVerticalMedium : VLCExpandAnimationTypeHorizontalMedium;
     }
 
     if(isLibrarySupplementaryView) {
@@ -299,11 +307,24 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
                   @"Failed to create NSCollectionViewLayoutAttributes for view of kind %@.",
                   elementKind);
 
-        float selectedItemFrameMaxY = _selectedIndexPath == nil ? 0 : NSMaxY([[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame]);
-        detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame) + self.minimumInteritemSpacing,
-                                                selectedItemFrameMaxY + VLCLibraryUIUnits.mediumSpacing,
-                                                self.collectionViewContentSize.width - (self.minimumInteritemSpacing * 2),
-                                                [self currentAnimationStep]);
+        const NSRect selectedItemFrame = [[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame];
+
+        if (self.scrollDirection == NSCollectionViewScrollDirectionVertical) {
+            const float selectedItemFrameMaxY = _selectedIndexPath == nil ? 0 : NSMaxY(selectedItemFrame);
+            detailViewAttributes.frame = NSMakeRect(NSMinX(self.collectionView.frame) + self.minimumInteritemSpacing,
+                                                    selectedItemFrameMaxY + VLCLibraryUIUnits.mediumSpacing,
+                                                    self.collectionViewContentSize.width - (self.minimumInteritemSpacing * 2),
+                                                    [self currentAnimationStep]);
+
+        } else if (self.scrollDirection == NSCollectionViewScrollDirectionHorizontal) {
+            const float selectedItemFrameMinY = _selectedIndexPath == nil ? 0 : NSMinY(selectedItemFrame);
+            const float selectedItemFrameMaxX = _selectedIndexPath == nil ? 0 : NSMaxX(selectedItemFrame);
+            const float selectedItemFrameHeight = _selectedIndexPath == nil ? 0 : selectedItemFrame.size.height;
+            detailViewAttributes.frame = NSMakeRect(selectedItemFrameMaxX + self.minimumInteritemSpacing,
+                                                    selectedItemFrameMinY,
+                                                    [self currentAnimationStep],
+                                                    selectedItemFrameHeight);
+        }
 
         return detailViewAttributes;
     }
@@ -344,9 +365,13 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         }
 
         NSRect selectedItemFrame = selectedItemLayoutAttributes.frame;
+        if (self.scrollDirection == NSCollectionViewScrollDirectionVertical &&
+            NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
+        } else if (self.scrollDirection == NSCollectionViewScrollDirectionHorizontal &&
+                   NSMinX(attributesFrame) > (NSMaxX(selectedItemFrame))) {
 
-        if (NSMinY(attributesFrame) > (NSMaxY(selectedItemFrame))) {
             attributesFrame.origin.y += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
+            attributesFrame.origin.x += [self currentAnimationStep] + VLCLibraryUIUnits.mediumSpacing;
         }
     }
 

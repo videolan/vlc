@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) const CGFloat mediumTableViewRowHeight;
 @property (class, readonly) const CGFloat smallTableViewRowHeight;
 
+@property (class, readonly) const CGFloat mediumDetailSupplementaryViewCollectionViewWidth;
 @property (class, readonly) const CGFloat mediumDetailSupplementaryViewCollectionViewHeight;
 @property (class, readonly) const CGFloat largeDetailSupplementaryViewCollectionViewHeight;
 
