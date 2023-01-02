@@ -671,7 +671,11 @@ static void Drain(audio_output_t *aout)
         if (op != NULL)
             pa_operation_unref(op);
         else
-            aout_DrainedReport(aout);
+        {
+            /* Timing failed, update the drain timer using the last known
+             * latency */
+            TriggerDrain(aout);
+        }
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
