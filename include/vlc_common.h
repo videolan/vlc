@@ -170,6 +170,10 @@
  */
 #  define VLC_USED
 # endif
+#else // !GCC
+# define VLC_USED
+# define VLC_MALLOC
+# define VLC_DEPRECATED
 #endif
 
 
