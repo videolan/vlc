@@ -368,17 +368,37 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)repeatStateUpdated:(NSNotification *)aNotification
 {
     enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
-    switch (currentRepeatState) {
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:NSColor.VLCAccentColor];
-            break;
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:NSColor.VLCAccentColor];
-            break;
 
-        default:
-            self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatOff"];
-            break;
+    if (@available(macOS 11.0, *)) {
+        switch (currentRepeatState) {
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+                self.repeatPlaylistButton.image = [NSImage imageWithSystemSymbolName:@"repeat.1"
+                                                            accessibilityDescription:@"Repeat current"];
+                self.repeatPlaylistButton.contentTintColor = [NSColor VLCAccentColor];
+                break;
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+                self.repeatPlaylistButton.image = [NSImage imageWithSystemSymbolName:@"repeat"
+                                                            accessibilityDescription:@"Repeat"];
+                self.repeatPlaylistButton.contentTintColor = [NSColor VLCAccentColor];
+                break;
+            default:
+                self.repeatPlaylistButton.image = [NSImage imageWithSystemSymbolName:@"repeat"
+                                                            accessibilityDescription:@"Repeat"];
+                self.repeatPlaylistButton.contentTintColor = nil;
+                break;
+        }
+    } else {
+        switch (currentRepeatState) {
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+                self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:NSColor.VLCAccentColor];
+                break;
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+                self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:NSColor.VLCAccentColor];
+                break;
+            default:
+                self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatOff"];
+                break;
+        }
     }
 }
 
