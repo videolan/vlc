@@ -132,13 +132,45 @@
     [self.fullscreenButton setToolTip: _NS("Enter fullscreen")];
     self.fullscreenButton.accessibilityLabel = self.fullscreenButton.toolTip;
 
-    _playImage = imageFromRes(@"VLCPlayTemplate");
-    _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
-    _pauseImage = imageFromRes(@"VLCPauseTemplate");
-    _pressedPauseImage = imageFromRes(@"VLCPauseTemplate");
-    _backwardImage = imageFromRes(@"VLCBackwardTemplate");
-    _forwardImage = imageFromRes(@"VLCForwardTemplate");
-    _fullscreenImage = imageFromRes(@"VLCFullscreenOffTemplate");
+    if (@available(macOS 11.0, *)) {
+        _playImage = [NSImage imageWithSystemSymbolName:@"play.circle.fill"
+                               accessibilityDescription:_NS("Play")];
+        _pressedPlayImage = [NSImage imageWithSystemSymbolName:@"play.circle.fill"
+                                      accessibilityDescription:_NS("Play")];
+        _pauseImage = [NSImage imageWithSystemSymbolName:@"pause.circle.fill"
+                                accessibilityDescription:_NS("Pause")];
+        _pressedPauseImage = [NSImage imageWithSystemSymbolName:@"pause.circle.fill"
+                                       accessibilityDescription:_NS("Pause")];
+        _backwardImage = [NSImage imageWithSystemSymbolName:@"backward.fill"
+                                   accessibilityDescription:_NS("Previous")];
+        _forwardImage = [NSImage imageWithSystemSymbolName:@"forward.fill"
+                                  accessibilityDescription:_NS("Next")];
+        _repeatAllImage = [NSImage imageWithSystemSymbolName:@"repeat"
+                                    accessibilityDescription:_NS("Repeat all")];
+        _repeatOneImage = [NSImage imageWithSystemSymbolName:@"repeat.1"
+                                    accessibilityDescription:_NS("Repeat one")];
+        _repeatOffImage = [NSImage imageWithSystemSymbolName:@"repeat"
+                                    accessibilityDescription:_NS("Repeat off")];
+        _shuffleOnImage = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                    accessibilityDescription:_NS("Shuffle on")];
+        _shuffleOffImage = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                     accessibilityDescription:_NS("Shuffle off")];
+        _fullscreenImage = [NSImage imageWithSystemSymbolName:@"arrow.up.backward.and.arrow.down.forward"
+                                     accessibilityDescription:_NS("Fullscreen")];
+    } else {
+        _playImage = imageFromRes(@"VLCPlayTemplate");
+        _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
+        _pauseImage = imageFromRes(@"VLCPauseTemplate");
+        _pressedPauseImage = imageFromRes(@"VLCPauseTemplate");
+        _backwardImage = imageFromRes(@"VLCBackwardTemplate");
+        _forwardImage = imageFromRes(@"VLCForwardTemplate");
+        _fullscreenImage = imageFromRes(@"VLCFullscreenOffTemplate");
+        _repeatAllImage = [NSImage imageNamed:@"repeatAll"];
+        _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
+        _repeatOneImage = [NSImage imageNamed:@"repeatOne"];
+        _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
+        _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
+    }
 
     [self.backwardButton setImage: _backwardImage];
     [self.backwardButton setAlternateImage: _backwardImage];
