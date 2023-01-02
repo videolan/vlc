@@ -85,14 +85,6 @@
 
     [self.volumeUpButton setImage: imageFromRes(@"VLCVolumeOnTemplate")];
 
-    [self.fullscreenButton setImage: imageFromRes(@"VLCFullscreenOffTemplate")];
-    [self.fullscreenButton setAlternateImage: imageFromRes(@"VLCFullscreenOffTemplate")];
-
-    [self.prevButton setImage: imageFromRes(@"previous-6btns")];
-    [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
-    [self.nextButton setImage: imageFromRes(@"next-6btns")];
-    [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
-
     [self playbackStateChanged:nil];
     [self.stopButton setHidden:YES];
 
