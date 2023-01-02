@@ -634,8 +634,9 @@
 /* Define to `sa_family' if <sys/socket.h> does not define. */
 #mesondefine ss_family
 
-/* Define to `int' if <sys/types.h> does not define. */
+/* Define to `ptrdiff_t' if <sys/types.h> does not define. */
 #mesondefine ssize_t
+#mesondefine SSIZE_MAX
 
 #include <vlc_fixups.h>
 

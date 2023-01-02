@@ -696,9 +696,10 @@ if not cc.has_type('struct ss_family', prefix: '#include <sys/socket.h>')
 endif
 
 # Check for ssize_t type
-# Define it to `int` if missing
+# Define it to `ptrdiff_t` if missing
 if not cc.has_type('ssize_t', prefix: '#include <sys/types.h>')
-    cdata.set('ssize_t', 'int')
+    cdata.set('ssize_t', 'ptrdiff_t')
+    cdata.set('SSIZE_MAX', 'PTRDIFF_MAX')
 endif
 
 # Check for struct pollfd type
