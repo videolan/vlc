@@ -55,11 +55,8 @@
     NSImage *_backwardImage;
     NSImage *_forwardImage;
     NSImage *_fullscreenImage;
-    NSImage *_repeatOffImage;
-    NSImage *_repeatAllImage;
-    NSImage *_repeatOneImage;
-    NSImage *_shuffleOffImage;
-    NSImage *_shuffleOnImage;
+    NSImage *_mutedVolumeImage;
+    NSImage *_unmutedVolumeImage;
 
     NSTimeInterval last_fwd_event;
     NSTimeInterval last_bwd_event;
@@ -102,7 +99,7 @@
                                name:VLCPlayerStateChanged
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(updateCurrentItemDisplayControls:)
+                           selector:@selector(updatePlaybackControls:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
     [notificationCenter addObserver:self
@@ -145,18 +142,12 @@
                                    accessibilityDescription:_NS("Previous")];
         _forwardImage = [NSImage imageWithSystemSymbolName:@"forward.fill"
                                   accessibilityDescription:_NS("Next")];
-        _repeatAllImage = [NSImage imageWithSystemSymbolName:@"repeat"
-                                    accessibilityDescription:_NS("Repeat all")];
-        _repeatOneImage = [NSImage imageWithSystemSymbolName:@"repeat.1"
-                                    accessibilityDescription:_NS("Repeat one")];
-        _repeatOffImage = [NSImage imageWithSystemSymbolName:@"repeat"
-                                    accessibilityDescription:_NS("Repeat off")];
-        _shuffleOnImage = [NSImage imageWithSystemSymbolName:@"shuffle"
-                                    accessibilityDescription:_NS("Shuffle on")];
-        _shuffleOffImage = [NSImage imageWithSystemSymbolName:@"shuffle"
-                                     accessibilityDescription:_NS("Shuffle off")];
         _fullscreenImage = [NSImage imageWithSystemSymbolName:@"arrow.up.backward.and.arrow.down.forward"
                                      accessibilityDescription:_NS("Fullscreen")];
+        _mutedVolumeImage = [NSImage imageWithSystemSymbolName:@"speaker.slash.fill"
+                                      accessibilityDescription:_NS("Muted")];
+        _unmutedVolumeImage = [NSImage imageWithSystemSymbolName:@"speaker.wave.3.fill"
+                                        accessibilityDescription:_NS("Unmuted")];
     } else {
         _playImage = imageFromRes(@"VLCPlayTemplate");
         _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
@@ -165,11 +156,8 @@
         _backwardImage = imageFromRes(@"VLCBackwardTemplate");
         _forwardImage = imageFromRes(@"VLCForwardTemplate");
         _fullscreenImage = imageFromRes(@"VLCFullscreenOffTemplate");
-        _repeatAllImage = [NSImage imageNamed:@"repeatAll"];
-        _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
-        _repeatOneImage = [NSImage imageNamed:@"repeatOne"];
-        _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
-        _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
+        _mutedVolumeImage = imageFromRes(@"VLCVolumeOffTemplate");
+        _unmutedVolumeImage = imageFromRes(@"VLCVolumeOnTemplate");
     }
 
     [self.backwardButton setImage: _backwardImage];
@@ -443,7 +431,7 @@
 - (void)updateMuteVolumeButtonImage
 {
     _muteVolumeButton.image = _playerController.mute ?
-        imageFromRes(@"VLCVolumeOffTemplate") : imageFromRes(@"VLCVolumeOnTemplate");
+        _mutedVolumeImage : _unmutedVolumeImage;
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification

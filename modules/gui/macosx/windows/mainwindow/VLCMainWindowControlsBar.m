@@ -51,6 +51,13 @@
 
 @interface VLCMainWindowControlsBar()
 {
+    NSImage *_repeatOffImage;
+    NSImage *_repeatAllImage;
+    NSImage *_repeatOneImage;
+    NSImage *_shuffleOffImage;
+    NSImage *_shuffleOnImage;
+    NSImage *_alwaysMuteImage;
+
     VLCPlaylistController *_playlistController;
     VLCPlayerController *_playerController;
 }
@@ -73,6 +80,17 @@
                            selector:@selector(playbackStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(shuffleStateUpdated:)
+                               name:VLCPlaybackOrderChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(repeatStateUpdated:)
+                               name:VLCPlaybackRepeatChanged
+                             object:nil];
+
+    self.repeatButton.action = @selector(repeatAction:);
+    self.shuffleButton.action = @selector(shuffleAction:);
 
     [self.stopButton setToolTip: _NS("Stop")];
     self.stopButton.accessibilityLabel = self.stopButton.toolTip;
@@ -80,10 +98,40 @@
     [self.volumeUpButton setToolTip: _NS("Full Volume")];
     self.volumeUpButton.accessibilityLabel = self.volumeUpButton.toolTip;
 
-    [self.stopButton setImage: imageFromRes(@"stop")];
-    [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
+    if (@available(macOS 11.0, *)) {
+        _repeatAllImage = [NSImage imageWithSystemSymbolName:@"repeat"
+                                    accessibilityDescription:_NS("Repeat all")];
+        _repeatOneImage = [NSImage imageWithSystemSymbolName:@"repeat.1"
+                                    accessibilityDescription:_NS("Repeat one")];
+        _repeatOffImage = [NSImage imageWithSystemSymbolName:@"repeat"
+                                    accessibilityDescription:_NS("Repeat off")];
+        _shuffleOnImage = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                    accessibilityDescription:_NS("Shuffle on")];
+        _shuffleOffImage = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                     accessibilityDescription:_NS("Shuffle off")];
+        _alwaysMuteImage = [NSImage imageWithSystemSymbolName:@"speaker.minus.fill"
+                                     accessibilityDescription:_NS("Mute")];
 
-    [self.volumeUpButton setImage: imageFromRes(@"VLCVolumeOnTemplate")];
+        [self.stopButton setImage: [NSImage imageWithSystemSymbolName:@"stop.fill"
+                                             accessibilityDescription:_NS("Stop")]];
+        [self.volumeUpButton setImage: [NSImage imageWithSystemSymbolName:@"speaker.plus.fill"
+                                                 accessibilityDescription:_NS("Volume up")]];
+    } else {
+        _repeatAllImage = [NSImage imageNamed:@"repeatAll"];
+        _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
+        _repeatOneImage = [NSImage imageNamed:@"repeatOne"];
+        _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
+        _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
+        _alwaysMuteImage = [NSImage imageNamed:@"VLCVolumeOffTemplate"];
+
+        [self.stopButton setImage: imageFromRes(@"stop")];
+        [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
+        [self.volumeUpButton setImage: imageFromRes(@"VLCVolumeOnTemplate")];
+    }
+
+    [self repeatStateUpdated:nil];
+    [self shuffleStateUpdated:nil];
+    [self updateMuteVolumeButtonImage];
 
     [self playbackStateChanged:nil];
     [self.stopButton setHidden:YES];
@@ -164,7 +212,7 @@
 
 - (void)updateMuteVolumeButtonImage
 {
-    self.muteVolumeButton.image = imageFromRes(@"VLCVolumeOffTemplate");
+    self.muteVolumeButton.image = _alwaysMuteImage;
 }
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
