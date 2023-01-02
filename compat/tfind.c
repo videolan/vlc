@@ -6,9 +6,6 @@
 # include <config.h>
 #endif
 
-/** search.h is not present so every t* functions has to be implemented */
-#ifndef HAVE_SEARCH_H
-
 #include <assert.h>
 #include <stdlib.h>
 
@@ -240,5 +237,3 @@ twalk(const void *vroot, cmp_fn_t action) /* Root of the tree to be walked */
 	if (vroot != NULL && action != NULL)
 		trecurse(vroot, action, 0);
 }
-
-#endif // HAVE_SEARCH_H

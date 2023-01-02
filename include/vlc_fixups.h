@@ -481,7 +481,7 @@ ssize_t sendmsg(int, const struct msghdr *, int);
 #endif
 
 /* search.h */
-#ifndef HAVE_SEARCH_H
+#ifndef HAVE_TFIND
 typedef enum {
     preorder,
     postorder,
@@ -498,7 +498,7 @@ void twalk( const void *root, void(*action)(const void *nodep, VISIT which, int 
 void *lfind( const void *key, const void *base, size_t *nmemb,
              size_t size, int(*cmp)(const void *, const void *) );
 #endif
-#endif /* HAVE_SEARCH_H */
+#endif /* HAVE_TFIND */
 
 #ifndef HAVE_TDESTROY
 void tdestroy( void *root, void (*free_node)(void *nodep) );
