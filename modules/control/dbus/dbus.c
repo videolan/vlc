@@ -595,6 +595,34 @@ static int GetPollFds( intf_thread_t *p_intf, struct pollfd *p_fds )
     return i_fds;
 }
 
+
+/**
+ * ProcessPlaylistChanged() reacts to tracks being either inserted or removed from the playlist
+ *
+ * This function must be called by ProcessEvents only
+ *
+ * @param intf_thread_t *p_intf This interface thread state
+ * @param callback_info_t *p_events the list of events to process
+ */
+static void ProcessPlaylistChanged( intf_thread_t *p_intf,
+                                    vlc_dictionary_t *player_properties,
+                                    vlc_dictionary_t *tracklist_properties )
+{
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    bool b_can_play = vlc_playlist_Count(playlist) > 0;
+    vlc_playlist_Unlock(playlist);
+
+    if( b_can_play != p_intf->p_sys->b_can_play )
+    {
+        p_intf->p_sys->b_can_play = b_can_play;
+        vlc_dictionary_insert( player_properties, "CanPlay", NULL );
+    }
+
+    if( !vlc_dictionary_has_key( tracklist_properties, "Tracks" ) )
+        vlc_dictionary_insert( tracklist_properties, "Tracks", NULL );
+}
+
 /**
  * ProcessEvents() reacts to a list of events originating from other VLC threads
  *
@@ -606,8 +634,6 @@ static int GetPollFds( intf_thread_t *p_intf, struct pollfd *p_fds )
 static void ProcessEvents( intf_thread_t *p_intf,
                            callback_info_t **p_events, int i_events )
 {
-    bool b_can_play = p_intf->p_sys->b_can_play;
-
     vlc_dictionary_t player_properties, tracklist_properties, root_properties;
     vlc_dictionary_init( &player_properties,    0 );
     vlc_dictionary_init( &tracklist_properties, 0 );
@@ -627,23 +653,11 @@ static void ProcessEvents( intf_thread_t *p_intf,
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
             break;
         case SIGNAL_PLAYLIST_ITEM_APPEND:
-        case SIGNAL_PLAYLIST_ITEM_DELETED:
-        {
-            vlc_playlist_t *playlist = p_intf->p_sys->playlist;
-            vlc_playlist_Lock(playlist);
-            b_can_play = vlc_playlist_Count(playlist) > 0;
-            vlc_playlist_Unlock(playlist);
-
-            if( b_can_play != p_intf->p_sys->b_can_play )
-            {
-                p_intf->p_sys->b_can_play = b_can_play;
-                vlc_dictionary_insert( &player_properties, "CanPlay", NULL );
-            }
-
-            if( !vlc_dictionary_has_key( &tracklist_properties, "Tracks" ) )
-                vlc_dictionary_insert( &tracklist_properties, "Tracks", NULL );
+            ProcessPlaylistChanged( p_intf, &player_properties, &tracklist_properties );
             break;
-        }
+        case SIGNAL_PLAYLIST_ITEM_DELETED:
+            ProcessPlaylistChanged( p_intf, &player_properties, &tracklist_properties );
+            break;
         case SIGNAL_VOLUME_MUTED:
         case SIGNAL_VOLUME_CHANGE:
             vlc_dictionary_insert( &player_properties, "Volume", NULL );
