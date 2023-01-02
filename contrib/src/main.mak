@@ -10,6 +10,8 @@ SRC_BUILT := $(TOPSRC_BUILT)/src
 TARBALLS := $(TOPSRC)/tarballs
 VLC_TOOLS ?= $(TOPSRC)/../extras/tools/build
 
+CMAKE_GENERATOR ?= Ninja
+
 PATH :=$(abspath $(VLC_TOOLS)/bin):$(PATH)
 export PATH
 
@@ -460,8 +462,9 @@ endif
 ifdef MSYS_BUILD
 CMAKE = PKG_CONFIG_LIBDIR="$(PKG_CONFIG_PATH)" $(CMAKE)
 CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
-CMAKE += -G "MSYS Makefiles"
+CMAKE_GENERATOR="MSYS Makefiles"
 endif
+CMAKE += -G $(CMAKE_GENERATOR)
 
 ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
