@@ -18,9 +18,15 @@ libvlc_sources = [
     'picture.c'
 ]
 
+libvlc_cargs = []
+if host_system == 'windows'
+    libvlc_cargs += ['-DLIBVLC_DLL_EXPORT']
+endif
+
 libvlc = library('vlc',
     libvlc_sources, rev_target,
     include_directories: [vlc_include_dirs],
+    c_args: libvlc_cargs,
     link_with: [vlc_libcompat],
     dependencies: [libvlccore_dep, m_lib, threads_dep],
     install: true

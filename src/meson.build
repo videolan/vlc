@@ -35,6 +35,8 @@ libvlccore_deps = [
     m_lib, dl_lib, threads_dep, intl_dep, socket_libs, iconv_dep, anl_lib, idn_dep
 ]
 
+vlccore_cargs = [ '-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ]
+
 if host_system == 'darwin'
     libvlccore_deps += foundation_dep
     libvlccore_deps += corefoundation_dep
@@ -43,6 +45,7 @@ elif host_system == 'windows'
     libvlccore_deps += cc.find_library('bcrypt')
     libvlccore_deps += cc.find_library('winmm')
     libvlccore_deps += cc.find_library('normaliz')
+    vlccore_cargs += ['-DVLC_DLL_EXPORT']
 endif
 
 #
@@ -338,7 +341,7 @@ libvlccore = library(
     libvlccore_sources, vlc_about, fourcc, rev_target,
     include_directories: vlc_include_dirs,
     version: '9.0.0',
-    c_args: ['-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ],
+    c_args: vlccore_cargs,
     link_args: libvlccore_link_args,
     link_with: [vlc_libcompat],
     dependencies: libvlccore_deps,
