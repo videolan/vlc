@@ -29,6 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 #include "dbus_common.h"
 
 #define DBUS_MPRIS_TRACKLIST_INTERFACE    "org.mpris.MediaPlayer2.TrackList"
@@ -36,6 +37,61 @@
 
 #define DBUS_MPRIS_NOTRACK   "/org/mpris/MediaPlayer2/TrackList/NoTrack"
 #define DBUS_MPRIS_APPEND    "/org/mpris/MediaPlayer2/TrackList/Append"
+
+struct tracklist_change_event {
+    size_t index;
+    size_t count;
+    struct tracklist_change_event *next;
+};
+
+struct tracklist_append_event {
+    struct tracklist_change_event change_ev;
+    playlist_item_t items[];
+};
+
+struct tracklist_remove_event {
+    struct tracklist_change_event change_ev;
+};
+
+typedef struct tracklist_append_event tracklist_append_event_t;
+typedef struct tracklist_remove_event tracklist_remove_event_t;
+
+/* Creates an event holding what items have been appended to a tracklist.
+ * The event data will be used to generate TrackAdded DBus signals later on.
+ */
+tracklist_append_event_t *
+tracklist_append_event_create( size_t index,
+                               playlist_item_t *const items[],
+                               size_t count );
+
+/* Creates an event holding what items have been removed from a tracklist.
+ *  The event data will be used to generate TrackRemoved DBus signals later on.
+ */
+tracklist_remove_event_t *
+tracklist_remove_event_create( size_t index, size_t count );
+
+/* Releases any resources reserved for this event */
+void tracklist_append_event_destroy( tracklist_append_event_t *event );
+void tracklist_remove_event_destroy( tracklist_remove_event_t *event );
+
+/* Gets next event in the list */
+static inline tracklist_append_event_t *
+tracklist_append_event_next( tracklist_append_event_t *event ) {
+    if( !event )
+        return NULL;
+    char *p = (char *) event->change_ev.next;
+    return (tracklist_append_event_t *)
+        (p - offsetof(struct tracklist_append_event, change_ev));
+}
+
+static inline tracklist_remove_event_t *
+tracklist_remove_event_next( tracklist_remove_event_t *event ) {
+    if( !event )
+        return NULL;
+    char *p = (char *) event->change_ev.next;
+    return (tracklist_remove_event_t *)
+        (p - offsetof(struct tracklist_remove_event, change_ev));
+}
 
 /* Handle incoming dbus messages */
 DBusHandlerResult handle_tracklist ( DBusConnection *p_conn,
