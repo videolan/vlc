@@ -514,6 +514,7 @@ MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
     item = playlist_CurrentPlayingItem( playlist );
 
     if( item != NULL )
+        // TODO: vlc_object_hold this
         result = GetInputMeta( item, container );
     else
     {   // avoid breaking the type marshalling

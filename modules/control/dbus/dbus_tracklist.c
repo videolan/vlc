@@ -148,24 +148,25 @@ DBUS_METHOD( GetTracksMetadata )
         dbus_message_iter_get_basic( &track_ids, &psz_track_id );
 
         if( 1 != sscanf( psz_track_id, MPRIS_TRACKID_FORMAT, &i_track_id ) )
+            goto invalid_track_id;
+
+        playlist_item_t *item = NULL;
+
+        playlist_Lock(p_playlist);
+        item = playlist_ItemGetById(p_playlist, i_track_id);
+        if (item)
         {
+            GetInputMeta(item, &meta);
+        }
+        playlist_Unlock(p_playlist);
+
+        if (!item)
+        {
+invalid_track_id:
             msg_Err( (vlc_object_t*) p_this, "Invalid track id: %s",
                                              psz_track_id );
             continue;
         }
-
-        PL_LOCK;
-        for( int i = 0; i < p_playlist->current.i_size; i++ )
-        {
-            playlist_item_t *item = p_playlist->current.p_elems[i];
-
-            if( item->i_id == i_track_id )
-            {
-                GetInputMeta( item, &meta );
-                break;
-            }
-        }
-        PL_UNLOCK;
 
         dbus_message_iter_next( &track_ids );
     }
