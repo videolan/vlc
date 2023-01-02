@@ -89,6 +89,10 @@ static const DBusObjectPathVTable dbus_mpris_vtable = {
 typedef struct
 {
     int signal;
+    union {
+        tracklist_append_event_t *items_appended;
+        tracklist_remove_event_t *items_removed;
+    };
 } callback_info_t;
 
 enum
@@ -639,6 +643,14 @@ static void ProcessEvents( intf_thread_t *p_intf,
     vlc_dictionary_init( &tracklist_properties, 0 );
     vlc_dictionary_init( &root_properties,      0 );
 
+    // In case multiple *_ITEM_APPEND or *_ITEM_DELETED events appear on the
+    // list, the elements in their respective map values will be linked in
+    // order.
+    // We keep the tail of the list in order to append the elements to the end
+    // of each list.
+    tracklist_append_event_t *last_append = NULL;
+    tracklist_remove_event_t *last_remove = NULL;
+
     for( int i = 0; i < i_events; i++ )
     {
         switch( p_events[i]->signal )
@@ -653,9 +665,27 @@ static void ProcessEvents( intf_thread_t *p_intf,
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
             break;
         case SIGNAL_PLAYLIST_ITEM_APPEND:
+            if( !last_append ) {
+                assert (!vlc_dictionary_has_key( &tracklist_properties, "TrackAdded" ) );
+                vlc_dictionary_insert( &tracklist_properties, "TrackAdded", p_events[i]->items_appended );
+
+                last_append = p_events[i]->items_appended;
+            } else {
+                last_append->change_ev.next = &p_events[i]->items_appended->change_ev;
+                last_append = p_events[i]->items_appended;
+            }
             ProcessPlaylistChanged( p_intf, &player_properties, &tracklist_properties );
             break;
         case SIGNAL_PLAYLIST_ITEM_DELETED:
+            if( !last_remove ) {
+                assert (!vlc_dictionary_has_key( &tracklist_properties, "TrackRemoved" ) );
+                vlc_dictionary_insert( &tracklist_properties, "TrackRemoved", p_events[i]->items_removed );
+
+                last_remove = p_events[i]->items_removed;
+            } else {
+                last_remove->change_ev.next = &p_events[i]->items_removed->change_ev;
+                last_remove = p_events[i]->items_removed;
+            }
             ProcessPlaylistChanged( p_intf, &player_properties, &tracklist_properties );
             break;
         case SIGNAL_VOLUME_MUTED:
@@ -1018,18 +1048,22 @@ playlist_on_items_added(vlc_playlist_t *playlist, size_t index,
                         vlc_playlist_item_t *const items[], size_t count,
                         void *data)
 {
+    tracklist_append_event_t *append_event = tracklist_append_event_create(index, items, count);
     add_event_signal(data,
-            &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_APPEND });
-    (void) playlist; (void) index; (void) items; (void) count;
+            &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_APPEND,
+                                .items_appended = append_event });
+    (void) playlist;
 }
 
 static void
 playlist_on_items_removed(vlc_playlist_t *playlist,
                           size_t index, size_t count, void *data)
 {
+    tracklist_remove_event_t *remove_event = tracklist_remove_event_create(index, count);
     add_event_signal(data,
-            &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_DELETED });
-    (void) playlist; (void) index; (void) count;
+            &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_DELETED,
+                                .items_removed = remove_event });
+    (void) playlist;
 }
 
 static void
