@@ -24,6 +24,7 @@
 #import "VLCControlsBarCommon.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
@@ -75,10 +76,25 @@
     _playerController = _playlistController.playerController;
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    [notificationCenter addObserver:self selector:@selector(updateTimeSlider:) name:VLCPlayerTimeAndPositionChanged object:nil];
-    [notificationCenter addObserver:self selector:@selector(playerStateUpdated:) name:VLCPlayerStateChanged object:nil];
-    [notificationCenter addObserver:self selector:@selector(updatePlaybackControls:) name:VLCPlaylistCurrentItemChanged object:nil];
-    [notificationCenter addObserver:self selector:@selector(fullscreenStateUpdated:) name:VLCPlayerFullscreenChanged object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateTimeSlider:)
+                               name:VLCPlayerTimeAndPositionChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playerStateUpdated:)
+                               name:VLCPlayerStateChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updatePlaybackControls:) name:VLCPlaylistCurrentItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(fullscreenStateUpdated:)
+                               name:VLCPlayerFullscreenChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(repeatStateUpdated:)
+                               name:VLCPlaybackRepeatChanged
+                             object:nil];
 
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
@@ -142,6 +158,7 @@
     [self.backwardButton setAction:@selector(bwd:)];
 
     [self playerStateUpdated:nil];
+    [self repeatStateUpdated:nil];
 
     [_artworkImageView setCropsImagesToRoundedCorners:YES];
     [_artworkImageView setImage:[NSImage imageNamed:@"noart"]];
@@ -150,8 +167,6 @@
     _repeatAllImage = [NSImage imageNamed:@"repeatAll"];
     _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
     _repeatOneImage = [NSImage imageNamed:@"repeatOne"];
-
-    [_repeatButton setImage:_repeatOffImage];
 
     _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
     _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
@@ -349,6 +364,29 @@
         [self setPause];
     } else {
         [self setPlay];
+    }
+}
+
+- (void)repeatStateUpdated:(NSNotification *)aNotification
+{
+    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
+
+    switch (currentRepeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            self.repeatButton.image = _repeatOneImage;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            self.repeatButton.image = _repeatAllImage;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
+        default:
+            self.repeatButton.image = _repeatOffImage;
+            break;
+    }
+
+    if (@available(macOS 11.0, *)) {
+        self.repeatButton.contentTintColor = currentRepeatState == VLC_PLAYLIST_PLAYBACK_REPEAT_NONE ?
+            nil : [NSColor VLCAccentColor];
     }
 }
 
