@@ -37,6 +37,8 @@ FocusScope {
     property var enqueueActionBtn
     property var playActionBtn
 
+    property bool forcePlayActionBtnFocusOnce: false
+
     signal retract()
 
     implicitWidth: layout.implicitWidth
@@ -56,6 +58,8 @@ FocusScope {
 
     function setCurrentItemFocus(reason) {
         root.playActionBtn.forceActiveFocus(reason);
+        if (VLCStyle.isScreenSmall)
+            root.forcePlayActionBtnFocusOnce = true;
     }
 
     function _getStringTrack() {
@@ -146,6 +150,16 @@ FocusScope {
                         iconTxt: VLCIcons.play_outline
                         text: I18n.qtr("Play")
                         onClicked: MediaLib.addAndPlay( root.model.id )
+
+                        onActiveFocusChanged: {
+                            // root.setCurrentItemFocus sets active focus to playActionBtn, but it gets stolen
+                            // by the delegate of the first track at initial load when playActionBtn is in the
+                            // header of tracks
+                            if (VLCStyle.isScreenSmall && root.forcePlayActionBtnFocusOnce) {
+                                root.forcePlayActionBtnFocusOnce = false
+                                root.playActionBtn.forceActiveFocus(Qt.TabFocusReason)
+                            }
+                        }
                     }
 
                     Widgets.ButtonExt {
