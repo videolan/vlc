@@ -401,7 +401,7 @@ endif
 # will differ based on the platform we're building for
 if host_system == 'windows'
   arpa_inet_h = '#include <ws2tcpip.h>\n#include <windows.h>'
-  net_if_h = '#include <iphlpapi.h>'
+  net_if_h = '#include <windows.h>\n#include <iphlpapi.h>'
 else
   arpa_inet_h = '#include <arpa/inet.h>'
   net_if_h = '#include <net.if.h>'
