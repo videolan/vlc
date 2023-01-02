@@ -319,7 +319,7 @@
 # define VLC_EXTERN
 #endif
 
-#if defined (_WIN32) && defined (DLL_EXPORT)
+#if defined (_WIN32) && defined (VLC_DLL_EXPORT)
 # define VLC_EXPORT __declspec(dllexport)
 #elif defined (__GNUC__)
 # define VLC_EXPORT __attribute__((visibility("default")))

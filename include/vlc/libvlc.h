@@ -34,7 +34,7 @@
 #ifndef VLC_LIBVLC_H
 #define VLC_LIBVLC_H 1
 
-#if defined (_WIN32) && defined (DLL_EXPORT)
+#if defined (_WIN32) && defined (LIBVLC_DLL_EXPORT)
 # define LIBVLC_API __declspec(dllexport)
 #elif defined (__GNUC__) && (__GNUC__ >= 4)
 # define LIBVLC_API __attribute__((visibility("default")))
