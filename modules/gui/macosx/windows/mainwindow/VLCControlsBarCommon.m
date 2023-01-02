@@ -161,6 +161,7 @@
     [self.forwardButton setAction:@selector(fwd:)];
     [self.backwardButton setAction:@selector(bwd:)];
 
+    self.repeatButton.action = @selector(repeatAction:);
     self.shuffleButton.action = @selector(shuffleAction:);
 
     [self playerStateUpdated:nil];
@@ -310,6 +311,23 @@
         _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
     } else {
         _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
+}
+
+- (IBAction)repeatAction:(id)sender
+{
+    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
+    switch (currentRepeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+            break;
+
+        default:
+            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+            break;
     }
 }
 
