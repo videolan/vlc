@@ -402,9 +402,13 @@ endif
 if host_system == 'windows'
   arpa_inet_h = '#include <ws2tcpip.h>\n#include <windows.h>'
   net_if_h = '#include <windows.h>\n#include <iphlpapi.h>'
+  getpid_h = '#include <process.h>'
+  swab_h   = '#include <stdlib.h>'
 else
   arpa_inet_h = '#include <arpa/inet.h>'
   net_if_h = '#include <net.if.h>'
+  getpid_h = '#include <unistd.h>'
+  swab_h   = '#include <unistd.h>'
 endif
 
 #
@@ -424,6 +428,7 @@ check_functions = [
     ['getmntent_r',      '#include <mntent.h>'],
     ['getpwuid_r',       '#include <pwd.h>'],
     ['isatty',           '#include <unistd.h>'],
+    ['isatty',           '#include <io.h>'],
     ['memalign',         '#include <malloc.h>'],
     ['mkostemp',         '#include <unistd.h>'],
     ['mkostemp',         '#include <stdlib.h>'],
@@ -491,7 +496,7 @@ libcompat_functions = [
     ['flockfile',        '#include <stdio.h>'],
     ['fsync',            '#include <unistd.h>'],
     ['getdelim',         '#include <stdio.h>'],
-    ['getpid',           '#include <unistd.h>'],
+    ['getpid',           getpid_h],
     ['lfind',            '#include <search.h>'],
     ['lldiv',            '#include <stdlib.h>'],
     ['memrchr',          '#include <string.h>'],
@@ -514,7 +519,7 @@ libcompat_functions = [
     ['strtof',           '#include <stdlib.h>'],
     ['strtok_r',         '#include <string.h>'],
     ['strtoll',          '#include <stdlib.h>'],
-    ['swab',             '#include <unistd.h>'],
+    ['swab',             swab_h],
     ['tdestroy',         '#include <search.h>'],
     ['tfind',            '#include <search.h>'],
     ['timegm',           '#include <time.h>'],
