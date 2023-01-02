@@ -337,10 +337,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)shuffleStateUpdated:(NSNotification *)aNotification
 {
-    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
-        self.shufflePlaylistButton.image = [NSImage imageNamed:@"shuffleOff"];
+    if (@available(macOS 11.0, *)) {
+        self.shufflePlaylistButton.image = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                                     accessibilityDescription:@"Shuffle"];
+        self.shufflePlaylistButton.contentTintColor = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+            nil : [NSColor VLCAccentColor];
     } else {
-        self.shufflePlaylistButton.image = [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
+        self.shufflePlaylistButton.image = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+            [NSImage imageNamed:@"shuffleOff"] : [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
     }
 }
 
