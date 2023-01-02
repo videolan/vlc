@@ -26,6 +26,28 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+#if defined(_MSC_VER)
+// disable common warnings when compiling POSIX code
+#define _CRT_NONSTDC_NO_WARNINGS    1
+#define _CRT_SECURE_NO_WARNINGS     1
+
+// sys/stat.h values
+#define S_IWUSR     _S_IWRITE
+#define S_IRUSR     _S_IREAD
+#define S_IFIFO     _S_IFIFO
+#define S_ISDIR(m)  (((m) & S_IFMT) == S_IFDIR)
+#define S_ISREG(m)  (((m) & S_IFMT) == S_IFREG)
+#define S_ISBLK(m)  (0)
+
+// same type as statXXX structures st_mode field
+typedef unsigned short mode_t;
+
+// no compat, but there's an MSVC equivalent
+#define strncasecmp _strnicmp
+#define snwprintf   _snwprintf
+
+#endif // _MSC_VER
+
 #ifdef _WIN32
 // avoid collision between numeric_limits::max() and max define
 #define NOMINMAX
