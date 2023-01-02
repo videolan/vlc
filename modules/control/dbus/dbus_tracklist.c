@@ -132,13 +132,20 @@ DBUS_METHOD( GetTracksMetadata )
 
         vlc_playlist_Lock(playlist);
         bool id_valid = i_track_id < vlc_playlist_Count(playlist);
+        vlc_playlist_item_t *item = NULL;
         if (id_valid)
         {
-            vlc_playlist_item_t *item = vlc_playlist_Get(playlist, i_track_id);
-            GetInputMeta(playlist, item, &meta);
+            item = vlc_playlist_Get(playlist, i_track_id);
+            vlc_playlist_item_Hold(item);
         }
         vlc_playlist_Unlock(playlist);
-        if (!id_valid)
+
+        if (id_valid)
+        {
+            GetInputMeta(i_track_id, item, &meta);
+            vlc_playlist_item_Release(item);
+        }
+        else
         {
 invalid_track_id:
             msg_Err( (vlc_object_t*) p_this, "Invalid track id: %s",

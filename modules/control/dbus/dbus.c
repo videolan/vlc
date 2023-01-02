@@ -1311,7 +1311,7 @@ int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg )
         free( psz ); \
     }
 
-int GetInputMeta(vlc_playlist_t *playlist, vlc_playlist_item_t *item, DBusMessageIter *args)
+int GetInputMeta(size_t index, vlc_playlist_item_t *item, DBusMessageIter *args)
 {
     input_item_t *p_input = vlc_playlist_item_GetMedia(item);
     DBusMessageIter dict, dict_entry, variant, list;
@@ -1322,8 +1322,7 @@ int GetInputMeta(vlc_playlist_t *playlist, vlc_playlist_item_t *item, DBusMessag
     dbus_int64_t i_length = i_mtime / 1000;
     char *psz_trackid;
 
-    if (asprintf(&psz_trackid, MPRIS_TRACKID_FORMAT,
-                 vlc_playlist_IndexOf(playlist, item)) == -1)
+    if (asprintf(&psz_trackid, MPRIS_TRACKID_FORMAT, index) == -1)
         return VLC_ENOMEM;
 
     const char* ppsz_meta_items[] =

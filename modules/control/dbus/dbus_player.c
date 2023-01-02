@@ -525,13 +525,20 @@ static int
 MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     int result = VLC_SUCCESS;
+
+    vlc_playlist_item_t *plitem = NULL;
     vlc_playlist_t *playlist = p_intf->p_sys->playlist;
     vlc_playlist_Lock(playlist);
     ssize_t id = vlc_playlist_GetCurrentIndex(playlist);
-    if(id != -1)
+    if (id != -1) {
+        plitem = vlc_playlist_Get(playlist, id);
+        vlc_playlist_item_Hold(plitem);
+    }
+    vlc_playlist_Unlock(playlist);
+    if(plitem)
     {
-        vlc_playlist_item_t *plitem = vlc_playlist_Get(playlist, id);
-        result = GetInputMeta(playlist, plitem, container);
+        result = GetInputMeta(id, plitem, container);
+        vlc_playlist_item_Release(plitem);
     }
     else
     {   // avoid breaking the type marshalling
@@ -541,7 +548,6 @@ MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
             !dbus_message_iter_close_container( container, &a ) )
             result = VLC_ENOMEM;
     }
-    vlc_playlist_Unlock(playlist);
     return result;
 }
 

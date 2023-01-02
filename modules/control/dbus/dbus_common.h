@@ -144,7 +144,7 @@ enum
 };
 
 int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg );
-int GetInputMeta( vlc_playlist_t *, vlc_playlist_item_t *,
+int GetInputMeta( size_t index, vlc_playlist_item_t *,
                   DBusMessageIter *args );
 int AddProperty ( intf_thread_t *p_intf,
                   DBusMessageIter *p_container,
