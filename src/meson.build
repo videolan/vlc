@@ -42,6 +42,7 @@ if host_system == 'darwin'
 elif host_system == 'windows'
     libvlccore_deps += cc.find_library('bcrypt')
     libvlccore_deps += cc.find_library('winmm')
+    libvlccore_deps += cc.find_library('normaliz')
 endif
 
 #
