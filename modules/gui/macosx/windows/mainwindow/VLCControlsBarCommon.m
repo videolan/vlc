@@ -161,6 +161,8 @@
     [self.forwardButton setAction:@selector(fwd:)];
     [self.backwardButton setAction:@selector(bwd:)];
 
+    self.shuffleButton.action = @selector(shuffleAction:);
+
     [self playerStateUpdated:nil];
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
@@ -300,6 +302,15 @@
 - (IBAction)fullscreen:(id)sender
 {
     [_playerController toggleFullscreen];
+}
+
+- (IBAction)shuffleAction:(id)sender
+{
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    } else {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
 }
 
 #pragma mark -
