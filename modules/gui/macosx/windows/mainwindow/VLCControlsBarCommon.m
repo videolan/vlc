@@ -92,6 +92,10 @@
                                name:VLCPlayerFullscreenChanged
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(shuffleStateUpdated:)
+                               name:VLCPlaybackOrderChanged
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(repeatStateUpdated:)
                                name:VLCPlaybackRepeatChanged
                              object:nil];
@@ -159,6 +163,7 @@
 
     [self playerStateUpdated:nil];
     [self repeatStateUpdated:nil];
+    [self shuffleStateUpdated:nil];
 
     [_artworkImageView setCropsImagesToRoundedCorners:YES];
     [_artworkImageView setImage:[NSImage imageNamed:@"noart"]];
@@ -170,9 +175,6 @@
 
     _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
     _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
-
-    [_shuffleButton setImage:_shuffleOffImage];
-
 }
 
 - (void)dealloc
@@ -386,6 +388,17 @@
 
     if (@available(macOS 11.0, *)) {
         self.repeatButton.contentTintColor = currentRepeatState == VLC_PLAYLIST_PLAYBACK_REPEAT_NONE ?
+            nil : [NSColor VLCAccentColor];
+    }
+}
+
+- (void)shuffleStateUpdated:(NSNotification *)aNotification
+{
+    self.shuffleButton.image = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+        _shuffleOffImage : _shuffleOnImage;
+
+    if (@available(macOS 11.0, *)) {
+        self.shuffleButton.contentTintColor = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
             nil : [NSColor VLCAccentColor];
     }
 }
