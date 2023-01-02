@@ -52,6 +52,14 @@
     NSImage *_pressedPauseImage;
     NSImage *_playImage;
     NSImage *_pressedPlayImage;
+    NSImage *_backwardImage;
+    NSImage *_forwardImage;
+    NSImage *_fullscreenImage;
+    NSImage *_repeatOffImage;
+    NSImage *_repeatAllImage;
+    NSImage *_repeatOneImage;
+    NSImage *_shuffleOffImage;
+    NSImage *_shuffleOnImage;
 
     NSTimeInterval last_fwd_event;
     NSTimeInterval last_bwd_event;
@@ -124,17 +132,21 @@
     [self.fullscreenButton setToolTip: _NS("Enter fullscreen")];
     self.fullscreenButton.accessibilityLabel = self.fullscreenButton.toolTip;
 
-    [self.backwardButton setImage: imageFromRes(@"VLCBackwardTemplate")];
-    [self.backwardButton setAlternateImage: imageFromRes(@"VLCBackwardTemplate")];
     _playImage = imageFromRes(@"VLCPlayTemplate");
     _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
     _pauseImage = imageFromRes(@"VLCPauseTemplate");
     _pressedPauseImage = imageFromRes(@"VLCPauseTemplate");
-    [self.forwardButton setImage: imageFromRes(@"VLCForwardTemplate")];
-    [self.forwardButton setAlternateImage: imageFromRes(@"VLCForwardTemplate")];
+    _backwardImage = imageFromRes(@"VLCBackwardTemplate");
+    _forwardImage = imageFromRes(@"VLCForwardTemplate");
+    _fullscreenImage = imageFromRes(@"VLCFullscreenOffTemplate");
 
-    [self.fullscreenButton setImage: imageFromRes(@"VLCFullscreenOffTemplate")];
-    [self.fullscreenButton setAlternateImage: imageFromRes(@"VLCFullscreenOffTemplate")];
+    [self.backwardButton setImage: _backwardImage];
+    [self.backwardButton setAlternateImage: _backwardImage];
+    [self.forwardButton setImage: _forwardImage];
+    [self.forwardButton setAlternateImage: _forwardImage];
+
+    [self.fullscreenButton setImage: _fullscreenImage];
+    [self.fullscreenButton setAlternateImage: _fullscreenImage];
     [self.playButton setImage: _playImage];
     [self.playButton setAlternateImage: _pressedPlayImage];
 
