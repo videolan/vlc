@@ -599,10 +599,12 @@ static inline size_t vlc_align(size_t v, size_t align)
     return (v + (align - 1)) & ~(align - 1);
 }
 
-#if defined(__clang__) && __has_attribute(diagnose_if)
+#if defined __has_attribute
+# if __has_attribute(diagnose_if)
 static inline size_t vlc_align(size_t v, size_t align)
     __attribute__((diagnose_if(((align & (align - 1)) || (align == 0)),
         "align must be power of 2", "error")));
+# endif
 #endif
 
 /** Greatest common divisor */
