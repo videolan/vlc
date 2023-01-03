@@ -34,6 +34,9 @@
 
 #import "playlist/VLCPlaylistController.h"
 
+#import <vlc_input.h>
+#import <vlc_url.h>
+
 @interface VLCLibraryMenuController ()
 {
     VLCLibraryInformationPanel *_informationPanel;
@@ -182,15 +185,43 @@
 
 - (void)revealInFinder:(id)sender
 {
-    if(_representedItem == nil) {
+    if (_representedItem != nil) {
+        [self revealMediaLibraryItemInFinder:_representedItem];
+    } else if (_representedInputItem != nil && (!_representedInputItem.isStream)) {
+        [self revealInputItemInFinder:_representedInputItem];
+    }
+}
+
+- (void)revealMediaLibraryItemInFinder:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
+{
+    NSParameterAssert(mediaLibraryItem);
+    VLCMediaLibraryMediaItem *firstMediaItem = mediaLibraryItem.firstMediaItem;
+
+    if(firstMediaItem) {
+        [VLCMain.sharedInstance.libraryController showItemInFinder:firstMediaItem];
+    }
+}
+
+- (void)revealInputItemInFinder:(VLCInputItem*)inputItem
+{
+    NSParameterAssert(inputItem);
+    NSAssert(!inputItem.isStream, @"Cannot reveal a stream input item in Finder");
+    
+    input_item_t *p_media = inputItem.vlcInputItem;
+    if (!p_media) {
+        return;
+    }
+    char *psz_url = input_item_GetURI(p_media);
+    if (!psz_url) {
         return;
     }
 
-    VLCMediaLibraryMediaItem *firstMediaItem = _representedItem.firstMediaItem;
+    char *psz_path = vlc_uri2path(psz_url);
+    NSString *path = toNSStr(psz_path);
+    free(psz_url);
+    free(psz_path);
 
-    if(firstMediaItem) {
-        [[[VLCMain sharedInstance] libraryController] showItemInFinder:firstMediaItem];
-    }
+    [NSWorkspace.sharedWorkspace selectFile:path inFileViewerRootedAtPath:path];
 }
 
 - (void)moveToTrash:(id)sender
