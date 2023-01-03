@@ -201,7 +201,7 @@ typedef enum video_orientation_t
 /** Convert enum video_orientation_t to EXIF */
 #define ORIENT_TO_EXIF(orient) ((0x76853421U >> (4 * (orient))) & 15)
 /** If the orientation is natural or mirrored */
-#define ORIENT_IS_MIRROR(orient) parity(orient)
+#define ORIENT_IS_MIRROR(orient) vlc_parity(orient)
 /** If the orientation swaps dimensions */
 #define ORIENT_IS_SWAP(orient) (((orient) & 4) != 0)
 /** Applies horizontal flip to an orientation */
