@@ -128,8 +128,10 @@ picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
 {
     if (count == 0)
         vlc_assert_unreachable();
+    if (unlikely(count > POOL_MAX))
+        return NULL;
 
-    picture_t *picture[count];
+    picture_t *picture[POOL_MAX];
     unsigned i;
 
     for (i = 0; i < count; i++) {
@@ -154,8 +156,10 @@ picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
 {
     if (count == 0)
         vlc_assert_unreachable();
+    if (unlikely(count > POOL_MAX))
+        return NULL;
 
-    picture_t *picture[count];
+    picture_t *picture[POOL_MAX];
     unsigned i;
 
     for (i = 0; i < count; i++) {
