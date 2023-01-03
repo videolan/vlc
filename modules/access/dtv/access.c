@@ -31,6 +31,11 @@
 #ifdef HAVE_SEARCH_H
 #include <search.h>
 #endif
+#if defined(_WIN32)
+/* the Win32 prototype of lfind() expects an unsigned* for 'nelp' */
+# define lfind(a,b,c,d,e) \
+         lfind((a),(b), &(unsigned){ (*(c) > UINT_MAX) ? UINT_MAX : *(c) }, (d),(e))
+#endif
 
 #include "dtv.h"
 
