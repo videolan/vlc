@@ -35,6 +35,7 @@
     VLCLibraryInformationPanel *_informationPanel;
 
     NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
+    NSHashTable<NSMenuItem*> *_inputItemRequiringMenuItems;
 }
 @end
 
@@ -78,11 +79,17 @@
     [_mediaItemRequiringMenuItems addObject:revealItem];
     [_mediaItemRequiringMenuItems addObject:deleteItem];
     [_mediaItemRequiringMenuItems addObject:informationItem];
+
+    _inputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
+    [_inputItemRequiringMenuItems addObject:playItem];
+    [_inputItemRequiringMenuItems addObject:appendItem];
+    [_inputItemRequiringMenuItems addObject:deleteItem];
 }
 
-- (void)setMediaItemRequiringMenuItemsHidden:(BOOL)hidden
+- (void)menuItems:(NSHashTable<NSMenuItem*>*)menuItems
+        setHidden:(BOOL)hidden
 {
-    for (NSMenuItem *menuItem in _mediaItemRequiringMenuItems) {
+    for (NSMenuItem *menuItem in menuItems) {
         menuItem.hidden = hidden;
     }
 }
@@ -90,7 +97,10 @@
 - (void)updateMenuItems
 {
     BOOL hideMediaItemMenuItems = _representedItem == nil;
-    [self setMediaItemRequiringMenuItemsHidden:hideMediaItemMenuItems];
+    BOOL hideInputItemMenuItems = _representedInputItem == nil;
+
+    [self menuItems:_mediaItemRequiringMenuItems setHidden:hideMediaItemMenuItems];
+    [self menuItems:_inputItemRequiringMenuItems setHidden:hideInputItemMenuItems];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
