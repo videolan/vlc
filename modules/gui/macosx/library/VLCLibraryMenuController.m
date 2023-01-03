@@ -22,13 +22,17 @@
 
 #import "VLCLibraryMenuController.h"
 
-#import "main/VLCMain.h"
+#import "extensions/NSMenu+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryInformationPanel.h"
 
-#import "extensions/NSString+Helpers.h"
-#import "extensions/NSMenu+VLCAdditions.h"
+#import "main/VLCMain.h"
+
+#import "playlist/VLCPlaylistController.h"
 
 @interface VLCLibraryMenuController ()
 {
@@ -111,21 +115,42 @@
 #pragma mark - actions
 - (void)addToPlaylist:(BOOL)playImmediately
 {
-    if(_representedItem == nil) {
-        return;
+    if (_representedItem != nil) {
+        [self addMediaLibraryItemToPlaylist:_representedItem
+                            playImmediately:playImmediately];
+    } else if (_representedInputItem != nil) {
+        [self addInputItemToPlaylist:_representedInputItem
+                     playImmediately:playImmediately];
     }
+}
+
+- (void)addMediaLibraryItemToPlaylist:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
+                      playImmediately:(BOOL)playImmediately
+{
+    NSParameterAssert(mediaLibraryItem);
 
     // We want to add all the tracks to the playlist but only play the first one immediately,
     // otherwise we will skip straight to the last track of the last album from the artist
     __block BOOL beginPlayImmediately = playImmediately;
 
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:mediaItem playImmediately:beginPlayImmediately];
+    [mediaLibraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* childMediaItem) {
+        [VLCMain.sharedInstance.libraryController appendItemToPlaylist:childMediaItem
+                                                       playImmediately:beginPlayImmediately];
 
         if(beginPlayImmediately) {
             beginPlayImmediately = NO;
         }
     }];
+}
+
+- (void)addInputItemToPlaylist:(VLCInputItem*)inputItem
+               playImmediately:(BOOL)playImmediately
+{
+    NSParameterAssert(inputItem);
+    [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItem.vlcInputItem
+                                                 atPosition:-1
+                                              startPlayback:playImmediately];
+
 }
 
 - (void)play:(id)sender
