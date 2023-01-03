@@ -33,7 +33,6 @@
 @interface VLCLibraryMenuController ()
 {
     VLCLibraryInformationPanel *_informationPanel;
-    id<VLCMediaLibraryItemProtocol> _representedItem;
 
     NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
 }
