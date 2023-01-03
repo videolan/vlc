@@ -87,13 +87,10 @@
     }
 }
 
-- (void)updateLibraryMenuItems
+- (void)updateMenuItems
 {
-    if (_representedItem) {
-        [self setMediaItemRequiringMenuItemsHidden:NO];
-    } else {
-        [self setMediaItemRequiringMenuItemsHidden:YES];
-    }
+    BOOL hideMediaItemMenuItems = _representedItem == nil;
+    [self setMediaItemRequiringMenuItemsHidden:hideMediaItemMenuItems];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
@@ -189,7 +186,15 @@
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
 {
     _representedItem = item;
-    [self updateLibraryMenuItems];
+    _representedInputItem = nil;
+    [self updateMenuItems];
+}
+
+- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
+{
+    _representedInputItem = representedInputItem;
+    _representedItem = nil;
+    [self updateMenuItems];
 }
 
 @end
