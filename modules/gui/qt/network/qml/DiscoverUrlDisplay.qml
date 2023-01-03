@@ -28,7 +28,12 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
+    // Properties
+
     readonly property bool isViewMultiView: false
+
+    property int leftPadding: 0
+    property int rightPadding: 0
 
     //---------------------------------------------------------------------------------------------
     // Functions
@@ -115,7 +120,16 @@ FocusScope {
 
             active: MainCtx.mediaLibraryAvailable
             source: "qrc:///medialibrary/UrlListDisplay.qml"
+
             onLoaded: {
+                item.leftPadding = Qt.binding(function() {
+                    return root.leftPadding
+                })
+
+                item.rightPadding = Qt.binding(function() {
+                    return root.rightPadding
+                })
+
                 item.Navigation.upItem = searchField
                 item.Navigation.parentItem =  root
             }
