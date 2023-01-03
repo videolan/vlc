@@ -92,7 +92,7 @@ static inline double secf_from_vlc_tick(vlc_tick_t vtk)
 
 static inline vlc_tick_t vlc_tick_rate_duration(float frame_rate)
 {
-    return CLOCK_FREQ / frame_rate;
+    return (vlc_tick_t)(CLOCK_FREQ / frame_rate);
 }
 
 /*
