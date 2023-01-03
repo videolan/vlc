@@ -67,8 +67,8 @@ FocusScope {
 
     EmptyLabelButton {
         anchors.fill: parent
-        visible: tracklistdisplay_id.model.count === 0
-        focus: tracklistdisplay_id.model.count === 0
+        visible: tracklistdisplay_id.model.hasContent && tracklistdisplay_id.model.count === 0
+        focus: visible
         text: I18n.qtr("No tracks found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover

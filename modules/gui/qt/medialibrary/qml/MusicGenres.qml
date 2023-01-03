@@ -311,8 +311,8 @@ FocusScope {
 
     EmptyLabelButton {
         anchors.fill: parent
-        visible: genreModel.count === 0
-        focus: genreModel.count === 0
+        visible: genreModel.hasContent && genreModel.count === 0
+        focus: visible
         text: I18n.qtr("No genres found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
