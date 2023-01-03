@@ -40,7 +40,7 @@ struct vlc_rcu_thread {
     uintptr_t recursion;
 };
 
-static _Thread_local struct vlc_rcu_thread current;
+static thread_local struct vlc_rcu_thread current;
 
 bool vlc_rcu_read_held(void)
 {
@@ -108,7 +108,7 @@ void vlc_rcu_synchronize(void)
     idx = (idx + 1) % ARRAY_SIZE(gens);
     atomic_store_explicit(&generation, &gens[idx], memory_order_release);
 
-    /* Let old generation readers know that we are waiting for them. */ 
+    /* Let old generation readers know that we are waiting for them. */
     atomic_exchange_explicit(&gen->writer, 1, memory_order_acquire);
 
     while (atomic_load_explicit(&gen->readers, memory_order_relaxed) > 0)
