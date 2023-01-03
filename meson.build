@@ -42,7 +42,6 @@ vlc_src_root = meson.current_source_dir()
 vlc_build_root = meson.current_build_dir()
 
 cdata = configuration_data()
-vlc_include_dirs = include_directories('.', 'include')
 
 gen_vlc_about = find_program('buildsystem/gen-vlc-about.py')
 vlc_about = custom_target('vlc_about.h',
@@ -89,6 +88,13 @@ endif
 cc = meson.get_compiler('c')
 cpp = meson.get_compiler('cpp')
 host_system = host_machine.system()
+
+list_inc_dirs = ['.', 'include']
+if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl'
+    # extra POSIX headers not found in the Windows SDK
+    list_inc_dirs += 'compat/windows'
+endif
+vlc_include_dirs = include_directories(list_inc_dirs)
 
 if host_system == 'darwin'
     add_languages('objc', native: false)
