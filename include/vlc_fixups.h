@@ -482,15 +482,6 @@ ssize_t sendmsg(int, const struct msghdr *, int);
 
 /* search.h */
 #ifndef HAVE_SEARCH_H
-typedef struct entry {
-    char *key;
-    void *data;
-} ENTRY;
-
-typedef enum {
-    FIND, ENTER
-} ACTION;
-
 typedef enum {
     preorder,
     postorder,
