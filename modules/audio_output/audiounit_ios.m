@@ -602,6 +602,14 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
             (long) [p_sys->avInstance outputNumberOfChannels],
             p_sys->b_spatial_audio_supported);
 
+    if (!p_sys->b_preferred_channels_set && fmt->i_channels > 2)
+    {
+        /* Ask the core to downmix to stereo if the preferred number of
+         * channels can't be set. */
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        aout_FormatPrepare(fmt);
+    }
+
     p_aout->current_sink_info.headphones = port_type == PORT_TYPE_HEADPHONES;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
