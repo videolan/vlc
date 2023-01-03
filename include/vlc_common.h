@@ -170,7 +170,13 @@
  */
 #  define VLC_USED
 # endif
-#else // !GCC
+#elif defined(_MSC_VER)
+# define VLC_USED _Check_return_
+// # define VLC_MALLOC __declspec(allocator)
+# define VLC_MALLOC
+// # define VLC_DEPRECATED __declspec(deprecated)
+# define VLC_DEPRECATED
+#else // !GCC && !MSVC
 # define VLC_USED
 # define VLC_MALLOC
 # define VLC_DEPRECATED
