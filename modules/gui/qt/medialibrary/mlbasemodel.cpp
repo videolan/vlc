@@ -39,6 +39,9 @@ MLBaseModel::MLBaseModel(QObject *parent)
         })
 {
     connect( this, &MLBaseModel::resetRequested, this, &MLBaseModel::onResetRequested );
+
+    connect( this, &MLBaseModel::mlChanged, this, &MLBaseModel::hasContentChanged );
+    connect( this, &MLBaseModel::countChanged, this, &MLBaseModel::hasContentChanged );
 }
 
 /* For std::unique_ptr, see Effective Modern C++, Item 22 */
@@ -276,9 +279,14 @@ MediaLib* MLBaseModel::ml() const
 void MLBaseModel::setMl(MediaLib* medialib)
 {
     assert(medialib);
+
+    if (m_mediaLib == medialib)
+        return;
+
     m_mediaLib = medialib;
     if ( m_ml_event_handle == nullptr )
         m_ml_event_handle.reset( m_mediaLib->registerEventListener(onVlcMlEvent, this ) );
+    mlChanged();
 }
 
 const QString& MLBaseModel::searchPattern() const
@@ -614,4 +622,9 @@ MLBaseModel::BaseLoader::BaseLoader(const MLBaseModel &model)
 MLQueryParams MLBaseModel::BaseLoader::getParams(size_t index, size_t count) const
 {
     return { m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
+}
+
+bool MLBaseModel::hasContent() const
+{
+    return m_mediaLib && (getCount() > 0);
 }
