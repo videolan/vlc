@@ -108,7 +108,7 @@ int main(void)
 
     /* Test rejected connection */
     conn_create();
-    conn_shutdown(SHUT_RD);
+    conn_shutdown(false);
     s = stream_open(false);
     if (s != NULL)
         /* Remote read shutdown does not result in an error on some systems. */
@@ -119,7 +119,7 @@ int main(void)
     conn_create();
     s = stream_open(false);
     assert(s != NULL);
-    conn_shutdown(SHUT_WR);
+    conn_shutdown(true);
 
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
@@ -141,7 +141,7 @@ int main(void)
     s = stream_open(false);
     assert(s != NULL);
     conn_send("Go away!\r\n\r\n");
-    conn_shutdown(SHUT_WR);
+    conn_shutdown(true);
 
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
@@ -159,7 +159,7 @@ int main(void)
     assert(m != NULL);
 
     conn_send("Hello world!");
-    conn_shutdown(SHUT_WR);
+    conn_shutdown(true);
     b = vlc_http_msg_read(m);
     assert(b != NULL);
     assert(b->i_buffer == 12);
@@ -179,7 +179,7 @@ int main(void)
     assert(m != NULL);
 
     conn_send("Hello again!");
-    conn_shutdown(SHUT_WR);
+    conn_shutdown(true);
     b = vlc_http_msg_read(m);
     assert(b != NULL);
     assert(b->i_buffer == 12);
@@ -243,7 +243,7 @@ int main(void)
     assert(b->i_buffer == 6);
     assert(!memcmp(b->p_buffer, "Hello ", 6));
     block_Release(b);
-    conn_shutdown(SHUT_RDWR);
+    conn_shutdown(true);
     b = vlc_http_msg_read(m);
     assert(b == vlc_http_error);
     vlc_http_msg_destroy(m);
