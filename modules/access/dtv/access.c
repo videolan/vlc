@@ -659,7 +659,7 @@ static const char *var_InheritModulation (vlc_object_t *obj, const char *var)
     if (mod == NULL)
         return "";
 
-    size_t n = sizeof (modulation_vlc) / sizeof (modulation_vlc[0]);
+    size_t n = ARRAY_SIZE(modulation_vlc);
     const char *const *p = lfind (mod, modulation_vlc, &n, sizeof (mod), modcmp);
     if (p != NULL)
     {
