@@ -2278,7 +2278,9 @@ static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
                 break;
 
             default:
-                assert(0);
+                vlc_assert_unreachable();
+                free( p_sgpd->p_entries );
+                MP4_READBOX_EXIT( 0 );
         }
     }
 
