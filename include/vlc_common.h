@@ -1153,19 +1153,6 @@ static inline void SetQWLE (void *p, uint64_t qw)
 
 #if defined(_WIN32)
 /* several type definitions */
-#   if defined( __MINGW32__ )
-#       if !defined( _OFF_T_ )
-            typedef long long _off_t;
-            typedef _off_t off_t;
-#           define _OFF_T_
-#       else
-#           ifdef off_t
-#               undef off_t
-#           endif
-#           define off_t long long
-#       endif
-#   endif
-
 #   ifndef O_NONBLOCK
 #       define O_NONBLOCK 0
 #   endif
