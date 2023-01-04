@@ -143,66 +143,62 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
 
     assert(priv->displayed.next);
 
+    vlc_tick_t new_next_pts =
+        vlc_clock_ConvertToSystem(priv->clock, system_now,
+                                  priv->displayed.next->date, priv->rate);
+
+    /* Well, we should use the most recent picture fitting in the vsync period */
+    if (new_next_pts /*- priv->vsync.initial_offset */< priv->vsync.next_date)
     {
-        vlc_tick_t new_next_pts =
-            vlc_clock_ConvertToSystem(priv->clock, system_now,
-                                      priv->displayed.next->date, priv->rate);
-
-        /* Well, we should use the most recent picture fitting in the vsync period */
-        if (new_next_pts /*- priv->vsync.initial_offset */< priv->vsync.next_date)
-        {
-            picture_Release(priv->displayed.current);
-            NextPicture(scheduler);
-            priv->state.current = VOUT_STATE_CONTROL;
-
-            return;
-        }
-
-        /* If the current VSYNC is not valid, return to the VOUT_STATE_IDLE
-         * state and wait the next one. */
-        if ( priv->vsync.next_date == VLC_TICK_INVALID
-          || priv->vsync.last_date == priv->vsync.next_date
-          || priv->vsync.missed == true)
-        {
-            const char *error =
-                priv->vsync.missed ? "missed" :
-                priv->vsync.next_date == VLC_TICK_INVALID ? "next date invalid" :
-                "no new VSYNC";
-
-            /* Wait for any input signal to unblock the state machine.
-             * In particular, the state machine will always run into the
-             * VOUT_STATE_IDLE state as long as no VSYNC has happened. */
-            priv->state.current = VOUT_STATE_IDLE;
-            return;
-        }
-
-
-        //bool no_vsync_halted = WaitForVSYNC(scheduler, new_next_pts, &vsync_date);
-
-        //if (/*atomic_load(&sys->control_is_terminated) ||*/ !no_vsync_halted)
-        //    return VLC_EGENERIC;
-        vlc_tick_t vsync_date = priv->vsync.next_date;
-
-        // TODO: why the condition on vsync_date and system_now here ?
-        if (new_next_pts < vsync_date)// || system_now + render_delay > vsync_date)
-        {
-            //if (!priv->displayed.current_rendered)
-            /*msg_Dbg((vlc_object_t*)vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms",
-                (int)MS_FROM_VLC_TICK(vsync_date - new_next_pts),
-                (int)MS_FROM_VLC_TICK(render_delay),
-                (int)MS_FROM_VLC_TICK(new_next_pts),
-                (int)MS_FROM_VLC_TICK(vsync_date));*/
-            picture_Release(priv->displayed.current);
-            NextPicture(scheduler);
-            priv->state.current = VOUT_STATE_CONTROL;
-
-            return;
-        }
-
-        /* Wait, this picture has already been rendered. */
-        if (priv->displayed.current_rendered)
-            priv->state.current = VOUT_STATE_IDLE;
+        picture_Release(priv->displayed.current);
+        NextPicture(scheduler);
+        priv->state.current = VOUT_STATE_CONTROL;
+        return;
     }
+
+    /* If the current VSYNC is not valid, return to the VOUT_STATE_IDLE
+     * state and wait the next one. */
+    if ( priv->vsync.next_date == VLC_TICK_INVALID
+      || priv->vsync.last_date == priv->vsync.next_date
+      || priv->vsync.missed == true)
+    {
+        const char *error =
+            priv->vsync.missed ? "missed" :
+            priv->vsync.next_date == VLC_TICK_INVALID ? "next date invalid" :
+            "no new VSYNC";
+
+        /* Wait for any input signal to unblock the state machine.
+         * In particular, the state machine will always run into the
+         * VOUT_STATE_IDLE state as long as no VSYNC has happened. */
+        priv->state.current = VOUT_STATE_IDLE;
+        return;
+    }
+
+
+    //bool no_vsync_halted = WaitForVSYNC(scheduler, new_next_pts, &vsync_date);
+
+    //if (/*atomic_load(&sys->control_is_terminated) ||*/ !no_vsync_halted)
+    //    return VLC_EGENERIC;
+    vlc_tick_t vsync_date = priv->vsync.next_date;
+
+    // TODO: why the condition on vsync_date and system_now here ?
+    if (new_next_pts < vsync_date)// || system_now + render_delay > vsync_date)
+    {
+        //if (!priv->displayed.current_rendered)
+        /*msg_Dbg((vlc_object_t*)vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms",
+            (int)MS_FROM_VLC_TICK(vsync_date - new_next_pts),
+            (int)MS_FROM_VLC_TICK(render_delay),
+            (int)MS_FROM_VLC_TICK(new_next_pts),
+            (int)MS_FROM_VLC_TICK(vsync_date));*/
+        picture_Release(priv->displayed.current);
+        NextPicture(scheduler);
+        priv->state.current = VOUT_STATE_CONTROL;
+        return;
+    }
+
+    /* Wait, this picture has already been rendered. */
+    if (priv->displayed.current_rendered)
+        priv->state.current = VOUT_STATE_IDLE;
 
     priv->state.current = VOUT_STATE_DISPLAY;
     return;
