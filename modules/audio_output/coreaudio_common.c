@@ -805,7 +805,7 @@ MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelDescriptions;
     inlayout->mNumberChannelDescriptions = aout_FormatNbChannels(fmt);
 
-    bool swap_rear_surround = fmt->i_physical_channels & AOUT_CHANS_7_0;
+    bool swap_rear_surround = (fmt->i_physical_channels & AOUT_CHANS_7_0) == AOUT_CHANS_7_0;
     if (swap_rear_surround)
         msg_Dbg(p_aout, "swapping Surround and RearSurround channels "
                 "for 7.1 Rear Surround");
