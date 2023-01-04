@@ -43,6 +43,7 @@ extern NSString *VLCInputItemPreparsingSucceeded;
 @property (readonly) struct input_item_t *vlcInputItem;
 @property (readonly) NSString *MRL;
 @property (readonly) NSString *decodedMRL;
+@property (readonly) NSString *path;
 @property (readwrite) NSString *name;
 @property (readwrite) NSString *title;
 @property (readwrite) NSString *artist;

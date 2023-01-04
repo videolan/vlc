@@ -450,6 +450,25 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
     return nil;
 }
 
+- (NSString*)path
+{
+    if (_vlcInputItem || (_vlcInputItem && _vlcInputItem->b_net)) {
+        char *psz_url = input_item_GetURI(_vlcInputItem);
+        if (!psz_url) {
+            return @"";
+        }
+
+        char *psz_path = vlc_uri2path(psz_url);
+        NSString *path = toNSStr(psz_path);
+        free(psz_url);
+        free(psz_path);
+
+        return path;
+    }
+
+    return @"";
+}
+
 - (vlc_tick_t)duration
 {
     if (_vlcInputItem) {

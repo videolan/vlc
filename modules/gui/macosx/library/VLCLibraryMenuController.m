@@ -207,19 +207,11 @@
     NSParameterAssert(inputItem);
     NSAssert(!inputItem.isStream, @"Cannot reveal a stream input item in Finder");
     
-    input_item_t *p_media = inputItem.vlcInputItem;
-    if (!p_media) {
-        return;
-    }
-    char *psz_url = input_item_GetURI(p_media);
-    if (!psz_url) {
-        return;
-    }
+    NSString *path = inputItem.path;
 
-    char *psz_path = vlc_uri2path(psz_url);
-    NSString *path = toNSStr(psz_path);
-    free(psz_url);
-    free(psz_path);
+    if (!path || path.length == 0) {
+        return;
+    }
 
     [NSWorkspace.sharedWorkspace selectFile:path inFileViewerRootedAtPath:path];
 }
@@ -252,19 +244,11 @@
     NSParameterAssert(inputItem);
     NSAssert(!inputItem.isStream, @"Cannot move a stream input item to trash");
 
-    input_item_t *p_media = inputItem.vlcInputItem;
-    if (!p_media) {
-        return;
-    }
-    char *psz_url = input_item_GetURI(p_media);
-    if (!psz_url) {
-        return;
-    }
+    NSString *path = inputItem.path;
 
-    char *psz_path = vlc_uri2path(psz_url);
-    NSString *path = toNSStr(psz_path);
-    free(psz_url);
-    free(psz_path);
+    if (!path || path.length == 0) {
+        return;
+    }
 
     [NSFileManager.defaultManager trashItemAtURL:[NSURL URLWithString:path]
                                 resultingItemURL:nil
