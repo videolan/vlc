@@ -4100,7 +4100,7 @@ AS_IF([test "${enable_skins2}" != "no"], [
 
   dnl Win32
   AS_IF([test "${SYS}" = "mingw32"], [
-    VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -DWIN32_SKINS])
+    VLC_ADD_CPPFLAGS([skins2],[-DWIN32_SKINS])
     VLC_ADD_LIBS([skins2],[-lgdi32 -lole32 -luuid -lmsimg32])
   dnl OS/2
   ], [test "${SYS}" = "os2"], [
