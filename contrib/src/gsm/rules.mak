@@ -23,6 +23,7 @@ gsm: gsm-$(GSM_MAJVERSION)-pl$(GSM_MINVERSION).tar.gz .sum-gsm
 	sed -i.orig 's,^.c.o:,#.c.o:,' "$(UNPACK_DIR)/Makefile"
 	sed -i.orig 's,^		$$(CC),#		$$(CC),' "$(UNPACK_DIR)/Makefile"
 	sed -i.orig 's,^		@-mv,#		@-mv,' "$(UNPACK_DIR)/Makefile"
+	sed -i.orig 's,make \$$,$$(MAKE) \$$,' "$(UNPACK_DIR)/Makefile"
 	$(MOVE)
 
 GSM_ENV := GSM_INSTALL_ROOT="$(PREFIX)" \
