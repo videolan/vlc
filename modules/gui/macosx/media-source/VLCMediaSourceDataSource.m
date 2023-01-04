@@ -120,12 +120,7 @@
         cellView.identifier = @"VLCMediaSourceTableViewCellIdentifier";
     }
 
-    VLCInputNode *rootNode = _nodeToDisplay;
-    NSArray *nodeChildren = rootNode.children;
-    VLCInputNode *childNode = nodeChildren[row];
-    VLCInputItem *childRootInput = childNode.inputItem;
-    cellView.representedInputItem = childRootInput;
-
+    cellView.representedInputItem = [self mediaSourceInputItemAtRow:row];
     return cellView;
 }
 
@@ -154,6 +149,23 @@
     VLCInputNode *childNode = nodeChildren[selectedIndex];
 
     [self performActionForNode:childNode allowPlayback:YES];
+}
+
+- (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow
+{
+    if (_nodeToDisplay == nil) {
+        return nil;
+    }
+
+    VLCInputNode *rootNode = _nodeToDisplay;
+    NSArray *nodeChildren = rootNode.children;
+
+    if (nodeChildren == nil || nodeChildren.count == 0) {
+        return nil;
+    }
+
+    VLCInputNode *childNode = nodeChildren[tableViewRow];
+    return childNode.inputItem;
 }
 
 #pragma mark - generic actions

@@ -24,6 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCInputItem;
 @class VLCInputNode;
 @class VLCMediaSource;
 
@@ -37,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) BOOL gridViewMode;
 
 - (void)setupViews;
+- (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
 
 @end
 
