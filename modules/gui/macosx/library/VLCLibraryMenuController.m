@@ -226,16 +226,49 @@
 
 - (void)moveToTrash:(id)sender
 {
-    if(_representedItem == nil) {
+    if (_representedItem != nil) {
+        [self moveMediaLibraryItemToTrash:_representedItem];
+    } else if (_representedInputItem != nil && (!_representedInputItem.isStream)) {
+        [self moveInputItemToTrash:_representedInputItem];
+    }
+}
+
+- (void)moveMediaLibraryItemToTrash:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
+{
+    NSParameterAssert(mediaLibraryItem);
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    [mediaLibraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* childMediaItem) {
+        for (VLCMediaLibraryFile *fileToTrash in childMediaItem.files) {
+            [fileManager trashItemAtURL:fileToTrash.fileURL
+                       resultingItemURL:nil
+                                  error:nil];
+        }
+    }];
+}
+
+- (void)moveInputItemToTrash:(VLCInputItem*)inputItem
+{
+    NSParameterAssert(inputItem);
+    NSAssert(!inputItem.isStream, @"Cannot move a stream input item to trash");
+
+    input_item_t *p_media = inputItem.vlcInputItem;
+    if (!p_media) {
+        return;
+    }
+    char *psz_url = input_item_GetURI(p_media);
+    if (!psz_url) {
         return;
     }
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        for (VLCMediaLibraryFile *fileToTrash in mediaItem.files) {
-            [fileManager trashItemAtURL:fileToTrash.fileURL resultingItemURL:nil error:nil];
-        }
-    }];
+    char *psz_path = vlc_uri2path(psz_url);
+    NSString *path = toNSStr(psz_path);
+    free(psz_url);
+    free(psz_path);
+
+    [NSFileManager.defaultManager trashItemAtURL:[NSURL URLWithString:path]
+                                resultingItemURL:nil
+                                           error:nil];
 }
 
 - (void)showInformation:(id)sender
