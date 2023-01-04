@@ -1169,7 +1169,7 @@ static void WriteMetaToId3v2( ID3v2::Tag* tag, input_item_t* p_item )
         fclose( p_file );
         return;
     }
-    off_t file_size = st.st_size;
+    auto file_size = st.st_size;
 
     free( psz_path );
 
