@@ -23,16 +23,27 @@
 #import "VLCMediaSourceCollectionViewItem.h"
 
 #import "main/VLCMain.h"
-#import "views/VLCImageView.h"
-#import "views/VLCTrackingView.h"
+
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
+
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryMenuController.h"
+
 #import "playlist/VLCPlaylistController.h"
 
+#import "views/VLCImageView.h"
+#import "views/VLCTrackingView.h"
+
 NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
+
+@interface VLCMediaSourceCollectionViewItem()
+{
+    VLCLibraryMenuController *_menuController;
+}
+@end
 
 @implementation VLCMediaSourceCollectionViewItem
 
@@ -183,6 +194,32 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 - (IBAction)addToPlaylist:(id)sender
 {
     [[[VLCMain sharedInstance] playlistController] addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:NO];
+}
+
+-(void)mouseDown:(NSEvent *)theEvent
+{
+    if (theEvent.modifierFlags & NSControlKeyMask) {
+        if (!_menuController) {
+            _menuController = [[VLCLibraryMenuController alloc] init];
+        }
+
+        [_menuController setRepresentedInputItem:_representedInputItem];
+        [_menuController popupMenuWithEvent:theEvent forView:self.view];
+    }
+
+    [super mouseDown:theEvent];
+}
+
+- (void)rightMouseDown:(NSEvent *)theEvent
+{
+    if (!_menuController) {
+        _menuController = [[VLCLibraryMenuController alloc] init];
+    }
+
+    [_menuController setRepresentedInputItem:_representedInputItem];
+    [_menuController popupMenuWithEvent:theEvent forView:self.view];
+
+    [super rightMouseDown:theEvent];
 }
 
 @end
