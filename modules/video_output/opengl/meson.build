@@ -7,7 +7,6 @@ gl_common_dep = declare_dependency(
         'gl_util.c',
         'importer.c',
         'interop.c',
-        'interop_sw.c',
         'picture.c',
         'sampler.c',
         ),
@@ -44,3 +43,25 @@ if opengles2_dep.found()
                                      c_args: '-DUSE_OPENGL_ES2')
 endif
 
+# interop_sw
+if ['darwin', 'android'].contains(host_system) or opengl_dep.found() or opengles2_dep.found()
+    interop_sw_deps = []
+    interop_sw_cargs = []
+
+    if have_osx and opengl_dep.found()
+        interop_sw_deps += libvlc_opengl
+    elif ['darwin', 'android'].contains(host_system) and opengles2_dep.found()
+        interop_sw_deps += libvlc_opengles
+    endif
+
+    if opengles2_dep.found()
+        interop_sw_cargs += '-DUSE_OPENGL_ES2'
+    endif
+
+    vlc_modules += {
+        'name' : 'interop_sw',
+        'sources' : files('interop_sw.c'),
+        'dependencies' : interop_sw_deps,
+        'c_args' : interop_sw_cargs,
+    }
+endif
