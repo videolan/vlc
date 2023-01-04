@@ -43,6 +43,7 @@
 
     NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_inputItemRequiringMenuItems;
+    NSHashTable<NSMenuItem*> *_localInputItemRequiringMenuItems;
 }
 @end
 
@@ -90,7 +91,10 @@
     _inputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_inputItemRequiringMenuItems addObject:playItem];
     [_inputItemRequiringMenuItems addObject:appendItem];
-    [_inputItemRequiringMenuItems addObject:deleteItem];
+
+    _localInputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
+    [_localInputItemRequiringMenuItems addObject:revealItem];
+    [_localInputItemRequiringMenuItems addObject:deleteItem];
 }
 
 - (void)menuItems:(NSHashTable<NSMenuItem*>*)menuItems
@@ -105,9 +109,12 @@
 {
     BOOL hideMediaItemMenuItems = _representedItem == nil;
     BOOL hideInputItemMenuItems = _representedInputItem == nil;
+    BOOL hideLocalInputItemMenuItems = _representedInputItem == nil ||
+                                       (_representedInputItem != nil && _representedInputItem.isStream);
 
     [self menuItems:_mediaItemRequiringMenuItems setHidden:hideMediaItemMenuItems];
     [self menuItems:_inputItemRequiringMenuItems setHidden:hideInputItemMenuItems];
+    [self menuItems:_localInputItemRequiringMenuItems setHidden:hideLocalInputItemMenuItems];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
