@@ -130,11 +130,11 @@ typedef struct
     int i_streams;
     int i_stream_video;
 
-    off_t i_movi_size;
+    uint32_t i_movi_size;
     avi_stream_t stream[100];
 
     avi_idx1_t idx1;
-    off_t i_idx1_size;
+    uint32_t i_idx1_size;
 
 } sout_mux_sys_t;
 
