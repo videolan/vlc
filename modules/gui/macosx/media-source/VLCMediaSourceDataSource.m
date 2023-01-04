@@ -130,10 +130,8 @@
     if (selectedIndex < 0) {
         return;
     }
-    VLCInputNode *rootNode = self.nodeToDisplay;
-    NSArray *nodeChildren = rootNode.children;
-    VLCInputNode *childNode = nodeChildren[selectedIndex];
 
+    VLCInputNode *childNode = [self mediaSourceInputNodeAtRow:selectedIndex];
     [self performActionForNode:childNode allowPlayback:NO];
 }
 
@@ -144,14 +142,11 @@
         return;
     }
 
-    VLCInputNode *rootNode = self.nodeToDisplay;
-    NSArray *nodeChildren = rootNode.children;
-    VLCInputNode *childNode = nodeChildren[selectedIndex];
-
+    VLCInputNode *childNode = [self mediaSourceInputNodeAtRow:selectedIndex];
     [self performActionForNode:childNode allowPlayback:YES];
 }
 
-- (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow
+- (VLCInputNode*)mediaSourceInputNodeAtRow:(NSInteger)tableViewRow
 {
     if (_nodeToDisplay == nil) {
         return nil;
@@ -164,7 +159,17 @@
         return nil;
     }
 
-    VLCInputNode *childNode = nodeChildren[tableViewRow];
+    return nodeChildren[tableViewRow];
+}
+
+- (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow
+{
+    VLCInputNode *childNode = [self mediaSourceInputNodeAtRow:tableViewRow];
+
+    if (childNode == nil) {
+        return nil;
+    }
+
     return childNode.inputItem;
 }
 
