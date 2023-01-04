@@ -385,27 +385,6 @@ vlc_frame_t *vlc_frame_shm_Alloc (void *addr, size_t length)
 #endif
 
 
-#ifdef _WIN32
-# include <io.h>
-
-static
-ssize_t pread (int fd, void *buf, size_t count, off_t offset)
-{
-    HANDLE handle = (HANDLE)(intptr_t)_get_osfhandle (fd);
-    if (handle == INVALID_HANDLE_VALUE)
-        return -1;
-
-    OVERLAPPED olap = {.Offset = offset, .OffsetHigh = (offset >> 32)};
-    DWORD written;
-    /* This braindead API will override the file pointer even if we specify
-     * an explicit read offset... So do not expect this to mix well with
-     * regular read() calls. */
-    if (ReadFile (handle, buf, count, &written, &olap))
-        return written;
-    return -1;
-}
-#endif
-
 vlc_frame_t *vlc_frame_File(int fd, bool write)
 {
     size_t length;
@@ -451,9 +430,10 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
             return vlc_frame_mmap_Alloc (addr, length);
     }
 #elif defined(_WIN32)
+    HANDLE handle = INVALID_HANDLE_VALUE;
     if (length > 0)
     {
-        HANDLE handle = (HANDLE)(intptr_t)_get_osfhandle (fd);
+        handle = (HANDLE)(intptr_t)_get_osfhandle (fd);
         if (handle != INVALID_HANDLE_VALUE)
         {
             void *addr = NULL;
@@ -465,7 +445,9 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
             if (hMap != INVALID_HANDLE_VALUE)
                 addr = MapViewOfFileFromApp(hMap, access, 0, length);
 #else
-            hMap = CreateFileMapping(handle, NULL, prot, 0, length, NULL);
+            DWORD hLength = (DWORD)(length >> 32);
+            DWORD lLength = (DWORD)(length & 0xFFFFFFFF);
+            hMap = CreateFileMapping(handle, NULL, prot, hLength, lLength, NULL);
             if (hMap != INVALID_HANDLE_VALUE)
                 addr = MapViewOfFile(hMap, access, 0, 0, length);
 #endif
@@ -474,6 +456,12 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
                 return vlc_frame_mapview_Alloc(hMap, addr, length);
 
             CloseHandle(hMap);
+        }
+        else
+        {
+            // fail early
+            errno = EBADF;
+            return NULL;
         }
     }
 #else
@@ -486,6 +474,48 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         return NULL;
     vlc_frame_cleanup_push (frame);
 
+#if defined(_WIN32)
+    LARGE_INTEGER srcPointer = { 0 };
+    if (unlikely(!SetFilePointerEx(handle, srcPointer, &srcPointer, FILE_CURRENT)))
+    {
+        vlc_frame_Release (frame);
+        frame = NULL;
+        errno = EIO;
+        goto done;
+    }
+    LARGE_INTEGER startPointer = { 0 };
+    if (unlikely(!SetFilePointerEx(handle, startPointer, NULL, FILE_BEGIN)))
+    {
+        vlc_frame_Release (frame);
+        frame = NULL;
+        errno = EIO;
+        goto done;
+    }
+    for (size_t i = 0; i < length;)
+    {
+        DWORD hOffset = (DWORD)(i >> 32);
+        DWORD lOffset = (DWORD)(i & 0xFFFFFFFF);
+        OVERLAPPED olap = {.Offset = hOffset, .OffsetHigh = lOffset};
+        DWORD lLength = (length - i) > ULONG_MAX ? ULONG_MAX : (DWORD)(length - i);
+        DWORD len;
+        if (!ReadFile(handle, frame->p_buffer + i, lLength, &len, &olap))
+        {
+            vlc_frame_Release (frame);
+            frame = NULL;
+            errno = EIO;
+            break;
+        }
+        vlc_testcancel();
+        i += len;
+    }
+    if (unlikely(!SetFilePointerEx(handle, srcPointer, NULL, FILE_BEGIN)))
+    {
+        vlc_frame_Release (frame);
+        frame = NULL;
+        errno = EIO;
+        goto done;
+    }
+#else // !_WIN32
     for (size_t i = 0; i < length;)
     {
         ssize_t len = pread (fd, frame->p_buffer + i, length - i, i);
@@ -497,6 +527,8 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         }
         i += len;
     }
+#endif // !_WIN32
+done:
     vlc_cleanup_pop ();
     return frame;
 }
