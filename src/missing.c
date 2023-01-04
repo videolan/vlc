@@ -69,7 +69,7 @@ noreturn ssize_t sout_AccessOutRead(sout_access_out_t *out, block_t *block)
     vlc_assert_unreachable ();
 }
 
-noreturn int sout_AccessOutSeek(sout_access_out_t *out, off_t offset)
+noreturn int sout_AccessOutSeek(sout_access_out_t *out, uint64_t offset)
 {
     VLC_UNUSED (out); VLC_UNUSED (offset);
     vlc_assert_unreachable ();

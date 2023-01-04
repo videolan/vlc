@@ -52,7 +52,7 @@ static int     Seek   (stream_t *, uint64_t);
 static int     Control(stream_t *, int, va_list);
 static ssize_t Write(sout_access_out_t *, block_t *);
 static int     OutControl(sout_access_out_t *, int, va_list);
-static int     OutSeek (sout_access_out_t *, off_t);
+static int     OutSeek (sout_access_out_t *, uint64_t);
 
 static int UrlInterruptCallback(void *access)
 {
@@ -279,7 +279,7 @@ static int Seek(stream_t *access, uint64_t position)
     return VLC_SUCCESS;
 }
 
-static int OutSeek(sout_access_out_t *p_access, off_t i_pos)
+static int OutSeek(sout_access_out_t *p_access, uint64_t i_pos)
 {
     sout_access_out_sys_t *sys = p_access->p_sys;
 

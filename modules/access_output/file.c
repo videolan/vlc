@@ -185,7 +185,7 @@ static ssize_t Send(sout_access_out_t *access, block_t *block)
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( sout_access_out_t *p_access, off_t i_pos )
+static int Seek( sout_access_out_t *p_access, uint64_t i_pos )
 {
     int *fdp = p_access->p_sys, fd = *fdp;
 

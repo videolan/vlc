@@ -114,7 +114,7 @@ static int Seek( stream_t *, uint64_t );
 static int Control( stream_t *, int, va_list );
 static int DirRead( stream_t *, input_item_node_t * );
 #ifdef ENABLE_SOUT
-static int OutSeek( sout_access_out_t *, off_t );
+static int OutSeek( sout_access_out_t *, uint64_t );
 static ssize_t Write( sout_access_out_t *, block_t * );
 #endif
 
@@ -886,7 +886,7 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 }
 
 #ifdef ENABLE_SOUT
-static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
+static int OutSeek( sout_access_out_t *p_access, uint64_t i_pos )
 {
     return SeekCommon(VLC_OBJECT(p_access), GET_OUT_SYS(p_access), i_pos);
 }

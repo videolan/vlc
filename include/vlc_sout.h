@@ -58,7 +58,7 @@ struct sout_access_out_t
 
     char                    *psz_path;
     void                    *p_sys;
-    int                     (*pf_seek)( sout_access_out_t *, off_t );
+    int                     (*pf_seek)( sout_access_out_t *, uint64_t );
     ssize_t                 (*pf_read)( sout_access_out_t *, block_t * );
     ssize_t                 (*pf_write)( sout_access_out_t *, block_t * );
     int                     (*pf_control)( sout_access_out_t *, int, va_list );
@@ -76,7 +76,7 @@ VLC_API sout_access_out_t * sout_AccessOutNew( vlc_object_t *, const char *psz_a
 #define sout_AccessOutNew( obj, access, name ) \
         sout_AccessOutNew( VLC_OBJECT(obj), access, name )
 VLC_API void sout_AccessOutDelete( sout_access_out_t * );
-VLC_API int sout_AccessOutSeek( sout_access_out_t *, off_t );
+VLC_API int sout_AccessOutSeek( sout_access_out_t *, uint64_t );
 VLC_API ssize_t sout_AccessOutRead( sout_access_out_t *, block_t * );
 VLC_API ssize_t sout_AccessOutWrite( sout_access_out_t *, block_t * );
 VLC_API int sout_AccessOutControl( sout_access_out_t *, int, ... );

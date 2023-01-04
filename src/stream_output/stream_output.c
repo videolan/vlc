@@ -266,7 +266,7 @@ void sout_AccessOutDelete( sout_access_out_t *p_access )
 /*****************************************************************************
  * sout_AccessSeek:
  *****************************************************************************/
-int sout_AccessOutSeek( sout_access_out_t *p_access, off_t i_pos )
+int sout_AccessOutSeek( sout_access_out_t *p_access, uint64_t i_pos )
 {
     if (p_access->pf_seek == NULL)
         return VLC_EGENERIC;
