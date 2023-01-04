@@ -36,9 +36,6 @@
 #include <windows.h>
 #include <shellapi.h>
 
-#ifndef _WIN32_IE
-#  define  _WIN32_IE 0x501
-#endif
 #include <fcntl.h>
 #include <io.h>
 #include <shlobj.h>
