@@ -451,6 +451,7 @@ typedef int64_t stime_t;
 #define HANDLER_ID32 ATOM_ID32
 
 #define SAMPLEGROUP_rap  VLC_FOURCC('r', 'a', 'p', ' ')
+#define SAMPLEGROUP_roll VLC_FOURCC('r', 'o', 'l', 'l')
 
 /* tref reference type boxes */
 #define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )

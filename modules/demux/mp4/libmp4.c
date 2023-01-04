@@ -2223,6 +2223,7 @@ static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
     switch( p_sgpd->i_grouping_type )
     {
         case SAMPLEGROUP_rap:
+        case SAMPLEGROUP_roll:
             break;
 
         default:
@@ -2279,6 +2280,23 @@ static int MP4_ReadBox_sgpd( stream_t *p_stream, MP4_Box_t *p_box )
                     MP4_GET1BYTE( i_data );
                     p_sgpd->p_entries[i].rap.i_num_leading_samples_known = i_data & 0x80;
                     p_sgpd->p_entries[i].rap.i_num_leading_samples = i_data & 0x7F;
+                }
+                break;
+
+            case SAMPLEGROUP_roll:
+                {
+                    if( i_read < 2 )
+                    {
+                        free( p_sgpd->p_entries );
+                        MP4_READBOX_EXIT( 0 );
+                    }
+                    union
+                    {
+                        uint16_t u;
+                        int16_t  s;
+                    } readsigned;
+                    MP4_GET2BYTES( readsigned.u );
+                    p_sgpd->p_entries[i].roll.i_roll_distance = readsigned.s;
                 }
                 break;
 
