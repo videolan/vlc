@@ -198,7 +198,10 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
 
     /* Wait, this picture has already been rendered. */
     if (priv->displayed.current_rendered)
+    {
         priv->state.current = VOUT_STATE_IDLE;
+        return;
+    }
 
     priv->state.current = VOUT_STATE_DISPLAY;
     return;
