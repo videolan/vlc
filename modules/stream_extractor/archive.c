@@ -129,7 +129,7 @@ static int libarchive_jump_cb( libarchive_t* p_arc, void* p_obj_current,
 
 
 static la_int64_t libarchive_skip_cb( libarchive_t* p_arc, void* p_obj,
-  off_t i_request )
+                                      la_int64_t i_request )
 {
     VLC_UNUSED( p_arc );
 
