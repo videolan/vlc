@@ -271,7 +271,7 @@ int config_LoadCmdLine( libvlc_int_t *p_this, int i_argc,
 
     int ret = -1;
     bool color = false;
-#ifndef _WIN32
+#ifdef HAVE_ISATTY
     color = (isatty(STDERR_FILENO));
 #endif
 

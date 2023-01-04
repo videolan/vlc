@@ -42,9 +42,8 @@
 
 #if defined( _WIN32 )
 # define wcwidth(cp) ((void)(cp), 1) /* LOL */
-#else
-# include <unistd.h>
 #endif
+#include <unistd.h>
 
 #if defined( _WIN32 ) && !defined( VLC_WINSTORE_APP )
 static void ShowConsole (void);
@@ -583,7 +582,7 @@ static void Usage (libvlc_int_t *p_this, char const *psz_search)
     }
 
     bool color = false;
-#ifndef _WIN32
+#ifdef HAVE_ISATTY
     if (isatty(STDOUT_FILENO))
         color = var_InheritBool(p_this, "color");
 #endif
@@ -645,7 +644,7 @@ static void ListModules (libvlc_int_t *p_this, bool b_verbose)
     bool color = false;
 
     ShowConsole();
-#ifndef _WIN32
+#ifdef HAVE_ISATTY
     if (isatty(STDOUT_FILENO))
         color = var_InheritBool(p_this, "color");
 #else
