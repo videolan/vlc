@@ -2066,7 +2066,7 @@ test_random(void)
     /* in random order, previous uses the history of randomly selected items */
     assert(!vlc_playlist_HasPrev(playlist));
 
-    bool selected[5] = {};
+    bool selected[5] = { false, false, false, false, false };
     for (int i = 0; i < 5; ++i)
     {
         assert(vlc_playlist_HasNext(playlist));

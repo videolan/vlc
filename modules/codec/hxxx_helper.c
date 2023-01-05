@@ -722,7 +722,7 @@ h264_helper_get_avcc_config(const struct hxxx_helper *hh)
 static block_t *
 hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
 {
-    struct hevc_dcr_params params = {};
+    struct hevc_dcr_params params = { .i_vps_count = 0 };
     const struct hxxx_helper_nal *p_nal;
 
     HELPER_FOREACH_NAL(p_nal, hh->hevc.vps_list, hh->hevc.i_vps_count,

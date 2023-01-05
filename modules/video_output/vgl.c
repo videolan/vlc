@@ -146,7 +146,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
     if( sys->setupCb )
     {
-        libvlc_video_setup_device_cfg_t setup_cfg = {};
+        libvlc_video_setup_device_cfg_t setup_cfg = { .hardware_decoding = false };
         libvlc_video_setup_device_info_t configured_cfg;
         if( !sys->setupCb(&sys->opaque, &setup_cfg, &configured_cfg) )
         {
