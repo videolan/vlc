@@ -107,14 +107,16 @@
 
 - (void)updateMenuItems
 {
-    BOOL hideMediaItemMenuItems = _representedItem == nil;
-    BOOL hideInputItemMenuItems = _representedInputItem == nil;
-    BOOL hideLocalInputItemMenuItems = _representedInputItem == nil ||
-                                       (_representedInputItem != nil && _representedInputItem.isStream);
-
-    [self menuItems:_mediaItemRequiringMenuItems setHidden:hideMediaItemMenuItems];
-    [self menuItems:_inputItemRequiringMenuItems setHidden:hideInputItemMenuItems];
-    [self menuItems:_localInputItemRequiringMenuItems setHidden:hideLocalInputItemMenuItems];
+    if (_representedItem != nil) {
+        [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+    } else if (_representedInputItem != nil) {
+        [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
+        [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
+        
+        [self menuItems:_localInputItemRequiringMenuItems setHidden:_representedInputItem.isStream];
+    }
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
