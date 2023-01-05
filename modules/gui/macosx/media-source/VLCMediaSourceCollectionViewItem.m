@@ -22,25 +22,24 @@
 
 #import "VLCMediaSourceCollectionViewItem.h"
 
-#import "main/VLCMain.h"
+#import <vlc_input.h>
+#import <vlc_url.h>
 
-#import "extensions/NSString+Helpers.h"
-#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryMenuController.h"
 
+#import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistController.h"
 
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
-
-#import <vlc_input.h>
-#import <vlc_url.h>
-
-#import <QuickLook/QuickLook.h>
 
 NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
@@ -188,21 +187,8 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
             free(psz_url);
             free(psz_path);
 
-            NSDictionary *dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-                                                             forKey:(NSString *)kQLThumbnailOptionIconModeKey];
-            CGImageRef ref = QLThumbnailImageCreate(kCFAllocatorDefault,
-                                                    CFBridgingRetain([NSURL fileURLWithPath:path]),
-                                                    CGSizeMake(400, 400),
-                                                    CFBridgingRetain(dict));
-
-            if (ref != NULL) {
-                NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithCGImage:ref];
-                if (bitmapImageRep) {
-                    image = [[NSImage alloc] initWithSize:[bitmapImageRep size]];
-                    [image addRepresentation:bitmapImageRep];
-                }
-                CFRelease(ref);
-            }
+            image = [NSImage quickLookPreviewForLocalPath:path
+                                                 withSize:self.view.frame.size];
 
             if (!image) {
                 image = [[NSWorkspace sharedWorkspace] iconForFile:path];
