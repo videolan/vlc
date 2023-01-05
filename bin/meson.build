@@ -17,7 +17,8 @@ executable('vlc',
     link_with: [libvlc],
     include_directories: [vlc_include_dirs],
     dependencies: vlc_deps,
-    install: true
+    install: true,
+    win_subsystem: 'windows'
 )
 
 vlc_top_builddir_def = '-DTOP_BUILDDIR="@0@"'.format(vlc_build_root)
@@ -29,5 +30,6 @@ executable('vlc-static',
     include_directories: [vlc_include_dirs],
     dependencies: vlc_deps,
     c_args: [vlc_top_builddir_def, vlc_top_srcdir_def],
-    objc_args: [vlc_top_builddir_def, vlc_top_srcdir_def]
+    objc_args: [vlc_top_builddir_def, vlc_top_srcdir_def],
+    win_subsystem: 'windows'
 )
