@@ -195,6 +195,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
             if (!image) {
                 image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+                image.size = maxImageSize;
             }
         }
     }
