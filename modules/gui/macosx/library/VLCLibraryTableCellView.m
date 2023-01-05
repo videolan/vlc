@@ -22,17 +22,27 @@
 
 #import "VLCLibraryTableCellView.h"
 
+#import <vlc_input.h>
+#import <vlc_url.h>
+
 #import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
-#import "views/VLCImageView.h"
-#import "views/VLCTrackingView.h"
-#import "main/VLCMain.h"
+
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCInputItem.h"
+#import "library/VLCLibraryUIUnits.h"
+
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+
+#import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistController.h"
+
+#import "views/VLCImageView.h"
+#import "views/VLCTrackingView.h"
 
 @implementation VLCLibraryTableCellView
 
@@ -126,8 +136,25 @@
 - (NSImage *)imageForInputItem
 {
     NSImage *image;
-    if (_representedInputItem.inputType == ITEM_TYPE_DIRECTORY) {
-        image = [NSImage imageNamed:NSImageNameFolder];
+    if (!_representedInputItem.isStream && _representedInputItem.vlcInputItem) {
+        char *psz_url = input_item_GetURI(_representedInputItem.vlcInputItem);
+        if (psz_url) {
+            char *psz_path = vlc_uri2path(psz_url);
+            NSString *path = toNSStr(psz_path);
+
+            free(psz_url);
+            free(psz_path);
+
+            NSSize maxImageSize = NSMakeSize([VLCLibraryUIUnits largeTableViewRowHeight] * 2,
+                                             [VLCLibraryUIUnits largeTableViewRowHeight] * 2);
+            image = [NSImage quickLookPreviewForLocalPath:path
+                                                 withSize:maxImageSize];
+
+            if (!image) {
+                image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+                image.size = maxImageSize;
+            }
+        }
     }
 
     if (!image) {
