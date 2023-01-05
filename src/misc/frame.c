@@ -385,6 +385,14 @@ vlc_frame_t *vlc_frame_shm_Alloc (void *addr, size_t length)
 #endif
 
 
+#ifdef _WIN32
+static void cleanup_hmap(void *opaque)
+{
+    HANDLE hMap = opaque;
+    CloseHandle(hMap);
+}
+#endif
+
 vlc_frame_t *vlc_frame_File(int fd, bool write)
 {
     size_t length;
@@ -455,6 +463,9 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
         if (hMap != INVALID_HANDLE_VALUE)
             addr = MapViewOfFile(hMap, access, 0, 0, length);
 #endif
+        vlc_cleanup_push(cleanup_hmap, hMap);
+        vlc_testcancel();
+        vlc_cleanup_pop();
 
         if (addr != NULL)
             return vlc_frame_mapview_Alloc(hMap, addr, length);
