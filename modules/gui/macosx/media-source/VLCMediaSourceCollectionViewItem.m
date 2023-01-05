@@ -33,6 +33,7 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryMenuController.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "main/VLCMain.h"
 
@@ -187,8 +188,10 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
             free(psz_url);
             free(psz_path);
 
+            NSSize maxImageSize = NSMakeSize([VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2,
+                                             [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2);
             image = [NSImage quickLookPreviewForLocalPath:path
-                                                 withSize:self.view.frame.size];
+                                                 withSize:maxImageSize];
 
             if (!image) {
                 image = [[NSWorkspace sharedWorkspace] iconForFile:path];
