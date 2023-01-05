@@ -37,6 +37,9 @@
 #import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 
+#import <vlc_input.h>
+#import <vlc_url.h>
+
 NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 @interface VLCMediaSourceCollectionViewItem()
@@ -174,8 +177,17 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 - (NSImage *)imageForInputItem
 {
     NSImage *image;
-    if (_representedInputItem.inputType == ITEM_TYPE_DIRECTORY) {
-        image = [NSImage imageNamed:NSImageNameFolder];
+    if (!_representedInputItem.isStream && _representedInputItem.vlcInputItem) {
+        char *psz_url = input_item_GetURI(_representedInputItem.vlcInputItem);
+        if (psz_url) {
+            char *psz_path = vlc_uri2path(psz_url);
+            NSString *path = toNSStr(psz_path);
+
+            free(psz_url);
+            free(psz_path);
+
+            image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+        }
     }
 
     if (!image) {
