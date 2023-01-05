@@ -100,7 +100,7 @@ static const d3d_format_t d3d_formats[] = {
     { "B5G6R5",   DXGI_FORMAT_B5G6R5_UNORM,   VLC_CODEC_RGB16,         5, 1, 1, { DXGI_FORMAT_B5G6R5_UNORM } },
     { "I420_OPAQUE", DXGI_FORMAT_420_OPAQUE,  VLC_CODEC_D3D11_OPAQUE,  8, 2, 2, { DXGI_FORMAT_UNKNOWN } },
 
-    { NULL, 0, 0, 0, 0, 0, {} }
+    { NULL, 0, 0, 0, 0, 0, { DXGI_FORMAT_UNKNOWN } }
 };
 
 const char *DxgiFormatToStr(DXGI_FORMAT format)
