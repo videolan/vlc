@@ -21,8 +21,9 @@
  *****************************************************************************/
 
 #import "VLCLibraryTableView.h"
-#import <library/VLCLibraryDataTypes.h>
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryMenuController.h"
+#import "media-source/VLCMediaSourceDataSource.h"
 
 @interface VLCLibraryTableView ()
 {
@@ -47,7 +48,8 @@
 {
     [super setDataSource:dataSource];
 
-    if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+    if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)] ||
+       self.dataSource.class == VLCMediaSourceDataSource.class) {
         _vlcDataSourceConforming = YES;
         [self setupMenu];
     } else {
@@ -65,7 +67,17 @@
         return;
     }
 
-    [_menuController setRepresentedItem:[(id<VLCLibraryTableViewDataSource>)self.dataSource libraryItemAtRow:self.clickedRow forTableView:self]];
+    if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+        id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = (id<VLCLibraryTableViewDataSource>)self.dataSource;
+        id<VLCMediaLibraryItemProtocol> mediaLibraryItem = [vlcLibraryDataSource libraryItemAtRow:self.clickedRow
+                                                                                     forTableView:self];
+        [_menuController setRepresentedItem:mediaLibraryItem];
+    } else if (self.dataSource.class == VLCMediaSourceDataSource.class) {
+        VLCMediaSourceDataSource *mediaSourceDataSource = (VLCMediaSourceDataSource*)self.dataSource;
+        NSAssert(mediaSourceDataSource != nil, @"This should be a valid pointer");
+        VLCInputItem *mediaSourceInputItem = [mediaSourceDataSource mediaSourceInputItemAtRow:self.clickedRow];
+        [_menuController setRepresentedInputItem:mediaSourceInputItem];
+    }
 }
 
 @end
