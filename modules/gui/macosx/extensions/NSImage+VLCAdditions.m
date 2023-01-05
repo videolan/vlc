@@ -22,6 +22,43 @@
 
 #import "NSImage+VLCAdditions.h"
 
+#import <QuickLook/QuickLook.h>
+
 @implementation NSImage(VLCAdditions)
+
++ (instancetype)quickLookPreviewForLocalPath:(NSString *)path withSize:(NSSize)size
+{
+    NSURL *pathUrl = [NSURL fileURLWithPath:path];
+    return [self quickLookPreviewForLocalURL:pathUrl withSize:size];
+}
+
++ (instancetype)quickLookPreviewForLocalURL:(NSURL *)url withSize:(NSSize)size
+{
+    NSDictionary *dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                     forKey:(NSString *)kQLThumbnailOptionIconModeKey];
+    CFDictionaryRef dictRef = CFBridgingRetain(dict);
+    CFURLRef urlRef = CFBridgingRetain(url);
+    CGImageRef qlThumbnailRef = QLThumbnailImageCreate(kCFAllocatorDefault,
+                                                       urlRef,
+                                                       size,
+                                                       dictRef);
+
+    CFRelease(dictRef);
+    CFRelease(urlRef);
+
+    if (qlThumbnailRef == NULL) {
+        return nil;
+    }
+
+    NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithCGImage:qlThumbnailRef];
+    if (bitmapImageRep == nil) {
+        return nil;
+    }
+
+    NSImage *image = [[NSImage alloc] initWithSize:[bitmapImageRep size]];
+    [image addRepresentation:bitmapImageRep];
+    CFRelease(qlThumbnailRef);
+    return image;
+}
 
 @end
