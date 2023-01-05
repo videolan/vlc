@@ -23,6 +23,7 @@ libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,QuartzCore \
 	-Wl,-framework,ScriptingBridge \
 	-Wl,-framework,WebKit \
+	-Wl,-framework,QuickLook \
 	-Wl,-weak_framework,MediaPlayer
 
 if HAVE_SPARKLE

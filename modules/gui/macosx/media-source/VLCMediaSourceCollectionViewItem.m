@@ -40,6 +40,8 @@
 #import <vlc_input.h>
 #import <vlc_url.h>
 
+#import <QuickLook/QuickLook.h>
+
 NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
 @interface VLCMediaSourceCollectionViewItem()
@@ -186,7 +188,25 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
             free(psz_url);
             free(psz_path);
 
-            image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+            NSDictionary *dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+                                                             forKey:(NSString *)kQLThumbnailOptionIconModeKey];
+            CGImageRef ref = QLThumbnailImageCreate(kCFAllocatorDefault,
+                                                    CFBridgingRetain([NSURL fileURLWithPath:path]),
+                                                    CGSizeMake(400, 400),
+                                                    CFBridgingRetain(dict));
+
+            if (ref != NULL) {
+                NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithCGImage:ref];
+                if (bitmapImageRep) {
+                    image = [[NSImage alloc] initWithSize:[bitmapImageRep size]];
+                    [image addRepresentation:bitmapImageRep];
+                }
+                CFRelease(ref);
+            }
+
+            if (!image) {
+                image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+            }
         }
     }
 
