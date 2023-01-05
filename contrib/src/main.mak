@@ -731,14 +731,14 @@ endif
 endif
 endif
 
-crossfile.meson: $(SRC)/gen-meson-crossfile.py
+crossfile.meson: $(SRC)/gen-meson-machinefile.py
 	$(HOSTVARS_MESON) \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
 	HOST_ARCH="$(subst i386,x86,$(ARCH))" \
 	HOST="$(HOST)" \
-	$(SRC)/gen-meson-crossfile.py $@
+	$(SRC)/gen-meson-machinefile.py $@
 	cat $@
 
 # Default pattern rules
