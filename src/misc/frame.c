@@ -434,35 +434,32 @@ vlc_frame_t *vlc_frame_File(int fd, bool write)
     if (length > 0)
     {
         handle = (HANDLE)(intptr_t)_get_osfhandle (fd);
-        if (handle != INVALID_HANDLE_VALUE)
+        if (handle == INVALID_HANDLE_VALUE)
         {
-            void *addr = NULL;
-            HANDLE hMap;
-            DWORD prot = write ? PAGE_READWRITE : PAGE_READONLY;
-            DWORD access = FILE_MAP_READ | (write ? FILE_MAP_WRITE : 0);
-#ifdef VLC_WINSTORE_APP
-            hMap = CreateFileMappingFromApp(handle, NULL, prot, length, NULL);
-            if (hMap != INVALID_HANDLE_VALUE)
-                addr = MapViewOfFileFromApp(hMap, access, 0, length);
-#else
-            DWORD hLength = (DWORD)(length >> 32);
-            DWORD lLength = (DWORD)(length & 0xFFFFFFFF);
-            hMap = CreateFileMapping(handle, NULL, prot, hLength, lLength, NULL);
-            if (hMap != INVALID_HANDLE_VALUE)
-                addr = MapViewOfFile(hMap, access, 0, 0, length);
-#endif
-
-            if (addr != NULL)
-                return vlc_frame_mapview_Alloc(hMap, addr, length);
-
-            CloseHandle(hMap);
-        }
-        else
-        {
-            // fail early
             errno = EBADF;
             return NULL;
         }
+
+        void *addr = NULL;
+        HANDLE hMap;
+        DWORD prot = write ? PAGE_READWRITE : PAGE_READONLY;
+        DWORD access = FILE_MAP_READ | (write ? FILE_MAP_WRITE : 0);
+#ifdef VLC_WINSTORE_APP
+        hMap = CreateFileMappingFromApp(handle, NULL, prot, length, NULL);
+        if (hMap != INVALID_HANDLE_VALUE)
+            addr = MapViewOfFileFromApp(hMap, access, 0, length);
+#else
+        DWORD hLength = (DWORD)(length >> 32);
+        DWORD lLength = (DWORD)(length & 0xFFFFFFFF);
+        hMap = CreateFileMapping(handle, NULL, prot, hLength, lLength, NULL);
+        if (hMap != INVALID_HANDLE_VALUE)
+            addr = MapViewOfFile(hMap, access, 0, 0, length);
+#endif
+
+        if (addr != NULL)
+            return vlc_frame_mapview_Alloc(hMap, addr, length);
+
+        CloseHandle(hMap);
     }
 #else
     (void) write;
