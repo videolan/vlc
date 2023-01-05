@@ -38,11 +38,13 @@
 #include <vlc_charset.h>
 #include <vlc_subpicture.h>
 
-#define INITGUID
-
 #include <windows.h>
 #include <sapi.h>
 #include <sphelper.h>
+
+#include <initguid.h>
+// not available in standard libraries and used in inline functions without __uuidof()
+DEFINE_GUID(CLSID_SpObjectTokenCategory, 0xa910187f, 0x0c7a, 0x45ac, 0x92,0xcc, 0x59,0xed,0xaf,0xb7,0x7b,0x53);
 
 static int Create (filter_t *);
 static void Destroy(filter_t *);
@@ -116,7 +118,7 @@ static int Create (filter_t *p_filter)
     p_sys->cpVoice = NULL;
     p_sys->lastString = NULL;
 
-    hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_INPROC_SERVER, IID_ISpVoice, (void**) &p_sys->cpVoice);
+    hr = CoCreateInstance(__uuidof(SpVoice), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISpVoice), (void**) &p_sys->cpVoice);
     if (SUCCEEDED(hr)) {
         ISpObjectToken*        cpVoiceToken = NULL;
         IEnumSpObjectTokens*   cpEnum = NULL;
