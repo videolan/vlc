@@ -35,10 +35,8 @@ struct iovec;
 # ifndef fstat
 #  define fstat _fstati64
 # endif
-# ifndef _MSC_VER
-#  undef lseek
-#  define lseek _lseeki64
-# endif
+# undef lseek
+# define lseek _lseeki64
 #else // !_WIN32
 #include <dirent.h>
 #endif
