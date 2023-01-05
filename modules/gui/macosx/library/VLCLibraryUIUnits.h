@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioViewController.h: MacOS X interface module
+ * VLCLibraryUIUnits.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -41,8 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (const CGFloat)mediumDetailSupplementaryViewCollectionViewHeight;
 + (const CGFloat)largeDetailSupplementaryViewCollectionViewHeight;
 
-+ (const CGFloat)dynamicCollectionViewItemMinimumSize;
-+ (const CGFloat)dynamicCollectionViewItemMaximumSize;
++ (const CGFloat)dynamicCollectionViewItemMinimumWidth;
++ (const CGFloat)dynamicCollectionViewItemMaximumWidth;
 
 @end
 

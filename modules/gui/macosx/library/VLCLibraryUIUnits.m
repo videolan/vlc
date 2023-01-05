@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAudioViewController.m: MacOS X interface module
+ * VLCLibraryUIUnits.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -69,12 +69,12 @@
     return 500;
 }
 
-+ (const CGFloat)dynamicCollectionViewItemMinimumSize
++ (const CGFloat)dynamicCollectionViewItemMinimumWidth
 {
     return 180;
 }
 
-+ (const CGFloat)dynamicCollectionViewItemMaximumSize
++ (const CGFloat)dynamicCollectionViewItemMaximumWidth
 {
     return 280;
 }

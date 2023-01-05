@@ -93,13 +93,13 @@
                                            withLayout:collectionViewLayout
                                withNumberOfItemsInRow:numItemsInRow];
 
-    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumSize]) {
+    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth]) {
         ++numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
                             withNumberOfItemsInRow:numItemsInRow];
     }
-    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumSize]) {
+    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumWidth]) {
         --numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
