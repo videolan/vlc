@@ -29,7 +29,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryImageCache.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
 
@@ -96,16 +96,7 @@
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
 
-    NSURL *artworkURL = _representedInputItem.artworkURL;
-    NSSize maxImageSize = NSMakeSize([VLCLibraryUIUnits largeTableViewRowHeight] * 2,
-                                     [VLCLibraryUIUnits largeTableViewRowHeight] * 2);
-    NSImage *placeholderImage = [_representedInputItem thumbnailWithSize:maxImageSize];
-
-    if (artworkURL) {
-        [self.representedImageView setImageURL:artworkURL placeholderImage:placeholderImage];
-    } else {
-        self.representedImageView.image = placeholderImage;
-    }
+    self.representedImageView.image = [VLCLibraryImageCache thumbnailForInputItem:_representedInputItem];
 
     self.trackingView.viewToHide = self.playInstantlyButton;
     self.playInstantlyButton.action = @selector(playInputItemInstantly:);
