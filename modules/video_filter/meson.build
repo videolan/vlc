@@ -285,7 +285,7 @@ vlc_modules += {
         'deinterlace/algo_ivtc.c',
     ),
     # Inline ASM doesn't build with -O0
-    'c_args' : ['-O2'],
+    # bring back if needed when inline ASM is supported 'c_args' : ['-O2'],
     'link_with' : [deinterlacecommon_lib]
 }
 
