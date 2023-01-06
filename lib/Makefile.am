@@ -68,9 +68,13 @@ libvlc_la_LDFLAGS = \
 	-version-number @LIBVLC_ABI_MAJOR@:@LIBVLC_ABI_MINOR@:@LIBVLC_ABI_MICRO@ \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym
+libvlc_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_WIN32
 libvlc_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
 libvlc_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
+if HAVE_DYNAMIC_PLUGINS
+libvlc_la_CPPFLAGS += -DLIBVLC_DLL_EXPORT
+endif
 endif
 if HAVE_OS2
 libvlc_la_LDFLAGS += -avoid-version
