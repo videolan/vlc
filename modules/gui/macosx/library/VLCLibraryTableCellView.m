@@ -96,7 +96,12 @@
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
 
-    self.representedImageView.image = [VLCLibraryImageCache thumbnailForInputItem:_representedInputItem];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        NSImage *image = [VLCLibraryImageCache thumbnailForInputItem:self->_representedInputItem];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.representedImageView.image = image;
+        });
+    });
 
     self.trackingView.viewToHide = self.playInstantlyButton;
     self.playInstantlyButton.action = @selector(playInputItemInstantly:);
