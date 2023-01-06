@@ -138,7 +138,12 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     }
 
     _mediaTitleTextField.stringValue = _representedInputItem.name;
-    _mediaImageView.image = [VLCLibraryImageCache thumbnailForInputItem:_representedInputItem];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        NSImage *image = [VLCLibraryImageCache thumbnailForInputItem:self->_representedInputItem];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self->_mediaImageView.image = image;
+        });
+    });
 
     switch (_representedInputItem.inputType) {
         case ITEM_TYPE_DIRECTORY:
