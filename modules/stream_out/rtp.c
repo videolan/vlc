@@ -1329,8 +1329,11 @@ static void* ThreadSend( void *data )
     vlc_thread_set_name("vlc-rt-send");
 
 #ifdef _WIN32
+# undef ENOBUFS
 # define ENOBUFS      WSAENOBUFS
+# undef EAGAIN
 # define EAGAIN       WSAEWOULDBLOCK
+# undef EWOULDBLOCK
 # define EWOULDBLOCK  WSAEWOULDBLOCK
 #endif
     sout_stream_id_sys_t *id = data;
