@@ -29,7 +29,7 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryMenuController.h"
-#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryImageCache.h"
 
 #import "main/VLCMain.h"
 
@@ -138,15 +138,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     }
 
     _mediaTitleTextField.stringValue = _representedInputItem.name;
-    NSURL *artworkURL = _representedInputItem.artworkURL;
-    NSSize maxImageSize = NSMakeSize([VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2,
-                                     [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2);
-    NSImage *placeholderImage = [_representedInputItem thumbnailWithSize:maxImageSize];
-    if (artworkURL) {
-        [_mediaImageView setImageURL:artworkURL placeholderImage:placeholderImage];
-    } else {
-        _mediaImageView.image = placeholderImage;
-    }
+    _mediaImageView.image = [VLCLibraryImageCache thumbnailForInputItem:_representedInputItem];
 
     switch (_representedInputItem.inputType) {
         case ITEM_TYPE_DIRECTORY:
