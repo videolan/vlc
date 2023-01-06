@@ -618,6 +618,19 @@ endif
 # D3D9 common library
 # TODO: Do not build for Winstore
 if host_system == 'windows'
+    d3d11_common_lib = static_library('d3d11_common',
+        files(
+            '../video_chroma/d3d11_fmt.c',
+            '../video_chroma/dxgi_fmt.c',
+            ),
+        include_directories: [vlc_include_dirs],
+        pic: true,
+        install: false,
+        dependencies: [
+            cc.find_library('dxguid'),
+            cc.find_library('wbemuuid'),
+        ]
+    )
     d3d9_common_lib = static_library('d3d9_common',
         files(
             '../video_chroma/d3d9_fmt.c',
