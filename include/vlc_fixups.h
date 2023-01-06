@@ -26,6 +26,12 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+#ifdef _WIN32
+// avoid collision between numeric_limits::max() and max define
+#define NOMINMAX
+#endif
+
+
 /* needed to detect uClibc */
 #ifdef HAVE_FEATURES_H
 #include <features.h>
