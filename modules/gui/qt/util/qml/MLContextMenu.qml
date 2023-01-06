@@ -51,6 +51,14 @@ NativeMenu {
             "text": I18n.qtr("Enqueue"),
             "action": enqueue
         }, {
+            "text": I18n.qtr("Add to favorites"),
+            "action": addFavorite,
+            "visible": _showAddFavorite
+        }, {
+            "text": I18n.qtr("Remove from favorites"),
+            "action": removeFavorite,
+            "visible": _showRemoveFavorite
+        }, {
             "text": I18n.qtr("Add to a playlist"),
             "action": addToAPlaylist
         }, {
@@ -93,6 +101,14 @@ NativeMenu {
         DialogsProvider.playlistsDialog(_mlIDList(dataList))
     }
 
+    function addFavorite(dataList, options, indexes) {
+        model.setItemFavorite(indexes[0], true)
+    }
+
+    function removeFavorite(dataList, options, indexes) {
+        model.setItemFavorite(indexes[0], false)
+    }
+
     function markSeen(dataList, options, indexes) {
         model.setItemPlayed(indexes[0], true)
     }
@@ -107,6 +123,26 @@ NativeMenu {
     }
 
     // Private
+
+    function _showAddFavorite(options, indexes) {
+        if (indexes.length !== 1)
+            return false
+
+        var isFavorite = model.getDataAt(indexes[0]).isFavorite
+
+        // NOTE: Strictly comparing 'isFavorite' given it might be undefined.
+        return (isFavorite === false)
+    }
+
+    function _showRemoveFavorite(options, indexes) {
+        if (indexes.length !== 1)
+            return false
+
+        var isFavorite = model.getDataAt(indexes[0]).isFavorite
+
+        // NOTE: Strictly comparing 'isFavorite' given it might be undefined.
+        return (isFavorite === true)
+    }
 
     function _showSeen(options, indexes) {
         if (indexes.length !== 1)
