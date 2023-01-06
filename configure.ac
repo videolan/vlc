@@ -1034,6 +1034,7 @@ dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `ptrdiff_t' if <stddef.h> does not define.]) dnl ` (fix VIM syntax highlight
 AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, ptrdiff_t)
+  AC_DEFINE([SSIZE_MAX], [PTRDIFF_MAX], [Max possible value of the ssize_t type])
 ])
 
 dnl It seems that autoconf detects pkg-config only during the first
