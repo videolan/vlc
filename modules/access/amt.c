@@ -1407,11 +1407,9 @@ static int amt_send_mem_update( stream_t *p_access, bool leave)
     int           i_ipv6_hdr_len = IPv6_HOP_BY_HOP_OPTION_LEN + IPv6_FIXED_HDR_LEN;
     int           i_sendBufSize = i_amt_hdr_len + IP_HDR_IGMP_LEN;
     int           i_sendBufSizeIPv6 = i_amt_hdr_len + i_ipv6_hdr_len + MLD_REPORT_LEN;
-    uint8_t       pSendBuffer[ i_sendBufSize > i_sendBufSizeIPv6 ? i_sendBufSize : i_sendBufSizeIPv6 ]; /* make the buffer as large as needed */
+    char          pSendBuffer[MAC_LEN + NONCE_LEN + AMT_HDR_LEN + IPv6_HOP_BY_HOP_OPTION_LEN + IPv6_FIXED_HDR_LEN + MLD_REPORT_LEN] = { 0 };
     uint32_t      ulNonce = 0;
     access_sys_t *sys = p_access->p_sys;
-
-    memset( pSendBuffer, 0, sizeof(pSendBuffer) );
 
     pSendBuffer[0] = AMT_MEM_UPD;
 
@@ -1632,8 +1630,7 @@ static bool amt_rcv_relay_adv( stream_t *p_access )
 static bool amt_rcv_relay_mem_query( stream_t *p_access )
 {
     int i_buf_len = RELAY_QUERY_MSG_LEN + AMT_IPV6_MAX_NUM_SOURCES*16;
-    char pkt[i_buf_len];
-    memset( pkt, 0, i_buf_len);
+    char pkt[RELAY_QUERY_MSG_LEN + AMT_IPV6_MAX_NUM_SOURCES*16] = { 0 };
     struct pollfd ufd[1];
     access_sys_t *sys = p_access->p_sys;
 
