@@ -93,6 +93,8 @@ public:
 
     bool isNew() const;
     void setIsNew(bool isNew);
+    bool isFavorite() const;
+    void setIsFavorite(bool isFavorite);
     QString getFileName() const;
     QString getTitle() const;
     QString getThumbnail(vlc_ml_thumbnail_status_t* status);
@@ -110,6 +112,7 @@ public:
 
 private:
     bool m_isNew;
+    bool m_isFavorite;
     QString m_fileName;
     QString m_title;
     QString m_thumbnail;

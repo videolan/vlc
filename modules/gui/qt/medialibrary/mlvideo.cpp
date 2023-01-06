@@ -86,6 +86,8 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
 
     m_isNew = (m_playCount == 0 && m_progress <= 0);
 
+    m_isFavorite = data->b_is_favorite;
+
     for( const vlc_ml_file_t& file: ml_range_iterate<vlc_ml_file_t>( data->p_files ) )
         if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
         {
@@ -144,6 +146,16 @@ bool MLVideo::isNew() const
 void MLVideo::setIsNew(bool isNew)
 {
     m_isNew = isNew;
+}
+
+bool MLVideo::isFavorite() const
+{
+    return m_isFavorite;
+}
+
+void MLVideo::setIsFavorite(bool isFavorite)
+{
+    m_isFavorite = isFavorite;
 }
 
 QString MLVideo::getFileName() const
