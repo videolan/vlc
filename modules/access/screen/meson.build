@@ -22,7 +22,7 @@ if get_option('screen').allowed()
       screen_files += files('win32.c', 'dxgi.cpp')
       gdi32_dep = cc.find_library('gdi32')
       screen_deps += [gdi32_dep]
-      screen_link_with += d3d9_common_lib
+      screen_link_with += d3d11_common_lib
     else
       screen_files += files('mac.c')
       applicationservices_dep = dependency('ApplicationServices', required: true)
