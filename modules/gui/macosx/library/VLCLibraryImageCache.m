@@ -21,12 +21,15 @@
 *****************************************************************************/
 
 #import "VLCLibraryImageCache.h"
+
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
+
 #import "main/VLCMain.h"
 
 NSUInteger kVLCMaximumLibraryImageCacheSize = 50;
 uint32_t kVLCDesiredThumbnailWidth = 512;
-uint32_t kVLCDesiredThumbnailHeight = 320;
+uint32_t kVLCDesiredThumbnailHeight = 512;
 float kVLCDefaultThumbnailPosition = .15;
 
 @interface VLCLibraryImageCache()
@@ -103,6 +106,41 @@ float kVLCDefaultThumbnailPosition = .15;
                                     kVLCDesiredThumbnailWidth,
                                     kVLCDesiredThumbnailHeight,
                                     kVLCDefaultThumbnailPosition);
+}
+
++ (NSImage *)thumbnailForInputItem:(VLCInputItem *)inputItem
+{
+    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:inputItem];
+}
+
+- (NSImage *)imageForInputItem:(VLCInputItem *)inputItem
+{
+    NSImage *cachedImage = [_imageCache objectForKey:inputItem.MRL];
+    if (cachedImage) {
+        return cachedImage;
+    }
+    return [self generateImageForInputItem:inputItem];
+}
+
+- (NSImage *)generateImageForInputItem:(VLCInputItem *)inputItem
+{
+    NSImage *image;
+    NSURL *artworkURL = inputItem.artworkURL;
+    NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
+
+    if (artworkURL) {
+        image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
+    }
+
+    if (image == nil) {
+        image = [inputItem thumbnailWithSize:imageSize];
+    }
+
+    if (image) {
+        [_imageCache setObject:image forKey:inputItem.MRL];
+    }
+
+    return image;
 }
 
 @end

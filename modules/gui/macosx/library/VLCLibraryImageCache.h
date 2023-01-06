@@ -24,11 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCInputItem;
 @protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryImageCache : NSObject
 
 + (nullable NSImage *)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
++ (nullable NSImage *)thumbnailForInputItem:(VLCInputItem*)inputItem;
 
 @end
 
