@@ -54,18 +54,41 @@ MLVideoModel::MLVideoModel(QObject* parent)
 
     assert(m_mediaLib);
 
-    const MLItemId & itemId = video->getId();
+    int64_t id = video->getId().id;
 
     // ML thread
-    m_mediaLib->runOnMLThread(this, [itemId, played] (vlc_medialibrary_t * ml)
+    m_mediaLib->runOnMLThread(this, [id, played] (vlc_medialibrary_t * ml)
     {
-        vlc_ml_media_set_played(ml, itemId.id, played);
+        vlc_ml_media_set_played(ml, id, played);
     });
 
     // NOTE: We want the change to be visible right away.
     video->setIsNew(played == false);
 
     emit dataChanged(index, index, { VIDEO_IS_NEW });
+}
+
+/* Q_INVOKABLE */ void MLVideoModel::setItemFavorite(const QModelIndex & index, bool favorite)
+{
+    MLVideo * video = static_cast<MLVideo *>(item(index.row()));
+
+    if (video == nullptr)
+        return;
+
+    assert(m_mediaLib);
+
+    int64_t id = video->getId().id;
+
+    // ML thread
+    m_mediaLib->runOnMLThread(this, [id, favorite] (vlc_medialibrary_t * ml)
+    {
+        vlc_ml_media_set_favorite(ml, id, favorite);
+    });
+
+    // NOTE: We want the change to be visible right away.
+    video->setIsFavorite(favorite);
+
+    emit dataChanged(index, index, { VIDEO_IS_FAVORITE });
 }
 
 QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
@@ -80,6 +103,8 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
             return QVariant::fromValue( video->getId() );
         case VIDEO_IS_NEW:
             return QVariant::fromValue( video->isNew() );
+        case VIDEO_IS_FAVORITE:
+            return QVariant::fromValue( video->isFavorite() );
         case VIDEO_FILENAME:
             return QVariant::fromValue( video->getFileName() );
         case VIDEO_TITLE:
@@ -125,6 +150,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
     return {
         { VIDEO_ID, "id" },
         { VIDEO_IS_NEW, "isNew" },
+        { VIDEO_IS_FAVORITE, "isFavorite" },
         { VIDEO_FILENAME, "fileName" },
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },

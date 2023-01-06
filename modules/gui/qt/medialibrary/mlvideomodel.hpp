@@ -39,6 +39,7 @@ public:
     enum Role {
         VIDEO_ID = Qt::UserRole + 1,
         VIDEO_IS_NEW,
+        VIDEO_IS_FAVORITE,
         VIDEO_FILENAME,
         VIDEO_TITLE,
         VIDEO_THUMBNAIL,
@@ -63,8 +64,11 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 public: // Interface
-    // NOTE: This function is useful when we want to apply the change before the database event.
+    // NOTE: These functions are useful when we want to apply a change before the database event.
+
     Q_INVOKABLE void setItemPlayed(const QModelIndex & index, bool played);
+
+    Q_INVOKABLE void setItemFavorite(const QModelIndex & index, bool played);
 
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
