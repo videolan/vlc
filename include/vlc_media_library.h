@@ -581,6 +581,7 @@ enum vlc_ml_control
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
     VLC_ML_MEDIA_SET_TYPE,                  /**< arg1: media id; arg2: vlc_ml_media_type_t */
     VLC_ML_MEDIA_SET_PLAYED,                /**< arg1: media id; arg2: bool */
+    VLC_ML_MEDIA_SET_FAVORITE,              /**< arg1: media id; arg2: bool */
     VLC_ML_MEDIA_ADD_BOOKMARK,              /**< arg1: media id; arg2: int64_t */
     VLC_ML_MEDIA_REMOVE_BOOKMARK,           /**< arg1: media id; arg2: int64_t */
     VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS,      /**< arg1: media id */
@@ -1086,6 +1087,12 @@ static inline int vlc_ml_media_set_played( vlc_medialibrary_t* p_ml, int64_t i_m
                                            bool b_played )
 {
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_PLAYED, i_media_id, (int) b_played );
+}
+
+static inline int vlc_ml_media_set_favorite( vlc_medialibrary_t* p_ml, int64_t i_media_id,
+                                             bool b_favorite )
+{
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_FAVORITE, i_media_id, (int) b_favorite );
 }
 
 static inline vlc_ml_bookmark_list_t*

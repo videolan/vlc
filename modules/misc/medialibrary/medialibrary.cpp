@@ -626,6 +626,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
         case VLC_ML_MEDIA_SET_TYPE:
         case VLC_ML_MEDIA_SET_PLAYED:
+        case VLC_ML_MEDIA_SET_FAVORITE:
         case VLC_ML_MEDIA_ADD_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
@@ -1471,6 +1472,13 @@ int MediaLibrary::controlMedia( int query, va_list args )
                     return VLC_EGENERIC;
             }
             else if ( m->removeFromHistory() == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_SET_FAVORITE:
+        {
+            bool favorite = va_arg( args, int );
+            if ( m->setFavorite( favorite ) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
