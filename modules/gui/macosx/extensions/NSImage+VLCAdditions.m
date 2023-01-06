@@ -34,8 +34,7 @@
 
 + (instancetype)quickLookPreviewForLocalURL:(NSURL *)url withSize:(NSSize)size
 {
-    NSDictionary *dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-                                                     forKey:(NSString *)kQLThumbnailOptionIconModeKey];
+    NSDictionary *dict = @{(NSString*)kQLThumbnailOptionIconModeKey : [NSNumber numberWithBool:NO]};
     CFDictionaryRef dictRef = CFBridgingRetain(dict);
     CFURLRef urlRef = CFBridgingRetain(url);
     CGImageRef qlThumbnailRef = QLThumbnailImageCreate(kCFAllocatorDefault,
