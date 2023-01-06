@@ -77,6 +77,31 @@ void tracklist_remove_event_destroy(tracklist_remove_event_t *event) {
     free(event);
 }
 
+static DBusHandlerResult InvalidTrackId(DBusConnection *p_conn,
+                                        DBusMessage *p_from,
+                                        const char *trackId,
+                                        void *p_this) {
+  msg_Err((vlc_object_t *)p_this, "Invalid track id: %s", trackId);
+
+  DBusMessage *p_msg = dbus_message_new_error_printf(
+      p_from, DBUS_ERROR_UNKNOWN_OBJECT, "Invalid track id: %s", trackId);
+  if (!p_msg)
+    return DBUS_HANDLER_RESULT_NEED_MEMORY;
+  REPLY_SEND;
+}
+
+static DBusHandlerResult InvalidArguments(DBusConnection *p_conn,
+                                          DBusMessage *p_from,
+                                          void *p_this) {
+  msg_Err((vlc_object_t *)p_this, "Invalid arguments");
+
+  DBusMessage *p_msg = dbus_message_new_error(p_from, DBUS_ERROR_INVALID_ARGS,
+                                              "Invalid arguments");
+  if (!p_msg)
+    return DBUS_HANDLER_RESULT_NEED_MEMORY;
+  REPLY_SEND;
+}
+
 DBUS_METHOD( AddTrack )
 {
     REPLY_INIT;
@@ -173,23 +198,24 @@ DBUS_METHOD( GetTracksMetadata )
 
     if( DBUS_TYPE_ARRAY != dbus_message_iter_get_arg_type( &in_args ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "Invalid arguments" );
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+        return InvalidArguments(p_conn, p_from, p_this);
     }
 
     dbus_message_iter_recurse( &in_args, &track_ids );
     dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "a{sv}", &meta );
 
-    while( DBUS_TYPE_OBJECT_PATH ==
-           dbus_message_iter_get_arg_type( &track_ids ) )
+    bool id_valid = true;
+    while( DBUS_TYPE_OBJECT_PATH == dbus_message_iter_get_arg_type( &track_ids ) )
     {
         dbus_message_iter_get_basic( &track_ids, &psz_track_id );
 
         if( 1 != sscanf( psz_track_id, MPRIS_TRACKID_FORMAT, &i_track_id ) )
-            goto invalid_track_id;
+        {
+            id_valid = false;
+            break;
+        }
 
         playlist_item_t *item = NULL;
-
         playlist_Lock(p_playlist);
         item = playlist_ItemGetById(p_playlist, i_track_id);
         if (item)
@@ -200,13 +226,18 @@ DBUS_METHOD( GetTracksMetadata )
 
         if (!item)
         {
-invalid_track_id:
-            msg_Err( (vlc_object_t*) p_this, "Invalid track id: %s",
-                                             psz_track_id );
-            continue;
+            id_valid = false;
+            break;
         }
 
         dbus_message_iter_next( &track_ids );
+    }
+
+    if( !id_valid )
+    {
+        dbus_message_iter_abandon_container( &args, &meta );
+        dbus_message_unref(p_msg);
+        return InvalidTrackId(p_conn, p_from, psz_track_id, p_this);
     }
 
     dbus_message_iter_close_container( &args, &meta );
@@ -237,26 +268,21 @@ DBUS_METHOD( GoTo )
     }
 
     if( 1 != sscanf( psz_track_id, MPRIS_TRACKID_FORMAT, &i_track_id ) )
-    {
-        msg_Err( (vlc_object_t*) p_this, "Invalid track id %s", psz_track_id );
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
+        goto invalid_track_id;
 
     PL_LOCK;
-
-    for( int i = 0; i < p_playlist->current.i_size; i++ )
-    {
-        playlist_item_t *item = p_playlist->current.p_elems[i];
-
-        if( item->i_id == i_track_id )
-        {
-            playlist_ViewPlay( p_playlist, item->p_parent, item );
-            break;
-        }
-    }
-
+    playlist_item_t *item = playlist_ItemGetById( p_playlist, i_track_id );
+    if( item )
+        playlist_ViewPlay( p_playlist, item->p_parent, item );
     PL_UNLOCK;
+
+    if( !item )
+        goto invalid_track_id;
+
     REPLY_SEND;
+
+invalid_track_id:
+    return InvalidTrackId(p_conn, p_from, psz_track_id, p_this);
 }
 
 DBUS_METHOD( RemoveTrack )
@@ -283,26 +309,21 @@ DBUS_METHOD( RemoveTrack )
     }
 
     if( 1 != sscanf( psz_id, MPRIS_TRACKID_FORMAT, &i_id ) )
-    {
-        msg_Err( (vlc_object_t*) p_this, "Invalid track id: %s", psz_id );
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
+        goto invalid_track_id;
 
     PL_LOCK;
-
-    for( int i = 0; i < p_playlist->current.i_size; i++ )
-    {
-        playlist_item_t *item = p_playlist->current.p_elems[i];
-
-        if( item->i_id == i_id )
-        {
-            playlist_NodeDelete( p_playlist, item );
-            break;
-        }
-    }
-
+    playlist_item_t *item = playlist_ItemGetById( p_playlist, i_id );
+    if( item )
+        playlist_NodeDelete( p_playlist, item );
     PL_UNLOCK;
+
+    if( !item )
+        goto invalid_track_id;
+
     REPLY_SEND;
+
+invalid_track_id:
+    return InvalidTrackId(p_conn, p_from, psz_id, p_this);
 }
 
 static int MarshalTrack( DBusMessageIter *iter, int id )
