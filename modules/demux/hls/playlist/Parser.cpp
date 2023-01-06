@@ -790,9 +790,9 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
         if(xstartTag->getAttributeByName("TIME-OFFSET"))
         {
             float offset = xstartTag->getAttributeByName("TIME-OFFSET")->floatingPoint();
-            if(offset > 0 && (offset * CLOCK_FREQ) <= playlist->duration.Get())
+            if(offset > 0 && vlc_tick_from_sec(offset) <= playlist->duration.Get())
                 playlist->presentationStartOffset.Set(CLOCK_FREQ * offset);
-            else if(offset < 0 && (-offset * CLOCK_FREQ) <= playlist->duration.Get())
+            else if(offset < 0 && vlc_tick_from_sec(-offset) <= playlist->duration.Get())
                 playlist->presentationStartOffset.Set(playlist->duration.Get() +
                                                       CLOCK_FREQ * offset);
         }

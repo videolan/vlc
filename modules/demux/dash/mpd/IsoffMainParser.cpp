@@ -70,7 +70,7 @@ static void parseAvailability(MPD *mpd, Node *node, T *s)
     if(node->hasAttribute("availabilityTimeOffset"))
     {
         double val = Integer<double>(node->getAttributeValue("availabilityTimeOffset"));
-        s->addAttribute(new AvailabilityTimeOffsetAttr(val * CLOCK_FREQ));
+        s->addAttribute(new AvailabilityTimeOffsetAttr(vlc_tick_from_sec(val)));
     }
     if(node->hasAttribute("availabilityTimeComplete"))
     {
