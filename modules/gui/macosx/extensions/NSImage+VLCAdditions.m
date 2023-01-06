@@ -51,6 +51,7 @@
 
     NSBitmapImageRep *bitmapImageRep = [[NSBitmapImageRep alloc] initWithCGImage:qlThumbnailRef];
     if (bitmapImageRep == nil) {
+        CFRelease(qlThumbnailRef);
         return nil;
     }
 
