@@ -222,7 +222,8 @@ struct vlc_list_it vlc_list_it_reverse_start(const struct vlc_list *head)
 {
     struct vlc_list *first = head->prev;
 
-    return (struct vlc_list_it){ head, first, first->prev };
+    struct vlc_list_it it = { head, first, first->prev };
+    return it;
 }
 
 static inline bool vlc_list_it_continue(const struct vlc_list_it *restrict it)
