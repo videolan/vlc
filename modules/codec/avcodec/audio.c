@@ -549,7 +549,7 @@ vlc_fourcc_t GetVlcAudioFormat( int fmt )
         [AV_SAMPLE_FMT_FLTP]  = VLC_CODEC_FL32,
         [AV_SAMPLE_FMT_DBLP]  = VLC_CODEC_FL64,
     };
-    if( (sizeof(fcc) / sizeof(fcc[0])) > (unsigned)fmt )
+    if( ARRAY_SIZE(fcc) > (unsigned)fmt )
         return fcc[fmt];
     return VLC_CODEC_S16N;
 }
