@@ -3275,8 +3275,8 @@ HRESULT BDAGraph::Register()
     }
 
     size_t len = sizeof(pwsz_graph_name) / sizeof(pwsz_graph_name[0]);
-    _snwprintf( pwsz_graph_name, len - 1, L"VLC BDA Graph %08x Pid %08x",
-        (DWORD_PTR) p_filter_graph, ::GetCurrentProcessId() );
+    _snwprintf( pwsz_graph_name, len - 1, L"VLC BDA Graph %08p Pid %08x",
+        p_filter_graph, ::GetCurrentProcessId() );
     pwsz_graph_name[len-1] = 0;
     hr = CreateItemMoniker( L"!", pwsz_graph_name, &l.p_moniker );
     if( FAILED( hr ) )
