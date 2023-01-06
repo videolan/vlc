@@ -23,6 +23,8 @@
 #import "VLCInputItem.h"
 
 #import "main/VLCMain.h"
+
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import <vlc_url.h>
@@ -588,6 +590,34 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
         return VLC_ENOENT;
     }
     return input_item_WriteMeta(VLC_OBJECT(getIntf()), _vlcInputItem);
+}
+
+- (NSImage*)thumbnailWithSize:(NSSize)size
+{
+    NSImage *image;
+    if (!self.isStream && _vlcInputItem != NULL) {
+        char *psz_url = input_item_GetURI(_vlcInputItem);
+        if (psz_url) {
+            char *psz_path = vlc_uri2path(psz_url);
+            NSString *path = toNSStr(psz_path);
+
+            free(psz_url);
+            free(psz_path);
+
+            image = [NSImage quickLookPreviewForLocalPath:path
+                                                 withSize:size];
+
+            if (!image) {
+                image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+                image.size = size;
+            }
+        }
+    }
+
+    if (!image) {
+        image = [NSImage imageNamed: @"noart.png"];
+    }
+    return image;
 }
 
 @end

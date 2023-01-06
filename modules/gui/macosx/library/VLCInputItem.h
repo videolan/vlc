@@ -79,6 +79,8 @@ extern NSString *VLCInputItemPreparsingSucceeded;
 - (int)preparseInputItem;
 - (int)writeMetadataToFile;
 
+- (NSImage*)thumbnailWithSize:(NSSize)size;
+
 @end
 
 @interface VLCInputNode : NSObject
