@@ -22,12 +22,8 @@
 
 #import "VLCMediaSourceCollectionViewItem.h"
 
-#import <vlc_input.h>
-#import <vlc_url.h>
-
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
-#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
@@ -143,7 +139,9 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
 
     _mediaTitleTextField.stringValue = _representedInputItem.name;
     NSURL *artworkURL = _representedInputItem.artworkURL;
-    NSImage *placeholderImage = [self imageForInputItem];
+    NSSize maxImageSize = NSMakeSize([VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2,
+                                     [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2);
+    NSImage *placeholderImage = [_representedInputItem thumbnailWithSize:maxImageSize];
     if (artworkURL) {
         [_mediaImageView setImageURL:artworkURL placeholderImage:placeholderImage];
     } else {
@@ -174,36 +172,6 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
         default:
             break;
     }
-}
-
-- (NSImage *)imageForInputItem
-{
-    NSImage *image;
-    if (!_representedInputItem.isStream && _representedInputItem.vlcInputItem) {
-        char *psz_url = input_item_GetURI(_representedInputItem.vlcInputItem);
-        if (psz_url) {
-            char *psz_path = vlc_uri2path(psz_url);
-            NSString *path = toNSStr(psz_path);
-
-            free(psz_url);
-            free(psz_path);
-
-            NSSize maxImageSize = NSMakeSize([VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2,
-                                             [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth] * 2);
-            image = [NSImage quickLookPreviewForLocalPath:path
-                                                 withSize:maxImageSize];
-
-            if (!image) {
-                image = [[NSWorkspace sharedWorkspace] iconForFile:path];
-                image.size = maxImageSize;
-            }
-        }
-    }
-
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    return image;
 }
 
 #pragma mark - actions
