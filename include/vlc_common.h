@@ -552,9 +552,6 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
  *****************************************************************************/
 #if defined( _WIN32 )
 #   include <malloc.h>
-#   ifndef PATH_MAX
-#       define PATH_MAX MAX_PATH
-#   endif
 #   include <windows.h>
 #endif
 
