@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 
+#include <media/NdkMediaCodec.h>
 #include <OMX_Core.h>
 #include <OMX_Component.h>
 #include "omxil_utils.h"
@@ -55,33 +56,6 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
 #define AMEDIACODEC_FLAG_CODEC_CONFIG 2
 
 /*****************************************************************************
- * NdkMediaError.h
- *****************************************************************************/
-
-typedef enum {
-    AMEDIA_OK = 0,
-
-    AMEDIA_ERROR_BASE                  = -10000,
-    AMEDIA_ERROR_UNKNOWN               = AMEDIA_ERROR_BASE,
-    AMEDIA_ERROR_MALFORMED             = AMEDIA_ERROR_BASE - 1,
-    AMEDIA_ERROR_UNSUPPORTED           = AMEDIA_ERROR_BASE - 2,
-    AMEDIA_ERROR_INVALID_OBJECT        = AMEDIA_ERROR_BASE - 3,
-    AMEDIA_ERROR_INVALID_PARAMETER     = AMEDIA_ERROR_BASE - 4,
-
-    AMEDIA_DRM_ERROR_BASE              = -20000,
-    AMEDIA_DRM_NOT_PROVISIONED         = AMEDIA_DRM_ERROR_BASE - 1,
-    AMEDIA_DRM_RESOURCE_BUSY           = AMEDIA_DRM_ERROR_BASE - 2,
-    AMEDIA_DRM_DEVICE_REVOKED          = AMEDIA_DRM_ERROR_BASE - 3,
-    AMEDIA_DRM_SHORT_BUFFER            = AMEDIA_DRM_ERROR_BASE - 4,
-    AMEDIA_DRM_SESSION_NOT_OPENED      = AMEDIA_DRM_ERROR_BASE - 5,
-    AMEDIA_DRM_TAMPER_DETECTED         = AMEDIA_DRM_ERROR_BASE - 6,
-    AMEDIA_DRM_VERIFY_FAILED           = AMEDIA_DRM_ERROR_BASE - 7,
-    AMEDIA_DRM_NEED_KEY                = AMEDIA_DRM_ERROR_BASE - 8,
-    AMEDIA_DRM_LICENSE_EXPIRED         = AMEDIA_DRM_ERROR_BASE - 9,
-
-} media_status_t;
-
-/*****************************************************************************
  * NdkMediaCodec.h
  *****************************************************************************/
 
@@ -91,31 +65,6 @@ typedef enum {
 #else
 #define off_t_compat off_t
 #endif
-
-struct AMediaCodec;
-typedef struct AMediaCodec AMediaCodec;
-
-struct AMediaCodecBufferInfo {
-    int32_t offset;
-    int32_t size;
-    int64_t presentationTimeUs;
-    uint32_t flags;
-};
-typedef struct AMediaCodecBufferInfo AMediaCodecBufferInfo;
-
-enum {
-    AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM = 4,
-    AMEDIACODEC_CONFIGURE_FLAG_ENCODE = 1,
-    AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED = -3,
-    AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED = -2,
-    AMEDIACODEC_INFO_TRY_AGAIN_LATER = -1
-};
-
-struct AMediaFormat;
-typedef struct AMediaFormat AMediaFormat;
-
-struct AMediaCrypto;
-typedef struct AMediaCrypto AMediaCrypto;
 
 /*****************************************************************************
  * Ndk symbols
