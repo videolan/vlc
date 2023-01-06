@@ -54,7 +54,7 @@
 #if defined(WINAPI_FAMILY)
 # undef WINAPI_FAMILY
 #endif
-#define WINAPI_FAMILY WINAPI_PARTITION_DESKTOP
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 #include <wbemidl.h>
 
 #define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \

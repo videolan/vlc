@@ -75,7 +75,7 @@ static const int PROF_AV1_HIGH[]    = { FF_PROFILE_AV1_HIGH, FF_PROFILE_AV1_MAIN
 #if defined(WINAPI_FAMILY)
 # undef WINAPI_FAMILY
 #endif
-#define WINAPI_FAMILY WINAPI_PARTITION_DESKTOP
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 
 #include <d3d9.h>
 #include <dxva2api.h>
