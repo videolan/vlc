@@ -604,8 +604,8 @@
 /* host which ran configure */
 #mesondefine VLC_COMPILE_HOST
 
-/* TODO: Define to 1 if you want to build for Windows Store apps */
-#undef VLC_WINSTORE_APP
+/* Define to 1 if building for Windows Store. */
+#mesondefine VLC_WINSTORE_APP
 
 /* Define to 1 if build machine is big endian */
 #mesondefine WORDS_BIGENDIAN

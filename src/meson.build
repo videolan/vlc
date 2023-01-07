@@ -54,6 +54,9 @@ min_windows_version_test = '''
     libvlccore_deps += cc.find_library('bcrypt')
     libvlccore_deps += cc.find_library('winmm')
     libvlccore_deps += cc.find_library('normaliz')
+    if have_win_store
+        libvlccore_deps += cc.find_library('runtimeobject')
+    endif
     if cc.compiles(min_windows_version_test.format('_WIN32_WINNT_WIN8'), name: 'Compiling for Win8+')
         libvlccore_deps += cc.find_library('synchronization')
     endif

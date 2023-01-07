@@ -277,6 +277,8 @@ endif
 #
 
 have_mingw = false
+have_win_desktop = false
+have_win_store = false
 mingw_libs = []
 
 if host_system == 'windows'
@@ -363,6 +365,9 @@ windows_version_test = '''
             mingw_libs += mingwex_lib
         endif
 
+        # TODO: enable when meson 0.63 is required
+        # add_project_dependencies(mingw_libs, language: ['c', 'cpp'])
+
         # Check for fnative-struct or mms-bitfields support for MinGW
         if cc.has_argument('-mms-bitfields')
             add_project_arguments('-mms-bitfields',
@@ -382,6 +387,18 @@ windows_version_test = '''
         # DEP, ASLR, NO SEH
         add_project_link_arguments('-Wl,--nxcompat', '-Wl,--no-seh', '-Wl,--dynamicbase',
             language: ['c', 'cpp'])
+    endif
+
+    # Check if we are building for Windows Store
+    if get_option('winstore_app')
+        have_win_store = true
+        cdata.set('VLC_WINSTORE_APP', 1)
+        add_project_arguments('-DWINSTORECOMPAT', language: ['c', 'cpp'])
+        windowsappcompat_lib = cc.find_library('windowsappcompat')
+        # TODO: enable when meson 0.63 is required
+        # add_project_dependencies(windowsappcompat_lib, language: ['c', 'cpp'])
+    else
+        have_win_desktop = true
     endif
 
 endif
@@ -572,6 +589,10 @@ if host_system == 'linux'
 endif
 
 libcompat_sources = []
+
+if have_win_store
+    libcompat_sources += 'gai_strerror.c'
+endif
 
 # Check all functions in libcompat_functions array
 foreach f : libcompat_functions
