@@ -141,6 +141,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/main/VLCMain.h \
 	gui/macosx/main/VLCMain.m \
 	gui/macosx/main/macosx.m \
+	gui/macosx/media-source/VLCLibraryMediaSourceViewController.h \
+	gui/macosx/media-source/VLCLibraryMediaSourceViewController.m \
 	gui/macosx/media-source/VLCMediaSource.h \
 	gui/macosx/media-source/VLCMediaSource.m \
 	gui/macosx/media-source/VLCMediaSourceBaseDataSource.h \
