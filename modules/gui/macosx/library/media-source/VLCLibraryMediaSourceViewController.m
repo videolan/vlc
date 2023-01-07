@@ -24,7 +24,10 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryWindow.h"
+
+#import "main/VLCMain.h"
 
 @implementation VLCLibraryMediaSourceViewController
 
@@ -41,6 +44,8 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);
+    _libraryTargetView = libraryWindow.libraryTargetView;
+    _mediaSourceView = libraryWindow.mediaSourceView;
     _collectionView = libraryWindow.mediaSourceCollectionView;
     _collectionViewScrollView = libraryWindow.mediaSourceCollectionViewScrollView;
     _tableView = libraryWindow.mediaSourceTableView;
@@ -48,6 +53,10 @@
     _homeButton = libraryWindow.mediaSourceHomeButton;
     _pathControl = libraryWindow.mediaSourcePathControl;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
+    _optionBarView = libraryWindow.optionBarView;
+    _librarySortButton = libraryWindow.librarySortButton;
+    _librarySearchField = libraryWindow.librarySearchField;
+
 }
 
 - (void)setupBaseDataSource
@@ -60,6 +69,41 @@
     _baseDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
     _baseDataSource.tableView = _tableView;
     [_baseDataSource setupViews];
+}
+
+- (void)presentBrowseView
+{
+    [self presentMediaSourceView:VLCLibraryBrowseSegment];
+}
+
+- (void)presentStreamsView
+{
+    [self presentMediaSourceView:VLCLibraryStreamsSegment];
+}
+
+- (void)presentMediaSourceView:(VLCLibrarySegment)viewSegment
+{
+    for (NSView *subview in _libraryTargetView.subviews) {
+        [subview removeFromSuperview];
+    }
+
+    if (_mediaSourceView.superview == nil) {
+        _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_mediaSourceView];
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
+    }
+
+    _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegment ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
+
+    _librarySortButton.hidden = YES;
+    _librarySearchField.enabled = NO;
+    _librarySearchField.stringValue = @"";
+    [VLCMain.sharedInstance.libraryController filterByString:@""];
+    _optionBarView.hidden = YES;
+
+    [_baseDataSource reloadViews];
 }
 
 @end

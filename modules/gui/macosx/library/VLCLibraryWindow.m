@@ -479,8 +479,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
             [self showAudioLibrary];
             break;
         case VLCLibraryBrowseSegment:
+            [_libraryMediaSourceViewController presentBrowseView];
+            break;
         case VLCLibraryStreamsSegment:
-            [self showMediaSourceAppearance];
+            [_libraryMediaSourceViewController presentStreamsView];
             break;
         default:
             break;
@@ -516,33 +518,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.gridVsListSegmentedControl.target = self;
     self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
-}
-
-- (void)showMediaSourceAppearance
-{
-    if (_videoLibraryView.superview != nil) {
-        [_videoLibraryView removeFromSuperview];
-    }
-    if (_audioLibraryView.superview != nil) {
-        [_audioLibraryView removeFromSuperview];
-    }
-    if (_emptyLibraryView.superview != nil) {
-        [_emptyLibraryView removeFromSuperview];
-    }
-    if (_mediaSourceView.superview == nil) {
-        _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_mediaSourceView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
-    }
-    _libraryMediaSourceViewController.baseDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 2 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
-    _librarySortButton.hidden = YES;
-    _librarySearchField.enabled = NO;
-    [self clearLibraryFilterString];
-    _optionBarView.hidden = YES;
-    _audioSegmentedControl.hidden = YES;
-    [_libraryMediaSourceViewController.baseDataSource reloadViews];
 }
 
 - (IBAction)playlistDoubleClickAction:(id)sender
