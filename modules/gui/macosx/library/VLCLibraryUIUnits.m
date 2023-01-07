@@ -22,6 +22,9 @@
 
 #import "VLCLibraryUIUnits.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
+
 @implementation VLCLibraryUIUnits
 
 + (const CGFloat)largeSpacing
@@ -77,6 +80,52 @@
 + (const CGFloat)dynamicCollectionViewItemMaximumWidth
 {
     return 280;
+}
+
++ (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
+                                                     withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+{
+    static uint numItemsInRow = 5;
+
+    NSSize itemSize = [self itemSizeForCollectionView:collectionView
+                                           withLayout:collectionViewLayout
+                               withNumberOfItemsInRow:numItemsInRow];
+
+    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumSize]) {
+        ++numItemsInRow;
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewLayout
+                            withNumberOfItemsInRow:numItemsInRow];
+    }
+    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumSize]) {
+        --numItemsInRow;
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewLayout
+                            withNumberOfItemsInRow:numItemsInRow];
+    }
+
+    return itemSize;
+}
+
++ (const NSSize)itemSizeForCollectionView:(NSCollectionView *)collectionView
+                               withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+                   withNumberOfItemsInRow:(uint)numItemsInRow
+{
+    NSParameterAssert(numItemsInRow > 0);
+    NSParameterAssert(collectionView);
+    NSParameterAssert(collectionViewLayout);
+
+    const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
+    const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
+
+    const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
+                                    (sectionInsets.left +
+                                     sectionInsets.right +
+                                     (interItemSpacing * (numItemsInRow - 1)) +
+                                     1);
+
+    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
+    return NSMakeSize(itemWidth, itemWidth + [VLCLibraryCollectionViewItem bottomTextViewsHeight]);
 }
 
 @end

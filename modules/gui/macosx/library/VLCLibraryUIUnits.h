@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCLibraryCollectionViewFlowLayout;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryUIUnits : NSObject
@@ -43,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (const CGFloat)dynamicCollectionViewItemMinimumWidth;
 + (const CGFloat)dynamicCollectionViewItemMaximumWidth;
+
++ (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
+                                                     withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout;
 
 @end
 
