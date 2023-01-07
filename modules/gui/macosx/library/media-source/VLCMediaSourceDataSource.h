@@ -28,7 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCInputNode;
 @class VLCMediaSource;
 
-@interface VLCMediaSourceDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
+@interface VLCMediaSourceDataSource : NSObject <NSCollectionViewDataSource,
+                                                NSCollectionViewDelegate,
+                                                NSCollectionViewDelegateFlowLayout,
+                                                NSTableViewDelegate,
+                                                NSTableViewDataSource>
 
 @property (readwrite, retain) VLCMediaSource *displayedMediaSource;
 @property (readwrite, retain, nonatomic) VLCInputNode *nodeToDisplay;

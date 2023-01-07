@@ -31,6 +31,7 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "main/VLCMain.h"
 
@@ -103,6 +104,55 @@
     VLCInputNode *childNode = nodeChildren[indexPath.item];
 
     [self performActionForNode:childNode allowPlayback:YES];
+}
+
+- (NSSize)collectionView:(NSCollectionView *)collectionView
+                  layout:(NSCollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSCollectionViewFlowLayout *collectionViewFlowLayout = (NSCollectionViewFlowLayout*)collectionViewLayout;
+
+    static uint numItemsInRow = 5;
+
+    NSSize itemSize = [self itemSizeForCollectionView:collectionView
+                                           withLayout:collectionViewFlowLayout
+                               withNumberOfItemsInRow:numItemsInRow];
+
+    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumSize]) {
+        ++numItemsInRow;
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewFlowLayout
+                            withNumberOfItemsInRow:numItemsInRow];
+    }
+    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumSize]) {
+        --numItemsInRow;
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewFlowLayout
+                            withNumberOfItemsInRow:numItemsInRow];
+    }
+
+    return itemSize;
+}
+
+- (NSSize)itemSizeForCollectionView:(NSCollectionView *)collectionView
+                        withLayout:(NSCollectionViewFlowLayout *)collectionViewLayout
+            withNumberOfItemsInRow:(uint)numItemsInRow
+{
+    NSParameterAssert(numItemsInRow > 0);
+    NSParameterAssert(collectionView);
+    NSParameterAssert(collectionViewLayout);
+
+    const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
+    const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
+
+    const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
+                                    (sectionInsets.left +
+                                     sectionInsets.right +
+                                     (interItemSpacing * (numItemsInRow - 1)) +
+                                     1);
+
+    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
+    return NSMakeSize(itemWidth, itemWidth + 46);
 }
 
 #pragma mark - table view data source and delegation

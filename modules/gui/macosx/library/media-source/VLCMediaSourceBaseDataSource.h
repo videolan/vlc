@@ -31,7 +31,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMediaSourceDataSource;
 
-@interface VLCMediaSourceBaseDataSource : NSObject
+@interface VLCMediaSourceBaseDataSource : NSObject <NSCollectionViewDataSource,
+                                                    NSCollectionViewDelegate,
+                                                    NSCollectionViewDelegateFlowLayout,
+                                                    NSTableViewDelegate,
+                                                    NSTableViewDataSource>
 
 @property (readwrite) NSCollectionView *collectionView;
 @property (readwrite) NSScrollView *collectionViewScrollView;

@@ -24,6 +24,7 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryWindow.h"
 
@@ -37,6 +38,7 @@
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupBaseDataSource];
+        [self setupCollectionView];
     }
     return self;
 }
@@ -69,6 +71,11 @@
     _baseDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
     _baseDataSource.tableView = _tableView;
     [_baseDataSource setupViews];
+}
+
+- (void)setupCollectionView
+{
+    _collectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 }
 
 - (void)presentBrowseView
