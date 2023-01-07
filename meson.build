@@ -280,6 +280,7 @@ have_mingw = false
 have_win_desktop = false
 have_win_store = false
 mingw_libs = []
+libcom_cppflags = []
 
 if host_system == 'windows'
 
@@ -361,6 +362,14 @@ windows_version_test = '''
 
         # TODO: enable when meson 0.63 is required
         # add_project_dependencies(mingw_libs, language: ['c', 'cpp'])
+
+        # fno-strict-aliasing is necessary for WRL and IID_PPV_ARGS to work safely
+        # MSVC doesn't have this option but doesn't do pointer aliasing, so it
+        # should work too
+        libcom_cppflags += '-fno-strict-aliasing'
+        if not cpp.has_argument(libcom_cppflags)
+            error('-fno-strict-aliasing is necessary for Windows C++ modules')
+        endif
 
         # Check for fnative-struct or mms-bitfields support for MinGW
         if cc.has_argument('-mms-bitfields')
