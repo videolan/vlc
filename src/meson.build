@@ -52,9 +52,10 @@ min_windows_version_test = '''
 '''
 
     libvlccore_deps += cc.find_library('bcrypt')
-    libvlccore_deps += cc.find_library('winmm')
     libvlccore_deps += cc.find_library('normaliz')
-    if have_win_store
+    if not have_win_store
+        libvlccore_deps += cc.find_library('winmm')
+    else
         libvlccore_deps += cc.find_library('runtimeobject')
     endif
     if cc.compiles(min_windows_version_test.format('_WIN32_WINNT_WIN8'), name: 'Compiling for Win8+')
@@ -313,7 +314,6 @@ if host_system == 'darwin'
     libvlccore_link_args += '-Wl,-U,_vlc_static_modules'
 elif host_system == 'windows'
     libvlccore_sources += [
-        'win32/dirs.c',
         'win32/error.c',
         'win32/filesystem.c',
         'win32/netconf.c',
@@ -321,9 +321,20 @@ elif host_system == 'windows'
         'win32/rand.c',
         'win32/specific.c',
         'win32/thread.c',
-
-        'win32/timer.c' # TODO: this is non-winstore
     ]
+
+    if have_win_store
+        libvlccore_sources += [
+            'posix/timer.c',
+            'win32/dirs-uap.c',
+        ]
+    else
+        libvlccore_sources += [
+            'win32/timer.c',
+            'win32/dirs.c',
+            'win32/spawn.c',
+        ]
+    endif
 elif host_system == 'linux'
     libvlccore_sources += [
         'posix/dirs.c',
