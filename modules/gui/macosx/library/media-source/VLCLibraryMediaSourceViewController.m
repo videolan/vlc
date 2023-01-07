@@ -22,6 +22,29 @@
 
 #import "VLCLibraryMediaSourceViewController.h"
 
+#import "library/VLCLibraryWindow.h"
+
 @implementation VLCLibraryMediaSourceViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super init];
+    if (self) {
+        [self setupPropertiesFromLibraryWindow:libraryWindow];
+    }
+    return self;
+}
+
+- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    NSParameterAssert(libraryWindow);
+    _collectionView = libraryWindow.mediaSourceCollectionView;
+    _collectionViewScrollView = libraryWindow.mediaSourceCollectionViewScrollView;
+    _tableView = libraryWindow.mediaSourceTableView;
+    _tableViewScrollView = libraryWindow.mediaSourceTableViewScrollView;
+    _homeButton = libraryWindow.mediaSourceHomeButton;
+    _pathControl = libraryWindow.mediaSourcePathControl;
+    _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
+}
 
 @end
