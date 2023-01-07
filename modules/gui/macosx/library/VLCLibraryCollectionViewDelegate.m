@@ -77,57 +77,11 @@
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
     if (collectionViewLayout) {
         VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
-        return [self adjustedItemSizeForCollectionView:collectionView
-                                            withLayout:collectionViewFlowLayout];
+        return [VLCLibraryUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
+                                                                       withLayout:collectionViewFlowLayout];
     }
 
     return NSZeroSize;
-}
-
-- (NSSize)adjustedItemSizeForCollectionView:(NSCollectionView *)collectionView
-                                 withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
-{
-    static uint numItemsInRow = 5;
-
-    NSSize itemSize = [self itemSizeForCollectionView:collectionView
-                                           withLayout:collectionViewLayout
-                               withNumberOfItemsInRow:numItemsInRow];
-
-    while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth]) {
-        ++numItemsInRow;
-        itemSize = [self itemSizeForCollectionView:collectionView
-                                        withLayout:collectionViewLayout
-                            withNumberOfItemsInRow:numItemsInRow];
-    }
-    while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumWidth]) {
-        --numItemsInRow;
-        itemSize = [self itemSizeForCollectionView:collectionView
-                                        withLayout:collectionViewLayout
-                            withNumberOfItemsInRow:numItemsInRow];
-    }
-
-    return itemSize;
-}
-
-- (NSSize)itemSizeForCollectionView:(NSCollectionView *)collectionView
-                        withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
-            withNumberOfItemsInRow:(uint)numItemsInRow
-{
-    NSParameterAssert(numItemsInRow > 0);
-    NSParameterAssert(collectionView);
-    NSParameterAssert(collectionViewLayout);
-
-    const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
-    const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
-
-    const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
-                                    (sectionInsets.left +
-                                     sectionInsets.right +
-                                     (interItemSpacing * (numItemsInRow - 1)) +
-                                     1);
-
-    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
-    return NSMakeSize(itemWidth, itemWidth + [VLCLibraryCollectionViewItem bottomTextViewsHeight]);
 }
 
 - (BOOL)collectionView:(NSCollectionView *)collectionView
