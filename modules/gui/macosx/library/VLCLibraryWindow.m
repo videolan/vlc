@@ -49,6 +49,7 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
+#import "media-source/VLCLibraryMediaSourceViewController.h"
 
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
@@ -233,15 +234,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _audioLibraryGridModeSplitViewListTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
 
-    _mediaSourceDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
-    _mediaSourceDataSource.collectionView = _mediaSourceCollectionView;
-    _mediaSourceDataSource.collectionViewScrollView = _mediaSourceCollectionViewScrollView;
-    _mediaSourceDataSource.homeButton = _mediaSourceHomeButton;
-    _mediaSourceDataSource.pathControl = _mediaSourcePathControl;
-    _mediaSourceDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
+    _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
     _mediaSourceTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
-    _mediaSourceDataSource.tableView = _mediaSourceTableView;
-    [_mediaSourceDataSource setupViews];
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
     self.upNextLabel.stringValue = _NS("Playlist");
@@ -542,13 +536,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
     }
-    _mediaSourceDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 2 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
+    _libraryMediaSourceViewController.baseDataSource.mediaSourceMode = _segmentedTitleControl.selectedSegment == 2 ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
     _librarySortButton.hidden = YES;
     _librarySearchField.enabled = NO;
     [self clearLibraryFilterString];
     _optionBarView.hidden = YES;
     _audioSegmentedControl.hidden = YES;
-    [_mediaSourceDataSource reloadViews];
+    [_libraryMediaSourceViewController.baseDataSource reloadViews];
 }
 
 - (IBAction)playlistDoubleClickAction:(id)sender

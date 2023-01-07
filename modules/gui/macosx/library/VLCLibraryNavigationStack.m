@@ -28,6 +28,7 @@
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
+#import "media-source/VLCLibraryMediaSourceViewController.h"
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 #import "media-source/VLCMediaSource.h"
@@ -177,12 +178,12 @@
     [_delegate.segmentedTitleControl setSelectedSegment:state.libraryWindowSelectedSegment];
     [_delegate.audioSegmentedControl setSelectedSegment:state.audioLibraryViewSelectedSegment];
     [_delegate.gridVsListSegmentedControl setSelectedSegment:state.viewModeSelectedSegment];
-    [_delegate.mediaSourceDataSource setChildDataSource:state.currentMediaSource];
-    [_delegate.mediaSourceDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
+    [_delegate.libraryMediaSourceViewController.baseDataSource setChildDataSource:state.currentMediaSource];
+    [_delegate.libraryMediaSourceViewController.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 
     [_delegate segmentedControlAction:self];
     [_delegate.libraryAudioViewController segmentedControlAction:self];
-    [_delegate.mediaSourceDataSource setGridOrListMode:self];
+    [_delegate.libraryMediaSourceViewController.baseDataSource setGridOrListMode:self];
 
     [self updateDelegateNavigationButtons];
 }

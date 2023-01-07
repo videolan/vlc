@@ -22,6 +22,8 @@
 
 #import "VLCLibraryMediaSourceViewController.h"
 
+#import "VLCMediaSourceBaseDataSource.h"
+
 #import "library/VLCLibraryWindow.h"
 
 @implementation VLCLibraryMediaSourceViewController
@@ -31,6 +33,7 @@
     self = [super init];
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupBaseDataSource];
     }
     return self;
 }
@@ -45,6 +48,18 @@
     _homeButton = libraryWindow.mediaSourceHomeButton;
     _pathControl = libraryWindow.mediaSourcePathControl;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
+}
+
+- (void)setupBaseDataSource
+{
+    _baseDataSource = [[VLCMediaSourceBaseDataSource alloc] init];
+    _baseDataSource.collectionView = _collectionView;
+    _baseDataSource.collectionViewScrollView = _collectionViewScrollView;
+    _baseDataSource.homeButton = _homeButton;
+    _baseDataSource.pathControl = _pathControl;
+    _baseDataSource.gridVsListSegmentedControl = _gridVsListSegmentedControl;
+    _baseDataSource.tableView = _tableView;
+    [_baseDataSource setupViews];
 }
 
 @end

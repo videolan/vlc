@@ -23,6 +23,8 @@
 #import "VLCLibraryNavigationState.h"
 
 #import "VLCLibraryWindow.h"
+
+#import "media-source/VLCLibraryMediaSourceViewController.h"
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 
@@ -36,8 +38,8 @@
         _libraryWindowSelectedSegment = libraryWindow.segmentedTitleControl.selectedSegment;
         _viewModeSelectedSegment = libraryWindow.gridVsListSegmentedControl.selectedSegment;
         _audioLibraryViewSelectedSegment = libraryWindow.audioSegmentedControl.selectedSegment;
-        _currentMediaSource = libraryWindow.mediaSourceDataSource.childDataSource;
-        _currentNodeDisplayed = libraryWindow.mediaSourceDataSource.childDataSource.nodeToDisplay;
+        _currentMediaSource = libraryWindow.libraryMediaSourceViewController.baseDataSource.childDataSource;
+        _currentNodeDisplayed = libraryWindow.libraryMediaSourceViewController.baseDataSource.childDataSource.nodeToDisplay;
     }
 
     return navState;
