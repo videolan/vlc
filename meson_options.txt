@@ -40,6 +40,11 @@ option('run_as_root',
     value : false,
     description : 'Allow running VLC as root')
 
+option('winstore_app',
+    type : 'boolean',
+    value : 'false',
+    description : 'Build targeted for Windows Store apps')
+
 # TODO: Missing pdb option, this should probably be solved in meson itself
 
 # TODO: Missing ssp option
