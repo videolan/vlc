@@ -22,20 +22,24 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
-#import "media-source/VLCMediaSourceProvider.h"
-#import "media-source/VLCMediaSource.h"
-#import "media-source/VLCMediaSourceDeviceCollectionViewItem.h"
-#import "media-source/VLCMediaSourceCollectionViewItem.h"
-#import "media-source/VLCMediaSourceDataSource.h"
+#import "VLCMediaSourceProvider.h"
+#import "VLCMediaSource.h"
+#import "VLCMediaSourceDeviceCollectionViewItem.h"
+#import "VLCMediaSourceCollectionViewItem.h"
+#import "VLCMediaSourceDataSource.h"
 
-#import "main/VLCMain.h"
-#import "views/VLCImageView.h"
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableCellView.h"
-#import "extensions/NSString+Helpers.h"
+
+#import "main/VLCMain.h"
+
+#import "views/VLCImageView.h"
+
 
 NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellIdentifier";
 

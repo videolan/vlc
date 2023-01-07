@@ -840,7 +840,6 @@
 				1C1ED5122204B0B500811EC0 /* imported */,
 				1C1ED5132204B0CB00811EC0 /* library */,
 				1C1ED50E2204B01C00811EC0 /* main */,
-				7DFBDCB8226CED3700B700A5 /* media-source */,
 				1C1ED50F2204B04A00811EC0 /* menus */,
 				1C1ED50C2204AFD900811EC0 /* os-integration */,
 				1C1ED5032204A99400811EC0 /* panels */,
@@ -1129,6 +1128,7 @@
 			children = (
 				53B447EB293BB47A00857588 /* video-library */,
 				5325C5742930026600B2B63A /* audio-library */,
+				7DFBDCB8226CED3700B700A5 /* media-source */,
 				7DFBDCBF226DC16200B700A5 /* VLCInputItem.h */,
 				7DFBDCC0226DC16200B700A5 /* VLCInputItem.m */,
 				536283ED291146BC00640C15 /* VLCLibraryCollectionViewFlowLayout.h */,

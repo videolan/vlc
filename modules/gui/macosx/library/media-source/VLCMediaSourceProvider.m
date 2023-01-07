@@ -22,7 +22,8 @@
 
 #import "VLCMediaSourceProvider.h"
 
-#import "media-source/VLCMediaSource.h"
+#import "VLCMediaSource.h"
+
 #import "main/VLCMain.h"
 
 #import <vlc_media_source.h>

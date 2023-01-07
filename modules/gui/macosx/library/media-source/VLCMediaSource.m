@@ -22,9 +22,9 @@
 
 #import "VLCMediaSource.h"
 
-#import "library/VLCInputItem.h"
-
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
 
 @interface VLCMediaSource ()
 {

@@ -21,7 +21,9 @@
  *****************************************************************************/
 
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
+
 #import "extensions/NSColor+VLCAdditions.h"
+
 #import "views/VLCImageView.h"
 
 NSString *VLCMediaSourceDeviceCellIdentifier = @"VLCMediaSourceDeviceCellIdentifier";

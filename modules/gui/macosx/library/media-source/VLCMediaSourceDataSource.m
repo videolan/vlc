@@ -22,16 +22,21 @@
 
 #import "VLCMediaSourceDataSource.h"
 
+#import "VLCMediaSourceCollectionViewItem.h"
+#import "VLCMediaSource.h"
+
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryTableCellView.h"
-#import "media-source/VLCMediaSourceCollectionViewItem.h"
-#import "media-source/VLCMediaSource.h"
+
 #import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistController.h"
+
 #import "views/VLCImageView.h"
-#import "extensions/NSString+Helpers.h"
 
 @interface VLCMediaSourceDataSource()
 {

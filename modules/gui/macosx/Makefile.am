@@ -132,6 +132,20 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.m \
 	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.m \
+	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.h \
+	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.m \
+	gui/macosx/library/media-source/VLCMediaSource.h \
+	gui/macosx/library/media-source/VLCMediaSource.m \
+	gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.h \
+	gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.m \
+	gui/macosx/library/media-source/VLCMediaSourceCollectionViewItem.h \
+	gui/macosx/library/media-source/VLCMediaSourceCollectionViewItem.m \
+	gui/macosx/library/media-source/VLCMediaSourceDataSource.h \
+	gui/macosx/library/media-source/VLCMediaSourceDataSource.m \
+	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.h \
+	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.m \
+	gui/macosx/library/media-source/VLCMediaSourceProvider.h \
+	gui/macosx/library/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/main/CompatibilityFixes.h \
 	gui/macosx/main/CompatibilityFixes.m \
 	gui/macosx/main/VLCApplication.h \
@@ -141,20 +155,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/main/VLCMain.h \
 	gui/macosx/main/VLCMain.m \
 	gui/macosx/main/macosx.m \
-	gui/macosx/media-source/VLCLibraryMediaSourceViewController.h \
-	gui/macosx/media-source/VLCLibraryMediaSourceViewController.m \
-	gui/macosx/media-source/VLCMediaSource.h \
-	gui/macosx/media-source/VLCMediaSource.m \
-	gui/macosx/media-source/VLCMediaSourceBaseDataSource.h \
-	gui/macosx/media-source/VLCMediaSourceBaseDataSource.m \
-	gui/macosx/media-source/VLCMediaSourceCollectionViewItem.h \
-	gui/macosx/media-source/VLCMediaSourceCollectionViewItem.m \
-	gui/macosx/media-source/VLCMediaSourceDataSource.h \
-	gui/macosx/media-source/VLCMediaSourceDataSource.m \
-	gui/macosx/media-source/VLCMediaSourceDeviceCollectionViewItem.h \
-	gui/macosx/media-source/VLCMediaSourceDeviceCollectionViewItem.m \
-	gui/macosx/media-source/VLCMediaSourceProvider.h \
-	gui/macosx/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/menus/VLCMainMenu.h \
 	gui/macosx/menus/VLCMainMenu.m \
 	gui/macosx/menus/VLCStatusBarIcon.h \
