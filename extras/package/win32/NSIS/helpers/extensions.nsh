@@ -172,6 +172,7 @@ FunctionEnd
   !insertmacro ${_action} Audio ".snd"
   !insertmacro ${_action} Audio ".s3m"
   !insertmacro ${_action} Audio ".spx"
+  !insertmacro ${_action} Audio ".tak"
   !insertmacro ${_action} Audio ".tta"
   !insertmacro ${_action} Audio ".voc"
   !insertmacro ${_action} Audio ".vqf"
