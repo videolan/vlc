@@ -434,7 +434,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                             bool hw_decoding, d3d11_device_t *out)
 {
 #ifndef VLC_WINSTORE_APP
-# define D3D11CreateDevice(args...)             pf_CreateDevice(args)
+# define D3D11CreateDevice(a,b,c,d,e,f,g,h,i,j)   pf_CreateDevice(a,b,c,d,e,f,g,h,i,j)
     /* */
     PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
     pf_CreateDevice = (void *)GetProcAddress(hd3d->hdll, "D3D11CreateDevice");
