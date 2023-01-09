@@ -62,11 +62,11 @@ h1chunked_test = executable('h1chunked_test',
     link_with : vlc_http_lib,
     include_directories : [vlc_include_dirs])
 http_msg_test = executable('http_msg_test',
-    files('message_test.c', 'message.c'),
+    files('message_test.c'),
     link_with : vlc_http_lib,
     include_directories : [vlc_include_dirs])
 http_file_test = executable('http_file_test',
-    files('file_test.c', 'message.c', 'resource.c', 'file.c'),
+    files('file_test.c'),
     link_with : vlc_http_lib,
     include_directories : [vlc_include_dirs])
 http_tunnel_test = executable('http_tunnel_test',
