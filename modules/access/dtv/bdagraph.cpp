@@ -603,8 +603,7 @@ int BDAGraph::SetCQAM(long l_frequency)
         return VLC_EGENERIC;
     }
 
-    hr = l.p_tune_request->QueryInterface( IID_IDigitalCableTuneRequest,
-        reinterpret_cast<void**>( &l.p_cqam_tune_request ) );
+    hr = l.p_tune_request->QueryInterface( IID_PPV_ARGS( &l.p_cqam_tune_request ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetCQAM: "\
@@ -718,8 +717,7 @@ int BDAGraph::SetATSC(long l_frequency)
         return VLC_EGENERIC;
     }
 
-    hr = l.p_tune_request->QueryInterface( IID_IATSCChannelTuneRequest,
-        reinterpret_cast<void**>( &l.p_atsc_tune_request ) );
+    hr = l.p_tune_request->QueryInterface( IID_PPV_ARGS( &l.p_atsc_tune_request ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetATSC: "\
@@ -850,8 +848,7 @@ int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
     }
 
     msg_Dbg( p_access, "SetDVBT: Creating DVB tune request" );
-    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    hr = l.p_tune_request->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tune_request ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBT: "\
@@ -873,8 +870,7 @@ int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
     }
 
     msg_Dbg( p_access, "SetDVBT: QI to DVBT TS" );
-    hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
-        reinterpret_cast<void**>( &l.p_dvb_tuning_space ) );
+    hr = p_tuning_space->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tuning_space ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBT: "\
@@ -1016,8 +1012,7 @@ int BDAGraph::SetDVBT2(long l_frequency, uint32_t fec,
     }
 
     msg_Dbg( p_access, "SetDVBT: Creating DVB tune request" );
-    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    hr = l.p_tune_request->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tune_request ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBT: "\
@@ -1039,8 +1034,7 @@ int BDAGraph::SetDVBT2(long l_frequency, uint32_t fec,
     }
 
     msg_Dbg( p_access, "SetDVBT: QI to DVBT TS" );
-    hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
-        reinterpret_cast<void**>( &l.p_dvb_tuning_space ) );
+    hr = p_tuning_space->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tuning_space ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBT: "\
@@ -1213,8 +1207,7 @@ int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
     }
 
     msg_Dbg( p_access, "SetDVBC: QI for dvb tune request" );
-    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    hr = l.p_tune_request->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tune_request ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBC: "\
@@ -1247,8 +1240,7 @@ int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
     }
 
     msg_Dbg( p_access, "SetDVBC: QI for dvb tuning space" );
-    hr = p_tuning_space->QueryInterface( IID_IDVBTuningSpace2,
-        reinterpret_cast<void**>( &l.p_dvb_tuning_space ) );
+    hr = p_tuning_space->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tuning_space ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBC: "\
@@ -1353,8 +1345,7 @@ int BDAGraph::SetInversion(int inversion)
         return VLC_EGENERIC;
     }
 
-    hr = p_tuning_space->QueryInterface( IID_IDVBSTuningSpace,
-        reinterpret_cast<void**>( &l.p_dvbs_tuning_space ) );
+    hr = p_tuning_space->QueryInterface( IID_PPV_ARGS( &l.p_dvbs_tuning_space ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetInversion: "\
@@ -1475,8 +1466,7 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
         return VLC_EGENERIC;
     }
 
-    hr = l.p_tune_request->QueryInterface( IID_IDVBTuneRequest,
-        reinterpret_cast<void**>( &l.p_dvb_tune_request ) );
+    hr = l.p_tune_request->QueryInterface( IID_PPV_ARGS( &l.p_dvb_tune_request ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBS: "\
@@ -1506,8 +1496,7 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
         return VLC_EGENERIC;
     }
 
-    hr = p_tuning_space->QueryInterface( IID_IDVBSTuningSpace,
-        reinterpret_cast<void**>( &l.p_dvbs_tuning_space ) );
+    hr = p_tuning_space->QueryInterface( IID_PPV_ARGS( &l.p_dvbs_tuning_space ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBS: "\
@@ -2063,8 +2052,7 @@ HRESULT BDAGraph::Check( REFCLSID clsid_this_network_type )
     if( p_scanning_tuner )
         p_scanning_tuner->Release();
     p_scanning_tuner = NULL;
-    hr = p_network_provider->QueryInterface( IID_IScanningTuner,
-        reinterpret_cast<void**>( &p_scanning_tuner ) );
+    hr = p_network_provider->QueryInterface( IID_PPV_ARGS( &p_scanning_tuner ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Check: "\
@@ -2216,8 +2204,7 @@ HRESULT BDAGraph::Build()
     if( p_grabber )
         p_grabber->Release();
     p_grabber = NULL;
-    hr = p_sample_grabber->QueryInterface( IID_ISampleGrabber,
-        reinterpret_cast<void**>( &p_grabber ) );
+    hr = p_sample_grabber->QueryInterface( IID_PPV_ARGS( &p_grabber ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
