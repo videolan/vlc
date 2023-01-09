@@ -88,6 +88,11 @@ option('qt',
     value : 'auto',
     description : 'Enable/disable Qt support')
 
+option('qt_gtk',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable Qt GTK support')
+
 option('qt_qml_debug',
     type: 'boolean',
     value: false,
