@@ -177,8 +177,6 @@ static void WindowSetFullscreen(vlc_window_t *p_wnd, const char *psz_id)
     }
 }
 
-static void WindowClose(vlc_window_t *);
-
 static const struct vlc_window_operations ops = {
     WindowEnable,
     WindowDisable,
