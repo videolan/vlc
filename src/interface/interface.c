@@ -147,7 +147,7 @@ int intf_Create( libvlc_int_t *libvlc, const char *chain )
     vlc_value_t val;
     var_Create( p_intf, "intf-add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, _("Add Interface") );
-#if !defined(_WIN32) && defined(HAVE_ISATTY)
+#if defined(HAVE_ISATTY)
     if( isatty( 0 ) )
 #endif
     {
