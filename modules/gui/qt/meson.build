@@ -125,6 +125,7 @@ moc_headers = files(
     'util/mouse_event_filter.hpp',
     'util/effects_image_provider.hpp',
     'util/flickable_scroll_handler.hpp',
+    'util/hover_handler_rev11.hpp',
     'util/qvlcapp.hpp',
     'util/renderer_manager.hpp',
     'util/selectable_list_model.hpp',
@@ -417,6 +418,8 @@ some_sources = files(
     'util/item_key_event_filter.hpp',
     'util/flickable_scroll_handler.cpp',
     'util/flickable_scroll_handler.hpp',
+    'util/hover_handler_rev11.cpp',
+    'util/hover_handler_rev11.hpp',
     'util/qt_dirs.cpp',
     'util/qt_dirs.hpp',
     'util/qvlcapp.hpp',
@@ -534,7 +537,8 @@ if qt5_dep.found()
     qt5pre_files = qt5.preprocess(ui_files: ui_sources,
         moc_headers: moc_headers,
         qresources: qrc_files,
-        include_directories: qt_include_dir)
+        include_directories: qt_include_dir,
+        dependencies: qt5_dep)
 
     qt_sources = files('qt.cpp')
 

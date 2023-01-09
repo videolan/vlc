@@ -76,6 +76,7 @@
         <file alias="ViewDragAutoScrollHandler.qml">util/qml/ViewDragAutoScrollHandler.qml</file>
         <file alias="BindingRev8.qml">util/qml/BindingRev8.qml</file>
         <file alias="BindingRev14.qml">util/qml/BindingRev14.qml</file>
+        <file alias="MouseHoverHandlerRev12.qml">util/qml/MouseHoverHandlerRev12.qml</file>
         <file alias="TouchScreenTapHandlerRev11.qml">util/qml/TouchScreenTapHandlerRev11.qml</file>
         <file alias="TouchScreenTapHandlerRev12.qml">util/qml/TouchScreenTapHandlerRev12.qml</file>
         <file alias="VanillaObject.qml">util/qml/VanillaObject.qml</file>

@@ -42,6 +42,7 @@
 #include "util/qmlinputitem.hpp"
 #include "util/mouse_event_filter.hpp"
 #include "util/flickable_scroll_handler.hpp"
+#include "util/hover_handler_rev11.hpp"
 #include "util/color_svg_image_provider.hpp"
 #include "util/effects_image_provider.hpp"
 #include "util/csdbuttonmodel.hpp"
@@ -331,8 +332,10 @@ void MainUI::registerQMLTypes()
 #endif
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+        qmlRegisterType(QUrl("qrc:///util/MouseHoverHandlerRev12.qml"), uri, versionMajor, versionMinor, "MouseHoverHandlerCompat");
         qmlRegisterType(QUrl("qrc:///util/TouchScreenTapHandlerRev12.qml"), uri, versionMajor, versionMinor, "TouchScreenTapHandlerCompat");
 #else
+        qmlRegisterType<HoverHandlerRev11>( uri, versionMajor, versionMinor, "MouseHoverHandlerCompat" );
         qmlRegisterType(QUrl("qrc:///util/TouchScreenTapHandlerRev11.qml"), uri, versionMajor, versionMinor, "TouchScreenTapHandlerCompat");
 #endif
 
