@@ -2132,8 +2132,7 @@ static int MP4_ReadBox_ASF( stream_t *p_stream, MP4_Box_t *p_box )
 static void MP4_FreeBox_sbgp( MP4_Box_t *p_box )
 {
     MP4_Box_data_sbgp_t *p_sbgp = p_box->data.p_sbgp;
-    free( p_sbgp->entries.pi_sample_count );
-    free( p_sbgp->entries.pi_group_description_index );
+    free( p_sbgp->p_entries );
 }
 
 static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2163,10 +2162,8 @@ static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_sbgp->i_entry_count > i_read / (4 + 4) )
         p_sbgp->i_entry_count = i_read / (4 + 4);
 
-    p_sbgp->entries.pi_sample_count = vlc_alloc( p_sbgp->i_entry_count, sizeof(uint32_t) );
-    p_sbgp->entries.pi_group_description_index = vlc_alloc( p_sbgp->i_entry_count, sizeof(uint32_t) );
-
-    if( !p_sbgp->entries.pi_sample_count || !p_sbgp->entries.pi_group_description_index )
+    p_sbgp->p_entries = vlc_alloc( p_sbgp->i_entry_count, sizeof(*p_sbgp->p_entries) );
+    if( !p_sbgp->p_entries )
     {
         MP4_FreeBox_sbgp( p_box );
         MP4_READBOX_EXIT( 0 );
@@ -2174,8 +2171,8 @@ static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
 
     for( uint32_t i=0; i<p_sbgp->i_entry_count; i++ )
     {
-        MP4_GET4BYTES( p_sbgp->entries.pi_sample_count[i] );
-        MP4_GET4BYTES( p_sbgp->entries.pi_group_description_index[i] );
+        MP4_GET4BYTES( p_sbgp->p_entries[i].i_sample_count );
+        MP4_GET4BYTES( p_sbgp->p_entries[i].i_group_description_index );
     }
 
 #ifdef MP4_VERBOSE
@@ -2184,8 +2181,8 @@ static int MP4_ReadBox_sbgp( stream_t *p_stream, MP4_Box_t *p_box )
  #ifdef MP4_ULTRA_VERBOSE
     for (uint32_t i = 0; i < p_sbgp->i_entry_count; i++)
         msg_Dbg( p_stream, "\t samples %" PRIu32 " group %" PRIu32,
-                 p_sbgp->entries.pi_sample_count[i],
-                 p_sbgp->entries.pi_group_description_index[i] );
+                 p_sbgp->entries[i].i_sample_count,
+                 p_sbgp->entries[i].i_group_description_index );
  #endif
 #endif
 

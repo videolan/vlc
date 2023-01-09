@@ -3101,7 +3101,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
             for ( uint32_t i=0; i<p_sbgp_data->i_entry_count; i++ )
             {
                 /* Sample belongs to rap group ? */
-                if( p_sbgp_data->entries.pi_group_description_index[i] != 0 )
+                if( p_sbgp_data->p_entries[i].i_group_description_index != 0 )
                 {
                     if( i_sample < i_group_sample )
                     {
@@ -3116,7 +3116,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
                         i_ret = VLC_SUCCESS;
                     }
                 }
-                i_group_sample += p_sbgp_data->entries.pi_sample_count[i];
+                i_group_sample += p_sbgp_data->p_entries[i].i_sample_count;
             }
 
             if( i_ret == VLC_SUCCESS && *pi_sync_sample )

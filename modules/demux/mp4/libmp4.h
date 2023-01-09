@@ -1382,9 +1382,9 @@ typedef struct
     uint32_t i_entry_count;
     struct
     {
-        uint32_t *pi_sample_count;
-        uint32_t *pi_group_description_index;
-    } entries;
+        uint32_t i_sample_count;
+        uint32_t i_group_description_index;
+    } *p_entries;
 } MP4_Box_data_sbgp_t;
 
 typedef struct
