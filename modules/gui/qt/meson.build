@@ -562,6 +562,10 @@ if qt5_dep.found()
         endif
     endif
 
+    if get_option('qt_qml_debug')
+        qt_extra_flags += '-DQT_QML_DEBUG'
+    endif
+
     vlc_modules += {
         'name' : 'qt',
         'sources' : [qt5pre_files, qt_sources, some_sources],

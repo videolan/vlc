@@ -88,6 +88,11 @@ option('qt',
     value : 'auto',
     description : 'Enable/disable Qt support')
 
+option('qt_qml_debug',
+    type: 'boolean',
+    value: false,
+    description: 'Enable/disable Qt QML debugger')
+
 option('dbus',
     type : 'feature',
     value : 'auto',
