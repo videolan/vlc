@@ -139,7 +139,7 @@ static NSString * ipAddressAsStringForData(NSData * data)
     ip_socket_address *socketAddress = (ip_socket_address *)[data bytes];
 
     if (socketAddress) {
-        const char *addressStr;
+        const char *addressStr = NULL;
         if (socketAddress->sa.sa_family == AF_INET) {
             addressStr = inet_ntop(socketAddress->sa.sa_family,
                                            (void *)&(socketAddress->ipv4.sin_addr),
@@ -151,6 +151,8 @@ static NSString * ipAddressAsStringForData(NSData * data)
                                            addressBuffer,
                                            sizeof(addressBuffer));
         }
+        else vlc_assert_unreachable();
+
         if (addressStr != NULL) {
             returnValue = [NSString stringWithUTF8String:addressStr];
         }
