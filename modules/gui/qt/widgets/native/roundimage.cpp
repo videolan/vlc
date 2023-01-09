@@ -351,6 +351,8 @@ namespace
             auto reply = engine->networkAccessManager()->get(request);
             return new NetworkImageResponse(reply, requestedSize, radius);
         }
+#else
+        return nullptr;
 #endif
     }
 }
