@@ -118,7 +118,7 @@ static int Create (filter_t *p_filter)
     p_sys->cpVoice = NULL;
     p_sys->lastString = NULL;
 
-    hr = CoCreateInstance(__uuidof(SpVoice), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISpVoice), (void**) &p_sys->cpVoice);
+    hr = CoCreateInstance(__uuidof(SpVoice), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p_sys->cpVoice));
     if (SUCCEEDED(hr)) {
         ISpObjectToken*        cpVoiceToken = NULL;
         IEnumSpObjectTokens*   cpEnum = NULL;
