@@ -154,7 +154,7 @@ MIDL_INTERFACE("6b652fff-11fe-4fce-92ad-0266b5d7c78f")
 ISampleGrabber : public IUnknown
 {
     virtual HRESULT STDMETHODCALLTYPE SetOneShot(
-        WINBOOL OneShot) = 0;
+        BOOL OneShot) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE SetMediaType(
         const AM_MEDIA_TYPE *pType) = 0;
@@ -163,7 +163,7 @@ ISampleGrabber : public IUnknown
         AM_MEDIA_TYPE *pType) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE SetBufferSamples(
-        WINBOOL BufferThem) = 0;
+        BOOL BufferThem) = 0;
 
     virtual HRESULT STDMETHODCALLTYPE GetCurrentBuffer(
         LONG *pBufferSize,
@@ -199,7 +199,7 @@ typedef struct ISampleGrabberVtbl {
     /*** ISampleGrabber methods ***/
     HRESULT (STDMETHODCALLTYPE *SetOneShot)(
         ISampleGrabber *This,
-        WINBOOL OneShot);
+        BOOL OneShot);
 
     HRESULT (STDMETHODCALLTYPE *SetMediaType)(
         ISampleGrabber *This,
@@ -211,7 +211,7 @@ typedef struct ISampleGrabberVtbl {
 
     HRESULT (STDMETHODCALLTYPE *SetBufferSamples)(
         ISampleGrabber *This,
-        WINBOOL BufferThem);
+        BOOL BufferThem);
 
     HRESULT (STDMETHODCALLTYPE *GetCurrentBuffer)(
         ISampleGrabber *This,
@@ -260,7 +260,7 @@ static FORCEINLINE ULONG ISampleGrabber_Release(ISampleGrabber* This) {
     return This->lpVtbl->Release(This);
 }
 /*** ISampleGrabber methods ***/
-static FORCEINLINE HRESULT ISampleGrabber_SetOneShot(ISampleGrabber* This,WINBOOL OneShot) {
+static FORCEINLINE HRESULT ISampleGrabber_SetOneShot(ISampleGrabber* This,BOOL OneShot) {
     return This->lpVtbl->SetOneShot(This,OneShot);
 }
 static FORCEINLINE HRESULT ISampleGrabber_SetMediaType(ISampleGrabber* This,const AM_MEDIA_TYPE *pType) {
@@ -269,7 +269,7 @@ static FORCEINLINE HRESULT ISampleGrabber_SetMediaType(ISampleGrabber* This,cons
 static FORCEINLINE HRESULT ISampleGrabber_GetConnectedMediaType(ISampleGrabber* This,AM_MEDIA_TYPE *pType) {
     return This->lpVtbl->GetConnectedMediaType(This,pType);
 }
-static FORCEINLINE HRESULT ISampleGrabber_SetBufferSamples(ISampleGrabber* This,WINBOOL BufferThem) {
+static FORCEINLINE HRESULT ISampleGrabber_SetBufferSamples(ISampleGrabber* This,BOOL BufferThem) {
     return This->lpVtbl->SetBufferSamples(This,BufferThem);
 }
 static FORCEINLINE HRESULT ISampleGrabber_GetCurrentBuffer(ISampleGrabber* This,LONG *pBufferSize,LONG *pBuffer) {
