@@ -157,7 +157,7 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
     ComPtr<ISensorManager> pSensorManager;
     HRESULT hr = CoCreateInstance( CLSID_SensorManager,
                       NULL, CLSCTX_INPROC_SERVER,
-                      IID_ISensorManager, (void**)&pSensorManager );
+                      IID_PPV_ARGS(pSensorManager.GetAddressOf()) );
     if (FAILED(hr))
         return NULL;
 
