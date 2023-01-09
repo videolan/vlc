@@ -525,10 +525,15 @@ ui_sources = files(
     'dialogs/vlm/vlm.ui',
 )
 
+qrc_files = files('vlc.qrc')
+if host_system == 'windows'
+  qrc_files += files('windows.qrc')
+endif
+
 if qt5_dep.found()
     qt5pre_files = qt5.preprocess(ui_files : ui_sources,
         moc_headers : moc_headers,
-        qresources : files('vlc.qrc'),
+        qresources : qrc_files,
         include_directories: qt_include_dir)
 
     qt_sources = files('qt.cpp')
