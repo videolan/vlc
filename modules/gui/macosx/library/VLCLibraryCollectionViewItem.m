@@ -47,6 +47,8 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 {
     VLCLibraryController *_libraryController;
     VLCLibraryMenuController *_menuController;
+
+    NSLayoutConstraint *_videoImageViewAspectRatioConstraint;
 }
 @end
 
@@ -94,6 +96,15 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)awakeFromNib
 {
+    _videoImageViewAspectRatioConstraint = [NSLayoutConstraint constraintWithItem:_mediaImageView
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                        toItem:_mediaImageView
+                                                                        attribute:NSLayoutAttributeWidth
+                                                                        multiplier:10.0/16.0
+                                                                        constant:1];
+    _videoImageViewAspectRatioConstraint.active = NO;
+
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
     self.secondaryInfoTextField.textColor = [NSColor VLClibrarySubtitleColor];
     self.annotationTextField.font = [NSFont VLClibraryCellAnnotationFont];
@@ -200,8 +211,17 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     // TODO: Add handling for the other types
     if([_representedItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
         VLCMediaLibraryMediaItem *mediaItem = (VLCMediaLibraryMediaItem *)_representedItem;
-        VLCMediaLibraryTrack *videoTrack = mediaItem.firstVideoTrack;
-        [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth andHeight:videoTrack.videoHeight];
+
+        if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
+            VLCMediaLibraryTrack *videoTrack = mediaItem.firstVideoTrack;
+            [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
+                                      andHeight:videoTrack.videoHeight];
+            _imageViewAspectRatioConstraint.active = NO;
+            _videoImageViewAspectRatioConstraint.active = YES;
+        } else {
+            _imageViewAspectRatioConstraint.active = YES;
+            _videoImageViewAspectRatioConstraint.active = NO;
+        }
 
         CGFloat position = mediaItem.progress;
         if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
