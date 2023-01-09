@@ -119,7 +119,8 @@ if (get_option('macosx_avfoundation')
     vlc_modules += {
         'name' : 'avcapture',
         'sources' : files('avcapture.m'),
-        'dependencies' : [avfoundation_dep, coremedia_dep, foundation_dep, corevideo_dep]
+        'objc_args' : ['-fobjc-arc'],
+        'dependencies' : [avfoundation_dep, coremedia_dep, foundation_dep, corevideo_dep],
     }
 endif
 
