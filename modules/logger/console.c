@@ -26,6 +26,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <inttypes.h>
+#ifdef _WIN32
+# include <io.h> // isatty()
+#endif
 #include <unistd.h>         /* isatty(), STDERR_FILNO */
 
 #include <vlc_common.h>
@@ -62,7 +65,6 @@ static int OS2ConsoleOutput(FILE *stream, const char *format, va_list ap)
 }
 #endif
 
-#ifndef _WIN32
 # define COL(x,y) "\033[" #x ";" #y "m"
 # define RED      COL(31,1)
 # define GREEN    COL(32,1)
@@ -100,7 +102,6 @@ static const struct vlc_logger_operations color_ops =
     LogConsoleColor,
     NULL
 };
-#endif /* !_WIN32 */
 
 static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
                            const char *format, va_list ap)
@@ -154,7 +155,7 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj,
 
     *sysp = verbosities + verbosity;
 
-#if defined (HAVE_ISATTY) && !defined (_WIN32)
+#if defined (HAVE_ISATTY)
     if (isatty(STDERR_FILENO) && var_InheritBool(obj, "color"))
         return &color_ops;
 #endif
