@@ -35,6 +35,7 @@ hpack_test = executable('hpack_test',
 hpackenc_test = executable('hpackenc_test',
     files('hpack.c', 'hpackenc.c'),
     c_args : ['-DENC_TEST'],
+    link_with : vlc_libcompat,
     include_directories : [vlc_include_dirs])
 h2frame_test = executable('h2frame_test',
     files(
