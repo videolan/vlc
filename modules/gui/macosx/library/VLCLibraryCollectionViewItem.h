@@ -45,6 +45,7 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
 @property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
 @property (readwrite, assign) IBOutlet NSBox *highlightBox;
+@property (readwrite, assign) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;
 
 @property (readwrite, retain, nonatomic) id<VLCMediaLibraryItemProtocol> representedItem;
 

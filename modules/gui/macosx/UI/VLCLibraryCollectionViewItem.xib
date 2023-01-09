@@ -9,12 +9,13 @@
             <connections>
                 <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
                 <outlet property="annotationTextField" destination="tm2-NW-WsZ" id="Miy-RS-Rol"/>
-                <outlet property="secondaryInfoTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
                 <outlet property="highlightBox" destination="Vwd-1n-Sbd" id="h1g-hL-1gh"/>
+                <outlet property="imageViewAspectRatioConstraint" destination="f7c-vp-30m" id="2As-9A-WOn"/>
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
                 <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="JlC-bE-i5Y"/>
                 <outlet property="progressIndicator" destination="dFt-oZ-h9P" id="JC6-gk-Mid"/>
+                <outlet property="secondaryInfoTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
                 <outlet property="unplayedIndicatorTextField" destination="u2r-zy-XEW" id="56s-K4-Kxr"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
