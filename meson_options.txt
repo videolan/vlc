@@ -1,5 +1,10 @@
 # General options
 
+option('vlc',
+    type : 'boolean',
+    value : 'true',
+    description : 'Build the VLC executable program.')
+
 option('nls',
     type : 'feature',
     value : 'auto',
@@ -44,7 +49,6 @@ option('run_as_root',
 # TODO: Missing sve option
 # TODO: Missing branch_protection option
 # TODO: Missing altivec option
-# TODO: Missing vlc option
 # TODO: Missing update-check option
 
 # Font options
