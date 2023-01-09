@@ -21,7 +21,7 @@
 #ifndef VLC_SPAWN_H
 #define VLC_SPAWN_H 1
 
-#include <sys/types.h>
+#include <unistd.h>
 
 /**
  * \defgroup spawn Process management
