@@ -611,8 +611,8 @@ int BDAGraph::SetCQAM(long l_frequency)
         return VLC_EGENERIC;
     }
 
-    hr = ::CoCreateInstance( CLSID_DigitalCableLocator, 0, CLSCTX_INPROC,
-        IID_IDigitalCableLocator, reinterpret_cast<void**>( &l.p_cqam_locator ) );
+    hr = ::CoCreateInstance( __uuidof(DigitalCableLocator), 0, CLSCTX_INPROC,
+        IID_PPV_ARGS( &l.p_cqam_locator ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetCQAM: "\
@@ -725,8 +725,8 @@ int BDAGraph::SetATSC(long l_frequency)
         return VLC_EGENERIC;
     }
 
-    hr = ::CoCreateInstance( CLSID_ATSCLocator, 0, CLSCTX_INPROC,
-        IID_IATSCLocator, reinterpret_cast<void**>( &l.p_atsc_locator ) );
+    hr = ::CoCreateInstance( __uuidof(ATSCLocator), 0, CLSCTX_INPROC,
+        IID_PPV_ARGS( &l.p_atsc_locator ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetATSC: "\
@@ -879,8 +879,8 @@ int BDAGraph::SetDVBT(long l_frequency, uint32_t fec_hp, uint32_t fec_lp,
     }
 
     msg_Dbg( p_access, "SetDVBT: Creating local locator" );
-    hr = ::CoCreateInstance( CLSID_DVBTLocator, 0, CLSCTX_INPROC,
-        IID_IDVBTLocator, reinterpret_cast<void**>( &l.p_dvbt_locator ) );
+    hr = ::CoCreateInstance( __uuidof(DVBTLocator), 0, CLSCTX_INPROC,
+        IID_PPV_ARGS( &l.p_dvbt_locator ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBT: "\
@@ -1044,8 +1044,8 @@ int BDAGraph::SetDVBT2(long l_frequency, uint32_t fec,
 
     msg_Dbg( p_access, "SetDVBT: Creating local locator2" );
 
-    hr = ::CoCreateInstance( CLSID_DVBTLocator2, 0, CLSCTX_INPROC,
-        IID_IDVBTLocator2, reinterpret_cast<void**>( &l.p_dvbt_locator ) );
+    hr = ::CoCreateInstance(__uuidof(DVBTLocator2), 0, CLSCTX_INPROC,
+        IID_PPV_ARGS( &l.p_dvbt_locator ) );
 
 
     if( FAILED( hr ) )
@@ -1220,8 +1220,8 @@ int BDAGraph::SetDVBC(long l_frequency, const char *mod, long l_symbolrate)
     l.p_dvb_tune_request->put_TSID( -1 );
 
     msg_Dbg( p_access, "SetDVBC: create dvbc locator" );
-    hr = ::CoCreateInstance( CLSID_DVBCLocator, 0, CLSCTX_INPROC,
-        IID_IDVBCLocator, reinterpret_cast<void**>( &l.p_dvbc_locator ) );
+    hr = ::CoCreateInstance( __uuidof(DVBCLocator), 0, CLSCTX_INPROC,
+        IID_PPV_ARGS( &l.p_dvbc_locator ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBC: "\
@@ -1478,8 +1478,8 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
     l.p_dvb_tune_request->put_SID( -1 );
     l.p_dvb_tune_request->put_TSID( -1 );
 
-    hr = ::CoCreateInstance( CLSID_DVBSLocator, 0, CLSCTX_INPROC,
-        IID_IDVBSLocator, reinterpret_cast<void**>( &l.p_dvbs_locator ) );
+    hr = ::CoCreateInstance( __uuidof(DVBSLocator), 0, CLSCTX_INPROC,
+        IID_PPV_ARGS( &l.p_dvbs_locator ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SetDVBS: "\
@@ -2000,7 +2000,7 @@ HRESULT BDAGraph::Check( REFCLSID clsid_this_network_type )
         Destroy();
     p_filter_graph = NULL;
     hr = ::CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC,
-        IID_IGraphBuilder, reinterpret_cast<void**>( &p_filter_graph ) );
+        IID_PPV_ARGS( &p_filter_graph ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Check: "\
@@ -2014,7 +2014,7 @@ HRESULT BDAGraph::Check( REFCLSID clsid_this_network_type )
         p_network_provider->Release();
     p_network_provider = NULL;
     hr = ::CoCreateInstance( clsid_this_network_type, NULL, CLSCTX_INPROC_SERVER,
-        IID_IBaseFilter, reinterpret_cast<void**>( &p_network_provider ) );
+        IID_PPV_ARGS( &p_network_provider ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Check: "\
@@ -2184,7 +2184,7 @@ HRESULT BDAGraph::Build()
     p_sample_grabber = NULL;
     /* Insert the Sample Grabber to tap into the Transport Stream. */
     hr = ::CoCreateInstance( CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER,
-        IID_IBaseFilter, reinterpret_cast<void**>( &p_sample_grabber ) );
+        IID_PPV_ARGS( &p_sample_grabber ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
@@ -2257,8 +2257,7 @@ HRESULT BDAGraph::Build()
         p_mpeg_demux->Release();
     p_mpeg_demux = NULL;
     hr = ::CoCreateInstance( CLSID_MPEG2Demultiplexer, NULL,
-        CLSCTX_INPROC_SERVER, IID_IBaseFilter,
-        reinterpret_cast<void**>( &p_mpeg_demux ) );
+        CLSCTX_INPROC_SERVER, IID_PPV_ARGS( &p_mpeg_demux ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
@@ -2412,7 +2411,7 @@ HRESULT BDAGraph::ListFilters( REFCLSID this_clsid )
         l.p_local_system_dev_enum->Release();
     l.p_local_system_dev_enum = NULL;
     hr = ::CoCreateInstance( CLSID_SystemDeviceEnum, 0, CLSCTX_INPROC,
-        IID_ICreateDevEnum, reinterpret_cast<void**>( &l.p_local_system_dev_enum ) );
+        IID_PPV_ARGS( &l.p_local_system_dev_enum ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "ListFilters: "\
@@ -2588,7 +2587,7 @@ HRESULT BDAGraph::FindFilter( REFCLSID this_clsid, long* i_moniker_used,
     {
         msg_Dbg( p_access, "FindFilter: Create p_system_dev_enum");
         hr = ::CoCreateInstance( CLSID_SystemDeviceEnum, 0, CLSCTX_INPROC,
-            IID_ICreateDevEnum, reinterpret_cast<void**>( &p_system_dev_enum ) );
+            IID_PPV_ARGS( &p_system_dev_enum ) );
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "FindFilter: "\
