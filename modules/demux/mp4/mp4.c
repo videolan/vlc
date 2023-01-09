@@ -336,6 +336,111 @@ static MP4_Box_t * MP4_GetTrafByTrackID( MP4_Box_t *p_moof, const uint32_t i_id 
     return p_traf;
 }
 
+static const MP4_Box_t * MP4_GroupDescriptionByType( const MP4_Box_t *p_node,
+                                                     uint32_t i_grouping_type )
+{
+    for( const MP4_Box_t *p_sgpd = MP4_BoxGet( p_node, "sgpd" );
+                          p_sgpd; p_sgpd = p_sgpd->p_next )
+    {
+        const MP4_Box_data_sgpd_t *p_sgpd_data = BOXDATA(p_sgpd);
+        if( p_sgpd->i_type != ATOM_sgpd || !p_sgpd_data ||
+            p_sgpd_data->i_grouping_type != i_grouping_type )
+            continue;
+        return p_sgpd;
+    }
+    return NULL;
+}
+
+enum SampleGroupMatch
+{
+    SAMPLE_GROUP_MATCH_EXACT = 0,
+    SAMPLE_GROUP_MATCH_LAST_VALID = 1,
+};
+
+static const MP4_Box_data_sbgp_entry_t *
+    MP4_SampleToGroupInfo( const MP4_Box_t *p_node, uint32_t i_sample,
+                           uint32_t i_grouping_type,
+                           uint32_t i_grouping_type_parameter,
+                           uint32_t *pi_group_sample,
+                           enum SampleGroupMatch match,
+                           const MP4_Box_data_sgpd_entry_t **pp_descentry )
+{
+    const MP4_Box_t *p_sbgp = MP4_BoxGet( p_node, "sbgp" );
+    const MP4_Box_data_sbgp_t *p_sbgp_data;
+    for( ; p_sbgp; p_sbgp = p_sbgp->p_next )
+    {
+        p_sbgp_data = BOXDATA(p_sbgp);
+        if( p_sbgp->i_type == ATOM_sbgp && p_sbgp_data &&
+            p_sbgp_data->i_grouping_type == i_grouping_type &&
+            (i_grouping_type_parameter == 0 ||
+             p_sbgp_data->i_grouping_type_parameter == i_grouping_type_parameter) )
+            break;
+    }
+
+    if( !p_sbgp )
+        return NULL;
+
+    const MP4_Box_data_sbgp_entry_t *p_sampleentry = NULL;
+    uint32_t i_entry_start_sample = 0;
+    for ( uint32_t i=0; i<p_sbgp_data->i_entry_count; i++ )
+    {
+        const uint32_t next_entry_start_sample = i_entry_start_sample +
+                       p_sbgp_data->p_entries[i].i_sample_count;
+        if( i_sample >= next_entry_start_sample )
+        {
+            if( match == SAMPLE_GROUP_MATCH_LAST_VALID &&
+                p_sbgp_data->p_entries[i].i_group_description_index != 0 )
+            {
+                p_sampleentry = &p_sbgp_data->p_entries[i];
+                if( pi_group_sample )
+                    *pi_group_sample = i_entry_start_sample;
+            }
+            i_entry_start_sample = next_entry_start_sample;
+            continue;
+        }
+
+        /* Sample has meaning for group */
+        if( p_sbgp_data->p_entries[i].i_group_description_index != 0 )
+        {
+            p_sampleentry = &p_sbgp_data->p_entries[i];
+            if( pi_group_sample )
+                *pi_group_sample = i_entry_start_sample;
+        }
+        break;
+    }
+
+    /* No meaning found for sample */
+    if( p_sampleentry == NULL )
+        return NULL;
+
+    /* We have a sample entry in the group and maybe a description */
+    if( pp_descentry == NULL )
+        return p_sampleentry;
+
+    /* Lookup designated group description */
+    const MP4_Box_t *p_sgpd = MP4_GroupDescriptionByType( p_node, i_grouping_type );
+    if( p_sgpd )
+    {
+        const MP4_Box_data_sgpd_t *p_descdata = BOXDATA(p_sgpd);
+        if( p_sampleentry &&
+            p_sampleentry->i_group_description_index <= p_descdata->i_entry_count )
+        {
+            *pp_descentry = &p_descdata->
+                p_entries[p_sampleentry->i_group_description_index - 1];
+        }
+        else if( p_sampleentry == NULL &&
+                 p_descdata->i_version >= 2 &&
+                 p_descdata->i_default_sample_description_index &&
+                 p_descdata->i_default_sample_description_index <= p_descdata->i_entry_count )
+        {
+            *pp_descentry = &p_descdata->
+                p_entries[p_descdata->i_default_sample_description_index - 1];
+        }
+    }
+
+    return p_sampleentry;
+}
+
 static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
                                    bool b_forced_spu )
 {
@@ -3065,7 +3170,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
                                      uint32_t i_sample, uint32_t *pi_sync_sample )
 {
     int i_ret = VLC_EGENERIC;
-    *pi_sync_sample = 0;
+    *pi_sync_sample = i_sample;
 
     const MP4_Box_t *p_stss;
     if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
@@ -3087,44 +3192,13 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
         }
     }
 
-    /* try rap samples groups */
-    const MP4_Box_t *p_sbgp = MP4_BoxGet( p_track->p_stbl, "sbgp" );
-    for( ; p_sbgp; p_sbgp = p_sbgp->p_next )
+    /* try or refine using RAP samples groups */
+    if( MP4_SampleToGroupInfo( p_track->p_stbl, i_sample, SAMPLEGROUP_rap,
+                               0, pi_sync_sample, true, NULL ) )
     {
-        const MP4_Box_data_sbgp_t *p_sbgp_data = BOXDATA(p_sbgp);
-        if( p_sbgp->i_type != ATOM_sbgp || !p_sbgp_data )
-            continue;
-
-        if( p_sbgp_data->i_grouping_type == SAMPLEGROUP_rap )
-        {
-            uint32_t i_group_sample = 0;
-            for ( uint32_t i=0; i<p_sbgp_data->i_entry_count; i++ )
-            {
-                /* Sample belongs to rap group ? */
-                if( p_sbgp_data->p_entries[i].i_group_description_index != 0 )
-                {
-                    if( i_sample < i_group_sample )
-                    {
-                        msg_Dbg( p_demux, "sbgp lookup failed %" PRIu32 " (sample number)",
-                                 i_sample );
-                        break;
-                    }
-                    else if ( i_sample >= i_group_sample &&
-                              *pi_sync_sample < i_group_sample )
-                    {
-                        *pi_sync_sample = i_group_sample;
-                        i_ret = VLC_SUCCESS;
-                    }
-                }
-                i_group_sample += p_sbgp_data->p_entries[i].i_sample_count;
-            }
-
-            if( i_ret == VLC_SUCCESS && *pi_sync_sample )
-            {
-                msg_Dbg( p_demux, "sbgp gives %d --> %" PRIu32 " (sample number)",
-                         i_sample, *pi_sync_sample );
-            }
-        }
+        i_ret = VLC_SUCCESS;
+        msg_Dbg( p_demux, "tk %u sbgp gives %d --> %" PRIu32 " (sample number)",
+                 p_track->i_track_ID, i_sample, *pi_sync_sample );
     }
 
     return i_ret;

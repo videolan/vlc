@@ -1358,21 +1358,33 @@ typedef struct
     uint8_t i_stream_number;
 } MP4_Box_data_ASF_t;
 
+typedef union
+{
+    struct
+    {
+        uint8_t i_num_leading_samples_known;
+        uint8_t i_num_leading_samples;
+    } rap;
+    struct
+    {
+        int16_t i_roll_distance;
+    } roll;
+} MP4_Box_data_sgpd_entry_t;
+
 typedef struct
 {
     uint8_t i_version;
     uint32_t i_grouping_type;
     uint32_t i_default_sample_description_index;
     uint32_t i_entry_count;
-    union
-    {
-        struct
-        {
-            uint8_t i_num_leading_samples_known;
-            uint8_t i_num_leading_samples;
-        } rap;
-    } *p_entries;
+    MP4_Box_data_sgpd_entry_t *p_entries;
 } MP4_Box_data_sgpd_t;
+
+typedef struct
+{
+    uint32_t i_sample_count;
+    uint32_t i_group_description_index;
+} MP4_Box_data_sbgp_entry_t;
 
 typedef struct
 {
@@ -1380,11 +1392,7 @@ typedef struct
     uint32_t i_grouping_type;
     uint32_t i_grouping_type_parameter;
     uint32_t i_entry_count;
-    struct
-    {
-        uint32_t i_sample_count;
-        uint32_t i_group_description_index;
-    } *p_entries;
+    MP4_Box_data_sbgp_entry_t *p_entries;
 } MP4_Box_data_sbgp_t;
 
 typedef struct
