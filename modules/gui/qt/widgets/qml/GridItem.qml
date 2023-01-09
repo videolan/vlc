@@ -38,7 +38,7 @@ T.Control {
     property int titleMargin: VLCStyle.margin_xsmall
     property Item dragItem: null
 
-    readonly property bool highlighted: (contentItem.containsMouse || visualFocus)
+    readonly property bool highlighted: (mouseHoverHandler.hovered || visualFocus)
 
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
@@ -172,8 +172,6 @@ T.Control {
 
         acceptedButtons: Qt.RightButton | Qt.LeftButton
 
-        hoverEnabled: true
-
         drag.target: root.dragItem
 
         drag.axis: Drag.XAndYAxis
@@ -217,6 +215,10 @@ T.Control {
                 root.itemClicked(picture, Qt.LeftButton, Qt.NoModifier)
                 root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
             }
+        }
+
+        MouseHoverHandlerCompat {
+            id: mouseHoverHandler
         }
 
         ColumnLayout {
@@ -329,14 +331,10 @@ T.Control {
 
                 ToolTip.delay: VLCStyle.delayToolTipAppear
                 ToolTip.text: subtitleTxt.text
-                ToolTip.visible: subtitleTxtMouseArea.containsMouse
+                ToolTip.visible: subtitleTxtMouseHandler.hovered
 
-                MouseArea {
-                    id: subtitleTxtMouseArea
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    acceptedButtons: Qt.NoButton
+                MouseHoverHandlerCompat {
+                    id: subtitleTxtMouseHandler
                 }
             }
         }
