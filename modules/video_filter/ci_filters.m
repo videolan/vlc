@@ -318,7 +318,6 @@ ParamsCallback(vlc_object_t *obj,
 
 static void filter_PsychedelicInit(filter_t *filter, struct filter_chain *fchain)
 {
-    filter_sys_t *sys = filter->p_sys;
     fchain->ctx.psychedelic.x = filter->fmt_in.video.i_width / 2;
     fchain->ctx.psychedelic.y = filter->fmt_in.video.i_height / 2;
     fchain->ctx.psychedelic.count = PSYCHEDELIC_COUNT_DEFAULT;
@@ -475,7 +474,6 @@ Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
 
     for (int i = 0; i < NUM_FILTER_PARAM_MAX && filter_param_descs[i].vlc; ++i)
     {
-        NSString *ci_param_name = filter_param_descs[i].ci;
         char const *vlc_param_name = filter_param_descs[i].vlc;
 
         float vlc_param_val;
