@@ -284,12 +284,12 @@ static block_t *Fl32toS32(filter_t *filter, block_t *b)
     int32_t *dst = (int32_t *)src;
     for (size_t i = b->i_buffer / 4; i--;)
     {
-        float s = *(src++) * 2147483648.f;
-        if (s >= 2147483647.f)
-            *(dst++) = 2147483647;
+        float s = *(src++) * -((float)INT32_MIN);
+        if (s >= ((float)INT32_MAX))
+            *(dst++) = INT32_MAX;
         else
-        if (s <= -2147483648.f)
-            *(dst++) = -2147483648;
+        if (s <= ((float)INT32_MIN))
+            *(dst++) = INT32_MIN;
         else
             *(dst++) = lroundf(s);
     }
@@ -346,7 +346,7 @@ static block_t *S32toFl32(filter_t *filter, block_t *b)
     int32_t *src = (int32_t*)b->p_buffer;
     float   *dst = (float *)src;
     for (int i = b->i_buffer / 4; i--;)
-        *dst++ = (float)(*src++) / 2147483648.f;
+        *dst++ = (float)(*src++) / -((float)INT32_MIN);
     return b;
 }
 
@@ -360,7 +360,7 @@ static block_t *S32toFl64(filter_t *filter, block_t *bsrc)
     int32_t *src = (int32_t*)bsrc->p_buffer;
     double  *dst = (double *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer / 4; i--;)
-        *dst++ = (double)(*src++) / 2147483648.;
+        *dst++ = (double)(*src++) / -(double)INT32_MIN;
 out:
     VLC_UNUSED(filter);
     block_Release(bsrc);
@@ -426,12 +426,12 @@ static block_t *Fl64toS32(filter_t *filter, block_t *b)
     int32_t *dst = (int32_t *)src;
     for (size_t i = b->i_buffer / 8; i--;)
     {
-        float s = *(src++) * 2147483648.;
-        if (s >= 2147483647.f)
-            *(dst++) = 2147483647;
+        float s = *(src++) * -((double)INT32_MIN);
+        if (s >= ((float)INT32_MAX))
+            *(dst++) = INT32_MAX;
         else
-        if (s <= -2147483648.f)
-            *(dst++) = -2147483648;
+        if (s <= ((float)INT32_MIN))
+            *(dst++) = INT32_MIN;
         else
             *(dst++) = lround(s);
     }
