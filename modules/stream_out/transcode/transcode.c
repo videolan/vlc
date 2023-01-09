@@ -784,29 +784,26 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
         goto error;
     }
 
-    if( p_out )
+    for( block_t *it = p_out; it != NULL; )
     {
-        for( block_t *it = p_out; it != NULL; )
+        block_t *next = it->p_next;
+        it->p_next = NULL;
+
+        const vlc_tick_t pcr =
+            transcode_track_pcr_helper_SignalLeavingFrame( id->pcr_helper, it );
+
+        if( sout_StreamIdSend( p_stream->p_next, id->downstream_id, it ) != VLC_SUCCESS )
         {
-            block_t *next = it->p_next;
-            it->p_next = NULL;
-
-            const vlc_tick_t pcr =
-                transcode_track_pcr_helper_SignalLeavingFrame( id->pcr_helper, it );
-
-            if( sout_StreamIdSend( p_stream->p_next, id->downstream_id, it ) != VLC_SUCCESS )
-            {
-                p_buffer = next;
-                goto error;
-            }
-
-            if( pcr != VLC_TICK_INVALID )
-            {
-                sout_StreamSetPCR( p_stream->p_next, pcr );
-            }
-
-            it = next;
+            p_buffer = next;
+            goto error;
         }
+
+        if( pcr != VLC_TICK_INVALID )
+        {
+            sout_StreamSetPCR( p_stream->p_next, pcr );
+        }
+
+        it = next;
     }
 
     if (i_ret != VLC_SUCCESS)
