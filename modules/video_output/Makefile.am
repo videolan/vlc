@@ -214,6 +214,7 @@ libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
 	video_output/win32/events.c video_output/win32/events.h \
 	video_output/win32/sensors.cpp \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
+libglwin32_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libwgl_plugin_la_SOURCES = video_output/win32/wgl.c
 
 libglwin32_plugin_la_LIBADD = libchroma_copy.la -lopengl32 -lgdi32 $(LIBCOM) -luuid libvlc_opengl.la
