@@ -10,6 +10,7 @@ qt_extra_deps = []
 qt_extra_flags = []
 
 qt5_dep = dependency('qt5',
+    version : '>=5.11.0',
     modules : [
         'Core', 'Gui', 'Widgets', 'Svg', 'Qml',
         'Quick', 'QuickWidgets', 'QuickControls2',
