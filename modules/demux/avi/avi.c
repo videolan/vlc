@@ -2277,8 +2277,10 @@ static int AVI_PacketNext( demux_t *p_demux )
         i_skip = __EVEN( avi_ck.i_size ) + 8;
     }
 
-    if( i_skip > SSIZE_MAX )
+#if SSIZE_MAX < UINT32_MAX // otherwise i_skip can't be bigger than SSIZE_MAX
+    if (i_skip > SSIZE_MAX)
         return VLC_EGENERIC;
+#endif
 
     if( vlc_stream_Read( p_demux->s, NULL, i_skip ) != i_skip )
     {
