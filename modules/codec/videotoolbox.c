@@ -2251,14 +2251,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             goto end;
         }
 
-        /* VT is not pacing frame allocation. If we are not fast enough to
-         * render (release) the output pictures, the VT session can end up
-         * allocating way too many frames. This can be problematic for 4K
-         * 10bits. To fix this issue, we ensure that we don't have too many
-         * output frames allocated by waiting for the vout to release them. */
-        if (pic_pacer_Wait(p_sys->pic_pacer, p_pic))
-            msg_Warn(p_dec, "pic_pacer_Wait timed out");
-
         vlc_mutex_lock(&p_sys->lock);
 
         if (p_sys->b_vt_flush)
