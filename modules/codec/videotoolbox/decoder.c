@@ -133,6 +133,7 @@ typedef struct decoder_sys_t
     frame_info_t               *p_pic_reorder;
     uint8_t                     i_pic_reorder;
     uint8_t                     i_pic_reorder_max;
+    bool                        b_strict_reorder;
     bool                        b_invalid_pic_reorder_max;
     bool                        b_poc_based_reorder;
 
@@ -924,7 +925,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
     while(p_info->b_flush || p_sys->i_pic_reorder >= p_sys->i_pic_reorder_max)
     {
         /* First check if DPB sizing was correct before removing one frame */
-        if (p_sys->p_pic_reorder && !p_info->b_flush &&
+        if (p_sys->p_pic_reorder && !p_sys->b_strict_reorder && !p_info->b_flush &&
             p_sys->i_pic_reorder_max < H264_MAX_DPB)
         {
             if (p_sys->b_poc_based_reorder && p_sys->p_pic_reorder->i_foc > p_info->i_foc)
@@ -1430,6 +1431,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
             p_sys->pf_configure_vout = ConfigureVoutH264;
             p_sys->pf_copy_extradata = CopyDecoderExtradataH264;
             p_sys->pf_fill_reorder_info = FillReorderInfoH264;
+            p_sys->b_strict_reorder = false;
             p_sys->b_poc_based_reorder = true;
             p_sys->b_vt_need_keyframe = true;
             break;
@@ -1444,6 +1446,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
             p_sys->pf_configure_vout = ConfigureVoutHEVC;
             p_sys->pf_copy_extradata = CopyDecoderExtradataHEVC;
             p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
+            p_sys->b_strict_reorder = true;
             p_sys->b_poc_based_reorder = true;
             p_sys->b_vt_need_keyframe = true;
             break;
