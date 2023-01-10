@@ -23,6 +23,7 @@
 #include "util/keyhelper.hpp"
 #include <QScreen>
 #include <QQmlProperty>
+#include <cmath>
 
 
 InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QWidget* widget, QObject *parent)
@@ -40,9 +41,6 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 
     m_window->setIcon( QApplication::windowIcon() );
     m_window->setOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
-
-    m_window->setMinimumWidth( 450 );
-    m_window->setMinimumHeight( 300 );
 
     // this needs to be called asynchronously
     // otherwise QQuickWidget won't initialize properly
@@ -64,7 +62,20 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
         connect( THEMIM, &PlayerController::nameChanged, m_window, &QWindow::setTitle );
     }
 
-    connect( m_window, &QWindow::screenChanged, m_mainCtx, &MainCtx::updateIntfScaleFactor);
+    connect( m_window, &QWindow::screenChanged, m_mainCtx, &MainCtx::updateIntfScaleFactor );
+
+    const auto updateMinimumSize = [this]()
+    {
+        int width = 320;
+        int height = 300;
+
+        double intfScaleFactor = m_mainCtx->getIntfScaleFactor();
+        int scaledWidth = std::ceil( intfScaleFactor * width );
+        int scaledHeight = std::ceil( intfScaleFactor * height );
+
+        m_window->setMinimumSize( QSize(scaledWidth, scaledHeight) );
+    };
+    connect( m_mainCtx, &MainCtx::intfScaleFactorChanged, this, updateMinimumSize );
     m_mainCtx->updateIntfScaleFactor();
 
     m_mainCtx->onWindowVisibilityChanged(m_window->visibility());
