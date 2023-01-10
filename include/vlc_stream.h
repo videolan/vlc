@@ -99,7 +99,7 @@ struct stream_t
      * \return a data block,
      * NULL if no data available yet, on error and at end-of-stream
      */
-    block_t    *(*pf_block)(stream_t *, bool *eof);
+    block_t    *(*pf_block)(stream_t *, bool *restrict eof);
 
     /**
      * Read directory.
