@@ -673,7 +673,9 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->i_poc = POC;
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
                 p_info->i_num_ts = hevc_get_num_clock_ts(p_sps, sei.p_timing);
-                p_info->b_flush = (POC == 0);
+                p_info->b_flush = (POC == 0) ||
+                                  (i_nal_type >= HEVC_NAL_IDR_N_LP &&
+                                   i_nal_type <= HEVC_NAL_IRAP_VCL23);
                 p_info->b_field = (p_info->i_num_ts == 1);
                 p_info->b_progressive = hevc_frame_is_progressive(p_sps, sei.p_timing);
 
@@ -1782,13 +1784,13 @@ static void Drain(decoder_t *p_dec, bool flush)
     /* draining: return last pictures of the reordered queue */
     vlc_mutex_lock(&p_sys->lock);
     p_sys->b_vt_flush = true;
-    DrainDPBLocked(p_dec, flush);
     vlc_mutex_unlock(&p_sys->lock);
 
     if (p_sys->session && p_sys->b_vt_feed)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
+    DrainDPBLocked(p_dec, flush);
     assert(RemoveOneFrameFromDPB(p_sys) == NULL);
     p_sys->b_vt_flush = false;
     p_sys->b_vt_feed = false;
