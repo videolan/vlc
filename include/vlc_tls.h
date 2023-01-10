@@ -75,7 +75,7 @@ struct vlc_tls_operations
      *
      * See \ref vlc_tls_GetPollFD().
      */
-    int (*get_fd)(struct vlc_tls *, short *events);
+    int (*get_fd)(struct vlc_tls *, short *restrict events);
 
     /** Callback for receiving data.
      *
