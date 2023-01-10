@@ -540,7 +540,7 @@ static int vlc_h2_parse_headers_end(struct vlc_h2_parser *p)
 
     if (s != NULL)
     {
-        const char *ch[n ? n : 1][2];
+        const char *ch[VLC_H2_MAX_HEADERS][2];
 
         for (int i = 0; i < n; i++)
             ch[i][0] = headers[i][0], ch[i][1] = headers[i][1];
