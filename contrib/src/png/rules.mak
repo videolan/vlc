@@ -1,5 +1,5 @@
 # PNG
-PNG_VERSION := 1.6.38
+PNG_VERSION := 1.6.39
 PNG_URL := $(SF)/libpng/libpng16/$(PNG_VERSION)/libpng-$(PNG_VERSION).tar.xz
 
 PKGS += png
@@ -36,6 +36,13 @@ PNG_CONF += -DPNG_ARM_NEON=on
 else ifdef HAVE_WIN32
 # No runtime detection needed
 PNG_CONF += -DPNG_ARM_NEON=on
+else ifdef HAVE_ANDROID
+# libpng disallows "check" for ARM here as it would be redundant/"unproductive",
+# see https://github.com/glennrp/libpng/commit/b8ca9108acddfb9fb5d886f5e8a072ebaf436dbb
+PNG_CONF += -DPNG_ARM_NEON=on
+else
+# Otherwise do runtime detection
+PNG_CONF += -DPNG_ARM_NEON=check
 endif
 endif
 
