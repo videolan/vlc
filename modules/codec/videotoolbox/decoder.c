@@ -91,6 +91,7 @@ struct frame_info_t
     bool b_progressive;
     bool b_top_field_first;
     uint8_t i_num_ts;
+    uint8_t i_max_reorder;
     unsigned i_length;
     frame_info_t *p_next;
 };
@@ -298,6 +299,8 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
 
                 p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
+                unsigned dummy;
+                h264_get_dpb_values(p_sps, &p_info->i_max_reorder, &dummy);
 
                 if (!p_info->b_progressive)
                     p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
@@ -310,20 +313,6 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     date_Change( &p_sys->pts, p_sps->vui.i_time_scale,
                                               p_sps->vui.i_num_units_in_tick );
                 }
-
-                if(!p_sys->b_invalid_pic_reorder_max && i_nal_type == H264_NAL_SLICE_IDR)
-                {
-                    unsigned dummy;
-                    uint8_t i_reorder;
-                    h264_get_dpb_values(p_sps, &i_reorder, &dummy);
-                    vlc_mutex_lock(&p_sys->lock);
-                    p_sys->i_pic_reorder_max = i_reorder;
-                    pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
-                                                  p_sys->i_pic_reorder_max,
-                                                  p_info->i_num_ts);
-                    vlc_mutex_unlock(&p_sys->lock);
-                }
-
             }
 
             return true; /* No need to parse further NAL */
@@ -674,6 +663,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->i_poc = POC;
                 p_info->i_foc = POC; /* clearly looks wrong :/ */
                 p_info->i_num_ts = hevc_get_num_clock_ts(p_sps, sei.p_timing);
+                p_info->i_max_reorder = hevc_get_max_num_reorder(p_vps);
                 p_info->b_flush = (POC == 0) ||
                                   (i_nal_type >= HEVC_NAL_IDR_N_LP &&
                                    i_nal_type <= HEVC_NAL_IRAP_VCL23);
@@ -691,17 +681,6 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
 
                 if (sei.p_timing)
                     hevc_release_sei_pic_timing(sei.p_timing);
-
-                if (!p_sys->b_invalid_pic_reorder_max && p_vps)
-                {
-                    vlc_mutex_lock(&p_sys->lock);
-                    p_sys->i_pic_reorder_max = hevc_get_max_num_reorder(p_vps);
-                    pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
-                                                  p_sys->i_pic_reorder_max,
-                                                  p_info->i_num_ts);
-                    vlc_mutex_unlock(&p_sys->lock);
-                }
-
             }
 
             hevc_rbsp_release_slice_header(p_sli);
@@ -925,6 +904,14 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
 static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if(!p_sys->b_invalid_pic_reorder_max &&
+       p_info->i_max_reorder != p_sys->i_pic_reorder_max)
+    {
+        p_sys->i_pic_reorder_max = p_info->i_max_reorder;
+        pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
+                                   p_sys->i_pic_reorder_max, p_info->b_field ? 2 : 1);
+    }
 
     while(p_info->b_flush || p_sys->i_pic_reorder >= p_sys->i_pic_reorder_max)
     {
