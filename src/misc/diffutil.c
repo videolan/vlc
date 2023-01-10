@@ -163,7 +163,7 @@ static bool FindMidPoint(diffutil_context_t* ctx, const diffutil_box_t* box, dif
     assert(box != NULL);
     int boxSize = box->size;
     if (boxSize == 0)
-        return NULL;
+        return false;
 
     int boxmax = (boxSize + 1) / 2;
 
