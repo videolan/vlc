@@ -371,6 +371,12 @@ if host_system == 'windows'
 
 endif
 
+if cc.has_argument('-Werror-implicit-function-declaration')
+    add_project_arguments('-Werror-implicit-function-declaration', language : ['c', 'cpp'])
+elif cc.has_argument('-we4013')
+    add_project_arguments('-we4013', language : ['c', 'cpp'])
+endif
+
 #
 # Check if other libs are needed
 #
