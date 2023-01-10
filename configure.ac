@@ -4140,6 +4140,25 @@ then
       AC_MSG_ERROR([ibtool was not found, but is required for --enable-macosx])
     ])
   ])
+
+  dnl
+  dnl If possible, use xcrun to find the right actool
+  dnl
+
+  AS_IF([test ! "${XCRUN}" = "no"], [
+    AC_MSG_CHECKING([for actool (using xcrun)])
+    ACTOOL="$(eval $XCRUN -f actool 2>/dev/null || echo no)"
+    AC_MSG_RESULT([${ACTOOL}])
+  ], [
+    AC_MSG_WARN([Looking for tools without using xcrun])
+  ])
+
+  AS_IF([test "${ACTOOL}" = "no"], [
+    AC_PATH_PROG(ACTOOL, [actool], [no])
+    AS_IF([test "${ACTOOL}" = "no"], [
+      AC_MSG_ERROR([actool was not found, but is required for --enable-macosx])
+    ])
+  ])
 fi
 AM_CONDITIONAL([ENABLE_MACOSX_UI], [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
 
