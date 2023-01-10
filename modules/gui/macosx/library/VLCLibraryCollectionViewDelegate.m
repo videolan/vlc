@@ -26,7 +26,6 @@
 #import "VLCLibraryCollectionViewFlowLayout.h"
 #import "VLCLibraryCollectionViewItem.h"
 #import "VLCLibraryDataTypes.h"
-#import "VLCLibraryUIUnits.h"
 
 @implementation VLCLibraryCollectionViewDelegate
 
@@ -36,6 +35,7 @@
     if (self) {
         _dynamicItemSizing = YES;
         _staticItemSize = [VLCLibraryCollectionViewItem defaultSize];
+        _itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioDefaultItem;
     }
     return self;
 }
@@ -78,7 +78,8 @@
     if (collectionViewLayout) {
         VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
         return [VLCLibraryUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
-                                                                       withLayout:collectionViewFlowLayout];
+                                                                       withLayout:collectionViewFlowLayout
+                                                             withItemsAspectRatio:_itemsAspectRatio];
     }
 
     return NSZeroSize;

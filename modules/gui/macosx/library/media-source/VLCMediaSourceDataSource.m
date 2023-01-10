@@ -113,7 +113,8 @@
     VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionViewLayout;
     NSAssert(collectionViewLayout, @"This should be a flow layout and thus a valid pointer");
     return [VLCLibraryUIUnits adjustedCollectionViewItemSizeForCollectionView:collectionView
-                                                                   withLayout:collectionViewFlowLayout];
+                                                                   withLayout:collectionViewFlowLayout
+                                                         withItemsAspectRatio:VLCLibraryCollectionViewItemAspectRatioDefaultItem];
 }
 
 #pragma mark - table view data source and delegation

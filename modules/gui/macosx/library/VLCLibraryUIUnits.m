@@ -84,23 +84,27 @@
 
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+                                           withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
 {
     static uint numItemsInRow = 5;
 
     NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                            withLayout:collectionViewLayout
+                                 withItemsAspectRatio:itemsAspectRatio
                                withNumberOfItemsInRow:numItemsInRow];
 
     while (itemSize.width > [VLCLibraryUIUnits dynamicCollectionViewItemMaximumWidth]) {
         ++numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
+                              withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
     }
     while (itemSize.width < [VLCLibraryUIUnits dynamicCollectionViewItemMinimumWidth]) {
         --numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
+                              withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
     }
 
@@ -109,6 +113,7 @@
 
 + (const NSSize)itemSizeForCollectionView:(NSCollectionView *)collectionView
                                withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+                     withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
                    withNumberOfItemsInRow:(uint)numItemsInRow
 {
     NSParameterAssert(numItemsInRow > 0);
@@ -125,7 +130,11 @@
                                      1);
 
     const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
-    return NSMakeSize(itemWidth, itemWidth + [VLCLibraryCollectionViewItem bottomTextViewsHeight]);
+    const CGFloat itemHeight = itemsAspectRatio == VLCLibraryCollectionViewItemAspectRatioDefaultItem ?
+        itemWidth + [VLCLibraryCollectionViewItem bottomTextViewsHeight] :
+        (itemWidth * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]) + [VLCLibraryCollectionViewItem bottomTextViewsHeight];
+
+    return NSMakeSize(itemWidth, itemHeight);
 }
 
 @end

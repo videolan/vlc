@@ -22,12 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "VLCLibraryUIUnits.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryCollectionViewDelegate : NSObject <NSCollectionViewDelegate, NSCollectionViewDelegateFlowLayout>
 
 @property (readwrite, assign) BOOL dynamicItemSizing;
 @property (readwrite, assign) NSSize staticItemSize;
+@property (readwrite, assign) VLCLibraryCollectionViewItemAspectRatio itemsAspectRatio;
 
 @end
 

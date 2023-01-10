@@ -24,6 +24,11 @@
 
 @class VLCLibraryCollectionViewFlowLayout;
 
+typedef NS_ENUM(NSUInteger, VLCLibraryCollectionViewItemAspectRatio) {
+    VLCLibraryCollectionViewItemAspectRatioDefaultItem = 0,
+    VLCLibraryCollectionViewItemAspectRatioVideoItem,
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryUIUnits : NSObject
@@ -47,7 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (const CGFloat)dynamicCollectionViewItemMaximumWidth;
 
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
-                                                     withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout;
+                                                     withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+                                           withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio;
 
 @end
 
