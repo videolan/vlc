@@ -49,7 +49,7 @@
 #include "clock/clock.h"
 
 static const char *const ppsz_snap_formats[] =
-{ "png", "jpg", "tiff" };
+{ "png", "jpg", "tiff", "webp" };
 
 /*****************************************************************************
  * Configuration options for the core module. Each module will also separately
