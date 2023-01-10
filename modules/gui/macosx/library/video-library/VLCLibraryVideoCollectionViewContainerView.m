@@ -112,6 +112,7 @@
     _collectionView.allowsMultipleSelection = NO;
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
     _collectionView.delegate = _collectionViewDelegate;
 }
 
