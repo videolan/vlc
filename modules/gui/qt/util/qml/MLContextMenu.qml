@@ -148,11 +148,20 @@ NativeMenu {
         if (indexes.length !== 1)
             return false
 
-        return model.getDataAt(indexes[0]).isNew
+        var isNew = model.getDataAt(indexes[0]).isNew
+
+        // NOTE: Strictly comparing 'isNew' given it might be undefined.
+        return (isNew === true)
     }
 
     function _showUnseen(options, indexes) {
-        return (_showSeen(options, indexes) === false)
+        if (indexes.length !== 1)
+            return false
+
+        var isNew = model.getDataAt(indexes[0]).isNew
+
+        // NOTE: Strictly comparing 'isNew' given it might be undefined.
+        return (isNew === false)
     }
 
     function _signalShowInformation(dataList, options) {
