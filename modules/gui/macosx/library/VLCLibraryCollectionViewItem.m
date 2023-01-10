@@ -60,6 +60,13 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     return CGSizeMake(width, width + [self bottomTextViewsHeight]);
 }
 
++ (NSSize)defaultVideoItemSize
+{
+    CGFloat width = 214;
+    CGFloat imageViewHeight = (214. / 16.) * 10.;
+    return CGSizeMake(width, imageViewHeight + [self bottomTextViewsHeight]);
+}
+
 + (CGFloat)bottomTextViewsHeight
 {
     return [VLCLibraryUIUnits smallSpacing] +
