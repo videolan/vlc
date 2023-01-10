@@ -54,26 +54,36 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 @implementation VLCLibraryCollectionViewItem
 
-+ (NSSize)defaultSize
++ (const NSSize)defaultSize
 {
-    CGFloat width = 214;
+    const CGFloat width = [VLCLibraryCollectionViewItem defaultWidth];
     return CGSizeMake(width, width + [self bottomTextViewsHeight]);
 }
 
-+ (NSSize)defaultVideoItemSize
++ (const NSSize)defaultVideoItemSize
 {
-    CGFloat width = 214;
-    CGFloat imageViewHeight = (214. / 16.) * 10.;
+    const CGFloat width = [VLCLibraryCollectionViewItem defaultWidth];
+    const CGFloat imageViewHeight = width * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier];
     return CGSizeMake(width, imageViewHeight + [self bottomTextViewsHeight]);
 }
 
-+ (CGFloat)bottomTextViewsHeight
++ (const CGFloat)defaultWidth
+{
+    return 214.;
+}
+
++ (const CGFloat)bottomTextViewsHeight
 {
     return [VLCLibraryUIUnits smallSpacing] +
            16 +
            [VLCLibraryUIUnits smallSpacing] +
            16 +
            [VLCLibraryUIUnits smallSpacing];
+}
+
++ (const CGFloat)videoHeightAspectRatioMultiplier
+{
+    return 10. / 16.;
 }
 
 - (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -108,8 +118,9 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
                                                                         relatedBy:NSLayoutRelationEqual
                                                                         toItem:_mediaImageView
                                                                         attribute:NSLayoutAttributeWidth
-                                                                        multiplier:10.0/16.0
+                                                                       multiplier:[VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]
                                                                         constant:1];
+    _videoImageViewAspectRatioConstraint.priority = NSLayoutPriorityRequired;
     _videoImageViewAspectRatioConstraint.active = NO;
 
     [(VLCTrackingView *)self.view setViewToHide:self.playInstantlyButton];
@@ -223,10 +234,8 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             VLCMediaLibraryTrack *videoTrack = mediaItem.firstVideoTrack;
             [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
                                       andHeight:videoTrack.videoHeight];
-            _imageViewAspectRatioConstraint.active = NO;
             _videoImageViewAspectRatioConstraint.active = YES;
         } else {
-            _imageViewAspectRatioConstraint.active = YES;
             _videoImageViewAspectRatioConstraint.active = NO;
         }
 
