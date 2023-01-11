@@ -106,7 +106,7 @@ if fluidsynth_dep.found()
 endif
 
 # Audiotoolbox MIDI plugin (Darwin only)
-if host_system == 'darwin'
+if have_osx
     vlc_modules += {
         'name' : 'audiotoolboxmidi',
         'sources' : files('audiotoolbox_midi.c'),
