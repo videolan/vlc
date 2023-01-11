@@ -79,7 +79,7 @@ vlc_module_begin ()
     set_description(N_("WebM video encoder"))
     set_callback(OpenEncoder)
 #   define ENC_CFG_PREFIX "sout-vpx-"
-    add_integer( ENC_CFG_PREFIX "quality-mode", VPX_DL_GOOD_QUALITY, QUALITY_MODE_TEXT,
+    add_integer( ENC_CFG_PREFIX "quality-mode", VPX_DL_BEST_QUALITY, QUALITY_MODE_TEXT,
                  QUALITY_MODE_LONGTEXT )
         change_integer_list( quality_values, quality_desc );
 #endif
