@@ -9,7 +9,7 @@ if get_option('screen').allowed()
   endif
 
   # screen
-  if host_system == 'windows' or host_system == 'darwin'
+  if host_system == 'windows' or have_osx
     screen_files = files(
       'screen.c',
       'screen.h'
