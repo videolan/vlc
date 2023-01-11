@@ -406,6 +406,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     switch (p_enc->fmt_out.i_codec)
     {
 #ifdef ENABLE_VP8_ENCODER
+    case VLC_CODEC_WEBP:
     case VLC_CODEC_VP8:
         iface = &vpx_codec_vp8_cx_algo;
         vp_version = 8;
