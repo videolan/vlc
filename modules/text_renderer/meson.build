@@ -48,7 +48,7 @@ if rsvg_dep.found()
 endif
 
 # macOS text to speech
-if host_system == 'darwin'
+if have_osx
     vlc_modules += {
         'name' : 'nsspeechsynthesizer',
         'sources' : files('nsspeechsynthesizer.m'),
