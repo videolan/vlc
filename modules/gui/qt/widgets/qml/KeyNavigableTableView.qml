@@ -41,8 +41,11 @@ FocusScope {
     // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own
     //       margins implementation like in ExpandGridView. The default values should be the same
     //       than ExpandGridView to respect the grid parti pris.
-    property int leftMargin: VLCStyle.column_margin
-    property int rightMargin: VLCStyle.column_margin
+    property int leftMargin: VLCStyle.column_margin + leftPadding
+    property int rightMargin: VLCStyle.column_margin + rightPadding
+
+    property int leftPadding: 0
+    property int rightPadding: 0
 
     readonly property int extraMargin: Math.max(0, (width - usedRowSpace) / 2)
 
