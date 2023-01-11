@@ -278,6 +278,11 @@
         _audioSegmentedControl.selectedSegment == VLCAudioLibraryAlbumsSegment) {
 
         [_audioLibraryCollectionView deselectAll:self];
+        const VLCLibraryCollectionViewFlowLayout * const collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout *)_audioLibraryCollectionView.collectionViewLayout;
+        if (collectionViewFlowLayout) {
+            [collectionViewFlowLayout resetLayout];
+        }
+
         _audioCollectionViewScrollView.hidden = NO;
         _audioLibraryGridModeSplitView.hidden = YES;
         return;
