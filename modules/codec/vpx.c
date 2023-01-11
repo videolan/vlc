@@ -443,15 +443,16 @@ static int OpenEncoder(vlc_object_t *p_this)
     config_ChainParse(p_enc, ENC_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg);
 
     /* Deadline (in ms) to spend in encoder */
-    switch (var_GetInteger(p_enc, ENC_CFG_PREFIX "quality-mode")) {
+    const unsigned long quality = var_GetInteger(p_enc, ENC_CFG_PREFIX "quality-mode");
+    switch (quality) {
         case VPX_DL_REALTIME:
-            p_sys->quality = VPX_DL_REALTIME;
-            break;
         case VPX_DL_BEST_QUALITY:
-            p_sys->quality = VPX_DL_BEST_QUALITY;
+        case VPX_DL_GOOD_QUALITY:
+            p_sys->quality = quality;
             break;
         default:
-            p_sys->quality = VPX_DL_GOOD_QUALITY;
+            msg_Warn(p_this, "Unexpected quality %lu, forcing %d", quality, VPX_DL_BEST_QUALITY);
+            p_sys->quality = VPX_DL_BEST_QUALITY;
             break;
     }
 
