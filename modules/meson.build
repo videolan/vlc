@@ -83,7 +83,6 @@ if host_system == 'darwin'
     avfoundation_dep = dependency('AVFoundation', required: true)
     corevideo_dep = dependency('CoreVideo', required: true)
     videotoolbox_dep = dependency('VideoToolbox', required: true)
-    audiounit_dep = dependency('AudioUnit', required: true)
     audiotoolbox_dep = dependency('AudioToolbox', required: true)
     iokit_dep = dependency('IOKit', required: true)
     quartz_dep = dependency('QuartzCore', required: true)
@@ -97,6 +96,7 @@ endif
 if have_osx
     cocoa_dep = dependency('Cocoa', required: true)
     opengl_dep = dependency('OpenGL', required: true)
+    audiounit_dep = dependency('AudioUnit', required: true)
 endif
 
 # iOS/tvOS specific dependencies
