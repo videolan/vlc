@@ -168,7 +168,7 @@ endif
 vlc_modules += {
     'name' : 'shm',
     'sources' : files('shm.c'),
-    'dependencies': [m_lib]
+    'dependencies' : [m_lib]
 }
 
 
@@ -180,7 +180,7 @@ subdir('screen')
 freerdp_dep = dependency('freerdp', required: get_option('freerdp'))
 if freerdp_dep.found()
     vlc_modules += {
-    'name': 'rdp',
+    'name' : 'rdp',
     'sources' : files('rdp.c'),
     'dependencies' : [freerdp_dep]
     }
@@ -191,7 +191,7 @@ vncclient_dep = dependency('libvncclient', required: get_option('vnc'))
 if vncclient_dep.found()
     vlc_modules += {
     'name' : 'vnc',
-    'sources': files('vnc.c'),
+    'sources' : files('vnc.c'),
     'dependencies' : [vncclient_dep]
     }
 endif
@@ -415,7 +415,7 @@ vlc_modules += {
 ## Misc
 
 vlc_modules += {
-    'name': 'access_concat',
+    'name' : 'access_concat',
     'sources' : files('concat.c')
 }
 

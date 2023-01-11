@@ -32,8 +32,8 @@ if get_option('screen').allowed()
     vlc_modules += {
         'name' : 'screen',
         'sources' : screen_files,
-        'dependencies': screen_deps,
-        'link_with': screen_link_with,
+        'dependencies' : screen_deps,
+        'link_with' : screen_link_with,
     }
   endif
 endif

@@ -232,7 +232,7 @@ check_headers = [
     ['dcomp.h'],
     ['wordexp.h'],
     ['GL/wglew.h',
-        { 'prefix': ['#include <windows.h>', '#include <GL/glew.h>'],
+        { 'prefix' : ['#include <windows.h>', '#include <GL/glew.h>'],
           'args' : [contrib_inc_args] }],
 ]
 

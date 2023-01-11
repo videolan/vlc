@@ -139,7 +139,7 @@ if x11_dep.found() and egl_dep.found()
     vlc_modules += {
         'name' : 'egl_x11',
         'sources' : files('opengl/egl.c'),
-        'c_args': ['-DUSE_PLATFORM_X11=1'],
+        'c_args' : ['-DUSE_PLATFORM_X11=1'],
         'dependencies' : [egl_dep, x11_dep]
     }
 endif
@@ -148,6 +148,6 @@ if x11_dep.found() and opengl_dep.found()
     vlc_modules += {
         'name' : 'glx',
         'sources' : files('glx.c'),
-        'dependencies': [x11_dep, opengl_dep]
+        'dependencies' : [x11_dep, opengl_dep]
     }
 endif

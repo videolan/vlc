@@ -574,7 +574,7 @@ vlc_modules += {
     ),
     'include_directories' : include_directories('adaptive', './'),
     'dependencies' : [socket_libs, m_lib, z_lib],
-    'link_with': vlc_http_lib,
+    'link_with' : vlc_http_lib,
     # TODO: Add optional GCRYPT dependency!
 }
 

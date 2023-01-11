@@ -3,19 +3,19 @@
 # Dummy
 vlc_modules += {
     'name' : 'access_output_dummy',
-    'sources': files('dummy.c')
+    'sources' : files('dummy.c')
 }
 
 # File
 vlc_modules += {
     'name' : 'access_output_file',
-    'sources': files('file.c')
+    'sources' : files('file.c')
 }
 
 # HTTP
 vlc_modules += {
     'name' : 'access_output_http',
-    'sources': files('http.c')
+    'sources' : files('http.c')
 }
 
 # TODO: Add HAVE_GCRYPT + livehttp
