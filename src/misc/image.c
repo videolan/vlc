@@ -615,6 +615,7 @@ static const struct
     { VLC_CODEC_SVG,               "svg" },
     { VLC_CODEC_TIFF,              "tif" },
     { VLC_CODEC_TIFF,              "tiff" },
+    { VLC_CODEC_WEBP,              "webp" },
     { VLC_FOURCC('l','b','m',' '), "lbm" },
     { VLC_CODEC_PPM,               "ppm" },
 };
@@ -659,6 +660,7 @@ static const struct
     { VLC_CODEC_SVG,               "image/svg+xml" },
     { VLC_CODEC_TIFF,              "image/tiff" },
     { VLC_CODEC_TARGA,             "image/x-tga" },
+    { VLC_CODEC_WEBP,              "image/webp" },
     { VLC_FOURCC('x','p','m',' '), "image/x-xpixmap" },
     { 0, NULL }
 };
