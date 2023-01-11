@@ -87,6 +87,7 @@ struct frame_info_t
     bool b_flush;
     bool b_eos;
     bool b_keyframe;
+    bool b_leading;
     bool b_field;
     bool b_progressive;
     bool b_top_field_first;
@@ -123,9 +124,18 @@ typedef struct decoder_sys_t
 
     /* !Codec specific callbacks */
 
-    bool                        b_vt_feed;
     bool                        b_vt_flush;
-    bool                        b_vt_need_keyframe;
+    enum
+    {
+        STATE_BITSTREAM_WAITING_RAP = -2,
+        STATE_BITSTREAM_DISCARD_LEADING = -1,
+        STATE_BITSTREAM_SYNCED = 0,
+    } sync_state, start_sync_state;
+    enum
+    {
+        STATE_DECODER_WAITING_RAP = 0,
+        STATE_DECODER_STARTED,
+    } decoder_state;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
 
@@ -146,7 +156,6 @@ typedef struct decoder_sys_t
 
     h264_poc_context_t          h264_pocctx;
     hevc_poc_ctx_t              hevc_pocctx;
-    bool                        b_drop_blocks;
     date_t                      pts;
 
     vlc_video_context          *vctx;
@@ -624,27 +633,6 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
             if (!p_sli)
                 return false;
 
-            /* XXX: Work-around a VT bug on recent devices (iPhone X, MacBook
-             * Pro 2017). The VT session will report a BadDataErr if you send a
-             * RASL frame just after a CRA one. Indeed, RASL frames are
-             * corrupted if the decoding start at an IRAP frame (IDR/CRA), VT
-             * is likely failing to handle this case. */
-            if (!p_sys->b_vt_feed && (i_nal_type != HEVC_NAL_IDR_W_RADL &&
-                                      i_nal_type != HEVC_NAL_IDR_N_LP))
-                p_sys->b_drop_blocks = true;
-            else if (p_sys->b_drop_blocks)
-            {
-                if (i_nal_type == HEVC_NAL_RASL_N || i_nal_type == HEVC_NAL_RASL_R)
-                {
-                    hevc_rbsp_release_slice_header(p_sli);
-                    return false;
-                }
-                else
-                {
-                    p_sys->b_drop_blocks = false;
-                }
-            }
-
             p_info->b_keyframe = i_nal_type >= HEVC_NAL_BLA_W_LP;
             enum hevc_slice_type_e slice_type;
             if (hevc_get_slice_type(p_sli, &slice_type))
@@ -691,6 +679,14 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 if (sei.p_timing)
                     hevc_release_sei_pic_timing(sei.p_timing);
             }
+
+            /* RASL Open GOP */
+            /* XXX: Work-around a VT bug on recent devices (iPhone X, MacBook
+             * Pro 2017). The VT session will report a BadDataErr if you send a
+             * RASL frame just after a CRA one. Indeed, RASL frames are
+             * corrupted if the decoding start at an IRAP frame (IDR/CRA), VT
+             * is likely failing to handle this case. */
+            p_info->b_leading = ( i_nal_type == HEVC_NAL_RASL_N || i_nal_type == HEVC_NAL_RASL_R );
 
             hevc_rbsp_release_slice_header(p_sli);
             return true; /* No need to parse further NAL */
@@ -1276,8 +1272,8 @@ static void StopVideoToolbox(decoder_t *p_dec)
         CFRelease(p_sys->videoFormatDescription);
         p_sys->videoFormatDescription = NULL;
     }
-    p_sys->b_vt_feed = false;
-    p_sys->b_drop_blocks = false;
+    p_sys->sync_state = p_sys->start_sync_state;
+    p_sys->decoder_state = STATE_DECODER_WAITING_RAP;
 }
 
 #pragma mark - module open and close
@@ -1412,8 +1408,6 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
         return i_ret;
     }
 
-    p_sys->b_vt_need_keyframe = false;
-
     vlc_mutex_init(&p_sys->lock);
 
     p_dec->pf_decode = DecodeBlock;
@@ -1433,7 +1427,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
             p_sys->pf_fill_reorder_info = FillReorderInfoH264;
             p_sys->b_strict_reorder = false;
             p_sys->b_poc_based_reorder = true;
-            p_sys->b_vt_need_keyframe = true;
+            p_sys->start_sync_state = STATE_BITSTREAM_WAITING_RAP;
             break;
 
         case kCMVideoCodecType_HEVC:
@@ -1448,7 +1442,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
             p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
             p_sys->b_strict_reorder = true;
             p_sys->b_poc_based_reorder = true;
-            p_sys->b_vt_need_keyframe = true;
+            p_sys->start_sync_state = STATE_BITSTREAM_WAITING_RAP;
             break;
 
         case kCMVideoCodecType_MPEG4Video:
@@ -1459,6 +1453,8 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
             p_sys->pf_copy_extradata = NULL;
             break;
     }
+
+    p_sys->sync_state = p_sys->start_sync_state;
 
     if (p_sys->pf_codec_init && !p_sys->pf_codec_init(p_dec))
     {
@@ -1802,7 +1798,7 @@ static void Drain(decoder_t *p_dec, bool flush)
     p_sys->b_vt_flush = true;
     vlc_mutex_unlock(&p_sys->lock);
 
-    if (p_sys->session && p_sys->b_vt_feed)
+    if (p_sys->session && p_sys->decoder_state == STATE_DECODER_STARTED)
         VTDecompressionSessionWaitForAsynchronousFrames(p_sys->session);
 
     vlc_mutex_lock(&p_sys->lock);
@@ -1810,8 +1806,7 @@ static void Drain(decoder_t *p_dec, bool flush)
     picture_t *p_output;
     assert(RemoveOneFrameFromDPB(p_sys, &p_output) == VLC_EGENERIC);
     p_sys->b_vt_flush = false;
-    p_sys->b_vt_feed = false;
-    p_sys->b_drop_blocks = false;
+    p_sys->sync_state = p_sys->start_sync_state;
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1921,7 +1916,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
     if (unlikely(p_block->i_flags&(BLOCK_FLAG_CORRUPTED)))
     {
-        if (p_sys->b_vt_feed)
+        if (p_sys->sync_state == STATE_BITSTREAM_SYNCED)
         {
             Drain(p_dec, false);
             PtsInit(p_dec);
@@ -1973,10 +1968,25 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    if (!p_sys->b_vt_feed && p_sys->b_vt_need_keyframe && !p_info->b_keyframe)
+    if (p_sys->sync_state == STATE_BITSTREAM_WAITING_RAP)
     {
-        free(p_info);
-        goto skip;
+        if(!p_info->b_keyframe)
+        {
+            msg_Dbg(p_dec, "discarding non recovery frame %"PRId64, p_info->pts);
+            free(p_info);
+            goto skip;
+        }
+        p_sys->sync_state = STATE_BITSTREAM_DISCARD_LEADING;
+    }
+    else if(p_sys->sync_state == STATE_BITSTREAM_DISCARD_LEADING)
+    {
+        if(p_info->b_leading)
+        {
+            msg_Dbg(p_dec, "discarding skipped leading frame %"PRId64, p_info->pts);
+            free(p_info);
+            goto skip;
+        }
+        p_sys->sync_state = STATE_BITSTREAM_SYNCED;
     }
 
     CMSampleBufferRef sampleBuffer =
@@ -1997,12 +2007,18 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     enum vtsession_status vtsession_status;
     if (HandleVTStatus(p_dec, status, &vtsession_status) == VLC_SUCCESS)
     {
-        p_sys->b_vt_feed = true;
+        if(p_sys->decoder_state != STATE_DECODER_STARTED)
+        {
+            msg_Dbg(p_dec, "session accepted first frame %"PRId64, p_info->pts);
+            p_sys->decoder_state = STATE_DECODER_STARTED;
+        }
         if (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE)
             Drain( p_dec, false );
     }
     else
     {
+        msg_Dbg(p_dec, "session rejected frame %"PRId64" with status %d", p_info->pts, status);
+        p_sys->sync_state = p_sys->start_sync_state;
         vlc_mutex_lock(&p_sys->lock);
         p_sys->vtsession_status = vtsession_status;
         /* In case of abort, the decoder module will be reloaded next time
