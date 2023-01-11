@@ -20,7 +20,7 @@ opengl_vout_commonsources = files(
     'vout_helper.c',
 )
 
-if opengl_dep.found()
+if opengl_dep.found() and not (have_ios or have_tvos)
     libvlc_opengl = static_library('vlc_opengl',
                                    dependencies: [
                                     gl_common_dep,
