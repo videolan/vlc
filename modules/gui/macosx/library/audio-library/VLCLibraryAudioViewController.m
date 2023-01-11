@@ -277,6 +277,7 @@
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment ||
         _audioSegmentedControl.selectedSegment == VLCAudioLibraryAlbumsSegment) {
 
+        [_audioLibraryCollectionView deselectAll:self];
         _audioCollectionViewScrollView.hidden = NO;
         _audioLibraryGridModeSplitView.hidden = YES;
         return;
