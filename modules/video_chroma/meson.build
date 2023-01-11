@@ -13,7 +13,7 @@ vlc_modules += {
     'sources' : files('chain.c')
 }
 
-swscale_dep = dependency('libswscale', version : '>= 0.5.0', required : get_option('swscale'))
+swscale_dep = dependency('libswscale', version: '>= 0.5.0', required: get_option('swscale'))
 if swscale_dep.found()
   vlc_modules += {
       'name' : 'swscale',

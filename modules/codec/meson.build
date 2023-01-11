@@ -33,7 +33,7 @@ if a52_lib.found()
 endif
 
 # DTS Coherent Acoustics decoder
-dca_dep = dependency('libdca', version : '>= 0.0.5', required : get_option('dca'))
+dca_dep = dependency('libdca', version: '>= 0.0.5', required: get_option('dca'))
 if dca_dep.found()
     vlc_modules += {
         'name' : 'dca',
@@ -81,9 +81,9 @@ fluidsynth_option = get_option('fluidsynth')
 fluidsynth_module_flags = []
 if not fluidsynth_option.disabled()
     fluidsynth_module_flags += f'-DDATADIR="@sysdatadir_path@"'
-    fluidsynth_dep = dependency('fluidsynth', version : '>= 1.1.2', required : false)
+    fluidsynth_dep = dependency('fluidsynth', version: '>= 1.1.2', required: false)
     if not fluidsynth_dep.found()
-        fluidsynth_dep = dependency('fluidlite', required : false)
+        fluidsynth_dep = dependency('fluidlite', required: false)
         if fluidsynth_dep.found()
             fluidsynth_module_flags += '-DHAVE_FLUIDLITE_H'
         endif
@@ -93,7 +93,7 @@ if not fluidsynth_option.disabled()
         error('Neither fluidsynth or fluidlite were found.')
     endif
 else
-    fluidsynth_dep = dependency('', required : false)
+    fluidsynth_dep = dependency('', required: false)
 endif
 
 if fluidsynth_dep.found()
@@ -121,7 +121,7 @@ vlc_modules += {
 }
 
 # libmad codec
-mad_dep = dependency('mad', required : get_option('mad'))
+mad_dep = dependency('mad', required: get_option('mad'))
 if mad_dep.found()
   vlc_modules += {
       'name' : 'mad',
@@ -131,7 +131,7 @@ if mad_dep.found()
 endif
 
 # libmpg123 decoder
-mpg123_dep = dependency('libmpg123', required : get_option('mpg123'))
+mpg123_dep = dependency('libmpg123', required: get_option('mpg123'))
 if mpg123_dep.found()
     vlc_modules += {
         'name' : 'mpg123',
@@ -156,7 +156,7 @@ vlc_modules += {
 }
 
 # libmpeg2 decoder
-mpeg2_dep = dependency('libmpeg2', version : '> 0.3.2', required : get_option('mpeg2'))
+mpeg2_dep = dependency('libmpeg2', version: '> 0.3.2', required: get_option('mpeg2'))
 if mpeg2_dep.found()
     vlc_modules += {
         'name' : 'libmpeg2',
@@ -218,7 +218,7 @@ if jpeg_dep.found()
 endif
 
 # BPG codec
-bpg_lib = cc.find_library('bpg', required : get_option('bpg'))
+bpg_lib = cc.find_library('bpg', required: get_option('bpg'))
 if bpg_lib.found()
   vlc_modules += {
       'name' : 'bpg',
@@ -228,7 +228,7 @@ if bpg_lib.found()
 endif
 
 # SVG image decoder
-cairo_dep = dependency('cairo', version : '>= 1.13.1', required : get_option('cairo'))
+cairo_dep = dependency('cairo', version: '>= 1.13.1', required: get_option('cairo'))
 if rsvg_dep.found() and cairo_dep.found()
     vlc_modules += {
         'name' : 'svgdec',
@@ -238,7 +238,7 @@ if rsvg_dep.found() and cairo_dep.found()
 endif
 
 # xwd
-xproto_dep = dependency('xproto', required : get_option('xcb'))
+xproto_dep = dependency('xproto', required: get_option('xcb'))
 if xproto_dep.found()
   vlc_modules += {
       'name' : 'xwd',
@@ -292,7 +292,7 @@ vlc_modules += {
 }
 
 # aribsub
-aribb24_dep = dependency('aribb24', version : '>= 1.0.1', required : get_option('aribsub'))
+aribb24_dep = dependency('aribb24', version: '>= 1.0.1', required: get_option('aribsub'))
 if aribb24_dep.found()
   vlc_modules += {
       'name' : 'aribsub',
@@ -439,7 +439,7 @@ if flex.found() and bison.found() and not get_option('css_engine').disabled()
             vlc_include_dirs,
             include_directories('webvtt')])
 
-    test('css_parser', css_parser_test, suite : 'css_parser')
+    test('css_parser', css_parser_test, suite: 'css_parser')
 
 endif
 
@@ -563,7 +563,7 @@ if avcodec_dep.found()
         files('avcodec/fourcc.c', 'avcodec/chroma.c'),
         dependencies: [avutil_dep, avcodec_dep],
         install: false,
-        include_directories : [
+        include_directories: [
             vlc_include_dirs,
             include_directories('avcodec')
         ],

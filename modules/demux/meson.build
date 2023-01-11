@@ -4,10 +4,10 @@
 
 # Common Xiph metadata library
 xiph_meta_lib = static_library('xiph_metadata',
-    sources : files('xiph_metadata.c'),
-    include_directories : [vlc_include_dirs],
-    install : false,
-    pic : true
+    sources: files('xiph_metadata.c'),
+    include_directories: [vlc_include_dirs],
+    install: false,
+    pic: true
 )
 
 # FLAC demux
@@ -19,7 +19,7 @@ vlc_modules += {
 }
 
 # OGG demux
-ogg_dep = dependency('ogg', version : '>= 1.0', required : get_option('ogg'))
+ogg_dep = dependency('ogg', version: '>= 1.0', required: get_option('ogg'))
 if ogg_dep.found()
     vlc_modules += {
         'name' : 'ogg',
@@ -32,9 +32,9 @@ endif
 # Xiph test
 xiph_test = executable('xiph_test',
     files('xiph_test.c'),
-    include_directories : [vlc_include_dirs])
+    include_directories: [vlc_include_dirs])
 
-test('xiph_test', hpack_test, suite : 'demux')
+test('xiph_test', hpack_test, suite: 'demux')
 
 # Demux dump
 vlc_modules += {
@@ -91,8 +91,8 @@ vlc_modules += {
 }
 
 # libmodplug
-libmodplug_dep = dependency('libmodplug', version : ['>= 0.8.4', '!= 0.8.8'],
-    required : get_option('libmodplug'))
+libmodplug_dep = dependency('libmodplug', version: ['>= 0.8.4', '!= 0.8.8'],
+    required: get_option('libmodplug'))
 if libmodplug_dep.found()
     vlc_modules += {
         'name' : 'mod',
@@ -255,8 +255,8 @@ vlc_modules += {
 }
 
 # MKV demux
-libebml_dep = dependency('libebml', required : get_option('matroska'))
-libmatroska_dep = dependency('libmatroska', required : get_option('matroska'))
+libebml_dep = dependency('libebml', required: get_option('matroska'))
+libmatroska_dep = dependency('libmatroska', required: get_option('matroska'))
 if libebml_dep.found() and libmatroska_dep.found()
     vlc_modules += {
         'name' : 'mkv',
@@ -326,8 +326,8 @@ vlc_modules += {
 }
 
 # TS demux
-aribb24_dep = dependency('aribb24', version : '>= 1.0.1', required : get_option('aribb24'))
-libdvbpsi_dep = dependency('libdvbpsi', version : '>= 1.2.0', required : get_option('libdvbpsi'))
+aribb24_dep = dependency('aribb24', version: '>= 1.0.1', required: get_option('aribb24'))
+libdvbpsi_dep = dependency('libdvbpsi', version: '>= 1.2.0', required: get_option('libdvbpsi'))
 if libdvbpsi_dep.found()
     arrib24_define = []
     if aribb24_dep.found()

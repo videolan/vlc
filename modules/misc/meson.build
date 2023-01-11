@@ -34,7 +34,7 @@ vlc_modules += {
 }
 
 # libxml2 module
-libxml2_dep = dependency('libxml-2.0', version : '>= 2.5', required : get_option('libxml2'))
+libxml2_dep = dependency('libxml-2.0', version: '>= 2.5', required: get_option('libxml2'))
 if libxml2_dep.found()
     vlc_modules += {
         'name' : 'xml',
@@ -44,7 +44,7 @@ if libxml2_dep.found()
 endif
 
 # medialibrary module
-medialibrary_dep = dependency('medialibrary', required : get_option('medialibrary'), method : 'pkg-config')
+medialibrary_dep = dependency('medialibrary', required: get_option('medialibrary'), method: 'pkg-config')
 if medialibrary_dep.found()
     vlc_modules += {
         'name' : 'medialibrary',
@@ -81,7 +81,7 @@ if host_system == 'darwin'
 endif
 
 # GnuTLS module
-gnutls_dep = dependency('gnutls', version : '>= 3.5.0', required : get_option('gnutls'))
+gnutls_dep = dependency('gnutls', version: '>= 3.5.0', required: get_option('gnutls'))
 if gnutls_dep.found()
 
     gnutls_darwin_deps = []
@@ -135,15 +135,15 @@ if have_wayland
     # include this file correctly. This needs to be fixed.
     wl_inhibit_client_proto = custom_target(
         'idle-inhibit-client-protocol-generator',
-        output : 'idle-inhibit-client-protocol.h',
-        input : wayland_protocols_dir / 'unstable/idle-inhibit/idle-inhibit-unstable-v1.xml',
-        command : [wayland_scanner, 'client-header', '@INPUT@', '@OUTPUT@'],
+        output: 'idle-inhibit-client-protocol.h',
+        input: wayland_protocols_dir / 'unstable/idle-inhibit/idle-inhibit-unstable-v1.xml',
+        command: [wayland_scanner, 'client-header', '@INPUT@', '@OUTPUT@'],
     )
     wl_inhibit_proto = custom_target(
         'idle-inhibit-protocol-generator',
-        output : 'idle-inhibit-protocol.c',
-        input : wayland_protocols_dir / 'unstable/idle-inhibit/idle-inhibit-unstable-v1.xml',
-        command : [wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
+        output: 'idle-inhibit-protocol.c',
+        input: wayland_protocols_dir / 'unstable/idle-inhibit/idle-inhibit-unstable-v1.xml',
+        command: [wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
     )
 
     vlc_modules += {

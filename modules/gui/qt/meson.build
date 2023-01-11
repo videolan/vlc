@@ -10,8 +10,8 @@ qt_extra_deps = []
 qt_extra_flags = []
 
 qt5_dep = dependency('qt5',
-    version : '>=5.11.0',
-    modules : [
+    version: '>=5.11.0',
+    modules: [
         'Core', 'Gui', 'Widgets', 'Svg', 'Qml',
         'Quick', 'QuickWidgets', 'QuickControls2',
         ],
@@ -531,9 +531,9 @@ if host_system == 'windows'
 endif
 
 if qt5_dep.found()
-    qt5pre_files = qt5.preprocess(ui_files : ui_sources,
-        moc_headers : moc_headers,
-        qresources : qrc_files,
+    qt5pre_files = qt5.preprocess(ui_files: ui_sources,
+        moc_headers: moc_headers,
+        qresources: qrc_files,
         include_directories: qt_include_dir)
 
     qt_sources = files('qt.cpp')

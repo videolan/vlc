@@ -70,7 +70,7 @@ vlc_modules += {
 }
 
 # Kernel Mode Setting
-drm_dep = dependency('libdrm', version : '>= 2.4.83', required : get_option('drm'))
+drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm'))
 if drm_dep.found()
     vlc_modules += {
         'name' : 'kms',
@@ -80,7 +80,7 @@ if drm_dep.found()
 endif
 
 # Coloured ASCII art (Caca)
-caca_dep = dependency('caca', version : '>= 0.99.beta14', required : get_option('caca'))
+caca_dep = dependency('caca', version: '>= 0.99.beta14', required: get_option('caca'))
 if caca_dep.found()
     vlc_modules += {
         'name' : 'caca',
@@ -98,7 +98,7 @@ if xcb_dep.found()
     vlc_xcb_events_lib = library('vlc_xcb_events',
         files('xcb/events.c'),
         include_directories: [vlc_include_dirs],
-        dependencies : [xcb_dep, libvlccore_dep])
+        dependencies: [xcb_dep, libvlccore_dep])
 
     if xcb_randr_dep.found() and xproto_dep.found()
         vlc_modules += {
@@ -133,7 +133,7 @@ if xcb_dep.found()
     endif
 endif
 
-egl_dep = dependency('egl', required : false)
+egl_dep = dependency('egl', required: false)
 
 if x11_dep.found() and egl_dep.found()
     vlc_modules += {

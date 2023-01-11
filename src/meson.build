@@ -2,12 +2,12 @@
 # VLC revision file generation
 #
 git_dir = vlc_src_root / '.git'
-rev_target = vcs_tag(command : ['git',
+rev_target = vcs_tag(command: ['git',
     '--git-dir', git_dir,
     'describe', '--tags', '--long',
     '--match', '?.*.*', '--always'],
-    input : 'revision.c.in',
-    output : 'revision.c')
+    input: 'revision.c.in',
+    output: 'revision.c')
 
 #
 # FourCC preprocessor
@@ -20,10 +20,10 @@ fourcc_gen = executable('fourcc_gen',
 )
 
 fourcc = custom_target('fourcc_tables.h',
-                        output :  ['fourcc_tables.h'],
-                        depend_files : ['misc/fourcc_list.h', '../include/vlc_fourcc.h'],
-                        capture : true,
-                        command : [fourcc_gen])
+                        output:  ['fourcc_tables.h'],
+                        depend_files: ['misc/fourcc_list.h', '../include/vlc_fourcc.h'],
+                        capture: true,
+                        command: [fourcc_gen])
 
 
 #

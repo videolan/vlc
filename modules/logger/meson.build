@@ -19,7 +19,7 @@ if cc.check_header('syslog.h')
 endif
 
 # Systemd journal logger
-libsystemd_dep = dependency('libsystemd', required : false)
+libsystemd_dep = dependency('libsystemd', required: false)
 if libsystemd_dep.found()
     vlc_modules += {
         'name' : 'sd_journal',

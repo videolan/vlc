@@ -23,21 +23,21 @@ if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').e
     xcb_damage_dep = dependency('xcb-damage', required: get_option('xcb'))
     xcb_xfixes_dep = dependency('xcb-xfixes', required: get_option('xcb'))
 else
-    xcb_dep = dependency('', required : false)
+    xcb_dep = dependency('', required: false)
 endif
 
 # Check for Wayland
 if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').enabled()
-    wayland_scanner_dep = dependency('wayland-scanner', version : '>= 1.15',
-        required : get_option('wayland'), native : true)
+    wayland_scanner_dep = dependency('wayland-scanner', version: '>= 1.15',
+        required: get_option('wayland'), native: true)
 
     wayland_protocols_dep = dependency('wayland-protocols', version: '>= 1.15',
-        required : get_option('wayland'))
+        required: get_option('wayland'))
 
     wayland_deps = [
-        dependency('wayland-client', version : '>= 1.5.91', required : get_option('wayland')),
-        dependency('wayland-cursor', required : get_option('wayland')),
-        dependency('wayland-egl', required : get_option('wayland')),
+        dependency('wayland-client', version: '>= 1.5.91', required: get_option('wayland')),
+        dependency('wayland-cursor', required: get_option('wayland')),
+        dependency('wayland-egl', required: get_option('wayland')),
         wayland_scanner_dep,
         wayland_protocols_dep
     ]
@@ -66,26 +66,26 @@ endif
 pulse_dep = dependency('libpulse', version: '>= 1.0', required: get_option('pulse'))
 
 # ALSA
-alsa_dep = dependency('alsa', version : '>= 1.0.24', required : get_option('alsa'))
+alsa_dep = dependency('alsa', version: '>= 1.0.24', required: get_option('alsa'))
 
 # JACK (TODO: set required based on a get_option())
-jack_dep = dependency('jack', version : '>= 1.9.7', required : false)
+jack_dep = dependency('jack', version: '>= 1.9.7', required: false)
 if not jack_dep.found()
     # Try jack1 instead
-    jack_dep = dependency('jack', version : ['>= 0.120.1', '< 1.0'],
-        required : false)
+    jack_dep = dependency('jack', version: ['>= 0.120.1', '< 1.0'],
+        required: false)
 endif
 
 # Darwin-specific dependencies
 if host_system == 'darwin'
-    security_dep = dependency('Security', required : true)
-    coremedia_dep = dependency('CoreMedia', required : true)
-    avfoundation_dep = dependency('AVFoundation', required : true)
-    corevideo_dep = dependency('CoreVideo', required : true)
-    videotoolbox_dep = dependency('VideoToolbox', required : true)
+    security_dep = dependency('Security', required: true)
+    coremedia_dep = dependency('CoreMedia', required: true)
+    avfoundation_dep = dependency('AVFoundation', required: true)
+    corevideo_dep = dependency('CoreVideo', required: true)
+    videotoolbox_dep = dependency('VideoToolbox', required: true)
     audiounit_dep = dependency('AudioUnit', required: true)
-    audiotoolbox_dep = dependency('AudioToolbox', required : true)
-    iokit_dep = dependency('IOKit', required : true)
+    audiotoolbox_dep = dependency('AudioToolbox', required: true)
+    iokit_dep = dependency('IOKit', required: true)
     quartz_dep = dependency('QuartzCore', required: true)
     coretext_dep = dependency('CoreText', required: true)
     coreaudio_dep = dependency('CoreAudio', required: true)
@@ -124,13 +124,13 @@ if pulse_dep.found()
 endif
 
 # SRT
-srt_dep = dependency('srt', version : '>=1.3.0', required : get_option('srt'))
+srt_dep = dependency('srt', version: '>=1.3.0', required: get_option('srt'))
 
 # libRist
-librist_dep = dependency('librist', required : false)
+librist_dep = dependency('librist', required: false)
 
 # MTP
-mtp_dep = dependency('libmtp', version : '>=1.0.0', required : get_option('mtp'))
+mtp_dep = dependency('libmtp', version: '>=1.0.0', required: get_option('mtp'))
 
 # FFmpeg
 avformat_dep = dependency('libavformat', version: '>= 53.21.0', required: get_option('avformat'))
@@ -138,13 +138,13 @@ avcodec_dep  = dependency('libavcodec', version: '>= 57.37.100', required: get_o
 avutil_dep   = dependency('libavutil', version: '>= 55.22.101', required: false)
 
 # Freetype, used by text_renderer and ASS access
-freetype_dep = dependency('freetype2', required : get_option('freetype'))
+freetype_dep = dependency('freetype2', required: get_option('freetype'))
 
 # ZVBI, used by Linsys SDI access and VBI/Teletext decoders
 zvbi_dep = dependency('zvbi-0.2', version: '>= 0.2.28', required: false)
 
 # rsvg, used by SVG codec and text renderer
-rsvg_dep = dependency('librsvg-2.0', version : '>= 2.9.0', required : get_option('rsvg'))
+rsvg_dep = dependency('librsvg-2.0', version: '>= 2.9.0', required: get_option('rsvg'))
 
 # Array that holds all enabled VLC module dicts
 vlc_modules = []

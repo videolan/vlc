@@ -204,7 +204,7 @@ if get_option('vcd_module')
     vcd_cdda_flags = []
 
     # TODO: Add gcrypt dependency if it's present
-    libcddb_dep = dependency('libcddb', version : '>= 0.9.5', required : get_option('libcddb'))
+    libcddb_dep = dependency('libcddb', version: '>= 0.9.5', required: get_option('libcddb'))
     if libcddb_dep.found()
         vcd_cdda_flags += '-DHAVE_LIBCDDB'
     endif

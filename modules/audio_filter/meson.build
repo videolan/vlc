@@ -153,7 +153,7 @@ vlc_modules += {
 # simple_channel_mixer_plugin_arm_neon
 
 # Spatial audio (ambisonics/binaural) mixer
-spatial_dep = dependency('spatialaudio', required : get_option('spatialaudio'))
+spatial_dep = dependency('spatialaudio', required: get_option('spatialaudio'))
 if spatial_dep.found()
     vlc_modules += {
         'name' : 'spatialaudio',
@@ -228,7 +228,7 @@ if ebur128_dep.found()
 endif
 
 # Speex resampler
-speexdsp_dep = dependency('speexdsp', required : get_option('speexdsp'))
+speexdsp_dep = dependency('speexdsp', required: get_option('speexdsp'))
 if speexdsp_dep.found()
     vlc_modules += {
         'name' : 'speex_resampler',
@@ -238,7 +238,7 @@ if speexdsp_dep.found()
 endif
 
 # Rnnoise denoiser
-rnnoise_dep = dependency('rnnoise', required : get_option('rnnoise'))
+rnnoise_dep = dependency('rnnoise', required: get_option('rnnoise'))
 if rnnoise_dep.found()
     vlc_modules += {
 	'name' : 'rnnoise',

@@ -1,7 +1,7 @@
 project('VLC', ['c', 'cpp'],
-    version : '4.0.0-dev',
-    default_options : ['c_std=gnu11', 'cpp_std=c++14'],
-    meson_version : '>=0.60.0')
+    version: '4.0.0-dev',
+    default_options: ['c_std=gnu11', 'cpp_std=c++14'],
+    meson_version: '>=0.60.0')
 
 vlc_copyright_years = '1996-2018'
 vlc_version_codename = 'Otto Chriek'
@@ -53,7 +53,7 @@ vlc_about = custom_target('vlc_about.h',
                                    '@INPUT2@',
                                    '@OUTPUT@'])
 
-add_project_arguments('-DHAVE_CONFIG_H=1', language : ['c', 'cpp', 'objc'])
+add_project_arguments('-DHAVE_CONFIG_H=1', language: ['c', 'cpp', 'objc'])
 
 # If building with contribs, read the relevant paths from the machine file
 # to use it during checks (check_header, find_library) later.
@@ -256,11 +256,11 @@ if host_system == 'darwin'
 
     # Check if compiling for iOS
     have_ios = cc.get_define('TARGET_OS_IPHONE',
-        prefix : '#include <TargetConditionals.h>') == '1'
+        prefix: '#include <TargetConditionals.h>') == '1'
 
     # Check if compiling for tvOS
     have_tvos = cc.get_define('TARGET_OS_TV',
-        prefix : '#include <TargetConditionals.h>') == '1'
+        prefix: '#include <TargetConditionals.h>') == '1'
 
     # If none of the above, assume compiling for macOS
     have_osx = not have_ios and not have_tvos
@@ -320,7 +320,7 @@ windows_version_test = '''
 
         # Check which kind of MinGW
         mingw_version_major = cc.get_define('__MINGW64_VERSION_MAJOR',
-            prefix : '#include <_mingw.h>')
+            prefix: '#include <_mingw.h>')
 
         if mingw_version_major == ''
             error('Cannot compile with MinGW, use MinGW-w64 >= 5.0 instead.')
@@ -334,7 +334,7 @@ windows_version_test = '''
         have_mingw = true
 
         mingw_version_minor = cc.get_define('__MINGW64_VERSION_MINOR',
-            prefix : '#include <_mingw.h>')
+            prefix: '#include <_mingw.h>')
 
         mingw_version = '@0@.@1@'.format(mingw_version_major, mingw_version_minor)
         message('Using MinGW-w64 ' + mingw_version)
@@ -359,7 +359,7 @@ windows_version_test = '''
         endforeach
 
         # Check for the need to link to the mingwex lib for MinGW-w64 32bit
-        mingwex_lib = cc.find_library('mingwex', required : false)
+        mingwex_lib = cc.find_library('mingwex', required: false)
 
         if mingwex_lib.found() and not cc.find_library('mingw32', required: false).found()
             mingw_libs += mingwex_lib
@@ -371,17 +371,17 @@ windows_version_test = '''
         # Check for fnative-struct or mms-bitfields support for MinGW
         if cc.has_argument('-mms-bitfields')
             add_project_arguments('-mms-bitfields',
-                language : ['c', 'cpp'])
+                language: ['c', 'cpp'])
             # Check for the warning flag without "-Wno-", GCC accepts
             # -Wno-<anything> for unsupported warnings, which can trigger
             # other warnings instead.
             if cc.has_argument('-Wincompatible-ms-struct')
                 add_project_arguments('-Wno-incompatible-ms-struct',
-                    language : ['c', 'cpp'])
+                    language: ['c', 'cpp'])
             endif
         elif cc.has_argument('-fnative-struct')
             add_project_arguments('-fnative-struct',
-                    language : ['c', 'cpp'])
+                    language: ['c', 'cpp'])
         endif
 
         # DEP, ASLR, NO SEH
@@ -404,9 +404,9 @@ windows_version_test = '''
 endif
 
 if cc.has_argument('-Werror-implicit-function-declaration')
-    add_project_arguments('-Werror-implicit-function-declaration', language : ['c', 'cpp'])
+    add_project_arguments('-Werror-implicit-function-declaration', language: ['c', 'cpp'])
 elif cc.has_argument('-we4013')
-    add_project_arguments('-we4013', language : ['c', 'cpp'])
+    add_project_arguments('-we4013', language: ['c', 'cpp'])
 endif
 
 #
@@ -524,7 +524,7 @@ foreach f : check_functions
     # then not found using the other header, it would overwrite
     # the previous value!
 
-    if cc.has_function(f[0], prefix : vlc_conf_prefix + f[1], dependencies: [socket_libs])
+    if cc.has_function(f[0], prefix: vlc_conf_prefix + f[1], dependencies: [socket_libs])
         cdata.set('HAVE_' + f[0].underscorify().to_upper(), 1)
     endif
 endforeach
@@ -596,7 +596,7 @@ endif
 
 # Check all functions in libcompat_functions array
 foreach f : libcompat_functions
-    if cc.has_function(f[0], prefix : vlc_conf_prefix + f[1], dependencies: [rt_lib, socket_libs])
+    if cc.has_function(f[0], prefix: vlc_conf_prefix + f[1], dependencies: [rt_lib, socket_libs])
         cdata.set('HAVE_' + f[0].underscorify().to_upper(), 1)
     else
         libcompat_sources += f[0] + '.c'
@@ -614,7 +614,7 @@ libcompat_functions = [
 ]
 
 foreach f : libcompat_functions
-    if cc.has_header_symbol(f[1], f[0], prefix : vlc_conf_prefix)
+    if cc.has_header_symbol(f[1], f[0], prefix: vlc_conf_prefix)
         cdata.set('HAVE_' + f[0].underscorify().to_upper(), 1)
     else
         libcompat_sources += f[0] + '.c'
@@ -691,7 +691,7 @@ endif
 
 # Check for __attribute__((packed)) support
 if cc.compiles('struct __attribute__((packed)) foo { int bar; };',
-               name : '__attribute__((packed))')
+               name: '__attribute__((packed))')
     cdata.set('HAVE_ATTRIBUTE_PACKED', 1)
 endif
 
@@ -726,7 +726,7 @@ endif
 # Add -fvisibility=hidden if compiler supports those
 add_project_arguments(
     cc.get_supported_arguments('-fvisibility=hidden'),
-    language : ['c'])
+    language: ['c'])
 
 # Check for struct sockaddr_storage type
 # Define it to `sockaddr` if missing
@@ -768,16 +768,16 @@ if cc.has_type('struct pollfd', prefix: '\n'.join([vlc_conf_prefix, pollfd_prefi
 endif
 
 # Check for if_nameindex function and struct
-if cc.has_function('if_nameindex', prefix : '#include <net/if.h>')
+if cc.has_function('if_nameindex', prefix: '#include <net/if.h>')
   cdata.set('HAVE_IF_NAMEINDEX', 1)
 endif
 
-if cc.has_type('struct if_nameindex', prefix : '#include <net/if.h>')
+if cc.has_type('struct if_nameindex', prefix: '#include <net/if.h>')
   cdata.set('HAVE_STRUCT_IF_NAMEINDEX', 1)
 endif
 
 # Check for locale_t type in C++ locale header
-if cpp.has_type('locale_t', prefix : '#include <locale>')
+if cpp.has_type('locale_t', prefix: '#include <locale>')
     cdata.set('HAVE_CXX_LOCALE_T', 1)
 endif
 
