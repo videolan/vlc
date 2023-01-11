@@ -89,7 +89,7 @@ if pulse_dep.found()
 endif
 
 # AVFoundation audio capture access
-if host_system == 'darwin'
+if have_osx
     vlc_modules += {
         'name' : 'avaudiocapture',
         'sources' : files('avaudiocapture.m'),
@@ -114,7 +114,7 @@ endif
 
 # macOS AVFoundation-based video capture
 if (get_option('macosx_avfoundation')
-    .require(host_system == 'darwin', error_message: 'AVCapture requires macOS/iOS')
+    .require(have_osx and host_system == 'darwin', error_message: 'AVCapture requires macOS')
     .allowed())
     vlc_modules += {
         'name' : 'avcapture',
@@ -222,7 +222,7 @@ if get_option('vcd_module')
     endif
 
     if (needed_vcd_unix_headers_present or 
-        host_system in ['darwin', 'windows'])
+        host_system in ['windows'] or have_osx)
 
         vcd_cdda_darwin_deps = []
         if host_system == 'darwin'
