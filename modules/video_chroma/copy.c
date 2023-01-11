@@ -1107,7 +1107,9 @@ int main(void)
     alarm(10);
 
 #ifndef COPY_TEST_NOOPTIM
+#ifdef CAN_COMPILE_SSE2
     if (!vlc_CPU_SSE2())
+#endif
     {
         fprintf(stderr, "WARNING: could not test SSE\n");
         return 77;
