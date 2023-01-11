@@ -10,6 +10,10 @@ libplacebo_dep = dependency('libplacebo',
 opengl_dep = dependency('gl', required: false)
 opengles2_dep = dependency('glesv2', required: get_option('gles2'))
 
+if host_system == 'darwin'
+    subdir('apple')
+endif
+
 if libplacebo_dep.found()
     libplacebo_utils = static_library('vlc_libplacebo_utils',
                                   files('./libplacebo/utils.c'),
