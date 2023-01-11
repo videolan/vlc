@@ -57,7 +57,7 @@ vlc_modules += {
 # Raw PCM demux module
 vlc_modules += {
     'name' : 'araw',
-    'sources' : files(['araw.c']),
+    'sources' : files('araw.c'),
 }
 
 # faad decoder plugin

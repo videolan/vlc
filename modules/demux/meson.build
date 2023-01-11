@@ -69,7 +69,7 @@ vlc_modules += {
 # WAV demux module
 vlc_modules += {
     'name' : 'wav',
-    'sources' : files(['wav.c']),
+    'sources' : files('wav.c'),
 }
 
 # NSV demux
@@ -122,7 +122,7 @@ vlc_modules += {
 # Subtitle demux
 vlc_modules += {
     'name' : 'subtitle',
-    'sources' : files(['subtitle.c']),
+    'sources' : files('subtitle.c'),
     'dependencies' : [m_lib]
 }
 
