@@ -254,8 +254,7 @@ if host_system == 'darwin'
             coregraphics_dep,
             coreimage_dep,
             corevideo_dep,
-            (have_osx) ? dependency('gl', required: true) : []
-            # Add OpenGLES dependency for iOS
+            (have_osx) ? dependency('gl', required: true) : opengles_dep
         ],
         'include_directories' : [include_directories('../codec')]
     }
