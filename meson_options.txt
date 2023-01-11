@@ -596,6 +596,11 @@ option('udev',
     value: 'auto',
     description: 'Linux udev services discovery')
 
+option('rist',
+    type: 'feature',
+    value: 'auto',
+    description: 'librist support for access and access_output')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
