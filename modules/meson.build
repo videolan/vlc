@@ -96,11 +96,13 @@ endif
 # macOS specific dependencies
 if have_osx
     cocoa_dep = dependency('Cocoa', required: true)
+    opengl_dep = dependency('OpenGL', required: true)
 endif
 
 # iOS/tvOS specific dependencies
 if have_ios or have_tvos
     uikit_dep = dependency('UIKit', required: true)
+    opengles_dep = dependency('OpenGLES', required: true)
 endif
 
 # Windows-specific dependencies
