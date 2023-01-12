@@ -42,10 +42,8 @@
 #mesondefine UNICODE
 #mesondefine _UNICODE
 
-# ifndef _WIN32_WINNT
 /* Define for Windows 7 APIs. */
 #mesondefine _WIN32_WINNT
-# endif
 
 # ifndef _WIN32_IE
 /* Define for IE 6.0 (and shell) APIs. */

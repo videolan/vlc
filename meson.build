@@ -284,8 +284,23 @@ if host_system == 'windows'
     # Defines needed for Windows
     windows_defines = [
         ['UNICODE',      1], # Define to 1 for Unicode (Wide Chars) APIs
-        ['_WIN32_WINNT', '0x0601'], # Define for Windows 7 APIs
     ]
+
+windows_version_test = '''
+#ifdef _WIN32_WINNT
+# error _WIN32_WINNT already defined
+#else
+# include <windows.h>
+# if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0601
+#  error _WIN32_WINNT toolchain default high enough
+# endif
+#endif
+'''
+    if cc.compiles(windows_version_test, name: 'need _WIN32_WINNT defined to Win7')
+        windows_defines += [
+            ['_WIN32_WINNT', '0x0601'] # Define for Windows 7 APIs
+        ]
+    endif
 
     foreach d : windows_defines
         cdata.set(d.get(0), d.get(1))
