@@ -347,7 +347,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 
     AVCaptureDeviceInput    *input = nil;
 
-    int                     i, i_width, i_height, deviceCount, ivideo;
+    int                     deviceCount, ivideo;
 
     char                    *psz_uid = NULL;
 
