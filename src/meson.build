@@ -42,9 +42,21 @@ if host_system == 'darwin'
     libvlccore_deps += corefoundation_dep
     libvlccore_deps += dependency('CFNetwork', required: true)
 elif host_system == 'windows'
+min_windows_version_test = '''
+#include <sdkddkver.h>
+#if !defined(@0@)
+# error SDK too old for @0@
+#elif _WIN32_WINNT < @0@
+# error building for older version than @0@
+#endif
+'''
+
     libvlccore_deps += cc.find_library('bcrypt')
     libvlccore_deps += cc.find_library('winmm')
     libvlccore_deps += cc.find_library('normaliz')
+    if cc.compiles(min_windows_version_test.format('_WIN32_WINNT_WIN8'), name: 'Compiling for Win8+')
+        libvlccore_deps += cc.find_library('synchronization')
+    endif
     vlccore_cargs += ['-DVLC_DLL_EXPORT']
 endif
 
