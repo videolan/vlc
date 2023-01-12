@@ -347,10 +347,6 @@ windows_version_test = '''
             ['_ISOC11_SOURCE',              1], # Extensions to ISO C99 from ISO C11
             ['_POSIX_SOURCE',               1], # IEEE Std 1003.1
             ['_POSIX_C_SOURCE',             '200809L'], #IEEE Std 1003.1
-            ['_XOPEN_SOURCE',               700], # POSIX and XPG 7th edition
-            ['_XOPEN_SOURCE_EXTENDED',      1], # XPG things and X/Open Unix extensions
-            ['_BSD_SOURCE',                 1], # ISO C, POSIX, and 4.3BSD things
-            ['_SVID_SOURCE',                1], # ISO C, POSIX, and SVID things
         ]
 
         foreach d : mingw_defines

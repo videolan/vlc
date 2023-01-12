@@ -18,9 +18,6 @@
 /* Define if the zvbi module is built */
 // #undef ZVBI_COMPILED
 
-/* ISO C, POSIX, and 4.3BSD things. */
-#mesondefine _BSD_SOURCE
-
 /* Define to 64 for large files support. */
 #mesondefine _FILE_OFFSET_BITS
 
@@ -56,18 +53,6 @@
 
 /* IEEE Std 1003.1. */
 #mesondefine _POSIX_C_SOURCE
-
-/* POSIX and XPG 7th edition */
-#mesondefine _XOPEN_SOURCE
-
-/* TODO: Still needed? XPG things and X/Open Unix extensions. */
-#mesondefine _XOPEN_SOURCE_EXTENDED
-
-/* ISO C, POSIX, and 4.3BSD things. */
-#mesondefine _BSD_SOURCE
-
-/* ISO C, POSIX, and SVID things. */
-#mesondefine _SVID_SOURCE
 
 /* Define to 1 to force use of MinGW provided C99 *printf over msvcrt */
 #mesondefine __USE_MINGW_ANSI_STDIO
