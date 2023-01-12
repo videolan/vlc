@@ -98,10 +98,6 @@ vlc_include_dirs = include_directories(list_inc_dirs)
 
 if host_system == 'darwin'
     add_languages('objc', native: false)
-    add_project_arguments('-mmacosx-version-min=10.11',
-        language: ['c', 'cpp', 'objc'])
-    add_project_link_arguments('-mmacosx-version-min=10.11',
-        language: ['c', 'cpp', 'objc'])
 endif
 
 #
@@ -269,6 +265,13 @@ else
     have_ios = false
     have_tvos = false
     have_osx = false
+endif
+
+if have_osx
+    add_project_arguments('-mmacosx-version-min=10.11',
+        language: ['c', 'cpp', 'objc'])
+    add_project_link_arguments('-mmacosx-version-min=10.11',
+        language: ['c', 'cpp', 'objc'])
 endif
 
 
