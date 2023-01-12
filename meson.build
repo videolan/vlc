@@ -403,6 +403,47 @@ windows_version_test = '''
 
 endif
 
+add_project_arguments(cc.get_supported_arguments([
+    '-Wno-deprecated-copy', # Some Qt version are generating tons of warning that cannot be
+                            # avoided so mute them
+]), language: ['c', 'cpp', 'objc'])
+
+add_project_arguments(cc.get_supported_arguments([
+    '-Wextra',
+    '-Wsign-compare',
+    '-Wundef',
+    '-Wpointer-arith',
+    '-Wvolatile-register-var',
+    '-Wformat',
+    '-Wformat-security',
+    '-Wduplicated-branches',
+    '-Wduplicated-cond',
+]), language: ['c', 'cpp'])
+
+add_project_arguments(cc.get_supported_arguments([
+    '-Wbad-function-cast',
+    '-Wwrite-strings',
+    '-Wmissing-prototypes',
+    '-Werror-implicit-function-declaration',
+    '-Winit-self',
+    '-Wlogical-op',
+    '-Wshadow=local',
+    '-Wmultistatement-macros',
+    '-pipe'
+]), language: ['c'])
+
+if get_option('branch_protection') \
+    .require(host_machine.cpu_family() == 'aarch64', error_message: 'Branch protection is only available for AArch64') \
+    .require(cc.has_argument('-mbranch-protection=standard'), error_message: 'Compiler does not support `-mbranch-protection`') \
+    .allowed()
+    add_project_arguments('-mbranch-protection=standard', language: ['c', 'cpp'])
+endif
+
+if cc.get_id() not in ['clang-cl']
+    add_project_arguments(cc.get_supported_arguments([
+        '-Wall', # too verbose with clang-cl
+    ]), language: ['c', 'cpp'])
+endif
 
 add_project_arguments(cc.first_supported_argument(['-Werror-implicit-function-declaration', '-we4013']), language: ['c'])
 
