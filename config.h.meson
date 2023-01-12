@@ -45,11 +45,6 @@
 /* Define for Windows 7 APIs. */
 #mesondefine _WIN32_WINNT
 
-# ifndef _WIN32_IE
-/* Define for IE 6.0 (and shell) APIs. */
-#mesondefine _WIN32_IE
-# endif
-
 /* Extensions to ISO C89 from ISO C99. */
 #mesondefine _ISOC99_SOURCE
 
