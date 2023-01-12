@@ -72,7 +72,12 @@ struct vlc_thumbnailer_request_t
 
     vlc_mutex_t lock;
     vlc_cond_t cond_ended;
-    bool ended;
+    enum
+    {
+        RUNNING,
+        INTERRUPTED,
+        ENDED,
+    } status;
     picture_t *pic;
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
@@ -101,7 +106,7 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
 
     vlc_mutex_init(&task->lock);
     vlc_cond_init(&task->cond_ended);
-    task->ended = false;
+    task->status = RUNNING;
     task->pic = NULL;
 
     task->runnable.run = RunnableRun;
@@ -139,8 +144,6 @@ static void NotifyThumbnail(task_t *task, picture_t *pic)
 {
     assert(task->cb);
     task->cb(task->userdata, pic);
-    if (pic)
-        picture_Release(pic);
 }
 
 static void
@@ -156,7 +159,7 @@ on_thumbnailer_input_event( input_thread_t *input,
     task_t *task = userdata;
 
     vlc_mutex_lock(&task->lock);
-    if (task->ended)
+    if (task->status != RUNNING)
     {
         /* We may receive a THUMBNAIL_READY event followed by an
          * INPUT_EVENT_STATE (end of stream), we must only consider the first
@@ -165,7 +168,7 @@ on_thumbnailer_input_event( input_thread_t *input,
         return;
     }
 
-    task->ended = true;
+    task->status = ENDED;
 
     if (event->type == INPUT_EVENT_THUMBNAIL_READY)
         task->pic = picture_Hold(event->thumbnail);
@@ -209,22 +212,28 @@ RunnableRun(void *userdata)
     vlc_mutex_lock(&task->lock);
     if (task->timeout == VLC_TICK_INVALID)
     {
-        while (!task->ended)
+        while (task->status == RUNNING)
             vlc_cond_wait(&task->cond_ended, &task->lock);
     }
     else
     {
         vlc_tick_t deadline = now + task->timeout;
         bool timeout = false;
-        while (!task->ended && !timeout)
+        while (task->status == RUNNING && !timeout)
             timeout =
                 vlc_cond_timedwait(&task->cond_ended, &task->lock, deadline);
     }
     picture_t* pic = task->pic;
     task->pic = NULL;
+
+    bool notify = task->status != INTERRUPTED;
     vlc_mutex_unlock(&task->lock);
 
-    NotifyThumbnail(task, pic);
+    if (notify)
+        NotifyThumbnail(task, pic);
+
+    if (pic != NULL)
+        picture_Release(pic);
 
     input_Stop(input);
     input_Close(input);
@@ -239,7 +248,7 @@ Interrupt(task_t *task)
 {
     /* Wake up RunnableRun() which will call input_Stop() */
     vlc_mutex_lock(&task->lock);
-    task->ended = true;
+    task->status = INTERRUPTED;
     vlc_mutex_unlock(&task->lock);
     vlc_cond_signal(&task->cond_ended);
 }

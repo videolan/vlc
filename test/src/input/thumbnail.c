@@ -162,14 +162,10 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
 static void thumbnailer_callback_cancel( void* data, picture_t* p_thumbnail )
 {
-    struct test_ctx* p_ctx = data;
-    assert( p_thumbnail == NULL );
-    vlc_mutex_lock( &p_ctx->lock );
-    p_ctx->b_done = true;
-    vlc_cond_signal( &p_ctx->cond );
-    vlc_mutex_unlock( &p_ctx->lock );
+    (void) data; (void) p_thumbnail;
+    /* This callback should not be called since the request is cancelled */
+    vlc_assert_unreachable();
 }
-
 
 static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 {
@@ -177,28 +173,22 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
                 VLC_OBJECT( p_vlc->p_libvlc_int ) );
     assert( p_thumbnailer != NULL );
 
-    struct test_ctx ctx;
-    ctx.b_done = false;
-    vlc_cond_init( &ctx.cond );
-    vlc_mutex_init( &ctx.lock );
-
-    const char* psz_mrl = "mock://video_track_count=1;audio_track_count=1";
+    const char* psz_mrl = "mock://video_track_count=0;audio_track_count=1;"
+                          /* force timeout: parsing will take the same time as length */
+                          "can_control_pace=false;"
+                          "length=200";
     input_item_t* p_item = input_item_New( psz_mrl, "mock item" );
     assert( p_item != NULL );
 
-    vlc_mutex_lock( &ctx.lock );
-    int res = 0;
     vlc_thumbnailer_request_t* p_req = vlc_thumbnailer_RequestByTime( p_thumbnailer,
-        VLC_TICK_FROM_SEC( 1 ), VLC_THUMBNAILER_SEEK_PRECISE, p_item,
-        VLC_TICK_INVALID, thumbnailer_callback_cancel, &ctx );
+        VLC_TICK_INVALID, VLC_THUMBNAILER_SEEK_PRECISE, p_item,
+        VLC_TICK_INVALID, thumbnailer_callback_cancel, NULL );
+
     vlc_thumbnailer_Cancel( p_thumbnailer, p_req );
-    while ( ctx.b_done == false )
-    {
-        vlc_tick_t timeout = vlc_tick_now() + VLC_TICK_FROM_SEC( 1 );
-        res = vlc_cond_timedwait( &ctx.cond, &ctx.lock, timeout );
-        assert( res != ETIMEDOUT );
-    }
-    vlc_mutex_unlock( &ctx.lock );
+
+    /* Check that thumbnailer_callback_cancel is not called, even after the
+     * normal termination of the parsing. */
+    (vlc_tick_sleep)(VLC_TICK_FROM_MS(250));
 
     input_item_Release( p_item );
 
