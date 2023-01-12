@@ -192,7 +192,7 @@ RunnableRun(void *userdata)
             input_Create( thumbnailer->parent, on_thumbnailer_input_event, task,
                           task->item, INPUT_TYPE_THUMBNAILING, NULL, NULL );
     if (!input)
-        goto end;
+        goto error;
 
     if (task->seek_target.type == VLC_THUMBNAILER_SEEK_TIME)
         input_SetTime(input, task->seek_target.time, task->fast_seek);
@@ -206,7 +206,7 @@ RunnableRun(void *userdata)
     if (ret != VLC_SUCCESS)
     {
         input_Close(input);
-        goto end;
+        goto error;
     }
 
     vlc_mutex_lock(&task->lock);
@@ -229,6 +229,8 @@ RunnableRun(void *userdata)
     bool notify = task->status != INTERRUPTED;
     vlc_mutex_unlock(&task->lock);
 
+    ThumbnailerRemoveTask(thumbnailer, task);
+
     if (notify)
         NotifyThumbnail(task, pic);
 
@@ -238,7 +240,10 @@ RunnableRun(void *userdata)
     input_Stop(input);
     input_Close(input);
 
-end:
+    TaskDelete(task);
+    return;
+
+error:
     ThumbnailerRemoveTask(thumbnailer, task);
     TaskDelete(task);
 }
