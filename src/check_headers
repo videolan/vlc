@@ -12,7 +12,7 @@ while read l; do
 	test -z "$d" && continue
 	test "$d" = "WORDS_BIGENDIAN" && continue
 	test "$d" = "UNICODE" && continue
-	test "$d" = "__LIBVLC__" && continue
+	test "$d" = "LIBVLC_INTERNAL_" && continue
 
 	if test -z "$regexp"; then
 		regexp="[^A-Za-z0-9_]\("

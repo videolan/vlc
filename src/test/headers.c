@@ -25,10 +25,10 @@
 
 #define PACKAGE "vlc"
 
-/* Because we are from src/ __LIBVLC__ is defined, but we don't want that,
+/* Because we are from src/ LIBVLC_INTERNAL_ is defined, but we don't want that,
  * as we act here as a third-party program just linking to libvlc */
-#ifdef __LIBVLC__
-# undef __LIBVLC__
+#ifdef LIBVLC_INTERNAL_
+# undef LIBVLC_INTERNAL_
 #endif
 
 #include <vlc/vlc.h>

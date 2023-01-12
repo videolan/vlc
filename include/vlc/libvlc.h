@@ -42,7 +42,7 @@
 # define LIBVLC_API
 #endif
 
-#ifdef __LIBVLC__
+#ifdef LIBVLC_INTERNAL_
 /* Avoid unhelpful warnings from libvlc with our deprecated APIs */
 #   define LIBVLC_DEPRECATED
 #elif defined(__GNUC__) && \

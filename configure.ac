@@ -48,7 +48,7 @@ AH_VERBATIM([FORTIFY_SOURCE],
 # define _FORTIFY_SOURCE 2
 #endif])
 AC_DEFINE([_FILE_OFFSET_BITS], 64, [Define to 64 for large files support.])
-AC_DEFINE([__LIBVLC__],, [Define within the LibVLC source code tree.])
+AC_DEFINE([LIBVLC_INTERNAL_],, [Define within the LibVLC source code tree.])
 AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Define to limit the scope of <windows.h>.])
 
 AC_PROG_CXX

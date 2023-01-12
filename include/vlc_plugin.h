@@ -577,7 +577,7 @@ int CDECL_SYMBOL VLC_SYMBOL(vlc_entry_cfg_str_enum)(const char *name, \
     "\x47\x4e\x55\x20\x47\x65\x6e\x65\x72\x61\x6c\x20\x50\x75\x62\x6c" \
     "\x69\x63\x20\x4c\x69\x63\x65\x6e\x73\x65\x2c\x20\x76\x65\x72\x73" \
     "\x69\x6f\x6e\x20\x32\x20\x6f\x72\x20\x6c\x61\x74\x65\x72\x2e"
-#if defined (__LIBVLC__)
+#if defined (LIBVLC_INTERNAL_)
 # define VLC_MODULE_COPYRIGHT VLC_COPYRIGHT_VIDEOLAN
 # ifndef VLC_MODULE_LICENSE
 #  define VLC_MODULE_LICENSE VLC_LICENSE_LGPL_2_1_PLUS

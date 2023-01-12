@@ -298,7 +298,7 @@
  *
  * This macro performs a run-time assertion if C assertions are enabled
  * and the following preprocessor symbol is defined:
- * @verbatim __LIBVLC__ @endverbatim
+ * @verbatim LIBVLC_INTERNAL_ @endverbatim
  * That restriction ensures that assertions in public header files are not
  * unwittingly <i>leaked</i> to externally-compiled plug-ins
  * including those header files.
@@ -306,7 +306,7 @@
  * Within the LibVLC code base, this is exactly the same as assert(), which can
  * and probably should be used directly instead.
  */
-#ifdef __LIBVLC__
+#ifdef LIBVLC_INTERNAL_
 # define vlc_assert(pred) assert(pred)
 #else
 # define vlc_assert(pred) ((void)0)
