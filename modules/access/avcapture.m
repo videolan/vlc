@@ -209,8 +209,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (vlc_tick_t)copyCurrentFrameToBuffer:(void *)buffer
 {
     CVImageBufferRef imageBuffer;
-    vlc_tick_t pts;
-
     void *pixels;
 
     if ( !currentImageBuffer || currentPts == previousPts )
@@ -221,7 +219,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         imageBuffer = CVBufferRetain(currentImageBuffer);
         if (imageBuffer)
         {
-            pts = previousPts = currentPts;
+            previousPts = currentPts;
             CVPixelBufferLockBaseAddress(imageBuffer, 0);
             pixels = CVPixelBufferGetBaseAddress(imageBuffer);
             if (pixels)
