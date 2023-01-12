@@ -3173,6 +3173,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
     *pi_sync_sample = i_sample;
 
     const MP4_Box_t *p_stss;
+    /* try sync points without recovery roll */
     if( ( p_stss = MP4_BoxGet( p_track->p_stbl, "stss" ) ) )
     {
         const MP4_Box_data_stss_t *p_stss_data = BOXDATA(p_stss);
@@ -3192,13 +3193,17 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
         }
     }
 
-    /* try or refine using RAP samples groups */
+    /* try or refine using RAP with recovery roll info */
+    uint32_t i_alternative_sync_sample = i_sample;
     if( MP4_SampleToGroupInfo( p_track->p_stbl, i_sample, SAMPLEGROUP_rap,
-                               0, pi_sync_sample, true, NULL ) )
+                               0, &i_alternative_sync_sample, true, NULL ) )
     {
         i_ret = VLC_SUCCESS;
         msg_Dbg( p_demux, "tk %u sbgp gives %d --> %" PRIu32 " (sample number)",
-                 p_track->i_track_ID, i_sample, *pi_sync_sample );
+                 p_track->i_track_ID, i_sample, i_alternative_sync_sample );
+        if( i_alternative_sync_sample > *pi_sync_sample &&
+            i_alternative_sync_sample < i_sample )
+            *pi_sync_sample = i_alternative_sync_sample;
     }
 
     return i_ret;
