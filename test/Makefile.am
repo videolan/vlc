@@ -35,6 +35,7 @@ check_PROGRAMS = \
 	test_src_misc_bits \
 	test_src_misc_epg \
 	test_src_misc_keystore \
+	test_src_misc_image \
 	test_src_video_output \
 	test_src_video_output_opengl \
 	test_modules_packetizer_helpers \
@@ -199,6 +200,9 @@ test_src_input_decoder_SOURCES = \
 	src/input/decoder/input_decoder.h \
 	src/input/decoder/input_decoder_scenarios.c
 test_src_input_decoder_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_src_misc_image_SOURCES = src/misc/image.c
+test_src_misc_image_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
