@@ -292,7 +292,7 @@ static void Close(vlc_object_t *p_this)
 
     /* Signal ARC we won't use those references anymore. */
     p_demux->p_sys = nil;
-    demux = nil;
+    (void)demux;
 }
 
 /*****************************************************************************
