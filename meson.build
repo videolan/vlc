@@ -403,11 +403,8 @@ windows_version_test = '''
 
 endif
 
-if cc.has_argument('-Werror-implicit-function-declaration')
-    add_project_arguments('-Werror-implicit-function-declaration', language: ['c', 'cpp'])
-elif cc.has_argument('-we4013')
-    add_project_arguments('-we4013', language: ['c', 'cpp'])
-endif
+
+add_project_arguments(cc.first_supported_argument(['-Werror-implicit-function-declaration', '-we4013']), language: ['c'])
 
 #
 # Check if other libs are needed
