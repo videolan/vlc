@@ -159,9 +159,9 @@ static int check2(es_out_t *out, struct context *, FakeESOut *fakees)
         SEND(TMS(100000));
 
         first = fakees->commandsQueue()->getFirstTimes();
-        fprintf(stderr,"first.continuous %ld", first.continuous);
+        fprintf(stderr,"first.continuous %" PRId64 "\n", first.continuous);
         Expect(first.continuous == TMS(100000));
-        fprintf(stderr,"first.segment.demux %ld", first.segment.demux);
+        fprintf(stderr,"first.segment.demux %" PRId64 "\n", first.segment.demux);
         Expect(first.segment.demux == TMS(100000));
 
         fakees->resetTimestamps();
@@ -175,7 +175,7 @@ static int check2(es_out_t *out, struct context *, FakeESOut *fakees)
         SEND(TMS(100000 + 5000));
         PCR(TMS(100000 + 5000));
         first = fakees->commandsQueue()->getFirstTimes();
-        fprintf(stderr,"first %ld\n", first.continuous);
+        fprintf(stderr,"first %" PRId64 "\n", first.continuous);
         Expect(first.continuous == TMS(60000));
 
         fakees->resetTimestamps();
@@ -188,7 +188,7 @@ static int check2(es_out_t *out, struct context *, FakeESOut *fakees)
         SEND(TMS(500000));
         PCR(TMS(500000));
         first = fakees->commandsQueue()->getFirstTimes();
-        fprintf(stderr,"first %ld\n", first.continuous);
+        fprintf(stderr,"first %" PRId64 "\n", first.continuous);
         Expect(first.continuous == TMS(60000));
 
         /* setAssociatedTimestamp check explicit rolled MPEGTS timestamp mapping (WebVTT) */
@@ -198,7 +198,7 @@ static int check2(es_out_t *out, struct context *, FakeESOut *fakees)
         SEND(TMS(500000));
         PCR(TMS(500000));
         first = fakees->commandsQueue()->getFirstTimes();
-        fprintf(stderr,"first %ld\n", first.continuous);
+        fprintf(stderr,"first %" PRId64 "\n", first.continuous);
         Expect(first.continuous == TMS(60000));
 
     } catch (...) {
@@ -247,7 +247,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         Expect(fakees->commandsQueue()->getBufferingLevel().continuous == reference);
         vlc_tick_t ts = TMS(1000) + FROM_MPEGTS(0x1FFFFFFFF);
         ts = fakees->applyTimestampContinuity(ts);
-        fprintf(stderr, "timestamp %ld\n", ts);
+        fprintf(stderr, "timestamp %" PRId64 "\n", ts);
         Expect(ts == reference + DMS(1000));
 
         /* Reference has local multiple rolled timestamp < multiple rolled ts */
@@ -259,7 +259,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         PCR(reference);
         ts = TMS(1000) + FROM_MPEGTS(0x1FFFFFFFF) * 5;
         ts = fakees->applyTimestampContinuity(ts);
-        fprintf(stderr, "timestamp %ld\n", ts);
+        fprintf(stderr, "timestamp %" PRId64 "\n", ts);
         Expect(ts == reference + DMS(1000));
 
 
@@ -273,7 +273,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         Expect(fakees->commandsQueue()->getBufferingLevel().continuous == reference);
         ts = VLC_TICK_0 + 1;
         ts = fakees->applyTimestampContinuity(ts);
-        fprintf(stderr, "timestamp %ld\n", ts);
+        fprintf(stderr, "timestamp %" PRId64 "\n", ts);
         Expect(ts == reference + 1);
 
         /* Reference has local timestamp mutiple rolled > multiple rolled ts */
@@ -286,7 +286,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         Expect(fakees->commandsQueue()->getBufferingLevel().continuous == reference);
         ts = VLC_TICK_0 + 1 + FROM_MPEGTS(0x1FFFFFFFF) * 2;
         ts = fakees->applyTimestampContinuity(ts);
-        fprintf(stderr, "timestamp %ld\n", ts);
+        fprintf(stderr, "timestamp %" PRId64 "\n", ts);
         Expect(ts == reference + 1);
 
         /* Do not trigger unwanted roll on long playbacks due to
