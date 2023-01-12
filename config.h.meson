@@ -42,12 +42,6 @@
 /* Define for Windows 7 APIs. */
 #mesondefine _WIN32_WINNT
 
-/* Extensions to ISO C89 from ISO C99. */
-#mesondefine _ISOC99_SOURCE
-
-/* Extensions to ISO C99 from ISO C11. */
-#mesondefine _ISOC11_SOURCE
-
 /* IEEE Std 1003.1. */
 #mesondefine _POSIX_SOURCE
 

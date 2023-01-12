@@ -343,8 +343,6 @@ windows_version_test = '''
 
         mingw_defines = [
             ['__USE_MINGW_ANSI_STDIO',      1], # Define to force use of MinGW printf
-            ['_ISOC99_SOURCE',              1], # Extensions to ISO C89 from ISO C99
-            ['_ISOC11_SOURCE',              1], # Extensions to ISO C99 from ISO C11
             ['_POSIX_SOURCE',               1], # IEEE Std 1003.1
             ['_POSIX_C_SOURCE',             '200809L'], #IEEE Std 1003.1
         ]
