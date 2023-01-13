@@ -63,7 +63,7 @@ static const struct
 static const struct
 {
     const uint32_t xa9_type;
-    const char metadata[25];
+    const char metadata[26];
 } xa9typetoextrameta[] = {
     { ATOM_0xa9wrt, N_("Writer") },
     { ATOM_0xa9com, N_("Composer") },
