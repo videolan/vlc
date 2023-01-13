@@ -539,7 +539,11 @@ static void CEA708_Window_Reset( cea708_window_t *p_w )
 
 static bool CEA708_Window_BreaksSpace( const cea708_window_t *p_w )
 {
+#if 1
+    // FIXME: missing test case
+    (void)p_w;
     return true;
+#else
     if( p_w->style.print_direction == CEA708_WA_DIRECTION_LTR &&
         p_w->style.justify == CEA708_WA_JUSTIFY_LEFT )
         return true;
@@ -549,6 +553,7 @@ static bool CEA708_Window_BreaksSpace( const cea708_window_t *p_w )
         return true;
 
     return false;
+#endif
 }
 
 static uint8_t CEA708_Window_MinCol( const cea708_window_t *p_w )
