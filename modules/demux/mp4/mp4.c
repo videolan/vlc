@@ -473,28 +473,26 @@ static vlc_tick_t MP4_TrackGetDTSPTS( demux_t *p_demux, const mp4_track_t *p_tra
     return i_dts;
 }
 
-static inline vlc_tick_t MP4_GetSamplesDuration( demux_t *p_demux, mp4_track_t *p_track,
-                                              unsigned i_nb_samples )
+static stime_t MP4_GetChunkSamplesDuration( const mp4_chunk_t *p_chunk,
+                                            uint32_t i_start_sample,
+                                            uint32_t i_nb_samples )
 {
-    VLC_UNUSED( p_demux );
-
-    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
     stime_t i_duration = 0;
 
     /* Forward to right index, and set remaining count in that index */
-    unsigned i_index = 0;
-    unsigned i_remain = 0;
-    for( unsigned i = p_chunk->i_sample_first;
-         i<p_track->i_sample && i_index < p_chunk->i_entries_dts; )
+    uint32_t i_index = 0;
+    uint32_t i_remain = 0;
+    for( uint32_t i = p_chunk->i_sample_first;
+         i<i_start_sample && i_index < p_chunk->i_entries_dts; )
     {
-        if( p_track->i_sample - i >= p_chunk->p_sample_count_dts[i_index] )
+        if( i_start_sample - i >= p_chunk->p_sample_count_dts[i_index] )
         {
             i += p_chunk->p_sample_count_dts[i_index];
             i_index++;
         }
         else
         {
-            i_remain = p_track->i_sample - i;
+            i_remain = i_start_sample - i;
             break;
         }
     }
@@ -517,6 +515,15 @@ static inline vlc_tick_t MP4_GetSamplesDuration( demux_t *p_demux, mp4_track_t *
         }
     }
 
+    return i_duration;
+}
+
+static inline vlc_tick_t MP4_GetSamplesDuration( const mp4_track_t *p_track,
+                                                 uint32_t i_nb_samples )
+{
+    stime_t i_duration = MP4_GetChunkSamplesDuration( &p_track->chunk[p_track->i_chunk],
+                                                      p_track->i_sample,
+                                                      i_nb_samples );
     return MP4_rescale_mtime( i_duration, p_track->i_timescale );
 }
 
@@ -1490,7 +1497,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
                            ? VLC_TICK_0 + i_current_nzpts
                            : VLC_TICK_INVALID;
 
-            p_block->i_length = MP4_GetSamplesDuration( p_demux, tk, i_nb_samples );
+            p_block->i_length = MP4_GetSamplesDuration( tk, i_nb_samples );
 
             MP4_Block_Send( p_demux, tk, p_block );
         }
