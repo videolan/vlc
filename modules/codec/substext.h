@@ -299,7 +299,7 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         .p_sys       = sys,
     };
     SubpictureUpdaterSysRegionInit( &sys->region );
-    sys->margin_ratio = 0.04;
+    sys->margin_ratio = 0.04f;
     sys->p_default_style = text_style_Create( STYLE_NO_DEFAULTS );
     if(unlikely(!sys->p_default_style))
     {

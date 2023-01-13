@@ -105,8 +105,8 @@ typedef enum
 #define EIA608_SCREEN_ROWS 15
 #define EIA608_SCREEN_COLUMNS 32
 
-#define EIA608_MARGIN  0.10
-#define EIA608_VISIBLE (1.0 - EIA608_MARGIN * 2)
+#define EIA608_MARGIN  0.10f
+#define EIA608_VISIBLE (1.0f - EIA608_MARGIN * 2)
 #define FONT_TO_LINE_HEIGHT_RATIO 1.06
 
 struct eia608_screen // A CC buffer
