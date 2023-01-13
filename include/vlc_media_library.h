@@ -945,7 +945,7 @@ VLC_API void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* pre
 VLC_API void vlc_ml_bookmark_release( vlc_ml_bookmark_t* p_bookmark );
 VLC_API void vlc_ml_bookmark_list_release( vlc_ml_bookmark_list_t* p_list );
 
-static inline vlc_ml_query_params_t vlc_ml_query_params_create()
+static inline vlc_ml_query_params_t vlc_ml_query_params_create(void)
 {
     return (vlc_ml_query_params_t) {
         .psz_pattern = NULL,

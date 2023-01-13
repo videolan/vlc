@@ -66,7 +66,7 @@ struct es_data
     pcr_event_t *last_pcr_event;
 };
 
-static inline struct es_data es_data_Init()
+static inline struct es_data es_data_Init(void)
 {
     return (struct es_data){.is_deleted = false,
                             .last_input_dts = VLC_TICK_INVALID,

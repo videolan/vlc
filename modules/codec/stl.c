@@ -110,7 +110,7 @@ static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
                                    {CCT_ISO_8859_7, "ISO_8859-7"},
                                    {CCT_ISO_8859_8, "ISO_8859-8"} };
 
-static text_style_t * CreateGroupStyle()
+static text_style_t * CreateGroupStyle(void)
 {
     text_style_t *p_style = text_style_Create(STYLE_NO_DEFAULTS);
     if(p_style)

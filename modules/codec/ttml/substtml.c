@@ -131,7 +131,7 @@ static void ttml_style_Delete( ttml_style_t* p_ttml_style )
     free( p_ttml_style );
 }
 
-static ttml_style_t * ttml_style_New( )
+static ttml_style_t * ttml_style_New( void )
 {
     ttml_style_t *p_ttml_style = calloc( 1, sizeof( ttml_style_t ) );
     if( unlikely( !p_ttml_style ) )

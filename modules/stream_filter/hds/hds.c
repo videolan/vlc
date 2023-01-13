@@ -491,7 +491,7 @@ static uint8_t* parse_afrt( vlc_object_t* p_this,
     return data_p;
 }
 
-static inline chunk_t* chunk_new()
+static inline chunk_t* chunk_new(void)
 {
     chunk_t* chunk = calloc(1, sizeof(chunk_t));
     return chunk;

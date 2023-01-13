@@ -79,7 +79,7 @@ static inline void SubpictureUpdaterSysRegionInit(substext_updater_region_t *p_u
     p_updtregion->inner_align = 0;
 }
 
-static inline substext_updater_region_t *SubpictureUpdaterSysRegionNew( )
+static inline substext_updater_region_t *SubpictureUpdaterSysRegionNew( void )
 {
     substext_updater_region_t *p_region = malloc(sizeof(*p_region));
     if(p_region)

@@ -73,7 +73,7 @@ typedef struct scte18_cea_t
  ****************************************************************************/
 #define BUF_ADVANCE(n) p_buffer += n; i_buffer -= n;
 
-static inline scte18_cea_t * scte18_cea_New()
+static inline scte18_cea_t * scte18_cea_New(void)
 {
     return calloc( 1, sizeof(scte18_cea_t) );
 }

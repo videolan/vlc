@@ -82,7 +82,7 @@ static char *AuthGetParamNoQuotesConcat( const char *psz_header, const char *psz
     }
 }
 
-static char *GenerateCnonce()
+static char *GenerateCnonce(void)
 {
     char ps_random[32];
     char *md5_hex;

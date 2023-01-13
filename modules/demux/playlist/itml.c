@@ -338,7 +338,7 @@ static bool parse_track_dict( stream_t *p_demux, input_item_node_t *p_input_node
     return i_ret;
 }
 
-static track_elem_t *new_track()
+static track_elem_t *new_track(void)
 {
     track_elem_t *p_track = malloc( sizeof *p_track );
     if( likely( p_track ) )
