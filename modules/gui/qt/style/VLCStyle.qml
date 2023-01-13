@@ -230,8 +230,8 @@ QtObject {
     readonly property bool isScreenSmall: appWidth <= smallWidth
 
     //global application margin "safe area"
-    readonly property int applicationHorizontalMargin: 0
-    readonly property int applicationVerticalMargin: 0
+    readonly property int applicationHorizontalMargin: MainCtx.safeArea * appWidth / 100
+    readonly property int applicationVerticalMargin: applicationHorizontalMargin
 
     readonly property int globalToolbar_height: dp(40, scale)
     readonly property int localToolbar_height: dp(48, scale)
