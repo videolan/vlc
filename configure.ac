@@ -49,7 +49,6 @@ AH_VERBATIM([FORTIFY_SOURCE],
 #endif])
 AC_DEFINE([_FILE_OFFSET_BITS], 64, [Define to 64 for large files support.])
 AC_DEFINE([LIBVLC_INTERNAL_],, [Define within the LibVLC source code tree.])
-AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Define to limit the scope of <windows.h>.])
 
 AC_PROG_CXX
 AC_PROG_CPP
@@ -292,6 +291,7 @@ int foo() { return my_array[0]; }
       AC_MSG_RESULT([yes])
       VLC_ADD_LIBS([libvlccore], [-lsynchronization])
     ])
+    AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Define to limit the scope of <windows.h>.])
     AC_DEFINE([UNICODE], [1], [Define to 1 for Unicode (Wide Chars) APIs.])
     AC_DEFINE([_ISOC99_SOURCE], [1], [Extensions to ISO C89 from ISO C99.])
     AC_DEFINE([_ISOC11_SOURCE], [1], [Extensions to ISO C99 from ISO C11.])
