@@ -310,6 +310,8 @@ void MainCtx::loadPrefs(const bool callSignals)
     loadFromVLCOption(m_pinVideoControls, "qt-pin-controls", &MainCtx::pinVideoControlsChanged);
 
     loadFromVLCOption(m_pinOpacity, "qt-fs-opacity", &MainCtx::pinOpacityChanged);
+
+    loadFromVLCOption(m_safeArea, "qt-safe-area", &MainCtx::safeAreaChanged);
 }
 
 void MainCtx::loadFromSettingsImpl(const bool callSignals)
