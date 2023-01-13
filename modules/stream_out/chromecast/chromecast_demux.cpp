@@ -221,7 +221,7 @@ struct demux_cc
                 ret = demux_Control( p_demux->s, DEMUX_SET_TIME, time, false );
 
             if( ret != VLC_SUCCESS && pos >= 0 )
-                demux_Control( p_demux->s, DEMUX_SET_POSITION, pos, false );
+                demux_SetPosition( p_demux->s, pos, false, true );
         }
     }
 
@@ -346,7 +346,7 @@ struct demux_cc
         {
             double pos = va_arg( args, double );
             /* Force imprecise seek */
-            int ret = demux_Control( p_demux->s, DEMUX_SET_POSITION, pos, false );
+            int ret = demux_SetPosition( p_demux->s, pos, false, true );
             if( ret != VLC_SUCCESS )
                 return ret;
 
