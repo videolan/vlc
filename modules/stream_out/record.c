@@ -254,7 +254,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 typedef struct
 {
     const char  psz_muxer[19];
-    const char  psz_extension[4];
+    const char  psz_extension[5];
     int         i_es_max;
     vlc_fourcc_t codec[128];
 } muxer_properties_t;
