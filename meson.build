@@ -819,11 +819,6 @@ if cpp.has_type('locale_t', prefix: '#include <locale>')
     cdata.set('HAVE_CXX_LOCALE_T', 1)
 endif
 
-# Check if assert.h has static_assert
-if cc.has_header_symbol('assert.h', 'static_assert')
-    cdata.set('HAVE_STATIC_ASSERT', 1)
-endif
-
 # Check if build machine is big endian
 if build_machine.endian() == 'big'
     cdata.set('WORDS_BIGENDIAN', 1)

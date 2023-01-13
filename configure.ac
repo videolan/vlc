@@ -751,17 +751,6 @@ dnl mingw64 implements those as static inline, not functions with C linkage
 VLC_REPLACE_DECL([asprintf], [#include <stdio.h>])
 VLC_REPLACE_DECL([vasprintf], [#include <stdio.h>])
 
-dnl C11 static_assert()
-AC_MSG_CHECKING([for static_assert in assert.h])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <assert.h>], [
-static_assert(1, "The impossible happened.");
-])], [
-  AC_MSG_RESULT([yes])
-  AC_DEFINE([HAVE_STATIC_ASSERT], [1], [Define to 1 if <assert.h> defines static_assert.])
-], [
-  AC_MSG_RESULT([no])
-])
-
 # Windows CE does not have strcoll()
 AC_FUNC_STRCOLL
 
