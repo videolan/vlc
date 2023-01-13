@@ -98,11 +98,11 @@ static inline vlc_tick_t vlc_tick_rate_duration(float frame_rate)
 /*
  * samples<>vlc_tick_t
  */
-static inline vlc_tick_t vlc_tick_from_samples(int64_t samples, int samp_rate)
+static inline vlc_tick_t vlc_tick_from_samples(int64_t samples, unsigned samp_rate)
 {
     return CLOCK_FREQ * samples / samp_rate;
 }
-static inline int64_t samples_from_vlc_tick(vlc_tick_t t, int samp_rate)
+static inline int64_t samples_from_vlc_tick(vlc_tick_t t, unsigned samp_rate)
 {
     return t * samp_rate / CLOCK_FREQ;
 }
