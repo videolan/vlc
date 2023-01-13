@@ -28,6 +28,10 @@
 #include <assert.h>
 #include <vlc_atomic.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct vlc_ancillary;
 typedef uint32_t vlc_ancillary_id;
 
@@ -527,5 +531,9 @@ static inline void picture_SwapUV(picture_t *picture)
 }
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* VLC_PICTURE_H */
