@@ -35,7 +35,17 @@ static void Close (vlc_object_t *);
 #define AMEM_NB_FORMATS 3
 
 /* Forward declaration */
-static const char *const format_list[AMEM_NB_FORMATS];
+static const char* const format_list[AMEM_NB_FORMATS] = {
+    "S16N",
+    "S32N",
+    "FL32",
+};
+
+static const vlc_fourcc_t format_list_fourcc[AMEM_NB_FORMATS] = {
+    VLC_CODEC_S16N,
+    VLC_CODEC_S32N,
+    VLC_CODEC_FL32,
+};
 
 vlc_module_begin ()
     set_shortname (N_("Audio memory"))
@@ -58,18 +68,6 @@ vlc_module_begin ()
         change_private()
 
 vlc_module_end ()
-
-static const char *const format_list[AMEM_NB_FORMATS] = {
-    "S16N",
-    "S32N",
-    "FL32",
-};
-
-static const vlc_fourcc_t format_list_fourcc[AMEM_NB_FORMATS] = {
-    VLC_CODEC_S16N,
-    VLC_CODEC_S32N,
-    VLC_CODEC_FL32,
-};
 
 typedef struct
 {
