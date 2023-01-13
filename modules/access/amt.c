@@ -1331,7 +1331,7 @@ static int serialize_ipv6_pkt(amt_ipv6_t *ip, uint8_t *buf, int buflen){
     buf[i++] = ((ip->flow_label >> 8) & 0xFF);
     buf[i++] = (ip->flow_label & 0xFF);
 
-    buf[i++] = ip->payload_len >> 16;
+    buf[i++] = ip->payload_len >> 8;
     buf[i++] = ip->payload_len & 0xFF;
     buf[i++] = ip->next_header;
     buf[i++] = ip->hop_limit;
