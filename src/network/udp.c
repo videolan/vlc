@@ -725,6 +725,7 @@ int net_SetCSCov (int fd, int sendcov, int recvcov)
                     &type, &(socklen_t){ sizeof (type) }))
         return VLC_EGENERIC;
 
+#if defined( UDPLITE_RECV_CSCOV ) || defined( DCCP_SOCKOPT_SEND_CSCOV )
     switch (type)
     {
 #ifdef UDPLITE_RECV_CSCOV
@@ -768,7 +769,7 @@ int net_SetCSCov (int fd, int sendcov, int recvcov)
             return VLC_SUCCESS;
 #endif
     }
-#if !defined( UDPLITE_RECV_CSCOV ) && !defined( DCCP_SOCKOPT_SEND_CSCOV )
+#else
     VLC_UNUSED(sendcov);
     VLC_UNUSED(recvcov);
 #endif
