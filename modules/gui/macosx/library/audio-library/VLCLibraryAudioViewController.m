@@ -334,8 +334,14 @@
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
 {
-    if ([_libraryTargetView.subviews containsObject:_audioLibraryView] ||
-        _presentingAudioLibraryPlaceholderView) {
+    NSParameterAssert(aNotification);
+    VLCLibraryModel *model = (VLCLibraryModel *)aNotification.object;
+    NSAssert(model, @"Notification object should be a VLCLibraryModel");
+    NSArray<VLCMediaLibraryMediaItem *> * audioList = model.listOfAudioMedia;
+
+    if ((audioList.count == 0 && !_presentingAudioLibraryPlaceholderView) ||
+        (audioList.count > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView])) {
+        
         [self updatePresentedView];
     }
 }
