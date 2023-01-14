@@ -116,9 +116,7 @@
 
 - (void)presentVideoView
 {
-    for (NSView *subview in _libraryTargetView.subviews) {
-        [subview removeFromSuperview];
-    }
+    _libraryTargetView.subviews = @[];
 
     if (_libraryVideoTableViewDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
         [self presentPlaceholderVideoLibraryView];
@@ -141,7 +139,7 @@
     }
 
     _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_libraryTargetView addSubview:_emptyLibraryView];
+    _libraryTargetView.subviews = @[_emptyLibraryView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
@@ -153,7 +151,8 @@
 - (void)presentVideoLibraryView
 {
     _videoLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_libraryTargetView addSubview:_videoLibraryView];
+    _libraryTargetView.subviews = @[_videoLibraryView];
+
     NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
