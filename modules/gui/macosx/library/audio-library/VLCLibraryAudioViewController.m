@@ -269,6 +269,14 @@
     [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
 }
 
+- (void)hideAllViews
+{
+    _audioLibrarySplitView.hidden = YES;
+    _audioLibraryGridModeSplitView.hidden = YES;
+    _audioSongTableViewScrollView.hidden = YES;
+    _audioCollectionViewScrollView.hidden = YES;
+}
+
 - (void)presentAudioGridModeView
 {
     _audioLibrarySplitView.hidden = YES;
