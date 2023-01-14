@@ -259,12 +259,6 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
-    if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
-        [self presentAudioGridModeView];
-    } else {
-        [self presentAudioTableView];
-    }
-
     [self configureAudioSegmentedControl];
     [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
 }
@@ -309,10 +303,8 @@
     _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
 
     if (_audioDataSource.libraryModel.listOfAudioMedia.count == 0) {
-        return;
-    }
-
-    if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
+        [self presentPlaceholderAudioView];
+    } else if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
         [self presentAudioTableView];
     } else if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
         [self presentAudioGridModeView];
