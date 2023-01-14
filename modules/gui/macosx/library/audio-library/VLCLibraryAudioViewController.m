@@ -211,7 +211,8 @@
 {
     _libraryTargetView.subviews = @[];
 
-    [self presentAudioLibraryView];
+    [self configureAudioSegmentedControl];
+    [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
 
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
@@ -245,16 +246,13 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 }
 
-- (void)presentAudioLibraryView
+- (void)prepareAudioLibraryView
 {
     _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
     _libraryTargetView.subviews = @[_audioLibraryView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-
-    [self configureAudioSegmentedControl];
-    [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
 }
 
 - (void)hideAllViews
@@ -267,6 +265,7 @@
 
 - (void)presentAudioGridModeView
 {
+    [self prepareAudioLibraryView];
     [self hideAllViews];
 
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment ||
@@ -283,6 +282,7 @@
 
 - (void)presentAudioTableView
 {
+    [self prepareAudioLibraryView];
     [self hideAllViews];
 
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment) {
