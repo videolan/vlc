@@ -279,36 +279,29 @@
 
 - (void)presentAudioGridModeView
 {
-    _audioLibrarySplitView.hidden = YES;
-    _audioSongTableViewScrollView.hidden = YES;
+    [self hideAllViews];
 
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment ||
         _audioSegmentedControl.selectedSegment == VLCAudioLibraryAlbumsSegment) {
 
         [_audioLibraryCollectionView deselectAll:self];
         [(VLCLibraryCollectionViewFlowLayout *)_audioLibraryCollectionView.collectionViewLayout resetLayout];
-        
-        _audioCollectionViewScrollView.hidden = NO;
-        _audioLibraryGridModeSplitView.hidden = YES;
-        return;
-    }
 
-    _audioCollectionViewScrollView.hidden = YES;
-    _audioLibraryGridModeSplitView.hidden = NO;
+        _audioCollectionViewScrollView.hidden = NO;
+    } else {
+        _audioLibraryGridModeSplitView.hidden = NO;
+    }
 }
 
 - (void)presentAudioTableView
 {
-    _audioCollectionViewScrollView.hidden = YES;
-    _audioLibraryGridModeSplitView.hidden = YES;
+    [self hideAllViews];
 
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment) {
-        _audioLibrarySplitView.hidden = YES;
         _audioSongTableViewScrollView.hidden = NO;
-        return;
+    } else {
+        _audioLibrarySplitView.hidden = NO;
     }
-    _audioSongTableViewScrollView.hidden = YES;
-    _audioLibrarySplitView.hidden = NO;
 }
 
 - (IBAction)segmentedControlAction:(id)sender
