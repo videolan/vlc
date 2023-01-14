@@ -90,13 +90,11 @@
 
 - (void)presentMediaSourceView:(VLCLibrarySegment)viewSegment
 {
-    for (NSView *subview in _libraryTargetView.subviews) {
-        [subview removeFromSuperview];
-    }
+    _libraryTargetView.subviews = @[];
 
     if (_mediaSourceView.superview == nil) {
         _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_libraryTargetView addSubview:_mediaSourceView];
+        _libraryTargetView.subviews = @[_mediaSourceView];
         NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceView);
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
