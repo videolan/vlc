@@ -209,15 +209,9 @@
 
 - (void)presentAudioView
 {
-    for (NSView *subview in _libraryTargetView.subviews) {
-        [subview removeFromSuperview];
-    }
+    _libraryTargetView.subviews = @[];
 
-    if (_audioDataSource.libraryModel.numberOfAudioMedia == 0) { // empty library
-        [self presentPlaceholderAudioView];
-    } else {
-        [self presentAudioLibraryView];
-    }
+    [self presentAudioLibraryView];
 
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
@@ -245,7 +239,7 @@
     }
 
     _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_libraryTargetView addSubview:_emptyLibraryView];
+    _libraryTargetView.subviews = @[_emptyLibraryView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
@@ -254,7 +248,7 @@
 - (void)presentAudioLibraryView
 {
     _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_libraryTargetView addSubview:_audioLibraryView];
+    _libraryTargetView.subviews = @[_audioLibraryView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
