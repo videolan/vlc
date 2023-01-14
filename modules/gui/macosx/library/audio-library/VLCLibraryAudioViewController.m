@@ -44,6 +44,8 @@
     NSArray<NSString *> *_placeholderLabelStrings;
 
     VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
+
+    BOOL _presentingAudioLibraryPlaceholderView;
 }
 @end
 
@@ -65,6 +67,14 @@
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
         [self setupAudioSegmentedControl];
+
+        _presentingAudioLibraryPlaceholderView = NO;
+
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelAudioMediaListUpdated
+                                 object:nil];
     }
 
     return self;
@@ -244,6 +254,8 @@
     NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+
+    _presentingAudioLibraryPlaceholderView = YES;
 }
 
 - (void)prepareAudioLibraryView
@@ -265,9 +277,6 @@
 
 - (void)presentAudioGridModeView
 {
-    [self prepareAudioLibraryView];
-    [self hideAllViews];
-
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment ||
         _audioSegmentedControl.selectedSegment == VLCAudioLibraryAlbumsSegment) {
 
@@ -282,9 +291,6 @@
 
 - (void)presentAudioTableView
 {
-    [self prepareAudioLibraryView];
-    [self hideAllViews];
-
     if (_audioSegmentedControl.selectedSegment == VLCAudioLibrarySongsSegment) {
         _audioSongTableViewScrollView.hidden = NO;
     } else {
@@ -292,17 +298,28 @@
     }
 }
 
-- (IBAction)segmentedControlAction:(id)sender
+- (void)updatePresentedView
 {
     _audioDataSource.audioLibrarySegment = _audioSegmentedControl.selectedSegment;
 
     if (_audioDataSource.libraryModel.listOfAudioMedia.count == 0) {
         [self presentPlaceholderAudioView];
-    } else if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
-        [self presentAudioTableView];
-    } else if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
-        [self presentAudioGridModeView];
+    } else {
+        _presentingAudioLibraryPlaceholderView = NO;
+        [self prepareAudioLibraryView];
+        [self hideAllViews];
+
+        if (self.gridVsListSegmentedControl.selectedSegment == VLCListViewModeSegment) {
+            [self presentAudioTableView];
+        } else if (self.gridVsListSegmentedControl.selectedSegment == VLCGridViewModeSegment) {
+            [self presentAudioGridModeView];
+        }
     }
+}
+
+- (IBAction)segmentedControlAction:(id)sender
+{
+    [self updatePresentedView];
 
     VLCLibraryNavigationStack *globalNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
     if(sender != globalNavStack) {
@@ -313,6 +330,14 @@
 - (void)reloadData
 {
     [_audioDataSource reloadData];
+}
+
+- (void)libraryModelUpdated:(NSNotification *)aNotification
+{
+    if ([_libraryTargetView.subviews containsObject:_audioLibraryView] ||
+        _presentingAudioLibraryPlaceholderView) {
+        [self updatePresentedView];
+    }
 }
 
 @end
