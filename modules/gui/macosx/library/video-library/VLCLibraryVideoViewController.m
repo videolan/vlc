@@ -46,6 +46,12 @@
         [self setupTableViewDataSource];
         [self setupGridViewController];
         [self setupVideoPlaceholderView];
+
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelUpdated:)
+                                   name:VLCLibraryModelVideoMediaListUpdated
+                                 object:nil];
     }
 
     return self;
@@ -66,6 +72,7 @@
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
 
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
+    _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _optionBarView = libraryWindow.optionBarView;
     _librarySortButton = libraryWindow.librarySortButton;
     _librarySearchField = libraryWindow.librarySearchField;
@@ -114,15 +121,20 @@
 
 #pragma mark - Show the video library view
 
-- (void)presentVideoView
+- (void)updatePresentedView
 {
-    _libraryTargetView.subviews = @[];
-
     if (_libraryVideoTableViewDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
         [self presentPlaceholderVideoLibraryView];
     } else {
         [self presentVideoLibraryView];
     }
+}
+
+- (void)presentVideoView
+{
+    _libraryTargetView.subviews = @[];
+
+    [self updatePresentedView];
 
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
@@ -165,6 +177,21 @@
         _videoLibrarySplitView.hidden = NO;
         _videoLibraryCollectionViewsStackViewScrollView.hidden = YES;
         [_libraryVideoTableViewDataSource reloadData];
+    }
+}
+
+- (void)libraryModelUpdated:(NSNotification *)aNotification
+{
+    NSParameterAssert(aNotification);
+    VLCLibraryModel *model = (VLCLibraryModel *)aNotification.object;
+    NSAssert(model, @"Notification object should be a VLCLibraryModel");
+    NSArray<VLCMediaLibraryMediaItem *> * videoList = model.listOfVideoMedia;
+
+    if (_segmentedTitleControl.selectedSegment == VLCLibraryVideoSegment &&
+        ((videoList.count == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
+         (videoList.count > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView]))) {
+
+        [self updatePresentedView];
     }
 }
 
