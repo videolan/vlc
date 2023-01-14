@@ -38,14 +38,14 @@
 
 #import "main/VLCMain.h"
 
+NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudioViewIdentifier";
+
 @interface VLCLibraryAudioViewController()
 {
     NSArray<NSString *> *_placeholderImageNames;
     NSArray<NSString *> *_placeholderLabelStrings;
 
     VLCLibraryCollectionViewDelegate *_audioLibraryCollectionViewDelegate;
-
-    BOOL _presentingAudioLibraryPlaceholderView;
 }
 @end
 
@@ -67,8 +67,6 @@
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
         [self setupAudioSegmentedControl];
-
-        _presentingAudioLibraryPlaceholderView = NO;
 
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
@@ -104,6 +102,7 @@
 
     _audioSegmentedControl = libraryWindow.audioSegmentedControl;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
+    _segmentedTitleControl = libraryWindow.segmentedTitleControl;
     _optionBarView = libraryWindow.optionBarView;
     _librarySortButton = libraryWindow.librarySortButton;
     _librarySearchField = libraryWindow.librarySearchField;
@@ -255,7 +254,7 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
-    _presentingAudioLibraryPlaceholderView = YES;
+    _emptyLibraryView.identifier = VLCLibraryPlaceholderAudioViewIdentifier;
 }
 
 - (void)prepareAudioLibraryView
@@ -305,7 +304,6 @@
     if (_audioDataSource.libraryModel.listOfAudioMedia.count == 0) {
         [self presentPlaceholderAudioView];
     } else {
-        _presentingAudioLibraryPlaceholderView = NO;
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
@@ -339,9 +337,10 @@
     NSAssert(model, @"Notification object should be a VLCLibraryModel");
     NSArray<VLCMediaLibraryMediaItem *> * audioList = model.listOfAudioMedia;
 
-    if ((audioList.count == 0 && !_presentingAudioLibraryPlaceholderView) ||
-        (audioList.count > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView])) {
-        
+    if (_segmentedTitleControl.selectedSegment == VLCLibraryMusicSegment &&
+        ((audioList.count == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
+         (audioList.count > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView]))) {
+
         [self updatePresentedView];
     }
 }
