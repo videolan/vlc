@@ -16,12 +16,14 @@ if get_option('screen').allowed()
     )
 
     screen_deps = []
+    screen_cppargs = []
     screen_link_with = []
 
     if host_system == 'windows'
       screen_files += files('win32.c', 'dxgi.cpp')
       gdi32_dep = cc.find_library('gdi32')
       screen_deps += [gdi32_dep]
+      screen_cppargs += libcom_cppflags
       screen_link_with += d3d11_common_lib
     else
       screen_files += files('mac.c')
@@ -33,6 +35,7 @@ if get_option('screen').allowed()
         'name' : 'screen',
         'sources' : screen_files,
         'dependencies' : screen_deps,
+        'cpp_args' : screen_cppargs,
         'link_with' : screen_link_with,
     }
   endif
