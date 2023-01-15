@@ -8,6 +8,7 @@ qt_include_dir = include_directories('.')
 
 qt_extra_deps = []
 qt_extra_flags = []
+qt_cppargs = []
 
 qt5_dep = dependency('qt5',
     version: '>=5.11.0',
@@ -576,13 +577,17 @@ if qt5_dep.found()
         qt_extra_flags += '-DQT_QML_DEBUG'
     endif
 
+    if host_system == 'windows'
+        qt_cppargs += libcom_cppflags
+    endif
+
     vlc_modules += {
         'name' : 'qt',
         'sources' : [qt5pre_files, qt_sources, some_sources],
         'dependencies' : [qt5_dep, qt_extra_deps],
         'include_directories' : qt_include_dir,
         'c_args' : qt_extra_flags,
-        'cpp_args' : qt_extra_flags
+        'cpp_args' : [qt_extra_flags, qt_cppargs]
     }
 
     #Qt GTK theme module
