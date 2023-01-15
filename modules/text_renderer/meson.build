@@ -16,8 +16,10 @@ freetype_srcs = files(
     'freetype/ftcache.c',
     'freetype/lru.c',
 )
+freetype_cppargs = []
 if host_system == 'windows'
     freetype_srcs += files('freetype/fonts/dwrite.cpp')
+    freetype_cppargs += libcom_cppflags
     # TODO: Don't add this file for UWP builds
     freetype_srcs += files('freetype/fonts/win32.c')
 elif host_system == 'darwin'
@@ -32,6 +34,7 @@ if freetype_dep.found()
         'name' : 'freetype',
         'sources' : freetype_srcs,
         'dependencies' : freetype_deps,
+        'cpp_args' : freetype_cppargs
     }
 endif
 
