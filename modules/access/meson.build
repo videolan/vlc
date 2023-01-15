@@ -331,7 +331,8 @@ if host_system == 'windows'
             dtv_common_sources,
             files('dtv/bdagraph.cpp')
         ],
-        'dependencies' : [strmiids_lib]
+        'dependencies' : [strmiids_lib],
+        'cpp_args' : libcom_cppflags
     }
 endif
 

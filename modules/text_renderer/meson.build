@@ -67,7 +67,8 @@ if host_system == 'windows'
     if have_sapi
         vlc_modules += {
             'name' : 'sapi',
-            'sources' : files('sapi.cpp')
+            'sources' : files('sapi.cpp'),
+            'cpp_args' : libcom_cppflags
         }
     endif
 endif
