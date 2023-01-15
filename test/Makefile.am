@@ -50,6 +50,10 @@ check_PROGRAMS = \
 	test_modules_playlist_m3u \
 	$(NULL)
 
+if HAVE_DARWIN
+check_PROGRAMS += test_src_misc_image_cvpx
+endif
+
 if ENABLE_SOUT
 check_PROGRAMS += test_modules_tls \
 	test_modules_stream_out_transcode \
@@ -136,6 +140,9 @@ test_src_misc_epg_SOURCES = src/misc/epg.c
 test_src_misc_epg_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_keystore_SOURCES = src/misc/keystore.c
 test_src_misc_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_image_cvpx_SOURCES = src/misc/image_cvpx.c
+test_src_misc_image_cvpx_LDADD = $(LIBVLCCORE) $(LIBVLC) ../modules/libvlc_vtutils.la
+test_src_misc_image_cvpx_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreVideo
 test_src_interface_dialog_SOURCES = src/interface/dialog.c
 test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_media_source_LDADD = $(LIBVLCCORE) $(LIBVLC)
