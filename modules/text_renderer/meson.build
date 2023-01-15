@@ -55,8 +55,16 @@ endif
 
 # Windows SAPI text to speech
 if host_system == 'windows'
-    vlc_modules += {
-        'name' : 'sapi',
-        'sources' : files('sapi.cpp')
-    }
+    have_sapi = cpp.has_type('ISpObjectToken', prefix: '\n'.join([
+        '#include <windows.h>',
+        '#include <sapi.h>',
+        '#include <sphelper.h>'
+    ]))
+
+    if have_sapi
+        vlc_modules += {
+            'name' : 'sapi',
+            'sources' : files('sapi.cpp')
+        }
+    endif
 endif
