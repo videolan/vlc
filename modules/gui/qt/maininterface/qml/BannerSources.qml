@@ -160,17 +160,11 @@ FocusScope {
                                  Navigation.parentItem: root
                                  Navigation.rightItem: globalMenuGroup
                                  Navigation.downItem: localMenuGroup.visible ? localMenuGroup : localToolbarBg
-                             }
-
-                            Image {
-                                sourceSize.width: VLCStyle.icon_normal
-                                sourceSize.height: VLCStyle.icon_normal
-                                source: SVGColorImage.colorize("qrc:///misc/cone.svg")
-                                                .accent(VLCStyle.colors.accent)
-                                                .uri()
-                                enabled: false
                             }
 
+                            Widgets.BannerCone {
+
+                            }
                         }
 
                         /* Button for the sources */
