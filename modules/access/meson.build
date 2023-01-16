@@ -64,7 +64,7 @@ endif
 
 # OSS access
 if get_option('oss').disable_auto_if(
-    host_machine.system() not in ['freebsd', 'netbsd', 'dragonfly']).allowed()
+    host_system not in ['freebsd', 'netbsd', 'dragonfly']).allowed()
 
     # TODO: Actually add the OSS module
 endif
