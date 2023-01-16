@@ -29,6 +29,8 @@
 #ifdef _WIN32
 // avoid collision between numeric_limits::max() and max define
 #define NOMINMAX
+// enable M_PI definition
+#define _USE_MATH_DEFINES           1
 #endif
 
 
