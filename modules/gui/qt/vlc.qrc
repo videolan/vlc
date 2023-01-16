@@ -155,6 +155,7 @@
     <qresource prefix="/widgets">
         <file alias="ActionButtonOverlay.qml">widgets/qml/ActionButtonOverlay.qml</file>
         <file alias="ActionButtonPrimary.qml">widgets/qml/ActionButtonPrimary.qml</file>
+        <file alias="BannerCone.qml">widgets/qml/BannerCone.qml</file>
         <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
         <file alias="AcrylicBackground.qml">widgets/qml/AcrylicBackground.qml</file>
