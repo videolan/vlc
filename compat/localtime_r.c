@@ -37,7 +37,11 @@ struct tm *localtime_r (const time_t *timep, struct tm *result)
 #if (__STDC_WANT_LIB_EXT1__)
     return localtime_s(timep, result);
 #elif defined (_WIN32)
-    return ((errno = localtime_s(result, timep)) == 0) ? result : NULL;
+    errno_t ret = localtime_s(result, timep);
+    if (ret == 0)
+        return result;
+    errno = ret;
+    return NULL;
 #else
 # warning localtime_r() not implemented!
     return gmtime_r(timep, result);
