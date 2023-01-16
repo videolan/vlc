@@ -69,12 +69,18 @@ typedef struct {
             GLint enabled;
             GLint sigma;
             GLint fast;
+            GLint masked;
+            GLint mask_contrast;
+            GLint mask_brightness;
             GLint one_pixel_up;
             GLint one_pixel_right;
         } loc;
         _Atomic(bool)  enabled;
         _Atomic(float) sigma;
         _Atomic(bool)  fast;
+        _Atomic(bool)  masked;
+        _Atomic(float) mask_contrast;
+        _Atomic(float) mask_brightness;
         /* Texture coordinates unit vectors */
         float u[2];
         float v[2];
@@ -84,7 +90,7 @@ typedef struct {
 
 static const char *const ppsz_filter_options[] = {
     "adjust", "contrast", "brightness", "hue", "saturation", "gamma",
-    "sharpen", "sharpen-sigma", "sharpen-fast",
+    "sharpen", "sharpen-sigma", "sharpen-fast", "sharpen-mask", "sharpen-mask-contrast", "sharpen-mask-brightness",
     NULL
 };
 
@@ -204,6 +210,12 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
                   atomic_load_explicit(&sys->sharpen.fast, memory_order_relaxed));              
     vt->Uniform1f(sys->sharpen.loc.sigma,
                   atomic_load_explicit(&sys->sharpen.sigma, memory_order_relaxed));
+    vt->Uniform1i(sys->sharpen.loc.masked,
+                  atomic_load_explicit(&sys->sharpen.masked, memory_order_relaxed));
+    vt->Uniform1f(sys->sharpen.loc.mask_contrast,
+                  atomic_load_explicit(&sys->sharpen.mask_contrast, memory_order_relaxed));
+    vt->Uniform1f(sys->sharpen.loc.mask_brightness,
+                  atomic_load_explicit(&sys->sharpen.mask_brightness, memory_order_relaxed));
     vt->Uniform2f(sys->sharpen.loc.one_pixel_right, sys->sharpen.u[0] / width,
                                                     sys->sharpen.u[1] / height);
     vt->Uniform2f(sys->sharpen.loc.one_pixel_up, sys->sharpen.v[0] / width,
@@ -265,6 +277,12 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
                 var_GetBool(filter, "sharpen-fast"));
     atomic_init(&sys->sharpen.sigma,
                 var_CreateGetFloatCommand(filter, "sharpen-sigma"));
+    atomic_init(&sys->sharpen.masked,
+                var_GetBool(filter, "sharpen-mask"));
+    atomic_init(&sys->sharpen.mask_contrast,
+                var_CreateGetFloatCommand(filter, "sharpen-mask-contrast"));
+    atomic_init(&sys->sharpen.mask_brightness,
+                var_CreateGetFloatCommand(filter, "sharpen-mask-brightness"));
 
     var_AddCallback(filter, "adjust", OpenGLFilterBoolVarCallback,
                         &sys->adjust.enabled );
@@ -280,6 +298,12 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
                         &sys->sharpen.enabled );
     var_AddCallback(filter, "sharpen-sigma", OpenGLFilterFloatVarCallback,
                     &sys->sharpen.sigma );
+    var_AddCallback(filter, "sharpen-mask", OpenGLFilterBoolVarCallback,
+                        &sys->sharpen.masked );
+    var_AddCallback(filter, "sharpen-mask-contrast", OpenGLFilterFloatVarCallback,
+                    &sys->sharpen.mask_contrast );
+    var_AddCallback(filter, "sharpen-mask-brightness", OpenGLFilterFloatVarCallback,
+                    &sys->sharpen.mask_brightness );
 
     vlc_gl_t *gl = (vlc_gl_t *)vlc_object_parent(filter);
     filter_t *video_filter = (filter_t *)vlc_object_parent(gl);
@@ -309,6 +333,9 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "uniform bool sharpen;\n"
         "uniform bool sharpen_fast;\n"
         "uniform float sigma;\n"
+        "uniform bool sharpen_masked;\n"
+        "uniform float sharpen_mask_brightness;\n"
+        "uniform float sharpen_mask_contrast;\n"
         "uniform vec2 one_pixel_up;\n"
         "uniform vec2 one_pixel_right;\n"
         "\n"
@@ -364,11 +391,15 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "  return res + m;\n"
         "}\n"
         "\n"
+        "float avg(vec3 v) { return (v.x + v.y + v.z) / 3.0; }\n"
+        "\n"
         "void main() {\n"
         "  vec3 color = vlc_texture(tex_coords).rgb;\n"
+        "  float sharpen_sigma = sigma;\n"
         "  if (sharpen) {\n"
         "    vec3 pix;"
         "    if (sharpen_fast) {\n"
+        "       sharpen_sigma *= 2.0;\n"
         "       pix = -(  vlc_texture(tex_coords                - one_pixel_right).rgb\n"
         "               + vlc_texture(tex_coords - one_pixel_up                  ).rgb\n"
         "               + vlc_texture(tex_coords                + one_pixel_right).rgb\n"
@@ -385,7 +416,19 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         "               + vlc_texture(tex_coords + one_pixel_up                  ).rgb)\n"
         "               + 8.0 * color;\n"
         "    }\n"
-        "    color = clamp(color + sigma * pix, 0.0, 1.0);\n"
+        "    vec3 mask = vec3(1.0);\n"
+        "    if (sharpen_masked) {\n"
+        "      float mask_weight = 4.0;\n"
+        "      float mask_offset = 4.0;\n"
+        "      float src = avg(color);\n"
+        "      float src_sx = avg(vlc_texture(tex_coords + one_pixel_right * mask_offset).rgb);\n"
+        "      float src_sy = avg(vlc_texture(tex_coords + one_pixel_up * mask_offset).rgb);\n"
+        "      vec2 edges = vec2(src - src_sx, src - src_sy);\n"
+        "      float mag = length(edges);\n"
+        "      float value = (mag * mask_weight / src) + (sharpen_mask_brightness - 1.0);\n"
+        "      mask = vec3(clamp((value - 0.5) * sharpen_mask_contrast + 0.5, 0.0, 1.0));\n"
+        "    }\n"
+        "    color = clamp(color + sharpen_sigma * pix * mask, 0.0, 1.0);\n"
         "  }\n"
         "  if (adjust) {\n"
         "    color = rgb_to_hsl(color.r, color.g, color.b);\n"
@@ -474,6 +517,15 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     sys->sharpen.loc.sigma = vt->GetUniformLocation(program_id, "sigma");
     assert(sys->sharpen.loc.sigma != -1);
+    
+    sys->sharpen.loc.masked = vt->GetUniformLocation(program_id, "sharpen_masked");
+    assert(sys->sharpen.loc.masked != -1);
+
+    sys->sharpen.loc.mask_contrast = vt->GetUniformLocation(program_id, "sharpen_mask_contrast");
+    assert(sys->sharpen.loc.mask_contrast != -1);
+    
+    sys->sharpen.loc.mask_brightness = vt->GetUniformLocation(program_id, "sharpen_mask_brightness");
+    assert(sys->sharpen.loc.mask_brightness != -1);
 
     sys->sharpen.loc.one_pixel_up = vt->GetUniformLocation(program_id, "one_pixel_up");
     assert(sys->sharpen.loc.one_pixel_up != -1);
@@ -512,6 +564,9 @@ static int OpenVideoFilter(filter_t *filter)
 
     var_CreateGetBoolCommand( filter, "sharpen" );
     var_CreateGetFloatCommand( filter, "sharpen-sigma" );
+    var_CreateGetBoolCommand( filter, "sharpen-mask" );
+    var_CreateGetFloatCommand( filter, "sharpen-mask-brightness" );
+    var_CreateGetFloatCommand( filter, "sharpen-mask-contrast" );
 
     module_t *module = vlc_gl_WrapOpenGLFilter(filter, "glsk");
     return module ? VLC_SUCCESS : VLC_EGENERIC;
@@ -553,6 +608,9 @@ vlc_module_begin()
     add_bool( "sharpen", false, SHARPEN_TEXT, SHARPEN_LONGTEXT )
     add_float_with_range( "sharpen-sigma", 0.05, 0.0, 2.0, SHARPEN_SIGMA_TEXT, SHARPEN_SIGMA_LONGTEXT )
     add_bool( "sharpen-fast", false, SHARPEN_FAST_TEXT, SHARPEN_FAST_LONGTEXT )
+    add_bool( "sharpen-mask", true, "", "" )
+    add_float_with_range( "sharpen-mask-contrast", 1.0, 0.0, 2.0, "", "" )
+    add_float_with_range( "sharpen-mask-brightness", 1.0, 0.0, 2.0, "", "" )
     
     set_callback(OpenVideoFilter)
     add_shortcut("glsk")
