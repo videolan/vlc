@@ -1864,7 +1864,7 @@ vlc_player_GetV4l2Object(vlc_player_t *player)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     return input && var_Type(input->thread, "controls") != 0 ?
-           (vlc_object_t*) input->thread : NULL;
+           VLC_OBJECT(input->thread) : NULL;
 }
 
 static void
