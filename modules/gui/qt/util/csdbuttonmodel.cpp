@@ -67,6 +67,11 @@ void CSDButton::click()
     emit clicked();
 }
 
+void CSDButton::doubleClick()
+{
+    emit doubleClicked();
+}
+
 CSDButtonModel::CSDButtonModel(MainCtx *mainCtx, QObject *parent)
     : QObject {parent}
     , m_mainCtx {mainCtx}
@@ -87,6 +92,17 @@ QList<CSDButton *> CSDButtonModel::windowCSDButtons() const
 {
     return m_windowCSDButtons;
 }
+
+CSDButton *CSDButtonModel::systemMenuButton() const
+{
+    return m_systemMenuButton.get();
+}
+
+void CSDButtonModel::setSystemMenuButton(std::shared_ptr<SystemMenuButton> button)
+{
+    m_systemMenuButton = std::move(button);
+}
+
 
 void CSDButtonModel::minimizeButtonClicked()
 {
