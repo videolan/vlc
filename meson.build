@@ -606,6 +606,8 @@ libcompat_functions = [
     ['tfind',            '#include <search.h>'],
     ['timegm',           '#include <time.h>'],
     ['timespec_get',     '#include <time.h>'],
+    ['gmtime_r',         '#include <time.h>'],
+    ['localtime_r',      '#include <time.h>'],
     ['strverscmp',       '#include <string.h>'],
     ['writev',           '#include <sys/uio.h>'],
 
@@ -644,11 +646,9 @@ endforeach
 # These functions need to be checked with has_header_symbol as
 # MinGW-w64 implements those as static inline, not functions with C linkage
 libcompat_functions = [
-    ['gmtime_r',         'time.h'],
     ['realpath',         'stdlib.h'],
     ['asprintf',         'stdio.h'],
     ['vasprintf',        'stdio.h'],
-    ['localtime_r',      'time.h'],
 ]
 
 foreach f : libcompat_functions
