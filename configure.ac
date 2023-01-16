@@ -293,7 +293,6 @@ int foo() { return my_array[0]; }
     ])
     AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Define to limit the scope of <windows.h>.])
     AC_DEFINE([UNICODE], [1], [Define to 1 for Unicode (Wide Chars) APIs.])
-    AC_DEFINE([_POSIX_SOURCE], [1], [IEEE Std 1003.1.])
     AC_DEFINE([_POSIX_C_SOURCE], [200809L], [IEEE Std 1003.1.])
 
     AC_ARG_WITH(packagedir,

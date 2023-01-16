@@ -42,9 +42,6 @@
 #mesondefine _WIN32_WINNT
 
 /* IEEE Std 1003.1. */
-#mesondefine _POSIX_SOURCE
-
-/* IEEE Std 1003.1. */
 #mesondefine _POSIX_C_SOURCE
 
 /* Define to 1 to force use of MinGW provided C99 *printf over msvcrt */
