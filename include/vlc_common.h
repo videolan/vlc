@@ -74,16 +74,6 @@
 
 /* Try to fix format strings for all versions of mingw and mingw64 */
 #if defined( _WIN32 ) && defined( __USE_MINGW_ANSI_STDIO )
- #undef PRId64
- #define PRId64 "lld"
- #undef PRIi64
- #define PRIi64 "lli"
- #undef PRIu64
- #define PRIu64 "llu"
- #undef PRIo64
- #define PRIo64 "llo"
- #undef PRIx64
- #define PRIx64 "llx"
  #define snprintf __mingw_snprintf
  #define vsnprintf __mingw_vsnprintf
  #define swprintf _snwprintf
