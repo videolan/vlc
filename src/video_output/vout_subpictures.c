@@ -1372,14 +1372,16 @@ static int RestartSubFilterCallback(vlc_object_t *obj, char const *psz_var,
 
 static int SubFilterAddProxyCallbacks(filter_t *filter, void *opaque)
 {
-    filter_AddProxyCallbacks((vlc_object_t *)opaque, filter,
+    vout_thread_t *vout = opaque;
+    filter_AddProxyCallbacks(VLC_OBJECT(vout), filter,
                              RestartSubFilterCallback);
     return VLC_SUCCESS;
 }
 
 static int SubFilterDelProxyCallbacks(filter_t *filter, void *opaque)
 {
-    filter_DelProxyCallbacks((vlc_object_t *)opaque, filter,
+    vout_thread_t *vout = opaque;
+    filter_DelProxyCallbacks(VLC_OBJECT(vout), filter,
                              RestartSubFilterCallback);
     return VLC_SUCCESS;
 }
@@ -1401,7 +1403,8 @@ static int SubSourceAddProxyCallbacks(filter_t *filter, void *opaque)
 
 static int SubSourceDelProxyCallbacks(filter_t *filter, void *opaque)
 {
-    filter_DelProxyCallbacks((vlc_object_t *)opaque, filter,
+    vout_thread_t *vout = opaque;
+    filter_DelProxyCallbacks(VLC_OBJECT(vout), filter,
                              RestartSubSourceCallback);
     return VLC_SUCCESS;
 }

@@ -718,7 +718,8 @@ static int FilterRestartCallback(vlc_object_t *p_this, char const *psz_var,
 
 static int DelFilterCallbacks(filter_t *filter, void *opaque)
 {
-    filter_DelProxyCallbacks((vlc_object_t*)opaque, filter,
+    vout_thread_sys_t *sys = opaque;
+    filter_DelProxyCallbacks(VLC_OBJECT(sys), filter,
                              FilterRestartCallback);
     return VLC_SUCCESS;
 }
