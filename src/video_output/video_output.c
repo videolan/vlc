@@ -427,7 +427,10 @@ void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     assert( !picture_HasChainedPics( picture ) );
+
+    vlc_mutex_lock(&sys->scheduler_lock);
     picture_fifo_Push(sys->decoder_fifo, picture);
+    vlc_mutex_unlock(&sys->scheduler_lock);
     vout_control_Wake(&sys->control);
     if (sys->scheduler->ops->put_picture != NULL)
         sys->scheduler->ops->put_picture(sys->scheduler, picture);
@@ -1730,7 +1733,13 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
         }
     }
 
+    // TODO lock until scheduler is flushed, warning, scheduler might need inverse lock
+    vlc_mutex_lock(&sys->scheduler_lock);
     picture_fifo_Flush(sys->decoder_fifo, date, below);
+
+    if (sys->scheduler)
+        vlc_vout_scheduler_Flush(sys->scheduler, VLC_TICK_INVALID);
+    vlc_mutex_unlock(&sys->scheduler_lock);
 
     vlc_queuedmutex_lock(&sys->display_lock);
     if (sys->display != NULL)

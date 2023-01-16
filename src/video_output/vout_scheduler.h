@@ -32,7 +32,7 @@ struct vlc_vout_scheduler;
 struct vlc_vout_scheduler_operations
 {
     void (*put_picture)(struct vlc_vout_scheduler *scheduler, picture_t *pic);
-    void (*flush)(struct vlc_vout_scheduler *scheduler);
+    void (*flush)(struct vlc_vout_scheduler *scheduler, vlc_tick_t date);
     void (*signal_vsync)(struct vlc_vout_scheduler *scheduler, vlc_tick_t next_ts);
     void (*destroy)(struct vlc_vout_scheduler *scheduler);
 };
@@ -70,6 +70,13 @@ static inline void
 vlc_vout_scheduler_Destroy(struct vlc_vout_scheduler *scheduler)
 {
     scheduler->ops->destroy(scheduler);
+}
+
+static inline void
+vlc_vout_scheduler_Flush(struct vlc_vout_scheduler *scheduler, vlc_tick_t date)
+{
+    if (scheduler->ops->flush)
+        scheduler->ops->flush(scheduler, date);
 }
 
 static inline bool

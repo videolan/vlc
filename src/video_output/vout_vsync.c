@@ -454,6 +454,27 @@ SignalVSYNC(struct vlc_vout_scheduler *scheduler, vlc_tick_t next_ts)
 #endif
 }
 
+static void
+Flush(struct vlc_vout_scheduler *scheduler, vlc_tick_t before)
+{
+    struct vlc_vout_vsync_priv *priv =
+        container_of(scheduler, struct vlc_vout_vsync_priv, impl);
+
+    (void)before; // TODO: partial flush
+    vlc_mutex_lock(&priv->state.lock);
+    if (priv->displayed.current)
+        picture_Release(priv->displayed.current);
+    if (priv->displayed.next)
+        picture_Release(priv->displayed.next);
+
+    priv->displayed.current = NULL;
+    priv->displayed.next = NULL;
+    priv->state.current = VOUT_STATE_CONTROL;
+    priv->displayed.current_rendered = false;
+
+    vlc_mutex_unlock(&priv->state.lock);
+}
+
 struct vlc_vout_scheduler *
 vlc_vout_scheduler_NewVSYNC(vout_thread_t *vout, vlc_clock_t *clock,
                        vout_display_t *display,
@@ -468,6 +489,7 @@ vlc_vout_scheduler_NewVSYNC(vout_thread_t *vout, vlc_clock_t *clock,
         .destroy = DestroyScheduler,
         .put_picture = PutPicture,
         .signal_vsync = SignalVSYNC,
+        .flush = Flush,
     };
     scheduler->ops = &ops;
     priv->vout = vout;
