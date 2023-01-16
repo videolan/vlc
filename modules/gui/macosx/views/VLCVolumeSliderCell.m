@@ -139,37 +139,6 @@
                                                               ]];
 }
 
-- (void)drawKnob:(NSRect)knobRect
-{
-    // Draw knob
-    NSBezierPath* knobPath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 1.0, 1.0)];
-    if (self.isHighlighted) {
-        if (_knobGradient) {
-            [_knobGradient vlc_safeDrawInBezierPath:knobPath angle:_knobGradientAngleHighlighted];
-        } else {
-            [_activeKnobFillColor setFill];
-        }
-    } else {
-        if (_knobGradient) {
-            [_knobGradient vlc_safeDrawInBezierPath:knobPath angle:_knobGradientAngle];
-        } else {
-            [_knobFillColor setFill];
-        }
-    }
-
-    if (!_knobGradient)
-        [knobPath fill];
-
-    [_knobStrokeColor setStroke];
-    knobPath.lineWidth = 0.5;
-
-    [NSGraphicsContext saveGraphicsState];
-    if (self.isHighlighted)
-        [_knobShadow set];
-    [knobPath stroke];
-    [NSGraphicsContext restoreGraphicsState];
-}
-
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
 {
     // Inset rect
