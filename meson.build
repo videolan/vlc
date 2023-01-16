@@ -347,9 +347,7 @@ windows_version_test = '''
 
         # Defines needed for MinGW
 
-        mingw_defines = [
-            ['_POSIX_C_SOURCE',             '200809L'], #IEEE Std 1003.1
-        ]
+        mingw_defines = []
 
 ucrt_version_test = '''
 #include <crtdefs.h>
