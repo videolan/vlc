@@ -37,7 +37,6 @@
 
 /* Define to 1 for Unicode (Wide Chars) APIs. */
 #mesondefine UNICODE
-#mesondefine _UNICODE
 
 /* Define for Windows 7 APIs. */
 #mesondefine _WIN32_WINNT
