@@ -28,6 +28,13 @@
 
 struct tm *gmtime_r (const time_t *timep, struct tm *tm)
 {
+#if defined (_WIN32)
+    errno_t ret = gmtime_s(tm, timep);
+    if (ret == 0)
+        return tm;
+    errno = ret;
+    return NULL;
+#else // !_WIN32
     static const unsigned short normal[12] =
         { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     static const unsigned short leap[12] =
@@ -92,4 +99,5 @@ struct tm *gmtime_r (const time_t *timep, struct tm *tm)
 
     tm->tm_isdst = 0; /* UTC time */
     return tm;
+#endif // !_WIN32
 }
