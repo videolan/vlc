@@ -26,28 +26,4 @@
 
 @interface VLCVolumeSliderCell : VLCDefaultValueSliderCell
 
-// Colors
-@property NSColor *gradientColor;
-@property NSColor *gradientColor2;
-@property NSColor *trackStrokeColor;
-@property NSColor *filledTrackColor;
-@property NSColor *knobFillColor;
-@property NSColor *activeKnobFillColor;
-@property NSColor *shadowColor;
-@property NSColor *knobStrokeColor;
-@property NSColor *highlightBackground;
-
-// Gradients
-@property NSGradient *trackGradient;
-@property NSGradient *highlightGradient;
-@property NSGradient *knobGradient;
-@property CGFloat knobGradientAngle;
-@property CGFloat knobGradientAngleHighlighted;
-
-// Shadows
-@property NSShadow *knobShadow;
-
-- (void)setSliderStyleLight;
-- (void)setSliderStyleDark;
-
 @end
