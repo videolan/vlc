@@ -11,6 +11,7 @@ libandroid_aaudio_plugin_la_SOURCES = audio_output/android/aaudio.c audio_output
 libandroid_aaudio_plugin_la_LIBADD = libandroid_env.la $(LIBDL)
 
 libandroid_audiodevice_plugin_la_SOURCES = audio_output/android/device.c audio_output/android/device.h
+libandroid_audiodevice_plugin_la_LIBADD = libandroid_env.la
 
 if HAVE_ANDROID
 aout_LTLIBRARIES += libandroid_audiodevice_plugin.la libopensles_android_plugin.la \
