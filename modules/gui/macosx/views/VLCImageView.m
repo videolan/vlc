@@ -84,10 +84,8 @@
 {
     if (self.shouldShowDarkAppearance) {
         self.layer.borderColor = [NSColor VLClibraryItemBorderDarkColor].CGColor;
-        self.layer.backgroundColor = [NSColor VLClibraryCollectionViewItemBackgroundDarkColor].CGColor;
     } else {
         self.layer.borderColor = [NSColor VLClibraryItemBorderLightColor].CGColor;
-        self.layer.backgroundColor = [NSColor VLClibraryCollectionViewItemBackgroundLightColor].CGColor ;
     }
 }
 
