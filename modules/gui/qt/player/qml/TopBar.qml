@@ -226,19 +226,20 @@ FocusScope{
                 onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
             }
 
-            Image {
+            Widgets.BannerCone {
                 id: logo
 
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: backBtn.right
                 anchors.leftMargin: VLCStyle.margin_xxsmall
 
-                sourceSize.width: VLCStyle.icon_normal
-                sourceSize.height: VLCStyle.icon_normal
-                source: SVGColorImage.colorize("qrc:///misc/cone.svg")
-                            .accent(root.colors.accent)
-                            .uri()
-                enabled: false
+                Connections {
+                    target: logo.button
+
+                    onSystemMenuVisibilityChanged: {
+                        root.requestLockUnlockAutoHide(visible)
+                    }
+                }
             }
         }
 
