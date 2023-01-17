@@ -218,8 +218,8 @@ RunnableRun(void *userdata)
     else
     {
         vlc_tick_t deadline = now + task->timeout;
-        bool timeout = false;
-        while (task->status == RUNNING && !timeout)
+        int timeout = 0;
+        while (task->status == RUNNING && timeout == 0)
             timeout =
                 vlc_cond_timedwait(&task->cond_ended, &task->lock, deadline);
     }
