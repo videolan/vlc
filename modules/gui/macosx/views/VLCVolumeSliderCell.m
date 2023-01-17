@@ -28,6 +28,7 @@
 
 @interface VLCVolumeSliderCell () {
     BOOL _isRTL;
+    NSColor *_emptySliderBackgroundColor;
 }
 @end
 
@@ -37,6 +38,7 @@
 {
     self = [super init];
     if (self) {
+        [self setSliderStyleLight];
         _isRTL = ([self userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft);
     }
     return self;
@@ -46,9 +48,20 @@
 {
     self = [super initWithCoder:coder];
     if (self) {
+        [self setSliderStyleLight];
         _isRTL = ([self userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft);
     }
     return self;
+}
+
+- (void)setSliderStyleLight
+{
+    _emptySliderBackgroundColor = [NSColor colorWithCalibratedWhite:0.5 alpha:0.5];
+}
+
+- (void)setSliderStyleDark
+{
+    _emptySliderBackgroundColor = [NSColor colorWithCalibratedWhite:1 alpha:0.2];
 }
 
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
@@ -59,11 +72,6 @@
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect
                                                                    xRadius:trackBorderRadius
                                                                    yRadius:trackBorderRadius];
-
-    NSColor *emptyColor = [NSColor lightGrayColor];
-    if (@available(macOS 10.14, *)) {
-        emptyColor = [NSColor unemphasizedSelectedContentBackgroundColor];
-    }
 
     // Calculate filled track
     NSRect filledTrackRect = rect;
@@ -82,7 +90,7 @@
                                                                     yRadius:trackBorderRadius];
     NSColor *filledColor = [NSColor VLCAccentColor];
 
-    [emptyColor setFill];
+    [_emptySliderBackgroundColor setFill];
     [emptyTrackPath fill];
     [filledColor setFill];
     [filledTrackPath fill];

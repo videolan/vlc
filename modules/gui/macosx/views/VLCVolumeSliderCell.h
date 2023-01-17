@@ -26,4 +26,7 @@
 
 @interface VLCVolumeSliderCell : VLCDefaultValueSliderCell
 
+- (void)setSliderStyleLight;
+- (void)setSliderStyleDark;
+
 @end

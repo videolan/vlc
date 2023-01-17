@@ -34,6 +34,12 @@
     if (self) {
         NSAssert([self.cell isKindOfClass:[VLCVolumeSliderCell class]],
                  @"VLCVolumeSlider cell is not VLCVolumeSliderCell");
+
+        if (@available(macOS 10.14, *)) {
+            [self viewDidChangeEffectiveAppearance];
+        } else {
+            [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
+        }
     }
     return self;
 }
@@ -47,6 +53,15 @@
 // http://stackoverflow.com/questions/3985816/custom-nsslidercell
 - (void)setNeedsDisplayInRect:(NSRect)invalidRect {
     [super setNeedsDisplayInRect:[self bounds]];
+}
+
+- (void)viewDidChangeEffectiveAppearance
+{
+    if (self.shouldShowDarkAppearance) {
+        [(VLCVolumeSliderCell*)self.cell setSliderStyleDark];
+    } else {
+        [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
+    }
 }
 
 @end
