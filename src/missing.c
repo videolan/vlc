@@ -34,21 +34,19 @@
 # include "config.h"
 #endif
 
-#include <stdnoreturn.h>
-
 #include <vlc_common.h>
 #include <assert.h>
 
 #ifndef ENABLE_SOUT
 # include <vlc_sout.h>
 
-noreturn int sout_AccessOutControl(sout_access_out_t *out, int query, ...)
+_Noreturn int sout_AccessOutControl(sout_access_out_t *out, int query, ...)
 {
     VLC_UNUSED (out); VLC_UNUSED (query);
     vlc_assert_unreachable ();
 }
 
-noreturn void sout_AccessOutDelete(sout_access_out_t *out)
+_Noreturn void sout_AccessOutDelete(sout_access_out_t *out)
 {
     VLC_UNUSED (out);
     vlc_assert_unreachable ();
@@ -63,19 +61,19 @@ sout_access_out_t *sout_AccessOutNew (vlc_object_t *obj,
     return NULL;
 }
 
-noreturn ssize_t sout_AccessOutRead(sout_access_out_t *out, block_t *block)
+_Noreturn ssize_t sout_AccessOutRead(sout_access_out_t *out, block_t *block)
 {
     VLC_UNUSED (out); VLC_UNUSED (block);
     vlc_assert_unreachable ();
 }
 
-noreturn int sout_AccessOutSeek(sout_access_out_t *out, uint64_t offset)
+_Noreturn int sout_AccessOutSeek(sout_access_out_t *out, uint64_t offset)
 {
     VLC_UNUSED (out); VLC_UNUSED (offset);
     vlc_assert_unreachable ();
 }
 
-noreturn ssize_t sout_AccessOutWrite(sout_access_out_t *out, block_t *block)
+_Noreturn ssize_t sout_AccessOutWrite(sout_access_out_t *out, block_t *block)
 {
     VLC_UNUSED (out); VLC_UNUSED (block);
     vlc_assert_unreachable ();
@@ -92,7 +90,7 @@ session_descriptor_t *sout_AnnounceRegisterSDP (vlc_object_t *obj,
 }
 
 #undef sout_AnnounceUnRegister
-noreturn void sout_AnnounceUnRegister(vlc_object_t *obj,
+_Noreturn void sout_AnnounceUnRegister(vlc_object_t *obj,
                                       session_descriptor_t *d)
 {
     VLC_UNUSED (obj); VLC_UNUSED (d);
@@ -107,58 +105,58 @@ encoder_t *sout_EncoderCreate( vlc_object_t *p_this, size_t owner_size )
     return NULL;
 }
 
-noreturn sout_input_t *sout_MuxAddStream(sout_mux_t *mux,
+_Noreturn sout_input_t *sout_MuxAddStream(sout_mux_t *mux,
                                          const es_format_t *fmt)
 {
     VLC_UNUSED (mux); VLC_UNUSED (fmt);
     vlc_assert_unreachable ();
 }
 
-noreturn void sout_MuxDelete(sout_mux_t *mux)
+_Noreturn void sout_MuxDelete(sout_mux_t *mux)
 {
     VLC_UNUSED (mux);
     vlc_assert_unreachable ();
 }
 
-noreturn void sout_MuxDeleteStream(sout_mux_t *mux, sout_input_t *input)
+_Noreturn void sout_MuxDeleteStream(sout_mux_t *mux, sout_input_t *input)
 {
     VLC_UNUSED (mux); VLC_UNUSED (input);
     vlc_assert_unreachable ();
 }
 
-noreturn int sout_MuxGetStream(sout_mux_t *mux, unsigned n, vlc_tick_t *date)
+_Noreturn int sout_MuxGetStream(sout_mux_t *mux, unsigned n, vlc_tick_t *date)
 {
     (void) mux; (void) n; (void) date;
     vlc_assert_unreachable ();
 }
 
-noreturn sout_mux_t *sout_MuxNew(sout_access_out_t *out, const char *mux)
+_Noreturn sout_mux_t *sout_MuxNew(sout_access_out_t *out, const char *mux)
 {
     VLC_UNUSED(out); VLC_UNUSED(mux);
     vlc_assert_unreachable ();
 }
 
-noreturn int sout_MuxSendBuffer(sout_mux_t *mux, sout_input_t *input,
+_Noreturn int sout_MuxSendBuffer(sout_mux_t *mux, sout_input_t *input,
                                 block_t *block)
 {
     VLC_UNUSED (mux); VLC_UNUSED (input); VLC_UNUSED (block);
     vlc_assert_unreachable ();
 }
 
-noreturn void sout_MuxFlush(sout_mux_t *mux, sout_input_t *input)
+_Noreturn void sout_MuxFlush(sout_mux_t *mux, sout_input_t *input)
 {
     VLC_UNUSED (mux); VLC_UNUSED (input);
     vlc_assert_unreachable ();
 }
 
-noreturn void sout_StreamChainDelete(sout_stream_t *first,
+_Noreturn void sout_StreamChainDelete(sout_stream_t *first,
                                      sout_stream_t *end)
 {
     (void) first; (void) end;
     vlc_assert_unreachable ();
 }
 
-noreturn sout_stream_t *sout_StreamChainNew(vlc_object_t *sout,
+_Noreturn sout_stream_t *sout_StreamChainNew(vlc_object_t *sout,
                                             const char *chain,
                                             sout_stream_t *next)
 {
@@ -170,20 +168,20 @@ noreturn sout_stream_t *sout_StreamChainNew(vlc_object_t *sout,
 #ifndef ENABLE_VLM
 # include <vlc_vlm.h>
 
-noreturn int vlm_Control(vlm_t *vlm, int query, ...)
+_Noreturn int vlm_Control(vlm_t *vlm, int query, ...)
 {
     VLC_UNUSED (query);
     VLC_UNUSED (vlm);
     vlc_assert_unreachable ();
 }
 
-noreturn void vlm_Delete(vlm_t *vlm)
+_Noreturn void vlm_Delete(vlm_t *vlm)
 {
     VLC_UNUSED (vlm);
     vlc_assert_unreachable ();
 }
 
-noreturn int vlm_ExecuteCommand(vlm_t *vlm, const char *cmd,
+_Noreturn int vlm_ExecuteCommand(vlm_t *vlm, const char *cmd,
                                 vlm_message_t **pm)
 {
     VLC_UNUSED (vlm);
@@ -192,14 +190,14 @@ noreturn int vlm_ExecuteCommand(vlm_t *vlm, const char *cmd,
     vlc_assert_unreachable ();
 }
 
-noreturn vlm_message_t *vlm_MessageAdd(vlm_message_t *a, vlm_message_t *b)
+_Noreturn vlm_message_t *vlm_MessageAdd(vlm_message_t *a, vlm_message_t *b)
 {
     VLC_UNUSED (a);
     VLC_UNUSED (b);
     vlc_assert_unreachable ();
 }
 
-noreturn void vlm_MessageDelete(vlm_message_t *m)
+_Noreturn void vlm_MessageDelete(vlm_message_t *m)
 {
     VLC_UNUSED (m);
     vlc_assert_unreachable ();
@@ -236,31 +234,31 @@ update_t *(update_New)(vlc_object_t *obj)
     return NULL;
 }
 
-noreturn void update_Delete(update_t *u)
+_Noreturn void update_Delete(update_t *u)
 {
     (void) u;
     vlc_assert_unreachable();
 }
 
-noreturn void update_Check(update_t *u, void (*cb)(void *, bool), void *opaque)
+_Noreturn void update_Check(update_t *u, void (*cb)(void *, bool), void *opaque)
 {
     (void) u; (void) cb; (void) opaque;
     vlc_assert_unreachable();
 }
 
-noreturn bool update_NeedUpgrade(update_t *u)
+_Noreturn bool update_NeedUpgrade(update_t *u)
 {
     (void) u;
     vlc_assert_unreachable();
 }
 
-noreturn void update_Download(update_t *u, const char *dir)
+_Noreturn void update_Download(update_t *u, const char *dir)
 {
     (void) u; (void) dir;
     vlc_assert_unreachable();
 }
 
-noreturn update_release_t *update_GetRelease(update_t *u)
+_Noreturn update_release_t *update_GetRelease(update_t *u)
 {
     (void) u;
     vlc_assert_unreachable();
@@ -269,7 +267,7 @@ noreturn update_release_t *update_GetRelease(update_t *u)
 
 #include <vlc_threads.h>
 #if defined(LIBVLC_USE_PTHREAD_CLEANUP)
-noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
+_Noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 {
     (void) cleaner;
     vlc_assert_unreachable ();

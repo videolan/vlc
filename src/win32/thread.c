@@ -36,7 +36,6 @@
 #include "libvlc.h"
 #include <stdarg.h>
 #include <stdatomic.h>
-#include <stdnoreturn.h>
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>
@@ -465,7 +464,7 @@ void vlc_restorecancel (int state)
     th->killable = !!state;
 }
 
-noreturn static void vlc_docancel(struct vlc_thread *th)
+_Noreturn static void vlc_docancel(struct vlc_thread *th)
 {
     th->killable = false; /* Do not re-enter cancellation cleanup */
 
