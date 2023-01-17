@@ -153,7 +153,9 @@ public:
         if ( !m_useClientSideDecoration || (msg->hwnd != WinId(m_window)) )
             return false;
 
-        if ( msg->message == WM_NCCALCSIZE )
+        switch ( msg->message )
+        {
+        case WM_NCCALCSIZE:
         {
             /* This is used to remove the decoration instead of using FramelessWindowHint because
              * frameless window don't support areo snapping
@@ -194,20 +196,23 @@ public:
             return true;
         }
 
-        // These undocumented messages are sent to draw themed window
-        // borders. Block them to prevent drawing borders over the client
-        // area.
-        if ( msg->message == WM_NCUAHDRAWCAPTION || msg->message == WM_NCUAHDRAWFRAME)
+        case WM_NCUAHDRAWCAPTION:
+        case WM_NCUAHDRAWFRAME:
         {
-             *result = 0;
-             return true;
+            // These undocumented messages are sent to draw themed window
+            // borders. Block them to prevent drawing borders over the client
+            // area.
+
+            *result = 0;
+            return true;
         }
 
-        // send to determine on what part of UI is mouse ON
-        // handle it to relay if mouse is on the CSD buttons
-        // required for snap layouts menu (WINDOWS 11)
-        if ( msg->message == WM_NCHITTEST )
+        case WM_NCHITTEST:
         {
+            // send to determine on what part of UI is mouse ON
+            // handle it to relay if mouse is on the CSD buttons
+            // required for snap layouts menu (WINDOWS 11)
+
             setAllUnhovered();
 
             // Get the point in screen coordinates.
@@ -236,11 +241,12 @@ public:
                 vlc_assert_unreachable();
                 return false;
             }
+
+            break;
         }
 
-        if ( msg->message == WM_NCMOUSEMOVE )
+        case WM_NCMOUSEMOVE:
         {
-
             // when we handle WM_NCHITTEST, that makes the OS to capture the mouse events
             // and WM_NCMOUSEMOVE is sent in this case, manually handle them here and relay
             // to UI to draw correct button state
@@ -277,14 +283,20 @@ public:
                 TrackMouseEvent(&ev); // TODO check return?
                 m_trackingMouse = true;
             }
+
+            break;
         }
 
-        if ( msg->message == WM_NCMOUSELEAVE || msg->message == WM_MOUSELEAVE )
+        case WM_NCMOUSELEAVE:
+        case WM_MOUSELEAVE:
         {
             m_trackingMouse = false;
 
             // release all buttons we may have captured
             setAllUnhovered();
+
+            break;
+        }
         }
 
         return false;
