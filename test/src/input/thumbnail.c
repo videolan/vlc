@@ -165,8 +165,8 @@ static void thumbnailer_callback_cancel( void* data, picture_t* p_thumbnail )
     assert( p_thumbnail == NULL );
     vlc_mutex_lock( &p_ctx->lock );
     p_ctx->b_done = true;
-    vlc_mutex_unlock( &p_ctx->lock );
     vlc_cond_signal( &p_ctx->cond );
+    vlc_mutex_unlock( &p_ctx->lock );
 }
 
 
