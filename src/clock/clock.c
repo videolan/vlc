@@ -154,9 +154,10 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 /* System and stream ts should be incrementing */
                 if (system_diff < 0 || stream_diff < 0)
                 {
-                    vlc_warning(main_clock->logger, "resetting master clock: "
-                                "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
-                                system_diff, stream_diff);
+                    if (main_clock->logger != NULL)
+                        vlc_warning(main_clock->logger, "resetting master clock: "
+                                    "decreasing ts: system: %"PRId64 ", stream: %" PRId64,
+                                    system_diff, stream_diff);
                     /* Reset and continue (calculate the offset from the
                      * current point) */
                     vlc_clock_main_reset(main_clock);
@@ -165,8 +166,9 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 else if (instant_coeff > 1.0 + COEFF_THRESHOLD
                       || instant_coeff < 1.0 - COEFF_THRESHOLD)
                 {
-                    vlc_warning(main_clock->logger, "resetting master clock: "
-                                "coefficient too unstable: %f", instant_coeff);
+                    if (main_clock->logger != NULL)
+                        vlc_warning(main_clock->logger, "resetting master clock: "
+                                    "coefficient too unstable: %f", instant_coeff);
                     /* Reset and continue (calculate the offset from the
                      * current point) */
                     vlc_clock_main_reset(main_clock);
@@ -283,7 +285,8 @@ vlc_clock_monotonic_to_system_locked(vlc_clock_t *clock, vlc_tick_t now,
 
         if (pcr_delay > CR_MAX_GAP)
         {
-            vlc_error(main_clock->logger, "Invalid PCR delay ! Ignoring it...");
+            if (main_clock->logger != NULL)
+                vlc_error(main_clock->logger, "Invalid PCR delay ! Ignoring it...");
             pcr_delay = 0;
         }
 
@@ -434,11 +437,6 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
         return NULL;
 
     main_clock->logger = vlc_LogHeaderCreate(parent_logger, "clock");
-    if (main_clock->logger == NULL)
-    {
-        free(main_clock);
-        return NULL;
-    }
     main_clock->tracer = parent_tracer;
 
     vlc_mutex_init(&main_clock->lock);
@@ -539,7 +537,8 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
 void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
 {
     assert(main_clock->rc == 1);
-    vlc_LogDestroy(main_clock->logger);
+    if (main_clock->logger != NULL)
+        vlc_LogDestroy(main_clock->logger);
     free(main_clock);
 }
 
