@@ -906,6 +906,7 @@ Demux(demux_t *demux)
     if (ret != VLC_SUCCESS)
         return VLC_DEMUXER_EGENERIC;
 
+    vlc_tick_t prev_pts = sys->pts;
     if (sys->audio_track_count > 0
      && (sys->video_track_count > 0 || sys->sub_track_count > 0))
         sys->pts = __MIN(sys->audio_pts, sys->video_pts);
@@ -916,6 +917,15 @@ Demux(demux_t *demux)
 
     if (sys->pts > sys->length)
         sys->pts = sys->length;
+
+    if (!sys->can_control_pace)
+    {
+        /* Simulate a live input */
+        vlc_tick_t delay = sys->pts - prev_pts;
+        delay = delay - delay / 1000 /* Sleep a little less */;
+        vlc_tick_sleep(delay);
+    }
+
     es_out_SetPCR(demux->out, sys->pts);
 
     const vlc_tick_t video_step_length =
