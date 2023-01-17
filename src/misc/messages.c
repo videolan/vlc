@@ -484,6 +484,9 @@ static const struct vlc_logger_operations header_ops = {
 struct vlc_logger *vlc_LogHeaderCreate(struct vlc_logger *parent,
                                        const char *str)
 {
+    if (parent == NULL)
+        return NULL;
+
     size_t len = strlen(str) + 1;
     struct vlc_logger_header *header = malloc(sizeof (*header) + len);
     if (unlikely(header == NULL))
