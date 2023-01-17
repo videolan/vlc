@@ -53,8 +53,12 @@
 
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
 {
+    const CGFloat trackBorderRadius = 1;
+
     // Empty Track Drawing
-    NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:1 yRadius:1];
+    NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect
+                                                                   xRadius:trackBorderRadius
+                                                                   yRadius:trackBorderRadius];
 
     NSColor *emptyColor = [NSColor lightGrayColor];
     if (@available(macOS 10.14, *)) {
@@ -62,25 +66,26 @@
     }
 
     // Calculate filled track
-    NSRect leadingTrackRect = rect;
+    NSRect filledTrackRect = rect;
     NSRect knobRect = [self knobRectFlipped:NO];
     CGFloat sliderCenter = knobRect.origin.x  + (self.knobThickness / 2);
 
-    leadingTrackRect.size.width = sliderCenter;
     if (_isRTL) {
-        leadingTrackRect.origin.x = sliderCenter;
+        filledTrackRect.size.width = rect.origin.x + rect.size.width - sliderCenter;
+        filledTrackRect.origin.x = sliderCenter;
+    } else {
+        filledTrackRect.size.width = sliderCenter;
     }
 
-    CGFloat leadingTrackCornerRadius = 2;
-    NSBezierPath* leadingTrackPath = [NSBezierPath bezierPathWithRoundedRect:leadingTrackRect
-                                                                     xRadius:leadingTrackCornerRadius
-                                                                     yRadius:leadingTrackCornerRadius];
+    NSBezierPath* filledTrackPath = [NSBezierPath bezierPathWithRoundedRect:filledTrackRect
+                                                                    xRadius:trackBorderRadius
+                                                                    yRadius:trackBorderRadius];
     NSColor *filledColor = [NSColor VLCAccentColor];
 
     [emptyColor setFill];
     [emptyTrackPath fill];
     [filledColor setFill];
-    [leadingTrackPath fill];
+    [filledTrackPath fill];
 }
 
 @end
