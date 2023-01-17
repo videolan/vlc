@@ -178,17 +178,9 @@ static int OpenEncoder(vlc_object_t *this)
         goto error;
     }
 
-    RaRational *timebase = malloc(sizeof(RaRational));
-    if (timebase == NULL)
-    {
-        msg_Err(enc, "%s", "Unable to allocate timebase\n");
-        err = VLC_ENOMEM;
-        goto error;
-    }
+    RaRational timebase = { .num = enc->fmt_in.video.i_frame_rate_base, .den = enc->fmt_in.video.i_frame_rate };
 
-    timebase->num = enc->fmt_in.video.i_frame_rate_base;
-    timebase->den = enc->fmt_in.video.i_frame_rate;
-    rav1e_config_set_time_base(ra_config, *timebase);
+    rav1e_config_set_time_base(ra_config, timebase);
 
     int tile_rows = var_InheritInteger(enc, SOUT_CFG_PREFIX "tile-rows");
     int tile_columns = var_InheritInteger(enc, SOUT_CFG_PREFIX "tile-columns");
