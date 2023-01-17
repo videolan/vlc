@@ -606,7 +606,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         AOM_IMG_FMT_I42016 : AOM_IMG_FMT_I420;
 
     /* Create and initialize the aom_image */
-    if (!aom_img_wrap(&img, img_fmt, i_w, i_h, 32, p_pict->p[0].p_pixels))
+    if (!aom_img_wrap(&img, img_fmt, i_w, i_h, p_pict->p[0].i_pitch, p_pict->p[0].p_pixels))
     {
         AOM_ERR(p_enc, ctx, "Failed to wrap image");
         return NULL;
