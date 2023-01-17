@@ -212,13 +212,13 @@ void MediaLib::addAndPlay(const MLItemId & itemId, const QStringList &options )
 void MediaLib::addAndPlay(const QString& mrl, const QStringList &options)
 {
     vlc::playlist::Media media{ mrl, mrl, options };
-    m_intf->p_mainPlaylistController->append( {media}, true );
+    m_intf->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{media}, true );
 }
 
 void MediaLib::addAndPlay(const QUrl& mrl, const QStringList &options)
 {
     vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName(), options };
-    m_intf->p_mainPlaylistController->append( {media}, true );
+    m_intf->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{media}, true );
 }
 
 
