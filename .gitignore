@@ -23,7 +23,8 @@ aclocal.m4
 ChangeLog
 compile
 config.status
-config.h*
+config.h
+config.h.in
 config.log
 configure
 doltcompile
