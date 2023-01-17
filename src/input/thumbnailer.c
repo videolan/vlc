@@ -173,9 +173,8 @@ on_thumbnailer_input_event( input_thread_t *input,
     if (event->type == INPUT_EVENT_THUMBNAIL_READY)
         task->pic = picture_Hold(event->thumbnail);
 
-    vlc_mutex_unlock(&task->lock);
-
     vlc_cond_signal(&task->cond_ended);
+    vlc_mutex_unlock(&task->lock);
 }
 
 static void
@@ -254,8 +253,8 @@ Interrupt(task_t *task)
     /* Wake up RunnableRun() which will call input_Stop() */
     vlc_mutex_lock(&task->lock);
     task->status = INTERRUPTED;
-    vlc_mutex_unlock(&task->lock);
     vlc_cond_signal(&task->cond_ended);
+    vlc_mutex_unlock(&task->lock);
 }
 
 static task_t *
