@@ -69,7 +69,7 @@ static void conn_send_raw(const void *buf, size_t len)
 
 static void conn_send(const char *str)
 {
-    return conn_send_raw(str, strlen(str));
+    conn_send_raw(str, strlen(str));
 }
 
 static void conn_shutdown(bool duplex)

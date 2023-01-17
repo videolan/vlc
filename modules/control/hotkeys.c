@@ -77,7 +77,8 @@ INTF_ACTION_HANDLER()
     switch (action_id)
     {
         case ACTIONID_QUIT:
-            return libvlc_Quit(vlc_object_instance(intf));
+            libvlc_Quit(vlc_object_instance(intf));
+            return;
         case ACTIONID_INTF_TOGGLE_FSC:
         case ACTIONID_INTF_HIDE:
             varname = "intf-toggle-fscontrol";
@@ -1098,7 +1099,10 @@ handle_action(intf_thread_t *intf, vlc_action_id_t action_id)
             actions[action_idx].range.last >= action_id)
             break;
     if (actions[action_idx].type == NULL_ACTION)
-        return msg_Warn(intf, "no handler for action %d", action_id);
+    {
+        msg_Warn(intf, "no handler for action %d", action_id);
+        return;
+    }
     struct vlc_action const *action = actions + action_idx;
 
     vlc_playlist_t *playlist = intf->p_sys->playlist;
