@@ -33,7 +33,8 @@ if opengl_dep.found()
                 files('display.c'),
                 opengl_vout_commonsources
             ],
-        'link_with' : [libvlc_opengl]
+        'link_with' : [libvlc_opengl],
+        'dependencies' : [gl_common_dep, m_lib]
     }
 endif
 
@@ -45,7 +46,7 @@ endif
 
 # interop_sw
 if ['darwin', 'android'].contains(host_system) or opengl_dep.found() or opengles2_dep.found()
-    interop_sw_deps = []
+    interop_sw_deps = [gl_common_dep, m_lib]
     interop_sw_cargs = []
 
     if have_osx and opengl_dep.found()
