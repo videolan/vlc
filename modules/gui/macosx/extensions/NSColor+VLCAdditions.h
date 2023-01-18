@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)VLClibraryCollectionViewItemBackgroundLightColor;
 + (instancetype)VLClibraryCollectionViewItemBackgroundDarkColor;
 + (instancetype)VLCSliderFillColor;
++ (instancetype)VLCSliderLightBackgroundColor;
++ (instancetype)VLCSliderDarkBackgroundColor;
 
 @end
 

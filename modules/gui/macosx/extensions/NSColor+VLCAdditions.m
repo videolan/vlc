@@ -101,7 +101,18 @@
 
 + (instancetype)VLCSliderFillColor
 {
-    return [NSColor colorWithRed:1. green:0.38039 blue:0.03921 alpha:1.];
+    return [NSColor VLCAccentColor];
+}
+
+
++ (instancetype)VLCSliderLightBackgroundColor
+{
+    return [NSColor colorWithCalibratedWhite:0.5 alpha:0.5];
+}
+
++ (instancetype)VLCSliderDarkBackgroundColor
+{
+    return [NSColor colorWithCalibratedWhite:1 alpha:0.2];
 }
 
 @end
