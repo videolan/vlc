@@ -160,6 +160,7 @@ static struct d3d11va_pic_context *CreatePicContext(
     ID3D11ShaderResourceView_GetResource(renderSrc[0], &p_resource);
 
     pic_ctx->ctx.picsys.slice_index = slice;
+    pic_ctx->ctx.picsys.sharedHandle = INVALID_HANDLE_VALUE;
     for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
     {
         pic_ctx->ctx.picsys.resource[i] = p_resource;

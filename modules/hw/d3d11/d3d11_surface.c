@@ -654,6 +654,7 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter, filter_sys_t *p_sy
         d3d11_pic_context_destroy, d3d11_pic_context_copy,
         vlc_video_context_Hold(p_filter->vctx_out),
     };
+    pic_ctx->picsys.sharedHandle = INVALID_HANDLE_VALUE;
     AcquireD3D11PictureSys(&pic_ctx->picsys);
     ID3D11Texture2D_Release(pic_ctx->picsys.texture[KNOWN_DXGI_INDEX]);
 

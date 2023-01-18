@@ -840,6 +840,7 @@ static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
     pic_ctx->ctx.s.vctx = vlc_video_context_Hold(vctx);
 
     pic_ctx->ctx.picsys.slice_index = slice;
+    pic_ctx->ctx.picsys.sharedHandle = INVALID_HANDLE_VALUE;
     for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
     {
         pic_ctx->ctx.picsys.texture[i] = texture;
