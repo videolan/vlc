@@ -132,7 +132,6 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         assert( p_item != NULL );
 
         vlc_mutex_lock( &ctx.lock );
-        int res = 0;
 
         if ( test_params[i].b_use_pos )
         {
