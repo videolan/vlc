@@ -71,5 +71,6 @@
 
 - (IBAction)timeSliderAction:(id)sender;
 - (IBAction)fullscreen:(id)sender;
+- (void)updateTimeSlider:(NSNotification *)aNotification;
 
 @end

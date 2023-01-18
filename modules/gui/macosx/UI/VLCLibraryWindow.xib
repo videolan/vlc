@@ -21,7 +21,7 @@
             <rect key="contentRect" x="196" y="240" width="896" height="456"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <visualEffectView key="contentView" wantsLayer="YES" misplaced="YES" blendingMode="behindWindow" material="appearanceBased" state="followsWindowActiveState" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="896" height="190"/>
+                <rect key="frame" x="0.0" y="0.0" width="896" height="456"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <splitView autosaveName="librarywindowsplitview" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u8g-jy-S4e">
@@ -335,7 +335,7 @@
                                         <rect key="frame" x="212" y="4" width="472" height="37"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
-                                                <rect key="frame" x="156" y="21" width="160" height="16"/>
+                                                <rect key="frame" x="177" y="21" width="160" height="16"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name" customClass="VLCWrappableTextField">
                                                         <rect key="frame" x="-2" y="0.0" width="78" height="16"/>
@@ -369,7 +369,6 @@
                                                     </textField>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstItem="d0e-29-yNq" firstAttribute="leading" secondItem="jlv-jC-dQB" secondAttribute="leading" id="PFS-2F-yZT"/>
                                                     <constraint firstAttribute="height" secondItem="d0e-29-yNq" secondAttribute="height" id="ppe-cg-mD0"/>
                                                 </constraints>
                                                 <visibilityPriorities>
@@ -431,7 +430,6 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="trailing" id="25y-hg-Obr"/>
-                                            <constraint firstItem="jlv-jC-dQB" firstAttribute="centerX" secondItem="Ktr-qT-1fr" secondAttribute="centerX" priority="250" id="4V1-XB-slx"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="leading" constant="-4" id="6HG-39-dSt"/>
                                             <constraint firstItem="5o7-Z0-dqS" firstAttribute="centerY" secondItem="Ktr-qT-1fr" secondAttribute="centerY" id="6rb-4H-ISj"/>
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="centerY" secondItem="9Hg-t2-K5z" secondAttribute="centerY" id="Egp-c6-x6Y"/>
@@ -445,6 +443,7 @@
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jlv-jC-dQB" secondAttribute="trailing" constant="4" id="dE6-x3-y9L"/>
                                             <constraint firstItem="jlv-jC-dQB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="zOB-QJ-TUy" secondAttribute="leading" id="nyg-q0-uLs"/>
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="trailing" constant="8" id="ob8-aS-evc"/>
+                                            <constraint firstItem="jlv-jC-dQB" firstAttribute="centerX" secondItem="9Hg-t2-K5z" secondAttribute="centerX" id="spW-Wf-nKA"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="leading" secondItem="zOB-QJ-TUy" secondAttribute="trailing" constant="4" id="tjf-4h-ukW"/>
                                         </constraints>
                                     </customView>
@@ -548,7 +547,7 @@
                         </constraints>
                     </visualEffectView>
                     <visualEffectView misplaced="YES" blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="6gW-0d-ymm" userLabel="Option Bar">
-                        <rect key="frame" x="0.0" y="-79" width="596" height="32"/>
+                        <rect key="frame" x="0.0" y="187" width="596" height="32"/>
                         <subviews>
                             <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8iI-b7-Eag">
                                 <rect key="frame" x="189" y="4" width="223" height="24"/>
@@ -790,6 +789,7 @@
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
                 <outlet property="repeatButton" destination="t4r-bt-Jxm" id="U7s-Tb-Ado"/>
                 <outlet property="shuffleButton" destination="SYG-jf-oHJ" id="b4m-v0-sC9"/>
+                <outlet property="songArtistSeparatorTextField" destination="XbZ-eQ-zmA" id="lh8-I7-g90"/>
                 <outlet property="songNameTextField" destination="d0e-29-yNq" id="JTI-XG-miC"/>
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>

@@ -25,11 +25,17 @@
 #import "VLCControlsBarCommon.h"
 
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindow.h"
+
 #import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+
 #import "views/VLCVolumeSlider.h"
+#import "views/VLCWrappableTextField.h"
 
 /*****************************************************************************
  * VLCMainWindowControlsBar
@@ -129,6 +135,18 @@
 
 #pragma mark -
 #pragma mark Extra updaters
+
+- (void)updateTimeSlider:(NSNotification *)aNotification
+{
+    [super updateTimeSlider:aNotification];
+
+    VLCInputItem *inputItem = _playerController.currentMedia;
+    if (inputItem == nil) {
+        return;
+    }
+
+    _songArtistSeparatorTextField.hidden = inputItem.artist.length == 0;
+}
 
 - (void)updateVolumeSlider:(NSNotification *)aNotification
 {
