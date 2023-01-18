@@ -99,32 +99,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     CVDisplayLinkSetOutputCallback(_displayLink, DisplayLinkCallback, (__bridge void*) self);
 }
 
-- (double)myNormalizedDouble
-{
-    double min;
-    double max;
-    double current;
-
-    min = [self minValue];
-    max = [self maxValue];
-    current = [self doubleValue];
-
-    max -= min;
-    current -= min;
-
-    return current / max;
-}
-
-- (NSRect)knobRectFlipped:(BOOL)flipped
-{
-    NSRect barRect = [self barRectFlipped:NO];
-    CGFloat knobThickness = barRect.size.height;
-    double val = [self myNormalizedDouble];
-
-    NSRect rect = NSMakeRect((NSWidth(barRect) - knobThickness) * val, 0, knobThickness, knobThickness);
-    return [[self controlView] backingAlignedRect:rect options:NSAlignAllEdgesNearest];
-}
-
 #pragma mark -
 #pragma mark Normal slider drawing
 
@@ -135,11 +109,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     }
 
     [super drawKnob:knobRect];
-}
-
-- (NSRect)barRectFlipped:(BOOL)flipped
-{
-    return [[self controlView] bounds];
 }
 
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
