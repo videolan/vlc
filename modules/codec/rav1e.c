@@ -32,11 +32,14 @@
 
 #define SOUT_CFG_PREFIX "sout-rav1e-"
 
+struct frame_priv_s
+{
+    vlc_tick_t pts;
+};
+
 typedef struct
 {
     struct RaContext *ra_context;
-    date_t date;
-    bool date_set;
 } encoder_sys_t;
 
 static block_t *Encode(encoder_t *enc, picture_t *p_pict)
@@ -46,13 +49,14 @@ static block_t *Encode(encoder_t *enc, picture_t *p_pict)
     block_t *p_out = NULL;
 
     RaFrame *frame;
+    struct frame_priv_s *frame_priv = NULL;
     if (p_pict != NULL)
     {
-        if (!sys->date_set && p_pict->date != VLC_TICK_INVALID)
-        {
-            date_Set(&sys->date, p_pict->date);
-            sys->date_set = true;
-        }
+        frame_priv = malloc(sizeof(*frame_priv));
+        if (!frame_priv)
+            goto error;
+
+        frame_priv->pts = p_pict->date;
 
         frame = rav1e_frame_new(ctx);
         if (frame == NULL) {
@@ -60,12 +64,14 @@ static block_t *Encode(encoder_t *enc, picture_t *p_pict)
             goto error;
         }
 
-        for (int idx = 0; idx < p_pict->i_planes; idx++)
+        for (int idx = 0; idx < p_pict->i_planes; idx++) {
             rav1e_frame_fill_plane(frame, idx,
                                    p_pict->p[idx].p_pixels,
                                    p_pict->p[idx].i_pitch * p_pict->p[idx].i_visible_lines,
                                    p_pict->p[idx].i_pitch,
                                    p_pict->p[idx].i_pixel_pitch);
+        }
+        rav1e_frame_set_opaque(frame, frame_priv, free);
     }
     else
         frame = NULL; /* Drain with a NULL frame */
@@ -98,7 +104,11 @@ static block_t *Encode(encoder_t *enc, picture_t *p_pict)
                 }
 
                 memcpy(p_block->p_buffer, pkt->data, pkt->len);
-                p_block->i_dts = p_block->i_pts = date_Get(&sys->date);
+                /* Reordered frames are always muxed together in the same packet with the
+                   next visible frame, and visible frames always come out in order. Therefore
+                   dts and pts will always be equal for any given packet. */
+                p_block->i_dts = p_block->i_pts = ((struct frame_priv_s *) pkt->opaque)->pts;
+                free(pkt->opaque);
 
                 if (pkt->frame_type == RA_FRAME_TYPE_KEY)
                     p_block->i_flags |= BLOCK_FLAG_TYPE_I;
@@ -123,6 +133,7 @@ static block_t *Encode(encoder_t *enc, picture_t *p_pict)
     return p_out;
 
 error:
+    free(frame_priv);
     free(p_out);
     return NULL;
 }
@@ -264,10 +275,6 @@ static int OpenEncoder(vlc_object_t *this)
         goto error;
     }
     rav1e_config_unref(ra_config);
-
-    date_Init(&sys->date, enc->fmt_out.video.i_frame_rate,
-              enc->fmt_out.video.i_frame_rate_base);
-    sys->date_set = false;
 
     static const struct vlc_encoder_operations ops =
     {
