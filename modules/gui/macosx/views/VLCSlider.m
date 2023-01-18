@@ -58,7 +58,7 @@ static inline void mouseEnteredOrExited(NSLayoutConstraint *const __unsafe_unret
         if (@available(macOS 10.14, *)) {
             [self viewDidChangeEffectiveAppearance];
         } else {
-            [self setSliderStyleLight];
+            [(VLCSliderCell*)self.cell setSliderStyleLight];
         }
         
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^(){
@@ -140,22 +140,12 @@ static inline void mouseEnteredOrExited(NSLayoutConstraint *const __unsafe_unret
     return NO;
 }
 
-- (void)setSliderStyleLight
-{
-    [(VLCSliderCell*)[self cell] setSliderStyleLight];
-}
-
-- (void)setSliderStyleDark
-{
-    [(VLCSliderCell*)[self cell] setSliderStyleDark];
-}
-
 - (void)viewDidChangeEffectiveAppearance
 {
     if (self.shouldShowDarkAppearance) {
-        [self setSliderStyleDark];
+        [(VLCSliderCell*)self.cell setSliderStyleDark];
     } else {
-        [self setSliderStyleLight];
+        [(VLCSliderCell*)self.cell setSliderStyleLight];
     }
 }
 

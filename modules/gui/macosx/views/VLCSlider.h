@@ -30,7 +30,4 @@
 /* Indicates if the slider is scrollable with the mouse or trackpad scrollwheel. */
 @property (readwrite) BOOL isScrollable;
 
-- (void)setSliderStyleLight;
-- (void)setSliderStyleDark;
-
 @end
