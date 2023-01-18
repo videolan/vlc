@@ -335,33 +335,33 @@
                                         <rect key="frame" x="212" y="4" width="472" height="37"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
-                                                <rect key="frame" x="177" y="21" width="160" height="16"/>
+                                                <rect key="frame" x="175" y="21" width="164" height="16"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name" customClass="VLCWrappableTextField">
                                                         <rect key="frame" x="-2" y="0.0" width="78" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="uah-Xv-MK9"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Song Name" id="o4l-8l-eNX">
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="right" title="Song Name" id="o4l-8l-eNX">
                                                             <font key="font" metaFont="systemBold"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="XbZ-eQ-zmA">
-                                                        <rect key="frame" x="76" y="0.0" width="10" height="16"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="·" id="iAI-Pb-eVu">
+                                                        <rect key="frame" x="76" y="0.0" width="14" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="·" id="iAI-Pb-eVu">
                                                             <font key="font" metaFont="systemBlack" size="13"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0jI-HH-uWa" userLabel="Artist Name" customClass="VLCWrappableTextField">
-                                                        <rect key="frame" x="86" y="0.0" width="76" height="16"/>
+                                                        <rect key="frame" x="90" y="0.0" width="76" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="dVn-o0-6hg"/>
                                                         </constraints>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Artist Name" id="n8Z-ER-5JE">
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" title="Artist Name" id="n8Z-ER-5JE">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -779,6 +779,7 @@
         <customObject id="Uzf-Tf-H8x" userLabel="Detached Window Controls Bar" customClass="VLCMainWindowControlsBar">
             <connections>
                 <outlet property="artistNameTextField" destination="0jI-HH-uWa" id="ftC-MD-ymJ"/>
+                <outlet property="artistNameTextFieldWidthConstraint" destination="dVn-o0-6hg" id="f7h-af-ae8"/>
                 <outlet property="artworkButton" destination="15t-2s-22l" id="aR1-bU-1to"/>
                 <outlet property="artworkImageView" destination="5o7-Z0-dqS" id="Pns-yT-lKx"/>
                 <outlet property="backwardButton" destination="jGc-Xw-GYI" id="0AG-44-SN3"/>

@@ -145,6 +145,7 @@
         return;
     }
 
+    _artistNameTextFieldWidthConstraint.active = inputItem.artist.length != 0;
     _songArtistSeparatorTextField.hidden = inputItem.artist.length == 0;
 }
 
