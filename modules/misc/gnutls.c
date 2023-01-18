@@ -266,22 +266,24 @@ static vlc_tls_gnutls_t *gnutls_SessionOpen(vlc_object_t *obj, int type,
 
     if (alpn != NULL)
     {
-        gnutls_datum_t *protv = NULL;
-        unsigned protc = 0;
+        gnutls_datum_t *protv;
+        size_t protc = 0;
+        const char *const *alpn_count = alpn;
 
-        while (*alpn != NULL)
+        while (*alpn_count != NULL)
         {
-            gnutls_datum_t *n = realloc(protv, sizeof (*protv) * (protc + 1));
-            if (unlikely(n == NULL))
-            {
-                free(protv);
-                goto error;
-            }
-            protv = n;
-
-            protv[protc].data = (void *)*alpn;
-            protv[protc].size = strlen(*alpn);
             protc++;
+            alpn_count++;
+        }
+
+        protv = vlc_alloc(protc, sizeof (*protv));
+        if (unlikely(protv == NULL))
+            goto error;
+
+        for (size_t i=0; i < protc; i++)
+        {
+            protv[i].data = (void *)*alpn;
+            protv[i].size = strlen(*alpn);
             alpn++;
         }
 
