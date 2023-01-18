@@ -27,6 +27,7 @@
 #include "extradata.h"
 #include "../packetizer/av1_obu.h"
 #include "../packetizer/a52.h"
+#include "../codec/hxxx_helper.h"
 
 struct mux_extradata_builder_cb
 {
@@ -161,6 +162,41 @@ const struct mux_extradata_builder_cb av1_cb =
     generic_free_extra_Deinit,
 };
 
+static void hxxx_extradata_builder_Feed(mux_extradata_builder_t *m,
+                                        const uint8_t *data, size_t size)
+{
+    if (m->i_extra)
+        return;
+
+    struct hxxx_helper hh;
+    hxxx_helper_init(&hh, m->obj, m->fcc, 0, 0);
+
+    int ret = hxxx_helper_process_buffer(&hh, data, size);
+    (void)ret;
+
+    if (hxxx_helper_has_config(&hh) && m->i_extra == 0)
+    {
+        assert(m->priv == NULL);
+        block_t *config = hxxx_helper_get_extradata_block(&hh);
+        m->i_extra = config->i_buffer;
+        m->p_extra = config->p_buffer;
+        m->priv = config;
+    }
+}
+
+static void hxxx_extradata_builder_Deinit(mux_extradata_builder_t *m)
+{
+    if (m->priv)
+        block_Release(m->priv);
+}
+
+const struct mux_extradata_builder_cb hxxx_cb =
+{
+    NULL,
+    hxxx_extradata_builder_Feed,
+    hxxx_extradata_builder_Deinit,
+};
+
 void mux_extradata_builder_Delete(mux_extradata_builder_t *m)
 {
     m->cb.pf_deinit(m);
@@ -176,6 +212,8 @@ static const struct
     { EXTRADATA_ISOBMFF, VLC_CODEC_AV1,  &av1_cb },
     { EXTRADATA_ISOBMFF, VLC_CODEC_A52,  &ac3_cb },
     { EXTRADATA_ISOBMFF, VLC_CODEC_EAC3, &eac3_cb },
+    { EXTRADATA_ISOBMFF, VLC_CODEC_H264, &hxxx_cb },
+    { EXTRADATA_ISOBMFF, VLC_CODEC_HEVC, &hxxx_cb },
 };
 
 mux_extradata_builder_t * mux_extradata_builder_New(vlc_object_t *obj,
