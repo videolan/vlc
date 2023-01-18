@@ -53,6 +53,9 @@ vlc_about = custom_target('vlc_about.h',
                                    '@INPUT2@',
                                    '@OUTPUT@'])
 
+cargo_rustc_static_libs = find_program('buildsystem/cargo-rustc-static-libs.py')
+cargo_output = find_program('buildsystem/cargo-output.py')
+
 add_project_arguments('-DHAVE_CONFIG_H=1', language: ['c', 'cpp', 'objc'])
 
 # If building with contribs, read the relevant paths from the machine file

@@ -199,9 +199,12 @@ rsvg_dep = dependency('librsvg-2.0', version: '>= 2.9.0', required: get_option('
 libgcrypt_dep = dependency('libgcrypt',
                             version: '>= 1.6.0',
                             required: get_option('libgcrypt'))
+# Rust support
+cargo_bin = find_program('cargo', required: get_option('rust'))
 
 # Array that holds all enabled VLC module dicts
 vlc_modules = []
+vlc_rust_modules = []
 
 # video chroma modules
 subdir('video_chroma')
@@ -376,3 +379,163 @@ foreach module : vlc_modules
         module['name']: module
     }
 endforeach
+
+# Rust/cargo common handling code
+if get_option('rust')
+    rust_optimization_args = {
+        'plain': [],
+        '0': [],
+        'g': ['-C', 'opt-level=0'],
+        '1': ['-C', 'opt-level=1'],
+        '2': ['-C', 'opt-level=2'],
+        '3': ['-C', 'opt-level=3'],
+        's': ['-C', 'opt-level=s'],
+    }
+    
+    print_static_libs_rustc = run_command([cargo_rustc_static_libs, cargo_bin],
+        check: true, capture: true)
+    rust_common_link_args = print_static_libs_rustc.stdout().split()
+
+    # Do not try to reorder those two operations, they may triger a bug in
+    # meson where array += element is not equal to array += array
+    rust_flags = get_option('extra_rust_flags')
+    rust_flags += rust_optimization_args[get_option('optimization')]
+    
+    cargo_target_dir = join_paths(meson.current_build_dir(), 'cargo_target')
+
+    extra_cargo_args = []
+    module_cargo_depends = []
+    if get_option('vendored_rust_deps') != 'no'
+        if get_option('vendored_rust_deps') == 'yes'
+            cargo_fetch_deps_tgt = custom_target('cargo_fetch_deps',
+                capture: false,
+                console: true,
+                build_by_default: true,
+                input: files('Cargo.lock'),
+                output: 'cargo_vendored_deps',
+                command: [cargo_bin, 'vendor', '--locked', '--versioned-dirs', '--manifest-path',
+                    files('Cargo.toml'), '@OUTPUT@'],
+            )
+            vendored_rust_deps_sources = cargo_fetch_deps_tgt.full_path()
+            module_cargo_depends = [cargo_fetch_deps_tgt]
+        else
+            vendored_rust_deps_sources = get_option('vendored_rust_deps')
+        endif
+
+        extra_cargo_args += ['--offline',
+            '--config', 'source.crates-io.replace-with="vendored-sources"',
+            '--config', f'source.vendored-sources.directory="@vendored_rust_deps_sources@"']
+    endif
+
+    vlcrs_core = custom_target('vlcrs_core-cargo',
+        capture: false,
+        console: true,
+        build_by_default: true,
+        input: files(
+            'vlcrs-core/Cargo.toml',
+            'vlcrs-core/src/error.rs',
+            'vlcrs-core/src/input_item.rs',
+            'vlcrs-core/src/lib.rs',
+            'vlcrs-core/src/messages.rs',
+            'vlcrs-core/src/module/args.rs',
+            'vlcrs-core/src/module/capi.rs',
+            'vlcrs-core/src/module.rs',
+            'vlcrs-core/src/object.rs',
+            'vlcrs-core/src/tick.rs',
+            'vlcrs-core/src/url.rs',
+            'vlcrs-core/sys/build.rs',
+            'vlcrs-core/sys/Cargo.toml',
+            'vlcrs-core/sys/src/lib.rs',
+            'vlcrs-core/sys/wrapper.h',
+        ),
+        output: 'libvlcrs_core.rlib',
+        depfile: 'libvlcrs_core.d',
+        depends: module_cargo_depends,
+        env: {
+          'RUSTFLAGS': rust_flags,
+          'CARGO_TARGET_DIR': cargo_target_dir
+        },
+        command: [cargo_output, '--output', '@OUTDIR@', '--depfile',
+            cargo_bin, 'build', '--locked', extra_cargo_args,
+            '--manifest-path', files('Cargo.toml'),
+            '-p', 'vlcrs-core']
+    )
+    vlcrs_core_macros = custom_target('vlcrs_core_macros-cargo',
+        capture: false,
+        console: true,
+        build_by_default: true,
+        input: files(
+            'vlcrs-core/macros/Cargo.toml',
+            'vlcrs-core/macros/src/lib.rs',
+            'vlcrs-core/macros/src/module.rs',
+        ),
+        depfile: 'libvlcrs_core_macros.d',
+        output: 'libvlcrs_core_macros.so',
+        depends: module_cargo_depends,
+        env: {
+          'RUSTFLAGS': rust_flags,
+          'CARGO_TARGET_DIR': cargo_target_dir
+        },
+        command: [cargo_output, '--output', '@OUTDIR@', '--depfile',
+            cargo_bin, 'build', '--locked', extra_cargo_args,
+            '--manifest-path', files('Cargo.toml'),
+            '-p', 'vlcrs-core-macros']
+    )
+
+    module_cargo_depends += [vlcrs_core, vlcrs_core_macros]
+
+    foreach module : vlc_rust_modules
+        if not module.has_key('name')
+            error('Got invalid vlc_rust_modules entry without \'name\' key')
+        endif
+        if not module.has_key('sources')
+            error('The vlc_rust_modules entry for ' + module['name'] + ' has no sources')
+        endif
+        if not module.has_key('cargo_toml')
+            error('The vlc_rust_modules entry for ' + module['name'] + ' has no cargo_toml')
+        endif
+
+        # This list MUST be kept in sync with the keys used below!
+        valid_dict_keys = [
+            'name',
+            'sources',
+            'cargo_toml',
+            'link_with',
+            'link_depends',
+            'dependencies',
+        ]
+        foreach key : module.keys()
+            if key not in valid_dict_keys
+                error('Invalid key \'@0@\' found in vlc_rust_modules entry for \'@1@\''
+                    .format(key, module['name']))
+            endif
+        endforeach
+
+        module_cargo = custom_target(module['name'] + '_cargo',
+            build_by_default: true,
+            input: module['cargo_toml'],
+            depends: module_cargo_depends,
+            depfile: 'lib' + module['name'] + '.d',
+            output: 'lib' + module['name'] + '.a',
+            env: {
+              'RUSTFLAGS': rust_flags,
+              'CARGO_TARGET_DIR': cargo_target_dir,
+            },
+            command: [cargo_output, '--output', '@OUTDIR@', '--depfile',
+                cargo_bin, 'rustc', '--quiet', '--color=always', '--crate-type=staticlib',
+                '--locked', extra_cargo_args, '--manifest-path', module['cargo_toml']]
+        )
+
+        library(module['name'] + '_plugin',
+            # FIXME(meson): `module_cargo` shouldn't be in `link_whole` because it prevents dead code
+            # elimination but meson doesn't yet have any way of setting the symbols to export and since
+            # `module_cargo` is an archive file everything is exported so nothing is really.
+            link_whole: module_cargo,
+            link_with: module.get('link_with', []),
+            link_args: [module.get('link_args', []), rust_common_link_args],
+            link_depends: module.get('link_depends', []),
+            dependencies: [module.get('dependencies', []), libvlccore_dep],
+            build_by_default: true,
+        )
+    endforeach
+endif

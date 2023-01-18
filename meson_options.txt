@@ -70,6 +70,11 @@ option('extra_rust_flags',
     value : [],
     description : 'Extra RUSTFLAGS to be passed to the compiler when compiling Rust VLC modules')
 
+option('vendored_rust_deps',
+    type : 'string',
+    value : 'no',
+    description : 'Should use vendored sources: `no`, `yes` or PATH_TO_VENDORED_SOURCES')
+
 # TODO: Missing pdb option, this should probably be solved in meson itself
 
 # TODO: Missing ssp option
