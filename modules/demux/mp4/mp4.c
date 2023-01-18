@@ -3404,29 +3404,44 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
 
 
     /* *** Try to find nearest sync points *** */
-    uint32_t i_sync_sample;
+    uint32_t i_sync_sample = i_sample;
     if( VLC_SUCCESS ==
         TrackGetNearestSeekPoint( p_demux, p_track, i_sample, &i_sync_sample ) )
     {
-        /* Go to chunk */
-        if( i_sync_sample <= i_sample )
+        msg_Dbg(p_demux,"track[Id 0x%x] sync point found sample %"PRIu32"(-%"PRIu32")",
+                p_track->i_track_ID, i_sync_sample, i_sample - i_sync_sample);
+    }
+    else
+    {
+        const MP4_Box_data_sgpd_entry_t *p_entrydesc;
+        if( MP4_SampleToGroupInfo( p_track->p_stbl, i_sample,
+                                  SAMPLEGROUP_roll, 0, &i_sync_sample,
+                                  SAMPLE_GROUP_MATCH_EXACT, &p_entrydesc ) )
         {
-            while( i_chunk > 0 &&
-                   i_sync_sample < p_track->chunk[i_chunk].i_sample_first )
-                i_chunk--;
+            msg_Dbg(p_demux, "track[Id 0x%x] preroll offset: %"PRId16" samples",
+                    p_track->i_track_ID, p_entrydesc->roll.i_roll_distance );
+            if( p_entrydesc->roll.i_roll_distance < 0 )
+                i_sync_sample += p_entrydesc->roll.i_roll_distance;
         }
-        else
-        {
-            while( i_chunk < p_track->i_chunk_count - 1 &&
-                   i_sync_sample >= p_track->chunk[i_chunk].i_sample_first +
-                                    p_track->chunk[i_chunk].i_sample_count )
-                i_chunk++;
-        }
-        i_sample = i_sync_sample;
+    }
+
+    /* Go to sync point chunk */
+    if( i_sync_sample <= i_sample )
+    {
+        while( i_chunk > 0 &&
+               i_sync_sample < p_track->chunk[i_chunk].i_sample_first )
+            i_chunk--;
+    }
+    else
+    {
+        while( i_chunk < p_track->i_chunk_count - 1 &&
+               i_sync_sample >= p_track->chunk[i_chunk].i_sample_first +
+                                p_track->chunk[i_chunk].i_sample_count )
+            i_chunk++;
     }
 
     *pi_chunk  = i_chunk;
-    *pi_sample = i_sample;
+    *pi_sample = i_sync_sample;
 
     return VLC_SUCCESS;
 }
