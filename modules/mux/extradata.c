@@ -190,16 +190,16 @@ mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc,
         return NULL;
 
     mux_extradata_builder_t *m = calloc(1, sizeof(*m));
-    if(m)
+    if(m == NULL)
+        return NULL;
+
+    m->priv = NULL;
+    m->fcc = fcc;
+    m->cb = *cb;
+    if(m->cb.pf_init && m->cb.pf_init(m) != 0)
     {
-        m->priv = NULL;
-        m->fcc = fcc;
-        m->cb = *cb;
-        if(m->cb.pf_init && m->cb.pf_init(m) != 0)
-        {
-            free(m);
-            m = NULL;
-        }
+        free(m);
+        m = NULL;
     }
     return m;
 }
