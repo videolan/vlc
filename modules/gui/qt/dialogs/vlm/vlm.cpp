@@ -779,14 +779,14 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
 
     if( _scherepeatnumber > 0 )
     {
-       command = "setup \"" + name + "\" repeat \"" + _scherepeatnumber + "\"";
+       command = "setup \"" + name + "\" repeat \"" + QString::number(_scherepeatnumber) + "\"";
        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
        vlm_MessageDelete( message );
     }
 
     if( _repeatDays > 0 )
     {
-       command = "setup \"" + name + "\" period \"" + _repeatDays + "\"";
+       command = "setup \"" + name + "\" period \"" + QString::number(_repeatDays) + "\"";
        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
        vlm_MessageDelete( message );
     }
