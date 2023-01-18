@@ -39,23 +39,24 @@ const struct
     float f_pos;
     bool b_use_pos;
     bool b_fast_seek;
+    bool b_can_control_pace;
     vlc_tick_t i_timeout;
     bool b_expected_success;
 } test_params[] = {
     /* Simple test with a thumbnail at 60s, with a video track */
-    { 1, 0, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true,
+    { 1, 0, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, true,
         VLC_TICK_FROM_SEC( 1 ), true },
     /* Test without fast-seek */
-    { 1, 0, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, false,
+    { 1, 0, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, false, true,
         VLC_TICK_FROM_SEC( 1 ), true },
     /* Seek by position test */
-    { 1, 0, VLC_TICK_INVALID, 0, .3f, true, true, VLC_TICK_FROM_SEC( 1 ), true },
+    { 1, 0, VLC_TICK_INVALID, 0, .3f, true, true, true, VLC_TICK_FROM_SEC( 1 ), true },
     /* Seek at a negative position */
-    { 1, 0, VLC_TICK_INVALID, -12345, .0f, false, true, VLC_TICK_FROM_SEC( 1 ), true },
+    { 1, 0, VLC_TICK_INVALID, -12345, .0f, false, true, true, VLC_TICK_FROM_SEC( 1 ), true },
     /* Take a thumbnail of a file without video, which should timeout. */
-    { 0, 1, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, VLC_TICK_FROM_MS( 100 ), false },
+    { 0, 1, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, false, VLC_TICK_FROM_MS( 100 ), false },
     /* Take a thumbnail of a file with a video track starting later */
-    { 1, 1, VLC_TICK_FROM_SEC( 60 ), VLC_TICK_FROM_SEC( 30 ), .0f, false, true,
+    { 1, 1, VLC_TICK_FROM_SEC( 60 ), VLC_TICK_FROM_SEC( 30 ), .0f, false, true, true,
         VLC_TICK_FROM_SEC( 2 ), true },
 };
 
@@ -123,9 +124,10 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         ctx.b_done = false;
 
         if ( asprintf( &psz_mrl, "mock://video_track_count=%u;audio_track_count=%u"
-                       ";length=%" PRId64 ";video_chroma=ARGB;video_add_track_at=%" PRId64,
+                       ";length=%" PRId64 ";can_control_pace=%s;video_chroma=ARGB;video_add_track_at=%" PRId64,
                        test_params[i].i_nb_video_tracks,
                        test_params[i].i_nb_audio_tracks, MOCK_DURATION,
+                       test_params[i].b_can_control_pace ? "true" : "false",
                        test_params[i].i_add_video_track_at ) < 0 )
             assert( !"Failed to allocate mock mrl" );
         input_item_t* p_item = input_item_New( psz_mrl, "mock item" );
