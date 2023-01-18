@@ -334,18 +334,21 @@
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ktr-qT-1fr">
                                         <rect key="frame" x="212" y="4" width="472" height="37"/>
                                         <subviews>
-                                            <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
+                                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jlv-jC-dQB">
                                                 <rect key="frame" x="156" y="21" width="160" height="16"/>
                                                 <subviews>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name" customClass="VLCWrappableTextField">
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d0e-29-yNq" userLabel="Song Name" customClass="VLCWrappableTextField">
                                                         <rect key="frame" x="-2" y="0.0" width="78" height="16"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Song Name" id="o4l-8l-eNX">
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="uah-Xv-MK9"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Song Name" id="o4l-8l-eNX">
                                                             <font key="font" metaFont="systemBold"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XbZ-eQ-zmA">
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="XbZ-eQ-zmA">
                                                         <rect key="frame" x="76" y="0.0" width="10" height="16"/>
                                                         <textFieldCell key="cell" lineBreakMode="clipping" title="·" id="iAI-Pb-eVu">
                                                             <font key="font" metaFont="systemBlack" size="13"/>
@@ -353,9 +356,12 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0jI-HH-uWa" userLabel="Artist Name" customClass="VLCWrappableTextField">
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0jI-HH-uWa" userLabel="Artist Name" customClass="VLCWrappableTextField">
                                                         <rect key="frame" x="86" y="0.0" width="76" height="16"/>
-                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Artist Name" id="n8Z-ER-5JE">
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="dVn-o0-6hg"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Artist Name" id="n8Z-ER-5JE">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -363,6 +369,7 @@
                                                     </textField>
                                                 </subviews>
                                                 <constraints>
+                                                    <constraint firstItem="d0e-29-yNq" firstAttribute="leading" secondItem="jlv-jC-dQB" secondAttribute="leading" id="PFS-2F-yZT"/>
                                                     <constraint firstAttribute="height" secondItem="d0e-29-yNq" secondAttribute="height" id="ppe-cg-mD0"/>
                                                 </constraints>
                                                 <visibilityPriorities>
@@ -424,7 +431,7 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="trailing" id="25y-hg-Obr"/>
-                                            <constraint firstItem="jlv-jC-dQB" firstAttribute="centerX" secondItem="Ktr-qT-1fr" secondAttribute="centerX" id="4V1-XB-slx"/>
+                                            <constraint firstItem="jlv-jC-dQB" firstAttribute="centerX" secondItem="Ktr-qT-1fr" secondAttribute="centerX" priority="250" id="4V1-XB-slx"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="trailing" secondItem="oGd-mG-cFw" secondAttribute="leading" constant="-4" id="6HG-39-dSt"/>
                                             <constraint firstItem="5o7-Z0-dqS" firstAttribute="centerY" secondItem="Ktr-qT-1fr" secondAttribute="centerY" id="6rb-4H-ISj"/>
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="centerY" secondItem="9Hg-t2-K5z" secondAttribute="centerY" id="Egp-c6-x6Y"/>
@@ -435,6 +442,8 @@
                                             <constraint firstItem="5o7-Z0-dqS" firstAttribute="top" secondItem="Ktr-qT-1fr" secondAttribute="top" id="Qmp-zE-IXn"/>
                                             <constraint firstAttribute="bottom" secondItem="9Hg-t2-K5z" secondAttribute="bottom" id="UzQ-FS-i2L"/>
                                             <constraint firstItem="5o7-Z0-dqS" firstAttribute="leading" secondItem="Ktr-qT-1fr" secondAttribute="leading" id="Zqk-vQ-rnV"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jlv-jC-dQB" secondAttribute="trailing" constant="4" id="dE6-x3-y9L"/>
+                                            <constraint firstItem="jlv-jC-dQB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="zOB-QJ-TUy" secondAttribute="leading" id="nyg-q0-uLs"/>
                                             <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="trailing" constant="8" id="ob8-aS-evc"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="leading" secondItem="zOB-QJ-TUy" secondAttribute="trailing" constant="4" id="tjf-4h-ukW"/>
                                         </constraints>
