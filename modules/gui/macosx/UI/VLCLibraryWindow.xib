@@ -394,13 +394,11 @@
                                         </constraints>
                                     </customView>
                                     <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCSlider">
-                                        <rect key="frame" x="-2" y="74" width="900" height="9"/>
+                                        <rect key="frame" x="-2" y="74" width="900" height="19"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="5" identifier="heightConstraintIdentifier" id="yYi-ay-9FG"/>
+                                            <constraint firstAttribute="height" constant="15" identifier="heightConstraintIdentifier" id="yYi-ay-9FG"/>
                                         </constraints>
-                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="YMg-uo-8nX" customClass="VLCSliderCell">
-                                            <font key="font" usesAppearanceFont="YES"/>
-                                        </sliderCell>
+                                        <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="YMg-uo-8nX" customClass="VLCSliderCell"/>
                                         <connections>
                                             <action selector="timeSliderAction:" target="Uzf-Tf-H8x" id="eDh-39-Ej1"/>
                                         </connections>
