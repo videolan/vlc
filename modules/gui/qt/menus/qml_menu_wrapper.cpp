@@ -31,6 +31,7 @@
 #include <QPainter>
 #include <QSignalMapper>
 #include <QScreen>
+#include <QActionGroup>
 
 namespace
 {
