@@ -394,17 +394,14 @@
                                         </constraints>
                                     </customView>
                                     <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCSlider">
-                                        <rect key="frame" x="-2" y="74" width="900" height="19"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="15" identifier="heightConstraintIdentifier" id="yYi-ay-9FG"/>
-                                        </constraints>
+                                        <rect key="frame" x="-2" y="74" width="900" height="17"/>
                                         <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="YMg-uo-8nX" customClass="VLCSliderCell"/>
                                         <connections>
                                             <action selector="timeSliderAction:" target="Uzf-Tf-H8x" id="eDh-39-Ej1"/>
                                         </connections>
                                     </slider>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
-                                        <rect key="frame" x="730" y="34" width="56" height="13"/>
+                                        <rect key="frame" x="730" y="40" width="56" height="13"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="13" id="ZpD-fD-qke"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="52" id="aOU-Hc-ufI"/>
@@ -480,7 +477,7 @@
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="9Hg-t2-K5z" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" id="2uE-Wc-re0"/>
+                                    <constraint firstItem="9Hg-t2-K5z" firstAttribute="top" secondItem="MQH-bI-Zdh" secondAttribute="top" constant="4" id="2uE-Wc-re0"/>
                                     <constraint firstItem="dwM-Uz-pAw" firstAttribute="leading" secondItem="noz-yJ-oH4" secondAttribute="trailing" constant="24" id="A2S-l6-Vfg"/>
                                     <constraint firstItem="dwM-Uz-pAw" firstAttribute="centerY" secondItem="oGd-mG-cFw" secondAttribute="centerY" id="Brc-26-tG5"/>
                                     <constraint firstAttribute="bottom" secondItem="YAj-e7-KCU" secondAttribute="bottom" id="Gqk-sg-bBK"/>
