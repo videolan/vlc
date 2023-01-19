@@ -140,12 +140,23 @@
     [self updateTimeSlider:nil];
 
     NSColor *timeFieldTextColor = [NSColor controlTextColor];
+
     [self.timeField setTextColor: timeFieldTextColor];
     [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
     [self.timeField setAlignment: NSCenterTextAlignment];
     [self.timeField setNeedsDisplay:YES];
-    [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
+    [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsElapsed];
+    self.trailingTimeField.isTimeRemaining = NO;
     self.timeField.accessibilityLabel = _NS("Playback time");
+
+    self.trailingTimeField.isTimeRemaining = !self.timeField.isTimeRemaining;
+    [self.trailingTimeField setTextColor: timeFieldTextColor];
+    [self.trailingTimeField setFont:[NSFont titleBarFontOfSize:10.0]];
+    [self.trailingTimeField setAlignment: NSCenterTextAlignment];
+    [self.trailingTimeField setNeedsDisplay:YES];
+    [self.trailingTimeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
+    self.trailingTimeField.isTimeRemaining = YES;
+    self.trailingTimeField.accessibilityLabel = _NS("Playback time");
 
     // remove fullscreen button for lion fullscreen
     if (_nativeFullscreenMode) {
@@ -387,6 +398,8 @@
                                                   negative:YES];
     [self.timeField setTime:timeString withRemainingTime:remainingTime];
     [self.timeField setNeedsDisplay:YES];
+    [self.trailingTimeField setTime:timeString withRemainingTime:remainingTime];
+    [self.trailingTimeField setNeedsDisplay:YES];
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification

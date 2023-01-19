@@ -54,6 +54,7 @@
 @property (readwrite, strong) IBOutlet VLCWrappableTextField *songNameTextField;
 @property (readwrite, strong) IBOutlet VLCWrappableTextField *artistNameTextField;
 @property (readwrite, strong) IBOutlet VLCTimeField *timeField;
+@property (readwrite, strong) IBOutlet VLCTimeField *trailingTimeField;
 
 @property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
