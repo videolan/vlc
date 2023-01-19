@@ -6,6 +6,7 @@
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          Marvin Scholz <epirat07 at gmail dot com>
+ *          Claudio Cambra <developer at claudiocambra dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,14 +33,13 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 @interface VLCTimeField ()
 {
     NSString *_identifier;
-    BOOL _isTimeRemaining;
-
     NSString *_cachedTime;
     NSString *_remainingTime;
 }
 @end
 
 @implementation VLCTimeField
+
 + (void)initialize
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -57,23 +57,28 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
     _isTimeRemaining = [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
 }
 
-- (void)mouseDown: (NSEvent *)ourEvent
+- (void)setIsTimeRemaining:(BOOL)isTimeRemaining
 {
-    if ( [ourEvent clickCount] > 1 )
-        [[[VLCMain sharedInstance] mainMenu] goToSpecificTime: nil];
-    else
-    {
-        if (_identifier) {
-            _isTimeRemaining = [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
-            _isTimeRemaining = !_isTimeRemaining;
-            [[NSUserDefaults standardUserDefaults] setObject:(_isTimeRemaining ? @"YES" : @"NO") forKey:_identifier];
-        } else {
-            _isTimeRemaining = !_isTimeRemaining;
-        }
-
-        [self updateTimeValue];
+    if (_identifier) {
+        _isTimeRemaining = [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
+        _isTimeRemaining = !_isTimeRemaining;
+        [[NSUserDefaults standardUserDefaults] setObject:(_isTimeRemaining ? @"YES" : @"NO") forKey:_identifier];
+    } else {
+        _isTimeRemaining = !_isTimeRemaining;
     }
 
+    [self updateTimeValue];
+}
+
+- (void)mouseDown: (NSEvent *)ourEvent
+{
+    if ( [ourEvent clickCount] > 1 ) {
+        [[[VLCMain sharedInstance] mainMenu] goToSpecificTime: nil];
+    } else {
+        self.isTimeRemaining = !self.isTimeRemaining;
+    }
+
+    [self updateTimeValue];
     [[self nextResponder] mouseDown:ourEvent];
 }
 
