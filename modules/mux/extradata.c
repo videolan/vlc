@@ -44,6 +44,11 @@ struct mux_extradata_builder_t
     vlc_fourcc_t fcc;
 };
 
+static void generic_free_extra_Deinit(mux_extradata_builder_t *m)
+{
+    free(m->p_extra);
+}
+
 static void ac3_extradata_builder_Feed(mux_extradata_builder_t *m,
                                        const uint8_t *p_data, size_t i_data)
 {
@@ -76,7 +81,7 @@ const struct mux_extradata_builder_cb ac3_cb =
 {
     NULL,
     ac3_extradata_builder_Feed,
-    NULL,
+    generic_free_extra_Deinit,
 };
 
 static void eac3_extradata_builder_Feed(mux_extradata_builder_t *m,
@@ -120,7 +125,7 @@ const struct mux_extradata_builder_cb eac3_cb =
 {
     NULL,
     eac3_extradata_builder_Feed,
-    NULL,
+    generic_free_extra_Deinit,
 };
 
 static void av1_extradata_builder_Feed(mux_extradata_builder_t *m,
@@ -152,14 +157,12 @@ const struct mux_extradata_builder_cb av1_cb =
 {
     NULL,
     av1_extradata_builder_Feed,
-    NULL,
+    generic_free_extra_Deinit,
 };
 
 void mux_extradata_builder_Delete(mux_extradata_builder_t *m)
 {
-    if(m->cb.pf_deinit)
-        m->cb.pf_deinit(m);
-    free(m->p_extra);
+    m->cb.pf_deinit(m);
     free(m);
 }
 
@@ -188,6 +191,9 @@ mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc,
 
     if(cb == NULL)
         return NULL;
+
+    assert(cb->pf_feed != NULL);
+    assert(cb->pf_deinit != NULL);
 
     mux_extradata_builder_t *m = calloc(1, sizeof(*m));
     if(m == NULL)
