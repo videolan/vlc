@@ -225,7 +225,7 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
                                              id->p_decoder->fmt_in,
                                              transcode_encoder_format_out( id->encoder ),
                                              id->es_id );
-    msg_Info( p_dec, "video format update succeed" );
+    msg_Info( p_dec, "video format update success" );
 
 end:
     return VLC_SUCCESS;
