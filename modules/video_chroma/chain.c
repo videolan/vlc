@@ -374,6 +374,7 @@ static int ChainMouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
 static int BuildFilterChain( filter_t *p_filter )
 {
     es_format_t fmt_mid;
+    es_format_Init(&fmt_mid, p_filter->fmt_in.i_cat, p_filter->fmt_in.i_codec);
     int i_ret = VLC_EGENERIC;
 
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -392,6 +393,7 @@ static int BuildFilterChain( filter_t *p_filter )
         msg_Dbg( p_filter, "Trying to use chroma %4.4s as middle man",
                  (char*)&i_chroma );
 
+        es_format_Clean( &fmt_mid );
         es_format_Copy( &fmt_mid, &p_filter->fmt_in );
         fmt_mid.i_codec        =
         fmt_mid.video.i_chroma = i_chroma;
@@ -401,26 +403,27 @@ static int BuildFilterChain( filter_t *p_filter )
         video_format_FixRgb(&fmt_mid.video);
 
         if( filter_chain_AppendConverter( p_sys->p_chain,
-                                          &fmt_mid ) == VLC_SUCCESS )
-        {
-            p_sys->p_video_filter =
-                filter_chain_AppendFilter( p_sys->p_chain,
-                                           p_filter->psz_name, p_filter->p_cfg,
-                                           &fmt_mid );
-            if( p_sys->p_video_filter )
-            {
-                filter_AddProxyCallbacks( p_filter,
-                                          p_sys->p_video_filter,
-                                          RestartFilterCallback );
+                                          &fmt_mid ) != VLC_SUCCESS )
+            continue;
+        
+        p_sys->p_video_filter =
+            filter_chain_AppendFilter( p_sys->p_chain,
+                                       p_filter->psz_name, p_filter->p_cfg,
+                                       &fmt_mid );
+        if( p_sys->p_video_filter == NULL)
+            continue;
 
-                es_format_Clean( &fmt_mid );
-                i_ret = VLC_SUCCESS;
-                p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
-                break;
-            }
-        }
-        es_format_Clean( &fmt_mid );
+        filter_AddProxyCallbacks( p_filter,
+                                  p_sys->p_video_filter,
+                                  RestartFilterCallback );
+
+        i_ret = VLC_SUCCESS;
+        p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
+        break;
     }
+
+    es_format_Clean( &fmt_mid );
+
     if( i_ret != VLC_SUCCESS )
         filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
