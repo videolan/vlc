@@ -119,6 +119,9 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
 
+    if( atomic_load_explicit(&id->b_error, memory_order_acquire) )
+        return VLC_EGENERIC;
+
     vlc_mutex_lock(&id->fifo.lock);
     if( id->encoder != NULL && transcode_encoder_opened( id->encoder ) )
     {
@@ -225,12 +228,22 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
                                              id->p_decoder->fmt_in,
                                              transcode_encoder_format_out( id->encoder ),
                                              id->es_id );
+
+    if( id->downstream_id == NULL )
+    {
+        vlc_mutex_lock( &id->fifo.lock );
+        goto error;
+    }
+
     msg_Info( p_dec, "video format update success" );
 
 end:
     return VLC_SUCCESS;
 
 error:
+
+    atomic_store_explicit( &id->b_error, true, memory_order_release );
+
     transcode_remove_filters( &id->p_final_conv_static );
 
     if( transcode_encoder_opened( id->encoder ) )
