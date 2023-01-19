@@ -38,6 +38,7 @@ struct mux_extradata_builder_cb
 struct mux_extradata_builder_t
 {
     struct mux_extradata_builder_cb cb;
+    vlc_object_t *obj;
     void *priv;
     uint8_t *p_extra;
     size_t i_extra;
@@ -177,7 +178,8 @@ static const struct
     { EXTRADATA_ISOBMFF, VLC_CODEC_EAC3, &eac3_cb },
 };
 
-mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc,
+mux_extradata_builder_t * mux_extradata_builder_New(vlc_object_t *obj,
+                                                    vlc_fourcc_t fcc,
                                                     enum mux_extradata_type_e type)
 {
     const struct mux_extradata_builder_cb *cb = NULL;
@@ -202,6 +204,7 @@ mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc,
     m->priv = NULL;
     m->fcc = fcc;
     m->cb = *cb;
+    m->obj = obj;
     if(m->cb.pf_init && m->cb.pf_init(m) != 0)
     {
         free(m);
