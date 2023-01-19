@@ -205,6 +205,10 @@ FocusScope {
     }
 
     function setCurrentItemFocus(reason) {
+        if (view.currentItem === null) {
+            Qt.callLater(setCurrentItemFocus, reason)
+            return
+        }
         view.currentItem.setCurrentItemFocus(reason);
     }
 

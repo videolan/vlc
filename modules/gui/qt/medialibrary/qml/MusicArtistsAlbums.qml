@@ -53,12 +53,22 @@ FocusScope {
     property alias currentAlbumIndex: albumSubView.currentIndex
 
     property alias currentArtist: albumSubView.artist
+    property bool isScreenSmall: VLCStyle.isScreenSmall
 
     onInitialAlbumIndexChanged: resetFocus()
     onInitialIndexChanged: resetFocus()
     onCurrentIndexChanged: currentArtist = model.getDataAt(currentIndex)
+    onIsScreenSmallChanged: {
+        if (VLCStyle.isScreenSmall)
+            resetFocus()
+    }
 
     function resetFocus() {
+        if (VLCStyle.isScreenSmall) {
+            albumSubView.setCurrentItemFocus(Qt.OtherFocusReason)
+            return
+        }
+
         if (artistModel.count === 0) {
             return
         }
