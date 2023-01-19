@@ -35,8 +35,8 @@
 #define S_IWUSR     _S_IWRITE
 #define S_IRUSR     _S_IREAD
 #define S_IFIFO     _S_IFIFO
-#define S_ISDIR(m)  (((m) & S_IFMT) == S_IFDIR)
-#define S_ISREG(m)  (((m) & S_IFMT) == S_IFREG)
+#define S_ISDIR(m)  (((m) & _S_IFMT) == _S_IFDIR)
+#define S_ISREG(m)  (((m) & _S_IFMT) == _S_IFREG)
 #define S_ISBLK(m)  (0)
 
 // same type as statXXX structures st_mode field
