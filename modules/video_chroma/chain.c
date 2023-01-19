@@ -438,15 +438,12 @@ static int CreateChain( filter_t *p_filter, const es_format_t *p_fmt_mid )
     filter_sys_t *p_sys = p_filter->p_sys;
     filter_chain_Reset( p_sys->p_chain, &p_filter->fmt_in, p_filter->vctx_in, &p_filter->fmt_out );
 
-    {
-        if( filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid ) )
-            return VLC_EGENERIC;
-    }
+    if( filter_chain_AppendConverter( p_sys->p_chain, p_fmt_mid ) )
+        return VLC_EGENERIC;
 
-    {
-        if( filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out ) )
-            goto error;
-    }
+    if( filter_chain_AppendConverter( p_sys->p_chain, &p_filter->fmt_out ) )
+        goto error;
+
     p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );
     return VLC_SUCCESS;
 error:
