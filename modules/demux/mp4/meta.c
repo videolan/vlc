@@ -21,12 +21,14 @@
 # include "config.h"
 #endif
 
-#include "mp4.h"
+#include "libmp4.h"
 #include "../../meta_engine/ID3Genres.h"  /* for ATOM_gnre */
 #include "languages.h"
 
 #include <vlc_meta.h>
 #include <vlc_charset.h>
+
+#include "meta.h"
 
 #include "../../meta_engine/ID3Tag.h"
 #include "../../meta_engine/ID3Meta.h"

@@ -196,7 +196,6 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
                   const MP4_Box_t *p_sample, es_format_t *, track_config_t * );
 int SetupSpuES( demux_t *p_demux, const mp4_track_t *p_track,
                 const MP4_Box_t *p_sample, es_format_t *, track_config_t * );
-void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta );
 
 /* format of RTP reception hint track sample constructor */
 typedef struct

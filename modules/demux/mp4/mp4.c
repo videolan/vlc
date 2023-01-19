@@ -37,6 +37,7 @@
 #include <vlc_url.h>
 #include <assert.h>
 #include <limits.h>
+#include "meta.h"
 #include "attachments.h"
 #include "heif.h"
 #include "../../codec/cc.h"
