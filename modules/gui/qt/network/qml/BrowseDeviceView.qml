@@ -202,8 +202,7 @@ FocusScope {
 
         searchRole: "name"
 
-        // TODO: Handle the searchPattern on a partial list.
-        searchPattern: (sourceModel && maximumRows === -1) ? sourceModel.searchPattern : ""
+        searchPattern: (sourceModel) ? sourceModel.searchPattern : ""
     }
 
     Widgets.StackViewExt {
