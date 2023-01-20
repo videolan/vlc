@@ -354,7 +354,6 @@ vlc_vaapi_OpenChroma(filter_t *filter)
 
     if (!(filter_sys = calloc(1, sizeof(filter_sys_t))))
     {
-        msg_Err(filter, "unable to allocate memory");
         return VLC_ENOMEM;
     }
     filter_sys->derive_failed = false;
