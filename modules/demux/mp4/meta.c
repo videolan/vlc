@@ -162,12 +162,12 @@ inline static char * StringConvert( const MP4_Box_data_data_t *p_data )
     }
 }
 
-static char * ExtractString( MP4_Box_t *p_box )
+static char * ExtractString( const MP4_Box_t *p_box )
 {
     if ( p_box->i_type == ATOM_data )
         return StringConvert( p_box->data.p_data );
 
-    MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+    const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
     if ( p_data )
         return StringConvert( BOXDATA(p_data) );
     else if ( p_box->data.p_binary && p_box->data.p_binary->p_blob )
@@ -222,7 +222,7 @@ static bool AtomXA9ToMeta( uint32_t i_type,
     return *meta_type || *meta_key;
 }
 
-static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, MP4_Box_t* p_box )
+static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, const MP4_Box_t* p_box )
 {
     vlc_meta_type_t const* type;
     char const* key;
@@ -246,7 +246,7 @@ static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, MP4_Box_t
     return true;
 }
 
-static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
+static int ExtractIntlStrings( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
 {
     if( MP4_BoxGet( p_box, "data" ) )
         return false;
@@ -326,13 +326,13 @@ static int ExtractIntlStrings( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     return i_read == 0;
 }
 
-static void ExtractItunesInfoTriplets( vlc_meta_t *p_meta, MP4_Box_t *p_box )
+static void ExtractItunesInfoTriplets( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
 {
     if( p_box->i_type != ATOM_ITUN )
         return;
-    MP4_Box_t *p_mean = MP4_BoxGet( p_box, "mean" );
-    MP4_Box_t *p_name = MP4_BoxGet( p_box, "name" );
-    MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+    const MP4_Box_t *p_mean = MP4_BoxGet( p_box, "mean" );
+    const MP4_Box_t *p_name = MP4_BoxGet( p_box, "name" );
+    const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
     if( !p_mean || p_mean->data.p_binary->i_blob < 4 + 16 ||
         !p_name || p_name->data.p_binary->i_blob < 5 ||
         !p_data || !BOXDATA(p_data) )
@@ -351,7 +351,7 @@ static void ExtractItunesInfoTriplets( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
 }
 
-static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
+static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
 {
     const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
 
@@ -462,7 +462,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
 }
 
-static void SetupmdtaMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box, MP4_Box_t *p_keys )
+static void SetupmdtaMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box, const MP4_Box_t *p_keys )
 {
     if ( !p_keys || !BOXDATA(p_keys) || BOXDATA(p_keys)->i_entry_count == 0 )
         return;
@@ -504,7 +504,7 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload,
     return VLC_SUCCESS;
 }
 
-static void SetupID3v2Meta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
+static void SetupID3v2Meta( vlc_meta_t *p_meta, const MP4_Box_t *p_box )
 {
     const MP4_Box_t *p_binary = MP4_BoxGet( p_box, "ID32" );
     if( p_binary == NULL || !BOXDATA(p_binary) || BOXDATA(p_binary)->i_blob < 6 + 20 + 1 )
@@ -521,13 +521,13 @@ void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta )
     if ( p_udta->p_father )
         i_handler = p_udta->i_handler;
 
-    for( MP4_Box_t *p_box = p_udta->p_first; p_box; p_box = p_box->p_next )
+    for( const MP4_Box_t *p_box = p_udta->p_first; p_box; p_box = p_box->p_next )
     {
         switch( i_handler )
         {
             case HANDLER_mdta:
             {
-                MP4_Box_t *p_keys = MP4_BoxGet( p_udta->p_father, "keys" );
+                const MP4_Box_t *p_keys = MP4_BoxGet( p_udta->p_father, "keys" );
                 SetupmdtaMeta( p_meta, p_box, p_keys );
                 break;
             }
