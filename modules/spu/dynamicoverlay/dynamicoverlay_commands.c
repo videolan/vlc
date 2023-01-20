@@ -471,7 +471,6 @@ static int exec_DataSharedMem( filter_t *p_filter,
         p_ovl->data.p_text = malloc( p_params->i_width );
         if( p_ovl->data.p_text == NULL )
         {
-            msg_Err( p_filter, "Unable to allocate string storage" );
             return VLC_ENOMEM;
         }
 
