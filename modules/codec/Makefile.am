@@ -360,7 +360,7 @@ liboggspots_plugin_la_LIBADD = $(OGGSPOTS_LIBS)
 EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_PLUGINS += $(LTLIBoggspots)
 
-libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox.c
+libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox/decoder.c
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 if HAVE_DARWIN

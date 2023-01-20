@@ -343,7 +343,7 @@ modules/codec/ttml/ttml.c
 modules/codec/ttml/ttml.h
 modules/codec/twolame.c
 modules/codec/uleaddvaudio.c
-modules/codec/videotoolbox.c
+modules/codec/videotoolbox/decoder.c
 modules/codec/vorbis.c
 modules/codec/vpx.c
 modules/codec/webvtt/webvtt.c
