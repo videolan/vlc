@@ -182,15 +182,10 @@ void transcode_encoder_close( transcode_encoder_t *p_enc )
     if( !p_enc->p_encoder->p_module )
         return;
 
-    switch( p_enc->p_encoder->fmt_in.i_cat )
-    {
-        case VIDEO_ES:
-            transcode_encoder_video_close( p_enc );
-            break;
-        default:
-            module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
-            break;
-    }
+    if( p_enc->p_encoder->fmt_in.i_cat == VIDEO_ES )
+        transcode_encoder_video_close( p_enc );
+
+    module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
 
     p_enc->p_encoder->p_module = NULL;
 }

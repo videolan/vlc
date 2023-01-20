@@ -385,10 +385,6 @@ void transcode_encoder_video_close( transcode_encoder_t *p_enc )
         vlc_mutex_unlock( &p_enc->lock_out );
         vlc_join( p_enc->thread, NULL );
     }
-
-    /* Close encoder */
-    module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
-    p_enc->p_encoder->p_module = NULL;
 }
 
 int transcode_encoder_video_open( transcode_encoder_t *p_enc,
