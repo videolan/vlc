@@ -200,7 +200,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev = calloc( 1, sizeof( *p_sys->p_ev ) );
     if( !p_sys->p_ev )
     {
-        msg_Err( p_access, "failed to create event thread struct" );
         Close( p_this );
         return VLC_ENOMEM;
     }
