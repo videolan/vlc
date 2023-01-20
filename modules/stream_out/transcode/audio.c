@@ -201,7 +201,6 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
 void transcode_audio_clean( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     /* Close encoder */
-    transcode_encoder_close( id->encoder );
     transcode_encoder_delete( id->encoder );
 
     es_format_Clean( &id->decoder_out );

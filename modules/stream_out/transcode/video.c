@@ -398,10 +398,7 @@ void transcode_video_clean( sout_stream_id_sys_t *id )
 {
     /* Close encoder, but only if one was opened. */
     if ( id->encoder )
-    {
-        transcode_encoder_close( id->encoder );
         transcode_encoder_delete( id->encoder );
-    }
 
     es_format_Clean( &id->decoder_out );
 
