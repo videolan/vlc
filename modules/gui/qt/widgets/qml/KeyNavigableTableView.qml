@@ -258,7 +258,6 @@ FocusScope {
             width: view.width
             height: col.height
             color: headerColor
-            visible: view.count > 0
             z: 3
 
             // with inline header positioning and for `root.header` which changes it's height after loading,
