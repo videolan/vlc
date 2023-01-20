@@ -30,6 +30,7 @@
 
 // NOTE: Qt won't let us inherit from QAbstractListModel when declaring a template class. So we
 //       specify a base class for properties and signals.
+// TODO: Implement searchRole and searchPattern.
 class BaseClipListModel : public QAbstractListModel
 {
     Q_OBJECT
