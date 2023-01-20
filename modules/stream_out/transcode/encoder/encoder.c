@@ -185,6 +185,12 @@ void transcode_encoder_close( transcode_encoder_t *p_enc )
     if( p_enc->p_encoder->fmt_in.i_cat == VIDEO_ES )
         transcode_encoder_video_stop( p_enc );
 
+    if( p_enc->p_encoder->ops != NULL && p_enc->p_encoder->ops->close != NULL )
+    {
+        p_enc->p_encoder->ops->close( p_enc->p_encoder );
+        p_enc->p_encoder->ops = NULL;
+    }
+
     module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
 
     p_enc->p_encoder->p_module = NULL;
