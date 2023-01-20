@@ -375,7 +375,7 @@ int transcode_encoder_video_drain( transcode_encoder_t *p_enc, block_t **out )
     return VLC_SUCCESS;
 }
 
-void transcode_encoder_video_close( transcode_encoder_t *p_enc )
+void transcode_encoder_video_stop( transcode_encoder_t *p_enc )
 {
     if( p_enc->b_threaded && !p_enc->b_abort )
     {

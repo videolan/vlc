@@ -40,7 +40,7 @@ int transcode_encoder_video_open( transcode_encoder_t *p_enc,
 int transcode_encoder_spu_open( transcode_encoder_t *p_enc,
                                 const transcode_encoder_config_t *p_cfg );
 
-void transcode_encoder_video_close( transcode_encoder_t *p_enc );
+void transcode_encoder_video_stop( transcode_encoder_t *p_enc );
 
 block_t * transcode_encoder_video_encode( transcode_encoder_t *p_enc, picture_t *p_pic );
 block_t * transcode_encoder_audio_encode( transcode_encoder_t *p_enc, block_t *p_block );
