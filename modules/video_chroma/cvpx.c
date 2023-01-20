@@ -560,6 +560,18 @@ static const struct vlc_filter_operations chain_CVPX_ops = {
     .close = Close_chain_CVPX,
 };
 
+static picture_t *VideoBufferNew(filter_t *filter)
+{
+    filter_t *cvpx_chain = filter->owner.sys;
+    return filter_NewPicture(cvpx_chain);
+}
+
+static struct vlc_decoder_device *VideoHoldDevice(vlc_object_t *obj, void *sys)
+{
+    filter_t *cvpx_chain = sys;
+    return filter_HoldDecoderDevice(cvpx_chain);
+}
+
 static int
 Open_chain_CVPX(filter_t *filter)
 {
@@ -624,9 +636,21 @@ Open_chain_CVPX(filter_t *filter)
              (const char *)&input_chroma,
              (const char *)&output_chroma);
 
+    static const struct filter_video_callbacks owner_cbs =
+    {
+        .buffer_new = VideoBufferNew,
+        .hold_device = VideoHoldDevice,
+    };
+
+    const struct filter_owner_t owner =
+    {
+        .sys = filter,
+        .video = &owner_cbs,
+    };
+
     /* We create a filter chain to encapsulate the two converters. */
     filter_chain_t *chain =
-        filter_chain_NewVideo(filter, false, &filter->owner);
+        filter_chain_NewVideo(filter, false, &owner);
     if (chain == NULL)
         return VLC_ENOMEM;
 
