@@ -116,7 +116,8 @@ FocusScope {
                 width: flickable.width
                 height: contentHeight
 
-                maximumRows: root.maximumRows
+                // NOTE: We are not capping the list when filtering.
+                maximumRows: (model.searchPattern === "") ? root.maximumRows : -1
 
                 visible: (model.count !== 0)
 
@@ -152,7 +153,7 @@ FocusScope {
                 width: flickable.width
                 height: contentHeight
 
-                maximumRows: root.maximumRows
+                maximumRows: foldersSection.maximumRows
 
                 visible: (model.count !== 0)
 
@@ -199,7 +200,7 @@ FocusScope {
                 width: flickable.width
                 height: contentHeight
 
-                maximumRows: root.maximumRows
+                maximumRows: foldersSection.maximumRows
 
                 visible: (model.count !== 0)
 
