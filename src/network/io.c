@@ -361,7 +361,7 @@ int net_Accept(vlc_object_t *obj, int *fds)
             return fd;
         }
     }
-    return -1;
+    vlc_assert_unreachable();
 }
 
 ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
