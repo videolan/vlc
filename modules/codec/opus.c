@@ -814,7 +814,6 @@ static int OpenEncoder(vlc_object_t *p_this)
     if (opus_write_header((uint8_t **) &enc->fmt_out.p_extra,
                           &enc->fmt_out.i_extra, &header, opus_get_version_string()))
     {
-        msg_Err(enc, "Failed to write header.");
         status = VLC_ENOMEM;
         goto error;
     }
