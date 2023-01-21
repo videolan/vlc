@@ -42,7 +42,7 @@ Row {
                 anchors.fill: label
                 color: "black"
                 opacity: 0.5
-                radius: 3
+                radius: VLCStyle.dp(3, VLCStyle.scale)
             }
 
             Accessible.ignored: true
