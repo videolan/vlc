@@ -383,8 +383,11 @@
                                                 </customSpacing>
                                             </stackView>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zOB-QJ-TUy" customClass="VLCTimeField">
-                                                <rect key="frame" x="43" y="0.0" width="35" height="13"/>
-                                                <textFieldCell key="cell" lineBreakMode="clipping" title="00:00" id="q8L-S3-Ylc">
+                                                <rect key="frame" x="39" y="0.0" width="44" height="13"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="40" id="Rox-Cf-MSz"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="00:00" id="q8L-S3-Ylc">
                                                     <font key="font" metaFont="systemSemibold" size="10"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -413,15 +416,18 @@
                                                 </constraints>
                                             </customView>
                                             <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" mirrorLayoutDirectionWhenInternationalizing="never" translatesAutoresizingMaskIntoConstraints="NO" id="9Hg-t2-K5z" customClass="VLCSlider">
-                                                <rect key="frame" x="78" y="-2" width="357" height="17"/>
+                                                <rect key="frame" x="83" y="-2" width="339" height="17"/>
                                                 <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="YMg-uo-8nX" customClass="VLCSliderCell"/>
                                                 <connections>
                                                     <action selector="timeSliderAction:" target="Uzf-Tf-H8x" id="eDh-39-Ej1"/>
                                                 </connections>
                                             </slider>
                                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGd-mG-cFw" customClass="VLCTimeField">
-                                                <rect key="frame" x="435" y="0.0" width="39" height="13"/>
-                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" state="on" alignment="center" title="00:00" id="adD-oG-KsD">
+                                                <rect key="frame" x="422" y="0.0" width="52" height="13"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="48" id="mAg-xF-yHo"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="left" title="-00:00" id="adD-oG-KsD">
                                                     <font key="font" metaFont="systemSemibold" size="10"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -442,7 +448,7 @@
                                             <constraint firstItem="5o7-Z0-dqS" firstAttribute="leading" secondItem="Ktr-qT-1fr" secondAttribute="leading" id="Zqk-vQ-rnV"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jlv-jC-dQB" secondAttribute="trailing" constant="4" id="dE6-x3-y9L"/>
                                             <constraint firstItem="jlv-jC-dQB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="zOB-QJ-TUy" secondAttribute="leading" id="nyg-q0-uLs"/>
-                                            <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="trailing" constant="8" id="ob8-aS-evc"/>
+                                            <constraint firstItem="zOB-QJ-TUy" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="trailing" constant="4" id="ob8-aS-evc"/>
                                             <constraint firstItem="jlv-jC-dQB" firstAttribute="centerX" secondItem="9Hg-t2-K5z" secondAttribute="centerX" id="spW-Wf-nKA"/>
                                             <constraint firstItem="9Hg-t2-K5z" firstAttribute="leading" secondItem="zOB-QJ-TUy" secondAttribute="trailing" constant="4" id="tjf-4h-ukW"/>
                                         </constraints>
