@@ -147,7 +147,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
     int n = aout_DevicesList( aout, &values, &texts );
     aout_Release(aout);
     if( n < 0 )
-        goto err;
+        goto err; //goto statement
 
     for (int i = 0; i < n; i++)
     {
@@ -167,7 +167,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
 
     free( texts );
     free( values );
-err:
+err://goto label
     *pp = NULL;
     return list;
 }
@@ -219,8 +219,7 @@ char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
 void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )
 {
     int mute = libvlc_audio_get_mute( mp );
-    if( mute != -1 )
-        libvlc_audio_set_mute( mp, !mute );
+    ( mute != -1 )?libvlc_audio_set_mute( mp, !mute ):/*just skip*/;
 }
 
 int libvlc_audio_get_mute( libvlc_media_player_t *mp )
@@ -246,7 +245,7 @@ void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
     }
 }
 
-int libvlc_audio_get_volume( libvlc_media_player_t *mp )
+int libvlc_audio_get_volume( const libvlc_media_player_t *mp )
 {
     int volume = -1;
 
@@ -338,11 +337,11 @@ int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
             /* found */
             vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
             i_ret = 0;
-            goto end;
+            goto end;//goto statement
         }
     }
     libvlc_printerr( "Track identifier not found" );
-end:
+end://goto label
     vlc_player_Unlock(player);
     return i_ret;
 }
@@ -353,8 +352,7 @@ end:
 libvlc_audio_output_stereomode_t libvlc_audio_get_stereomode( libvlc_media_player_t *mp )
 {
     audio_output_t *p_aout = GetAOut( mp );
-    if( !p_aout )
-        return libvlc_AudioStereoMode_Unset;
+   ( !p_aout )?return libvlc_AudioStereoMode_Unset:/*skip*/;
 
     int val = var_GetInteger( p_aout, "stereo-mode" );
     aout_Release(p_aout);
@@ -396,8 +394,7 @@ int libvlc_audio_set_stereomode( libvlc_media_player_t *mp, libvlc_audio_output_
 libvlc_audio_output_mixmode_t libvlc_audio_get_mixmode( libvlc_media_player_t *mp )
 {
     audio_output_t *p_aout = GetAOut( mp );
-    if( !p_aout )
-        return libvlc_AudioMixMode_Unset;
+    (!p_aout)?return libvlc_AudioMixMode_Unset:/*skip*/;
 
     int val = var_GetInteger( p_aout, "mix-mode" );
     aout_Release(p_aout);
@@ -420,8 +417,7 @@ int libvlc_audio_set_mixmode( libvlc_media_player_t *mp, libvlc_audio_output_mix
     audio_output_t *p_aout = GetAOut( mp );
     int ret = 0;
 
-    if( !p_aout )
-        return -1;
+   ( !p_aout )?return -1:/*skip*/;
 
     if( var_SetInteger( p_aout, "mix-mode", mode ) < 0 )
     {
@@ -476,8 +472,7 @@ unsigned libvlc_audio_equalizer_get_preset_count( void )
  *****************************************************************************/
 const char *libvlc_audio_equalizer_get_preset_name( unsigned u_index )
 {
-    if ( u_index >= NB_PRESETS )
-        return NULL;
+   (u_index >= NB_PRESETS )?return NULL:/*skip*/;
 
     return preset_list_text[ u_index ];
 }
@@ -495,10 +490,8 @@ unsigned libvlc_audio_equalizer_get_band_count( void )
  *****************************************************************************/
 float libvlc_audio_equalizer_get_band_frequency( unsigned u_index )
 {
-    if ( u_index >= EQZ_BANDS_MAX )
-        return -1.f;
-
-    return f_iso_frequency_table_10b[ u_index ];
+   ( u_index >= EQZ_BANDS_MAX )?return -1.f:/*skip*/;
+      return f_iso_frequency_table_10b[ u_index ];
 }
 
 /*****************************************************************************
@@ -508,8 +501,7 @@ libvlc_equalizer_t *libvlc_audio_equalizer_new( void )
 {
     libvlc_equalizer_t *p_equalizer;
     p_equalizer = malloc( sizeof( *p_equalizer ) );
-    if ( unlikely( p_equalizer == NULL ) )
-        return NULL;
+    ( unlikely( p_equalizer == NULL ) )?return NULL:/*skip*/;
 
     p_equalizer->f_preamp = 0.f;
     for ( unsigned i = 0; i < EQZ_BANDS_MAX; i++ )
@@ -525,12 +517,10 @@ libvlc_equalizer_t *libvlc_audio_equalizer_new_from_preset( unsigned u_index )
 {
     libvlc_equalizer_t *p_equalizer;
 
-    if ( u_index >= NB_PRESETS )
-        return NULL;
+   ( u_index >= NB_PRESETS )?return NULL:/*skip*/;
 
     p_equalizer = malloc( sizeof( *p_equalizer ) );
-    if ( unlikely( p_equalizer == NULL ) )
-        return NULL;
+   ( unlikely( p_equalizer == NULL ) )?return NULL:/*skip*/;
 
     p_equalizer->f_preamp = eqz_preset_10b[ u_index ].f_preamp;
 
@@ -553,12 +543,8 @@ void libvlc_audio_equalizer_release( libvlc_equalizer_t *p_equalizer )
  *****************************************************************************/
 int libvlc_audio_equalizer_set_preamp( libvlc_equalizer_t *p_equalizer, float f_preamp )
 {
-    if( isnan(f_preamp) )
-        return -1;
-    if( f_preamp < -20.f )
-        f_preamp = -20.f;
-    else if( f_preamp > 20.f )
-        f_preamp = 20.f;
+  ( isnan(f_preamp) )?return -1:/*skip*/;
+   ( f_preamp < -20.f )? f_preamp = -20.f:(( f_preamp > 20.f )?f_preamp = 20.f:/*skip*/);
 
     p_equalizer->f_preamp = f_preamp;
     return 0;
@@ -577,14 +563,8 @@ float libvlc_audio_equalizer_get_preamp( libvlc_equalizer_t *p_equalizer )
  *****************************************************************************/
 int libvlc_audio_equalizer_set_amp_at_index( libvlc_equalizer_t *p_equalizer, float f_amp, unsigned u_band )
 {
-    if( u_band >= EQZ_BANDS_MAX || isnan(f_amp) )
-        return -1;
-
-
-    if( f_amp < -20.f )
-        f_amp = -20.f;
-    else if( f_amp > 20.f )
-        f_amp = 20.f;
+   ( u_band >= EQZ_BANDS_MAX || isnan(f_amp) )?return -1:/*skip*/;
+   ( f_amp < -20.f )? f_amp = -20.f;:(( f_amp > 20.f )?f_amp = 20.f:/*skip*/);
 
     p_equalizer->f_amp[ u_band ] = f_amp;
     return 0;
@@ -595,8 +575,7 @@ int libvlc_audio_equalizer_set_amp_at_index( libvlc_equalizer_t *p_equalizer, fl
  *****************************************************************************/
 float libvlc_audio_equalizer_get_amp_at_index( libvlc_equalizer_t *p_equalizer, unsigned u_band )
 {
-    if ( u_band >= EQZ_BANDS_MAX )
-        return nanf("");
+    ( u_band >= EQZ_BANDS_MAX )?return nanf(""):/*skip*/;
 
     return p_equalizer->f_amp[ u_band ];
 }
