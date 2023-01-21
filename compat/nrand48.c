@@ -53,7 +53,12 @@ double erand48 (unsigned short subi[3])
 
 long jrand48 (unsigned short subi[3])
 {
-    return ((int64_t)iterate48 (subi)) >> 16;
+    union {
+        uint32_t u;
+        int32_t i;
+    } v;
+    v.u = iterate48(subi) >> 16;
+    return v.i;
 }
 
 long nrand48 (unsigned short subi[3])
