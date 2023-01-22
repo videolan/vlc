@@ -34,6 +34,6 @@ x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 	sed -i -e 's/x264.pc/x262.pc/g' $(BUILD_DIR)/Makefile
 	sed -i -e 's/x264.h/x262.h/g' $(BUILD_DIR)/Makefile
 	+$(MAKEBUILD)
-	cp $(BUILD_DIR)/x264.h $(BUILD_DIR)/x262.h
+	cp $</x264.h $</x262.h
 	+$(MAKEBUILD) install
 	touch $@
