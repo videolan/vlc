@@ -3210,6 +3210,60 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
                 }
             }
+
+            switch( p_fmt->i_codec )
+            {
+                /* When not specified, set max standard decoder delay */
+                case VLC_CODEC_MP4A:
+                case VLC_CODEC_OPUS:
+                case VLC_CODEC_MP3:
+                case VLC_CODEC_MP2:
+                case VLC_CODEC_MPGA:
+                {
+                    const MP4_Box_t *p_elst = p_track->p_elst;
+                    if( p_elst && BOXDATA(p_elst)->i_entry_count &&
+                        BOXDATA(p_elst)->entries[0].i_media_time < 0 )
+                    {
+                        p_track->i_decoder_delay = MP4_rescale( BOXDATA(p_elst)->entries[0].i_segment_duration,
+                                                                p_sys->i_timescale,
+                                                                p_track->i_timescale );
+                    }
+                    /* AAC historical Apple decoder delay 2112 > 2048 */
+                    else if( p_fmt->i_codec == VLC_CODEC_MP4A )
+                    {
+                        p_track->i_decoder_delay =  MP4_rescale_qtime(
+                                    vlc_tick_from_samples( 2112, p_fmt->audio.i_rate ),
+                                    p_track->i_timescale );
+                    }
+                    /* Opus has an expected 80ms discard on seek */
+                    else if( p_fmt->i_codec == VLC_CODEC_OPUS )
+                    {
+                        p_track->i_decoder_delay =  MP4_rescale_qtime(
+                                    vlc_tick_from_samples( 80 * 48, 48000 ),
+                                    p_track->i_timescale );
+                    }
+                    /* MPEG have One frame delay */
+                    else if( p_fmt->i_codec == VLC_CODEC_MP3 )
+                    {
+                        /* https://lame.sourceforge.io/tech-FAQ.txt
+                         * https://www.compuphase.com/mp3/mp3loops.htm
+                           https://www.iis.fraunhofer.de/content/dam/iis/de/doc/ame/conference/AES-116-Convention_guideline-to-audio-codec-delay_AES116.pdf */
+                        p_track->i_decoder_delay =  MP4_rescale_qtime(
+                                    vlc_tick_from_samples( 576, p_fmt->audio.i_rate ),
+                                    p_track->i_timescale );
+                    }
+                    else if( p_fmt->i_codec == VLC_CODEC_MPGA ||
+                             p_fmt->i_codec == VLC_CODEC_MP2 )
+                    {
+                        p_track->i_decoder_delay =  MP4_rescale_qtime(
+                                    vlc_tick_from_samples( 240, p_fmt->audio.i_rate ),
+                                    p_track->i_timescale );
+                    }
+                }
+                break;
+                default:
+                    break;
+            }
             break;
         default:
             break;
@@ -3422,6 +3476,23 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
                     p_track->i_track_ID, p_entrydesc->roll.i_roll_distance );
             if( p_entrydesc->roll.i_roll_distance < 0 )
                 i_sync_sample += p_entrydesc->roll.i_roll_distance;
+        }
+        else if( p_track->i_decoder_delay > 0 &&
+                 p_track->i_decoder_delay <= i_start )
+        {
+            uint32_t i_withdelay_sample, i_withdelay_chunk;
+            if( STTSToSampleChunk( p_track, i_start - p_track->i_decoder_delay,
+                                   &i_withdelay_chunk,
+                                   &i_withdelay_sample ) == VLC_SUCCESS )
+            {
+                msg_Warn( p_demux, "track[Id 0x%x] has %ldµs decoder delay from %ld",
+                          p_track->i_track_ID,
+                          MP4_rescale_mtime( p_track->i_decoder_delay, p_track->i_timescale),
+                          i_start );
+                *pi_chunk  = i_withdelay_chunk;
+                *pi_sample = i_withdelay_sample;
+                return VLC_SUCCESS;
+            }
         }
     }
 
