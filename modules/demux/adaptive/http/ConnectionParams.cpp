@@ -70,8 +70,8 @@ void ConnectionParams::setPath(const std::string &path_)
 
     if (!hostname.empty()) {
         url_components.psz_host = const_cast<char *>(hostname.c_str());
-        if ((port != 80 && scheme != "http") ||
-            (port != 443 && scheme != "https"))
+        if ((port != 80 && scheme == "http") ||
+            (port != 443 && scheme == "https"))
             url_components.i_port = port;
     }
 
