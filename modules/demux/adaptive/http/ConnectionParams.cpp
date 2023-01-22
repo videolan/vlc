@@ -70,8 +70,8 @@ void ConnectionParams::setPath(const std::string &path_)
     if(!hostname.empty())
     {
         os << hostname;
-        if( (port != 80 && scheme != "http") ||
-            (port != 443 && scheme != "https") )
+        if( (port != 80 && scheme == "http") ||
+            (port != 443 && scheme == "https") )
             os << ":" << port;
     }
     os << path;
