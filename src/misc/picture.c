@@ -609,6 +609,7 @@ int picture_Export( vlc_object_t *p_obj,
     if( !p_image )
         return VLC_ENOMEM;
 
+    vlc_tick_t date = p_picture->date;
     block_t *p_block = image_Write( p_image, p_picture, &fmt_in, &fmt_out );
 
     image_HandlerDelete( p_image );
@@ -617,7 +618,7 @@ int picture_Export( vlc_object_t *p_obj,
         return VLC_EGENERIC;
 
     p_block->i_pts =
-    p_block->i_dts = p_picture->date;
+    p_block->i_dts = date;
 
     if( p_fmt )
         *p_fmt = fmt_out;
