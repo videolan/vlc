@@ -38,6 +38,7 @@ check_PROGRAMS = \
 	test_src_misc_image \
 	test_src_video_output \
 	test_src_video_output_opengl \
+	test_modules_misc_medialibrary \
 	test_modules_packetizer_helpers \
 	test_modules_packetizer_hxxx \
 	test_modules_packetizer_h264 \
@@ -147,6 +148,9 @@ test_src_interface_dialog_SOURCES = src/interface/dialog.c
 test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_media_source_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_media_source_SOURCES = src/media_source/media_source.c
+
+test_modules_misc_medialibrary_SOURCES = modules/misc/medialibrary.c
+test_modules_misc_medialibrary_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_helpers_SOURCES = modules/packetizer/helpers.c
 test_modules_packetizer_helpers_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
