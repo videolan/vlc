@@ -517,6 +517,8 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_UNBAN_FOLDER:
         case VLC_ML_RELOAD_FOLDER:
         case VLC_ML_RESUME_BACKGROUND:
+        case VLC_ML_NEW_EXTERNAL_MEDIA:
+        case VLC_ML_NEW_STREAM:
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         {
             /* These operations require the media library to be started
