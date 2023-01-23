@@ -419,6 +419,8 @@ MediaLibrary* MediaLibrary::create( vlc_medialibrary_module_t* vlc_ml )
                         medialibrary::LogLevel::Debug : medialibrary::LogLevel::Warning;
     cfg.logger = std::make_shared<Logger>( VLC_OBJECT( vlc_ml ) );
 
+    msg_Dbg(VLC_OBJECT(vlc_ml), "Opening medialibrary from %s, db at %s",
+            dbPath.c_str(), mlFolderPath.c_str());
     auto ml = NewMediaLibrary( dbPath.c_str(), mlFolderPath.c_str(), true, &cfg );
     if ( !ml )
         return nullptr;
