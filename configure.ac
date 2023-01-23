@@ -3004,11 +3004,6 @@ if test "${enable_x264}" != "no"; then
       PKG_CHECK_MODULES(X264,x264 >= 0.148, [
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LIBS([x264],[${X264_LIBS}])
-
-        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-          VLC_ADD_LDFLAGS([x264],[${ac_cv_ld_bsymbolic}])
-        ])
-
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
       ],[
         if test "${enable_x264}" = "yes"; then
@@ -3026,11 +3021,6 @@ if test "${enable_x26410b}" != "no"; then
       PKG_CHECK_MODULES(X26410b,x264 >= 0.153, [
         VLC_ADD_PLUGIN([x26410b])
         VLC_ADD_LIBS([x26410b],[${X264_LIBS}])
-
-        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-          VLC_ADD_LDFLAGS([x26410b],[${ac_cv_ld_bsymbolic}])
-        ])
-
         VLC_ADD_CFLAGS([x26410b],[${X264_CFLAGS}])
       ],[
         if test "${enable_x26410b}" = "yes"; then
