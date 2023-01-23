@@ -83,8 +83,13 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     if ( ctx.thumbnail == nullptr )
         return false;
 
+    /* Both picture_Export and ThumbnailerCtx will release the thumbnail, so
+     * ensure that only picture_Export does. */
+    picture_t *thumbnail = nullptr;
+    std::swap(thumbnail, ctx.thumbnail);
+
     block_t* block;
-    if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, ctx.thumbnail,
+    if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, thumbnail,
                          VLC_CODEC_JPEG, desiredWidth, desiredHeight, true ) != VLC_SUCCESS )
         return false;
     auto blockPtr = vlc::wrap_cptr( block, &block_Release );
