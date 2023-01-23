@@ -33,6 +33,9 @@ endif
 if png_dep.found()
     test_libvlc_media_thumbnail_modules += ['png']
 endif
+if vpx_dep.found()
+    test_libvlc_media_thumbnail_modules += ['vpx']
+endif
 
 vlc_tests += {
     'name' : 'test_libvlc_media_thumbnail_argb',
@@ -66,6 +69,18 @@ vlc_tests += {
     'c_args' : [
         '-DTEST_THUMB_TYPE=libvlc_picture_Png',
         '-DTEST_REQUIRED_MODULES="png"',
+    ],
+    'module_depends': test_libvlc_media_thumbnail_modules,
+}
+
+vlc_tests += {
+    'name' : 'test_libvlc_media_thumbnail_webp',
+    'sources' : files('media_thumbnail.c'),
+    'link_with' : [libvlc, libvlccore],
+    'suite' : ['libvlc', 'test_libvlc_media_thumbnail'],
+    'c_args' : [
+        '-DTEST_THUMB_TYPE=libvlc_picture_WebP',
+        '-DTEST_REQUIRED_MODULES="vpx"',
     ],
     'module_depends': test_libvlc_media_thumbnail_modules,
 }
