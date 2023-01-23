@@ -2984,9 +2984,6 @@ if test "${enable_x262}" != "no"; then
     PKG_CHECK_MODULES(X262, x262, [
         VLC_ADD_PLUGIN([x262])
         VLC_ADD_LIBS([x262],[${X262_LIBS}])
-        AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-          VLC_ADD_LDFLAGS([x262],[${ac_cv_ld_bsymbolic}])
-        ])
         VLC_ADD_CFLAGS([x262],[${X262_CFLAGS}])
     ], [
        if test "${enable_x262}" = "yes"; then
