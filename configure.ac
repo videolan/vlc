@@ -2705,9 +2705,6 @@ then
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
-      AS_IF([test -n "${ac_cv_ld_bsymbolic}"], [
-        VLC_ADD_LIBS([swscale],[${ac_cv_ld_bsymbolic}])
-      ])
     ],[
       AC_MSG_ERROR([${SWSCALE_PKG_ERRORS}. Pass --disable-swscale to ignore this error. Proper software scaling and some video chroma conversion will be missing.])
   ])

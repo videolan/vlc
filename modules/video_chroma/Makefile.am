@@ -9,7 +9,7 @@ noinst_LTLIBRARIES += libchroma_copy.la
 libswscale_plugin_la_SOURCES = video_chroma/swscale.c codec/avcodec/chroma.c
 libswscale_plugin_la_CFLAGS = $(AM_CFLAGS) $(SWSCALE_CFLAGS)
 libswscale_plugin_la_LIBADD = $(SWSCALE_LIBS) $(LIBM)
-libswscale_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)'
+libswscale_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS) -rpath '$(chromadir)'
 
 libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
 
