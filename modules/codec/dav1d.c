@@ -365,8 +365,23 @@ static int Decode(decoder_t *dec, block_t *block)
                 decoder_QueueVideo(dec, pic);
                 ExtractCaptions(dec, &img);
                 dav1d_picture_unref(&img);
+
+                /* if not draining then break here and don't get further
+                 * decoded frames. this allows for proper frame threading
+                 * as otherwise all frames would be drained directly */
+                if(p_data != NULL && !b_eos)
+                    break;
             }
-            else if (res != DAV1D_ERR(EAGAIN))
+            else if (res == DAV1D_ERR(EAGAIN))
+            {
+                /* the decoder needs more data to be able to output something.
+                 * if there is more data pending, continue the loop below or
+                 * otherwise break and first read more data */
+                if (p_data && p_data->sz != 0)
+                    res = 0;
+                break;
+            }
+            else
             {
                 msg_Warn(dec, "Decoder error %d!", res);
                 b_output_error = true;
@@ -384,7 +399,7 @@ static int Decode(decoder_t *dec, block_t *block)
             b_draining = true;
             res = 0;
         }
-    } while (res == 0 || (p_data && p_data->sz != 0));
+    } while (res == 0 && ((p_data && p_data->sz != 0) || b_draining));
 
     if(p_data && p_data->sz > 0)
         dav1d_data_unref(p_data);
