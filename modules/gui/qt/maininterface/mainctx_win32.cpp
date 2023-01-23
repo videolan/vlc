@@ -35,6 +35,7 @@
 #include "util/csdbuttonmodel.hpp"
 
 #include <QBitmap>
+#include <QTimer>
 
 #include <assert.h>
 
@@ -113,6 +114,103 @@ HWND WinId( QWindow *windowHandle )
     else
         return 0;
 }
+
+
+bool isWindowFixedSize(const QWindow *window)
+{
+    if (window->flags() & Qt::MSWindowsFixedSizeDialogHint)
+        return true;
+
+    const auto minSize = window->minimumSize();
+    const auto maxSize = window->maximumSize();
+
+    return minSize.isValid() && maxSize.isValid() && minSize == maxSize;
+}
+
+
+class WinSystemMenuButton : public SystemMenuButton
+{
+public:
+    WinSystemMenuButton(QWindow *window, QObject *parent)
+        : SystemMenuButton {parent}
+        , m_window {window}
+    {
+        connect(this, &CSDButton::clicked, this, &WinSystemMenuButton::handleClick);
+        connect(this, &CSDButton::doubleClicked, this, &WinSystemMenuButton::handleDoubleClick);
+    }
+
+    void showSystemMenu() override
+    {
+        HWND hwnd = (HWND)m_window->winId();
+        HMENU hmenu = ::GetSystemMenu(hwnd, FALSE);
+        if (!hmenu)
+            return;
+
+        // Tweak the menu items according to the current window status.
+        const auto winState = m_window->windowStates();
+        const bool maxOrFull = (winState.testFlag(Qt::WindowMaximized) || winState.testFlag(Qt::WindowFullScreen));
+        const bool fixedSize = isWindowFixedSize(m_window);
+
+        EnableMenuItem(hmenu, SC_MOVE, (MF_BYCOMMAND | (!maxOrFull ? MFS_ENABLED : MFS_DISABLED)));
+        EnableMenuItem(hmenu, SC_SIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize) ? MFS_ENABLED : MFS_DISABLED)));
+
+        EnableMenuItem(hmenu, SC_RESTORE, (MF_BYCOMMAND | ((maxOrFull && !fixedSize) ? MFS_ENABLED : MFS_DISABLED)));
+        EnableMenuItem(hmenu, SC_MINIMIZE, (MF_BYCOMMAND | MFS_ENABLED));
+        EnableMenuItem(hmenu, SC_MAXIMIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize) ? MFS_ENABLED : MFS_DISABLED)));
+        EnableMenuItem(hmenu, SC_CLOSE, (MF_BYCOMMAND | MFS_ENABLED));
+
+        // calculate screen point 'margin' down from system menu button's rect
+        const QPoint margin {0, 4};
+        const auto bottomLeft = rect().bottomLeft();
+        const auto screenPoints = m_window->mapToGlobal(bottomLeft) + margin;
+
+        const auto alignment = (QGuiApplication::isRightToLeft() ? TPM_RIGHTALIGN : TPM_LEFTALIGN);
+
+        // show menu
+        emit systemMenuVisibilityChanged(true);
+
+        const int action = TrackPopupMenu(hmenu, (TPM_RETURNCMD | alignment)
+                                          , screenPoints.x(), screenPoints.y()
+                                          , NULL, hwnd, 0);
+
+        // unlike native system menu which sends WM_SYSCOMMAND, TrackPopupMenu sends WM_COMMAND
+        // imitate native system menu by sending the action manually as WM_SYSCOMMAND
+        PostMessageW(hwnd, WM_SYSCOMMAND, action, 0);
+
+        emit systemMenuVisibilityChanged(false);
+    }
+
+private:
+    // target window
+    QWindow *m_window = {};
+
+    // used to reject click() incase a doubleClick() is followed
+    bool m_triggerSystemMenu = false;
+
+    void handleClick()
+    {
+        // delay the show of sytem menu to check if this 'click' is
+        // a double click, 'm_triggerSystemMenu' is used to reject the
+        // queued 'showSystemMenu' call in case this is a double click
+
+        m_triggerSystemMenu = true;
+        QTimer::singleShot(100, this, [this]()
+        {
+            if (!m_triggerSystemMenu)
+                return;
+
+            showSystemMenu();
+        });
+    }
+
+    void handleDoubleClick()
+    {
+        // reject any queued showSystemMenu call
+        m_triggerSystemMenu = false;
+
+        m_window->close();
+    }
+};
 
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
 {
@@ -654,6 +752,9 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
 #endif
 
 {
+    auto systemMenuButton = std::make_shared<WinSystemMenuButton>(mainCtx->intfMainWindow(), nullptr);
+    mainCtx->csdButtonModel()->setSystemMenuButton(systemMenuButton);
+
     QApplication::instance()->installNativeEventFilter(this);
 }
 
