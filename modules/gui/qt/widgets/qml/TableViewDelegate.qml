@@ -163,6 +163,10 @@ T.Control {
                     delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
                     delegate.itemDoubleClicked(delegate._index, delegate.rowModel)
                 }
+
+                onLongPressed: {
+                    delegate.rightClick(delegate, delegate.rowModel, point.scenePosition)
+                }
             }
         }
     }

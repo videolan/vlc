@@ -215,6 +215,10 @@ T.Control {
                 root.itemClicked(picture, Qt.LeftButton, Qt.NoModifier)
                 root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
             }
+
+            onLongPressed: {
+                contextMenuButtonClicked(picture, point.scenePosition);
+            }
         }
 
         MouseHoverHandlerCompat {

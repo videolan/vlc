@@ -275,6 +275,10 @@ T.Control {
                     moveSelected()
                 }
             }
+
+            onLongPressed: {
+                contextMenu.popup(index, point.scenePosition)
+            }
         }
     }
 
