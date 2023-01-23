@@ -17,6 +17,9 @@ check_PROGRAMS = \
 	test_libvlc_core \
 	test_libvlc_equalizer \
 	test_libvlc_media \
+	test_libvlc_media_thumbnail_argb \
+	test_libvlc_media_thumbnail_jpeg \
+	test_libvlc_media_thumbnail_png \
 	test_libvlc_media_list \
 	test_libvlc_media_player \
 	test_libvlc_media_player_record \
@@ -115,6 +118,15 @@ test_libvlc_equalizer_SOURCES = libvlc/equalizer.c
 test_libvlc_equalizer_LDADD = $(LIBVLC)
 test_libvlc_media_SOURCES = libvlc/media.c
 test_libvlc_media_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_media_thumbnail_argb_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_argb_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_media_thumbnail_argb_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Argb -DTEST_REQUIRED_MODULES=\"avcodec\"
+test_libvlc_media_thumbnail_png_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_png_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_media_thumbnail_png_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Png -DTEST_REQUIRED_MODULES=\"png\"
+test_libvlc_media_thumbnail_jpeg_SOURCES = libvlc/media_thumbnail.c
+test_libvlc_media_thumbnail_jpeg_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_libvlc_media_thumbnail_jpeg_CPPFLAGS = $(AM_CPPFLAGS) -DTEST_THUMB_TYPE=libvlc_picture_Jpg -DTEST_REQUIRED_MODULES=\"jpeg\"
 test_libvlc_media_list_player_SOURCES = libvlc/media_list_player.c
 test_libvlc_media_list_player_LDADD = $(LIBVLC)
 test_libvlc_media_list_SOURCES = libvlc/media_list.c

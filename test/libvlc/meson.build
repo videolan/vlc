@@ -20,6 +20,56 @@ vlc_tests += {
     'module_depends': vlc_plugins_targets.keys()
 }
 
+test_libvlc_media_thumbnail_modules = ['demux_mock']
+if avcodec_dep.found()
+    test_libvlc_media_thumbnail_modules += ['avcodec']
+endif
+if swscale_dep.found()
+    test_libvlc_media_thumbnail_modules += ['swscale']
+endif
+if jpeg_dep.found()
+    test_libvlc_media_thumbnail_modules += ['jpeg']
+endif
+if png_dep.found()
+    test_libvlc_media_thumbnail_modules += ['png']
+endif
+
+vlc_tests += {
+    'name' : 'test_libvlc_media_thumbnail_argb',
+    'sources' : files('media_thumbnail.c'),
+    'link_with' : [libvlc, libvlccore],
+    'suite' : ['libvlc', 'test_libvlc_media_thumbnail'],
+    'c_args' : [
+        '-DTEST_THUMB_TYPE=libvlc_picture_Argb',
+        '-DTEST_REQUIRED_MODULES="avcodec"',
+    ],
+    'module_depends': test_libvlc_media_thumbnail_modules,
+}
+
+vlc_tests += {
+    'name' : 'test_libvlc_media_thumbnail_jpeg',
+    'sources' : files('media_thumbnail.c'),
+    'link_with' : [libvlc, libvlccore],
+    'suite' : ['libvlc', 'test_libvlc_media_thumbnail'],
+    'c_args' : [
+        '-DTEST_THUMB_TYPE=libvlc_picture_Jpg',
+        '-DTEST_REQUIRED_MODULES="jpeg"',
+    ],
+    'module_depends': test_libvlc_media_thumbnail_modules,
+}
+
+vlc_tests += {
+    'name' : 'test_libvlc_media_thumbnail_png',
+    'sources' : files('media_thumbnail.c'),
+    'link_with' : [libvlc, libvlccore],
+    'suite' : ['libvlc', 'test_libvlc_media_thumbnail'],
+    'c_args' : [
+        '-DTEST_THUMB_TYPE=libvlc_picture_Png',
+        '-DTEST_REQUIRED_MODULES="png"',
+    ],
+    'module_depends': test_libvlc_media_thumbnail_modules,
+}
+
 # vlc_tests += {
 #     'name' : 'test_libvlc_media_list_player',
 #     'sources' : files('libvlc/media_list_player.c'),
