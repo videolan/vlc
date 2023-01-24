@@ -44,6 +44,8 @@ const char vlc_module_name[] = MODULE_STRING;
 
 #include <limits.h>
 
+static atomic_bool encoder_opened = false;
+
 static int OpenIntf(vlc_object_t *root)
 {
     image_handler_t *ih = image_HandlerCreate(root);
@@ -68,15 +70,18 @@ static int OpenIntf(vlc_object_t *root)
     assert(block != NULL);
     block_Release(block);
     picture_Release(picture);
+    assert(atomic_load(&encoder_opened));
+    atomic_store(&encoder_opened, false);
 
     picture = picture_NewFromFormat(&fmt_in);
     fmt_out.i_width = fmt_out.i_visible_width = 400;
     fmt_out.i_height = fmt_out.i_visible_height = 300;
     block = image_Write(ih, picture, &fmt_in, &fmt_out);
     assert(block != NULL);
-
     block_Release(block);
     picture_Release(picture);
+    assert(atomic_load(&encoder_opened));
+
     image_HandlerDelete(ih);
 
     return VLC_SUCCESS;
@@ -98,6 +103,7 @@ static int OpenEncoder(vlc_object_t *obj)
         .encode_video = EncodeVideo
     };
     encoder->ops = &ops;
+    atomic_store(&encoder_opened, true);
     return VLC_SUCCESS;
 }
 
