@@ -213,8 +213,7 @@ RunnableRun(void *userdata)
 
     if (notify)
         NotifyThumbnail(task, pic);
-
-    if (pic != NULL)
+    else if (pic != NULL)
         picture_Release(pic);
 
     input_Stop(input);

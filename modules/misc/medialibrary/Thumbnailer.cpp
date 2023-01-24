@@ -49,7 +49,7 @@ void Thumbnailer::onThumbnailComplete( void* data, picture_t* thumbnail )
     {
         vlc::threads::mutex_locker lock( ctx->thumbnailer->m_mutex );
         ctx->done = true;
-        ctx->thumbnail = thumbnail ? picture_Hold( thumbnail ) : nullptr;
+        ctx->thumbnail = thumbnail;
         ctx->thumbnailer->m_currentContext = nullptr;
     }
     ctx->thumbnailer->m_cond.signal();
