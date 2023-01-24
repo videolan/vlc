@@ -1280,6 +1280,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
 
     block_t *p_block = encode_avframe( p_enc, p_sys, frame );
+    picture_Release( p_pict );
 
     return p_block;
 }
