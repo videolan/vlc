@@ -1078,7 +1078,7 @@ void libvlc_media_thumbnail_request_cancel( libvlc_media_thumbnail_request_t *re
 {
     libvlc_priv_t *p_priv = libvlc_priv(req->instance->p_libvlc_int);
     assert( p_priv->p_thumbnailer != NULL );
-    vlc_thumbnailer_Cancel( p_priv->p_thumbnailer, req->req );
+    vlc_thumbnailer_DestroyRequest( p_priv->p_thumbnailer, req->req );
 }
 
 // Destroy a thumbnail request

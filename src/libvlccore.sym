@@ -814,7 +814,7 @@ vlc_encoder_Destroy
 vlc_thumbnailer_Create
 vlc_thumbnailer_RequestByTime
 vlc_thumbnailer_RequestByPos
-vlc_thumbnailer_Cancel
+vlc_thumbnailer_DestroyRequest
 vlc_thumbnailer_Release
 vlc_player_AddAssociatedMedia
 vlc_player_AddListener

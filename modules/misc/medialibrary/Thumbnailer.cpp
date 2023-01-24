@@ -107,7 +107,8 @@ void Thumbnailer::stop()
     vlc::threads::mutex_locker lock{ m_mutex };
     if ( m_currentContext != nullptr )
     {
-        vlc_thumbnailer_Cancel( m_thumbnailer.get(), m_currentContext->request );
+        vlc_thumbnailer_DestroyRequest( m_thumbnailer.get(),
+                                        m_currentContext->request );
         m_currentContext->done = true;
         m_cond.signal();
     }

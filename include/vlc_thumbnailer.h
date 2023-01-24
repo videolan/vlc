@@ -73,10 +73,10 @@ enum vlc_thumbnailer_seek_speed
  * \return An opaque request object, or NULL in case of failure
  *
  * If this function returns a valid request object, the callback is guaranteed
- * to be called, even in case of later failure.
- * The returned request object must not be used after the callback has been
- * invoked. That request object is owned by the thumbnailer, and must not be
- * released.
+ * to be called, even in case of later failure (except if destroyed early by
+ * the user).
+ * The returned request object must be freed with
+ * vlc_thumbnailer_DestroyRequest().
  * The provided input_item will be held by the thumbnailer and can safely be
  * released safely after calling this function.
  */
@@ -98,10 +98,10 @@ vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
  * \return An opaque request object, or NULL in case of failure
  *
  * If this function returns a valid request object, the callback is guaranteed
- * to be called, even in case of later failure.
- * The returned request object must not be used after the callback has been
- * invoked. That request object is owned by the thumbnailer, and must not be
- * released.
+ * to be called, even in case of later failure (except if destroyed early by
+ * the user).
+ * The returned request object must be freed with
+ * vlc_thumbnailer_DestroyRequest().
  * The provided input_item will be held by the thumbnailer and can safely be
  * released after calling this function.
  */
@@ -113,16 +113,16 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                               vlc_thumbnailer_cb cb, void* user_data );
 
 /**
- * \brief vlc_thumbnailer_Cancel Cancel a thumbnail request
+ * \brief vlc_thumbnailer_DestroyRequest Destroy a thumbnail request
  * \param thumbnailer A thumbnailer object
  * \param request An opaque thumbnail request object
  *
- * Cancelling a request will invoke the completion callback with a NULL picture
- * The behavior is undefined if the request is cancelled after its completion.
+ * The request can be destroyed before receiving a callback (in that case, the
+ * callback won't be called) or after (to release resources).
  */
 VLC_API void
-vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer,
-                        vlc_thumbnailer_request_t* request );
+vlc_thumbnailer_DestroyRequest( vlc_thumbnailer_t* thumbnailer,
+                                vlc_thumbnailer_request_t* request );
 
 /**
  * \brief vlc_thumbnailer_Release releases a thumbnailer and cancel all pending requests
