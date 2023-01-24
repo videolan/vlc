@@ -750,7 +750,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 DWORD len = 256;
                 if( RegQueryValueEx( h_key, TEXT("Lang"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
                     langReg = FromWide( szData );
-                    ui.langCombo->setCurrentIndex( ui.langCombo->findData(langReg) );
+                    ui.langCombo->setCurrentIndex( ui.langCombo->findData(qfu(langReg)) );
                 }
             }
             free( langReg);
