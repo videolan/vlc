@@ -140,6 +140,11 @@ vlc_module_begin ()
     set_callback( InitVideoEnc )
 
     add_submodule()
+    set_description( N_("FFmpeg video encoder") )
+    set_capability( "image encoder", 100 )
+    set_callback( InitVideoEnc )
+
+    add_submodule()
     add_shortcut( "ffmpeg" )
     set_section( N_("Encoding") , NULL )
     set_description( N_("FFmpeg audio encoder") )
