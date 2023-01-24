@@ -93,11 +93,24 @@ static const struct vlc_block_callbacks block_cbs =
     libvlc_picture_block_release,
 };
 
+static bool IsSupportedByLibVLC(vlc_fourcc_t fcc)
+{
+    switch (fcc)
+    {
+        case VLC_CODEC_PNG:
+        case VLC_CODEC_JPEG:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* attachment )
 {
     vlc_fourcc_t fcc = image_Mime2Fourcc( attachment->psz_mime );
-    if ( fcc != VLC_CODEC_PNG && fcc != VLC_CODEC_JPEG )
+    if (!IsSupportedByLibVLC(fcc))
         return NULL;
+
     libvlc_picture_t *pic = malloc( sizeof( *pic ) );
     if ( unlikely( pic == NULL ) )
         return NULL;
