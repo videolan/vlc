@@ -65,21 +65,14 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
     pic->type = type;
     pic->time = libvlc_time_from_vlc_tick( input->date );
     pic->attachment = NULL;
-    vlc_fourcc_t format;
-    switch ( type )
-    {
-        case libvlc_picture_Argb:
-            format = VLC_CODEC_ARGB;
-            break;
-        case libvlc_picture_Jpg:
-            format = VLC_CODEC_JPEG;
-            break;
-        case libvlc_picture_Png:
-            format = VLC_CODEC_PNG;
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+
+    static const vlc_fourcc_t table[] = {
+        [libvlc_picture_Jpg] = VLC_CODEC_JPEG,
+        [libvlc_picture_Png] = VLC_CODEC_PNG,
+        [libvlc_picture_Argb] = VLC_CODEC_ARGB,
+    };
+    assert(ARRAY_SIZE(table) > type && table[type] != 0);
+    vlc_fourcc_t format = table[type];
     if ( picture_Export( p_obj, &pic->converted, &pic->fmt,
                          input, format, width, height, crop ) != VLC_SUCCESS )
     {
