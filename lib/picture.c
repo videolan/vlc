@@ -70,6 +70,7 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
         [libvlc_picture_Jpg] = VLC_CODEC_JPEG,
         [libvlc_picture_Png] = VLC_CODEC_PNG,
         [libvlc_picture_Argb] = VLC_CODEC_ARGB,
+        [libvlc_picture_WebP] = VLC_CODEC_WEBP,
     };
     assert(ARRAY_SIZE(table) > type && table[type] != 0);
     vlc_fourcc_t format = table[type];
@@ -99,6 +100,7 @@ static bool IsSupportedByLibVLC(vlc_fourcc_t fcc)
     {
         case VLC_CODEC_PNG:
         case VLC_CODEC_JPEG:
+        case VLC_CODEC_WEBP:
             return true;
         default:
             return false;
@@ -132,6 +134,9 @@ static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* att
         break;
     case VLC_CODEC_JPEG:
         pic->type = libvlc_picture_Jpg;
+        break;
+    case VLC_CODEC_WEBP:
+        pic->type = libvlc_picture_WebP;
         break;
     default:
         vlc_assert_unreachable();
