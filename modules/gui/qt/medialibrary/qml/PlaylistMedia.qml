@@ -198,6 +198,8 @@ MainInterface.MainTableView {
 
         showTitleText: false
 
+        criteriaCover: "thumbnail"
+
         //-----------------------------------------------------------------------------------------
         // TableColumns implementation
 

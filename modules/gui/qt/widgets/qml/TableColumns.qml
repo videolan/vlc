@@ -29,21 +29,56 @@ import "qrc:///style/"
 Item {
     id: root
 
+    // Properties
+
     property bool showTitleText: true
+    property bool showCriterias: false
+
+    // NOTE: That's useful when we want to enforce a cover criteria for the titleDelegate.
+    property string criteriaCover: "cover"
+
     property int titleCover_width: VLCStyle.trackListAlbumCover_width
     property int titleCover_height: VLCStyle.trackListAlbumCover_heigth
     property int titleCover_radius: VLCStyle.trackListAlbumCover_radius
+
+    // Functions
 
     function titlecoverLabels(model) {
         // implement this function to show labels in title Cover
         return []
     }
 
+    function getCriterias(colModel, rowModel) {
+        var criterias = colModel.subCriterias
+
+        if (criterias === undefined || criterias.length === 0)
+            return ""
+
+        var string = ""
+
+        for (var i = 0; i < criterias.length; i++) {
+            if (i) string += " • "
+
+            var criteria = rowModel[criterias[i]]
+
+            // NOTE: We can't use 'instanceof' because VLCTick is uncreatable.
+            if (criteria.toString().indexOf("VLCTick(") === 0)
+                string += criteria.formatShort()
+            else
+                string += criteria
+        }
+
+        return string
+    }
+
+    // Components
+
     property Component titleDelegate: RowLayout {
         id: titleDel
 
         property var rowModel: parent.rowModel
         property var model: parent.colModel
+
         readonly property bool containsMouse: parent.containsMouse
         readonly property bool currentlyFocused: parent.currentlyFocused
         readonly property color foregroundColor: parent.foregroundColor
@@ -67,10 +102,7 @@ Item {
                 source: {
                     var cover = null
                     if (!!titleDel.rowModel) {
-                        if (root.showTitleText)
-                            cover = titleDel.rowModel.cover
-                        else
-                            cover = titleDel.rowModel[titleDel.model.criteria]
+                        cover = titleDel.rowModel[root.criteriaCover]
                     }
                     return cover || titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
                 }
@@ -98,25 +130,51 @@ Item {
             }
         }
 
-        Widgets.ScrollingText {
-            id: textRect
-
-            label: text
-            forceScroll: parent.currentlyFocused
-            clip: scrolling
-            visible: root.showTitleText
-
+        Column {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            Widgets.ListLabel {
-                id: text
+            Layout.topMargin: VLCStyle.margin_xxsmall
+            Layout.bottomMargin: VLCStyle.margin_xxsmall
 
-                anchors.verticalCenter: parent.verticalCenter
-                text: (titleDel.rowModel && root.showTitleText)
-                      ? (titleDel.rowModel[titleDel.model.criteria] || I18n.qtr("Unknown Title"))
-                      : ""
-                color: titleDel.foregroundColor
+            Widgets.ScrollingText {
+                id: textRect
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                height: (root.showCriterias) ? Math.round(parent.height / 2)
+                                             : parent.height
+
+                visible: root.showTitleText
+
+                clip: scrolling
+
+                label: text
+
+                forceScroll: titleDel.currentlyFocused
+
+                Widgets.ListLabel {
+                    id: text
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: (titleDel.rowModel && root.showTitleText)
+                          ? (titleDel.rowModel[titleDel.model.criteria] || I18n.qtr("Unknown Title"))
+                          : ""
+                    color: titleDel.foregroundColor
+                }
+            }
+
+            Widgets.MenuCaption {
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                height: textRect.height
+
+                visible: root.showCriterias
+
+                text: (visible && titleDel.rowModel) ? root.getCriterias(titleDel.model,
+                                                                         titleDel.rowModel) : ""
             }
         }
     }
@@ -168,6 +226,8 @@ Item {
             color: timeDel.foregroundColor
         }
     }
+
+    // Children
 
     TextMetrics {
         id: timeTextMetric

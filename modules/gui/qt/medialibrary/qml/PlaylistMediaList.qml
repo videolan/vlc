@@ -394,6 +394,8 @@ FocusScope {
 
                 showTitleText: false
 
+                criteriaCover: "thumbnail"
+
                 //---------------------------------------------------------------------------------
                 // NOTE: When it's music we want the cover to be square
 
