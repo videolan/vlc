@@ -79,6 +79,13 @@ vlc_module_begin ()
     set_capability("video encoder", 60)
     set_description(N_("WebM video encoder"))
     set_callback(OpenEncoder)
+
+    add_submodule()
+    set_shortname("vpx")
+    set_capability("image encoder", 60)
+    set_description(N_("WebP image encoder"))
+    set_callback(OpenEncoder)
+
 #   define ENC_CFG_PREFIX "sout-vpx-"
     add_integer( ENC_CFG_PREFIX "quality-mode", VPX_DL_BEST_QUALITY, QUALITY_MODE_TEXT,
                  QUALITY_MODE_LONGTEXT )
