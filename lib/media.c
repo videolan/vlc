@@ -1073,18 +1073,12 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
     return req;
 }
 
-// Cancel a thumbnail request
-void libvlc_media_thumbnail_request_cancel( libvlc_media_thumbnail_request_t *req )
+// Destroy a thumbnail request
+void libvlc_media_thumbnail_request_destroy( libvlc_media_thumbnail_request_t *req )
 {
     libvlc_priv_t *p_priv = libvlc_priv(req->instance->p_libvlc_int);
     assert( p_priv->p_thumbnailer != NULL );
     vlc_thumbnailer_DestroyRequest( p_priv->p_thumbnailer, req->req );
-}
-
-// Destroy a thumbnail request
-void libvlc_media_thumbnail_request_destroy( libvlc_media_thumbnail_request_t *req )
-{
-    libvlc_media_thumbnail_request_cancel( req );
     libvlc_media_release( req->md );
     libvlc_release(req->instance);
     free( req );
