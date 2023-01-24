@@ -393,7 +393,10 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     {
         p_image->p_enc = CreateEncoder( p_image->p_parent,
                                         p_fmt_in, p_fmt_out );
-        if( !p_image->p_enc ) return NULL;
+        if( !p_image->p_enc ) {
+            picture_Release( p_pic );
+            return NULL;
+        }
     }
 
     /* Check if we need chroma conversion or resizing */
@@ -427,6 +430,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
             if( !p_image->p_converter )
             {
+                picture_Release( p_pic );
                 return NULL;
             }
         }
