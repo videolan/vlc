@@ -287,7 +287,11 @@ Win7NativeEventFilter::Win7NativeEventFilter(QObject* parent)
 }
 
 //parse native events that are not reported by Qt
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+bool Win7NativeEventFilter::nativeEventFilter(const QByteArray&, void* message, qintptr*)
+#else
 bool Win7NativeEventFilter::nativeEventFilter(const QByteArray&, void* message, long*)
+#endif
 {
     MSG * msg = static_cast<MSG*>( message );
 

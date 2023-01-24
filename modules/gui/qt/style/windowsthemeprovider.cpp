@@ -50,7 +50,11 @@ public:
         return !m_settings.value(WIN_THEME_SETTING_LIGHT_THEME_KEY).toBool();
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool nativeEventFilter(const QByteArray &, void *message, qintptr *)
+#else
     bool nativeEventFilter(const QByteArray &, void *message, long *)
+#endif
     {
         MSG* msg = static_cast<MSG*>( message );
         if ( msg->message == WM_SETTINGCHANGE
