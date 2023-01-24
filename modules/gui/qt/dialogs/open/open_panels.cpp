@@ -410,7 +410,7 @@ void DiscOpenPanel::onFocus()
                     displayName = displayName + " - "  + psz_title;
                 }
 
-                ui.deviceCombo->addItem( displayName, psz_drive );
+                ui.deviceCombo->addItem( displayName, qfu(psz_drive) );
                 free( psz_drive );
                 free( psz_title );
             }
@@ -422,7 +422,7 @@ void DiscOpenPanel::onFocus()
     }
 
     char *psz_config = config_GetPsz( "dvd" );
-    int temp = ui.deviceCombo->findData( psz_config, Qt::UserRole, Qt::MatchStartsWith );
+    int temp = ui.deviceCombo->findData( qfu(psz_config), Qt::UserRole, Qt::MatchStartsWith );
     free( psz_config );
     if( temp != -1 )
         ui.deviceCombo->setCurrentIndex( temp );

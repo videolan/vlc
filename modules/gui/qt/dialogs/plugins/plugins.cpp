@@ -840,7 +840,7 @@ QVariant AddonsListModel::Addon::data( int role ) const
         returnval = QVariant( (int) p_entry->i_score );
         break;
     case VersionRole:
-        returnval = QVariant( p_entry->psz_version );
+        returnval = QVariant( qfu(p_entry->psz_version) );
         break;
     case AuthorRole:
         returnval = qfu( p_entry->psz_author );

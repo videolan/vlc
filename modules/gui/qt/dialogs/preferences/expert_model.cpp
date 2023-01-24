@@ -380,7 +380,7 @@ QVariant ExpertPrefsTableModel::data( const QModelIndex &index, int role ) const
                         return QString( "#%1" ).arg( item->cfg_item->value.i, 0, 16 );
                     return QString( "%1" ).arg( item->cfg_item->value.i );
                 case CONFIG_ITEM_STRING:
-                    return item->cfg_item->value.psz;
+                    return QVariant( qfu(item->cfg_item->value.psz) );
                 default:
                     break;
             }
