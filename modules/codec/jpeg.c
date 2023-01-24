@@ -115,15 +115,22 @@ vlc_module_begin()
     set_callbacks(OpenDecoder, CloseDecoder)
     add_shortcut("jpeg")
 
-    /* encoder submodule */
+    /* video encoder submodule */
     add_submodule()
     add_shortcut("jpeg")
     set_section(N_("Encoding"), NULL)
-    set_description(N_("JPEG image encoder"))
+    set_description(N_("JPEG video encoder"))
     set_capability("video encoder", 1000)
     set_callback(OpenEncoder)
     add_integer_with_range(ENC_CFG_PREFIX "quality", 95, 0, 100,
                            ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT)
+    /* image encoder submodule */
+    add_submodule()
+    add_shortcut("jpeg")
+    set_section(N_("Encoding"), NULL)
+    set_description(N_("JPEG image encoder"))
+    set_capability("image encoder", 1000)
+    set_callback(OpenEncoder)
 vlc_module_end()
 
 
