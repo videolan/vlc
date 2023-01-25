@@ -224,6 +224,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         assert(va_image.format.fourcc == priv->fourcc);
 
 #if VA_CHECK_VERSION(1, 1, 0)
+        VA_CALL(o, vaSyncSurface, priv->vadpy, vlc_vaapi_PicGetSurface(pic));
         if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
                                           VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
                                           VA_EXPORT_SURFACE_READ_ONLY | VA_EXPORT_SURFACE_SEPARATE_LAYERS,
