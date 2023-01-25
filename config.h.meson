@@ -419,9 +419,9 @@
 /* Define to 1 if you have the `posix_memalign' function. */
 #mesondefine HAVE_POSIX_MEMALIGN
 
-/* TODO: Define to 1 if the system has the type
+/* Define to 1 if the system has the type
    `PROCESS_MITIGATION_IMAGE_LOAD_POLICY'. */
-#undef HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
+#mesondefine HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
 
 /* Define to 1 if you have the `readv' function. */
 #mesondefine HAVE_READV

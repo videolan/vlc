@@ -310,6 +310,11 @@ windows_version_test = '''
         vlc_conf_prefix = vlc_conf_prefix + '#define @0@ @1@\n'.format(d.get(0), d.get(1))
     endforeach
 
+    # Check for HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY type
+    if cc.has_type('PROCESS_MITIGATION_IMAGE_LOAD_POLICY', prefix: '#include <winnt.h>')
+        cdata.set('HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY', 1)
+    endif
+
     mingw_check = '''
     #ifndef __MINGW32__
     # error Not compiling with mingw
