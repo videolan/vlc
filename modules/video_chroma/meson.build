@@ -21,7 +21,8 @@ if swscale_dep.found()
         'swscale.c',
         '../codec/avcodec/chroma.c'
       ),
-      'dependencies' : [swscale_dep, m_lib]
+      'dependencies' : [swscale_dep, m_lib],
+      'link_args' : symbolic_linkargs
   }
 endif
 
