@@ -287,7 +287,7 @@ debian:
 
         # Configure VLC
         ./bootstrap
-        ./configure
+        ./configure CFLAGS="$LIBVLC_EXTRA_CFLAGS"
 
         # Allow core dumps for tracing test failures
         ulimit -c unlimited
@@ -295,7 +295,9 @@ debian:
         # Build, check and distcheck VLC
         export XZ_OPT="-T 0"
         VLC_TEST_TIMEOUT=60 make -j$NCPU distcheck || ./test/dump_stacktraces.sh
-    variables: *variables-debian
+    variables:
+        <<: *variables-debian
+        LIBVLC_EXTRA_CFLAGS: -Werror=restrict
 
 nightly-debian:
     extends: debian
