@@ -33,7 +33,7 @@
 
 static LPPROC_THREAD_ATTRIBUTE_LIST allow_hstd_inherit(HANDLE *handles)
 {
-    size_t attribute_list_size;
+    SIZE_T attribute_list_size;
     InitializeProcThreadAttributeList(NULL, 1, 0, &attribute_list_size);
 
     LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList = malloc(attribute_list_size);
