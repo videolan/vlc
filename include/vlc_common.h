@@ -72,12 +72,6 @@
 # define VLC_GCC_VERSION(maj,min) (0)
 #endif
 
-/* Try to fix format strings for all versions of mingw and mingw64 */
-#if defined( _WIN32 ) && defined( __USE_MINGW_ANSI_STDIO )
- #define snprintf __mingw_snprintf
- #define vsnprintf __mingw_vsnprintf
-#endif
-
 /* Function attributes for compiler warnings */
 #if defined __has_attribute
 # if __has_attribute(warning)
