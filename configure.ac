@@ -643,6 +643,21 @@ dnl
 dnl checks for mingw
 AS_IF([test "${SYS}" = "mingw32"], [
 
+    dnl Check if this is a UCRT build
+    AC_MSG_CHECKING([whether compiling with Universal C Runtime])
+    win_ucrt_build=no
+    AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+#include <crtdefs.h>
+#if !(defined(_UCRT) || (__MSVCRT_VERSION__ >= 0x1400) || (__MSVCRT_VERSION__ >= 0xE00 && __MSVCRT_VERSION__ < 0x1000))
+# error This is NOT a UCRT build
+#endif
+    ])], [
+        AC_MSG_RESULT([yes])
+        win_ucrt_build=yes
+    ], [
+        AC_MSG_RESULT([no])
+    ])
+
 AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #if !defined(__MINGW32__)
 # error Not compiling with mingw
