@@ -467,6 +467,23 @@ error:
     return VLC_EGENERIC;
 }
 
+static const uint32_t webp_simple_lossy_header[5] = {
+    VLC_FOURCC('R', 'I', 'F', 'F'),
+    0, /* TBD: total size of VP8 data plus 12 bytes for WEBP fourcc + VP8 ChunkHeader */
+    VLC_FOURCC('W', 'E', 'B', 'P'),
+    VLC_FOURCC('V', 'P', '8', ' '),
+    0, /* TBD: total size of VP8 data */
+};
+
+static void webp_write_header(uint8_t *p_header, uint32_t i_size, size_t i_header_size)
+{
+    assert(i_header_size == sizeof(webp_simple_lossy_header));
+
+    memcpy(p_header, webp_simple_lossy_header, i_header_size);
+    SetDWLE(p_header + 1*sizeof(uint32_t), i_size + 4 + 8);
+    SetDWLE(p_header + 4*sizeof(uint32_t), i_size);
+}
+
 /****************************************************************************
  * Encode: the whole thing
  ****************************************************************************/
@@ -508,12 +525,27 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     const vpx_codec_cx_pkt_t *pkt = NULL;
     vpx_codec_iter_t iter = NULL;
     block_t *p_out = NULL;
+
+    /* WebP container specific context */
+    uint32_t i_vp8_data_size = 0;
+    uint8_t *p_header = NULL;
+    const bool b_is_webp = p_enc->fmt_out.i_codec == VLC_CODEC_WEBP;
+    static const size_t i_webp_header_size = sizeof(webp_simple_lossy_header);
+
     while ((pkt = vpx_codec_get_cx_data(ctx, &iter)) != NULL)
     {
         if (pkt->kind == VPX_CODEC_CX_FRAME_PKT)
         {
+            size_t i_block_sz = pkt->data.frame.sz;
+            const bool b_needs_padding_byte = b_is_webp && (pkt->data.frame.sz & 1);
             int keyframe = pkt->data.frame.flags & VPX_FRAME_IS_KEY;
-            block_t *p_block = block_Alloc(pkt->data.frame.sz);
+
+            if (b_is_webp && p_header == NULL) {
+                i_block_sz += i_webp_header_size;
+                i_block_sz += b_needs_padding_byte;
+            }
+
+            block_t *p_block = block_Alloc(i_block_sz);
             if (unlikely(p_block == NULL))
             {
                 block_ChainRelease(p_out);
@@ -521,13 +553,33 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
                 break;
             }
 
-            memcpy(p_block->p_buffer, pkt->data.frame.buf, pkt->data.frame.sz);
+            uint8_t *p_buffer = p_block->p_buffer;
+
+            /* Leave room at the beginning for the WebP header data. */
+            if (b_is_webp && p_header == NULL) {
+                p_header = p_buffer;
+                p_buffer += i_webp_header_size;
+                i_vp8_data_size += pkt->data.frame.sz;
+            }
+
+            memcpy(p_buffer, pkt->data.frame.buf, pkt->data.frame.sz);
             p_block->i_dts = p_block->i_pts = pkt->data.frame.pts;
             if (keyframe)
                 p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+
+            /* If Chunk Size is odd, a single padding byte -- that MUST be 0 to
+               conform with RIFF -- is added. */
+            if (b_needs_padding_byte)
+                p_block->p_buffer[i_block_sz - 1] = 0;
+
             block_ChainAppend(&p_out, p_block);
         }
     }
+
+    /* For WebP, now that we have the total size, write the RIFF header. */
+    if (b_is_webp && p_header)
+        webp_write_header(p_header, i_vp8_data_size, i_webp_header_size);
+
     vpx_img_free(&img);
     picture_Release(p_pict);
     return p_out;
