@@ -76,7 +76,6 @@
 #if defined( _WIN32 ) && defined( __USE_MINGW_ANSI_STDIO )
  #define snprintf __mingw_snprintf
  #define vsnprintf __mingw_vsnprintf
- #define swprintf _snwprintf
 #endif
 
 /* Function attributes for compiler warnings */
