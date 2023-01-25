@@ -401,7 +401,8 @@ if avformat_dep.found()
     vlc_modules += {
         'name' : 'avio',
         'sources' : files('avio.c'),
-        'dependencies' : [avutil_dep, avformat_dep, m_lib]
+        'dependencies' : [avutil_dep, avformat_dep, m_lib],
+        'link_args' : symbolic_linkargs
     }
 endif
 
