@@ -260,6 +260,7 @@ foreach module : vlc_modules
         'name',
         'sources',
         'link_with',
+        'link_args',
         'link_depends',
         'link_language',
         'include_directories',
