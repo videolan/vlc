@@ -348,10 +348,27 @@ windows_version_test = '''
         # Defines needed for MinGW
 
         mingw_defines = [
-            ['__USE_MINGW_ANSI_STDIO',      1], # Define to force use of MinGW printf
             ['_POSIX_SOURCE',               1], # IEEE Std 1003.1
             ['_POSIX_C_SOURCE',             '200809L'], #IEEE Std 1003.1
         ]
+
+ucrt_version_test = '''
+#include <crtdefs.h>
+#if !(defined(_UCRT) || (__MSVCRT_VERSION__ >= 0x1400) || (__MSVCRT_VERSION__ >= 0xE00 && __MSVCRT_VERSION__ < 0x1000))
+# error This is NOT a UCRT build
+#endif
+'''
+        if cc.compiles(ucrt_version_test, name: 'compiles with Universal C Runtime')
+            # for UCRT build we use the standard compatibility define of UCRT
+            mingw_defines += [
+                ['__USE_MINGW_ANSI_STDIO',      0],
+            ]
+        else
+            # Define to force use of MinGW printf
+            mingw_defines += [
+                ['__USE_MINGW_ANSI_STDIO',      1],
+            ]
+        endif
 
         foreach d : mingw_defines
             cdata.set(d.get(0), d.get(1))
