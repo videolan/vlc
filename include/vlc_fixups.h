@@ -49,10 +49,14 @@ typedef unsigned short mode_t;
 #endif // _MSC_VER
 
 #ifdef _WIN32
+# if !defined(NOMINMAX)
 // avoid collision between numeric_limits::max() and max define
-#define NOMINMAX
+#  define NOMINMAX
+# endif
+# if !defined(_USE_MATH_DEFINES)
 // enable M_PI definition
-#define _USE_MATH_DEFINES           1
+#  define _USE_MATH_DEFINES
+# endif
 #endif
 
 
