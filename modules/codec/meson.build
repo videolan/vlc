@@ -682,7 +682,8 @@ if x262_dep.found()
         'name' : 'x262',
         'sources' : files('x264.c'),
         'dependencies' : [x262_dep],
-        'c_args' : ['-DPLUGIN_X262']
+        'c_args' : ['-DPLUGIN_X262'],
+        'link_args' : symbolic_linkargs
     }
 endif
 
