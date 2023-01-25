@@ -470,6 +470,31 @@ test_PCRHelperSplitFrameInput(vlc_pcr_sync_t *sync,
     assert(pcr == VLC_TICK_INVALID);
 }
 
+static void test_PCRHelperIOMismatch(vlc_pcr_sync_t *sync,
+                                     transcode_track_pcr_helper_t *pcr_helper)
+{
+    const vlc_frame_t in_frame = {.i_dts = 1u, .i_length = 10u};
+    vlc_tick_t dropped_frame_pcr;
+    transcode_track_pcr_helper_SignalEnteringFrame(
+        pcr_helper, &in_frame, &dropped_frame_pcr);
+    assert(dropped_frame_pcr == VLC_TICK_INVALID);
+
+    assert(vlc_pcr_sync_SignalPCR(sync, 10u) == VLC_SUCCESS);
+
+    const vlc_frame_t out_frame1 = {.i_dts = 2000u, .i_length = 10u};
+    const vlc_frame_t out_frame2 = {.i_dts = 2010u, .i_length = 10u};
+    vlc_tick_t pcr;
+    int status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame1, &pcr);
+    assert(status == VLC_SUCCESS);
+    assert(pcr == 10u);
+
+    status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame2, &pcr);
+    assert(status == VLC_EGENERIC);
+    assert(pcr == VLC_TICK_INVALID);
+}
+
 int main()
 {
     test_Run(test_Simple);
@@ -488,4 +513,5 @@ int main()
     test_PCRHelper(test_PCRHelperMultipleTracks);
     test_PCRHelper(test_PCRHelperSplitFrameOutput);
     test_PCRHelper(test_PCRHelperSplitFrameInput);
+    test_PCRHelper(test_PCRHelperIOMismatch);
 }
