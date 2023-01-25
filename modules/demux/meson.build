@@ -232,7 +232,8 @@ if avformat_dep.found()
             avformat_extra_sources
         ),
         'dependencies' : [avformat_dep, avutil_dep],
-        'link_with' : [libavcodec_common]
+        'link_with' : [libavcodec_common],
+        'link_args' : symbolic_linkargs
     }
 endif
 
