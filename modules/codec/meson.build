@@ -694,7 +694,8 @@ if x26410b_dep.found()
         'name' : 'x26410b',
         'sources' : files('x264.c'),
         'dependencies' : [x26410b_dep],
-        'c_args' : ['-DPLUGIN_X264_10B']
+        'c_args' : ['-DPLUGIN_X264_10B'],
+        'link_args' : symbolic_linkargs
     }
 endif
 
@@ -705,7 +706,8 @@ if x264_dep.found()
         'name' : 'x264',
         'sources' : files('x264.c'),
         'dependencies' : [x264_dep],
-        'c_args' : ['-DPLUGIN_X264']
+        'c_args' : ['-DPLUGIN_X264'],
+        'link_args' : symbolic_linkargs
     }
 endif
 
