@@ -225,7 +225,8 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
 #if VA_CHECK_VERSION(1, 1, 0)
         if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
-                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2, 0,
+                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
+                                          VA_EXPORT_SURFACE_READ_ONLY | VA_EXPORT_SURFACE_SEPARATE_LAYERS,
                                           &va_surface_descriptor))
             goto error;
 #else
@@ -243,12 +244,6 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
     for (unsigned i = 0; i < va_surface_descriptor.num_layers; ++i)
     {
         unsigned obj_idx = va_surface_descriptor.layers[i].object_index[0];
-
-        /* Since we don't ask for composite object through
-         * vaExportSurfaceHandle, we shouldn't get any multiplane
-         * layer. */
-        if (va_surface_descriptor.layers[i].num_planes > 1)
-          goto error;
 
         egl_images[i] =
             vaegl_image_create(interop, tex_width[i], tex_height[i],
