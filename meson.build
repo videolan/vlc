@@ -791,6 +791,12 @@ add_project_arguments(
     cc.get_supported_arguments('-fvisibility=hidden'),
     language: ['c'])
 
+# Check if linker supports -Bsymbolic
+symbolic_linkargs = []
+if cc.has_link_argument('-Wl,-Bsymbolic')
+    symbolic_linkargs += '-Wl,-Bsymbolic'
+endif
+
 # Check for struct sockaddr_storage type
 # Define it to `sockaddr` if missing
 have_sockaddr_storage = cc.has_type('struct sockaddr_storage', prefix: '#include <sys/socket.h>')
