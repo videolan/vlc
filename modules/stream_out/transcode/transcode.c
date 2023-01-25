@@ -813,8 +813,17 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 
         vlc_tick_t pcr = VLC_TICK_INVALID;
         if( sys->pcr_forwarding_enabled )
-            transcode_track_pcr_helper_SignalLeavingFrame(
+        {
+            const int status = transcode_track_pcr_helper_SignalLeavingFrame(
                 id->pcr_helper, it, &pcr );
+            if( status != VLC_SUCCESS )
+            {
+                msg_Err( p_stream,
+                         "Failed to match transcode input with encoder output. "
+                         "Disabling PCR forwarding..." );
+                sys->pcr_forwarding_enabled = false;
+            }
+        }
 
         if( sout_StreamIdSend( p_stream->p_next, id->downstream_id, it ) != VLC_SUCCESS )
         {
