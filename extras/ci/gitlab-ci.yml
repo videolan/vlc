@@ -155,13 +155,17 @@ win32:
     extends: .win-common
     image:
         name: $VLC_WIN32_IMAGE
-    variables: *variables-win32
+    variables:
+        <<: *variables-win32
+        LIBVLC_EXTRA_BUILD_FLAGS: -x
 
 win64:
     extends: .win-common
     image:
         name: $VLC_WIN64_IMAGE
-    variables: *variables-win64
+    variables:
+        <<: *variables-win64
+        LIBVLC_EXTRA_BUILD_FLAGS: -x
 
 win64-llvm:
     extends: .win-common
