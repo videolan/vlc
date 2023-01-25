@@ -155,10 +155,14 @@ int transcode_track_pcr_helper_SignalEnteringFrame(transcode_track_pcr_helper_t 
     return VLC_SUCCESS;
 }
 
-vlc_tick_t transcode_track_pcr_helper_SignalLeavingFrame(transcode_track_pcr_helper_t *pcr_helper,
-                                                         const vlc_frame_t *frame)
+int transcode_track_pcr_helper_SignalLeavingFrame(transcode_track_pcr_helper_t *pcr_helper,
+                                                  const vlc_frame_t *frame,
+                                                  vlc_tick_t *pcr)
 {
-    assert(!vlc_list_is_empty(&pcr_helper->delayed_frames_data));
+    *pcr = VLC_TICK_INVALID;
+
+    if (vlc_list_is_empty(&pcr_helper->delayed_frames_data))
+        return VLC_EGENERIC;
 
     pcr_helper->last_dts_output = frame->i_dts;
 
@@ -166,7 +170,6 @@ vlc_tick_t transcode_track_pcr_helper_SignalLeavingFrame(transcode_track_pcr_hel
     const vlc_tick_t output_media_time =
         pcr_helper->input_media_time - pcr_helper->held_media_time;
 
-    vlc_tick_t pcr = VLC_TICK_INVALID;
     delayed_frame_data_t *frame_data;
     vlc_list_foreach(frame_data, &pcr_helper->delayed_frames_data, node)
     {
@@ -176,11 +179,14 @@ vlc_tick_t transcode_track_pcr_helper_SignalLeavingFrame(transcode_track_pcr_hel
         const vlc_tick_t current_pcr =
             transcode_track_pcr_helper_GetFramePCR(pcr_helper, frame_data->dts);
         if (current_pcr != VLC_TICK_INVALID)
-            pcr = current_pcr;
+            *pcr = current_pcr;
 
         vlc_list_remove(&frame_data->node);
         free(frame_data);
     }
-    return (pcr == VLC_TICK_INVALID) ? VLC_TICK_INVALID
-                                     : __MIN(frame->i_dts, pcr);
+
+    if (*pcr != VLC_TICK_INVALID)
+        *pcr = __MIN(frame->i_dts, *pcr);
+
+    return VLC_SUCCESS;
 }

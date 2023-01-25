@@ -350,8 +350,10 @@ static void test_PCRHelperSimple(vlc_pcr_sync_t *sync,
     assert(vlc_pcr_sync_SignalPCR(sync, 10u) == VLC_SUCCESS);
 
     const vlc_frame_t out_frame = {.i_dts = 2000u, .i_length = 10u};
-    const vlc_tick_t pcr =
-        transcode_track_pcr_helper_SignalLeavingFrame(pcr_helper, &out_frame);
+    vlc_tick_t pcr;
+    const int status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame, &pcr);
+    assert(status == VLC_SUCCESS);
     assert(pcr == 10u);
 }
 
@@ -380,11 +382,14 @@ test_PCRHelperMultipleTracks(vlc_pcr_sync_t *sync,
             assert(vlc_pcr_sync_SignalPCR(sync, 101) == VLC_SUCCESS);
     }
 
+    vlc_tick_t pcr;
     // Unqueue the audio frames first to mimic fast decoding
     for (vlc_tick_t dts = 0; dts < 200; dts += 10)
     {
         const vlc_frame_t a_frame = {.i_dts = dts + 1, .i_length = 10u};
-        const vlc_tick_t pcr = transcode_track_pcr_helper_SignalLeavingFrame(audio, &a_frame);
+        const int status = transcode_track_pcr_helper_SignalLeavingFrame(
+            audio, &a_frame, &pcr);
+        assert(status == VLC_SUCCESS);
         assert(pcr == VLC_TICK_INVALID);
     }
 
@@ -392,7 +397,9 @@ test_PCRHelperMultipleTracks(vlc_pcr_sync_t *sync,
     {
         const vlc_frame_t v_frame = {.i_dts = (dts * 2) - 10 + 1,
                                      .i_length = 20u};
-        const vlc_tick_t pcr = transcode_track_pcr_helper_SignalLeavingFrame(video, &v_frame);
+        const int status = transcode_track_pcr_helper_SignalLeavingFrame(
+            video, &v_frame, &pcr);
+        assert(status == VLC_SUCCESS);
         if (dts != 50)
             assert(pcr == VLC_TICK_INVALID);
         else
@@ -416,11 +423,15 @@ test_PCRHelperSplitFrameOutput(vlc_pcr_sync_t *sync,
 
     const vlc_frame_t out_frame1 = {.i_dts = 2000u, .i_length = 5u};
     const vlc_frame_t out_frame2 = {.i_dts = 2005u, .i_length = 5u};
-    vlc_tick_t pcr =
-        transcode_track_pcr_helper_SignalLeavingFrame(pcr_helper, &out_frame1);
+    vlc_tick_t pcr;
+    int status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame1, &pcr);
+    assert(status == VLC_SUCCESS);
     assert(pcr == VLC_TICK_INVALID);
-    pcr =
-        transcode_track_pcr_helper_SignalLeavingFrame(pcr_helper, &out_frame2);
+
+    status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame2, &pcr);
+    assert(status == VLC_SUCCESS);
     assert(pcr == 10u);
 }
 
@@ -446,13 +457,16 @@ test_PCRHelperSplitFrameInput(vlc_pcr_sync_t *sync,
     assert(dropped_frame_pcr == VLC_TICK_INVALID);
 
     const vlc_frame_t out_frame1 = {.i_dts = 1u, .i_length = 20u};
-    vlc_tick_t pcr =
-        transcode_track_pcr_helper_SignalLeavingFrame(pcr_helper, &out_frame1);
+    vlc_tick_t pcr;
+    int status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame1, &pcr);
+    assert(status == VLC_SUCCESS);
     // PCR should be re-synthetized.
     assert(pcr == 1u);
     const vlc_frame_t out_frame2 = {.i_dts = 21u, .i_length = 10u};
-    pcr =
-        transcode_track_pcr_helper_SignalLeavingFrame(pcr_helper, &out_frame2);
+    status = transcode_track_pcr_helper_SignalLeavingFrame(
+        pcr_helper, &out_frame2, &pcr);
+    assert(status == VLC_SUCCESS);
     assert(pcr == VLC_TICK_INVALID);
 }
 
