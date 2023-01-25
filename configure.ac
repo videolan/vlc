@@ -682,8 +682,13 @@ dnl Check for broken versions of mingw-runtime compatability library
         AC_MSG_ERROR([LibVLC requires Mingw-w64 version 5.0 or higher!])
     ])
 
-    dnl force use of mingw provided c99 *printf over msvcrt
-    CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
+    AS_IF([test "${win_ucrt_build}" = "no"], [
+        dnl force use of mingw provided c99 *printf over msvcrt
+        CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
+    ],[
+        dnl for UCRT build we use the standard compatibility define of UCRT
+        CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=0"
+    ])
 
     dnl Check for the need to include the mingwex lib for mingw32
     VLC_SAVE_FLAGS
