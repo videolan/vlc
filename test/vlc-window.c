@@ -86,9 +86,8 @@ static void ReportOutput(
         const char *desc)
 {
     (void)wnd;
-    if (desc)
+    if (!desc)
         printf(" - output added %s: %s\n", id, desc);
-    else
         printf(" - output removed %s\n", id);
 }
 
@@ -97,9 +96,9 @@ static void ReportResized(
         unsigned width, unsigned height,
         vlc_window_ack_cb ack_cb, void *opaque)
 {
-    if (ack_cb)
-        ack_cb(wnd, width, height, opaque);
-    printf(" - window resized to %ux%u\n", width, height);
+    if (!ack_cb)
+        printf(" - window resized to %ux%u\n", width, height);
+    ack_cb(wnd, width, height, opaque);
 }
 
 int main(int argc, char *argv[])
