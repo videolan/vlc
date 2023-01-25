@@ -40,13 +40,28 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    readonly property int _nbCols: VLCStyle.gridColumnsForWidth(listView_id.availableRowWidth)
+    readonly property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
 
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
+    property var _modelSmall: [{
+        size: Math.max(2, _nbCols),
 
-    sortModel: [{
+        model: ({
+            criteria: mainCriteria,
+
+            subCriterias: [ "duration" ],
+
+            showSection: "title",
+
+            text: I18n.qtr("Title"),
+
+            placeHolder: VLCStyle.noArtVideoCover,
+
+            headerDelegate: tableColumns.titleHeaderDelegate,
+            colDelegate   : tableColumns.titleDelegate
+        })
+    }]
+
+    property var _modelMedium: [{
         size: 1,
 
         model: ({
@@ -62,7 +77,7 @@ MainInterface.MainTableView {
             colDelegate   : tableColumns.titleDelegate
         })
     }, {
-        size: Math.max(listView_id._nbCols - 2, 1),
+        size: Math.max(1, _nbCols - 2),
 
         model: ({
             criteria: mainCriteria,
@@ -84,6 +99,11 @@ MainInterface.MainTableView {
             colDelegate   : tableColumns.timeColDelegate
         })
     }]
+
+    // Settings
+
+    sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                          : _modelMedium
 
     section.property: "title_first_symbol"
 
@@ -131,7 +151,11 @@ MainInterface.MainTableView {
     Widgets.TableColumns {
         id: tableColumns
 
-        showTitleText: false
+        showTitleText: (listView_id.sortModel === listView_id._modelSmall)
+        showCriterias: showTitleText
+
+        criteriaCover: "thumbnail"
+
         titleCover_height: VLCStyle.listAlbumCover_height
         titleCover_width: VLCStyle.listAlbumCover_width
         titleCover_radius: VLCStyle.listAlbumCover_radius
