@@ -704,8 +704,9 @@ typedef enum libvlc_thumbnailer_seek_speed_t
 /**
  * \brief libvlc_media_request_thumbnail_by_time Start an asynchronous thumbnail generation
  *
- * If the request is successfully queued, the libvlc_MediaThumbnailGenerated
- * is guaranteed to be emitted.
+ * If the request is successfully queued, the libvlc_MediaThumbnailGenerated is
+ * guaranteed to be emitted (except if the request is destroyed early by the
+ * user).
  * The resulting thumbnail size can either be:
  * - Hardcoded by providing both width & height. In which case, the image will
  *   be stretched to match the provided aspect ratio, or cropped if crop is true.
@@ -742,8 +743,9 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
 /**
  * \brief libvlc_media_request_thumbnail_by_pos Start an asynchronous thumbnail generation
  *
- * If the request is successfully queued, the libvlc_MediaThumbnailGenerated
- * is guaranteed to be emitted.
+ * If the request is successfully queued, the libvlc_MediaThumbnailGenerated is
+ * guaranteed to be emitted (except if the request is destroyed early by the
+ * user).
  * The resulting thumbnail size can either be:
  * - Hardcoded by providing both width & height. In which case, the image will
  *   be stretched to match the provided aspect ratio, or cropped if crop is true.
