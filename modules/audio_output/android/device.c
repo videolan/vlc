@@ -29,6 +29,7 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include "device.h"
+#include "audioformat_jni.h"
 #include "../video_output/android/env.h"
 
 /* There is an undefined behavior when configuring AudioTrack with SPDIF or
@@ -94,7 +95,7 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     struct sys *sys = aout->sys;
 
-    if (!AudioTrack_HasEncoding(sys->encoding_flags, fmt->i_format))
+    if (!vlc_android_AudioFormat_HasEncoding(sys->encoding_flags, fmt->i_format))
         return VLC_EGENERIC;
 
     aout_stream_t *s = vlc_object_create(aout, sizeof (*s));
@@ -249,7 +250,7 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
             for (size_t i = 0;
                  i < sizeof(enc_fourccs)/ sizeof(enc_fourccs[0]); ++i)
             {
-                if (AudioTrack_HasEncoding(sys->encoding_flags, enc_fourccs[i]))
+                if (vlc_android_AudioFormat_HasEncoding(sys->encoding_flags, enc_fourccs[i]))
                     msg_Dbg(aout, "device has %4.4s passthrough support",
                              (const char *)&enc_fourccs[i]);
             }
@@ -267,6 +268,9 @@ Open(vlc_object_t *obj)
     int ret = AudioTrack_InitJNI(aout, &dp_fields);
     if (ret != VLC_SUCCESS)
         return ret;
+
+    if (vlc_android_AudioFormat_InitJNI(obj) != VLC_SUCCESS)
+        return VLC_EGENERIC;
 
     struct sys *sys = aout->sys = vlc_obj_malloc(obj, sizeof(*sys));
     if (sys == NULL)
