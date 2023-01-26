@@ -144,6 +144,13 @@ else
     COMPILING_WITH_CLANG=0
 fi
 
+# Check if this is a UCRT toolchain
+if printf "#include <crtdefs.h>\n#if defined(_UCRT) || (__MSVCRT_VERSION__ >= 0x1400) || (__MSVCRT_VERSION__ >= 0xE00 && __MSVCRT_VERSION__ < 0x1000)\n# error This is a UCRT build\n#endif" | $CC -E - 1>/dev/null 2>/dev/null; then
+    COMPILING_WITH_UCRT=0
+else
+    COMPILING_WITH_UCRT=1
+fi
+
 info "Building extra tools"
 mkdir -p extras/tools
 cd extras/tools
