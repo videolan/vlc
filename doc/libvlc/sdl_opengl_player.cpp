@@ -1,10 +1,10 @@
 //g++ sdl_opengl_player.cpp $(pkg-config --cflags --libs libvlc sdl2 gl)
 
-/* Licence WTFPL  */
+/* SPDX-License-Identifier: WTFPL  */
 /* Written by Pierre Lamot */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include <exception>
 #include <mutex>
