@@ -230,6 +230,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
     block_t *p_audio_bufs = transcode_dequeue_all_audios( id );
 
+    bool error = false;
     do
     {
         block_t *p_audio_buf = p_audio_bufs;
@@ -238,7 +239,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_bufs = p_audio_buf->p_next;
         p_audio_buf->p_next = NULL;
 
-        if( id->b_error )
+        if( error )
         {
             block_Release( p_audio_buf );
             continue;
@@ -340,14 +341,14 @@ int transcode_audio_process( sout_stream_t *p_stream,
 error:
         if( p_audio_buf )
             block_Release( p_audio_buf );
-        id->b_error = true;
+        error = true;
     } while( p_audio_bufs );
 
     /* Drain encoder */
-    if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
+    if( unlikely( !error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
         transcode_encoder_drain( id->encoder, out );
     }
 
-    return id->b_error ? VLC_EGENERIC : VLC_SUCCESS;
+    return error ? VLC_EGENERIC : VLC_SUCCESS;
 }
