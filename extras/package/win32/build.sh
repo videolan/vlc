@@ -226,7 +226,7 @@ fi
 
 if [ ! -z "$BUILD_UCRT" ]; then
     WIDL=${TRIPLET}-widl
-    CPPFLAGS="$CPPFLAGS -D__MSVCRT_VERSION__=0xE00"
+    CPPFLAGS="$CPPFLAGS -D__MSVCRT_VERSION__=0xE00 -D_UCRT"
 
     if [ ! -z "$WINSTORE" ]; then
         SHORTARCH="$SHORTARCH-uwp"
