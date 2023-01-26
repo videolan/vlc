@@ -186,6 +186,12 @@ cd ../../
 
 CONTRIB_PREFIX=$TRIPLET
 if [ ! -z "$BUILD_UCRT" ]; then
+
+    if [ ! "$COMPILING_WITH_UCRT" -gt 0 ]; then
+        echo "UCRT builds need a UCRT toolchain"
+        exit 1
+    fi
+
     if [ ! -z "$WINSTORE" ]; then
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt --disable-sdl --disable-SDL_image --disable-caca"
         # modplug uses GlobalAlloc/Free and lstrcpyA/wsprintfA/lstrcpynA
