@@ -436,7 +436,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
         GLint type;
         GLint plane2_type;
     } formats[] = {
-        // 3 planes
+        // 3 and 4 planes
             // 8 bits pixels
             { GL_R8, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
             // 16 bits pixels
@@ -475,6 +475,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     uint8_t format_index = 0;
     switch (desc->plane_count)
     {
+    case 4:
     case 3:
         break;
     case 2:
@@ -524,9 +525,9 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
             return VLC_EGENERIC;
     }
 
-    if (desc->plane_count == 3)
+    if (desc->plane_count >= 3)
     {
-        interop->tex_count = 3;
+        interop->tex_count = desc->plane_count;
         for (unsigned i = 0; i < interop->tex_count; ++i )
         {
             interop->texs[i] = (struct vlc_gl_tex_cfg) {
