@@ -751,7 +751,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
         case VIDEO_ES:
             /* Drain if we didn't receive an error, otherwise the
              * decoder/encoder might not even exist. */
-            if(!id->b_error)
+            if( !atomic_load_explicit( &id->b_error, memory_order_acquire ) )
                 Send( p_stream, id, NULL );
             dec_Delete( id->p_decoder );
             vlc_mutex_lock( &p_sys->lock );
@@ -784,7 +784,7 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     block_t *p_out = NULL;
 
-    if( id->b_error )
+    if( atomic_load_explicit(&id->b_error, memory_order_acquire) )
         goto error;
 
     if( !id->b_transcode )
@@ -863,7 +863,7 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     }
 
     if (i_ret != VLC_SUCCESS)
-        id->b_error = true;
+        atomic_store_explicit( &id->b_error, true, memory_order_release );
 
     return i_ret;
 error:
