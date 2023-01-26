@@ -451,6 +451,21 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
 
     if (desc->plane_count == 1)
     {
+        if (chroma == VLC_CODEC_VUYA)
+        {
+            interop->tex_count = 2;
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
+                { 1, 1 }, { 1, 1 },
+                GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
+            };
+            return VLC_SUCCESS;
+        }
+        else if (desc->pixel_size != 2)
+        {
+            msg_Warn(interop->gl, "unsupported chroma %.4s", (char*)&chroma);
+            return VLC_EGENERIC;
+        }
+
         /* Only YUV 4:2:2 formats */
         /* The pictures have only 1 plane, but it is uploaded twice, once to
          * access the Y components, once to access the UV components. See
