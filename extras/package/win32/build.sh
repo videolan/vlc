@@ -138,7 +138,7 @@ TRIPLET=$ARCH-w64-mingw32
 
 # Check if compiling with clang
 CC=${CC:-$TRIPLET-gcc}
-if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E -; then
+if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E - 1>/dev/null 2>/dev/null; then
     COMPILING_WITH_CLANG=1
 else
     COMPILING_WITH_CLANG=0
