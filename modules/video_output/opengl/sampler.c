@@ -468,7 +468,9 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                     vlc_fourcc_t chroma,
                     const vlc_chroma_description_t *desc)
 {
-    if (desc->plane_count == 3)
+    if (desc->plane_count == 4)
+        swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = swizzle_per_tex[3] = "r";
+    else if (desc->plane_count == 3)
         swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = "r";
     else if (desc->plane_count == 2)
     {
@@ -858,17 +860,22 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
             assert(swizzle);
             color_count += strlen(swizzle);
             assert(color_count < PICTURE_PLANE_MAX);
+            if (i > 0)
+                ADD("  ,");
             if (tex_target == GL_TEXTURE_RECTANGLE)
             {
                 /* The coordinates are in texels values, not normalized */
-                ADDF("  %s(Textures[%u], TexSizes[%u] * tex_coords).%s,\n", lookup, i, i, swizzle);
+                ADDF("  %s(Textures[%u], TexSizes[%u] * tex_coords).%s\n", lookup, i, i, swizzle);
             }
             else
             {
-                ADDF("  %s(Textures[%u], tex_coords).%s,\n", lookup, i, swizzle);
+                ADDF("  %s(Textures[%u], tex_coords).%s\n", lookup, i, swizzle);
             }
         }
-        ADD("  1.0);\n");
+        if (color_count == 3)
+            ADD("  ,  1.0);\n");
+        else
+            ADD(");\n");
         ADD(" vec4 result = ConvMatrix * pixel;\n");
     }
     else
@@ -879,7 +886,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
         ADDF(" vec4 result = %s(Textures[0], tex_coords);\n", lookup);
         color_count = 1;
     }
-    assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
+    assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3 || color_count == 4);
 
 #ifdef HAVE_LIBPLACEBO_GL
     if (priv->pl_sh_res) {
