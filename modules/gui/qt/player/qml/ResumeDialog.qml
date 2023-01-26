@@ -31,9 +31,10 @@ FocusScope {
     id: resumePanel
 
     property VLCColors colors: VLCStyle.colors
+    property int maxWidth
 
-    implicitWidth: layout.implicitWidth
-    implicitHeight: layout.implicitHeight
+    implicitHeight: continueBtn.y + continueBtn.implicitHeight
+    implicitWidth: maxWidth
 
     visible: false
 
@@ -83,60 +84,101 @@ FocusScope {
         hideResumePanel()
     }
 
-    RowLayout {
-        id: layout
+    TextMetrics {
+        id: textMetrics
 
-        anchors.fill: parent
+        font: label.font
+        text: label.text
+    }
 
-        spacing: VLCStyle.margin_small
+    //FIXME use the right xxxLabel class
+    Label {
+        id: label
 
-        //FIXME use the right xxxLabel class
-        T.Label {
-            Layout.preferredHeight: implicitHeight
-            Layout.preferredWidth: implicitWidth
-            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+        anchors.topMargin: VLCStyle.margin_small
+        anchors.top: parent.top
+        anchors.left: parent.left
 
+        color: resumePanel.colors.playerFg
+        font.pixelSize: VLCStyle.fontSize_normal
+        font.bold: true
+        wrapMode: Text.Wrap
 
-            color: resumePanel.colors.playerFg
-            font.pixelSize: VLCStyle.fontSize_normal
-            font.bold: true
+        text: I18n.qtr("Do you want to restart the playback where you left off?")
+    }
 
-            text: I18n.qtr("Do you want to restart the playback where you left off?")
+    Widgets.ButtonExt {
+        id: continueBtn
+
+        anchors.verticalCenter: label.verticalCenter
+        anchors.left: label.right
+        anchors.leftMargin: VLCStyle.margin_xsmall
+
+        text: I18n.qtr("Continue")
+        font.bold: true
+        color: resumePanel.colors.playerFg
+        focus: true
+        onClicked: {
+            Player.restorePlaybackPos()
+            hideResumePanel()
         }
 
-        Widgets.ButtonExt {
-            id: continueBtn
-            Layout.preferredHeight: implicitHeight
-            Layout.preferredWidth: implicitWidth
-            text: I18n.qtr("Continue")
-            font.bold: true
-            color: resumePanel.colors.playerFg
-            focus: true
-            onClicked: {
-                Player.restorePlaybackPos()
-                hideResumePanel()
+        Navigation.parentItem: resumePanel
+        Navigation.rightItem: closeBtn
+        Keys.priority: Keys.AfterItem
+        Keys.onPressed:  continueBtn.Navigation.defaultKeyAction(event)
+    }
+
+    Widgets.ButtonExt {
+        id: closeBtn
+
+        anchors.verticalCenter: label.verticalCenter
+        anchors.left: continueBtn.right
+
+        text: I18n.qtr("Dismiss")
+        font.bold: true
+        color: resumePanel.colors.playerFg
+        onClicked: hideResumePanel()
+
+        Navigation.parentItem: resumePanel
+        Navigation.leftItem: continueBtn
+        Keys.priority: Keys.AfterItem
+        Keys.onPressed: closeBtn.Navigation.defaultKeyAction(event)
+    }
+
+    states: [
+        State {
+            name: "small"
+
+            PropertyChanges {
+                target: label
+
+                width: resumePanel.maxWidth
             }
 
-            Navigation.parentItem: resumePanel
-            Navigation.rightItem: closeBtn
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed:  continueBtn.Navigation.defaultKeyAction(event)
-        }
+            PropertyChanges {
+                target: continueBtn
 
-        Widgets.ButtonExt {
-            id: closeBtn
-            Layout.preferredHeight: implicitHeight
-            Layout.preferredWidth: implicitWidth
-            text: I18n.qtr("Dismiss")
-            font.bold: true
-            color: resumePanel.colors.playerFg
-            onClicked: hideResumePanel()
+                anchors.leftMargin: -VLCStyle.margin_xsmall
+            }
 
-            Navigation.parentItem: resumePanel
-            Navigation.leftItem: continueBtn
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed: closeBtn.Navigation.defaultKeyAction(event)
+            AnchorChanges {
+                target: continueBtn
+
+                anchors.top: label.bottom
+                anchors.verticalCenter: undefined
+                anchors.left: parent.left
+            }
+
+            AnchorChanges {
+                target: closeBtn
+
+                anchors.top: label.bottom
+                anchors.verticalCenter: undefined
+            }
         }
-    }
+    ]
+
+    state: (textMetrics.width + VLCStyle.margin_xsmall + continueBtn.width + closeBtn.width
+            > maxWidth) ? "small" : ""
 }
-

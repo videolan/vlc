@@ -61,7 +61,16 @@ FocusScope{
 
     function _layoutLine(c1, c2, offset)
     {
-        var lineHeight =  Math.max(c1 !== undefined ? c1.implicitHeight : 0, c2 !== undefined ? c2.implicitHeight : 0)
+        var c1Height = c1 !== undefined ? c1.implicitHeight : 0
+        var c2Height = c2 !== undefined ? c2.implicitHeight : 0
+
+        if (c2 === csdDecorations) {
+            //csdDecorations.implicitHeight gets overwritten when the height is set,
+            //VLCStyle.icon_normal is its initial value
+            c2Height = VLCStyle.icon_normal
+        }
+
+        var lineHeight = Math.max(c1Height, c2Height)
 
         if (c1) {
             c1.height = lineHeight
@@ -82,7 +91,9 @@ FocusScope{
 
         if (root.pinControls && !root.showToolbar && root.showCSD) {
             //place everything on one line
-            var lineHeight = Math.max(logoOrResume.implicitHeight, playlistGroup.implicitHeight, csdDecorations.implicitHeight)
+            //csdDecorations.implicitHeight gets overwritten when the height is set,
+            //VLCStyle.icon_normal is its initial value
+            var lineHeight = Math.max(logoOrResume.implicitHeight, playlistGroup.implicitHeight, VLCStyle.icon_normal)
 
             centerTitleText.y = 0
             centerTitleText.height = lineHeight
@@ -196,6 +207,8 @@ FocusScope{
         implicitHeight: resumeDialog.visible ? resumeDialog.implicitHeight
                                              : logoGroup.implicitHeight
 
+        onImplicitHeightChanged: root._layout()
+
         Item {
             id: logoGroup
 
@@ -252,6 +265,9 @@ FocusScope{
             anchors.leftMargin: VLCStyle.margin_xsmall
 
             colors: root.colors
+            maxWidth: ((root.showCSD && !root.pinControls) ? csdDecorations : playlistGroup).x
+                - VLCStyle.applicationHorizontalMargin
+                - VLCStyle.margin_large
 
             Navigation.parentItem: rootPlayer
 
