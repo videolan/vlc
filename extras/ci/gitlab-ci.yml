@@ -262,7 +262,7 @@ debian:
 
         # Build contribs
         mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
-        ../bootstrap
+        ../bootstrap --enable-x262
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
             make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}" || PREBUILT_FAILED=yes
@@ -324,7 +324,7 @@ debian-meson:
             echo -e "\e[0Ksection_start:$(date +%s):build_contribs_section\r\e[0KContribs build"
             # Build contribs
             mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
-            ../bootstrap
+            ../bootstrap --enable-x262
             if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
                 echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
                 make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}" || PREBUILT_FAILED=yes
