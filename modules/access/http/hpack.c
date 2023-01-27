@@ -552,8 +552,8 @@ static int hpack_decode_hdr(struct hpack_decoder *dec,
                             char **restrict namep,
                             char **restrict valuep)
 {
-    int (*cb)(struct hpack_decoder *, const uint8_t **, size_t *,
-              char **, char **);
+    int (*cb)(struct hpack_decoder *, const uint8_t ** restrict, size_t * restrict,
+              char ** restrict, char ** restrict);
 
     assert(*lengthp >= 1);
 
