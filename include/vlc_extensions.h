@@ -98,10 +98,9 @@ static inline int extension_Control( extensions_manager_t *p_mgr,
  * Helper for extension_HasMenu, extension_IsActivated...
  * Do not use.
  **/
-static inline bool __extension_GetBool( extensions_manager_t *p_mgr,
-                                        extension_t *p_ext,
-                                        int i_flag,
-                                        bool b_default )
+static inline bool
+vlc_extension_GetBool( extensions_manager_t *p_mgr, extension_t *p_ext,
+                       int i_flag, bool b_default )
 {
     bool b = b_default;
     int i_ret = extension_Control( p_mgr, i_flag, p_ext, &b );
@@ -125,11 +124,11 @@ static inline bool __extension_GetBool( extensions_manager_t *p_mgr,
 
 /** Is this extension activated? */
 #define extension_IsActivated( mgr, ext ) \
-        __extension_GetBool( mgr, ext, EXTENSION_IS_ACTIVATED, false )
+        vlc_extension_GetBool( mgr, ext, EXTENSION_IS_ACTIVATED, false )
 
 /** Does this extension have a sub-menu? */
 #define extension_HasMenu( mgr, ext ) \
-        __extension_GetBool( mgr, ext, EXTENSION_HAS_MENU, false )
+        vlc_extension_GetBool( mgr, ext, EXTENSION_HAS_MENU, false )
 
 /** Get this extension's sub-menu */
 static inline int extension_GetMenu( extensions_manager_t *p_mgr,
@@ -172,7 +171,7 @@ static inline int extension_MetaChanged( extensions_manager_t *p_mgr,
 /** Can this extension only be triggered but not activated?
     Not compatible with HasMenu */
 #define extension_TriggerOnly( mgr, ext ) \
-        __extension_GetBool( mgr, ext, EXTENSION_TRIGGER_ONLY, false )
+        vlc_extension_GetBool( mgr, ext, EXTENSION_TRIGGER_ONLY, false )
 
 
 /*****************************************************************************
