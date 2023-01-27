@@ -122,7 +122,7 @@ static int vlc_h2_reset(void *ctx, uint_fast32_t last_seq, uint_fast32_t code)
     return 0;
 }
 
-static void vlc_h2_window_status(void *ctx, uint32_t *rcwd)
+static void vlc_h2_window_status(void *ctx, uint32_t * restrict rcwd)
 {
     assert(ctx == CTX);
     *rcwd = (1u << 31) - 1;
