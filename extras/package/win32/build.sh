@@ -37,11 +37,12 @@ OPTIONS:
    -w            Restrict to Windows Store APIs
    -z            Build without GUI (libvlc only)
    -o <path>     Install the built binaries in the absolute path
+   -m            Build with Meson rather than autotools
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:W:sb:dD:xS:uwzo:" OPTION
+while getopts "hra:pcli:W:sb:dD:xS:uwzo:m" OPTION
 do
      case $OPTION in
          h)
@@ -100,6 +101,9 @@ do
          ;;
          o)
              INSTALL_PATH=$OPTARG
+         ;;
+         m)
+             BUILD_MESON="yes"
          ;;
      esac
 done
@@ -363,14 +367,6 @@ else
 fi
 cd ../..
 
-info "Bootstrapping"
-
-if ! [ -e ${VLC_ROOT_PATH}/configure ]; then
-    echo "Bootstraping vlc"
-    ${VLC_ROOT_PATH}/bootstrap
-fi
-
-info "Configuring VLC"
 if [ -z "$PKG_CONFIG" ]; then
     if [ `unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL` = "FAIL" ]; then
         # $TRIPLET-pkg-config DOESNT WORK
@@ -386,9 +382,6 @@ if [ -z "$PKG_CONFIG" ]; then
         export PKG_CONFIG="$TRIPLET-pkg-config"
     fi
 fi
-
-mkdir -p $SHORTARCH
-cd $SHORTARCH
 
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
@@ -430,6 +423,17 @@ if [ ! -z "$INSTALL_PATH" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --with-packagedir=$INSTALL_PATH"
 fi
 
+info "Bootstrapping"
+
+if ! [ -e ${VLC_ROOT_PATH}/configure ]; then
+    echo "Bootstraping vlc"
+    ${VLC_ROOT_PATH}/bootstrap
+fi
+
+mkdir -p $SHORTARCH
+cd $SHORTARCH
+
+info "Configuring VLC"
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
 
 info "Compiling"
