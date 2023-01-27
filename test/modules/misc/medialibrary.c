@@ -81,6 +81,8 @@ static int OpenIntf(vlc_object_t *root)
     vlc_sem_wait(&sem);
     vlc_ml_event_unregister_callback(ml, listener);
 
+    vlc_ml_media_release(media);
+
     return VLC_SUCCESS;
 }
 
