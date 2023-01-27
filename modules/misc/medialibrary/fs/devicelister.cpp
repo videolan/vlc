@@ -72,7 +72,8 @@ bool DeviceLister::start( ml::IDeviceListerCb* cb )
         MediaSource s{ mediaSource };
 
         static const vlc_media_tree_callbacks cbs {
-            &onChildrenReset, &onChildrenAdded, &onChildrenRemoved, nullptr
+            &DeviceLister::onChildrenReset, &DeviceLister::onChildrenAdded,
+            &DeviceLister::onChildrenRemoved, nullptr
         };
 
         s.l = vlc_media_tree_AddListener( s.s->tree, &cbs, this, true );
