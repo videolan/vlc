@@ -26,7 +26,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <strings.h>
+#include <cstring>
 
 namespace vlc {
   namespace medialibrary {
