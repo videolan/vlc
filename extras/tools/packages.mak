@@ -27,7 +27,7 @@ PKGCFG_URL=$(SF)/pkgconfiglite/$(PKGCFG_VERSION)/pkg-config-lite-$(PKGCFG_VERSIO
 TAR_VERSION=1.26
 TAR_URL=$(GNU)/tar/tar-$(TAR_VERSION).tar.bz2
 
-XZ_VERSION=5.2.2
+XZ_VERSION=5.4.1
 XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2
 
 RAGEL_VERSION=6.10
