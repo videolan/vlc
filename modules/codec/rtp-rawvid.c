@@ -545,8 +545,8 @@ static void decode_yuv411_8(void *restrict *restrict planes,
     }
 }
 
-typedef void (*vlc_rtp_video_raw_cb)(void *restrict *,
-                                     const unsigned char *, size_t);
+typedef void (*vlc_rtp_video_raw_cb)(void *restrict * restrict,
+                                     const unsigned char * restrict, size_t);
 
 struct vlc_rtp_video_raw_dec {
     unsigned int pgroup;
