@@ -238,13 +238,17 @@ if rsvg_dep.found() and cairo_dep.found()
 endif
 
 # xwd
-xproto_dep = dependency('xproto', required: get_option('xcb'))
-if xproto_dep.found()
-  vlc_modules += {
-      'name' : 'xwd',
-      'sources' : files('xwd.c'),
-      'dependencies' : [xproto_dep]
-  }
+if (get_option('xcb')
+    .disable_auto_if(host_system in ['darwin', 'windows'])
+    .allowed())
+  xproto_dep = dependency('xproto', required: get_option('xcb'))
+  if xproto_dep.found()
+    vlc_modules += {
+        'name' : 'xwd',
+        'sources' : files('xwd.c'),
+        'dependencies' : [xproto_dep]
+    }
+  endif
 endif
 
 
