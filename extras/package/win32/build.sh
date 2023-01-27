@@ -385,11 +385,14 @@ fi
 
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
+     MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized"
 else
      CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
+     MCONFIGFLAGS="$MCONFIGFLAGS --buildtype release"
 fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"
+     MCONFIGFLAGS="$MCONFIGFLAGS -Dnls=disabled"
 fi
 if [ ! -z "$BREAKPAD" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
@@ -406,23 +409,44 @@ if [ ! -z "$EXTRA_CHECKS" ]; then
 fi
 if [ ! -z "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dvlc=false -Dqt=disabled"
+    # MCONFIGFLAGS="$MCONFIGFLAGS -Dskins2=disabled"
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=enabled"
+    # MCONFIGFLAGS="$MCONFIGFLAGS -Dskins2=enabled"
 fi
 if [ ! -z "$WINSTORE" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-winstore-app"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dwinstore_app=true"
     # uses CreateFile to access files/drives outside of the app
     CONFIGFLAGS="$CONFIGFLAGS --disable-vcd"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dvcd_module=false"
     # other modules that were disabled in the old UWP builds
     CONFIGFLAGS="$CONFIGFLAGS --disable-dxva2"
+    # MCONFIGFLAGS="$MCONFIGFLAGS -Ddxva2=disabled"
 
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Ddvdread=enabled -Dcaca=enabled"
 fi
 if [ ! -z "$INSTALL_PATH" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --with-packagedir=$INSTALL_PATH"
 fi
 
+if [ -n "$BUILD_MESON" ]; then
+    mkdir -p $SHORTARCH-meson
+    rm -rf $SHORTARCH-meson/meson-private
+
+    info "Configuring VLC"
+    BUILD_PATH="$( pwd -P )"
+    cd ${VLC_ROOT_PATH}
+    meson setup ${BUILD_PATH}/$SHORTARCH-meson $MCONFIGFLAGS --cross-file ${BUILD_PATH}/contrib/contrib-$SHORTARCH/crossfile.meson --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
+
+    info "Compiling"
+    cd ${BUILD_PATH}/$SHORTARCH-meson
+    meson compile -j $JOBS
+else
 info "Bootstrapping"
 
 if ! [ -e ${VLC_ROOT_PATH}/configure ]; then
@@ -451,4 +475,5 @@ elif [ "$INSTALLER" = "m" ]; then
 make package-msi
 elif [ ! -z "$INSTALL_PATH" ]; then
 make package-win-common
+fi
 fi
