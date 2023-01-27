@@ -947,13 +947,13 @@ VLC_API void vlc_ml_bookmark_list_release( vlc_ml_bookmark_list_t* p_list );
 
 static inline vlc_ml_query_params_t vlc_ml_query_params_create(void)
 {
-    return (vlc_ml_query_params_t) {
-        .psz_pattern = NULL,
-        .i_nbResults = 0,
-        .i_offset = 0,
-        .i_sort = VLC_ML_SORTING_DEFAULT,
-        .b_desc = false
-    };
+#ifdef __cplusplus
+    vlc_ml_query_params_t ret = { };
+    ret.i_sort = VLC_ML_SORTING_DEFAULT;
+#else
+    vlc_ml_query_params_t ret = { .i_sort = VLC_ML_SORTING_DEFAULT };
+#endif
+    return ret;
 }
 
 static inline int vlc_ml_add_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
