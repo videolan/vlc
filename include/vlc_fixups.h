@@ -46,6 +46,10 @@ typedef unsigned short mode_t;
 #define strncasecmp _strnicmp
 #define snwprintf   _snwprintf
 
+// since we define restrist as __restrict for C++, __declspec(restrict) is bogus
+#define _CRT_SUPPRESS_RESTRICT
+#define DECLSPEC_RESTRICT
+
 #endif // _MSC_VER
 
 #ifdef _WIN32
