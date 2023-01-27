@@ -33,6 +33,7 @@ extern "C" {
 
 #include <sys/types.h>
 #include <vlc_es.h>
+#include <vlc_clock.h>
 
 /**
  * \defgroup sout Stream output
@@ -203,6 +204,12 @@ VLC_API int sout_StreamIdSend( sout_stream_t *s, void *id, block_t *b);
 VLC_API void sout_StreamFlush(sout_stream_t *s, void *id);
 VLC_API void sout_StreamSetPCR(sout_stream_t *s, vlc_tick_t pcr);
 VLC_API int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args);
+
+VLC_API vlc_clock_main_t *sout_ClockMainCreate(sout_stream_t *) VLC_USED;
+VLC_API void sout_ClockMainDelete(vlc_clock_main_t *);
+VLC_API void sout_ClockMainSetFirstPcr(vlc_clock_main_t *, vlc_tick_t pcr);
+VLC_API vlc_clock_t *sout_ClockCreate(vlc_clock_main_t *, const es_format_t *) VLC_USED;
+VLC_API void sout_ClockDelete(vlc_clock_t *);
 
 static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
 {

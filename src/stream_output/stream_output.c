@@ -49,6 +49,8 @@
 
 #include "input/input_interface.h"
 
+#include "clock/clock.h"
+
 #undef DEBUG_BUFFER
 /*****************************************************************************
  * Local prototypes
@@ -769,6 +771,35 @@ static void sout_StreamDelete( sout_stream_t *p_stream )
 
     msg_Dbg( p_stream, "destroying chain done" );
     vlc_object_delete(p_stream);
+}
+
+vlc_clock_main_t *sout_ClockMainCreate( sout_stream_t *p_stream )
+{
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_stream->obj );
+    return vlc_clock_main_New( p_stream->obj.logger, tracer );
+}
+
+void sout_ClockMainDelete( vlc_clock_main_t *main_clock )
+{
+    vlc_clock_main_Delete( main_clock );
+}
+
+void sout_ClockMainSetFirstPcr( vlc_clock_main_t *main_clock, vlc_tick_t pcr )
+{
+    vlc_clock_main_Reset( main_clock );
+    vlc_clock_main_SetFirstPcr( main_clock, vlc_tick_now(), pcr );
+}
+
+vlc_clock_t *sout_ClockCreate( vlc_clock_main_t *main_clock,
+                               const es_format_t *fmt )
+{
+    return vlc_clock_main_CreateSlave( main_clock, NULL, fmt->i_cat,
+                                       NULL, NULL );
+}
+
+void sout_ClockDelete( vlc_clock_t *clock )
+{
+    vlc_clock_Delete( clock );
 }
 
 /* Destroy a "stream_out" modules chain

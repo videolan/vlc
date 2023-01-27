@@ -359,6 +359,11 @@ sout_StreamIdSend
 sout_StreamFlush
 sout_StreamSetPCR
 sout_StreamControlVa
+sout_ClockMainCreate
+sout_ClockMainDelete
+sout_ClockMainSetFirstPcr
+sout_ClockCreate
+sout_ClockDelete
 spu_Create
 spu_Destroy
 spu_PutSubpicture
