@@ -213,7 +213,7 @@ static void Stop (audio_output_t *aout)
     vlc_mutex_unlock(&sys->lock);
 }
 
-static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
+static int Start (audio_output_t *aout, audio_sample_format_t * restrict fmt)
 {
     aout_sys_t *sys = aout->sys;
     char format[5] = "S16N";
