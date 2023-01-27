@@ -32,6 +32,8 @@
 #include <dlfcn.h>
 
 #include "device.h"
+#include "dynamicsprocessing_jni.h"
+#include "../../video_output/android/env.h"
 
 #include <aaudio/AAudio.h>
 

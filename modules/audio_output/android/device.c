@@ -59,8 +59,6 @@ static const struct {
     {  NULL, NULL, ANDROID_AUDIO_DEVICE_DEFAULT },
 };
 
-static struct DynamicsProcessing_fields dp_fields;
-
 struct sys {
     aout_stream_t *stream;
 
@@ -265,10 +263,6 @@ Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
-    int ret = AudioTrack_InitJNI(aout, &dp_fields);
-    if (ret != VLC_SUCCESS)
-        return ret;
-
     if (vlc_android_AudioFormat_InitJNI(obj) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
@@ -301,90 +295,6 @@ Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-#define THREAD_NAME "android_audio"
-#define GET_ENV() android_getEnv( VLC_OBJECT(stream), THREAD_NAME )
-#define JNI_CALL( what, obj, method, ... ) (*env)->what( env, obj, method, ##__VA_ARGS__ )
-#define JNI_CALL_INT( obj, method, ... ) JNI_CALL( CallIntMethod, obj, method, ##__VA_ARGS__ )
-#define JNI_CALL_VOID( obj, method, ... ) JNI_CALL( CallVoidMethod, obj, method, ##__VA_ARGS__ )
-static inline bool
-check_exception( JNIEnv *env, aout_stream_t *stream,
-                 const char *class, const char *method )
-{
-    if( (*env)->ExceptionCheck( env ) )
-    {
-        (*env)->ExceptionDescribe( env );
-        (*env)->ExceptionClear( env );
-        msg_Err( stream, "%s.%s triggered an exception !", class, method );
-        return true;
-    } else
-        return false;
-}
-#define CHECK_EXCEPTION( class, method ) check_exception( env, stream, class, method )
-
-jobject
-DynamicsProcessing_New( aout_stream_t *stream, int session_id )
-{
-    JNIEnv *env;
-    if( !( env = GET_ENV() ) )
-        return NULL;
-
-    if( !dp_fields.clazz )
-        return NULL;
-
-    jobject dp = JNI_CALL( NewObject, dp_fields.clazz,
-                           dp_fields.ctor, session_id );
-
-    if( CHECK_EXCEPTION( "DynamicsProcessing", "ctor" ) )
-        return NULL;
-
-    jobject global_dp = (*env)->NewGlobalRef( env, dp );
-    (*env)->DeleteLocalRef( env, dp );
-
-    return global_dp;
-}
-
-void
-DynamicsProcessing_Disable( aout_stream_t *stream, jobject dp )
-{
-    JNIEnv *env;
-    if( !( env = GET_ENV() ) )
-        return;
-
-    JNI_CALL_INT( dp, dp_fields.setEnabled, false );
-    CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" );
-}
-
-int
-DynamicsProcessing_SetVolume( aout_stream_t *stream, jobject dp, float volume )
-{
-    JNIEnv *env;
-    if( !( env = GET_ENV() ) )
-        return VLC_EGENERIC;
-
-    /* convert linear gain to dB */
-    float dB = volume == 0.0f ? -144 : 20.0f * log10f( volume );
-
-    JNI_CALL_VOID( dp, dp_fields.setInputGainAllChannelsTo, dB );
-    int ret = JNI_CALL_INT( dp, dp_fields.setEnabled, volume != 1.0f );
-
-    if( CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" ) || ret != 0 )
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
-
-void
-DynamicsProcessing_Delete( aout_stream_t *stream, jobject dp )
-{
-    JNIEnv *env;
-    if( !( env = GET_ENV() ) )
-        return;
-
-    JNI_CALL_INT( dp, dp_fields.setEnabled, false );
-    CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" );
-
-    (*env)->DeleteGlobalRef( env, dp );
-}
 
 #define add_aout(shortcut, name, desc) \
     add_submodule() \

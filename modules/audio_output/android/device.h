@@ -32,33 +32,6 @@ enum android_audio_device_type
 };
 #define ANDROID_AUDIO_DEVICE_MAX_CHANNELS 8
 
-struct DynamicsProcessing_fields
-{
-    jclass clazz;
-    jmethodID ctor;
-    jmethodID setInputGainAllChannelsTo;
-    jmethodID setEnabled;
-};
-
-int
-AudioTrack_InitJNI(audio_output_t *aout,
-                   struct DynamicsProcessing_fields *dp_fields);
-
-bool
-AudioTrack_HasEncoding(long long encoding_flags, vlc_fourcc_t format);
-
-jobject
-DynamicsProcessing_New(aout_stream_t *stream, int32_t session_id);
-
-int
-DynamicsProcessing_SetVolume(aout_stream_t *stream, jobject dp, float volume);
-
-void
-DynamicsProcessing_Disable(aout_stream_t *stream, jobject dp);
-
-void
-DynamicsProcessing_Delete(aout_stream_t *stream, jobject dp);
-
 struct aout_stream
 {
     struct vlc_object_t obj;

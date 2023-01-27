@@ -5,9 +5,14 @@ libvlc_android_audioformat_jni_la_SOURCES = \
 	audio_output/android/audioformat_jni.c \
 	audio_output/android/audioformat_jni.h
 
+libvlc_android_dynamicsprocessing_jni_la_SOURCES = \
+	audio_output/android/dynamicsprocessing_jni.c \
+	audio_output/android/dynamicsprocessing_jni.h
+
 if HAVE_ANDROID
 noinst_LTLIBRARIES += \
-	libvlc_android_audioformat_jni.la
+	libvlc_android_audioformat_jni.la \
+	libvlc_android_dynamicsprocessing_jni.la
 endif
 
 libopensles_android_plugin_la_SOURCES = audio_output/android/opensles.c
@@ -15,15 +20,16 @@ libopensles_android_plugin_la_LIBADD = libandroid_env.la $(LIBDL) $(LIBM)
 
 libandroid_audiotrack_plugin_la_SOURCES = audio_output/android/audiotrack.c audio_output/android/device.h
 libandroid_audiotrack_plugin_la_LIBADD = libandroid_env.la \
-	libvlc_android_audioformat_jni.la
+	libvlc_android_audioformat_jni.la \
+	libvlc_android_dynamicsprocessing_jni.la
 
 libandroid_aaudio_plugin_la_SOURCES = audio_output/android/aaudio.c audio_output/android/device.h
-libandroid_aaudio_plugin_la_LIBADD = libandroid_env.la $(LIBDL)
+libandroid_aaudio_plugin_la_LIBADD = libandroid_env.la libvlc_android_dynamicsprocessing_jni.la $(LIBDL)
 
 libandroid_audiodevice_plugin_la_SOURCES = audio_output/android/device.c audio_output/android/device.h
-libandroid_audiodevice_plugin_la_LIBADD = libandroid_env.la
 libandroid_audiodevice_plugin_la_LIBADD = libandroid_env.la \
-	libvlc_android_audioformat_jni.la
+	libvlc_android_audioformat_jni.la \
+	libvlc_android_dynamicsprocessing_jni.la
 
 if HAVE_ANDROID
 aout_LTLIBRARIES += libandroid_audiodevice_plugin.la libopensles_android_plugin.la \

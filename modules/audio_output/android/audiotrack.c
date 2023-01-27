@@ -36,6 +36,7 @@
 #include "../video_output/android/env.h"
 #include "device.h"
 #include "audioformat_jni.h"
+#include "dynamicsprocessing_jni.h"
 
 #define SMOOTHPOS_SAMPLE_COUNT 10
 #define SMOOTHPOS_INTERVAL_US VLC_TICK_FROM_MS(30) // 30ms
@@ -188,8 +189,6 @@ static struct
     struct {
         jint ENCODING_PCM_8BIT;
         jint ENCODING_PCM_16BIT;
-        jint ENCODING_PCM_32BIT;
-        bool has_ENCODING_PCM_32BIT;
         jint ENCODING_PCM_FLOAT;
         bool has_ENCODING_PCM_FLOAT;
         jint ENCODING_IEC61937;
@@ -227,20 +226,19 @@ static struct
         jfieldID framePosition;
         jfieldID nanoTime;
     } AudioTimestamp;
-    struct DynamicsProcessing_fields DynamicsProcessing;
+
 } jfields;
 
 /* init all jni fields.
  * Done only one time during the first initialisation */
-int
-AudioTrack_InitJNI( audio_output_t *p_aout,
-                    struct DynamicsProcessing_fields *dp_fields )
+static int
+AudioTrack_InitJNI( vlc_object_t *p_aout)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
     jclass clazz;
     jfieldID field;
-    JNIEnv *env = android_getEnv( VLC_OBJECT(p_aout), THREAD_NAME );
+    JNIEnv *env = android_getEnv( p_aout, THREAD_NAME );
 
     if( env == NULL )
         return VLC_EGENERIC;
@@ -393,8 +391,6 @@ AudioTrack_InitJNI( audio_output_t *p_aout,
     GET_CLASS( "android/media/AudioFormat", true );
     GET_CONST_INT( AudioFormat.ENCODING_PCM_8BIT, "ENCODING_PCM_8BIT", true );
     GET_CONST_INT( AudioFormat.ENCODING_PCM_16BIT, "ENCODING_PCM_16BIT", true );
-    GET_CONST_INT( AudioFormat.ENCODING_PCM_32BIT, "ENCODING_PCM_32BIT", false );
-    jfields.AudioFormat.has_ENCODING_PCM_32BIT = field != NULL;
 
 #ifdef AUDIOTRACK_USE_FLOAT
     GET_CONST_INT( AudioFormat.ENCODING_PCM_FLOAT, "ENCODING_PCM_FLOAT",
@@ -436,27 +432,6 @@ AudioTrack_InitJNI( audio_output_t *p_aout,
     GET_CONST_INT( AudioManager.ERROR_DEAD_OBJECT, "ERROR_DEAD_OBJECT", false );
     jfields.AudioManager.has_ERROR_DEAD_OBJECT = field != NULL;
     GET_CONST_INT( AudioManager.STREAM_MUSIC, "STREAM_MUSIC", true );
-
-    /* Don't use DynamicsProcessing before Android 12 since it may crash
-     * randomly, cf. videolan/vlc-android#2221.
-     *
-     * ENCODING_PCM_32BIT is available on API 31, so test its availability to
-     * check if we are running Android 12 */
-    if( jfields.AudioFormat.has_ENCODING_PCM_32BIT )
-    {
-        GET_CLASS( "android/media/audiofx/DynamicsProcessing", false );
-        if( clazz )
-        {
-            jfields.DynamicsProcessing.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
-            CHECK_EXCEPTION( "NewGlobalRef", true );
-            GET_ID( GetMethodID, DynamicsProcessing.ctor, "<init>", "(I)V", true );
-            GET_ID( GetMethodID, DynamicsProcessing.setInputGainAllChannelsTo,
-                    "setInputGainAllChannelsTo", "(F)V", true );
-            GET_ID( GetMethodID, DynamicsProcessing.setEnabled,
-                    "setEnabled", "(Z)I", true );
-        }
-    }
-    *dp_fields = jfields.DynamicsProcessing;
 
 #undef CHECK_EXCEPTION
 #undef GET_CLASS
@@ -1298,6 +1273,8 @@ Start( aout_stream_t *stream, audio_sample_format_t *restrict p_fmt,
 
     if( !( env = GET_ENV() ) )
         return VLC_EGENERIC;
+
+    AudioTrack_InitJNI(VLC_OBJECT(stream));
 
     aout_sys_t *p_sys = stream->sys = calloc( 1, sizeof (aout_sys_t) );
 
