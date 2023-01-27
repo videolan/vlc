@@ -27,6 +27,7 @@
 
 #import <vlc_modules.h>
 #import <vlc_extensions.h>
+#import <vlc_playlist.h>
 
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
@@ -162,6 +163,8 @@
             return false;
         }
 
+        vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf);
+        p_extensions_manager->player = vlc_playlist_GetPlayer(playlist);
         p_extensions_manager->p_module = module_need(p_extensions_manager, "extension", NULL, false);
 
         if (!p_extensions_manager->p_module) {
