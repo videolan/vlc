@@ -357,7 +357,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *BlockAMT( stream_t *, bool * );
+static block_t *BlockAMT( stream_t *, bool * restrict );
 static int Control( stream_t *, int, va_list );
 
 /*****************************************************************************

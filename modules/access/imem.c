@@ -198,7 +198,7 @@ typedef void (*imem_release_t)(void *data, const char *cookie, size_t, void *);
  *****************************************************************************/
 
 /* */
-static block_t *Block(stream_t *, bool *);
+static block_t *Block(stream_t *, bool * restrict);
 static int ControlAccess(stream_t *, int, va_list);
 
 static int Demux(demux_t *);

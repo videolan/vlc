@@ -151,7 +151,7 @@ se_StreamRead( stream_t* stream, void* buf, size_t len )
 }
 
 static block_t*
-se_StreamBlock( stream_t* stream, bool* eof )
+se_StreamBlock( stream_t* stream, bool* restrict eof )
 {
     struct stream_extractor_private* priv = stream->p_sys;
     return priv->extractor.pf_block( &priv->extractor, eof );

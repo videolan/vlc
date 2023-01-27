@@ -430,7 +430,7 @@ typedef struct
     tuner_setup_t pf_setup;
 } access_sys_t;
 
-static block_t *Read (stream_t *, bool *);
+static block_t *Read (stream_t *, bool * restrict);
 static int Control (stream_t *, int, va_list);
 static dtv_delivery_t GuessSystem (const char *, dvb_device_t *);
 static dtv_delivery_t GetDeliveryByScheme(const char *psz_scheme);

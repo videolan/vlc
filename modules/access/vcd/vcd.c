@@ -81,7 +81,7 @@ typedef struct
     int         i_sector;                                  /* Current Sector */
 } access_sys_t;
 
-static block_t *Block( stream_t *, bool * );
+static block_t *Block( stream_t *, bool * restrict);
 static int      Seek( stream_t *, uint64_t );
 static int      Control( stream_t *, int, va_list );
 static int      EntryPoints( stream_t * );
