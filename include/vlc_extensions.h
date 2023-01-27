@@ -29,6 +29,7 @@
 /* Structures */
 typedef struct extensions_manager_sys_t extensions_manager_sys_t;
 typedef struct extensions_manager_t extensions_manager_t;
+struct vlc_player_t;
 struct vlc_logger;
 
 /** Extension descriptor: name, title, author, ... */
@@ -60,6 +61,7 @@ struct extensions_manager_t
 
     module_t *p_module;                /**< Extensions manager module */
     void *p_sys;              /**< Reserved for the module */
+    struct vlc_player_t *player;
 
     DECL_ARRAY(extension_t*) extensions; /**< Array of extension descriptors */
     vlc_mutex_t lock;                  /**< A lock for the extensions array */
