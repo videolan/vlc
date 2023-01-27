@@ -83,6 +83,9 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     if ( ctx.thumbnail == nullptr )
         return false;
 
+    vlc_thumbnailer_DestroyRequest(m_thumbnailer.get(), ctx.request);
+    ctx.request = NULL;
+
     /* Both picture_Export and ThumbnailerCtx will release the thumbnail, so
      * ensure that only picture_Export does. */
     picture_t *thumbnail = nullptr;
