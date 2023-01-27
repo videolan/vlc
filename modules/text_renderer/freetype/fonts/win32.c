@@ -165,7 +165,7 @@ static int GetFileFontByName( const WCHAR * font_name, char **psz_filename, int 
     return 0;
 }
 
-static char* GetWindowsFontPath()
+static char* GetWindowsFontPath(void)
 {
     wchar_t wdir[MAX_PATH];
     if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
