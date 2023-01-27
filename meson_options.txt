@@ -45,6 +45,11 @@ option('branch_protection',
     value : 'auto',
     description : 'AArch64 branch protection')
 
+option('ssp',
+    type : 'feature',
+    value : 'auto',
+    description : 'Stack smashing protection')
+
 option('winstore_app',
     type : 'boolean',
     value : 'false',

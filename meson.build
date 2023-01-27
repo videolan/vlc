@@ -791,6 +791,33 @@ add_project_arguments(
     cc.get_supported_arguments('-fvisibility=hidden'),
     language: ['c'])
 
+# Stack smashing protection (default enabled for optimized builds)
+if (get_option('ssp')
+    .disable_auto_if(get_option('optimization') == '0')
+    .allowed())
+    add_project_arguments(
+        cc.get_supported_arguments('-fstack-protector-strong'),
+        language: ['c', 'cpp'])
+
+    if host_system == 'windows'
+        # Win32 requires linking to ssp for stack-protection
+ssp_test = '''
+#include <stdio.h>
+
+int main(void) {
+    char buf[100];
+    fgets(buf, sizeof(buf), stdin);
+    return 0;
+}
+'''
+        # Check if linker supports -lssp
+        if cc.links(ssp_test, args: ['-fstack-protector-strong', '-lssp'],
+                    name: 'linker supports stack protectors')
+            add_project_link_arguments('-lssp', language: ['c', 'cpp'])
+        endif
+    endif
+endif
+
 # Check if linker supports -Bsymbolic
 symbolic_linkargs = []
 if cc.has_link_argument('-Wl,-Bsymbolic')
