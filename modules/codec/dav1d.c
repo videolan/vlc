@@ -89,27 +89,35 @@ static const struct
     vlc_fourcc_t          i_chroma;
     enum Dav1dPixelLayout i_chroma_id;
     uint8_t               i_bitdepth;
+    enum Dav1dTransferCharacteristics transfer_characteristics;
 } chroma_table[] =
 {
-    {VLC_CODEC_GREY, DAV1D_PIXEL_LAYOUT_I400, 8},
-    {VLC_CODEC_I420, DAV1D_PIXEL_LAYOUT_I420, 8},
-    {VLC_CODEC_I422, DAV1D_PIXEL_LAYOUT_I422, 8},
-    {VLC_CODEC_I444, DAV1D_PIXEL_LAYOUT_I444, 8},
+    /* Transfer characteristic-dependent mappings must come first */
+    {VLC_CODEC_GBR_PLANAR, DAV1D_PIXEL_LAYOUT_I444, 8, DAV1D_TRC_SRGB},
+    {VLC_CODEC_GBR_PLANAR_10L, DAV1D_PIXEL_LAYOUT_I444, 10, DAV1D_TRC_SRGB},
 
-    {VLC_CODEC_I420_10L, DAV1D_PIXEL_LAYOUT_I420, 10},
-    {VLC_CODEC_I422_10L, DAV1D_PIXEL_LAYOUT_I422, 10},
-    {VLC_CODEC_I444_10L, DAV1D_PIXEL_LAYOUT_I444, 10},
+    {VLC_CODEC_GREY, DAV1D_PIXEL_LAYOUT_I400, 8, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I420, DAV1D_PIXEL_LAYOUT_I420, 8, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I422, DAV1D_PIXEL_LAYOUT_I422, 8, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I444, DAV1D_PIXEL_LAYOUT_I444, 8, DAV1D_TRC_UNKNOWN},
 
-    {VLC_CODEC_I420_12L, DAV1D_PIXEL_LAYOUT_I420, 12},
-    {VLC_CODEC_I422_12L, DAV1D_PIXEL_LAYOUT_I422, 12},
-    {VLC_CODEC_I444_12L, DAV1D_PIXEL_LAYOUT_I444, 12},
+    {VLC_CODEC_I420_10L, DAV1D_PIXEL_LAYOUT_I420, 10, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I422_10L, DAV1D_PIXEL_LAYOUT_I422, 10, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I444_10L, DAV1D_PIXEL_LAYOUT_I444, 10, DAV1D_TRC_UNKNOWN},
+
+    {VLC_CODEC_I420_12L, DAV1D_PIXEL_LAYOUT_I420, 12, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I422_12L, DAV1D_PIXEL_LAYOUT_I422, 12, DAV1D_TRC_UNKNOWN},
+    {VLC_CODEC_I444_12L, DAV1D_PIXEL_LAYOUT_I444, 12, DAV1D_TRC_UNKNOWN},
 };
 
 static vlc_fourcc_t FindVlcChroma(const Dav1dPicture *img)
 {
+
     for (unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++)
         if (chroma_table[i].i_chroma_id == img->p.layout &&
-            chroma_table[i].i_bitdepth == img->p.bpc)
+            chroma_table[i].i_bitdepth == img->p.bpc &&
+            (chroma_table[i].transfer_characteristics == DAV1D_TRC_UNKNOWN ||
+             chroma_table[i].transfer_characteristics == img->seq_hdr->trc))
             return chroma_table[i].i_chroma;
 
     return 0;
