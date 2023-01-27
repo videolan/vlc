@@ -66,19 +66,6 @@ static int OpenIntf(vlc_object_t *root)
         return VLC_SUCCESS;
     }
 
-    video_format_t fmt_in;
-    video_format_Init(&fmt_in, VLC_CODEC_RGBA);
-    fmt_in.i_width = fmt_in.i_visible_width = 800;
-    fmt_in.i_height = fmt_in.i_visible_height = 600;
-
-    video_format_t fmt_out;
-    video_format_Init(&fmt_out, VLC_CODEC_PNG);
-    fmt_out.i_width = fmt_out.i_visible_width = 800;
-    fmt_out.i_height = fmt_out.i_visible_height = 600;
-
-    picture_t *picture = picture_NewFromFormat(&fmt_in);
-    assert(picture != NULL);
-
     #define MOCK_URL "mock://video_track_count=1;length=100000000;" \
                      "video_width=800;video_height=600"
     vlc_ml_media_t *media = vlc_ml_new_external_media(ml, MOCK_URL);
