@@ -21,4 +21,5 @@ import QtQuick 2.11
 Item {
     //mock, TapHandler is present in QtQuick >= 2.12
     signal tapped()
+    signal longPressed()
 }
