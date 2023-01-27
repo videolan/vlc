@@ -39,7 +39,7 @@ SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
 ANT_VERSION=1.9.7
 ANT_URL=$(APACHE)/ant/binaries/apache-ant-$(ANT_VERSION)-bin.tar.bz2
 
-BISON_VERSION=3.0.4
+BISON_VERSION=3.8.2
 BISON_URL=$(GNU)/bison/bison-$(BISON_VERSION).tar.xz
 
 FLEX_VERSION=2.6.4
