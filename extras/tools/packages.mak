@@ -12,7 +12,7 @@ CMAKE_URL=http://www.cmake.org/files/v3.24/cmake-$(CMAKE_VERSION).tar.gz
 LIBTOOL_VERSION=2.4.7
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
 
-AUTOCONF_VERSION=2.69
+AUTOCONF_VERSION=2.71
 AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.gz
 
 AUTOMAKE_VERSION=1.16.1
