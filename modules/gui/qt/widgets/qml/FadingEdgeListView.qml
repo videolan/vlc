@@ -126,16 +126,6 @@ ListView {
                                            (!lastVisibleItem.activeFocus &&
                                             !Helpers.get(lastVisibleItem, "hovered", false)))
 
-    // If Qt < 5.14, have to force clip enable,
-    // because we can not dictate the reused
-    // one to always have a binding assigned
-    // to clip property.
-    Component.onCompleted: {
-        if (!(clipBinding.restoreMode === 3 /* RestoreBindingOrValue */)) {
-            clip = Qt.binding(function() { return true })
-        }
-    }
-
     BindingCompat on disableBeginningFade {
         when: !!root.headerItem && (root.headerPositioning !== ListView.InlineHeader)
         value: true
@@ -144,16 +134,6 @@ ListView {
     BindingCompat on disableEndFade {
         when: !!root.footerItem && (root.footerPositioning !== ListView.InlineFooter)
         value: true
-    }
-
-    // When the effect is active,
-    // it will clip inherently.
-    // So the parent does not need
-    // clipping enabled.
-    BindingCompat on clip {
-        id: clipBinding
-        when: proxyContentItem.visible
-        value: false
     }
 
     ShaderEffectSource {
