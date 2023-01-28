@@ -301,7 +301,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     }
 
     /* Create new script descriptor */
-    extension_t *p_ext = ( extension_t* ) calloc( 1, sizeof( extension_t ) );
+    extension_t *p_ext = calloc( 1, sizeof( extension_t ) );
     if( !p_ext )
     {
         free( psz_script );
@@ -309,7 +309,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     }
 
     p_ext->psz_name = psz_script;
-    p_ext->p_sys = (extension_sys_t*) calloc( 1, sizeof( extension_sys_t ) );
+    p_ext->p_sys = calloc( 1, sizeof( extension_sys_t ) );
     if( !p_ext->p_sys || !p_ext->psz_name )
     {
         free( p_ext->psz_name );
