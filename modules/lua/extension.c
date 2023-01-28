@@ -286,16 +286,12 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
 
     /* Experimental: read .vle packages (Zip archives) */
     char *psz_script = NULL;
-    int i_flen = strlen( psz_filename );
-    if( !strncasecmp( psz_filename + i_flen - 4, ".vle", 4 ) )
+    char *extension = strrchr(psz_filename, '.');
+    if (extension != NULL && strcmp(extension, ".vle") == 0)
     {
         msg_Dbg( p_this, "reading Lua script in a zip archive" );
-        psz_script = calloc( 1, i_flen + 6 + 12 + 1 );
-        if( !psz_script )
-            return 0;
-        strcpy( psz_script, "zip://" );
-        strncat( psz_script, psz_filename, i_flen + 19 );
-        strncat( psz_script, "!/script.lua", i_flen + 19 );
+        if (asprintf(&psz_script, "zip://%s!/script.lua", psz_filename) == -1)
+            return VLC_ENOMEM;
     }
     else
     {
