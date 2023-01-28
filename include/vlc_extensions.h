@@ -54,7 +54,7 @@ struct extensions_manager_t
     struct vlc_object_t obj;
 
     module_t *p_module;                /**< Extensions manager module */
-    extensions_manager_sys_t *p_sys;   /**< Reserved for the module */
+    void *p_sys;              /**< Reserved for the module */
 
     DECL_ARRAY(extension_t*) extensions; /**< Array of extension descriptors */
     vlc_mutex_t lock;                  /**< A lock for the extensions array */
