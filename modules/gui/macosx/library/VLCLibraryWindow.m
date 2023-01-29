@@ -250,13 +250,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
 
-    // We want all the insets to look even, and since the scrollbar is transparent,
-    // we have to compensate for this on the sides where there isn't a scrollbar to
-    // match up the perceived whitespace on all sides
-    const CGFloat scrollViewTopInset = [VLCLibraryUIUnits scrollBarSmallSideSize];
-    const CGFloat scrollViewRightInset = 0.;
-    const CGFloat scrollViewBottomInset = [VLCLibraryUIUnits scrollBarSmallSideSize];
-    const CGFloat scrollViewLeftInset = [VLCLibraryUIUnits scrollBarSmallSideSize];
+    const CGFloat scrollViewTopInset = [VLCLibraryUIUnits mediumSpacing];
+    const CGFloat scrollViewRightInset = [VLCLibraryUIUnits mediumSpacing];
+    const CGFloat scrollViewBottomInset = [VLCLibraryUIUnits mediumSpacing];
+    const CGFloat scrollViewLeftInset = [VLCLibraryUIUnits mediumSpacing];
 
     // Need to account for the audio collection switcher at the top
     const CGFloat audioScrollViewTopInset = scrollViewTopInset + _optionBarView.frame.size.height;
