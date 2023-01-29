@@ -81,11 +81,11 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self
                                             forKeyPath:@"effectiveAppearance"
-                                               options:0
+                                               options:NSKeyValueObservingOptionNew
                                                context:nil];
     }
 
-    [self updateColoredAppearance];
+    [self updateColoredAppearance:self.view.effectiveAppearance];
     [self updateFontBasedOnSetting:nil];
     [self prepareForReuse];
 }
@@ -97,12 +97,21 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change
                        context:(void *)context
 {
-    [self updateColoredAppearance];
+    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        NSAppearance *effectiveAppearance = change[NSKeyValueChangeNewKey];
+        [self updateColoredAppearance:effectiveAppearance];
+    }
 }
 
-- (void)updateColoredAppearance
+- (void)updateColoredAppearance:(NSAppearance*)appearance
 {
-    self.mediaTitleTextField.textColor = self.view.shouldShowDarkAppearance ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
+    NSParameterAssert(appearance);
+    BOOL isDark = NO;
+    if (@available(macOS 10.14, *)) {
+        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+    }
+
+    self.mediaTitleTextField.textColor = isDark ? [NSColor VLClibraryDarkTitleColor] : [NSColor VLClibraryLightTitleColor];
 }
 
 - (void)updateFontBasedOnSetting:(NSNotification *)aNotification
