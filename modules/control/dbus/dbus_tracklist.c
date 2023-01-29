@@ -613,29 +613,31 @@ int TrackListPropertiesChangedEmit( intf_thread_t    * p_intf,
         tracklist_append_event_t *added_tracks =
             vlc_dictionary_value_for_key( p_changed_properties, "TrackAdded" );
 
-        while (added_tracks) {
+        while ( added_tracks ) {
             for (size_t i = 0; i < added_tracks->change_ev.count; ++i) {
                 TrackAddedSignal( p_intf,
                         added_tracks->change_ev.index + i,
                         added_tracks->items[i] );
             }
-            added_tracks = tracklist_append_event_next(added_tracks);
+            tracklist_append_event_t *next = tracklist_append_event_next( added_tracks );
+            tracklist_append_event_destroy( added_tracks );
+            added_tracks = next;
         }
-        tracklist_append_event_destroy( added_tracks );
     }
 
     if( vlc_dictionary_has_key( p_changed_properties, "TrackRemoved" ) ) {
         tracklist_remove_event_t *removed_tracks =
             vlc_dictionary_value_for_key( p_changed_properties, "TrackRemoved" );
 
-        while (removed_tracks) {
+        while ( removed_tracks ) {
             for (size_t i = 0; i < removed_tracks->change_ev.count; ++i) {
                 TrackRemovedSignal( p_intf, removed_tracks->change_ev.index + i );
             }
-            removed_tracks = tracklist_remove_event_next(removed_tracks);
+            tracklist_remove_event_t *next = tracklist_remove_event_next( removed_tracks );
+            tracklist_remove_event_destroy( removed_tracks );
+            removed_tracks = next;
         }
 
-        tracklist_remove_event_destroy( removed_tracks );
     }
 
     return VLC_SUCCESS;

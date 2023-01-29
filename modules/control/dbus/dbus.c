@@ -673,8 +673,10 @@ static void ProcessEvents( intf_thread_t *p_intf,
             vlc_dictionary_insert( &player_properties, "Metadata", NULL );
             break;
         case SIGNAL_PLAYLIST_ITEM_APPEND:
+            if ( !last_append ) {
+                last_append = vlc_dictionary_value_for_key( &tracklist_properties, "TrackAdded" );
+            }
             if( !last_append ) {
-                assert (!vlc_dictionary_has_key( &tracklist_properties, "TrackAdded" ) );
                 vlc_dictionary_insert( &tracklist_properties, "TrackAdded", p_events[i]->items_appended );
 
                 last_append = p_events[i]->items_appended;
