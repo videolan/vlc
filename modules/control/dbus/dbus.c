@@ -404,6 +404,14 @@ static void Close   ( vlc_object_t *p_this )
     for( size_t i = 0; i < vlc_array_count( &p_sys->events ); i++ )
     {
         callback_info_t* info = vlc_array_item_at_index( &p_sys->events, i );
+        switch( info->signal ) {
+        case SIGNAL_PLAYLIST_ITEM_APPEND:
+            tracklist_append_event_destroy( info->items_appended );
+            break;
+        case SIGNAL_PLAYLIST_ITEM_DELETED:
+            tracklist_remove_event_destroy( info->items_removed );
+            break;
+        }
         free( info );
     }
     vlc_array_clear( &p_sys->events );
