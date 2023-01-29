@@ -129,7 +129,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)awakeFromNib
 {
     self.identifier = VLCLibraryWindowIdentifier;
-    
+
+    if(@available(macOS 10.12, *)) {
+        self.tabbingMode = NSWindowTabbingModeDisallowed;
+    }
+
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
 
