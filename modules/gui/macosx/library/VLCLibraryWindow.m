@@ -188,7 +188,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (@available(macOS 10.14, *)) {
         [[NSApplication sharedApplication] addObserver:self
                                             forKeyPath:@"effectiveAppearance"
-                                               options:0
+                                               options:NSKeyValueObservingOptionNew
                                                context:nil];
         
         _mediaToolBar.centeredItemIdentifier = _segmentedTitleControlToolbarItem.itemIdentifier;
@@ -239,9 +239,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
     self.upNextLabel.stringValue = _NS("Playlist");
-    [self updateColorsBasedOnAppearance];
     self.openMediaButton.title = _NS("Open media...");
     self.dragDropImageBackgroundBox.fillColor = [NSColor VLClibrarySeparatorLightColor];
+
+    [self updateColorsBasedOnAppearance:self.effectiveAppearance];
 
     _mainSplitView.delegate = self;
     _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
@@ -379,15 +380,24 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change
                        context:(void *)context
 {
-    [self updateColorsBasedOnAppearance];
+    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        NSAppearance *effectiveAppearance = change[NSKeyValueChangeNewKey];
+        [self updateColorsBasedOnAppearance:effectiveAppearance];
+    }
 }
 
-- (void)updateColorsBasedOnAppearance
+- (void)updateColorsBasedOnAppearance:(NSAppearance*)appearance
 {
+    NSParameterAssert(appearance);
+    BOOL isDark = NO;
+    if (@available(macOS 10.14, *)) {
+        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+    }
+
     // If we try to pull the view's effectiveAppearance we are going to get the previous appearance's name despite
     // responding to the effectiveAppearance change (???) so it is a better idea to pull from the general system
     // theme preference, which is always up-to-date
-    if ([[[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"] isEqualToString:@"Dark"]) {
+    if (isDark) {
         self.upNextLabel.textColor = [NSColor VLClibraryDarkTitleColor];
         self.upNextSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
         self.clearPlaylistSeparator.borderColor = [NSColor VLClibrarySeparatorDarkColor];
