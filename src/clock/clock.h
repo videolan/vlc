@@ -17,8 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef VLC_CLOCK_H
-#define VLC_CLOCK_H
+#ifndef CLOCK_H
+#define CLOCK_H
 
 enum vlc_clock_master_source
 {
@@ -230,4 +230,4 @@ vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
     return system;
 }
 
-#endif /*VLC_CLOCK_H*/
+#endif /*CLOCK_H*/
