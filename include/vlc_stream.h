@@ -23,7 +23,9 @@
 #ifndef VLC_STREAM_H
 #define VLC_STREAM_H 1
 
+#include <vlc_tick.h>
 #include <vlc_block.h>
+#include <vlc_input.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -37,6 +39,45 @@ extern "C" {
  * \file
  * Byte streams and byte stream filter modules interface
  */
+
+struct vlc_stream_operations {
+    /* Cannot fail */
+    bool (*can_seek)(stream_t *);
+    bool (*can_pause)(stream_t *);
+    bool (*can_control_pace)(stream_t *);
+
+    int (*get_pts_delay)(stream_t *, vlc_tick_t *);
+    int (*get_seekpoint)(stream_t *, unsigned *);
+    int (*get_signal)(stream_t *, double *, double *);
+    int (*get_title)(stream_t *, unsigned *);
+    int (*get_meta)(stream_t *, vlc_meta_t *);
+    int (*get_type)(stream_t *, int *);
+
+    int (*set_pause_state)(stream_t *, bool);
+    int (*set_seek_point)(stream_t *, int);
+    int (*set_title)(stream_t *, int);
+
+    void (*close)(stream_t *);
+
+    union {
+        struct {
+            bool (*can_fastseek)(stream_t *);
+
+            int (*get_size)(stream_t *, uint64_t *);
+            int (*get_title_info)(stream_t *, input_title_t ***, int *);
+            int (*get_content_type)(stream_t *, char **);
+            int (*get_tags)(stream_t *, const block_t **);
+            int (*get_private_id_state)(stream_t *, int, bool *);
+
+            int (*set_record_state)(stream_t *, bool, const char *, const char *);
+            int (*set_private_id_state)(stream_t *, int, bool);
+            int (*set_private_id_ca)(stream_t *, void *);
+        } stream;
+        struct {
+            /* TODO: Add the demux callbacks */
+        } demux;
+    };
+};
 
 /**
  * stream_t definition
@@ -125,11 +166,19 @@ struct stream_t
     /**
      * Stream control.
      *
-     * Cannot be NULL.
+     * Legacy way of implementing callbacks.
+     * \ref vlc_stream_operations should be prefered.
      *
      * \see stream_query_e
      */
     int         (*pf_control)(stream_t *, int i_query, va_list);
+
+    /**
+     * Implementation of the Stream/Demux API.
+     *
+     * If NULL all operations will be redirected to \ref stream_t.pf_control.
+     */
+    const struct vlc_stream_operations *ops;
 
     /**
      * Private data pointer
@@ -325,12 +374,125 @@ VLC_API void vlc_stream_Delete(stream_t *s);
 
 VLC_API stream_t *vlc_stream_CommonNew(vlc_object_t *, void (*)(stream_t *));
 
+VLC_USED static inline bool vlc_stream_CanSeek(stream_t *s)
+{
+    bool can_seek = false;
+    vlc_stream_Control(s, STREAM_CAN_SEEK, &can_seek);
+    return can_seek;
+}
+
+VLC_USED static inline bool vlc_stream_CanFastSeek(stream_t *s)
+{
+    bool can_fast_seek = false;
+    vlc_stream_Control(s, STREAM_CAN_FASTSEEK, &can_fast_seek);
+    return can_fast_seek;
+}
+
+VLC_USED static inline bool vlc_stream_CanPause(stream_t *s)
+{
+    bool can_pause = false;
+    vlc_stream_Control(s, STREAM_CAN_PAUSE, &can_pause);
+    return can_pause;
+}
+
+VLC_USED static inline bool vlc_stream_CanPace(stream_t *s)
+{
+    bool can_control_pace = false;
+    vlc_stream_Control(s, STREAM_CAN_CONTROL_PACE, &can_control_pace);
+    return can_control_pace;
+}
+
+VLC_USED static inline int vlc_stream_GetPtsDelay(stream_t *s, vlc_tick_t *pts_delay)
+{
+    return vlc_stream_Control(s, STREAM_GET_PTS_DELAY, pts_delay);
+}
+
+VLC_USED static inline int vlc_stream_GetSeekpoint(stream_t *s, unsigned *seekpoint)
+{
+    return vlc_stream_Control(s, STREAM_GET_SEEKPOINT, seekpoint);
+}
+
+VLC_USED static inline int vlc_stream_GetSignal(stream_t *s, double *quality, double *strength)
+{
+    return vlc_stream_Control(s, STREAM_GET_SIGNAL, quality, strength);
+}
+
+VLC_USED static inline int vlc_stream_GetTitle(stream_t *s, unsigned *title)
+{
+    return vlc_stream_Control(s, STREAM_GET_TITLE, title);
+}
+
+VLC_USED static inline int vlc_stream_GetMeta(stream_t *s, vlc_meta_t *meta)
+{
+    return vlc_stream_Control(s, STREAM_GET_META, meta);
+}
+
+VLC_USED static inline int vlc_stream_GetType(stream_t *s, int *type)
+{
+    return vlc_stream_Control(s, STREAM_GET_TYPE, type);
+}
+
 /**
  * Get the size of the stream.
  */
-VLC_USED static inline int vlc_stream_GetSize( stream_t *s, uint64_t *size )
+VLC_USED static inline int vlc_stream_GetSize(stream_t *s, uint64_t *size)
 {
-    return vlc_stream_Control( s, STREAM_GET_SIZE, size );
+    return vlc_stream_Control(s, STREAM_GET_SIZE, size);
+}
+
+VLC_USED static inline int vlc_stream_GetTitleInfo(stream_t *s, input_title_t ***title_info, int *size)
+{
+    return vlc_stream_Control(s, STREAM_GET_TITLE_INFO, title_info, size);
+}
+
+VLC_USED static inline int vlc_stream_GetContentType(stream_t *s, char **content_type)
+{
+    return vlc_stream_Control(s, STREAM_GET_CONTENT_TYPE, content_type);
+}
+
+VLC_USED static inline int vlc_stream_GetTags(stream_t *s, const block_t **tags)
+{
+    return vlc_stream_Control(s, STREAM_GET_TAGS, tags);
+}
+
+VLC_USED static inline int vlc_stream_GetPrivateIdState(stream_t *s, int priv_id, bool *state)
+{
+    return vlc_stream_Control(s, STREAM_GET_PRIVATE_ID_STATE, priv_id, state);
+}
+
+VLC_USED static inline int vlc_stream_SetPauseState(stream_t *s, bool pause_state)
+{
+    return vlc_stream_Control(s, STREAM_SET_PAUSE_STATE, pause_state);
+}
+
+VLC_USED static inline int vlc_stream_SetSeekPoint(stream_t *s, int seekpoint)
+{
+    return vlc_stream_Control(s, STREAM_SET_SEEKPOINT, seekpoint);
+}
+
+VLC_USED static inline int vlc_stream_SetTitle(stream_t *s, int title)
+{
+    return vlc_stream_Control(s, STREAM_SET_TITLE, title);
+}
+
+VLC_USED static inline int vlc_stream_SetRecordState(stream_t *s, bool record_state, const char *dir_path, const char *ext)
+{
+    return vlc_stream_Control(s, STREAM_SET_RECORD_STATE, record_state, dir_path, ext);
+}
+
+VLC_USED static inline int vlc_stream_SetPrivateIdState(stream_t *s, int priv_id, bool state)
+{
+    return vlc_stream_Control(s, STREAM_SET_PRIVATE_ID_STATE, priv_id, state);
+}
+
+/**
+ * Set the private ID ca.
+ *
+ * The ca arg is of type `en50221_capmt_info_t`.
+ */
+VLC_USED static inline int vlc_stream_SetPrivateIdCa(stream_t *s, void *ca)
+{
+    return vlc_stream_Control(s, STREAM_SET_PRIVATE_ID_CA, ca);
 }
 
 static inline int64_t stream_Size( stream_t *s )
@@ -360,7 +522,7 @@ static inline bool stream_HasExtension( stream_t *s, const char *extension )
 static inline char *stream_ContentType( stream_t *s )
 {
     char *res;
-    if( vlc_stream_Control( s, STREAM_GET_CONTENT_TYPE, &res ) )
+    if (vlc_stream_GetContentType(s, &res))
         return NULL;
     return res;
 }

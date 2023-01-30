@@ -26,6 +26,7 @@
 #endif
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,6 +92,7 @@ stream_t *vlc_stream_CustomNew(vlc_object_t *parent,
     s->pf_seek = NULL;
     s->pf_control = NULL;
     s->p_sys = NULL;
+    s->ops = NULL;
     assert(destroy != NULL);
     priv->destroy = destroy;
     priv->block = NULL;
@@ -142,6 +144,9 @@ void vlc_stream_Delete(stream_t *s)
 {
     stream_priv_t *priv = stream_priv(s);
 
+    if (s->ops != NULL && s->ops->close != NULL) {
+        s->ops->close(s);
+    }
     priv->destroy(s);
     stream_CommonDelete(s);
 }
@@ -701,7 +706,18 @@ int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
         {
-            int ret = s->pf_control(s, cmd, args);
+            int ret;
+
+            if (s->ops != NULL && cmd == STREAM_SET_TITLE) {
+                int title = va_arg(args, int);
+                ret = s->ops->set_title(s, title);
+            } else if (s->ops != NULL && cmd == STREAM_SET_SEEKPOINT) {
+                int seekpoint = va_arg(args, int);
+                ret = s->ops->set_seek_point(s, seekpoint);
+            } else {
+                ret = s->pf_control(s, cmd, args);
+            }
+
             if (ret != VLC_SUCCESS)
                 return ret;
 
@@ -722,7 +738,154 @@ int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
             return VLC_SUCCESS;
         }
     }
-    return s->pf_control(s, cmd, args);
+
+    if (s->ops == NULL)
+        return s->pf_control(s, cmd, args);
+
+    switch (cmd) {
+        case STREAM_CAN_SEEK:
+        {
+            bool *can_seek = va_arg(args, bool *);
+            if (s->ops->can_seek != NULL) {
+                *can_seek = s->ops->can_seek(s);
+            } else {
+                *can_seek = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case STREAM_CAN_FASTSEEK:
+        {
+            bool *can_fastseek = va_arg(args, bool *);
+            if (s->ops->stream.can_fastseek != NULL) {
+                *can_fastseek = s->ops->stream.can_fastseek(s);
+            } else {
+                *can_fastseek = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case STREAM_CAN_PAUSE:
+        {
+            bool *can_pause = va_arg(args, bool *);
+            if (s->ops->can_pause != NULL) {
+                *can_pause = s->ops->can_pause(s);
+            } else {
+                *can_pause = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case STREAM_CAN_CONTROL_PACE:
+        {
+            bool *can_control_pace = va_arg(args, bool *);
+            if (s->ops->can_control_pace != NULL) {
+                *can_control_pace = s->ops->can_control_pace(s);
+            } else {
+                *can_control_pace = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case STREAM_GET_SIZE:
+            if (s->ops->stream.get_size != NULL) {
+                uint64_t *size = va_arg(args, uint64_t *);
+                return s->ops->stream.get_size(s, size);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_PTS_DELAY:
+            if (s->ops->get_pts_delay != NULL) {
+                vlc_tick_t *pts_delay = va_arg(args, vlc_tick_t *);
+                return s->ops->get_pts_delay(s, pts_delay);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_TITLE_INFO:
+            if (s->ops->stream.get_title_info != NULL) {
+                input_title_t ***title_info = va_arg(args, input_title_t ***);
+                int *unk = va_arg(args, int *);
+                return s->ops->stream.get_title_info(s, title_info, unk);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_TITLE:
+            if (s->ops->get_title != NULL) {
+                unsigned *title = va_arg(args, unsigned *);
+                return s->ops->get_title(s, title);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_SEEKPOINT:
+            if (s->ops->get_seekpoint != NULL) {
+                unsigned *seekpoint = va_arg(args, unsigned *);
+                return s->ops->get_seekpoint(s, seekpoint);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_META:
+            if (s->ops->get_meta != NULL) {
+                vlc_meta_t *meta = va_arg(args, vlc_meta_t *);
+                return s->ops->get_meta(s, meta);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_CONTENT_TYPE:
+            if (s->ops->stream.get_content_type != NULL) {
+                char **content_type = va_arg(args, char **);
+                return s->ops->stream.get_content_type(s, content_type);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_SIGNAL:
+            if (s->ops->get_signal != NULL) {
+                double *quality = va_arg(args, double *);
+                double *strength = va_arg(args, double *);
+                return s->ops->get_signal(s, quality, strength);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_TAGS:
+            if (s->ops->stream.get_tags != NULL) {
+                const block_t **block = va_arg(args, const block_t **);
+                return s->ops->stream.get_tags(s, block);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_TYPE:
+            if (s->ops->get_type != NULL) {
+                int *type = va_arg(args, int *);
+                return s->ops->get_type(s, type);
+            }
+            return VLC_EGENERIC;
+        case STREAM_GET_PRIVATE_ID_STATE:
+            if (s->ops->stream.get_private_id_state != NULL) {
+                int priv_data = va_arg(args, int);
+                bool *selected = va_arg(args, bool *);
+                return s->ops->stream.get_private_id_state(s, priv_data, selected);
+            }
+            return VLC_EGENERIC;
+        case STREAM_SET_PAUSE_STATE:
+            if (s->ops->set_pause_state != NULL) {
+                bool pause_state = (bool)va_arg(args, int);
+                return s->ops->set_pause_state(s, pause_state);
+            }
+            return VLC_EGENERIC;
+        case STREAM_SET_RECORD_STATE:
+            if (s->ops->stream.set_record_state != NULL) {
+                bool record_state = (bool)va_arg(args, int);
+                const char *dir_path = NULL;
+                const char *ext = NULL;
+                if (record_state) {
+                    dir_path = va_arg(args, const char *);
+                    ext = va_arg(args, const char *);
+                }
+                return s->ops->stream.set_record_state(s, record_state, dir_path, ext);
+            }
+            return VLC_EGENERIC;
+        case STREAM_SET_PRIVATE_ID_STATE:
+            if (s->ops->stream.set_private_id_state != NULL) {
+                int priv_data = va_arg(args, int);
+                bool selected = (bool)va_arg(args, int);
+                return s->ops->stream.set_private_id_state(s, priv_data, selected);
+            }
+            return VLC_EGENERIC;
+        case STREAM_SET_PRIVATE_ID_CA:
+            if (s->ops->stream.set_private_id_ca != NULL) {
+                void *payload = va_arg(args, void *);
+                return s->ops->stream.set_private_id_ca(s, payload);
+            }
+            return VLC_EGENERIC;
+        default:
+            vlc_assert_unreachable();
+    }
 }
 
 /**
