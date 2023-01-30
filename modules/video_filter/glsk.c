@@ -229,7 +229,13 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
 static void
 Close(struct vlc_gl_filter *filter) {
-    
+    glsk_filter_sys_t *sys = filter->sys;
+    const opengl_vtable_t *vt = &filter->api->vt;
+
+    vt->DeleteBuffers(1, &sys->vbo);
+    vt->DeleteProgram(sys->program_id);
+    vlc_gl_sampler_Delete(sys->sampler);
+    free(sys);
 }
 
 // static vlc_gl_filter_open_fn Open;
