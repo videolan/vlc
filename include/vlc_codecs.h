@@ -140,13 +140,6 @@ ATTR_PACKED
     uint32_t   biClrUsed;
     uint32_t   biClrImportant;
 } VLC_BITMAPINFOHEADER, *VLC_PBITMAPINFOHEADER, *VLC_LPBITMAPINFOHEADER;
-
-typedef struct
-ATTR_PACKED
-{
-    VLC_BITMAPINFOHEADER bmiHeader;
-    int                  bmiColors[1];
-} VLC_BITMAPINFO, *VLC_LPBITMAPINFO;
 #endif
 
 #ifndef _REFERENCE_TIME_
