@@ -543,6 +543,55 @@ if qt5_dep.found()
 
     qt_sources = files('qt.cpp')
 
+    # Qt plugins
+    qt_static_check = '''
+    #include <qconfig.h>
+    #ifndef QT_STATIC
+    #error Qt using shared libraries
+    #endif
+    '''
+    if cpp.compiles(qt_static_check, dependencies: qt5_dep, name: 'Qt5 compiled with static libraries')
+        qt_extra_deps += [
+            dependency('qtgraphicaleffectsplugin',  required: false),
+            dependency('qtquick2plugin ',           required: false),
+            dependency('qtquickcontrols2plugin',    required: false),
+            dependency('qtquicktemplates2plugin',   required: false),
+            dependency('qquicklayoutsplugin',       required: false),
+            dependency('windowplugin',              required: false),
+            dependency('qmlshapesplugin',           required: false),
+            dependency('qmlplugin',                 required: false),
+            dependency('modelsplugin',              required: false),
+            dependency('qsvg',                      required: false),
+            dependency('qsvgicon',                  required: false),
+            dependency('qtgraphicaleffectsprivate', required: false),
+            dependency('qjpeg',                     required: false),
+        ]
+
+        qt_extra_deps += [
+            dependency('qxcb-glx-integration',      required: false),
+            dependency('qxcb',                      required: false),
+        ]
+
+        qt_extra_deps += [
+            dependency('qwayland-generic',          required: false),
+            dependency('qwayland-egl',              required: false),
+            dependency('xdg-shell',                 required: false),
+        ]
+
+        if host_system == 'windows'
+            qt_extra_deps += [
+                dependency('qwindows',              required: false),
+                dependency('qwindowsvistastyle',    required: false),
+            ]
+        endif
+
+        if host_system == 'darwin'
+            qt_extra_deps += [
+                dependency('qcocoa',                required: false),
+            ]
+        endif
+    endif
+
     if host_system == 'windows'
         qt_extra_deps += [
             cc.find_library('comctl32'),
