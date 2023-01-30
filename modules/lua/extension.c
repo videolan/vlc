@@ -259,6 +259,15 @@ static int vlclua_extension_require( lua_State *L )
     return 0;
 }
 
+static char *
+GetStringFieldOrNull(lua_State *L, const char *name)
+{
+    lua_getfield(L, -1, name);
+    char *value = luaL_strdupornull(L, -1);
+    lua_pop(L, 1);
+    return value;
+}
+
 /**
  * Batch scan all Lua files in folder "extensions": callback
  * @param p_this This extensions_manager_t object
@@ -416,31 +425,12 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
             }
             lua_pop( L, 1 );
 
-            /* Get author */
-            lua_getfield( L, -1, "author" );
-            p_ext->psz_author = luaL_strdupornull( L, -1 );
-            lua_pop( L, 1 );
-
-            /* Get description */
-            lua_getfield( L, -1, "description" );
-            p_ext->psz_description = luaL_strdupornull( L, -1 );
-            lua_pop( L, 1 );
-
-            /* Get short description */
-            lua_getfield( L, -1, "shortdesc" );
-            p_ext->psz_shortdescription = luaL_strdupornull( L, -1 );
-            lua_pop( L, 1 );
-
-            /* Get URL */
-            lua_getfield( L, -1, "url" );
-            p_ext->psz_url = luaL_strdupornull( L, -1 );
-            lua_pop( L, 1 );
-
-            /* Get version */
-            lua_getfield( L, -1, "version" );
-            p_ext->psz_version = luaL_strdupornull( L, -1 );
-            lua_pop( L, 1 );
-
+            /* Get the fields from the extension manifest. */
+            p_ext->psz_author = GetStringFieldOrNull(L, "author");
+            p_ext->psz_description = GetStringFieldOrNull(L, "description");
+            p_ext->psz_shortdescription = GetStringFieldOrNull(L, "shortdesc");
+            p_ext->psz_url = GetStringFieldOrNull(L, "url");
+            p_ext->psz_version = GetStringFieldOrNull(L, "version");
             /* Get icon data */
             lua_getfield( L, -1, "icon" );
             if( !lua_isnil( L, -1 ) && lua_isstring( L, -1 ) )
