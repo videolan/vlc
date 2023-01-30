@@ -142,25 +142,6 @@ ATTR_PACKED
 } VLC_BITMAPINFOHEADER, *VLC_PBITMAPINFOHEADER, *VLC_LPBITMAPINFOHEADER;
 #endif
 
-#ifndef _REFERENCE_TIME_
-#define _REFERENCE_TIME_
-typedef int64_t REFERENCE_TIME;
-#endif
-
-#ifndef _VIDEOINFOHEADER_
-#define _VIDEOINFOHEADER_
-typedef struct
-ATTR_PACKED
-{
-    RECT32                  rcSource;
-    RECT32                  rcTarget;
-    uint32_t                dwBitRate;
-    uint32_t                dwBitErrorRate;
-    REFERENCE_TIME          AvgTimePerFrame;
-    VLC_BITMAPINFOHEADER    bmiHeader;
-} VIDEOINFOHEADER;
-#endif
-
 #if defined(__SUNPRO_C) || defined(_MSC_VER)
 #   pragma pack()
 #elif defined(__APPLE__) && !defined(HAVE_ATTRIBUTE_PACKED)

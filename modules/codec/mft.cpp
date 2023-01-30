@@ -47,7 +47,6 @@ extern "C" {
 #include <codecapi.h>
 
 
-#define _VIDEOINFOHEADER_
 #include <vlc_codecs.h>
 
 #include <algorithm>
