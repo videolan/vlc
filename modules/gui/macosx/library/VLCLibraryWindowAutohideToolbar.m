@@ -45,6 +45,7 @@
                                selector:@selector(shouldShowToolbar:)
                                    name:VLCVideoWindowShouldShowFullscreenController
                                  object:nil];
+        _autohide = NO;
     }
     return self;
 }
@@ -56,6 +57,7 @@
                            selector:@selector(shouldShowToolbar:)
                                name:VLCVideoWindowShouldShowFullscreenController
                              object:nil];
+    _autohide = NO;
 }
 
 - (void)stopAutohideTimer
