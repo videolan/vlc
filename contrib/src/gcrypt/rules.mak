@@ -1,6 +1,6 @@
 # GCRYPT
 GCRYPT_VERSION := 1.10.1
-GCRYPT_URL := http://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
+GCRYPT_URL := https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 PKGS += gcrypt
 ifeq ($(call need_pkg,"libgcrypt"),)
