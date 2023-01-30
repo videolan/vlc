@@ -46,8 +46,11 @@ typedef GUID vlc_guid_t;
 
 #ifdef HAVE_ATTRIBUTE_PACKED
 #   define ATTR_PACKED __attribute__((__packed__))
-#elif defined(__SUNPRO_C) || defined(_MSC_VER)
+#elif defined(__SUNPRO_C)
 #   pragma pack(1)
+#   define ATTR_PACKED
+#elif defined(_MSC_VER)
+#   include <pshpack1.h>
 #   define ATTR_PACKED
 #elif defined(__APPLE__)
 #   pragma pack(push, 1)
@@ -142,8 +145,10 @@ ATTR_PACKED
 } VLC_BITMAPINFOHEADER, *VLC_PBITMAPINFOHEADER, *VLC_LPBITMAPINFOHEADER;
 #endif
 
-#if defined(__SUNPRO_C) || defined(_MSC_VER)
+#if defined(__SUNPRO_C)
 #   pragma pack()
+#elif defined(_MSC_VER)
+#   include <poppack.h>
 #elif defined(__APPLE__) && !defined(HAVE_ATTRIBUTE_PACKED)
 #   pragma pack(pop)
 #endif
