@@ -499,7 +499,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     unsigned i_h = p_enc->fmt_in.video.i_visible_height;
 
     /* Create and initialize the vpx_image */
-    if (!vpx_img_wrap(&img, VPX_IMG_FMT_I420, i_w, i_h, 32, p_pict->p[0].p_pixels)) {
+    if (!vpx_img_wrap(&img, VPX_IMG_FMT_I420, i_w, i_h, p_pict->p[0].i_pitch, p_pict->p[0].p_pixels)) {
         VPX_ERR(p_enc, ctx, "Failed to wrap image");
         picture_Release(p_pict);
         return NULL;
