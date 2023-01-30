@@ -100,6 +100,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryUIUnits.m \
 	gui/macosx/library/VLCLibraryWindow.h \
 	gui/macosx/library/VLCLibraryWindow.m \
+	gui/macosx/library/VLCLibraryWindowAutohideToolbar.h \
+	gui/macosx/library/VLCLibraryWindowAutohideToolbar.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
 	gui/macosx/library/VLCLibraryWindowController.m \
 	gui/macosx/library/video-library/VLCLibraryVideoViewController.h \
