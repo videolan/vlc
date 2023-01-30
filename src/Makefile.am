@@ -43,6 +43,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_configuration.h \
 	../include/vlc_cpu.h \
 	../include/vlc_cxx_helpers.hpp \
+	../include/vlc_clock.h \
 	../include/vlc_decoder.h \
 	../include/vlc_demux.h \
 	../include/vlc_dialog.h \
