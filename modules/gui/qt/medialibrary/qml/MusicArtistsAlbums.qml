@@ -147,9 +147,9 @@ FocusScope {
             height: parent.height
             width: VLCStyle.isScreenSmall
                    ? 0
-                   : Helpers.clamp(root.width / resizeHandle.widthFactor,
-                                   VLCStyle.colWidth(1) + VLCStyle.column_spacing,
-                                   root.width * .5)
+                   : Math.round(Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                              VLCStyle.colWidth(1) + VLCStyle.column_spacing,
+                                              root.width * .5))
 
             visible: !VLCStyle.isScreenSmall && (artistModel.count > 0)
             focus: !VLCStyle.isScreenSmall && (artistModel.count > 0)
