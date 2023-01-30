@@ -24,6 +24,8 @@
 
 #import "main/VLCMain.h"
 
+#import "windows/video/VLCVideoWindowCommon.h"
+
 #import <vlc_common.h>
 
 @interface VLCLibraryWindowAutohideToolbar()
@@ -33,6 +35,28 @@
 @end
 
 @implementation VLCLibraryWindowAutohideToolbar
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(shouldShowToolbar:)
+                                   name:VLCVideoWindowShouldShowFullscreenController
+                                 object:nil];
+    }
+    return self;
+}
+
+- (void)awakeFromNib
+{
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(shouldShowToolbar:)
+                               name:VLCVideoWindowShouldShowFullscreenController
+                             object:nil];
+}
 
 - (void)stopAutohideTimer
 {
@@ -73,9 +97,13 @@
     if (autohide) {
         [self startAutohideTimer];
     } else {
-        [self stopAutohideTimer];
-        self.visible = YES;
+        [self displayToolbar];
     }
+}
+
+- (void)shouldShowToolbar:(NSNotification *)aNotification
+{
+    [self displayToolbar];
 }
 
 - (void)displayToolbar
