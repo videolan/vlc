@@ -149,15 +149,6 @@ ATTR_PACKED
 } VLC_BITMAPINFO, *VLC_LPBITMAPINFO;
 #endif
 
-#ifndef _RECT32_
-#define _RECT32_
-typedef struct
-ATTR_PACKED
-{
-    int left, top, right, bottom;
-} RECT32;
-#endif
-
 #ifndef _REFERENCE_TIME_
 #define _REFERENCE_TIME_
 typedef int64_t REFERENCE_TIME;
