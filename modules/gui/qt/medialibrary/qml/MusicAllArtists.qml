@@ -252,7 +252,7 @@ FocusScope {
 
     EmptyLabelButton {
         anchors.fill: parent
-        visible: artistModel.hasContent && artistModel.count === 0
+        visible: !artistModel.hasContent
         focus: visible
         text: I18n.qtr("No artists found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
