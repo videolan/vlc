@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL autohide;
 
+- (void)displayToolbar;
+
 @end
 
 NS_ASSUME_NONNULL_END

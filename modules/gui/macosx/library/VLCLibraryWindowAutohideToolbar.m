@@ -78,4 +78,19 @@
     }
 }
 
+- (void)displayToolbar
+{
+    [self stopAutohideTimer];
+
+    if (self.visible && !_autohide) {
+        return;
+    }
+
+    self.visible = YES;
+
+    if (_autohide) {
+        [self startAutohideTimer];
+    }
+}
+
 @end
