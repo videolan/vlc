@@ -31,8 +31,6 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property int rightPadding: 0
-
     property var artist: ({})
 
     //the index to "go to" when the view is loaded
@@ -50,6 +48,8 @@ FocusScope {
            return headerItem.albumsListView.currentIndex
     }
 
+    property alias rightPadding: view.rightPadding
+
     property alias _currentView: view.currentItem
 
     property Component header: FocusScope {
@@ -60,7 +60,7 @@ FocusScope {
 
         focus: true
         height: col.height
-        width: root.width - root.rightPadding
+        width: root.width
 
         function setCurrentItemFocus(reason) {
             if (albumsListView)
@@ -81,6 +81,9 @@ FocusScope {
 
                 focus: true
                 width: headerFs.width
+
+                rightPadding: root.rightPadding
+
                 artist: root.artist
                 Navigation.parentItem: root
                 Navigation.downAction: function() {
@@ -100,7 +103,7 @@ FocusScope {
                 sourceComponent: Column {
                     property alias albumsListView: albumsList
 
-                    width: root.width
+                    width: albumsList.width
                     height: implicitHeight
 
                     Widgets.SubtitleLabel {
@@ -116,8 +119,10 @@ FocusScope {
                         id: albumsList
 
                         focus: true
+
                         height: VLCStyle.gridItem_music_height + VLCStyle.margin_normal
-                        width: root.width
+                        width: root.width - root.rightPadding
+
                         leftMargin: VLCStyle.margin_xlarge
                         topMargin: VLCStyle.margin_xsmall
                         bottomMargin: VLCStyle.margin_xsmall
@@ -473,8 +478,6 @@ FocusScope {
         id: view
 
         anchors.fill: parent
-
-        rightPadding: root.rightPadding
 
         focus: albumModel.count !== 0
         initialItem: MainCtx.gridView ? gridComponent : tableComponent
