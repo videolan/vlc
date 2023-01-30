@@ -22,6 +22,44 @@
 
 #import "VLCLibraryWindowAutohideToolbar.h"
 
+#import "main/VLCMain.h"
+
+#import <vlc_common.h>
+
+@interface VLCLibraryWindowAutohideToolbar()
+{
+    NSTimer *_hideToolbarTimer;
+}
+@end
+
 @implementation VLCLibraryWindowAutohideToolbar
+
+- (void)stopAutohideTimer
+{
+    [_hideToolbarTimer invalidate];
+}
+
+- (void)startAutohideTimer
+{
+    /* Do nothing if timer is already in place */
+    if (_hideToolbarTimer.valid) {
+        return;
+    }
+
+    /* Get timeout and make sure it is not lower than 1 second */
+    long long timeToKeepVisibleInSec = MAX(var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000, 1);
+
+    _hideToolbarTimer = [NSTimer scheduledTimerWithTimeInterval:timeToKeepVisibleInSec
+                                                         target:self
+                                                       selector:@selector(hideToolbar:)
+                                                       userInfo:nil
+                                                        repeats:NO];
+}
+
+- (void)hideToolbar:(id)sender
+{
+    [self stopAutohideTimer];
+    self.visible = NO;
+}
 
 @end
