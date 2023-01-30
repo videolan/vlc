@@ -36,9 +36,9 @@
 #include <vlc_codec.h>
 #include <vlc_codecs.h>
 
-#ifdef _WIN32
-#   include <objbase.h>
-#endif
+#include <objbase.h>
+#include <strmif.h>
+#include <amvideo.h>
 
 #include <vlc_codecs.h>
 #include "dmo.h"
@@ -353,7 +353,7 @@ static int DecOpen( decoder_t *p_dec )
     }
     else
     {
-        VLC_BITMAPINFOHEADER *p_bih;
+        BITMAPINFOHEADER *p_bih;
 
         int i_size = sizeof(VIDEOINFOHEADER) + p_dec->fmt_in->i_extra;
         p_vih = malloc( i_size );
@@ -369,8 +369,7 @@ static int DecOpen( decoder_t *p_dec )
         p_bih->biHeight = p_dec->fmt_in->video.i_height;
         p_bih->biBitCount = p_dec->fmt_in->video.i_bits_per_pixel;
         p_bih->biPlanes = 1;
-        p_bih->biSize = i_size - sizeof(VIDEOINFOHEADER) +
-            sizeof(VLC_BITMAPINFOHEADER);
+        p_bih->biSize = i_size - sizeof(VIDEOINFOHEADER) + sizeof(*p_bih);
 
         p_vih->rcSource.left = p_vih->rcSource.top = 0;
         p_vih->rcSource.right = p_dec->fmt_in->video.i_width;
@@ -432,7 +431,7 @@ static int DecOpen( decoder_t *p_dec )
     }
     else
     {
-        VLC_BITMAPINFOHEADER *p_bih;
+        BITMAPINFOHEADER *p_bih;
         DMO_MEDIA_TYPE mt;
         unsigned i_chroma = VLC_CODEC_YUYV;
         int i_bpp = 16;
@@ -486,7 +485,7 @@ static int DecOpen( decoder_t *p_dec )
             (p_dec->fmt_in->video.i_bits_per_pixel + 7) / 8;
 
         p_bih->biPlanes = 1; /* http://msdn.microsoft.com/en-us/library/dd183376%28v=vs.85%29.aspx */
-        p_bih->biSize = sizeof(VLC_BITMAPINFOHEADER);
+        p_bih->biSize = sizeof(*p_bih);
 
         dmo_output_type.majortype = MEDIATYPE_Video;
         dmo_output_type.formattype = FORMAT_VideoInfo;
@@ -1062,7 +1061,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     int i, i_selected, i_err;
     DMO_MEDIA_TYPE dmo_type;
     VIDEOINFOHEADER vih, *p_vih;
-    VLC_BITMAPINFOHEADER *p_bih;
+    BITMAPINFOHEADER *p_bih;
 
     /* FIXME */
     p_enc->fmt_in.video.i_bits_per_pixel =
@@ -1096,7 +1095,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     p_bih->biSizeImage = p_enc->fmt_in.video.i_visible_width *
         p_enc->fmt_in.video.i_visible_height * p_enc->fmt_in.video.i_bits_per_pixel /8;
     p_bih->biPlanes = 3;
-    p_bih->biSize = sizeof(VLC_BITMAPINFOHEADER);
+    p_bih->biSize = sizeof(*p_bih);
 
     vih.rcSource.left = vih.rcSource.top = 0;
     vih.rcSource.right = p_enc->fmt_in.video.i_visible_width;
