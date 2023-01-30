@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowAutohideToolbar : NSToolbar
 
+@property (readwrite, nonatomic) BOOL autohide;
+
 @end
 
 NS_ASSUME_NONNULL_END

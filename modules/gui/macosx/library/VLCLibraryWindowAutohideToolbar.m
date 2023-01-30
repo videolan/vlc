@@ -62,4 +62,20 @@
     self.visible = NO;
 }
 
+- (void)setAutohide:(BOOL)autohide
+{
+    if (_autohide == autohide) {
+        return;
+    }
+
+    _autohide = autohide;
+
+    if (autohide) {
+        [self startAutohideTimer];
+    } else {
+        [self stopAutohideTimer];
+        self.visible = YES;
+    }
+}
+
 @end
