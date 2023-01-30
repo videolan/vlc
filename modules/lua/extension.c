@@ -379,7 +379,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                     const char *psz_cap = luaL_checkstring( L, -1 );
                     bool found = false;
                     /* Find this capability's flag */
-                    for( size_t i = 0; i < sizeof(caps)/sizeof(caps[0]); i++ )
+                    for( size_t i = 0; i < ARRAY_SIZE(caps); i++ )
                     {
                         if( !strcmp( caps[i], psz_cap ) )
                         {
