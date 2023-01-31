@@ -56,7 +56,6 @@ extern const CGFloat VLCLibraryWindowMinimalHeight;
 extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
 @property (readwrite, strong) IBOutlet NSView *playlistView;
@@ -108,11 +107,18 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *playlistCounterTextField;
 @property (readwrite, weak) IBOutlet NSButton *librarySortButton;
 @property (readwrite, weak) IBOutlet NSSearchField *librarySearchField;
-@property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
 @property (readwrite, weak) IBOutlet NSButton *playQueueToggle;
 @property (readwrite, weak) IBOutlet NSButton *backwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
+@property (readwrite, weak) IBOutlet NSToolbarItem *backwardsToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *forwardsToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *libraryViewModeToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *sortOrderToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *flexibleSpaceToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *segmentedTitleControlToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *togglePlaylistToolbarItem;
 
 @property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
 @property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
