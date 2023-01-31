@@ -174,29 +174,25 @@ FocusScope {
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(artistTable.availableRowWidth)
 
-            anchors.fill: parent
-            selectionDelegateModel: selectionModel
-            model: artistModel
-            focus: true
-            headerColor: VLCStyle.colors.bg
-            dragItem: artistsDragItem
-            rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: VLCStyle.margin_normal
+            property var _modelSmall: [{
+                size: Math.max(2, artistTable._nbCols),
 
-            Navigation.parentItem: root
-            Navigation.cancelAction: root._onNavigationCancel
+                model: ({
+                    criteria: "name",
 
-            onActionForSelection: {
-                if (selection.length > 1) {
-                    MediaLib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
-                } else if ( selection.length === 1) {
-                    requestArtistAlbumView(Qt.TabFocusReason)
-                    MediaLib.addAndPlay( artistModel.getIdForIndex( selection[0] ) )
-                }
-            }
+                    subCriterias: [ "nb_tracks" ],
 
-            sortModel: [{
-                size: Math.max(artistTable._nbCols - 1, 1),
+                    text: I18n.qtr("Name"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate,
+
+                    placeHolder: VLCStyle.noArtArtistSmall
+                })
+            }]
+
+            property var _modelMedium: [{
+                size: Math.max(1, artistTable._nbCols - 1),
 
                 model: {
                     criteria: "name",
@@ -218,6 +214,30 @@ FocusScope {
                 }
             }]
 
+            anchors.fill: parent
+            selectionDelegateModel: selectionModel
+            model: artistModel
+            focus: true
+            headerColor: VLCStyle.colors.bg
+            dragItem: artistsDragItem
+            rowHeight: VLCStyle.tableCoverRow_height
+            headerTopPadding: VLCStyle.margin_normal
+
+            Navigation.parentItem: root
+            Navigation.cancelAction: root._onNavigationCancel
+
+            onActionForSelection: {
+                if (selection.length > 1) {
+                    MediaLib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
+                } else if ( selection.length === 1) {
+                    requestArtistAlbumView(Qt.TabFocusReason)
+                    MediaLib.addAndPlay( artistModel.getIdForIndex( selection[0] ) )
+                }
+            }
+
+            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                  : _modelMedium
+
             onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
@@ -225,6 +245,8 @@ FocusScope {
 
             Widgets.TableColumns {
                 id: tableColumns
+
+                showCriterias: (artistTable.sortModel === artistTable._modelSmall)
             }
         }
     }
