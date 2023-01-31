@@ -25,23 +25,24 @@
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_decoder.h>
-#include <vlc_sout.h>
+
 #include <vlc_block.h>
+#include <vlc_decoder.h>
+#include <vlc_plugin.h>
+#include <vlc_sout.h>
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define AUDIO_TEXT N_("Enable audio")
+#define AUDIO_TEXT N_( "Enable audio" )
 #define AUDIO_LONGTEXT N_( "Enable/disable audio rendering." )
-#define VIDEO_TEXT N_("Enable video")
+#define VIDEO_TEXT N_( "Enable video" )
 #define VIDEO_LONGTEXT N_( "Enable/disable video rendering." )
-#define DELAY_TEXT N_("Delay (ms)")
+#define DELAY_TEXT N_( "Delay (ms)" )
 #define DELAY_LONGTEXT N_( "Introduces a delay in the display of the stream." )
 
 static int  Open ( vlc_object_t * );
@@ -49,8 +50,8 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-display-"
 
-vlc_module_begin ()
-    set_shortname( N_("Display"))
+vlc_module_begin()
+    set_shortname( N_("Display") )
     set_description( N_("Display stream output") )
     set_capability( "sout output", 50 )
     add_shortcut( "display" )
@@ -63,7 +64,7 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "delay", 100, DELAY_TEXT,
                  DELAY_LONGTEXT )
     set_callbacks( Open, Close )
-vlc_module_end ()
+vlc_module_end()
 
 
 /*****************************************************************************
@@ -75,10 +76,10 @@ static const char *const ppsz_sout_options[] = {
 
 typedef struct
 {
-    bool     b_audio;
-    bool     b_video;
+    bool b_audio;
+    bool b_video;
 
-    vlc_tick_t     i_delay;
+    vlc_tick_t i_delay;
     input_resource_t *p_resource;
 } sout_stream_sys_t;
 
@@ -86,8 +87,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if( ( p_fmt->i_cat == AUDIO_ES && !p_sys->b_audio )||
-        ( p_fmt->i_cat == VIDEO_ES && !p_sys->b_video ) )
+    if( (p_fmt->i_cat == AUDIO_ES && !p_sys->b_audio) ||
+        (p_fmt->i_cat == VIDEO_ES && !p_sys->b_video) )
     {
         return NULL;
     }
@@ -142,17 +143,17 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 
 static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 {
-    switch (i_query)
+    switch( i_query )
     {
         case SOUT_STREAM_ID_SPU_HIGHLIGHT:
         {
-            vlc_input_decoder_t *p_dec = va_arg(args, void *);
-            void *spu_hl = va_arg(args, void *);
+            vlc_input_decoder_t *p_dec = va_arg( args, void * );
+            void *spu_hl = va_arg( args, void * );
             return vlc_input_decoder_SetSpuHighlight( p_dec, spu_hl );
         }
 
         case SOUT_STREAM_IS_SYNCHRONOUS:
-            *va_arg(args, bool *) = true;
+            *va_arg( args, bool * ) = true;
             break;
 
         default:
@@ -171,10 +172,10 @@ static const struct sout_stream_operations ops = {
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
 
-    p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    p_sys = malloc( sizeof(sout_stream_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
@@ -186,14 +187,15 @@ static int Open( vlc_object_t *p_this )
     }
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
-                   p_stream->p_cfg );
+                       p_stream->p_cfg );
 
-    p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX"audio" );
+    p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX "audio" );
     p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
-    p_sys->i_delay = VLC_TICK_FROM_MS( var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ) );
+    p_sys->i_delay =
+        VLC_TICK_FROM_MS( var_GetInteger(p_stream, SOUT_CFG_PREFIX "delay") );
 
     p_stream->ops = &ops;
-    p_stream->p_sys     = p_sys;
+    p_stream->p_sys = p_sys;
     return VLC_SUCCESS;
 }
 
@@ -202,7 +204,7 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     input_resource_Release( p_sys->p_resource );
