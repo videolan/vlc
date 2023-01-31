@@ -218,18 +218,24 @@ FocusScope {
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
-            model: albumModelId
-            selectionDelegateModel: selectionModel
-            headerColor: VLCStyle.colors.bg
-            onActionForSelection: _actionAtIndex(selection[0]);
-            Navigation.parentItem: root
-            section.property: "title_first_symbol"
-            header: root.header
-            dragItem: albumDragItem
-            rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: VLCStyle.margin_normal
+            property var _modelSmall: [{
+                size: Math.max(2, tableView_id._nbCols),
 
-            sortModel: [{
+                model: ({
+                    criteria: "title",
+
+                    subCriterias: [ "main_artist", "duration" ],
+
+                    text: I18n.qtr("Title"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate,
+
+                    placeHolder: VLCStyle.noArtAlbumCover
+                })
+            }]
+
+            property var _modelMedium: [{
                 size: 2,
 
                 model: {
@@ -243,7 +249,7 @@ FocusScope {
                     placeHolder: VLCStyle.noArtAlbumCover
                 }
             }, {
-                size: Math.max(tableView_id._nbCols - 3, 1),
+                size: Math.max(1, tableView_id._nbCols - 3),
 
                 model: {
                     criteria: "main_artist",
@@ -263,6 +269,20 @@ FocusScope {
                 }
             }]
 
+            model: albumModelId
+            selectionDelegateModel: selectionModel
+            headerColor: VLCStyle.colors.bg
+            onActionForSelection: _actionAtIndex(selection[0]);
+            Navigation.parentItem: root
+            section.property: "title_first_symbol"
+            header: root.header
+            dragItem: albumDragItem
+            rowHeight: VLCStyle.tableCoverRow_height
+            headerTopPadding: VLCStyle.margin_normal
+
+            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                  : _modelMedium
+
             Navigation.cancelAction: root._onNavigationCancel
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
@@ -271,6 +291,8 @@ FocusScope {
 
             Widgets.TableColumns {
                 id: tableColumns
+
+                showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
             }
 
             Connections {
