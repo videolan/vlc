@@ -479,7 +479,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
 
-    switch (_segmentedTitleControl.selectedSegment) {
+    VLCLibrarySegment selectedLibrarySegment = _segmentedTitleControl.selectedSegment;
+    switch (selectedLibrarySegment) {
         case VLCLibraryVideoSegment:
             [self showVideoLibrary];
             break;
@@ -487,10 +488,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
             [self showAudioLibrary];
             break;
         case VLCLibraryBrowseSegment:
-            [_libraryMediaSourceViewController presentBrowseView];
-            break;
         case VLCLibraryStreamsSegment:
-            [_libraryMediaSourceViewController presentStreamsView];
+            [self showMediaSourceLibraryWithSegment:selectedLibrarySegment];
             break;
         default:
             break;
@@ -534,6 +533,23 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 
     [_libraryAudioViewController presentAudioView];
+}
+
+- (void)showMediaSourceLibraryWithSegment:(VLCLibrarySegment)segment
+{
+    NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
+
+    _optionBarView.hidden = YES;
+    _librarySortButton.hidden = YES;
+    _librarySearchField.enabled = NO;
+    _librarySearchField.stringValue = @"";
+    [VLCMain.sharedInstance.libraryController filterByString:@""];
+
+    if (segment == VLCLibraryBrowseSegment) {
+        [_libraryMediaSourceViewController presentBrowseView];
+    } else if (segment == VLCLibraryStreamsSegment) {
+        [_libraryMediaSourceViewController presentStreamsView];
+    }
 }
 
 - (IBAction)playlistDoubleClickAction:(id)sender

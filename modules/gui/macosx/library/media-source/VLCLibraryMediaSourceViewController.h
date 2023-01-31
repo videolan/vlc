@@ -38,9 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSButton *homeButton;
 @property (readonly) NSPathControl *pathControl;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
-@property (readonly) NSButton *librarySortButton;
-@property (readonly) NSSearchField *librarySearchField;
-@property (readonly) NSVisualEffectView *optionBarView;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
 

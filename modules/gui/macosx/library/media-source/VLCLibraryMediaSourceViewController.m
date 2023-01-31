@@ -55,10 +55,6 @@
     _homeButton = libraryWindow.mediaSourceHomeButton;
     _pathControl = libraryWindow.mediaSourcePathControl;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
-    _optionBarView = libraryWindow.optionBarView;
-    _librarySortButton = libraryWindow.librarySortButton;
-    _librarySearchField = libraryWindow.librarySearchField;
-
 }
 
 - (void)setupBaseDataSource
@@ -101,13 +97,6 @@
     }
 
     _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegment ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
-
-    _librarySortButton.hidden = YES;
-    _librarySearchField.enabled = NO;
-    _librarySearchField.stringValue = @"";
-    [VLCMain.sharedInstance.libraryController filterByString:@""];
-    _optionBarView.hidden = YES;
-
     [_baseDataSource reloadViews];
 }
 
