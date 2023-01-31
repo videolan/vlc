@@ -124,6 +124,10 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         free( id );
         return NULL;
     }
+
+    if( p_sys->i_delay != VLC_TICK_INVALID )
+        vlc_input_decoder_ChangeDelay( id->dec, p_sys->i_delay );
+
     return id;
 }
 
@@ -161,19 +165,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
         p_buffer->p_next = NULL;
 
         if( id != NULL && p_buffer->i_buffer > 0 )
-        {
-            if( p_buffer->i_dts == VLC_TICK_INVALID )
-                p_buffer->i_dts = 0;
-            else
-                p_buffer->i_dts += p_sys->i_delay;
-
-            if( p_buffer->i_pts == VLC_TICK_INVALID )
-                p_buffer->i_pts = 0;
-            else
-                p_buffer->i_pts += p_sys->i_delay;
-
             vlc_input_decoder_Decode( id_sys->dec, p_buffer, false );
-        }
 
         p_buffer = p_next;
     }
