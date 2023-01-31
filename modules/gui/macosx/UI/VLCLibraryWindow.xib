@@ -642,10 +642,6 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="hs0-cc-34q"/>
-                    <toolbarItem implicitItemIdentifier="FCCB897D-45D4-411A-91BF-302620882C8C" label="smallCone" paletteLabel="Toolbar Cone" tag="-1" image="VLC" navigational="YES" id="L28-Xw-ydE">
-                        <size key="minSize" width="512" height="512"/>
-                        <size key="maxSize" width="512" height="512"/>
-                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="85037E27-D263-490C-B4B2-0EFE5B5837AA" label="Library View Type" paletteLabel="Library View Type" sizingBehavior="auto" id="kBa-MC-Mdq">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="lIg-5J-C5F">
@@ -705,7 +701,6 @@
                     </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
-                    <toolbarItem reference="L28-Xw-ydE"/>
                     <toolbarItem reference="6Ie-eu-GDn"/>
                     <toolbarItem reference="g2e-7o-Qet"/>
                     <toolbarItem reference="kBa-MC-Mdq"/>
