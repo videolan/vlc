@@ -40,6 +40,7 @@
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindowAutohideToolbar.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
@@ -183,10 +184,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [notificationCenter addObserver:self
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(videoDisplayToolbar:)
-                               name:VLCVideoWindowShouldShowFullscreenController
                              object:nil];
 
     if (@available(macOS 10.14, *)) {
@@ -695,47 +692,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _windowFrameBeforePlayback = [self frame];
 }
 
-- (void)startToolbarAutohideTimer
-{
-    /* Do nothing if timer is already in place */
-    if (_hideToolbarTimer.valid) {
-        return;
-    }
-
-    /* Get timeout and make sure it is not lower than 1 second */
-    long long timeToKeepVisibleInSec = MAX(var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000, 1);
-
-    _hideToolbarTimer = [NSTimer scheduledTimerWithTimeInterval:timeToKeepVisibleInSec
-                                                         target:self
-                                                       selector:@selector(videoHideToolbar:)
-                                                       userInfo:nil
-                                                        repeats:NO];
-}
-
-- (void)stopAutohideTimer
-{
-    [_hideToolbarTimer invalidate];
-}
-
-- (void)videoHideToolbar:(id)sender
-{
-    if (self.hasActiveVideo && !self.videoView.hidden) {
-        [self stopAutohideTimer];
-        self.toolbar.visible = NO;
-    }
-}
-
-- (void)videoDisplayToolbar:(id)sender
-{
-    [self stopAutohideTimer];
-
-    if (self.hasActiveVideo && !self.videoView.hidden) {
-        [self startToolbarAutohideTimer];
-    }
-
-    self.toolbar.visible = YES;
-}
-
 - (void)setHasActiveVideo:(BOOL)hasActiveVideo
 {
     [super setHasActiveVideo:hasActiveVideo];
@@ -811,7 +767,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_fspanel shouldBecomeActive:nil];
     }
 
-    [self startToolbarAutohideTimer];
+    [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:YES];
 }
 
 - (void)disableVideoPlaybackAppearance
@@ -858,7 +814,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_fspanel shouldBecomeInactive:nil];
     }
 
-    [self videoDisplayToolbar:self];
+    [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:NO];
 }
 
 #pragma mark -
