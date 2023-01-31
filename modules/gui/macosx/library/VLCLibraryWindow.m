@@ -513,6 +513,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showVideoLibrary
 {
+    _backwardsNavigationButton.hidden = YES;
+    _forwardsNavigationButton.hidden = YES;
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = YES;
@@ -525,6 +527,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showAudioLibrary
 {
+    _backwardsNavigationButton.hidden = YES;
+    _forwardsNavigationButton.hidden = YES;
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = NO;
@@ -540,6 +544,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
 
     _optionBarView.hidden = YES;
+    _backwardsNavigationButton.hidden = NO;
+    _forwardsNavigationButton.hidden = NO;
     _librarySortButton.hidden = YES;
     _librarySearchField.enabled = NO;
     _librarySearchField.stringValue = @"";
