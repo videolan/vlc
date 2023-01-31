@@ -135,6 +135,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         self.tabbingMode = NSWindowTabbingModeDisallowed;
     }
 
+    self.toolbar.allowsUserCustomization = NO;
+    
     VLCMain *mainInstance = [VLCMain sharedInstance];
     _playlistController = [mainInstance playlistController];
 
