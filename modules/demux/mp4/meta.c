@@ -406,6 +406,20 @@ static void iTUNTripletCallback( const char *psz_key,
         }
         free( psz_val );
     }
+    else if( !strcmp(psz_key, "Encoding Params"))
+    {
+        struct qt_itunes_triplet_data data = {.type = iTunEncodingParams,
+                                               .EncodingParams = { 0 } };
+        for( size_t i=0; i<p_data->i_blob; i += 8 )
+        {
+            const char *id = (const char*) &p_data->p_blob[i];
+            if( !strncmp(id, "brat", 4) )
+                data.EncodingParams.target_bitrate = GetDWBE(&p_data->p_blob[i+4]);
+            else if( !strncmp(id, "vbrq", 4) )
+                data.EncodingParams.target_quality = GetDWBE(&p_data->p_blob[i+4]);
+        }
+        ctx->ituncb( &data, ctx->priv );
+    }
 }
 
 static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box, void *priv )

@@ -26,6 +26,7 @@ struct qt_itunes_triplet_data
     {
         iTunSMPB,
         iTunNORM,
+        iTunEncodingParams,
     } type;
     union
     {
@@ -40,6 +41,11 @@ struct qt_itunes_triplet_data
             float volume_adjust;
             float peak;
         } NORM;
+        struct
+        {
+            uint32_t target_bitrate;
+            uint32_t target_quality;
+        } EncodingParams;
     };
 };
 

@@ -145,6 +145,7 @@ typedef struct
         uint32_t i_delay_samples;
         float f_replay_gain_norm;
         float f_replay_gain_peak;
+        uint32_t i_target_bitrate;
     } qt;
 
     /* ASF in MP4 */
@@ -2197,6 +2198,10 @@ static void ItunMetaCallback( const struct qt_itunes_triplet_data *data, void *p
         p_sys->qt.f_replay_gain_norm = data->NORM.volume_adjust;
         p_sys->qt.f_replay_gain_peak = data->NORM.peak;
     }
+    else if( data->type == iTunEncodingParams )
+    {
+        p_sys->qt.i_target_bitrate = data->EncodingParams.target_bitrate;
+    }
 }
 
 static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
@@ -3244,6 +3249,11 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_peak;
                     p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
                 }
+            }
+
+            if( p_sys->qt.i_target_bitrate )
+            {
+                p_fmt->i_bitrate = p_sys->qt.i_target_bitrate;
             }
 
             switch( p_fmt->i_codec )
