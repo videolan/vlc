@@ -231,11 +231,13 @@ subdir('lua')
 if qt5_dep.found()
     executable('vlc-qt-check',
         files('gui/qt/vlc-qt-check.cpp'),
-        dependencies: [qt5_dep],
+        dependencies: [qt5_dep, qt_extra_deps],
         include_directories: [vlc_include_dirs],
         build_by_default: true,
         install: true,
-        install_dir: get_option('libexecdir')
+        install_dir: get_option('libexecdir'),
+        c_args : qt_extra_flags,
+        cpp_args : qt_extra_flags,
     )
 endif
 
