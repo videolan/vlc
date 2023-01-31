@@ -30,8 +30,8 @@
 
 #include <vlc_common.h>
 
-#include <vlc_block.h>
 #include <vlc_decoder.h>
+#include <vlc_frame.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 
@@ -141,7 +141,7 @@ static void Del( sout_stream_t *p_stream, void *id )
     free( id_sys );
 }
 
-static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
+static int Send( sout_stream_t *p_stream, void *id, vlc_frame_t *frames )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id_sys = id;
@@ -154,20 +154,20 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
                      "Missing first pcr event. Forced to drop early frames." );
             p_sys->error = true;
         }
-        vlc_frame_ChainRelease( p_buffer );
+        vlc_frame_ChainRelease( frames );
         return VLC_EGENERIC;
     }
 
-    while( p_buffer )
+    while( frames )
     {
-        block_t *p_next = p_buffer->p_next;
+        vlc_frame_t *p_next = frames->p_next;
 
-        p_buffer->p_next = NULL;
+        frames->p_next = NULL;
 
-        if( id != NULL && p_buffer->i_buffer > 0 )
-            vlc_input_decoder_Decode( id_sys->dec, p_buffer, false );
+        if( id != NULL && frames->i_buffer > 0 )
+            vlc_input_decoder_Decode( id_sys->dec, frames, false );
 
-        p_buffer = p_next;
+        frames = p_next;
     }
 
     return VLC_SUCCESS;
