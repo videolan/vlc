@@ -622,6 +622,14 @@ if qt5_dep.found()
         endif
     endif
 
+    # Qt5 wayland
+    wayland_qt5_dep = dependency('qt5', modules: ['WaylandClient'], required: false)
+
+    if wayland_qt5_dep.found()
+        qt_extra_deps += [wayland_dep]
+        qt_extra_flags += '-DQT5_HAS_WAYLAND'
+    endif
+
     if get_option('qt_qml_debug')
         qt_extra_flags += '-DQT_QML_DEBUG'
     endif
