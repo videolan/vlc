@@ -236,6 +236,14 @@ Close(struct vlc_gl_filter *filter) {
     vt->DeleteProgram(sys->program_id);
     vlc_gl_sampler_Delete(sys->sampler);
     free(sys);
+
+    vlc_gl_t *gl = (vlc_gl_t *)vlc_object_parent(filter);
+    filter_t *video_filter = (filter_t *)vlc_object_parent(gl);
+    for( size_t i = 0; ppsz_filter_options[i] != NULL; i++ )
+    {
+        var_DelCallback( video_filter, ppsz_filter_options[i],
+                        VideoFilterForwardVarCallback, filter );
+    }
 }
 
 // static vlc_gl_filter_open_fn Open;
