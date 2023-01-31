@@ -667,6 +667,8 @@ if qt5_dep.found()
         endif
     endif
 
+    # TODO support qmlcachegen
+
     vlc_modules += {
         'name' : 'qt',
         'sources' : [qt5pre_files, qt_sources, some_sources],
