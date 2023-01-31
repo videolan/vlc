@@ -40,17 +40,17 @@
 {
     self = [super init];
     if (self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-        [notificationCenter addObserver:self
-                               selector:@selector(shouldShowToolbar:)
-                                   name:VLCVideoWindowShouldShowFullscreenController
-                                 object:nil];
-        _autohide = NO;
+        [self setup];
     }
     return self;
 }
 
 - (void)awakeFromNib
+{
+    [self setup];
+}
+
+- (void)setup
 {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
