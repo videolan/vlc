@@ -514,10 +514,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showVideoLibrary
 {
-    [_libraryVideoViewController presentVideoView];
+    _librarySortButton.hidden = NO;
+    _librarySearchField.enabled = YES;
+    _optionBarView.hidden = YES;
 
-    self.gridVsListSegmentedControl.target = self;
-    self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
+    _gridVsListSegmentedControl.target = self;
+    _gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
+
+    [_libraryVideoViewController presentVideoView];
 }
 
 - (void)showAudioLibrary
@@ -525,7 +529,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = NO;
-    
+
     _gridVsListSegmentedControl.target = self;
     _gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 

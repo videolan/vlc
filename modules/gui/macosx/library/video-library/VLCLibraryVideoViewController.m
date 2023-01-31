@@ -73,9 +73,6 @@
 
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
     _segmentedTitleControl = libraryWindow.segmentedTitleControl;
-    _optionBarView = libraryWindow.optionBarView;
-    _librarySortButton = libraryWindow.librarySortButton;
-    _librarySearchField = libraryWindow.librarySearchField;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
@@ -133,12 +130,7 @@
 - (void)presentVideoView
 {
     _libraryTargetView.subviews = @[];
-
     [self updatePresentedView];
-
-    _librarySortButton.hidden = NO;
-    _librarySearchField.enabled = YES;
-    _optionBarView.hidden = YES;
 }
 
 - (void)presentPlaceholderVideoLibraryView

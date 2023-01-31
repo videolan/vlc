@@ -44,9 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTableView *videoLibraryGroupsTableView;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readonly) NSSegmentedControl *segmentedTitleControl;
-@property (readonly) NSButton *librarySortButton;
-@property (readonly) NSSearchField *librarySearchField;
-@property (readonly) NSVisualEffectView *optionBarView;
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;
 @property (readonly) NSView *emptyLibraryView;
