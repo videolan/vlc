@@ -48,6 +48,7 @@ VLC_API void vlc_input_decoder_Decode( vlc_input_decoder_t *, block_t *, bool b_
 VLC_API void vlc_input_decoder_Drain( vlc_input_decoder_t * );
 VLC_API void vlc_input_decoder_Flush( vlc_input_decoder_t * );
 VLC_API int  vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *, const vlc_spu_highlight_t * );
+VLC_API void vlc_input_decoder_ChangeDelay( vlc_input_decoder_t *, vlc_tick_t i_delay );
 
 /**
  * It creates an empty input resource handler.

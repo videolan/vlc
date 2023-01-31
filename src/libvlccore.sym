@@ -182,6 +182,7 @@ vlc_input_decoder_Decode
 vlc_input_decoder_Drain
 vlc_input_decoder_Flush
 vlc_input_decoder_SetSpuHighlight
+vlc_input_decoder_ChangeDelay
 input_item_AddInfo
 input_item_AddOption
 input_item_AddOptions
