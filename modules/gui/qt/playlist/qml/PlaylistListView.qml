@@ -427,10 +427,19 @@ Control {
             }
 
             add: Transition {
-                NumberAnimation {
-                    property: "opacity"; from: 0; to: 1.0
+                SequentialAnimation {
+                    PropertyAction {
+                        // TODO: Remove this >= Qt 5.15
+                        property: "opacity"
+                        value: 0.0
+                    }
 
-                    duration: VLCStyle.duration_long
+                    OpacityAnimator {
+                        from: 0.0 // QTBUG-66475
+                        to: 1.0
+                        duration: VLCStyle.duration_long
+                        easing.type: Easing.OutSine
+                    }
                 }
             }
 
@@ -440,8 +449,6 @@ Control {
 
                     duration: VLCStyle.duration_long; easing.type: Easing.OutSine
                 }
-
-                NumberAnimation { property: "opacity"; to: 1.0 }
             }
 
             onSelectAll: root.model.selectAll()
