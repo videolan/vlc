@@ -84,6 +84,7 @@ typedef struct
 
     vlc_clock_main_t *main_clock;
     bool first_pcr_signaled;
+    bool error;
 } sout_stream_sys_t;
 
 typedef struct
@@ -140,6 +141,18 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id_sys = id;
+
+    if( !p_sys->first_pcr_signaled )
+    {
+        if( !p_sys->error )
+        {
+            msg_Err( p_stream,
+                     "Missing first pcr event. Forced to drop early frames." );
+            p_sys->error = true;
+        }
+        vlc_frame_ChainRelease( p_buffer );
+        return VLC_EGENERIC;
+    }
 
     while( p_buffer )
     {
@@ -240,6 +253,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_delay =
         VLC_TICK_FROM_MS( var_GetInteger(p_stream, SOUT_CFG_PREFIX "delay") );
     p_sys->first_pcr_signaled = false;
+    p_sys->error = false;
 
     p_stream->ops = &ops;
     p_stream->p_sys = p_sys;
