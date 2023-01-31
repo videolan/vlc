@@ -81,11 +81,15 @@ typedef struct
 
     vlc_tick_t i_delay;
     input_resource_t *p_resource;
+
+    vlc_clock_main_t *main_clock;
+    bool first_pcr_signaled;
 } sout_stream_sys_t;
 
 typedef struct
 {
     vlc_input_decoder_t *dec;
+    vlc_clock_t *clock;
 } sout_stream_id_sys_t;
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
@@ -102,12 +106,20 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( unlikely(id == NULL) )
         return NULL;
 
+    id->clock = sout_ClockCreate( p_sys->main_clock, p_fmt );
+    if( unlikely(id->clock == NULL) )
+    {
+        free( id );
+        return NULL;
+    }
+
     id->dec = vlc_input_decoder_Create(
-        VLC_OBJECT(p_stream), p_fmt, NULL, p_sys->p_resource );
+        VLC_OBJECT(p_stream), p_fmt, id->clock, p_sys->p_resource );
     if( id->dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
                  (char*)&p_fmt->i_codec );
+        sout_ClockDelete( id->clock );
         free( id );
         return NULL;
     }
@@ -120,6 +132,7 @@ static void Del( sout_stream_t *p_stream, void *id )
 
     sout_stream_id_sys_t *id_sys = id;
     vlc_input_decoder_Delete( id_sys->dec );
+    sout_ClockDelete( id_sys->clock );
     free( id_sys );
 }
 
@@ -177,8 +190,19 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
+static void SetPCR( sout_stream_t *p_stream, vlc_tick_t pcr )
+{
+    sout_stream_sys_t *sys = p_stream->p_sys;
+
+    if( sys->first_pcr_signaled )
+        return;
+
+    sout_ClockMainSetFirstPcr( sys->main_clock, pcr );
+    sys->first_pcr_signaled = true;
+}
+
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, NULL, NULL
+    Add, Del, Send, Control, NULL, SetPCR
 };
 
 /*****************************************************************************
@@ -200,6 +224,14 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    p_sys->main_clock = sout_ClockMainCreate(p_stream);
+    if( unlikely(p_sys->main_clock == NULL) )
+    {
+        input_resource_Release( p_sys->p_resource );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                        p_stream->p_cfg );
 
@@ -207,6 +239,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
     p_sys->i_delay =
         VLC_TICK_FROM_MS( var_GetInteger(p_stream, SOUT_CFG_PREFIX "delay") );
+    p_sys->first_pcr_signaled = false;
 
     p_stream->ops = &ops;
     p_stream->p_sys = p_sys;
@@ -222,5 +255,6 @@ static void Close( vlc_object_t * p_this )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     input_resource_Release( p_sys->p_resource );
+    sout_ClockMainDelete( p_sys->main_clock );
     free( p_sys );
 }
