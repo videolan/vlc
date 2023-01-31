@@ -817,6 +817,21 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:NO];
 }
 
+- (void)mouseMoved:(NSEvent *)o_event
+{
+    if (!self.videoView.hidden) {
+        NSPoint mouseLocation = [o_event locationInWindow];
+        NSRect windowRectWithFrame = [self frameRectForContentRect:self.contentView.frame];
+
+        if ([self.contentView mouse:mouseLocation inRect:windowRectWithFrame]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
+                                                                object:self];
+        }
+    }
+
+    [super mouseMoved:o_event];
+}
+
 #pragma mark -
 #pragma mark respond to core events
 
