@@ -639,7 +639,7 @@ if qt5_dep.found()
         qt_extra_flags += '-DQPNI_HEADER=<' + qt5_dep.version() + '/QtGui/qpa/qplatformnativeinterface.h>'
     endif
 
-    if not host_system in ['windows', 'darwin']
+    if not (host_system in ['windows', 'darwin'])
         #Qt GTK theme module
         gtk_dep = dependency(
             'gtk+-3.0',
@@ -662,6 +662,8 @@ if qt5_dep.found()
                 ),
                 'dependencies' : [gtk_dep]
             }
+
+            qt_extra_flags += '-DQT5_HAS_GTK'
         endif
     endif
 
