@@ -522,10 +522,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showAudioLibrary
 {
-    [_libraryAudioViewController presentAudioView];
+    _librarySortButton.hidden = NO;
+    _librarySearchField.enabled = YES;
+    _optionBarView.hidden = NO;
+    
+    _gridVsListSegmentedControl.target = self;
+    _gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 
-    self.gridVsListSegmentedControl.target = self;
-    self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
+    [_libraryAudioViewController presentAudioView];
 }
 
 - (IBAction)playlistDoubleClickAction:(id)sender

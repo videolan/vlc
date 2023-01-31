@@ -103,9 +103,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioSegmentedControl = libraryWindow.audioSegmentedControl;
     _gridVsListSegmentedControl = libraryWindow.gridVsListSegmentedControl;
     _segmentedTitleControl = libraryWindow.segmentedTitleControl;
-    _optionBarView = libraryWindow.optionBarView;
-    _librarySortButton = libraryWindow.librarySortButton;
-    _librarySearchField = libraryWindow.librarySearchField;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
@@ -222,11 +219,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     [self configureAudioSegmentedControl];
     [self segmentedControlAction:VLCMain.sharedInstance.libraryWindow.navigationStack];
-
-    _librarySortButton.hidden = NO;
-    _librarySearchField.enabled = YES;
-    _optionBarView.hidden = NO;
-    _audioSegmentedControl.hidden = NO;
 }
 
 - (void)presentPlaceholderAudioView
