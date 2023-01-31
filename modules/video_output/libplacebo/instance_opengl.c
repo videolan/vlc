@@ -121,7 +121,6 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
         .proc_ctx = sys->gl,
 #endif
     });
-    vlc_gl_ReleaseCurrent (sys->gl);
     if (!sys->opengl)
         goto error;
 
@@ -138,6 +137,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
         goto error;
 
     vlc_gl_ReleaseCurrent(sys->gl);
+    current = false;
 
     pl->gpu = sys->opengl->gpu;
     pl->ops = &instance_opts;
