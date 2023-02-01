@@ -241,6 +241,12 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, con
     if ( devsys == NULL )
         return VLC_EGENERIC;
 
+    if (!(ID3D11Device_GetCreationFlags(devsys->d3d_dev.d3ddevice) & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
+    {
+        msg_Err(va, "Missing D3D11_CREATE_DEVICE_VIDEO_SUPPORT");
+        return VLC_EGENERIC;
+    }
+
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
