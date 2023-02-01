@@ -419,6 +419,9 @@ VLC_API void demux_PacketizerDestroy( decoder_t *p_packetizer );
 
 /* */
 #define DEMUX_INIT_COMMON() do {            \
+    p_demux->pf_read = NULL;                \
+    p_demux->pf_block = NULL;               \
+    p_demux->pf_seek = NULL;                \
     p_demux->pf_control = Control;          \
     p_demux->pf_demux = Demux;              \
     p_demux->p_sys = calloc( 1, sizeof( demux_sys_t ) ); \
