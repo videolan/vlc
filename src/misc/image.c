@@ -446,11 +446,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         /* Hold the picture there to let the caller release its own picture,
          * since filters will consume the picture. */
         p_pic = p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
-
-        if( likely(p_pic != NULL) )
-        {
-            assert(!picture_HasChainedPics(p_pic)); // no chaining
-        }
+        assert(p_pic == NULL || !picture_HasChainedPics(p_pic)); // no chaining
     }
 
     block_t *p_block = NULL;
