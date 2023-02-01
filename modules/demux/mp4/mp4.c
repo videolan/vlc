@@ -143,6 +143,8 @@ typedef struct
     struct
     {
         uint32_t i_delay_samples;
+        float f_replay_gain_norm;
+        float f_replay_gain_peak;
     } qt;
 
     /* ASF in MP4 */
@@ -2190,6 +2192,11 @@ static void ItunMetaCallback( const struct qt_itunes_triplet_data *data, void *p
     {
         p_sys->qt.i_delay_samples = data->SMPB.delay;
     }
+    else if( data->type == iTunNORM )
+    {
+        p_sys->qt.f_replay_gain_norm = data->NORM.volume_adjust;
+        p_sys->qt.f_replay_gain_peak = data->NORM.peak;
+    }
 }
 
 static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
@@ -3221,6 +3228,21 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     double f_gain = vlc_atof_c( psz_meta );
                     p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
                     p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
+                }
+            }
+
+            if( p_sys->qt.f_replay_gain_peak > 0 )
+            {
+                audio_replay_gain_t *p_arg = &p_fmt->audio_replay_gain;
+                if( !p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] )
+                {
+                    p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_norm;
+                    p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
+                }
+                if( !p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] )
+                {
+                    p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_peak;
+                    p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
                 }
             }
 
