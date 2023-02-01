@@ -390,13 +390,9 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
     HRESULT hr;
     ID3D11DeviceContext_GetDevice( d3d11ctx, &out->d3ddevice );
 
-    UINT creationFlags = ID3D11Device_GetCreationFlags(out->d3ddevice);
-    if (!(creationFlags & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
+    if (!(ID3D11Device_GetCreationFlags(out->d3ddevice) & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
     {
-        msg_Err(obj, "the provided D3D11 device doesn't support decoding");
-        ID3D11Device_Release(out->d3ddevice);
-        out->d3ddevice = NULL;
-        return E_FAIL;
+        msg_Warn(obj, "the provided D3D11 device doesn't support decoding");
     }
 
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(out->d3ddevice);
