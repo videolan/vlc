@@ -54,7 +54,7 @@ Rectangle {
 
     border.color: root.active
                   ? root.activeBorderColor
-                  : VLCStyle.colors.setColorAlpha(root.activeBorderColor, 0)
+                  : VLCStyle.setColorAlpha(root.activeBorderColor, 0)
 
     border.width: root.active ? VLCStyle.focus_border : 0
 

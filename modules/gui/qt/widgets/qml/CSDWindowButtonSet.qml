@@ -31,7 +31,7 @@ Row {
     width: implicitWidth
 
     property color color: theme.fg.primary
-    property color hoverColor: VLCStyle.colors.setColorAlpha(theme.bg.primary, 0.5)
+    property color hoverColor: VLCStyle.setColorAlpha(theme.bg.primary, 0.5)
 
     readonly property bool hovered: {
         var h = false

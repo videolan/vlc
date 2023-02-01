@@ -34,9 +34,9 @@ ViewBlockingRectangle {
 
     property color alternativeColor: tintColor
 
-    readonly property color _actualTintColor: VLCStyle.colors.setColorAlpha(tintColor, 0.7)
+    readonly property color _actualTintColor: VLCStyle.setColorAlpha(tintColor, 0.7)
     property real _blend: usingAcrylic ? AcrylicController.uiTransluency : 0
 
 
-    color: VLCStyle.colors.blendColors(root._actualTintColor, root.alternativeColor, root._blend)
+    color: VLCStyle.blendColors(root._actualTintColor, root.alternativeColor, root._blend)
 }

@@ -213,7 +213,7 @@ T.Control {
             blurRadius: VLCStyle.dp(9)
             yOffset: VLCStyle.dp(4)
 
-            color: VLCStyle.colors.setColorAlpha(theme.accent, 0.29)
+            color: VLCStyle.setColorAlpha(theme.accent, 0.29)
 
             xRadius: parent.width
             yRadius: xRadius
@@ -232,7 +232,7 @@ T.Control {
             blurRadius: VLCStyle.dp(14)
             yOffset: VLCStyle.dp(1)
 
-            color: VLCStyle.colors.setColorAlpha(theme.accent, 1.0)
+            color: VLCStyle.setColorAlpha(theme.accent, 1.0)
 
             xRadius: parent.width
             yRadius: xRadius

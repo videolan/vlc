@@ -308,6 +308,10 @@ QtObject {
 
     readonly property var dp: MainCtx.dp
 
+    //"alias" ColorHelper functions
+    readonly property var blendColors: vlc_style.palette.blendColors
+    readonly property var setColorAlpha: vlc_style.palette.setColorAlpha
+
     function colWidth(nb) {
       return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_spacing;
     }
