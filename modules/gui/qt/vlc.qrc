@@ -278,7 +278,6 @@
         <file alias="AcrylicController.qml">style/AcrylicController.qml</file>
         <file alias="qmldir">style/qmldir</file>
         <file alias="VLCStyle.qml">style/VLCStyle.qml</file>
-        <file alias="VLCColors.qml">style/VLCColors.qml</file>
         <file alias="VLCIcons.qml">style/VLCIcons.qml</file>
     </qresource>
     <qresource prefix="/playlist">

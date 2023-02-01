@@ -89,16 +89,6 @@ public:
     std::unique_ptr<CSDMetrics> m_csdMetrics;
 };
 
-
-#define COLOR_PROPERTY(name) \
-    Q_PROPERTY(QColor name READ get_##name NOTIFY paletteChanged FINAL) \
-public: \
-    inline QColor get_## name() const { return m_##name; } \
-private: \
-    QColor m_##name { "#FF00FF" };
-
-
-
 #define COLOR_DEFINITION(name, value) \
     Q_PROPERTY(QColor name READ get_##name NOTIFY paletteChanged FINAL) \
 public: \
@@ -117,10 +107,6 @@ public:
     Q_PROPERTY(bool isDark MEMBER m_isDark NOTIFY paletteChanged FINAL)
     Q_PROPERTY(bool hasCSDImage READ hasCSDImage NOTIFY hasCSDImageChanged FINAL)
     Q_PROPERTY(CSDMetrics* csdMetrics READ getCSDMetrics NOTIFY CSDMetricsChanged FINAL)
-
-
-    VLC_QT_INTF_PUBLIC_COLORS(COLOR_PROPERTY)
-#undef COLOR_PROPERTY
 
     //standard color definitions used by light/dark themes
     COLOR_DEFINITION(orange500, "#FF8800");

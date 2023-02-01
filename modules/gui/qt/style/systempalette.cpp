@@ -645,57 +645,6 @@ void SystemPalette::makeLightPalette()
         setColor(CS, C::Bg, C::Highlight, C::Normal, darkGrey800); //FIXME
         setColor(CS, C::Fg, C::Highlight, C::Normal, Qt::white); //FIXME
     }
-
-    m_text =  QColor{"#232627"};
-    m_textInactive =  QColor{"#7f8c8d"};
-    m_textDisabled = "#bdc3c7";
-
-    m_bg =  lightGrey100;
-    m_bgInactive =  QColor{"#fcfdfc"};
-
-    m_bgAlt =  lightGrey400;
-    m_bgAltInactive =  lightGrey400;
-
-    m_bgHover =  lightGrey400;
-    m_bgHoverText =  m_text;
-    m_bgHoverInactive =  QColor{"#3daee9"};
-    m_bgHoverTextInactive =  m_text;
-
-    m_bgFocus =  Qt::black;
-
-    m_button =  QColor{"#eff0f1"};
-    m_buttonText =  m_text;
-    m_buttonBorder =  ::blendColors(m_button, m_buttonText, 0.8);
-
-    m_textActiveSource =  QColor{"#ff950d"};
-
-    m_topBanner =  lightGrey400;
-    m_lowerBanner =  Qt::white;
-
-    m_accent =  orange800;
-
-    m_alert = QColor{"#d70022"};
-
-    m_separator =  lightGrey400;
-    m_playerControlBarFg =  QColor{"#333333"};
-    m_expandDelegate =  Qt::white;
-
-    m_tooltipTextColor = Qt::black;
-    m_tooltipColor = Qt::white;
-
-    m_border = QColor{"#e0e0e0"};
-    m_buttonHover = lightGrey300;
-    m_buttonBanner = grey2;
-    m_buttonPrimaryHover = QColor{"#e65609"};
-    m_buttonPlayer = QColor{"#484848"};
-    m_grid = lightGrey400;
-    m_gridSelect = lightGrey600;
-    m_listHover = lightGrey500;
-    m_textField = QColor{"#999999"};
-    m_textFieldHover = QColor{"#4c4c4c"};
-    m_icon = QColor{"#616161"};
-    m_sliderBarMiniplayerBgColor = QColor{"#FFEEEEEE"};
-    m_windowCSDButtonBg = QColor{"#80DADADA"};
 }
 
 void SystemPalette::makeDarkPalette()
@@ -891,63 +840,6 @@ void SystemPalette::makeDarkPalette()
         setColor(CS, C::Bg, C::Highlight, C::Normal, lightGrey600); //FIXME
         setColor(CS, C::Fg, C::Highlight, C::Normal, Qt::black); //FIXME
     }
-
-    //QColor grey1 = QColor{"#666666"};
-    //QColor grey2 = QColor{"#AAAAAA"};
-
-    m_text = "#eff0f1";
-    m_textInactive = "#bdc3c7";
-    m_textDisabled = "#bdc3c7";
-
-    m_bg = darkGrey200;
-    m_bgInactive = "#232629";
-
-    m_bgAlt = darkGrey400;
-    m_bgAltInactive = darkGrey300;
-
-    m_bgHover = darkGrey800;
-    m_bgHoverInactive = "#3daee9";
-
-    m_bgHoverText = m_text;
-    m_bgHoverTextInactive = m_text;
-
-    m_bgFocus = Qt::white;
-
-    m_button = "#31363b";
-    m_buttonText = m_text;
-    m_buttonBorder = "#575b5f";
-
-    m_textActiveSource = "#ff950d";
-
-    m_topBanner = darkGrey400;
-    m_lowerBanner = Qt::black;
-
-    m_accent = orange500;
-
-    m_alert = QColor{"#d70022"};
-
-    m_separator = darkGrey700;
-
-    m_playerControlBarFg = Qt::white;
-
-    m_expandDelegate = Qt::black;
-
-    m_tooltipTextColor = Qt::white;
-    m_tooltipColor = Qt::black;
-
-    m_border = darkGrey800;
-    m_buttonHover = darkGrey800;
-    m_buttonBanner = QColor("#a6a6a6");
-    m_buttonPrimaryHover = QColor{"#e67A00"};
-    m_buttonPlayer = lightGrey600;
-    m_grid = darkGrey500;
-    m_gridSelect = darkGrey800;
-    m_listHover = darkGrey500;
-    m_textField = QColor{"#6f6f6f"};
-    m_textFieldHover = QColor{"#b7b7b7"};
-    m_icon = Qt::white;
-    m_sliderBarMiniplayerBgColor = QColor{"#FF929292"};
-    m_windowCSDButtonBg =  QColor{"#80484848"};
 }
 
 void SystemPalette::makeSystemPalette()

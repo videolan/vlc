@@ -47,16 +47,6 @@ QtObject {
         ctx: MainCtx
     }
 
-    readonly property VLCColors colors: VLCColors {
-        palette: vlc_style.palette
-    }
-
-    // When trying to force night/dark theme colors for items,
-    // this can be used:
-    readonly property VLCColors nightColors: VLCColors {
-        palette: vlc_style.darkPalette
-    }
-
     // Sizes
     readonly property double margin_xxxsmall: dp(2, scale);
     readonly property double margin_xxsmall: dp(4, scale);

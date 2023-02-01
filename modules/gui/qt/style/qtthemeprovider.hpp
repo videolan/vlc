@@ -26,48 +26,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#define VLC_QT_INTF_PUBLIC_COLORS(X) \
-    X(text) \
-    X(textInactive) \
-    X(textDisabled) \
-    X(bg) \
-    X(bgInactive) \
-    X(bgAlt) \
-    X(bgAltInactive) \
-    X(bgHover) \
-    X(bgHoverText) \
-    X(bgHoverInactive) \
-    X(bgHoverTextInactive) \
-    X(bgFocus) \
-    X(button) \
-    X(buttonText) \
-    X(buttonBorder) \
-    X(textActiveSource) \
-    X(topBanner) \
-    X(lowerBanner) \
-    X(accent) \
-    X(alert) \
-    X(separator) \
-    X(playerControlBarFg) \
-    X(expandDelegate) \
-    X(tooltipTextColor) \
-    X(tooltipColor) \
-    X(border) \
-    X(buttonHover) \
-    X(buttonBanner) \
-    X(buttonPrimaryHover) \
-    X(buttonPlayer) \
-    X(grid) \
-    X(gridSelect) \
-    X(listHover) \
-    X(textField) \
-    X(textFieldHover) \
-    X(icon) \
-    X(sliderBarMiniplayerBgColor) \
-    X(windowCSDButtonBg)
-
-#define DEFINE_QCOLOR_STRUCT(x) void* x;
-
 enum vlc_qt_theme_color_state {
     VQTC_STATE_NORMAL = 0,
     VQTC_STATE_DISABLED,
@@ -118,13 +76,6 @@ enum vlc_qt_theme_color_name {
     VQTC_NAME_SEPARATOR,
     VQTC_NAME_COUNT
 };
-
-struct vlc_qt_palette_t
-{
-    VLC_QT_INTF_PUBLIC_COLORS(DEFINE_QCOLOR_STRUCT)
-};
-
-#undef DEFINE_QCOLOR_STRUCT
 
 enum vlc_qt_theme_image_type
 {
