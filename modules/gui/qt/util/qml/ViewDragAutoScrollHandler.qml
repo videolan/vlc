@@ -71,22 +71,30 @@ QtObject {
                                             root.dragItem.x,
                                             root.dragItem.y)
 
-            var size, mark
+            var size, mark, atBeginning, atEnd
             if (root.orientation === Qt.Vertical) {
                 size = root.view.height
                 mark = pos.y
+
+                atBeginning = root.view.atYBeginning
+                atEnd = root.view.atYEnd
             } else {
                 size = root.view.width
                 mark = pos.x
+
+                atBeginning = root.view.atXBeginning
+                atEnd = root.view.atXEnd
             }
 
             if (size < root.margin * 2.5)
                 return ViewDragAutoScrollHandler.Direction.None
 
             if (mark < root.margin)
-                return ViewDragAutoScrollHandler.Direction.Backward
+                return !atBeginning ? ViewDragAutoScrollHandler.Direction.Backward
+                                    : ViewDragAutoScrollHandler.Direction.None
             else if (mark > (size - root.margin))
-                return ViewDragAutoScrollHandler.Direction.Forward
+                return !atEnd ? ViewDragAutoScrollHandler.Direction.Forward
+                              : ViewDragAutoScrollHandler.Direction.None
             else
                 return ViewDragAutoScrollHandler.Direction.None
         }
