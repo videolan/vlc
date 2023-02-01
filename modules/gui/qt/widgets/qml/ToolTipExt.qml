@@ -17,17 +17,27 @@
  *****************************************************************************/
 
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///style/"
 
-ToolTip {
+T.ToolTip {
     id: control
+
+    x: 0
+    y: -implicitHeight - VLCStyle.margin_xxxsmall
+
+    implicitWidth: Math.max(background ? background.implicitWidth : 0,
+                            contentItem.implicitWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(background ? background.implicitHeight : 0,
+                             contentItem.implicitHeight + topPadding + bottomPadding)
 
     margins: VLCStyle.margin_xsmall
     padding: VLCStyle.margin_xsmall
 
     font.pixelSize: VLCStyle.fontSize_normal
+
+    closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutsideParent | T.Popup.CloseOnReleaseOutsideParent
 
     property VLCColors colors: VLCStyle.colors
 
