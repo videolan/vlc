@@ -4249,10 +4249,10 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     info_category_AddCodecInfo( p_cat, _("Codec"),
                                 i_codec_fourcc, psz_codec_description );
 
-    if( es->psz_language && *es->psz_language )
+    if( !EMPTY_STR(es->psz_language) )
         info_category_AddInfo( p_cat, _("Language"), "%s",
                                es->psz_language );
-    if( fmt->psz_description && *fmt->psz_description )
+    if( !EMPTY_STR(fmt->psz_description) )
         info_category_AddInfo( p_cat, _("Description"), "%s",
                                fmt->psz_description );
 
