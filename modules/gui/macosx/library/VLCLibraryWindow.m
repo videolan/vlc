@@ -513,10 +513,36 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 }
 
+- (void)hideToolbarItem:(NSToolbarItem *)toolbarItem
+{
+    NSInteger toolbarItemIndex = [[self.toolbar items] indexOfObject:toolbarItem];
+    if (toolbarItemIndex != NSNotFound) {
+        [self.toolbar removeItemAtIndex:toolbarItemIndex];
+    }
+}
+
+- (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible
+{
+    if (!visible) {
+        [self hideToolbarItem:_forwardsToolbarItem];
+        [self hideToolbarItem:_backwardsToolbarItem];
+        return;
+    }
+
+    NSInteger backwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_backwardsToolbarItem];
+    if (backwardsToolbarItemIndex == NSNotFound) {
+        [self.toolbar insertItemWithItemIdentifier:_backwardsToolbarItem.itemIdentifier atIndex:0];
+    }
+
+    NSInteger forwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_forwardsToolbarItem];
+    if (forwardsToolbarItemIndex == NSNotFound) {
+        [self.toolbar insertItemWithItemIdentifier:_forwardsToolbarItem.itemIdentifier atIndex:1];
+    }
+}
+
 - (void)showVideoLibrary
 {
-    _backwardsNavigationButton.hidden = YES;
-    _forwardsNavigationButton.hidden = YES;
+    [self setForwardsBackwardsToolbarItemsVisible:NO];
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = YES;
@@ -529,8 +555,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showAudioLibrary
 {
-    _backwardsNavigationButton.hidden = YES;
-    _forwardsNavigationButton.hidden = YES;
+    [self setForwardsBackwardsToolbarItemsVisible:NO];
     _librarySortButton.hidden = NO;
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = NO;
@@ -545,9 +570,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
 
+    [self setForwardsBackwardsToolbarItemsVisible:YES];
     _optionBarView.hidden = YES;
-    _backwardsNavigationButton.hidden = NO;
-    _forwardsNavigationButton.hidden = NO;
     _librarySortButton.hidden = YES;
     _librarySearchField.enabled = NO;
     _librarySearchField.stringValue = @"";
