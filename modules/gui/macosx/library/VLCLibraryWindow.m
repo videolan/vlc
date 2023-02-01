@@ -540,10 +540,46 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 }
 
+- (void)setSortOrderToolbarItemVisible:(BOOL)visible
+{
+    if (!visible) {
+        [self hideToolbarItem:_sortOrderToolbarItem];
+        return;
+    }
+
+    NSInteger sortOrderToolbarItemIndex = [[self.toolbar items] indexOfObject:_sortOrderToolbarItem];
+    if (sortOrderToolbarItemIndex != NSNotFound) {
+        return;
+    }
+
+    NSInteger libraryViewModeToolbarItemIndex = [[self.toolbar items] indexOfObject:_libraryViewModeToolbarItem];
+    if (libraryViewModeToolbarItemIndex != NSNotFound) {
+        [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier
+                                           atIndex:libraryViewModeToolbarItemIndex + 1];
+        return;
+    }
+
+    NSInteger forwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_forwardsToolbarItem];
+    if (forwardsToolbarItemIndex != NSNotFound) {
+        [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier
+                                           atIndex:forwardsToolbarItemIndex + 1];
+        return;
+    }
+
+    NSInteger backwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_backwardsToolbarItem];
+    if (backwardsToolbarItemIndex != NSNotFound) {
+        [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier
+                                           atIndex:backwardsToolbarItemIndex + 1];
+        return;
+    }
+
+    [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier atIndex:0];
+}
+
 - (void)showVideoLibrary
 {
     [self setForwardsBackwardsToolbarItemsVisible:NO];
-    _librarySortButton.hidden = NO;
+    [self setSortOrderToolbarItemVisible:YES];
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = YES;
 
@@ -556,7 +592,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showAudioLibrary
 {
     [self setForwardsBackwardsToolbarItemsVisible:NO];
-    _librarySortButton.hidden = NO;
+    [self setSortOrderToolbarItemVisible:YES];
     _librarySearchField.enabled = YES;
     _optionBarView.hidden = NO;
 
@@ -571,8 +607,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
 
     [self setForwardsBackwardsToolbarItemsVisible:YES];
+    [self setSortOrderToolbarItemVisible:NO];
     _optionBarView.hidden = YES;
-    _librarySortButton.hidden = YES;
     _librarySearchField.enabled = NO;
     _librarySearchField.stringValue = @"";
     [VLCMain.sharedInstance.libraryController filterByString:@""];
