@@ -20,6 +20,33 @@
 #ifndef VLC_MP4_META_H_
 #define VLC_MP4_META_H_
 
-void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta );
+struct qt_itunes_triplet_data
+{
+    enum
+    {
+        iTunSMPB,
+        iTunNORM,
+    } type;
+    union
+    {
+        struct
+        {
+            uint32_t delay;
+            uint32_t padding;
+            uint64_t original_samplescount;
+        } SMPB;
+        struct
+        {
+            float volume_adjust;
+            float peak;
+        } NORM;
+    };
+};
+
+typedef void (*qt_itunes_callback)(const struct qt_itunes_triplet_data *, void *);
+
+void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta,
+                qt_itunes_callback, void *priv );
+
 
 #endif

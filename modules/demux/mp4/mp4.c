@@ -2179,6 +2179,11 @@ static int FragSeekToPos( demux_t *p_demux, double f, bool b_accurate )
                            MP4_rescale_mtime( i_duration, p_sys->i_timescale ) ), b_accurate );
 }
 
+static void ItunMetaCallback( const struct qt_itunes_triplet_data *data, void *priv )
+{
+    VLC_UNUSED(data); VLC_UNUSED(priv);
+}
+
 static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
 {
     if( !p_meta )
@@ -2190,7 +2195,7 @@ static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
     MP4_GetCoverMetaURI( p_sys->p_root, p_metaroot, psz_metapath, p_meta );
 
     if( p_metaroot )
-        SetupMeta( p_meta, p_metaroot );
+        SetupMeta( p_meta, p_metaroot, ItunMetaCallback, p_sys );
 
     return VLC_SUCCESS;
 }
