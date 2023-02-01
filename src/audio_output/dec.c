@@ -233,7 +233,7 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
         }
     }
 
-    if( p_format->i_rate > 384000 )
+    if( p_format->i_rate > 768000 )
     {
         msg_Err( p_aout, "excessive audio sample frequency (%u)",
                  p_format->i_rate );
