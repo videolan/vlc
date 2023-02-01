@@ -445,9 +445,10 @@ Control {
 
             displaced: Transition {
                 NumberAnimation {
-                    properties: "x,y"
-
-                    duration: VLCStyle.duration_long; easing.type: Easing.OutSine
+                    // TODO: Use YAnimator >= Qt 6.0 (QTBUG-66475)
+                    property: "y"
+                    duration: VLCStyle.duration_long
+                    easing.type: Easing.OutSine
                 }
             }
 
