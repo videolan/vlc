@@ -521,6 +521,38 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 }
 
+/*
+ * Try to insert the toolbar item ahead of a group of possible toolbar items.
+ * "items" should contain items sorted from the leading edge of the toolbar to trailing edge.
+ * "toolbarItem" will be inserted as close to the trailing edge as possible.
+ *
+ * If you have: | item1 | item2 | item3 | item4 |
+ * and the "items" parameter is an array containing @[item1, item2, item5, item6]
+ * then the "toolbarItem" provided to this function will place toolbarItem thus:
+ * | item1 | item2 | toolbarItem | item3 | item4 |
+*/
+
+- (void)insertToolbarItem:(NSToolbarItem *)toolbarItem inFrontOf:(NSArray<NSToolbarItem *> *)items
+{
+    NSParameterAssert(toolbarItem != nil && items != nil && toolbarItem.itemIdentifier.length > 0);
+
+    NSInteger toolbarItemIndex = [[self.toolbar items] indexOfObject:toolbarItem];
+    if (toolbarItemIndex != NSNotFound) {
+        return;
+    }
+
+    for (NSToolbarItem *item in items) {
+        NSInteger itemIndex = [[self.toolbar items] indexOfObject:item];
+
+        if (itemIndex != NSNotFound) {
+            [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier atIndex:itemIndex + 1];
+            return;
+        }
+    }
+
+    [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier atIndex:0];
+}
+
 - (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible
 {
     if (!visible) {
@@ -547,33 +579,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return;
     }
 
-    NSInteger sortOrderToolbarItemIndex = [[self.toolbar items] indexOfObject:_sortOrderToolbarItem];
-    if (sortOrderToolbarItemIndex != NSNotFound) {
-        return;
-    }
-
-    NSInteger libraryViewModeToolbarItemIndex = [[self.toolbar items] indexOfObject:_libraryViewModeToolbarItem];
-    if (libraryViewModeToolbarItemIndex != NSNotFound) {
-        [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier
-                                           atIndex:libraryViewModeToolbarItemIndex + 1];
-        return;
-    }
-
-    NSInteger forwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_forwardsToolbarItem];
-    if (forwardsToolbarItemIndex != NSNotFound) {
-        [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier
-                                           atIndex:forwardsToolbarItemIndex + 1];
-        return;
-    }
-
-    NSInteger backwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_backwardsToolbarItem];
-    if (backwardsToolbarItemIndex != NSNotFound) {
-        [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier
-                                           atIndex:backwardsToolbarItemIndex + 1];
-        return;
-    }
-
-    [self.toolbar insertItemWithItemIdentifier:_sortOrderToolbarItem.itemIdentifier atIndex:0];
+    [self insertToolbarItem:_sortOrderToolbarItem
+                  inFrontOf:@[_libraryViewModeToolbarItem, _forwardsToolbarItem, _backwardsToolbarItem]];
 }
 
 - (void)showVideoLibrary
