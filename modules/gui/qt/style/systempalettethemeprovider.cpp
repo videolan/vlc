@@ -70,7 +70,7 @@ static void setColor(vlc_qt_theme_provider_t* obj, void* ptr, const QColor c)
     obj->setColorInt(ptr, c.red(), c.green(), c.blue(), c.alpha());
 }
 
-static void updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
+static int updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
 {
     QPalette palette = qApp->palette();
 
@@ -107,6 +107,8 @@ static void updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*
     setColor(obj, p->tooltipColor, palette.color(QPalette::Normal, QPalette::ToolTipBase));
     setColor(obj, p->tooltipTextColor, palette.color(QPalette::Normal, QPalette::ToolTipText));
 
+    //use VLC palette, choose the one maching the dark/light settings
+    return VLC_SUCCESS;
 }
 
 static void Close(vlc_qt_theme_provider_t* obj)

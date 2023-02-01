@@ -246,10 +246,11 @@ CSDMetrics* ExternalPaletteImpl::getCSDMetrics() const
     return m_csdMetrics.get();
 }
 
-void ExternalPaletteImpl::update(vlc_qt_palette_t& p)
+int ExternalPaletteImpl::update(vlc_qt_palette_t& p)
 {
     if (m_provider->updatePalette)
-        m_provider->updatePalette(m_provider, &p);
+        return m_provider->updatePalette(m_provider, &p);
+    return VLC_EGENERIC;
 }
 
 void ExternalPaletteImpl::updateMetrics(vlc_qt_theme_image_type type)
@@ -518,17 +519,19 @@ void SystemPalette::makeSystemPalette()
         return;
     }
 
-    if (palette->isThemeDark())
-        makeDarkPalette();
-    else
-        makeLightPalette();
-
     vlc_qt_palette_t p;
 #define BIND_COLOR(name)  p. name = &m_##name;
     VLC_QT_INTF_PUBLIC_COLORS(BIND_COLOR)
 #undef BIND_COLOR
 
-    palette->update(p);
+    int ret = palette->update(p);
+    if (ret != VLC_SUCCESS)
+    {
+        if (palette->isThemeDark())
+            makeDarkPalette();
+        else
+            makeLightPalette();
+    }
 
     m_palettePriv = std::move(palette);
 }

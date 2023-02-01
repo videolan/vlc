@@ -144,7 +144,10 @@ struct vlc_qt_theme_provider_t
     //set by module
     void (*close)(vlc_qt_theme_provider_t* obj);
     bool (*isThemeDark)(vlc_qt_theme_provider_t* obj);
-    void (*updatePalette)(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*);
+    /**
+     * return VLC_SUCCESS if palette have been updated, VLC_EGENERIC otherwise
+     */
+    int (*updatePalette)(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*);
     picture_t* (*getThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, const vlc_qt_theme_image_setting* setting);
     bool (*getThemeMetrics)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type, vlc_qt_theme_metrics* setting);
     bool (*supportThemeImage)(vlc_qt_theme_provider_t* obj, vlc_qt_theme_image_type type);

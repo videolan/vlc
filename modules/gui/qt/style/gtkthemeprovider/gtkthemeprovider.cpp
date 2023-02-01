@@ -137,7 +137,7 @@ bool supportThemeImage(vlc_qt_theme_provider_t*, vlc_qt_theme_image_type type)
     return false;
 }
 
-static void updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
+static int updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t* p)
 {
     GdkRGBA bg = GetBgColor("GtkTreeView#treeview.view GtkTreeView#treeview.view.cell");
     GdkRGBA text = GetFgColor("GtkLabel#label");
@@ -164,6 +164,8 @@ static void updatePalette(vlc_qt_theme_provider_t* obj, struct vlc_qt_palette_t*
 
     setGtkColor(obj, p->tooltipColor, GetBgColorFromStyleContext(tooltip_context));
     setGtkColor(obj, p->tooltipTextColor, GtkStyleContextGetColor(AppendCssNodeToStyleContext(tooltip_context, "GtkLabel#label")));
+
+    return VLC_SUCCESS;
 }
 
 static void Close(vlc_qt_theme_provider_t* obj)

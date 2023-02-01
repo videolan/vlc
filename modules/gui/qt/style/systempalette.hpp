@@ -64,7 +64,7 @@ public:
 
     bool hasCSDImages() const;
 
-    void update(vlc_qt_palette_t& p);
+    int update(vlc_qt_palette_t& p);
     void updateMetrics(vlc_qt_theme_image_type type);
 
 signals:
