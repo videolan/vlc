@@ -576,11 +576,30 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                   inFrontOf:@[_libraryViewModeToolbarItem, _forwardsToolbarItem, _backwardsToolbarItem]];
 }
 
+- (void)setLibrarySearchToolbarItemVisible:(BOOL)visible
+{
+    if (!visible) {
+        [self hideToolbarItem:_librarySearchToolbarItem];
+        _librarySearchField.stringValue = @"";
+        [VLCMain.sharedInstance.libraryController filterByString:@""];
+        return;
+    }
+
+    // Display as far to the right as possible, but not in front of the playlist toggle button
+    NSMutableArray<NSToolbarItem *> *currentToolbarItems = [NSMutableArray arrayWithArray:self.toolbar.items];
+    if (currentToolbarItems.lastObject == _togglePlaylistToolbarItem) {
+        [currentToolbarItems removeLastObject];
+    }
+
+    NSArray *reversedCurrentToolbarItems = [[currentToolbarItems reverseObjectEnumerator] allObjects];
+    [self insertToolbarItem:_librarySearchToolbarItem inFrontOf:reversedCurrentToolbarItems];
+}
+
 - (void)showVideoLibrary
 {
     [self setForwardsBackwardsToolbarItemsVisible:NO];
     [self setSortOrderToolbarItemVisible:YES];
-    _librarySearchField.enabled = YES;
+    [self setLibrarySearchToolbarItemVisible:YES];
     _optionBarView.hidden = YES;
 
     _gridVsListSegmentedControl.target = self;
@@ -593,7 +612,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [self setForwardsBackwardsToolbarItemsVisible:NO];
     [self setSortOrderToolbarItemVisible:YES];
-    _librarySearchField.enabled = YES;
+    [self setLibrarySearchToolbarItemVisible:YES];
     _optionBarView.hidden = NO;
 
     _gridVsListSegmentedControl.target = self;
@@ -608,10 +627,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self setForwardsBackwardsToolbarItemsVisible:YES];
     [self setSortOrderToolbarItemVisible:NO];
+    [self setLibrarySearchToolbarItemVisible:NO];
     _optionBarView.hidden = YES;
-    _librarySearchField.enabled = NO;
-    _librarySearchField.stringValue = @"";
-    [VLCMain.sharedInstance.libraryController filterByString:@""];
 
     if (segment == VLCLibraryBrowseSegment) {
         [_libraryMediaSourceViewController presentBrowseView];
