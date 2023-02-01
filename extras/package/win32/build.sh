@@ -448,11 +448,7 @@ if [ -n "$BUILD_MESON" ]; then
     meson compile -j $JOBS
 else
 info "Bootstrapping"
-
-if ! [ -e ${VLC_ROOT_PATH}/configure ]; then
-    echo "Bootstraping vlc"
-    ${VLC_ROOT_PATH}/bootstrap
-fi
+${VLC_ROOT_PATH}/bootstrap
 
 mkdir -p $SHORTARCH
 cd $SHORTARCH
