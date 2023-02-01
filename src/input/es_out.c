@@ -3159,9 +3159,10 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     if( !EMPTY_STR(es->psz_language) )
         info_category_AddInfo( p_cat, _("Language"), "%s",
                                es->psz_language );
-    if( !EMPTY_STR(fmt->psz_description) )
+    if( !EMPTY_STR(fmt->psz_description) || !EMPTY_STR(p_fmt_es->psz_description) )
         info_category_AddInfo( p_cat, _("Description"), "%s",
-                               fmt->psz_description );
+                               EMPTY_STR(fmt->psz_description) ? p_fmt_es->psz_description
+                                                               : fmt->psz_description );
 
     switch( fmt->i_cat )
     {
