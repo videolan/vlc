@@ -523,11 +523,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 /*
  * Try to insert the toolbar item ahead of a group of possible toolbar items.
- * "items" should contain items sorted from the leading edge of the toolbar to trailing edge.
+ * "items" should contain items sorted from the trailing edge of the toolbar to leading edge.
  * "toolbarItem" will be inserted as close to the trailing edge as possible.
  *
  * If you have: | item1 | item2 | item3 | item4 |
- * and the "items" parameter is an array containing @[item1, item2, item5, item6]
+ * and the "items" parameter is an array containing @[item6, item5, item2, item1]
  * then the "toolbarItem" provided to this function will place toolbarItem thus:
  * | item1 | item2 | toolbarItem | item3 | item4 |
 */
@@ -561,15 +561,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return;
     }
 
-    NSInteger backwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_backwardsToolbarItem];
-    if (backwardsToolbarItemIndex == NSNotFound) {
-        [self.toolbar insertItemWithItemIdentifier:_backwardsToolbarItem.itemIdentifier atIndex:0];
-    }
-
-    NSInteger forwardsToolbarItemIndex = [[self.toolbar items] indexOfObject:_forwardsToolbarItem];
-    if (forwardsToolbarItemIndex == NSNotFound) {
-        [self.toolbar insertItemWithItemIdentifier:_forwardsToolbarItem.itemIdentifier atIndex:1];
-    }
+    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[]];
+    [self insertToolbarItem:_forwardsToolbarItem inFrontOf:@[_backwardsToolbarItem]];
 }
 
 - (void)setSortOrderToolbarItemVisible:(BOOL)visible
