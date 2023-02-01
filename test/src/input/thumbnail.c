@@ -96,7 +96,6 @@ static void thumbnailer_callback( void* data, picture_t* thumbnail )
         }
         assert( thumbnail->date == expected_date && "Unexpected picture date");
 #endif
-        picture_Release( thumbnail );
     }
     else
         assert( !test_params[p_ctx->test_idx].b_expected_success &&

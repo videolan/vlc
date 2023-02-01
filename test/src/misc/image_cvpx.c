@@ -85,6 +85,8 @@ static int OpenIntf(vlc_object_t *root)
     block_Release(block);
     image_HandlerDelete(ih);
 
+    picture_Release(picture);
+
     return VLC_SUCCESS;
 }
 

@@ -49,7 +49,8 @@ void Thumbnailer::onThumbnailComplete( void* data, picture_t* thumbnail )
     {
         vlc::threads::mutex_locker lock( ctx->thumbnailer->m_mutex );
         ctx->done = true;
-        ctx->thumbnail = thumbnail;
+        if (thumbnail != nullptr)
+            ctx->thumbnail = picture_Hold(thumbnail);
         ctx->thumbnailer->m_currentContext = nullptr;
     }
     ctx->thumbnailer->m_cond.signal();
@@ -86,13 +87,8 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     vlc_thumbnailer_DestroyRequest(m_thumbnailer.get(), ctx.request);
     ctx.request = NULL;
 
-    /* Both picture_Export and ThumbnailerCtx will release the thumbnail, so
-     * ensure that only picture_Export does. */
-    picture_t *thumbnail = nullptr;
-    std::swap(thumbnail, ctx.thumbnail);
-
     block_t* block;
-    if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, thumbnail,
+    if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, ctx.thumbnail,
                          VLC_CODEC_JPEG, desiredWidth, desiredHeight, true ) != VLC_SUCCESS )
         return false;
     auto blockPtr = vlc::wrap_cptr( block, &block_Release );

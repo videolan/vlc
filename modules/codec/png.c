@@ -446,7 +446,6 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     block_t *p_block = block_Alloc( p_sys->i_blocksize );
     if( p_block == NULL )
     {
-        picture_Release( p_pic );
         return NULL;
     }
 
@@ -454,7 +453,6 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     if( p_png == NULL )
     {
         block_Release( p_block );
-        picture_Release( p_pic );
         return NULL;
     }
 
@@ -521,7 +519,6 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     p_block->i_buffer = i_start - p_block->i_buffer;
 
     p_block->i_dts = p_block->i_pts = p_pic->date;
-    picture_Release( p_pic );
 
     return p_block;
 
@@ -530,6 +527,5 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     png_destroy_write_struct( &p_png, p_info ? &p_info : NULL );
 
     block_Release(p_block);
-    picture_Release( p_pic );
     return NULL;
 }

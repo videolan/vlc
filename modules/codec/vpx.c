@@ -501,7 +501,6 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     /* Create and initialize the vpx_image */
     if (!vpx_img_wrap(&img, VPX_IMG_FMT_I420, i_w, i_h, p_pict->p[0].i_pitch, p_pict->p[0].p_pixels)) {
         VPX_ERR(p_enc, ctx, "Failed to wrap image");
-        picture_Release(p_pict);
         return NULL;
     }
 
@@ -518,7 +517,6 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     if (res != VPX_CODEC_OK) {
         VPX_ERR(p_enc, ctx, "Failed to encode frame");
         vpx_img_free(&img);
-        picture_Release(p_pict);
         return NULL;
     }
 
@@ -581,7 +579,6 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         webp_write_header(p_header, i_vp8_data_size, i_webp_header_size);
 
     vpx_img_free(&img);
-    picture_Release(p_pict);
     return p_out;
 }
 

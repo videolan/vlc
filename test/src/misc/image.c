@@ -67,6 +67,7 @@ static int OpenIntf(vlc_object_t *root)
     block = image_Write(ih, picture, &fmt_in, &fmt_out);
     assert(block != NULL);
     block_Release(block);
+    picture_Release(picture);
 
     picture = picture_NewFromFormat(&fmt_in);
     fmt_out.i_width = fmt_out.i_visible_width = 400;
@@ -75,6 +76,7 @@ static int OpenIntf(vlc_object_t *root)
     assert(block != NULL);
 
     block_Release(block);
+    picture_Release(picture);
     image_HandlerDelete(ih);
 
     return VLC_SUCCESS;
@@ -82,10 +84,9 @@ static int OpenIntf(vlc_object_t *root)
 
 static block_t * EncodeVideo(encoder_t *encoder, picture_t *pic)
 {
-    (void)encoder;
+    (void)encoder; (void)pic;
 
     /* Dummy encoder */
-    picture_Release(pic);
     return block_Alloc(1);
 }
 

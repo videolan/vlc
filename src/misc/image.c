@@ -393,11 +393,11 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     {
         p_image->p_enc = CreateEncoder( p_image->p_parent,
                                         p_fmt_in, p_fmt_out );
-        if( !p_image->p_enc ) {
-            picture_Release( p_pic );
-            return NULL;
-        }
+        if( !p_image->p_enc ) return NULL;
     }
+
+    /* We'll release the picture at the end or during conversion. */
+    picture_Hold(p_pic);
 
     /* Check if we need chroma conversion or resizing */
     if( p_image->p_enc->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
@@ -430,7 +430,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
             if( !p_image->p_converter )
             {
-                picture_Release( p_pic );
+                picture_Release(p_pic);
                 return NULL;
             }
         }
@@ -443,6 +443,8 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
             es_format_Copy( &p_image->p_converter->fmt_out, &p_image->p_enc->fmt_in );
         }
 
+        /* Hold the picture there to let the caller release its own picture,
+         * since filters will consume the picture. */
         p_pic = p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
 
         if( likely(p_pic != NULL) )
@@ -453,7 +455,10 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
     block_t *p_block = NULL;
     if (p_pic != NULL)
+    {
         p_block = vlc_encoder_EncodeVideo(p_image->p_enc, p_pic);
+        picture_Release(p_pic);
+    }
 
     if( !p_block )
     {

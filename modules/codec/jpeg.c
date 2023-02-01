@@ -651,7 +651,6 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     block_t *p_block = block_Alloc(p_sys->i_blocksize);
     if (p_block == NULL)
     {
-        picture_Release(p_pic);
         return NULL;
     }
 
@@ -736,7 +735,6 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 
     p_block->i_buffer = size;
     p_block->i_dts = p_block->i_pts = p_pic->date;
-    picture_Release(p_pic);
 
     return p_block;
 
@@ -753,7 +751,6 @@ error:
     free(p_row_pointers);
 
     block_Release(p_block);
-    picture_Release(p_pic);
 
     return NULL;
 }
