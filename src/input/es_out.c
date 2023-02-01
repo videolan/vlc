@@ -4257,6 +4257,10 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
                                EMPTY_STR(fmt->psz_description) ? p_fmt_es->psz_description
                                                                : fmt->psz_description );
 
+    if( p_fmt_es->i_bitrate > 0 )
+        info_category_AddInfo( p_cat, _("Bitrate"), _("%u kb/s"),
+                               p_fmt_es->i_bitrate / 1000 );
+
     switch( fmt->i_cat )
     {
     case AUDIO_ES:
@@ -4304,11 +4308,10 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
             info_category_AddInfo( p_cat, _("Decoded bits per sample"), "%u",
                                    i_outbps );
 
-        if( fmt->i_bitrate != 0 )
-        {
-            info_category_AddInfo( p_cat, _("Bitrate"), _("%u kb/s"),
+        if( fmt->i_bitrate > 0 )
+            info_category_AddInfo( p_cat, _("Decoded Bitrate"), _("%u kb/s"),
                                    fmt->i_bitrate / 1000 );
-        }
+
         for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
         {
             const audio_replay_gain_t *p_rg = &fmt->audio_replay_gain;
