@@ -140,6 +140,10 @@ typedef struct
     int          i_seekpoint;
     input_title_t *p_title;
     vlc_meta_t    *p_meta;
+    struct
+    {
+        uint32_t i_delay_samples;
+    } qt;
 
     /* ASF in MP4 */
     asf_packet_sys_t asfpacketsys;
@@ -2181,7 +2185,11 @@ static int FragSeekToPos( demux_t *p_demux, double f, bool b_accurate )
 
 static void ItunMetaCallback( const struct qt_itunes_triplet_data *data, void *priv )
 {
-    VLC_UNUSED(data); VLC_UNUSED(priv);
+    demux_sys_t *p_sys = priv;
+    if( data->type == iTunSMPB )
+    {
+        p_sys->qt.i_delay_samples = data->SMPB.delay;
+    }
 }
 
 static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
@@ -3232,6 +3240,12 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                         p_track->i_decoder_delay = MP4_rescale( BOXDATA(p_elst)->entries[0].i_segment_duration,
                                                                 p_sys->i_timescale,
                                                                 p_track->i_timescale );
+                    }
+                    else if( p_sys->qt.i_delay_samples > 0 )
+                    {
+                        p_track->i_decoder_delay =  MP4_rescale_qtime(
+                                    vlc_tick_from_samples( p_sys->qt.i_delay_samples, p_fmt->audio.i_rate ),
+                                    p_track->i_timescale );
                     }
                     /* AAC historical Apple decoder delay 2112 > 2048 */
                     else if( p_fmt->i_codec == VLC_CODEC_MP4A )
