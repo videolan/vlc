@@ -142,7 +142,7 @@ typedef struct
 
     struct
     {
-        int es_cat_filters;
+        enum es_format_category_e es_cat_filter;
     } hacks;
 
     mp4_fragments_index_t *p_fragsindex;
@@ -923,7 +923,7 @@ static int Open( vlc_object_t * p_this )
             case BRAND_M4A:
                 msg_Dbg( p_demux, "iTunes audio" );
                 if( var_InheritBool( p_demux, CFG_PREFIX"m4a-audioonly" ) )
-                    p_sys->hacks.es_cat_filters = AUDIO_ES;
+                    p_sys->hacks.es_cat_filter = AUDIO_ES;
                 break;
             default:
                 msg_Dbg( p_demux,
@@ -1262,6 +1262,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->asfpacketsys.pf_gettrackinfo = MP4ASF_GetTrackInfo;
     p_sys->asfpacketsys.pf_updatetime = NULL;
     p_sys->asfpacketsys.pf_setaspectratio = NULL;
+
+    p_sys->hacks.es_cat_filter = UNKNOWN_ES;
 
     return VLC_SUCCESS;
 
@@ -3677,7 +3679,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
         }
     }
 
-    if( p_sys->hacks.es_cat_filters && (p_sys->hacks.es_cat_filters & p_track->fmt.i_cat) == 0 )
+    if( p_sys->hacks.es_cat_filter != UNKNOWN_ES &&
+        p_sys->hacks.es_cat_filter != p_track->fmt.i_cat )
     {
         p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
     }
