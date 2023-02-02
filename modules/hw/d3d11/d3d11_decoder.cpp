@@ -136,6 +136,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
             block_Release( p_block );
             return VLC_EGENERIC;
         }
+        DxgiFormatMask( p_sys->output_format->formatTexture, &p_dec->fmt_out.video );
 
         if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
         {
@@ -283,6 +284,7 @@ int D3D11OpenBlockDecoder( vlc_object_t *obj )
             vlc_decoder_device_Release(dec_dev);
             return VLC_EGENERIC;
         }
+        DxgiFormatMask( p_sys->output_format->formatTexture, &p_dec->fmt_out.video );
 
         if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
         {
