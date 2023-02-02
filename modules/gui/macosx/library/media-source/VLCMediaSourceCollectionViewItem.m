@@ -157,11 +157,6 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     });
 
     switch (_representedInputItem.inputType) {
-        case ITEM_TYPE_DIRECTORY:
-            _annotationTextField.stringValue = _NS("Folder");
-            _annotationTextField.hidden = NO;
-            break;
-
         case ITEM_TYPE_STREAM:
             _annotationTextField.stringValue = _NS("Stream");
             _annotationTextField.hidden = NO;
