@@ -33,6 +33,8 @@ typedef struct extension_sys_t extension_sys_t;
 
 /** Extension descriptor: name, title, author, ... */
 typedef struct extension_t {
+    void *p_sys;              /**< Reserved for the manager module */
+
     /* Below, (ro) means read-only for the GUI */
     char *psz_name;           /**< Real name of the extension (ro) */
 
@@ -44,8 +46,6 @@ typedef struct extension_t {
     char *psz_shortdescription; /**< Short description (eg. 1 line)  (ro) */
     char *p_icondata;         /**< Embedded data for the icon (ro) */
     int   i_icondata_size;    /**< Size of that data */
-
-    extension_sys_t *p_sys;   /**< Reserved for the manager module */
 } extension_t;
 
 /** Extensions manager object */
