@@ -64,7 +64,7 @@ static const char caps[][20] = {
 static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
                             const struct luabatch_context_t * );
-static int Control( extensions_manager_t *, int, va_list );
+static int Control( extensions_manager_t *, int, extension_t *, va_list );
 static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     char ***pppsz_titles, uint16_t **ppi_ids );
 static lua_State* GetLuaState( extensions_manager_t *p_mgr,
@@ -483,9 +483,9 @@ exit:
     return VLC_EGENERIC;
 }
 
-static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
+static int Control(extensions_manager_t *p_mgr, int i_control,
+                   extension_t *ext, va_list args)
 {
-    extension_t *p_ext = NULL;
     bool *pb = NULL;
     uint16_t **ppus = NULL;
     char ***pppsz = NULL;
@@ -494,118 +494,102 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
     switch( i_control )
     {
         case EXTENSION_ACTIVATE:
-            p_ext = va_arg( args, extension_t* );
-            return Activate( p_mgr, p_ext );
+            return Activate(p_mgr, ext);
 
         case EXTENSION_DEACTIVATE:
-            p_ext = va_arg( args, extension_t* );
-            return Deactivate( p_mgr, p_ext );
+            return Deactivate(p_mgr, ext);
 
         case EXTENSION_IS_ACTIVATED:
-            p_ext = va_arg( args, extension_t* );
             pb = va_arg( args, bool* );
-            vlc_mutex_lock( &p_ext->p_sys->command_lock );
-            *pb = p_ext->p_sys->b_activated;
-            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+            vlc_mutex_lock(&ext->p_sys->command_lock);
+            *pb = ext->p_sys->b_activated;
+            vlc_mutex_unlock(&ext->p_sys->command_lock);
             break;
 
         case EXTENSION_HAS_MENU:
-            p_ext = va_arg( args, extension_t* );
             pb = va_arg( args, bool* );
-            *pb = ( p_ext->p_sys->i_capabilities & EXT_HAS_MENU ) ? 1 : 0;
+            *pb = (ext->p_sys->i_capabilities & EXT_HAS_MENU) ? 1 : 0;
             break;
 
         case EXTENSION_GET_MENU:
-            p_ext = va_arg( args, extension_t* );
             pppsz = va_arg( args, char*** );
             ppus = va_arg( args, uint16_t** );
-            if( p_ext == NULL )
-                return VLC_EGENERIC;
-            return GetMenuEntries( p_mgr, p_ext, pppsz, ppus );
+            return GetMenuEntries(p_mgr, ext, pppsz, ppus);
 
         case EXTENSION_TRIGGER_ONLY:
-            p_ext = va_arg( args, extension_t* );
             pb = va_arg( args, bool* );
-            *pb = ( p_ext->p_sys->i_capabilities & EXT_TRIGGER_ONLY ) ? 1 : 0;
+            *pb = (ext->p_sys->i_capabilities & EXT_TRIGGER_ONLY) ? 1 : 0;
             break;
 
         case EXTENSION_TRIGGER:
-            p_ext = va_arg( args, extension_t* );
-            return TriggerExtension( p_mgr, p_ext );
+            return TriggerExtension(p_mgr, ext);
 
         case EXTENSION_TRIGGER_MENU:
-            p_ext = va_arg( args, extension_t* );
             i = va_arg( args, int );
-            return TriggerMenu( p_ext, i );
+            return TriggerMenu(ext, i);
 
         case EXTENSION_SET_INPUT:
         {
-            p_ext = va_arg( args, extension_t* );
             input_item_t *p_item = va_arg( args, struct input_item_t * );
 
-            if( p_ext == NULL )
-                return VLC_EGENERIC;
-            vlc_mutex_lock( &p_ext->p_sys->command_lock );
-            if ( p_ext->p_sys->b_exiting == true )
+            vlc_mutex_lock(&ext->p_sys->command_lock);
+            if (ext->p_sys->b_exiting)
             {
-                vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+                vlc_mutex_unlock(&ext->p_sys->command_lock);
                 return VLC_EGENERIC;
             }
-            vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+            vlc_mutex_unlock(&ext->p_sys->command_lock);
 
-            vlc_mutex_lock( &p_ext->p_sys->running_lock );
+            vlc_mutex_lock(&ext->p_sys->running_lock);
 
             // Change input
-            input_item_t *old = p_ext->p_sys->p_item;
+            input_item_t *old = ext->p_sys->p_item;
             if( old )
             {
                 // Untrack meta fetched events
-                if( p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
+                if (ext->p_sys->i_capabilities & EXT_META_LISTENER)
                 {
-                    vlc_event_detach( &old->event_manager,
-                                      vlc_InputItemMetaChanged,
-                                      inputItemMetaChanged,
-                                      p_ext );
+                    vlc_event_detach(&old->event_manager,
+                                     vlc_InputItemMetaChanged,
+                                     inputItemMetaChanged,
+                                     ext);
                 }
                 input_item_Release( old );
             }
 
-            p_ext->p_sys->p_item = p_item ? input_item_Hold(p_item) : NULL;
+            ext->p_sys->p_item = p_item ? input_item_Hold(p_item) : NULL;
 
             // Tell the script the input changed
-            if( p_ext->p_sys->i_capabilities & EXT_INPUT_LISTENER )
+            if(ext->p_sys->i_capabilities & EXT_INPUT_LISTENER)
             {
-                PushCommandUnique( p_ext, CMD_SET_INPUT );
+                PushCommandUnique(ext, CMD_SET_INPUT);
             }
 
             // Track meta fetched events
-            if( p_ext->p_sys->p_item &&
-                p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
+            if (ext->p_sys->p_item &&
+                ext->p_sys->i_capabilities & EXT_META_LISTENER )
             {
-                vlc_event_attach( &p_item->event_manager,
-                                  vlc_InputItemMetaChanged,
-                                  inputItemMetaChanged,
-                                  p_ext );
+                vlc_event_attach(&p_item->event_manager,
+                                 vlc_InputItemMetaChanged,
+                                 inputItemMetaChanged,
+                                 ext);
             }
 
-            vlc_mutex_unlock( &p_ext->p_sys->running_lock );
+            vlc_mutex_unlock(&ext->p_sys->running_lock);
             break;
         }
         case EXTENSION_PLAYING_CHANGED:
         {
-            p_ext = va_arg( args, extension_t* );
-            assert( p_ext->psz_name != NULL );
+            assert(ext->psz_name != NULL);
             i = va_arg( args, int );
-            if( p_ext->p_sys->i_capabilities & EXT_PLAYING_LISTENER )
-            {
-                PushCommand( p_ext, CMD_PLAYING_CHANGED, i );
-            }
+            if (ext->p_sys->i_capabilities & EXT_PLAYING_LISTENER)
+                PushCommand(ext, CMD_PLAYING_CHANGED, i);
             break;
         }
         case EXTENSION_META_CHANGED:
         {
-            p_ext = va_arg( args, extension_t* );
-            PushCommand( p_ext, CMD_UPDATE_META );
+            ext = va_arg( args, extension_t* );
+            PushCommand(ext, CMD_UPDATE_META);
             break;
         }
         default:

@@ -60,7 +60,7 @@ struct extensions_manager_t
     vlc_mutex_t lock;                  /**< A lock for the extensions array */
 
     /** Control, see extension_Control */
-    int ( *pf_control ) ( extensions_manager_t*, int, va_list );
+    int (*pf_control)(extensions_manager_t*, int, extension_t *, va_list);
 };
 
 /* Control commands */
@@ -85,11 +85,12 @@ enum
  * Every GUI -> extension command will go through this function.
  **/
 static inline int extension_Control( extensions_manager_t *p_mgr,
-                                     int i_control, ... )
+                                     int i_control,
+                                     extension_t *ext, ... )
 {
     va_list args;
-    va_start( args, i_control );
-    int i_ret = p_mgr->pf_control( p_mgr, i_control, args );
+    va_start(args, ext);
+    int i_ret = p_mgr->pf_control(p_mgr, i_control, ext, args);
     va_end( args );
     return i_ret;
 }
