@@ -329,22 +329,22 @@ FocusScope {
 
             property int _columns: Math.max(1, VLCStyle.gridColumnsForWidth(availableRowWidth) - 2)
 
-            //-------------------------------------------------------------------------------------
-            // Settings
+            property var _modelSmall: [{
+                size: Math.max(2, _columns),
 
-            rowHeight: VLCStyle.tableCoverRow_height
+                model: {
+                    criteria: "name",
 
-            headerTopPadding: VLCStyle.margin_normal
+                    subCriterias: [ "count" ],
 
-            model: root.model
+                    text: I18n.qtr("Name"),
 
-            selectionDelegateModel: modelSelect
+                    headerDelegate: columns.titleHeaderDelegate,
+                    colDelegate   : columns.titleDelegate
+                }
+            }]
 
-            dragItem: dragItemPlaylist
-
-            headerColor: VLCStyle.colors.bg
-
-            sortModel: [{
+            property var _modelMedium: [{
                 size: 1,
 
                 model: {
@@ -371,6 +371,24 @@ FocusScope {
                 }
             }]
 
+            //-------------------------------------------------------------------------------------
+            // Settings
+
+            rowHeight: VLCStyle.tableCoverRow_height
+
+            headerTopPadding: VLCStyle.margin_normal
+
+            model: root.model
+
+            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                  : _modelMedium
+
+            selectionDelegateModel: modelSelect
+
+            dragItem: dragItemPlaylist
+
+            headerColor: VLCStyle.colors.bg
+
             Navigation.parentItem: root
             Navigation.cancelAction: root._onNavigationCancel
 
@@ -392,7 +410,8 @@ FocusScope {
             Widgets.TableColumns {
                 id: columns
 
-                showTitleText: false
+                showTitleText: (tableView.sortModel === tableView._modelSmall)
+                showCriterias: showTitleText
 
                 criteriaCover: "thumbnail"
 
