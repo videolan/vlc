@@ -44,17 +44,24 @@ MainInterface.MainTableView {
 
     property bool _before: true
 
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
+    property var _modelSmall: [{
+        size: Math.max(2, columns),
 
-    rowHeight: VLCStyle.tableCoverRow_height
+        model: {
+            criteria: "title",
 
-    headerColor: VLCStyle.colors.bg
+            subCriterias: [ "duration" ],
 
-    acceptDrop: true
+            text: I18n.qtr("Title"),
 
-    sortModel: [{
+            headerDelegate: table.titleHeaderDelegate,
+            colDelegate   : table.titleDelegate,
+
+            placeHolder: VLCStyle.noArtAlbumCover
+        }
+    }]
+
+    property var _modelMedium: [{
         size: 1,
 
         model: {
@@ -68,7 +75,7 @@ MainInterface.MainTableView {
             placeHolder: VLCStyle.noArtAlbumCover
         }
     }, {
-        size: Math.max(columns - 2, 1),
+        size: Math.max(1, columns - 2),
 
         model: {
             criteria: "title",
@@ -85,6 +92,19 @@ MainInterface.MainTableView {
             colDelegate   : table.timeColDelegate
         }
     }]
+
+    //---------------------------------------------------------------------------------------------
+    // Settings
+    //---------------------------------------------------------------------------------------------
+
+    rowHeight: VLCStyle.tableCoverRow_height
+
+    headerColor: VLCStyle.colors.bg
+
+    acceptDrop: true
+
+    sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                          : _modelMedium
 
     //---------------------------------------------------------------------------------------------
     // Events
@@ -196,7 +216,8 @@ MainInterface.MainTableView {
         titleCover_height: VLCStyle.listAlbumCover_height
         titleCover_radius: VLCStyle.listAlbumCover_radius
 
-        showTitleText: false
+        showTitleText: (root.sortModel === root._modelSmall)
+        showCriterias: showTitleText
 
         criteriaCover: "thumbnail"
 
