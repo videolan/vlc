@@ -90,13 +90,15 @@ T.TabButton {
     }
 
     contentItem: Item {
-        implicitWidth: tabRow.implicitWidth
+        implicitWidth: tabRow.implicitWidth + VLCStyle.margin_xxsmall * 2
         implicitHeight: tabRow.implicitHeight
 
         RowLayout {
             id: tabRow
 
             anchors.centerIn: parent
+            anchors.leftMargin: VLCStyle.margin_xxsmall
+            anchors.rightMargin: VLCStyle.margin_xxsmall
 
             spacing: VLCStyle.margin_xsmall
 
@@ -132,7 +134,7 @@ T.TabButton {
 
             orientation: Qt.Horizontal
 
-            margin: VLCStyle.dp(3, VLCStyle.scale)
+            margin: VLCStyle.margin_xxsmall
 
             visible: (control.showCurrentIndicator && control.selected)
         }
