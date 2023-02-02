@@ -315,6 +315,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/mainwindow/VLCControlsBarCommon.m \
 	gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.h \
 	gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.m \
+	gui/macosx/windows/video/VLCAspectRatioRetainingVideoWindow.h \
+	gui/macosx/windows/video/VLCAspectRatioRetainingVideoWindow.m \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.h \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.m \
 	gui/macosx/windows/video/VLCFSPanelController.h \
