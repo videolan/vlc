@@ -32,9 +32,10 @@ Widgets.KeyNavigableTableView {
 
     // Properties
 
-    readonly property int _expandingColsSpan: Math.floor((VLCStyle.gridColumnsForWidth(root.availableRowWidth) - 3 /* static cols (track_number, etc)*/) / 3)
+    property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
 
-    property alias parentId: rootmodel.parentId
+    readonly property int _sizeA: Math.floor((_nbCols - 3) / 3)
+    readonly property int _sizeB: Math.floor((_nbCols - 2) / 2)
 
     // Private
 
@@ -95,15 +96,15 @@ Widgets.KeyNavigableTableView {
     })
 
     property var _modelLarge: [{
-        size: _expandingColsSpan,
+        size: _sizeA,
 
         model: _lineTitle
     }, {
-        size: _expandingColsSpan,
+        size: _sizeA,
 
         model: _lineAlbum
     }, {
-        size: _expandingColsSpan,
+        size: _sizeA,
 
         model: _lineArtist
     }, {
@@ -121,11 +122,11 @@ Widgets.KeyNavigableTableView {
     }]
 
     property var _modelMedium: [{
-        size: 2,
+        size: _sizeB,
 
         model: _lineTitle
     }, {
-        size: 2,
+        size: _sizeB,
 
         model: _lineAlbum
     }, {
@@ -139,25 +140,32 @@ Widgets.KeyNavigableTableView {
     }]
 
     property var _modelSmall: [{
-        size: 1,
+        size: Math.max(2, _nbCols),
 
-        model: _lineTitle
-    }, {
-        size: 1,
+        model: ({
+            criteria: "title",
 
-        model: _lineAlbum
-    }, {
-        size: 1,
+            subCriterias: [ "duration", "album_title" ],
 
-        model: _lineArtist
-    }, {
-        size: 1,
+            text: I18n.qtr("Title"),
 
-        model: _lineDuration
+            showSection: "title",
+
+            colDelegate: tableColumns.titleDelegate,
+            headerDelegate: tableColumns.titleHeaderDelegate,
+
+            placeHolder: VLCStyle.noArtAlbumCover
+        })
     }]
 
+    // Aliases
+
+    property alias parentId: rootmodel.parentId
+
+    // Settings
+
     sortModel: {
-        if (availableRowWidth < VLCStyle.colWidth(6))
+        if (availableRowWidth < VLCStyle.colWidth(4))
             return _modelSmall
         else if (availableRowWidth < VLCStyle.colWidth(9))
             return _modelMedium
@@ -186,6 +194,8 @@ Widgets.KeyNavigableTableView {
 
     Widgets.TableColumns {
         id: tableColumns
+
+        showCriterias: (root.sortModel === root._modelSmall)
     }
 
     MLAlbumTrackModel {
