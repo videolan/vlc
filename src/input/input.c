@@ -588,7 +588,8 @@ static void MainLoopStatistics( input_thread_t *p_input )
 
     /* In case of failure (not implemented or in case of seek), use the last
      * normal_time value (that is VLC_TICK_0 by default). */
-    demux_Control( priv->master->p_demux, DEMUX_GET_NORMAL_TIME, &priv->normal_time );
+    if (demux_Control( priv->master->p_demux, DEMUX_GET_NORMAL_TIME, &priv->normal_time ) != VLC_SUCCESS)
+        priv->normal_time = VLC_TICK_0;
 
     es_out_SetTimes( priv->p_es_out, f_position, i_time, priv->normal_time,
                      i_length );
