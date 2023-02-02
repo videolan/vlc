@@ -29,10 +29,16 @@
 /* Structures */
 typedef struct extensions_manager_sys_t extensions_manager_sys_t;
 typedef struct extensions_manager_t extensions_manager_t;
+struct vlc_logger;
 
 /** Extension descriptor: name, title, author, ... */
 typedef struct extension_t {
     void *p_sys;              /**< Reserved for the manager module */
+
+    /**
+     * The LibVLC logger to use for the extension.
+     */
+    struct vlc_logger *logger;
 
     /* Below, (ro) means read-only for the GUI */
     char *psz_name;           /**< Real name of the extension (ro) */
