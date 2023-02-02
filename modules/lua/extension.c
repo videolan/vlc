@@ -310,6 +310,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         return 0;
     }
 
+    p_ext->logger = vlc_object_logger(p_mgr);
     p_ext->psz_name = psz_script;
     struct lua_extension *sys
         = p_ext->p_sys
