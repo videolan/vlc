@@ -329,11 +329,11 @@ static void* Run( void *data )
 
             case CMD_DEACTIVATE:
             {
-                msg_Dbg( p_mgr, "Deactivating '%s'", p_ext->psz_title );
+                vlc_debug(p_ext->logger, "Deactivating '%s'", p_ext->psz_title);
                 if( lua_ExtensionDeactivate( p_mgr, p_ext ) < 0 )
                 {
-                    msg_Warn( p_mgr, "Extension '%s' did not deactivate properly",
-                              p_ext->psz_title );
+                    vlc_warning(p_ext->logger, "Extension '%s' did not deactivate properly",
+                                p_ext->psz_title);
                 }
                 vlc_mutex_lock(&sys->command_lock);
                 sys->b_activated = false;
@@ -352,12 +352,10 @@ static void* Run( void *data )
             {
                 extension_widget_t *p_widget = cmd->data[0];
                 assert( p_widget );
-                msg_Dbg( p_mgr, "Clicking '%s': '%s'",
-                         p_ext->psz_name, p_widget->psz_text );
+                vlc_debug(p_ext->logger, "Clicking '%s': '%s'",
+                         p_ext->psz_name, p_widget->psz_text);
                 if( lua_ExtensionWidgetClick( p_mgr, p_ext, p_widget ) < 0 )
-                {
-                    msg_Warn( p_mgr, "Could not translate click" );
-                }
+                    vlc_debug(p_ext->logger, "Could not translate click");
                 break;
             }
 
@@ -365,8 +363,8 @@ static void* Run( void *data )
             {
                 int *pi_id = cmd->data[0];
                 assert( pi_id );
-                msg_Dbg( p_mgr, "Trigger menu %d of '%s'",
-                         *pi_id, p_ext->psz_name );
+                vlc_debug(p_ext->logger, "Trigger menu %d of '%s'",
+                          *pi_id, p_ext->psz_name);
                 lua_ExtensionTriggerMenu( p_mgr, p_ext, *pi_id );
                 break;
             }
