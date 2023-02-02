@@ -124,6 +124,8 @@ static void FreeCommands( struct command_t *command )
 bool QueueDeactivateCommand( extension_t *p_ext )
 {
     struct lua_extension *sys = p_ext->p_sys;
+    vlc_mutex_assert(&sys->command_lock);
+
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
     if( unlikely( cmd == NULL ) )
         return false;
