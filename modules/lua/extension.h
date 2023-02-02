@@ -50,7 +50,7 @@ typedef enum
     LUA_TEXT
 } lua_datatype_e;
 
-struct extension_sys_t
+struct lua_extension
 {
     /* Extension general */
     int i_capabilities;

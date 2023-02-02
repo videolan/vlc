@@ -29,7 +29,6 @@
 /* Structures */
 typedef struct extensions_manager_sys_t extensions_manager_sys_t;
 typedef struct extensions_manager_t extensions_manager_t;
-typedef struct extension_sys_t extension_sys_t;
 
 /** Extension descriptor: name, title, author, ... */
 typedef struct extension_t {

@@ -48,7 +48,7 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_ext != NULL );
 
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     assert(sys != NULL);
 
     vlc_mutex_lock(&sys->command_lock);
@@ -121,7 +121,7 @@ static void FreeCommands( struct command_t *command )
 
 bool QueueDeactivateCommand( extension_t *p_ext )
 {
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
     if( unlikely( cmd == NULL ) )
         return false;
@@ -146,7 +146,7 @@ bool QueueDeactivateCommand( extension_t *p_ext )
 /** Deactivate this extension: pushes immediate command and drops queued */
 int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     vlc_mutex_lock(&sys->command_lock);
     if (!sys->b_activated && !sys->b_activating)
     {
@@ -179,7 +179,7 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 /* MUST be called with command_lock held */
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     msg_Dbg( p_mgr, "Killing extension now" );
     vlclua_fd_interrupt(&sys->dtable);
     sys->b_activated = false;
@@ -191,7 +191,7 @@ void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
 int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
                    va_list args )
 {
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     /* Create command */
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
     if( unlikely( cmd == NULL ) )
@@ -280,7 +280,7 @@ int PushCommand__( extension_t *p_ext,  bool b_unique, command_type_e i_command,
 static void* Run( void *data )
 {
     extension_t *p_ext = data;
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     extensions_manager_t *p_mgr = sys->p_mgr;
 
     vlc_thread_set_name("vlc-lua-ext");

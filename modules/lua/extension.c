@@ -139,7 +139,7 @@ void Close_Extension( vlc_object_t *p_this )
     {
         if( !p_ext )
             break;
-        extension_sys_t *sys = p_ext->p_sys;
+        struct lua_extension *sys = p_ext->p_sys;
 
         vlc_mutex_lock(&sys->command_lock);
         if (sys->b_activated && sys->p_progress_id == NULL &&
@@ -311,7 +311,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     }
 
     p_ext->psz_name = psz_script;
-    struct extension_sys_t *sys
+    struct lua_extension *sys
         = p_ext->p_sys
         = calloc(1, sizeof(*sys));
     if (sys == NULL || !p_ext->psz_name)
@@ -489,7 +489,7 @@ exit:
 static int Control(extensions_manager_t *p_mgr, int i_control,
                    extension_t *ext, va_list args)
 {
-    extension_sys_t *sys = ext->p_sys;
+    struct lua_extension *sys = ext->p_sys;
 
     bool *pb = NULL;
     uint16_t **ppus = NULL;
@@ -616,7 +616,7 @@ int lua_ExtensionActivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_mgr != NULL && p_ext != NULL );
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
 
     vlclua_fd_interrupt(&sys->dtable);
 
@@ -639,7 +639,7 @@ int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
                               extension_t *p_ext,
                               extension_widget_t *p_widget )
 {
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     if (sys->L == NULL)
         return VLC_SUCCESS;
 
@@ -665,7 +665,7 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
 {
     assert( *pppsz_titles == NULL );
     assert( *ppi_ids == NULL );
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
 
     vlc_mutex_lock(&sys->command_lock);
     if (!sys->b_activated || sys->b_exiting)
@@ -761,7 +761,7 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
                                extension_t *p_ext )
 {
     assert( p_ext != NULL );
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     lua_State *L = sys->L;
 
     if( !L )
@@ -985,7 +985,7 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
 static int TriggerExtension( extensions_manager_t *p_mgr,
                              extension_t *p_ext )
 {
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
 
     int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "trigger", LUA_END );
 
@@ -1032,7 +1032,7 @@ extension_t *vlclua_extension_get( lua_State *L )
 int vlclua_extension_deactivate( lua_State *L )
 {
     extension_t *p_ext = vlclua_extension_get( L );
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
 
     vlc_mutex_lock(&sys->command_lock);
     bool b_ret = QueueDeactivateCommand( p_ext );
@@ -1047,7 +1047,7 @@ int vlclua_extension_deactivate( lua_State *L )
 int vlclua_extension_keep_alive( lua_State *L )
 {
     extension_t *p_ext = vlclua_extension_get( L );
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
 
     vlc_mutex_lock(&sys->command_lock);
     if (sys->p_progress_id != NULL)
@@ -1126,7 +1126,7 @@ static void inputItemMetaChanged( const vlc_event_t *p_event,
 static void WatchTimerCallback( void *data )
 {
     extension_t *p_ext = data;
-    extension_sys_t *sys = p_ext->p_sys;
+    struct lua_extension *sys = p_ext->p_sys;
     extensions_manager_t *p_mgr = sys->p_mgr;
 
     vlc_mutex_lock(&sys->command_lock);
