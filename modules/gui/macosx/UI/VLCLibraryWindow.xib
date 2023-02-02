@@ -657,9 +657,11 @@
                     </toolbarItem>
                     <searchToolbarItem implicitItemIdentifier="A132890F-6B3D-4523-A71B-B00F095057C4" label="Search" paletteLabel="Search" visibilityPriority="1001" id="dv4-Il-y8X">
                         <nil key="toolTip"/>
-                        <searchField key="view" verticalHuggingPriority="750" textCompletion="NO" id="ab6-kR-8Io">
-                            <rect key="frame" x="0.0" y="0.0" width="100" height="21"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                        <searchField key="view" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ab6-kR-8Io">
+                            <rect key="frame" x="0.0" y="0.0" width="100" height="22"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="200" id="hhF-2O-Qx7"/>
+                            </constraints>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsSearchStringImmediately="YES" id="MW6-rQ-Qtr">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
