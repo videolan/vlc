@@ -92,7 +92,7 @@ struct lua_extension
 };
 
 /* Extensions: manager functions */
-int Activate( extensions_manager_t *p_mgr, extension_t * );
+int Activate(extension_t *);
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
 bool QueueDeactivateCommand( extension_t *p_ext );
 void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext );

@@ -28,6 +28,9 @@
 #include "extension.h"
 #include "assert.h"
 
+#include <vlc_common.h>
+#include <vlc_messages.h>
+
 struct thread_sys_t
 {
     extensions_manager_t *p_mgr;
@@ -40,11 +43,10 @@ static void FreeCommands( struct command_t *command );
 
 /**
  * Activate an extension
- * @param p_mgr This manager
  * @param p_ext Extension to activate
  * @return The usual VLC return codes
  **/
-int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
+int Activate(extension_t *p_ext)
 {
     assert( p_ext != NULL );
 
@@ -70,7 +72,7 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
         sys->command->i_command = CMD_ACTIVATE; /* No params */
         if (sys->b_thread_running)
         {
-            msg_Dbg( p_mgr, "Reactivating extension %s", p_ext->psz_title);
+            vlc_debug(p_ext->logger, "Reactivating extension %s", p_ext->psz_title);
             vlc_cond_signal(&sys->wait);
         }
         sys->b_activating = true;
@@ -80,7 +82,7 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
     if (sys->b_thread_running)
         return VLC_SUCCESS;
 
-    msg_Dbg( p_mgr, "Activating extension '%s'", p_ext->psz_title );
+    vlc_debug(p_ext->logger, "Activating extension '%s'", p_ext->psz_title);
     /* Start thread */
     sys->b_exiting = false;
     sys->b_thread_running = true;

@@ -500,7 +500,7 @@ static int Control(extensions_manager_t *p_mgr, int i_control,
     switch( i_control )
     {
         case EXTENSION_ACTIVATE:
-            return Activate(p_mgr, ext);
+            return Activate(ext);
 
         case EXTENSION_DEACTIVATE:
             return Deactivate(p_mgr, ext);
