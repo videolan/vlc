@@ -31,7 +31,7 @@ VLC is available for the following platforms:
 - [Windows] *(from 7 and later, including UWP platforms and all versions of Windows 10)*
 - [macOS] *(10.10 and later)*
 - [GNU/Linux] and affiliated
-- \*BSD and affiliated
+- [BSD] and affiliated
 - [Android] *(4.2 and later)*, including Android TV and Android Auto
 - [iOS] *(9 and later)*, including AppleTV and iPadOS
 - Haiku, OS/2 and a few others.
@@ -39,6 +39,7 @@ VLC is available for the following platforms:
 [Windows]: https://www.videolan.org/vlc/download-windows.html
 [macOS]: https://www.videolan.org/vlc/download-macosx.html
 [GNU/Linux]: https://www.videolan.org/vlc/#download
+[BSD]: https://www.videolan.org/vlc/download-freebsd.html
 [Android]: https://www.videolan.org/vlc/download-android.html
 [iOS]: https://www.videolan.org/vlc/download-ios.html
 
@@ -61,12 +62,12 @@ Other repositories linked to vlc are done in languages including Kotlin/Java [(A
 Swift [(iOS)](https://code.videolan.org/videolan/vlc-ios/), and C# [(libVLCSharp)](https://code.videolan.org/videolan/libvlcsharp/).
 
 We need help with the following tasks:
-- coding
-- packaging for Windows, macOS and Linux distributions
-- technical writing for the documentation
-- design
-- support
-- community management and communication.
+- Coding
+- Packaging for Windows, macOS and Linux distributions
+- Technical writing for the documentation
+- Design
+- Support
+- Community management and communication.
 
 Please contribute :)
 
