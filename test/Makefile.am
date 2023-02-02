@@ -118,8 +118,6 @@ test_libvlc_tracer_SOURCES = libvlc/tracer.c
 test_libvlc_tracer_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_ancillary_SOURCES = src/misc/ancillary.c
 test_src_misc_ancillary_LDADD = $(LIBVLCCORE) $(LIBVLC)
-test_libvlc_tracer_SOURCES = libvlc/tracer.c
-test_libvlc_tracer_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_variables_SOURCES = src/misc/variables.c
 test_src_misc_variables_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_config_chain_SOURCES = src/config/chain.c
@@ -396,3 +394,12 @@ noinst_PROGRAMS += vlccoreios vlccoreiostuner
 endif
 
 noinst_PROGRAMS += vlccoretuner
+
+vout_vsync_SOURCES = src/video_output/vout_vsync.c ../src/video_output/vout_scheduler.h ../src/video_output/vout_vsync.c
+vout_vsync_LDFLAGS = -Xlinker -rpath -Xlinker "@executable_path/../../lib/.libs" -Xlinker -rpath -Xlinker "@executable_path/../../src/.libs"
+vout_vsync_LDADD = ../lib/libvlc.la ../src/libvlccore.la
+vout_vsync_CFLAGS = $(AM_CFLAGS) -DVOUT_VSYNC_TEST
+if HAVE_STATIC_LIBVLC
+vout_vsync_CFLAGS += -DHAVE_STATIC_LIBVLC
+endif
+noinst_PROGRAMS += vout-vsync
