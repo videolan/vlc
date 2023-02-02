@@ -236,25 +236,24 @@ FocusScope {
         MainInterface.MainTableView {
             id: tableView_id
 
-            property int _nameColSpan: Math.max(1, VLCStyle.gridColumnsForWidth(availableRowWidth) - 2)
+            property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
 
-            model: genreModel
-            selectionDelegateModel: selectionModel
-            headerColor: VLCStyle.colors.bg
-            focus: true
-            onActionForSelection: _actionAtIndex(selection)
-            Navigation.parentItem: root
-            Navigation.cancelAction: function() {
-                if (_currentView.currentIndex <= 0)
-                    root.Navigation.defaultNavigationCancel()
-                else
-                    _currentView.currentIndex = 0;
-            }
-            dragItem: genreDragItem
-            rowHeight: VLCStyle.tableCoverRow_height
-            headerTopPadding: VLCStyle.margin_normal
+            property var _modelSmall: [{
+                size: Math.max(2, tableView_id._nbCols),
 
-            sortModel: [{
+                model: {
+                    criteria: "name",
+
+                    subCriterias: [ "nb_tracks" ],
+
+                    text: I18n.qtr("Name"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate
+                }
+            }]
+
+            property var _modelMedium: [{
                 size: 1,
 
                 model: {
@@ -264,7 +263,7 @@ FocusScope {
                     colDelegate: tableColumns.titleDelegate
                 }
             }, {
-                size: _nameColSpan,
+                size: Math.max(1, _nbCols - 2),
 
                 model: {
                     criteria: "name",
@@ -281,6 +280,26 @@ FocusScope {
                 }
             }]
 
+            model: genreModel
+
+            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                  : _modelMedium
+
+            selectionDelegateModel: selectionModel
+            headerColor: VLCStyle.colors.bg
+            focus: true
+            onActionForSelection: _actionAtIndex(selection)
+            Navigation.parentItem: root
+            Navigation.cancelAction: function() {
+                if (_currentView.currentIndex <= 0)
+                    root.Navigation.defaultNavigationCancel()
+                else
+                    _currentView.currentIndex = 0;
+            }
+            dragItem: genreDragItem
+            rowHeight: VLCStyle.tableCoverRow_height
+            headerTopPadding: VLCStyle.margin_normal
+
             onItemDoubleClicked: {
                 root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
             }
@@ -291,7 +310,9 @@ FocusScope {
             Widgets.TableColumns {
                 id: tableColumns
 
-                showTitleText: false
+                showTitleText: (tableView_id.sortModel === tableView_id._modelSmall)
+                showCriterias: showTitleText
+
                 titleCover_height: VLCStyle.listAlbumCover_height
                 titleCover_width: VLCStyle.listAlbumCover_width
                 titleCover_radius: VLCStyle.listAlbumCover_radius
