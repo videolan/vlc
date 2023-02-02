@@ -408,7 +408,22 @@ FocusScope {
             headerPositioning: ListView.InlineHeader
             rowHeight: VLCStyle.tableCoverRow_height
 
-            sortModel: [{
+            property var _modelSmall: [{
+                size: Math.max(2, tableView_id._nbCols),
+
+                model: {
+                    criteria: "title",
+
+                    subCriterias: [ "duration", "album_title" ],
+
+                    text: I18n.qtr("Title"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate
+                }
+            }]
+
+            property var _modelMedium: [{
                 size: 2,
 
                 model: {
@@ -420,7 +435,7 @@ FocusScope {
                     colDelegate: tableColumns.titleDelegate
                 }
             }, {
-                size: Math.max(tableView_id._nbCols - 3, 1),
+                size: Math.max(1, tableView_id._nbCols - 3),
 
                 model: {
                     criteria: "album_title",
@@ -439,6 +454,9 @@ FocusScope {
                     colDelegate: tableColumns.timeColDelegate
                 }
             }]
+
+            sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
+                                                                  : _modelMedium
 
             Navigation.parentItem: root
 
@@ -464,6 +482,8 @@ FocusScope {
 
             Widgets.TableColumns {
                 id: tableColumns
+
+                showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
             }
 
             Util.SelectableDelegateModel {
