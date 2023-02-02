@@ -197,7 +197,7 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
         h->nb_coupled = ch;
 
         /* Multi-stream support */
-        if(h->channel_mapping == 2)
+        if(h->channel_mapping <= 2)
         {
             if (h->nb_coupled + h->nb_streams > 255)
                 return 0;
