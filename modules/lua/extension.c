@@ -1140,7 +1140,7 @@ static void WatchTimerCallback( void *data )
                 vlc_dialog_release(p_mgr, sys->p_progress_id);
                 sys->p_progress_id = NULL;
             }
-            KillExtension( p_mgr, p_ext );
+            KillExtension(p_ext);
             vlc_mutex_unlock(&sys->command_lock);
             return;
         }
@@ -1156,7 +1156,7 @@ static void WatchTimerCallback( void *data )
                                          p_ext->psz_title );
         if (sys->p_progress_id == NULL)
         {
-            KillExtension( p_mgr, p_ext );
+            KillExtension(p_ext);
             vlc_mutex_unlock(&sys->command_lock);
             return;
         }
@@ -1169,7 +1169,7 @@ static void WatchTimerCallback( void *data )
         {
             vlc_dialog_release(p_mgr, sys->p_progress_id);
             sys->p_progress_id = NULL;
-            KillExtension( p_mgr, p_ext );
+            KillExtension(p_ext);
             vlc_mutex_unlock(&sys->command_lock);
             return;
         }

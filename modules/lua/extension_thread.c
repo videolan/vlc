@@ -167,7 +167,7 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         // Extension is stuck, kill it now
         vlc_dialog_release(p_mgr, sys->p_progress_id);
         sys->p_progress_id = NULL;
-        KillExtension( p_mgr, p_ext );
+        KillExtension(p_ext);
         vlc_mutex_unlock(&sys->command_lock);
         return VLC_SUCCESS;
     }
@@ -179,10 +179,10 @@ int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 }
 
 /* MUST be called with command_lock held */
-void KillExtension( extensions_manager_t *p_mgr, extension_t *p_ext )
+void KillExtension(extension_t *p_ext)
 {
     struct lua_extension *sys = p_ext->p_sys;
-    msg_Dbg( p_mgr, "Killing extension now" );
+    vlc_debug(p_ext->logger, "Killing extension now");
     vlclua_fd_interrupt(&sys->dtable);
     sys->b_activated = false;
     sys->b_exiting = true;
