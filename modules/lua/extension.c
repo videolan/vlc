@@ -824,17 +824,15 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             /* Load all required modules manually */
             lua_register( L, "require", &vlclua_extension_require );
         }
-        else
+        else if (vlclua_add_modules_path(L, p_ext->psz_name))
         {
-            if( vlclua_add_modules_path( L, p_ext->psz_name ) )
-            {
-                msg_Warn( p_mgr, "Error while setting the module "
-                          "search path for %s", p_ext->psz_name );
-                vlclua_fd_cleanup(&sys->dtable);
-                lua_close( L );
-                return NULL;
-            }
+            msg_Warn(p_mgr, "Error while setting the module "
+                     "search path for %s", p_ext->psz_name);
+            vlclua_fd_cleanup(&sys->dtable);
+            lua_close(L);
+            return NULL;
         }
+
         /* Load and run the script(s) */
         if( vlclua_dofile( VLC_OBJECT( p_mgr ), L, p_ext->psz_name ) )
         {
