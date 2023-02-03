@@ -66,3 +66,17 @@ if host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.f
         'c_args' : interop_sw_cargs,
     }
 endif
+
+# interop_dxva2
+if have_win_desktop
+    opengl32_lib = cc.find_library('opengl32', required: false)
+    if opengl32_lib.found()
+        vlc_modules += {
+            'name' : 'interop_dxva2',
+            'sources' : files('interop_dxva2.c'),
+            'c_args' : [ contrib_inc_args ],
+            'dependencies' : [ opengl32_lib ],
+            'link_with' : [ d3d9_common_lib ]
+        }
+    endif
+endif
