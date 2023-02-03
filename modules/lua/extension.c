@@ -80,11 +80,6 @@ static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
                                              vlc_value_t newval,
                                              void *p_data );
 
-/* Input item callback: vlc_InputItemMetaChanged */
-static void inputItemMetaChanged( const vlc_event_t *p_event,
-                                  void *data );
-
-
 /**
  * Module entry-point
  **/
@@ -547,17 +542,7 @@ static int Control(extensions_manager_t *p_mgr, int i_control,
             // Change input
             input_item_t *old = sys->p_item;
             if( old )
-            {
-                // Untrack meta fetched events
-                if (sys->i_capabilities & EXT_META_LISTENER)
-                {
-                    vlc_event_detach(&old->event_manager,
-                                     vlc_InputItemMetaChanged,
-                                     inputItemMetaChanged,
-                                     ext);
-                }
                 input_item_Release( old );
-            }
 
             sys->p_item = p_item ? input_item_Hold(p_item) : NULL;
 
@@ -565,15 +550,6 @@ static int Control(extensions_manager_t *p_mgr, int i_control,
             if (sys->i_capabilities & EXT_INPUT_LISTENER)
             {
                 PushCommandUnique(ext, CMD_SET_INPUT);
-            }
-
-            // Track meta fetched events
-            if (sys->p_item && sys->i_capabilities & EXT_META_LISTENER )
-            {
-                vlc_event_attach(&p_item->event_manager,
-                                 vlc_InputItemMetaChanged,
-                                 inputItemMetaChanged,
-                                 ext);
             }
 
             vlc_mutex_unlock(&sys->running_lock);
@@ -620,11 +596,6 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
     // Unset and release input objects
     if (sys->p_item)
     {
-        if (sys->i_capabilities & EXT_META_LISTENER)
-            vlc_event_detach(&sys->p_item->event_manager,
-                             vlc_InputItemMetaChanged,
-                             inputItemMetaChanged,
-                             p_ext);
         input_item_Release(sys->p_item);
         sys->p_item = NULL;
     }
@@ -1100,19 +1071,6 @@ static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
     }
 
     return VLC_SUCCESS;
-}
-
-/** Callback on vlc_InputItemMetaChanged event
- **/
-static void inputItemMetaChanged( const vlc_event_t *p_event,
-                                  void *data )
-{
-    assert( p_event && p_event->type == vlc_InputItemMetaChanged );
-
-    extension_t *p_ext = ( extension_t* ) data;
-    assert( p_ext != NULL );
-
-    PushCommandUnique( p_ext, CMD_UPDATE_META );
 }
 
 /** Watch timer callback
