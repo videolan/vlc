@@ -125,9 +125,8 @@ VideoAll {
             property var model: MLVideoModel { ml: MediaLib }
 
             function onAction(indexes) {
-                g_mainDisplay.showPlayer()
-
                 MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+                g_mainDisplay.showPlayer()
             }
 
             function onDoubleClick(object) { g_mainDisplay.play(MediaLib, object.id) }
@@ -153,9 +152,8 @@ VideoAll {
                 var object = model.getDataAt(index);
 
                 if (object.isVideo) {
-                    g_mainDisplay.showPlayer()
-
                     MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+                    g_mainDisplay.showPlayer()
 
                     return
                 }

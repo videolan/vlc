@@ -36,8 +36,8 @@ Widgets.GridItem {
 
     function play() {
         if ( model.id !== undefined ) {
-            g_mainDisplay.showPlayer()
             MediaLib.addAndPlay( model.id )
+            g_mainDisplay.showPlayer()
         }
     }
 

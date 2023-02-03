@@ -48,8 +48,8 @@ FocusScope {
     // Functions
 
     function _actionAtIndex(index) {
-        g_mainDisplay.showPlayer()
         MediaLib.addAndPlay( model.getIdForIndexes(index), [":restore-playback-pos=2"] )
+        g_mainDisplay.showPlayer()
     }
 
     // Childs
@@ -151,8 +151,8 @@ FocusScope {
 
                 function play() {
                     if (model.id !== undefined) {
-                        g_mainDisplay.showPlayer()
                         MediaLib.addAndPlay( model.id, [":restore-playback-pos=2"] )
+                        g_mainDisplay.showPlayer()
                     }
                 }
             }

@@ -137,9 +137,8 @@ FocusScope {
     // Events
 
     function onAction(indexes) {
-        g_mainDisplay.showPlayer()
-
         MediaLib.addAndPlay(model.getIdsForIndexes(indexes))
+        g_mainDisplay.showPlayer()
     }
 
     function onDoubleClick(object) {
