@@ -273,7 +273,6 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
 {
     VLC_UNUSED(dummy);
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
-    bool b_ok = false;
 
     msg_Dbg( p_mgr, "Scanning Lua script %s", psz_filename );
 
@@ -339,7 +338,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         msg_Warn( p_mgr, "Error loading script %s: %s", psz_script,
                   lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
-        goto exit;
+        goto discard;
     }
 
     /* Scan script for capabilities */
@@ -349,7 +348,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     {
         msg_Warn( p_mgr, "Error while running script %s, "
                   "function descriptor() not found", psz_script );
-        goto exit;
+        goto discard;
     }
 
     if( lua_pcall( L, 0, 1, 0 ) )
@@ -357,7 +356,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         msg_Warn( p_mgr, "Error while running script %s, "
                   "function descriptor(): %s", psz_script,
                   lua_tostring( L, lua_gettop( L ) ) );
-        goto exit;
+        goto discard;
     }
 
     if( lua_gettop( L ) )
@@ -441,40 +440,35 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         {
             msg_Warn( p_mgr, "In script %s, function descriptor() "
                       "did not return a table!", psz_script );
-            goto exit;
+            goto discard;
         }
     }
     else
     {
         msg_Err( p_mgr, "Script %s went completely foobar", psz_script );
-        goto exit;
+        goto discard;
     }
 
     msg_Dbg(p_mgr, "Script %s has the following capability flags: 0x%x",
             psz_script, sys->i_capabilities);
 
-    b_ok = true;
-exit:
     lua_close( L );
-    if( !b_ok )
-    {
-        free( p_ext->psz_name );
-        free( p_ext->psz_title );
-        free( p_ext->psz_url );
-        free( p_ext->psz_author );
-        free( p_ext->psz_description );
-        free( p_ext->psz_shortdescription );
-        free( p_ext->psz_version );
-        free(sys);
-        free( p_ext );
-    }
-    else
-    {
-        /* Add the extension to the list of known extensions */
-        ARRAY_APPEND( p_mgr->extensions, p_ext );
-    }
+    /* Add the extension to the list of known extensions */
+    ARRAY_APPEND(p_mgr->extensions, p_ext);
 
     /* Continue batch execution */
+    return VLC_EGENERIC;
+discard:
+    lua_close(L);
+    free(p_ext->psz_name);
+    free(p_ext->psz_title);
+    free(p_ext->psz_url);
+    free(p_ext->psz_author);
+    free(p_ext->psz_description);
+    free(p_ext->psz_shortdescription);
+    free(p_ext->psz_version);
+    free(p_ext);
+    free(sys);
     return VLC_EGENERIC;
 }
 
