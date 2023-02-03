@@ -672,8 +672,12 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
         goto exit;
     }
 
-    if( lua_gettop( L ) )
+    if (lua_gettop(L) == 0)
     {
+        msg_Warn(p_mgr, "Script %s went completely foobar", p_ext->psz_name);
+        goto exit;
+    }
+
         if( lua_istable( L, -1 ) )
         {
             /* Get table size */
@@ -705,12 +709,6 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                       "did not return a table", p_ext->psz_name );
             goto exit;
         }
-    }
-    else
-    {
-        msg_Warn( p_mgr, "Script %s went completely foobar", p_ext->psz_name );
-        goto exit;
-    }
 
     i_ret = VLC_SUCCESS;
 
