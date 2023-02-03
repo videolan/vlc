@@ -49,6 +49,8 @@ Rectangle {
 
     property bool animationRunning: borderAnimation.running || bgAnimation.running
 
+    property bool animate: true
+
     //---------------------------------------------------------------------------------------------
     // Implementation
     //---------------------------------------------------------------------------------------------
@@ -66,6 +68,8 @@ Rectangle {
     //---------------------------------------------------------------------------------------------
 
     Behavior on border.color {
+        enabled: root.animate
+
         ColorAnimation {
             id: borderAnimation
 
@@ -74,6 +78,7 @@ Rectangle {
     }
 
     Behavior on color {
+        enabled: root.animate
         ColorAnimation {
             id: bgAnimation
 
@@ -82,6 +87,7 @@ Rectangle {
     }
 
     Behavior on foregroundColor {
+        enabled: root.animate
         ColorAnimation {
             duration: root.animationDuration
         }
