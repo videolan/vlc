@@ -37,6 +37,9 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
+#include <vlc_player.h>
 #include <vlc_extensions.h>
 
 #include <limits.h>
@@ -58,6 +61,7 @@ static int OpenIntf(vlc_object_t *root)
     var_Create(libvlc, "test-lua-activate", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
     var_Create(libvlc, "test-lua-deactivate", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
 
+    intf_thread_t *intf = (intf_thread_t*)root;
     extensions_manager_t *mgr =
         vlc_object_create(root, sizeof *mgr);
     assert(mgr);
@@ -66,6 +70,9 @@ static int OpenIntf(vlc_object_t *root)
     setenv("VLC_DATA_PATH", LUA_EXTENSION_DIR, 1);
     setenv("VLC_LIB_PATH", LUA_EXTENSION_DIR, 1);
 
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+    mgr->player = player;
     mgr->p_module = module_need(mgr, "extension", "lua", true);
 
     if (mgr->p_module == NULL)
