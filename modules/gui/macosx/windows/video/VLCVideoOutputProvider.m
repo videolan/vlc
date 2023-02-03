@@ -23,23 +23,28 @@
 
 #import "VLCVideoOutputProvider.h"
 
-#include <vlc_vout_display.h>
-
 #import "extensions/NSScreen+VLCAdditions.h"
+
+#import "library/VLCLibraryWindow.h"
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
-#import "windows/video/VLCDetachedVideoWindow.h"
-#import "windows/video/VLCVoutView.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
-#import "library/VLCLibraryWindow.h"
+
 #import "os-integration/VLCKeyboardBacklightControl.h"
 
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCAudioEffectsWindowController.h"
 #import "panels/VLCBookmarksWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
+
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
+
+#import "windows/video/VLCAspectRatioRetainingVideoWindow.h"
+#import "windows/video/VLCDetachedVideoWindow.h"
+#import "windows/video/VLCVoutView.h"
+
+#include <vlc_vout_display.h>
 
 NSString *VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
 NSString *VLCWindowLevelKey = @"VLCWindowLevelKey";
@@ -354,8 +359,8 @@ int WindowOpen(vlc_window_t *p_wnd)
         [self cascadeVoutWindowsForVideoWindow:videoWindow];
     }
 
-    // resize window
-    [videoWindow setNativeVideoSize:videoViewSize];
+    // resize window if it is an aspect ratio retaining window
+    [(VLCAspectRatioRetainingVideoWindow*)videoWindow setNativeVideoSize:videoViewSize];
     [videoWindow makeKeyAndOrderFront: self];
 }
 
@@ -469,7 +474,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vlc_window_t *)p_wnd
 {
-    VLCVideoWindowCommon *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
+    VLCAspectRatioRetainingVideoWindow *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
     if (!o_window) {
         msg_Err(getIntf(), "Cannot set size for nonexisting window");
         return;

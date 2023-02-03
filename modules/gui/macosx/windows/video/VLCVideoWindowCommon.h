@@ -49,7 +49,6 @@ extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 @property (readonly) BOOL inFullscreenTransition;
 @property (readonly) BOOL windowShouldExitFullscreenWhenFinished;
 @property (readwrite, assign) NSRect previousSavedFrame;
-@property (nonatomic, readwrite, assign) NSSize nativeVideoSize;
 @property (readonly) VLCPlayerController *playerController;
 
 - (void)setWindowLevel:(NSInteger)i_state;
