@@ -74,7 +74,6 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
-    NSRect _windowFrameBeforePlayback;
     CGFloat _lastPlaylistWidthBeforeCollaps;
     
     NSInteger _currentSelectedSegment;
@@ -795,12 +794,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 #pragma mark - video output controlling
 
-- (void)videoPlaybackWillBeStarted
-{
-    if (!self.fullscreen && !self.isInNativeFullscreen)
-        _windowFrameBeforePlayback = [self frame];
-}
-
 - (void)setHasActiveVideo:(BOOL)hasActiveVideo
 {
     [super setHasActiveVideo:hasActiveVideo];
@@ -881,25 +874,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)disableVideoPlaybackAppearance
 {
-    if (!self.nonembedded &&
-        !self.isInNativeFullscreen &&
-        !self.fullscreen &&
-        _windowFrameBeforePlayback.size.width > 0 &&
-        _windowFrameBeforePlayback.size.height > 0) {
-
-        // only resize back to minimum view of this is still desired final state
-        CGFloat f_threshold_height = VLCVideoWindowCommonMinimalHeight + [self.controlsBar height];
-        if (_windowFrameBeforePlayback.size.height > f_threshold_height) {
-            if ([[VLCMain sharedInstance] isTerminating]) {
-                [self setFrame:_windowFrameBeforePlayback display:YES];
-            } else {
-                [[self animator] setFrame:_windowFrameBeforePlayback display:YES];
-            }
-        }
-    }
-
-    _windowFrameBeforePlayback = NSMakeRect(0, 0, 0, 0);
-
     [self makeFirstResponder: _playlistTableView];
     [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 

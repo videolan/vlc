@@ -136,7 +136,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCFSPanelController *fspanel;
 
-- (void)videoPlaybackWillBeStarted;
 - (void)reopenVideoView;
 - (void)togglePlaylist;
 

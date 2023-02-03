@@ -271,11 +271,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 - (VLCVideoWindowCommon *)setupMainLibraryVideoWindow
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
-    
-    // should be called before any window resizing occurs
-    [mainInstance.libraryWindow videoPlaybackWillBeStarted];
     b_mainWindowHasVideo = YES;
-    
     return mainInstance.libraryWindow;
 }
 
