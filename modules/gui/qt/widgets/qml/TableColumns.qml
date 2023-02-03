@@ -49,6 +49,9 @@ Item {
     }
 
     function getCriterias(colModel, rowModel) {
+        if (colModel === null || rowModel === null)
+            return ""
+
         var criterias = colModel.subCriterias
 
         if (criterias === undefined || criterias.length === 0)
@@ -173,8 +176,7 @@ Item {
 
                 visible: root.showCriterias
 
-                text: (visible && titleDel.rowModel) ? root.getCriterias(titleDel.model,
-                                                                         titleDel.rowModel) : ""
+                text: (visible) ? root.getCriterias(titleDel.model, titleDel.rowModel) : ""
             }
         }
     }
