@@ -685,28 +685,28 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
         goto exit;
     }
 
-            /* Get table size */
-            size_t i_size = lua_objlen( L, -1 );
-            *pppsz_titles = ( char** ) calloc( i_size+1, sizeof( char* ) );
-            *ppi_ids = ( uint16_t* ) calloc( i_size+1, sizeof( uint16_t ) );
+    /* Get table size */
+    size_t i_size = lua_objlen( L, -1 );
+    *pppsz_titles = ( char** ) calloc( i_size+1, sizeof( char* ) );
+    *ppi_ids = ( uint16_t* ) calloc( i_size+1, sizeof( uint16_t ) );
 
-            /* Walk table */
-            size_t i_idx = 0;
-            lua_pushnil( L );
-            while( lua_next( L, -2 ) != 0 )
-            {
-                assert( i_idx < i_size );
-                if( (!lua_isstring( L, -1 )) || (!lua_isnumber( L, -2 )) )
-                {
-                    msg_Warn( p_mgr, "In script %s, an entry in "
-                              "the menu table is invalid!", p_ext->psz_name );
-                    goto exit;
-                }
-                (*pppsz_titles)[ i_idx ] = strdup( luaL_checkstring( L, -1 ) );
-                (*ppi_ids)[ i_idx ] = luaL_checkinteger( L, -2 ) & 0xFFFF;
-                i_idx++;
-                lua_pop( L, 1 );
-            }
+    /* Walk table */
+    size_t i_idx = 0;
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0)
+    {
+        assert(i_idx < i_size);
+        if(!lua_isstring(L, -1) || !lua_isnumber(L, -2))
+        {
+            msg_Warn(p_mgr, "In script %s, an entry in "
+                     "the menu table is invalid!", p_ext->psz_name);
+            goto exit;
+        }
+        (*pppsz_titles)[i_idx] = strdup(luaL_checkstring(L, -1));
+        (*ppi_ids)[i_idx] = luaL_checkinteger(L, -2) & 0xFFFF;
+        i_idx++;
+        lua_pop(L, 1);
+    }
 
     i_ret = VLC_SUCCESS;
 
