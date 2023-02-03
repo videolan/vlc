@@ -35,4 +35,10 @@ if have_win_desktop
         'sources' : files('wingdi.c', 'common.c', 'events.c', 'win32touch.c'),
         'link_with' : [ chroma_copy_lib ]
     }
+
+    # Desktop inhibit
+    vlc_modules += {
+        'name' : 'winhibit',
+        'sources' : files('inhibit.c')
+    }
 endif
