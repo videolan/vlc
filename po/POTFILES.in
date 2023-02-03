@@ -559,8 +559,6 @@ modules/gui/macosx/playlist/VLCPlaylistController.h
 modules/gui/macosx/playlist/VLCPlaylistController.m
 modules/gui/macosx/playlist/VLCPlaylistDataSource.h
 modules/gui/macosx/playlist/VLCPlaylistDataSource.m
-modules/gui/macosx/playlist/VLCPlaylistImageCache.h
-modules/gui/macosx/playlist/VLCPlaylistImageCache.m
 modules/gui/macosx/playlist/VLCPlaylistItem.h
 modules/gui/macosx/playlist/VLCPlaylistItem.m
 modules/gui/macosx/playlist/VLCPlaylistMenuController.h
