@@ -359,8 +359,12 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         goto discard;
     }
 
-    if( lua_gettop( L ) )
+    if (lua_gettop(L) == 0)
     {
+        msg_Err(p_mgr, "Script %s went completely foobar", psz_script);
+        goto discard;
+    }
+
         if( lua_istable( L, -1 ) )
         {
             /* Get caps */
@@ -442,12 +446,6 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                       "did not return a table!", psz_script );
             goto discard;
         }
-    }
-    else
-    {
-        msg_Err( p_mgr, "Script %s went completely foobar", psz_script );
-        goto discard;
-    }
 
     msg_Dbg(p_mgr, "Script %s has the following capability flags: 0x%x",
             psz_script, sys->i_capabilities);
