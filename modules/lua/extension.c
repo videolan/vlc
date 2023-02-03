@@ -678,8 +678,13 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
         goto exit;
     }
 
-        if( lua_istable( L, -1 ) )
-        {
+    if (!lua_istable(L, -1))
+    {
+        msg_Warn(p_mgr, "Function menu() in script %s "
+                 "did not return a table", p_ext->psz_name);
+        goto exit;
+    }
+
             /* Get table size */
             size_t i_size = lua_objlen( L, -1 );
             *pppsz_titles = ( char** ) calloc( i_size+1, sizeof( char* ) );
@@ -702,13 +707,6 @@ static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                 i_idx++;
                 lua_pop( L, 1 );
             }
-        }
-        else
-        {
-            msg_Warn( p_mgr, "Function menu() in script %s "
-                      "did not return a table", p_ext->psz_name );
-            goto exit;
-        }
 
     i_ret = VLC_SUCCESS;
 
