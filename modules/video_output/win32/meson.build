@@ -38,6 +38,17 @@ if have_win_desktop
 
     opengl32_lib = cc.find_library('opengl32', required: false)
     if opengl32_lib.found()
+        # glwin32
+        vlc_modules += {
+            'name' : 'glwin32',
+            'sources' : [
+                files('glwin32.c', 'common.c', 'events.c', 'sensors.cpp', 'win32touch.c'),
+                opengl_vout_commonsources
+            ],
+            'c_args' : [ contrib_inc_args ],
+            'dependencies' : [ gl_common_dep, opengl32_lib ]
+        }
+
         # WGL
         vlc_modules += {
             'name' : 'wgl',
