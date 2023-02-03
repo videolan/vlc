@@ -348,6 +348,10 @@ int WindowOpen(vlc_window_t *p_wnd)
     if (!isEmbedded) {
         [self setupWindowOriginForVideoWindow:videoWindow
                                    atPosition:videoViewPosition];
+
+        if ([videoWindow isKindOfClass:[VLCAspectRatioRetainingVideoWindow class]]) {
+            [(VLCAspectRatioRetainingVideoWindow*)videoWindow setNativeVideoSize:videoViewSize];
+        }
     }
 
     // cascade windows if we have more than one vout
@@ -355,8 +359,6 @@ int WindowOpen(vlc_window_t *p_wnd)
         [self cascadeVoutWindowsForVideoWindow:videoWindow];
     }
 
-    // resize window if it is an aspect ratio retaining window
-    [(VLCAspectRatioRetainingVideoWindow*)videoWindow setNativeVideoSize:videoViewSize];
     [videoWindow makeKeyAndOrderFront: self];
 }
 
@@ -470,13 +472,15 @@ int WindowOpen(vlc_window_t *p_wnd)
 
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vlc_window_t *)p_wnd
 {
-    VLCAspectRatioRetainingVideoWindow *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
+    VLCVideoWindowCommon *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
     if (!o_window) {
         msg_Err(getIntf(), "Cannot set size for nonexisting window");
         return;
+    } else if (![o_window isKindOfClass:[VLCAspectRatioRetainingVideoWindow class]]) {
+        return;
     }
 
-    [o_window setNativeVideoSize:size];
+    [(VLCAspectRatioRetainingVideoWindow*)o_window setNativeVideoSize:size];
 }
 
 - (void)setWindowLevel:(NSInteger)i_level forWindow:(vlc_window_t *)p_wnd
