@@ -37,6 +37,7 @@
 #include <vlc_interface.h>
 #include <vlc_events.h>
 #include <vlc_dialog.h>
+#include <vlc_player.h>
 
 /* Functions to register */
 static const luaL_Reg p_reg[] =

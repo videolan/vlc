@@ -76,6 +76,7 @@ struct lua_extension
     /* The item this extension should use for vlc.input
      * or NULL if it should use playlist's current input */
     struct input_item_t *p_item;
+    struct vlc_player_listener_id *player_listener;
 
     extensions_manager_t *p_mgr;     ///< Parent
     /* Queue of commands to execute */
