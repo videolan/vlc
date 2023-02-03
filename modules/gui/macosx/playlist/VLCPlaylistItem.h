@@ -43,7 +43,7 @@ extern NSString *VLCPlaylistItemPasteboardType;
 
 @property (readwrite, retain, nullable) NSString *artistName;
 @property (readwrite, retain, nullable) NSString *albumName;
-@property (readonly, copy) NSImage *artworkImage;
+@property (readonly) NSURL *artworkURL;
 
 - (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item;
 - (void)updateRepresentation;

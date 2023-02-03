@@ -25,18 +25,11 @@
 #import <vlc_input.h>
 #import <vlc_url.h>
 
-#import "playlist/VLCPlaylistImageCache.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
 NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
-
-@interface VLCPlaylistItem()
-{
-    NSURL *_artworkURL;
-}
-@end
 
 @implementation VLCPlaylistItem
 
@@ -140,15 +133,6 @@ NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
     free(psz_url);
     free(psz_path);
     return path;
-}
-
-- (NSImage *)artworkImage
-{
-    NSImage *image = [VLCPlaylistImageCache artworkForPlaylistItemWithURL:_artworkURL];
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    return image;
 }
 
 @end
