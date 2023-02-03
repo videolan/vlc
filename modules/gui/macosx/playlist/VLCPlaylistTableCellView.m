@@ -25,6 +25,8 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
 
+#import "library/VLCLibraryImageCache.h"
+
 #import "main/VLCMain.h"
 
 #import "playlist/VLCPlaylistImageCache.h"
@@ -67,16 +69,24 @@
 
 - (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
 {
-    NSImage *image = [NSImage imageNamed: @"noart.png"];
-    if (item.artworkURL != nil) {
-        NSImage *artworkImage = [VLCPlaylistImageCache artworkForPlaylistItemWithURL:item.artworkURL];
-        if (artworkImage) {
-            image = artworkImage;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        NSImage *image = [NSImage imageNamed: @"noart.png"];
+        if (item.artworkURL != nil) {
+            NSImage *artworkImage = [VLCPlaylistImageCache artworkForPlaylistItemWithURL:item.artworkURL];
+            if (artworkImage) {
+                image = artworkImage;
+            }
+        } else {
+            NSImage *thumbnailImage = [VLCLibraryImageCache thumbnailForPlaylistItem:item];
+            if (thumbnailImage) {
+                image = thumbnailImage;
+            }
         }
-    }
 
-    self.audioArtworkImageView.image = image;
-    self.mediaImageView.image = image;
+        self.audioArtworkImageView.image = image;
+        self.mediaImageView.image = image;
+    });
+
 
     NSString *artist = item.artistName;
     if (artist && artist.length > 0) {
