@@ -41,4 +41,16 @@ if have_win_desktop
         'name' : 'winhibit',
         'sources' : files('inhibit.c')
     }
+
+    # Window
+    vlc_modules += {
+        'name' : 'win32_window',
+        'sources' : files('window.c')
+    }
+
+    # Windows drawable
+    vlc_modules += {
+        'name' : 'drawable',
+        'sources' : files('drawable.c')
+    }
 endif
