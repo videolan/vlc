@@ -731,83 +731,83 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
         return sys->L;
 
     lua_State *L = luaL_newstate();
-        if( !L )
-        {
-            msg_Err( p_mgr, "Could not create new Lua State" );
-            return NULL;
-        }
-        vlclua_set_this( L, p_mgr );
-        intf_thread_t *intf = (intf_thread_t *) vlc_object_parent(p_mgr);
-        vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
-        vlclua_set_playlist_internal(L, playlist);
-        vlclua_extension_set( L, p_ext );
+    if (L == NULL)
+    {
+        msg_Err(p_mgr, "Could not create new Lua State");
+        return NULL;
+    }
+    vlclua_set_this(L, p_mgr);
+    intf_thread_t *intf = (intf_thread_t *)vlc_object_parent(p_mgr);
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);
+    vlclua_set_playlist_internal(L, playlist);
+    vlclua_extension_set(L, p_ext);
 
-        luaL_openlibs( L );
-        luaL_register_namespace( L, "vlc", p_reg );
-        luaopen_msg( L );
+    luaL_openlibs(L);
+    luaL_register_namespace(L, "vlc", p_reg);
+    luaopen_msg(L);
 
-        /* Load more libraries */
-        luaopen_config( L );
-        luaopen_dialog( L, p_ext );
-        luaopen_input( L );
-        luaopen_msg( L );
-        if (vlclua_fd_init(L, &sys->dtable))
-        {
-            lua_close( L );
-            return NULL;
-        }
-        luaopen_object( L );
-        luaopen_osd( L );
-        luaopen_playlist( L );
-        luaopen_stream( L );
-        luaopen_strings( L );
-        luaopen_variables( L );
-        luaopen_video( L );
-        luaopen_vlm( L );
-        luaopen_volume( L );
-        luaopen_xml( L );
-        luaopen_vlcio( L );
-        luaopen_errno( L );
-        luaopen_rand( L );
-        luaopen_rd( L );
-        luaopen_ml( L );
+    /* Load more libraries */
+    luaopen_config(L);
+    luaopen_dialog(L, p_ext);
+    luaopen_input(L);
+    luaopen_msg(L);
+    if (vlclua_fd_init(L, &sys->dtable))
+    {
+        lua_close(L);
+        return NULL;
+    }
+    luaopen_object(L);
+    luaopen_osd(L);
+    luaopen_playlist(L);
+    luaopen_stream(L);
+    luaopen_strings(L);
+    luaopen_variables(L);
+    luaopen_video(L);
+    luaopen_vlm(L);
+    luaopen_volume(L);
+    luaopen_xml(L);
+    luaopen_vlcio(L);
+    luaopen_errno(L);
+    luaopen_rand(L);
+    luaopen_rd(L);
+    luaopen_ml(L);
 #if defined(_WIN32) && !defined(VLC_WINSTORE_APP)
-        luaopen_win( L );
+    luaopen_win(L);
 #endif
 
-        /* Register extension specific functions */
-        lua_getglobal( L, "vlc" );
-        lua_pushcfunction( L, vlclua_extension_deactivate );
-        lua_setfield( L, -2, "deactivate" );
-        lua_pushcfunction( L, vlclua_extension_keep_alive );
-        lua_setfield( L, -2, "keep_alive" );
+    /* Register extension specific functions */
+    lua_getglobal(L, "vlc");
+    lua_pushcfunction(L, vlclua_extension_deactivate);
+    lua_setfield(L, -2, "deactivate");
+    lua_pushcfunction(L, vlclua_extension_keep_alive);
+    lua_setfield(L, -2, "keep_alive");
 
-        /* Setup the module search path */
-        if( !strncmp( p_ext->psz_name, "zip://", 6 ) )
-        {
-            /* Load all required modules manually */
-            lua_register( L, "require", &vlclua_extension_require );
-        }
-        else if (vlclua_add_modules_path(L, p_ext->psz_name))
-        {
-            msg_Warn(p_mgr, "Error while setting the module "
-                     "search path for %s", p_ext->psz_name);
-            vlclua_fd_cleanup(&sys->dtable);
-            lua_close(L);
-            return NULL;
-        }
+    /* Setup the module search path */
+    if (!strncmp(p_ext->psz_name, "zip://", 6))
+    {
+        /* Load all required modules manually */
+        lua_register(L, "require", &vlclua_extension_require);
+    }
+    else if (vlclua_add_modules_path(L, p_ext->psz_name))
+    {
+        msg_Warn(p_mgr, "Error while setting the module "
+                "search path for %s", p_ext->psz_name);
+        vlclua_fd_cleanup(&sys->dtable);
+        lua_close(L);
+        return NULL;
+    }
 
-        /* Load and run the script(s) */
-        if( vlclua_dofile( VLC_OBJECT( p_mgr ), L, p_ext->psz_name ) )
-        {
-            msg_Warn( p_mgr, "Error loading script %s: %s", p_ext->psz_name,
-                      lua_tostring( L, lua_gettop( L ) ) );
-            vlclua_fd_cleanup(&sys->dtable);
-            lua_close( L );
-            return NULL;
-        }
+    /* Load and run the script(s) */
+    if (vlclua_dofile(VLC_OBJECT(p_mgr), L, p_ext->psz_name))
+    {
+        msg_Warn(p_mgr, "Error loading script %s: %s", p_ext->psz_name,
+                 lua_tostring(L, lua_gettop(L)));
+        vlclua_fd_cleanup(&sys->dtable);
+        lua_close(L);
+        return NULL;
+    }
 
-        sys->L = L;
+    sys->L = L;
 
     return L;
 }
