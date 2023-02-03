@@ -36,6 +36,17 @@ if have_win_desktop
         'link_with' : [ chroma_copy_lib ]
     }
 
+    opengl32_lib = cc.find_library('opengl32', required: false)
+    if opengl32_lib.found()
+        # WGL
+        vlc_modules += {
+            'name' : 'wgl',
+            'sources' : files('wgl.c'),
+            'c_args' : [ contrib_inc_args ],
+            'dependencies' : [ opengl32_lib ]
+        }
+    endif
+
     # Desktop inhibit
     vlc_modules += {
         'name' : 'winhibit',
