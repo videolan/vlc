@@ -32,6 +32,7 @@ extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 
 @class VLCVoutView;
 @class VLCControlsBarCommon;
+@class VLCPlayerController;
 
 /*****************************************************************************
  * VLCVideoWindowCommon
@@ -49,11 +50,9 @@ extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 @property (readonly) BOOL windowShouldExitFullscreenWhenFinished;
 @property (readwrite, assign) NSRect previousSavedFrame;
 @property (nonatomic, readwrite, assign) NSSize nativeVideoSize;
+@property (readonly) VLCPlayerController *playerController;
 
 - (void)setWindowLevel:(NSInteger)i_state;
-- (void)resizeWindow;
-
-- (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size;
 
 /* fullscreen handling */
 - (void)enterFullscreenWithAnimation:(BOOL)b_animation;
