@@ -23,23 +23,19 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_codecs.h>
-#include <vlc_codec.h>
-
 #include "../../video_chroma/dxgi_fmt.h"
 
 #include "directx_va.h"
 
 extern const GUID DXVA2_ModeMPEG2_VLD;
-extern const GUID DXVA2_ModeMPEG2and1_VLD;
-extern const GUID DXVA2_ModeH264_E;
-extern const GUID DXVA2_ModeH264_F;
+extern const GUID DXVA_ModeMPEG2and1_VLD;
+extern const GUID DXVA_ModeH264_E;
+extern const GUID DXVA_ModeH264_F;
 extern const GUID DXVA_Intel_H264_NoFGT_ClearVideo;
 extern const GUID DXVA_ModeH264_VLD_WithFMOASO_NoFGT;
 extern const GUID DXVA_ModeH264_VLD_NoFGT_Flash;
-extern const GUID DXVA2_ModeVC1_D;
-extern const GUID DXVA2_ModeVC1_D2010;
+extern const GUID DXVA_ModeVC1_D;
+extern const GUID DXVA_ModeVC1_D2010;
 extern const GUID DXVA_ModeHEVC_VLD_Main10;
 extern const GUID DXVA_ModeHEVC_VLD_Main;
 extern const GUID DXVA_ModeVP9_VLD_Profile0;
@@ -65,14 +61,14 @@ static const GUID *NoHEVC[] = {
 
 static const GUID *AnyDecoder[] = {
     &DXVA2_ModeMPEG2_VLD,
-    &DXVA2_ModeMPEG2and1_VLD,
-    &DXVA2_ModeH264_E,
-    &DXVA2_ModeH264_F,
+    &DXVA_ModeMPEG2and1_VLD,
+    &DXVA_ModeH264_E,
+    &DXVA_ModeH264_F,
     &DXVA_Intel_H264_NoFGT_ClearVideo,
     &DXVA_ModeH264_VLD_WithFMOASO_NoFGT,
     &DXVA_ModeH264_VLD_NoFGT_Flash,
-    &DXVA2_ModeVC1_D,
-    &DXVA2_ModeVC1_D2010,
+    &DXVA_ModeVC1_D,
+    &DXVA_ModeVC1_D2010,
     &DXVA_ModeHEVC_VLD_Main,
     &DXVA_ModeHEVC_VLD_Main10,
     &DXVA_ModeVP9_VLD_Profile0,
