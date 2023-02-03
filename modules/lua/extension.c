@@ -372,78 +372,79 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         goto discard;
     }
 
-            /* Get caps */
-            lua_getfield( L, -1, "capabilities" );
-            if( lua_istable( L, -1 ) )
+    /* Get caps */
+    lua_getfield(L, -1, "capabilities");
+    if (lua_istable(L, -1))
+    {
+        lua_pushnil(L);
+        while (lua_next(L, -2) != 0)
+        {
+            /* Key is at index -2 and value at index -1. Discard key */
+            const char *psz_cap = luaL_checkstring(L, -1);
+            bool found = false;
+            /* Find this capability's flag */
+            for (size_t i = 0; i < ARRAY_SIZE(caps); i++)
             {
-                lua_pushnil( L );
-                while( lua_next( L, -2 ) != 0 )
+                if (!strcmp(caps[i], psz_cap))
                 {
-                    /* Key is at index -2 and value at index -1. Discard key */
-                    const char *psz_cap = luaL_checkstring( L, -1 );
-                    bool found = false;
-                    /* Find this capability's flag */
-                    for( size_t i = 0; i < ARRAY_SIZE(caps); i++ )
-                    {
-                        if( !strcmp( caps[i], psz_cap ) )
-                        {
-                            /* Flag it! */
-                            sys->i_capabilities |= 1 << i;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if( !found )
-                    {
-                        msg_Warn( p_mgr, "Extension capability '%s' unknown in"
-                                  " script %s", psz_cap, psz_script );
-                    }
-                    /* Removes 'value'; keeps 'key' for next iteration */
-                    lua_pop( L, 1 );
+                    /* Flag it! */
+                    sys->i_capabilities |= 1 << i;
+                    found = true;
+                    break;
                 }
             }
-            else
+            if (!found)
             {
-                msg_Warn( p_mgr, "In script %s, function descriptor() "
-                              "did not return a table of capabilities.",
-                              psz_script );
+                msg_Warn(p_mgr, "Extension capability '%s' unknown in"
+                         " script %s", psz_cap, psz_script);
             }
-            lua_pop( L, 1 );
+            /* Removes 'value'; keeps 'key' for next iteration */
+            lua_pop(L, 1);
+        }
+    }
+    else
+    {
+        msg_Warn(p_mgr, "In script %s, function descriptor() "
+                     "did not return a table of capabilities.",
+                     psz_script);
+    }
+    lua_pop(L, 1);
 
-            /* Get title */
-            lua_getfield( L, -1, "title" );
-            if( lua_isstring( L, -1 ) )
-            {
-                p_ext->psz_title = strdup( luaL_checkstring( L, -1 ) );
-            }
-            else
-            {
-                msg_Dbg( p_mgr, "In script %s, function descriptor() "
-                                "did not return a string as title.",
-                                psz_script );
-                p_ext->psz_title = strdup( psz_script );
-            }
-            lua_pop( L, 1 );
+    /* Get title */
+    lua_getfield(L, -1, "title");
+    if (lua_isstring(L, -1))
+    {
+        p_ext->psz_title = strdup(luaL_checkstring(L, -1));
+    }
+    else
+    {
+        msg_Dbg(p_mgr,"In script %s, function descriptor() "
+                      "did not return a string as title.",
+                      psz_script);
+        p_ext->psz_title = strdup(psz_script);
+    }
+    lua_pop(L, 1);
 
-            /* Get the fields from the extension manifest. */
-            p_ext->psz_author = GetStringFieldOrNull(L, "author");
-            p_ext->psz_description = GetStringFieldOrNull(L, "description");
-            p_ext->psz_shortdescription = GetStringFieldOrNull(L, "shortdesc");
-            p_ext->psz_url = GetStringFieldOrNull(L, "url");
-            p_ext->psz_version = GetStringFieldOrNull(L, "version");
-            /* Get icon data */
-            lua_getfield( L, -1, "icon" );
-            if( !lua_isnil( L, -1 ) && lua_isstring( L, -1 ) )
-            {
-                int len = lua_strlen( L, -1 );
-                p_ext->p_icondata = malloc( len );
-                if( p_ext->p_icondata )
-                {
-                    p_ext->i_icondata_size = len;
-                    memcpy( p_ext->p_icondata, lua_tostring( L, -1 ), len );
-                }
-            }
-            lua_pop( L, 1 );
+    /* Get the fields from the extension manifest. */
+    p_ext->psz_author = GetStringFieldOrNull(L, "author");
+    p_ext->psz_description = GetStringFieldOrNull(L, "description");
+    p_ext->psz_shortdescription = GetStringFieldOrNull(L, "shortdesc");
+    p_ext->psz_url = GetStringFieldOrNull(L, "url");
+    p_ext->psz_version = GetStringFieldOrNull(L, "version");
+    /* Get icon data */
+    lua_getfield(L, -1, "icon");
+    if (!lua_isnil(L, -1) && lua_isstring(L, -1))
+    {
+        int len = lua_strlen(L, -1);
+        p_ext->p_icondata = malloc(len);
+        if (p_ext->p_icondata)
+        {
+            p_ext->i_icondata_size = len;
+            memcpy(p_ext->p_icondata, lua_tostring(L, -1), len);
+        }
+    }
+    lua_pop(L, 1);
+
 
     msg_Dbg(p_mgr, "Script %s has the following capability flags: 0x%x",
             psz_script, sys->i_capabilities);
