@@ -20,6 +20,10 @@ if libplacebo_dep.found()
     subdir('libplacebo')
 endif
 
+if host_system == 'windows'
+    subdir('win32')
+endif
+
 # Dummy video output
 vlc_modules += {
     'name' : 'vdummy',
