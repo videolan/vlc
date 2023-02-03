@@ -41,6 +41,7 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_playlist.h>
 #include <vlc_player.h>
 #include <vlc_extensions.h>
+#include <vlc_input_item.h>
 
 #include <limits.h>
 
@@ -60,6 +61,7 @@ static int OpenIntf(vlc_object_t *root)
     vlc_object_t *libvlc = (vlc_object_t*)vlc_object_instance(root);
     var_Create(libvlc, "test-lua-activate", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
     var_Create(libvlc, "test-lua-deactivate", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
+    var_Create(libvlc, "test-lua-input-changed", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
 
     intf_thread_t *intf = (intf_thread_t*)root;
     extensions_manager_t *mgr =
@@ -81,25 +83,39 @@ static int OpenIntf(vlc_object_t *root)
         goto end;
     }
 
-    vlc_sem_t sem_activate, sem_deactivate;
+    vlc_sem_t sem_input, sem_activate, sem_deactivate;
+    vlc_sem_init(&sem_input, 0);
     vlc_sem_init(&sem_activate, 0);
     vlc_sem_init(&sem_deactivate, 0);
 
     var_AddCallback(libvlc, "test-lua-activate", OnLuaEventTriggered, &sem_activate);
     var_AddCallback(libvlc, "test-lua-deactivate", OnLuaEventTriggered, &sem_deactivate);
+    var_AddCallback(libvlc, "test-lua-input-changed", OnLuaEventTriggered, &sem_input);
 
     /* Check that the extension from the test is correctly probed. */
     assert(mgr->extensions.i_size == 1);
     extension_Activate(mgr, mgr->extensions.p_elems[0]);
     vlc_sem_wait(&sem_activate);
 
+    vlc_player_Lock(player);
+    input_item_t *item = input_item_New(
+            "mock://length=100000000000000000", // TODO: make it infinite
+            "lua_test_sample");
+    vlc_player_SetCurrentMedia(player, item);
+    vlc_player_Start(player);
+    vlc_player_Unlock(player);
+
+    vlc_sem_wait(&sem_input);
+
     extension_Deactivate(mgr, mgr->extensions.p_elems[0]);
     vlc_sem_wait(&sem_deactivate);
 
     var_DelCallback(libvlc, "test-lua-activate", OnLuaEventTriggered, &sem_activate);
     var_DelCallback(libvlc, "test-lua-deactivate", OnLuaEventTriggered, &sem_deactivate);
+    var_DelCallback(libvlc, "test-lua-input-changed", OnLuaEventTriggered, &sem_input);
 
     module_unneed(mgr, mgr->p_module);
+    input_item_Release(item);
 end:
     vlc_object_delete(mgr);
     return VLC_SUCCESS;
