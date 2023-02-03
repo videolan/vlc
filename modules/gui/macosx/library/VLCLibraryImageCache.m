@@ -27,6 +27,8 @@
 
 #import "main/VLCMain.h"
 
+#import "playlist/VLCPlaylistItem.h"
+
 NSUInteger kVLCMaximumLibraryImageCacheSize = 50;
 uint32_t kVLCDesiredThumbnailWidth = 512;
 uint32_t kVLCDesiredThumbnailHeight = 512;
@@ -141,6 +143,11 @@ float kVLCDefaultThumbnailPosition = .15;
     }
 
     return image;
+}
+
++ (NSImage *)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem
+{
+    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem];
 }
 
 @end
