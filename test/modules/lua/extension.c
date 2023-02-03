@@ -43,8 +43,21 @@ const char vlc_module_name[] = MODULE_STRING;
 
 static int exitcode = 0;
 
+static int OnLuaEventTriggered(vlc_object_t *obj, const char *name,
+        vlc_value_t oldv, vlc_value_t newv, void *opaque)
+{
+    (void)obj; (void)name; (void)oldv; (void)newv;
+    vlc_sem_t *sem = opaque;
+    vlc_sem_post(sem);
+    return VLC_SUCCESS;
+}
+
 static int OpenIntf(vlc_object_t *root)
 {
+    vlc_object_t *libvlc = (vlc_object_t*)vlc_object_instance(root);
+    var_Create(libvlc, "test-lua-activate", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
+    var_Create(libvlc, "test-lua-deactivate", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
+
     extensions_manager_t *mgr =
         vlc_object_create(root, sizeof *mgr);
     assert(mgr);
@@ -61,10 +74,23 @@ static int OpenIntf(vlc_object_t *root)
         goto end;
     }
 
+    vlc_sem_t sem_activate, sem_deactivate;
+    vlc_sem_init(&sem_activate, 0);
+    vlc_sem_init(&sem_deactivate, 0);
+
+    var_AddCallback(libvlc, "test-lua-activate", OnLuaEventTriggered, &sem_activate);
+    var_AddCallback(libvlc, "test-lua-deactivate", OnLuaEventTriggered, &sem_deactivate);
+
     /* Check that the extension from the test is correctly probed. */
     assert(mgr->extensions.i_size == 1);
     extension_Activate(mgr, mgr->extensions.p_elems[0]);
+    vlc_sem_wait(&sem_activate);
+
     extension_Deactivate(mgr, mgr->extensions.p_elems[0]);
+    vlc_sem_wait(&sem_deactivate);
+
+    var_DelCallback(libvlc, "test-lua-activate", OnLuaEventTriggered, &sem_activate);
+    var_DelCallback(libvlc, "test-lua-deactivate", OnLuaEventTriggered, &sem_deactivate);
 
     module_unneed(mgr, mgr->p_module);
 end:
