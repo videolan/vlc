@@ -63,7 +63,9 @@ static const char *const enc_hq_list_text[] = {
 #endif
 
 #ifdef MERGE_FFMPEG
-# include "../../demux/avformat/avformat.h"
+# ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
+#  include "../../demux/avformat/avformat.h"
+# endif
 # include "../../access/avio.h"
 # include "../../packetizer/avparser.h"
 #endif
@@ -200,7 +202,9 @@ vlc_module_begin ()
 
 #ifdef MERGE_FFMPEG
     add_submodule ()
+# ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 #   include "../../demux/avformat/avformat.c"
+# endif
     add_submodule ()
         AVIO_MODULE
     add_submodule ()
