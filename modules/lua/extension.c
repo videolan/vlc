@@ -726,11 +726,11 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
 {
     assert( p_ext != NULL );
     struct lua_extension *sys = p_ext->p_sys;
-    lua_State *L = sys->L;
 
-    if( !L )
-    {
-        L = luaL_newstate();
+    if (sys->L != NULL)
+        return sys->L;
+
+    lua_State *L = luaL_newstate();
         if( !L )
         {
             msg_Err( p_mgr, "Could not create new Lua State" );
@@ -808,7 +808,6 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
         }
 
         sys->L = L;
-    }
 
     return L;
 }
