@@ -620,8 +620,6 @@ if get_option('libva').require(
 
 endif
 
-# D3D9 common library
-# TODO: Do not build for Winstore
 if host_system == 'windows'
     d3d11_common_lib = static_library('d3d11_common',
         files(
