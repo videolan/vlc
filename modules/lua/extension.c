@@ -365,8 +365,13 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
         goto discard;
     }
 
-        if( lua_istable( L, -1 ) )
-        {
+    if (!lua_istable(L, -1))
+    {
+        msg_Warn(p_mgr, "In script %s, function descriptor() "
+                 "did not return a table!", psz_script);
+        goto discard;
+    }
+
             /* Get caps */
             lua_getfield( L, -1, "capabilities" );
             if( lua_istable( L, -1 ) )
@@ -439,13 +444,6 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
                 }
             }
             lua_pop( L, 1 );
-        }
-        else
-        {
-            msg_Warn( p_mgr, "In script %s, function descriptor() "
-                      "did not return a table!", psz_script );
-            goto discard;
-        }
 
     msg_Dbg(p_mgr, "Script %s has the following capability flags: 0x%x",
             psz_script, sys->i_capabilities);
