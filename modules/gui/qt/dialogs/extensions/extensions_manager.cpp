@@ -25,6 +25,8 @@
 #include "extensions.hpp"
 
 #include <vlc_modules.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
 #include "assert.h"
 
 #include <QMenu>
@@ -72,6 +74,8 @@ bool ExtensionsManager::loadExtensions()
             return false;
         }
 
+        vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf->intf);
+        p_extensions_manager->player = vlc_playlist_GetPlayer(playlist);
         p_extensions_manager->p_module =
                 module_need( p_extensions_manager, "extension", NULL, false );
 
