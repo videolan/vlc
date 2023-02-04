@@ -850,3 +850,13 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
     obj->deleteLater();
 #endif
 }
+
+double MainCtx::dp(const double px, const double scale)
+{
+    return std::round(px * scale);
+}
+
+double MainCtx::dp(const double px) const
+{
+    return dp(px, m_intfScaleFactor);
+}

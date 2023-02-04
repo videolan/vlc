@@ -296,6 +296,9 @@ public:
 
     CSDButtonModel *csdButtonModel() { return m_csdButtonModel.get(); }
 
+    Q_INVOKABLE static double dp(const double px, const double scale);
+    Q_INVOKABLE double dp(const double px) const;
+
 protected:
     /* Systray */
     void createSystray();
