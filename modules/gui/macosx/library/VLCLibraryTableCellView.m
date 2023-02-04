@@ -130,7 +130,18 @@
 
 - (void)playMediaItemInstantly:(id)sender
 {
-    [[[VLCMain sharedInstance] libraryController] appendItemToPlaylist:_representedItem playImmediately:YES];
+    VLCLibraryController *libraryController = VLCMain.sharedInstance.libraryController;
+
+    // We want to add all the tracks to the playlist but only play the first one immediately,
+    // otherwise we will skip straight to the last track of the last album from the artist
+    __block BOOL playImmediately = YES;
+    [_representedItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
+        [libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
+
+        if(playImmediately) {
+            playImmediately = NO;
+        }
+    }];
 }
 
 - (void)playInputItemInstantly:(id)sender
