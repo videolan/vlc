@@ -16,6 +16,7 @@ $(TARBALLS)/breakpad-$(BREAKPAD_VERSION).tar.gz:
 breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 	$(UNPACK)
 	$(APPLY) $(SRC)/breakpad/0001-mac-client-Upgrade-Breakpad.xib-to-new-format.patch
+	sed -i.orig -e "s/GCC_TREAT_WARNINGS_AS_ERRORS = YES/GCC_TREAT_WARNINGS_AS_ERRORS = NO/" "$(UNPACK_DIR)/src/common/mac/Breakpad.xcconfig"
 	$(MOVE)
 
 BREAKPAD_CONF := --disable-processor
