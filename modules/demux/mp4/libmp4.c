@@ -135,7 +135,7 @@ static char *mp4_getstringz( uint8_t **restrict in, uint64_t *restrict size )
  *  either 0xA9 + 24-bit ASCII text string (and 0xA9 isn't printable)
  *  either 32-bit ASCII text string
  */
-#define MP4_BOX_TYPE_ASCII() ( ((char*)&p_box->i_type)[0] != (char)0xA9 )
+#define MP4_BOX_TYPE_ASCII() ( ((unsigned char*)&p_box->i_type)[0] != 0xA9 )
 
 static inline uint32_t Get24bBE( const uint8_t *p )
 {
