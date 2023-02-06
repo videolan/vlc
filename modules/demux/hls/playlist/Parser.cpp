@@ -396,14 +396,14 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 if(segmentstoappend.size() && segmentstoappend.back()->getDisplayTime() == VLC_TICK_INVALID)
                 {
                     vlc_tick_t tempTime = absReferenceTime;
-                    for(auto it = segmentstoappend.crbegin(); it != segmentstoappend.crend(); ++it)
+                    for(auto sit = segmentstoappend.crbegin(); sit != segmentstoappend.crend(); ++sit)
                     {
-                        vlc_tick_t duration = timescale.ToTime((*it)->duration.Get());
+                        vlc_tick_t duration = timescale.ToTime((*sit)->duration.Get());
                         if( duration < tempTime - VLC_TICK_0 )
                             tempTime -= duration;
                         else
                             tempTime = VLC_TICK_0;
-                        (*it)->setDisplayTime(tempTime);
+                        (*sit)->setDisplayTime(tempTime);
                     }
                 }
                 break;
