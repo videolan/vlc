@@ -379,12 +379,16 @@ int config_LoadCmdLine( libvlc_int_t *p_this, int i_argc,
 
         /* Internal error: unknown option or missing option value */
         char *optlabel;
-        if ( (state.opt && asprintf(&optlabel, "%s-%c%s",
-                                    color ? TS_YELLOW : "", state.opt,
-                                    color ? TS_RESET : "") < 0)
-          || (!state.opt && asprintf(&optlabel, "%s%s%s",
-                                     color ? TS_YELLOW : "", ppsz_argv[state.ind-1],
-                                     color ? TS_RESET : "") < 0) )
+        int aspret;
+        if ( state.opt )
+            aspret = asprintf(&optlabel, "%s-%c%s", color ? TS_YELLOW : "",
+                              state.opt,
+                              color ? TS_RESET : "");
+        else
+            aspret = asprintf(&optlabel, "%s%s%s", color ? TS_YELLOW : "",
+                              ppsz_argv[state.ind-1],
+                              color ? TS_RESET : "");
+        if ( aspret < 0 )
         {
             /* just ignore failure - unlikely and not worth trying to handle in some way */
             optlabel = NULL;
