@@ -118,6 +118,7 @@ private:
 private slots:
     void moreInformation();
     void updateButtons();
+    void reloadExtensions();
 
 private:
     QListView *extList;
