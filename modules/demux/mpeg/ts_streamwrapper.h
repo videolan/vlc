@@ -31,7 +31,7 @@ static ssize_t ts_stream_wrapper_Read(stream_t *s, void *buf, size_t len)
     return demuxstream->pf_read(demuxstream, buf, len);
 }
 
-static block_t * ts_stream_wrapper_ReadBlock(stream_t *s, bool *eof)
+static block_t * ts_stream_wrapper_ReadBlock(stream_t *s, bool *restrict eof)
 {
     stream_t *demuxstream = s->p_sys;
     return demuxstream->pf_block(demuxstream, eof);
