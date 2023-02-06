@@ -89,7 +89,9 @@ int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
     }
     else
         res = -1;
+#ifndef VLC_WINSTORE_APP
 out:
+#endif
     free (str);
     return res;
 #endif
@@ -307,4 +309,3 @@ void *ToCharset(const char *charset, const char *in, size_t *outsize)
     vlc_iconv_close (hd);
     return res;
 }
-
