@@ -177,9 +177,9 @@ static const int pi_sample_rates[16] =
 static int ChannelConfigurationToVLC(uint8_t i_channel)
 {
     if (i_channel == 7)
-        i_channel = 8; // 7.1
-    else if (i_channel >= 8)
-        i_channel = -1;
+        return 8; // 7.1
+    if (i_channel >= 8)
+        return -1;
     return i_channel;
 }
 
