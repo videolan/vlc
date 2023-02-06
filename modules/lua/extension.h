@@ -29,6 +29,13 @@
 
 #define WATCH_TIMER_PERIOD    VLC_TICK_FROM_SEC(10) ///< 10s period for the timer
 
+/* Extension capabilities */
+#define EXT_HAS_MENU          (1 << 0)   ///< Hook: menu
+#define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable
+#define EXT_INPUT_LISTENER    (1 << 2)   ///< Hook: input_changed
+#define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
+#define EXT_PLAYING_LISTENER  (1 << 4)   ///< Hook: status_changed
+
 /* List of available commands */
 typedef enum
 {

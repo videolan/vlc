@@ -49,15 +49,10 @@ static const luaL_Reg p_reg[] =
  * Note: #define and ppsz_capabilities must be in sync
  */
 static const char caps[][20] = {
-#define EXT_HAS_MENU          (1 << 0)   ///< Hook: menu
     "menu",
-#define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable
     "trigger",
-#define EXT_INPUT_LISTENER    (1 << 2)   ///< Hook: input_changed
     "input-listener",
-#define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
     "meta-listener",
-#define EXT_PLAYING_LISTENER  (1 << 4)   ///< Hook: status_changed
     "playing-listener",
 };
 
