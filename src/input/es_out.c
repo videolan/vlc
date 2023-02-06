@@ -530,61 +530,6 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
     }
 }
 
-static const struct es_out_callbacks es_out_cbs;
-
-/*****************************************************************************
- * input_EsOutNew:
- *****************************************************************************/
-es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, float rate,
-                          enum input_type input_type )
-{
-    es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
-    if( !p_sys )
-        return NULL;
-
-    p_sys->out.cbs = &es_out_cbs;
-
-    vlc_mutex_init( &p_sys->lock );
-    p_sys->p_input = p_input;
-    p_sys->main_source = main_source;
-
-    p_sys->b_active = false;
-    p_sys->p_next_frame_es = NULL;
-    p_sys->i_mode   = ES_OUT_MODE_NONE;
-    p_sys->input_type = input_type;
-
-    vlc_list_init(&p_sys->programs);
-    vlc_list_init(&p_sys->es);
-    vlc_list_init(&p_sys->es_slaves);
-
-    /* */
-    EsOutPropsInit( &p_sys->video, true, p_input, input_type,
-                    ES_OUT_ES_POLICY_AUTO,
-                    "video-track-id", "video-track", NULL, NULL );
-    EsOutPropsInit( &p_sys->audio, true, p_input, input_type,
-                    ES_OUT_ES_POLICY_EXCLUSIVE,
-                    "audio-track-id", "audio-track", "audio-language", "audio" );
-    EsOutPropsInit( &p_sys->sub,  false, p_input, input_type,
-                    ES_OUT_ES_POLICY_AUTO,
-                    "sub-track-id", "sub-track", "sub-language", "sub" );
-
-    p_sys->cc_decoder = var_InheritInteger( p_input, "captions" );
-
-    p_sys->i_group_id = var_GetInteger( p_input, "program" );
-
-    p_sys->user_clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );
-
-    p_sys->i_pause_date = -1;
-
-    p_sys->rate = rate;
-
-    p_sys->b_buffering = true;
-    p_sys->i_preroll_end = -1;
-    p_sys->i_prev_stream_level = -1;
-
-    return &p_sys->out;
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -4064,6 +4009,59 @@ static const struct es_out_callbacks es_out_cbs =
     .destroy = EsOutDelete,
     .priv_control = EsOutPrivControl,
 };
+
+/*****************************************************************************
+ * input_EsOutNew:
+ *****************************************************************************/
+es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, float rate,
+                          enum input_type input_type )
+{
+    es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
+    if( !p_sys )
+        return NULL;
+
+    p_sys->out.cbs = &es_out_cbs;
+
+    vlc_mutex_init( &p_sys->lock );
+    p_sys->p_input = p_input;
+    p_sys->main_source = main_source;
+
+    p_sys->b_active = false;
+    p_sys->p_next_frame_es = NULL;
+    p_sys->i_mode   = ES_OUT_MODE_NONE;
+    p_sys->input_type = input_type;
+
+    vlc_list_init(&p_sys->programs);
+    vlc_list_init(&p_sys->es);
+    vlc_list_init(&p_sys->es_slaves);
+
+    /* */
+    EsOutPropsInit( &p_sys->video, true, p_input, input_type,
+                    ES_OUT_ES_POLICY_AUTO,
+                    "video-track-id", "video-track", NULL, NULL );
+    EsOutPropsInit( &p_sys->audio, true, p_input, input_type,
+                    ES_OUT_ES_POLICY_EXCLUSIVE,
+                    "audio-track-id", "audio-track", "audio-language", "audio" );
+    EsOutPropsInit( &p_sys->sub,  false, p_input, input_type,
+                    ES_OUT_ES_POLICY_AUTO,
+                    "sub-track-id", "sub-track", "sub-language", "sub" );
+
+    p_sys->cc_decoder = var_InheritInteger( p_input, "captions" );
+
+    p_sys->i_group_id = var_GetInteger( p_input, "program" );
+
+    p_sys->user_clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );
+
+    p_sys->i_pause_date = -1;
+
+    p_sys->rate = rate;
+
+    p_sys->b_buffering = true;
+    p_sys->i_preroll_end = -1;
+    p_sys->i_prev_stream_level = -1;
+
+    return &p_sys->out;
+}
 
 /****************************************************************************
  * LanguageGetName: try to expand iso639 into plain name
