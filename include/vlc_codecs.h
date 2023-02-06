@@ -215,8 +215,12 @@ ATTR_PACKED
 
 #define WAVE_FORMAT_A52                 0x2000 /* a52 */
 #define WAVE_FORMAT_DTSINC_DTS          0x2001 /* DTS */
+#ifndef WAVE_FORMAT_ALAC
 #define WAVE_FORMAT_ALAC                0x6c61
+#endif
+#ifndef WAVE_FORMAT_OPUS
 #define WAVE_FORMAT_OPUS                0x704f
+#endif
 #define WAVE_FORMAT_AVCODEC_AAC         0x706D
 #define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
 
@@ -251,7 +255,9 @@ ATTR_PACKED
 #define WAVE_FORMAT_G723_1              0xa100
 #define WAVE_FORMAT_AAC_3               0xa106
 #define WAVE_FORMAT_SPEEX               0xa109 /* Speex audio */
+#ifndef WAVE_FORMAT_FLAC
 #define WAVE_FORMAT_FLAC                0xf1ac /* Xiph Flac */
+#endif
 
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
   #define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
