@@ -30,6 +30,10 @@
 #include <libavcodec/avcodec.h>
 #include "va.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* */
 typedef struct vlc_va_surface_t vlc_va_surface_t;
 typedef struct va_pool_t va_pool_t;
@@ -107,5 +111,9 @@ void va_surface_AddRef(vlc_va_surface_t *surface);
  * \see va_pool_Close()
  */
 void va_surface_Release(vlc_va_surface_t *surface);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* AVCODEC_VA_SURFACE_INTERNAL_H */
