@@ -302,19 +302,7 @@ QtObject {
     // Player controlbar
     readonly property int maxControlbarControlHeight: dp(64, scale)
 
-    //device pixel
-    function dp(px, scale) {
-        if (typeof scale === "undefined")
-            scale = MainCtx.intfScaleFactor
-
-        var scaledPx = Math.round(px * scale)
-        if (scaledPx < 0)
-            return Math.min(-1, scaledPx)
-        else if (scaledPx > 0)
-            return Math.max(1, scaledPx)
-        else // scaledPx == 0
-            return 0
-    }
+    readonly property var dp: MainCtx.dp
 
     function colWidth(nb) {
       return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_spacing;
