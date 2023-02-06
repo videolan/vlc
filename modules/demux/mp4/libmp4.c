@@ -1680,9 +1680,9 @@ static uint64_t MP4_ReadLengthDescriptor( uint8_t **restrict bufp,
     do
     {
         if (unlikely(len == 0))
-            return -1; /* end of bit stream */
+            return UINT64_C(-1); /* end of bit stream */
         if (unlikely(value > (UINT64_MAX >> 7)))
-            return -1; /* integer overflow */
+            return UINT64_C(-1); /* integer overflow */
 
         b = *(buf++);
         len--;
