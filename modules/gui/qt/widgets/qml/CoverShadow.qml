@@ -26,11 +26,17 @@ Item {
 
     property alias cached: primaryShadow.cached
     property alias source: primaryShadow.source
+
+    property alias primaryColor: primaryShadow.color
     property alias primaryVerticalOffset: primaryShadow.verticalOffset
-    property alias primaryRadius: primaryShadow.radius
+    property alias primaryHorizontalOffset: primaryShadow.horizontalOffset
+    property alias primaryBlurRadius: primaryShadow.radius
     property alias primarySamples: primaryShadow.samples
+
+    property alias secondaryColor: secondaryShadow.color
     property alias secondaryVerticalOffset: secondaryShadow.verticalOffset
-    property alias secondaryRadius: secondaryShadow.radius
+    property alias secondaryHorizontalOffset: secondaryShadow.horizontalOffset
+    property alias secondaryBlurRadius: secondaryShadow.radius
     property alias secondarySamples: secondaryShadow.samples
 
     DropShadow {

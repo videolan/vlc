@@ -415,13 +415,15 @@ FocusScope {
                     }
                 }
 
+                //don't use a DoubleShadow here as cover size will change
+                //dynamically with the window size
                 Widgets.CoverShadow {
                     anchors.fill: parent
                     source: cover
                     primaryVerticalOffset: VLCStyle.dp(24)
-                    primaryRadius: VLCStyle.dp(54)
+                    primaryBlurRadius: VLCStyle.dp(54)
                     secondaryVerticalOffset: VLCStyle.dp(5)
-                    secondaryRadius: VLCStyle.dp(14)
+                    secondaryBlurRadius: VLCStyle.dp(14)
                 }
             }
 
