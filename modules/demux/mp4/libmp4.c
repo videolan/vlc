@@ -257,7 +257,7 @@ int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
     if( i_toread > SSIZE_MAX ) // we can't read more than that
         return VLC_EGENERIC;
 
-    if( vlc_stream_Read( p_stream, NULL, i_toread ) != i_toread )
+    if( vlc_stream_Read( p_stream, NULL, i_toread ) != (ssize_t) i_toread )
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -3928,7 +3928,7 @@ static int MP4_ReadBox_tref( stream_t *p_stream, MP4_Box_t *p_box )
 {
     /* skip header */
     size_t i_header = mp4_box_headersize( p_box );
-    if( vlc_stream_Read( p_stream, NULL, i_header ) != i_header )
+    if( vlc_stream_Read( p_stream, NULL, i_header ) != (ssize_t) i_header )
         return 0;
     /* read each reference atom with forced handler */
     uint64_t i_remain = p_box->i_size - 8;
@@ -4061,7 +4061,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
 
     /* skip over box header */
-    if( vlc_stream_Read( p_stream, NULL, i_headersize ) != i_headersize )
+    if( vlc_stream_Read( p_stream, NULL, i_headersize ) != (ssize_t) i_headersize )
         return 0;
 
     /* meta content starts with a 4 byte version/flags value (should be 0) */
