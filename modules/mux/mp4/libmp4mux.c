@@ -1120,7 +1120,7 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     char fcc[4];
     bo_t *specificbox = NULL;
     uint16_t i_qt_version = 1;
-    uint16_t i_compression_id = -2;
+    uint16_t i_compression_id = 0xFFFE;
     uint32_t i_uncompressed_bps = 0;
     bo_t *srat = NULL;
 
