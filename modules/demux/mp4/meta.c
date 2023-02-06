@@ -227,10 +227,15 @@ static bool SetMeta( vlc_meta_t* p_meta, int i_type, char const* name, const MP4
     vlc_meta_type_t const* type;
     char const* key;
 
-    if( ( name != NULL && !AppleNameToMeta( name, &type, &key ) ) ||
-        ( name == NULL && !AtomXA9ToMeta( i_type, &type, &key ) ) )
+    if( name != NULL)
     {
-        return false;
+        if ( !AppleNameToMeta( name, &type, &key ) )
+            return false;
+    }
+    else
+    {
+        if ( !AtomXA9ToMeta( i_type, &type, &key ) )
+            return false;
     }
 
     char* psz_utf = ExtractString( p_box );
