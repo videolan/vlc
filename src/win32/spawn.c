@@ -250,9 +250,11 @@ int vlc_waitpid(pid_t pid)
 
     WaitForSingleObject(process, INFINITE);
 
-    DWORD exit_code = -1;
-    GetExitCodeProcess(process, &exit_code);
+    DWORD exit_code;
+    BOOL success = GetExitCodeProcess(process, &exit_code);
 
     CloseHandle(process);
-    return exit_code;
+    if (success)
+        return exit_code;
+    return -1;
 }
