@@ -593,7 +593,7 @@ hxxx_helper_get_annexb_config( const struct hxxx_helper_nal *pp_nal_lists[],
 {
     static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x00, 0x01 };
 
-    block_t *p_block_list = NULL, *p_current;
+    block_t *p_block_list = NULL, *p_current = NULL;
     for (size_t i = 0; i < i_lists_size; ++i)
     {
         size_t i_nals_size = 0;
