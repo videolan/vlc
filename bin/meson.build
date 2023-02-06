@@ -1,7 +1,7 @@
 # Do we build the main VLC binary?
 build_vlc = get_option('vlc')
 
-if build_vlc
+if build_vlc and (host_system != 'darwin' or have_osx)
     vlc_sources = []
 
     vlc_deps = [m_lib, dl_lib, threads_dep]
@@ -9,7 +9,9 @@ if build_vlc
     if host_system == 'darwin'
         vlc_sources += ['darwinvlc.m']
         vlc_deps += corefoundation_dep
-        vlc_deps += dependency('Cocoa', required: true)
+        if have_osx
+            vlc_deps += dependency('Cocoa', required: true)
+        endif
     elif host_system == 'windows'
         vlc_sources += ['winvlc.c']
     else
