@@ -346,7 +346,7 @@ static int vlclua_countchoices( lua_State *L )
 {
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
-    int i_count = var_CountChoices( *pp_obj, psz_var );
+    size_t i_count = var_CountChoices( *pp_obj, psz_var );
 
     lua_pushinteger( L, i_count );
     return 1;
