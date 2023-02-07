@@ -38,6 +38,8 @@
 
 #import "main/VLCMain.h"
 
+#import "windows/video/VLCVoutView.h"
+
 NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudioViewIdentifier";
 
 @interface VLCLibraryAudioViewController()
@@ -331,7 +333,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     if (_segmentedTitleControl.selectedSegment == VLCLibraryMusicSegment &&
         ((audioList.count == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
-         (audioList.count > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView]))) {
+         (audioList.count > 0 && ![_libraryTargetView.subviews containsObject:_audioLibraryView])) &&
+        _libraryWindow.videoView.hidden) {
 
         [self updatePresentedView];
     }
