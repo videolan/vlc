@@ -164,6 +164,8 @@ typedef struct vout_thread_sys_t
         vout_chrono_t render;         /**< picture render time estimator */
     } chrono;
 
+    unsigned frame_next_count;
+
     vlc_atomic_rc_t rc;
 
 } vout_thread_sys_t;
@@ -1395,6 +1397,13 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
 {
     assert(sys->clock);
 
+    if (sys->frame_next_count > 0)
+    {
+        if (DisplayNextFrame(sys) == VLC_SUCCESS)
+            --sys->frame_next_count;
+        return false;
+    }
+
     if (sys->displayed.current == NULL)
     {
         sys->displayed.current = PreparePicture(sys, true, false);
@@ -1570,10 +1579,9 @@ void vout_NextPicture(vout_thread_t *vout)
 
     vout_control_Hold(&sys->control);
 
-    if (DisplayNextFrame(sys) != VLC_SUCCESS)
-        msg_Warn(vout, "vout_NextPicture failed");
+    sys->frame_next_count++;
 
-    vout_control_Release(&sys->control);
+    vout_control_ReleaseAndWake(&sys->control);
 }
 
 void vout_ChangeDelay(vout_thread_t *vout, vlc_tick_t delay)
@@ -2032,6 +2040,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     if (sys->splitter_name != NULL)
         var_Destroy(vout, "window");
     sys->window_enabled = false;
+    sys->frame_next_count = 0;
     vlc_mutex_init(&sys->window_lock);
 
     if (var_InheritBool(vout, "video-wallpaper"))
