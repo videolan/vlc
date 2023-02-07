@@ -31,6 +31,8 @@
 
 #include "mpeg4_iod.h"
 
+#include <stdlib.h>
+
 //#define OD_DEBUG 1
 static void od_debug( vlc_object_t *p_object, const char *format, ... )
 {
@@ -629,6 +631,25 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
 #define ODTag_ObjectDescrUpdate 0x01
 #define ODTag_ObjectDescrRemove 0x02
 
+struct bsearch_key
+{
+    uint16_t id;
+    const od_descriptor_t ***ppp_lowerbest;
+};
+
+static int bsearch_cmp( const void *key_, const void *el_ )
+{
+    const struct bsearch_key *key = key_;
+    const od_descriptor_t *el = *((const od_descriptor_t **) el_);
+    if( key->id < el->i_ID )
+        return -1;
+    if( key->ppp_lowerbest )
+        *key->ppp_lowerbest = (const od_descriptor_t **) el_;
+    if( key->id > el->i_ID )
+        return 1;
+    return 0;
+}
+
 static void ObjectDescrUpdateCommandRead( vlc_object_t *p_object, od_descriptors_t *p_ods,
                                           unsigned i_data, const uint8_t *p_data )
 {
@@ -637,16 +658,21 @@ static void ObjectDescrUpdateCommandRead( vlc_object_t *p_object, od_descriptors
     for( int i=0; i<i_count; i++ )
     {
         od_descriptor_t *p_od = p_odsread[i];
-        int i_pos = -1;
-        ARRAY_BSEARCH( p_ods->objects, ->i_ID, int, p_od->i_ID, i_pos );
-        if ( i_pos > -1 )
+        const od_descriptor_t **pp_lowerbest = NULL;
+        struct bsearch_key key = { .id = p_od->i_ID, .ppp_lowerbest = &pp_lowerbest };
+        od_descriptor_t **pp_cur = bsearch( &key, p_ods->objects.p_elems,
+                                            p_ods->objects.i_size, sizeof(*pp_cur),
+                                            bsearch_cmp );
+        if ( pp_cur )
         {
-            ODFree( p_ods->objects.p_elems[i_pos] );
+            int i_pos = pp_cur - p_ods->objects.p_elems;
+            ODFree( *pp_cur );
             p_ods->objects.p_elems[i_pos] = p_od;
         }
         else
         {
-            ARRAY_APPEND( p_ods->objects, p_od );
+            int i_pos = pp_lowerbest ? pp_lowerbest - (const od_descriptor_t **) p_ods->objects.p_elems + 1 : 0;
+            ARRAY_INSERT( p_ods->objects, p_od, i_pos );
         }
     }
 }
@@ -659,11 +685,13 @@ static void ObjectDescrRemoveCommandRead( vlc_object_t *p_object, od_descriptors
     bs_init( &s, p_data, i_data );
     for( unsigned i=0; i< (i_data * 8 / 10); i++ )
     {
-        uint16_t i_id = bs_read( &s, 10 );
-        int i_pos = -1;
-        ARRAY_BSEARCH( p_ods->objects, ->i_ID, int, i_id, i_pos );
-        if( i_pos > -1 )
-            ARRAY_REMOVE( p_ods->objects, i_pos );
+        struct bsearch_key key = { 0 };
+        key.id = bs_read( &s, 10 );
+        od_descriptor_t **pp_cur = bsearch( &key, p_ods->objects.p_elems,
+                                            p_ods->objects.i_size, sizeof(*pp_cur),
+                                            bsearch_cmp );
+        if( pp_cur )
+            ARRAY_REMOVE( p_ods->objects, pp_cur - p_ods->objects.p_elems );
     }
 }
 
