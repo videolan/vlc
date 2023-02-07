@@ -37,7 +37,7 @@ if have_win_desktop
     }
 
     opengl32_lib = cc.find_library('opengl32', required: false)
-    if opengl32_lib.found()
+    if opengl32_lib.found() and not missing_win_glew
         # glwin32
         vlc_modules += {
             'name' : 'glwin32',

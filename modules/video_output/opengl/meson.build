@@ -70,7 +70,7 @@ endif
 # interop_dxva2
 if have_win_desktop
     opengl32_lib = cc.find_library('opengl32', required: false)
-    if opengl32_lib.found()
+    if opengl32_lib.found() and not missing_win_glew
         vlc_modules += {
             'name' : 'interop_dxva2',
             'sources' : files('interop_dxva2.c'),
