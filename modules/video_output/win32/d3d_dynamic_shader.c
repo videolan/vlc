@@ -324,7 +324,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
 #ifdef VLC_WINSTORE_APP
     VLC_UNUSED(compiler);
 #else
-# define D3DCompile(args...)    compiler->OurD3DCompile(args)
+# define D3DCompile(a,b,c,d,e,f,g,h,i,j,k)    compiler->OurD3DCompile(a,b,c,d,e,f,g,h,i,j,k)
 # if !defined(NDEBUG)
     if (IsDebuggerPresent())
         compileFlags += D3DCOMPILE_DEBUG;
