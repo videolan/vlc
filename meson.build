@@ -189,11 +189,10 @@ if (get_option('x11')
     .disable_auto_if(host_system in ['darwin', 'windows'])
     .allowed())
     x11_dep = dependency('x11', required: get_option('x11'))
-    if not x11_dep.found()
-        cdata.set('X_DISPLAY_MISSING', 1)
-    endif
 else
     x11_dep = disabler()
+endif
+if not x11_dep.found()
     cdata.set('X_DISPLAY_MISSING', 1)
 endif
 
