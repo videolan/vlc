@@ -35,6 +35,8 @@
 
 #import "main/VLCMain.h"
 
+#import "windows/video/VLCVoutView.h"
+
 @implementation VLCLibraryVideoViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -181,7 +183,8 @@
 
     if (_segmentedTitleControl.selectedSegment == VLCLibraryVideoSegment &&
         ((videoList.count == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
-         (videoList.count > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView]))) {
+         (videoList.count > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
+        _libraryWindow.videoView.hidden) {
 
         [self updatePresentedView];
     }
