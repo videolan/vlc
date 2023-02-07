@@ -45,6 +45,7 @@ void vout_control_Init(vout_control_t *);
 void vout_control_Wake(vout_control_t *);
 void vout_control_Hold(vout_control_t *);
 void vout_control_Release(vout_control_t *);
+void vout_control_ReleaseAndWake(vout_control_t *);
 
 /* control inside of the vout thread */
 void vout_control_Wait(vout_control_t *, vlc_tick_t deadline);

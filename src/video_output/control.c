@@ -64,12 +64,26 @@ void vout_control_Hold(vout_control_t *ctrl)
     vlc_mutex_unlock(&ctrl->lock);
 }
 
-void vout_control_Release(vout_control_t *ctrl)
+static void vout_control_ReleaseUnlocked(vout_control_t *ctrl)
 {
-    vlc_mutex_lock(&ctrl->lock);
     assert(ctrl->is_held);
     ctrl->is_held = false;
     vlc_cond_signal(&ctrl->wait_available);
+}
+
+void vout_control_Release(vout_control_t *ctrl)
+{
+    vlc_mutex_lock(&ctrl->lock);
+    vout_control_ReleaseUnlocked(ctrl);
+    vlc_mutex_unlock(&ctrl->lock);
+}
+
+void vout_control_ReleaseAndWake(vout_control_t *ctrl)
+{
+    vlc_mutex_lock(&ctrl->lock);
+    vout_control_ReleaseUnlocked(ctrl);
+    ctrl->forced_awake = true;
+    vlc_cond_signal(&ctrl->wait_request);
     vlc_mutex_unlock(&ctrl->lock);
 }
 
