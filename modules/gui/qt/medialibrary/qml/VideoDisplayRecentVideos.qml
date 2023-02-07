@@ -95,6 +95,9 @@ FocusScope {
 
             focus: true
 
+            // NOTE: We want a gentle fade at the beginning / end of the history.
+            enableFade: true
+
             backgroundColor: VLCStyle.colors.bg
 
             Navigation.parentItem: root
