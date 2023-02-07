@@ -4,10 +4,24 @@
 
 # Declared here, as its used by both the
 # libplacebo and opengl subfolder build file.
+if have_win_store
+    # even if it's there, don't use it
+    missing_win_glew = true
+elif host_system == 'windows'
+    missing_win_glew = not cdata.has('HAVE_GL_WGLEW_H')
+else
+    missing_win_glew = false
+endif
+
 libplacebo_dep = dependency('libplacebo',
                             version: '>= 2.72',
                             required: get_option('libplacebo'))
-opengl_dep = dependency('gl', required: false)
+if missing_win_glew
+    # Our OpenGL code requires glew.h to be present
+    opengl_dep = disabler()
+else
+    opengl_dep = dependency('gl', required: false)
+endif
 opengles2_dep = dependency('glesv2', required: get_option('gles2'))
 
 if host_system == 'darwin'
