@@ -37,6 +37,10 @@ FadingEdgeListView {
 
     property bool keyNavigationWraps: false
 
+    // NOTE: Fading is disabled by default, 'enableBeginningFade' and 'enableEndFade' take
+    // precedence over 'enableFade'.
+    property bool enableFade: false
+
     // Private
 
     property bool _keyPressed: false
@@ -88,13 +92,13 @@ FadingEdgeListView {
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading
 
-    disableBeginningFade: (dragAutoScrollHandler.scrollingDirection
-                           ===
-                           Util.ViewDragAutoScrollHandler.Backward)
+    disableBeginningFade: (enableFade === false || dragAutoScrollHandler.scrollingDirection
+                                                   ===
+                                                   Util.ViewDragAutoScrollHandler.Backward)
 
-    disableEndFade: (dragAutoScrollHandler.scrollingDirection
-                     ===
-                     Util.ViewDragAutoScrollHandler.Forward)
+    disableEndFade: (enableFade === false || dragAutoScrollHandler.scrollingDirection
+                                             ===
+                                             Util.ViewDragAutoScrollHandler.Forward)
 
     Accessible.role: Accessible.List
 
