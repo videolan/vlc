@@ -104,7 +104,11 @@ static inline void D3D_ShaderBlobRelease(d3d_shader_blob *blob)
 {
     if (blob->pf_release)
         blob->pf_release(blob);
-    *blob = (d3d_shader_blob) { };
+#ifdef __cplusplus
+    *blob = { };
+#else
+    *blob = (d3d_shader_blob) { .pf_release = NULL };
+#endif
 }
 
 float D3D_GetFormatLuminance(vlc_object_t *, const video_format_t *);
