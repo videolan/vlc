@@ -282,6 +282,9 @@ Control {
 
             dragAutoScrollDragItem: dragItem
 
+            // NOTE: We want a gentle fade at the beginning / end of the playqueue.
+            enableFade: true
+
             backgroundColor: background.usingAcrylic ? "transparent"
                                                      : background.alternativeColor
 
