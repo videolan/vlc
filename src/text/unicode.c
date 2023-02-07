@@ -112,7 +112,7 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
     return res;
 }
 
-size_t vlc_towc (const char *str, uint32_t *restrict pwc)
+ssize_t vlc_towc (const char *str, uint32_t *restrict pwc)
 {
     assert (str != NULL);
 

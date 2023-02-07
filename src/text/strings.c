@@ -289,7 +289,7 @@ void vlc_xml_decode( char *psz_value )
 char *vlc_xml_encode (const char *str)
 {
     struct vlc_memstream stream;
-    size_t n;
+    ssize_t n;
     uint32_t cp;
 
     assert(str != NULL);
@@ -297,7 +297,7 @@ char *vlc_xml_encode (const char *str)
 
     while ((n = vlc_towc (str, &cp)) != 0)
     {
-        if (unlikely(n == (size_t)-1))
+        if (unlikely(n == -1))
         {
             if (vlc_memstream_close(&stream) == 0)
                 free(stream.ptr);

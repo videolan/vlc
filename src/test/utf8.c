@@ -29,13 +29,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static void test_towc(const char *in, size_t want_len, uint32_t want_cp)
+static void test_towc(const char *in, ssize_t want_len, uint32_t want_cp)
 {
     uint32_t cp;
-    size_t len;
+    ssize_t len;
 
-    if (want_len != (size_t)-1)
-        printf("\"%s\" is U+%04"PRIX32" (%zu bytes)\n", in, want_cp, want_len);
+    if (want_len != -1)
+        printf("\"%s\" is U+%04"PRIX32" (%zd bytes)\n", in, want_cp, want_len);
     else
         printf("Invalid sequence of %zu bytes\n", strlen(in));
 
@@ -47,7 +47,7 @@ static void test_towc(const char *in, size_t want_len, uint32_t want_cp)
         exit(1);
     }
 
-    if (len != (size_t)-1 && want_cp != cp)
+    if (len != -1 && want_cp != cp)
     {
         printf(" ERROR: code point mismatch: %04"PRIX32"\n", cp);
         exit(1);

@@ -42,12 +42,12 @@
  *
  * \return the number of bytes occupied by the decoded code point
  *
- * \retval (size_t)-1 not a valid UTF-8 sequence
+ * \retval -1 not a valid UTF-8 sequence
  * \retval 0 null character (i.e. str points to an empty string)
  * \retval 1 (non-null) ASCII character
  * \retval 2-4 non-ASCII character
  */
-VLC_API size_t vlc_towc(const char *str, uint32_t *restrict pwc);
+VLC_API ssize_t vlc_towc(const char *str, uint32_t *restrict pwc);
 
 /**
  * Checks UTF-8 validity.
@@ -61,11 +61,11 @@ VLC_API size_t vlc_towc(const char *str, uint32_t *restrict pwc);
  */
 VLC_USED static inline const char *IsUTF8(const char *str)
 {
-    size_t n;
+    ssize_t n;
     uint32_t cp;
 
     while ((n = vlc_towc(str, &cp)) != 0)
-        if (likely(n != (size_t)-1))
+        if (likely(n != -1))
             str += n;
         else
             return NULL;
@@ -114,11 +114,11 @@ VLC_USED static inline const char *IsASCII(const char *str)
 static inline char *EnsureUTF8(char *str)
 {
     char *ret = str;
-    size_t n;
+    ssize_t n;
     uint32_t cp;
 
     while ((n = vlc_towc(str, &cp)) != 0)
-        if (likely(n != (size_t)-1))
+        if (likely(n != -1))
             str += n;
         else
         {

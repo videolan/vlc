@@ -254,15 +254,16 @@ static void print_desc(const char *str, unsigned margin, bool color)
         fputs(TS_BLUE_BOLD, stdout);
 
     const char *word = str;
-    int wordlen = 0, wordwidth = 0;
+    size_t wordlen = 0;
+    int wordwidth = 0;
     unsigned offset = 0;
     bool newline = true;
 
     while (str[0])
     {
         uint32_t cp;
-        size_t charlen = vlc_towc(str, &cp);
-        if (unlikely(charlen == (size_t)-1))
+        ssize_t charlen = vlc_towc(str, &cp);
+        if (unlikely(charlen == -1))
             break;
 
         int charwidth = wcwidth(cp);
@@ -316,11 +317,11 @@ static int vlc_swidth(const char *str)
     for (int total = 0;;)
     {
         uint32_t cp;
-        size_t charlen = vlc_towc(str, &cp);
+        ssize_t charlen = vlc_towc(str, &cp);
 
         if (charlen == 0)
             return total;
-        if (charlen == (size_t)-1)
+        if (charlen == -1)
             return -1;
         str += charlen;
 

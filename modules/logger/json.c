@@ -4,7 +4,7 @@
  * Copyright © 2021 Videolabs
  *
  * Authors : Nicolas Le Quec
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -120,7 +120,8 @@ static void JsonPrintString(FILE *stream, const char *str)
             else
             {
                 uint32_t bytes;
-                size_t len = vlc_towc(str, &bytes);
+                ssize_t len = vlc_towc(str, &bytes);
+                assert(len > 0);
                 PrintUTF8Char(stream, bytes);
                 str += len - 1;
             }
