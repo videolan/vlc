@@ -34,9 +34,11 @@ if libplacebo_dep.found()
                                   dependencies: [libplacebo_dep],
                                   include_directories: [vlc_include_dirs])
 
-    subdir('opengl')
     subdir('libplacebo')
+else
+    libplacebo_utils = []
 endif
+subdir('opengl')
 
 if host_system == 'windows'
     subdir('win32')
