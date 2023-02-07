@@ -861,7 +861,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.librarySearchField setEnabled:NO];
     [self clearLibraryFilterString];
 
-    // Repurpose the back button
+    // Make sure the back button is visible...
+    [self insertToolbarItem:_backwardsToolbarItem inFrontOf:@[]];
+    // And repurpose it to hide the video view
     [self.backwardsNavigationButton setEnabled:YES];
 
     if (self.isInNativeFullscreen && [self hasActiveVideo] && [self fullscreen]) {
