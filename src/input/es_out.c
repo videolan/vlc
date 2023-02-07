@@ -213,6 +213,7 @@ typedef struct
 
     /* */
     bool        b_paused;
+    es_out_id_t *p_next_frame_es;
     vlc_tick_t  i_pause_date;
 
     /* Current preroll */
@@ -251,6 +252,7 @@ static void EsOutDeleteInfoEs( es_out_t *, es_out_id_t *es );
 static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update );
 static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es );
 static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_date );
+static void EsOutChangePosition( es_out_t *out, bool b_flush, es_out_id_t *p_next_frame_es );
 static void EsOutProgramChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_date );
 static void EsOutProgramsChangeRate( es_out_t *out );
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
@@ -547,6 +549,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->main_source = main_source;
 
     p_sys->b_active = false;
+    p_sys->p_next_frame_es = NULL;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
     p_sys->input_type = input_type;
 
@@ -892,6 +895,16 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record, const char *dir_path )
 
     return VLC_SUCCESS;
 }
+
+static void EsOutStopNextFrame( es_out_t *out )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    assert( p_sys->p_next_frame_es != NULL );
+    /* Flush every ES except the video one */
+    EsOutChangePosition( out, true, p_sys->p_next_frame_es );
+    p_sys->p_next_frame_es = NULL;
+}
+
 static void EsOutChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_date )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -904,6 +917,9 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_date )
     }
     else
     {
+        if( p_sys->p_next_frame_es != NULL )
+            EsOutStopNextFrame( out );
+
         if( p_sys->i_buffering_extra_initial > 0 )
         {
             vlc_tick_t i_stream_start;
@@ -946,7 +962,8 @@ static void EsOutChangeRate( es_out_t *out, float rate )
             vlc_input_decoder_ChangeRate( es->p_dec, rate );
 }
 
-static void EsOutChangePosition( es_out_t *out, bool b_flush )
+static void EsOutChangePosition( es_out_t *out, bool b_flush,
+                                 es_out_id_t *p_next_frame_es )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_id_t *p_es;
@@ -957,7 +974,7 @@ static void EsOutChangePosition( es_out_t *out, bool b_flush )
     {
         if( p_es->p_dec != NULL )
         {
-            if( b_flush )
+            if( b_flush && p_es != p_next_frame_es )
                 vlc_input_decoder_Flush( p_es->p_dec );
             if( !p_sys->b_buffering )
             {
@@ -1177,69 +1194,32 @@ static void EsOutProgramsChangeRate( es_out_t *out )
 static void EsOutFrameNext( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    es_out_id_t *p_es_video = NULL, *p_es;
-
-    if( p_sys->b_buffering )
-    {
-        msg_Warn( p_sys->p_input, "buffering, ignoring 'frame next'" );
-        return;
-    }
 
     assert( p_sys->b_paused );
 
-    foreach_es_then_es_slaves(p_es)
-        if( p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec && !p_es_video /* nested loop */ )
-        {
-            p_es_video = p_es;
-            break;
-        }
-
-    if( !p_es_video )
+    if( p_sys->p_next_frame_es == NULL )
     {
-        msg_Warn( p_sys->p_input, "No video track selected, ignoring 'frame next'" );
-        return;
+        /* Don't use 'foreach_es_then_es_slaves': next-frame is not implemented
+         * on ES slaves */
+        es_out_id_t *p_es;
+        vlc_list_foreach( p_es, &p_sys->es, node )
+            if( p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec )
+            {
+                p_sys->p_next_frame_es = p_es;
+                break;
+            }
+
+        if( p_sys->p_next_frame_es == NULL )
+        {
+            msg_Warn( p_sys->p_input, "No video track selected, ignoring 'frame next'" );
+            return;
+        }
     }
 
     vlc_tick_t i_duration;
-    vlc_input_decoder_FrameNext( p_es_video->p_dec, &i_duration );
+    vlc_input_decoder_FrameNext( p_sys->p_next_frame_es->p_dec, &i_duration );
 
     msg_Dbg( p_sys->p_input, "EsOutFrameNext consumed %d ms", (int)MS_FROM_VLC_TICK(i_duration) );
-
-    if( i_duration <= 0 )
-        i_duration = VLC_TICK_FROM_MS(40);
-
-    /* FIXME it is not a clean way ? */
-    if( p_sys->i_buffering_extra_initial <= 0 )
-    {
-        vlc_tick_t i_stream_start;
-        vlc_tick_t i_system_start;
-        vlc_tick_t i_stream_duration;
-        vlc_tick_t i_system_duration;
-        int i_ret;
-
-        i_ret = input_clock_GetState( p_sys->p_pgrm->p_input_clock,
-                                      &i_stream_start, &i_system_start,
-                                      &i_stream_duration, &i_system_duration );
-        if( i_ret )
-            return;
-
-        p_sys->i_buffering_extra_initial = 1 + i_stream_duration
-                                         - p_sys->i_pts_delay
-                                         - p_sys->i_pts_jitter
-                                         - p_sys->i_tracks_pts_delay; /* FIXME < 0 ? */
-        p_sys->i_buffering_extra_system =
-        p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
-    }
-
-    const float rate = input_clock_GetRate( p_sys->p_pgrm->p_input_clock );
-
-    p_sys->b_buffering = true;
-    p_sys->i_buffering_extra_system += i_duration;
-    p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial +
-        ( p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial ) * rate;
-
-    p_sys->i_preroll_end = -1;
-    p_sys->i_prev_stream_level = -1;
 }
 static vlc_tick_t EsOutGetBuffering( es_out_t *out )
 {
@@ -2565,6 +2545,9 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
         return;
     }
 
+    if( p_sys->p_next_frame_es == es )
+        EsOutStopNextFrame( out );
+
     if( es->p_master )
     {
         if( es->p_master->p_dec )
@@ -3424,6 +3407,9 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         }
         else if( p_pgrm == p_sys->p_pgrm )
         {
+            if( p_sys->p_next_frame_es != NULL )
+                return VLC_SUCCESS;
+
             /* Last pcr/clock update was late. We need to compensate by offsetting
                from the clock the rendering dates */
             if( i_late > 0 && ( !priv->p_sout ||
@@ -3485,7 +3471,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
 
     case ES_OUT_RESET_PCR:
         msg_Dbg( p_sys->p_input, "ES_OUT_RESET_PCR called" );
-        EsOutChangePosition( out, true );
+        EsOutChangePosition( out, true, NULL );
         return VLC_SUCCESS;
 
     case ES_OUT_SET_GROUP:
@@ -3840,7 +3826,19 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
     case ES_OUT_PRIV_GET_BUFFERING:
     {
         bool *pb = va_arg( args, bool* );
-        *pb = p_sys->b_buffering;
+        if( p_sys->b_buffering )
+            *pb = true;
+        else if( p_sys->p_next_frame_es != NULL )
+        {
+            /* The input thread will continue to call demux() if this control
+             * returns true. In case of next-frame, ask the input thread to
+             * continue to demux() until the vout has a picture to display. */
+            assert( p_sys->b_paused );
+            *pb = p_sys->p_next_frame_es->p_dec != NULL
+                && vlc_input_decoder_IsEmpty( p_sys->p_next_frame_es->p_dec );
+        }
+        else
+            *pb = false;
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_SET_ES_DELAY:
