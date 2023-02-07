@@ -1385,7 +1385,7 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
         sys->displayed.current = next;
     }
 
-    if (!sys->displayed.current)
+    if (!next)
         return VLC_EGENERIC;
 
     return RenderPicture(sys, true);
