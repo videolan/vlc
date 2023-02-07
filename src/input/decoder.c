@@ -2619,11 +2619,9 @@ void vlc_input_decoder_Wait( vlc_input_decoder_t *p_owner )
     vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
-void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner,
-                                  vlc_tick_t *pi_duration )
+void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner )
 {
     assert( p_owner->paused );
-    *pi_duration = 0;
 
     vlc_fifo_Lock( p_owner->p_fifo );
     p_owner->frames_countdown++;
@@ -2634,7 +2632,7 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner,
     if( p_owner->dec.fmt_in->i_cat == VIDEO_ES )
     {
         if( p_owner->p_vout )
-            vout_NextPicture( p_owner->p_vout, pi_duration );
+            vout_NextPicture( p_owner->p_vout );
     }
     vlc_fifo_Unlock(p_owner->p_fifo);
 }

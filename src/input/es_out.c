@@ -1216,10 +1216,7 @@ static void EsOutFrameNext( es_out_t *out )
         }
     }
 
-    vlc_tick_t i_duration;
-    vlc_input_decoder_FrameNext( p_sys->p_next_frame_es->p_dec, &i_duration );
-
-    msg_Dbg( p_sys->p_input, "EsOutFrameNext consumed %d ms", (int)MS_FROM_VLC_TICK(i_duration) );
+    vlc_input_decoder_FrameNext( p_sys->p_next_frame_es->p_dec );
 }
 static vlc_tick_t EsOutGetBuffering( es_out_t *out )
 {

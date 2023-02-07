@@ -226,7 +226,7 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
 /**
  * This function will force to display the next picture while paused
  */
-void vout_NextPicture( vout_thread_t *p_vout, vlc_tick_t *pi_duration );
+void vout_NextPicture( vout_thread_t *p_vout );
 
 /**
  * This function will ask the display of the input title

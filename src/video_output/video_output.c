@@ -117,11 +117,6 @@ typedef struct vout_thread_sys_t
     } displayed;
 
     struct {
-        vlc_tick_t  last;
-        vlc_tick_t  timestamp;
-    } step;
-
-    struct {
         bool        is_on;
         vlc_tick_t  date;
     } pause;
@@ -1503,10 +1498,7 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 
     if (sys->pause.is_on)
         FilterFlush(sys, false);
-    else {
-        sys->step.timestamp = VLC_TICK_INVALID;
-        sys->step.last      = VLC_TICK_INVALID;
-    }
+
     sys->pause.is_on = is_paused;
     sys->pause.date  = date;
     vout_control_Release(&sys->control);
@@ -1525,9 +1517,6 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
                                vlc_tick_t date)
 {
     vout_thread_sys_t *sys = vout;
-
-    sys->step.timestamp = VLC_TICK_INVALID;
-    sys->step.last      = VLC_TICK_INVALID;
 
     FilterFlush(vout, false); /* FIXME too much */
 
@@ -1574,26 +1563,16 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
         vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "flushed");
 }
 
-void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
+void vout_NextPicture(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    *duration = 0;
 
     vout_control_Hold(&sys->control);
-    if (sys->step.last == VLC_TICK_INVALID)
-        sys->step.last = sys->displayed.timestamp;
 
-    if (DisplayNextFrame(sys) == VLC_SUCCESS) {
-        sys->step.timestamp = sys->displayed.timestamp;
+    if (DisplayNextFrame(sys) != VLC_SUCCESS)
+        msg_Warn(vout, "vout_NextPicture failed");
 
-        if (sys->step.last != VLC_TICK_INVALID &&
-            sys->step.timestamp > sys->step.last) {
-            *duration = sys->step.timestamp - sys->step.last;
-            sys->step.last = sys->step.timestamp;
-            /* TODO advance subpicture by the duration ... */
-        }
-    }
     vout_control_Release(&sys->control);
 }
 
@@ -1726,9 +1705,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     sys->displayed.date          = VLC_TICK_INVALID;
     sys->displayed.timestamp     = VLC_TICK_INVALID;
     sys->displayed.is_interlaced = false;
-
-    sys->step.last               = VLC_TICK_INVALID;
-    sys->step.timestamp          = VLC_TICK_INVALID;
 
     sys->pause.is_on = false;
     sys->pause.date  = VLC_TICK_INVALID;
