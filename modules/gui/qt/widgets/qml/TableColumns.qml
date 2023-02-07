@@ -62,13 +62,20 @@ Item {
         for (var i = 0; i < criterias.length; i++) {
             if (i) string += " • "
 
-            var criteria = rowModel[criterias[i]]
+            var criteria = criterias[i]
+
+            var value = rowModel[criteria]
 
             // NOTE: We can't use 'instanceof' because VLCTick is uncreatable.
-            if (criteria.toString().indexOf("VLCTick(") === 0)
-                string += criteria.formatShort()
-            else
-                string += criteria
+            if (value.toString().indexOf("VLCTick(") === 0) {
+
+                string += value.formatShort()
+            } else if (criteria === "nb_tracks") {
+
+                string += I18n.qtr("%1 tracks").arg(value)
+            } else {
+                string += value
+            }
         }
 
         return string
