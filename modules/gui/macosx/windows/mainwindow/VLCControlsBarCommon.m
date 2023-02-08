@@ -376,7 +376,6 @@
     [self.timeSlider setHidden:NO];
     [self.timeSlider setKnobHidden:NO];
     [self.timeSlider setFloatValue:_playerController.position];
-    [self.bottomBarView setHidden:NO];
 
     vlc_tick_t duration = inputItem.duration;
     bool buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
