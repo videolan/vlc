@@ -2349,6 +2349,80 @@ test_sort(void)
     vlc_playlist_Delete(playlist);
 }
 
+static void
+test_stable_sort(void)
+{
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    assert(playlist);
+
+    input_item_t *media[10];
+    media[0] = CreateDummyMedia(1); media[0]->i_duration = 10;
+    media[1] = CreateDummyMedia(1); media[1]->i_duration = 20;
+    media[2] = CreateDummyMedia(1); media[2]->i_duration = 30;
+    media[3] = CreateDummyMedia(3); media[3]->i_duration = 10;
+    media[4] = CreateDummyMedia(3); media[4]->i_duration = 20;
+    media[5] = CreateDummyMedia(3); media[5]->i_duration = 30;
+    media[6] = CreateDummyMedia(4); media[6]->i_duration = 10;
+    media[7] = CreateDummyMedia(2); media[7]->i_duration = 20;
+    media[8] = CreateDummyMedia(2); media[8]->i_duration = 30;
+    media[9] = CreateDummyMedia(2); media[9]->i_duration = 10;
+
+    /* initial playlist with 10 items */
+    int ret = vlc_playlist_Append(playlist, media, 10);
+    assert(ret == VLC_SUCCESS);
+
+    struct vlc_playlist_sort_criterion criteria[] = {
+        { VLC_PLAYLIST_SORT_KEY_TITLE, VLC_PLAYLIST_SORT_ORDER_ASCENDING },
+        { VLC_PLAYLIST_SORT_KEY_DURATION, VLC_PLAYLIST_SORT_ORDER_ASCENDING },
+    };
+
+    /* first sort by the 2nd criteria (duration) */
+    vlc_playlist_Sort(playlist, &criteria[1], 1);
+
+    EXPECT_AT(0, 0);
+    EXPECT_AT(1, 3);
+    EXPECT_AT(2, 6);
+    EXPECT_AT(3, 9);
+    EXPECT_AT(4, 1);
+    EXPECT_AT(5, 4);
+    EXPECT_AT(6, 7);
+    EXPECT_AT(7, 2);
+    EXPECT_AT(8, 5);
+    EXPECT_AT(9, 8);
+
+    /* then sort by the 1st criteria (title) */
+    vlc_playlist_Sort(playlist, &criteria[0], 1);
+
+    EXPECT_AT(0, 0);
+    EXPECT_AT(1, 1);
+    EXPECT_AT(2, 2);
+    EXPECT_AT(3, 9);
+    EXPECT_AT(4, 7);
+    EXPECT_AT(5, 8);
+    EXPECT_AT(6, 3);
+    EXPECT_AT(7, 4);
+    EXPECT_AT(8, 5);
+    EXPECT_AT(9, 6);
+
+    /* sorting by both criteria at once must be equivalent */
+    vlc_playlist_Shuffle(playlist);
+    vlc_playlist_Sort(playlist, criteria, 2);
+
+    EXPECT_AT(0, 0);
+    EXPECT_AT(1, 1);
+    EXPECT_AT(2, 2);
+    EXPECT_AT(3, 9);
+    EXPECT_AT(4, 7);
+    EXPECT_AT(5, 8);
+    EXPECT_AT(6, 3);
+    EXPECT_AT(7, 4);
+    EXPECT_AT(8, 5);
+    EXPECT_AT(9, 6);
+
+    DestroyMediaArray(media, 10);
+    vlc_playlist_Delete(playlist);
+}
+
 #undef EXPECT_AT
 
 int main(void)
@@ -2384,6 +2458,7 @@ int main(void)
     test_random();
     test_shuffle();
     test_sort();
+    test_stable_sort();
     return 0;
 }
 

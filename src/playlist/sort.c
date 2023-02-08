@@ -37,6 +37,7 @@
  */
 struct vlc_playlist_item_meta {
     vlc_playlist_item_t *item;
+    size_t index;
     const char *title_or_name;
     vlc_tick_t duration;
     const char *artist;
@@ -240,7 +241,7 @@ vlc_playlist_item_meta_InitFields(struct vlc_playlist_item_meta *meta,
 }
 
 static struct vlc_playlist_item_meta *
-vlc_playlist_item_meta_New(vlc_playlist_item_t *item,
+vlc_playlist_item_meta_New(size_t index, vlc_playlist_item_t *item,
                            const struct vlc_playlist_sort_criterion criteria[],
                            size_t count)
 {
@@ -250,6 +251,7 @@ vlc_playlist_item_meta_New(vlc_playlist_item_t *item,
         return NULL;
 
     meta->item = item;
+    meta->index = index;
 
     vlc_mutex_lock(&item->media->lock);
     int ret = vlc_playlist_item_meta_InitFields(meta, criteria, count);
@@ -394,7 +396,11 @@ compare_meta(const void *lhs, const void *rhs, void *userdata)
             return ret;
         }
     }
-    return 0;
+
+    /* If the items are equals regarding the sorting criteria, keep their
+     * initial relative order, to make the sort stable. */
+    assert(a->index != b->index);
+    return a->index < b->index ? -1 : 1;
 }
 
 static void
@@ -419,7 +425,7 @@ vlc_playlist_NewMetaArray(vlc_playlist_t *playlist,
     size_t i;
     for (i = 0; i < playlist->items.size; ++i)
     {
-        array[i] = vlc_playlist_item_meta_New(playlist->items.data[i],
+        array[i] = vlc_playlist_item_meta_New(i, playlist->items.data[i],
                                               criteria, count);
         if (unlikely(!array[i]))
             break;
