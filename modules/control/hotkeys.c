@@ -279,6 +279,9 @@ PLAYER_ACTION_HANDLER(State)
         case ACTIONID_FRAME_NEXT:
             vlc_player_NextVideoFrame(player);
             break;
+        case ACTIONID_FRAME_PREVIOUS:
+            vlc_player_PreviousVideoFrame(player);
+            break;
         default:
             vlc_assert_unreachable();
     }
@@ -982,6 +985,7 @@ static struct vlc_action const actions[] =
     VLC_ACTION_INTF(SET_BOOKMARK1, PLAY_BOOKMARK10, PlaylistBookmark, true)
     /* player actions */
     VLC_ACTION_PLAYER(PLAY_PAUSE, FRAME_NEXT, State, true)
+    VLC_ACTION_PLAYER(PLAY_PAUSE, FRAME_PREVIOUS, State, true)
     VLC_ACTION_INTF(JUMP_BACKWARD_EXTRASHORT, JUMP_FORWARD_LONG, PlayerSeek, true)
     VLC_ACTION_PLAYER(POSITION, POSITION, Position, true)
     VLC_ACTION_PLAYER(PROGRAM_SID_PREV, DISC_MENU, NavigateMedia, true)
