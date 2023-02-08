@@ -802,11 +802,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)playerStateChanged:(NSNotification *)notification
 {
-    if(_playlistController.playerController.playerState != VLC_PLAYER_STATE_PLAYING) {
+    if (_playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+        [self hideControlsBar];
         return;
     }
 
-    [self reopenVideoView];
+    if(_playlistController.playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
+        [self reopenVideoView];
+    }
+
+    [self showControlsBar];
 }
 
 // This handles reopening the video view when the user has closed it.
@@ -938,6 +943,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)shouldShowController:(NSNotification *)aNotification
 {
     [self makeKeyAndOrderFront:nil];
+    [self showControlsBar];
 }
 
 - (void)shouldShowFullscreenController:(NSNotification *)aNotification
