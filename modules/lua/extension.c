@@ -642,14 +642,7 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         p_ext->p_sys->p_item = NULL;
     }
 
-    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
-
-    if ( p_ext->p_sys->L == NULL )
-        return VLC_EGENERIC;
-    lua_close( p_ext->p_sys->L );
-    p_ext->p_sys->L = NULL;
-
-    return i_ret;
+    return lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
 }
 
 int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
