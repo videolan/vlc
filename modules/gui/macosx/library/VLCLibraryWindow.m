@@ -148,6 +148,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
+    [self hideControlsBar];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
     [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
