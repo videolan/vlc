@@ -2066,6 +2066,14 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
     vlc_mutex_lock( &p_sys->lock );
 
+    /* Drop all ESes except the video one in case of next-frame */
+    if( p_sys->p_next_frame_es != NULL && p_sys->p_next_frame_es != es )
+    {
+        block_Release( p_block );
+        vlc_mutex_unlock( &p_sys->lock );
+        return VLC_SUCCESS;
+    }
+
     /* Mark preroll blocks */
     if( p_sys->i_preroll_end >= 0 )
     {
