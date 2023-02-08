@@ -87,6 +87,8 @@ struct extension_sys_t
 
     bool b_thread_running; //< Only accessed out of the extension thread.
     bool b_activated; ///< Protected by the command lock
+    bool b_activating; ///< Protected by the command lock
+    bool b_deactivating; ///< Protected by the command lock
 };
 
 /* Extensions: manager functions */

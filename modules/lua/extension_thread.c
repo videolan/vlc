@@ -51,8 +51,13 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
     struct extension_sys_t *p_sys = p_ext->p_sys;
     assert( p_sys != NULL );
 
-    vlc_mutex_lock( &p_sys->command_lock );
-    if ( p_sys->b_activated == false )
+    vlc_mutex_lock(&p_sys->command_lock);
+    if (p_sys->b_activating)
+    {
+        vlc_mutex_unlock(&p_sys->command_lock);
+        return VLC_SUCCESS;
+    }
+    if (!p_sys->b_activated)
     {
         /* Prepare first command */
         assert(p_sys->command == NULL);
@@ -68,6 +73,7 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
             msg_Dbg( p_mgr, "Reactivating extension %s", p_ext->psz_title);
             vlc_cond_signal( &p_sys->wait );
         }
+        p_sys->b_activating = true;
     }
     vlc_mutex_unlock( &p_sys->command_lock );
 
@@ -131,6 +137,8 @@ bool QueueDeactivateCommand( extension_t *p_ext )
     else
         p_ext->p_sys->command = cmd;
 
+    p_ext->p_sys->b_deactivating = true;
+    p_ext->p_sys->b_activating = false;
     vlc_cond_signal( &p_ext->p_sys->wait );
     return true;
 }
@@ -138,7 +146,13 @@ bool QueueDeactivateCommand( extension_t *p_ext )
 /** Deactivate this extension: pushes immediate command and drops queued */
 int Deactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
+    extension_sys_t *sys = p_ext->p_sys;
+    vlc_mutex_lock(&sys->command_lock);
+    if (!sys->b_activated && !sys->b_activating)
+    {
+        vlc_mutex_unlock(&sys->command_lock);
+        return VLC_SUCCESS;
+    }
 
     if( p_ext->p_sys->b_exiting )
     {
@@ -270,7 +284,8 @@ static void* Run( void *data )
 
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
 
-    while( !p_ext->p_sys->b_exiting )
+    extension_sys_t *sys = p_ext->p_sys;
+    while (!sys->b_exiting || (sys->command && sys->command->i_command == CMD_DEACTIVATE))
     {
         struct command_t *cmd = p_ext->p_sys->command;
 
@@ -303,6 +318,7 @@ static void* Run( void *data )
                 }
                 vlc_mutex_lock( &p_ext->p_sys->command_lock );
                 p_ext->p_sys->b_activated = true;
+                p_ext->p_sys->b_activating = false;
                 vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                 break;
             }
@@ -317,6 +333,7 @@ static void* Run( void *data )
                 }
                 vlc_mutex_lock( &p_ext->p_sys->command_lock );
                 p_ext->p_sys->b_activated = false;
+                sys->b_deactivating = false;
                 vlc_mutex_unlock( &p_ext->p_sys->command_lock );
                 break;
             }

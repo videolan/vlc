@@ -140,11 +140,12 @@ void Close_Extension( vlc_object_t *p_this )
         if( !p_ext )
             break;
 
-        vlc_mutex_lock( &p_ext->p_sys->command_lock );
-        if( p_ext->p_sys->b_activated == true && p_ext->p_sys->p_progress_id == NULL )
+        vlc_mutex_lock(&p_ext->p_sys->command_lock);
+        if (p_ext->p_sys->b_activated && p_ext->p_sys->p_progress_id == NULL &&
+            !p_ext->p_sys->b_deactivating)
         {
-            p_ext->p_sys->b_exiting = true;
             // QueueDeactivateCommand will signal the wait condition.
+            p_ext->p_sys->b_exiting = true;
             QueueDeactivateCommand( p_ext );
         }
         else
@@ -626,10 +627,8 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_mgr != NULL && p_ext != NULL );
 
-    if( p_ext->p_sys->b_activated == false )
-        return VLC_SUCCESS;
-
-    vlclua_fd_interrupt( &p_ext->p_sys->dtable );
+    extension_sys_t *sys = p_ext->p_sys;
+    vlclua_fd_interrupt(&sys->dtable);
 
     // Unset and release input objects
     if( p_ext->p_sys->p_item )
