@@ -1381,6 +1381,9 @@ static const char *const mouse_wheel_texts[] = {
 #define FRAME_NEXT_KEY_TEXT N_("Next frame")
 #define FRAME_NEXT_KEY_LONGTEXT \
     N_("Select the hotkey to got to the next video frame.")
+#define FRAME_PREVIOUS_KEY_TEXT N_("Previous frame")
+#define FRAME_PREVIOUS_KEY_LONGTEXT \
+    N_("Select the hotkey to got to the previous video frame.")
 
 #define JIEXTRASHORT_TEXT N_("Very short jump length")
 #define JIEXTRASHORT_LONGTEXT N_("Very short jump length, in seconds.")
@@ -2321,6 +2324,7 @@ vlc_module_begin ()
 #   define KEY_JUMP_MLONG         "Command+Shift+Alt+Left"
 #   define KEY_JUMP_PLONG         "Command+Shift+Alt+Right"
 #   define KEY_FRAME_NEXT         "e"
+#   define KEY_FRAME_PREVIOUS     "Shift+e"
 #   define KEY_NAV_ACTIVATE       "Enter"
 #   define KEY_NAV_UP             "Up"
 #   define KEY_NAV_DOWN           "Down"
@@ -2472,6 +2476,7 @@ vlc_module_begin ()
 #   define KEY_FRAME_NEXT         "e\tBrowser Next"
 #endif
 
+#   define KEY_FRAME_PREVIOUS     "Shift+e"
 #   define KEY_SUBDELAY_UP        "h"
 #   define KEY_SUBDELAY_DOWN      "g"
 #   define KEY_SUBPOS_DOWN        NULL
@@ -2606,6 +2611,8 @@ vlc_module_begin ()
             JFLONG_KEY_TEXT, JFLONG_KEY_LONGTEXT)
     add_key("key-frame-next", KEY_FRAME_NEXT,
             FRAME_NEXT_KEY_TEXT, FRAME_NEXT_KEY_LONGTEXT)
+    add_key("key-frame-previous", KEY_FRAME_PREVIOUS,
+            FRAME_PREVIOUS_KEY_TEXT, FRAME_PREVIOUS_KEY_LONGTEXT)
     add_key("key-nav-activate", KEY_NAV_ACTIVATE,
             NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT)
     add_key("key-nav-up", KEY_NAV_UP, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT)
