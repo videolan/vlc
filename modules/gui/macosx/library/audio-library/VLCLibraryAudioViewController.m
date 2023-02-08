@@ -363,11 +363,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (IBAction)segmentedControlAction:(id)sender
 {
     [self updatePresentedView];
-
-    VLCLibraryNavigationStack *globalNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
-    if(sender != globalNavStack) {
-        [globalNavStack appendCurrentLibraryState];
-    }
 }
 
 - (void)reloadData

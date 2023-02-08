@@ -75,14 +75,10 @@
     [libraryWindow.gridVsListSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewModeSegment];
     [libraryWindow.audioSegmentedControl setSelectedSegment:rememberedSelectedLibraryViewAudioSegment];
 
-    // We don't want to add these to the navigation stack...
-    [libraryWindow segmentedControlAction:libraryWindow.navigationStack];
+    [libraryWindow segmentedControlAction:self];
     if (rememberedSelectedLibrarySegment == VLCLibraryMusicSegment) {
-        [libraryWindow.libraryAudioViewController segmentedControlAction:libraryWindow.navigationStack];
+        [libraryWindow.libraryAudioViewController segmentedControlAction:self];
     }
-
-    // But we do want the "final" initial position to be added. So we manually invoke the navigation stack
-    [libraryWindow.navigationStack appendCurrentLibraryState];
 
     completionHandler(libraryWindow, nil);
 }

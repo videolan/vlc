@@ -411,10 +411,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self setViewForSelectedSegment];
     [self invalidateRestorableState];
-
-    if(sender != _navigationStack) {
-        [self.navigationStack appendCurrentLibraryState];
-    }
 }
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem

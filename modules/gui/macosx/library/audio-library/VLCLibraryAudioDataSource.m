@@ -26,7 +26,6 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
