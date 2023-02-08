@@ -92,13 +92,13 @@ FadingEdgeListView {
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading
 
-    disableBeginningFade: (enableFade === false || dragAutoScrollHandler.scrollingDirection
-                                                   ===
-                                                   Util.ViewDragAutoScrollHandler.Backward)
+    enableBeginningFade: (enableFade && dragAutoScrollHandler.scrollingDirection
+                                        !==
+                                        Util.ViewDragAutoScrollHandler.Backward)
 
-    disableEndFade: (enableFade === false || dragAutoScrollHandler.scrollingDirection
-                                             ===
-                                             Util.ViewDragAutoScrollHandler.Forward)
+    enableEndFade: (enableFade && dragAutoScrollHandler.scrollingDirection
+                                  !==
+                                  Util.ViewDragAutoScrollHandler.Forward)
 
     Accessible.role: Accessible.List
 

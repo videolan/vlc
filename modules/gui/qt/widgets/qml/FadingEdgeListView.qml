@@ -50,8 +50,8 @@ ListView {
         visible: proxyContentItem.visible && color.a > 0.0
     }
 
-    property bool disableBeginningFade: false
-    property bool disableEndFade: false
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
 
     property real fadeSize: root.delegateItem
                            ? (orientation === Qt.Vertical ? root.delegateItem.height
@@ -110,7 +110,7 @@ ListView {
                                                  ? root.height
                                                  : root.width) > (fadeSize * 2 + VLCStyle.dp(25))
 
-    readonly property bool _beginningFade: !disableBeginningFade &&
+    readonly property bool _beginningFade: enableBeginningFade &&
                                            _fadeRectEnoughSize &&
                                            (orientation === ListView.Vertical ? !atYBeginning
                                                                               : !atXBeginning) &&
@@ -118,7 +118,7 @@ ListView {
                                            (!firstVisibleItem.activeFocus &&
                                             !Helpers.get(firstVisibleItem, "hovered", false)))
 
-    readonly property bool _endFade:       !disableEndFade &&
+    readonly property bool _endFade:       enableEndFade &&
                                            _fadeRectEnoughSize &&
                                            (orientation === ListView.Vertical ? !atYEnd
                                                                               : !atXEnd) &&
@@ -126,14 +126,14 @@ ListView {
                                            (!lastVisibleItem.activeFocus &&
                                             !Helpers.get(lastVisibleItem, "hovered", false)))
 
-    BindingCompat on disableBeginningFade {
+    BindingCompat on enableBeginningFade {
         when: !!root.headerItem && (root.headerPositioning !== ListView.InlineHeader)
-        value: true
+        value: false
     }
 
-    BindingCompat on disableEndFade {
+    BindingCompat on enableEndFade {
         when: !!root.footerItem && (root.footerPositioning !== ListView.InlineFooter)
-        value: true
+        value: false
     }
 
     ShaderEffectSource {
