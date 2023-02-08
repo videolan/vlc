@@ -175,15 +175,8 @@
         return;
     }
 
-    [_delegate.segmentedTitleControl setSelectedSegment:state.libraryWindowSelectedSegment];
-    [_delegate.audioSegmentedControl setSelectedSegment:state.audioLibraryViewSelectedSegment];
-    [_delegate.gridVsListSegmentedControl setSelectedSegment:state.viewModeSelectedSegment];
     [_delegate.libraryMediaSourceViewController.baseDataSource setChildDataSource:state.currentMediaSource];
     [_delegate.libraryMediaSourceViewController.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
-
-    [_delegate segmentedControlAction:self];
-    [_delegate.libraryAudioViewController segmentedControlAction:self];
-    [_delegate.libraryMediaSourceViewController.baseDataSource setGridOrListMode:self];
 
     [self updateDelegateNavigationButtons];
 }

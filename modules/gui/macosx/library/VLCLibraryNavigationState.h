@@ -31,9 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryNavigationState : NSObject
 
-@property (readonly) NSInteger libraryWindowSelectedSegment;
-@property (readonly) NSInteger viewModeSelectedSegment;
-@property (readonly) NSInteger audioLibraryViewSelectedSegment;
 @property (readonly) VLCMediaSourceDataSource *currentMediaSource;
 @property (readonly) VLCInputNode *currentNodeDisplayed;
 

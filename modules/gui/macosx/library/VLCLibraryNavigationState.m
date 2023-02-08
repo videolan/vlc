@@ -35,9 +35,6 @@
     VLCLibraryNavigationState* navState = [super init];
 
     if(navState) {
-        _libraryWindowSelectedSegment = libraryWindow.segmentedTitleControl.selectedSegment;
-        _viewModeSelectedSegment = libraryWindow.gridVsListSegmentedControl.selectedSegment;
-        _audioLibraryViewSelectedSegment = libraryWindow.audioSegmentedControl.selectedSegment;
         _currentMediaSource = libraryWindow.libraryMediaSourceViewController.baseDataSource.childDataSource;
         _currentNodeDisplayed = libraryWindow.libraryMediaSourceViewController.baseDataSource.childDataSource.nodeToDisplay;
     }
