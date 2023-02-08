@@ -2343,6 +2343,9 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     {
         vlc_input_decoder_ChangeRate( dec, p_sys->rate );
 
+        if( unlikely( p_sys->b_paused ) ) /* Could happen during next-frame */
+            vlc_input_decoder_ChangePause( dec, true, p_sys->i_pause_date );
+
         if( p_sys->b_buffering )
             vlc_input_decoder_StartWait( dec );
 
@@ -2360,8 +2363,13 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
             };
             p_es->p_dec_record = vlc_input_decoder_New( VLC_OBJECT(p_input), &rec_cfg );
 
-            if( p_es->p_dec_record && p_sys->b_buffering )
-                vlc_input_decoder_StartWait( p_es->p_dec_record );
+            if( p_es->p_dec_record )
+            {
+                if( p_sys->b_buffering )
+                    vlc_input_decoder_StartWait( p_es->p_dec_record );
+                if( unlikely( p_sys->b_paused ) ) /* Could happen during next-frame */
+                    vlc_input_decoder_ChangePause( p_es->p_dec_record, true, p_sys->i_pause_date );
+            }
         }
 
         if( p_es->mouse_event_cb && p_es->fmt.i_cat == VIDEO_ES )
