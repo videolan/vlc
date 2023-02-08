@@ -454,8 +454,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
     plane_CopyPixels( dst->p, &src_planes );
 
     /* */
-    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext,
-                              p_sys->resource[KNOWN_DXGI_INDEX], p_sys->slice_index);
+    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, sys->staging_resource, 0);
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
