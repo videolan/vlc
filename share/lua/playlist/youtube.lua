@@ -113,8 +113,18 @@ end
 -- Descramble the "n" parameter using the javascript code that does that
 -- in the web page
 function n_descramble( nparam, js )
-    if not js then
-        return nil
+    if not js.stream then
+        if not js.url then
+            return nil
+        end
+        js.stream = vlc.stream( js_url )
+        if not js.stream then
+            -- Retry once for transient errors
+            js.stream = vlc.stream( js_url )
+            if not js.stream then
+                return nil
+            end
+        end
     end
 
     -- Look for the descrambler function's name
@@ -498,8 +508,18 @@ end
 -- Descramble the URL signature using the javascript code that does that
 -- in the web page
 function sig_descramble( sig, js )
-    if not js then
-        return nil
+    if not js.stream then
+        if not js.url then
+            return nil
+        end
+        js.stream = vlc.stream( js.url )
+        if not js.stream then
+            -- Retry once for transient errors
+            js.stream = vlc.stream( js.url )
+            if not js.stream then
+                return nil
+            end
+        end
     end
 
     -- Look for the descrambler function's name
@@ -666,18 +686,10 @@ function pick_stream( stream_map, js_url )
         return nil
     end
 
-    -- Fetch javascript code: we'll need this to descramble maybe the
-    -- URL signature, and normally always the "n" throttling parameter.
-    local js = nil
-    if js_url then
-        js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
-        if not js.stream then
-            -- Retry once for transient errors
-            js.stream = vlc.stream( js_url )
-            if not js.stream then
-                js = nil
-            end
-        end
+    -- Shared JavaScript resources - lazy initialization
+    local js = { url = js_url, stream = nil, lines = {}, i = 0 }
+    if not js.url then
+        vlc.msg.warn( "Couldn't extract YouTube JavaScript player code URL, descrambling functions unavailable" )
     end
 
     -- Either the "url" or the "signatureCipher" parameter is present,
