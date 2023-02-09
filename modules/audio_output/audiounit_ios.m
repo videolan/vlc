@@ -350,6 +350,12 @@ static int role2policy_cmp(const void *key, const void *val)
 static AVAudioSessionRouteSharingPolicy
 GetRouteSharingPolicy(audio_output_t *p_aout)
 {
+#if __IPHONEOS_VERSION_MAX_ALLOWED < 130000
+    AVAudioSessionRouteSharingPolicy AVAudioSessionRouteSharingPolicyLongFormAudio =
+        AVAudioSessionRouteSharingPolicyLongForm;
+    AVAudioSessionRouteSharingPolicy AVAudioSessionRouteSharingPolicyLongFormVideo =
+        AVAudioSessionRouteSharingPolicyLongForm;
+#endif
     /* LongFormAudio by default */
     AVAudioSessionRouteSharingPolicy policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
     AVAudioSessionRouteSharingPolicy video_policy;
