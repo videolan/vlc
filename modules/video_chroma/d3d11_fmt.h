@@ -74,6 +74,7 @@ typedef struct
     ID3D11VideoProcessorOutputView *processorOutput; /* when used as processor output */
     ID3D11ShaderResourceView      *renderSrc[DXGI_MAX_SHADER_VIEW];
     HANDLE                        sharedHandle;
+    bool                          ownHandle;
 } picture_sys_d3d11_t;
 
 struct d3d11_pic_context

@@ -927,7 +927,7 @@ void d3d11_pic_context_destroy(picture_context_t *ctx)
 {
     struct d3d11_pic_context *pic_ctx = D3D11_PICCONTEXT_FROM_PICCTX(ctx);
     ReleaseD3D11PictureSys(&pic_ctx->picsys);
-    if (pic_ctx->picsys.sharedHandle != INVALID_HANDLE_VALUE)
+    if (pic_ctx->picsys.sharedHandle != INVALID_HANDLE_VALUE && pic_ctx->picsys.ownHandle)
         CloseHandle(pic_ctx->picsys.sharedHandle);
     free(pic_ctx);
 }
@@ -985,6 +985,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
             IDXGIResource1_CreateSharedHandle(sharedResource, NULL,
                                               DXGI_SHARED_RESOURCE_READ/*|DXGI_SHARED_RESOURCE_WRITE*/,
                                               NULL, &pic_ctx->picsys.sharedHandle);
+            pic_ctx->picsys.ownHandle = true;
             IDXGIResource1_Release(sharedResource);
         }
     }
