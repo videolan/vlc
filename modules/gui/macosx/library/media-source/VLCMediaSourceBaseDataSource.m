@@ -377,6 +377,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
         NSLog(@"Received bad node or media source, could not configure child data media source");
         return;
     }
+
+    [mediaSource preparseInputNodeWithinTree:node];
     
     VLCMediaSourceDataSource *newChildDataSource = [[VLCMediaSourceDataSource alloc] init];
     
