@@ -525,6 +525,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     NSParameterAssert(segment == VLCLibraryBrowseSegment || segment == VLCLibraryStreamsSegment);
 
+    [self.navigationStack clear];
     [self setForwardsBackwardsToolbarItemsVisible:YES];
     [self setSortOrderToolbarItemVisible:NO];
     [self setLibrarySearchToolbarItemVisible:NO];
