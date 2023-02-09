@@ -728,6 +728,7 @@ int D3D11OpenConverter( filter_t *p_filter )
         pixel_bytes = 2;
         break;
     case VLC_CODEC_RGBA:
+    case VLC_CODEC_RGBA10:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_RGBA )
             return VLC_EGENERIC;
         p_filter->ops = &D3D11_RGBA_ops;
