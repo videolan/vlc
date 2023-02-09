@@ -123,7 +123,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
         {
             msg_Err(p_dec, "Unknown texture format %d", outDesc.Format);
             block_Release( p_block );
-            return VLC_EGENERIC;
+            return VLCDEC_ECRITICAL;
         }
     }
 
@@ -134,14 +134,14 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
         if (!p_sys->vctx)
         {
             block_Release( p_block );
-            return VLC_EGENERIC;
+            return VLCDEC_ECRITICAL;
         }
         DxgiFormatMask( p_sys->output_format->formatTexture, &p_dec->fmt_out.video );
 
         if( decoder_UpdateVideoOutput( p_dec, p_sys->vctx ) )
         {
             block_Release( p_block );
-            return VLCDEC_SUCCESS;
+            return VLCDEC_ECRITICAL;
         }
     }
 
@@ -177,7 +177,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     if (unlikely(FAILED(hr)))
     {
         block_Release( p_block );
-        return VLCDEC_SUCCESS;
+        return VLCDEC_ECRITICAL;
     }
 
     ID3D11Texture2D *srcTex = src_sys->texture[0];
