@@ -114,11 +114,15 @@ ColumnLayout {
             slider.value = Math.min(value, slider.to)
     }
 
+    function sliderToSpeed(value) {
+        return Math.pow(2, value / 17)
+    }
+
     function _applyPlayer(value) {
         if (_update === false)
             return
 
-        value = Math.pow(2, value / 17)
+        value = sliderToSpeed(value)
 
         if (_shiftPressed === false) {
             for (var i = 0; i < _values.length; i++) {
@@ -289,6 +293,44 @@ ColumnLayout {
             radius: slider.implicitHeight
 
             color: root._color
+
+        }
+
+        MouseArea {
+            id: toolTipTracker
+
+            anchors.fill: parent
+
+            acceptedButtons: Qt.NoButton
+
+            hoverEnabled: true
+
+            onPressed: {
+                mouse.accepted = false
+            }
+
+            preventStealing: true
+
+            propagateComposedEvents: true
+        }
+
+        Widgets.PointingTooltip {
+           z: 1 // without this tooltips get placed below root's parent popup
+
+           property real _mouseX: toolTipTracker.mouseX
+
+           pos: Qt.point(_mouseX, slider.handle.width / 2)
+
+           visible: !slider.pressed && toolTipTracker.containsMouse
+
+           text: {
+               if (!visible) return ""
+
+               var v = slider.valueAt(slider.positionAt(_mouseX))
+               return sliderToSpeed(v).toFixed(2)
+           }
+
+           colors: root.colors
         }
 
         MouseArea {
@@ -301,6 +343,13 @@ ColumnLayout {
 
                 root._shiftPressed = (mouse.modifiers === Qt.ShiftModifier)
             }
+        }
+
+        function positionAt(x) {
+            // find postion under x, taken from qt sources QQuickSlider.cpp
+            var contentX = x - slider.leftPadding - slider.handle.width / 2
+            var extend = slider.availableWidth - slider.handle.width
+            return x / extend
         }
     }
 
