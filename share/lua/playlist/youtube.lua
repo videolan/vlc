@@ -757,10 +757,10 @@ function parse()
         or string.match( vlc.path, "/live%?" )
         or string.match( vlc.path, "/shorts/" )
     then -- This is the HTML page's URL
-        local js_url
+        local path, title, description, artist, arturl, js_url
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_formats)
-        fmt = get_url_param( vlc.path, "fmt" )
+        local fmt = get_url_param( vlc.path, "fmt" )
         while true do
             -- The new HTML code layout has fewer and longer lines; always
             -- use the long line workaround until we get more visibility.
