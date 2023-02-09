@@ -1797,7 +1797,7 @@ static void Drain(decoder_t *p_dec, bool flush)
 
     /* draining: return last pictures of the reordered queue */
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_discard_decoder_output = true;
+    p_sys->b_discard_decoder_output = flush;
     vlc_mutex_unlock(&p_sys->lock);
 
     if (p_sys->session && p_sys->decoder_state == STATE_DECODER_STARTED)
