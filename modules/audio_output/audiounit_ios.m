@@ -335,19 +335,21 @@ avas_GetPortType(audio_output_t *p_aout, enum port_type *pport_type)
     return VLC_SUCCESS;
 }
 
-struct role2policy
+struct API_AVAILABLE(ios(11.0))
+role2policy
 {
     char role[sizeof("accessibility")];
     AVAudioSessionRouteSharingPolicy policy;
 };
 
-static int role2policy_cmp(const void *key, const void *val)
+static int API_AVAILABLE(ios(11.0))
+role2policy_cmp(const void *key, const void *val)
 {
     const struct role2policy *entry = val;
     return strcmp(key, entry->role);
 }
 
-static AVAudioSessionRouteSharingPolicy
+static AVAudioSessionRouteSharingPolicy API_AVAILABLE(ios(11.0))
 GetRouteSharingPolicy(audio_output_t *p_aout)
 {
 #if __IPHONEOS_VERSION_MAX_ALLOWED < 130000
@@ -404,9 +406,10 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 
     if (active)
     {
-        AVAudioSessionRouteSharingPolicy policy = GetRouteSharingPolicy(p_aout);
         if (@available(iOS 11.0, tvOS 11.0, *))
         {
+            AVAudioSessionRouteSharingPolicy policy = GetRouteSharingPolicy(p_aout);
+
             ret = [instance setCategory:AVAudioSessionCategoryPlayback
                                    mode:AVAudioSessionModeMoviePlayback
                      routeSharingPolicy:policy
