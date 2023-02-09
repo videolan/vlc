@@ -620,7 +620,7 @@ function pick_url( url_map, fmt, js_url )
     for stream in string.gmatch( url_map, "[^,]+" ) do
         local itag = string.match( stream, "itag=(%d+)" )
         if not fmt or not itag or tonumber( itag ) == tonumber( fmt ) then
-            return stream_url( stream, js_url )
+            return nil -- stream_url( stream, js_url )
         end
     end
     return nil
