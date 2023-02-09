@@ -705,7 +705,7 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
 
     /* cdt2 is optional */
     uint_fast32_t cdt2_size = 0;
-    const uint8_t *cdt2;
+    const uint8_t *cdt2 = NULL;
 
     if (p_block->i_buffer >= 8) {
         size_t size = GetDWBE(p_block->p_buffer) - 8;
