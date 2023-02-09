@@ -257,7 +257,7 @@ static int Open(vlc_object_t *obj)
         end = strchr(dst, ']');
 
         if (end != NULL)
-            *(end++) = '\0';
+            ++end;
     } else {
         dhost = dst;
         end = strchr(dst, ':');
