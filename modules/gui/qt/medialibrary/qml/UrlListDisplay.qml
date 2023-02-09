@@ -49,11 +49,11 @@ Widgets.KeyNavigableTableView {
         size: Math.max(listView_id._nbCols - 1, 1),
 
         model: {
-            criteria: url,
+            criteria: "url",
 
             text: I18n.qtr("Url"),
 
-            showSection: url,
+            showSection: "url",
 
             headerDelegate: urlHeaderDelegate
         }
@@ -61,7 +61,7 @@ Widgets.KeyNavigableTableView {
         size: 1,
 
         model: {
-            criteria: last_played_date,
+            criteria: "last_played_date",
 
             showSection: "",
             showContextButton: true,
