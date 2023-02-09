@@ -351,8 +351,6 @@ FocusScope {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: VLCStyle.icon_tableHeader
-
-                    color: parent.foregroundColor
                 }
             }
 
