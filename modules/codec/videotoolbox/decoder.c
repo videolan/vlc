@@ -123,7 +123,6 @@ typedef struct decoder_sys_t
 
     /* !Codec specific callbacks */
 
-    bool                        b_vt_flush;
     enum
     {
         STATE_BITSTREAM_WAITING_RAP = -2,
@@ -138,7 +137,10 @@ typedef struct decoder_sys_t
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
 
+    /* Decoder Callback Synchronization */
     vlc_mutex_t                 lock;
+    bool                        b_discard_decoder_output;
+
     frame_info_t               *p_pic_reorder;
     uint8_t                     i_pic_reorder;
     uint8_t                     i_pic_reorder_max;
@@ -1769,7 +1771,7 @@ static void RequestFlush(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_vt_flush = true;
+    p_sys->b_discard_decoder_output = true;
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1779,7 +1781,7 @@ static void Drain(decoder_t *p_dec, bool flush)
 
     /* draining: return last pictures of the reordered queue */
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_vt_flush = true;
+    p_sys->b_discard_decoder_output = true;
     vlc_mutex_unlock(&p_sys->lock);
 
     if (p_sys->session && p_sys->decoder_state == STATE_DECODER_STARTED)
@@ -1789,7 +1791,7 @@ static void Drain(decoder_t *p_dec, bool flush)
     DrainDPBLocked(p_dec, flush);
     picture_t *p_output;
     assert(RemoveOneFrameFromDPB(p_sys, &p_output) == VLC_EGENERIC);
-    p_sys->b_vt_flush = false;
+    p_sys->b_discard_decoder_output = false;
     p_sys->sync_state = p_sys->start_sync_state;
     vlc_mutex_unlock(&p_sys->lock);
 }
@@ -1798,7 +1800,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->b_vt_flush)
+    if (p_sys->b_discard_decoder_output)
     {
         Drain(p_dec, true);
         PtsInit(p_dec);
@@ -2155,7 +2157,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     frame_info_t *p_info = (frame_info_t *) sourceFrameRefCon;
 
     vlc_mutex_lock(&p_sys->lock);
-    if (p_sys->b_vt_flush)
+    if (p_sys->b_discard_decoder_output)
         goto end;
 
     enum vtsession_status vtsession_status;
@@ -2235,7 +2237,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
     vlc_mutex_lock(&p_sys->lock);
 
-    if (p_sys->b_vt_flush)
+    if (p_sys->b_discard_decoder_output)
         picture_Release(p_pic);
     else
         p_info->p_picture = p_pic;
