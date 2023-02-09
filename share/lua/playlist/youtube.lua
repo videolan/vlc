@@ -648,6 +648,13 @@ end
 
 -- Pick suitable stream among available formats
 function pick_stream( formats, fmt )
+    if not formats then
+        return nil
+    end
+
+    -- Remove subobject fields to ease parsing of stream object array
+    formats = string.gsub( formats, '"[^"]-":{[^{}]-},?', '' )
+
     fmt = tonumber( fmt )
     if fmt then
         -- Legacy match from URL parameter
@@ -682,16 +689,19 @@ function pick_stream( formats, fmt )
 end
 
 -- Parse and pick our video stream URL (new-style parameters)
-function pick_stream_url( stream_map, js_url, fmt )
-    local pick = pick_stream( stream_map, fmt )
-    if not pick then
-        return nil
-    end
-
+function pick_stream_url( muxed, adaptive, js_url, fmt )
     -- Shared JavaScript resources - lazy initialization
     local js = { url = js_url, stream = nil, lines = {}, i = 0 }
     if not js.url then
         vlc.msg.warn( "Couldn't extract YouTube JavaScript player code URL, descrambling functions unavailable" )
+    end
+
+    local pick = pick_stream( muxed, fmt )
+    if not pick and tonumber( fmt ) then
+        pick = pick_stream( adaptive, fmt )
+    end
+    if not pick then
+        return nil
     end
 
     -- Either the "url" or the "signatureCipher" parameter is present,
@@ -906,10 +916,19 @@ function parse()
                         stream_map = string.match( line, '"formats":%[(.-)%]' )
                     end
                     if stream_map then
-                        vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
                         -- FIXME: do this properly (see #24958)
                         stream_map = string.gsub( stream_map, "\\u0026", "&" )
-                        path = pick_stream_url( stream_map, js_url, fmt )
+                    end
+
+                    local adaptive_map = string.match( line, '"adaptiveFormats":%[(.-)%]' )
+                    if adaptive_map then
+                        -- FIXME: do this properly (see #24958)
+                        adaptive_map = string.gsub( adaptive_map, "\\u0026", "&" )
+                    end
+
+                    if stream_map or adaptive_map then
+                        vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
+                        path = pick_stream_url( stream_map, adaptive_map, js_url, fmt )
                     end
                 end
 
@@ -979,7 +998,7 @@ function parse()
                 stream_map = vlc.strings.decode_uri( stream_map )
                 -- FIXME: do this properly (see #24958)
                 stream_map = string.gsub( stream_map, "\\u0026", "&" )
-                path = pick_stream_url( stream_map, js_url, fmt )
+                path = pick_stream_url( stream_map, nil, js_url, fmt )
             end
         end
 
