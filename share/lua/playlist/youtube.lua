@@ -1,6 +1,6 @@
 --[[
 
- Copyright © 2007-2022 the VideoLAN team
+ Copyright © 2007-2023 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -727,6 +727,7 @@ function probe()
                string.match( vlc.path, "/watch%?" ) -- the html page
             or string.match( vlc.path, "/live$" ) -- user live stream html page
             or string.match( vlc.path, "/live%?" ) -- user live stream html page
+            or string.match( vlc.path, "/shorts/" ) -- YouTube Shorts HTML page
             or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
             or string.match( vlc.path, "/embed/" ) -- embedded player iframe
@@ -754,6 +755,7 @@ function parse()
     elseif string.match( vlc.path, "/watch%?" )
         or string.match( vlc.path, "/live$" )
         or string.match( vlc.path, "/live%?" )
+        or string.match( vlc.path, "/shorts/" )
     then -- This is the HTML page's URL
         local js_url
         -- fmt is the format of the video
