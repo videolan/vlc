@@ -404,23 +404,21 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 
     if (active)
     {
-        AVAudioSessionCategory category = AVAudioSessionCategoryPlayback;
-        AVAudioSessionMode mode = AVAudioSessionModeMoviePlayback;
         AVAudioSessionRouteSharingPolicy policy = GetRouteSharingPolicy(p_aout);
-
         if (@available(iOS 11.0, tvOS 11.0, *))
         {
-            ret = [instance setCategory:category
-                                   mode:mode
+            ret = [instance setCategory:AVAudioSessionCategoryPlayback
+                                   mode:AVAudioSessionModeMoviePlayback
                      routeSharingPolicy:policy
                                 options:0
                                   error:&error];
         }
         else
         {
-            ret = [instance setCategory:category
+            ret = [instance setCategory:AVAudioSessionCategoryPlayback
                                   error:&error];
-            ret = ret && [instance setMode:mode error:&error];
+            ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback
+                                     error:&error];
             /* Not AVAudioSessionRouteSharingPolicy on older devices */
         }
         if (@available(iOS 15.0, tvOS 15.0, *)) {
