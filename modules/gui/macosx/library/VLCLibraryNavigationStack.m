@@ -181,4 +181,11 @@
     [self updateDelegateNavigationButtons];
 }
 
+- (void)clear
+{
+    _navigationStates = [NSMutableArray array];
+    _currentPosition = nil;
+    [self updateDelegateNavigationButtons];
+}
+
 @end

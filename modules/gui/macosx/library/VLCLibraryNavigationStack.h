@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)forwards;
 
 - (void)appendCurrentLibraryState;
+- (void)clear;
 
 @end
 
