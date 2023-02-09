@@ -167,13 +167,19 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     assert(src_sys->texture[1] == nullptr);
 
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueDevice(p_sys->dec_dev);
-    ComPtr<ID3D11Device1> d3d11VLC1;
-    dev_sys->d3d_dev.d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3d11VLC1));
-
-    picture_sys_d3d11_t *pic_sys = ActiveD3D11PictureSys(p_pic);
-
     ID3D11Texture2D* sharedTex;
-    hr = d3d11VLC1->OpenSharedResource1(pic_sys->sharedHandle, IID_GRAPHICS_PPV_ARGS(&sharedTex));
+    picture_sys_d3d11_t *pic_sys = ActiveD3D11PictureSys(p_pic);
+    if (pic_sys->ownHandle)
+    {
+        ComPtr<ID3D11Device1> d3d11VLC1;
+        dev_sys->d3d_dev.d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&d3d11VLC1));
+
+        hr = d3d11VLC1->OpenSharedResource1(pic_sys->sharedHandle, IID_GRAPHICS_PPV_ARGS(&sharedTex));
+    }
+    else
+    {
+        hr = dev_sys->d3d_dev.d3ddevice->OpenSharedResource(pic_sys->sharedHandle, IID_GRAPHICS_PPV_ARGS(&sharedTex));
+    }
     if (unlikely(FAILED(hr)))
     {
         block_Release( p_block );
