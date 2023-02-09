@@ -704,7 +704,7 @@ function pick_stream( stream_map, js_url )
     local n = string.match( url, "[?&]n=([^&]+)" )
     if n then
         n = vlc.strings.decode_uri( n )
-        local dn = n_descramble( n, js )
+        local dn = nil -- n_descramble( n, js )
         if dn then
             url = string.gsub( url, "([?&])n=[^&]+", "%1n="..vlc.strings.encode_uri_component( dn ), 1 )
         else
