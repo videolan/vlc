@@ -646,27 +646,24 @@ function pick_url( url_map, fmt, js_url )
     return nil
 end
 
--- Parse and pick our video stream URL (new-style parameters)
-function pick_stream( stream_map, js_url )
-    local pick = nil
-
-    local fmt = tonumber( get_url_param( vlc.path, "fmt" ) )
+-- Pick suitable stream among available formats
+function pick_stream( formats, fmt )
+    fmt = tonumber( fmt )
     if fmt then
         -- Legacy match from URL parameter
-        for stream in string.gmatch( stream_map, '{(.-)}' ) do
+        for stream in string.gmatch( formats, '{(.-)}' ) do
             local itag = tonumber( string.match( stream, '"itag":(%d+)' ) )
             if fmt == itag then
-                pick = stream
-                break
+                return stream
             end
         end
+        return nil
     else
         -- Compare the different available formats listed with our
         -- quality targets
         local prefres = vlc.var.inherit( nil, "preferred-resolution" )
-        local bestres = nil
-
-        for stream in string.gmatch( stream_map, '{(.-)}' ) do
+        local bestres, pick
+        for stream in string.gmatch( formats, '{(.-)}' ) do
             local height = tonumber( string.match( stream, '"height":(%d+)' ) )
 
             -- Better than nothing
@@ -680,8 +677,13 @@ function pick_stream( stream_map, js_url )
                 pick = stream
             end
         end
+        return pick
     end
+end
 
+-- Parse and pick our video stream URL (new-style parameters)
+function pick_stream_url( stream_map, js_url, fmt )
+    local pick = pick_stream( stream_map, fmt )
     if not pick then
         return nil
     end
@@ -907,7 +909,7 @@ function parse()
                         vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
                         -- FIXME: do this properly (see #24958)
                         stream_map = string.gsub( stream_map, "\\u0026", "&" )
-                        path = pick_stream( stream_map, js_url )
+                        path = pick_stream_url( stream_map, js_url, fmt )
                     end
                 end
 
@@ -977,7 +979,7 @@ function parse()
                 stream_map = vlc.strings.decode_uri( stream_map )
                 -- FIXME: do this properly (see #24958)
                 stream_map = string.gsub( stream_map, "\\u0026", "&" )
-                path = pick_stream( stream_map, js_url )
+                path = pick_stream_url( stream_map, js_url, fmt )
             end
         end
 
