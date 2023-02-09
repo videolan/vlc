@@ -50,9 +50,9 @@
 - (void)setNodeToDisplay:(nonnull VLCInputNode*)nodeToDisplay
 {
     NSAssert(nodeToDisplay, @"Nil node to display, will not set");
-    
     _nodeToDisplay = nodeToDisplay;
     [self.displayedMediaSource preparseInputNodeWithinTree:_nodeToDisplay];
+    [self reloadData];
 }
 
 - (void)setupViews
@@ -203,7 +203,6 @@
     if (childRootInput.inputType == ITEM_TYPE_DIRECTORY || childRootInput.inputType == ITEM_TYPE_NODE) {
         self.pathControl.URL = [NSURL URLWithString:[self.pathControl.URL.path stringByAppendingPathComponent:[childRootInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         self.nodeToDisplay = node;
-        [self reloadData];
         [[VLCMain sharedInstance].libraryWindow.navigationStack appendCurrentLibraryState];
     } else if (childRootInput.inputType == ITEM_TYPE_FILE && allowPlayback) {
         [[[VLCMain sharedInstance] playlistController] addInputItem:childRootInput.vlcInputItem atPosition:-1 startPlayback:YES];
