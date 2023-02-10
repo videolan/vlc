@@ -79,19 +79,16 @@ int Activate(extension_t *p_ext)
     }
     vlc_mutex_unlock(&sys->command_lock);
 
-    if (sys->b_thread_running)
-        return VLC_SUCCESS;
-
-    vlc_debug(p_ext->logger, "Activating extension '%s'", p_ext->psz_title);
-    /* Start thread */
-    sys->b_exiting = false;
-    sys->b_thread_running = true;
-
-    if (vlc_clone(&sys->thread, Run, p_ext) != VLC_SUCCESS)
+    if (!sys->b_thread_running)
     {
-        sys->b_exiting = true;
-        sys->b_thread_running = false;
-        return VLC_ENOMEM;
+        vlc_debug(p_ext->logger, "Activating extension '%s'", p_ext->psz_title);
+        sys->b_exiting = false;
+        if (vlc_clone(&sys->thread, Run, p_ext) != VLC_SUCCESS)
+        {
+            sys->b_exiting = true;
+            return VLC_ENOMEM;
+        }
+        sys->b_thread_running = true;
     }
 
     return VLC_SUCCESS;
