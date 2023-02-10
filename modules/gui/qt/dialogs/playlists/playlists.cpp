@@ -209,13 +209,18 @@ void PlaylistsDialog::onTextEdited()
 
 void PlaylistsDialog::onAccepted()
 {
-    MLItemId id;
 
     QString text = m_lineEdit->text();
 
     if (text.isEmpty())
-        id = m_model->getItemId(m_playlists->currentIndex().row());
+    {
+        const MLItemId playlistId = m_model->getItemId(m_playlists->currentIndex().row());
+        m_model->append(playlistId, m_ids);
+    }
     else
+    {
         m_model->create(text, m_ids);
+    }
+
     close();
 }
