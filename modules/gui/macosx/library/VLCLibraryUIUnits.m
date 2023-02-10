@@ -145,4 +145,13 @@
                             [VLCLibraryUIUnits mediumSpacing]);
 }
 
++ (const NSEdgeInsets)libraryViewScrollViewScrollerInsets
+{
+    const NSEdgeInsets contentInsets = [self libraryViewScrollViewContentInsets];
+    return NSEdgeInsetsMake(-contentInsets.top,
+                            -contentInsets.left,
+                            -contentInsets.bottom,
+                            -contentInsets.right);
+}
+
 @end
