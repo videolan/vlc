@@ -161,10 +161,9 @@ HRESULT STDMETHODCALLTYPE DBMSDIOutput::ScheduledFrameCompleted
 #else
     bool b_active;
 #endif
-    vlc_mutex_lock(&feeder.lock);
+    vlc_mutex_locker locker(&feeder.lock);
     if((S_OK == p_output->IsScheduledPlaybackRunning(&b_active)) && b_active)
         vlc_cond_signal(&feeder.cond);
-    vlc_mutex_unlock(&feeder.lock);
 
     return S_OK;
 }
@@ -592,14 +591,13 @@ void DBMSDIOutput::feederThread()
     vlc_tick_t maxdelay = CLOCK_FREQ/60;
     for(;;)
     {
-        vlc_mutex_lock(&feeder.lock);
+        vlc_mutex_locker locker(&feeder.lock);
         vlc_cond_timedwait(&feeder.cond, &feeder.lock, vlc_tick_now() + maxdelay);
         if (feeder.canceled)
             break;
         doSchedule();
         if(timescale)
             maxdelay = CLOCK_FREQ * frameduration / timescale;
-        vlc_mutex_unlock(&feeder.lock);
     }
 }
 
@@ -608,9 +606,8 @@ int DBMSDIOutput::Process()
     if((!p_output && !FAKE_DRIVER))
         return VLC_SUCCESS;
 
-    vlc_mutex_lock(&feeder.lock);
+    vlc_mutex_locker locker(&feeder.lock);
     vlc_cond_signal(&feeder.cond);
-    vlc_mutex_unlock(&feeder.lock);
 
     return VLC_SUCCESS;
 }
