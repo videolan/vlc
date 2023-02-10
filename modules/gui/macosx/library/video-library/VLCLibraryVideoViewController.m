@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
@@ -48,6 +49,7 @@
         [self setupTableViewDataSource];
         [self setupGridViewController];
         [self setupVideoPlaceholderView];
+        [self setupVideoLibraryViews];
 
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
@@ -117,6 +119,12 @@
     ];
 }
 
+- (void)setupVideoLibraryViews
+{
+    _videoLibraryGroupsTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _videoLibraryGroupSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+
+}
 
 #pragma mark - Show the video library view
 
