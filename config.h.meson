@@ -274,6 +274,9 @@
 /* Define to 1 if you have the `qsort_r' function. */
 #mesondefine HAVE_QSORT_R
 
+/* Define to 1 if you have the `_lock_file' function. */
+#mesondefine HAVE__LOCK_FILE
+
 /* Define to 1 if you have the `backtrace' function. */
 #mesondefine HAVE_BACKTRACE
 
