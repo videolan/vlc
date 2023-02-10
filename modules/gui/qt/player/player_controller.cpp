@@ -188,7 +188,7 @@ void PlayerControllerPrivate::UpdateMeta( input_item_t *p_item )
     Q_Q(PlayerController);
 
     {
-        vlc_mutex_lock(&p_item->lock);
+        vlc_mutex_locker locker(&p_item->lock);
 
         if (p_item->p_meta)
         {
@@ -197,8 +197,6 @@ void PlayerControllerPrivate::UpdateMeta( input_item_t *p_item )
             m_album   = vlc_meta_Get(p_item->p_meta, vlc_meta_Album);
             m_artwork = vlc_meta_Get(p_item->p_meta, vlc_meta_ArtworkURL);
         }
-
-        vlc_mutex_unlock(&p_item->lock);
     }
 
     emit q->currentMetaChanged( p_item  );

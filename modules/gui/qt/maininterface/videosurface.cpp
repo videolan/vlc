@@ -64,7 +64,7 @@ void WindowResizer::reportSize(float width, float height)
     if (width < 0 || height < 0)
         return;
 
-    vlc_mutex_lock(&m_lock);
+    vlc_mutex_locker locker(&m_lock);
     m_requestedWidth = static_cast<unsigned>(width);
     m_requestedHeight = static_cast<unsigned>(height);
     if (m_running == false)
@@ -72,16 +72,14 @@ void WindowResizer::reportSize(float width, float height)
         m_running = true;
         QThreadPool::globalInstance()->start(this);
     }
-    vlc_mutex_unlock(&m_lock);
 }
 
 /* Must called under m_voutlock before deletion */
 void WindowResizer::waitForCompletion()
 {
-    vlc_mutex_lock(&m_lock);
+    vlc_mutex_locker locker(&m_lock);
     while (m_running)
         vlc_cond_wait(&m_cond, &m_lock);
-    vlc_mutex_unlock(&m_lock);
 }
 
 VideoSurfaceProvider::VideoSurfaceProvider(QObject* parent)

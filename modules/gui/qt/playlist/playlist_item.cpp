@@ -72,7 +72,7 @@ QUrl PlaylistItem::getUrl() const
 
 void PlaylistItem::sync() {
     input_item_t *media = vlc_playlist_item_GetMedia(d->item.get());
-    vlc_mutex_lock(&media->lock);
+    vlc_mutex_locker locker(&media->lock);
     d->duration = media->i_duration;
     d->url      = media->psz_uri;
 
@@ -86,8 +86,6 @@ void PlaylistItem::sync() {
     if (d->title.isNull())
         /* If there is no title, use the item name */
         d->title = media->psz_name;
-
-    vlc_mutex_unlock(&media->lock);
 }
 
 PlaylistItem::operator bool() const
