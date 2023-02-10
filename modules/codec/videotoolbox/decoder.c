@@ -1784,11 +1784,8 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
 
 static void RequestFlush(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_discard_decoder_output = true;
-    vlc_mutex_unlock(&p_sys->lock);
+    Drain(p_dec, true);
+    PtsInit(p_dec);
 }
 
 static void Drain(decoder_t *p_dec, bool flush)
@@ -1815,12 +1812,6 @@ static void Drain(decoder_t *p_dec, bool flush)
 static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (p_sys->b_discard_decoder_output)
-    {
-        Drain(p_dec, true);
-        PtsInit(p_dec);
-    }
 
     if (p_block == NULL)
     {
