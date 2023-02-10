@@ -114,7 +114,7 @@ static int OpenResampler (vlc_object_t *obj)
 
 static void Close (filter_t *filter)
 {
-    SRC_STATE *s = (SRC_STATE *)filter->p_sys;
+    SRC_STATE *s = filter->p_sys;
 
     src_delete (s);
 }
@@ -124,7 +124,7 @@ static block_t *Resample (filter_t *filter, block_t *in)
     block_t *out = NULL;
     const size_t framesize = filter->fmt_out.audio.i_bytes_per_frame;
 
-    SRC_STATE *s = (SRC_STATE *)filter->p_sys;
+    SRC_STATE *s = filter->p_sys;
     SRC_DATA src;
 
     src.src_ratio = (double)filter->fmt_out.audio.i_rate

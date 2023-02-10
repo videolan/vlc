@@ -482,7 +482,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 static void stereo2mono_downmix( filter_t * p_filter,
                                  block_t * p_in_buf, block_t * p_out_buf )
 {
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
@@ -585,7 +585,7 @@ static void stereo2mono_downmix( filter_t * p_filter,
 static unsigned int mono( filter_t *p_filter,
                           block_t *p_output, block_t *p_input )
 {
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     int16_t *p_in, *p_out;
     unsigned int n = 0, r = 0;
 
@@ -605,7 +605,7 @@ static unsigned int mono( filter_t *p_filter,
 static unsigned int stereo_to_mono( filter_t *p_filter,
                                     block_t *p_output, block_t *p_input )
 {
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     int16_t *p_in, *p_out;
     unsigned int n;
 

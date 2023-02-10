@@ -236,7 +236,7 @@ static int Activate( filter_t *p_filter )
 
     b_padd = var_CreateGetBool( p_filter, CFG_PREFIX "padd" );
 
-    filter_sys_t *p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
+    filter_sys_t *p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;

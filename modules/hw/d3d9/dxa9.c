@@ -68,7 +68,7 @@ static bool GetLock(filter_t *p_filter, IDirect3DSurface9 *d3d,
 
 static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
-    copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
+    copy_cache_t *p_copy_cache = p_filter->p_sys;
     picture_sys_d3d9_t *p_sys = ActiveD3D9PictureSys(src);
 
     D3DSURFACE_DESC desc;
@@ -138,7 +138,7 @@ static void DXA9_YV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 
 static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
-    copy_cache_t *p_copy_cache = (copy_cache_t*) p_filter->p_sys;
+    copy_cache_t *p_copy_cache = p_filter->p_sys;
     picture_sys_d3d9_t *p_sys = ActiveD3D9PictureSys(src);
 
     D3DSURFACE_DESC desc;

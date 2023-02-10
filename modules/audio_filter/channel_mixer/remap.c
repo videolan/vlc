@@ -167,7 +167,7 @@ static void RemapCopy##name( filter_t *p_filter, \
                     int i_nb_samples, \
                     unsigned i_nb_in_channels, unsigned i_nb_out_channels ) \
 { \
-    filter_sys_t *p_sys = ( filter_sys_t * )p_filter->p_sys; \
+    filter_sys_t *p_sys = p_filter->p_sys; \
     const type *p_src = p_srcorig; \
     type *p_dest = p_destorig; \
  \
@@ -191,7 +191,7 @@ static void RemapAdd##name( filter_t *p_filter, \
                     int i_nb_samples, \
                     unsigned i_nb_in_channels, unsigned i_nb_out_channels ) \
 { \
-    filter_sys_t *p_sys = ( filter_sys_t * )p_filter->p_sys; \
+    filter_sys_t *p_sys = p_filter->p_sys; \
     const type *p_src = p_srcorig; \
     type *p_dest = p_destorig; \
  \
@@ -378,7 +378,7 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *Remap( filter_t *p_filter, block_t *p_block )
 {
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     if( !p_block || !p_block->i_nb_samples )
     {
         if( p_block )

@@ -255,7 +255,7 @@ static int DenoiseCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
-    filter_sys_t *sys = (filter_sys_t*)p_data;
+    filter_sys_t *sys = p_data;
 
     /* Just take values and flag for recalc so we don't block UI thread calling this
      * and don't right thread safety calcing coefs in here without mutex*/

@@ -112,14 +112,14 @@ static int Open (vlc_object_t *obj)
 
 static void Close (filter_t *filter)
 {
-    SpeexResamplerState *st = (SpeexResamplerState *)filter->p_sys;
+    SpeexResamplerState *st = filter->p_sys;
 
     speex_resampler_destroy (st);
 }
 
 static block_t *Resample (filter_t *filter, block_t *in)
 {
-    SpeexResamplerState *st = (SpeexResamplerState *)filter->p_sys;
+    SpeexResamplerState *st = filter->p_sys;
 
     const size_t framesize = filter->fmt_out.audio.i_bytes_per_frame;
     const unsigned irate = filter->fmt_in.audio.i_rate;

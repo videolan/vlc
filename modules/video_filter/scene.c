@@ -242,7 +242,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
 static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
 {
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     if( !p_pic ) return;
 
@@ -283,7 +283,7 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
  *****************************************************************************/
 static void SavePicture( filter_t *p_filter, picture_t *p_pic )
 {
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     video_format_t fmt_in, fmt_out;
     char *psz_filename = NULL;
     char *psz_temp = NULL;

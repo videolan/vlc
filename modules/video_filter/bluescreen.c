@@ -259,7 +259,7 @@ static int BluescreenCallback( vlc_object_t *p_this, char const *psz_var,
                                void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+    filter_sys_t *p_sys = p_data;
 
     vlc_mutex_lock( &p_sys->lock );
 #define VAR_IS( a ) !strcmp( psz_var, CFG_PREFIX a )

@@ -240,7 +240,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
                            void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+    filter_sys_t *p_sys = p_data;
 
     if( !strcmp( psz_var, "contrast" ) )
         SetLevel( &p_sys->Contrast, newval.f_float );

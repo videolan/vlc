@@ -357,7 +357,7 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *Filter( filter_t *p_filter, block_t *p_block )
 {
-    void (*work)(filter_t *, block_t *, block_t *) = (void *)p_filter->p_sys;
+    void (*work)(filter_t *, block_t *, block_t *) = p_filter->p_sys;
 
     if( !p_block || !p_block->i_nb_samples )
     {

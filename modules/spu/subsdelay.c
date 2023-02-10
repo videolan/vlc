@@ -303,7 +303,7 @@ static int SubsdelayCreate( filter_t *p_filter )
     filter_sys_t *p_sys;
 
     /* allocate structure */
-    p_sys = (filter_sys_t*) malloc( sizeof(filter_sys_t) );
+    p_sys = malloc( sizeof(filter_sys_t) );
 
     if( !p_sys )
     {
@@ -446,7 +446,7 @@ static subpicture_t * SubsdelayFilter( filter_t *p_filter, subpicture_t* p_subpi
 static int SubsdelayCallback( vlc_object_t *p_this, char const *psz_var, vlc_value_t oldval, vlc_value_t newval,
         void *p_data )
 {
-    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+    filter_sys_t *p_sys = p_data;
 
     VLC_UNUSED( oldval );
 

@@ -335,7 +335,7 @@ static int paramCallback( vlc_object_t *p_this, char const *psz_var,
                           vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+    filter_sys_t *p_sys = p_data;
 
     if( !strncmp( psz_var, "delay-time", 10 ) )
     {

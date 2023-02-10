@@ -170,7 +170,7 @@ static int OpenFilter( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
-    p_filter->p_sys = (filter_sys_t *)vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof( filter_sys_t ) );
+    p_filter->p_sys = vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof( filter_sys_t ) );
     if( unlikely(!p_filter->p_sys) ) return VLC_ENOMEM;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,

@@ -224,7 +224,7 @@ static int paramCallback( vlc_object_t *p_this, char const *psz_var,
                             void *p_data )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+    filter_sys_t *p_sys = p_data;
 
     VLC_UNUSED(oldval);
     VLC_UNUSED(p_this);
