@@ -31,6 +31,7 @@
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryWindow.h"
 
+#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 
@@ -69,6 +70,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
         [self setupAudioSegmentedControl];
+        [self setupAudioLibraryViews];
 
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self
@@ -211,6 +213,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     [_audioSegmentedControl setTarget:self];
     [_audioSegmentedControl setAction:@selector(segmentedControlAction:)];
+}
+
+- (void)setupAudioLibraryViews
+{
+    _audioCollectionSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _audioLibraryGridModeSplitViewListTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+    _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
 }
 
 #pragma mark - Show the audio view
