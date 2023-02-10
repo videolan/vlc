@@ -137,4 +137,12 @@
     return NSMakeSize(itemWidth, itemHeight);
 }
 
++ (const NSEdgeInsets)libraryViewScrollViewContentInsets
+{
+    return NSEdgeInsetsMake([VLCLibraryUIUnits mediumSpacing],
+                            [VLCLibraryUIUnits mediumSpacing],
+                            [VLCLibraryUIUnits mediumSpacing],
+                            [VLCLibraryUIUnits mediumSpacing]);
+}
+
 @end

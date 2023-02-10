@@ -55,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio;
 
++ (const NSEdgeInsets)libraryViewScrollViewContentInsets;
+
 @end
 
 NS_ASSUME_NONNULL_END
