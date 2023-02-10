@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
@@ -39,6 +40,7 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupBaseDataSource];
         [self setupCollectionView];
+        [self setupMediaSourceLibraryViews];
     }
     return self;
 }
@@ -48,6 +50,7 @@
     NSParameterAssert(libraryWindow);
     _libraryTargetView = libraryWindow.libraryTargetView;
     _mediaSourceView = libraryWindow.mediaSourceView;
+    _mediaSourceTableView = libraryWindow.mediaSourceTableView;
     _collectionView = libraryWindow.mediaSourceCollectionView;
     _collectionViewScrollView = libraryWindow.mediaSourceCollectionViewScrollView;
     _tableView = libraryWindow.mediaSourceTableView;
@@ -72,6 +75,11 @@
 - (void)setupCollectionView
 {
     _collectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+}
+
+- (void)setupMediaSourceLibraryViews
+{
+    _mediaSourceTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
 }
 
 - (void)presentBrowseView

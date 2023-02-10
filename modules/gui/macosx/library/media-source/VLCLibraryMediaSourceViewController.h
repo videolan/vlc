@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *mediaSourceView;
+@property (readonly) NSTableView *mediaSourceTableView;
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) NSTableView *tableView;

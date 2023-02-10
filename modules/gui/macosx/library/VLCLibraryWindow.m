@@ -230,9 +230,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
-
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
-    _mediaSourceTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
     self.upNextLabel.stringValue = _NS("Playlist");
