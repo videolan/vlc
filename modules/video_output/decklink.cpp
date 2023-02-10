@@ -424,7 +424,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     } wanted_mode;
     wanted_mode.id = bmdModeUnknown;
 
-    vlc_mutex_lock(&sys->lock);
+    vlc_mutex_locker locker(&sys->lock);
 
     /* wait until aout is ready */
     msg_Info(vd, "Waiting for DeckLink audio input module to start");
@@ -610,8 +610,6 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     p_attributes->Release();
     decklink_iterator->Release();
 
-    vlc_mutex_unlock(&sys->lock);
-
     return VLC_SUCCESS;
 
 error:
@@ -630,8 +628,6 @@ error:
     if (p_display_mode)
         p_display_mode->Release();
     video_format_Clean(fmt);
-
-    vlc_mutex_unlock(&sys->lock);
 
     return VLC_EGENERIC;
 #undef CHECK
