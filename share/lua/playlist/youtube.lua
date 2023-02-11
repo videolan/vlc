@@ -713,8 +713,25 @@ function pick_stream_url( muxed, adaptive, js_url, fmt )
         -- Specifically audio or video only, no fallback
         pick = pick_stream( adaptive, fmt )
     else
-        -- Default: multiplexed streams
-        pick = pick_stream( muxed, fmt )
+        if fmt == "hd" then
+            -- Try and leverage full array of adaptive formats
+            local audio = pick_stream( adaptive, "audio" )
+            local video = pick_stream( adaptive, "video" )
+            if audio and video then
+                local audio_url = assemble_stream_url( audio, js )
+                local video_url = assemble_stream_url( video, js )
+                if audio_url and video_url then
+                    return video_url, audio_url
+                end
+            end
+        end
+
+        if not pick then
+            -- Default or fallback: safe old multiplexed streams,
+            -- but reduced to a single, low-definition format
+            -- available in some cases
+            pick = pick_stream( muxed, fmt )
+        end
     end
 
     if not pick then
@@ -804,7 +821,7 @@ function parse()
         or string.match( vlc.path, "/live%?" )
         or string.match( vlc.path, "/shorts/" )
     then -- This is the HTML page's URL
-        local path, title, description, artist, arturl, js_url
+        local path, path2, title, description, artist, arturl, js_url
 
         -- Retired YouTube API for video format itag parameter,
         -- still supported and extended as youtube.lua API
@@ -951,7 +968,7 @@ function parse()
 
                     if stream_map or adaptive_map then
                         vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
-                        path = pick_stream_url( stream_map, adaptive_map, js_url, fmt )
+                        path, path2 = pick_stream_url( stream_map, adaptive_map, js_url, fmt )
                     end
                 end
 
@@ -977,7 +994,11 @@ function parse()
             arturl = get_arturl()
         end
 
-        return { { path = path; name = title; description = description; artist = artist; arturl = arturl } }
+        local options = { }
+        if path2 then
+            table.insert( options, ":input-slave="..path2 )
+        end
+        return { { path = path; name = title; description = description; artist = artist; arturl = arturl; options = options } }
 
     elseif string.match( vlc.path, "/get_video_info%?" ) then
         -- video info API, retired since summer 2021
