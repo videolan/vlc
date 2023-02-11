@@ -110,6 +110,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
     _emptyLibraryView = libraryWindow.emptyLibraryView;
+    _optionBarView = libraryWindow.optionBarView;
 }
 
 - (void)setupAudioDataSource
@@ -220,6 +221,32 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioCollectionSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _audioLibraryGridModeSplitViewListTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _audioGroupSelectionTableView.rowHeight = [VLCLibraryAlbumTableCellView defaultHeight];
+
+    const NSEdgeInsets defaultContentInsets = [VLCLibraryUIUnits libraryViewScrollViewContentInsets];
+    const CGFloat topAudioScrollViewContentInset = defaultContentInsets.top + _optionBarView.frame.size.height;
+    const NSEdgeInsets audioScrollViewContentInsets = NSEdgeInsetsMake(topAudioScrollViewContentInset,
+                                                                       defaultContentInsets.left,
+                                                                       defaultContentInsets.bottom,
+                                                                       defaultContentInsets.right);
+    const NSEdgeInsets audioScrollViewScrollerInsets = [VLCLibraryUIUnits libraryViewScrollViewScrollerInsets];
+
+    _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioCollectionViewScrollView.contentInsets = audioScrollViewContentInsets;
+    _audioCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
+
+    _audioCollectionSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioCollectionSelectionTableViewScrollView.contentInsets = audioScrollViewContentInsets;
+    _audioCollectionSelectionTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
+    _audioGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioGroupSelectionTableViewScrollView.contentInsets = audioScrollViewContentInsets;
+    _audioGroupSelectionTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
+
+    _audioLibraryGridModeSplitViewListTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioLibraryGridModeSplitViewListTableViewScrollView.contentInsets = audioScrollViewContentInsets;
+    _audioLibraryGridModeSplitViewListTableViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = audioScrollViewContentInsets;
+    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
 }
 
 #pragma mark - Show the audio view

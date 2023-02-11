@@ -251,41 +251,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     const CGFloat scrollViewBottomInset = [VLCLibraryUIUnits mediumSpacing];
     const CGFloat scrollViewLeftInset = [VLCLibraryUIUnits mediumSpacing];
 
-    // Need to account for the audio collection switcher at the top
-    const CGFloat audioScrollViewTopInset = scrollViewTopInset + _optionBarView.frame.size.height;
-
     const NSEdgeInsets defaultInsets = NSEdgeInsetsMake(scrollViewTopInset,
                                                         scrollViewLeftInset,
                                                         scrollViewBottomInset,
                                                         scrollViewRightInset);
-    const NSEdgeInsets audioScrollViewInsets = NSEdgeInsetsMake(audioScrollViewTopInset,
-                                                                scrollViewLeftInset,
-                                                                scrollViewBottomInset,
-                                                                scrollViewRightInset);
+
     // We might want to give the content some insets, but this will also affect the scrollbars.
     // We need to compensate for this or they will look wrong.
     const NSEdgeInsets scrollerInsets = NSEdgeInsetsMake(-scrollViewTopInset,
                                                         -scrollViewLeftInset,
                                                         -scrollViewBottomInset,
                                                         -scrollViewRightInset);
-    
-    _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioCollectionViewScrollView.contentInsets = audioScrollViewInsets;
-    _audioCollectionViewScrollView.scrollerInsets = scrollerInsets;
-
-    _audioCollectionSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioCollectionSelectionTableViewScrollView.contentInsets = audioScrollViewInsets;
-    _audioCollectionSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
-    _audioGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioGroupSelectionTableViewScrollView.contentInsets = audioScrollViewInsets;
-    _audioGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
-
-    _audioLibraryGridModeSplitViewListTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioLibraryGridModeSplitViewListTableViewScrollView.contentInsets = audioScrollViewInsets;
-    _audioLibraryGridModeSplitViewListTableViewScrollView.scrollerInsets = scrollerInsets;
-    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.contentInsets = audioScrollViewInsets;
-    _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = scrollerInsets;
 
     _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;
