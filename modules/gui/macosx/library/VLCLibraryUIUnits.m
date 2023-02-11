@@ -82,6 +82,11 @@
     return 280;
 }
 
++ (const CGFloat)collectionViewItemSpacing
+{
+    return [self largeSpacing];
+}
+
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
