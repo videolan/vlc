@@ -252,13 +252,31 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @end
 
-#pragma mark - Audio media library classes
+#pragma mark - Media library item classes
+
+@interface VLCAbstractMediaLibraryItem ()
+
+@property (readwrite, assign) int64_t libraryID;
+@property (readwrite, assign) BOOL smallArtworkGenerated;
+@property (readwrite, assign) NSString *smallArtworkMRL;
+
+@end
+
+@implementation VLCAbstractMediaLibraryItem
+
+- (NSImage *)smallArtworkImage
+{
+    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
+    if (!image) {
+        image = [NSImage imageNamed:@"noart.png"];
+    }
+    return image;
+}
+
+@end
 
 @implementation VLCMediaLibraryArtist
 
-@synthesize libraryID = _libraryID;
-@synthesize smallArtworkGenerated = _smallArtworkGenerated;
-@synthesize smallArtworkMRL = _smallArtworkMRL;
 @synthesize numberOfTracks = _numberOfTracks;
 
 + (nullable instancetype)artistWithID:(int64_t)artistID
@@ -279,25 +297,17 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 {
     self = [super init];
     if (self && p_artist != NULL) {
-        _libraryID = p_artist->i_id;
+        self.libraryID = p_artist->i_id;
+        self.smallArtworkGenerated = p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+
         _name = toNSStr(p_artist->psz_name);
         _shortBiography = toNSStr(p_artist->psz_shortbio);
-        _smallArtworkGenerated = p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
-        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
         _numberOfTracks = p_artist->i_nb_tracks;
     }
     return self;
-}
-
-- (NSImage *)smallArtworkImage
-{
-    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
-    if (!image) {
-        image = [NSImage imageNamed:@"noart.png"];
-    }
-    return image;
 }
 
 - (NSString *)displayString
@@ -334,12 +344,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
 {
-    return fetchAlbumsForLibraryItem(vlc_ml_list_artist_albums, _libraryID);
+    return fetchAlbumsForLibraryItem(vlc_ml_list_artist_albums, self.libraryID);
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    return fetchMediaItemsForLibraryItem(vlc_ml_list_artist_tracks, _libraryID);
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_artist_tracks, self.libraryID);
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -358,9 +368,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @implementation VLCMediaLibraryAlbum
 
-@synthesize libraryID = _libraryID;
-@synthesize smallArtworkGenerated = _smallArtworkGenerated;
-@synthesize smallArtworkMRL = _smallArtworkMRL;
 @synthesize numberOfTracks = _numberOfTracks;
 
 + (nullable instancetype)albumWithID:(int64_t)albumID
@@ -381,11 +388,12 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 {
     self = [super init];
     if (self && p_album != NULL) {
-        _libraryID = p_album->i_id;
+        self.libraryID = p_album->i_id;
+        self.smallArtworkGenerated = p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+
         _title = toNSStr(p_album->psz_title);
         _summary = toNSStr(p_album->psz_summary);
-        _smallArtworkGenerated = p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
-        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
         _artistName = toNSStr(p_album->psz_artist);
         _artistID = p_album->i_artist_id;
         _numberOfTracks = p_album->i_nb_tracks;
@@ -393,15 +401,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _year = p_album->i_year;
     }
     return self;
-}
-
-- (NSImage *)smallArtworkImage
-{
-    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
-    if (!image) {
-        image = [NSImage imageNamed:@"noart.png"];
-    }
-    return image;
 }
 
 - (NSString *)displayString
@@ -431,7 +430,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    return fetchMediaItemsForLibraryItem(vlc_ml_list_album_tracks, _libraryID);
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_album_tracks, self.libraryID);
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -450,20 +449,18 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @implementation VLCMediaLibraryGenre
 
-@synthesize libraryID = _libraryID;
-@synthesize smallArtworkGenerated = _smallArtworkGenerated;
-@synthesize smallArtworkMRL = _smallArtworkMRL;
 @synthesize numberOfTracks = _numberOfTracks;
 
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre
 {
     self = [super init];
     if (self && p_genre != NULL) {
-        _libraryID = p_genre->i_id;
+        self.libraryID = p_genre->i_id;
+        self.smallArtworkGenerated = p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+
         _name = toNSStr(p_genre->psz_name);
         _numberOfTracks = p_genre->i_nb_tracks;
-        _smallArtworkGenerated = p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
-        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
     }
     return self;
 }
@@ -480,15 +477,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         genre = [[VLCMediaLibraryGenre alloc] initWithGenre:p_genre];
     }
     return genre;
-}
-
-- (NSImage *)smallArtworkImage
-{
-    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
-    if (!image) {
-        image = [NSImage imageNamed:@"noart.png"];
-    }
-    return image;
 }
 
 - (NSString *)displayString
@@ -512,18 +500,18 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (NSArray<VLCMediaLibraryAlbum *> *)albums
 {
-    return fetchAlbumsForLibraryItem(vlc_ml_list_genre_albums, _libraryID);
+    return fetchAlbumsForLibraryItem(vlc_ml_list_genre_albums, self.libraryID);
 }
 
 - (NSArray<VLCMediaLibraryArtist *> *)artists
 {
 
-    return fetchArtistsForLibraryItem(vlc_ml_list_genre_artists, _libraryID);
+    return fetchArtistsForLibraryItem(vlc_ml_list_genre_artists, self.libraryID);
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    return fetchMediaItemsForLibraryItem(vlc_ml_list_genre_tracks, _libraryID);
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_genre_tracks, self.libraryID);
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
@@ -569,10 +557,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 @implementation VLCMediaLibraryMediaItem
 
 #pragma mark - initialization
-
-@synthesize libraryID = _libraryID;
-@synthesize smallArtworkGenerated = _smallArtworkGenerated;
-@synthesize smallArtworkMRL = _smallArtworkMRL;
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
 {
@@ -627,8 +611,11 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 {
     self = [super init];
     if (self && p_mediaItem != NULL && p_mediaLibrary != NULL) {
+        self.libraryID = p_mediaItem->i_id;
+        self.smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+
         _p_mediaLibrary = p_mediaLibrary;
-        _libraryID = p_mediaItem->i_id;
         _mediaType = p_mediaItem->i_type;
         _mediaSubType = p_mediaItem->i_subtype;
         NSMutableArray *mutArray = [[NSMutableArray alloc] initWithCapacity:p_mediaItem->p_files->i_nb_items];
@@ -656,8 +643,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         _lastPlayedDate = p_mediaItem->i_last_played_date;
         _progress = p_mediaItem->f_progress;
         _title = toNSStr(p_mediaItem->psz_title);
-        _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
-        _smallArtworkMRL = _smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
         _favorited = p_mediaItem->b_is_favorite;
 
         switch (p_mediaItem->i_subtype) {
@@ -747,13 +732,13 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
         return;
     }
 
-    [aCoder encodeInt64:_libraryID forKey:VLCMediaLibraryMediaItemLibraryID];
+    [aCoder encodeInt64:self.libraryID forKey:VLCMediaLibraryMediaItemLibraryID];
 }
 
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ — title: %@, ID: %lli, type: %i, artwork: %@",
-            NSStringFromClass([self class]), _title, _libraryID, _mediaType, _smallArtworkMRL];
+            NSStringFromClass([self class]), _title, self.libraryID, _mediaType, self.smallArtworkMRL];
 }
 
 - (NSString *)readableMediaType
@@ -794,15 +779,6 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     }
 }
 
-- (NSImage *)smallArtworkImage
-{
-    NSImage *image = [VLCLibraryImageCache thumbnailForLibraryItem:self];
-    if (!image) {
-        image = [NSImage imageNamed:@"noart.png"];
-    }
-    return image;
-}
-
 - (NSString *)displayString
 {
     return _title;
@@ -841,7 +817,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (VLCInputItem *)inputItem
 {
-    input_item_t *p_inputItem = vlc_ml_get_input_item(_p_mediaLibrary, _libraryID);
+    input_item_t *p_inputItem = vlc_ml_get_input_item(_p_mediaLibrary, self.libraryID);
     VLCInputItem *inputItem = nil;
     if (p_inputItem) {
         inputItem = [[VLCInputItem alloc] initWithInputItem:p_inputItem];
@@ -864,7 +840,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (int)setIntegerPreference:(int)value forKey:(enum vlc_ml_playback_state)key
 {
-    return vlc_ml_media_set_playback_state(_p_mediaLibrary, _libraryID, key, [[[NSNumber numberWithInt:value] stringValue] UTF8String]);
+    return vlc_ml_media_set_playback_state(_p_mediaLibrary, self.libraryID, key, [[[NSNumber numberWithInt:value] stringValue] UTF8String]);
 }
 
 - (int)integerPreferenceForKey:(enum vlc_ml_playback_state)key
@@ -872,7 +848,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     int ret = 0;
     char *psz_value;
 
-    if (vlc_ml_media_get_playback_state(_p_mediaLibrary, _libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
+    if (vlc_ml_media_get_playback_state(_p_mediaLibrary, self.libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
         ret = atoi(psz_value);
         free(psz_value);
     }
@@ -882,7 +858,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (int)setFloatPreference:(float)value forKey:(enum vlc_ml_playback_state)key
 {
-    return vlc_ml_media_set_playback_state(_p_mediaLibrary, _libraryID, key, [[[NSNumber numberWithFloat:value] stringValue] UTF8String]);
+    return vlc_ml_media_set_playback_state(_p_mediaLibrary, self.libraryID, key, [[[NSNumber numberWithFloat:value] stringValue] UTF8String]);
 }
 
 - (float)floatPreferenceForKey:(enum vlc_ml_playback_state)key
@@ -890,7 +866,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     float ret = .0;
     char *psz_value;
 
-    if (vlc_ml_media_get_playback_state(_p_mediaLibrary, _libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
+    if (vlc_ml_media_get_playback_state(_p_mediaLibrary, self.libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
         ret = atof(psz_value);
         free(psz_value);
     }
@@ -900,7 +876,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 - (int)setStringPreference:(NSString *)value forKey:(enum vlc_ml_playback_state)key
 {
-    return vlc_ml_media_set_playback_state(_p_mediaLibrary, _libraryID, key, [value UTF8String]);
+    return vlc_ml_media_set_playback_state(_p_mediaLibrary, self.libraryID, key, [value UTF8String]);
 }
 
 - (NSString *)stringPreferenceForKey:(enum vlc_ml_playback_state)key
@@ -908,7 +884,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     NSString *ret = @"";
     char *psz_value;
 
-    if (vlc_ml_media_get_playback_state(_p_mediaLibrary, _libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
+    if (vlc_ml_media_get_playback_state(_p_mediaLibrary, self.libraryID, key, &psz_value) == VLC_SUCCESS && psz_value != NULL) {
         ret = toNSStr(psz_value);
         free(psz_value);
     }
