@@ -124,6 +124,19 @@
     _videoLibraryGroupsTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
     _videoLibraryGroupSelectionTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
 
+    const NSEdgeInsets defaultInsets = [VLCLibraryUIUnits libraryViewScrollViewContentInsets];
+    const NSEdgeInsets scrollerInsets = [VLCLibraryUIUnits libraryViewScrollViewScrollerInsets];
+
+    _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryCollectionViewsStackViewScrollView.scrollerInsets = scrollerInsets;
+
+    _videoLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryGroupsTableViewScrollView.scrollerInsets = scrollerInsets;
+    _videoLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _videoLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
+    _videoLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
 }
 
 #pragma mark - Show the video library view

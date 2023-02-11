@@ -263,17 +263,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                                         -scrollViewBottomInset,
                                                         -scrollViewRightInset);
 
-    _videoLibraryCollectionViewsStackViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryCollectionViewsStackViewScrollView.contentInsets = defaultInsets;
-    _videoLibraryCollectionViewsStackViewScrollView.scrollerInsets = scrollerInsets;
-    
-    _videoLibraryGroupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryGroupsTableViewScrollView.contentInsets = defaultInsets;
-    _videoLibraryGroupsTableViewScrollView.scrollerInsets = scrollerInsets;
-    _videoLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _videoLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
-    _videoLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
-
     _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _mediaSourceCollectionViewScrollView.contentInsets = defaultInsets;
     _mediaSourceCollectionViewScrollView.scrollerInsets = scrollerInsets;
