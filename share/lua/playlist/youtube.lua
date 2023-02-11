@@ -720,7 +720,12 @@ function pick_stream_url( muxed, adaptive, js_url, fmt )
     if not pick then
         return nil
     end
+    return assemble_stream_url( pick, js )
+end
 
+-- Parse, descramble and assemble elements of video stream URL
+function assemble_stream_url( pick, js )
+    -- 1/ URL signature
     -- Either the "url" or the "signatureCipher" parameter is present,
     -- depending on whether the URL signature is scrambled.
     local url
@@ -739,6 +744,7 @@ function pick_stream_url( muxed, adaptive, js_url, fmt )
         return nil
     end
 
+    -- 2/ Data transfer throttling
     -- The "n" parameter is scrambled too, and needs to be descrambled
     -- and replaced in place, otherwise the data transfer gets throttled
     -- down to between 40 and 80 kB/s, below real-time playability level.
