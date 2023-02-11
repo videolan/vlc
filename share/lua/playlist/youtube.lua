@@ -655,9 +655,9 @@ function pick_stream( formats, fmt )
     -- Remove subobject fields to ease parsing of stream object array
     formats = string.gsub( formats, '"[^"]-":{[^{}]-},?', '' )
 
-    fmt = tonumber( fmt )
-    if fmt then
+    if tonumber( fmt ) then
         -- Legacy match from URL parameter
+        fmt = tonumber( fmt )
         for stream in string.gmatch( formats, '{(.-)}' ) do
             local itag = tonumber( string.match( stream, '"itag":(%d+)' ) )
             if fmt == itag then
@@ -673,8 +673,14 @@ function pick_stream( formats, fmt )
         for stream in string.gmatch( formats, '{(.-)}' ) do
             local height = tonumber( string.match( stream, '"height":(%d+)' ) )
 
+            -- We have no preference mechanism for audio formats,
+            -- so just pick the first one
+            if fmt == "audio" and not height then
+                return stream
+            end
+
             -- Better than nothing
-            if not pick or ( height and ( not bestres
+            if ( not pick and fmt ~= "video" ) or ( height and ( not bestres
                 -- Better quality within limits
                 or ( ( prefres < 0 or height <= prefres ) and height > bestres )
                 -- Lower quality more suited to limits
@@ -696,10 +702,21 @@ function pick_stream_url( muxed, adaptive, js_url, fmt )
         vlc.msg.warn( "Couldn't extract YouTube JavaScript player code URL, descrambling functions unavailable" )
     end
 
-    local pick = pick_stream( muxed, fmt )
-    if not pick and tonumber( fmt ) then
+    local pick = nil
+    if tonumber( fmt ) then
+        -- Specific numeric itag, search in both lists
+        pick = pick_stream( muxed, fmt )
+        if not pick then
+            pick = pick_stream( adaptive, fmt )
+        end
+    elseif ( fmt == "audio" or fmt == "video" ) then
+        -- Specifically audio or video only, no fallback
         pick = pick_stream( adaptive, fmt )
+    else
+        -- Default: multiplexed streams
+        pick = pick_stream( muxed, fmt )
     end
+
     if not pick then
         return nil
     end
@@ -784,7 +801,7 @@ function parse()
         local path, title, description, artist, arturl, js_url
 
         -- Retired YouTube API for video format itag parameter,
-        -- still supported as youtube.lua API
+        -- still supported and extended as youtube.lua API
         -- https://en.wikipedia.org/w/index.php?title=YouTube&oldid=716878321#Quality_and_formats
         local fmt = get_url_param( vlc.path, "fmt" )
 
