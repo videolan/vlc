@@ -138,7 +138,14 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryCollectionView.allowsMultipleSelection = NO;
     _audioLibraryCollectionView.allowsEmptySelection = YES;
 
-    _audioLibraryCollectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    const CGFloat collectionItemSpacing = [VLCLibraryUIUnits collectionViewItemSpacing];
+    const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
+
+    NSCollectionViewFlowLayout *audioLibraryCollectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _audioLibraryCollectionView.collectionViewLayout = audioLibraryCollectionViewLayout;
+    audioLibraryCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    audioLibraryCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    audioLibraryCollectionViewLayout.sectionInset = collectionViewSectionInset;
 }
 
 - (void)setupAudioTableViews
@@ -169,7 +176,15 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsMultipleSelection = NO;
     _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsEmptySelection = YES;
 
-    _audioLibraryGridModeSplitViewListSelectionCollectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    const CGFloat collectionItemSpacing = [VLCLibraryUIUnits collectionViewItemSpacing];
+    const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
+
+    NSCollectionViewFlowLayout *audioLibraryGridModeListSelectionCollectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _audioLibraryGridModeSplitViewListSelectionCollectionView.collectionViewLayout = audioLibraryGridModeListSelectionCollectionViewLayout;
+    audioLibraryGridModeListSelectionCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    audioLibraryGridModeListSelectionCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    audioLibraryGridModeListSelectionCollectionViewLayout.sectionInset = collectionViewSectionInset;
+
 }
 
 - (void)setupAudioPlaceholderView
