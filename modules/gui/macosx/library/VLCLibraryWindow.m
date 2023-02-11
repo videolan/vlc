@@ -246,31 +246,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
 
-    const CGFloat scrollViewTopInset = [VLCLibraryUIUnits mediumSpacing];
-    const CGFloat scrollViewRightInset = [VLCLibraryUIUnits mediumSpacing];
-    const CGFloat scrollViewBottomInset = [VLCLibraryUIUnits mediumSpacing];
-    const CGFloat scrollViewLeftInset = [VLCLibraryUIUnits mediumSpacing];
-
-    const NSEdgeInsets defaultInsets = NSEdgeInsetsMake(scrollViewTopInset,
-                                                        scrollViewLeftInset,
-                                                        scrollViewBottomInset,
-                                                        scrollViewRightInset);
-
-    // We might want to give the content some insets, but this will also affect the scrollbars.
-    // We need to compensate for this or they will look wrong.
-    const NSEdgeInsets scrollerInsets = NSEdgeInsetsMake(-scrollViewTopInset,
-                                                        -scrollViewLeftInset,
-                                                        -scrollViewBottomInset,
-                                                        -scrollViewRightInset);
-
-    _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _mediaSourceCollectionViewScrollView.contentInsets = defaultInsets;
-    _mediaSourceCollectionViewScrollView.scrollerInsets = scrollerInsets;
-
-    _mediaSourceTableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _mediaSourceTableViewScrollView.contentInsets = defaultInsets;
-    _mediaSourceTableViewScrollView.scrollerInsets = scrollerInsets;
-
     const CGFloat collectionItemSpacing = [VLCLibraryUIUnits largeSpacing];
     const NSEdgeInsets collectionViewSectionInset = NSEdgeInsetsMake(collectionItemSpacing,
                                                                      collectionItemSpacing,

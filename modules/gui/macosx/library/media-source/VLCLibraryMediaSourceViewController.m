@@ -80,6 +80,17 @@
 - (void)setupMediaSourceLibraryViews
 {
     _mediaSourceTableView.rowHeight = [VLCLibraryUIUnits mediumTableViewRowHeight];
+
+    const NSEdgeInsets defaultInsets = [VLCLibraryUIUnits libraryViewScrollViewContentInsets];
+    const NSEdgeInsets scrollerInsets = [VLCLibraryUIUnits libraryViewScrollViewScrollerInsets];
+
+    _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _collectionViewScrollView.contentInsets = defaultInsets;
+    _collectionViewScrollView.scrollerInsets = scrollerInsets;
+
+    _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _tableViewScrollView.contentInsets = defaultInsets;
+    _tableViewScrollView.scrollerInsets = scrollerInsets;
 }
 
 - (void)presentBrowseView
