@@ -25,6 +25,7 @@
 #import "VLCMediaSourceBaseDataSource.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -74,7 +75,15 @@
 
 - (void)setupCollectionView
 {
-    _collectionView.collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    const CGFloat collectionItemSpacing = [VLCLibraryUIUnits collectionViewItemSpacing];
+    const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
+    
+    NSCollectionViewFlowLayout *mediaSourceCollectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
+    mediaSourceCollectionViewLayout.itemSize = [VLCLibraryCollectionViewItem defaultSize];
+    mediaSourceCollectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    mediaSourceCollectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    mediaSourceCollectionViewLayout.sectionInset = collectionViewSectionInset;
 }
 
 - (void)setupMediaSourceLibraryViews
