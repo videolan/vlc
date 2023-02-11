@@ -97,8 +97,9 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
-#pragma mark - Audio media library classes
+#pragma mark - Media library classes
 
+// Protocol with common methods and properties expected for media library items
 @protocol VLCMediaLibraryItemProtocol <NSObject>
 
 @property (readonly) int64_t libraryID;
@@ -114,12 +115,25 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
+// Extended VLCMediaLibraryItemProtocol that includes additional properties for media library item
+// audio groups (i.e. artists, genres, etc.)
 @protocol VLCMediaLibraryAudioGroupProtocol <VLCMediaLibraryItemProtocol>
 
 @property (readonly) unsigned int numberOfTracks;
 @property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
 @property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
+
+@end
+
+// Base abstract class with common implementations of properties used by media library items.
+// Do not use directly -- subclass to create new media library item types.
+@interface VLCAbstractMediaLibraryItem : NSObject
+
+@property (readonly) int64_t libraryID;
+@property (readonly) BOOL smallArtworkGenerated;
+@property (readonly) NSImage *smallArtworkImage;
+@property (readonly) NSString *smallArtworkMRL;
 
 @end
 
