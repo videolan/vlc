@@ -52,6 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (const CGFloat)dynamicCollectionViewItemMaximumWidth;
 
 + (const CGFloat)collectionViewItemSpacing;
++ (const NSEdgeInsets)collectionViewSectionInsets;
 
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout

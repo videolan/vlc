@@ -87,6 +87,12 @@
     return [self largeSpacing];
 }
 
++ (const NSEdgeInsets)collectionViewSectionInsets
+{
+    const CGFloat inset = [self largeSpacing];
+    return NSEdgeInsetsMake(inset, inset, inset, inset);
+}
+
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
