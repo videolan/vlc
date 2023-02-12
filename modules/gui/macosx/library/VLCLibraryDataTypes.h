@@ -146,7 +146,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 // Like VLCAbstractMediaLibraryItem but with some additional functionality for audio groupings
 // such as artists and genres. Do not use directly, subclass instead.
-@interface VLCAbstractMediaLibraryAudioGroup : VLCAbstractMediaLibraryItem
+@interface VLCAbstractMediaLibraryAudioGroup : VLCAbstractMediaLibraryItem<VLCLocallyManipulableItemProtocol>
 
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
 @property (readonly) VLCMediaLibraryMediaItem *firstMediaItem;

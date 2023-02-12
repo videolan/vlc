@@ -293,6 +293,18 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return [[self tracksAsMediaItems] firstObject];
 }
 
+- (void)moveToTrash
+{
+    [self iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* childMediaItem) {
+        [childMediaItem moveToTrash];
+    }];
+}
+
+- (void)revealInFinder
+{
+    [self.firstMediaItem revealInFinder];
+}
+
 @end
 
 @implementation VLCMediaLibraryArtist
