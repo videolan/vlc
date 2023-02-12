@@ -99,8 +99,15 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 #pragma mark - Media library classes
 
+@protocol VLCLocallyManipulableItemProtocol <NSObject>
+
+- (void)revealInFinder;
+- (void)moveToTrash;
+
+@end
+
 // Protocol with common methods and properties expected for media library items
-@protocol VLCMediaLibraryItemProtocol <NSObject>
+@protocol VLCMediaLibraryItemProtocol <VLCLocallyManipulableItemProtocol>
 
 @property (readonly) int64_t libraryID;
 @property (readonly) BOOL smallArtworkGenerated;
@@ -123,13 +130,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSArray <VLCMediaLibraryArtist *> *artists;
 @property (readonly) NSArray <VLCMediaLibraryAlbum *> *albums;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *tracksAsMediaItems;
-
-@end
-
-@protocol VLCLocallyManipulableItemProtocol <NSObject>
-
-- (void)revealInFinder;
-- (void)moveToTrash;
 
 @end
 
@@ -190,7 +190,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
-@interface VLCMediaLibraryMediaItem : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol, VLCLocallyManipulableItemProtocol>
+@interface VLCMediaLibraryMediaItem : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
 + (nullable instancetype)mediaItemForURL:(NSURL *)url;
