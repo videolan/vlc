@@ -275,6 +275,26 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @end
 
+@implementation VLCAbstractMediaLibraryAudioGroup
+
+- (NSArray <VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return [[self tracksAsMediaItems] firstObject];
+}
+
+@end
+
 @implementation VLCMediaLibraryArtist
 
 @synthesize numberOfTracks = _numberOfTracks;
