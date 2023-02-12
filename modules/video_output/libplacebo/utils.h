@@ -38,6 +38,10 @@ struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *);
 struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *);
 enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
 
+// Map HDR10+ metadata struct (on supported version of libplacebo)
+void vlc_placebo_HdrMetadata(const vlc_video_hdr_dynamic_metadata_t *src,
+                             struct pl_hdr_metadata *dst);
+
 #if PL_API_VER >= 185
 // Map raw dolby vision metadata struct
 void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,

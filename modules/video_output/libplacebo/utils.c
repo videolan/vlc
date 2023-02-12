@@ -452,6 +452,28 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *fmt)
     };
 }
 
+void vlc_placebo_HdrMetadata(const vlc_video_hdr_dynamic_metadata_t *src,
+                             struct pl_hdr_metadata *dst)
+{
+#if PL_API_VER >= 242
+    for (size_t i = 0; i < ARRAY_SIZE(dst->scene_max); i++)
+        dst->scene_max[i] = src->maxscl[i];
+    dst->scene_avg = src->average_maxrgb;
+
+    if (src->tone_mapping_flag) {
+        static_assert(sizeof(dst->ootf.anchors) == sizeof(src->bezier_curve_anchors), "array mismatch");
+        memcpy(dst->ootf.anchors, src->bezier_curve_anchors, sizeof(dst->ootf.anchors));
+        dst->ootf.num_anchors = src->num_bezier_anchors;
+        dst->ootf.target_luma = src->targeted_luminance;
+        dst->ootf.knee_x = src->knee_point_x;
+        dst->ootf.knee_y = src->knee_point_y;
+    }
+#else
+    (void) src;
+    (void) dst;
+#endif
+}
+
 #if PL_API_VER >= 185
 void vlc_placebo_DoviMetadata(const vlc_video_dovi_metadata_t *src,
                               struct pl_dovi_metadata *dst)

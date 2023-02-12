@@ -259,6 +259,12 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         pl_icc_profile_compute_signature(&img.profile);
     }
 
+    struct vlc_ancillary *hdrplus = picture_GetAncillary(pic, VLC_ANCILLARY_ID_HDR10PLUS);
+    if (hdrplus) {
+        vlc_video_hdr_dynamic_metadata_t *hdm = vlc_ancillary_GetData(hdrplus);
+        vlc_placebo_HdrMetadata(hdm, &img.color.hdr);
+    }
+
     // Upload the image data for each plane
     struct pl_plane_data data[4];
     if (!vlc_placebo_PlaneData(pic, data, NULL)) {
