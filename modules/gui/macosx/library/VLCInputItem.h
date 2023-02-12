@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "library/VLCLibraryDataTypes.h"
+
 #import <vlc_common.h>
 #import <vlc_input_item.h>
 #import <vlc_tick.h>
@@ -36,7 +38,7 @@ extern NSString *VLCInputItemPreparsingFailed;
 extern NSString *VLCInputItemPreparsingTimeOut;
 extern NSString *VLCInputItemPreparsingSucceeded;
 
-@interface VLCInputItem : NSObject
+@interface VLCInputItem : NSObject<VLCLocallyManipulableItemProtocol>
 
 - (instancetype)initWithInputItem:(struct input_item_t *)p_inputItem;
 

@@ -620,6 +620,36 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
     return image;
 }
 
+- (void)moveToTrash
+{
+    if (self.isStream) {
+        return;
+    }
+    
+    NSURL *pathUrl = [NSURL URLWithString:self.path];
+    if (pathUrl == nil) {
+        return;
+    }
+
+    [NSFileManager.defaultManager trashItemAtURL:pathUrl
+                                resultingItemURL:nil
+                                           error:nil];
+}
+
+- (void)revealInFinder
+{
+    if (self.isStream) {
+        return;
+    }
+
+    NSURL *pathUrl = [NSURL URLWithString:self.path];
+    if (pathUrl == nil) {
+        return;
+    }
+
+    [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[pathUrl]];
+}
+
 @end
 
 
