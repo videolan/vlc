@@ -258,7 +258,7 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
 
 @property (readwrite, assign) int64_t libraryID;
 @property (readwrite, assign) BOOL smallArtworkGenerated;
-@property (readwrite, assign) NSString *smallArtworkMRL;
+@property (readwrite, atomic, strong) NSString *smallArtworkMRL;
 
 @end
 
