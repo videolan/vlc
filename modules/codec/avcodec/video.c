@@ -50,6 +50,10 @@
 # include <libavutil/dovi_meta.h>
 #endif
 
+#if LIBAVUTIL_VERSION_CHECK( 56, 25, 100 )
+# include <libavutil/hdr_dynamic_metadata.h>
+#endif
+
 #include "../cc.h"
 #define FRAME_INFO_DEPTH 64
 
@@ -755,6 +759,39 @@ static void map_dovi_metadata( vlc_video_dovi_metadata_t *out,
 }
 #endif
 
+#if LIBAVUTIL_VERSION_CHECK( 56, 25, 100 )
+static void map_hdrplus_metadata( vlc_video_hdr_dynamic_metadata_t *out,
+                                  const AVDynamicHDRPlus *data )
+{
+    out->country_code = data->itu_t_t35_country_code;
+    out->application_version = data->application_version;
+    out->targeted_luminance = av_q2d( data->targeted_system_display_maximum_luminance );
+
+    assert( data->num_windows > 0 );
+    const AVHDRPlusColorTransformParams *pars = &data->params[0];
+    for ( size_t i = 0; i < ARRAY_SIZE( out->maxscl ); i++ )
+        out->maxscl[i] = av_q2d( pars->maxscl[i] );
+    out->average_maxrgb = av_q2d( pars->average_maxrgb );
+    out->num_histogram = pars->num_distribution_maxrgb_percentiles;
+    assert( out->num_histogram < ARRAY_SIZE( out->histogram ));
+    for ( size_t i = 0; i < out->num_histogram; i++ ) {
+        const AVHDRPlusPercentile pct = pars->distribution_maxrgb[i];
+        out->histogram[i].percentage = pct.percentage;
+        out->histogram[i].percentile = av_q2d( pct.percentile );
+    }
+    out->fraction_bright_pixels = av_q2d( pars->fraction_bright_pixels );
+    out->tone_mapping_flag = pars->tone_mapping_flag;
+    if ( out->tone_mapping_flag ) {
+        out->knee_point_x = av_q2d( pars->knee_point_x );
+        out->knee_point_y = av_q2d( pars->knee_point_y );
+        out->num_bezier_anchors = pars->num_bezier_curve_anchors;
+        assert( out->num_bezier_anchors < ARRAY_SIZE( out->bezier_curve_anchors ));
+        for ( size_t i = 0; i < out->num_bezier_anchors; i++ )
+            out->bezier_curve_anchors[i] = av_q2d( pars->bezier_curve_anchors[i] );
+    }
+}
+#endif
+
 static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_pic )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -917,6 +954,18 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
         if( !dst )
             return VLC_ENOMEM;
         map_dovi_metadata( dst, (AVDOVIMetadata *) p_dovi->data );
+    }
+#endif
+
+#if LIBAVUTIL_VERSION_CHECK( 56, 25, 100 )
+    const AVFrameSideData *p_hdrplus = av_frame_get_side_data( frame, AV_FRAME_DATA_DYNAMIC_HDR_PLUS );
+    if( p_hdrplus )
+    {
+        vlc_video_hdr_dynamic_metadata_t *dst;
+        dst = picture_AttachNewAncillary( p_pic, VLC_ANCILLARY_ID_HDR10PLUS, sizeof(*dst) );
+        if( !dst )
+            return VLC_ENOMEM;
+        map_hdrplus_metadata( dst, (AVDynamicHDRPlus *) p_hdrplus->data );
     }
 #endif
 
