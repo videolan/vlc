@@ -611,6 +611,39 @@ typedef struct vlc_video_dovi_metadata_t
 } vlc_video_dovi_metadata_t;
 
 /**
+ * HDR10+ Dynamic metadata (based on ATSC A/341 Amendment 2094-40)
+ *
+ * This is similar to SMPTE ST2094-40:2016, but omits the mastering display and
+ * target display actual peak luminance LUTs, the rectangular boundaries and
+ * ellipse coefficients, and support for multiple processing windows, as these
+ * are intentionally left unused in this version of the specification.
+ */
+
+#define VLC_ANCILLARY_ID_HDR10PLUS VLC_FOURCC('H','D','R','+')
+
+typedef struct vlc_video_hdr_dynamic_metadata_t
+{
+    uint8_t country_code;           /* ITU-T T.35 Annex A */
+    uint8_t application_version;
+    float targeted_luminance;       /* in cd/m² */
+
+    /* parameters for the first processing window (encompassing the frame) */
+    float maxscl[3];                /* in linearized range [0,1] */
+    float average_maxrgb;           /* in linearized range [0,1] */
+    uint8_t num_histogram;          /* in range [0,15] */
+    struct {
+        uint8_t percentage;         /* in range [1,100] */
+        float percentile;           /* in linearized range [0,1] */
+    } histogram[15];
+    float fraction_bright_pixels;/* in range [0,1] */
+    uint8_t tone_mapping_flag;
+    float knee_point_x;             /* in ootf range [0,1] */
+    float knee_point_y;             /* in ootf range [0,1] */
+    uint8_t num_bezier_anchors;     /* in range [1,15] */
+    float bezier_curve_anchors[15]; /* in range [0,1] */
+} vlc_video_hdr_dynamic_metadata_t;
+
+/**
  * Embedded ICC profiles
  */
 
