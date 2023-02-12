@@ -155,7 +155,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
-@interface VLCMediaLibraryArtist : VLCAbstractMediaLibraryItem<VLCMediaLibraryAudioGroupProtocol>
+@interface VLCMediaLibraryArtist : VLCAbstractMediaLibraryAudioGroup<VLCMediaLibraryAudioGroupProtocol>
 
 + (nullable instancetype)artistWithID:(int64_t)artistID;
 - (instancetype)initWithArtist:(struct vlc_ml_artist_t *)p_artist;
@@ -167,7 +167,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
-@interface VLCMediaLibraryAlbum : VLCAbstractMediaLibraryItem<VLCMediaLibraryAudioGroupProtocol>
+@interface VLCMediaLibraryAlbum : VLCAbstractMediaLibraryAudioGroup<VLCMediaLibraryAudioGroupProtocol>
 
 + (nullable instancetype)albumWithID:(int64_t)albumID;
 - (instancetype)initWithAlbum:(struct vlc_ml_album_t *)p_album;
@@ -181,7 +181,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @end
 
-@interface VLCMediaLibraryGenre : VLCAbstractMediaLibraryItem<VLCMediaLibraryAudioGroupProtocol>
+@interface VLCMediaLibraryGenre : VLCAbstractMediaLibraryAudioGroup<VLCMediaLibraryAudioGroupProtocol>
 
 + (nullable instancetype)genreWithID:(int64_t)genreID;
 - (instancetype)initWithGenre:(struct vlc_ml_genre_t *)p_genre;
