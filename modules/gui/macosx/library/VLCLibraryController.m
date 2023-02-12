@@ -118,21 +118,6 @@
     return ret;
 }
 
-- (void)showItemInFinder:(VLCMediaLibraryMediaItem *)mediaItem;
-{
-    if (mediaItem == nil) {
-        return;
-    }
-    VLCMediaLibraryFile *firstFile = mediaItem.files.firstObject;
-
-    if (firstFile) {
-        NSURL *URL = [NSURL URLWithString:firstFile.MRL];
-        if (URL) {
-            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
-        }
-    }
-}
-
 #pragma mark - folder management
 
 - (int)addFolderWithFileURL:(NSURL *)fileURL

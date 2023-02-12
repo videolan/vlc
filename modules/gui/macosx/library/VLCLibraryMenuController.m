@@ -195,73 +195,19 @@
 - (void)revealInFinder:(id)sender
 {
     if (_representedItem != nil) {
-        [self revealMediaLibraryItemInFinder:_representedItem];
-    } else if (_representedInputItem != nil && (!_representedInputItem.isStream)) {
-        [self revealInputItemInFinder:_representedInputItem];
+        [_representedItem revealInFinder];
+    } else if (_representedInputItem != nil) {
+        [_representedInputItem revealInFinder];
     }
-}
-
-- (void)revealMediaLibraryItemInFinder:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
-{
-    NSParameterAssert(mediaLibraryItem);
-    VLCMediaLibraryMediaItem *firstMediaItem = mediaLibraryItem.firstMediaItem;
-
-    if(firstMediaItem) {
-        [VLCMain.sharedInstance.libraryController showItemInFinder:firstMediaItem];
-    }
-}
-
-- (void)revealInputItemInFinder:(VLCInputItem*)inputItem
-{
-    NSParameterAssert(inputItem);
-    NSAssert(!inputItem.isStream, @"Cannot reveal a stream input item in Finder");
-    
-    NSString *path = inputItem.path;
-
-    if (!path || path.length == 0) {
-        return;
-    }
-
-    [NSWorkspace.sharedWorkspace selectFile:path inFileViewerRootedAtPath:path];
 }
 
 - (void)moveToTrash:(id)sender
 {
     if (_representedItem != nil) {
-        [self moveMediaLibraryItemToTrash:_representedItem];
-    } else if (_representedInputItem != nil && (!_representedInputItem.isStream)) {
-        [self moveInputItemToTrash:_representedInputItem];
+        [_representedItem moveToTrash];
+    } else if (_representedInputItem != nil) {
+        [_representedInputItem moveToTrash];
     }
-}
-
-- (void)moveMediaLibraryItemToTrash:(id<VLCMediaLibraryItemProtocol>)mediaLibraryItem
-{
-    NSParameterAssert(mediaLibraryItem);
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [mediaLibraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* childMediaItem) {
-        for (VLCMediaLibraryFile *fileToTrash in childMediaItem.files) {
-            [fileManager trashItemAtURL:fileToTrash.fileURL
-                       resultingItemURL:nil
-                                  error:nil];
-        }
-    }];
-}
-
-- (void)moveInputItemToTrash:(VLCInputItem*)inputItem
-{
-    NSParameterAssert(inputItem);
-    NSAssert(!inputItem.isStream, @"Cannot move a stream input item to trash");
-
-    NSString *path = inputItem.path;
-
-    if (!path || path.length == 0) {
-        return;
-    }
-
-    [NSFileManager.defaultManager trashItemAtURL:[NSURL URLWithString:path]
-                                resultingItemURL:nil
-                                           error:nil];
 }
 
 - (void)showInformation:(id)sender

@@ -35,7 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (int)appendItemToPlaylist:(VLCMediaLibraryMediaItem *)mediaItem playImmediately:(BOOL)playImmediately;
 - (int)appendItemsToPlaylist:(NSArray <VLCMediaLibraryMediaItem *> *)mediaItemArray playFirstItemImmediately:(BOOL)playFirstItemImmediately;
-- (void)showItemInFinder:(VLCMediaLibraryMediaItem *)mediaItem;
 
 - (int)addFolderWithFileURL:(NSURL *)fileURL;
 - (int)banFolderWithFileURL:(NSURL *)fileURL;
