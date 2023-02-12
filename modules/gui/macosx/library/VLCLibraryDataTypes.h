@@ -177,8 +177,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @property (readonly) NSString *name;
 
-- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock orderedBy:(int)mediaItemParentType;
-
 @end
 
 @interface VLCMediaLibraryMediaItem : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
@@ -234,7 +232,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @property (readonly) int trackNumber;
 @property (readonly) int discNumber;
-
 
 @end
 
