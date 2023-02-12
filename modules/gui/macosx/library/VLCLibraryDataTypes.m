@@ -1054,6 +1054,28 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     [self setIntegerPreference:lastSubtitleDelay forKey:VLC_ML_PLAYBACK_STATE_SUBTITLE_DELAY];
 }
 
+- (void)revealInFinder
+{
+    VLCMediaLibraryFile *firstFile = _files.firstObject;
+
+    if (firstFile) {
+        NSURL *URL = [NSURL URLWithString:firstFile.MRL];
+        if (URL) {
+            [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
+        }
+    }
+}
+
+- (void)moveToTrash
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    for (VLCMediaLibraryFile *fileToTrash in _files) {
+        [fileManager trashItemAtURL:fileToTrash.fileURL
+                   resultingItemURL:nil
+                              error:nil];
+    }
+}
+
 @end
 
 @implementation VLCMediaLibraryEntryPoint
