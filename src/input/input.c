@@ -869,6 +869,25 @@ static void InitTitle( input_thread_t * p_input, bool had_titles )
         });
 }
 
+static void FillFileStatsIfAny( input_thread_t * p_input )
+{
+    input_thread_private_t *priv = input_priv( p_input );
+    input_source_t *master = priv->master;
+    stream_t *stream_filters = master->p_demux->s;
+
+    if( stream_filters == NULL )
+        return;
+
+    uint64_t size;
+    
+    if( vlc_stream_GetSize(stream_filters, &size) == VLC_SUCCESS )
+        input_item_AddStat( priv->p_item, "size", size );
+
+    uint64_t mtime;
+    if( vlc_stream_GetMTime(stream_filters, &mtime) == VLC_SUCCESS )
+        input_item_AddStat( priv->p_item, "mtime", mtime );
+}
+
 static void StartTitle( input_thread_t * p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
@@ -1313,6 +1332,8 @@ static int Init( input_thread_t * p_input )
 
     /* Load master infos */
     InputSourceStatistics( master, priv->p_item, priv->p_es_out );
+
+    FillFileStatsIfAny( p_input );
 
     if( priv->type != INPUT_TYPE_PREPARSING )
     {
