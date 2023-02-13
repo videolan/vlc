@@ -28,7 +28,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
-#import "library/VLCLibraryImageCache.h"
+#import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -201,9 +201,7 @@
     VLCInputItem *childRootInput = node.inputItem;
 
     if (childRootInput.inputType == ITEM_TYPE_DIRECTORY || childRootInput.inputType == ITEM_TYPE_NODE) {
-        NSPathControlItem *nodePathItem = [[NSPathControlItem alloc] init];
-        nodePathItem.image = [VLCLibraryImageCache thumbnailForInputItem:childRootInput];
-        nodePathItem.title = childRootInput.name;
+        VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
 
         NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathControl.pathItems];
         [pathItems addObject:nodePathItem];

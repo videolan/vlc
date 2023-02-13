@@ -31,7 +31,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryImageCache.h"
+#import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -405,12 +405,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     }
     
     _childDataSource = childDataSource;
-    
-    VLCInputItem *nodeInput = childDataSource.nodeToDisplay.inputItem;
 
-    NSPathControlItem *nodePathItem = [[NSPathControlItem alloc] init];
-    nodePathItem.image = [VLCLibraryImageCache thumbnailForInputItem:nodeInput];
-    nodePathItem.title = nodeInput.name;
+    VLCInputNode *node = childDataSource.nodeToDisplay;
+    VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
 
     self.pathControl.pathItems = @[nodePathItem];
     self.pathControl.hidden = NO;

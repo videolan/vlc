@@ -23,7 +23,7 @@
 #import "VLCLibraryNavigationStack.h"
 
 #import "VLCInputItem.h"
-#import "VLCLibraryImageCache.h"
+#import "VLCInputNodePathControlItem.h"
 #import "VLCLibraryNavigationState.h"
 #import "VLCLibraryWindow.h"
 
@@ -110,10 +110,8 @@
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex + 1;
     _currentPosition = [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
-    VLCInputItem *nodeInput = _currentPosition.navigationState.currentNodeDisplayed.inputItem;
-    NSPathControlItem *nodePathItem = [[NSPathControlItem alloc] init];
-    nodePathItem.image = [VLCLibraryImageCache thumbnailForInputItem:nodeInput];
-    nodePathItem.title = nodeInput.name;
+    VLCInputNode *node = _currentPosition.navigationState.currentNodeDisplayed;
+    VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
 
     NSMutableArray *pathItems = [NSMutableArray arrayWithArray:_delegate.mediaSourcePathControl.pathItems];
     [pathItems addObject:nodePathItem];
