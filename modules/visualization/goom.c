@@ -301,6 +301,12 @@ static void *Thread( void *p_thread_data )
 
     p_plugin_info = goom_init( p_thread->fmt.i_width, p_thread->fmt.i_height );
 
+    plane_t src;
+    src.i_lines = p_thread->fmt.i_height;
+    src.i_pitch = p_thread->fmt.i_width * 4;
+    src.i_visible_lines = p_thread->fmt.i_height;
+    src.i_visible_pitch = p_thread->fmt.i_width * 4;
+
     for( ;; )
     {
         uint32_t  *plane;
@@ -338,8 +344,8 @@ static void *Thread( void *p_thread_data )
         if( unlikely(p_pic == NULL) )
             continue;
 
-        memcpy( p_pic->p[0].p_pixels, plane,
-                p_thread->fmt.i_width * p_thread->fmt.i_height * 4 );
+        src.p_pixels = (uint8_t*)plane;
+        plane_CopyPixels(&p_pic->p[0], &src);
 
         p_pic->date = date_Get( &i_pts ) + GOOM_DELAY;
         p_pic->b_progressive = true;
