@@ -434,6 +434,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     self.tableView.delegate = self;
 
     _childDataSource = nil;
+    _pathControl.pathItems = @[];
 
     [self reloadData];
 }
@@ -442,9 +443,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 {
     [self returnHome];
     VLCLibraryNavigationStack *mainNavStack = [VLCMain sharedInstance].libraryWindow.navigationStack;
-    if(sender != mainNavStack && sender != self) {
-        [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
-    }
+    [mainNavStack clear];
 }
 
 - (void)setCurrentViewMode
