@@ -127,9 +127,9 @@ static int Open( vlc_object_t *p_this )
     const int width  = var_InheritInteger( p_filter, "goom-width" );
     const int height = var_InheritInteger( p_filter, "goom-height" );
 
+    video_format_Init(&p_thread->fmt, VLC_CODEC_RGB32);
     p_thread->fmt.i_width = p_thread->fmt.i_visible_width = width;
     p_thread->fmt.i_height = p_thread->fmt.i_visible_height = height;
-    p_thread->fmt.i_chroma = VLC_CODEC_RGB32;
     p_thread->fmt.i_sar_num = p_thread->fmt.i_sar_den = 1;
     p_thread->fmt.b_color_range_full = true;
 
@@ -138,6 +138,7 @@ static int Open( vlc_object_t *p_this )
     if( p_thread->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
+        video_format_Clean(&p_thread->fmt);
         free( p_thread );
         free( p_sys );
         return VLC_EGENERIC;
@@ -162,6 +163,7 @@ static int Open( vlc_object_t *p_this )
         vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
         aout_filter_RequestVout( p_filter, p_thread->p_vout, NULL );
+        video_format_Clean(&p_thread->fmt);
         free( p_thread );
         free( p_sys );
         return VLC_EGENERIC;
@@ -373,8 +375,8 @@ static void Close( vlc_object_t *p_this )
         block_Release( p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks] );
     }
 
+    video_format_Clean(&p_sys->p_thread->fmt);
     free( p_sys->p_thread );
-
     free( p_sys );
 }
 
