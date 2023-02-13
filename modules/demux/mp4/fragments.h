@@ -37,7 +37,7 @@ mp4_fragments_index_t * MP4_Fragments_Index_New( unsigned i_tracks, unsigned i_n
 
 stime_t MP4_Fragment_Index_GetTrackStartTime( mp4_fragments_index_t *p_index,
                                               unsigned i_track_index, uint64_t i_moof_pos );
-stime_t MP4_Fragment_Index_GetTrackDuration( mp4_fragments_index_t *p_index, unsigned i_track_index );
+stime_t MP4_Fragment_Index_GetTracksDuration( const mp4_fragments_index_t *p_index );
 
 bool MP4_Fragments_Index_Lookup( mp4_fragments_index_t *p_index,
                                  stime_t *pi_time, uint64_t *pi_pos, unsigned i_track_index );

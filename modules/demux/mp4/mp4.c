@@ -4290,7 +4290,6 @@ static stime_t GetCumulatedDuration( demux_t *p_demux )
 
     for ( unsigned int i=0; i<p_sys->i_tracks; i++ )
     {
-        stime_t i_track_duration = 0;
         MP4_Box_t *p_trak = MP4_GetTrakByTrackID( p_sys->p_moov, p_sys->track[i].i_track_ID );
         const MP4_Box_t *p_stsz;
         const MP4_Box_t *p_tkhd;
@@ -4301,13 +4300,11 @@ static stime_t GetCumulatedDuration( demux_t *p_demux )
         {
             i_max_duration = __MAX( (uint64_t)i_max_duration, BOXDATA(p_tkhd)->i_duration );
         }
-
-        if( p_sys->p_fragsindex )
-        {
-            i_track_duration += MP4_Fragment_Index_GetTrackDuration( p_sys->p_fragsindex, i );
-        }
-
-        i_max_duration = __MAX( i_max_duration, i_track_duration );
+    }
+    if( p_sys->p_fragsindex )
+    {
+        stime_t i_tracks_duration = MP4_Fragment_Index_GetTracksDuration( p_sys->p_fragsindex );
+        i_max_duration = __MAX( i_max_duration, i_tracks_duration );
     }
 
     return i_max_duration;
