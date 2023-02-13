@@ -22,9 +22,10 @@
 
 #import "VLCLibraryNavigationStack.h"
 
-#import "VLCLibraryWindow.h"
-#import "VLCLibraryNavigationState.h"
 #import "VLCInputItem.h"
+#import "VLCLibraryImageCache.h"
+#import "VLCLibraryNavigationState.h"
+#import "VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
@@ -108,6 +109,16 @@
 
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex + 1;
     _currentPosition = [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
+
+    VLCInputItem *nodeInput = _currentPosition.navigationState.currentNodeDisplayed.inputItem;
+    NSPathControlItem *nodePathItem = [[NSPathControlItem alloc] init];
+    nodePathItem.image = [VLCLibraryImageCache thumbnailForInputItem:nodeInput];
+    nodePathItem.title = nodeInput.name;
+
+    NSMutableArray *pathItems = [NSMutableArray arrayWithArray:_delegate.mediaSourcePathControl.pathItems];
+    [pathItems addObject:nodePathItem];
+    _delegate.mediaSourcePathControl.pathItems = pathItems;
+
     [self setDelegateToState:_currentPosition.navigationState];
 }
 
@@ -119,6 +130,11 @@
 
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex - 1;
     _currentPosition = [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
+
+    NSMutableArray *pathItems = [NSMutableArray arrayWithArray:_delegate.mediaSourcePathControl.pathItems];
+    [pathItems removeLastObject];
+    _delegate.mediaSourcePathControl.pathItems = pathItems;
+
     [self setDelegateToState:_currentPosition.navigationState];
 }
 
