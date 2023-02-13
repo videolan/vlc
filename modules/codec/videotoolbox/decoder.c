@@ -84,6 +84,9 @@ struct frame_info_t
     int i_poc;
     int i_foc;
     vlc_tick_t pts;
+    vlc_tick_t dts;
+    unsigned field_rate_num;
+    unsigned field_rate_den;
     bool b_flush;
     bool b_eos;
     bool b_keyframe;
@@ -101,6 +104,9 @@ struct frame_info_t
 
 #define H264_MAX_DPB 16
 #define VT_MAX_SEI_COUNT 16
+
+#define DEFAULT_FRAME_RATE_NUM 30000
+#define DEFAULT_FRAME_RATE_DEN 1001
 
 typedef struct decoder_sys_t
 {
@@ -318,12 +324,10 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
 
                 /* Set frame rate for timings in case of missing rate */
-                if ( (!p_dec->fmt_in->video.i_frame_rate_base ||
-                      !p_dec->fmt_in->video.i_frame_rate) &&
-                     p_sps->vui.i_time_scale && p_sps->vui.i_num_units_in_tick )
+                if (p_sps->vui.i_time_scale && p_sps->vui.i_num_units_in_tick)
                 {
-                    date_Change( &p_sys->pts, p_sps->vui.i_time_scale,
-                                              p_sps->vui.i_num_units_in_tick );
+                    p_info->field_rate_num = p_sps->vui.i_time_scale;
+                    p_info->field_rate_den = p_sps->vui.i_num_units_in_tick;
                 }
             }
 
@@ -662,13 +666,9 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 p_info->b_progressive = hevc_frame_is_progressive(p_sps, sei.p_timing);
 
                 /* Set frame rate for timings in case of missing rate */
-                if ( (!p_dec->fmt_in->video.i_frame_rate_base ||
-                     !p_dec->fmt_in->video.i_frame_rate) )
-                {
-                    unsigned num, den;
-                    if (hevc_get_frame_rate(p_sps, p_vps, &num, &den))
-                        date_Change(&p_sys->pts, num, den);
-                }
+                if(hevc_get_frame_rate(p_sps, p_vps, &p_info->field_rate_num,
+                                                     &p_info->field_rate_den))
+                    p_info->field_rate_num *= 2;
 
                 if (sei.p_timing)
                     hevc_release_sei_pic_timing(sei.p_timing);
@@ -799,11 +799,28 @@ static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
 
     do
     {
-        /* Compute time if missing */
+        /* Asynchronous fallback time init */
+        if(date_Get(&p_sys->pts) == VLC_TICK_INVALID)
+        {
+            date_Set(&p_sys->pts, p_info->pts != VLC_TICK_INVALID ?
+                                  p_info->pts : p_info->dts );
+        }
+
+        /* Compute time from output if missing */
         if (p_info->pts == VLC_TICK_INVALID)
             p_info->pts = date_Get(&p_sys->pts);
         else
             date_Set(&p_sys->pts, p_info->pts);
+
+        /* Update frame rate (used on interpolation) */
+        if(p_info->field_rate_num != p_sys->pts.i_divider_num ||
+           p_info->field_rate_den != p_sys->pts.i_divider_den)
+        {
+            /* no date_Change due to possible invalid num */
+            date_Init(&p_sys->pts, p_info->field_rate_num,
+                                   p_info->field_rate_den);
+            date_Set(&p_sys->pts, p_info->pts);
+        }
 
         /* Set next picture time, in case it is missing */
         if (p_info->i_length)
@@ -888,14 +905,23 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
         p_info->b_keyframe = true;
     }
 
+    p_info->dts = p_block->i_dts;
     p_info->pts = p_block->i_pts;
     p_info->i_length = p_block->i_length;
 
+    if(p_dec->fmt_in->video.i_frame_rate && p_dec->fmt_in->video.i_frame_rate_base) /* demux forced rate */
+    {
+        p_info->field_rate_num = p_dec->fmt_in->video.i_frame_rate * 2;
+        p_info->field_rate_den = p_dec->fmt_in->video.i_frame_rate_base;
+    }
+    else if(!p_info->field_rate_num || !p_info->field_rate_den) /* full fallback */
+    {
+        p_info->field_rate_num = DEFAULT_FRAME_RATE_NUM * 2;
+        p_info->field_rate_den = DEFAULT_FRAME_RATE_DEN;
+    }
+
     /* required for still pictures/menus */
     p_info->b_eos = (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
-
-    if (date_Get(&p_sys->pts) == VLC_TICK_INVALID)
-        date_Set(&p_sys->pts, p_block->i_dts);
 
     return p_info;
 }
@@ -1130,21 +1156,6 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     return decoderConfiguration;
 }
 
-static void PtsInit(decoder_t *p_dec)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (p_dec->fmt_in->video.i_frame_rate_base && p_dec->fmt_in->video.i_frame_rate)
-    {
-        date_Init(&p_sys->pts, p_dec->fmt_in->video.i_frame_rate * 2,
-                  p_dec->fmt_in->video.i_frame_rate_base);
-    }
-    else
-    {
-        date_Init(&p_sys->pts, 2 * 30000, 1001);
-    }
-}
-
 static int StartVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1367,6 +1378,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->i_pic_reorder_max = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
+    /* will be fixed later */
+    date_Init(&p_sys->pts, p_dec->fmt_in->video.i_frame_rate,
+                           p_dec->fmt_in->video.i_frame_rate_base);
 
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
@@ -1461,7 +1475,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     i_ret = StartVideoToolbox(p_dec);
     if (i_ret == VLC_SUCCESS) {
-        PtsInit(p_dec);
+        date_Set(&p_sys->pts, VLC_TICK_INVALID);
         msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'",
                         (char *)&p_dec->fmt_in->i_codec);
     } else {
@@ -1768,8 +1782,9 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
 
 static void RequestFlush(decoder_t *p_dec)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     Drain(p_dec, true);
-    PtsInit(p_dec);
+    date_Set(&p_sys->pts, VLC_TICK_INVALID);
 }
 
 static void Drain(decoder_t *p_dec, bool flush)
@@ -1896,7 +1911,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         if (p_sys->sync_state == STATE_BITSTREAM_SYNCED)
         {
             Drain(p_dec, false);
-            PtsInit(p_dec);
+            date_Set(&p_sys->pts, VLC_TICK_INVALID);
         }
         goto skip;
     }
