@@ -249,35 +249,35 @@ struct stream_t
 enum stream_query_e
 {
     /* capabilities */
-    STREAM_CAN_SEEK,            /**< arg1= bool *   res=cannot fail*/
-    STREAM_CAN_FASTSEEK,        /**< arg1= bool *   res=cannot fail*/
-    STREAM_CAN_PAUSE,           /**< arg1= bool *   res=cannot fail*/
-    STREAM_CAN_CONTROL_PACE,    /**< arg1= bool *   res=cannot fail*/
+    STREAM_CAN_SEEK,                        /**< arg1=(bool *) res=cannot fail */
+    STREAM_CAN_FASTSEEK,                    /**< arg1=(bool *) res=cannot fail */
+    STREAM_CAN_PAUSE,                       /**< arg1=(bool *) res=cannot fail */
+    STREAM_CAN_CONTROL_PACE,                /**< arg1=(bool *) res=cannot fail */
     /* */
-    STREAM_GET_SIZE=6,          /**< arg1= uint64_t *     res=can fail */
+    STREAM_GET_SIZE=6,                      /**< arg1=(uint64_t *) res=can fail */
 
     /* */
-    STREAM_GET_PTS_DELAY = 0x101,/**< arg1= vlc_tick_t* res=cannot fail */
-    STREAM_GET_TITLE_INFO, /**< arg1=input_title_t*** arg2=int* res=can fail */
-    STREAM_GET_TITLE,       /**< arg1=unsigned * res=can fail */
-    STREAM_GET_SEEKPOINT,   /**< arg1=unsigned * res=can fail */
-    STREAM_GET_META,        /**< arg1= vlc_meta_t *       res=can fail */
-    STREAM_GET_CONTENT_TYPE,    /**< arg1= char **         res=can fail */
-    STREAM_GET_SIGNAL,      /**< arg1=double *pf_quality, arg2=double *pf_strength   res=can fail */
-    STREAM_GET_TAGS,        /**< arg1=const block_t ** res=can fail */
-    STREAM_GET_TYPE,        /**< arg1=int*             res=can fail */
+    STREAM_GET_PTS_DELAY = 0x101,           /**< arg1=(vlc_tick_t *) res=cannot fail */
+    STREAM_GET_TITLE_INFO,                  /**< arg1=(input_title_t***) arg2=(int*) res=can fail */
+    STREAM_GET_TITLE,                       /**< arg1=(unsigned *) res=can fail */
+    STREAM_GET_SEEKPOINT,                   /**< arg1=(unsigned *) res=can fail */
+    STREAM_GET_META,                        /**< arg1=(vlc_meta_t *) res=can fail */
+    STREAM_GET_CONTENT_TYPE,                /**< arg1=(char **) res=can fail */
+    STREAM_GET_SIGNAL,                      /**< arg1=(double *pf_quality), arg2=(double *pf_strength) res=can fail */
+    STREAM_GET_TAGS,                        /**< arg1=(const block_t **) res=can fail */
+    STREAM_GET_TYPE,                        /**< arg1=(int*) res=can fail */
 
-    STREAM_SET_PAUSE_STATE = 0x200, /**< arg1= bool        res=can fail */
-    STREAM_SET_TITLE,       /**< arg1= int          res=can fail */
-    STREAM_SET_SEEKPOINT,   /**< arg1= int          res=can fail */
+    STREAM_SET_PAUSE_STATE = 0x200,         /**< arg1=(bool) res=can fail */
+    STREAM_SET_TITLE,                       /**< arg1=(int) res=can fail */
+    STREAM_SET_SEEKPOINT,                   /**< arg1=(int) res=can fail */
 
     /* XXX only data read through vlc_stream_Read/Block will be recorded */
-    STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *dir_path (if arg1 is true)
-                                      arg3=const char *psz_ext (if arg1 is true)  res=can fail */
+    STREAM_SET_RECORD_STATE,                /**< arg1=bool, arg2=const char *dir_path (if arg1 is true),
+                                                 arg3=const char *psz_ext (if arg1 is true) res=can fail */
 
-    STREAM_SET_PRIVATE_ID_STATE = 0x1000, /* arg1= int i_private_data, bool b_selected    res=can fail */
-    STREAM_SET_PRIVATE_ID_CA,             /* arg1= void * */
-    STREAM_GET_PRIVATE_ID_STATE,          /* arg1=int i_private_data arg2=bool *          res=can fail */
+    STREAM_SET_PRIVATE_ID_STATE = 0x1000,   /**< arg1=(int i_private_data) arg2=(bool b_selected) res=can fail */
+    STREAM_SET_PRIVATE_ID_CA,               /**< arg1=(void *) */
+    STREAM_GET_PRIVATE_ID_STATE,            /**< arg1=(int i_private_data) arg2=(bool *) res=can fail */
 };
 
 /**
