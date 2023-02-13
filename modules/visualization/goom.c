@@ -125,9 +125,9 @@ static int Open( vlc_object_t *p_this )
     const int width  = var_InheritInteger( p_filter, "goom-width" );
     const int height = var_InheritInteger( p_filter, "goom-height" );
 
+    video_format_Init(&p_thread->fmt, VLC_CODEC_RGB32);
     p_thread->fmt.i_width = p_thread->fmt.i_visible_width = width;
     p_thread->fmt.i_height = p_thread->fmt.i_visible_height = height;
-    p_thread->fmt.i_chroma = VLC_CODEC_RGB32;
     p_thread->fmt.i_sar_num = p_thread->fmt.i_sar_den = 1;
     p_thread->fmt.color_range = COLOR_RANGE_FULL;
 
@@ -135,6 +135,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->pool = picture_pool_NewFromFormat(&p_thread->fmt, 3);
     if (p_thread->pool == NULL)
     {
+        video_format_Clean(&p_thread->fmt);
         free(p_thread);
         return VLC_ENOMEM;
     }
@@ -144,6 +145,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "no suitable vout module" );
         picture_pool_Release(p_thread->pool);
+        video_format_Clean(&p_thread->fmt);
         free( p_thread );
         return VLC_EGENERIC;
     }
@@ -165,6 +167,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_filter, "cannot launch goom thread" );
         vout_Close( p_thread->p_vout );
         picture_pool_Release(p_thread->pool);
+        video_format_Clean(&p_thread->fmt);
         free( p_thread );
         return VLC_EGENERIC;
     }
@@ -380,6 +383,7 @@ static void Close( filter_t *p_filter )
     }
 
     picture_pool_Release(p_thread->pool);
+    video_format_Clean(&p_thread->fmt);
     free( p_thread );
 }
 
