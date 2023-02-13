@@ -22,6 +22,22 @@
 
 #import "VLCInputNodePathControlItem.h"
 
+#import "VLCInputItem.h"
+#import "VLCLibraryImageCache.h"
+
 @implementation VLCInputNodePathControlItem
+
+- (instancetype)initWithInputNode:(VLCInputNode *)inputNode
+{
+    self = [super init];
+    if (self && inputNode != nil && inputNode.inputItem != nil) {
+        _inputNode = inputNode;
+
+        VLCInputItem *inputItem = inputNode.inputItem;
+        self.image = [VLCLibraryImageCache thumbnailForInputItem:inputItem];
+        self.title = inputItem.name;
+    }
+    return self;
+}
 
 @end
