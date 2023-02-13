@@ -129,6 +129,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->fmt.i_height = p_thread->fmt.i_visible_height = height;
     p_thread->fmt.i_chroma = VLC_CODEC_RGB32;
     p_thread->fmt.i_sar_num = p_thread->fmt.i_sar_den = 1;
+    p_thread->fmt.color_range = COLOR_RANGE_FULL;
 
     /* TODO: the number of picture is arbitrary for now. */
     p_thread->pool = picture_pool_NewFromFormat(&p_thread->fmt, 3);
