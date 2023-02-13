@@ -131,6 +131,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->fmt.i_height = p_thread->fmt.i_visible_height = height;
     p_thread->fmt.i_chroma = VLC_CODEC_RGB32;
     p_thread->fmt.i_sar_num = p_thread->fmt.i_sar_den = 1;
+    p_thread->fmt.b_color_range_full = true;
 
     p_thread->p_vout = aout_filter_RequestVout( p_filter, NULL,
                                                 &p_thread->fmt );
