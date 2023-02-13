@@ -58,6 +58,9 @@
 
 #define TAGLIB_VERSION_1_11 VERSION_INT(1,11,0)
 
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+#include <tfilestream.h>
+#endif
 #include <fileref.h>
 #include <tag.h>
 #include <tbytevector.h>
@@ -872,11 +875,21 @@ static int ReadMeta( vlc_object_t* p_this)
         free( psz_path );
         return VLC_EGENERIC;
     }
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+    FileStream stream( wpath, true );
+    f = FileRef( &stream );
+#else /* TAGLIB_VERSION */
     f = FileRef( wpath );
+#endif /* TAGLIB_VERSION */
     free( wpath );
-#else
+#else /* _WIN32 */
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+    FileStream stream( psz_path, true );
+    f = FileRef( &stream );
+#else /* TAGLIB_VERSION */
     f = FileRef( psz_path );
-#endif
+#endif /* TAGLIB_VERSION */
+#endif /* _WIN32 */
     free( psz_path );
 #endif /* VLC_WINSTORE_APP */
 
