@@ -109,8 +109,11 @@ static int Open (vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     p_sys->settings = new_fluid_settings ();
-    fluid_settings_setnum(p_sys->settings, "synth.sample-rate",
-                          p_dec->fmt_out.audio.i_rate);
+
+    const int64_t i_samplerate =
+        var_InheritInteger (p_this, "synth-sample-rate");
+    fluid_settings_setnum (p_sys->settings, "synth.sample-rate", i_samplerate);
+
     p_sys->synth = new_fluid_synth (p_sys->settings);
     p_sys->soundfont = -1;
 
@@ -193,8 +196,7 @@ static int Open (vlc_object_t *p_this)
     fluid_synth_set_reverb_on (p_sys->synth,
                                var_InheritBool (p_this, "synth-reverb"));
 
-    p_dec->fmt_out.audio.i_rate =
-        var_InheritInteger (p_this, "synth-sample-rate");;
+    p_dec->fmt_out.audio.i_rate = i_samplerate;
     p_dec->fmt_out.audio.i_channels = 2;
     p_dec->fmt_out.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
