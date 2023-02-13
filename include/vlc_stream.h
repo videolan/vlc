@@ -69,6 +69,7 @@ struct vlc_stream_operations {
             int (*get_title)(stream_t *, unsigned *);
             int (*get_seekpoint)(stream_t *, unsigned *);
             int (*get_size)(stream_t *, uint64_t *);
+            int (*get_mtime)(stream_t *, uint64_t *);
             int (*get_title_info)(stream_t *, input_title_t ***, int *);
             int (*get_content_type)(stream_t *, char **);
             int (*get_tags)(stream_t *, const block_t **);
@@ -255,6 +256,8 @@ enum stream_query_e
     STREAM_CAN_CONTROL_PACE,                /**< arg1=(bool *) res=cannot fail */
     /* */
     STREAM_GET_SIZE=6,                      /**< arg1=(uint64_t *) res=can fail */
+    STREAM_GET_MTIME,                       /**< arg1=(uint64_t *) res=can fail
+                                                 Returns the last modified time in seconds since epoch. */
 
     /* */
     STREAM_GET_PTS_DELAY = 0x101,           /**< arg1=(vlc_tick_t *) res=cannot fail */
@@ -495,6 +498,11 @@ VLC_USED static inline int vlc_stream_GetType(stream_t *s, int *type)
 VLC_USED static inline int vlc_stream_GetSize(stream_t *s, uint64_t *size)
 {
     return vlc_stream_Control(s, STREAM_GET_SIZE, size);
+}
+
+VLC_USED static inline int vlc_stream_GetMTime(stream_t *s, uint64_t *mtime)
+{
+    return vlc_stream_Control(s, STREAM_GET_MTIME, mtime);
 }
 
 VLC_USED static inline int vlc_stream_GetTitleInfo(stream_t *s, input_title_t ***title_info, int *size)

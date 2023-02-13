@@ -795,6 +795,12 @@ int vlc_stream_vaControl(stream_t *s, int cmd, va_list args)
                 return s->ops->stream.get_size(s, size);
             }
             return VLC_EGENERIC;
+        case STREAM_GET_MTIME:
+            if (s->ops->stream.get_mtime != NULL) {
+                uint64_t *mtime = va_arg(args, uint64_t *);
+                return s->ops->stream.get_mtime(s, mtime);
+            }
+            return VLC_EGENERIC;
         case STREAM_GET_PTS_DELAY:
             if (s->ops->get_pts_delay != NULL) {
                 vlc_tick_t *pts_delay = va_arg(args, vlc_tick_t *);
