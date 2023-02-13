@@ -31,6 +31,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -99,7 +100,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
-    self.pathControl.URL = nil;
+    self.pathControl.pathItems = @[];
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -119,7 +120,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 - (void)loadMediaSources
 {
-    self.pathControl.URL = nil;
+    self.pathControl.pathItems = @[];
     NSArray *mediaSources;
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
         mediaSources = [VLCMediaSourceProvider listOfLocalMediaSources];
@@ -406,7 +407,12 @@ referenceSizeForHeaderInSection:(NSInteger)section
     _childDataSource = childDataSource;
     
     VLCInputItem *nodeInput = childDataSource.nodeToDisplay.inputItem;
-    self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [nodeInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
+
+    NSPathControlItem *nodePathItem = [[NSPathControlItem alloc] init];
+    nodePathItem.image = [VLCLibraryImageCache thumbnailForInputItem:nodeInput];
+    nodePathItem.title = nodeInput.name;
+
+    self.pathControl.pathItems = @[nodePathItem];
     self.pathControl.hidden = NO;
     
     [_childDataSource setupViews];
