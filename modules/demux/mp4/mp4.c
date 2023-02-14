@@ -367,7 +367,10 @@ static const MP4_Box_data_sbgp_entry_t *
 {
     const MP4_Box_t *p_sbgp = MP4_BoxGet( p_node, "sbgp" );
     const MP4_Box_data_sbgp_t *p_sbgp_data;
-    for( ; p_sbgp; p_sbgp = p_sbgp->p_next )
+    if( !p_sbgp )
+        return NULL;
+
+    do
     {
         p_sbgp_data = BOXDATA(p_sbgp);
         if( p_sbgp->i_type == ATOM_sbgp && p_sbgp_data &&
@@ -375,7 +378,8 @@ static const MP4_Box_data_sbgp_entry_t *
             (i_grouping_type_parameter == 0 ||
              p_sbgp_data->i_grouping_type_parameter == i_grouping_type_parameter) )
             break;
-    }
+        p_sbgp = p_sbgp->p_next;
+    } while(p_sbgp);
 
     if( !p_sbgp )
         return NULL;
