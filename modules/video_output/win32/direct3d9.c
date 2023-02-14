@@ -363,21 +363,19 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     };
     RECT texture_visible_rect = {
         .left   = 0,
-        .right  = vd->source->i_visible_width,
+        .right  = sys->texture_width,
         .top    = 0,
-        .bottom = vd->source->i_visible_height,
+        .bottom = sys->texture_height,
     };
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
-    if (texture_visible_rect.right & 1)
+    if (source_visible_rect.right & 1)
     {
-        texture_visible_rect.right++;
         source_visible_rect.right++;
     }
-    if (texture_visible_rect.bottom & 1)
+    if (source_visible_rect.bottom & 1)
     {
-        texture_visible_rect.bottom++;
         source_visible_rect.bottom++;
     }
 
