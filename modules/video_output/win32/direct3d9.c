@@ -145,6 +145,9 @@ typedef struct vout_display_sys_t
     HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     IDirect3DPixelShader9*  d3dx_shader;
 
+    UINT                    texture_width;
+    UINT                    texture_height;
+
     // scene objects
     IDirect3DTexture9       *sceneTexture;
     IDirect3DVertexBuffer9  *sceneVertexBuffer;
@@ -543,13 +546,13 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9        *d3ddev = sys->d3d9_device->d3ddev.dev;
     HRESULT hr;
 
-    UINT width  = fmt->i_visible_width;
-    UINT height = fmt->i_visible_height;
+    sys->texture_width  = fmt->i_visible_width;
+    sys->texture_height = fmt->i_visible_height;
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
-    if (height & 1) height++;
-    if (width  & 1) width++;
+    if (sys->texture_height & 1) sys->texture_height++;
+    if (sys->texture_width  & 1) sys->texture_width++;
 
     /*
      * Create a texture for use when rendering a scene
@@ -557,8 +560,8 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      * which would usually be a RGB format
      */
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        width,
-                                        height,
+                                        sys->texture_width,
+                                        sys->texture_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         sys->BufferFormat,
@@ -571,7 +574,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     }
 
 #ifndef NDEBUG
-    msg_Dbg(vd, "Direct3D created texture: %ix%i", width, height);
+    msg_Dbg(vd, "Direct3D created texture: %ix%i", sys->texture_width, sys->texture_height);
 #endif
 
     /*
