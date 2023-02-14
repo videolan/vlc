@@ -24,7 +24,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCInputNodePathControlItem;
+
 @interface VLCInputNodePathControl : NSPathControl
+
+@property (readonly) NSMutableDictionary *inputNodePathControlItems;
+
+- (void)appendInputNodePathControlItem:(VLCInputNodePathControlItem *)inputNodePathControlItem;
+- (void)removeLastInputNodePathControlItem;
+- (void)clearInputNodePathControlItems;
 
 @end
 

@@ -22,12 +22,42 @@
 
 #import "VLCInputNodePathControl.h"
 
+#import "VLCInputNodePathControlItem.h"
+
 @implementation VLCInputNodePathControl
 
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
+- (void)appendInputNodePathControlItem:(VLCInputNodePathControlItem *)inputNodePathControlItem
+{
+    if (_inputNodePathControlItems == nil) {
+        _inputNodePathControlItems = [NSMutableDictionary dictionary];
+    }
+
+    [_inputNodePathControlItems setObject:inputNodePathControlItem forKey:inputNodePathControlItem.image.name];
+
+    NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    [pathItems addObject:inputNodePathControlItem];
+    self.pathItems = pathItems;
+}
+
+- (void)removeLastInputNodePathControlItem
+{
+    if (self.pathItems.count == 0) {
+        _inputNodePathControlItems = [NSMutableDictionary dictionary];
+        return;
+    }
+
+    NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSPathControlItem *lastItem = pathItems.lastObject;
+
+    [pathItems removeLastObject];
+    self.pathItems = pathItems;
+    [_inputNodePathControlItems removeObjectForKey:lastItem.image.name];
+}
+
+- (void)clearInputNodePathControlItems
+{
+    _inputNodePathControlItems = [NSMutableDictionary dictionary];
+    self.pathItems = @[];
 }
 
 @end
