@@ -28,6 +28,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryTableCellView.h"
@@ -202,10 +203,7 @@
 
     if (childRootInput.inputType == ITEM_TYPE_DIRECTORY || childRootInput.inputType == ITEM_TYPE_NODE) {
         VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
-
-        NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathControl.pathItems];
-        [pathItems addObject:nodePathItem];
-        self.pathControl.pathItems = pathItems;
+        [self.pathControl appendInputNodePathControlItem:nodePathItem];
 
         [self.displayedMediaSource preparseInputNodeWithinTree:node];
         self.nodeToDisplay = node;

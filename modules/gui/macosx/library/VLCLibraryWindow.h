@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
+@class VLCInputNodePathControl;
 @class VLCLibraryNavigationStack;
 @class VLCLibraryAudioViewController;
 @class VLCLibraryMediaSourceViewController;
@@ -87,7 +88,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *audioSegmentedControl;
 @property (readwrite, weak) IBOutlet NSView *mediaSourceView;
 @property (readwrite, weak) IBOutlet NSButton *mediaSourceHomeButton;
-@property (readwrite, weak) IBOutlet NSPathControl *mediaSourcePathControl;
+@property (readwrite, weak) IBOutlet VLCInputNodePathControl *mediaSourcePathControl;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *mediaSourceTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceCollectionViewScrollView;

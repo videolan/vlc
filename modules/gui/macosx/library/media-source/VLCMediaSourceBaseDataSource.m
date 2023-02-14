@@ -31,6 +31,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCInputItem.h"
@@ -100,7 +101,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
-    self.pathControl.pathItems = @[];
+    [self.pathControl clearInputNodePathControlItems];
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -120,7 +121,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 - (void)loadMediaSources
 {
-    self.pathControl.pathItems = @[];
+    [self.pathControl clearInputNodePathControlItems];
     NSArray *mediaSources;
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
         mediaSources = [VLCMediaSourceProvider listOfLocalMediaSources];
@@ -409,7 +410,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     VLCInputNode *node = childDataSource.nodeToDisplay;
     VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
 
-    self.pathControl.pathItems = @[nodePathItem];
+    [self.pathControl appendInputNodePathControlItem:nodePathItem];
     self.pathControl.hidden = NO;
     
     [_childDataSource setupViews];
@@ -431,7 +432,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     self.tableView.delegate = self;
 
     _childDataSource = nil;
-    _pathControl.pathItems = @[];
+    [self.pathControl clearInputNodePathControlItems];
 
     [self reloadData];
 }

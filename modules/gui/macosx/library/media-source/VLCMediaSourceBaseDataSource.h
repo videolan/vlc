@@ -29,6 +29,7 @@ typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCInputNodePathControl;
 @class VLCMediaSourceDataSource;
 
 @interface VLCMediaSourceBaseDataSource : NSObject <NSCollectionViewDataSource,
@@ -42,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSTableView *tableView;
 @property (readwrite) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite) NSButton *homeButton;
-@property (readwrite) NSPathControl *pathControl;
+@property (readwrite) VLCInputNodePathControl *pathControl;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
 

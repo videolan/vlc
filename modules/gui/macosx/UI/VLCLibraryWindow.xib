@@ -1077,7 +1077,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rjk-Q6-FYy">
+                <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rjk-Q6-FYy" customClass="VLCInputNodePathControl">
                     <rect key="frame" x="46" y="381" width="472" height="20"/>
                     <pathCell key="cell" controlSize="small" selectable="YES" editable="YES" alignment="left" id="kIb-Jz-eus">
                         <font key="font" metaFont="message" size="11"/>
