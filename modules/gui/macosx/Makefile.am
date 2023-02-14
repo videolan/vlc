@@ -85,6 +85,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/imported/SPMediaKeyTap/SPMediaKeyTap.m \
 	gui/macosx/library/VLCInputItem.h \
 	gui/macosx/library/VLCInputItem.m \
+	gui/macosx/library/VLCInputNodePathControl.h \
+	gui/macosx/library/VLCInputNodePathControl.m \
 	gui/macosx/library/VLCInputNodePathControlItem.h \
 	gui/macosx/library/VLCInputNodePathControlItem.m \
 	gui/macosx/library/VLCLibraryCollectionViewDataSource.h \
