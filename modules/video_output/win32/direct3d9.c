@@ -154,6 +154,9 @@ struct vout_display_sys_t
     IDirect3DPixelShader9*  d3dx_shader;
     d3d9_device_t           d3d_dev;
 
+    UINT                    texture_width;
+    UINT                    texture_height;
+
     // scene objects
     LPDIRECT3DTEXTURE9      d3dtex;
     LPDIRECT3DVERTEXBUFFER9 d3dvtc;
@@ -255,12 +258,14 @@ static HINSTANCE Direct3D9LoadShaderLibrary(void)
 
 static unsigned int GetPictureWidth(const vout_display_t *vd)
 {
-    return vd->source.i_visible_width;
+    vout_display_sys_t *sys = vd->sys;
+    return sys->texture_width;
 }
 
 static unsigned int GetPictureHeight(const vout_display_t *vd)
 {
-    return vd->source.i_visible_height;
+    vout_display_sys_t *sys = vd->sys;
+    return sys->texture_height;
 }
 
 /**
@@ -1262,10 +1267,10 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
     // When copying the entire buffer, the margin end up being blended in the actual picture
     // on nVidia (regardless of even/odd dimensions)
-    UINT texture_width  = fmt->i_visible_width;
-    UINT texture_height = fmt->i_visible_height;
-    if (texture_width  & 1) texture_width++;
-    if (texture_height & 1) texture_height++;
+    sys->texture_width  = fmt->i_visible_width;
+    sys->texture_height = fmt->i_visible_height;
+    if (sys->texture_width  & 1) sys->texture_width++;
+    if (sys->texture_height & 1) sys->texture_height++;
 
     /*
      * Create a texture for use when rendering a scene
@@ -1274,8 +1279,8 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      */
     LPDIRECT3DTEXTURE9 d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        texture_width,
-                                        texture_height,
+                                        sys->texture_width,
+                                        sys->texture_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         p_d3d9_dev->pp.BackBufferFormat,
@@ -1288,7 +1293,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     }
 
 #ifndef NDEBUG
-    msg_Dbg(vd, "Direct3D created texture: %ix%i", texture_width, texture_height);
+    msg_Dbg(vd, "Direct3D created texture: %ix%i", sys->texture_width, sys->texture_height);
 #endif
 
     /*
