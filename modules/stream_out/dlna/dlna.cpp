@@ -30,6 +30,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_dialog.h>
@@ -106,7 +107,6 @@ static char *getServerIPAddress() {
 std::string dlna_write_protocol_info (const protocol_info_t info)
 {
     std::ostringstream protocol;
-    char dlna_info[448];
 
     if (info.transport == DLNA_TRANSPORT_PROTOCOL_HTTP)
         protocol << "http-get:*:";
@@ -121,11 +121,17 @@ std::string dlna_write_protocol_info (const protocol_info_t info)
                              DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
                              DLNA_ORG_FLAG_CONNECTION_STALL |
                              DLNA_ORG_FLAG_DLNA_V15;
-    sprintf (dlna_info, "%s=%.2x;%s=%d;%s=%.8x%.24x",
-               "DLNA.ORG_OP", DLNA_ORG_OPERATION_RANGE,
-               "DLNA.ORG_CI", info.ci,
-               "DLNA.ORG_FLAGS", flags, 0);
-    protocol << dlna_info;
+
+    protocol << std::setfill('0')
+        << "DLNA.ORG_OP="
+        << std::hex << std::setw(2)
+        << DLNA_ORG_OPERATION_RANGE
+        << ";DLNA.ORG_CI="
+        << std::dec << info.ci
+        << ";DLNA.ORG_FLAGS="
+        << std::hex
+        << std::setw(8) << flags
+        << std::setw(24) << 0;
 
     return protocol.str();
 }
