@@ -458,6 +458,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     VLCInputNodePathControlItem *matchingItem = [_pathControl.inputNodePathControlItems objectForKey:itemNodeMrl];
     if (matchingItem != nil) {
         _childDataSource.nodeToDisplay = matchingItem.inputNode;
+        [_pathControl clearPathControlItemsAheadOf:selectedItem];
     }
 }
 
