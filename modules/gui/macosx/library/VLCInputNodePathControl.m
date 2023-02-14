@@ -60,4 +60,31 @@
     self.pathItems = @[];
 }
 
+- (void)clearPathControlItemsAheadOf:(NSPathControlItem *)item
+{
+    if ([item.image.name isEqualToString:@""]) {
+        return;
+    }
+
+    NSUInteger indexOfItem = [self.pathItems indexOfObjectPassingTest:^BOOL(NSPathControlItem *searchItem, NSUInteger idx, BOOL *stop) {
+        return [searchItem.image.name isEqualToString:item.image.name];
+    }];
+
+    if (indexOfItem == NSNotFound) {
+        return;
+    }
+
+    NSMutableArray<NSPathControlItem *> *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSArray<NSPathControlItem *> *itemsToRemove = [pathItems subarrayWithRange:NSMakeRange(indexOfItem + 1, pathItems.count - indexOfItem - 1)];
+    NSMutableArray<NSString *> *itemMrlsToRemove = [NSMutableArray arrayWithCapacity:itemsToRemove.count];
+
+    for (NSPathControlItem *searchItem in itemsToRemove) {
+        NSString *searchItemMrl = searchItem.image.name;
+        [itemMrlsToRemove addObject:searchItemMrl];
+    };
+
+    self.pathItems = [pathItems subarrayWithRange:NSMakeRange(0, indexOfItem + 1)];
+    [_inputNodePathControlItems removeObjectsForKeys:itemMrlsToRemove];
+}
+
 @end

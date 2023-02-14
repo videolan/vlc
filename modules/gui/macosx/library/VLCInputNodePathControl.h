@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)appendInputNodePathControlItem:(VLCInputNodePathControlItem *)inputNodePathControlItem;
 - (void)removeLastInputNodePathControlItem;
 - (void)clearInputNodePathControlItems;
+- (void)clearPathControlItemsAheadOf:(NSPathControlItem *)item;
 
 @end
 
