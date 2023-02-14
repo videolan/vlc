@@ -775,7 +775,11 @@ bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
                           uint8_t *pi_depth, unsigned *pi_delay )
 {
     uint8_t i_max_num_reorder_frames = p_sps->vui.i_max_num_reorder_frames;
-    if( !p_sps->vui.b_bitstream_restriction_flag )
+    if( p_sps->i_pic_order_cnt_type == 2 ) /* 8.2.1.3 */
+    {
+        i_max_num_reorder_frames = 0;
+    }
+    else if( !p_sps->vui.b_bitstream_restriction_flag )
     {
         switch( p_sps->i_profile ) /* E-2.1 */
         {
