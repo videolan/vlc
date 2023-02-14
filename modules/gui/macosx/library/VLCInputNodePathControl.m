@@ -32,6 +32,10 @@
         _inputNodePathControlItems = [NSMutableDictionary dictionary];
     }
 
+    if ([inputNodePathControlItem.image.name isEqualToString:@""]) {
+        return;
+    }
+
     [_inputNodePathControlItems setObject:inputNodePathControlItem forKey:inputNodePathControlItem.image.name];
 
     NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
