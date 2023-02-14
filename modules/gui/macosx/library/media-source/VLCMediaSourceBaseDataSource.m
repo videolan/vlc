@@ -102,6 +102,8 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
     [self.pathControl clearInputNodePathControlItems];
+    self.pathControl.action = @selector(pathControlAction:);
+    self.pathControl.target = self;
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -442,6 +444,21 @@ referenceSizeForHeaderInSection:(NSInteger)section
     [self returnHome];
     VLCLibraryNavigationStack *mainNavStack = [VLCMain sharedInstance].libraryWindow.navigationStack;
     [mainNavStack clear];
+}
+
+- (void)pathControlAction:(id)sender
+{
+    if (_pathControl.clickedPathItem == nil || _childDataSource == nil) {
+        return;
+    }
+
+    NSPathControlItem *selectedItem = _pathControl.clickedPathItem;
+    NSString *itemNodeMrl = selectedItem.image.name;
+
+    VLCInputNodePathControlItem *matchingItem = [_pathControl.inputNodePathControlItems objectForKey:itemNodeMrl];
+    if (matchingItem != nil) {
+        _childDataSource.nodeToDisplay = matchingItem.inputNode;
+    }
 }
 
 - (void)setCurrentViewMode

@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setupViews;
 - (void)reloadViews;
 - (void)homeButtonAction:(id)sender;
+- (void)pathControlAction:(id)sender;
 - (void)setGridOrListMode:(id)sender;
 
 @end
