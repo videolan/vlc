@@ -409,10 +409,12 @@ referenceSizeForHeaderInSection:(NSInteger)section
     
     _childDataSource = childDataSource;
 
-    VLCInputNode *node = childDataSource.nodeToDisplay;
-    VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        VLCInputNode *node = childDataSource.nodeToDisplay;
+        VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
 
-    [self.pathControl appendInputNodePathControlItem:nodePathItem];
+        [self.pathControl appendInputNodePathControlItem:nodePathItem];
+    }
     self.pathControl.hidden = NO;
     
     [_childDataSource setupViews];
