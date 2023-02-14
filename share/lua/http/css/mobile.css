@@ -80,19 +80,21 @@ body{
 
 
 #buttons{
+	--button-scale: 1.2;
 	margin:0 auto; 
 	position: relative; 
-	width: 288px;
+	width: calc(288px * var(--button-scale));
 }
 .button48{
-	width: 48px;
-	height: 48px;
+	width: calc(48px * var(--button-scale));
+	height: calc(48px * var(--button-scale));
 	margin: 5px 0px 5px 0px;
 	background: none;
 	border: none;
 	display: inline-block;
 	cursor: pointer;
 	background-image: url("../images/buttons.png");
+	background-size: calc(672px * var(--button-scale));
 	background-repeat: no-repeat;
 }
 
@@ -104,34 +106,34 @@ body{
 	background-position: 0px 0px;
 }
 #buttonStop{
-	background-position: -576px 0px;
+	background-position: calc(-576px * var(--button-scale)) 0px;
 }
 #buttonRewd{
-	background-position: -528px 0px;
+	background-position: calc(-528px * var(--button-scale)) 0px;
 }
 #buttonFwrd{
-	background-position: -96px 0px;
+	background-position: calc(-96px * var(--button-scale)) 0px;
 }
 .playing {
-	background-position: -336px 0px;
+	background-position: calc(-336px * var(--button-scale)) 0px;
 }
 .paused {
-	background-position: -384px 0px;
+	background-position: calc(-384px * var(--button-scale)) 0px;
 }
 #buttonPrev{
-	background-position: -144px 0px;
+	background-position: calc(-144px * var(--button-scale)) 0px;
 }
 #buttonNext{
-	background-position: -288px 0px;
+	background-position: calc(-288px * var(--button-scale)) 0px;
 }
 #buttonFull{
-	background-position: -192px 0px;
+	background-position: calc(-192px * var(--button-scale)) 0px;
 }
 #buttonSout{
-	background-position: -624px 0px;
+	background-position: calc(-624px * var(--button-scale)) 0px;
 }
 #buttonEQ{
-	background-position: -48px 0px;
+	background-position: calc(-48px * var(--button-scale)) 0px;
 }
 #window_browse ol{
 	list-style-type: none;
