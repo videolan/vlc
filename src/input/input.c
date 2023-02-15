@@ -319,6 +319,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->is_running = false;
     priv->is_stopped = false;
     priv->b_recording = false;
+    priv->b_next_frame = false;
     priv->i_rate = INPUT_RATE_DEFAULT;
     memset( &priv->bookmark, 0, sizeof(priv->bookmark) );
     TAB_INIT( priv->i_bookmark, priv->pp_bookmark );
@@ -1803,6 +1804,17 @@ static void ControlUnpause( input_thread_t *p_input, vlc_tick_t i_control_date )
     /* Switch to play */
     input_ChangeState( p_input, PLAYING_S );
     es_out_SetPauseState( input_priv(p_input)->p_es_out, false, false, i_control_date );
+
+    if( input_priv(p_input)->b_next_frame )
+    {
+        input_priv(p_input)->b_next_frame = false;
+        int64_t i_time;
+        if( demux_Control( input_priv(p_input)->master->p_demux, DEMUX_GET_TIME, &i_time ) == 0)
+        {
+            vlc_value_t val = { .i_int = i_time };
+            Control( p_input, INPUT_CONTROL_SET_TIME, val );
+        }
+    }
 }
 
 static void ViewpointApply( input_thread_t *p_input )
@@ -2365,6 +2377,7 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_FRAME_NEXT:
             if( input_priv(p_input)->i_state == PAUSE_S )
             {
+                input_priv(p_input)->b_next_frame = true;
                 es_out_SetFrameNext( input_priv(p_input)->p_es_out );
             }
             else if( input_priv(p_input)->i_state == PLAYING_S )
