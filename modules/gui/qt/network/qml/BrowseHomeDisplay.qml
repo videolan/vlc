@@ -119,7 +119,7 @@ FocusScope {
         focus: true
 
         Column {
-            width: parent.width
+            width: foldersSection.width
             height: implicitHeight
 
             spacing: VLCStyle.margin_small
@@ -127,7 +127,7 @@ FocusScope {
             BrowseDeviceView {
                 id: foldersSection
 
-                width: flickable.width
+                width: root.width
                 height: contentHeight
 
                 // NOTE: We are not capping the list when filtering.
@@ -164,7 +164,7 @@ FocusScope {
             BrowseDeviceView {
                 id: deviceSection
 
-                width: flickable.width
+                width: root.width
                 height: contentHeight
 
                 maximumRows: foldersSection.maximumRows
@@ -211,7 +211,7 @@ FocusScope {
             BrowseDeviceView {
                 id: lanSection
 
-                width: flickable.width
+                width: root.width
                 height: contentHeight
 
                 maximumRows: foldersSection.maximumRows
