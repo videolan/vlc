@@ -57,15 +57,22 @@ void *vlc_dlopen(const char *psz_file, bool lazy)
         return NULL;
 
     HMODULE handle = NULL;
-#ifndef VLC_WINSTORE_APP
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     DWORD mode;
     if (SetThreadErrorMode (SEM_FAILCRITICALERRORS, &mode) != 0)
     {
         handle = LoadLibraryExW(wfile, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
         SetThreadErrorMode (mode, NULL);
     }
-#else
+#elif WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
     handle = LoadPackagedLibrary( wfile, 0 );
+#elif defined(WINAPI_FAMILY_GAMES) && (WINAPI_FAMILY == WINAPI_FAMILY_GAMES)
+    // SEM_FAILCRITICALERRORS is not available on Xbox, error messages are not
+    // possible. This is a sandboxed environment where the library dependencies
+    // need to be managed manually per platform.
+    handle = LoadLibraryExW(wfile, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+#else
+#error Unknown Windows Platform!
 #endif
     free (wfile);
 
