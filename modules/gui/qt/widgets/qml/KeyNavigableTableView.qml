@@ -74,12 +74,17 @@ FocusScope {
     property real rowHeight: VLCStyle.tableRow_height
 
     property real availableRowWidth: 0
-    property real _availabeRowWidthLastUpdateTime: Date.now()
-
-    readonly property real _currentAvailableRowWidth: width - leftMargin - rightMargin
 
     property Item dragItem
     property bool acceptDrop: false
+
+    // Private
+
+    property bool _ready: false
+
+    property real _availabeRowWidthLastUpdateTime: Date.now()
+
+    readonly property real _currentAvailableRowWidth: width - leftMargin - rightMargin
 
     // Aliases
 
@@ -143,11 +148,15 @@ FocusScope {
 
     // Events
 
-    Component.onDestruction: {
-        _qtAvoidSectionUpdate()
+    Component.onCompleted: {
+        _ready = true
+
+        availableRowWidthUpdater.enqueueUpdate()
     }
 
-    on_CurrentAvailableRowWidthChanged: availableRowWidthUpdater.enqueueUpdate()
+    Component.onDestruction: _qtAvoidSectionUpdate()
+
+    on_CurrentAvailableRowWidthChanged: if (_ready) availableRowWidthUpdater.enqueueUpdate()
 
     // Functions
 
