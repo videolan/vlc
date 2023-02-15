@@ -175,11 +175,17 @@ struct pic_pacer
 {
     vlc_mutex_t lock;
     vlc_cond_t  wait;
-    uint8_t     nb_field_out;
-    uint8_t     field_reorder_max;
+    uint8_t     nb_out;
+    uint8_t     allocated_max;
+    uint8_t     allocated_next;
 };
 
-static void pic_pacer_UpdateReorderMax(struct pic_pacer *, uint8_t, uint8_t);
+#define PIC_PACER_ALLOCATABLE_MAX (1 /* callback, pre-reorder */ \
+                                 + 2 /* filters */ \
+                                 + 1 /* display */ \
+                                 + 1 /* next/prev display */)
+
+static void pic_pacer_UpdateReorderMax(struct pic_pacer *, uint8_t);
 
 #pragma mark - start & stop
 
@@ -934,8 +940,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
        p_info->i_max_reorder != p_sys->i_pic_reorder_max)
     {
         p_sys->i_pic_reorder_max = p_info->i_max_reorder;
-        pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
-                                   p_sys->i_pic_reorder_max, p_info->b_field ? 2 : 1);
+        pic_pacer_UpdateReorderMax(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
     }
 
     while(p_info->b_flush || p_sys->i_pic_reorder >= p_sys->i_pic_reorder_max)
@@ -948,8 +953,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
-                pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
-                                              p_sys->i_pic_reorder_max, p_info->i_num_ts);
+                pic_pacer_UpdateReorderMax(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
                 msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
@@ -959,8 +963,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
-                pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
-                                              p_sys->i_pic_reorder_max, p_info->i_num_ts);
+                pic_pacer_UpdateReorderMax(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
                 msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
@@ -1288,12 +1291,13 @@ static void pic_pacer_Destroy(void *priv)
     (void) priv;
 }
 
-static void pic_pacer_Init(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max)
+static void pic_pacer_Init(struct pic_pacer *pic_pacer)
 {
     vlc_mutex_init(&pic_pacer->lock);
     vlc_cond_init(&pic_pacer->wait);
-    pic_pacer->nb_field_out = 0;
-    pic_pacer->field_reorder_max = pic_reorder_max * 2;
+    pic_pacer->nb_out = 0;
+    pic_pacer->allocated_max = PIC_PACER_ALLOCATABLE_MAX;
+    pic_pacer->allocated_next = pic_pacer->allocated_max;
 }
 
 static int
@@ -1329,7 +1333,7 @@ CreateVideoContext(decoder_t *p_dec)
                                          CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX);
     assert(p_sys->pic_pacer);
 
-    pic_pacer_Init(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
+    pic_pacer_Init(p_sys->pic_pacer);
 
     return VLC_SUCCESS;
 }
@@ -2107,30 +2111,48 @@ video_context_OnPicReleased(vlc_video_context *vctx, unsigned nb_fields)
 {
     struct pic_pacer *pic_pacer =
         vlc_video_context_GetCVPXPrivate(vctx, CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX);
+    VLC_UNUSED(nb_fields);
 
     vlc_mutex_lock(&pic_pacer->lock);
-    assert((int) pic_pacer->nb_field_out - nb_fields >= 0);
-    pic_pacer->nb_field_out -= nb_fields;
-    vlc_cond_signal(&pic_pacer->wait);
+    assert(pic_pacer->nb_out > 0);
+    pic_pacer->nb_out -= 1;
+
+    /* our shrink condition */
+    if(pic_pacer->allocated_next < pic_pacer->allocated_max &&
+       pic_pacer->nb_out <= pic_pacer->allocated_next)
+        pic_pacer->allocated_max = pic_pacer->allocated_next;
+
+    if(pic_pacer->nb_out < pic_pacer->allocated_max)
+        vlc_cond_signal(&pic_pacer->wait);
+
     vlc_mutex_unlock(&pic_pacer->lock);
 }
 
 static void
-pic_pacer_UpdateReorderMax(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max,
-                              uint8_t nb_field)
+pic_pacer_UpdateReorderMax(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max)
 {
     vlc_mutex_lock(&pic_pacer->lock);
 
-    pic_pacer->field_reorder_max = pic_reorder_max * (nb_field < 2 ? 2 : nb_field);
-    vlc_cond_signal(&pic_pacer->wait);
+    pic_reorder_max += PIC_PACER_ALLOCATABLE_MAX;
+    bool b_growing  = pic_reorder_max > pic_pacer->allocated_max;
+
+    if(b_growing)
+    {
+        pic_pacer->allocated_max = pic_reorder_max;
+        pic_pacer->allocated_next = pic_reorder_max;
+        vlc_cond_signal(&pic_pacer->wait);
+    }
+    else
+    {
+        pic_pacer->allocated_next = pic_reorder_max;
+    }
 
     vlc_mutex_unlock(&pic_pacer->lock);
 }
 
 static int pic_pacer_Wait(struct pic_pacer *pic_pacer, const picture_t *pic)
 {
-    const uint8_t reserved_fields = 2 * (pic->i_nb_fields < 2 ? 2 : pic->i_nb_fields);
-
+    VLC_UNUSED(pic);
     vlc_mutex_lock(&pic_pacer->lock);
 
     /* Wait 200 ms max. We can't really know what the video output will do with
@@ -2139,10 +2161,10 @@ static int pic_pacer_Wait(struct pic_pacer *pic_pacer, const picture_t *pic)
      * call. */
     vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_MS(200);
     int ret = 0;
-    while (ret == 0 && pic_pacer->field_reorder_max != 0
-        && pic_pacer->nb_field_out >= pic_pacer->field_reorder_max + reserved_fields)
+    while (ret == 0 && pic_pacer->allocated_max != 0
+        && pic_pacer->nb_out >= pic_pacer->allocated_max)
         ret = vlc_cond_timedwait(&pic_pacer->wait, &pic_pacer->lock, deadline);
-    pic_pacer->nb_field_out += pic->i_nb_fields;
+    pic_pacer->nb_out += 1;
 
     vlc_mutex_unlock(&pic_pacer->lock);
 
