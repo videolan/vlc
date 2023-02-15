@@ -491,7 +491,7 @@ static int ReadICYMeta( stream_t *p_access )
 
     /* Now parse the meta */
     /* Look for StreamTitle= */
-    p = strcasestr( (char *)psz_meta, "StreamTitle=" );
+    p = strcasestr( psz_meta, "StreamTitle=" );
     if( p )
     {
         p += strlen( "StreamTitle=" );
