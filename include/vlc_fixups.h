@@ -28,8 +28,12 @@
 
 #if defined(_MSC_VER)
 // disable common warnings when compiling POSIX code
+#ifndef _CRT_NONSTDC_NO_WARNINGS
 #define _CRT_NONSTDC_NO_WARNINGS    1
+#endif
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS     1
+#endif
 
 // sys/stat.h values
 #define S_IWUSR     _S_IWRITE
