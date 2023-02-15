@@ -119,10 +119,8 @@ vlc_player_osd_Icon(vlc_player_t *player, short type)
 void
 vlc_player_osd_Position(vlc_player_t *player,
                         struct vlc_player_input *input, vlc_tick_t time,
-                        double position, enum vlc_player_whence whence)
+                        double position)
 {
-    vlc_tick_t now = vlc_tick_now();
-
     if (input->length != VLC_TICK_INVALID)
     {
         if (time == VLC_TICK_INVALID)
@@ -136,13 +134,6 @@ vlc_player_osd_Position(vlc_player_t *player,
 
     if (time != VLC_TICK_INVALID)
     {
-        if (whence == VLC_PLAYER_WHENCE_RELATIVE)
-        {
-            time += vlc_player_input_GetTime(input, false, now);
-            if (time < 0)
-                time = 0;
-        }
-
         char time_text[MSTRTIME_MAX_SIZE];
         vlc_tick_to_str(time_text, time);
         if (input->length != VLC_TICK_INVALID)
@@ -156,15 +147,7 @@ vlc_player_osd_Position(vlc_player_t *player,
     }
 
     if (vlc_player_vout_IsFullscreen(player))
-    {
-        if (whence == VLC_PLAYER_WHENCE_RELATIVE)
-        {
-            position += vlc_player_input_GetPos(input, false, now);
-            if (position < 0.f)
-                position = 0.f;
-        }
         vouts_osd_Slider(vouts, count, position * 100, OSD_HOR_SLIDER);
-    }
     vlc_player_osd_ReleaseAll(player, vouts, count);
 }
 

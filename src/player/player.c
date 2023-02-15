@@ -1399,8 +1399,7 @@ vlc_player_DisplayPosition(vlc_player_t *player)
     vlc_tick_t now = vlc_tick_now();
     vlc_player_osd_Position(player, input,
                             vlc_player_input_GetTime(input, false, now),
-                            vlc_player_input_GetPos(input, false, now),
-                            VLC_PLAYER_WHENCE_ABSOLUTE);
+                            vlc_player_input_GetPos(input, false, now));
 }
 
 void

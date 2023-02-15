@@ -125,18 +125,24 @@ vlc_player_input_SeekByPos(struct vlc_player_input *input, double position,
     vlc_player_t *player = input->player;
     vlc_player_assert_seek_params(speed, whence);
 
-    const int type =
-        whence == VLC_PLAYER_WHENCE_ABSOLUTE ? INPUT_CONTROL_SET_POSITION
-                                             : INPUT_CONTROL_JUMP_POSITION;
-    int ret = input_ControlPush(input->thread, type,
+    if (whence != VLC_PLAYER_WHENCE_ABSOLUTE)
+        position += vlc_player_input_GetPos(input, true, vlc_tick_now());
+
+    if (position < 0)
+        position = 0;
+    else if (position > 1)
+        position = 1;
+
+    vlc_player_UpdateTimerSeekState(player, VLC_TICK_INVALID, position);
+
+    int ret = input_ControlPush(input->thread, INPUT_CONTROL_SET_POSITION,
         &(input_control_param_t) {
             .pos.f_val = position,
             .pos.b_fast_seek = speed == VLC_PLAYER_SEEK_FAST,
     });
 
     if (ret == VLC_SUCCESS)
-        vlc_player_osd_Position(player, input, VLC_TICK_INVALID, position,
-                                whence);
+        vlc_player_osd_Position(player, input, VLC_TICK_INVALID, position);
 }
 
 void
@@ -147,17 +153,22 @@ vlc_player_input_SeekByTime(struct vlc_player_input *input, vlc_tick_t time,
     vlc_player_t *player = input->player;
     vlc_player_assert_seek_params(speed, whence);
 
-    const int type =
-        whence == VLC_PLAYER_WHENCE_ABSOLUTE ? INPUT_CONTROL_SET_TIME
-                                             : INPUT_CONTROL_JUMP_TIME;
-    int ret = input_ControlPush(input->thread, type,
+    if (whence != VLC_PLAYER_WHENCE_ABSOLUTE)
+        time += vlc_player_input_GetTime(input, true, vlc_tick_now());
+
+    if (time < VLC_TICK_0)
+        time = VLC_TICK_0;
+
+    vlc_player_UpdateTimerSeekState(player, time, -1);
+
+    int ret = input_ControlPush(input->thread, INPUT_CONTROL_SET_TIME,
         &(input_control_param_t) {
             .time.i_val = time,
             .time.b_fast_seek = speed == VLC_PLAYER_SEEK_FAST,
     });
 
     if (ret == VLC_SUCCESS)
-        vlc_player_osd_Position(player, input, time, -1, whence);
+        vlc_player_osd_Position(player, input, time, -1);
 }
 
 void

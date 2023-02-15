@@ -539,7 +539,7 @@ vlc_player_osd_Icon(vlc_player_t *player, short type);
 void
 vlc_player_osd_Position(vlc_player_t *player,
                         struct vlc_player_input *input, vlc_tick_t time,
-                        double position, enum vlc_player_whence whence);
+                        double position);
 void
 vlc_player_osd_Volume(vlc_player_t *player, bool mute_action);
 
