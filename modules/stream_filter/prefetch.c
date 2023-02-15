@@ -65,6 +65,7 @@ typedef struct
     bool         can_pace;
     bool         can_pause;
     uint64_t     size;
+    uint64_t     mtime;
     vlc_tick_t   pts_delay;
     char        *content_type;
 
@@ -365,6 +366,11 @@ static int Control(stream_t *stream, int query, va_list args)
                 return VLC_EGENERIC;
             *va_arg(args, uint64_t *) = sys->size;
             break;
+        case STREAM_GET_MTIME:
+            if (sys->mtime == (uint64_t)-1)
+                return VLC_EGENERIC;
+            *va_arg(args, uint64_t *) = sys->mtime;
+            break;
         case STREAM_GET_PTS_DELAY:
             *va_arg(args, vlc_tick_t *) = sys->pts_delay;
             break;
@@ -451,6 +457,8 @@ static int Open(vlc_object_t *obj)
 
     if (vlc_stream_GetSize(stream->s, &sys->size) != VLC_SUCCESS)
         sys->size = -1;
+    if (vlc_stream_GetMTime(stream->s, &sys->mtime) != VLC_SUCCESS)
+        sys->mtime = -1;
 
     vlc_stream_GetPtsDelay(stream->s, &sys->pts_delay);
     if (vlc_stream_GetContentType(stream->s, &sys->content_type) != VLC_SUCCESS)
