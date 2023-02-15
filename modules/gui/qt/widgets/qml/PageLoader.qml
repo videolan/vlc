@@ -21,6 +21,8 @@ import org.videolan.vlc 0.1
 FocusScope {
     id: root
 
+    // Properties
+
     property var view: null
 
     property var pageModel: []
@@ -31,20 +33,39 @@ FocusScope {
     // one may use `loadPage(string pageName)` to load the page from 'pageModel'
     property var loadDefaultView: null
 
+    // Private
+
+    property bool _ready: false
+
+    // Aliases
+
     property alias leftPadding: stackView.leftPadding
     property alias rightPadding: stackView.rightPadding
 
     property alias stackView: stackView
 
+    // Signals
+
     signal pageChanged(string page)
     signal currentItemChanged(var currentItem)
 
-    Component.onCompleted: loadView()
-    onViewChanged: {
+    // Events
+
+    Component.onCompleted: {
+        _ready = true
+
         loadView()
     }
 
+    onViewChanged: loadView()
+
+    // Functions
+
     function loadView() {
+        // NOTE: We wait for the item to be fully loaded to avoid size glitches.
+        if (_ready === false)
+            return
+
         if (view === null) {
             if (!loadDefaultView)
                 console.error("both 'view' and 'loadDefaultView' is null, history -", JSON.stringify(History.current))
@@ -78,6 +99,8 @@ FocusScope {
     function setCurrentItemFocus(reason) {
         stackView.setCurrentItemFocus(reason);
     }
+
+    // Children
 
     StackViewExt {
         id: stackView
