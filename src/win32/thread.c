@@ -694,7 +694,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
 {
     SelectClockSource(vlc);
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || NTDDI_VERSION >= NTDDI_WIN10_RS3
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
