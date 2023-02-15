@@ -413,7 +413,8 @@ static vlc_tick_t EsOutGetWakeup( es_out_t *out )
      * to avoid too heavy buffering */
     if( !input_priv(p_input)->b_can_pace_control ||
         input_priv(p_input)->b_out_pace_control ||
-        p_sys->b_buffering )
+        p_sys->b_buffering ||
+        p_sys->p_next_frame_es != NULL )
         return 0;
 
     return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
