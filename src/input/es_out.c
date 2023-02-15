@@ -2829,13 +2829,17 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         input_SendEventLength( p_sys->p_input, i_length );
 
-        if( !p_sys->b_buffering )
+        if( !p_sys->b_buffering || p_sys->p_next_frame_es != NULL )
         {
+            /* Also report times in next-frame mode without taking into
+             * account the buffering. */
+
             vlc_tick_t i_delay;
 
             /* Fix for buffering delay */
-            if( !input_priv(p_sys->p_input)->p_sout ||
-                !input_priv(p_sys->p_input)->b_out_pace_control )
+            if( p_sys->p_next_frame_es == NULL
+             && (!input_priv(p_sys->p_input)->p_sout ||
+                 !input_priv(p_sys->p_input)->b_out_pace_control ) )
                 i_delay = EsOutGetBuffering( out );
             else
                 i_delay = 0;
