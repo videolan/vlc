@@ -284,13 +284,12 @@ ColumnLayout {
         }
 
         handle: Rectangle {
-            width: slider.implicitHeight
-            height: slider.implicitHeight
+            width: VLCStyle.icon_small
+            height: width
+            radius: width * .5
 
             x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
             y: slider.topPadding + slider.availableHeight / 2 - height / 2
-
-            radius: slider.implicitHeight
 
             color: root._color
 
