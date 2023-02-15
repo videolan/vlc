@@ -31,7 +31,13 @@
 #include <string.h>
 #include <assert.h>
 #ifdef _WIN32
+# include <windows.h>
 # include <io.h>
+
+#ifndef IDN_ALLOW_UNASSIGNED // GAMES
+#define IDN_ALLOW_UNASSIGNED        0x01  // Allow unassigned "query" behavior per RFC 3454
+#endif
+
 #endif
 
 #include <vlc_common.h>
