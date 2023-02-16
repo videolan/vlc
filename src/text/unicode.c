@@ -214,6 +214,8 @@ char *vlc_strcasestr (const char *haystack, const char *needle)
         }
 
         s = vlc_towc (haystack, &(uint32_t) { 0 });
+        if (unlikely(s < 0))
+            return NULL;
         haystack += s;
     }
     while (s > 0);
