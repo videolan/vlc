@@ -52,8 +52,11 @@ endif
 
 RUSTUP_HOME= $(BUILDBINDIR)/.rustup
 CARGO_HOME = $(BUILDBINDIR)/.cargo
+CARGO_ENV = TARGET_CC="$(CC)" TARGET_AR="$(AR)" \
+	TARGET_CFLAGS="$(CFLAGS)" RUSTFLAGS="-C panic=abort -C opt-level=z"
 
-CARGO = . $(CARGO_HOME)/env && RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) cargo
+CARGO = . $(CARGO_HOME)/env && \
+		RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) $(CARGO_ENV) cargo
 
 CARGO_INSTALL_ARGS = --target=$(RUST_TARGET) --prefix=$(PREFIX) \
 	--library-type staticlib --release
@@ -64,10 +67,7 @@ CARGO_INSTALL_ARGS += \
 
 CARGO_INSTALL = $(CARGO) install $(CARGO_INSTALL_ARGS)
 
-CARGOC_INSTALL = export TARGET_CC="$(CC)" && export TARGET_AR="$(AR)" && \
-	export TARGET_CFLAGS="$(CFLAGS)" && \
-	export RUSTFLAGS="-C panic=abort -C opt-level=z" && \
-	$(CARGO) capi install $(CARGO_INSTALL_ARGS)
+CARGOC_INSTALL = $(CARGO) capi install $(CARGO_INSTALL_ARGS)
 
 download_vendor = \
 	$(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(1)) || (\
