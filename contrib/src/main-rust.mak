@@ -71,6 +71,10 @@ CARGO = . $(CARGO_HOME)/env && \
 CARGO_INSTALL_ARGS = --target=$(RUST_TARGET) --prefix=$(PREFIX) \
 	--library-type staticlib --profile=$(CARGO_PROFILE)
 
+ifeq ($(V),1)
+CARGO_INSTALL_ARGS += --verbose
+endif
+
 # Use the .cargo-vendor source if present, otherwise use crates.io
 CARGO_INSTALL_ARGS += \
 	$(shell test -d $<-vendor && echo --frozen --offline || echo --locked)
