@@ -36,7 +36,18 @@
 {
     NSDictionary *dict = @{(NSString*)kQLThumbnailOptionIconModeKey : [NSNumber numberWithBool:NO]};
     CFDictionaryRef dictRef = CFBridgingRetain(dict);
+    if (dictRef == NULL) {
+        NSLog(@"Got null dict for quickLook preview");
+        return nil;
+    }
+
     CFURLRef urlRef = CFBridgingRetain(url);
+    if (urlRef == NULL) {
+        NSLog(@"Got null url ref for quickLook preview");
+        CFRelease(dictRef);
+        return nil;
+    }
+
     CGImageRef qlThumbnailRef = QLThumbnailImageCreate(kCFAllocatorDefault,
                                                        urlRef,
                                                        size,
