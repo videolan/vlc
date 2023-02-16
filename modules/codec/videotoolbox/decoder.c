@@ -83,6 +83,7 @@ struct frame_info_t
     picture_t *p_picture;
     int i_poc;
     int i_foc;
+    vlc_tick_t pts;
     bool b_flush;
     bool b_eos;
     bool b_keyframe;
@@ -786,7 +787,7 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
         else if (p_sys->b_poc_based_reorder)
             b_insert = ((*pp_lead_in)->i_foc > p_info->i_foc);
         else
-            b_insert = ((*pp_lead_in)->p_picture->date >= p_info->p_picture->date);
+            b_insert = ((*pp_lead_in)->pts >= p_info->pts);
 
         if (b_insert)
         {
@@ -803,36 +804,44 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
 #endif
 }
 
-static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
+static int RemoveOneFrameFromDPB(decoder_sys_t *p_sys, picture_t **pp_ret)
 {
     frame_info_t *p_info = p_sys->p_pic_reorder;
     if (p_info == NULL)
-        return NULL;
+    {
+        *pp_ret = NULL;
+        return VLC_EGENERIC;
+    }
 
     const int i_framepoc = p_info->i_poc;
+    const vlc_tick_t i_framepts = p_info->pts;
 
-    picture_t *p_ret = NULL;
-    picture_t **pp_ret_last = &p_ret;
+    picture_t **pp_ret_last = pp_ret;
     bool b_dequeue;
 
     do
     {
-        picture_t *p_field = p_info->p_picture;
-
         /* Compute time if missing */
-        if (p_field->date == VLC_TICK_INVALID)
-            p_field->date = date_Get(&p_sys->pts);
+        if (p_info->pts == VLC_TICK_INVALID)
+            p_info->pts = date_Get(&p_sys->pts);
         else
-            date_Set(&p_sys->pts, p_field->date);
+            date_Set(&p_sys->pts, p_info->pts);
 
         /* Set next picture time, in case it is missing */
         if (p_info->i_length)
-            date_Set(&p_sys->pts, p_field->date + p_info->i_length);
+            date_Set(&p_sys->pts, p_info->pts + p_info->i_length);
         else
             date_Increment(&p_sys->pts, p_info->i_num_ts);
 
-        *pp_ret_last = p_field;
-        pp_ret_last = &p_field->p_next;
+        if( p_info->p_picture ) /* Can have no picture attached to entry on error */
+        {
+            if( p_info->p_picture->date == VLC_TICK_INVALID )
+                p_info->p_picture->date = p_info->pts;
+
+            /* Extract attached field to output list */
+            *pp_ret_last = p_info->p_picture;
+            pp_ret_last = &p_info->p_picture->p_next;
+        }
 
         p_sys->i_pic_reorder--;
 
@@ -845,7 +854,7 @@ static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
             if (p_sys->b_poc_based_reorder)
                 b_dequeue = (p_info->i_poc == i_framepoc);
             else
-                b_dequeue = (p_field->date == p_info->p_picture->date);
+                b_dequeue = (p_info->pts == i_framepts);
         }
         else
         {
@@ -854,7 +863,7 @@ static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
 
     } while(b_dequeue);
 
-    return p_ret;
+    return VLC_SUCCESS;
 }
 
 static void DrainDPBLocked(decoder_t *p_dec, bool flush)
@@ -862,10 +871,10 @@ static void DrainDPBLocked(decoder_t *p_dec, bool flush)
     decoder_sys_t *p_sys = p_dec->p_sys;
     for ( ;; )
     {
-        picture_t *p_fields = RemoveOneFrameFromDPB(p_sys);
-        if (p_fields == NULL)
+        picture_t *p_fields;
+        if(RemoveOneFrameFromDPB(p_sys, &p_fields) != VLC_SUCCESS)
             break;
-        do
+        for ( ; p_fields; )
         {
             picture_t *p_next = p_fields->p_next;
             p_fields->p_next = NULL;
@@ -874,7 +883,7 @@ static void DrainDPBLocked(decoder_t *p_dec, bool flush)
             else
                 decoder_QueueVideo(p_dec, p_fields);
             p_fields = p_next;
-        } while(p_fields != NULL);
+        }
     }
 }
 
@@ -901,6 +910,7 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
         p_info->b_keyframe = true;
     }
 
+    p_info->pts = p_block->i_pts;
     p_info->i_length = p_block->i_length;
 
     /* required for still pictures/menus */
@@ -915,7 +925,7 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
 static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    assert(p_info->p_picture);
+
     while(p_info->b_flush || p_sys->i_pic_reorder >= p_sys->i_pic_reorder_max)
     {
         /* First check if DPB sizing was correct before removing one frame */
@@ -932,8 +942,8 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
                 break;
             }
             else if (!p_sys->b_poc_based_reorder &&
-                     p_info->p_picture->date > VLC_TICK_INVALID &&
-                     p_sys->p_pic_reorder->p_picture->date > p_info->p_picture->date)
+                     p_info->pts > VLC_TICK_INVALID &&
+                     p_sys->p_pic_reorder->pts > p_info->pts)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
@@ -944,16 +954,16 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             }
         }
 
-        picture_t *p_fields = RemoveOneFrameFromDPB(p_sys);
-        if (p_fields == NULL)
+        picture_t *p_fields;
+        if(RemoveOneFrameFromDPB(p_sys, &p_fields) != VLC_SUCCESS)
             break;
-        do
+        for(; p_fields;)
         {
             picture_t *p_next = p_fields->p_next;
             p_fields->p_next = NULL;
             decoder_QueueVideo(p_dec, p_fields);
             p_fields = p_next;
-        } while(p_fields != NULL);
+        }
     }
 
     InsertIntoDPB(p_sys, p_info);
@@ -1791,7 +1801,8 @@ static void Drain(decoder_t *p_dec, bool flush)
 
     vlc_mutex_lock(&p_sys->lock);
     DrainDPBLocked(p_dec, flush);
-    assert(RemoveOneFrameFromDPB(p_sys) == NULL);
+    picture_t *p_output;
+    assert(RemoveOneFrameFromDPB(p_sys, &p_output) == VLC_EGENERIC);
     p_sys->b_vt_flush = false;
     p_sys->b_vt_feed = false;
     p_sys->b_drop_blocks = false;
@@ -2179,19 +2190,20 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     if (CVPixelBufferGetDataSize(imageBuffer) == 0)
         goto end;
 
-    if (likely(p_info))
+    if (unlikely(p_info == NULL))
     {
-        /* Unlock the mutex because decoder_NewPicture() is blocking. Indeed,
+        vlc_mutex_unlock(&p_sys->lock);
+        return;
+    }
+
+    /* Unlock the mutex because decoder_NewPicture() is blocking. Indeed,
          * it can wait indefinitely when the input is paused. */
 
-        vlc_mutex_unlock(&p_sys->lock);
+    vlc_mutex_unlock(&p_sys->lock);
 
-        picture_t *p_pic = decoder_NewPicture(p_dec);
-        if (!p_pic)
-            goto unlocked_end;
-
-        p_info->p_picture = p_pic;
-
+    picture_t *p_pic = decoder_NewPicture(p_dec);
+    if (p_pic)
+    {
         p_pic->date = pts.value;
         p_pic->b_force = p_info->b_eos;
         p_pic->b_still = p_info->b_eos;
@@ -2203,36 +2215,31 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         }
 
         if (cvpxpic_attach(p_pic, imageBuffer, p_sys->vctx,
-                           video_context_OnPicReleased) != VLC_SUCCESS)
+                           video_context_OnPicReleased) == VLC_SUCCESS)
         {
-            picture_Release(p_pic);
-            goto unlocked_end;
+            /* VT is not pacing frame allocation. If we are not fast enough to
+                 * render (release) the output pictures, the VT session can end up
+                 * allocating way too many frames. This can be problematic for 4K
+                 * 10bits. To fix this issue, we ensure that we don't have too many
+                 * output frames allocated by waiting for the vout to release them. */
+            if (pic_pacer_Wait(p_sys->pic_pacer, p_pic))
+                msg_Warn(p_dec, "pic_pacer_Wait timed out");
         }
-
-        /* VT is not pacing frame allocation. If we are not fast enough to
-         * render (release) the output pictures, the VT session can end up
-         * allocating way too many frames. This can be problematic for 4K
-         * 10bits. To fix this issue, we ensure that we don't have too many
-         * output frames allocated by waiting for the vout to release them. */
-        if (pic_pacer_Wait(p_sys->pic_pacer, p_pic))
-            msg_Warn(p_dec, "pic_pacer_Wait timed out");
-
-        vlc_mutex_lock(&p_sys->lock);
-
-        if (p_sys->b_vt_flush)
-        {
-            picture_Release(p_pic);
-            goto end;
-        }
-
-        OnDecodedFrame( p_dec, p_info );
-        p_info = NULL;
     }
 
+    vlc_mutex_lock(&p_sys->lock);
+
+    if (p_sys->b_vt_flush)
+        picture_Release(p_pic);
+    else
+        p_info->p_picture = p_pic;
+
+    OnDecodedFrame( p_dec, p_info );
+    p_info = NULL;
+
 end:
-    vlc_mutex_unlock(&p_sys->lock);
-unlocked_end:
     free(p_info);
+    vlc_mutex_unlock(&p_sys->lock);
     return;
 }
 
