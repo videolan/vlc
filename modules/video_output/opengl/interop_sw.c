@@ -44,6 +44,7 @@ typedef struct
 
 struct priv
 {
+    bool   has_gl_3;
     bool   has_texture_rg;
     bool   has_unpack_subimage;
     void * texture_temp_buf;
@@ -354,6 +355,70 @@ DivideRationalByTwo(vlc_rational_t *r) {
         r->den *= 2;
 }
 
+static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fmt)
+{
+    struct priv *priv = interop->priv;
+    if (*intfmt == 0)
+        return true;
+
+    //GLES 3.0, OpenGL 3.0 and OpenGL with GL_ARB_texture_rg
+    //don't need transformations
+    if (priv->has_gl_3
+        || (priv->has_texture_rg && interop->gl->api_type == VLC_OPENGL))
+        return true;
+
+    //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
+    if (priv->has_texture_rg)
+    {
+        switch (*intfmt) {
+        case GL_R8:
+            *intfmt = GL_RED;
+            *fmt = GL_RED;
+            break;
+        case GL_RG8:
+            *intfmt = GL_RG;
+            *fmt = GL_RG;
+            break;
+        case GL_R16UI:
+        case GL_RG16UI:
+            return false;
+        default:
+            vlc_assert_unreachable();
+        }
+
+        return true;
+    }
+
+    //fallback to GL_LUMINANCE / GL_LUMINANCE_ALPHA
+    switch (*intfmt) {
+    case GL_R8:
+        *intfmt = GL_LUMINANCE;
+        *fmt = GL_LUMINANCE;
+        break;
+    case GL_R16UI:
+        if (interop->gl->api_type == VLC_OPENGL_ES2)
+            return false;
+
+        *intfmt = GL_LUMINANCE16;
+        *fmt = GL_LUMINANCE;
+        break;
+    case GL_RG8:
+        *intfmt = GL_LUMINANCE_ALPHA;
+        *fmt = GL_LUMINANCE_ALPHA;
+        break;
+    case GL_RG16UI:
+        if (interop->gl->api_type == VLC_OPENGL_ES2)
+            return false;
+
+        *intfmt = GL_LUMINANCE16_ALPHA16;
+        *fmt = GL_LUMINANCE_ALPHA;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
+    return true;
+}
+
 static int
 interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                       vlc_fourcc_t chroma, const vlc_chroma_description_t *desc)
@@ -373,42 +438,14 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     } formats[] = {
         // 3 planes
             // 8 bits pixels
-                // OpenGL, no texture RG
-                { GL_LUMINANCE, GL_LUMINANCE, 0, 0,  GL_UNSIGNED_BYTE, 0 },
-                // OpenGL, texture RG available
-                { GL_RED, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
-                // OpenGLES, no texture RG
-                { GL_LUMINANCE, GL_LUMINANCE, 0, 0, GL_UNSIGNED_BYTE, 0 },
-                // OpenGLES, texture RG available
-                { GL_RED, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
+            { GL_R8, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
             // 16 bits pixels
-                // OpenGL, no texture RG
-                { GL_LUMINANCE16, GL_LUMINANCE16, 0, 0, GL_UNSIGNED_SHORT, 0 },
-                // OpenGL, texture RG available
-                { GL_R16, GL_RG16, 0, 0, GL_UNSIGNED_SHORT, 0 },
-                // OpenGLES, no texture RG
-                { GL_LUMINANCE16, GL_LUMINANCE16, 0, 0, GL_UNSIGNED_SHORT, 0 },
-                // OpenGLES, texture RG available
-                { GL_R16, GL_RG, 0, 0, GL_UNSIGNED_SHORT, 0 },
+            { GL_R16UI, GL_RED, 0, 0, GL_UNSIGNED_SHORT, 0 },
         // 2 planes
             // 8 bits pixels
-                // OpenGL, no texture RG
-                { GL_LUMINANCE, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
-                // OpenGL texture RG available
-                { GL_RED, GL_RED, GL_RG, GL_RG, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
-                // OpenGLES, no texture RG
-                { GL_LUMINANCE, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
-                // OpenGLES, texture RG available
-                { GL_RED, GL_RED, GL_RG, GL_RG, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
+            { GL_R8, GL_RED, GL_RG8, GL_RG, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
             // 16 bits pixels
-                // OpenGL, no texture RG
-                { GL_LUMINANCE16, GL_LUMINANCE, GL_LUMINANCE16, GL_LUMINANCE, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
-                // OpenGL texture RG available
-                { GL_RG, GL_RG16, GL_RG, GL_RG16, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
-                // OpenGLES, no texture RG
-                { GL_LUMINANCE16, GL_LUMINANCE, GL_LUMINANCE16, GL_LUMINANCE, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
-                // OpenGLES, texture RG available
-                { GL_R16, GL_RG, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
+            { GL_R16UI, GL_RED, GL_RG16UI, GL_RG_INTEGER, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
         // 1 plane is a special case that will be handled explicitly
     };
 
@@ -418,17 +455,11 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
         /* The pictures have only 1 plane, but it is uploaded twice, once to
          * access the Y components, once to access the UV components. See
          * #26712. */
-        GLint fmt, intfmt;
-        if (priv->has_texture_rg)
-        {
-            intfmt = GL_RG8;
-            fmt = GL_RG;
-        }
-        else
-        {
-            intfmt = GL_LUMINANCE;
-            fmt = GL_LUMINANCE_ALPHA;
-        }
+        GLint intfmt = GL_RG8;
+        GLint fmt = GL_RG;
+        if (!fixGLFormat(interop, &intfmt, &fmt))
+            return VLC_EGENERIC;
+
         interop->tex_count = 2;
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { 1, 1 }, { 1, 1 },
@@ -447,7 +478,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     case 3:
         break;
     case 2:
-        format_index += 8;
+        format_index += 2;
         break;
     default:
         vlc_assert_unreachable();
@@ -459,23 +490,31 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     case 1:
         break;
     case 2:
-        format_index += 4;
+        format_index += 1;
         break;
     default:
         return VLC_EGENERIC;
     }
-    if (interop->gl->api_type != VLC_OPENGL)
-        format_index += 2;
-    if (priv->has_texture_rg)
-        format_index += 1;
+
     assert(format_index < ARRAY_SIZE(formats));
 
     struct interop_formats* format = &formats[format_index];
+
+    GLint plane1_intfmt = format->intfmt;
+    GLint plane1_fmt = format->fmt;
+    if (!fixGLFormat(interop, &plane1_intfmt, &plane1_fmt))
+        return VLC_EGENERIC;
+
+    GLint plane2_intfmt = format->plane2_intfmt;
+    GLint plane2_fmt = format->plane2_fmt;
+    if (!fixGLFormat(interop, &plane2_intfmt, &plane2_fmt))
+        return VLC_EGENERIC;
+
     msg_Dbg(interop, "Using format at index %u", format_index);
-    msg_Dbg(interop, "Plane1: fmt=%#x intfmt=%#x type=%#x", format->fmt,
-            format->intfmt, format->type);
-    msg_Dbg(interop, "Plane2: fmt=%#x intfmt=%#x type=%#x", format->plane2_fmt,
-            format->plane2_intfmt, format->plane2_type);
+    msg_Dbg(interop, "Plane1: fmt=%#x intfmt=%#x type=%#x", plane1_fmt,
+            plane1_intfmt, format->type);
+    msg_Dbg(interop, "Plane2: fmt=%#x intfmt=%#x type=%#x", plane2_fmt,
+            plane2_intfmt, format->plane2_type);
 
 
     if (desc->pixel_size == 2)
@@ -493,7 +532,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
             interop->texs[i] = (struct vlc_gl_tex_cfg) {
                 { desc->p[i].w.num, desc->p[i].w.den },
                 { desc->p[i].h.num, desc->p[i].h.den },
-                format->intfmt, format->fmt, format->type
+                plane1_intfmt, plane1_fmt, format->type
             };
         }
     }
@@ -511,12 +550,12 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { desc->p[0].w.num, desc->p[0].w.den },
             { desc->p[0].h.num, desc->p[0].h.den },
-            format->intfmt, format->fmt, format->type
+            plane1_intfmt, plane1_fmt, format->type
         };
         interop->texs[1] = (struct vlc_gl_tex_cfg) {
             { desc->p[1].w.num, desc->p[1].w.den },
             { desc->p[1].h.num, desc->p[1].h.den },
-            format->plane2_intfmt, format->plane2_fmt, format->plane2_type
+            plane2_intfmt, plane2_fmt, format->plane2_type
         };
 
         /*
@@ -643,8 +682,10 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         || vlc_gl_HasExtension(&extension_vt, "GL_EXT_unpack_subimage");
 
     /* RG textures are available natively since OpenGL 3.0 and OpenGL ES 3.0 */
-    priv->has_texture_rg = vlc_gl_GetVersionMajor(&extension_vt) >= 3
-        || (interop->gl->api_type == VLC_OPENGL
+    priv->has_gl_3 = vlc_gl_GetVersionMajor(&extension_vt) >= 3;
+
+    priv->has_texture_rg =
+        (interop->gl->api_type == VLC_OPENGL
             && vlc_gl_HasExtension(&extension_vt, "GL_ARB_texture_rg"))
         || (interop->gl->api_type == VLC_OPENGL_ES2
             && vlc_gl_HasExtension(&extension_vt, "GL_EXT_texture_rg"));
