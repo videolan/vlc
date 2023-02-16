@@ -513,8 +513,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     _cachedArtists = nil;
     _cachedAudioMedia = nil;
 
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListUpdated object:nil];
-    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListUpdated object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelVideoMediaListUpdated object:self];
+    [_defaultNotificationCenter postNotificationName:VLCLibraryModelAudioMediaListUpdated object:self];
 }
 
 @end
