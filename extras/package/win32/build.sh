@@ -263,20 +263,20 @@ if [ ! -z "$BUILD_UCRT" ]; then
         CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
-        EXTRA_CRUNTIME="vcruntime140_app"
+        EXTRA_CRUNTIME="-lvcruntime140_app"
     else
         SHORTARCH="$SHORTARCH-ucrt"
         # this library doesn't exist yet, so use ucrt twice as a placeholder
-        # EXTRA_CRUNTIME="vcruntime140"
-        EXTRA_CRUNTIME="ucrt"
+        # EXTRA_CRUNTIME="-lvcruntime140"
+        EXTRA_CRUNTIME="-lucrt"
     fi
 
-    LDFLAGS="$LDFLAGS -l$EXTRA_CRUNTIME -lucrt"
+    LDFLAGS="$LDFLAGS $EXTRA_CRUNTIME -lucrt"
     if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
         # assume gcc
         NEWSPECFILE="`pwd`/specfile-$SHORTARCH"
         # tell gcc to replace msvcrt with ucrtbase+ucrt
-        $CC -dumpspecs | sed -e "s/-lmsvcrt/-l$EXTRA_CRUNTIME -lucrt/" > $NEWSPECFILE
+        $CC -dumpspecs | sed -e "s/-lmsvcrt/$EXTRA_CRUNTIME -lucrt/" > $NEWSPECFILE
         CFLAGS="$CFLAGS -specs=$NEWSPECFILE"
         CXXFLAGS="$CXXFLAGS -specs=$NEWSPECFILE"
 
@@ -288,8 +288,8 @@ if [ ! -z "$BUILD_UCRT" ]; then
             sed -i -e "s/-lkernel32//" $NEWSPECFILE
         fi
     else
-        CFLAGS="$CFLAGS -Wl,-l$EXTRA_CRUNTIME,-lucrt"
-        CXXFLAGS="$CXXFLAGS -Wl,-l$EXTRA_CRUNTIME,-lucrt"
+        CFLAGS="$CFLAGS -Wl,$EXTRA_CRUNTIME,-lucrt"
+        CXXFLAGS="$CXXFLAGS -Wl,$EXTRA_CRUNTIME,-lucrt"
     fi
 
     # the values are not passed to the makefiles/configures
