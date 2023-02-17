@@ -456,6 +456,11 @@ vlc_player_input_SeekByTime(struct vlc_player_input *input, vlc_tick_t time,
                             enum vlc_player_whence whence);
 
 void
+vlc_player_input_UpdateViewpoint(struct vlc_player_input *input,
+                                 const vlc_viewpoint_t *viewpoint,
+                                 enum vlc_player_whence whence);
+
+void
 vlc_player_input_HandleState(struct vlc_player_input *, enum vlc_player_state,
                              vlc_tick_t state_date);
 
