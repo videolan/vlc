@@ -990,6 +990,10 @@ input_thread_Events(input_thread_t *input_thread,
                                  input->signal_quality, input->signal_strength);
             break;
         case INPUT_EVENT_CACHE:
+            if (event->cache == 0.0f)
+                vlc_player_UpdateTimerState(player, NULL,
+                                            VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
+                                            VLC_TICK_INVALID);
             input->cache = event->cache;
             vlc_player_SendEvent(player, on_buffering_changed, event->cache);
             break;
