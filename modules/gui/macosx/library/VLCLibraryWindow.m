@@ -758,7 +758,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     VLCVoutView *videoView = self.videoView;
     videoView.translatesAutoresizingMaskIntoConstraints = NO;
     videoView.hidden = NO;
-    
+
     [_libraryTargetView addSubview:videoView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(videoView);
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[videoView(>=572.)]|"
@@ -794,6 +794,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:YES];
+    [self hideControlsBar];
 }
 
 - (void)disableVideoPlaybackAppearance
@@ -822,6 +823,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:NO];
+    [self showControlsBar];
 }
 
 - (void)mouseMoved:(NSEvent *)o_event
