@@ -1493,16 +1493,6 @@ static size_t ControlGetReducedIndexLocked( input_thread_t *p_input,
         {
             return sys->i_control - 1;
         }
-        else if ( i_ct == INPUT_CONTROL_JUMP_TIME )
-        {
-            c->param.time.i_val += prev_control->param.time.i_val;
-            return sys->i_control - 1;
-        }
-        else if ( i_ct == INPUT_CONTROL_JUMP_POSITION )
-        {
-            c->param.pos.f_val += prev_control->param.pos.f_val;
-            return sys->i_control - 1;
-        }
         else if ( i_ct == INPUT_CONTROL_UPDATE_VIEWPOINT )
         {
             c->param.viewpoint.yaw += prev_control->param.viewpoint.yaw;
@@ -1601,9 +1591,7 @@ static bool ControlIsSeekRequest( int i_type )
     switch( i_type )
     {
     case INPUT_CONTROL_SET_POSITION:
-    case INPUT_CONTROL_JUMP_POSITION:
     case INPUT_CONTROL_SET_TIME:
-    case INPUT_CONTROL_JUMP_TIME:
     case INPUT_CONTROL_SET_TITLE:
     case INPUT_CONTROL_SET_TITLE_NEXT:
     case INPUT_CONTROL_SET_TITLE_PREV:
@@ -1917,9 +1905,7 @@ static bool Control( input_thread_t *p_input,
     switch( i_type )
     {
         case INPUT_CONTROL_SET_POSITION:
-        case INPUT_CONTROL_JUMP_POSITION:
         {
-            const bool absolute = i_type == INPUT_CONTROL_SET_POSITION;
             if( priv->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION ignored while recording" );
@@ -1929,12 +1915,10 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
             if( demux_SetPosition( priv->master->p_demux, param.pos.f_val,
-                                   !param.pos.b_fast_seek, absolute ) )
+                                   !param.pos.b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
-                         "%s%2.1f%% failed",
-                         absolute ? "@" : param.pos.f_val >= 0 ? "+" : "",
-                         param.pos.f_val * 100.f );
+                         "%2.1f%% failed", param.pos.f_val * 100.f );
             }
             else
             {
@@ -1948,9 +1932,7 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_SET_TIME:
-        case INPUT_CONTROL_JUMP_TIME:
         {
-            const bool absolute = i_type == INPUT_CONTROL_SET_TIME;
             int i_ret;
 
             if( priv->b_recording )
@@ -1963,7 +1945,7 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
 
             i_ret = demux_SetTime( priv->master->p_demux, param.time.i_val,
-                                   !param.time.b_fast_seek, absolute );
+                                   !param.time.b_fast_seek );
             if( i_ret )
             {
                 vlc_tick_t i_length = InputSourceGetLength( priv->master, priv->p_item );
@@ -1972,16 +1954,13 @@ static bool Control( input_thread_t *p_input,
                 {
                     double f_pos = (double)param.time.i_val / (double)i_length;
                     i_ret = demux_SetPosition( priv->master->p_demux, f_pos,
-                                               !param.time.b_fast_seek,
-                                               absolute );
+                                               !param.time.b_fast_seek );
                 }
             }
             if( i_ret )
             {
-                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME %s%"PRId64
-                         " failed or not possible",
-                         absolute ? "@" : param.time.i_val >= 0 ? "+" : "",
-                         param.time.i_val );
+                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME @%"PRId64
+                         " failed or not possible", param.time.i_val );
             }
             else
             {

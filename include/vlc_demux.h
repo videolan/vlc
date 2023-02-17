@@ -544,18 +544,8 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
     return true;
 }
 
-static inline int demux_SetPosition( demux_t *p_demux, double pos, bool precise,
-                                     bool absolute)
+static inline int demux_SetPosition( demux_t *p_demux, double pos, bool precise )
 {
-    if( !absolute )
-    {
-        double current_pos;
-        int ret = vlc_demux_GetPosition( p_demux, &current_pos );
-        if( ret != VLC_SUCCESS )
-            return ret;
-        pos += current_pos;
-    }
-
     if( pos < 0.f )
         pos = 0.f;
     else if( pos > 1.f )
@@ -563,18 +553,8 @@ static inline int demux_SetPosition( demux_t *p_demux, double pos, bool precise,
     return demux_Control( p_demux, DEMUX_SET_POSITION, pos, precise );
 }
 
-static inline int demux_SetTime( demux_t *p_demux, vlc_tick_t time, bool precise,
-                                 bool absolute )
+static inline int demux_SetTime( demux_t *p_demux, vlc_tick_t time, bool precise )
 {
-    if( !absolute )
-    {
-        vlc_tick_t current_time;
-        int ret = vlc_demux_GetTime( p_demux, &current_time );
-        if( ret != VLC_SUCCESS )
-            return ret;
-        time += current_time;
-    }
-
     if( time < 0 )
         time = 0;
     return demux_Control( p_demux, DEMUX_SET_TIME, time, precise );

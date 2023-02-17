@@ -804,7 +804,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 vlc_tick_t i_time = va_arg( args, vlc_tick_t );
                 i_time -= p_sys->tk[p_sys->i_time_track_index].i_first_pts;
-                return demux_SetPosition( p_demux, (double) i_time / p_sys->i_length, false, true );
+                return demux_SetPosition( p_demux, (double) i_time / p_sys->i_length, false );
             }
             break;
         }
