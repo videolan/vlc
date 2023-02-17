@@ -121,6 +121,8 @@ vlc_player_osd_Position(vlc_player_t *player,
                         struct vlc_player_input *input, vlc_tick_t time,
                         double position, enum vlc_player_whence whence)
 {
+    vlc_tick_t now = vlc_tick_now();
+
     if (input->length != VLC_TICK_INVALID)
     {
         if (time == VLC_TICK_INVALID)
@@ -136,7 +138,7 @@ vlc_player_osd_Position(vlc_player_t *player,
     {
         if (whence == VLC_PLAYER_WHENCE_RELATIVE)
         {
-            time += vlc_player_input_GetTime(input); /* XXX: TOCTOU */
+            time += vlc_player_input_GetTime(input, now);
             if (time < 0)
                 time = 0;
         }
@@ -157,7 +159,7 @@ vlc_player_osd_Position(vlc_player_t *player,
     {
         if (whence == VLC_PLAYER_WHENCE_RELATIVE)
         {
-            position += vlc_player_input_GetPos(input); /* XXX: TOCTOU */
+            position += vlc_player_input_GetPos(input, now);
             if (position < 0.f)
                 position = 0.f;
         }

@@ -1378,7 +1378,7 @@ vlc_player_GetTime(vlc_player_t *player)
     if (!input)
         return VLC_TICK_INVALID;
 
-    return vlc_player_input_GetTime(input);
+    return vlc_player_input_GetTime(input, vlc_tick_now());
 }
 
 double
@@ -1386,7 +1386,7 @@ vlc_player_GetPosition(vlc_player_t *player)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
-    return input ? vlc_player_input_GetPos(input) : -1.f;
+    return input ? vlc_player_input_GetPos(input, vlc_tick_now()) : -1.f;
 }
 
 void
@@ -1395,9 +1395,11 @@ vlc_player_DisplayPosition(vlc_player_t *player)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (!input)
         return;
+
+    vlc_tick_t now = vlc_tick_now();
     vlc_player_osd_Position(player, input,
-                            vlc_player_input_GetTime(input),
-                            vlc_player_input_GetPos(input),
+                            vlc_player_input_GetTime(input, now),
+                            vlc_player_input_GetPos(input, now),
                             VLC_PLAYER_WHENCE_ABSOLUTE);
 }
 
