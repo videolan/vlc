@@ -241,9 +241,8 @@ if [ ! -z "$BUILD_UCRT" ]; then
     else
         SHORTARCH="$SHORTARCH-ucrt"
         WINVER=0x0601
-        # this library doesn't exist yet, so use ucrt twice as a placeholder
+        # this library doesn't exist yet
         # EXTRA_CRUNTIME="-lvcruntime140"
-        EXTRA_CRUNTIME="-lucrt"
     fi
 
     LDFLAGS="$LDFLAGS $EXTRA_CRUNTIME -lucrt"
@@ -263,8 +262,10 @@ if [ ! -z "$BUILD_UCRT" ]; then
             sed -i -e "s/-lkernel32//" $NEWSPECFILE
         fi
     else
-        CFLAGS="$CFLAGS -Wl,$EXTRA_CRUNTIME,-lucrt"
-        CXXFLAGS="$CXXFLAGS -Wl,$EXTRA_CRUNTIME,-lucrt"
+        if [ -n "$EXTRA_CRUNTIME" ]; then
+            CFLAGS="$CFLAGS -Wl,$EXTRA_CRUNTIME"
+            CXXFLAGS="$CXXFLAGS -Wl,$EXTRA_CRUNTIME"
+        fi
     fi
 
     # the values are not passed to the makefiles/configures
