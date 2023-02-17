@@ -792,6 +792,71 @@ vlc_player_input_HandleVoutEvent(struct vlc_player_input *input,
 }
 
 static void
+vlc_player_input_NavigationFallback(struct vlc_player_input *input, int nav_type)
+{
+    vlc_player_t *player = input->player;
+
+    /* Handle Up/Down/Left/Right if the demux can't navigate */
+    vlc_viewpoint_t vp = { 0 };
+    int vol_direction = 0;
+    int seek_direction = 0;
+    switch (nav_type)
+    {
+        case INPUT_CONTROL_NAV_UP:
+            vol_direction = 1;
+            vp.pitch = -1.f;
+            break;
+        case INPUT_CONTROL_NAV_DOWN:
+            vol_direction = -1;
+            vp.pitch = 1.f;
+            break;
+        case INPUT_CONTROL_NAV_LEFT:
+            seek_direction = -1;
+            vp.yaw = -1.f;
+            break;
+        case INPUT_CONTROL_NAV_RIGHT:
+            seek_direction = 1;
+            vp.yaw = 1.f;
+            break;
+        case INPUT_CONTROL_NAV_ACTIVATE:
+        case INPUT_CONTROL_NAV_POPUP:
+        case INPUT_CONTROL_NAV_MENU:
+            return;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    /* Try to change the viewpoint if possible */
+    bool viewpoint_ch = false;
+    size_t vout_count;
+    vout_thread_t **vouts = vlc_player_vout_HoldAll(input->player, &vout_count);
+    for (size_t i = 0; i < vout_count; ++i)
+    {
+        if (!viewpoint_ch && var_GetBool(vouts[i], "viewpoint-changeable"))
+            viewpoint_ch = true;
+        vout_Release(vouts[i]);
+    }
+    free(vouts);
+
+    if (viewpoint_ch)
+        vlc_player_input_UpdateViewpoint(input, &vp, VLC_PLAYER_WHENCE_RELATIVE);
+    else if (seek_direction != 0)
+    {
+        /* Seek or change volume if the input doesn't have navigation or viewpoint */
+        vlc_tick_t it = vlc_tick_from_sec(seek_direction
+                      * var_InheritInteger(player, "short-jump-size"));
+        vlc_player_input_SeekByTime(input, it, VLC_PLAYER_SEEK_PRECISE,
+                                    VLC_PLAYER_WHENCE_RELATIVE);
+    }
+    else
+    {
+        assert(vol_direction != 0);
+        if (input == player->input)
+            vlc_player_aout_IncrementVolume(player, vol_direction, NULL);
+    }
+}
+
+static void
 input_thread_Events(input_thread_t *input_thread,
                     const struct vlc_input_event *event, void *user_data)
 {
@@ -961,6 +1026,9 @@ input_thread_Events(input_thread_t *input_thread,
                                  input_GetItem(input->thread),
                                  event->attachments.array,
                                  event->attachments.count);
+            break;
+        case INPUT_EVENT_NAV_FAILED:
+            vlc_player_input_NavigationFallback(input, event->nav_type);
             break;
         default:
             break;

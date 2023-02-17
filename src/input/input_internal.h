@@ -145,6 +145,9 @@ typedef enum input_event_type_e
 
     /* Attachments */
     INPUT_EVENT_ATTACHMENTS,
+
+    /* The demux is not able to navigate */
+    INPUT_EVENT_NAV_FAILED,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -310,6 +313,8 @@ struct vlc_input_event
         picture_t *thumbnail;
         /* INPUT_EVENT_ATTACHMENTS */
         struct vlc_input_event_attachments attachments;
+        /* INPUT_EVENT_NAV_FAILED */
+        int nav_type;
     };
 };
 

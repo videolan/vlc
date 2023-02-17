@@ -1755,80 +1755,10 @@ static void ControlNav( input_thread_t *p_input, int i_type )
                         - INPUT_CONTROL_NAV_ACTIVATE + DEMUX_NAV_ACTIVATE ) )
         return; /* The demux handled the navigation control */
 
-    /* Handle Up/Down/Left/Right if the demux can't navigate */
-    vlc_viewpoint_t vp = {0};
-    int vol_direction = 0;
-    int seek_direction = 0;
-    switch( i_type )
-    {
-        case INPUT_CONTROL_NAV_UP:
-            vol_direction = 1;
-            vp.pitch = -1.f;
-            break;
-        case INPUT_CONTROL_NAV_DOWN:
-            vol_direction = -1;
-            vp.pitch = 1.f;
-            break;
-        case INPUT_CONTROL_NAV_LEFT:
-            seek_direction = -1;
-            vp.yaw = -1.f;
-            break;
-        case INPUT_CONTROL_NAV_RIGHT:
-            seek_direction = 1;
-            vp.yaw = 1.f;
-            break;
-        case INPUT_CONTROL_NAV_ACTIVATE:
-        case INPUT_CONTROL_NAV_POPUP:
-        case INPUT_CONTROL_NAV_MENU:
-            return;
-        default:
-            vlc_assert_unreachable();
-    }
-
-    /* Try to change the viewpoint if possible */
-    vout_thread_t **pp_vout;
-    size_t i_vout;
-    bool b_viewpoint_ch = false;
-    input_resource_HoldVouts( priv->p_resource, &pp_vout, &i_vout );
-    for( size_t i = 0; i < i_vout; ++i )
-    {
-        if( !b_viewpoint_ch
-         && var_GetBool( pp_vout[i], "viewpoint-changeable" ) )
-            b_viewpoint_ch = true;
-        vout_Release(pp_vout[i]);
-    }
-    free( pp_vout );
-
-    if( b_viewpoint_ch )
-    {
-        priv->viewpoint_changed = true;
-        priv->viewpoint.yaw   += vp.yaw;
-        priv->viewpoint.pitch += vp.pitch;
-        priv->viewpoint.roll  += vp.roll;
-        priv->viewpoint.fov   += vp.fov;
-        ViewpointApply( p_input );
-        return;
-    }
-
-    /* Seek or change volume if the input doesn't have navigation or viewpoint */
-    if( seek_direction != 0 )
-    {
-        vlc_tick_t it = vlc_tick_from_sec( seek_direction * var_InheritInteger( p_input, "short-jump-size" ) );
-        Control( p_input, INPUT_CONTROL_JUMP_TIME, (input_control_param_t) {
-            .time.b_fast_seek = false,
-            .time.i_val = it
-        });
-    }
-    else
-    {
-        assert( vol_direction != 0 );
-        audio_output_t *p_aout = input_resource_HoldAout( priv->p_resource );
-        if( p_aout )
-        {
-            aout_VolumeUpdate( p_aout, vol_direction, NULL );
-            aout_Release(p_aout);
-        }
-    }
+    input_SendEvent(p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_NAV_FAILED,
+        .nav_type = i_type,
+    });
 }
 
 static void ControlUpdateRenderer( input_thread_t *p_input, bool b_enable )
