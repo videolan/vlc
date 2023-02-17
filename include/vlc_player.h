@@ -3399,6 +3399,15 @@ struct vlc_player_timer_cbs
      * @param data opaque pointer set by vlc_player_AddTimer()
      */
     void (*on_discontinuity)(vlc_tick_t system_date, void *data);
+
+    /**
+     * Called when the player is seeking or finished seeking
+     *
+     * @param value point of the seek request or NULL when seeking is finished
+     * value.system_date = VLC_TICK_MAX in that case
+     * @param data opaque pointer set by vlc_player_AddTimer()
+     */
+    void (*on_seek)(const struct vlc_player_timer_point *value, void *data);
 };
 
 /**

@@ -215,12 +215,15 @@ struct vlc_player_timer
     vlc_mutex_t lock;
 
     enum vlc_player_timer_state state;
-    bool seeking;
 
     vlc_tick_t input_length;
     vlc_tick_t input_normal_time;
     vlc_tick_t last_ts;
     double input_position;
+
+    vlc_tick_t seek_ts;
+    double seek_position;
+    bool seeking;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];
 #define best_source sources[VLC_PLAYER_TIMER_TYPE_BEST]
@@ -483,6 +486,10 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
                             vlc_tick_t system_date);
 
 void
+vlc_player_UpdateTimerSeekState(vlc_player_t *player, vlc_tick_t time,
+                                double position);
+
+void
 vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
                        bool es_source_is_master,
                        const struct vlc_player_timer_point *point,
@@ -493,7 +500,8 @@ void
 vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source);
 
 int
-vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
+vlc_player_GetTimerPoint(vlc_player_t *player, bool seeking,
+                         vlc_tick_t system_now,
                          vlc_tick_t *out_ts, double *out_pos);
 
 /*

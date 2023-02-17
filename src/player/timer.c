@@ -37,8 +37,26 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.last_ts = VLC_TICK_INVALID;
     player->timer.input_position = 0;
     player->timer.smpte_source.smpte.last_framenum = ULONG_MAX;
+    player->timer.seek_ts = VLC_TICK_INVALID;
+    player->timer.seek_position = -1;
+    player->timer.seeking = false;
 
     vlc_mutex_unlock(&player->timer.lock);
+}
+
+static void
+vlc_player_SendTimerSeek(vlc_player_t *player,
+                         struct vlc_player_timer_source *source,
+                         const struct vlc_player_timer_point *point)
+{
+    (void) player;
+    vlc_player_timer_id *timer;
+
+    vlc_list_foreach(timer, &source->listeners, node)
+    {
+        if (timer->cbs->on_seek != NULL)
+            timer->cbs->on_seek(point, timer->data);
+    }
 }
 
 static void
@@ -194,8 +212,22 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
                 if (source->es != es_source)
                     continue;
                 /* signal discontinuity only on best source */
-                if (source->point.system_date != VLC_TICK_INVALID)
-                    notify = bestsource->es == es_source;
+                if (bestsource->es == es_source)
+                {
+                    /* And only once */
+                    if (source->point.system_date != VLC_TICK_INVALID)
+                        notify = true;
+
+                    /* There can be several discontinuities on the same source
+                     * for one seek request, hence the need of the
+                     * 'timer.seeking' variable to notify only once the end of
+                     * the seek request. */
+                    if (player->timer.seeking)
+                    {
+                        player->timer.seeking = false;
+                        vlc_player_SendTimerSeek(player, bestsource, NULL);
+                    }
+                }
                 source->point.system_date = VLC_TICK_INVALID;
             }
             break;
@@ -225,6 +257,47 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
         timer->cbs->on_discontinuity(system_date, timer->data);
     }
 
+    vlc_mutex_unlock(&player->timer.lock);
+}
+
+void
+vlc_player_UpdateTimerSeekState(vlc_player_t *player, vlc_tick_t time,
+                                double position)
+{
+    vlc_mutex_lock(&player->timer.lock);
+    struct vlc_player_timer_source *source = &player->timer.best_source;
+
+    if (time == VLC_TICK_INVALID)
+    {
+        assert(position >= 0);
+        if (source->point.length != VLC_TICK_INVALID)
+            player->timer.seek_ts = position * source->point.length;
+        else
+            player->timer.seek_ts = VLC_TICK_INVALID;
+    }
+    else
+        player->timer.seek_ts = time;
+
+    if (position < 0)
+    {
+        assert(time != VLC_TICK_INVALID);
+        if (source->point.length != VLC_TICK_INVALID)
+            player->timer.seek_position = time / (double) source->point.length;
+    }
+    else
+        player->timer.seek_position = position;
+
+    const struct vlc_player_timer_point point =
+    {
+        .position = player->timer.seek_position,
+        .rate = source->point.rate,
+        .ts = player->timer.seek_ts,
+        .length = source->point.length,
+        .system_date = VLC_TICK_MAX,
+    };
+
+    player->timer.seeking = true;
+    vlc_player_SendTimerSeek(player, source, &point);
     vlc_mutex_unlock(&player->timer.lock);
 }
 
@@ -340,6 +413,17 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
                                          system_date);
 
+            /* It is possible to receive valid points while seeking. These
+             * points could be updated when the input thread didn't yet process
+             * the seek request. */
+            if (!player->timer.seeking)
+            {
+                /* Reset seek time/position now that we receive a valid point
+                 * and seek was processed */
+                player->timer.seek_ts = VLC_TICK_INVALID;
+                player->timer.seek_position = -1;
+            }
+
             if (!vlc_list_is_empty(&source->listeners))
                 vlc_player_SendTimerSourceUpdates(player, source, force_update,
                                                   &source->point);
@@ -384,6 +468,14 @@ void
 vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source)
 {
     vlc_mutex_lock(&player->timer.lock);
+
+    /* Unlikely case where the source ES is deleted while seeking */
+    if (player->timer.best_source.es == es_source && player->timer.seeking)
+    {
+        player->timer.seeking = false;
+        vlc_player_SendTimerSeek(player, &player->timer.best_source, NULL);
+    }
+
     for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
     {
         struct vlc_player_timer_source *source = &player->timer.sources[i];
@@ -398,16 +490,33 @@ vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source)
 }
 
 int
-vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
+vlc_player_GetTimerPoint(vlc_player_t *player, bool seeking,
+                         vlc_tick_t system_now,
                          vlc_tick_t *out_ts, double *out_pos)
 {
-    int ret;
+    int ret = VLC_EGENERIC;
     vlc_mutex_lock(&player->timer.lock);
-    if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
+    if (seeking
+     && (player->timer.seek_ts != VLC_TICK_INVALID || player->timer.seek_position >= 0.0f))
     {
-        vlc_mutex_unlock(&player->timer.lock);
-        return VLC_EGENERIC;
+        if (out_ts != NULL)
+        {
+            if (player->timer.seek_ts == VLC_TICK_INVALID)
+                goto end;
+            *out_ts = player->timer.seek_ts;
+        }
+        if (out_pos != NULL)
+        {
+            if (player->timer.seek_position < 0)
+                goto end;
+            *out_pos = player->timer.seek_position;
+        }
+        ret = VLC_SUCCESS;
+        goto end;
     }
+
+    if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
+        goto end;
 
     if (system_now != VLC_TICK_INVALID)
         ret = vlc_player_timer_point_Interpolate(&player->timer.best_source.point,
@@ -415,6 +524,7 @@ vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
     else
         ret = VLC_SUCCESS;
 
+end:
     vlc_mutex_unlock(&player->timer.lock);
     return ret;
 }
