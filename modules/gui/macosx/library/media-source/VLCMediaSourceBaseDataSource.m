@@ -483,10 +483,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
     _childDataSource.gridViewMode = _gridViewMode;
 
     [self setCurrentViewMode];
-
-    if(sender != [[[VLCMain sharedInstance] libraryWindow] navigationStack]) {
-        [[[[VLCMain sharedInstance] libraryWindow] navigationStack] appendCurrentLibraryState];
-    }
 }
 
 #pragma mark - VLCMediaSource Delegation
