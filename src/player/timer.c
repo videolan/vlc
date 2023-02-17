@@ -35,7 +35,7 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.input_length = VLC_TICK_INVALID;
     player->timer.input_normal_time = VLC_TICK_0;
     player->timer.last_ts = VLC_TICK_INVALID;
-    player->timer.input_position = 0.f;
+    player->timer.input_position = 0;
     player->timer.smpte_source.smpte.last_framenum = ULONG_MAX;
 
     vlc_mutex_unlock(&player->timer.lock);

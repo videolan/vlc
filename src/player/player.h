@@ -220,7 +220,7 @@ struct vlc_player_timer
     vlc_tick_t input_length;
     vlc_tick_t input_normal_time;
     vlc_tick_t last_ts;
-    float input_position;
+    double input_position;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];
 #define best_source sources[VLC_PLAYER_TIMER_TYPE_BEST]
