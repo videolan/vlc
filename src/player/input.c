@@ -100,6 +100,60 @@ vlc_player_input_Start(struct vlc_player_input *input)
     return ret;
 }
 
+static inline void
+vlc_player_assert_seek_params(enum vlc_player_seek_speed speed,
+                              enum vlc_player_whence whence)
+{
+    assert(speed == VLC_PLAYER_SEEK_PRECISE
+        || speed == VLC_PLAYER_SEEK_FAST);
+    assert(whence == VLC_PLAYER_WHENCE_ABSOLUTE
+        || whence == VLC_PLAYER_WHENCE_RELATIVE);
+    (void) speed; (void) whence;
+}
+
+void
+vlc_player_input_SeekByPos(struct vlc_player_input *input, double position,
+                           enum vlc_player_seek_speed speed,
+                           enum vlc_player_whence whence)
+{
+    vlc_player_t *player = input->player;
+    vlc_player_assert_seek_params(speed, whence);
+
+    const int type =
+        whence == VLC_PLAYER_WHENCE_ABSOLUTE ? INPUT_CONTROL_SET_POSITION
+                                             : INPUT_CONTROL_JUMP_POSITION;
+    int ret = input_ControlPush(input->thread, type,
+        &(input_control_param_t) {
+            .pos.f_val = position,
+            .pos.b_fast_seek = speed == VLC_PLAYER_SEEK_FAST,
+    });
+
+    if (ret == VLC_SUCCESS)
+        vlc_player_osd_Position(player, input, VLC_TICK_INVALID, position,
+                                whence);
+}
+
+void
+vlc_player_input_SeekByTime(struct vlc_player_input *input, vlc_tick_t time,
+                            enum vlc_player_seek_speed speed,
+                            enum vlc_player_whence whence)
+{
+    vlc_player_t *player = input->player;
+    vlc_player_assert_seek_params(speed, whence);
+
+    const int type =
+        whence == VLC_PLAYER_WHENCE_ABSOLUTE ? INPUT_CONTROL_SET_TIME
+                                             : INPUT_CONTROL_JUMP_TIME;
+    int ret = input_ControlPush(input->thread, type,
+        &(input_control_param_t) {
+            .time.i_val = time,
+            .time.b_fast_seek = speed == VLC_PLAYER_SEEK_FAST,
+    });
+
+    if (ret == VLC_SUCCESS)
+        vlc_player_osd_Position(player, input, time, -1, whence);
+}
+
 static bool
 vlc_player_WaitRetryDelay(vlc_player_t *player)
 {

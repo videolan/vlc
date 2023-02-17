@@ -446,6 +446,16 @@ int
 vlc_player_input_Start(struct vlc_player_input *input);
 
 void
+vlc_player_input_SeekByPos(struct vlc_player_input *input, double position,
+                           enum vlc_player_seek_speed speed,
+                           enum vlc_player_whence whence);
+
+void
+vlc_player_input_SeekByTime(struct vlc_player_input *input, vlc_tick_t time,
+                            enum vlc_player_seek_speed speed,
+                            enum vlc_player_whence whence);
+
+void
 vlc_player_input_HandleState(struct vlc_player_input *, enum vlc_player_state,
                              vlc_tick_t state_date);
 
