@@ -32,6 +32,7 @@ Widgets.IconControlButton {
             playlistWidget.gainFocus(playlistBtn)
         }
     }
+    checked: MainCtx.playlistVisible
 
     text: I18n.qtr("Playlist")
 }

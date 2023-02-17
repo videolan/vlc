@@ -422,6 +422,8 @@ FocusScope{
             text: I18n.qtr("Playlist")
             focus: root.showToolbar
 
+            checked: MainCtx.playlistVisible
+
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
 

@@ -419,6 +419,8 @@ FocusScope {
                             Widgets.IconToolButton {
                                 id: playlist_btn
 
+                                checked: MainCtx.playlistVisible
+
                                 size: VLCStyle.icon_banner
                                 iconText: VLCIcons.playlist
                                 text: I18n.qtr("Playlist")
