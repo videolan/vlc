@@ -401,15 +401,19 @@ int
 vlc_player_GetTimerPoint(vlc_player_t *player, vlc_tick_t system_now,
                          vlc_tick_t *out_ts, double *out_pos)
 {
+    int ret;
     vlc_mutex_lock(&player->timer.lock);
     if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
     {
         vlc_mutex_unlock(&player->timer.lock);
         return VLC_EGENERIC;
     }
-    int ret =
-        vlc_player_timer_point_Interpolate(&player->timer.best_source.point,
-                                           system_now, out_ts, out_pos);
+
+    if (system_now != VLC_TICK_INVALID)
+        ret = vlc_player_timer_point_Interpolate(&player->timer.best_source.point,
+                                                 system_now, out_ts, out_pos);
+    else
+        ret = VLC_SUCCESS;
 
     vlc_mutex_unlock(&player->timer.lock);
     return ret;
