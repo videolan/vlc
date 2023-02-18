@@ -28,7 +28,7 @@ This allows embedding the engine in 3rd party applications, while letting them t
 # Platforms
 
 VLC is available for the following platforms:
-- [Windows] *(from 7 and later, including UWP platforms and all versions of Windows 10)*
+- [Windows] *(from 7 and later (And XP using OneCore API, including UWP platforms and all versions of Windows 10)*
 - [macOS] *(10.10 and later)*
 - [GNU/Linux] and affiliated
 - [BSD] and affiliated
