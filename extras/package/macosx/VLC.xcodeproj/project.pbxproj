@@ -255,6 +255,7 @@
 		5317FE05294E8D1A001702F0 /* VLCLibraryCollectionViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCollectionViewDataSource.h; sourceTree = "<group>"; };
 		5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioViewController.m; sourceTree = "<group>"; };
 		5325C57C29302E6800B2B63A /* VLCLibraryAudioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAudioViewController.h; sourceTree = "<group>"; };
+		534E8E3729A04F95009503F8 /* VLCMainVideoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCMainVideoView.xib; sourceTree = "<group>"; };
 		5362550B293FD639005D64FA /* VLCLibraryWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowController.h; sourceTree = "<group>"; };
 		5362550C293FD639005D64FA /* VLCLibraryWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowController.m; sourceTree = "<group>"; };
 		536283DC291146BC00640C15 /* VLCLibraryAlbumTracksDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAlbumTracksDataSource.h; sourceTree = "<group>"; };
@@ -1766,6 +1767,7 @@
 				536283FA2911476A00640C15 /* VLCLibrarySongTableCellView.xib */,
 				7DE2F0482282D7980040DD0A /* VLCLibraryTableCellView.xib */,
 				7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */,
+				534E8E3729A04F95009503F8 /* VLCMainVideoView.xib */,
 				7D67318322C8F3F60000AD40 /* VLCMediaSourceCollectionViewItem.xib */,
 				7DF14FBC2270CB1C0008ABE4 /* VLCMediaSourceDeviceCollectionViewItem.xib */,
 				7D0F64002201F66D00FDB91F /* VLCPlaylistTableCellView.xib */,
