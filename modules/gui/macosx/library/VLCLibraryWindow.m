@@ -713,7 +713,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self reopenVideoView];
     }
 
-    [self showControlsBar];
+    if (self.videoView.isHidden) {
+        [self showControlsBar];
+    }
 }
 
 // This handles reopening the video view when the user has closed it.
@@ -847,7 +849,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)shouldShowController:(NSNotification *)aNotification
 {
     [self makeKeyAndOrderFront:nil];
-    [self showControlsBar];
+
+    if (self.videoView.isHidden) {
+        [self showControlsBar];
+    }
 }
 
 - (void)shouldShowFullscreenController:(NSNotification *)aNotification
