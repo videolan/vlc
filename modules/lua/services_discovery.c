@@ -145,7 +145,6 @@ typedef struct
     vlc_queue_t queue;
     bool dead;
 } services_discovery_sys_t;
-static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
 struct sd_query
 {
@@ -203,6 +202,8 @@ int Open_LuaSD( vlc_object_t *p_this )
     }
     vlclua_set_this( L, p_sd );
     luaL_openlibs( L );
+
+    static const luaL_Reg p_reg[] = { { NULL, NULL } };
     luaL_register_namespace( L, "vlc", p_reg );
     luaopen_input( L );
     luaopen_msg( L );
