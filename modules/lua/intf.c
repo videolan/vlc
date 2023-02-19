@@ -38,11 +38,6 @@
 #include "vlc.h"
 #include "libs.h"
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-static void *Run( void * );
-
 static const char * const ppsz_intf_options[] = { "intf", "config", NULL };
 
 /*****************************************************************************
@@ -182,6 +177,23 @@ static char *StripPasswords( const char *psz_config )
 }
 
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
+
+static void *Run(void *data)
+{
+    vlc_thread_set_name("vlc-lua-intf");
+
+    intf_thread_t *p_intf = data;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    lua_State *L = p_sys->L;
+
+    if (vlclua_dofile(VLC_OBJECT(p_intf), L, p_sys->psz_filename))
+    {
+        msg_Err(p_intf, "Error loading script %s: %s", p_sys->psz_filename,
+                lua_tostring(L, lua_gettop(L)));
+        lua_pop(L, 1);
+    }
+    return NULL;
+}
 
 static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 {
@@ -398,23 +410,6 @@ void Close_LuaIntf( vlc_object_t *p_this )
     free( p_sys->psz_filename );
     free( p_sys );
     vlc_LogDestroy( p_intf->obj.logger );
-}
-
-static void *Run( void *data )
-{
-    vlc_thread_set_name("vlc-lua-intf");
-
-    intf_thread_t *p_intf = data;
-    intf_sys_t *p_sys = p_intf->p_sys;
-    lua_State *L = p_sys->L;
-
-    if( vlclua_dofile( VLC_OBJECT(p_intf), L, p_sys->psz_filename ) )
-    {
-        msg_Err( p_intf, "Error loading script %s: %s", p_sys->psz_filename,
-                 lua_tostring( L, lua_gettop( L ) ) );
-        lua_pop( L, 1 );
-    }
-    return NULL;
 }
 
 int Open_LuaIntf( vlc_object_t *p_this )
