@@ -175,14 +175,12 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
         goto error;
     }
 
-            const char * psz_value;
-
-            psz_value = lua_tostring( L, -1 );
-            if( psz_value && *psz_value != 0 )
-            {
-                lua_Dbg( p_this, "setting arturl: %s", psz_value );
-                input_item_SetArtURL ( p_context->p_item, psz_value );
-            }
+    const char *psz_value = lua_tostring(L, -1);
+    if (psz_value && *psz_value != 0)
+    {
+        lua_Dbg(p_this, "setting arturl: %s", psz_value);
+        input_item_SetArtURL(p_context->p_item, psz_value);
+    }
 
     lua_close(L);
     return VLC_SUCCESS;
