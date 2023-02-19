@@ -43,6 +43,8 @@
 #include "../../codec/cc.h"
 #include "../av1_unpack.h"
 
+#include <stdlib.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -3213,26 +3215,54 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
     return i_ret;
 }
 
+struct cmplowestchunkdts_ctx
+{
+    uint64_t dts;
+    const mp4_chunk_t **pp_lowest;
+};
+
+static int cmplowestchunkdts( const void *key, const void *other )
+{
+    const struct cmplowestchunkdts_ctx *ctx = key;
+    const mp4_chunk_t *ck = other;
+    if(ctx->dts > ck->i_first_dts)
+    {
+        *ctx->pp_lowest = ck;
+        return 1;
+    }
+    else if(ctx->dts < ck->i_first_dts)
+    {
+        return -1;
+    }
+    else
+    {
+        *ctx->pp_lowest = ck;
+        return 0;
+    }
+}
+
 static int STTSToSampleChunk(const mp4_track_t *p_track, uint64_t i_dts,
                              uint32_t *pi_chunk, uint32_t *pi_sample)
 {
-    const mp4_chunk_t *ck;
-    for( unsigned int i_chunk = 0; ; i_chunk++ )
-    {
-        if( i_chunk + 1 >= p_track->i_chunk_count )
-        {
-            /* at the end and can't check if i_start in this chunk,
-               it will be check while searching i_sample */
-            ck = &p_track->chunk[p_track->i_chunk_count - 1];
-            break;
-        }
+    const mp4_chunk_t *ck = NULL;
 
-        if( (uint64_t)i_dts >= p_track->chunk[i_chunk].i_first_dts &&
-            (uint64_t)i_dts <  p_track->chunk[i_chunk + 1].i_first_dts )
-        {
-            ck = &p_track->chunk[i_chunk];
-            break;
-        }
+    if( p_track->i_chunk_count > 1 &&  /* start heuristic */
+        (uint64_t) i_dts < p_track->chunk[1].i_first_dts )
+    {
+        ck = &p_track->chunk[0];
+    }
+    else
+    {
+        const mp4_chunk_t *lowestchunk = NULL;
+        struct cmplowestchunkdts_ctx bsearchkeyctx = { .dts = i_dts,
+                                                       .pp_lowest = &lowestchunk };
+        ck = bsearch( &bsearchkeyctx, p_track->chunk, p_track->i_chunk_count,
+                      sizeof(*p_track->chunk), cmplowestchunkdts );
+        if( ck == NULL )
+            ck = lowestchunk;
+        if( unlikely(ck == NULL) )
+            /* if we default to last chunk, it will be checked searching i_sample */
+            ck = &p_track->chunk[p_track->i_chunk_count - 1];
     }
 
     /* *** find sample in the chunk *** */
