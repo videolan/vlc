@@ -276,4 +276,3 @@ int FindArt( meta_fetcher_t *p_finder )
     return vlclua_scripts_batch_execute( VLC_OBJECT(p_finder), "meta"DIR_SEP"art",
                                          &fetch_art, (void*)&context );
 }
-
