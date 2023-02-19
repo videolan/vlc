@@ -74,86 +74,6 @@
 
 static int vlc_sd_probe_Open( vlc_object_t * );
 
-vlc_module_begin ()
-        set_shortname( N_("Lua") )
-        set_description( N_("Lua interpreter") )
-        set_subcategory( SUBCAT_INTERFACE_MAIN )
-
-        add_bool( "lua", true, LUA_TEXT, NULL );
-        add_string( "lua-intf", "dummy", INTF_TEXT, INTF_LONGTEXT )
-        add_string( "lua-config", "", CONFIG_TEXT, CONFIG_LONGTEXT )
-        set_capability( "interface", 0 )
-        set_callbacks( Open_LuaIntf, Close_LuaIntf )
-        add_shortcut( "luaintf" )
-
-    add_submodule ()
-        set_section( N_("Lua HTTP"), 0 )
-            add_password("http-password", NULL, PASS_TEXT, PASS_LONGTEXT)
-            add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT )
-            add_bool   ( "http-index", false, INDEX_TEXT, INDEX_LONGTEXT )
-        set_capability( "interface", 0 )
-        set_callbacks( Open_LuaHTTP, Close_LuaIntf )
-        add_shortcut( "luahttp", "http" )
-        set_description( N_("Lua HTTP") )
-
-    add_submodule ()
-        set_section( N_("Lua Telnet"), 0 )
-            add_string( "telnet-host", "localhost", TELNETHOST_TEXT,
-                        TELNETHOST_LONGTEXT )
-            add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
-                         TELNETPORT_LONGTEXT )
-                change_integer_range( 1, 65535 )
-            add_password("telnet-password", NULL, TELNETPWD_TEXT,
-                         TELNETPWD_LONGTEXT)
-        set_capability( "interface", 0 )
-        set_callbacks( Open_LuaTelnet, Close_LuaIntf )
-        set_description( N_("Lua Telnet") )
-        add_shortcut( "luatelnet", "telnet" )
-
-    add_submodule ()
-        set_shortname( N_( "Lua Meta Fetcher" ) )
-        set_description( N_("Fetch meta data using lua scripts") )
-        set_capability( "meta fetcher", 10 )
-        set_callback( FetchMeta )
-
-    add_submodule ()
-        set_shortname( N_( "Lua Meta Reader" ) )
-        set_description( N_("Read meta data using lua scripts") )
-        set_capability( "meta reader", 10 )
-        set_callback( ReadMeta )
-
-    add_submodule ()
-        add_shortcut( "luaplaylist" )
-        set_shortname( N_("Lua Playlist") )
-        set_description( N_("Lua Playlist Parser Interface") )
-        set_capability( "demux", 2 )
-        set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
-
-    add_submodule ()
-        set_shortname( N_( "Lua Art" ) )
-        set_description( N_("Fetch artwork using lua scripts") )
-        set_capability( "art finder", 10 )
-        set_callback( FindArt )
-
-    add_submodule ()
-        set_shortname( N_("Lua Extension") )
-        set_description( N_("Lua Extension") )
-        add_shortcut( "luaextension" )
-        set_capability( "extension", 1 )
-        set_callbacks( Open_Extension, Close_Extension )
-
-    add_submodule ()
-        set_description( N_("Lua SD Module") )
-        add_shortcut( "luasd" )
-        set_capability( "services_discovery", 0 )
-        add_string( "lua-sd", "", NULL, NULL )
-            change_volatile()
-        set_callbacks( Open_LuaSD, Close_LuaSD )
-
-    VLC_SD_PROBE_SUBMODULE
-
-vlc_module_end ()
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -696,3 +616,83 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *curi )
     free( uri );
     return i_ret;
 }
+
+vlc_module_begin ()
+        set_shortname( N_("Lua") )
+        set_description( N_("Lua interpreter") )
+        set_subcategory( SUBCAT_INTERFACE_MAIN )
+
+        add_bool( "lua", true, LUA_TEXT, NULL );
+        add_string( "lua-intf", "dummy", INTF_TEXT, INTF_LONGTEXT )
+        add_string( "lua-config", "", CONFIG_TEXT, CONFIG_LONGTEXT )
+        set_capability( "interface", 0 )
+        set_callbacks( Open_LuaIntf, Close_LuaIntf )
+        add_shortcut( "luaintf" )
+
+    add_submodule ()
+        set_section( N_("Lua HTTP"), 0 )
+            add_password("http-password", NULL, PASS_TEXT, PASS_LONGTEXT)
+            add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT )
+            add_bool   ( "http-index", false, INDEX_TEXT, INDEX_LONGTEXT )
+        set_capability( "interface", 0 )
+        set_callbacks( Open_LuaHTTP, Close_LuaIntf )
+        add_shortcut( "luahttp", "http" )
+        set_description( N_("Lua HTTP") )
+
+    add_submodule ()
+        set_section( N_("Lua Telnet"), 0 )
+            add_string( "telnet-host", "localhost", TELNETHOST_TEXT,
+                        TELNETHOST_LONGTEXT )
+            add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
+                         TELNETPORT_LONGTEXT )
+                change_integer_range( 1, 65535 )
+            add_password("telnet-password", NULL, TELNETPWD_TEXT,
+                         TELNETPWD_LONGTEXT)
+        set_capability( "interface", 0 )
+        set_callbacks( Open_LuaTelnet, Close_LuaIntf )
+        set_description( N_("Lua Telnet") )
+        add_shortcut( "luatelnet", "telnet" )
+
+    add_submodule ()
+        set_shortname( N_( "Lua Meta Fetcher" ) )
+        set_description( N_("Fetch meta data using lua scripts") )
+        set_capability( "meta fetcher", 10 )
+        set_callback( FetchMeta )
+
+    add_submodule ()
+        set_shortname( N_( "Lua Meta Reader" ) )
+        set_description( N_("Read meta data using lua scripts") )
+        set_capability( "meta reader", 10 )
+        set_callback( ReadMeta )
+
+    add_submodule ()
+        add_shortcut( "luaplaylist" )
+        set_shortname( N_("Lua Playlist") )
+        set_description( N_("Lua Playlist Parser Interface") )
+        set_capability( "demux", 2 )
+        set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
+
+    add_submodule ()
+        set_shortname( N_( "Lua Art" ) )
+        set_description( N_("Fetch artwork using lua scripts") )
+        set_capability( "art finder", 10 )
+        set_callback( FindArt )
+
+    add_submodule ()
+        set_shortname( N_("Lua Extension") )
+        set_description( N_("Lua Extension") )
+        add_shortcut( "luaextension" )
+        set_capability( "extension", 1 )
+        set_callbacks( Open_Extension, Close_Extension )
+
+    add_submodule ()
+        set_description( N_("Lua SD Module") )
+        add_shortcut( "luasd" )
+        set_capability( "services_discovery", 0 )
+        add_string( "lua-sd", "", NULL, NULL )
+            change_volatile()
+        set_callbacks( Open_LuaSD, Close_LuaSD )
+
+    VLC_SD_PROBE_SUBMODULE
+
+vlc_module_end ()
