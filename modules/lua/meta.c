@@ -143,10 +143,8 @@ error:
  *****************************************************************************/
 static bool validate_scope( const luabatch_context_t *p_context, meta_fetcher_scope_t e_scope )
 {
-    if ( p_context->e_scope == FETCHER_SCOPE_ANY )
-        return true;
-    else
-        return ( p_context->e_scope == e_scope );
+    return p_context->e_scope == FETCHER_SCOPE_ANY
+        || p_context->e_scope == e_scope;
 }
 
 static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
