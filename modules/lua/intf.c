@@ -176,8 +176,6 @@ static char *StripPasswords( const char *psz_config )
     return psz_log;
 }
 
-static const luaL_Reg p_reg[] = { { NULL, NULL } };
-
 static void *Run(void *data)
 {
     vlc_thread_set_name("vlc-lua-intf");
@@ -255,6 +253,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     luaL_openlibs( L );
 
     /* register our functions */
+    static const luaL_Reg p_reg[] = { { NULL, NULL } };
     luaL_register_namespace( L, "vlc", p_reg );
 
     /* register submodules */
