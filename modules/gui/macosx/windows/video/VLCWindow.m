@@ -145,19 +145,6 @@
     [NSAnimationContext endGrouping];
 }
 
-- (VLCVoutView *)videoView
-{
-    NSArray *o_subViews = [[self contentView] subviews];
-    if ([o_subViews count] > 0) {
-        id o_vout_view = [o_subViews firstObject];
-
-        if ([o_vout_view class] == [VLCVoutView class])
-            return (VLCVoutView *)o_vout_view;
-    }
-
-    return nil;
-}
-
 - (BOOL)isInNativeFullscreen
 {
     return ([self styleMask] & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen;

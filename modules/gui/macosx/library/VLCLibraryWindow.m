@@ -859,7 +859,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
-        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] && ![[currentWindow videoView] isHidden]) {
+        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] &&
+            [currentWindow respondsToSelector:@selector(videoView)] && ![[currentWindow videoView] isHidden]) {
             if ([_playlistController.playerController activeVideoPlayback]) {
                 [_fspanel fadeIn];
             }

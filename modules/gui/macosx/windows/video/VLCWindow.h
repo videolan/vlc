@@ -44,6 +44,4 @@
 - (void)orderFront:(id)sender animate:(BOOL)animate;
 - (void)orderOut:(id)sender animate:(BOOL)animate;
 
-- (VLCVoutView *)videoView;
-
 @end
