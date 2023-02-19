@@ -161,8 +161,11 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
         return i_ret;
     }
 
-    if(lua_gettop( L ))
+    if(lua_gettop(L) == 0)
     {
+        msg_Err(p_this, "Script went completely foobar");
+        goto error;
+    }
         const char * psz_value;
 
         if( lua_isstring( L, -1 ) )
@@ -182,11 +185,8 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
                  "didn't return a string", psz_filename );
         }
     }
-    else
-    {
-        msg_Err( p_this, "Script went completely foobar" );
-    }
 
+error:
     lua_close( L );
     return VLC_EGENERIC;
 }
