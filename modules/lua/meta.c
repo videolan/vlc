@@ -38,8 +38,6 @@
 /*****************************************************************************
  * Init lua
  *****************************************************************************/
-static const luaL_Reg p_reg[] = { { NULL, NULL } };
-
 static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char *psz_filename )
 {
     lua_State * L = luaL_newstate();
@@ -54,6 +52,7 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char
     /* Load Lua libraries */
     luaL_openlibs( L ); /* XXX: Don't open all the libs? */
 
+    static const luaL_Reg p_reg[] = { { NULL, NULL } };
     luaL_register_namespace( L, "vlc", p_reg );
 
     luaopen_msg( L );
