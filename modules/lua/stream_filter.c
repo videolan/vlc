@@ -100,24 +100,6 @@ static int vlclua_demux_readline( lua_State *L )
 }
 
 /*****************************************************************************
- *
- *****************************************************************************/
-/* Functions to register */
-static const luaL_Reg p_reg[] =
-{
-    { "peek", vlclua_demux_peek },
-    { NULL, NULL }
-};
-
-/* Functions to register for parse() function call only */
-static const luaL_Reg p_reg_parse[] =
-{
-    { "read", vlclua_demux_read },
-    { "readline", vlclua_demux_readline },
-    { NULL, NULL }
-};
-
-/*****************************************************************************
  * Called through lua_scripts_batch_execute to call 'probe' on
  * the script pointed by psz_filename.
  *****************************************************************************/
@@ -138,6 +120,13 @@ static int probe_luascript(vlc_object_t *obj, const char *filename,
     luaL_openlibs( L ); /* FIXME: Don't open all the libs? */
 
     vlclua_set_this(L, s);
+
+    /* Functions to register */
+    static const luaL_Reg p_reg[] =
+    {
+        { "peek", vlclua_demux_peek },
+        { NULL, NULL }
+    };
     luaL_register_namespace( L, "vlc", p_reg );
     luaopen_msg( L );
     luaopen_strings( L );
@@ -213,6 +202,13 @@ static int ReadDir(stream_t *s, input_item_node_t *node)
     struct vlclua_playlist *sys = s->p_sys;
     lua_State *L = sys->L;
 
+    /* Functions to register for parse() function call only */
+    static const luaL_Reg p_reg_parse[] =
+    {
+        { "read", vlclua_demux_read },
+        { "readline", vlclua_demux_readline },
+        { NULL, NULL }
+    };
     luaL_register_namespace( L, "vlc", p_reg_parse );
 
     lua_getglobal( L, "parse" );
