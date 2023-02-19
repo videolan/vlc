@@ -31,6 +31,8 @@
 #import "os-integration/Spotify.h"
 #import "library/VLCInputItem.h"
 
+#import "views/VLCMainVideoView.h"
+
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoWindowCommon.h"
 
@@ -1622,7 +1624,8 @@ static int BossCallback(vlc_object_t *p_this,
 
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(videoView)]) {
-        VLCVoutView *videoView = [(VLCVideoWindowCommon *)currentWindow videoView];
+        VLCVideoWindowCommon *videoWindow = (VLCVideoWindowCommon *)currentWindow;
+        VLCVoutView *videoView = videoWindow.videoView.voutView;
         if (videoView) {
             p_vout = [videoView voutThread];
         }

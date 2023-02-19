@@ -36,6 +36,8 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCMainVideoView.h"
+
 #import "windows/video/VLCVoutView.h"
 
 @implementation VLCLibraryVideoViewController

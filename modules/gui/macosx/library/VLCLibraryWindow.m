@@ -54,6 +54,7 @@
 
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
+#import "views/VLCMainVideoView.h"
 #import "views/VLCRoundedCornerTextField.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
@@ -146,7 +147,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.navigationStack = [[VLCLibraryNavigationStack alloc] init];
     self.navigationStack.delegate = self;
 
-    self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
+    //self.videoView.voutView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
     [self hideControlsBar];
 
@@ -757,7 +758,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     
     NSLog(@"Presenting video view in main library window.");
     
-    VLCVoutView *videoView = self.videoView;
+    VLCVoutView *videoView = self.videoView.voutView;
     videoView.translatesAutoresizingMaskIntoConstraints = NO;
     videoView.hidden = NO;
 

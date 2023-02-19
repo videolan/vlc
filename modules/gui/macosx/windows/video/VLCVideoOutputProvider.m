@@ -40,6 +40,8 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
+#import "views/VLCMainVideoView.h"
+
 #import "windows/video/VLCAspectRatioRetainingVideoWindow.h"
 #import "windows/video/VLCDetachedVideoWindow.h"
 #import "windows/video/VLCVoutView.h"
@@ -244,11 +246,11 @@ int WindowOpen(vlc_window_t *p_wnd)
     newVideoWindow.acceptsMouseMovedEvents = !asVideoWallpaper;
     newVideoWindow.movableByWindowBackground = !asVideoWallpaper;
 
-    VLCVoutView *voutView = [[VLCVoutView alloc] initWithFrame:newVideoWindow.contentView.bounds];
-    voutView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    //VLCVoutView *voutView = [[VLCVoutView alloc] initWithFrame:newVideoWindow.contentView.bounds];
+    //voutView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 
-    [newVideoWindow.contentView addSubview:voutView positioned:NSWindowAbove relativeTo:nil];
-    newVideoWindow.videoView = voutView;
+    //[newVideoWindow.contentView addSubview:voutView positioned:NSWindowAbove relativeTo:nil];
+    //newVideoWindow.videoView.voutView = voutView;
 
     if (asVideoWallpaper) {
         [newVideoWindow setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
@@ -365,7 +367,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 - (void)setupVideoOutputForVideoWindow:(VLCVideoWindowCommon *)videoWindow
                          withVlcWindow:(vlc_window_t *)p_wnd
 {
-    VLCVoutView *voutView = videoWindow.videoView;
+    VLCVoutView *voutView = videoWindow.videoView.voutView;
     
     [videoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
     [_voutWindows setObject:videoWindow forKey:[NSValue valueWithPointer:p_wnd]];
@@ -401,7 +403,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 {
     _playerController = [VLCMain sharedInstance].playlistController.playerController;
     VLCVideoWindowCommon *newVideoWindow = [self setupVideoWindow];
-    VLCVoutView *voutView = newVideoWindow.videoView;
+    VLCVoutView *voutView = newVideoWindow.videoView.voutView;
 
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
@@ -429,7 +431,7 @@ int WindowOpen(vlc_window_t *p_wnd)
         return;
     }
 
-    [[videoWindow videoView] releaseVoutThread];
+    [videoWindow.videoView.voutView releaseVoutThread];
 
     // set active video to no BEFORE closing the window and exiting fullscreen
     // (avoid stopping playback due to NSWindowWillCloseNotification, preserving fullscreen state)
