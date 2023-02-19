@@ -296,8 +296,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     {
         msg_Warn( p_intf, "Error while setting the module search path for %s",
                   p_sys->psz_filename );
-        lua_close( L );
-        goto error;
+        goto error_lua;
     }
 
     /*
@@ -369,8 +368,7 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
         {
             msg_Err( p_intf, "Couldn't find lua interface script \"cli\", "
                              "needed by telnet wrapper" );
-            lua_close( p_sys->L );
-            goto error;
+            goto error_lua;
         }
         lua_pushstring( L, wrapped_file );
         lua_setglobal( L, "wrapped_file" );
