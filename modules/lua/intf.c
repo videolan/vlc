@@ -380,13 +380,12 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     p_sys->L = L;
 
     if( vlc_clone( &p_sys->thread, Run, p_intf ) )
-    {
-        vlclua_fd_cleanup( &p_sys->dtable );
-        lua_close( p_sys->L );
-        goto error;
-    }
+        goto error_lua;
     free( namebuf );
     return VLC_SUCCESS;
+error_lua:
+    vlclua_fd_cleanup( &p_sys->dtable );
+    lua_close( p_sys->L );
 error:
     free( p_sys->psz_filename );
     free( p_sys );
