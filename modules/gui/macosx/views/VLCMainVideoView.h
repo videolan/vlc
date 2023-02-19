@@ -22,13 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import <windows/mainwindow/VLCControlsBarCommon.h>
 #import <windows/video/VLCVoutView.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMainVideoView : NSView
 
-@property (readonly, strong) IBOutlet VLCVoutView *voutView;
+@property (readwrite, strong) IBOutlet VLCVoutView *voutView;
+@property (readwrite, strong) IBOutlet VLCControlsBarCommon *controlsBar;
 
 @end
 
