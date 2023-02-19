@@ -166,25 +166,26 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
         msg_Err(p_this, "Script went completely foobar");
         goto error;
     }
-        const char * psz_value;
 
-        if( lua_isstring( L, -1 ) )
-        {
+    if (!lua_isstring(L, -1))
+    {
+        if (!lua_isnoneornil(L, -1))
+            msg_Err(p_this, "Lua art fetcher script %s: "
+                 "didn't return a string", psz_filename);
+        goto error;
+    }
+
+            const char * psz_value;
+
             psz_value = lua_tostring( L, -1 );
             if( psz_value && *psz_value != 0 )
             {
                 lua_Dbg( p_this, "setting arturl: %s", psz_value );
                 input_item_SetArtURL ( p_context->p_item, psz_value );
-                lua_close( L );
-                return VLC_SUCCESS;
             }
-        }
-        else if( !lua_isnoneornil( L, -1 ) )
-        {
-            msg_Err( p_this, "Lua art fetcher script %s: "
-                 "didn't return a string", psz_filename );
-        }
-    }
+
+    lua_close(L);
+    return VLC_SUCCESS;
 
 error:
     lua_close( L );
