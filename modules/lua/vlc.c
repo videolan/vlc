@@ -72,8 +72,6 @@
 #define TELNETPWD_LONGTEXT N_( "A single password restricts access " \
     "to this interface." )
 
-static int vlc_sd_probe_Open( vlc_object_t * );
-
 /*****************************************************************************
  *
  *****************************************************************************/
