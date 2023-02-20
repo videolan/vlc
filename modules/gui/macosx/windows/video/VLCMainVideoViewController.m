@@ -22,6 +22,14 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "views/VLCBottomBarView.h"
+
 @implementation VLCMainVideoViewController
+
+- (instancetype)init
+{
+    self = [super initWithNibName:@"VLCMainVideoView" bundle:nil];
+    return self;
+}
 
 @end
