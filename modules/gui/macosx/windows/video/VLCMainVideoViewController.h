@@ -33,6 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSBox *mainControlsView;
 @property (readwrite, strong) IBOutlet VLCControlsBarCommon *controlsBar;
 
+@property (readwrite, nonatomic) BOOL autohideControls;
+
+- (void)showControls;
+
 @end
 
 NS_ASSUME_NONNULL_END

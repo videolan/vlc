@@ -22,7 +22,19 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "main/VLCMain.h"
+
 #import "views/VLCBottomBarView.h"
+
+#import "windows/video/VLCVideoWindowCommon.h"
+
+#import <vlc_common.h>
+
+@interface VLCMainVideoViewController()
+{
+    NSTimer *_hideControlsTimer;
+}
+@end
 
 @implementation VLCMainVideoViewController
 
@@ -34,7 +46,77 @@
 
 - (void)viewDidLoad
 {
+    _autohideControls = YES;
     _controlsBar.bottomBarView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(shouldShowControls:)
+                               name:VLCVideoWindowShouldShowFullscreenController
+                             object:nil];
+}
+
+- (void)stopAutohideTimer
+{
+    [_hideControlsTimer invalidate];
+}
+
+- (void)startAutohideTimer
+{
+    /* Do nothing if timer is already in place */
+    if (_hideControlsTimer.valid) {
+        return;
+    }
+
+    /* Get timeout and make sure it is not lower than 1 second */
+    long long timeToKeepVisibleInSec = MAX(var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000, 1);
+
+    _hideControlsTimer = [NSTimer scheduledTimerWithTimeInterval:timeToKeepVisibleInSec
+                                                          target:self
+                                                        selector:@selector(hideControls:)
+                                                        userInfo:nil
+                                                         repeats:NO];
+}
+
+- (void)hideControls:(id)sender
+{
+    [self stopAutohideTimer];
+    _mainControlsView.hidden = YES;
+}
+
+- (void)setAutohideControls:(BOOL)autohide
+{
+    if (_autohideControls == autohide) {
+        return;
+    }
+
+    _autohideControls = autohide;
+
+    if (autohide) {
+        [self startAutohideTimer];
+    } else {
+        [self showControls];
+    }
+}
+
+- (void)shouldShowControls:(NSNotification *)aNotification
+{
+    [self showControls];
+}
+
+- (void)showControls
+{
+    [self stopAutohideTimer];
+
+    if (!_mainControlsView.hidden && !_autohideControls) {
+        return;
+    }
+
+    _mainControlsView.hidden = NO;
+
+    if (_autohideControls) {
+        [self startAutohideTimer];
+    }
 }
 
 @end
