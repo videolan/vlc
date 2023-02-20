@@ -169,6 +169,10 @@ Control {
                 }
             }))
         }
+
+        function getSelectedInputItem(cb) {
+            cb(root.model.getItemsForIndexes(root.model.getSelection()))
+        }
     }
 
     PlaylistContextMenu {
