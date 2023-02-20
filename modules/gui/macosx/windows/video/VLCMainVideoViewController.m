@@ -32,4 +32,9 @@
     return self;
 }
 
+- (void)viewDidLoad
+{
+    _controlsBar.bottomBarView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+}
+
 @end
