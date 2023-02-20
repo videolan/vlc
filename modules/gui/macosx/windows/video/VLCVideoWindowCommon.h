@@ -30,7 +30,7 @@ extern NSString *VLCVideoWindowDidEnterFullscreen;
 extern NSString *VLCWindowShouldShowController;
 extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 
-@class VLCMainVideoView;
+@class VLCMainVideoViewController;
 @class VLCControlsBarCommon;
 @class VLCPlayerController;
 
@@ -44,7 +44,7 @@ extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 
 @property (weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 
-@property (nonatomic, strong) IBOutlet VLCMainVideoView* videoView;
+@property (nonatomic, strong) IBOutlet VLCMainVideoViewController* videoViewController;
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
 @property (readonly) BOOL inFullscreenTransition;
 @property (readonly) BOOL windowShouldExitFullscreenWhenFinished;

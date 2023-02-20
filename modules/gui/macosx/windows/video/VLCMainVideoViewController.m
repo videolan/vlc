@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMainVideoView.m: MacOS X interface module
+ * VLCMainVideoViewController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCMainVideoView.h"
+#import "VLCMainVideoViewController.h"
 
-@implementation VLCMainVideoView
+@implementation VLCMainVideoViewController
 
 @end

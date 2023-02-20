@@ -54,13 +54,15 @@
 
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
-#import "views/VLCMainVideoView.h"
 #import "views/VLCRoundedCornerTextField.h"
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
+
 #import "windows/video/VLCFSPanelController.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
+#import "windows/video/VLCMainVideoViewController.h"
+
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCOpenInputMetadata.h"
 
@@ -148,7 +150,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.navigationStack.delegate = self;
 
     //self.videoView.voutView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
-    self.videoView.hidden = YES;
+    self.videoViewController.view.hidden = YES;
     [self hideControlsBar];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
@@ -687,7 +689,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)backwardsNavigationAction:(id)sender
 {
-    self.videoView.hidden ? [_navigationStack backwards] : [self disableVideoPlaybackAppearance];
+    self.videoViewController.view.hidden ? [_navigationStack backwards] : [self disableVideoPlaybackAppearance];
 }
 
 - (IBAction)forwardsNavigationAction:(id)sender
@@ -714,7 +716,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self reopenVideoView];
     }
 
-    if (self.videoView.isHidden) {
+    if (self.videoViewController.view.isHidden) {
         [self showControlsBar];
     }
 }
@@ -758,7 +760,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     
     NSLog(@"Presenting video view in main library window.");
     
-    VLCVoutView *videoView = self.videoView.voutView;
+    VLCVoutView *videoView = self.videoViewController.voutView;
     videoView.translatesAutoresizingMaskIntoConstraints = NO;
     videoView.hidden = NO;
 
@@ -807,7 +809,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];
-    self.videoView.hidden = YES;
+    self.videoViewController.view.hidden = YES;
 
     [self.segmentedTitleControl setHidden:NO];
     [self.forwardsNavigationButton setHidden:NO];
@@ -831,7 +833,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)mouseMoved:(NSEvent *)o_event
 {
-    if (!self.videoView.hidden) {
+    if (!self.videoViewController.view.hidden) {
         NSPoint mouseLocation = [o_event locationInWindow];
         NSRect windowRectWithFrame = [self frameRectForContentRect:self.contentView.frame];
 
@@ -851,7 +853,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [self makeKeyAndOrderFront:nil];
 
-    if (self.videoView.isHidden) {
+    if (self.videoViewController.view.isHidden) {
         [self showControlsBar];
     }
 }
@@ -861,7 +863,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     id currentWindow = [NSApp keyWindow];
     if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
         if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] &&
-            [currentWindow respondsToSelector:@selector(videoView)] && ![[currentWindow videoView] isHidden]) {
+            [currentWindow respondsToSelector:@selector(videoViewController)] && ![[[currentWindow videoViewController] view] isHidden]) {
             if ([_playlistController.playerController activeVideoPlayback]) {
                 [_fspanel fadeIn];
             }

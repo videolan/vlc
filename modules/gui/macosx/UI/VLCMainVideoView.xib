@@ -5,10 +5,11 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCMainVideoView">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCMainVideoViewController">
             <connections>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
-                <outlet property="voutView" destination="WRu-Ic-lQK" id="m6h-HU-Drd"/>
+                <outlet property="view" destination="WRu-Ic-lQK" id="B9p-x5-Kd8"/>
+                <outlet property="voutView" destination="mAS-4a-RS8" id="GeX-XO-HYC"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -26,10 +27,13 @@
                 <outlet property="trailingTimeField" destination="f4v-2z-dQ1" id="AXX-AU-lF0"/>
             </connections>
         </customObject>
-        <customView id="WRu-Ic-lQK" customClass="VLCVoutView">
+        <customView id="WRu-Ic-lQK">
             <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="mAS-4a-RS8" customClass="VLCVoutView">
+                    <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                </customView>
                 <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx" customClass="VLCBottomBarView">
                     <rect key="frame" x="0.0" y="0.0" width="720" height="90"/>
                     <subviews>
@@ -57,7 +61,7 @@
                             <constraints>
                                 <constraint firstAttribute="height" constant="15" id="xm6-li-LpC"/>
                             </constraints>
-                            <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" tickMarkPosition="above" sliderType="linear" id="dZM-dm-qvL"/>
+                            <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" tickMarkPosition="above" sliderType="linear" id="dZM-dm-qvL" customClass="VLCSliderCell"/>
                         </slider>
                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sJu-ZK-5QH">
                             <rect key="frame" x="479" y="49" width="221" height="24"/>
@@ -111,12 +115,12 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                         </button>
-                                        <slider verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="lyY-Zo-4aH" customClass="VLCDefaultValueSlider">
+                                        <slider verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="lyY-Zo-4aH" customClass="VLCVolumeSlider">
                                             <rect key="frame" x="19" y="0.0" width="84" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="80" id="SeC-cP-5Dr"/>
                                             </constraints>
-                                            <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="Zws-Wl-Ctp" customClass="VLCDefaultValueSliderCell"/>
+                                            <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="Zws-Wl-Ctp" customClass="VLCVolumeSliderCell"/>
                                         </slider>
                                     </subviews>
                                     <visibilityPriorities>
@@ -234,9 +238,13 @@
             </subviews>
             <constraints>
                 <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="WRu-Ic-lQK" secondAttribute="centerY" id="9WR-UJ-JIx"/>
+                <constraint firstItem="mAS-4a-RS8" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="F3X-8V-3Hg"/>
+                <constraint firstAttribute="bottom" secondItem="mAS-4a-RS8" secondAttribute="bottom" id="RPX-tv-ZTb"/>
                 <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="TlB-bL-48T"/>
+                <constraint firstItem="mAS-4a-RS8" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="Ygq-Dt-Lbg"/>
                 <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="c1j-FE-eoR"/>
                 <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerX" secondItem="WRu-Ic-lQK" secondAttribute="centerX" id="hWp-6J-hcS"/>
+                <constraint firstAttribute="trailing" secondItem="mAS-4a-RS8" secondAttribute="trailing" id="jOZ-5U-ips"/>
                 <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="lL9-8j-p90"/>
             </constraints>
             <point key="canvasLocation" x="66" y="-232"/>

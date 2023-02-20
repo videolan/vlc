@@ -287,8 +287,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCImageView.m \
 	gui/macosx/views/VLCLinearProgressIndicator.h \
 	gui/macosx/views/VLCLinearProgressIndicator.m \
-	gui/macosx/views/VLCMainVideoView.h \
-	gui/macosx/views/VLCMainVideoView.m \
 	gui/macosx/views/VLCRoundedCornerTextField.h \
 	gui/macosx/views/VLCRoundedCornerTextField.m \
 	gui/macosx/views/VLCScrollingClipView.h \
@@ -349,6 +347,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.m \
 	gui/macosx/windows/video/VLCFSPanelController.h \
 	gui/macosx/windows/video/VLCFSPanelController.m \
+	gui/macosx/windows/video/VLCMainVideoViewController.h \
+	gui/macosx/windows/video/VLCMainVideoViewController.m \
 	gui/macosx/windows/video/VLCVideoOutputProvider.h \
 	gui/macosx/windows/video/VLCVideoOutputProvider.m \
 	gui/macosx/windows/video/VLCVideoWindowCommon.h \

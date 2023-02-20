@@ -24,7 +24,7 @@
 
 #import "main/VLCMain.h"
 #import "playlist/VLCPlayerController.h"
-#import "views/VLCMainVideoView.h"
+#import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVoutView.h"
 
 @implementation VLCAspectRatioRetainingVideoWindow
@@ -49,8 +49,8 @@
 
     /* Calculate the window's new size */
     NSRect new_frame;
-    new_frame.size.width = [self frame].size.width - [self.videoView frame].size.width + f_width;
-    new_frame.size.height = [self frame].size.height - [self.videoView frame].size.height + f_height;
+    new_frame.size.width = [self frame].size.width - [self.videoViewController.view frame].size.width + f_width;
+    new_frame.size.height = [self frame].size.height - [self.videoViewController.view frame].size.height + f_height;
     new_frame.origin.x = topleftscreen.x;
     new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
@@ -104,12 +104,12 @@
     if (self.inFullscreenTransition || [self fullscreen] || [self isInNativeFullscreen])
         return proposedFrameSize;
 
-    if ([self.videoView isHidden])
+    if ([self.videoViewController.view isHidden])
         return proposedFrameSize;
 
     if ([self.playerController aspectRatioIsLocked]) {
         NSRect videoWindowFrame = [self frame];
-        NSRect viewRect = [self.videoView convertRect:[self.videoView bounds] toView: nil];
+        NSRect viewRect = [self.videoViewController.view convertRect:[self.videoViewController.view bounds] toView: nil];
         NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];
         CGFloat marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
         CGFloat marginx = contentRect.size.width - viewRect.size.width;

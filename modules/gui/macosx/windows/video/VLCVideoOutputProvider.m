@@ -40,10 +40,9 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
-#import "views/VLCMainVideoView.h"
-
 #import "windows/video/VLCAspectRatioRetainingVideoWindow.h"
 #import "windows/video/VLCDetachedVideoWindow.h"
+#import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVoutView.h"
 
 #include <vlc_vout_display.h>
@@ -250,7 +249,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     //voutView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 
     //[newVideoWindow.contentView addSubview:voutView positioned:NSWindowAbove relativeTo:nil];
-    //newVideoWindow.videoView.voutView = voutView;
+    //newVideoWindow.videoViewController.voutView = voutView;
 
     if (asVideoWallpaper) {
         [newVideoWindow setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
@@ -367,7 +366,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 - (void)setupVideoOutputForVideoWindow:(VLCVideoWindowCommon *)videoWindow
                          withVlcWindow:(vlc_window_t *)p_wnd
 {
-    VLCVoutView *voutView = videoWindow.videoView.voutView;
+    VLCVoutView *voutView = videoWindow.videoViewController.voutView;
     
     [videoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
     [_voutWindows setObject:videoWindow forKey:[NSValue valueWithPointer:p_wnd]];
@@ -403,7 +402,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 {
     _playerController = [VLCMain sharedInstance].playlistController.playerController;
     VLCVideoWindowCommon *newVideoWindow = [self setupVideoWindow];
-    VLCVoutView *voutView = newVideoWindow.videoView.voutView;
+    VLCVoutView *voutView = newVideoWindow.videoViewController.voutView;
 
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     BOOL videoWallpaper = var_InheritBool(getIntf(), "video-wallpaper") && !multipleVoutWindows;
@@ -431,7 +430,7 @@ int WindowOpen(vlc_window_t *p_wnd)
         return;
     }
 
-    [videoWindow.videoView.voutView releaseVoutThread];
+    [videoWindow.videoViewController.voutView releaseVoutThread];
 
     // set active video to no BEFORE closing the window and exiting fullscreen
     // (avoid stopping playback due to NSWindowWillCloseNotification, preserving fullscreen state)

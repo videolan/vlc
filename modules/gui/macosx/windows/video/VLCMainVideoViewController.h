@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMainVideoView.h: MacOS X interface module
+ * VLCMainVideoViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -27,7 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCMainVideoView : NSView
+@interface VLCMainVideoViewController : NSViewController
 
 @property (readwrite, strong) IBOutlet VLCVoutView *voutView;
 @property (readwrite, strong) IBOutlet VLCControlsBarCommon *controlsBar;
