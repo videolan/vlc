@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCMainVideoViewController : NSViewController
 
 @property (readwrite, strong) IBOutlet VLCVoutView *voutView;
+@property (readwrite, strong) IBOutlet NSBox *mainControlsView;
 @property (readwrite, strong) IBOutlet VLCControlsBarCommon *controlsBar;
 
 @end
