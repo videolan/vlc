@@ -40,7 +40,6 @@ qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0009-Add-KHRONOS_STATIC-to-allow-static-linking-on-Windows.patch
 	$(APPLY) $(SRC)/qt/0003-allow-cross-compilation-of-angle-with-wine.patch
 	$(APPLY) $(SRC)/qt/qt-fix-gcc11-build.patch
-	$(APPLY) $(SRC)/qt/qt-add-missing-header-darwin.patch
 	# force path replacement in pkg-config output files
 	$(APPLY) $(SRC)/qt/force-pkgconfg-replace.patch
 	# pass all files installed through our installer
