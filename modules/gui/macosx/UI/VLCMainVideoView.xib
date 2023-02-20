@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -41,8 +42,33 @@
                         <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
+                                <rect key="frame" x="7" y="434" width="38" height="39"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="UoQ-34-Pox" secondAttribute="height" multiplier="1:1" id="Mvu-rV-2bc"/>
+                                    <constraint firstAttribute="width" constant="32" id="cjt-DQ-vMP"/>
+                                </constraints>
+                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="CU4-UE-tsW">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <imageReference key="image" image="arrow.backward" catalog="system" symbolScale="small"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </button>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
+                                <rect key="frame" x="675" y="434" width="38" height="39"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="9vC-fK-tZu"/>
+                                    <constraint firstAttribute="width" secondItem="Drq-if-dw4" secondAttribute="height" multiplier="1:1" id="cVK-cW-Opa"/>
+                                </constraints>
+                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="music.note.list" catalog="system" imagePosition="overlaps" borderStyle="border" inset="2" id="VDP-ql-lW8">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </button>
                             <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx" customClass="VLCBottomBarView">
-                                <rect key="frame" x="0.0" y="0.0" width="720" height="90"/>
+                                <rect key="frame" x="0.0" y="0.0" width="720" height="91"/>
                                 <subviews>
                                     <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f4v-2z-dQ1" customClass="VLCTimeField">
                                         <rect key="frame" x="623" y="10" width="79" height="14"/>
@@ -56,7 +82,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField wantsLayer="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="lEW-MN-FFU" customClass="VLCWrappableTextField">
-                                        <rect key="frame" x="18" y="49" width="443" height="31"/>
+                                        <rect key="frame" x="18" y="49" width="411" height="32"/>
                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Nothing Playing" usesSingleLineMode="YES" id="8l0-zS-fOa">
                                             <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -71,16 +97,16 @@
                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="10000" tickMarkPosition="above" sliderType="linear" id="dZM-dm-qvL" customClass="VLCSliderCell"/>
                                     </slider>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sJu-ZK-5QH">
-                                        <rect key="frame" x="479" y="49" width="221" height="24"/>
+                                        <rect key="frame" x="447" y="49" width="253" height="32"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zz2-tP-2nh">
-                                                <rect key="frame" x="0.0" y="0.0" width="56" height="24"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="72" height="32"/>
                                                 <subviews>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="OOc-d0-zZ5" customClass="VLCImageButton">
-                                                        <rect key="frame" x="0.0" y="-2" width="24" height="28"/>
+                                                        <rect key="frame" x="0.0" y="-2" width="32" height="36"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="OOc-d0-zZ5" secondAttribute="height" multiplier="1:1" id="Q0j-Qh-QEM"/>
-                                                            <constraint firstAttribute="width" constant="24" id="srt-SR-yUh"/>
+                                                            <constraint firstAttribute="width" constant="32" id="srt-SR-yUh"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="backward.end.alt.fill" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="ER2-kO-erS">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -88,10 +114,10 @@
                                                         </buttonCell>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="M70-qG-1Ll" customClass="VLCImageButton">
-                                                        <rect key="frame" x="32" y="-2" width="24" height="28"/>
+                                                        <rect key="frame" x="40" y="-2" width="32" height="36"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="M70-qG-1Ll" secondAttribute="height" multiplier="1:1" id="9m5-yx-9ye"/>
-                                                            <constraint firstAttribute="width" constant="24" id="hh3-yQ-P86"/>
+                                                            <constraint firstAttribute="width" constant="32" id="hh3-yQ-P86"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="forward.end.alt.fill" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="e5T-Qz-avb">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -109,12 +135,12 @@
                                                 </customSpacing>
                                             </stackView>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8F-hr-iaW">
-                                                <rect key="frame" x="76" y="4" width="101" height="16"/>
+                                                <rect key="frame" x="92" y="4" width="109" height="24"/>
                                                 <subviews>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="tVB-Xs-sJJ" customClass="VLCImageButton">
-                                                        <rect key="frame" x="0.0" y="-3" width="16" height="22"/>
+                                                        <rect key="frame" x="0.0" y="-3" width="24" height="30"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" constant="16" id="PGL-rL-Qcp"/>
+                                                            <constraint firstAttribute="width" constant="24" id="PGL-rL-Qcp"/>
                                                             <constraint firstAttribute="width" secondItem="tVB-Xs-sJJ" secondAttribute="height" multiplier="1:1" id="qTO-ie-xwE"/>
                                                         </constraints>
                                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="volume.3.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="volume.fill" imageScaling="proportionallyUpOrDown" inset="2" id="skE-5H-zgX">
@@ -123,7 +149,7 @@
                                                         </buttonCell>
                                                     </button>
                                                     <slider verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="lyY-Zo-4aH" customClass="VLCVolumeSlider">
-                                                        <rect key="frame" x="19" y="0.0" width="84" height="17"/>
+                                                        <rect key="frame" x="27" y="4" width="84" height="17"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="80" id="SeC-cP-5Dr"/>
                                                         </constraints>
@@ -140,10 +166,10 @@
                                                 </customSpacing>
                                             </stackView>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
-                                                <rect key="frame" x="197" y="-3" width="24" height="30"/>
+                                                <rect key="frame" x="221" y="-3" width="32" height="38"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="dYZ-ri-Kra" secondAttribute="height" multiplier="1:1" id="cHQ-Fu-L8k"/>
-                                                    <constraint firstAttribute="width" constant="24" id="quS-fD-Od7"/>
+                                                    <constraint firstAttribute="width" constant="32" id="quS-fD-Od7"/>
                                                 </constraints>
                                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSEnterFullScreenTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Z8g-js-0W6">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -247,11 +273,15 @@
                             </stackView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="10" id="0l2-eC-67c"/>
+                            <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="10" id="BkP-RA-uxn"/>
                             <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="KQN-vk-oha"/>
                             <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Qn0-ts-S0d"/>
+                            <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="10" id="VyM-t4-y6F"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerX" secondItem="1tI-8K-e3c" secondAttribute="centerX" id="YMh-Zl-NSA"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
+                            <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="10" id="rWa-NJ-Aju"/>
                         </constraints>
                     </view>
                     <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
@@ -273,10 +303,12 @@
     <resources>
         <image name="NSEnterFullScreenTemplate" width="20" height="18"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
+        <image name="arrow.backward" catalog="system" width="12" height="10"/>
         <image name="backward.end.alt.fill" catalog="system" width="25" height="13"/>
         <image name="forward.end.alt.fill" catalog="system" width="25" height="13"/>
         <image name="gobackward.10" catalog="system" width="15" height="17"/>
         <image name="goforward.10" catalog="system" width="15" height="17"/>
+        <image name="music.note.list" catalog="system" width="17" height="15"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
         <image name="volume.3.fill" catalog="system" width="22" height="15"/>
         <image name="volume.fill" catalog="system" width="13" height="14"/>
