@@ -149,7 +149,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.navigationStack = [[VLCLibraryNavigationStack alloc] init];
     self.navigationStack.delegate = self;
 
-    //self.videoView.voutView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
+    self.videoViewController = [[VLCMainVideoViewController alloc] init];
+    self.videoViewController.view.frame = self.mainSplitView.frame;
     self.videoViewController.view.hidden = YES;
     [self hideControlsBar];
 
@@ -760,7 +761,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     
     NSLog(@"Presenting video view in main library window.");
     
-    VLCVoutView *videoView = self.videoViewController.voutView;
+    NSView *videoView = self.videoViewController.view;
     videoView.translatesAutoresizingMaskIntoConstraints = NO;
     videoView.hidden = NO;
 
