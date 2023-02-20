@@ -796,11 +796,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     if (self.isInNativeFullscreen && [self hasActiveVideo] && [self fullscreen]) {
         [self hideControlsBar];
+        [self.videoViewController showControls];
         [_fspanel shouldBecomeActive:nil];
     }
 
     [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:YES];
     [self hideControlsBar];
+    [self.videoViewController showControls];
 }
 
 - (void)disableVideoPlaybackAppearance
