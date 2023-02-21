@@ -394,7 +394,7 @@ typedef struct vlc_window {
         void     *hwnd;          /**< Win32 window handle */
         uint32_t xid;            /**< X11 windows ID */
         void     *nsobject;      /**< macOS/iOS view object */
-        void     *anativewindow; /**< Android native window */
+        int      android_id;     /**< AWindow_ID */
         struct wl_surface *wl;   /**< Wayland surface (client pointer) */
         void     *dcomp_visual;  /**<  Win32 direct composition visual */
         uint32_t crtc;           /**< KMS CRTC identifier */
@@ -413,6 +413,7 @@ typedef struct vlc_window {
         struct wl_display *wl; /**< Wayland display (client pointer) */
         void* dcomp_device; /**< DirectComposition device */
         int      drm_fd; /**< KMS DRM device */
+        void* anativewindow; /**< Android native window */
     } display;
 
     const struct vlc_window_operations *ops; /**< operations handled by the

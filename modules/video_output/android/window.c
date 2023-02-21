@@ -72,7 +72,7 @@ static void Close(vlc_window_t *wnd)
 {
     vout_window_sys_t *sys = (vout_window_sys_t *) wnd->sys;
     vlc_wasync_resize_compressor_destroy(&sys->compressor);
-    AWindowHandler_destroy(wnd->handle.anativewindow);
+    AWindowHandler_destroy(wnd->display.anativewindow);
 }
 
 static int Open(vlc_window_t *wnd)
@@ -101,7 +101,8 @@ static int Open(vlc_window_t *wnd)
         return VLC_EGENERIC;
 
     wnd->type = VLC_WINDOW_TYPE_ANDROID_NATIVE;
-    wnd->handle.anativewindow = p_awh;
+    wnd->display.anativewindow = p_awh;
+    wnd->handle.android_id = AWindow_Video;
     wnd->ops = &ops;
 
     return VLC_SUCCESS;
@@ -112,7 +113,7 @@ OpenDecDevice(vlc_decoder_device *device, vlc_window_t *window)
 {
     AWindowHandler *awh;
     if (window && window->type == VLC_WINDOW_TYPE_ANDROID_NATIVE)
-        awh = window->handle.anativewindow;
+        awh = window->display.anativewindow;
     else
         awh = AWindowHandler_new(VLC_OBJECT(device), NULL, NULL);
 

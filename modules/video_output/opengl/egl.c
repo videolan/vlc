@@ -472,16 +472,16 @@ out:
 
 static void DestroySurface(vlc_gl_t *gl)
 {
-    AWindowHandler_releaseANativeWindow(gl->surface->handle.anativewindow,
-                                        AWindow_Video);
+    AWindowHandler_releaseANativeWindow(gl->surface->display.anativewindow,
+                                        gl->surface->handle.android_id);
 }
 
 static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
                                 unsigned int width, unsigned int height)
 {
     ANativeWindow *anw =
-        AWindowHandler_getANativeWindow(gl->surface->handle.anativewindow,
-                                        AWindow_Video);
+        AWindowHandler_getANativeWindow(gl->surface->display.anativewindow,
+                                        gl->surface->handle.android_id);
 
     (void) width; (void) height;
     return (anw != NULL) ? eglCreateWindowSurface(dpy, config, anw, NULL)

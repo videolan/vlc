@@ -716,8 +716,8 @@ static int Open(vout_display_t *vd,
      || context == NULL)
         return VLC_EGENERIC;
 
-    assert(embed->handle.anativewindow);
-    AWindowHandler *p_awh = embed->handle.anativewindow;
+    assert(embed->display.anativewindow);
+    AWindowHandler *p_awh = embed->display.anativewindow;
 
     /* Allocate structure */
     vd->sys = sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
