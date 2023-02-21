@@ -179,9 +179,9 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
     {
         case SOUT_STREAM_ID_SPU_HIGHLIGHT:
         {
-            vlc_input_decoder_t *p_dec = va_arg( args, void * );
+            sout_stream_id_sys_t *id = va_arg( args, void * );
             void *spu_hl = va_arg( args, void * );
-            return vlc_input_decoder_SetSpuHighlight( p_dec, spu_hl );
+            return vlc_input_decoder_SetSpuHighlight( id->dec, spu_hl );
         }
 
         case SOUT_STREAM_IS_SYNCHRONOUS:
