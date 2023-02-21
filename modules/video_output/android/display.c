@@ -63,7 +63,6 @@ struct android_window
 
     enum AWindow_ID id;
     ANativeWindow *p_surface;
-    jobject       *p_jsurface;
 };
 
 typedef struct buffer_bounds buffer_bounds;
@@ -280,9 +279,6 @@ static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
                                                               p_window->id);
         if (!p_window->p_surface)
             return -1;
-        if (p_window->b_opaque)
-            p_window->p_jsurface = AWindowHandler_getSurface(sys->p_awh,
-                                                             p_window->id);
     }
 
     return 0;
