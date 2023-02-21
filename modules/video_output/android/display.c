@@ -42,11 +42,6 @@
 #include "utils.h"
 
 #define USE_ANWP
-#define CHROMA_TEXT "Chroma used"
-#define CHROMA_LONGTEXT \
-    "Force use of a specific chroma for output. Default is RGB32."
-
-#define CFG_PREFIX "android-display-"
 
 static const vlc_fourcc_t subpicture_chromas[] =
 {
@@ -803,13 +798,7 @@ static int Open(vout_display_t *vd,
 
     fmt = *fmtp;
     if (fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
-        /* Setup chroma */
-        char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
-        if (psz_fcc) {
-            fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, psz_fcc);
-            free(psz_fcc);
-        } else
-            fmt.i_chroma = VLC_CODEC_RGB32;
+        fmt.i_chroma = VLC_CODEC_RGB32;
 
         switch(fmt.i_chroma) {
             case VLC_CODEC_YV12:
@@ -908,6 +897,6 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description("Android video output")
     add_shortcut("android-display")
-    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT)
+    add_obsolete_string("android-display-chroma") /* since 4.0.0 */
     set_callback_display(Open, 260)
 vlc_module_end()
