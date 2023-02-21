@@ -11,6 +11,7 @@
             <connections>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
+                <outlet property="returnButton" destination="UoQ-34-Pox" id="nyY-OF-9zj"/>
                 <outlet property="view" destination="WRu-Ic-lQK" id="B9p-x5-Kd8"/>
                 <outlet property="voutView" destination="mAS-4a-RS8" id="GeX-XO-HYC"/>
             </connections>

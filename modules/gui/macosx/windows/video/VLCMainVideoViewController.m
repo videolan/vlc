@@ -22,6 +22,8 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "library/VLCLibraryWindow.h"
+
 #import "main/VLCMain.h"
 
 #import "views/VLCBottomBarView.h"
@@ -48,6 +50,8 @@
 {
     _autohideControls = YES;
     _controlsBar.bottomBarView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
+
+    [self setDisplayLibraryControls:[self.view.window class] == [VLCLibraryWindow class]];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
@@ -117,6 +121,18 @@
     if (_autohideControls) {
         [self startAutohideTimer];
     }
+}
+
+- (void)setDisplayLibraryControls:(BOOL)displayLibraryControls
+{
+    if (_displayLibraryControls == displayLibraryControls) {
+        return;
+    }
+    
+    _displayLibraryControls = displayLibraryControls;
+
+    _returnButton.hidden = !displayLibraryControls;
+    _playlistButton.hidden = !displayLibraryControls;
 }
 
 @end
