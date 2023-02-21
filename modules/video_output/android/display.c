@@ -41,8 +41,6 @@
 
 #include "utils.h"
 
-#define USE_ANWP
-
 static const vlc_fourcc_t subpicture_chromas[] =
 {
     VLC_CODEC_RGBA,
