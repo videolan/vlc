@@ -68,6 +68,9 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="bezelColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <action selector="togglePlaylist:" target="-2" id="WrP-vg-etw"/>
+                                </connections>
                             </button>
                             <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx" customClass="VLCBottomBarView">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="91"/>

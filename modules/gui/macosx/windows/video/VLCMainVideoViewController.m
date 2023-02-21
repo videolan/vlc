@@ -52,6 +52,7 @@
     _controlsBar.bottomBarView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
 
     [self setDisplayLibraryControls:[self.view.window class] == [VLCLibraryWindow class]];
+    [self updatePlaylistToggleState];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
@@ -111,6 +112,7 @@
 - (void)showControls
 {
     [self stopAutohideTimer];
+    [self updatePlaylistToggleState];
 
     if (!_mainControlsView.hidden && !_autohideControls) {
         return;
@@ -133,6 +135,23 @@
 
     _returnButton.hidden = !displayLibraryControls;
     _playlistButton.hidden = !displayLibraryControls;
+}
+
+- (void)updatePlaylistToggleState
+{
+    VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
+    if (libraryWindow != nil && _displayLibraryControls) {
+        _playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:libraryWindow.playlistView] ?
+            NSControlStateValueOff : NSControlStateValueOn;
+    }
+}
+
+- (IBAction)togglePlaylist:(id)sender
+{
+    VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
+    if (libraryWindow != nil) {
+        [libraryWindow togglePlaylist];
+    }
 }
 
 @end

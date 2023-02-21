@@ -257,11 +257,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self toggleToolbarShown:self];
     [self toggleToolbarShown:self];
 
-    // The playlist toggle button's default state is OFF so we set it to ON if the playlist
-    // is not collapsed when we open the library window
-    if (![_mainSplitView isSubviewCollapsed:_playlistView]) {
-        _playQueueToggle.state = NSControlStateValueOn;
-    }
+    [self updatePlayqueueToggleState];
 }
 
 - (void)dealloc
@@ -499,6 +495,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self insertToolbarItem:_librarySearchToolbarItem inFrontOf:reversedCurrentToolbarItems];
 }
 
+- (void)updatePlayqueueToggleState
+{
+    _playQueueToggle.state = [_mainSplitView isSubviewCollapsed:_playlistView] ?
+        NSControlStateValueOff : NSControlStateValueOn;
+}
+
 - (void)showVideoLibrary
 {
     [self setForwardsBackwardsToolbarItemsVisible:NO];
@@ -677,9 +679,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if ([_mainSplitView isSubviewCollapsed:_playlistView]) {
         [_mainSplitView setPosition:splitViewWidth - _lastPlaylistWidthBeforeCollaps ofDividerAtIndex:0];
         _playQueueToggle.state = NSControlStateValueOn;
+        self.videoViewController.playlistButton.state = NSControlStateValueOn;
     } else {
         [_mainSplitView setPosition:splitViewWidth ofDividerAtIndex:0];
         _playQueueToggle.state = NSControlStateValueOff;
+        self.videoViewController.playlistButton.state = NSControlStateValueOff;
     }
 }
 
