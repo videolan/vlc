@@ -40,7 +40,6 @@
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibraryUIUnits.h"
-#import "library/VLCLibraryWindowAutohideToolbar.h"
 
 #import "library/video-library/VLCLibraryVideoCollectionViewsStackViewController.h"
 #import "library/video-library/VLCLibraryVideoTableViewDataSource.h"
@@ -82,7 +81,8 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
     NSInteger _currentSelectedSegment;
     NSInteger _currentSelectedViewModeSegment;
 
-    NSTimer *_hideToolbarTimer;
+    BOOL _autohideTitlebar;
+    NSTimer *_hideTitlebarTimer;
 }
 
 - (IBAction)goToBrowseSection:(id)sender;
@@ -258,6 +258,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self toggleToolbarShown:self];
 
     [self updatePlayqueueToggleState];
+
+    _autohideTitlebar = NO;
 }
 
 - (void)dealloc
@@ -757,6 +759,70 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _splitViewBottomConstraintToSuperView.priority = 1;
 }
 
+- (void)stopTitlebarAutohideTimer
+{
+    [_hideTitlebarTimer invalidate];
+}
+
+- (void)startTitlebarAutohideTimer
+{
+    /* Do nothing if timer is already in place */
+    if (_hideTitlebarTimer.valid) {
+        return;
+    }
+
+    /* Get timeout and make sure it is not lower than 1 second */
+    long long timeToKeepVisibleInSec = MAX(var_CreateGetInteger(getIntf(), "mouse-hide-timeout") / 1000, 1);
+
+    _hideTitlebarTimer = [NSTimer scheduledTimerWithTimeInterval:timeToKeepVisibleInSec
+                                                          target:self
+                                                        selector:@selector(hideTitleBar:)
+                                                        userInfo:nil
+                                                         repeats:NO];
+}
+
+- (void)showTitleBar
+{
+    [self stopTitlebarAutohideTimer];
+
+    NSView *titlebarView =  [self standardWindowButton:NSWindowCloseButton].superview;
+    if (!titlebarView.hidden && !_autohideTitlebar) {
+        return;
+    }
+
+    titlebarView.hidden = NO;
+
+    if (_autohideTitlebar) {
+        [self startTitlebarAutohideTimer];
+    }
+}
+
+- (void)hideTitleBar:(id)sender
+{
+    [self stopTitlebarAutohideTimer];
+    [self standardWindowButton:NSWindowCloseButton].superview.hidden = YES;
+}
+
+- (void)enableVideoTitleBarMode
+{
+    self.toolbar.visible = NO;
+    self.styleMask |= NSWindowStyleMaskFullSizeContentView;
+    self.titlebarAppearsTransparent = YES;
+
+    _autohideTitlebar = YES;
+    [self showTitleBar];
+}
+
+- (void)disableVideoTitleBarMode
+{
+    self.toolbar.visible = YES;
+    self.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
+    self.titlebarAppearsTransparent = NO;
+
+    _autohideTitlebar = NO;
+    [self showTitleBar];
+}
+
 - (void)presentVideoView
 {
     for (NSView *subview in _libraryTargetView.subviews) {
@@ -804,7 +870,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_fspanel shouldBecomeActive:nil];
     }
 
-    [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:YES];
+    [self enableVideoTitleBarMode];
     [self hideControlsBar];
     [self.videoViewController showControls];
 }
@@ -834,7 +900,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_fspanel shouldBecomeInactive:nil];
     }
 
-    [(VLCLibraryWindowAutohideToolbar *)self.toolbar setAutohide:NO];
+    [self disableVideoTitleBarMode];
     [self showControlsBar];
 }
 
@@ -862,20 +928,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     if (self.videoViewController.view.isHidden) {
         [self showControlsBar];
+        NSView *standardWindowButtonsSuperView = [self standardWindowButton:NSWindowCloseButton].superview;
+        standardWindowButtonsSuperView.hidden = NO;
     }
 }
 
 - (void)shouldShowFullscreenController:(NSNotification *)aNotification
 {
-    id currentWindow = [NSApp keyWindow];
-    if ([currentWindow respondsToSelector:@selector(hasActiveVideo)] && [currentWindow hasActiveVideo]) {
-        if ([currentWindow respondsToSelector:@selector(fullscreen)] && [currentWindow fullscreen] &&
-            [currentWindow respondsToSelector:@selector(videoViewController)] && ![[[currentWindow videoViewController] view] isHidden]) {
-            if ([_playlistController.playerController activeVideoPlayback]) {
-                [_fspanel fadeIn];
-            }
-        }
-    }
+    [self showTitleBar];
 }
 
 @end
