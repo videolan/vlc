@@ -139,7 +139,8 @@ void FirstRunWizard::finish()
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     config_PutInt( "qt-titlebar", ui.layoutGroup->checkedId() );
 #endif
-    p_intf->p_mi->setPinVideoControls( ui.layoutGroup->checkedId() );
+
+    config_PutInt( "qt-pin-controls", ui.layoutGroup->checkedId() );
 
     ControlbarProfileModel* controlbarModel = p_intf->p_mi->controlbarProfileModel();
     assert(controlbarModel);
