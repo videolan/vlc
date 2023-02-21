@@ -19,7 +19,6 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.11
-import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
 
@@ -234,12 +233,10 @@ ColumnLayout {
         }
     }
 
-    T.Slider {
+    Widgets.Slider {
         id: slider
 
         Layout.fillWidth: true
-
-        implicitHeight: VLCStyle.heightBar_small
 
         // NOTE: These values come from the VLC 3.x implementation.
         from: -34
@@ -249,6 +246,12 @@ ColumnLayout {
 
         wheelEnabled: true
 
+        valueText: function (value) {
+            return sliderToSpeed(value).toFixed(2)
+        }
+
+        tooltipFollowsMouse: true
+
         Navigation.parentItem: root
         Navigation.upItem: buttonReset
         Navigation.downItem: comboBox
@@ -257,79 +260,6 @@ ColumnLayout {
         Keys.onPressed: Navigation.defaultKeyAction(event)
 
         onValueChanged: root._applyPlayer(value)
-
-        background: Rectangle {
-            width: slider.availableWidth
-            height: implicitHeight
-
-            implicitWidth: VLCStyle.dp(256, VLCStyle.scale)
-            implicitHeight: VLCStyle.dp(4, VLCStyle.scale)
-
-            x: slider.leftPadding
-            y: slider.topPadding + slider.availableHeight / 2 - height / 2
-
-            radius: VLCStyle.dp(2, VLCStyle.scale)
-
-            color: theme.bg.secondary
-
-            Rectangle {
-                width: slider.visualPosition * parent.width
-                height: parent.height
-
-                radius: parent.radius
-
-                color: root._color
-            }
-        }
-
-        handle: Rectangle {
-            width: VLCStyle.icon_small
-            height: width
-            radius: width * .5
-
-            x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-            y: slider.topPadding + slider.availableHeight / 2 - height / 2
-
-            color: root._color
-
-        }
-
-        MouseArea {
-            id: toolTipTracker
-
-            anchors.fill: parent
-
-            acceptedButtons: Qt.NoButton
-
-            hoverEnabled: true
-
-            onPressed: {
-                mouse.accepted = false
-            }
-
-            preventStealing: true
-
-            propagateComposedEvents: true
-        }
-
-        Widgets.PointingTooltip {
-           z: 1 // without this tooltips get placed below root's parent popup
-
-           property real _mouseX: toolTipTracker.mouseX
-
-           pos: Qt.point(_mouseX, slider.handle.width / 2)
-
-           visible: !slider.pressed && toolTipTracker.containsMouse
-
-           text: {
-               if (!visible) return ""
-
-               var v = slider.valueAt(slider.positionAt(_mouseX))
-               return sliderToSpeed(v).toFixed(2)
-           }
-
-           colors: root.colors
-        }
 
         MouseArea {
             anchors.fill: parent
@@ -341,13 +271,6 @@ ColumnLayout {
 
                 root._shiftPressed = (mouse.modifiers === Qt.ShiftModifier)
             }
-        }
-
-        function positionAt(x) {
-            // find postion under x, taken from qt sources QQuickSlider.cpp
-            var contentX = x - slider.leftPadding - slider.handle.width / 2
-            var extend = slider.availableWidth - slider.handle.width
-            return x / extend
         }
     }
 
