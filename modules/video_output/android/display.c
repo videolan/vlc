@@ -41,41 +41,18 @@
 
 #include "utils.h"
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 #define USE_ANWP
 #define CHROMA_TEXT "Chroma used"
 #define CHROMA_LONGTEXT \
     "Force use of a specific chroma for output. Default is RGB32."
 
 #define CFG_PREFIX "android-display-"
-static int Open(vout_display_t *vd,
-                video_format_t *fmtp, vlc_video_context *context);
-static void Close(vout_display_t *vd);
-static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
-
-vlc_module_begin()
-    set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_description("Android video output")
-    add_shortcut("android-display")
-    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT)
-    set_callback_display(Open, 260)
-vlc_module_end()
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
 
 static const vlc_fourcc_t subpicture_chromas[] =
 {
     VLC_CODEC_RGBA,
     0
 };
-
-static void             Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
-static void             Display(vout_display_t *, picture_t *);
-static int              Control(vout_display_t *, int);
 
 typedef struct
 {
@@ -473,131 +450,6 @@ static void SetRGBMask(video_format_t *p_fmt)
     }
 }
 
-static const struct vlc_display_operations ops = {
-    .close = Close,
-    .prepare = Prepare,
-    .display = Display,
-    .control = Control,
-    .set_viewpoint = NULL,
-};
-
-static int Open(vout_display_t *vd,
-                video_format_t *fmtp, vlc_video_context *context)
-{
-    vout_display_sys_t *sys;
-    video_format_t fmt, sub_fmt;
-
-    vlc_window_t *embed = vd->cfg->window;
-    if (embed->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
-        return VLC_EGENERIC;
-
-    assert(embed->handle.anativewindow);
-    AWindowHandler *p_awh = embed->handle.anativewindow;
-
-    /* Allocate structure */
-    vd->sys = sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
-    if (!sys)
-        return VLC_ENOMEM;
-
-    sys->embed = embed;
-    sys->p_awh = p_awh;
-    sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
-
-    fmt = *fmtp;
-    if (fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
-        /* Setup chroma */
-        char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
-        if (psz_fcc) {
-            fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, psz_fcc);
-            free(psz_fcc);
-        } else
-            fmt.i_chroma = VLC_CODEC_RGB32;
-
-        switch(fmt.i_chroma) {
-            case VLC_CODEC_YV12:
-                /* avoid swscale usage by asking for I420 instead since the
-                 * vout already has code to swap the buffers */
-                fmt.i_chroma = VLC_CODEC_I420;
-            case VLC_CODEC_I420:
-                break;
-            case VLC_CODEC_RGB16:
-            case VLC_CODEC_RGB32:
-            case VLC_CODEC_RGBA:
-                SetRGBMask(&fmt);
-                video_format_FixRgb(&fmt);
-                break;
-            default:
-                goto error;
-        }
-        sys->avctx = NULL;
-    }
-    else
-    {
-        if (!context)
-            goto error;
-        sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
-        assert(sys->avctx);
-        if (sys->avctx->texture != NULL)
-        {
-            /* video context configured for opengl */
-            goto error;
-        }
-    }
-
-    sys->p_window = AndroidWindow_New(vd, &fmt, AWindow_Video);
-    if (!sys->p_window)
-        goto error;
-
-    /* use software rotation if we don't do opaque */
-    if (!sys->p_window->b_opaque)
-        video_format_TransformTo(&fmt, ORIENT_NORMAL);
-
-    msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" : "ANW");
-
-    video_format_ApplyRotation(&sub_fmt, &fmt);
-    sub_fmt.i_chroma = subpicture_chromas[0];
-    SetRGBMask(&sub_fmt);
-    video_format_FixRgb(&sub_fmt);
-    sys->p_sub_window = AndroidWindow_New(vd, &sub_fmt, AWindow_Subtitles);
-    if (sys->p_sub_window) {
-
-        FixSubtitleFormat(vd);
-        sys->i_sub_last_order = -1;
-
-        /* Export the subpicture capability of this vout. */
-        vd->info.subpicture_chromas = subpicture_chromas;
-    }
-    else if (!vd->obj.force && sys->p_window->b_opaque)
-    {
-        msg_Warn(vd, "cannot blend subtitles with an opaque surface, "
-                     "trying next vout");
-        goto error;
-    }
-
-    /* Setup vout_display */
-    if (!sys->p_window->b_opaque)
-    {
-        if (AndroidWindow_SetupSW(sys, sys->p_window) != 0)
-            goto error;
-
-        sys->p_prepared_pic = PictureAlloc(&sys->p_window->fmt);
-        if (sys->p_prepared_pic == NULL)
-            goto error;
-
-        UpdateVideoSize(sys, &sys->p_window->fmt);
-    }
-
-    vd->ops = &ops;
-
-    *fmtp = fmt;
-
-    return VLC_SUCCESS;
-
-error:
-    Close(vd);
-    return VLC_EGENERIC;
-}
-
 static void ClearSurface(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -638,41 +490,6 @@ end:
             sys->anw->unlockAndPost(p_window->p_surface);
         }
     }
-}
-
-static void Close(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* Check if SPU regions have been properly cleared, and clear them if they
-     * were not. */
-    if (sys->b_has_subpictures)
-    {
-        SubpicturePrepare(vd, NULL);
-        AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic);
-    }
-
-    if (sys->p_window)
-    {
-        if (sys->b_displayed)
-            ClearSurface(vd);
-        AndroidWindow_Destroy(vd, sys->p_window);
-    }
-
-    if (sys->p_prepared_pic)
-        picture_Release(sys->p_prepared_pic);
-    if (sys->p_sub_pic)
-        picture_Release(sys->p_sub_pic);
-    if (sys->p_spu_blend)
-        filter_DeleteBlend(sys->p_spu_blend);
-    free(sys->p_sub_buffer_bounds);
-    if (sys->p_sub_window)
-        AndroidWindow_Destroy(vd, sys->p_sub_window);
-
-    if (sys->embed)
-        AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
-
-    free(sys);
 }
 
 static void SubtitleRegionToBounds(subpicture_t *subpicture,
@@ -926,3 +743,171 @@ static int Control(vout_display_t *vd, int query)
         return VLC_EGENERIC;
     }
 }
+
+static void Close(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    /* Check if SPU regions have been properly cleared, and clear them if they
+     * were not. */
+    if (sys->b_has_subpictures)
+    {
+        SubpicturePrepare(vd, NULL);
+        AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic);
+    }
+
+    if (sys->p_window)
+    {
+        if (sys->b_displayed)
+            ClearSurface(vd);
+        AndroidWindow_Destroy(vd, sys->p_window);
+    }
+
+    if (sys->p_prepared_pic)
+        picture_Release(sys->p_prepared_pic);
+    if (sys->p_sub_pic)
+        picture_Release(sys->p_sub_pic);
+    if (sys->p_spu_blend)
+        filter_DeleteBlend(sys->p_spu_blend);
+    free(sys->p_sub_buffer_bounds);
+    if (sys->p_sub_window)
+        AndroidWindow_Destroy(vd, sys->p_sub_window);
+
+    if (sys->embed)
+        AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
+
+    free(sys);
+}
+
+static int Open(vout_display_t *vd,
+                video_format_t *fmtp, vlc_video_context *context)
+{
+    vout_display_sys_t *sys;
+    video_format_t fmt, sub_fmt;
+
+    vlc_window_t *embed = vd->cfg->window;
+    if (embed->type != VLC_WINDOW_TYPE_ANDROID_NATIVE)
+        return VLC_EGENERIC;
+
+    assert(embed->handle.anativewindow);
+    AWindowHandler *p_awh = embed->handle.anativewindow;
+
+    /* Allocate structure */
+    vd->sys = sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+
+    sys->embed = embed;
+    sys->p_awh = p_awh;
+    sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
+
+    fmt = *fmtp;
+    if (fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
+        /* Setup chroma */
+        char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
+        if (psz_fcc) {
+            fmt.i_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, psz_fcc);
+            free(psz_fcc);
+        } else
+            fmt.i_chroma = VLC_CODEC_RGB32;
+
+        switch(fmt.i_chroma) {
+            case VLC_CODEC_YV12:
+                /* avoid swscale usage by asking for I420 instead since the
+                 * vout already has code to swap the buffers */
+                fmt.i_chroma = VLC_CODEC_I420;
+            case VLC_CODEC_I420:
+                break;
+            case VLC_CODEC_RGB16:
+            case VLC_CODEC_RGB32:
+            case VLC_CODEC_RGBA:
+                SetRGBMask(&fmt);
+                video_format_FixRgb(&fmt);
+                break;
+            default:
+                goto error;
+        }
+        sys->avctx = NULL;
+    }
+    else
+    {
+        if (!context)
+            goto error;
+        sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
+        assert(sys->avctx);
+        if (sys->avctx->texture != NULL)
+        {
+            /* video context configured for opengl */
+            goto error;
+        }
+    }
+
+    sys->p_window = AndroidWindow_New(vd, &fmt, AWindow_Video);
+    if (!sys->p_window)
+        goto error;
+
+    /* use software rotation if we don't do opaque */
+    if (!sys->p_window->b_opaque)
+        video_format_TransformTo(&fmt, ORIENT_NORMAL);
+
+    msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" : "ANW");
+
+    video_format_ApplyRotation(&sub_fmt, &fmt);
+    sub_fmt.i_chroma = subpicture_chromas[0];
+    SetRGBMask(&sub_fmt);
+    video_format_FixRgb(&sub_fmt);
+    sys->p_sub_window = AndroidWindow_New(vd, &sub_fmt, AWindow_Subtitles);
+    if (sys->p_sub_window) {
+
+        FixSubtitleFormat(vd);
+        sys->i_sub_last_order = -1;
+
+        /* Export the subpicture capability of this vout. */
+        vd->info.subpicture_chromas = subpicture_chromas;
+    }
+    else if (!vd->obj.force && sys->p_window->b_opaque)
+    {
+        msg_Warn(vd, "cannot blend subtitles with an opaque surface, "
+                     "trying next vout");
+        goto error;
+    }
+
+    /* Setup vout_display */
+    if (!sys->p_window->b_opaque)
+    {
+        if (AndroidWindow_SetupSW(sys, sys->p_window) != 0)
+            goto error;
+
+        sys->p_prepared_pic = PictureAlloc(&sys->p_window->fmt);
+        if (sys->p_prepared_pic == NULL)
+            goto error;
+
+        UpdateVideoSize(sys, &sys->p_window->fmt);
+    }
+
+    static const struct vlc_display_operations ops = {
+        .close = Close,
+        .prepare = Prepare,
+        .display = Display,
+        .control = Control,
+        .set_viewpoint = NULL,
+    };
+
+    vd->ops = &ops;
+
+    *fmtp = fmt;
+
+    return VLC_SUCCESS;
+
+error:
+    Close(vd);
+    return VLC_EGENERIC;
+}
+
+vlc_module_begin()
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_description("Android video output")
+    add_shortcut("android-display")
+    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT)
+    set_callback_display(Open, 260)
+vlc_module_end()
