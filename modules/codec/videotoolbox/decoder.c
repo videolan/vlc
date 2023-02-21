@@ -37,6 +37,8 @@
 #import "../../packetizer/h264_slice.h"
 #import "../../packetizer/hxxx_nal.h"
 #import "../../packetizer/hxxx_sei.h"
+#import "../../packetizer/vp9_frame.h"
+#import "vp9_repack.h"
 #import "pacer.h"
 #import "dpb.h"
 
@@ -52,6 +54,14 @@
 
 #define VT_ALIGNMENT 16
 #define VT_RESTART_MAX 1
+
+#pragma mark - Compat
+
+#if (!TARGET_OS_OSX    || __MAC_OS_X_VERSION_MAX_ALLOWED   < 110000) && \
+    (!TARGET_OS_IPHONE || __IPHONE_OS_VERSION_MAX_ALLOWED  < 140000) && \
+    (!TARGET_OS_TV     || __TV_OS_VERSION_MAX_ALLOWED      < 140000)
+enum { kCMVideoCodecType_VP9 = 'vp09' };
+#endif
 
 #pragma mark - local prototypes
 
@@ -872,6 +882,139 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
         return NULL; /* MPEG4 without esds ? */
 }
 
+/** VP9 Specific */
+
+struct vt_vp9_context
+{
+    struct vp9_uncompressed_header vp9_header;
+    struct vp9_repacker vp9_repacker;
+};
+
+static void CleanVP9(void *p_codec_context)
+{
+    struct vt_vp9_context *vp9ctx = p_codec_context;
+    vp9_repacker_Clean(&vp9ctx->vp9_repacker);
+    free(vp9ctx);
+}
+
+static bool InitVP9(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+#if (TARGET_OS_OSX && defined(MAC_OS_VERSION_11_0) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0) || \
+    (TARGET_OS_IOS && defined(__IPHONE_26_2) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_2) || \
+    (TARGET_OS_TV && defined(__TVOS_26_2) && __TV_OS_VERSION_MAX_ALLOWED >= __TVOS_26_2)
+    if(__builtin_available(macOS 11.0, iOS 26.2, tvOS 26.2, *))
+        VTRegisterSupplementalVideoDecoderIfAvailable(kCMVideoCodecType_VP9);
+#endif
+
+    if(__builtin_available(macOS 10.13, iOS 11.0, tvOS 11.0, *)) {
+        if (!VTIsHardwareDecodeSupported(kCMVideoCodecType_VP9))
+            return false;
+    } else {
+        return false;
+    }
+
+    struct vt_vp9_context *ctx = malloc(sizeof(*ctx));
+    if(!ctx)
+        return false;
+    p_sys->p_codec_context = ctx;
+    vp9_repacker_Init(&ctx->vp9_repacker);
+    memset(&ctx->vp9_header, 0, sizeof(ctx->vp9_header));
+    return true;
+}
+
+static bool CodecSupportedVP9(decoder_t *p_dec)
+{
+    return p_dec->fmt_in->i_profile == 0 ||
+           p_dec->fmt_in->i_profile == 2;
+}
+
+static CFDictionaryRef CopyDecoderExtradataVP9(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_vp9_context *vp9ctx = p_sys->p_codec_context;
+
+    CFDictionaryRef extradata = NULL;
+    if (p_dec->fmt_in->i_extra)
+    {
+        /* copy DecoderConfiguration */
+        extradata = ExtradataInfoCreate(CFSTR("vpcC"),
+                                        p_dec->fmt_in->p_extra,
+                                        p_dec->fmt_in->i_extra);
+    }
+    else
+    {
+        uint8_t dcr[VP9_DECODER_CONFIG_SIZE];
+        int level = p_dec->fmt_in->i_level;
+        if (es_format_HasVpxAlpha(p_dec->fmt_in))
+            level = level & ~0x1000;
+
+        if(vp9_fill_decoder_config(&vp9ctx->vp9_header,
+                                   level,
+                                   p_dec->fmt_in->video.chroma_location,
+                                   dcr))
+            extradata = ExtradataInfoCreate(CFSTR("vpcC"),
+                                            dcr, VP9_DECODER_CONFIG_SIZE);
+    }
+    return extradata;
+}
+
+static bool LateStartVP9(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_vp9_context *vp9ctx = p_sys->p_codec_context;
+    return (p_dec->fmt_in->i_extra == 0 && vp9ctx->vp9_header.bit_depth == 0);
+}
+
+static block_t *ProcessBlockVP9(decoder_t *p_dec, block_t *p_block, bool *pb_config_changed)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_vp9_context *vp9ctx = p_sys->p_codec_context;
+
+    *pb_config_changed = false;
+
+    struct vp9_uncompressed_header hdr = {0};
+    if(!vp9_parse_uncompressed_header(p_block->p_buffer, p_block->i_buffer, &hdr))
+    {
+        block_Release(p_block);
+        return NULL;
+    }
+
+    if(hdr.frame_type == VP9_KEY_FRAME || hdr.intra_only)
+    {
+        *pb_config_changed = !vp9_configs_equals(&hdr, &vp9ctx->vp9_header);
+        if(*pb_config_changed)
+        {
+            vp9ctx->vp9_header = hdr;
+        }
+    }
+
+    return vp9_repacker_Push(&vp9ctx->vp9_repacker, p_block, hdr.show_frame);
+}
+
+static bool ConfigureVoutVP9(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_vp9_context *vp9ctx = p_sys->p_codec_context;
+    const struct vp9_uncompressed_header *h = &vp9ctx->vp9_header;
+    video_format_t *fmt = &p_dec->fmt_out.video;
+
+    if (p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
+        vp9_get_colorimetry(h, &fmt->primaries, &fmt->transfer,
+                            &fmt->space, &fmt->color_range);
+
+    if (!p_dec->fmt_in->video.i_visible_width ||
+        !p_dec->fmt_in->video.i_visible_height)
+    {
+        fmt->i_visible_width = h->render_width_minus1 + 1;
+        fmt->i_width = vlc_align(h->frame_width_minus1 + 1, VT_ALIGNMENT);
+        fmt->i_visible_height = h->render_height_minus1 + 1;
+        fmt->i_height = vlc_align(h->frame_height_minus1 + 1, VT_ALIGNMENT);
+    }
+
+    return true;
+}
+
 /* !Codec Specific */
 
 static void DrainDPBLocked(decoder_t *p_dec, bool flush)
@@ -1016,6 +1159,9 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             msg_Dbg(p_dec, "Will decode MP4V with original FourCC '%4.4s'", (char *)&p_dec->fmt_in->i_original_fourcc);
             return kCMVideoCodecType_MPEG4Video;
         }
+
+        case VLC_CODEC_VP9:
+            return kCMVideoCodecType_VP9;
 #if !TARGET_OS_IPHONE
         case VLC_CODEC_H263:
             return kCMVideoCodecType_H263;
@@ -1498,6 +1644,21 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
             p_sys->dpb.b_strict_reorder = true;
             p_sys->dpb.b_poc_based_reorder = true;
+            p_sys->start_sync_state = STATE_BITSTREAM_WAITING_RAP;
+            break;
+
+        case kCMVideoCodecType_VP9:
+            p_sys->pf_codec_init = InitVP9;
+            p_sys->pf_codec_clean = CleanVP9;
+            p_sys->pf_codec_supported = CodecSupportedVP9;
+            p_sys->pf_late_start = LateStartVP9;
+            p_sys->pf_process_block = ProcessBlockVP9;
+            p_sys->pf_need_restart = NULL;
+            p_sys->pf_configure_vout = ConfigureVoutVP9;
+            p_sys->pf_copy_extradata = CopyDecoderExtradataVP9;
+            p_sys->pf_fill_reorder_info = NULL;
+            p_sys->dpb.b_strict_reorder = true;
+            p_sys->dpb.b_poc_based_reorder = false;
             p_sys->start_sync_state = STATE_BITSTREAM_WAITING_RAP;
             break;
 

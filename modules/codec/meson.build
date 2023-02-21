@@ -595,6 +595,10 @@ if host_system == 'darwin'
             'videotoolbox/dpb.h',
             'videotoolbox/pacer.c',
             'videotoolbox/pacer.h',
+            'videotoolbox/vp9_repack.c',
+            'videotoolbox/vp9_repack.h',
+            '../packetizer/vp9_frame.c',
+            '../packetizer/vp9_frame.h'
         ),
         'dependencies' : [
             frameworks['VideoToolbox'],
