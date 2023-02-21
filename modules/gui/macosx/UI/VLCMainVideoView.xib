@@ -56,6 +56,9 @@
                                     <imageReference key="image" image="arrow.backward" catalog="system" symbolScale="small"/>
                                 </buttonCell>
                                 <color key="bezelColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <connections>
+                                    <action selector="returnToLibrary:" target="-2" id="rnL-S1-zSR"/>
+                                </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
                                 <rect key="frame" x="675" y="434" width="38" height="39"/>

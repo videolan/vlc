@@ -154,4 +154,12 @@
     }
 }
 
+- (IBAction)returnToLibrary:(id)sender
+{
+    VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
+    if (libraryWindow != nil) {
+        [libraryWindow disableVideoPlaybackAppearance];
+    }
+}
+
 @end

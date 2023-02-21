@@ -140,6 +140,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCFSPanelController *fspanel;
 
 - (void)reopenVideoView;
+- (void)disableVideoPlaybackAppearance;
 - (void)togglePlaylist;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
