@@ -222,6 +222,7 @@
         <file alias="CSDThemeButtonSet.qml">widgets/qml/CSDThemeButtonSet.qml</file>
         <file alias="CSDThemeButton.qml">widgets/qml/CSDThemeButton.qml</file>
         <file alias="TextFieldExt.qml">widgets/qml/TextFieldExt.qml</file>
+        <file alias="Slider.qml">widgets/qml/Slider.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>

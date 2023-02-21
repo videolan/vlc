@@ -1026,6 +1026,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/ScanProgressBar.qml \
 	gui/qt/widgets/qml/ScrollingText.qml \
 	gui/qt/widgets/qml/SearchBox.qml \
+	gui/qt/widgets/qml/Slider.qml \
 	gui/qt/widgets/qml/SortControl.qml \
 	gui/qt/widgets/qml/SpinBoxExt.qml \
 	gui/qt/widgets/qml/StackViewExt.qml \
