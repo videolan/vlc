@@ -41,7 +41,6 @@
 #import "playlist/VLCPlayerController.h"
 
 #import "windows/video/VLCAspectRatioRetainingVideoWindow.h"
-#import "windows/video/VLCDetachedVideoWindow.h"
 #import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVoutView.h"
 
