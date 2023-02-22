@@ -40,6 +40,9 @@
 @property (readwrite, strong) IBOutlet NSButton *prevButton;
 @property (readwrite, strong) IBOutlet NSButton *nextButton;
 
+@property (readwrite, strong) IBOutlet NSButton *repeatButton;
+@property (readwrite, strong) IBOutlet NSButton *shuffleButton;
+
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *artistNameTextFieldWidthConstraint;
 
 @property (readwrite, strong) IBOutlet NSTextField *songArtistSeparatorTextField;

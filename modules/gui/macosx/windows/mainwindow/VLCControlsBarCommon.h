@@ -45,8 +45,6 @@
 @property (readwrite, strong) IBOutlet NSButton *playButton;
 @property (readwrite, strong) IBOutlet NSButton *backwardButton;
 @property (readwrite, strong) IBOutlet NSButton *forwardButton;
-@property (readwrite, strong) IBOutlet NSButton *repeatButton;
-@property (readwrite, strong) IBOutlet NSButton *shuffleButton;
 
 @property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
 @property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
