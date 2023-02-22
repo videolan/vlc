@@ -192,6 +192,11 @@
     [self.volumeUpButton setEnabled: !b_muted];
 }
 
+- (void)updateMuteVolumeButtonImage
+{
+    self.muteVolumeButton.image = imageFromRes(@"volume-low");
+}
+
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
     switch (_playerController.playerState) {

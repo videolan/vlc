@@ -74,7 +74,10 @@
 - (IBAction)volumeAction:(id)sender;
 - (IBAction)fullscreen:(id)sender;
 
+- (void)updateMuteVolumeButtonImage;
+
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 - (void)updateVolumeSlider:(NSNotification *)aNotification;
+- (void)updateMuteVolumeButton:(NSNotification *)aNotification;
 
 @end

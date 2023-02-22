@@ -84,6 +84,10 @@
                                name:VLCPlayerMuteChanged
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(updateMuteVolumeButton:)
+                               name:VLCPlayerMuteChanged
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(playerStateUpdated:)
                                name:VLCPlayerStateChanged
                              object:nil];
@@ -144,7 +148,7 @@
 
     [self.muteVolumeButton setToolTip: _NS("Mute")];
     self.muteVolumeButton.accessibilityLabel = self.muteVolumeButton.toolTip;
-    [self.muteVolumeButton setImage: imageFromRes(@"volume-low")];
+    [self updateMuteVolumeButtonImage];
 
     NSColor *timeFieldTextColor = [NSColor controlTextColor];
 
@@ -310,6 +314,7 @@
         [_playerController setVolume:[sender floatValue]];
     } else if (sender == self.muteVolumeButton) {
         [_playerController toggleMute];
+        [self updateMuteVolumeButtonImage];
     }
 }
 
@@ -388,6 +393,17 @@
     [self.volumeSlider setToolTip:volumeTooltip];
 
     [self.volumeSlider setEnabled: !b_muted];
+}
+
+- (void)updateMuteVolumeButton:(NSNotification*)aNotification
+{
+    [self updateMuteVolumeButtonImage];
+}
+
+- (void)updateMuteVolumeButtonImage
+{
+    _muteVolumeButton.image = _playerController.mute ?
+        imageFromRes(@"volume-low") : imageFromRes(@"volume-high");
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification
