@@ -153,21 +153,32 @@ ATTR_PACKED
 #   pragma pack(pop)
 #endif
 
-/* disable Windws ones, keep consistency throughout our source code */
-#undef WAVE_FORMAT_PCM
-#undef WAVE_FORMAT_IMA_ADPCM
+#if defined(static_assert) || defined(__cpp_static_assert)
+#define VLC_CHECK_WAV_FORMAT(name, val)  \
+    static_assert(name == val, "unpexpected definition of " #name);
+#else
+#define VLC_CHECK_WAV_FORMAT(name, val)
+#endif
 
 /* WAVE format wFormatTag IDs */
 /* See http://msdn.microsoft.com/en-us/library/aa904731%28v=vs.80%29.aspx */
 #define WAVE_FORMAT_UNKNOWN             0x0000 /* Microsoft Corporation */
+#ifndef WAVE_FORMAT_PCM
 #define WAVE_FORMAT_PCM                 0x0001 /* Microsoft Corporation */
+#else
+VLC_CHECK_WAV_FORMAT(WAVE_FORMAT_PCM, 0x0001)
+#endif
 #define WAVE_FORMAT_ADPCM               0x0002 /* Microsoft Corporation */
 #define WAVE_FORMAT_IEEE_FLOAT          0x0003 /* Microsoft Corporation */
 #define WAVE_FORMAT_ALAW                0x0006 /* Microsoft Corporation */
 #define WAVE_FORMAT_MULAW               0x0007 /* Microsoft Corporation */
 #define WAVE_FORMAT_DTS                 0x0008 /* Microsoft Corporation */
 #define WAVE_FORMAT_WMAS                0x000a /* WMA 9 Speech */
+#ifndef WAVE_FORMAT_IMA_ADPCM
 #define WAVE_FORMAT_IMA_ADPCM           0x0011 /* Intel Corporation */
+#else
+VLC_CHECK_WAV_FORMAT(WAVE_FORMAT_IMA_ADPCM, 0x0011)
+#endif
 #define WAVE_FORMAT_YAMAHA_ADPCM        0x0020 /* Yamaha */
 #define WAVE_FORMAT_TRUESPEECH          0x0022 /* TrueSpeech */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
@@ -217,9 +228,13 @@ ATTR_PACKED
 #define WAVE_FORMAT_DTSINC_DTS          0x2001 /* DTS */
 #ifndef WAVE_FORMAT_ALAC
 #define WAVE_FORMAT_ALAC                0x6c61
+#else
+VLC_CHECK_WAV_FORMAT(WAVE_FORMAT_ALAC, 0x6c61)
 #endif
 #ifndef WAVE_FORMAT_OPUS
 #define WAVE_FORMAT_OPUS                0x704f
+#else
+VLC_CHECK_WAV_FORMAT(WAVE_FORMAT_OPUS, 0x704f)
 #endif
 #define WAVE_FORMAT_AVCODEC_AAC         0x706D
 #define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
