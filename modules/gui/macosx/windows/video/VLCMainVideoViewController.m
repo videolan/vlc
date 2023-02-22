@@ -23,6 +23,7 @@
 #import "VLCMainVideoViewController.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryUIUnits.h"
 
 #import "main/VLCMain.h"
 
@@ -53,6 +54,7 @@
 
     [self setDisplayLibraryControls:[self.view.window class] == [VLCLibraryWindow class]];
     [self updatePlaylistToggleState];
+    [self updateLibraryControlsTopConstraint];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
@@ -113,6 +115,7 @@
 {
     [self stopAutohideTimer];
     [self updatePlaylistToggleState];
+    [self updateLibraryControlsTopConstraint];
 
     if (!_mainControlsView.hidden && !_autohideControls) {
         return;
@@ -144,6 +147,28 @@
         _playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:libraryWindow.playlistView] ?
             NSControlStateValueOff : NSControlStateValueOn;
     }
+}
+
+- (void)updateLibraryControlsTopConstraint
+{
+    const NSWindow * const viewWindow = self.view.window;
+    const NSView * const titlebarView = [viewWindow standardWindowButton:NSWindowCloseButton].superview;
+    const CGFloat windowTitlebarHeight = titlebarView.frame.size.height;
+
+    const BOOL windowFullscreen = [(VLCWindow*)viewWindow isInNativeFullscreen] || [(VLCWindow*)viewWindow fullscreen];
+    const CGFloat spaceToTitlebar = viewWindow.titlebarAppearsTransparent ? [VLCLibraryUIUnits smallSpacing] : [VLCLibraryUIUnits mediumSpacing];
+    const CGFloat topSpaceWithTitlebar = windowTitlebarHeight + spaceToTitlebar;
+
+    // Since the close/maximise/minimise buttons go on the left, we want to make sure the return
+    // button does not overlap. But for the playlist button, as long as the toolbar and titlebar
+    // appears fully transparent, it looks nicer to leave it at the top
+    const CGFloat returnButtonTopSpace = titlebarView.hidden || windowFullscreen ?
+        [VLCLibraryUIUnits mediumSpacing] : topSpaceWithTitlebar;
+    const CGFloat playlistButtonTopSpace = viewWindow.toolbar.visible && viewWindow.titlebarAppearsTransparent && !windowFullscreen ?
+        topSpaceWithTitlebar : [VLCLibraryUIUnits mediumSpacing];
+
+    _returnButtonTopConstraint.constant = returnButtonTopSpace;
+    _playlistButtonTopConstraint.constant = playlistButtonTopSpace;
 }
 
 - (IBAction)togglePlaylist:(id)sender
