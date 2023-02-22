@@ -24,6 +24,10 @@
 # include <vlc_es.h>
 # include <vlc_bits.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PROFILE_H264_BASELINE             66
 #define PROFILE_H264_MAIN                 77
 #define PROFILE_H264_EXTENDED             88
@@ -221,5 +225,9 @@ typedef struct
 } h264_sei_recovery_point_t;
 
 bool h264_decode_sei_recovery_point( bs_t *, h264_sei_recovery_point_t * );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H264_NAL_H */

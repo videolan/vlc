@@ -23,6 +23,10 @@
 # include <vlc_es.h>
 # include <vlc_bits.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define HEVC_VPS_ID_MAX 15
 #define HEVC_SPS_ID_MAX 15
 #define HEVC_PPS_ID_MAX 63
@@ -386,5 +390,9 @@ uint8_t hevc_get_num_clock_ts( const hevc_sequence_parameter_set_t *,
                                const hevc_sei_pic_timing_t * /* can be NULL */ );
 bool hevc_frame_is_progressive( const hevc_sequence_parameter_set_t *,
                                 const hevc_sei_pic_timing_t * /* can be NULL */);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* HEVC_NAL_H */
