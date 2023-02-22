@@ -498,14 +498,15 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     unsigned i_w = p_enc->fmt_in.video.i_visible_width;
     unsigned i_h = p_enc->fmt_in.video.i_visible_height;
 
-    /* Create and initialize the vpx_image */
-    if (!vpx_img_wrap(&img, VPX_IMG_FMT_I420, i_w, i_h, p_pict->p[0].i_pitch, p_pict->p[0].p_pixels)) {
+    /* Create and initialize the vpx_image (use 1 and correct later to avoid getting
+       rejected for non-power of 2 pitch) */
+    if (!vpx_img_wrap(&img, VPX_IMG_FMT_I420, i_w, i_h, 1, p_pict->p[0].p_pixels)) {
         VPX_ERR(p_enc, ctx, "Failed to wrap image");
         return NULL;
     }
 
-    /* Correct chroma plane offsets. */
-    for (int plane = 1; plane < p_pict->i_planes; plane++) {
+    /* Fill in real plane/stride values. */
+    for (int plane = 0; plane < p_pict->i_planes; plane++) {
         img.planes[plane] = p_pict->p[plane].p_pixels;
         img.stride[plane] = p_pict->p[plane].i_pitch;
     }
