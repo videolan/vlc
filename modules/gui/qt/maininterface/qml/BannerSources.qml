@@ -359,6 +359,8 @@ FocusScope {
                         anchors.right: playlistGroup.left
                         anchors.rightMargin: VLCStyle.margin_xxsmall // only applied when right aligned
 
+                        ScrollBar.horizontal: ScrollBar { }
+
                         on_AlignHCenterChanged: {
                             if (_alignHCenter) {
                                 anchors.horizontalCenter = localToolbarContent.horizontalCenter
