@@ -29,14 +29,14 @@
 #import <vlc_common.h>
 #import <vlc_plugin.h>
 #import <vlc_codec.h>
-#import "hxxx_helper.h"
+#import "../hxxx_helper.h"
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
-#import "vt_utils.h"
-#import "../packetizer/h264_nal.h"
-#import "../packetizer/h264_slice.h"
-#import "../packetizer/hxxx_nal.h"
-#import "../packetizer/hxxx_sei.h"
+#import "../vt_utils.h"
+#import "../../packetizer/h264_nal.h"
+#import "../../packetizer/h264_slice.h"
+#import "../../packetizer/hxxx_nal.h"
+#import "../../packetizer/hxxx_sei.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
