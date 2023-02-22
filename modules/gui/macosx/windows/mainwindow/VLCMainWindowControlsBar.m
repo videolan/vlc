@@ -66,16 +66,12 @@
     [self.stopButton setToolTip: _NS("Stop")];
     self.stopButton.accessibilityLabel = self.stopButton.toolTip;
     
-    [self.volumeDownButton setToolTip: _NS("Mute")];
-    self.volumeDownButton.accessibilityLabel = self.volumeDownButton.toolTip;
-    
     [self.volumeUpButton setToolTip: _NS("Full Volume")];
     self.volumeUpButton.accessibilityLabel = self.volumeUpButton.toolTip;
 
     [self.stopButton setImage: imageFromRes(@"stop")];
     [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
 
-    [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
     [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
 
     [self.fullscreenButton setImage: imageFromRes(@"VLCFullscreenOffTemplate")];
@@ -114,9 +110,7 @@
 
 - (IBAction)volumeAction:(id)sender
 {
-    if (sender == self.volumeDownButton) {
-        [_playerController toggleMute];
-    } else if (sender == self.volumeUpButton) {
+    if (sender == self.volumeUpButton) {
         [_playerController setVolume:VLCVolumeMaximum];
     } else {
         [super volumeAction:sender];

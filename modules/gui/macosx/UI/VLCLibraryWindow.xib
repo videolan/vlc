@@ -834,7 +834,7 @@
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>
                 <outlet property="trailingTimeField" destination="oGd-mG-cFw" id="geo-iq-0th"/>
-                <outlet property="volumeDownButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
+                <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
                 <outlet property="volumeSlider" destination="noz-yJ-oH4" id="nbe-1c-lFH"/>
                 <outlet property="volumeUpButton" destination="75c-FF-mgb" id="xRz-F4-n0Z"/>
             </connections>

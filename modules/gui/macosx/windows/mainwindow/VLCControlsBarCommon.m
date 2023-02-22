@@ -156,6 +156,10 @@
     [self.volumeSlider setDefaultValue: VLCVolumeDefault];
     [self updateVolumeSlider:nil];
 
+    [self.muteVolumeButton setToolTip: _NS("Mute")];
+    self.muteVolumeButton.accessibilityLabel = self.muteVolumeButton.toolTip;
+    [self.muteVolumeButton setImage: imageFromRes(@"volume-low")];
+
     NSColor *timeFieldTextColor = [NSColor controlTextColor];
 
     [self.timeField setTextColor: timeFieldTextColor];
@@ -330,6 +334,8 @@
 {
     if (sender == self.volumeSlider) {
         [_playerController setVolume:[sender floatValue]];
+    } else if (sender == self.muteVolumeButton) {
+        [_playerController toggleMute];
     }
 }
 

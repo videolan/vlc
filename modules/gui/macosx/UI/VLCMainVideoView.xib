@@ -28,6 +28,7 @@
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
+                <outlet property="muteVolumeButton" destination="tVB-Xs-sJJ" id="snj-OU-aTI"/>
                 <outlet property="playButton" destination="PCC-8a-sVF" id="ddT-ZM-Jhz"/>
                 <outlet property="songNameTextField" destination="lEW-MN-FFU" id="btX-L9-7TO"/>
                 <outlet property="timeField" destination="3ri-8b-8mw" id="f0i-Gh-R8V"/>
@@ -128,6 +129,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="volumeAction:" target="3" id="4W0-Ft-7pO"/>
+                                                        </connections>
                                                     </button>
                                                     <slider verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="lyY-Zo-4aH" customClass="VLCVolumeSlider">
                                                         <rect key="frame" x="27" y="4" width="84" height="17"/>

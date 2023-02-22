@@ -50,6 +50,7 @@
 
 @property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
 @property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
+@property (readwrite, strong) IBOutlet NSButton *muteVolumeButton;
 
 @property (readwrite, strong) IBOutlet VLCImageView *artworkImageView;
 @property (readwrite, strong) IBOutlet NSButton *artworkButton;
