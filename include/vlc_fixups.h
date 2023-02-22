@@ -57,6 +57,26 @@ typedef unsigned short mode_t;
 #define _CRT_SUPPRESS_RESTRICT
 #define DECLSPEC_RESTRICT
 
+// turn CPU MSVC-ism into more standard defines
+#if defined(_M_X64) && !defined(__x86_64__)
+# define __x86_64__
+#endif
+#if defined(_M_IX86) && !defined(__i386__)
+# define __i386__
+#endif
+#if defined(_M_ARM64) && !defined(__aarch64__)
+# define __aarch64__
+#endif
+#if defined(_M_ARM) && !defined(__arm__)
+# define __arm__
+#endif
+#if defined(_M_IX86_FP) && _M_IX86_FP == 1 && !defined(__SSE__)
+# define __SSE__
+#endif
+#if defined(_M_IX86_FP) && _M_IX86_FP == 2 && !defined(__SSE2__)
+# define __SSE2__
+#endif
+
 #endif // _MSC_VER
 
 #ifdef _WIN32
