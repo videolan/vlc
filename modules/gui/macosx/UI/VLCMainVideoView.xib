@@ -295,7 +295,7 @@
                             <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="10" id="rWa-NJ-Aju"/>
                         </constraints>
                     </view>
-                    <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+                    <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.60225340136054417" colorSpace="custom" customColorSpace="sRGB"/>
                 </box>
             </subviews>
             <constraints>
