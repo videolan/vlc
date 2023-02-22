@@ -16,6 +16,7 @@ qt5_dep = dependency('qt5',
         'Core', 'Gui', 'Widgets', 'Svg', 'Qml',
         'Quick', 'QuickWidgets', 'QuickControls2',
         ],
+    private_headers: true,
     required: get_option('qt'))
 
 moc_headers = files(
@@ -635,6 +636,12 @@ if qt5_dep.found()
 
     if get_option('qt_qml_debug')
         qt_extra_flags += '-DQT_QML_DEBUG'
+    endif
+
+    #check private headers
+    if cpp.has_header('private/qquickitem_p.h', dependencies: qt5_dep) \
+      and cpp.has_header('private/qquickwindow_p.h', dependencies: qt5_dep)
+        qt_extra_flags += '-DQT5_DECLARATIVE_PRIVATE'
     endif
 
     if host_system == 'windows'
