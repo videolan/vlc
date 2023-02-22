@@ -558,7 +558,6 @@ check_functions = [
     ['open_memstream',   '#include <stdio.h>'],
     ['pipe2',            '#include <unistd.h>'],
     ['posix_fadvise',    '#include <fcntl.h>'],
-    ['stricmp',          '#include <string.h>'],
     ['strcoll',          '#include <string.h>'],
     ['wordexp',          '#include <wordexp.h>'],
 

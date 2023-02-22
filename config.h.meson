@@ -464,9 +464,6 @@
 /* Define to 1 if you have the `strdup' function. */
 #mesondefine HAVE_STRDUP
 
-/* Define to 1 if you have the `stricmp' function. */
-#mesondefine HAVE_STRICMP
-
 /* Define to 1 if you have the `strlcpy' function. */
 #mesondefine HAVE_STRLCPY
 

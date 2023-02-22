@@ -28,8 +28,8 @@
 
 int strcasecmp (const char *s1, const char *s2)
 {
-#ifdef HAVE_STRICMP
-    return stricmp (s1, s2);
+#ifdef _WIN32
+    return _stricmp (s1, s2);
 #else
     for (size_t i = 0;; i++)
     {
