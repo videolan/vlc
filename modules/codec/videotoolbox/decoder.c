@@ -112,11 +112,10 @@ struct frame_info_t
 typedef struct decoder_sys_t
 {
     CMVideoCodecType            codec;
-    struct                      hxxx_helper hh;
 
-    /* Codec specific callbacks */
+    /* Codec specific callbacks and contexts */
     bool                        (*pf_codec_init)(decoder_t *);
-    void                        (*pf_codec_clean)(decoder_t *);
+    void                        (*pf_codec_clean)(void *);
     bool                        (*pf_codec_supported)(decoder_t *);
     bool                        (*pf_late_start)(decoder_t *);
     block_t*                    (*pf_process_block)(decoder_t *,
@@ -127,8 +126,8 @@ typedef struct decoder_sys_t
     CFDictionaryRef             (*pf_copy_extradata)(decoder_t *);
     bool                        (*pf_fill_reorder_info)(decoder_t *, const block_t *,
                                                         frame_info_t *);
-
-    /* !Codec specific callbacks */
+    void                         *p_codec_context;
+    /* !Codec specific callbacks and contexts */
 
     enum
     {
@@ -162,8 +161,6 @@ typedef struct decoder_sys_t
     OSType                      i_cvpx_format;
     bool                        b_cvpx_format_forced;
 
-    h264_poc_context_t          h264_pocctx;
-    hevc_poc_ctx_t              hevc_pocctx;
     date_t                      pts;
 
     vlc_video_context          *vctx;
@@ -247,57 +244,65 @@ static void pic_pacer_WaitAllocatableSlot(struct pic_pacer *pic_pacer)
 
 #pragma mark - start & stop
 
-/* Codec Specific */
-
-static void HXXXGetBestChroma(decoder_t *p_dec)
+static OSType GetBestChroma(uint8_t i_chroma_format, uint8_t i_depth_luma,
+                            uint8_t i_depth_chroma)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (p_sys->i_cvpx_format != 0 || p_sys->b_cvpx_format_forced)
-        return;
-
-    uint8_t i_chroma_format, i_depth_luma, i_depth_chroma;
-    if (hxxx_helper_get_chroma_chroma(&p_sys->hh, &i_chroma_format, &i_depth_luma,
-                                      &i_depth_chroma) != VLC_SUCCESS)
-        return;
-
     if (i_chroma_format == 1 /* YUV 4:2:0 */)
     {
         if (i_depth_luma == 8 && i_depth_chroma == 8)
-            p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
-        else if (i_depth_luma == 10 && i_depth_chroma == 10)
+            return kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+        if (i_depth_luma == 10 && i_depth_chroma == 10)
         {
 #if !TARGET_OS_IPHONE
             if (deviceSupportsHEVC()) /* 42010bit went with HEVC on macOS */
-                p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
-            else
+                return kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
 #endif
            /* Force BGRA output (and let VT handle the tone mapping) since the
             * Apple openGL* implementation can't handle 16 bit textures. This
             * is the case for iOS and some macOS devices (ones that are not
             * handling HEVC). */
-            p_sys->i_cvpx_format = kCVPixelFormatType_32BGRA;
+            return kCVPixelFormatType_32BGRA;
         }
         else if (i_depth_luma > 10 && i_depth_chroma > 10)
         {
             /* XXX: The apple openGL implementation doesn't support 12 or 16
              * bit rendering */
-            p_sys->i_cvpx_format = kCVPixelFormatType_32BGRA;
+            return kCVPixelFormatType_32BGRA;
         }
     }
+    return 0;
 }
+
+/* Codec Specific */
+
+/** H26x Specific */
+static OSType GetBestChromaFromHxxx(struct hxxx_helper *hh)
+{
+    uint8_t a, b, c;
+    if (hxxx_helper_get_chroma_chroma(hh, &a, &b, &c) != VLC_SUCCESS)
+        return 0;
+    return GetBestChroma(a, b, c);
+}
+
+/** H264 Specific */
+
+struct vt_h264_context
+{
+    struct hxxx_helper hh;
+    h264_poc_context_t poc;
+};
 
 static void GetxPSH264(uint8_t i_pps_id, void *priv,
                       const h264_sequence_parameter_set_t **pp_sps,
                       const h264_picture_parameter_set_t **pp_pps)
 {
-    decoder_sys_t *p_sys = priv;
+    struct vt_h264_context *h264ctx = priv;
 
-    *pp_pps = p_sys->hh.h264.pps_list[i_pps_id].h264_pps;
+    *pp_pps = h264ctx->hh.h264.pps_list[i_pps_id].h264_pps;
     if (*pp_pps == NULL)
         *pp_sps = NULL;
     else
-        *pp_sps = p_sys->hh.h264.sps_list[(*pp_pps)->i_sps_id].h264_sps;
+        *pp_sps = h264ctx->hh.h264.sps_list[(*pp_pps)->i_sps_id].h264_sps;
 }
 
 struct sei_callback_h264_s
@@ -338,9 +343,10 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                                 frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
     hxxx_iterator_ctx_t itctx;
     hxxx_iterator_init(&itctx, p_block->p_buffer, p_block->i_buffer,
-                       p_sys->hh.i_output_nal_length_size);
+                       h264ctx->hh.i_output_nal_length_size);
 
     const uint8_t *p_nal; size_t i_nal;
     struct
@@ -359,16 +365,16 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
         if (i_nal_type <= H264_NAL_SLICE_IDR && i_nal_type != H264_NAL_UNKNOWN)
         {
             h264_slice_t slice;
-            if (!h264_decode_slice(p_nal, i_nal, GetxPSH264, p_sys, &slice))
+            if (!h264_decode_slice(p_nal, i_nal, GetxPSH264, h264ctx, &slice))
                 return false;
 
             const h264_sequence_parameter_set_t *p_sps;
             const h264_picture_parameter_set_t *p_pps;
-            GetxPSH264(slice.i_pic_parameter_set_id, p_sys, &p_sps, &p_pps);
+            GetxPSH264(slice.i_pic_parameter_set_id, h264ctx, &p_sps, &p_pps);
             if (p_sps)
             {
                 int bFOC;
-                h264_compute_poc(p_sps, &slice, &p_sys->h264_pocctx,
+                h264_compute_poc(p_sps, &slice, &h264ctx->poc,
                                  &p_info->i_poc, &p_info->i_foc, &bFOC);
 
                 p_info->b_keyframe = slice.type == H264_SLICE_TYPE_I;
@@ -421,48 +427,55 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
 static block_t *ProcessBlockH264(decoder_t *p_dec, block_t *p_block, bool *pb_config_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    p_block = hxxx_helper_process_block(&p_sys->hh, p_block);
-    *pb_config_changed = hxxx_helper_has_new_config(&p_sys->hh);
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
+    p_block = hxxx_helper_process_block(&h264ctx->hh, p_block);
+    *pb_config_changed = hxxx_helper_has_new_config(&h264ctx->hh);
     return p_block;
 }
 
-static void CleanH264(decoder_t *p_dec)
+static void CleanH264(void *p_codec_context)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    hxxx_helper_clean(&p_sys->hh);
+    struct vt_h264_context *h264ctx = p_codec_context;
+    hxxx_helper_clean(&h264ctx->hh);
+    free(h264ctx);
 }
 
 static bool InitH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    h264_poc_context_init(&p_sys->h264_pocctx);
-    hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
+    struct vt_h264_context *ctx = malloc(sizeof(*ctx));
+    if(!ctx)
+        return false;
+    h264_poc_context_init(&ctx->poc);
+    hxxx_helper_init(&ctx->hh, VLC_OBJECT(p_dec),
                      p_dec->fmt_in->i_codec, 0, 4);
-    if(hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
-                                         p_dec->fmt_in->i_extra) != VLC_SUCCESS)
+    if(hxxx_helper_set_extra(&ctx->hh, p_dec->fmt_in->p_extra,
+                                       p_dec->fmt_in->i_extra) != VLC_SUCCESS)
     {
-        CleanH264(p_dec);
+        CleanH264(ctx);
         return false;
     }
+    p_sys->p_codec_context = ctx;
     return true;
 }
 
 static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in->i_extra && p_sys->hh.i_input_nal_length_size)
+    if (p_dec->fmt_in->i_extra && h264ctx->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("avcC"),
                                         p_dec->fmt_in->p_extra,
                                         p_dec->fmt_in->i_extra);
     }
-    else if (hxxx_helper_has_config(&p_sys->hh))
+    else if (hxxx_helper_has_config(&h264ctx->hh))
     {
         /* build DecoderConfiguration from gathered */
-        block_t *p_avcC = hxxx_helper_get_extradata_block(&p_sys->hh);
+        block_t *p_avcC = hxxx_helper_get_extradata_block(&h264ctx->hh);
         if (p_avcC)
         {
             extradata = ExtradataInfoCreate(CFSTR("avcC"),
@@ -477,9 +490,10 @@ static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
 static bool CodecSupportedH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
 
     uint8_t i_profile, i_level;
-    if (hxxx_helper_get_current_profile_level(&p_sys->hh, &i_profile, &i_level))
+    if (hxxx_helper_get_current_profile_level(&h264ctx->hh, &i_profile, &i_level))
         return true;
 
     switch (i_profile) {
@@ -516,7 +530,8 @@ static bool CodecSupportedH264(decoder_t *p_dec)
         return false;
     }
 
-    HXXXGetBestChroma(p_dec);
+    if (p_sys->i_cvpx_format == 0 && !p_sys->b_cvpx_format_forced)
+        p_sys->i_cvpx_format = GetBestChromaFromHxxx(&h264ctx->hh);
 
     return true;
 }
@@ -524,12 +539,14 @@ static bool CodecSupportedH264(decoder_t *p_dec)
 static bool LateStartH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return (p_dec->fmt_in->i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
+    return (p_dec->fmt_in->i_extra == 0 && !hxxx_helper_has_config(&h264ctx->hh));
 }
 
 static bool ConfigureVoutH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
 
     if (p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
     {
@@ -537,7 +554,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
         video_transfer_func_t transfer;
         video_color_space_t colorspace;
         video_color_range_t full_range;
-        if (hxxx_helper_get_colorimetry(&p_sys->hh,
+        if (hxxx_helper_get_colorimetry(&h264ctx->hh,
                                         &primaries,
                                         &transfer,
                                         &colorspace,
@@ -554,7 +571,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
     {
         unsigned i_width, i_height, i_vis_width, i_vis_height;
         if (VLC_SUCCESS ==
-           hxxx_helper_get_current_picture_size(&p_sys->hh,
+           hxxx_helper_get_current_picture_size(&h264ctx->hh,
                                                 &i_width, &i_height,
                                                 &i_vis_width, &i_vis_height))
         {
@@ -570,7 +587,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
     {
         int i_sar_num, i_sar_den;
         if (VLC_SUCCESS ==
-            hxxx_helper_get_current_sar(&p_sys->hh, &i_sar_num, &i_sar_den))
+            hxxx_helper_get_current_sar(&h264ctx->hh, &i_sar_num, &i_sar_den))
         {
             p_dec->fmt_out.video.i_sar_num = i_sar_num;
             p_dec->fmt_out.video.i_sar_den = i_sar_den;
@@ -584,7 +601,8 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
                                            VTDecompressionSessionRef session)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const struct hxxx_helper *hh = &p_sys->hh;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
+    const struct hxxx_helper *hh = &h264ctx->hh;
 
     unsigned w, h, vw, vh;
     int sarn, sard;
@@ -620,20 +638,37 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     return b_ret;
 }
 
-#define CleanHEVC CleanH264
+/** HEVC Specific */
+
+struct vt_hevc_context
+{
+    struct hxxx_helper hh;
+    hevc_poc_ctx_t poc;
+};
+
+static void CleanHEVC(void *p_codec_context)
+{
+    struct vt_hevc_context *hevcctx = p_codec_context;
+    hxxx_helper_clean(&hevcctx->hh);
+    free(hevcctx);
+}
 
 static bool InitHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    hevc_poc_cxt_init(&p_sys->hevc_pocctx);
-    hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
+    struct vt_hevc_context *ctx = malloc(sizeof(*ctx));
+    if(!ctx)
+        return false;
+    hevc_poc_cxt_init(&ctx->poc);
+    hxxx_helper_init(&ctx->hh, VLC_OBJECT(p_dec),
                      p_dec->fmt_in->i_codec, 0, 4);
-    if(hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
-                                         p_dec->fmt_in->i_extra) != VLC_SUCCESS)
+    if(hxxx_helper_set_extra(&ctx->hh, p_dec->fmt_in->p_extra,
+                                       p_dec->fmt_in->i_extra) != VLC_SUCCESS)
     {
-        CleanHEVC(p_dec);
+        CleanHEVC(ctx);
         return false;
     }
+    p_sys->p_codec_context = ctx;
     return true;
 }
 
@@ -642,9 +677,9 @@ static void GetxPSHEVC(uint8_t i_id, void *priv,
                        hevc_sequence_parameter_set_t **pp_sps,
                        hevc_video_parameter_set_t **pp_vps)
 {
-    decoder_sys_t *p_sys = priv;
+    struct vt_hevc_context *hevcctx = priv;
 
-    *pp_pps = p_sys->hh.hevc.pps_list[i_id].hevc_pps;
+    *pp_pps = hevcctx->hh.hevc.pps_list[i_id].hevc_pps;
     if (*pp_pps == NULL)
     {
         *pp_vps = NULL;
@@ -653,13 +688,13 @@ static void GetxPSHEVC(uint8_t i_id, void *priv,
     else
     {
         uint8_t i_sps_id = hevc_get_pps_sps_id(*pp_pps);
-        *pp_sps = p_sys->hh.hevc.sps_list[i_sps_id].hevc_sps;
+        *pp_sps = hevcctx->hh.hevc.sps_list[i_sps_id].hevc_sps;
         if (*pp_sps == NULL)
             *pp_vps = NULL;
         else
         {
             uint8_t i_vps_id = hevc_get_sps_vps_id(*pp_sps);
-            *pp_vps = p_sys->hh.hevc.vps_list[i_vps_id].hevc_vps;
+            *pp_vps = hevcctx->hh.hevc.vps_list[i_vps_id].hevc_vps;
         }
     }
 }
@@ -686,9 +721,10 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                                 frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
     hxxx_iterator_ctx_t itctx;
     hxxx_iterator_init(&itctx, p_block->p_buffer, p_block->i_buffer,
-                       p_sys->hh.i_output_nal_length_size);
+                       hevcctx->hh.i_output_nal_length_size);
 
     const uint8_t *p_nal; size_t i_nal;
     struct
@@ -707,7 +743,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
         if (i_nal_type <= HEVC_NAL_IRAP_VCL23)
         {
             hevc_slice_segment_header_t *p_sli =
-                    hevc_decode_slice_header(p_nal, i_nal, true, GetxPSHEVC, p_sys);
+                    hevc_decode_slice_header(p_nal, i_nal, true, GetxPSHEVC, hevcctx);
             if (!p_sli)
                 return false;
 
@@ -721,7 +757,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
             hevc_sequence_parameter_set_t *p_sps;
             hevc_picture_parameter_set_t *p_pps;
             hevc_video_parameter_set_t *p_vps;
-            GetxPSHEVC(hevc_get_slice_pps_id(p_sli), p_sys, &p_pps, &p_sps, &p_vps);
+            GetxPSHEVC(hevc_get_slice_pps_id(p_sli), hevcctx, &p_pps, &p_sps, &p_vps);
             if (p_sps)
             {
                 struct hevc_sei_callback_s sei;
@@ -729,7 +765,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 sei.p_timing = NULL;
 
                 const int POC = hevc_compute_picture_order_count(p_sps, p_sli,
-                                                                 &p_sys->hevc_pocctx);
+                                                                 &hevcctx->poc);
 
                 for (size_t i=0; i<i_sei_count; i++)
                     HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal,
@@ -781,19 +817,20 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
 static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in->i_extra && p_sys->hh.i_input_nal_length_size)
+    if (p_dec->fmt_in->i_extra && hevcctx->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("hvcC"),
                                         p_dec->fmt_in->p_extra,
                                         p_dec->fmt_in->i_extra);
     }
-    else if (hxxx_helper_has_config(&p_sys->hh))
+    else if (hxxx_helper_has_config(&hevcctx->hh))
     {
         /* build DecoderConfiguration from gathered */
-        block_t *p_hvcC = hxxx_helper_get_extradata_block(&p_sys->hh);
+        block_t *p_hvcC = hxxx_helper_get_extradata_block(&hevcctx->hh);
         if (p_hvcC)
         {
             extradata = ExtradataInfoCreate(CFSTR("hvcC"),
@@ -808,13 +845,16 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
 static bool LateStartHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return (p_dec->fmt_in->i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
+    struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
+    return (p_dec->fmt_in->i_extra == 0 && !hxxx_helper_has_config(&hevcctx->hh));
 }
 
 static bool CodecSupportedHEVC(decoder_t *p_dec)
 {
-    HXXXGetBestChroma(p_dec);
-
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
+    if (p_sys->i_cvpx_format == 0 && !p_sys->b_cvpx_format_forced)
+        p_sys->i_cvpx_format = GetBestChromaFromHxxx(&hevcctx->hh);
     return true;
 }
 
@@ -1406,7 +1446,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     StopVideoToolbox(p_dec);
 
     if (p_sys->pf_codec_clean)
-        p_sys->pf_codec_clean(p_dec);
+        p_sys->pf_codec_clean(p_sys->p_codec_context);
 
     vlc_video_context_Release(p_sys->vctx);
 
