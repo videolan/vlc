@@ -26,11 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
-# include <io.h>
-#else
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 {

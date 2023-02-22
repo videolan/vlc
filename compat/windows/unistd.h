@@ -29,5 +29,16 @@
 // _getpid() exists but it returns an int, not a pid_t
 typedef int pid_t;
 
+// redirect missing functions from the GDK
+#define strdup(s) _strdup(s)
+
+#define read(fd, dst, count)  _read(fd, dst, count)
+#define write(fd, src, count) _write(fd, src, count)
+#define close(fd) _close(fd)
+#define dup(fd) _dup(fd)
+#define dup2(fd, f2) _dup2(fd,f2)
+#define setmode(fd, m) _setmode(fd,m)
+#define fdopen(a, b)  _fdopen(a, b)
+
 
 #endif // WINSDK_UNISTD_H__

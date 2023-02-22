@@ -37,16 +37,12 @@
 #include <fcntl.h>
 #include <winsock2.h>
 #include <direct.h>
+#include <unistd.h>
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include "libvlc.h" /* vlc_mkdir */
-
-#ifdef _MSC_VER
-# define __STDC__ 1
-# include <io.h> /* _pipe */
-#endif
 
 #ifndef NTDDI_WIN10_RS3
 #define NTDDI_WIN10_RS3  0x0A000004
