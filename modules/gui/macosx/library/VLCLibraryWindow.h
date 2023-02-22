@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "windows/video/VLCVideoWindowCommon.h"
+#import "windows/video/VLCFullVideoViewWindow.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,7 +49,7 @@ typedef NS_ENUM(NSUInteger, VLCViewModeSegment) {
     VLCListViewModeSegment
 };
 
-@interface VLCLibraryWindow : VLCVideoWindowCommon<NSUserInterfaceItemIdentification>
+@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification>
 
 extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;
