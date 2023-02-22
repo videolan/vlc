@@ -64,6 +64,8 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     BOOL b_video_view_was_hidden;
 
     NSRect _frameBeforeLionFullscreen;
+
+    BOOL _preFullScreenVideoViewLibraryControlsDisplayed;
 }
 
 - (void)customZoom:(id)sender;
@@ -507,11 +509,14 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         [o_fullscreen_window setCanBecomeMainWindow: YES];
         [o_fullscreen_window setHasActiveVideo: YES];
         [o_fullscreen_window setFullscreen: YES];
+        [o_fullscreen_window setAcceptsMouseMovedEvents:YES];
 
         /* Make sure video view gets visible in case the playlist was visible before */
         b_video_view_was_hidden = [_videoViewController.view isHidden];
         [_videoViewController.view setHidden: NO];
         _videoViewController.view.translatesAutoresizingMaskIntoConstraints = YES;
+        _preFullScreenVideoViewLibraryControlsDisplayed = _videoViewController.displayLibraryControls;
+        _videoViewController.displayLibraryControls = NO;
 
         if (!b_animation) {
             /* We don't animate if we are not visible, instead we
@@ -741,6 +746,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         [self makeFirstResponder: [[_videoViewController.view subviews] firstObject]];
 
     [_videoViewController.view setHidden: b_video_view_was_hidden];
+    _videoViewController.displayLibraryControls = _preFullScreenVideoViewLibraryControlsDisplayed;
 
     [self makeKeyAndOrderFront:self];
 
