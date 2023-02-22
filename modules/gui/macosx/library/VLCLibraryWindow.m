@@ -57,7 +57,6 @@
 
 #import "windows/mainwindow/VLCControlsBarCommon.h"
 
-#import "windows/video/VLCFSPanelController.h"
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCMainVideoViewController.h"
@@ -201,9 +200,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         
         _mediaToolBar.centeredItemIdentifier = _segmentedTitleControlToolbarItem.itemIdentifier;
     }
-
-    _fspanel = [[VLCFSPanelController alloc] init];
-    [_fspanel showWindow:self];
 
     _currentSelectedSegment = -1; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 4;
@@ -868,7 +864,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (self.isInNativeFullscreen && [self hasActiveVideo] && [self fullscreen]) {
         [self hideControlsBar];
         [self.videoViewController showControls];
-        [_fspanel shouldBecomeActive:nil];
     }
 
     [self enableVideoTitleBarMode];
@@ -898,7 +893,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     if (self.isInNativeFullscreen) {
         [self showControlsBar];
-        [_fspanel shouldBecomeInactive:nil];
     }
 
     [self disableVideoTitleBarMode];

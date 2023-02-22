@@ -591,8 +591,6 @@ modules/gui/macosx/views/VLCDefaultValueSliderCell.h
 modules/gui/macosx/views/VLCDefaultValueSliderCell.m
 modules/gui/macosx/views/VLCDragDropView.h
 modules/gui/macosx/views/VLCDragDropView.m
-modules/gui/macosx/views/VLCFSPanelDraggableView.h
-modules/gui/macosx/views/VLCFSPanelDraggableView.m
 modules/gui/macosx/views/VLCHUDOutlineView.h
 modules/gui/macosx/views/VLCHUDOutlineView.m
 modules/gui/macosx/views/VLCHUDTableCornerView.h
@@ -659,8 +657,6 @@ modules/gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.h
 modules/gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.m
 modules/gui/macosx/windows/video/VLCDetachedVideoWindow.h
 modules/gui/macosx/windows/video/VLCDetachedVideoWindow.m
-modules/gui/macosx/windows/video/VLCFSPanelController.h
-modules/gui/macosx/windows/video/VLCFSPanelController.m
 modules/gui/macosx/windows/video/VLCVideoOutputProvider.h
 modules/gui/macosx/windows/video/VLCVideoOutputProvider.m
 modules/gui/macosx/windows/video/VLCVideoWindowCommon.h

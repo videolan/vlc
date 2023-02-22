@@ -23,8 +23,6 @@
 		1C3113A91E508C6900D4DD76 /* VLCDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C39ABBD1DA9AB9B00FE052A /* VLCDocumentController.m */; };
 		1C3113AB1E508C6900D4DD76 /* VLCExtensionsDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71114C0D4A90057F8D1 /* VLCExtensionsDialogProvider.m */; };
 		1C3113AD1E508C6900D4DD76 /* VLCExtensionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71314C0D4A90057F8D1 /* VLCExtensionsManager.m */; };
-		1C3113AF1E508C6900D4DD76 /* VLCFSPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */; };
-		1C3113B11E508C6900D4DD76 /* VLCFSPanelDraggableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */; };
 		1C3113B41E508C6900D4DD76 /* VLCPlaybackContinuityController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812EE1B555A340052293C /* VLCPlaybackContinuityController.m */; };
 		1C3113B61E508C6900D4DD76 /* VLCMain+OldPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D871D381B5E6844000B56C0 /* VLCMain+OldPrefs.m */; };
 		1C3113B81E508C6900D4DD76 /* VLCMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27D03E2EB1C0059A3A7 /* VLCMain.m */; };
@@ -235,8 +233,6 @@
 		1C864182217D318900D2CF7C /* vlc-hardening.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "vlc-hardening.entitlements"; sourceTree = "<group>"; };
 		1CAC3EE620CD1B3B00613DB2 /* VLCVideoOutputProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVideoOutputProvider.m; sourceTree = "<group>"; };
 		1CAC3EE720CD1B3B00613DB2 /* VLCVideoOutputProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVideoOutputProvider.h; sourceTree = "<group>"; };
-		1CAEBBFF1E1EC0A400A99E49 /* VLCFSPanelDraggableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCFSPanelDraggableView.h; sourceTree = "<group>"; };
-		1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelDraggableView.m; sourceTree = "<group>"; };
 		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* Pseudo-VLC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pseudo-VLC.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCD8F9F2117957600407114 /* avaudiocapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = avaudiocapture.m; path = ../../../modules/access/avaudiocapture.m; sourceTree = "<group>"; };
@@ -528,8 +524,6 @@
 		6BBBB8B61D114628001BD9BA /* VLCRendererDiscovery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCRendererDiscovery.m; sourceTree = "<group>"; };
 		6BBBF9831F7B257100B404CD /* VLCLogMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLogMessage.h; sourceTree = "<group>"; };
 		6BBBF9841F7B257100B404CD /* VLCLogMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLogMessage.m; sourceTree = "<group>"; };
-		6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCFSPanelController.h; sourceTree = "<group>"; };
-		6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelController.m; sourceTree = "<group>"; };
 		6BF093F71EE0182B0049D8B0 /* VLCTimeField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCTimeField.h; sourceTree = "<group>"; };
 		6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCTimeField.m; sourceTree = "<group>"; };
 		6BF557CF1E4E0E2500C03C9D /* VLCPauseTemplate.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = VLCPauseTemplate.pdf; path = "Button-Icons/VLCPauseTemplate.pdf"; sourceTree = "<group>"; };
@@ -924,8 +918,6 @@
 			children = (
 				7D66D43A2200D6090040D04A /* VLCDetachedVideoWindow.h */,
 				7D66D43B2200D6090040D04A /* VLCDetachedVideoWindow.m */,
-				6BCB59091DA247CD009BCA66 /* VLCFSPanelController.h */,
-				6BCB590A1DA247CD009BCA66 /* VLCFSPanelController.m */,
 				534E8E3829A06325009503F8 /* VLCMainVideoViewController.h */,
 				534E8E3929A06325009503F8 /* VLCMainVideoViewController.m */,
 				1CAC3EE720CD1B3B00613DB2 /* VLCVideoOutputProvider.h */,
@@ -957,8 +949,6 @@
 				6B6A499D1DFD9B23009128AC /* VLCDefaultValueSliderCell.m */,
 				7D460B0A229EB4C700097948 /* VLCDragDropView.h */,
 				7D460B0B229EB4C700097948 /* VLCDragDropView.m */,
-				1CAEBBFF1E1EC0A400A99E49 /* VLCFSPanelDraggableView.h */,
-				1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */,
 				6BBB05D81EEFEA29003A1019 /* VLCHUDOutlineView.h */,
 				6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */,
 				6BBB05DE1EEFF165003A1019 /* VLCHUDTableCornerView.h */,
@@ -1973,10 +1963,8 @@
 				7DE2F0442282C84A0040DD0A /* VLCLibraryAudioDataSource.m in Sources */,
 				7D0F640C2202163E00FDB91F /* VLCPlaylistDataSource.m in Sources */,
 				1C3113AD1E508C6900D4DD76 /* VLCExtensionsManager.m in Sources */,
-				1C3113AF1E508C6900D4DD76 /* VLCFSPanelController.m in Sources */,
 				7DFBDCBB226CED6300B700A5 /* VLCMediaSourceProvider.m in Sources */,
 				7D66D4362200BC340040D04A /* VLCClickerManager.m in Sources */,
-				1C3113B11E508C6900D4DD76 /* VLCFSPanelDraggableView.m in Sources */,
 				53B447F9293BB47B00857588 /* VLCLibraryVideoTableViewDataSource.m in Sources */,
 				1C3113B41E508C6900D4DD76 /* VLCPlaybackContinuityController.m in Sources */,
 				7D28E6392275B7340098D30E /* NSFont+VLCAdditions.m in Sources */,

@@ -273,8 +273,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCDefaultValueSliderCell.m \
 	gui/macosx/views/VLCDragDropView.h \
 	gui/macosx/views/VLCDragDropView.m \
-	gui/macosx/views/VLCFSPanelDraggableView.h \
-	gui/macosx/views/VLCFSPanelDraggableView.m \
 	gui/macosx/views/VLCHUDOutlineView.h \
 	gui/macosx/views/VLCHUDOutlineView.m \
 	gui/macosx/views/VLCHUDTableCornerView.h \
@@ -345,8 +343,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/video/VLCAspectRatioRetainingVideoWindow.m \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.h \
 	gui/macosx/windows/video/VLCDetachedVideoWindow.m \
-	gui/macosx/windows/video/VLCFSPanelController.h \
-	gui/macosx/windows/video/VLCFSPanelController.m \
 	gui/macosx/windows/video/VLCMainVideoViewController.h \
 	gui/macosx/windows/video/VLCMainVideoViewController.m \
 	gui/macosx/windows/video/VLCVideoOutputProvider.h \

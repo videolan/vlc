@@ -59,10 +59,6 @@ int  WindowOpen   (vlc_window_t *);
 #define BLACK_LONGTEXT N_("In fullscreen mode, keep screen where there is no " \
                           "video displayed black")
 
-#define FSPANEL_TEXT N_("Show Fullscreen controller")
-#define FSPANEL_LONGTEXT N_("Shows a lucent controller when moving the mouse " \
-                            "in fullscreen mode.")
-
 #define AUTOPLAY_OSX_TEST N_("Auto-playback of new items")
 #define AUTOPLAY_OSX_LONGTEXT N_("Start playback of new items immediately " \
                                  "once they were added.")
@@ -148,7 +144,6 @@ vlc_module_begin()
     set_section(N_("Behavior"), 0)
         add_bool("macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT)
         add_bool("macosx-recentitems", true, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT)
-        add_bool("macosx-fspanel", true, FSPANEL_TEXT, FSPANEL_LONGTEXT)
         add_bool("macosx-video-autoresize", true, KEEPSIZE_TEXT, KEEPSIZE_LONGTEXT)
         add_bool("macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT)
         add_bool("macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, NULL)

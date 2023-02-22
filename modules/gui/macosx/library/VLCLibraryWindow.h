@@ -35,7 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistDataSource;
 @class VLCPlaylistController;
 @class VLCPlaylistSortingMenuController;
-@class VLCFSPanelController;
 @class VLCCustomEmptyLibraryBrowseButton;
 
 typedef NS_ENUM(NSUInteger, VLCLibrarySegment) {
@@ -137,7 +136,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCPlaylistDataSource *playlistDataSource;
 @property (readonly) VLCPlaylistSortingMenuController *playlistSortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;
-@property (readonly) VLCFSPanelController *fspanel;
 
 - (void)reopenVideoView;
 - (void)disableVideoPlaybackAppearance;
