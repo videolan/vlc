@@ -281,9 +281,30 @@ int WindowOpen(vlc_window_t *p_wnd)
 {
     BOOL multipleVoutWindows = _voutWindows.count > 0;
     // setup detached window with controls
-    NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
-    [o_controller loadWindow];
-    VLCVideoWindowCommon *newVideoWindow = (VLCDetachedVideoWindow *)o_controller.window;
+    NSWindowStyleMask mask = NSWindowStyleMaskClosable |
+        NSWindowStyleMaskMiniaturizable |
+        NSWindowStyleMaskResizable |
+        NSWindowStyleMaskTitled |
+        NSWindowStyleMaskFullSizeContentView;
+    VLCVideoWindowCommon *newVideoWindow = [[VLCAspectRatioRetainingVideoWindow alloc] initWithContentRect:NSMakeRect(0,0,300,300)
+                                                                                                 styleMask:mask
+                                                                                                   backing:NSBackingStoreBuffered
+                                                                                                     defer:YES];
+
+    newVideoWindow.backgroundColor = [NSColor blackColor];
+    newVideoWindow.canBecomeKeyWindow = YES;
+    newVideoWindow.canBecomeMainWindow = YES;
+    newVideoWindow.acceptsMouseMovedEvents = YES;
+    newVideoWindow.movableByWindowBackground = YES;
+    newVideoWindow.minSize = NSMakeSize(VLCVideoWindowCommonMinimalHeight, VLCVideoWindowCommonMinimalHeight);
+    newVideoWindow.titlebarAppearsTransparent = YES;
+
+    newVideoWindow.videoViewController = [[VLCMainVideoViewController alloc] init];
+    newVideoWindow.videoViewController.displayLibraryControls = NO;
+    newVideoWindow.videoViewController.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    newVideoWindow.videoViewController.view.frame = newVideoWindow.contentView.frame;
+
+    [newVideoWindow.contentView addSubview:newVideoWindow.videoViewController.view positioned:NSWindowAbove relativeTo:nil];
 
     // no frame autosave for additional vout windows
     if (multipleVoutWindows) {
@@ -292,6 +313,7 @@ int WindowOpen(vlc_window_t *p_wnd)
 
     newVideoWindow.delegate = newVideoWindow;
     newVideoWindow.level = NSNormalWindowLevel;
+    [newVideoWindow center];
     return newVideoWindow;
 }
 
@@ -348,12 +370,12 @@ int WindowOpen(vlc_window_t *p_wnd)
     
     // set (only!) window origin if specified
     if (!isEmbedded) {
-        [self setupWindowOriginForVideoWindow:videoWindow
-                                   atPosition:videoViewPosition];
-
         if ([videoWindow isKindOfClass:[VLCAspectRatioRetainingVideoWindow class]]) {
             [(VLCAspectRatioRetainingVideoWindow*)videoWindow setNativeVideoSize:videoViewSize];
         }
+
+        [self setupWindowOriginForVideoWindow:videoWindow
+                                   atPosition:videoViewPosition];
     }
 
     // cascade windows if we have more than one vout

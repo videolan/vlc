@@ -94,6 +94,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
         _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+        _videoViewController = [[VLCMainVideoViewController alloc] init];
     }
 
     return self;
@@ -106,6 +107,10 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)awakeFromNib
 {
+    if (_videoViewController == nil) {
+        _videoViewController = [[VLCMainVideoViewController alloc] init];
+    }
+
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(mediaMetadataChanged:)

@@ -130,6 +130,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.identifier = VLCLibraryWindowIdentifier;
 
     if(@available(macOS 10.12, *)) {
@@ -148,7 +149,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.navigationStack = [[VLCLibraryNavigationStack alloc] init];
     self.navigationStack.delegate = self;
 
-    self.videoViewController = [[VLCMainVideoViewController alloc] init];
     self.videoViewController.view.frame = self.mainSplitView.frame;
     self.videoViewController.view.hidden = YES;
     self.videoViewController.displayLibraryControls = YES;
