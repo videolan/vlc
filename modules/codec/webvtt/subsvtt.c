@@ -57,8 +57,8 @@ typedef struct webvtt_dom_node_t webvtt_dom_node_t;
 typedef struct webvtt_dom_cue_t webvtt_dom_cue_t;
 
 #define WEBVTT_REGION_LINES_COUNT          18
-#define WEBVTT_DEFAULT_LINE_HEIGHT_VH    5.33
-#define WEBVTT_LINE_TO_HEIGHT_RATIO      1.06
+#define WEBVTT_DEFAULT_LINE_HEIGHT_VH    5.33f
+#define WEBVTT_LINE_TO_HEIGHT_RATIO      1.06f
 #define WEBVTT_MAX_DEPTH                 20 /* recursion prevention for now */
 
 enum webvtt_align_e
@@ -1770,7 +1770,7 @@ static void RenderRegions( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_
             v.i_left_offset = p_vttregion->anchor_x * p_vttregion->f_width;
             v.i_left = p_vttregion->viewport_anchor_x - v.i_left_offset;
             v.i_top_offset = p_vttregion->anchor_y * p_vttregion->i_lines_max_scroll *
-                             WEBVTT_DEFAULT_LINE_HEIGHT_VH / 100.0;
+                             WEBVTT_DEFAULT_LINE_HEIGHT_VH / 100.0f;
             v.i_top = p_vttregion->viewport_anchor_y - v.i_top_offset;
             /* !Variables */
 
