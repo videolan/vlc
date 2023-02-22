@@ -152,6 +152,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.videoViewController = [[VLCMainVideoViewController alloc] init];
     self.videoViewController.view.frame = self.mainSplitView.frame;
     self.videoViewController.view.hidden = YES;
+    self.videoViewController.displayLibraryControls = YES;
     [self hideControlsBar];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];

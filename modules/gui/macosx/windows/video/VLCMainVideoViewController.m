@@ -52,7 +52,7 @@
     _autohideControls = YES;
     _controlsBar.bottomBarView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
 
-    [self setDisplayLibraryControls:[self.view.window class] == [VLCLibraryWindow class]];
+    [self setDisplayLibraryControls:NO];
     [self updatePlaylistToggleState];
     [self updateLibraryControlsTopConstraint];
 
@@ -130,10 +130,6 @@
 
 - (void)setDisplayLibraryControls:(BOOL)displayLibraryControls
 {
-    if (_displayLibraryControls == displayLibraryControls) {
-        return;
-    }
-    
     _displayLibraryControls = displayLibraryControls;
 
     _returnButton.hidden = !displayLibraryControls;
@@ -151,6 +147,10 @@
 
 - (void)updateLibraryControlsTopConstraint
 {
+    if (!_displayLibraryControls) {
+        return;
+    }
+
     const NSWindow * const viewWindow = self.view.window;
     const NSView * const titlebarView = [viewWindow standardWindowButton:NSWindowCloseButton].superview;
     const CGFloat windowTitlebarHeight = titlebarView.frame.size.height;
