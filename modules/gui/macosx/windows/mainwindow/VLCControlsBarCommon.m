@@ -385,7 +385,6 @@
         [self.timeSlider setIndefinite:NO];
         [self.timeSlider setEnabled:NO];
         [self.timeSlider setHidden:YES];
-        [self.nowPlayingView setHidden:YES];
         return;
     }
 
@@ -400,7 +399,6 @@
         _artworkImageView.image = [NSImage imageNamed:@"noart"];
     }
 
-    [self.nowPlayingView setHidden:NO];
     [self.timeSlider setHidden:NO];
     [self.timeSlider setKnobHidden:NO];
     [self.timeSlider setFloatValue:_playerController.position];

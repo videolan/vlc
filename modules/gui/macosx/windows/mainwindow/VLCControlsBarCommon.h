@@ -62,7 +62,6 @@
 @property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
 
-@property (readwrite, strong) IBOutlet NSView *nowPlayingView;
 @property (readwrite, strong) IBOutlet VLCBottomBarView *bottomBarView;
 
 @property (readonly) BOOL nativeFullscreenMode;
