@@ -130,6 +130,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [super awakeFromNib];
     self.identifier = VLCLibraryWindowIdentifier;
+    self.minSize = NSMakeSize(VLCLibraryWindowMinimalWidth, VLCLibraryWindowMinimalHeight);
 
     if(@available(macOS 10.12, *)) {
         self.tabbingMode = NSWindowTabbingModeDisallowed;
@@ -764,14 +765,36 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [_libraryTargetView addSubview:videoView];
     NSDictionary *dict = NSDictionaryOfVariableBindings(videoView);
-    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[videoView(>=572.)]|"
-                                                                               options:0
-                                                                               metrics:0
-                                                                                 views:dict]];
-    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[videoView(>=444.)]|"
-                                                                               options:0
-                                                                               metrics:0
-                                                                                 views:dict]];
+    [_libraryTargetView addConstraints:@[
+        [NSLayoutConstraint constraintWithItem:videoView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1.
+                                      constant:0.],
+        [NSLayoutConstraint constraintWithItem:videoView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1.
+                                      constant:0.],
+        [NSLayoutConstraint constraintWithItem:videoView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1.
+                                      constant:0.],
+        [NSLayoutConstraint constraintWithItem:videoView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:_libraryTargetView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1.
+                                      constant:0.]
+    ]];
 }
 
 - (void)enableVideoPlaybackAppearance
