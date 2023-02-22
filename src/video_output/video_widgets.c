@@ -205,8 +205,8 @@ static subpicture_region_t *OSDSlider(int type, int position,
  */
 static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
 {
-    const float size_ratio   = 0.05;
-    const float margin_ratio = 0.07;
+    const float size_ratio   = 0.05f;
+    const float margin_ratio = 0.07f;
 
     const int size   = __MAX(fmt->i_visible_width, fmt->i_visible_height);
     const int width  = size * size_ratio;

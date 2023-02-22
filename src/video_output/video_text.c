@@ -75,7 +75,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
 
     r->p_text = text_segment_New( sys->text );
 
-    const float margin_ratio = 0.04;
+    const float margin_ratio = 0.04f;
     const int   margin_h     = margin_ratio * fmt_dst->i_visible_width;
     const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 

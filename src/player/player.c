@@ -1315,9 +1315,9 @@ static void
 vlc_player_ChangeRateOffset(vlc_player_t *player, bool increment)
 {
     static const float rates[] = {
-        1.0/64, 1.0/32, 1.0/16, 1.0/8, 1.0/4, 1.0/3, 1.0/2, 2.0/3,
-        1.0/1,
-        3.0/2, 2.0/1, 3.0/1, 4.0/1, 8.0/1, 16.0/1, 32.0/1, 64.0/1,
+        1.0f/64, 1.0f/32, 1.0f/16, 1.0f/8, 1.0f/4, 1.0f/3, 1.0f/2, 2.0f/3,
+        1.0f/1,
+        3.0f/2, 2.0f/1, 3.0f/1, 4.0f/1, 8.0f/1, 16.0f/1, 32.0f/1, 64.0f/1,
     };
     float rate = vlc_player_GetRate(player) * (increment ? 1.1f : 0.9f);
 
