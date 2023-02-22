@@ -60,16 +60,10 @@
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(updatePlaybackControls:) name:VLCPlaylistCurrentItemChanged object:nil];
-    [notificationCenter addObserver:self selector:@selector(updateVolumeSlider:) name:VLCPlayerVolumeChanged object:nil];
-    [notificationCenter addObserver:self selector:@selector(updateVolumeSlider:) name:VLCPlayerMuteChanged object:nil];
     [notificationCenter addObserver:self selector:@selector(playbackStateChanged:) name:VLCPlayerStateChanged object:nil];
 
     [self.stopButton setToolTip: _NS("Stop")];
     self.stopButton.accessibilityLabel = self.stopButton.toolTip;
-
-    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
-    [self.volumeSlider setToolTip: volumeTooltip];
-    self.volumeSlider.accessibilityLabel = _NS("Volume");
     
     [self.volumeDownButton setToolTip: _NS("Mute")];
     self.volumeDownButton.accessibilityLabel = self.volumeDownButton.toolTip;
@@ -90,10 +84,6 @@
     [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
     [self.nextButton setImage: imageFromRes(@"next-6btns")];
     [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
-
-    [self.volumeSlider setMaxValue: VLCVolumeMaximum];
-    [self.volumeSlider setDefaultValue: VLCVolumeDefault];
-    [self updateVolumeSlider:nil];
 
     [self playbackStateChanged:nil];
     [self.stopButton setHidden:YES];
@@ -120,12 +110,13 @@
 
 - (IBAction)volumeAction:(id)sender
 {
-    if (sender == self.volumeSlider)
-        [_playerController setVolume:[sender floatValue]];
-    else if (sender == self.volumeDownButton)
+    if (sender == self.volumeDownButton) {
         [_playerController toggleMute];
-    else
+    } else if (sender == self.volumeUpButton) {
         [_playerController setVolume:VLCVolumeMaximum];
+    } else {
+        [super volumeAction:sender];
+    }
 }
 
 - (IBAction)artworkButtonAction:(id)sender
@@ -136,32 +127,10 @@
 #pragma mark -
 #pragma mark Extra updaters
 
-- (void)updateTimeSlider:(NSNotification *)aNotification
-{
-    [super updateTimeSlider:aNotification];
-
-    VLCInputItem *inputItem = _playerController.currentMedia;
-    if (inputItem == nil) {
-        return;
-    }
-
-    _artistNameTextFieldWidthConstraint.active = inputItem.artist.length != 0;
-    _songArtistSeparatorTextField.hidden = inputItem.artist.length == 0;
-}
-
 - (void)updateVolumeSlider:(NSNotification *)aNotification
 {
-    float f_volume = _playerController.volume;
+    [super updateVolumeSlider:aNotification];
     BOOL b_muted = _playerController.mute;
-
-    if (b_muted)
-        f_volume = 0.f;
-
-    [self.volumeSlider setFloatValue: f_volume];
-    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), (int)(f_volume * 100.0f)];
-    [self.volumeSlider setToolTip:volumeTooltip];
-
-    [self.volumeSlider setEnabled: !b_muted];
     [self.volumeUpButton setEnabled: !b_muted];
 }
 

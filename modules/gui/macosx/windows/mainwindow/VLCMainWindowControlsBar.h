@@ -43,13 +43,10 @@
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *artistNameTextFieldWidthConstraint;
 
 @property (readwrite, strong) IBOutlet NSTextField *songArtistSeparatorTextField;
-@property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
 @property (readwrite, strong) IBOutlet NSButton *volumeDownButton;
 @property (readwrite, strong) IBOutlet NSButton *volumeUpButton;
 
 - (IBAction)stop:(id)sender;
-
-- (IBAction)volumeAction:(id)sender;
 
 @end
 

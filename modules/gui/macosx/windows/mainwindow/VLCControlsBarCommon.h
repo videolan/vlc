@@ -25,6 +25,7 @@
 
 @class VLCDragDropView;
 @class VLCSlider;
+@class VLCVolumeSlider;
 @class VLCTimeField;
 @class VLCImageView;
 @class VLCBottomBarView;
@@ -48,6 +49,7 @@
 @property (readwrite, strong) IBOutlet NSButton *shuffleButton;
 
 @property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
+@property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
 
 @property (readwrite, strong) IBOutlet VLCImageView *artworkImageView;
 @property (readwrite, strong) IBOutlet NSButton *artworkButton;
@@ -71,7 +73,10 @@
 - (IBAction)fwd:(id)sender;
 
 - (IBAction)timeSliderAction:(id)sender;
+- (IBAction)volumeAction:(id)sender;
 - (IBAction)fullscreen:(id)sender;
+
 - (void)updateTimeSlider:(NSNotification *)aNotification;
+- (void)updateVolumeSlider:(NSNotification *)aNotification;
 
 @end

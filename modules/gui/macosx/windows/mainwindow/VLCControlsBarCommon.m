@@ -35,6 +35,7 @@
 #import "views/VLCImageView.h"
 #import "views/VLCTimeField.h"
 #import "views/VLCSlider.h"
+#import "views/VLCVolumeSlider.h"
 #import "views/VLCWrappableTextField.h"
 
 /*****************************************************************************
@@ -79,6 +80,14 @@
     [notificationCenter addObserver:self
                            selector:@selector(updateTimeSlider:)
                                name:VLCPlayerTimeAndPositionChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateVolumeSlider:)
+                               name:VLCPlayerVolumeChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateVolumeSlider:)
+                               name:VLCPlayerMuteChanged
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(playerStateUpdated:)
@@ -138,6 +147,14 @@
 
     [self.timeSlider setHidden:NO];
     [self updateTimeSlider:nil];
+
+    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
+    [self.volumeSlider setToolTip: volumeTooltip];
+    self.volumeSlider.accessibilityLabel = _NS("Volume");
+
+    [self.volumeSlider setMaxValue: VLCVolumeMaximum];
+    [self.volumeSlider setDefaultValue: VLCVolumeDefault];
+    [self updateVolumeSlider:nil];
 
     NSColor *timeFieldTextColor = [NSColor controlTextColor];
 
@@ -311,6 +328,13 @@
     [self.timeSlider setFloatValue:newPosition];
 }
 
+- (IBAction)volumeAction:(id)sender
+{
+    if (sender == self.volumeSlider) {
+        [_playerController setVolume:[sender floatValue]];
+    }
+}
+
 - (IBAction)fullscreen:(id)sender
 {
     [_playerController toggleFullscreen];
@@ -399,6 +423,21 @@
     [self.timeField setNeedsDisplay:YES];
     [self.trailingTimeField setTime:timeString withRemainingTime:remainingTime];
     [self.trailingTimeField setNeedsDisplay:YES];
+}
+
+- (void)updateVolumeSlider:(NSNotification *)aNotification
+{
+    float f_volume = _playerController.volume;
+    BOOL b_muted = _playerController.mute;
+
+    if (b_muted)
+        f_volume = 0.f;
+
+    [self.volumeSlider setFloatValue: f_volume];
+    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), (int)(f_volume * 100.0f)];
+    [self.volumeSlider setToolTip:volumeTooltip];
+
+    [self.volumeSlider setEnabled: !b_muted];
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification
