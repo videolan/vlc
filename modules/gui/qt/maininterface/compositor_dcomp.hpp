@@ -70,7 +70,7 @@ protected:
     void windowDestroy() override;
 
 private:
-    QWindow* m_rootWindow = nullptr;
+    DCompRenderWindow* m_rootWindow = nullptr;
 
     std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
 

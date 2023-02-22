@@ -275,6 +275,8 @@ some_sources = files(
     'maininterface/compositor.cpp',
     'maininterface/compositor_common.hpp',
     'maininterface/compositor_common.cpp',
+    'maininterface/compositor_accessibility.hpp',
+    'maininterface/compositor_accessibility.cpp',
     'maininterface/compositor_dummy.hpp',
     'maininterface/compositor_dummy.cpp',
     'maininterface/interface_window_handler.cpp',

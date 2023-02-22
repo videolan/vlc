@@ -252,7 +252,7 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
         bool ret;
         m_mainCtx = mainCtx;
 
-        m_rootWindow = new QWindow();
+        m_rootWindow = new DCompRenderWindow();
 
         m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf);
         m_videoWindowHandler->setWindow( m_rootWindow );

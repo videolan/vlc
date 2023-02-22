@@ -166,6 +166,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/compositor.cpp \
 	gui/qt/maininterface/compositor_common.hpp \
 	gui/qt/maininterface/compositor_common.cpp \
+	gui/qt/maininterface/compositor_accessibility.cpp \
+	gui/qt/maininterface/compositor_accessibility.hpp \
 	gui/qt/maininterface/compositor_dummy.hpp \
 	gui/qt/maininterface/compositor_dummy.cpp \
 	gui/qt/maininterface/interface_window_handler.cpp \

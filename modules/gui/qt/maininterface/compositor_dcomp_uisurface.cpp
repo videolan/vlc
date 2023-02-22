@@ -33,6 +33,9 @@
 #include <d3dcompiler.h>
 #include <comdef.h>
 
+#include "compositor_common.hpp""
+#include "compositor_accessibility.hpp"
+
 namespace vlc {
 
 using namespace Microsoft::WRL;
@@ -138,16 +141,34 @@ private:
     HINSTANCE                 m_compiler_dll = nullptr;
 };
 
+QAccessibleInterface* DCompRenderWindow::accessibleRoot() const
+{
+    QAccessibleInterface* iface = QAccessible::queryAccessibleInterface(
+        const_cast<DCompRenderWindow*>(this));
+    return iface;
+}
+
+void DCompRenderWindow::setOffscreenWindow(CompositorOffscreenWindow* window)
+{
+    m_offscreenWindow = window;
+}
+
+QQuickWindow* DCompRenderWindow::getOffscreenWindow() const
+{
+    return m_offscreenWindow;
+}
+
 CompositorDCompositionUISurface::CompositorDCompositionUISurface(qt_intf_t* p_intf,
-                                                                 QWindow* window,
+                                                                 DCompRenderWindow* window,
                                                                  Microsoft::WRL::ComPtr<IDCompositionVisual> dcVisual,
                                                                  QObject* parent)
     : QObject(parent)
     , m_intf(p_intf)
     , m_dcUiVisual(dcVisual)
-    , m_rootWindow(window)
+    , m_renderWindow(window)
 {
 }
+
 
 bool CompositorDCompositionUISurface::init()
 {
@@ -161,7 +182,7 @@ bool CompositorDCompositionUISurface::init()
     format.setAlphaBufferSize(8);
 
     m_context = new QOpenGLContext(this);
-    m_context->setScreen(m_rootWindow->screen());
+    m_context->setScreen(m_renderWindow->screen());
     m_context->setFormat(format);
     ret = m_context->create();
     if (!ret || !m_context->isValid())
@@ -198,12 +219,15 @@ bool CompositorDCompositionUISurface::init()
     m_uiOffscreenSurface->setFormat(format);;
     m_uiOffscreenSurface->create();
 
-    m_uiRenderControl = new CompositorDCompositionRenderControl(m_rootWindow);
+    m_uiRenderControl = new CompositorDCompositionRenderControl(m_renderWindow);
 
-    m_uiWindow = new QQuickWindow(m_uiRenderControl);
+    m_uiWindow = new CompositorOffscreenWindow(m_uiRenderControl);
+
     m_uiWindow->setDefaultAlphaBuffer(true);
     m_uiWindow->setFormat(format);
     m_uiWindow->setClearBeforeRendering(false);
+
+    m_renderWindow->setOffscreenWindow(m_uiWindow);
 
     m_d3dCompiler = std::make_shared<OurD3DCompiler>();
     ret = m_d3dCompiler->init(VLC_OBJECT(m_intf));
@@ -212,8 +236,8 @@ bool CompositorDCompositionUISurface::init()
         return false;
     }
 
-    qreal dpr = m_rootWindow->devicePixelRatio();
-    ret = initialiseD3DSwapchain(dpr * m_rootWindow->width(), dpr * m_rootWindow->height());
+    qreal dpr = m_renderWindow->devicePixelRatio();
+    ret = initialiseD3DSwapchain(dpr * m_renderWindow->width(), dpr * m_renderWindow->height());
     if (!ret)
         return false;
 
@@ -225,10 +249,15 @@ bool CompositorDCompositionUISurface::init()
 
     connect(m_uiWindow, &QQuickWindow::sceneGraphInitialized, this, &CompositorDCompositionUISurface::createFbo);
     connect(m_uiWindow, &QQuickWindow::sceneGraphInvalidated, this, &CompositorDCompositionUISurface::destroyFbo);
+
+    connect(m_uiWindow, &QQuickWindow::focusObjectChanged, this, &CompositorDCompositionUISurface::forwardFocusObjectChanged);
+
     connect(m_uiRenderControl, &QQuickRenderControl::renderRequested, this, &CompositorDCompositionUISurface::requestUpdate);
     connect(m_uiRenderControl, &QQuickRenderControl::sceneChanged, this, &CompositorDCompositionUISurface::requestUpdate);
 
-    m_rootWindow->installEventFilter(this);
+    QAccessible::installFactory(&compositionAccessibleFactory);
+
+    m_renderWindow->installEventFilter(this);
     return true;
 }
 
@@ -525,7 +554,7 @@ void CompositorDCompositionUISurface::render()
 {
     EGLBoolean eglRet;
 
-    QSize realSize = m_rootWindow->size() * m_rootWindow->devicePixelRatio();
+    QSize realSize = m_renderWindow->size() * m_renderWindow->devicePixelRatio();
     if (realSize != m_surfaceSize)
     {
         m_surfaceSize = realSize;
@@ -609,15 +638,24 @@ static void remapInputMethodQueryEvent(QObject *object, QInputMethodQueryEvent *
     }
 }
 
+
+
+
 bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event)
 {
-    if (object != m_rootWindow)
+    if (object != m_renderWindow)
         return false;
 
     switch (event->type()) {
     case QEvent::Move:
     case QEvent::Show:
+        //offscreen window won't be really visible
+        m_uiWindow->setPseudoVisible(true);
         updatePosition();
+        break;
+
+    case QEvent::Hide:
+        m_uiWindow->setPseudoVisible(false);
         break;
 
     case QEvent::Resize:
@@ -625,6 +663,11 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
         forceRender();
         break;
 
+    case QEvent::FocusAboutToChange:
+        return QCoreApplication::sendEvent(m_uiWindow, event);
+    case QEvent::WindowStateChange:
+        m_uiWindow->setWindowStateExt(m_renderWindow->windowState());
+        break;
     case QEvent::WindowActivate:
     case QEvent::WindowDeactivate:
     case QEvent::Leave:
@@ -638,6 +681,10 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
         event->setAccepted(mappedEvent.isAccepted());
         return ret;
     }
+
+    case QEvent::FocusIn:
+    case QEvent::FocusOut:
+        return QCoreApplication::sendEvent(m_uiWindow, event);
 
     case QEvent::InputMethod:
         return QCoreApplication::sendEvent(m_uiWindow->focusObject(), event);
@@ -665,6 +712,9 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
         QCoreApplication::sendEvent(m_uiWindow, &mappedEvent);
         return true;
     }
+
+    case QEvent::ShortcutOverride:
+
     case QEvent::Wheel:
     case QEvent::HoverEnter:
     case QEvent::HoverLeave:
@@ -689,8 +739,9 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
         return QCoreApplication::sendEvent(m_uiWindow, event);
 
     case QEvent::ScreenChangeInternal:
-        m_uiWindow->setScreen(m_rootWindow->screen());
+        m_uiWindow->setScreen(m_renderWindow->screen());
         break;
+
     default:
         break;
     }
@@ -700,7 +751,7 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
 void CompositorDCompositionUISurface::createFbo()
 {
     //write to the immediate context
-    m_uiWindow->setRenderTarget(0, m_rootWindow->size());
+    m_uiWindow->setRenderTarget(0, m_renderWindow->size());
 }
 
 void CompositorDCompositionUISurface::destroyFbo()
@@ -709,8 +760,8 @@ void CompositorDCompositionUISurface::destroyFbo()
 
 void CompositorDCompositionUISurface::updateSizes()
 {
-    qreal dpr = m_rootWindow->devicePixelRatio();
-    QSize windowSize = m_rootWindow->size();
+    qreal dpr = m_renderWindow->devicePixelRatio();
+    QSize windowSize = m_renderWindow->size();
 
     resizeSwapchain(windowSize.width() * dpr, windowSize.height() * dpr);
     updateSharedTexture(windowSize.width() * dpr, windowSize.height() * dpr);
@@ -722,7 +773,7 @@ void CompositorDCompositionUISurface::updateSizes()
 
 void CompositorDCompositionUISurface::updatePosition()
 {
-    QPoint windowPosition = m_rootWindow->mapToGlobal(QPoint(0,0));
+    QPoint windowPosition = m_renderWindow->mapToGlobal(QPoint(0,0));
     if (m_uiWindow->position() != windowPosition)
         m_uiWindow->setPosition(windowPosition);
 }
@@ -736,11 +787,19 @@ void CompositorDCompositionUISurface::requestUpdate()
     }
 }
 
+QQuickWindow* CompositorDCompositionUISurface::getOffscreenWindow() const {
+    return m_uiWindow;
+}
+
 void CompositorDCompositionUISurface::handleScreenChange()
 {
-    msg_Info(m_intf, "handle screen change");
-    m_uiWindow->setGeometry(0, 0, m_rootWindow->width(), m_rootWindow->height());;
+    m_uiWindow->setGeometry(0, 0, m_renderWindow->width(), m_renderWindow->height());;
     requestUpdate();
+}
+
+void CompositorDCompositionUISurface::forwardFocusObjectChanged(QObject* object)
+{
+    m_renderWindow->focusObjectChanged(object);
 }
 
 }

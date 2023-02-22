@@ -43,6 +43,7 @@ class QQmlComponent;
 class QWindow;
 class QQuickItem;
 class QQuickView;
+class QQuickWindow;
 
 namespace vlc {
 
@@ -100,6 +101,7 @@ public:
 
         virtual QQuickItem * activeFocusItem() const = 0;
     };
+
 public:
     explicit CompositorVideo(qt_intf_t* p_intf, QObject* parent = nullptr);
     virtual ~CompositorVideo();

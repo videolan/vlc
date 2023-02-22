@@ -59,8 +59,28 @@
 
 #include "qt.hpp"
 #include "compositor.hpp"
+#include "compositor_accessibility.hpp"
 
 namespace vlc {
+
+class CompositorOffscreenWindow;
+
+//on screen window
+class DCompRenderWindow : public QWindow, public AccessibleRenderWindow
+{
+    Q_OBJECT
+public:
+#ifndef QT_NO_ACCESSIBILITY
+    QAccessibleInterface* accessibleRoot() const override;
+#endif
+
+    void setOffscreenWindow(CompositorOffscreenWindow* window);
+    QQuickWindow* getOffscreenWindow() const override;
+
+private:
+    CompositorOffscreenWindow* m_offscreenWindow = nullptr;
+};
+
 
 class CompositorDCompositionRenderControl : public QQuickRenderControl
 {
@@ -85,7 +105,7 @@ class CompositorDCompositionUISurface : public QObject, public CompositorVideo::
     Q_OBJECT
 public:
     explicit CompositorDCompositionUISurface(qt_intf_t* p_intf,
-                                             QWindow* window,
+                                             DCompRenderWindow* window,
                                              Microsoft::WRL::ComPtr<IDCompositionVisual> dcVisual,
                                              QObject *parent = nullptr);
 
@@ -94,6 +114,7 @@ public:
     bool init();
 
     QQmlEngine* engine() const override { return m_qmlEngine; }
+    QQuickWindow* getOffscreenWindow() const;
 
     void setContent(QQmlComponent* component,  QQuickItem* rootItem) override;
 
@@ -113,6 +134,7 @@ private:
     void forceRender();
 
     void handleScreenChange();
+    void forwardFocusObjectChanged(QObject* object);
 
     void createFbo();
     void destroyFbo();
@@ -121,6 +143,8 @@ private:
     void updatePosition();
 
 private:
+    friend class DCompRenderWindow;
+
     qt_intf_t* m_intf = nullptr;
 
     class OurD3DCompiler;
@@ -171,9 +195,10 @@ private:
     CompositorDCompositionRenderControl* m_uiRenderControl = nullptr;
 
     //the actual window where we render
-    QWindow* m_rootWindow = nullptr;
+    DCompRenderWindow* m_renderWindow = nullptr;
 
-    QQuickWindow* m_uiWindow = nullptr;
+    //offscreen window for QML content
+    CompositorOffscreenWindow* m_uiWindow = nullptr;
     QQmlEngine* m_qmlEngine = nullptr;
     QQmlComponent* m_qmlComponent = nullptr;
     QQuickItem* m_rootItem = nullptr;
