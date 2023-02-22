@@ -43,6 +43,8 @@
                            selector:@selector(shouldShowFullscreenController:)
                                name:VLCVideoWindowShouldShowFullscreenController
                              object:nil];
+
+    self.titleVisibility = NSWindowTitleHidden;
 }
 
 - (void)stopTitlebarAutohideTimer
