@@ -33,10 +33,16 @@
 
 @implementation VLCFullVideoViewWindow
 
-- (void)awakeFromNib
+- (void)setup
 {
-    [super awakeFromNib];
+    [super setup];
     _autohideTitlebar = NO;
+
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(shouldShowFullscreenController:)
+                               name:VLCVideoWindowShouldShowFullscreenController
+                             object:nil];
 }
 
 - (void)stopTitlebarAutohideTimer
@@ -100,6 +106,11 @@
     self.titlebarAppearsTransparent = NO;
 
     _autohideTitlebar = NO;
+    [self showTitleBar];
+}
+
+- (void)shouldShowFullscreenController:(NSNotification *)aNotification
+{
     [self showTitleBar];
 }
 

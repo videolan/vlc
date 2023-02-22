@@ -47,6 +47,8 @@ extern const CGFloat VLCVideoWindowCommonMinimalHeight;
 @property (readwrite, assign) NSRect previousSavedFrame;
 @property (readonly) VLCPlayerController *playerController;
 
+- (void)setup;
+
 - (void)setWindowLevel:(NSInteger)i_state;
 
 /* fullscreen handling */

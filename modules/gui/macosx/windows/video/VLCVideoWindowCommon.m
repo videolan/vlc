@@ -83,15 +83,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
                               backing:backingType defer:flag];
 
     if (self) {
-        /* we want to be moveable regardless of our style */
-        [self setMovableByWindowBackground: YES];
-        [self setCanBecomeKeyWindow:YES];
-
-        o_temp_view = [[NSView alloc] init];
-        [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
-
-        _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
-        _videoViewController = [[VLCMainVideoViewController alloc] init];
+        [self setup];
     }
 
     return self;
@@ -103,6 +95,12 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 }
 
 - (void)awakeFromNib
+{
+    [super awakeFromNib];
+    [self setup];
+}
+
+- (void)setup
 {
     if (_videoViewController == nil) {
         _videoViewController = [[VLCMainVideoViewController alloc] init];
@@ -117,6 +115,17 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
                            selector:@selector(mediaMetadataChanged:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
+
+    /* we want to be moveable regardless of our style */
+    [self setMovableByWindowBackground:YES];
+    [self setCanBecomeKeyWindow:YES];
+
+    o_temp_view = [[NSView alloc] init];
+    [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+
+    _playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    _videoViewController = [[VLCMainVideoViewController alloc] init];
+
     [self mediaMetadataChanged:nil];
 
     BOOL b_nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
@@ -127,8 +136,6 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         // Native fullscreen seems to be default on El Capitan, this disables it explicitly
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     }
-
-    [super awakeFromNib];
 }
 
 - (void)mediaMetadataChanged:(NSNotification *)aNotification
