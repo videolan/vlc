@@ -34,17 +34,15 @@ import "qrc:///dialogs/" as DG
 FocusScope {
     id: rootPlayer
 
+    // Properties
+
     //menu/overlay to dismiss
     property var menu: undefined
-    property int _lockAutoHide: 0
-    readonly property bool _autoHide: _lockAutoHide == 0
-                                      && rootPlayer.hasEmbededVideo
-                                      && Player.hasVideoOutput
-                                      && playlistpopup.state !== "visible"
 
-    property bool pinVideoControls: MainCtx.pinVideoControls && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
     property bool hasEmbededVideo: MainCtx.hasEmbededVideo
+
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
+
     readonly property string coverSource: {
         if (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
             mainPlaylistController.currentItem.artwork
@@ -54,7 +52,23 @@ FocusScope {
             VLCStyle.noArtAlbumCover
 
     }
+
+    // Private
+
+    property int _lockAutoHide: 0
+
+    readonly property bool _autoHide: _lockAutoHide == 0
+                                      && rootPlayer.hasEmbededVideo
+                                      && Player.hasVideoOutput
+                                      && playlistpopup.state !== "visible"
+
+    property bool _controlsUnderVideo: (MainCtx.pinVideoControls
+                                        &&
+                                        (MainCtx.intfMainWindow.visibility !== Window.FullScreen))
+
     property bool _keyPressed: false
+
+    // Settings
 
     layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
 
@@ -96,9 +110,9 @@ FocusScope {
             toolbarAutoHide.restart()
     }
 
-    onPinVideoControlsChanged: {
-        lockUnlockAutoHide(pinVideoControls)
-        if (pinVideoControls)
+    on_ControlsUnderVideoChanged: {
+        lockUnlockAutoHide(_controlsUnderVideo)
+        if (_controlsUnderVideo)
             toolbarAutoHide.setVisibleControlBar(true)
     }
 
@@ -145,9 +159,12 @@ FocusScope {
     //we draw both the view and the window here
     ColorContext {
         id: windowTheme
+
         // NOTE: We force the night theme when playing a video.
-        palette: (MainCtx.hasEmbededVideo && !rootPlayer.pinVideoControls) ? VLCStyle.darkPalette
-                                                                           : VLCStyle.palette
+        palette: (MainCtx.hasEmbededVideo && MainCtx.pinVideoControls === false)
+                 ? VLCStyle.darkPalette
+                 : VLCStyle.palette
+
         colorSet: ColorContext.Window
     }
 
@@ -181,8 +198,8 @@ FocusScope {
         visible: rootPlayer.hasEmbededVideo
         enabled: rootPlayer.hasEmbededVideo
         anchors.fill: parent
-        anchors.topMargin: rootPlayer.pinVideoControls ? topcontrolView.height : 0
-        anchors.bottomMargin: rootPlayer.pinVideoControls ? controlBarView.height : 0
+        anchors.topMargin: rootPlayer._controlsUnderVideo ? topcontrolView.height : 0
+        anchors.bottomMargin: rootPlayer._controlsUnderVideo ? controlBarView.height : 0
 
         onMouseMoved: {
             //short interval for mouse events
@@ -219,7 +236,7 @@ FocusScope {
         }
     }
 
-    /// Backgrounds of topControlbar and controlBar are drawn separately since they can outgrow their content
+    // Backgrounds of topControlbar and controlBar are drawn separately since they can outgrow their content
     Component {
         id: backgroundForPinnedControls
 
@@ -234,26 +251,30 @@ FocusScope {
 
         Widgets.AcrylicBackground {
             width: rootPlayer.width
+
+            visible: (rootPlayer._controlsUnderVideo || topcontrolView.resumeVisible)
+
             tintColor: windowTheme.bg.primary
         }
     }
 
     /* top control bar background */
     Widgets.LoaderFade {
-        state: topcontrolView.state
         width: parent.width
-        visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls
+
+        state: topcontrolView.state
+
         height: item.height
 
         sourceComponent: {
-            if (rootPlayer.pinVideoControls)
+            if (MainCtx.pinVideoControls)
                 return acrylicBackground
             else
                 return topcontrolViewBackground
         }
 
         onItemChanged: {
-            if (rootPlayer.pinVideoControls)
+            if (rootPlayer._controlsUnderVideo)
                 item.height = Qt.binding(function () { return topcontrolView.height + topcontrolView.anchors.topMargin; })
         }
 
@@ -263,6 +284,9 @@ FocusScope {
             Rectangle {
                 width: rootPlayer.width
                 height: VLCStyle.dp(206, VLCStyle.scale)
+
+                visible: rootPlayer.hasEmbededVideo
+
                 gradient: Gradient {
                     GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
                     GradientStop { position: 1; color: "transparent" }
@@ -281,11 +305,12 @@ FocusScope {
 
         state: controlBarView.state
 
-        sourceComponent: rootPlayer.pinVideoControls
+        sourceComponent: (MainCtx.pinVideoControls)
                          ? backgroundForPinnedControls
                          : (rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia)
+
         onItemChanged: {
-            if (rootPlayer.pinVideoControls)
+            if (rootPlayer._controlsUnderVideo)
                 item.height = Qt.binding(function () { return rootPlayer.height - rootPlayer.positionSliderY; })
         }
 
@@ -315,8 +340,10 @@ FocusScope {
         }
     }
 
-    Widgets.LoaderFade{
+    Widgets.LoaderFade {
         id: topcontrolView
+
+        property bool resumeVisible: (item) ? item.resumeVisible : false
 
         anchors {
             top: parent.top
@@ -325,8 +352,6 @@ FocusScope {
         }
 
         z: 1
-
-        state: "visible"
 
         sourceComponent: TopBar {
             id: topbar
@@ -340,10 +365,19 @@ FocusScope {
             textWidth: (MainCtx.playlistVisible) ? rootPlayer.width - playlistpopup.width
                                                  : rootPlayer.width
 
+            // NOTE: With pinned controls, the top controls are hidden when switching to
+            //       fullScreen. Except when resume is visible
+            visible: (MainCtx.pinVideoControls === false
+                      ||
+                      MainCtx.intfMainWindow.visibility !== Window.FullScreen
+                      ||
+                      resumeVisible)
+
             focus: true
             title: mainPlaylistController.currentItem.title
 
-            pinControls: rootPlayer.pinVideoControls
+            pinControls: MainCtx.pinVideoControls
+
             showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
             showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
 
@@ -525,8 +559,9 @@ FocusScope {
 
         anchors {
             // NOTE: When the controls are pinned we display the playqueue under the topBar.
-            top: (rootPlayer.pinVideoControls) ? topcontrolView.bottom
-                                               : parent.top
+            top: (rootPlayer._controlsUnderVideo) ? topcontrolView.bottom
+                                                  : parent.top
+
             right: parent.right
             bottom: parent.bottom
 
@@ -555,7 +590,7 @@ FocusScope {
                 anchors.fill: parent
                 rightPadding: VLCStyle.applicationHorizontalMargin
                 topPadding:  {
-                    if (rootPlayer.pinVideoControls)
+                    if (rootPlayer._controlsUnderVideo)
                         return VLCStyle.margin_normal
                     else
                         // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
@@ -606,14 +641,18 @@ FocusScope {
             bottom: controlBarView.item.visible ? controlBarView.top : rootPlayer.bottom
             left: parent.left
             right: parent.right
-            bottomMargin: rootPlayer.pinVideoControls || !controlBarView.item.visible ? 0 : - VLCStyle.margin_large
+
+            bottomMargin: (rootPlayer._controlsUnderVideo || !controlBarView.item.visible)
+                          ? 0 : - VLCStyle.margin_large
         }
     }
 
     Widgets.LoaderFade {
         id: controlBarView
 
-        readonly property int sliderY: rootPlayer.pinVideoControls ? item.sliderY - VLCStyle.margin_xxxsmall : item.sliderY
+        readonly property int sliderY: (MainCtx.pinVideoControls) ? item.sliderY
+                                                                    - VLCStyle.margin_xxxsmall
+                                                                  : item.sliderY
 
         anchors {
             bottom: parent.bottom
@@ -623,10 +662,8 @@ FocusScope {
 
         focus: true
 
-        state: "visible"
-
         onStateChanged: {
-            if (state === "visible")
+            if (state === "visible" && item)
                 item.showChapterMarks()
         }
 
@@ -654,7 +691,9 @@ FocusScope {
                 anchors.rightMargin: VLCStyle.applicationHorizontalMargin
                 anchors.bottomMargin: VLCStyle.applicationVerticalMargin
 
-                textPosition: rootPlayer.pinVideoControls ? ControlBar.TimeTextPosition.LeftRightSlider : ControlBar.TimeTextPosition.AboveSlider
+                textPosition: (MainCtx.pinVideoControls)
+                              ? ControlBar.TimeTextPosition.LeftRightSlider
+                              : ControlBar.TimeTextPosition.AboveSlider
 
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
