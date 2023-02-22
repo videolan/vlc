@@ -245,11 +245,12 @@ int WindowOpen(vlc_window_t *p_wnd)
     newVideoWindow.acceptsMouseMovedEvents = !asVideoWallpaper;
     newVideoWindow.movableByWindowBackground = !asVideoWallpaper;
 
-    //VLCVoutView *voutView = [[VLCVoutView alloc] initWithFrame:newVideoWindow.contentView.bounds];
-    //voutView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    newVideoWindow.videoViewController = [[VLCMainVideoViewController alloc] init];
+    newVideoWindow.videoViewController.displayLibraryControls = NO;
+    newVideoWindow.videoViewController.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    newVideoWindow.videoViewController.view.frame = newVideoWindow.contentView.frame;
 
-    //[newVideoWindow.contentView addSubview:voutView positioned:NSWindowAbove relativeTo:nil];
-    //newVideoWindow.videoViewController.voutView = voutView;
+    [newVideoWindow.contentView addSubview:newVideoWindow.videoViewController.view positioned:NSWindowAbove relativeTo:nil];
 
     if (asVideoWallpaper) {
         [newVideoWindow setLevel:CGWindowLevelForKey(kCGDesktopWindowLevelKey) + 1];
