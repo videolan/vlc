@@ -285,10 +285,11 @@ int WindowOpen(vlc_window_t *p_wnd)
         NSWindowStyleMaskResizable |
         NSWindowStyleMaskTitled |
         NSWindowStyleMaskFullSizeContentView;
-    VLCVideoWindowCommon *newVideoWindow = [[VLCAspectRatioRetainingVideoWindow alloc] initWithContentRect:NSMakeRect(0,0,300,300)
-                                                                                                 styleMask:mask
-                                                                                                   backing:NSBackingStoreBuffered
-                                                                                                     defer:YES];
+
+    VLCAspectRatioRetainingVideoWindow *newVideoWindow = [[VLCAspectRatioRetainingVideoWindow alloc] initWithContentRect:NSMakeRect(0,0,300,300)
+                                                                                                               styleMask:mask
+                                                                                                                 backing:NSBackingStoreBuffered
+                                                                                                                   defer:YES];
 
     newVideoWindow.backgroundColor = [NSColor blackColor];
     newVideoWindow.canBecomeKeyWindow = YES;
@@ -302,6 +303,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     newVideoWindow.videoViewController.displayLibraryControls = NO;
     newVideoWindow.videoViewController.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     newVideoWindow.videoViewController.view.frame = newVideoWindow.contentView.frame;
+    [newVideoWindow enableVideoTitleBarMode];
 
     [newVideoWindow.contentView addSubview:newVideoWindow.videoViewController.view positioned:NSWindowAbove relativeTo:nil];
 
