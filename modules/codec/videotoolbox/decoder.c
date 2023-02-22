@@ -426,6 +426,11 @@ static block_t *ProcessBlockH264(decoder_t *p_dec, block_t *p_block, bool *pb_co
     return p_block;
 }
 
+static void CleanH264(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    hxxx_helper_clean(&p_sys->hh);
+}
 
 static bool InitH264(decoder_t *p_dec)
 {
@@ -433,14 +438,13 @@ static bool InitH264(decoder_t *p_dec)
     h264_poc_context_init(&p_sys->h264_pocctx);
     hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
                      p_dec->fmt_in->i_codec, 0, 4);
-    return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
-                                             p_dec->fmt_in->i_extra) == VLC_SUCCESS;
-}
-
-static void CleanH264(decoder_t *p_dec)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    hxxx_helper_clean(&p_sys->hh);
+    if(hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
+                                         p_dec->fmt_in->i_extra) != VLC_SUCCESS)
+    {
+        CleanH264(p_dec);
+        return false;
+    }
+    return true;
 }
 
 static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
@@ -616,17 +620,22 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     return b_ret;
 }
 
+#define CleanHEVC CleanH264
+
 static bool InitHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     hevc_poc_cxt_init(&p_sys->hevc_pocctx);
     hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
                      p_dec->fmt_in->i_codec, 0, 4);
-    return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
-                                             p_dec->fmt_in->i_extra) == VLC_SUCCESS;
+    if(hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
+                                         p_dec->fmt_in->i_extra) != VLC_SUCCESS)
+    {
+        CleanHEVC(p_dec);
+        return false;
+    }
+    return true;
 }
-
-#define CleanHEVC CleanH264
 
 static void GetxPSHEVC(uint8_t i_id, void *priv,
                        hevc_picture_parameter_set_t **pp_pps,
@@ -1521,6 +1530,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
 
     if (p_sys->pf_codec_init && !p_sys->pf_codec_init(p_dec))
     {
+        p_sys->pf_codec_clean = NULL; /* avoid double free */
         CloseDecoder(p_this);
         return VLC_EGENERIC;
     }
