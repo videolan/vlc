@@ -9,8 +9,12 @@
 // Windows is not a real POSIX system and doesn't provide this header
 // provide a dummy one so the code can compile
 
+#if defined(_GAMING_XBOX_SCARLETT) || defined(_GAMING_XBOX_XBOXONE) || defined(_XBOX_ONE)
+# define _CRT_DECLARE_NONSTDC_NAMES 0
+#else
 // many functions commonly found in unistd.h are found in io.h and process.h
-#define _CRT_DECLARE_NONSTDC_NAMES 1
+# define _CRT_DECLARE_NONSTDC_NAMES 1
+#endif
 #include <io.h>
 #include <process.h>
 

@@ -28,8 +28,11 @@
 
 #if defined(_MSC_VER)
 // disable common warnings when compiling POSIX code
-#ifndef _CRT_NONSTDC_NO_WARNINGS
-#define _CRT_NONSTDC_NO_WARNINGS    1
+#ifndef _CRT_NONSTDC_NO_DEPRECATE
+// the POSIX variants are not available in the GDK
+# if !(defined(_GAMING_XBOX_SCARLETT) || defined(_GAMING_XBOX_XBOXONE) || defined(_XBOX_ONE))
+#  define _CRT_NONSTDC_NO_DEPRECATE
+# endif
 #endif
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS     1
