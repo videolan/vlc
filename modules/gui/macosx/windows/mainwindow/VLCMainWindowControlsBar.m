@@ -34,6 +34,7 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
+#import "views/VLCTimeField.h"
 #import "views/VLCVolumeSlider.h"
 #import "views/VLCWrappableTextField.h"
 
@@ -87,6 +88,9 @@
 
     [self playbackStateChanged:nil];
     [self.stopButton setHidden:YES];
+
+    [self.timeField setAlignment: NSCenterTextAlignment];
+    [self.trailingTimeField setAlignment: NSCenterTextAlignment];
 }
 
 #pragma mark -

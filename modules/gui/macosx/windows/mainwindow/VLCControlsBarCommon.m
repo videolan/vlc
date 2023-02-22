@@ -160,7 +160,6 @@
 
     [self.timeField setTextColor: timeFieldTextColor];
     [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
-    [self.timeField setAlignment: NSCenterTextAlignment];
     [self.timeField setNeedsDisplay:YES];
     [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsElapsed];
     self.trailingTimeField.isTimeRemaining = NO;
@@ -169,7 +168,6 @@
     self.trailingTimeField.isTimeRemaining = !self.timeField.isTimeRemaining;
     [self.trailingTimeField setTextColor: timeFieldTextColor];
     [self.trailingTimeField setFont:[NSFont titleBarFontOfSize:10.0]];
-    [self.trailingTimeField setAlignment: NSCenterTextAlignment];
     [self.trailingTimeField setNeedsDisplay:YES];
     [self.trailingTimeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
     self.trailingTimeField.isTimeRemaining = YES;
