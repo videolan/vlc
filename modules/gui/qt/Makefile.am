@@ -81,6 +81,18 @@ endif
 if HAVE_QT5_GTK
 libqt_plugin_la_CPPFLAGS += -DQT5_HAS_GTK
 endif
+if HAVE_QT5_DECLARATIVE_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT5_DECLARATIVE_PRIVATE \
+	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION)/QtCore \
+	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION)/QtGui \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION)/QtQml \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION) \
+	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION)/QtQuick
+
+endif
 
 libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp gui/qt/plugins.hpp \
