@@ -310,6 +310,7 @@ int WindowOpen(vlc_window_t *p_wnd)
         newVideoWindow.frameAutosaveName = @"";
     }
 
+    newVideoWindow.releasedWhenClosed = NO;
     newVideoWindow.delegate = newVideoWindow;
     newVideoWindow.level = NSNormalWindowLevel;
     [newVideoWindow center];
