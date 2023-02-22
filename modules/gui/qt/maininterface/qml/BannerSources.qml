@@ -28,6 +28,7 @@ import org.videolan.vlc 0.1
 import org.videolan.compat 0.1
 
 import "qrc:///style/"
+import "qrc:///playlist/" as PL
 import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 import "qrc:///util/Helpers.js" as Helpers
@@ -49,6 +50,10 @@ FocusScope {
     property alias model: pLBannerSources.model
     property var extraLocalActions: undefined
     property alias localMenuDelegate: localMenuGroup.sourceComponent
+
+    // For now, used for d&d functionality
+    // Not strictly necessary to set
+    property PL.PlaylistListView plListView: null
 
     property bool _showCSD: MainCtx.clientSideDecoration && !(MainCtx.intfMainWindow.visibility === Window.FullScreen)
 
@@ -429,6 +434,46 @@ FocusScope {
                                 highlighted: MainCtx.playlistVisible
 
                                 onClicked:  MainCtx.playlistVisible = !MainCtx.playlistVisible
+
+                                DropArea {
+                                    anchors.fill: parent
+
+                                    onContainsDragChanged: {
+                                        if (containsDrag) {
+                                            _timer.restart()
+
+                                            if (plListView)
+                                                MainCtx.setCursor(Qt.DragCopyCursor)
+                                        } else {
+                                            _timer.stop()
+
+                                            if (plListView)
+                                                MainCtx.restoreCursor()
+                                        }
+                                    }
+
+                                    onEntered: {
+                                        if (drag.hasUrls || Helpers.isValidInstanceOf(drag.source, Widgets.DragItem)) {
+                                            drag.accept() // Not actually necessary, as it is accepted by default
+                                        } else {
+                                            drag.accepted = false
+                                        }
+                                    }
+
+                                    onDropped: {
+                                        if (plListView)
+                                            plListView.acceptDrop(plListView.model.count, drop)
+                                    }
+
+                                    Timer {
+                                        id: _timer
+                                        interval: VLCStyle.duration_humanMoment
+
+                                        onTriggered: {
+                                            MainCtx.playlistVisible = true
+                                        }
+                                    }
+                                }
                             }
 
                             Widgets.IconToolButton {

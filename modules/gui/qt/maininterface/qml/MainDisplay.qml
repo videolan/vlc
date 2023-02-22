@@ -274,6 +274,8 @@ FocusScope {
 
                     model: root.tabModel
 
+                    plListView: playlist
+
                     onItemClicked: {
                         var name = root.tabModel.get(index).name
                         selectedIndex = index
