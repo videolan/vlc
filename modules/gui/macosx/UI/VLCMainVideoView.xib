@@ -139,6 +139,9 @@
                                                             <constraint firstAttribute="width" constant="80" id="SeC-cP-5Dr"/>
                                                         </constraints>
                                                         <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="512" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="Zws-Wl-Ctp" customClass="VLCVolumeSliderCell"/>
+                                                        <connections>
+                                                            <action selector="volumeAction:" target="3" id="rPg-yg-qAG"/>
+                                                        </connections>
                                                     </slider>
                                                 </subviews>
                                                 <visibilityPriorities>
