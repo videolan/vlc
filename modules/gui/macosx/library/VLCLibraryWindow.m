@@ -51,6 +51,7 @@
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
 
+#import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
@@ -734,7 +735,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)hideControlsBar
 {
-    [super hideControlsBar];
+    _controlsBar.bottomBarView.hidden = YES;
+    _videoViewBottomConstraint.priority = 1;
     _splitViewBottomConstraintToBottomBar.priority = 1;
     _splitViewBottomConstraintToSuperView.priority = 999;
 
@@ -742,7 +744,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showControlsBar
 {
-    [super showControlsBar];
+    _controlsBar.bottomBarView.hidden = NO;
+    _videoViewBottomConstraint.priority = 999;
     _splitViewBottomConstraintToBottomBar.priority = 999;
     _splitViewBottomConstraintToSuperView.priority = 1;
 }
@@ -852,6 +855,23 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self showControlsBar];
         NSView *standardWindowButtonsSuperView = [self standardWindowButton:NSWindowCloseButton].superview;
         standardWindowButtonsSuperView.hidden = NO;
+    }
+}
+
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+    [super windowWillEnterFullScreen:notification];
+
+    if (!self.videoViewController.view.hidden) {
+        [self hideControlsBar];
+    }
+}
+
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+    [super windowDidEnterFullScreen:notification];
+    if (!self.videoViewController.view.hidden) {
+        [self showControlsBar];
     }
 }
 

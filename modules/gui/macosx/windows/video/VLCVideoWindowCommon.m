@@ -35,9 +35,6 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
-#import "views/VLCBottomBarView.h"
-
-#import "windows/mainwindow/VLCControlsBarCommon.h"
 #import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCVoutView.h"
@@ -337,18 +334,6 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 #pragma mark -
 #pragma mark Lion native fullscreen handling
 
-- (void)hideControlsBar
-{
-    [[self.controlsBar bottomBarView] setHidden: YES];
-    self.videoViewBottomConstraint.priority = 1;
-}
-
-- (void)showControlsBar
-{
-    [[self.controlsBar bottomBarView] setHidden: NO];
-    self.videoViewBottomConstraint.priority = 999;
-}
-
 -(NSArray*)customWindowsToEnterFullScreenForWindow:(NSWindow *)window
 {
     if (window == self) {
@@ -415,10 +400,6 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         }
     }
 
-    if (![_videoViewController.view isHidden]) {
-        [self hideControlsBar];
-    }
-
     [self setMovableByWindowBackground: NO];
 }
 
@@ -460,10 +441,6 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     }
 
     [NSCursor setHiddenUntilMouseMoves: NO];
-
-    if (![_videoViewController.view isHidden]) {
-        [self showControlsBar];
-    }
 
     [self setMovableByWindowBackground: YES];
 }

@@ -24,6 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCControlsBarCommon;
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
 @class VLCInputNodePathControl;
@@ -55,6 +56,8 @@ extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;
 extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
+@property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
@@ -140,6 +143,8 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (void)reopenVideoView;
 - (void)disableVideoPlaybackAppearance;
 - (void)togglePlaylist;
+- (void)hideControlsBar;
+- (void)showControlsBar;
 
 - (IBAction)playlistDoubleClickAction:(id)sender;
 - (IBAction)shuffleAction:(id)sender;
