@@ -20,11 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCVideoWindowCommon.h"
+#import "VLCFullVideoViewWindow.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCAspectRatioRetainingVideoWindow : VLCVideoWindowCommon
+@interface VLCAspectRatioRetainingVideoWindow : VLCFullVideoViewWindow
 
 @property (nonatomic, readwrite, assign) NSSize nativeVideoSize;
 
