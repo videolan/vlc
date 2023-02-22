@@ -48,49 +48,49 @@ unsigned vlc_CPU_raw(void);
 #  define VLC_CPU_AVX    0x00002000
 #  define VLC_CPU_AVX2   0x00004000
 
-# if defined (__SSE__)
-#  define VLC_SSE
-# else
-#  define VLC_SSE __attribute__ ((__target__ ("sse")))
-# endif
+#  if defined (__SSE__)
+#   define VLC_SSE
+#  else
+#   define VLC_SSE __attribute__ ((__target__ ("sse")))
+#  endif
 
-# ifdef __SSE2__
-#  define vlc_CPU_SSE2() (1)
-# else
-#  define vlc_CPU_SSE2() ((vlc_CPU() & VLC_CPU_SSE2) != 0)
-# endif
+#  ifdef __SSE2__
+#   define vlc_CPU_SSE2() (1)
+#  else
+#   define vlc_CPU_SSE2() ((vlc_CPU() & VLC_CPU_SSE2) != 0)
+#  endif
 
-# ifdef __SSE3__
-#  define vlc_CPU_SSE3() (1)
-# else
-#  define vlc_CPU_SSE3() ((vlc_CPU() & VLC_CPU_SSE3) != 0)
-# endif
+#  ifdef __SSE3__
+#   define vlc_CPU_SSE3() (1)
+#  else
+#   define vlc_CPU_SSE3() ((vlc_CPU() & VLC_CPU_SSE3) != 0)
+#  endif
 
-# ifdef __SSSE3__
-#  define vlc_CPU_SSSE3() (1)
-# else
-#  define vlc_CPU_SSSE3() ((vlc_CPU() & VLC_CPU_SSSE3) != 0)
-# endif
+#  ifdef __SSSE3__
+#   define vlc_CPU_SSSE3() (1)
+#  else
+#   define vlc_CPU_SSSE3() ((vlc_CPU() & VLC_CPU_SSSE3) != 0)
+#  endif
 
-# ifdef __SSE4_1__
-#  define vlc_CPU_SSE4_1() (1)
-# else
-#  define vlc_CPU_SSE4_1() ((vlc_CPU() & VLC_CPU_SSE4_1) != 0)
-# endif
+#  ifdef __SSE4_1__
+#   define vlc_CPU_SSE4_1() (1)
+#  else
+#   define vlc_CPU_SSE4_1() ((vlc_CPU() & VLC_CPU_SSE4_1) != 0)
+#  endif
 
-# ifdef __AVX__
-#  define vlc_CPU_AVX() (1)
-#  define VLC_AVX
-# else
-#  define vlc_CPU_AVX() ((vlc_CPU() & VLC_CPU_AVX) != 0)
-#  define VLC_AVX __attribute__ ((__target__ ("avx")))
-# endif
+#  ifdef __AVX__
+#   define vlc_CPU_AVX() (1)
+#   define VLC_AVX
+#  else
+#   define vlc_CPU_AVX() ((vlc_CPU() & VLC_CPU_AVX) != 0)
+#   define VLC_AVX __attribute__ ((__target__ ("avx")))
+#  endif
 
-# ifdef __AVX2__
-#  define vlc_CPU_AVX2() (1)
-# else
-#  define vlc_CPU_AVX2() ((vlc_CPU() & VLC_CPU_AVX2) != 0)
-# endif
+#  ifdef __AVX2__
+#   define vlc_CPU_AVX2() (1)
+#  else
+#   define vlc_CPU_AVX2() ((vlc_CPU() & VLC_CPU_AVX2) != 0)
+#  endif
 
 # elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
 #  define HAVE_FPU 1
