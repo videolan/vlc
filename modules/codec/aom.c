@@ -605,15 +605,16 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     const aom_img_fmt_t img_fmt = p_enc->fmt_in.i_codec == VLC_CODEC_I420_10L ?
         AOM_IMG_FMT_I42016 : AOM_IMG_FMT_I420;
 
-    /* Create and initialize the aom_image */
-    if (!aom_img_wrap(&img, img_fmt, i_w, i_h, p_pict->p[0].i_pitch, p_pict->p[0].p_pixels))
+    /* Create and initialize the aom_image (use 1 and correct later to avoid getting
+       rejected for non-power of 2 pitch) */
+    if (!aom_img_wrap(&img, img_fmt, i_w, i_h, 1, p_pict->p[0].p_pixels))
     {
         AOM_ERR(p_enc, ctx, "Failed to wrap image");
         return NULL;
     }
 
-    /* Correct chroma plane offsets. */
-    for (int plane = 1; plane < p_pict->i_planes; plane++) {
+    /* Fill in real plane/stride values. */
+    for (int plane = 0; plane < p_pict->i_planes; plane++) {
         img.planes[plane] = p_pict->p[plane].p_pixels;
         img.stride[plane] = p_pict->p[plane].i_pitch;
     }
