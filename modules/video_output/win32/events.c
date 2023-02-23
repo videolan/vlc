@@ -230,8 +230,8 @@ void EventThreadStop( event_thread_t *p_event )
 /***********************************
  * Local functions implementations *
  ***********************************/
-static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
-                                       WPARAM wParam, LPARAM lParam )
+static LRESULT CALLBACK VideoEventProc( HWND hwnd, UINT message,
+                                        WPARAM wParam, LPARAM lParam )
 {
     if( message == WM_CREATE )
     {
@@ -305,7 +305,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;          /* style: dbl click */
-    wc.lpfnWndProc   = (WNDPROC)VideoEventProc;         /* event handler */
+    wc.lpfnWndProc   = VideoEventProc;                  /* event handler */
     wc.cbClsExtra    = 0;                         /* no extra class data */
     wc.cbWndExtra    = 0;                        /* no extra window data */
     wc.hInstance     = hInstance;                            /* instance */

@@ -400,8 +400,8 @@ static int Win32VoutConvertKey( int i_key )
  * Nonqueued Messages are those that Windows will send directly to this
  * procedure (like WM_DESTROY, WM_WINDOWPOSCHANGED...)
  *****************************************************************************/
-static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
-                                         WPARAM wParam, LPARAM lParam )
+static LRESULT CALLBACK WinVoutEventProc( HWND hwnd, UINT message,
+                                          WPARAM wParam, LPARAM lParam )
 {
     if( message == WM_CREATE )
     {
@@ -816,7 +816,7 @@ static int Open(vlc_window_t *wnd)
     WNDCLASS wc = { 0 };
     /* Fill in the window class structure */
     wc.style         = CS_OWNDC|CS_DBLCLKS;           /* style: dbl click */
-    wc.lpfnWndProc   = (WNDPROC)WinVoutEventProc;        /* event handler */
+    wc.lpfnWndProc   = WinVoutEventProc;                 /* event handler */
     wc.hInstance     = hInstance;                             /* instance */
     wc.hIcon         = sys->vlc_icon;            /* load the vlc big icon */
     wc.lpszClassName = sys->class_main;            /* use a special class */

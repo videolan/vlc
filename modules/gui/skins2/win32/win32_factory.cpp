@@ -161,7 +161,7 @@ bool Win32Factory::init()
     // Create window class
     WNDCLASS skinWindowClass;
     skinWindowClass.style = CS_DBLCLKS;
-    skinWindowClass.lpfnWndProc = (WNDPROC)Win32Factory::Win32Proc;
+    skinWindowClass.lpfnWndProc = Win32Factory::Win32Proc;
     skinWindowClass.lpszClassName = vlc_class;
     skinWindowClass.lpszMenuName = NULL;
     skinWindowClass.cbClsExtra = 0;
