@@ -599,18 +599,18 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
         char *psz_url = input_item_GetURI(_vlcInputItem);
         if (psz_url) {
             char *psz_path = vlc_uri2path(psz_url);
-            NSString *path = toNSStr(psz_path);
+            if (psz_path) {
+                NSString *path = toNSStr(psz_path);
+                free(psz_path);
+                image = [NSImage quickLookPreviewForLocalPath:path
+                                                     withSize:size];
 
-            free(psz_url);
-            free(psz_path);
-
-            image = [NSImage quickLookPreviewForLocalPath:path
-                                                 withSize:size];
-
-            if (!image) {
-                image = [[NSWorkspace sharedWorkspace] iconForFile:path];
-                image.size = size;
+                if (!image) {
+                    image = [[NSWorkspace sharedWorkspace] iconForFile:path];
+                    image.size = size;
+                }
             }
+            free(psz_url);
         }
     }
 
