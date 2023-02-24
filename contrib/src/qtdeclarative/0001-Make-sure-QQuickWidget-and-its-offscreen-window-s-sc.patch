@@ -1,0 +1,84 @@
+From 3bb63935369d7e1baf53aa401563cc75b87397fb Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Sat, 29 Jan 2022 21:59:33 +0200
+Subject: [PATCH 1/2] Make sure QQuickWidget and its offscreen window's screens
+ are always in sync
+
+By default, the offscreen window is placed on the primary screen.
+However, if the parent widget argument is passed to the QQuickWidget's
+constructor, then QQuickWidget's and the offscreen window's screens can
+be different and that can create rendering issues, e.g. blurry text if
+the primary screen and QQuickWidget's screen have different scale
+factors.
+
+Change-Id: I10c62b5635664f943b11828773f14017f198a770
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+Reviewed-by: Laszlo Agocs <laszlo.agocs@qt.io>
+(cherry picked from commit a2a2734bffa1459639b31fb3f4f83873ba44ab5c)
+---
+ src/quickwidgets/qquickwidget.cpp | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/src/quickwidgets/qquickwidget.cpp b/src/quickwidgets/qquickwidget.cpp
+index 39780f8de3..223d91f579 100644
+--- a/src/quickwidgets/qquickwidget.cpp
++++ b/src/quickwidgets/qquickwidget.cpp
+@@ -106,6 +106,7 @@ void QQuickWidgetPrivate::init(QQmlEngine* e)
+ 
+     renderControl = new QQuickWidgetRenderControl(q);
+     offscreenWindow = new QQuickWindow(*new QQuickOffcreenWindowPrivate(),renderControl);
++    offscreenWindow->setScreen(q->screen());
+     offscreenWindow->setTitle(QString::fromLatin1("Offscreen"));
+     offscreenWindow->setObjectName(QString::fromLatin1("QQuickOffScreenWindow"));
+     // Do not call create() on offscreenWindow.
+@@ -901,9 +902,7 @@ void QQuickWidgetPrivate::createContext()
+ 
+         context = new QOpenGLContext;
+         context->setFormat(offscreenWindow->requestedFormat());
+-        const QWindow *win = q->window()->windowHandle();
+-        if (win && win->screen())
+-            context->setScreen(win->screen());
++        context->setScreen(q->screen());
+         QOpenGLContext *shareContext = qt_gl_global_share_context();
+         if (!shareContext)
+             shareContext = QWidgetPrivate::get(q->window())->shareContext();
+@@ -1520,19 +1519,16 @@ bool QQuickWidget::event(QEvent *e)
+         d->handleWindowChange();
+         break;
+ 
+-    case QEvent::ScreenChangeInternal:
+-        if (QWindow *window = this->window()->windowHandle()) {
+-            QScreen *newScreen = window->screen();
+-
+-            if (d->offscreenWindow)
+-                d->offscreenWindow->setScreen(newScreen);
+-            if (d->offscreenSurface)
+-                d->offscreenSurface->setScreen(newScreen);
++    case QEvent::ScreenChangeInternal: {
++        QScreen *newScreen = screen();
++        if (d->offscreenWindow)
++            d->offscreenWindow->setScreen(newScreen);
++        if (d->offscreenSurface)
++            d->offscreenSurface->setScreen(newScreen);
+ #if QT_CONFIG(opengl)
+-            if (d->context)
+-                d->context->setScreen(newScreen);
++        if (d->context)
++            d->context->setScreen(newScreen);
+ #endif
+-        }
+ 
+         if (d->useSoftwareRenderer
+ #if QT_CONFIG(opengl)
+@@ -1545,7 +1541,7 @@ bool QQuickWidget::event(QEvent *e)
+             d->render(true);
+         }
+         break;
+-
++    }
+     case QEvent::Show:
+     case QEvent::Move:
+         d->updatePosition();
+-- 
+2.34.1
+
