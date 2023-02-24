@@ -322,7 +322,32 @@ static int  CmdExecuteControl( es_out_t *, ts_cmd_control_t * );
 static int  CmdExecutePrivControl( es_out_t *, ts_cmd_privcontrol_t * );
 
 /* File helpers */
-static int GetTmpFile( char **ppsz_file, const char *psz_path );
+static int GetTmpFile( char **filename, const char *dirname )
+{
+    if( dirname != NULL
+     && asprintf( filename, "%s"DIR_SEP PACKAGE_NAME"-timeshift.XXXXXX",
+                  dirname ) >= 0 )
+    {
+        vlc_mkdir( dirname, 0700 );
+
+        int fd = vlc_mkstemp( *filename );
+        if( fd != -1 )
+            return fd;
+
+        free( *filename );
+    }
+
+    *filename = strdup( DIR_SEP"tmp"DIR_SEP PACKAGE_NAME"-timeshift.XXXXXX" );
+    if( unlikely(*filename == NULL) )
+        return -1;
+
+    int fd = vlc_mkstemp( *filename );
+    if( fd != -1 )
+        return fd;
+
+    free( *filename );
+    return -1;
+}
 
 /*****************************************************************************
  * Internal functions
@@ -1819,31 +1844,4 @@ static int CmdExecutePrivControl( es_out_t *p_tsout, ts_cmd_privcontrol_t *p_cmd
         return es_out_PrivControl( p_sys->p_out, i_query );
     default: vlc_assert_unreachable();
     }
-}
-
-static int GetTmpFile( char **filename, const char *dirname )
-{
-    if( dirname != NULL
-     && asprintf( filename, "%s"DIR_SEP PACKAGE_NAME"-timeshift.XXXXXX",
-                  dirname ) >= 0 )
-    {
-        vlc_mkdir( dirname, 0700 );
-
-        int fd = vlc_mkstemp( *filename );
-        if( fd != -1 )
-            return fd;
-
-        free( *filename );
-    }
-
-    *filename = strdup( DIR_SEP"tmp"DIR_SEP PACKAGE_NAME"-timeshift.XXXXXX" );
-    if( unlikely(*filename == NULL) )
-        return -1;
-
-    int fd = vlc_mkstemp( *filename );
-    if( fd != -1 )
-        return fd;
-
-    free( *filename );
-    return -1;
 }
