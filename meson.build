@@ -200,7 +200,7 @@ endif
 # Check for headers
 #
 
-check_headers = [
+check_c_headers = [
     ['arpa/inet.h'],
     ['threads.h'],
     ['netinet/tcp.h'],
@@ -224,18 +224,34 @@ check_headers = [
     ['X11/Xlib.h'],
     ['xlocale.h'],
     ['zlib.h'],
-    ['dcomp.h'],
     ['wordexp.h'],
     ['GL/wglew.h',
         { 'prefix' : ['#include <windows.h>', '#include <GL/glew.h>'],
           'args' : [contrib_inc_args] }],
 ]
 
-foreach header : check_headers
+check_cpp_headers = [
+    ['dcomp.h',
+        { 'prefix' : ['#include <windows.h>'],
+          'args' : [contrib_inc_args]}],
+]
+
+foreach header : check_c_headers
     header_kwargs = header.get(1, {})
     # TODO: Once we require meson 1.0, drop the array join here
     # See: https://github.com/mesonbuild/meson/pull/11099
     if cc.check_header(header[0],
+                       prefix: '\n'.join(header_kwargs.get('prefix', [])),
+                       args: header_kwargs.get('args', []))
+        cdata.set('HAVE_' + header[0].underscorify().to_upper(), 1)
+    endif
+endforeach
+
+foreach header : check_cpp_headers
+    header_kwargs = header.get(1, {})
+    # TODO: Once we require meson 1.0, drop the array join here
+    # See: https://github.com/mesonbuild/meson/pull/11099
+    if cpp.check_header(header[0],
                        prefix: '\n'.join(header_kwargs.get('prefix', [])),
                        args: header_kwargs.get('args', []))
         cdata.set('HAVE_' + header[0].underscorify().to_upper(), 1)
