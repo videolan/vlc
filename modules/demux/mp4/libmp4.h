@@ -26,6 +26,10 @@
 #include <vlc_codecs.h>
 #include "coreaudio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Use alias for scaled time */
 typedef int64_t stime_t;
 
@@ -1998,5 +2002,9 @@ int MP4_ReadBoxContainerRestricted( stream_t *p_stream, MP4_Box_t *p_container,
                                     const uint32_t excludelist[] );
 
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
