@@ -22,6 +22,7 @@ GNU ?= http://ftpmirror.gnu.org/gnu
 SF := https://downloads.sourceforge.net/project
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
+VIDEOLAN_GIT := https://git.videolan.org/git
 GITHUB := https://github.com
 GNUGPG := https://www.gnupg.org/ftp/gcrypt
 XIPH := https://ftp.osuosl.org/pub/xiph/releases
