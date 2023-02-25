@@ -24,6 +24,7 @@ GNU ?= http://ftp.gnu.org/gnu
 SF := https://downloads.sourceforge.net/project
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
+VIDEOLAN_GIT := https://git.videolan.org/git
 GITHUB := https://github.com
 GOOGLE_CODE := https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com
 QT := https://download.qt.io/official_releases/qt
