@@ -1,6 +1,6 @@
 # x262
 
-X262_GITURL := git://git.videolan.org/x262.git
+X262_GITURL := $(VIDEOLAN_GIT)/x262.git
 X262_HASH := bb887aa4c0a4da955524aa220b62998c3b50504e
 
 # ifdef BUILD_ENCODERS
