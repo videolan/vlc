@@ -88,6 +88,18 @@
 - (void)hideControls:(id)sender
 {
     [self stopAutohideTimer];
+
+    NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
+
+    if ([_centralControlsStackView mouse:mousePos inRect:_centralControlsStackView.frame] ||
+        [_controlsBar.bottomBarView mouse:mousePos inRect: _controlsBar.bottomBarView.frame]) {
+        // If the mouse is on the controls let's not hide, and make sure to tell other hideable
+        // controls elsewhere to show themselves
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
+                                                          object:self];
+        return;
+    }
+
     _mainControlsView.hidden = YES;
 }
 
