@@ -856,9 +856,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     if (!self.videoViewController.view.hidden) {
         NSPoint mouseLocation = [o_event locationInWindow];
-        NSRect windowRectWithFrame = [self frameRectForContentRect:self.contentView.frame];
+        NSView *videoView = self.videoViewController.view;
+        NSRect videoViewRect = [videoView convertRect:videoView.frame toView:self.contentView];
 
-        if ([self.contentView mouse:mouseLocation inRect:windowRectWithFrame]) {
+        if ([self.contentView mouse:mouseLocation inRect:videoViewRect]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:VLCVideoWindowShouldShowFullscreenController
                                                                 object:self];
         }
