@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL autohideControls;
 @property (readwrite, nonatomic) BOOL displayLibraryControls;
+@property (readonly) BOOL mouseOnControls;
 
 - (void)showControls;
 

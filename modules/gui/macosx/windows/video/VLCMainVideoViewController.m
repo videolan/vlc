@@ -63,6 +63,16 @@
                              object:nil];
 }
 
+- (BOOL)mouseOnControls
+{
+    NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
+
+    return [_centralControlsStackView mouse:mousePos inRect:_centralControlsStackView.frame] ||
+        [_controlsBar.bottomBarView mouse:mousePos inRect: _controlsBar.bottomBarView.frame] ||
+        [_returnButton mouse:mousePos inRect: _returnButton.frame] ||
+        [_playlistButton mouse:mousePos inRect: _playlistButton.frame];
+}
+
 - (void)stopAutohideTimer
 {
     [_hideControlsTimer invalidate];
@@ -91,8 +101,7 @@
 
     NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
 
-    if ([_centralControlsStackView mouse:mousePos inRect:_centralControlsStackView.frame] ||
-        [_controlsBar.bottomBarView mouse:mousePos inRect: _controlsBar.bottomBarView.frame]) {
+    if ([self mouseOnControls]) {
         // If the mouse is on the controls let's not hide, and make sure to tell other hideable
         // controls elsewhere to show themselves
         [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
