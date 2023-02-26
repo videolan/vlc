@@ -26,6 +26,9 @@
 
 #import "main/VLCMain.h"
 
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
+
 @interface VLCFullVideoViewWindow ()
 {
     BOOL _autohideTitlebar;
@@ -91,7 +94,8 @@
 {
     [self stopTitlebarAutohideTimer];
 
-    if (self.videoViewController.mouseOnControls) {
+    if (self.videoViewController.mouseOnControls ||
+        VLCMain.sharedInstance.playlistController.playerController.playerState == VLC_PLAYER_STATE_PAUSED) {
         [self showTitleBar];
         return;
     }

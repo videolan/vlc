@@ -27,6 +27,9 @@
 
 #import "main/VLCMain.h"
 
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
+
 #import "views/VLCBottomBarView.h"
 
 #import "windows/video/VLCVideoWindowCommon.h"
@@ -101,11 +104,9 @@
 
     NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
 
-    if ([self mouseOnControls]) {
-        // If the mouse is on the controls let's not hide, and make sure to tell other hideable
-        // controls elsewhere to show themselves
-        [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
-                                                          object:self];
+    if ([self mouseOnControls] ||
+        VLCMain.sharedInstance.playlistController.playerController.playerState == VLC_PLAYER_STATE_PAUSED) {
+        [self showControls];
         return;
     }
 
