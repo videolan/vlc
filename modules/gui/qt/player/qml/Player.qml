@@ -239,23 +239,22 @@ FocusScope {
     }
 
     /* top control bar background */
-    Widgets.DrawerExt {
-        edge: Widgets.DrawerExt.Edges.Top
+    Widgets.LoaderFade {
         state: topcontrolView.state
         width: parent.width
         visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls
-        height: contentItem.height
+        height: item.height
 
-        component: {
+        sourceComponent: {
             if (rootPlayer.pinVideoControls)
                 return acrylicBackground
             else
                 return topcontrolViewBackground
         }
 
-        onContentItemChanged: {
+        onItemChanged: {
             if (rootPlayer.pinVideoControls)
-                contentItem.height = Qt.binding(function () { return topcontrolView.height + topcontrolView.anchors.topMargin; })
+                item.height = Qt.binding(function () { return topcontrolView.height + topcontrolView.anchors.topMargin; })
         }
 
         Component {
@@ -273,19 +272,21 @@ FocusScope {
     }
 
     /* bottom control bar background */
-    Widgets.DrawerExt {
+    Widgets.LoaderFade {
         anchors.bottom: controlBarView.bottom
         anchors.left: controlBarView.left
         anchors.right: controlBarView.right
-        height: contentItem.height
-        edge: Widgets.DrawerExt.Edges.Bottom
+
+        height: item.height
+
         state: controlBarView.state
-        component: rootPlayer.pinVideoControls
-                   ? backgroundForPinnedControls
-                   : (rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia)
-        onContentItemChanged: {
+
+        sourceComponent: rootPlayer.pinVideoControls
+                         ? backgroundForPinnedControls
+                         : (rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia)
+        onItemChanged: {
             if (rootPlayer.pinVideoControls)
-                contentItem.height = Qt.binding(function () { return rootPlayer.height - rootPlayer.positionSliderY; })
+                item.height = Qt.binding(function () { return rootPlayer.height - rootPlayer.positionSliderY; })
         }
 
         Component {
@@ -314,7 +315,7 @@ FocusScope {
         }
     }
 
-    Widgets.DrawerExt{
+    Widgets.LoaderFade{
         id: topcontrolView
 
         anchors {
@@ -324,10 +325,10 @@ FocusScope {
         }
 
         z: 1
-        edge: Widgets.DrawerExt.Edges.Top
+
         state: "visible"
 
-        component: TopBar {
+        sourceComponent: TopBar {
             id: topbar
 
             width: topcontrolView.width
@@ -558,7 +559,7 @@ FocusScope {
                         return VLCStyle.margin_normal
                     else
                         // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
-                        return topcontrolView.contentItem.reservedHeight
+                        return topcontrolView.item.reservedHeight
                 }
 
                 Navigation.parentItem: rootPlayer
@@ -602,33 +603,34 @@ FocusScope {
         bgContent: rootPlayer
 
         anchors {
-            bottom: controlBarView.contentItem.visible ? controlBarView.top : rootPlayer.bottom
+            bottom: controlBarView.item.visible ? controlBarView.top : rootPlayer.bottom
             left: parent.left
             right: parent.right
-            bottomMargin: rootPlayer.pinVideoControls || !controlBarView.contentItem.visible ? 0 : - VLCStyle.margin_large
+            bottomMargin: rootPlayer.pinVideoControls || !controlBarView.item.visible ? 0 : - VLCStyle.margin_large
         }
     }
 
-    Widgets.DrawerExt {
+    Widgets.LoaderFade {
         id: controlBarView
 
-        readonly property int sliderY: rootPlayer.pinVideoControls ? contentItem.sliderY - VLCStyle.margin_xxxsmall : contentItem.sliderY
+        readonly property int sliderY: rootPlayer.pinVideoControls ? item.sliderY - VLCStyle.margin_xxxsmall : item.sliderY
 
         anchors {
             bottom: parent.bottom
             left: parent.left
             right: parent.right
         }
+
         focus: true
+
         state: "visible"
-        edge: Widgets.DrawerExt.Edges.Bottom
 
         onStateChanged: {
             if (state === "visible")
-                contentItem.showChapterMarks()
+                item.showChapterMarks()
         }
 
-        component: MouseArea {
+        sourceComponent: MouseArea {
             id: controllerMouseArea
 
             readonly property alias sliderY: controllerId.sliderY
