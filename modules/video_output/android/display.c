@@ -112,28 +112,6 @@ static inline int ChromaToAndroidHal(vlc_fourcc_t i_chroma)
     }
 }
 
-static int UpdateVideoSize(vout_display_sys_t *sys, video_format_t *p_fmt)
-{
-    unsigned int i_width, i_height;
-    unsigned int i_sar_num = 1, i_sar_den = 1;
-    video_format_t rot_fmt;
-
-    video_format_ApplyRotation(&rot_fmt, p_fmt);
-
-    if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0) {
-        i_sar_num = rot_fmt.i_sar_num;
-        i_sar_den = rot_fmt.i_sar_den;
-    }
-    i_width = rot_fmt.i_width;
-    i_height = rot_fmt.i_height;
-
-    AWindowHandler_setVideoLayout(sys->p_awh, i_width, i_height,
-                                  rot_fmt.i_visible_width,
-                                  rot_fmt.i_visible_height,
-                                  i_sar_num, i_sar_den);
-    return 0;
-}
-
 static void AndroidPicture_Destroy(picture_t *pic)
 {
     free(pic->p_sys);
@@ -631,29 +609,42 @@ static void Display(vout_display_t *vd, picture_t *picture)
     sys->b_displayed = true;
 }
 
-static void CopySourceAspect(video_format_t *p_dest,
-                             const video_format_t *p_src)
-{
-    p_dest->i_sar_num = p_src->i_sar_num;
-    p_dest->i_sar_den = p_src->i_sar_den;
-}
-
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    {
+        msg_Dbg(vd, "change source crop: %ux%u @ %ux%u",
+                vd->source->i_x_offset, vd->source->i_y_offset,
+                vd->source->i_visible_width,
+                vd->source->i_visible_height);
+
+        video_format_CopyCrop(&sys->p_window->fmt, vd->source);
+
+        video_format_t rot_fmt;
+        video_format_ApplyRotation(&rot_fmt, &sys->p_window->fmt);
+        AWindowHandler_setVideoLayout(sys->p_awh, 0, 0,
+                                      rot_fmt.i_visible_width,
+                                      rot_fmt.i_visible_height,
+                                      0, 0);
+        FixSubtitleFormat(vd);
+        return VLC_SUCCESS;
+    }
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     {
-        msg_Dbg(vd, "change source crop/aspect");
+        msg_Dbg(vd, "change source aspect: %d/%d", vd->source->i_sar_num,
+                vd->source->i_sar_den);
 
-        if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-            video_format_CopyCrop(&sys->p_window->fmt, vd->source);
-        } else
-            CopySourceAspect(&sys->p_window->fmt, vd->source);
+        sys->p_window->fmt.i_sar_num = vd->source->i_sar_num;
+        sys->p_window->fmt.i_sar_den = vd->source->i_sar_den;
+        video_format_t rot_fmt;
+        video_format_ApplyRotation(&rot_fmt, &sys->p_window->fmt);
+        if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0)
+            AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0,
+                                          rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 
-        UpdateVideoSize(sys, &sys->p_window->fmt);
         FixSubtitleFormat(vd);
         return VLC_SUCCESS;
     }
@@ -762,6 +753,16 @@ static int Open(vout_display_t *vd,
                      "trying next vout");
         goto error;
     }
+
+
+    video_format_t rot_fmt;
+    video_format_ApplyRotation(&rot_fmt, &sys->p_window->fmt);
+
+    AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
+                                  rot_fmt.i_visible_width,
+                                  rot_fmt.i_visible_height,
+                                  rot_fmt.i_sar_num, rot_fmt.i_sar_den);
+
 
     static const struct vlc_display_operations ops = {
         .close = Close,
