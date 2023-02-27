@@ -168,38 +168,38 @@ static const struct
     vlc_fourcc_t     i_chroma;
     enum aom_img_fmt i_chroma_id;
     uint8_t          i_bitdepth;
-    uint8_t          i_needs_hack;
+    enum aom_transfer_characteristics transfer_characteristics;
 
 } chroma_table[] =
 {
-    { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, 0 },
-    { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, 0 },
-    { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, 0 },
+    /* Transfer characteristic-dependent mappings must come first */
+    { VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, AOM_CICP_TC_SRGB },
+    { VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, AOM_CICP_TC_SRGB },
 
-    { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, 0 },
+    { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, AOM_CICP_TC_UNSPECIFIED },
 
-    { VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, 1 },
-    { VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, 1 },
+    { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, AOM_CICP_TC_UNSPECIFIED },
 
-    { VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, 0 },
-    { VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, 0 },
-    { VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, 0 },
+    { VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, AOM_CICP_TC_UNSPECIFIED },
 
-    { VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, 0 },
-    { VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, 0 },
-    { VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, 0 },
+    { VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, AOM_CICP_TC_UNSPECIFIED },
 
-    { VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, 0 },
+    { VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, AOM_CICP_TC_UNSPECIFIED },
 };
 
 static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
 {
-    uint8_t hack = (img->fmt & AOM_IMG_FMT_I444) && (img->tc == AOM_CICP_TC_SRGB);
-
     for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
         if( chroma_table[i].i_chroma_id == img->fmt &&
             chroma_table[i].i_bitdepth == img->bit_depth &&
-            chroma_table[i].i_needs_hack == hack )
+            ( chroma_table[i].transfer_characteristics == AOM_CICP_TC_UNSPECIFIED ||
+              chroma_table[i].transfer_characteristics == img->tc ) )
             return chroma_table[i].i_chroma;
 
     return 0;
