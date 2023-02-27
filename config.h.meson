@@ -449,9 +449,6 @@
 /* Define to 1 if you have the sincos function. */
 #mesondefine HAVE_SINCOS
 
-/* Define to 1 if <assert.h> defines static_assert. */
-#mesondefine HAVE_STATIC_ASSERT
-
 /* Define to 1 if you have the `strcasecmp' function. */
 #mesondefine HAVE_STRCASECMP
 
