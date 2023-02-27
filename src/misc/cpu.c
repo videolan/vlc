@@ -46,6 +46,9 @@
 #include <signal.h>
 #else
 #include <errno.h>
+#if defined(_MSC_VER) && !defined(__clang__)
+# include <intrin.h> // __cpuid
+#endif
 #endif
 
 #ifdef __APPLE__
@@ -109,11 +112,20 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     unsigned int i_eax, i_ebx, i_ecx, i_edx;
 
     /* Needed for x86 CPU capabilities detection */
+#if defined(_MSC_VER) && !defined(__clang__)
+# define cpuid(reg)  \
+    do { \
+        int cpuInfo[4]; \
+        __cpuid(cpuInfo, reg); \
+        i_eax = cpuInfo[0]; i_ebx = cpuInfo[1]; i_ecx = cpuInfo[2]; i_edx = cpuInfo[3]; \
+    } while(0)
+#else // !_MSC_VER
 # define cpuid(reg) \
     asm ("cpuid" \
          : "=a" (i_eax), "=b" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
          : "a" (reg) \
          : "cc");
+#endif // !_MSC_VER
 
      /* Check if the OS really supports the requested instructions */
 # if defined (__i386__) && !defined (__i586__) \
