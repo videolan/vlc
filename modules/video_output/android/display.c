@@ -73,7 +73,7 @@ typedef struct vout_display_sys_t
 {
     vlc_window_t *embed;
 
-    AWindowHandler *p_awh;
+    AWindowHandler *awh;
     native_window_api_t *anw;
     android_video_context_t *avctx;
 
@@ -241,7 +241,7 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
                                             android_window *p_window)
 {
     if (p_window->p_surface) {
-        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id);
+        AWindowHandler_releaseANativeWindow(sys->awh, p_window->id);
         p_window->p_surface = NULL;
     }
 }
@@ -250,7 +250,7 @@ static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
                                         android_window *p_window)
 {
     if (!p_window->p_surface) {
-        p_window->p_surface = AWindowHandler_getANativeWindow(sys->p_awh,
+        p_window->p_surface = AWindowHandler_getANativeWindow(sys->awh,
                                                               p_window->id);
         if (!p_window->p_surface)
             return -1;
@@ -625,7 +625,7 @@ static int Control(vout_display_t *vd, int query)
 
         video_format_t rot_fmt;
         video_format_ApplyRotation(&rot_fmt, &sys->p_window->fmt);
-        AWindowHandler_setVideoLayout(sys->p_awh, 0, 0,
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0,
                                       rot_fmt.i_visible_width,
                                       rot_fmt.i_visible_height,
                                       0, 0);
@@ -642,7 +642,7 @@ static int Control(vout_display_t *vd, int query)
         video_format_t rot_fmt;
         video_format_ApplyRotation(&rot_fmt, &sys->p_window->fmt);
         if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0)
-            AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0,
+            AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0,
                                           rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 
         FixSubtitleFormat(vd);
@@ -690,7 +690,7 @@ static void Close(vout_display_t *vd)
         AndroidWindow_Destroy(vd, sys->p_sub_window);
 
     if (sys->embed)
-        AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
 
     free(sys);
 }
@@ -716,8 +716,8 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     sys->embed = embed;
-    sys->p_awh = p_awh;
-    sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
+    sys->awh = p_awh;
+    sys->anw = AWindowHandler_getANativeWindowAPI(sys->awh);
 
     fmt = *fmtp;
     sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
