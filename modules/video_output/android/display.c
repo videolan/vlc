@@ -34,13 +34,244 @@
 
 #include <vlc_opengl.h>
 #include "utils.h"
+#include "../opengl/gl_api.h"
+#include "../opengl/sub_renderer.h"
+
+struct subpicture
+{
+    vlc_window_t *window;
+    vlc_gl_t *gl;
+    struct vlc_gl_api api;
+    struct vlc_gl_interop *interop;
+    struct vlc_gl_sub_renderer *renderer;
+    vout_display_place_t place;
+    bool place_changed;
+    bool is_dirty;
+
+    struct {
+        PFNGLFLUSHPROC Flush;
+    } vt;
+};
 
 struct sys
 {
     AWindowHandler *awh;
     android_video_context_t *avctx;
     video_format_t fmt;
+    struct subpicture sub;
 };
+
+static void FlipVerticalAlign(struct vout_display_placement *dp)
+{
+    /* Reverse vertical alignment as the GL tex are Y inverted */
+    if (dp->align.vertical == VLC_VIDEO_ALIGN_TOP)
+        dp->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+    else if (dp->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+        dp->align.vertical = VLC_VIDEO_ALIGN_TOP;
+}
+
+static int subpicture_Control(vout_display_t *vd, int query)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+
+    switch (query)
+    {
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_ZOOM:
+    {
+        struct vout_display_placement dp = vd->cfg->display;
+
+        FlipVerticalAlign(&dp);
+        vout_display_PlacePicture(&sub->place, vd->source, &dp);
+        sub->place_changed = true;
+        vlc_gl_Resize(sub->gl, dp.width, dp.height);
+        return VLC_SUCCESS;
+    }
+
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        return VLC_SUCCESS;
+    default:
+        break;
+    }
+    return VLC_EGENERIC;
+}
+
+static void subpicture_Prepare(vout_display_t *vd, subpicture_t *subpicture)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+
+    if (vlc_gl_MakeCurrent(sub->gl) != VLC_SUCCESS)
+        return;
+
+    sub->api.vt.ClearColor(0.f, 0.f, 0.f, 0.f);
+    sub->api.vt.Clear(GL_COLOR_BUFFER_BIT);
+
+    int ret = vlc_gl_sub_renderer_Prepare(sub->renderer, subpicture);
+    if (ret != VLC_SUCCESS)
+        goto error;
+    sub->vt.Flush();
+
+    if (sub->place_changed)
+    {
+        sub->api.vt.Viewport(sub->place.x, sub->place.y,
+                             sub->place.width, sub->place.height);
+        sub->place_changed = false;
+    }
+
+    ret = vlc_gl_sub_renderer_Draw(sub->renderer);
+    if (ret != VLC_SUCCESS)
+        goto error;
+    sub->vt.Flush();
+
+    sub->is_dirty = true;
+error:
+    vlc_gl_ReleaseCurrent(sub->gl);
+}
+
+static void subpicture_Display(vout_display_t *vd)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+
+    if (sub->is_dirty)
+        vlc_gl_Swap(sub->gl);
+}
+
+static void subpicture_CloseDisplay(vout_display_t *vd)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+
+    vlc_gl_MakeCurrent(sub->gl);
+
+    vlc_gl_sub_renderer_Delete(sub->renderer);
+    vlc_gl_interop_Delete(sub->interop);
+
+    vlc_gl_ReleaseCurrent(sub->gl);
+
+    vlc_gl_Delete(sub->gl);
+
+    vlc_window_Disable(sub->window);
+    vlc_window_Delete(sub->window);
+}
+
+static void subpicture_window_Resized(struct vlc_window *wnd, unsigned width,
+                                    unsigned height, vlc_window_ack_cb cb,
+                                    void *opaque)
+{
+    if (cb != NULL)
+        cb(wnd, width, height, opaque);
+}
+
+static int subpicture_window_Open(vlc_window_t *wnd)
+{
+    static const struct vlc_window_operations ops = {
+    };
+
+    wnd->type = VLC_WINDOW_TYPE_ANDROID_NATIVE;
+    wnd->display.anativewindow = wnd->owner.sys;
+    wnd->handle.android_id = AWindow_Subtitles;
+    wnd->ops = &ops;
+    return VLC_SUCCESS;
+}
+
+static int subpicture_OpenDisplay(vout_display_t *vd)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+
+    sub->is_dirty = false;
+
+    /* Create a VLC sub window that will hold the subpicture surface */
+    static const struct vlc_window_callbacks win_cbs = {
+        .resized = subpicture_window_Resized,
+    };
+
+    const vlc_window_cfg_t win_cfg = {
+        .is_fullscreen = true,
+        .is_decorated = false,
+        .width = sys->fmt.i_width,
+        .height = sys->fmt.i_height,
+    };
+
+    const vlc_window_owner_t win_owner = {
+        .cbs = &win_cbs,
+        .sys = vd->cfg->window->display.anativewindow,
+    };
+
+    sub->window = vlc_window_New(VLC_OBJECT(vd), "android-subpicture",
+                                 &win_owner, &win_cfg);
+    if (sub->window == NULL)
+        return -1;
+
+    if (vlc_window_Enable(sub->window) != 0)
+        goto delete_win;
+
+    /* Create the OpenGLES2 context on the subpicture window/surface */
+    vout_display_cfg_t vd_cfg = *vd->cfg;
+    vd_cfg.window = sub->window;
+
+    struct vlc_gl_cfg gl_cfg = { .need_alpha = true };
+    sub->gl = vlc_gl_Create(&vd_cfg, VLC_OPENGL_ES2, NULL, &gl_cfg);
+    if (sub->gl == NULL)
+        goto disable_win;
+
+    /* Initialize and configure subpicture renderer/interop */
+    struct vout_display_placement dp = vd->cfg->display;
+    FlipVerticalAlign(&dp);
+    vout_display_PlacePicture(&sub->place, vd->source, &dp);
+    sub->place_changed = true;
+    vlc_gl_Resize(sub->gl, dp.width, dp.height);
+
+    if (vlc_gl_MakeCurrent(sub->gl))
+        goto delete_gl;
+
+    sub->vt.Flush = vlc_gl_GetProcAddress(sub->gl, "glFlush");
+    if (sub->vt.Flush == NULL)
+        goto release_gl;
+
+    int ret = vlc_gl_api_Init(&sub->api, sub->gl);
+    if (ret != VLC_SUCCESS)
+        goto release_gl;
+
+    sub->interop = vlc_gl_interop_NewForSubpictures(sub->gl);
+    if (sub->interop == NULL)
+    {
+        msg_Err(vd, "Could not create sub interop");
+        goto release_gl;
+    }
+
+    sub->renderer = vlc_gl_sub_renderer_New(sub->gl, &sub->api, sub->interop);
+    if (sub->renderer == NULL)
+        goto delete_interop;
+
+    vlc_gl_ReleaseCurrent(sub->gl);
+
+    static const vlc_fourcc_t gl_subpicture_chromas[] = {
+        VLC_CODEC_RGBA,
+        0
+    };
+    vd->info.subpicture_chromas = gl_subpicture_chromas;
+
+    return 0;
+
+delete_interop:
+    vlc_gl_interop_Delete(sub->interop);
+release_gl:
+    vlc_gl_ReleaseCurrent(sub->gl);
+delete_gl:
+    vlc_gl_Delete(sub->gl);
+disable_win:
+    vlc_window_Disable(sub->window);
+delete_win:
+    vlc_window_Delete(sub->window);
+    sub->window = NULL;
+    return -1;
+}
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture, vlc_tick_t date)
@@ -59,6 +290,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 msg_Warn(vd, "picture way too early to release at time");
         }
     }
+
+    if (sys->sub.window != NULL)
+        subpicture_Prepare(vd, subpicture);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -66,11 +300,17 @@ static void Display(vout_display_t *vd, picture_t *picture)
     struct sys *sys = vd->sys;
     assert(picture->context);
     sys->avctx->render(picture->context);
+
+    if (sys->sub.window != NULL)
+        subpicture_Display(vd);
 }
 
 static int Control(vout_display_t *vd, int query)
 {
     struct sys *sys = vd->sys;
+
+    if (sys->sub.window != NULL)
+        subpicture_Control(vd, query);
 
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
@@ -126,6 +366,9 @@ static void Close(vout_display_t *vd)
 
     AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
 
+    if (sys->sub.window != NULL)
+        subpicture_CloseDisplay(vd);
+
     free(sys);
 }
 
@@ -151,6 +394,15 @@ static int Open(vout_display_t *vd,
     if (sys->avctx->texture != NULL)
     {
         /* video context configured for opengl */
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
+    int ret = subpicture_OpenDisplay(vd);
+    if (ret != 0 && !vd->obj.force)
+    {
+        msg_Warn(vd, "cannot blend subtitle with an opaque surface, "
+                     "trying next vout");
         free(sys);
         return VLC_EGENERIC;
     }
@@ -182,4 +434,8 @@ vlc_module_begin()
     add_shortcut("android-display")
     add_obsolete_string("android-display-chroma") /* since 4.0.0 */
     set_callback_display(Open, 260)
+    add_submodule ()
+        set_capability("vout window", 0)
+        set_callback(subpicture_window_Open)
+        add_shortcut("android-subpicture")
 vlc_module_end()

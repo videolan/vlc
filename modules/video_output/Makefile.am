@@ -304,7 +304,8 @@ libandroid_window_plugin_la_SOURCES = video_output/android/window.c \
 libandroid_window_plugin_la_LIBADD = libandroid_utils.la $(LIBDL)
 
 libandroid_display_plugin_la_SOURCES = video_output/android/display.c
-libandroid_display_plugin_la_LIBADD = libandroid_utils.la $(LIBDL)
+libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
+libandroid_display_plugin_la_LIBADD = libvlc_opengles.la
 
 libglinterop_android_plugin_la_SOURCES = video_output/opengl/interop_android.c \
 	video_output/opengl/interop.h
