@@ -22,8 +22,9 @@
 #include <QQmlProperty>
 #include <QPointer>
 #include <QQuickItem>
+#include <QQmlParserStatus>
 
-class FlickableScrollHandler : public QObject
+class FlickableScrollHandler : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
 
@@ -34,6 +35,8 @@ class FlickableScrollHandler : public QObject
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged FINAL)
     Q_PROPERTY(bool fallbackScroll MEMBER m_fallbackScroll NOTIFY fallbackScrollChanged FINAL)
     Q_PROPERTY(bool handleOnlyPixelDelta MEMBER m_handleOnlyPixelDelta NOTIFY handleOnlyPixelDeltaChanged FINAL)
+
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     explicit FlickableScrollHandler(QObject *parent = nullptr);
@@ -46,6 +49,9 @@ public:
     void setScaleFactor(qreal newScaleFactor);
     void setEnabled(bool newEnabled);
 
+    void classBegin() override;
+    void componentComplete() override;
+
 signals:
     void initialized();
 
@@ -57,8 +63,6 @@ signals:
     void handleOnlyPixelDeltaChanged();
 
 private slots:
-    void init();
-
     void adjustScrollBarV();
     void adjustScrollBarH();
 

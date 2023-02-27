@@ -34,8 +34,6 @@ FlickableScrollHandler::FlickableScrollHandler(QObject *parent)
     });
 
     setScaleFactor(1.0);
-
-    QMetaObject::invokeMethod(this, &FlickableScrollHandler::init, Qt::QueuedConnection);
 }
 
 FlickableScrollHandler::~FlickableScrollHandler()
@@ -43,7 +41,11 @@ FlickableScrollHandler::~FlickableScrollHandler()
     detach();
 }
 
-void FlickableScrollHandler::init()
+void FlickableScrollHandler::classBegin()
+{
+}
+
+void FlickableScrollHandler::componentComplete()
 {
     assert(parent());
 
