@@ -32,10 +32,19 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 
+#include <vlc_vector.h>
 #include <vlc_opengl.h>
 #include "utils.h"
 #include "../opengl/gl_api.h"
 #include "../opengl/sub_renderer.h"
+
+struct sub_region
+{
+    int x;
+    int y;
+    unsigned int width;
+    unsigned int height;
+};
 
 struct subpicture
 {
@@ -47,6 +56,10 @@ struct subpicture
     vout_display_place_t place;
     bool place_changed;
     bool is_dirty;
+    bool clear;
+
+    int64_t last_order;
+    struct VLC_VECTOR(struct sub_region) regions;
 
     struct {
         PFNGLFLUSHPROC Flush;
@@ -99,10 +112,97 @@ static int subpicture_Control(vout_display_t *vd, int query)
     return VLC_EGENERIC;
 }
 
+static bool subpicture_NeedDraw(vout_display_t *vd, subpicture_t *subpicture)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+
+    if (subpicture == NULL)
+    {
+        if (!sub->clear)
+            return false;
+        sub->clear = false;
+        /* Need to draw one last time in order to clear the current subpicture */
+        return true;
+    }
+
+    sub->clear = true;
+
+    size_t count = 0;
+    for (subpicture_region_t *r = subpicture->p_region;
+         r != NULL; r = r->p_next)
+        count++;
+
+    if (subpicture->i_order != sub->last_order)
+    {
+        sub->last_order = subpicture->i_order;
+        /* Subpicture content is different */
+        goto end;
+    }
+
+    bool draw = false;
+
+    if (count == sub->regions.size)
+    {
+        size_t i = 0;
+        for (subpicture_region_t *r = subpicture->p_region;
+             r != NULL; r = r->p_next)
+        {
+            struct sub_region *cmp = &sub->regions.data[i++];
+            if (cmp->x != r->i_x || cmp->y != r->i_y
+             || cmp->width != r->fmt.i_visible_width
+             || cmp->height != r->fmt.i_visible_height)
+            {
+                /* Subpicture regions are different */
+                draw = true;
+                break;
+            }
+        }
+    }
+    else
+    {
+        /* Subpicture region count is different */
+        draw = true;
+    }
+
+    if (!draw)
+        return false;
+
+end:
+    /* Store the current subpicture regions in order to compare then later.
+     */
+    if (!vlc_vector_reserve(&sub->regions, count))
+        return false;
+
+    sub->regions.size = 0;
+
+    for (subpicture_region_t *r = subpicture->p_region;
+         r != NULL; r = r->p_next)
+    {
+        struct sub_region reg = {
+            .x = r->i_x,
+            .y = r->i_y,
+            .width = r->fmt.i_visible_width,
+            .height = r->fmt.i_visible_height,
+        };
+        bool res = vlc_vector_push(&sub->regions, reg);
+        /* Already checked with vlc_vector_reserve */
+        assert(res); (void) res;
+    }
+
+    return true;
+}
+
 static void subpicture_Prepare(vout_display_t *vd, subpicture_t *subpicture)
 {
     struct sys *sys = vd->sys;
     struct subpicture *sub = &sys->sub;
+
+    if (!subpicture_NeedDraw(vd, subpicture))
+    {
+        sub->is_dirty = false;
+        return;
+    }
 
     if (vlc_gl_MakeCurrent(sub->gl) != VLC_SUCCESS)
         return;
@@ -157,6 +257,8 @@ static void subpicture_CloseDisplay(vout_display_t *vd)
 
     vlc_window_Disable(sub->window);
     vlc_window_Delete(sub->window);
+
+    vlc_vector_destroy(&sub->regions);
 }
 
 static void subpicture_window_Resized(struct vlc_window *wnd, unsigned width,
@@ -185,6 +287,9 @@ static int subpicture_OpenDisplay(vout_display_t *vd)
     struct subpicture *sub = &sys->sub;
 
     sub->is_dirty = false;
+    sub->clear = false;
+    sub->last_order = -1;
+    vlc_vector_init(&sub->regions);
 
     /* Create a VLC sub window that will hold the subpicture surface */
     static const struct vlc_window_callbacks win_cbs = {
