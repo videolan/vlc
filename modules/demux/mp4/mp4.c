@@ -499,6 +499,52 @@ static const mp4_chunk_t * MP4_TrackChunkForSample( const mp4_track_t *p_track,
     return NULL;
 }
 
+static stime_t MP4_MapTrackTimeIntoTimeline( const mp4_track_t *p_track,
+                                             uint32_t i_movie_timescale,
+                                             stime_t i_time )
+{
+    if( !p_track->p_elst || p_track->BOXDATA(p_elst)->i_entry_count == 0 )
+        return i_time;
+
+    const MP4_Box_data_elst_entry_t *edit =
+            &p_track->BOXDATA(p_elst)->entries[p_track->i_elst];
+
+    /* convert to offset in our current edit */
+    if( edit->i_media_time > 0 && p_track->i_start_dts >= edit->i_media_time )
+        i_time -= edit->i_media_time;
+
+    /* convert media timeline to track timescale */
+    stime_t i_media_elst_start = MP4_rescale( p_track->i_elst_time,
+                                              i_movie_timescale,
+                                              p_track->i_timescale );
+    /* add to timeline start in current edit */
+    i_time += i_media_elst_start;
+
+    return i_time;
+}
+
+static stime_t MP4_MapMediaTimelineToTrackTime( const mp4_track_t *p_track,
+                                                uint32_t i_movie_timescale,
+                                                stime_t i_time )
+{
+    if( !p_track->p_elst || p_track->BOXDATA(p_elst)->i_entry_count == 0 )
+        return i_time;
+
+    const MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
+    /* convert media timeline to track timescale */
+    stime_t i_media_elst_start = MP4_rescale( p_track->i_elst_time,
+                                              i_movie_timescale,
+                                              p_track->i_timescale );
+    /* convert to timeline offset in current edit */
+    i_time -= i_media_elst_start;
+
+    /* add edit start in track samples time to get track sample time */
+    if( elst->entries[p_track->i_elst].i_media_time > 0 )
+        i_time += elst->entries[p_track->i_elst].i_media_time;
+
+    return i_time;
+}
+
 static stime_t MP4_ChunkGetSampleDTS( const mp4_chunk_t *p_chunk,
                                       uint32_t i_sample )
 {
@@ -548,25 +594,9 @@ static vlc_tick_t MP4_TrackGetDTSPTS( demux_t *p_demux, const mp4_track_t *p_tra
     uint32_t delta = p_track->i_next_delta;
 
     /* now handle elst */
-    if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count )
-    {
-        const MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
-        const MP4_Box_data_elst_entry_t *edit = &elst->entries[p_track->i_elst];
-
-        /* convert to offset */
-        if( edit->i_media_time > 0 &&
-           ( edit->i_media_rate_integer > 0 || edit->i_media_rate_fraction > 0 ) )
-        {
-            if( p_track->i_start_dts >= edit->i_media_time )
-            {
-                sdts -= edit->i_media_time;
-            }
-        }
-    }
+    sdts = MP4_MapTrackTimeIntoTimeline( p_track, p_sys->i_timescale, sdts );
 
     vlc_tick_t i_dts = MP4_rescale_mtime( sdts, p_track->i_timescale);
-    /* add i_elst_time */
-    i_dts += MP4_rescale_mtime( p_track->i_elst_time, p_sys->i_timescale );
 
     if( pi_nzpts )
     {
@@ -1813,8 +1843,8 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, bool b_accurate )
         }
     }
 
-    msg_Dbg( p_demux, "seeking with %"PRId64 "ms %s", MS_FROM_VLC_TICK(i_date - i_start),
-            !b_accurate ? "alignment" : "preroll (use input-fast-seek to avoid)" );
+    msg_Dbg( p_demux, "seeking with %"PRId64 "ms %s to %ld", MS_FROM_VLC_TICK(i_date - i_start),
+            !b_accurate ? "alignment" : "preroll (use input-fast-seek to avoid)", i_date );
 
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
@@ -3315,10 +3345,6 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     MP4_TrackSetELST( p_demux, p_track, start );
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count > 0 )
     {
-        const MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
-        const MP4_Box_data_elst_entry_t *edit = &elst->entries[p_track->i_elst];
-        int64_t i_mvt= MP4_rescale_qtime( start, p_sys->i_timescale );
-
         /* now calculate i_start for this elst */
         /* offset */
         if( start < MP4_rescale_mtime( p_track->i_elst_time, p_sys->i_timescale ) )
@@ -3329,18 +3355,13 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
             return VLC_SUCCESS;
         }
         /* to track time scale */
-        i_start  = MP4_rescale_qtime( start, p_track->i_timescale );
-        /* add elst offset */
-        if( ( edit->i_media_rate_integer > 0 || edit->i_media_rate_fraction > 0 ) &&
-            edit->i_media_time > 0 )
-        {
-            i_start += edit->i_media_time;
-        }
-        i_start -= MP4_rescale( p_track->i_elst_time, p_sys->i_timescale, p_track->i_timescale );
+        i_start = MP4_rescale_qtime( start, p_track->i_timescale );
+        /* map through elst offset */
+        i_start = MP4_MapMediaTimelineToTrackTime( p_track, p_sys->i_timescale, i_start );
 
         msg_Dbg( p_demux, "elst (%d) gives %"PRId64"ms (movie)-> %"PRId64
                  "ms (track)", p_track->i_elst,
-                 MP4_rescale( i_mvt, p_sys->i_timescale, 1000 ),
+                 MS_FROM_VLC_TICK(start),
                  MP4_rescale( i_start, p_track->i_timescale, 1000 ) );
     }
     else
