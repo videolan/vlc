@@ -20,16 +20,6 @@ have_sse2_intrinsics = cc.compiles('''
 ''', args: ['-msse2'], name: 'SSE2 intrinsics check')
 cdata.set('HAVE_SSE2_INTRINSICS', have_sse2_intrinsics)
 
-# Check for SSE inline assembly support
-can_compile_sse = cc.compiles('''
-    void f() {
-        void *p;
-        asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
-    }
-''', args: ['-msse'], name: 'SSE inline asm check')
-cdata.set('CAN_COMPILE_SSE', can_compile_sse)
-have_sse = can_compile_sse
-
 # Check for SSE2 inline assembly support
 can_compile_sse2 = cc.compiles('''
     void f() {

@@ -100,9 +100,6 @@
 /* Define to 1 if SSE2 intrinsics are available. */
 #mesondefine HAVE_SSE2_INTRINSICS
 
-/* Define to 1 if SSE inline assembly is available. */
-#mesondefine CAN_COMPILE_SSE
-
 /* Define to 1 if SSE2 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSE2
 
