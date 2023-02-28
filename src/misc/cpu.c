@@ -39,66 +39,14 @@
 
 #include <assert.h>
 
-#include <sys/types.h>
-#ifndef _WIN32
-#include <unistd.h>
-#include <sys/wait.h>
-#include <signal.h>
-#else
-#include <errno.h>
 #if defined(_MSC_VER) && !defined(__clang__)
 # include <intrin.h> // __cpuid
-#endif
-#endif
-
-#ifdef __APPLE__
-#include <sys/sysctl.h>
 #endif
 
 #if defined(__OpenBSD__) && defined(__powerpc__)
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <machine/cpu.h>
-#endif
-
-#if defined (__i386__) || defined (__x86_64__)
-# if defined (HAVE_FORK)
-static bool vlc_CPU_check (const char *name, void (*func) (void))
-{
-    pid_t pid = fork();
-
-    switch (pid)
-    {
-        case 0:
-            signal (SIGILL, SIG_DFL);
-            func ();
-            _exit (0);
-        case -1:
-            return false;
-    }
-
-    int status;
-    while( waitpid( pid, &status, 0 ) == -1 );
-
-    if( WIFEXITED( status ) && WEXITSTATUS( status ) == 0 )
-        return true;
-
-    fprintf (stderr, "Warning: your CPU has %s instructions, but not your "
-                     "operating system.\n", name);
-    fprintf( stderr, "         some optimizations will be disabled unless "
-                     "you upgrade your OS\n" );
-    return false;
-}
-
-#if defined (CAN_COMPILE_SSE) && !defined (__SSE__)
-VLC_SSE static void SSE_test (void)
-{
-    asm volatile ("xorps %%xmm0,%%xmm0\n" : : : "xmm0", "xmm1");
-}
-#endif
-#else /* _WIN32 || __OS2__ */
-# define vlc_CPU_check(name, func) (1)
-#endif
 #endif
 
 /**
@@ -159,19 +107,14 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
 
     cpuid( 0x00000001 );
 
-# if defined (CAN_COMPILE_SSE) && !defined (__SSE__)
-    if (( i_edx & 0x02000000 ) && vlc_CPU_check ("SSE", SSE_test))
-# endif
-    {
-        if (i_edx & 0x04000000)
-            i_capabilities |= VLC_CPU_SSE2;
-        if (i_ecx & 0x00000001)
-            i_capabilities |= VLC_CPU_SSE3;
-        if (i_ecx & 0x00000200)
-            i_capabilities |= VLC_CPU_SSSE3;
-        if (i_ecx & 0x00080000)
-            i_capabilities |= VLC_CPU_SSE4_1;
-    }
+    if (i_edx & 0x04000000)
+        i_capabilities |= VLC_CPU_SSE2;
+    if (i_ecx & 0x00000001)
+        i_capabilities |= VLC_CPU_SSE3;
+    if (i_ecx & 0x00000200)
+        i_capabilities |= VLC_CPU_SSSE3;
+    if (i_ecx & 0x00080000)
+        i_capabilities |= VLC_CPU_SSE4_1;
 
     /* test for additional capabilities */
     cpuid( 0x80000000 );
