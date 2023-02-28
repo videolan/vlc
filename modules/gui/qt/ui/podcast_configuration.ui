@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>PodcastConfiguration</class>
- <widget class="QWidget" name="PodcastConfiguration" >
+ <widget class="QDialog" name="PodcastConfiguration" >
   <property name="geometry" >
    <rect>
     <x>0</x>
