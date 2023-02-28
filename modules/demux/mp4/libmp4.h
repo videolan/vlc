@@ -984,15 +984,19 @@ typedef struct MP4_Box_data_stdp_s
 
 } MP4_Box_data_stdp_t;
 
+typedef struct
+{
+    uint64_t i_segment_duration; /* movie timescale */
+    int64_t  i_media_time; /* media(track) timescale */
+    uint16_t i_media_rate_integer;
+    uint16_t i_media_rate_fraction;
+} MP4_Box_data_elst_entry_t;
+
 typedef struct MP4_Box_data_elst_s
 {
     uint32_t i_entry_count;
 
-    uint64_t *i_segment_duration; /* movie timescale */
-    int64_t  *i_media_time; /* media(track) timescale */
-    uint16_t *i_media_rate_integer;
-    uint16_t *i_media_rate_fraction;
-
+    MP4_Box_data_elst_entry_t *entries;
 
 } MP4_Box_data_elst_t;
 

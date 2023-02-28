@@ -551,15 +551,15 @@ static vlc_tick_t MP4_TrackGetDTSPTS( demux_t *p_demux, const mp4_track_t *p_tra
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count )
     {
         const MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
+        const MP4_Box_data_elst_entry_t *edit = &elst->entries[p_track->i_elst];
 
         /* convert to offset */
-        if( elst->i_media_time[p_track->i_elst] > 0 &&
-           ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
-             elst->i_media_rate_fraction[p_track->i_elst] > 0 ) )
+        if( edit->i_media_time > 0 &&
+           ( edit->i_media_rate_integer > 0 || edit->i_media_rate_fraction > 0 ) )
         {
-            if( p_track->i_start_dts >= elst->i_media_time[p_track->i_elst] )
+            if( p_track->i_start_dts >= edit->i_media_time )
             {
-                sdts -= elst->i_media_time[p_track->i_elst];
+                sdts -= edit->i_media_time;
             }
         }
     }
@@ -3315,7 +3315,8 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     MP4_TrackSetELST( p_demux, p_track, start );
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count > 0 )
     {
-        MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
+        const MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
+        const MP4_Box_data_elst_entry_t *edit = &elst->entries[p_track->i_elst];
         int64_t i_mvt= MP4_rescale_qtime( start, p_sys->i_timescale );
 
         /* now calculate i_start for this elst */
@@ -3330,11 +3331,10 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
         /* to track time scale */
         i_start  = MP4_rescale_qtime( start, p_track->i_timescale );
         /* add elst offset */
-        if( ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
-             elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
-            elst->i_media_time[p_track->i_elst] > 0 )
+        if( ( edit->i_media_rate_integer > 0 || edit->i_media_rate_fraction > 0 ) &&
+            edit->i_media_time > 0 )
         {
-            i_start += elst->i_media_time[p_track->i_elst];
+            i_start += edit->i_media_time;
         }
 
         msg_Dbg( p_demux, "elst (%d) gives %"PRId64"ms (movie)-> %"PRId64
@@ -3670,14 +3670,15 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
         msg_Warn( p_demux, "elst box found" );
         for( i = 0; i < elst->i_entry_count; i++ )
         {
+            const MP4_Box_data_elst_entry_t *edit = &elst->entries[i];
             msg_Dbg( p_demux, "   - [%d] duration=%"PRId64"ms media time=%"PRId64
                      "ms) rate=%d.%d", i,
-                     MP4_rescale( elst->i_segment_duration[i], p_sys->i_timescale, 1000 ),
-                     elst->i_media_time[i] >= 0 ?
-                        MP4_rescale( elst->i_media_time[i], p_track->i_timescale, 1000 ) :
+                     MP4_rescale( edit->i_segment_duration, p_sys->i_timescale, 1000 ),
+                     edit->i_media_time >= 0 ?
+                        MP4_rescale( edit->i_media_time, p_track->i_timescale, 1000 ) :
                         INT64_C(-1),
-                     elst->i_media_rate_integer[i],
-                     elst->i_media_rate_fraction[i] );
+                     edit->i_media_rate_integer,
+                     edit->i_media_rate_fraction );
         }
 
         if( var_InheritBool( p_demux, CFG_PREFIX"editlist" ) )
@@ -3778,12 +3779,12 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
 #define MAX_SELECTABLE (INT_MAX - ES_PRIORITY_SELECTABLE_MIN)
         for ( uint32_t i=0; i<p_track->BOXDATA(p_elst)->i_entry_count; i++ )
         {
-            if ( p_track->BOXDATA(p_elst)->i_media_time[i] >= 0 &&
-                 p_track->BOXDATA(p_elst)->i_segment_duration[i] )
+            const MP4_Box_data_elst_entry_t *edit = &p_track->BOXDATA(p_elst)->entries[i];
+            if ( edit->i_media_time >= 0 && edit->i_segment_duration )
             {
                 /* We do selection by inverting start time into priority.
                    The track with earliest edit will have the highest prio */
-                const int i_time = __MIN( MAX_SELECTABLE, p_track->BOXDATA(p_elst)->i_media_time[i] );
+                const int i_time = __MIN( MAX_SELECTABLE, edit->i_media_time );
                 p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + MAX_SELECTABLE - i_time;
                 break;
             }
@@ -4236,7 +4237,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t
                                             p_sys->i_timescale );
         if( p_track->i_elst < elst->i_entry_count &&
             i_mvt >= p_track->i_elst_time +
-                     elst->i_segment_duration[p_track->i_elst] )
+                     elst->entries[p_track->i_elst].i_segment_duration )
         {
             MP4_TrackSetELST( p_demux, p_track,
                               MP4_TrackGetDTSPTS( p_demux, p_track, NULL ) );
@@ -4262,7 +4263,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
 
         for( tk->i_elst = 0; tk->i_elst < elst->i_entry_count; tk->i_elst++ )
         {
-            uint64_t i_dur = elst->i_segment_duration[tk->i_elst];
+            uint64_t i_dur = elst->entries[tk->i_elst].i_segment_duration;
 
             if( tk->i_elst_time <= i_mvt
              && i_mvt < (int64_t)(tk->i_elst_time + i_dur) )
@@ -4276,20 +4277,14 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         {
             /* msg_Dbg( p_demux, "invalid number of entry in elst" ); */
             tk->i_elst = elst->i_entry_count - 1;
-            tk->i_elst_time -= elst->i_segment_duration[tk->i_elst];
-        }
-
-        if( elst->i_media_time[tk->i_elst] < 0 )
-        {
-            /* track offset */
-            tk->i_elst_time += elst->i_segment_duration[tk->i_elst];
+            tk->i_elst_time -= elst->entries[tk->i_elst].i_segment_duration;
         }
 
         if( i_elst_last != tk->i_elst )
         {
             msg_Warn( p_demux, "elst old=%d new=%"PRIu32, i_elst_last, tk->i_elst );
             if( i_elst_last < elst->i_entry_count &&
-                elst->i_media_time[i_elst_last] >= 0 )
+                elst->entries[i_elst_last].i_media_time >= 0 )
                 tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
     }
