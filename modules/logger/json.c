@@ -259,9 +259,6 @@ static const struct vlc_tracer_operations *Open(vlc_object_t *obj,
     return ops;
 }
 
-#define FILE_LOG_TEXT N_("Log to file")
-#define FILE_LOG_LONGTEXT N_("Log all VLC traces to a json file.")
-
 #define LOGFILE_NAME_TEXT N_("Log filename")
 #define LOGFILE_NAME_LONGTEXT N_("Specify the log filename.")
 
