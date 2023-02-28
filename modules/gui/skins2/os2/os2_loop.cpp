@@ -76,26 +76,18 @@ OS2Loop::OS2Loop( intf_thread_t *pIntf ): OSLoop( pIntf )
 }
 
 
-OS2Loop::~OS2Loop()
-{
-}
-
-
 OSLoop *OS2Loop::instance( intf_thread_t *pIntf )
 {
     if( pIntf->p_sys->p_osLoop == NULL )
-    {
-        OSLoop *pOsLoop = new OS2Loop( pIntf );
-        pIntf->p_sys->p_osLoop = pOsLoop;
-    }
-    return pIntf->p_sys->p_osLoop;
+        pIntf->p_sys->p_osLoop = std::make_unique<OS2Loop>(pIntf);
+    return pIntf->p_sys->p_osLoop.get();
 }
 
 
 void OS2Loop::destroy( intf_thread_t *pIntf )
 {
-    delete pIntf->p_sys->p_osLoop;
-    pIntf->p_sys->p_osLoop = NULL;
+    assert(pIntf->p_sys->p_osLoop);
+    pIntf->p_sys->p_osLoop.reset();
 }
 
 
