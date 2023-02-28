@@ -663,6 +663,12 @@ struct addrinfo
     struct addrinfo *ai_next;
 };
 
+# ifdef __LIBCN__
+/* OS/2 LIBCn has inet_pton(). Because of this, socklen_t is not defined above.
+ * And OS/2 LIBCn has socklen_t. So include sys/socket.h here for socklen_t. */
+#  include <sys/socket.h>
+# endif
+
 const char *gai_strerror (int);
 
 int  getaddrinfo  (const char *node, const char *service,
