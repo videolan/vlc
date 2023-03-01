@@ -453,6 +453,9 @@ static block_t *GrabJack( demux_t *p_demux )
         return NULL;
     }
 
+    /* Find the previous power of 2 */
+    i_read = 1 << ((sizeof(i_read)*8 - 1) - vlc_clz(i_read - 1));
+
     if( p_sys->p_block_audio )
     {
         p_block = p_sys->p_block_audio;
@@ -466,9 +469,6 @@ static block_t *GrabJack( demux_t *p_demux )
         msg_Warn( p_demux, "cannot get block" );
         return 0;
     }
-
-    /* Find the previous power of 2 */
-    i_read = 1 << ((sizeof(i_read)*8 - 1) - vlc_clz(i_read - 1));
 
     i_read = jack_ringbuffer_read( p_sys->p_jack_ringbuffer, ( char * ) p_block->p_buffer, i_read );
 
