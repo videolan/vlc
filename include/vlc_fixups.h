@@ -42,6 +42,10 @@
 #define S_IWUSR     _S_IWRITE
 #define S_IRUSR     _S_IREAD
 #define S_IFIFO     _S_IFIFO
+#define S_IFMT      _S_IFMT
+#define S_IFCHR     _S_IFCHR
+#define S_IFREG     _S_IFREG
+#define S_IFDIR     _S_IFDIR
 #define S_ISDIR(m)  (((m) & _S_IFMT) == _S_IFDIR)
 #define S_ISREG(m)  (((m) & _S_IFMT) == _S_IFREG)
 #define S_ISBLK(m)  (0)
@@ -174,6 +178,11 @@ typedef struct
     !defined (HAVE_WRITEV) || \
     !defined (HAVE_READV)
 # include <sys/types.h> /* ssize_t, pid_t */
+
+# if defined(_CRT_INTERNAL_NONSTDC_NAMES) && !_CRT_INTERNAL_NONSTDC_NAMES
+// MS POSIX aliases missing
+typedef _off_t off_t;
+# endif
 #endif
 
 #if !defined (HAVE_DIRFD) || \
@@ -740,6 +749,30 @@ int clock_nanosleep(clockid_t clock_id, int flags,
         const struct timespec *rqtp, struct timespec *rmtp);
 # endif
 #endif
+
+#ifdef _WIN32
+# if defined(_CRT_INTERNAL_NONSTDC_NAMES) && !_CRT_INTERNAL_NONSTDC_NAMES
+#  include <string.h>
+// the MS POSIX aliases are missing
+static inline char *strdup(const char *str)
+{
+    return _strdup(str);
+}
+
+#  define O_WRONLY    _O_WRONLY
+#  define O_CREAT     _O_CREAT
+#  define O_APPEND    _O_APPEND
+#  define O_TRUNC     _O_TRUNC
+#  define O_BINARY    _O_BINARY
+#  define O_EXCL      _O_EXCL
+#  define O_RDWR      _O_RDWR
+#  define O_TEXT      _O_TEXT
+#  define O_NOINHERIT _O_NOINHERIT
+#  define O_RDONLY    _O_RDONLY
+
+# endif // !_CRT_INTERNAL_NONSTDC_NAMES
+#endif // _WIN32
+
 
 #ifdef __cplusplus
 } /* extern "C" */
