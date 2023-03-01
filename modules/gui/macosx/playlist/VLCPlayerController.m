@@ -90,11 +90,11 @@ const CGFloat VLCVolumeDefault = 1.;
     VLCRemoteControlService *_remoteControlService;
 
     /* iTunes/Apple Music/Spotify play/pause support */
-    BOOL _iTunesAvailable;
+    iTunesApplication *_iTunesApp;
     BOOL _iTunesPlaybackWasPaused;
-    BOOL _appleMusicAvailable;
+    iTunesApplication *_appleMusicApp;
     BOOL _appleMusicPlaybackWasPaused;
-    BOOL _spotifyAvailable;
+    SpotifyApplication *_spotifyApp;
     BOOL _spotifyPlaybackWasPaused;
 
     NSTimer *_playbackHasTruelyEndedTimer;
@@ -624,10 +624,21 @@ static int BossCallback(vlc_object_t *p_this,
         [_remoteControlService subscribeToRemoteCommands];
     }
 
-    // Force check at least once
-    _iTunesAvailable = YES;
-    _appleMusicAvailable = YES;
-    _spotifyAvailable = YES;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        if (@available(macOS 10.15, *)) {
+            self->_appleMusicApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+        } else {
+            self->_iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+        }
+
+        self->_spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+
+        if (self->_playerState == VLC_PLAYER_STATE_PLAYING || self->_playerState == VLC_PLAYER_STATE_STARTED) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self stopOtherAudioPlaybackApps];
+            });
+        }
+    });
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -866,46 +877,31 @@ static int BossCallback(vlc_object_t *p_this,
     // don't bother looking for iTunes on macOS above 10.15
     if (@available(macOS 10.15, *)) {
         // Pause Apple Music playback
-        if (_appleMusicAvailable && !_appleMusicPlaybackWasPaused) {
-            iTunesApplication *appleMusicApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
-            _appleMusicAvailable = appleMusicApp != nil;
-
-            if (appleMusicApp && [appleMusicApp isRunning]) {
-                if ([appleMusicApp playerState] == iTunesEPlSPlaying) {
-                    msg_Dbg(p_intf, "pausing Apple Music");
-                    [appleMusicApp pause];
-                    _appleMusicPlaybackWasPaused = YES;
-                }
+        if (_appleMusicApp != nil && !_appleMusicPlaybackWasPaused && [_appleMusicApp isRunning]) {
+            if ([_appleMusicApp playerState] == iTunesEPlSPlaying) {
+                msg_Dbg(p_intf, "pausing Apple Music");
+                [_appleMusicApp pause];
+                _appleMusicPlaybackWasPaused = YES;
             }
         }
-    } else if (_iTunesAvailable && !_iTunesPlaybackWasPaused) {
+    } else if (_iTunesApp != nil && !_iTunesPlaybackWasPaused && [_iTunesApp isRunning] && [_iTunesApp playerState] == iTunesEPlSPlaying) {
         // Pause iTunes playback
-        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-        _iTunesAvailable = iTunesApp != nil;
-
-        if (iTunesApp && [iTunesApp isRunning]) {
-            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
-                msg_Dbg(p_intf, "pausing iTunes");
-                [iTunesApp pause];
-                _iTunesPlaybackWasPaused = YES;
-            }
-        }
+        msg_Dbg(p_intf, "pausing iTunes");
+        [_iTunesApp pause];
+        _iTunesPlaybackWasPaused = YES;
     }
 
-    // pause Spotify
-    if (_spotifyAvailable && !_spotifyPlaybackWasPaused) {
-        SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-        _spotifyAvailable = spotifyApp != nil;
+    // Pause Spotify
+    if (_spotifyApp != nil &&
+        !_spotifyPlaybackWasPaused &&
+        [_spotifyApp respondsToSelector:@selector(isRunning)] &&
+        [_spotifyApp respondsToSelector:@selector(playerState)] &&
+        [_spotifyApp isRunning] &&
+        [_spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
 
-        if (spotifyApp) {
-            if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
-                if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
-                    msg_Dbg(p_intf, "pausing Spotify");
-                    [spotifyApp pause];
-                    _spotifyPlaybackWasPaused = YES;
-                }
-            }
-        }
+        msg_Dbg(p_intf, "pausing Spotify");
+        [_spotifyApp pause];
+        _spotifyPlaybackWasPaused = YES;
     }
 }
 
