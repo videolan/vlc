@@ -297,13 +297,16 @@ static inline int httpd_UrlCatchCall(httpd_url_t *url, httpd_client_t *client)
 {
     const uint8_t msg = client->query.i_type;
 
+    int status = VLC_EGENERIC;
+    vlc_mutex_lock(&url->lock);
     if (url->catch[msg].cb != NULL)
     {
-        return url->catch[msg].cb(url->catch[msg].p_sys, client, &client->answer,
-                                  &client->query);
+        status = url->catch[msg].cb(
+            url->catch[msg].p_sys, client, &client->answer, &client->query);
     }
+    vlc_mutex_unlock(&url->lock);
 
-    return VLC_EGENERIC;
+    return status;
 }
 
 
