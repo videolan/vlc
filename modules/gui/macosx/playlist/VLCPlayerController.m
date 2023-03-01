@@ -877,13 +877,13 @@ static int BossCallback(vlc_object_t *p_this,
     }
 
     if (_appleMusicAvailable && !_appleMusicPlaybackWasPaused) {
-        iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
-        _appleMusicAvailable = iTunesApp != nil;
+        iTunesApplication *appleMusicApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+        _appleMusicAvailable = appleMusicApp != nil;
 
-        if (iTunesApp && [iTunesApp isRunning]) {
-            if ([iTunesApp playerState] == iTunesEPlSPlaying) {
+        if (appleMusicApp && [appleMusicApp isRunning]) {
+            if ([appleMusicApp playerState] == iTunesEPlSPlaying) {
                 msg_Dbg(p_intf, "pausing Apple Music");
-                [iTunesApp pause];
+                [appleMusicApp pause];
                 _appleMusicPlaybackWasPaused = YES;
             }
         }
