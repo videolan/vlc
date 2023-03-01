@@ -84,9 +84,8 @@ static int
 tc_anop_allocate_textures(const struct vlc_gl_interop *interop, uint32_t textures[],
                           const int32_t tex_width[], const int32_t tex_height[])
 {
-    (void) tex_width; (void) tex_height;
-    struct priv *priv = interop->priv;
-    assert(textures[0] != 0);
+    (void) interop; (void) tex_width; (void) tex_height;
+    assert(textures[0] != 0); (void) textures;
 
     return VLC_SUCCESS;
 }
