@@ -711,7 +711,16 @@ static const struct in6_addr in6addr_any =
 # ifndef HAVE_IF_NAMETOINDEX
 #  define if_nametoindex(name)  atoi(name)
 # endif
-#endif
+
+/* static_assert missing in assert.h */
+# if defined(__STDC_VERSION__) && \
+     __STDC_VERSION__ >= 201112L && __STDC_VERSION__ < 202311L
+#  include <assert.h>
+#  ifndef static_assert
+#   define static_assert _Static_assert
+#  endif
+# endif
+#endif  /* __OS2__ */
 
 /* math.h */
 
