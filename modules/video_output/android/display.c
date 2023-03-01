@@ -486,6 +486,12 @@ static int Open(vout_display_t *vd,
      || context == NULL)
         return VLC_EGENERIC;
 
+    if (!vd->obj.force && fmtp->projection_mode != PROJECTION_MODE_RECTANGULAR)
+    {
+        /* Let the gles2 vout handle projection */
+        return VLC_EGENERIC;
+    }
+
     struct sys *sys;
     vd->sys = sys = malloc(sizeof(*sys));
     if (sys == NULL)
@@ -538,7 +544,7 @@ vlc_module_begin()
     set_description("Android video output")
     add_shortcut("android-display")
     add_obsolete_string("android-display-chroma") /* since 4.0.0 */
-    set_callback_display(Open, 260)
+    set_callback_display(Open, 280)
     add_submodule ()
         set_capability("vout window", 0)
         set_callback(subpicture_window_Open)
