@@ -90,9 +90,12 @@ const CGFloat VLCVolumeDefault = 1.;
     VLCRemoteControlService *_remoteControlService;
 
     /* iTunes/Apple Music/Spotify play/pause support */
+    BOOL _iTunesAvailable;
     BOOL _iTunesPlaybackWasPaused;
+    BOOL _appleMusicAvailable;
     BOOL _appleMusicPlaybackWasPaused;
-    BOOL _SpotifyPlaybackWasPaused;
+    BOOL _spotifyAvailable;
+    BOOL _spotifyPlaybackWasPaused;
 
     NSTimer *_playbackHasTruelyEndedTimer;
 }
@@ -620,6 +623,11 @@ static int BossCallback(vlc_object_t *p_this,
         _remoteControlService = [[VLCRemoteControlService alloc] init];
         [_remoteControlService subscribeToRemoteCommands];
     }
+
+    // Force check at least once
+    _iTunesAvailable = YES;
+    _appleMusicAvailable = YES;
+    _spotifyAvailable = YES;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -855,8 +863,10 @@ static int BossCallback(vlc_object_t *p_this,
         return;
 
     // pause iTunes
-    if (!_iTunesPlaybackWasPaused) {
+    if (_iTunesAvailable && !_iTunesPlaybackWasPaused) {
         iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+        _iTunesAvailable = iTunesApp != nil;
+
         if (iTunesApp && [iTunesApp isRunning]) {
             if ([iTunesApp playerState] == iTunesEPlSPlaying) {
                 msg_Dbg(p_intf, "pausing iTunes");
@@ -866,8 +876,10 @@ static int BossCallback(vlc_object_t *p_this,
         }
     }
 
-    if (!_appleMusicPlaybackWasPaused) {
+    if (_appleMusicAvailable && !_appleMusicPlaybackWasPaused) {
         iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+        _appleMusicAvailable = iTunesApp != nil;
+
         if (iTunesApp && [iTunesApp isRunning]) {
             if ([iTunesApp playerState] == iTunesEPlSPlaying) {
                 msg_Dbg(p_intf, "pausing Apple Music");
@@ -878,14 +890,16 @@ static int BossCallback(vlc_object_t *p_this,
     }
 
     // pause Spotify
-    if (!_SpotifyPlaybackWasPaused) {
+    if (_spotifyAvailable && !_spotifyPlaybackWasPaused) {
         SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
+        _spotifyAvailable = spotifyApp != nil;
+
         if (spotifyApp) {
             if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
                 if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
                     msg_Dbg(p_intf, "pausing Spotify");
                     [spotifyApp pause];
-                    _SpotifyPlaybackWasPaused = YES;
+                    _spotifyPlaybackWasPaused = YES;
                 }
             }
         }
@@ -916,7 +930,7 @@ static int BossCallback(vlc_object_t *p_this,
             }
         }
 
-        if (_SpotifyPlaybackWasPaused) {
+        if (_spotifyPlaybackWasPaused) {
             SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
             if (spotifyApp) {
                 if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
@@ -931,7 +945,7 @@ static int BossCallback(vlc_object_t *p_this,
 
     _iTunesPlaybackWasPaused = NO;
     _appleMusicPlaybackWasPaused = NO;
-    _SpotifyPlaybackWasPaused = NO;
+    _spotifyPlaybackWasPaused = NO;
 }
 
 - (void)errorChanged:(enum vlc_player_error)error
