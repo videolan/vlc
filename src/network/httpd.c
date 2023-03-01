@@ -297,8 +297,13 @@ static inline int httpd_UrlCatchCall(httpd_url_t *url, httpd_client_t *client)
 {
     const uint8_t msg = client->query.i_type;
 
-    return url->catch[msg].cb(url->catch[msg].p_sys, client, &client->answer,
-                              &client->query);
+    if (url->catch[msg].cb != NULL)
+    {
+        return url->catch[msg].cb(url->catch[msg].p_sys, client, &client->answer,
+                                  &client->query);
+    }
+
+    return VLC_EGENERIC;
 }
 
 
@@ -1871,8 +1876,6 @@ static void httpdLoop(httpd_host_t *host)
                         /* Search the url and trigger callbacks */
                         vlc_list_foreach(url, &host->urls, node) {
                             if (strcmp(url->psz_url, query->psz_url))
-                                continue;
-                            if (!url->catch[i_msg].cb)
                                 continue;
 
                             if (answer) {
