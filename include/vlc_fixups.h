@@ -37,6 +37,12 @@
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS     1
 #endif
+#if defined(_GAMING_XBOX_SCARLETT) || defined(_GAMING_XBOX_XBOXONE) || defined(_XBOX_ONE)
+// make sure we don't use MS POSIX aliases that won't link
+# undef _CRT_DECLARE_NONSTDC_NAMES
+# define _CRT_DECLARE_NONSTDC_NAMES 0
+#endif
+
 
 // sys/stat.h values
 #define S_IWUSR     _S_IWRITE
