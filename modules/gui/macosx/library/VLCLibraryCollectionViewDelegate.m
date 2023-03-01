@@ -111,14 +111,15 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
         id<VLCMediaLibraryItemProtocol> libraryItem = [vlcDataSource libraryItemAtIndexPath:indexPath
                                                                           forCollectionView:collectionView];
 
-        VLCMediaLibraryMediaItem *mediaItem = libraryItem.firstMediaItem;
-        [encodedLibraryItemsArray addObject:mediaItem];
+        [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *mediaItem) {
+            [encodedLibraryItemsArray addObject:mediaItem];
 
-        VLCMediaLibraryFile *file = mediaItem.files.firstObject;
-        if (file) {
-            NSURL *url = [NSURL URLWithString:file.MRL];
-            [filePathsArray addObject:url.path];
-        }
+            VLCMediaLibraryFile *file = mediaItem.files.firstObject;
+            if (file) {
+                NSURL *url = [NSURL URLWithString:file.MRL];
+                [filePathsArray addObject:url.path];
+            }
+        }];
     }
 
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:encodedLibraryItemsArray];
