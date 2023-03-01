@@ -1652,7 +1652,6 @@ static int httpd_ClientSend(httpd_client_t *cl)
     if (cl->i_buffer >= cl->i_buffer_size) {
         if (cl->answer.i_body == 0  && cl->answer.i_body_offset > 0) {
             /* catch more body data */
-            int     i_msg = cl->query.i_type;
             int64_t i_offset = cl->answer.i_body_offset;
 
             httpd_MsgClean(&cl->answer);
