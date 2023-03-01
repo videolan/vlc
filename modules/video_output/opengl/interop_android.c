@@ -92,9 +92,9 @@ tc_anop_allocate_textures(const struct vlc_gl_interop *interop, uint32_t texture
 }
 
 static int
-tc_anop_update(struct vlc_gl_interop *interop, uint32_t textures[],
+tc_anop_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                const int32_t tex_width[], const int32_t tex_height[],
-               picture_t *pic, const size_t *plane_offset)
+               picture_t *pic, const size_t plane_offset[])
 {
     struct priv *priv = interop->priv;
 
