@@ -703,6 +703,9 @@ struct sockaddr_in6
 static const struct in6_addr in6addr_any =
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
+#define IN6ADDR_ANY_INIT \
+    { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
+
 # include <errno.h>
 # ifndef EPROTO
 #  define EPROTO (ELAST + 1)
