@@ -736,6 +736,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "equalizer-preamp", VLC_VAR_FLOAT);
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
+    var_Create (mp, "equalizer-preset", VLC_VAR_STRING);
 
     /* variables for signalling creation of new files */
     var_Create(mp, "record-file", VLC_VAR_STRING);
