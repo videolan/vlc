@@ -168,6 +168,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu WRITE setHasToolbarMenu NOTIFY hasToolbarMenuChanged FINAL)
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged FINAL)
+    Q_PROPERTY(float pinOpacity READ pinOpacity WRITE setPinOpacity NOTIFY pinOpacityChanged FINAL)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT FINAL)
     Q_PROPERTY(bool hasAcrylicSurface READ hasAcrylicSurface NOTIFY hasAcrylicSurfaceChanged FINAL)
     Q_PROPERTY(PlaylistPtr mainPlaylist READ getMainPlaylist CONSTANT FINAL)
@@ -251,7 +252,10 @@ public:
     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
+
     inline bool pinVideoControls() const { return m_pinVideoControls; }
+    inline float pinOpacity() const { return m_pinOpacity; }
+
     inline ControlbarProfileModel* controlbarProfileModel() const { return m_controlbarProfileModel; }
     inline QUrl getDialogFilePath() const { return m_dialogFilepath; }
     inline void setDialogFilePath(const QUrl& filepath ){ m_dialogFilepath = filepath; }
@@ -348,7 +352,11 @@ protected:
     // NOTE: Ideally this should be a QVLCBool.
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
+
+    /* Pinned */
     bool                 m_pinVideoControls = false;
+    float                m_pinOpacity       = 1.0f;
+
     bool                 m_useGlobalShortcuts = true;
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
@@ -387,7 +395,10 @@ public slots:
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( double );
     void setHasToolbarMenu( bool );
+
     void setPinVideoControls( bool );
+    void setPinOpacity( float );
+
     void updateIntfScaleFactor();
     void onWindowVisibilityChanged(QWindow::Visibility);
     void setHasAcrylicSurface(bool);
@@ -440,7 +451,10 @@ signals:
     void requestInterfaceMinimized();
 
     void intfScaleFactorChanged();
+
     void pinVideoControlsChanged();
+    void pinOpacityChanged();
+
     void hasAcrylicSurfaceChanged();
 
     void acrylicActiveChanged();

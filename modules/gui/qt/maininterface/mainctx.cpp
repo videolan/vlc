@@ -97,6 +97,12 @@ int loadVLCOption<int>(vlc_object_t *obj, const char *name)
 }
 
 template <>
+float loadVLCOption<float>(vlc_object_t *obj, const char *name)
+{
+    return var_InheritFloat(obj, name);
+}
+
+template <>
 bool loadVLCOption<bool>(vlc_object_t *obj, const char *name)
 {
     return var_InheritBool(obj, name);
@@ -303,6 +309,7 @@ void MainCtx::loadPrefs(const bool callSignals)
 
     loadFromVLCOption(m_pinVideoControls, "qt-pin-controls", &MainCtx::pinVideoControlsChanged);
 
+    loadFromVLCOption(m_pinOpacity, "qt-fs-opacity", &MainCtx::pinOpacityChanged);
 }
 
 void MainCtx::loadFromSettingsImpl(const bool callSignals)
@@ -441,6 +448,16 @@ void MainCtx::setPinVideoControls(bool pinVideoControls)
 
     m_pinVideoControls = pinVideoControls;
     emit pinVideoControlsChanged();
+}
+
+void MainCtx::setPinOpacity(float pinOpacity)
+{
+    if (m_pinOpacity == pinOpacity)
+        return;
+
+    m_pinOpacity = pinOpacity;
+
+    emit pinOpacityChanged();
 }
 
 inline void MainCtx::initSystray()
