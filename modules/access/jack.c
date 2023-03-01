@@ -106,7 +106,6 @@ typedef struct
     int                         i_sample_rate;
     int                         i_audio_max_frame_size;
     int                         i_frequency;
-    block_t                     *p_block_audio;
     es_out_id_t                 *p_es_audio;
     date_t                      pts;
 
@@ -321,7 +320,6 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t    *p_sys = p_demux->p_sys;
 
     msg_Dbg( p_demux,"Module unloaded" );
-    if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
     if( p_sys->p_jack_client ) jack_client_close( p_sys->p_jack_client );
     if( p_sys->p_jack_ringbuffer ) jack_ringbuffer_free( p_sys->p_jack_ringbuffer );
     free( p_sys->pp_jack_port_input );
@@ -456,14 +454,8 @@ static block_t *GrabJack( demux_t *p_demux )
     /* Find the previous power of 2 */
     i_read = 1 << ((sizeof(i_read)*8 - 1) - vlc_clz(i_read - 1));
 
-    if( p_sys->p_block_audio )
-    {
-        p_block = p_sys->p_block_audio;
-    }
-    else
-    {
-        p_block = block_Alloc( i_read );
-    }
+    p_block = block_Alloc( i_read );
+
     if( !p_block )
     {
         msg_Warn( p_demux, "cannot get block" );
@@ -475,9 +467,7 @@ static block_t *GrabJack( demux_t *p_demux )
     p_block->i_dts = p_block->i_pts = date_Increment( &p_sys->pts,
          i_read/(p_sys->i_channels * p_sys->jack_sample_size) );
 
-    p_sys->p_block_audio = p_block;
     p_block->i_buffer = i_read;
-    p_sys->p_block_audio = 0;
 
     return p_block;
 }
