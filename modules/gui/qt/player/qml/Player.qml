@@ -242,6 +242,9 @@ FocusScope {
 
         Rectangle {
             width: rootPlayer.width
+
+            opacity: MainCtx.pinOpacity
+
             color: windowTheme.bg.primary
         }
     }
@@ -253,6 +256,9 @@ FocusScope {
             width: rootPlayer.width
 
             visible: (rootPlayer._controlsUnderVideo || topcontrolView.resumeVisible)
+
+            opacity: (MainCtx.intfMainWindow.visibility === Window.FullScreen) ? MainCtx.pinOpacity
+                                                                               : 1.0
 
             tintColor: windowTheme.bg.primary
         }
