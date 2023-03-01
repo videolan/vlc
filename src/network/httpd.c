@@ -293,6 +293,14 @@ static size_t httpd_HtmlError (char **body, int code, const char *url)
     return (size_t)res;
 }
 
+static inline int httpd_UrlCatchCall(httpd_url_t *url, httpd_client_t *client)
+{
+    const uint8_t msg = client->query.i_type;
+
+    return url->catch[msg].cb(url->catch[msg].p_sys, client, &client->answer,
+                              &client->query);
+}
+
 
 /*****************************************************************************
  * High Level Functions: httpd_file_t
@@ -1645,8 +1653,7 @@ static int httpd_ClientSend(httpd_client_t *cl)
             httpd_MsgClean(&cl->answer);
             cl->answer.i_body_offset = i_offset;
 
-            cl->url->catch[i_msg].cb(cl->url->catch[i_msg].p_sys, cl,
-                                     &cl->answer, &cl->query);
+            httpd_UrlCatchCall(cl->url, cl);
         }
 
         if (cl->answer.i_body > 0) {
@@ -1876,7 +1883,7 @@ static void httpdLoop(httpd_host_t *host)
                                    break;
                             }
 
-                            if (url->catch[i_msg].cb(url->catch[i_msg].p_sys, cl, answer, query))
+                            if (httpd_UrlCatchCall(url, cl))
                                 continue;
 
                             if (answer->i_proto == HTTPD_PROTO_NONE)
