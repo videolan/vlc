@@ -3336,6 +3336,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
         {
             i_start += edit->i_media_time;
         }
+        i_start -= MP4_rescale( p_track->i_elst_time, p_sys->i_timescale, p_track->i_timescale );
 
         msg_Dbg( p_demux, "elst (%d) gives %"PRId64"ms (movie)-> %"PRId64
                  "ms (track)", p_track->i_elst,
