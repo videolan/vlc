@@ -862,8 +862,24 @@ static int BossCallback(vlc_object_t *p_this,
     if (controlOtherPlayers <= 0)
         return;
 
-    // pause iTunes
-    if (_iTunesAvailable && !_iTunesPlaybackWasPaused) {
+    // Don't bother looking for Apple Music on macOS below 10.15, and conversely
+    // don't bother looking for iTunes on macOS above 10.15
+    if (@available(macOS 10.15, *)) {
+        // Pause Apple Music playback
+        if (_appleMusicAvailable && !_appleMusicPlaybackWasPaused) {
+            iTunesApplication *appleMusicApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
+            _appleMusicAvailable = appleMusicApp != nil;
+
+            if (appleMusicApp && [appleMusicApp isRunning]) {
+                if ([appleMusicApp playerState] == iTunesEPlSPlaying) {
+                    msg_Dbg(p_intf, "pausing Apple Music");
+                    [appleMusicApp pause];
+                    _appleMusicPlaybackWasPaused = YES;
+                }
+            }
+        }
+    } else if (_iTunesAvailable && !_iTunesPlaybackWasPaused) {
+        // Pause iTunes playback
         iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
         _iTunesAvailable = iTunesApp != nil;
 
@@ -872,19 +888,6 @@ static int BossCallback(vlc_object_t *p_this,
                 msg_Dbg(p_intf, "pausing iTunes");
                 [iTunesApp pause];
                 _iTunesPlaybackWasPaused = YES;
-            }
-        }
-    }
-
-    if (_appleMusicAvailable && !_appleMusicPlaybackWasPaused) {
-        iTunesApplication *appleMusicApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
-        _appleMusicAvailable = appleMusicApp != nil;
-
-        if (appleMusicApp && [appleMusicApp isRunning]) {
-            if ([appleMusicApp playerState] == iTunesEPlSPlaying) {
-                msg_Dbg(p_intf, "pausing Apple Music");
-                [appleMusicApp pause];
-                _appleMusicPlaybackWasPaused = YES;
             }
         }
     }
