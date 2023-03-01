@@ -9,19 +9,14 @@
 // Windows is not a real POSIX system and doesn't provide this header
 // provide a dummy one so the code can compile
 
-#if defined(_GAMING_XBOX_SCARLETT) || defined(_GAMING_XBOX_XBOXONE) || defined(_XBOX_ONE)
-# define _CRT_DECLARE_NONSTDC_NAMES 0
-#else
 // many functions commonly found in unistd.h are found in io.h and process.h
-# define _CRT_DECLARE_NONSTDC_NAMES 1
-#endif
 #include <io.h>
 #include <process.h>
 
 // defines corresponding to stdin/stdout/stderr without the __acrt_iob_func() call
-#define	STDIN_FILENO  0
-#define	STDOUT_FILENO 1
-#define	STDERR_FILENO 2
+#define    STDIN_FILENO  0
+#define    STDOUT_FILENO 1
+#define    STDERR_FILENO 2
 
 // _access() doesn't function the same as access(), but this should work
 #define R_OK  04
@@ -30,15 +25,37 @@
 typedef int pid_t;
 
 // redirect missing functions from the GDK
-#define strdup(s) _strdup(s)
+#if defined(_CRT_INTERNAL_NONSTDC_NAMES) && !_CRT_INTERNAL_NONSTDC_NAMES
+static inline FILE *fdopen(int fd, const char *mode)
+{
+    return _fdopen(fd, mode);
+}
+static inline int close(int fd)
+{
+    return _close(fd);
+}
+static inline int read(int fd, void *dst, unsigned int dst_size)
+{
+    return _read(fd, dst, dst_size);
+}
+static inline int write(int fd, const void *src, unsigned int src_size)
+{
+    return _write(fd, src, src_size);
+}
+static inline int setmode(int fd, int mode)
+{
+    return _setmode(fd, mode);
+}
+static inline int dup(int fd)
+{
+    return _dup(fd);
+}
+static inline int dup2(int src, int dst)
+{
+    return _dup2(src, dst);
+}
+#endif // !_CRT_INTERNAL_NONSTDC_NAMES
 
-#define read(fd, dst, count)  _read(fd, dst, count)
-#define write(fd, src, count) _write(fd, src, count)
-#define close(fd) _close(fd)
-#define dup(fd) _dup(fd)
-#define dup2(fd, f2) _dup2(fd,f2)
-#define setmode(fd, m) _setmode(fd,m)
-#define fdopen(a, b)  _fdopen(a, b)
 
 
 #endif // WINSDK_UNISTD_H__
