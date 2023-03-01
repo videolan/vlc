@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryTableView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryAudioGroupDataSource;
 @class VLCMediaLibraryAlbum;
 
-@interface VLCLibraryAudioGroupDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, NSCollectionViewDataSource>
+@interface VLCLibraryAudioGroupDataSource : NSObject <VLCLibraryTableViewDataSource, NSTableViewDelegate, VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, retain, nullable) NSArray <VLCMediaLibraryAlbum *> *representedListOfAlbums;
 
