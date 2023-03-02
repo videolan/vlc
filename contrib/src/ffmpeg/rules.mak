@@ -1,8 +1,8 @@
 # FFmpeg
 
 FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
-FFMPEG_MAJVERSION := 4.4
-FFMPEG_REVISION := 3
+FFMPEG_MAJVERSION := 5.1
+FFMPEG_REVISION := 2
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
@@ -29,7 +29,6 @@ FFMPEGCONF = \
 	--disable-bsfs \
 	--disable-bzlib \
 	--disable-libvpx \
-	--disable-avresample \
 	--enable-bsf=vp9_superframe \
 	--disable-swresample \
 	--disable-iconv \
@@ -226,10 +225,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-ffmpeg-add-target_os-support-for-emscripten.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-dxva2_hevc-don-t-use-frames-as-reference-if-they-are.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-lavc-aarch64-fix-relocation-out-of-range-error.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg
