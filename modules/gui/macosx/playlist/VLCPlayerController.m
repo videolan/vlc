@@ -909,36 +909,33 @@ static int BossCallback(vlc_object_t *p_this,
 {
     intf_thread_t *p_intf = getIntf();
     if (var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
-        if (_iTunesPlaybackWasPaused) {
-            iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-            if (iTunesApp && [iTunesApp isRunning]) {
-                if ([iTunesApp playerState] == iTunesEPlSPaused) {
-                    msg_Dbg(p_intf, "unpausing iTunes");
-                    [iTunesApp playpause];
-                }
+        if (@available(macOS 10.15, *)) {
+            if (_appleMusicApp != nil &&
+                _appleMusicPlaybackWasPaused &&
+                [_appleMusicApp isRunning] &&
+                [_appleMusicApp playerState] == iTunesEPlSPaused) {
+
+                msg_Dbg(p_intf, "unpausing Apple Music");
+                [_appleMusicApp playpause];
             }
+        } else if (_iTunesApp != nil &&
+            _iTunesPlaybackWasPaused &&
+            [_iTunesApp isRunning] &&
+            [_iTunesApp playerState] == iTunesEPlSPaused) {
+
+            msg_Dbg(p_intf, "unpausing iTunes");
+            [_iTunesApp playpause];
         }
 
-        if (_appleMusicPlaybackWasPaused) {
-            iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.Music"];
-            if (iTunesApp && [iTunesApp isRunning]) {
-                if ([iTunesApp playerState] == iTunesEPlSPaused) {
-                    msg_Dbg(p_intf, "unpausing Apple Music");
-                    [iTunesApp playpause];
-                }
-            }
-        }
+        if (_spotifyApp != nil &&
+            _spotifyPlaybackWasPaused &&
+            [_spotifyApp respondsToSelector:@selector(isRunning)] &&
+            [_spotifyApp respondsToSelector:@selector(playerState)] &&
+            [_spotifyApp isRunning] &&
+            [_spotifyApp playerState] == kSpotifyPlayerStatePaused) {
 
-        if (_spotifyPlaybackWasPaused) {
-            SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-            if (spotifyApp) {
-                if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
-                    if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePaused) {
-                        msg_Dbg(p_intf, "unpausing Spotify");
-                        [spotifyApp play];
-                    }
-                }
-            }
+            msg_Dbg(p_intf, "unpausing Spotify");
+            [_spotifyApp play];
         }
     }
 
