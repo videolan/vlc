@@ -160,8 +160,5 @@ vlc_module_begin()
     set_callback(Open)
 vlc_module_end()
 
-/* Inject the glue interface as a static module */
-typedef int (*vlc_plugin_cb)(vlc_set_cb, void*);
-
 __attribute__((visibility("default")))
 vlc_plugin_cb vlc_static_modules[] = { vlc_entry__ios_interface, NULL };

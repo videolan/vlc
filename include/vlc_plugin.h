@@ -270,6 +270,9 @@ struct vlc_param;
 
 EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
 
+/** Plugin entry point prototype */
+typedef int (*vlc_plugin_cb) (vlc_set_cb, void *);
+
 #define vlc_plugin_set(...) vlc_set (opaque,   NULL, __VA_ARGS__)
 #define vlc_module_set(...) vlc_set (opaque, module, __VA_ARGS__)
 #define vlc_config_set(...) vlc_set (opaque, config, __VA_ARGS__)

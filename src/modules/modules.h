@@ -66,9 +66,6 @@ extern struct vlc_plugin_t *vlc_plugins;
 
 #define MODULE_SHORTCUT_MAX 20
 
-/** Plugin entry point prototype */
-typedef int (*vlc_plugin_cb) (vlc_set_cb, void *);
-
 /** Plugin deactivation callback */
 typedef void (*vlc_deactivate_cb)(vlc_object_t*);
 

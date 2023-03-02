@@ -167,9 +167,6 @@ static int
 OpenOpenGLESOffscreen(vlc_gl_t *gl, unsigned width, unsigned height)
     { return OpenOpenGLCommon(gl, width, height, true, VLC_OPENGL_ES2); };
 
-/* Helper typedef for vlc_static_modules */
-typedef int (*vlc_plugin_cb)(vlc_set_cb, void*);
-
 /**
  * Inject the mocked modules as a static plugin:
  *  - decoder device for generating video context and testing release

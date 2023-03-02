@@ -395,9 +395,6 @@ vlc_module_begin()
 
 vlc_module_end()
 
-/* Helper typedef for vlc_static_modules */
-typedef int (*vlc_plugin_cb)(vlc_set_cb, void*);
-
 VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
     VLC_SYMBOL(vlc_entry),
     NULL
