@@ -45,9 +45,9 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="mAS-4a-RS8" customClass="VLCVoutView">
                     <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                 </customView>
-                <box appearanceType="darkAqua" boxType="custom" borderType="none" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="D4V-Zd-qvB">
+                <box appearanceType="darkAqua" boxType="custom" borderType="none" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D4V-Zd-qvB">
                     <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
-                    <view key="contentView" id="1tI-8K-e3c">
+                    <view key="contentView" wantsLayer="YES" id="1tI-8K-e3c">
                         <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -57,11 +57,16 @@
                                     <constraint firstAttribute="width" secondItem="UoQ-34-Pox" secondAttribute="height" multiplier="1:1" id="Mvu-rV-2bc"/>
                                     <constraint firstAttribute="width" constant="32" id="cjt-DQ-vMP"/>
                                 </constraints>
+                                <shadow key="shadow" blurRadius="2">
+                                    <size key="offset" width="1" height="1"/>
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
                                 <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="CU4-UE-tsW">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <imageReference key="image" image="chevron.left" catalog="system" symbolScale="large"/>
+                                    <imageReference key="image" image="chevron.left.circle" catalog="system" symbolScale="large"/>
                                 </buttonCell>
+                                <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="returnToLibrary:" target="-2" id="rnL-S1-zSR"/>
                                 </connections>
@@ -72,11 +77,16 @@
                                     <constraint firstAttribute="width" constant="32" id="9vC-fK-tZu"/>
                                     <constraint firstAttribute="width" secondItem="Drq-if-dw4" secondAttribute="height" multiplier="1:1" id="cVK-cW-Opa"/>
                                 </constraints>
+                                <shadow key="shadow" blurRadius="2">
+                                    <size key="offset" width="1" height="1"/>
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
                                 <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="VDP-ql-lW8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                     <imageReference key="image" image="music.note.list" catalog="system" symbolScale="large"/>
                                 </buttonCell>
+                                <color key="contentTintColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                 <symbolConfiguration key="symbolConfiguration" weight="ultraLight"/>
                                 <connections>
                                     <action selector="togglePlaylist:" target="-2" id="WrP-vg-etw"/>
@@ -207,7 +217,7 @@
                                     <constraint firstItem="sJu-ZK-5QH" firstAttribute="bottom" secondItem="qNZ-Fh-W8i" secondAttribute="top" constant="-5" id="xsM-6a-gdn"/>
                                 </constraints>
                             </visualEffectView>
-                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CvV-yX-Nbh">
+                            <stackView wantsLayer="YES" distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CvV-yX-Nbh">
                                 <rect key="frame" x="260" y="208" width="200" height="64"/>
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="V9d-hX-iyg" customClass="VLCImageButton">
@@ -216,11 +226,14 @@
                                             <constraint firstAttribute="width" constant="48" id="XBm-GM-29d"/>
                                             <constraint firstAttribute="width" secondItem="V9d-hX-iyg" secondAttribute="height" multiplier="1:1" id="mjk-wN-72b"/>
                                         </constraints>
+                                        <shadow key="shadow" blurRadius="10">
+                                            <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </shadow>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="backward.fill" catalog="system" imagePosition="only" alignment="center" continuous="YES" imageScaling="proportionallyUpOrDown" inset="2" id="fFm-ZG-R1p">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.70445365650000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <action selector="bwd:" target="3" id="nDS-qm-Htv"/>
                                         </connections>
@@ -231,11 +244,14 @@
                                             <constraint firstAttribute="width" secondItem="PCC-8a-sVF" secondAttribute="height" multiplier="1:1" id="2jF-Y0-kn3"/>
                                             <constraint firstAttribute="width" constant="64" id="OHb-xJ-sqM"/>
                                         </constraints>
+                                        <shadow key="shadow" blurRadius="15">
+                                            <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </shadow>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="play.fill" catalog="system" imagePosition="overlaps" alignment="center" alternateImage="VLCPauseTemplate" imageScaling="proportionallyUpOrDown" inset="2" id="Jk0-sw-EOp">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.70445365646258506" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267136324741" colorSpace="custom" customColorSpace="sRGB"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="boolean" keyPath="toggle" value="YES"/>
                                         </userDefinedRuntimeAttributes>
@@ -249,11 +265,14 @@
                                             <constraint firstAttribute="width" constant="48" id="M5n-CD-fd3"/>
                                             <constraint firstAttribute="width" secondItem="sF5-Z0-bef" secondAttribute="height" multiplier="1:1" id="b5c-td-Idb"/>
                                         </constraints>
+                                        <shadow key="shadow" blurRadius="10">
+                                            <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </shadow>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="forward.fill" catalog="system" imagePosition="only" alignment="center" continuous="YES" imageScaling="proportionallyUpOrDown" inset="2" id="I4n-VO-oYa">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.70445365650000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <action selector="fwd:" target="3" id="uPX-Xa-CwO"/>
                                         </connections>
@@ -303,7 +322,7 @@
         <image name="NSEnterFullScreenTemplate" width="20" height="18"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
         <image name="backward.fill" catalog="system" width="20" height="12"/>
-        <image name="chevron.left" catalog="system" width="12" height="16"/>
+        <image name="chevron.left.circle" catalog="system" width="19" height="19"/>
         <image name="forward.fill" catalog="system" width="20" height="12"/>
         <image name="music.note.list" catalog="system" width="21" height="19"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
