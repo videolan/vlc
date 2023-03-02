@@ -233,11 +233,17 @@ enum vlc_config_subcat
 /* I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
 #define CRUDE_HACK( y, z )  y##__##z
+#define STRINGIFY_NAME_( z ) #z
+#define STRINGIFY_NAME( z )   STRINGIFY_NAME_( z )
 
 #if defined(__cplusplus)
 #define EXTERN_SYMBOL extern "C"
 #else
 #define EXTERN_SYMBOL
+#endif
+
+#if !defined(MODULE_STRING) && defined(MODULE_NAME)
+# define MODULE_STRING  STRINGIFY_NAME(MODULE_NAME)
 #endif
 
 /* If the module is built-in, then we need to define foo_InitModule instead
