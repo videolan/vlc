@@ -2,7 +2,7 @@
 
 DAV1D_VERSION := 1.0.0
 DAV1D_URL := $(VIDEOLAN)/dav1d/$(DAV1D_VERSION)/dav1d-$(DAV1D_VERSION).tar.xz
-DAV1D_HASH := 6777dd0a61ab78cc9fab92af53558ea44c135056
+DAV1D_HASH := bf5ae021edff111d3954b32fef09debcc4981738
 DAV1D_VERSION := $(DAV1D_HASH)
 DAV1D_GITURL := https://code.videolan.org/videolan/dav1d.git
 
