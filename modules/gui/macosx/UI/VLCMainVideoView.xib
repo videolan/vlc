@@ -99,7 +99,7 @@
                                     <textField wantsLayer="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="lEW-MN-FFU" customClass="VLCWrappableTextField">
                                         <rect key="frame" x="18" y="49" width="495" height="32"/>
                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Nothing Playing" usesSingleLineMode="YES" id="8l0-zS-fOa">
-                                            <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
+                                            <font key="font" metaFont="systemBold" size="24"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
