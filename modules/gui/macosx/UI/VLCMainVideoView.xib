@@ -45,7 +45,7 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="mAS-4a-RS8" customClass="VLCVoutView">
                     <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                 </customView>
-                <box boxType="custom" borderType="none" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="D4V-Zd-qvB">
+                <box appearanceType="darkAqua" boxType="custom" borderType="none" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="D4V-Zd-qvB">
                     <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                     <view key="contentView" id="1tI-8K-e3c">
                         <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
