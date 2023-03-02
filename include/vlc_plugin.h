@@ -246,6 +246,11 @@ enum vlc_config_subcat
 # define MODULE_STRING  STRINGIFY_NAME(MODULE_NAME)
 #endif
 
+// name of the module entry point table
+#define VLC_MODULE_ENTRY(name)        CONCATENATE(vlc_entry, name)
+// declare a vlc_plugin_cb
+#define VLC_DECL_MODULE_ENTRY(name)   int (VLC_MODULE_ENTRY(name))(vlc_set_cb, void *)
+
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef VLC_DYNAMIC_PLUGIN
