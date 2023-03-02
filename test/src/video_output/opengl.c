@@ -24,7 +24,6 @@
 
 /* Define a builtin module for mocked parts */
 #define MODULE_NAME test_offscreen_mock
-#define MODULE_STRING "test_offscreen_mock"
 #undef VLC_DYNAMIC_PLUGIN
 
 #include "../../libvlc/test.h"

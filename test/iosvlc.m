@@ -27,7 +27,6 @@
 #undef VLC_DYNAMIC_PLUGINS
 
 #define MODULE_NAME ios_interface
-#define MODULE_STRING "ios_interface"
 #undef VLC_DYNAMIC_PLUGINS
 
 #import <UIKit/UIKit.h>

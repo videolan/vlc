@@ -26,7 +26,6 @@
 
 /* Define a builtin module for mocked parts */
 #define MODULE_NAME test_misc_image
-#define MODULE_STRING "test_misc_image"
 #undef VLC_DYNAMIC_PLUGIN
 
 #include "../../libvlc/test.h"

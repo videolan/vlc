@@ -26,7 +26,6 @@
 
 /* Define a builtin module for mocked parts */
 #define MODULE_NAME test_lua_extension
-#define MODULE_STRING "test_lua_extension"
 #undef VLC_DYNAMIC_PLUGIN
 
 #include "../../libvlc/test.h"

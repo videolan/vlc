@@ -26,7 +26,6 @@
 
 /* Define a builtin module for mocked parts */
 #define MODULE_NAME test_input_decoder_mock
-#define MODULE_STRING "test_input_decoder_mock"
 #undef VLC_DYNAMIC_PLUGIN
 
 #include "../../../libvlc/test.h"
