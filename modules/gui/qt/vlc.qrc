@@ -151,6 +151,7 @@
         <file alias="NoMedialibHome.qml">maininterface/qml/NoMedialibHome.qml</file>
         <file alias="MainTableView.qml">maininterface/qml/MainTableView.qml</file>
         <file alias="MainGridView.qml">maininterface/qml/MainGridView.qml</file>
+        <file alias="MainViewLoader.qml">maininterface/qml/MainViewLoader.qml</file>
     </qresource>
     <qresource prefix="/widgets">
         <file alias="ActionButtonOverlay.qml">widgets/qml/ActionButtonOverlay.qml</file>

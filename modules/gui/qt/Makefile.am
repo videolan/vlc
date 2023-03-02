@@ -848,6 +848,7 @@ libqt_plugin_la_QML = \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
 	gui/qt/maininterface/qml/BannerSources.qml \
 	gui/qt/maininterface/qml/MainInterface.qml \
+	gui/qt/maininterface/qml/MainViewLoader.qml \
 	gui/qt/maininterface/qml/MainDisplay.qml \
 	gui/qt/maininterface/qml/MainGridView.qml \
 	gui/qt/maininterface/qml/MainTableView.qml \
