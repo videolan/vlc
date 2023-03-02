@@ -394,8 +394,6 @@ int vlc_demux_process_memory(const struct vlc_run_args *args,
 #ifdef HAVE_STATIC_MODULES
 # include <vlc_plugin.h>
 
-extern vlc_plugin_cb vlc_static_modules[];
-
 #ifdef HAVE_DECODERS
 #define DECODER_PLUGINS(f) \
     f(codec_adpcm) \
@@ -487,6 +485,8 @@ extern vlc_plugin_cb vlc_static_modules[];
 
 PLUGINS(DECL_PLUGIN)
 
-__attribute__((visibility("default")))
-vlc_plugin_cb vlc_static_modules[] = { PLUGINS(FUNC_PLUGIN) NULL };
+VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
+    PLUGINS(FUNC_PLUGIN)
+    NULL
+};
 #endif /* HAVE_STATIC_MODULES */

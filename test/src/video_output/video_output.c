@@ -284,8 +284,7 @@ vlc_module_begin()
 
 vlc_module_end()
 
-VLC_EXPORT const vlc_plugin_cb vlc_static_modules[];
-const vlc_plugin_cb vlc_static_modules[] = {
+VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
     VLC_SYMBOL(vlc_entry),
     NULL
 };

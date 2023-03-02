@@ -198,8 +198,10 @@ vlc_module_begin()
         set_capability("opengl es2 offscreen", 1)
 vlc_module_end()
 
-VLC_EXPORT vlc_plugin_cb
-vlc_static_modules[] = { vlc_entry__test_offscreen_mock, NULL };
+VLC_EXPORT vlc_plugin_cb vlc_static_modules[] = {
+    VLC_SYMBOL(vlc_entry),
+    NULL
+};
 
 static void test_opengl_offscreen(vlc_object_t *root, enum vlc_gl_api_type api_type)
 {

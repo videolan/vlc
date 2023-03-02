@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#undef VLC_DYNAMIC_PLUGINS
 
 #import <UIKit/UIKit.h>
 #include <vlc/vlc.h>
@@ -160,5 +161,7 @@ vlc_module_begin()
     set_callback(Open)
 vlc_module_end()
 
-__attribute__((visibility("default")))
-vlc_plugin_cb vlc_static_modules[] = { vlc_entry__ios_interface, NULL };
+VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
+    VLC_SYMBOL(vlc_entry),
+    NULL
+};
