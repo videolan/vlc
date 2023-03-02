@@ -403,7 +403,7 @@
 - (void)updateMuteVolumeButtonImage
 {
     _muteVolumeButton.image = _playerController.mute ?
-        imageFromRes(@"volume-low") : imageFromRes(@"volume-high");
+        imageFromRes(@"VLCVolumeOffTemplate") : imageFromRes(@"VLCVolumeOnTemplate");
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification
