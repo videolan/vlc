@@ -24,6 +24,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#define MODULE_NAME ios_interface
+#define MODULE_STRING "ios_interface"
 #undef VLC_DYNAMIC_PLUGINS
 
 #import <UIKit/UIKit.h>
@@ -154,8 +157,6 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-#define MODULE_NAME ios_interface
-#define MODULE_STRING "ios_interface"
 vlc_module_begin()
     set_capability("interface", 0)
     set_callback(Open)
