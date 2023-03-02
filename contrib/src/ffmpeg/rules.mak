@@ -6,8 +6,8 @@
 
 ifndef USE_LIBAV
 FFMPEG_HASH=71fb6132637a2a430375c24afc381fff8b854fe7
-FFMPEG_MAJVERSION := 4.4
-FFMPEG_REVISION := 5
+FFMPEG_MAJVERSION := 5.1
+FFMPEG_REVISION := 2
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
@@ -40,7 +40,6 @@ FFMPEGCONF = \
 	--disable-bsfs \
 	--disable-bzlib \
 	--disable-libvpx \
-	--disable-avresample \
 	--enable-bsf=vp9_superframe
 
 ifdef USE_FFMPEG
@@ -249,14 +248,10 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0003-avcodec-hevcdec-allow-HEVC-422-10-12-bits-decoding-w.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-fix-MediaFoundation-compilation-if-WINVER-was-forced.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
 	# replace Vista checks with XP SP1 checks so we don't actually change _WIN32_WINNT
 	sed -i.orig 's,< 0x0600,< 0x0501,g' $(UNPACK_DIR)/configure
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-dxva2_hevc-don-t-use-frames-as-reference-if-they-are.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-Replace-all-occurences-of-av_mallocz_array-by-av_cal.patch
-	$(APPLY) $(SRC)/ffmpeg/0002-compat-w32dlfcn.h-Remove-MAX_PATH-limit-and-replace-.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch

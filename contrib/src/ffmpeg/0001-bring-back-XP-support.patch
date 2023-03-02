@@ -1,6 +1,6 @@
-From 7a0e937637fe0544cfef85d5535230ffa6c718d8 Mon Sep 17 00:00:00 2001
+From 2ffa952b2a6db36269c9b1c90b6e4269ab8c6232 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
-Date: Tue, 8 Jun 2021 09:14:07 +0200
+Date: Fri, 3 Apr 2026 14:29:37 +0200
 Subject: [PATCH] bring back XP support
 
 Force bcrypt not to be used as it's not available on XP.
@@ -12,15 +12,15 @@ Other misdetected features mean you need this flags for proper XP support
 --disable-mediafoundation --disable-amf --disable-schannel
 ---
  configure         | 12 ++++++------
- libavformat/udp.c |  2 +-
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ libavformat/udp.c |  2 ++
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/configure b/configure
-index d7a3f507e8..589338f59b 100755
+index ba5793b2ff..ba7cb1cabd 100755
 --- a/configure
 +++ b/configure
-@@ -6188,7 +6188,7 @@ check_headers asm/types.h
- check_builtin stdatomic stdatomic.h "atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0); foo += bar"
+@@ -6336,7 +6336,7 @@ for LATOMIC in "-latomic" ""; do
+ done
  
  check_lib advapi32 "windows.h"            RegCloseKey          -ladvapi32
 -check_lib bcrypt   "windows.h bcrypt.h"   BCryptGenRandom      -lbcrypt &&
@@ -29,19 +29,19 @@ index d7a3f507e8..589338f59b 100755
  check_lib ole32    "windows.h"            CoTaskMemFree        -lole32
  check_lib shell32  "windows.h shellapi.h" CommandLineToArgvW   -lshell32
 diff --git a/libavformat/udp.c b/libavformat/udp.c
-index 9b9d3de197..2c881a30ca 100644
+index 3b36a4a094..760fc0b3d7 100644
 --- a/libavformat/udp.c
 +++ b/libavformat/udp.c
-@@ -64,6 +64,9 @@
- #if HAVE_W32THREADS
- #undef HAVE_PTHREAD_CANCEL
- #define HAVE_PTHREAD_CANCEL 1
-+#elif defined(_WIN32_WINNT) && _WIN32_WINNT < 0x600
-+#undef HAVE_PTHREAD_CANCEL // disable UDP threading as CancelIOEx is not on XP
-+#define HAVE_PTHREAD_CANCEL 0
+@@ -1122,7 +1122,9 @@ static int udp_close(URLContext *h)
+              * the socket and abort pending IO, subsequent recvfrom() calls
+              * will fail with WSAESHUTDOWN causing the thread to exit. */
+             shutdown(s->udp_fd, SD_RECEIVE);
++#if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
+             CancelIoEx((HANDLE)(SOCKET)s->udp_fd, NULL);
++#endif
+ #else
+             pthread_cancel(s->circular_buffer_thread);
  #endif
-
- #if HAVE_PTHREAD_CANCEL
 -- 
-2.27.0.windows.1
+2.52.0.windows.1
 
