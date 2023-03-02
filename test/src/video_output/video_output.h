@@ -20,10 +20,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define MODULE_NAME test_vout_mock
-#define MODULE_STRING "test_vout_mock"
-#undef VLC_DYNAMIC_PLUGIN
-
 #include <vlc_fourcc.h>
 #include <vlc_vout_display.h>
 

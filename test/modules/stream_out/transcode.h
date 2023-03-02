@@ -20,10 +20,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define MODULE_NAME test_transcode_mock
-#define MODULE_STRING "test_transcode_mock"
-#undef VLC_DYNAMIC_PLUGIN
-
 #include <vlc_fourcc.h>
 
 #define TEST_FLAG_CONVERTER 0x01

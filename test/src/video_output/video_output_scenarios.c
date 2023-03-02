@@ -24,10 +24,6 @@
 # include "config.h"
 #endif
 
-#define MODULE_NAME test_vout_mock
-#define MODULE_STRING "test_vout_mock"
-#undef VLC_DYNAMIC_PLUGIN
-
 #include <vlc_common.h>
 #include "video_output.h"
 
