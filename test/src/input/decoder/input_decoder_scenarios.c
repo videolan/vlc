@@ -26,7 +26,7 @@
 
 #define MODULE_NAME test_input_decoder_mock
 #define MODULE_STRING "test_input_decoder_mock"
-#undef __PLUGIN__
+#undef VLC_DYNAMIC_PLUGIN
 
 #include <vlc_common.h>
 #include <vlc_messages.h>

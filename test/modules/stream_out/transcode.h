@@ -22,7 +22,7 @@
 
 #define MODULE_NAME test_transcode_mock
 #define MODULE_STRING "test_transcode_mock"
-#undef __PLUGIN__
+#undef VLC_DYNAMIC_PLUGIN
 
 #include <vlc_fourcc.h>
 

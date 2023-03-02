@@ -282,7 +282,7 @@ foreach module : vlc_modules
 
     common_args = [
         '-DMODULE_STRING="@0@"'.format(module['name']),
-        '-D__PLUGIN__'
+        '-DVLC_DYNAMIC_PLUGIN'
     ]
 
     library(module['name'] + '_plugin',

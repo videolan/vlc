@@ -27,7 +27,7 @@
 /* Define a builtin module for mocked parts */
 #define MODULE_NAME test_misc_image_cvpx
 #define MODULE_STRING "test_misc_image_cvpx"
-#undef __PLUGIN__
+#undef VLC_DYNAMIC_PLUGIN
 const char vlc_module_name[] = MODULE_STRING;
 
 #include "../../libvlc/test.h"

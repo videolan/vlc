@@ -27,7 +27,7 @@
 /* Define a builtin module for mocked parts */
 #define MODULE_NAME test_transcode_mock
 #define MODULE_STRING "test_transcode_mock"
-#undef __PLUGIN__
+#undef VLC_DYNAMIC_PLUGIN
 
 static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
 

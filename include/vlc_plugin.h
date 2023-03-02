@@ -242,7 +242,7 @@ enum vlc_config_subcat
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
-#ifdef __PLUGIN__
+#ifdef VLC_DYNAMIC_PLUGIN
 # define VLC_SYMBOL(symbol) symbol
 # define VLC_MODULE_NAME_HIDDEN_SYMBOL \
     EXTERN_SYMBOL const char vlc_module_name[] = MODULE_STRING;
@@ -252,7 +252,7 @@ enum vlc_config_subcat
 #endif
 
 #define CDECL_SYMBOL
-#if defined (__PLUGIN__)
+#if defined (VLC_DYNAMIC_PLUGIN)
 # if defined (_WIN32)
 #   define DLL_SYMBOL              __declspec(dllexport)
 #   undef CDECL_SYMBOL
@@ -407,7 +407,7 @@ VLC_METADATA_EXPORTS
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
 
-#ifndef __PLUGIN__
+#ifndef VLC_DYNAMIC_PLUGIN
 #define add_category_hint(text, longtext) \
     add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
 #endif
@@ -438,7 +438,7 @@ VLC_METADATA_EXPORTS
     add_string_inner(CONFIG_ITEM_MODULE_LIST, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, VLC_CHECKED_TYPE(const char *, cap));
 
-#ifndef __PLUGIN__
+#ifndef VLC_DYNAMIC_PLUGIN
 #define add_module_cat(name, subcategory, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_CAT, name, text, longtext, value) \
     change_integer_range (subcategory /* gruik */, 0);

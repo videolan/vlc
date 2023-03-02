@@ -20,7 +20,7 @@ MODULE_NAME = $$(p="$@"; p=$$(echo "$$p"|sed 's/lib//g'); p="$${p%_plugin*}"; p=
 
 AM_CPPFLAGS = -DMODULE_STRING=\"$(MODULE_STRING)\"
 if HAVE_DYNAMIC_PLUGINS
-AM_CPPFLAGS += -D__PLUGIN__
+AM_CPPFLAGS += -DVLC_DYNAMIC_PLUGIN
 else
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
 endif
