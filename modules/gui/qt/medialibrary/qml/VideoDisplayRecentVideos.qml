@@ -47,8 +47,8 @@ FocusScope {
 
     // Functions
 
-    function _actionAtIndex(index) {
-        MediaLib.addAndPlay( model.getIdForIndexes(index), [":restore-playback-pos=2"] )
+    function _play(id) {
+        MediaLib.addAndPlay( id, [":restore-playback-pos=2"] )
         g_mainDisplay.showPlayer()
     }
 
@@ -158,13 +158,14 @@ FocusScope {
 
                 function play() {
                     if (model.id !== undefined) {
-                        MediaLib.addAndPlay( model.id, [":restore-playback-pos=2"] )
-                        g_mainDisplay.showPlayer()
+                        root._play(model.id)
                     }
                 }
             }
 
-            onActionAtIndex: root._actionAtIndex(index)
+            onActionAtIndex: {
+                root._play(model.getIdForIndex(index))
+            }
         }
 
         Widgets.SubtitleLabel {
