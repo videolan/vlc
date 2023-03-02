@@ -29,10 +29,6 @@
 #define MODULE_STRING "test_transcode_mock"
 #undef VLC_DYNAMIC_PLUGIN
 
-static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
-
-const char vlc_module_name[] = MODULE_STRING;
-
 #include "../../libvlc/test.h"
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -50,6 +46,11 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <limits.h>
 
 #include "transcode.h"
+
+static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
+
+const char vlc_module_name[] = MODULE_STRING;
+
 static size_t current_scenario = 0;
 
 static vlc_cond_t player_cond = VLC_STATIC_COND;

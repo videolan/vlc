@@ -28,7 +28,6 @@
 #define MODULE_NAME test_misc_image_cvpx
 #define MODULE_STRING "test_misc_image_cvpx"
 #undef VLC_DYNAMIC_PLUGIN
-const char vlc_module_name[] = MODULE_STRING;
 
 #include "../../libvlc/test.h"
 #include "../../../modules/codec/vt_utils.h"
@@ -42,6 +41,8 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_block.h>
 
 #include <limits.h>
+
+const char vlc_module_name[] = MODULE_STRING;
 
 static int OpenIntf(vlc_object_t *root)
 {

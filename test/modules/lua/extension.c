@@ -28,7 +28,6 @@
 #define MODULE_NAME test_lua_extension
 #define MODULE_STRING "test_lua_extension"
 #undef VLC_DYNAMIC_PLUGIN
-const char vlc_module_name[] = MODULE_STRING;
 
 #include "../../libvlc/test.h"
 
@@ -44,6 +43,8 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <vlc_input_item.h>
 
 #include <limits.h>
+
+const char vlc_module_name[] = MODULE_STRING;
 
 static int exitcode = 0;
 

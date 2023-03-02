@@ -29,10 +29,6 @@
 #define MODULE_STRING "test_vout_mock"
 #undef VLC_DYNAMIC_PLUGIN
 
-static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
-
-const char vlc_module_name[] = MODULE_STRING;
-
 #include "../../libvlc/test.h"
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -48,6 +44,11 @@ const char vlc_module_name[] = MODULE_STRING;
 #include <limits.h>
 
 #include "video_output.h"
+
+static const char dec_dev_arg[] = "--dec-dev=" MODULE_STRING;
+
+const char vlc_module_name[] = MODULE_STRING;
+
 static size_t current_scenario;
 
 static void DecoderDeviceClose(struct vlc_decoder_device *device)
