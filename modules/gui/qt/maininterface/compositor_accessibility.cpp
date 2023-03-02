@@ -27,6 +27,7 @@
 #include <private/qquickitem_p.h>
 
 #include "compositor_accessibility.hpp"
+#include "compositor.hpp"
 
 #ifdef HAVE_DCOMP_H
 #  include "compositor_dcomp_uisurface.hpp"

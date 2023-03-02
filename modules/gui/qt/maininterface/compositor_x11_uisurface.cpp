@@ -23,13 +23,17 @@
 #include <QOffscreenSurface>
 
 #include "compositor_x11_uisurface.hpp"
+#include "compositor_common.hpp"
 
 using namespace vlc;
 
 CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     : QWindow(screen)
+    , m_renderWindow(window)
 {
     setSurfaceType(QWindow::OpenGLSurface);
+
+    m_renderWindow->installEventFilter(this);
 
     QSurfaceFormat format;
     // Qt Quick may need a depth and stencil buffer. Always make sure these are available.
@@ -71,6 +75,8 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
 
 CompositorX11UISurface::~CompositorX11UISurface()
 {
+    m_renderWindow->removeEventFilter(this);
+
     auto surface = new QOffscreenSurface();
     surface->setFormat(m_context->format());
     surface->create();
@@ -107,6 +113,11 @@ void CompositorX11UISurface::setContent(QQmlComponent*,  QQuickItem* rootItem)
 QQuickItem * CompositorX11UISurface::activeFocusItem() const /* override */
 {
     return m_uiWindow->activeFocusItem();
+}
+
+QQuickWindow* CompositorX11UISurface::getOffscreenWindow() const
+{
+    return m_uiWindow;
 }
 
 void CompositorX11UISurface::createFbo()
@@ -191,7 +202,7 @@ static void remapInputMethodQueryEvent(QObject *object, QInputMethodQueryEvent *
     }
 }
 
-bool CompositorX11UISurface::handleWindowEvent(QEvent *event)
+bool CompositorX11UISurface::eventFilter(QObject*, QEvent *event)
 {
     switch (event->type())
     {

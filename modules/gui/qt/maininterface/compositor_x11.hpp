@@ -49,7 +49,7 @@ public:
 
     inline Type type() const override { return X11Compositor; };
 
-    inline QWindow* interfaceMainWindow() const override { return m_interfaceWindow; };
+    QWindow* interfaceMainWindow() const override;
 
     QQuickItem * activeFocusItem() const override;
 
@@ -62,7 +62,6 @@ private slots:
     void onSurfaceSizeChanged(const QSizeF& size) override;
 
 private:
-    QWindow* m_interfaceWindow = nullptr;
     xcb_connection_t* m_conn = nullptr;
 
     std::unique_ptr<QWidget> m_videoWidget;

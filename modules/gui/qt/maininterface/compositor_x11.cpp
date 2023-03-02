@@ -158,13 +158,14 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     if (!m_renderWindow->init())
         return false;
 
-    m_videoWidget = std::make_unique<DummyNativeWidget>(m_renderWindow.get());
+    m_videoWidget = std::make_unique<DummyNativeWidget>();
     // widget would normally require WindowTransparentForInput, without this
     // we end up with an invisible area within our window that grabs our mouse events.
     // But using this this causes rendering issues with some VoutDisplay
     // (xcb_render for instance) instead, we manually, set a null input region afterwards
     // see setTransparentForMouseEvent
     m_videoWidget->winId();
+    m_videoWidget->windowHandle()->setParent(m_renderWindow.get());
 
     //update manually EventMask as we don't use WindowTransparentForInput
     const uint32_t mask = XCB_CW_EVENT_MASK;
@@ -174,18 +175,16 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     setTransparentForMouseEvent(QX11Info::connection(), m_videoWidget->winId());
     m_videoWidget->show();
 
-    m_interfaceWindow = m_renderWindow->getWindow();
-
-    m_qmlView = std::make_unique<CompositorX11UISurface>(m_interfaceWindow);
+    m_qmlView = std::make_unique<CompositorX11UISurface>(m_renderWindow.get());
     m_qmlView->setFlag(Qt::WindowType::WindowTransparentForInput);
-    m_qmlView->setParent(m_interfaceWindow);
+    m_qmlView->setParent(m_renderWindow.get());
     m_qmlView->winId();
     m_qmlView->show();
 
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP;
     if (m_renderWindow->hasAcrylic())
         flags |= CompositorVideo::HAS_ACRYLIC;
-    commonGUICreate(m_interfaceWindow, m_renderWindow.get(), m_qmlView.get(), flags);
+    commonGUICreate(m_renderWindow.get(), nullptr, m_qmlView.get(), flags);
 
     m_renderWindow->setInterfaceWindow(m_qmlView.get());
     m_renderWindow->setVideoWindow(m_videoWidget->windowHandle());
@@ -226,6 +225,8 @@ bool CompositorX11::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb
     commonSetupVoutWindow(p_wnd, destroyCb);
     return true;
 }
+
+QWindow* CompositorX11::interfaceMainWindow() const { return m_renderWindow.get(); }
 
 QQuickItem * CompositorX11::activeFocusItem() const /* override */
 {

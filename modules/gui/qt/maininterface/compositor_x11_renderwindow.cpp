@@ -318,40 +318,23 @@ void X11DamageObserver::onEvent()
 
 //// CompositorX11RenderWindow
 
-CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWidget* parent)
-    : QMainWindow(parent)
+CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWindow* parent)
+    : DummyRenderWindow(parent)
     , m_intf(p_intf)
     , m_conn(conn)
 {
-    setAcceptDrops(true);
-    setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setAttribute(Qt::WA_NoSystemBackground);
-    setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_MouseTracking);
-
     if (useCSD)
-        setWindowFlag(Qt::FramelessWindowHint);
-
-    m_stable = new DummyNativeWidget(this);
-    m_stable->winId();
-    setTransparentForMouseEvent(QX11Info::connection(), m_stable->winId());
-
-    setCentralWidget(m_stable);
+        setFlag(Qt::FramelessWindowHint);
 
     winId();
     show();
 
-    m_window = window()->windowHandle();
     m_wid = winId();
 }
 
 CompositorX11RenderWindow::~CompositorX11RenderWindow()
 {
     stopRendering();
-
-    removeEventFilter(this);
-    m_window->removeEventFilter(this);
 }
 
 bool CompositorX11RenderWindow::init()
@@ -377,11 +360,6 @@ bool CompositorX11RenderWindow::init()
                             blurBehindAtom, XCB_ATOM_CARDINAL, 32, 1, &val);
         m_hasAcrylic = true;
     }
-
-    //install event filters
-    installEventFilter(this);
-    m_window->installEventFilter(this);
-
     return true;
 }
 
@@ -390,7 +368,7 @@ bool CompositorX11RenderWindow::startRendering()
     assert(m_interfaceWindow);
 
     //Rendering thread
-    m_renderTask = new RenderTask(m_intf, m_conn, m_stable->effectiveWinId(), m_pictureLock);
+    m_renderTask = new RenderTask(m_intf, m_conn, m_wid, m_pictureLock);
     m_renderThread = new QThread(this);
 
     m_renderTask->moveToThread(m_renderThread);
@@ -409,7 +387,7 @@ bool CompositorX11RenderWindow::startRendering()
     //pass initial values
     m_renderTask->onInterfaceSurfaceChanged(m_interfaceClient.get());
     m_renderTask->onVideoSurfaceChanged(m_videoClient.get());
-    m_renderTask->onWindowSizeChanged(size() * devicePixelRatioF());
+    m_renderTask->onWindowSizeChanged(size() * devicePixelRatio());
     m_renderTask->onAcrylicChanged(m_hasAcrylic);
 
     //use the same thread as the rendering thread, neither tasks are blocking.
@@ -457,61 +435,33 @@ void CompositorX11RenderWindow::resetClientPixmaps()
     }
 }
 
-bool CompositorX11RenderWindow::eventFilter(QObject* obj, QEvent* event)
+void CompositorX11RenderWindow::exposeEvent(QExposeEvent* event)
 {
-    bool ret = false;
-    bool needRefresh = false;
+    DummyRenderWindow::exposeEvent(event);
+    resetClientPixmaps();
+    emit requestUIRefresh();
+}
 
-    //event on the window
-    if (obj == m_window)
-    {
-        //window may get resized without the widget knowing about it
-        if (event->type() == QEvent::Resize)
-        {
-            auto resizeEvent = static_cast<QResizeEvent*>(event);
-            if (m_interfaceWindow)
-                m_interfaceWindow->handleWindowEvent(event);
-            resetClientPixmaps();
-            emit windowSizeChanged(resizeEvent->size() * devicePixelRatioF());
-            needRefresh = true;
-        }
-    }
-    else
-    {
-        assert(obj == this);
-        if (event->type() == QEvent::Resize)
-            return false;
+void CompositorX11RenderWindow::resizeEvent(QResizeEvent* event)
+{
+    DummyRenderWindow::resizeEvent(event);
+    resetClientPixmaps();
+    emit windowSizeChanged(event->size() * devicePixelRatio());
+    emit requestUIRefresh();
+}
 
-        if (m_interfaceWindow)
-            ret =  m_interfaceWindow->handleWindowEvent(event);
+void CompositorX11RenderWindow::showEvent(QShowEvent* event)
+{
+    DummyRenderWindow::showEvent(event);
+    resetClientPixmaps();
+    emit visiblityChanged(true);
+    emit requestUIRefresh();
+}
 
-        switch (event->type())
-        {
-        case QEvent::Expose:
-        {
-            resetClientPixmaps();
-            needRefresh = true;
-            break;
-        }
-        case QEvent::Show:
-        {
-            resetClientPixmaps();
-            needRefresh = true;
-            emit visiblityChanged(true);
-            break;
-        }
-        case QEvent::Hide:
-            emit visiblityChanged(false);
-            break;
-        default:
-            break;
-        }
-    }
-
-    if (needRefresh)
-        emit requestUIRefresh();
-
-    return ret;
+void CompositorX11RenderWindow::hideEvent(QHideEvent* event)
+{
+    DummyRenderWindow::hideEvent(event);
+    emit visiblityChanged(false);
 }
 
 void CompositorX11RenderWindow::setVideoPosition(const QPoint& position)
@@ -535,7 +485,7 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
             m_videoClient->resetPixmap();
             m_videoClient->getPicture();
         }
-        m_videoPosition.setSize(size * devicePixelRatioF());
+        m_videoPosition.setSize(size * devicePixelRatio());
         emit videoPositionChanged(m_videoPosition);
     }
 }
