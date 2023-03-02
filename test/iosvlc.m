@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#undef VLC_DYNAMIC_PLUGINS
 
 #define MODULE_NAME ios_interface
 #define MODULE_STRING "ios_interface"

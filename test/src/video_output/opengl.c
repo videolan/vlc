@@ -199,7 +199,7 @@ vlc_module_begin()
         set_callback_opengl_es2_offscreen(OpenOpenGLESOffscreen, 1)
 vlc_module_end()
 
-VLC_EXPORT vlc_plugin_cb vlc_static_modules[] = {
+VLC_EXPORT const vlc_plugin_cb vlc_static_modules[] = {
     VLC_SYMBOL(vlc_entry),
     NULL
 };
