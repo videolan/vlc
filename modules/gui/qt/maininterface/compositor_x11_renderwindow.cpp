@@ -23,6 +23,9 @@
 #include <QMainWindow>
 #include <QThread>
 #include <QSocketNotifier>
+#ifndef QT_NO_ACCESSIBILITY
+#include <QAccessible>
+#endif
 
 #include <xcb/composite.h>
 
@@ -79,7 +82,6 @@ void RenderTask::render(unsigned int requestId)
         xcb_render_fill_rectangles(m_conn, XCB_RENDER_PICT_OP_SRC, drawingarea,
                                    clear, 1, &rect);
     }
-
 
     {
         QMutexLocker lock(&m_pictureLock);
@@ -508,6 +510,11 @@ void CompositorX11RenderWindow::enableVideoWindow()
 void CompositorX11RenderWindow::disableVideoWindow()
 {
     emit registerVideoWindow(0);
+}
+
+QQuickWindow* CompositorX11RenderWindow::getOffscreenWindow() const
+{
+    return m_interfaceWindow->getOffscreenWindow();
 }
 
 void CompositorX11RenderWindow::setInterfaceWindow(CompositorX11UISurface* window)

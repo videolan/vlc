@@ -39,9 +39,11 @@
 
 #include "compositor_x11_utils.hpp"
 #include "compositor_common.hpp"
+#include "compositor_accessibility.hpp"
 
 class QWidget;
 class QSocketNotifier;
+class QAccessibleInterface;
 
 namespace vlc {
 
@@ -145,7 +147,7 @@ public:
     QSocketNotifier* m_socketNotifier = nullptr;
 };
 
-class CompositorX11RenderWindow : public DummyRenderWindow
+class CompositorX11RenderWindow : public DummyRenderWindow, public AccessibleRenderWindow
 {
     Q_OBJECT
 public:
@@ -167,6 +169,8 @@ public:
 
     void enableVideoWindow();
     void disableVideoWindow();
+
+    QQuickWindow* getOffscreenWindow() const override;
 
 signals:
     void windowSizeChanged(const QSize& newSize);

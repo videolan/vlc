@@ -25,6 +25,7 @@
 #include "interface_window_handler.hpp"
 #include "video_window_handler.hpp"
 #include "mainui.hpp"
+#include "compositor_accessibility.hpp"
 
 using namespace vlc;
 
@@ -144,6 +145,10 @@ bool CompositorX11::init()
             return false;
         }
     }
+
+#if !defined(QT_NO_ACCESSIBILITY) && defined(QT5_DECLARATIVE_PRIVATE)
+    QAccessible::installFactory(&compositionAccessibleFactory);
+#endif
 
     return true;
 }
