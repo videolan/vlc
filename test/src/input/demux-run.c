@@ -480,10 +480,10 @@ extern vlc_plugin_cb vlc_static_modules[];
 #endif
 
 #define DECL_PLUGIN(p) \
-    int vlc_entry__##p(int (*)(void *, void *, int, ...), void *);
+    vlc_plugin_cb CONCATENATE(vlc_entry,p);
 
 #define FUNC_PLUGIN(p) \
-    vlc_entry__##p,
+    CONCATENATE(vlc_entry,p),
 
 PLUGINS(DECL_PLUGIN)
 
