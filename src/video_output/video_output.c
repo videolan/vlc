@@ -2198,20 +2198,25 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (vout_Start(vout, vctx, cfg))
     {
         msg_Err(cfg->vout, "video output display creation failed");
-        vout_DisableWindow(vout);
-        return -1;
+        goto error_display;
     }
     atomic_store(&sys->control_is_terminated, false);
-    if (vlc_clone(&sys->thread, Thread, vout)) {
-        vout_ReleaseDisplay(vout);
-        vout_DisableWindow(vout);
-        return -1;
-    }
+    if (vlc_clone(&sys->thread, Thread, vout))
+        goto error_thread;
 
     if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
     vout_IntfReinit(cfg->vout);
     return 0;
+
+error_thread:
+    vout_ReleaseDisplay(vout);
+error_display:
+    vout_DisableWindow(vout);
+    vlc_mutex_lock(&sys->clock_lock);
+    sys->clock = NULL;
+    vlc_mutex_unlock(&sys->clock_lock);
+    return -1;
 }
 
 vlc_decoder_device *vout_GetDevice(vout_thread_t *vout)
