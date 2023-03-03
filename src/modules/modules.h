@@ -69,9 +69,6 @@ extern struct vlc_plugin_t *vlc_plugins;
 /** Plugin deactivation callback */
 typedef void (*vlc_deactivate_cb)(vlc_object_t*);
 
-/** Core module */
-int vlc_entry__core (vlc_set_cb, void *);
-
 /**
  * Internal module descriptor
  */
