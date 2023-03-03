@@ -189,6 +189,9 @@
                                     <constraint firstItem="3ri-8b-8mw" firstAttribute="top" secondItem="qNZ-Fh-W8i" secondAttribute="bottom" constant="5" id="jze-EU-1TL"/>
                                     <constraint firstItem="sJu-ZK-5QH" firstAttribute="bottom" secondItem="qNZ-Fh-W8i" secondAttribute="top" constant="-5" id="xsM-6a-gdn"/>
                                 </constraints>
+                                <shadow key="shadow" blurRadius="2">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
                             </customView>
                             <stackView wantsLayer="YES" distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CvV-yX-Nbh">
                                 <rect key="frame" x="260" y="208" width="200" height="64"/>
