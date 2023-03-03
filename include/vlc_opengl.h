@@ -49,6 +49,8 @@ enum vlc_gl_api_type {
     VLC_OPENGL_ES2,
 };
 
+typedef int (*vlc_gl_activate)(vlc_gl_t *, unsigned width, unsigned height);
+
 struct vlc_gl_operations
 {
     union {
