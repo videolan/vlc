@@ -58,13 +58,12 @@
                                     <constraint firstAttribute="width" constant="32" id="cjt-DQ-vMP"/>
                                 </constraints>
                                 <shadow key="shadow" blurRadius="2">
-                                    <size key="offset" width="1" height="1"/>
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </shadow>
                                 <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="CU4-UE-tsW">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <imageReference key="image" image="chevron.left.circle" catalog="system" symbolScale="large"/>
+                                    <imageReference key="image" image="rectangle.grid.2x2.fill" catalog="system" symbolScale="large"/>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
@@ -78,7 +77,6 @@
                                     <constraint firstAttribute="width" secondItem="Drq-if-dw4" secondAttribute="height" multiplier="1:1" id="cVK-cW-Opa"/>
                                 </constraints>
                                 <shadow key="shadow" blurRadius="2">
-                                    <size key="offset" width="1" height="1"/>
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </shadow>
                                 <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="VDP-ql-lW8">
@@ -322,10 +320,10 @@
         <image name="NSEnterFullScreenTemplate" width="20" height="18"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
         <image name="backward.fill" catalog="system" width="20" height="12"/>
-        <image name="chevron.left.circle" catalog="system" width="19" height="19"/>
         <image name="forward.fill" catalog="system" width="20" height="12"/>
         <image name="music.note.list" catalog="system" width="21" height="19"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
+        <image name="rectangle.grid.2x2.fill" catalog="system" width="23" height="17"/>
         <image name="volume.3.fill" catalog="system" width="22" height="15"/>
     </resources>
 </document>
