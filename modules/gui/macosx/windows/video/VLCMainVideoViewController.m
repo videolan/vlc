@@ -234,11 +234,6 @@
     _returnButtonBottomConstraint.active = placeInFakeToolbar;
     _playlistButtonBottomConstraint.active = placeInFakeToolbar;
 
-    const NSRect windowButtonBox = [self windowButtonsRect];
-
-    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + [VLCLibraryUIUnits mediumSpacing] : [VLCLibraryUIUnits largeSpacing];
-    _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? buttonTopSpace : [VLCLibraryUIUnits largeSpacing];
-
     NSControlSize buttonSize = NSControlSizeRegular;
 
     if (@available(macOS 11.0, *)) {
@@ -253,6 +248,12 @@
 
     _returnButton.controlSize = buttonSize;
     _playlistButton.controlSize = buttonSize;
+
+    const CGFloat realButtonSpace = (windowTitlebarHeight - _playlistButton.cell.cellSize.height) / 2;
+    const NSRect windowButtonBox = [self windowButtonsRect];
+
+    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + [VLCLibraryUIUnits mediumSpacing] + realButtonSpace : [VLCLibraryUIUnits largeSpacing];
+    _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: [VLCLibraryUIUnits largeSpacing];
 }
 
 - (IBAction)togglePlaylist:(id)sender
