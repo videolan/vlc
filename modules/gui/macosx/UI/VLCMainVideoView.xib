@@ -259,14 +259,14 @@
                                 </customSpacing>
                             </stackView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
-                                <rect key="frame" x="20" y="431" width="33" height="29"/>
+                                <rect key="frame" x="20" y="431" width="22" height="29"/>
                                 <shadow key="shadow" blurRadius="2">
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </shadow>
-                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="CU4-UE-tsW">
+                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CU4-UE-tsW">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <imageReference key="image" image="rectangle.grid.2x2.fill" catalog="system" symbolScale="large"/>
+                                    <imageReference key="image" image="NSLeftFacingTriangleTemplate" symbolScale="large"/>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
@@ -278,13 +278,12 @@
                                 <shadow key="shadow" blurRadius="2">
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </shadow>
-                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="VDP-ql-lW8">
+                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VDP-ql-lW8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                     <font key="font" metaFont="system"/>
-                                    <imageReference key="image" image="music.note.list" catalog="system" symbolScale="large"/>
+                                    <imageReference key="image" image="NSListViewTemplate" symbolScale="large"/>
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
-                                <symbolConfiguration key="symbolConfiguration" weight="ultraLight"/>
                                 <connections>
                                     <action selector="togglePlaylist:" target="-2" id="WrP-vg-etw"/>
                                 </connections>
@@ -323,12 +322,12 @@
     </objects>
     <resources>
         <image name="NSEnterFullScreenTemplate" width="20" height="18"/>
+        <image name="NSLeftFacingTriangleTemplate" width="12" height="16"/>
+        <image name="NSListViewTemplate" width="21" height="14"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
         <image name="backward.fill" catalog="system" width="20" height="12"/>
         <image name="forward.fill" catalog="system" width="20" height="12"/>
-        <image name="music.note.list" catalog="system" width="21" height="19"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
-        <image name="rectangle.grid.2x2.fill" catalog="system" width="23" height="17"/>
         <image name="volume.3.fill" catalog="system" width="22" height="15"/>
     </resources>
 </document>
