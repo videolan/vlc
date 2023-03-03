@@ -167,6 +167,29 @@
     }
 }
 
+- (NSRect)windowButtonsRect
+{
+    NSWindow * const window = self.view.window;
+    NSRect buttonBox = NSZeroRect;
+
+    NSButton * const closeButton = [window standardWindowButton:NSWindowCloseButton];
+    if (closeButton) {
+        buttonBox = NSUnionRect(buttonBox, closeButton.frame);
+    }
+
+    NSButton * const minimizeButton = [window standardWindowButton:NSWindowMiniaturizeButton];
+    if (minimizeButton) {
+        buttonBox = NSUnionRect(buttonBox, minimizeButton.frame);
+    }
+
+    NSButton * const zoomButton = [window standardWindowButton:NSWindowZoomButton];
+    if (zoomButton) {
+        buttonBox = NSUnionRect(buttonBox, zoomButton.frame);
+    }
+
+    return buttonBox;
+}
+
 - (void)updateLibraryControlsTopConstraint
 {
     if (!_displayLibraryControls) {
