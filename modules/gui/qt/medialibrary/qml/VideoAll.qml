@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2021 VLC authors and VideoLAN
+ * Copyright (C) 2021-23 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,23 +30,19 @@ import "qrc:///util/"    as Util
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-FocusScope {
+MainInterface.MainViewLoader {
     id: root
 
     // Properties
 
-    readonly property int contentMargin: (_currentView) ? _currentView.contentLeftMargin : 0
+    readonly property int contentMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
 
     // NOTE: Specify an optional header for the view.
     property Component header: null
 
-    property Item headerItem: (_currentView) ? _currentView.headerItem : null
+    property Item headerItem: Helpers.get(currentItem, "headerItem", null)
 
-    readonly property int currentIndex: _currentView.currentIndex
-
-    property int initialIndex: 0
-
-    /* required */ property var model
+    readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
 
     // NOTE: The ContextMenu depends on the model so we have to provide it too.
     /* required */ property var contextMenu
@@ -56,69 +52,12 @@ FocusScope {
         { text: I18n.qtr("Duration"),   criteria: "duration" }
     ]
 
-    // Aliases
-
-    property alias leftPadding: view.leftPadding
-    property alias rightPadding: view.rightPadding
-
     property alias dragItem: dragItem
 
-    // Private
+    list: list
+    grid: grid
+    emptyLabel: emptylabel
 
-    property alias _currentView: view.currentItem
-
-    // Events
-
-    onModelChanged: resetFocus()
-
-    onInitialIndexChanged: resetFocus()
-
-    // Connections
-
-    Connections {
-        target: MainCtx
-
-        onGridViewChanged: {
-            if (MainCtx.gridView) view.replace(grid)
-            else                  view.replace(list)
-        }
-    }
-
-    Connections {
-        target: model
-
-        onCountChanged: {
-            if (model.count === 0 || modelSelect.hasSelection)
-                return;
-
-            resetFocus();
-        }
-    }
-
-    // Functions
-
-    function setCurrentItemFocus(reason) {
-        _currentView.setCurrentItemFocus(reason);
-    }
-
-    function resetFocus() {
-        if (!model || model.count === 0) return
-
-        var initialIndex = root.initialIndex
-
-        if (initialIndex >= model.count)
-            initialIndex = 0
-
-        modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-
-        if (_currentView) {
-            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
-
-            // Table View require this for focus handling
-            if (!MainCtx.gridView)
-                _currentView.currentIndex = initialIndex
-        }
-    }
 
     function getLabel(model) {
         if (!model) return ""
@@ -159,30 +98,13 @@ FocusScope {
     }
 
     function _onNavigationCancel() {
-        if (_currentView.currentIndex <= 0) {
+        if (currentItem.currentIndex <= 0) {
             Navigation.defaultNavigationCancel()
         } else {
-            _currentView.currentIndex = 0
+            currentItem.currentIndex = 0
 
-            _currentView.positionViewAtIndex(0, ItemView.Contain)
+            currentItem.positionViewAtIndex(0, ItemView.Contain)
         }
-    }
-
-    // Children
-
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.View
-    }
-
-    Widgets.StackViewExt {
-        id: view
-
-        anchors.fill: parent
-
-        focus: (model.count !== 0)
-
-        initialItem: (MainCtx.gridView) ? grid : list
     }
 
     Widgets.MLDragItem {
@@ -190,17 +112,11 @@ FocusScope {
 
         mlModel: root.model
 
-        indexes: modelSelect.selectedIndexes
+        indexes: selectionModel.selectedIndexes
 
         coverRole: "thumbnail"
 
         defaultCover: VLCStyle.noArtVideoCover
-    }
-
-    Util.SelectableDelegateModel {
-        id: modelSelect
-
-        model: root.model
     }
 
     Component {
@@ -218,7 +134,7 @@ FocusScope {
 
             model: root.model
 
-            selectionDelegateModel: modelSelect
+            selectionDelegateModel: selectionModel
 
             headerDelegate: root.header
 
@@ -236,16 +152,16 @@ FocusScope {
             // Events
 
             // NOTE: Define the initial position and selection. This is done on activeFocus rather
-            //       than Component.onCompleted because modelSelect.selectedGroup update itself
+            //       than Component.onCompleted because selectionModel.selectedGroup update itself
             //       after this event.
             onActiveFocusChanged: {
-                if (activeFocus == false || model.count === 0 || modelSelect.hasSelection)
+                if (activeFocus == false || model.count === 0 || selectionModel.hasSelection)
                     return;
 
                 resetFocus() // restores initialIndex
             }
 
-            onActionAtIndex: root.onAction(modelSelect.selectedIndexes)
+            onActionAtIndex: root.onAction(selectionModel.selectedIndexes)
 
             // Connections
 
@@ -296,7 +212,7 @@ FocusScope {
                     if (root.isInfoExpandPanelAvailable(model))
                         options["information"] = index
 
-                    root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos, options);
+                    root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, options);
                 }
 
                 // Animations
@@ -336,7 +252,7 @@ FocusScope {
 
             model: root.model
 
-            selectionDelegateModel: modelSelect
+            selectionDelegateModel: selectionModel
 
             dragItem: root.dragItem
 
@@ -359,13 +275,13 @@ FocusScope {
 
             // Events
 
-            onActionForSelection: root.onAction(modelSelect.selectedIndexes)
+            onActionForSelection: root.onAction(selectionModel.selectedIndexes)
 
             onItemDoubleClicked: root.onDoubleClick(model)
 
-            onContextMenuButtonClicked: root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
+            onContextMenuButtonClicked: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
-            onRightClick: root.contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
+            onRightClick: root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
             // Functions
 
@@ -373,20 +289,20 @@ FocusScope {
         }
     }
 
-    EmptyLabelButton {
-        anchors.fill: parent
+    Component {
+        id: emptylabel
 
-        coverWidth : VLCStyle.dp(182, VLCStyle.scale)
-        coverHeight: VLCStyle.dp(114, VLCStyle.scale)
+        EmptyLabelButton {
+            coverWidth : VLCStyle.dp(182, VLCStyle.scale)
+            coverHeight: VLCStyle.dp(114, VLCStyle.scale)
 
-        visible: model.isReady && (model.count <= 0)
+            focus: true
 
-        focus: visible
+            text: I18n.qtr("No video found\nPlease try adding sources, by going to the Browse tab")
 
-        text: I18n.qtr("No video found\nPlease try adding sources, by going to the Browse tab")
+            cover: VLCStyle.noArtVideoCover
 
-        cover: VLCStyle.noArtVideoCover
-
-        Navigation.parentItem: root
+            Navigation.parentItem: root
+        }
     }
 }

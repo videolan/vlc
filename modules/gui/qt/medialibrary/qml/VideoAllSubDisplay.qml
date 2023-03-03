@@ -91,7 +91,7 @@ VideoAll {
         if (headerItem && headerItem.focus)
             headerItem.forceActiveFocus(reason)
         else
-            _currentView.setCurrentItemFocus(reason)
+            currentItem.setCurrentItemFocus(reason)
     }
 
     // VideoAll events reimplementation
@@ -234,7 +234,7 @@ VideoAll {
         Navigation.parentItem: root
 
         Navigation.downAction: function() {
-            _currentView.setCurrentItemFocus(Qt.TabFocusReason);
+            currentItem.setCurrentItemFocus(Qt.TabFocusReason)
         }
 
         onImplicitHeightChanged: {
