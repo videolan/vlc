@@ -600,12 +600,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
                 unsigned width, unsigned height,
                 const struct vlc_gl_cfg *gl_cfg)
 {
-    if (gl_cfg->need_alpha)
-    {
-        msg_Err(gl, "Cannot support alpha yet");
-        return VLC_ENOTSUP;
-    }
-
     InitEGL();
 
     int ret = VLC_EGENERIC;
@@ -651,6 +645,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         EGL_RED_SIZE, 5,
         EGL_GREEN_SIZE, 5,
         EGL_BLUE_SIZE, 5,
+        EGL_ALPHA_SIZE, gl_cfg->need_alpha ? 5 : 0,
         EGL_RENDERABLE_TYPE, api->render_bit,
         EGL_NONE
     };
