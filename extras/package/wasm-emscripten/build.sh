@@ -197,7 +197,7 @@ FUN_LIST=""
 for file in "$BUILD_PATH"/modules/.libs/*plugin.a
 do
     ENTRY=$(get_entryname "$file")
-    FUN_PROTOS="$FUN_PROTOS""int $ENTRY (int (*)(void *, void *, int, ...), void *);\n"
+    FUN_PROTOS="$FUN_PROTOS""VLC_ENTRY_FUNC($ENTRY);\n"
     FUN_LIST="$FUN_LIST""$ENTRY,\n"
 done;
 
