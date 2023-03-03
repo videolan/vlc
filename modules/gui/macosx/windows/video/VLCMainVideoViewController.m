@@ -246,8 +246,21 @@
         buttonSize = NSControlSizeMini;
     }
 
+    NSControlSize previousButtonSize = _playlistButton.controlSize;
     _returnButton.controlSize = buttonSize;
     _playlistButton.controlSize = buttonSize;
+
+    // HACK: Upon changing the control size the actual highlight of toggled/hovered buttons doesn't change
+    // properly, at least for recessed buttons. This is most obvious on the toggleable playlist button.
+    // So reset the state and then retoggle once done.
+    if (previousButtonSize != buttonSize) {
+        NSControlStateValue returnButtonControlState = _returnButton.state;
+        NSControlStateValue playlistButtonControlState = _playlistButton.state;
+        _returnButton.state = NSControlStateValueOff;
+        _playlistButton.state = NSControlStateValueOff;
+        _returnButton.state = returnButtonControlState;
+        _playlistButton.state = playlistButtonControlState;
+    }
 
     const CGFloat realButtonSpace = (windowTitlebarHeight - _playlistButton.cell.cellSize.height) / 2;
     const NSRect windowButtonBox = [self windowButtonsRect];
