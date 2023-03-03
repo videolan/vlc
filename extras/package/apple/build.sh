@@ -418,7 +418,7 @@ gen_vlc_static_module_list()
     local declarations_list
 
     for symbol in "${symbol_array[@]}"; do
-        declarations_list+="int ${symbol}(int (*)(void *, void *, int, ...), void *);\\n"
+        declarations_list+="VLC_ENTRY_FUNC(${symbol});\\n"
         array_list+="    ${symbol},\\n"
     done
 
