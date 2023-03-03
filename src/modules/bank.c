@@ -183,7 +183,7 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
     || (defined(__MACH__) && defined(HAVE_DYLIB_DYNAMIC_LOOKUP)) \
     || !defined(HAVE_DYNAMIC_PLUGINS)
 VLC_WEAK
-extern vlc_plugin_cb vlc_static_modules[];
+extern const vlc_plugin_cb vlc_static_modules[];
 
 static void module_InitStaticModules(void)
 {
