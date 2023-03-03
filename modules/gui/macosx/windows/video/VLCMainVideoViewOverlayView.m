@@ -22,11 +22,22 @@
 
 #import "VLCMainVideoViewOverlayView.h"
 
+@interface VLCMainVideoViewOverlayView ()
+{
+    NSRect _oldBounds;
+}
+@end
+
 @implementation VLCMainVideoViewOverlayView
 
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
-    
+
+    if (CGRectEqualToRect(_oldBounds, self.bounds)) {
+        return;
+    }
+
+    _oldBounds = self.bounds;
     // Drawing code here.
 }
 
