@@ -102,7 +102,6 @@ Widgets.PageLoader {
                 History.push(["mc", "music", "playlists", "list",
                              { parentId: model.id, name: model.name }]);
 
-                stackView.currentItem.setCurrentItemFocus(reason);
             }
         }
     }

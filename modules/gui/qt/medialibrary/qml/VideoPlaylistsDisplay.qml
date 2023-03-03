@@ -102,8 +102,6 @@ Widgets.PageLoader {
             onShowList: {
                 History.push(["mc", "video", "playlists", "list",
                              { parentId: model.id, name: model.name }]);
-
-                stackView.currentItem.setCurrentItemFocus(reason);
             }
         }
     }
