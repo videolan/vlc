@@ -29,7 +29,6 @@
         <customObject id="3" userLabel="Main Video View Controls Bar" customClass="VLCControlsBarCommon">
             <connections>
                 <outlet property="backwardButton" destination="V9d-hX-iyg" id="ZFn-jn-7OB"/>
-                <outlet property="bottomBarView" destination="1GA-GG-Sdx" id="hk1-nG-zqb"/>
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
@@ -61,7 +60,10 @@
                                     <constraint firstAttribute="height" id="wY4-If-nIp"/>
                                 </constraints>
                             </visualEffectView>
-                            <visualEffectView blendingMode="withinWindow" material="fullScreenUI" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx" customClass="VLCBottomBarView">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="FGS-tq-54S" customClass="VLCMainVideoViewOverlayView">
+                                <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="107"/>
                                 <subviews>
                                     <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f4v-2z-dQ1" customClass="VLCTimeField">
@@ -185,7 +187,7 @@
                                     <constraint firstItem="3ri-8b-8mw" firstAttribute="top" secondItem="qNZ-Fh-W8i" secondAttribute="bottom" constant="5" id="jze-EU-1TL"/>
                                     <constraint firstItem="sJu-ZK-5QH" firstAttribute="bottom" secondItem="qNZ-Fh-W8i" secondAttribute="top" constant="-5" id="xsM-6a-gdn"/>
                                 </constraints>
-                            </visualEffectView>
+                            </customView>
                             <stackView wantsLayer="YES" distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CvV-yX-Nbh">
                                 <rect key="frame" x="260" y="208" width="200" height="64"/>
                                 <subviews>
@@ -292,6 +294,7 @@
                         <constraints>
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="0l2-eC-67c"/>
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="20" id="BkP-RA-uxn"/>
+                            <constraint firstItem="FGS-tq-54S" firstAttribute="top" secondItem="jnw-gL-nrF" secondAttribute="bottom" id="Doc-Mq-oOI"/>
                             <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="KQN-vk-oha"/>
                             <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Qn0-ts-S0d"/>
                             <constraint firstAttribute="trailing" secondItem="jnw-gL-nrF" secondAttribute="trailing" id="SDl-7h-q9o"/>
@@ -300,8 +303,11 @@
                             <constraint firstItem="jnw-gL-nrF" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Z37-TJ-B2D"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
+                            <constraint firstAttribute="bottom" secondItem="FGS-tq-54S" secondAttribute="bottom" id="ps4-nL-1Xc"/>
+                            <constraint firstItem="FGS-tq-54S" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="qfd-OD-CHv"/>
                             <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="20" id="rWa-NJ-Aju"/>
                             <constraint firstItem="jnw-gL-nrF" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" id="t6W-5p-Vgt"/>
+                            <constraint firstAttribute="trailing" secondItem="FGS-tq-54S" secondAttribute="trailing" id="t7T-OV-bf0"/>
                         </constraints>
                     </view>
                     <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.35060533940397354" colorSpace="custom" customColorSpace="sRGB"/>
