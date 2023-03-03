@@ -418,16 +418,16 @@ gen_vlc_static_module_list()
     local declarations_list
 
     for symbol in "${symbol_array[@]}"; do
-        declarations_list+="VLC_ENTRY_FUNC(${symbol});\\n"
+        declarations_list+="int ${symbol}(int (*)(void *, void *, int, ...), void *);\\n"
         array_list+="    ${symbol},\\n"
     done
 
     printf "\
-#include <stddef.h>\\n\
-#define VLC_ENTRY_FUNC(funcname)\
-int funcname(int (*)(void *, void *, int, ...), void *)\\n\
+#include \"config.h\"\\n\
+#include <vlc_common.h>\\n\
+#include <vlc_plugin.h>\\n\
 %b\\n\
-const void *vlc_static_modules[] = {\\n
+const vlc_plugin_cb vlc_static_modules[] = {\\n
 %b
     NULL\\n
 };" \
@@ -780,7 +780,7 @@ VLC_STATIC_MODULELIST_NAME="static-module-list"
 rm -f "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_STATIC_MODULELIST_NAME}.o"
 gen_vlc_static_module_list "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_PLUGINS_SYMBOL_LIST[@]}"
 
-${VLC_HOST_CC:-cc} -c  ${CFLAGS} "${VLC_STATIC_MODULELIST_NAME}.c" \
+${VLC_HOST_CC:-cc} -c  ${CFLAGS} -I"${VLC_SRC_DIR}/include" -I"${VLC_BUILD_DIR}/build" "${VLC_STATIC_MODULELIST_NAME}.c" \
   || abort_err "Compiling module list file failed"
 
 echo "${VLC_BUILD_DIR}/static-lib/${VLC_STATIC_MODULELIST_NAME}.o" \
