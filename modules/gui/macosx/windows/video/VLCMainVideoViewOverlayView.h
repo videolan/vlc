@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMainVideoViewOverlayView : NSView
 
+@property (readwrite, assign) CGFloat bottomBarTopBoundary;
+
 @end
 
 NS_ASSUME_NONNULL_END

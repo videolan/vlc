@@ -24,7 +24,7 @@
 
 @interface VLCMainVideoViewOverlayView ()
 {
-    NSRect _oldBounds;
+    NSColor *_darkestGradientColor;
 }
 @end
 
@@ -33,12 +33,16 @@
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
 
-    if (CGRectEqualToRect(_oldBounds, self.bounds)) {
-        return;
+    // Drawing code here.
+    if (_darkestGradientColor == nil) {
+        _darkestGradientColor = [NSColor colorWithWhite:0 alpha:0.8];
     }
 
-    _oldBounds = self.bounds;
-    // Drawing code here.
+    const CGFloat bottomBarTopPositionRelative = (_bottomBarTopBoundary * 1.25) / self.frame.size.height;
+    NSGradient *gradient = [[NSGradient alloc] initWithColorsAndLocations:_darkestGradientColor, 0,
+                                                                          [NSColor clearColor], bottomBarTopPositionRelative,
+                                                                          nil];
+    [gradient drawInRect:self.frame angle:90];
 }
 
 @end
