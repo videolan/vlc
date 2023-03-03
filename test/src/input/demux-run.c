@@ -477,11 +477,9 @@ int vlc_demux_process_memory(const struct vlc_run_args *args,
 # define PLUGIN_MKV(f)
 #endif
 
-#define DECL_PLUGIN(p) \
-    vlc_plugin_cb CONCATENATE(vlc_entry,p);
+#define DECL_PLUGIN(p)   VLC_DECL_MODULE_ENTRY(p);
 
-#define FUNC_PLUGIN(p) \
-    CONCATENATE(vlc_entry,p),
+#define FUNC_PLUGIN(p)   VLC_MODULE_ENTRY(p),
 
 PLUGINS(DECL_PLUGIN)
 
