@@ -164,6 +164,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/playlists/playlists.cpp gui/qt/dialogs/playlists/playlists.hpp \
 	gui/qt/maininterface/compositor.hpp \
 	gui/qt/maininterface/compositor.cpp \
+	gui/qt/maininterface/compositor_common.hpp \
+	gui/qt/maininterface/compositor_common.cpp \
 	gui/qt/maininterface/compositor_dummy.hpp \
 	gui/qt/maininterface/compositor_dummy.cpp \
 	gui/qt/maininterface/interface_window_handler.cpp \
@@ -440,6 +442,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/toolbar/controlbar_profile_model.moc.cpp \
 	gui/qt/dialogs/playlists/playlists.moc.cpp \
 	gui/qt/maininterface/compositor.moc.cpp \
+	gui/qt/maininterface/compositor_common.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/interface_window_handler.moc.cpp \
 	gui/qt/maininterface/mainctx.moc.cpp \
