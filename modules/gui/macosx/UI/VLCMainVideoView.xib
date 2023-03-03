@@ -9,11 +9,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainVideoViewController">
             <connections>
+                <outlet property="bottomBarView" destination="1GA-GG-Sdx" id="0UY-5o-eVD"/>
                 <outlet property="centralControlsStackView" destination="CvV-yX-Nbh" id="zyI-Rb-bem"/>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
                 <outlet property="fakeTitleBar" destination="jnw-gL-nrF" id="7lZ-al-c3d"/>
                 <outlet property="fakeTitleBarHeightConstraint" destination="wY4-If-nIp" id="wPt-X4-mgu"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
+                <outlet property="overlayView" destination="FGS-tq-54S" id="RSC-7m-N0y"/>
                 <outlet property="playlistButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
                 <outlet property="playlistButtonTopConstraint" destination="VyM-t4-y6F" id="V94-GS-KcS"/>
                 <outlet property="playlistButtonTrailingConstraint" destination="rWa-NJ-Aju" id="tzU-Iz-CXl"/>

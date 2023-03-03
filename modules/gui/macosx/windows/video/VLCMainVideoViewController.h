@@ -25,12 +25,16 @@
 #import <windows/mainwindow/VLCControlsBarCommon.h>
 #import <windows/video/VLCVoutView.h>
 
+@class VLCMainVideoViewOverlayView;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMainVideoViewController : NSViewController
 
 @property (readwrite, strong) IBOutlet VLCVoutView *voutView;
 @property (readwrite, strong) IBOutlet NSBox *mainControlsView;
+@property (readwrite, strong) IBOutlet VLCMainVideoViewOverlayView *overlayView;
+@property (readwrite, strong) IBOutlet NSView *bottomBarView;
 @property (readwrite, strong) IBOutlet NSStackView *centralControlsStackView;
 @property (readwrite, strong) IBOutlet VLCControlsBarCommon *controlsBar;
 @property (readwrite, strong) IBOutlet NSButton *returnButton;

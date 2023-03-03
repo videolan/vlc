@@ -32,6 +32,7 @@
 
 #import "views/VLCBottomBarView.h"
 
+#import "windows/video/VLCMainVideoViewOverlayView.h"
 #import "windows/video/VLCVideoWindowCommon.h"
 
 #import <vlc_common.h>
@@ -84,6 +85,8 @@
 
     _returnButtonBottomConstraint.active = NO;
     _playlistButtonBottomConstraint.active = NO;
+
+    _overlayView.bottomBarTopBoundary = _bottomBarView.frame.size.height;
 }
 
 - (BOOL)mouseOnControls
