@@ -165,4 +165,9 @@
                             -contentInsets.right);
 }
 
++ (const CGFloat)controlsFadeAnimationDuration
+{
+    return 0.4f;
+}
+
 @end

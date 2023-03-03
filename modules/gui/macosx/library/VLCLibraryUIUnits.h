@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (const NSEdgeInsets)libraryViewScrollViewContentInsets;
 + (const NSEdgeInsets)libraryViewScrollViewScrollerInsets;
 
++ (const CGFloat)controlsFadeAnimationDuration;
+
 @end
 
 NS_ASSUME_NONNULL_END
