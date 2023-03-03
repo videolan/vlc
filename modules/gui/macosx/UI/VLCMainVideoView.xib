@@ -52,7 +52,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
-                                <rect key="frame" x="10" y="437" width="32" height="33"/>
+                                <rect key="frame" x="20" y="427" width="32" height="33"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="UoQ-34-Pox" secondAttribute="height" multiplier="1:1" id="Mvu-rV-2bc"/>
                                     <constraint firstAttribute="width" constant="32" id="cjt-DQ-vMP"/>
@@ -71,7 +71,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
-                                <rect key="frame" x="678" y="437" width="32" height="33"/>
+                                <rect key="frame" x="668" y="427" width="32" height="33"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="32" id="9vC-fK-tZu"/>
                                     <constraint firstAttribute="width" secondItem="Drq-if-dw4" secondAttribute="height" multiplier="1:1" id="cVK-cW-Opa"/>
@@ -289,15 +289,15 @@
                             </stackView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="10" id="0l2-eC-67c"/>
-                            <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="10" id="BkP-RA-uxn"/>
+                            <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="0l2-eC-67c"/>
+                            <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="20" id="BkP-RA-uxn"/>
                             <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="KQN-vk-oha"/>
                             <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Qn0-ts-S0d"/>
-                            <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="10" id="VyM-t4-y6F"/>
+                            <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="VyM-t4-y6F"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerX" secondItem="1tI-8K-e3c" secondAttribute="centerX" id="YMh-Zl-NSA"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
-                            <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="10" id="rWa-NJ-Aju"/>
+                            <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="20" id="rWa-NJ-Aju"/>
                         </constraints>
                     </view>
                     <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.35060533940397354" colorSpace="custom" customColorSpace="sRGB"/>
