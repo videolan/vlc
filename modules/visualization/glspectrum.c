@@ -199,7 +199,7 @@ static int Open(vlc_object_t * p_this)
         .height = var_InheritInteger(p_filter, "glspectrum-height"),
     };
 
-    p_sys->gl = vlc_gl_surface_Create(p_this, &cfg, NULL);
+    p_sys->gl = vlc_gl_surface_Create(p_this, &cfg, NULL, NULL);
     if (p_sys->gl == NULL)
         return VLC_EGENERIC;
 

@@ -597,8 +597,15 @@ static void InitEGL(void)
  * Probe EGL display availability
  */
 static int Open(vlc_gl_t *gl, const struct gl_api *api,
-                unsigned width, unsigned height)
+                unsigned width, unsigned height,
+                const struct vlc_gl_cfg *gl_cfg)
 {
+    if (gl_cfg->need_alpha)
+    {
+        msg_Err(gl, "Cannot support alpha yet");
+        return VLC_ENOTSUP;
+    }
+
     InitEGL();
 
     int ret = VLC_EGENERIC;
@@ -699,22 +706,24 @@ error:
     return ret;
 }
 
-static int OpenGLES2(vlc_gl_t *gl, unsigned width, unsigned height)
+static int OpenGLES2(vlc_gl_t *gl, unsigned width, unsigned height,
+                     const struct vlc_gl_cfg *gl_cfg)
 {
     static const struct gl_api api = {
         "OpenGL_ES", EGL_OPENGL_ES_API, 4, EGL_OPENGL_ES2_BIT,
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE },
     };
-    return Open(gl, &api, width, height);
+    return Open(gl, &api, width, height, gl_cfg);
 }
 
-static int OpenGL(vlc_gl_t *gl, unsigned width, unsigned height)
+static int OpenGL(vlc_gl_t *gl, unsigned width, unsigned height,
+                  const struct vlc_gl_cfg *gl_cfg)
 {
     static const struct gl_api api = {
         "OpenGL", EGL_OPENGL_API, 4, EGL_OPENGL_BIT,
         { EGL_NONE },
     };
-    return Open(gl, &api, width, height);
+    return Open(gl, &api, width, height, gl_cfg);
 }
 
 #ifdef USE_PLATFORM_XCB

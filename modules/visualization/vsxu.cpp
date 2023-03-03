@@ -134,7 +134,7 @@ static int Open( vlc_object_t * p_this )
     cfg.width = var_InheritInteger( p_filter, "vsxu-width" );
     cfg.height = var_InheritInteger( p_filter, "vsxu-height" );
 
-    p_sys->gl = vlc_gl_surface_Create( VLC_OBJECT(p_filter), &cfg, NULL );
+    p_sys->gl = vlc_gl_surface_Create( VLC_OBJECT(p_filter), &cfg, NULL, NULL);
     if( p_sys->gl == NULL )
         goto error;
 

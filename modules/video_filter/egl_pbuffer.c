@@ -385,8 +385,15 @@ static void Close( vlc_gl_t *gl )
     vlc_egl_display_Delete(sys->vlc_display);
 }
 
-static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
+                const struct vlc_gl_cfg *gl_cfg)
 {
+    if (gl_cfg->need_alpha)
+    {
+        msg_Err(gl, "Cannot support alpha yet");
+        return VLC_ENOTSUP;
+    }
+
     struct vlc_gl_pbuffer *sys = vlc_obj_malloc(&gl->obj, sizeof *sys);
     if (sys == NULL)
         return VLC_ENOMEM;

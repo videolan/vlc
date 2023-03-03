@@ -122,9 +122,10 @@ static void OpenGLClose(vlc_gl_t *gl)
 static int
 OpenOpenGLCommon(
         vlc_gl_t *gl, unsigned width, unsigned height,
-        bool offscreen, enum vlc_gl_api_type api_type)
+        bool offscreen, enum vlc_gl_api_type api_type,
+        const struct vlc_gl_cfg *cfg)
 {
-    (void)width; (void)height;
+    (void)width; (void)height; (void) cfg;
     assert(gl->api_type == api_type);
 
     static const struct vlc_gl_operations onscreen_ops =
@@ -152,20 +153,24 @@ OpenOpenGLCommon(
 }
 
 static int
-OpenOpenGL(vlc_gl_t *gl, unsigned width, unsigned height)
-    { return OpenOpenGLCommon(gl, width, height, false, VLC_OPENGL); };
+OpenOpenGL(vlc_gl_t *gl, unsigned width, unsigned height,
+           const struct vlc_gl_cfg *cfg)
+    { return OpenOpenGLCommon(gl, width, height, false, VLC_OPENGL, cfg); };
 
 static int
-OpenOpenGLES(vlc_gl_t *gl, unsigned width, unsigned height)
-    { return OpenOpenGLCommon(gl, width, height, false, VLC_OPENGL_ES2); };
+OpenOpenGLES(vlc_gl_t *gl, unsigned width, unsigned height,
+             const struct vlc_gl_cfg *cfg)
+    { return OpenOpenGLCommon(gl, width, height, false, VLC_OPENGL_ES2, cfg); };
 
 static int
-OpenOpenGLOffscreen(vlc_gl_t *gl, unsigned width, unsigned height)
-    { return OpenOpenGLCommon(gl, width, height, true, VLC_OPENGL); };
+OpenOpenGLOffscreen(vlc_gl_t *gl, unsigned width, unsigned height,
+                    const struct vlc_gl_cfg *cfg)
+    { return OpenOpenGLCommon(gl, width, height, true, VLC_OPENGL, cfg); };
 
 static int
-OpenOpenGLESOffscreen(vlc_gl_t *gl, unsigned width, unsigned height)
-    { return OpenOpenGLCommon(gl, width, height, true, VLC_OPENGL_ES2); };
+OpenOpenGLESOffscreen(vlc_gl_t *gl, unsigned width, unsigned height,
+                      const struct vlc_gl_cfg *cfg)
+    { return OpenOpenGLCommon(gl, width, height, true, VLC_OPENGL_ES2, cfg); };
 
 /**
  * Inject the mocked modules as a static plugin:
@@ -206,7 +211,7 @@ static void test_opengl_offscreen(vlc_object_t *root, enum vlc_gl_api_type api_t
     assert(device != NULL);
 
     vlc_gl_t *gl = vlc_gl_CreateOffscreen(
-            root, device, 800, 600, api_type, MODULE_STRING);
+            root, device, 800, 600, api_type, MODULE_STRING, NULL);
     assert(gl != NULL);
     vlc_decoder_device_Release(device);
 
@@ -233,7 +238,7 @@ static void test_opengl(vlc_object_t *root, enum vlc_gl_api_type api_type)
         .display.width = wnd_cfg.width,
         .display.height = wnd_cfg.height,
     };
-    vlc_gl_t *gl = vlc_gl_Create(&cfg, api_type, MODULE_STRING);
+    vlc_gl_t *gl = vlc_gl_Create(&cfg, api_type, MODULE_STRING, NULL);
     assert(gl != NULL);
 
     assert(vlc_gl_MakeCurrent(gl) == VLC_SUCCESS);

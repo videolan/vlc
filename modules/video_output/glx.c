@@ -152,9 +152,16 @@ static void Close(vlc_gl_t *gl)
     free(sys);
 }
 
-static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
+                const struct vlc_gl_cfg *gl_cfg)
 {
     vlc_object_t *obj = VLC_OBJECT(gl);
+
+    if (gl_cfg->need_alpha)
+    {
+        msg_Err(gl, "Cannot support alpha yet");
+        return VLC_ENOTSUP;
+    }
 
     if (gl->surface->type != VLC_WINDOW_TYPE_XID || !vlc_xlib_init (obj))
         return VLC_EGENERIC;

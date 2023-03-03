@@ -122,7 +122,8 @@ static void Close(vlc_gl_t *gl)
         }                                                          \
     } while( 0 )
 
-static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
+                const struct vlc_gl_cfg *gl_cfg)
 {
     vout_display_sys_t * sys;
 
@@ -130,6 +131,12 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     if ( engineType != libvlc_video_engine_opengl &&
          engineType != libvlc_video_engine_gles2 )
         return VLC_ENOTSUP;
+
+    if (gl_cfg->need_alpha)
+    {
+        msg_Err(gl, "Cannot support alpha yet");
+        return VLC_ENOTSUP;
+    }
 
     /* Allocate structure */
     gl->sys = sys = vlc_obj_calloc(VLC_OBJECT(gl), 1, sizeof(*sys));

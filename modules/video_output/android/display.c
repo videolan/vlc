@@ -606,7 +606,7 @@ static void ClearSurface(vout_display_t *vd)
     {
         /* Clear the surface to black with OpenGL ES 2 */
         char *modlist = var_InheritString(sys->embed, "gles2");
-        vlc_gl_t *gl = vlc_gl_Create(vd->cfg, VLC_OPENGL_ES2, modlist);
+        vlc_gl_t *gl = vlc_gl_Create(vd->cfg, VLC_OPENGL_ES2, modlist, NULL);
         free(modlist);
         if (gl == NULL)
             return;

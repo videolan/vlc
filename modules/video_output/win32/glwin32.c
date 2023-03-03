@@ -148,7 +148,7 @@ static int Open(vout_display_t *vd,
         goto error;
 
     char *modlist = var_InheritString(embed_cfg.window, "gl");
-    sys->gl = vlc_gl_Create(&embed_cfg, VLC_OPENGL, modlist);
+    sys->gl = vlc_gl_Create(&embed_cfg, VLC_OPENGL, modlist, NULL);
     free(modlist);
     if (!sys->gl)
     {

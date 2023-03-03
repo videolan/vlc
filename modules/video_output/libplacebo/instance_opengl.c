@@ -105,7 +105,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
     bool current = false;
 
     char *name = var_InheritString(pl, MODULE_VARNAME);
-    sys->gl = vlc_gl_Create(cfg, API, name);
+    sys->gl = vlc_gl_Create(cfg, API, name, NULL);
     free(name);
     if (!sys->gl || vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
         goto error;

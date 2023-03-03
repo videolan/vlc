@@ -190,7 +190,7 @@ static int Open( vlc_object_t * p_this )
     cfg.width = var_CreateGetInteger( p_filter, "projectm-width" );
     cfg.height = var_CreateGetInteger( p_filter, "projectm-height" );
 
-    p_sys->gl = vlc_gl_surface_Create( VLC_OBJECT(p_filter), &cfg, NULL );
+    p_sys->gl = vlc_gl_surface_Create( VLC_OBJECT(p_filter), &cfg, NULL, NULL );
     if( p_sys->gl == NULL )
         goto error;
 

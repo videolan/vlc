@@ -33,6 +33,10 @@
 #include "libvlc.h"
 #include <vlc_modules.h>
 
+static const struct vlc_gl_cfg gl_cfg_default = {
+    .need_alpha = false
+};
+
 struct vlc_gl_priv_t
 {
     vlc_gl_t gl;
@@ -44,8 +48,9 @@ static int vlc_gl_start(void *func, bool forced, va_list ap)
     vlc_gl_t *gl = va_arg(ap, vlc_gl_t *);
     unsigned width = va_arg(ap, unsigned);
     unsigned height = va_arg(ap, unsigned);
+    const struct vlc_gl_cfg *gl_cfg = va_arg(ap, const struct vlc_gl_cfg *);
 
-    int ret = activate(gl, width, height);
+    int ret = activate(gl, width, height, gl_cfg);
     if (ret)
         vlc_objres_clear(VLC_OBJECT(gl));
     (void) forced;
@@ -53,11 +58,14 @@ static int vlc_gl_start(void *func, bool forced, va_list ap)
 }
 
 vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
-                        unsigned flags, const char *name)
+                        unsigned flags, const char *name,
+                        const struct vlc_gl_cfg * gl_cfg)
 {
     vlc_window_t *wnd = cfg->window;
     struct vlc_gl_priv_t *glpriv;
     const char *type;
+    if (gl_cfg == NULL)
+        gl_cfg = &gl_cfg_default;
 
     enum vlc_gl_api_type api_type;
 
@@ -85,7 +93,8 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
     gl->device = NULL;
 
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
-                                 cfg->display.width, cfg->display.height);
+                                 cfg->display.width, cfg->display.height,
+                                 gl_cfg);
     if (gl->module == NULL)
     {
         vlc_object_delete(gl);
@@ -104,12 +113,15 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
 vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
                                  struct vlc_decoder_device *device,
                                  unsigned width, unsigned height,
-                                 unsigned flags, const char *name)
+                                 unsigned flags, const char *name,
+                                 const struct vlc_gl_cfg *gl_cfg)
 {
     struct vlc_gl_priv_t *glpriv;
     const char *type;
 
     enum vlc_gl_api_type api_type;
+    if (gl_cfg == NULL)
+        gl_cfg = &gl_cfg_default;
 
     switch (flags /*& VLC_OPENGL_API_MASK*/)
     {
@@ -140,7 +152,7 @@ vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
     gl->surface = NULL;
     gl->device = device ? vlc_decoder_device_Hold(device) : NULL;
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl, width,
-                                 height);
+                                 height, gl_cfg);
     if (gl->module == NULL)
     {
         vlc_object_delete(gl);
@@ -199,7 +211,8 @@ static void vlc_gl_surface_ResizeNotify(vlc_window_t *surface,
 
 vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
                                 const vlc_window_cfg_t *cfg,
-                                struct vlc_window **restrict wp)
+                                struct vlc_window **restrict wp,
+                                const struct vlc_gl_cfg *gl_cfg)
 {
     vlc_gl_surface_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -244,7 +257,7 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
     }
     vlc_mutex_unlock(&sys->lock);
 
-    vlc_gl_t *gl = vlc_gl_Create(&dcfg, VLC_OPENGL, NULL);
+    vlc_gl_t *gl = vlc_gl_Create(&dcfg, VLC_OPENGL, NULL, gl_cfg);
     if (gl == NULL) {
         vlc_window_Disable(surface);
         vlc_window_Delete(surface);

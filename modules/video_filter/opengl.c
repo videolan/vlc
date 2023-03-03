@@ -183,7 +183,7 @@ static int Open( vlc_object_t *obj )
 
     struct vlc_decoder_device *device = filter_HoldDecoderDevice(filter);
     sys->gl = vlc_gl_CreateOffscreen(obj, device, width, height, VLCGLAPI,
-                                     NULL);
+                                     NULL, NULL);
 
     /* The vlc_gl_t instance must have hold the device if it needs it. */
     if (device)
