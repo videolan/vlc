@@ -39,9 +39,22 @@
     }
 
     const CGFloat bottomBarTopPositionRelative = (_bottomBarTopBoundary * 1.25) / self.frame.size.height;
-    NSGradient *gradient = [[NSGradient alloc] initWithColorsAndLocations:_darkestGradientColor, 0,
-                                                                          [NSColor clearColor], bottomBarTopPositionRelative,
-                                                                          nil];
+    NSGradient *gradient;
+
+    if (_drawGradientForTopControls) {
+        const CGFloat topControlsBottomPositionRelative = (_topControlsBottomBoundary * 0.9) / self.frame.size.height;
+        gradient = [[NSGradient alloc] initWithColorsAndLocations:_darkestGradientColor, 0.,
+                    [NSColor clearColor], bottomBarTopPositionRelative,
+                    [NSColor clearColor], topControlsBottomPositionRelative,
+                    _darkestGradientColor, 1.,
+                    nil];
+    } else {
+        gradient = [[NSGradient alloc] initWithColorsAndLocations:_darkestGradientColor, 0,
+                    [NSColor clearColor], bottomBarTopPositionRelative,
+                    nil];
+    }
+
+    // Draws bottom-up
     [gradient drawInRect:self.frame angle:90];
 }
 
