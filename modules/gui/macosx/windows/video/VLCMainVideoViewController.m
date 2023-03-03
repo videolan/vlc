@@ -39,6 +39,8 @@
 @interface VLCMainVideoViewController()
 {
     NSTimer *_hideControlsTimer;
+    NSLayoutConstraint *_returnButtonBottomConstraint;
+    NSLayoutConstraint *_playlistButtonBottomConstraint;
 }
 @end
 
@@ -57,13 +59,31 @@
 
     [self setDisplayLibraryControls:NO];
     [self updatePlaylistToggleState];
-    [self updateLibraryControlsTopConstraint];
+    [self updateLibraryControls];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowControls:)
                                name:VLCVideoWindowShouldShowFullscreenController
                              object:nil];
+
+    _returnButtonBottomConstraint = [NSLayoutConstraint constraintWithItem:_returnButton
+                                                                 attribute:NSLayoutAttributeBottom
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:_fakeTitleBar
+                                                                 attribute:NSLayoutAttributeBottom
+                                                                multiplier:1.
+                                                                  constant:0];
+    _playlistButtonBottomConstraint = [NSLayoutConstraint constraintWithItem:_playlistButton
+                                                                   attribute:NSLayoutAttributeBottom
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:_fakeTitleBar
+                                                                   attribute:NSLayoutAttributeBottom
+                                                                  multiplier:1.
+                                                                    constant:0];
+
+    _returnButtonBottomConstraint.active = NO;
+    _playlistButtonBottomConstraint.active = NO;
 }
 
 - (BOOL)mouseOnControls
@@ -137,7 +157,7 @@
 {
     [self stopAutohideTimer];
     [self updatePlaylistToggleState];
-    [self updateLibraryControlsTopConstraint];
+    [self updateLibraryControls];
 
     if (!_mainControlsView.hidden && !_autohideControls) {
         return;
@@ -190,7 +210,7 @@
     return buttonBox;
 }
 
-- (void)updateLibraryControlsTopConstraint
+- (void)updateLibraryControls
 {
     if (!_displayLibraryControls) {
         return;
@@ -200,20 +220,24 @@
     const NSView * const titlebarView = [viewWindow standardWindowButton:NSWindowCloseButton].superview;
     const CGFloat windowTitlebarHeight = titlebarView.frame.size.height;
 
-    const BOOL windowFullscreen = [(VLCWindow*)viewWindow isInNativeFullscreen] || [(VLCWindow*)viewWindow fullscreen];
-    const CGFloat spaceToTitlebar = viewWindow.titlebarAppearsTransparent ? [VLCLibraryUIUnits smallSpacing] : [VLCLibraryUIUnits mediumSpacing];
-    const CGFloat topSpaceWithTitlebar = windowTitlebarHeight + spaceToTitlebar;
+    const BOOL windowFullscreen = [(VLCWindow*)viewWindow isInNativeFullscreen] ||
+                                  [(VLCWindow*)viewWindow fullscreen];
+    const BOOL placeInFakeToolbar = viewWindow.titlebarAppearsTransparent &&
+                                    !windowFullscreen;
 
-    // Since the close/maximise/minimise buttons go on the left, we want to make sure the return
-    // button does not overlap. But for the playlist button, as long as the toolbar and titlebar
-    // appears fully transparent, it looks nicer to leave it at the top
-    const CGFloat returnButtonTopSpace = titlebarView.hidden || windowFullscreen ?
-        [VLCLibraryUIUnits mediumSpacing] : topSpaceWithTitlebar;
-    const CGFloat playlistButtonTopSpace = viewWindow.toolbar.visible && viewWindow.titlebarAppearsTransparent && !windowFullscreen ?
-        topSpaceWithTitlebar : [VLCLibraryUIUnits mediumSpacing];
+    const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : [VLCLibraryUIUnits largeSpacing];
 
-    _returnButtonTopConstraint.constant = returnButtonTopSpace;
-    _playlistButtonTopConstraint.constant = playlistButtonTopSpace;
+    _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
+
+    _returnButtonTopConstraint.constant = buttonTopSpace;
+    _playlistButtonTopConstraint.constant = buttonTopSpace;
+    _returnButtonBottomConstraint.active = placeInFakeToolbar;
+    _playlistButtonBottomConstraint.active = placeInFakeToolbar;
+
+    const NSRect windowButtonBox = [self windowButtonsRect];
+
+    _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + [VLCLibraryUIUnits mediumSpacing] : [VLCLibraryUIUnits largeSpacing];
+    _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? 0. : [VLCLibraryUIUnits largeSpacing];
 }
 
 - (IBAction)togglePlaylist:(id)sender

@@ -11,10 +11,14 @@
             <connections>
                 <outlet property="centralControlsStackView" destination="CvV-yX-Nbh" id="zyI-Rb-bem"/>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
+                <outlet property="fakeTitleBar" destination="jnw-gL-nrF" id="7lZ-al-c3d"/>
+                <outlet property="fakeTitleBarHeightConstraint" destination="wY4-If-nIp" id="wPt-X4-mgu"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
                 <outlet property="playlistButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
                 <outlet property="playlistButtonTopConstraint" destination="VyM-t4-y6F" id="V94-GS-KcS"/>
+                <outlet property="playlistButtonTrailingConstraint" destination="rWa-NJ-Aju" id="tzU-Iz-CXl"/>
                 <outlet property="returnButton" destination="UoQ-34-Pox" id="nyY-OF-9zj"/>
+                <outlet property="returnButtonLeadingConstraint" destination="BkP-RA-uxn" id="CsI-gH-SYp"/>
                 <outlet property="returnButtonTopConstraint" destination="0l2-eC-67c" id="78K-sz-kmV"/>
                 <outlet property="view" destination="WRu-Ic-lQK" id="B9p-x5-Kd8"/>
                 <outlet property="voutView" destination="mAS-4a-RS8" id="GeX-XO-HYC"/>
@@ -51,45 +55,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
-                                <rect key="frame" x="20" y="427" width="32" height="33"/>
+                            <visualEffectView blendingMode="withinWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="jnw-gL-nrF">
+                                <rect key="frame" x="0.0" y="480" width="720" height="0.0"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="UoQ-34-Pox" secondAttribute="height" multiplier="1:1" id="Mvu-rV-2bc"/>
-                                    <constraint firstAttribute="width" constant="32" id="cjt-DQ-vMP"/>
+                                    <constraint firstAttribute="height" id="wY4-If-nIp"/>
                                 </constraints>
-                                <shadow key="shadow" blurRadius="2">
-                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </shadow>
-                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="CU4-UE-tsW">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                    <imageReference key="image" image="rectangle.grid.2x2.fill" catalog="system" symbolScale="large"/>
-                                </buttonCell>
-                                <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <action selector="returnToLibrary:" target="-2" id="rnL-S1-zSR"/>
-                                </connections>
-                            </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
-                                <rect key="frame" x="668" y="427" width="32" height="33"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="9vC-fK-tZu"/>
-                                    <constraint firstAttribute="width" secondItem="Drq-if-dw4" secondAttribute="height" multiplier="1:1" id="cVK-cW-Opa"/>
-                                </constraints>
-                                <shadow key="shadow" blurRadius="2">
-                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </shadow>
-                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="VDP-ql-lW8">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                    <imageReference key="image" image="music.note.list" catalog="system" symbolScale="large"/>
-                                </buttonCell>
-                                <color key="contentTintColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                <symbolConfiguration key="symbolConfiguration" weight="ultraLight"/>
-                                <connections>
-                                    <action selector="togglePlaylist:" target="-2" id="WrP-vg-etw"/>
-                                </connections>
-                            </button>
+                            </visualEffectView>
                             <visualEffectView blendingMode="withinWindow" material="fullScreenUI" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx" customClass="VLCBottomBarView">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="107"/>
                                 <subviews>
@@ -287,17 +258,51 @@
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UoQ-34-Pox">
+                                <rect key="frame" x="20" y="431" width="33" height="29"/>
+                                <shadow key="shadow" blurRadius="2">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="CU4-UE-tsW">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <imageReference key="image" image="rectangle.grid.2x2.fill" catalog="system" symbolScale="large"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <action selector="returnToLibrary:" target="-2" id="rnL-S1-zSR"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Drq-if-dw4">
+                                <rect key="frame" x="669" y="431" width="31" height="29"/>
+                                <shadow key="shadow" blurRadius="2">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <buttonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" controlSize="large" borderStyle="border" inset="2" id="VDP-ql-lW8">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <imageReference key="image" image="music.note.list" catalog="system" symbolScale="large"/>
+                                </buttonCell>
+                                <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
+                                <symbolConfiguration key="symbolConfiguration" weight="ultraLight"/>
+                                <connections>
+                                    <action selector="togglePlaylist:" target="-2" id="WrP-vg-etw"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="0l2-eC-67c"/>
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="20" id="BkP-RA-uxn"/>
                             <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="KQN-vk-oha"/>
                             <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Qn0-ts-S0d"/>
+                            <constraint firstAttribute="trailing" secondItem="jnw-gL-nrF" secondAttribute="trailing" id="SDl-7h-q9o"/>
                             <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="VyM-t4-y6F"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerX" secondItem="1tI-8K-e3c" secondAttribute="centerX" id="YMh-Zl-NSA"/>
+                            <constraint firstItem="jnw-gL-nrF" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Z37-TJ-B2D"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
                             <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="20" id="rWa-NJ-Aju"/>
+                            <constraint firstItem="jnw-gL-nrF" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" id="t6W-5p-Vgt"/>
                         </constraints>
                     </view>
                     <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.35060533940397354" colorSpace="custom" customColorSpace="sRGB"/>

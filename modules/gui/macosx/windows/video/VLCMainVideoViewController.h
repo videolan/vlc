@@ -36,7 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSButton *returnButton;
 @property (readwrite, strong) IBOutlet NSButton *playlistButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonTopConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonLeadingConstraint;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *playlistButtonTopConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *playlistButtonTrailingConstraint;
+@property (readwrite, strong) IBOutlet NSVisualEffectView *fakeTitleBar;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 
 @property (readwrite, nonatomic) BOOL autohideControls;
 @property (readwrite, nonatomic) BOOL displayLibraryControls;
