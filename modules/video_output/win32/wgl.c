@@ -47,8 +47,7 @@ vlc_module_begin()
 
     add_integer("gpu-affinity", -1, HW_GPU_AFFINITY_TEXT, NULL)
 
-    set_capability("opengl", 50)
-    set_callback(Open)
+    set_callback_opengl(Open, 50)
     add_shortcut("wgl")
 vlc_module_end()
 

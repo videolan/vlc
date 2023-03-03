@@ -434,8 +434,7 @@ error1:
 vlc_module_begin()
     set_shortname( N_("egl_surfacetexture") )
     set_description( N_("EGL Android SurfaceTexture offscreen opengl provider") )
-    set_capability( "opengl es2 offscreen", 100)
+    set_callback_opengl_es2_offscreen(Open, 100)
 
     add_shortcut( "egl_surfacetexture" )
-    set_callback( Open )
 vlc_module_end()

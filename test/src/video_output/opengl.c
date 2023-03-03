@@ -182,20 +182,16 @@ vlc_module_begin()
         set_capability("vout window", 1)
 
     add_submodule()
-        set_callback(OpenOpenGL)
-        set_capability("opengl", 1)
+        set_callback_opengl(OpenOpenGL, 1)
 
     add_submodule()
-        set_callback(OpenOpenGLES)
-        set_capability("opengl es2", 1)
+        set_callback_opengl_es2(OpenOpenGLES, 1)
 
     add_submodule()
-        set_callback(OpenOpenGLOffscreen)
-        set_capability("opengl offscreen", 1)
+        set_callback_opengl_offscreen(OpenOpenGLOffscreen, 1)
 
     add_submodule()
-        set_callback(OpenOpenGLESOffscreen)
-        set_capability("opengl es2 offscreen", 1)
+        set_callback_opengl_es2_offscreen(OpenOpenGLESOffscreen, 1)
 vlc_module_end()
 
 VLC_EXPORT vlc_plugin_cb vlc_static_modules[] = {

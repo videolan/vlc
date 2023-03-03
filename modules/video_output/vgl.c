@@ -181,12 +181,11 @@ vlc_module_begin()
     set_description("GL texture output")
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
-    set_capability("opengl", 0)
-    set_callback(Open)
+    set_callback_opengl(Open, 0)
+
     add_shortcut("vglmem")
 
     add_submodule()
-    set_capability("opengl es2", 0)
-    set_callback(Open)
+    set_callback_opengl_es2(Open, 0)
     add_shortcut("vglmem")
 vlc_module_end()

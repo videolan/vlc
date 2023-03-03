@@ -51,6 +51,29 @@ enum vlc_gl_api_type {
 
 typedef int (*vlc_gl_activate)(vlc_gl_t *, unsigned width, unsigned height);
 
+#define set_callback_opengl_common(activate) \
+    { \
+        vlc_gl_activate activate__ = activate; \
+        (void) activate__; \
+        set_callback(activate) \
+    } \
+
+#define set_callback_opengl(activate, priority) \
+    set_callback_opengl_common(activate) \
+    set_capability("opengl", priority)
+
+#define set_callback_opengl_offscreen(activate, priority) \
+    set_callback_opengl_common(activate) \
+    set_capability("opengl offscreen", priority)
+
+#define set_callback_opengl_es2(activate, priority) \
+    set_callback_opengl_common(activate) \
+    set_capability("opengl es2", priority)
+
+#define set_callback_opengl_es2_offscreen(activate, priority) \
+    set_callback_opengl_common(activate) \
+    set_capability("opengl es2 offscreen", priority)
+
 struct vlc_gl_operations
 {
     union {

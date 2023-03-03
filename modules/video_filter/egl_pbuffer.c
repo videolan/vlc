@@ -482,11 +482,9 @@ vlc_module_begin()
     set_shortname( N_("egl_pbuffer") )
     set_description( N_("EGL PBuffer offscreen opengl provider") )
 #ifdef USE_OPENGL_ES2
-    set_capability( "opengl es2 offscreen", 1)
+    set_callback_opengl_es2_offscreen( Open, 1 )
 #else
-    set_capability( "opengl offscreen", 1 )
+    set_callback_opengl_offscreen( Open, 1 )
 #endif
-
     add_shortcut( "egl_pbuffer" )
-    set_callback( Open )
 vlc_module_end()
