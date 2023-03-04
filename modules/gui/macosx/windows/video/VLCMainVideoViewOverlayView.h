@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
  * NOTE: Needs to occupy the entirety, and exactly, the area of the VLCMainVideoView */
 @interface VLCMainVideoViewOverlayView : NSView
 
-@property (readwrite, assign) CGFloat bottomBarTopBoundary;
-@property (readwrite, assign) CGFloat topControlsBottomBoundary;
 @property (readwrite, assign) BOOL drawGradientForTopControls;
 
 @end

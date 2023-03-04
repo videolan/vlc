@@ -22,35 +22,24 @@
 
 #import "VLCMainVideoViewOverlayView.h"
 
-@interface VLCMainVideoViewOverlayView ()
-{
-    NSColor *_darkestGradientColor;
-}
-@end
-
 @implementation VLCMainVideoViewOverlayView
 
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
 
     // Drawing code here.
-    if (_darkestGradientColor == nil) {
-        _darkestGradientColor = [NSColor colorWithWhite:0 alpha:0.8];
-    }
+    NSColor *_darkestGradientColor = [NSColor colorWithWhite:0 alpha:0.4];
 
-    const CGFloat bottomBarTopPositionRelative = (_bottomBarTopBoundary * 1.25) / self.frame.size.height;
     NSGradient *gradient;
 
     if (_drawGradientForTopControls) {
-        const CGFloat topControlsBottomPositionRelative = (_topControlsBottomBoundary * 0.9) / self.frame.size.height;
         gradient = [[NSGradient alloc] initWithColorsAndLocations:_darkestGradientColor, 0.,
-                    [NSColor clearColor], bottomBarTopPositionRelative,
-                    [NSColor clearColor], topControlsBottomPositionRelative,
+                    [NSColor clearColor], 0.5,
                     _darkestGradientColor, 1.,
                     nil];
     } else {
         gradient = [[NSGradient alloc] initWithColorsAndLocations:_darkestGradientColor, 0,
-                    [NSColor clearColor], bottomBarTopPositionRelative,
+                    [NSColor clearColor], 1.,
                     nil];
     }
 

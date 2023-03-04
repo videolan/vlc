@@ -87,9 +87,6 @@
 
     _returnButtonBottomConstraint.active = NO;
     _playlistButtonBottomConstraint.active = NO;
-
-    _overlayView.bottomBarTopBoundary = _bottomBarView.frame.size.height;
-    [_overlayView drawRect:_overlayView.frame];
 }
 
 - (BOOL)mouseOnControls
@@ -281,7 +278,6 @@
     _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + [VLCLibraryUIUnits mediumSpacing] + realButtonSpace : [VLCLibraryUIUnits largeSpacing];
     _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: [VLCLibraryUIUnits largeSpacing];
 
-    _overlayView.topControlsBottomBoundary = _overlayView.frame.size.height - (buttonTopSpace + _returnButton.frame.size.height);
     _overlayView.drawGradientForTopControls = !placeInFakeToolbar;
     [_overlayView drawRect:_overlayView.frame];
 }
