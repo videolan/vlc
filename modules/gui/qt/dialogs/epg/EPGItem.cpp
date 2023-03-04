@@ -151,7 +151,7 @@ uint16_t EPGItem::eventID() const
 
 bool EPGItem::setData( const vlc_epg_event_t *data )
 {
-    QDateTime newtime = QDateTime::fromTime_t( data->i_start );
+    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start );
     QString newname = qfu( data->psz_name );
     QString newdesc = qfu( data->psz_description );
     QString newshortdesc = qfu( data->psz_short_description );
