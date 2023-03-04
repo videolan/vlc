@@ -178,7 +178,7 @@ bool QVLCTools::restoreWidgetPosition(QSettings *settings, QWidget *widget,
         widget->resize(defSize);
 
         if (defPos.x() == 0 && defPos.y()==0)
-            widget->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, widget->size(), qApp->desktop()->availableGeometry()));
+            widget->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, widget->size(), qApp->primaryScreen()->availableGeometry()));
         return true;
     }
     return false;
