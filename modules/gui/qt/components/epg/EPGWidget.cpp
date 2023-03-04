@@ -110,7 +110,11 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     vlc_mutex_lock(  & p_input_item->lock );
     m_epgView->updateEPG( p_input_item->pp_epg, p_input_item->i_epg );
     m_epgView->setEpgTime( ( p_input_item->i_epg_time ) ?
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+                           QDateTime::fromSecsSinceEpoch( p_input_item->i_epg_time ) :
+#else
                            QDateTime::fromTime_t( p_input_item->i_epg_time ) :
+#endif
                            QDateTime() );
     vlc_mutex_unlock( & p_input_item->lock );
 
