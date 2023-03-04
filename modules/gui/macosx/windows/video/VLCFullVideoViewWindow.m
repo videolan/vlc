@@ -24,6 +24,8 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "library/VLCLibraryUIUnits.h"
+
 #import "main/VLCMain.h"
 
 #import "playlist/VLCPlaylistController.h"
@@ -33,6 +35,7 @@
 {
     BOOL _autohideTitlebar;
     NSTimer *_hideTitlebarTimer;
+    BOOL _isFadingIn;
 }
 @end
 
@@ -78,16 +81,21 @@
 {
     [self stopTitlebarAutohideTimer];
 
-    NSView *titlebarView =  [self standardWindowButton:NSWindowCloseButton].superview;
-    if (!titlebarView.hidden && !_autohideTitlebar) {
+    NSView *titlebarView = [self standardWindowButton:NSWindowCloseButton].superview;
+
+    if (!_autohideTitlebar) {
+        titlebarView.alphaValue = 1.0f;
         return;
     }
 
-    titlebarView.hidden = NO;
-
-    if (_autohideTitlebar) {
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        self->_isFadingIn = YES;
+        [context setDuration:[VLCLibraryUIUnits controlsFadeAnimationDuration]];
+        [titlebarView.animator setAlphaValue:1.0f];
+    } completionHandler:^{
+        self->_isFadingIn = NO;
         [self startTitlebarAutohideTimer];
-    }
+    }];
 }
 
 - (void)hideTitleBar:(id)sender
@@ -100,7 +108,12 @@
         return;
     }
 
-    [self standardWindowButton:NSWindowCloseButton].superview.hidden = YES;
+    NSView *titlebarView = [self standardWindowButton:NSWindowCloseButton].superview;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        [context setDuration:[VLCLibraryUIUnits controlsFadeAnimationDuration]];
+        [titlebarView.animator setAlphaValue:0.0f];
+    } completionHandler:nil];
 }
 
 - (void)enableVideoTitleBarMode
