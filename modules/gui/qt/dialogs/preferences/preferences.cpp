@@ -69,7 +69,7 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     types->setAlignment( Qt::AlignHCenter );
     QHBoxLayout *types_l = new QHBoxLayout;
     types_l->setSpacing( 3 );
-    types_l->setMargin( 3 );
+    types_l->setContentsMargins(3, 3, 3, 3);
     simple = new QRadioButton( qtr( "Simple" ), types );
     simple->setToolTip( qtr( "Switch to simple preferences view" ) );
     all = new QRadioButton( qtr("All"), types );
@@ -110,9 +110,9 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     simple_split_widget->layout()->addWidget( simple_tree_panel );
     simple_split_widget->layout()->addWidget( simple_panels_stack );
 
-    simple_tree_panel->layout()->setMargin( 1 );
+    simple_tree_panel->layout()->setContentsMargins(1, 1, 1, 1);
     simple_panels_stack->setContentsMargins( 6, 0, 0, 3 );
-    simple_split_widget->layout()->setMargin( 0 );
+    simple_split_widget->layout()->setContentsMargins(0, 0, 0, 0);
 
     stack->insertWidget( SIMPLE, simple_split_widget );
 
@@ -164,7 +164,7 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     main_layout->addWidget( types, 3, 0, 2, 1 );
     main_layout->addWidget( buttonsBox, 4, 2, 1 ,1 );
     main_layout->setRowStretch( 2, 4 );
-    main_layout->setMargin( 9 );
+    main_layout->setContentsMargins(9, 9, 9, 9);
 
     switch( var_InheritInteger( p_intf, "qt-initial-prefs-view" ) )
     {

@@ -554,7 +554,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
     /* Widgets now */
     global_layout = new QVBoxLayout();
-    global_layout->setMargin( 2 );
+    global_layout->setContentsMargins(2, 2, 2, 2);
 
     QLabel *titleLabel = new QLabel( heading );
     QFont titleFont = QApplication::font();

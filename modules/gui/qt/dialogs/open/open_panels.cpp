@@ -177,7 +177,7 @@ inline void FileOpenPanel::BuildOldPanel()
         connect( lineFileEdit, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
     }
 
-    dialogBox->layout()->setMargin( 0 );
+    dialogBox->layout()->setContentsMargins(0, 0, 0, 0);
     dialogBox->layout()->setSizeConstraint( QLayout::SetNoConstraint );
 
     /** END of QFileDialog tweaking **/
