@@ -202,7 +202,7 @@
                                             <constraint firstAttribute="width" constant="48" id="XBm-GM-29d"/>
                                             <constraint firstAttribute="width" secondItem="V9d-hX-iyg" secondAttribute="height" multiplier="1:1" id="mjk-wN-72b"/>
                                         </constraints>
-                                        <shadow key="shadow" blurRadius="10">
+                                        <shadow key="shadow" blurRadius="20">
                                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </shadow>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="backward.fill" catalog="system" imagePosition="only" alignment="center" continuous="YES" imageScaling="proportionallyUpOrDown" inset="2" id="fFm-ZG-R1p">
@@ -220,7 +220,7 @@
                                             <constraint firstAttribute="width" secondItem="PCC-8a-sVF" secondAttribute="height" multiplier="1:1" id="2jF-Y0-kn3"/>
                                             <constraint firstAttribute="width" constant="64" id="OHb-xJ-sqM"/>
                                         </constraints>
-                                        <shadow key="shadow" blurRadius="15">
+                                        <shadow key="shadow" blurRadius="30">
                                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </shadow>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="play.fill" catalog="system" imagePosition="overlaps" alignment="center" alternateImage="VLCPauseTemplate" imageScaling="proportionallyUpOrDown" inset="2" id="Jk0-sw-EOp">
@@ -241,7 +241,7 @@
                                             <constraint firstAttribute="width" constant="48" id="M5n-CD-fd3"/>
                                             <constraint firstAttribute="width" secondItem="sF5-Z0-bef" secondAttribute="height" multiplier="1:1" id="b5c-td-Idb"/>
                                         </constraints>
-                                        <shadow key="shadow" blurRadius="10">
+                                        <shadow key="shadow" blurRadius="20">
                                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </shadow>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="forward.fill" catalog="system" imagePosition="only" alignment="center" continuous="YES" imageScaling="proportionallyUpOrDown" inset="2" id="I4n-VO-oYa">
