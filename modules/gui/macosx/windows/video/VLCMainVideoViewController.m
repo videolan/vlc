@@ -42,6 +42,8 @@
     NSTimer *_hideControlsTimer;
     NSLayoutConstraint *_returnButtonBottomConstraint;
     NSLayoutConstraint *_playlistButtonBottomConstraint;
+
+    BOOL _isFadingIn;
 }
 @end
 
@@ -134,7 +136,10 @@
         return;
     }
 
-    _mainControlsView.hidden = YES;
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        [context setDuration:[VLCLibraryUIUnits controlsFadeAnimationDuration]];
+        [self->_mainControlsView.animator setAlphaValue:0.0f];
+    } completionHandler:nil];
 }
 
 - (void)setAutohideControls:(BOOL)autohide
@@ -163,15 +168,19 @@
     [self updatePlaylistToggleState];
     [self updateLibraryControls];
 
-    if (!_mainControlsView.hidden && !_autohideControls) {
+    if (!_autohideControls) {
+        _mainControlsView.alphaValue = 1.0f;
         return;
     }
 
-    _mainControlsView.hidden = NO;
-
-    if (_autohideControls) {
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        self->_isFadingIn = YES;
+        [context setDuration:[VLCLibraryUIUnits controlsFadeAnimationDuration]];
+        [self->_mainControlsView.animator setAlphaValue:1.0f];
+    } completionHandler:^{
+        self->_isFadingIn = NO;
         [self startAutohideTimer];
-    }
+    }];
 }
 
 - (void)setDisplayLibraryControls:(BOOL)displayLibraryControls
