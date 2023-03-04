@@ -49,7 +49,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     setWindowTitle( qtr( "Program Guide" ) );
 
     QVBoxLayout *layout = new QVBoxLayout( this );
-    layout->setMargin( 0 );
+    layout->setContentsMargins(0, 0, 0, 0);
     epg = new EPGWidget( this );
 
     QGroupBox *descBox = new QGroupBox( qtr( "Description" ), this );

@@ -161,7 +161,7 @@ inline void FileOpenPanel::BuildOldPanel()
     /* Change the text that was uncool in the usual box */
     listLabel[2]->setText( qtr( "Filter:" ) );
 
-    dialogBox->layout()->setMargin( 0 );
+    dialogBox->layout()->setContentsMargins(0, 0, 0, 0);
     dialogBox->layout()->setSizeConstraint( QLayout::SetNoConstraint );
 
     /** END of QFileDialog tweaking **/

@@ -273,7 +273,7 @@ void FileConfigControl::fillGrid( QGridLayout *l, int line )
     l->addWidget( label, line, 0 );
     l->setColumnMinimumWidth( 1, 10 );
     QHBoxLayout *textAndButton = new QHBoxLayout();
-    textAndButton->setMargin( 0 );
+    textAndButton->setContentsMargins( 0, 0, 0, 0 );
     textAndButton->addWidget( text, 2 );
     textAndButton->addWidget( browse, 0 );
     l->addLayout( textAndButton, line, LAST_COLUMN );

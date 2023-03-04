@@ -353,7 +353,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
     QVBoxLayout *layout = new QVBoxLayout( rightPane );
 
     // Left Pane
-    leftPane->layout()->setMargin(0);
+    leftPane->layout()->setContentsMargins(0, 0, 0, 0);
     leftPane->layout()->setSpacing(0);
 
     SearchLineEdit *searchInput = new SearchLineEdit();
@@ -405,7 +405,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
                   ADDON_EXTENSION );
 
     // Right Pane
-    rightPane->layout()->setMargin(0);
+    rightPane->layout()->setContentsMargins(0, 0, 0, 0);
     rightPane->layout()->setSpacing(0);
 
     // Splitter sizes init
@@ -1285,7 +1285,7 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
     QPushButton *infoButton;
 
     editorWidget->setLayout( new QHBoxLayout() );
-    editorWidget->layout()->setMargin( 0 );
+    editorWidget->layout()->setContentsMargins(0, 0, 0, 0);
 
     infoButton = new QPushButton( QIcon( ":/menu/info.svg" ),
                                   qtr( "More information..." ) );

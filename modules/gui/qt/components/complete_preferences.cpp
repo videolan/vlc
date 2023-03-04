@@ -622,7 +622,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     /* Widgets now */
     global_layout = new QVBoxLayout();
-    global_layout->setMargin( 2 );
+    global_layout->setContentsMargins( 2, 2, 2, 2 );
     QString head;
     QString help;
 
