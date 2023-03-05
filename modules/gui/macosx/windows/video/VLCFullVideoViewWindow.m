@@ -104,7 +104,11 @@
 {
     [self stopTitlebarAutohideTimer];
 
-    if (self.videoViewController.mouseOnControls) {
+    if (self.videoViewController.mouseOnControls ||
+        !_autohideTitlebar ||
+        self.isInNativeFullscreen ||
+        self.videoViewController.view.hidden) {
+
         [self showTitleBar];
         return;
     }
