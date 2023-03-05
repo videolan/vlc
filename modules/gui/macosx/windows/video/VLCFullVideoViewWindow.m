@@ -53,6 +53,8 @@
                              object:nil];
 
     self.titleVisibility = NSWindowTitleHidden;
+    self.ignoresMouseEvents = NO;
+    self.acceptsMouseMovedEvents = YES;
 }
 
 - (void)stopTitlebarAutohideTimer
@@ -138,6 +140,23 @@
 - (void)shouldShowFullscreenController:(NSNotification *)aNotification
 {
     [self showTitleBar];
+}
+
+- (void)mouseMoved:(NSEvent *)event
+{
+    [super mouseExited:event];
+
+    NSPoint mouseLocation = [event locationInWindow];
+
+    BOOL mouseOutsideWindow = ![self.contentView mouse:mouseLocation inRect:self.contentView.frame];
+
+    if (_autohideTitlebar && mouseOutsideWindow) {
+        [self hideTitleBar:self];
+    }
+
+    if (self.videoViewController.autohideControls && mouseOutsideWindow) {
+        [self.videoViewController hideControls];
+    }
 }
 
 @end
