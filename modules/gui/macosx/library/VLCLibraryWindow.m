@@ -814,11 +814,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     // And repurpose it to hide the video view
     [self.backwardsNavigationButton setEnabled:YES];
 
-    if (self.isInNativeFullscreen && [self hasActiveVideo] && [self fullscreen]) {
-        [self hideControlsBar];
-        [self.videoViewController showControls];
-    }
-
     [self enableVideoTitleBarMode];
     [self hideControlsBar];
     [self.videoViewController showControls];
@@ -843,10 +838,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.backwardsNavigationButton setEnabled:_navigationStack.backwardsAvailable];
 
     [self setViewForSelectedSegment];
-
-    if (self.isInNativeFullscreen) {
-        [self showControlsBar];
-    }
 
     [self disableVideoTitleBarMode];
     [self showControlsBar];
