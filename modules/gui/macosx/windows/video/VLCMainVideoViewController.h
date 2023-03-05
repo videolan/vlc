@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL mouseOnControls;
 
 - (void)showControls;
+- (void)hideControls;
 
 - (IBAction)togglePlaylist:(id)sender;
 - (IBAction)returnToLibrary:(id)sender;

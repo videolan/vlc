@@ -116,12 +116,17 @@
 
     _hideControlsTimer = [NSTimer scheduledTimerWithTimeInterval:timeToKeepVisibleInSec
                                                           target:self
-                                                        selector:@selector(hideControls:)
+                                                        selector:@selector(shouldHideControls:)
                                                         userInfo:nil
                                                          repeats:NO];
 }
 
-- (void)hideControls:(id)sender
+- (void)shouldHideControls:(id)sender
+{
+    [self hideControls];
+}
+
+- (void)hideControls
 {
     [self stopAutohideTimer];
 
