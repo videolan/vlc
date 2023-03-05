@@ -127,8 +127,7 @@
 
     NSPoint mousePos = [self.view.window mouseLocationOutsideOfEventStream];
 
-    if ([self mouseOnControls] ||
-        VLCMain.sharedInstance.playlistController.playerController.playerState == VLC_PLAYER_STATE_PAUSED) {
+    if ([self mouseOnControls]) {
         [self showControls];
         return;
     }

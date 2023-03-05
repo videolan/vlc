@@ -102,8 +102,7 @@
 {
     [self stopTitlebarAutohideTimer];
 
-    if (self.videoViewController.mouseOnControls ||
-        VLCMain.sharedInstance.playlistController.playerController.playerState == VLC_PLAYER_STATE_PAUSED) {
+    if (self.videoViewController.mouseOnControls) {
         [self showTitleBar];
         return;
     }
