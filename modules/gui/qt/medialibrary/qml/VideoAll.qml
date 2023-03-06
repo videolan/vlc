@@ -379,7 +379,7 @@ FocusScope {
         coverWidth : VLCStyle.dp(182, VLCStyle.scale)
         coverHeight: VLCStyle.dp(114, VLCStyle.scale)
 
-        visible: !model.hasContent
+        visible: model.isReady && (model.count <= 0)
 
         focus: visible
 

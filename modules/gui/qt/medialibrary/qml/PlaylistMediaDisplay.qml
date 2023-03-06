@@ -197,7 +197,7 @@ FocusScope {
     EmptyLabelButton {
         anchors.fill: parent
 
-        visible: !model.hasContent
+        visible: model.isReady && (model.count <= 0)
 
         focus: visible
 

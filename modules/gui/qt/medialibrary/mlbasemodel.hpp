@@ -57,7 +57,8 @@ class MLBaseModel : public QAbstractListModel
 
     Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged FINAL)
 
-    Q_PROPERTY(bool hasContent READ hasContent NOTIFY hasContentChanged FINAL)
+    // isReady is true when ml is not null pointer and cache count is not uninitialized
+    Q_PROPERTY(bool isReady READ isReady NOTIFY isReadyChanged FINAL)
 
 public:
     explicit MLBaseModel(QObject *parent = nullptr);
@@ -88,7 +89,7 @@ signals:
     void sortOrderChanged();
     void sortCriteriaChanged();
     void countChanged(unsigned int) const;
-    void hasContentChanged();
+    void isReadyChanged() const;
 
 protected slots:
     void onResetRequested();
@@ -174,7 +175,7 @@ public:
     int rowCount(const QModelIndex &parent = {}) const override;
     virtual unsigned int getCount() const;
 
-    bool hasContent() const;
+    bool isReady() const;
 
 private:
     void onCacheDataChanged(int first, int last);

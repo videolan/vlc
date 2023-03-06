@@ -332,7 +332,7 @@ FocusScope {
 
     EmptyLabelButton {
         anchors.fill: parent
-        visible: !albumModelId.hasContent
+        visible: albumModelId.isReady && (albumModelId.count <= 0)
         focus: visible
         text: I18n.qtr("No albums found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
