@@ -746,9 +746,6 @@ static void CleanInputVideo(decoder_t *p_dec)
         if (p_dec->fmt_in->i_codec == VLC_CODEC_H264
          || p_dec->fmt_in->i_codec == VLC_CODEC_HEVC)
             hxxx_helper_clean(&p_sys->video.hh);
-
-        if (p_sys->video.timestamp_fifo)
-            timestamp_FifoRelease(p_sys->video.timestamp_fifo);
     }
 }
 
@@ -1056,6 +1053,9 @@ static void CleanDecoder(decoder_sys_t *p_sys)
 
     if (p_sys->video.surfacetexture)
         vlc_asurfacetexture_Delete(p_sys->video.surfacetexture);
+
+    if (p_sys->video.timestamp_fifo)
+        timestamp_FifoRelease(p_sys->video.timestamp_fifo);
 
     free(p_sys);
 }
