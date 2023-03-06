@@ -404,8 +404,29 @@ void MainUI::registerQMLTypes()
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)
 {
-    for (auto& error: qmlErrors)
+    for( const auto& error: qmlErrors )
     {
-        msg_Warn( m_intf, "qml error %s:%i %s", qtu(error.url().toString()), error.line(), qtu(error.description()) );
+        vlc_log_type type;
+
+        switch( error.messageType() )
+        {
+        case QtInfoMsg:
+            type = VLC_MSG_INFO; break;
+        case QtWarningMsg:
+            type = VLC_MSG_WARN; break;
+        case QtCriticalMsg:
+        case QtFatalMsg:
+            type = VLC_MSG_ERR; break;
+        case QtDebugMsg:
+        default:
+            type = VLC_MSG_DBG;
+        }
+
+        msg_Generic( m_intf,
+                     type,
+                     "qml message %s:%i %s",
+                     qtu(error.url().toString()),
+                     error.line(),
+                     qtu(error.description()) );
     }
 }
