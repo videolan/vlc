@@ -1,0 +1,43 @@
+From 2d5f9c9a5472ec826ab9e3f2d3e1ded11aeecd4b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sun, 5 Mar 2023 23:36:53 +0200
+Subject: [PATCH 1/2] vulkan: Fix win/i386 calling convention
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This fixes the following error when compiling with a modern
+version of Clang for Windows/i386:
+
+src/libavutil/hwcontext_vulkan.c:738:32: error: incompatible function pointer types initializing 'PFN_vkDebugUtilsMessengerCallbackEXT' (aka 'unsigned int (*)(enum VkDebugUtilsMessageSeverityFlagBitsEXT, unsigned int, const struct VkDebugUtilsMessengerCallbackDataEXT *, void *) __attribute__((stdcall))') with an expression of type 'VkBool32 (VkDebugUtilsMessageSeverityFlagBitsEXT, VkDebugUtilsMessageTypeFlagsEXT, const VkDebugUtilsMessengerCallbackDataEXT *, void *)' (aka 'unsigned int (enum VkDebugUtilsMessageSeverityFlagBitsEXT, unsigned int, const struct VkDebugUtilsMessengerCallbackDataEXT *, void *)') [-Wincompatible-function-pointer-types]
+            .pfnUserCallback = vk_dbg_callback,
+                               ^~~~~~~~~~~~~~~
+
+Signed-off-by: Martin Storsjö <martin@martin.st>
+(cherry picked from commit f9620d74cd49c35223304ba41e28be6144e45783)
+---
+ libavutil/hwcontext_vulkan.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libavutil/hwcontext_vulkan.c b/libavutil/hwcontext_vulkan.c
+index 2a9b5f4aac..5b86aa65e9 100644
+--- a/libavutil/hwcontext_vulkan.c
++++ b/libavutil/hwcontext_vulkan.c
+@@ -401,10 +401,10 @@ static const char *vk_ret2str(VkResult res)
+ #undef CASE
+ }
+ 
+-static VkBool32 vk_dbg_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+-                                VkDebugUtilsMessageTypeFlagsEXT messageType,
+-                                const VkDebugUtilsMessengerCallbackDataEXT *data,
+-                                void *priv)
++static VkBool32 VKAPI_CALL vk_dbg_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
++                                           VkDebugUtilsMessageTypeFlagsEXT messageType,
++                                           const VkDebugUtilsMessengerCallbackDataEXT *data,
++                                           void *priv)
+ {
+     int l;
+     AVHWDeviceContext *ctx = priv;
+-- 
+2.34.1
+
