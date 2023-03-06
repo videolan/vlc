@@ -1,0 +1,50 @@
+From 0ce6b348746c3c0fc5cb4f1494c50bcca9a28172 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kacper=20Michaj=C5=82ow?= <kasper93@gmail.com>
+Date: Thu, 2 Mar 2023 17:27:30 +0100
+Subject: [PATCH 2/2] lavu/vulkan: fix handle type for 32-bit targets
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes compilation with clang which errors out on Wint-conversion.
+
+Signed-off-by: Kacper Michajłow <kasper93@gmail.com>
+Signed-off-by: Martin Storsjö <martin@martin.st>
+(cherry picked from commit cc76e8340d28438c1ac56ee7dfd774d25e944264)
+---
+ libavutil/hwcontext_vulkan.c | 2 +-
+ libavutil/vulkan.h           | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/libavutil/hwcontext_vulkan.c b/libavutil/hwcontext_vulkan.c
+index 5b86aa65e9..ffd4f5dec4 100644
+--- a/libavutil/hwcontext_vulkan.c
++++ b/libavutil/hwcontext_vulkan.c
+@@ -1149,7 +1149,7 @@ static void free_exec_ctx(AVHWFramesContext *hwfc, VulkanExecCtx *cmd)
+ 
+     av_freep(&cmd->queues);
+     av_freep(&cmd->bufs);
+-    cmd->pool = NULL;
++    cmd->pool = VK_NULL_HANDLE;
+ }
+ 
+ static VkCommandBuffer get_buf_exec_ctx(AVHWFramesContext *hwfc, VulkanExecCtx *cmd)
+diff --git a/libavutil/vulkan.h b/libavutil/vulkan.h
+index d1ea1e24fb..90922c6cf3 100644
+--- a/libavutil/vulkan.h
++++ b/libavutil/vulkan.h
+@@ -122,7 +122,11 @@ typedef struct FFVulkanPipeline {
+     VkDescriptorSetLayout         *desc_layout;
+     VkDescriptorPool               desc_pool;
+     VkDescriptorSet               *desc_set;
++#if VK_USE_64_BIT_PTR_DEFINES == 1
+     void                         **desc_staging;
++#else
++    uint64_t                      *desc_staging;
++#endif
+     VkDescriptorSetLayoutBinding **desc_binding;
+     VkDescriptorUpdateTemplate    *desc_template;
+     int                           *desc_set_initialized;
+-- 
+2.34.1
+
