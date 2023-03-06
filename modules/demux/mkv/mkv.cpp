@@ -39,6 +39,7 @@ extern "C" {
 
 #include <vlc_fs.h>
 #include <vlc_url.h>
+#include <vlc_ancillary.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -534,6 +535,13 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtu
     return p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, b_precise ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
+static void ReleaseVpxAlpha(void *opaque)
+{
+    auto alpha = static_cast<vlc_vpx_alpha_t*>(opaque);
+    free(alpha->data);
+    delete alpha;
+}
+
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                   KaxBlockAdditions *additions,
@@ -697,6 +705,52 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             p_block = AV1_Unpack_Sample( p_block );
             if( unlikely( !p_block ) )
                 continue;
+            break;
+
+        case VLC_CODEC_VP8:
+        case VLC_CODEC_VP9:
+            if (additions && track.fmt.i_level) // contains alpha extradata
+            {
+                KaxBlockMore *blockMore = FindChild<KaxBlockMore>(*additions);
+                if(blockMore == nullptr)
+                    break;
+                KaxBlockAddID *addId = FindChild<KaxBlockAddID>(*blockMore);
+                if(addId == nullptr)
+                    break;
+                if (static_cast<uint64>(*addId) != 1)
+                    break;
+
+                KaxBlockAdditional *addition = FindChild<KaxBlockAdditional>(*blockMore);
+                if(addition == nullptr)
+                    break;
+
+                auto alpha_data = new(std::nothrow) vlc_vpx_alpha_t();
+                if (unlikely(alpha_data == nullptr))
+                {
+                    block_Release( p_block );
+                    return;
+                }
+                alpha_data->data = static_cast<uint8_t*>(malloc(addition->GetSize()));
+                if (unlikely(alpha_data->data == nullptr))
+                {
+                    delete alpha_data;
+                    block_Release( p_block );
+                    return;
+                }
+                alpha_data->size = addition->GetSize();
+                memcpy(alpha_data->data, addition->GetBuffer(), addition->GetSize());
+                vlc_ancillary *alpha =
+                    vlc_ancillary_CreateWithFreeCb(alpha_data, VLC_ANCILLARY_ID_VPX_ALPHA,
+                                                   ReleaseVpxAlpha);
+                if (likely(alpha != NULL))
+                    vlc_frame_AttachAncillary(p_block, alpha);
+                else
+                {
+                    ReleaseVpxAlpha(alpha_data);
+                    block_Release( p_block );
+                    return;
+                }
+            }
             break;
         }
 

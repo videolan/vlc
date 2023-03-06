@@ -1773,10 +1773,14 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_VP8") {
             vars.p_fmt->i_codec = VLC_CODEC_VP8;
+            if (vars.p_tk->b_has_alpha)
+                vars.p_fmt->i_level = 0x1000; // mark as containing alpha data
             vars.p_tk->b_pts_only = true;
         }
         S_CASE("V_VP9") {
             vars.p_fmt->i_codec = VLC_CODEC_VP9;
+            if (vars.p_tk->b_has_alpha)
+                vars.p_fmt->i_level = 0x1000; // mark as containing alpha data
             vars.p_fmt->b_packetized = false;
             vars.p_tk->b_pts_only = true;
 
