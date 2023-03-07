@@ -1061,7 +1061,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     if (player->sub_string_ids)
         vlc_player_input_SelectTracksByStringIds(input, SPU_ES,
                                                  player->sub_string_ids);
-
+  #if 0
     /* Initial sub/audio delay */
     const vlc_tick_t cat_delays[DATA_ES] = {
         [VIDEO_ES] =
@@ -1088,6 +1088,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
                                      cat_delays[i]);
         }
     }
+#endif
     return input;
 }
 
