@@ -594,7 +594,10 @@ Flush(aout_stream_t *stream)
 
     vlc_tick_t unused;
     if (GetFrameTimestampLocked(stream, &sys->frames_flush_pos, &unused) != VLC_SUCCESS)
+    {
+        sys->frames_flush_pos = 0;
         msg_Warn(stream, "Flush: can't get paused position");
+    }
 
     vlc_mutex_unlock(&sys->lock);
 
