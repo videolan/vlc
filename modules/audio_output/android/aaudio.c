@@ -424,7 +424,8 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
                 TicksToBytes(sys, TIMING_REPORT_DELAY_TICKS);
 
             pos_frames -= sys->frames_flush_pos;
-            assert(pos_frames > 0);
+            if (unlikely(pos_frames < 0))
+                pos_frames = 0;
             vlc_tick_t pos_ticks = FramesToTicks(sys, pos_frames);
 
             /* Add the start silence to the system time and don't subtract
