@@ -185,8 +185,7 @@ static int Open( vlc_object_t *p_this )
 
     /* allocate input ports */
     if( p_sys->i_channels == 0 ) p_sys->i_channels = 2 ; /* default number of port */
-    p_sys->pp_jack_port_input = malloc(
-        p_sys->i_channels * sizeof( jack_port_t* ) );
+    p_sys->pp_jack_port_input = vlc_alloc( p_sys->i_channels, sizeof( jack_port_t* ) );
     if( p_sys->pp_jack_port_input == NULL )
     {
         jack_client_close( p_sys->p_jack_client );
@@ -225,8 +224,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* allocate buffer for input ports */
-    p_sys->pp_jack_buffer = malloc ( p_sys->i_channels
-        * sizeof( jack_default_audio_sample_t * ) );
+    p_sys->pp_jack_buffer = vlc_alloc( p_sys->i_channels, sizeof( jack_default_audio_sample_t * ) );
     if( p_sys->pp_jack_buffer == NULL )
     {
         for( unsigned i = 0; i < p_sys->i_channels; i++ )
