@@ -571,7 +571,13 @@ Flush(aout_stream_t *stream)
      && WaitState(stream, AAUDIO_STREAM_STATE_PAUSED) != VLC_SUCCESS)
         return;
 
-    /* No lock needed since the DataCallback stop being called (paused) */
+    /* The doc states that "Pausing a stream will freeze the data flow but not
+     * flush any buffers" but this does not seem to be the case for all
+     * arch/devices/versions. So, flush everything with the lock held in the
+     * unlikely case that the data callback is called between PAUSED and
+     * FLUSHING */
+    vlc_mutex_lock(&sys->lock);
+
     vlc_frame_ChainRelease(sys->frame_chain);
     sys->frame_chain = NULL;
     sys->frame_last = &sys->frame_chain;
@@ -588,6 +594,8 @@ Flush(aout_stream_t *stream)
     vlc_tick_t unused;
     if (GetFrameTimestampLocked(stream, &sys->frames_flush_pos, &unused) != VLC_SUCCESS)
         msg_Warn(stream, "Flush: can't get paused position");
+
+    vlc_mutex_unlock(&sys->lock);
 
     if (RequestFlush(stream) != VLC_SUCCESS)
         return;
