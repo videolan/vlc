@@ -146,8 +146,6 @@ typedef struct decoder_sys_t
     bool                        b_drop_blocks;
     date_t                      pts;
 
-    int error_counter;
-
     vlc_video_context          *vctx;
     struct pic_pacer           *pic_pacer;
 } decoder_sys_t;
@@ -1377,7 +1375,6 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
     if (!p_sys)
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
-    p_sys->error_counter = 0;
     p_sys->session = NULL;
     p_sys->codec = codec;
     p_sys->videoFormatDescription = NULL;
@@ -1706,7 +1703,6 @@ enum {
 static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                           enum vtsession_status * p_vtsession_status)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
 #define VTERRCASE(x) \
     case x: msg_Warn(p_dec, "vt session error: '" #x "'"); break;
 
@@ -1716,7 +1712,6 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
     switch (status)
     {
         case noErr:
-            p_sys->error_counter = 0;
             return VLC_SUCCESS;
 
         VTERRCASE(kVTPropertyNotSupportedErr)
@@ -1777,14 +1772,8 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case kVTVideoDecoderReferenceMissingErr:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
                 break;
-            case kVTVideoDecoderBadDataErr:
-                p_sys->error_counter++;
-                if (p_sys->error_counter == 3)
-                    *p_vtsession_status = VTSESSION_STATUS_ABORT;
-                else
-                    *p_vtsession_status = VTSESSION_STATUS_RESTART;
-                break;
             case -8969 /* codecBadDataErr */:
+            case kVTVideoDecoderBadDataErr:
             default:
                 *p_vtsession_status = VTSESSION_STATUS_ABORT;
                 break;
