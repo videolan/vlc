@@ -162,16 +162,14 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     p_sys->i_channels = aout_FormatNbChannels( fmt );
     aout_FormatPrepare(fmt);
 
-    p_sys->p_jack_ports = malloc( p_sys->i_channels *
-                                  sizeof(jack_port_t *) );
+    p_sys->p_jack_ports = vlc_alloc( p_sys->i_channels, sizeof(jack_port_t *) );
     if( p_sys->p_jack_ports == NULL )
     {
         status = VLC_ENOMEM;
         goto error_out;
     }
 
-    p_sys->p_jack_buffers = malloc( p_sys->i_channels *
-                                    sizeof(jack_sample_t *) );
+    p_sys->p_jack_buffers = vlc_alloc( p_sys->i_channels, sizeof(jack_sample_t *) );
     if( p_sys->p_jack_buffers == NULL )
     {
         status = VLC_ENOMEM;
