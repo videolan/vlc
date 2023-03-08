@@ -38,6 +38,10 @@ T.ToolButton {
 
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    // Accessible
+
+    Accessible.onPressAction: control.clicked()
+
     readonly property ColorContext colorContext : ColorContext {
         id: theme
         colorSet: ColorContext.ToolButton

@@ -108,6 +108,8 @@ Item {
                 implicitWidth: contentItem.implicitWidth + VLCStyle.margin_xsmall * 2
                 implicitHeight: contentItem.implicitHeight + VLCStyle.margin_xxxsmall * 2
 
+                Accessible.onPressAction: control.clicked()
+
                 ColorContext {
                     id: theme
                     colorSet: root.colorContext.colorSet

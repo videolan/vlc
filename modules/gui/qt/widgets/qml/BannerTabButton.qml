@@ -57,6 +57,10 @@ T.TabButton {
 
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    // Accessible
+
+    Accessible.onPressAction: control.clicked()
+
     // Childs
 
     ColorContext {

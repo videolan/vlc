@@ -47,6 +47,9 @@ Slider {
     Keys.onRightPressed: Player.jumpFwd()
     Keys.onLeftPressed: Player.jumpBwd()
 
+    Accessible.onIncreaseAction: Player.jumpFwd()
+    Accessible.onDecreaseAction: Player.jumpBwd()
+
     function showChapterMarks() {
         _isSeekPointsShown = true
         seekpointTimer.restart()

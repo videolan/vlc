@@ -26,6 +26,9 @@ Button{
     hoverEnabled: true
     property real size: VLCStyle.icon_normal
 
+    //Accessible
+    Accessible.onPressAction: control.clicked()
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View

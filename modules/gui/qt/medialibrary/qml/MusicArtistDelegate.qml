@@ -53,6 +53,8 @@ T.Control {
 
     implicitHeight: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
 
+    Accessible.onPressAction: root.itemClicked()
+
     // Childs
 
     readonly property ColorContext colorContext: ColorContext {

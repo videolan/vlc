@@ -74,6 +74,16 @@ T.Pane {
             text: I18n.qtr("Mute")
             onClicked: Player.muted = !Player.muted
 
+            Accessible.onIncreaseAction: {
+                Player.muted = false
+                Player.setVolumeUp()
+            }
+
+            Accessible.onDecreaseAction: {
+                Player.muted = false
+                Player.setVolumeDown()
+            }
+
             Navigation.parentItem: root
             Navigation.rightItem: volControl
         }

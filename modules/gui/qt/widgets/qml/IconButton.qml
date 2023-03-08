@@ -35,6 +35,9 @@ T.Button {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    //Accessible
+    Accessible.onPressAction: control.clicked()
+
     contentItem: Item {
         T.Label {
             id: content

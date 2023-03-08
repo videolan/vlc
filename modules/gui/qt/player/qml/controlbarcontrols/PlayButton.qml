@@ -40,6 +40,9 @@ T.Control {
 
     property alias cursorInside: mouseArea.cursorInside
 
+    Accessible.onPressAction: mainPlaylistController.togglePlayPause()
+    Accessible.onToggleAction: mainPlaylistController.togglePlayPause()
+
     Keys.onPressed: {
         if (KeyHelper.matchOk(event) ) {
             if (!event.isAutoRepeat) {

@@ -66,6 +66,11 @@ T.Button {
 
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+
+    // Accessible
+
+    Accessible.onPressAction: control.clicked()
+
     // Childs
 
 

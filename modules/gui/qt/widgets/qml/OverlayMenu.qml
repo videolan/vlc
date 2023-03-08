@@ -233,6 +233,8 @@ FocusScope {
                     }
                 }
 
+                Accessible.onPressAction: trigger(true)
+
                 contentItem: RowLayout {
                     id: rowLayout
 

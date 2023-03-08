@@ -436,8 +436,9 @@ FocusScope{
 
             Navigation.parentItem: root
             Navigation.leftItem: menuSelector.visible ? menuSelector : backBtn
-            onClicked: togglePlaylistVisibility()
 
+            onClicked: togglePlaylistVisibility()
+            Accessible.onToggleAction:togglePlaylistVisibility()
             onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
         }
     }

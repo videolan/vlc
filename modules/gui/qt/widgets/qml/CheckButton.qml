@@ -63,6 +63,11 @@ T.Switch {
 
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    // Accessible
+
+    Accessible.onPressAction: control.clicked()
+    Accessible.onToggleAction: control.toggle()
+
     // Events
 
     onWidthChanged: {

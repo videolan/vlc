@@ -80,6 +80,7 @@ T.Control {
 
     Accessible.role: Accessible.Cell
     Accessible.name: title
+    Accessible.onPressAction: root.playClicked()
 
     Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
 

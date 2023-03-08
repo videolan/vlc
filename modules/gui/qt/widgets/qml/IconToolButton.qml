@@ -57,6 +57,10 @@ T.ToolButton {
 
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    // Accessible
+
+    Accessible.onPressAction: control.clicked()
+
     // Childs
 
     T.ToolTip.text: control.text

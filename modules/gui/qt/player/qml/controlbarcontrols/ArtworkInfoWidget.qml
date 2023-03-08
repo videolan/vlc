@@ -60,9 +60,9 @@ AbstractButton {
         }
     }
 
-    onClicked: {
-        g_mainDisplay.showPlayer()
-    }
+    onClicked: g_mainDisplay.showPlayer()
+
+    Accessible.onPressAction: artworkInfoItem.clicked()
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
