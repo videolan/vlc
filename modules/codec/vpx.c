@@ -273,17 +273,10 @@ static int Decode(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
 
     for (int plane = 0; plane < pic->i_planes; plane++ ) {
-        uint8_t *src = img->planes[plane];
-        uint8_t *dst = pic->p[plane].p_pixels;
-        int src_stride = img->stride[plane];
-        int dst_stride = pic->p[plane].i_pitch;
-
-        int size = __MIN( src_stride, dst_stride );
-        for( int line = 0; line < pic->p[plane].i_visible_lines; line++ ) {
-            memcpy( dst, src, size );
-            src += src_stride;
-            dst += dst_stride;
-        }
+        plane_t src_plane = pic->p[plane];
+        src_plane.p_pixels = img->planes[plane];
+        src_plane.i_pitch = img->stride[plane];
+        plane_CopyPixels(&pic->p[plane], &src_plane);
     }
 
     pic->b_progressive = true; /* codec does not support interlacing */
