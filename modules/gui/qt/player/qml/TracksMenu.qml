@@ -191,16 +191,36 @@ T.Popup {
 
                 Navigation.leftItem: column
 
-                model: [{
+                //we store the model in a different property as functions can't be passed in modelData
+                property var modelDefinition: [{
                         "title": I18n.qtr("Subtitle"),
-                        "tracksModel": Player.subtitleTracks
+                        "tracksModel": Player.subtitleTracks,
+                        "menuIcon": VLCIcons.expand,
+                        "menuText": I18n.qtr("Menu"),
+                        "menuAction": function(menuPos) {
+                            menuSubtitle.popup(menuPos)
+                        },
+
                     }, {
                         "title": I18n.qtr("Audio"),
-                        "tracksModel": Player.audioTracks
+                        "tracksModel": Player.audioTracks,
+                        "menuIcon": VLCIcons.expand,
+                        "menuText": I18n.qtr("Menu"),
+                        "menuAction": function(menuPos) {
+                            menuSubtitle.popup(menuPos)
+                        }
                     }, {
                         "title": I18n.qtr("Video Tracks"),
-                        "tracksModel": Player.videoTracks
+                        "tracksModel": Player.videoTracks,
+                        "menuIcon": VLCIcons.add,
+                        "menuText": I18n.qtr("Add"),
+                        "menuAction": function(menuPos) {
+                            DialogsProvider.loadVideoFile()
+                        },
                     }]
+
+                //note that parenthesis around functions are *mandatory*
+                model: modelDefinition
 
                 delegate: Column {
                     id: tracksListContainer
@@ -263,24 +283,15 @@ T.Popup {
 
                             focus: true
 
-                            iconText: (index === 2) ? VLCIcons.add
-                                                    : VLCIcons.expand
+                            text: modelData.menuText
+                            iconText: modelData.menuIcon
 
                             Navigation.parentItem: tracksListContainer
                             Navigation.downItem: tracksList
 
                             onClicked: {
-                                switch (index) {
-                                case 0:
-                                    menuSubtitle.popup(mapToGlobal(0, height))
-                                    break
-                                case 1:
-                                    menuAudio.popup(mapToGlobal(0, height))
-                                    break
-                                case 2:
-                                    DialogsProvider.loadVideoFile()
-                                    break
-                                }
+                                //functions aren't passed to modelData
+                                row.modelDefinition[index].menuAction(mapToGlobal(0, height))
                             }
                         }
                     }
