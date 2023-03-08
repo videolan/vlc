@@ -2604,6 +2604,8 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     p_es->p_dec = dec;
 
     EsOutDecoderChangeDelay( out, p_es );
+
+    EsOutUpdateDelayJitter(out);
 }
 static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 {
