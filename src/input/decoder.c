@@ -2223,31 +2223,18 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     /* Make sure we aren't waiting/decoding anymore */
     vlc_cond_signal( &p_owner->wait_request );
 
-    /* If the video output is paused or slow, or if the picture pool size was
-     * under-estimated (e.g. greedy video filter, buggy decoder...), the
-     * the picture pool may be empty, and the decoder thread or any decoder
-     * module worker threads may be stuck waiting for free picture buffers.
-     *
-     * This unblocks the thread, allowing the decoder module to join all its
-     * worker threads (if any) and the decoder thread to terminate. */
+    /* The DecoderThread could be stuck in pf_decode(), waiting for a frame
+     * to be released to queue the block and return from there. In that case,
+     * it's not possible to close the decoder before the return of the callback.
+     * To fix this issue, prevent the decoder to queue picture in the vout by
+     * setting p_owner->aborting, and flush the vout from here to return the
+     * pictures to the decoder. This unblocks the DecoderThread, allowing the
+     * decoder module to later join all its worker threads (if any) and the
+     * decoder thread to terminate. */
     if( p_dec->fmt_in->i_cat == VIDEO_ES && p_owner->p_vout != NULL
      && p_owner->vout_started )
     {
-        if( p_owner->paused )
-        {
-            /* The DecoderThread could be stuck in pf_decode(). This is likely the
-            * case with paused asynchronous decoder modules that have a limited
-            * input and output pool size. Indeed, with such decoders, you have to
-            * release an output buffer to get an input buffer. So, when paused and
-            * flushed, the DecoderThread could be waiting for an output buffer to
-            * be released (or rendered). In that case, the DecoderThread will
-            * never be flushed since it be never leave pf_decode(). To fix this
-            * issue, pre-flush the vout from here. The vout will have to be
-            * flushed again since the module could be outputting more buffers just
-            * after being unstuck. */
-
-            vout_FlushAll( p_owner->p_vout );
-        }
+        vout_FlushAll( p_owner->p_vout );
     }
     vlc_fifo_Unlock( p_owner->p_fifo );
 
