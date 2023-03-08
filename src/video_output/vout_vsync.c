@@ -233,7 +233,7 @@ static void *StateMachine(void *object)
                     vlc_tick_t deadline =
                         vlc_clock_ConvertToSystem(priv->clock, system_now,
                                                   priv->displayed.next->date, priv->rate);
-                    if (deadline < system_now)
+                    if (deadline <= system_now)
                     {
                         priv->state.current = VOUT_STATE_CONTROL;
                         break;
