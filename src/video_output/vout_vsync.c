@@ -121,7 +121,7 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
     if (priv->displayed.current == NULL)
     {
         NextPicture(scheduler);
-        priv->state.current = VOUT_STATE_DISPLAY;
+        priv->state.current = VOUT_STATE_CONTROL;
         return;
     }
 
