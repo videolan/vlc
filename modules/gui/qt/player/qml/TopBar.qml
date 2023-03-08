@@ -306,6 +306,7 @@ FocusScope{
                                               && _centerX + centerTitleText.implicitWidth < _rightLimit
 
         visible: root.pinControls && !resumeVisible
+        enabled: visible
 
         width: Math.min(centerTitleText._availableWidth, centerTitleText.implicitWidth)
 
@@ -344,6 +345,7 @@ FocusScope{
         width: root.textWidth - VLCStyle.margin_normal
 
         visible: !root.pinControls
+        enabled: visible
 
         topPadding: VLCStyle.margin_large
         leftPadding: logo.x

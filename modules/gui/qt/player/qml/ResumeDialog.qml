@@ -36,6 +36,7 @@ FocusScope {
     implicitWidth: maxWidth
 
     visible: false
+    enabled: visible
 
     Accessible.role: Accessible.Dialog
     Accessible.name: I18n.qtr("Resume dialog")

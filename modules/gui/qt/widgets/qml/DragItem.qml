@@ -146,6 +146,7 @@ Item {
     opacity: visible ? 0.90 : 0
 
     visible: Drag.active
+    enabled: visible
 
     function _getCover(index, data) {
         console.assert(dragItem.coverRole)

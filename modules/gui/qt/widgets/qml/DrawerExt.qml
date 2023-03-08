@@ -62,6 +62,7 @@ FocusScope {
                 y: 0
                 x: 0
                 visible: true
+                enabled: true
             }
         },
         State {
@@ -71,6 +72,7 @@ FocusScope {
                 y: root.edgeToOffset(root.edge)
                 x: root.edgeToOffset(root.edge)
                 visible: false
+                enabled: false
             }
         }
     ]

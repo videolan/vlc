@@ -46,6 +46,7 @@ Control {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    enabled: visible
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: root.Navigation.defaultKeyAction(event)

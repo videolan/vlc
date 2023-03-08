@@ -597,6 +597,7 @@ Control {
                 anchors.centerIn: parent
 
                 visible: (model.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
+                enabled: visible
 
                 opacity: (listView.activeFocus) ? 1.0 : 0.4
 

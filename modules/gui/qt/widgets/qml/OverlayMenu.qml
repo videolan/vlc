@@ -58,6 +58,7 @@ FocusScope {
     property alias scrollBarActive: scrollBar.active
 
     visible: false
+    enabled: visible
 
     function open() {
         listView.currentModel = root.model

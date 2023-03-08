@@ -41,6 +41,7 @@ FocusScope {
 
     property alias column: column
 
+    enabled: visible
     Accessible.role: Accessible.Pane
     Accessible.name: I18n.qtr("Empty view")
 
