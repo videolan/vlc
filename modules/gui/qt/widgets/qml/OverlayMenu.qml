@@ -77,6 +77,8 @@ FocusScope {
         }
     }
 
+    Accessible.role: Accessible.PopupMenu
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Window

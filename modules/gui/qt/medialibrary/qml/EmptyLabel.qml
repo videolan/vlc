@@ -41,6 +41,9 @@ FocusScope {
 
     property alias column: column
 
+    Accessible.role: Accessible.Pane
+    Accessible.name: I18n.qtr("Empty view")
+
     // Children
 
     readonly property ColorContext colorContext: ColorContext {

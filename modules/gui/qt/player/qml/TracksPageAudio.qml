@@ -61,6 +61,9 @@ TracksPage {
 
             spacing: VLCStyle.margin_xsmall
 
+            Acessible.role: Acessible.Grouping
+            Acessible.name: I18n.qtr("Audio track delay")
+
             Widgets.MenuCaption {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter

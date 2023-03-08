@@ -31,10 +31,16 @@ Item {
     onXChanged: videoSurface.onSurfacePositionChanged()
     onYChanged: videoSurface.onSurfacePositionChanged()
 
+    objectName: "pip window"
+
     property real dragXMin: 0
     property real dragXMax: 0
     property real dragYMin: undefined
     property real dragYMax: undefined
+
+    Accessible.role: Accessible.Graphic
+    Accessible.focusable: false
+    Accessible.name: I18n.qtr("video content")
 
     Connections {
         target: mouseArea.drag

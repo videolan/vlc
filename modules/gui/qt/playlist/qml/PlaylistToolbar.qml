@@ -35,6 +35,7 @@ RowLayout {
     height: VLCStyle.heightBar_normal
     spacing: VLCStyle.margin_normal
 
+    Accessible.role: Accessible.ToolBar
 
     Item {
         Layout.fillWidth: true

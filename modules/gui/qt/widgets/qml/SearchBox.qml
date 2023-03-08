@@ -127,6 +127,8 @@ FocusScope {
             Navigation.rightItem: clearButton.visible ? clearButton : iconButton
             Navigation.cancelAction: function() { root.state = "" }
 
+            Accessible.searchEdit: true
+
             //ideally we should use Keys.onShortcutOverride but it doesn't
             //work with TextField before 5.13 see QTBUG-68711
             onActiveFocusChanged: {

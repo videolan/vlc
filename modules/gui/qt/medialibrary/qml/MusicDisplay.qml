@@ -33,6 +33,9 @@ Widgets.PageLoader {
     property var contentModel
     property bool isViewMultiView: true
 
+    Accessible.role: Accessible.Client
+    Accessible.name: I18n.qtr("Music view")
+
     pageModel: [{
             displayText: I18n.qtr("Artists"),
             name: "artists",

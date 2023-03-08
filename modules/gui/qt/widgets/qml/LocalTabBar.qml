@@ -28,6 +28,8 @@ NavigableRow {
     height: VLCStyle.localToolbar_height
     focus: true
 
+    Accessible.role: Accessible.PageTabList
+
     delegate: BannerTabButton {
         text: model.displayText
         selected: model.name === row.currentView.name

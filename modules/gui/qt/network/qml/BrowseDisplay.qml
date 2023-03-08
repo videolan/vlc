@@ -59,6 +59,9 @@ Widgets.PageLoader {
         loadPage("home")
     }
 
+    Accessible.role: Accessible.Client
+    Accessible.name: I18n.qtr("Browse view")
+
     // Events
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel;

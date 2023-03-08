@@ -119,6 +119,18 @@ T.ItemDelegate {
             Layout.preferredWidth: VLCStyle.icon_normal
             Layout.alignment: Qt.AlignVCenter
 
+            Accessible.role: Accessible.Graphic
+            Accessible.name: I18n.qtr("Cover")
+            Accessible.description: {
+                if (model.isCurrent) {
+                    if (Player.playingState === Player.PLAYING_STATE_PLAYING)
+                        return I18n.qtr("Playing")
+                    else if (Player.playingState === Player.PLAYING_STATE_PAUSED)
+                        return I18n.qtr("Paused")
+                }
+                return I18n.qtr("Media cover")
+            }
+
             Widgets.ScaledImage {
                 id: artwork
 

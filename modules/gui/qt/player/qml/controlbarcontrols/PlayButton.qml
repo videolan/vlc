@@ -40,6 +40,11 @@ T.Control {
 
     property alias cursorInside: mouseArea.cursorInside
 
+    Accessible.role: Accessible.Button
+    Accessible.name: I18n.qtr("Play/Pause")
+    Accessible.checkable: true
+    Accessible.checked: Player.playingState !== Player.PLAYING_STATE_PAUSED
+                        && Player.playingState !== Player.PLAYING_STATE_STOPPED
     Accessible.onPressAction: mainPlaylistController.togglePlayPause()
     Accessible.onToggleAction: mainPlaylistController.togglePlayPause()
 

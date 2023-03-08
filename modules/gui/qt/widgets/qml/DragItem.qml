@@ -163,6 +163,10 @@ Item {
             return data[dragItem.titleRole] || dragItem.defaultText
     }
 
+    //NoRole because I'm not sure we need this to be accessible
+    //can drag items be considered Tooltip ? or is another class better suited
+    Accessible.role: Accessible.NoRole
+    Accessible.name: I18n.qtr("drag item")
 
     on_ActiveChanged: {
         if (_active) {

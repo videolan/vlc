@@ -36,6 +36,9 @@ Control {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
+    Accessible.role: Accessible.Indicator
+    Accessible.name:  paintOnly ? "00:00:00:00" : Player.highResolutionTime
+
     function _adjustSMPTETimer(add) {
         if (typeof toolbarEditor !== "undefined") // FIXME: Can't use paintOnly because it is set later
             return

@@ -145,10 +145,6 @@ FocusScope {
     signal dropExited(Item delegate, int index,  var drag, bool before)
     signal dropEvent(Item delegate, int index,  var drag, var drop, bool before)
 
-    // Settings
-
-    Accessible.role: Accessible.Table
-
     // Events
 
     Component.onCompleted: {

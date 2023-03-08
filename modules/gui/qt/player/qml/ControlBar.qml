@@ -46,13 +46,12 @@ Control {
 
     signal requestLockUnlockAutoHide(bool lock)
 
-    function showChapterMarks() {
-        trackPositionSlider.showChapterMarks()
-    }
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: root.Navigation.defaultKeyAction(event)
     Navigation.cancelAction: function() { History.previous() }
+
+    Accessible.name: I18n.qtr("Player controls")
 
     onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus(focusReason)
 
@@ -63,6 +62,11 @@ Control {
     }
 
     onTextPositionChanged: _layout()
+
+    function showChapterMarks() {
+        trackPositionSlider.showChapterMarks()
+    }
+
 
     function _layout() {
         switch (textPosition) {

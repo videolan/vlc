@@ -62,6 +62,9 @@ Item {
     property int _countHovered: 0
 
 
+    // Accessible
+    Accessible.role: Accessible.MenuBar
+
     function openMenu(obj, cb, index) {
         cb.trigger(obj)
         root._menuIndex = index

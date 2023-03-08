@@ -118,6 +118,9 @@ AbstractButton {
 
                 asynchronous: true
 
+                Accessible.role: Accessible.Graphic
+                Accessible.name: I18n.qtr("Cover")
+
                 ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
                                  && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
                 ToolTip.delay: VLCStyle.delayToolTipAppear

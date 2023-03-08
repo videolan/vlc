@@ -24,6 +24,9 @@ import "qrc:///widgets/" as Widgets
 
 FocusScope {
 
+    Accessible.role: Accessible.Client
+    Accessible.name: I18n.qtr("Home view")
+
     ColorContext {
         id: theme
         colorSet: ColorContext.View

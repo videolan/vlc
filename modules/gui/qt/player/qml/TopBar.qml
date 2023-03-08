@@ -58,6 +58,10 @@ FocusScope{
     signal requestLockUnlockAutoHide(bool lock)
     signal backRequested()
 
+
+    Accessible.name: I18n.qtr("Player topbar")
+    Accessible.role: Accessible.ToolBar
+
     Component.onCompleted:  root._layout()
 
     onShowCSDChanged: root._layout()

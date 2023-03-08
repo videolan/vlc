@@ -69,6 +69,9 @@ TracksPage {
 
             spacing: VLCStyle.margin_xsmall
 
+            Acessible.role: Acessible.Grouping
+            Acessible.name: I18n.qtr("Primary subtitle delay")
+
             Widgets.MenuCaption {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
@@ -141,6 +144,9 @@ TracksPage {
 
             spacing: VLCStyle.margin_xsmall
 
+            Acessible.role: Acessible.Grouping
+            Acessible.name: I18n.qtr("Secondary subtitle delay")
+
             Widgets.MenuCaption {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
@@ -211,6 +217,9 @@ TracksPage {
             Layout.fillWidth: true
 
             spacing: VLCStyle.margin_xsmall
+
+            Acessible.role: Acessible.Grouping
+            Acessible.name: I18n.qtr("Subtitle Speed")
 
             Widgets.MenuCaption {
                 Layout.fillWidth: true

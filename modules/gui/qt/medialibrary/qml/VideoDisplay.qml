@@ -80,6 +80,9 @@ Widgets.PageLoader {
         loadPage("all")
     }
 
+    Accessible.role: Accessible.Client
+    Accessible.name: I18n.qtr("Video view")
+
     onCurrentItemChanged: {
         isViewMultiView = (currentItem.isViewMultiView === undefined
                            ||

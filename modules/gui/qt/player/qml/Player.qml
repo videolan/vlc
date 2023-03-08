@@ -72,6 +72,9 @@ FocusScope {
 
     layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
 
+    Accessible.role: Accessible.Client
+    Accessible.name: I18n.qtr("Player")
+
     // Events
 
     Component.onCompleted: MainCtx.preferHotkeys = true
@@ -460,6 +463,9 @@ FocusScope {
                     asynchronous: true
 
                     sourceSize: Qt.size(maximumSize, maximumSize)
+
+                    Accessible.role: Accessible.Graphic
+                    Accessible.name: I18n.qtr("Cover")
 
                     onStatusChanged: {
                         if (status === Image.Ready)

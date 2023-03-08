@@ -43,6 +43,8 @@ Control {
     topPadding: VLCStyle.margin_normal
     bottomPadding: VLCStyle.margin_normal
 
+    Accessible.name: I18n.qtr("Playqueue")
+
     onActiveFocusChanged: if (activeFocus) listView.forceActiveFocus(focusReason)
 
     readonly property ColorContext colorContext: ColorContext {
@@ -244,14 +246,26 @@ Control {
                 font.pixelSize: VLCStyle.icon_playlistHeader
 
                 color: theme.fg.secondary
+
+                Accessible.role: Accessible.ColumnHeader
+                Accessible.name: I18n.qtr("Cover")
+                Accessible.ignored: false
             }
 
-            Widgets.CaptionLabel {
+            //Use Text here as we're redefining its Accessible.role
+            Text {
                 Layout.fillWidth: true
+
+                elide: Text.ElideRight
+                font.pixelSize: VLCStyle.fontSize_normal
+                textFormat: Text.PlainText
 
                 verticalAlignment: Text.AlignVCenter
                 text: I18n.qtr("Title")
                 color: theme.fg.secondary
+
+                Accessible.role: Accessible.ColumnHeader
+                Accessible.name: text
             }
 
             Widgets.IconLabel {
@@ -262,6 +276,10 @@ Control {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: VLCStyle.icon_playlistHeader
+
+                Accessible.role: Accessible.ColumnHeader
+                Accessible.name: I18n.qtr("Duration")
+                Accessible.ignored: false
 
                 TextMetrics {
                     id: durationMetric

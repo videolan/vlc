@@ -49,6 +49,9 @@ Widgets.PageLoader {
         loadPage("services")
     }
 
+    Accessible.role: Accessible.Client
+    Accessible.name: I18n.qtr("Discover view")
+
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel
         contentModel = currentItem.model

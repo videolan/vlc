@@ -150,6 +150,8 @@ FocusScope {
                         width: parent.width
                         height: VLCStyle.globalToolbar_height
 
+                        Accessible.role: Accessible.ToolBar
+
                         RowLayout {
                             id: globalToolbarLeft
                             anchors.verticalCenter: parent.verticalCenter
@@ -190,6 +192,8 @@ FocusScope {
                             focus: true
 
                             indexFocus: root.selectedIndex
+
+                            Accessible.role: Accessible.PageTabList
 
                             Navigation.parentItem: root
                             Navigation.leftItem: history_back.enabled ? history_back : null

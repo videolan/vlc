@@ -38,6 +38,10 @@ Item {
     ToolTip.visible: scrolling && hoverArea.containsMouse
     ToolTip.text: label.text
 
+    //Accessible
+    Accessible.role: Accessible.StaticText
+    Accessible.name: label.text
+
     onLabelChanged: {
         label.width = Qt.binding(function () { return Math.min(label.implicitWidth, root.width) })
 

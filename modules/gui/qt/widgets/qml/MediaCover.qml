@@ -19,10 +19,12 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import org.videolan.vlc 0.1
+import org.videolan.controls 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-import org.videolan.controls 0.1
 
 // NOTE: This rectangle is useful to discern the item against a similar background.
 // FIXME: Maybe we could refactor this to draw the background directly in the RoundImage.
@@ -55,6 +57,9 @@ Rectangle {
 
     height: VLCStyle.listAlbumCover_height
     width: VLCStyle.listAlbumCover_width
+
+    Accessible.role: Accessible.Graphic
+    Accessible.name: I18n.qtr("Media cover")
 
     // Children
 

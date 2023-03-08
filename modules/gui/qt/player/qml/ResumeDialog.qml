@@ -37,6 +37,9 @@ FocusScope {
 
     visible: false
 
+    Accessible.role: Accessible.Dialog
+    Accessible.name: I18n.qtr("Resume dialog")
+
     signal hidden()
 
     function showResumePanel ()

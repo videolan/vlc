@@ -212,6 +212,9 @@ T.Popup {
 
                     focus: true
 
+                    Accessible.role: Accessible.Pane
+                    Accessible.name: modelData.title
+
                     onActiveFocusChanged: if (activeFocus) tracksList.forceActiveFocus(focusReason)
 
                     Item {
@@ -291,6 +294,9 @@ T.Popup {
                         leftMargin: separator.width
                         focus: true
                         clip: true
+
+                        Accessible.role: Accessible.List
+                        Accessible.name: I18n.qtr("Track list")
 
                         Navigation.parentItem: tracksListContainer
                         Navigation.upItem: button

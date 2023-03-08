@@ -167,6 +167,9 @@ Item {
 
             property real layoutWidth: layout.width
 
+            Accessible.role: Accessible.AlertMessage
+            Accessible.name: I18n.qtr("error popup")
+
             RowLayout {
                 id: layout
 

@@ -38,6 +38,9 @@ FocusScope {
 
     implicitHeight: VLCStyle.artistBanner_height
 
+    Accessible.role: Accessible.Pane
+    Accessible.name: I18n.qtr("Artist banner")
+
     function setCurrentItemFocus(reason) {
         playActionBtn.forceActiveFocus(reason);
     }
