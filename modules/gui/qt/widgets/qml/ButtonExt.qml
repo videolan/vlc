@@ -151,6 +151,9 @@ T.Button {
             Widgets.ListLabel {
                 text: control.text
 
+                //button text is already exposed
+                Accessible.ignored: true
+
                 color: theme.fg.primary
             }
         }

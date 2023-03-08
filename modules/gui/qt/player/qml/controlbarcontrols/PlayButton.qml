@@ -199,6 +199,8 @@ T.Control {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
 
+        Accessible.ignored: true
+
         Behavior on color {
             enabled: theme.initialized
             ColorAnimation {

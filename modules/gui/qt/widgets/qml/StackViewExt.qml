@@ -36,6 +36,9 @@ StackView {
 
     replaceExit: null
 
+    //don't report this node
+    Accessible.ignored: true
+
     // Events
 
     onCurrentItemChanged: {

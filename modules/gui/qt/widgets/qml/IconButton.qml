@@ -47,6 +47,9 @@ T.Button {
             text: control.iconText
             color: control.color
             font: control.font
+
+            //Button text is already exposed
+            Accessible.ignored: true
         }
     }
 

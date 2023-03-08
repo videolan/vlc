@@ -48,6 +48,8 @@ Item {
         label.elide = Qt.binding(function () {
             return root.scrolling ? Text.ElideNone : Text.ElideRight
         })
+
+        label.Accessible.ignored = true
     }
 
     MouseArea {

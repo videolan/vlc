@@ -82,6 +82,8 @@ Control {
             color: theme.fg.primary
 
             horizontalAlignment: Text.AlignHCenter
+
+            Accessible.ignored: true
         }
 
         TextMetrics {

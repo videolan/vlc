@@ -52,5 +52,7 @@ Item {
 
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
+
+        Accessible.ignored: true
     }
 }

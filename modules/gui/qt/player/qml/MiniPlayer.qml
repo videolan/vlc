@@ -39,6 +39,9 @@ T.Pane {
     state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? ""
                                                                   : "expanded"
 
+    //redundant with child ControlBar
+    Accessible.ignored: true
+
     states: State {
         name: "expanded"
 

@@ -44,6 +44,8 @@ Button{
         color: theme.fg.primary
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
+
+        Accessible.ignored: true
     }
 
     background: Rectangle {

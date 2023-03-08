@@ -280,6 +280,7 @@ FocusScope {
                                 horizontalAlignment: Text.AlignHCenter
                                 text: "✓"
                                 color: theme.fg.primary
+                                Accessible.ignored: true
                             }
                         }
 
@@ -302,6 +303,9 @@ FocusScope {
                         font.weight: Font.Normal
                         text: modelData.text
                         color: theme.fg.primary
+
+                        //name is reported at the button level
+                        Accessible.ignored: true
                     }
 
                     ListLabel {
@@ -316,6 +320,8 @@ FocusScope {
                                                                                                   : ""
 
                         color: theme.fg.primary
+
+                        Accessible.ignored: true
                     }
                 }
             }

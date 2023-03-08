@@ -58,6 +58,9 @@ T.ToolButton {
         color: theme.fg.primary
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
+
+        //button text is already exposed
+        Accessible.ignored: true
     }
 
     background: AnimatedBackground {

@@ -159,6 +159,7 @@ Item {
                                              : parent.height
 
                 visible: root.showTitleText
+                enabled: visible
 
                 clip: scrolling
 
@@ -188,6 +189,7 @@ Item {
                 height: textRect.height
 
                 visible: root.showCriterias
+                enabled: visible
 
                 text: (visible) ? root.getCriterias(titleDel.model, titleDel.rowModel) : ""
 
@@ -227,6 +229,8 @@ Item {
                     ? titleHeadDel.model.text || ""
                     : ""
             visible: root.showTitleText
+
+            Accessible.ignored: true
         }
     }
 

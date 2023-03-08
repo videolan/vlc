@@ -123,6 +123,9 @@ T.TabButton {
                               control.hovered     ||
                               control.selected) ? Font.DemiBold
                                                 : Font.Normal
+
+                //button text is already exposed
+                Accessible.ignored: true
             }
         }
 

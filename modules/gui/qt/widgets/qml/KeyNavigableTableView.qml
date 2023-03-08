@@ -38,6 +38,8 @@ FocusScope {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
 
+        Accessible.ignored: true
+
         text: model.text || ""
         color: parent.colorContext.fg.secondary
     }
