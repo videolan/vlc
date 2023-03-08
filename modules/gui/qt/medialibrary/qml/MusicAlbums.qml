@@ -218,6 +218,8 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "duration",
 
+                    text: I18n.qtr("Duration"),
+
                     showSection: "",
 
                     headerDelegate: tableColumns.timeHeaderDelegate,

@@ -294,6 +294,8 @@ FocusScope {
                 model: {
                     criteria: "artwork",
 
+                    text: I18n.qtr("Cover"),
+
                     headerDelegate: artworkHeader,
                     colDelegate: artworkColumn
                 }

@@ -69,6 +69,8 @@ MainInterface.MainTableView {
 
             criteria: "thumbnail",
 
+            text: I18n.qtr("Cover"),
+
             showSection: "",
 
             placeHolder: VLCStyle.noArtVideoCover,
@@ -91,6 +93,8 @@ MainInterface.MainTableView {
 
         model: ({
             criteria: "duration",
+
+            text: I18n.qtr("Duration"),
 
             showSection: "",
             showContextButton: true,

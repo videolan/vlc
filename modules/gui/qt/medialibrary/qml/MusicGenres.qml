@@ -221,6 +221,8 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "cover",
 
+                    text: I18n.qtr("Cover"),
+
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate
                 }

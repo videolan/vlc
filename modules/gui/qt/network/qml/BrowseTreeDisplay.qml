@@ -283,6 +283,8 @@ FocusScope {
                 model: {
                     criteria: "thumbnail",
 
+                    text: I18n.qtr("Cover"),
+
                     headerDelegate: thumbnailHeader,
                     colDelegate: thumbnailColumn
                 }

@@ -336,6 +336,9 @@ FocusScope {
                             height: VLCStyle.dp(20, VLCStyle.scale)
                             width: VLCStyle.colWidth(modelData.size) || 1
 
+                            Accessible.role: Accessible.ColumnHeader
+                            Accessible.name: modelData.model.text
+
                             Loader {
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom

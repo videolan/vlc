@@ -67,6 +67,8 @@ MainInterface.MainTableView {
         model: {
             criteria: "thumbnail",
 
+            text: I18n.qtr("Cover"),
+
             type: "image",
 
             headerDelegate: table.titleHeaderDelegate,
@@ -87,6 +89,8 @@ MainInterface.MainTableView {
 
         model: {
             criteria: "duration",
+
+            text: I18n.qtr("Duration"),
 
             headerDelegate: table.timeHeaderDelegate,
             colDelegate   : table.timeColDelegate

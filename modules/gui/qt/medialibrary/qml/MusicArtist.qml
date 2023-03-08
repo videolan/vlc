@@ -452,6 +452,8 @@ FocusScope {
                 model: {
                     criteria: "duration",
 
+                    text: I18n.qtr("Album"),
+
                     showSection: "",
 
                     headerDelegate: tableColumns.timeHeaderDelegate,

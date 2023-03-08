@@ -63,6 +63,8 @@ Widgets.KeyNavigableTableView {
         model: {
             criteria: "last_played_date",
 
+            text: I18n.qtr("Last played date"),
+
             showSection: "",
             showContextButton: true,
 

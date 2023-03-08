@@ -264,6 +264,8 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "thumbnail",
 
+                    text: I18n.qtr("Cover"),
+
                     headerDelegate: columns.titleHeaderDelegate,
                     colDelegate   : columns.titleDelegate
                 }
