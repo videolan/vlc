@@ -7,7 +7,11 @@
 #include <vlc_executor.h>
 
 #include "vout_scheduler.h"
-#include "../clock/clock.h"
+#ifdef VOUT_VSYNC_TEST
+ #include "../../test/src/video_output/vout_vsync_test_clock.h"
+#else
+ #include "../clock/clock.h"
+#endif
 
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
