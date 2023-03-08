@@ -106,7 +106,7 @@
     [self.stopButton setImage: imageFromRes(@"stop")];
     [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
 
-    [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
+    [self.volumeUpButton setImage: imageFromRes(@"VLCVolumeOnTemplate")];
 
     [self.fullscreenButton setImage: imageFromRes(@"VLCFullscreenOffTemplate")];
     [self.fullscreenButton setAlternateImage: imageFromRes(@"VLCFullscreenOffTemplate")];
@@ -194,7 +194,7 @@
 
 - (void)updateMuteVolumeButtonImage
 {
-    self.muteVolumeButton.image = imageFromRes(@"volume-low");
+    self.muteVolumeButton.image = imageFromRes(@"VLCVolumeOffTemplate");
 }
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
