@@ -704,8 +704,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     if( !p_sys )
         return NULL;
 
-    p_sys->i_audio_delay = var_InheritInteger(p_input, "audio-desync");
-
     p_sys->out.cbs = &es_out_cbs;
 
     vlc_mutex_init( &p_sys->lock );
