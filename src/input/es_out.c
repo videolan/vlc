@@ -708,6 +708,15 @@ static bool EsOutDecodersIsEmpty( es_out_t *out )
     return true;
 }
 
+static void EsOutUpdateDelayJitter(es_out_t *out)
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    /* Update the clock pts delay only if the extra tracks delay changed */
+    EsOutPrivControlLocked(out, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
+                           p_sys->i_pts_jitter, p_sys->i_cr_average);
+}
+
 static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -718,9 +727,7 @@ static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 
     EsOutDecoderChangeDelay(out, es);
 
-    /* Update the clock pts delay only if the extra tracks delay changed */
-    EsOutPrivControlLocked(out, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
-                           p_sys->i_pts_jitter, p_sys->i_cr_average);
+    EsOutUpdateDelayJitter(out);
 }
 
 static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
@@ -736,9 +743,7 @@ static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
     foreach_es_then_es_slaves(es)
         EsOutDecoderChangeDelay(out, es);
 
-    /* Update the clock pts delay only if the extra tracks delay changed */
-    EsOutPrivControlLocked(out, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
-                           p_sys->i_pts_jitter, p_sys->i_cr_average);
+    EsOutUpdateDelayJitter(out);
 }
 
 static int EsOutSetRecord(  es_out_t *out, bool b_record, const char *dir_path )
