@@ -373,6 +373,7 @@ vlc_vout_scheduler_New(vout_thread_t *vout, vlc_clock_t *clock,
     priv->display = display;
     priv->displayed.current = NULL;
     priv->rate = 1.f; // TODO
+    priv->pause.is_on = false;
     atomic_store(&priv->is_terminated, false);
 
     scheduler->owner.sys = owner;
