@@ -205,6 +205,8 @@ FocusScope {
 
                 enabled: modelData.enabled
 
+                text: modelData.text
+
                 width: listView.width
 
                 topPadding: VLCStyle.margin_xsmall

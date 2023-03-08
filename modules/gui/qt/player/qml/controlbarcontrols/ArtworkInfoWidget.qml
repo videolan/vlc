@@ -35,6 +35,8 @@ AbstractButton {
 
     property bool _keyPressed: false
 
+    text: I18n.qtr("Open player")
+
     padding: VLCStyle.focus_border
 
     Keys.onPressed: {

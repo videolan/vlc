@@ -90,6 +90,8 @@ Item {
                 anchors.centerIn: parent
 
                 font.pixelSize: VLCStyle.icon_large
+
+                text: I18n.qtr("play/pause")
                 iconText: (Player.playingState !== Player.PLAYING_STATE_PAUSED
                        && Player.playingState !== Player.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause
@@ -107,6 +109,7 @@ Item {
                 }
 
                 font.pixelSize: VLCStyle.icon_PIP
+                text: I18n.qtr("close video")
                 iconText: VLCIcons.close
 
                 onClicked: mainPlaylistController.stop()
@@ -122,6 +125,8 @@ Item {
                 }
 
                 font.pixelSize: VLCStyle.icon_PIP
+
+                text: I18n.qtr("maximize player")
                 iconText: VLCIcons.fullscreen
 
                 onClicked: History.push(["player"])

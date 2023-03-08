@@ -169,6 +169,7 @@ T.Popup {
 
                     x: (column.width - width) / 2
 
+                    text: I18n.qtr("Playback Speed")
                     iconText: (index === 0) ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
                                             : modelData.icon
 
