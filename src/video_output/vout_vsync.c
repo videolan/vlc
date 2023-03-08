@@ -178,28 +178,6 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
         return;
     }
 
-
-    //bool no_vsync_halted = WaitForVSYNC(scheduler, new_next_pts, &vsync_date);
-
-    //if (/*atomic_load(&sys->control_is_terminated) ||*/ !no_vsync_halted)
-    //    return VLC_EGENERIC;
-    vlc_tick_t vsync_date = priv->vsync.next_date;
-
-    // TODO: why the condition on vsync_date and system_now here ?
-    if (new_next_pts < vsync_date)// || system_now + render_delay > vsync_date)
-    {
-        //if (!priv->displayed.current_rendered)
-        /*msg_Dbg((vlc_object_t*)vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms",
-            (int)MS_FROM_VLC_TICK(vsync_date - new_next_pts),
-            (int)MS_FROM_VLC_TICK(render_delay),
-            (int)MS_FROM_VLC_TICK(new_next_pts),
-            (int)MS_FROM_VLC_TICK(vsync_date));*/
-        picture_Release(priv->displayed.current);
-        NextPicture(scheduler);
-        priv->state.current = VOUT_STATE_CONTROL;
-        return;
-    }
-
     /* Wait, this picture has already been rendered. */
     if (priv->displayed.current_rendered)
     {
