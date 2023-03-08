@@ -58,8 +58,7 @@ vlc_module_end ()
 /* Keep a list of busy drawables, so we don't overlap videos if there are
  * more than one video track in the stream. */
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
-static HHOOK hook = NULL;
-static struct drawable_sys *used = NULL;
+static HWND *used = NULL;
 
 static const struct vlc_window_operations ops = {
     .destroy = Close,
@@ -68,39 +67,43 @@ static const struct vlc_window_operations ops = {
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
 #define RECTHeight(r)  (LONG)((r).bottom - (r).top)
 
+static const TCHAR *EMBED_HWND_CLASS = TEXT("VLC embedded HWND");
+
 struct drawable_sys
 {
     HWND embed_hwnd;
     RECT rect_parent;
 
+    WNDPROC prev_proc;
+
     vlc_wasync_resize_compressor_t compressor;
 };
 
-static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK WinVoutEventProc(HWND hwnd, UINT message,
+                                         WPARAM wParam, LPARAM lParam )
 {
-    if (nCode < 0)
-        return CallNextHookEx(NULL, nCode, wParam, lParam);
-
-    MSG *pMsg = (void*)(intptr_t)lParam;
-    vlc_mutex_lock (&serializer);
-    for (struct drawable_sys *sys = used; sys->embed_hwnd != 0; sys++)
+    HANDLE p_user_data = GetProp(hwnd, EMBED_HWND_CLASS);
+    struct drawable_sys *sys = (struct drawable_sys *)p_user_data;
+    LRESULT res = CallWindowProc(sys->prev_proc, hwnd, message, wParam, lParam);
+    switch(message)
     {
-        if (pMsg->hwnd == sys->embed_hwnd)
+        case WM_SIZE:
         {
             RECT clientRect;
-            GetClientRect(pMsg->hwnd, &clientRect);
+            GetClientRect(hwnd, &clientRect);
             if (RECTWidth(sys->rect_parent)  != RECTWidth(clientRect) ||
                 RECTHeight(sys->rect_parent) != RECTHeight(clientRect))
             {
                 sys->rect_parent = clientRect;
-                vlc_wasync_resize_compressor_reportSize(&sys->compressor, RECTWidth(sys->rect_parent),
-                                                                          RECTHeight(sys->rect_parent));
+
+                vlc_wasync_resize_compressor_reportSize(&sys->compressor,
+                                                        RECTWidth(sys->rect_parent),
+                                                        RECTHeight(sys->rect_parent));
             }
-            break;
         }
+        break;
     }
-    vlc_mutex_unlock (&serializer);
-    return 0;
+    return res;
 }
 
 static void RemoveDrawable(HWND val)
@@ -110,25 +113,19 @@ static void RemoveDrawable(HWND val)
     /* Remove this drawable from the list of busy ones */
     vlc_mutex_lock (&serializer);
     assert (used != NULL);
-    while (used[n].embed_hwnd != val)
+    while (used[n] != val)
     {
-        assert (used[n].embed_hwnd);
+        assert (used[n]);
         n++;
     }
-
-    vlc_wasync_resize_compressor_destroy(&used[n].compressor);
-
     do
         used[n] = used[n + 1];
-    while (used[++n].embed_hwnd != 0);
+    while (used[++n] != 0);
 
     if (n == 1)
     {
         free (used);
         used = NULL;
-
-        UnhookWindowsHookEx(hook);
-        hook = NULL;
     }
     vlc_mutex_unlock (&serializer);
 }
@@ -143,77 +140,59 @@ static int Open(vlc_window_t *wnd)
         return VLC_EGENERIC;
     HWND val = (HWND)drawable;
 
+    HWND *tab;
     size_t n = 0;
 
     vlc_mutex_lock (&serializer);
-    bool first_hwnd = used == NULL;
     if (used != NULL)
-        for (/*n = 0*/; used[n].embed_hwnd; n++)
-            if (used[n].embed_hwnd == val)
+        for (/*n = 0*/; used[n]; n++)
+            if (used[n] == val)
             {
                 msg_Warn (wnd, "HWND 0x%p is busy", val);
                 vlc_mutex_unlock (&serializer);
                 return VLC_EGENERIC;
             }
 
-    if (hook == NULL)
-    {
-        assert(first_hwnd);
-        /* Get this DLL instance, it can't be a global module */
-        HMODULE hInstance = GetModuleHandle(TEXT("lib" MODULE_STRING "_plugin.dll"));
-        hook = SetWindowsHookEx(WH_GETMESSAGE, GetMsgProc, hInstance, 0);
-        if (hook == NULL)
-        {
-            vlc_mutex_unlock (&serializer);
-
-            char msg[256];
-            int i_error = GetLastError();
-            FormatMessageA( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                            NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-                            msg, ARRAY_SIZE(msg), NULL );
-            msg_Err(wnd, "Failed to hook to the parent window: %s", msg);
-            return VLC_EGENERIC;
-        }
-    }
-
-    struct drawable_sys *tab = realloc (used, sizeof (*used) * (n + 2));
+    tab = realloc (used, sizeof (*used) * (n + 2));
     if (unlikely(tab == NULL)) {
         vlc_mutex_unlock (&serializer);
-        if (first_hwnd)
-        {
-            UnhookWindowsHookEx(hook);
-            hook = NULL;
-        }
         return VLC_ENOMEM;
     }
     used = tab;
-    used[n].embed_hwnd = val;
-    used[n + 1].embed_hwnd = 0;
+    used[n] = val;
+    used[n + 1] = 0;
 
     vlc_mutex_unlock (&serializer);
 
+    struct drawable_sys *sys = vlc_obj_calloc(VLC_OBJECT(wnd), 1, sizeof(*sys));
+    if (unlikely(sys == NULL)) {
+        RemoveDrawable(val);
+        return VLC_ENOMEM;
+    }
 
-    struct drawable_sys *sys = &used[n];
-    GetClientRect(val, &sys->rect_parent);
+    sys->embed_hwnd = val;
 
     if (vlc_wasync_resize_compressor_init(&sys->compressor, wnd))
     {
         msg_Err(wnd, "Failed to init async resize compressor");
-        goto error;
+        RemoveDrawable(val);
+        return VLC_EGENERIC;
     }
 
-    vlc_wasync_resize_compressor_reportSize(&sys->compressor, RECTWidth(sys->rect_parent),
-                                                                 RECTHeight(sys->rect_parent));
+    GetClientRect(val, &sys->rect_parent);
+    vlc_wasync_resize_compressor_reportSize(&sys->compressor,
+                                            RECTWidth(sys->rect_parent),
+                                            RECTHeight(sys->rect_parent));
+
+    sys->prev_proc = (WNDPROC)(uintptr_t) GetWindowLongPtr(val, GWLP_WNDPROC);
+    SetProp(val, EMBED_HWND_CLASS, sys);
+    SetWindowLongPtr(val, GWLP_WNDPROC, (LONG_PTR) WinVoutEventProc);
 
     wnd->type = VLC_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = (void *)val;
     wnd->ops = &ops;
-    wnd->sys = val;
+    wnd->sys = sys;
     return VLC_SUCCESS;
-
-error:
-    Close(wnd);
-    return VLC_EGENERIC;
 }
 
 /**
@@ -221,5 +200,13 @@ error:
  */
 static void Close (vlc_window_t *wnd)
 {
-    RemoveDrawable(wnd->sys);
+    struct drawable_sys *sys = wnd->sys;
+
+    // do not use our callback anymore
+    SetWindowLongPtr(sys->embed_hwnd, GWLP_WNDPROC, (LONG_PTR) sys->prev_proc);
+    RemoveProp(sys->embed_hwnd, EMBED_HWND_CLASS);
+
+    vlc_wasync_resize_compressor_destroy(&sys->compressor);
+
+    RemoveDrawable(sys->embed_hwnd);
 }
