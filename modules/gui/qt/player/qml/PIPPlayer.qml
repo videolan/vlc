@@ -90,7 +90,7 @@ Item {
                 anchors.centerIn: parent
 
                 font.pixelSize: VLCStyle.icon_large
-                text: (Player.playingState !== Player.PLAYING_STATE_PAUSED
+                iconText: (Player.playingState !== Player.PLAYING_STATE_PAUSED
                        && Player.playingState !== Player.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause
                       : VLCIcons.play
@@ -107,7 +107,7 @@ Item {
                 }
 
                 font.pixelSize: VLCStyle.icon_PIP
-                text: VLCIcons.close
+                iconText: VLCIcons.close
 
                 onClicked: mainPlaylistController.stop()
             }
@@ -122,7 +122,7 @@ Item {
                 }
 
                 font.pixelSize: VLCStyle.icon_PIP
-                text: VLCIcons.fullscreen
+                iconText: VLCIcons.fullscreen
 
                 onClicked: History.push(["player"])
             }

@@ -26,10 +26,12 @@ import "qrc:///style/"
 T.Button {
     id: control
 
+    property color color: "white"
+    property string iconText: ""
+
     width: content.implicitWidth
     height: content.implicitHeight
 
-    property color color: "white"
     font.family: VLCIcons.fontFamily
 
     Keys.priority: Keys.AfterItem
@@ -42,7 +44,7 @@ T.Button {
         T.Label {
             id: content
             anchors.centerIn: parent
-            text: control.text
+            text: control.iconText
             color: control.color
             font: control.font
         }

@@ -96,7 +96,7 @@ T.ToolButton {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
 
-        text: iconText
+        text: control.iconText
 
         color: control.background.foregroundColor
 
