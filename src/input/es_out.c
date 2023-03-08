@@ -974,6 +974,17 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
                                   &i_stream_duration, &i_system_duration ))
         return;
 
+    /* If demux signals PCR going back in time while we were buffering,
+     * we want to reset the pipeline, and reset buffering back to zero
+     * so that we don't compare a reference from the future against
+     * values from the past, which could artifically and arbitrarily
+     * increase the buffering duration. */
+    if (i_stream_duration < 0)
+    {
+        EsOutChangePosition(out, true, NULL);
+        return;
+    }
+
     vlc_tick_t i_preroll_duration = 0;
     if( p_sys->i_preroll_end >= 0 )
         i_preroll_duration = __MAX( p_sys->i_preroll_end - i_stream_start, 0 );
