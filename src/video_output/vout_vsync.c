@@ -152,7 +152,8 @@ static void SamplePicture(struct vlc_vout_scheduler *scheduler)
                                   priv->displayed.next->date, priv->rate);
 
     /* Well, we should use the most recent picture fitting in the vsync period */
-    if (new_next_pts /*- priv->vsync.initial_offset */< priv->vsync.next_date)
+    if (new_next_pts < priv->vsync.next_date ||
+        (new_next_pts <= system_now && priv->vsync.last_date == priv->vsync.next_date))
     {
         picture_Release(priv->displayed.current);
         NextPicture(scheduler);
