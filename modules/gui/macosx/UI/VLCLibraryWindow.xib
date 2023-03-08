@@ -498,11 +498,12 @@
                                                         </connections>
                                                     </slider>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="75c-FF-mgb">
-                                                        <rect key="frame" x="106" y="13" width="13" height="11"/>
+                                                        <rect key="frame" x="106" y="13" width="12" height="12"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="11" id="Kt0-WP-qU0"/>
+                                                            <constraint firstAttribute="height" constant="12" id="Kt0-WP-qU0"/>
+                                                            <constraint firstAttribute="width" secondItem="75c-FF-mgb" secondAttribute="height" multiplier="1:1" id="isb-xH-sqB"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="volume-high" imagePosition="only" alignment="center" id="a9Z-7I-lXJ">
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="VLCVolumeOnTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" id="a9Z-7I-lXJ">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system" size="10"/>
                                                         </buttonCell>
@@ -511,11 +512,12 @@
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="IAy-58-UPp">
-                                                        <rect key="frame" x="45" y="13" width="5" height="11"/>
+                                                        <rect key="frame" x="38" y="13" width="12" height="12"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="11" id="VxM-zR-jQR"/>
+                                                            <constraint firstAttribute="height" constant="12" id="VxM-zR-jQR"/>
+                                                            <constraint firstAttribute="width" secondItem="IAy-58-UPp" secondAttribute="height" multiplier="1:1" id="geK-ie-rhZ"/>
                                                         </constraints>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="volume-low" imagePosition="only" alignment="center" id="qTN-dX-Oj5">
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="VLCVolumeOffTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" id="qTN-dX-Oj5">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system" size="10"/>
                                                         </buttonCell>
@@ -826,6 +828,7 @@
                 <outlet property="dropView" destination="MQH-bI-Zdh" id="Wz9-NB-wtE"/>
                 <outlet property="forwardButton" destination="dPD-MZ-5oT" id="btH-v5-s7F"/>
                 <outlet property="fullscreenButton" destination="dwM-Uz-pAw" id="gXA-WS-Gig"/>
+                <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
                 <outlet property="playButton" destination="WgO-zh-k4s" id="0yC-Yh-H4V"/>
                 <outlet property="repeatButton" destination="t4r-bt-Jxm" id="U7s-Tb-Ado"/>
                 <outlet property="shuffleButton" destination="SYG-jf-oHJ" id="b4m-v0-sC9"/>
@@ -834,7 +837,6 @@
                 <outlet property="timeField" destination="zOB-QJ-TUy" id="mJL-1V-2lQ"/>
                 <outlet property="timeSlider" destination="9Hg-t2-K5z" id="sVe-s8-xW6"/>
                 <outlet property="trailingTimeField" destination="oGd-mG-cFw" id="geo-iq-0th"/>
-                <outlet property="muteVolumeButton" destination="IAy-58-UPp" id="dDN-pE-Vmj"/>
                 <outlet property="volumeSlider" destination="noz-yJ-oH4" id="nbe-1c-lFH"/>
                 <outlet property="volumeUpButton" destination="75c-FF-mgb" id="xRz-F4-n0Z"/>
             </connections>
@@ -1747,6 +1749,8 @@
         <image name="VLC" width="512" height="512"/>
         <image name="VLCBackwardTemplate" width="128" height="128"/>
         <image name="VLCForwardTemplate" width="128" height="128"/>
+        <image name="VLCVolumeOffTemplate" width="128" height="128"/>
+        <image name="VLCVolumeOnTemplate" width="128" height="128"/>
         <image name="arrow.up.arrow.down" catalog="system" width="19" height="15"/>
         <image name="dropzone" width="112" height="112"/>
         <image name="fullscreen-one-button" width="29" height="23"/>
@@ -1757,7 +1761,5 @@
         <image name="repeatOff" width="24" height="24"/>
         <image name="shuffleOn" width="24" height="24"/>
         <image name="trash" catalog="system" width="15" height="17"/>
-        <image name="volume-high" width="13" height="11"/>
-        <image name="volume-low" width="5" height="11"/>
     </resources>
 </document>
