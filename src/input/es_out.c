@@ -1185,6 +1185,12 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
                                   &i_stream_duration, &i_system_duration ))
         return;
 
+    if (i_stream_duration < 0)
+    {
+        EsOutChangePosition(out, true);
+        return;
+    }
+
     vlc_tick_t i_preroll_duration = 0;
     if( p_sys->i_preroll_end >= 0 )
         i_preroll_duration = __MAX( p_sys->i_preroll_end - i_stream_start, 0 );
