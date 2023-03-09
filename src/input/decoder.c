@@ -264,7 +264,7 @@ static inline bool vlc_input_decoder_IsSynchronous( const vlc_input_decoder_t *d
     return dec->p_sout != NULL;
 }
 
-static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
+static void Decoder_ChangePause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
 {
     vlc_fifo_Assert(p_owner->p_fifo);
 
@@ -288,7 +288,7 @@ static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused
     }
 }
 
-static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
+static void Decoder_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
 {
     vlc_fifo_Assert(p_owner->p_fifo);
 
@@ -319,7 +319,7 @@ static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
     p_owner->output_rate = rate;
 }
 
-static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t delay )
+static void Decoder_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t delay )
 {
     vlc_fifo_Assert(p_owner->p_fifo);
 
@@ -1805,7 +1805,7 @@ static void *DecoderThread( void *p_data )
         }
 
         /* Reset the original pause/rate state when a new aout/vout is created:
-         * this will trigger the DecoderThread_ChangePause/DecoderThread_ChangeRate code path
+         * this will trigger the Decoder_ChangePause/Decoder_ChangeRate code path
          * if needed. */
         if( p_owner->reset_out_state )
         {
@@ -1820,21 +1820,21 @@ static void *DecoderThread( void *p_data )
             vlc_tick_t date = p_owner->pause_date;
 
             paused = p_owner->paused;
-            DecoderThread_ChangePause( p_owner, paused, date );
+            Decoder_ChangePause( p_owner, paused, date );
             continue;
         }
 
         if( rate != p_owner->request_rate )
         {
             rate = p_owner->request_rate;
-            DecoderThread_ChangeRate( p_owner, rate );
+            Decoder_ChangeRate( p_owner, rate );
             continue;
         }
 
         if( delay != p_owner->delay )
         {
             delay = p_owner->delay;
-            DecoderThread_ChangeDelay( p_owner, delay );
+            Decoder_ChangeDelay( p_owner, delay );
             continue;
         }
 
