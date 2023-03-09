@@ -352,6 +352,7 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
     uint8_t *data = data_;
 
     vlc_mutex_lock(&sys->lock);
+    aaudio_stream_state_t state = GetState(stream);
 
     if (!sys->started)
     {
@@ -419,7 +420,8 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
 
         int64_t pos_frames;
         vlc_tick_t system_ts;
-        if (sys->timing_report_last_written_bytes >= sys->timing_report_delay_bytes
+        if (state == AAUDIO_STREAM_STATE_STARTED
+         && sys->timing_report_last_written_bytes >= sys->timing_report_delay_bytes
          && GetFrameTimestampLocked(stream, &pos_frames, &system_ts) == VLC_SUCCESS)
         {
             sys->timing_report_last_written_bytes = 0;
