@@ -26,26 +26,21 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: playerControlLayout
 
-    implicitWidth: layoutLoader_left.implicitWidth + layoutLoader_center.implicitWidth + layoutLoader_right.implicitWidth + 2 * layoutSpacing
-    implicitHeight: VLCStyle.maxControlbarControlHeight
+    // Properties
 
     property real defaultSize: VLCStyle.icon_normal // default size for IconToolButton based controls
 
     property real spacing: VLCStyle.margin_normal // spacing between controls
+
     property real layoutSpacing: VLCStyle.margin_xxlarge // spacing between layouts (left, center, and right)
 
     property int identifier: -1
+
     readonly property PlayerControlbarModel model: {
         if (!!MainCtx.controlbarProfileModel.currentModel)
-            MainCtx.controlbarProfileModel.currentModel.getModel(identifier)
+            return MainCtx.controlbarProfileModel.currentModel.getModel(identifier)
         else
-            null
-    }
-
-    signal requestLockUnlockAutoHide(bool lock)
-
-    Component.onCompleted: {
-        console.assert(identifier >= 0)
+            return null
     }
 
     readonly property ColorContext colorContext: ColorContext {
@@ -53,11 +48,28 @@ FocusScope {
         colorSet: ColorContext.Window
     }
 
+    // Signals
+
+    signal requestLockUnlockAutoHide(bool lock)
+
+    // Settings
+
+    implicitWidth: loaderLeft.implicitWidth + loaderCenter.implicitWidth
+                   + loaderRight.implicitWidth + 2 * layoutSpacing
+
+    implicitHeight: VLCStyle.maxControlbarControlHeight
+
+    // Events
+
+    Component.onCompleted: console.assert(identifier >= 0)
+
+    // Children
+
     Loader {
-        id: layoutLoader_left
+        id: loaderLeft
 
         anchors {
-            right: layoutLoader_center.left
+            right: loaderCenter.left
             left: parent.left
             top: parent.top
             bottom: parent.bottom
@@ -66,8 +78,7 @@ FocusScope {
             rightMargin: layoutSpacing - spacing
         }
 
-        active: !!playerControlLayout.model
-                && !!playerControlLayout.model.left
+        active: !!playerControlLayout.model && !!playerControlLayout.model.left
 
         focus: true
 
@@ -79,19 +90,19 @@ FocusScope {
                 ctx: MainCtx
             }
 
-            Navigation.parentItem: playerControlLayout
-            Navigation.rightItem: layoutLoader_center.item
-
             focus: true
 
             altFocusAction: Navigation.defaultNavigationRight
+
+            Navigation.parentItem: playerControlLayout
+            Navigation.rightItem: loaderCenter.item
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
     }
 
     Loader {
-        id: layoutLoader_center
+        id: loaderCenter
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -99,8 +110,7 @@ FocusScope {
             bottom: parent.bottom
         }
 
-        active: !!playerControlLayout.model
-                && !!playerControlLayout.model.center
+        active: !!playerControlLayout.model && !!playerControlLayout.model.center
 
         width: (parent.width < implicitWidth) ? parent.width
                                               : implicitWidth
@@ -113,23 +123,23 @@ FocusScope {
                 ctx: MainCtx
             }
 
-            Navigation.parentItem: playerControlLayout
-            Navigation.leftItem: layoutLoader_left.item
-            Navigation.rightItem: layoutLoader_right.item
-
             focus: true
 
             altFocusAction: Navigation.defaultNavigationUp
+
+            Navigation.parentItem: playerControlLayout
+            Navigation.leftItem: loaderLeft.item
+            Navigation.rightItem: loaderRight.item
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
     }
 
     Loader {
-        id: layoutLoader_right
+        id: loaderRight
 
         anchors {
-            left: layoutLoader_center.right
+            left: loaderCenter.right
             right: parent.right
             top: parent.top
             bottom: parent.bottom
@@ -138,8 +148,7 @@ FocusScope {
             leftMargin: layoutSpacing - spacing
         }
 
-        active: !!playerControlLayout.model
-                && !!playerControlLayout.model.right
+        active: !!playerControlLayout.model && !!playerControlLayout.model.right
 
         sourceComponent: ControlLayout {
             model: ControlListFilter {
@@ -151,12 +160,12 @@ FocusScope {
 
             rightAligned: true
 
-            Navigation.parentItem: playerControlLayout
-            Navigation.leftItem: layoutLoader_center.item
-
             focus: true
 
             altFocusAction: Navigation.defaultNavigationLeft
+
+            Navigation.parentItem: playerControlLayout
+            Navigation.leftItem: loaderCenter.item
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
