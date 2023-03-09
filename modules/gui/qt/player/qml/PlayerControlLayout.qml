@@ -32,7 +32,7 @@ FocusScope {
 
     property real spacing: VLCStyle.margin_normal // spacing between controls
 
-    property real layoutSpacing: VLCStyle.margin_xxlarge // spacing between layouts (left, center, and right)
+    property real layoutSpacing: VLCStyle.margin_xlarge // spacing between layouts (left, center, and right)
 
     property int identifier: -1
 
