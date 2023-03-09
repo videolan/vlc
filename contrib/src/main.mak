@@ -505,7 +505,7 @@ MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" \
 	$(MESONFLAGS)
 
 else
-MESON = meson $(MESONFLAGS)
+MESON = meson setup $(MESONFLAGS)
 endif
 MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
 MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(BUILD_DIR)
