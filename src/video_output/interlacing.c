@@ -79,14 +79,12 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     }
 
     /* */
-    char *old = var_CreateGetString(vout, "sout-deinterlace-mode");
     var_SetString(vout, "sout-deinterlace-mode", mode);
 
     msg_Dbg(vout, "deinterlace %d, mode %s, is_needed %d", deinterlace_state, mode, is_needed);
     vout_ControlChangeInterlacing(vout, deinterlace_state != 0 && (is_needed || deinterlace_state >= 0));
 
     /* */
-    free(old);
     free(mode);
     return VLC_SUCCESS;
 }
@@ -144,6 +142,8 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys
 
     var_SetInteger(vout, "deinterlace", deinterlace_state);
     free(deinterlace_mode);
+
+    var_Create(vout, "sout-deinterlace-mode", VLC_VAR_STRING);
 
     sys->interlacing.is_interlaced = false;
 }
