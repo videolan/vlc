@@ -160,6 +160,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
+    p_demux->ops        = NULL;
 
     char *modbuf = NULL;
     bool strict = true;
@@ -235,7 +236,294 @@ int demux_Demux(demux_t *demux)
 
 int demux_vaControl( demux_t *demux, int query, va_list args )
 {
-    return demux->pf_control( demux, query, args );
+    if (demux->ops == NULL)
+        return demux->pf_control( demux, query, args );
+
+    switch (query) {
+        case DEMUX_CAN_SEEK:
+        {
+            bool *can_seek = va_arg(args, bool *);
+            if (demux->ops->can_seek != NULL) {
+                *can_seek = demux->ops->can_seek(demux);
+            } else {
+                *can_seek = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_CAN_PAUSE:
+        {
+            bool *can_pause = va_arg(args, bool *);
+            if (demux->ops->can_pause != NULL) {
+                *can_pause = demux->ops->can_pause(demux);
+            } else {
+                *can_pause = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_CAN_RECORD:
+        {
+            bool *can_record = va_arg(args, bool *);
+            if (demux->ops->demux.can_record != NULL) {
+                *can_record = demux->ops->demux.can_record(demux);
+            } else {
+                *can_record = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_CAN_CONTROL_PACE:
+        {
+            bool *can_control_pace = va_arg(args, bool *);
+            if (demux->ops->can_control_pace != NULL) {
+                *can_control_pace = demux->ops->can_control_pace(demux);
+            } else {
+                *can_control_pace = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_CAN_CONTROL_RATE:
+        {
+            bool *can_control_rate = va_arg(args, bool *);
+            if (demux->ops->demux.can_control_rate != NULL) {
+                *can_control_rate = demux->ops->demux.can_control_rate(demux);
+            } else {
+                *can_control_rate = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_HAS_UNSUPPORTED_META:
+        {
+            bool *has_unsupported_meta = va_arg(args, bool *);
+            if (demux->ops->demux.has_unsupported_meta != NULL) {
+                *has_unsupported_meta = demux->ops->demux.has_unsupported_meta(demux);
+            } else {
+                *has_unsupported_meta = false;
+            }
+            return VLC_SUCCESS;
+        }
+        case DEMUX_GET_PTS_DELAY:
+            if (demux->ops->get_pts_delay != NULL) {
+                vlc_tick_t *pts_delay = va_arg(args, vlc_tick_t *);
+                return demux->ops->get_pts_delay(demux, pts_delay);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_TITLE_INFO:
+            if (demux->ops->demux.get_title_info != NULL) {
+                input_title_t ***title_info = va_arg(args, input_title_t ***);
+                int *size = va_arg(args, int *);
+                int *pi_title_offset = va_arg(args, int *);
+                int *pi_seekpoint_offset = va_arg(args, int *);
+                return demux->ops->demux.get_title_info(demux, title_info, size, pi_title_offset, pi_seekpoint_offset);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_TITLE:
+            if (demux->ops->demux.get_title != NULL) {
+                int *title = va_arg(args, int *);
+                return demux->ops->demux.get_title(demux, title);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_SEEKPOINT:
+            if (demux->ops->demux.get_seekpoint != NULL) {
+                int *seekpoint = va_arg(args, int *);
+                return demux->ops->demux.get_seekpoint(demux, seekpoint);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_META:
+            if (demux->ops->get_meta != NULL) {
+                vlc_meta_t *meta = va_arg(args, vlc_meta_t *);
+                return demux->ops->get_meta(demux, meta);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_SIGNAL:
+            if (demux->ops->get_signal != NULL) {
+                double *quality = va_arg(args, double *);
+                double *strength = va_arg(args, double *);
+                return demux->ops->get_signal(demux, quality, strength);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_TYPE:
+            if (demux->ops->get_type != NULL) {
+                int *type = va_arg(args, int *);
+                return demux->ops->get_type(demux, type);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_POSITION:
+            if (demux->ops->demux.get_position != NULL) {
+                *va_arg(args, double *) = demux->ops->demux.get_position(demux);
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_LENGTH:
+            if (demux->ops->demux.get_length != NULL) {
+                *va_arg(args, vlc_tick_t *) = demux->ops->demux.get_length(demux);
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_TIME:
+            if (demux->ops->demux.get_time != NULL) {
+                *va_arg(args, vlc_tick_t *) = demux->ops->demux.get_time(demux);
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_NORMAL_TIME:
+            if (demux->ops->demux.get_normal_time != NULL) {
+                vlc_tick_t *normal_time = va_arg(args, vlc_tick_t *);
+                return demux->ops->demux.get_normal_time(demux, normal_time);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_FPS:
+            if (demux->ops->demux.get_fps != NULL) {
+                double *fps = va_arg(args, double *);
+                return demux->ops->demux.get_fps(demux, fps);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_GET_ATTACHMENTS:
+            if (demux->ops->demux.get_attachments != NULL) {
+                input_attachment_t ***attachments = va_arg(args, input_attachment_t ***);
+                return demux->ops->demux.get_attachments(demux, attachments);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_SEEKPOINT:
+            if (demux->ops->set_seek_point != NULL) {
+                int seekpoint = va_arg(args, int);
+                return demux->ops->set_seek_point(demux, seekpoint);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_TITLE:
+            if (demux->ops->set_title != NULL) {
+                int title = va_arg(args, int);
+                return demux->ops->set_title(demux, title);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_PAUSE_STATE:
+            if (demux->ops->set_pause_state != NULL) {
+                bool pause_state = (bool)va_arg(args, int);
+                return demux->ops->set_pause_state(demux, pause_state);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_RECORD_STATE:
+            if (demux->ops->demux.set_record_state != NULL) {
+                bool record_state = (bool)va_arg(args, int);
+                const char *dir_path = NULL;
+                if (record_state) {
+                    dir_path = va_arg(args, const char *);
+                }
+                return demux->ops->demux.set_record_state(demux, record_state, dir_path);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_POSITION:
+        {
+            if (demux->ops->demux.set_position != NULL) {
+                double position = va_arg(args, double);
+                bool precise = (bool)va_arg(args, int);
+                return demux->ops->demux.set_position(demux, position, precise);
+            }
+            return VLC_EGENERIC;
+        }
+        case DEMUX_SET_TIME:
+        {
+            if (demux->ops->demux.set_time != NULL) {
+                vlc_tick_t time = va_arg(args, vlc_tick_t);
+                bool precise = (bool)va_arg(args, int);
+                return demux->ops->demux.set_time(demux, time, precise);
+            }
+            return VLC_EGENERIC;
+        }
+        case DEMUX_SET_NEXT_DEMUX_TIME:
+            if (demux->ops->demux.set_next_demux_time != NULL) {
+                vlc_tick_t next_demux_time = va_arg(args, vlc_tick_t);
+                return demux->ops->demux.set_next_demux_time(demux, next_demux_time);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_RATE:
+            if (demux->ops->demux.set_next_demux_time != NULL) {
+                float *rate = va_arg(args, float *);
+                return demux->ops->demux.set_rate(demux, rate);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_GROUP_DEFAULT:
+            if (demux->ops->demux.set_group_default != NULL) {
+                return demux->ops->demux.set_group_default(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_GROUP_ALL:
+            if (demux->ops->demux.set_group_all != NULL) {
+                return demux->ops->demux.set_group_all(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_GROUP_LIST:
+            if (demux->ops->demux.set_group_list != NULL) {
+                size_t size = va_arg(args, size_t);
+                const int *idx = va_arg(args, const int *);
+                return demux->ops->demux.set_group_list(demux, size, idx);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_ES:
+            if (demux->ops->demux.set_es != NULL) {
+                int es = va_arg(args, int);
+                return demux->ops->demux.set_es(demux, es);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_SET_ES_LIST:
+            if (demux->ops->demux.set_es_list != NULL) {
+                size_t size = va_arg(args, size_t);
+                const int *idx = va_arg(args, const int *);
+                return demux->ops->demux.set_es_list(demux, size, idx);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_ACTIVATE:
+            if (demux->ops->demux.nav_activate != NULL) {
+                return demux->ops->demux.nav_activate(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_UP:
+            if (demux->ops->demux.nav_up != NULL) {
+                return demux->ops->demux.nav_up(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_DOWN:
+            if (demux->ops->demux.nav_down != NULL) {
+                return demux->ops->demux.nav_down(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_LEFT:
+            if (demux->ops->demux.nav_left != NULL) {
+                return demux->ops->demux.nav_left(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_RIGHT:
+            if (demux->ops->demux.nav_right != NULL) {
+                return demux->ops->demux.nav_right(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_POPUP:
+            if (demux->ops->demux.nav_popup != NULL) {
+                return demux->ops->demux.nav_popup(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_NAV_MENU:
+            if (demux->ops->demux.nav_menu != NULL) {
+                return demux->ops->demux.nav_menu(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_FILTER_ENABLE:
+            if (demux->ops->demux.filter_enable != NULL) {
+                return demux->ops->demux.filter_enable(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_FILTER_DISABLE:
+            if (demux->ops->demux.filter_disable != NULL) {
+                return demux->ops->demux.filter_disable(demux);
+            }
+            return VLC_EGENERIC;
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+            if (demux->ops->demux.test_and_clear_flags != NULL) {
+                unsigned *flags = va_arg(args, unsigned *);
+                return demux->ops->demux.test_and_clear_flags(demux, flags);
+            }
+            return VLC_EGENERIC;
+        default:
+            vlc_assert_unreachable();
+    }
 }
 
 /*****************************************************************************

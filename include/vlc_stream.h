@@ -74,7 +74,44 @@ struct vlc_stream_operations {
             int (*set_private_id_ca)(stream_t *, void *);
         } stream;
         struct {
-            /* TODO: Add the demux callbacks */
+            bool (*can_record)(demux_t *);
+            bool (*can_control_rate)(demux_t *);
+
+            bool (*has_unsupported_meta)(demux_t *);
+
+            int (*get_title)(demux_t *, int *);
+            int (*get_seekpoint)(demux_t *, int *);
+            double (*get_position)(demux_t *);
+            vlc_tick_t (*get_length)(demux_t *);
+            vlc_tick_t (*get_time)(demux_t *);
+            int (*get_normal_time)(demux_t *, vlc_tick_t *);
+            int (*get_title_info)(demux_t *, input_title_t ***, int *, int *, int *);
+            int (*get_fps)(demux_t *, double *);
+            int (*get_attachments)(demux_t *, input_attachment_t ***);
+
+            int (*set_position)(demux_t *, double, bool);
+            int (*set_time)(demux_t *, vlc_tick_t, bool);
+            int (*set_next_demux_time)(demux_t *, vlc_tick_t);
+            int (*set_record_state)(demux_t *, bool, const char *);
+            int (*set_rate)(demux_t *, float *);
+            int (*set_group_default)(demux_t *);
+            int (*set_group_all)(demux_t *);
+            int (*set_group_list)(demux_t *, size_t, const int *);
+            int (*set_es)(demux_t *, int);
+            int (*set_es_list)(demux_t *, size_t, const int *);
+           
+            int (*nav_activate)(demux_t *);
+            int (*nav_up)(demux_t *);
+            int (*nav_down)(demux_t *);
+            int (*nav_left)(demux_t *);
+            int (*nav_right)(demux_t *);
+            int (*nav_popup)(demux_t *);
+            int (*nav_menu)(demux_t *);
+
+            int (*filter_enable)(demux_t *);
+            int (*filter_disable)(demux_t *);
+
+            int (*test_and_clear_flags)(demux_t *, unsigned *);
         } demux;
     };
 };
