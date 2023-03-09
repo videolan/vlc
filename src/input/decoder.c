@@ -193,12 +193,11 @@ struct vlc_input_decoder_t
 #define PREROLL_FORCED VLC_TICK_MAX
 
     /* Pause & Rate */
-    bool reset_out_state;
     vlc_tick_t pause_date;
-    vlc_tick_t delay;
+    vlc_tick_t delay, output_delay;
     float rate, output_rate;
     unsigned frames_countdown;
-    bool paused;
+    bool paused, output_paused;
 
     bool error;
 
@@ -284,6 +283,7 @@ static void Decoder_ChangeOutputPause( vlc_input_decoder_t *p_owner, bool paused
         default:
             vlc_assert_unreachable();
     }
+    p_owner->output_paused = paused;
 }
 
 static void Decoder_ChangeOutputRate( vlc_input_decoder_t *p_owner, float rate )
@@ -345,6 +345,19 @@ static void Decoder_ChangeOutputDelay( vlc_input_decoder_t *p_owner, vlc_tick_t 
         default:
             vlc_assert_unreachable();
     }
+    p_owner->output_delay = delay;
+}
+
+static void Decoder_UpdateOutState(vlc_input_decoder_t *owner)
+{
+    if (owner->paused)
+        Decoder_ChangeOutputPause(owner, owner->paused, owner->pause_date);
+
+    if (owner->rate != 1.f)
+        Decoder_ChangeOutputRate(owner, owner->rate);
+
+    if (owner->delay != 0)
+        Decoder_ChangeOutputDelay(owner, owner->delay);
 }
 
 /**
@@ -569,7 +582,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         p_dec->fmt_out.audio.i_frame_length =
             p_owner->fmt.audio.i_frame_length;
 
-        p_owner->reset_out_state = true;
+        Decoder_UpdateOutState( p_owner );
         vlc_fifo_Unlock( p_owner->p_fifo );
     }
     return 0;
@@ -660,7 +673,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
 
         if (vout_state == INPUT_RESOURCE_VOUT_STARTED)
         {
-            p_owner->reset_out_state = true;
+            Decoder_UpdateOutState( p_owner );
             vlc_fifo_Unlock(p_owner->p_fifo);
 
             decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
@@ -1687,9 +1700,6 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
 static void *DecoderThread( void *p_data )
 {
     vlc_input_decoder_t *p_owner = (vlc_input_decoder_t *)p_data;
-    float rate = 1.f;
-    vlc_tick_t delay = 0;
-    bool paused = false;
 
     const char *thread_name;
     switch (p_owner->dec.fmt_in->i_cat)
@@ -1726,37 +1736,21 @@ static void *DecoderThread( void *p_data )
             continue;
         }
 
-        /* Reset the original pause/rate state when a new aout/vout is created:
-         * this will trigger the Decoder_ChangeOutputPause/Decoder_ChangeOutputRate code path
-         * if needed. */
-        if( p_owner->reset_out_state )
-        {
-            rate = 1.f;
-            paused = false;
-            delay = 0;
-            p_owner->reset_out_state = false;
-        }
-
-        if( paused != p_owner->paused )
+        if( p_owner->paused != p_owner->output_paused )
         {   /* Update playing/paused status of the output */
-            vlc_tick_t date = p_owner->pause_date;
-
-            paused = p_owner->paused;
-            Decoder_ChangeOutputPause( p_owner, paused, date );
+            Decoder_ChangeOutputPause( p_owner, p_owner->paused, p_owner->pause_date );
             continue;
         }
 
-        if( rate != p_owner->rate )
+        if( p_owner->rate != p_owner->output_rate )
         {
-            rate = p_owner->rate;
-            Decoder_ChangeOutputRate( p_owner, rate );
+            Decoder_ChangeOutputRate( p_owner, p_owner->rate );
             continue;
         }
 
-        if( delay != p_owner->delay )
+        if( p_owner->delay != p_owner->output_delay )
         {
-            delay = p_owner->delay;
-            Decoder_ChangeOutputDelay( p_owner, delay );
+            Decoder_ChangeOutputDelay( p_owner, p_owner->delay );
             continue;
         }
 
@@ -1892,10 +1886,9 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
 
-    p_owner->reset_out_state = false;
-    p_owner->delay = 0;
+    p_owner->output_delay = p_owner->delay = 0;
     p_owner->output_rate = p_owner->rate = 1.f;
-    p_owner->paused = false;
+    p_owner->output_paused = p_owner->paused = false;
     p_owner->pause_date = VLC_TICK_INVALID;
     p_owner->frames_countdown = 0;
 
