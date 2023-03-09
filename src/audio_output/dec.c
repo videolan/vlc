@@ -788,6 +788,17 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(stream->sync.clock, system_now, original_pts,
                                   stream->sync.rate);
+
+    if (stream->sync.request_delay < 0 &&
+        stream->timing.played_samples == 0 &&
+        play_date < system_now)
+    {
+        /* This should only happen if stream is not master */
+        msg_Warn(aout, "playback late due to negative delay: %" PRId64,
+                 play_date - system_now);
+        goto drop;
+    }
+
     if (unlikely(play_date == VLC_TICK_MAX))
     {
         /* The clock is paused but not the output, play the audio anyway since
