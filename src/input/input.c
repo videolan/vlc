@@ -1862,6 +1862,31 @@ void input_SetProgramId(input_thread_t *input, int group_id)
     }
 }
 
+int input_SetEsCatDelay(input_thread_t *input, enum es_format_category_e cat,
+                        vlc_tick_t delay)
+{
+    input_thread_private_t *sys = input_priv(input);
+    /* A failure can only happen in the input_ControlPush section. */
+    int ret = VLC_SUCCESS;
+
+    if (!sys->is_running && !sys->is_stopped)
+    {
+        /* Not running, send the control synchronously since we are sure that
+         * it won't block */
+        es_out_SetDelay(sys->p_es_out_display, cat, delay);
+    }
+    else
+    {
+        const input_control_param_t param = {
+            .cat_delay = { cat, delay }
+        };
+        ret = input_ControlPush(input, INPUT_CONTROL_SET_CATEGORY_DELAY,
+                                &param);
+    }
+
+    return ret;
+}
+
 void input_SetEsCatIds(input_thread_t *input, enum es_format_category_e cat,
                        const char *str_ids)
 {

@@ -626,6 +626,26 @@ static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type
 void input_SetProgramId(input_thread_t *input, int group_id);
 
 /**
+ * Set the default delay applied to the given category.
+ *
+ * Set the default delay for the given \p es_format_category_e synchronously
+ * if the input is not running yet, otherwise push a control to signal to the
+ * input which delay should be updated.
+ *
+ * @param input Any input to change the delay for.
+ * @param cat The ES category to apply the delay to.
+ * @param delay The delay to apply to the category, a positive delay shifting
+ *              the track to the future.
+ * @return VLC_SUCCESS when the delay has been applied, or signal an error
+ *         otherwise.
+ *
+ * @note This function can be called before start or while running.
+ * @note This function is not thread-safe, the caller should handle the locking.
+ */
+int input_SetEsCatDelay(input_thread_t *input, enum es_format_category_e cat,
+                        vlc_tick_t delay);
+
+/**
  * Set the list of string ids to enable for a category
  *
  * cf. ES_OUT_SET_ES_CAT_IDS
