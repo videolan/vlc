@@ -264,6 +264,91 @@ static inline bool vlc_input_decoder_IsSynchronous( const vlc_input_decoder_t *d
     return dec->p_sout != NULL;
 }
 
+static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
+{
+    vlc_fifo_Assert(p_owner->p_fifo);
+
+    decoder_t *p_dec = &p_owner->dec;
+
+    msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
+    switch( p_dec->fmt_in->i_cat )
+    {
+        case VIDEO_ES:
+            if( p_owner->p_vout != NULL && p_owner->vout_started )
+                vout_ChangePause( p_owner->p_vout, paused, date );
+            break;
+        case AUDIO_ES:
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_ChangePause( p_owner->p_astream, paused, date );
+            break;
+        case SPU_ES:
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
+static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
+{
+    vlc_fifo_Assert(p_owner->p_fifo);
+
+    decoder_t *p_dec = &p_owner->dec;
+
+    msg_Dbg( p_dec, "changing rate: %f", rate );
+    switch( p_dec->fmt_in->i_cat )
+    {
+        case VIDEO_ES:
+            if( p_owner->p_vout != NULL && p_owner->vout_started )
+                vout_ChangeRate( p_owner->p_vout, rate );
+            break;
+        case AUDIO_ES:
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_ChangeRate( p_owner->p_astream, rate );
+            break;
+        case SPU_ES:
+            if( p_owner->p_vout != NULL )
+            {
+                assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
+                vout_ChangeSpuRate(p_owner->p_vout, p_owner->i_spu_channel,
+                                   rate );
+            }
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+    p_owner->output_rate = rate;
+}
+
+static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t delay )
+{
+    vlc_fifo_Assert(p_owner->p_fifo);
+
+    decoder_t *p_dec = &p_owner->dec;
+
+    msg_Dbg( p_dec, "changing delay: %"PRId64, delay );
+    switch( p_dec->fmt_in->i_cat )
+    {
+        case VIDEO_ES:
+            if( p_owner->p_vout != NULL && p_owner->vout_started )
+                vout_ChangeDelay( p_owner->p_vout, delay );
+            break;
+        case AUDIO_ES:
+            if( p_owner->p_astream != NULL )
+                vlc_aout_stream_ChangeDelay( p_owner->p_astream, delay );
+            break;
+        case SPU_ES:
+            if( p_owner->p_vout != NULL )
+            {
+                assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
+                vout_ChangeSpuDelay(p_owner->p_vout, p_owner->i_spu_channel,
+                                    delay);
+            }
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 /**
  * Load a decoder module
  */
@@ -1670,91 +1755,6 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
         }
     }
     vlc_mutex_unlock(&p_owner->cc.lock);
-}
-
-static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused, vlc_tick_t date )
-{
-    vlc_fifo_Assert(p_owner->p_fifo);
-
-    decoder_t *p_dec = &p_owner->dec;
-
-    msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
-    switch( p_dec->fmt_in->i_cat )
-    {
-        case VIDEO_ES:
-            if( p_owner->p_vout != NULL && p_owner->vout_started )
-                vout_ChangePause( p_owner->p_vout, paused, date );
-            break;
-        case AUDIO_ES:
-            if( p_owner->p_astream != NULL )
-                vlc_aout_stream_ChangePause( p_owner->p_astream, paused, date );
-            break;
-        case SPU_ES:
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
-}
-
-static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
-{
-    vlc_fifo_Assert(p_owner->p_fifo);
-
-    decoder_t *p_dec = &p_owner->dec;
-
-    msg_Dbg( p_dec, "changing rate: %f", rate );
-    switch( p_dec->fmt_in->i_cat )
-    {
-        case VIDEO_ES:
-            if( p_owner->p_vout != NULL && p_owner->vout_started )
-                vout_ChangeRate( p_owner->p_vout, rate );
-            break;
-        case AUDIO_ES:
-            if( p_owner->p_astream != NULL )
-                vlc_aout_stream_ChangeRate( p_owner->p_astream, rate );
-            break;
-        case SPU_ES:
-            if( p_owner->p_vout != NULL )
-            {
-                assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
-                vout_ChangeSpuRate(p_owner->p_vout, p_owner->i_spu_channel,
-                                   rate );
-            }
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
-    p_owner->output_rate = rate;
-}
-
-static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t delay )
-{
-    vlc_fifo_Assert(p_owner->p_fifo);
-
-    decoder_t *p_dec = &p_owner->dec;
-
-    msg_Dbg( p_dec, "changing delay: %"PRId64, delay );
-    switch( p_dec->fmt_in->i_cat )
-    {
-        case VIDEO_ES:
-            if( p_owner->p_vout != NULL && p_owner->vout_started )
-                vout_ChangeDelay( p_owner->p_vout, delay );
-            break;
-        case AUDIO_ES:
-            if( p_owner->p_astream != NULL )
-                vlc_aout_stream_ChangeDelay( p_owner->p_astream, delay );
-            break;
-        case SPU_ES:
-            if( p_owner->p_vout != NULL )
-            {
-                assert(p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID);
-                vout_ChangeSpuDelay(p_owner->p_vout, p_owner->i_spu_channel,
-                                    delay);
-            }
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
 }
 
 /**
