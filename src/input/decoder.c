@@ -350,6 +350,18 @@ static void Decoder_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t delay 
     p_owner->output_delay = delay;
 }
 
+static void Decoder_UpdateOutState(vlc_input_decoder_t *owner)
+{
+    if (owner->paused)
+        Decoder_ChangePause(owner, owner->paused, owner->pause_date);
+
+    if (owner->request_rate != 1.f)
+        Decoder_ChangeRate(owner, owner->request_rate);
+
+    if (owner->request_delay != 0)
+        Decoder_ChangeDelay(owner, owner->request_delay);
+}
+
 /**
  * Load a decoder module
  */
@@ -581,9 +593,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         p_dec->fmt_out.audio.i_frame_length =
             p_owner->fmt.audio.i_frame_length;
 
-        p_owner->output_rate = 1.f;
-        p_owner->output_paused = false;
-        p_owner->output_delay = 0;
+        Decoder_UpdateOutState( p_owner );
         vlc_fifo_Unlock( p_owner->p_fifo );
     }
     return 0;
@@ -698,9 +708,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
 
         if (vout_state == INPUT_RESOURCE_VOUT_STARTED)
         {
-            p_owner->output_rate = 1.f;
-            p_owner->output_paused = false;
-            p_owner->output_delay = 0;
+            Decoder_UpdateOutState( p_owner );
             vlc_fifo_Unlock(p_owner->p_fifo);
 
             decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
