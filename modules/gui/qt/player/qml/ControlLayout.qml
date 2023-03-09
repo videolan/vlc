@@ -30,9 +30,7 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: controlLayout
 
-    signal requestLockUnlockAutoHide(bool lock)
-
-    property alias model: repeater.model
+    // Properties
 
     readonly property real minimumWidth: {
         var minimumWidth = 0
@@ -54,6 +52,26 @@ FocusScope {
 
     property bool rightAligned: false
 
+    property var altFocusAction: Navigation.defaultNavigationUp
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Window
+    }
+
+    // Aliases
+
+    property alias model: repeater.model
+
+    // Signals
+
+    signal requestLockUnlockAutoHide(bool lock)
+
+    // Settings
+
+    implicitWidth: minimumWidth
+    implicitHeight: rowLayout.implicitHeight
+
     Navigation.navigable: {
         for (var i = 0; i < repeater.count; ++i) {
             if (repeater.itemAt(i).item.focus) {
@@ -63,10 +81,14 @@ FocusScope {
         return false
     }
 
-    implicitWidth: minimumWidth
-    implicitHeight: rowLayout.implicitHeight
+    // Events
 
-    property var altFocusAction: Navigation.defaultNavigationUp
+    Component.onCompleted: {
+        visibleChanged.connect(_handleFocus)
+        activeFocusChanged.connect(_handleFocus)
+    }
+
+    // Functions
 
     function _handleFocus() {
         if (typeof activeFocus === "undefined")
@@ -76,15 +98,7 @@ FocusScope {
             altFocusAction()
     }
 
-    Component.onCompleted: {
-        visibleChanged.connect(_handleFocus)
-        activeFocusChanged.connect(_handleFocus)
-    }
-
-    readonly property ColorContext colorContext: ColorContext {
-        id: theme
-        colorSet: ColorContext.Window
-    }
+    // Children
 
     RowLayout {
         id: rowLayout
@@ -113,6 +127,13 @@ FocusScope {
             delegate: Loader {
                 id: loader
 
+                // Properties
+
+                readonly property real minimumWidth: (expandable ? item.minimumWidth : item.implicitWidth)
+                readonly property bool expandable: (item.minimumWidth !== undefined)
+
+                // Settings
+
                 source: PlayerControlbarControls.control(model.id).source
 
                 focus: (index === 0)
@@ -122,9 +143,6 @@ FocusScope {
                 Layout.fillWidth: expandable
                 Layout.maximumWidth: item.implicitWidth
 
-                readonly property real minimumWidth: (expandable ? item.minimumWidth : item.implicitWidth)
-                readonly property bool expandable: (item.minimumWidth !== undefined)
-
                 BindingCompat {
                     delayed: true // this is important
                     target: loader
@@ -132,27 +150,13 @@ FocusScope {
                     value: (loader.x + minimumWidth <= rowLayout.width)
                 }
 
+                // Events
+
                 Component.onCompleted: repeater.countChanged.connect(controlLayout._handleFocus)
 
                 onActiveFocusChanged: {
                     if (activeFocus && (!!item && !item.focus)) {
                         recoverFocus()
-                    }
-                }
-
-                Connections {
-                    target: item
-
-                    enabled: loader.status === Loader.Ready
-
-                    onEnabledChanged: {
-                        if (activeFocus && !item.enabled) // Loader has focus but item is not enabled
-                            recoverFocus()
-                    }
-
-                    onVisibleChanged: {
-                        if (activeFocus && !item.visible)
-                            recoverFocus()
                     }
                 }
 
@@ -181,6 +185,26 @@ FocusScope {
                         })
                     }
                 }
+
+                // Connections
+
+                Connections {
+                    target: item
+
+                    enabled: loader.status === Loader.Ready
+
+                    onEnabledChanged: {
+                        if (activeFocus && !item.enabled) // Loader has focus but item is not enabled
+                            recoverFocus()
+                    }
+
+                    onVisibleChanged: {
+                        if (activeFocus && !item.visible)
+                            recoverFocus()
+                    }
+                }
+
+                // Functions
 
                 function applyNavigation() {
                     var itemLeft  = repeater.itemAt(index - 1)
@@ -223,20 +247,6 @@ FocusScope {
                     }
                 }
 
-                function _focusIfFocusable(_loader) {
-                    if (!!_loader && !!_loader.item && _loader.item.focus) {
-                        if (item.focusReason !== undefined)
-                            _loader.item.forceActiveFocus(item.focusReason)
-                        else {
-                            console.warn("focusReason is not available in %1!".arg(item))
-                            _loader.item.forceActiveFocus()
-                        }
-                        return true
-                    } else {
-                        return false
-                    }
-                }
-
                 function recoverFocus(_index) {
                     if (!controlLayout.visible)
                         return
@@ -268,6 +278,22 @@ FocusScope {
                         controlLayout.Navigation.defaultNavigationLeft()
                     } else {
                         controlLayout.altFocusAction()
+                    }
+                }
+
+                // Private
+
+                function _focusIfFocusable(_loader) {
+                    if (!!_loader && !!_loader.item && _loader.item.focus) {
+                        if (item.focusReason !== undefined)
+                            _loader.item.forceActiveFocus(item.focusReason)
+                        else {
+                            console.warn("focusReason is not available in %1!".arg(item))
+                            _loader.item.forceActiveFocus()
+                        }
+                        return true
+                    } else {
+                        return false
                     }
                 }
             }
