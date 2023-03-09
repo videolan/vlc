@@ -459,7 +459,7 @@ MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBD
 	$(MESONFLAGS)
 
 else
-MESON = meson $(MESONFLAGS)
+MESON = meson setup $(MESONFLAGS)
 endif
 MESONCLEAN = rm -rf $</build
 MESONBUILD = meson compile -C $</build $(MESON_BUILD) && meson install -C $</build
