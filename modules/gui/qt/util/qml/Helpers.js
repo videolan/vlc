@@ -30,7 +30,7 @@ function isValidInstanceOf(object, type) {
 // If the hash contains no item with the key,
 // or the value is invalid, returns defaultValue
 function get(dict, key, defaultValue) {
-    var v = typeof dict !== "undefined" ? dict[key] : undefined
+    var v = typeof dict !== "undefined" && !!dict ? dict[key] : undefined
     return typeof v === "undefined" ? defaultValue : v
 }
 
