@@ -357,14 +357,13 @@ Control {
 
                     opacity: 0.8
 
-                    T.Label {
+                    Widgets.IconLabel {
                         anchors.centerIn: parent
 
                         text: VLCIcons.add
 
-                        font.pointSize: VLCStyle.fontHeight_xxxlarge
+                        font.pixelSize: VLCStyle.fontHeight_xxxlarge
 
-                        font.family: VLCIcons.fontFamily
                         color: theme.accent
                     }
                 }
