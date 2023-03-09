@@ -220,7 +220,7 @@ enum CoreAudio_Layout
 
 struct CoreAudio_layout_s
 {
-    uint32_t i_channels_layout_tag;
+    enum CoreAudio_Layout i_channels_layout_tag;
     uint32_t i_channels_bitmap;
     uint32_t i_channels_description_count;
     struct
