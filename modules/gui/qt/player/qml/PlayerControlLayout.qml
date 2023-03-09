@@ -48,35 +48,96 @@ FocusScope {
         colorSet: ColorContext.Window
     }
 
+    // Private
+
+    property int _minimumSpacing: layoutSpacing - spacing
+
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
 
     // Settings
 
-    implicitWidth: loaderLeft.implicitWidth + loaderCenter.implicitWidth
-                   + loaderRight.implicitWidth + 2 * layoutSpacing
-
     implicitHeight: VLCStyle.maxControlbarControlHeight
 
     // Events
 
-    Component.onCompleted: console.assert(identifier >= 0)
+    Component.onCompleted: {
+        console.assert(identifier >= 0)
+
+        _updateLayout()
+    }
+
+    onWidthChanged: _updateLayout()
+
+    // Functions
+
+    function _updateLayout() {
+        var item = loaderCenter.item
+
+        // NOTE: Sometimes this gets called before the item is loaded.
+        if (item === null)
+            return
+
+        if (item.count) {
+
+            loaderCenter.width = Math.min(loaderCenter.implicitWidth, width)
+
+            loaderLeft.width = loaderCenter.x - _minimumSpacing
+
+            loaderRight.width = width - loaderCenter.x - loaderCenter.width - _minimumSpacing
+
+        } else if (loaderRight.item.count) {
+
+            var implicitLeft = loaderLeft.implicitWidth
+            var implicitRight = loaderRight.implicitWidth
+
+            var total = implicitLeft + implicitRight
+
+            var size = total + _minimumSpacing
+
+            if (size > width) {
+                size = width - _minimumSpacing
+
+                // NOTE: When both sizes are equals we expand on the left.
+                if (implicitLeft >= implicitRight) {
+
+                    loaderRight.width = Math.round(size * (implicitRight / total))
+
+                    var contentWidth = loaderRight.item.contentWidth
+
+                    // NOTE: We assign the remaining width based on the contentWidth.
+                    if (contentWidth)
+                        loaderLeft.width = width - contentWidth - _minimumSpacing
+                    else
+                        loaderLeft.width = width
+                } else {
+                    loaderLeft.width = Math.round(size * (implicitLeft / total))
+
+                    var contentWidth = loaderLeft.item.contentWidth
+
+                    // NOTE: We assign the remaining width based on the contentWidth.
+                    if (contentWidth)
+                        loaderRight.width = width - contentWidth - _minimumSpacing
+                    else
+                        loaderRight.width = width
+                }
+            } else {
+                loaderLeft.width = implicitLeft
+                loaderRight.width = implicitRight
+            }
+        } else
+            loaderLeft.width = width
+    }
 
     // Children
 
     Loader {
         id: loaderLeft
 
-        anchors {
-            right: loaderCenter.left
-            left: parent.left
-            top: parent.top
-            bottom: parent.bottom
-
-            // Spacing for the filler item acts as padding
-            rightMargin: layoutSpacing - spacing
-        }
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
         active: !!playerControlLayout.model && !!playerControlLayout.model.left
 
@@ -90,12 +151,18 @@ FocusScope {
                 ctx: MainCtx
             }
 
+            alignment: Qt.AlignLeft
+
             focus: true
 
             altFocusAction: Navigation.defaultNavigationRight
 
             Navigation.parentItem: playerControlLayout
             Navigation.rightItem: loaderCenter.item
+
+            onImplicitWidthChanged: playerControlLayout._updateLayout()
+
+            onCountChanged: playerControlLayout._updateLayout()
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
@@ -104,16 +171,12 @@ FocusScope {
     Loader {
         id: loaderCenter
 
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            bottom: parent.bottom
-        }
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+        anchors.horizontalCenter: parent.horizontalCenter
 
         active: !!playerControlLayout.model && !!playerControlLayout.model.center
-
-        width: (parent.width < implicitWidth) ? parent.width
-                                              : implicitWidth
 
         sourceComponent: ControlLayout {
             model: ControlListFilter {
@@ -131,6 +194,10 @@ FocusScope {
             Navigation.leftItem: loaderLeft.item
             Navigation.rightItem: loaderRight.item
 
+            onImplicitWidthChanged: playerControlLayout._updateLayout()
+
+            onCountChanged: playerControlLayout._updateLayout()
+
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
     }
@@ -138,15 +205,9 @@ FocusScope {
     Loader {
         id: loaderRight
 
-        anchors {
-            left: loaderCenter.right
-            right: parent.right
-            top: parent.top
-            bottom: parent.bottom
-
-            // Spacing for the filler item acts as padding
-            leftMargin: layoutSpacing - spacing
-        }
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
 
         active: !!playerControlLayout.model && !!playerControlLayout.model.right
 
@@ -158,7 +219,7 @@ FocusScope {
                 ctx: MainCtx
             }
 
-            rightAligned: true
+            alignment: Qt.AlignRight
 
             focus: true
 
@@ -166,6 +227,10 @@ FocusScope {
 
             Navigation.parentItem: playerControlLayout
             Navigation.leftItem: loaderCenter.item
+
+            onImplicitWidthChanged: playerControlLayout._updateLayout()
+
+            onCountChanged: playerControlLayout._updateLayout()
 
             onRequestLockUnlockAutoHide: playerControlLayout.requestLockUnlockAutoHide(lock)
         }
