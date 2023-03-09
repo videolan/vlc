@@ -1663,9 +1663,7 @@ vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
         delay = *cat_delay;
     }
 
-    const input_control_param_t param = { .cat_delay = { cat, delay } };
-    int ret = input_ControlPush(input->thread, INPUT_CONTROL_SET_CATEGORY_DELAY,
-                                &param);
+    int ret = input_SetEsCatDelay(input->thread, cat, delay);
     if (ret == VLC_SUCCESS)
     {
         vlc_player_osd_Message(player, _("%s delay: %i ms"),
