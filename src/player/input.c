@@ -734,9 +734,7 @@ vlc_player_input_HandleAoutLatency(struct vlc_player_input *input,
     {
         enum es_format_category_e cat = cats[i];
         vlc_tick_t delay = input->cat_delays[cat] + latency;
-
-        const input_control_param_t param = { .cat_delay = { cat, delay } };
-        input_ControlPush(input->thread, INPUT_CONTROL_SET_CATEGORY_DELAY, &param);
+        input_SetEsCatDelay(input->thread, cat, input->cat_delays[cat] + latency);
     }
 }
 
