@@ -74,7 +74,9 @@ FocusScope {
 
     Navigation.navigable: {
         for (var i = 0; i < repeater.count; ++i) {
-            if (repeater.itemAt(i).item.focus) {
+            var item = repeater.itemAt(i).item
+
+            if (item && item.focus) {
                 return true
             }
         }
@@ -129,8 +131,16 @@ FocusScope {
 
                 // Properties
 
-                readonly property real minimumWidth: (expandable ? item.minimumWidth : item.implicitWidth)
-                readonly property bool expandable: (item.minimumWidth !== undefined)
+                property int minimumWidth: {
+                    if (expandable)
+                        return item.minimumWidth
+                    else if (item)
+                        return item.implicitWidth
+                    else
+                        return 0
+                }
+
+                readonly property bool expandable: (item && item.minimumWidth !== undefined)
 
                 // Settings
 
@@ -138,10 +148,14 @@ FocusScope {
 
                 focus: (index === 0)
 
-                Layout.alignment: Qt.AlignVCenter | (rightAligned ? Qt.AlignRight : Qt.AlignLeft)
-                Layout.minimumWidth: minimumWidth
                 Layout.fillWidth: expandable
-                Layout.maximumWidth: item.implicitWidth
+
+                Layout.minimumWidth: minimumWidth
+
+                // NOTE: -1 resets to the implicit maximum width.
+                Layout.maximumWidth: (item) ? item.implicitWidth : -1
+
+                Layout.alignment: Qt.AlignVCenter | (rightAligned ? Qt.AlignRight : Qt.AlignLeft)
 
                 BindingCompat {
                     delayed: true // this is important
@@ -207,27 +221,37 @@ FocusScope {
                 // Functions
 
                 function applyNavigation() {
+                    if (item == null) return
+
                     var itemLeft  = repeater.itemAt(index - 1)
                     var itemRight = repeater.itemAt(index + 1)
 
                     if (itemLeft) {
-                        var componentLeft = itemLeft.item;
+                        var componentLeft = itemLeft.item
 
-                        item.Navigation.leftItem = componentLeft
+                        if (componentLeft)
+                        {
+                            item.Navigation.leftItem = componentLeft
 
-                        componentLeft.Navigation.rightItem = item
+                            componentLeft.Navigation.rightItem = item
+                        }
                     }
 
                     if (itemRight) {
-                        var componentRight = itemRight.item;
+                        var componentRight = itemRight.item
 
-                        item.Navigation.rightItem = componentRight
+                        if (componentRight)
+                        {
+                            item.Navigation.rightItem = componentRight
 
-                        componentRight.Navigation.leftItem = item
+                            componentRight.Navigation.leftItem = item
+                        }
                     }
                 }
 
                 function removeNavigation() {
+                    if (item == null) return
+
                     var itemLeft = repeater.itemAt(index - 1)
 
                     // NOTE: The current item was removed from the repeater so we test against the
@@ -248,6 +272,8 @@ FocusScope {
                 }
 
                 function recoverFocus(_index) {
+                    if (item == null) return
+
                     if (!controlLayout.visible)
                         return
 
