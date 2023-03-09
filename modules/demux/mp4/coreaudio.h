@@ -21,24 +21,6 @@
 #define VLC_DEMUX_COREAUDIO_H
 #include <vlc_aout.h>
 
-struct CoreAudio_layout_s
-{
-    uint32_t i_channels_layout_tag;
-    uint32_t i_channels_bitmap;
-    uint32_t i_channels_description_count;
-    struct
-    {
-        uint32_t i_channel_label;
-        uint32_t i_channel_flags;
-        float    f_coordinates[3];
-    } *p_descriptions;
-};
-
-static inline void CoreAudio_Layout_Clean(struct CoreAudio_layout_s *c)
-{
-    free( c->p_descriptions );
-}
-
 /* According to Apple's CoreAudio_Bitmap/CoreAudio_BitmapTypes.h */
 enum
 {
@@ -69,50 +51,6 @@ enum
     CoreAudio_Bitmap_LEFTTOPREAR          = (1<<24),
     CoreAudio_Bitmap_CENTERTOPREAR        = (1<<25),
     CoreAudio_Bitmap_RIGHTTOPREAR         = (1<<26),
-};
-
-static const uint32_t pi_vlc_chan_order_CoreAudio[] =
-{
-    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
-    AOUT_CHAN_LFE,
-    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARCENTER,
-    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-    0
-};
-
-static const struct
-{
-    uint32_t i_bitmap;
-    uint32_t i_vlc_bitmap;
-} CoreAudio_Bitmap_mapping[] = {
-    { CoreAudio_Bitmap_LEFT,         AOUT_CHAN_LEFT },
-    { CoreAudio_Bitmap_RIGHT,        AOUT_CHAN_RIGHT },
-    { CoreAudio_Bitmap_CENTER,       AOUT_CHAN_CENTER },
-    { CoreAudio_Bitmap_LFESCREEN,    AOUT_CHAN_LFE },
-    { CoreAudio_Bitmap_LEFTSURROUND,     AOUT_CHAN_REARLEFT },
-    { CoreAudio_Bitmap_RIGHTSURROUND,    AOUT_CHAN_REARRIGHT },
-    { CoreAudio_Bitmap_LEFTCENTER,   AOUT_CHAN_LEFT },
-    { CoreAudio_Bitmap_RIGHTCENTER,  AOUT_CHAN_RIGHT },
-    { CoreAudio_Bitmap_CENTERSURROUND,   AOUT_CHAN_REARCENTER },
-    { CoreAudio_Bitmap_LEFTSURROUNDDIRECT,     AOUT_CHAN_MIDDLELEFT },
-    { CoreAudio_Bitmap_RIGHTSURROUNDDIRECT,    AOUT_CHAN_MIDDLERIGHT },
-    { CoreAudio_Bitmap_TOPCENTERSURROUND,    0 },
-    { CoreAudio_Bitmap_VHEIGHTLEFT, 0 },
-    { CoreAudio_Bitmap_VHEIGHTCENTER,0 },
-    { CoreAudio_Bitmap_VHEIGHTRIGHT,0 },
-    { CoreAudio_Bitmap_TOPBACKLEFT,  0 },
-    { CoreAudio_Bitmap_TOPBACKCENTER,0 },
-    { CoreAudio_Bitmap_TOPBACKRIGHT, 0 },
-    // CoreAudio_Bitmap_LEFTTOPFRONT
-    // CoreAudio_Bitmap_CENTERTOPFRONT
-    // CoreAudio_Bitmap_RIGHTTOPFRONT
-    { CoreAudio_Bitmap_LEFTTOPMIDDLE, 0 },
-    // CoreAudio_Bitmap_CENTERTOPMIDDLE
-    { CoreAudio_Bitmap_RIGHTTOPMIDDLE, 0 },
-    { CoreAudio_Bitmap_LEFTTOPREAR, 0 },
-    { CoreAudio_Bitmap_CENTERTOPREAR, 0 },
-    { CoreAudio_Bitmap_RIGHTTOPREAR, 0 },
 };
 
 enum CoreAudio_Layout
@@ -278,6 +216,68 @@ enum CoreAudio_Layout
 
     CoreAudio_Layout_DiscreteInOrder    = (147<<16) | 0,
     CoreAudio_Layout_Unknown            = 0xFFFF0000
+};
+
+struct CoreAudio_layout_s
+{
+    uint32_t i_channels_layout_tag;
+    uint32_t i_channels_bitmap;
+    uint32_t i_channels_description_count;
+    struct
+    {
+        uint32_t i_channel_label;
+        uint32_t i_channel_flags;
+        float    f_coordinates[3];
+    } *p_descriptions;
+};
+
+static inline void CoreAudio_Layout_Clean(struct CoreAudio_layout_s *c)
+{
+    free( c->p_descriptions );
+}
+
+static const uint32_t pi_vlc_chan_order_CoreAudio[] =
+{
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+    AOUT_CHAN_LFE,
+    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARCENTER,
+    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+    0
+};
+
+static const struct
+{
+    uint32_t i_bitmap;
+    uint32_t i_vlc_bitmap;
+} CoreAudio_Bitmap_mapping[] = {
+    { CoreAudio_Bitmap_LEFT,         AOUT_CHAN_LEFT },
+    { CoreAudio_Bitmap_RIGHT,        AOUT_CHAN_RIGHT },
+    { CoreAudio_Bitmap_CENTER,       AOUT_CHAN_CENTER },
+    { CoreAudio_Bitmap_LFESCREEN,    AOUT_CHAN_LFE },
+    { CoreAudio_Bitmap_LEFTSURROUND,     AOUT_CHAN_REARLEFT },
+    { CoreAudio_Bitmap_RIGHTSURROUND,    AOUT_CHAN_REARRIGHT },
+    { CoreAudio_Bitmap_LEFTCENTER,   AOUT_CHAN_LEFT },
+    { CoreAudio_Bitmap_RIGHTCENTER,  AOUT_CHAN_RIGHT },
+    { CoreAudio_Bitmap_CENTERSURROUND,   AOUT_CHAN_REARCENTER },
+    { CoreAudio_Bitmap_LEFTSURROUNDDIRECT,     AOUT_CHAN_MIDDLELEFT },
+    { CoreAudio_Bitmap_RIGHTSURROUNDDIRECT,    AOUT_CHAN_MIDDLERIGHT },
+    { CoreAudio_Bitmap_TOPCENTERSURROUND,    0 },
+    { CoreAudio_Bitmap_VHEIGHTLEFT, 0 },
+    { CoreAudio_Bitmap_VHEIGHTCENTER,0 },
+    { CoreAudio_Bitmap_VHEIGHTRIGHT,0 },
+    { CoreAudio_Bitmap_TOPBACKLEFT,  0 },
+    { CoreAudio_Bitmap_TOPBACKCENTER,0 },
+    { CoreAudio_Bitmap_TOPBACKRIGHT, 0 },
+    // CoreAudio_Bitmap_LEFTTOPFRONT
+    // CoreAudio_Bitmap_CENTERTOPFRONT
+    // CoreAudio_Bitmap_RIGHTTOPFRONT
+    { CoreAudio_Bitmap_LEFTTOPMIDDLE, 0 },
+    // CoreAudio_Bitmap_CENTERTOPMIDDLE
+    { CoreAudio_Bitmap_RIGHTTOPMIDDLE, 0 },
+    { CoreAudio_Bitmap_LEFTTOPREAR, 0 },
+    { CoreAudio_Bitmap_CENTERTOPREAR, 0 },
+    { CoreAudio_Bitmap_RIGHTTOPREAR, 0 },
 };
 
 static inline int CoreAudio_Bitmap_to_vlc_bitmap( const struct CoreAudio_layout_s *c,
