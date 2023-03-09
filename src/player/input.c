@@ -1077,12 +1077,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         input->cat_delays[i] = cat_delays[i];
         if (cat_delays[i] != 0)
         {
-            const input_control_param_t param = {
-                .cat_delay = { i, cat_delays[i] }
-            };
-            int ret = input_ControlPush(input->thread,
-                                        INPUT_CONTROL_SET_CATEGORY_DELAY,
-                                        &param);
+            int ret = input_SetEsCatDelay(input->thread, i, cat_delays[i]);
             if (ret == VLC_SUCCESS)
                 vlc_player_SendEvent(player, on_category_delay_changed, i,
                                      cat_delays[i]);
