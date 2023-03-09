@@ -19,15 +19,17 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQml.Models 2.2
+
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-FocusScope {
+MainInterface.MainViewLoader {
     id: root
 
     // Properties
@@ -36,47 +38,18 @@ FocusScope {
         { text: I18n.qtr("Alphabetic"), criteria: "title" }
     ]
 
-    readonly property var currentIndex: _currentView.currentIndex
+    readonly property var currentIndex: Helpers.get(currentItem, "currentIndex", - 1)
 
-    //the index to "go to" when the view is loaded
-    property int initialIndex: 0
-
-    // Aliases
-
-    property alias leftPadding: view.leftPadding
-    property alias rightPadding: view.rightPadding
-
-    property alias model: genreModel
-
-    property alias _currentView: view.currentItem
+    // FIXME: remove this
+    property var _currentView: currentItem
 
     signal showAlbumView(var id, string name, int reason)
 
-    onInitialIndexChanged:  resetFocus()
+    model: genreModel
 
-    function loadView() {
-        if (MainCtx.gridView) {
-            view.replace(gridComponent)
-        } else {
-            view.replace(tableComponent)
-        }
-    }
-
-    function resetFocus() {
-        if (genreModel.count === 0) {
-            return
-        }
-        var initialIndex = root.initialIndex
-        if (initialIndex >= genreModel.count)
-            initialIndex = 0
-        selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (_currentView)
-            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
-    }
-
-    function setCurrentItemFocus(reason) {
-        _currentView.setCurrentItemFocus(reason);
-    }
+    list: tableComponent
+    grid: gridComponent
+    emptyLabel: emptyLabelComponent
 
     MLGenreModel {
         id: genreModel
@@ -101,12 +74,6 @@ FocusScope {
         }
     }
 
-    Util.SelectableDelegateModel {
-        id: selectionModel
-
-        model: genreModel
-    }
-
     Widgets.MLDragItem {
         id: genreDragItem
 
@@ -125,10 +92,11 @@ FocusScope {
     onActiveFocusChanged: {
         if (activeFocus && genreModel.count > 0 && !selectionModel.hasSelection) {
             var initialIndex = 0
-            if (_currentView.currentIndex !== -1)
-                initialIndex = _currentView.currentIndex
+            if (currentIndex !== -1)
+                initialIndex = currentIndex
+
             selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-            _currentView.currentIndex = initialIndex
+            currentItem.currentIndex = initialIndex
         }
     }
 
@@ -319,33 +287,14 @@ FocusScope {
         }
     }
 
-    Widgets.StackViewExt {
-        id: view
 
-        anchors.fill: parent
+    Component {
+        id: emptyLabelComponent
 
-        initialItem: MainCtx.gridView ? gridComponent : tableComponent
-
-        focus: genreModel.count !== 0
-    }
-
-    Connections {
-        target: MainCtx
-        onGridViewChanged: {
-            if (MainCtx.gridView) {
-                view.replace(gridComponent)
-            } else {
-                view.replace(tableComponent)
-            }
+        EmptyLabelButton {
+            text: I18n.qtr("No genres found\nPlease try adding sources, by going to the Browse tab")
+            Navigation.parentItem: root
+            cover: VLCStyle.noArtAlbumCover
         }
-    }
-
-    EmptyLabelButton {
-        anchors.fill: parent
-        visible: genreModel.isReady && (genreModel.count <= 0)
-        focus: visible
-        text: I18n.qtr("No genres found\nPlease try adding sources, by going to the Browse tab")
-        Navigation.parentItem: root
-        cover: VLCStyle.noArtAlbumCover
     }
 }
