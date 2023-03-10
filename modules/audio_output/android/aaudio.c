@@ -39,6 +39,13 @@
 
 struct sys
 {
+    struct
+    {
+        aaudio_format_t format;
+        int32_t session_id;
+        bool low_latency;
+    } cfg;
+
     AAudioStream *as;
 
     jobject dp;
@@ -489,7 +496,7 @@ CloseAAudioStream(aout_stream_t *stream)
 }
 
 static int
-OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
+OpenAAudioStream(aout_stream_t *stream)
 {
     struct sys *sys = stream->sys;
     aaudio_result_t result;
@@ -502,28 +509,11 @@ OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    aaudio_format_t format;
-    if (fmt->i_format == VLC_CODEC_S16N)
-        format = AAUDIO_FORMAT_PCM_I16;
-    else
-    {
-        if (fmt->i_format != VLC_CODEC_FL32)
-        {
-            /* override to request conversion */
-            fmt->i_format = VLC_CODEC_FL32;
-            fmt->i_bytes_per_frame = 4 * fmt->i_channels;
-        }
-        format = AAUDIO_FORMAT_PCM_FLOAT;
-    }
-
-    vt.AAudioStreamBuilder_setFormat(builder, format);
-    vt.AAudioStreamBuilder_setChannelCount(builder, fmt->i_channels);
+    vt.AAudioStreamBuilder_setFormat(builder, sys->cfg.format);
+    vt.AAudioStreamBuilder_setChannelCount(builder, sys->fmt.i_channels);
 
     /* Setup the session-id */
-    int32_t session_id = var_InheritInteger(stream, "audiotrack-session-id");
-    if (session_id == 0)
-        session_id = AAUDIO_SESSION_ID_ALLOCATE;
-    vt.AAudioStreamBuilder_setSessionId(builder, session_id);
+    vt.AAudioStreamBuilder_setSessionId(builder, sys->cfg.session_id);
 
     /* Setup the role */
     char *vlc_role = var_InheritString(stream, "role");
@@ -534,17 +524,10 @@ OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
         free(vlc_role);
     } /* else if not set, default is MEDIA usage */
 
-    bool low_latency = false;
-    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
-    {
-        fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
-        low_latency = true;
-    }
-
     vt.AAudioStreamBuilder_setDataCallback(builder, DataCallback, stream);
     vt.AAudioStreamBuilder_setErrorCallback(builder, ErrorCallback, stream);
 
-    if (low_latency)
+    if (sys->cfg.low_latency)
         vt.AAudioStreamBuilder_setPerformanceMode(builder,
             AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
 
@@ -558,14 +541,42 @@ OpenAAudioStream(aout_stream_t *stream, audio_sample_format_t *fmt)
     }
     vt.AAudioStreamBuilder_delete(builder);
 
-    /* Use the native sample rate of the device */
-    fmt->i_rate = vt.AAudioStream_getSampleRate(as);
-    assert(fmt->i_rate > 0);
-
     sys->as = as;
-    sys->fmt = *fmt;
 
     return VLC_SUCCESS;
+}
+
+static void
+PrepareAudioFormat(aout_stream_t *stream, audio_sample_format_t *fmt)
+{
+    struct sys *sys = stream->sys;
+
+    sys->cfg.session_id = var_InheritInteger(stream, "audiotrack-session-id");
+    if (sys->cfg.session_id == 0)
+        sys->cfg.session_id = AAUDIO_SESSION_ID_ALLOCATE;
+
+    if (fmt->i_format == VLC_CODEC_S16N)
+        sys->cfg.format = AAUDIO_FORMAT_PCM_I16;
+    else
+    {
+        if (fmt->i_format != VLC_CODEC_FL32)
+        {
+            /* override to request conversion */
+            fmt->i_format = VLC_CODEC_FL32;
+            fmt->i_bytes_per_frame = 4 * fmt->i_channels;
+        }
+        sys->cfg.format = AAUDIO_FORMAT_PCM_FLOAT;
+    }
+
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    {
+        fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
+        sys->cfg.low_latency = true;
+    }
+    else
+        sys->cfg.low_latency = false;
+
+    sys->fmt = *fmt;
 }
 
 static void
@@ -814,17 +825,23 @@ Start(aout_stream_t *stream, audio_sample_format_t *fmt,
     sys->timing_report_last_written_bytes = 0;
     sys->timing_report_delay_bytes = 0;
 
-    int ret = OpenAAudioStream(stream, fmt);
+    PrepareAudioFormat(stream, fmt);
+
+    int ret = OpenAAudioStream(stream);
     if (ret != VLC_SUCCESS)
     {
         free(sys);
         return ret;
     }
 
-    int32_t session_id = vt.AAudioStream_getSessionId(sys->as);
+    /* Use the native sample rate of the device */
+    sys->fmt.i_rate = fmt->i_rate = vt.AAudioStream_getSampleRate(sys->as);
+    assert(fmt->i_rate > 0);
 
-    if (session_id != AAUDIO_SESSION_ID_NONE)
-        sys->dp = DynamicsProcessing_New(stream, session_id);
+    sys->cfg.session_id = vt.AAudioStream_getSessionId(sys->as);
+
+    if (sys->cfg.session_id != AAUDIO_SESSION_ID_NONE)
+        sys->dp = DynamicsProcessing_New(stream, sys->cfg.session_id);
     else
         sys->dp = NULL;
 
